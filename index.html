@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Talen Overhoren</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--ink:#172033;--muted:#687386;--accent:#315efb;--ok:#159447;--bad:#d83a4a;--border:#dfe4ee}
+*{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(135deg,#315efb,#6848d8);color:white;padding:28px 18px}
+.wrap{max-width:1000px;margin:auto}.brand{display:flex;justify-content:space-between;align-items:center;gap:16px}.brand h1{margin:0;font-size:28px}.brand p{margin:5px 0 0;opacity:.88}
+main{padding:22px 14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px;box-shadow:0 6px 20px #1720330a}
+h2{margin:0 0 14px;font-size:19px}label{display:block;font-weight:650;margin:12px 0 6px}input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:10px;font:inherit;background:#fff}
+textarea{min-height:160px;resize:vertical}.hint{color:var(--muted);font-size:13px;line-height:1.45}
+button{border:0;border-radius:10px;padding:11px 15px;font:inherit;font-weight:700;cursor:pointer;background:var(--accent);color:#fff}button.secondary{background:#eef1f7;color:var(--ink)}button.danger{background:#fff0f1;color:var(--bad)}button:disabled{opacity:.5;cursor:not-allowed}
+.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.stats{display:flex;gap:10px;flex-wrap:wrap}.pill{padding:7px 10px;background:#f0f3fa;border-radius:999px;font-size:13px}
+.quiz{display:none;margin-top:18px}.quiz.active{display:block}.question{font-size:30px;font-weight:800;text-align:center;padding:24px 10px 14px}.progress{height:8px;background:#e9edf5;border-radius:20px;overflow:hidden}.progress>div{height:100%;background:var(--accent);width:0}.answerRow{display:flex;gap:10px;margin-top:14px}.answerRow input{flex:1}.feedback{text-align:center;font-weight:800;min-height:28px;margin-top:12px}.ok{color:var(--ok)}.bad{color:var(--bad)}
+.wordlist{max-height:280px;overflow:auto;border:1px solid var(--border);border-radius:10px}.word{display:flex;justify-content:space-between;gap:10px;padding:9px 11px;border-bottom:1px solid var(--border);font-size:14px}.word:last-child{border-bottom:0}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:30px 10px}
+@media(max-width:720px){.grid{grid-template-columns:1fr}.brand{align-items:flex-start;flex-direction:column}.question{font-size:25px}}
+</style>
+</head>
+<body>
+<header><div class="wrap brand">
+  <div><h1>🌍 Talen Overhoren</h1><p>Oefen woordjes eenvoudig alleen of samen met klasgenoten.</p></div>
+  <button id="startTop">Overhoren</button>
+</div></header>
+
+<main class="wrap">
+<div class="grid">
+<section class="card">
+<h2>1. Woordjes invoeren</h2>
+<label for="setName">Naam van de woordenlijst</label>
+<input id="setName" value="Mijn woordenlijst" placeholder="Bijv. Frans hoofdstuk 3">
+<label for="language">Taal</label>
+<input id="language" value="Frans" placeholder="Bijv. Frans">
+<label for="words">Woorden — één paar per regel</label>
+<textarea id="words" placeholder="bonjour = hallo&#10;merci = bedankt&#10;maison = huis"></textarea>
+<div class="hint">Gebruik <b>=</b> tussen het vreemde woord en de Nederlandse vertaling. Komma werkt ook. Hoofdletters tellen niet mee.</div>
+<div class="actions">
+<button id="save">Opslaan op dit apparaat</button>
+<button class="secondary" id="clear">Wissen</button>
+</div>
+</section>
+
+<section class="card">
+<h2>2. Mijn woordenlijst</h2>
+<div class="stats" id="stats"></div>
+<div class="wordlist" id="wordlist"><div class="hint" style="padding:12px">Voer hierboven woorden in.</div></div>
+<div class="actions">
+<button id="start">Start overhoring</button>
+<button class="secondary" id="share">Deel woordenlijst</button>
+</div>
+<p class="hint">Delen maakt een link met de woordenlijst. Iedereen met die link kan de lijst openen.</p>
+</section>
+</div>
+
+<section class="card quiz" id="quiz">
+<h2 id="quizTitle">Overhoring</h2>
+<div class="progress"><div id="bar"></div></div>
+<div class="question" id="question">—</div>
+<div class="hint" style="text-align:center" id="direction">Vertaal naar het Nederlands</div>
+<div class="answerRow"><input id="answer" autocomplete="off" placeholder="Typ je antwoord…"><button id="check">Controleer</button></div>
+<div class="feedback" id="feedback"></div>
+<div class="actions" style="justify-content:center">
+<button class="secondary" id="skip">Overslaan</button>
+<button class="secondary" id="stop">Stoppen</button>
+</div>
+</section>
+</main>
+<footer>Talen Overhoren • Werkt op telefoon, tablet en computer.</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+let pairs=[], order=[], pos=0, score=0, answered=false, reverse=false;
+
+function parseWords(text){
+ return text.split(/\n+/).map(x=>x.trim()).filter(Boolean).map(line=>{
+   let parts=line.split(/\s*=\s*|\s*;\s*|\s*,\s*/);
+   return parts.length>=2?{foreign:parts[0].trim(), dutch:parts.slice(1).join(', ').trim()}:null;
+ }).filter(x=>x&&x.foreign&&x.dutch);
+}
+function render(){
+ pairs=parseWords($('words').value);
+ $('wordlist').innerHTML=pairs.length?pairs.map((p,i)=>`<div class="word"><span>${i+1}. ${escape(p.foreign)}</span><span>${escape(p.dutch)}</span></div>`).join(''):'<div class="hint" style="padding:12px">Nog geen woorden.</div>';
+ $('stats').innerHTML=`<span class="pill">${pairs.length} woorden</span><span class="pill">${escape($('language').value||'Taal')}</span>`;
+}
+function escape(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function save(){localStorage.setItem('talenOverhoren',JSON.stringify({name:$('setName').value,language:$('language').value,words:$('words').value})); render(); alert('Opgeslagen op dit apparaat.');}
+function load(){
+ let d=localStorage.getItem('talenOverhoren');
+ if(d) try{d=JSON.parse(d);$('setName').value=d.name||'';$('language').value=d.language||'';$('words').value=d.words||'';}catch(e){}
+ const q=new URLSearchParams(location.search).get('list');
+ if(q) try{let d=JSON.parse(decodeURIComponent(escape(atob(q))));$('setName').value=d.name||'';$('language').value=d.language||'';$('words').value=d.words||'';}catch(e){}
+ render();
+}
+function start(){
+ pairs=parseWords($('words').value);
+ if(pairs.length<1){alert('Voer eerst minstens één woordpaar in.');return}
+ order=[...Array(pairs.length).keys()].sort(()=>Math.random()-.5);pos=0;score=0;answered=false;reverse=Math.random()<.5;
+ $('quiz').classList.add('active'); $('quizTitle').textContent=($('setName').value||'Overhoring');
+ $('feedback').textContent=''; showQuestion(); $('quiz').scrollIntoView({behavior:'smooth'});
+}
+function showQuestion(){
+ let p=pairs[order[pos]], q=reverse?p.dutch:p.foreign;
+ $('question').textContent=q; $('direction').textContent=reverse?`Vertaal naar ${$('language').value||'de andere taal'}`:'Vertaal naar het Nederlands';
+ $('answer').value=''; $('answer').focus(); $('feedback').textContent=''; answered=false;
+ $('bar').style.width=((pos)/order.length*100)+'%';
+}
+function norm(s){return s.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[.!?]/g,'');}
+function check(){
+ if(answered)return;
+ let p=pairs[order[pos]], expected=reverse?p.foreign:p.dutch, got=$('answer').value;
+ if(!got.trim())return;
+ answered=true;
+ if(norm(got)===norm(expected)){score++;$('feedback').className='feedback ok';$('feedback').textContent='✓ Goed!';}
+ else{$('feedback').className='feedback bad';$('feedback').textContent='✗ Goed antwoord: '+expected;}
+ setTimeout(()=>{pos++; if(pos>=order.length){$('bar').style.width='100%';$('question').textContent='Klaar!';$('direction').textContent=`Score: ${score} / ${order.length}`;$('answer').value='';$('feedback').className='feedback';$('feedback').textContent='';return} showQuestion();},900);
+}
+function share(){
+ pairs=parseWords($('words').value);
+ if(!pairs.length){alert('Voer eerst woorden in.');return}
+ let d={name:$('setName').value,language:$('language').value,words:$('words').value};
+ let code=btoa(unescape(encodeURIComponent(JSON.stringify(d))));
+ let url=location.origin+location.pathname+'?list='+encodeURIComponent(code);
+ navigator.clipboard?.writeText(url).then(()=>alert('Deel-link gekopieerd!')).catch(()=>prompt('Kopieer deze link:',url));
+}
+$('words').addEventListener('input',render);$('language').addEventListener('input',render);
+$('save').onclick=save;$('clear').onclick=()=>{if(confirm('Woordenlijst wissen?')){$('words').value='';render();}};
+$('start').onclick=start;$('startTop').onclick=start;$('check').onclick=check;$('answer').addEventListener('keydown',e=>{if(e.key==='Enter')check()});
+$('skip').onclick=()=>{if(!answered){pos++;if(pos>=order.length){$('question').textContent='Klaar!';$('direction').textContent=`Score: ${score} / ${order.length}`;return}showQuestion()}};
+$('stop').onclick=()=>{$('quiz').classList.remove('active')};$('share').onclick=share;load();
+</script>
+</body></html>

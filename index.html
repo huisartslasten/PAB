@@ -566,8 +566,7 @@ function showSubject(subject) {
       </span>
     `;
 
-    btn.onclick = () =>
-      showLesson(lesson.id);
+  btn.onclick = () => openLesson(lesson.id);
 
     container.appendChild(btn);
 
@@ -578,7 +577,15 @@ function showSubject(subject) {
 /* =========================
    LES VIEW
 ========================= */
+function openLesson(id) {
+  currentLesson = allLessons.find(l => l.id === id);
+  if (!currentLesson) return;
 
+  hideAll();
+
+  document.getElementById("lessonChoice").classList.remove("hidden");
+  document.getElementById("choiceTitle").textContent = currentLesson.title;
+}
 function showLesson(id) {
 
   if (id) {

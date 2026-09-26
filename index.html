@@ -1555,21 +1555,12 @@ function finishQuiz() {
 
 function goBack() {
 
-  if (editingLessonId) {
-
-    showLesson();
-
-  } else if (currentSubject) {
-
-    showSubject(
-      currentSubject
-    );
-
+  if (currentLesson && currentSubject) {
+    showSubject(currentSubject);
   } else {
-
     showHome();
-
   }
+
 }
 
 

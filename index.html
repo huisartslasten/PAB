@@ -571,11 +571,19 @@ label {
 
   <!-- HOME -->
   <section id="home">
-    <div class="topbar">
-      <h2>Vakken</h2>
-      <button onclick="showAddLesson()">➕ Nieuwe les</button>
-    </div>
+   <div class="topbar">
+  <h2>Vakken</h2>
 
+  <div class="row">
+    <button id="loginButton" class="secondary" onclick="showLogin()">
+      🔐 Ouder login
+    </button>
+
+    <button id="addLessonButton" onclick="showAddLesson()">
+      ➕ Nieuwe les
+    </button>
+  </div>
+</div>
     <div id="subjects" class="grid"></div>
   </section>
 
@@ -583,8 +591,9 @@ label {
   <section id="lessonList" class="hidden">
     <div class="topbar">
       <button class="secondary" onclick="showHome()">← Terug</button>
-      <button onclick="showAddLesson(currentSubject)">➕ Nieuwe les</button>
-    </div>
+<button id="addLessonButton2" onclick="showAddLesson(currentSubject)">
+  ➕ Nieuwe les
+</button>    </div>
 
     <h2 id="subjectTitle"></h2>
     <div id="lessons"></div>

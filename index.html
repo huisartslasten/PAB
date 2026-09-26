@@ -282,6 +282,30 @@ label {
     </div>
   </section>
 
+<!-- LESSON CHOICE -->
+<section id="lessonChoice" class="hidden">
+  <div class="topbar">
+    <button class="secondary" onclick="goBack()">← Terug</button>
+  </div>
+
+  <div class="card">
+    <h2 id="choiceTitle"></h2>
+    <p class="small">
+      Wil je de les eerst bekijken of jezelf meteen overhoren?
+    </p>
+
+    <div class="row">
+      <button class="big-button" onclick="showLesson()">
+        📖 Les bekijken
+      </button>
+
+      <button class="green big-button" onclick="startQuiz()">
+        ▶️ Direct overhoren
+      </button>
+    </div>
+  </div>
+</section>
+  
   <!-- LESSON VIEW -->
   <section id="lessonView" class="hidden">
     <div class="topbar">

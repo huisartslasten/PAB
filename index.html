@@ -596,7 +596,7 @@ function hideAll() {
    HOME
 ========================= */
 
-function showHome() {
+  function showHome() {
 
   hideAll();
 
@@ -623,7 +623,28 @@ function showHome() {
     return;
   }
 
-  subjects.forEach(subject => {
+  const icons = {
+    "Nederlands": "📚",
+    "Engels": "🇬🇧",
+    "Rekenen": "🔢",
+    "Geschiedenis": "🏴‍☠️",
+    "Aardrijkskunde": "🌍",
+    "Biologie": "🧬",
+    "Natuur": "🔬",
+    "Frans": "🇫🇷",
+    "Spaans": "🇪🇸"
+  };
+
+  const colors = [
+    "subject-blue",
+    "subject-purple",
+    "subject-green",
+    "subject-orange",
+    "subject-pink",
+    "subject-cyan"
+  ];
+
+  subjects.forEach((subject, index) => {
 
     const lessons =
       allLessons.filter(
@@ -633,13 +654,20 @@ function showHome() {
     const btn =
       document.createElement("button");
 
-    btn.className = "big-button";
+    btn.className =
+      "big-button " +
+      colors[index % colors.length];
 
-    btn.textContent =
-      subject +
-      "\n" +
-      lessons.length +
-      " lessen";
+    const icon =
+      icons[subject] || "🎮";
+
+    btn.innerHTML = `
+      <span class="subject-icon">${icon}</span>
+      <span class="subject-name">${escapeHtml(subject)}</span>
+      <span class="subject-count">
+        ${lessons.length} ${lessons.length === 1 ? "les" : "lessen"}
+      </span>
+    `;
 
     btn.onclick = () =>
       showSubject(subject);
@@ -648,7 +676,6 @@ function showHome() {
 
   });
 }
-
 
 /* =========================
    VAK

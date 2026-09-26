@@ -750,7 +750,7 @@ function showSubject(subject) {
       l => l.subject === subject
     );
 
-  lessons.forEach(lesson => {
+  lessons.forEach((lesson, index) => {
 
     const btn =
       document.createElement("button");
@@ -758,23 +758,35 @@ function showSubject(subject) {
     btn.className =
       "lesson-button";
 
+    const icon =
+      lesson.type === "questions"
+        ? "❓"
+        : "📖";
+
     btn.innerHTML = `
-      ${lesson.type === "questions" ? "❓" : "📖"}
-      ${escapeHtml(lesson.title)}
-      <br>
-      <span class="small">
-        ${lesson.lesson_items.length} items
+      <span class="lesson-icon">${icon}</span>
+
+      <span class="lesson-info">
+        <span class="lesson-title">
+          ${escapeHtml(lesson.title)}
+        </span>
+
+        <span class="lesson-count">
+          ${lesson.lesson_items.length}
+          ${lesson.lesson_items.length === 1 ? "item" : "items"}
+        </span>
       </span>
+
+      <span class="lesson-arrow">›</span>
     `;
 
-  btn.onclick = () => openLesson(lesson.id);
+    btn.onclick = () =>
+      openLesson(lesson.id);
 
     container.appendChild(btn);
 
   });
 }
-
-
 /* =========================
    LES VIEW
 ========================= */

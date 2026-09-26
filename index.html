@@ -863,9 +863,9 @@ function hideAll() {
     .classList
     .remove("hidden");
 
-const subjects = [...new Set(allLessons.map(l => JSON.stringify(l.subject)))];
-  const container =
+const subjects = [...new Set(allLessons.map(l => l.subject))];  const container =
     document.getElementById("subjects");
+    console.log("VAKKEN:", subjects);
 
   container.innerHTML = "";
 

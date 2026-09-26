@@ -105,18 +105,67 @@ h3 {
 /* LESSONS */
 
 .lesson-button {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 88px;
   width: 100%;
+  padding: 16px 20px;
+  margin-bottom: 14px;
   text-align: left;
-  padding: 20px 22px;
-  margin-bottom: 12px;
-  border-radius: 18px;
-  border: 2px solid #e5eaff;
-  background: white;
-  color: #24324a;
-  font-size: 18px;
-  font-weight: 700;
-  box-shadow: 0 4px 14px rgba(50, 70, 110, .06);
-  transition: transform .15s ease, border-color .15s ease;
+  border: 0;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #6366f1, #818cf8);
+  color: white;
+  box-shadow: 0 6px 0 #4f46b5, 0 10px 22px rgba(80, 80, 180, .12);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.lesson-button:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 0 #4f46b5, 0 15px 25px rgba(80, 80, 180, .16);
+}
+
+.lesson-button:active {
+  transform: translateY(3px);
+  box-shadow: 0 3px 0 #4f46b5;
+}
+
+.lesson-icon {
+  width: 54px;
+  height: 54px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 17px;
+  background: rgba(255,255,255,.22);
+  font-size: 28px;
+}
+
+.lesson-info {
+  flex: 1;
+}
+
+.lesson-title {
+  display: block;
+  font-size: 19px;
+  font-weight: 850;
+  line-height: 1.25;
+}
+
+.lesson-count {
+  display: block;
+  margin-top: 5px;
+  color: rgba(255,255,255,.82);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.lesson-arrow {
+  font-size: 36px;
+  font-weight: 300;
+  color: rgba(255,255,255,.8);
 }
 
 .lesson-button:hover {

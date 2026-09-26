@@ -568,7 +568,29 @@ label {
 <div class="container">
 
   <div id="message"></div>
+<!-- PARENT LOGIN -->
+<section id="login" class="hidden">
+  <div class="card">
+    <h2>🔐 Ouder login</h2>
 
+    <p class="small">
+      Log in om lessen te maken en te bewerken.
+    </p>
+
+    <label>E-mailadres</label>
+    <input id="loginEmail" type="email" placeholder="Jouw e-mailadres">
+
+    <label>Wachtwoord</label>
+    <input id="loginPassword" type="password" placeholder="Wachtwoord">
+
+    <div id="loginError" class="error hidden"></div>
+
+    <div class="row">
+      <button onclick="loginParent()">Inloggen</button>
+      <button class="secondary" onclick="showHome()">Annuleren</button>
+    </div>
+  </div>
+</section>
   <!-- HOME -->
   <section id="home">
    <div class="topbar">
@@ -816,6 +838,7 @@ function hideAll() {
     "lessonView",
     "lessonChoice",
     "quiz"
+    "login"
   ].forEach(id => {
 
     document
@@ -2047,7 +2070,32 @@ function escapeAttr(text) {
 ========================= */
 
 loadLessons();
+function showLogin() {
+  hideAll();
+  document.getElementById("login").classList.remove("hidden");
+}
 
+async function loginParent() {
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+  const error = document.getElementById("loginError");
+
+  error.classList.add("hidden");
+  error.textContent = "";
+
+  const { error: loginError } = await db.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (loginError) {
+    error.textContent = "Inloggen mislukt. Controleer je e-mailadres en wachtwoord.";
+    error.classList.remove("hidden");
+    return;
+  }
+
+  showHome();
+}
 </script>
 
 </body>

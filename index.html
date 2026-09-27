@@ -2230,7 +2230,7 @@ function updateQuizProgress(){
 function audioUrlForItem(item){
   if(!item || !item.question) return null;
 
-  const word = item.question.trim();
+  const word = item.question.trim().toLowerCase();
 
   return (
     SUPABASE_URL +

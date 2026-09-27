@@ -684,7 +684,7 @@ label{
     <h2 id="choiceTitle"></h2>
 
     <p class="small">
-      Wil je de les eerst bekijken of jezelf meteen overhoren?
+      Wil je de les eerst bekijken, overhoren of een toets maken?
     </p>
 
     <div class="row">
@@ -698,9 +698,16 @@ label{
 
       <button
         class="green big-button"
-        onclick="startQuiz()"
+        onclick="startPractice()"
       >
-        ▶️ Direct overhoren
+        ▶️ Overhoren
+      </button>
+
+      <button
+        class="big-button"
+        onclick="startTest()"
+      >
+        📝 Toets
       </button>
 
     </div>
@@ -751,12 +758,21 @@ label{
 
     <br>
 
-    <button
-      class="green big-button"
-      onclick="startQuiz()"
-    >
-      ▶️ Start de quiz
-    </button>
+    <div class="row">
+      <button
+        class="green big-button"
+        onclick="startPractice()"
+      >
+        ▶️ Overhoren
+      </button>
+
+      <button
+        class="big-button"
+        onclick="startTest()"
+      >
+        📝 Toets
+      </button>
+    </div>
 
   </div>
 
@@ -851,6 +867,10 @@ let quizScore = 0;
 let quizAnswered = false;
 
 let quizWrongCount = 0;
+
+let quizIsTest = false;
+
+let quizMistakes = 0;
 
 
 /* =========================================================
@@ -2042,582 +2062,301 @@ async function deleteCurrentLesson(){
 
 
 /* =========================================================
-   QUIZ START
+   QUIZ / TRAINING / TEST
 ========================================================= */
+
+function shuffle(items){
+  const copy = [...items];
+  for(let i=copy.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [copy[i],copy[j]] = [copy[j],copy[i]];
+  }
+  return copy;
+}
+
+function startPractice(){
+  startQuizMode(false);
+}
+
+function startTest(){
+  startQuizMode(true);
+}
 
 function startQuiz(){
+  startPractice();
+}
 
-  if(
-    !currentLesson ||
-    !currentLesson.lesson_items.length
-  ){
+function startQuizMode(isTest){
+  if(!currentLesson || !currentLesson.lesson_items.length){
     return;
   }
 
-  quizItems =
-    [...currentLesson.lesson_items]
-      .sort(
-        ()=>Math.random()-.5
-      );
-
+  quizItems = shuffle(currentLesson.lesson_items);
   quizQueue = [...quizItems];
-
   quizIndex = 0;
-
   quizScore = 0;
-
   quizWrongCount = 0;
-
+  quizMistakes = 0;
   quizAnswered = false;
+  quizIsTest = isTest;
 
   hideAll();
-
-  document
-    .getElementById("quiz")
-    .classList
-    .remove("hidden");
-
+  document.getElementById("quiz").classList.remove("hidden");
   showQuizItem();
 }
-
-
-/* =========================================================
-   QUIZ PROGRESS
-========================================================= */
 
 function updateQuizProgress(){
+  const remaining = Math.max(quizQueue.length - quizIndex, 0);
+  const total = Math.max(quizItems.length, 1);
+  const completed = Math.max(total - remaining, 0);
+  const percentage = Math.min((completed / total) * 100, 100);
 
-  const total =
-    quizItems.length;
+  document.getElementById("quizProgressFill").style.width = percentage + "%";
 
-  const current =
-    Math.min(
-      quizIndex+1,
-      total
-    );
-
-  const percentage =
-    total
-      ? ((current-1)/total)*100
-      : 0;
-
-  document
-    .getElementById("quizProgressFill")
-    .style
-    .width =
-      percentage+"%";
+  if(quizIsTest){
+    document.getElementById("quizProgress").textContent =
+      `Vraag ${Math.min(quizIndex+1,total)} van ${total} • nog ${remaining}`;
+  }else{
+    document.getElementById("quizProgress").textContent =
+      remaining === 1 ? "Nog 1 woord" : `Nog ${remaining} woorden`;
+  }
 }
-
-
-/* =========================================================
-   SPEECH
-========================================================= */
 
 function speakDictationWord(){
-
-  if(
-    !currentLesson ||
-    currentLesson.type!=="dictation"
-  ){
-    return;
-  }
-
-  const item =
-    quizQueue[quizIndex];
-
-  if(!item)return;
+  if(!currentLesson || currentLesson.type!=="dictation") return;
+  const item = quizQueue[quizIndex];
+  if(!item) return;
 
   window.speechSynthesis.cancel();
-
-  const speech =
-    new SpeechSynthesisUtterance(
-      item.answer
-    );
-
+  const speech = new SpeechSynthesisUtterance(item.answer);
   speech.lang = "en-US";
-
   speech.rate = .75;
-
   speech.pitch = 1;
-
-  window.speechSynthesis.speak(
-    speech
-  );
+  window.speechSynthesis.speak(speech);
 }
-
-
-/* =========================================================
-   SHOW QUIZ ITEM
-========================================================= */
 
 function showQuizItem(){
-
-  if(
-    quizIndex >= quizQueue.length
-  ){
-
+  if(quizIndex >= quizQueue.length){
     finishQuiz();
-
     return;
   }
 
-
-  const item =
-    quizQueue[quizIndex];
-
-
-  document
-    .getElementById("quizProgress")
-    .textContent =
-      `Vraag ${quizIndex+1} van ${quizQueue.length}`;
-
-
+  const item = quizQueue[quizIndex];
+  const container = document.getElementById("quizContent");
+  quizAnswered = false;
   updateQuizProgress();
 
-
-  const container =
-    document.getElementById("quizContent");
-
-
-  quizAnswered = false;
-
-
-  /* DICTEE */
-
-  if(
-    currentLesson.type==="dictation"
-  ){
-
+  if(currentLesson.type === "dictation"){
     container.innerHTML = `
-
-      <div class="quiz-question">
-        🔊 Luister en typ het woord
-      </div>
-
-      <div class="dictation-sound">
-        Het woord wordt automatisch uitgesproken.
-      </div>
-
-      <button
-        class="big-button"
-        onclick="speakDictationWord()"
-      >
-        🔊 Nog een keer luisteren
-      </button>
-
-      <input
-        id="quizInput"
-        placeholder="Typ het woord..."
-        autocomplete="off"
-        onkeydown="if(event.key==='Enter')checkDictationAnswer()"
-      >
-
-      <button
-        class="big-button"
-        onclick="checkDictationAnswer()"
-      >
-        Controleren
-      </button>
-
+      <div class="quiz-question">🔊 Luister en typ het woord</div>
+      <div class="dictation-sound">Het woord wordt automatisch uitgesproken.</div>
+      <button class="big-button" onclick="speakDictationWord()">🔊 Nog een keer luisteren</button>
+      <input id="quizInput" placeholder="Typ het woord..." autocomplete="off"
+        onkeydown="if(event.key==='Enter')checkDictationAnswer()">
+      <button class="big-button" onclick="checkDictationAnswer()">Controleren</button>
       <div id="quizResult"></div>
-
     `;
-
-
-    setTimeout(
-      ()=>{
-        speakDictationWord();
-
-        const input =
-          document.getElementById("quizInput");
-
-        if(input){
-          input.focus();
-        }
-
-      },
-      350
-    );
-
+    setTimeout(()=>{
+      speakDictationWord();
+      document.getElementById("quizInput")?.focus();
+    },350);
     return;
   }
 
-
-  /* WOORDTRAINER */
-
-  if(
-    currentLesson.type==="words"
-  ){
-
+  if(currentLesson.type === "words"){
     container.innerHTML = `
-
-      <div class="quiz-question">
-        ${escapeHtml(item.question)}
-      </div>
-
-      <input
-        id="quizInput"
-        placeholder="Typ je antwoord..."
-        autocomplete="off"
-        onkeydown="if(event.key==='Enter')checkWordAnswer()"
-      >
-
-      <button
-        class="big-button"
-        onclick="checkWordAnswer()"
-      >
-        Controleren
-      </button>
-
+      <div class="quiz-question">${escapeHtml(item.question)}</div>
+      <input id="quizInput" placeholder="Typ je antwoord..." autocomplete="off"
+        onkeydown="if(event.key==='Enter')checkWordAnswer()">
+      <button class="big-button" onclick="checkWordAnswer()">Controleren</button>
       <div id="quizResult"></div>
-
     `;
-
-
-    setTimeout(
-      ()=>{
-        const input =
-          document.getElementById("quizInput");
-
-        if(input){
-          input.focus();
-        }
-      },
-      100
-    );
-
+    setTimeout(()=>document.getElementById("quizInput")?.focus(),100);
     return;
   }
-
-
-  /* VRAGEN */
 
   container.innerHTML = `
-
-    <div class="quiz-question">
-      ${escapeHtml(item.question)}
-    </div>
-
-    <textarea
-      id="quizInput"
-      placeholder="Typ je antwoord..."
-    ></textarea>
-
-    <button
-      class="big-button"
-      onclick="showQuestionAnswer()"
-    >
-      Antwoord bekijken
+    <div class="quiz-question">${escapeHtml(item.question)}</div>
+    <textarea id="quizInput" placeholder="Typ je antwoord..."></textarea>
+    <button class="big-button" onclick="checkQuestionAnswer()">
+      ${quizIsTest ? "Antwoord opslaan" : "Antwoord bekijken"}
     </button>
-
     <div id="quizResult"></div>
-
   `;
 }
 
-
-/* =========================================================
-   WOORDTRAINER ANSWER
-========================================================= */
+function normalizeAnswer(value){
+  return String(value || "").trim().toLowerCase();
+}
 
 function checkWordAnswer(){
+  if(quizAnswered) return;
 
-  if(quizAnswered)return;
-
-  quizAnswered = true;
-
-  const input =
-    document.getElementById("quizInput");
-
-  const result =
-    document.getElementById("quizResult");
-
-  const given =
-    input.value
-      .trim()
-      .toLowerCase();
-
-  const correct =
-    quizQueue[quizIndex]
-      .answer
-      .trim()
-      .toLowerCase();
-
+  const input = document.getElementById("quizInput");
+  const given = normalizeAnswer(input.value);
+  const item = quizQueue[quizIndex];
+  const correct = normalizeAnswer(item.answer);
 
   input.disabled = true;
+  quizAnswered = true;
 
-
-  if(given===correct){
-
+  if(given === correct){
     quizScore++;
 
-    result.innerHTML = `
-
-      <div class="success">
-        🟢 Goed!
-      </div>
-
-      <button onclick="nextQuizItem()">
-        Volgende →
-      </button>
-
-    `;
-
-  }
-
-  else{
-
+    if(quizIsTest){
+      showTestNextButton("Goed", true);
+    }else{
+      document.getElementById("quizResult").innerHTML = `
+        <div class="success">🟢 Goed!</div>
+        <button onclick="nextQuizItem()">Volgende →</button>
+      `;
+    }
+  }else{
     quizWrongCount++;
+    quizMistakes++;
 
-    result.innerHTML = `
-
-      <div class="error">
-        🔴 Niet helemaal.
-        <br><br>
-        Het juiste antwoord is:
-        <strong>
-          ${escapeHtml(
-            quizQueue[quizIndex].answer
-          )}
-        </strong>
-      </div>
-
-      <button onclick="nextQuizItem()">
-        Volgende →
-      </button>
-
-    `;
-
+    if(quizIsTest){
+      showTestNextButton("Antwoord opgeslagen", false);
+    }else{
+      // Fout antwoord gaat terug in de trainingslijst.
+      quizQueue.push(item);
+      document.getElementById("quizResult").innerHTML = `
+        <div class="error">
+          🔴 Niet goed. Dit woord komt later opnieuw terug.
+        </div>
+        <button onclick="nextQuizItem()">Volgende →</button>
+      `;
+    }
   }
 }
-
-
-/* =========================================================
-   DICTATION ANSWER
-========================================================= */
 
 function checkDictationAnswer(){
+  if(quizAnswered) return;
 
-  if(quizAnswered)return;
-
-  quizAnswered = true;
-
-  const input =
-    document.getElementById("quizInput");
-
-  const result =
-    document.getElementById("quizResult");
-
-  const given =
-    input.value
-      .trim()
-      .toLowerCase();
-
-  const correct =
-    quizQueue[quizIndex]
-      .answer
-      .trim()
-      .toLowerCase();
-
+  const input = document.getElementById("quizInput");
+  const given = normalizeAnswer(input.value);
+  const item = quizQueue[quizIndex];
+  const correct = normalizeAnswer(item.answer);
 
   input.disabled = true;
+  quizAnswered = true;
 
-
-  if(given===correct){
-
+  if(given === correct){
     quizScore++;
-
-    result.innerHTML = `
-
-      <div class="success">
-        🟢 Goed gespeld!
-      </div>
-
-      <button onclick="nextQuizItem()">
-        Volgende →
-      </button>
-
-    `;
-
-  }
-
-  else{
-
+    if(quizIsTest){
+      showTestNextButton("Goed", true);
+    }else{
+      document.getElementById("quizResult").innerHTML = `
+        <div class="success">🟢 Goed gespeld!</div>
+        <button onclick="nextQuizItem()">Volgende →</button>
+      `;
+    }
+  }else{
     quizWrongCount++;
-
-    result.innerHTML = `
-
-      <div class="error">
-        🔴 Niet goed gespeld.
-        <br><br>
-        Het juiste woord is:
-        <strong>
-          ${escapeHtml(
-            quizQueue[quizIndex].answer
-          )}
-        </strong>
-      </div>
-
-      <button onclick="nextQuizItem()">
-        Volgende →
-      </button>
-
-    `;
-
+    quizMistakes++;
+    if(quizIsTest){
+      showTestNextButton("Antwoord opgeslagen", false);
+    }else{
+      quizQueue.push(item);
+      document.getElementById("quizResult").innerHTML = `
+        <div class="error">🔴 Niet goed. Dit woord komt later opnieuw terug.</div>
+        <button onclick="nextQuizItem()">Volgende →</button>
+      `;
+    }
   }
 }
 
+function checkQuestionAnswer(){
+  if(quizAnswered) return;
 
-/* =========================================================
-   QUESTIONS
-========================================================= */
-
-function showQuestionAnswer(){
-
-  const input =
-    document.getElementById("quizInput");
-
-  const result =
-    document.getElementById("quizResult");
+  const input = document.getElementById("quizInput");
+  const given = normalizeAnswer(input.value);
+  const item = quizQueue[quizIndex];
+  const correct = normalizeAnswer(item.answer);
 
   input.disabled = true;
+  quizAnswered = true;
 
-  result.innerHTML = `
+  if(quizIsTest){
+    if(given === correct) quizScore++;
+    else quizMistakes++;
+    showTestNextButton("Antwoord opgeslagen", given === correct);
+    return;
+  }
 
-    <div class="quiz-answer">
-      ${escapeHtml(
-        quizQueue[quizIndex].answer
-      )}
-    </div>
-
-    <p style="text-align:center">
-      Had je het goed?
-    </p>
-
+  document.getElementById("quizResult").innerHTML = `
+    <div class="quiz-answer">${escapeHtml(item.answer)}</div>
+    <p style="text-align:center">Had je het goed?</p>
     <div class="row">
-
-      <button
-        class="green"
-        onclick="questionCorrect()"
-      >
-        🟢 Ik had het goed
-      </button>
-
-      <button
-        class="danger"
-        onclick="questionWrong()"
-      >
-        🔴 Ik had het fout
-      </button>
-
+      <button class="green" onclick="questionCorrect()">🟢 Ik had het goed</button>
+      <button class="danger" onclick="questionWrong()">🔴 Ik had het fout</button>
     </div>
-
   `;
 }
 
+function showTestNextButton(label, wasCorrect){
+  document.getElementById("quizResult").innerHTML = `
+    <div class="small" style="text-align:center;margin:15px 0">
+      Antwoord opgeslagen. Je ziet de uitslag pas aan het einde.
+    </div>
+    <button onclick="nextQuizItem()">Volgende →</button>
+  `;
+}
 
 function questionCorrect(){
-
+  if(quizAnswered !== true) return;
   quizScore++;
-
-  quizAnswered = true;
-
   nextQuizItem();
 }
-
 
 function questionWrong(){
-
+  if(quizAnswered !== true) return;
   quizWrongCount++;
-
-  quizAnswered = true;
-
+  quizMistakes++;
   nextQuizItem();
 }
 
-
-/* =========================================================
-   NEXT QUIZ ITEM
-========================================================= */
-
 function nextQuizItem(){
-
   quizIndex++;
-
   showQuizItem();
 }
 
-
-/* =========================================================
-   FINISH QUIZ
-========================================================= */
-
 function finishQuiz(){
+  const total = quizItems.length;
+  const percentage = total ? Math.round((quizScore/total)*100) : 0;
 
-  document
-    .getElementById("quizProgress")
-    .textContent =
-      "Klaar!";
+  document.getElementById("quizProgress").textContent =
+    quizIsTest ? "Toets klaar!" : "Training klaar!";
+  document.getElementById("quizProgressFill").style.width = "100%";
 
-  document
-    .getElementById("quizProgressFill")
-    .style
-    .width = "100%";
-
-
-  const total =
-    quizQueue.length;
-
-  const percentage =
-    total
-      ? Math.round(
-          (quizScore/total)*100
-        )
-      : 0;
-
-
-  document
-    .getElementById("quizContent")
-    .innerHTML = `
-
+  if(quizIsTest){
+    const grade = Math.round((percentage / 10) * 10) / 10;
+    document.getElementById("quizContent").innerHTML = `
       <div class="score">
-
-        🎉 Quiz klaar!
-
-        <br><br>
-
-        ${quizScore}
-        van
-        ${total}
-        goed
-
-        <br><br>
-
-        ${percentage}%
-
+        📝 Toets klaar!<br><br>
+        <div style="font-size:64px">${grade.toFixed(1)}</div>
+        <br>
+        ${quizScore} van ${total} goed
       </div>
-
       <br>
-
-      <button
-        class="big-button"
-        onclick="startQuiz()"
-      >
-        🔄 Opnieuw
-      </button>
-
+      <button class="big-button" onclick="startTest()">🔄 Opnieuw</button>
       <br><br>
-
-      <button
-        class="secondary big-button"
-        onclick="showLesson()"
-      >
-        ← Terug naar de les
-      </button>
-
+      <button class="secondary big-button" onclick="showLesson()">← Terug naar de les</button>
     `;
+  }else{
+    document.getElementById("quizContent").innerHTML = `
+      <div class="score">
+        🎉 Training klaar!<br><br>
+        Alle woorden zijn goed beantwoord.<br><br>
+        ${quizMistakes === 0 ? "Alles in één keer goed!" : `${quizMistakes} fout antwoord${quizMistakes===1?"":"en"} opnieuw geoefend.`}
+      </div>
+      <br>
+      <button class="big-button" onclick="startPractice()">🔄 Opnieuw oefenen</button>
+      <br><br>
+      <button class="secondary big-button" onclick="showLesson()">← Terug naar de les</button>
+    `;
+  }
 }
-
 
 /* =========================================================
    BACK

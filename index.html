@@ -1986,7 +1986,36 @@ async function saveLesson(){
 
     return;
   }
+/* AUDIO-WACHTRIJ */
 
+if(type==="dictation"){
+
+  const audioRows =
+    items.map(
+      item=>({
+        word:item.question.toLowerCase()
+      })
+    );
+
+  const {
+    error:audioQueueError
+  } = await db
+    .from("audio_queue")
+    .upsert(
+      audioRows,
+      {
+        onConflict:"word",
+        ignoreDuplicates:true
+      }
+    );
+
+  if(audioQueueError){
+    console.warn(
+      "Audio wachtrij fout:",
+      audioQueueError.message
+    );
+  }
+}
 
   await loadLessons();
 

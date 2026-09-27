@@ -380,6 +380,103 @@ label{
   box-shadow:0 7px 0 #087f5b
 }
 
+/* QUIZ / TOETS - rustige invoerlayout */
+.quiz-action{
+  display:flex;
+  justify-content:center;
+  margin:8px 0 18px
+}
+
+.quiz-listen-button{
+  width:auto;
+  min-height:0;
+  padding:8px 14px;
+  border-radius:12px;
+  font-size:14px;
+  font-weight:700;
+  box-shadow:none;
+}
+
+.quiz-input-wrap{
+  margin:18px 0 14px;
+}
+
+.quiz-input-label{
+  display:block;
+  text-align:left;
+  margin:0 0 8px;
+  font-size:15px;
+  font-weight:800;
+  color:#34415a
+}
+
+#quizContent #quizInput{
+  width:100%;
+  min-height:72px;
+  margin:0 0 14px;
+  padding:18px 20px;
+  border:3px solid #bfc7e8;
+  border-radius:18px;
+  background:#fff;
+  font-size:24px;
+  font-weight:650;
+  text-align:center;
+  box-shadow:0 5px 16px rgba(50,70,110,.07);
+}
+
+#quizContent #quizInput::placeholder{
+  color:#9aa5bd;
+  font-weight:550;
+}
+
+#quizContent #quizInput:focus{
+  border-color:#7467f0;
+  box-shadow:0 0 0 5px rgba(116,103,240,.12),0 6px 18px rgba(50,70,110,.08);
+}
+
+.quiz-submit{
+  display:block;
+  width:auto;
+  min-height:0;
+  margin:0 auto;
+  padding:12px 26px;
+  border-radius:14px;
+  font-size:16px;
+  box-shadow:0 4px 0 #4546b5;
+}
+
+.quiz-submit:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 0 #4546b5
+}
+
+.quiz-submit:active{
+  transform:translateY(2px);
+  box-shadow:0 2px 0 #4546b5
+}
+
+#quizContent textarea#quizInput{
+  min-height:150px;
+  text-align:left;
+  line-height:1.45;
+  resize:vertical;
+}
+
+#quizContent .quiz-result{
+  margin-top:16px;
+}
+
+@media(max-width:600px){
+  #quizContent #quizInput{
+    min-height:66px;
+    font-size:21px;
+  }
+
+  #quizContent textarea#quizInput{
+    min-height:130px;
+  }
+}
+
 .dictation-sound{
   text-align:center;
   font-size:22px;
@@ -2132,7 +2229,7 @@ function updateQuizProgress(){
 
 function audioUrlForItem(item){
   if(!item || !item.id) return null;
-  return `https://ncpkqrvxljxwboavxtak.supabase.co/storage/v1/object/public/audio/item-${item.id}.wav`;
+  return `audio/item-${item.id}.wav`;
 }
 
 
@@ -2226,22 +2323,27 @@ function showQuizItem(){
           : "Luister goed. Foute woorden komen later opnieuw terug."}
       </div>
 
-      <button
-        class="big-button"
-        onclick="speakDictationWord()"
-      >
-        🔊 Nog een keer luisteren
-      </button>
+      <div class="quiz-action">
+        <button
+          class="quiz-listen-button secondary"
+          onclick="speakDictationWord()"
+        >
+          🔊 Nog een keer luisteren
+        </button>
+      </div>
 
-      <input
-        id="quizInput"
-        placeholder="Typ het woord..."
-        autocomplete="off"
-        onkeydown="if(event.key==='Enter')checkDictationAnswer()"
-      >
+      <div class="quiz-input-wrap">
+        <label class="quiz-input-label" for="quizInput">Jouw antwoord</label>
+        <input
+          id="quizInput"
+          placeholder="Typ hier je antwoord..."
+          autocomplete="off"
+          onkeydown="if(event.key==='Enter')checkDictationAnswer()"
+        >
+      </div>
 
       <button
-        class="big-button"
+        class="quiz-submit"
         onclick="checkDictationAnswer()"
       >
         ${quizMode === "test" ? "Volgende →" : "Controleren"}
@@ -2274,15 +2376,18 @@ function showQuizItem(){
         🔊 Luisteren
       </button>
 
-      <input
-        id="quizInput"
-        placeholder="Typ je antwoord..."
-        autocomplete="off"
-        onkeydown="if(event.key==='Enter')checkWordAnswer()"
-      >
+      <div class="quiz-input-wrap">
+        <label class="quiz-input-label" for="quizInput">Jouw antwoord</label>
+        <input
+          id="quizInput"
+          placeholder="Typ hier je antwoord..."
+          autocomplete="off"
+          onkeydown="if(event.key==='Enter')checkWordAnswer()"
+        >
+      </div>
 
       <button
-        class="big-button"
+        class="quiz-submit"
         onclick="checkWordAnswer()"
       >
         ${quizMode === "test" ? "Volgende →" : "Controleren"}
@@ -2305,13 +2410,16 @@ function showQuizItem(){
       ${escapeHtml(item.question)}
     </div>
 
-    <textarea
-      id="quizInput"
-      placeholder="Typ je antwoord..."
-    ></textarea>
+    <div class="quiz-input-wrap">
+      <label class="quiz-input-label" for="quizInput">Jouw antwoord</label>
+      <textarea
+        id="quizInput"
+        placeholder="Typ hier je antwoord..."
+      ></textarea>
+    </div>
 
     <button
-      class="big-button"
+      class="quiz-submit"
       onclick="${quizMode === "test" ? "submitTestQuestion()" : "showQuestionAnswer()"}"
     >
       ${quizMode === "test" ? "Volgende →" : "Antwoord bekijken"}

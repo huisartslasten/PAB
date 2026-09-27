@@ -1,2805 +1,1754 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PacoGo!</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
-*{box-sizing:border-box}
-
-body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-  background:#f3f7ff;
-  color:#24324a
-}
-
-header{
-  background:linear-gradient(135deg,#5b5ce2,#7467f0);
-  color:white;
-  padding:28px 22px 32px;
-  border-radius:0 0 30px 30px;
-  box-shadow:0 8px 25px rgba(77,78,180,.18)
-}
-
-header h1{
-  max-width:1000px;
-  margin:auto;
-  font-size:32px;
-  font-weight:850;
-  letter-spacing:-1px
-}
-
-.container{
-  max-width:1000px;
-  margin:30px auto 60px;
-  padding:0 22px
-}
-
-h2{
-  font-size:28px;
-  margin:0 0 8px;
-  font-weight:800
-}
-
-h3{
-  font-size:21px;
-  font-weight:800
-}
-
-.card{
-  background:white;
-  border:0;
-  border-radius:24px;
-  padding:28px;
-  margin-bottom:22px;
-  box-shadow:0 8px 30px rgba(50,70,110,.09)
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
-  gap:20px
-}
-
-.big-button{
-  width:100%;
-  min-height:145px;
-  padding:25px;
-  border-radius:24px;
-  border:0;
-  font-size:22px;
-  font-weight:850;
-  color:white;
-  background:linear-gradient(135deg,#5b5ce2,#7c6cf2);
-  box-shadow:0 8px 0 #4546b5;
-  transition:transform .15s ease,box-shadow .15s ease
-}
-
-.big-button:hover{
-  transform:translateY(-4px);
-  box-shadow:0 12px 0 #4546b5
-}
-
-.big-button:active{
-  transform:translateY(3px);
-  box-shadow:0 5px 0 #4546b5
-}
-
-.lesson-button{
-  display:flex;
-  align-items:center;
-  gap:16px;
-  min-height:88px;
-  width:100%;
-  padding:16px 20px;
-  margin-bottom:14px;
-  text-align:left;
-  border:0;
-  border-radius:22px;
-  background:linear-gradient(135deg,#8b8ff7,#a9a7ff);
-  color:white;
-  box-shadow:0 6px 0 #7477d9,0 10px 22px rgba(80,80,180,.10);
-  transition:transform .15s ease,box-shadow .15s ease
-}
-
-.lesson-button:hover{
-  transform:translateX(5px);
-  box-shadow:0 9px 0 #7477d9,0 14px 25px rgba(80,80,180,.14)
-}
-
-.lesson-button:active{
-  transform:translateY(3px);
-  box-shadow:0 3px 0 #7477d9
-}
-
-.lesson-icon{
-  width:50px;
-  height:50px;
-  flex-shrink:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:15px;
-  background:rgba(255,255,255,.22);
-  font-size:27px
-}
-
-.lesson-info{
-  flex:1
-}
-
-.lesson-title{
-  display:block;
-  font-size:18px;
-  font-weight:800;
-  line-height:1.25
-}
-
-.lesson-count{
-  display:block;
-  margin-top:5px;
-  color:rgba(255,255,255,.82);
-  font-size:14px;
-  font-weight:600
-}
-
-.lesson-arrow{
-  font-size:34px;
-  font-weight:300;
-  color:rgba(255,255,255,.8)
-}
-
-button{
-  border:0;
-  border-radius:14px;
-  padding:13px 19px;
-  font-size:15px;
-  font-weight:750;
-  cursor:pointer;
-  background:#5b5ce2;
-  color:white;
-  transition:transform .15s ease,opacity .15s ease
-}
-
-button:hover{
-  opacity:.95;
-  transform:translateY(-2px)
-}
-
-button.secondary{
-  background:#e9edfa;
-  color:#34415a
-}
-
-button.green{
-  background:#20c997
-}
-
-button.danger{
-  background:#f05b6f
-}
-
-input,textarea,select{
-  width:100%;
-  padding:14px 15px;
-  border:2px solid #e3e8f5;
-  border-radius:13px;
-  font-size:16px;
-  background:white;
-  color:#24324a;
-  font-family:inherit;
-  margin-top:6px;
-  margin-bottom:16px
-}
-
-input:focus,textarea:focus,select:focus{
-  outline:none;
-  border-color:#7467f0;
-  box-shadow:0 0 0 4px rgba(116,103,240,.12)
-}
-
-textarea{
-  min-height:90px;
-  resize:vertical
-}
-
-label{
-  font-weight:750;
-  color:#34415a
-}
-
-.row{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap
-}
-
-.row>*{
-  flex:1
-}
-
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-  margin-bottom:22px
-}
-
-.hidden{
-  display:none!important
-}
-
-.word{
-  display:grid;
-  grid-template-columns:1fr 1fr auto;
-  gap:10px;
-  align-items:center;
-  margin-bottom:12px
-}
-
-.question-card{
-  background:#f8f9ff;
-  border:2px solid #e5e9f6;
-  border-radius:18px;
-  padding:20px;
-  margin-bottom:15px;
-  white-space:pre-line
-}
-
-.quiz-question{
-  font-size:36px;
-  line-height:1.3;
-  font-weight:850;
-  text-align:center;
-  color:#24324a;
-  background:linear-gradient(135deg,#fff,#f7f8ff);
-  border-radius:28px;
-  padding:50px 35px;
-  margin:30px 0 22px;
-  border:3px solid #e4e7ff;
-  box-shadow:0 10px 0 #dfe3f7,0 15px 30px rgba(50,70,110,.10);
-  white-space:pre-line
-}
-
-.quiz-answer{
-  font-size:24px;
-  line-height:1.5;
-  text-align:center;
-  padding:28px;
-  margin:20px 0;
-  background:linear-gradient(135deg,#f3f1ff,#eef7ff);
-  color:#24324a;
-  border-radius:22px;
-  border:2px solid #e2e4ff;
-  box-shadow:0 6px 18px rgba(50,70,110,.06);
-  white-space:pre-line
-}
-
-.score{
-  font-size:28px;
-  font-weight:850;
-  text-align:center
-}
-
-.small{
-  color:#718096;
-  font-size:14px
-}
-
-.error{
-  background:#fff0f1;
-  color:#c53045;
-  padding:14px 16px;
-  border-radius:14px;
-  margin-bottom:16px
-}
-
-.success{
-  background:#e9fbf4;
-  color:#087f5b;
-  padding:14px 16px;
-  border-radius:14px;
-  margin-bottom:16px
-}
-
-.subject-blue{
-  background:linear-gradient(135deg,#3b82f6,#60a5fa)
-}
-
-.subject-purple{
-  background:linear-gradient(135deg,#8b5cf6,#a78bfa)
-}
-
-.subject-green{
-  background:linear-gradient(135deg,#10b981,#34d399)
-}
-
-.subject-orange{
-  background:linear-gradient(135deg,#f97316,#fb923c)
-}
-
-.subject-pink{
-  background:linear-gradient(135deg,#ec4899,#f472b6)
-}
-
-.subject-cyan{
-  background:linear-gradient(135deg,#06b6d4,#22d3ee)
-}
-
-.subject-icon{
-  display:block;
-  font-size:48px;
-  margin-bottom:12px
-}
-
-.subject-name{
-  display:block;
-  font-size:23px;
-  font-weight:850
-}
-
-.subject-count{
-  display:block;
-  margin-top:7px;
-  font-size:15px;
-  font-weight:600;
-  opacity:.9
-}
-
-#lessonChoice .card{
-  text-align:center;
-  padding:35px 30px
-}
-
-#lessonChoice h2{
-  font-size:30px;
-  margin-bottom:10px
-}
-
-#lessonChoice .small{
-  font-size:16px;
-  margin-bottom:28px
-}
-
-#lessonChoice .row{
-  gap:18px
-}
-
-#lessonChoice .big-button{
-  min-height:135px;
-  font-size:20px
-}
-
-#lessonChoice .green{
-  background:linear-gradient(135deg,#10b981,#34d399);
-  box-shadow:0 7px 0 #087f5b
-}
-
-.dictation-sound{
-  text-align:center;
-  font-size:22px;
-  font-weight:800;
-  margin:10px 0 20px
-}
-
-.dictation-word{
-  font-size:20px;
-  font-weight:800;
-  text-align:center;
-  padding:18px;
-  background:#f8f9ff;
-  border-radius:18px;
-  margin-bottom:18px
-}
-
-.quiz-progress-bar{
-  height:12px;
-  background:#e7eaf5;
-  border-radius:20px;
-  overflow:hidden;
-  margin:10px 0 20px
-}
-
-.quiz-progress-fill{
-  height:100%;
-  background:linear-gradient(90deg,#5b5ce2,#20c997);
-  transition:width .3s ease
-}
-
-@media(max-width:600px){
-  header{
-    padding:23px 18px 27px;
-    border-radius:0 0 24px 24px
-  }
-
-  header h1{
-    font-size:26px
-  }
-
-  .container{
-    margin-top:22px;
-    padding:0 15px
-  }
-
-  .card{
-    padding:20px;
-    border-radius:20px
-  }
-
-  .big-button{
-    min-height:115px;
-    font-size:19px
-  }
-
-  .quiz-question{
-    font-size:27px
-  }
-
-  .word{
-    grid-template-columns:1fr
-  }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PacoGO!</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6fb;
+      color: #222;
+    }
+
+    header {
+      background: #ffffff;
+      padding: 18px 22px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 26px;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 25px 16px 60px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 18px;
+      box-shadow: 0 3px 14px rgba(0,0,0,.08);
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+      margin: 5px 4px 5px 0;
+    }
+
+    button:hover {
+      opacity: .9;
+    }
+
+    button.secondary {
+      background: #64748b;
+    }
+
+    button.danger {
+      background: #dc2626;
+    }
+
+    button.green {
+      background: #16a34a;
+    }
+
+    button.small {
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 16px;
+      margin: 6px 0 14px;
+      font-family: inherit;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 8px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .lesson-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .lesson-card h3 {
+      margin: 0 0 5px;
+    }
+
+    .muted {
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    .item {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 15px;
+      margin-bottom: 12px;
+    }
+
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .item-number {
+      font-weight: bold;
+    }
+
+    .answer-box {
+      background: #ecfdf5;
+      border: 1px solid #bbf7d0;
+      padding: 15px;
+      border-radius: 12px;
+      margin-top: 10px;
+    }
+
+    .quiz-question {
+      font-size: 23px;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+
+    .score {
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .top-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .warning {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 15px;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 22px;
+      }
+
+      main {
+        padding: 15px 10px 40px;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      button {
+        width: 100%;
+        margin-right: 0;
+      }
+
+      .item-header {
+        align-items: flex-start;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
 <header>
   <h1>📚 PacoGO!</h1>
+  <button id="logoutBtn" class="secondary hidden" onclick="logout()">Uitloggen</button>
 </header>
 
-<div class="container">
+<main>
 
-<div id="message"></div>
+  <!-- LOGIN -->
+  <section id="loginSection" class="card">
+    <h2>Ouder login</h2>
 
-<!-- LOGIN -->
-
-<section id="login" class="hidden">
-  <div class="card">
-
-    <h2>🔐 Ouder login</h2>
-
-    <p class="small">
-      Log in om lessen te maken en te bewerken.
-    </p>
-
-    <label>E-mailadres</label>
-    <input
-      id="loginEmail"
-      type="email"
-      autocomplete="email"
-      placeholder="Jouw e-mailadres"
-    >
+    <label>E-mail</label>
+    <input id="emailInput" type="email" placeholder="E-mail">
 
     <label>Wachtwoord</label>
-    <input
-      id="loginPassword"
-      type="password"
-      autocomplete="current-password"
-      placeholder="Wachtwoord"
-    >
+    <input id="passwordInput" type="password" placeholder="Wachtwoord">
 
-    <div id="loginError" class="error hidden"></div>
+    <button onclick="login()">Inloggen</button>
 
-    <div class="row">
-      <button onclick="loginParent()">Inloggen</button>
-      <button class="secondary" onclick="showHome()">Annuleren</button>
-    </div>
+    <p id="loginMessage" class="muted"></p>
+  </section>
 
-  </div>
-</section>
 
-<!-- HOME -->
+  <!-- HOME -->
+  <section id="homeSection" class="hidden">
 
-<section id="home">
+    <div class="card">
+      <h2>📚 PacoGO!</h2>
+      <p>Kies een vak.</p>
 
-  <div class="topbar">
+      <div id="subjectsContainer"></div>
 
-    <h2>Vakken</h2>
-
-    <div class="row">
-
-      <button
-        id="loginButton"
-        class="secondary"
-        onclick="showLogin()"
-      >
-        🔐 Ouder login
-      </button>
-
-      <button
-        id="logoutButton"
-        class="secondary hidden"
-        onclick="logoutParent()"
-      >
-        🚪 Uitloggen
-      </button>
-
-      <button
-        id="addLessonButton"
-        class="hidden"
-        onclick="showAddLesson()"
-      >
+      <button class="green" onclick="showAddLesson()">
         ➕ Nieuwe les
       </button>
+    </div>
+
+  </section>
+
+
+  <!-- LESSON LIST -->
+  <section id="lessonListSection" class="hidden">
+
+    <div class="card">
+
+      <div class="top-buttons">
+        <button class="secondary" onclick="goHome()">← Terug</button>
+      </div>
+
+      <h2 id="lessonListTitle">Lessen</h2>
+
+      <div id="lessonsContainer"></div>
 
     </div>
 
-  </div>
+  </section>
 
-  <div id="subjects" class="grid"></div>
 
-</section>
+  <!-- LESSON EDITOR -->
+  <section id="editorSection" class="hidden">
 
-<!-- LESSON LIST -->
+    <div class="card">
 
-<section id="lessonList" class="hidden">
+      <div class="top-buttons">
+        <button class="secondary" onclick="cancelEditor()">← Annuleren</button>
+      </div>
 
-  <div class="topbar">
+      <h2 id="editorTitle">Nieuwe les</h2>
 
-    <button class="secondary" onclick="showHome()">
-      ← Terug
-    </button>
+      <label>Vak</label>
+      <input id="lessonSubject" type="text" placeholder="Bijvoorbeeld Nederlands">
 
-    <button
-      id="addLessonButton2"
-      class="hidden"
-      onclick="showAddLesson(currentSubject)"
-    >
-      ➕ Nieuwe les
-    </button>
+      <label>Naam van de les</label>
+      <input id="lessonTitle" type="text" placeholder="Bijvoorbeeld Les 1">
 
-  </div>
+      <label>Type les</label>
+      <select id="lessonType" onchange="changeLessonType()">
+        <option value="words">Woorden</option>
+        <option value="questions">Vragen & antwoorden</option>
+        <option value="dictation">Dictee</option>
+      </select>
 
-  <h2 id="subjectTitle"></h2>
+      <div id="editorItems"></div>
 
-  <div id="lessons"></div>
-
-</section>
-
-<!-- LESSON EDITOR -->
-
-<section id="lessonEditor" class="hidden">
-
-  <div class="topbar">
-    <button class="secondary" onclick="goBack()">
-      ← Terug
-    </button>
-  </div>
-
-  <div class="card">
-
-    <h2 id="editorTitle">Nieuwe les</h2>
-
-    <label>Vak</label>
-
-    <input
-      id="subjectInput"
-      placeholder="Bijvoorbeeld 🇬🇧 Engels"
-    >
-
-    <label>Naam van de les</label>
-
-    <input
-      id="titleInput"
-      placeholder="Bijvoorbeeld Les 3 – Dieren"
-    >
-
-    <label>Type les</label>
-
-    <select
-      id="typeInput"
-      onchange="changeLessonType()"
-    >
-      <option value="words">🎯 Woordtrainer</option>
-      <option value="questions">❓ Vragen</option>
-      <option value="dictation">✏️ Dictee</option>
-    </select>
-
-    <!-- WOORDTRAINER -->
-
-    <div id="wordsEditor">
-
-      <h3>Woorden</h3>
-
-      <div id="wordRows"></div>
-
-      <button
-        class="secondary"
-        onclick="addWordRow()"
-      >
-        ➕ Woord toevoegen
+      <button class="green" onclick="addEditorItem()">
+        ➕ Item toevoegen
       </button>
 
-    </div>
+      <br><br>
 
-    <!-- VRAGEN -->
-
-    <div id="questionsEditor" class="hidden">
-
-      <h3>Vragen</h3>
-
-      <div id="questionRows"></div>
-
-      <button
-        class="secondary"
-        onclick="addQuestionRow()"
-      >
-        ➕ Vraag toevoegen
-      </button>
-
-    </div>
-
-    <!-- DICTEE -->
-
-    <div id="dictationEditor" class="hidden">
-
-      <h3>Dicteewoorden</h3>
-
-      <p class="small">
-        Bij dictee wordt het woord uitgesproken.
-        De leerling hoort het woord en typt daarna de spelling.
-      </p>
-
-      <div id="dictationRows"></div>
-
-      <button
-        class="secondary"
-        onclick="addDictationRow()"
-      >
-        ➕ Woord toevoegen
-      </button>
-
-    </div>
-
-    <br><br>
-
-    <button onclick="saveLesson()">
-      💾 Opslaan
-    </button>
-
-  </div>
-
-</section>
-
-<!-- LESSON CHOICE -->
-
-<section id="lessonChoice" class="hidden">
-
-  <div class="topbar">
-
-    <button class="secondary" onclick="goBack()">
-      ← Terug
-    </button>
-
-  </div>
-
-  <div class="card">
-
-    <h2 id="choiceTitle"></h2>
-
-    <p class="small">
-      Wil je de les eerst bekijken of jezelf meteen overhoren?
-    </p>
-
-    <div class="row">
-
-      <button
-        class="big-button"
-        onclick="showLesson()"
-      >
-        📖 Les bekijken
-      </button>
-
-      <button
-        class="green big-button"
-        onclick="startQuiz()"
-      >
-        ▶️ Direct overhoren
-      </button>
-
-    </div>
-
-  </div>
-
-</section>
-
-<!-- LESSON VIEW -->
-
-<section id="lessonView" class="hidden">
-
-  <div class="topbar">
-
-    <button class="secondary" onclick="goBack()">
-      ← Terug
-    </button>
-
-    <div>
-
-      <button
-        id="editLessonButton"
-        class="hidden"
-        onclick="editCurrentLesson()"
-      >
-        ✏️ Bewerken
+      <button onclick="saveLesson()">
+        💾 Les opslaan
       </button>
 
       <button
         id="deleteLessonButton"
         class="danger hidden"
-        onclick="deleteCurrentLesson()"
-      >
-        🗑️ Verwijderen
+        onclick="deleteCurrentLesson()">
+        🗑️ Les verwijderen
+      </button>
+
+      <p id="saveMessage" class="muted"></p>
+
+    </div>
+
+  </section>
+
+
+  <!-- LESSON CHOICE -->
+  <section id="lessonChoiceSection" class="hidden">
+
+    <div class="card">
+
+      <button class="secondary" onclick="goBackToLessons()">← Terug</button>
+
+      <h2 id="choiceTitle"></h2>
+
+      <p>Wat wil je doen?</p>
+
+      <button onclick="showLessonContent()">
+        📖 Les bekijken
+      </button>
+
+      <button onclick="startQuiz()">
+        🎯 Overhoren
+      </button>
+
+      <button id="editLessonChoiceButton" class="secondary" onclick="editCurrentLesson()">
+        ✏️ Les bewerken
       </button>
 
     </div>
 
-  </div>
+  </section>
 
-  <div class="card">
 
-    <h2 id="viewTitle"></h2>
+  <!-- LESSON VIEW -->
+  <section id="lessonViewSection" class="hidden">
 
-    <p id="viewInfo" class="small"></p>
+    <div class="card">
 
-    <div id="viewItems"></div>
+      <button class="secondary" onclick="backToLessonChoice()">← Terug</button>
 
-    <br>
+      <h2 id="viewTitle"></h2>
 
-    <button
-      class="green big-button"
-      onclick="startQuiz()"
-    >
-      ▶️ Start de quiz
-    </button>
+      <div id="lessonContent"></div>
 
-  </div>
+      <br>
 
-</section>
+      <button onclick="startQuiz()">
+        🎯 Nu overhoren
+      </button>
 
-<!-- QUIZ -->
-
-<section id="quiz" class="hidden">
-
-  <div class="topbar">
-
-    <button
-      class="secondary"
-      onclick="showLesson()"
-    >
-      ← Stoppen
-    </button>
-
-  </div>
-
-  <div class="card">
-
-    <div id="quizProgress" class="small"></div>
-
-    <div class="quiz-progress-bar">
-      <div
-        id="quizProgressFill"
-        class="quiz-progress-fill"
-        style="width:0%"
-      ></div>
     </div>
 
-    <div id="quizContent"></div>
+  </section>
 
-  </div>
 
-</section>
+  <!-- QUIZ -->
+  <section id="quizSection" class="hidden">
 
-</div>
+    <div class="card">
+
+      <button class="secondary" onclick="backToLessonChoice()">← Stoppen</button>
+
+      <div id="quizContent"></div>
+
+    </div>
+
+  </section>
+
+</main>
+
 
 <script>
 
-/* =========================================================
-   SUPABASE
-========================================================= */
+  // ============================================================
+  // SUPABASE
+  // ============================================================
 
-const SUPABASE_URL =
-  "https://ncpkqrvxljxwboavxtak.supabase.co";
+  const SUPABASE_URL =
+    "https://ncpkqrvxljxwboavxtak.supabase.co";
 
-const SUPABASE_KEY =
-  "sb_publishable_skiKpO4UU79zWY7hskHsoA_WQxA6CFc";
+  const SUPABASE_ANON_KEY =
+    "sb_publishable_skiKpO4UU79zWY7hskHsoA_WQxA6CFc";
 
-const db =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
+  const supabaseClient =
+    supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 
-/* =========================================================
-   PARENT ACCOUNTS
-========================================================= */
-
-const PARENT_IDS = new Set([
-  "5d0e1e5c-1dbe-4909-bd3a-81a1e7b26d09",
-  "418833d5-049a-4ec9-8072-2d48a85f04b1"
-]);
+  // Deze IDs mogen zichtbaar zijn.
+  // De echte beveiliging gebeurt door Supabase RLS.
+  const PARENT_IDS = [
+    "5d0e1e5c-1dbe-4909-bd3a-81a1e7b26d09",
+    "418833d5-049a-4ec9-8072-2d48a85f04b1"
+  ];
 
 
-/* =========================================================
-   STATE
-========================================================= */
+  let lessons = [];
+  let currentSubject = null;
+  let currentLesson = null;
+  let editingLessonId = null;
 
-let currentSession = null;
-
-let allLessons = [];
-
-let currentSubject = "";
-
-let currentLesson = null;
-
-let editingLessonId = null;
-
-let quizItems = [];
-
-let quizQueue = [];
-
-let quizIndex = 0;
-
-let quizScore = 0;
-
-let quizAnswered = false;
-
-let quizWrongCount = 0;
+  let quizItems = [];
+  let quizIndex = 0;
+  let quizScore = 0;
 
 
-/* =========================================================
-   AUTH
-========================================================= */
+  // ============================================================
+  // INITIALISATIE
+  // ============================================================
 
-function isParentLoggedIn(){
-  return !!currentSession &&
-    PARENT_IDS.has(currentSession.user.id);
-}
+  document.addEventListener("DOMContentLoaded", async () => {
 
+    const {
+      data: {
+        session
+      }
+    } = await supabaseClient.auth.getSession();
 
-function updateAuthUI(session){
+    if (session) {
+      await checkUser(session);
+    } else {
+      showOnly("loginSection");
+    }
 
-  currentSession = session;
-
-  const loggedIn =
-    isParentLoggedIn();
-
-  document
-    .getElementById("loginButton")
-    ?.classList
-    .toggle("hidden",loggedIn);
-
-  document
-    .getElementById("logoutButton")
-    ?.classList
-    .toggle("hidden",!loggedIn);
-
-  document
-    .getElementById("addLessonButton")
-    ?.classList
-    .toggle("hidden",!loggedIn);
-
-  document
-    .getElementById("addLessonButton2")
-    ?.classList
-    .toggle("hidden",!loggedIn);
-
-  document
-    .getElementById("editLessonButton")
-    ?.classList
-    .toggle("hidden",!loggedIn);
-
-  document
-    .getElementById("deleteLessonButton")
-    ?.classList
-    .toggle("hidden",!loggedIn);
-}
+  });
 
 
-function requireParent(){
+  // ============================================================
+  // AUTH
+  // ============================================================
 
-  if(!isParentLoggedIn()){
+  async function login() {
 
-    showMessage(
-      "Alleen ouders kunnen lessen wijzigen. Log eerst in.",
-      "error"
-    );
+    const email =
+      document.getElementById("emailInput").value.trim();
+
+    const password =
+      document.getElementById("passwordInput").value;
+
+    const message =
+      document.getElementById("loginMessage");
+
+    message.textContent = "Inloggen...";
+
+    const {
+      data,
+      error
+    } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      message.textContent =
+        "Inloggen mislukt: " + error.message;
+      return;
+    }
+
+    await checkUser(data.session);
+  }
+
+
+  async function checkUser(session) {
+
+    if (!session || !session.user) {
+      showOnly("loginSection");
+      return;
+    }
+
+    const userId = session.user.id;
+
+    if (!PARENT_IDS.includes(userId)) {
+
+      await supabaseClient.auth.signOut();
+
+      document.getElementById("loginMessage").textContent =
+        "Dit account heeft geen ouderrechten.";
+
+      showOnly("loginSection");
+      return;
+    }
+
+    document.getElementById("logoutBtn")
+      .classList.remove("hidden");
+
+    await loadLessons();
 
     showHome();
-
-    return false;
   }
 
-  return true;
-}
 
+  async function logout() {
 
-/* =========================================================
-   INITIALIZATION
-========================================================= */
+    await supabaseClient.auth.signOut();
 
-async function initializeApp(){
+    document.getElementById("logoutBtn")
+      .classList.add("hidden");
 
-  const {
-    data:{session}
-  } = await db.auth.getSession();
-
-  updateAuthUI(session);
-
-  await loadLessons();
-}
-
-
-db.auth.onAuthStateChange(
-  (_event,session)=>{
-    updateAuthUI(session);
-  }
-);
-
-
-/* =========================================================
-   LOAD LESSONS
-========================================================= */
-
-async function loadLessons(){
-
-  showMessage(
-    "Lessen laden...",
-    "success"
-  );
-
-  const {
-    data,
-    error
-  } = await db
-    .from("lessons")
-    .select(`
-      id,
-      subject,
-      title,
-      type,
-      lesson_items(
-        id,
-        question,
-        answer,
-        sort_order
-      )
-    `)
-    .order("id");
-
-  if(error){
-
-    showMessage(
-      "Fout bij laden: "+error.message,
-      "error"
-    );
-
-    return;
+    showOnly("loginSection");
   }
 
-  allLessons = data || [];
 
-  allLessons.forEach(
-    lesson=>{
+  // ============================================================
+  // SCHERMEN
+  // ============================================================
+
+  function showOnly(sectionId) {
+
+    const sections = [
+      "loginSection",
+      "homeSection",
+      "lessonListSection",
+      "editorSection",
+      "lessonChoiceSection",
+      "lessonViewSection",
+      "quizSection"
+    ];
+
+    sections.forEach(id => {
+      document.getElementById(id)
+        .classList.add("hidden");
+    });
+
+    document.getElementById(sectionId)
+      .classList.remove("hidden");
+  }
+
+
+  function showHome() {
+
+    showOnly("homeSection");
+
+    renderSubjects();
+  }
+
+
+  function goHome() {
+
+    currentSubject = null;
+    currentLesson = null;
+
+    showHome();
+  }
+
+
+  function goBackToLessons() {
+
+    if (currentSubject) {
+      showLessonList(currentSubject);
+    } else {
+      showHome();
+    }
+  }
+
+
+  function backToLessonChoice() {
+
+    if (currentLesson) {
+      document.getElementById("choiceTitle").textContent =
+        currentLesson.title;
+
+      showOnly("lessonChoiceSection");
+    }
+  }
+
+
+  function cancelEditor() {
+
+    if (currentLesson && editingLessonId) {
+      backToLessonChoice();
+    } else {
+      goHome();
+    }
+  }
+
+
+  // ============================================================
+  // LESSEN LADEN
+  // ============================================================
+
+  async function loadLessons() {
+
+    const {
+      data,
+      error
+    } = await supabaseClient
+      .from("lessons")
+      .select(`
+        *,
+        lesson_items (
+          id,
+          lesson_id,
+          question,
+          answer,
+          sort_order
+        )
+      `)
+      .order("created_at", {
+        ascending: true
+      });
+
+    if (error) {
+
+      console.error(error);
+
+      alert(
+        "De lessen konden niet worden geladen:\n" +
+        error.message
+      );
+
+      return;
+    }
+
+    lessons = data || [];
+
+    lessons.forEach(lesson => {
 
       lesson.lesson_items =
         (lesson.lesson_items || [])
-          .sort(
-            (a,b)=>
-              a.sort_order-b.sort_order
+          .sort((a, b) =>
+            (a.sort_order || 0) -
+            (b.sort_order || 0)
           );
 
-    }
-  );
-
-  hideMessage();
-
-  showHome();
-}
-
-
-/* =========================================================
-   MESSAGES
-========================================================= */
-
-function showMessage(text,type){
-
-  const el =
-    document.getElementById("message");
-
-  el.className = type || "";
-
-  el.textContent = text;
-}
-
-
-function hideMessage(){
-
-  const el =
-    document.getElementById("message");
-
-  el.textContent = "";
-
-  el.className = "";
-}
-
-
-/* =========================================================
-   NAVIGATION
-========================================================= */
-
-function hideAll(){
-
-  [
-    "home",
-    "lessonList",
-    "lessonEditor",
-    "lessonView",
-    "lessonChoice",
-    "quiz",
-    "login"
-  ]
-  .forEach(
-    id=>
-      document
-        .getElementById(id)
-        .classList
-        .add("hidden")
-  );
-}
-
-
-function showHome(){
-
-  hideAll();
-
-  document
-    .getElementById("home")
-    .classList
-    .remove("hidden");
-
-  const subjects =
-    [...new Set(
-      allLessons.map(l=>l.subject)
-    )];
-
-  const container =
-    document.getElementById("subjects");
-
-  container.innerHTML = "";
-
-  if(!subjects.length){
-
-    container.innerHTML =
-      "<p>Nog geen vakken.</p>";
-
-    return;
+    });
   }
 
-  const icons = {
 
-    Nederlands:"📚",
-    Engels:"🇬🇧",
-    Rekenen:"🔢",
-    Geschiedenis:"🏴‍☠️",
-    Aardrijkskunde:"🌍",
-    Biologie:"🧬",
-    Natuur:"🔬",
-    Frans:"🇫🇷",
-    Spaans:"🇪🇸"
+  // ============================================================
+  // VAKKEN
+  // ============================================================
 
-  };
+  function renderSubjects() {
 
-  const colors = [
+    const container =
+      document.getElementById("subjectsContainer");
 
-    "subject-blue",
-    "subject-purple",
-    "subject-green",
-    "subject-orange",
-    "subject-pink",
-    "subject-cyan"
+    container.innerHTML = "";
 
-  ];
+    const subjects = [
+      ...new Set(
+        lessons
+          .map(l => l.subject)
+          .filter(Boolean)
+      )
+    ];
 
-  subjects.forEach(
-    (subject,index)=>{
+    if (subjects.length === 0) {
 
-      const lessons =
-        allLessons.filter(
-          l=>l.subject===subject
-        );
+      container.innerHTML =
+        `<p class="muted">
+          Er zijn nog geen lessen.
+        </p>`;
 
-      const btn =
+      return;
+    }
+
+    subjects.forEach(subject => {
+
+      const button =
         document.createElement("button");
 
-      btn.className =
-        "big-button "+
-        colors[index%colors.length];
+      button.textContent =
+        "📘 " + subject;
 
-      const icon =
-        icons[subject] || "🎮";
+      button.onclick = () =>
+        showLessonList(subject);
 
-      btn.innerHTML = `
-
-        <span class="subject-icon">
-          ${icon}
-        </span>
-
-        <span class="subject-name">
-          ${escapeHtml(subject)}
-        </span>
-
-        <span class="subject-count">
-          ${lessons.length}
-          ${lessons.length===1?"les":"lessen"}
-        </span>
-
-      `;
-
-      btn.onclick =
-        ()=>showSubject(subject);
-
-      container.appendChild(btn);
-
-    }
-  );
-}
-
-
-function showSubject(subject){
-
-  currentSubject = subject;
-
-  currentLesson = null;
-
-  hideAll();
-
-  document
-    .getElementById("lessonList")
-    .classList
-    .remove("hidden");
-
-  document
-    .getElementById("subjectTitle")
-    .textContent = subject;
-
-  const container =
-    document.getElementById("lessons");
-
-  container.innerHTML = "";
-
-  allLessons
-    .filter(l=>l.subject===subject)
-    .forEach(
-      lesson=>{
-
-        const btn =
-          document.createElement("button");
-
-        btn.className =
-          "lesson-button";
-
-        let icon;
-
-        if(lesson.type==="questions"){
-          icon="❓";
-        }
-        else if(lesson.type==="dictation"){
-          icon="✏️";
-        }
-        else{
-          icon="🎯";
-        }
-
-        btn.innerHTML = `
-
-          <span class="lesson-icon">
-            ${icon}
-          </span>
-
-          <span class="lesson-info">
-
-            <span class="lesson-title">
-              ${escapeHtml(lesson.title)}
-            </span>
-
-            <span class="lesson-count">
-              ${lesson.lesson_items.length}
-              ${lesson.lesson_items.length===1?"item":"items"}
-            </span>
-
-          </span>
-
-          <span class="lesson-arrow">
-            ›
-          </span>
-
-        `;
-
-        btn.onclick =
-          ()=>openLesson(lesson.id);
-
-        container.appendChild(btn);
-
-      }
-    );
-}
-
-
-function openLesson(id){
-
-  currentLesson =
-    allLessons.find(
-      l=>l.id===id
-    );
-
-  if(!currentLesson)return;
-
-  hideAll();
-
-  document
-    .getElementById("lessonChoice")
-    .classList
-    .remove("hidden");
-
-  document
-    .getElementById("choiceTitle")
-    .textContent =
-      currentLesson.title;
-}
-
-
-function showLesson(id){
-
-  if(id){
-    currentLesson =
-      allLessons.find(
-        l=>l.id===id
-      );
+      container.appendChild(button);
+    });
   }
 
-  if(!currentLesson)return;
 
-  hideAll();
+  // ============================================================
+  // LESSENLIJST
+  // ============================================================
 
-  document
-    .getElementById("lessonView")
-    .classList
-    .remove("hidden");
+  function showLessonList(subject) {
 
-  document
-    .getElementById("viewTitle")
-    .textContent =
-      currentLesson.title;
+    currentSubject = subject;
 
-  let typeName;
+    document.getElementById("lessonListTitle")
+      .textContent = subject;
 
-  if(currentLesson.type==="questions"){
-    typeName="vragen";
-  }
-  else if(currentLesson.type==="dictation"){
-    typeName="dicteewoorden";
-  }
-  else{
-    typeName="woorden";
-  }
+    const container =
+      document.getElementById("lessonsContainer");
 
-  document
-    .getElementById("viewInfo")
-    .textContent =
-      `${currentLesson.subject} • ${currentLesson.lesson_items.length} ${typeName}`;
+    container.innerHTML = "";
 
-  const container =
-    document.getElementById("viewItems");
+    const subjectLessons =
+      lessons.filter(l => l.subject === subject);
 
-  container.innerHTML = "";
+    if (subjectLessons.length === 0) {
 
-  currentLesson.lesson_items
-    .forEach(
-      (item,i)=>{
+      container.innerHTML =
+        `<p class="muted">
+          Geen lessen gevonden.
+        </p>`;
+
+    } else {
+
+      subjectLessons.forEach(lesson => {
 
         const div =
           document.createElement("div");
 
-        div.className =
-          "question-card";
+        div.className = "lesson-card";
 
-        if(currentLesson.type==="words"){
+        const count =
+          lesson.lesson_items
+            ? lesson.lesson_items.length
+            : 0;
+
+        div.innerHTML = `
+          <h3>${escapeHtml(lesson.title)}</h3>
+
+          <p class="muted">
+            ${getTypeName(lesson.type)}
+            · ${count} items
+          </p>
+
+          <button>
+            ▶️ Openen
+          </button>
+        `;
+
+        div.querySelector("button")
+          .onclick = () => openLesson(lesson.id);
+
+        container.appendChild(div);
+      });
+    }
+
+    showOnly("lessonListSection");
+  }
+
+
+  // ============================================================
+  // LES OPENEN
+  // ============================================================
+
+  function openLesson(id) {
+
+    currentLesson =
+      lessons.find(l => l.id === id);
+
+    if (!currentLesson) return;
+
+    document.getElementById("choiceTitle")
+      .textContent = currentLesson.title;
+
+    showOnly("lessonChoiceSection");
+  }
+
+
+  // ============================================================
+  // LES BEKIJKEN
+  // ============================================================
+
+  function showLessonContent() {
+
+    if (!currentLesson) return;
+
+    document.getElementById("viewTitle")
+      .textContent = currentLesson.title;
+
+    const container =
+      document.getElementById("lessonContent");
+
+    container.innerHTML = "";
+
+    const items =
+      currentLesson.lesson_items || [];
+
+    if (items.length === 0) {
+
+      container.innerHTML =
+        "<p>Deze les bevat nog geen items.</p>";
+
+    } else {
+
+      items.forEach((item, index) => {
+
+        const div =
+          document.createElement("div");
+
+        div.className = "item";
+
+        if (currentLesson.type === "words") {
 
           div.innerHTML = `
-            <strong>
-              ${i+1}. ${escapeHtml(item.question)}
-            </strong>
-
-            <span>
-              → ${escapeHtml(item.answer)}
-            </span>
-          `;
-
-        }
-
-        else if(currentLesson.type==="dictation"){
-
-          div.innerHTML = `
-            <strong>
-              ${i+1}. ✏️ ${escapeHtml(item.answer)}
-            </strong>
-          `;
-
-        }
-
-        else{
-
-          div.innerHTML = `
-            <strong>
-              ${i+1}. ${escapeHtml(item.question)}
-            </strong>
-
-            <br>
-
-            <span class="small">
-              Antwoord:
+            <strong>${index + 1}. ${escapeHtml(item.question)}</strong>
+            <div class="answer-box">
               ${escapeHtml(item.answer)}
-            </span>
+            </div>
+          `;
+
+        } else if (currentLesson.type === "questions") {
+
+          div.innerHTML = `
+            <strong>${index + 1}. ${escapeHtml(item.question)}</strong>
+            <div class="answer-box">
+              ${escapeHtml(item.answer)}
+            </div>
+          `;
+
+        } else if (currentLesson.type === "dictation") {
+
+          div.innerHTML = `
+            <strong>${index + 1}.</strong>
+            <p class="muted">
+              Luister en schrijf het woord op tijdens het overhoren.
+            </p>
           `;
 
         }
 
         container.appendChild(div);
+      });
+    }
+
+    showOnly("lessonViewSection");
+  }
+
+
+  // ============================================================
+  // NIEUWE LES
+  // ============================================================
+
+  function showAddLesson() {
+
+    editingLessonId = null;
+    currentLesson = null;
+
+    document.getElementById("editorTitle")
+      .textContent = "Nieuwe les";
+
+    document.getElementById("lessonSubject")
+      .value = currentSubject || "";
+
+    document.getElementById("lessonTitle")
+      .value = "";
+
+    document.getElementById("lessonType")
+      .value = "words";
+
+    document.getElementById("deleteLessonButton")
+      .classList.add("hidden");
+
+    document.getElementById("saveMessage")
+      .textContent = "";
+
+    changeLessonType();
+
+    showOnly("editorSection");
+  }
+
+
+  // ============================================================
+  // BESTAANDE LES BEWERKEN
+  // ============================================================
+
+  function editCurrentLesson() {
+
+    if (!currentLesson) return;
+
+    editingLessonId = currentLesson.id;
+
+    document.getElementById("editorTitle")
+      .textContent = "Les bewerken";
+
+    document.getElementById("lessonSubject")
+      .value = currentLesson.subject || "";
+
+    document.getElementById("lessonTitle")
+      .value = currentLesson.title || "";
+
+    document.getElementById("lessonType")
+      .value = currentLesson.type || "words";
+
+    document.getElementById("deleteLessonButton")
+      .classList.remove("hidden");
+
+    document.getElementById("saveMessage")
+      .textContent = "";
+
+    changeLessonType();
+
+    const container =
+      document.getElementById("editorItems");
+
+    container.innerHTML = "";
+
+    const items =
+      currentLesson.lesson_items || [];
+
+    items.forEach(item => {
+      addEditorItem(item);
+    });
+
+    if (items.length === 0) {
+      addEditorItem();
+    }
+
+    showOnly("editorSection");
+  }
+
+
+  // ============================================================
+  // TYPE LES
+  // ============================================================
+
+  function changeLessonType() {
+
+    const type =
+      document.getElementById("lessonType").value;
+
+    const container =
+      document.getElementById("editorItems");
+
+    container.innerHTML = "";
+
+    if (type === "words") {
+
+      addEditorItem();
+      addEditorItem();
+
+    } else {
+
+      addEditorItem();
+    }
+  }
+
+
+  function getTypeName(type) {
+
+    if (type === "words")
+      return "Woorden";
+
+    if (type === "questions")
+      return "Vragen & antwoorden";
+
+    if (type === "dictation")
+      return "Dictee";
+
+    return type;
+  }
+
+
+  // ============================================================
+  // EDITOR ITEM TOEVOEGEN
+  // ============================================================
+
+  function addEditorItem(existingItem = null) {
+
+    const type =
+      document.getElementById("lessonType").value;
+
+    const container =
+      document.getElementById("editorItems");
+
+    const div =
+      document.createElement("div");
+
+    div.className = "item";
+
+    if (type === "words") {
+
+      div.innerHTML = `
+        <div class="item-header">
+          <span class="item-number"></span>
+          <button
+            type="button"
+            class="danger small"
+            onclick="removeEditorItem(this)">
+            Verwijderen
+          </button>
+        </div>
+
+        <label>Woord / vraag</label>
+        <input
+          class="question-input"
+          type="text"
+          placeholder="Bijvoorbeeld hond"
+          value="${escapeAttribute(existingItem?.question || "")}">
+
+        <label>Antwoord</label>
+        <input
+          class="answer-input"
+          type="text"
+          placeholder="Bijvoorbeeld dog"
+          value="${escapeAttribute(existingItem?.answer || "")}">
+      `;
+
+    } else if (type === "questions") {
+
+      div.innerHTML = `
+        <div class="item-header">
+          <span class="item-number"></span>
+          <button
+            type="button"
+            class="danger small"
+            onclick="removeEditorItem(this)">
+            Verwijderen
+          </button>
+        </div>
+
+        <label>Vraag</label>
+        <textarea
+          class="question-input"
+          placeholder="Typ hier de vraag...">${escapeHtml(existingItem?.question || "")}</textarea>
+
+        <label>Juiste/modelantwoord</label>
+        <textarea
+          class="answer-input"
+          placeholder="Typ hier het antwoord...">${escapeHtml(existingItem?.answer || "")}</textarea>
+      `;
+
+    } else if (type === "dictation") {
+
+      div.innerHTML = `
+        <div class="item-header">
+          <span class="item-number"></span>
+          <button
+            type="button"
+            class="danger small"
+            onclick="removeEditorItem(this)">
+            Verwijderen
+          </button>
+        </div>
+
+        <label>Woord</label>
+        <input
+          class="question-input"
+          type="text"
+          placeholder="Bijvoorbeeld elephant"
+          value="${escapeAttribute(existingItem?.question || "")}">
+      `;
+    }
+
+    container.appendChild(div);
+
+    updateItemNumbers();
+  }
+
+
+  function removeEditorItem(button) {
+
+    const item =
+      button.closest(".item");
+
+    if (item) {
+      item.remove();
+    }
+
+    updateItemNumbers();
+  }
+
+
+  function updateItemNumbers() {
+
+    const items =
+      document.querySelectorAll("#editorItems .item");
+
+    items.forEach((item, index) => {
+
+      const number =
+        item.querySelector(".item-number");
+
+      if (number) {
+        number.textContent =
+          "Item " + (index + 1);
+      }
+
+    });
+  }
+
+
+  // ============================================================
+  // LES OPSLAAN
+  // ============================================================
+
+  async function saveLesson() {
+
+    const message =
+      document.getElementById("saveMessage");
+
+    message.textContent = "Opslaan...";
+
+    const subject =
+      document.getElementById("lessonSubject")
+        .value.trim();
+
+    const title =
+      document.getElementById("lessonTitle")
+        .value.trim();
+
+    const type =
+      document.getElementById("lessonType")
+        .value;
+
+    if (!subject) {
+
+      message.textContent =
+        "Vul een vak in.";
+
+      return;
+    }
+
+    if (!title) {
+
+      message.textContent =
+        "Vul een naam voor de les in.";
+
+      return;
+    }
+
+    const editorItems =
+      document.querySelectorAll("#editorItems .item");
+
+    const items = [];
+
+    editorItems.forEach((item, index) => {
+
+      const question =
+        item.querySelector(".question-input")
+          ?.value.trim() || "";
+
+      const answer =
+        item.querySelector(".answer-input")
+          ?.value.trim() || "";
+
+      if (question) {
+
+        items.push({
+          question,
+          answer,
+          sort_order: index
+        });
 
       }
-    );
-}
+    });
 
 
-/* =========================================================
-   LES EDITOR
-========================================================= */
+    if (items.length === 0) {
 
-function showAddLesson(subject=""){
-
-  if(!requireParent())return;
-
-  hideAll();
-
-  document
-    .getElementById("lessonEditor")
-    .classList
-    .remove("hidden");
-
-  editingLessonId = null;
-
-  document
-    .getElementById("editorTitle")
-    .textContent = "Nieuwe les";
-
-  document
-    .getElementById("subjectInput")
-    .value = subject;
-
-  document
-    .getElementById("titleInput")
-    .value = "";
-
-  document
-    .getElementById("typeInput")
-    .value = "words";
-
-  document
-    .getElementById("wordRows")
-    .innerHTML = "";
-
-  document
-    .getElementById("questionRows")
-    .innerHTML = "";
-
-  document
-    .getElementById("dictationRows")
-    .innerHTML = "";
-
-  changeLessonType();
-
-  addWordRow();
-  addWordRow();
-}
-
-
-function changeLessonType(){
-
-  const type =
-    document
-      .getElementById("typeInput")
-      .value;
-
-  document
-    .getElementById("wordsEditor")
-    .classList
-    .toggle(
-      "hidden",
-      type!=="words"
-    );
-
-  document
-    .getElementById("questionsEditor")
-    .classList
-    .toggle(
-      "hidden",
-      type!=="questions"
-    );
-
-  document
-    .getElementById("dictationEditor")
-    .classList
-    .toggle(
-      "hidden",
-      type!=="dictation"
-    );
-
-  if(
-    type==="questions" &&
-    document
-      .getElementById("questionRows")
-      .children.length===0
-  ){
-    addQuestionRow();
-  }
-
-  if(
-    type==="dictation" &&
-    document
-      .getElementById("dictationRows")
-      .children.length===0
-  ){
-    addDictationRow();
-  }
-}
-
-
-function addWordRow(
-  question="",
-  answer=""
-){
-
-  const row =
-    document.createElement("div");
-
-  row.className = "word";
-
-  row.innerHTML = `
-
-    <input
-      placeholder="Nederlands"
-      value="${escapeAttr(question)}"
-    >
-
-    <input
-      placeholder="Engels"
-      value="${escapeAttr(answer)}"
-    >
-
-    <button
-      class="danger"
-      onclick="this.parentElement.remove()"
-    >
-      ✕
-    </button>
-
-  `;
-
-  document
-    .getElementById("wordRows")
-    .appendChild(row);
-}
-
-
-function addDictationRow(word=""){
-
-  const row =
-    document.createElement("div");
-
-  row.className = "word";
-
-  row.innerHTML = `
-
-    <input
-      placeholder="Woord"
-      value="${escapeAttr(word)}"
-    >
-
-    <div></div>
-
-    <button
-      class="danger"
-      onclick="this.parentElement.remove()"
-    >
-      ✕
-    </button>
-
-  `;
-
-  document
-    .getElementById("dictationRows")
-    .appendChild(row);
-}
-
-
-function addQuestionRow(
-  question="",
-  answer="",
-  insertBefore=null
-){
-
-  const card =
-    document.createElement("div");
-
-  card.className =
-    "question-card";
-
-  card.innerHTML = `
-
-    <label>Vraag</label>
-
-    <textarea
-      placeholder="Typ hier de vraag..."
-    >${escapeHtml(question)}</textarea>
-
-    <label>Modelantwoord</label>
-
-    <textarea
-      placeholder="Typ hier het juiste antwoord..."
-    >${escapeHtml(answer)}</textarea>
-
-    <div class="row">
-
-      <button
-        class="secondary"
-        onclick="insertQuestionBefore(this.parentElement.parentElement)"
-      >
-        ➕ Hier invoegen
-      </button>
-
-      <button
-        class="danger"
-        onclick="this.parentElement.parentElement.remove()"
-      >
-        🗑️ Verwijderen
-      </button>
-
-    </div>
-
-  `;
-
-  const container =
-    document.getElementById("questionRows");
-
-  if(insertBefore){
-    container.insertBefore(
-      card,
-      insertBefore
-    );
-  }
-  else{
-    container.appendChild(card);
-  }
-}
-
-
-function insertQuestionBefore(card){
-
-  addQuestionRow(
-    "",
-    "",
-    card
-  );
-}
-
-
-/* =========================================================
-   SAVE LESSON
-========================================================= */
-
-async function saveLesson(){
-
-  if(!requireParent())return;
-
-  const subject =
-    document
-      .getElementById("subjectInput")
-      .value
-      .trim();
-
-  const title =
-    document
-      .getElementById("titleInput")
-      .value
-      .trim();
-
-  const type =
-    document
-      .getElementById("typeInput")
-      .value;
-
-  if(!subject || !title){
-
-    showMessage(
-      "Vul het vak en de naam van de les in.",
-      "error"
-    );
-
-    return;
-  }
-
-  let items = [];
-
-
-  /* WOORDTRAINER */
-
-  if(type==="words"){
-
-    document
-      .querySelectorAll("#wordRows .word")
-      .forEach(
-        (row,i)=>{
-
-          const inputs =
-            row.querySelectorAll("input");
-
-          const question =
-            inputs[0].value.trim();
-
-          const answer =
-            inputs[1].value.trim();
-
-          if(question && answer){
-
-            items.push({
-              question,
-              answer,
-              sort_order:i+1
-            });
-
-          }
-
-        }
-      );
-  }
-
-
-  /* VRAGEN */
-
-  else if(type==="questions"){
-
-    document
-      .querySelectorAll("#questionRows .question-card")
-      .forEach(
-        (card,i)=>{
-
-          const fields =
-            card.querySelectorAll("textarea");
-
-          const question =
-            fields[0].value.trim();
-
-          const answer =
-            fields[1].value.trim();
-
-          if(question && answer){
-
-            items.push({
-              question,
-              answer,
-              sort_order:i+1
-            });
-
-          }
-
-        }
-      );
-  }
-
-
-  /* DICTEE */
-
-  else if(type==="dictation"){
-
-    document
-      .querySelectorAll("#dictationRows .word")
-      .forEach(
-        (row,i)=>{
-
-          const input =
-            row.querySelector("input");
-
-          const word =
-            input.value.trim();
-
-          if(word){
-
-            items.push({
-
-              question:word,
-
-              answer:word,
-
-              sort_order:i+1
-
-            });
-
-          }
-
-        }
-      );
-  }
-
-
-  if(!items.length){
-
-    showMessage(
-      "Voeg minstens één item toe.",
-      "error"
-    );
-
-    return;
-  }
-
-
-  showMessage(
-    "Opslaan...",
-    "success"
-  );
-
-
-  let lessonId =
-    editingLessonId;
-
-
-  /* BESTAANDE LES */
-
-  if(editingLessonId){
-
-    const {
-      error
-    } = await db
-      .from("lessons")
-      .update({
-        subject,
-        title,
-        type
-      })
-      .eq(
-        "id",
-        editingLessonId
-      );
-
-    if(error){
-
-      showMessage(
-        "Fout: "+error.message,
-        "error"
-      );
+      message.textContent =
+        "Voeg minstens één item toe.";
 
       return;
     }
 
 
-    const {
-      error:itemDeleteError
-    } = await db
-      .from("lesson_items")
-      .delete()
-      .eq(
-        "lesson_id",
-        editingLessonId
-      );
+    try {
+
+      // --------------------------------------------------------
+      // BESTAANDE LES
+      // --------------------------------------------------------
+
+      if (editingLessonId) {
+
+        const {
+          error: lessonError
+        } = await supabaseClient
+          .from("lessons")
+          .update({
+            subject,
+            title,
+            type
+          })
+          .eq("id", editingLessonId);
 
-    if(itemDeleteError){
+        if (lessonError)
+          throw lessonError;
 
-      showMessage(
-        "Fout bij verwijderen oude items: "+
-        itemDeleteError.message,
-        "error"
-      );
 
-      return;
-    }
+        // Eerst oude items verwijderen
+        const {
+          error: deleteError
+        } = await supabaseClient
+          .from("lesson_items")
+          .delete()
+          .eq("lesson_id", editingLessonId);
+
+        if (deleteError)
+          throw deleteError;
+
+
+        // Nieuwe items opslaan
+        const rows =
+          items.map(item => ({
+            lesson_id: editingLessonId,
+            question: item.question,
+            answer: item.answer,
+            sort_order: item.sort_order
+          }));
+
+        const {
+          error: insertError
+        } = await supabaseClient
+          .from("lesson_items")
+          .insert(rows);
+
+        if (insertError)
+          throw insertError;
+
+
+        message.textContent =
+          "Les opgeslagen!";
+
+      }
+
+      // --------------------------------------------------------
+      // NIEUWE LES
+      // --------------------------------------------------------
+
+      else {
+
+        const {
+          data: newLesson,
+          error: lessonError
+        } = await supabaseClient
+          .from("lessons")
+          .insert({
+            subject,
+            title,
+            type
+          })
+          .select()
+          .single();
+
+        if (lessonError)
+          throw lessonError;
+
+
+        const rows =
+          items.map(item => ({
+            lesson_id: newLesson.id,
+            question: item.question,
+            answer: item.answer,
+            sort_order: item.sort_order
+          }));
+
+        const {
+          error: insertError
+        } = await supabaseClient
+          .from("lesson_items")
+          .insert(rows);
+
+        if (insertError)
+          throw insertError;
+
+
+        message.textContent =
+          "Nieuwe les opgeslagen!";
+      }
 
-  }
 
+      // Alles opnieuw ophalen
+      await loadLessons();
 
-  /* NIEUWE LES */
+      // De huidige les opnieuw zoeken
+      if (editingLessonId) {
 
-  else{
+        currentLesson =
+          lessons.find(
+            lesson => lesson.id === editingLessonId
+          );
 
-    const {
-      data,
-      error
-    } = await db
-      .from("lessons")
-      .insert({
-        subject,
-        title,
-        type
-      })
-      .select()
-      .single();
+      }
 
-    if(error){
+      // Even wachten zodat gebruiker ziet dat het gelukt is
+      setTimeout(() => {
 
-      showMessage(
-        "Fout: "+error.message,
-        "error"
-      );
-
-      return;
-    }
-
-    lessonId = data.id;
-  }
-
-
-  const rows =
-    items.map(
-      item=>({
-
-        lesson_id:lessonId,
-
-        question:item.question,
-
-        answer:item.answer,
-
-        sort_order:item.sort_order
-
-      })
-    );
-
-
-  const {
-    error:itemError
-  } = await db
-    .from("lesson_items")
-    .insert(rows);
-
-
-  if(itemError){
-
-    showMessage(
-      "Fout bij opslaan items: "+
-      itemError.message,
-      "error"
-    );
-
-    return;
-  }
-
-
-  await loadLessons();
-
-  currentLesson =
-    allLessons.find(
-      l=>l.id===lessonId
-    );
-
-  if(currentLesson){
-    showLesson();
-  }
-}
-
-
-/* =========================================================
-   EDIT LESSON
-========================================================= */
-
-function editCurrentLesson(){
-
-  if(
-    !requireParent() ||
-    !currentLesson
-  ){
-    return;
-  }
-
-  hideAll();
-
-  document
-    .getElementById("lessonEditor")
-    .classList
-    .remove("hidden");
-
-  editingLessonId =
-    currentLesson.id;
-
-  document
-    .getElementById("editorTitle")
-    .textContent =
-      "Les bewerken";
-
-  document
-    .getElementById("subjectInput")
-    .value =
-      currentLesson.subject;
-
-  document
-    .getElementById("titleInput")
-    .value =
-      currentLesson.title;
-
-  document
-    .getElementById("typeInput")
-    .value =
-      currentLesson.type;
-
-  document
-    .getElementById("wordRows")
-    .innerHTML = "";
-
-  document
-    .getElementById("questionRows")
-    .innerHTML = "";
-
-  document
-    .getElementById("dictationRows")
-    .innerHTML = "";
-
-
-  if(currentLesson.type==="words"){
-
-    currentLesson.lesson_items
-      .forEach(
-        item=>
-          addWordRow(
-            item.question,
-            item.answer
-          )
-      );
-
-  }
-
-  else if(
-    currentLesson.type==="questions"
-  ){
-
-    currentLesson.lesson_items
-      .forEach(
-        item=>
-          addQuestionRow(
-            item.question,
-            item.answer
-          )
-      );
-
-  }
-
-  else if(
-    currentLesson.type==="dictation"
-  ){
-
-    currentLesson.lesson_items
-      .forEach(
-        item=>
-          addDictationRow(
-            item.answer
-          )
-      );
-
-  }
-
-  changeLessonType();
-}
-
-
-/* =========================================================
-   DELETE
-========================================================= */
-
-async function deleteCurrentLesson(){
-
-  if(
-    !requireParent() ||
-    !currentLesson
-  ){
-    return;
-  }
-
-  if(
-    !confirm(
-      `Weet je zeker dat je "${currentLesson.title}" wilt verwijderen?`
-    )
-  ){
-    return;
-  }
-
-  const {
-    error
-  } = await db
-    .from("lessons")
-    .delete()
-    .eq(
-      "id",
-      currentLesson.id
-    );
-
-  if(error){
-
-    showMessage(
-      "Fout bij verwijderen: "+
-      error.message,
-      "error"
-    );
-
-    return;
-  }
-
-  currentLesson = null;
-
-  await loadLessons();
-}
-
-
-/* =========================================================
-   QUIZ START
-========================================================= */
-
-function startQuiz(){
-
-  if(
-    !currentLesson ||
-    !currentLesson.lesson_items.length
-  ){
-    return;
-  }
-
-  quizItems =
-    [...currentLesson.lesson_items]
-      .sort(
-        ()=>Math.random()-.5
-      );
-
-  quizQueue = [...quizItems];
-
-  quizIndex = 0;
-
-  quizScore = 0;
-
-  quizWrongCount = 0;
-
-  quizAnswered = false;
-
-  hideAll();
-
-  document
-    .getElementById("quiz")
-    .classList
-    .remove("hidden");
-
-  showQuizItem();
-}
-
-
-/* =========================================================
-   QUIZ PROGRESS
-========================================================= */
-
-function updateQuizProgress(){
-
-  const total =
-    quizItems.length;
-
-  const current =
-    Math.min(
-      quizIndex+1,
-      total
-    );
-
-  const percentage =
-    total
-      ? ((current-1)/total)*100
-      : 0;
-
-  document
-    .getElementById("quizProgressFill")
-    .style
-    .width =
-      percentage+"%";
-}
-
-
-/* =========================================================
-   SPEECH
-========================================================= */
-
-function speakDictationWord(){
-
-  if(
-    !currentLesson ||
-    currentLesson.type!=="dictation"
-  ){
-    return;
-  }
-
-  const item =
-    quizQueue[quizIndex];
-
-  if(!item)return;
-
-  window.speechSynthesis.cancel();
-
-  const speech =
-    new SpeechSynthesisUtterance(
-      item.answer
-    );
-
-  speech.lang = "en-US";
-
-  speech.rate = .75;
-
-  speech.pitch = 1;
-
-  window.speechSynthesis.speak(
-    speech
-  );
-}
-
-
-/* =========================================================
-   SHOW QUIZ ITEM
-========================================================= */
-
-function showQuizItem(){
-
-  if(
-    quizIndex >= quizQueue.length
-  ){
-
-    finishQuiz();
-
-    return;
-  }
-
-
-  const item =
-    quizQueue[quizIndex];
-
-
-  document
-    .getElementById("quizProgress")
-    .textContent =
-      `Vraag ${quizIndex+1} van ${quizQueue.length}`;
-
-
-  updateQuizProgress();
-
-
-  const container =
-    document.getElementById("quizContent");
-
-
-  quizAnswered = false;
-
-
-  /* DICTEE */
-
-  if(
-    currentLesson.type==="dictation"
-  ){
-
-    container.innerHTML = `
-
-      <div class="quiz-question">
-        🔊 Luister en typ het woord
-      </div>
-
-      <div class="dictation-sound">
-        Het woord wordt automatisch uitgesproken.
-      </div>
-
-      <button
-        class="big-button"
-        onclick="speakDictationWord()"
-      >
-        🔊 Nog een keer luisteren
-      </button>
-
-      <input
-        id="quizInput"
-        placeholder="Typ het woord..."
-        autocomplete="off"
-        onkeydown="if(event.key==='Enter')checkDictationAnswer()"
-      >
-
-      <button
-        class="big-button"
-        onclick="checkDictationAnswer()"
-      >
-        Controleren
-      </button>
-
-      <div id="quizResult"></div>
-
-    `;
-
-
-    setTimeout(
-      ()=>{
-        speakDictationWord();
-
-        const input =
-          document.getElementById("quizInput");
-
-        if(input){
-          input.focus();
+        if (currentLesson) {
+          openLesson(currentLesson.id);
+        } else {
+          showLessonList(subject);
         }
 
-      },
-      350
-    );
+      }, 500);
 
-    return;
+
+    } catch (error) {
+
+      console.error(error);
+
+      message.textContent =
+        "Opslaan mislukt: " + error.message;
+    }
   }
 
 
-  /* WOORDTRAINER */
+  // ============================================================
+  // LES VERWIJDEREN
+  // ============================================================
 
-  if(
-    currentLesson.type==="words"
-  ){
+  async function deleteCurrentLesson() {
 
-    container.innerHTML = `
+    if (!editingLessonId) {
+      return;
+    }
+
+    const lesson =
+      lessons.find(
+        l => l.id === editingLessonId
+      );
+
+    if (!lesson) {
+      return;
+    }
+
+
+    // ========================================================
+    // BELANGRIJK:
+    // EERST BEVESTIGING
+    // ========================================================
+
+    const confirmed = confirm(
+      `Weet je zeker dat je de les "${lesson.title}" wilt verwijderen?\n\n` +
+      `Deze actie kan niet ongedaan worden.`
+    );
+
+
+    // Gebruiker kiest "Annuleren"
+    if (!confirmed) {
+      return;
+    }
+
+
+    // Gebruiker heeft "OK" gekozen
+    const button =
+      document.getElementById("deleteLessonButton");
+
+    button.disabled = true;
+    button.textContent = "Verwijderen...";
+
+
+    try {
+
+      // Eerst de items verwijderen.
+      // Hierdoor werkt verwijderen ook wanneer
+      // de foreign key nog geen ON DELETE CASCADE heeft.
+
+      const {
+        error: itemsError
+      } = await supabaseClient
+        .from("lesson_items")
+        .delete()
+        .eq("lesson_id", editingLessonId);
+
+      if (itemsError)
+        throw itemsError;
+
+
+      // Daarna de les zelf verwijderen.
+
+      const {
+        error: lessonError
+      } = await supabaseClient
+        .from("lessons")
+        .delete()
+        .eq("id", editingLessonId);
+
+      if (lessonError)
+        throw lessonError;
+
+
+      // Lokale gegevens opnieuw ophalen
+      await loadLessons();
+
+      currentLesson = null;
+      editingLessonId = null;
+
+      alert("De les is verwijderd.");
+
+      showHome();
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        "De les kon niet worden verwijderd:\n\n" +
+        error.message
+      );
+
+      button.disabled = false;
+      button.textContent = "🗑️ Les verwijderen";
+    }
+  }
+
+
+  // ============================================================
+  // QUIZ
+  // ============================================================
+
+  function startQuiz() {
+
+    if (!currentLesson) return;
+
+    const items =
+      currentLesson.lesson_items || [];
+
+    if (items.length === 0) {
+
+      alert("Deze les bevat nog geen vragen.");
+
+      return;
+    }
+
+    quizItems =
+      [...items]
+        .sort(() => Math.random() - 0.5);
+
+    quizIndex = 0;
+    quizScore = 0;
+
+    showOnly("quizSection");
+
+    showNextQuizQuestion();
+  }
+
+
+  function showNextQuizQuestion() {
+
+    if (quizIndex >= quizItems.length) {
+
+      showQuizResult();
+
+      return;
+    }
+
+    const item =
+      quizItems[quizIndex];
+
+    const container =
+      document.getElementById("quizContent");
+
+    let html = `
+
+      <p class="muted">
+        Vraag ${quizIndex + 1} van ${quizItems.length}
+      </p>
 
       <div class="quiz-question">
         ${escapeHtml(item.question)}
       </div>
-
-      <input
-        id="quizInput"
-        placeholder="Typ je antwoord..."
-        autocomplete="off"
-        onkeydown="if(event.key==='Enter')checkWordAnswer()"
-      >
-
-      <button
-        class="big-button"
-        onclick="checkWordAnswer()"
-      >
-        Controleren
-      </button>
-
-      <div id="quizResult"></div>
-
     `;
 
 
-    setTimeout(
-      ()=>{
-        const input =
-          document.getElementById("quizInput");
+    if (currentLesson.type === "questions") {
 
-        if(input){
-          input.focus();
-        }
-      },
-      100
-    );
+      html += `
 
-    return;
+        <textarea
+          id="quizAnswer"
+          placeholder="Typ je antwoord..."
+        ></textarea>
+
+        <button onclick="showQuestionAnswer()">
+          Antwoord bekijken
+        </button>
+
+        <div id="answerArea"></div>
+      `;
+
+    } else {
+
+      html += `
+
+        <input
+          id="quizAnswer"
+          type="text"
+          placeholder="Typ je antwoord..."
+          onkeydown="if(event.key === 'Enter') checkQuizAnswer()"
+        >
+
+        <button onclick="checkQuizAnswer()">
+          Controleer
+        </button>
+
+        <div id="answerArea"></div>
+      `;
+    }
+
+    container.innerHTML = html;
+
+    const input =
+      document.getElementById("quizAnswer");
+
+    if (input) {
+      input.focus();
+    }
+
+
+    // Dictee automatisch uitspreken
+    if (currentLesson.type === "dictation") {
+
+      setTimeout(() => {
+
+        speakDictationWord(item.question);
+
+      }, 400);
+    }
   }
 
 
-  /* VRAGEN */
+  // ============================================================
+  // WOORDEN / DICTEE CONTROLEREN
+  // ============================================================
 
-  container.innerHTML = `
+  function checkQuizAnswer() {
 
-    <div class="quiz-question">
-      ${escapeHtml(item.question)}
-    </div>
+    const item =
+      quizItems[quizIndex];
 
-    <textarea
-      id="quizInput"
-      placeholder="Typ je antwoord..."
-    ></textarea>
+    const input =
+      document.getElementById("quizAnswer");
 
-    <button
-      class="big-button"
-      onclick="showQuestionAnswer()"
-    >
-      Antwoord bekijken
-    </button>
+    const userAnswer =
+      input.value.trim().toLowerCase();
 
-    <div id="quizResult"></div>
-
-  `;
-}
-
-
-/* =========================================================
-   WOORDTRAINER ANSWER
-========================================================= */
-
-function checkWordAnswer(){
-
-  if(quizAnswered)return;
-
-  quizAnswered = true;
-
-  const input =
-    document.getElementById("quizInput");
-
-  const result =
-    document.getElementById("quizResult");
-
-  const given =
-    input.value
-      .trim()
-      .toLowerCase();
-
-  const correct =
-    quizQueue[quizIndex]
-      .answer
+    const correctAnswer =
+      (
+        currentLesson.type === "dictation"
+          ? item.question
+          : item.answer
+      )
       .trim()
       .toLowerCase();
 
 
-  input.disabled = true;
+    const answerArea =
+      document.getElementById("answerArea");
 
 
-  if(given===correct){
+    if (!userAnswer) {
 
-    quizScore++;
+      answerArea.innerHTML =
+        `<p>Typ eerst een antwoord.</p>`;
 
-    result.innerHTML = `
+      return;
+    }
 
-      <div class="success">
-        🟢 Goed!
-      </div>
 
-      <button onclick="nextQuizItem()">
-        Volgende →
-      </button>
+    if (userAnswer === correctAnswer) {
 
-    `;
+      quizScore++;
 
+      answerArea.innerHTML = `
+        <div class="answer-box">
+          <strong>✅ Goed!</strong>
+        </div>
+
+        <button onclick="nextQuizQuestion()">
+          Volgende
+        </button>
+      `;
+
+    } else {
+
+      answerArea.innerHTML = `
+        <div class="warning">
+          <strong>❌ Niet helemaal.</strong>
+          <br><br>
+          Het juiste antwoord is:
+          <strong>${escapeHtml(correctAnswer)}</strong>
+        </div>
+
+        <button onclick="nextQuizQuestion()">
+          Volgende
+        </button>
+      `;
+    }
+
+
+    input.disabled = true;
   }
 
-  else{
 
-    quizWrongCount++;
+  // ============================================================
+  // VRAGEN MET OPEN ANTWOORD
+  // ============================================================
 
-    result.innerHTML = `
+  function showQuestionAnswer() {
 
-      <div class="error">
-        🔴 Niet helemaal.
+    const item =
+      quizItems[quizIndex];
+
+    const container =
+      document.getElementById("answerArea");
+
+    container.innerHTML = `
+
+      <div class="answer-box">
+        <strong>Modelantwoord:</strong>
         <br><br>
-        Het juiste antwoord is:
-        <strong>
-          ${escapeHtml(
-            quizQueue[quizIndex].answer
-          )}
-        </strong>
+        ${escapeHtml(item.answer)}
       </div>
 
-      <button onclick="nextQuizItem()">
-        Volgende →
-      </button>
-
-    `;
-
-  }
-}
-
-
-/* =========================================================
-   DICTATION ANSWER
-========================================================= */
-
-function checkDictationAnswer(){
-
-  if(quizAnswered)return;
-
-  quizAnswered = true;
-
-  const input =
-    document.getElementById("quizInput");
-
-  const result =
-    document.getElementById("quizResult");
-
-  const given =
-    input.value
-      .trim()
-      .toLowerCase();
-
-  const correct =
-    quizQueue[quizIndex]
-      .answer
-      .trim()
-      .toLowerCase();
-
-
-  input.disabled = true;
-
-
-  if(given===correct){
-
-    quizScore++;
-
-    result.innerHTML = `
-
-      <div class="success">
-        🟢 Goed gespeld!
-      </div>
-
-      <button onclick="nextQuizItem()">
-        Volgende →
-      </button>
-
-    `;
-
-  }
-
-  else{
-
-    quizWrongCount++;
-
-    result.innerHTML = `
-
-      <div class="error">
-        🔴 Niet goed gespeld.
-        <br><br>
-        Het juiste woord is:
-        <strong>
-          ${escapeHtml(
-            quizQueue[quizIndex].answer
-          )}
-        </strong>
-      </div>
-
-      <button onclick="nextQuizItem()">
-        Volgende →
-      </button>
-
-    `;
-
-  }
-}
-
-
-/* =========================================================
-   QUESTIONS
-========================================================= */
-
-function showQuestionAnswer(){
-
-  const input =
-    document.getElementById("quizInput");
-
-  const result =
-    document.getElementById("quizResult");
-
-  input.disabled = true;
-
-  result.innerHTML = `
-
-    <div class="quiz-answer">
-      ${escapeHtml(
-        quizQueue[quizIndex].answer
-      )}
-    </div>
-
-    <p style="text-align:center">
-      Had je het goed?
-    </p>
-
-    <div class="row">
+      <p>
+        Heeft je antwoord dit ongeveer goed?
+      </p>
 
       <button
         class="green"
-        onclick="questionCorrect()"
-      >
-        🟢 Ik had het goed
+        onclick="markQuestionCorrect()">
+        ✅ Goed
       </button>
 
       <button
         class="danger"
-        onclick="questionWrong()"
-      >
-        🔴 Ik had het fout
+        onclick="markQuestionWrong()">
+        ❌ Fout
       </button>
+    `;
 
-    </div>
-
-  `;
-}
-
-
-function questionCorrect(){
-
-  quizScore++;
-
-  quizAnswered = true;
-
-  nextQuizItem();
-}
+    document.getElementById("quizAnswer")
+      .disabled = true;
+  }
 
 
-function questionWrong(){
+  function markQuestionCorrect() {
 
-  quizWrongCount++;
+    quizScore++;
 
-  quizAnswered = true;
-
-  nextQuizItem();
-}
+    nextQuizQuestion();
+  }
 
 
-/* =========================================================
-   NEXT QUIZ ITEM
-========================================================= */
+  function markQuestionWrong() {
 
-function nextQuizItem(){
-
-  quizIndex++;
-
-  showQuizItem();
-}
+    nextQuizQuestion();
+  }
 
 
-/* =========================================================
-   FINISH QUIZ
-========================================================= */
+  function nextQuizQuestion() {
 
-function finishQuiz(){
+    quizIndex++;
 
-  document
-    .getElementById("quizProgress")
-    .textContent =
-      "Klaar!";
-
-  document
-    .getElementById("quizProgressFill")
-    .style
-    .width = "100%";
+    showNextQuizQuestion();
+  }
 
 
-  const total =
-    quizQueue.length;
+  // ============================================================
+  // QUIZ RESULTAAT
+  // ============================================================
 
-  const percentage =
-    total
-      ? Math.round(
-          (quizScore/total)*100
-        )
-      : 0;
+  function showQuizResult() {
 
+    const percentage =
+      Math.round(
+        (quizScore / quizItems.length) * 100
+      );
 
-  document
-    .getElementById("quizContent")
-    .innerHTML = `
+    const container =
+      document.getElementById("quizContent");
+
+    container.innerHTML = `
 
       <div class="score">
-
-        🎉 Quiz klaar!
-
-        <br><br>
-
-        ${quizScore}
-        van
-        ${total}
-        goed
-
-        <br><br>
-
-        ${percentage}%
-
+        🎉 Klaar!
       </div>
+
+      <p style="text-align:center;font-size:20px;">
+        ${quizScore} van ${quizItems.length} goed
+      </p>
+
+      <p style="text-align:center;font-size:18px;">
+        ${percentage}%
+      </p>
 
       <br>
 
-      <button
-        class="big-button"
-        onclick="startQuiz()"
-      >
-        🔄 Opnieuw
+      <button onclick="startQuiz()">
+        🔄 Nog een keer
       </button>
 
-      <br><br>
-
       <button
-        class="secondary big-button"
-        onclick="showLesson()"
-      >
+        class="secondary"
+        onclick="backToLessonChoice()">
         ← Terug naar de les
       </button>
-
     `;
-}
-
-
-/* =========================================================
-   BACK
-========================================================= */
-
-function goBack(){
-
-  if(
-    currentLesson &&
-    currentSubject
-  ){
-
-    showSubject(
-      currentSubject
-    );
-
-  }
-
-  else{
-
-    showHome();
-
-  }
-}
-
-
-/* =========================================================
-   SECURITY / HTML ESCAPING
-========================================================= */
-
-function escapeHtml(text){
-
-  return String(text)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-}
-
-
-function escapeAttr(text){
-
-  return escapeHtml(text);
-}
-
-
-/* =========================================================
-   LOGIN
-========================================================= */
-
-function showLogin(){
-
-  hideAll();
-
-  document
-    .getElementById("login")
-    .classList
-    .remove("hidden");
-
-  document
-    .getElementById("loginError")
-    .classList
-    .add("hidden");
-}
-
-
-async function loginParent(){
-
-  const email =
-    document
-      .getElementById("loginEmail")
-      .value
-      .trim();
-
-  const password =
-    document
-      .getElementById("loginPassword")
-      .value;
-
-  const error =
-    document
-      .getElementById("loginError");
-
-
-  error
-    .classList
-    .add("hidden");
-
-  error.textContent = "";
-
-
-  if(!email || !password){
-
-    error.textContent =
-      "Vul je e-mailadres en wachtwoord in.";
-
-    error
-      .classList
-      .remove("hidden");
-
-    return;
   }
 
 
-  const {
-    data,
-    error:loginError
-  } =
-    await db.auth.signInWithPassword({
-      email,
-      password
-    });
+  // ============================================================
+  // DICTEE
+  // ============================================================
 
+  function speakDictationWord(word) {
 
-  if(loginError){
+    if (!window.speechSynthesis) {
+      return;
+    }
 
-    error.textContent =
-      "Inloggen mislukt. Controleer je e-mailadres en wachtwoord.";
+    window.speechSynthesis.cancel();
 
-    error
-      .classList
-      .remove("hidden");
+    const speech =
+      new SpeechSynthesisUtterance(word);
 
-    return;
+    speech.lang = "en-US";
+    speech.rate = 0.75;
+    speech.pitch = 1;
+
+    window.speechSynthesis.speak(speech);
   }
 
 
-  if(
-    !PARENT_IDS.has(
-      data.user.id
-    )
-  ){
+  // ============================================================
+  // HELPERS
+  // ============================================================
 
-    await db.auth.signOut();
+  function escapeHtml(value) {
 
-    error.textContent =
-      "Dit account heeft geen ouderrechten.";
+    if (value === null || value === undefined) {
+      return "";
+    }
 
-    error
-      .classList
-      .remove("hidden");
-
-    return;
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   }
 
 
-  showHome();
-}
+  function escapeAttribute(value) {
 
-
-async function logoutParent(){
-
-  const {
-    error
-  } =
-    await db.auth.signOut();
-
-  if(error){
-
-    showMessage(
-      "Uitloggen mislukt: "+
-      error.message,
-      "error"
-    );
-
-    return;
+    return escapeHtml(value);
   }
-
-  currentSession = null;
-
-  updateAuthUI(null);
-
-  showHome();
-}
-
-
-/* =========================================================
-   START
-========================================================= */
-
-initializeApp();
 
 </script>
 

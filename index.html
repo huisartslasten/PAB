@@ -926,12 +926,6 @@ function requireParent(){
 
 async function initializeApp(){
 
-  // Altijd starten op het vakken-scherm.
-  // De ouder-login wordt alleen geopend wanneer de ouder
-  // zelf op "Ouder login" klikt.
-  hideAll();
-  document.getElementById("home").classList.remove("hidden");
-
   const {
     data:{session}
   } = await db.auth.getSession();
@@ -939,9 +933,6 @@ async function initializeApp(){
   updateAuthUI(session);
 
   await loadLessons();
-
-  // Ook na het laden van de lessen blijven we op Vakken.
-  showHome();
 }
 
 

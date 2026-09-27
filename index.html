@@ -26,12 +26,12 @@ input,textarea,select{width:100%;padding:14px 15px;border:2px solid #e3e8f5;bord
 .row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1}.topbar{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:22px}.hidden{display:none!important}
 .word{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:center;margin-bottom:12px}.question-card{background:#f8f9ff;border:2px solid #e5e9f6;border-radius:18px;padding:20px;margin-bottom:15px;white-space:pre-line}
 .quiz-question{font-size:36px;line-height:1.3;font-weight:850;text-align:center;color:#24324a;background:linear-gradient(135deg,#fff,#f7f8ff);border-radius:28px;padding:50px 35px;margin:30px 0 22px;border:3px solid #e4e7ff;box-shadow:0 10px 0 #dfe3f7,0 15px 30px rgba(50,70,110,.10);white-space:pre-line}
-.quiz-answer{font-size:24px;line-height:1.5;text-align:center;padding:28px;margin:20px 0;background:linear-gradient(135deg,#f3f1ff,#eef7ff);color:#24324a;border-radius:22px;border:2px solid #e2e4ff;box-shadow:0 6px 18px rgba(50,70,110,.06);white-space:pre-line}
+.progress-wrap{margin:18px 0 26px}.progress-label{display:flex;justify-content:space-between;gap:12px;font-weight:800;color:#4d5a73;margin-bottom:8px}.progress-track{height:14px;background:#e9ecf5;border-radius:999px;overflow:hidden;border:1px solid #dfe3ee}.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,#6d5dfc,#4f9cff);border-radius:999px;transition:width .3s ease}.mode-button{min-height:120px;font-size:20px}.choice-card{padding:24px}.multiple-choice{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}.multiple-choice button{min-height:64px;font-size:18px;background:#eef0ff;color:#34415a;border:2px solid #dfe3f7}.multiple-choice button:hover{background:#e1e4ff}.multiple-choice button:disabled{opacity:.75;cursor:default;transform:none}.test-score{font-size:42px;font-weight:900;text-align:center;margin:15px 0}.result-list{margin:20px 0}.result-row{display:flex;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid #e5e9f2}.result-row:last-child{border-bottom:0}.result-wrong{color:#c53045}.result-right{color:#087f5b}.quiz-answer{font-size:24px;line-height:1.5;text-align:center;padding:28px;margin:20px 0;background:linear-gradient(135deg,#f3f1ff,#eef7ff);color:#24324a;border-radius:22px;border:2px solid #e2e4ff;box-shadow:0 6px 18px rgba(50,70,110,.06);white-space:pre-line}
 .score{font-size:28px;font-weight:850;text-align:center}.small{color:#718096;font-size:14px}.error{background:#fff0f1;color:#c53045;padding:14px 16px;border-radius:14px;margin-bottom:16px}.success{background:#e9fbf4;color:#087f5b;padding:14px 16px;border-radius:14px;margin-bottom:16px}
 .subject-blue{background:linear-gradient(135deg,#3b82f6,#60a5fa)}.subject-purple{background:linear-gradient(135deg,#8b5cf6,#a78bfa)}.subject-green{background:linear-gradient(135deg,#10b981,#34d399)}.subject-orange{background:linear-gradient(135deg,#f97316,#fb923c)}.subject-pink{background:linear-gradient(135deg,#ec4899,#f472b6)}.subject-cyan{background:linear-gradient(135deg,#06b6d4,#22d3ee)}
 .subject-icon{display:block;font-size:48px;margin-bottom:12px}.subject-name{display:block;font-size:23px;font-weight:850}.subject-count{display:block;margin-top:7px;font-size:15px;font-weight:600;opacity:.9}
 #lessonChoice .card{text-align:center;padding:35px 30px}#lessonChoice h2{font-size:30px;margin-bottom:10px}#lessonChoice .small{font-size:16px;margin-bottom:28px}#lessonChoice .row{gap:18px}#lessonChoice .big-button{min-height:135px;font-size:20px}#lessonChoice .green{background:linear-gradient(135deg,#10b981,#34d399);box-shadow:0 7px 0 #087f5b}
-@media(max-width:600px){header{padding:23px 18px 27px;border-radius:0 0 24px 24px}header h1{font-size:26px}.container{margin-top:22px;padding:0 15px}.card{padding:20px;border-radius:20px}.big-button{min-height:115px;font-size:19px}.quiz-question{font-size:27px}.word{grid-template-columns:1fr}}
+@media(max-width:600px){header{padding:23px 18px 27px;border-radius:0 0 24px 24px}header h1{font-size:26px}.container{margin-top:22px;padding:0 15px}.card{padding:20px;border-radius:20px}.big-button{min-height:115px;font-size:19px}.quiz-question{font-size:27px}.multiple-choice{grid-template-columns:1fr}.word{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -103,12 +103,13 @@ input,textarea,select{width:100%;padding:14px 15px;border:2px solid #e3e8f5;bord
 
 <section id="lessonChoice" class="hidden">
   <div class="topbar"><button class="secondary" onclick="goBack()">← Terug</button></div>
-  <div class="card">
+  <div class="card choice-card">
     <h2 id="choiceTitle"></h2>
-    <p class="small">Wil je de les eerst bekijken of jezelf meteen overhoren?</p>
+    <p class="small">Kies hoe je deze les wilt doen.</p>
     <div class="row">
-      <button class="big-button" onclick="showLesson()">📖 Les bekijken</button>
-      <button class="green big-button" onclick="startQuiz()">▶️ Direct overhoren</button>
+      <button class="big-button mode-button" onclick="showLesson()">📖 Les bekijken</button>
+      <button class="green big-button mode-button" onclick="startPractice()">🎯 Oefenen</button>
+      <button class="big-button mode-button" onclick="startTest()">📝 Toets</button>
     </div>
   </div>
 </section>
@@ -130,7 +131,7 @@ input,textarea,select{width:100%;padding:14px 15px;border:2px solid #e3e8f5;bord
 
 <section id="quiz" class="hidden">
   <div class="topbar"><button class="secondary" onclick="showLesson()">← Stoppen</button></div>
-  <div class="card"><div id="quizProgress" class="small"></div><div id="quizContent"></div></div>
+  <div class="card"><div id="quizProgress" class="small"></div><div id="quizMeter"></div><div id="quizContent"></div></div>
 </section>
 </div>
 
@@ -152,6 +153,10 @@ let editingLessonId=null;
 let quizItems=[];
 let quizIndex=0;
 let quizScore=0;
+let quizMastered=new Set();
+let quizQueue=[];
+let quizMode="practice";
+let quizTestAnswers=[];
 
 function isParentLoggedIn(){return !!currentSession&&PARENT_IDS.has(currentSession.user.id)}
 
@@ -286,32 +291,179 @@ async function deleteCurrentLesson(){
   currentLesson=null;await loadLessons()
 }
 
-function startQuiz(){
-  if(!currentLesson||!currentLesson.lesson_items.length)return;quizItems=[...currentLesson.lesson_items].sort(()=>Math.random()-.5);quizIndex=0;quizScore=0;hideAll();document.getElementById("quiz").classList.remove("hidden");showQuizItem()
+function resetQuizState(){
+  quizItems=[...currentLesson.lesson_items].sort(()=>Math.random()-.5);
+  quizQueue=[...quizItems];
+  quizIndex=0;
+  quizScore=0;
+  quizMastered=new Set();
+}
+
+function startPractice(){
+  if(!currentLesson||!currentLesson.lesson_items.length)return;
+  resetQuizState();
+  quizMode="practice";
+  quizTestAnswers=[];
+  hideAll();
+  document.getElementById("quiz").classList.remove("hidden");
+  showQuizItem();
+}
+
+function startTest(){
+  if(!currentLesson||!currentLesson.lesson_items.length)return;
+  resetQuizState();
+  quizMode="test";
+  quizTestAnswers=[];
+  quizQueue=[...quizItems];
+  hideAll();
+  document.getElementById("quiz").classList.remove("hidden");
+  showQuizItem();
+}
+
+function startQuiz(){startPractice()}
+
+function updateQuizMeter(){
+  const meter=document.getElementById("quizMeter");
+  if(!meter)return;
+  const total=quizItems.length;
+  if(quizMode==="test"){
+    const current=Math.min(quizIndex,total);
+    const percent=total?Math.round((current/total)*100):0;
+    meter.innerHTML=`<div class="progress-wrap"><div class="progress-label"><span>Toets: ${current} van ${total}</span><span>${percent}%</span></div><div class="progress-track"><div class="progress-bar" style="width:${percent}%"></div></div></div>`;
+    return;
+  }
+  const mastered=quizMastered.size;
+  const percent=total?Math.round((mastered/total)*100):0;
+  meter.innerHTML=`<div class="progress-wrap"><div class="progress-label"><span>${mastered} van ${total} geleerd</span><span>${percent}%</span></div><div class="progress-track"><div class="progress-bar" style="width:${percent}%"></div></div>${mastered<total?`<div class="small" style="margin-top:8px;text-align:center">Nog ${total-mastered} woord${total-mastered===1?"":"en"} te leren</div>`:""}</div>`;
 }
 
 function showQuizItem(){
-  if(quizIndex>=quizItems.length){finishQuiz();return}
-  const item=quizItems[quizIndex];document.getElementById("quizProgress").textContent=`Vraag ${quizIndex+1} van ${quizItems.length}`;const container=document.getElementById("quizContent");
+  if(quizIndex>=quizQueue.length){finishQuiz();return}
+  const item=quizQueue[quizIndex];
+  updateQuizMeter();
+  document.getElementById("quizProgress").textContent=quizMode==="test"?`Vraag ${quizIndex+1} van ${quizItems.length}`:(currentLesson.type==="words"?`Oefenen • ${quizMastered.size} van ${quizItems.length} geleerd`:`Vraag ${quizIndex+1} van ${quizQueue.length}`);
+  const container=document.getElementById("quizContent");
+
   if(currentLesson.type==="words"){
-    container.innerHTML=`<div class="quiz-question">${escapeHtml(item.question)}</div><input id="quizInput" placeholder="Typ je antwoord..." autocomplete="off" onkeydown="if(event.key==='Enter')checkWordAnswer()"><button class="big-button" onclick="checkWordAnswer()">Controleren</button><div id="quizResult"></div>`;
-    setTimeout(()=>{const input=document.getElementById("quizInput");if(input)input.focus()},100)
-  }else container.innerHTML=`<div class="quiz-question">${escapeHtml(item.question)}</div><textarea id="quizInput" placeholder="Typ je antwoord..."></textarea><button class="big-button" onclick="showQuestionAnswer()">Antwoord bekijken</button><div id="quizResult"></div>`
+    if(quizMode==="practice"){
+      const useMultipleChoice=quizItems.length>=4 && Math.random()<0.45;
+      if(useMultipleChoice){showWordMultipleChoice(item);}
+      else {showWordTyping(item);}
+    }else{
+      showWordTyping(item);
+    }
+  }else{
+    container.innerHTML=`<div class="quiz-question">${escapeHtml(item.question)}</div><textarea id="quizInput" placeholder="Typ je antwoord..."></textarea><button class="big-button" onclick="showQuestionAnswer()">Antwoord bekijken</button><div id="quizResult"></div>`;
+  }
+}
+
+function showWordTyping(item){
+  const container=document.getElementById("quizContent");
+  container.innerHTML=`<div class="quiz-question">${escapeHtml(item.question)}</div><input id="quizInput" placeholder="Typ je antwoord..." autocomplete="off" onkeydown="if(event.key==='Enter')checkWordAnswer()"><button class="big-button" onclick="checkWordAnswer()">Controleren</button><div id="quizResult"></div>`;
+  setTimeout(()=>{const input=document.getElementById("quizInput");if(input)input.focus()},100);
+}
+
+function getMultipleChoiceOptions(item){
+  const correct=item.answer;
+  const others=quizItems.filter(x=>String(x.id)!==String(item.id)).map(x=>x.answer);
+  const unique=[...new Set(others.filter(x=>x.trim().toLowerCase()!==correct.trim().toLowerCase()))];
+  unique.sort(()=>Math.random()-.5);
+  return [correct,...unique.slice(0,3)].sort(()=>Math.random()-.5);
+}
+
+function showWordMultipleChoice(item){
+  const options=getMultipleChoiceOptions(item);
+  const container=document.getElementById("quizContent");
+  container.innerHTML=`<div class="quiz-question">${escapeHtml(item.question)}</div><div class="multiple-choice">${options.map((option,i)=>`<button onclick="checkMultipleChoice(${i})" data-option="${i}">${escapeHtml(option)}</button>`).join("")}</div><div id="quizResult"></div>`;
+  window.currentMcOptions=options;
+  window.currentMcItemId=String(item.id);
+}
+
+function finishPracticeWord(item,correct){
+  const result=document.getElementById("quizResult");
+  if(correct){
+    quizMastered.add(String(item.id));
+    quizScore=quizMastered.size;
+    result.innerHTML=`<div class="success">🟢 Goed! Dit woord heb je geleerd.</div><button onclick="nextQuizItem()">Volgende →</button>`;
+  }else{
+    quizQueue.push(item);
+    result.innerHTML=`<div class="error">🔴 Nog niet goed.<br><br>Het juiste antwoord is: <strong>${escapeHtml(item.answer)}</strong><br><br>Dit woord komt later opnieuw.</div><button onclick="nextQuizItem()">Volgende →</button>`;
+  }
+  updateQuizMeter();
 }
 
 function checkWordAnswer(){
-  const input=document.getElementById("quizInput"),result=document.getElementById("quizResult");const given=input.value.trim().toLowerCase(),correct=quizItems[quizIndex].answer.trim().toLowerCase();
-  if(given===correct){quizScore++;result.innerHTML=`<div class="success">🟢 Goed!</div><button onclick="nextQuizItem()">Volgende →</button>`}else result.innerHTML=`<div class="error">🔴 Niet helemaal.<br><br>Het juiste antwoord is: <strong>${escapeHtml(quizItems[quizIndex].answer)}</strong></div><button onclick="nextQuizItem()">Volgende →</button>`;
-  input.disabled=true
+  const input=document.getElementById("quizInput"),item=quizQueue[quizIndex];
+  if(!input||!item)return;
+  const given=input.value.trim().toLowerCase(),correct=item.answer.trim().toLowerCase();
+  input.disabled=true;
+  if(quizMode==="test"){
+    quizTestAnswers.push({item,given,correct:given===correct});
+    if(given===correct)quizScore++;
+    document.getElementById("quizResult").innerHTML=given===correct?`<div class="success">🟢 Antwoord opgeslagen.</div>`:`<div class="error">🔴 Antwoord opgeslagen.</div>`;
+    document.getElementById("quizResult").innerHTML+=`<button onclick="nextQuizItem()">Volgende →</button>`;
+  }else{
+    finishPracticeWord(item,given===correct);
+  }
+}
+
+function checkMultipleChoice(index){
+  const item=quizQueue[quizIndex];
+  const chosen=window.currentMcOptions[index];
+  document.querySelectorAll(".multiple-choice button").forEach(b=>b.disabled=true);
+  const correct=chosen.trim().toLowerCase()===item.answer.trim().toLowerCase();
+  finishPracticeWord(item,correct);
 }
 
 function showQuestionAnswer(){
-  const input=document.getElementById("quizInput"),result=document.getElementById("quizResult");input.disabled=true;result.innerHTML=`<div class="quiz-answer">${escapeHtml(quizItems[quizIndex].answer)}</div><p style="text-align:center">Had je het goed?</p><div class="row"><button class="green" onclick="questionCorrect()">🟢 Ik had het goed</button><button class="danger" onclick="questionWrong()">🔴 Ik had het fout</button></div>`
+  const input=document.getElementById("quizInput"),result=document.getElementById("quizResult"),item=quizQueue[quizIndex];
+  input.disabled=true;
+  if(quizMode==="test"){
+    const given=input.value.trim();
+    quizTestAnswers.push({item,given,correct:null});
+    result.innerHTML=`<div class="quiz-answer">Antwoord opgeslagen.</div><button onclick="nextQuizItem()">Volgende →</button>`;
+    return;
+  }
+  result.innerHTML=`<div class="quiz-answer">${escapeHtml(item.answer)}</div><p style="text-align:center">Had je het goed?</p><div class="row"><button class="green" onclick="questionCorrect()">🟢 Ik had het goed</button><button class="danger" onclick="questionWrong()">🔴 Ik had het fout</button></div>`;
 }
-function questionCorrect(){quizScore++;nextQuizItem()}function questionWrong(){nextQuizItem()}function nextQuizItem(){quizIndex++;showQuizItem()}
+
+function questionCorrect(){quizScore++;nextQuizItem()}
+function questionWrong(){nextQuizItem()}
+function nextQuizItem(){quizIndex++;showQuizItem()}
+
+function calculateGrade(correct,total){
+  if(!total)return 0;
+  return Math.round((correct/total)*10*10)/10;
+}
 
 function finishQuiz(){
-  document.getElementById("quizProgress").textContent="Klaar!";document.getElementById("quizContent").innerHTML=`<div class="score">🎉 Quiz klaar!<br><br>${quizScore} van ${quizItems.length} goed</div><br><button class="big-button" onclick="startQuiz()">🔄 Opnieuw</button><br><br><button class="secondary big-button" onclick="showLesson()">← Terug naar de les</button>`
+  const total=quizItems.length;
+  document.getElementById("quizProgress").textContent="Klaar!";
+  updateQuizMeter();
+  if(quizMode==="practice" && currentLesson.type==="words"){
+    document.getElementById("quizContent").innerHTML=`<div class="score">🎉 Alle woordjes geleerd!</div><p style="text-align:center;font-size:18px">${total} van ${total} woorden beheerst.</p><br><button class="big-button" onclick="startPractice()">🔄 Opnieuw oefenen</button><br><br><button class="secondary big-button" onclick="showLesson()">← Terug naar de les</button>`;
+    return;
+  }
+  if(quizMode==="practice"){
+    document.getElementById("quizContent").innerHTML=`<div class="score">🎉 Oefening klaar!</div><p style="text-align:center;font-size:18px">${quizScore} van ${total} goed</p><br><button class="big-button" onclick="startPractice()">🔄 Opnieuw</button><br><br><button class="secondary big-button" onclick="showLesson()">← Terug naar de les</button>`;
+    return;
+  }
+  let correct=0;
+  quizTestAnswers.forEach(entry=>{
+    if(currentLesson.type==="words"){
+      if(entry.correct)correct++;
+    }else if(entry.given.trim().toLowerCase()===entry.item.answer.trim().toLowerCase()){
+      correct++;
+    }
+  });
+  const grade=calculateGrade(correct,total);
+  const percent=total?Math.round(correct/total*100):0;
+  const rows=quizTestAnswers.map(entry=>{
+    const given=entry.given||"(geen antwoord)";
+    const ok=currentLesson.type==="words"?entry.correct:(given.trim().toLowerCase()===entry.item.answer.trim().toLowerCase());
+    return `<div class="result-row"><span>${escapeHtml(entry.item.question)}</span><span class="${ok?"result-right":"result-wrong"}">${ok?"✅":"❌"} ${escapeHtml(given)}</span></div>${ok?"":`<div class="result-row"><span>Juiste antwoord</span><strong>${escapeHtml(entry.item.answer)}</strong></div>`}`;
+  }).join("");
+  document.getElementById("quizContent").innerHTML=`<div class="test-score">${grade.toFixed(1)}</div><p style="text-align:center;font-size:20px;font-weight:800">${correct} van ${total} goed (${percent}%)</p><div class="card result-list"><h3>Resultaat</h3>${rows}</div><button class="big-button" onclick="startTest()">🔄 Toets opnieuw</button><br><br><button class="secondary big-button" onclick="showLesson()">← Terug naar de les</button>`;
 }
 
 function goBack(){if(currentLesson&&currentSubject)showSubject(currentSubject);else showHome()}

@@ -2274,13 +2274,58 @@ function speakDictationWord(){
     return;
   }
 
-  const item = quizQueue[0];
+  const item =
+    quizQueue[quizIndex];
 
   if(!item)return;
 
-  playItemAudio(item);
-}
+  /*
+    Eerst proberen we de Piper-audio uit Supabase.
+    Bestandsnaam = het antwoord + .wav
+  */
 
+  const word =
+    item.answer.trim();
+
+  const audioUrl =
+    SUPABASE_URL +
+    "/storage/v1/object/public/audio/" +
+    encodeURIComponent(word) +
+    ".wav";
+
+  const audio =
+    new Audio(audioUrl);
+
+  audio.play()
+    .catch(error=>{
+
+      console.warn(
+        "Piper-audio niet gevonden, browserstem wordt gebruikt:",
+        error
+      );
+
+      /*
+        Als er nog geen Piper-bestand bestaat,
+        gebruiken we tijdelijk de browserstem.
+      */
+
+      window.speechSynthesis.cancel();
+
+      const speech =
+        new SpeechSynthesisUtterance(
+          word
+        );
+
+      speech.lang = "nl-NL";
+      speech.rate = .75;
+      speech.pitch = 1;
+
+      window.speechSynthesis.speak(
+        speech
+      );
+
+    });
+}
 
 /* =========================================================
    SHOW QUIZ ITEM

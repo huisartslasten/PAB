@@ -2228,8 +2228,16 @@ function updateQuizProgress(){
 ========================================================= */
 
 function audioUrlForItem(item){
-  if(!item || !item.id) return null;
-  return `audio/item-${item.id}.wav`;
+  if(!item || !item.question) return null;
+
+  const word = item.question.trim();
+
+  return (
+    SUPABASE_URL +
+    "/storage/v1/object/public/audio/" +
+    encodeURIComponent(word) +
+    ".wav"
+  );
 }
 
 

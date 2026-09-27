@@ -1,493 +1,145 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="nl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PacoGo!</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PacoGO!</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f3f7ff;color:#24324a}
-header{background:linear-gradient(135deg,#5b5ce2,#7467f0);color:white;padding:28px 22px 32px;border-radius:0 0 30px 30px;box-shadow:0 8px 25px rgba(77,78,180,.18)}
-header h1{max-width:1000px;margin:auto;font-size:32px;font-weight:850;letter-spacing:-1px}
-.container{max-width:1000px;margin:30px auto 60px;padding:0 22px}
-h2{font-size:28px;margin:0 0 8px;font-weight:800} h3{font-size:21px;font-weight:800}
-.card{background:white;border:0;border-radius:24px;padding:28px;margin-bottom:22px;box-shadow:0 8px 30px rgba(50,70,110,.09)}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:20px}
-.big-button{width:100%;min-height:145px;padding:25px;border-radius:24px;border:0;font-size:22px;font-weight:850;color:white;background:linear-gradient(135deg,#5b5ce2,#7c6cf2);box-shadow:0 8px 0 #4546b5;transition:transform .15s ease,box-shadow .15s ease}
-.big-button:hover{transform:translateY(-4px);box-shadow:0 12px 0 #4546b5}.big-button:active{transform:translateY(3px);box-shadow:0 5px 0 #4546b5}
-.lesson-button{display:flex;align-items:center;gap:16px;min-height:88px;width:100%;padding:16px 20px;margin-bottom:14px;text-align:left;border:0;border-radius:22px;background:linear-gradient(135deg,#8b8ff7,#a9a7ff);color:white;box-shadow:0 6px 0 #7477d9,0 10px 22px rgba(80,80,180,.10);transition:transform .15s ease,box-shadow .15s ease}
-.lesson-button:hover{transform:translateX(5px);box-shadow:0 9px 0 #7477d9,0 14px 25px rgba(80,80,180,.14)}
-.lesson-button:active{transform:translateY(3px);box-shadow:0 3px 0 #7477d9}
-.lesson-icon{width:50px;height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:15px;background:rgba(255,255,255,.22);font-size:27px}
-.lesson-info{flex:1}.lesson-title{display:block;font-size:18px;font-weight:800;line-height:1.25}.lesson-count{display:block;margin-top:5px;color:rgba(255,255,255,.82);font-size:14px;font-weight:600}.lesson-arrow{font-size:34px;font-weight:300;color:rgba(255,255,255,.8)}
-button{border:0;border-radius:14px;padding:13px 19px;font-size:15px;font-weight:750;cursor:pointer;background:#5b5ce2;color:white;transition:transform .15s ease,opacity .15s ease}button:hover{opacity:.95;transform:translateY(-2px)}button.secondary{background:#e9edfa;color:#34415a}button.green{background:#20c997}button.danger{background:#f05b6f}
-input,textarea,select{width:100%;padding:14px 15px;border:2px solid #e3e8f5;border-radius:13px;font-size:16px;background:white;color:#24324a;font-family:inherit;margin-top:6px;margin-bottom:16px}input:focus,textarea:focus,select:focus{outline:none;border-color:#7467f0;box-shadow:0 0 0 4px rgba(116,103,240,.12)}textarea{min-height:90px;resize:vertical}label{font-weight:750;color:#34415a}
-.row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1}.topbar{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:22px}.hidden{display:none!important}
-.word{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:center;margin-bottom:12px}.question-card{background:#f8f9ff;border:2px solid #e5e9f6;border-radius:18px;padding:20px;margin-bottom:15px;white-space:pre-line}
-.quiz-question{font-size:36px;line-height:1.3;font-weight:850;text-align:center;color:#24324a;background:linear-gradient(135deg,#fff,#f7f8ff);border-radius:28px;padding:50px 35px;margin:30px 0 22px;border:3px solid #e4e7ff;box-shadow:0 10px 0 #dfe3f7,0 15px 30px rgba(50,70,110,.10);white-space:pre-line}
-.progress-wrap{margin:18px 0 26px}.progress-label{display:flex;justify-content:space-between;gap:12px;font-weight:800;color:#4d5a73;margin-bottom:8px}.progress-track{height:14px;background:#e9ecf5;border-radius:999px;overflow:hidden;border:1px solid #dfe3ee}.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,#6d5dfc,#4f9cff);border-radius:999px;transition:width .3s ease}.mode-button{min-height:120px;font-size:20px}.choice-card{padding:24px}.multiple-choice{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}.multiple-choice button{min-height:64px;font-size:18px;background:#eef0ff;color:#34415a;border:2px solid #dfe3f7}.multiple-choice button:hover{background:#e1e4ff}.multiple-choice button:disabled{opacity:.75;cursor:default;transform:none}.test-score{font-size:42px;font-weight:900;text-align:center;margin:15px 0}.result-list{margin:20px 0}.result-row{display:flex;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid #e5e9f2}.result-row:last-child{border-bottom:0}.result-wrong{color:#c53045}.result-right{color:#087f5b}.quiz-answer{font-size:24px;line-height:1.5;text-align:center;padding:28px;margin:20px 0;background:linear-gradient(135deg,#f3f1ff,#eef7ff);color:#24324a;border-radius:22px;border:2px solid #e2e4ff;box-shadow:0 6px 18px rgba(50,70,110,.06);white-space:pre-line}
-.score{font-size:28px;font-weight:850;text-align:center}.small{color:#718096;font-size:14px}.error{background:#fff0f1;color:#c53045;padding:14px 16px;border-radius:14px;margin-bottom:16px}.success{background:#e9fbf4;color:#087f5b;padding:14px 16px;border-radius:14px;margin-bottom:16px}
-.subject-blue{background:linear-gradient(135deg,#3b82f6,#60a5fa)}.subject-purple{background:linear-gradient(135deg,#8b5cf6,#a78bfa)}.subject-green{background:linear-gradient(135deg,#10b981,#34d399)}.subject-orange{background:linear-gradient(135deg,#f97316,#fb923c)}.subject-pink{background:linear-gradient(135deg,#ec4899,#f472b6)}.subject-cyan{background:linear-gradient(135deg,#06b6d4,#22d3ee)}
-.subject-icon{display:block;font-size:48px;margin-bottom:12px}.subject-name{display:block;font-size:23px;font-weight:850}.subject-count{display:block;margin-top:7px;font-size:15px;font-weight:600;opacity:.9}
-#lessonChoice .card{text-align:center;padding:35px 30px}#lessonChoice h2{font-size:30px;margin-bottom:10px}#lessonChoice .small{font-size:16px;margin-bottom:28px}#lessonChoice .row{gap:18px}#lessonChoice .big-button{min-height:135px;font-size:20px}#lessonChoice .green{background:linear-gradient(135deg,#10b981,#34d399);box-shadow:0 7px 0 #087f5b}
-@media(max-width:600px){header{padding:23px 18px 27px;border-radius:0 0 24px 24px}header h1{font-size:26px}.container{margin-top:22px;padding:0 15px}.card{padding:20px;border-radius:20px}.big-button{min-height:115px;font-size:19px}.quiz-question{font-size:27px}.multiple-choice{grid-template-columns:1fr}.word{grid-template-columns:1fr}}
+:root{--bg:#f4f7fb;--card:#fff;--text:#172033;--muted:#667085;--primary:#4f46e5;--primary2:#3730a3;--danger:#dc2626;--success:#16a34a;--border:#e5e7eb;--shadow:0 8px 24px rgba(23,32,51,.08)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,textarea,select{font:inherit}button{border:0;cursor:pointer;border-radius:12px;padding:11px 16px;background:var(--primary);color:#fff;font-weight:700}button:hover{background:var(--primary2)}button.secondary{background:#eef2ff;color:#3730a3}button.danger{background:#fee2e2;color:#b91c1c}button.success{background:#dcfce7;color:#166534}button.big{font-size:18px;padding:15px 20px}.hidden{display:none!important}.container{max-width:1000px;margin:0 auto;padding:24px}.topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:24px}.topbar h2{margin:0}.row{display:flex;gap:10px;flex-wrap:wrap}.brand{font-size:30px;font-weight:900;margin:0}.subtitle{color:var(--muted);margin-top:5px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px;box-shadow:var(--shadow)}.subject-card{min-height:150px;display:flex;flex-direction:column;justify-content:space-between}.subject-icon{font-size:38px}.subject-title{font-size:21px;font-weight:800}.subject-blue{border-top:6px solid #3b82f6}.subject-purple{border-top:6px solid #8b5cf6}.subject-green{border-top:6px solid #22c55e}.subject-orange{border-top:6px solid #f97316}.subject-pink{border-top:6px solid #ec4899}.subject-cyan{border-top:6px solid #06b6d4}.lesson-card{cursor:pointer}.lesson-card:hover{transform:translateY(-2px);transition:.15s}.badge{display:inline-block;padding:5px 9px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:12px;font-weight:800;margin-bottom:9px}.type-dictation{background:#fff7ed;color:#c2410c}.type-question{background:#f0fdf4;color:#15803d}.type-word{background:#eff6ff;color:#1d4ed8}.editor-row{background:#f8fafc;border:1px solid var(--border);padding:14px;border-radius:14px;margin:10px 0}.field{margin-bottom:14px}.field label{display:block;font-weight:750;margin-bottom:6px}.field input,.field textarea,.field select{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:10px;background:#fff;color:var(--text)}textarea{min-height:100px;resize:vertical}.message{padding:12px 14px;border-radius:12px;margin:14px 0}.message.error{background:#fee2e2;color:#991b1b}.message.success{background:#dcfce7;color:#166534}.choice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:22px}.choice{padding:25px;border-radius:18px;background:#fff;border:2px solid var(--border);box-shadow:var(--shadow);text-align:left}.choice:hover{border-color:#a5b4fc}.choice .emoji{font-size:38px}.choice h3{margin:8px 0 5px}.choice p{color:var(--muted);margin:0}.practice-box{max-width:700px;margin:0 auto;text-align:center}.prompt{font-size:34px;font-weight:900;margin:30px 0 22px;white-space:pre-line}.answer-input{font-size:22px;padding:15px;text-align:center}.feedback{font-size:18px;font-weight:800;min-height:30px;margin:15px 0}.progress-wrap{margin:15px 0 25px}.progress-label{display:flex;justify-content:space-between;color:var(--muted);font-size:14px;margin-bottom:7px}.progress{height:12px;background:#e5e7eb;border-radius:999px;overflow:hidden}.progress-bar{height:100%;background:linear-gradient(90deg,#4f46e5,#7c3aed);transition:width .25s}.speaker{font-size:18px;background:#eef2ff;color:#3730a3}.speaker:hover{background:#e0e7ff}.mc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}.mc-grid button{background:#f8fafc;color:var(--text);border:2px solid var(--border);text-align:left}.mc-grid button:hover{border-color:#818cf8;background:#eef2ff}.result-score{font-size:54px;font-weight:900;color:var(--primary);margin:20px 0}.result-item{padding:12px;border-bottom:1px solid var(--border);text-align:left}.correct{color:#15803d}.incorrect{color:#b91c1c}.login-card{max-width:420px;margin:40px auto}.small{font-size:13px;color:var(--muted)}.section-title{margin-top:28px}.empty{padding:30px;text-align:center;color:var(--muted);background:#fff;border:1px dashed #cbd5e1;border-radius:16px}.danger-text{color:#b91c1c}.remove-row{float:right;background:#fee2e2;color:#b91c1c;padding:6px 10px}.test-instructions{background:#eef2ff;padding:14px;border-radius:12px;color:#3730a3}.self-buttons{display:flex;justify-content:center;gap:10px;margin-top:18px}.question-answer{white-space:pre-line;background:#f8fafc;border-radius:14px;padding:18px;text-align:left;margin:20px 0}.dictation-word{font-size:20px;color:var(--muted)}
+@media(max-width:600px){.container{padding:16px}.topbar{align-items:flex-start;flex-direction:column}.prompt{font-size:28px}.mc-grid{grid-template-columns:1fr}.brand{font-size:26px}}
 </style>
 </head>
 <body>
-<header><h1>📚 PacoGO!</h1></header>
 <div class="container">
-<div id="message"></div>
+  <header class="topbar">
+    <div><h1 class="brand">📚 PacoGO!</h1><div class="subtitle">Leren, oefenen en jezelf testen.</div></div>
+  </header>
 
-<section id="login" class="hidden">
-  <div class="card">
-    <h2>🔐 Ouder login</h2>
-    <p class="small">Log in om lessen te maken en te bewerken.</p>
-    <label>E-mailadres</label>
-    <input id="loginEmail" type="email" autocomplete="email" placeholder="Jouw e-mailadres">
-    <label>Wachtwoord</label>
-    <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Wachtwoord">
-    <div id="loginError" class="error hidden"></div>
-    <div class="row">
-      <button onclick="loginParent()">Inloggen</button>
-      <button class="secondary" onclick="showHome()">Annuleren</button>
-    </div>
-  </div>
-</section>
-
-<section id="home">
-  <div class="topbar">
-    <h2>Vakken</h2>
-    <div class="row">
+  <main id="home" class="page">
+    <div class="topbar"><h2>Vakken</h2><div class="row">
       <button id="loginButton" class="secondary" onclick="showLogin()">🔐 Ouder login</button>
       <button id="logoutButton" class="secondary hidden" onclick="logoutParent()">🚪 Uitloggen</button>
       <button id="addLessonButton" class="hidden" onclick="showAddLesson()">➕ Nieuwe les</button>
-    </div>
-  </div>
-  <div id="subjects" class="grid"></div>
-</section>
+    </div></div>
+    <div id="subjects" class="grid"></div>
+  </main>
 
-<section id="lessonList" class="hidden">
-  <div class="topbar">
-    <button class="secondary" onclick="showHome()">← Terug</button>
-    <button id="addLessonButton2" class="hidden" onclick="showAddLesson(currentSubject)">➕ Nieuwe les</button>
-  </div>
-  <h2 id="subjectTitle"></h2>
-  <div id="lessons"></div>
-</section>
+  <main id="subject" class="page hidden">
+    <div class="topbar"><div><button class="secondary" onclick="showHome()">← Terug</button><h2 id="subjectTitle" style="margin-top:14px"></h2></div></div>
+    <div id="lessons" class="grid"></div>
+    <div class="row" style="margin-top:18px"><button id="addLessonButton2" class="hidden" onclick="showAddLesson(currentSubject)">➕ Nieuwe les</button></div>
+  </main>
 
-<section id="lessonEditor" class="hidden">
-  <div class="topbar"><button class="secondary" onclick="goBack()">← Terug</button></div>
-  <div class="card">
-    <h2 id="editorTitle">Nieuwe les</h2>
-    <label>Vak</label>
-    <input id="subjectInput" placeholder="Bijvoorbeeld 🇬🇧 Engels">
-    <label>Naam van de les</label>
-    <input id="titleInput" placeholder="Bijvoorbeeld Les 3 – Dieren">
-    <label>Type les</label>
-    <select id="typeInput" onchange="changeLessonType()">
-      <option value="words">📖 Woordjes</option>
-      <option value="questions">❓ Vragen</option>
-    </select>
-    <div id="wordsEditor">
-      <h3>Woorden</h3><div id="wordRows"></div>
-      <button class="secondary" onclick="addWordRow()">➕ Woord toevoegen</button>
-    </div>
-    <div id="questionsEditor" class="hidden">
-      <h3>Vragen</h3><div id="questionRows"></div>
-      <button class="secondary" onclick="addQuestionRow()">➕ Vraag toevoegen</button>
-    </div>
-    <br><br><button onclick="saveLesson()">💾 Opslaan</button>
-  </div>
-</section>
-
-<section id="lessonChoice" class="hidden">
-  <div class="topbar"><button class="secondary" onclick="goBack()">← Terug</button></div>
-  <div class="card choice-card">
-    <h2 id="choiceTitle"></h2>
-    <p class="small">Kies hoe je deze les wilt doen.</p>
-    <div class="row">
-      <button class="big-button mode-button" onclick="showLesson()">📖 Les bekijken</button>
-      <button class="green big-button mode-button" onclick="startPractice()">🎯 Oefenen</button>
-      <button class="big-button mode-button" onclick="startTest()">📝 Toets</button>
-    </div>
-  </div>
-</section>
-
-<section id="lessonView" class="hidden">
-  <div class="topbar">
+  <main id="lessonChoice" class="page hidden">
     <button class="secondary" onclick="goBack()">← Terug</button>
-    <div>
-      <button id="editLessonButton" class="hidden" onclick="editCurrentLesson()">✏️ Bewerken</button>
-      <button id="deleteLessonButton" class="danger hidden" onclick="deleteCurrentLesson()">🗑️ Verwijderen</button>
-    </div>
-  </div>
-  <div class="card">
-    <h2 id="viewTitle"></h2><p id="viewInfo" class="small"></p>
-    <div id="viewItems"></div><br>
-    <button class="green big-button" onclick="startQuiz()">▶️ Start de quiz</button>
-  </div>
-</section>
+    <div class="card" style="margin-top:18px"><h2 id="choiceTitle"></h2><div id="choiceMeta" class="small"></div></div>
+    <div id="choiceGrid" class="choice-grid"></div>
+  </main>
 
-<section id="quiz" class="hidden">
-  <div class="topbar"><button class="secondary" onclick="showLesson()">← Stoppen</button></div>
-  <div class="card"><div id="quizProgress" class="small"></div><div id="quizMeter"></div><div id="quizContent"></div></div>
-</section>
+  <main id="lessonView" class="page hidden">
+    <div class="topbar"><div><button class="secondary" onclick="goBack()">← Terug</button><h2 id="lessonTitle" style="margin-top:14px"></h2></div><div id="lessonAdminButtons" class="row"><button id="editLessonButton" class="hidden" onclick="editCurrentLesson()">✏️ Bewerken</button><button id="deleteLessonButton" class="danger hidden" onclick="deleteCurrentLesson()">🗑️ Verwijderen</button></div></div>
+    <div id="lessonContent"></div>
+  </main>
+
+  <main id="editor" class="page hidden">
+    <button class="secondary" onclick="goBack()">← Annuleren</button>
+    <div class="card" style="margin-top:18px"><h2 id="editorTitle">Nieuwe les</h2>
+      <div class="field"><label for="lessonSubject">Vak</label><input id="lessonSubject" placeholder="Bijvoorbeeld Nederlands"></div>
+      <div class="field"><label for="lessonName">Naam van de les</label><input id="lessonName" placeholder="Bijvoorbeeld Week 4"></div>
+      <div class="field"><label for="lessonType">Onderdeel</label><select id="lessonType" onchange="changeLessonType()"><option value="words">🎯 Woordtrainer</option><option value="questions">❓ Vragen</option><option value="dictation">✏️ Dictee</option></select></div>
+      <div id="wordEditor"></div><div id="questionEditor" class="hidden"></div><div id="dictationEditor" class="hidden"></div>
+      <div class="row" style="margin-top:18px"><button onclick="addCurrentRow()">➕ Rij toevoegen</button><button class="success" onclick="saveLesson()">💾 Les opslaan</button></div>
+      <div id="editorError" class="message error hidden"></div>
+    </div>
+  </main>
+
+  <main id="login" class="page hidden"><button class="secondary" onclick="showHome()">← Terug</button><div class="card login-card"><h2>🔐 Ouder login</h2><div class="field"><label for="loginEmail">E-mailadres</label><input id="loginEmail" type="email" autocomplete="email"></div><div class="field"><label for="loginPassword">Wachtwoord</label><input id="loginPassword" type="password" autocomplete="current-password"></div><button class="big" onclick="loginParent()">Inloggen</button><div id="loginError" class="message error hidden"></div></div></main>
+
+  <main id="practice" class="page hidden"><button class="secondary" onclick="leaveActivity()">← Stoppen</button><div class="card practice-box" style="margin-top:18px"><h2 id="practiceTitle"></h2><div id="practiceProgress" class="progress-wrap"></div><div id="practiceContent"></div></div></main>
+
+  <main id="test" class="page hidden"><button class="secondary" onclick="leaveActivity()">← Stoppen</button><div class="card practice-box" style="margin-top:18px"><h2 id="testTitle"></h2><div id="testProgress" class="progress-wrap"></div><div id="testContent"></div></div></main>
+
+  <main id="result" class="page hidden"><div class="card practice-box"><h2 id="resultTitle"></h2><div id="resultScore" class="result-score"></div><div id="resultDetails"></div><div class="row" style="justify-content:center;margin-top:22px"><button onclick="showLessonChoice(currentLesson)">Nog een keer</button><button class="secondary" onclick="goBack()">Terug naar les</button></div></div></main>
+
+  <div id="globalMessage"></div>
 </div>
 
 <script>
-const SUPABASE_URL="https://ncpkqrvxljxwboavxtak.supabase.co";
-const SUPABASE_KEY="sb_publishable_skiKpO4UU79zWY7hskHsoA_WQxA6CFc";
-const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-
-const PARENT_IDS=new Set([
-  "5d0e1e5c-1dbe-4909-bd3a-81a1e7b26d09",
-  "418833d5-049a-4ec9-8072-2d48a85f04b1"
-]);
-
-let currentSession=null;
-let allLessons=[];
-let currentSubject="";
-let currentLesson=null;
-let editingLessonId=null;
-let quizItems=[];
-let quizIndex=0;
-let quizScore=0;
-let quizMastered=new Set();
-let quizQueue=[];
-let quizMode="practice";
-let quizTestAnswers=[];
+const SUPABASE_URL = 'https://ncpkqrvxljxwboavxtak.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_skiKpO4UU79zWY7hskHsoA_WQxA6CFc';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const PARENT_IDS = new Set(['5d0e1e5c-1dbe-4909-bd3a-81a1e7b26d09','418833d5-049a-4ec9-8072-2d48a85f04b1']);
+let currentSession=null,currentSubject=null,currentLesson=null,lessons=[];
+let activity=null;
 
 function isParentLoggedIn(){return !!currentSession&&PARENT_IDS.has(currentSession.user.id)}
+function updateAuthUI(session){currentSession=session;const logged=isParentLoggedIn();document.getElementById('loginButton')?.classList.toggle('hidden',logged);document.getElementById('logoutButton')?.classList.toggle('hidden',!logged);document.getElementById('addLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('addLessonButton2')?.classList.toggle('hidden',!logged);document.getElementById('editLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('deleteLessonButton')?.classList.toggle('hidden',!logged)}
+function requireParent(){if(!isParentLoggedIn()){showMessage('Alleen ouders kunnen lessen wijzigen. Log eerst in.','error');showHome();return false}return true}
+function hideAll(){document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));window.speechSynthesis?.cancel()}
+function showHome(){hideAll();document.getElementById('home').classList.remove('hidden');renderSubjects()}
+function showLogin(){hideAll();document.getElementById('login').classList.remove('hidden');document.getElementById('loginError').classList.add('hidden')}
+function showMessage(text,type='success'){const box=document.getElementById('globalMessage');box.innerHTML='<div class="message '+type+'">'+escapeHtml(text)+'</div>';setTimeout(()=>box.innerHTML='',3500)}
+function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function normalize(v){return String(v??'').trim().toLowerCase()}
+function shuffle(arr){return [...arr].sort(()=>Math.random()-.5)}
+function typeLabel(type){return type==='words'?'🎯 Woordtrainer':type==='dictation'?'✏️ Dictee':'❓ Vragen'}
+function typeClass(type){return type==='words'?'type-word':type==='dictation'?'type-dictation':'type-question'}
+function subjectClass(s){const map={Nederlands:'subject-blue',Engels:'subject-purple',Rekenen:'subject-green',Geschiedenis:'subject-orange',Aardrijkskunde:'subject-cyan',Biologie:'subject-green',Natuur:'subject-orange',Frans:'subject-pink',Spaans:'subject-purple'};return map[s]||'subject-blue'}
+function subjectIcon(s){const map={Nederlands:'📚',Engels:'🇬🇧',Rekenen:'🔢',Geschiedenis:'🏴‍☠️',Aardrijkskunde:'🌍',Biologie:'🧬',Natuur:'🔬',Frans:'🇫🇷',Spaans:'🇪🇸'};return map[s]||'🎮'}
 
-function updateAuthUI(session){
-  currentSession=session;
-  const loggedIn=isParentLoggedIn();
-  document.getElementById("loginButton")?.classList.toggle("hidden",loggedIn);
-  document.getElementById("logoutButton")?.classList.toggle("hidden",!loggedIn);
-  document.getElementById("addLessonButton")?.classList.toggle("hidden",!loggedIn);
-  document.getElementById("addLessonButton2")?.classList.toggle("hidden",!loggedIn);
-  document.getElementById("editLessonButton")?.classList.toggle("hidden",!loggedIn);
-  document.getElementById("deleteLessonButton")?.classList.toggle("hidden",!loggedIn);
-}
+async function initializeApp(){const {data:{session}}=await db.auth.getSession();updateAuthUI(session);await loadLessons()}
+db.auth.onAuthStateChange((_event,session)=>updateAuthUI(session));
 
-function requireParent(){
-  if(!isParentLoggedIn()){
-    showMessage("Alleen ouders kunnen lessen wijzigen. Log eerst in.","error");
-    showHome();
-    return false;
-  }
-  return true;
-}
+async function loadLessons(){const {data,error}=await db.from('lessons').select('*, lesson_items(*)').order('id',{ascending:true});if(error){showMessage('Lessen laden mislukt: '+error.message,'error');return}lessons=(data||[]).map(l=>({...l,lesson_items:(l.lesson_items||[]).sort((a,b)=>(a.sort_order??0)-(b.sort_order??0))}));showHome()}
+function renderSubjects(){const el=document.getElementById('subjects');const names=[...new Set(lessons.map(l=>l.subject))];if(!names.length){el.innerHTML='<div class="empty">Nog geen lessen. Een ouder kan rechtsboven een les toevoegen.</div>';return}el.innerHTML=names.map(s=>{const count=lessons.filter(l=>l.subject===s).length;return `<div class="card subject-card ${subjectClass(s)}" onclick="showSubject('${escapeAttr(s)}')"><div><div class="subject-icon">${subjectIcon(s)}</div><div class="subject-title">${escapeHtml(s)}</div></div><div class="small">${count} ${count===1?'les':'lessen'}</div></div>`}).join('')}
+function escapeAttr(v){return escapeHtml(v).replace(/`/g,'&#96;')}
+function showSubject(subject){currentSubject=subject;hideAll();document.getElementById('subject').classList.remove('hidden');document.getElementById('subjectTitle').textContent=subject;const ls=lessons.filter(l=>l.subject===subject);const el=document.getElementById('lessons');el.innerHTML=ls.length?ls.map(l=>`<div class="card lesson-card" onclick="openLesson(${l.id})"><span class="badge ${typeClass(l.type)}">${typeLabel(l.type)}</span><h3>${escapeHtml(l.title)}</h3><div class="small">${l.lesson_items.length} ${l.lesson_items.length===1?'onderdeel':'onderdelen'}</div></div>`).join(''):'<div class="empty">Nog geen lessen in dit vak.</div>'}
+function openLesson(id){const l=lessons.find(x=>x.id===id);if(!l)return;currentLesson=l;hideAll();document.getElementById('lessonChoice').classList.remove('hidden');document.getElementById('choiceTitle').textContent=l.title;document.getElementById('choiceMeta').textContent=`${l.subject} · ${typeLabel(l.type)} · ${l.lesson_items.length} items`;const g=document.getElementById('choiceGrid');if(l.type==='words'){g.innerHTML=`<button class="choice" onclick="startPractice('words')"><div class="emoji">🎯</div><h3>Oefenen</h3><p>Fouten komen later opnieuw terug totdat je ze beheerst.</p></button><button class="choice" onclick="startTest('words')"><div class="emoji">📝</div><h3>Toets</h3><p>Alle woorden één keer, zonder hulp.</p></button><button class="choice" onclick="showLesson()"><div class="emoji">📖</div><h3>Bekijken</h3><p>Bekijk de woorden en antwoorden.</p></button>`}else if(l.type==='dictation'){g.innerHTML=`<button class="choice" onclick="startPractice('dictation')"><div class="emoji">✏️</div><h3>Oefenen</h3><p>Luister, typ en herhaal fouten totdat de spelling goed is.</p></button><button class="choice" onclick="startTest('dictation')"><div class="emoji">📝</div><h3>Toets</h3><p>Luister en schrijf alle woorden. Feedback komt pas aan het einde.</p></button><button class="choice" onclick="showLesson()"><div class="emoji">📖</div><h3>Bekijken</h3><p>Bekijk de dicteewoorden.</p></button>`}else{g.innerHTML=`<button class="choice" onclick="startQuestions()"><div class="emoji">❓</div><h3>Vragen maken</h3><p>Beantwoord de vragen en controleer jezelf.</p></button><button class="choice" onclick="showLesson()"><div class="emoji">📖</div><h3>Bekijken</h3><p>Bekijk vragen en antwoorden.</p></button>`}}
+function showLesson(){hideAll();document.getElementById('lessonView').classList.remove('hidden');document.getElementById('lessonTitle').textContent=currentLesson.title;const admin=isParentLoggedIn();document.getElementById('editLessonButton').classList.toggle('hidden',!admin);document.getElementById('deleteLessonButton').classList.toggle('hidden',!admin);const el=document.getElementById('lessonContent');el.innerHTML=currentLesson.lesson_items.length?currentLesson.lesson_items.map((it,i)=>`<div class="card" style="margin-bottom:10px"><strong>${i+1}. ${escapeHtml(it.question)}</strong><div style="margin-top:8px;white-space:pre-line">${escapeHtml(it.answer)}</div></div>`).join(''):'<div class="empty">Deze les heeft nog geen items.</div>'}
+function goBack(){if(activity){activity=null}if(currentSubject)showSubject(currentSubject);else showHome()}
+function leaveActivity(){window.speechSynthesis?.cancel();activity=null;showLessonChoice(currentLesson)}
+function showLessonChoice(l){currentLesson=l;openLesson(l.id)}
 
-async function initializeApp(){
-  const {data:{session}}=await db.auth.getSession();
-  updateAuthUI(session);
-  await loadLessons();
-}
+function showAddLesson(subject=''){if(!requireParent())return;hideAll();document.getElementById('editor').classList.remove('hidden');document.getElementById('editorTitle').textContent='Nieuwe les';document.getElementById('lessonSubject').value=subject||currentSubject||'';document.getElementById('lessonName').value='';document.getElementById('lessonType').value='words';document.getElementById('editorError').classList.add('hidden');resetEditorRows();changeLessonType()}
+function resetEditorRows(){document.getElementById('wordEditor').innerHTML='';document.getElementById('questionEditor').innerHTML='';document.getElementById('dictationEditor').innerHTML='';addWordRow();addWordRow()}
+function changeLessonType(){const t=document.getElementById('lessonType').value;document.getElementById('wordEditor').classList.toggle('hidden',t!=='words');document.getElementById('questionEditor').classList.toggle('hidden',t!=='questions');document.getElementById('dictationEditor').classList.toggle('hidden',t!=='dictation');if(t==='questions'&&!document.getElementById('questionEditor').children.length){addQuestionRow();addQuestionRow()}if(t==='dictation'&&!document.getElementById('dictationEditor').children.length){addDictationRow();addDictationRow()}if(t==='words'&&!document.getElementById('wordEditor').children.length){addWordRow();addWordRow()}}
+function rowHtml(content,kind){return `<div class="editor-row"><button class="remove-row" type="button" onclick="this.parentElement.remove()">✕</button>${content}</div>`}
+function addWordRow(q='',a=''){document.getElementById('wordEditor').insertAdjacentHTML('beforeend',rowHtml(`<div class="field"><label>Nederlands / vraag</label><input class="word-q" value="${escapeAttr(q)}" placeholder="bijvoorbeeld huis"></div><div class="field"><label>Antwoord</label><input class="word-a" value="${escapeAttr(a)}" placeholder="bijvoorbeeld house"></div>`,'word'))}
+function addQuestionRow(q='',a=''){document.getElementById('questionEditor').insertAdjacentHTML('beforeend',rowHtml(`<div class="field"><label>Vraag</label><textarea class="question-q" placeholder="Bijvoorbeeld: Wat betekent democratie?">${escapeHtml(q)}</textarea></div><div class="field"><label>Antwoord / uitleg</label><textarea class="question-a" placeholder="Schrijf hier het antwoord of de uitleg.">${escapeHtml(a)}</textarea></div>`,'question'))}
+function addDictationRow(w=''){document.getElementById('dictationEditor').insertAdjacentHTML('beforeend',rowHtml(`<div class="field"><label>Dicteewoord</label><input class="dictation-w" value="${escapeAttr(w)}" placeholder="bijvoorbeeld beautiful"></div><div class="small">Dit woord wordt tijdens het dictee uitgesproken en niet op het scherm getoond.</div>`,'dictation'))}
+function addCurrentRow(){const t=document.getElementById('lessonType').value;if(t==='words')addWordRow();else if(t==='questions')addQuestionRow();else addDictationRow()}
+function collectItems(){const t=document.getElementById('lessonType').value;let items=[];if(t==='words')document.querySelectorAll('#wordEditor .editor-row').forEach((r,i)=>{const q=r.querySelector('.word-q').value.trim(),a=r.querySelector('.word-a').value.trim();if(q&&a)items.push({question:q,answer:a,sort_order:i})});if(t==='questions')document.querySelectorAll('#questionEditor .editor-row').forEach((r,i)=>{const q=r.querySelector('.question-q').value.trim(),a=r.querySelector('.question-a').value.trim();if(q&&a)items.push({question:q,answer:a,sort_order:i})});if(t==='dictation')document.querySelectorAll('#dictationEditor .editor-row').forEach((r,i)=>{const w=r.querySelector('.dictation-w').value.trim();if(w)items.push({question:w,answer:w,sort_order:i})});return items}
+async function saveLesson(){if(!requireParent())return;const subject=document.getElementById('lessonSubject').value.trim(),title=document.getElementById('lessonName').value.trim(),type=document.getElementById('lessonType').value,items=collectItems(),err=document.getElementById('editorError');if(!subject||!title||!items.length){err.textContent='Vul het vak, de lestitel en minstens één item in.';err.classList.remove('hidden');return}err.classList.add('hidden');let lessonId=currentLesson?.id;let error;if(lessonId){({error}=await db.from('lessons').update({subject,title,type}).eq('id',lessonId));if(!error){({error}=await db.from('lesson_items').delete().eq('lesson_id',lessonId));if(!error){({error}=await db.from('lesson_items').insert(items.map(x=>({...x,lesson_id:lessonId})))});}}}else{const res=await db.from('lessons').insert({subject,title,type}).select().single();error=res.error;lessonId=res.data?.id;if(!error){({error}=await db.from('lesson_items').insert(items.map(x=>({...x,lesson_id:lessonId})))});}}if(error){err.textContent='Opslaan mislukt: '+error.message;err.classList.remove('hidden');return}currentSubject=subject;currentLesson=null;await loadLessons();showMessage('Les opgeslagen.','success')}
+function editCurrentLesson(){if(!requireParent())return;const l=currentLesson;hideAll();document.getElementById('editor').classList.remove('hidden');document.getElementById('editorTitle').textContent='Les bewerken';document.getElementById('lessonSubject').value=l.subject;document.getElementById('lessonName').value=l.title;document.getElementById('lessonType').value=l.type;document.getElementById('wordEditor').innerHTML='';document.getElementById('questionEditor').innerHTML='';document.getElementById('dictationEditor').innerHTML='';l.lesson_items.forEach(it=>{if(l.type==='words')addWordRow(it.question,it.answer);else if(l.type==='questions')addQuestionRow(it.question,it.answer);else addDictationRow(it.question)});changeLessonType()}
+async function deleteCurrentLesson(){if(!requireParent())return;if(!confirm('Deze hele les verwijderen?'))return;const {error}=await db.from('lessons').delete().eq('id',currentLesson.id);if(error){showMessage('Verwijderen mislukt: '+error.message,'error');return}const s=currentSubject;currentLesson=null;await loadLessons();currentSubject=s;showSubject(s);showMessage('Les verwijderd.','success')}
+async function logoutParent(){const {error}=await db.auth.signOut();if(error){showMessage('Uitloggen mislukt: '+error.message,'error');return}currentSession=null;updateAuthUI(null);showHome()}
+async function loginParent(){const email=document.getElementById('loginEmail').value.trim(),password=document.getElementById('loginPassword').value,error=document.getElementById('loginError');error.classList.add('hidden');const res=await db.auth.signInWithPassword({email,password});if(res.error){error.textContent='Inloggen mislukt. Controleer je e-mailadres en wachtwoord.';error.classList.remove('hidden');return}showHome()}
 
-db.auth.onAuthStateChange((_event,session)=>{updateAuthUI(session)});
+function startPractice(type){window.speechSynthesis?.cancel();activity={kind:'practice',type,items:shuffle(currentLesson.lesson_items),remaining:new Set(currentLesson.lesson_items.map(x=>x.id)),attempts:0,current:null,mode:null};hideAll();document.getElementById('practice').classList.remove('hidden');document.getElementById('practiceTitle').textContent=type==='dictation'?'✏️ Dictee oefenen':'🎯 Woordtrainer oefenen';renderPractice()}
+function updatePracticeProgress(){const total=currentLesson.lesson_items.length,mastered=total-activity.remaining.size,pct=total?mastered/total*100:0;document.getElementById('practiceProgress').innerHTML=`<div class="progress-label"><span>${mastered} / ${total} beheerst</span><span>Nog ${total-mastered}</span></div><div class="progress"><div class="progress-bar" style="width:${pct}%"></div></div>`}
+function pickPracticeItem(){const rem=[...activity.remaining];if(!rem.length){finishPractice();return null}const candidates=currentLesson.lesson_items.filter(x=>activity.remaining.has(x.id));return candidates[Math.floor(Math.random()*candidates.length)]}
+function renderPractice(){updatePracticeProgress();const item=pickPracticeItem();if(!item)return;activity.current=item;activity.mode=activity.type==='dictation'?'typing':(Math.random()<.72?'typing':'mc');const el=document.getElementById('practiceContent');if(activity.type==='dictation'){el.innerHTML=`<div class="dictation-word">Luister goed en schrijf het woord.</div><div style="margin:22px"><button class="speaker big" onclick="speakDictation()">🔊 Nog een keer</button></div><input id="practiceAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Typ het woord"><div id="practiceFeedback" class="feedback"></div><button class="big" onclick="checkPractice()">Controleren</button>`;setTimeout(()=>{speakDictation();document.getElementById('practiceAnswer')?.focus()},350)}else if(activity.mode==='typing'){el.innerHTML=`<div class="small">Typ het Engelse antwoord.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="practiceAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Typ je antwoord"><div id="practiceFeedback" class="feedback"></div><button class="big" onclick="checkPractice()">Controleren</button>`}else{const opts=shuffle([item.answer,...shuffle(currentLesson.lesson_items.filter(x=>x.id!==item.id)).slice(0,3).map(x=>x.answer)]);el.innerHTML=`<div class="small">Kies het juiste antwoord.</div><div class="prompt">${escapeHtml(item.question)}</div><div class="mc-grid">${opts.map(o=>`<button onclick="checkPracticeMC('${escapeAttr(o)}')">${escapeHtml(o)}</button>`).join('')}</div><div id="practiceFeedback" class="feedback"></div>`}}
+function speakDictation(){if(!activity?.current)return;const u=new SpeechSynthesisUtterance(activity.current.answer);u.lang='en-US';u.rate=.82;u.pitch=1;window.speechSynthesis.cancel();window.speechSynthesis.speak(u)}
+function checkPracticeMC(answer){const ok=normalize(answer)===normalize(activity.current.answer);const f=document.getElementById('practiceFeedback');if(ok){f.textContent='Goed! Nu moet je dit woord nog zelf kunnen typen.';f.className='feedback correct';setTimeout(()=>{activity.mode='typing';renderTypingAfterMC()},650)}else{f.textContent='Nog niet. Dit woord komt later terug.';f.className='feedback incorrect';setTimeout(()=>{renderPractice()},800)}}
+function renderTypingAfterMC(){const item=activity.current;updatePracticeProgress();document.getElementById('practiceContent').innerHTML=`<div class="small">Typ nu zelf het antwoord.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="practiceAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Typ je antwoord"><div id="practiceFeedback" class="feedback"></div><button class="big" onclick="checkPractice()">Controleren</button>`;document.getElementById('practiceAnswer')?.focus()}
+function checkPractice(){const input=document.getElementById('practiceAnswer');if(!input)return;const ok=normalize(input.value)===normalize(activity.current.answer),f=document.getElementById('practiceFeedback');activity.attempts++;if(ok){activity.remaining.delete(activity.current.id);f.textContent='✅ Goed gespeld!';f.className='feedback correct';setTimeout(renderPractice,650)}else{f.textContent='❌ Nog niet goed. Het woord komt later opnieuw terug.';f.className='feedback incorrect';setTimeout(renderPractice,900)}}
+function finishPractice(){window.speechSynthesis?.cancel();const total=currentLesson.lesson_items.length;document.getElementById('practiceProgress').innerHTML=`<div class="progress-label"><span>🎉 ${total} / ${total} beheerst</span><span>Klaar!</span></div><div class="progress"><div class="progress-bar" style="width:100%"></div></div>`;document.getElementById('practiceContent').innerHTML=`<div class="result-score">🎉 Klaar!</div><p>Je hebt alle ${total} ${activity.type==='dictation'?'dicteewoorden':'woorden'} goed kunnen maken.</p><button class="big" onclick="showLessonChoice(currentLesson)">Terug naar de les</button>`;activity=null}
 
-async function loadLessons(){
-  showMessage("Lessen laden...","success");
-  const {data,error}=await db.from("lessons").select(`id,subject,title,type,lesson_items(id,question,answer,sort_order)`).order("id");
-  if(error){showMessage("Fout bij laden: "+error.message,"error");return}
-  allLessons=data||[];
-  allLessons.forEach(lesson=>{lesson.lesson_items=(lesson.lesson_items||[]).sort((a,b)=>a.sort_order-b.sort_order)});
-  hideMessage();
-  showHome();
-}
+function startTest(type){window.speechSynthesis?.cancel();activity={kind:'test',type,items:shuffle(currentLesson.lesson_items),index:0,answers:[]};hideAll();document.getElementById('test').classList.remove('hidden');document.getElementById('testTitle').textContent=type==='dictation'?'✏️ Dictee toets':'📝 Woordtrainer toets';renderTest()}
+function updateTestProgress(){const total=activity.items.length,i=activity.index;const pct=total?i/total*100:0;document.getElementById('testProgress').innerHTML=`<div class="progress-label"><span>Vraag ${Math.min(i+1,total)} van ${total}</span><span>${i} gemaakt</span></div><div class="progress"><div class="progress-bar" style="width:${pct}%"></div></div>`}
+function renderTest(){updateTestProgress();const item=activity.items[activity.index],el=document.getElementById('testContent');if(activity.type==='dictation'){el.innerHTML=`<div class="test-instructions">Luister naar het woord en typ precies wat je hoort. Je krijgt pas aan het einde te zien wat goed en fout was.</div><div style="margin:25px"><button class="speaker big" onclick="speakTest()">🔊 Luister</button></div><input id="testAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Typ het woord"><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>`;setTimeout(()=>{speakTest();document.getElementById('testAnswer')?.focus()},350)}else{el.innerHTML=`<div class="test-instructions">Typ het Engelse antwoord. Je krijgt pas aan het einde de uitslag.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="testAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Typ je antwoord"><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>`;document.getElementById('testAnswer')?.focus()}}
+function speakTest(){if(!activity?.current&&activity?.items){}const item=activity.items[activity.index];const u=new SpeechSynthesisUtterance(item.answer);u.lang='en-US';u.rate=.82;window.speechSynthesis.cancel();window.speechSynthesis.speak(u)}
+function submitTest(){const item=activity.items[activity.index],input=document.getElementById('testAnswer'),value=input?.value??'';activity.answers.push({item,value,correct:normalize(value)===normalize(item.answer)});activity.index++;if(activity.index>=activity.items.length){finishTest()}else renderTest()}
+function finishTest(){window.speechSynthesis?.cancel();const total=activity.items.length,correct=activity.answers.filter(x=>x.correct).length,note=Math.round((correct/total*10)*10)/10;hideAll();document.getElementById('result').classList.remove('hidden');document.getElementById('resultTitle').textContent=activity.type==='dictation'?'✏️ Dictee klaar!':'📝 Toets klaar!';document.getElementById('resultScore').textContent=`${note.toFixed(1)}`;document.getElementById('resultDetails').innerHTML=`<p><strong>${correct} van ${total}</strong> goed.</p>`+activity.answers.map((x,i)=>`<div class="result-item ${x.correct?'correct':'incorrect'}"><strong>${i+1}. ${escapeHtml(x.item.question)}</strong><br>Jouw antwoord: ${escapeHtml(x.value||'—')}<br>${x.correct?'✓ Goed':'✗ Goed antwoord: '+escapeHtml(x.item.answer)}</div>`).join('');activity=null}
+function startQuestions(){activity={kind:'questions',items:shuffle(currentLesson.lesson_items),index:0};hideAll();document.getElementById('practice').classList.remove('hidden');document.getElementById('practiceTitle').textContent='❓ Vragen';renderQuestion()}
+function renderQuestion(){const item=activity.items[activity.index];document.getElementById('practiceProgress').innerHTML=`<div class="progress-label"><span>Vraag ${activity.index+1} van ${activity.items.length}</span></div><div class="progress"><div class="progress-bar" style="width:${activity.index/activity.items.length*100}%"></div></div>`;document.getElementById('practiceContent').innerHTML=`<div class="prompt">${escapeHtml(item.question)}</div><textarea id="questionAnswer" class="answer-input" style="width:100%;min-height:130px;text-align:left" placeholder="Schrijf je antwoord..."></textarea><div class="row" style="justify-content:center;margin-top:15px"><button class="big" onclick="revealQuestion()">Antwoord bekijken</button></div>`}
+function revealQuestion(){const item=activity.items[activity.index],answer=document.getElementById('questionAnswer').value;document.getElementById('practiceContent').innerHTML=`<div class="prompt">${escapeHtml(item.question)}</div><div class="question-answer"><strong>Jouw antwoord:</strong><br>${escapeHtml(answer||'—')}<hr><strong>Voorbeeldantwoord:</strong><br>${escapeHtml(item.answer)}</div><div class="self-buttons"><button class="success" onclick="nextQuestion(true)">✓ Goed</button><button class="danger" onclick="nextQuestion(false)">✗ Nog niet</button></div>`}
+function nextQuestion(){activity.index++;if(activity.index>=activity.items.length){document.getElementById('practiceContent').innerHTML=`<div class="result-score">Klaar!</div><p>Je hebt alle vragen bekeken.</p><button class="big" onclick="showLessonChoice(currentLesson)">Terug naar de les</button>`;activity=null;return}renderQuestion()}
 
-function showMessage(text,type){const el=document.getElementById("message");el.className=type||"";el.textContent=text}
-function hideMessage(){const el=document.getElementById("message");el.textContent="";el.className=""}
-
-function hideAll(){["home","lessonList","lessonEditor","lessonView","lessonChoice","quiz","login"].forEach(id=>document.getElementById(id).classList.add("hidden"))}
-
-function showHome(){
-  hideAll();document.getElementById("home").classList.remove("hidden");
-  const subjects=[...new Set(allLessons.map(l=>l.subject))];
-  const container=document.getElementById("subjects");container.innerHTML="";
-  if(!subjects.length){container.innerHTML="<p>Nog geen vakken.</p>";return}
-  const icons={Nederlands:"📚",Engels:"🇬🇧",Rekenen:"🔢",Geschiedenis:"🏴‍☠️",Aardrijkskunde:"🌍",Biologie:"🧬",Natuur:"🔬",Frans:"🇫🇷",Spaans:"🇪🇸"};
-  const colors=["subject-blue","subject-purple","subject-green","subject-orange","subject-pink","subject-cyan"];
-  subjects.forEach((subject,index)=>{
-    const lessons=allLessons.filter(l=>l.subject===subject);const btn=document.createElement("button");
-    btn.className="big-button "+colors[index%colors.length];const icon=icons[subject]||"🎮";
-    btn.innerHTML=`<span class="subject-icon">${icon}</span><span class="subject-name">${escapeHtml(subject)}</span><span class="subject-count">${lessons.length} ${lessons.length===1?"les":"lessen"}</span>`;
-    btn.onclick=()=>showSubject(subject);container.appendChild(btn);
-  });
-}
-
-function showSubject(subject){
-  currentSubject=subject;currentLesson=null;hideAll();document.getElementById("lessonList").classList.remove("hidden");document.getElementById("subjectTitle").textContent=subject;
-  const container=document.getElementById("lessons");container.innerHTML="";
-  allLessons.filter(l=>l.subject===subject).forEach(lesson=>{
-    const btn=document.createElement("button");btn.className="lesson-button";const icon=lesson.type==="questions"?"❓":"📖";
-    btn.innerHTML=`<span class="lesson-icon">${icon}</span><span class="lesson-info"><span class="lesson-title">${escapeHtml(lesson.title)}</span><span class="lesson-count">${lesson.lesson_items.length} ${lesson.lesson_items.length===1?"item":"items"}</span></span><span class="lesson-arrow">›</span>`;
-    btn.onclick=()=>openLesson(lesson.id);container.appendChild(btn);
-  });
-}
-
-function openLesson(id){currentLesson=allLessons.find(l=>l.id===id);if(!currentLesson)return;hideAll();document.getElementById("lessonChoice").classList.remove("hidden");document.getElementById("choiceTitle").textContent=currentLesson.title}
-
-function showLesson(id){
-  if(id)currentLesson=allLessons.find(l=>l.id===id);if(!currentLesson)return;hideAll();document.getElementById("lessonView").classList.remove("hidden");
-  document.getElementById("viewTitle").textContent=currentLesson.title;
-  document.getElementById("viewInfo").textContent=`${currentLesson.subject} • ${currentLesson.lesson_items.length} ${currentLesson.type==="questions"?"vragen":"woorden"}`;
-  const container=document.getElementById("viewItems");container.innerHTML="";
-  currentLesson.lesson_items.forEach((item,i)=>{const div=document.createElement("div");div.className="question-card";div.innerHTML=currentLesson.type==="words"?`<strong>${i+1}. ${escapeHtml(item.question)}</strong><span> → ${escapeHtml(item.answer)}</span>`:`<strong>${i+1}. ${escapeHtml(item.question)}</strong><br><span class="small">Antwoord: ${escapeHtml(item.answer)}</span>`;container.appendChild(div)})
-}
-
-function showAddLesson(subject=""){
-  if(!requireParent())return;hideAll();document.getElementById("lessonEditor").classList.remove("hidden");editingLessonId=null;
-  document.getElementById("editorTitle").textContent="Nieuwe les";document.getElementById("subjectInput").value=subject;document.getElementById("titleInput").value="";document.getElementById("typeInput").value="words";document.getElementById("wordRows").innerHTML="";document.getElementById("questionRows").innerHTML="";changeLessonType();addWordRow();addWordRow();
-}
-
-function changeLessonType(){
-  const type=document.getElementById("typeInput").value;document.getElementById("wordsEditor").classList.toggle("hidden",type!=="words");document.getElementById("questionsEditor").classList.toggle("hidden",type!=="questions");
-  if(type==="questions"&&document.getElementById("questionRows").children.length===0)addQuestionRow();
-}
-
-function addWordRow(question="",answer=""){
-  const row=document.createElement("div");row.className="word";row.innerHTML=`<input placeholder="Nederlands" value="${escapeAttr(question)}"><input placeholder="Engels" value="${escapeAttr(answer)}"><button class="danger" onclick="this.parentElement.remove()">✕</button>`;document.getElementById("wordRows").appendChild(row)
-}
-
-function addQuestionRow(question="",answer="",insertBefore=null){
-  const card=document.createElement("div");card.className="question-card";card.innerHTML=`<label>Vraag</label><textarea placeholder="Typ hier de vraag...">${escapeHtml(question)}</textarea><label>Modelantwoord</label><textarea placeholder="Typ hier het juiste antwoord...">${escapeHtml(answer)}</textarea><div class="row"><button class="secondary" onclick="insertQuestionBefore(this.parentElement.parentElement)">➕ Hier invoegen</button><button class="danger" onclick="this.parentElement.parentElement.remove()">🗑️ Verwijderen</button></div>`;
-  const container=document.getElementById("questionRows");insertBefore?container.insertBefore(card,insertBefore):container.appendChild(card)
-}
-function insertQuestionBefore(card){addQuestionRow("","",card)}
-
-async function saveLesson(){
-  if(!requireParent())return;
-  const subject=document.getElementById("subjectInput").value.trim(),title=document.getElementById("titleInput").value.trim(),type=document.getElementById("typeInput").value;
-  if(!subject||!title){showMessage("Vul het vak en de naam van de les in.","error");return}
-  let items=[];
-  if(type==="words")document.querySelectorAll("#wordRows .word").forEach((row,i)=>{const inputs=row.querySelectorAll("input"),question=inputs[0].value.trim(),answer=inputs[1].value.trim();if(question&&answer)items.push({question,answer,sort_order:i+1})});
-  else document.querySelectorAll("#questionRows .question-card").forEach((card,i)=>{const fields=card.querySelectorAll("textarea"),question=fields[0].value.trim(),answer=fields[1].value.trim();if(question&&answer)items.push({question,answer,sort_order:i+1})});
-  if(!items.length){showMessage("Voeg minstens één item toe.","error");return}
-  showMessage("Opslaan...","success");let lessonId=editingLessonId;
-  if(editingLessonId){
-    const {error}=await db.from("lessons").update({subject,title,type}).eq("id",editingLessonId);if(error){showMessage("Fout: "+error.message,"error");return}
-    const {error:itemDeleteError}=await db.from("lesson_items").delete().eq("lesson_id",editingLessonId);if(itemDeleteError){showMessage("Fout bij verwijderen oude items: "+itemDeleteError.message,"error");return}
-  }else{
-    const {data,error}=await db.from("lessons").insert({subject,title,type}).select().single();if(error){showMessage("Fout: "+error.message,"error");return}lessonId=data.id
-  }
-  const rows=items.map(item=>({lesson_id:lessonId,question:item.question,answer:item.answer,sort_order:item.sort_order}));
-  const {error:itemError}=await db.from("lesson_items").insert(rows);if(itemError){showMessage("Fout bij opslaan items: "+itemError.message,"error");return}
-  await loadLessons();currentLesson=allLessons.find(l=>l.id===lessonId);if(currentLesson)showLesson()
-}
-
-function editCurrentLesson(){
-  if(!requireParent()||!currentLesson)return;hideAll();document.getElementById("lessonEditor").classList.remove("hidden");editingLessonId=currentLesson.id;
-  document.getElementById("editorTitle").textContent="Les bewerken";document.getElementById("subjectInput").value=currentLesson.subject;document.getElementById("titleInput").value=currentLesson.title;document.getElementById("typeInput").value=currentLesson.type;document.getElementById("wordRows").innerHTML="";document.getElementById("questionRows").innerHTML="";
-  if(currentLesson.type==="words")currentLesson.lesson_items.forEach(item=>addWordRow(item.question,item.answer));else currentLesson.lesson_items.forEach(item=>addQuestionRow(item.question,item.answer));changeLessonType()
-}
-
-async function deleteCurrentLesson(){
-  if(!requireParent()||!currentLesson)return;
-  if(!confirm(`Weet je zeker dat je "${currentLesson.title}" wilt verwijderen?`))return;
-  const {error}=await db.from("lessons").delete().eq("id",currentLesson.id);if(error){showMessage("Fout bij verwijderen: "+error.message,"error");return}
-  currentLesson=null;await loadLessons()
-}
-
-function resetQuizState(){
-  quizItems=[...currentLesson.lesson_items].sort(()=>Math.random()-.5);
-  quizQueue=[...quizItems];
-  quizIndex=0;
-  quizScore=0;
-  quizMastered=new Set();
-}
-
-function startPractice(){
-  if(!currentLesson||!currentLesson.lesson_items.length)return;
-  resetQuizState();
-  quizMode="practice";
-  quizTestAnswers=[];
-  hideAll();
-  document.getElementById("quiz").classList.remove("hidden");
-  showQuizItem();
-}
-
-function startTest(){
-  if(!currentLesson||!currentLesson.lesson_items.length)return;
-  resetQuizState();
-  quizMode="test";
-  quizTestAnswers=[];
-  quizQueue=[...quizItems];
-  hideAll();
-  document.getElementById("quiz").classList.remove("hidden");
-  showQuizItem();
-}
-
-function startQuiz(){startPractice()}
-
-function updateQuizMeter(){
-  const meter=document.getElementById("quizMeter");
-  if(!meter)return;
-  const total=quizItems.length;
-  if(quizMode==="test"){
-    const current=Math.min(quizIndex,total);
-    const percent=total?Math.round((current/total)*100):0;
-    meter.innerHTML=`<div class="progress-wrap"><div class="progress-label"><span>Toets: ${current} van ${total}</span><span>${percent}%</span></div><div class="progress-track"><div class="progress-bar" style="width:${percent}%"></div></div></div>`;
-    return;
-  }
-  const mastered=quizMastered.size;
-  const percent=total?Math.round((mastered/total)*100):0;
-  meter.innerHTML=`<div class="progress-wrap"><div class="progress-label"><span>${mastered} van ${total} geleerd</span><span>${percent}%</span></div><div class="progress-track"><div class="progress-bar" style="width:${percent}%"></div></div>${mastered<total?`<div class="small" style="margin-top:8px;text-align:center">Nog ${total-mastered} woord${total-mastered===1?"":"en"} te leren</div>`:""}</div>`;
-}
-
-function showQuizItem(){
-  if(quizIndex>=quizQueue.length){finishQuiz();return}
-  const item=quizQueue[quizIndex];
-  updateQuizMeter();
-  document.getElementById("quizProgress").textContent=quizMode==="test"?`Vraag ${quizIndex+1} van ${quizItems.length}`:(currentLesson.type==="words"?`Oefenen • ${quizMastered.size} van ${quizItems.length} geleerd`:`Vraag ${quizIndex+1} van ${quizQueue.length}`);
-  const container=document.getElementById("quizContent");
-
-  if(currentLesson.type==="words"){
-    if(quizMode==="practice"){
-      const useMultipleChoice=quizItems.length>=4 && Math.random()<0.45;
-      if(useMultipleChoice){showWordMultipleChoice(item);}
-      else {showWordTyping(item);}
-    }else{
-      showWordTyping(item);
-    }
-  }else{
-    container.innerHTML=`<div class="quiz-question">${escapeHtml(item.question)}</div><textarea id="quizInput" placeholder="Typ je antwoord..."></textarea><button class="big-button" onclick="showQuestionAnswer()">Antwoord bekijken</button><div id="quizResult"></div>`;
-  }
-}
-
-function showWordTyping(item){
-  const container=document.getElementById("quizContent");
-  container.innerHTML=`<div class="quiz-question">${escapeHtml(item.question)}</div><input id="quizInput" placeholder="Typ je antwoord..." autocomplete="off" onkeydown="if(event.key==='Enter')checkWordAnswer()"><button class="big-button" onclick="checkWordAnswer()">Controleren</button><div id="quizResult"></div>`;
-  setTimeout(()=>{const input=document.getElementById("quizInput");if(input)input.focus()},100);
-}
-
-function getMultipleChoiceOptions(item){
-  const correct=item.answer;
-  const others=quizItems.filter(x=>String(x.id)!==String(item.id)).map(x=>x.answer);
-  const unique=[...new Set(others.filter(x=>x.trim().toLowerCase()!==correct.trim().toLowerCase()))];
-  unique.sort(()=>Math.random()-.5);
-  return [correct,...unique.slice(0,3)].sort(()=>Math.random()-.5);
-}
-
-function showWordMultipleChoice(item){
-  const options=getMultipleChoiceOptions(item);
-  const container=document.getElementById("quizContent");
-  container.innerHTML=`<div class="quiz-question">${escapeHtml(item.question)}</div><div class="multiple-choice">${options.map((option,i)=>`<button onclick="checkMultipleChoice(${i})" data-option="${i}">${escapeHtml(option)}</button>`).join("")}</div><div id="quizResult"></div>`;
-  window.currentMcOptions=options;
-  window.currentMcItemId=String(item.id);
-}
-
-function finishPracticeWord(item,correct){
-  const result=document.getElementById("quizResult");
-  if(correct){
-    quizMastered.add(String(item.id));
-    quizScore=quizMastered.size;
-    result.innerHTML=`<div class="success">🟢 Goed! Dit woord heb je geleerd.</div><button onclick="nextQuizItem()">Volgende →</button>`;
-  }else{
-    quizQueue.push(item);
-    result.innerHTML=`<div class="error">🔴 Nog niet goed.<br><br>Het juiste antwoord is: <strong>${escapeHtml(item.answer)}</strong><br><br>Dit woord komt later opnieuw.</div><button onclick="nextQuizItem()">Volgende →</button>`;
-  }
-  updateQuizMeter();
-}
-
-function checkWordAnswer(){
-  const input=document.getElementById("quizInput"),item=quizQueue[quizIndex];
-  if(!input||!item)return;
-  const given=input.value.trim().toLowerCase(),correct=item.answer.trim().toLowerCase();
-  input.disabled=true;
-  if(quizMode==="test"){
-    quizTestAnswers.push({item,given,correct:given===correct});
-    if(given===correct)quizScore++;
-    document.getElementById("quizResult").innerHTML=given===correct?`<div class="success">🟢 Antwoord opgeslagen.</div>`:`<div class="error">🔴 Antwoord opgeslagen.</div>`;
-    document.getElementById("quizResult").innerHTML+=`<button onclick="nextQuizItem()">Volgende →</button>`;
-  }else{
-    finishPracticeWord(item,given===correct);
-  }
-}
-
-function checkMultipleChoice(index){
-  const item=quizQueue[quizIndex];
-  const chosen=window.currentMcOptions[index];
-  document.querySelectorAll(".multiple-choice button").forEach(b=>b.disabled=true);
-  const correct=chosen.trim().toLowerCase()===item.answer.trim().toLowerCase();
-  finishPracticeWord(item,correct);
-}
-
-function showQuestionAnswer(){
-  const input=document.getElementById("quizInput"),result=document.getElementById("quizResult"),item=quizQueue[quizIndex];
-  input.disabled=true;
-  if(quizMode==="test"){
-    const given=input.value.trim();
-    quizTestAnswers.push({item,given,correct:null});
-    result.innerHTML=`<div class="quiz-answer">Antwoord opgeslagen.</div><button onclick="nextQuizItem()">Volgende →</button>`;
-    return;
-  }
-  result.innerHTML=`<div class="quiz-answer">${escapeHtml(item.answer)}</div><p style="text-align:center">Had je het goed?</p><div class="row"><button class="green" onclick="questionCorrect()">🟢 Ik had het goed</button><button class="danger" onclick="questionWrong()">🔴 Ik had het fout</button></div>`;
-}
-
-function questionCorrect(){quizScore++;nextQuizItem()}
-function questionWrong(){nextQuizItem()}
-function nextQuizItem(){quizIndex++;showQuizItem()}
-
-function calculateGrade(correct,total){
-  if(!total)return 0;
-  return Math.round((correct/total)*10*10)/10;
-}
-
-function finishQuiz(){
-  const total=quizItems.length;
-  document.getElementById("quizProgress").textContent="Klaar!";
-  updateQuizMeter();
-  if(quizMode==="practice" && currentLesson.type==="words"){
-    document.getElementById("quizContent").innerHTML=`<div class="score">🎉 Alle woordjes geleerd!</div><p style="text-align:center;font-size:18px">${total} van ${total} woorden beheerst.</p><br><button class="big-button" onclick="startPractice()">🔄 Opnieuw oefenen</button><br><br><button class="secondary big-button" onclick="showLesson()">← Terug naar de les</button>`;
-    return;
-  }
-  if(quizMode==="practice"){
-    document.getElementById("quizContent").innerHTML=`<div class="score">🎉 Oefening klaar!</div><p style="text-align:center;font-size:18px">${quizScore} van ${total} goed</p><br><button class="big-button" onclick="startPractice()">🔄 Opnieuw</button><br><br><button class="secondary big-button" onclick="showLesson()">← Terug naar de les</button>`;
-    return;
-  }
-  let correct=0;
-  quizTestAnswers.forEach(entry=>{
-    if(currentLesson.type==="words"){
-      if(entry.correct)correct++;
-    }else if(entry.given.trim().toLowerCase()===entry.item.answer.trim().toLowerCase()){
-      correct++;
-    }
-  });
-  const grade=calculateGrade(correct,total);
-  const percent=total?Math.round(correct/total*100):0;
-  const rows=quizTestAnswers.map(entry=>{
-    const given=entry.given||"(geen antwoord)";
-    const ok=currentLesson.type==="words"?entry.correct:(given.trim().toLowerCase()===entry.item.answer.trim().toLowerCase());
-    return `<div class="result-row"><span>${escapeHtml(entry.item.question)}</span><span class="${ok?"result-right":"result-wrong"}">${ok?"✅":"❌"} ${escapeHtml(given)}</span></div>${ok?"":`<div class="result-row"><span>Juiste antwoord</span><strong>${escapeHtml(entry.item.answer)}</strong></div>`}`;
-  }).join("");
-  document.getElementById("quizContent").innerHTML=`<div class="test-score">${grade.toFixed(1)}</div><p style="text-align:center;font-size:20px;font-weight:800">${correct} van ${total} goed (${percent}%)</p><div class="card result-list"><h3>Resultaat</h3>${rows}</div><button class="big-button" onclick="startTest()">🔄 Toets opnieuw</button><br><br><button class="secondary big-button" onclick="showLesson()">← Terug naar de les</button>`;
-}
-
-function goBack(){if(currentLesson&&currentSubject)showSubject(currentSubject);else showHome()}
-function escapeHtml(text){return String(text).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
-function escapeAttr(text){return escapeHtml(text)}
-
-function showLogin(){hideAll();document.getElementById("login").classList.remove("hidden");document.getElementById("loginError").classList.add("hidden")}
-
-async function loginParent(){
-  const email=document.getElementById("loginEmail").value.trim(),password=document.getElementById("loginPassword").value,error=document.getElementById("loginError");
-  error.classList.add("hidden");error.textContent="";
-  if(!email||!password){error.textContent="Vul je e-mailadres en wachtwoord in.";error.classList.remove("hidden");return}
-  const {data,error:loginError}=await db.auth.signInWithPassword({email,password});
-  if(loginError){error.textContent="Inloggen mislukt. Controleer je e-mailadres en wachtwoord.";error.classList.remove("hidden");return}
-  if(!PARENT_IDS.has(data.user.id)){await db.auth.signOut();error.textContent="Dit account heeft geen ouderrechten.";error.classList.remove("hidden");return}
-  showHome()
-}
-
-async function logoutParent(){
-  const {error}=await db.auth.signOut();
-  if(error){showMessage("Uitloggen mislukt: "+error.message,"error");return}
-  currentSession=null;updateAuthUI(null);showHome()
-}
-
+function showLessonChoiceCompat(){openLesson(currentLesson.id)}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'){if(document.activeElement?.id==='practiceAnswer')checkPractice();if(document.activeElement?.id==='testAnswer')submitTest()}});
 initializeApp();
 </script>
 </body>

@@ -38,39 +38,27 @@
 .student-area{position:relative;z-index:3;margin-top:-86px;padding:0 22px 26px}
 .student-title{font-size:34px;font-weight:950;text-align:center;color:#102b57;margin:0 0 18px}
 .student-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;max-width:900px;margin:auto}
-.student-card{border:0;border-radius:26px;padding:22px 18px 18px;background:#fff;box-shadow:0 10px 0 rgba(16,43,87,.16),0 18px 35px rgba(16,43,87,.15);text-align:center;color:#102b57;transition:transform .12s,box-shadow .12s;cursor:pointer}
+.student-card{border:0;border-radius:26px;padding:24px 18px 20px;background:#fff;box-shadow:0 10px 0 rgba(16,43,87,.16),0 18px 35px rgba(16,43,87,.15);text-align:center;color:#102b57;transition:transform .12s,box-shadow .12s;cursor:pointer}
 .student-card:hover{transform:translateY(-4px)}
 .student-card:active{transform:translateY(5px);box-shadow:0 4px 0 rgba(16,43,87,.16),0 9px 18px rgba(16,43,87,.12)}
-.student-avatar{width:82px;height:82px;margin:0 auto 10px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:48px;background:#fff3c7;border:5px solid #ffc928}
-.student-card:nth-child(2) .student-avatar{background:#dff3ff;border-color:#2e9cf4}.student-card:nth-child(3) .student-avatar{background:#e4f8e9;border-color:#47bd70}
-.student-name{font-size:26px;font-weight:950}.student-sub{font-size:14px;color:#667894;margin:4px 0 13px}.student-go{display:inline-block;padding:10px 18px;border-radius:14px;background:#1787f2;color:white;font-weight:900;box-shadow:0 5px 0 #0d6fd4}
+.student-card:nth-child(2) .student-card:nth-child(3) .student-name{font-size:26px;font-weight:950}.student-sub{font-size:14px;color:#667894;margin:4px 0 13px}.student-go{display:inline-block;padding:10px 18px;border-radius:14px;background:#1787f2;color:white;font-weight:900;box-shadow:0 5px 0 #0d6fd4}
 .student-back{margin-bottom:16px;display:flex;justify-content:flex-start}
 .personal-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0 14px}.personal-title h2{margin:0}.switch-student{background:#fff;color:#126fc9;border:2px solid #dce9f6;box-shadow:0 4px 0 #dce9f6}
 .editor-student{background:#eaf7ff;border:2px solid #cde8fb;border-radius:14px;padding:13px;margin-bottom:14px}
-@media(max-width:700px){.aruba-hero{margin:0 -12px 18px;height:300px;border-radius:0 0 25px 25px}.hero-logo{font-size:46px;letter-spacing:-2px;top:18px}.student-area{margin-top:-48px;padding:0 8px 20px}.student-title{font-size:27px}.student-grid{grid-template-columns:1fr;gap:13px}.student-card{display:grid;grid-template-columns:70px 1fr auto;align-items:center;text-align:left;padding:13px}.student-avatar{width:62px;height:62px;font-size:36px;margin:0}.student-go{justify-self:end}.student-sub{margin:2px 0}.personal-title{align-items:flex-start}.personal-title h2{font-size:24px}}
+@media(max-width:700px){.aruba-hero{margin:0 -12px 18px;height:300px;border-radius:0 0 25px 25px}.hero-logo{font-size:46px;letter-spacing:-2px;top:18px}.student-area{margin-top:-48px;padding:0 8px 20px}.student-title{font-size:27px}.student-grid{grid-template-columns:1fr;gap:13px}.student-card{display:grid;grid-template-columns:70px 1fr auto;align-items:center;text-align:left;padding:13px}.student-go{justify-self:end}.student-sub{margin:2px 0}.personal-title{align-items:flex-start}.personal-title h2{font-size:24px}}
 </style>
 </head>
 <body>
 <div class="container">
-  <header class="site-header aruba-hero">
-    <div class="hero-overlay">
-      <div class="hero-user-area">
-        <button id="loginButton" class="hero-parent" onclick="showLogin()">👤 Ouder</button>
-        <button id="logoutButton" class="hero-parent hidden" onclick="logoutParent()">👤 Ouder · Uitloggen</button>
-        <button id="addLessonButton" class="hero-add hidden" onclick="showAddLesson()">＋ Nieuwe les</button>
-      </div>
-    </div>
-  </header>
-
   <main id="home" class="page">
     <section id="studentChooser">
       <div class="aruba-hero"><img src="pacogo-aruba-hero.png" alt="PacoGO op Aruba"><div class="hero-logo">Paco<span>GO!</span></div></div>
       <div class="student-area">
         <h1 class="student-title">Wie gaat er leren?</h1>
         <div class="student-grid">
-          <button class="student-card" onclick="selectStudent('Zyon')"><div class="student-avatar">👦</div><div><div class="student-name">Zyon</div><div class="student-sub">Mijn lessen</div></div><span class="student-go">GO! →</span></button>
-          <button class="student-card" onclick="selectStudent('Zenith')"><div class="student-avatar">👦</div><div><div class="student-name">Zenith</div><div class="student-sub">Mijn lessen</div></div><span class="student-go">GO! →</span></button>
-          <button class="student-card" onclick="selectStudent('Zephon')"><div class="student-avatar">👦</div><div><div class="student-name">Zephon</div><div class="student-sub">Mijn lessen</div></div><span class="student-go">GO! →</span></button>
+          <button class="student-card" onclick="selectStudent('Zyon')"><div><div class="student-name">Zyon</div><div class="student-sub">Mijn lessen</div></div><span class="student-go">GO! →</span></button>
+          <button class="student-card" onclick="selectStudent('Zenith')"><div><div class="student-name">Zenith</div><div class="student-sub">Mijn lessen</div></div><span class="student-go">GO! →</span></button>
+          <button class="student-card" onclick="selectStudent('Zephon')"><div><div class="student-name">Zephon</div><div class="student-sub">Mijn lessen</div></div><span class="student-go">GO! →</span></button>
         </div>
       </div>
     </section>

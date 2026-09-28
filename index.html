@@ -292,7 +292,7 @@ function hashSubject(s){let h=0;for(let i=0;i<String(s).length;i++)h=((h<<5)-h)+
 function subjectIcon(s){const map={Nederlands:'📚',Engels:'🇬🇧',Rekenen:'🔢',Geschiedenis:'🏴‍☠️',Aardrijkskunde:'🌍',Biologie:'🧬',Natuur:'🔬',Frans:'🇫🇷',Spaans:'🇪🇸',Muziek:'🎵',Lezen:'📖',Topografie:'🗺️',Wetenschap:'🧪',Techniek:'⚙️'};return map[s]||'🎓'}
 
 let guestMode=false,guestToken=null,guestName='',guestLessons=[];
-function guestUrl(token){return new URL('/?guest='+encodeURIComponent(token),location.href).href}
+function guestUrl(token){const u=new URL(location.href);u.search='';u.hash='';u.searchParams.set('guest',token);return u.href}
 function randomGuestToken(){const a=new Uint8Array(12);crypto.getRandomValues(a);return [...a].map(x=>x.toString(16).padStart(2,'0')).join('').toUpperCase()}
 async function ensureDefaultGuests(){if(!isParentLoggedIn())return;const {data,error}=await db.from('guest_access').select('*').in('guest_name',['Leo','Kaylong']).order('id');if(error)return;for(const name of ['Leo','Kaylong']){if(!(data||[]).some(x=>x.guest_name===name)){await db.from('guest_access').insert({guest_name:name,token:randomGuestToken(),active:true})}}}
 async function showGuestManagement(){if(!requireParent())return;hideAll();document.getElementById('guestManagement').classList.remove('hidden');await ensureDefaultGuests();await renderGuestManagement()}

@@ -13,6 +13,14 @@
 @media(max-width:1050px){.dashboard{grid-template-columns:180px minmax(0,1fr)}.side-panel{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.paco-logo{font-size:54px}.tagline{font-size:20px}.welcome-paco{width:250px}}
 @media(max-width:700px){.container{padding:0 12px 24px}.site-header{margin:0 -12px}.header-inner{padding:16px 18px;align-items:flex-start}.paco-logo{font-size:43px;letter-spacing:-2px}.tagline{display:none}.user-area{position:absolute;right:18px;top:16px}.user-pill{font-size:13px;padding:9px 12px}.dashboard{display:block;margin-top:0}.sidebar{position:static;display:flex;overflow:auto;gap:4px;margin-bottom:15px;padding:7px}.side-item{width:auto;min-width:max-content;margin:0;padding:10px 12px}.sidebar-note{display:none}.welcome{padding:24px;min-height:235px}.welcome-copy{max-width:100%}.welcome h2{font-size:29px}.welcome p{font-size:16px}.welcome-paco{display:none}.side-panel{display:grid;grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}.subject-card{min-height:155px}.subject-icon{height:70px;font-size:40px}.prompt{font-size:28px}.mc-grid{grid-template-columns:1fr}.brand{font-size:26px}}
 
+/* Nieuwe leerling-knoppen en banner */
+.student-card{font-family:"Trebuchet MS",Inter,system-ui,sans-serif}
+.student-name{font-size:34px;font-weight:950;line-height:1.05;letter-spacing:-.5px}
+.student-card:active,.student-card.selected{background:#eef9ff;box-shadow:0 4px 0 rgba(16,43,87,.12),0 10px 22px rgba(16,43,87,.10);transform:translateY(5px)}
+.student-card:focus-visible{outline:4px solid #8ed0ff;outline-offset:3px}
+.student-banner{margin-bottom:18px}
+@media(max-width:700px){.student-name{font-size:29px}.student-banner{margin-bottom:12px}}
+
 /* Aruba hero */
 .aruba-hero{height:500px;min-height:500px;margin:0 -22px 0;background-image:url("pacogo-aruba-hero.png");background-size:cover;background-position:center top;border:0;border-radius:0;position:relative;overflow:hidden}
 .aruba-hero:after{display:none}
@@ -33,7 +41,7 @@
 .aruba-hero{position:relative;margin:0 -22px 24px;height:430px;overflow:hidden;background:#72d9f4;border-radius:0 0 34px 34px}
 .aruba-hero img{width:100%;height:100%;object-fit:cover;display:block}
 .aruba-hero:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(16,43,87,.12) 0%,rgba(16,43,87,.02) 48%,rgba(16,43,87,.32) 100%);pointer-events:none}
-.hero-logo{position:absolute;z-index:2;left:50%;top:24px;transform:translateX(-50%);font-size:72px;line-height:1;font-weight:1000;letter-spacing:-4px;color:#fff;text-shadow:5px 6px 0 #102b57;white-space:nowrap}
+.hero-logo{display:none!important;position:absolute;z-index:2;left:50%;top:24px;transform:translateX(-50%);font-size:72px;line-height:1;font-weight:1000;letter-spacing:-4px;color:#fff;text-shadow:5px 6px 0 #102b57;white-space:nowrap}
 .hero-logo span{color:#ffc928}
 .student-area{position:relative;z-index:3;margin-top:-86px;padding:0 22px 26px}
 .student-title{font-size:34px;font-weight:950;text-align:center;color:#102b57;margin:0 0 18px}
@@ -45,14 +53,14 @@
 .student-back{margin-bottom:16px;display:flex;justify-content:flex-start}
 .personal-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0 14px}.personal-title h2{margin:0}.switch-student{background:#fff;color:#126fc9;border:2px solid #dce9f6;box-shadow:0 4px 0 #dce9f6}
 .editor-student{background:#eaf7ff;border:2px solid #cde8fb;border-radius:14px;padding:13px;margin-bottom:14px}
-@media(max-width:700px){.aruba-hero{margin:0 -12px 18px;height:300px;border-radius:0 0 25px 25px}.hero-logo{font-size:46px;letter-spacing:-2px;top:18px}.student-area{margin-top:-48px;padding:0 8px 20px}.student-title{font-size:27px}.student-grid{grid-template-columns:1fr;gap:13px}.student-card{display:grid;grid-template-columns:70px 1fr auto;align-items:center;text-align:left;padding:13px}.student-go{justify-self:end}.student-sub{margin:2px 0}.personal-title{align-items:flex-start}.personal-title h2{font-size:24px}}
+@media(max-width:700px){.aruba-hero{margin:0 -12px 18px;height:300px;border-radius:0 0 25px 25px}.hero-logo{display:none!important;font-size:46px;letter-spacing:-2px;top:18px}.student-area{margin-top:-48px;padding:0 8px 20px}.student-title{font-size:27px}.student-grid{grid-template-columns:1fr;gap:13px}.student-card{display:grid;grid-template-columns:70px 1fr auto;align-items:center;text-align:left;padding:13px}.student-go{justify-self:end}.student-sub{margin:2px 0}.personal-title{align-items:flex-start}.personal-title h2{font-size:24px}}
 </style>
 </head>
 <body>
 <div class="container">
   <main id="home" class="page">
     <section id="studentChooser">
-      <div class="aruba-hero"><img src="pacogo-aruba-hero.png" alt="PacoGO op Aruba"><div class="hero-logo">Paco<span>GO!</span></div></div>
+      <div class="aruba-hero"><img src="pacogo-aruba-hero.png" alt="PacoGO op Aruba"></div>
       <div class="student-area">
         <h1 class="student-title">Wie gaat er leren?</h1>
         <div class="student-grid">
@@ -63,6 +71,7 @@
       </div>
     </section>
     <div id="studentDashboard" class="hidden">
+      <div class="aruba-hero student-banner"><img src="pacogo-aruba-hero.png" alt="PacoGO op Aruba"></div>
       <div class="student-back"><button class="secondary" onclick="switchStudent()">← Andere leerling</button></div>
       <div class="personal-title"><h2 id="personalGreeting"></h2><button class="switch-student" onclick="switchStudent()">👦 Wissel</button></div>
     <div class="dashboard">

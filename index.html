@@ -54,6 +54,22 @@
 .personal-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0 14px}.personal-title h2{margin:0}.switch-student{background:#fff;color:#126fc9;border:2px solid #dce9f6;box-shadow:0 4px 0 #dce9f6}
 .editor-student{background:#eaf7ff;border:2px solid #cde8fb;border-radius:14px;padding:13px;margin-bottom:14px}
 @media(max-width:700px){.aruba-hero{margin:0 -12px 18px;height:300px;border-radius:0 0 25px 25px}.hero-logo{display:none!important;font-size:46px;letter-spacing:-2px;top:18px}.student-area{margin-top:-48px;padding:0 8px 20px}.student-title{font-size:27px}.student-grid{grid-template-columns:1fr;gap:13px}.student-card{display:grid;grid-template-columns:70px 1fr auto;align-items:center;text-align:left;padding:13px}.student-go{justify-self:end}.student-sub{margin:2px 0}.personal-title{align-items:flex-start}.personal-title h2{font-size:24px}}
+
+/* Consistente Aruba-uitstraling op alle leerlingpagina's */
+.page-banner{position:relative;height:210px;margin:0 -22px 22px;overflow:hidden;border-radius:0 0 28px 28px;background:#55c8f3}
+.page-banner img{width:100%;height:100%;object-fit:cover;display:block}
+.page-banner:after{content:"";position:absolute;right:0;top:0;width:190px;height:95px;background:radial-gradient(circle at 35% 55%,#45c4f1 0%,#36bbed 58%,#39bff0 100%);filter:blur(3px);opacity:.98;pointer-events:none}
+.page-banner .banner-title{position:absolute;left:28px;bottom:18px;z-index:2;color:#fff;font-size:30px;font-weight:950;text-shadow:3px 3px 0 #102b57}
+.lesson-page-shell{max-width:1200px;margin:0 auto}
+#subject .grid,#lessonChoice .choice-grid,#lessonView #lessonContent{margin-top:8px}
+#subject .lesson-card,#lessonChoice .choice,#lessonView #lessonContent .card,#practice .practice-box,#test .practice-box,#result .practice-box{border-radius:24px;box-shadow:0 8px 0 rgba(16,43,87,.08),0 14px 28px rgba(16,43,87,.10)}
+#subject .lesson-card{padding:22px;min-height:155px;background:linear-gradient(135deg,#fff,#f5fbff)}
+#lessonChoice .card:first-of-type{background:linear-gradient(135deg,#f0f9ff,#fff)}
+#lessonChoice .choice{background:linear-gradient(135deg,#fff,#f7fcff);transition:transform .15s,box-shadow .15s}
+#lessonChoice .choice:hover{transform:translateY(-4px);box-shadow:0 11px 0 rgba(16,43,87,.08),0 18px 34px rgba(16,43,87,.13)}
+#lessonView #lessonContent .card{background:linear-gradient(135deg,#fff,#f7fcff);padding:22px}
+#practice .practice-box,#test .practice-box,#result .practice-box{max-width:850px;background:linear-gradient(135deg,#fff,#f2faff);padding:28px}
+@media(max-width:700px){.page-banner{height:180px;margin:0 -12px 18px;border-radius:0 0 24px 24px}.page-banner .banner-title{font-size:25px;left:18px}.page-banner:after{width:145px;height:75px}}
 </style>
 </head>
 <body>
@@ -103,19 +119,19 @@
     </div>
   </main>
 
-  <main id="subject" class="page hidden">
+  <main id="subject" class="page hidden"><div class="page-banner"><img src="pacogo-aruba-hero.png" alt="PacoGO op Aruba"><div class="banner-title" id="subjectBannerTitle">Mijn lessen</div></div>
     <div class="topbar"><div><button class="secondary" onclick="showHome()">← Terug</button><h2 id="subjectTitle" style="margin-top:14px"></h2></div></div>
     <div id="lessons" class="grid"></div>
     <div class="row" style="margin-top:18px"><button id="addLessonButton2" class="hidden" onclick="showAddLesson(currentSubject)">➕ Nieuwe les</button></div>
   </main>
 
-  <main id="lessonChoice" class="page hidden">
+  <main id="lessonChoice" class="page hidden"><div class="page-banner"><img src="pacogo-aruba-hero.png" alt="PacoGO op Aruba"><div class="banner-title">Kies wat je wilt doen</div></div>
     <button class="secondary" onclick="goBack()">← Terug</button>
     <div class="card" style="margin-top:18px"><h2 id="choiceTitle"></h2><div id="choiceMeta" class="small"></div></div>
     <div id="choiceGrid" class="choice-grid"></div>
   </main>
 
-  <main id="lessonView" class="page hidden">
+  <main id="lessonView" class="page hidden"><div class="page-banner"><img src="pacogo-aruba-hero.png" alt="PacoGO op Aruba"><div class="banner-title">Les</div></div>
     <div class="topbar"><div><button class="secondary" onclick="goBack()">← Terug</button><h2 id="lessonTitle" style="margin-top:14px"></h2></div><div id="lessonAdminButtons" class="row"><button id="editLessonButton" class="hidden" onclick="editCurrentLesson()">✏️ Bewerken</button><button id="deleteLessonButton" class="danger hidden" onclick="deleteCurrentLesson()">🗑️ Verwijderen</button></div></div>
     <div id="lessonContent"></div>
   </main>
@@ -135,11 +151,11 @@
 
   <main id="login" class="page hidden"><button class="secondary" onclick="showHome()">← Terug</button><div class="card login-card"><h2>🔐 Ouder login</h2><div class="field"><label for="loginEmail">E-mailadres</label><input id="loginEmail" type="email" autocomplete="email"></div><div class="field"><label for="loginPassword">Wachtwoord</label><input id="loginPassword" type="password" autocomplete="current-password"></div><button class="big" onclick="loginParent()">Inloggen</button><div id="loginError" class="message error hidden"></div></div></main>
 
-  <main id="practice" class="page hidden"><button class="secondary" onclick="leaveActivity()">← Stoppen</button><div class="card practice-box" style="margin-top:18px"><h2 id="practiceTitle"></h2><div id="practiceProgress" class="progress-wrap"></div><div id="practiceContent"></div></div></main>
+  <main id="practice" class="page hidden"><div class="page-banner"><img src="pacogo-aruba-hero.png" alt="PacoGO op Aruba"><div class="banner-title">Oefenen met Paco</div></div><button class="secondary" onclick="leaveActivity()">← Stoppen</button><div class="card practice-box" style="margin-top:18px"><h2 id="practiceTitle"></h2><div id="practiceProgress" class="progress-wrap"></div><div id="practiceContent"></div></div></main>
 
-  <main id="test" class="page hidden"><button class="secondary" onclick="leaveActivity()">← Stoppen</button><div class="card practice-box" style="margin-top:18px"><h2 id="testTitle"></h2><div id="testProgress" class="progress-wrap"></div><div id="testContent"></div></div></main>
+  <main id="test" class="page hidden"><div class="page-banner"><img src="pacogo-aruba-hero.png" alt="PacoGO op Aruba"><div class="banner-title">Toets</div></div><button class="secondary" onclick="leaveActivity()">← Stoppen</button><div class="card practice-box" style="margin-top:18px"><h2 id="testTitle"></h2><div id="testProgress" class="progress-wrap"></div><div id="testContent"></div></div></main>
 
-  <main id="result" class="page hidden"><div class="card practice-box"><h2 id="resultTitle"></h2><div id="resultScore" class="result-score"></div><div id="resultDetails"></div><div class="row" style="justify-content:center;margin-top:22px"><button onclick="showLessonChoice(currentLesson)">Nog een keer</button><button class="secondary" onclick="goBack()">Terug naar les</button></div></div></main>
+  <main id="result" class="page hidden"><div class="page-banner"><img src="pacogo-aruba-hero.png" alt="PacoGO op Aruba"><div class="banner-title">Klaar!</div></div><div class="card practice-box"><h2 id="resultTitle"></h2><div id="resultScore" class="result-score"></div><div id="resultDetails"></div><div class="row" style="justify-content:center;margin-top:22px"><button onclick="showLessonChoice(currentLesson)">Nog een keer</button><button class="secondary" onclick="goBack()">Terug naar les</button></div></div></main>
 
   <div id="globalMessage"></div>
 
@@ -189,7 +205,7 @@ db.auth.onAuthStateChange((_event,session)=>updateAuthUI(session));
 async function loadLessons(){const {data,error}=await db.from('lessons').select('*, lesson_items(*)').order('id',{ascending:true});if(error){showMessage('Lessen laden mislukt: '+error.message,'error');return}lessons=(data||[]).map(l=>({...l,lesson_items:(l.lesson_items||[]).sort((a,b)=>(a.sort_order??0)-(b.sort_order??0))}));showHome()}
 function renderSubjects(){const el=document.getElementById('subjects');const visibleLessons=lessons.filter(l=>l.student===currentStudent);const names=[...new Set(visibleLessons.map(l=>l.subject))];const lessonStat=document.getElementById('lessonCountStat');const subjectStat=document.getElementById('subjectCountStat');const progress=document.getElementById('dashboardProgress');if(lessonStat)lessonStat.textContent=lessons.length;if(subjectStat)subjectStat.textContent=names.length+' '+(names.length===1?'vak':'vakken');if(progress)progress.style.width=(lessons.length?Math.min(100,20+lessons.length*7):10)+'%';const recent=[...lessons.flatMap(l=>l.lesson_items.map(it=>({word:it.question,lesson:l.title})))].slice(-6).reverse();const recentEl=document.getElementById('recentWordList');if(recentEl)recentEl.innerHTML=recent.length?recent.map(x=>`<li><span>${escapeHtml(x.word)}</span><span class="paw">🐾</span></li>`).join(''):'<li class="small">Nog geen woorden.</li>';if(!names.length){el.innerHTML='<div class="empty">Nog geen lessen. Een ouder kan rechtsboven een les toevoegen.</div>';return}el.innerHTML=names.map(s=>{const count=visibleLessons.filter(l=>l.subject===s).length;return `<div class="card subject-card ${subjectClass(s)}" onclick="showSubject('${escapeAttr(s)}')"><div><div class="subject-icon">${subjectIcon(s)}</div><div class="subject-title">${escapeHtml(s)}</div></div><div class="small">${count} ${count===1?'les':'lessen'} · Bekijk →</div></div>`}).join('')}
 function escapeAttr(v){return escapeHtml(v).replace(/`/g,'&#96;')}
-function showSubject(subject){currentSubject=subject;hideAll();document.getElementById('subject').classList.remove('hidden');document.getElementById('subjectTitle').textContent=subject;const ls=lessons.filter(l=>l.subject===subject&&l.student===currentStudent);const el=document.getElementById('lessons');el.innerHTML=ls.length?ls.map(l=>`<div class="card lesson-card" onclick="openLesson(${l.id})"><span class="badge ${typeClass(l.type)}">${typeLabel(l.type)}</span><h3>${escapeHtml(l.title)}</h3><div class="small">${l.lesson_items.length} ${l.lesson_items.length===1?'onderdeel':'onderdelen'}</div></div>`).join(''):'<div class="empty">Nog geen lessen in dit vak.</div>'}
+function showSubject(subject){currentSubject=subject;hideAll();document.getElementById('subject').classList.remove('hidden');document.getElementById('subjectTitle').textContent=subject;document.getElementById('subjectBannerTitle').textContent=subject;const ls=lessons.filter(l=>l.subject===subject&&l.student===currentStudent);const el=document.getElementById('lessons');el.innerHTML=ls.length?ls.map(l=>`<div class="card lesson-card" onclick="openLesson(${l.id})"><span class="badge ${typeClass(l.type)}">${typeLabel(l.type)}</span><h3>${escapeHtml(l.title)}</h3><div class="small">${l.lesson_items.length} ${l.lesson_items.length===1?'onderdeel':'onderdelen'}</div></div>`).join(''):'<div class="empty">Nog geen lessen in dit vak.</div>'}
 function openLesson(id){const l=lessons.find(x=>x.id===id);if(!l)return;currentLesson=l;hideAll();document.getElementById('lessonChoice').classList.remove('hidden');document.getElementById('choiceTitle').textContent=l.title;document.getElementById('choiceMeta').textContent=`${l.subject} · ${typeLabel(l.type)} · ${l.lesson_items.length} items`;const g=document.getElementById('choiceGrid');if(l.type==='words'){g.innerHTML=`<button class="choice" onclick="startPractice('words')"><div class="emoji">🎯</div><h3>Oefenen</h3><p>Fouten komen later opnieuw terug totdat je ze beheerst.</p></button><button class="choice" onclick="startTest('words')"><div class="emoji">📝</div><h3>Toets</h3><p>Alle woorden één keer, zonder hulp.</p></button><button class="choice" onclick="showLesson()"><div class="emoji">📖</div><h3>Bekijken</h3><p>Bekijk de woorden en antwoorden.</p></button>`}else if(l.type==='dictation'){g.innerHTML=`<button class="choice" onclick="startPractice('dictation')"><div class="emoji">✏️</div><h3>Oefenen</h3><p>Luister, typ en herhaal fouten totdat de spelling goed is.</p></button><button class="choice" onclick="startTest('dictation')"><div class="emoji">📝</div><h3>Toets</h3><p>Luister en schrijf alle woorden. Feedback komt pas aan het einde.</p></button><button class="choice" onclick="showLesson()"><div class="emoji">📖</div><h3>Bekijken</h3><p>Bekijk de dicteewoorden.</p></button>`}else{g.innerHTML=`<button class="choice" onclick="startQuestions()"><div class="emoji">❓</div><h3>Vragen maken</h3><p>Beantwoord de vragen en controleer jezelf.</p></button><button class="choice" onclick="showLesson()"><div class="emoji">📖</div><h3>Bekijken</h3><p>Bekijk vragen en antwoorden.</p></button>`}}
 function showLesson(){hideAll();document.getElementById('lessonView').classList.remove('hidden');document.getElementById('lessonTitle').textContent=currentLesson.title;const admin=isParentLoggedIn();document.getElementById('editLessonButton').classList.toggle('hidden',!admin);document.getElementById('deleteLessonButton').classList.toggle('hidden',!admin);const el=document.getElementById('lessonContent');el.innerHTML=currentLesson.lesson_items.length?currentLesson.lesson_items.map((it,i)=>`<div class="card" style="margin-bottom:10px"><strong>${i+1}. ${escapeHtml(it.question)}</strong><div style="margin-top:8px;white-space:pre-line">${escapeHtml(it.answer)}</div></div>`).join(''):'<div class="empty">Deze les heeft nog geen items.</div>'}
 function goBack(){if(activity){activity=null}if(currentSubject)showSubject(currentSubject);else showHome()}
@@ -289,9 +305,42 @@ function finishPractice(){window.speechSynthesis?.cancel();const total=currentLe
 
 function startTest(type){window.speechSynthesis?.cancel();activity={kind:'test',type,items:shuffle(currentLesson.lesson_items),index:0,answers:[]};hideAll();document.getElementById('test').classList.remove('hidden');document.getElementById('testTitle').textContent=type==='dictation'?'✏️ Dictee toets':'📝 Woordtrainer toets';renderTest()}
 function updateTestProgress(){const total=activity.items.length,i=activity.index;const pct=total?i/total*100:0;document.getElementById('testProgress').innerHTML=`<div class="progress-label"><span>Vraag ${Math.min(i+1,total)} van ${total}</span><span>${i} gemaakt</span></div><div class="progress"><div class="progress-bar" style="width:${pct}%"></div></div>`}
-function renderTest(){updateTestProgress();const item=activity.items[activity.index],el=document.getElementById('testContent');if(activity.type==='dictation'){el.innerHTML=`<div class="test-instructions">Luister naar het woord en typ precies wat je hoort. Je krijgt pas aan het einde te zien wat goed en fout was.</div><div style="margin:25px"><button class="speaker big" onclick="speakTest()">🔊 Luister</button></div><input id="testAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Typ het woord"><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>`;setTimeout(()=>{speakTest();document.getElementById('testAnswer')?.focus()},350)}else{el.innerHTML=`<div class="test-instructions">Typ het Engelse antwoord. Je krijgt pas aan het einde de uitslag.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="testAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Typ je antwoord"><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>`;document.getElementById('testAnswer')?.focus()}}
+function renderTest(){updateTestProgress();const item=activity.items[activity.index],el=document.getElementById('testContent');if(activity.type==='dictation'){el.innerHTML=`<div class="test-instructions">Luister naar het woord en typ precies wat je hoort. Je krijgt pas aan het einde te zien wat goed en fout was.</div><div style="margin:25px"><button class="speaker big" onclick="speakTest()">🔊 Luister</button></div><input id="testAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Typ het woord"><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>`;setTimeout(()=>{speakTest();document.getElementById('testAnswer')?.focus()},350)}else{el.innerHTML=`<div class="test-instructions">Typ je antwoord. De AI kijkt naar de betekenis, niet alleen naar exacte woorden.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="testAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Typ je antwoord"><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>`;document.getElementById('testAnswer')?.focus()}}
 function speakTest(){if(!activity?.current&&activity?.items){}const item=activity.items[activity.index];const u=new SpeechSynthesisUtterance(item.answer);u.lang='en-US';u.rate=.82;window.speechSynthesis.cancel();window.speechSynthesis.speak(u)}
-function submitTest(){const item=activity.items[activity.index],input=document.getElementById('testAnswer'),value=input?.value??'';activity.answers.push({item,value,correct:normalize(value)===normalize(item.answer)});activity.index++;if(activity.index>=activity.items.length){finishTest()}else renderTest()}
+async function gradeWithAI(question,correctAnswer,userAnswer){
+  const {data,error}=await db.functions.invoke('grade-answer-v2',{body:{question,correctAnswer,userAnswer}});
+  if(error) throw error;
+  if(!data||typeof data.correct!=='boolean') throw new Error('Ongeldige AI-beoordeling');
+  return data;
+}
+async function submitTest(){
+  const item=activity.items[activity.index],input=document.getElementById('testAnswer'),value=input?.value?.trim()??'';
+  if(!value)return;
+  const button=document.querySelector('#testContent button.big:not(.speaker)');
+  if(button)button.disabled=true;
+  if(input)input.disabled=true;
+  let correct=false,feedback='';
+  if(activity.type==='dictation'){
+    correct=normalize(value)===normalize(item.answer);
+  }else{
+    if(normalize(value)===normalize(item.answer)){
+      correct=true;
+    }else{
+      try{
+        const grading=await gradeWithAI(item.question,item.answer,value);
+        correct=grading.correct;
+        feedback=grading.feedback||'';
+      }catch(error){
+        console.error('AI grading error:',error);
+        correct=false;
+        feedback='AI-beoordeling kon niet worden uitgevoerd.';
+      }
+    }
+  }
+  activity.answers.push({item,value,correct,feedback});
+  activity.index++;
+  if(activity.index>=activity.items.length)finishTest();else renderTest();
+}
 function finishTest(){window.speechSynthesis?.cancel();const total=activity.items.length,correct=activity.answers.filter(x=>x.correct).length,note=Math.round((correct/total*10)*10)/10;hideAll();document.getElementById('result').classList.remove('hidden');document.getElementById('resultTitle').textContent=activity.type==='dictation'?'✏️ Dictee klaar!':'📝 Toets klaar!';document.getElementById('resultScore').textContent=`${note.toFixed(1)}`;document.getElementById('resultDetails').innerHTML=`<p><strong>${correct} van ${total}</strong> goed.</p>`+activity.answers.map((x,i)=>`<div class="result-item ${x.correct?'correct':'incorrect'}"><strong>${i+1}. ${escapeHtml(x.item.question)}</strong><br>Jouw antwoord: ${escapeHtml(x.value||'—')}<br>${x.correct?'✓ Goed':'✗ Goed antwoord: '+escapeHtml(x.item.answer)}</div>`).join('');activity=null}
 function startQuestions(){activity={kind:'questions',items:shuffle(currentLesson.lesson_items),index:0};hideAll();document.getElementById('practice').classList.remove('hidden');document.getElementById('practiceTitle').textContent='❓ Vragen';renderQuestion()}
 function renderQuestion(){const item=activity.items[activity.index];document.getElementById('practiceProgress').innerHTML=`<div class="progress-label"><span>Vraag ${activity.index+1} van ${activity.items.length}</span></div><div class="progress"><div class="progress-bar" style="width:${activity.index/activity.items.length*100}%"></div></div>`;document.getElementById('practiceContent').innerHTML=`<div class="prompt">${escapeHtml(item.question)}</div><textarea id="questionAnswer" class="answer-input" style="width:100%;min-height:130px;text-align:left" placeholder="Schrijf je antwoord..."></textarea><div class="row" style="justify-content:center;margin-top:15px"><button class="big" onclick="revealQuestion()">Antwoord bekijken</button></div>`}

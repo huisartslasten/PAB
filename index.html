@@ -31,7 +31,7 @@
 
 /* PACOGO KINDKEUZE + ARUBA HERO */
 .aruba-hero{position:relative;margin:0 -22px 24px;height:430px;overflow:hidden;background:#72d9f4;border-radius:0 0 34px 34px}
-.aruba-hero img{width:100%;height:100%;object-fit:cover;display:block}
+.aruba-hero img{width:100%;height:100%;object-fit:cover;object-position:center center;display:block}
 .aruba-hero:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(16,43,87,.12) 0%,rgba(16,43,87,.02) 48%,rgba(16,43,87,.32) 100%);pointer-events:none}
 .hero-logo{display:none;position:absolute;z-index:2;left:50%;top:24px;transform:translateX(-50%);font-size:72px;line-height:1;font-weight:1000;letter-spacing:-4px;color:#fff;text-shadow:5px 6px 0 #102b57;white-space:nowrap}
 .hero-logo span{color:#ffc928}
@@ -51,7 +51,7 @@
 
 /* Paco banner op de leerling- en lespagina's */
 .page-paco-banner{position:relative;height:235px;margin:0 0 20px;border-radius:0 0 24px 24px;overflow:hidden;background:#72d9f4}
-.page-paco-banner img{width:100%;height:100%;object-fit:cover;object-position:34% center;display:block}
+.page-paco-banner img{width:100%;height:100%;object-fit:cover;object-position:center center;display:block}
 .page-paco-banner:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(16,43,87,.05),rgba(16,43,87,.22));pointer-events:none}
 .page-paco-banner .banner-label{position:absolute;left:22px;bottom:14px;z-index:2;color:#fff;font-size:24px;font-weight:950;text-shadow:3px 3px 0 #102b57}
 @media(max-width:700px){.page-paco-banner{height:185px;margin:0 -12px 16px;border-radius:0 0 22px 22px}.page-paco-banner .banner-label{font-size:20px;left:16px;bottom:10px}}
@@ -59,16 +59,6 @@
 </head>
 <body>
 <div class="container">
-  <header class="site-header aruba-hero">
-    <div class="hero-overlay">
-      <div class="hero-user-area">
-        <button id="loginButton" class="hero-parent" onclick="showLogin()">👤 Ouder</button>
-        <button id="logoutButton" class="hero-parent hidden" onclick="logoutParent()">👤 Ouder · Uitloggen</button>
-        <button id="addLessonButton" class="hero-add hidden" onclick="showAddLesson()">＋ Nieuwe les</button>
-      </div>
-    </div>
-  </header>
-
   <main id="home" class="page">
     <section id="studentChooser">
       <div class="aruba-hero"><img src="pacogo-aruba-hero.png" alt="PacoGO op Aruba"></div>

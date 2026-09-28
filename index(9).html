@@ -2327,45 +2327,13 @@ function showQuizItem(){
 ========================================================= */
 
 async function gradeWithAI(question, correctAnswer, userAnswer){
-  const url = `${SUPABASE_URL}/functions/v1/grade-answer-v2`;
+  const { data, error } = await db.functions.invoke("grade-answer-v2", {
+    body: { question, correctAnswer, userAnswer }
+  });
 
-  let response;
-  let rawText = "";
-
-  try{
-    response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "apikey": SUPABASE_KEY,
-        "Authorization": `Bearer ${SUPABASE_KEY}`
-      },
-      body: JSON.stringify({
-        question,
-        correctAnswer,
-        userAnswer
-      })
-    });
-
-    rawText = await response.text();
-  }catch(networkError){
-    console.error("AI network error:", networkError);
-    throw new Error("De verbinding met de AI-functie mislukte.");
-  }
-
-  console.log("AI grading response:", response.status, rawText);
-
-  let data = null;
-  try{
-    data = rawText ? JSON.parse(rawText) : null;
-  }catch(parseError){
-    console.error("AI response was not valid JSON:", rawText);
-    throw new Error(`Ongeldig antwoord van de AI-functie (HTTP ${response.status}).`);
-  }
-
-  if(!response.ok){
-    const serverMessage = data?.error || data?.message || rawText || "Onbekende fout";
-    throw new Error(`AI-functie gaf HTTP ${response.status}: ${serverMessage}`);
+  if(error){
+    console.error("AI grading error:", error);
+    throw error;
   }
 
   if(!data){

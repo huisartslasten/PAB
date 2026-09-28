@@ -34,37 +34,49 @@ body{
 button,input,textarea,select{font:inherit}
 button{cursor:pointer}
 
-header{
+header.site-header{
   position:relative;
   z-index:20;
-  min-height:76px;
-  padding:15px clamp(18px,4vw,52px);
+  min-height:92px;
+  padding:16px clamp(18px,4vw,54px);
   display:flex;
   align-items:center;
   justify-content:space-between;
-  background:#fff;
-  box-shadow:0 4px 18px rgba(49,63,110,.08);
+  background:rgba(255,255,255,.96);
   border:0;
+  box-shadow:0 5px 0 rgba(43,67,145,.08),0 12px 28px rgba(43,67,145,.08);
+}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-paw{
+  width:46px;height:46px;
+  display:grid;place-items:center;
+  background:#ffd84d;
+  border-radius:16px 16px 19px 19px;
+  transform:rotate(-8deg);
+  box-shadow:0 5px 0 #dfbd36;
+  font-size:25px;
 }
 .logo{
-  font-size:30px;
+  font-size:42px;
   line-height:1;
-  font-weight:900;
-  letter-spacing:-1.5px;
-  color:var(--blue);
-  text-shadow:0 2px 0 #dfe6ff;
+  font-weight:950;
+  letter-spacing:-2.5px;
+  color:#3867f6;
+  text-shadow:0 4px 0 #dce4ff;
 }
-.logo span{color:var(--purple)}
-header button{
+.logo span{color:#7657e8}
+.parent-button{
   border:0;
   background:#eef1ff;
   color:#4a3bb5;
-  padding:11px 17px;
+  padding:12px 17px;
   border-radius:16px;
-  font-weight:800;
-  box-shadow:0 4px 0 #d7dcf8;
+  font-weight:900;
+  box-shadow:0 5px 0 #d5daf4;
   transition:transform .08s,box-shadow .08s;
 }
+.parent-button:hover{transform:translateY(-1px)}
+.parent-button:active{transform:translateY(4px);box-shadow:0 1px 0 #d5daf4}
 header button:hover{transform:translateY(-1px)}
 header button:active{transform:translateY(3px);box-shadow:0 1px 0 #d7dcf8}
 
@@ -78,6 +90,32 @@ main{
 h1,h2,h3{margin-top:0}
 .page-title{margin-bottom:10px}
 .subtitle{color:var(--muted);margin-top:-3px;margin-bottom:24px}
+
+
+.hero-kicker{
+  position:relative;
+  z-index:3;
+  display:inline-block;
+  margin:0 auto 10px;
+  padding:8px 15px;
+  border-radius:999px;
+  background:rgba(255,255,255,.18);
+  border:2px solid rgba(255,255,255,.28);
+  color:#fff;
+  font-weight:900;
+  font-size:14px;
+  letter-spacing:.1px;
+}
+.hero-shape{
+  position:absolute;
+  z-index:1;
+  border-radius:50%;
+  pointer-events:none;
+  background:rgba(255,255,255,.13);
+}
+.hero-shape-one{width:130px;height:130px;left:5%;top:16%}
+.hero-shape-two{width:85px;height:85px;right:8%;top:37%}
+.hero-shape-three{width:190px;height:190px;right:-70px;bottom:7%}
 
 #homePage{
   position:relative;
@@ -99,6 +137,7 @@ h1,h2,h3{margin-top:0}
 #homePage:before{width:330px;height:330px;right:-110px;top:-110px}
 #homePage:after{width:220px;height:220px;left:-100px;bottom:-90px}
 
+#homePage .hero-kicker,
 #homePage .page-title,
 #homePage .subtitle{
   position:relative;
@@ -110,7 +149,7 @@ h1,h2,h3{margin-top:0}
   font-size:clamp(32px,5vw,54px);
   line-height:1.05;
   font-weight:900;
-  letter-spacing:-1.5px;
+  letter-spacing:-2px;
   margin:4px 0 8px;
   text-shadow:0 4px 0 rgba(36,57,145,.18);
 }
@@ -162,7 +201,14 @@ h1,h2,h3{margin-top:0}
   transform:rotate(45deg);
   border-radius:4px;
 }
+
 @media(max-width:700px){
+  header.site-header{min-height:74px;padding:12px 15px}
+  .brand{gap:7px}
+  .brand-paw{width:38px;height:38px;border-radius:13px;font-size:20px}
+  .logo{font-size:31px;letter-spacing:-1.7px}
+  .parent-button{padding:9px 11px;font-size:12px}
+
   .paco-home-mascot{gap:7px;margin-bottom:0}
   .paco-cartoon{transform:scale(.72);transform-origin:bottom right;margin-left:-28px;margin-right:-28px}
   .paco-bubble{font-size:12px;padding:10px 12px;margin-bottom:31px}
@@ -330,15 +376,22 @@ footer{text-align:center;color:#9aa5bb;font-size:13px;padding:30px}
 
 <body>
 
-<header>
-    <div class="logo">Paco<span>GO!</span></div>
-    <button id="parentButton" onclick="openParentLogin()">👨‍👩‍👦 Ouder</button>
+<header class="site-header">
+    <div class="brand">
+        <div class="brand-paw">🐾</div>
+        <div class="logo">Paco<span>GO!</span></div>
+    </div>
+    <button id="parentButton" class="parent-button" onclick="openParentLogin()">👨‍👩‍👦 Ouder</button>
 </header>
 
 <main>
 
     <!-- HOME -->
     <section id="homePage">
+        <div class="hero-shape hero-shape-one"></div>
+        <div class="hero-shape hero-shape-two"></div>
+        <div class="hero-shape hero-shape-three"></div>
+        <div class="hero-kicker">🐾 Samen leren met Paco</div>
         <h1 class="page-title">Wat wil je leren?</h1>
         <div class="paco-home-mascot" aria-hidden="true">
             <img src="paco-cartoon.png" alt="Paco" class="paco-cartoon-image">

@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO V21: based on V12; direct lesson management + persistent toets-klaar progress -->
+<!-- PacoGO V22: repair of V21; based on V12; direct lesson management + persistent toets-klaar progress -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -283,7 +283,7 @@ function refreshPageSidebars(){
   const all=getTestCalendar().filter(t=>t.student===currentStudent).sort((a,b)=>a.date.localeCompare(b.date));
   const today=new Date().toISOString().slice(0,10);
   const upcoming=all.filter(t=>t.date>=today).slice(0,4);
-  const html=upcoming.length?upcoming.map(t=>`<div class="test-calendar-item" ${t.lessonId?'onclick="openCalendarLesson(\\''+t.lessonId+'\\')" style="cursor:pointer"':''}><div class="test-calendar-date">${formatTestDate(t.date)}</div><div class="test-calendar-title">${escapeHtml(t.subject)} — ${escapeHtml(t.title)}</div><div class="test-calendar-countdown">⏳ ${testCountdown(t.date)}</div></div>`).join(''):'<div class="test-calendar-empty">Geen komende toetsen.</div>';
+  const html=upcoming.length?upcoming.map(t=>{const click=t.lessonId?`onclick="openCalendarLesson(\'${t.lessonId}\')" style="cursor:pointer"`:"";return `<div class="test-calendar-item" ${click}><div class="test-calendar-date">${formatTestDate(t.date)}</div><div class="test-calendar-title">${escapeHtml(t.subject)} — ${escapeHtml(t.title)}</div><div class="test-calendar-countdown">⏳ ${testCountdown(t.date)}</div></div>`}).join(''):'<div class="test-calendar-empty">Geen komende toetsen.</div>';
   document.querySelectorAll('.side-calendar-list').forEach(e=>e.innerHTML=html);
 }
 function hideAll(){document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));window.speechSynthesis?.cancel()}

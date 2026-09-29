@@ -127,7 +127,7 @@ body{background:#1787f2}
 <div class="container">
   <main id="home" class="page">
     <section id="studentChooser">
-      <div class="aruba-hero"><img src="pacogo-aruba-hero.png" alt="PacoGO op Aruba"></div>
+      <div class="aruba-hero"><img src="pacogo-aruba-hero.png" alt="PacoGO op Aruba"><div class="hero-user-area"><button class="parent-button" onclick="isParentLoggedIn()?showParentDashboard():showLogin()">⚙️ Ouder</button></div></div>
       <div class="student-area">
         <h1 class="student-title">Wie gaat er leren?</h1>
         <div class="student-grid">
@@ -147,7 +147,7 @@ body{background:#1787f2}
         <button class="side-item" onclick="document.getElementById('subjects').scrollIntoView({behavior:'smooth'})"><span class="side-icon">📖</span>Mijn lessen</button>
         
         <button class="side-item" onclick="document.getElementById('progressPanel').scrollIntoView({behavior:'smooth'})"><span class="side-icon">📊</span>Voortgang</button>
-        <button class="side-item" onclick="isParentLoggedIn()?showAddLesson():showLogin()"><span class="side-icon">⚙️</span>Ouder</button><button class="side-item" onclick="isParentLoggedIn()?showTestHistory():showLogin()"><span class="side-icon">📝</span>Toetsgeschiedenis</button>
+        <button class="side-item" onclick="isParentLoggedIn()?showParentDashboard():showLogin()"><span class="side-icon">⚙️</span>Ouder</button><button class="side-item" onclick="isParentLoggedIn()?showTestHistory():showLogin()"><span class="side-icon">📝</span>Toetsgeschiedenis</button>
         <div class="sidebar-note">🐾 <strong>Goed bezig!</strong><br>Elke les brengt je een pootje verder.</div>
       </aside>
 
@@ -242,7 +242,9 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div class="version-badge">PacoGO — TEST 003</div>\n\n<div id="globalMessage"></div>
+  <div class="version-badge">PacoGO — TEST 003</div>
+
+<div id="globalMessage"></div>
 
   <div id="deleteModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
     <div class="modal">

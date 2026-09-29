@@ -371,7 +371,7 @@ async async function showParentDashboard(){
   parentSelectedStudent=parentSelectedStudent||currentStudent||'Zenith';
   await renderParentDashboard();
 }
-async function renderParentDashboard(){
+async async function renderParentDashboard(){
   const grid=document.getElementById('parentStudentGrid');
   const management=document.getElementById('parentManagement');
   if(!grid||!management)return;
@@ -391,7 +391,7 @@ function selectParentStudent(name,isGuest=false,guestId=''){
   parentSelectedStudent=name;
   renderParentDashboard();
 }
-async function renderParentStudent(){
+async async function renderParentStudent(){
   const el=document.getElementById('parentManagement');
   if(!el)return;
   const isGuest=parentSelectedStudent && !['Zyon','Zenith','Zephon'].includes(parentSelectedStudent);
@@ -420,7 +420,7 @@ function parentLessonRow(l,isGuest,isActive,assignmentId){
   }
   return '<div class="parent-lesson-row"><div class="parent-lesson-info"><strong>'+escapeHtml(l.title)+'</strong><span>'+meta+'</span></div>'+action+'</div>';
 }
-async function setGuestLesson(lessonId,active){
+async async function setGuestLesson(lessonId,active){
   if(!requireParent())return;
   const guest=await db.from('guest_access').select('id').eq('guest_name',parentSelectedStudent).maybeSingle();
   if(guest.error||!guest.data){showMessage('Gastleerling kon niet worden gevonden.','error');return;}

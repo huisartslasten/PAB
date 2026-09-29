@@ -387,9 +387,9 @@ function parentStudentCard(name,isGuest=false,guestId=''){
   const active=parentSelectedStudent===name?' active':'';
   return '<button class="parent-student-card'+active+'" onclick="selectParentStudent('+JSON.stringify(name)+','+(isGuest?'true':'false')+','+JSON.stringify(guestId)+')"><div class="name">'+escapeHtml(name)+'</div><div class="kind">'+(isGuest?'👤 Gastleerling':'👦 Leerling')+'</div></button>';
 }
-async function selectParentStudent(name,isGuest=false,guestId=''){
+function selectParentStudent(name,isGuest=false,guestId=''){
   parentSelectedStudent=name;
-  await renderParentDashboard();
+  renderParentDashboard();
 }
 async function renderParentStudent(){
   const el=document.getElementById('parentManagement');

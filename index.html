@@ -305,7 +305,16 @@ function openGuestLesson(id){const l=guestLessons.find(x=>Number(x.lesson_id)===
 async function initializeApp(){if(await startGuestFromUrl())return;const {data:{session}}=await db.auth.getSession();updateAuthUI(session);await loadLessons()}
 db.auth.onAuthStateChange((_event,session)=>updateAuthUI(session));
 
-async function loadLessons(){const {data,error}=await db.from('lessons').select('*, lesson_items(*)').order('id',{ascending:true});if(error){showMessage('Lessen laden mislukt: '+error.message,'error');return}lessons=(data||[]).map(l=>({...l,lesson_items:(l.lesson_items||[]).sort((a,b)=>(a.sort_order??0)-(b.sort_order??0))}));showHome()}
+async function loadLessons(){
+  const lessonsRes=await db.from('lessons').select('*').order('id',{ascending:true});
+  if(lessonsRes.error){console.error('LESSONS LOAD ERROR',lessonsRes.error);showMessage('Lessen laden mislukt: '+lessonsRes.error.message,'error');return}
+  const itemsRes=await db.from('lesson_items').select('*').order('sort_order',{ascending:true});
+  if(itemsRes.error){console.error('LESSON ITEMS LOAD ERROR',itemsRes.error);showMessage('Lesinhoud laden mislukt: '+itemsRes.error.message,'error');return}
+  const items=itemsRes.data||[];
+  lessons=(lessonsRes.data||[]).map(l=>({...l,lesson_items:items.filter(it=>Number(it.lesson_id)===Number(l.id)).sort((a,b)=>(a.sort_order??0)-(b.sort_order??0))}));
+  console.log('PacoGO lessons loaded:',lessons.length,lessons.map(l=>({id:l.id,student:l.student,title:l.title,items:l.lesson_items.length})));
+  showHome();
+}
 function renderSubjects(){const el=document.getElementById('subjects');const visibleLessons=lessons.filter(l=>l.student===currentStudent);const names=[...new Set(visibleLessons.map(l=>l.subject))];const lessonStat=document.getElementById('lessonCountStat');const subjectStat=document.getElementById('subjectCountStat');const progress=document.getElementById('dashboardProgress');if(lessonStat)lessonStat.textContent=visibleLessons.length;if(subjectStat)subjectStat.textContent=names.length+' '+(names.length===1?'vak':'vakken');if(progress)progress.style.width=(visibleLessons.length?Math.min(100,20+visibleLessons.length*7):10)+'%';if(!names.length){el.innerHTML='<div class="empty">Nog geen lessen. Een ouder kan rechtsboven een les toevoegen.</div>';return}el.innerHTML=names.map(s=>{const count=visibleLessons.filter(l=>l.subject===s).length;return `<div class="card subject-card ${subjectClass(s)}" onclick="showSubject('${escapeAttr(s)}')"><div><div class="subject-icon">${subjectIcon(s)}</div><div class="subject-title">${escapeHtml(s)}</div></div><div class="small">${count} ${count===1?'les':'lessen'} · Bekijk →</div></div>`}).join('')}
 function escapeAttr(v){return escapeHtml(v).replace(/`/g,'&#96;')}
 function showSubject(subject){currentSubject=subject;hideAll();document.getElementById('subject').classList.remove('hidden');document.getElementById('subjectTitle').textContent=subject;refreshPageSidebars();const ls=lessons.filter(l=>l.subject===subject&&l.student===currentStudent);const el=document.getElementById('lessons');el.innerHTML=ls.length?ls.map(l=>`<div class="card lesson-card" onclick="openLesson(${l.id})"><span class="badge ${typeClass(l.type)}">${typeLabel(l.type)}</span><h3>${escapeHtml(l.title)}</h3><div class="small">${l.lesson_items.length} ${l.lesson_items.length===1?'onderdeel':'onderdelen'}</div></div>`).join(''):'<div class="empty">Nog geen lessen in dit vak.</div>'}

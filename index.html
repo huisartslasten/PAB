@@ -146,7 +146,7 @@ body{background:#1787f2}
         <button class="side-item" onclick="document.getElementById('subjects').scrollIntoView({behavior:'smooth'})"><span class="side-icon">📖</span>Mijn lessen</button>
         
         <button class="side-item" onclick="document.getElementById('progressPanel').scrollIntoView({behavior:'smooth'})"><span class="side-icon">📊</span>Voortgang</button>
-        <button class="side-item" onclick="isParentLoggedIn()?showAddLesson():showLogin()"><span class="side-icon">⚙️</span>Ouder</button>
+        <button class="side-item" onclick="isParentLoggedIn()?showAddLesson():showLogin()"><span class="side-icon">⚙️</span>Ouder</button><button class="side-item" onclick="isParentLoggedIn()?showTestHistory():showLogin()"><span class="side-icon">📝</span>Toetsgeschiedenis</button>
         <div class="sidebar-note">🐾 <strong>Goed bezig!</strong><br>Elke les brengt je een pootje verder.</div>
       </aside>
 
@@ -206,6 +206,12 @@ body{background:#1787f2}
   </main>
 
   <main id="login" class="page hidden"><button class="secondary" onclick="showHome()">← Terug</button><div class="card login-card"><h2>🔐 Ouder login</h2><div class="field"><label for="loginEmail">E-mailadres</label><input id="loginEmail" type="email" autocomplete="email"></div><div class="field"><label for="loginPassword">Wachtwoord</label><input id="loginPassword" type="password" autocomplete="current-password"></div><button class="big" onclick="loginParent()">Inloggen</button><button class="secondary" type="button" onclick="sendPasswordReset()" style="margin-top:10px;width:100%">Wachtwoord vergeten?</button><div id="loginError" class="message error hidden"></div><div id="loginResetMessage" class="message success hidden"></div></div></main>
+
+  <main id="testHistory" class="page hidden">
+    <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 Toetsgeschiedenis</div></div>
+    <div class="topbar"><div><button class="secondary" onclick="showHome()">← Terug</button><h2 style="margin-top:14px">📚 Toetsgeschiedenis</h2></div></div>
+    <div id="testHistoryContent"></div>
+  </main>
 
   <main id="resetPassword" class="page hidden"><button class="secondary" onclick="showLogin()">← Terug naar inloggen</button><div class="card login-card"><h2>🔑 Nieuw wachtwoord</h2><p class="small" style="margin-bottom:18px">Kies hieronder een nieuw wachtwoord voor je ouderaccount.</p><div class="field"><label for="newPassword">Nieuw wachtwoord</label><input id="newPassword" type="password" autocomplete="new-password"></div><div class="field"><label for="newPasswordConfirm">Nieuw wachtwoord opnieuw</label><input id="newPasswordConfirm" type="password" autocomplete="new-password"></div><button class="big" onclick="updateParentPassword()">Wachtwoord opslaan</button><div id="resetPasswordError" class="message error hidden"></div></div></main>
 
@@ -516,7 +522,7 @@ async function checkPractice(){
 }
 function finishPractice(){window.speechSynthesis?.cancel();const total=currentLesson.lesson_items.length;document.getElementById('practiceProgress').innerHTML=`<div class="progress-label"><span>🎉 ${total} / ${total} beheerst</span><span>Klaar!</span></div><div class="progress"><div class="progress-bar" style="width:100%"></div></div>`;document.getElementById('practiceContent').innerHTML=`<div class="result-score">🎉 Klaar!</div><p>Je hebt alle ${total} ${activity.type==='dictation'?'dicteewoorden':'woorden'} goed kunnen maken.</p><button class="big" onclick="showLessonChoice(currentLesson)">Terug naar de les</button>`;activity=null}
 
-function startTest(type){window.speechSynthesis?.cancel();activity={kind:'test',type,items:shuffle(currentLesson.lesson_items),index:0,answers:[]};hideAll();document.getElementById('test').classList.remove('hidden');document.getElementById('testTitle').textContent=type==='dictation'?'✏️ Dictee toets':'📝 Woordtrainer toets';renderTest()}
+function startTest(type){window.speechSynthesis?.cancel();activity={kind:'test',type,items:shuffle(currentLesson.lesson_items),index:0,answers:[],startedAt:new Date().toISOString()};hideAll();document.getElementById('test').classList.remove('hidden');document.getElementById('testTitle').textContent=type==='dictation'?'✏️ Dictee toets':'📝 Woordtrainer toets';renderTest()}
 function updateTestProgress(){const total=activity.items.length,i=activity.index;const pct=total?i/total*100:0;document.getElementById('testProgress').innerHTML=`<div class="progress-label"><span>Vraag ${Math.min(i+1,total)} van ${total}</span><span>${i} gemaakt</span></div><div class="progress"><div class="progress-bar" style="width:${pct}%"></div></div>`}
 function renderTest(){updateTestProgress();const item=activity.items[activity.index],el=document.getElementById('testContent');if(activity.type==='math'){el.innerHTML=`<div class="test-instructions">Los de som op. Je krijgt pas aan het einde de uitslag.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="testAnswer" class="answer-input" type="number" inputmode="numeric" autofocus autocomplete="off" placeholder="Typ je antwoord"><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>`;document.getElementById('testAnswer')?.focus()}else if(activity.type==='dictation'){el.innerHTML=`<div class="test-instructions">Luister naar het woord en typ precies wat je hoort. Je krijgt pas aan het einde te zien wat goed en fout was.</div><div style="margin:25px"><button class="speaker big" onclick="speakTest()">🔊 Luister</button></div><input id="testAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier het woord in"><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>`;setTimeout(()=>{speakTest();document.getElementById('testAnswer')?.focus()},350)}else{el.innerHTML=`<div class="test-instructions">Typ hier het woord. Je krijgt pas aan het einde de uitslag.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="testAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier het woord in"><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>`;document.getElementById('testAnswer')?.focus()}}
 function speakTest(){if(!activity?.current&&activity?.items){}const item=activity.items[activity.index];const u=new SpeechSynthesisUtterance(item.answer);u.lang='en-US';u.rate=.82;window.speechSynthesis.cancel();window.speechSynthesis.speak(u)}
@@ -553,7 +559,37 @@ async function submitTest(){
   activity.index++;
   if(activity.index>=activity.items.length)finishTest();else renderTest();
 }
-function finishTest(){window.speechSynthesis?.cancel();const total=activity.items.length,correct=activity.answers.filter(x=>x.correct).length,note=Math.round((correct/total*10)*10)/10;hideAll();document.getElementById('result').classList.remove('hidden');document.getElementById('resultTitle').textContent=activity.type==='dictation'?'✏️ Dictee klaar!':'📝 Toets klaar!';document.getElementById('resultScore').textContent=`${note.toFixed(1)}`;document.getElementById('resultDetails').innerHTML=`<p><strong>${correct} van ${total}</strong> goed.</p>`+activity.answers.map((x,i)=>`<div class="result-item ${x.correct?'correct':'incorrect'}"><strong>${i+1}. ${escapeHtml(x.item.question)}</strong><br>Jouw antwoord: ${escapeHtml(x.value||'—')}<br>${x.correct?'✓ Goed':'✗ Goed antwoord: '+escapeHtml(x.item.answer)}</div>`).join('');activity=null}
+async function saveTestAttempt(attempt){
+  if(!attempt?.answers?.length || !currentStudent || !currentLesson) return;
+  const total=attempt.answers.length;
+  const score=attempt.answers.filter(x=>x.correct).length;
+  const inserted=await db.from('test_attempts').insert({lesson_id:currentLesson.id,student:currentStudent,score,total_questions:total,started_at:attempt.startedAt||new Date().toISOString(),completed_at:new Date().toISOString(),is_test:true}).select().single();
+  if(inserted.error) throw inserted.error;
+  const rows=attempt.answers.map((x,i)=>({attempt_id:inserted.data.id,question_order:i+1,question:String(x.item?.question??''),expected_answer:String(x.item?.answer??''),given_answer:String(x.value??''),is_correct:x.correct===true,question_type:attempt.type||currentLesson.type,answered_at:new Date().toISOString()}));
+  const answerInsert=await db.from('test_attempt_answers').insert(rows);
+  if(answerInsert.error) throw answerInsert.error;
+}
+
+async function finishTest(){
+  window.speechSynthesis?.cancel();
+  const attempt=activity,total=attempt.items.length,correct=attempt.answers.filter(x=>x.correct).length,note=Math.round((correct/total*10)*10)/10;
+  try{await saveTestAttempt(attempt)}catch(error){console.error('Test history save error:',error);showMessage('⚠️ De toets is klaar, maar kon niet in de toetsgeschiedenis worden opgeslagen.','error')}
+  hideAll();document.getElementById('result').classList.remove('hidden');
+  document.getElementById('resultTitle').textContent=attempt.type==='dictation'?'✏️ Dictee klaar!':'📝 Toets klaar!';
+  document.getElementById('resultScore').textContent=note.toFixed(1);
+  document.getElementById('resultDetails').innerHTML='<p><strong>'+correct+' van '+total+'</strong> goed.</p>'+attempt.answers.map((x,i)=>'<div class="result-item '+(x.correct?'correct':'incorrect')+'"><strong>'+(i+1)+'. '+escapeHtml(x.item.question)+'</strong><br>Jouw antwoord: '+escapeHtml(x.value||'—')+'<br>'+(x.correct?'✓ Goed':'✗ Goed antwoord: '+escapeHtml(x.item.answer))+'</div>').join('');
+  activity=null;
+}
+
+async function showTestHistory(){
+  if(!requireParent()) return;
+  hideAll();const el=document.getElementById('testHistoryContent');el.innerHTML='<div class="card">Toetsgeschiedenis laden...</div>';document.getElementById('testHistory').classList.remove('hidden');
+  const {data,error}=await db.from('test_attempts').select('id,lesson_id,student,score,total_questions,started_at,completed_at,test_attempt_answers(id,question_order,question,expected_answer,given_answer,is_correct,question_type,answered_at)').order('completed_at',{ascending:false});
+  if(error){console.error('Test history load error:',error);el.innerHTML='<div class="card message error">De toetsgeschiedenis kon niet worden geladen.</div>';return}
+  if(!data?.length){el.innerHTML='<div class="card empty">Nog geen gemaakte toetsen opgeslagen.</div>';return}
+  const lessonMap=new Map(lessons.map(l=>[Number(l.id),l]));
+  el.innerHTML=data.map(a=>{const lesson=lessonMap.get(Number(a.lesson_id));const pct=a.total_questions?Math.round(a.score/a.total_questions*100):0;const date=a.completed_at?new Intl.DateTimeFormat('nl-NL',{dateStyle:'medium',timeStyle:'short'}).format(new Date(a.completed_at)):'Onbekende datum';const answers=(a.test_attempt_answers||[]).sort((x,y)=>x.question_order-y.question_order);return '<div class="card" style="margin-bottom:16px"><h3 style="margin-top:0">'+escapeHtml(lesson?.subject||'Toets')+' — '+escapeHtml(lesson?.title||('Les '+a.lesson_id))+'</h3><p class="small"><strong>'+escapeHtml(a.student)+'</strong> · '+date+' · '+a.score+'/'+a.total_questions+' goed ('+pct+'%)</p><div>'+answers.map(x=>'<div class="result-item '+(x.is_correct?'correct':'incorrect')+'"><strong>'+x.question_order+'. '+escapeHtml(x.question)+'</strong><br>Antwoord van leerling: '+escapeHtml(x.given_answer||'—')+'<br>'+(x.is_correct?'✓ Goed':'✗ Verwacht antwoord: '+escapeHtml(x.expected_answer||'—'))+'</div>').join('')+'</div></div>'}).join('');
+}
 function startQuestions(){activity={kind:'questions',items:shuffle(currentLesson.lesson_items),index:0};hideAll();document.getElementById('practice').classList.remove('hidden');document.getElementById('practiceTitle').textContent='❓ Vragen';renderQuestion()}
 function renderQuestion(){const item=activity.items[activity.index];document.getElementById('practiceProgress').innerHTML=`<div class="progress-label"><span>Vraag ${activity.index+1} van ${activity.items.length}</span></div><div class="progress"><div class="progress-bar" style="width:${activity.index/activity.items.length*100}%"></div></div>`;document.getElementById('practiceContent').innerHTML=`<div class="prompt">${escapeHtml(item.question)}</div><textarea id="questionAnswer" class="answer-input" style="width:100%;min-height:130px;text-align:left" placeholder="Schrijf je antwoord..."></textarea><div class="row" style="justify-content:center;margin-top:15px"><button class="big" onclick="revealQuestion()">Antwoord bekijken</button></div>`}
 function revealQuestion(){const item=activity.items[activity.index],answer=document.getElementById('questionAnswer').value;document.getElementById('practiceContent').innerHTML=`<div class="prompt">${escapeHtml(item.question)}</div><div class="question-answer"><strong>Jouw antwoord:</strong><br>${escapeHtml(answer||'—')}<hr><strong>Voorbeeldantwoord:</strong><br>${escapeHtml(item.answer)}</div><div class="self-buttons"><button class="success" onclick="nextQuestion(true)">✓ Goed</button><button class="danger" onclick="nextQuestion(false)">✗ Nog niet</button></div>`}

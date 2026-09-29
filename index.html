@@ -120,7 +120,8 @@ body{background:#1787f2}
   .date-picker-weekday{font-size:13px}
   .date-picker-day{min-height:52px;font-size:16px;border-radius:12px}
 }
-</style>
+
+.version-badge{position:fixed;right:14px;bottom:14px;z-index:10000;background:#102b57;color:#fff;padding:7px 11px;border-radius:999px;font-size:12px;font-weight:900;box-shadow:0 5px 14px rgba(16,43,87,.2);letter-spacing:.2px}.parent-dashboard-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:18px 0}.parent-dashboard-head h2{margin:0}.parent-student-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}.parent-student-card{background:#fff;border:2px solid var(--border);border-radius:18px;padding:18px;text-align:left;cursor:pointer;box-shadow:var(--shadow);transition:.14s}.parent-student-card:hover{border-color:#8bcfff;transform:translateY(-2px)}.parent-student-card.active{border-color:var(--blue);background:#eef8ff}.parent-student-card .name{font-size:22px;font-weight:950}.parent-student-card .kind{font-size:13px;color:var(--muted);margin-top:3px}.parent-management{margin-top:18px}.parent-lesson-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid var(--border)}.parent-lesson-row:last-child{border-bottom:0}.parent-lesson-info strong{display:block}.parent-lesson-info span{font-size:13px;color:var(--muted)}.parent-guest-toggle{min-width:120px}.parent-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}@media(max-width:700px){.version-badge{right:8px;bottom:8px;font-size:11px}.parent-student-grid{grid-template-columns:1fr 1fr}.parent-lesson-row{align-items:flex-start;flex-direction:column}.parent-guest-toggle{width:100%}}</style>
 </head>
 <body>
 <div class="container">
@@ -139,7 +140,7 @@ body{background:#1787f2}
     <div id="studentDashboard" class="hidden">
       <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 Pootjes klaar? Let’s go!</div></div>
       <div class="student-back"><button class="secondary" onclick="switchStudent()">← Andere leerling</button></div>
-      <div class="personal-title"><h2 id="personalGreeting"></h2><div class="row dashboard-actions"><button id="loginButton" class="parent-button" onclick="isParentLoggedIn()?showAddLesson():showLogin()">⚙️ Ouder</button><button id="logoutButton" class="logout-button hidden" onclick="logoutParent()">Uitloggen</button></div></div>
+      <div class="personal-title"><h2 id="personalGreeting"></h2><div class="row dashboard-actions"><button id="loginButton" class="parent-button" onclick="isParentLoggedIn()?showParentDashboard():showLogin()">⚙️ Ouder</button><button id="logoutButton" class="logout-button hidden" onclick="logoutParent()">Uitloggen</button></div></div>
     <div class="dashboard">
       <aside class="sidebar">
         <button class="side-item active" onclick="showHome()"><span class="side-icon">🏠</span>Home</button>
@@ -192,6 +193,16 @@ body{background:#1787f2}
     <div id="lessonContent"></div>
   </main>
 
+  <main id="parentDashboard" class="page hidden">
+    <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">⚙️ Ouderbeheer</div></div>
+    <div class="topbar"><div><button class="secondary" onclick="showHome()">← Terug</button><h2 style="margin-top:14px">⚙️ Ouderbeheer</h2></div><div class="row"><button onclick="showAddLesson()">➕ Nieuwe les</button><button class="secondary" onclick="showTestHistory()">📝 Toetsgeschiedenis</button></div></div>
+    <div class="card">
+      <div class="parent-dashboard-head"><div><h2>Leerling kiezen</h2><div class="small">Kies voor wie je lessen, voortgang of toegang wilt beheren.</div></div></div>
+      <div id="parentStudentGrid" class="parent-student-grid"></div>
+    </div>
+    <div id="parentManagement" class="parent-management"></div>
+  </main>
+
   <main id="editor" class="page hidden">
     <button class="secondary" onclick="goBack()">← Annuleren</button>
     <div class="card" style="margin-top:18px"><h2 id="editorTitle">Nieuwe les</h2>
@@ -231,7 +242,7 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div id="globalMessage"></div>
+  <div class="version-badge">PacoGO — TEST 003</div>\n\n<div id="globalMessage"></div>
 
   <div id="deleteModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
     <div class="modal">
@@ -246,10 +257,10 @@ body{background:#1787f2}
 </div>
 
 <script>
-const SUPABASE_URL = 'https://ncpkqrvxljxwboavxtak.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_skiKpO4UU79zWY7hskHsoA_WQxA6CFc';
+const SUPABASE_URL = 'https://btnhhvtpmuvrpbnkyjnm.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_g9VPrXM9Mn-Phf625whFrQ_6CA8yUMH';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const PARENT_IDS = new Set(['5d0e1e5c-1dbe-4909-bd3a-81a1e7b26d09','418833d5-049a-4ec9-8072-2d48a85f04b1']);
+const PARENT_IDS = new Set(['f0f92b9c-5eb7-4b78-aca0-1fea615b1999']);
 let currentSession=null,currentSubject=null,currentLesson=null,lessons=[];
 let currentStudent=null;
 let activity=null;
@@ -349,6 +360,79 @@ function showLesson(){hideAll();document.getElementById('lessonView').classList.
 function goBack(){if(activity){activity=null}if(currentSubject)showSubject(currentSubject);else showHome()}
 function leaveActivity(){window.speechSynthesis?.cancel();activity=null;showLessonChoice(currentLesson)}
 function showLessonChoice(l){currentLesson=l;openLesson(l.id)}
+
+let parentSelectedStudent=null;
+async function showParentDashboard(){
+  if(!requireParent())return;
+  hideAll();
+  document.getElementById('parentDashboard').classList.remove('hidden');
+  parentSelectedStudent=parentSelectedStudent||currentStudent||'Zenith';
+  await renderParentDashboard();
+}
+async function renderParentDashboard(){
+  const grid=document.getElementById('parentStudentGrid');
+  const management=document.getElementById('parentManagement');
+  if(!grid||!management)return;
+  const baseStudents=['Zyon','Zenith','Zephon'];
+  let guests=[];
+  const guestRes=await db.from('guest_access').select('id,guest_name,active').eq('active',true).order('id',{ascending:true});
+  if(!guestRes.error)guests=guestRes.data||[];
+  grid.innerHTML=baseStudents.map(name=>parentStudentCard(name,false)).join('')+
+    guests.map(g=>parentStudentCard(g.guest_name,true,g.id)).join('');
+  await renderParentStudent();
+}
+function parentStudentCard(name,isGuest=false,guestId=''){
+  const active=parentSelectedStudent===name?' active':'';
+  return '<button class="parent-student-card'+active+'" onclick="selectParentStudent('+JSON.stringify(name)+','+(isGuest?'true':'false')+','+JSON.stringify(guestId)+')"><div class="name">'+escapeHtml(name)+'</div><div class="kind">'+(isGuest?'👤 Gastleerling':'👦 Leerling')+'</div></button>';
+}
+async function selectParentStudent(name,isGuest=false,guestId=''){
+  parentSelectedStudent=name;
+  await renderParentDashboard();
+}
+async function renderParentStudent(){
+  const el=document.getElementById('parentManagement');
+  if(!el)return;
+  const isGuest=parentSelectedStudent && !['Zyon','Zenith','Zephon'].includes(parentSelectedStudent);
+  if(!parentSelectedStudent){el.innerHTML='';return;}
+  if(!isGuest){
+    const own=lessons.filter(l=>l.student===parentSelectedStudent);
+    el.innerHTML='<div class="card"><div class="parent-dashboard-head"><div><h2>👦 '+escapeHtml(parentSelectedStudent)+'</h2><div class="small">'+own.length+' actieve lessen</div></div><button onclick="showAddLesson()">➕ Les maken</button></div>'+
+      (own.length?own.map(l=>parentLessonRow(l,false,true)).join(''):'<div class="empty">Nog geen lessen voor deze leerling.</div>')+'</div>';
+    return;
+  }
+  const guestRes=await db.from('guest_access').select('id,guest_name,active').eq('guest_name',parentSelectedStudent).maybeSingle();
+  if(guestRes.error||!guestRes.data){el.innerHTML='<div class="card message error">Gastleerling kon niet worden geladen.</div>';return;}
+  const glRes=await db.from('guest_lessons').select('id,lesson_id,active').eq('guest_id',guestRes.data.id);
+  const assignments=glRes.error?[]:(glRes.data||[]);
+  const assigned=new Map(assignments.map(x=>[Number(x.lesson_id),x]));
+  el.innerHTML='<div class="card"><div class="parent-dashboard-head"><div><h2>👤 '+escapeHtml(parentSelectedStudent)+'</h2><div class="small">Activeer hier welke lessen deze gastleerling mag zien.</div></div></div>'+
+    '<div>'+lessons.map(l=>parentLessonRow(l,true,!!assigned.get(Number(l.id))&&assigned.get(Number(l.id)).active,assigned.get(Number(l.id))?.id)).join('')+'</div></div>';
+}
+function parentLessonRow(l,isGuest,isActive,assignmentId){
+  const meta=escapeHtml(l.subject)+' · '+escapeHtml(typeLabel(l.type))+' · '+l.lesson_items.length+' onderdelen';
+  let action='';
+  if(isGuest){
+    action=isActive?'<button class="secondary parent-guest-toggle" onclick="setGuestLesson('+Number(l.id)+',false)">Deactiveren</button>':'<button class="success parent-guest-toggle" onclick="setGuestLesson('+Number(l.id)+',true)">Activeren</button>';
+  }else{
+    action='<button class="secondary" onclick="openLesson('+Number(l.id)+')">Bekijken</button>';
+  }
+  return '<div class="parent-lesson-row"><div class="parent-lesson-info"><strong>'+escapeHtml(l.title)+'</strong><span>'+meta+'</span></div>'+action+'</div>';
+}
+async function setGuestLesson(lessonId,active){
+  if(!requireParent())return;
+  const guest=await db.from('guest_access').select('id').eq('guest_name',parentSelectedStudent).maybeSingle();
+  if(guest.error||!guest.data){showMessage('Gastleerling kon niet worden gevonden.','error');return;}
+  const existing=await db.from('guest_lessons').select('id').eq('guest_id',guest.data.id).eq('lesson_id',lessonId).maybeSingle();
+  if(existing.data){
+    const res=await db.from('guest_lessons').update({active}).eq('id',existing.data.id);
+    if(res.error){showMessage('Activeren mislukt: '+res.error.message,'error');return;}
+  }else if(active){
+    const res=await db.from('guest_lessons').insert({guest_id:guest.data.id,lesson_id:lessonId,active:true});
+    if(res.error){showMessage('Activeren mislukt: '+res.error.message,'error');return;}
+  }
+  await renderParentStudent();
+  showMessage(active?'Les geactiveerd.':'Les gedeactiveerd.','success');
+}
 
 function showAddLesson(subject=''){if(!requireParent())return;currentLesson=null;hideAll();document.getElementById('editor').classList.remove('hidden');document.getElementById('editorTitle').textContent='Nieuwe les';document.getElementById('lessonSubject').value=subject||currentSubject||'';document.querySelectorAll('input[name=lessonStudent]').forEach(r=>r.checked=r.value===currentStudent);document.getElementById('lessonName').value='';document.getElementById('lessonType').value='words';document.getElementById('lessonTestDate').value='';document.getElementById('editorError').classList.add('hidden');resetEditorRows();changeLessonType();renderDatePicker('lessonTestDatePicker','lessonTestDate','')}
 function resetEditorRows(){document.getElementById('wordEditor').innerHTML='';document.getElementById('questionEditor').innerHTML='';document.getElementById('dictationEditor').innerHTML='';document.getElementById('mathEditor').innerHTML='';addWordRow();addWordRow()}

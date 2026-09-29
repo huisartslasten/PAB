@@ -364,7 +364,7 @@ function leaveActivity(){window.speechSynthesis?.cancel();activity=null;showLess
 function showLessonChoice(l){currentLesson=l;openLesson(l.id)}
 
 let parentSelectedStudent=null;
-async function showParentDashboard(){
+async async function showParentDashboard(){
   if(!requireParent())return;
   hideAll();
   document.getElementById('parentDashboard').classList.remove('hidden');

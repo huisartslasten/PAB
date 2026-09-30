@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO V2.7 -->
+<!-- PacoGO V2.8 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -228,7 +228,7 @@ body{background:#1787f2}
   </main>
 
   <main id="parentDashboard" class="page hidden">
-    <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 PacoGO — TEST V2.7</div></div>
+    <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 PacoGO — TEST V2.8</div></div>
     <div class="topbar"><div><button id="logoutButton" class="logout-button hidden" onclick="logoutParent()">Logout</button></div></div>
     <div class="card">
       <div class="parent-dashboard-head"><div><h2>Leerling kiezen</h2><div class="small">Kies voor wie je lessen, voortgang of toegang wilt beheren.</div></div></div>
@@ -289,7 +289,7 @@ body{background:#1787f2}
       <div class="field"><label for="photoLessonSubject">Vak</label><input id="photoLessonSubject" placeholder="Bijvoorbeeld Nederlands"></div>
       <div class="field"><label for="photoLessonName">Naam van de les</label><input id="photoLessonName" placeholder="Bijvoorbeeld Thema 4"></div>
       <div class="field"><label for="photoLessonType">Onderdeel</label><select id="photoLessonType"><option value="words">🎯 Woordtrainer</option><option value="dictation">✏️ Dictee</option></select></div>
-      <div class="field"><label for="photoLessonWords">Gelezen woorden — controleer en pas aan</label><textarea id="photoLessonWords" class="photo-words" placeholder="Eén woord per regel"></textarea></div>
+      <div class="field"><label for="photoLessonWords">🤖 Voorgestelde vragen en antwoorden — controleer en pas aan</label><textarea id="photoLessonWords" class="photo-words" placeholder="Vraag || Antwoord&#10;Bijvoorbeeld: Wat betekent kapen? || Een schip met geweld overnemen"></textarea></div>
       <button class="success big" onclick="createLessonFromPhoto()">💾 Maak les</button>
     </div>
   </div>
@@ -692,21 +692,45 @@ function handlePhotoLessonFile(e){
   document.getElementById('photoUploadedStatus').classList.add('hidden');
   document.getElementById('photoOcrStatus').textContent='Foto klaar. Controleer of de woorden goed leesbaar zijn.';
 }
+function photoPairsFromOcr(result){
+  const lines=(result?.data?.lines||[]).map(line=>{
+    const text=String(line.text||'').replace(/^\s*[-•·*]\s*/,'').trim();
+    const b=line.bbox||{};
+    return {text,x:Number(b.x0||0),y:Number(b.y0||0),h:Number((b.y1||0)-(b.y0||0))};
+  }).filter(x=>x.text);
+  if(lines.length<2)return lines.map(x=>({question:x.text,answer:x.text}));
+  const xs=lines.map(x=>x.x).sort((a,b)=>a-b);
+  const mid=(xs[0]+xs[xs.length-1])/2;
+  const left=lines.filter(x=>x.x<=mid);
+  const right=lines.filter(x=>x.x>mid);
+  if(left.length<1||right.length<1)return lines.map(x=>({question:x.text,answer:x.text}));
+  const avg=(arr)=>arr.reduce((s,x)=>s+x.text.length,0)/Math.max(1,arr.length);
+  // In a typical homework sheet the short entries are the terms and the longer entries are definitions.
+  let termSide=left, defSide=right;
+  if(avg(left)>avg(right)){termSide=right;defSide=left;}
+  termSide.sort((a,b)=>a.y-b.y); defSide.sort((a,b)=>a.y-b.y);
+  const pairs=[];
+  for(const term of termSide){
+    const candidates=defSide.filter(d=>Math.abs((d.y+d.h/2)-(term.y+term.h/2))<Math.max(28,term.h*1.8));
+    const d=(candidates.length?candidates:defSide).sort((a,b)=>Math.abs(a.y-term.y)-Math.abs(b.y-term.y))[0];
+    if(d) pairs.push({question:'Wat betekent '+term.text+'?',answer:d.text});
+  }
+  return pairs.length?pairs:lines.map(x=>({question:x.text,answer:x.text}));
+}
 async function readPhotoLesson(){
   const file=photoLessonSelectedFile||document.getElementById('photoLessonFile')?.files?.[0];
   if(!file)return;
   const status=document.getElementById('photoOcrStatus');
-  status.textContent='🤖 PacoGO leest de foto...';
+  status.textContent='🤖 PacoGO leest de foto en zoekt kolommen...';
   try{
     if(!window.Tesseract)throw new Error('OCR niet geladen');
     const result=await Tesseract.recognize(file,'eng',{logger:m=>{
       if(m.status==='recognizing text'&&typeof m.progress==='number')status.textContent='🤖 Foto lezen... '+Math.round(m.progress*100)+'%';
     }});
-    const raw=String(result?.data?.text||'');
-    const words=raw.split(/\r?\n/).map(x=>x.replace(/^\s*[-•·*]\s*/,'').trim()).filter(Boolean);
-    document.getElementById('photoLessonWords').value=words.join('\n');
+    const pairs=photoPairsFromOcr(result);
+    document.getElementById('photoLessonWords').value=pairs.map(p=>p.question+' || '+p.answer).join('\n');
     document.getElementById('photoReview').classList.remove('hidden');
-    status.textContent=words.length?'✅ '+words.length+' regels gevonden. Controleer ze hieronder.':'⚠️ Geen woorden gevonden. Probeer een scherpere foto.';
+    status.textContent=pairs.length?'✅ '+pairs.length+' mogelijke vraag-antwoordparen gevonden. Controleer ze hieronder.':'⚠️ Geen tekst gevonden. Probeer een scherpere foto.';
   }catch(error){
     console.error('Photo OCR error:',error);
     status.textContent='⚠️ De foto kon niet worden gelezen.';
@@ -718,19 +742,24 @@ async function createLessonFromPhoto(){
   const subject=document.getElementById('photoLessonSubject').value.trim();
   const title=document.getElementById('photoLessonName').value.trim();
   const type=document.getElementById('photoLessonType').value;
-  const words=document.getElementById('photoLessonWords').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  const entries=document.getElementById('photoLessonWords').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
   const status=document.getElementById('photoOcrStatus');
-  if(!student||!subject||!title||!words.length){
-    status.textContent='⚠️ Vul leerling, vak, lestitel en minstens één woord in.';
+  if(!student||!subject||!title||!entries.length){
+    status.textContent='⚠️ Vul leerling, vak, lestitel en minstens één vraag-antwoordpaar in.';
     return;
   }
+  const pairs=entries.map(line=>{
+    const parts=line.split('||');
+    return {question:(parts[0]||'').trim(),answer:(parts.slice(1).join('||')||parts[0]||'').trim()};
+  }).filter(p=>p.question&&p.answer);
+  if(!pairs.length){status.textContent='⚠️ Controleer de vraag-antwoordparen.';return;}
   const created=await db.from('lessons').insert({student,subject,title,type}).select().single();
   if(created.error){status.textContent='⚠️ Les opslaan mislukt: '+created.error.message;return;}
-  const rows=words.map((word,i)=>({lesson_id:created.data.id,question:word,answer:word,sort_order:i}));
+  const rows=pairs.map((p,i)=>({lesson_id:created.data.id,question:p.question,answer:p.answer,sort_order:i}));
   const inserted=await db.from('lesson_items').insert(rows);
   if(inserted.error){
     await db.from('lessons').delete().eq('id',created.data.id);
-    status.textContent='⚠️ Woorden opslaan mislukt: '+inserted.error.message;
+    status.textContent='⚠️ Vragen opslaan mislukt: '+inserted.error.message;
     return;
   }
   await loadLessons();

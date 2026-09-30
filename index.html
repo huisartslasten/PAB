@@ -364,14 +364,14 @@ function leaveActivity(){window.speechSynthesis?.cancel();activity=null;showLess
 function showLessonChoice(l){currentLesson=l;openLesson(l.id)}
 
 let parentSelectedStudent=null;
-async async function showParentDashboard(){
+async async async function showParentDashboard(){
   if(!requireParent())return;
   hideAll();
   document.getElementById('parentDashboard').classList.remove('hidden');
   parentSelectedStudent=parentSelectedStudent||currentStudent||'Zenith';
   await renderParentDashboard();
 }
-async async function renderParentDashboard(){
+async function renderParentDashboard(){
   const grid=document.getElementById('parentStudentGrid');
   const management=document.getElementById('parentManagement');
   if(!grid||!management)return;

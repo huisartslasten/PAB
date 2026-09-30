@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO V2.8 -->
+<!-- PacoGO V2.9 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -228,7 +228,7 @@ body{background:#1787f2}
   </main>
 
   <main id="parentDashboard" class="page hidden">
-    <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 PacoGO — TEST V2.8</div></div>
+    <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 PacoGO — TEST V2.9</div></div>
     <div class="topbar"><div><button id="logoutButton" class="logout-button hidden" onclick="logoutParent()">Logout</button></div></div>
     <div class="card">
       <div class="parent-dashboard-head"><div><h2>Leerling kiezen</h2><div class="small">Kies voor wie je lessen, voortgang of toegang wilt beheren.</div></div></div>
@@ -780,11 +780,13 @@ async function createLessonFromPhoto(){
   showParentDashboard();
 }
 async function showAddLesson(){if(photoSessionToken)await cleanupPhotoSession();if(!requireParent())return;currentLesson=null;hideAll();document.getElementById('editor').classList.remove('hidden');document.getElementById('editorTitle').textContent='Nieuwe les';document.getElementById('lessonSubject').value='';document.querySelectorAll('input[name=lessonStudent]').forEach(r=>r.checked=r.value===currentStudent);document.getElementById('lessonName').value='';document.getElementById('lessonType').value='words';document.getElementById('lessonTestDate').value='';document.getElementById('lessonTestDateEnabled').checked=false;document.getElementById('lessonTestDatePicker').classList.add('hidden');document.getElementById('editorError').classList.add('hidden');resetEditorRows();changeLessonType();renderDatePicker('lessonTestDatePicker','lessonTestDate','')}
-function resetEditorRows(){document.getElementById('wordEditor').innerHTML='';document.getElementById('questionEditor').innerHTML='';document.getElementById('dictationEditor').innerHTML='';document.getElementById('mathEditor').innerHTML='';addWordRow();addWordRow()}
+const DEFAULT_LESSON_ROWS=25;
+function fillDefaultLessonRows(addRow){for(let i=0;i<DEFAULT_LESSON_ROWS;i++)addRow()}
+function resetEditorRows(){document.getElementById('wordEditor').innerHTML='';document.getElementById('questionEditor').innerHTML='';document.getElementById('dictationEditor').innerHTML='';document.getElementById('mathEditor').innerHTML='';fillDefaultLessonRows(addWordRow)}
 function syncLessonTypeButton(){const select=document.getElementById('lessonType'),text=document.getElementById('lessonTypeButtonText');if(!select||!text)return;const labels={words:'🎯 Woordtrainer',questions:'❓ Vragen',dictation:'✏️ Dictee',math:'🔢 Rekenen'};text.textContent=labels[select.value]||'🎯 Woordtrainer'}
 function toggleLessonTypeMenu(){document.getElementById('lessonTypeMenu')?.classList.toggle('hidden')}
 function setLessonType(value){const select=document.getElementById('lessonType');if(!select)return;select.value=value;syncLessonTypeButton();document.getElementById('lessonTypeMenu')?.classList.add('hidden');changeLessonType()}
-function changeLessonType(){syncLessonTypeButton();const t=document.getElementById('lessonType').value;document.getElementById('wordEditor').classList.toggle('hidden',t!=='words');document.getElementById('questionEditor').classList.toggle('hidden',t!=='questions');document.getElementById('dictationEditor').classList.toggle('hidden',t!=='dictation');document.getElementById('mathEditor').classList.toggle('hidden',t!=='math');if(t==='questions'&&!document.getElementById('questionEditor').children.length){addQuestionRow();addQuestionRow()}if(t==='dictation'&&!document.getElementById('dictationEditor').children.length){addDictationRow();addDictationRow()}if(t==='words'&&!document.getElementById('wordEditor').children.length){addWordRow();addWordRow()}if(t==='math'&&!document.getElementById('mathEditor').children.length){addMathRow();addMathRow()}}
+function changeLessonType(){syncLessonTypeButton();const t=document.getElementById('lessonType').value;document.getElementById('wordEditor').classList.toggle('hidden',t!=='words');document.getElementById('questionEditor').classList.toggle('hidden',t!=='questions');document.getElementById('dictationEditor').classList.toggle('hidden',t!=='dictation');document.getElementById('mathEditor').classList.toggle('hidden',t!=='math');if(t==='questions'&&!document.getElementById('questionEditor').children.length){fillDefaultLessonRows(addQuestionRow)}if(t==='dictation'&&!document.getElementById('dictationEditor').children.length){fillDefaultLessonRows(addDictationRow)}if(t==='words'&&!document.getElementById('wordEditor').children.length){fillDefaultLessonRows(addWordRow)}if(t==='math'&&!document.getElementById('mathEditor').children.length){fillDefaultLessonRows(addMathRow)}}
 function rowHtml(content,kind){return `<div class="editor-row"><button class="remove-row" type="button" onclick="this.parentElement.remove()">✕</button>${content}</div>`}
 function addWordRow(q='',a=''){document.getElementById('wordEditor').insertAdjacentHTML('beforeend',rowHtml(`<div class="field question-field"><label>Vraag</label><input class="word-q" value="${escapeAttr(q)}" placeholder="bijvoorbeeld huis"></div><div class="field answer-field"><label>Antwoord</label><input class="word-a" value="${escapeAttr(a)}" placeholder="bijvoorbeeld house"></div>`,'word'))}
 function addQuestionRow(q='',a=''){document.getElementById('questionEditor').insertAdjacentHTML('beforeend',rowHtml(`<div class="field question-field"><label>Vraag</label><textarea class="question-q" placeholder="Bijvoorbeeld: Wat betekent democratie?">${escapeHtml(q)}</textarea></div><div class="field"><label>Antwoord</label><textarea class="question-a" placeholder="Schrijf hier het antwoord of de uitleg.">${escapeHtml(a)}</textarea></div>`,'question'))}

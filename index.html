@@ -602,6 +602,33 @@ async function readPhotoLesson(){
     status.textContent='⚠️ De foto kon niet worden gelezen.';
   }
 }
+async function createLessonFromPhoto(){
+  if(!requireParent())return;
+  const student=document.getElementById('photoLessonStudent').value;
+  const subject=document.getElementById('photoLessonSubject').value.trim();
+  const title=document.getElementById('photoLessonName').value.trim();
+  const words=document.getElementById('photoLessonWords').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  const status=document.getElementById('photoOcrStatus');
+  if(!student||!subject||!title||!words.length){
+    status.textContent='⚠️ Vul leerling, vak, lestitel en minstens één woord in.';
+    return;
+  }
+  const created=await db.from('lessons').insert({student,subject,title,type:'words'}).select().single();
+  if(created.error){status.textContent='⚠️ Les opslaan mislukt: '+created.error.message;return;}
+  const rows=words.map((word,i)=>({lesson_id:created.data.id,question:word,answer:word,sort_order:i}));
+  const inserted=await db.from('lesson_items').insert(rows);
+  if(inserted.error){
+    await db.from('lessons').delete().eq('id',created.data.id);
+    status.textContent='⚠️ Woorden opslaan mislukt: '+inserted.error.message;
+    return;
+  }
+  await loadLessons();
+  currentStudent=student;
+  currentSubject=subject;
+  currentLesson=lessons.find(l=>Number(l.id)===Number(created.data.id))||null;
+  showMessage('Les gemaakt uit de foto. Controleer hem gerust nog even.','success');
+  showParentDashboard();
+}
 function showAddLesson(){if(!requireParent())return;currentLesson=null;hideAll();document.getElementById('editor').classList.remove('hidden');document.getElementById('editorTitle').textContent='Nieuwe les';document.getElementById('lessonSubject').value='';document.querySelectorAll('input[name=lessonStudent]').forEach(r=>r.checked=r.value===currentStudent);document.getElementById('lessonName').value='';document.getElementById('lessonType').value='words';document.getElementById('lessonTestDate').value='';document.getElementById('lessonTestDateEnabled').checked=false;document.getElementById('lessonTestDatePicker').classList.add('hidden');document.getElementById('editorError').classList.add('hidden');resetEditorRows();changeLessonType();renderDatePicker('lessonTestDatePicker','lessonTestDate','')}
 function resetEditorRows(){document.getElementById('wordEditor').innerHTML='';document.getElementById('questionEditor').innerHTML='';document.getElementById('dictationEditor').innerHTML='';document.getElementById('mathEditor').innerHTML='';addWordRow();addWordRow()}
 function syncLessonTypeButton(){const select=document.getElementById('lessonType'),text=document.getElementById('lessonTypeButtonText');if(!select||!text)return;const labels={words:'🎯 Woordtrainer',questions:'❓ Vragen',dictation:'✏️ Dictee',math:'🔢 Rekenen'};text.textContent=labels[select.value]||'🎯 Woordtrainer'}

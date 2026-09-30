@@ -460,7 +460,7 @@ function upsertTestDate(lessonId,student,date,lesson){if(!date)return;const item
 function removeTestDate(lessonId,student){const items=getTestCalendar().filter(t=>!(Number(t.lessonId)===Number(lessonId)&&t.student===student));saveTestCalendar(items)}
 function toggleLessonTestDate(){const enabled=document.getElementById('lessonTestDateEnabled')?.checked;const picker=document.getElementById('lessonTestDatePicker');if(picker)picker.classList.toggle('hidden',!enabled);if(!enabled){const input=document.getElementById('lessonTestDate');if(input)input.value='';}}
 
-async async function saveLesson(){
+async function saveLesson(){
   if(!requireParent())return;
   const subject=document.getElementById('lessonSubject').value.trim();
   const student=document.querySelector('input[name=lessonStudent]:checked')?.value||currentStudent;

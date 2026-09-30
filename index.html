@@ -152,7 +152,7 @@ body{background:#1787f2}
     </section>
     <div id="studentDashboard" class="hidden">
       <div class="page-paco-banner student-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 Pootjes klaar? Let’s go!</div></div>
-      <div class="personal-title"><div class="row dashboard-actions"><button class="secondary main-page-button" onclick="switchStudent()">Main page</button><div class="dashboard-admin-actions"><button id="manageButton" class="parent-button hidden" onclick="showParentDashboard()">⚙️ Beheer</button><button id="logoutButton" class="logout-button hidden" onclick="logoutParent()">Uitloggen</button></div></div></div>
+      <div class="personal-title"><div class="row dashboard-actions"><button class="secondary main-page-button" onclick="switchStudent()">Main page</button><div class="dashboard-admin-actions"><button id="logoutButton" class="logout-button hidden" onclick="logoutParent()">Uitloggen</button></div></div></div>
     <div class="dashboard">
       <aside class="sidebar">
         <div class="student-sidebar-greeting" id="sidebarGreeting"></div>
@@ -170,6 +170,7 @@ body{background:#1787f2}
       </section>
 
       <aside class="side-panel">
+        <button id="manageButton" class="parent-button side-manage-button hidden" onclick="showParentDashboard()">⚙️ Beheer</button>
         <div id="progressPanel" class="card side-card">
           <h3>Jouw voortgang</h3>
           <p class="stat-big" id="lessonCountStat">0</p><div class="small">lessen beschikbaar</div>

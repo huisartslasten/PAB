@@ -558,6 +558,50 @@ async function setGuestLesson(lessonId,active){
   showMessage(active?'Les geactiveerd.':'Les gedeactiveerd.','success');
 }
 
+function showPhotoLesson(){
+  if(!requireParent())return;
+  hideAll();
+  document.getElementById('photoLesson').classList.remove('hidden');
+  document.getElementById('photoLessonStudent').value=currentStudent||parentSelectedStudent||'Zenith';
+  document.getElementById('photoLessonSubject').value='';
+  document.getElementById('photoLessonName').value='';
+  document.getElementById('photoLessonWords').value='';
+  document.getElementById('photoLessonFile').value='';
+  document.getElementById('photoLessonPreview').classList.add('hidden');
+  document.getElementById('photoOcrControls').classList.add('hidden');
+  document.getElementById('photoReview').classList.add('hidden');
+  document.getElementById('photoOcrStatus').textContent='';
+}
+function handlePhotoLessonFile(e){
+  const file=e.target.files?.[0];
+  if(!file)return;
+  const preview=document.getElementById('photoLessonPreview');
+  preview.src=URL.createObjectURL(file);
+  preview.classList.remove('hidden');
+  document.getElementById('photoOcrControls').classList.remove('hidden');
+  document.getElementById('photoReview').classList.add('hidden');
+  document.getElementById('photoOcrStatus').textContent='Foto klaar. Controleer of de woorden goed leesbaar zijn.';
+}
+async function readPhotoLesson(){
+  const file=document.getElementById('photoLessonFile')?.files?.[0];
+  if(!file)return;
+  const status=document.getElementById('photoOcrStatus');
+  status.textContent='🤖 PacoGO leest de foto...';
+  try{
+    if(!window.Tesseract)throw new Error('OCR niet geladen');
+    const result=await Tesseract.recognize(file,'eng',{logger:m=>{
+      if(m.status==='recognizing text'&&typeof m.progress==='number')status.textContent='🤖 Foto lezen... '+Math.round(m.progress*100)+'%';
+    }});
+    const raw=String(result?.data?.text||'');
+    const words=raw.split(/\r?\n/).map(x=>x.replace(/^\s*[-•·*]\s*/,'').trim()).filter(Boolean);
+    document.getElementById('photoLessonWords').value=words.join('\n');
+    document.getElementById('photoReview').classList.remove('hidden');
+    status.textContent=words.length?'✅ '+words.length+' regels gevonden. Controleer ze hieronder.':'⚠️ Geen woorden gevonden. Probeer een scherpere foto.';
+  }catch(error){
+    console.error('Photo OCR error:',error);
+    status.textContent='⚠️ De foto kon niet worden gelezen.';
+  }
+}
 function showAddLesson(){if(!requireParent())return;currentLesson=null;hideAll();document.getElementById('editor').classList.remove('hidden');document.getElementById('editorTitle').textContent='Nieuwe les';document.getElementById('lessonSubject').value='';document.querySelectorAll('input[name=lessonStudent]').forEach(r=>r.checked=r.value===currentStudent);document.getElementById('lessonName').value='';document.getElementById('lessonType').value='words';document.getElementById('lessonTestDate').value='';document.getElementById('lessonTestDateEnabled').checked=false;document.getElementById('lessonTestDatePicker').classList.add('hidden');document.getElementById('editorError').classList.add('hidden');resetEditorRows();changeLessonType();renderDatePicker('lessonTestDatePicker','lessonTestDate','')}
 function resetEditorRows(){document.getElementById('wordEditor').innerHTML='';document.getElementById('questionEditor').innerHTML='';document.getElementById('dictationEditor').innerHTML='';document.getElementById('mathEditor').innerHTML='';addWordRow();addWordRow()}
 function syncLessonTypeButton(){const select=document.getElementById('lessonType'),text=document.getElementById('lessonTypeButtonText');if(!select||!text)return;const labels={words:'🎯 Woordtrainer',questions:'❓ Vragen',dictation:'✏️ Dictee',math:'🔢 Rekenen'};text.textContent=labels[select.value]||'🎯 Woordtrainer'}

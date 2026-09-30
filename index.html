@@ -1,11 +1,12 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO V2.5 -->
+<!-- PacoGO V2.6 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>@import url("https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap");
 
 :root{--bg:#f7fbff;--card:#fff;--text:#102b57;--muted:#667894;--blue:#1787f2;--blue2:#0d6fd4;--yellow:#ffc928;--cream:#fff6df;--sand:#f8e6c2;--green:#43b96b;--border:#dce9f6;--shadow:0 10px 28px rgba(16,43,87,.09)}
@@ -140,6 +141,8 @@ body{background:#1787f2}
 #lessonSubject,#lessonName{border-width:1.5px}
 .editor-row{border-color:#b9cce0}
 .question-field,.answer-field{border-color:#c4d4e3}
+
+.photo-preview{width:100%;max-height:360px;object-fit:contain;border-radius:18px;background:#f7fbff;border:2px dashed #cdddec;margin-top:12px}.photo-drop{border:3px dashed #8bcfff;border-radius:20px;padding:28px;text-align:center;background:#eef8ff}.photo-drop input{margin-top:12px}.photo-ocr-status{min-height:24px;margin-top:12px;font-weight:800;color:#126fc9}.photo-words{min-height:220px}.photo-step{margin-top:18px}
 </style>
 </head>
 <body>
@@ -216,7 +219,7 @@ body{background:#1787f2}
   </main>
 
   <main id="parentDashboard" class="page hidden">
-    <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 PacoGO — TEST V2.5</div></div>
+    <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 PacoGO — TEST V2.6</div></div>
     <div class="topbar"><div><button id="logoutButton" class="logout-button hidden" onclick="logoutParent()">Logout</button></div></div>
     <div class="card">
       <div class="parent-dashboard-head"><div><h2>Leerling kiezen</h2><div class="small">Kies voor wie je lessen, voortgang of toegang wilt beheren.</div></div></div>
@@ -238,7 +241,8 @@ body{background:#1787f2}
     </div>
   </main>
 
-  <main id="login" class="page hidden"><button class="secondary" onclick="showHome()">← Terug</button><div class="card login-card"><h2>🔐 Beheer login</h2><div class="field"><label for="loginEmail">E-mailadres</label><input id="loginEmail" type="email" autocomplete="email"></div><div class="field"><label for="loginPassword">Wachtwoord</label><input id="loginPassword" type="password" autocomplete="current-password"></div><button class="big" onclick="loginParent()">Inloggen</button><button class="secondary" type="button" onclick="sendPasswordReset()" style="margin-top:10px;width:100%">Wachtwoord vergeten?</button><div id="loginError" class="message error hidden"></div><div id="loginResetMessage" class="message success hidden"></div></div></main>
+  <main id="photoLesson" class="page hidden"><button class="secondary" onclick="showParentDashboard()">← Terug naar beheer</button><div class="card"><div class="page-heading subject-heading"><span class="page-heading-label">FOTO → LES</span><h2>📸 Maak een les van een foto</h2><p>Maak een foto van een woordenlijst. PacoGO leest de woorden en jij controleert ze.</p></div><div class="photo-step"><div class="photo-drop"><strong>📷 Kies of maak een foto</strong><div class="small">Op telefoon kun je hier direct de camera gebruiken.</div><input id="photoLessonFile" type="file" accept="image/*" capture="environment" onchange="handlePhotoLessonFile(event)"></div><img id="photoLessonPreview" class="photo-preview hidden" alt="Voorbeeld van de huiswerkfoto"></div><div id="photoOcrStatus" class="photo-ocr-status"></div><div id="photoOcrControls" class="row photo-step hidden"><button class="big" onclick="readPhotoLesson()">🤖 Lees woorden uit foto</button></div><div id="photoReview" class="photo-step hidden"><div class="field"><label for="photoLessonStudent">Voor welke leerling?</label><select id="photoLessonStudent"><option>Zyon</option><option>Zenith</option><option>Zephon</option></select></div><div class="field"><label for="photoLessonSubject">Vak</label><input id="photoLessonSubject" placeholder="Bijvoorbeeld Nederlands"></div><div class="field"><label for="photoLessonName">Naam van de les</label><input id="photoLessonName" placeholder="Bijvoorbeeld Thema 4"></div><div class="field"><label for="photoLessonWords">Gelezen woorden — controleer en pas aan</label><textarea id="photoLessonWords" class="photo-words" placeholder="Eén woord per regel"></textarea></div><button class="success big" onclick="createLessonFromPhoto()">💾 Maak les</button></div></div></main>
+<main id="login" class="page hidden"><button class="secondary" onclick="showHome()">← Terug</button><div class="card login-card"><h2>🔐 Beheer login</h2><div class="field"><label for="loginEmail">E-mailadres</label><input id="loginEmail" type="email" autocomplete="email"></div><div class="field"><label for="loginPassword">Wachtwoord</label><input id="loginPassword" type="password" autocomplete="current-password"></div><button class="big" onclick="loginParent()">Inloggen</button><button class="secondary" type="button" onclick="sendPasswordReset()" style="margin-top:10px;width:100%">Wachtwoord vergeten?</button><div id="loginError" class="message error hidden"></div><div id="loginResetMessage" class="message success hidden"></div></div></main>
 
   <main id="testHistory" class="page hidden">
     <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="page-banner-greeting" id="testHistoryGreeting"></div><div class="banner-label">🐾 Toetsgeschiedenis</div></div>
@@ -265,7 +269,7 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div class="version-badge">PacoGO — TEST V2.5</div>
+  <div class="version-badge">PacoGO — TEST V2.6</div>
 
 <div id="globalMessage"></div>
 
@@ -516,7 +520,7 @@ async function renderParentStudent(){
   if(!parentSelectedStudent){el.innerHTML='';return;}
   if(!isGuest){
     const own=lessons.filter(l=>l.student===parentSelectedStudent);
-    el.innerHTML='<div class="card"><div class="parent-dashboard-head"><div><h2>👦 '+escapeHtml(parentSelectedStudent)+'</h2><div class="small">'+own.length+' actieve lessen</div></div><button onclick="showAddLesson()">➕ Les maken</button></div>'+
+    el.innerHTML='<div class="card"><div class="parent-dashboard-head"><div><h2>👦 '+escapeHtml(parentSelectedStudent)+'</h2><div class="small">'+own.length+' actieve lessen</div></div><div class="row"><button class="secondary" onclick="showPhotoLesson()">📸 Foto → les</button><button onclick="showAddLesson()">➕ Les maken</button></div></div>'+
       (own.length?own.map(l=>parentLessonRow(l,false,true)).join(''):'<div class="empty">Nog geen lessen voor deze leerling.</div>')+'</div>';
     return;
   }

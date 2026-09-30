@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO V2.4 -->
+<!-- PacoGO V2.5 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -216,7 +216,7 @@ body{background:#1787f2}
   </main>
 
   <main id="parentDashboard" class="page hidden">
-    <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 PacoGO — TEST V2.4</div></div>
+    <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 PacoGO — TEST V2.5</div></div>
     <div class="topbar"><div><button id="logoutButton" class="logout-button hidden" onclick="logoutParent()">Logout</button></div></div>
     <div class="card">
       <div class="parent-dashboard-head"><div><h2>Leerling kiezen</h2><div class="small">Kies voor wie je lessen, voortgang of toegang wilt beheren.</div></div></div>
@@ -265,7 +265,7 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div class="version-badge">PacoGO — TEST V2.4</div>
+  <div class="version-badge">PacoGO — TEST V2.5</div>
 
 <div id="globalMessage"></div>
 
@@ -382,10 +382,10 @@ async function loadLessons(){const {data,error}=await db.from('lessons').select(
 function renderSubjects(){const el=document.getElementById('subjects');const visibleLessons=lessons.filter(l=>l.student===currentStudent);const names=[...new Set(visibleLessons.map(l=>l.subject))];const lessonStat=document.getElementById('lessonCountStat');const subjectStat=document.getElementById('subjectCountStat');const progress=document.getElementById('dashboardProgress');if(lessonStat)lessonStat.textContent=visibleLessons.length;if(subjectStat)subjectStat.textContent=names.length+' '+(names.length===1?'vak':'vakken');if(progress)progress.style.width=(visibleLessons.length?Math.min(100,20+visibleLessons.length*7):10)+'%';if(!names.length){el.innerHTML='<div class="empty">Nog geen lessen. Een ouder kan een les toevoegen.</div>';return}el.innerHTML=names.map(s=>{const count=visibleLessons.filter(l=>l.subject===s).length;return `<div class="card subject-card ${subjectClass(s)}" onclick="showSubject('${escapeAttr(s)}')"><div><div class="subject-icon">${subjectIcon(s)}</div><div class="subject-title">${escapeHtml(s)}</div></div><div class="small">${count} ${count===1?'les':'lessen'} · Bekijk →</div></div>`}).join('')}
 function escapeAttr(v){return escapeHtml(v).replace(/`/g,'&#96;')}
 function getLessonOrderKey(student,subject){return 'pacogo-lesson-order-'+String(student||'')+'-'+String(subject||'')}
-function getOrderedLessons(list,student,subject){
-  const key=getLessonOrderKey(student,subject);
-  let saved=[];
-  try{saved=JSON.parse(localStorage.getItem(key)||'[]')}catch(e){saved=[]}
+function getLocalLessonOrder(student,subject){
+  try{const saved=JSON.parse(localStorage.getItem(getLessonOrderKey(student,subject))||'[]');return Array.isArray(saved)?saved.map(Number):[]}catch(e){return []}
+}
+function applyLessonOrder(list,saved){
   const rank=new Map((Array.isArray(saved)?saved:[]).map((id,i)=>[Number(id),i]));
   return [...list].sort((a,b)=>{
     const ar=rank.has(Number(a.id))?rank.get(Number(a.id)):999999;
@@ -393,8 +393,22 @@ function getOrderedLessons(list,student,subject){
     return ar-br || Number(a.id)-Number(b.id);
   });
 }
-function saveLessonOrder(student,subject,list){
-  try{localStorage.setItem(getLessonOrderKey(student,subject),JSON.stringify(list.map(l=>Number(l.id))))}catch(e){}
+async function getOrderedLessons(list,student,subject){
+  const {data,error}=await db.from('lesson_order').select('lesson_id,position').eq('student',student).eq('subject',subject).order('position',{ascending:true});
+  if(!error&&data?.length){
+    return applyLessonOrder(list,data.map(x=>Number(x.lesson_id)));
+  }
+  return applyLessonOrder(list,getLocalLessonOrder(student,subject));
+}
+async function saveLessonOrder(student,subject,list){
+  const ids=list.map(l=>Number(l.id));
+  try{localStorage.setItem(getLessonOrderKey(student,subject),JSON.stringify(ids))}catch(e){}
+  if(!student||!subject||!ids.length||!isParentLoggedIn())return;
+  const del=await db.from('lesson_order').delete().eq('student',student).eq('subject',subject);
+  if(del.error)throw del.error;
+  const rows=ids.map((lesson_id,position)=>({student,subject,lesson_id,position}));
+  const ins=await db.from('lesson_order').insert(rows);
+  if(ins.error)throw ins.error;
 }
 function clearLessonDragState(){
   document.querySelectorAll('#lessons .lesson-card.dragging,#lessons .lesson-card.drag-over').forEach(el=>el.classList.remove('dragging','drag-over'));
@@ -411,7 +425,7 @@ function dragLessonOver(e){
   if(!card.classList.contains('dragging'))card.classList.add('drag-over');
 }
 function dragLessonLeave(e){e.currentTarget.classList.remove('drag-over')}
-function dragLessonDrop(e,targetId){
+async function dragLessonDrop(e,targetId){
   e.preventDefault();
   const sourceId=Number(e.dataTransfer.getData('text/plain'));
   targetId=Number(targetId);
@@ -424,17 +438,18 @@ function dragLessonDrop(e,targetId){
   const rect=target.getBoundingClientRect();
   if(e.clientY>rect.top+rect.height/2)target.after(source);else target.before(source);
   const order=[...el.querySelectorAll('.lesson-card')].map(c=>Number(c.dataset.lessonId));
-  saveLessonOrder(currentStudent,currentSubject,order.map(id=>lessons.find(l=>Number(l.id)===id)).filter(Boolean));
+  try{await saveLessonOrder(currentStudent,currentSubject,order.map(id=>lessons.find(l=>Number(l.id)===id)).filter(Boolean));}
+  catch(error){console.error('Lesson order save error:',error);showMessage('⚠️ De volgorde kon niet in PacoGO worden opgeslagen.','error')}
   clearLessonDragState();
 }
 function dragLessonEnd(){clearLessonDragState()}
-function showSubject(subject){
+async function showSubject(subject){
   currentSubject=subject;
   hideAll();
   document.getElementById('subject').classList.remove('hidden');
   document.getElementById('subjectTitle').textContent=subject;
   refreshPageSidebars();
-  const ls=getOrderedLessons(lessons.filter(l=>l.subject===subject&&l.student===currentStudent),currentStudent,subject);
+  const ls=await getOrderedLessons(lessons.filter(l=>l.subject===subject&&l.student===currentStudent),currentStudent,subject);
   const el=document.getElementById('lessons');
   el.innerHTML=ls.length?ls.map(l=>`<div class="card lesson-card" draggable="true" data-lesson-id="${l.id}" onclick="openLesson(${l.id})" ondragstart="dragLessonStart(event,${l.id})" ondragover="dragLessonOver(event)" ondragleave="dragLessonLeave(event)" ondrop="dragLessonDrop(event,${l.id})" ondragend="dragLessonEnd()">
     <span class="badge lesson-badge">LES</span>

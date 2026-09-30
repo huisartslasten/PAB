@@ -62,11 +62,11 @@
 .page-paco-banner{position:relative;height:500px;margin:0 0 20px;border-radius:0 0 24px 24px;overflow:hidden;background:#72d9f4}
 .page-paco-banner img{width:100%;height:100%;object-fit:cover;object-position:center center;display:block}
 .page-paco-banner:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(16,43,87,.05),rgba(16,43,87,.22));pointer-events:none}
-.page-paco-banner .banner-label{position:absolute;left:22px;bottom:14px;z-index:2;color:#fff;font-size:24px;font-weight:950;text-shadow:3px 3px 0 #102b57}
-@media(max-width:700px){.page-paco-banner{height:390px;margin:0 -12px 16px;border-radius:0 0 22px 22px}.page-paco-banner .banner-label{font-size:20px;left:16px;bottom:10px}}
+.page-paco-banner .banner-label{position:absolute;left:22px;bottom:14px;z-index:2;color:#fff;font-size:24px;font-weight:950;text-shadow:3px 3px 0 #102b57}.page-banner-greeting{position:absolute;left:22px;top:18px;z-index:2;color:#fff;font-family:"Baloo 2",Nunito,sans-serif;font-size:28px;font-weight:900;text-shadow:3px 3px 0 #102b57}
+@media(max-width:700px){.page-paco-banner{height:390px;margin:0 -12px 16px;border-radius:0 0 22px 22px}.page-paco-banner .banner-label{font-size:20px;left:16px;bottom:10px}.page-banner-greeting{font-size:23px;left:16px;top:14px}}
 
 .parent-button,.logout-button{border-radius:14px;padding:10px 15px;font-weight:800;box-shadow:0 4px 0 rgba(16,43,87,.18)}.student-title-row{display:flex;align-items:center;justify-content:center;gap:18px;margin:0 0 18px}.student-title-row .student-title{margin:0}.main-manage-button{font-size:17px;padding:13px 20px;border-radius:16px}.page-side-left,.page-side-right{position:sticky;top:18px;align-self:start;height:max-content}.page-side-left .sidebar,.page-side-right .side-panel{position:static}.dashboard{align-items:start}.dashboard>.sidebar,.dashboard>.side-panel{position:sticky;top:18px;align-self:start;height:max-content}.lesson-test-date-box{padding:11px 14px}.lesson-test-date-toggle{display:flex;align-items:center;gap:9px;font-weight:850;cursor:pointer}.lesson-test-date-toggle input{width:18px;height:18px}.lesson-test-date-picker{margin-top:10px}.lesson-test-date-picker.hidden{display:none}@media(max-width:700px){.student-title-row{gap:10px;justify-content:space-between;align-items:center}.student-title-row .student-title{font-size:27px}.main-manage-button{font-size:14px;padding:10px 13px}}
-.parent-button{background:#ffc928;color:#102b57}.logout-button{background:#fff;color:#102b57;border:2px solid #dce9f6}.dashboard-actions{align-items:center;justify-content:flex-end}.personal-title{gap:14px}.personal-title h2{display:none}.personal-title{display:flex;justify-content:flex-end}.dashboard-actions{margin-left:auto}.logout-button{margin-left:auto}
+.parent-button{background:#ffc928;color:#102b57}.logout-button{background:#fff;color:#102b57;border:2px solid #dce9f6}.dashboard-actions{align-items:center;justify-content:flex-end;margin-left:auto}.personal-title{display:flex;justify-content:flex-end;margin:8px 0 14px}.main-page-button{white-space:nowrap}
 .student-title,.personal-title h2,.home-intro h2,.section-head h2,.card h2,.card h3{font-family:Nunito,system-ui,sans-serif;font-weight:900;letter-spacing:-.02em}
 
 /* PacoGO speelse afwerking */
@@ -142,7 +142,7 @@ body{background:#1787f2}
     <section id="studentChooser">
       <div class="aruba-hero"><img src="pacogo-aruba-hero.png" alt="PacoGO op Aruba"></div>
       <div class="student-area">
-        <div class="student-title-row"><h1 class="student-title">Wie gaat er leren?</h1><button class="parent-button main-manage-button" onclick="isParentLoggedIn()?showParentDashboard():showLogin()">⚙️ Beheer</button></div>
+        <div class="student-title-row"><h1 class="student-title">Wie gaat er leren?</h1></div>
         <div class="student-grid">
           <button class="student-card" onclick="selectStudent('Zyon')"><div><div class="student-name">Zyon</div><div class="student-sub">Mijn lessen</div></div><span class="student-go">GO! →</span></button>
           <button class="student-card" onclick="selectStudent('Zenith')"><div><div class="student-name">Zenith</div><div class="student-sub">Mijn lessen</div></div><span class="student-go">GO! →</span></button>
@@ -152,8 +152,7 @@ body{background:#1787f2}
     </section>
     <div id="studentDashboard" class="hidden">
       <div class="page-paco-banner student-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 Pootjes klaar? Let’s go!</div></div>
-      <div class="student-back"><button class="secondary" onclick="switchStudent()">← Andere leerling</button></div>
-      <div class="personal-title"><h2 id="personalGreeting"></h2><div class="row dashboard-actions"><button id="loginButton" class="parent-button" onclick="isParentLoggedIn()?showParentDashboard():showLogin()">⚙️ Beheer</button><button id="logoutButton" class="logout-button hidden" onclick="logoutParent()">Uitloggen</button></div></div>
+      <div class="personal-title"><div class="row dashboard-actions"><button class="secondary main-page-button" onclick="switchStudent()">Main page</button><button id="logoutButton" class="logout-button hidden" onclick="logoutParent()">Uitloggen</button></div></div>
     <div class="dashboard">
       <aside class="sidebar">
         <div class="student-sidebar-greeting" id="sidebarGreeting"></div>
@@ -166,8 +165,7 @@ body{background:#1787f2}
       </aside>
 
       <section class="main-dashboard">
-        <div class="page-heading"><h2>Wat wil je leren?</h2><p>Kies hieronder een vak en ga aan de slag met Paco.</p></div>
-        <div class="section-head"><h2>Mijn lessen</h2><span class="section-link">Bekijk alle lessen →</span></div>
+        <div class="page-heading"><h2>Wat wil je leren?</h2></div>
         <div id="subjects" class="grid"></div>
       </section>
 
@@ -191,7 +189,6 @@ body{background:#1787f2}
     <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 Jouw lessen</div></div>
     <div class="topbar"><div><button class="secondary" onclick="showHome()">← Terug</button></div></div>
     <div class="page-heading subject-heading"><div class="page-heading-label">Vak</div><h2 id="subjectTitle"></h2><p>Dit zijn jouw lessen binnen dit vak.</p></div>
-    <div class="subject-lessons-label">📚 Lesblokjes</div>
     <div id="lessons" class="grid"></div>
     <div class="row" style="margin-top:18px"><button id="addLessonButton2" class="hidden" onclick="showAddLesson(currentSubject)">➕ Nieuwe les</button></div>
   </main>
@@ -235,7 +232,7 @@ body{background:#1787f2}
   <main id="login" class="page hidden"><button class="secondary" onclick="showHome()">← Terug</button><div class="card login-card"><h2>🔐 Beheer login</h2><div class="field"><label for="loginEmail">E-mailadres</label><input id="loginEmail" type="email" autocomplete="email"></div><div class="field"><label for="loginPassword">Wachtwoord</label><input id="loginPassword" type="password" autocomplete="current-password"></div><button class="big" onclick="loginParent()">Inloggen</button><button class="secondary" type="button" onclick="sendPasswordReset()" style="margin-top:10px;width:100%">Wachtwoord vergeten?</button><div id="loginError" class="message error hidden"></div><div id="loginResetMessage" class="message success hidden"></div></div></main>
 
   <main id="testHistory" class="page hidden">
-    <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 Toetsgeschiedenis</div></div>
+    <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="page-banner-greeting" id="testHistoryGreeting"></div><div class="banner-label">🐾 Toetsgeschiedenis</div></div>
     <div class="topbar"><div><button class="secondary" onclick="showHome()">← Terug</button></div></div>
     <div class="page-heading"><h2>📚 Toetsgeschiedenis</h2><p>Bekijk hier de gemaakte toetsen en de antwoorden.</p></div>
     <div id="testHistoryContent"></div>
@@ -259,7 +256,7 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div class="version-badge">PacoGO — TEST V1.1</div>
+  <div class="version-badge">PacoGO — TEST V1.2</div>
 
 <div id="globalMessage"></div>
 
@@ -324,7 +321,7 @@ function refreshPageSidebars(){
 }
 function hideAll(){document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));window.speechSynthesis?.cancel()}
 function showHome(){hideAll();document.getElementById('home').classList.remove('hidden');renderStudentHome();refreshPageSidebars()}
-function renderStudentHome(){const chooser=document.getElementById('studentChooser'),dash=document.getElementById('studentDashboard');if(currentStudent){chooser.classList.add('hidden');dash.classList.remove('hidden');document.getElementById('personalGreeting').textContent='Hoi '+currentStudent+'! 🐶';document.getElementById('sidebarGreeting').textContent='Hoi '+currentStudent+'! 🐶';renderSubjects();renderTestCalendar();refreshPageSidebars()}else{chooser.classList.remove('hidden');dash.classList.add('hidden')}}
+function renderStudentHome(){const chooser=document.getElementById('studentChooser'),dash=document.getElementById('studentDashboard');if(currentStudent){chooser.classList.add('hidden');dash.classList.remove('hidden');document.getElementById('personalGreeting')?.textContent='Hoi '+currentStudent+'! 🐶';document.getElementById('sidebarGreeting').textContent='Hoi '+currentStudent+'! 🐶';renderSubjects();renderTestCalendar();refreshPageSidebars()}else{chooser.classList.remove('hidden');dash.classList.add('hidden')}}
 function selectStudent(name){currentStudent=name;showHome()}
 function switchStudent(){currentStudent=null;showHome()}
 function showLogin(){hideAll();document.getElementById('login').classList.remove('hidden');document.getElementById('loginError').classList.add('hidden')}
@@ -695,6 +692,8 @@ async function finishTest(){
 async function showTestHistory(studentFilter=''){
   if(!requireParent()) return;
   hideAll();
+  const historyGreeting=document.getElementById('testHistoryGreeting');
+  if(historyGreeting) historyGreeting.textContent=(studentFilter||currentStudent)?'Hoi '+(studentFilter||currentStudent)+'! 🐶':'';
   const el=document.getElementById('testHistoryContent');
   el.innerHTML='<div class="card">Toetsgeschiedenis laden...</div>';
   document.getElementById('testHistory').classList.remove('hidden');

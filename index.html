@@ -1002,6 +1002,12 @@ async function checkPractice(){
   f.className='feedback';
   try{
     if(activity.type==='spelling'){const expected=String(item.answer||'').split(' || ');const given=userAnswer.split(' || ');const correct=normalize(given[0])===normalize(expected[0])&&normalize(given[1])===normalize(expected[1]);if(correct){activity.remaining.delete(item.id);recordPracticeResult(item,true);f.textContent='✅ Beide goed!';f.className='feedback correct';}else{recordPracticeResult(item,false);f.textContent='❌ Nog niet. Goed: '+(expected[0]||'')+' en '+(expected[1]||'');f.className='feedback incorrect';}const next=document.createElement('button');next.className='big';next.textContent='OK → Volgende vraag';next.onclick=()=>renderPractice();f.insertAdjacentElement('afterend',next);return;}
+    if(activity.type==='dictation'){
+      const correct=normalize(userAnswer)===normalize(item.answer);
+      if(correct){activity.remaining.delete(item.id);recordPracticeResult(item,true);f.textContent='✅ Goed!';f.className='feedback correct';}
+      else{recordPracticeResult(item,false);f.textContent='❌ Niet goed. Het woord moet exact juist gespeld zijn: '+escapeHtml(item.answer)+'.';f.className='feedback incorrect';}
+      const next=document.createElement('button');next.className='big';next.textContent='OK → Volgende vraag';next.onclick=()=>renderPractice();f.insertAdjacentElement('afterend',next);return;
+    }
     if(activity.type==='math'){
       const correct=Number(userAnswer)===Number(item.answer);
       if(correct){activity.remaining.delete(item.id);recordPracticeResult(item,true);f.textContent='✅ Goed!';f.className='feedback correct';}else{recordPracticeResult(item,false);f.textContent='❌ Nog niet. Het juiste antwoord is '+escapeHtml(item.answer)+'.';f.className='feedback incorrect';}

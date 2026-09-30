@@ -867,16 +867,15 @@ async function saveLesson(){
     try{
       const spellCheck=await checkDictationSpelling();
       if(spellCheck.issues?.length){
-        err.innerHTML='<strong>⚠️ AI ziet mogelijke spellingproblemen:</strong><br><br>'+spellCheck.issues.map(x=>'• <strong>Rij '+escapeHtml(String(x.row))+' — '+escapeHtml(x.word)+'</strong>: '+escapeHtml(x.reason)).join('<br>')+'<br><br>De woorden zijn niet aangepast. Controleer ze zelf en sla daarna opnieuw op.';
+        err.innerHTML='<strong>❗ AI-waarschuwing — mogelijke spellingproblemen:</strong><br><br>'+spellCheck.issues.map(x=>'• <strong>Rij '+escapeHtml(String(x.row))+' — '+escapeHtml(x.word)+'</strong>: '+escapeHtml(x.reason)+(x.suggestion?' — Bedoel je: <strong>'+escapeHtml(x.suggestion)+'</strong>?':'')).join('<br>')+'<br><br>De woorden zijn niet aangepast. <strong>De ouder blijft verantwoordelijk en kan deze waarschuwing negeren.</strong>';
         err.classList.remove('hidden');
-        return;
+      }else{
+        err.classList.add('hidden');
       }
-      err.classList.add('hidden');
     }catch(error){
       console.error('Dictation spelling check error:',error);
-      err.textContent='⚠️ De AI-spellingscontrole kon niet worden uitgevoerd. De les is daarom niet opgeslagen.';
+      err.textContent='⚠️ AI-spellingscontrole niet beschikbaar. De les wordt toch opgeslagen; de ouder blijft verantwoordelijk.';
       err.classList.remove('hidden');
-      return;
     }
   }
 

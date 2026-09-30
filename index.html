@@ -791,7 +791,7 @@ function changeLessonType(){syncLessonTypeButton();const t=document.getElementBy
 function rowHtml(content,kind){return `<div class="editor-row"><button class="remove-row" type="button" onclick="this.parentElement.remove()">✕</button>${content}</div>`}
 function addWordRow(q='',a=''){document.getElementById('wordEditor').insertAdjacentHTML('beforeend',rowHtml(`<div class="field question-field"><label>Vraag</label><input class="word-q" value="${escapeAttr(q)}" placeholder="bijvoorbeeld huis"></div><div class="field answer-field"><label>Antwoord</label><input class="word-a" value="${escapeAttr(a)}" placeholder="bijvoorbeeld house"></div>`,'word'))}
 function addQuestionRow(q='',a=''){document.getElementById('questionEditor').insertAdjacentHTML('beforeend',rowHtml(`<div class="field question-field"><label>Vraag</label><textarea class="question-q" placeholder="Bijvoorbeeld: Wat betekent democratie?">${escapeHtml(q)}</textarea></div><div class="field"><label>Antwoord</label><textarea class="question-a" placeholder="Schrijf hier het antwoord of de uitleg.">${escapeHtml(a)}</textarea></div>`,'question'))}
-function addDictationRow(w=''){document.getElementById('dictationEditor').insertAdjacentHTML('beforeend',rowHtml(`<div class="field"><label>Dicteewoord</label><input class="dictation-w" value="${escapeAttr(w)}" placeholder="bijvoorbeeld beautiful"></div><div class="small">Dit woord wordt tijdens het dictee uitgesproken en niet op het scherm getoond.</div>`,'dictation'))}
+function addDictationRow(w=''){document.getElementById('dictationEditor').insertAdjacentHTML('beforeend',rowHtml(`<div class="field"><label>Dicteewoord</label><input class="dictation-w" value="${escapeAttr(w)}" placeholder="bijvoorbeeld beautiful" onblur="checkDictationWord(this)"><div class="dictation-spellcheck"></div></div><div class="small">Dit woord wordt tijdens het dictee uitgesproken en niet op het scherm getoond.</div>`,'dictation'))}
 function addMathRow(q='',a=''){document.getElementById('mathEditor').insertAdjacentHTML('beforeend',rowHtml(`<div class="field question-field"><label>Som</label><input class="math-q" value="${escapeAttr(q)}" placeholder="bijvoorbeeld 27 + 15 ="></div><div class="field answer-field"><label>Antwoord</label><input class="math-a" type="number" inputmode="numeric" value="${escapeAttr(a)}" placeholder="bijvoorbeeld 42"></div>`,'math'))}
 function addSpellingRow(q='',perfect='',adjective=''){document.getElementById('spellingEditor').insertAdjacentHTML('beforeend',rowHtml('<div class="field"><label>Werkwoord</label><input class="spelling-q" value="'+escapeAttr(q)+'" placeholder="bijvoorbeeld opvoeden"></div><div class="field"><label>Voltooid deelwoord</label><input class="spelling-perfect" value="'+escapeAttr(perfect)+'" placeholder="bijvoorbeeld opgevoed"></div><div class="field"><label>Bijvoeglijk gebruikt voltooid deelwoord</label><input class="spelling-adjective" value="'+escapeAttr(adjective)+'" placeholder="bijvoorbeeld opgevoede"></div>','spelling'))}
 function addCurrentRow(){const t=document.getElementById('lessonType').value;if(t==='words')addWordRow();else if(t==='questions')addQuestionRow();else if(t==='dictation')addDictationRow();else if(t==='math')addMathRow();else addSpellingRow()}
@@ -808,6 +808,33 @@ function upsertTestDate(lessonId,student,date,lesson){if(!date)return;const item
 function removeTestDate(lessonId,student){const items=getTestCalendar().filter(t=>!(Number(t.lessonId)===Number(lessonId)&&t.student===student));saveTestCalendar(items)}
 function toggleLessonTestDate(){const enabled=document.getElementById('lessonTestDateEnabled')?.checked;const picker=document.getElementById('lessonTestDatePicker');if(picker)picker.classList.toggle('hidden',!enabled);if(!enabled){const input=document.getElementById('lessonTestDate');if(input)input.value='';}}
 
+async function checkDictationWord(input){
+  const word=String(input?.value||'').trim();
+  const box=input?.parentElement?.querySelector('.dictation-spellcheck');
+  if(!box)return;
+  box.innerHTML='';
+  if(!word)return;
+  box.textContent='🤖 Spelling controleren...';
+  box.style.color='#667894';
+  try{
+    const row=[...document.querySelectorAll('#dictationEditor .editor-row')].indexOf(input.closest('.editor-row'))+1;
+    const subject=document.getElementById('lessonSubject').value.trim();
+    const {data,error}=await db.functions.invoke('check-dictation-spelling-v1',{body:{entries:[{row,word}],subject}});
+    if(error)throw error;
+    const issue=data?.issues?.[0];
+    if(issue){
+      box.innerHTML='❗ <strong>'+escapeHtml(issue.reason)+'</strong><br>Bedoel je: <strong>'+escapeHtml(issue.suggestion)+'</strong>?';
+      box.style.color='#b91c1c';
+      box.style.fontWeight='800';
+      return;
+    }
+    box.innerHTML='';
+  }catch(error){
+    console.error('Dictation word spelling check error:',error);
+    box.textContent='⚠️ Spellingscontrole kon niet worden uitgevoerd.';
+    box.style.color='#b91c1c';
+  }
+}
 async function checkDictationSpelling(){
   const rows=[...document.querySelectorAll('#dictationEditor .editor-row')];
   const entries=rows.map((r,i)=>({row:i+1,word:r.querySelector('.dictation-w')?.value.trim()||''})).filter(x=>x.word);

@@ -241,7 +241,7 @@ body{background:#1787f2}
     </div>
   </main>
 
-  <main id="photoLesson" class="page hidden"><button class="secondary" onclick="showParentDashboard()">← Terug naar beheer</button><div class="card"><div class="page-heading subject-heading"><span class="page-heading-label">FOTO → LES</span><h2>📸 Maak een les van een foto</h2><p>Maak een foto van een woordenlijst. PacoGO leest de woorden en jij controleert ze.</p></div><div class="photo-step"><div class="photo-drop"><strong>📷 Kies of maak een foto</strong><div class="small">Op telefoon kun je hier direct de camera gebruiken.</div><input id="photoLessonFile" type="file" accept="image/*" capture="environment" onchange="handlePhotoLessonFile(event)"></div><img id="photoLessonPreview" class="photo-preview hidden" alt="Voorbeeld van de huiswerkfoto"></div><div id="photoOcrStatus" class="photo-ocr-status"></div><div id="photoOcrControls" class="row photo-step hidden"><button class="big" onclick="readPhotoLesson()">🤖 Lees woorden uit foto</button></div><div id="photoReview" class="photo-step hidden"><div class="field"><label for="photoLessonStudent">Voor welke leerling?</label><select id="photoLessonStudent"><option>Zyon</option><option>Zenith</option><option>Zephon</option></select></div><div class="field"><label for="photoLessonSubject">Vak</label><input id="photoLessonSubject" placeholder="Bijvoorbeeld Nederlands"></div><div class="field"><label for="photoLessonName">Naam van de les</label><input id="photoLessonName" placeholder="Bijvoorbeeld Thema 4"></div><div class="field"><label for="photoLessonWords">Gelezen woorden — controleer en pas aan</label><textarea id="photoLessonWords" class="photo-words" placeholder="Eén woord per regel"></textarea></div><button class="success big" onclick="createLessonFromPhoto()">💾 Maak les</button></div></div></main>
+  <main id="photoLesson" class="page hidden"><button class="secondary" onclick="showParentDashboard()">← Terug naar beheer</button><div class="card"><div class="page-heading subject-heading"><span class="page-heading-label">FOTO → LES</span><h2>📸 Maak een les van een foto</h2><p>Maak een foto van een woordenlijst. PacoGO leest de woorden en jij controleert ze.</p></div><div class="photo-step"><div class="photo-drop"><strong>📷 Kies of maak een foto</strong><div class="small">Op telefoon kun je hier direct de camera gebruiken.</div><input id="photoLessonFile" type="file" accept="image/*" capture="environment" onchange="handlePhotoLessonFile(event)"></div><img id="photoLessonPreview" class="photo-preview hidden" alt="Voorbeeld van de huiswerkfoto"></div><div id="photoOcrStatus" class="photo-ocr-status"></div><div id="photoOcrControls" class="row photo-step hidden"><button class="big" onclick="readPhotoLesson()">🤖 Lees woorden uit foto</button></div><div id="photoReview" class="photo-step hidden"><div class="field"><label for="photoLessonStudent">Voor welke leerling?</label><select id="photoLessonStudent"><option>Zyon</option><option>Zenith</option><option>Zephon</option></select></div><div class="field"><label for="photoLessonSubject">Vak</label><input id="photoLessonSubject" placeholder="Bijvoorbeeld Nederlands"></div><div class="field"><label for="photoLessonName">Naam van de les</label><input id="photoLessonName" placeholder="Bijvoorbeeld Thema 4"></div><div class="field"><label for="photoLessonType">Onderdeel</label><select id="photoLessonType"><option value="words">🎯 Woordtrainer</option><option value="dictation">✏️ Dictee</option></select></div><div class="field"><label for="photoLessonWords">Gelezen woorden — controleer en pas aan</label><textarea id="photoLessonWords" class="photo-words" placeholder="Eén woord per regel"></textarea></div><button class="success big" onclick="createLessonFromPhoto()">💾 Maak les</button></div></div></main>
 <main id="login" class="page hidden"><button class="secondary" onclick="showHome()">← Terug</button><div class="card login-card"><h2>🔐 Beheer login</h2><div class="field"><label for="loginEmail">E-mailadres</label><input id="loginEmail" type="email" autocomplete="email"></div><div class="field"><label for="loginPassword">Wachtwoord</label><input id="loginPassword" type="password" autocomplete="current-password"></div><button class="big" onclick="loginParent()">Inloggen</button><button class="secondary" type="button" onclick="sendPasswordReset()" style="margin-top:10px;width:100%">Wachtwoord vergeten?</button><div id="loginError" class="message error hidden"></div><div id="loginResetMessage" class="message success hidden"></div></div></main>
 
   <main id="testHistory" class="page hidden">
@@ -565,7 +565,7 @@ function showPhotoLesson(){
   document.getElementById('photoLessonStudent').value=currentStudent||parentSelectedStudent||'Zenith';
   document.getElementById('photoLessonSubject').value='';
   document.getElementById('photoLessonName').value='';
-  document.getElementById('photoLessonWords').value='';
+  document.getElementById('photoLessonWords').value='';document.getElementById('photoLessonType').value='words';
   document.getElementById('photoLessonFile').value='';
   document.getElementById('photoLessonPreview').classList.add('hidden');
   document.getElementById('photoOcrControls').classList.add('hidden');
@@ -607,13 +607,14 @@ async function createLessonFromPhoto(){
   const student=document.getElementById('photoLessonStudent').value;
   const subject=document.getElementById('photoLessonSubject').value.trim();
   const title=document.getElementById('photoLessonName').value.trim();
+  const type=document.getElementById('photoLessonType').value;
   const words=document.getElementById('photoLessonWords').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
   const status=document.getElementById('photoOcrStatus');
   if(!student||!subject||!title||!words.length){
     status.textContent='⚠️ Vul leerling, vak, lestitel en minstens één woord in.';
     return;
   }
-  const created=await db.from('lessons').insert({student,subject,title,type:'words'}).select().single();
+  const created=await db.from('lessons').insert({student,subject,title,type}).select().single();
   if(created.error){status.textContent='⚠️ Les opslaan mislukt: '+created.error.message;return;}
   const rows=words.map((word,i)=>({lesson_id:created.data.id,question:word,answer:word,sort_order:i}));
   const inserted=await db.from('lesson_items').insert(rows);

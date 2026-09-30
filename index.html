@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO V2.3 -->
+<!-- PacoGO V2.4 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -13,7 +13,9 @@
 /* Nieuwe PacoGO dashboardstijl */
 .site-header{margin:0 -22px 0;background:linear-gradient(180deg,#79d7f7 0%,#bcefff 72%,#dff8ff 100%);min-height:235px;position:relative;overflow:hidden;border-bottom:5px solid #fff}.site-header:after{content:"";position:absolute;left:-5%;right:-5%;bottom:-48px;height:95px;background:#fff;border-radius:50% 50% 0 0/55% 55% 0 0}.header-inner{max-width:1400px;margin:auto;padding:22px 35px;display:flex;align-items:center;justify-content:space-between;gap:25px;position:relative;z-index:2}.logo-wrap{display:flex;align-items:center;gap:14px}.paco-logo{font-size:68px;line-height:.9;font-weight:1000;letter-spacing:-4px;color:#fff;text-shadow:4px 5px 0 #102b57,-1px -1px 0 #102b57;white-space:nowrap}.paco-logo span{color:var(--yellow);text-shadow:4px 5px 0 #102b57,-1px -1px 0 #102b57}.tagline{font-size:25px;font-weight:900;font-style:italic;color:#102b57;max-width:300px;line-height:1.05}.user-area{display:flex;align-items:center;gap:10px}.user-pill{background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.9);padding:11px 16px;border-radius:999px;font-weight:800;color:#102b57}.student-left-column{min-width:0;display:flex;flex-direction:column;gap:10px}.student-left-column .main-page-button{width:100%;margin:0}.student-left-column .sidebar{position:sticky;top:18px}.dashboard{display:grid;grid-template-columns:220px minmax(0,1fr) 280px;gap:20px;align-items:start;margin-top:-5px;position:relative;z-index:3}.sidebar{background:#fff;border:1px solid var(--border);border-radius:22px;padding:14px;box-shadow:var(--shadow);position:sticky;top:18px}.side-item{width:100%;display:flex;align-items:center;gap:12px;background:transparent;color:var(--text);box-shadow:none;text-align:left;padding:14px;border-radius:15px;margin-bottom:5px}.side-item:hover{background:#eef7ff;color:var(--blue2)}.side-item.active{background:#dff0ff;color:var(--blue2)}.side-icon{font-size:22px;width:27px;text-align:center}.sidebar-note{margin-top:35px;padding:15px 4px;border-radius:17px;background:transparent;font-weight:800;font-size:14px;line-height:1.4;text-align:center}.main-dashboard{min-width:0}.welcome{min-height:250px;background:linear-gradient(135deg,#f0f9ff,#fff);overflow:hidden;display:flex;align-items:center;justify-content:space-between;padding:28px 34px}.welcome-copy{max-width:58%;position:relative;z-index:2}.welcome h2{font-size:36px;line-height:1.05;margin:0 0 10px}.welcome p{font-size:18px;line-height:1.5;color:var(--muted);max-width:590px}.welcome-paco{width:310px;min-width:260px;align-self:stretch;display:flex;align-items:flex-end;justify-content:center}.paco-svg{width:280px;height:190px}.section-head{display:flex;align-items:center;justify-content:space-between;margin:28px 2px 14px}.section-head h2{margin:0;font-size:27px}.section-link{color:var(--blue);font-weight:850}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:15px}.subject-card{min-height:175px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;transition:.16s;overflow:hidden;position:relative}.subject-card:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(16,43,87,.13)}.subject-icon{font-size:48px;background:#eef8ff;border-radius:17px;height:82px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}.subject-title{font-size:20px;font-weight:900}.subject-blue{border-top:5px solid #2e9cf4}.subject-purple{border-top:5px solid #9b78ed}.subject-green{border-top:5px solid #47bd70}.subject-orange{border-top:5px solid #f3a23b}.subject-pink{border-top:5px solid #ed78a8}.subject-cyan{border-top:5px solid #2cbfd0}.side-panel{display:flex;flex-direction:column;gap:18px}.side-card h3{margin:0 0 14px;font-size:20px}.stat-big{font-size:38px;font-weight:950;margin:0}.progress-wrap{margin:15px 0 25px}.progress-label{display:flex;justify-content:space-between;color:var(--muted);font-size:14px;margin-bottom:7px}.progress{height:8px;background:#e4edf6;border-radius:999px;overflow:hidden;max-width:320px}.progress-bar{height:100%;background:linear-gradient(90deg,#4dcf75,#2e9cf4);transition:width .25s}.motivation{background:#eaf7ff;border:0}.word-list{list-style:none;margin:0;padding:0}.word-list li{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e8eff6}.word-list li:last-child{border-bottom:0}.mini-speaker{width:34px;height:34px;padding:0;border-radius:50%;font-size:15px}.paw{font-size:22px}
 .lesson-badge{background:#1787f2;color:#fff}
-.lesson-card{cursor:pointer}
+.lesson-card{cursor:grab}
+.lesson-card.dragging{opacity:.45;cursor:grabbing}
+.lesson-card.drag-over{outline:3px dashed #1787f2;outline-offset:3px}
 .lesson-card-actions{display:flex;gap:8px;margin-top:13px;position:relative;z-index:2}
 .lesson-card-actions button{padding:8px 11px;font-size:13px;border-radius:11px;box-shadow:0 3px 0 rgba(16,43,87,.12)}
 .lesson-card-actions .lesson-edit{background:#eaf4ff;color:#126fc9}
@@ -214,7 +216,7 @@ body{background:#1787f2}
   </main>
 
   <main id="parentDashboard" class="page hidden">
-    <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 PacoGO — TEST V2.3</div></div>
+    <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 PacoGO — TEST V2.4</div></div>
     <div class="topbar"><div><button id="logoutButton" class="logout-button hidden" onclick="logoutParent()">Logout</button></div></div>
     <div class="card">
       <div class="parent-dashboard-head"><div><h2>Leerling kiezen</h2><div class="small">Kies voor wie je lessen, voortgang of toegang wilt beheren.</div></div></div>
@@ -263,7 +265,7 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div class="version-badge">PacoGO — TEST V2.3</div>
+  <div class="version-badge">PacoGO — TEST V2.4</div>
 
 <div id="globalMessage"></div>
 
@@ -379,18 +381,65 @@ db.auth.onAuthStateChange((_event,session)=>{updateAuthUI(session);if(_event==='
 async function loadLessons(){const {data,error}=await db.from('lessons').select('*, lesson_items(*)').order('id',{ascending:true});if(error){showMessage('Lessen laden mislukt: '+error.message,'error');return}lessons=(data||[]).map(l=>({...l,lesson_items:(l.lesson_items||[]).sort((a,b)=>(a.sort_order??0)-(b.sort_order??0))}));showHome()}
 function renderSubjects(){const el=document.getElementById('subjects');const visibleLessons=lessons.filter(l=>l.student===currentStudent);const names=[...new Set(visibleLessons.map(l=>l.subject))];const lessonStat=document.getElementById('lessonCountStat');const subjectStat=document.getElementById('subjectCountStat');const progress=document.getElementById('dashboardProgress');if(lessonStat)lessonStat.textContent=visibleLessons.length;if(subjectStat)subjectStat.textContent=names.length+' '+(names.length===1?'vak':'vakken');if(progress)progress.style.width=(visibleLessons.length?Math.min(100,20+visibleLessons.length*7):10)+'%';if(!names.length){el.innerHTML='<div class="empty">Nog geen lessen. Een ouder kan een les toevoegen.</div>';return}el.innerHTML=names.map(s=>{const count=visibleLessons.filter(l=>l.subject===s).length;return `<div class="card subject-card ${subjectClass(s)}" onclick="showSubject('${escapeAttr(s)}')"><div><div class="subject-icon">${subjectIcon(s)}</div><div class="subject-title">${escapeHtml(s)}</div></div><div class="small">${count} ${count===1?'les':'lessen'} · Bekijk →</div></div>`}).join('')}
 function escapeAttr(v){return escapeHtml(v).replace(/`/g,'&#96;')}
+function getLessonOrderKey(student,subject){return 'pacogo-lesson-order-'+String(student||'')+'-'+String(subject||'')}
+function getOrderedLessons(list,student,subject){
+  const key=getLessonOrderKey(student,subject);
+  let saved=[];
+  try{saved=JSON.parse(localStorage.getItem(key)||'[]')}catch(e){saved=[]}
+  const rank=new Map((Array.isArray(saved)?saved:[]).map((id,i)=>[Number(id),i]));
+  return [...list].sort((a,b)=>{
+    const ar=rank.has(Number(a.id))?rank.get(Number(a.id)):999999;
+    const br=rank.has(Number(b.id))?rank.get(Number(b.id)):999999;
+    return ar-br || Number(a.id)-Number(b.id);
+  });
+}
+function saveLessonOrder(student,subject,list){
+  try{localStorage.setItem(getLessonOrderKey(student,subject),JSON.stringify(list.map(l=>Number(l.id))))}catch(e){}
+}
+function clearLessonDragState(){
+  document.querySelectorAll('#lessons .lesson-card.dragging,#lessons .lesson-card.drag-over').forEach(el=>el.classList.remove('dragging','drag-over'));
+}
+function dragLessonStart(e,id){
+  e.dataTransfer.effectAllowed='move';
+  e.dataTransfer.setData('text/plain',String(id));
+  e.currentTarget.classList.add('dragging');
+}
+function dragLessonOver(e){
+  e.preventDefault();
+  e.dataTransfer.dropEffect='move';
+  const card=e.currentTarget;
+  if(!card.classList.contains('dragging'))card.classList.add('drag-over');
+}
+function dragLessonLeave(e){e.currentTarget.classList.remove('drag-over')}
+function dragLessonDrop(e,targetId){
+  e.preventDefault();
+  const sourceId=Number(e.dataTransfer.getData('text/plain'));
+  targetId=Number(targetId);
+  if(!sourceId||!targetId||sourceId===targetId){clearLessonDragState();return}
+  const el=document.getElementById('lessons');
+  const cards=[...el.querySelectorAll('.lesson-card')];
+  const source=cards.find(c=>Number(c.dataset.lessonId)===sourceId);
+  const target=cards.find(c=>Number(c.dataset.lessonId)===targetId);
+  if(!source||!target){clearLessonDragState();return}
+  const rect=target.getBoundingClientRect();
+  if(e.clientY>rect.top+rect.height/2)target.after(source);else target.before(source);
+  const order=[...el.querySelectorAll('.lesson-card')].map(c=>Number(c.dataset.lessonId));
+  saveLessonOrder(currentStudent,currentSubject,order.map(id=>lessons.find(l=>Number(l.id)===id)).filter(Boolean));
+  clearLessonDragState();
+}
+function dragLessonEnd(){clearLessonDragState()}
 function showSubject(subject){
   currentSubject=subject;
   hideAll();
   document.getElementById('subject').classList.remove('hidden');
   document.getElementById('subjectTitle').textContent=subject;
   refreshPageSidebars();
-  const ls=lessons.filter(l=>l.subject===subject&&l.student===currentStudent);
+  const ls=getOrderedLessons(lessons.filter(l=>l.subject===subject&&l.student===currentStudent),currentStudent,subject);
   const el=document.getElementById('lessons');
-  el.innerHTML=ls.length?ls.map(l=>`<div class="card lesson-card" onclick="openLesson(${l.id})">
+  el.innerHTML=ls.length?ls.map(l=>`<div class="card lesson-card" draggable="true" data-lesson-id="${l.id}" onclick="openLesson(${l.id})" ondragstart="dragLessonStart(event,${l.id})" ondragover="dragLessonOver(event)" ondragleave="dragLessonLeave(event)" ondrop="dragLessonDrop(event,${l.id})" ondragend="dragLessonEnd()">
     <span class="badge lesson-badge">LES</span>
     <h3>${escapeHtml(l.title)}</h3>
-    <div class="small">${l.lesson_items.length} ${l.lesson_items.length===1?'onderdeel':'onderdelen'}</div>
+    <div class="small">${l.lesson_items.length} ${l.lesson_items.length===1?'onderdeel':'onderdelen'} · Sleep om te ordenen</div>
     ${isParentLoggedIn()?`<div class="lesson-card-actions">
       <button class="lesson-edit" onclick="event.stopPropagation();editLessonById(${l.id})">✏️ Bewerken</button>
       <button class="lesson-delete" onclick="event.stopPropagation();deleteLessonById(${l.id})">🗑️ Verwijderen</button>

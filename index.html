@@ -342,6 +342,9 @@ body{background:#1787f2}
 const SUPABASE_URL = 'https://ncpkqrvxljxwboavxtak.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_skiKpO4UU79zWY7hskHsoA_WQxA6CFc';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+function photoSessionDb(token){
+  return window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY,{global:{headers:{'x-photo-token':String(token||'')}}});
+}
 const PARENT_IDS = new Set(['5d0e1e5c-1dbe-4909-bd3a-81a1e7b26d09']);
 let currentSession=null,currentSubject=null,currentLesson=null,lessons=[];
 let currentStudent=null;
@@ -617,7 +620,8 @@ async function setGuestLesson(lessonId,active){
 async function cleanupPhotoSession(){
   if(photoSessionTimer){clearInterval(photoSessionTimer);photoSessionTimer=null}
   if(photoSessionToken){
-    await db.from('photo_upload_sessions').delete().eq('token',photoSessionToken);
+    const photoDb=photoSessionDb(photoSessionToken);
+    await photoDb.from('photo_upload_sessions').delete().eq('token',photoSessionToken);
     photoSessionToken='';
   }
 }
@@ -633,7 +637,8 @@ function dataUrlToFile(dataUrl,name='huiswerkfoto.jpg'){
 async function createPhotoUploadSession(){
   await cleanupPhotoSession();
   const token=(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2)).replace(/[^a-zA-Z0-9]/g,'');
-  const inserted=await db.from('photo_upload_sessions').insert({token}).select('id,token').single();
+  const photoDb=photoSessionDb(token);
+  const inserted=await photoDb.from('photo_upload_sessions').insert({token}).select('id,token').single();
   if(inserted.error)throw inserted.error;
   photoSessionToken=inserted.data.token;
   const uploadUrl='https://huisartslasten.github.io/PAB/photo-phone.html?token='+encodeURIComponent(photoSessionToken);
@@ -646,7 +651,8 @@ async function createPhotoUploadSession(){
 }
 async function checkPhotoUploadSession(){
   if(!photoSessionToken)return;
-  const res=await db.from('photo_upload_sessions').select('photo_data,status').eq('token',photoSessionToken).maybeSingle();
+  const photoDb=photoSessionDb(photoSessionToken);
+  const res=await photoDb.from('photo_upload_sessions').select('photo_data,status').eq('token',photoSessionToken).maybeSingle();
   if(res.error||!res.data)return;
   if(res.data.status!=='uploaded'||!res.data.photo_data)return;
   clearInterval(photoSessionTimer);photoSessionTimer=null;

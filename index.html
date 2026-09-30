@@ -1,11 +1,12 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO V2.6 -->
+<!-- PacoGO V2.7 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>@import url("https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap");
 
@@ -143,6 +144,14 @@ body{background:#1787f2}
 .question-field,.answer-field{border-color:#c4d4e3}
 
 .photo-preview{width:100%;max-height:360px;object-fit:contain;border-radius:18px;background:#f7fbff;border:2px dashed #cdddec;margin-top:12px}.photo-drop{border:3px dashed #8bcfff;border-radius:20px;padding:28px;text-align:center;background:#eef8ff}.photo-drop input{margin-top:12px}.photo-ocr-status{min-height:24px;margin-top:12px;font-weight:800;color:#126fc9}.photo-words{min-height:220px}.photo-step{margin-top:18px}
+.photo-qr-card{display:grid;grid-template-columns:230px minmax(0,1fr);gap:24px;align-items:center;background:#fffdf0;border:3px solid #f4e8a8;border-radius:20px;padding:20px}
+.photo-qr-code{width:230px;min-height:230px;background:#fff;border-radius:16px;display:flex;align-items:center;justify-content:center;padding:5px}
+.photo-qr-code img,.photo-qr-code canvas{max-width:220px!important;height:auto!important}
+.photo-qr-title{font-family:"Baloo 2",Nunito,sans-serif;font-size:27px;font-weight:900;margin:0 0 8px}
+.photo-qr-status{font-weight:800;color:#126fc9;min-height:24px}
+.photo-uploaded{background:#ddf7e5;color:#166534;border-radius:14px;padding:12px;margin-top:14px;font-weight:800}
+.photo-direct{border-top:2px solid #e8eff6;padding-top:20px;margin-top:24px}
+@media(max-width:700px){.photo-qr-card{grid-template-columns:1fr;text-align:center}.photo-qr-code{margin:auto}.photo-qr-card .row{justify-content:center}}
 </style>
 </head>
 <body>
@@ -219,7 +228,7 @@ body{background:#1787f2}
   </main>
 
   <main id="parentDashboard" class="page hidden">
-    <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 PacoGO — TEST V2.6</div></div>
+    <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 PacoGO — TEST V2.7</div></div>
     <div class="topbar"><div><button id="logoutButton" class="logout-button hidden" onclick="logoutParent()">Logout</button></div></div>
     <div class="card">
       <div class="parent-dashboard-head"><div><h2>Leerling kiezen</h2><div class="small">Kies voor wie je lessen, voortgang of toegang wilt beheren.</div></div></div>
@@ -241,7 +250,50 @@ body{background:#1787f2}
     </div>
   </main>
 
-  <main id="photoLesson" class="page hidden"><button class="secondary" onclick="showParentDashboard()">← Terug naar beheer</button><div class="card"><div class="page-heading subject-heading"><span class="page-heading-label">FOTO → LES</span><h2>📸 Maak een les van een foto</h2><p>Maak een foto van een woordenlijst. PacoGO leest de woorden en jij controleert ze.</p></div><div class="photo-step"><div class="photo-drop"><strong>📷 Kies of maak een foto</strong><div class="small">Op telefoon kun je hier direct de camera gebruiken.</div><input id="photoLessonFile" type="file" accept="image/*" capture="environment" onchange="handlePhotoLessonFile(event)"></div><img id="photoLessonPreview" class="photo-preview hidden" alt="Voorbeeld van de huiswerkfoto"></div><div id="photoOcrStatus" class="photo-ocr-status"></div><div id="photoOcrControls" class="row photo-step hidden"><button class="big" onclick="readPhotoLesson()">🤖 Lees woorden uit foto</button></div><div id="photoReview" class="photo-step hidden"><div class="field"><label for="photoLessonStudent">Voor welke leerling?</label><select id="photoLessonStudent"><option>Zyon</option><option>Zenith</option><option>Zephon</option></select></div><div class="field"><label for="photoLessonSubject">Vak</label><input id="photoLessonSubject" placeholder="Bijvoorbeeld Nederlands"></div><div class="field"><label for="photoLessonName">Naam van de les</label><input id="photoLessonName" placeholder="Bijvoorbeeld Thema 4"></div><div class="field"><label for="photoLessonType">Onderdeel</label><select id="photoLessonType"><option value="words">🎯 Woordtrainer</option><option value="dictation">✏️ Dictee</option></select></div><div class="field"><label for="photoLessonWords">Gelezen woorden — controleer en pas aan</label><textarea id="photoLessonWords" class="photo-words" placeholder="Eén woord per regel"></textarea></div><button class="success big" onclick="createLessonFromPhoto()">💾 Maak les</button></div></div></main>
+  <main id="photoLesson" class="page hidden">
+  <button class="secondary" onclick="showParentDashboard()">← Terug naar beheer</button>
+  <div class="card">
+    <div class="page-heading subject-heading">
+      <span class="page-heading-label">FOTO → LES</span>
+      <h2>📸 Maak een les van een foto</h2>
+      <p>Maak de foto gewoon met je telefoon. PacoGO ontvangt hem automatisch op de computer.</p>
+    </div>
+
+    <div class="photo-qr-card photo-step">
+      <div id="photoQrCode" class="photo-qr-code"><span class="small">QR-code maken...</span></div>
+      <div>
+        <div class="photo-qr-title">📱 Maak de foto met je telefoon</div>
+        <div class="small">Scan deze QR-code met je telefoon. Er opent een eenvoudige PacoGO-pagina waar je direct een foto kunt maken.</div>
+        <div id="photoQrStatus" class="photo-qr-status" style="margin-top:12px"></div>
+        <div id="photoUploadedStatus" class="photo-uploaded hidden">✅ Foto ontvangen! PacoGO staat klaar om hem te lezen.</div>
+      </div>
+    </div>
+
+    <div class="photo-direct">
+      <div class="small" style="margin-bottom:8px"><strong>Of gebruik deze computer</strong> — je kunt ook hier een foto kiezen.</div>
+      <div class="photo-step">
+        <div class="photo-drop">
+          <strong>📷 Kies of maak een foto</strong>
+          <div class="small">Op een telefoon opent dit direct de camera.</div>
+          <input id="photoLessonFile" type="file" accept="image/*" capture="environment" onchange="handlePhotoLessonFile(event)">
+        </div>
+        <img id="photoLessonPreview" class="photo-preview hidden" alt="Voorbeeld van de huiswerkfoto">
+      </div>
+    </div>
+
+    <div id="photoOcrStatus" class="photo-ocr-status"></div>
+    <div id="photoOcrControls" class="row photo-step hidden"><button class="big" onclick="readPhotoLesson()">🤖 Lees woorden uit foto</button></div>
+
+    <div id="photoReview" class="photo-step hidden">
+      <div class="field"><label for="photoLessonStudent">Voor welke leerling?</label><select id="photoLessonStudent"><option>Zyon</option><option>Zenith</option><option>Zephon</option></select></div>
+      <div class="field"><label for="photoLessonSubject">Vak</label><input id="photoLessonSubject" placeholder="Bijvoorbeeld Nederlands"></div>
+      <div class="field"><label for="photoLessonName">Naam van de les</label><input id="photoLessonName" placeholder="Bijvoorbeeld Thema 4"></div>
+      <div class="field"><label for="photoLessonType">Onderdeel</label><select id="photoLessonType"><option value="words">🎯 Woordtrainer</option><option value="dictation">✏️ Dictee</option></select></div>
+      <div class="field"><label for="photoLessonWords">Gelezen woorden — controleer en pas aan</label><textarea id="photoLessonWords" class="photo-words" placeholder="Eén woord per regel"></textarea></div>
+      <button class="success big" onclick="createLessonFromPhoto()">💾 Maak les</button>
+    </div>
+  </div>
+</main>
 <main id="login" class="page hidden"><button class="secondary" onclick="showHome()">← Terug</button><div class="card login-card"><h2>🔐 Beheer login</h2><div class="field"><label for="loginEmail">E-mailadres</label><input id="loginEmail" type="email" autocomplete="email"></div><div class="field"><label for="loginPassword">Wachtwoord</label><input id="loginPassword" type="password" autocomplete="current-password"></div><button class="big" onclick="loginParent()">Inloggen</button><button class="secondary" type="button" onclick="sendPasswordReset()" style="margin-top:10px;width:100%">Wachtwoord vergeten?</button><div id="loginError" class="message error hidden"></div><div id="loginResetMessage" class="message success hidden"></div></div></main>
 
   <main id="testHistory" class="page hidden">
@@ -269,7 +321,7 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div class="version-badge">PacoGO — TEST V2.6</div>
+  <div class="version-badge">PacoGO — TEST V2.7</div>
 
 <div id="globalMessage"></div>
 
@@ -293,6 +345,9 @@ const PARENT_IDS = new Set(['f0f92b9c-5eb7-4b78-aca0-1fea615b1999']);
 let currentSession=null,currentSubject=null,currentLesson=null,lessons=[];
 let currentStudent=null;
 let activity=null;
+let photoSessionToken='';
+let photoSessionTimer=null;
+let photoLessonSelectedFile=null;
 
 function isParentLoggedIn(){return !!currentSession&&PARENT_IDS.has(currentSession.user.id)}
 function updateAuthUI(session){currentSession=session;const logged=isParentLoggedIn();document.getElementById('loginButton')?.classList.toggle('hidden',logged);document.getElementById('logoutButton')?.classList.toggle('hidden',!logged);document.querySelectorAll('.side-manage-button').forEach(e=>e.classList.toggle('hidden',!logged));document.getElementById('manageButton')?.classList.toggle('hidden',!logged);document.getElementById('addLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('addLessonButton2')?.classList.toggle('hidden',!logged);document.getElementById('editLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('deleteLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('addTestButton')?.classList.toggle('hidden',!logged);}
@@ -558,32 +613,87 @@ async function setGuestLesson(lessonId,active){
   showMessage(active?'Les geactiveerd.':'Les gedeactiveerd.','success');
 }
 
-function showPhotoLesson(){
+async function cleanupPhotoSession(){
+  if(photoSessionTimer){clearInterval(photoSessionTimer);photoSessionTimer=null}
+  if(photoSessionToken){
+    await db.from('photo_upload_sessions').delete().eq('token',photoSessionToken);
+    photoSessionToken='';
+  }
+}
+function dataUrlToFile(dataUrl,name='huiswerkfoto.jpg'){
+  const parts=String(dataUrl||'').split(',');
+  if(parts.length!==2)return null;
+  const meta=parts[0],binary=atob(parts[1]);
+  const mime=(meta.match(/data:([^;]+)/)||[])[1]||'image/jpeg';
+  const bytes=new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+  return new File([bytes],name,{type:mime});
+}
+async function createPhotoUploadSession(){
+  await cleanupPhotoSession();
+  const token=(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2)).replace(/[^a-zA-Z0-9]/g,'');
+  const inserted=await db.from('photo_upload_sessions').insert({token}).select('id,token').single();
+  if(inserted.error)throw inserted.error;
+  photoSessionToken=inserted.data.token;
+  const uploadUrl=SUPABASE_URL+'/functions/v1/photo-upload-v1?token='+encodeURIComponent(photoSessionToken);
+  const qr=document.getElementById('photoQrCode');
+  qr.innerHTML='';
+  if(!window.QRCode)throw new Error('QR-code bibliotheek niet geladen');
+  new QRCode(qr,{text:uploadUrl,width:220,height:220,colorDark:'#102b57',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+  document.getElementById('photoQrStatus').textContent='Scan de QR-code met je telefoon.';
+  photoSessionTimer=setInterval(checkPhotoUploadSession,1500);
+}
+async function checkPhotoUploadSession(){
+  if(!photoSessionToken)return;
+  const res=await db.from('photo_upload_sessions').select('photo_data,status').eq('token',photoSessionToken).maybeSingle();
+  if(res.error||!res.data)return;
+  if(res.data.status!=='uploaded'||!res.data.photo_data)return;
+  clearInterval(photoSessionTimer);photoSessionTimer=null;
+  const file=dataUrlToFile(res.data.photo_data);
+  if(!file)return;
+  photoLessonSelectedFile=file;
+  const preview=document.getElementById('photoLessonPreview');
+  preview.src=res.data.photo_data;
+  preview.classList.remove('hidden');
+  document.getElementById('photoOcrControls').classList.remove('hidden');
+  document.getElementById('photoReview').classList.add('hidden');
+  document.getElementById('photoUploadedStatus').classList.remove('hidden');
+  document.getElementById('photoQrStatus').textContent='📱 Foto ontvangen vanaf je telefoon.';
+  document.getElementById('photoOcrStatus').textContent='Foto ontvangen. Controleer hem en laat PacoGO de woorden lezen.';
+}
+async function showPhotoLesson(){
   if(!requireParent())return;
   hideAll();
   document.getElementById('photoLesson').classList.remove('hidden');
   document.getElementById('photoLessonStudent').value=currentStudent||parentSelectedStudent||'Zenith';
   document.getElementById('photoLessonSubject').value='';
   document.getElementById('photoLessonName').value='';
-  document.getElementById('photoLessonWords').value='';document.getElementById('photoLessonType').value='words';
+  document.getElementById('photoLessonWords').value='';
+  document.getElementById('photoLessonType').value='words';
   document.getElementById('photoLessonFile').value='';
   document.getElementById('photoLessonPreview').classList.add('hidden');
   document.getElementById('photoOcrControls').classList.add('hidden');
   document.getElementById('photoReview').classList.add('hidden');
+  document.getElementById('photoUploadedStatus').classList.add('hidden');
   document.getElementById('photoOcrStatus').textContent='';
+  document.getElementById('photoQrStatus').textContent='QR-code maken...';
+  photoLessonSelectedFile=null;
+  try{await createPhotoUploadSession()}catch(error){console.error('Photo QR error:',error);document.getElementById('photoQrStatus').textContent='⚠️ QR-code kon niet worden gemaakt.'}
 }
 function handlePhotoLessonFile(e){
   const file=e.target.files?.[0];
   if(!file)return;
+  photoLessonSelectedFile=file;
   const preview=document.getElementById('photoLessonPreview');
   preview.src=URL.createObjectURL(file);
   preview.classList.remove('hidden');
   document.getElementById('photoOcrControls').classList.remove('hidden');
   document.getElementById('photoReview').classList.add('hidden');
+  document.getElementById('photoUploadedStatus').classList.add('hidden');
   document.getElementById('photoOcrStatus').textContent='Foto klaar. Controleer of de woorden goed leesbaar zijn.';
 }
 async function readPhotoLesson(){
-  const file=document.getElementById('photoLessonFile')?.files?.[0];
+  const file=photoLessonSelectedFile||document.getElementById('photoLessonFile')?.files?.[0];
   if(!file)return;
   const status=document.getElementById('photoOcrStatus');
   status.textContent='🤖 PacoGO leest de foto...';
@@ -630,7 +740,7 @@ async function createLessonFromPhoto(){
   showMessage('Les gemaakt uit de foto. Controleer hem gerust nog even.','success');
   showParentDashboard();
 }
-function showAddLesson(){if(!requireParent())return;currentLesson=null;hideAll();document.getElementById('editor').classList.remove('hidden');document.getElementById('editorTitle').textContent='Nieuwe les';document.getElementById('lessonSubject').value='';document.querySelectorAll('input[name=lessonStudent]').forEach(r=>r.checked=r.value===currentStudent);document.getElementById('lessonName').value='';document.getElementById('lessonType').value='words';document.getElementById('lessonTestDate').value='';document.getElementById('lessonTestDateEnabled').checked=false;document.getElementById('lessonTestDatePicker').classList.add('hidden');document.getElementById('editorError').classList.add('hidden');resetEditorRows();changeLessonType();renderDatePicker('lessonTestDatePicker','lessonTestDate','')}
+async function showAddLesson(){if(photoSessionToken)await cleanupPhotoSession();if(!requireParent())return;currentLesson=null;hideAll();document.getElementById('editor').classList.remove('hidden');document.getElementById('editorTitle').textContent='Nieuwe les';document.getElementById('lessonSubject').value='';document.querySelectorAll('input[name=lessonStudent]').forEach(r=>r.checked=r.value===currentStudent);document.getElementById('lessonName').value='';document.getElementById('lessonType').value='words';document.getElementById('lessonTestDate').value='';document.getElementById('lessonTestDateEnabled').checked=false;document.getElementById('lessonTestDatePicker').classList.add('hidden');document.getElementById('editorError').classList.add('hidden');resetEditorRows();changeLessonType();renderDatePicker('lessonTestDatePicker','lessonTestDate','')}
 function resetEditorRows(){document.getElementById('wordEditor').innerHTML='';document.getElementById('questionEditor').innerHTML='';document.getElementById('dictationEditor').innerHTML='';document.getElementById('mathEditor').innerHTML='';addWordRow();addWordRow()}
 function syncLessonTypeButton(){const select=document.getElementById('lessonType'),text=document.getElementById('lessonTypeButtonText');if(!select||!text)return;const labels={words:'🎯 Woordtrainer',questions:'❓ Vragen',dictation:'✏️ Dictee',math:'🔢 Rekenen'};text.textContent=labels[select.value]||'🎯 Woordtrainer'}
 function toggleLessonTypeMenu(){document.getElementById('lessonTypeMenu')?.classList.toggle('hidden')}

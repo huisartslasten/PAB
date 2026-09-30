@@ -659,7 +659,8 @@ async function checkPhotoUploadSession(){
   document.getElementById('photoReview').classList.add('hidden');
   document.getElementById('photoUploadedStatus').classList.remove('hidden');
   document.getElementById('photoQrStatus').textContent='📱 Foto ontvangen vanaf je telefoon.';
-  document.getElementById('photoOcrStatus').textContent='Foto ontvangen. Controleer hem en laat PacoGO de woorden lezen.';
+  document.getElementById('photoOcrStatus').textContent='Foto ontvangen. PacoGO gaat hem begrijpen...';
+  try{await analyzePhotoWithAI(res.data.photo_data)}catch(error){console.error('Photo AI error:',error);document.getElementById('photoOcrStatus').textContent='⚠️ '+(error.message||'AI-analyse mislukt')}
 }
 async function showPhotoLesson(){
   if(!requireParent())return;
@@ -717,23 +718,32 @@ function photoPairsFromOcr(result){
   }
   return pairs.length?pairs:lines.map(x=>({question:x.text,answer:x.text}));
 }
+async function analyzePhotoWithAI(dataUrl){
+  const status=document.getElementById('photoOcrStatus');
+  status.textContent='🤖 PacoGO begrijpt de foto...';
+  const response=await fetch('https://btnhhvtpmuvrpbnkyjnm.supabase.co/functions/v1/photo-understand-v1',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({image:dataUrl,subject:document.getElementById('photoLessonSubject')?.value.trim()||''})
+  });
+  const out=await response.json();
+  if(!response.ok||out.error)throw new Error(out.error||'AI-analyse mislukt');
+  const pairs=Array.isArray(out.pairs)?out.pairs:[];
+  if(!pairs.length)throw new Error('Geen bruikbare vraag-antwoordparen gevonden');
+  document.getElementById('photoLessonWords').value=pairs.map(p=>p.question+' || '+p.answer).join('\n');
+  document.getElementById('photoReview').classList.remove('hidden');
+  status.textContent='✅ '+pairs.length+' vraag-antwoordparen gevonden. Controleer ze hieronder.';
+}
 async function readPhotoLesson(){
   const file=photoLessonSelectedFile||document.getElementById('photoLessonFile')?.files?.[0];
   if(!file)return;
-  const status=document.getElementById('photoOcrStatus');
-  status.textContent='🤖 PacoGO leest de foto en zoekt kolommen...';
   try{
-    if(!window.Tesseract)throw new Error('OCR niet geladen');
-    const result=await Tesseract.recognize(file,'eng',{logger:m=>{
-      if(m.status==='recognizing text'&&typeof m.progress==='number')status.textContent='🤖 Foto lezen... '+Math.round(m.progress*100)+'%';
-    }});
-    const pairs=photoPairsFromOcr(result);
-    document.getElementById('photoLessonWords').value=pairs.map(p=>p.question+' || '+p.answer).join('\n');
-    document.getElementById('photoReview').classList.remove('hidden');
-    status.textContent=pairs.length?'✅ '+pairs.length+' mogelijke vraag-antwoordparen gevonden. Controleer ze hieronder.':'⚠️ Geen tekst gevonden. Probeer een scherpere foto.';
+    const reader=new FileReader();
+    const dataUrl=await new Promise((resolve,reject)=>{reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file)});
+    await analyzePhotoWithAI(String(dataUrl));
   }catch(error){
-    console.error('Photo OCR error:',error);
-    status.textContent='⚠️ De foto kon niet worden gelezen.';
+    console.error('Photo AI error:',error);
+    document.getElementById('photoOcrStatus').textContent='⚠️ '+(error.message||'De foto kon niet worden begrepen.');
   }
 }
 async function createLessonFromPhoto(){

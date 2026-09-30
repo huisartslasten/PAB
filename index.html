@@ -635,7 +635,7 @@ async function createPhotoUploadSession(){
   const inserted=await db.from('photo_upload_sessions').insert({token}).select('id,token').single();
   if(inserted.error)throw inserted.error;
   photoSessionToken=inserted.data.token;
-  const uploadUrl=SUPABASE_URL+'/functions/v1/photo-upload-v1?token='+encodeURIComponent(photoSessionToken);
+  const uploadUrl='https://huisartslasten.github.io/PAB/photo-phone.html?token='+encodeURIComponent(photoSessionToken);
   const qr=document.getElementById('photoQrCode');
   qr.innerHTML='';
   if(!window.QRCode)throw new Error('QR-code bibliotheek niet geladen');

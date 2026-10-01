@@ -598,6 +598,7 @@ function parentStudentCard(name,isGuest=false,guestId=''){
 }
 function selectParentStudent(name,isGuest=false,guestId=''){
   parentSelectedStudent=name;
+  currentStudent=name;
   renderParentDashboard();
 }
 async function renderParentStudent(){

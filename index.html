@@ -406,7 +406,7 @@ body{background:#1787f2}
 
   <main id="lessonView" class="page hidden">
     <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 Aan de slag met Paco</div></div>
-    <div class="topbar"><div><button class="secondary" onclick="goBack()">← Terug</button><h2 id="lessonTitle" style="margin-top:14px"></h2></div><div id="lessonAdminButtons" class="row"><button id="editLessonButton" class="hidden" onclick="editCurrentLesson()">✏️ Bewerken</button><button id="archiveLessonButton" class="archive-button hidden" onclick="archiveCurrentLesson()">🗄️ Archiveren</button><button id="deleteLessonButton" class="danger hidden" onclick="deleteCurrentLesson()">🗑️ Verwijderen</button></div></div>
+    <div class="topbar"><div><button class="secondary" onclick="goBack()">← Terug</button><h2 id="lessonTitle" style="margin-top:14px"></h2></div><div id="lessonAdminButtons" class="row"><button id="editLessonButton" class="hidden" onclick="editCurrentLesson()">✏️ Bewerken</button><button id="aiImproveLessonButton" class="hidden" onclick="showAiImproveCurrentLesson()">🤖 AI verbeteren</button><button id="archiveLessonButton" class="archive-button hidden" onclick="archiveCurrentLesson()">🗄️ Archiveren</button><button id="deleteLessonButton" class="danger hidden" onclick="deleteCurrentLesson()">🗑️ Verwijderen</button></div></div>
     <div id="lessonContent"></div>
   </main>
 
@@ -725,7 +725,7 @@ let photoLessonSelectedFile=null;
 function isParentLoggedIn(){return !!currentSession&&PARENT_IDS.has(currentSession.user.id)}
 const CREATOR_IDS = new Set([...PARENT_IDS]);
 function isCreator(){return !!currentSession&&CREATOR_IDS.has(currentSession.user.id)}
-function updateAuthUI(session){currentSession=session;const logged=isParentLoggedIn();document.getElementById('loginButton')?.classList.toggle('hidden',logged);document.getElementById('logoutButton')?.classList.toggle('hidden',!logged);document.querySelectorAll('.side-manage-button').forEach(e=>e.classList.remove('hidden'));document.getElementById('manageButton')?.classList.remove('hidden');document.getElementById('addLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('addLessonButton2')?.classList.toggle('hidden',!logged);document.getElementById('editLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('deleteLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('addTestButton')?.classList.toggle('hidden',!logged);}
+function updateAuthUI(session){currentSession=session;const logged=isParentLoggedIn();document.getElementById('loginButton')?.classList.toggle('hidden',logged);document.getElementById('logoutButton')?.classList.toggle('hidden',!logged);document.querySelectorAll('.side-manage-button').forEach(e=>e.classList.remove('hidden'));document.getElementById('manageButton')?.classList.remove('hidden');document.getElementById('addLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('addLessonButton2')?.classList.toggle('hidden',!logged);document.getElementById('editLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('aiImproveLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('deleteLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('addTestButton')?.classList.toggle('hidden',!logged);document.querySelectorAll('#parentDashboard .parent-sidebar,#aiAssignment .parent-sidebar,#creatorConsole .parent-sidebar').forEach(el=>{el.outerHTML=buildParentSideBarHtml()});}
 function requireParent(){if(!isParentLoggedIn()){showMessage('Alleen ouders kunnen lessen wijzigen. Log eerst in.','error');showHome();return false}return true}
 function buildSideBarHtml(){return `<aside class="sidebar"><button class="side-item" onclick="showHome()"><span class="side-icon">🏠</span>Home</button><button class="side-item" onclick="goToSubjects()"><span class="side-icon">📖</span>Mijn lessen</button><div class="sidebar-subjects"></div><button class="side-item" onclick="showAgenda()"><span class="side-icon">📅</span>Mijn agenda</button><div class="sidebar-subjects agenda-subjects"><button class="sidebar-subject" onclick="showAgendaImport()"><span>📥</span>Agenda invoeren</button></div><button class="side-item" onclick="isParentLoggedIn()?showTestHistory(currentStudent):showLogin()"><span class="side-icon">📝</span>Toetsgeschiedenis</button><div class="sidebar-note">🐾 <strong>Goed bezig!</strong><br>Elke les brengt je een pootje verder.</div></aside>`}
 function buildParentSideBarHtml(){const names=['Zyon','Zenith','Zephon','Testleerling'];const creator=isCreator();return `<aside class="sidebar parent-sidebar"><div class="parent-sidebar-title">⚙️ Beheer</div><div class="parent-sidebar-subtitle">👤 Leerling kiezen</div><div class="parent-sidebar-students">${names.map(name=>{const active=parentSelectedStudent===name?' active':'';return `<button class="parent-sidebar-student${active}" onclick="selectParentStudent('${name}')">👦 <strong>${name}</strong></button>`}).join('')}</div><div class="parent-sidebar-actions"><button class="parent-sidebar-action" onclick="parentStartLesson()">➕ Les maken</button><button class="parent-sidebar-action" onclick="showAiAssignment()">🤖 AI-opdracht</button><button class="parent-sidebar-action" onclick="showTestHistory(parentSelectedStudent)">📝 Toetsgeschiedenis</button><button class="parent-sidebar-action parent-feedback-button" onclick="showParentFeedback()">💬 Feedback & ideeën</button>${creator?'<button class="parent-sidebar-action parent-feedback-button" onclick="showCreatorConsole()">🧠 Creator Console</button>':''}</div><div class="sidebar-note">🐾 <strong>PacoGO Beheer</strong><br>${creator?'Hoofdbeheerder':'Ouder'}omgeving.</div></aside>`}
@@ -1224,6 +1224,27 @@ function showAiAssignment(){
   document.getElementById('aiSourceMaterial').value='';
   document.getElementById('aiAssignmentStatus').textContent='';
   document.getElementById('aiAssignmentDraft').innerHTML='';
+  aiExistingLessonId=null;
+  const heading=document.querySelector('#aiAssignment .page-heading h2');if(heading)heading.textContent='🤖 AI-opdracht';
+  const desc=document.querySelector('#aiAssignment .page-heading p');if(desc)desc.textContent='Beschrijf gewoon wat je wilt maken. PacoGO maakt eerst een voorstel dat je kunt bekijken en verbeteren.';
+}
+function showAiImproveCurrentLesson(){
+  if(!requireParent()||!currentLesson)return;
+  aiExistingLessonId=currentLesson.id;
+  parentSelectedStudent=currentLesson.student;
+  currentStudent=currentLesson.student;
+  hideAll();
+  document.getElementById('aiAssignment').classList.remove('hidden');
+  document.getElementById('aiAssignmentStudent').value=currentLesson.student;
+  document.getElementById('aiAssignmentSubject').value=currentLesson.subject||'';
+  document.getElementById('aiAssignmentTitle').value=currentLesson.title||'';
+  document.getElementById('aiAssignmentPrompt').value='Verbeter deze bestaande les. Houd de inhoud van het materiaal aan, maar verbeter de oefeningen waar dat nodig is. Beschrijf zo nodig wat er in de vragen of antwoorden beter kan.';
+  const source=['UITLEG:',currentLesson.explanation||'(geen aparte uitleg)','', 'OEFENINGEN:'].concat((currentLesson.lesson_items||[]).map((it,i)=>((i+1)+'. Vraag: '+it.question+' | Antwoord: '+it.answer))).join('\n');
+  document.getElementById('aiSourceMaterial').value=source;
+  document.getElementById('aiAssignmentStatus').textContent='Bestaande les geladen. Beschrijf eventueel extra wat je anders wilt zien en maak daarna een AI-voorstel.';
+  document.getElementById('aiAssignmentDraft').innerHTML='';
+  const heading=document.querySelector('#aiAssignment .page-heading h2');if(heading)heading.textContent='🤖 AI verbeteren';
+  const desc=document.querySelector('#aiAssignment .page-heading p');if(desc)desc.textContent='PacoGO maakt een voorstel voor een bestaande les. De huidige les wordt pas aangepast nadat je het voorstel in de editor controleert en opslaat.';
 }
 function showCreatorConsole(){
   if(!isCreator()){showMessage('Alleen de hoofdbeheerder heeft toegang tot de Creator Console.','error');return}
@@ -1395,7 +1416,7 @@ async function restoreArchivedLesson(id){
   showMessage('Les teruggezet.','success');
 }
 function openLesson(id){const l=lessons.find(x=>x.id===id);if(!l)return;currentLesson=l;hideAll();document.getElementById('lessonChoice').classList.remove('hidden');document.getElementById('choiceSubject').textContent=l.subject;document.getElementById('choiceTitle').textContent=l.title;document.getElementById('choiceMeta').textContent=`${l.subject} · ${typeLabel(l.type)} · ${l.lesson_items.length} items`;refreshPageSidebars();const g=document.getElementById('choiceGrid');if(l.type==='words'){g.innerHTML=`<button class="choice" onclick="startPractice('words')"><div class="emoji">🎯</div><h3>Oefenen</h3><p>Fouten komen later opnieuw terug totdat je ze beheerst.</p></button><button class="choice" onclick="startTest('words')"><div class="emoji">📝</div><h3>Toets</h3><p>Alle woorden één keer, zonder hulp.</p></button><button class="choice" onclick="showLesson()"><div class="emoji">📖</div><h3>Bekijken</h3><p>Bekijk de woorden en antwoorden.</p></button>`}else if(l.type==='dictation'){g.innerHTML=`<button class="choice" onclick="startPractice('dictation')"><div class="emoji">✏️</div><h3>Oefenen</h3><p>Luister, typ en herhaal fouten totdat de spelling goed is.</p></button><button class="choice" onclick="startTest('dictation')"><div class="emoji">📝</div><h3>Toets</h3><p>Luister en schrijf alle woorden. Feedback komt pas aan het einde.</p></button><button class="choice" onclick="showLesson()"><div class="emoji">📖</div><h3>Bekijken</h3><p>Bekijk de dicteewoorden.</p></button>`}else if(l.type==='spelling'){g.innerHTML='<button class="choice" onclick="startPractice(\'spelling\')"><div class="emoji">✍️</div><h3>Oefenen</h3><p>Vul beide vormen in.</p></button><button class="choice" onclick="startTest(\'spelling\')"><div class="emoji">📝</div><h3>Toets</h3><p>Vul beide vormen in.</p></button><button class="choice" onclick="showLesson()"><div class="emoji">📖</div><h3>Bekijken</h3><p>Bekijk de vormen.</p></button>'}else if(l.type==='math'){g.innerHTML=`<button class="choice" onclick="startPractice('math')"><div class="emoji">🔢</div><h3>Oefenen</h3><p>Los de sommen op en probeer opnieuw wat nog niet goed ging.</p></button><button class="choice" onclick="startTest('math')"><div class="emoji">📝</div><h3>Toets</h3><p>Maak alle sommen zonder hulp.</p></button><button class="choice" onclick="showLesson()"><div class="emoji">📖</div><h3>Bekijken</h3><p>Bekijk de sommen en antwoorden.</p></button>`}else{g.innerHTML=`<button class="choice" onclick="startQuestions()"><div class="emoji">❓</div><h3>Vragen maken</h3><p>Beantwoord de vragen en controleer jezelf.</p></button><button class="choice" onclick="showLesson()"><div class="emoji">📖</div><h3>Bekijken</h3><p>Bekijk vragen en antwoorden.</p></button>`}}
-function showLesson(){hideAll();document.getElementById('lessonView').classList.remove('hidden');document.getElementById('lessonTitle').textContent=currentLesson.title;refreshPageSidebars();const admin=isParentLoggedIn();document.getElementById('editLessonButton').classList.toggle('hidden',!admin);document.getElementById('archiveLessonButton').classList.toggle('hidden',!admin||!!currentLesson.archived);document.getElementById('deleteLessonButton').classList.toggle('hidden',!admin);const el=document.getElementById('lessonContent');const explanation=currentLesson.explanation?'<div class="lesson-explanation"><div class="lesson-explanation-title">📖 Uitleg</div>'+escapeHtml(currentLesson.explanation)+'</div>':'';el.innerHTML=explanation+(currentLesson.lesson_items.length?currentLesson.lesson_items.map((it,i)=>`<div class="card" style="margin-bottom:10px"><strong>${i+1}. ${escapeHtml(it.question)}</strong><div style="margin-top:8px;white-space:pre-line">${escapeHtml(it.answer)}</div></div>`).join(''):'<div class="empty">Deze les heeft nog geen items.</div>')}
+function showLesson(){hideAll();document.getElementById('lessonView').classList.remove('hidden');document.getElementById('lessonTitle').textContent=currentLesson.title;refreshPageSidebars();const admin=isParentLoggedIn();document.getElementById('editLessonButton').classList.toggle('hidden',!admin);document.getElementById('aiImproveLessonButton').classList.toggle('hidden',!admin);document.getElementById('archiveLessonButton').classList.toggle('hidden',!admin||!!currentLesson.archived);document.getElementById('deleteLessonButton').classList.toggle('hidden',!admin);const el=document.getElementById('lessonContent');const explanation=currentLesson.explanation?'<div class="lesson-explanation"><div class="lesson-explanation-title">📖 Uitleg</div>'+escapeHtml(currentLesson.explanation)+'</div>':'';el.innerHTML=explanation+(currentLesson.lesson_items.length?currentLesson.lesson_items.map((it,i)=>`<div class="card" style="margin-bottom:10px"><strong>${i+1}. ${escapeHtml(it.question)}</strong><div style="margin-top:8px;white-space:pre-line">${escapeHtml(it.answer)}</div></div>`).join(''):'<div class="empty">Deze les heeft nog geen items.</div>')}
 function goBack(){if(activity){activity=null}if(currentSubject)showSubject(currentSubject);else showHome()}
 function leaveActivity(){window.speechSynthesis?.cancel();activity=null;showLessonChoice(currentLesson)}
 function showLessonChoice(l){currentLesson=l;openLesson(l.id)}
@@ -1549,7 +1570,8 @@ async function generateAiAssignment(refinement=''){
   const title=document.getElementById('aiAssignmentTitle').value.trim();
   const basePrompt=document.getElementById('aiAssignmentPrompt').value.trim();
   const sourceMaterial=document.getElementById('aiSourceMaterial').value.trim();
-  const prompt=refinement?basePrompt+'\n\nAANPASSING NA FEEDBACK:\n'+refinement:basePrompt;
+  const priorDraft=refinement&&aiDraft?JSON.stringify({title:aiDraft.title,subject:aiDraft.subject,type:aiDraft.type,explanation:aiDraft.explanation,items:aiDraft.items}).slice(0,14000):'';
+  const prompt=refinement?basePrompt+'\n\nAANPASSING NA FEEDBACK:\n'+refinement+'\n\nHUIDIGE AI-VERSIE DIE JE MOET VERBETEREN:\n'+priorDraft:basePrompt;
   if(!prompt||!sourceMaterial){
     status.textContent='⚠️ Vul eerst in wat je wilt maken en voeg het bronmateriaal toe.';
     return;
@@ -1578,12 +1600,12 @@ async function refineAiAssignment(){
 function useAiDraft(){
   if(!aiDraft||aiDraft.needsClarification)return;
   if(!requireParent())return;
-  currentLesson=null;
+  currentLesson=aiExistingLessonId?lessons.find(l=>Number(l.id)===Number(aiExistingLessonId))||null:null;
   currentStudent=aiDraft.student||document.getElementById('aiAssignmentStudent').value;
   currentSubject=aiDraft.subject||document.getElementById('aiAssignmentSubject').value.trim();
   hideAll();
   document.getElementById('editor').classList.remove('hidden');
-  document.getElementById('editorTitle').textContent='AI-les controleren';
+  document.getElementById('editorTitle').textContent=aiExistingLessonId?'AI-verbetering controleren':'AI-les controleren';
   document.querySelectorAll('input[name=lessonStudent]').forEach(r=>r.checked=r.value===currentStudent);
   document.getElementById('lessonSubject').value=currentSubject;
   document.getElementById('lessonName').value=aiDraft.title||'';
@@ -1593,6 +1615,7 @@ function useAiDraft(){
   document.getElementById('lessonTestDateEnabled').checked=false;
   document.getElementById('lessonTestDatePicker').classList.add('hidden');
   document.getElementById('editorError').classList.add('hidden');
+  aiExistingLessonId=null;
   document.getElementById('wordEditor').innerHTML='';
   document.getElementById('questionEditor').innerHTML='';
   document.getElementById('dictationEditor').innerHTML='';

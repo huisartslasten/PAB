@@ -210,6 +210,11 @@ body{background:#1787f2}
 .agenda-mode-page .agenda-header h2{color:var(--text)}.agenda-mode-page .agenda-page-heading{background:linear-gradient(135deg,#eef8ff,#fff);border:2px solid #dce9f6}
 .agenda-mode-page .agenda-page-heading h2{color:#102b57;font-family:"Baloo 2",Nunito,sans-serif}
 .agenda-mode-page .agenda-page-heading p{color:#667894}
+.agenda-page-heading{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.agenda-page-heading-main{min-width:0}
+.agenda-add-subheading{border:0;background:transparent;color:#126fc9;font-family:"Baloo 2",Nunito,sans-serif;font-size:18px;font-weight:900;cursor:pointer;padding:8px 2px;white-space:nowrap}
+.agenda-add-subheading:hover{text-decoration:underline}
+
 .agenda-topbar{margin:-6px 0 18px}
 .agenda-topbar .big{font-size:17px}
 
@@ -351,15 +356,15 @@ body{background:#1787f2}
 
   <main id="agenda" class="page hidden agenda-mode-page">
     <div class="page-heading agenda-page-heading">
-      <h2>📅 Mijn agenda</h2>
-      <p>Plan wat je moet doen en zie wat eraan komt.</p>
+      <div class="agenda-page-heading-main">
+        <h2>📅 Mijn agenda</h2>
+        <p>Plan wat je moet doen en zie wat eraan komt.</p>
+      </div>
+      <button class="agenda-add-subheading" onclick="showAgendaImport()">📥 Agenda toevoegen</button>
     </div>
     <div class="topbar agenda-topbar">
       <div></div>
-      <div class="row">
-        <button class="big agenda-add-button" onclick="showAgendaImport()">📥 Agenda toevoegen</button>
-        <button class="secondary" onclick="showHome()">← Terug</button>
-      </div>
+      <button class="secondary" onclick="showHome()">← Terug</button>
     </div>
     <div class="agenda-shell agenda-school-shell">
       <div id="agendaContent"></div>

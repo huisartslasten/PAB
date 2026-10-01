@@ -202,6 +202,13 @@ body{background:#1787f2}
 .agenda-today-button{border:1px solid #b9d9f5;background:#eef8ff;color:var(--blue2)}
 .agenda-school-week{border:1px solid var(--border);border-radius:20px;background:#fff;box-shadow:var(--shadow);overflow:hidden}
 .agenda-school-week-title{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:18px 20px;background:#f5fbff;border-bottom:1px solid var(--border)}
+.agenda-school-week-title strong,.agenda-school-week-title-center strong{color:var(--text)}
+.agenda-school-week-title-center{text-align:center;flex:1}
+.agenda-school-week-title-center span{display:block;color:var(--muted);font-weight:700;margin-top:3px}
+.agenda-week-nav-button{white-space:nowrap;border:1px solid #b9d9f5;background:#eaf6ff;color:var(--blue2);border-radius:12px;padding:10px 14px;font-weight:850;cursor:pointer}
+.agenda-week-bottom-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;background:#f8fbfe;border-top:1px solid var(--border)}
+.agenda-mode-page .agenda-header h2{color:var(--text)}
+
 .agenda-school-week-title strong{font-size:22px}
 .agenda-school-week-title span{color:var(--muted);font-weight:700}
 .agenda-week-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
@@ -254,6 +261,10 @@ body{background:#1787f2}
 @media(max-width:700px){
   .agenda-import-choice-grid,.agenda-import-choice-grid-two{grid-template-columns:1fr}
   .agenda-week-days{grid-template-columns:1fr}
+  .agenda-school-week-title,.agenda-week-bottom-nav{flex-wrap:wrap}
+  .agenda-school-week-title-center{order:-1;width:100%}
+  .agenda-week-nav-button{flex:1}
+
   .agenda-week-day{border-right:0;border-bottom:1px solid var(--border);min-height:0}
   .agenda-week-day:last-child{border-bottom:0}
   .agenda-week-nav{gap:8px}
@@ -916,7 +927,7 @@ function agendaGetCurrentWeekStart(){const d=new Date();d.setHours(12,0,0,0);ret
 function agendaSetWeek(date){const d=new Date(date);d.setHours(12,0,0,0);agendaWeekStart=agendaStartOfWeek(d);renderAgenda()}
 function agendaMoveWeek(delta){const base=agendaWeekStart||agendaGetCurrentWeekStart();const d=new Date(base);d.setDate(d.getDate()+delta*7);agendaSetWeek(d)}
 function agendaGoToday(){agendaSetWeek(new Date())}
-function agendaDateRangeLabel(start){const end=new Date(start);end.setDate(end.getDate()+6);return agendaFormatRange(start)+' – '+end.toLocaleDateString('nl-NL',{day:'numeric',month:'short'})}
+function agendaDateRangeLabel(start){return agendaFormatRange(start)}
 function buildAgendaItemsForRender(){
   const custom=getCustomAgendaItems();
   const demo=currentStudent==='Testleerling'?agendaDemoItems.map(item=>({...item,date:agendaDateFromOffset(item.offset),id:'demo_'+item.offset,student:currentStudent,source:'demo'})):[];
@@ -952,9 +963,9 @@ function renderAgenda(){
   }).join('');
   const isCurrent=agendaKey(start)===agendaKey(agendaGetCurrentWeekStart());
   const customCount=getCustomAgendaItems().length;
-  el.innerHTML='<div class="agenda-week-nav"><button class="secondary" type="button" onclick="agendaMoveWeek(-1)">← Vorige week</button><div class="agenda-week-nav-center"><strong>'+((isCurrent)?'Deze week':'Schoolweek')+'</strong><span>'+agendaDateRangeLabel(start)+'</span></div><button class="secondary" type="button" onclick="agendaMoveWeek(1)">Volgende week →</button></div>'+
-  (!isCurrent?'<div class="row" style="justify-content:center;margin-bottom:14px"><button class="agenda-today-button" type="button" onclick="agendaGoToday()">📍 Naar vandaag</button></div>':'')+
-  '<section class="agenda-school-week"><div class="agenda-school-week-title"><strong>📚 '+(isCurrent?'Deze schoolweek':'Schoolweek')+'</strong><span>'+agendaDateRangeLabel(start)+'</span></div><div class="agenda-week-days">'+days+'</div></section>'+
+  const navTop='<div class="agenda-school-week-title"><button class="agenda-week-nav-button" type="button" onclick="agendaMoveWeek(-1)">← Vorige week</button><div class="agenda-school-week-title-center"><strong>📚 Deze schoolweek</strong><span>'+agendaDateRangeLabel(start)+'</span></div><button class="agenda-week-nav-button" type="button" onclick="agendaMoveWeek(1)">Volgende week →</button></div>';
+  const navBottom='<div class="agenda-week-bottom-nav"><button class="agenda-week-nav-button" type="button" onclick="agendaMoveWeek(-1)">← Vorige week</button>'+(!isCurrent?'<button class="agenda-today-button" type="button" onclick="agendaGoToday()">📍 Vandaag</button>':'')+'<button class="agenda-week-nav-button" type="button" onclick="agendaMoveWeek(1)">Volgende week →</button></div>';
+  el.innerHTML='<section class="agenda-school-week">'+navTop+'<div class="agenda-week-days">'+days+'</div>'+navBottom+'</section>'+
   '<div class="agenda-demo-note" style="margin-top:14px">'+(customCount?'📅 '+customCount+' eigen agenda-item'+(customCount===1?'':'s')+'.':'🧪 Proefagenda — voeg echte afspraken toe via <strong>Agenda toevoegen</strong>.')+'</div>';
 }
 function showHome(){hideAll();document.getElementById('home').classList.remove('hidden');renderStudentHome();refreshPageSidebars()}

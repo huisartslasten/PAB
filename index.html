@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V3.4 -->
+<!-- PacoGO TEST V3.5 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -203,6 +203,17 @@ body{background:#1787f2}
 .agenda-import-file{width:100%;padding:14px;border:2px dashed #9bcdf2;border-radius:14px;background:#fff}
 .agenda-import-preview{width:100%;max-height:420px;object-fit:contain;border-radius:14px;background:#102b57;margin-top:14px}
 .agenda-import-status{min-height:24px;margin-top:12px;font-weight:800;color:#126fc9}
+.agenda-ai-busy{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:12px;background:#eef8ff;border:1px solid #b9ddf8}
+.agenda-ai-spinner{width:18px;height:18px;border:3px solid #b9ddf8;border-top-color:#1787f2;border-radius:50%;animation:agendaSpin .8s linear infinite;flex:none}
+.agenda-ai-dots{display:inline-flex;gap:3px;margin-left:2px}
+.agenda-ai-dots span{width:5px;height:5px;border-radius:50%;background:#1787f2;animation:agendaDot 1.2s infinite ease-in-out}
+.agenda-ai-dots span:nth-child(2){animation-delay:.15s}.agenda-ai-dots span:nth-child(3){animation-delay:.3s}
+@keyframes agendaSpin{to{transform:rotate(360deg)}}
+@keyframes agendaDot{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+.agenda-lesson-match{margin-top:9px;padding:9px 10px;border-radius:10px;background:#f1fbf4;border:1px solid #bfe5c8}
+.agenda-lesson-match strong{display:block}
+.agenda-lesson-match button{margin-top:7px;padding:7px 10px;font-size:12px}
+
 .agenda-import-review{display:grid;gap:10px;margin-top:14px}
 .agenda-import-found{border:1px solid var(--border);border-radius:14px;padding:13px;background:#fff}
 .agenda-import-found-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
@@ -628,6 +639,43 @@ function agendaReviewFromText(text,sourceLabel){
   }
   return candidates.slice(0,20);
 }
+function renderAgendaAiProgress(status,step,total){
+  if(!status)return;
+  status.innerHTML='<div class="agenda-ai-busy"><span class="agenda-ai-spinner"></span><span><strong>🤖 PacoGO AI analyseert je schermopname</strong><br><span class="small">Beeld '+step+' van '+total+' wordt bekeken<span class="agenda-ai-dots"><span></span><span></span><span></span></span><br><span class="small">Even geduld — PacoGO is nog bezig.</span></span></div>';
+}
+function normalizeAgendaText(value){
+  return String(value||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+}
+function findAgendaLessonMatch(item){
+  const visible=lessons.filter(l=>l.student===currentStudent&&!l.archived&&l.lesson_items?.length);
+  const itemText=normalizeAgendaText([item.title,item.meta].join(' '));
+  const itemTokens=new Set(itemText.split(/\s+/).filter(t=>t.length>=4&&!['toets','proefwerk','huiswerk','werkblad','thema','hoofdstuk','voor','deze','morgen','vandaag','afmaken','af'].includes(t)));
+  let best=null;
+  visible.forEach(lesson=>{
+    const lessonText=normalizeAgendaText([lesson.subject,lesson.title].join(' '));
+    const lessonTokens=new Set(lessonText.split(/\s+/).filter(t=>t.length>=4&&!['toets','proefwerk','huiswerk','werkblad','thema','hoofdstuk','voor','deze','morgen','vandaag','afmaken','af'].includes(t)));
+    const shared=[...itemTokens].filter(t=>lessonTokens.has(t));
+    let score=shared.length*3;
+    if(normalizeAgendaText(item.title)&&lessonText.includes(normalizeAgendaText(item.title)))score+=6;
+    if(normalizeAgendaText(lesson.title)&&itemText.includes(normalizeAgendaText(lesson.title)))score+=6;
+    if(item.type==='test'&&/toets|proefwerk/.test(itemText))score+=1;
+    if(score>=(best?.score||0))best={lesson,score,shared};
+  });
+  if(!best)return null;
+  const confidence=best.score>=7?'strong':best.score>=5?'possible':'weak';
+  return confidence==='weak'?null:{...best,confidence};
+}
+function startAgendaLessonPractice(lessonId){
+  const lesson=lessons.find(l=>l.id===lessonId&&l.student===currentStudent);
+  if(!lesson)return;
+  currentLesson=lesson;
+  startPractice(lesson.type);
+}
+function agendaLessonMatchHtml(item){
+  const match=findAgendaLessonMatch(item);
+  if(!match)return '';
+  return '<div class="agenda-lesson-match"><strong>🔗 Bijpassende PacoGO-les</strong><span>'+escapeHtml(match.lesson.subject+' — '+match.lesson.title)+'</span><br><button type="button" onclick="startAgendaLessonPractice('+JSON.stringify(match.lesson.id)+')">🐾 Nu oefenen →</button></div>';
+}
 function renderAgendaImportReview(items){
   agendaImportReview=items||[];
   const box=document.getElementById('agendaImportReview');
@@ -642,6 +690,7 @@ function renderAgendaImportReview(items){
       '<select id="agendaReviewType'+i+'"><option value="test">📝 Toets</option><option value="homework">📚 Huiswerk</option><option value="submit">📖 Inleveren</option><option value="activity">🎒 Schoolactiviteit</option><option value="free">🎉 Vrije dag</option><option value="other">📌 Overig</option></select>'+
     '</div>'+
     '<textarea id="agendaReviewMeta'+i+'" maxlength="300" style="margin-top:8px" placeholder="Omschrijving">'+escapeHtml(item.meta||'')+'</textarea>'+
+    agendaLessonMatchHtml(item)+
   '</div>').join('');
   agendaImportReview.forEach((item,i)=>{document.getElementById('agendaReviewType'+i).value=item.type||'other'});
   box.classList.remove('hidden');
@@ -760,7 +809,7 @@ async function analyzeAgendaVideo(){
     }
     const merged=mergeAgendaAiEvents(events);
     renderAgendaImportReview(merged);
-    status.textContent=merged.length?'✅ AI vond '+merged.length+' unieke afspraak'+(merged.length===1?'':'afspraken')+'. Controleer hieronder.':'⚠️ AI kon geen duidelijke afspraken herkennen.';
+    status.innerHTML=merged.length?'<strong>✅ Analyse klaar!</strong><br>AI vond '+merged.length+' unieke afspraak'+(merged.length===1?'':'afspraken')+'. Controleer ze hieronder.':'<strong>⚠️ Analyse klaar.</strong><br>AI kon geen duidelijke afspraken herkennen.';
   }catch(error){
     console.error('Agenda AI video error:',error);
     status.textContent='⚠️ De AI-analyse van de schermopname is mislukt.';
@@ -878,7 +927,7 @@ function renderAgenda(){
           const icon=item.icon||agendaTypeIcon(item.type);
           const custom=String(item.id||'').startsWith('agenda_');
           return '<div class="agenda-event '+(item.type||'other')+(custom?' custom':'')+'"><div class="agenda-event-title">'+icon+' '+escapeHtml(item.title)+'</div><div class="agenda-event-meta">'+escapeHtml(item.meta||agendaTypeLabel(item.type))+'</div>'+
-          (item.lesson?'<div class="agenda-event-action"><button onclick="showAgendaPracticeDemo()">🐾 Nu oefenen</button></div>':'')+
+          (item.lesson?'<div class="agenda-event-action"><button onclick="showAgendaPracticeDemo()">🐾 Nu oefenen</button></div>':agendaLessonMatchHtml(item))+
           (custom?'<div class="agenda-event-actions"><button class="secondary" onclick="editAgendaItem('+JSON.stringify(item.id)+')">✏️ Bewerken</button><button class="danger" onclick="deleteAgendaItem('+JSON.stringify(item.id)+')">🗑️ Verwijderen</button></div>':'')+
           '</div>';
         }).join('')+'</div></div>');

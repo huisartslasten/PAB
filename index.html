@@ -948,7 +948,6 @@ function showAgenda(){
   if(!currentStudent){showHome();return}
   document.getElementById('studentDashboard')?.classList.add('hidden');
   hideAll();document.getElementById('agenda').classList.remove('hidden');
-  document.getElementById('agendaSubtitle').textContent='Voor '+currentStudent;
   agendaWeekStart=agendaWeekStart||agendaGetCurrentWeekStart();
   renderAgenda();
 }

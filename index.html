@@ -207,7 +207,12 @@ body{background:#1787f2}
 .agenda-school-week-title-center span{display:block;color:var(--muted);font-weight:700;margin-top:3px}
 .agenda-week-nav-button{white-space:nowrap;border:1px solid #b9d9f5;background:#eaf6ff;color:var(--blue2);border-radius:12px;padding:10px 14px;font-weight:850;cursor:pointer}
 .agenda-week-bottom-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;background:#f8fbfe;border-top:1px solid var(--border)}
-.agenda-mode-page .agenda-header h2{color:var(--text)}
+.agenda-mode-page .agenda-header h2{color:var(--text)}.agenda-mode-page .agenda-page-heading{background:linear-gradient(135deg,#eef8ff,#fff);border:2px solid #dce9f6}
+.agenda-mode-page .agenda-page-heading h2{color:#102b57;font-family:"Baloo 2",Nunito,sans-serif}
+.agenda-mode-page .agenda-page-heading p{color:#667894}
+.agenda-topbar{margin:-6px 0 18px}
+.agenda-topbar .big{font-size:17px}
+
 
 .agenda-school-week-title strong{font-size:22px}
 .agenda-school-week-title span{color:var(--muted);font-weight:700}
@@ -345,12 +350,18 @@ body{background:#1787f2}
   </main>
 
   <main id="agenda" class="page hidden agenda-mode-page">
-    <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">📅 MIJN AGENDA</div></div>
-    <div class="agenda-shell agenda-school-shell">
-      <div class="agenda-header">
-        <div><h2>📅 Mijn agenda</h2><div id="agendaSubtitle" class="small"></div></div>
-        <div class="row"><button class="big agenda-add-button" onclick="showAgendaImport()">📥 Agenda toevoegen</button><button class="secondary" onclick="showHome()">← Terug</button></div>
+    <div class="page-heading agenda-page-heading">
+      <h2>📅 Mijn agenda</h2>
+      <p>Plan wat je moet doen en zie wat eraan komt.</p>
+    </div>
+    <div class="topbar agenda-topbar">
+      <div></div>
+      <div class="row">
+        <button class="big agenda-add-button" onclick="showAgendaImport()">📥 Agenda toevoegen</button>
+        <button class="secondary" onclick="showHome()">← Terug</button>
       </div>
+    </div>
+    <div class="agenda-shell agenda-school-shell">
       <div id="agendaContent"></div>
     </div>
   </main>

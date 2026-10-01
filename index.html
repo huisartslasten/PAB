@@ -762,20 +762,18 @@ function mergeAgendaAiEvents(allEvents){
   }
   return merged.slice(0,30);
 }
-function renderAgendaAiProgress(status,index,total){
-  if(status)status.textContent='🤖 AI kijkt naar scherm '+index+' / '+total+'...';
-}
+
 async function analyzeAgendaImage(){
   if(!agendaImportFile)return;
   const status=document.getElementById('agendaImageStatus');
   const button=document.getElementById('agendaImageAnalyzeButton');
   try{
     button.disabled=true;
-    status.textContent='🤖 AI leest de screenshot...';
+    status.innerHTML='<div class="agenda-ai-busy"><span class="agenda-ai-spinner"></span><span><strong>🤖 PacoGO AI analyseert je screenshot</strong><br><span class="small">De afbeelding wordt bekeken<span class="agenda-ai-dots"><span></span><span></span><span></span></span><br><span class="small">Even geduld — PacoGO is nog bezig.</span></span></div>';
     const dataUrl=await agendaImageToDataUrl(agendaImportFile);
     const events=await understandAgendaFrame(dataUrl);
     renderAgendaImportReview(events);
-    status.textContent=events.length?'✅ AI vond '+events.length+' afspraak'+(events.length===1?'':'afspraken')+'. Controleer hieronder.':'⚠️ AI kon geen duidelijke afspraak herkennen. Probeer een scherpere screenshot.';
+    status.innerHTML=events.length?'<strong>✅ Analyse klaar!</strong><br>AI vond '+events.length+' afspraak'+(events.length===1?'':'afspraken')+'. Controleer ze hieronder.':'<strong>⚠️ Analyse klaar.</strong><br>AI kon geen duidelijke afspraak herkennen. Probeer een scherpere screenshot.';
   }catch(error){
     console.error('Agenda AI image error:',error);
     status.textContent='⚠️ De AI-analyse van de screenshot is mislukt.';

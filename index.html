@@ -179,14 +179,14 @@ body{background:#1787f2}
 .agenda-demo-note{background:#fff8df;border:1px solid #f3d36b;border-radius:14px;padding:12px 14px;margin-bottom:20px;color:#765800;font-size:13px}
 @media(max-width:700px){.agenda-shell{padding:16px}.agenda-header{align-items:flex-start}.agenda-header h2{font-size:25px}.agenda-day{grid-template-columns:58px minmax(0,1fr);gap:8px}.agenda-day-date{font-size:13px}.agenda-event{padding:10px}}
 /* V3.2 compacte agenda in rechter zijbalk */
-.mini-agenda-card{display:block;width:100%;text-align:left;border:0;cursor:pointer;padding:20px;margin:0 0 18px;background:#fff}
+.mini-agenda-card{display:block;width:100%;text-align:left;border:0;cursor:pointer;padding:20px;margin:0 0 18px;background:#fff;color:var(--text)}
 .mini-agenda-card:hover{transform:translateY(-1px)}
 .mini-agenda-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
-.mini-agenda-head h3{margin:0;font-size:20px}
+.mini-agenda-head h3{margin:0;font-size:20px;color:var(--text)}
 .mini-agenda-head span{font-size:12px;font-weight:900;color:#1478d1}
 .mini-agenda-item{display:grid;grid-template-columns:58px minmax(0,1fr);gap:8px;padding:8px 0;border-top:1px solid #edf2f7}
 .mini-agenda-date{font-size:12px;font-weight:900;color:#52708f}
-.mini-agenda-title{font-size:13px;font-weight:800;line-height:1.25}
+.mini-agenda-title{font-size:13px;font-weight:800;line-height:1.25;color:var(--text)}
 .mini-agenda-empty{font-size:13px;color:var(--muted);padding:6px 0}
 .test-ready-card{margin-top:0}
 </style>
@@ -233,10 +233,6 @@ body{background:#1787f2}
           <p class="stat-big" id="lessonCountStat">0</p><div class="small">lessen beschikbaar</div>
           <div class="progress-wrap"><div class="progress-label"><span>Je bent goed bezig</span><span id="subjectCountStat">0 vakken</span></div><div class="progress"><div id="dashboardProgress" class="progress-bar" style="width:15%"></div></div></div>
           <div class="card motivation"><strong>📈 Je voorbereiding</strong><br><span class="small prep-note">Dit cijfer groeit wanneer je onderdelen tijdens het oefenen 3× achter elkaar goed maakt.</span></div>
-        </div>
-        <div id="testCalendar" class="card side-card test-calendar-card">
-          <div class="calendar-head"><h3>📅 Toetskalender</h3><button id="addTestButton" class="calendar-add hidden" onclick="addTestDate()">+ Toets</button></div>
-          <div id="testCalendarList" class="test-calendar-list"></div>
         </div>
       </aside>
     </div>

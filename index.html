@@ -153,6 +153,31 @@ body{background:#1787f2}
 .photo-uploaded{background:#ddf7e5;color:#166534;border-radius:14px;padding:12px;margin-top:14px;font-weight:800}
 .photo-direct{border-top:2px solid #e8eff6;padding-top:20px;margin-top:24px}
 @media(max-width:700px){.photo-qr-card{grid-template-columns:1fr;text-align:center}.photo-qr-code{margin:auto}.photo-qr-card .row{justify-content:center}}
+
+/* V3.2 slimme agenda */
+.test-student-card{border:2px dashed #7bbcf3;background:linear-gradient(145deg,#f5fbff,#eaf7ff)}
+.agenda-shell{padding:24px;max-width:900px;margin:0 auto}
+.agenda-header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:20px}
+.agenda-header h2{margin:0 0 4px;font-size:30px}
+.agenda-week{margin:24px 0}
+.agenda-week-title{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--border)}
+.agenda-week-title strong{font-size:20px}
+.agenda-week-title span{font-size:13px;color:var(--muted);font-weight:800}
+.agenda-day{display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;padding:10px 0;border-bottom:1px solid #edf2f7}
+.agenda-day:last-child{border-bottom:0}
+.agenda-day-date{font-weight:900;color:#38577d;padding-top:4px}
+.agenda-day-date .day-name{display:block;font-size:13px;color:var(--muted)}
+.agenda-events{display:grid;gap:8px}
+.agenda-event{border:1px solid var(--border);border-left:5px solid #1787f2;border-radius:14px;padding:11px 13px;background:#fff;box-shadow:0 5px 14px rgba(16,43,87,.06)}
+.agenda-event.test{border-left-color:#ffc928}
+.agenda-event.free{border-left-color:#43b96b}
+.agenda-event-title{font-weight:900}
+.agenda-event-meta{font-size:13px;color:var(--muted);margin-top:3px}
+.agenda-event-action{margin-top:8px}
+.agenda-event-action button{padding:7px 11px;font-size:13px}
+.agenda-empty{padding:18px;text-align:center;color:var(--muted);background:#f7fbff;border-radius:14px}
+.agenda-demo-note{background:#fff8df;border:1px solid #f3d36b;border-radius:14px;padding:12px 14px;margin-bottom:20px;color:#765800;font-size:13px}
+@media(max-width:700px){.agenda-shell{padding:16px}.agenda-header{align-items:flex-start}.agenda-header h2{font-size:25px}.agenda-day{grid-template-columns:58px minmax(0,1fr);gap:8px}.agenda-day-date{font-size:13px}.agenda-event{padding:10px}}
 </style>
 </head>
 <body>
@@ -323,7 +348,7 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div class="version-badge">PacoGO TEST V3.1</div>
+  <div class="version-badge">PacoGO TEST V3.2</div>
 
 <div id="globalMessage"></div>
 
@@ -357,7 +382,7 @@ let photoLessonSelectedFile=null;
 function isParentLoggedIn(){return !!currentSession&&PARENT_IDS.has(currentSession.user.id)}
 function updateAuthUI(session){currentSession=session;const logged=isParentLoggedIn();document.getElementById('loginButton')?.classList.toggle('hidden',logged);document.getElementById('logoutButton')?.classList.toggle('hidden',!logged);document.querySelectorAll('.side-manage-button').forEach(e=>e.classList.remove('hidden'));document.getElementById('manageButton')?.classList.remove('hidden');document.getElementById('addLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('addLessonButton2')?.classList.toggle('hidden',!logged);document.getElementById('editLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('deleteLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('addTestButton')?.classList.toggle('hidden',!logged);}
 function requireParent(){if(!isParentLoggedIn()){showMessage('Alleen ouders kunnen lessen wijzigen. Log eerst in.','error');showHome();return false}return true}
-function buildSideBarHtml(){return `<aside class="sidebar"><button class="side-item" onclick="showHome()"><span class="side-icon">🏠</span>Home</button><button class="side-item" onclick="goToSubjects()"><span class="side-icon">📖</span>Mijn lessen</button><div class="sidebar-subjects"></div><button class="side-item" onclick="isParentLoggedIn()?showTestHistory(currentStudent):showLogin()"><span class="side-icon">📝</span>Toetsgeschiedenis</button><div class="sidebar-note">🐾 <strong>Goed bezig!</strong><br>Elke les brengt je een pootje verder.</div></aside>`}
+function buildSideBarHtml(){return `<aside class="sidebar"><button class="side-item" onclick="showHome()"><span class="side-icon">🏠</span>Home</button><button class="side-item" onclick="goToSubjects()"><span class="side-icon">📖</span>Mijn lessen</button><div class="sidebar-subjects"></div><button class="side-item" onclick="showAgenda()"><span class="side-icon">📅</span>Mijn agenda</button><button class="side-item" onclick="isParentLoggedIn()?showTestHistory(currentStudent):showLogin()"><span class="side-icon">📝</span>Toetsgeschiedenis</button><div class="sidebar-note">🐾 <strong>Goed bezig!</strong><br>Elke les brengt je een pootje verder.</div></aside>`}
 function buildParentSideBarHtml(){const names=['Zyon','Zenith','Zephon'];return `<aside class="sidebar parent-sidebar"><div class="parent-sidebar-title">⚙️ Beheer</div><div class="parent-sidebar-subtitle">👤 Leerling kiezen</div><div class="parent-sidebar-students">${names.map(name=>{const active=parentSelectedStudent===name?' active':'';return `<button class="parent-sidebar-student${active}" onclick="selectParentStudent('${name}')">👦 <strong>${name}</strong></button>`}).join('')}</div><div class="parent-sidebar-actions"><button class="parent-sidebar-action" onclick="parentStartLesson()">➕ Les maken</button><button class="parent-sidebar-action" onclick="showTestHistory(parentSelectedStudent)">📝 Toetsgeschiedenis</button><button class="parent-sidebar-action parent-feedback-button" onclick="showParentFeedback()">💬 Feedback & ideeën</button></div><div class="sidebar-note">🐾 <strong>PacoGO Beheer</strong><br>Kies een leerling om te beheren.</div></aside>`}
 function buildSideRightHtml(includeManage=true){return `<aside class="side-panel">${includeManage?'<button class="parent-button side-manage-button hidden" onclick="isParentLoggedIn()?showParentDashboard():showLogin()">⚙️ Beheer</button>':''}<div class="card side-card"><h3>🎯 Toets-klaar</h3><p class="stat-big side-prep-percent">0%</p><div class="small">van je onderdelen beheerst</div><div class="progress-wrap"><div class="progress-label"><span>3× achter elkaar goed = beheerst</span><span class="side-subject-count">0 vakken</span></div><div class="progress"><div class="progress-bar side-progress-bar" style="width:10%"></div></div></div><div class="card motivation"><strong>🎯 Goed bezig!</strong><br><span class="small">Elke dag een beetje oefenen maakt verschil.</span></div></div><div class="card side-card test-calendar-card side-calendar-mini"><h3>📅 Toetskalender</h3><div class="side-calendar-list"></div></div></aside>`}
 function installPageSidebars(){document.querySelectorAll('.page').forEach(page=>{if(page.id==='home'||page.dataset.sidesReady)return;const banner=page.querySelector(':scope > .page-paco-banner');if(banner)banner.remove();const backWrap=document.createElement('div');backWrap.className='page-back-above-left';const directButtons=[...page.querySelectorAll(':scope > .secondary')];directButtons.forEach(btn=>{if(/Terug|Stoppen|Annuleren/.test(btn.textContent||'')){backWrap.appendChild(btn);}});page.querySelectorAll(':scope > .topbar').forEach(top=>{const btn=[...top.querySelectorAll('.secondary')].find(b=>/Terug|Stoppen|Annuleren/.test(b.textContent||''));if(btn){backWrap.appendChild(btn);if(!top.querySelector(':scope > div > button.secondary')&&top.textContent.trim()==='')top.remove();}});const shell=document.createElement('div');shell.className='page-side-layout';const left=document.createElement('div');left.className='page-side-left';left.innerHTML=page.id==='parentDashboard'?buildParentSideBarHtml():buildSideBarHtml();const center=document.createElement('div');center.className='page-side-center';const right=document.createElement('div');right.className='page-side-right';right.innerHTML=buildSideRightHtml(page.id!=='parentDashboard');if(backWrap.childElementCount)left.insertAdjacentElement('afterbegin',backWrap);while(page.firstChild)center.appendChild(page.firstChild);shell.append(left,center,right);page.appendChild(shell);if(banner)page.insertBefore(banner,shell);page.dataset.sidesReady='1';});}
@@ -396,6 +421,50 @@ function refreshPageSidebars(){
   document.querySelectorAll('.side-calendar-list').forEach(e=>e.innerHTML=html);
 }
 function hideAll(){document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));window.speechSynthesis?.cancel()}
+
+/* V3.2 slimme agenda — eerst alleen Testleerling */
+const agendaDemoItems=[
+  {offset:1,type:'homework',icon:'📚',title:'Rekenen maken',meta:'Bladzijde 42–43'},
+  {offset:3,type:'test',icon:'📝',title:'Toets spelling',meta:'Hoofdstuk 3',lesson:true},
+  {offset:5,type:'homework',icon:'📖',title:'Lezen',meta:'20 minuten lezen'},
+  {offset:9,type:'test',icon:'📝',title:'Toets rekenen',meta:'Breuken',lesson:true},
+  {offset:12,type:'free',icon:'🎉',title:'Vrije dag',meta:'Geen school'},
+  {offset:16,type:'activity',icon:'🎒',title:'Schoolactiviteit',meta:'Meer informatie volgt'},
+  {offset:23,type:'homework',icon:'📚',title:'Engels oefenen',meta:'Themawoorden week 6'}
+];
+function agendaDateFromOffset(offset){const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+offset);return d}
+function agendaStartOfWeek(d){const x=new Date(d);x.setHours(12,0,0,0);const day=x.getDay();const diff=day===0?-6:1-day;x.setDate(x.getDate()+diff);return x}
+function agendaKey(d){return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')}
+function agendaFormatRange(start){const end=new Date(start);end.setDate(end.getDate()+6);const f=new Intl.DateTimeFormat('nl-NL',{day:'numeric',month:'short'});return f.format(start)+' – '+f.format(end)}
+function agendaDayLabel(d){return new Intl.DateTimeFormat('nl-NL',{weekday:'short'}).format(d).replace('.','')}
+function agendaDateLabel(d){return new Intl.DateTimeFormat('nl-NL',{day:'numeric',month:'short'}).format(d)}
+function showAgenda(){
+  if(!currentStudent){showHome();return}
+  hideAll();
+  document.getElementById('agenda').classList.remove('hidden');
+  document.getElementById('agendaSubtitle').textContent='Voor '+currentStudent;
+  renderAgenda();
+  refreshPageSidebars();
+}
+function renderAgenda(){
+  const el=document.getElementById('agendaContent');if(!el)return;
+  if(currentStudent!=='Testleerling'){
+    el.innerHTML='<div class="agenda-demo-note">🧪 De slimme agenda bouwen we eerst met <strong>Testleerling</strong>. Kies Testleerling op de startpagina om de proefagenda te bekijken.</div><div class="agenda-empty">Voor deze leerling staat de agenda nog niet aan.</div>';
+    return;
+  }
+  const byWeek=new Map();
+  const today=new Date();today.setHours(12,0,0,0);
+  const start=agendaStartOfWeek(today);
+  for(let w=0;w<6;w++){const week=new Date(start);week.setDate(start.getDate()+w*7);byWeek.set(agendaKey(week),{start:week,days:new Map()})}
+  agendaDemoItems.forEach(item=>{const d=agendaDateFromOffset(item.offset);const week=agendaStartOfWeek(d);const wk=byWeek.get(agendaKey(week));if(!wk)return;if(!wk.days.has(agendaKey(d)))wk.days.set(agendaKey(d),[]);wk.days.get(agendaKey(d)).push(item)});
+  const weeks=[...byWeek.values()];
+  el.innerHTML='<div class="agenda-demo-note">🧪 <strong>Dit is de proefagenda van Testleerling.</strong> We testen hier eerst de slimme weekweergave. Geen maanden om doorheen te klikken — gewoon naar beneden scrollen.</div>'+weeks.map((week,wi)=>{
+    const days=[];for(let i=0;i<7;i++){const d=new Date(week.start);d.setDate(d.getDate()+i);const items=week.days.get(agendaKey(d))||[];if(!items.length)continue;days.push('<div class="agenda-day"><div class="agenda-day-date"><span class="day-name">'+agendaDayLabel(d)+'</span>'+agendaDateLabel(d)+'</div><div class="agenda-events">'+items.map(item=>'<div class="agenda-event '+item.type+'"><div class="agenda-event-title">'+item.icon+' '+escapeHtml(item.title)+'</div><div class="agenda-event-meta">'+escapeHtml(item.meta)+'</div>'+(item.lesson?'<div class="agenda-event-action"><button onclick="showAgendaPracticeDemo()">🐾 Nu oefenen</button></div>':'')+'</div>').join('')+'</div></div>')}
+    return '<section class="agenda-week"><div class="agenda-week-title"><strong>'+(wi===0?'Deze week':wi===1?'Volgende week':'Week daarna')+'</strong><span>'+agendaFormatRange(week.start)+'</span></div>'+(days.length?days.join(''):'<div class="agenda-empty">Geen afspraken of schoolitems. Een rustige week. 😊</div>')+'</section>';
+  }).join('');
+}
+function showAgendaPracticeDemo(){showMessage('🧪 Dit wordt later gekoppeld aan de bijbehorende PacoGO-les.','success')}
+
 function showHome(){hideAll();document.getElementById('home').classList.remove('hidden');renderStudentHome();refreshPageSidebars()}
 function renderStudentHome(){const chooser=document.getElementById('studentChooser'),dash=document.getElementById('studentDashboard');if(currentStudent){chooser.classList.add('hidden');dash.classList.remove('hidden');document.getElementById('sidebarGreeting').textContent='Hoi '+currentStudent+'! 🐶';renderSubjects();renderTestCalendar();refreshPageSidebars()}else{chooser.classList.remove('hidden');dash.classList.add('hidden')}}
 function selectStudent(name){currentStudent=name;showHome()}

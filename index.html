@@ -336,10 +336,22 @@ body{background:#1787f2}
 
       <div id="agendaImportManualStep" class="agenda-import-step hidden">
         <h3>✍️ Handmatig toevoegen</h3>
-        <div class="field"><label for="agendaManualDate">Datum</label><input id="agendaManualDate" class="calendar-date-input" type="date"></div>
+        <div class="field"><label>Wat wil je toevoegen?</label><div class="row">
+          <label class="radio-choice"><input type="radio" name="agendaManualRange" value="single" checked onchange="setManualAgendaRange('single')"> Eén datum</label>
+          <label class="radio-choice"><input type="radio" name="agendaManualRange" value="range" onchange="setManualAgendaRange('range')"> Periode</label>
+        </div></div>
+        <div id="agendaManualSingleFields">
+          <div class="field"><label for="agendaManualDate">Datum</label><input id="agendaManualDate" class="calendar-date-input" type="date"></div>
+        </div>
+        <div id="agendaManualRangeFields" class="hidden">
+          <div class="row">
+            <div class="field" style="flex:1"><label for="agendaManualStartDate">Van</label><input id="agendaManualStartDate" class="calendar-date-input" type="date"></div>
+            <div class="field" style="flex:1"><label for="agendaManualEndDate">Tot en met</label><input id="agendaManualEndDate" class="calendar-date-input" type="date"></div>
+          </div>
+        </div>
         <div class="field"><label for="agendaManualType">Type</label><select id="agendaManualType"><option value="test">📝 Toets</option><option value="homework">📚 Huiswerk</option><option value="submit">📖 Inleveren</option><option value="activity">🎒 Schoolactiviteit</option><option value="free">🎉 Vrije dag</option><option value="other">📌 Overig</option></select></div>
-        <div class="field"><label for="agendaManualTitle">Titel</label><input id="agendaManualTitle" maxlength="120" placeholder="Bijvoorbeeld Toets rekenen"></div>
-        <div class="field"><label for="agendaManualMeta">Omschrijving</label><textarea id="agendaManualMeta" maxlength="300" placeholder="Bijvoorbeeld Breuken hoofdstuk 3"></textarea></div>
+        <div class="field"><label for="agendaManualTitle">Titel</label><input id="agendaManualTitle" maxlength="120" placeholder="Bijvoorbeeld Herfstvakantie"></div>
+        <div class="field"><label for="agendaManualMeta">Omschrijving</label><textarea id="agendaManualMeta" maxlength="300" placeholder="Bijvoorbeeld Geen school"></textarea></div>
         <div class="agenda-import-actions"><button class="big" type="button" onclick="addManualAgendaItem()">➕ Toevoegen</button></div>
       </div>
 
@@ -754,15 +766,39 @@ async function analyzeAgendaVideo(){
     status.textContent='⚠️ De AI-analyse van de schermopname is mislukt.';
   }finally{button.disabled=false}
 }
+function setManualAgendaRange(mode){
+  document.getElementById('agendaManualSingleFields')?.classList.toggle('hidden',mode!=='single');
+  document.getElementById('agendaManualRangeFields')?.classList.toggle('hidden',mode!=='range');
+}
 function addManualAgendaItem(){
+  const mode=document.querySelector('input[name="agendaManualRange"]:checked')?.value||'single';
   const date=document.getElementById('agendaManualDate').value;
+  const startDate=document.getElementById('agendaManualStartDate').value;
+  const endDate=document.getElementById('agendaManualEndDate').value;
   const title=document.getElementById('agendaManualTitle').value.trim();
   const type=document.getElementById('agendaManualType').value;
   const meta=document.getElementById('agendaManualMeta').value.trim();
-  if(!date||!title){showMessage('Vul minimaal datum en titel in.','error');return}
   const items=getCustomAgendaItems();
-  items.push({id:'agenda_'+Date.now(),student:currentStudent,date,type,title,meta,source:'handmatig',createdAt:new Date().toISOString()});
-  saveCustomAgendaItems([...items,...getCustomAgendaItems(currentStudent).filter(x=>!items.some(y=>y.id===x.id))]);
+  const now=new Date().toISOString();
+
+  if(!title){showMessage('Vul minimaal een titel in.','error');return}
+
+  if(mode==='single'){
+    if(!date){showMessage('Kies een datum.','error');return}
+    items.push({id:'agenda_'+Date.now(),student:currentStudent,date,type,title,meta,source:'handmatig',createdAt:now});
+  }else{
+    if(!startDate||!endDate){showMessage('Kies een begin- en einddatum.','error');return}
+    if(endDate<startDate){showMessage('De einddatum moet op of na de begindatum liggen.','error');return}
+    const start=new Date(startDate+'T12:00:00');
+    const end=new Date(endDate+'T12:00:00');
+    const periodId='agenda_'+Date.now();
+    for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1)){
+      const dateKey=agendaKey(d);
+      items.push({id:periodId+'_'+dateKey,student:currentStudent,date:dateKey,type,title,meta,source:'handmatig-periode',periodId,periodStart:startDate,periodEnd:endDate,createdAt:now});
+    }
+  }
+
+  saveCustomAgendaItems(items);
   showMessage('📅 Agenda-item toegevoegd.','success');
   document.getElementById('agendaManualTitle').value='';
   document.getElementById('agendaManualMeta').value='';

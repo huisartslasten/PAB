@@ -225,21 +225,32 @@ body{background:#1787f2}
 
 .agenda-school-week-title strong{font-size:22px}
 .agenda-school-week-title span{color:var(--muted);font-weight:700}
-.agenda-week-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
-.agenda-week-day{min-width:0;min-height:250px;padding:13px;border-right:1px solid var(--border);background:#fff}
-.agenda-week-day:last-child{border-right:0}
+.agenda-week-days{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:auto auto}
+.agenda-weekday-row{display:grid;grid-column:1/-1;grid-template-columns:repeat(5,minmax(0,1fr));min-height:300px}
+.agenda-weekend-row{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--border);height:122px}
+.agenda-week-day{min-width:0;min-height:0;padding:13px;border-right:1px solid var(--border);background:#fff;overflow:hidden}
+.agenda-weekday-row .agenda-week-day:last-child,.agenda-weekend-row .agenda-week-day:last-child{border-right:0}
 .agenda-week-day.weekend{background:#fafcff}
 .agenda-week-day.today{background:#fff4cf;box-shadow:inset 0 4px 0 #f4c43f}
 .agenda-week-day-head{text-align:center;margin-bottom:12px}
+.agenda-weekend-row .agenda-week-day-head{display:flex;align-items:baseline;gap:8px;text-align:left;margin-bottom:7px}
 .agenda-week-day-head .day-name{display:block;font-weight:900;font-size:15px}
+.agenda-weekend-row .agenda-week-day-head .day-name{font-size:14px}
 .agenda-week-day-head .day-date{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.agenda-weekend-row .agenda-week-day-head .day-date{font-size:12px}
 .agenda-today-pill{display:inline-block;margin-top:6px;padding:3px 8px;border-radius:999px;background:#f4c43f;color:#5c4300;font-size:11px;font-weight:900}
 .agenda-day-empty{text-align:center;color:#a0adbb;font-size:13px;margin-top:34px}
-.agenda-week-event{padding:11px;border-radius:13px;background:#f7fbff;border:1px solid #d9e9f5;margin-bottom:9px}
+.agenda-weekend-row .agenda-day-empty{margin-top:0;text-align:left}
+.agenda-week-events{display:grid;gap:7px}
+.agenda-week-event{padding:9px;border-radius:12px;background:#f7fbff;border:1px solid #d9e9f5;margin-bottom:0;overflow:hidden}
 .agenda-week-day.today .agenda-week-event{background:#fffdf4;border-color:#ead78c}
-.agenda-week-event-title{font-weight:900;line-height:1.25}
-.agenda-week-event-meta{color:var(--muted);font-size:13px;margin-top:5px;line-height:1.3}
-.agenda-week-event .agenda-event-actions{margin-top:8px}
+.agenda-week-event-title{font-weight:900;line-height:1.22;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.agenda-week-event-meta{color:var(--muted);font-size:12px;margin-top:4px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.agenda-week-event .agenda-event-actions{margin-top:7px}
+.agenda-weekend-row .agenda-week-event{display:flex;align-items:center;gap:8px;padding:7px 9px}
+.agenda-weekend-row .agenda-week-event-title{-webkit-line-clamp:2}
+.agenda-weekend-row .agenda-event-actions,.agenda-weekend-row .agenda-event-action,.agenda-weekend-row .agenda-lesson-match{display:none}
+.agenda-more{font-size:12px;font-weight:900;color:#667894;margin-top:5px}
 
 .agenda-import-choice{background:linear-gradient(145deg,#eaf7ff,#d7efff);border:2px solid #8bcfff;color:var(--text);box-shadow:none;text-align:left;min-height:125px}
 .agenda-import-choice.active{border-color:#1787f2;box-shadow:0 0 0 3px rgba(23,135,242,.12)}
@@ -274,13 +285,14 @@ body{background:#1787f2}
 .agenda-event.custom{border-left-color:#9b78ed}
 @media(max-width:700px){
   .agenda-import-choice-grid,.agenda-import-choice-grid-two{grid-template-columns:1fr}
-  .agenda-week-days{grid-template-columns:1fr}
+  .agenda-week-days{display:block}
+  .agenda-weekday-row,.agenda-weekend-row{display:block;height:auto;min-height:0}
+  .agenda-week-day{border-right:0;border-bottom:1px solid var(--border);min-height:110px}
+  .agenda-weekend-row{border-top:0}
+  .agenda-weekend-row .agenda-week-day:last-child{border-bottom:0}
   .agenda-school-week-title,.agenda-week-bottom-nav{flex-wrap:wrap}
   .agenda-school-week-title-center{order:-1;width:100%}
   .agenda-week-nav-button{flex:1}
-
-  .agenda-week-day{border-right:0;border-bottom:1px solid var(--border);min-height:0}
-  .agenda-week-day:last-child{border-bottom:0}
   .agenda-week-nav{gap:8px}
   .agenda-week-nav-center strong{font-size:18px}
   .agenda-import-found-grid{grid-template-columns:1fr}
@@ -1039,23 +1051,30 @@ function renderAgenda(){
   const itemsByDay=new Map();
   for(let i=0;i<7;i++){const d=new Date(start);d.setDate(d.getDate()+i);itemsByDay.set(agendaKey(d),[])}
   allItems.forEach(item=>{if(itemsByDay.has(item.date))itemsByDay.get(item.date).push(item)});
-  const days=[...itemsByDay.entries()].map(([key,items])=>{
-    const d=new Date(key+'T12:00:00'),isToday=key===todayKey,weekend=d.getDay()===0||d.getDay()===6;
+  const dayEntries=[...itemsByDay.entries()];
+  const renderDay=(key,items,isWeekend)=>{
+    const d=new Date(key+'T12:00:00'),isToday=key===todayKey;
     const dayName=d.toLocaleDateString('nl-NL',{weekday:'long'}),dayDate=d.toLocaleDateString('nl-NL',{day:'numeric',month:'short'});
-    const events=items.length?items.map(item=>{
+    const limit=isWeekend?2:3;
+    const visible=items.slice(0,limit);
+    const more=items.length-limit;
+    const events=visible.length?visible.map(item=>{
       const icon=item.icon||agendaTypeIcon(item.type),custom=String(item.id||'').startsWith('agenda_');
       return '<div class="agenda-week-event"><div class="agenda-week-event-title">'+icon+' '+escapeHtml(item.title)+'</div><div class="agenda-week-event-meta">'+escapeHtml(item.meta||agendaTypeLabel(item.type))+'</div>'+
       (item.lesson?'<div class="agenda-event-action"><button onclick="showAgendaPracticeDemo()">🐾 Nu oefenen</button></div>':agendaLessonMatchHtml(item))+
-      (custom?'<div class="agenda-event-actions"><button type="button" class="secondary" onclick="editAgendaItem(\''+escapeAttr(item.id)+'\')">✏️ Bewerken</button><button type="button" class="danger" onclick="deleteAgendaItem(\''+escapeAttr(item.id)+'\')">🗑️ Verwijderen</button></div>':'')+
+      (custom?'<div class="agenda-event-actions"><button type="button" class="secondary" onclick="editAgendaItem(\\''+escapeAttr(item.id)+'\\')">✏️ Bewerken</button><button type="button" class="danger" onclick="deleteAgendaItem(\\''+escapeAttr(item.id)+'\\')">🗑️ Verwijderen</button></div>':'')+
       '</div>';
-    }).join(''):'<div class="agenda-day-empty">'+(weekend?'Vrije dag 🏠':'Geen afspraken')+'</div>';
-    return '<div class="agenda-week-day '+(weekend?'weekend ':'')+(isToday?'today':'')+'"><div class="agenda-week-day-head"><span class="day-name">'+dayName+'</span><span class="day-date">'+dayDate+'</span>'+(isToday?'<span class="agenda-today-pill">VANDAAG</span>':'')+'</div>'+events+'</div>';
-  }).join('');
+    }).join(''):'<div class="agenda-day-empty">'+(isWeekend?'Vrije dag 🏠':'Geen afspraken')+'</div>';
+    const moreHtml=more>0?'<div class="agenda-more">+ '+more+' meer</div>':'';
+    return '<div class="agenda-week-day '+(isWeekend?'weekend ':'')+(isToday?'today':'')+'"><div class="agenda-week-day-head"><span class="day-name">'+dayName+'</span><span class="day-date">'+dayDate+'</span>'+(isToday?'<span class="agenda-today-pill">VANDAAG</span>':'')+'</div><div class="agenda-week-events">'+events+'</div>'+moreHtml+'</div>';
+  };
+  const weekdayDays=dayEntries.slice(0,5).map(([key,items])=>renderDay(key,items,false)).join('');
+  const weekendDays=dayEntries.slice(5,7).map(([key,items])=>renderDay(key,items,true)).join('');
   const isCurrent=agendaKey(start)===agendaKey(agendaGetCurrentWeekStart());
   const customCount=getCustomAgendaItems().length;
   const navTop='<div class="agenda-school-week-title"><button class="agenda-week-nav-button" type="button" onclick="agendaMoveWeek(-1)">← Vorige week</button><div class="agenda-school-week-title-center"><strong>📚 Deze schoolweek</strong><span>'+agendaDateRangeLabel(start)+'</span></div><button class="agenda-week-nav-button" type="button" onclick="agendaMoveWeek(1)">Volgende week →</button></div>';
   const navBottom='<div class="agenda-week-bottom-nav"><button class="agenda-week-nav-button" type="button" onclick="agendaMoveWeek(-1)">← Vorige week</button>'+(!isCurrent?'<button class="agenda-today-button" type="button" onclick="agendaGoToday()">📍 Vandaag</button>':'')+'<button class="agenda-week-nav-button" type="button" onclick="agendaMoveWeek(1)">Volgende week →</button></div>';
-  el.innerHTML='<section class="agenda-school-week">'+navTop+'<div class="agenda-week-days">'+days+'</div>'+navBottom+'</section>'+
+  el.innerHTML='<section class="agenda-school-week">'+navTop+'<div class="agenda-week-days"><div class="agenda-weekday-row">'+weekdayDays+'</div><div class="agenda-weekend-row">'+weekendDays+'</div></div>'+navBottom+'</section>'+
   '<div class="agenda-demo-note" style="margin-top:14px">'+(customCount?'📅 '+customCount+' eigen agenda-item'+(customCount===1?'':'s')+'.':'🧪 Proefagenda — voeg echte afspraken toe via <strong>Agenda toevoegen</strong>.')+'</div>';
 }
 function showHome(){hideAll();document.getElementById('home').classList.remove('hidden');renderStudentHome();refreshPageSidebars()}

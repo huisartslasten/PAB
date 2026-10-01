@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V3.1 -->
+<!-- PacoGO TEST V3.3 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -189,6 +189,35 @@ body{background:#1787f2}
 .mini-agenda-title{font-size:13px;font-weight:800;line-height:1.25;color:var(--text)}
 .mini-agenda-empty{font-size:13px;color:var(--muted);padding:6px 0}
 .test-ready-card{margin-top:0}
+
+/* V3.3 agenda import */
+.agenda-import-card{max-width:900px;margin:0 auto}
+.agenda-import-choice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0}
+.agenda-import-choice{background:linear-gradient(145deg,#eaf7ff,#d7efff);border:2px solid #8bcfff;color:var(--text);box-shadow:none;text-align:left;min-height:125px}
+.agenda-import-choice.active{border-color:#1787f2;box-shadow:0 0 0 3px rgba(23,135,242,.12)}
+.agenda-import-choice .emoji{font-size:38px;display:block;margin-bottom:8px}
+.agenda-import-choice strong{font-size:18px;display:block}
+.agenda-import-choice span{font-size:13px;color:var(--muted);display:block;margin-top:4px;line-height:1.35}
+.agenda-import-step{background:#f7fbff;border:1px solid var(--border);border-radius:16px;padding:16px;margin-top:16px}
+.agenda-import-step h3{margin:0 0 8px}
+.agenda-import-file{width:100%;padding:14px;border:2px dashed #9bcdf2;border-radius:14px;background:#fff}
+.agenda-import-preview{width:100%;max-height:420px;object-fit:contain;border-radius:14px;background:#102b57;margin-top:14px}
+.agenda-import-status{min-height:24px;margin-top:12px;font-weight:800;color:#126fc9}
+.agenda-import-review{display:grid;gap:10px;margin-top:14px}
+.agenda-import-found{border:1px solid var(--border);border-radius:14px;padding:13px;background:#fff}
+.agenda-import-found-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.agenda-import-found input,.agenda-import-found textarea,.agenda-import-found select{width:100%;padding:10px;border:1px solid #cdddec;border-radius:10px;background:#fff;color:var(--text)}
+.agenda-import-found-grid{display:grid;grid-template-columns:150px 1fr 150px;gap:8px;margin-top:10px}
+.agenda-import-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:16px}
+.agenda-add-button{margin-left:8px}
+.agenda-event-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.agenda-event-actions button{padding:6px 9px;font-size:12px}
+.agenda-event.custom{border-left-color:#9b78ed}
+@media(max-width:700px){
+  .agenda-import-choice-grid{grid-template-columns:1fr}
+  .agenda-import-found-grid{grid-template-columns:1fr}
+  .agenda-add-button{margin:8px 0 0;width:100%}
+}
 </style>
 </head>
 <body>
@@ -266,9 +295,62 @@ body{background:#1787f2}
     <div class="card agenda-shell">
       <div class="agenda-header">
         <div><h2>📅 Mijn agenda</h2><div id="agendaSubtitle" class="small"></div></div>
-        <button class="secondary" onclick="showHome()">← Terug</button>
+        <div class="row"><button class="big agenda-add-button" onclick="showAgendaImport()">📥 Agenda toevoegen</button><button class="secondary" onclick="showHome()">← Terug</button></div>
       </div>
       <div id="agendaContent"></div>
+    </div>
+  </main>
+
+  <main id="agendaImport" class="page hidden">
+    <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">📥 AGENDA TOEVOEGEN</div></div>
+    <div class="card agenda-import-card">
+      <div class="page-heading subject-heading">
+        <span class="page-heading-label">AGENDA IMPORT</span>
+        <h2>Hoe wil je de agenda invoeren?</h2>
+        <p>Voor <strong id="agendaImportStudentLabel"></strong>. Kies de makkelijkste manier.</p>
+      </div>
+
+      <div class="agenda-import-choice-grid">
+        <button id="agendaModeVideo" class="agenda-import-choice active" type="button" onclick="setAgendaImportMode('video')"><span class="emoji">📹</span><strong>Schermopname</strong><span>Meerdere afspraken uit Scolpanos tegelijk.</span></button>
+        <button id="agendaModeImage" class="agenda-import-choice" type="button" onclick="setAgendaImportMode('image')"><span class="emoji">📷</span><strong>Screenshot</strong><span>Voor één losse afspraak of wijziging.</span></button>
+        <button id="agendaModeManual" class="agenda-import-choice" type="button" onclick="setAgendaImportMode('manual')"><span class="emoji">✍️</span><strong>Handmatig</strong><span>Zelf snel een afspraak toevoegen.</span></button>
+      </div>
+
+      <div id="agendaImportVideoStep" class="agenda-import-step">
+        <h3>📹 Schermopname uit Scolpanos</h3>
+        <p class="small">Open Scolpanos, start je schermopname en tik de stipjes aan die je wilt meenemen. Stop daarna de opname en kies hem hieronder.</p>
+        <input id="agendaVideoFile" class="agenda-import-file" type="file" accept="video/*" onchange="handleAgendaImportFile(event,'video')">
+        <video id="agendaVideoPreview" class="agenda-import-preview hidden" controls playsinline></video>
+        <div id="agendaVideoStatus" class="agenda-import-status"></div>
+        <div class="agenda-import-actions"><button id="agendaVideoAnalyzeButton" class="big hidden" type="button" onclick="analyzeAgendaVideo()">🤖 Opname analyseren</button></div>
+      </div>
+
+      <div id="agendaImportImageStep" class="agenda-import-step hidden">
+        <h3>📷 Screenshot</h3>
+        <p class="small">Kies een screenshot uit je telefoon. PacoGO leest wat erop staat en zet het klaar voor controle.</p>
+        <input id="agendaImageFile" class="agenda-import-file" type="file" accept="image/*" capture="environment" onchange="handleAgendaImportFile(event,'image')">
+        <img id="agendaImagePreview" class="agenda-import-preview hidden" alt="Agenda screenshot">
+        <div id="agendaImageStatus" class="agenda-import-status"></div>
+        <div class="agenda-import-actions"><button id="agendaImageAnalyzeButton" class="big hidden" type="button" onclick="analyzeAgendaImage()">🤖 Screenshot analyseren</button></div>
+      </div>
+
+      <div id="agendaImportManualStep" class="agenda-import-step hidden">
+        <h3>✍️ Handmatig toevoegen</h3>
+        <div class="field"><label for="agendaManualDate">Datum</label><input id="agendaManualDate" class="calendar-date-input" type="date"></div>
+        <div class="field"><label for="agendaManualType">Type</label><select id="agendaManualType"><option value="test">📝 Toets</option><option value="homework">📚 Huiswerk</option><option value="submit">📖 Inleveren</option><option value="activity">🎒 Schoolactiviteit</option><option value="free">🎉 Vrije dag</option><option value="other">📌 Overig</option></select></div>
+        <div class="field"><label for="agendaManualTitle">Titel</label><input id="agendaManualTitle" maxlength="120" placeholder="Bijvoorbeeld Toets rekenen"></div>
+        <div class="field"><label for="agendaManualMeta">Omschrijving</label><textarea id="agendaManualMeta" maxlength="300" placeholder="Bijvoorbeeld Breuken hoofdstuk 3"></textarea></div>
+        <div class="agenda-import-actions"><button class="big" type="button" onclick="addManualAgendaItem()">➕ Toevoegen</button></div>
+      </div>
+
+      <div id="agendaImportReview" class="agenda-import-step hidden">
+        <h3>🔎 Controleer gevonden afspraken</h3>
+        <div class="small">PacoGO verandert niets automatisch. Controleer eerst de gevonden informatie.</div>
+        <div id="agendaImportReviewList" class="agenda-import-review"></div>
+        <div class="agenda-import-actions"><button class="secondary" type="button" onclick="clearAgendaImportReview()">Opnieuw</button><button class="big" type="button" onclick="saveAgendaImportReview()">✅ Toevoegen aan agenda</button></div>
+      </div>
+
+      <div class="row" style="justify-content:flex-start;margin-top:18px"><button class="secondary" onclick="showAgenda()">← Terug naar agenda</button></div>
     </div>
   </main>
 
@@ -456,10 +538,192 @@ function agendaDateLabel(d){return new Intl.DateTimeFormat('nl-NL',{day:'numeric
 function renderMiniAgenda(){
   const lists=document.querySelectorAll('.mini-agenda-list');
   if(!lists.length)return;
-  if(currentStudent!=='Testleerling'){lists.forEach(e=>e.innerHTML='<div class="mini-agenda-empty">Nog geen agenda-items.</div>');return;}
-  const items=agendaDemoItems.map(item=>({item,date:agendaDateFromOffset(item.offset)})).sort((a,b)=>a.date-b.date).slice(0,4);
-  const html=items.map(({item,date})=>'<div class="mini-agenda-item"><div class="mini-agenda-date">'+agendaDateLabel(date)+'</div><div class="mini-agenda-title">'+item.icon+' '+escapeHtml(item.title)+'</div></div>').join('');
+  const items=buildAgendaItemsForRender().filter(x=>new Date(x.date+'T12:00:00')>=new Date(new Date().toDateString()+' 12:00:00')).slice(0,4);
+  if(!items.length){lists.forEach(e=>e.innerHTML='<div class="mini-agenda-empty">Nog geen agenda-items.</div>');return}
+  const html=items.map(item=>'<div class="mini-agenda-item"><div class="mini-agenda-date">'+agendaDateLabel(new Date(item.date+'T12:00:00'))+'</div><div class="mini-agenda-title">'+(item.icon||agendaTypeIcon(item.type))+' '+escapeHtml(item.title)+'</div></div>').join('');
   lists.forEach(e=>e.innerHTML=html);
+}
+function getCustomAgendaItems(student=currentStudent){
+  try{
+    const all=JSON.parse(localStorage.getItem('pacogo_agenda_items')||'[]');
+    return all.filter(x=>x.student===student);
+  }catch{return []}
+}
+function saveCustomAgendaItems(items){
+  try{localStorage.setItem('pacogo_agenda_items',JSON.stringify(items))}catch(error){console.error('Agenda local save error:',error)}
+}
+function agendaTypeIcon(type){return ({test:'📝',homework:'📚',submit:'📖',activity:'🎒',free:'🎉',other:'📌'})[type]||'📌'}
+function agendaTypeLabel(type){return ({test:'Toets',homework:'Huiswerk',submit:'Inleveren',activity:'Schoolactiviteit',free:'Vrije dag',other:'Overig'})[type]||'Agenda'}
+function showAgendaImport(){
+  if(!currentStudent){showHome();return}
+  hideAll();
+  document.getElementById('agendaImport').classList.remove('hidden');
+  document.getElementById('agendaImportStudentLabel').textContent=currentStudent;
+  setAgendaImportMode('video');
+}
+let agendaImportMode='video';
+let agendaImportFile=null;
+let agendaImportReview=[];
+function setAgendaImportMode(mode){
+  agendaImportMode=mode;
+  ['video','image','manual'].forEach(m=>{
+    document.getElementById('agendaMode'+m.charAt(0).toUpperCase()+m.slice(1))?.classList.toggle('active',m===mode);
+    document.getElementById('agendaImport'+m.charAt(0).toUpperCase()+m.slice(1)+'Step')?.classList.toggle('hidden',m!==mode);
+  });
+  document.getElementById('agendaImportReview')?.classList.add('hidden');
+}
+function handleAgendaImportFile(event,mode){
+  const file=event.target.files?.[0];
+  if(!file)return;
+  agendaImportFile=file;
+  const status=document.getElementById(mode==='video'?'agendaVideoStatus':'agendaImageStatus');
+  if(mode==='video'){
+    const video=document.getElementById('agendaVideoPreview');
+    video.src=URL.createObjectURL(file);
+    video.classList.remove('hidden');
+    document.getElementById('agendaVideoAnalyzeButton').classList.remove('hidden');
+    status.textContent='✅ Opname ontvangen. Klaar om te analyseren.';
+  }else{
+    const img=document.getElementById('agendaImagePreview');
+    img.src=URL.createObjectURL(file);
+    img.classList.remove('hidden');
+    document.getElementById('agendaImageAnalyzeButton').classList.remove('hidden');
+    status.textContent='✅ Screenshot ontvangen. Klaar om te analyseren.';
+  }
+}
+function agendaDateFromText(text){
+  const m=String(text||'').match(/\b(\d{1,2})[.\/-](\d{1,2})(?:[.\/-](\d{2,4}))?\b/);
+  if(!m)return '';
+  const y=m[3]?Number(m[3].length===2?'20'+m[3]:m[3]):new Date().getFullYear();
+  const d=new Date(y,Number(m[2])-1,Number(m[1]),12);
+  if(Number.isNaN(d.getTime()))return '';
+  return d.toISOString().slice(0,10);
+}
+function agendaReviewFromText(text,sourceLabel){
+  const clean=String(text||'').replace(/\r/g,'').split(/\n+/).map(x=>x.trim()).filter(x=>x.length>=3);
+  const candidates=[];
+  for(const line of clean){
+    if(/^(agenda|kalender|ma|di|wo|do|vr|za|zo|maandag|dinsdag|woensdag|donderdag|vrijdag|zaterdag|zondag)$/i.test(line))continue;
+    const date=agendaDateFromText(line);
+    if(date)candidates.push({date,title:line.replace(/\b\d{1,2}[.\/-]\d{1,2}(?:[.\/-]\d{2,4})?\b/,'').replace(/\s+/g,' ').trim()||'Agenda-afspraak',meta:'Gevonden in '+sourceLabel,type:'other'});
+  }
+  if(!candidates.length&&clean.length){
+    candidates.push({date:'',title:clean.slice(0,2).join(' — ').slice(0,140),meta:'Gevonden in '+sourceLabel,type:'other'});
+  }
+  return candidates.slice(0,20);
+}
+function renderAgendaImportReview(items){
+  agendaImportReview=items||[];
+  const box=document.getElementById('agendaImportReview');
+  const list=document.getElementById('agendaImportReviewList');
+  if(!box||!list)return;
+  if(!agendaImportReview.length){box.classList.add('hidden');return}
+  list.innerHTML=agendaImportReview.map((item,i)=>'<div class="agenda-import-found">'+
+    '<div class="agenda-import-found-head"><strong>Afspraak '+(i+1)+'</strong><span class="small">'+escapeHtml(item.source||'Import')+'</span></div>'+
+    '<div class="agenda-import-found-grid">'+
+      '<input id="agendaReviewDate'+i+'" type="date" value="'+escapeAttr(item.date||'')+'">'+
+      '<input id="agendaReviewTitle'+i+'" maxlength="120" value="'+escapeAttr(item.title||'')+'">'+
+      '<select id="agendaReviewType'+i+'"><option value="test">📝 Toets</option><option value="homework">📚 Huiswerk</option><option value="submit">📖 Inleveren</option><option value="activity">🎒 Schoolactiviteit</option><option value="free">🎉 Vrije dag</option><option value="other">📌 Overig</option></select>'+
+    '</div>'+
+    '<textarea id="agendaReviewMeta'+i+'" maxlength="300" style="margin-top:8px" placeholder="Omschrijving">'+escapeHtml(item.meta||'')+'</textarea>'+
+  '</div>').join('');
+  agendaImportReview.forEach((item,i)=>{document.getElementById('agendaReviewType'+i).value=item.type||'other'});
+  box.classList.remove('hidden');
+}
+async function ocrAgendaImage(file){
+  const result=await Tesseract.recognize(file,'eng',{logger:m=>{if(m.status==='recognizing text'){const pct=Math.round((m.progress||0)*100);document.getElementById('agendaImageStatus').textContent='🤖 Screenshot lezen... '+pct+'%'}}});
+  return result?.data?.text||'';
+}
+async function analyzeAgendaImage(){
+  if(!agendaImportFile)return;
+  const status=document.getElementById('agendaImageStatus');
+  try{
+    status.textContent='🤖 Screenshot lezen...';
+    const text=await ocrAgendaImage(agendaImportFile);
+    const items=agendaReviewFromText(text,'screenshot');
+    renderAgendaImportReview(items);
+    status.textContent=items.length?'✅ Gevonden. Controleer hieronder.':'⚠️ Ik kon geen duidelijke afspraak vinden. Probeer een scherpere screenshot.';
+  }catch(error){console.error('Agenda image OCR error:',error);status.textContent='⚠️ Screenshot kon niet worden gelezen.'}
+}
+async function analyzeAgendaVideo(){
+  if(!agendaImportFile)return;
+  const status=document.getElementById('agendaVideoStatus');
+  const video=document.getElementById('agendaVideoPreview');
+  try{
+    status.textContent='🤖 Opname voorbereiden...';
+    await video.play().catch(()=>{});
+    video.pause();
+    const duration=Number(video.duration||0);
+    if(!duration)throw new Error('Geen videoduur gevonden');
+    const count=Math.min(12,Math.max(4,Math.ceil(duration/2)));
+    const canvas=document.createElement('canvas');
+    const ctx=canvas.getContext('2d',{willReadFrequently:true});
+    const texts=[];
+    for(let i=0;i<count;i++){
+      const t=count===1?0:(duration-0.2)*(i/(count-1));
+      await new Promise(resolve=>{const onSeek=()=>{video.removeEventListener('seeked',onSeek);resolve()};video.addEventListener('seeked',onSeek);video.currentTime=t});
+      canvas.width=video.videoWidth||720;canvas.height=video.videoHeight||1280;
+      ctx.drawImage(video,0,0,canvas.width,canvas.height);
+      const dataUrl=canvas.toDataURL('image/jpeg',0.78);
+      status.textContent='🤖 Opname lezen... '+(i+1)+' / '+count;
+      const result=await Tesseract.recognize(dataUrl,'eng');
+      if(result?.data?.text)texts.push(result.data.text);
+    }
+    const combined=[...new Set(texts.flatMap(x=>x.split(/\n+/).map(y=>y.trim()).filter(Boolean)))].join('\n');
+    const items=agendaReviewFromText(combined,'schermopname');
+    renderAgendaImportReview(items);
+    status.textContent=items.length?'✅ Opname gelezen. Controleer hieronder.':'⚠️ Ik kon geen duidelijke afspraken uit de opname halen. We kunnen de analyse later slimmer maken.';
+  }catch(error){console.error('Agenda video OCR error:',error);status.textContent='⚠️ De schermopname kon niet worden gelezen.'}
+}
+function addManualAgendaItem(){
+  const date=document.getElementById('agendaManualDate').value;
+  const title=document.getElementById('agendaManualTitle').value.trim();
+  const type=document.getElementById('agendaManualType').value;
+  const meta=document.getElementById('agendaManualMeta').value.trim();
+  if(!date||!title){showMessage('Vul minimaal datum en titel in.','error');return}
+  const items=getCustomAgendaItems();
+  items.push({id:'agenda_'+Date.now(),student:currentStudent,date,type,title,meta,source:'handmatig',createdAt:new Date().toISOString()});
+  saveCustomAgendaItems([...items,...getCustomAgendaItems(currentStudent).filter(x=>!items.some(y=>y.id===x.id))]);
+  showMessage('📅 Agenda-item toegevoegd.','success');
+  document.getElementById('agendaManualTitle').value='';
+  document.getElementById('agendaManualMeta').value='';
+  showAgenda();
+}
+function saveAgendaImportReview(){
+  const items=getCustomAgendaItems();
+  const added=agendaImportReview.map((item,i)=>({
+    id:'agenda_'+Date.now()+'_'+i,student:currentStudent,date:document.getElementById('agendaReviewDate'+i)?.value||'',
+    type:document.getElementById('agendaReviewType'+i)?.value||'other',
+    title:document.getElementById('agendaReviewTitle'+i)?.value.trim()||'Agenda-afspraak',
+    meta:document.getElementById('agendaReviewMeta'+i)?.value.trim()||'',
+    source:item.source||agendaImportMode,createdAt:new Date().toISOString()
+  })).filter(x=>x.date&&x.title);
+  if(!added.length){showMessage('Vul bij minimaal één afspraak een datum en titel in.','error');return}
+  const existingKeys=new Set(items.map(x=>[x.date,x.title.toLowerCase()].join('|')));
+  const fresh=added.filter(x=>!existingKeys.has([x.date,x.title.toLowerCase()].join('|')));
+  saveCustomAgendaItems([...items,...fresh]);
+  showMessage(fresh.length+' agenda-item'+(fresh.length===1?'':'s')+' toegevoegd.','success');
+  agendaImportReview=[];
+  showAgenda();
+}
+function clearAgendaImportReview(){agendaImportReview=[];document.getElementById('agendaImportReview')?.classList.add('hidden')}
+function editAgendaItem(id){
+  const items=getCustomAgendaItems();
+  const item=items.find(x=>x.id===id);if(!item)return;
+  const date=prompt('Datum (YYYY-MM-DD)',item.date);if(date===null)return;
+  const title=prompt('Titel',item.title);if(title===null)return;
+  const meta=prompt('Omschrijving',item.meta||'');if(meta===null)return;
+  const all=items.map(x=>x.id===id?{...x,date,title:title.trim()||x.title,meta}:x);
+  saveCustomAgendaItems(all);renderAgenda();renderMiniAgenda();
+}
+function deleteAgendaItem(id){
+  if(!confirm('Deze agenda-afspraak verwijderen?'))return;
+  saveCustomAgendaItems(getCustomAgendaItems().filter(x=>x.id!==id));renderAgenda();renderMiniAgenda();
+}
+function buildAgendaItemsForRender(){
+  const custom=getCustomAgendaItems();
+  const demo=currentStudent==='Testleerling'?agendaDemoItems.map(item=>({...item,date:agendaDateFromOffset(item.offset),id:'demo_'+item.offset,student:currentStudent,source:'demo'})):[];
+  return [...demo,...custom].sort((a,b)=>new Date(a.date)-new Date(b.date));
 }
 function showAgenda(){
   if(!currentStudent){showHome();return}
@@ -471,19 +735,41 @@ function showAgenda(){
 }
 function renderAgenda(){
   const el=document.getElementById('agendaContent');if(!el)return;
-  if(currentStudent!=='Testleerling'){
-    el.innerHTML='<div class="agenda-demo-note">🧪 De slimme agenda bouwen we eerst met <strong>Testleerling</strong>. Kies Testleerling op de startpagina om de proefagenda te bekijken.</div><div class="agenda-empty">Voor deze leerling staat de agenda nog niet aan.</div>';
+  const allItems=buildAgendaItemsForRender();
+  if(!allItems.length){
+    el.innerHTML='<div class="agenda-demo-note">📅 Nog geen agenda-items voor <strong>'+escapeHtml(currentStudent)+'</strong>. Gebruik <strong>Agenda toevoegen</strong> om iets in te voeren.</div>';
     return;
   }
   const byWeek=new Map();
   const today=new Date();today.setHours(12,0,0,0);
   const start=agendaStartOfWeek(today);
-  for(let w=0;w<6;w++){const week=new Date(start);week.setDate(start.getDate()+w*7);byWeek.set(agendaKey(week),{start:week,days:new Map()})}
-  agendaDemoItems.forEach(item=>{const d=agendaDateFromOffset(item.offset);const week=agendaStartOfWeek(d);const wk=byWeek.get(agendaKey(week));if(!wk)return;if(!wk.days.has(agendaKey(d)))wk.days.set(agendaKey(d),[]);wk.days.get(agendaKey(d)).push(item)});
+  for(let w=0;w<8;w++){const week=new Date(start);week.setDate(start.getDate()+w*7);byWeek.set(agendaKey(week),{start:week,days:new Map()})}
+  allItems.forEach(item=>{
+    const d=new Date(item.date+'T12:00:00');if(Number.isNaN(d.getTime()))return;
+    const week=agendaStartOfWeek(d);const wk=byWeek.get(agendaKey(week));if(!wk)return;
+    if(!wk.days.has(agendaKey(d)))wk.days.set(agendaKey(d),[]);
+    wk.days.get(agendaKey(d)).push(item);
+  });
   const weeks=[...byWeek.values()];
-  el.innerHTML='<div class="agenda-demo-note">🧪 <strong>Dit is de proefagenda van Testleerling.</strong> We testen hier eerst de slimme weekweergave. Geen maanden om doorheen te klikken — gewoon naar beneden scrollen.</div>'+weeks.map((week,wi)=>{
-    const days=[];for(let i=0;i<7;i++){const d=new Date(week.start);d.setDate(d.getDate()+i);const items=week.days.get(agendaKey(d))||[];if(!items.length)continue;days.push('<div class="agenda-day"><div class="agenda-day-date"><span class="day-name">'+agendaDayLabel(d)+'</span>'+agendaDateLabel(d)+'</div><div class="agenda-events">'+items.map(item=>'<div class="agenda-event '+item.type+'"><div class="agenda-event-title">'+item.icon+' '+escapeHtml(item.title)+'</div><div class="agenda-event-meta">'+escapeHtml(item.meta)+'</div>'+(item.lesson?'<div class="agenda-event-action"><button onclick="showAgendaPracticeDemo()">🐾 Nu oefenen</button></div>':'')+'</div>').join('')+'</div></div>')}
-    return '<section class="agenda-week"><div class="agenda-week-title"><strong>'+(wi===0?'Deze week':wi===1?'Volgende week':'Week daarna')+'</strong><span>'+agendaFormatRange(week.start)+'</span></div>'+(days.length?days.join(''):'<div class="agenda-empty">Geen afspraken of schoolitems. Een rustige week. 😊</div>')+'</section>';
+  const customCount=getCustomAgendaItems().length;
+  el.innerHTML=(customCount?'<div class="agenda-demo-note">📅 Deze agenda bevat <strong>'+customCount+'</strong> eigen agenda-item'+(customCount===1?'':'s')+'. Je kunt elk eigen item hieronder bewerken of verwijderen.</div>':'<div class="agenda-demo-note">🧪 Dit is de proefagenda. Voeg nu ook echte afspraken toe met <strong>Agenda toevoegen</strong>.</div>')+
+  weeks.map((week,wi)=>{
+    const days=[];
+    for(let i=0;i<7;i++){
+      const d=new Date(week.start);d.setDate(d.getDate()+i);
+      const items=week.days.get(agendaKey(d))||[];if(!items.length)continue;
+      days.push('<div class="agenda-day"><div class="agenda-day-date"><span class="day-name">'+agendaDayLabel(d)+'</span>'+agendaDateLabel(d)+'</div><div class="agenda-events">'+
+        items.map(item=>{
+          const icon=item.icon||agendaTypeIcon(item.type);
+          const custom=String(item.id||'').startsWith('agenda_');
+          return '<div class="agenda-event '+(item.type||'other')+(custom?' custom':'')+'"><div class="agenda-event-title">'+icon+' '+escapeHtml(item.title)+'</div><div class="agenda-event-meta">'+escapeHtml(item.meta||agendaTypeLabel(item.type))+'</div>'+
+          (item.lesson?'<div class="agenda-event-action"><button onclick="showAgendaPracticeDemo()">🐾 Nu oefenen</button></div>':'')+
+          (custom?'<div class="agenda-event-actions"><button class="secondary" onclick="editAgendaItem('+JSON.stringify(item.id)+')">✏️ Bewerken</button><button class="danger" onclick="deleteAgendaItem('+JSON.stringify(item.id)+')">🗑️ Verwijderen</button></div>':'')+
+          '</div>';
+        }).join('')+'</div></div>');
+    }
+    return '<section class="agenda-week"><div class="agenda-week-title"><strong>'+(wi===0?'Deze week':wi===1?'Volgende week':'Week '+(wi+1))+'</strong><span>'+agendaFormatRange(week.start)+'</span></div>'+
+      (days.length?days.join(''):'<div class="agenda-empty">Geen afspraken of schoolitems. Een rustige week. 😊</div>')+'</section>';
   }).join('');
 }
 function showAgendaPracticeDemo(){showMessage('🧪 Dit wordt later gekoppeld aan de bijbehorende PacoGO-les.','success')}

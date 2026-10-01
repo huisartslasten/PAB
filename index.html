@@ -178,6 +178,17 @@ body{background:#1787f2}
 .agenda-empty{padding:18px;text-align:center;color:var(--muted);background:#f7fbff;border-radius:14px}
 .agenda-demo-note{background:#fff8df;border:1px solid #f3d36b;border-radius:14px;padding:12px 14px;margin-bottom:20px;color:#765800;font-size:13px}
 @media(max-width:700px){.agenda-shell{padding:16px}.agenda-header{align-items:flex-start}.agenda-header h2{font-size:25px}.agenda-day{grid-template-columns:58px minmax(0,1fr);gap:8px}.agenda-day-date{font-size:13px}.agenda-event{padding:10px}}
+/* V3.2 compacte agenda in rechter zijbalk */
+.mini-agenda-card{display:block;width:100%;text-align:left;border:0;cursor:pointer;padding:20px;margin:0 0 18px;background:#fff}
+.mini-agenda-card:hover{transform:translateY(-1px)}
+.mini-agenda-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.mini-agenda-head h3{margin:0;font-size:20px}
+.mini-agenda-head span{font-size:12px;font-weight:900;color:#1478d1}
+.mini-agenda-item{display:grid;grid-template-columns:58px minmax(0,1fr);gap:8px;padding:8px 0;border-top:1px solid #edf2f7}
+.mini-agenda-date{font-size:12px;font-weight:900;color:#52708f}
+.mini-agenda-title{font-size:13px;font-weight:800;line-height:1.25}
+.mini-agenda-empty{font-size:13px;color:var(--muted);padding:6px 0}
+.test-ready-card{margin-top:0}
 </style>
 </head>
 <body>
@@ -396,7 +407,7 @@ function updateAuthUI(session){currentSession=session;const logged=isParentLogge
 function requireParent(){if(!isParentLoggedIn()){showMessage('Alleen ouders kunnen lessen wijzigen. Log eerst in.','error');showHome();return false}return true}
 function buildSideBarHtml(){return `<aside class="sidebar"><button class="side-item" onclick="showHome()"><span class="side-icon">🏠</span>Home</button><button class="side-item" onclick="goToSubjects()"><span class="side-icon">📖</span>Mijn lessen</button><div class="sidebar-subjects"></div><button class="side-item" onclick="showAgenda()"><span class="side-icon">📅</span>Mijn agenda</button><button class="side-item" onclick="isParentLoggedIn()?showTestHistory(currentStudent):showLogin()"><span class="side-icon">📝</span>Toetsgeschiedenis</button><div class="sidebar-note">🐾 <strong>Goed bezig!</strong><br>Elke les brengt je een pootje verder.</div></aside>`}
 function buildParentSideBarHtml(){const names=['Zyon','Zenith','Zephon','Testleerling'];return `<aside class="sidebar parent-sidebar"><div class="parent-sidebar-title">⚙️ Beheer</div><div class="parent-sidebar-subtitle">👤 Leerling kiezen</div><div class="parent-sidebar-students">${names.map(name=>{const active=parentSelectedStudent===name?' active':'';return `<button class="parent-sidebar-student${active}" onclick="selectParentStudent('${name}')">👦 <strong>${name}</strong></button>`}).join('')}</div><div class="parent-sidebar-actions"><button class="parent-sidebar-action" onclick="parentStartLesson()">➕ Les maken</button><button class="parent-sidebar-action" onclick="showTestHistory(parentSelectedStudent)">📝 Toetsgeschiedenis</button><button class="parent-sidebar-action parent-feedback-button" onclick="showParentFeedback()">💬 Feedback & ideeën</button></div><div class="sidebar-note">🐾 <strong>PacoGO Beheer</strong><br>Kies een leerling om te beheren.</div></aside>`}
-function buildSideRightHtml(includeManage=true){return `<aside class="side-panel">${includeManage?'<button class="parent-button side-manage-button hidden" onclick="isParentLoggedIn()?showParentDashboard():showLogin()">⚙️ Beheer</button>':''}<div class="card side-card"><h3>🎯 Toets-klaar</h3><p class="stat-big side-prep-percent">0%</p><div class="small">van je onderdelen beheerst</div><div class="progress-wrap"><div class="progress-label"><span>3× achter elkaar goed = beheerst</span><span class="side-subject-count">0 vakken</span></div><div class="progress"><div class="progress-bar side-progress-bar" style="width:10%"></div></div></div><div class="card motivation"><strong>🎯 Goed bezig!</strong><br><span class="small">Elke dag een beetje oefenen maakt verschil.</span></div></div><div class="card side-card test-calendar-card side-calendar-mini"><h3>📅 Toetskalender</h3><div class="side-calendar-list"></div></div></aside>`}
+function buildSideRightHtml(includeManage=true){return '<aside class="side-panel">'+ (includeManage?'<button class="parent-button side-manage-button hidden" onclick="isParentLoggedIn()?showParentDashboard():showLogin()">⚙️ Beheer</button>':'')+ '<button class="card side-card mini-agenda-card" onclick="showAgenda()" type="button"><div class="mini-agenda-head"><h3>📅 Mijn agenda</h3><span>Bekijk →</span></div><div class="mini-agenda-list"></div></button>'+ '<div class="card side-card test-ready-card"><h3>🎯 Toets-klaar</h3><p class="stat-big side-prep-percent">0%</p><div class="small">van je onderdelen beheerst</div><div class="progress-wrap"><div class="progress-label"><span>3× achter elkaar goed = beheerst</span><span class="side-subject-count">0 vakken</span></div><div class="progress"><div class="progress-bar side-progress-bar" style="width:10%"></div></div></div><div class="card motivation"><strong>🎯 Goed bezig!</strong><br><span class="small">Elke dag een beetje oefenen maakt verschil.</span></div></div></aside>';}
 function installPageSidebars(){document.querySelectorAll('.page').forEach(page=>{if(page.id==='home'||page.dataset.sidesReady)return;const banner=page.querySelector(':scope > .page-paco-banner');if(banner)banner.remove();const backWrap=document.createElement('div');backWrap.className='page-back-above-left';const directButtons=[...page.querySelectorAll(':scope > .secondary')];directButtons.forEach(btn=>{if(/Terug|Stoppen|Annuleren/.test(btn.textContent||'')){backWrap.appendChild(btn);}});page.querySelectorAll(':scope > .topbar').forEach(top=>{const btn=[...top.querySelectorAll('.secondary')].find(b=>/Terug|Stoppen|Annuleren/.test(b.textContent||''));if(btn){backWrap.appendChild(btn);if(!top.querySelector(':scope > div > button.secondary')&&top.textContent.trim()==='')top.remove();}});const shell=document.createElement('div');shell.className='page-side-layout';const left=document.createElement('div');left.className='page-side-left';left.innerHTML=page.id==='parentDashboard'?buildParentSideBarHtml():buildSideBarHtml();const center=document.createElement('div');center.className='page-side-center';const right=document.createElement('div');right.className='page-side-right';right.innerHTML=buildSideRightHtml(page.id!=='parentDashboard');if(backWrap.childElementCount)left.insertAdjacentElement('afterbegin',backWrap);while(page.firstChild)center.appendChild(page.firstChild);shell.append(left,center,right);page.appendChild(shell);if(banner)page.insertBefore(banner,shell);page.dataset.sidesReady='1';});}
 function goToSubjects(){if(isParentLoggedIn()&&!document.getElementById('parentDashboard')?.classList.contains('hidden')){document.getElementById('parentManagement')?.scrollIntoView({behavior:'smooth'});return}showHome();setTimeout(()=>document.getElementById('subjects')?.scrollIntoView({behavior:'smooth'}),50)}
 function goToProgress(){showHome();setTimeout(()=>document.getElementById('progressPanel')?.scrollIntoView({behavior:'smooth'}),50)}
@@ -426,11 +437,7 @@ function refreshPageSidebars(){
   document.querySelectorAll('.side-subject-count').forEach(e=>e.textContent=names.length+' '+(names.length===1?'vak':'vakken'));
   document.querySelectorAll('.side-prep-percent').forEach(e=>e.textContent=stats.pct+'%');
   document.querySelectorAll('.side-progress-bar').forEach(e=>e.style.width=stats.pct+'%');
-  const all=getTestCalendar().filter(t=>t.student===currentStudent).sort((a,b)=>a.date.localeCompare(b.date));
-  const today=new Date().toISOString().slice(0,10);
-  const upcoming=all.filter(t=>t.date>=today).slice(0,4);
-  const html=upcoming.length?upcoming.map(t=>{const click=t.lessonId?`onclick="openCalendarLesson(\'${t.lessonId}\')" style="cursor:pointer"`:"";return `<div class="test-calendar-item" ${click}><div class="test-calendar-date">${formatTestDate(t.date)}</div><div class="test-calendar-title">${escapeHtml(t.subject)} — ${escapeHtml(t.title)}</div><div class="test-calendar-countdown">⏳ ${testCountdown(t.date)}</div></div>`}).join(''):'<div class="test-calendar-empty">Geen komende toetsen.</div>';
-  document.querySelectorAll('.side-calendar-list').forEach(e=>e.innerHTML=html);
+  renderMiniAgenda();
 }
 function hideAll(){document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));window.speechSynthesis?.cancel()}
 
@@ -450,6 +457,14 @@ function agendaKey(d){return [d.getFullYear(),String(d.getMonth()+1).padStart(2,
 function agendaFormatRange(start){const end=new Date(start);end.setDate(end.getDate()+6);const f=new Intl.DateTimeFormat('nl-NL',{day:'numeric',month:'short'});return f.format(start)+' – '+f.format(end)}
 function agendaDayLabel(d){return new Intl.DateTimeFormat('nl-NL',{weekday:'short'}).format(d).replace('.','')}
 function agendaDateLabel(d){return new Intl.DateTimeFormat('nl-NL',{day:'numeric',month:'short'}).format(d)}
+function renderMiniAgenda(){
+  const lists=document.querySelectorAll('.mini-agenda-list');
+  if(!lists.length)return;
+  if(currentStudent!=='Testleerling'){lists.forEach(e=>e.innerHTML='<div class="mini-agenda-empty">Nog geen agenda-items.</div>');return;}
+  const items=agendaDemoItems.map(item=>({item,date:agendaDateFromOffset(item.offset)})).sort((a,b)=>a.date-b.date).slice(0,4);
+  const html=items.map(({item,date})=>'<div class="mini-agenda-item"><div class="mini-agenda-date">'+agendaDateLabel(date)+'</div><div class="mini-agenda-title">'+item.icon+' '+escapeHtml(item.title)+'</div></div>').join('');
+  lists.forEach(e=>e.innerHTML=html);
+}
 function showAgenda(){
   if(!currentStudent){showHome();return}
   hideAll();

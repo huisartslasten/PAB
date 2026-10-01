@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V3.3 -->
+<!-- PacoGO TEST V3.4 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -634,50 +634,125 @@ function renderAgendaImportReview(items){
   agendaImportReview.forEach((item,i)=>{document.getElementById('agendaReviewType'+i).value=item.type||'other'});
   box.classList.remove('hidden');
 }
-async function ocrAgendaImage(file){
-  const result=await Tesseract.recognize(file,'eng',{logger:m=>{if(m.status==='recognizing text'){const pct=Math.round((m.progress||0)*100);document.getElementById('agendaImageStatus').textContent='🤖 Screenshot lezen... '+pct+'%'}}});
-  return result?.data?.text||'';
+async function agendaImageToDataUrl(file,maxWidth=1280){
+  return await new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onerror=()=>reject(new Error('Bestand kon niet worden gelezen.'));
+    reader.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        const scale=Math.min(1,maxWidth/(img.naturalWidth||maxWidth));
+        const canvas=document.createElement('canvas');
+        canvas.width=Math.max(1,Math.round((img.naturalWidth||maxWidth)*scale));
+        canvas.height=Math.max(1,Math.round((img.naturalHeight||maxWidth)*scale));
+        const ctx=canvas.getContext('2d',{willReadFrequently:true});
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        resolve(canvas.toDataURL('image/jpeg',0.78));
+      };
+      img.onerror=()=>reject(new Error('Afbeelding kon niet worden geopend.'));
+      img.src=reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+async function agendaFrameToDataUrl(video,time,maxWidth=1280){
+  await new Promise(resolve=>{
+    const onSeek=()=>{video.removeEventListener('seeked',onSeek);resolve()};
+    video.addEventListener('seeked',onSeek);
+    video.currentTime=time;
+  });
+  const vw=video.videoWidth||720,vh=video.videoHeight||1280;
+  const scale=Math.min(1,maxWidth/vw);
+  const canvas=document.createElement('canvas');
+  canvas.width=Math.max(1,Math.round(vw*scale));
+  canvas.height=Math.max(1,Math.round(vh*scale));
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});
+  ctx.drawImage(video,0,0,canvas.width,canvas.height);
+  return canvas.toDataURL('image/jpeg',0.78);
+}
+async function understandAgendaFrame(dataUrl){
+  const {data,error}=await db.functions.invoke('agenda-understand-v1',{
+    body:{
+      image:dataUrl,
+      today:new Date().toISOString().slice(0,10),
+      student:currentStudent||''
+    }
+  });
+  if(error) throw error;
+  return Array.isArray(data?.events)?data.events:[];
+}
+function mergeAgendaAiEvents(allEvents){
+  const seen=new Set();
+  const merged=[];
+  for(const event of allEvents||[]){
+    const title=String(event.title||'').trim();
+    const date=String(event.date||'').trim();
+    if(!title||!date)continue;
+    const key=date+'|'+title.toLowerCase().replace(/\\s+/g,' ');
+    if(seen.has(key))continue;
+    seen.add(key);
+    merged.push({
+      date,
+      type:event.type||'other',
+      title,
+      meta:event.meta||'Gevonden door AI in Scolpanos',
+      source:'AI agenda-import'
+    });
+  }
+  return merged.slice(0,30);
+}
+function renderAgendaAiProgress(status,index,total){
+  if(status)status.textContent='🤖 AI kijkt naar scherm '+index+' / '+total+'...';
 }
 async function analyzeAgendaImage(){
   if(!agendaImportFile)return;
   const status=document.getElementById('agendaImageStatus');
+  const button=document.getElementById('agendaImageAnalyzeButton');
   try{
-    status.textContent='🤖 Screenshot lezen...';
-    const text=await ocrAgendaImage(agendaImportFile);
-    const items=agendaReviewFromText(text,'screenshot');
-    renderAgendaImportReview(items);
-    status.textContent=items.length?'✅ Gevonden. Controleer hieronder.':'⚠️ Ik kon geen duidelijke afspraak vinden. Probeer een scherpere screenshot.';
-  }catch(error){console.error('Agenda image OCR error:',error);status.textContent='⚠️ Screenshot kon niet worden gelezen.'}
+    button.disabled=true;
+    status.textContent='🤖 AI leest de screenshot...';
+    const dataUrl=await agendaImageToDataUrl(agendaImportFile);
+    const events=await understandAgendaFrame(dataUrl);
+    renderAgendaImportReview(events);
+    status.textContent=events.length?'✅ AI vond '+events.length+' afspraak'+(events.length===1?'':'afspraken')+'. Controleer hieronder.':'⚠️ AI kon geen duidelijke afspraak herkennen. Probeer een scherpere screenshot.';
+  }catch(error){
+    console.error('Agenda AI image error:',error);
+    status.textContent='⚠️ De AI-analyse van de screenshot is mislukt.';
+  }finally{button.disabled=false}
 }
 async function analyzeAgendaVideo(){
   if(!agendaImportFile)return;
   const status=document.getElementById('agendaVideoStatus');
+  const button=document.getElementById('agendaVideoAnalyzeButton');
   const video=document.getElementById('agendaVideoPreview');
   try{
+    button.disabled=true;
     status.textContent='🤖 Opname voorbereiden...';
     await video.play().catch(()=>{});
     video.pause();
     const duration=Number(video.duration||0);
     if(!duration)throw new Error('Geen videoduur gevonden');
-    const count=Math.min(12,Math.max(4,Math.ceil(duration/2)));
-    const canvas=document.createElement('canvas');
-    const ctx=canvas.getContext('2d',{willReadFrequently:true});
-    const texts=[];
+
+    const count=Math.min(10,Math.max(6,Math.ceil(duration/1.5)));
+    const events=[];
     for(let i=0;i<count;i++){
-      const t=count===1?0:(duration-0.2)*(i/(count-1));
-      await new Promise(resolve=>{const onSeek=()=>{video.removeEventListener('seeked',onSeek);resolve()};video.addEventListener('seeked',onSeek);video.currentTime=t});
-      canvas.width=video.videoWidth||720;canvas.height=video.videoHeight||1280;
-      ctx.drawImage(video,0,0,canvas.width,canvas.height);
-      const dataUrl=canvas.toDataURL('image/jpeg',0.78);
-      status.textContent='🤖 Opname lezen... '+(i+1)+' / '+count;
-      const result=await Tesseract.recognize(dataUrl,'eng');
-      if(result?.data?.text)texts.push(result.data.text);
+      const t=count===1?0:Math.max(0,Math.min(duration-0.25,duration*(i/(count-1))));
+      renderAgendaAiProgress(status,i+1,count);
+      const frame=await agendaFrameToDataUrl(video,t);
+      try{
+        const found=await understandAgendaFrame(frame);
+        events.push(...found);
+      }catch(frameError){
+        console.error('Agenda AI frame error',i+1,frameError);
+      }
     }
-    const combined=[...new Set(texts.flatMap(x=>x.split(/\n+/).map(y=>y.trim()).filter(Boolean)))].join('\n');
-    const items=agendaReviewFromText(combined,'schermopname');
-    renderAgendaImportReview(items);
-    status.textContent=items.length?'✅ Opname gelezen. Controleer hieronder.':'⚠️ Ik kon geen duidelijke afspraken uit de opname halen. We kunnen de analyse later slimmer maken.';
-  }catch(error){console.error('Agenda video OCR error:',error);status.textContent='⚠️ De schermopname kon niet worden gelezen.'}
+    const merged=mergeAgendaAiEvents(events);
+    renderAgendaImportReview(merged);
+    status.textContent=merged.length?'✅ AI vond '+merged.length+' unieke afspraak'+(merged.length===1?'':'afspraken')+'. Controleer hieronder.':'⚠️ AI kon geen duidelijke afspraken herkennen.';
+  }catch(error){
+    console.error('Agenda AI video error:',error);
+    status.textContent='⚠️ De AI-analyse van de schermopname is mislukt.';
+  }finally{button.disabled=false}
 }
 function addManualAgendaItem(){
   const date=document.getElementById('agendaManualDate').value;

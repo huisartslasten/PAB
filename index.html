@@ -794,23 +794,33 @@ async function analyzeAgendaVideo(){
 
     const count=Math.min(10,Math.max(6,Math.ceil(duration/1.5)));
     const events=[];
+    let successfulFrames=0;
+    let failedFrames=0;
     for(let i=0;i<count;i++){
       const t=count===1?0:Math.max(0,Math.min(duration-0.25,duration*(i/(count-1))));
       renderAgendaAiProgress(status,i+1,count);
-      const frame=await agendaFrameToDataUrl(video,t);
       try{
+        const frame=await agendaFrameToDataUrl(video,t);
         const found=await understandAgendaFrame(frame);
+        successfulFrames++;
         events.push(...found);
       }catch(frameError){
+        failedFrames++;
         console.error('Agenda AI frame error',i+1,frameError);
       }
     }
     const merged=mergeAgendaAiEvents(events);
     renderAgendaImportReview(merged);
-    status.innerHTML=merged.length?'<strong>✅ Analyse klaar!</strong><br>AI vond '+merged.length+' unieke afspraak'+(merged.length===1?'':'afspraken')+'. Controleer ze hieronder.':'<strong>⚠️ Analyse klaar.</strong><br>AI kon geen duidelijke afspraken herkennen.';
+    if(!successfulFrames){
+      status.innerHTML='<strong>⚠️ Analyse niet gelukt</strong><br>PacoGO kon de schermopname niet goed verwerken. Er kwam geen bruikbaar AI-resultaat terug.<br><span class="small">Probeer de opname opnieuw.</span>';
+    }else if(!merged.length){
+      status.innerHTML='<strong>🔍 Analyse voltooid</strong><br>PacoGO heeft de schermopname bekeken, maar kon geen duidelijke afspraken herkennen.'+(failedFrames?'<br><span class="small">'+failedFrames+' van '+count+' beelden konden niet worden verwerkt.</span>':'');
+    }else{
+      status.innerHTML='<strong>✅ Analyse klaar!</strong><br>AI vond '+merged.length+' unieke afspraak'+(merged.length===1?'':'afspraken')+'. Controleer ze hieronder.'+(failedFrames?'<br><span class="small">'+failedFrames+' van '+count+' beelden konden niet worden verwerkt.</span>':'');
+    }
   }catch(error){
     console.error('Agenda AI video error:',error);
-    status.textContent='⚠️ De AI-analyse van de schermopname is mislukt.';
+    status.innerHTML='<strong>⚠️ Analyse niet gelukt</strong><br>PacoGO kon de schermopname niet goed verwerken. Probeer het opnieuw.';
   }finally{button.disabled=false}
 }
 function setManualAgendaRange(mode){

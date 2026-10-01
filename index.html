@@ -35,6 +35,10 @@
 /* Aruba hero */
 .aruba-hero{height:500px;min-height:500px;margin:0 -22px 0;background-image:url("pacogo-aruba-hero.png");background-size:cover;background-position:center top;border:0;border-radius:0;position:relative;overflow:hidden}
 .aruba-hero:after{display:none}
+.test-student-float{position:absolute;left:50%;top:18%;transform:translateX(-50%);z-index:8;padding:10px 16px;border:3px solid #fff;border-radius:999px;background:#ffd94f;color:#102b57;font-family:"Baloo 2",Nunito,sans-serif;font-size:16px;font-weight:950;box-shadow:0 5px 0 rgba(16,43,87,.22),0 10px 22px rgba(16,43,87,.22);cursor:pointer;white-space:nowrap}
+.test-student-float:hover{transform:translateX(-50%) translateY(-3px)}
+.test-student-float:active{transform:translateX(-50%) translateY(2px)}
+@media(max-width:700px){.test-student-float{top:12%;font-size:14px;padding:8px 13px}}
 .hero-overlay{position:relative;width:100%;height:100%;z-index:5}
 .hero-user-area{position:absolute;right:28px;top:24px;display:flex;gap:10px;align-items:center}
 .hero-parent,.hero-add{border-radius:999px;padding:12px 20px;background:#1575df;color:#fff;font-weight:900;box-shadow:0 5px 0 #0c58ae,0 8px 16px rgba(16,43,87,.18)}
@@ -304,14 +308,13 @@ body{background:#1787f2}
 <div class="container">
   <main id="home" class="page">
     <section id="studentChooser">
-      <div class="aruba-hero"><img src="pacogo-aruba-hero.png" alt="PacoGO op Aruba"></div>
+      <div class="aruba-hero"><img src="pacogo-aruba-hero.png" alt="PacoGO op Aruba"><button class="test-student-float" type="button" onclick="selectStudent('Testleerling')" title="Open Testleerling">🧪 Testleerling</button></div>
       <div class="student-area">
         <div class="student-title-row"><h1 class="student-title">Wie gaat er leren?</h1></div>
         <div class="student-grid">
           <button class="student-card" onclick="selectStudent('Zyon')"><div><div class="student-name">Zyon</div><div class="student-sub">Mijn lessen</div></div><span class="student-go">GO! →</span></button>
           <button class="student-card" onclick="selectStudent('Zenith')"><div><div class="student-name">Zenith</div><div class="student-sub">Mijn lessen</div></div><span class="student-go">GO! →</span></button>
           <button class="student-card" onclick="selectStudent('Zephon')"><div><div class="student-name">Zephon</div><div class="student-sub">Mijn lessen</div></div><span class="student-go">GO! →</span></button>
-          <button class="student-card test-student-card" onclick="selectStudent('Testleerling')"><div><div class="student-name">Testleerling</div><div class="student-sub">🧪 Agenda testen</div></div><span class="student-go">GO! →</span></button>
         </div>
       </div>
     </section>

@@ -549,8 +549,12 @@ function getCustomAgendaItems(student=currentStudent){
     return all.filter(x=>x.student===student);
   }catch{return []}
 }
-function saveCustomAgendaItems(items){
-  try{localStorage.setItem('pacogo_agenda_items',JSON.stringify(items))}catch(error){console.error('Agenda local save error:',error)}
+function saveCustomAgendaItems(items,student=currentStudent){
+  try{
+    const all=JSON.parse(localStorage.getItem('pacogo_agenda_items')||'[]');
+    const others=all.filter(x=>x.student!==student);
+    localStorage.setItem('pacogo_agenda_items',JSON.stringify([...others,...items]));
+  }catch(error){console.error('Agenda local save error:',error)}
 }
 function agendaTypeIcon(type){return ({test:'📝',homework:'📚',submit:'📖',activity:'🎒',free:'🎉',other:'📌'})[type]||'📌'}
 function agendaTypeLabel(type){return ({test:'Toets',homework:'Huiswerk',submit:'Inleveren',activity:'Schoolactiviteit',free:'Vrije dag',other:'Overig'})[type]||'Agenda'}

@@ -1062,7 +1062,7 @@ function renderAgenda(){
       const icon=item.icon||agendaTypeIcon(item.type),custom=String(item.id||'').startsWith('agenda_');
       return '<div class="agenda-week-event"><div class="agenda-week-event-title">'+icon+' '+escapeHtml(item.title)+'</div><div class="agenda-week-event-meta">'+escapeHtml(item.meta||agendaTypeLabel(item.type))+'</div>'+
       (item.lesson?'<div class="agenda-event-action"><button onclick="showAgendaPracticeDemo()">🐾 Nu oefenen</button></div>':agendaLessonMatchHtml(item))+
-      (custom?'<div class="agenda-event-actions"><button type="button" class="secondary" onclick="editAgendaItem(\\''+escapeAttr(item.id)+'\\')">✏️ Bewerken</button><button type="button" class="danger" onclick="deleteAgendaItem(\\''+escapeAttr(item.id)+'\\')">🗑️ Verwijderen</button></div>':'')+
+      (custom?'<div class="agenda-event-actions"><button type="button" class="secondary" onclick="editAgendaItem(\''+escapeAttr(item.id)+'\')">✏️ Bewerken</button><button type="button" class="danger" onclick="deleteAgendaItem(\''+escapeAttr(item.id)+'\')">🗑️ Verwijderen</button></div>':'')+
       '</div>';
     }).join(''):'<div class="agenda-day-empty">'+(isWeekend?'Vrije dag 🏠':'Geen afspraken')+'</div>';
     const moreHtml=more>0?'<div class="agenda-more">+ '+more+' meer</div>':'';

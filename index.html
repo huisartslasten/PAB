@@ -1476,12 +1476,14 @@ function dragLessonLeave(e){
   e.currentTarget.classList.remove('drag-over');
 }
 async function updateLessonSubvak(lesson,newSubvak){
+  if(!isParentLoggedIn())throw new Error('Alleen beheer kan lessen naar een ander subvak verplaatsen.');
   const value=String(newSubvak||'').trim();
   const {error}=await db.from('lessons').update({subvak:value}).eq('id',lesson.id);
   if(error)throw error;
   lesson.subvak=value;
 }
 async function dragLessonDrop(e,targetId){
+  if(!isParentLoggedIn()){clearLessonDragState();return}
   e.preventDefault();
   e.stopPropagation();
   const sourceId=Number(e.dataTransfer.getData('text/plain'));
@@ -1523,6 +1525,7 @@ function dragSubvakLeave(e){
   e.currentTarget.classList.remove('drop-active');
 }
 async function dragLessonIntoSubvak(e,subvakKey){
+  if(!isParentLoggedIn()){clearLessonDragState();return}
   e.preventDefault();
   e.stopPropagation();
   const sourceId=Number(e.dataTransfer.getData('text/plain'));
@@ -1572,7 +1575,7 @@ async function showSubject(subject){
     return '<section class="subvak-block" data-subvak-key="'+escapeAttr(group.key)+'" data-subvak-label="'+escapeAttr(group.label)+'" ondragover="dragSubvakOver(event)" ondragleave="dragSubvakLeave(event)" ondrop="dragLessonIntoSubvak(event,'+JSON.stringify(group.key)+')">'+
       '<h2 class="subvak-title '+(muted?'muted':'')+'">'+(muted?'📚 ':'📁 ')+escapeHtml(group.label)+'</h2>'+
       '<div class="subvak-lessons-grid">'+
-        group.lessons.map(l=>'<div class="card lesson-card" draggable="true" data-lesson-id="'+l.id+'" onclick="openLesson('+l.id+')" ondragstart="dragLessonStart(event,'+l.id+')" ondragover="dragLessonOver(event)" ondragleave="dragLessonLeave(event)" ondrop="dragLessonDrop(event,'+l.id+')" ondragend="dragLessonEnd()"><span class="badge lesson-badge">LES</span><h3>'+escapeHtml(l.title)+'</h3><div class="small">'+l.lesson_items.length+' '+(l.lesson_items.length===1?'onderdeel':'onderdelen')+' · '+escapeHtml(typeLabel(l.type))+'</div>'+((l.subvak&&String(l.subvak).trim())?'<div class="lesson-subvak">'+escapeHtml(l.subvak)+'</div>':'')+(isParentLoggedIn()?'<div class="lesson-card-actions"><button class="lesson-edit" onclick="event.stopPropagation();editLessonById('+l.id+')">✏️ Bewerken</button><button class="lesson-delete" onclick="event.stopPropagation();deleteLessonById('+l.id+')">🗑️ Verwijderen</button></div>':'')+'</div>').join('')+
+        group.lessons.map(l=>'<div class="card lesson-card" draggable="'+(isParentLoggedIn()?'true':'false')+'" data-lesson-id="'+l.id+'" onclick="openLesson('+l.id+')" ondragstart="dragLessonStart(event,'+l.id+')" ondragover="dragLessonOver(event)" ondragleave="dragLessonLeave(event)" ondrop="dragLessonDrop(event,'+l.id+')" ondragend="dragLessonEnd()"><span class="badge lesson-badge">LES</span><h3>'+escapeHtml(l.title)+'</h3><div class="small">'+l.lesson_items.length+' '+(l.lesson_items.length===1?'onderdeel':'onderdelen')+' · '+escapeHtml(typeLabel(l.type))+'</div>'+((l.subvak&&String(l.subvak).trim())?'<div class="lesson-subvak">'+escapeHtml(l.subvak)+'</div>':'')+(isParentLoggedIn()?'<div class="lesson-card-actions"><button class="lesson-edit" onclick="event.stopPropagation();editLessonById('+l.id+')">✏️ Bewerken</button><button class="lesson-delete" onclick="event.stopPropagation();deleteLessonById('+l.id+')">🗑️ Verwijderen</button></div>':'')+'</div>').join('')+
       '</div>'+
     '</section>';
   }).join('')+'</div>';
@@ -2211,7 +2214,9 @@ async function saveLesson(){
   const title=document.getElementById('lessonName').value.trim();
   const explanation=document.getElementById('lessonExplanation')?.value.trim()||'';
   const type=document.getElementById('lessonType').value;
-  const subvak=document.getElementById('lessonSubvak')?.value.trim()||'';
+  const enteredSubvak=document.getElementById('lessonSubvak')?.value.trim()||'';
+  const existingSubvak=lessons.find(l=>l.student===student&&l.subject===subject&&normalizeSubvakKey(l.subvak)===normalizeSubvakKey(enteredSubvak)&&String(l.subvak||'').trim());
+  const subvak=existingSubvak?.subvak?.trim()||enteredSubvak;
   const aiCheckAnswers=document.getElementById('customAiCheckAnswers')?.checked===true;
   const editorLabels=type==='spelling'?getSpellingLabels():null;
   const testDate=document.getElementById('lessonTestDate')?.value||'';

@@ -435,6 +435,10 @@ body{background:#1787f2}
 
       <aside class="side-panel">
         <button id="manageButton" class="parent-button side-manage-button" onclick="isParentLoggedIn()?showParentDashboard():showLogin()">⚙️ Beheer</button>
+        <button class="card side-card mini-agenda-card" onclick="showAgenda()" type="button">
+          <div class="mini-agenda-head"><h3>📅 Mijn agenda</h3><span>Bekijk →</span></div>
+          <div class="mini-agenda-list"></div>
+        </button>
         <div id="progressPanel" class="card side-card">
           <h3>Jouw voortgang</h3>
           <p class="stat-big" id="lessonCountStat">0</p><div class="small">lessen beschikbaar</div>

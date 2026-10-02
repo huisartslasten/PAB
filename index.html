@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V3.19 -->
+<!-- PacoGO TEST V3.20 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -165,7 +165,7 @@ body{background:#1787f2}
   .date-picker-day{min-height:52px;font-size:16px;border-radius:12px}
 }
 
-.version-badge{position:static;display:block;width:max-content;margin:28px auto 8px;background:transparent;color:#9aa9ba;padding:0;font-size:12px;font-weight:700;box-shadow:none;letter-spacing:.2px}.parent-dashboard-intro h2{font-family:"Baloo 2",Nunito,sans-serif;font-size:38px;line-height:1;font-weight:900;color:#102b57;margin:0}.parent-dashboard-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:18px 0}.parent-dashboard-head h2{margin:0}.parent-student-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}.parent-student-card{background:#fff;border:2px solid var(--border);border-radius:18px;padding:18px;text-align:left;cursor:pointer;box-shadow:var(--shadow);transition:.14s}.parent-student-card:hover{border-color:#8bcfff;transform:translateY(-2px)}.parent-student-card.active{border-color:var(--blue);background:#eef8ff}.parent-student-card .name{font-size:22px;font-weight:950;color:var(--text)}.parent-student-card .kind{font-size:13px;color:var(--muted);margin-top:3px}.parent-management{margin-top:18px}.parent-lesson-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid var(--border)}.parent-lesson-row:last-child{border-bottom:0}.parent-lesson-info strong{display:block}.parent-lesson-info span{font-size:13px;color:var(--muted)}.parent-guest-toggle{min-width:120px}.parent-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}@media(max-width:700px){.dashboard-admin-actions{gap:6px}.dashboard-admin-actions button{padding:9px 11px}.version-badge{right:8px;bottom:8px;font-size:11px}.parent-student-grid{grid-template-columns:1fr 1fr}.parent-lesson-row{align-items:flex-start;flex-direction:column}.parent-guest-toggle{width:100%}}
+.version-badge{position:static;display:block;width:max-content;margin:28px auto 8px;background:transparent;color:#9aa9ba;padding:0;font-size:12px;font-weight:700;box-shadow:none;letter-spacing:.2px}.parent-dashboard-intro h2{font-family:"Baloo 2",Nunito,sans-serif;font-size:38px;line-height:1;font-weight:900;color:#102b57;margin:0}.parent-dashboard-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:18px 0}.parent-dashboard-head h2{margin:0}.parent-student-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}.parent-student-card{background:#fff;border:2px solid var(--border);border-radius:18px;padding:18px;box-shadow:var(--shadow);transition:.14s}.parent-student-card:hover{border-color:#8bcfff;transform:translateY(-2px)}.parent-student-card .name{font-size:24px;font-weight:950;color:var(--text)}.parent-student-card .kind{font-size:13px;color:var(--muted);margin-top:3px}.parent-student-card .meta{font-size:14px;color:var(--muted);margin-top:10px}.parent-student-card-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.parent-student-card-actions button{flex:1;min-width:150px}.parent-management{margin-top:18px}.parent-lesson-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid var(--border)}.parent-lesson-row:last-child{border-bottom:0}.parent-lesson-info strong{display:block}.parent-lesson-info span{font-size:13px;color:var(--muted)}.parent-guest-toggle{min-width:120px}.parent-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}@media(max-width:700px){.dashboard-admin-actions{gap:6px}.dashboard-admin-actions button{padding:9px 11px}.version-badge{right:8px;bottom:8px;font-size:11px}.parent-student-grid{grid-template-columns:1fr 1fr}.parent-lesson-row{align-items:flex-start;flex-direction:column}.parent-guest-toggle{width:100%}}
 /* TEST 004 — nieuwe les editor: rustige, duidelijke blokken */
 .editor-student,.editor-type-box,.field{border-color:#b9cce0}
 .editor-student,.editor-type-box{width:100%;max-width:none}
@@ -652,10 +652,10 @@ body{background:#1787f2}
   <main id="parentDashboard" class="page hidden">
     <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 BEHEER</div></div>
     <div class="card parent-dashboard-intro">
-      <h2>👨‍👩‍👧 Beheer</h2>
-      <p class="small">Kies links een leerling om de lessen en toetsgeschiedenis te bekijken.</p>
+      <h2>⚙️ Beheer</h2>
+      <p class="small">Kies een leerling om verder te gaan, of print direct de maandkalender.</p>
     </div>
-    <div id="parentStudentGrid" class="parent-student-grid hidden"></div>
+    <div id="parentStudentGrid" class="parent-student-grid"></div>
     <div id="parentManagement" class="parent-management"></div>
   </main>
 
@@ -804,7 +804,7 @@ function isCreator(){return !!currentSession&&CREATOR_IDS.has(currentSession.use
 function updateAuthUI(session){currentSession=session;const logged=isParentLoggedIn();document.getElementById('loginButton')?.classList.toggle('hidden',logged);document.getElementById('logoutButton')?.classList.toggle('hidden',!logged);document.querySelectorAll('.side-logout-button').forEach(e=>e.classList.toggle('hidden',!logged));document.querySelectorAll('.side-manage-button').forEach(e=>e.classList.remove('hidden'));document.getElementById('manageButton')?.classList.remove('hidden');document.getElementById('addLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('addLessonButton2')?.classList.toggle('hidden',!logged);document.getElementById('editLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('aiImproveLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('deleteLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('addTestButton')?.classList.toggle('hidden',!logged);document.querySelectorAll('#parentDashboard .parent-sidebar,#aiAssignment .parent-sidebar,#creatorConsole .parent-sidebar').forEach(el=>{el.outerHTML=buildParentSideBarHtml()});}
 function requireParent(){if(!isParentLoggedIn()){showMessage('Alleen ouders kunnen lessen wijzigen. Log eerst in.','error');showHome();return false}return true}
 function buildSideBarHtml(){return `<aside class="sidebar"><div class="student-sidebar-greeting"></div><button class="side-item" onclick="showHome()"><span class="side-icon">🏠</span>Home</button><button class="side-item" onclick="goToSubjects()"><span class="side-icon">📖</span>Mijn lessen</button><div class="sidebar-subjects"></div><button class="side-item" onclick="showAgenda()"><span class="side-icon">📅</span>Mijn agenda</button><div class="sidebar-subjects agenda-subjects"><button class="sidebar-subject" onclick="showAgendaImport()"><span>📥</span>Agenda invoeren</button><button class="sidebar-subject sidebar-print-month hidden" onclick="printAgendaMonth()"><span>🖨️</span>Print maandkalender</button></div><button class="side-item" onclick="isParentLoggedIn()?showTestHistory(currentStudent):showLogin()"><span class="side-icon">📝</span>Toetsgeschiedenis</button><div class="sidebar-note">🐾 <strong>Goed bezig!</strong><br>Elke les brengt je een pootje verder.</div></aside>`}
-function buildParentSideBarHtml(){const names=['Zyon','Zenith','Zephon','Testleerling'];const creator=isCreator();return `<aside class="sidebar parent-sidebar"><div class="parent-sidebar-title">⚙️ Beheer</div><button class="parent-sidebar-mainpage" onclick="switchStudent()">🏠 Main Page</button><div class="parent-sidebar-subtitle">👤 Leerling kiezen</div><div class="parent-sidebar-students">${names.map(name=>{const active=parentSelectedStudent===name?' active':'';return `<button class="parent-sidebar-student${active}" onclick="selectParentStudent('${name}')">👦 <strong>${name}</strong></button>`}).join('')}</div><div class="parent-sidebar-actions"><button class="parent-sidebar-action" onclick="parentStartLesson()">➕ Les maken</button><button class="parent-sidebar-action" onclick="showAiAssignment()">🤖 AI-opdracht</button><button class="parent-sidebar-action" onclick="showTestHistory(parentSelectedStudent)">📝 Toetsgeschiedenis</button><button class="parent-sidebar-action parent-feedback-button" onclick="showParentFeedback()">💬 Feedback & ideeën</button>${creator?'<button class="parent-sidebar-action parent-feedback-button" onclick="showCreatorConsole()">🧠 Creator Console</button>':''}</div><div class="sidebar-note">🐾 <strong>PacoGO Beheer</strong><br>${creator?'Hoofdbeheerder':'Ouder'}omgeving.</div></aside>`}
+function buildParentSideBarHtml(){const creator=isCreator();return `<aside class="sidebar parent-sidebar"><div class="parent-sidebar-title">⚙️ Beheer</div><button class="parent-sidebar-mainpage" onclick="switchStudent()">🏠 Main Page</button><div class="parent-sidebar-actions"><button class="parent-sidebar-action" onclick="parentStartLesson()">➕ Les maken</button><button class="parent-sidebar-action" onclick="showAiAssignment()">🤖 AI-opdracht</button><button class="parent-sidebar-action" onclick="showTestHistory()">📝 Toetsgeschiedenis</button><button class="parent-sidebar-action parent-feedback-button" onclick="showParentFeedback()">💬 Feedback & ideeën</button>${creator?'<button class="parent-sidebar-action parent-feedback-button" onclick="showCreatorConsole()">🧠 Creator Console</button>':''}</div><div class="sidebar-note">🐾 <strong>PacoGO Beheer</strong><br>${creator?'Hoofdbeheerder':'Ouder'}omgeving.</div></aside>`}
 function buildSideRightHtml(includeManage=true){
   return '<aside class="side-panel">'+
     (!includeManage?'<button class="logout-button side-logout-button hidden" onclick="logoutParent()">Logout</button>':'')+
@@ -1344,6 +1344,7 @@ function renderAgenda(){
   el.innerHTML='<section class="agenda-school-week">'+navTop+'<div class="agenda-week-days"><div class="agenda-weekday-row">'+weekdayDays+'</div><div class="agenda-weekend-row">'+weekendDays+'</div></div>'+navBottom+'</section>'+
   '';
 }
+function printAgendaMonthForStudent(name){if(!isParentLoggedIn())return;const previous=currentStudent;currentStudent=name;printAgendaMonth();currentStudent=previous}
 function printAgendaMonth(){
   if(!isParentLoggedIn()){showMessage('Alleen de beheerder kan de maandkalender printen.','error');return}
   const base=agendaWeekStart||agendaGetCurrentWeekStart();
@@ -1669,14 +1670,8 @@ function leaveActivity(){window.speechSynthesis?.cancel();activity=null;showLess
 function showLessonChoice(l){currentLesson=l;openLesson(l.id)}
 
 let parentSelectedStudent=null;
-async function showParentDashboard(){
-  if(!requireParent())return;
-  hideAll();
-  document.getElementById('parentDashboard').classList.remove('hidden');
-  parentSelectedStudent=parentSelectedStudent||currentStudent||'Zenith';
-  await renderParentDashboard();
-}
-function parentStartLesson(){if(!requireParent())return;currentStudent=parentSelectedStudent||currentStudent||'Zyon';showAddLesson()}
+async function showParentDashboard(){if(!requireParent())return;hideAll();parentSelectedStudent=null;currentStudent=null;document.getElementById('parentDashboard').classList.remove('hidden');renderParentDashboard()}
+function parentStartLesson(){if(!requireParent())return;currentStudent=null;showAddLesson()}
 async function renderParentDashboard(){
   const grid=document.getElementById('parentStudentGrid');
   const management=document.getElementById('parentManagement');
@@ -1685,24 +1680,19 @@ async function renderParentDashboard(){
   let guests=[];
   const guestRes=await db.from('guest_access').select('id,guest_name,active').eq('active',true).order('id',{ascending:true});
   if(!guestRes.error)guests=guestRes.data||[];
-  grid.innerHTML=baseStudents.map(name=>parentStudentCard(name,false)).join('')+
-    guests.map(g=>parentStudentCard(g.guest_name,true,g.id)).join('');
+  grid.innerHTML=baseStudents.map(name=>parentStudentCard(name,false)).join('')+guests.map(g=>parentStudentCard(g.guest_name,true,g.id)).join('');
+  management.innerHTML='';
   const parentPage=document.getElementById('parentDashboard');
   const parentSidebar=parentPage?.querySelector('.parent-sidebar');
   if(parentSidebar)parentSidebar.outerHTML=buildParentSideBarHtml();
-  await renderParentStudent();
 }
 function parentStudentCard(name,isGuest=false,guestId=''){
-  const active=parentSelectedStudent===name?' active':'';
+  const own=lessons.filter(l=>l.student===name&&!l.archived);
   const jsName=escapeAttr(JSON.stringify(name));
-  const jsGuestId=escapeAttr(JSON.stringify(guestId));
-  return '<button class="parent-student-card'+active+'" onclick="selectParentStudent('+jsName+','+(isGuest?'true':'false')+','+jsGuestId+')"><div class="name">'+escapeHtml(name)+'</div><div class="kind">'+(isGuest?'👤 Gastleerling':'👦 Leerling')+'</div></button>';
+  return '<div class="parent-student-card"><div class="name">👦 '+escapeHtml(name)+'</div><div class="kind">'+(isGuest?'Gastleerling':'Leerling')+'</div><div class="meta">📚 '+own.length+' actieve lessen</div><div class="parent-student-card-actions"><button class="secondary" type="button" onclick="printAgendaMonthForStudent('+jsName+')">🖨️ Maandkalender printen</button><button type="button" onclick="selectParentStudent('+jsName+')">→ Naar leerling</button></div></div>';
 }
-function selectParentStudent(name,isGuest=false,guestId=''){
-  parentSelectedStudent=name;
-  currentStudent=name;
-  showHome();
-}
+function selectParentStudent(name,isGuest=false,guestId=''){parentSelectedStudent=name;currentStudent=name;showHome()}
+
 async function showParentFeedback(){
   if(!requireParent())return;
   hideAll();

@@ -367,7 +367,7 @@ body{background:#1787f2}
 .ai-item-proposal .proposal-reason{margin-top:10px;color:#667894;font-size:13px}
 
 <style id="pacogo-ai-modal-fix">@media(max-width:700px){.modal-backdrop{padding:10px;align-items:flex-start}.modal{max-height:calc(100dvh - 20px);padding:20px}.ai-item-edit-modal{width:100%;height:calc(100dvh - 20px);max-height:calc(100dvh - 20px)}}
-.ai-item-edit-modal .modal-actions{position:sticky;bottom:0;background:#fff;padding:12px 0 2px;margin-top:14px;border-top:1px solid var(--border);z-index:4}</style>
+.lesson-ai-instructions{display:grid;gap:8px}.lesson-ai-instruction-row{display:flex;align-items:center;gap:8px}.lesson-ai-instruction-row input{flex:1;min-width:0;padding:11px 12px;border:1px solid #cdddec;border-radius:12px;background:#fff;color:var(--text)}.lesson-ai-instruction-row button{flex:0 0 auto;background:#fee5e3;color:#b42318;box-shadow:none;padding:8px 10px;border-radius:10px}.lesson-ai-instruction-empty{padding:11px 12px;border:1px dashed #cbdceb;border-radius:12px;background:#f7fbff;color:var(--muted);font-size:14px}.ai-item-edit-modal .modal-actions{position:sticky;bottom:0;background:#fff;padding:12px 0 2px;margin-top:14px;border-top:1px solid var(--border);z-index:4}</style>
 </head>
 <body>
 <div class="container">
@@ -622,7 +622,7 @@ body{background:#1787f2}
       <div class="editor-student"><strong>Voor welke leerling?</strong><div class="editor-student-buttons"><label class="editor-student-choice"><input type="radio" name="lessonStudent" value="Zyon"><span>Zyon</span></label><label class="editor-student-choice"><input type="radio" name="lessonStudent" value="Zenith"><span>Zenith</span></label><label class="editor-student-choice"><input type="radio" name="lessonStudent" value="Zephon"><span>Zephon</span></label><label class="editor-student-choice"><input type="radio" name="lessonStudent" value="Testleerling"><span>Testleerling</span></label></div></div>
       <div class="field"><label for="lessonSubject">Vak</label><input id="lessonSubject" placeholder="Voer vak in bijvoorbeeld Nederlands"></div>
       <div class="field"><label for="lessonName">Naam van de les</label><input id="lessonName" placeholder="Bijvoorbeeld Week 4"></div>
-      <div class="field"><label for="lessonExplanation">Uitleg <span class="small">(optioneel)</span></label><textarea id="lessonExplanation" placeholder="Leg hier de leerstof of regel uit. Dit wordt apart boven de oefeningen getoond."></textarea></div><div class="field"><label for="lessonAiInstruction">🤖 AI-instructie voor de hele les <span class="small">(optioneel)</span></label><textarea id="lessonAiInstruction" placeholder="Bijvoorbeeld: Noem de woorden tussen haakjes niet in de vragen of antwoorden. Deze regel geldt voor de hele les."></textarea><div class="small">Deze instructie geldt voor alle AI-aanpassingen binnen deze les.</div></div><div class="row" style="justify-content:flex-end;margin:-6px 0 16px"><button class="secondary" type="button" onclick="showAiImproveCurrentLesson()">🤖 AI aanpassen voor hele les</button></div>
+      <div class="field"><label for="lessonExplanation">Uitleg <span class="small">(optioneel)</span></label><textarea id="lessonExplanation" placeholder="Leg hier de leerstof of regel uit. Dit wordt apart boven de oefeningen getoond."></textarea></div><div class="field"><label>🤖 AI-instructies voor de hele les <span class="small">(optioneel)</span></label><div id="lessonAiInstructions" class="lesson-ai-instructions"></div><div class="row" style="justify-content:flex-start;margin-top:8px"><button class="secondary" type="button" onclick="addLessonAiInstructionRow()">➕ Instructie toevoegen</button></div><div class="small">Deze instructies blijven bij de les bewaard. Je kunt later nieuwe instructies toevoegen of bestaande aanpassen.</div></div><div class="row" style="justify-content:flex-end;margin:-6px 0 16px"><button class="secondary" type="button" onclick="showAiImproveCurrentLesson()">🤖 AI aanpassen voor hele les</button></div>
       <div class="editor-type-box"><div class="field"><label for="lessonType">Onderdeel</label><div class="lesson-type-select"><button type="button" id="lessonTypeButton" class="lesson-type-button" onclick="toggleLessonTypeMenu()"><span id="lessonTypeButtonText">🎯 Woordtrainer</span><span class="lesson-type-chevron">⌄</span></button><div id="lessonTypeMenu" class="lesson-type-menu hidden"><button type="button" onclick="setLessonType('words')">🎯 Woordtrainer</button><button type="button" onclick="setLessonType('questions')">❓ Vragen</button><button type="button" onclick="setLessonType('dictation')">✏️ Dictee</button><button type="button" onclick="setLessonType('math')">🔢 Rekenen</button><button type="button" onclick="setLessonType('spelling')">✍️ Spelling</button></div><select id="lessonType" class="lesson-type-native" tabindex="-1" aria-hidden="true"><option value="words">words</option><option value="questions">questions</option><option value="dictation">dictation</option><option value="math">math</option><option value="spelling">spelling</option></select></div></div><div class="lesson-test-date-box"><label class="lesson-test-date-toggle"><input id="lessonTestDateEnabled" type="checkbox" onchange="toggleLessonTestDate()"> 📅 Toetsdatum instellen</label><div class="small" style="margin-top:5px">Optioneel. Alleen instellen als er al een toetsdatum bekend is.</div><input id="lessonTestDate" type="hidden"><div id="lessonTestDatePicker" class="date-picker lesson-test-date-picker hidden"></div></div>
       <div id="wordEditor"></div><div id="questionEditor" class="hidden"></div><div id="dictationEditor" class="hidden"></div><div id="mathEditor" class="hidden"></div><div id="spellingEditor" class="hidden"></div>
       <div class="row" style="margin-top:18px"><button onclick="addCurrentRow()">➕ Rij toevoegen</button><button class="success" onclick="saveLesson()">💾 Les opslaan</button></div>
@@ -735,7 +735,7 @@ body{background:#1787f2}
       <div class="field"><label for="aiItemCurrentQuestion">Huidige vraag</label><textarea id="aiItemCurrentQuestion" class="ai-item-readonly" readonly></textarea></div>
       <div class="field"><label for="aiItemCurrentAnswer">Huidig antwoord</label><textarea id="aiItemCurrentAnswer" class="ai-item-readonly" readonly></textarea></div>
       <div class="field"><label for="aiItemInstruction">Wat wil je anders?</label><textarea id="aiItemInstruction" placeholder="Bijvoorbeeld: Maak de vraag duidelijker en zorg dat de leerling zelf het juiste Spaanse woord moet geven."></textarea></div>
-      <div class="field"><label for="aiItemScope">Wat mag AI aanpassen?</label><select id="aiItemScope"><option value="question">Alleen de vraag</option><option value="both">Vraag en antwoord</option></select></div>
+      <div class="field"><label for="aiItemScope">Wat mag AI aanpassen?</label><select id="aiItemScope"><option value="question">Alleen de vraag</option><option value="answer">Alleen het antwoord</option><option value="both">Vraag en antwoord</option></select><div class="small">Kies bijvoorbeeld <strong>Alleen het antwoord</strong> wanneer de vraag al goed is.</div></div>
       <div id="aiItemEditStatus" class="ai-ai-status"></div>
       <div id="aiItemEditProposal"></div>
       <div class="modal-actions">
@@ -1428,13 +1428,13 @@ function showAiImproveCurrentLesson(){
     subject=document.getElementById('lessonSubject')?.value.trim()||currentLesson.subject||'';
     title=document.getElementById('lessonName')?.value.trim()||currentLesson.title||'';
     explanation=document.getElementById('lessonExplanation')?.value.trim()||currentLesson.explanation||'';
-    lessonInstruction=document.getElementById('lessonAiInstruction')?.value.trim()||currentLesson.ai_instruction||'';
+    lessonInstruction=lessonAiInstructionText(serializeLessonAiInstructions(getLessonAiInstructions().length?getLessonAiInstructions():parseLessonAiInstructions(currentLesson.ai_instruction||'')));
     source=aiItemSourceMaterial();
   }else{
     subject=currentLesson.subject||'';
     title=currentLesson.title||'';
     explanation=currentLesson.explanation||'';
-    lessonInstruction=currentLesson.ai_instruction||'';
+    lessonInstruction=lessonAiInstructionText(currentLesson.ai_instruction||'');
     source=['UITLEG:',explanation||'(geen aparte uitleg)','OEFENINGEN:'].concat((currentLesson.lesson_items||[]).map((it,i)=>(i+1)+'. Vraag: '+it.question+' | Antwoord: '+it.answer)).join('\\n');
   }
   hideAll();
@@ -1443,7 +1443,7 @@ function showAiImproveCurrentLesson(){
   document.getElementById('aiAssignmentSubject').value=subject;
   document.getElementById('aiAssignmentTitle').value=title;
   document.getElementById('aiAssignmentPrompt').value='Pas deze instructie toe op de hele les. Behoud de leerinhoud en betekenis, maar pas de vragen en antwoorden waar nodig aan.';
-  if(document.getElementById('aiLessonInstruction'))document.getElementById('aiLessonInstruction').value=lessonInstruction;
+  if(document.getElementById('aiLessonInstruction'))document.getElementById('aiLessonInstruction').value=lessonInstruction.replace(/^• /gm,'').replace(/\n• /g,'\n');
   document.getElementById('aiSourceMaterial').value=source;
   document.getElementById('aiAssignmentStatus').textContent='Bestaande les geladen. Geef eventueel extra uitleg en maak daarna één voorstel voor de hele les.';
   document.getElementById('aiAssignmentDraft').innerHTML='';
@@ -2107,12 +2107,61 @@ async function createLessonFromPhoto(){
   showMessage('Les gemaakt uit de foto. Controleer hem gerust nog even.','success');
   showParentDashboard();
 }
-async function showAddLesson(){if(photoSessionToken)await cleanupPhotoSession();if(!requireParent())return;currentLesson=null;hideAll();document.getElementById('editor').classList.remove('hidden');document.getElementById('editorTitle').textContent='Nieuwe les';document.getElementById('lessonSubject').value='';document.querySelectorAll('input[name=lessonStudent]').forEach(r=>r.checked=r.value===currentStudent);document.getElementById('lessonName').value='';document.getElementById('lessonExplanation').value='';if(document.getElementById('lessonAiInstruction'))document.getElementById('lessonAiInstruction').value='';document.getElementById('lessonType').value='words';document.getElementById('lessonTestDate').value='';document.getElementById('lessonTestDateEnabled').checked=false;document.getElementById('lessonTestDatePicker').classList.add('hidden');document.getElementById('editorError').classList.add('hidden');resetEditorRows();changeLessonType();renderDatePicker('lessonTestDatePicker','lessonTestDate','')}
+async function showAddLesson(){if(photoSessionToken)await cleanupPhotoSession();if(!requireParent())return;currentLesson=null;hideAll();document.getElementById('editor').classList.remove('hidden');document.getElementById('editorTitle').textContent='Nieuwe les';document.getElementById('lessonSubject').value='';document.querySelectorAll('input[name=lessonStudent]').forEach(r=>r.checked=r.value===currentStudent);document.getElementById('lessonName').value='';document.getElementById('lessonExplanation').value='';renderLessonAiInstructions('');addLessonAiInstructionRow();document.getElementById('lessonType').value='words';document.getElementById('lessonTestDate').value='';document.getElementById('lessonTestDateEnabled').checked=false;document.getElementById('lessonTestDatePicker').classList.add('hidden');document.getElementById('editorError').classList.add('hidden');resetEditorRows();changeLessonType();renderDatePicker('lessonTestDatePicker','lessonTestDate','')}
 function resetEditorRows(){document.getElementById('wordEditor').innerHTML='';document.getElementById('questionEditor').innerHTML='';document.getElementById('dictationEditor').innerHTML='';document.getElementById('mathEditor').innerHTML='';document.getElementById('spellingEditor').innerHTML='';addWordRow()}
 function syncLessonTypeButton(){const select=document.getElementById('lessonType'),text=document.getElementById('lessonTypeButtonText');if(!select||!text)return;const labels={words:'🎯 Woordtrainer',questions:'❓ Vragen',dictation:'✏️ Dictee',math:'🔢 Rekenen',spelling:'✍️ Spelling'};text.textContent=labels[select.value]||'🎯 Woordtrainer'}
 function toggleLessonTypeMenu(){document.getElementById('lessonTypeMenu')?.classList.toggle('hidden')}
 function setLessonType(value){const select=document.getElementById('lessonType');if(!select)return;select.value=value;syncLessonTypeButton();document.getElementById('lessonTypeMenu')?.classList.add('hidden');changeLessonType()}
 let aiItemEditState=null;
+function parseLessonAiInstructions(value){
+  const raw=String(value||'').trim();
+  if(!raw)return [];
+  try{
+    const parsed=JSON.parse(raw);
+    if(Array.isArray(parsed))return parsed.map(x=>String(x||'').trim()).filter(Boolean);
+  }catch(_){}
+  return raw.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+}
+function serializeLessonAiInstructions(list){
+  return JSON.stringify((Array.isArray(list)?list:[]).map(x=>String(x||'').trim()).filter(Boolean));
+}
+function getLessonAiInstructions(){
+  return [...document.querySelectorAll('#lessonAiInstructions .lesson-ai-instruction-input')].map(el=>el.value.trim()).filter(Boolean);
+}
+function renderLessonAiInstructions(value){
+  const wrap=document.getElementById('lessonAiInstructions');
+  if(!wrap)return;
+  const list=parseLessonAiInstructions(value);
+  if(!list.length){
+    wrap.innerHTML='<div class="lesson-ai-instruction-empty">Nog geen lesbrede AI-instructies.</div>';
+    return;
+  }
+  wrap.innerHTML=list.map((instruction)=>'<div class="lesson-ai-instruction-row"><input class="lesson-ai-instruction-input" value="'+escapeAttr(instruction)+'" placeholder="Bijvoorbeeld: Noem de woorden tussen haakjes niet in de vragen of antwoorden."><button type="button" title="Instructie verwijderen">✕</button></div>').join('');
+  wrap.querySelectorAll('.lesson-ai-instruction-row button').forEach(btn=>btn.onclick=()=>removeLessonAiInstructionRow(btn));
+}
+function addLessonAiInstructionRow(value=''){
+  const wrap=document.getElementById('lessonAiInstructions');
+  if(!wrap)return;
+  const empty=wrap.querySelector('.lesson-ai-instruction-empty');
+  if(empty)empty.remove();
+  const row=document.createElement('div');
+  row.className='lesson-ai-instruction-row';
+  row.innerHTML='<input class="lesson-ai-instruction-input" placeholder="Bijvoorbeeld: Noem de woorden tussen haakjes niet in de vragen of antwoorden."><button type="button" title="Instructie verwijderen">✕</button>';
+  const input=row.querySelector('input');
+  if(input)input.value=String(value||'');
+  row.querySelector('button').onclick=()=>removeLessonAiInstructionRow(row.querySelector('button'));
+  wrap.appendChild(row);
+  input?.focus();
+}
+function removeLessonAiInstructionRow(button){
+  button?.closest('.lesson-ai-instruction-row')?.remove();
+  const wrap=document.getElementById('lessonAiInstructions');
+  if(wrap&&!wrap.querySelector('.lesson-ai-instruction-row'))wrap.innerHTML='<div class="lesson-ai-instruction-empty">Nog geen lesbrede AI-instructies.</div>';
+}
+function lessonAiInstructionText(value){
+  return parseLessonAiInstructions(value).map(x=>'• '+x).join('\n');
+}
+
 
 function aiItemFields(row,type){
   const get=selector=>row?.querySelector(selector)?.value?.trim()||'';
@@ -2140,7 +2189,8 @@ function aiItemSetFields(row,type,question,answer){
 }
 function aiItemSourceMaterial(){
   const explanation=document.getElementById('lessonExplanation')?.value.trim()||currentLesson?.explanation||'';
-  const lessonAiInstruction=document.getElementById('lessonAiInstruction')?.value.trim()||currentLesson?.ai_instruction||'';
+  const currentInstructions=getLessonAiInstructions();
+  const lessonAiInstruction=serializeLessonAiInstructions(currentInstructions.length?currentInstructions:parseLessonAiInstructions(currentLesson?.ai_instruction||''));
   let items=[];
   try{items=collectItems().map((it,i)=>(i+1)+'. Vraag: '+it.question+' | Antwoord: '+it.answer);}catch(_){}
   if(!items.length&&currentLesson?.lesson_items?.length)items=currentLesson.lesson_items.map((it,i)=>(i+1)+'. Vraag: '+it.question+' | Antwoord: '+it.answer);
@@ -2189,7 +2239,7 @@ async function generateAiItemProposal(){
       subject:document.getElementById('lessonSubject').value.trim(),
       lessonTitle:document.getElementById('lessonName').value.trim(),
       explanation:document.getElementById('lessonExplanation').value.trim(),
-      lessonInstruction:document.getElementById('lessonAiInstruction')?.value.trim()||'',
+      lessonInstruction:lessonAiInstructionText(serializeLessonAiInstructions(getLessonAiInstructions().length?getLessonAiInstructions():parseLessonAiInstructions(currentLesson?.ai_instruction||''))),
       scope,
       instruction,
       currentQuestion:fields.question,
@@ -2215,8 +2265,9 @@ function applyAiItemProposal(){
   const {row,type,proposal}=aiItemEditState;
   const scope=document.getElementById('aiItemScope').value;
   const current=aiItemFields(row,type);
-  const answer=scope==='both'?proposal.answer:current.answer;
-  aiItemSetFields(row,type,proposal.question,answer);
+  const question=scope==='answer'?current.question:proposal.question;
+  const answer=scope==='question'?current.answer:proposal.answer;
+  aiItemSetFields(row,type,question,answer);
   closeAiItemEditor();
   showMessage('✅ AI-voorstel toegepast. Sla de les op om de wijziging definitief te bewaren.','success');
 }
@@ -2295,7 +2346,7 @@ async function saveLesson(){
   const student=document.querySelector('input[name=lessonStudent]:checked')?.value||currentStudent;
   const title=document.getElementById('lessonName').value.trim();
   const explanation=document.getElementById('lessonExplanation')?.value.trim()||'';
-  const aiInstruction=document.getElementById('lessonAiInstruction')?.value.trim()||'';
+  const aiInstruction=serializeLessonAiInstructions(getLessonAiInstructions());
   const type=document.getElementById('lessonType').value;
   const testDate=document.getElementById('lessonTestDate')?.value||'';
   const items=collectItems();
@@ -2364,7 +2415,7 @@ async function saveLesson(){
   refreshPageSidebars();
   showMessage(testDate?'Les opgeslagen en toetsdatum toegevoegd.':'Les opgeslagen.','success');
 }
-function editCurrentLesson(){if(!requireParent())return;const l=currentLesson;hideAll();document.getElementById('editor').classList.remove('hidden');document.getElementById('editorTitle').textContent='Les bewerken';document.getElementById('lessonSubject').value=l.subject;document.querySelectorAll('input[name=lessonStudent]').forEach(r=>r.checked=r.value===l.student);document.getElementById('lessonName').value=l.title;document.getElementById('lessonExplanation').value=l.explanation||'';if(document.getElementById('lessonAiInstruction'))document.getElementById('lessonAiInstruction').value=l.ai_instruction||'';document.getElementById('lessonType').value=l.type;const existingTest=getTestDateForLesson(l.id,l.student);document.getElementById('lessonTestDate').value=existingTest?.date||'';document.getElementById('lessonTestDateEnabled').checked=!!existingTest?.date;document.getElementById('lessonTestDatePicker').classList.toggle('hidden',!existingTest?.date);document.getElementById('wordEditor').innerHTML='';document.getElementById('questionEditor').innerHTML='';document.getElementById('dictationEditor').innerHTML='';document.getElementById('mathEditor').innerHTML='';document.getElementById('spellingEditor').innerHTML='';l.lesson_items.forEach(it=>{if(l.type==='words')addWordRow(it.question,it.answer);else if(l.type==='questions')addQuestionRow(it.question,it.answer);else if(l.type==='dictation')addDictationRow(it.question);else if(l.type==='math')addMathRow(it.question,it.answer);else if(l.type==='spelling'){const a=String(it.answer||'').split(' || ');addSpellingRow(it.question,a[0]||'',a[1]||'')}});changeLessonType();addCurrentRow();renderDatePicker('lessonTestDatePicker','lessonTestDate',existingTest?.date||'')}
+function editCurrentLesson(){if(!requireParent())return;const l=currentLesson;hideAll();document.getElementById('editor').classList.remove('hidden');document.getElementById('editorTitle').textContent='Les bewerken';document.getElementById('lessonSubject').value=l.subject;document.querySelectorAll('input[name=lessonStudent]').forEach(r=>r.checked=r.value===l.student);document.getElementById('lessonName').value=l.title;document.getElementById('lessonExplanation').value=l.explanation||'';renderLessonAiInstructions(l.ai_instruction||'');document.getElementById('lessonType').value=l.type;const existingTest=getTestDateForLesson(l.id,l.student);document.getElementById('lessonTestDate').value=existingTest?.date||'';document.getElementById('lessonTestDateEnabled').checked=!!existingTest?.date;document.getElementById('lessonTestDatePicker').classList.toggle('hidden',!existingTest?.date);document.getElementById('wordEditor').innerHTML='';document.getElementById('questionEditor').innerHTML='';document.getElementById('dictationEditor').innerHTML='';document.getElementById('mathEditor').innerHTML='';document.getElementById('spellingEditor').innerHTML='';l.lesson_items.forEach(it=>{if(l.type==='words')addWordRow(it.question,it.answer);else if(l.type==='questions')addQuestionRow(it.question,it.answer);else if(l.type==='dictation')addDictationRow(it.question);else if(l.type==='math')addMathRow(it.question,it.answer);else if(l.type==='spelling'){const a=String(it.answer||'').split(' || ');addSpellingRow(it.question,a[0]||'',a[1]||'')}});changeLessonType();addCurrentRow();renderDatePicker('lessonTestDatePicker','lessonTestDate',existingTest?.date||'')}
 function deleteCurrentLesson(){
   if(!requireParent())return;
   if(!currentLesson)return;

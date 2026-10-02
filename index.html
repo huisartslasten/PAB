@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V3.8 -->
+<!-- PacoGO TEST V3.9 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -339,6 +339,64 @@ body{background:#1787f2}
 .lesson-explanation-title{font-weight:900;margin-bottom:6px}
 @media(max-width:800px){.ai-assignment-grid{grid-template-columns:1fr}.ai-draft-head{flex-direction:column}}
 
+
+/* TEST V3.9 — subvakken als blokken + drag & drop */
+.subvak-block{
+  margin:24px 0 28px;
+  padding:14px 16px 18px;
+  background:#eef8ff;
+  border:2px solid #bfe6ff;
+  border-radius:20px;
+  box-shadow:0 7px 18px rgba(16,43,87,.08);
+}
+.subvak-block.drop-active{
+  border-color:#1787f2;
+  background:#e5f4ff;
+  box-shadow:0 0 0 3px rgba(23,135,242,.12),0 8px 20px rgba(16,43,87,.10);
+}
+.subvak-title{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin:0;
+  padding:8px 14px;
+  background:#dff0ff;
+  border:1px solid #bfe6ff;
+  border-radius:13px;
+  color:#126fc9;
+  font-family:"Baloo 2",Nunito,sans-serif;
+  font-size:21px;
+  line-height:1.05;
+  font-weight:900;
+}
+.subvak-title.muted{
+  color:#52708f;
+  background:#f4f9fd;
+  border-color:#dce9f6;
+}
+.subvak-lessons-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(205px,1fr));
+  gap:15px;
+  margin-top:14px;
+}
+.subvak-empty{
+  margin-top:12px;
+  padding:10px 12px;
+  border-radius:12px;
+  background:#f7fbff;
+  color:#667894;
+  font-size:13px;
+}
+.mini-agenda-test{
+  padding:9px 0 10px;
+  border-top:1px solid #dce9f6;
+}
+.mini-agenda-test:first-child{border-top:0;padding-top:0}
+.mini-agenda-test-title{font-size:13px;font-weight:900;line-height:1.25;color:#123c73}
+.mini-agenda-test-date{font-size:12px;color:#667894;margin-top:3px}
+.mini-agenda-test-countdown{font-size:13px;font-weight:900;color:#126fc9;margin-top:4px}
+.mini-agenda-practice{margin-top:7px!important;width:100%;padding:7px 10px!important;font-size:12px!important}
 </style>
 </head>
 <body>
@@ -668,7 +726,7 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div class="version-badge">PacoGO TEST V3.8</div>
+  <div class="version-badge">PacoGO TEST V3.9</div>
 
 <div id="globalMessage"></div>
 
@@ -729,7 +787,16 @@ function updateAuthUI(session){currentSession=session;const logged=isParentLogge
 function requireParent(){if(!isParentLoggedIn()){showMessage('Alleen ouders kunnen lessen wijzigen. Log eerst in.','error');showHome();return false}return true}
 function buildSideBarHtml(){return `<aside class="sidebar"><button class="side-item" onclick="showHome()"><span class="side-icon">🏠</span>Home</button><button class="side-item" onclick="goToSubjects()"><span class="side-icon">📖</span>Mijn lessen</button><div class="sidebar-subjects"></div><button class="side-item" onclick="showAgenda()"><span class="side-icon">📅</span>Mijn agenda</button><div class="sidebar-subjects agenda-subjects"><button class="sidebar-subject" onclick="showAgendaImport()"><span>📥</span>Agenda invoeren</button></div><button class="side-item" onclick="isParentLoggedIn()?showTestHistory(currentStudent):showLogin()"><span class="side-icon">📝</span>Toetsgeschiedenis</button><div class="sidebar-note">🐾 <strong>Goed bezig!</strong><br>Elke les brengt je een pootje verder.</div></aside>`}
 function buildParentSideBarHtml(){const names=['Zyon','Zenith','Zephon','Testleerling'];const creator=isCreator();return `<aside class="sidebar parent-sidebar"><div class="parent-sidebar-title">⚙️ Beheer</div><div class="parent-sidebar-subtitle">👤 Leerling kiezen</div><div class="parent-sidebar-students">${names.map(name=>{const active=parentSelectedStudent===name?' active':'';return `<button class="parent-sidebar-student${active}" onclick="selectParentStudent('${name}')">👦 <strong>${name}</strong></button>`}).join('')}</div><div class="parent-sidebar-actions"><button class="parent-sidebar-action" onclick="parentStartLesson()">➕ Les maken</button><button class="parent-sidebar-action" onclick="showAiAssignment()">🤖 AI-opdracht</button><button class="parent-sidebar-action" onclick="showTestHistory(parentSelectedStudent)">📝 Toetsgeschiedenis</button><button class="parent-sidebar-action parent-feedback-button" onclick="showParentFeedback()">💬 Feedback & ideeën</button>${creator?'<button class="parent-sidebar-action parent-feedback-button" onclick="showCreatorConsole()">🧠 Creator Console</button>':''}</div><div class="sidebar-note">🐾 <strong>PacoGO Beheer</strong><br>${creator?'Hoofdbeheerder':'Ouder'}omgeving.</div></aside>`}
-function buildSideRightHtml(includeManage=true){return '<aside class="side-panel">'+ (includeManage?'<button class="parent-button side-manage-button hidden" onclick="isParentLoggedIn()?showParentDashboard():showLogin()">⚙️ Beheer</button>':'')+ '<button class="card side-card mini-agenda-card" onclick="showAgenda()" type="button"><div class="mini-agenda-head"><h3>📅 Mijn agenda</h3><span>Bekijk →</span></div><div class="mini-agenda-list"></div></button>'+ '<div class="card side-card upcoming-test-card"><h3>📝 Aankomende toetsen</h3><div class="upcoming-test-list"></div></div>'+ '<div class="card side-card test-ready-card"><h3>🎯 Toets-klaar</h3><p class="stat-big side-prep-percent">0%</p><div class="small">van je onderdelen beheerst</div><div class="progress-wrap"><div class="progress-label"><span>3× achter elkaar goed = beheerst</span><span class="side-subject-count">0 vakken</span></div><div class="progress"><div class="progress-bar side-progress-bar" style="width:10%"></div></div></div><div class="card motivation"><strong>🎯 Goed bezig!</strong><br><span class="small">Elke dag een beetje oefenen maakt verschil.</span></div></div></aside>';}
+function buildSideRightHtml(includeManage=true){
+  return '<aside class="side-panel">'+
+    (includeManage?'<button class="parent-button side-manage-button hidden" onclick="isParentLoggedIn()?showParentDashboard():showLogin()">⚙️ Beheer</button>':'')+
+    '<button class="card side-card mini-agenda-card" onclick="showAgenda()" type="button">'+
+      '<div class="mini-agenda-head"><h3>📅 Mijn agenda</h3><span>Bekijk →</span></div>'+
+      '<div class="mini-agenda-list"></div>'+
+    '</button>'+
+    '<div class="card side-card test-ready-card"><h3>🎯 Toets-klaar</h3><p class="stat-big side-prep-percent">0%</p><div class="small">van je onderdelen beheerst</div><div class="progress-wrap"><div class="progress-label"><span>3× achter elkaar goed = beheerst</span><span class="side-subject-count">0 vakken</span></div><div class="progress"><div class="progress-bar side-progress-bar" style="width:10%"></div></div></div><div class="card motivation"><strong>🎯 Goed bezig!</strong><br><span class="small">Elke dag een beetje oefenen maakt verschil.</span></div></div>'+
+  '</aside>';
+}
 function installPageSidebars(){document.querySelectorAll('.page').forEach(page=>{if(page.id==='home'||page.dataset.sidesReady)return;const banner=page.querySelector(':scope > .page-paco-banner');if(banner)banner.remove();const backWrap=document.createElement('div');backWrap.className='page-back-above-left';const directButtons=[...page.querySelectorAll(':scope > .secondary')];directButtons.forEach(btn=>{if(/Terug|Stoppen|Annuleren/.test(btn.textContent||'')){backWrap.appendChild(btn);}});page.querySelectorAll(':scope > .topbar').forEach(top=>{const btn=[...top.querySelectorAll('.secondary')].find(b=>/Terug|Stoppen|Annuleren/.test(b.textContent||''));if(btn){backWrap.appendChild(btn);if(!top.querySelector(':scope > div > button.secondary')&&top.textContent.trim()==='')top.remove();}});const shell=document.createElement('div');const agendaMode=page.id==='agenda'||page.id==='agendaImport';const parentMode=page.id==='parentDashboard'||page.id==='aiAssignment'||page.id==='creatorConsole';shell.className='page-side-layout'+(agendaMode?' page-side-layout-agenda':'');const left=document.createElement('div');left.className='page-side-left';left.innerHTML=parentMode?buildParentSideBarHtml():buildSideBarHtml();const center=document.createElement('div');center.className='page-side-center';if(agendaMode){if(backWrap.childElementCount)left.insertAdjacentElement('afterbegin',backWrap);while(page.firstChild)center.appendChild(page.firstChild);shell.append(left,center)}else{const right=document.createElement('div');right.className='page-side-right';right.innerHTML=buildSideRightHtml(!parentMode);if(backWrap.childElementCount)left.insertAdjacentElement('afterbegin',backWrap);while(page.firstChild)center.appendChild(page.firstChild);shell.append(left,center,right)}page.appendChild(shell);if(banner)page.insertBefore(banner,shell);page.dataset.sidesReady='1';});}
 function goToSubjects(){if(isParentLoggedIn()&&!document.getElementById('parentDashboard')?.classList.contains('hidden')){document.getElementById('parentManagement')?.scrollIntoView({behavior:'smooth'});return}showHome();setTimeout(()=>document.getElementById('subjects')?.scrollIntoView({behavior:'smooth'}),50)}
 function goToProgress(){showHome();setTimeout(()=>document.getElementById('progressPanel')?.scrollIntoView({behavior:'smooth'}),50)}
@@ -760,7 +827,6 @@ function refreshPageSidebars(){
   document.querySelectorAll('.side-prep-percent').forEach(e=>e.textContent=stats.pct+'%');
   document.querySelectorAll('.side-progress-bar').forEach(e=>e.style.width=stats.pct+'%');
   renderMiniAgenda();
-  renderUpcomingLinkedTests();
 }
 function daysUntilTest(date){
   const today=new Date();today.setHours(0,0,0,0);
@@ -774,30 +840,6 @@ function upcomingTestCountdown(date){
   if(days===0)return 'Vandaag';
   if(days===1)return 'Morgen';
   return 'Over '+days+' dagen';
-}
-function renderUpcomingLinkedTests(){
-  const lists=document.querySelectorAll('.upcoming-test-list');
-  if(!lists.length)return;
-  const today=new Date().toISOString().slice(0,10);
-  const linked=getTestCalendar()
-    .filter(t=>t.student===currentStudent&&t.lessonId&&t.date>=today)
-    .sort((a,b)=>a.date.localeCompare(b.date))
-    .slice(0,2);
-  if(!linked.length){
-    lists.forEach(el=>el.innerHTML='<div class="upcoming-test-empty">Als er een toets aan een PacoGO-les is gekoppeld, verschijnt die hier.</div>');
-    return;
-  }
-  const html=linked.map(t=>{
-    const lesson=lessons.find(l=>Number(l.id)===Number(t.lessonId)&&l.student===currentStudent);
-    const title=lesson?(lesson.subject+' — '+lesson.title):(t.subject+' — '+t.title);
-    return '<div class="upcoming-test-item">'+
-      '<div class="upcoming-test-title">📝 '+escapeHtml(title)+'</div>'+
-      '<div class="upcoming-test-date">'+escapeHtml(formatTestDate(t.date))+'</div>'+
-      '<div class="upcoming-test-countdown">⏳ '+escapeHtml(upcomingTestCountdown(t.date))+'</div>'+
-      '<button type="button" class="upcoming-test-button" onclick="startAgendaLessonPractice('+JSON.stringify(Number(t.lessonId))+')">🐾 Wil je oefenen?</button>'+
-    '</div>';
-  }).join('');
-  lists.forEach(el=>el.innerHTML=html);
 }
 function hideAll(){document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));window.speechSynthesis?.cancel()}
 
@@ -820,9 +862,26 @@ function agendaDateLabel(d){return new Intl.DateTimeFormat('nl-NL',{day:'numeric
 function renderMiniAgenda(){
   const lists=document.querySelectorAll('.mini-agenda-list');
   if(!lists.length)return;
-  const items=buildAgendaItemsForRender().filter(x=>new Date(x.date+'T12:00:00')>=new Date(new Date().toDateString()+' 12:00:00')).slice(0,4);
-  if(!items.length){lists.forEach(e=>e.innerHTML='<div class="mini-agenda-empty">Nog geen agenda-items.</div>');return}
-  const html=items.map(item=>'<div class="mini-agenda-item"><div class="mini-agenda-date">'+agendaDateLabel(new Date(item.date+'T12:00:00'))+'</div><div class="mini-agenda-title">'+(item.icon||agendaTypeIcon(item.type))+' '+escapeHtml(item.title)+'</div></div>').join('');
+  const todayKey=agendaKey(new Date());
+  const items=buildAgendaItemsForRender()
+    .filter(x=>x.date>=todayKey)
+    .slice(0,4);
+  if(!items.length){
+    lists.forEach(e=>e.innerHTML='<div class="mini-agenda-empty">Nog geen agenda-items.</div>');
+    return;
+  }
+  const html=items.map(item=>{
+    if(item.type==='test'){
+      const lesson=item.lessonId?lessons.find(l=>Number(l.id)===Number(item.lessonId)&&l.student===currentStudent&&!l.archived):null;
+      return '<div class="mini-agenda-test">'+
+        '<div class="mini-agenda-test-title">📝 '+escapeHtml(item.title)+'</div>'+
+        '<div class="mini-agenda-test-date">📅 '+escapeHtml(agendaDateLabel(new Date(item.date+'T12:00:00')))+'</div>'+
+        '<div class="mini-agenda-test-countdown">⏳ '+escapeHtml(upcomingTestCountdown(item.date))+'</div>'+
+        (lesson?'<button type="button" class="mini-agenda-practice" onclick="event.stopPropagation();startAgendaLessonPractice('+JSON.stringify(Number(lesson.id))+')">🐾 Wil je oefenen?</button>':'')+
+      '</div>';
+    }
+    return '<div class="mini-agenda-item"><div class="mini-agenda-date">'+agendaDateLabel(new Date(item.date+'T12:00:00'))+'</div><div class="mini-agenda-title">'+(item.icon||agendaTypeIcon(item.type))+' '+escapeHtml(item.title)+'</div></div>';
+  }).join('');
   lists.forEach(e=>e.innerHTML=html);
 }
 function getCustomAgendaItems(student=currentStudent){
@@ -925,9 +984,10 @@ function startAgendaLessonPractice(lessonId){
   startPractice(lesson.type);
 }
 function agendaLessonMatchHtml(item){
-  const match=findAgendaLessonMatch(item);
+  const directLesson=item.lessonId?lessons.find(l=>Number(l.id)===Number(item.lessonId)&&l.student===currentStudent&&!l.archived):null;
+  const match=directLesson?{lesson:directLesson}:findAgendaLessonMatch(item);
   if(!match)return '';
-  return '<div class="agenda-lesson-match"><strong>🔗 Bijpassende PacoGO-les</strong><span>'+escapeHtml(match.lesson.subject+' — '+match.lesson.title)+'</span><br><button type="button" onclick="startAgendaLessonPractice('+JSON.stringify(match.lesson.id)+')">🐾 Nu oefenen →</button></div>';
+  return '<div class="agenda-lesson-match"><strong>🔗 Bijpassende PacoGO-les</strong><span>'+escapeHtml(match.lesson.subject+' — '+match.lesson.title)+'</span><br><button type="button" onclick="startAgendaLessonPractice('+JSON.stringify(Number(match.lesson.id))+')">🐾 Nu oefenen →</button></div>';
 }
 function renderAgendaImportReview(items){
   agendaImportReview=items||[];
@@ -1205,7 +1265,23 @@ function agendaDateRangeLabel(start){return agendaFormatRange(start)}
 function buildAgendaItemsForRender(){
   const custom=getCustomAgendaItems();
   const demo=currentStudent==='Testleerling'?agendaDemoItems.map(item=>({...item,date:agendaDateFromOffset(item.offset),id:'demo_'+item.offset,student:currentStudent,source:'demo'})):[];
-  return [...demo,...custom].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const linkedTests=getTestCalendar()
+    .filter(t=>t.student===currentStudent&&t.date)
+    .map(t=>{
+      const lesson=t.lessonId?lessons.find(l=>Number(l.id)===Number(t.lessonId)&&l.student===currentStudent&&!l.archived):null;
+      return {
+        id:'test_'+String(t.id),
+        date:t.date,
+        type:'test',
+        icon:'📝',
+        title:lesson?(lesson.subject+' — '+lesson.title):((t.subject||'Toets')+' — '+(t.title||'Toets')),
+        meta:lesson?'Toets gekoppeld aan deze PacoGO-les':(t.subject||'Toets'),
+        student:currentStudent,
+        source:'testCalendar',
+        lessonId:lesson?Number(lesson.id):null
+      };
+    });
+  return [...demo,...custom,...linkedTests].sort((a,b)=>new Date(a.date)-new Date(b.date));
 }
 function showAgenda(){
   if(!currentStudent){showHome();return}
@@ -1369,45 +1445,137 @@ async function saveLessonOrder(student,subject,list){
   const ins=await db.from('lesson_order').insert(rows);
   if(ins.error)throw ins.error;
 }
+function normalizeSubvakKey(value){
+  return String(value||'').trim().replace(/\s+/g,' ').toLocaleLowerCase('nl-NL');
+}
+function subvakDisplayLabel(value){
+  const clean=String(value||'').trim().replace(/\s+/g,' ');
+  return clean||'Zonder subvak';
+}
+function getRenderedLessonOrder(){
+  return [...document.querySelectorAll('#lessons .lesson-card')].map(c=>Number(c.dataset.lessonId)).filter(Boolean);
+}
 function clearLessonDragState(){
-  document.querySelectorAll('#lessons .lesson-card.dragging,#lessons .lesson-card.drag-over').forEach(el=>el.classList.remove('dragging','drag-over'));
+  document.querySelectorAll('#lessons .lesson-card.dragging,#lessons .lesson-card.drag-over,#lessons .subvak-block.drop-active').forEach(el=>el.classList.remove('dragging','drag-over','drop-active'));
 }
 function dragLessonStart(e,id){
+  e.stopPropagation();
   e.dataTransfer.effectAllowed='move';
   e.dataTransfer.setData('text/plain',String(id));
   e.currentTarget.classList.add('dragging');
 }
 function dragLessonOver(e){
   e.preventDefault();
+  e.stopPropagation();
   e.dataTransfer.dropEffect='move';
   const card=e.currentTarget;
   if(!card.classList.contains('dragging'))card.classList.add('drag-over');
 }
-function dragLessonLeave(e){e.currentTarget.classList.remove('drag-over')}
+function dragLessonLeave(e){
+  e.stopPropagation();
+  e.currentTarget.classList.remove('drag-over');
+}
+async function updateLessonSubvak(lesson,newSubvak){
+  const value=String(newSubvak||'').trim();
+  const {error}=await db.from('lessons').update({subvak:value}).eq('id',lesson.id);
+  if(error)throw error;
+  lesson.subvak=value;
+}
 async function dragLessonDrop(e,targetId){
   e.preventDefault();
+  e.stopPropagation();
   const sourceId=Number(e.dataTransfer.getData('text/plain'));
   targetId=Number(targetId);
   if(!sourceId||!targetId||sourceId===targetId){clearLessonDragState();return}
   const el=document.getElementById('lessons');
-  const cards=[...el.querySelectorAll('.lesson-card')];
-  const source=cards.find(c=>Number(c.dataset.lessonId)===sourceId);
-  const target=cards.find(c=>Number(c.dataset.lessonId)===targetId);
+  const source=el.querySelector('.lesson-card[data-lesson-id="'+sourceId+'"]');
+  const target=el.querySelector('.lesson-card[data-lesson-id="'+targetId+'"]');
   if(!source||!target){clearLessonDragState();return}
-  const rect=target.getBoundingClientRect();
-  if(e.clientY>rect.top+rect.height/2)target.after(source);else target.before(source);
-  const order=[...el.querySelectorAll('.lesson-card')].map(c=>Number(c.dataset.lessonId));
-  try{await saveLessonOrder(currentStudent,currentSubject,order.map(id=>lessons.find(l=>Number(l.id)===id)).filter(Boolean));}
-  catch(error){console.error('Lesson order save error:',error);showMessage('⚠️ De volgorde kon niet in PacoGO worden opgeslagen.','error')}
+  const sourceGroup=source.closest('.subvak-lessons-grid');
+  const targetGroup=target.closest('.subvak-lessons-grid');
+  const sourceLesson=lessons.find(l=>Number(l.id)===sourceId);
+  const targetBlock=target.closest('.subvak-block');
+  if(!sourceLesson||!targetGroup||!targetBlock){clearLessonDragState();return}
+  const newSubvak=targetBlock.dataset.subvakLabel==='Zonder subvak'?'':targetBlock.dataset.subvakLabel;
+  try{
+    if(sourceGroup!==targetGroup||normalizeSubvakKey(sourceLesson.subvak)!==normalizeSubvakKey(newSubvak)){
+      await updateLessonSubvak(sourceLesson,newSubvak);
+    }
+    const rect=target.getBoundingClientRect();
+    if(e.clientY>rect.top+rect.height/2)target.after(source);else target.before(source);
+    await saveLessonOrder(currentStudent,currentSubject,getRenderedLessonOrder().map(id=>lessons.find(l=>Number(l.id)===id)).filter(Boolean));
+  }catch(error){
+    console.error('Lesson drag save error:',error);
+    showMessage('⚠️ De les kon niet op die plek worden opgeslagen.','error');
+    await showSubject(currentSubject);
+  }
+  clearLessonDragState();
+}
+function dragSubvakOver(e){
+  if(e.target.closest('.lesson-card'))return;
+  e.preventDefault();
+  e.stopPropagation();
+  e.dataTransfer.dropEffect='move';
+  e.currentTarget.classList.add('drop-active');
+}
+function dragSubvakLeave(e){
+  if(e.currentTarget.contains(e.relatedTarget))return;
+  e.currentTarget.classList.remove('drop-active');
+}
+async function dragLessonIntoSubvak(e,subvakKey){
+  e.preventDefault();
+  e.stopPropagation();
+  const sourceId=Number(e.dataTransfer.getData('text/plain'));
+  const source=document.getElementById('lessons')?.querySelector('.lesson-card[data-lesson-id="'+sourceId+'"]');
+  const block=e.currentTarget;
+  const targetGrid=block.querySelector('.subvak-lessons-grid');
+  const sourceLesson=lessons.find(l=>Number(l.id)===sourceId);
+  if(!source||!targetGrid||!sourceLesson){clearLessonDragState();return}
+  const newSubvak=block.dataset.subvakLabel==='Zonder subvak'?'':block.dataset.subvakLabel;
+  try{
+    await updateLessonSubvak(sourceLesson,newSubvak);
+    targetGrid.appendChild(source);
+    await saveLessonOrder(currentStudent,currentSubject,getRenderedLessonOrder().map(id=>lessons.find(l=>Number(l.id)===id)).filter(Boolean));
+  }catch(error){
+    console.error('Lesson subvak drop error:',error);
+    showMessage('⚠️ De les kon niet naar dit subvak worden verplaatst.','error');
+    await showSubject(currentSubject);
+  }
   clearLessonDragState();
 }
 function dragLessonEnd(){clearLessonDragState()}
 async function showSubject(subject){
-  currentSubject=subject;hideAll();document.getElementById('subject').classList.remove('hidden');document.getElementById('subjectTitle').textContent=subject;refreshPageSidebars();
-  const ls=await getOrderedLessons(lessons.filter(l=>l.subject===subject&&l.student===currentStudent&&!l.archived),currentStudent,subject);const el=document.getElementById('lessons');
+  currentSubject=subject;
+  hideAll();
+  document.getElementById('subject').classList.remove('hidden');
+  document.getElementById('subjectTitle').textContent=subject;
+  refreshPageSidebars();
+  const ls=await getOrderedLessons(lessons.filter(l=>l.subject===subject&&l.student===currentStudent&&!l.archived),currentStudent,subject);
+  const el=document.getElementById('lessons');
   if(!ls.length){el.innerHTML='<div class="empty">Nog geen lessen in dit vak.</div>';return}
-  const groups=[...new Set(ls.map(l=>String(l.subvak||'').trim()||'Geen subvak'))];
-  el.innerHTML=groups.map(group=>{const groupLessons=ls.filter(l=>(String(l.subvak||'').trim()||'Geen subvak')===group);return '<section><div class="section-head" style="margin-top:18px"><h2>'+escapeHtml(group)+'</h2></div><div class="grid">'+groupLessons.map(l=>'<div class="card lesson-card" draggable="true" data-lesson-id="'+l.id+'" onclick="openLesson('+l.id+')" ondragstart="dragLessonStart(event,'+l.id+')" ondragover="dragLessonOver(event)" ondragleave="dragLessonLeave(event)" ondrop="dragLessonDrop(event,'+l.id+')" ondragend="dragLessonEnd()"><span class="badge lesson-badge">LES</span><h3>'+escapeHtml(l.title)+'</h3><div class="small">'+l.lesson_items.length+' '+(l.lesson_items.length===1?'onderdeel':'onderdelen')+' · '+escapeHtml(typeLabel(l.type))+'</div>'+(l.subvak?'<div class="lesson-subvak">'+escapeHtml(l.subvak)+'</div>':'')+(isParentLoggedIn()?'<div class="lesson-card-actions"><button class="lesson-edit" onclick="event.stopPropagation();editLessonById('+l.id+')">✏️ Bewerken</button><button class="lesson-delete" onclick="event.stopPropagation();deleteLessonById('+l.id+')">🗑️ Verwijderen</button></div>':'')+'</div>').join('')+'</div></section>'}).join('');
+
+  const groups=[];
+  const byKey=new Map();
+  ls.forEach(l=>{
+    const raw=String(l.subvak||'').trim();
+    const key=normalizeSubvakKey(raw)||'__geen_subvak__';
+    if(!byKey.has(key)){
+      const group={key,label:subvakDisplayLabel(raw),lessons:[]};
+      byKey.set(key,group);
+      groups.push(group);
+    }
+    byKey.get(key).lessons.push(l);
+  });
+
+  el.innerHTML='<div class="subject-groups">'+groups.map(group=>{
+    const muted=group.key==='__geen_subvak__';
+    return '<section class="subvak-block" data-subvak-key="'+escapeAttr(group.key)+'" data-subvak-label="'+escapeAttr(group.label)+'" ondragover="dragSubvakOver(event)" ondragleave="dragSubvakLeave(event)" ondrop="dragLessonIntoSubvak(event,'+JSON.stringify(group.key)+')">'+
+      '<h2 class="subvak-title '+(muted?'muted':'')+'">'+(muted?'📚 ':'📁 ')+escapeHtml(group.label)+'</h2>'+
+      '<div class="subvak-lessons-grid">'+
+        group.lessons.map(l=>'<div class="card lesson-card" draggable="true" data-lesson-id="'+l.id+'" onclick="openLesson('+l.id+')" ondragstart="dragLessonStart(event,'+l.id+')" ondragover="dragLessonOver(event)" ondragleave="dragLessonLeave(event)" ondrop="dragLessonDrop(event,'+l.id+')" ondragend="dragLessonEnd()"><span class="badge lesson-badge">LES</span><h3>'+escapeHtml(l.title)+'</h3><div class="small">'+l.lesson_items.length+' '+(l.lesson_items.length===1?'onderdeel':'onderdelen')+' · '+escapeHtml(typeLabel(l.type))+'</div>'+((l.subvak&&String(l.subvak).trim())?'<div class="lesson-subvak">'+escapeHtml(l.subvak)+'</div>':'')+(isParentLoggedIn()?'<div class="lesson-card-actions"><button class="lesson-edit" onclick="event.stopPropagation();editLessonById('+l.id+')">✏️ Bewerken</button><button class="lesson-delete" onclick="event.stopPropagation();deleteLessonById('+l.id+')">🗑️ Verwijderen</button></div>':'')+'</div>').join('')+
+      '</div>'+
+    '</section>';
+  }).join('')+'</div>';
 }
 function editLessonById(id){
   const l=lessons.find(x=>Number(x.id)===Number(id));

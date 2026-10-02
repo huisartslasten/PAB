@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V3.20 -->
+<!-- PacoGO TEST V3.21 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -165,7 +165,7 @@ body{background:#1787f2}
   .date-picker-day{min-height:52px;font-size:16px;border-radius:12px}
 }
 
-.version-badge{position:static;display:block;width:max-content;margin:28px auto 8px;background:transparent;color:#9aa9ba;padding:0;font-size:12px;font-weight:700;box-shadow:none;letter-spacing:.2px}.parent-dashboard-intro h2{font-family:"Baloo 2",Nunito,sans-serif;font-size:38px;line-height:1;font-weight:900;color:#102b57;margin:0}.parent-dashboard-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:18px 0}.parent-dashboard-head h2{margin:0}.parent-student-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}.parent-student-card{background:#fff;border:2px solid var(--border);border-radius:18px;padding:18px;box-shadow:var(--shadow);transition:.14s}.parent-student-card:hover{border-color:#8bcfff;transform:translateY(-2px)}.parent-student-card .name{font-size:24px;font-weight:950;color:var(--text)}.parent-student-card .kind{font-size:13px;color:var(--muted);margin-top:3px}.parent-student-card .meta{font-size:14px;color:var(--muted);margin-top:10px}.parent-student-card-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.parent-student-card-actions button{flex:1;min-width:150px}.parent-management{margin-top:18px}.parent-lesson-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid var(--border)}.parent-lesson-row:last-child{border-bottom:0}.parent-lesson-info strong{display:block}.parent-lesson-info span{font-size:13px;color:var(--muted)}.parent-guest-toggle{min-width:120px}.parent-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}@media(max-width:700px){.dashboard-admin-actions{gap:6px}.dashboard-admin-actions button{padding:9px 11px}.version-badge{right:8px;bottom:8px;font-size:11px}.parent-student-grid{grid-template-columns:1fr 1fr}.parent-lesson-row{align-items:flex-start;flex-direction:column}.parent-guest-toggle{width:100%}}
+.version-badge{position:static;display:block;width:max-content;margin:28px auto 8px;background:transparent;color:#9aa9ba;padding:0;font-size:12px;font-weight:700;box-shadow:none;letter-spacing:.2px}.parent-dashboard-intro h2{font-family:"Baloo 2",Nunito,sans-serif;font-size:38px;line-height:1;font-weight:900;color:#102b57;margin:0}.parent-dashboard-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:18px 0}.parent-dashboard-head h2{margin:0}.parent-student-grid{display:flex;flex-direction:column;gap:0}.parent-student-card{background:#fff;border:0;border-bottom:1px solid var(--border);border-radius:0;padding:18px 8px;display:grid;grid-template-columns:minmax(150px,180px) minmax(260px,1fr) minmax(220px,280px);align-items:center;gap:22px}.parent-student-card:first-child{border-top:1px solid var(--border)}.parent-student-card .name{font-size:24px;font-weight:950;color:var(--text)}.parent-student-card .kind{font-size:13px;color:var(--muted);margin-top:3px}.parent-student-card .meta{font-size:14px;color:var(--muted);margin-top:10px}.parent-student-agenda-title,.parent-student-subjects-title{font-size:12px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}.parent-student-agenda-list{display:flex;flex-direction:column;gap:5px}.parent-student-agenda-item{border:0;background:transparent;padding:3px 0;text-align:left;color:var(--text);font:inherit;cursor:pointer}.parent-student-agenda-item:hover{text-decoration:underline;color:var(--blue2)}.parent-student-subjects{display:flex;flex-wrap:wrap;gap:6px}.parent-student-subject{border:1px solid #cfe8f8;background:#f3faff;color:#24527e;border-radius:10px;padding:5px 8px;font-weight:800;cursor:pointer;font:inherit}.parent-student-subject:hover{background:#e5f4ff}.parent-student-card-actions{display:flex;gap:8px;flex-wrap:wrap;grid-column:2 / 4}.parent-student-card-actions button{flex:1;min-width:150px}.parent-management{margin-top:18px}@media(max-width:900px){.parent-student-card{grid-template-columns:1fr;gap:12px}.parent-student-card-actions{grid-column:auto}}.parent-lesson-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid var(--border)}.parent-lesson-row:last-child{border-bottom:0}.parent-lesson-info strong{display:block}.parent-lesson-info span{font-size:13px;color:var(--muted)}.parent-guest-toggle{min-width:120px}.parent-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}@media(max-width:700px){.dashboard-admin-actions{gap:6px}.dashboard-admin-actions button{padding:9px 11px}.version-badge{right:8px;bottom:8px;font-size:11px}.parent-student-grid{grid-template-columns:1fr 1fr}.parent-lesson-row{align-items:flex-start;flex-direction:column}.parent-guest-toggle{width:100%}}
 /* TEST 004 — nieuwe les editor: rustige, duidelijke blokken */
 .editor-student,.editor-type-box,.field{border-color:#b9cce0}
 .editor-student,.editor-type-box{width:100%;max-width:none}
@@ -1687,11 +1687,26 @@ async function renderParentDashboard(){
   if(parentSidebar)parentSidebar.outerHTML=buildParentSideBarHtml();
 }
 function parentStudentCard(name,isGuest=false,guestId=''){
+  if(isGuest)return '';
   const own=lessons.filter(l=>l.student===name&&!l.archived);
+  const subjects=[...new Set(own.map(l=>l.subject).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'nl'));
   const jsName=escapeAttr(JSON.stringify(name));
-  return '<div class="parent-student-card"><div class="name">👦 '+escapeHtml(name)+'</div><div class="kind">'+(isGuest?'Gastleerling':'Leerling')+'</div><div class="meta">📚 '+own.length+' actieve lessen</div><div class="parent-student-card-actions"><button class="secondary" type="button" onclick="printAgendaMonthForStudent('+jsName+')">🖨️ Maandkalender printen</button><button type="button" onclick="selectParentStudent('+jsName+')">→ Naar leerling</button></div></div>';
+  const previous=currentStudent;
+  currentStudent=name;
+  const agenda=buildAgendaItemsForRender().filter(item=>item.date&&item.date>=agendaKey(new Date())).slice(0,3);
+  currentStudent=previous;
+  const agendaHtml=agenda.length?agenda.map(item=>{
+    const date=new Date(item.date+'T12:00:00').toLocaleDateString('nl-NL',{weekday:'short',day:'numeric',month:'short'});
+    return '<button class="parent-student-agenda-item" type="button" onclick="showParentAgendaForStudent('+jsName+')">'+escapeHtml((item.icon||agendaTypeIcon(item.type))+' '+item.title)+' · '+escapeHtml(date)+'</button>';
+  }).join(''):'<div class="small">Geen komende agenda-items.</div>';
+  const subjectHtml=subjects.length?subjects.slice(0,5).map(s=>'<button class="parent-student-subject" type="button" onclick="showParentSubject('+jsName+','+escapeAttr(JSON.stringify(s))+')">'+escapeHtml(subjectIcon(s)+' '+s)+'</button>').join(''):'<span class="small">Nog geen lessen.</span>';
+  return '<div class="parent-student-card"><div><div class="name">👦 '+escapeHtml(name)+'</div><div class="kind">Leerling</div></div><div><div class="parent-student-agenda-title">📅 Agenda</div><div class="parent-student-agenda-list">'+agendaHtml+'</div></div><div><div class="parent-student-subjects-title">📚 Vakken</div><div class="parent-student-subjects">'+subjectHtml+'</div></div><div class="parent-student-card-actions"><button class="secondary" type="button" onclick="parentStartLessonForStudent('+jsName+')">➕ Les maken</button><button class="secondary" type="button" onclick="printAgendaMonthForStudent('+jsName+')">🖨️ Maandkalender</button><button type="button" onclick="selectParentStudent('+jsName+')">→ Naar leerling</button></div></div>';
 }
+
 function selectParentStudent(name,isGuest=false,guestId=''){parentSelectedStudent=name;currentStudent=name;showHome()}
+function parentStartLessonForStudent(name){if(!requireParent())return;parentSelectedStudent=name;currentStudent=name;showAddLesson()}
+function showParentAgendaForStudent(name){if(!requireParent())return;parentSelectedStudent=name;currentStudent=name;showAgenda()}
+function showParentSubject(name,subject){if(!requireParent())return;parentSelectedStudent=name;currentStudent=name;showSubject(subject)}
 
 async function showParentFeedback(){
   if(!requireParent())return;

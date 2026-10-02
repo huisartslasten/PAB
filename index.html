@@ -359,14 +359,14 @@ body{background:#1787f2}
 .editor-row .remove-row{float:none;position:static}
 .ai-row-button{background:#eaf7ff;color:#126fc9;padding:6px 9px;box-shadow:none;border:1px solid #8bcfff;border-radius:10px;font-size:12px}
 .ai-row-button:hover{background:#dff0ff}
-.ai-item-edit-modal{width:min(680px,100%);height:min(90dvh,760px);max-height:90dvh;overflow-y:auto;overscroll-behavior:contain}
+.ai-item-edit-modal{width:min(680px,100%);height:calc(100dvh - 40px);max-height:calc(100dvh - 40px);overflow-y:auto;overscroll-behavior:contain}
 .ai-item-readonly{background:#f7fbff;border-color:#cdddec}
 .ai-item-proposal{border:2px solid #8bcfff;background:#f7fcff;border-radius:14px;padding:14px;margin-top:12px}
 .ai-item-proposal .proposal-label{font-weight:900;color:#126fc9}
 .ai-item-proposal .proposal-answer{margin-top:8px}
 .ai-item-proposal .proposal-reason{margin-top:10px;color:#667894;font-size:13px}
 
-<style id="pacogo-ai-modal-fix">@media(max-width:700px){.modal-backdrop{padding:10px;align-items:flex-start}.modal{max-height:calc(100dvh - 20px);padding:20px}.ai-item-edit-modal{width:100%;height:calc(100dvh - 20px);max-height:none}}
+<style id="pacogo-ai-modal-fix">@media(max-width:700px){.modal-backdrop{padding:10px;align-items:flex-start}.modal{max-height:calc(100dvh - 20px);padding:20px}.ai-item-edit-modal{width:100%;height:calc(100dvh - 20px);max-height:calc(100dvh - 20px)}}
 .ai-item-edit-modal .modal-actions{position:sticky;bottom:0;background:#fff;padding:12px 0 2px;margin-top:14px;border-top:1px solid var(--border);z-index:4}</style>
 </head>
 <body>
@@ -434,7 +434,7 @@ body{background:#1787f2}
 
   <main id="lessonView" class="page hidden">
     <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 Aan de slag met Paco</div></div>
-    <div class="topbar"><div><button class="secondary" onclick="goBack()">← Terug</button><h2 id="lessonTitle" style="margin-top:14px"></h2></div><div id="lessonAdminButtons" class="row"><button id="editLessonButton" class="hidden" onclick="editCurrentLesson()">✏️ Bewerken</button><button id="aiImproveLessonButton" class="hidden" onclick="showAiImproveCurrentLesson()">🤖 AI verbeteren</button><button id="archiveLessonButton" class="archive-button hidden" onclick="archiveCurrentLesson()">🗄️ Archiveren</button><button id="deleteLessonButton" class="danger hidden" onclick="deleteCurrentLesson()">🗑️ Verwijderen</button></div></div>
+    <div class="topbar"><div><button class="secondary" onclick="goBack()">← Terug</button><h2 id="lessonTitle" style="margin-top:14px"></h2></div><div id="lessonAdminButtons" class="row"><button id="editLessonButton" class="hidden" onclick="editCurrentLesson()">✏️ Bewerken</button><button id="aiImproveLessonButton" class="hidden" onclick="showAiImproveCurrentLesson()">🤖 AI aanpassen voor hele les</button><button id="archiveLessonButton" class="archive-button hidden" onclick="archiveCurrentLesson()">🗄️ Archiveren</button><button id="deleteLessonButton" class="danger hidden" onclick="deleteCurrentLesson()">🗑️ Verwijderen</button></div></div>
     <div id="lessonContent"></div>
   </main>
 
@@ -1448,7 +1448,7 @@ function showAiImproveCurrentLesson(){
   document.getElementById('aiAssignmentStatus').textContent='Bestaande les geladen. Geef eventueel extra uitleg en maak daarna één voorstel voor de hele les.';
   document.getElementById('aiAssignmentDraft').innerHTML='';
   const heading=document.querySelector('#aiAssignment .page-heading h2');if(heading)heading.textContent='🤖 AI aanpassen voor hele les';
-  const desc=document.querySelector('#aiAssignment .page-heading p');if(desc)desc.textContent='PacoGO past jouw instructie toe op alle onderdelen van deze les. De huidige les wordt pas aangepast nadat je het voorstel controleert.';
+  const desc=document.querySelector('#aiAssignment .page-heading p');if(desc)desc.textContent='PacoGO past jouw instructie toe op alle onderdelen van deze les. De huidige les wordt pas aangepast nadat je het voorstel controleert. Dit is de versie voor de <strong>hele les</strong>, niet voor één vraag.';
 }
 function showCreatorConsole(){
   if(!isCreator()){showMessage('Alleen de hoofdbeheerder heeft toegang tot de Creator Console.','error');return}
@@ -2222,7 +2222,7 @@ function applyAiItemProposal(){
 }
 
 function changeLessonType(){syncLessonTypeButton();const t=document.getElementById('lessonType').value;document.getElementById('wordEditor').classList.toggle('hidden',t!=='words');document.getElementById('questionEditor').classList.toggle('hidden',t!=='questions');document.getElementById('dictationEditor').classList.toggle('hidden',t!=='dictation');document.getElementById('mathEditor').classList.toggle('hidden',t!=='math');document.getElementById('spellingEditor').classList.toggle('hidden',t!=='spelling');if(t==='questions'&&!document.getElementById('questionEditor').children.length)addQuestionRow();if(t==='dictation'&&!document.getElementById('dictationEditor').children.length)addDictationRow();if(t==='words'&&!document.getElementById('wordEditor').children.length)addWordRow();if(t==='math'&&!document.getElementById('mathEditor').children.length)addMathRow();if(t==='spelling'&&!document.getElementById('spellingEditor').children.length)addSpellingRow()}
-function rowHtml(content,kind){return `<div class="editor-row"><div class="editor-row-tools"><button class="ai-row-button" type="button" title="Dit item met AI aanpassen" onclick="openAiItemEditor(this)">🤖 AI aanpassen</button><button class="remove-row" type="button" onclick="this.closest('.editor-row').remove()">✕</button></div>${content}</div>`}
+function rowHtml(content,kind){return `<div class="editor-row"><div class="editor-row-tools"><button class="ai-row-button" type="button" title="Alleen dit item met AI aanpassen" onclick="openAiItemEditor(this)">🤖 Alleen dit item</button><button class="remove-row" type="button" onclick="this.closest('.editor-row').remove()">✕</button></div>${content}</div>`}
 function ensureNextLessonRow(el){
   const row=el?.closest('.editor-row');
   if(!row)return;

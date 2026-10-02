@@ -1964,10 +1964,11 @@ function aiItemSetFields(row,type,question,answer){
   }
 }
 function aiItemSourceMaterial(){
-  if(!currentLesson)return '';
-  const explanation=currentLesson.explanation||'';
-  const items=(currentLesson.lesson_items||[]).map((it,i)=>(i+1)+'. Vraag: '+it.question+' | Antwoord: '+it.answer).join('\n');
-  return ['UITLEG:',explanation||'(geen aparte uitleg)','OEFENINGEN:',items].join('\n');
+  const explanation=document.getElementById('lessonExplanation')?.value.trim()||currentLesson?.explanation||'';
+  let items=[];
+  try{items=collectItems().map((it,i)=>(i+1)+'. Vraag: '+it.question+' | Antwoord: '+it.answer);}catch(_){}
+  if(!items.length&&currentLesson?.lesson_items?.length)items=currentLesson.lesson_items.map((it,i)=>(i+1)+'. Vraag: '+it.question+' | Antwoord: '+it.answer);
+  return ['UITLEG:',explanation||'(geen aparte uitleg)','OEFENINGEN:',items.join('\n')].join('\n');
 }
 function openAiItemEditor(button){
   if(!requireParent())return;

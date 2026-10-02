@@ -359,14 +359,15 @@ body{background:#1787f2}
 .editor-row .remove-row{float:none;position:static}
 .ai-row-button{background:#eaf7ff;color:#126fc9;padding:6px 9px;box-shadow:none;border:1px solid #8bcfff;border-radius:10px;font-size:12px}
 .ai-row-button:hover{background:#dff0ff}
-.ai-item-edit-modal{width:min(680px,100%);max-height:calc(100vh - 40px);overflow-y:auto}
+.ai-item-edit-modal{width:min(680px,100%);height:min(90dvh,760px);max-height:90dvh;overflow-y:auto;overscroll-behavior:contain}
 .ai-item-readonly{background:#f7fbff;border-color:#cdddec}
 .ai-item-proposal{border:2px solid #8bcfff;background:#f7fcff;border-radius:14px;padding:14px;margin-top:12px}
 .ai-item-proposal .proposal-label{font-weight:900;color:#126fc9}
 .ai-item-proposal .proposal-answer{margin-top:8px}
 .ai-item-proposal .proposal-reason{margin-top:10px;color:#667894;font-size:13px}
 
-<style id="pacogo-ai-modal-fix">@media(max-width:700px){.modal-backdrop{padding:10px}.modal{max-height:calc(100vh - 20px);padding:20px}.ai-item-edit-modal{width:100%;max-height:calc(100vh - 20px)}}.ai-item-edit-modal .modal-actions{position:sticky;bottom:-20px;background:#fff;padding-top:12px;margin-top:12px;border-top:1px solid var(--border)}</style>
+<style id="pacogo-ai-modal-fix">@media(max-width:700px){.modal-backdrop{padding:10px;align-items:flex-start}.modal{max-height:calc(100dvh - 20px);padding:20px}.ai-item-edit-modal{width:100%;height:calc(100dvh - 20px);max-height:none}}
+.ai-item-edit-modal .modal-actions{position:sticky;bottom:0;background:#fff;padding:12px 0 2px;margin-top:14px;border-top:1px solid var(--border);z-index:4}</style>
 </head>
 <body>
 <div class="container">
@@ -550,7 +551,7 @@ body{background:#1787f2}
         <textarea id="aiSourceMaterial" class="ai-source-material" placeholder="Plak hier de woorden, uitleg, voorbeelden, tekst of andere leerstof waarop de opdracht gebaseerd moet worden."></textarea>
       </div>
       <div class="row" style="justify-content:flex-end">
-        <button class="big" id="aiGenerateButton" type="button" onclick="generateAiAssignment()">🤖 Maak eerste versie</button>
+        <button class="big" id="aiGenerateButton" type="button" onclick="generateAiAssignment()">🤖 Maak AI-voorstel</button>
       </div>
       <div id="aiAssignmentStatus" class="ai-ai-status"></div>
       <div id="aiAssignmentDraft"></div>
@@ -621,7 +622,7 @@ body{background:#1787f2}
       <div class="editor-student"><strong>Voor welke leerling?</strong><div class="editor-student-buttons"><label class="editor-student-choice"><input type="radio" name="lessonStudent" value="Zyon"><span>Zyon</span></label><label class="editor-student-choice"><input type="radio" name="lessonStudent" value="Zenith"><span>Zenith</span></label><label class="editor-student-choice"><input type="radio" name="lessonStudent" value="Zephon"><span>Zephon</span></label><label class="editor-student-choice"><input type="radio" name="lessonStudent" value="Testleerling"><span>Testleerling</span></label></div></div>
       <div class="field"><label for="lessonSubject">Vak</label><input id="lessonSubject" placeholder="Voer vak in bijvoorbeeld Nederlands"></div>
       <div class="field"><label for="lessonName">Naam van de les</label><input id="lessonName" placeholder="Bijvoorbeeld Week 4"></div>
-      <div class="field"><label for="lessonExplanation">Uitleg <span class="small">(optioneel)</span></label><textarea id="lessonExplanation" placeholder="Leg hier de leerstof of regel uit. Dit wordt apart boven de oefeningen getoond."></textarea></div><div class="field"><label for="lessonAiInstruction">🤖 AI-instructie voor de hele les <span class="small">(optioneel)</span></label><textarea id="lessonAiInstruction" placeholder="Bijvoorbeeld: Noem de woorden tussen haakjes niet in de vragen of antwoorden. Deze regel geldt voor de hele les."></textarea><div class="small">Deze instructie geldt voor alle AI-aanpassingen binnen deze les.</div></div>
+      <div class="field"><label for="lessonExplanation">Uitleg <span class="small">(optioneel)</span></label><textarea id="lessonExplanation" placeholder="Leg hier de leerstof of regel uit. Dit wordt apart boven de oefeningen getoond."></textarea></div><div class="field"><label for="lessonAiInstruction">🤖 AI-instructie voor de hele les <span class="small">(optioneel)</span></label><textarea id="lessonAiInstruction" placeholder="Bijvoorbeeld: Noem de woorden tussen haakjes niet in de vragen of antwoorden. Deze regel geldt voor de hele les."></textarea><div class="small">Deze instructie geldt voor alle AI-aanpassingen binnen deze les.</div></div><div class="row" style="justify-content:flex-end;margin:-6px 0 16px"><button class="secondary" type="button" onclick="showAiImproveCurrentLesson()">🤖 AI aanpassen voor hele les</button></div>
       <div class="editor-type-box"><div class="field"><label for="lessonType">Onderdeel</label><div class="lesson-type-select"><button type="button" id="lessonTypeButton" class="lesson-type-button" onclick="toggleLessonTypeMenu()"><span id="lessonTypeButtonText">🎯 Woordtrainer</span><span class="lesson-type-chevron">⌄</span></button><div id="lessonTypeMenu" class="lesson-type-menu hidden"><button type="button" onclick="setLessonType('words')">🎯 Woordtrainer</button><button type="button" onclick="setLessonType('questions')">❓ Vragen</button><button type="button" onclick="setLessonType('dictation')">✏️ Dictee</button><button type="button" onclick="setLessonType('math')">🔢 Rekenen</button><button type="button" onclick="setLessonType('spelling')">✍️ Spelling</button></div><select id="lessonType" class="lesson-type-native" tabindex="-1" aria-hidden="true"><option value="words">words</option><option value="questions">questions</option><option value="dictation">dictation</option><option value="math">math</option><option value="spelling">spelling</option></select></div></div><div class="lesson-test-date-box"><label class="lesson-test-date-toggle"><input id="lessonTestDateEnabled" type="checkbox" onchange="toggleLessonTestDate()"> 📅 Toetsdatum instellen</label><div class="small" style="margin-top:5px">Optioneel. Alleen instellen als er al een toetsdatum bekend is.</div><input id="lessonTestDate" type="hidden"><div id="lessonTestDatePicker" class="date-picker lesson-test-date-picker hidden"></div></div>
       <div id="wordEditor"></div><div id="questionEditor" class="hidden"></div><div id="dictationEditor" class="hidden"></div><div id="mathEditor" class="hidden"></div><div id="spellingEditor" class="hidden"></div>
       <div class="row" style="margin-top:18px"><button onclick="addCurrentRow()">➕ Rij toevoegen</button><button class="success" onclick="saveLesson()">💾 Les opslaan</button></div>
@@ -729,8 +730,8 @@ body{background:#1787f2}
 
   <div id="aiItemEditModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="aiItemEditModalTitle">
     <div class="modal ai-item-edit-modal">
-      <h3 id="aiItemEditModalTitle">🤖 Vraag aanpassen met AI</h3>
-      <p>Vertel PacoGO wat je anders wilt. De AI gebruikt de bestaande les en het bronmateriaal. De wijziging wordt pas toegepast nadat jij het voorstel goedkeurt.</p>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px"><h3 id="aiItemEditModalTitle">🤖 Vraag aanpassen met AI</h3><button class="secondary" type="button" aria-label="Sluiten" onclick="closeAiItemEditor()" style="padding:7px 11px;border-radius:10px">✕</button></div>
+      <p>Vertel PacoGO wat je anders wilt. De AI gebruikt de bestaande les en het bronmateriaal. De wijziging wordt pas toegepast nadat jij het voorstel goedkeurt.</p><div class="message" style="background:#fff6df;color:#7a5600;margin-top:-8px">💡 Wil je dezelfde wijziging voor <strong>de hele les</strong>? Gebruik dan <strong>🤖 AI aanpassen voor hele les</strong> in de leseditor.</div>
       <div class="field"><label for="aiItemCurrentQuestion">Huidige vraag</label><textarea id="aiItemCurrentQuestion" class="ai-item-readonly" readonly></textarea></div>
       <div class="field"><label for="aiItemCurrentAnswer">Huidig antwoord</label><textarea id="aiItemCurrentAnswer" class="ai-item-readonly" readonly></textarea></div>
       <div class="field"><label for="aiItemInstruction">Wat wil je anders?</label><textarea id="aiItemInstruction" placeholder="Bijvoorbeeld: Maak de vraag duidelijker en zorg dat de leerling zelf het juiste Spaanse woord moet geven."></textarea></div>
@@ -1417,19 +1418,37 @@ function showAiImproveCurrentLesson(){
   aiExistingLessonId=currentLesson.id;
   parentSelectedStudent=currentLesson.student;
   currentStudent=currentLesson.student;
+  const editorVisible=!document.getElementById('editor')?.classList.contains('hidden');
+  let source;
+  let lessonInstruction;
+  let explanation;
+  let subject;
+  let title;
+  if(editorVisible){
+    subject=document.getElementById('lessonSubject')?.value.trim()||currentLesson.subject||'';
+    title=document.getElementById('lessonName')?.value.trim()||currentLesson.title||'';
+    explanation=document.getElementById('lessonExplanation')?.value.trim()||currentLesson.explanation||'';
+    lessonInstruction=document.getElementById('lessonAiInstruction')?.value.trim()||currentLesson.ai_instruction||'';
+    source=aiItemSourceMaterial();
+  }else{
+    subject=currentLesson.subject||'';
+    title=currentLesson.title||'';
+    explanation=currentLesson.explanation||'';
+    lessonInstruction=currentLesson.ai_instruction||'';
+    source=['UITLEG:',explanation||'(geen aparte uitleg)','OEFENINGEN:'].concat((currentLesson.lesson_items||[]).map((it,i)=>(i+1)+'. Vraag: '+it.question+' | Antwoord: '+it.answer)).join('\\n');
+  }
   hideAll();
   document.getElementById('aiAssignment').classList.remove('hidden');
   document.getElementById('aiAssignmentStudent').value=currentLesson.student;
-  document.getElementById('aiAssignmentSubject').value=currentLesson.subject||'';
-  document.getElementById('aiAssignmentTitle').value=currentLesson.title||'';
-  document.getElementById('aiAssignmentPrompt').value='Verbeter deze bestaande les. Houd de inhoud van het materiaal aan, maar verbeter de oefeningen waar dat nodig is. Beschrijf zo nodig wat er in de vragen of antwoorden beter kan.';
-  if(document.getElementById('aiLessonInstruction'))document.getElementById('aiLessonInstruction').value=currentLesson.ai_instruction||'';
-  const source=['UITLEG:',currentLesson.explanation||'(geen aparte uitleg)','', 'OEFENINGEN:'].concat((currentLesson.lesson_items||[]).map((it,i)=>((i+1)+'. Vraag: '+it.question+' | Antwoord: '+it.answer))).join('\n');
+  document.getElementById('aiAssignmentSubject').value=subject;
+  document.getElementById('aiAssignmentTitle').value=title;
+  document.getElementById('aiAssignmentPrompt').value='Pas deze instructie toe op de hele les. Behoud de leerinhoud en betekenis, maar pas de vragen en antwoorden waar nodig aan.';
+  if(document.getElementById('aiLessonInstruction'))document.getElementById('aiLessonInstruction').value=lessonInstruction;
   document.getElementById('aiSourceMaterial').value=source;
-  document.getElementById('aiAssignmentStatus').textContent='Bestaande les geladen. Beschrijf eventueel extra wat je anders wilt zien en maak daarna een AI-voorstel.';
+  document.getElementById('aiAssignmentStatus').textContent='Bestaande les geladen. Geef eventueel extra uitleg en maak daarna één voorstel voor de hele les.';
   document.getElementById('aiAssignmentDraft').innerHTML='';
-  const heading=document.querySelector('#aiAssignment .page-heading h2');if(heading)heading.textContent='🤖 AI verbeteren';
-  const desc=document.querySelector('#aiAssignment .page-heading p');if(desc)desc.textContent='PacoGO maakt een voorstel voor een bestaande les. De huidige les wordt pas aangepast nadat je het voorstel in de editor controleert en opslaat.';
+  const heading=document.querySelector('#aiAssignment .page-heading h2');if(heading)heading.textContent='🤖 AI aanpassen voor hele les';
+  const desc=document.querySelector('#aiAssignment .page-heading p');if(desc)desc.textContent='PacoGO past jouw instructie toe op alle onderdelen van deze les. De huidige les wordt pas aangepast nadat je het voorstel controleert.';
 }
 function showCreatorConsole(){
   if(!isCreator()){showMessage('Alleen de hoofdbeheerder heeft toegang tot de Creator Console.','error');return}

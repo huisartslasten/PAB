@@ -247,6 +247,10 @@ body{background:#1787f2}
 .agenda-mode-page .agenda-page-heading p{color:#667894}
 .agenda-page-heading{display:flex;align-items:center;justify-content:space-between;gap:20px}
 .agenda-page-heading-main{min-width:0}
+.agenda-print-month-button{border:1px solid #b9d9f5;background:#eaf6ff;color:var(--blue2);border-radius:12px;padding:10px 14px;font-weight:850;cursor:pointer;white-space:nowrap}
+.agenda-print-month-button:hover{background:#dff0ff}
+@media(max-width:700px){.agenda-page-heading{align-items:flex-start;flex-direction:column}.agenda-print-month-button{width:100%}}
+.agenda-print-only{display:none}
 .agenda-add-subheading{border:0;background:transparent;color:#126fc9;font-family:"Baloo 2",Nunito,sans-serif;font-size:18px;font-weight:900;cursor:pointer;padding:8px 2px;white-space:nowrap}
 .agenda-add-subheading:hover{text-decoration:underline}
 
@@ -507,6 +511,7 @@ body{background:#1787f2}
         <h2>📅 Mijn agenda</h2>
         <p>Plan wat je moet doen en zie wat eraan komt.</p>
       </div>
+      <button id="agendaPrintMonthButton" class="agenda-print-month-button" type="button" onclick="printAgendaMonth()">🖨️ Maandkalender printen</button>
     </div>
     <div class="topbar agenda-topbar">
       <div></div>
@@ -1308,6 +1313,8 @@ function showAgenda(){
 }
 function renderAgenda(){
   const el=document.getElementById('agendaContent');if(!el)return;
+  const printButton=document.getElementById('agendaPrintMonthButton');
+  if(printButton)printButton.classList.toggle('hidden',!isParentLoggedIn());
   const allItems=buildAgendaItemsForRender();
   const start=agendaWeekStart||agendaGetCurrentWeekStart();
   const todayKey=agendaKey(new Date());
@@ -1338,6 +1345,31 @@ function renderAgenda(){
   const navBottom='<div class="agenda-week-bottom-nav"><button class="agenda-week-nav-button" type="button" onclick="agendaMoveWeek(-1)">← Vorige week</button>'+(!isCurrent?'<button class="agenda-today-button" type="button" onclick="agendaGoToday()">📍 Vandaag</button>':'')+'<button class="agenda-week-nav-button" type="button" onclick="agendaMoveWeek(1)">Volgende week →</button></div>';
   el.innerHTML='<section class="agenda-school-week">'+navTop+'<div class="agenda-week-days"><div class="agenda-weekday-row">'+weekdayDays+'</div><div class="agenda-weekend-row">'+weekendDays+'</div></div>'+navBottom+'</section>'+
   '';
+}
+function printAgendaMonth(){
+  if(!isParentLoggedIn()){showMessage('Alleen de beheerder kan de maandkalender printen.','error');return}
+  const base=agendaWeekStart||agendaGetCurrentWeekStart();
+  const monthStart=new Date(base.getFullYear(),base.getMonth(),1,12);
+  const monthEnd=new Date(base.getFullYear(),base.getMonth()+1,0,12);
+  const firstDay=(monthStart.getDay()+6)%7;
+  const daysInMonth=monthEnd.getDate();
+  const allItems=buildAgendaItemsForRender().filter(item=>item.date&&item.date.slice(0,7)===agendaKey(monthStart).slice(0,7));
+  const byDay={};
+  allItems.forEach(item=>{const day=Number(String(item.date).slice(8,10));(byDay[day]||(byDay[day]=[])).push(item)});
+  const cells=[];
+  for(let i=0;i<firstDay;i++)cells.push('<div class="print-calendar-day empty"></div>');
+  for(let day=1;day<=daysInMonth;day++){
+    const d=new Date(monthStart);d.setDate(day);
+    const items=byDay[day]||[];
+    const events=items.map(item=>'<div class="print-calendar-event">'+escapeHtml((item.icon||agendaTypeIcon(item.type))+' '+item.title)+(item.meta?'<span>'+escapeHtml(item.meta)+'</span>':'')+'</div>').join('');
+    cells.push('<div class="print-calendar-day"><div class="print-calendar-date">'+day+'</div>'+events+'</div>');
+  }
+  while(cells.length%7)cells.push('<div class="print-calendar-day empty"></div>');
+  const monthLabel=new Intl.DateTimeFormat('nl-NL',{month:'long',year:'numeric'}).format(monthStart);
+  const printWindow=window.open('','_blank','width=1200,height=850');
+  if(!printWindow){showMessage('De printpagina kon niet worden geopend. Sta pop-ups toe voor PacoGO.','error');return}
+  printWindow.document.write('<!doctype html><html lang="nl"><head><meta charset="utf-8"><title>PacoGO — '+escapeHtml(currentStudent)+' — '+escapeHtml(monthLabel)+'</title><style>@page{size:A4 landscape;margin:10mm}*{box-sizing:border-box}body{font-family:Arial,Nunito,sans-serif;color:#102b57;margin:0}.head{display:flex;justify-content:space-between;align-items:end;margin-bottom:8mm}.head h1{margin:0;font-size:24px}.head p{margin:3px 0 0;font-size:13px;color:#667894}.head .month{font-size:21px;font-weight:800;text-transform:capitalize}.calendar{display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:auto repeat('+Math.ceil(cells.length/7)+',1fr);border:1px solid #b9cfe3}.weekday{font-weight:800;text-align:center;background:#eef8ff;padding:6px;border-right:1px solid #b9cfe3;border-bottom:1px solid #b9cfe3;font-size:12px}.weekday:last-child{border-right:0}.print-calendar-day{min-height:28mm;padding:5px;border-right:1px solid #cbd8e5;border-bottom:1px solid #cbd8e5;overflow:hidden}.print-calendar-day:nth-child(7n){border-right:0}.print-calendar-day.empty{background:#f7f9fb}.print-calendar-date{font-weight:900;font-size:13px;margin-bottom:3px}.print-calendar-event{font-size:10px;font-weight:700;line-height:1.2;margin:2px 0;padding:3px 4px;border-radius:4px;background:#eef7ff}.print-calendar-event span{display:block;font-weight:500;color:#5d7189;margin-top:1px}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body><div class="head"><div><h1>🐾 PacoGO — '+escapeHtml(currentStudent)+'</h1><p>Maandkalender</p></div><div class="month">'+escapeHtml(monthLabel)+'</div></div><div class="calendar"><div class="weekday">Maandag</div><div class="weekday">Dinsdag</div><div class="weekday">Woensdag</div><div class="weekday">Donderdag</div><div class="weekday">Vrijdag</div><div class="weekday">Zaterdag</div><div class="weekday">Zondag</div>'+cells.join('')+'</div><script>window.onload=function(){window.print()}</script></body></html>');
+  printWindow.document.close();
 }
 function showHome(){hideAll();document.getElementById('home').classList.remove('hidden');renderStudentHome();refreshPageSidebars()}
 function showAiAssignment(){

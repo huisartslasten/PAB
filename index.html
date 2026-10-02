@@ -1863,7 +1863,7 @@ async function saveLesson(){
   let lessonId=currentLesson?.id;
   let error=null;
   if(lessonId){
-    const updated=await db.from('.eq('id',lessonId);
+    const updated=await db.from('lessons').update({student,subject,title,type,explanation}).eq('id',lessonId);
     error=updated.error;
     if(!error){
       const removed=await db.from('lesson_items').delete().eq('lesson_id',lessonId);
@@ -1874,7 +1874,7 @@ async function saveLesson(){
       error=inserted.error;
     }
   }else{
-    const created=await db.from('.select().single();
+    const created=await db.from('lessons').insert({student,subject,title,type,explanation}).select().single();
     error=created.error;
     lessonId=created.data?.id;
     if(!error){
@@ -1899,7 +1899,7 @@ async function saveLesson(){
   refreshPageSidebars();
   showMessage(testDate?'Les opgeslagen en toetsdatum toegevoegd.':'Les opgeslagen.','success');
 }
-function editCurrentLesson(){if(!requireParent())return;const l=currentLesson;hideAll();document.getElementById('editor').classList.remove('hidden');document.getElementById('editorTitle').textContent='Les bewerken';document.getElementById('lessonSubject').value=l.subject;document.querySelectorAll('input[name=lessonStudent]').forEach(r=>r.checked=r.value===l.student);document.getElementById('lessonName').value=l.title;document.getElementById('lessonExplanation').value=l.explanation||''const existingTest=getTestDateForLesson(l.id,l.student);document.getElementById('lessonTestDate').value=existingTest?.date||'';document.getElementById('lessonTestDateEnabled').checked=!!existingTest?.date;document.getElementById('lessonTestDatePicker').classList.toggle('hidden',!existingTest?.date);document.getElementById('wordEditor').innerHTML='';document.getElementById('questionEditor').innerHTML='';document.getElementById('dictationEditor').innerHTML='';document.getElementById('mathEditor').innerHTML='';document.getElementById('spellingEditor').innerHTML='';l.lesson_items.forEach(it=>{if(l.type==='words')addWordRow(it.question,it.answer);else if(l.type==='questions')addQuestionRow(it.question,it.answer);else if(l.type==='dictation')addDictationRow(it.question);else if(l.type==='math')addMathRow(it.question,it.answer);else if(l.type==='spelling'){const a=String(it.answer||'').split(' || ');addSpellingRow(it.question,a[0]||'',a[1]||'')}});changeLessonType();addCurrentRow();renderDatePicker('lessonTestDatePicker','lessonTestDate',existingTest?.date||'')}
+function editCurrentLesson(){if(!requireParent())return;const l=currentLesson;hideAll();document.getElementById('editor').classList.remove('hidden');document.getElementById('editorTitle').textContent='Les bewerken';document.getElementById('lessonSubject').value=l.subject;document.querySelectorAll('input[name=lessonStudent]').forEach(r=>r.checked=r.value===l.student);document.getElementById('lessonName').value=l.title;document.getElementById('lessonExplanation').value=l.explanation||'';const existingTest=getTestDateForLesson(l.id,l.student);document.getElementById('lessonTestDate').value=existingTest?.date||'';document.getElementById('lessonTestDateEnabled').checked=!!existingTest?.date;document.getElementById('lessonTestDatePicker').classList.toggle('hidden',!existingTest?.date);document.getElementById('wordEditor').innerHTML='';document.getElementById('questionEditor').innerHTML='';document.getElementById('dictationEditor').innerHTML='';document.getElementById('mathEditor').innerHTML='';document.getElementById('spellingEditor').innerHTML='';l.lesson_items.forEach(it=>{if(l.type==='words')addWordRow(it.question,it.answer);else if(l.type==='questions')addQuestionRow(it.question,it.answer);else if(l.type==='dictation')addDictationRow(it.question);else if(l.type==='math')addMathRow(it.question,it.answer);else if(l.type==='spelling'){const a=String(it.answer||'').split(' || ');addSpellingRow(it.question,a[0]||'',a[1]||'')}});changeLessonType();addCurrentRow();renderDatePicker('lessonTestDatePicker','lessonTestDate',existingTest?.date||'')}
 function deleteCurrentLesson(){
   if(!requireParent())return;
   if(!currentLesson)return;

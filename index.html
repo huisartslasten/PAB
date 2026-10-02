@@ -2166,7 +2166,7 @@ async function checkPractice(){
       if(correct){activity.remaining.delete(item.id);recordPracticeResult(item,true);f.textContent='✅ Goed!';f.className='feedback correct';}else{recordPracticeResult(item,false);f.innerHTML='❌ Nog niet. Het juiste antwoord is '+escapeHtml(item.answer)+'.'+extraInfoHtml(item);f.className='feedback incorrect';}
       const next=document.createElement('button');next.className='big';next.textContent='OK → Volgende vraag';next.onclick=()=>renderPractice();f.insertAdjacentElement('afterend',next);return;
     }
-    const grading=currentLesson?.ai_check_answers?await gradeWithAI(item.question,item.answer,userAnswer):{correct:normalize(userAnswer)===normalize(item.answer),feedback:''};
+    const grading=currentLesson?.type==='custom'?(currentLesson.ai_check_answers?await gradeWithAI(item.question,item.answer,userAnswer):{correct:normalize(userAnswer)===normalize(item.answer),feedback:''}):await gradeWithAI(item.question,item.answer,userAnswer);
     const next=document.createElement('button');
     next.className='big';
     if(grading.correct){
@@ -2216,7 +2216,7 @@ async function submitTest(){
       status.className='feedback';
       status.textContent='🤖 Even kijken of je antwoord dezelfde betekenis heeft...';
       input.insertAdjacentElement('afterend',status);
-      const grading=currentLesson?.ai_check_answers?await gradeWithAI(item.question,item.answer,value.trim()):{correct:normalize(value)===normalize(item.answer),feedback:''};
+      const grading=currentLesson?.type==='custom'?(currentLesson.ai_check_answers?await gradeWithAI(item.question,item.answer,value.trim()):{correct:normalize(value)===normalize(item.answer),feedback:''}):await gradeWithAI(item.question,item.answer,value.trim());
       correct=grading.correct;
       feedback=grading.feedback||'';
     }

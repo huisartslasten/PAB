@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V4.37 -->
+<!-- PacoGO TEST V4.38 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -727,7 +727,7 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div class="version-badge">PacoGO TEST V4.37</div>
+  <div class="version-badge">PacoGO TEST V4.38</div>
 
 <div id="globalMessage"></div>
 
@@ -1021,16 +1021,17 @@ function renderAgendaImportReview(items){
   const list=document.getElementById('agendaImportReviewList');
   if(!box||!list)return;
   if(!agendaImportReview.length){box.classList.add('hidden');return}
-  list.innerHTML=agendaImportReview.map((item,i)=>'<div class="agenda-import-found">'+
+  list.innerHTML='<div class="agenda-review-select-all"><label class="agenda-review-description-toggle"><input id="agendaReviewMetaSelectAll" type="checkbox" onchange="toggleAllAgendaReviewMeta(this.checked)"> <span>SELECT ALL — omschrijvingen toevoegen</span></label></div>'+agendaImportReview.map((item,i)=>'<div class="agenda-import-found">'+
     '<div class="agenda-import-found-head"><strong>Afspraak '+(i+1)+'</strong><span class="small">'+escapeHtml(item.source||'Import')+'</span></div>'+
     '<div class="agenda-import-found-grid">'+
       '<input id="agendaReviewDate'+i+'" type="date" value="'+escapeAttr(item.date||'')+'">'+
       '<input id="agendaReviewTitle'+i+'" maxlength="120" value="'+escapeAttr(item.title||'')+'">'+
       '<select id="agendaReviewType'+i+'"><option value="test">📝 Toets</option><option value="homework">📚 Huiswerk</option><option value="submit">📖 Inleveren</option><option value="activity">🎒 Schoolactiviteit</option><option value="free">🎉 Vrije dag</option><option value="other">📌 Overig</option></select>'+
     '</div>'+
-    '<textarea id="agendaReviewMeta'+i+'" maxlength="300" style="margin-top:8px" placeholder="Omschrijving">'+escapeHtml(item.meta||'')+'</textarea>'+
+       '<label class="agenda-review-description-toggle"><input id="agendaReviewMetaEnabled'+i+'" type="checkbox" onchange="toggleAgendaReviewMeta('+i+')"> <span>Omschrijving toevoegen</span></label><textarea id="agendaReviewMeta'+i+'" class="agenda-review-description" maxlength="300" style="margin-top:8px" placeholder="Omschrijving">'+escapeHtml(item.meta||'')+'</textarea>'+
     agendaLessonMatchHtml(item)+
   '</div>').join('');
+  const selectAll=document.getElementById('agendaReviewMetaSelectAll'); if(selectAll)selectAll.checked=false; agendaImportReview.forEach((item,i)=>{const cb=document.getElementById('agendaReviewMetaEnabled'+i);if(cb){cb.checked=false;toggleAgendaReviewMeta(i)}});
   agendaImportReview.forEach((item,i)=>{document.getElementById('agendaReviewType'+i).value=item.type||'other'});
   box.classList.remove('hidden');
 }
@@ -1210,7 +1211,7 @@ function saveAgendaImportReview(){
     id:'agenda_'+Date.now()+'_'+i,student:currentStudent,date:document.getElementById('agendaReviewDate'+i)?.value||'',
     type:document.getElementById('agendaReviewType'+i)?.value||'other',
     title:document.getElementById('agendaReviewTitle'+i)?.value.trim()||'Agenda-afspraak',
-    meta:document.getElementById('agendaReviewMeta'+i)?.value.trim()||'',
+    meta:document.getElementById('agendaReviewMetaEnabled'+i)?.checked?(document.getElementById('agendaReviewMeta'+i)?.value.trim()||''):'',
     source:item.source||agendaImportMode,createdAt:new Date().toISOString()
   })).filter(x=>x.date&&x.title);
   if(!added.length){showMessage('Vul bij minimaal één afspraak een datum en titel in.','error');return}
@@ -1221,6 +1222,8 @@ function saveAgendaImportReview(){
   agendaImportReview=[];
   showAgenda();
 }
+function toggleAgendaReviewMeta(i){const cb=document.getElementById('agendaReviewMetaEnabled'+i);const field=document.getElementById('agendaReviewMeta'+i);if(field)field.classList.toggle('agenda-review-description-active',!!cb?.checked)}
+function toggleAllAgendaReviewMeta(checked){document.querySelectorAll('[id^="agendaReviewMetaEnabled"]').forEach(cb=>{cb.checked=checked;toggleAgendaReviewMeta(Number(cb.id.replace('agendaReviewMetaEnabled','')))})}
 function clearAgendaImportReview(){agendaImportReview=[];document.getElementById('agendaImportReview')?.classList.add('hidden')}
 let agendaEditItemId=null;
 function editAgendaItem(id){

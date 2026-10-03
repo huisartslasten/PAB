@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V4.24 -->
+<!-- PacoGO TEST V4.25 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -439,9 +439,9 @@ body{background:#1787f2}
       <div class="student-area">
         <div class="student-title-row"><h1 class="student-title">Wie gaat er leren?</h1></div>
         <div class="student-grid">
-          <button class="student-card" onclick="window.selectStudent('Zyon')"><div><div class="student-name">Zyon</div><div class="student-sub">Mijn lessen</div></div><span class="student-go">GO! →</span></button>
-          <button class="student-card" onclick="window.selectStudent('Zenith')"><div><div class="student-name">Zenith</div><div class="student-sub">Mijn lessen</div></div><span class="student-go">GO! →</span></button>
-          <button class="student-card" onclick="window.selectStudent('Zephon')"><div><div class="student-name">Zephon</div><div class="student-sub">Mijn lessen</div></div><span class="student-go">GO! →</span></button>
+          <button class="student-card" ><div><div class="student-name">Zyon</div><div class="student-sub">Mijn lessen</div></div><span class="student-go">GO! →</span></button>
+          <button class="student-card" ><div><div class="student-name">Zenith</div><div class="student-sub">Mijn lessen</div></div><span class="student-go">GO! →</span></button>
+          <button class="student-card" ><div><div class="student-name">Zephon</div><div class="student-sub">Mijn lessen</div></div><span class="student-go">GO! →</span></button>
         </div>
       </div>
     </section>
@@ -727,7 +727,7 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div class="version-badge">PacoGO TEST V4.24</div>
+  <div class="version-badge">PacoGO TEST V4.25</div>
 
 <div id="globalMessage"></div>
 
@@ -1468,6 +1468,7 @@ function showCreatorConsole(){
 function renderStudentHome(){const chooser=document.getElementById('studentChooser'),dash=document.getElementById('studentDashboard');if(currentStudent){chooser.classList.add('hidden');dash.classList.remove('hidden');document.getElementById('sidebarGreeting').textContent='Hoi '+currentStudent+'! 🐶';renderSubjects();renderTestCalendar();refreshPageSidebars()}else{chooser.classList.remove('hidden');dash.classList.add('hidden')}}
 window.selectStudent=function(name){currentStudent=name;showHome()}
 function switchStudent(){currentStudent=null;showHome()}
+document.querySelectorAll('#studentChooser .student-card').forEach((button,index)=>button.addEventListener('click',()=>{currentStudent=['Zyon','Zenith','Zephon'][index];showHome()}));
 function showLogin(){hideAll();document.getElementById('login').classList.remove('hidden');document.getElementById('loginError').classList.add('hidden')}
 function showMessage(text,type='success'){const box=document.getElementById('globalMessage');box.innerHTML='<div class="message '+type+'">'+escapeHtml(text)+'</div>';setTimeout(()=>box.innerHTML='',3500)}
 function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}

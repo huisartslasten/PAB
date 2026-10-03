@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO LIVE V4.11 -->
+<!-- PacoGO LIVE V4.12 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -937,9 +937,13 @@ async function loadAgendaItemsFromDb(student=currentStudent){
     writeLocalAgendaItems(items,student);
     return items;
   }
+  if(isParentLoggedIn()){
+    writeLocalAgendaItems([],student);
+    agendaItemsCacheByStudent[student]=[];
+    return [];
+  }
   const local=readLocalAgendaItems(student);
   agendaItemsCacheByStudent[student]=local;
-  if(local.length&&isParentLoggedIn())await saveCustomAgendaItems(local,student);
   return local;
 }
 async function saveCustomAgendaItems(items,student=currentStudent){

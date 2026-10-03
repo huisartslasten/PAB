@@ -1695,6 +1695,8 @@ function deleteLessonById(id){
 }
 async function archiveCurrentLesson(){
   if(!requireParent()||!currentLesson)return;
+  const confirmed=window.confirm('Les archiveren?\n\nDeze les wordt uit de actieve lessen gehaald. Je kunt hem later weer herstellen.');
+  if(!confirmed)return;
   const lessonId=currentLesson.id;
   const subject=currentSubject;
   const {error}=await db.from('lessons').update({archived:true}).eq('id',lessonId);

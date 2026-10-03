@@ -2509,4 +2509,4 @@ function editCurrentLesson(){if(!requireParent())return;const l=currentLesson;hi
     qp.forEach(x=>addUniversalQuestionPart(row,x));
     ap.forEach(x=>addUniversalAnswerPart(row,cfg.answers,cfg.answerClass,x.text||'',x.role||'answer',cfg.answerPlaceholder));
   }
-}););changeLessonType();addCurrentRow();renderDatePicker('lessonTestDatePicker','lessonTestDate',existingTest?.date||'')}
+});changeLessonType();addCurrentRow();renderDatePicker('lessonTestDatePicker','lessonTestDate',existingTest?.date||'')}

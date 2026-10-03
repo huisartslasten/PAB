@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V4.16 -->
+<!-- PacoGO TEST V4.17 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -2256,13 +2256,28 @@ function addWordRow(q='',a='',questionParts=null,answerParts=null){
   row.className='editor-row';
   row.innerHTML=`<button class="remove-row" type="button" onclick="this.parentElement.remove()">✕</button>
     <div class="word-parts-section"><div class="word-parts-head"><label>Vraag</label></div><div class="word-question-parts"></div><button type="button" class="word-add-line word-add-line-bottom" onclick="addWordQuestionPart(this.closest('.editor-row'))">➕ regel</button></div>
-    <div class="word-parts-section"><div class="word-parts-head"><label>Antwoord</label></div><div class="word-answer-parts"></div><button type="button" class="word-add-line word-add-line-bottom" onclick="addWordAnswerPart(this.closest('.editor-row'))">➕ regel</button><div class="word-extra-note">Kies per regel of deze wordt beoordeeld als antwoord of alleen als extra informatie.</div></div>`;
+    <div class="word-parts-section"><div class="word-parts-head"><label>Antwoord</label></div><div class="word-answer-parts"></div><button type="button" class="word-add-line word-add-line-bottom" onclick="addWordAnswerPart(this.closest('.editor-row'))">➕ regel</button><div class="word-extra-note">Kies per regel of deze wordt beoordeeld als antwoord of alleen als extra informatie.</div></div>
+    <button type="button" class="question-insert-button" onclick="insertWordQuestionAfter(this)">➕ Vraag hier invoegen</button>`;
   editor.appendChild(row);
   questionParts.forEach((part,i)=>addWordQuestionPart(row,part||''));
   answerParts.forEach(part=>addWordAnswerPart(row,part?.text||'',part?.role||'answer'));
 }
 function addQuestionRow(q='',a=''){const editor=document.getElementById('questionEditor');const row=document.createElement('div');row.className='editor-row';row.innerHTML=`<button class="remove-row" type="button" onclick="this.parentElement.remove()">✕</button><div class="field question-field"><label>Vraag</label><textarea class="question-q" oninput="ensureNextLessonRow(this)" placeholder="Bijvoorbeeld: Wat betekent democratie?">${escapeHtml(q)}</textarea></div><div class="field"><label>Antwoord</label><textarea class="question-a" oninput="ensureNextLessonRow(this)" placeholder="Schrijf hier het antwoord of de uitleg.">${escapeHtml(a)}</textarea></div><button type="button" class="question-insert-button" onclick="insertQuestionAfter(this)">➕ Vraag hier invoegen</button>`;editor.appendChild(row)}
 function insertQuestionAfter(button){const current=button.closest('.editor-row');if(!current)return;const q=document.createElement('div');q.className='editor-row';q.innerHTML=`<button class="remove-row" type="button" onclick="this.parentElement.remove()">✕</button><div class="field question-field"><label>Vraag</label><textarea class="question-q" oninput="ensureNextLessonRow(this)" placeholder="Bijvoorbeeld: Wat betekent democratie?"></textarea></div><div class="field"><label>Antwoord</label><textarea class="question-a" oninput="ensureNextLessonRow(this)" placeholder="Schrijf hier het antwoord of de uitleg."></textarea></div><button type="button" class="question-insert-button" onclick="insertQuestionAfter(this)">➕ Vraag hier invoegen</button>`;current.insertAdjacentElement('afterend',q);q.querySelector('.question-q')?.focus()}
+function insertWordQuestionAfter(button){
+  const current=button.closest('.editor-row');
+  if(!current)return;
+  const q=document.createElement('div');
+  q.className='editor-row';
+  q.innerHTML=`<button class="remove-row" type="button" onclick="this.parentElement.remove()">✕</button>
+    <div class="word-parts-section"><div class="word-parts-head"><label>Vraag</label></div><div class="word-question-parts"></div><button type="button" class="word-add-line word-add-line-bottom" onclick="addWordQuestionPart(this.closest('.editor-row'))">➕ regel</button></div>
+    <div class="word-parts-section"><div class="word-parts-head"><label>Antwoord</label></div><div class="word-answer-parts"></div><button type="button" class="word-add-line word-add-line-bottom" onclick="addWordAnswerPart(this.closest('.editor-row'))">➕ regel</button><div class="word-extra-note">Kies per regel of deze wordt beoordeeld als antwoord of alleen als extra informatie.</div></div>
+    <button type="button" class="question-insert-button" onclick="insertWordQuestionAfter(this)">➕ Vraag hier invoegen</button>`;
+  current.insertAdjacentElement('afterend',q);
+  addWordQuestionPart(q,'');
+  addWordAnswerPart(q,'','answer');
+  q.querySelector('.word-q-part')?.focus();
+}
 function addDictationRow(q='',a='',a2=''){document.getElementById('dictationEditor').insertAdjacentHTML('beforeend',rowHtml(`<div class="field"><label>Vraag</label><input class="dictation-q" value="${escapeAttr(q)}" oninput="ensureNextLessonRow(this)" placeholder="Vul hier de vraag in"></div><div class="field"><label>Antwoord</label><input class="dictation-a" value="${escapeAttr(a)}" oninput="ensureNextLessonRow(this)" onblur="checkDictationWord(this)" placeholder="Vul hier het antwoord in"><div class="dictation-spellcheck"></div></div><div class="field"><label>Tweede antwoord <span class="small">(optioneel)</span></label><input class="dictation-a2" value="${escapeAttr(a2)}" oninput="ensureNextLessonRow(this)" placeholder="Vul hier eventueel een tweede antwoord in"></div><div class="small">Het tweede antwoord is optioneel en kan als alternatief antwoord worden gebruikt.</div>`,'dictation'))}
 function addMathRow(q='',a=''){document.getElementById('mathEditor').insertAdjacentHTML('beforeend',rowHtml(`<div class="field question-field"><label>Som</label><input class="math-q" value="${escapeAttr(q)}" oninput="ensureNextLessonRow(this)" placeholder="bijvoorbeeld 27 + 15 ="></div><div class="field answer-field"><label>Antwoord</label><input class="math-a" type="number" inputmode="numeric" value="${escapeAttr(a)}" oninput="ensureNextLessonRow(this)" placeholder="bijvoorbeeld 42"></div>`,'math'))}
 function refreshSpellingLabels(){const labels=getSpellingLabels();document.querySelectorAll('.spelling-label-question').forEach(e=>e.textContent=labels.question);document.querySelectorAll('.spelling-label-perfect').forEach(e=>e.textContent=labels.perfect);document.querySelectorAll('.spelling-label-adjective').forEach(e=>e.textContent=labels.adjective)}

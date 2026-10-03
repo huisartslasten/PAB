@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO LIVE V4.7 -->
+<!-- PacoGO LIVE V4.8 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -773,7 +773,7 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 function photoSessionDb(token){
   return window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY,{global:{headers:{'x-photo-token':String(token||'')}}});
 }
-const PARENT_IDS = new Set(['5d0e1e5c-1dbe-4909-bd3a-81a1e7b26d09']);
+const PARENT_IDS = new Set(['5d0e1e5c-1dbe-4909-bd3a-81a1e7b26d09','418833d5-049a-4ec9-8072-2d48a85f04b1']);
 let currentSession=null,currentSubject=null,currentLesson=null,lessons=[];
 let currentStudent=null;
 let activity=null;

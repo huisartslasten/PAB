@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V4.27 -->
+<!-- PacoGO TEST V4.25 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -2372,18 +2372,6 @@ function monthLabel(d){return new Intl.DateTimeFormat('nl-NL',{month:'long',year
 function renderDatePicker(containerId,inputId,selected='',preserveMonth=false){const el=document.getElementById(containerId);if(!el)return;const state=datePickerState[containerId]||(datePickerState[containerId]={month:selected?parseDateKey(selected):new Date()});if(selected&&!preserveMonth){const sd=parseDateKey(selected);state.month=new Date(sd.getFullYear(),sd.getMonth(),1)}const d=state.month;const y=d.getFullYear(),m=d.getMonth(),first=new Date(y,m,1),days=new Date(y,m+1,0).getDate();let start=(first.getDay()+6)%7;let html=`<div class="date-picker-head"><button type="button" class="date-picker-nav" onclick="shiftDatePicker('${containerId}','${inputId}',-1)">‹</button><div class="date-picker-title">${monthLabel(d)}</div><button type="button" class="date-picker-nav" onclick="shiftDatePicker('${containerId}','${inputId}',1)">›</button></div><div class="date-picker-grid">${['Ma','Di','Wo','Do','Vr','Za','Zo'].map(x=>`<div class="date-picker-weekday">${x}</div>`).join('')}`;for(let i=0;i<start;i++)html+='<button type="button" class="date-picker-day empty"> </button>';const today=dateKey(new Date());for(let day=1;day<=days;day++){const key=`${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;const cls='date-picker-day'+(key===selected?' selected':'')+(key===today?' today':'');html+=`<button type="button" class="${cls}" onclick="pickDate('${containerId}','${inputId}','${key}')">${day}</button>`}html+='</div><div class="date-picker-help">Klik op een dag om de toetsdatum te kiezen.</div>';el.innerHTML=html}
 function shiftDatePicker(containerId,inputId,delta){const state=datePickerState[containerId]||(datePickerState[containerId]={month:new Date()});state.month=new Date(state.month.getFullYear(),state.month.getMonth()+delta,1);renderDatePicker(containerId,inputId,document.getElementById(inputId)?.value||'',true)}
 function pickDate(containerId,inputId,key){const input=document.getElementById(inputId);if(input)input.value=key;renderDatePicker(containerId,inputId,key)}
-function getTestCalendar(){try{return JSON.parse(localStorage.getItem('pacogo_test_calendar')||'[]')}catch{return []}}
-function saveTestCalendar(items){localStorage.setItem('pacogo_test_calendar',JSON.stringify(items))}
-function formatTestDate(date){return new Intl.DateTimeFormat('nl-NL',{day:'numeric',month:'short'}).format(new Date(date+'T12:00:00'))}
-function testCountdown(date){const now=new Date();const target=new Date(date+'T00:00:00');const ms=target-now;if(ms<0)return 'Deze toets is geweest';const days=Math.ceil(ms/86400000);return days===1?'Morgen!':days+' dagen'}
-function renderTestCalendar(){const el=document.getElementById('testCalendarList');if(!el)return;const all=getTestCalendar().filter(t=>t.student===currentStudent).sort((a,b)=>a.date.localeCompare(b.date));if(!all.length){el.innerHTML='<div class="test-calendar-empty">Nog geen toetsen ingevoerd.<br>Een ouder kan rechtsboven een toets toevoegen.</div>';refreshPageSidebars();return}const today=new Date().toISOString().slice(0,10);const upcoming=all.filter(t=>t.date>=today).slice(0,4);el.innerHTML=upcoming.length?upcoming.map(t=>`<div class="test-calendar-item" ${t.lessonId?'onclick="openCalendarLesson(\''+t.lessonId+'\')" style="cursor:pointer"':''}><button class="calendar-delete ${isParentLoggedIn()?'':'hidden'}" onclick="event.stopPropagation();deleteTestDate('${t.id}')">✕</button><div class="test-calendar-date">${formatTestDate(t.date)}</div><div class="test-calendar-title">${escapeHtml(t.subject)} — ${escapeHtml(t.title)}</div><div class="test-calendar-countdown">⏳ ${testCountdown(t.date)}</div></div>`).join(''):'<div class="test-calendar-empty">Geen komende toetsen.</div>';refreshPageSidebars()}
-function addTestDate(){if(!requireParent())return;const sel=document.getElementById('calendarLessonSelect');const opts=lessons.filter(l=>l.student===currentStudent);if(!opts.length){alert('Dit kind heeft nog geen lessen.');return}sel.innerHTML=opts.map(l=>`<option value="${l.id}">${escapeHtml(l.subject)} — ${escapeHtml(l.title)}</option>`).join('');updateCalendarLessonNote();const existing=getTestDateForLesson(Number(sel.value),currentStudent);const tomorrow=new Date();tomorrow.setDate(tomorrow.getDate()+1);const initial=existing?.date||tomorrow.toISOString().slice(0,10);document.getElementById('calendarDateInput').value=initial;renderDatePicker('calendarDatePicker','calendarDateInput',initial);document.getElementById('testCalendarModal').classList.remove('hidden')}
-function updateCalendarLessonNote(){const id=Number(document.getElementById('calendarLessonSelect')?.value);const l=lessons.find(x=>x.id===id);const note=document.getElementById('calendarLessonNote');if(note)note.textContent=l?`${l.lesson_items.length} onderdelen · ${typeLabel(l.type)}`:''}
-function closeTestCalendarModal(){document.getElementById('testCalendarModal')?.classList.add('hidden')}
-function saveTestCalendarEntry(){if(!requireParent())return;const lessonId=Number(document.getElementById('calendarLessonSelect').value),date=document.getElementById('calendarDateInput').value,l=lessons.find(x=>x.id===lessonId);if(!l||!date){alert('Kies eerst een les en een toetsdag.');return}upsertTestDate(l.id,currentStudent,date,l);closeTestCalendarModal();renderTestCalendar();refreshPageSidebars();renderUpcomingLinkedTests()}
-function openCalendarLesson(lessonId){const l=lessons.find(x=>x.id===Number(lessonId));if(!l)return;openLesson(l.id)}
-function deleteTestDate(id){if(!requireParent())return;saveTestCalendar(getTestCalendar().filter(t=>t.id!==id));renderTestCalendar();renderUpcomingLinkedTests()}
-
 function getTestDateForLesson(lessonId,student){return getTestCalendar().find(t=>Number(t.lessonId)===Number(lessonId)&&t.student===student)}
 function upsertTestDate(lessonId,student,date,lesson){if(!date)return;const items=getTestCalendar();const idx=items.findIndex(t=>Number(t.lessonId)===Number(lessonId)&&t.student===student);const entry={id:idx>=0?items[idx].id:Date.now().toString(),student,lessonId:Number(lessonId),subject:lesson.subject,title:lesson.title,date};if(idx>=0)items[idx]=entry;else items.push(entry);saveTestCalendar(items)}
 function removeTestDate(lessonId,student){const items=getTestCalendar().filter(t=>!(Number(t.lessonId)===Number(lessonId)&&t.student===student));saveTestCalendar(items)}
@@ -2524,7 +2512,3 @@ function editCurrentLesson(){if(!requireParent())return;const l=currentLesson;hi
     ap.forEach(x=>addUniversalAnswerPart(row,cfg.answers,cfg.answerClass,x.text||'',x.role||'answer',cfg.answerPlaceholder));
   }
 });changeLessonType();addCurrentRow();renderDatePicker('lessonTestDatePicker','lessonTestDate',existingTest?.date||'')}
-
-</script>
-</body>
-</html>

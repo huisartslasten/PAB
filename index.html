@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO LIVE V4.14 -->
+<!-- PacoGO LIVE V4.15 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -738,7 +738,7 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div class="version-badge">PacoGO LIVE V4.14</div>
+  <div class="version-badge">PacoGO LIVE V4.15</div>
 
 <div id="globalMessage"></div>
 
@@ -1670,7 +1670,7 @@ async function initializeApp(){const {data:{session}}=await db.auth.getSession()
 db.auth.onAuthStateChange((_event,session)=>{updateAuthUI(session);if(_event==='PASSWORD_RECOVERY')showResetPassword()});
 
 async function loadLessons(){const {data,error}=await db.from('lessons').select('*, lesson_items(*)').order('id',{ascending:true});if(error){showMessage('Lessen laden mislukt: '+error.message,'error');return}lessons=(data||[]).map(l=>({...l,lesson_items:(l.lesson_items||[]).sort((a,b)=>(a.sort_order??0)-(b.sort_order??0))}));showHome()}
-function renderSubjects(){const el=document.getElementById('subjects');const visibleLessons=lessons.filter(l=>l.student===currentStudent);const names=[...new Set(visibleLessons.map(l=>l.subject))];const lessonStat=document.getElementById('lessonCountStat');const subjectStat=document.getElementById('subjectCountStat');const progress=document.getElementById('dashboardProgress');if(lessonStat)lessonStat.textContent=visibleLessons.length;if(subjectStat)subjectStat.textContent=names.length+' '+(names.length===1?'vak':'vakken');if(progress)progress.style.width=(visibleLessons.length?Math.min(100,20+visibleLessons.length*7):10)+'%';if(!names.length){el.innerHTML='<div class="empty">Nog geen lessen. Een ouder kan een les toevoegen.</div>';return}el.innerHTML=names.map(s=>{const count=visibleLessons.filter(l=>l.subject===s).length;return `<div class="card subject-card ${subjectClass(s)}" onclick="showSubject('${escapeAttr(s)}')"><div><div class="subject-icon">${subjectIcon(s)}</div><div class="subject-title">${escapeHtml(s)}</div></div><div class="small">${count} ${count===1?'les':'lessen'} · Bekijk →</div></div>`}).join('')}
+function renderSubjects(){const el=document.getElementById('subjects');const visibleLessons=lessons.filter(l=>l.student===currentStudent&&!l.archived);const names=[...new Set(visibleLessons.map(l=>l.subject))];const lessonStat=document.getElementById('lessonCountStat');const subjectStat=document.getElementById('subjectCountStat');const progress=document.getElementById('dashboardProgress');if(lessonStat)lessonStat.textContent=visibleLessons.length;if(subjectStat)subjectStat.textContent=names.length+' '+(names.length===1?'vak':'vakken');if(progress)progress.style.width=(visibleLessons.length?Math.min(100,20+visibleLessons.length*7):10)+'%';if(!names.length){el.innerHTML='<div class="empty">Nog geen lessen. Een ouder kan een les toevoegen.</div>';return}el.innerHTML=names.map(s=>{const count=visibleLessons.filter(l=>l.subject===s).length;return `<div class="card subject-card ${subjectClass(s)}" onclick="showSubject('${escapeAttr(s)}')"><div><div class="subject-icon">${subjectIcon(s)}</div><div class="subject-title">${escapeHtml(s)}</div></div><div class="small">${count} ${count===1?'les':'lessen'} · Bekijk →</div></div>`}).join('')}
 function escapeAttr(v){return escapeHtml(v).replace(/`/g,'&#96;')}
 function getLessonOrderKey(student,subject){return 'pacogo-lesson-order-'+String(student||'')+'-'+String(subject||'')}
 function getLocalLessonOrder(student,subject){

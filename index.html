@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V4.27 -->
+<!-- PacoGO TEST V4.28 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -727,7 +727,7 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div class="version-badge">PacoGO TEST V4.27</div>
+  <div class="version-badge">PacoGO TEST V4.28</div>
 
 <div id="globalMessage"></div>
 
@@ -788,7 +788,7 @@ function isCreator(){return !!currentSession&&CREATOR_IDS.has(currentSession.use
 function updateAuthUI(session){currentSession=session;const logged=isParentLoggedIn();document.getElementById('loginButton')?.classList.toggle('hidden',logged);document.getElementById('logoutButton')?.classList.toggle('hidden',!logged);document.querySelectorAll('.side-logout-button').forEach(e=>e.classList.toggle('hidden',!logged));document.querySelectorAll('.side-manage-button').forEach(e=>e.classList.remove('hidden'));document.querySelectorAll('.page-side-layout-no-right .sidebar-manage-left').forEach(e=>e.classList.toggle('hidden',!logged));document.getElementById('manageButton')?.classList.remove('hidden');document.getElementById('addLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('addLessonButton2')?.classList.toggle('hidden',!logged);document.getElementById('editLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('deleteLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('addTestButton')?.classList.toggle('hidden',!logged);document.querySelectorAll('#parentDashboard .parent-sidebar,#aiAssignment .parent-sidebar,#creatorConsole .parent-sidebar').forEach(el=>{el.outerHTML=buildParentSideBarHtml()});}
 function requireParent(){if(!isParentLoggedIn()){showMessage('Alleen ouders kunnen lessen wijzigen. Log eerst in.','error');showHome();return false}return true}
 function buildSideBarHtml(){return `<aside class="sidebar"><div class="student-sidebar-greeting"></div><button class="side-item" onclick="showHome()"><span class="side-icon">🏠</span>Home</button><button class="side-item" onclick="goToSubjects()"><span class="side-icon">📖</span>Mijn lessen</button><div class="sidebar-subjects"></div><button class="side-item" onclick="showAgenda()"><span class="side-icon">📅</span>Mijn agenda</button><div class="sidebar-subjects agenda-subjects"><button class="sidebar-subject" onclick="showAgendaImport()"><span>📥</span>Agenda invoeren</button><button class="sidebar-subject sidebar-print-month" onclick="showPrintCalendar(currentStudent)"><span>📅</span>Maandkalender</button></div><button class="side-item" onclick="isParentLoggedIn()?showTestHistory(currentStudent):showLogin()"><span class="side-icon">📝</span>Toetsgeschiedenis</button><button class="side-item sidebar-manage-left hidden" onclick="isParentLoggedIn()?showParentDashboard():showLogin()"><span class="side-icon">⚙️</span>Beheer</button><div class="sidebar-note">🐾 <strong>Goed bezig!</strong><br>Elke les brengt je een pootje verder.</div></aside>`}
-function buildParentSideBarHtml(){const creator=isCreator();return `<aside class="sidebar parent-sidebar"><div class="parent-sidebar-title">⚙️ Beheer</div><button class="parent-sidebar-mainpage" onclick="switchStudent()">🏠 Main Page</button><div class="parent-sidebar-actions"><button class="parent-sidebar-action" onclick="parentStartLesson()">➕ Les maken</button><button class="parent-sidebar-action" onclick="showTestHistory()">📝 Toetsgeschiedenis</button><button class="parent-sidebar-action parent-feedback-button" onclick="showParentFeedback()">💬 Feedback & ideeën</button>${creator?'<button class="parent-sidebar-action parent-feedback-button" onclick="showCreatorConsole()">🧠 Creator Console</button>':''}</div><div class="sidebar-note">🐾 <strong>PacoGO Beheer</strong><br>${creator?'Hoofdbeheerder':'Ouder'}omgeving.</div></aside>`}
+function buildParentSideBarHtml(){const creator=isCreator();return `<aside class="sidebar parent-sidebar"><div class="parent-sidebar-title">⚙️ Beheer</div><button class="parent-sidebar-mainpage" onclick="switchStudent()">🏠 Main Page</button><div class="parent-sidebar-actions"><button class="parent-sidebar-action" onclick="parentStartLesson()">➕ Les maken</button><button class="parent-sidebar-action" onclick="showTestHistory()">📝 Toetsgeschiedenis</button><button class="parent-sidebar-action" onclick="showArchive()">🗄️ Archief</button><button class="parent-sidebar-action" onclick="showTrash()">🗑️ Prullenbak</button><button class="parent-sidebar-action parent-feedback-button" onclick="showParentFeedback()">💬 Feedback & ideeën</button>${creator?'<button class="parent-sidebar-action parent-feedback-button" onclick="showCreatorConsole()">🧠 Creator Console</button>':''}</div><div class="sidebar-note">🐾 <strong>PacoGO Beheer</strong><br>${creator?'Hoofdbeheerder':'Ouder'}omgeving.</div></aside>`}
 function buildSideRightHtml(includeManage=true){
   return '<aside class="side-panel">'+
     (!includeManage?'<button class="logout-button side-logout-button hidden" onclick="logoutParent()">Logout</button>':'')+
@@ -819,12 +819,12 @@ function getPreparationStats(){
   const mastered=items.filter(x=>getMastery(currentStudent,x.lessonId,x.itemId).mastered).length;
   return {total:items.length,mastered,pct:items.length?Math.round(mastered/items.length*100):0};
 }
-function renderSidebarSubjects(){const visibleLessons=lessons.filter(l=>l.student===currentStudent&&!l.archived);const names=[...new Set(visibleLessons.map(l=>l.subject).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'nl'));document.querySelectorAll('.sidebar-subjects:not(.agenda-subjects)').forEach(el=>{el.innerHTML=names.map(s=>{const active=currentSubject===s?' active':'';const jsSubject=escapeAttr(JSON.stringify(s));return '<button class="sidebar-subject'+active+'" onclick="showSubject('+jsSubject+')"><span>'+subjectIcon(s)+'</span>'+escapeHtml(s)+'</button>'}).join('')});}
+function renderSidebarSubjects(){const visibleLessons=lessons.filter(l=>l.student===currentStudent&&!l.archived&&!l.deleted);const names=[...new Set(visibleLessons.map(l=>l.subject).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'nl'));document.querySelectorAll('.sidebar-subjects:not(.agenda-subjects)').forEach(el=>{el.innerHTML=names.map(s=>{const active=currentSubject===s?' active':'';const jsSubject=escapeAttr(JSON.stringify(s));return '<button class="sidebar-subject'+active+'" onclick="showSubject('+jsSubject+')"><span>'+subjectIcon(s)+'</span>'+escapeHtml(s)+'</button>'}).join('')});}
 function refreshPageSidebars(){
   
   document.querySelectorAll('.student-sidebar-greeting').forEach(el=>{el.textContent=currentStudent?'Hoi '+currentStudent+'! 🐶':''});
   renderSidebarSubjects();
-  const visibleLessons=lessons.filter(l=>l.student===currentStudent);
+  const visibleLessons=lessons.filter(l=>l.student===currentStudent&&!l.archived&&!l.deleted);
   const names=[...new Set(visibleLessons.map(l=>l.subject))];
   const stats=getPreparationStats();
   document.querySelectorAll('.side-lesson-count').forEach(e=>e.textContent=visibleLessons.length);
@@ -1513,7 +1513,7 @@ async function initializeApp(){const {data:{session}}=await db.auth.getSession()
 db.auth.onAuthStateChange((_event,session)=>{updateAuthUI(session);if(_event==='PASSWORD_RECOVERY')showResetPassword()});
 
 async function loadLessons(){const {data,error}=await db.from('lessons').select('*, lesson_items(*)').order('id',{ascending:true});if(error){showMessage('Lessen laden mislukt: '+error.message,'error');return}lessons=(data||[]).map(l=>({...l,lesson_items:(l.lesson_items||[]).sort((a,b)=>(a.sort_order??0)-(b.sort_order??0))}));showHome()}
-function renderSubjects(){const el=document.getElementById('subjects');const visibleLessons=lessons.filter(l=>l.student===currentStudent);const names=[...new Set(visibleLessons.map(l=>l.subject))];const lessonStat=document.getElementById('lessonCountStat');const subjectStat=document.getElementById('subjectCountStat');const progress=document.getElementById('dashboardProgress');if(lessonStat)lessonStat.textContent=visibleLessons.length;if(subjectStat)subjectStat.textContent=names.length+' '+(names.length===1?'vak':'vakken');if(progress)progress.style.width=(visibleLessons.length?Math.min(100,20+visibleLessons.length*7):10)+'%';if(!names.length){el.innerHTML='<div class="empty">Nog geen lessen. Een ouder kan een les toevoegen.</div>';return}el.innerHTML=names.map(s=>{const count=visibleLessons.filter(l=>l.subject===s).length;return `<div class="card subject-card ${subjectClass(s)}" onclick="showSubject('${escapeAttr(s)}')"><div><div class="subject-icon">${subjectIcon(s)}</div><div class="subject-title">${escapeHtml(s)}</div></div><div class="small">${count} ${count===1?'les':'lessen'} · Bekijk →</div></div>`}).join('')}
+function renderSubjects(){const el=document.getElementById('subjects');const visibleLessons=lessons.filter(l=>l.student===currentStudent&&!l.archived&&!l.deleted);const names=[...new Set(visibleLessons.map(l=>l.subject))];const lessonStat=document.getElementById('lessonCountStat');const subjectStat=document.getElementById('subjectCountStat');const progress=document.getElementById('dashboardProgress');if(lessonStat)lessonStat.textContent=visibleLessons.length;if(subjectStat)subjectStat.textContent=names.length+' '+(names.length===1?'vak':'vakken');if(progress)progress.style.width=(visibleLessons.length?Math.min(100,20+visibleLessons.length*7):10)+'%';if(!names.length){el.innerHTML='<div class="empty">Nog geen lessen. Een ouder kan een les toevoegen.</div>';return}el.innerHTML=names.map(s=>{const count=visibleLessons.filter(l=>l.subject===s).length;return `<div class="card subject-card ${subjectClass(s)}" onclick="showSubject('${escapeAttr(s)}')"><div><div class="subject-icon">${subjectIcon(s)}</div><div class="subject-title">${escapeHtml(s)}</div></div><div class="small">${count} ${count===1?'les':'lessen'} · Bekijk →</div></div>`}).join('')}
 function escapeAttr(v){return escapeHtml(v).replace(/`/g,'&#96;')}
 function getLessonOrderKey(student,subject){return 'pacogo-lesson-order-'+String(student||'')+'-'+String(subject||'')}
 function getLocalLessonOrder(student,subject){
@@ -1656,7 +1656,7 @@ async function showSubject(subject){
   document.getElementById('subject').classList.remove('hidden');
   document.getElementById('subjectTitle').textContent=subject;
   refreshPageSidebars();
-  const ls=await getOrderedLessons(lessons.filter(l=>l.subject===subject&&l.student===currentStudent&&!l.archived),currentStudent,subject);
+  const ls=await getOrderedLessons(lessons.filter(l=>l.subject===subject&&l.student===currentStudent&&!l.archived&&!l.deleted),currentStudent,subject);
   const el=document.getElementById('lessons');
   if(!ls.length){el.innerHTML='<div class="empty">Nog geen lessen in dit vak.</div>';return}
 
@@ -1711,12 +1711,62 @@ async function archiveCurrentLesson(){
 }
 async function restoreArchivedLesson(id){
   if(!requireParent())return;
-  const {error}=await db.from('lessons').update({archived:false}).eq('id',Number(id));
+  const {error}=await db.from('lessons').update({archived:false,deleted:false}).eq('id',Number(id));
   if(error){showMessage('Herstellen mislukt: '+error.message,'error');return}
   await loadLessons();
   currentStudent=parentSelectedStudent;
   await renderParentDashboard();
   showMessage('Les teruggezet.','success');
+}
+function recoveryLessonRow(l,mode){
+  const action=mode==='archive'?'restoreArchivedLesson':'restoreDeletedLesson';
+  const meta=escapeHtml(l.subject)+' · '+escapeHtml(typeLabel(l.type))+' · '+l.lesson_items.length+' onderdelen';
+  return '<div class="parent-lesson-row"><div class="parent-lesson-info"><strong>'+escapeHtml(l.title)+'</strong><span>'+meta+'</span></div><button class="success" onclick="'+action+'('+Number(l.id)+')">↩️ Herstellen</button></div>';
+}
+function renderRecoveryPage(mode){
+  const el=document.getElementById('parentManagement');
+  if(!el)return;
+  const isArchive=mode==='archive';
+  const items=lessons.filter(l=>isArchive?!!l.archived&&!l.deleted:!!l.deleted);
+  if(!items.length){el.innerHTML='<div class="card empty">'+(isArchive?'Het archief is leeg.':'De prullenbak is leeg.')+'</div>';return;}
+  const students=[...new Set(items.map(l=>l.student).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'nl'));
+  el.innerHTML=students.map(student=>{
+    const studentItems=items.filter(l=>l.student===student);
+    const subjects=[...new Set(studentItems.map(l=>l.subject).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'nl'));
+    return '<div class="card" style="margin-bottom:18px"><div class="parent-dashboard-head"><div><h2>👦 '+escapeHtml(student)+'</h2><div class="small">'+studentItems.length+' '+(studentItems.length===1?'les':'lessen')+'</div></div></div>'+subjects.map(subject=>{
+      const subjectItems=studentItems.filter(l=>l.subject===subject);
+      return '<section style="margin-top:18px"><h3 style="margin:0 0 10px">'+escapeHtml(subjectIcon(subject)+' '+subject)+'</h3>'+subjectItems.map(l=>recoveryLessonRow(l,mode)).join('')+'</section>';
+    }).join('')+'</div>';
+  }).join('');
+}
+function showArchive(){
+  if(!requireParent())return;
+  hideAll();
+  const page=document.getElementById('parentDashboard');
+  page?.classList.remove('hidden');
+  document.getElementById('parentStudentGrid')?.classList.add('hidden');
+  parentSelectedStudent=null;currentStudent=null;
+  const sidebar=page?.querySelector('.parent-sidebar');if(sidebar)sidebar.outerHTML=buildParentSideBarHtml();
+  document.getElementById('parentManagement').innerHTML='<div class="card">Archief laden...</div>';
+  renderRecoveryPage('archive');
+}
+function showTrash(){
+  if(!requireParent())return;
+  hideAll();
+  const page=document.getElementById('parentDashboard');
+  page?.classList.remove('hidden');
+  document.getElementById('parentStudentGrid')?.classList.add('hidden');
+  parentSelectedStudent=null;currentStudent=null;
+  const sidebar=page?.querySelector('.parent-sidebar');if(sidebar)sidebar.outerHTML=buildParentSideBarHtml();
+  document.getElementById('parentManagement').innerHTML='<div class="card">Prullenbak laden...</div>';
+  renderRecoveryPage('trash');
+}
+async function restoreDeletedLesson(id){
+  if(!requireParent())return;
+  const {error}=await db.from('lessons').update({deleted:false,archived:false}).eq('id',Number(id));
+  if(error){showMessage('Herstellen uit de prullenbak mislukt: '+error.message,'error');return}
+  await loadLessons();
+  showMessage('Les uit de prullenbak hersteld.','success');
 }
 function openLesson(id){const l=lessons.find(x=>x.id===id);if(!l)return;currentLesson=l;hideAll();document.getElementById('lessonChoice').classList.remove('hidden');document.getElementById('choiceSubject').textContent=l.subject+(l.subvak?' · '+l.subvak:'');document.getElementById('choiceTitle').textContent=l.title;document.getElementById('choiceMeta').textContent=l.subject+(l.subvak?' · '+l.subvak:'')+' · '+typeLabel(l.type)+' · '+l.lesson_items.length+' items';refreshPageSidebars();const g=document.getElementById('choiceGrid');if(l.type==='words'||l.type==='custom'){g.innerHTML='<button class="choice" onclick="startPractice(\''+l.type+'\')"><div class="emoji">'+(l.type==='custom'?'🛠️':'🎯')+'</div><h3>Oefenen</h3><p>Fouten komen later opnieuw terug totdat je ze beheerst.</p></button><button class="choice" onclick="startTest(\''+l.type+'\')"><div class="emoji">📝</div><h3>Toets</h3><p>Alle items één keer, zonder hulp.</p></button><button class="choice" onclick="showLesson()"><div class="emoji">📖</div><h3>Bekijken</h3><p>Bekijk de vragen en antwoorden.</p></button>'}else if(l.type==='dictation'){g.innerHTML='<button class="choice" onclick="startPractice(\'dictation\')"><div class="emoji">✏️</div><h3>Oefenen</h3><p>Luister, typ en herhaal fouten totdat de spelling goed is.</p></button><button class="choice" onclick="startTest(\'dictation\')"><div class="emoji">📝</div><h3>Toets</h3><p>Luister en schrijf alle woorden. Feedback komt pas aan het einde.</p></button><button class="choice" onclick="showLesson()"><div class="emoji">📖</div><h3>Bekijken</h3><p>Bekijk de dicteewoorden.</p></button>'}else if(l.type==='spelling'){g.innerHTML='<button class="choice" onclick="startPractice(\'spelling\')"><div class="emoji">✍️</div><h3>Oefenen</h3><p>Vul beide vormen in.</p></button><button class="choice" onclick="startTest(\'spelling\')"><div class="emoji">📝</div><h3>Toets</h3><p>Vul beide vormen in.</p></button><button class="choice" onclick="showLesson()"><div class="emoji">📖</div><h3>Bekijken</h3><p>Bekijk de vormen.</p></button>'}else if(l.type==='math'){g.innerHTML='<button class="choice" onclick="startPractice(\'math\')"><div class="emoji">🔢</div><h3>Oefenen</h3><p>Los de sommen op en probeer opnieuw wat nog niet goed ging.</p></button><button class="choice" onclick="startTest(\'math\')"><div class="emoji">📝</div><h3>Toets</h3><p>Los alle sommen op.</p></button><button class="choice" onclick="showLesson()"><div class="emoji">📖</div><h3>Bekijken</h3><p>Bekijk de sommen en antwoorden.</p></button>'}else{g.innerHTML='<button class="choice" onclick="startQuestions()"><div class="emoji">❓</div><h3>Vragen maken</h3><p>Beantwoord de vragen en controleer jezelf.</p></button><button class="choice" onclick="showLesson()"><div class="emoji">📖</div><h3>Bekijken</h3><p>Bekijk vragen en antwoorden.</p></button>'}}
 function showLesson(){hideAll();document.getElementById('lessonView').classList.remove('hidden');document.getElementById('lessonTitle').textContent=currentLesson.title;refreshPageSidebars();const admin=isParentLoggedIn();document.getElementById('editLessonButton').classList.toggle('hidden',!admin);document.getElementById('archiveLessonButton').classList.toggle('hidden',!admin||!!currentLesson.archived);document.getElementById('deleteLessonButton').classList.toggle('hidden',!admin);const el=document.getElementById('lessonContent');const explanation=currentLesson.explanation?'<div class="lesson-explanation"><div class="lesson-explanation-title">📖 Uitleg</div>'+escapeHtml(currentLesson.explanation)+'</div>':'';el.innerHTML=explanation+(currentLesson.lesson_items.length?currentLesson.lesson_items.map((it,i)=>{const parts=Array.isArray(it.answer_parts)?it.answer_parts:[];const extra=parts.filter(p=>p&&p.role==='extra'&&String(p.text||'').trim()).map(p=>p.text).join('\n');const required=parts.filter(p=>p&&p.role==='answer'&&String(p.text||'').trim()).map(p=>p.text).join('\n')||it.answer;return `<div class="card" style="margin-bottom:10px"><strong>${i+1}. ${escapeHtml(it.question)}</strong><div style="margin-top:8px;white-space:pre-line">${escapeHtml(required)}</div>${extra?`<div class="lesson-extra-info"><div class="lesson-extra-info-title">💡 Extra informatie</div>${escapeHtml(extra)}</div>`:''}</div>`}).join(''):'<div class="empty">Deze les heeft nog geen items.</div>')}
@@ -1725,7 +1775,7 @@ function leaveActivity(){window.speechSynthesis?.cancel();activity=null;showLess
 function showLessonChoice(l){currentLesson=l;openLesson(l.id)}
 
 let parentSelectedStudent=null;
-async function showParentDashboard(){if(!requireParent())return;hideAll();parentSelectedStudent=null;currentStudent=null;document.getElementById('parentDashboard').classList.remove('hidden');renderParentDashboard()}
+async function showParentDashboard(){if(!requireParent())return;hideAll();parentSelectedStudent=null;currentStudent=null;document.getElementById('parentDashboard').classList.remove('hidden');document.getElementById('parentStudentGrid')?.classList.remove('hidden');renderParentDashboard()}
 function parentStartLesson(){if(!requireParent())return;currentStudent=null;showAddLesson()}
 async function renderParentDashboard(){
   const grid=document.getElementById('parentStudentGrid');
@@ -1995,8 +2045,8 @@ async function renderParentStudent(){
   const isGuest=parentSelectedStudent && !['Zyon','Zenith','Zephon','Testleerling'].includes(parentSelectedStudent);
   if(!parentSelectedStudent){el.innerHTML='';return;}
   if(!isGuest){
-    const own=lessons.filter(l=>l.student===parentSelectedStudent&&!l.archived);
-    const archived=lessons.filter(l=>l.student===parentSelectedStudent&&l.archived);
+    const own=lessons.filter(l=>l.student===parentSelectedStudent&&!l.archived&&!l.deleted);
+    const archived=lessons.filter(l=>l.student===parentSelectedStudent&&l.archived&&!l.deleted);
     el.innerHTML='<div class="card"><div class="parent-dashboard-head"><div><h2>👦 '+escapeHtml(parentSelectedStudent)+'</h2><div class="small">'+own.length+' actieve lessen</div></div></div>'+
       (own.length?own.map(l=>parentLessonRow(l,false,true)).join(''):'<div class="empty">Nog geen actieve lessen voor deze leerling.</div>')+
       (archived.length?'<div class="parent-archived"><details><summary>🗄️ Gearchiveerde lessen ('+archived.length+')</summary>'+archived.map(l=>parentLessonRow(l,false,false)).join('')+'</details></div>':'')+
@@ -2515,7 +2565,7 @@ function editCurrentLesson(){if(!requireParent())return;const l=currentLesson;hi
 function deleteCurrentLesson(){
   if(!requireParent())return;
   if(!currentLesson)return;
-  document.getElementById('deleteModalText').textContent=`Weet je zeker dat je de les “${currentLesson.title}” wilt verwijderen? Alle woorden, vragen en dicteewoorden uit deze les worden ook verwijderd.`;
+  document.getElementById('deleteModalText').textContent=`Weet je zeker dat je de les “${currentLesson.title}” naar de prullenbak wilt verplaatsen? De les blijft daar bewaard en kan later worden hersteld.`;
   document.getElementById('deleteModal').classList.remove('hidden');
 }
 function closeDeleteModal(){document.getElementById('deleteModal').classList.add('hidden')}
@@ -2524,13 +2574,13 @@ async function confirmDeleteLesson(){
   const lessonId=currentLesson.id;
   const subject=currentSubject;
   closeDeleteModal();
-  const {error}=await db.from('lessons').delete().eq('id',lessonId);
+  const {error}=await db.from('lessons').update({deleted:true,archived:false}).eq('id',lessonId);
   if(error){showMessage('Verwijderen mislukt: '+error.message,'error');return}
   currentLesson=null;
   await loadLessons();
   currentSubject=subject;
   showSubject(subject);
-  showMessage('Les verwijderd.','success');
+  showMessage('Les naar de prullenbak verplaatst.','success');
 }
 document.getElementById('deleteModal')?.addEventListener('click',e=>{if(e.target.id==='deleteModal')closeDeleteModal()});
 document.getElementById('agendaEditModal')?.addEventListener('click',e=>{if(e.target.id==='agendaEditModal')closeAgendaEditModal()});

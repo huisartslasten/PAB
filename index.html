@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V4.29 -->
+<!-- PacoGO TEST V4.30 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -1739,10 +1739,20 @@ function renderRecoveryPage(mode){
   el.innerHTML=students.map(student=>{
     const studentItems=items.filter(l=>l.student===student);
     const subjects=[...new Set(studentItems.map(l=>l.subject).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'nl'));
-    return '<div class="card" style="margin-bottom:18px"><div class="parent-dashboard-head"><div><h2>👦 '+escapeHtml(student)+'</h2><div class="small">'+studentItems.length+' '+(studentItems.length===1?'les':'lessen')+'</div></div></div>'+subjects.map(subject=>{
-      const subjectItems=studentItems.filter(l=>l.subject===subject);
-      return '<section style="margin-top:18px"><h3 style="margin:0 0 10px">'+escapeHtml(subjectIcon(subject)+' '+subject)+'</h3>'+subjectItems.map(l=>recoveryLessonRow(l,mode)).join('')+'</section>';
-    }).join('')+'</div>';
+    return '<section class="recovery-student-section">'+
+      '<div class="recovery-student-heading"><span class="page-heading-label">Leerling</span><h2>👦 '+escapeHtml(student)+'</h2><p>'+studentItems.length+' '+(studentItems.length===1?'les':'lessen')+' in het archief.</p></div>'+
+      '<div class="grid recovery-subject-grid">'+subjects.map(subject=>{
+        const subjectItems=studentItems.filter(l=>l.subject===subject);
+        return '<div class="card recovery-subject-card '+subjectClass(subject)+'">'+
+          '<div class="subject-icon">'+subjectIcon(subject)+'</div>'+
+          '<div class="subject-title">'+escapeHtml(subject)+'</div>'+
+          '<div class="small">'+subjectItems.length+' '+(subjectItems.length===1?'les':'lessen')+'</div>'+
+          '<div class="recovery-lessons-grid">'+subjectItems.map(l=>{
+            return '<div class="card lesson-card recovery-lesson-card" onclick="event.stopPropagation()"><span class="badge lesson-badge">LES</span><h3>'+escapeHtml(l.title)+'</h3><div class="small">'+l.lesson_items.length+' '+(l.lesson_items.length===1?'onderdeel':'onderdelen')+' · '+escapeHtml(typeLabel(l.type))+'</div>'+((l.subvak&&String(l.subvak).trim())?'<div class="lesson-subvak">'+escapeHtml(l.subvak)+'</div>':'')+'<div class="lesson-card-actions">'+recoveryLessonRow(l,mode)+'</div></div>';
+          }).join('')+'</div>'+
+        '</div>';
+      }).join('')+'</div>'+
+    '</section>';
   }).join('');
 }
 function showArchive(){

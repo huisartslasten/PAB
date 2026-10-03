@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO LIVE V4.9 -->
+<!-- PacoGO LIVE V4.10 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -566,7 +566,7 @@ body{background:#1787f2}
         <div id="agendaImportChoiceSummary" class="card" style="margin:14px 0"></div>
         <div class="agenda-import-actions">
           <button class="big" type="button" onclick="addAgendaImportDirect()">✅ Direct toevoegen</button>
-          <button class="secondary big" type="button" onclick="saveAgendaImportForLater()">🖥️ Later op Mac bekijken</button>
+          <button class="secondary big" type="button" onclick="saveAgendaImportForLater()">💻 Later op computer bekijken</button>
         </div>
       </div>
 
@@ -1206,17 +1206,26 @@ async function analyzeAgendaVideo(){
     status.innerHTML='<strong>⚠️ Analyse niet gelukt</strong><br>PacoGO kon de schermopname niet goed verwerken. Probeer het opnieuw.';
   }finally{button.disabled=false}
 }
+function isMobileDevice(){
+  return /Android|iPhone|iPad|iPod|Mobile|Tablet/i.test(navigator.userAgent||'');
+}
+
 function showAgendaImportChoice(items){
   agendaImportReview=items||[];
   agendaImportDraftId=null;
   const choice=document.getElementById('agendaImportChoice');
   const review=document.getElementById('agendaImportReview');
   const summary=document.getElementById('agendaImportChoiceSummary');
-  if(review)review.classList.add('hidden');
   if(!choice||!summary)return;
   if(!agendaImportReview.length){choice.classList.add('hidden');return}
-  summary.innerHTML='<strong>'+agendaImportReview.length+' afspraak'+(agendaImportReview.length===1?'':'afspraken')+' gevonden.</strong><br><span class="small">Je kunt ze nu direct toevoegen, of ze op de Mac eerst rustig controleren.</span>';
-  choice.classList.remove('hidden');
+  if(isMobileDevice()){
+    if(review)review.classList.add('hidden');
+    summary.innerHTML='<strong>'+agendaImportReview.length+' afspraak'+(agendaImportReview.length===1?'':'afspraken')+' gevonden.</strong><br><span class="small">Je kunt ze nu direct toevoegen, of ze later op een computer eerst rustig controleren.</span>';
+    choice.classList.remove('hidden');
+    return;
+  }
+  choice.classList.add('hidden');
+  renderAgendaImportReview(agendaImportReview);
 }
 async function addAgendaImportDirect(){
   if(!agendaImportReview.length)return;

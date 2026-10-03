@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V4.31 -->
+<!-- PacoGO TEST V4.32 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -819,13 +819,13 @@ function getPreparationStats(){
   const mastered=items.filter(x=>getMastery(currentStudent,x.lessonId,x.itemId).mastered).length;
   return {total:items.length,mastered,pct:items.length?Math.round(mastered/items.length*100):0};
 }
-function renderSidebarSubjects(){const visibleLessons=lessons.filter(l=>l.student===currentStudent&&!l.archived&&!l.deleted);const names=[...new Set(visibleLessons.map(l=>l.subject).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'nl'));document.querySelectorAll('.sidebar-subjects:not(.agenda-subjects)').forEach(el=>{el.innerHTML=names.map(s=>{const active=currentSubject===s?' active':'';const jsSubject=escapeAttr(JSON.stringify(s));return '<button class="sidebar-subject'+active+'" onclick="showSubject('+jsSubject+')"><span>'+subjectIcon(s)+'</span>'+escapeHtml(s)+'</button>'}).join('')});}
+function renderSidebarSubjects(){const visibleLessons=lessons.filter(l=>l.student===currentStudent&&!l.archived&&!l.deleted);const groups=groupLessonsBySubject(visibleLessons).sort((a,b)=>a.label.localeCompare(b.label,'nl'));document.querySelectorAll('.sidebar-subjects:not(.agenda-subjects)').forEach(el=>{el.innerHTML=groups.map(group=>{const s=group.label;const active=normalizeSubjectKey(currentSubject)===group.key?' active':'';const jsSubject=escapeAttr(JSON.stringify(s));return '<button class="sidebar-subject'+active+'" onclick="showSubject('+jsSubject+')"><span>'+subjectIcon(s)+'</span>'+escapeHtml(s)+'</button>'}).join('')});}
 function refreshPageSidebars(){
   
   document.querySelectorAll('.student-sidebar-greeting').forEach(el=>{el.textContent=currentStudent?'Hoi '+currentStudent+'! 🐶':''});
   renderSidebarSubjects();
   const visibleLessons=lessons.filter(l=>l.student===currentStudent&&!l.archived&&!l.deleted);
-  const names=[...new Set(visibleLessons.map(l=>l.subject))];
+  const groups=groupLessonsBySubject(visibleLessons);
   const stats=getPreparationStats();
   document.querySelectorAll('.side-lesson-count').forEach(e=>e.textContent=visibleLessons.length);
   document.querySelectorAll('.side-subject-count').forEach(e=>e.textContent=names.length+' '+(names.length===1?'vak':'vakken'));
@@ -1505,15 +1505,32 @@ function normalize(v){return String(v??'').trim().toLowerCase()}
 function shuffle(arr){return [...arr].sort(()=>Math.random()-.5)}
 function typeLabel(type){return type==='words'?'🎯 Woordtrainer':type==='dictation'?'✏️ Dictee':type==='math'?'🔢 Rekenen':type==='spelling'?'✍️ Spelling':type==='custom'?'🛠️ Eigen les':'❓ Vragen'}
 function typeClass(type){return type==='words'?'type-word':type==='dictation'?'type-dictation':'type-question'}
-function subjectClass(s){const map={Nederlands:'subject-blue',Engels:'subject-purple',Rekenen:'subject-green',Geschiedenis:'subject-orange',Aardrijkskunde:'subject-cyan',Biologie:'subject-green',Natuur:'subject-orange',Frans:'subject-pink',Spaans:'subject-purple',Muziek:'subject-pink',Lezen:'subject-blue',Topografie:'subject-cyan',Wetenschap:'subject-green',Techniek:'subject-orange'};return map[s]||['subject-blue','subject-purple','subject-green','subject-orange','subject-pink','subject-cyan'][Math.abs(hashSubject(s))%6]}
+function normalizeSubjectKey(value){return String(value||'').trim().replace(/\s+/g,' ').toLocaleLowerCase('nl-NL').normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
+function subjectDisplayLabel(value){
+  const clean=String(value||'').trim().replace(/\s+/g,' ');
+  const key=normalizeSubjectKey(clean);
+  const known={nederlands:'Nederlands',engels:'Engels',rekenen:'Rekenen',geschiedenis:'Geschiedenis',aardrijkskunde:'Aardrijkskunde',biologie:'Biologie',natuur:'Natuur',frans:'Frans',spaans:'Spaans',muziek:'Muziek',lezen:'Lezen',topografie:'Topografie',wetenschap:'Wetenschap',techniek:'Techniek'};
+  return known[key]||(!clean?'Onbekend vak':clean.charAt(0).toLocaleUpperCase('nl-NL')+clean.slice(1));
+}
+function groupLessonsBySubject(list){
+  const groups=[];const byKey=new Map();
+  (list||[]).forEach(l=>{
+    const key=normalizeSubjectKey(l.subject);
+    if(!key)return;
+    if(!byKey.has(key)){const group={key,label:subjectDisplayLabel(l.subject),lessons:[]};byKey.set(key,group);groups.push(group)}
+    byKey.get(key).lessons.push(l);
+  });
+  return groups;
+}
+function subjectClass(s){const map={Nederlands:'subject-blue',Engels:'subject-purple',Rekenen:'subject-green',Geschiedenis:'subject-orange',Aardrijkskunde:'subject-cyan',Biologie:'subject-green',Natuur:'subject-orange',Frans:'subject-pink',Spaans:'subject-purple',Muziek:'subject-pink',Lezen:'subject-blue',Topografie:'subject-cyan',Wetenschap:'subject-green',Techniek:'subject-orange'};return map[subjectDisplayLabel(s)]||['subject-blue','subject-purple','subject-green','subject-orange','subject-pink','subject-cyan'][Math.abs(hashSubject(normalizeSubjectKey(s)))%6]}
 function hashSubject(s){let h=0;for(let i=0;i<String(s).length;i++)h=((h<<5)-h)+String(s).charCodeAt(i)|0;return h<0?-h:h}
-function subjectIcon(s){const map={Nederlands:'📚',Engels:'🇬🇧',Rekenen:'🔢',Geschiedenis:'🏴‍☠️',Aardrijkskunde:'🌍',Biologie:'🧬',Natuur:'🔬',Frans:'🇫🇷',Spaans:'🇪🇸',Muziek:'🎵',Lezen:'📖',Topografie:'🗺️',Wetenschap:'🧪',Techniek:'⚙️'};return map[s]||'🎓'}
+function subjectIcon(s){const map={Nederlands:'📚',Engels:'🇬🇧',Rekenen:'🔢',Geschiedenis:'🏴‍☠️',Aardrijkskunde:'🌍',Biologie:'🧬',Natuur:'🔬',Frans:'🇫🇷',Spaans:'🇪🇸',Muziek:'🎵',Lezen:'📖',Topografie:'🗺️',Wetenschap:'🧪',Techniek:'⚙️'};return map[subjectDisplayLabel(s)]||'🎓'}
 
 async function initializeApp(){const {data:{session}}=await db.auth.getSession();updateAuthUI(session);await loadLessons()}
 db.auth.onAuthStateChange((_event,session)=>{updateAuthUI(session);if(_event==='PASSWORD_RECOVERY')showResetPassword()});
 
 async function loadLessons(){const {data,error}=await db.from('lessons').select('*, lesson_items(*)').order('id',{ascending:true});if(error){showMessage('Lessen laden mislukt: '+error.message,'error');return}lessons=(data||[]).map(l=>({...l,lesson_items:(l.lesson_items||[]).sort((a,b)=>(a.sort_order??0)-(b.sort_order??0))}));showHome()}
-function renderSubjects(){const el=document.getElementById('subjects');const visibleLessons=lessons.filter(l=>l.student===currentStudent&&!l.archived&&!l.deleted);const names=[...new Set(visibleLessons.map(l=>l.subject))];const lessonStat=document.getElementById('lessonCountStat');const subjectStat=document.getElementById('subjectCountStat');const progress=document.getElementById('dashboardProgress');if(lessonStat)lessonStat.textContent=visibleLessons.length;if(subjectStat)subjectStat.textContent=names.length+' '+(names.length===1?'vak':'vakken');if(progress)progress.style.width=(visibleLessons.length?Math.min(100,20+visibleLessons.length*7):10)+'%';if(!names.length){el.innerHTML='<div class="empty">Nog geen lessen. Een ouder kan een les toevoegen.</div>';return}el.innerHTML=names.map(s=>{const count=visibleLessons.filter(l=>l.subject===s).length;return `<div class="card subject-card ${subjectClass(s)}" onclick="showSubject('${escapeAttr(s)}')"><div><div class="subject-icon">${subjectIcon(s)}</div><div class="subject-title">${escapeHtml(s)}</div></div><div class="small">${count} ${count===1?'les':'lessen'} · Bekijk →</div></div>`}).join('')}
+function renderSubjects(){const el=document.getElementById('subjects');const visibleLessons=lessons.filter(l=>l.student===currentStudent&&!l.archived&&!l.deleted);const groups=groupLessonsBySubject(visibleLessons);const lessonStat=document.getElementById('lessonCountStat');const subjectStat=document.getElementById('subjectCountStat');const progress=document.getElementById('dashboardProgress');if(lessonStat)lessonStat.textContent=visibleLessons.length;if(subjectStat)subjectStat.textContent=groups.length+' '+(groups.length===1?'vak':'vakken');if(progress)progress.style.width=(visibleLessons.length?Math.min(100,20+visibleLessons.length*7):10)+'%';if(!groups.length){el.innerHTML='<div class="empty">Nog geen lessen. Een ouder kan een les toevoegen.</div>';return}el.innerHTML=groups.map(group=>{const s=group.label;const count=group.lessons.length;return '<div class="card subject-card '+subjectClass(s)+'" onclick="showSubject('+JSON.stringify(s)+')"><div><div class="subject-icon">'+subjectIcon(s)+'</div><div class="subject-title">'+escapeHtml(s)+'</div></div><div class="small">'+count+' '+(count===1?'les':'lessen')+' · Bekijk →</div></div>'}).join('')}
 function escapeAttr(v){return escapeHtml(v).replace(/`/g,'&#96;')}
 function getLessonOrderKey(student,subject){return 'pacogo-lesson-order-'+String(student||'')+'-'+String(subject||'')}
 function getLocalLessonOrder(student,subject){
@@ -1651,38 +1668,32 @@ async function dragLessonIntoSubvak(e,subvakKey){
 }
 function dragLessonEnd(){clearLessonDragState()}
 async function showSubject(subject){
-  currentSubject=subject;
+  const subjectKey=normalizeSubjectKey(subject);
+  const displaySubject=subjectDisplayLabel(subject);
+  currentSubject=displaySubject;
   hideAll();
   document.getElementById('subject').classList.remove('hidden');
-  document.getElementById('subjectTitle').textContent=subject;
+  document.getElementById('subjectTitle').textContent=displaySubject;
   refreshPageSidebars();
-  const ls=await getOrderedLessons(lessons.filter(l=>l.subject===subject&&l.student===currentStudent&&!l.archived&&!l.deleted),currentStudent,subject);
+  const ls=await getOrderedLessons(lessons.filter(l=>normalizeSubjectKey(l.subject)===subjectKey&&l.student===currentStudent&&!l.archived&&!l.deleted),currentStudent,displaySubject);
   const el=document.getElementById('lessons');
   if(!ls.length){el.innerHTML='<div class="empty">Nog geen lessen in dit vak.</div>';return}
-
-  const groups=[];
-  const byKey=new Map();
+  const groups=[];const byKey=new Map();
   ls.forEach(l=>{
-    const raw=String(l.subvak||'').trim();
-    const key=normalizeSubvakKey(raw)||'__geen_subvak__';
-    if(!byKey.has(key)){
-      const group={key,label:subvakDisplayLabel(raw),lessons:[]};
-      byKey.set(key,group);
-      groups.push(group);
-    }
+    const raw=String(l.subvak||'').trim();const key=normalizeSubvakKey(raw)||'__geen_subvak__';
+    if(!byKey.has(key)){const group={key,label:subvakDisplayLabel(raw),lessons:[]};byKey.set(key,group);groups.push(group)}
     byKey.get(key).lessons.push(l);
   });
-
   el.innerHTML='<div class="subject-groups">'+groups.map(group=>{
     const muted=group.key==='__geen_subvak__';
     return '<section class="subvak-block" data-subvak-key="'+escapeAttr(group.key)+'" data-subvak-label="'+escapeAttr(group.label)+'" ondragover="dragSubvakOver(event)" ondragleave="dragSubvakLeave(event)" ondrop="dragLessonIntoSubvak(event,'+JSON.stringify(group.key)+')">'+
       '<h2 class="subvak-title '+(muted?'muted':'')+'">'+(muted?'📚 ':'📁 ')+escapeHtml(group.label)+'</h2>'+
       '<div class="subvak-lessons-grid">'+
         group.lessons.map(l=>'<div class="card lesson-card" draggable="'+(isParentLoggedIn()?'true':'false')+'" data-lesson-id="'+l.id+'" onclick="openLesson('+l.id+')" ondragstart="dragLessonStart(event,'+l.id+')" ondragover="dragLessonOver(event)" ondragleave="dragLessonLeave(event)" ondrop="dragLessonDrop(event,'+l.id+')" ondragend="dragLessonEnd()"><span class="badge lesson-badge">LES</span><h3>'+escapeHtml(l.title)+'</h3><div class="small">'+l.lesson_items.length+' '+(l.lesson_items.length===1?'onderdeel':'onderdelen')+' · '+escapeHtml(typeLabel(l.type))+'</div>'+((l.subvak&&String(l.subvak).trim())?'<div class="lesson-subvak">'+escapeHtml(l.subvak)+'</div>':'')+(isParentLoggedIn()?'<div class="lesson-card-actions"><button class="lesson-edit" onclick="event.stopPropagation();editLessonById('+l.id+')">✏️ Bewerken</button><button class="archive-button" onclick="event.stopPropagation();archiveLessonById('+l.id+')">🗄️ Archiveren</button><button class="lesson-delete" onclick="event.stopPropagation();deleteLessonById('+l.id+')">🗑️ Verwijderen</button></div>':'')+'</div>').join('')+
-      '</div>'+
-    '</section>';
+      '</div></section>';
   }).join('')+'</div>';
 }
+
 function editLessonById(id){
   const l=lessons.find(x=>Number(x.id)===Number(id));
   if(!l||!requireParent())return;
@@ -1729,45 +1740,73 @@ function recoveryLessonRow(l,mode){
   const meta=escapeHtml(l.subject)+' · '+escapeHtml(typeLabel(l.type))+' · '+l.lesson_items.length+' onderdelen';
   return '<div class="parent-lesson-row"><div class="parent-lesson-info"><strong>'+escapeHtml(l.title)+'</strong><span>'+meta+'</span></div><button class="success" onclick="'+action+'('+Number(l.id)+')">↩️ Herstellen</button></div>';
 }
+let recoverySelectedStudent=null;
+function renderArchiveStudentPicker(students){
+  return '<div class="card editor-student archive-student-picker"><strong>Voor welke leerling?</strong><div class="editor-student-buttons">'+students.map(student=>{
+    const active=recoverySelectedStudent===student?' checked':'';
+    return '<label class="editor-student-choice"><input type="radio" name="archiveStudent" value="'+escapeAttr(student)+'"'+active+' onchange="selectArchiveStudent('+JSON.stringify(student)+')"><span>'+escapeHtml(student)+'</span></label>';
+  }).join('')+'</div></div>';
+}
+function selectArchiveStudent(student){recoverySelectedStudent=student;renderArchiveContent()}
+function renderArchiveContent(){
+  const el=document.getElementById('parentManagement');if(!el)return;
+  const allArchived=lessons.filter(l=>!!l.archived&&!l.deleted);
+  const students=[...new Set(allArchived.map(l=>l.student).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'nl'));
+  if(!recoverySelectedStudent||!students.includes(recoverySelectedStudent)){el.innerHTML=renderArchiveStudentPicker(students);return}
+  const items=allArchived.filter(l=>l.student===recoverySelectedStudent);
+  if(!items.length){el.innerHTML=renderArchiveStudentPicker(students)+'<div class="card empty">Het archief is leeg voor '+escapeHtml(recoverySelectedStudent)+'.</div>';return}
+  const groups=groupLessonsBySubject(items).sort((a,b)=>a.label.localeCompare(b.label,'nl'));
+  el.innerHTML=renderArchiveStudentPicker(students)+'<div class="section-head"><h2>📚 Vakken</h2></div><div id="archiveSubjects" class="grid">'+groups.map(group=>{
+    const s=group.label;
+    return '<div class="card subject-card '+subjectClass(s)+'" onclick="showArchiveSubject('+JSON.stringify(s)+')"><div><div class="subject-icon">'+subjectIcon(s)+'</div><div class="subject-title">'+escapeHtml(s)+'</div></div><div class="small">'+group.lessons.length+' '+(group.lessons.length===1?'les':'lessen')+' · Bekijk →</div></div>';
+  }).join('')+'</div>';
+}
+function showArchiveSubject(subject){
+  const el=document.getElementById('parentManagement');if(!el)return;
+  const subjectKey=normalizeSubjectKey(subject),displaySubject=subjectDisplayLabel(subject);
+  const items=lessons.filter(l=>!!l.archived&&!l.deleted&&l.student===recoverySelectedStudent&&normalizeSubjectKey(l.subject)===subjectKey);
+  const groups=[];const byKey=new Map();
+  items.forEach(l=>{
+    const raw=String(l.subvak||'').trim(),key=normalizeSubvakKey(raw)||'__geen_subvak__';
+    if(!byKey.has(key)){const group={key,label:subvakDisplayLabel(raw),lessons:[]};byKey.set(key,group);groups.push(group)}
+    byKey.get(key).lessons.push(l);
+  });
+  el.innerHTML='<div class="archive-subject-back"><button class="secondary" type="button" onclick="renderArchiveContent()">← Terug naar Archief</button></div>'+
+    '<div class="page-heading subject-heading"><span class="page-heading-label">ARCHIEF</span><h2>'+escapeHtml(displaySubject)+'</h2><p>Gearchiveerde lessen voor '+escapeHtml(recoverySelectedStudent)+'.</p></div>'+
+    (groups.length?'<div class="subject-lessons-label">Lessen</div><div class="subject-groups">'+groups.map(group=>{
+      const muted=group.key==='__geen_subvak__';
+      return '<section class="subvak-block"><h2 class="subvak-title '+(muted?'muted':'')+'">'+(muted?'📚 ':'📁 ')+escapeHtml(group.label)+'</h2><div class="subvak-lessons-grid">'+group.lessons.map(l=>'<div class="card lesson-card recovery-lesson-card" onclick="event.stopPropagation()"><span class="badge lesson-badge">LES</span><h3>'+escapeHtml(l.title)+'</h3><div class="small">'+l.lesson_items.length+' '+(l.lesson_items.length===1?'onderdeel':'onderdelen')+' · '+escapeHtml(typeLabel(l.type))+'</div>'+((l.subvak&&String(l.subvak).trim())?'<div class="lesson-subvak">'+escapeHtml(l.subvak)+'</div>':'')+'<div class="lesson-card-actions"><button class="success" onclick="event.stopPropagation();restoreArchivedLesson('+Number(l.id)+')">↩️ Herstellen</button></div></div>').join('')+'</div></section>';
+    }).join('')+'</div>':'<div class="card empty">Geen lessen in dit vak.</div>');
+}
 function renderRecoveryPage(mode){
-  const el=document.getElementById('parentManagement');
-  if(!el)return;
-  const isArchive=mode==='archive';
-  const items=lessons.filter(l=>isArchive?!!l.archived&&!l.deleted:!!l.deleted);
-  if(!items.length){el.innerHTML='<div class="card empty">'+(isArchive?'Het archief is leeg.':'De prullenbak is leeg.')+'</div>';return;}
+  const el=document.getElementById('parentManagement');if(!el)return;
+  const isArchive=mode==='archive',items=lessons.filter(l=>isArchive?!!l.archived&&!l.deleted:!!l.deleted);
+  if(!items.length){el.innerHTML='<div class="card empty">'+(isArchive?'Het archief is leeg.':'De prullenbak is leeg.')+'</div>';return}
   const students=[...new Set(items.map(l=>l.student).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'nl'));
+  if(isArchive){recoverySelectedStudent=recoverySelectedStudent&&students.includes(recoverySelectedStudent)?recoverySelectedStudent:students[0];renderArchiveContent();return}
   el.innerHTML=students.map(student=>{
-    const studentItems=items.filter(l=>l.student===student);
-    const subjects=[...new Set(studentItems.map(l=>l.subject).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'nl'));
-    return '<section class="recovery-student-section">'+
-      '<div class="recovery-student-heading"><span class="page-heading-label">Leerling</span><h2>👦 '+escapeHtml(student)+'</h2><p>'+studentItems.length+' '+(studentItems.length===1?'les':'lessen')+' in het archief.</p></div>'+
-      '<div class="grid recovery-subject-grid">'+subjects.map(subject=>{
-        const subjectItems=studentItems.filter(l=>l.subject===subject);
-        return '<div class="card recovery-subject-card '+subjectClass(subject)+'">'+
-          '<div class="subject-icon">'+subjectIcon(subject)+'</div>'+
-          '<div class="subject-title">'+escapeHtml(subject)+'</div>'+
-          '<div class="small">'+subjectItems.length+' '+(subjectItems.length===1?'les':'lessen')+'</div>'+
-          '<div class="recovery-lessons-grid">'+subjectItems.map(l=>{
-            return '<div class="card lesson-card recovery-lesson-card" onclick="event.stopPropagation()"><span class="badge lesson-badge">LES</span><h3>'+escapeHtml(l.title)+'</h3><div class="small">'+l.lesson_items.length+' '+(l.lesson_items.length===1?'onderdeel':'onderdelen')+' · '+escapeHtml(typeLabel(l.type))+'</div>'+((l.subvak&&String(l.subvak).trim())?'<div class="lesson-subvak">'+escapeHtml(l.subvak)+'</div>':'')+'<div class="lesson-card-actions">'+recoveryLessonRow(l,mode)+'</div></div>';
-          }).join('')+'</div>'+
-        '</div>';
-      }).join('')+'</div>'+
-    '</section>';
+    const studentItems=items.filter(l=>l.student===student),subjectGroups=groupLessonsBySubject(studentItems).sort((a,b)=>a.label.localeCompare(b.label,'nl'));
+    return '<section class="recovery-student-section"><div class="recovery-student-heading"><span class="page-heading-label">Leerling</span><h2>👦 '+escapeHtml(student)+'</h2><p>'+studentItems.length+' '+(studentItems.length===1?'les':'lessen')+' in de prullenbak.</p></div><div class="grid recovery-subject-grid">'+subjectGroups.map(group=>{
+      const subject=group.label;
+      return '<div class="card recovery-subject-card '+subjectClass(subject)+'"><div class="subject-icon">'+subjectIcon(subject)+'</div><div class="subject-title">'+escapeHtml(subject)+'</div><div class="small">'+group.lessons.length+' '+(group.lessons.length===1?'les':'lessen')+'</div><div class="recovery-lessons-grid">'+group.lessons.map(l=>'<div class="card lesson-card recovery-lesson-card" onclick="event.stopPropagation()"><span class="badge lesson-badge">LES</span><h3>'+escapeHtml(l.title)+'</h3><div class="small">'+l.lesson_items.length+' '+(l.lesson_items.length===1?'onderdeel':'onderdelen')+' · '+escapeHtml(typeLabel(l.type))+'</div><div class="lesson-card-actions">'+recoveryLessonRow(l,mode)+'</div></div>').join('')+'</div></div>';
+    }).join('')+'</div></section>';
   }).join('');
 }
+
 function showArchive(){
   if(!requireParent())return;
   hideAll();
   const page=document.getElementById('parentDashboard');
   page?.classList.remove('hidden');
   page.querySelector('.banner-label').textContent='🐾 ARCHIEF';
-  const heading=page.querySelector('.parent-dashboard-intro');if(heading)heading.className='page-heading parent-dashboard-intro';if(heading)heading.innerHTML='<div class="page-heading-label">Archief</div><h2>🗄️ Archief</h2><p>Bekijk gearchiveerde lessen per leerling en vak. Je kunt een les hier weer herstellen.</p>';
+  const heading=page.querySelector('.parent-dashboard-intro');if(heading)heading.className='page-heading parent-dashboard-intro';if(heading)heading.innerHTML='<div class="page-heading-label">Archief</div><h2>🗄️ Archief</h2><p>Bekijk je gearchiveerde lessen op dezelfde manier als je actieve lessen.</p>';
   document.getElementById('parentStudentGrid')?.classList.add('hidden');
-  parentSelectedStudent=null;currentStudent=null;
+  parentSelectedStudent=null;currentStudent=null;recoverySelectedStudent=null;
   const sidebar=page?.querySelector('.parent-sidebar');if(sidebar)sidebar.outerHTML=buildParentSideBarHtml();
   document.getElementById('parentManagement').innerHTML='<div class="card">Archief laden...</div>';
   renderRecoveryPage('archive');
 }
+
 function showTrash(){
   if(!requireParent())return;
   hideAll();
@@ -1809,7 +1848,8 @@ async function renderParentDashboard(){
 function parentStudentCard(name,isGuest=false,guestId=''){
   if(isGuest)return '';
   const own=lessons.filter(l=>l.student===name&&!l.archived&&!l.deleted);
-  const subjects=[...new Set(own.map(l=>l.subject).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'nl'));
+  const subjects=groupLessonsBySubject(own).sort((a,b)=>a.label.localeCompare(b.label,'nl')).map(group=>group.label);
+
   const jsName=escapeAttr(JSON.stringify(name));
   const previous=currentStudent;
   currentStudent=name;

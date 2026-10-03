@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V4.36 -->
+<!-- PacoGO TEST V4.37 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -522,7 +522,7 @@ body{background:#1787f2}
 
   <main id="agendaImport" class="page hidden">
     <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">📥 AGENDA TOEVOEGEN</div></div>
-    <div class="page-heading agenda-import-page-heading"><span class="page-heading-label">AGENDA IMPORT</span><h2>Hoe wil je de agenda invoeren?</h2><p>Voor <strong id="agendaImportStudentLabel"></strong>. Kies de makkelijkste manier.</p></div>
+    <div class="page-heading agenda-import-page-heading"><span class="page-heading-label">AGENDA IMPORT</span><h2>Hoe wil je de agenda invoeren?</h2><p>Voor <strong id="agendaImportStudentLabel"></strong>. Kies de makkelijkste manier.</p><div id="agendaImportStudentChoice" class="editor-student hidden"><strong>Voor welke leerling?</strong><div class="editor-student-buttons"><label class="editor-student-choice"><input type="radio" name="agendaImportStudent" value="Zyon" onchange="selectAgendaImportStudent(this.value)"><span>Zyon</span></label><label class="editor-student-choice"><input type="radio" name="agendaImportStudent" value="Zenith" onchange="selectAgendaImportStudent(this.value)"><span>Zenith</span></label><label class="editor-student-choice"><input type="radio" name="agendaImportStudent" value="Zephon" onchange="selectAgendaImportStudent(this.value)"><span>Zephon</span></label><label class="editor-student-choice"><input type="radio" name="agendaImportStudent" value="Testleerling" onchange="selectAgendaImportStudent(this.value)"><span>Testleerling</span></label></div></div></div>
     <div class="card agenda-import-card">
       <div class="agenda-import-choice-grid agenda-import-choice-grid-two">
         <button id="agendaModeMedia" class="agenda-import-choice active" type="button" onclick="setAgendaImportMode('media')"><span class="emoji">📥</span><strong>Agenda importeren</strong><span>Upload een screenshot óf schermopname. PacoGO herkent zelf wat je kiest.</span></button>
@@ -799,7 +799,7 @@ function isCreator(){return !!currentSession&&CREATOR_IDS.has(currentSession.use
 function updateAuthUI(session){currentSession=session;const logged=isParentLoggedIn();document.getElementById('loginButton')?.classList.toggle('hidden',logged);document.getElementById('logoutButton')?.classList.toggle('hidden',!logged);document.querySelectorAll('.side-logout-button').forEach(e=>e.classList.toggle('hidden',!logged));document.querySelectorAll('.side-manage-button').forEach(e=>e.classList.remove('hidden'));document.querySelectorAll('.page-side-layout-no-right .sidebar-manage-left').forEach(e=>e.classList.toggle('hidden',!logged));document.getElementById('manageButton')?.classList.remove('hidden');document.getElementById('addLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('addLessonButton2')?.classList.toggle('hidden',!logged);document.getElementById('editLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('deleteLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('addTestButton')?.classList.toggle('hidden',!logged);document.querySelectorAll('#parentDashboard .parent-sidebar,#aiAssignment .parent-sidebar,#creatorConsole .parent-sidebar').forEach(el=>{el.outerHTML=buildParentSideBarHtml()});}
 function requireParent(){if(!isParentLoggedIn()){showMessage('Alleen ouders kunnen lessen wijzigen. Log eerst in.','error');showHome();return false}return true}
 function buildSideBarHtml(){return `<aside class="sidebar"><div class="student-sidebar-greeting"></div><button class="side-item" onclick="showHome()"><span class="side-icon">🏠</span>Home</button><button class="side-item" onclick="goToSubjects()"><span class="side-icon">📖</span>Mijn lessen</button><div class="sidebar-subjects"></div><button class="side-item" onclick="showAgenda()"><span class="side-icon">📅</span>Mijn agenda</button><div class="sidebar-subjects agenda-subjects"><button class="sidebar-subject" onclick="showAgendaImport()"><span>📥</span>Agenda invoeren</button><button class="sidebar-subject sidebar-print-month" onclick="showPrintCalendar(currentStudent)"><span>📅</span>Maandkalender</button></div><button class="side-item" onclick="isParentLoggedIn()?showTestHistory(currentStudent):showLogin()"><span class="side-icon">📝</span>Toetsgeschiedenis</button><button class="side-item sidebar-manage-left hidden" onclick="isParentLoggedIn()?showParentDashboard():showLogin()"><span class="side-icon">⚙️</span>Beheer</button><div class="sidebar-note">🐾 <strong>Goed bezig!</strong><br>Elke les brengt je een pootje verder.</div></aside>`}
-function buildParentSideBarHtml(){const creator=isCreator();return `<aside class="sidebar parent-sidebar"><div class="parent-sidebar-title">⚙️ Beheer</div><button class="parent-sidebar-mainpage" onclick="switchStudent()">🏠 Main Page</button><div class="parent-sidebar-actions"><button class="parent-sidebar-action" onclick="parentStartLesson()">➕ Les maken</button><button class="parent-sidebar-action" onclick="showTestHistory()">📝 Toetsgeschiedenis</button><button class="parent-sidebar-action" onclick="showArchive()">🗄️ Archief</button><button class="parent-sidebar-action" onclick="showTrash()">🗑️ Prullenbak</button><button class="parent-sidebar-action parent-feedback-button" onclick="showParentFeedback()">💬 Feedback & ideeën</button>${creator?'<button class="parent-sidebar-action parent-feedback-button" onclick="showCreatorConsole()">🧠 Creator Console</button>':''}</div><div class="sidebar-note">🐾 <strong>PacoGO Beheer</strong><br>${creator?'Hoofdbeheerder':'Ouder'}omgeving.</div></aside>`}
+function buildParentSideBarHtml(){const creator=isCreator();return `<aside class="sidebar parent-sidebar"><div class="parent-sidebar-title">⚙️ Beheer</div><button class="parent-sidebar-mainpage" onclick="switchStudent()">🏠 Main Page</button><div class="parent-sidebar-actions"><button class="parent-sidebar-action" onclick="parentStartLesson()">➕ Les maken</button><button class="parent-sidebar-action" onclick="showTestHistory()">📝 Toetsgeschiedenis</button><button class="parent-sidebar-action" onclick="showAgendaImport()">📥 Agenda importeren</button><button class="parent-sidebar-action" onclick="showArchive()">🗄️ Archief</button><button class="parent-sidebar-action" onclick="showTrash()">🗑️ Prullenbak</button><button class="parent-sidebar-action parent-feedback-button" onclick="showParentFeedback()">💬 Feedback & ideeën</button>${creator?'<button class="parent-sidebar-action parent-feedback-button" onclick="showCreatorConsole()">🧠 Creator Console</button>':''}</div><div class="sidebar-note">🐾 <strong>PacoGO Beheer</strong><br>${creator?'Hoofdbeheerder':'Ouder'}omgeving.</div></aside>`}
 function buildSideRightHtml(includeManage=true){
   return '<aside class="side-panel">'+
     (!includeManage?'<button class="logout-button side-logout-button hidden" onclick="logoutParent()">Logout</button>':'')+
@@ -916,11 +916,21 @@ function saveCustomAgendaItems(items,student=currentStudent){
 function agendaTypeIcon(type){return ({test:'📝',homework:'📚',submit:'📖',activity:'🎒',free:'🎉',other:'📌'})[type]||'📌'}
 function agendaTypeLabel(type){return ({test:'Toets',homework:'Huiswerk',submit:'Inleveren',activity:'Schoolactiviteit',free:'Vrije dag',other:'Overig'})[type]||'Agenda'}
 function showAgendaImport(){
-  if(!currentStudent){showHome();return}
+  if(!currentStudent&&!isParentLoggedIn()){showHome();return}
   document.getElementById('studentDashboard')?.classList.add('hidden');
   hideAll();document.getElementById('agendaImport').classList.remove('hidden');
-  document.getElementById('agendaImportStudentLabel').textContent=currentStudent;
+  const sidebar=document.querySelector('#agendaImport .sidebar');
+  if(sidebar&&isParentLoggedIn()&&!sidebar.classList.contains('parent-sidebar'))sidebar.outerHTML=buildParentSideBarHtml();
+  const choice=document.getElementById('agendaImportStudentChoice');
+  choice.classList.toggle('hidden',!isParentLoggedIn());
+  choice.querySelectorAll('input').forEach(input=>{input.checked=input.value===currentStudent});
+  document.getElementById('agendaImportStudentLabel').textContent=currentStudent||'kies een leerling';
   setAgendaImportMode('media');
+}
+function selectAgendaImportStudent(name){
+  if(!isParentLoggedIn())return;
+  currentStudent=name;parentSelectedStudent=name;
+  document.getElementById('agendaImportStudentLabel').textContent=name;
 }
 let agendaImportMode='media';
 let agendaImportFile=null;
@@ -1159,6 +1169,7 @@ function setManualAgendaRange(mode){
   document.getElementById('agendaManualRangeFields')?.classList.toggle('hidden',mode!=='range');
 }
 function addManualAgendaItem(){
+  if(!currentStudent){showMessage('Kies eerst een leerling.','error');return}
   const mode=document.querySelector('input[name="agendaManualRange"]:checked')?.value||'single';
   const date=document.getElementById('agendaManualDate').value;
   const startDate=document.getElementById('agendaManualStartDate').value;
@@ -1193,6 +1204,7 @@ function addManualAgendaItem(){
   showAgenda();
 }
 function saveAgendaImportReview(){
+  if(!currentStudent){showMessage('Kies eerst een leerling.','error');return}
   const items=getCustomAgendaItems();
   const added=agendaImportReview.map((item,i)=>({
     id:'agenda_'+Date.now()+'_'+i,student:currentStudent,date:document.getElementById('agendaReviewDate'+i)?.value||'',

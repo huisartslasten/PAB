@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO LIVE V4.10 -->
+<!-- PacoGO LIVE V4.11 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -1244,15 +1244,25 @@ async function addAgendaImportDirect(){
 }
 async function saveAgendaImportForLater(){
   if(!agendaImportReview.length||!currentStudent)return;
+  const {data:{session}}=await db.auth.getSession();
+  if(!session||!PARENT_IDS.has(session.user.id)){
+    showMessage('Je moet als ouder zijn ingelogd om afspraken op een andere computer te kunnen bekijken.','error');
+    return;
+  }
+  currentSession=session;
   const {data,error}=await db.from('agenda_import_drafts').insert({
     student:currentStudent,events:agendaImportReview,source:agendaImportMode
   }).select('id').single();
-  if(error){console.error('Agenda draft save error:',error);showMessage('De gevonden afspraken konden niet tijdelijk worden opgeslagen.','error');return}
+  if(error){
+    console.error('Agenda draft save error:',error);
+    showMessage('De gevonden afspraken konden tijdelijk niet worden opgeslagen. Probeer PacoGO één keer te vernieuwen en daarna opnieuw.','error');
+    return;
+  }
   agendaImportDraftId=data.id;
   agendaImportReview=[];
   document.getElementById('agendaImportChoice')?.classList.add('hidden');
-  document.getElementById('agendaMediaStatus').innerHTML='<strong>🖥️ Klaar voor je Mac</strong><br>De gevonden afspraken zijn tijdelijk opgeslagen. Open PacoGO op je Mac en kies <strong>Agenda invoeren</strong>.';
-  showMessage('De afspraken staan klaar om op je Mac te bekijken.','success');
+  document.getElementById('agendaMediaStatus').innerHTML='<strong>💻 Klaar voor je computer</strong><br>De gevonden afspraken zijn tijdelijk opgeslagen. Open PacoGO op je computer en kies <strong>Agenda invoeren</strong>.';
+  showMessage('De afspraken staan klaar om op je computer te bekijken.','success');
 }
 async function loadAgendaImportDrafts(){
   const box=document.getElementById('agendaImportDraftNotice');

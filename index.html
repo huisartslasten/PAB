@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V4.22 -->
+<!-- PacoGO TEST V4.23 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -727,7 +727,7 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div class="version-badge">PacoGO TEST V4.22</div>
+  <div class="version-badge">PacoGO TEST V4.23</div>
 
 <div id="globalMessage"></div>
 
@@ -776,6 +776,7 @@ function photoSessionDb(token){
 const PARENT_IDS = new Set(['5d0e1e5c-1dbe-4909-bd3a-81a1e7b26d09']);
 let currentSession=null,currentSubject=null,currentLesson=null,lessons=[];
 let currentStudent=null;
+window.selectStudent=function(name){currentStudent=name;showHome()};;
 let activity=null;
 let photoSessionToken='';
 let photoSessionTimer=null;

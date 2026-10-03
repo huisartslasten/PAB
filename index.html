@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V4.28 -->
+<!-- PacoGO TEST V4.29 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -1678,7 +1678,7 @@ async function showSubject(subject){
     return '<section class="subvak-block" data-subvak-key="'+escapeAttr(group.key)+'" data-subvak-label="'+escapeAttr(group.label)+'" ondragover="dragSubvakOver(event)" ondragleave="dragSubvakLeave(event)" ondrop="dragLessonIntoSubvak(event,'+JSON.stringify(group.key)+')">'+
       '<h2 class="subvak-title '+(muted?'muted':'')+'">'+(muted?'📚 ':'📁 ')+escapeHtml(group.label)+'</h2>'+
       '<div class="subvak-lessons-grid">'+
-        group.lessons.map(l=>'<div class="card lesson-card" draggable="'+(isParentLoggedIn()?'true':'false')+'" data-lesson-id="'+l.id+'" onclick="openLesson('+l.id+')" ondragstart="dragLessonStart(event,'+l.id+')" ondragover="dragLessonOver(event)" ondragleave="dragLessonLeave(event)" ondrop="dragLessonDrop(event,'+l.id+')" ondragend="dragLessonEnd()"><span class="badge lesson-badge">LES</span><h3>'+escapeHtml(l.title)+'</h3><div class="small">'+l.lesson_items.length+' '+(l.lesson_items.length===1?'onderdeel':'onderdelen')+' · '+escapeHtml(typeLabel(l.type))+'</div>'+((l.subvak&&String(l.subvak).trim())?'<div class="lesson-subvak">'+escapeHtml(l.subvak)+'</div>':'')+(isParentLoggedIn()?'<div class="lesson-card-actions"><button class="lesson-edit" onclick="event.stopPropagation();editLessonById('+l.id+')">✏️ Bewerken</button><button class="lesson-delete" onclick="event.stopPropagation();deleteLessonById('+l.id+')">🗑️ Verwijderen</button></div>':'')+'</div>').join('')+
+        group.lessons.map(l=>'<div class="card lesson-card" draggable="'+(isParentLoggedIn()?'true':'false')+'" data-lesson-id="'+l.id+'" onclick="openLesson('+l.id+')" ondragstart="dragLessonStart(event,'+l.id+')" ondragover="dragLessonOver(event)" ondragleave="dragLessonLeave(event)" ondrop="dragLessonDrop(event,'+l.id+')" ondragend="dragLessonEnd()"><span class="badge lesson-badge">LES</span><h3>'+escapeHtml(l.title)+'</h3><div class="small">'+l.lesson_items.length+' '+(l.lesson_items.length===1?'onderdeel':'onderdelen')+' · '+escapeHtml(typeLabel(l.type))+'</div>'+((l.subvak&&String(l.subvak).trim())?'<div class="lesson-subvak">'+escapeHtml(l.subvak)+'</div>':'')+(isParentLoggedIn()?'<div class="lesson-card-actions"><button class="lesson-edit" onclick="event.stopPropagation();editLessonById('+l.id+')">✏️ Bewerken</button><button class="archive-button" onclick="event.stopPropagation();archiveLessonById('+l.id+')">🗄️ Archiveren</button><button class="lesson-delete" onclick="event.stopPropagation();deleteLessonById('+l.id+')">🗑️ Verwijderen</button></div>':'')+'</div>').join('')+
       '</div>'+
     '</section>';
   }).join('')+'</div>';
@@ -1694,6 +1694,12 @@ function deleteLessonById(id){
   if(!l||!requireParent())return;
   currentLesson=l;
   deleteCurrentLesson();
+}
+function archiveLessonById(id){
+  const l=lessons.find(x=>Number(x.id)===Number(id));
+  if(!l||!requireParent())return;
+  currentLesson=l;
+  archiveCurrentLesson();
 }
 async function archiveCurrentLesson(){
   if(!requireParent()||!currentLesson)return;
@@ -1790,7 +1796,7 @@ async function renderParentDashboard(){
 }
 function parentStudentCard(name,isGuest=false,guestId=''){
   if(isGuest)return '';
-  const own=lessons.filter(l=>l.student===name&&!l.archived);
+  const own=lessons.filter(l=>l.student===name&&!l.archived&&!l.deleted);
   const subjects=[...new Set(own.map(l=>l.subject).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'nl'));
   const jsName=escapeAttr(JSON.stringify(name));
   const previous=currentStudent;

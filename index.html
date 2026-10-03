@@ -862,7 +862,7 @@ function getPreparationStats(){
 }
 function renderSidebarSubjects(){const visibleLessons=lessons.filter(l=>l.student===currentStudent);const names=[...new Set(visibleLessons.map(l=>l.subject).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'nl'));document.querySelectorAll('.sidebar-subjects:not(.agenda-subjects)').forEach(el=>{el.innerHTML=names.map(s=>{const active=currentSubject===s?' active':'';const jsSubject=escapeAttr(JSON.stringify(s));return '<button class="sidebar-subject'+active+'" onclick="showSubject('+jsSubject+')"><span>'+subjectIcon(s)+'</span>'+escapeHtml(s)+'</button>'}).join('')});}
 function refreshPageSidebars(){
-  document.querySelectorAll('.sidebar-print-month').forEach(el=>el.classList.toggle('hidden',!isParentLoggedIn()));
+  
   document.querySelectorAll('.student-sidebar-greeting').forEach(el=>{el.textContent=currentStudent?'Hoi '+currentStudent+'! 🐶':''});
   renderSidebarSubjects();
   const visibleLessons=lessons.filter(l=>l.student===currentStudent);

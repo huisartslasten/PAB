@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V4.33 -->
+<!-- PacoGO TEST V4.34 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -750,6 +750,17 @@ body{background:#1787f2}
       <div class="modal-actions">
         <button class="secondary" type="button" onclick="closeAgendaEditModal()">Annuleren</button>
         <button type="button" onclick="saveAgendaEditModal()">Opslaan</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="archiveModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="archiveModalTitle">
+    <div class="modal">
+      <h3 id="archiveModalTitle">Les archiveren?</h3>
+      <p id="archiveModalText">Weet je zeker dat je deze les wilt archiveren?</p>
+      <div class="modal-actions">
+        <button class="secondary" type="button" onclick="closeArchiveModal()">Annuleren</button>
+        <button class="danger" type="button" onclick="confirmArchiveLesson()">Ja, archiveren</button>
       </div>
     </div>
   </div>
@@ -1712,12 +1723,17 @@ function archiveLessonById(id){
   currentLesson=l;
   archiveCurrentLesson();
 }
-async function archiveCurrentLesson(){
+function archiveCurrentLesson(){
   if(!requireParent()||!currentLesson)return;
-  const confirmed=window.confirm('Les archiveren?\n\nDeze les wordt uit de actieve lessen gehaald. Je kunt hem later weer herstellen.');
-  if(!confirmed)return;
+  document.getElementById('archiveModalText').textContent='Weet je zeker dat je de les "'+currentLesson.title+'" wilt archiveren? De les blijft bewaard en kan later worden hersteld.';
+  document.getElementById('archiveModal').classList.remove('hidden');
+}
+function closeArchiveModal(){document.getElementById('archiveModal').classList.add('hidden')}
+async function confirmArchiveLesson(){
+  if(!requireParent()||!currentLesson){closeArchiveModal();return}
   const lessonId=currentLesson.id;
   const subject=currentSubject;
+  closeArchiveModal();
   const {error}=await db.from('lessons').update({archived:true}).eq('id',lessonId);
   if(error){showMessage('Archiveren mislukt: '+error.message,'error');return}
   currentLesson=null;
@@ -1726,6 +1742,7 @@ async function archiveCurrentLesson(){
   showParentDashboard();
   showMessage('Les gearchiveerd.','success');
 }
+
 async function restoreArchivedLesson(id){
   if(!requireParent())return;
   const {error}=await db.from('lessons').update({archived:false,deleted:false}).eq('id',Number(id));
@@ -2642,9 +2659,10 @@ async function confirmDeleteLesson(){
   showMessage('Les naar de prullenbak verplaatst.','success');
 }
 document.getElementById('deleteModal')?.addEventListener('click',e=>{if(e.target.id==='deleteModal')closeDeleteModal()});
+document.getElementById('archiveModal')?.addEventListener('click',e=>{if(e.target.id==='archiveModal')closeArchiveModal()});
 document.getElementById('agendaEditModal')?.addEventListener('click',e=>{if(e.target.id==='agendaEditModal')closeAgendaEditModal()});
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDeleteModal();closeAgendaEditModal()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDeleteModal();closeArchiveModal();closeAgendaEditModal()}});
 async function logoutParent(){const {error}=await db.auth.signOut();if(error){showMessage('Uitloggen mislukt: '+error.message,'error');return}currentSession=null;updateAuthUI(null);showHome()}
 async function loginParent(){const email=document.getElementById('loginEmail').value.trim(),password=document.getElementById('loginPassword').value,error=document.getElementById('loginError');error.classList.add('hidden');const res=await db.auth.signInWithPassword({email,password});if(res.error){error.textContent='Inloggen mislukt. Controleer je e-mailadres en wachtwoord.';error.classList.remove('hidden');return}showHome()}
 async function sendPasswordReset(){const email=document.getElementById('loginEmail').value.trim(),error=document.getElementById('loginError'),msg=document.getElementById('loginResetMessage');error.classList.add('hidden');msg.classList.add('hidden');if(!email){error.textContent='Vul eerst je e-mailadres in.';error.classList.remove('hidden');return}const redirectTo=window.location.origin+window.location.pathname;const {error:resetError}=await db.auth.resetPasswordForEmail(email,{redirectTo});if(resetError){error.textContent='De resetmail kon niet worden verstuurd: '+resetError.message;error.classList.remove('hidden');return}msg.textContent='Er is een e-mail gestuurd waarmee je een nieuw wachtwoord kunt instellen.';msg.classList.remove('hidden')}

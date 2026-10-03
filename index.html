@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO LIVE V4.6 -->
+<!-- PacoGO LIVE V4.7 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -727,7 +727,7 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div class="version-badge">PacoGO LIVE V4.6</div>
+  <div class="version-badge">PacoGO LIVE V4.7</div>
 
 <div id="globalMessage"></div>
 
@@ -888,18 +888,69 @@ function renderMiniAgenda(){
   }).join('');
   lists.forEach(e=>e.innerHTML=html);
 }
-function getCustomAgendaItems(student=currentStudent){
+let agendaItemsCacheByStudent={};
+function readLocalAgendaItems(student){
   try{
     const all=JSON.parse(localStorage.getItem('pacogo_agenda_items')||'[]');
     return all.filter(x=>x.student===student);
   }catch{return []}
 }
-function saveCustomAgendaItems(items,student=currentStudent){
+function writeLocalAgendaItems(items,student){
   try{
     const all=JSON.parse(localStorage.getItem('pacogo_agenda_items')||'[]');
     const others=all.filter(x=>x.student!==student);
     localStorage.setItem('pacogo_agenda_items',JSON.stringify([...others,...items]));
   }catch(error){console.error('Agenda local save error:',error)}
+}
+function getCustomAgendaItems(student=currentStudent){
+  return student?(agendaItemsCacheByStudent[student]||[]):[];
+}
+async function loadAgendaItemsFromDb(student=currentStudent){
+  if(!student)return [];
+  const {data,error}=await db.from('agenda_items')
+    .select('client_id,student,date,time,type,title,meta,source,period_id,period_start,period_end,created_at')
+    .eq('student',student)
+    .order('date',{ascending:true});
+  if(error){
+    console.error('Agenda DB load error:',error);
+    const local=readLocalAgendaItems(student);
+    agendaItemsCacheByStudent[student]=local;
+    return local;
+  }
+  const items=(data||[]).map(x=>({
+    id:x.client_id,student:x.student,date:x.date,time:x.time||'',type:x.type||'other',
+    title:x.title,meta:x.meta||'',source:x.source||'',periodId:x.period_id||'',
+    periodStart:x.period_start||'',periodEnd:x.period_end||'',createdAt:x.created_at||''
+  }));
+  if(items.length){
+    agendaItemsCacheByStudent[student]=items;
+    writeLocalAgendaItems(items,student);
+    return items;
+  }
+  const local=readLocalAgendaItems(student);
+  agendaItemsCacheByStudent[student]=local;
+  if(local.length&&isParentLoggedIn())await saveCustomAgendaItems(local,student);
+  return local;
+}
+async function saveCustomAgendaItems(items,student=currentStudent){
+  if(!student)return;
+  agendaItemsCacheByStudent[student]=items;
+  writeLocalAgendaItems(items,student);
+  if(!isParentLoggedIn())return;
+  const rows=items.map(x=>({
+    student,client_id:String(x.id),date:x.date,time:x.time||null,type:x.type||'other',
+    title:x.title||'Agenda-afspraak',meta:x.meta||'',source:x.source||null,
+    period_id:x.periodId||null,period_start:x.periodStart||null,period_end:x.periodEnd||null,
+    created_at:x.createdAt||new Date().toISOString(),updated_at:new Date().toISOString()
+  }));
+  if(rows.length){
+    const {error}=await db.from('agenda_items').upsert(rows,{onConflict:'student,client_id'});
+    if(error){console.error('Agenda DB save error:',error);throw error}
+  }
+  let query=db.from('agenda_items').delete().eq('student',student);
+  if(rows.length)query=query.not('client_id','in','('+rows.map(x=>x.client_id).join(',')+')');
+  const {error:deleteError}=await query;
+  if(deleteError){console.error('Agenda DB cleanup error:',deleteError);throw deleteError}
 }
 function agendaTypeIcon(type){return ({test:'📝',homework:'📚',submit:'📖',activity:'🎒',free:'🎉',other:'📌'})[type]||'📌'}
 function agendaTypeLabel(type){return ({test:'Toets',homework:'Huiswerk',submit:'Inleveren',activity:'Schoolactiviteit',free:'Vrije dag',other:'Overig'})[type]||'Agenda'}
@@ -1146,7 +1197,7 @@ function setManualAgendaRange(mode){
   document.getElementById('agendaManualSingleFields')?.classList.toggle('hidden',mode!=='single');
   document.getElementById('agendaManualRangeFields')?.classList.toggle('hidden',mode!=='range');
 }
-function addManualAgendaItem(){
+async function addManualAgendaItem(){
   const mode=document.querySelector('input[name="agendaManualRange"]:checked')?.value||'single';
   const date=document.getElementById('agendaManualDate').value;
   const startDate=document.getElementById('agendaManualStartDate').value;
@@ -1174,13 +1225,13 @@ function addManualAgendaItem(){
     }
   }
 
-  saveCustomAgendaItems(items);
+  try{await saveCustomAgendaItems(items)}catch(error){showMessage('Opslaan van agenda-item mislukt.','error');return}
   showMessage('📅 Agenda-item toegevoegd.','success');
   document.getElementById('agendaManualTitle').value='';
   document.getElementById('agendaManualMeta').value='';
   showAgenda();
 }
-function saveAgendaImportReview(){
+async function saveAgendaImportReview(){
   const items=getCustomAgendaItems();
   const added=agendaImportReview.map((item,i)=>({
     id:'agenda_'+Date.now()+'_'+i,student:currentStudent,date:document.getElementById('agendaReviewDate'+i)?.value||'',
@@ -1192,7 +1243,7 @@ function saveAgendaImportReview(){
   if(!added.length){showMessage('Vul bij minimaal één afspraak een datum en titel in.','error');return}
   const existingKeys=new Set(items.map(x=>[x.date,x.title.toLowerCase()].join('|')));
   const fresh=added.filter(x=>!existingKeys.has([x.date,x.title.toLowerCase()].join('|')));
-  saveCustomAgendaItems([...items,...fresh]);
+  try{await saveCustomAgendaItems([...items,...fresh])}catch(error){showMessage('Opslaan van de agenda-import mislukt.','error');return}
   showMessage(fresh.length+' agenda-item'+(fresh.length===1?'':'s')+' toegevoegd.','success');
   agendaImportReview=[];
   showAgenda();
@@ -1223,7 +1274,7 @@ function closeAgendaEditModal(){
   agendaEditItemId=null;
   document.getElementById('agendaEditModal')?.classList.add('hidden');
 }
-function saveAgendaEditModal(){
+async function saveAgendaEditModal(){
   if(!agendaEditItemId)return;
   const items=getCustomAgendaItems();
   const item=items.find(x=>x.id===agendaEditItemId);
@@ -1256,9 +1307,10 @@ function saveAgendaEditModal(){
   renderAgenda();renderMiniAgenda();
   showMessage('Agenda-item opgeslagen.','success');
 }
-function deleteAgendaItem(id){
+async function deleteAgendaItem(id){
   if(!confirm('Deze agenda-afspraak verwijderen?'))return;
-  saveCustomAgendaItems(getCustomAgendaItems().filter(x=>x.id!==id));renderAgenda();renderMiniAgenda();
+  try{await saveCustomAgendaItems(getCustomAgendaItems().filter(x=>x.id!==id))}catch(error){showMessage('Verwijderen van agenda-item mislukt.','error');return}
+  renderAgenda();renderMiniAgenda();
 }
 let agendaWeekStart=null;
 function agendaGetCurrentWeekStart(){const d=new Date();d.setHours(12,0,0,0);return agendaStartOfWeek(d)}
@@ -1287,10 +1339,11 @@ function buildAgendaItemsForRender(){
     });
   return [...demo,...custom,...linkedTests].sort((a,b)=>new Date(a.date)-new Date(b.date));
 }
-function showAgenda(){
+async function showAgenda(){
   if(!currentStudent){showHome();return}
   document.getElementById('studentDashboard')?.classList.add('hidden');
   hideAll();document.getElementById('agenda').classList.remove('hidden');
+  await loadAgendaItemsFromDb(currentStudent);
   agendaWeekStart=agendaWeekStart||agendaGetCurrentWeekStart();
   renderAgenda();
 }

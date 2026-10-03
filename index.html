@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V4.18 -->
+<!-- PacoGO TEST V4.19 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -727,7 +727,7 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div class="version-badge">PacoGO TEST V4.18</div>
+  <div class="version-badge">PacoGO TEST V4.19</div>
 
 <div id="globalMessage"></div>
 
@@ -2211,7 +2211,7 @@ function resetEditorRows(){document.getElementById('wordEditor').innerHTML='';do
 function syncLessonTypeButton(){const select=document.getElementById('lessonType'),text=document.getElementById('lessonTypeButtonText');if(!select||!text)return;const labels={words:'🎯 Woordtrainer',questions:'❓ Vragen',dictation:'✏️ Dictee',math:'🔢 Rekenen',spelling:'✍️ Spelling',custom:'🛠️ Eigen les'};text.textContent=labels[select.value]||'🎯 Woordtrainer'}
 function toggleLessonTypeMenu(){document.getElementById('lessonTypeMenu')?.classList.toggle('hidden')}
 function setLessonType(value){const select=document.getElementById('lessonType');if(!select)return;select.value=value;syncLessonTypeButton();document.getElementById('lessonTypeMenu')?.classList.add('hidden');changeLessonType()}
-function changeLessonType(){syncLessonTypeButton();const t=document.getElementById('lessonType').value;const wordMode=t==='words'||t==='custom';document.getElementById('wordEditor').classList.toggle('hidden',!wordMode);document.getElementById('questionEditor').classList.toggle('hidden',t!=='questions');document.getElementById('dictationEditor').classList.toggle('hidden',t!=='dictation');document.getElementById('mathEditor').classList.toggle('hidden',t!=='math');document.getElementById('spellingEditor').classList.toggle('hidden',t!=='spelling');document.getElementById('lessonAiBox').classList.toggle('hidden',!wordMode);document.getElementById('spellingLabelsEditor').classList.toggle('hidden',t!=='spelling');toggleLessonAiInstruction();if(t==='questions'&&!document.getElementById('questionEditor').children.length)addQuestionRow();if(wordMode&&!document.getElementById('wordEditor').children.length)addWordRow();if(t==='dictation'&&!document.getElementById('dictationEditor').children.length)addDictationRow();if(t==='math'&&!document.getElementById('mathEditor').children.length)addMathRow();if(t==='spelling'&&!document.getElementById('spellingEditor').children.length)addSpellingRow()}
+function changeLessonType(){syncLessonTypeButton();const t=document.getElementById('lessonType').value;const wordMode=t==='words'||t==='custom';document.getElementById('wordEditor').classList.toggle('hidden',!wordMode);document.getElementById('questionEditor').classList.toggle('hidden',t!=='questions');document.getElementById('dictationEditor').classList.toggle('hidden',t!=='dictation');document.getElementById('mathEditor').classList.toggle('hidden',t!=='math');document.getElementById('spellingEditor').classList.toggle('hidden',t!=='spelling');document.getElementById('lessonAiBox').classList.remove('hidden');document.getElementById('spellingLabelsEditor').classList.toggle('hidden',t!=='spelling');toggleLessonAiInstruction();if(t==='questions'&&!document.getElementById('questionEditor').children.length)addQuestionRow();if(wordMode&&!document.getElementById('wordEditor').children.length)addWordRow();if(t==='dictation'&&!document.getElementById('dictationEditor').children.length)addDictationRow();if(t==='math'&&!document.getElementById('mathEditor').children.length)addMathRow();if(t==='spelling'&&!document.getElementById('spellingEditor').children.length)addSpellingRow()}
 function rowHtml(content,kind){return `<div class="editor-row"><button class="remove-row" type="button" onclick="this.parentElement.remove()">✕</button>${content}<button type="button" class="question-insert-button" onclick="insertLessonRowAfter(this)">➕ Vraag hier invoegen</button></div>`}
 function ensureNextLessonRow(el){
   const row=el?.closest('.editor-row');
@@ -2460,7 +2460,7 @@ async function saveLesson(){
   refreshPageSidebars();
   showMessage(testDate?'Les opgeslagen en toetsdatum toegevoegd.':'Les opgeslagen.','success');
 }
-function editCurrentLesson(){if(!requireParent())return;const l=currentLesson;hideAll();document.getElementById('editor').classList.remove('hidden');document.getElementById('editorTitle').textContent='Les bewerken';document.getElementById('editorBannerLabel').textContent='🐾 LES BEWERKEN';document.getElementById('lessonSubject').value=l.subject||'';document.getElementById('lessonSubvak').value=l.subvak||'';document.querySelectorAll('input[name=lessonStudent]').forEach(r=>r.checked=r.value===l.student);document.getElementById('lessonName').value=l.title||'';document.getElementById('lessonExplanation').value=l.explanation||'';document.getElementById('lessonType').value=l.type;document.getElementById('lessonAiCheckAnswers').checked=l.type==='words'?(l.ai_check_answers!==false):!!l.ai_check_answers;document.getElementById('lessonAiInstruction').value=l.ai_instruction||'';toggleLessonAiInstruction();const labels=l.editor_labels&&typeof l.editor_labels==='object'?l.editor_labels:null;document.getElementById('spellingLabelQuestion').value=labels?.question||'Werkwoord';document.getElementById('spellingLabelPerfect').value=labels?.perfect||'Voltooid deelwoord';document.getElementById('spellingLabelAdjective').value=labels?.adjective||'Bijvoeglijk gebruikt voltooid deelwoord';const existingTest=getTestDateForLesson(l.id,l.student);document.getElementById('lessonTestDate').value=existingTest?.date||'';document.getElementById('lessonTestDateEnabled').checked=!!existingTest?.date;document.getElementById('lessonTestDatePicker').classList.toggle('hidden',!existingTest?.date);document.getElementById('wordEditor').innerHTML='';document.getElementById('questionEditor').innerHTML='';document.getElementById('dictationEditor').innerHTML='';document.getElementById('mathEditor').innerHTML='';document.getElementById('spellingEditor').innerHTML='';l.lesson_items.forEach(it=>{if(l.type==='words'||l.type==='custom'){const qp=Array.isArray(it.question_parts)&&it.question_parts.length?it.question_parts:[it.question||''];const ap=Array.isArray(it.answer_parts)&&it.answer_parts.length?it.answer_parts:[{text:it.answer||'',role:'answer'}];addWordRow('', '', qp, ap)}else if(l.type==='questions')addQuestionRow(it.question,it.answer);else if(l.type==='dictation'){const answers=Array.isArray(it.answer_parts)?it.answer_parts.filter(p=>p&&p.role==='answer'&&String(p.text||'').trim()).map(p=>p.text):[];addDictationRow(it.question,it.answer||answers[0]||'',answers[1]||'');}else if(l.type==='math')addMathRow(it.question,it.answer);else if(l.type==='spelling'){const a=String(it.answer||'').split(' || ');addSpellingRow(it.question,a[0]||'',a[1]||'',a[2]||'')}});changeLessonType();addCurrentRow();renderDatePicker('lessonTestDatePicker','lessonTestDate',existingTest?.date||'')}
+function editCurrentLesson(){if(!requireParent())return;const l=currentLesson;hideAll();document.getElementById('editor').classList.remove('hidden');document.getElementById('editorTitle').textContent='Les bewerken';document.getElementById('editorBannerLabel').textContent='🐾 LES BEWERKEN';document.getElementById('lessonSubject').value=l.subject||'';document.getElementById('lessonSubvak').value=l.subvak||'';document.querySelectorAll('input[name=lessonStudent]').forEach(r=>r.checked=r.value===l.student);document.getElementById('lessonName').value=l.title||'';document.getElementById('lessonExplanation').value=l.explanation||'';document.getElementById('lessonType').value=l.type;document.getElementById('lessonAiCheckAnswers').checked=l.ai_check_answers!==false;document.getElementById('lessonAiInstruction').value=l.ai_instruction||'';toggleLessonAiInstruction();const labels=l.editor_labels&&typeof l.editor_labels==='object'?l.editor_labels:null;document.getElementById('spellingLabelQuestion').value=labels?.question||'Werkwoord';document.getElementById('spellingLabelPerfect').value=labels?.perfect||'Voltooid deelwoord';document.getElementById('spellingLabelAdjective').value=labels?.adjective||'Bijvoeglijk gebruikt voltooid deelwoord';const existingTest=getTestDateForLesson(l.id,l.student);document.getElementById('lessonTestDate').value=existingTest?.date||'';document.getElementById('lessonTestDateEnabled').checked=!!existingTest?.date;document.getElementById('lessonTestDatePicker').classList.toggle('hidden',!existingTest?.date);document.getElementById('wordEditor').innerHTML='';document.getElementById('questionEditor').innerHTML='';document.getElementById('dictationEditor').innerHTML='';document.getElementById('mathEditor').innerHTML='';document.getElementById('spellingEditor').innerHTML='';l.lesson_items.forEach(it=>{if(l.type==='words'||l.type==='custom'){const qp=Array.isArray(it.question_parts)&&it.question_parts.length?it.question_parts:[it.question||''];const ap=Array.isArray(it.answer_parts)&&it.answer_parts.length?it.answer_parts:[{text:it.answer||'',role:'answer'}];addWordRow('', '', qp, ap)}else if(l.type==='questions')addQuestionRow(it.question,it.answer);else if(l.type==='dictation'){const answers=Array.isArray(it.answer_parts)?it.answer_parts.filter(p=>p&&p.role==='answer'&&String(p.text||'').trim()).map(p=>p.text):[];addDictationRow(it.question,it.answer||answers[0]||'',answers[1]||'');}else if(l.type==='math')addMathRow(it.question,it.answer);else if(l.type==='spelling'){const a=String(it.answer||'').split(' || ');addSpellingRow(it.question,a[0]||'',a[1]||'',a[2]||'')}});changeLessonType();addCurrentRow();renderDatePicker('lessonTestDatePicker','lessonTestDate',existingTest?.date||'')}
 function deleteCurrentLesson(){
   if(!requireParent())return;
   if(!currentLesson)return;
@@ -2523,6 +2523,18 @@ async function gradeWithAI(question, correctAnswer, userAnswer, aiInstruction=''
   return {correct:data.correct===true,feedback:data.feedback||''};
 }
 
+async function gradeLessonAnswer(item,userAnswer){
+  const useAI=currentLesson?.ai_check_answers===true;
+  if(useAI){
+    let correctAnswer=String(item?.answer||'');
+    if(Array.isArray(item?.answer_parts)){
+      const accepted=item.answer_parts.filter(p=>p&&p.role==='answer'&&String(p.text||'').trim()).map(p=>String(p.text).trim());
+      if(accepted.length)correctAnswer=accepted.join(' / ');
+    }
+    return await gradeWithAI(String(item?.question||''),correctAnswer,String(userAnswer||''),currentLesson?.ai_instruction||'');
+  }
+  return {correct:normalize(String(userAnswer||''))===normalize(String(item?.answer||'')),feedback:''};
+}
 async function checkPractice(){
   const input=activity?.type==='spelling'?document.getElementById('practicePerfect'):document.getElementById('practiceAnswer');
   if(!input || !activity?.current)return;
@@ -2532,6 +2544,39 @@ async function checkPractice(){
   if(activity?.type==='spelling'&&!userAnswer.replaceAll(' || ','').trim()){f.textContent='Vul eerst de antwoorden in.';f.className='feedback incorrect';input.focus();return;}if(activity?.type!=='spelling'&&!userAnswer){f.textContent='Typ eerst een antwoord.';f.className='feedback incorrect';input.focus();return;}
   activity.attempts++;
   input.disabled=true;
+  if(currentLesson?.ai_check_answers===true){
+    const checkButton=document.querySelector('#practiceContent button[onclick="checkPractice()"]');
+    if(checkButton)checkButton.style.display='none';
+    const buttons=document.querySelectorAll('#practiceContent button');
+    buttons.forEach(b=>b.disabled=true);
+    f.textContent='🤖 Even kijken of je antwoord dezelfde betekenis heeft...';
+    f.className='feedback';
+    try{
+      const grading=await gradeLessonAnswer(item,userAnswer);
+      const next=document.createElement('button');
+      next.className='big';
+      next.textContent='OK → Volgende vraag';
+      next.onclick=()=>renderPractice();
+      if(grading.correct){
+        activity.remaining.delete(item.id);
+        recordPracticeResult(item,true);
+        f.innerHTML='✅ Goed! '+escapeHtml(grading.feedback||'')+extraInfoHtml(item);
+        f.className='feedback correct';
+      }else{
+        recordPracticeResult(item,false);
+        f.innerHTML='❌ Nog niet helemaal. '+escapeHtml(grading.feedback||'Dit antwoord klopt niet helemaal.')+'<br>Dit komt later opnieuw terug.'+extraInfoHtml(item);
+        f.className='feedback incorrect';
+      }
+      f.insertAdjacentElement('afterend',next);
+    }catch(error){
+      console.error('AI grading error:',error);
+      input.disabled=false;
+      buttons.forEach(b=>b.disabled=false);
+      f.textContent='⚠️ De AI-beoordeling kon niet worden uitgevoerd.';
+      f.className='feedback incorrect';
+    }
+    return;
+  }
   const checkButton=document.querySelector('#practiceContent button[onclick="checkPractice()"]');
   if(checkButton)checkButton.style.display='none';
   const buttons=document.querySelectorAll('#practiceContent button');
@@ -2592,6 +2637,25 @@ async function submitTest(){
   const nextButton=document.querySelector('#testContent button.big');
   if(nextButton)nextButton.disabled=true;
   input.disabled=true;
+  if(currentLesson?.ai_check_answers===true){
+    const status=document.createElement('div');
+    status.className='feedback';
+    status.textContent='🤖 Even kijken of je antwoord dezelfde betekenis heeft...';
+    input.insertAdjacentElement('afterend',status);
+    try{
+      const grading=await gradeLessonAnswer(item,value.trim());
+      activity.answers.push({item,value,correct:grading.correct,feedback:grading.feedback||''});
+      activity.index++;
+      if(activity.index>=activity.items.length)finishTest();else renderTest();
+    }catch(error){
+      console.error('AI grading error in test:',error);
+      input.disabled=false;
+      if(nextButton)nextButton.disabled=false;
+      status.textContent='⚠️ De AI-beoordeling kon niet worden uitgevoerd. Probeer opnieuw.';
+      status.className='feedback incorrect';
+    }
+    return;
+  }
   let correct=false,feedback='';
   try{
     if(activity.type==='spelling'){const expected=String(item.answer||'').split(' || '),given=value.split(' || ');correct=normalize(given[0])===normalize(expected[0])&&normalize(given[1])===normalize(expected[1]);}else if(activity.type==='math'){

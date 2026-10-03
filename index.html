@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V4.21 -->
+<!-- PacoGO TEST V4.22 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -727,7 +727,7 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div class="version-badge">PacoGO TEST V4.21</div>
+  <div class="version-badge">PacoGO TEST V4.22</div>
 
 <div id="globalMessage"></div>
 
@@ -1465,7 +1465,7 @@ function showCreatorConsole(){
 }
 
 function renderStudentHome(){const chooser=document.getElementById('studentChooser'),dash=document.getElementById('studentDashboard');if(currentStudent){chooser.classList.add('hidden');dash.classList.remove('hidden');document.getElementById('sidebarGreeting').textContent='Hoi '+currentStudent+'! 🐶';renderSubjects();renderTestCalendar();refreshPageSidebars()}else{chooser.classList.remove('hidden');dash.classList.add('hidden')}}
-function selectStudent(name){currentStudent=name;showHome()}
+window.selectStudent=function(name){currentStudent=name;showHome()}
 function switchStudent(){currentStudent=null;showHome()}
 function showLogin(){hideAll();document.getElementById('login').classList.remove('hidden');document.getElementById('loginError').classList.add('hidden')}
 function showMessage(text,type='success'){const box=document.getElementById('globalMessage');box.innerHTML='<div class="message '+type+'">'+escapeHtml(text)+'</div>';setTimeout(()=>box.innerHTML='',3500)}

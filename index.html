@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V4.17 -->
+<!-- PacoGO TEST V4.18 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -727,7 +727,7 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div class="version-badge">PacoGO TEST V4.17</div>
+  <div class="version-badge">PacoGO TEST V4.18</div>
 
 <div id="globalMessage"></div>
 
@@ -2212,7 +2212,7 @@ function syncLessonTypeButton(){const select=document.getElementById('lessonType
 function toggleLessonTypeMenu(){document.getElementById('lessonTypeMenu')?.classList.toggle('hidden')}
 function setLessonType(value){const select=document.getElementById('lessonType');if(!select)return;select.value=value;syncLessonTypeButton();document.getElementById('lessonTypeMenu')?.classList.add('hidden');changeLessonType()}
 function changeLessonType(){syncLessonTypeButton();const t=document.getElementById('lessonType').value;const wordMode=t==='words'||t==='custom';document.getElementById('wordEditor').classList.toggle('hidden',!wordMode);document.getElementById('questionEditor').classList.toggle('hidden',t!=='questions');document.getElementById('dictationEditor').classList.toggle('hidden',t!=='dictation');document.getElementById('mathEditor').classList.toggle('hidden',t!=='math');document.getElementById('spellingEditor').classList.toggle('hidden',t!=='spelling');document.getElementById('lessonAiBox').classList.toggle('hidden',!wordMode);document.getElementById('spellingLabelsEditor').classList.toggle('hidden',t!=='spelling');toggleLessonAiInstruction();if(t==='questions'&&!document.getElementById('questionEditor').children.length)addQuestionRow();if(wordMode&&!document.getElementById('wordEditor').children.length)addWordRow();if(t==='dictation'&&!document.getElementById('dictationEditor').children.length)addDictationRow();if(t==='math'&&!document.getElementById('mathEditor').children.length)addMathRow();if(t==='spelling'&&!document.getElementById('spellingEditor').children.length)addSpellingRow()}
-function rowHtml(content,kind){return `<div class="editor-row"><button class="remove-row" type="button" onclick="this.parentElement.remove()">✕</button>${content}</div>`}
+function rowHtml(content,kind){return `<div class="editor-row"><button class="remove-row" type="button" onclick="this.parentElement.remove()">✕</button>${content}<button type="button" class="question-insert-button" onclick="insertLessonRowAfter(this)">➕ Vraag hier invoegen</button></div>`}
 function ensureNextLessonRow(el){
   const row=el?.closest('.editor-row');
   if(!row)return;
@@ -2239,6 +2239,30 @@ function setWordPartRole(button,role){
   if(select)select.value=role;
   if(display){display.classList.toggle('role-extra',role==='extra');display.querySelector('span').textContent=role==='extra'?'Wordt niet getoetst':'Wordt getoetst';}
   row.querySelector('.word-part-role-menu')?.classList.add('hidden');
+
+  // Als de volgende vraag automatisch als kopie is aangemaakt en nog leeg is,
+  // neem dan ook de gekozen toetsstatus mee.
+  const currentLessonRow=row.closest('.editor-row');
+  const nextLessonRow=currentLessonRow?.nextElementSibling;
+  if(currentLessonRow&&nextLessonRow&&nextLessonRow.classList.contains('editor-row')){
+    const nextFields=[...nextLessonRow.querySelectorAll('input,textarea')];
+    const nextIsEmpty=nextFields.length>0&&nextFields.every(f=>!String(f.value||'').trim());
+    if(nextIsEmpty){
+      const currentRoles=[...currentLessonRow.querySelectorAll('.word-answer-parts .word-part-row')];
+      const nextRoles=[...nextLessonRow.querySelectorAll('.word-answer-parts .word-part-row')];
+      currentRoles.forEach((part,index)=>{
+        const nextPart=nextRoles[index];
+        const nextSelect=nextPart?.querySelector('.word-part-role');
+        const nextDisplay=nextPart?.querySelector('.word-part-role-button');
+        if(!nextSelect||!nextDisplay)return;
+        const nextRole=part.querySelector('.word-part-role')?.value||'answer';
+        nextSelect.value=nextRole;
+        nextDisplay.classList.toggle('role-extra',nextRole==='extra');
+        const label=nextDisplay.querySelector('span');
+        if(label)label.textContent=nextRole==='extra'?'Wordt niet getoetst':'Wordt getoetst';
+      });
+    }
+  }
   ensureNextLessonRow(row);
 }
 function addWordRow(q='',a='',questionParts=null,answerParts=null){
@@ -2277,6 +2301,17 @@ function insertWordQuestionAfter(button){
   addWordQuestionPart(q,'');
   addWordAnswerPart(q,'','answer');
   q.querySelector('.word-q-part')?.focus();
+}
+function insertLessonRowAfter(button){
+  const current=button.closest('.editor-row');
+  if(!current)return;
+  const editor=current.parentElement;
+  const before=editor.lastElementChild;
+  addCurrentRow();
+  const created=editor.lastElementChild;
+  if(!created||created===before||created===current)return;
+  current.insertAdjacentElement('afterend',created);
+  created.querySelector('input,textarea')?.focus();
 }
 function addDictationRow(q='',a='',a2=''){document.getElementById('dictationEditor').insertAdjacentHTML('beforeend',rowHtml(`<div class="field"><label>Vraag</label><input class="dictation-q" value="${escapeAttr(q)}" oninput="ensureNextLessonRow(this)" placeholder="Vul hier de vraag in"></div><div class="field"><label>Antwoord</label><input class="dictation-a" value="${escapeAttr(a)}" oninput="ensureNextLessonRow(this)" onblur="checkDictationWord(this)" placeholder="Vul hier het antwoord in"><div class="dictation-spellcheck"></div></div><div class="field"><label>Tweede antwoord <span class="small">(optioneel)</span></label><input class="dictation-a2" value="${escapeAttr(a2)}" oninput="ensureNextLessonRow(this)" placeholder="Vul hier eventueel een tweede antwoord in"></div><div class="small">Het tweede antwoord is optioneel en kan als alternatief antwoord worden gebruikt.</div>`,'dictation'))}
 function addMathRow(q='',a=''){document.getElementById('mathEditor').insertAdjacentHTML('beforeend',rowHtml(`<div class="field question-field"><label>Som</label><input class="math-q" value="${escapeAttr(q)}" oninput="ensureNextLessonRow(this)" placeholder="bijvoorbeeld 27 + 15 ="></div><div class="field answer-field"><label>Antwoord</label><input class="math-a" type="number" inputmode="numeric" value="${escapeAttr(a)}" oninput="ensureNextLessonRow(this)" placeholder="bijvoorbeeld 42"></div>`,'math'))}

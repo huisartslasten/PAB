@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V4.3 -->
+<!-- PacoGO TEST V4.4 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -655,16 +655,18 @@ body{background:#1787f2}
     <div id="parentManagement" class="parent-management"></div>
   </main>
   <main id="printCalendar" class="page hidden">
-    <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 PRINT MAANDKALENDER</div></div>
-    <div class="topbar"><div><button class="secondary" onclick="showParentDashboard()">← Terug naar beheer</button></div></div>
+    <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 MAANDKALENDER</div></div>
+    <div class="topbar"><div><button id="printCalendarBackButton" class="secondary" onclick="showAgenda()">← Terug naar agenda</button></div></div>
     <div class="page-heading print-calendar-page-heading">
       <span class="page-heading-label">MAANDKALENDER</span>
-      <h2>🖨️ Print maandkalender</h2>
-      <p>Kies eerst de leerling en daarna de maand. Je ziet hier precies de kalender die je kunt printen.</p>
+      <h2>📅 Maandkalender</h2>
+      <p>Bekijk de maandkalender en print hem wanneer je wilt.</p>
     </div>
     <div class="card print-calendar-picker">
-      <div class="print-calendar-section-title">👦 Voor welke leerling?</div>
-      <div id="printCalendarStudents" class="print-calendar-student-choices"></div>
+      <div id="printCalendarStudentPicker">
+        <div class="print-calendar-section-title">👦 Voor welke leerling?</div>
+        <div id="printCalendarStudents" class="print-calendar-student-choices"></div>
+      </div>
       <div class="print-calendar-monthbar">
         <button class="secondary" type="button" onclick="movePrintCalendarMonth(-1)">← Vorige maand</button>
         <div id="printCalendarMonthLabel" class="print-calendar-month-label"></div>
@@ -767,7 +769,7 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div class="version-badge">PacoGO TEST V4.3</div>
+  <div class="version-badge">PacoGO TEST V4.4</div>
 
 <div id="globalMessage"></div>
 
@@ -826,7 +828,7 @@ const CREATOR_IDS = new Set([...PARENT_IDS]);
 function isCreator(){return !!currentSession&&CREATOR_IDS.has(currentSession.user.id)}
 function updateAuthUI(session){currentSession=session;const logged=isParentLoggedIn();document.getElementById('loginButton')?.classList.toggle('hidden',logged);document.getElementById('logoutButton')?.classList.toggle('hidden',!logged);document.querySelectorAll('.side-logout-button').forEach(e=>e.classList.toggle('hidden',!logged));document.querySelectorAll('.side-manage-button').forEach(e=>e.classList.remove('hidden'));document.querySelectorAll('.page-side-layout-no-right .sidebar-manage-left').forEach(e=>e.classList.toggle('hidden',!logged));document.getElementById('manageButton')?.classList.remove('hidden');document.getElementById('addLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('addLessonButton2')?.classList.toggle('hidden',!logged);document.getElementById('editLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('aiImproveLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('deleteLessonButton')?.classList.toggle('hidden',!logged);document.getElementById('addTestButton')?.classList.toggle('hidden',!logged);document.querySelectorAll('#parentDashboard .parent-sidebar,#aiAssignment .parent-sidebar,#creatorConsole .parent-sidebar').forEach(el=>{el.outerHTML=buildParentSideBarHtml()});}
 function requireParent(){if(!isParentLoggedIn()){showMessage('Alleen ouders kunnen lessen wijzigen. Log eerst in.','error');showHome();return false}return true}
-function buildSideBarHtml(){return `<aside class="sidebar"><div class="student-sidebar-greeting"></div><button class="side-item" onclick="showHome()"><span class="side-icon">🏠</span>Home</button><button class="side-item" onclick="goToSubjects()"><span class="side-icon">📖</span>Mijn lessen</button><div class="sidebar-subjects"></div><button class="side-item" onclick="showAgenda()"><span class="side-icon">📅</span>Mijn agenda</button><div class="sidebar-subjects agenda-subjects"><button class="sidebar-subject" onclick="showAgendaImport()"><span>📥</span>Agenda invoeren</button><button class="sidebar-subject sidebar-print-month hidden" onclick="showPrintCalendar()"><span>🖨️</span>Print maandkalender</button></div><button class="side-item" onclick="isParentLoggedIn()?showTestHistory(currentStudent):showLogin()"><span class="side-icon">📝</span>Toetsgeschiedenis</button><button class="side-item sidebar-manage-left hidden" onclick="isParentLoggedIn()?showParentDashboard():showLogin()"><span class="side-icon">⚙️</span>Beheer</button><div class="sidebar-note">🐾 <strong>Goed bezig!</strong><br>Elke les brengt je een pootje verder.</div></aside>`}
+function buildSideBarHtml(){return `<aside class="sidebar"><div class="student-sidebar-greeting"></div><button class="side-item" onclick="showHome()"><span class="side-icon">🏠</span>Home</button><button class="side-item" onclick="goToSubjects()"><span class="side-icon">📖</span>Mijn lessen</button><div class="sidebar-subjects"></div><button class="side-item" onclick="showAgenda()"><span class="side-icon">📅</span>Mijn agenda</button><div class="sidebar-subjects agenda-subjects"><button class="sidebar-subject" onclick="showAgendaImport()"><span>📥</span>Agenda invoeren</button><button class="sidebar-subject sidebar-print-month" onclick="showPrintCalendar(currentStudent)"><span>📅</span>Maandkalender</button></div><button class="side-item" onclick="isParentLoggedIn()?showTestHistory(currentStudent):showLogin()"><span class="side-icon">📝</span>Toetsgeschiedenis</button><button class="side-item sidebar-manage-left hidden" onclick="isParentLoggedIn()?showParentDashboard():showLogin()"><span class="side-icon">⚙️</span>Beheer</button><div class="sidebar-note">🐾 <strong>Goed bezig!</strong><br>Elke les brengt je een pootje verder.</div></aside>`}
 function buildParentSideBarHtml(){const creator=isCreator();return `<aside class="sidebar parent-sidebar"><div class="parent-sidebar-title">⚙️ Beheer</div><button class="parent-sidebar-mainpage" onclick="switchStudent()">🏠 Main Page</button><div class="parent-sidebar-actions"><button class="parent-sidebar-action" onclick="parentStartLesson()">➕ Les maken</button><button class="parent-sidebar-action" onclick="showAiAssignment()">🤖 AI-opdracht</button><button class="parent-sidebar-action" onclick="showTestHistory()">📝 Toetsgeschiedenis</button><button class="parent-sidebar-action parent-feedback-button" onclick="showParentFeedback()">💬 Feedback & ideeën</button>${creator?'<button class="parent-sidebar-action parent-feedback-button" onclick="showCreatorConsole()">🧠 Creator Console</button>':''}</div><div class="sidebar-note">🐾 <strong>PacoGO Beheer</strong><br>${creator?'Hoofdbeheerder':'Ouder'}omgeving.</div></aside>`}
 function buildSideRightHtml(includeManage=true){
   return '<aside class="side-panel">'+
@@ -1370,12 +1372,16 @@ function renderAgenda(){
 let printCalendarStudent='';
 let printCalendarMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1,12);
 function showPrintCalendar(name=''){
-  if(!requireParent())return;
-  printCalendarStudent=name||parentSelectedStudent||currentStudent||'Zyon';
+  const parentMode=isParentLoggedIn();
+  if(!parentMode&&!currentStudent){showHome();return}
+  printCalendarStudent=parentMode?(name||parentSelectedStudent||currentStudent||'Zyon'):(name||currentStudent);
   const now=new Date();
   printCalendarMonth=new Date(now.getFullYear(),now.getMonth(),1,12);
   hideAll();
   document.getElementById('printCalendar').classList.remove('hidden');
+  document.getElementById('printCalendarStudentPicker')?.classList.toggle('hidden',!parentMode);
+  const backButton=document.getElementById('printCalendarBackButton');
+  if(backButton){backButton.textContent=parentMode?'← Terug naar beheer':'← Terug naar agenda';backButton.onclick=parentMode?showParentDashboard:showAgenda;}
   renderPrintCalendar();
 }
 function selectPrintCalendarStudent(name){

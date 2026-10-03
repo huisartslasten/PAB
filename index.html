@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V4.34 -->
+<!-- PacoGO TEST V4.35 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -839,7 +839,7 @@ function refreshPageSidebars(){
   const groups=groupLessonsBySubject(visibleLessons);
   const stats=getPreparationStats();
   document.querySelectorAll('.side-lesson-count').forEach(e=>e.textContent=visibleLessons.length);
-  document.querySelectorAll('.side-subject-count').forEach(e=>e.textContent=names.length+' '+(names.length===1?'vak':'vakken'));
+  document.querySelectorAll('.side-subject-count').forEach(e=>e.textContent=groups.length+' '+(groups.length===1?'vak':'vakken'));
   document.querySelectorAll('.side-prep-percent').forEach(e=>e.textContent=stats.pct+'%');
   document.querySelectorAll('.side-progress-bar').forEach(e=>e.style.width=stats.pct+'%');
   renderMiniAgenda();

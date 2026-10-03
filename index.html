@@ -2512,3 +2512,214 @@ function editCurrentLesson(){if(!requireParent())return;const l=currentLesson;hi
     ap.forEach(x=>addUniversalAnswerPart(row,cfg.answers,cfg.answerClass,x.text||'',x.role||'answer',cfg.answerPlaceholder));
   }
 });changeLessonType();addCurrentRow();renderDatePicker('lessonTestDatePicker','lessonTestDate',existingTest?.date||'')}
+function deleteCurrentLesson(){
+  if(!requireParent())return;
+  if(!currentLesson)return;
+  document.getElementById('deleteModalText').textContent=`Weet je zeker dat je de les “${currentLesson.title}” wilt verwijderen? Alle woorden, vragen en dicteewoorden uit deze les worden ook verwijderd.`;
+  document.getElementById('deleteModal').classList.remove('hidden');
+}
+function closeDeleteModal(){document.getElementById('deleteModal').classList.add('hidden')}
+async function confirmDeleteLesson(){
+  if(!requireParent()||!currentLesson){closeDeleteModal();return}
+  const lessonId=currentLesson.id;
+  const subject=currentSubject;
+  closeDeleteModal();
+  const {error}=await db.from('lessons').delete().eq('id',lessonId);
+  if(error){showMessage('Verwijderen mislukt: '+error.message,'error');return}
+  currentLesson=null;
+  await loadLessons();
+  currentSubject=subject;
+  showSubject(subject);
+  showMessage('Les verwijderd.','success');
+}
+document.getElementById('deleteModal')?.addEventListener('click',e=>{if(e.target.id==='deleteModal')closeDeleteModal()});
+document.getElementById('agendaEditModal')?.addEventListener('click',e=>{if(e.target.id==='agendaEditModal')closeAgendaEditModal()});
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDeleteModal();closeAgendaEditModal()}});
+async function logoutParent(){const {error}=await db.auth.signOut();if(error){showMessage('Uitloggen mislukt: '+error.message,'error');return}currentSession=null;updateAuthUI(null);showHome()}
+async function loginParent(){const email=document.getElementById('loginEmail').value.trim(),password=document.getElementById('loginPassword').value,error=document.getElementById('loginError');error.classList.add('hidden');const res=await db.auth.signInWithPassword({email,password});if(res.error){error.textContent='Inloggen mislukt. Controleer je e-mailadres en wachtwoord.';error.classList.remove('hidden');return}showHome()}
+async function sendPasswordReset(){const email=document.getElementById('loginEmail').value.trim(),error=document.getElementById('loginError'),msg=document.getElementById('loginResetMessage');error.classList.add('hidden');msg.classList.add('hidden');if(!email){error.textContent='Vul eerst je e-mailadres in.';error.classList.remove('hidden');return}const redirectTo=window.location.origin+window.location.pathname;const {error:resetError}=await db.auth.resetPasswordForEmail(email,{redirectTo});if(resetError){error.textContent='De resetmail kon niet worden verstuurd: '+resetError.message;error.classList.remove('hidden');return}msg.textContent='Er is een e-mail gestuurd waarmee je een nieuw wachtwoord kunt instellen.';msg.classList.remove('hidden')}
+function showResetPassword(){hideAll();document.getElementById('resetPassword').classList.remove('hidden');document.getElementById('resetPasswordError').classList.add('hidden');document.getElementById('newPassword').value='';document.getElementById('newPasswordConfirm').value=''}
+async function updateParentPassword(){const password=document.getElementById('newPassword').value,confirm=document.getElementById('newPasswordConfirm').value,error=document.getElementById('resetPasswordError');error.classList.add('hidden');if(password.length<6){error.textContent='Gebruik minimaal 6 tekens voor je nieuwe wachtwoord.';error.classList.remove('hidden');return}if(password!==confirm){error.textContent='De wachtwoorden zijn niet hetzelfde.';error.classList.remove('hidden');return}const {error:updateError}=await db.auth.updateUser({password});if(updateError){error.textContent='Wachtwoord wijzigen mislukt: '+updateError.message;error.classList.remove('hidden');return}await db.auth.signOut();showLogin();const msg=document.getElementById('loginResetMessage');msg.textContent='Je wachtwoord is gewijzigd. Je kunt nu inloggen met je nieuwe wachtwoord.';msg.classList.remove('hidden')}
+
+function getTestCalendar(){try{return JSON.parse(localStorage.getItem('pacogo_test_calendar')||'[]')}catch{return []}}
+function saveTestCalendar(items){localStorage.setItem('pacogo_test_calendar',JSON.stringify(items))}
+function formatTestDate(date){return new Intl.DateTimeFormat('nl-NL',{day:'numeric',month:'short'}).format(new Date(date+'T12:00:00'))}
+function testCountdown(date){const now=new Date();const target=new Date(date+'T00:00:00');const ms=target-now;if(ms<0)return 'Deze toets is geweest';const days=Math.ceil(ms/86400000);return days===1?'Morgen!':days+' dagen'}
+function renderTestCalendar(){const el=document.getElementById('testCalendarList');if(!el)return;const all=getTestCalendar().filter(t=>t.student===currentStudent).sort((a,b)=>a.date.localeCompare(b.date));if(!all.length){el.innerHTML='<div class="test-calendar-empty">Nog geen toetsen ingevoerd.<br>Een ouder kan rechtsboven een toets toevoegen.</div>';refreshPageSidebars();return}const today=new Date().toISOString().slice(0,10);const upcoming=all.filter(t=>t.date>=today).slice(0,4);el.innerHTML=upcoming.length?upcoming.map(t=>`<div class="test-calendar-item" ${t.lessonId?'onclick="openCalendarLesson(\''+t.lessonId+'\')" style="cursor:pointer"':''}><button class="calendar-delete ${isParentLoggedIn()?'':'hidden'}" onclick="event.stopPropagation();deleteTestDate('${t.id}')">✕</button><div class="test-calendar-date">${formatTestDate(t.date)}</div><div class="test-calendar-title">${escapeHtml(t.subject)} — ${escapeHtml(t.title)}</div><div class="test-calendar-countdown">⏳ ${testCountdown(t.date)}</div></div>`).join(''):'<div class="test-calendar-empty">Geen komende toetsen.</div>';refreshPageSidebars()}
+function addTestDate(){if(!requireParent())return;const sel=document.getElementById('calendarLessonSelect');const opts=lessons.filter(l=>l.student===currentStudent);if(!opts.length){alert('Dit kind heeft nog geen lessen.');return}sel.innerHTML=opts.map(l=>`<option value="${l.id}">${escapeHtml(l.subject)} — ${escapeHtml(l.title)}</option>`).join('');updateCalendarLessonNote();const existing=getTestDateForLesson(Number(sel.value),currentStudent);const tomorrow=new Date();tomorrow.setDate(tomorrow.getDate()+1);const initial=existing?.date||tomorrow.toISOString().slice(0,10);document.getElementById('calendarDateInput').value=initial;renderDatePicker('calendarDatePicker','calendarDateInput',initial);document.getElementById('testCalendarModal').classList.remove('hidden')}
+function updateCalendarLessonNote(){const id=Number(document.getElementById('calendarLessonSelect')?.value);const l=lessons.find(x=>x.id===id);const note=document.getElementById('calendarLessonNote');if(note)note.textContent=l?`${l.lesson_items.length} onderdelen · ${typeLabel(l.type)}`:''}
+function closeTestCalendarModal(){document.getElementById('testCalendarModal')?.classList.add('hidden')}
+function saveTestCalendarEntry(){if(!requireParent())return;const lessonId=Number(document.getElementById('calendarLessonSelect').value),date=document.getElementById('calendarDateInput').value,l=lessons.find(x=>x.id===lessonId);if(!l||!date){alert('Kies eerst een les en een toetsdag.');return}upsertTestDate(l.id,currentStudent,date,l);closeTestCalendarModal();renderTestCalendar();refreshPageSidebars();renderUpcomingLinkedTests()}
+function openCalendarLesson(lessonId){const l=lessons.find(x=>x.id===Number(lessonId));if(!l)return;openLesson(l.id)}
+function deleteTestDate(id){if(!requireParent())return;saveTestCalendar(getTestCalendar().filter(t=>t.id!==id));renderTestCalendar();renderUpcomingLinkedTests()}
+
+function stopAiAudio(){if(window.pacoAiAudio){try{window.pacoAiAudio.pause();window.pacoAiAudio.currentTime=0}catch(e){}if(window.pacoAiAudioUrl){URL.revokeObjectURL(window.pacoAiAudioUrl);window.pacoAiAudioUrl=''}window.pacoAiAudio=null}window.pacoAiSpeechRequest=(window.pacoAiSpeechRequest||0)+1}
+function startPractice(type){window.speechSynthesis?.cancel();stopAiAudio();activity={kind:'practice',type,items:shuffle(currentLesson.lesson_items),remaining:new Set(currentLesson.lesson_items.map(x=>x.id)),attempts:0,current:null,mode:null};hideAll();document.getElementById('practice').classList.remove('hidden');document.getElementById('practiceTitle').textContent=type==='dictation'?'✏️ Dictee oefenen':type==='custom'?'🛠️ Eigen les oefenen':'🎯 Woordtrainer oefenen';renderPractice()}
+function updatePracticeProgress(){const total=currentLesson.lesson_items.length,mastered=total-activity.remaining.size,pct=total?mastered/total*100:0;document.getElementById('practiceProgress').innerHTML=`<div class="progress-label"><span>${mastered} / ${total} beheerst</span><span>Nog ${total-mastered}</span></div><div class="progress"><div class="progress-bar" style="width:${pct}%"></div></div>`}
+function pickPracticeItem(){const rem=[...activity.remaining];if(!rem.length){finishPractice();return null}const candidates=currentLesson.lesson_items.filter(x=>activity.remaining.has(x.id));return candidates[Math.floor(Math.random()*candidates.length)]}
+function renderPractice(){updatePracticeProgress();const item=pickPracticeItem();if(!item)return;activity.current=item;activity.mode='typing';const el=document.getElementById('practiceContent');if(activity.type==='spelling'){const a=String(item.answer||'').split(' || ');el.innerHTML='<div class="small">Vul beide vormen in.</div><div class="prompt">'+escapeHtml(item.question)+'</div><div class="field"><label>Voltooid deelwoord</label><input id="practicePerfect" class="answer-input" placeholder="bijvoorbeeld opgevoed"></div><div class="field"><label>Bijvoeglijk gebruikt voltooid deelwoord</label><input id="practiceAdjective" class="answer-input" placeholder="bijvoorbeeld opgevoede"></div><div id="practiceFeedback" class="feedback"></div><button class="big" onclick="checkPractice()">Controleren</button>';}else if(activity.type==='math'){el.innerHTML=`<div class="small">Los de som op.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="practiceAnswer" class="answer-input" type="number" inputmode="numeric" autofocus autocomplete="off" placeholder="Typ je antwoord"><div id="practiceFeedback" class="feedback"></div><button class="big" onclick="checkPractice()">Controleren</button>`;document.getElementById('practiceAnswer')?.focus()}else if(activity.type==='dictation'){el.innerHTML=`<div class="dictation-word">Luister goed en schrijf het woord.</div><div id="practiceVoiceStatus" class="small" style="min-height:20px;margin-top:4px"></div><div style="margin:22px"><button class="speaker big" onclick="speakDictation()">🔊 Nog een keer</button></div><input id="practiceAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier het woord in"><div id="practiceFeedback" class="feedback"></div><button class="big" onclick="checkPractice()">Controleren</button>`;setTimeout(()=>{speakDictation();document.getElementById('practiceAnswer')?.focus()},350)}else if(activity.mode==='typing'){el.innerHTML=`<div class="small">Typ hier het woord.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="practiceAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier het woord in"><div id="practiceFeedback" class="feedback"></div><button class="big" onclick="checkPractice()">Controleren</button>`}else{const opts=shuffle([item.answer,...shuffle(currentLesson.lesson_items.filter(x=>x.id!==item.id)).slice(0,3).map(x=>x.answer)]);el.innerHTML=`<div class="small">Kies het juiste antwoord.</div><div class="prompt">${escapeHtml(item.question)}</div><div class="mc-grid">${opts.map(o=>`<button onclick="checkPracticeMC('${escapeAttr(o)}')">${escapeHtml(o)}</button>`).join('')}</div><div id="practiceFeedback" class="feedback"></div>`}}
+function getLessonLanguage(lesson){const subject=String(lesson?.subject||'').trim().toLowerCase();if(subject.includes('engels')||subject.includes('english'))return'en';if(subject.includes('spaans')||subject.includes('spanish'))return'es';if(subject.includes('frans')||subject.includes('french'))return'fr';if(subject.includes('duits')||subject.includes('german'))return'de';if(subject.includes('portugees')||subject.includes('portuguese'))return'pt';return'nl'}
+async function speakAiText(text,statusElementId='',language=getLessonLanguage(currentLesson)){if(!text)return;const status=statusElementId?document.getElementById(statusElementId):null;const requestId=(window.pacoAiSpeechRequest||0)+1;window.pacoAiSpeechRequest=requestId;if(window.pacoAiAudio){try{window.pacoAiAudio.pause();window.pacoAiAudio.currentTime=0}catch(e){}if(window.pacoAiAudioUrl){URL.revokeObjectURL(window.pacoAiAudioUrl);window.pacoAiAudioUrl=''}window.pacoAiAudio=null}if(status)status.textContent='🔄 AI-stem maken...';try{const response=await fetch(SUPABASE_URL+'/functions/v1/speak-word-v1',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY},body:JSON.stringify({text,language})});if(!response.ok){let detail='HTTP '+response.status;try{const e=await response.json();if(e?.error)detail=e.error}catch(_){}throw new Error(detail)}const blob=await response.blob();if(requestId!==window.pacoAiSpeechRequest)return;const url=URL.createObjectURL(blob);const audio=new Audio(url);audio.preload='auto';window.pacoAiAudio=audio;window.pacoAiAudioUrl=url;audio.onended=()=>{if(window.pacoAiAudio===audio){URL.revokeObjectURL(url);window.pacoAiAudio=null;window.pacoAiAudioUrl=''}};await audio.play();if(requestId!==window.pacoAiSpeechRequest){audio.pause();return}if(status)status.textContent='AI-stem speelt.'}catch(error){if(requestId!==window.pacoAiSpeechRequest)return;console.error('AI voice error:',error);if(status){status.textContent=error?.name==='NotAllowedError'?'🔊 Tik op "Nog een keer" om de AI-stem te starten.':'⚠️ AI-stem kon niet worden afgespeeld.'}}}
+async function speakDictation(){if(!activity?.current)return;await speakAiText(activity.current.question,'practiceVoiceStatus')}
+
+function getItemExtraInfo(item){return Array.isArray(item?.answer_parts)?item.answer_parts.filter(p=>p&&p.role==='extra'&&String(p.text||'').trim()).map(p=>p.text).join('\n'):''}
+function extraInfoHtml(item){const extra=getItemExtraInfo(item);return extra?`<div class="lesson-extra-info"><div class="lesson-extra-info-title">💡 Extra informatie</div>${escapeHtml(extra)}</div>`:''}
+function checkPracticeMC(answer){const ok=normalize(answer)===normalize(activity.current.answer);const f=document.getElementById('practiceFeedback');const buttons=document.querySelectorAll('#practiceContent .mc-grid button');buttons.forEach(b=>b.disabled=true);const next=document.createElement('button');next.className='big';next.textContent=ok?'OK → Typ het antwoord':'OK → Volgende vraag';if(ok){f.innerHTML='Goed! Nu moet je dit woord nog zelf kunnen typen.'+extraInfoHtml(activity.current);f.className='feedback correct';next.onclick=()=>{activity.mode='typing';renderTypingAfterMC()}}else{f.innerHTML='Nog niet. Dit woord komt later terug.'+extraInfoHtml(activity.current);f.className='feedback incorrect';next.onclick=()=>renderPractice()}f.insertAdjacentElement('afterend',next)}
+function renderTypingAfterMC(){const item=activity.current;updatePracticeProgress();document.getElementById('practiceContent').innerHTML=`<div class="small">Typ nu zelf het antwoord.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="practiceAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier het woord in"><div id="practiceFeedback" class="feedback"></div><button class="big" onclick="checkPractice()">Controleren</button>`;document.getElementById('practiceAnswer')?.focus()}
+async function gradeWithAI(question, correctAnswer, userAnswer){
+  const {data,error}=await db.functions.invoke('grade-answer-v2',{body:{question,correctAnswer,userAnswer}});
+  if(error){console.error('AI grading error:',error);throw error;}
+  if(!data) throw new Error('Geen antwoord van de AI.');
+  return {correct:data.correct===true,feedback:data.feedback||''};
+}
+
+async function checkPractice(){
+  const input=activity?.type==='spelling'?document.getElementById('practicePerfect'):document.getElementById('practiceAnswer');
+  if(!input || !activity?.current)return;
+  const f=document.getElementById('practiceFeedback');
+  const item=activity.current;
+  const userAnswer=activity?.type==='spelling'?document.getElementById('practicePerfect').value.trim()+' || '+document.getElementById('practiceAdjective').value.trim():input.value.trim();
+  if(activity?.type==='spelling'&&!userAnswer.replaceAll(' || ','').trim()){f.textContent='Vul eerst de antwoorden in.';f.className='feedback incorrect';input.focus();return;}if(activity?.type!=='spelling'&&!userAnswer){f.textContent='Typ eerst een antwoord.';f.className='feedback incorrect';input.focus();return;}
+  activity.attempts++;
+  input.disabled=true;
+  const checkButton=document.querySelector('#practiceContent button[onclick="checkPractice()"]');
+  if(checkButton)checkButton.style.display='none';
+  const buttons=document.querySelectorAll('#practiceContent button');
+  buttons.forEach(b=>b.disabled=true);
+  f.textContent='🤖 Even kijken of je antwoord dezelfde betekenis heeft...';
+  f.className='feedback';
+  try{
+    if(activity.type==='spelling'){const expected=String(item.answer||'').split(' || ');const given=userAnswer.split(' || ');const correct=normalize(given[0])===normalize(expected[0])&&normalize(given[1])===normalize(expected[1]);if(correct){activity.remaining.delete(item.id);recordPracticeResult(item,true);f.textContent='✅ Beide goed!';f.className='feedback correct';}else{recordPracticeResult(item,false);f.textContent='❌ Nog niet. Goed: '+(expected[0]||'')+' en '+(expected[1]||'');f.className='feedback incorrect';}const next=document.createElement('button');next.className='big';next.textContent='OK → Volgende vraag';next.onclick=()=>renderPractice();f.insertAdjacentElement('afterend',next);return;}
+    if(activity.type==='dictation'){
+      const accepted=Array.isArray(item.answer_parts)?item.answer_parts.filter(p=>p&&p.role==='answer'&&String(p.text||'').trim()).map(p=>p.text):[];
+      if(!accepted.length)accepted=[item.answer];
+      const correct=accepted.some(answer=>normalize(userAnswer)===normalize(answer));
+      if(correct){activity.remaining.delete(item.id);recordPracticeResult(item,true);f.textContent='✅ Goed!';f.className='feedback correct';}
+      else{recordPracticeResult(item,false);f.innerHTML='❌ Niet goed. Het juiste antwoord is: '+accepted.map(escapeHtml).join(' of ')+'.'+extraInfoHtml(item);f.className='feedback incorrect';}
+      const next=document.createElement('button');next.className='big';next.textContent='OK → Volgende vraag';next.onclick=()=>renderPractice();f.insertAdjacentElement('afterend',next);return;
+    }
+    if(activity.type==='math'){
+      const correct=Number(userAnswer)===Number(item.answer);
+      if(correct){activity.remaining.delete(item.id);recordPracticeResult(item,true);f.textContent='✅ Goed!';f.className='feedback correct';}else{recordPracticeResult(item,false);f.innerHTML='❌ Nog niet. Het juiste antwoord is '+escapeHtml(item.answer)+'.'+extraInfoHtml(item);f.className='feedback incorrect';}
+      const next=document.createElement('button');next.className='big';next.textContent='OK → Volgende vraag';next.onclick=()=>renderPractice();f.insertAdjacentElement('afterend',next);return;
+    }
+    const grading=currentLesson?.type==='custom'?(currentLesson.ai_check_answers?await gradeWithAI(item.question,item.answer,userAnswer):{correct:normalize(userAnswer)===normalize(item.answer),feedback:''}):await gradeWithAI(item.question,item.answer,userAnswer);
+    const next=document.createElement('button');
+    next.className='big';
+    if(grading.correct){
+      activity.remaining.delete(item.id);
+      recordPracticeResult(item,true);
+      f.innerHTML='✅ Goed! '+escapeHtml(grading.feedback||'')+extraInfoHtml(item);
+      f.className='feedback correct';
+      next.textContent='OK → Volgende vraag';
+      next.onclick=()=>renderPractice();
+    }else{
+      recordPracticeResult(item,false);
+      f.innerHTML='❌ Nog niet helemaal. '+escapeHtml(grading.feedback||'Dit antwoord klopt niet helemaal.')+'<br>Dit woord komt later opnieuw terug.'+extraInfoHtml(item);
+      f.className='feedback incorrect';
+      next.textContent='OK → Volgende vraag';
+      next.onclick=()=>renderPractice();
+    }
+    f.insertAdjacentElement('afterend',next);
+  }catch(error){
+    console.error('AI grading error:',error);
+    input.disabled=false;
+    buttons.forEach(b=>b.disabled=false);
+    if(checkButton)checkButton.style.display='';
+    f.textContent='⚠️ De AI-beoordeling kon niet worden uitgevoerd.';
+    f.className='feedback incorrect';
+  }
+}
+function finishPractice(){window.speechSynthesis?.cancel();const total=currentLesson.lesson_items.length;document.getElementById('practiceProgress').innerHTML=`<div class="progress-label"><span>🎉 ${total} / ${total} beheerst</span><span>Klaar!</span></div><div class="progress"><div class="progress-bar" style="width:100%"></div></div>`;document.getElementById('practiceContent').innerHTML=`<div class="result-score">🎉 Klaar!</div><p>Je hebt alle ${total} ${activity.type==='dictation'?'dicteewoorden':'woorden'} goed kunnen maken.</p><button class="big" onclick="showLessonChoice(currentLesson)">Terug naar de les</button>`;activity=null}
+
+function startTest(type){window.speechSynthesis?.cancel();stopAiAudio();activity={kind:'test',type,items:shuffle(currentLesson.lesson_items),index:0,answers:[],startedAt:new Date().toISOString()};hideAll();document.getElementById('test').classList.remove('hidden');document.getElementById('testTitle').textContent=type==='dictation'?'✏️ Dictee toets':type==='custom'?'🛠️ Eigen les toets':'📝 Woordtrainer toets';renderTest()}
+function updateTestProgress(){const total=activity.items.length,i=activity.index;const pct=total?i/total*100:0;document.getElementById('testProgress').innerHTML=`<div class="progress-label"><span>Vraag ${Math.min(i+1,total)} van ${total}</span><span>${i} gemaakt</span></div><div class="progress"><div class="progress-bar" style="width:${pct}%"></div></div>`}
+function renderTest(){updateTestProgress();const item=activity.items[activity.index],el=document.getElementById('testContent');if(activity.type==='spelling'){el.innerHTML='<div class="test-instructions">Vul het voltooid deelwoord en het bijvoeglijk gebruikt voltooid deelwoord in.</div><div class="prompt">'+escapeHtml(item.question)+'</div><div class="field"><label>Voltooid deelwoord</label><input id="testPerfect" class="answer-input" placeholder="bijvoorbeeld opgevoed"></div><div class="field"><label>Bijvoeglijk gebruikt voltooid deelwoord</label><input id="testAdjective" class="answer-input" placeholder="bijvoorbeeld opgevoede"></div><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>';}else if(activity.type==='math'){el.innerHTML=`<div class="test-instructions">Los de som op. Je krijgt pas aan het einde de uitslag.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="testAnswer" class="answer-input" type="number" inputmode="numeric" autofocus autocomplete="off" placeholder="Typ je antwoord"><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>`;document.getElementById('testAnswer')?.focus()}else if(activity.type==='dictation'){el.innerHTML=`<div class="test-instructions">Luister naar het woord en typ precies wat je hoort. Je krijgt pas aan het einde te zien wat goed en fout was.</div><div id="testVoiceStatus" class="small" style="min-height:20px;margin-top:4px"></div><div style="margin:25px"><button class="speaker big" onclick="speakTest()">🔊 Luister</button></div><input id="testAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier het woord in"><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>`;setTimeout(()=>{speakTest();document.getElementById('testAnswer')?.focus()},350)}else{el.innerHTML=`<div class="test-instructions">Typ hier het woord. Je krijgt pas aan het einde de uitslag.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="testAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier het woord in"><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>`;document.getElementById('testAnswer')?.focus()}}
+async function speakTest(){const item=activity?.items?.[activity.index];if(!item)return;await speakAiText(item.answer,'testVoiceStatus')}
+async function submitTest(){
+  const item=activity.items[activity.index];const spellingMode=activity.type==='spelling';const input=spellingMode?document.getElementById('testPerfect'):document.getElementById('testAnswer');const value=spellingMode?document.getElementById('testPerfect')?.value.trim()+' || '+document.getElementById('testAdjective')?.value.trim():input?.value??'';
+  if(!input)return;
+  const nextButton=document.querySelector('#testContent button.big');
+  if(nextButton)nextButton.disabled=true;
+  input.disabled=true;
+  let correct=false,feedback='';
+  try{
+    if(activity.type==='spelling'){const expected=String(item.answer||'').split(' || '),given=value.split(' || ');correct=normalize(given[0])===normalize(expected[0])&&normalize(given[1])===normalize(expected[1]);}else if(activity.type==='math'){
+      correct=Number(value)===Number(item.answer);
+    }else if(activity.type==='dictation'){
+      correct=normalize(value)===normalize(item.answer);
+    }else{
+      const status=document.createElement('div');
+      status.className='feedback';
+      status.textContent='🤖 Even kijken of je antwoord dezelfde betekenis heeft...';
+      input.insertAdjacentElement('afterend',status);
+      const grading=currentLesson?.type==='custom'?(currentLesson.ai_check_answers?await gradeWithAI(item.question,item.answer,value.trim()):{correct:normalize(value)===normalize(item.answer),feedback:''}):await gradeWithAI(item.question,item.answer,value.trim());
+      correct=grading.correct;
+      feedback=grading.feedback||'';
+    }
+  }catch(error){
+    console.error('AI grading error in test:',error);
+    input.disabled=false;
+    if(nextButton)nextButton.disabled=false;
+    const existing=input.parentElement.querySelector('.feedback');
+    if(existing){existing.textContent='⚠️ De AI-beoordeling kon niet worden uitgevoerd. Probeer opnieuw.';existing.className='feedback incorrect';}
+    return;
+  }
+  activity.answers.push({item,value,correct,feedback});
+  activity.index++;
+  if(activity.index>=activity.items.length)finishTest();else renderTest();
+}
+async function saveTestAttempt(attempt){
+  if(!attempt?.answers?.length || !currentStudent || !currentLesson) return;
+  const total=attempt.answers.length;
+  const score=attempt.answers.filter(x=>x.correct).length;
+  const inserted=await db.from('test_attempts').insert({lesson_id:currentLesson.id,student:currentStudent,score,total_questions:total,started_at:attempt.startedAt||new Date().toISOString(),completed_at:new Date().toISOString(),is_test:true}).select().single();
+  if(inserted.error) throw inserted.error;
+  const rows=attempt.answers.map((x,i)=>({attempt_id:inserted.data.id,question_order:i+1,question:String(x.item?.question??''),expected_answer:String(x.item?.answer??''),given_answer:String(x.value??''),is_correct:x.correct===true,question_type:attempt.type||currentLesson.type,answered_at:new Date().toISOString()}));
+  const answerInsert=await db.from('test_attempt_answers').insert(rows);
+  if(answerInsert.error) throw answerInsert.error;
+}
+
+async function finishTest(){
+  window.speechSynthesis?.cancel();
+  const attempt=activity,total=attempt.items.length,correct=attempt.answers.filter(x=>x.correct).length,note=Math.round((correct/total*10)*10)/10;
+  try{await saveTestAttempt(attempt)}catch(error){console.error('Test history save error:',error);showMessage('⚠️ De toets is klaar, maar kon niet in de toetsgeschiedenis worden opgeslagen.','error')}
+  hideAll();document.getElementById('result').classList.remove('hidden');
+  document.getElementById('resultTitle').textContent=attempt.type==='dictation'?'✏️ Dictee klaar!':'📝 Toets klaar!';
+  document.getElementById('resultScore').textContent=note.toFixed(1);
+  document.getElementById('resultDetails').innerHTML='<p><strong>'+correct+' van '+total+'</strong> goed.</p>'+attempt.answers.map((x,i)=>'<div class="result-item '+(x.correct?'correct':'incorrect')+'"><strong>'+(i+1)+'. '+escapeHtml(x.item.question)+'</strong><br>Jouw antwoord: '+escapeHtml(x.value||'—')+'<br>'+(x.correct?'✓ Goed':'✗ Goed antwoord: '+escapeHtml(x.item.answer))+'</div>').join('');
+  activity=null;
+}
+
+async function showTestHistory(studentFilter=''){
+  if(!requireParent()) return;
+  hideAll();
+  const historyGreeting=document.getElementById('testHistoryGreeting');
+  if(historyGreeting) historyGreeting.textContent=(studentFilter||currentStudent)?'Hoi '+(studentFilter||currentStudent)+'! 🐶':'';
+  const el=document.getElementById('testHistoryContent');
+  el.innerHTML='<div class="card">Toetsgeschiedenis laden...</div>';
+  document.getElementById('testHistory').classList.remove('hidden');
+  refreshPageSidebars();
+  let query=db.from('test_attempts').select('id,lesson_id,student,score,total_questions,started_at,completed_at,test_attempt_answers(id,question_order,question,expected_answer,given_answer,is_correct,question_type,answered_at)').order('completed_at',{ascending:false});
+  if(studentFilter) query=query.eq('student',studentFilter);
+  const {data,error}=await query;
+  if(error){console.error('Test history load error:',error);el.innerHTML='<div class="card message error">De toetsgeschiedenis kon niet worden geladen.</div>';return}
+  if(!data?.length){el.innerHTML='<div class="card empty">'+(studentFilter?'Nog geen gemaakte toetsen voor '+escapeHtml(studentFilter)+'.':'Nog geen gemaakte toetsen opgeslagen.')+'</div>';return}
+  const lessonMap=new Map(lessons.map(l=>[Number(l.id),l]));
+  el.innerHTML=data.map(a=>{const lesson=lessonMap.get(Number(a.lesson_id));const pct=a.total_questions?Math.round(a.score/a.total_questions*100):0;const errors=Math.max(0,(a.total_questions||0)-(a.score||0));const date=a.completed_at?new Intl.DateTimeFormat('nl-NL',{dateStyle:'medium',timeStyle:'short'}).format(new Date(a.completed_at)):'Onbekende datum';const answers=(a.test_attempt_answers||[]).sort((x,y)=>x.question_order-y.question_order);return '<details class="test-history-item"><summary><div class="test-history-main"><div><strong>'+escapeHtml(lesson?.subject||'Toets')+' — '+escapeHtml(lesson?.title||('Les '+a.lesson_id))+'</strong><div class="small">'+escapeHtml(a.student)+' · '+date+'</div></div><div class="test-history-summary"><span>'+a.total_questions+' vragen</span><span>'+a.score+' goed</span><span class="'+(errors?'history-errors':'history-ok')+'">'+errors+' fouten</span></div></div></summary><div class="test-history-details"><div class="test-history-score">'+a.score+'/'+a.total_questions+' goed ('+pct+'%)</div>'+answers.map(x=>'<div class="result-item '+(x.is_correct?'correct':'incorrect')+'"><strong>'+x.question_order+'. '+escapeHtml(x.question)+'</strong><br>Antwoord van leerling: '+escapeHtml(x.given_answer||'—')+'<br>'+(x.is_correct?'✓ Goed':'✗ Verwacht: '+escapeHtml(x.expected_answer||'—'))+'</div>').join('')+'</div></details>'}).join('')
+}
+function startQuestions(){activity={kind:'questions',items:shuffle(currentLesson.lesson_items),index:0};hideAll();document.getElementById('practice').classList.remove('hidden');document.getElementById('practiceTitle').textContent='❓ Vragen';renderQuestion()}
+function renderQuestion(){const item=activity.items[activity.index];document.getElementById('practiceProgress').innerHTML=`<div class="progress-label"><span>Vraag ${activity.index+1} van ${activity.items.length}</span></div><div class="progress"><div class="progress-bar" style="width:${activity.index/activity.items.length*100}%"></div></div>`;document.getElementById('practiceContent').innerHTML=`<div class="prompt">${escapeHtml(item.question)}</div><textarea id="questionAnswer" class="answer-input" style="width:100%;min-height:130px;text-align:left" placeholder="Schrijf je antwoord..."></textarea><div class="row" style="justify-content:center;margin-top:15px"><button class="big" onclick="revealQuestion()">Antwoord bekijken</button></div>`}
+function revealQuestion(){const item=activity.items[activity.index],answer=document.getElementById('questionAnswer').value;document.getElementById('practiceContent').innerHTML=`<div class="prompt">${escapeHtml(item.question)}</div><div class="question-answer"><strong>Jouw antwoord:</strong><br>${escapeHtml(answer||'—')}<hr><strong>Voorbeeldantwoord:</strong><br>${escapeHtml(item.answer)}</div><div class="self-buttons"><button class="success" onclick="nextQuestion(true)">✓ Goed</button><button class="danger" onclick="nextQuestion(false)">✗ Nog niet</button></div>`}
+function nextQuestion(){activity.index++;if(activity.index>=activity.items.length){document.getElementById('practiceContent').innerHTML=`<div class="result-score">Klaar!</div><p>Je hebt alle vragen bekeken.</p><button class="big" onclick="showLessonChoice(currentLesson)">Terug naar de les</button>`;activity=null;return}renderQuestion()}
+
+function showLessonChoiceCompat(){openLesson(currentLesson.id)}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'){if(document.activeElement?.id==='practiceAnswer')checkPractice();if(document.activeElement?.id==='testAnswer')submitTest()}});
+document.addEventListener('click',e=>{if(!e.target.closest('.lesson-type-select'))document.getElementById('lessonTypeMenu')?.classList.add('hidden')});
+installPageSidebars();
+document.getElementById('calendarLessonSelect')?.addEventListener('change',updateCalendarLessonNote);
+initializeApp();
+</script>
+</body>
+</html>

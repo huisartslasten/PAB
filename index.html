@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V4.32 -->
+<!-- PacoGO TEST V4.33 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -1751,7 +1751,8 @@ function selectArchiveStudent(student){recoverySelectedStudent=student;renderArc
 function renderArchiveContent(){
   const el=document.getElementById('parentManagement');if(!el)return;
   const allArchived=lessons.filter(l=>!!l.archived&&!l.deleted);
-  const students=[...new Set(allArchived.map(l=>l.student).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'nl'));
+  const baseStudents=['Zyon','Zenith','Zephon','Testleerling'];
+  const students=[...new Set([...baseStudents,...allArchived.map(l=>l.student).filter(Boolean)])].sort((a,b)=>a.localeCompare(b,'nl'));
   if(!recoverySelectedStudent||!students.includes(recoverySelectedStudent)){el.innerHTML=renderArchiveStudentPicker(students);return}
   const items=allArchived.filter(l=>l.student===recoverySelectedStudent);
   if(!items.length){el.innerHTML=renderArchiveStudentPicker(students)+'<div class="card empty">Het archief is leeg voor '+escapeHtml(recoverySelectedStudent)+'.</div>';return}
@@ -1783,7 +1784,7 @@ function renderRecoveryPage(mode){
   const isArchive=mode==='archive',items=lessons.filter(l=>isArchive?!!l.archived&&!l.deleted:!!l.deleted);
   if(!items.length){el.innerHTML='<div class="card empty">'+(isArchive?'Het archief is leeg.':'De prullenbak is leeg.')+'</div>';return}
   const students=[...new Set(items.map(l=>l.student).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'nl'));
-  if(isArchive){recoverySelectedStudent=recoverySelectedStudent&&students.includes(recoverySelectedStudent)?recoverySelectedStudent:students[0];renderArchiveContent();return}
+  if(isArchive){renderArchiveContent();return}
   el.innerHTML=students.map(student=>{
     const studentItems=items.filter(l=>l.student===student),subjectGroups=groupLessonsBySubject(studentItems).sort((a,b)=>a.label.localeCompare(b.label,'nl'));
     return '<section class="recovery-student-section"><div class="recovery-student-heading"><span class="page-heading-label">Leerling</span><h2>👦 '+escapeHtml(student)+'</h2><p>'+studentItems.length+' '+(studentItems.length===1?'les':'lessen')+' in de prullenbak.</p></div><div class="grid recovery-subject-grid">'+subjectGroups.map(group=>{

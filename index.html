@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO LIVE V4.8 -->
+<!-- PacoGO LIVE V4.9 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -560,9 +560,19 @@ body{background:#1787f2}
         <div class="agenda-import-actions"><button class="big" type="button" onclick="addManualAgendaItem()">➕ Toevoegen</button></div>
       </div>
 
+      <div id="agendaImportChoice" class="agenda-import-step hidden">
+        <h3>🔎 Afspraken gevonden</h3>
+        <p class="small">PacoGO heeft de afspraken uit de opname gehaald.</p>
+        <div id="agendaImportChoiceSummary" class="card" style="margin:14px 0"></div>
+        <div class="agenda-import-actions">
+          <button class="big" type="button" onclick="addAgendaImportDirect()">✅ Direct toevoegen</button>
+          <button class="secondary big" type="button" onclick="saveAgendaImportForLater()">🖥️ Later op Mac bekijken</button>
+        </div>
+      </div>
+
       <div id="agendaImportReview" class="agenda-import-step hidden">
         <h3>🔎 Controleer gevonden afspraken</h3>
-        <div class="small">PacoGO verandert niets automatisch. Controleer eerst de gevonden informatie.</div>
+        <div class="small">Controleer de afspraken en pas ze zo nodig aan voordat je ze toevoegt.</div>
         <div id="agendaImportReviewList" class="agenda-import-review"></div>
         <div class="agenda-import-actions"><button class="secondary" type="button" onclick="clearAgendaImportReview()">Opnieuw</button><button class="big" type="button" onclick="saveAgendaImportReview()">✅ Toevoegen aan agenda</button></div>
       </div>
@@ -960,10 +970,12 @@ function showAgendaImport(){
   hideAll();document.getElementById('agendaImport').classList.remove('hidden');
   document.getElementById('agendaImportStudentLabel').textContent=currentStudent;
   setAgendaImportMode('media');
+  loadAgendaImportDrafts();
 }
 let agendaImportMode='media';
 let agendaImportFile=null;
 let agendaImportReview=[];
+let agendaImportDraftId=null;
 function setAgendaImportMode(mode){
   agendaImportMode=mode;
   ['media','manual'].forEach(m=>{
@@ -971,6 +983,7 @@ function setAgendaImportMode(mode){
     document.getElementById('agendaImport'+m.charAt(0).toUpperCase()+m.slice(1)+'Step')?.classList.toggle('hidden',m!==mode);
   });
   document.getElementById('agendaImportReview')?.classList.add('hidden');
+  document.getElementById('agendaImportChoice')?.classList.add('hidden');
 }
 function handleAgendaMediaFile(event){
   const file=event.target.files?.[0];if(!file)return;
@@ -1142,8 +1155,8 @@ async function analyzeAgendaImage(){
     status.innerHTML='<div class="agenda-ai-busy"><span class="agenda-ai-spinner"></span><span><strong>🤖 PacoGO AI analyseert je screenshot</strong><br><span class="small">De afbeelding wordt bekeken<span class="agenda-ai-dots"><span></span><span></span><span></span></span><br><span class="small">Even geduld — PacoGO is nog bezig.</span></span></div>';
     const dataUrl=await agendaImageToDataUrl(agendaImportFile);
     const events=await understandAgendaFrame(dataUrl);
-    renderAgendaImportReview(events);
-    status.innerHTML=events.length?'<strong>✅ Analyse klaar!</strong><br>AI vond '+events.length+' afspraak'+(events.length===1?'':'afspraken')+'. Controleer ze hieronder.':'<strong>⚠️ Analyse klaar.</strong><br>AI kon geen duidelijke afspraak herkennen. Probeer een scherpere screenshot.';
+    showAgendaImportChoice(events);
+    status.innerHTML=events.length?'<strong>✅ Analyse klaar!</strong><br>AI vond '+events.length+' afspraak'+(events.length===1?'':'afspraken')+'.':'<strong>⚠️ Analyse klaar.</strong><br>AI kon geen duidelijke afspraak herkennen. Probeer een scherpere screenshot.';
   }catch(error){
     console.error('Agenda AI image error:',error);
     status.textContent='⚠️ De AI-analyse van de screenshot is mislukt.';
@@ -1180,7 +1193,7 @@ async function analyzeAgendaVideo(){
       }
     }
     const merged=mergeAgendaAiEvents(events);
-    renderAgendaImportReview(merged);
+    showAgendaImportChoice(merged);
     if(!successfulFrames){
       status.innerHTML='<strong>⚠️ Analyse niet gelukt</strong><br>PacoGO kon de schermopname niet goed verwerken. Er kwam geen bruikbaar AI-resultaat terug.<br><span class="small">Probeer de opname opnieuw.</span>';
     }else if(!merged.length){
@@ -1192,6 +1205,72 @@ async function analyzeAgendaVideo(){
     console.error('Agenda AI video error:',error);
     status.innerHTML='<strong>⚠️ Analyse niet gelukt</strong><br>PacoGO kon de schermopname niet goed verwerken. Probeer het opnieuw.';
   }finally{button.disabled=false}
+}
+function showAgendaImportChoice(items){
+  agendaImportReview=items||[];
+  agendaImportDraftId=null;
+  const choice=document.getElementById('agendaImportChoice');
+  const review=document.getElementById('agendaImportReview');
+  const summary=document.getElementById('agendaImportChoiceSummary');
+  if(review)review.classList.add('hidden');
+  if(!choice||!summary)return;
+  if(!agendaImportReview.length){choice.classList.add('hidden');return}
+  summary.innerHTML='<strong>'+agendaImportReview.length+' afspraak'+(agendaImportReview.length===1?'':'afspraken')+' gevonden.</strong><br><span class="small">Je kunt ze nu direct toevoegen, of ze op de Mac eerst rustig controleren.</span>';
+  choice.classList.remove('hidden');
+}
+async function addAgendaImportDirect(){
+  if(!agendaImportReview.length)return;
+  const items=getCustomAgendaItems();
+  const now=new Date().toISOString();
+  const existingKeys=new Set(items.map(x=>[x.date,String(x.title||'').toLowerCase()].join('|')));
+  const fresh=agendaImportReview.filter(x=>x.date&&x.title).filter(x=>!existingKeys.has([x.date,String(x.title).toLowerCase()].join('|'))).map((x,i)=>({
+    id:'agenda_'+Date.now()+'_'+i,student:currentStudent,date:x.date,time:x.time||'',type:x.type||'other',
+    title:x.title,meta:x.meta||'',source:x.source||agendaImportMode,createdAt:now
+  }));
+  if(!fresh.length){showMessage('Geen nieuwe afspraken om toe te voegen.','success');return}
+  try{await saveCustomAgendaItems([...items,...fresh])}catch(error){showMessage('Opslaan van de agenda-import mislukt.','error');return}
+  agendaImportReview=[];document.getElementById('agendaImportChoice')?.classList.add('hidden');
+  showMessage(fresh.length+' agenda-item'+(fresh.length===1?'':'s')+' toegevoegd.','success');
+  showAgenda();
+}
+async function saveAgendaImportForLater(){
+  if(!agendaImportReview.length||!currentStudent)return;
+  const {data,error}=await db.from('agenda_import_drafts').insert({
+    student:currentStudent,events:agendaImportReview,source:agendaImportMode
+  }).select('id').single();
+  if(error){console.error('Agenda draft save error:',error);showMessage('De gevonden afspraken konden niet tijdelijk worden opgeslagen.','error');return}
+  agendaImportDraftId=data.id;
+  agendaImportReview=[];
+  document.getElementById('agendaImportChoice')?.classList.add('hidden');
+  document.getElementById('agendaMediaStatus').innerHTML='<strong>🖥️ Klaar voor je Mac</strong><br>De gevonden afspraken zijn tijdelijk opgeslagen. Open PacoGO op je Mac en kies <strong>Agenda invoeren</strong>.';
+  showMessage('De afspraken staan klaar om op je Mac te bekijken.','success');
+}
+async function loadAgendaImportDrafts(){
+  const box=document.getElementById('agendaImportDraftNotice');
+  if(!box||!isParentLoggedIn()||!currentStudent)return;
+  const {data,error}=await db.from('agenda_import_drafts').select('id,student,events,source,created_at').eq('student',currentStudent).order('created_at',{ascending:false}).limit(1);
+  if(error){console.error('Agenda draft load error:',error);return}
+  if(!data?.length){box.classList.add('hidden');return}
+  const draft=data[0];
+  const count=Array.isArray(draft.events)?draft.events.length:0;
+  if(!count){box.classList.add('hidden');return}
+  box.innerHTML='<strong>🖥️ Er staat een agenda-import klaar</strong><br><span class="small">'+count+' afspraak'+(count===1?'':'afspraken')+' wacht'+(count===1?'':'en')+' om op deze Mac gecontroleerd te worden.</span><div style="margin-top:10px"><button type="button" onclick="openAgendaImportDraft('+JSON.stringify(draft.id)+')">🔎 Bekijken en controleren</button></div>';
+  box.classList.remove('hidden');
+}
+async function openAgendaImportDraft(id){
+  const {data,error}=await db.from('agenda_import_drafts').select('id,student,events').eq('id',id).eq('student',currentStudent).single();
+  if(error||!data){showMessage('De tijdelijke agenda-import kon niet worden geladen.','error');return}
+  agendaImportDraftId=data.id;
+  agendaImportReview=Array.isArray(data.events)?data.events:[];
+  document.getElementById('agendaImportChoice')?.classList.add('hidden');
+  renderAgendaImportReview(agendaImportReview);
+  document.getElementById('agendaImportDraftNotice')?.classList.add('hidden');
+}
+async function deleteAgendaImportDraft(){
+  if(!agendaImportDraftId)return;
+  const {error}=await db.from('agenda_import_drafts').delete().eq('id',agendaImportDraftId);
+  if(error)console.error('Agenda draft delete error:',error);
+  agendaImportDraftId=null;
 }
 function setManualAgendaRange(mode){
   document.getElementById('agendaManualSingleFields')?.classList.toggle('hidden',mode!=='single');
@@ -1243,7 +1322,7 @@ async function saveAgendaImportReview(){
   if(!added.length){showMessage('Vul bij minimaal één afspraak een datum en titel in.','error');return}
   const existingKeys=new Set(items.map(x=>[x.date,x.title.toLowerCase()].join('|')));
   const fresh=added.filter(x=>!existingKeys.has([x.date,x.title.toLowerCase()].join('|')));
-  try{await saveCustomAgendaItems([...items,...fresh])}catch(error){showMessage('Opslaan van de agenda-import mislukt.','error');return}
+  try{await saveCustomAgendaItems([...items,...fresh]);await deleteAgendaImportDraft()}catch(error){showMessage('Opslaan van de agenda-import mislukt.','error');return}
   showMessage(fresh.length+' agenda-item'+(fresh.length===1?'':'s')+' toegevoegd.','success');
   agendaImportReview=[];
   showAgenda();

@@ -1136,7 +1136,6 @@ async function analyzeAgendaVideo(){
     button.disabled=true;
     status.textContent='🤖 Opname voorbereiden...';
     await video.play().catch(()=>{});
-    video.pause();
     const duration=Number(video.duration||0);
     if(!duration)throw new Error('Geen videoduur gevonden');
 

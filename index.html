@@ -1242,7 +1242,7 @@ async function analyzeAgendaVideo(){
     const duration=Number(video.duration||0);
     if(!duration)throw new Error('Geen videoduur gevonden');
 
-    const count=30;
+    const count=20;
     const events=[];
     let successfulFrames=0;
     let failedFrames=0;

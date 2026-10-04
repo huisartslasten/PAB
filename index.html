@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V4.47 -->
+<!-- PacoGO TEST V4.48 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -727,7 +727,7 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div class="version-badge">PacoGO TEST V4.47</div>
+  <div class="version-badge">PacoGO TEST V4.48</div>
 
 <div id="globalMessage"></div>
 
@@ -1094,20 +1094,34 @@ function normalizeAgendaTitle(value){
   return String(value||'')
     .toLowerCase()
     .replace(/[\\.,;:!?()[\\]{}"'“”‘’]/g,' ')
+    .replace(/\\b(les|toets|proefwerk|huiswerk|opdracht|activiteit)\\b/g,' ')
     .replace(/\\s+/g,' ')
     .trim();
+}
+function agendaTitleWords(value){
+  return normalizeAgendaTitle(value).split(' ').filter(word=>word.length>1);
 }
 function agendaTitleSimilarity(a,b){
   const na=normalizeAgendaTitle(a);
   const nb=normalizeAgendaTitle(b);
   if(!na||!nb)return 0;
   if(na===nb)return 1;
-  if(na.includes(nb)||nb.includes(na))return 0.9;
-  const aa=new Set(na.split(' ').filter(Boolean));
-  const bb=new Set(nb.split(' ').filter(Boolean));
+  if(na.includes(nb)||nb.includes(na))return 0.94;
+  const aa=new Set(agendaTitleWords(a));
+  const bb=new Set(agendaTitleWords(b));
   const intersection=[...aa].filter(word=>bb.has(word)).length;
-  const union=new Set([...aa,...bb]).size;
-  return union?intersection/union:0;
+  const shorter=Math.min(aa.size,bb.size);
+  if(!shorter)return 0;
+  return intersection/shorter;
+}
+function agendaEventsAreDuplicate(a,b){
+  if(String(a.date||'').trim()!==String(b.date||'').trim())return false;
+  const titleScore=agendaTitleSimilarity(a.title,b.title);
+  if(titleScore>=0.9)return true;
+  const timeA=String(a.time||a.start_time||'').trim();
+  const timeB=String(b.time||b.start_time||'').trim();
+  if(timeA&&timeB&&timeA===timeB&&titleScore>=0.6)return true;
+  return false;
 }
 function mergeAgendaAiEvents(allEvents){
   const merged=[];
@@ -1115,17 +1129,13 @@ function mergeAgendaAiEvents(allEvents){
     const title=String(event.title||'').trim();
     const date=String(event.date||'').trim();
     if(!title||!date)continue;
-
-    const duplicate=merged.find(existing=>{
-      if(existing.date!==date)return false;
-      return agendaTitleSimilarity(existing.title,title)>=0.75;
-    });
+    const duplicate=merged.find(existing=>agendaEventsAreDuplicate(existing,event));
     if(duplicate){
       if(title.length>duplicate.title.length)duplicate.title=title;
       if(!duplicate.meta&&event.meta)duplicate.meta=event.meta;
+      if(!duplicate.type&&event.type)duplicate.type=event.type;
       continue;
     }
-
     merged.push({
       date,
       type:event.type||'other',
@@ -1136,7 +1146,6 @@ function mergeAgendaAiEvents(allEvents){
   }
   return merged.slice(0,30);
 }
-
 
 async function analyzeAgendaImage(){
   if(!agendaImportFile)return;
@@ -1214,6 +1223,8 @@ async function analyzeAgendaVideo(){
         const found=await understandAgendaFrame(frame);
         successfulFrames++;
         events.push(...found);
+        const liveUnique=mergeAgendaAiEvents(events).length;
+        status.innerHTML='<div class="agenda-ai-busy"><span class="agenda-ai-spinner"></span><span><strong>🔎 Beeld '+(i+1)+' van '+count+' wordt bekeken</strong><br><span class="small">Al '+liveUnique+' unieke afspraak'+(liveUnique===1?'':'afspraken')+' gevonden.</span></span></div>';
       }catch(frameError){
         failedFrames++;
         console.error('Agenda AI frame error',i+1,frameError);

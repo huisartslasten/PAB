@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V4.46 -->
+<!-- PacoGO TEST V4.47 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -727,7 +727,7 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div class="version-badge">PacoGO TEST V4.46</div>
+  <div class="version-badge">PacoGO TEST V4.47</div>
 
 <div id="globalMessage"></div>
 
@@ -1090,16 +1090,42 @@ async function understandAgendaFrame(dataUrl,timeoutMs=30000){
   if(error) throw error;
   return Array.isArray(data?.events)?data.events:[];
 }
+function normalizeAgendaTitle(value){
+  return String(value||'')
+    .toLowerCase()
+    .replace(/[\\.,;:!?()[\\]{}"'“”‘’]/g,' ')
+    .replace(/\\s+/g,' ')
+    .trim();
+}
+function agendaTitleSimilarity(a,b){
+  const na=normalizeAgendaTitle(a);
+  const nb=normalizeAgendaTitle(b);
+  if(!na||!nb)return 0;
+  if(na===nb)return 1;
+  if(na.includes(nb)||nb.includes(na))return 0.9;
+  const aa=new Set(na.split(' ').filter(Boolean));
+  const bb=new Set(nb.split(' ').filter(Boolean));
+  const intersection=[...aa].filter(word=>bb.has(word)).length;
+  const union=new Set([...aa,...bb]).size;
+  return union?intersection/union:0;
+}
 function mergeAgendaAiEvents(allEvents){
-  const seen=new Set();
   const merged=[];
   for(const event of allEvents||[]){
     const title=String(event.title||'').trim();
     const date=String(event.date||'').trim();
     if(!title||!date)continue;
-    const key=date+'|'+title.toLowerCase().replace(/\\s+/g,' ');
-    if(seen.has(key))continue;
-    seen.add(key);
+
+    const duplicate=merged.find(existing=>{
+      if(existing.date!==date)return false;
+      return agendaTitleSimilarity(existing.title,title)>=0.75;
+    });
+    if(duplicate){
+      if(title.length>duplicate.title.length)duplicate.title=title;
+      if(!duplicate.meta&&event.meta)duplicate.meta=event.meta;
+      continue;
+    }
+
     merged.push({
       date,
       type:event.type||'other',
@@ -1110,6 +1136,7 @@ function mergeAgendaAiEvents(allEvents){
   }
   return merged.slice(0,30);
 }
+
 
 async function analyzeAgendaImage(){
   if(!agendaImportFile)return;

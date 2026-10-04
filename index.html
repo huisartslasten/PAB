@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V4.40 -->
+<!-- PacoGO TEST V4.41 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -727,7 +727,7 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div class="version-badge">PacoGO TEST V4.40</div>
+  <div class="version-badge">PacoGO TEST V4.41</div>
 
 <div id="globalMessage"></div>
 
@@ -1127,6 +1127,49 @@ async function analyzeAgendaImage(){
     status.textContent='⚠️ De AI-analyse van de screenshot is mislukt.';
   }finally{button.disabled=false}
 }
+function agendaFrameDifference(a,b){
+  if(!a||!b)return 1;
+  const len=Math.min(a.length,b.length);
+  if(!len)return 1;
+  let total=0;
+  for(let i=0;i<len;i++)total+=Math.abs(a[i]-b[i]);
+  return total/(len*255);
+}
+function agendaFrameSignature(video,time,maxWidth=320,timeoutMs=8000){
+  return new Promise((resolve,reject)=>{
+    let done=false;
+    const finish=(fn,value)=>{
+      if(done)return;
+      done=true;
+      clearTimeout(timer);
+      video.removeEventListener('seeked',onSeek);
+      video.removeEventListener('error',onError);
+      fn(value)
+    };
+    const onSeek=()=>{
+      try{
+        const vw=video.videoWidth||720,vh=video.videoHeight||1280;
+        const scale=Math.min(1,maxWidth/vw);
+        const canvas=document.createElement('canvas');
+        canvas.width=Math.max(1,Math.round(vw*scale));
+        canvas.height=Math.max(1,Math.round(vh*scale));
+        const ctx=canvas.getContext('2d',{willReadFrequently:true});
+        ctx.drawImage(video,0,0,canvas.width,canvas.height);
+        const preview=document.createElement('canvas');
+        preview.width=32;preview.height=32;
+        const pctx=preview.getContext('2d',{willReadFrequently:true});
+        pctx.drawImage(canvas,0,0,32,32);
+        const signature=new Uint8Array(pctx.getImageData(0,0,32,32).data);
+        finish(resolve,{dataUrl:canvas.toDataURL('image/jpeg',0.78),signature});
+      }catch(error){finish(reject,error)}
+    };
+    const onError=()=>finish(reject,new Error('Video frame kon niet worden gelezen'));
+    const timer=setTimeout(()=>finish(reject,new Error('Video frame timeout')),timeoutMs);
+    video.addEventListener('seeked',onSeek,{once:true});
+    video.addEventListener('error',onError,{once:true});
+    try{video.currentTime=Math.max(0,Number(time)||0)}catch(error){finish(reject,error)}
+  });
+}
 async function analyzeAgendaVideo(){
   if(!agendaImportFile)return;
   const status=document.getElementById('agendaMediaStatus');
@@ -1139,31 +1182,48 @@ async function analyzeAgendaVideo(){
     const duration=Number(video.duration||0);
     if(!duration)throw new Error('Geen videoduur gevonden');
 
-    const count=Math.min(10,Math.max(6,Math.ceil(duration/1.5)));
+    const scanCount=100;
+    const selectedFrames=[];
+    let previousSignature=null;
+    let failedFrames=0;
+    for(let i=0;i<scanCount;i++){
+      const t=scanCount===1?0:Math.max(0,Math.min(duration-0.25,duration*(i/(scanCount-1))));
+      status.innerHTML='<div class="agenda-ai-busy"><span class="agenda-ai-spinner"></span><span><strong>🔎 Video scannen...</strong><br><span class="small">Beeld '+(i+1)+' van '+scanCount+' vergelijken</span></span></div>';
+      try{
+        const snapshot=await agendaFrameSignature(video,t);
+        const difference=agendaFrameDifference(previousSignature,snapshot.signature);
+        if(!previousSignature||difference>=0.045){
+          selectedFrames.push(snapshot.dataUrl);
+          previousSignature=snapshot.signature;
+        }
+      }catch(frameError){
+        failedFrames++;
+        console.error('Agenda video scan error',i+1,frameError);
+      }
+    }
+
+    const aiFrames=selectedFrames.length>40?selectedFrames.filter((_,i)=>i%Math.ceil(selectedFrames.length/40)===0).slice(0,40):selectedFrames;
     const events=[];
     let successfulFrames=0;
-    let failedFrames=0;
-    for(let i=0;i<count;i++){
-      const t=count===1?0:Math.max(0,Math.min(duration-0.25,duration*(i/(count-1))));
-      renderAgendaAiProgress(status,i+1,count);
+    for(let i=0;i<aiFrames.length;i++){
+      renderAgendaAiProgress(status,i+1,aiFrames.length);
       try{
-        const frame=await agendaFrameToDataUrl(video,t);
-        const found=await understandAgendaFrame(frame);
+        const found=await understandAgendaFrame(aiFrames[i]);
         successfulFrames++;
         events.push(...found);
       }catch(frameError){
-        failedFrames++;
         console.error('Agenda AI frame error',i+1,frameError);
       }
     }
+
     const merged=mergeAgendaAiEvents(events);
     renderAgendaImportReview(merged);
     if(!successfulFrames){
       status.innerHTML='<strong>⚠️ Analyse niet gelukt</strong><br>PacoGO kon de schermopname niet goed verwerken. Er kwam geen bruikbaar AI-resultaat terug.<br><span class="small">Probeer de opname opnieuw.</span>';
     }else if(!merged.length){
-      status.innerHTML='<strong>🔍 Analyse voltooid</strong><br>PacoGO heeft de schermopname bekeken, maar kon geen duidelijke afspraken herkennen.'+(failedFrames?'<br><span class="small">'+failedFrames+' van '+count+' beelden konden niet worden verwerkt.</span>':'');
+      status.innerHTML='<strong>🔍 Analyse voltooid</strong><br>PacoGO heeft '+scanCount+' beelden gescand en '+aiFrames.length+' relevante beelden door AI laten bekijken, maar kon geen duidelijke afspraken herkennen.'+(failedFrames?'<br><span class="small">'+failedFrames+' beelden konden niet worden gescand.</span>':'');
     }else{
-      status.innerHTML='<strong>✅ Analyse klaar!</strong><br>AI vond '+merged.length+' unieke afspraak'+(merged.length===1?'':'afspraken')+'. Controleer ze hieronder.'+(failedFrames?'<br><span class="small">'+failedFrames+' van '+count+' beelden konden niet worden verwerkt.</span>':'');
+      status.innerHTML='<strong>✅ Analyse klaar!</strong><br>'+scanCount+' beelden gescand → '+aiFrames.length+' relevante beelden door AI bekeken → '+merged.length+' unieke afspraken gevonden.'+(failedFrames?'<br><span class="small">'+failedFrames+' beelden konden niet worden gescand.</span>':'');
     }
   }catch(error){
     console.error('Agenda AI video error:',error);

@@ -1130,11 +1130,24 @@ function agendaTitleSimilarity(a,b){
 }
 function agendaEventsAreDuplicate(a,b){
   if(normalizeAgendaDate(a.date)!==normalizeAgendaDate(b.date))return false;
-  const titleScore=agendaTitleSimilarity(a.title,b.title);
+
+  const cleanTitle = value =>
+    String(value||'')
+      .replace(/^\s*toets\s*:\s*/i,'')
+      .trim();
+
+  const titleScore=agendaTitleSimilarity(
+    cleanTitle(a.title),
+    cleanTitle(b.title)
+  );
+
   if(titleScore>=0.9)return true;
+
   const timeA=String(a.time||a.start_time||'').trim();
   const timeB=String(b.time||b.start_time||'').trim();
+
   if(timeA&&timeB&&timeA===timeB&&titleScore>=0.6)return true;
+
   return false;
 }
 function mergeAgendaAiEvents(allEvents){

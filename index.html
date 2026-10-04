@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V4.45 -->
+<!-- PacoGO TEST V4.46 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -727,7 +727,7 @@ body{background:#1787f2}
     </div>
   </div>
 
-  <div class="version-badge">PacoGO TEST V4.45</div>
+  <div class="version-badge">PacoGO TEST V4.46</div>
 
 <div id="globalMessage"></div>
 
@@ -1175,7 +1175,7 @@ async function analyzeAgendaVideo(){
     const duration=Number(video.duration||0);
     if(!duration)throw new Error('Geen videoduur gevonden');
 
-    const count=60;
+    const count=30;
     const events=[];
     let successfulFrames=0;
     let failedFrames=0;

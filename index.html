@@ -1268,14 +1268,40 @@ async function analyzeAgendaVideo(){
         const liveUnique=mergeAgendaAiEvents(events).length;
         renderAgendaAiProgress(status,i+1,count,liveUnique);
         if(result.status==='transition'){
-          const nearby=[t-baseStep,t-baseStep/2,t+baseStep/2,t+baseStep];
-          for(const nearbyTime of nearby){
+          // Adaptief zoeken rond een overgang: eerst heel dichtbij, daarna steeds verder.
+          // We stoppen pas zodra een stabiel beeld met een afspraak is gevonden.
+          // De richting wordt afwisselend onderzocht zodat zowel vóór als ná de overgang
+          // bereikbaar blijft zonder blind tientallen extra beelden te analyseren.
+          const refinementOffsets=[
+            -baseStep*0.25,
+             baseStep*0.25,
+            -baseStep*0.5,
+             baseStep*0.5,
+            -baseStep*0.75,
+             baseStep*0.75,
+            -baseStep,
+             baseStep,
+            -baseStep*1.5,
+             baseStep*1.5,
+            -baseStep*2,
+             baseStep*2,
+            -baseStep*3,
+             baseStep*3
+          ];
+          let stableFound=false;
+          for(const offset of refinementOffsets){
+            if(stableFound)break;
+            const nearbyTime=t+offset;
+            if(nearbyTime<0||nearbyTime>duration-0.25)continue;
             try{
               refinementFrames++;
               const refined=await analyzeAt(nearbyTime);
               const refinedUnique=mergeAgendaAiEvents(events).length;
               renderAgendaAiProgress(status,i+1,count,refinedUnique);
-              if(refined.status==='stable'&&refined.events.length)break;
+              if(refined.status==='stable'&&refined.events.length){
+                stableFound=true;
+                break;
+              }
             }catch(refineError){
               failedFrames++;
               console.error('Agenda AI refinement frame error',i+1,refineError);

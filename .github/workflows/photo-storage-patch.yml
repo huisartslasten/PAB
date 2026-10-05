@@ -1,0 +1,39 @@
+name: PacoGO TEST photo storage patch
+
+on:
+  push:
+    branches: [test]
+
+permissions:
+  contents: write
+
+jobs:
+  patch-index:
+    if: ${{ !contains(github.event.head_commit.message, 'PacoGO TEST photo storage patch applied') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inject photo storage module and bump TEST version
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('index.html')
+          text = p.read_text(encoding='utf-8')
+          marker_old = '<!-- PacoGO TEST V4.60 -->'
+          marker_new = '<!-- PacoGO TEST V4.61 -->'
+          if marker_old not in text:
+              raise SystemExit('Expected TEST V4.60 marker not found; refusing to patch index.html')
+          if 'photo-storage.js' not in text:
+              if '</body>' not in text:
+                  raise SystemExit('Expected </body> not found; refusing to patch index.html')
+              text = text.replace('</body>', '  <script src="photo-storage.js"></script>\n</body>', 1)
+          text = text.replace(marker_old, marker_new, 1)
+          p.write_text(text, encoding='utf-8')
+      - name: Commit TEST patch and remove one-time workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git rm .github/workflows/photo-storage-patch.yml
+          git commit -m 'PacoGO TEST photo storage patch applied'
+          git push origin test

@@ -1,4 +1,4 @@
-export function createLessonPayload({ student, subject, title, type }) {
+export function buildLessonPayload({ student, subject, title, type } = {}) {
   return {
     student: String(student || '').trim(),
     subject: String(subject || '').trim(),
@@ -21,4 +21,11 @@ export function prepareLessonItems(items = []) {
     ...item,
     sort_order: Number(item.sort_order ?? index)
   }));
+}
+
+export function buildEditorModel({ lesson, testDate = null } = {}) {
+  return {
+    lesson: lesson || null,
+    testDate: testDate || null
+  };
 }

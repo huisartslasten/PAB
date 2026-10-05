@@ -5,108 +5,49 @@ git config user.name "PacoGO Bot"
 git config user.email "paco-go-bot@users.noreply.github.com"
 git fetch origin test
 git checkout -B test origin/test
-python3 -m pip install --quiet beautifulsoup4
 python3 - <<'PY'
 from pathlib import Path
-from bs4 import BeautifulSoup
 p=Path('index.html')
-soup=BeautifulSoup(p.read_text(), 'html.parser')
-editor=soup.select_one('#editor')
-card=editor.select_one('.editor-main-card') if editor else None
-if card is None: card=editor.select_one('.card') if editor else None
-if card is None: raise SystemExit('ERROR: editor main card not found')
-def by_id(name):
-    el=soup.find(id=name)
-    if el is None: raise SystemExit(f'ERROR: missing #{name}')
-    return el
-def field_parent(el):
-    x=el
-    while x is not None and x is not card:
-        if x.name=='div' and 'field' in (x.get('class') or []): return x
-        x=x.parent
-    return el.parent
-subject=by_id('lessonSubject'); subvak=by_id('lessonSubvak'); name=by_id('lessonName'); type_select=by_id('lessonType'); explanation=by_id('lessonExplanation')
-left_items=[field_parent(subject),field_parent(subvak),field_parent(name)]
-right_items=[field_parent(type_select)]
-test_label=None
-for lab in card.find_all('label'):
-    if 'Toetsdatum instellen' in lab.get_text(' ',strip=True): test_label=lab; break
-if test_label is not None:
-    x=test_label
-    while x is not None and x is not card:
-        cls=x.get('class') or []
-        if x.name=='div' and ('lesson-test-date-box' in cls or 'field' in cls): right_items.append(x); break
-        x=x.parent
-right_items.append(field_parent(explanation))
-def unique(items):
-    out=[]; seen=set()
-    for el in items:
-        if id(el) not in seen: out.append(el); seen.add(id(el))
-    return out
-left_items=unique(left_items); right_items=unique(right_items)
-ai=None
-for candidate_id in ('lessonAiBox','aiCheckBox','aiCheck'):
-    ai=soup.find(id=candidate_id)
-    if ai: break
-if ai is None:
-    for el in card.find_all(['div','section']):
-        if 'AI moet het antwoord controleren' in el.get_text(' ',strip=True): ai=el; break
-if ai is not None:
-    x=ai
-    while x.parent is not None and x.parent is not card and len(x.get_text(' ',strip=True))<600: x=x.parent
-    ai=x
-editors=[]
-for eid in ('wordEditor','questionEditor','dictationEditor','mathEditor','spellingEditor'):
-    el=soup.find(id=eid)
-    if el is not None: editors.append(el)
-old=soup.find(id='editor-top-grid')
-if old: old.decompose()
-top=soup.new_tag('div',id='editor-top-grid',attrs={'class':['editor-top-grid']})
-left=soup.new_tag('div',attrs={'class':['editor-top-left']}); right=soup.new_tag('div',attrs={'class':['editor-top-right']})
-top.append(left); top.append(right)
-for el in left_items: left.append(el)
-for el in right_items: right.append(el)
-anchor=None
-for el in [*editors,ai]:
-    if el is not None and el.parent is card: anchor=el; break
-if anchor is None: anchor=card.find('div')
-if anchor is None: card.append(top)
-else: anchor.insert_before(top)
-if ai is not None and ai.parent is card:
-    ai['class']=(ai.get('class') or [])+['editor-ai-independent']
-    top.insert_after(ai)
-for box in list(card.find_all(['div','section'])):
-    if box in (top,left,right,ai): continue
-    if 'editor-type-box' in (box.get('class') or []) and not box.get_text(' ',strip=True) and not box.find(['input','select','textarea','button']): box.decompose()
-style=soup.new_tag('style')
-style.string='''
-/* TEST V4.57 — structurally separated editor layout */
-#editor .editor-main-card{display:block}
-#editor .editor-top-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:18px;row-gap:8px;align-items:start;margin-bottom:10px}
-#editor .editor-top-left,#editor .editor-top-right{min-width:0}
-#editor .editor-top-left>.field,#editor .editor-top-right>.field{margin-bottom:10px}
-#editor .editor-top-right>.lesson-test-date-box{margin:0 0 10px}
-#editor .editor-ai-independent{width:100%;margin:0 0 10px}
-#editor .editor-main-card>#wordEditor,#editor .editor-main-card>#questionEditor,#editor .editor-main-card>#dictationEditor,#editor .editor-main-card>#mathEditor,#editor .editor-main-card>#spellingEditor{width:100%;display:block}
-#editor .editor-main-card>#wordEditor .editor-row,#editor .editor-main-card>#questionEditor .editor-row{display:block;width:100%;max-width:none;padding-top:10px;padding-bottom:10px}
-@media(max-width:900px){#editor .editor-top-grid{grid-template-columns:1fr}}
+s=p.read_text()
+start='      <div class="field"><label for="lessonSubject">Vak</label>'
+end='      <div id="spellingLabelsEditor"'
+a=s.find(start)
+b=s.find(end,a)
+if a<0 or b<0:
+    raise SystemExit('ERROR: expected editor field block not found')
+new='''      <div class="editor-top-grid">
+        <div class="editor-top-left">
+          <div class="field"><label for="lessonSubject">Vak</label><input id="lessonSubject" placeholder="Voer vak in bijvoorbeeld Nederlands"></div>
+          <div class="field"><label for="lessonSubvak">Subvak <span class="small">(optioneel)</span></label><input id="lessonSubvak" placeholder="Bijvoorbeeld Themawoorden of Spelling"></div>
+          <div class="field"><label for="lessonName">Naam van de les</label><input id="lessonName" placeholder="Bijvoorbeeld Week 4"></div>
+        </div>
+        <div class="editor-top-right">
+          <div class="field"><label for="lessonType">Onderdeel</label><div class="lesson-type-select"><button type="button" id="lessonTypeButton" class="lesson-type-button" onclick="toggleLessonTypeMenu()"><span id="lessonTypeButtonText">🎯 Woordtrainer</span><span class="lesson-type-chevron">⌄</span></button><div id="lessonTypeMenu" class="lesson-type-menu hidden"><button type="button" onclick="setLessonType('words')">🎯 Woordtrainer</button><button type="button" onclick="setLessonType('questions')">❓ Vragen</button><button type="button" onclick="setLessonType('dictation')">✏️ Dictee</button><button type="button" onclick="setLessonType('math')">🔢 Rekenen</button><button type="button" onclick="setLessonType('spelling')">✍️ Spelling</button><button type="button" onclick="setLessonType('custom')">🛠️ Eigen les</button></div><select id="lessonType" class="lesson-type-native" tabindex="-1" aria-hidden="true"><option value="words">words</option><option value="questions">questions</option><option value="dictation">dictation</option><option value="math">math</option><option value="spelling">spelling</option><option value="custom">custom</option></select></div></div>
+          <div class="lesson-test-date-box"><label class="lesson-test-date-toggle"><input id="lessonTestDateEnabled" type="checkbox" onchange="toggleLessonTestDate()"> 📅 Toetsdatum instellen</label><div class="small" style="margin-top:5px">Optioneel. Alleen instellen als er al een toetsdatum bekend is.</div><input id="lessonTestDate" type="hidden"><div id="lessonTestDatePicker" class="date-picker lesson-test-date-picker hidden"></div></div>
+          <div class="field"><label for="lessonExplanation">Uitleg <span class="small">(optioneel)</span></label><textarea id="lessonExplanation" placeholder="Leg hier de leerstof of regel uit. Dit wordt apart boven de oefeningen getoond."></textarea></div>
+        </div>
+      </div>
+      <div id="lessonAiBox" class="card lesson-ai-box hidden"><label class="lesson-test-date-toggle"><input id="lessonAiCheckAnswers" type="checkbox" onchange="toggleLessonAiInstruction()"> 🤖 AI moet het antwoord controleren</label><div class="small" style="margin-top:5px">Zet dit aan als je wilt dat AI bepaalt of het antwoord inhoudelijk goed is.</div><div id="lessonAiInstructionBox" class="lesson-ai-instruction hidden"><div class="field" style="margin:0"><label for="lessonAiInstruction">Instructie voor de AI <span class="small">(optioneel)</span></label><textarea id="lessonAiInstruction" placeholder="Bijvoorbeeld: Een kleine spelfout is niet erg. Het antwoord hoeft niet 100% correct gespeld te zijn als de betekenis duidelijk goed is."></textarea></div></div></div>
 '''
-soup.find('head').append(style)
-p.write_text(str(soup))
-print('Applied TEST V4.57 structural editor separation.')
+s=s[:a]+new+s[b:]
+css='''\n/* TEST V4.58 — editor fields structurally separated */\n#editor .editor-main-card{display:block}\n#editor .editor-top-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:18px;row-gap:8px;align-items:start;margin-bottom:10px}\n#editor .editor-top-left,#editor .editor-top-right{min-width:0}\n#editor .editor-top-left>.field,#editor .editor-top-right>.field{margin-bottom:10px}\n#editor .editor-top-right>.lesson-test-date-box{margin:0 0 10px}\n#editor #lessonAiBox{width:100%;margin:0 0 10px}\n#editor .editor-main-card>#wordEditor,#editor .editor-main-card>#questionEditor,#editor .editor-main-card>#dictationEditor,#editor .editor-main-card>#mathEditor,#editor .editor-main-card>#spellingEditor{width:100%;display:block}\n#editor .editor-main-card>#wordEditor .editor-row,#editor .editor-main-card>#questionEditor .editor-row{display:block;width:100%;max-width:none;padding-top:10px;padding-bottom:10px}\n@media(max-width:900px){#editor .editor-top-grid{grid-template-columns:1fr}}\n'''
+if '/* TEST V4.58 — editor fields structurally separated */' not in s:
+    s=s.replace('</style>',css+'</style>',1)
+p.write_text(s)
+print('Applied TEST V4.58: top fields are structurally independent; AI and questions are separate full-width blocks.')
 PY
 python3 - <<'PY'
 from pathlib import Path
-from bs4 import BeautifulSoup
-soup=BeautifulSoup(Path('index.html').read_text(),'html.parser')
-assert soup.select_one('#editor-top-grid')
-left=soup.select_one('.editor-top-left'); right=soup.select_one('.editor-top-right')
-assert left and right
-assert left.find(id='lessonSubject') and left.find(id='lessonSubvak') and left.find(id='lessonName')
-assert right.find(id='lessonType') and right.find(id='lessonExplanation')
-assert soup.find(id='wordEditor') and soup.find(id='questionEditor')
-print('CHECK OK: V4.57 independent left/right top fields; questions full width.')
+s=Path('index.html').read_text()
+assert '<!-- PacoGO TEST V4.53 -->' in s
+assert '<div class="editor-top-grid">' in s
+assert 'id="lessonSubject"' in s and 'id="lessonSubvak"' in s and 'id="lessonName"' in s
+assert 'id="lessonType"' in s and 'id="lessonExplanation"' in s
+assert '<div id="lessonAiBox"' in s
+assert '<div id="wordEditor"' in s
+assert 'TEST V4.58 — editor fields structurally separated' in s
+print('CHECK OK: V4.58 exact editor structure + AI/questions detached.')
 PY
 git add index.html
-git commit -m "TEST V4.57 structurally separate editor layout"
+git commit -m "TEST V4.58 structurally separate editor fields"
 git push origin HEAD:test

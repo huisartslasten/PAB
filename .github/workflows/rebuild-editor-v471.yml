@@ -1,4 +1,4 @@
-name: Rebuild TEST editor V4.71
+name: Rebuild TEST editor V4.71 clean
 
 on:
   push:

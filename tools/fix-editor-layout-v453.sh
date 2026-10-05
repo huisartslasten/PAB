@@ -10,9 +10,8 @@ from pathlib import Path
 import re, subprocess, tempfile
 p=Path('index.html')
 s=p.read_text()
-# TEST V4.64 is already present; first diagnose the actual inline JavaScript before changing anything.
 assert '<!-- PacoGO TEST V4.64 -->' in s
-blocks=re.findall(r'<script(?:\\s[^>]*)?>(.*?)</script>',s,re.S|re.I)
+blocks=re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',s,re.S|re.I)
 if not blocks:
     raise SystemExit('ERROR: no inline script blocks found')
 for i,code in enumerate(blocks,1):

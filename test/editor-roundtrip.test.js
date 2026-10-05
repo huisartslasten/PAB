@@ -53,6 +53,35 @@ test('hydrates fallback spelling answer string with V4.78 separator', () => {
   ]);
 });
 
+test('all six editor types survive load -> hydrate -> save-model round-trip', () => {
+  const cases = {
+    words: { question_parts: ['expert'], answer_parts: [{ text: 'deskundige', role: 'answer' }] },
+    custom: { question_parts: ['expert'], answer_parts: [{ text: 'deskundige', role: 'answer' }] },
+    questions: { question_parts: ['Wat is expert?'], answer_parts: [{ text: 'deskundige', role: 'answer' }, { text: 'kenner', role: 'extra' }] },
+    dictation: { question_parts: ['Schrijf op'], answer_parts: [{ text: 'deskundige', role: 'answer' }] },
+    math: { question_parts: ['2 + 2'], answer_parts: [{ text: '4', role: 'answer' }] },
+    spelling: { question_parts: ['werken'], answer_parts: [{ text: 'werkte', role: 'answer' }, { text: 'gewerkt', role: 'answer' }] }
+  };
+
+  for (const [type, persistedItem] of Object.entries(cases)) {
+    const hydrated = hydrateLessonForEditor({ type, lesson_items: [{ ...persistedItem, sort_order: 0 }] });
+    const [saved] = roundTripEditorItems(type, hydrated.items);
+
+    assert.ok(saved, `${type} should produce a save-model item`);
+    assert.deepEqual(saved.question_parts, persistedItem.question_parts, type);
+    assert.deepEqual(saved.answer_parts, persistedItem.answer_parts, type);
+    assert.equal(saved.sort_order, 0, type);
+  }
+});
+
+test('math hydration does not perform validation; deterministic builder does', () => {
+  const hydrated = hydrateLessonForEditor({
+    type: 'math', lesson_items: [{ question: '2 + 2', answer: 'vier' }]
+  });
+  assert.deepEqual(hydrated.items[0].answer_parts, [{ text: 'vier', role: 'answer' }]);
+  assert.deepEqual(roundTripEditorItems('math', hydrated.items), []);
+});
+
 test('editor item round-trip rebuilds persisted spelling shape deterministically', () => {
   const hydrated = hydrateLessonForEditor({
     type: 'spelling', lesson_items: [{

@@ -2,7 +2,7 @@ import { buildItemsForType } from './editor-items.js';
 
 const text = value => String(value ?? '').trim();
 
-function normalizeParts(parts, fallback = '') {
+function normalizeParts(parts, fallback = []) {
   if (Array.isArray(parts) && parts.length) {
     return parts.map(part => ({
       text: text(part?.text ?? part),
@@ -10,8 +10,9 @@ function normalizeParts(parts, fallback = '') {
     })).filter(part => part.text);
   }
 
-  const value = text(fallback);
-  return value ? [{ text: value, role: 'answer' }] : [];
+  return (Array.isArray(fallback) ? fallback : [fallback])
+    .map(value => ({ text: text(value), role: 'answer' }))
+    .filter(part => part.text);
 }
 
 export function hydrateLessonForEditor(lesson = null, { testDate = null } = {}) {

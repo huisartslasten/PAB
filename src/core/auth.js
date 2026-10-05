@@ -2,7 +2,8 @@
 // Mirrors the current V4.78 role rules; it is not wired into the legacy runtime yet.
 
 export const PARENT_IDS = Object.freeze([
-  '5d0e1e5c-1dbe-4909-bd3a-81a1e7b26d09'
+  '5d0e1e5c-1dbe-4909-bd3a-81a1e7b26d09',
+  '418833d5-049a-4ec9-8072-2d48a85f04b1'
 ]);
 
 export const CREATOR_IDS = Object.freeze([...PARENT_IDS]);

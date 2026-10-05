@@ -20,29 +20,34 @@ if 'id="photoSaveOriginal"' not in text:
 
 # Directly attach source-photo saving to the real lesson-creation function.
 start=text.find('async function createLessonFromPhoto(){')
-end=text.find('\nfunction showAddLesson',start)
-if start<0 or end<0:
-    raise SystemExit('createLessonFromPhoto boundary not found')
+if start<0:
+    raise SystemExit('createLessonFromPhoto start not found')
+end=text.find('\nfunction ',start+len('async function createLessonFromPhoto(){'))
+if end<0:
+    raise SystemExit('createLessonFromPhoto end boundary not found')
 fn=text[start:end]
 needle="  currentLesson=lessons.find(l=>Number(l.id)===Number(created.data.id))||null;"
 if fn.count(needle)!=1:
     raise SystemExit(f'Expected exactly one created-lesson assignment, found {fn.count(needle)}')
 save='''  if(document.getElementById('photoSaveOriginal')?.checked&&photoLessonSelectedFile&&window.saveLessonSourcePhoto){\n    try{\n      await window.saveLessonSourcePhoto(created.data.id,photoLessonSelectedFile);\n    }catch(error){\n      console.error('Source photo save error:',error);\n      showMessage('Les is gemaakt, maar de bronfoto kon niet worden opgeslagen.','error');\n    }\n  }\n'''
-fn=fn.replace(needle,needle+'\n'+save,1)
+if 'window.saveLessonSourcePhoto(created.data.id,photoLessonSelectedFile)' not in fn:
+    fn=fn.replace(needle,needle+'\n'+save,1)
 text=text[:start]+fn+text[end:]
 
 # Directly attach existing-lesson photo UI to the real showLesson function.
 show_start=text.find('function showLesson(){')
-go_back=text.find('\nfunction goBack(){',show_start)
-if show_start<0 or go_back<0:
-    raise SystemExit('showLesson boundary not found')
-show_prefix=text[:go_back]
-close=show_prefix.rfind('}')
-if close<show_start:
-    raise SystemExit('showLesson closing brace not found')
-if 'syncLessonPhotoUi(currentLesson?.id)' not in show_prefix[show_start:]:
-    show_prefix=show_prefix[:close]+'\nwindow.syncLessonPhotoUi(currentLesson?.id);\n'+show_prefix[close:]
-text=show_prefix+text[go_back:]
+if show_start<0:
+    raise SystemExit('showLesson start not found')
+go_back=text.find('\nfunction ',show_start+len('function showLesson(){'))
+if go_back<0:
+    raise SystemExit('showLesson end boundary not found')
+show_fn=text[show_start:go_back]
+if 'window.syncLessonPhotoUi(currentLesson?.id)' not in show_fn:
+    close=show_fn.rfind('}')
+    if close<0:
+        raise SystemExit('showLesson closing brace not found')
+    show_fn=show_fn[:close]+'\nwindow.syncLessonPhotoUi(currentLesson?.id);\n'+show_fn[close:]
+    text=text[:show_start]+show_fn+text[go_back:]
 
 p.write_text(text,encoding='utf-8')
 PY

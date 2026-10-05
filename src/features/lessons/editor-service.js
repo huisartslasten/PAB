@@ -10,14 +10,8 @@ export function createEditorService(supabaseClient) {
       return { lessonId };
     }
 
-    const { data, error } = await supabaseClient
-      .from('lessons')
-      .insert(lesson)
-      .select()
-      .single();
-    if (error) throw error;
-
-    const createdId = data?.id;
+    const created = await lessons.createLesson(lesson);
+    const createdId = created?.id;
     if (createdId == null) throw new Error('Nieuwe les kreeg geen id.');
     await lessons.replaceLessonItems(createdId, items);
     return { lessonId: createdId };

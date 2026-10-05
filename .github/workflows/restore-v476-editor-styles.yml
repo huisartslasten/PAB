@@ -1,0 +1,26 @@
+name: Restore approved V4.76 editor styling
+
+on:
+  push:
+    branches: [test]
+    paths:
+      - 'tools/restore-v476-editor-styles.sh'
+      - '.github/workflows/restore-v476-editor-styles.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout TEST
+        uses: actions/checkout@v4
+        with:
+          ref: test
+          fetch-depth: 0
+
+      - name: Restore approved editor styling
+        run: |
+          chmod +x tools/restore-v476-editor-styles.sh
+          bash tools/restore-v476-editor-styles.sh

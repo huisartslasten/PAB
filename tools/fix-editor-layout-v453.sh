@@ -9,78 +9,97 @@ python3 - <<'PY'
 from pathlib import Path
 p=Path('index.html')
 s=p.read_text()
-if 'PacoGO TEST V4.60' not in s:
-    raise SystemExit('ERROR: expected TEST V4.60 checkpoint not found')
+if 'PacoGO TEST V4.61' not in s:
+    raise SystemExit('ERROR: expected TEST V4.61 checkpoint not found')
 
 css=r'''
-/* TEST V4.61 — compact answer-assessment block + working insert buttons */
+/* TEST V4.62 — smarter assessment layout: readable hint, required words, minimum words at far right */
 #editor .editor-main-card>#wordEditor .editor-row,
 #editor .editor-main-card>#questionEditor .editor-row,
 #editor .editor-main-card>#dictationEditor .editor-row,
 #editor .editor-main-card>#mathEditor .editor-row,
 #editor .editor-main-card>#spellingEditor .editor-row{
   display:block!important;
-  padding:6px 10px 7px 54px!important;
-  margin:5px 0!important;
+  padding:8px 12px 10px 54px!important;
+  margin:7px 0!important;
 }
+
 #editor .editor-main-card>#wordEditor .word-rules-box{
-  margin:6px 0 0!important;
-  padding:8px 10px!important;
-  border-radius:12px!important;
+  margin:8px 0 0!important;
+  padding:10px 12px!important;
+  border-radius:14px!important;
 }
 #editor .editor-main-card>#wordEditor .word-rules-title{
-  font-size:15px!important;
-  margin:0 0 5px!important;
-  line-height:1.1!important;
+  font-size:16px!important;
+  margin:0 0 8px!important;
+  line-height:1.15!important;
 }
+
+/* One deliberate horizontal row: Hint gets real writing space; minimum words is compact and always far right. */
 #editor .editor-main-card>#wordEditor .word-rules-grid{
   display:grid!important;
-  grid-template-columns:minmax(110px,.9fr) minmax(150px,1.25fr) minmax(140px,1fr) minmax(150px,1.25fr) minmax(120px,1fr) minmax(170px,1.5fr)!important;
-  gap:5px 7px!important;
+  grid-template-columns:150px minmax(420px,2.1fr) 185px minmax(280px,1.35fr) 205px 82px!important;
+  gap:10px 12px!important;
   align-items:center!important;
 }
 #editor .editor-main-card>#wordEditor .word-rules-grid label{
   margin:0!important;
-  font-size:12px!important;
-  line-height:1.05!important;
+  font-size:15px!important;
+  line-height:1.15!important;
   white-space:nowrap!important;
 }
+
 #editor .editor-main-card>#wordEditor .word-rules-grid input,
 #editor .editor-main-card>#wordEditor .word-rules-grid textarea{
-  min-height:38px!important;
-  height:38px!important;
+  width:100%!important;
+  min-height:56px!important;
+  height:56px!important;
   margin:0!important;
-  padding:6px 9px!important;
-  font-size:13px!important;
-  border-radius:9px!important;
+  padding:10px 13px!important;
+  font-size:16px!important;
+  line-height:1.35!important;
+  border-radius:11px!important;
 }
 #editor .editor-main-card>#wordEditor .word-rules-grid textarea{
-  resize:none!important;
+  min-height:76px!important;
+  height:76px!important;
+  resize:vertical!important;
 }
+
+/* The minimum-word number field is intentionally small. */
+#editor .editor-main-card>#wordEditor .word-rules-grid input[type="number"]{
+  width:82px!important;
+  min-width:82px!important;
+  max-width:82px!important;
+  text-align:left!important;
+}
+
 #editor .editor-main-card>#wordEditor .word-rules-help{
-  margin:5px 0 0!important;
-  padding:4px 7px!important;
-  font-size:10.5px!important;
-  line-height:1.15!important;
+  margin:8px 0 0!important;
+  padding:5px 8px!important;
+  font-size:11.5px!important;
+  line-height:1.25!important;
 }
+
 #editor .editor-main-card>#wordEditor .question-insert-button,
 #editor .editor-main-card>#questionEditor .question-insert-button,
 #editor .editor-main-card>#dictationEditor .question-insert-button,
 #editor .editor-main-card>#mathEditor .question-insert-button,
 #editor .editor-main-card>#spellingEditor .question-insert-button{
-  margin:5px 0 0 auto!important;
-  padding:6px 10px!important;
-  font-size:12px!important;
-  border-radius:10px!important;
+  margin:7px 0 0 auto!important;
+  padding:8px 13px!important;
+  font-size:13px!important;
+  border-radius:11px!important;
 }
+
 #editor .editor-main-card>#wordEditor .word-parts-section,
 #editor .editor-main-card>#questionEditor .word-parts-section,
 #editor .editor-main-card>#dictationEditor .word-parts-section,
 #editor .editor-main-card>#mathEditor .word-parts-section,
 #editor .editor-main-card>#spellingEditor .word-parts-section{
-  margin:0 0 4px!important;
-  padding:4px 7px!important;
-  border-radius:11px!important;
+  margin:0 0 5px!important;
+  padding:5px 8px!important;
+  border-radius:12px!important;
 }
 #editor .editor-main-card>#wordEditor .word-parts-head,
 #editor .editor-main-card>#questionEditor .word-parts-head,
@@ -123,81 +142,48 @@ css=r'''
   width:38px!important;
   height:38px!important;
 }
+
+@media(max-width:1350px){
+  #editor .editor-main-card>#wordEditor .word-rules-grid{
+    grid-template-columns:125px minmax(320px,2fr) 165px minmax(220px,1.35fr) 180px 78px!important;
+    gap:8px!important;
+  }
+  #editor .editor-main-card>#wordEditor .word-rules-grid label{font-size:14px!important}
+}
 @media(max-width:1100px){
   #editor .editor-main-card>#wordEditor .word-rules-grid{
-    grid-template-columns:minmax(110px,1fr) minmax(150px,1.5fr) minmax(120px,1fr) minmax(150px,1.5fr)!important;
+    grid-template-columns:120px minmax(260px,1.8fr) 165px minmax(180px,1.2fr)!important;
   }
+  #editor .editor-main-card>#wordEditor .word-rules-grid input[type="number"]{width:82px!important}
 }
 @media(max-width:700px){
   #editor .editor-main-card>#wordEditor .word-rules-grid{
-    grid-template-columns:1fr 1fr!important;
+    grid-template-columns:1fr!important;
   }
   #editor .editor-main-card>#wordEditor .word-rules-grid label{white-space:normal!important}
+  #editor .editor-main-card>#wordEditor .word-rules-grid input[type="number"]{width:82px!important}
 }
 '''
 
-js=r'''
-/* TEST V4.61 — restore the insert-row handlers used by the editor buttons */
-function insertLessonRowAfter(button){
-  const current=button?.closest('.editor-row');
-  if(!current)return;
-  const editor=current.parentElement;
-  const type=document.getElementById('lessonType')?.value;
-  const makers={
-    words:()=>addWordRow(),
-    custom:()=>addWordRow(),
-    questions:()=>addQuestionRow(),
-    dictation:()=>addDictationRow(),
-    math:()=>addMathRow(),
-    spelling:()=>addSpellingRow()
-  };
-  const maker=makers[type];
-  if(!maker)return;
-  const beforeLast=editor.lastElementChild;
-  maker();
-  const created=editor.lastElementChild;
-  if(!created||created===beforeLast)return;
-  current.insertAdjacentElement('afterend',created);
-  created.querySelector('input,textarea')?.focus();
-}
-function insertWordQuestionAfter(button){
-  const current=button?.closest('.editor-row');
-  const editor=document.getElementById('wordEditor');
-  if(!current||!editor)return;
-  const questionParts=[...current.querySelectorAll('.word-q-part')].map(()=> '');
-  const answerParts=[...current.querySelectorAll('.word-a-part')].map(r=>({text:'',role:r.closest('.word-part-row')?.querySelector('.word-part-role')?.value||'answer'}));
-  const rules={hint:'',min_words:0,required_terms:[]};
-  addWordRow('', '', questionParts.length?questionParts:[''], answerParts.length?answerParts:[{text:'',role:'answer'}], rules);
-  const created=editor.lastElementChild;
-  if(!created||created===current)return;
-  current.insertAdjacentElement('afterend',created);
-  created.querySelector('.word-q-part')?.focus();
-}
-'''
-
-if '/* TEST V4.61 — compact answer-assessment block + working insert buttons */' not in s:
+if '/* TEST V4.62 — smarter assessment layout: readable hint, required words, minimum words at far right */' not in s:
     s=s.replace('</style>',css+'</style>',1)
-if '/* TEST V4.61 — restore the insert-row handlers used by the editor buttons */' not in s:
-    pos=s.rfind('</script>')
-    if pos<0:
-        raise SystemExit('ERROR: inline script closing tag not found')
-    s=s[:pos]+js+'\n'+s[pos:]
-s=s.replace('<!-- PacoGO TEST V4.60 -->','<!-- PacoGO TEST V4.61 -->',1)
+
+s=s.replace('<!-- PacoGO TEST V4.61 -->','<!-- PacoGO TEST V4.62 -->',1)
 p.write_text(s)
-print('Applied TEST V4.61: compact assessment block and working insert-row handlers.')
+print('Applied TEST V4.62 assessment layout.')
 PY
 python3 - <<'PY'
 from pathlib import Path
 s=Path('index.html').read_text()
-assert '<!-- PacoGO TEST V4.61 -->' in s
-assert 'TEST V4.61 — compact answer-assessment block + working insert buttons' in s
+assert '<!-- PacoGO TEST V4.62 -->' in s
+assert 'TEST V4.62 — smarter assessment layout: readable hint, required words, minimum words at far right' in s
 assert 'function insertLessonRowAfter(button)' in s
 assert 'function insertWordQuestionAfter(button)' in s
 assert s.count('id="lessonSubject"')==1
 assert s.count('id="lessonType"')==1
 assert s.count('id="questionEditor"')==1
-print('CHECK OK: TEST V4.61 version, compact assessment CSS, insert handlers, and key editor IDs.')
+print('CHECK OK: TEST V4.62 version, assessment layout, insert handlers, and key editor IDs.')
 PY
 git add index.html
-git commit -m "TEST V4.61 compact assessment and fix insert button"
+git commit -m "TEST V4.62 improve assessment layout"
 git push origin HEAD:test

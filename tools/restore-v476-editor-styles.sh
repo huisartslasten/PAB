@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 cd "$(dirname "$0")/.."
+git config user.name "PacoGO Bot"
+git config user.email "paco-go-bot@users.noreply.github.com"
 
 python3 - <<'PY'
 from pathlib import Path

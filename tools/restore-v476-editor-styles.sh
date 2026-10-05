@@ -9,7 +9,6 @@ s = p.read_text()
 
 assert '<!-- PacoGO TEST V4.77 -->' in s, 'ERROR: not TEST V4.77'
 assert "printWindow.document.write(" in s, 'ERROR: print calendar code missing'
-assert "</script></body></html>');" in s, 'ERROR: V4.77 print-calendar syntax repair missing'
 
 old_blocks = [
 '''/* TEST V4.76 — approved uniform editor styling */

@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<!-- PacoGO TEST V4.63 -->
+<!-- PacoGO TEST V4.64 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PacoGO!</title>
@@ -1009,6 +1009,15 @@ body{background:#1787f2}
   #editor .editor-main-card>#wordEditor .word-rules-grid > *{grid-column:auto!important;grid-row:auto!important}
   #editor .editor-main-card>#wordEditor .word-rules-grid input[type="number"]{width:82px!important}
 }
+
+/* TEST V4.64 — lesson editor action buttons: remove redundant row button; save left; photo/save swapped at top */
+#editor .pg-v464-hidden-row-add{display:none!important}
+#editor .pg-v464-bottom-actions{display:flex!important;align-items:center!important;gap:16px!important}
+#editor .pg-v464-bottom-actions .pg-v464-save{order:0!important;margin-left:0!important}
+#editor .pg-v464-bottom-actions .pg-v464-photo{order:1!important}
+#editor .pg-v464-top-actions{display:flex!important;align-items:center!important;gap:16px!important}
+#editor .pg-v464-top-actions .pg-v464-save{order:0!important}
+#editor .pg-v464-top-actions .pg-v464-photo{order:1!important}
 </style>
 </head>
 <body>
@@ -2193,7 +2202,57 @@ function printSelectedAgendaMonth(){
   const monthLabel=new Intl.DateTimeFormat('nl-NL',{month:'long',year:'numeric'}).format(monthStart);
   const printWindow=window.open('','_blank','width=1200,height=850');
   if(!printWindow){showMessage('De printpagina kon niet worden geopend. Sta pop-ups toe voor PacoGO.','error');return}
-  printWindow.document.write('<!doctype html><html lang="nl"><head><meta charset="utf-8"><title>PacoGO — '+escapeHtml(printCalendarStudent)+' — '+escapeHtml(monthLabel)+'</title><style>@page{size:A4 landscape !important;margin:10mm}*{box-sizing:border-box}body{font-family:Arial,Nunito,sans-serif;color:#102b57;margin:0;background:#fff}.print-sheet{width:100%;max-width:260mm;margin:0 auto;padding:0 5mm}.head{display:flex;justify-content:space-between;align-items:end;margin-bottom:8mm}.head h1{margin:0;font-size:24px}.head p{margin:3px 0 0;font-size:13px;color:#667894}.head .month{font-size:21px;font-weight:800;text-transform:capitalize}.calendar{display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:auto repeat('+rows+',1fr);border:1px solid #b9cfe3}.weekday{font-weight:800;text-align:center;background:#eef8ff;padding:6px;border-right:1px solid #b9cfe3;border-bottom:1px solid #b9cfe3;font-size:12px}.weekday:last-child{border-right:0}.print-calendar-day{min-height:28mm;padding:5px;border-right:1px solid #cbd8e5;border-bottom:1px solid #cbd8e5;overflow:hidden}.print-calendar-day:nth-child(7n){border-right:0}.print-calendar-day.empty{background:#f7f9fb}.print-calendar-date{font-weight:900;font-size:13px;margin-bottom:3px}.print-calendar-event{font-size:10px;font-weight:700;line-height:1.2;margin:2px 0;padding:3px 4px;border-radius:4px;background:#eef7ff}.print-calendar-event span{display:block;font-weight:500;color:#5d7189;margin-top:1px}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body><div class="print-sheet"><div class="head"><div><h1>🐾 PacoGO — '+escapeHtml(printCalendarStudent)+'</h1><p>Maandkalender</p></div><div class="month">'+escapeHtml(monthLabel)+'</div></div><div class="calendar"><div class="weekday">Maandag</div><div class="weekday">Dinsdag</div><div class="weekday">Woensdag</div><div class="weekday">Donderdag</div><div class="weekday">Vrijdag</div><div class="weekday">Zaterdag</div><div class="weekday">Zondag</div>'+cells.join('')+'</div></div><script>window.onload=function(){window.print()}<\/script></body></html>');
+  printWindow.document.write('<!doctype html><html lang="nl"><head><meta charset="utf-8"><title>PacoGO — '+escapeHtml(printCalendarStudent)+' — '+escapeHtml(monthLabel)+'</title><style>@page{size:A4 landscape !important;margin:10mm}*{box-sizing:border-box}body{font-family:Arial,Nunito,sans-serif;color:#102b57;margin:0;background:#fff}.print-sheet{width:100%;max-width:260mm;margin:0 auto;padding:0 5mm}.head{display:flex;justify-content:space-between;align-items:end;margin-bottom:8mm}.head h1{margin:0;font-size:24px}.head p{margin:3px 0 0;font-size:13px;color:#667894}.head .month{font-size:21px;font-weight:800;text-transform:capitalize}.calendar{display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:auto repeat('+rows+',1fr);border:1px solid #b9cfe3}.weekday{font-weight:800;text-align:center;background:#eef8ff;padding:6px;border-right:1px solid #b9cfe3;border-bottom:1px solid #b9cfe3;font-size:12px}.weekday:last-child{border-right:0}.print-calendar-day{min-height:28mm;padding:5px;border-right:1px solid #cbd8e5;border-bottom:1px solid #cbd8e5;overflow:hidden}.print-calendar-day:nth-child(7n){border-right:0}.print-calendar-day.empty{background:#f7f9fb}.print-calendar-date{font-weight:900;font-size:13px;margin-bottom:3px}.print-calendar-event{font-size:10px;font-weight:700;line-height:1.2;margin:2px 0;padding:3px 4px;border-radius:4px;background:#eef7ff}.print-calendar-event span{display:block;font-weight:500;color:#5d7189;margin-top:1px}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body><div class="print-sheet"><div class="head"><div><h1>🐾 PacoGO — '+escapeHtml(printCalendarStudent)+'</h1><p>Maandkalender</p></div><div class="month">'+escapeHtml(monthLabel)+'</div></div><div class="calendar"><div class="weekday">Maandag</div><div class="weekday">Dinsdag</div><div class="weekday">Woensdag</div><div class="weekday">Donderdag</div><div class="weekday">Vrijdag</div><div class="weekday">Zaterdag</div><div class="weekday">Zondag</div>'+cells.join('')+'</div></div><script>window.onload=function(){window.print()}<\/script>
+<script>
+/* TEST V4.64 — deterministic action-button cleanup/reorder */
+(function(){
+  function norm(t){return (t||'').replace(/[^\p{L}\p{N}]+/gu,' ').trim().toLowerCase();}
+  function findButtons(label){
+    return Array.from(document.querySelectorAll('#editor button')).filter(b=>norm(b.textContent)===label);
+  }
+  function applyV464(){
+    const rowBtns=findButtons('rij toevoegen');
+    const photoBtns=findButtons('maak les van foto');
+    const saveBtns=findButtons('les opslaan');
+
+    // Remove only the redundant editor-level "+ Rij toevoegen" button.
+    const rowBtn=rowBtns[0];
+    if(rowBtn){
+      rowBtn.classList.add('pg-v464-hidden-row-add');
+      const parent=rowBtn.parentElement;
+      if(parent){
+        const save=Array.from(parent.querySelectorAll('button')).find(b=>norm(b.textContent)==='les opslaan');
+        if(save){
+          parent.classList.add('pg-v464-bottom-actions');
+          save.classList.add('pg-v464-save');
+          save.style.order='0';
+          save.style.marginLeft='0';
+        }
+      }
+    }
+
+    // At the top, put LES OPSLAAN before MAAK LES VAN FOTO in their shared action row.
+    const photo=photoBtns[0];
+    if(photo){
+      const parent=photo.parentElement;
+      if(parent){
+        const save=Array.from(parent.querySelectorAll('button')).find(b=>norm(b.textContent)==='les opslaan');
+        if(save){
+          parent.classList.add('pg-v464-top-actions');
+          save.classList.add('pg-v464-save');
+          photo.classList.add('pg-v464-photo');
+          parent.insertBefore(save,photo);
+        }
+      }
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',applyV464);
+  else applyV464();
+  setTimeout(applyV464,300);
+  setTimeout(applyV464,1000);
+})();
+</script>
+</body></html>');
   printWindow.document.close();
 }
 function printAgendaMonthForStudent(name){showPrintCalendar(name)}

@@ -9,45 +9,153 @@ python3 - <<'PY'
 from pathlib import Path
 p=Path('index.html')
 s=p.read_text()
-if 'PacoGO TEST V4.58' not in s:
-    raise SystemExit('ERROR: expected TEST V4.58 checkpoint not found')
-start=s.find('<div class="editor-top-grid">')
-spelling=s.find('<div id="spellingLabelsEditor"',start)
-ai=s.find('<div id="lessonAiBox"',start)
-if start<0 or spelling<0 or ai<0 or not (start<ai<spelling):
-    raise SystemExit('ERROR: expected editor top block markers not found')
-ai_block=s[ai:spelling]
-canonical='''<div class="editor-top-grid">
-  <div class="editor-top-left">
-    <div class="field"><label for="lessonSubject">Vak</label><input id="lessonSubject" placeholder="Voer vak in bijvoorbeeld Nederlands"></div>
-    <div class="field"><label for="lessonSubvak">Subvak <span class="small">(optioneel)</span></label><input id="lessonSubvak" placeholder="Bijvoorbeeld Themawoorden of Spelling"></div>
-    <div class="field"><label for="lessonName">Naam van de les</label><input id="lessonName" placeholder="Bijvoorbeeld Week 4"></div>
-  </div>
-  <div class="editor-top-right">
-    <div class="field"><label for="lessonType">Onderdeel</label><div class="lesson-type-select"><button type="button" id="lessonTypeButton" class="lesson-type-button" onclick="toggleLessonTypeMenu()"><span id="lessonTypeButtonText">🎯 Woordtrainer</span><span class="lesson-type-chevron">⌄</span></button><div id="lessonTypeMenu" class="lesson-type-menu hidden"><button type="button" onclick="setLessonType('words')">🎯 Woordtrainer</button><button type="button" onclick="setLessonType('questions')">❓ Vragen</button><button type="button" onclick="setLessonType('dictation')">✏️ Dictee</button><button type="button" onclick="setLessonType('math')">🔢 Rekenen</button><button type="button" onclick="setLessonType('spelling')">✍️ Spelling</button><button type="button" onclick="setLessonType('custom')">🛠️ Eigen les</button></div><select id="lessonType" class="lesson-type-native" tabindex="-1" aria-hidden="true"><option value="words">words</option><option value="questions">questions</option><option value="dictation">dictation</option><option value="math">math</option><option value="spelling">spelling</option><option value="custom">custom</option></select></div></div>
-    <div class="lesson-test-date-box"><label class="lesson-test-date-toggle"><input id="lessonTestDateEnabled" type="checkbox" onchange="toggleLessonTestDate()"> 📅 Toetsdatum instellen</label><div class="small" style="margin-top:5px">Optioneel. Alleen instellen als er al een toetsdatum bekend is.</div><input id="lessonTestDate" type="hidden"><div id="lessonTestDatePicker" class="date-picker lesson-test-date-picker hidden"></div></div>
-    <div class="field"><label for="lessonExplanation">Uitleg <span class="small">(optioneel)</span></label><textarea id="lessonExplanation" placeholder="Leg hier de leerstof of regel uit. Dit wordt apart boven de oefeningen getoond."></textarea></div>
-  </div>
-</div>
+if 'PacoGO TEST V4.59' not in s:
+    raise SystemExit('ERROR: expected TEST V4.59 checkpoint not found')
+css='''
+/* TEST V4.60 — compact question/answer editor rows */
+#editor .editor-main-card>#wordEditor .editor-row,
+#editor .editor-main-card>#questionEditor .editor-row,
+#editor .editor-main-card>#dictationEditor .editor-row,
+#editor .editor-main-card>#mathEditor .editor-row,
+#editor .editor-main-card>#spellingEditor .editor-row{
+  padding:7px 10px 7px 54px!important;
+  margin:6px 0!important;
+}
+#editor .editor-main-card>#wordEditor .word-parts-section,
+#editor .editor-main-card>#questionEditor .word-parts-section,
+#editor .editor-main-card>#dictationEditor .word-parts-section,
+#editor .editor-main-card>#mathEditor .word-parts-section,
+#editor .editor-main-card>#spellingEditor .word-parts-section{
+  display:grid!important;
+  grid-template-columns:78px minmax(0,1fr) auto!important;
+  align-items:center!important;
+  column-gap:8px!important;
+  row-gap:3px!important;
+  margin:0 0 5px!important;
+  padding:5px 7px!important;
+  border-radius:12px!important;
+}
+#editor .editor-main-card>#wordEditor .word-parts-section:last-child,
+#editor .editor-main-card>#questionEditor .word-parts-section:last-child,
+#editor .editor-main-card>#dictationEditor .word-parts-section:last-child,
+#editor .editor-main-card>#mathEditor .word-parts-section:last-child,
+#editor .editor-main-card>#spellingEditor .word-parts-section:last-child{margin-bottom:0!important}
+#editor .editor-main-card>#wordEditor .word-parts-head,
+#editor .editor-main-card>#questionEditor .word-parts-head,
+#editor .editor-main-card>#dictationEditor .word-parts-head,
+#editor .editor-main-card>#mathEditor .word-parts-head,
+#editor .editor-main-card>#spellingEditor .word-parts-head{
+  padding:0!important;
+  margin:0!important;
+  border-bottom:0!important;
+}
+#editor .editor-main-card>#wordEditor .word-parts-head label,
+#editor .editor-main-card>#questionEditor .word-parts-head label,
+#editor .editor-main-card>#dictationEditor .word-parts-head label,
+#editor .editor-main-card>#mathEditor .word-parts-head label,
+#editor .editor-main-card>#spellingEditor .word-parts-head label{font-size:15px!important;white-space:nowrap}
+#editor .editor-main-card>#wordEditor .word-question-parts,
+#editor .editor-main-card>#questionEditor .word-question-parts,
+#editor .editor-main-card>#dictationEditor .word-question-parts,
+#editor .editor-main-card>#mathEditor .word-question-parts,
+#editor .editor-main-card>#spellingEditor .word-question-parts,
+#editor .editor-main-card>#wordEditor .word-answer-parts,
+#editor .editor-main-card>#questionEditor .question-answer-parts,
+#editor .editor-main-card>#dictationEditor .dictation-answer-parts,
+#editor .editor-main-card>#mathEditor .math-answer-parts,
+#editor .editor-main-card>#spellingEditor .spelling-answer-parts{min-width:0}
+#editor .editor-main-card>#wordEditor .word-part-row,
+#editor .editor-main-card>#questionEditor .word-part-row,
+#editor .editor-main-card>#dictationEditor .word-part-row,
+#editor .editor-main-card>#mathEditor .word-part-row,
+#editor .editor-main-card>#spellingEditor .word-part-row{
+  margin:0!important;
+  gap:6px!important;
+}
+#editor .editor-main-card>#wordEditor .word-question-parts .word-part-row,
+#editor .editor-main-card>#questionEditor .word-question-parts .word-part-row,
+#editor .editor-main-card>#dictationEditor .word-question-parts .word-part-row,
+#editor .editor-main-card>#mathEditor .word-question-parts .word-part-row,
+#editor .editor-main-card>#spellingEditor .word-question-parts .word-part-row{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 42px!important;
+  grid-template-areas:"input remove"!important;
+}
+#editor .editor-main-card>#wordEditor .word-answer-parts .word-part-row,
+#editor .editor-main-card>#questionEditor .question-answer-parts .word-part-row,
+#editor .editor-main-card>#dictationEditor .dictation-answer-parts .word-part-row,
+#editor .editor-main-card>#mathEditor .math-answer-parts .word-part-row,
+#editor .editor-main-card>#spellingEditor .spelling-answer-parts .word-part-row{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 170px 42px!important;
+  grid-template-areas:"input role remove"!important;
+  align-items:center!important;
+}
+#editor .editor-main-card>#wordEditor .word-part-role-select,
+#editor .editor-main-card>#questionEditor .word-part-role-select,
+#editor .editor-main-card>#dictationEditor .word-part-role-select,
+#editor .editor-main-card>#mathEditor .word-part-role-select,
+#editor .editor-main-card>#spellingEditor .word-part-role-select{grid-area:role!important}
+#editor .editor-main-card>#wordEditor .word-part-role-button,
+#editor .editor-main-card>#questionEditor .word-part-role-button,
+#editor .editor-main-card>#dictationEditor .word-part-role-button,
+#editor .editor-main-card>#mathEditor .word-part-role-button,
+#editor .editor-main-card>#spellingEditor .word-part-role-button{height:40px!important;padding:7px 10px!important;font-size:12px!important}
+#editor .editor-main-card>#wordEditor .word-part-remove,
+#editor .editor-main-card>#questionEditor .word-part-remove,
+#editor .editor-main-card>#dictationEditor .word-part-remove,
+#editor .editor-main-card>#mathEditor .word-part-remove,
+#editor .editor-main-card>#spellingEditor .word-part-remove{width:40px!important;height:40px!important}
+#editor .editor-main-card>#wordEditor .word-parts-section .word-add-line,
+#editor .editor-main-card>#questionEditor .word-parts-section .word-add-line,
+#editor .editor-main-card>#dictationEditor .word-parts-section .word-add-line,
+#editor .editor-main-card>#mathEditor .word-parts-section .word-add-line,
+#editor .editor-main-card>#spellingEditor .word-parts-section .word-add-line{
+  margin:0!important;
+  padding:6px 9px!important;
+  font-size:12px!important;
+  white-space:nowrap;
+}
+#editor .editor-main-card>#wordEditor .word-extra-note,
+#editor .editor-main-card>#questionEditor .word-extra-note,
+#editor .editor-main-card>#dictationEditor .word-extra-note,
+#editor .editor-main-card>#mathEditor .word-extra-note,
+#editor .editor-main-card>#spellingEditor .word-extra-note{
+  grid-column:2/-1!important;
+  margin:1px 0 0!important;
+  padding:4px 7px!important;
+  font-size:11px!important;
+  line-height:1.2!important;
+}
+@media(max-width:700px){
+  #editor .editor-main-card>#wordEditor .word-parts-section,
+  #editor .editor-main-card>#questionEditor .word-parts-section,
+  #editor .editor-main-card>#dictationEditor .word-parts-section,
+  #editor .editor-main-card>#mathEditor .word-parts-section,
+  #editor .editor-main-card>#spellingEditor .word-parts-section{grid-template-columns:64px minmax(0,1fr) auto!important}
+  #editor .editor-main-card>#wordEditor .word-answer-parts .word-part-row,
+  #editor .editor-main-card>#questionEditor .question-answer-parts .word-part-row,
+  #editor .editor-main-card>#dictationEditor .dictation-answer-parts .word-part-row,
+  #editor .editor-main-card>#mathEditor .math-answer-parts .word-part-row,
+  #editor .editor-main-card>#spellingEditor .spelling-answer-parts .word-part-row{grid-template-columns:minmax(0,1fr) 130px 40px!important}
+}
 '''
-s=s[:start]+canonical+ai_block+s[spelling:]
-css='''\n/* TEST V4.59 — questions/answers full width */\n#editor .editor-main-card>#wordEditor,\n#editor .editor-main-card>#questionEditor,\n#editor .editor-main-card>#dictationEditor,\n#editor .editor-main-card>#mathEditor,\n#editor .editor-main-card>#spellingEditor{\n  width:100%!important;\n  max-width:none!important;\n  display:block!important;\n  grid-column:1/-1!important;\n  margin-left:0!important;\n  margin-right:0!important;\n}\n#editor .editor-main-card>#wordEditor .editor-row,\n#editor .editor-main-card>#questionEditor .editor-row,\n#editor .editor-main-card>#dictationEditor .editor-row,\n#editor .editor-main-card>#mathEditor .editor-row,\n#editor .editor-main-card>#spellingEditor .editor-row{\n  width:100%!important;\n  max-width:none!important;\n  margin-left:0!important;\n  margin-right:0!important;\n}\n'''
-if '/* TEST V4.59 — questions/answers full width */' not in s:
+if '/* TEST V4.60 — compact question/answer editor rows */' not in s:
     s=s.replace('</style>',css+'</style>',1)
-s=s.replace('PacoGO TEST V4.58','PacoGO TEST V4.59')
+s=s.replace('PacoGO TEST V4.59','PacoGO TEST V4.60')
 p.write_text(s)
-print('Applied TEST V4.59: canonical editor top structure + full-width question/answer editors.')
+print('Applied TEST V4.60: compact question and answer sections without changing their functionality.')
 PY
 python3 - <<'PY'
 from pathlib import Path
 s=Path('index.html').read_text()
-assert 'PacoGO TEST V4.59' in s
-assert s.count('<div class="editor-top-grid">')==1
-for x in ['lessonSubject','lessonSubvak','lessonName','lessonType','lessonExplanation','lessonAiBox','wordEditor']:
-    assert s.count('id="'+x+'"')==1, x
-assert 'TEST V4.59 — questions/answers full width' in s
-print('CHECK OK: TEST V4.59 canonical editor structure and full-width question/answer selectors.')
+assert 'PacoGO TEST V4.60' in s
+assert 'TEST V4.60 — compact question/answer editor rows' in s
+assert s.count('id="lessonSubject"')==1
+assert s.count('id="lessonType"')==1
+assert s.count('id="questionEditor"')==1
+print('CHECK OK: TEST V4.60 version, compact editor CSS, and key editor IDs.')
 PY
 git add index.html
-git commit -m "TEST V4.59 canonical editor structure and full width"
+git commit -m "TEST V4.60 compact question and answer rows"
 git push origin HEAD:test

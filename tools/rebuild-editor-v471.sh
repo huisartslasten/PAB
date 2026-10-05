@@ -25,3 +25,5 @@ git add index.html
 git diff --cached --check
 git commit -m "TEST V4.71 give required words proper space"
 git push origin HEAD:test
+
+# Triggered from TEST after the editor-layout review.

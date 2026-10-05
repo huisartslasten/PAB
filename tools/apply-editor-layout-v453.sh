@@ -5,6 +5,9 @@ cd "$(dirname "$0")/.."
 git checkout test
 git pull origin test
 
+git config user.name "PacoGO Bot"
+git config user.email "paco-go-bot@users.noreply.github.com"
+
 python3 - <<'PY'
 from pathlib import Path
 p=Path('index.html')

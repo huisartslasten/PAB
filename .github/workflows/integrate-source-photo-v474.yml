@@ -1,0 +1,29 @@
+name: PacoGO TEST V4.74 source photo integration
+
+on:
+  push:
+    branches: [test]
+    paths:
+      - 'tools/integrate-source-photo-v474.sh'
+      - '.github/workflows/integrate-source-photo-v474.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: test
+          fetch-depth: 0
+      - name: Apply direct integration
+        run: bash tools/integrate-source-photo-v474.sh
+      - name: Commit index
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'PacoGO TEST V4.74 direct source photo integration' || exit 0
+          git push origin test

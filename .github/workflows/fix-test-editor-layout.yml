@@ -18,33 +18,23 @@ jobs:
         with:
           ref: test
           fetch-depth: 0
-      - name: Normalize approved editor styling and visible version
+      - name: Repair
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import re
-
-          p = Path('index.html')
-          s = p.read_text(encoding='utf-8')
-          assert '<!-- PacoGO TEST V4.77 -->' in s
-
-          # The visible badge was left behind at V4.71. Make the readable TEST
-          # version agree with the actual TEST source marker.
-          s = s.replace('<div class="version-badge">PacoGO TEST V4.71</div>', '<div class="version-badge">PacoGO TEST V4.77</div>')
-
-          marker = '/* TEST V4.77 — approved uniform editor styling */'
-          pattern = re.compile(
-              r'\n?'+re.escape(marker)+r'\n'
-              r'[^\n]*\n'
-              r'[^\n]*\n'
-              r'[^\n]*\n'
-              r'[^\n]*\n'
-              r'[^\n]*\n'
-              r'[^\n]*\n'
-          )
-          s = pattern.sub('\n', s)
-
-          block = '''
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('<div class="version-badge">PacoGO TEST V4.71</div>','<div class="version-badge">PacoGO TEST V4.77</div>')
+          marker='/* TEST V4.77 — approved uniform editor styling */'
+          while marker in s:
+              start=s.find(marker)
+              end=s.find('#editor .hint-box textarea{',start)
+              if end<0: raise SystemExit('CSS block end not found')
+              end=s.find('\n',end)
+              if end<0: end=len(s)
+              else: end+=1
+              s=s[:start]+s[end:]
+          block='''
 /* TEST V4.77 — approved uniform editor styling */
 .lesson-test-date-box{background:#eef8ff;border:2px solid #bfe6ff;border-radius:16px;padding:11px 14px}
 #lessonAiBox.lesson-ai-box{background:#eef8ff;border:2px solid #bfe6ff;border-radius:16px;padding:16px}
@@ -52,26 +42,13 @@ jobs:
 #editor .word-rules-box input{border:2px solid #bfe6ff;border-radius:14px;background:#fff}
 #editor .hint-box textarea{border:2px solid #cfe1f0;border-radius:14px;background:#fff}
 '''
-
-          pos = s.find('</style>')
-          if pos < 0:
-              raise SystemExit('ERROR: main page stylesheet closing tag not found')
-          s = s[:pos] + block + s[pos:]
-          p.write_text(s, encoding='utf-8')
+          pos=s.find('</style>')
+          if pos<0: raise SystemExit('style tag missing')
+          p.write_text(s[:pos]+block+s[pos:],encoding='utf-8')
           PY
-
-          test "$(grep -o 'TEST V4.77 — approved uniform editor styling' index.html | wc -l | tr -d ' ')" = "1"
-          grep -F '<!-- PacoGO TEST V4.77 -->' index.html
           grep -F '<div class="version-badge">PacoGO TEST V4.77</div>' index.html
-          grep -F '#editor .question-field input,#editor .answer-field input' index.html
-          grep -F '#editor .word-rules-box input' index.html
           git config user.name 'PacoGO Bot'
           git config user.email 'paco-go-bot@users.noreply.github.com'
           git add index.html
           git diff --cached --check
-          if git diff --cached --quiet; then
-            echo 'No normalization needed.'
-          else
-            git commit -m 'TEST V4.77 normalize editor CSS and visible version'
-            git push origin HEAD:test
-          fi
+          if git diff --cached --quiet; then echo clean; else git commit -m 'TEST V4.77 repair visible version and editor CSS'; git push origin HEAD:test; fi

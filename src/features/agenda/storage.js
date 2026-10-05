@@ -1,19 +1,23 @@
-const DEFAULT_KEY = 'pacogo_agenda';
+// Storage adapter only. The V4.78 agenda persistence contract is not assumed here.
+// The caller must provide the exact storage key once it has been verified.
 
-export function createAgendaStorage({ storage = globalThis.localStorage, key = DEFAULT_KEY } = {}) {
+export function createAgendaStorage({ storage = globalThis.localStorage, key } = {}) {
+  if (!key) throw new Error('createAgendaStorage requires the verified storage key');
+
+  function readAll() {
+    try { return JSON.parse(storage?.getItem(key) || '{}'); }
+    catch { return {}; }
+  }
+
   function getItems(student) {
     if (!storage || !student) return [];
-    try {
-      const all = JSON.parse(storage.getItem(key) || '{}');
-      return Array.isArray(all[student]) ? all[student] : [];
-    } catch {
-      return [];
-    }
+    const all = readAll();
+    return Array.isArray(all[student]) ? all[student] : [];
   }
 
   function saveItems(items, student) {
     if (!storage || !student) return;
-    const all = JSON.parse(storage.getItem(key) || '{}');
+    const all = readAll();
     all[student] = Array.isArray(items) ? items : [];
     storage.setItem(key, JSON.stringify(all));
   }

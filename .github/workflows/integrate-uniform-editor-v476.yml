@@ -1,10 +1,6 @@
 name: PacoGO TEST V4.76 uniform editor
 
-on:
-  push:
-    branches: [test]
-    paths:
-      - '.github/workflows/integrate-uniform-editor-v476.yml'
+on: push
 
 permissions:
   contents: write
@@ -18,7 +14,7 @@ jobs:
         with:
           ref: test
 
-      - name: Apply approved editor styling
+      - name: Apply approved uniform editor styling
         shell: bash
         run: |
           python3 - <<'PY'
@@ -55,15 +51,11 @@ jobs:
           grep -q '#editor .word-rules-box input' index.html
           grep -q '#lessonAiBox.lesson-ai-box' index.html
 
-      - name: Commit TEST V4.76 and remove integration workflow
+      - name: Commit TEST V4.76
         shell: bash
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git commit -m 'TEST V4.76 uniform editor styling' || true
-          git rm .github/workflows/integrate-uniform-editor-v476.yml
-          git commit -m 'Remove TEST V4.76 integration workflow'
+          git commit -m 'TEST V4.76 uniform editor styling'
           git push origin test
-
-# TEST V4.76 trigger

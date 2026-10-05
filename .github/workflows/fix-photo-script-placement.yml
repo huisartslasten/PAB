@@ -1,0 +1,46 @@
+name: PacoGO TEST fix photo script placement
+
+on:
+  push:
+    branches: [test]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: ${{ !contains(github.event.head_commit.message, 'PacoGO TEST fix photo script placement applied') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Repair index.html safely
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('index.html')
+          text = p.read_text(encoding='utf-8')
+          bad = '</script>  <script src="photo-storage.js"></script>\n</body></html>');'
+          # The previous patch accidentally inserted the external script inside the printWindow string.
+          if '  <script src="photo-storage.js"></script>\n</body></html>');' in text:
+              text = text.replace('  <script src="photo-storage.js"></script>\n</body></html>');', '</body></html>');', 1)
+          elif '  <script src="photo-storage.js"></script>\n</body></html>');' not in text:
+              raise SystemExit('Expected misplaced photo-storage script was not found; refusing to change index.html')
+          if 'src="photo-storage.js"' in text:
+              raise SystemExit('Photo-storage script still appears in an unexpected location; refusing to change index.html')
+          marker = '<!-- PacoGO TEST V4.72 -->'
+          if marker not in text:
+              raise SystemExit('Expected V4.72 marker not found; refusing to change index.html')
+          text = text.replace(marker, '<!-- PacoGO TEST V4.73 -->', 1)
+          pos = text.rfind('</body>')
+          if pos < 0:
+              raise SystemExit('Final </body> not found; refusing to change index.html')
+          text = text[:pos] + '  <script src="photo-storage.js"></script>\n' + text[pos:]
+          p.write_text(text, encoding='utf-8')
+      - name: Commit and remove one-time workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git rm .github/workflows/fix-photo-script-placement.yml
+          git commit -m 'PacoGO TEST fix photo script placement applied'
+          git push origin test

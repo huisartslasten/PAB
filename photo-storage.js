@@ -16,7 +16,8 @@
     const prepared=await compressPhoto(file),ext=prepared.type==='image/png'?'png':'jpg',path='lessons/'+String(lessonId)+'/'+crypto.randomUUID()+'.'+ext;
     const upload=await db.storage.from(BUCKET).upload(path,prepared,{contentType:prepared.type,cacheControl:'31536000',upsert:false});
     if(upload.error)throw upload.error;
-    const inserted=await db.from('lesson_photos').insert({lesson_id:Number(lessonId),storage_path:path,original_name:file.name||'bronfoto',mime_type:prepared.type,size_bytes:prepared.size,created_by:currentSession?.user?.id||null}).select('id,lesson_id,storage_path,original_name,mime_type,size_bytes,created_at').single();
+    const createdBy=typeof currentSession!=='undefined'?(currentSession?.user?.id||null):null;
+    const inserted=await db.from('lesson_photos').insert({lesson_id:Number(lessonId),storage_path:path,original_name:file.name||'bronfoto',mime_type:prepared.type,size_bytes:prepared.size,created_by:createdBy}).select('id,lesson_id,storage_path,original_name,mime_type,size_bytes,created_at').single();
     if(inserted.error){await db.storage.from(BUCKET).remove([path]);throw inserted.error}
     return inserted.data
   }
@@ -44,7 +45,7 @@
     panel.classList.remove('hidden');panel.innerHTML='<div class="small">📷 Bronfoto\'s laden...</div>';
     const photos=await loadPhotos(lessonId);
     if(!photos.length){panel.innerHTML='<div class="lesson-photos-head"><div><h3>📷 Bronfoto</h3><div class="small">Aan deze les is nog geen bronfoto gekoppeld.</div></div><button type="button" class="secondary" onclick="openExistingLessonPhotoPicker()">➕ Foto toevoegen</button></div>';return}
-    panel.innerHTML='<div class="lesson-photos-head"><div><h3>📷 Bronfoto'+(photos.length===1?'':\'s\')+'</h3><div class="small">Opgeslagen in PacoGO Storage.</div></div><button type="button" class="secondary" onclick="openExistingLessonPhotoPicker()">➕ Foto toevoegen</button></div><div class="lesson-photos-grid">'+photos.map(p=>'<figure class="lesson-photo-card">'+(p.url?'<a href="'+esc(p.url)+'" target="_blank" rel="noopener"><img src="'+esc(p.url)+'" alt="Bronfoto"></a>':'<div class="lesson-photo-missing">Foto niet beschikbaar</div>')+'<figcaption><span>'+esc(p.original_name||'Bronfoto')+'</span><button type="button" class="danger" onclick="deleteLessonPhoto('+Number(p.id)+','+JSON.stringify(p.storage_path)+')">🗑️ Verwijderen</button></figcaption></figure>').join('')+'</div>'
+    panel.innerHTML='<div class="lesson-photos-head"><div><h3>📷 Bronfoto'+(photos.length===1?'':"'s")+'</h3><div class="small">Opgeslagen in PacoGO Storage.</div></div><button type="button" class="secondary" onclick="openExistingLessonPhotoPicker()">➕ Foto toevoegen</button></div><div class="lesson-photos-grid">'+photos.map(p=>'<figure class="lesson-photo-card">'+(p.url?'<a href="'+esc(p.url)+'" target="_blank" rel="noopener"><img src="'+esc(p.url)+'" alt="Bronfoto"></a>':'<div class="lesson-photo-missing">Foto niet beschikbaar</div>')+'<figcaption><span>'+esc(p.original_name||'Bronfoto')+'</span><button type="button" class="danger" onclick="deleteLessonPhoto('+Number(p.id)+','+JSON.stringify(p.storage_path)+')">🗑️ Verwijderen</button></figcaption></figure>').join('')+'</div>'
   }
   async function addPhotoToCurrentLesson(file){
     if(!canManage()||!currentLesson||!file)return;

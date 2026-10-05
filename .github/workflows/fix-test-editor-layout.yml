@@ -20,3 +20,4 @@ jobs:
           fetch-depth: 0
       - name: Apply selector correction
         run: bash tools/fix-editor-layout-v453.sh
+      # TEST V4.58 — force application of the current editor-layout script

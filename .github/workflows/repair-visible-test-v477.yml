@@ -1,0 +1,23 @@
+name: One-time PacoGO TEST V4.77 repair
+
+on:
+  push:
+    branches: [test]
+    paths:
+      - '.github/workflows/repair-visible-test-v477.yml'
+      - 'index.html'
+      - 'tools/repair-visible-test-v477.sh'
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: test
+          fetch-depth: 0
+      - name: Repair readable TEST source
+        run: bash tools/repair-visible-test-v477.sh

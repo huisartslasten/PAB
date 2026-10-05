@@ -467,6 +467,13 @@ body{background:#1787f2}
 #editor .editor-main-card>#wordEditor .editor-row>.word-parts-section,#editor .editor-main-card>#questionEditor .editor-row>.word-parts-section{margin-bottom:0}
 @media(max-width:900px){#editor .editor-main-card{grid-template-columns:1fr 1fr}#editor .editor-main-card>.field{grid-column:span 1}#editor .editor-main-card>.field:nth-of-type(4),#editor .editor-main-card>.editor-type-box{grid-column:1/-1}}
 @media(max-width:700px){#editor .editor-main-card{display:block}#editor .editor-main-card>.field,#editor .editor-main-card>.editor-type-box{margin-bottom:12px}#editor .editor-main-card>#wordEditor .editor-row,#editor .editor-main-card>#questionEditor .editor-row{display:block}}
+
+/* TEST V4.53 — editor layout selector correction */
+#editor .editor-main-card>.field{grid-column:span 2}
+#editor .editor-main-card>.field:nth-child(6){grid-column:span 6}
+#editor .editor-main-card>.editor-type-box{grid-column:span 6}
+@media(max-width:900px){#editor .editor-main-card>.field{grid-column:span 1}#editor .editor-main-card>.field:nth-child(6),#editor .editor-main-card>.editor-type-box{grid-column:1/-1}}
+@media(max-width:700px){#editor .editor-main-card>.field,#editor .editor-main-card>.field:nth-child(6),#editor .editor-main-card>.editor-type-box{margin-bottom:12px}}
 </style>
 </head>
 <body>

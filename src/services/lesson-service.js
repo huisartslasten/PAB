@@ -22,6 +22,16 @@ export function createLessonService(db) {
       }));
     },
 
+    async createLesson(payload) {
+      const { data, error } = await db
+        .from('lessons')
+        .insert(payload)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+
     async updateLesson(id, payload) {
       const { data, error } = await db
         .from('lessons')

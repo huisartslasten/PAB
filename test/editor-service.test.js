@@ -1,3 +1,4 @@
+import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createEditorService } from '../src/features/lessons/editor-service.js';
 
@@ -9,12 +10,12 @@ function mockDb() {
       calls.push({ op: 'from', table });
       return {
         insert(rows) {
-          calls.push({ op: 'insert', rows });
+          calls.push({ op: 'insert', table, rows });
           return {
             select() {
               return {
                 single() {
-                  calls.push({ op: 'single-after-insert' });
+                  calls.push({ op: 'single-after-insert', table });
                   return Promise.resolve({ data: { id: 42 }, error: null });
                 }
               };
@@ -22,24 +23,27 @@ function mockDb() {
           };
         },
         update(payload) {
-          calls.push({ op: 'update', payload });
+          calls.push({ op: 'update', table, payload });
           return {
             eq(column, value) {
-              calls.push({ op: 'eq-update', column, value });
+              calls.push({ op: 'eq-update', table, column, value });
               return { select: () => ({ single: () => Promise.resolve({ data: { id: value }, error: null }) }) };
             }
           };
         },
         delete() {
-          calls.push({ op: 'delete' });
-          return { eq: () => Promise.resolve({ error: null }) };
+          calls.push({ op: 'delete', table });
+          return { eq: (column, value) => {
+            calls.push({ op: 'eq-delete', table, column, value });
+            return Promise.resolve({ error: null });
+          } };
         }
       };
     }
   };
 }
 
-test('new editor save uses lesson service create flow', async () => {
+test('new editor save creates lesson, then replaces its items', async () => {
   const db = mockDb();
   const service = createEditorService(db);
   const result = await service.saveDraft({
@@ -48,10 +52,13 @@ test('new editor save uses lesson service create flow', async () => {
   });
 
   assert.equal(result.lessonId, 42);
-  assert.deepEqual(db.calls.filter(x => ['insert', 'delete'].includes(x.op)).map(x => x.op), ['insert', 'delete']);
+  assert.deepEqual(
+    db.calls.filter(x => ['insert', 'delete'].includes(x.op)).map(x => `${x.op}:${x.table}`),
+    ['insert:lessons', 'delete:lesson_items', 'insert:lesson_items']
+  );
 });
 
-test('existing editor save updates lesson then replaces items', async () => {
+test('existing editor save updates lesson, then replaces its items', async () => {
   const db = mockDb();
   const service = createEditorService(db);
   const result = await service.saveDraft({
@@ -61,5 +68,8 @@ test('existing editor save updates lesson then replaces items', async () => {
   });
 
   assert.equal(result.lessonId, 7);
-  assert.deepEqual(db.calls.filter(x => ['update', 'delete'].includes(x.op)).map(x => x.op), ['update', 'delete']);
+  assert.deepEqual(
+    db.calls.filter(x => ['update', 'delete', 'insert'].includes(x.op)).map(x => `${x.op}:${x.table}`),
+    ['update:lessons', 'delete:lesson_items', 'insert:lesson_items']
+  );
 });

@@ -11,36 +11,39 @@ from pathlib import Path
 p = Path('index.html')
 s = p.read_text()
 
-assert '<!-- PacoGO TEST V4.76 -->' in s
+assert '<!-- PacoGO TEST V4.77 -->' in s, 'ERROR: expected current TEST V4.77'
+assert "printWindow.document.write(" in s, 'ERROR: print calendar code missing'
+assert "</script></body></html>');" in s, 'ERROR: print calendar syntax repair missing'
+
 marker = '/* TEST V4.76 — approved uniform editor styling */'
-assert marker in s, 'ERROR: V4.76 styling block not found'
-
-# The V4.76 styling block was accidentally inserted inside the single-quoted
-# printWindow.document.write() JavaScript string. Remove it from that string.
-block_start = s.find(marker)
-style_end = s.find('</style>', block_start)
-assert style_end >= 0, 'ERROR: end of misplaced V4.76 style block not found'
-s = s[:block_start] + s[style_end:]
-
-# Put the approved styling in the real page <style> block, where CSS belongs.
-css = '''
-/* TEST V4.77 — approved uniform editor styling */
+if marker not in s:
+    css = '''
+/* TEST V4.76 — approved uniform editor styling */
 .lesson-test-date-box{background:#eef8ff;border:2px solid #bfe6ff;border-radius:16px;padding:11px 14px}
 #lessonAiBox.lesson-ai-box{background:#eef8ff;border:2px solid #bfe6ff;border-radius:16px;padding:16px}
 #editor .question-field input,#editor .answer-field input,#editor .question-field textarea,#editor .answer-field textarea{border:2px solid #bfe6ff;border-radius:14px;background:#fff}
 #editor .word-rules-box input{border:2px solid #bfe6ff;border-radius:14px;background:#fff}
 #editor .hint-box textarea{border:2px solid #cfe1f0;border-radius:14px;background:#fff}
 '''
-head_style_end = s.find('</style>')
-assert head_style_end >= 0, 'ERROR: main page style block not found'
-s = s[:head_style_end] + css + s[head_style_end:]
+    idx = s.find('</style>')
+    if idx < 0:
+        raise SystemExit('ERROR: main page style block not found')
+    s = s[:idx] + css + s[idx:]
 
-s = s.replace('<!-- PacoGO TEST V4.76 -->', '<!-- PacoGO TEST V4.77 -->', 1)
+for token in [
+    '.lesson-test-date-box{background:#eef8ff;border:2px solid #bfe6ff;border-radius:16px;padding:11px 14px}',
+    '#lessonAiBox.lesson-ai-box{background:#eef8ff;border:2px solid #bfe6ff;border-radius:16px;padding:16px}',
+    '#editor .question-field input,#editor .answer-field input,#editor .question-field textarea,#editor .answer-field textarea{border:2px solid #bfe6ff;border-radius:14px;background:#fff}',
+    '#editor .word-rules-box input{border:2px solid #bfe6ff;border-radius:14px;background:#fff}',
+    '#editor .hint-box textarea{border:2px solid #cfe1f0;border-radius:14px;background:#fff}',
+]:
+    assert s.count(token) == 1, f'ERROR: duplicate or missing editor style: {token}'
+
+assert marker in s
 p.write_text(s)
-
-print('TEST V4.77 source repaired: uniform editor CSS moved out of printWindow.document.write() and into the real page stylesheet.')
+print('OK: TEST V4.77 now contains the approved V4.76 editor styling in the real page stylesheet; print-calendar syntax is preserved.')
 PY
 
 git add index.html
 git diff --cached --check
-git diff --cached --quiet || { git commit -m "TEST V4.77 repair editor CSS placement"; git push origin HEAD:test; }
+git diff --cached --quiet || { git commit -m "TEST V4.77 restore approved editor styling"; git push origin HEAD:test; }

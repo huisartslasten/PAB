@@ -2,11 +2,12 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
-git checkout test
-git pull origin test
 
 git config user.name "PacoGO Bot"
 git config user.email "paco-go-bot@users.noreply.github.com"
+
+git fetch origin test
+git checkout -B test origin/test
 
 python3 - <<'PY'
 from pathlib import Path
@@ -36,7 +37,7 @@ PY
 
 git add index.html
 git commit -m "TEST V4.53 compact lesson editor layout"
-git push origin test
+git push origin HEAD:test
 
 echo
 echo 'Klaar. Start TEST lokaal met:'

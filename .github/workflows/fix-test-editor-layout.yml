@@ -1,0 +1,22 @@
+name: Fix TEST editor layout
+
+on:
+  push:
+    branches: [test]
+    paths:
+      - 'tools/fix-editor-layout-v453.sh'
+      - '.github/workflows/fix-test-editor-layout.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: test
+          fetch-depth: 0
+      - name: Apply selector correction
+        run: bash tools/fix-editor-layout-v453.sh

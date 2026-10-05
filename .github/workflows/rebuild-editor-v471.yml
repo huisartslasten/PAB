@@ -1,5 +1,7 @@
 name: Rebuild TEST editor V4.71 clean
 
+# Triggered on TEST so the rebuild is applied to index.html.
+
 on:
   push:
     branches: [test]

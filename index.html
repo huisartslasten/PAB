@@ -482,6 +482,23 @@ body{background:#1787f2}
 #editor .editor-main-card>.editor-type-box{grid-column:span 6}
 @media(max-width:900px){#editor .editor-main-card>.field{grid-column:span 1}#editor .editor-main-card>.field:nth-of-type(4),#editor .editor-main-card>.field:nth-child(6),#editor .editor-main-card>.editor-type-box{grid-column:1/-1}}
 @media(max-width:700px){#editor .editor-main-card>.field,#editor .editor-main-card>.field:nth-of-type(4),#editor .editor-main-card>.field:nth-child(6),#editor .editor-main-card>.editor-type-box{margin-bottom:12px}}
+
+/* TEST V4.55 — editor structure layout */
+/* Top editor: left = Vak/Subvak/Naam, right = Onderdeel/Toetsdatum/Uitleg. */
+#editor .editor-main-card{grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:18px;row-gap:8px;align-items:start}
+#editor .editor-main-card>.editor-student{grid-column:1/-1}
+#editor .editor-main-card>.field{grid-column:auto;margin-bottom:4px}
+#editor .editor-main-card>.field:nth-child(3){grid-column:1;grid-row:2}
+#editor .editor-main-card>.field:nth-child(4){grid-column:1;grid-row:3}
+#editor .editor-main-card>.field:nth-child(5){grid-column:1;grid-row:4}
+#editor .editor-main-card>.editor-type-box{grid-column:2;grid-row:2 / span 2;margin:4px 0 0}
+#editor .editor-main-card>.field:nth-child(6){grid-column:2;grid-row:4}
+/* Keep question/answer rows full width; only tighten their internal spacing. */
+#editor .editor-main-card>#wordEditor .editor-row,#editor .editor-main-card>#questionEditor .editor-row{display:block;max-width:none;padding-top:11px;padding-bottom:11px}
+#editor .editor-main-card>#wordEditor .editor-row>.remove-row,#editor .editor-main-card>#questionEditor .editor-row>.remove-row{display:inline-block}
+#editor .editor-main-card>#wordEditor .editor-row>.word-rules-box,#editor .editor-main-card>#questionEditor .editor-row>.word-rules-box{width:100%}
+@media(max-width:900px){#editor .editor-main-card{grid-template-columns:1fr}#editor .editor-main-card>.editor-student,#editor .editor-main-card>.field,#editor .editor-main-card>.field:nth-child(3),#editor .editor-main-card>.field:nth-child(4),#editor .editor-main-card>.field:nth-child(5),#editor .editor-main-card>.field:nth-child(6),#editor .editor-main-card>.editor-type-box{grid-column:1;grid-row:auto}#editor .editor-main-card>.editor-type-box{margin-bottom:8px}}
+@media(max-width:700px){#editor .editor-main-card{display:block}#editor .editor-main-card>.field,#editor .editor-main-card>.editor-type-box{margin-bottom:12px}}
 </style>
 </head>
 <body>

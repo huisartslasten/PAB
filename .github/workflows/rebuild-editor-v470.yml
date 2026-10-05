@@ -1,0 +1,22 @@
+name: Rebuild TEST editor V4.70
+
+on:
+  push:
+    branches: [test]
+    paths:
+      - 'tools/rebuild-editor-v470.sh'
+      - '.github/workflows/rebuild-editor-v470.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: test
+          fetch-depth: 0
+      - name: Apply TEST V4.70 uniform Hint field
+        run: bash tools/rebuild-editor-v470.sh

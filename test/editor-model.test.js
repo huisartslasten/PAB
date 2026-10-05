@@ -1,10 +1,20 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createLessonPayload, validateLessonDraft, prepareLessonItems } from '../src/features/lessons/editor-model.js';
+import { buildLessonPayload, validateLessonDraft, prepareLessonItems } from '../src/features/lessons/editor-model.js';
 
-test('editor payload trims the four core lesson fields', () => {
-  assert.deepEqual(createLessonPayload({ student: ' Zyon ', subject: ' Nederlands ', title: ' Woorden ', type: 'words' }), {
-    student: 'Zyon', subject: 'Nederlands', title: 'Woorden', type: 'words'
+test('editor payload preserves the complete V4.78 lesson field set', () => {
+  assert.deepEqual(buildLessonPayload({
+    student: ' Zyon ', subject: ' Nederlands ', subvak: ' Themawoorden ', title: ' Woorden ', type: 'words',
+    explanation: ' Uitleg ', ai_check_answers: false, ai_instruction: ' Alleen betekenis telt ',
+    editor_labels: { question: ' Werkwoord ', perfect: '', adjective: ' Bijvoeglijk ' }
+  }), {
+    student: 'Zyon', subject: 'Nederlands', subvak: 'Themawoorden', title: 'Woorden', type: 'words',
+    explanation: 'Uitleg', ai_check_answers: false, ai_instruction: 'Alleen betekenis telt',
+    editor_labels: {
+      question: 'Werkwoord',
+      perfect: 'Voltooid deelwoord',
+      adjective: 'Bijvoeglijk'
+    }
   });
 });
 

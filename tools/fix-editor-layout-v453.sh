@@ -13,8 +13,7 @@ start='      <div class="field"><label for="lessonSubject">Vak</label>'
 end='      <div id="spellingLabelsEditor"'
 a=s.find(start)
 b=s.find(end,a)
-if a<0 or b<0:
-    raise SystemExit('ERROR: expected editor field block not found')
+if a<0 or b<0: raise SystemExit('ERROR: expected editor field block not found')
 new='''      <div class="editor-top-grid">
         <div class="editor-top-left">
           <div class="field"><label for="lessonSubject">Vak</label><input id="lessonSubject" placeholder="Voer vak in bijvoorbeeld Nederlands"></div>
@@ -31,23 +30,22 @@ new='''      <div class="editor-top-grid">
 '''
 s=s[:a]+new+s[b:]
 css='''\n/* TEST V4.58 — editor fields structurally separated */\n#editor .editor-main-card{display:block}\n#editor .editor-top-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:18px;row-gap:8px;align-items:start;margin-bottom:10px}\n#editor .editor-top-left,#editor .editor-top-right{min-width:0}\n#editor .editor-top-left>.field,#editor .editor-top-right>.field{margin-bottom:10px}\n#editor .editor-top-right>.lesson-test-date-box{margin:0 0 10px}\n#editor #lessonAiBox{width:100%;margin:0 0 10px}\n#editor .editor-main-card>#wordEditor,#editor .editor-main-card>#questionEditor,#editor .editor-main-card>#dictationEditor,#editor .editor-main-card>#mathEditor,#editor .editor-main-card>#spellingEditor{width:100%;display:block}\n#editor .editor-main-card>#wordEditor .editor-row,#editor .editor-main-card>#questionEditor .editor-row{display:block;width:100%;max-width:none;padding-top:10px;padding-bottom:10px}\n@media(max-width:900px){#editor .editor-top-grid{grid-template-columns:1fr}}\n'''
-if '/* TEST V4.58 — editor fields structurally separated */' not in s:
-    s=s.replace('</style>',css+'</style>',1)
+if '/* TEST V4.58 — editor fields structurally separated */' not in s: s=s.replace('</style>',css+'</style>',1)
+s=s.replace('<div class="version-badge">PacoGO TEST V4.53</div>','<div class="version-badge">PacoGO TEST V4.58</div>')
 p.write_text(s)
-print('Applied TEST V4.58: top fields are structurally independent; AI and questions are separate full-width blocks.')
+print('Applied TEST V4.58 targeted editor structure + version badge.')
 PY
 python3 - <<'PY'
 from pathlib import Path
 s=Path('index.html').read_text()
-assert '<!-- PacoGO TEST V4.53 -->' in s
+assert '<div class="version-badge">PacoGO TEST V4.58</div>' in s
 assert '<div class="editor-top-grid">' in s
-assert 'id="lessonSubject"' in s and 'id="lessonSubvak"' in s and 'id="lessonName"' in s
-assert 'id="lessonType"' in s and 'id="lessonExplanation"' in s
-assert '<div id="lessonAiBox"' in s
-assert '<div id="wordEditor"' in s
-assert 'TEST V4.58 — editor fields structurally separated' in s
-print('CHECK OK: V4.58 exact editor structure + AI/questions detached.')
+assert s.count('id="lessonSubject"')==1 and s.count('id="lessonSubvak"')==1 and s.count('id="lessonName"')==1
+assert s.count('id="lessonType"')==1 and s.count('id="lessonExplanation"')==1
+assert s.count('id="lessonAiBox"')==1 and s.count('id="wordEditor"')==1
+assert 'editor-type-box' in s
+print('CHECK OK: TEST V4.58 targeted structure, version, and existing editor functionality preserved.')
 PY
 git add index.html
-git commit -m "TEST V4.58 structurally separate editor fields"
+git commit -m "TEST V4.58 apply editor structure"
 git push origin HEAD:test

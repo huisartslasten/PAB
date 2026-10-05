@@ -43,15 +43,15 @@ js='''<script>
 })();
 </script>
 '''
-# Insert only before the final real </body>.
 idx=s.rfind('</body>')
 if idx<0: raise SystemExit('ERROR: final </body> not found')
-# Avoid duplicate real injection.
 if 'TEST V4.64 — deterministic action-button cleanup/reorder' not in s:
     s=s[:idx]+js+s[idx:]
+# Fix TEST V4.64 print-calendar JavaScript: a literal newline inside the single-quoted document.write string caused SyntaxError: Unexpected EOF.
+s=s.replace("<\\/script>\n\n</body></html>');", "<\\/script></body></html>');")
 p.write_text(s)
-print('TEST V4.64 repaired: no action-button script remains inside printWindow.document.write.')
+print('TEST V4.64 repaired: action buttons moved outside printWindow.document.write and print-calendar string newline fixed.')
 PY
 git add index.html
 git diff --cached --check
-git diff --cached --quiet || { git commit -m "TEST V4.64 repair editor action buttons"; git push origin HEAD:test; }
+git diff --cached --quiet || { git commit -m "TEST V4.64 fix print calendar script syntax"; git push origin HEAD:test; }

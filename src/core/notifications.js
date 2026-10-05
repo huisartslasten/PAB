@@ -1,12 +1,4 @@
-export function createNotificationBus({ onNotify = () => {} } = {}) {
-  function notify(notification = {}) {
-    const value = Object.freeze({
-      type: String(notification.type || 'info'),
-      message: String(notification.message || ''),
-      data: notification.data ?? null
-    });
-    onNotify(value);
-    return value;
-  }
-  return Object.freeze({ notify });
+export function createNotificationBoundary(notify = () => {}) {
+  const send = (message, type = 'info') => notify(String(message || ''), type);
+  return Object.freeze({ send, info: message => send(message, 'info'), success: message => send(message, 'success'), error: message => send(message, 'error') });
 }

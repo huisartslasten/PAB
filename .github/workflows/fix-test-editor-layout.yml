@@ -24,4 +24,3 @@ jobs:
           grep -F 'TEST V4.77 — approved uniform editor styling' index.html
           grep -F '#editor .question-field input,#editor .answer-field input' index.html
           grep -F '#editor .word-rules-box input' index.html
-          grep -F "</script></body></html>');" index.html

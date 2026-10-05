@@ -1,0 +1,22 @@
+name: Rebuild TEST editor V4.68
+
+on:
+  push:
+    branches: [test]
+    paths:
+      - 'tools/rebuild-editor-v468.sh'
+      - '.github/workflows/rebuild-editor-v468.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: test
+          fetch-depth: 0
+      - name: Rebuild clean TEST editor layout
+        run: bash tools/rebuild-editor-v468.sh

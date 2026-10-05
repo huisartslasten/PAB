@@ -447,6 +447,26 @@ body{background:#1787f2}
 .practice-hint-button{margin:0 0 8px;background:#fff6df;color:#7a5b00;border:2px solid #f1d48b;box-shadow:0 3px 0 #ead28a}
 .practice-hint-button:hover{background:#fff0c7}
 @media(max-width:700px){.word-rules-grid{grid-template-columns:1fr}.word-rules-grid label{padding-top:0}}
+
+/* TEST V4.53 — compacte les-editor layout */
+#editor .editor-main-card{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:14px;row-gap:8px}
+#editor .editor-main-card>.editor-action-row,#editor .editor-main-card>.editor-student,#editor .editor-main-card>#wordEditor,#editor .editor-main-card>#questionEditor,#editor .editor-main-card>#dictationEditor,#editor .editor-main-card>#mathEditor,#editor .editor-main-card>#spellingEditor,#editor .editor-main-card>.row,#editor .editor-main-card>#editorError{grid-column:1/-1}
+#editor .editor-main-card>.field{grid-column:span 2;margin-bottom:4px}
+#editor .editor-main-card>.field input,#editor .editor-main-card>.field select{padding:9px 11px;min-height:42px}
+#editor .editor-main-card>.field textarea{min-height:72px;padding:9px 11px}
+#editor .editor-main-card>.field>label{font-size:14px;margin-bottom:4px}
+#editor .editor-main-card>.editor-type-box{grid-column:span 6;margin:4px 0 0;padding:12px}
+#editor .editor-main-card>.editor-type-box .field{margin:0}
+#editor .editor-main-card>.editor-type-box .lesson-test-date-box{margin:8px 0 0;padding:10px 12px}
+#editor .editor-main-card>.editor-type-box .lesson-test-date-box .small{font-size:12px}
+#editor .editor-main-card>.field:nth-of-type(4){grid-column:span 6}
+#editor .editor-main-card>.editor-type-box{grid-column:span 6}
+#editor .editor-main-card>#wordEditor .editor-row,#editor .editor-main-card>#questionEditor .editor-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:12px;align-items:start}
+#editor .editor-main-card>#wordEditor .editor-row>.remove-row,#editor .editor-main-card>#questionEditor .editor-row>.remove-row,#editor .editor-main-card>#wordEditor .editor-row>.question-insert-button,#editor .editor-main-card>#questionEditor .editor-row>.question-insert-button{grid-column:1/-1}
+#editor .editor-main-card>#wordEditor .editor-row>.word-rules-box,#editor .editor-main-card>#questionEditor .editor-row>.word-rules-box{grid-column:1/-1}
+#editor .editor-main-card>#wordEditor .editor-row>.word-parts-section,#editor .editor-main-card>#questionEditor .editor-row>.word-parts-section{margin-bottom:0}
+@media(max-width:900px){#editor .editor-main-card{grid-template-columns:1fr 1fr}#editor .editor-main-card>.field{grid-column:span 1}#editor .editor-main-card>.field:nth-of-type(4),#editor .editor-main-card>.editor-type-box{grid-column:1/-1}}
+@media(max-width:700px){#editor .editor-main-card{display:block}#editor .editor-main-card>.field,#editor .editor-main-card>.editor-type-box{margin-bottom:12px}#editor .editor-main-card>#wordEditor .editor-row,#editor .editor-main-card>#questionEditor .editor-row{display:block}}
 </style>
 </head>
 <body>

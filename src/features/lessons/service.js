@@ -1,18 +1,12 @@
+// Compatibility adapter for the lessons feature.
+// The canonical data boundary lives in src/services/lesson-service.js.
+// Keep this adapter only while the staged migration is in progress.
+
+import { createLessonService } from '../../services/lesson-service.js';
+
 export function createLessonRepository(db) {
-  if (!db) throw new Error('Lesson repository requires a database client');
-
-  async function list() {
-    const { data, error } = await db
-      .from('lessons')
-      .select('*, lesson_items(*)')
-      .order('id', { ascending: true });
-    if (error) throw error;
-
-    return (data || []).map(lesson => ({
-      ...lesson,
-      lesson_items: [...(lesson.lesson_items || [])].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
-    }));
-  }
-
-  return { list };
+  const service = createLessonService(db);
+  return Object.freeze({
+    list: () => service.listAll()
+  });
 }

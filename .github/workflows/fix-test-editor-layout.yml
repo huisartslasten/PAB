@@ -18,51 +18,55 @@ jobs:
         with:
           ref: test
           fetch-depth: 0
-      - name: Put approved editor styling in the real page stylesheet
+      - name: Normalize approved editor styling
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          import re
 
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
-
           assert '<!-- PacoGO TEST V4.77 -->' in s
 
+          marker = '/* TEST V4.77 — approved uniform editor styling */'
+          pattern = re.compile(
+              r'\n?'+re.escape(marker)+r'\n'
+              r'[^\n]*\n'
+              r'[^\n]*\n'
+              r'[^\n]*\n'
+              r'[^\n]*\n'
+              r'[^\n]*\n'
+              r'[^\n]*\n'
+          )
+          s = pattern.sub('\n', s)
+
           block = '''
-          /* TEST V4.77 — approved uniform editor styling */
-          .lesson-test-date-box{background:#eef8ff!important;border:2px solid #bfe6ff!important;border-radius:16px!important;padding:11px 14px!important}
-          #lessonAiBox.lesson-ai-box{background:#eef8ff!important;border:2px solid #bfe6ff!important;border-radius:16px!important;padding:16px!important}
-          #editor .question-field input,#editor .answer-field input,#editor .question-field textarea,#editor .answer-field textarea{border:2px solid #bfe6ff!important;border-radius:14px!important;background:#fff!important}
-          #editor .word-rules-box input{border:2px solid #bfe6ff!important;border-radius:14px!important;background:#fff!important}
-          #editor .hint-box textarea{border:2px solid #cfe1f0!important;border-radius:14px!important;background:#fff!important}
-          '''
-          block = block.replace('          ', '')
+/* TEST V4.77 — approved uniform editor styling */
+.lesson-test-date-box{background:#eef8ff;border:2px solid #bfe6ff;border-radius:16px;padding:11px 14px}
+#lessonAiBox.lesson-ai-box{background:#eef8ff;border:2px solid #bfe6ff;border-radius:16px;padding:16px}
+#editor .question-field input,#editor .answer-field input,#editor .question-field textarea,#editor .answer-field textarea{border:2px solid #bfe6ff;border-radius:14px;background:#fff}
+#editor .word-rules-box input{border:2px solid #bfe6ff;border-radius:14px;background:#fff}
+#editor .hint-box textarea{border:2px solid #cfe1f0;border-radius:14px;background:#fff}
+'''
 
-          # Remove the styling block wherever it currently sits, including the old
-          # accidental location inside the print-calendar HTML string.
-          s = s.replace(block, '')
-
-          # The first closing style tag belongs to PacoGO's real page stylesheet.
           pos = s.find('</style>')
           if pos < 0:
               raise SystemExit('ERROR: main page stylesheet closing tag not found')
-
           s = s[:pos] + block + s[pos:]
           p.write_text(s, encoding='utf-8')
           PY
 
+          test "$(grep -o 'TEST V4.77 — approved uniform editor styling' index.html | wc -l | tr -d ' ')" = "1"
           grep -F '<!-- PacoGO TEST V4.77 -->' index.html
-          grep -F 'TEST V4.77 — approved uniform editor styling' index.html
           grep -F '#editor .question-field input,#editor .answer-field input' index.html
           grep -F '#editor .word-rules-box input' index.html
-
           git config user.name 'PacoGO Bot'
           git config user.email 'paco-go-bot@users.noreply.github.com'
           git add index.html
           git diff --cached --check
           if git diff --cached --quiet; then
-            echo 'No repair needed.'
+            echo 'No normalization needed.'
           else
-            git commit -m 'TEST V4.77 place approved editor styling in page CSS'
+            git commit -m 'TEST V4.77 normalize approved editor CSS'
             git push origin HEAD:test
           fi

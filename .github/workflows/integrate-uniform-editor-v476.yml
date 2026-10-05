@@ -23,7 +23,6 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import re
 
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
@@ -66,3 +65,5 @@ jobs:
           git rm .github/workflows/integrate-uniform-editor-v476.yml
           git commit -m 'Remove TEST V4.76 integration workflow'
           git push origin test
+
+# TEST V4.76 trigger

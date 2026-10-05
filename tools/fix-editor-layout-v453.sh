@@ -12,51 +12,42 @@ s=p.read_text()
 if 'PacoGO TEST V4.58' not in s:
     raise SystemExit('ERROR: expected TEST V4.58 checkpoint not found')
 start=s.find('<div class="editor-top-grid">')
-nested=s.find('<div class="editor-top-grid">',start+1)
-if start<0 or nested<0:
-    raise SystemExit('ERROR: malformed editor-top-grid structure not found')
-spelling=s.find('<div id="spellingLabelsEditor"',nested)
-left=s.find('<div class="editor-top-left">',nested)
-right=s.find('<div class="editor-top-right">',left)
-ai=s.find('<div id="lessonAiBox"',right)
-if min(spelling,left,right,ai)<0 or not (nested<left<right<ai<spelling):
-    raise SystemExit('ERROR: expected editor top markers not found in order')
-left_content=s[left+len('<div class="editor-top-left">'):right]
-if left_content.rstrip().endswith('</div>'):
-    left_content=left_content.rstrip()[:-len('</div>')]
-right_content=s[right+len('<div class="editor-top-right">'):ai]
-if right_content.rstrip().endswith('</div>'):
-    right_content=right_content.rstrip()[:-len('</div>')]
+spelling=s.find('<div id="spellingLabelsEditor"',start)
+ai=s.find('<div id="lessonAiBox"',start)
+if start<0 or spelling<0 or ai<0 or not (start<ai<spelling):
+    raise SystemExit('ERROR: expected editor top block markers not found')
 ai_block=s[ai:spelling]
-new_top=(
-    '<div class="editor-top-grid">\n'
-    '  <div class="editor-top-left">'+left_content+'\n  </div>\n'
-    '  <div class="editor-top-right">'+right_content+'\n  </div>\n'
-    '</div>'+ai_block
-)
-s=s[:start]+new_top+s[spelling:]
+canonical='''<div class="editor-top-grid">
+  <div class="editor-top-left">
+    <div class="field"><label for="lessonSubject">Vak</label><input id="lessonSubject" placeholder="Voer vak in bijvoorbeeld Nederlands"></div>
+    <div class="field"><label for="lessonSubvak">Subvak <span class="small">(optioneel)</span></label><input id="lessonSubvak" placeholder="Bijvoorbeeld Themawoorden of Spelling"></div>
+    <div class="field"><label for="lessonName">Naam van de les</label><input id="lessonName" placeholder="Bijvoorbeeld Week 4"></div>
+  </div>
+  <div class="editor-top-right">
+    <div class="field"><label for="lessonType">Onderdeel</label><div class="lesson-type-select"><button type="button" id="lessonTypeButton" class="lesson-type-button" onclick="toggleLessonTypeMenu()"><span id="lessonTypeButtonText">🎯 Woordtrainer</span><span class="lesson-type-chevron">⌄</span></button><div id="lessonTypeMenu" class="lesson-type-menu hidden"><button type="button" onclick="setLessonType('words')">🎯 Woordtrainer</button><button type="button" onclick="setLessonType('questions')">❓ Vragen</button><button type="button" onclick="setLessonType('dictation')">✏️ Dictee</button><button type="button" onclick="setLessonType('math')">🔢 Rekenen</button><button type="button" onclick="setLessonType('spelling')">✍️ Spelling</button><button type="button" onclick="setLessonType('custom')">🛠️ Eigen les</button></div><select id="lessonType" class="lesson-type-native" tabindex="-1" aria-hidden="true"><option value="words">words</option><option value="questions">questions</option><option value="dictation">dictation</option><option value="math">math</option><option value="spelling">spelling</option><option value="custom">custom</option></select></div></div>
+    <div class="lesson-test-date-box"><label class="lesson-test-date-toggle"><input id="lessonTestDateEnabled" type="checkbox" onchange="toggleLessonTestDate()"> 📅 Toetsdatum instellen</label><div class="small" style="margin-top:5px">Optioneel. Alleen instellen als er al een toetsdatum bekend is.</div><input id="lessonTestDate" type="hidden"><div id="lessonTestDatePicker" class="date-picker lesson-test-date-picker hidden"></div></div>
+    <div class="field"><label for="lessonExplanation">Uitleg <span class="small">(optioneel)</span></label><textarea id="lessonExplanation" placeholder="Leg hier de leerstof of regel uit. Dit wordt apart boven de oefeningen getoond."></textarea></div>
+  </div>
+</div>
+'''
+s=s[:start]+canonical+ai_block+s[spelling:]
 css='''\n/* TEST V4.59 — questions/answers full width */\n#editor .editor-main-card>#wordEditor,\n#editor .editor-main-card>#questionEditor,\n#editor .editor-main-card>#dictationEditor,\n#editor .editor-main-card>#mathEditor,\n#editor .editor-main-card>#spellingEditor{\n  width:100%!important;\n  max-width:none!important;\n  display:block!important;\n  grid-column:1/-1!important;\n  margin-left:0!important;\n  margin-right:0!important;\n}\n#editor .editor-main-card>#wordEditor .editor-row,\n#editor .editor-main-card>#questionEditor .editor-row,\n#editor .editor-main-card>#dictationEditor .editor-row,\n#editor .editor-main-card>#mathEditor .editor-row,\n#editor .editor-main-card>#spellingEditor .editor-row{\n  width:100%!important;\n  max-width:none!important;\n  margin-left:0!important;\n  margin-right:0!important;\n}\n'''
 if '/* TEST V4.59 — questions/answers full width */' not in s:
     s=s.replace('</style>',css+'</style>',1)
-s=s.replace('PacoGO TEST V4.58','PacoGO TEST V4.59',1)
 s=s.replace('PacoGO TEST V4.58','PacoGO TEST V4.59')
 p.write_text(s)
-print('Applied TEST V4.59: repaired editor top nesting and forced question/answer editors to full width.')
+print('Applied TEST V4.59: canonical editor top structure + full-width question/answer editors.')
 PY
 python3 - <<'PY'
 from pathlib import Path
 s=Path('index.html').read_text()
 assert 'PacoGO TEST V4.59' in s
 assert s.count('<div class="editor-top-grid">')==1
-assert s.count('id="lessonSubject"')==1
-assert s.count('id="lessonSubvak"')==1
-assert s.count('id="lessonName"')==1
-assert s.count('id="lessonType"')==1
-assert s.count('id="lessonExplanation"')==1
-assert s.count('id="lessonAiBox"')==1
-assert s.count('id="wordEditor"')==1
-print('CHECK OK: TEST V4.59 structure, unique editor fields, and full-width selectors.')
+for x in ['lessonSubject','lessonSubvak','lessonName','lessonType','lessonExplanation','lessonAiBox','wordEditor']:
+    assert s.count('id="'+x+'"')==1, x
+assert 'TEST V4.59 — questions/answers full width' in s
+print('CHECK OK: TEST V4.59 canonical editor structure and full-width question/answer selectors.')
 PY
 git add index.html
-git commit -m "TEST V4.59 repair editor top nesting and full width"
+git commit -m "TEST V4.59 canonical editor structure and full width"
 git push origin HEAD:test

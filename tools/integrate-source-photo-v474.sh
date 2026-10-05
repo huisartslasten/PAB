@@ -3,7 +3,6 @@ set -euo pipefail
 
 python3 - <<'PY'
 from pathlib import Path
-import re
 
 p=Path('index.html')
 text=p.read_text(encoding='utf-8')
@@ -25,22 +24,25 @@ end=text.find('\nfunction showAddLesson',start)
 if start<0 or end<0:
     raise SystemExit('createLessonFromPhoto boundary not found')
 fn=text[start:end]
-needle='  await loadLessons();'
+needle="  currentLesson=lessons.find(l=>Number(l.id)===Number(created.data.id))||null;"
 if fn.count(needle)!=1:
-    raise SystemExit(f'Expected exactly one loadLessons in createLessonFromPhoto, found {fn.count(needle)}')
+    raise SystemExit(f'Expected exactly one created-lesson assignment, found {fn.count(needle)}')
 save='''  if(document.getElementById('photoSaveOriginal')?.checked&&photoLessonSelectedFile&&window.saveLessonSourcePhoto){\n    try{\n      await window.saveLessonSourcePhoto(created.data.id,photoLessonSelectedFile);\n    }catch(error){\n      console.error('Source photo save error:',error);\n      showMessage('Les is gemaakt, maar de bronfoto kon niet worden opgeslagen.','error');\n    }\n  }\n'''
-fn=fn.replace(needle,save+needle,1)
+fn=fn.replace(needle,needle+'\n'+save,1)
 text=text[:start]+fn+text[end:]
 
 # Directly attach existing-lesson photo UI to the real showLesson function.
-pattern=r'(function showLesson\(\)\{.*?)(\}\nfunction goBack\(\))'
-m=re.search(pattern,text,re.S)
-if not m:
+show_start=text.find('function showLesson(){')
+go_back=text.find('\nfunction goBack(){',show_start)
+if show_start<0 or go_back<0:
     raise SystemExit('showLesson boundary not found')
-if 'syncLessonPhotoUi(currentLesson?.id)' in m.group(1):
-    raise SystemExit('showLesson photo integration already present')
-show_fn=m.group(1)+'\nwindow.syncLessonPhotoUi(currentLesson?.id);\n'+m.group(2)
-text=text[:m.start()]+show_fn+text[m.end():]
+show_prefix=text[:go_back]
+close=show_prefix.rfind('}')
+if close<show_start:
+    raise SystemExit('showLesson closing brace not found')
+if 'syncLessonPhotoUi(currentLesson?.id)' not in show_prefix[show_start:]:
+    show_prefix=show_prefix[:close]+'\nwindow.syncLessonPhotoUi(currentLesson?.id);\n'+show_prefix[close:]
+text=show_prefix+text[go_back:]
 
 p.write_text(text,encoding='utf-8')
 PY

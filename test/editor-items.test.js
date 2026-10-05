@@ -2,52 +2,50 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildItemsForType } from '../src/features/lessons/editor-items.js';
 
-test('words and custom preserve parts and deterministic answer rules', () => {
-  const [item] = buildItemsForType('words', [{
-    question_parts: ['Wat is expert?'],
-    answer_parts: [
-      { text: 'deskundige', role: 'answer' },
-      { text: 'iemand met veel kennis', role: 'extra' }
-    ],
-    hint: 'Denk aan kennis',
-    min_words: 2,
-    required_terms: ['kennis', 'vak']
-  }]);
+const cases = [
+  ['words', { question_parts: ['Wat is expert?'], answer_parts: [{ text: 'deskundige', role: 'answer' }, { text: 'kenner', role: 'extra' }], hint: 'Denk aan kennis', min_words: 2, required_terms: ['kennis'] }, 'deskundige'],
+  ['custom', { question_parts: ['Noem een voorbeeld'], answer_parts: [{ text: 'voorbeeld', role: 'answer' }] }, 'voorbeeld'],
+  ['questions', { question_parts: ['Leg uit', 'waarom?'], answer_parts: [{ text: 'Omdat het regent', role: 'answer' }, { text: 'Extra uitleg', role: 'extra' }] }, 'Omdat het regent'],
+  ['dictation', { question_parts: ['Vul het woord in'], answer_parts: [{ text: 'paard', role: 'answer' }] }, 'paard'],
+  ['math', { question_parts: ['12 + 30'], answer_parts: [{ text: '42', role: 'answer' }] }, '42'],
+  ['spelling', { question_parts: ['werken'], answer_parts: [{ text: 'werkte', role: 'answer' }, { text: 'gewerkt', role: 'answer' }, { text: 'werkend', role: 'extra' }] }, 'werkte || gewerkt']
+];
 
-  assert.deepEqual(item, {
-    question: 'Wat is expert?',
-    answer: 'deskundige',
-    question_parts: ['Wat is expert?'],
-    answer_parts: [
-      { text: 'deskundige', role: 'answer' },
-      { text: 'iemand met veel kennis', role: 'extra' }
-    ],
-    hint: 'Denk aan kennis',
-    min_words: 2,
-    required_terms: ['kennis', 'vak'],
-    sort_order: 0
+for (const [type, row, expectedAnswer] of cases) {
+  test(`${type} builds deterministic V4.78 item shape`, () => {
+    const [item] = buildItemsForType(type, [row]);
+    assert.ok(item);
+    assert.equal(item.question, row.question_parts.join('\n'));
+    assert.equal(item.answer, expectedAnswer);
+    assert.deepEqual(item.question_parts, row.question_parts);
+    assert.deepEqual(item.answer_parts, row.answer_parts);
+    assert.equal(item.sort_order, 0);
   });
+}
+
+test('words preserve hint, min_words and required_terms', () => {
+  const [item] = buildItemsForType('words', [{
+    question: 'Wat is expert?', answer: 'deskundige', hint: 'Denk aan kennis', min_words: 2, required_terms: ['kennis', 'vak']
+  }]);
+  assert.equal(item.hint, 'Denk aan kennis');
+  assert.equal(item.min_words, 2);
+  assert.deepEqual(item.required_terms, ['kennis', 'vak']);
 });
 
 test('math rejects non-numeric required answers', () => {
-  assert.deepEqual(buildItemsForType('math', [{ question: '2 + 2', answer_parts: [{ text: 'vier', role: 'answer' }] }]), []);
-  assert.equal(buildItemsForType('math', [{ question: '2 + 2', answer_parts: [{ text: '4', role: 'answer' }] }])[0].answer, '4');
+  assert.deepEqual(buildItemsForType('math', [{
+    question: '2 + 2', answer_parts: [{ text: 'vier', role: 'answer' }]
+  }]), []);
 });
 
-test('spelling joins required answer forms with the V4.78 separator', () => {
-  const [item] = buildItemsForType('spelling', [{
-    question_parts: ['werken'],
-    answer_parts: [
-      { text: 'werkte', role: 'answer' },
-      { text: 'gewerkt', role: 'answer' },
-      { text: 'werkend', role: 'extra' }
-    ]
+test('extra answer parts remain persisted but are excluded from required answer', () => {
+  const [item] = buildItemsForType('questions', [{
+    question_parts: ['Vraag'],
+    answer_parts: [{ text: 'antwoord', role: 'answer' }, { text: 'hinttekst', role: 'extra' }]
   }]);
-  assert.equal(item.answer, 'werkte || gewerkt');
-});
-
-test('all six V4.78 editor types are recognized', () => {
-  for (const type of ['words', 'questions', 'dictation', 'math', 'spelling', 'custom']) {
-    assert.notEqual(typeof buildItemsForType(type), 'undefined');
-  }
+  assert.equal(item.answer, 'antwoord');
+  assert.deepEqual(item.answer_parts, [
+    { text: 'antwoord', role: 'answer' },
+    { text: 'hinttekst', role: 'extra' }
+  ]);
 });

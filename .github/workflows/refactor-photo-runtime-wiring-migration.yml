@@ -1,0 +1,52 @@
+name: Controlled photo runtime wiring migration
+
+on:
+  push:
+    branches:
+      - refactor/professional-v1
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    if: github.actor == 'huisartslasten'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout refactor branch
+        uses: actions/checkout@v4
+        with:
+          ref: refactor/professional-v1
+          fetch-depth: 0
+
+      - name: Wire photo runtime bridge and facade
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('photo-storage.js')
+          text = path.read_text()
+          anchor = "// Recovery runtime facade: the four V4.78 recovery handlers are exposed\n"
+          if text.count(anchor) != 1:
+              raise SystemExit(f'Expected exactly one photo wiring anchor, found {text.count(anchor)}')
+
+          block = """// Photo-to-lesson runtime facade: the V4.78 photo lesson creation handler is\n// exposed synchronously, but execution waits for the refactored photo bootstrap.\n// The bridge reads classic-script state live and reuses the existing source-photo\n// storage function; there is deliberately no legacy fallback.\nconst lessonPhotoRuntimeBridge = Object.defineProperties({}, {\n  requireParent: { get: () => requireParent },\n  db: { get: () => db },\n  loadLessons: { get: () => loadLessons },\n  lessons: { get: () => lessons },\n  setCurrentStudent: { get: () => value => { currentStudent = value; } },\n  setCurrentSubject: { get: () => value => { currentSubject = value; } },\n  setCurrentLesson: { get: () => value => { currentLesson = value; } },\n  saveSourcePhoto: { get: () => window.saveLessonSourcePhoto },\n  showParentDashboard: { get: () => showParentDashboard },\n  showMessage: { get: () => showMessage }\n});\nconst lessonPhotoRuntimeBootstrap = import('./src/features/lessons/lesson-photo-runtime-bootstrap.js')\n  .then(({ bootstrapLessonPhotoRuntime }) => bootstrapLessonPhotoRuntime({\n    runtime: lessonPhotoRuntimeBridge,\n    target: window\n  }));\nwindow.pacoGOLessonPhotoRuntimeReady = lessonPhotoRuntimeBootstrap;\nwindow.createLessonFromPhoto = async function createLessonFromPhotoRuntimeFacade(input){\n  const runtimeHandler = await lessonPhotoRuntimeBootstrap;\n  return runtimeHandler(input);\n};\n\n"""
+          path.write_text(text.replace(anchor, block + anchor, 1))
+          PY
+
+          test "$(grep -c 'const lessonPhotoRuntimeBridge' photo-storage.js)" -eq 1
+          test "$(grep -c 'window.pacoGOLessonPhotoRuntimeReady' photo-storage.js)" -eq 1
+          test "$(grep -c 'window.createLessonFromPhoto = async function createLessonFromPhotoRuntimeFacade' photo-storage.js)" -eq 1
+
+      - name: Remove one-time migration workflow
+        run: rm .github/workflows/refactor-photo-runtime-wiring-migration.yml
+
+      - name: Commit controlled migration
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add photo-storage.js .github/workflows/refactor-photo-runtime-wiring-migration.yml
+          git diff --cached --check
+          git commit -m 'refactor(lessons): wire photo creation runtime boundary'
+          git push origin refactor/professional-v1

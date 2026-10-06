@@ -4,7 +4,7 @@ import { buildLessonSaveRuntimeEffects, LESSON_SAVE_VALIDATION_MESSAGE } from '.
 
 test('validation failure preserves the V4.78 message and does not run completion effects', async () => {
   const errorElement = { textContent: '', classList: { removed: [], remove(value) { this.removed.push(value); } } };
-  const effects = buildLessonSaveRuntimeEffects({ outcome: {} , errorElement });
+  const effects = buildLessonSaveRuntimeEffects({ errorElement });
   const result = await effects.handleValidationFailure();
 
   assert.equal(result.stage, 'validation');
@@ -14,7 +14,7 @@ test('validation failure preserves the V4.78 message and does not run completion
 
 test('persistence failure preserves the V4.78 error prefix', async () => {
   const errorElement = { textContent: '', classList: { remove() {} } };
-  const effects = buildLessonSaveRuntimeEffects({ outcome: {}, errorElement });
+  const effects = buildLessonSaveRuntimeEffects({ errorElement });
   const error = new Error('database unavailable');
   const result = await effects.handlePersistenceFailure(error);
 
@@ -23,21 +23,20 @@ test('persistence failure preserves the V4.78 error prefix', async () => {
   assert.equal(errorElement.textContent, 'Opslaan mislukt: database unavailable');
 });
 
-test('completion applies state then refreshes calendar, sidebars, and success message in order', async () => {
+test('completion uses the runtime outcome and refreshes state and UI effects in order', async () => {
   const order = [];
   const state = { currentSubject: 'old', currentLesson: { id: 1 } };
   const effects = buildLessonSaveRuntimeEffects({
-    outcome: {
-      currentSubject: 'Nederlands',
-      successMessage: 'Les opgeslagen.'
-    },
     state,
     refreshTestCalendar: async () => order.push('calendar'),
     refreshSidebars: async () => order.push('sidebars'),
     showMessage: async (message, kind) => order.push(`message:${message}:${kind}`)
   });
 
-  const result = await effects.handleComplete();
+  const result = await effects.handleComplete({
+    currentSubject: 'Nederlands',
+    successMessage: 'Les opgeslagen.'
+  });
 
   assert.equal(result.stage, 'complete');
   assert.equal(state.currentSubject, 'Nederlands');
@@ -45,9 +44,10 @@ test('completion applies state then refreshes calendar, sidebars, and success me
   assert.deepEqual(order, ['calendar', 'sidebars', 'message:Les opgeslagen.:success']);
 });
 
-test('rejects a missing outcome', () => {
-  assert.throws(
-    () => buildLessonSaveRuntimeEffects(),
-    /A lesson save outcome is required\./
+test('completion rejects a missing outcome at the execution boundary', async () => {
+  const effects = buildLessonSaveRuntimeEffects();
+  await assert.rejects(
+    effects.handleComplete(),
+    /A completed lesson save outcome is required\./
   );
 });

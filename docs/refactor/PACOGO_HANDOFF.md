@@ -73,6 +73,7 @@ Important lesson/player modules include:
 - `lesson-save-validation.js`
 - `dictation-spellcheck.js`
 - `lesson-test-calendar.js`
+- `lesson-save-post-persistence.js`
 
 ## 6. Verified player/result parity
 
@@ -95,6 +96,7 @@ Authoritative V4.78 behavior already mapped and extracted:
 - `lesson-save-validation.js`: pure pre-persistence validation boundary from V4.78; checks student, subject, title, non-empty items; exact V4.78 validation message; no DOM/AI/persistence/UI/navigation/state.
 - `dictation-spellcheck.js`: pure V4.78 dictation-only spelling-check boundary; builds one-based non-empty entries, injects the checker, preserves returned issues, reconstructs the V4.78 warning content and unavailable-check message; no DOM/Supabase/UI/state access. Checker failures are propagated so the future save orchestration can catch them without blocking persistence.
 - `lesson-test-calendar.js`: pure V4.78 local test-calendar add/update/remove boundary; preserves existing ids, creates new ids through an injected generator, normalizes lesson id to number, and contains no localStorage/UI/state access.
+- `lesson-save-post-persistence.js`: pure V4.78 post-save outcome model; preserves `currentSubject`, keeps `currentLesson` null, resolves the reloaded saved lesson, selects calendar action, and preserves exact success messages without performing runtime side effects.
 
 ## 8. Exact V4.78 `saveLesson()` orchestration mapping
 
@@ -109,14 +111,14 @@ The authoritative V4.78 flow is:
 7. update/create lesson
 8. replace/insert lesson items
 9. persistence error → `Opslaan mislukt: ...` and stop
-10. success → current state/reload
+10. success → set `currentSubject`, clear `currentLesson`, reload lessons
 11. after reload, find the saved lesson; if found, add/update or remove its local test-calendar entry based on `testDate`
 12. refresh test calendar/sidebar
 13. success message
 
 The extracted write service deliberately does **not** contain auth, DOM extraction, dictation AI check, test-calendar side effect, reload, rendering, success/error UI, navigation, or state changes.
 
-The extracted validation, dictation, and test-calendar boundaries are also deliberately not connected to the legacy runtime yet. Runtime wiring remains **CLOSED**.
+The extracted validation, dictation, test-calendar, and post-persistence boundaries are also deliberately not connected to the legacy runtime yet. Runtime wiring remains **CLOSED**.
 
 ## 9. Checkpoint history
 
@@ -135,18 +137,19 @@ The extracted validation, dictation, and test-calendar boundaries are also delib
 - 381–390: validation isolated/tested
 - 391–400: dictation-only spelling-check boundary source-verified and focused-tested; runtime wiring remains closed
 - 401–410: local test-calendar side effect source-verified and focused-tested; runtime wiring remains closed
+- 411–420: post-save state/calendar/message outcome source-verified and focused-tested; runtime wiring remains closed
 
 ## 10. Current state
 
-**Current checkpoint: 401–410.**
+**Current checkpoint: 411–420.**
 
-Checkpoint 401–410 established the authoritative V4.78 local test-calendar contract and isolated it in `src/features/lessons/lesson-test-calendar.js` without runtime replacement.
+Checkpoint 411–420 established the authoritative V4.78 post-save outcome contract and isolated it in `src/features/lessons/lesson-save-post-persistence.js` without runtime replacement.
 
-The committed focused test covers new-entry creation, generated ids, existing-entry updates, exact lesson/student matching, removal, and the date-driven upsert/removal paths. The focused six-test harness was executed with `node --test`: 6 passed, 0 failed. No full repository test-suite pass is claimed.
+The committed focused test covers current-state parity, calendar-action selection, the missing-reloaded-lesson case, and exact success messages. The focused four-test harness was executed with `node --test`: 4 passed, 0 failed. No full repository test-suite pass is claimed.
 
-The next technical gate is **411–420**.
+The next technical gate is **421–430**.
 
-The immediate goal is to source-verify the remaining post-save orchestration around exact V4.78 reload/state assignment and the ordering of test-calendar/sidebar refresh and success messaging.
+The immediate goal is to source-verify the exact legacy save-call orchestration and identify the smallest final coordinator boundary that can compose the already-proven validation, dictation-check, deterministic write, calendar sync, and post-save contracts without changing V4.78 ordering or UI behavior.
 
 Do not jump directly to runtime replacement. First establish the exact source behavior and contract, then build the smallest appropriate boundary and focused tests.
 
@@ -187,9 +190,9 @@ Before making code changes, a new chat continuing this project must be able to s
 3. the authoritative V4.78 parity source and that `legacy/index-v4.78.html` is not the parity source;
 4. the parity-first method and why runtime wiring remains closed;
 5. the current checkpoint and exact next technical gate;
-6. what was already proven in checkpoints 371–410 and therefore must not be restarted;
+6. what was already proven in checkpoints 371–420 and therefore must not be restarted;
 7. that the actual repository state must be inspected rather than relying only on chat memory;
 8. that both the handoff and the corresponding `step-X-Y.md` must be updated at checkpoint completion;
 9. that tests may only be claimed when actually executed.
 
-The specific next gate is **411–420: source-verify the remaining post-save V4.78 reload/state assignment and the ordering of test-calendar/sidebar refresh and success messaging**. The next chat must not jump straight to runtime replacement or unrelated refactoring.
+The specific next gate is **421–430: source-verify the exact legacy save-call orchestration and identify the smallest final coordinator boundary that can compose the already-proven validation, dictation-check, deterministic write, calendar sync, and post-save contracts without changing V4.78 ordering or UI behavior**. The next chat must not jump straight to runtime replacement or unrelated refactoring.

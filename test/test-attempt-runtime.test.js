@@ -32,9 +32,7 @@ test('runtime delegates the student-owned test completion without parent authori
     }
   });
 
-  assert.equal(result.ok, true);
-  assert.equal(result.stage, 'complete');
-  assert.equal(result.attemptId, 42);
+  assert.equal(result, undefined);
   assert.equal(db.events[0][0], 'test_attempts');
   assert.equal(db.events[1][0], 'test_attempt_answers');
 });

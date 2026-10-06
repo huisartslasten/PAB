@@ -6,17 +6,12 @@
 export const LESSON_SAVE_VALIDATION_MESSAGE = 'Vul het vak, de lestitel en minstens één item in.';
 
 export function buildLessonSaveRuntimeEffects({
-  outcome,
   errorElement,
   state = {},
   refreshTestCalendar,
   refreshSidebars,
   showMessage
 } = {}) {
-  if (!outcome || typeof outcome !== 'object') {
-    throw new Error('A lesson save outcome is required.');
-  }
-
   async function handleValidationFailure() {
     if (errorElement) {
       errorElement.textContent = LESSON_SAVE_VALIDATION_MESSAGE;
@@ -33,7 +28,7 @@ export function buildLessonSaveRuntimeEffects({
     return Object.freeze({ ok: false, stage: 'persistence', error });
   }
 
-  async function handleComplete(nextOutcome = outcome) {
+  async function handleComplete(nextOutcome) {
     if (!nextOutcome || typeof nextOutcome !== 'object') {
       throw new Error('A completed lesson save outcome is required.');
     }

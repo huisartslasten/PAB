@@ -160,6 +160,11 @@ const lessonSaveRuntimeBridge = Object.defineProperties({}, {
   removeTestDate: { get: () => removeTestDate }
 });
 
-import('./src/features/lessons/lesson-save-runtime-entry.js')
-  .then(({ installLessonSaveRuntimeEntry }) => installLessonSaveRuntimeEntry(lessonSaveRuntimeBridge))
-  .catch(error => console.error('PacoGO lesson-save runtime bridge failed:', error));
+// Explicit bootstrap: publish one readiness contract immediately. The save entry
+// itself is installed only after the ES module is loaded; failures are propagated.
+import('./src/features/lessons/lesson-save-runtime-bootstrap.js')
+  .then(({ bootstrapLessonSaveRuntime }) => bootstrapLessonSaveRuntime({
+    runtime: lessonSaveRuntimeBridge,
+    target: window
+  }))
+  .catch(error => console.error('PacoGO lesson-save runtime bootstrap failed:', error));

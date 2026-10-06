@@ -2,11 +2,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildLessonSaveRuntimeEffects, LESSON_SAVE_VALIDATION_MESSAGE } from '../src/features/lessons/lesson-save-runtime-effects.js';
 
-test('validation failure preserves the V4.78 message and does not run completion effects', async () => {
+test('validation failure preserves the V4.78 message and resolves the DOM dependency only when executed', async () => {
   const errorElement = { textContent: '', classList: { removed: [], remove(value) { this.removed.push(value); } } };
-  const effects = buildLessonSaveRuntimeEffects({ errorElement });
+  let lookupCount = 0;
+  const effects = buildLessonSaveRuntimeEffects({ getErrorElement: () => { lookupCount += 1; return errorElement; } });
+
+  assert.equal(lookupCount, 0);
   const result = await effects.handleValidationFailure();
 
+  assert.equal(lookupCount, 1);
   assert.equal(result.stage, 'validation');
   assert.equal(errorElement.textContent, LESSON_SAVE_VALIDATION_MESSAGE);
   assert.deepEqual(errorElement.classList.removed, ['hidden']);
@@ -14,7 +18,7 @@ test('validation failure preserves the V4.78 message and does not run completion
 
 test('persistence failure preserves the V4.78 error prefix', async () => {
   const errorElement = { textContent: '', classList: { remove() {} } };
-  const effects = buildLessonSaveRuntimeEffects({ errorElement });
+  const effects = buildLessonSaveRuntimeEffects({ getErrorElement: () => errorElement });
   const error = new Error('database unavailable');
   const result = await effects.handlePersistenceFailure(error);
 

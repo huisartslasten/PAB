@@ -10,11 +10,13 @@ export function createTestStartModel({
   shuffle = items => [...items],
   now = () => new Date().toISOString()
 } = {}) {
-  const items = Array.isArray(lessonItems) ? shuffle(lessonItems) : [];
+  const source = Array.isArray(lessonItems) ? [...lessonItems] : [];
+  const shuffled = shuffle(source);
+  const items = Array.isArray(shuffled) ? [...shuffled] : [];
   return Object.freeze({
     kind: 'test',
     type,
-    items: Array.isArray(items) ? items : [],
+    items,
     index: 0,
     answers: [],
     startedAt: now(),

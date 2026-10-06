@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="nl">
+<head><meta charset="utf-8"><title>PacoGO guest lesson runtime browser fixture</title></head>
+<body>
+  <script>
+    var currentStudent = 'Browser Student';
+    var requireParent = async () => { window.__events.push('authorize'); return true; };
+    var renderParentStudent = async () => window.__events.push('render-parent-student');
+    var showMessage = (message, type) => window.__events.push('message:' + type + ':' + message);
+    var __events = [];
+    var __guestAssignment = null;
+
+    var db = {
+      from(table) {
+        const state = { table, operation: null, filters: [], payload: null };
+        const builder = {
+          select(value) { state.operation = 'select:' + value; return builder; },
+          eq(column, value) { state.filters.push([column, value]); return builder; },
+          maybeSingle() {
+            window.__lastDbQuery = state;
+            if (table === 'guest_users') return Promise.resolve({ data: { id: 7001 }, error: null });
+            return Promise.resolve({ data: __guestAssignment, error: null });
+          },
+          insert(payload) {
+            state.operation = 'insert';
+            state.payload = payload;
+            window.__lastDbInsert = state;
+            __guestAssignment = { id: 8001 };
+            return Promise.resolve({ error: null });
+          },
+          update(payload) {
+            state.operation = 'update';
+            state.payload = payload;
+            return builder;
+          },
+          then(resolve, reject) {
+            window.__lastDbUpdate = state;
+            __guestAssignment = { id: 8001 };
+            return Promise.resolve({ error: null }).then(resolve, reject);
+          }
+        };
+        return builder;
+      }
+    };
+  </script>
+  <script src="/photo-storage.js"></script>
+</body>
+</html>

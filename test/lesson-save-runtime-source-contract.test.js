@@ -80,3 +80,5 @@ test('V4.78 monolith no longer contains the legacy saveLesson implementation', a
   assert.doesNotMatch(source, /async function saveLesson\s*\(/, 'the legacy saveLesson implementation must be removed from the monolith');
   assert.doesNotMatch(source, /function saveLesson\s*\(/, 'the monolith must not retain another legacy saveLesson declaration');
 });
+
+// Keep this source contract in the professional refactor gate: legacy save ownership must not return silently.

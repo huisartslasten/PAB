@@ -6,9 +6,11 @@ on:
     branches:
       - refactor/professional-v1
     paths:
+      - 'index.html'
       - 'photo-storage.js'
       - 'src/features/lessons/**'
       - 'test/browser/**'
+      - 'test/lesson-recovery-runtime-source-contract.test.js'
       - 'package.json'
       - '.github/workflows/refactor-browser-proof.yml'
   workflow_dispatch:

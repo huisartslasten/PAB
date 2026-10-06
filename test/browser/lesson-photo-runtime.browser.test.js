@@ -18,19 +18,30 @@ test('V4.78 photo lesson creation executes through the browser facade and bootst
       type: 'words',
       pairs: [{ question: 'kat', answer: 'dier' }]
     });
-    return { value, events: window.__events.slice(), insert: window.__lastDbInsert };
+    return {
+      value,
+      events: window.__events.slice(),
+      insert: window.__lastDbInsert,
+      state: {
+        student: window.currentStudent,
+        subject: window.currentSubject,
+        lesson: window.currentLesson
+      }
+    };
   });
 
   expect(result.value).toMatchObject({ ok: true, stage: 'complete', lessonId: 42, student: 'Zyon', subject: 'Themawoorden', title: 'Foto-les', type: 'words' });
   expect(result.events).toEqual([
     'authorize',
     'load',
-    'student:Zyon',
-    'subject:Themawoorden',
-    'lesson:42',
     'message:success:Les gemaakt uit de foto. Controleer hem gerust nog even.',
     'dashboard'
   ]);
+  expect(result.state).toMatchObject({
+    student: 'Zyon',
+    subject: 'Themawoorden',
+    lesson: { id: 42, title: 'Foto-les' }
+  });
   expect(result.insert).toMatchObject({ table: 'lesson_items', operation: 'insert' });
 });
 

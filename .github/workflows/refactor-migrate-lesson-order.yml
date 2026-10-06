@@ -25,7 +25,6 @@ jobs:
         shell: python
         run: |
           from pathlib import Path
-          import re
 
           path = Path('index.html')
           text = path.read_text(encoding='utf-8')
@@ -59,7 +58,7 @@ jobs:
 
       - name: Verify legacy lesson-order ownership is gone
         run: |
-          if grep -nE 'function getLessonOrderKey|function getLocalLessonOrder|function applyLessonOrder|function saveLessonOrder\(' index.html; then
+          if grep -nE 'function getLessonOrderKey|function getLocalLessonOrder|function applyLessonOrder|pacogo-lesson-order-' index.html; then
             echo 'Legacy lesson-order implementation still present.'
             exit 1
           fi

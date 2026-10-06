@@ -2340,7 +2340,23 @@ function subjectIcon(s){const map={Nederlands:'📚',Engels:'🇬🇧',Rekenen:'
 async function initializeApp(){const {data:{session}}=await db.auth.getSession();updateAuthUI(session);await loadLessons()}
 db.auth.onAuthStateChange((_event,session)=>{updateAuthUI(session);if(_event==='PASSWORD_RECOVERY')showResetPassword()});
 
-async function loadLessons(){const {data,error}=await db.from('lessons').select('*, lesson_items(*)').order('id',{ascending:true});if(error){showMessage('Lessen laden mislukt: '+error.message,'error');return}lessons=(data||[]).map(l=>({...l,lesson_items:(l.lesson_items||[]).sort((a,b)=>(a.sort_order??0)-(b.sort_order??0))}));showHome()}
+const lessonLoadRuntimeBridge = Object.defineProperties({}, {
+  db: { get: () => db },
+  setLessons: { get: () => value => { lessons = value; } },
+  showMessage: { get: () => showMessage },
+  showHome: { get: () => showHome }
+});
+
+const lessonLoadRuntimeBootstrap = import('./src/features/lessons/lesson-load-runtime-bootstrap.js')
+  .then(({ bootstrapLessonLoadRuntime }) => bootstrapLessonLoadRuntime({
+    runtime: lessonLoadRuntimeBridge,
+    target: window
+  }));
+window.pacoGOLessonLoadRuntimeReady = lessonLoadRuntimeBootstrap;
+async function loadLessons(){
+  const runtimeLoadLessons = await lessonLoadRuntimeBootstrap;
+  return runtimeLoadLessons();
+}
 function renderSubjects(){const el=document.getElementById('subjects');const visibleLessons=lessons.filter(l=>l.student===currentStudent&&!l.archived&&!l.deleted);const groups=groupLessonsBySubject(visibleLessons);const lessonStat=document.getElementById('lessonCountStat');const subjectStat=document.getElementById('subjectCountStat');const progress=document.getElementById('dashboardProgress');if(lessonStat)lessonStat.textContent=visibleLessons.length;if(subjectStat)subjectStat.textContent=groups.length+' '+(groups.length===1?'vak':'vakken');if(progress)progress.style.width=(visibleLessons.length?Math.min(100,20+visibleLessons.length*7):10)+'%';if(!groups.length){el.innerHTML='<div class="empty">Nog geen lessen. Een ouder kan een les toevoegen.</div>';return}el.innerHTML=groups.map(group=>{const s=group.label;const count=group.lessons.length;return '<div class="card subject-card '+subjectClass(s)+'" onclick="showSubject('+jsArg(s)+')"><div><div class="subject-icon">'+subjectIcon(s)+'</div><div class="subject-title">'+escapeHtml(s)+'</div></div><div class="small">'+count+' '+(count===1?'les':'lessen')+' · Bekijk →</div></div>'}).join('')}
 function escapeAttr(v){return escapeHtml(v).replace(/`/g,'&#96;')}
 function jsArg(v){return escapeAttr(JSON.stringify(v))}

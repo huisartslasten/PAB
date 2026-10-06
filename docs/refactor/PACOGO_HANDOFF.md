@@ -47,7 +47,7 @@
 ## Proven lesson/editor chain
 - `lesson-choice.js` is active via `choice-flow.js`.
 - `lesson-item-collector.js`: V4.78 item collection for words/custom, questions, dictation, math, spelling; preserves source-row `sort_order`.
-- `editor-items.js`: source-row parity fix.
+- `editor-items.js`: source-row parity fix and V4.78 legacy answer fallback.
 - `editor-roundtrip.js`: persisted parts/roles and legacy fallbacks verified.
 - `lesson-write-service.js`: deterministic create/update persistence ordering and item normalization.
 - `lesson-save-model.js`: canonical lesson save payload.
@@ -59,11 +59,11 @@
 - `lesson-save-runtime-adapter.js`: parent authorization and exact editor-field extraction.
 - `lesson-save-adapter.js`: runtime draft → canonical save model.
 - `lesson-save-preparation.js`: draft + `collectItems()` → coordinator input.
-- `lesson-save-request.js`: canonical model → coordinator/write execution request.
+- `lesson-save-request.js`: canonical model → coordinator/write execution request; missing model is rejected explicitly.
 - `lesson-save-runtime-flow.js`: authorization → draft extraction → preparation → execution request → coordinator → outcome callbacks.
-- `lesson-save-runtime-effects.js`: validation/persistence error UI and successful state/calendar/sidebar/message effects; does not duplicate coordinator-owned persistence/reload/calendar sync.
+- `lesson-save-runtime-effects.js`: validation/persistence error UI and successful state/calendar/sidebar/message effects; DOM error lookup is resolved lazily at execution time and it does not duplicate coordinator-owned persistence/reload/calendar sync.
 - `lesson-save-runtime-integration.js`: final injectable application integration contract; now also normalizes runtime-effect payload ownership.
-- `lesson-save-runtime-entry.js`: controlled TEST entry; receives the legacy runtime explicitly rather than resolving classic-script lexical bindings from ES-module scope.
+- `lesson-save-runtime-entry.js`: controlled TEST entry; receives the legacy runtime explicitly rather than resolving classic-script lexical bindings from ES-module scope; DOM and DB dependencies are deferred until their authorized execution boundaries.
 - `lesson-save-runtime-bootstrap.js`: explicit module-loading/readiness boundary; verifies the installed runtime entry and returns it from `pacoGOLessonSaveRuntimeReady`; propagates load/installer failures without legacy fallback.
 - `photo-storage.js`: classic-script boundary injects the live V4.78 runtime bridge and installs the synchronous `saveLesson` facade that waits for the explicit bootstrap readiness contract before invoking the refactored runtime.
 - `test/lesson-save-runtime-source-contract.test.js`: source-level guard for the three-part browser seam: facade → bootstrap readiness → installed runtime entry, plus explicit bridge dependencies and no timeout/fallback.
@@ -110,23 +110,24 @@
 - 491–500: application integration contract added/focused-tested; 4 passed/0 failed isolated harness
 - 501–510: application integration payload ownership hardened; isolated harness 2 passed/0 failed
 - 511–520: ES-module/classic-script runtime bridge corrected; explicit bootstrap/readiness boundary added; save invocation timing source-verified; synchronous runtime facade added; source-level seam guard added; browser execution still pending
+- 521–530: runtime dependency ordering hardened; DOM/DB dependencies deferred past authorization; editor answer fallback corrected; save-request input contract tightened; focused professional gate executed at 70 passed/0 failed; browser execution still pending
 
 ## Current state
-**Current checkpoint: 511–520, not yet fully closed.**
+**Checkpoint 521–530 is complete. The overall runtime-replacement gate remains open.**
 
-The critical runtime defect found during the 511–520 gate was module-scope visibility: the V4.78 page is a classic script, while `lesson-save-runtime-entry.js` is an ES module. Classic-script top-level lexical bindings such as `currentSubject` and `currentLesson` cannot be assumed to be directly resolvable from ES-module scope.
+The 521–530 boundary review found that the controlled runtime entry was resolving `#editorError` and constructing the lesson write service before the authorization boundary. That was treated as an architectural ordering defect, not patched around. The DOM error dependency is now resolved lazily, and the write service is constructed only when the authorized coordinator execution begins.
 
-The controlled bridge is now explicit. `photo-storage.js`, which executes in the classic-script environment, captures the V4.78 application bindings through live getters/setters and passes that bridge into the refactored save runtime through `lesson-save-runtime-bootstrap.js`.
+`editor-items.js` also had a genuine V4.78 fallback bug: a default parameter turned an omitted `answer_parts` field into an empty array, preventing the legacy `answer` fallback from running. That boundary is corrected without changing the deterministic editor contract.
 
-Source verification then established that the actual editor save buttons invoke the global `saveLesson()` directly. A dynamic import without an immediate facade would therefore leave a real startup race. The deliberate architecture is now: classic-script facade immediately available → single bootstrap readiness promise → installed refactored runtime entry → no legacy fallback. The facade propagates bootstrap failure rather than silently executing the old `saveLesson()`.
+`lesson-save-request.js` now rejects a missing model explicitly instead of silently converting the absence into `{}`.
 
-`lesson-save-runtime-bootstrap.js` now verifies that the installer produced a callable runtime entry and resolves the readiness promise with that installed entry. `photo-storage.js` defines the synchronous facade before the asynchronous module import can complete, so the existing V4.78 inline handlers have one deterministic entry point throughout startup.
+A dedicated GitHub Actions gate was added for the professional lesson-save refactor. The executed run at commit `c6b51b200e35ec671fa263e8ca2ebad73f369920` ran the focused refactor proof set on Node.js 22.23.3 and produced **70 tests passed, 0 failed, 0 skipped**. This is an actual executed result, not an inferred or local-only claim.
 
-`test/lesson-save-runtime-bootstrap.test.js` covers readiness publication, exactly-once installation, readiness resolving to the installed runtime entry, load-failure propagation, and installer-contract failure. `test/lesson-save-runtime-source-contract.test.js` additionally guards the source-level integration seam so future changes cannot silently replace the single readiness route with a timeout, fallback, or disconnected entry. `test/lesson-save-runtime-entry.test.js` continues to cover explicit bridge requirements and the validation stop before persistence.
+The standalone `lesson-write-service.test.js` was corrected separately to assert the explicit `lesson_items` table boundary. That test was not included in the 70-test executable gate and has not been re-executed after that correction.
 
-These tests have **not** been executed in the available environment, so no pass is claimed.
+The critical browser architecture remains: classic-script facade immediately available → single bootstrap readiness promise → installed refactored runtime entry → explicit V4.78 bridge → authorization-first runtime flow → no legacy fallback.
 
-**Actual legacy runtime replacement is still gated.** The next required proof is a real browser execution of the V4.78 save path through this facade/bootstrap, including actual save invocation timing, exact save order, Supabase persistence, and success/error effects. Until that proof exists, the legacy `saveLesson()` implementation must not be removed and checkpoint 511–520 must remain open.
+**Actual legacy runtime replacement is still gated.** The next required proof is a real browser execution of the V4.78 save path through this facade/bootstrap, including actual save invocation timing, exact save order, Supabase persistence, and success/error effects. Until that proof exists, the legacy `saveLesson()` implementation must not be removed and `main`/LIVE must not be touched.
 
 ## Safety
 - `main`/LIVE untouched.

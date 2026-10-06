@@ -1,13 +1,6 @@
 import { saveTestAttemptPersistence } from './test-attempt-write-service.js';
 
-function requireFunction(value, message) {
-  if (typeof value !== 'function') throw new Error(message);
-}
-
-export async function saveTestAttemptRuntime({ authorize, db, currentStudent, currentLesson, attempt } = {}) {
-  requireFunction(authorize, 'A test-attempt authorization function is required.');
-  if (!(await authorize())) return Object.freeze({ ok: false, stage: 'authorization' });
-
+export async function saveTestAttemptRuntime({ db, currentStudent, currentLesson, attempt } = {}) {
   const result = await saveTestAttemptPersistence({
     db,
     lessonId: currentLesson?.id,

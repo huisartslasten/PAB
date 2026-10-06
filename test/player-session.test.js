@@ -37,12 +37,15 @@ test('practice finishes only after every remaining item has been answered correc
   assert.equal(session.finished, true);
 });
 
-test('test session keeps ordered answers and advances one item at a time', () => {
+test('test session preserves the V4.78 test type and keeps ordered answers', () => {
   const session = createTestSession([{ id: 1 }, { id: 2 }], {
     shuffle: identityShuffle,
-    startedAt: '2026-10-05T00:00:00.000Z'
+    startedAt: '2026-10-05T00:00:00.000Z',
+    type: 'dictation'
   });
 
+  assert.equal(session.kind, 'test');
+  assert.equal(session.type, 'dictation');
   assert.equal(session.index, 0);
   assert.deepEqual(session.current, { id: 1 });
   assert.equal(session.startedAt, '2026-10-05T00:00:00.000Z');
@@ -74,14 +77,8 @@ test('V4.78 fixed answer rules require minimum words and required terms', () => 
   assert.equal(checkFixedAnswerRules(item, 'Veel computer kennis vandaag').ok, true);
 });
 
-test('V4.78 exact dictation answers accept persisted answer parts', () => {
-  const item = {
-    answer: 'fiets',
-    answer_parts: [
-      { text: 'fiets', role: 'answer' },
-      { text: 'rijwiel', role: 'extra' }
-    ]
-  };
+test('V4.78 exact dictation answers compare normalized item.answer directly', () => {
+  const item = { answer: 'fiets' };
   assert.equal(evaluateExactAnswer(item, 'Fiets'), true);
   assert.equal(evaluateExactAnswer(item, 'rijwiel'), false);
 });

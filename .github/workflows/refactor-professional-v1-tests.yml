@@ -1,0 +1,34 @@
+name: PacoGO professional refactor tests
+
+on:
+  push:
+    branches:
+      - refactor/professional-v1
+    paths:
+      - 'src/**'
+      - 'test/**'
+      - 'photo-storage.js'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/refactor-professional-v1-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  node-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout refactor branch
+        uses: actions/checkout@v4
+        with:
+          ref: refactor/professional-v1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run full Node test suite
+        run: npm test

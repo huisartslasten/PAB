@@ -116,8 +116,8 @@ test('lesson write service updates lesson before replacing its items', async () 
       op: 'update',
       table: 'lessons',
       payload: {
-        student: 'Zyon', subject: 'Rekenen', subvak: '', title: 'Aangepaste les',
-        type: 'math', explanation: '', ai_check_answers: false, ai_instruction: '', editor_labels: null
+        student: 'Zyon', subject: 'Rekenen', subvak: '', title: 'Aangepaste les', type: 'math',
+        explanation: '', ai_check_answers: false, ai_instruction: '', editor_labels: null
       }
     },
     { op: 'eq', table: 'lessons', column: 'id', value: 17 },
@@ -137,6 +137,37 @@ test('lesson write service propagates lesson update errors before touching items
     error
   );
   assert.equal(db.calls.some(call => call.op === 'delete'), false);
+});
+
+test('lesson write service propagates create errors before touching items', async () => {
+  const error = new Error('create failed');
+  const db = mockDb({ insertError: error });
+  const service = createLessonWriteService(db);
+
+  await assert.rejects(
+    () => service.saveLesson({ lesson: { student: 'Zyon', subject: 'Rekenen', title: 'Les', type: 'math' }, items: [] }),
+    error
+  );
+  assert.equal(db.calls.some(call => call.table === 'lesson_items'), false);
+});
+
+test('lesson write service preserves editor item ordering during replacement', async () => {
+  const db = mockDb({ rows: [{ id: 41 }] });
+  const service = createLessonWriteService(db);
+
+  await service.saveLesson({
+    lesson: { student: 'Zyon', subject: 'Nederlands', title: 'Woorden', type: 'words' },
+    items: [
+      { question: 'Eerste', answer: '1', sort_order: 3 },
+      { question: 'Tweede', answer: '2', sort_order: 7 }
+    ]
+  });
+
+  const itemInsert = db.calls.find(call => call.op === 'insert' && call.table === 'lesson_items');
+  assert.deepEqual(itemInsert.payload, [
+    { question: 'Eerste', answer: '1', sort_order: 3, hint: '', min_words: 0, required_terms: [], lesson_id: 41 },
+    { question: 'Tweede', answer: '2', sort_order: 7, hint: '', min_words: 0, required_terms: [], lesson_id: 41 }
+  ]);
 });
 
 test('lesson write service preserves the editor item normalization contract', async () => {

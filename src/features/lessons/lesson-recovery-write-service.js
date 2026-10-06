@@ -1,7 +1,7 @@
 // Pure persistence boundary for V4.78 lesson recovery actions.
 // Source behavior: delete -> deleted=true, archived=false; archive -> archived=true;
-// restore -> deleted=false, archived=false. UI, auth, state, navigation and messages
-// remain outside this service.
+// restore -> archived=false, deleted=false with Number(id). UI, auth, state,
+// navigation and messages remain outside this service.
 
 function requireDb(db) {
   if (!db || typeof db.from !== 'function') {
@@ -34,5 +34,6 @@ export async function archiveLesson({ db, lessonId } = {}) {
 }
 
 export async function restoreLesson({ db, lessonId } = {}) {
-  return updateLesson(db, lessonId, { deleted: false, archived: false });
+  const normalizedId = Number(requireLessonId(lessonId));
+  return updateLesson(db, normalizedId, { deleted: false, archived: false });
 }

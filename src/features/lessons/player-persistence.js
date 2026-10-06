@@ -8,6 +8,8 @@
 // 3. Read the generated attempt id.
 // 4. Insert test_attempt_answers rows linked by attempt_id.
 
+import { buildTestPersistencePayload } from './player-persistence-model.js';
+
 export function createPlayerPersistence(db, { clock = () => new Date().toISOString() } = {}) {
   if (!db) throw new Error('A Supabase client is required.');
   if (typeof clock !== 'function') throw new Error('A persistence clock is required.');
@@ -61,5 +63,10 @@ export function createPlayerPersistence(db, { clock = () => new Date().toISOStri
     return { attempt: savedAttempt, answers: savedAnswers || [] };
   }
 
-  return Object.freeze({ saveTestResult });
+  async function savePlayerAttempt(attempt) {
+    const payload = buildTestPersistencePayload(attempt);
+    return saveTestResult(payload);
+  }
+
+  return Object.freeze({ saveTestResult, savePlayerAttempt });
 }

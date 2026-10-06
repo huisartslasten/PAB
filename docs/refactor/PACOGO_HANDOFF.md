@@ -21,59 +21,33 @@
 9. Never claim a full `node --test` pass unless actually executed.
 10. Work only on `refactor/professional-v1`.
 11. **Patching is not an allowed refactor method.** Do not solve architectural or migration problems by adding local fixes, exceptions, compatibility shims, duplicated logic, or incremental edits to make the current structure merely work.
-12. **Legacy code is not a repair surface.** Do not modify `index.html` or other legacy runtime code to compensate for an incomplete refactor. Legacy changes are permitted only as a deliberate, final integration/removal step after the replacement boundary has been source-verified, focused-tested, and runtime-validated.
-13. Every proposed change must first identify its V4.78 source behavior, architectural responsibility, target module/boundary, contract, and parity test. If that cannot be stated clearly, stop before coding.
-14. **Refactor Gate:** before implementation, explicitly classify the change as either (a) new/refactored architecture or (b) patch/workaround. If it is (b), do not implement it; redesign the affected boundary instead.
-15. If an architectural mismatch, missing seam, or failed assumption is discovered, **stop and redesign the boundary** rather than patching the symptom. A blocked step is preferable to a workaround.
-16. Tests must prove contracts and behavior, not merely make the current implementation green. Do not weaken assertions or broaden accepted outcomes just to accommodate an uncertain implementation.
+12. **Legacy code is not a repair surface.** Modify legacy runtime only as a deliberate final integration/removal step after the replacement boundary is source-verified, focused-tested, and runtime-validated.
+13. Every proposed change must identify V4.78 source behavior, architectural responsibility, target module/boundary, contract, and parity test.
+14. **Refactor Gate:** classify every change as new/refactored architecture or patch/workaround. If workaround, redesign the boundary instead.
+15. If an architectural mismatch, missing seam, or failed assumption is discovered, stop and redesign the boundary rather than patching the symptom.
+16. Tests must prove contracts and behavior, not merely make the current implementation green. Do not weaken assertions.
 
 ## Long-term code quality and architecture policy
-PacoGO must not only be professionally structured during the current refactor, but also remain structurally maintainable and consistent over the long term.
-
-After every meaningful change, functional correctness must be checked together with whether obsolete or redundant parts left behind by earlier implementations are still present. This includes functions, variables, imports, exports, event handlers, UI/CSS, compatibility layers, fallback logic, tests, and documentation.
-
-The principle is:
+PacoGO must remain structurally maintainable throughout and after the refactor. After every meaningful change, check for obsolete or redundant functions, variables, imports/exports, event handlers, UI/CSS, compatibility layers, fallback logic, tests, and documentation.
 
 **A new implementation actually replaces an old implementation when the old implementation is no longer needed.**
 
-For successive changes X → Y → Z, completion means not only establishing that Z works correctly, but also removing obsolete parts of X and Y where they are no longer required.
-
-PacoGO should also periodically receive a broader architecture and codebase review to detect architectural drift early. This may include checking for:
-- duplicate implementations;
-- unused code and dependencies;
-- obsolete code paths;
-- modules that are too large or have too broad a responsibility;
-- unclear module boundaries;
-- unwanted dependencies;
-- outdated tests and documentation;
-- inconsistencies in UI/CSS;
-- compliance with GitHub/Supabase separation;
-- compliance with TEST/LIVE separation.
-
-The long-term goal is that a future major refactor should ideally not require reconstruction of the entire application, but instead be a targeted architecture review with focused improvements to individual components where needed.
-
-**This is a long-term principle and will be refined further later. It does not change or redesign the current refactor procedure at this time.**
+Periodically review duplicate implementations, unused code/dependencies, obsolete paths, oversized modules, unclear boundaries, unwanted dependencies, stale tests/docs, UI/CSS inconsistencies, GitHub/Supabase separation, and TEST/LIVE separation.
 
 ## Architecture / safety boundaries
-- **GitHub and Supabase are strictly separated responsibilities.**
-- GitHub contains the software: source code, tests, documentation, checkpoints, and Git history.
-- Supabase contains application data and backend services.
-- Within Supabase, **Database and Storage remain strictly separated**:
-  - Database = structured data, relationships, lessons, results, agenda data, and other relational/application records.
-  - Storage = user files such as photos, videos, audio, and other binary files.
+- GitHub contains software: source, tests, docs, checkpoints, Git history.
+- Supabase contains application data/backend services.
+- Supabase Database and Storage remain separate responsibilities.
 - Large user files must not be stored in Git/GitHub.
-- **Supabase TEST and Supabase LIVE must remain strictly separated**, just as `refactor/professional-v1` and `main` remain separated.
-- The refactor must not break, blur, or implicitly mix these boundaries.
+- Supabase TEST and LIVE remain strictly separated.
+- `refactor/professional-v1` and `main` remain strictly separated.
 
 ## Save-flow architecture
-The professional lesson-save path is now composed of explicit boundaries for editor row collection, editor round-trip, save model normalization, validation, dictation-only spelling checking, local test-calendar synchronization, deterministic persistence, post-persistence outcome resolution, runtime authorization/editor extraction, runtime preparation, execution request construction, runtime orchestration, application effects, runtime integration, runtime entry, and browser bootstrap.
+The professional lesson-save path is composed of explicit boundaries for editor row collection, editor round-trip, save model normalization, validation, dictation-only spelling checking, local test-calendar synchronization, deterministic persistence, post-persistence outcome resolution, runtime authorization/editor extraction, runtime preparation, execution request construction, runtime orchestration, application effects, runtime integration, runtime entry, and browser bootstrap.
 
-The classic-script runtime bridge exposes the V4.78 application dependencies without moving production data ownership into the modules. The runtime facade is explicit and has no timeout, fallback to legacy save, or duplicate execution.
-
-The browser-proof fixture uses isolated test doubles and never connects to real Supabase application data.
+The classic-script runtime bridge exposes V4.78 application dependencies without moving production data ownership into modules. The runtime facade has no timeout, legacy fallback, or duplicate execution.
 
 ## Save flow parity contract
-The proven V4.78 save flow is:
 1. parent authorization
 2. editor draft extraction
 3. collect editor items
@@ -107,51 +81,56 @@ The proven V4.78 save flow is:
 - 431–440: parent auth + editor-state adapter source-verified/focused-tested
 - 441–450: runtime draft → canonical save model source-verified/focused-tested
 - 451–460: save preparation seam source-verified/focused-tested
-- 461–470: canonical model → execution request boundary; test source added but not executed
-- 471–480: runtime orchestration seam source-verified/focused-tested; 5 passed/0 failed isolated harness
-- 481–490: application-effects boundary source-mapped/focused-tested; 4 passed/0 failed isolated harness
-- 491–500: application integration contract added/focused-tested; 4 passed/0 failed isolated harness
-- 501–510: application integration payload ownership hardened; isolated harness 2 passed/0 failed
-- 511–520: ES-module/classic-script runtime bridge corrected; explicit bootstrap/readiness boundary added; save invocation timing source-verified; synchronous runtime facade added; source-level seam guard added; browser execution still pending
-- 521–530: runtime dependency ordering hardened; DOM/DB dependencies deferred past authorization; editor answer fallback corrected; save-request input contract tightened; focused professional gate executed at 70 passed/0 failed; browser execution still pending
-- 531–540: standalone `lesson-write-service` contract promoted into the professional executable gate; GitHub Actions executed **76 passed / 0 failed / 0 skipped**; no production patch or weakened assertion; browser execution still pending
-- 541–550: controlled Playwright browser-proof boundary added; first fixture run failed during initialization; production code was not patched; fixture boundary was corrected
-- 551–560: **controlled browser proof closed and legacy V4.78 `saveLesson()` deliberately removed from `index.html`**; source-contract guard added; one-time removal gate succeeded; migration workflow removed immediately
+- 461–470: canonical model → execution request boundary
+- 471–480: runtime orchestration seam source-verified/focused-tested
+- 481–490: application-effects boundary source-mapped/focused-tested
+- 491–500: application integration contract added/focused-tested
+- 501–510: application integration payload ownership hardened
+- 511–520: ES-module/classic-script runtime bridge corrected; explicit bootstrap/readiness boundary added; synchronous runtime facade added
+- 521–530: runtime dependency ordering hardened; editor fallback and save-request contracts tightened; professional gate 70/70
+- 531–540: professional executable gate promoted; GitHub Actions 76 passed / 0 failed / 0 skipped
+- 541–550: controlled Playwright browser-proof boundary added and fixture corrected
+- 551–560: controlled browser proof closed; legacy V4.78 `saveLesson()` deliberately removed from `index.html`; source-contract guard added
+- 561–570: lesson recovery/delete/archive/restore boundary extracted, runtime-wired, focused-tested, browser-proven, and legacy recovery implementations removed from `index.html`
+- 571–580: guest lesson access boundary extracted, runtime-wired, focused-tested, browser-proven, and legacy `setGuestLesson()` implementation removed from `index.html`
 
 ## Current state
-The browser-runtime validation gate is closed and the legacy monolithic `saveLesson()` implementation has now been removed from `index.html` on `refactor/professional-v1`.
+The guest lesson access boundary is now fully migrated on `refactor/professional-v1`.
 
-The proven public save entry is now exclusively:
+The proven public guest access path is exclusively:
 
-**classic `window.saveLesson` facade → single bootstrap readiness promise → installed runtime entry → explicit V4.78 bridge → authorization → editor DOM extraction → deterministic item collection → validation → write service → reload/outcome → calendar/sidebar/message effects.**
+**classic `window.setGuestLesson` facade → single bootstrap readiness promise → installed guest runtime entry → explicit V4.78 bridge → parent authorization → guest lookup → assignment lookup/update/create → parent-student refresh → success/error message.**
 
-The post-removal `index.html` blob is `5ddbef244116b844f0089e3d392f7024f5f90624`.
+The legacy V4.78 `async function setGuestLesson(lessonId,active)` declaration has been deliberately removed from `index.html`. Existing call sites continue to use the public facade.
 
-A source-contract test in `test/lesson-save-runtime-source-contract.test.js` now fails if `index.html` ever regains either `async function saveLesson()` or `function saveLesson()`.
+The guest boundary consists of:
+- `src/features/lessons/lesson-guest-access-runtime.js` — pure orchestration/behavior contract;
+- `src/features/lessons/lesson-guest-access-write-service.js` — guest-user and guest-lesson persistence;
+- `src/features/lessons/lesson-guest-access-runtime-entry.js` — classic-script bridge adapter;
+- `src/features/lessons/lesson-guest-access-runtime-bootstrap.js` — explicit dynamic bootstrap/readiness boundary;
+- `photo-storage.js` — live bridge and synchronous public `window.setGuestLesson` facade.
 
-The one-time removal workflow succeeded as run `37504724654` and was then deleted. It is not part of the permanent runtime architecture.
+`test/lesson-guest-access-runtime-source-contract.test.js` guards that `index.html` cannot regain the legacy declaration and that `photo-storage.js` retains the refactored bootstrap/readiness facade.
+
+The controlled one-time legacy-removal workflow was deleted immediately after migration and is not part of the permanent architecture.
 
 ### Validation status
-- Pre-removal professional Node gate: **76 passed / 0 failed / 0 skipped**.
-- Controlled browser proof before removal: **success**, run `37496386784`.
-- One-time legacy removal gate: **success**, run `37504724654`.
-- Post-removal professional Node gate: **must be green on the post-removal documentation commit before this checkpoint is considered fully closed**.
-- Post-removal browser proof: **must be green on the post-removal documentation commit before this checkpoint is considered fully closed**.
-
-The first browser attempt failed at fixture runtime initialization. The fixture was corrected at its own boundary and the second run passed. The legacy removal was then performed only after that browser proof existed. No production fallback or patch was introduced.
-
-## Next gate
-Once the post-removal Node gate and browser proof are green, inspect the next remaining legacy-runtime ownership boundary. Do not perform unrelated cleanup, visual redesign, schema changes, agenda-import changes, or new lesson-editor AI work.
-
-If the next source audit exposes an architectural mismatch, stop and redesign the boundary rather than patching the legacy monolith.
-
-## Safety
-- `main`/LIVE untouched.
+- Post-removal professional Node gate: **success**, run `37517619183`.
+- Post-removal controlled browser proof: **success**, run `37517740123`.
+- Browser proof covers save runtime, recovery runtime, and guest access runtime.
+- The browser workflow temporarily exposed an `npm ci` dependency-install mistake during a proof-trigger edit; this was corrected back to the established `npm install` workflow before the successful run. No application code was changed for that failure.
 - No Supabase schema changes.
-- No real Supabase data access from the browser proof.
+- No `main`/LIVE changes.
 - No agenda-import changes.
 - No lesson-editor AI behavior added.
 - No visual redesign.
+
+## Next gate
+Inspect the next remaining legacy-runtime ownership boundary. Do not perform unrelated cleanup, visual redesign, schema changes, agenda-import changes, or new lesson-editor AI work.
+
+Apply the same sequence: authoritative V4.78 behavior → responsibility/contract → focused tests → runtime wiring → browser proof → controlled legacy removal → checkpoint.
+
+If the next source audit exposes an architectural mismatch, stop and redesign the boundary rather than patching the legacy monolith.
 
 ## New-chat procedure
 At every new chat: confirm repo/branch, read this handoff and latest checkpoint, inspect actual repository state, compare relevant behavior against authoritative V4.78, continue from the current gate, never touch `main`, and only claim tests that were actually executed. At checkpoint completion update both this handoff and `docs/refactor/step-X-Y.md`; keep historical checkpoint files.

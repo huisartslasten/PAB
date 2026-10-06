@@ -1,0 +1,56 @@
+name: one-time remove legacy saveLesson
+
+on:
+  push:
+    branches:
+      - refactor/professional-v1
+
+permissions:
+  contents: write
+
+jobs:
+  remove-legacy-saveLesson:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout refactor branch
+        uses: actions/checkout@v4
+        with:
+          ref: refactor/professional-v1
+          fetch-depth: 0
+
+      - name: Remove exactly the V4.78 legacy saveLesson implementation
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          path = Path('index.html')
+          source = path.read_text(encoding='utf-8')
+          pattern = re.compile(r'\nasync function saveLesson\(\)\{.*?\n\}\nfunction editCurrentLesson\(', re.S)
+          matches = list(pattern.finditer(source))
+          if len(matches) != 1:
+              raise SystemExit(f'Expected exactly one legacy saveLesson block, found {len(matches)}')
+
+          replacement = '\nfunction editCurrentLesson('
+          updated = pattern.sub(replacement, source, count=1)
+          if 'async function saveLesson()' in updated or 'function saveLesson()' in updated:
+              raise SystemExit('Legacy saveLesson declaration still exists after removal')
+
+          path.write_text(updated, encoding='utf-8')
+
+      - name: Verify exact source gate
+        shell: bash
+        run: |
+          ! grep -Eq '(^|[[:space:]])(async )?function saveLesson[[:space:]]*\(' index.html
+
+      - name: Commit removal
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --check
+          git diff --cached --quiet && { echo 'No legacy saveLesson removal was produced.'; exit 1; }
+          git commit -m 'refactor: remove legacy saveLesson implementation'
+          git push origin HEAD:refactor/professional-v1

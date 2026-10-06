@@ -164,23 +164,25 @@ test('player persistence preserves explicit timestamps', async () => {
   assert.equal(inserted[1].rows[0].answered_at, 'answered');
 });
 
-test('player persistence does not create answer rows when an attempt has no answers', async () => {
+test('player persistence skips the database entirely when an attempt has no answers', async () => {
   const calls = [];
   const db = {
     from(table) {
       calls.push(table);
       return {
-        insert(rows) {
-          return { select: () => ({ single: () => Promise.resolve({ data: { id: 12, ...rows }, error: null }) }) };
+        insert() {
+          throw new Error('Database must not be touched for an empty attempt.');
         }
       };
     }
   };
 
-  const result = await createPlayerPersistence(db).saveTestResult({ attempt: { lesson_id: 3 } });
-  assert.equal(result.attempt.id, 12);
-  assert.equal(typeof result.attempt.started_at, 'string');
-  assert.equal(typeof result.attempt.completed_at, 'string');
+  const result = await createPlayerPersistence(db).saveTestResult({
+    attempt: { lesson_id: 3 },
+    answers: []
+  });
+
+  assert.equal(result.attempt, null);
   assert.deepEqual(result.answers, []);
-  assert.deepEqual(calls, ['test_attempts']);
+  assert.deepEqual(calls, []);
 });

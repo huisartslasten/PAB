@@ -5,7 +5,7 @@
 <script>
 var currentStudent=null,currentSubject=null,currentLesson=null,lessons=[],__events=[],__lastDbInsert=null,__lastDbDelete=null,__failItemInsert=false,__createdLesson=null;
 var requireParent=async()=>{__events.push('authorize');return true};
-var loadLessons=async()=>{__events.push('load');lessons=__createdLesson?[__createdLesson]:[]};
+var loadLessons=async()=>{__events.push('load');lessons.length=0;if(__createdLesson)lessons.push(__createdLesson)};
 var setCurrentStudent=value=>{currentStudent=value;__events.push('student:'+value)};
 var setCurrentSubject=value=>{currentSubject=value;__events.push('subject:'+value)};
 var setCurrentLesson=value=>{currentLesson=value;__events.push('lesson:'+(value&&value.id||'null'))};

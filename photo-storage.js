@@ -160,11 +160,17 @@ const lessonSaveRuntimeBridge = Object.defineProperties({}, {
   removeTestDate: { get: () => removeTestDate }
 });
 
-// Explicit bootstrap: publish one readiness contract immediately. The save entry
-// itself is installed only after the ES module is loaded; failures are propagated.
-import('./src/features/lessons/lesson-save-runtime-bootstrap.js')
+// Explicit runtime facade: saveLesson is callable synchronously by the legacy
+// V4.78 inline handlers, but execution cannot enter the new runtime until the
+// bootstrap readiness contract resolves. A bootstrap failure is propagated;
+// the legacy implementation is never used as a fallback.
+const lessonSaveRuntimeBootstrap = import('./src/features/lessons/lesson-save-runtime-bootstrap.js')
   .then(({ bootstrapLessonSaveRuntime }) => bootstrapLessonSaveRuntime({
     runtime: lessonSaveRuntimeBridge,
     target: window
-  }))
-  .catch(error => console.error('PacoGO lesson-save runtime bootstrap failed:', error));
+  }));
+window.pacoGOLessonSaveRuntimeReady = lessonSaveRuntimeBootstrap;
+window.saveLesson = async function saveLessonRuntimeFacade(...args){
+  const runtimeSaveLesson = await lessonSaveRuntimeBootstrap;
+  return runtimeSaveLesson(...args);
+};

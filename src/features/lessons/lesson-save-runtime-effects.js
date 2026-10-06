@@ -6,13 +6,18 @@
 export const LESSON_SAVE_VALIDATION_MESSAGE = 'Vul het vak, de lestitel en minstens één item in.';
 
 export function buildLessonSaveRuntimeEffects({
-  errorElement,
+  getErrorElement,
   state = {},
   refreshTestCalendar,
   refreshSidebars,
   showMessage
 } = {}) {
+  const resolveErrorElement = () => (
+    typeof getErrorElement === 'function' ? getErrorElement() : null
+  );
+
   async function handleValidationFailure() {
+    const errorElement = resolveErrorElement();
     if (errorElement) {
       errorElement.textContent = LESSON_SAVE_VALIDATION_MESSAGE;
       errorElement.classList?.remove?.('hidden');
@@ -21,6 +26,7 @@ export function buildLessonSaveRuntimeEffects({
   }
 
   async function handlePersistenceFailure(error) {
+    const errorElement = resolveErrorElement();
     if (errorElement) {
       errorElement.textContent = 'Opslaan mislukt: ' + String(error?.message || error || 'Onbekende fout.');
       errorElement.classList?.remove?.('hidden');

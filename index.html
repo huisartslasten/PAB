@@ -3058,48 +3058,6 @@ async function readPhotoLesson(){
     document.getElementById('photoOcrStatus').textContent='⚠️ '+(error.message||'De foto kon niet worden begrepen.');
   }
 }
-async function createLessonFromPhoto(){
-  if(!requireParent())return;
-  const student=document.getElementById('photoLessonStudent').value;
-  const subject=document.getElementById('photoLessonSubject').value.trim();
-  const title=document.getElementById('photoLessonName').value.trim();
-  const type=document.getElementById('photoLessonType').value;
-  const entries=document.getElementById('photoLessonWords').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-  const status=document.getElementById('photoOcrStatus');
-  if(!student||!subject||!title||!entries.length){
-    status.textContent='⚠️ Vul leerling, vak, lestitel en minstens één vraag-antwoordpaar in.';
-    return;
-  }
-  const pairs=entries.map(line=>{
-    const parts=line.split('||');
-    return {question:(parts[0]||'').trim(),answer:(parts.slice(1).join('||')||parts[0]||'').trim()};
-  }).filter(p=>p.question&&p.answer);
-  if(!pairs.length){status.textContent='⚠️ Controleer de vraag-antwoordparen.';return;}
-  const created=await db.from('lessons').insert({student,subject,title,type}).select().single();
-  if(created.error){status.textContent='⚠️ Les opslaan mislukt: '+created.error.message;return;}
-  const rows=pairs.map((p,i)=>({lesson_id:created.data.id,question:p.question,answer:p.answer,sort_order:i}));
-  const inserted=await db.from('lesson_items').insert(rows);
-  if(inserted.error){
-    await db.from('lessons').delete().eq('id',created.data.id);
-    status.textContent='⚠️ Vragen opslaan mislukt: '+inserted.error.message;
-    return;
-  }
-  await loadLessons();
-  currentStudent=student;
-  currentSubject=subject;
-  currentLesson=lessons.find(l=>Number(l.id)===Number(created.data.id))||null;
-  if(document.getElementById('photoSaveOriginal')?.checked&&photoLessonSelectedFile&&window.saveLessonSourcePhoto){
-    try{
-      await window.saveLessonSourcePhoto(created.data.id,photoLessonSelectedFile);
-    }catch(error){
-      console.error('Source photo save error:',error);
-      showMessage('Les is gemaakt, maar de bronfoto kon niet worden opgeslagen.','error');
-    }
-  }
-
-  showMessage('Les gemaakt uit de foto. Controleer hem gerust nog even.','success');
-  showParentDashboard();
-}
 async function showAddLesson(){if(photoSessionToken)await cleanupPhotoSession();if(!requireParent())return;currentLesson=null;hideAll();document.getElementById('editor').classList.remove('hidden');document.getElementById('editorTitle').textContent='Nieuwe les';document.getElementById('editorBannerLabel').textContent='🐾 NIEUWE LES';document.getElementById('lessonSubject').value='';document.getElementById('lessonSubvak').value='';document.querySelectorAll('input[name=lessonStudent]').forEach(r=>r.checked=r.value===currentStudent);document.getElementById('lessonName').value='';document.getElementById('lessonExplanation').value='';document.getElementById('lessonType').value='words';document.getElementById('lessonAiCheckAnswers').checked=true;document.getElementById('lessonAiInstruction').value='';toggleLessonAiInstruction();document.getElementById('lessonTestDate').value='';document.getElementById('lessonTestDateEnabled').checked=false;document.getElementById('lessonTestDatePicker').classList.add('hidden');document.getElementById('editorError').classList.add('hidden');setDefaultSpellingLabels();resetEditorRows();changeLessonType();renderDatePicker('lessonTestDatePicker','lessonTestDate','')}
 function setDefaultSpellingLabels(){document.getElementById('spellingLabelQuestion').value='Werkwoord';document.getElementById('spellingLabelPerfect').value='Voltooid deelwoord';document.getElementById('spellingLabelAdjective').value='Bijvoeglijk gebruikt voltooid deelwoord'}
 function getSpellingLabels(){return {question:document.getElementById('spellingLabelQuestion')?.value.trim()||'Werkwoord',perfect:document.getElementById('spellingLabelPerfect')?.value.trim()||'Voltooid deelwoord',adjective:document.getElementById('spellingLabelAdjective')?.value.trim()||'Bijvoeglijk gebruikt voltooid deelwoord'}}

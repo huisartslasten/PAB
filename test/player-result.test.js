@@ -55,6 +55,18 @@ test('result keeps the learner answer and expected answer separately', () => {
   }]);
 });
 
+test('result preserves whitespace exactly as V4.78 renders it', () => {
+  const result = createPlayerResult({
+    answers: [
+      { item: { question: '  Vraag  ', answer: '  Goed  ' }, value: '  Mijn antwoord  ', correct: false }
+    ]
+  });
+
+  assert.equal(result.answers[0].question, '  Vraag  ');
+  assert.equal(result.answers[0].value, '  Mijn antwoord  ');
+  assert.equal(result.answers[0].expected, '  Goed  ');
+});
+
 test('empty result has no division error', () => {
   const result = createPlayerResult({ answers: [] });
   assert.equal(result.total, 0);

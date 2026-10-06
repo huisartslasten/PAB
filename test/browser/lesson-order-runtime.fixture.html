@@ -15,7 +15,12 @@
           eq(column, value) { state.filters.push([column, value]); return builder; },
           order(column, options) { state.order = [column, options]; return Promise.resolve({ data: window.__remoteRows, error: null }); },
           delete() { state.op = 'delete'; return builder; },
-          insert(rows) { state.op = 'insert'; state.payload = rows; return Promise.resolve({ data: null, error: null }); },
+          insert(rows) {
+            state.op = 'insert';
+            state.payload = rows;
+            window.__calls.push({ table, op: 'insert', rows });
+            return Promise.resolve({ data: null, error: null });
+          },
           then(resolve, reject) {
             try {
               if (state.op === 'delete') window.__calls.push({ table, op: 'delete', filters: state.filters.slice() });
@@ -23,7 +28,6 @@
             } catch (error) { return Promise.reject(error).then(resolve, reject); }
           }
         };
-        window.__calls.push({ table, op: state.op });
         return builder;
       }
     };

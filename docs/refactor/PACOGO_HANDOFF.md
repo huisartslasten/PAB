@@ -47,19 +47,6 @@ The professional lesson-save path is composed of explicit boundaries for editor 
 
 The classic-script runtime bridge exposes V4.78 application dependencies without moving production data ownership into modules. The runtime facade has no timeout, legacy fallback, or duplicate execution.
 
-## Save flow parity contract
-1. parent authorization
-2. editor draft extraction
-3. collect editor items
-4. validation
-5. dictation spelling check when applicable
-6. persistence
-7. persistence error → `Opslaan mislukt: ...` and stop
-8. success → `currentSubject`, clear `currentLesson`, reload lessons
-9. resolve saved lesson and add/update/remove local test-calendar entry from `testDate`
-10. refresh test calendar/sidebar
-11. success message
-
 ## Checkpoint history
 - 241–250: player navigation
 - 251–270: completion package
@@ -94,33 +81,28 @@ The classic-script runtime bridge exposes V4.78 application dependencies without
 - 561–570: lesson recovery/delete/archive/restore boundary extracted, runtime-wired, focused-tested, browser-proven, and legacy recovery implementations removed from `index.html`
 - 571–580: guest lesson access boundary extracted, runtime-wired, focused-tested, browser-proven, and legacy `setGuestLesson()` implementation removed from `index.html`
 - 581–590: photo-to-lesson creation boundary extracted, runtime-wired, focused-tested, controlled legacy removal completed, source-contract guarded, and controlled browser proof closed
+- 591–600: test-attempt persistence/runtime boundary extracted, runtime-wired, focused-tested, and browser-proven
 
 ## Current state
-The guest lesson access boundary is fully migrated on `refactor/professional-v1`.
+The guest lesson access, photo-to-lesson creation, and test-attempt completion boundaries are migrated on `refactor/professional-v1`.
 
-The photo-to-lesson creation boundary is also fully migrated and checkpoint 581–590 is closed. The proven public photo path is exclusively:
+The test-attempt path consists of:
+- `src/features/test-history/test-attempt-write-service.js` — deterministic `test_attempts` / `test_attempt_answers` persistence;
+- `src/features/test-history/test-attempt-runtime.js` — student-owned completion runtime contract;
+- `src/features/test-history/test-attempt-runtime-entry.js` — runtime state adapter/public handler installation;
+- `src/features/test-history/test-attempt-runtime-bootstrap.js` — explicit dynamic bootstrap/readiness boundary;
+- classic runtime bridge/facade — public `window.saveTestAttempt` path without legacy fallback.
 
-**classic `window.createLessonFromPhoto` facade → single bootstrap readiness promise → installed photo runtime entry → explicit V4.78 bridge → parent authorization → deterministic lesson/item persistence with rollback → lesson reload/state restoration → optional source-photo persistence → exact success/dashboard effects.**
+The test-attempt runtime deliberately does **not** require parent authorization: this path records the student's completed test attempt using the active student/lesson state.
 
-The photo boundary consists of:
-- `src/features/lessons/lesson-photo-runtime.js` — pure orchestration/behavior contract;
-- `src/features/lessons/lesson-photo-write-service.js` — deterministic lesson/item persistence and rollback;
-- `src/features/lessons/lesson-photo-runtime-entry.js` — classic-script bridge adapter and runtime contract validation;
-- `src/features/lessons/lesson-photo-runtime-bootstrap.js` — explicit dynamic bootstrap/readiness boundary;
-- `photo-storage.js` — live bridge and synchronous public `window.createLessonFromPhoto` facade.
-
-The legacy V4.78 `async function createLessonFromPhoto()` implementation has been deliberately removed from `index.html`. The controlled one-time migration succeeded in run `37521423151`; it created removal commit `6580f71f515eb9e92ba27ffd00ae0b2e17b6242a` and then deleted its own workflow in commit `25d1b9829dd6fcf283e71447f58ab9699028fab4`.
-
-`test/lesson-photo-runtime-source-contract.test.js` guards that `index.html` cannot regain the legacy photo implementation and that `photo-storage.js` retains the single refactored bootstrap/readiness facade without fallback or duplicate bootstrap.
-
-The final browser fixture correction commit is `ea9ecb281f8f7a45a973de52cad5b6a3408d2588`; it corrected the test fixture to mutate the existing lesson array rather than replace the array reference held by the runtime. It did not alter production behavior.
+Checkpoint 591–600 preserved the V4.78 result contract, including the returned `attemptId`, score and total-question count. The browser proof passed after the test-attempt browser assertion was aligned with the actual return contract rather than weakening the production implementation.
 
 ## Validation status
-- Controlled photo legacy-removal workflow: **success**, run `37521423151`.
-- Professional refactor gate: **success**, run `37522351036`, job `112470686619`.
-- Controlled Playwright browser proof: **success**, run `37523556598`, job `112474746075`; all browser-proof steps completed successfully.
-- Final photo fixture correction: commit `ea9ecb281f8f7a45a973de52cad5b6a3408d2588`.
-- Checkpoint documentation close: commit `7c142f481d096de3704d65623f5bbfaa2c937310`.
+- Photo boundary professional gate: **success**, run `37522351036`, job `112470686619`.
+- Photo browser proof: **success**, run `37523556598`, job `112474746075`.
+- Test-attempt professional gate: **success**, run `37526377590`.
+- Test-attempt browser proof: **success**, run `37526403261`, job `112484398814`.
+- Checkpoint documentation close: commit `4e434969ea2605d425ba2327fbebe2c930cbce1f`.
 - No Supabase schema changes.
 - No `main`/LIVE changes.
 - No agenda-import changes.
@@ -128,7 +110,7 @@ The final browser fixture correction commit is `ea9ecb281f8f7a45a973de52cad5b6a3
 - No visual redesign.
 
 ## Next gate
-Checkpoint 581–590 is closed. Inspect the next remaining legacy-runtime ownership boundary directly from the authoritative V4.78 source and the current `refactor/professional-v1` tree.
+Checkpoint 591–600 is closed. Inspect the next remaining legacy-runtime ownership boundary directly from the authoritative V4.78 source and the current `refactor/professional-v1` tree.
 
 Apply the same sequence: authoritative V4.78 behavior → responsibility/contract → focused tests → runtime wiring → browser proof → controlled legacy removal → checkpoint.
 

@@ -64,3 +64,4 @@ jobs:
           test/lesson-recovery-runtime-entry.test.js
           test/lesson-recovery-runtime-bootstrap.test.js
           test/lesson-recovery-runtime-source-contract.test.js
+          test/lesson-guest-access-runtime.test.js

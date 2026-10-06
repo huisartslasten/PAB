@@ -64,8 +64,8 @@
 - `lesson-save-runtime-effects.js`: validation/persistence error UI and successful state/calendar/sidebar/message effects; does not duplicate coordinator-owned persistence/reload/calendar sync.
 - `lesson-save-runtime-integration.js`: final injectable application integration contract; now also normalizes runtime-effect payload ownership.
 - `lesson-save-runtime-entry.js`: controlled TEST entry; receives the legacy runtime explicitly rather than resolving classic-script lexical bindings from ES-module scope.
-- `lesson-save-runtime-bootstrap.js`: explicit module-loading/readiness boundary for the lesson-save runtime; publishes `pacoGOLessonSaveRuntimeReady` and propagates load/installer failures without legacy fallback.
-- `photo-storage.js`: classic-script boundary injects the live V4.78 runtime bridge and enters through the explicit lesson-save bootstrap.
+- `lesson-save-runtime-bootstrap.js`: explicit module-loading/readiness boundary; verifies the installed runtime entry and returns it from `pacoGOLessonSaveRuntimeReady`; propagates load/installer failures without legacy fallback.
+- `photo-storage.js`: classic-script boundary injects the live V4.78 runtime bridge and installs the synchronous `saveLesson` facade that waits for the explicit bootstrap readiness contract before invoking the refactored runtime.
 
 ## Authoritative V4.78 saveLesson() order
 1. parent authorization
@@ -108,7 +108,7 @@
 - 481–490: application-effects boundary source-mapped/focused-tested; 4 passed/0 failed isolated harness
 - 491–500: application integration contract added/focused-tested; 4 passed/0 failed isolated harness
 - 501–510: application integration payload ownership hardened; isolated harness 2 passed/0 failed
-- 511–520: ES-module/classic-script runtime bridge corrected; explicit bootstrap/readiness boundary added; focused test sources added; full browser execution still pending
+- 511–520: ES-module/classic-script runtime bridge corrected; explicit bootstrap/readiness boundary added; save invocation timing source-verified; synchronous runtime facade added; browser execution still pending
 
 ## Current state
 **Current checkpoint: 511–520, not yet fully closed.**
@@ -117,11 +117,13 @@ The critical runtime defect found during the 511–520 gate was module-scope vis
 
 The controlled bridge is now explicit. `photo-storage.js`, which executes in the classic-script environment, captures the V4.78 application bindings through live getters/setters and passes that bridge into the refactored save runtime through `lesson-save-runtime-bootstrap.js`.
 
-The bootstrap boundary now publishes `window.pacoGOLessonSaveRuntimeReady`. It is an explicit module-loading contract, not a timeout/fallback mechanism: module-load or installer failures are propagated and the legacy save path is not deliberately executed as a compatibility fallback.
+Source verification then established that the actual editor save buttons invoke the global `saveLesson()` directly. A dynamic import without an immediate facade would therefore leave a real startup race. The deliberate architecture is now: classic-script facade immediately available → single bootstrap readiness promise → installed refactored runtime entry → no legacy fallback. The facade propagates bootstrap failure rather than silently executing the old `saveLesson()`.
 
-`test/lesson-save-runtime-bootstrap.test.js` covers readiness publication, exactly-once installation, load-failure propagation, and installer-contract failure. `test/lesson-save-runtime-entry.test.js` continues to cover explicit bridge requirements and the validation stop before persistence. These tests have **not** been executed in the available environment, so no pass is claimed.
+`lesson-save-runtime-bootstrap.js` now verifies that the installer produced a callable runtime entry and resolves the readiness promise with that installed entry. `photo-storage.js` defines the synchronous facade before the asynchronous module import can complete, so the existing V4.78 inline handlers have one deterministic entry point throughout startup.
 
-**Actual legacy runtime replacement is still gated.** The next required proof is a real browser execution of the V4.78 save path through this bootstrap, including the actual save invocation timing, exact save order, Supabase persistence, and success/error effects. Until that proof exists, the legacy `saveLesson()` implementation must not be removed and checkpoint 511–520 must remain open.
+`test/lesson-save-runtime-bootstrap.test.js` covers readiness publication, exactly-once installation, readiness resolving to the installed runtime entry, load-failure propagation, and installer-contract failure. `test/lesson-save-runtime-entry.test.js` continues to cover explicit bridge requirements and the validation stop before persistence. These tests have **not** been executed in the available environment, so no pass is claimed.
+
+**Actual legacy runtime replacement is still gated.** The next required proof is a real browser execution of the V4.78 save path through this facade/bootstrap, including actual save invocation timing, exact save order, Supabase persistence, and success/error effects. Until that proof exists, the legacy `saveLesson()` implementation must not be removed and checkpoint 511–520 must remain open.
 
 ## Safety
 - `main`/LIVE untouched.

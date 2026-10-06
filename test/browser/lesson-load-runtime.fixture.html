@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="nl">
+<head><meta charset="utf-8"><title>Lesson load runtime fixture</title></head>
+<body>
+  <div id="status"></div>
+  <script type="module">
+    import { bootstrapLessonLoadRuntime } from '../../src/features/lessons/lesson-load-runtime-bootstrap.js';
+
+    const state = { lessons: [], homeCalls: 0, messages: [] };
+    const db = {
+      from(table) {
+        if (table !== 'lessons') throw new Error('unexpected table');
+        return {
+          select(columns) {
+            if (columns !== '*, lesson_items(*)') throw new Error('unexpected select');
+            return {
+              order(column, options) {
+                if (column !== 'id' || !options?.ascending) throw new Error('unexpected order');
+                return Promise.resolve({
+                  data: [{ id: 2, title: 'Browser les', lesson_items: [{ id: 2, sort_order: 2 }, { id: 1, sort_order: 1 }] }],
+                  error: null
+                });
+              }
+            };
+          }
+        };
+      }
+    };
+
+    const handler = bootstrapLessonLoadRuntime({
+      runtime: {
+        db,
+        setLessons(value) { state.lessons = value; },
+        showMessage(text, type) { state.messages.push({ text, type }); },
+        showHome() { state.homeCalls += 1; }
+      },
+      target: window
+    });
+
+    const result = await handler();
+    document.getElementById('status').textContent = JSON.stringify({
+      ok: result.ok,
+      lessonCount: state.lessons.length,
+      itemOrder: state.lessons[0]?.lesson_items?.map(item => item.id),
+      homeCalls: state.homeCalls,
+      messages: state.messages,
+      installed: typeof window.loadLessonsRuntime === 'function'
+    });
+  </script>
+</body>
+</html>

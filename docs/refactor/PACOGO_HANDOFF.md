@@ -82,9 +82,10 @@ The classic-script runtime bridge exposes V4.78 application dependencies without
 - 571–580: guest lesson access boundary extracted, runtime-wired, focused-tested, browser-proven, and legacy `setGuestLesson()` implementation removed from `index.html`
 - 581–590: photo-to-lesson creation boundary extracted, runtime-wired, focused-tested, controlled legacy removal completed, source-contract guarded, and controlled browser proof closed
 - 591–600: test-attempt persistence/runtime boundary extracted, runtime-wired, focused-tested, and browser-proven
+- 601–610: lesson-loading runtime boundary extracted, runtime-wired, focused-tested, source-contract guarded, and browser-proven
 
 ## Current state
-The guest lesson access, photo-to-lesson creation, and test-attempt completion boundaries are migrated on `refactor/professional-v1`.
+The guest lesson access, photo-to-lesson creation, test-attempt completion, and lesson-loading boundaries are migrated on `refactor/professional-v1`.
 
 The test-attempt path consists of:
 - `src/features/test-history/test-attempt-write-service.js` — deterministic `test_attempts` / `test_attempt_answers` persistence;
@@ -93,16 +94,23 @@ The test-attempt path consists of:
 - `src/features/test-history/test-attempt-runtime-bootstrap.js` — explicit dynamic bootstrap/readiness boundary;
 - classic runtime bridge/facade — public `window.saveTestAttempt` path without legacy fallback.
 
-The test-attempt runtime deliberately does **not** require parent authorization: this path records the student's completed test attempt using the active student/lesson state.
+The lesson-loading path consists of:
+- `src/features/lessons/lesson-load-runtime.js` — V4.78 load success/error orchestration;
+- `src/features/lessons/lesson-load-runtime-entry.js` — explicit database/state/UI runtime bridge;
+- `src/features/lessons/lesson-load-runtime-bootstrap.js` — dynamic bootstrap/readiness boundary;
+- existing `src/services/lesson-service.js` — deterministic lesson query/data boundary reused without schema changes;
+- `index.html` — thin `loadLessons()` readiness-backed facade with no legacy Supabase implementation remaining.
 
-Checkpoint 591–600 preserved the V4.78 result contract, including the returned `attemptId`, score and total-question count. The browser proof passed after the test-attempt browser assertion was aligned with the actual return contract rather than weakening the production implementation.
+The lesson-loading contract preserves the V4.78 query shape, lesson/item ordering, state update, `showHome()` success behavior, and exact `Lessen laden mislukt: <message>` error behavior.
 
 ## Validation status
 - Photo boundary professional gate: **success**, run `37522351036`, job `112470686619`.
 - Photo browser proof: **success**, run `37523556598`, job `112474746075`.
 - Test-attempt professional gate: **success**, run `37526377590`.
 - Test-attempt browser proof: **success**, run `37526403261`, job `112484398814`.
-- Checkpoint documentation close: commit `4e434969ea2605d425ba2327fbebe2c930cbce1f`.
+- Lesson-loading professional gate: **success**, run `37536029041`, job `112517029265`.
+- Lesson-loading browser proof: **success**, run `37535869080`, job `112516489142`.
+- Checkpoint documentation close: commit `92d5ad0930aee56785065248ebfbff0e6a6e573b`.
 - No Supabase schema changes.
 - No `main`/LIVE changes.
 - No agenda-import changes.
@@ -110,7 +118,7 @@ Checkpoint 591–600 preserved the V4.78 result contract, including the returned
 - No visual redesign.
 
 ## Next gate
-Checkpoint 591–600 is closed. Inspect the next remaining legacy-runtime ownership boundary directly from the authoritative V4.78 source and the current `refactor/professional-v1` tree.
+Checkpoint 601–610 is closed. Inspect the next remaining legacy-runtime ownership boundary directly from the authoritative V4.78 source and the current `refactor/professional-v1` tree.
 
 Apply the same sequence: authoritative V4.78 behavior → responsibility/contract → focused tests → runtime wiring → browser proof → controlled legacy removal → checkpoint.
 

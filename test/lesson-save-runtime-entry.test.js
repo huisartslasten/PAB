@@ -106,6 +106,53 @@ test('runtime entry stops at authorization before reading or preparing an unauth
   ]);
 });
 
+test('runtime entry lets an authorized save reach preparation and coordinator without legacy saveLesson', async () => {
+  const calls = [];
+  const runtime = createValidRuntime({
+    currentSession: { user: { id: 'parent-1' } },
+    PARENT_IDS: new Set(['parent-1']),
+    currentStudent: 'Zyon',
+    document: {
+      getElementById(id) {
+        calls.push(['getElementById', id]);
+        const values = {
+          lessonSubject: { value: 'Rekenen' },
+          lessonName: { value: 'Optellen' },
+          lessonExplanation: { value: '' },
+          lessonType: { value: 'words' },
+          lessonSubvak: { value: '' },
+          lessonAiCheckAnswers: { checked: false },
+          lessonAiInstruction: { value: '' },
+          lessonTestDate: { value: '' },
+          editorError: { textContent: '', classList: { remove() {} } }
+        };
+        return values[id] || { value: '', checked: false, classList: { remove() {} } };
+      },
+      querySelector(selector) {
+        calls.push(['querySelector', selector]);
+        if (selector === 'input[name=lessonStudent]:checked') return { value: 'Zyon' };
+        return null;
+      },
+      querySelectorAll(selector) {
+        calls.push(['querySelectorAll', selector]);
+        return [];
+      }
+    },
+    loadLessons: async () => calls.push(['loadLessons']),
+    renderTestCalendar: () => calls.push(['renderTestCalendar']),
+    refreshPageSidebars: () => calls.push(['refreshPageSidebars']),
+    showMessage(message, type) { calls.push(['message', message, type]); }
+  });
+
+  const result = await executeLessonSaveRuntimeEntry(runtime);
+
+  assert.equal(result?.ok, false);
+  assert.ok(result?.stage === 'validation' || result?.stage === 'persistence');
+  assert.ok(calls.some(call => call[0] === 'querySelector'));
+  assert.ok(calls.some(call => call[0] === 'getElementById' && call[1] === 'lessonSubject'));
+  assert.ok(!calls.some(call => call[0] === 'showHome'));
+});
+
 test('runtime entry rejects direct module execution without the explicit V4.78 bridge', async () => {
   await assert.rejects(
     () => executeLessonSaveRuntimeEntry(),

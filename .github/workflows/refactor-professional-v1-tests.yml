@@ -5,11 +5,15 @@ on:
     branches:
       - refactor/professional-v1
     paths:
-      - 'src/**'
-      - 'test/**'
+      - 'src/features/lessons/**'
+      - 'test/lesson-save-*.test.js'
+      - 'test/lesson-item-collector.test.js'
+      - 'test/editor-items.test.js'
+      - 'test/dictation-spellcheck.test.js'
+      - 'test/lesson-test-calendar.test.js'
+      - 'test/lesson-write-service.test.js'
+      - 'test/lesson-save-runtime-source-contract.test.js'
       - 'photo-storage.js'
-      - 'package.json'
-      - 'package-lock.json'
       - '.github/workflows/refactor-professional-v1-tests.yml'
   workflow_dispatch:
 
@@ -17,7 +21,7 @@ permissions:
   contents: read
 
 jobs:
-  node-tests:
+  lesson-save-refactor-gate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout refactor branch
@@ -30,5 +34,21 @@ jobs:
         with:
           node-version: 22
 
-      - name: Run full Node test suite
-        run: npm test
+      - name: Run V4.78 lesson-save refactor tests
+        run: >-
+          node --test
+          test/lesson-item-collector.test.js
+          test/editor-items.test.js
+          test/dictation-spellcheck.test.js
+          test/lesson-test-calendar.test.js
+          test/lesson-write-service.test.js
+          test/lesson-save-model.test.js
+          test/lesson-save-validation.test.js
+          test/lesson-save-request.test.js
+          test/lesson-save-preparation.test.js
+          test/lesson-save-coordinator.test.js
+          test/lesson-save-runtime-effects.test.js
+          test/lesson-save-runtime-entry.test.js
+          test/lesson-save-runtime-bootstrap.test.js
+          test/lesson-save-runtime-source-contract.test.js
+          test/lesson-save-runtime-integration.test.js

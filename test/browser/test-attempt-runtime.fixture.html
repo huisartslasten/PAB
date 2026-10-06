@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="nl">
+<head><meta charset="utf-8"><title>PacoGO test-attempt runtime browser fixture</title></head>
+<body>
+<script>
+var currentStudent='Zyon',currentLesson={id:42,type:'words'},__events=[];
+var db={from(table){return{insert(payload){__events.push({table,payload});if(table==='test_attempts')return{select(){return{single:async()=>({data:{id:91},error:null})}}};return Promise.resolve({error:null})}}}};
+</script>
+<script src="/test-history-storage.js"></script>
+</body>
+</html>

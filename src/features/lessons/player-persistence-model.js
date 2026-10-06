@@ -2,7 +2,7 @@
 // Contract source: TEST V4.78 completion -> saveTestAttempt().
 // This module does not perform persistence and does not guess UI/runtime behavior.
 
-const text = value => String(value ?? '').trim();
+const text = value => String(value ?? '');
 
 export function buildTestAttemptRow({
   lessonId,
@@ -36,7 +36,7 @@ export function buildTestAttemptAnswerRows(answers = [], { finishedAt = null, qu
       is_correct: answer?.correct === true,
       // V4.78 derives this from the test attempt type, not from UI metadata.
       question_type: text(answer?.questionType || questionType || 'text') || 'text',
-      // V4.78 assigns the completion timestamp to every persisted answer row.
+      // The timestamp is supplied by the completion/persistence boundary.
       answered_at: finishedAt || null
     };
   });

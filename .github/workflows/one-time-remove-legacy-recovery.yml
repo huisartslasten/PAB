@@ -1,0 +1,90 @@
+name: One-time remove legacy lesson recovery
+
+on:
+  push:
+    branches: [refactor/professional-v1]
+    paths:
+      - '.github/workflows/one-time-remove-legacy-recovery.yml'
+
+jobs:
+  remove-legacy-recovery:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout refactor branch
+        uses: actions/checkout@v4
+        with:
+          ref: refactor/professional-v1
+          fetch-depth: 0
+
+      - name: Remove exactly the four legacy recovery implementations
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          patterns = [
+              r'\nfunction closeArchiveModal\(\)\{document\.getElementById\(\'archiveModal\'\)\.classList\.add\(\'hidden\'\)\}\nasync function confirmArchiveLesson\(\)\{.*?\n\}\n\n',
+              r'\nasync function restoreArchivedLesson\(id\)\{.*?\n\}\n',
+              r'\nasync function restoreDeletedLesson\(id\)\{.*?\n\}\n',
+              r'\nfunction deleteCurrentLesson\(\)\{.*?\n\}\nfunction closeDeleteModal\(\)\{document\.getElementById\(\'deleteModal\'\)\.classList\.add\(\'hidden\'\)\}\nasync function confirmDeleteLesson\(\)\{.*?\n\}\n',
+          ]
+
+          expected = [
+              'closeArchiveModal',
+              'restoreArchivedLesson',
+              'restoreDeletedLesson',
+              'deleteCurrentLesson/confirmDeleteLesson',
+          ]
+
+          for label, pattern in zip(expected, patterns):
+              matches = list(re.finditer(pattern, text, flags=re.S))
+              if len(matches) != 1:
+                  raise SystemExit(f'{label}: expected exactly one match, found {len(matches)}')
+              text = text[:matches[0].start()] + '\n' + text[matches[0].end():]
+
+          forbidden = [
+              'function deleteCurrentLesson(',
+              'async function confirmDeleteLesson(',
+              'function closeDeleteModal()',
+              'function archiveCurrentLesson()',
+              'function closeArchiveModal()',
+              'async function confirmArchiveLesson(',
+              'async function restoreArchivedLesson(',
+              'async function restoreDeletedLesson(',
+          ]
+          leftovers = [item for item in forbidden if item in text]
+          if leftovers:
+              raise SystemExit('Legacy recovery declarations remain: ' + ', '.join(leftovers))
+
+          path.write_text(text, encoding='utf-8')
+
+      - name: Verify runtime facades remain in photo-storage.js
+        run: |
+          grep -F "window.confirmDeleteLesson = async function confirmDeleteLessonRuntimeFacade" photo-storage.js
+          grep -F "window.confirmArchiveLesson = async function confirmArchiveLessonRuntimeFacade" photo-storage.js
+          grep -F "window.restoreArchivedLesson = async function restoreArchivedLessonRuntimeFacade" photo-storage.js
+          grep -F "window.restoreDeletedLesson = async function restoreDeletedLessonRuntimeFacade" photo-storage.js
+
+      - name: Verify legacy saveLesson remains removed
+        run: |
+          ! grep -Eq '(^|[^A-Za-z0-9_])(async function saveLesson|function saveLesson)\s*\(' index.html
+
+      - name: Delete this one-time workflow before commit
+        run: rm -f .github/workflows/one-time-remove-legacy-recovery.yml
+
+      - name: Commit and push
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html .github/workflows/one-time-remove-legacy-recovery.yml
+          git diff --cached --check
+          git diff --cached -- index.html .github/workflows/one-time-remove-legacy-recovery.yml
+          git commit -m 'refactor: remove legacy lesson recovery implementations'
+          git push origin HEAD:refactor/professional-v1

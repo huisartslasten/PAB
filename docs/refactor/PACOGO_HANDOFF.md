@@ -42,7 +42,7 @@
 - `lesson-save-request.js`: canonical model → coordinator/write execution request.
 - `lesson-save-runtime-flow.js`: authorization → draft extraction → preparation → execution request → coordinator → outcome callbacks.
 - `lesson-save-runtime-effects.js`: validation/persistence error UI and successful state/calendar/sidebar/message effects; does not duplicate coordinator-owned persistence/reload/calendar sync.
-- `lesson-save-runtime-integration.js`: final injectable application integration contract before the legacy call-site replacement.
+- `lesson-save-runtime-integration.js`: final injectable application integration contract; now also normalizes runtime-effect payload ownership.
 
 ## Authoritative V4.78 saveLesson() order
 1. parent authorization
@@ -84,15 +84,21 @@
 - 471–480: runtime orchestration seam source-verified/focused-tested; 5 passed/0 failed isolated harness
 - 481–490: application-effects boundary source-mapped/focused-tested; 4 passed/0 failed isolated harness
 - 491–500: application integration contract added/focused-tested; 4 passed/0 failed isolated harness
+- 501–510: application integration payload ownership hardened; isolated harness 2 passed/0 failed
 
 ## Current state
-**Current checkpoint: 491–500.**
+**Current checkpoint: 501–510.**
 
-`lesson-save-runtime-integration.js` now provides the final injectable contract immediately before legacy call-site replacement. It delegates to the already-proven runtime flow and does not access DOM, global state, persistence, rendering, navigation, or localStorage.
+`lesson-save-runtime-integration.js` now composes the proven runtime flow and, when injected, the runtime-effects boundary. It deliberately translates:
+- validation → full validation result;
+- persistence → actual `result.error`;
+- completion → actual `result.outcome`.
 
-Focused isolated Node harness: **4 passed, 0 failed**. This is not a full repository `node --test` run.
+Compatibility callbacks still receive the original runtime result. This removes the `[object Object]` risk at the persistence-effects boundary and prevents the effects layer from needing knowledge of the runtime-flow wrapper shape.
 
-**Actual legacy runtime wiring remains CLOSED.** The next gate is controlled replacement of the legacy `saveLesson()` body/call site using this proven integration contract, with focused integration-order tests against the actual legacy dependencies before committing that wiring.
+Focused isolated Node harness for this checkpoint: **2 passed, 0 failed**. This is not a full repository `node --test` run.
+
+**Actual legacy runtime wiring remains CLOSED.** The next gate is the controlled replacement of the legacy `saveLesson()` body/call site using this proven integration contract, with focused tests against the real V4.78 dependencies and exact call order before the legacy implementation is removed.
 
 ## Safety
 - `main`/LIVE untouched.

@@ -32,6 +32,30 @@ test('words preserve hint, min_words and required_terms', () => {
   assert.deepEqual(item.required_terms, ['kennis', 'vak']);
 });
 
+test('non-word editor types do not gain V4.78 word-rule metadata', () => {
+  const types = ['questions', 'dictation', 'math', 'spelling'];
+  for (const type of types) {
+    const [item] = buildItemsForType(type, [{
+      question: 'Vraag',
+      answer: type === 'math' ? '42' : 'antwoord',
+      hint: 'Niet van toepassing',
+      min_words: 3,
+      required_terms: ['verboden']
+    }]);
+    assert.ok(item);
+    assert.equal('hint' in item, false, type);
+    assert.equal('min_words' in item, false, type);
+    assert.equal('required_terms' in item, false, type);
+  }
+});
+
+test('unknown editor type does not silently fall back to words', () => {
+  assert.deepEqual(buildItemsForType('unknown', [{
+    question: 'Vraag',
+    answer: 'antwoord'
+  }]), []);
+});
+
 test('math rejects non-numeric required answers', () => {
   assert.deepEqual(buildItemsForType('math', [{
     question: '2 + 2', answer_parts: [{ text: 'vier', role: 'answer' }]

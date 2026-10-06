@@ -69,3 +69,4 @@ jobs:
           test/lesson-guest-access-write-service.test.js
           test/lesson-guest-access-runtime-entry.test.js
           test/lesson-guest-access-runtime-bootstrap.test.js
+          test/lesson-guest-access-runtime-source-contract.test.js

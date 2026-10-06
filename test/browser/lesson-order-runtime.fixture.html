@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>PacoGO lesson-order browser fixture</title></head>
+<body>
+  <script>
+    window.__calls = [];
+    window.__remoteRows = [];
+    window.__local = new Map();
+
+    const db = {
+      from(table) {
+        const state = { table, op: null, payload: null, filters: [] };
+        const builder = {
+          select(columns) { state.op = 'select'; state.columns = columns; return builder; },
+          eq(column, value) { state.filters.push([column, value]); return builder; },
+          order(column, options) { state.order = [column, options]; return Promise.resolve({ data: window.__remoteRows, error: null }); },
+          delete() { state.op = 'delete'; return builder; },
+          insert(rows) { state.op = 'insert'; state.payload = rows; return Promise.resolve({ data: null, error: null }); },
+          then(resolve, reject) {
+            try {
+              if (state.op === 'delete') window.__calls.push({ table, op: 'delete', filters: state.filters.slice() });
+              return Promise.resolve({ data: null, error: null }).then(resolve, reject);
+            } catch (error) { return Promise.reject(error).then(resolve, reject); }
+          }
+        };
+        window.__calls.push({ table, op: state.op });
+        return builder;
+      }
+    };
+
+    const storage = {
+      getItem(key) { return window.__local.has(key) ? window.__local.get(key) : null; },
+      setItem(key, value) { window.__local.set(key, String(value)); }
+    };
+
+    const runtime = {
+      db,
+      storage,
+      isParentLoggedIn: () => true
+    };
+
+    window.__runtimeReady = import('/src/features/lessons/lesson-order-runtime-bootstrap.js')
+      .then(({ bootstrapLessonOrderRuntime }) => bootstrapLessonOrderRuntime({ runtime, target: window }));
+  </script>
+</body>
+</html>

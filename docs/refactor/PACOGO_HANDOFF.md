@@ -27,6 +27,33 @@
 15. If an architectural mismatch, missing seam, or failed assumption is discovered, **stop and redesign the boundary** rather than patching the symptom. A blocked step is preferable to a workaround.
 16. Tests must prove contracts and behavior, not merely make the current implementation green. Do not weaken assertions or broaden accepted outcomes just to accommodate an uncertain implementation.
 
+## Long-term code quality and architecture policy
+PacoGO must not only be professionally structured during the current refactor, but also remain structurally maintainable and consistent over the long term.
+
+After every meaningful change, functional correctness must be checked together with whether obsolete or redundant parts left behind by earlier implementations are still present. This includes functions, variables, imports, exports, event handlers, UI/CSS, compatibility layers, fallback logic, tests, and documentation.
+
+The principle is:
+
+**A new implementation actually replaces an old implementation when the old implementation is no longer needed.**
+
+For successive changes X → Y → Z, completion means not only establishing that Z works correctly, but also removing obsolete parts of X and Y where they are no longer required.
+
+PacoGO should also periodically receive a broader architecture and codebase review to detect architectural drift early. This may include checking for:
+- duplicate implementations;
+- unused code and dependencies;
+- obsolete code paths;
+- modules that are too large or have too broad a responsibility;
+- unclear module boundaries;
+- unwanted dependencies;
+- outdated tests and documentation;
+- inconsistencies in UI/CSS;
+- compliance with GitHub/Supabase separation;
+- compliance with TEST/LIVE separation.
+
+The long-term goal is that a future major refactor should ideally not require reconstruction of the entire application, but instead be a targeted architecture review with focused improvements to individual components where needed.
+
+**This is a long-term principle and will be refined further later. It does not change or redesign the current refactor procedure at this time.**
+
 ## Architecture / safety boundaries
 - **GitHub and Supabase are strictly separated responsibilities.**
 - GitHub contains the software: source code, tests, documentation, checkpoints, and Git history.

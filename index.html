@@ -2921,21 +2921,6 @@ function parentLessonRow(l,isGuest,isActive,assignmentId){
   }
   return '<div class="parent-lesson-row"><div class="parent-lesson-info"><strong>'+escapeHtml(l.title)+'</strong><span>'+meta+'</span></div>'+action+'</div>';
 }
-async function setGuestLesson(lessonId,active){
-  if(!requireParent())return;
-  const guest=await db.from('guest_access').select('id').eq('guest_name',parentSelectedStudent).maybeSingle();
-  if(guest.error||!guest.data){showMessage('Gastleerling kon niet worden gevonden.','error');return;}
-  const existing=await db.from('guest_lessons').select('id').eq('guest_id',guest.data.id).eq('lesson_id',lessonId).maybeSingle();
-  if(existing.data){
-    const res=await db.from('guest_lessons').update({active}).eq('id',existing.data.id);
-    if(res.error){showMessage('Activeren mislukt: '+res.error.message,'error');return;}
-  }else if(active){
-    const res=await db.from('guest_lessons').insert({guest_id:guest.data.id,lesson_id:lessonId,active:true});
-    if(res.error){showMessage('Activeren mislukt: '+res.error.message,'error');return;}
-  }
-  await renderParentStudent();
-  showMessage(active?'Les geactiveerd.':'Les gedeactiveerd.','success');
-}
 
 async function cleanupPhotoSession(){
   if(photoSessionTimer){clearInterval(photoSessionTimer);photoSessionTimer=null}

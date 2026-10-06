@@ -8,7 +8,7 @@ import { readLessonEditorRows } from './lesson-save-dom-rows.js';
 import { prepareLessonSaveCoreInput } from './lesson-save-preparation.js';
 import { executeLessonSaveCore } from './lesson-save-coordinator.js';
 import { createLessonWriteService } from './lesson-write-service.js';
-import { validateLessonSave } from './lesson-save-validation.js';
+import { validateLessonSaveInput } from './lesson-save-validation.js';
 import { resolveLessonSavePostPersistence } from './lesson-save-post-persistence.js';
 import { buildLessonSaveRuntimeEffects } from './lesson-save-runtime-effects.js';
 
@@ -67,7 +67,7 @@ export async function executeLessonSaveRuntimeEntry() {
     executeCoordinator: async input => executeLessonSaveCore({
       draft: input.draft,
       collectItems: input.collectItems,
-      validate: validateLessonSave,
+      validate: validateLessonSaveInput,
       runDictationCheck: async () => checkDictationSpelling(),
       writeLesson: async request => writeService.saveLesson(request),
       reloadLessons: async () => {
@@ -87,8 +87,8 @@ export async function executeLessonSaveRuntimeEntry() {
     }),
     runtimeEffects,
     onValidationFailure: async result => {
-      if (result?.validation?.message) {
-        errorElement.textContent = result.validation.message;
+      if (result?.validation?.errorMessage) {
+        errorElement.textContent = result.validation.errorMessage;
         errorElement.classList.remove('hidden');
       }
     },

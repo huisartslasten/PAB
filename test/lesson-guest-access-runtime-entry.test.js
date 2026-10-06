@@ -50,7 +50,7 @@ test('entry delegates the runtime contract and returns completion', async () => 
   assert.equal(result.ok, true);
   assert.equal(result.stage, 'complete');
   assert.equal(result.guestId, 7);
-  assert.deepEqual(calls, [['message', 'Les geactiveerd.', 'success']]);
+  assert.deepEqual(calls, ['render', ['message', 'Les geactiveerd.', 'success']]);
   assert.deepEqual(db.calls.slice(-1), [['insert', { guest_id: 7, lesson_id: 12, active: true }]]);
 });
 

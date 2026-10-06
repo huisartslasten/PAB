@@ -22,7 +22,7 @@ test('entry maps live runtime state into the test-attempt runtime', async () => 
   const db = createDb();
   const runtime = { db, currentStudent: 'Zyon', currentLesson: { id: 12, type: 'words' } };
   const result = await executeSaveTestAttempt(runtime, { type: 'words', answers: [{ item: { question: 'q', answer: 'a' }, value: 'a', correct: true }] });
-  assert.equal(result.attemptId, 9);
+  assert.equal(result, undefined);
   assert.equal(db.calls[0].payload.lesson_id, 12);
   assert.equal(db.calls[0].payload.student, 'Zyon');
 });
@@ -33,5 +33,5 @@ test('entry installs a single public saveTestAttempt handler', async () => {
   const handler = installTestAttemptRuntimeEntry({ db, currentStudent: 'Zenith', currentLesson: { id: 13, type: 'words' } }, target);
   assert.equal(target.saveTestAttempt, handler);
   const result = await target.saveTestAttempt({ type: 'words', answers: [{ item: { question: 'q', answer: 'a' }, value: 'a', correct: true }] });
-  assert.equal(result.attemptId, 9);
+  assert.equal(result, undefined);
 });

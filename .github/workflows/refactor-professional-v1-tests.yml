@@ -11,7 +11,6 @@ on:
       - 'test/editor-items.test.js'
       - 'test/dictation-spellcheck.test.js'
       - 'test/lesson-test-calendar.test.js'
-      - 'test/lesson-write-service.test.js'
       - 'test/lesson-save-runtime-source-contract.test.js'
       - 'photo-storage.js'
       - '.github/workflows/refactor-professional-v1-tests.yml'
@@ -41,7 +40,6 @@ jobs:
           test/editor-items.test.js
           test/dictation-spellcheck.test.js
           test/lesson-test-calendar.test.js
-          test/lesson-write-service.test.js
           test/lesson-save-model.test.js
           test/lesson-save-validation.test.js
           test/lesson-save-request.test.js

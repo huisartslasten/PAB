@@ -33,13 +33,17 @@ export function buildLessonSaveRuntimeEffects({
     return Object.freeze({ ok: false, stage: 'persistence', error });
   }
 
-  async function handleComplete() {
-    state.currentSubject = outcome.currentSubject;
+  async function handleComplete(nextOutcome = outcome) {
+    if (!nextOutcome || typeof nextOutcome !== 'object') {
+      throw new Error('A completed lesson save outcome is required.');
+    }
+
+    state.currentSubject = nextOutcome.currentSubject;
     state.currentLesson = null;
 
     if (typeof refreshTestCalendar === 'function') await refreshTestCalendar();
     if (typeof refreshSidebars === 'function') await refreshSidebars();
-    if (typeof showMessage === 'function') await showMessage(outcome.successMessage, 'success');
+    if (typeof showMessage === 'function') await showMessage(nextOutcome.successMessage, 'success');
 
     return Object.freeze({ ok: true, stage: 'complete' });
   }

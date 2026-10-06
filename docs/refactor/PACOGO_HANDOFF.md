@@ -83,9 +83,10 @@ The classic-script runtime bridge exposes V4.78 application dependencies without
 - 581–590: photo-to-lesson creation boundary extracted, runtime-wired, focused-tested, controlled legacy removal completed, source-contract guarded, and controlled browser proof closed
 - 591–600: test-attempt persistence/runtime boundary extracted, runtime-wired, focused-tested, and browser-proven
 - 601–610: lesson-loading runtime boundary extracted, runtime-wired, focused-tested, source-contract guarded, and browser-proven
+- 611–620: lesson-order service/runtime boundary extracted and wired; focused contracts pass; browser proof pending closure
 
 ## Current state
-The guest lesson access, photo-to-lesson creation, test-attempt completion, and lesson-loading boundaries are migrated on `refactor/professional-v1`.
+The guest lesson access, photo-to-lesson creation, test-attempt completion, lesson-loading, and lesson-order boundaries are migrated on `refactor/professional-v1`.
 
 The test-attempt path consists of:
 - `src/features/test-history/test-attempt-write-service.js` — deterministic `test_attempts` / `test_attempt_answers` persistence;
@@ -103,6 +104,15 @@ The lesson-loading path consists of:
 
 The lesson-loading contract preserves the V4.78 query shape, lesson/item ordering, state update, `showHome()` success behavior, and exact `Lessen laden mislukt: <message>` error behavior.
 
+The lesson-order path consists of:
+- `src/features/lessons/lesson-order-service.js` — deterministic remote/local order persistence and ranking;
+- `src/features/lessons/lesson-order-runtime.js` — read/apply and save orchestration;
+- `src/features/lessons/lesson-order-runtime-entry.js` — explicit bridge validation and public runtime handlers;
+- `src/features/lessons/lesson-order-runtime-bootstrap.js` — dynamic bootstrap/readiness boundary;
+- `index.html` — thin readiness-backed `getOrderedLessons()` / `saveLessonOrder()` facades with the legacy `lesson_order` implementation removed.
+
+The lesson-order contract preserves the V4.78 remote-first/local-fallback behavior, exact storage-key shape, deterministic unknown-lesson ordering, local-first save behavior, parent-authenticated remote persistence, delete-then-insert write sequence, and propagated database errors.
+
 ## Validation status
 - Photo boundary professional gate: **success**, run `37522351036`, job `112470686619`.
 - Photo browser proof: **success**, run `37523556598`, job `112474746075`.
@@ -110,7 +120,9 @@ The lesson-loading contract preserves the V4.78 query shape, lesson/item orderin
 - Test-attempt browser proof: **success**, run `37526403261`, job `112484398814`.
 - Lesson-loading professional gate: **success**, run `37536029041`, job `112517029265`.
 - Lesson-loading browser proof: **success**, run `37535869080`, job `112516489142`.
-- Checkpoint documentation close: commit `92d5ad0930aee56785065248ebfbff0e6a6e573b`.
+- Lesson-order professional gate: **success**, run `37536871075`.
+- Lesson-order browser proof: run `37536895653` is currently **queued**; do not claim browser closure until it completes successfully.
+- Checkpoint documentation: `docs/refactor/step-611-620.md` added with pending browser closure status.
 - No Supabase schema changes.
 - No `main`/LIVE changes.
 - No agenda-import changes.
@@ -118,7 +130,7 @@ The lesson-loading contract preserves the V4.78 query shape, lesson/item orderin
 - No visual redesign.
 
 ## Next gate
-Checkpoint 601–610 is closed. Inspect the next remaining legacy-runtime ownership boundary directly from the authoritative V4.78 source and the current `refactor/professional-v1` tree.
+Finish checkpoint 611–620 by confirming the queued Chromium browser proof. If it fails, fix the actual boundary/fixture contract rather than weakening assertions. Once browser proof is green, close the checkpoint documentation and inspect the next remaining legacy-runtime ownership boundary directly from authoritative V4.78 source and the current refactor tree.
 
 Apply the same sequence: authoritative V4.78 behavior → responsibility/contract → focused tests → runtime wiring → browser proof → controlled legacy removal → checkpoint.
 

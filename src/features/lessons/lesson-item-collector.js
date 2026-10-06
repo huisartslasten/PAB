@@ -3,6 +3,8 @@
 // and performs only the deterministic filtering and item shaping that V4.78 applied.
 // No DOM, persistence, AI, navigation, or UI behavior belongs here.
 
+import { normalizeWordItemRules } from './word-item-rules.js';
+
 function text(value) {
   return String(value ?? '').trim();
 }
@@ -36,9 +38,10 @@ function buildItem({ questionParts, answerParts, sortOrder, rules = null, answer
   };
 
   if (rules) {
-    item.hint = text(rules.hint);
-    item.min_words = Number(rules.min_words || 0);
-    item.required_terms = Array.isArray(rules.required_terms) ? rules.required_terms : [];
+    const normalizedRules = normalizeWordItemRules(rules);
+    item.hint = normalizedRules.hint;
+    item.min_words = normalizedRules.min_words;
+    item.required_terms = normalizedRules.required_terms;
   }
 
   return item;

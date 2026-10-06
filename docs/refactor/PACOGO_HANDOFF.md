@@ -38,50 +38,26 @@
 - **Supabase TEST and Supabase LIVE must remain strictly separated**, just as `refactor/professional-v1` and `main` remain separated.
 - The refactor must not break, blur, or implicitly mix these boundaries.
 
-## Refactor method
-**authoritative V4.78 source → exact behavior → responsibility/contract → small module/boundary → focused tests → checkpoint → later runtime wiring**
+## Save-flow architecture
+The professional lesson-save path is now composed of explicit boundaries for editor row collection, editor round-trip, save model normalization, validation, dictation-only spelling checking, local test-calendar synchronization, deterministic persistence, post-persistence outcome resolution, runtime authorization/editor extraction, runtime preparation, execution request construction, runtime orchestration, application effects, runtime integration, runtime entry, and browser bootstrap.
 
-**Refactor Gate:** before any code change, identify the source behavior, responsibility, target boundary, contract, and proof. If the change would instead patch legacy structure, add a workaround, duplicate behavior, weaken a test, or compensate for an architectural gap, stop and redesign. Do not code around the problem.
+The classic-script runtime bridge exposes the V4.78 application dependencies without moving production data ownership into the modules. The runtime facade is explicit and has no timeout, fallback to legacy save, or duplicate execution.
 
-## Proven lesson/editor chain
-- `lesson-choice.js` is active via `choice-flow.js`.
-- `lesson-item-collector.js`: V4.78 item collection for words/custom, questions, dictation, math, spelling; preserves source-row `sort_order`.
-- `editor-items.js`: source-row parity fix and V4.78 legacy answer fallback.
-- `editor-roundtrip.js`: persisted parts/roles and legacy fallbacks verified.
-- `lesson-write-service.js`: deterministic create/update persistence ordering and item normalization.
-- `lesson-save-model.js`: canonical lesson save payload.
-- `lesson-save-validation.js`: exact V4.78 required-field/item validation.
-- `dictation-spellcheck.js`: dictation-only warning boundary; checker failure does not block persistence.
-- `lesson-test-calendar.js`: pure add/update/remove local calendar boundary.
-- `lesson-save-post-persistence.js`: pure saved-lesson/state/calendar/message outcome model.
-- `lesson-save-coordinator.js`: validation → dictation check → write → reload → post-persistence resolution → calendar sync; no DOM/global state.
-- `lesson-save-runtime-adapter.js`: parent authorization and exact editor-field extraction.
-- `lesson-save-adapter.js`: runtime draft → canonical save model.
-- `lesson-save-preparation.js`: draft + `collectItems()` → coordinator input.
-- `lesson-save-request.js`: canonical model → coordinator/write execution request; missing model is rejected explicitly.
-- `lesson-save-runtime-flow.js`: authorization → draft extraction → preparation → execution request → coordinator → outcome callbacks.
-- `lesson-save-runtime-effects.js`: validation/persistence error UI and successful state/calendar/sidebar/message effects; DOM error lookup is resolved lazily at execution time and it does not duplicate coordinator-owned persistence/reload/calendar sync.
-- `lesson-save-runtime-integration.js`: final injectable application integration contract; runtime-effect payload ownership is explicit.
-- `lesson-save-runtime-entry.js`: controlled TEST entry; receives the legacy runtime explicitly rather than resolving classic-script lexical bindings from ES-module scope; DOM and DB dependencies are deferred until authorized execution boundaries.
-- `lesson-save-runtime-bootstrap.js`: explicit module-loading/readiness boundary; verifies the installed runtime entry and returns it from `pacoGOLessonSaveRuntimeReady`; propagates load/installer failures without legacy fallback.
-- `photo-storage.js`: classic-script boundary injects the live V4.78 runtime bridge and installs the synchronous `saveLesson` facade that waits for the explicit bootstrap readiness contract before invoking the refactored runtime.
-- `test/lesson-save-runtime-source-contract.test.js`: source-level guard for facade → bootstrap → installed runtime entry, explicit bridge dependencies, and no timeout/fallback.
-- `test/browser/lesson-save-runtime.browser.test.js`: real-browser proof for the classic `saveLesson` facade and end-to-end refactored save flow using an isolated in-memory Supabase-shaped test double.
+The browser-proof fixture uses isolated test doubles and never connects to real Supabase application data.
 
-## Authoritative V4.78 saveLesson() order
+## Save flow parity contract
+The proven V4.78 save flow is:
 1. parent authorization
-2. read editor state
-3. resolve canonical subvak spelling
-4. `collectItems()`
-5. required-field/item validation
-6. dictation-only spelling check; warning/failure does not block
-7. create/update lesson
-8. replace/insert lesson items
-9. persistence error → `Opslaan mislukt: ...` and stop
-10. success → `currentSubject`, clear `currentLesson`, reload lessons
-11. resolve saved lesson and add/update/remove local test-calendar entry from `testDate`
-12. refresh test calendar/sidebar
-13. success message
+2. editor draft extraction
+3. collect editor items
+4. validation
+5. dictation spelling check when applicable
+6. persistence
+7. persistence error → `Opslaan mislukt: ...` and stop
+8. success → `currentSubject`, clear `currentLesson`, reload lessons
+9. resolve saved lesson and add/update/remove local test-calendar entry from `testDate`
+10. refresh test calendar/sidebar
+11. success message
 
 ## Checkpoint history
 - 241–250: player navigation
@@ -112,22 +88,31 @@
 - 511–520: ES-module/classic-script runtime bridge corrected; explicit bootstrap/readiness boundary added; save invocation timing source-verified; synchronous runtime facade added; source-level seam guard added; browser execution still pending
 - 521–530: runtime dependency ordering hardened; DOM/DB dependencies deferred past authorization; editor answer fallback corrected; save-request input contract tightened; focused professional gate executed at 70 passed/0 failed; browser execution still pending
 - 531–540: standalone `lesson-write-service` contract promoted into the professional executable gate; GitHub Actions executed **76 passed / 0 failed / 0 skipped**; no production patch or weakened assertion; browser execution still pending
-- 541–550: controlled Playwright browser-proof boundary added; fixture executes the actual classic `saveLesson` facade against isolated test data; browser workflow result still pending/needs verification
+- 541–550: controlled Playwright browser-proof boundary added; first fixture run failed during initialization; production code was not patched; fixture boundary was corrected
+- 551–560: **real browser proof verified**; GitHub Actions run `37496386784` completed successfully with Chromium, local fixture server, and the V4.78 browser proof all successful
 
 ## Current state
-**Checkpoint 541–550 is structurally complete, but the browser proof itself is not yet verified.**
+**Checkpoint 551–560 is complete. The browser-runtime validation gate is now closed.**
 
-The branch now contains a dedicated Playwright workflow that starts a local fixture server, installs Chromium, and executes the V4.78 save facade in a real browser. The fixture does not connect to Supabase; it provides an isolated in-memory test double so the proof covers runtime sequencing without touching TEST/LIVE application data.
+The professional Node gate remains verified at **76 passed / 0 failed / 0 skipped**. The dedicated Playwright workflow has now also been executed successfully in GitHub Actions. It installs Chromium, starts the isolated local fixture, and executes the actual classic `window.saveLesson()` facade through the refactored runtime chain.
 
-The intended browser chain is:
+The verified browser chain is:
 
 **classic `window.saveLesson` facade → single bootstrap readiness promise → installed runtime entry → explicit V4.78 bridge → authorization → editor DOM extraction → deterministic item collection → validation → write service → reload/outcome → calendar/sidebar/message effects.**
 
-The browser workflow was added but its GitHub Actions result has not been independently verified yet. Therefore **do not claim a browser pass**. If it fails, inspect the fixture/test boundary first; do not patch `index.html` or production runtime code merely to satisfy the harness.
+The first browser attempt failed at fixture runtime initialization. The fixture was corrected at its own boundary and the second run passed. This was not solved by changing `index.html`, weakening production assertions, or adding a legacy fallback.
 
-The previously verified Node professional gate remains **76 passed / 0 failed / 0 skipped**.
+### Next gate: controlled legacy-runtime replacement
+The browser proof does **not** mean that legacy code may now be deleted blindly. The next step is a source-level audit of the exact V4.78 `saveLesson()` definition and ownership at the legacy call site, followed by the smallest deliberate integration/removal step that preserves the proven entry contract.
 
-**Actual legacy runtime replacement is still gated.** Do not remove the legacy `saveLesson()` implementation and do not modify `index.html` until the browser proof is genuinely green and the exact V4.78 runtime behavior has been validated through the real facade.
+Before any deletion:
+- identify the exact authoritative V4.78 implementation;
+- identify every active reference/call site;
+- prove that the browser-tested replacement owns the same public entry contract;
+- preserve an explicit rollback boundary;
+- run the professional Node gate and browser proof again after the integration step.
+
+If the source audit exposes an architectural mismatch, stop and redesign the boundary. Do not patch the legacy monolith to make the replacement fit.
 
 ## Safety
 - `main`/LIVE untouched.

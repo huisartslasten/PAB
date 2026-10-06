@@ -24,7 +24,7 @@ export function buildTestAttemptRow({
   };
 }
 
-export function buildTestAttemptAnswerRows(answers = [], { finishedAt = null } = {}) {
+export function buildTestAttemptAnswerRows(answers = [], { finishedAt = null, questionType = 'text' } = {}) {
   return (Array.isArray(answers) ? answers : []).map((answer, index) => {
     const item = answer?.item || {};
     return {
@@ -34,7 +34,8 @@ export function buildTestAttemptAnswerRows(answers = [], { finishedAt = null } =
       expected_answer: text(item.answer ?? answer?.expected),
       given_answer: text(answer?.value ?? answer?.givenAnswer),
       is_correct: answer?.correct === true,
-      question_type: text(answer?.questionType || item.type || 'text') || 'text',
+      // V4.78 derives this from the test attempt type, not from UI metadata.
+      question_type: text(answer?.questionType || questionType || 'text') || 'text',
       // V4.78 assigns the completion timestamp to every persisted answer row.
       answered_at: finishedAt || null
     };

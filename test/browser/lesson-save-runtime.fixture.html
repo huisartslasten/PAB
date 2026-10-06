@@ -21,7 +21,6 @@
   <div id="lessonAdminButtons"></div>
 
   <script>
-    var db = window.__pacoDb;
     var currentSubject = '';
     var currentLesson = null;
     var currentSession = { user: { id: 'browser-parent' } };
@@ -70,6 +69,7 @@
         return builder;
       }
     };
+    var db = window.__pacoDb;
   </script>
   <script src="/photo-storage.js"></script>
 </body>

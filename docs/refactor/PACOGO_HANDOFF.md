@@ -80,6 +80,7 @@ Important lesson/player modules include:
 - `lesson-save-preparation.js`
 - `lesson-save-request.js`
 - `lesson-save-runtime-flow.js`
+- `lesson-save-runtime-effects.js`
 
 ## 6. Verified player/result parity
 
@@ -97,7 +98,7 @@ Authoritative V4.78 behavior already mapped and extracted:
 - `lesson-item-collector.js`: six supported types words/custom, questions, dictation, math numeric answers only, spelling with ` || ` separator; preserves the original source-row index as `sort_order` even when an earlier row is invalid.
 - `editor-items.js`: parity bug fixed so source index is preserved.
 - `editor-roundtrip.js`: verified student, subject, subvak, title, type, explanation, `ai_check_answers`, `ai_instruction`, `editor_labels`; persisted `question_parts`/`answer_parts` are preferred; legacy fallbacks are supported; answer/extra roles are preserved; `hint`, `min_words`, `required_terms` only apply to words/custom; unknown editor types must not silently become words.
-- `lesson-write-service.js`: deterministic persistence boundary preserving create/update ordering; normalizes `hint`, `min_words`, `required_terms`; update lesson first then replace items; create lesson first then insert items; lesson write failures prevent item writes.
+- `lesson-write-service.js`: deterministic persistence boundary preserving create/update ordering; normalizes `hint`, `min_words`, `required_terms`; update lesson first then replace items; create lesson then insert items; lesson write failures prevent item writes.
 - `lesson-save-model.js`: lesson-level save payload and item normalization; existing subvak spelling is preferred when supplied by orchestration.
 - `lesson-save-validation.js`: pure pre-persistence validation boundary from V4.78; checks student, subject, title, non-empty items; exact V4.78 validation message; no DOM/AI/persistence/UI/navigation/state.
 - `dictation-spellcheck.js`: pure V4.78 dictation-only spelling-check boundary; builds one-based non-empty entries, injects the checker, preserves returned issues, reconstructs the V4.78 warning content and unavailable-check message; no DOM/Supabase/UI/state access. Checker failures are propagated so the future save orchestration can catch them without blocking persistence.
@@ -109,6 +110,7 @@ Authoritative V4.78 behavior already mapped and extracted:
 - `lesson-save-preparation.js`: pure pre-coordinator seam that combines the already-proven `collectLessonItems()` output with the save adapter/model and exposes the normalized items through the coordinator's injected `collectItems` contract. It contains no runtime side effects.
 - `lesson-save-request.js`: pure final handoff from canonical save model to the coordinator/write-service execution contract; preserves id/create semantics, lesson payload, item payload, and test date while copying item objects.
 - `lesson-save-runtime-flow.js`: pure pre-wiring runtime orchestration seam; sequences authorization, draft extraction, preparation, execution-request construction, coordinator invocation, and validation/persistence/completion callbacks without directly accessing runtime systems.
+- `lesson-save-runtime-effects.js`: pure final application-effects boundary for validation/persistence error rendering and successful state/UI refresh. It deliberately does not duplicate coordinator-owned persistence, lesson reload, or local test-calendar synchronization.
 
 ## 8. Exact V4.78 `saveLesson()` orchestration mapping
 
@@ -130,9 +132,9 @@ The authoritative V4.78 flow is:
 
 The extracted chain now covers the pure and pre-wiring runtime portions:
 
-`runtime authorization → editor extraction → collectLessonItems → lesson-save-adapter/model → lesson-save-preparation → lesson-save-request → lesson-save-coordinator`
+`runtime authorization → editor extraction → collectLessonItems → lesson-save-adapter/model → lesson-save-preparation → lesson-save-request → lesson-save-coordinator → runtime effects`
 
-The coordinator still receives persistence/reload/post-persistence/calendar dependencies by injection. Actual legacy call-site wiring, final DOM error rendering, application-state mutation, sidebar refresh, success UI, navigation, and other runtime side effects remain outside these modules.
+The coordinator owns persistence, reload, saved-lesson resolution, and local test-calendar synchronization. The runtime-effects boundary owns only application-state mutation, calendar/sidebar rendering, error rendering, and success notification.
 
 ## 9. Checkpoint history
 
@@ -158,20 +160,19 @@ The coordinator still receives persistence/reload/post-persistence/calendar depe
 - 451–460: complete pre-runtime save preparation seam from editor draft + `collectItems()` into the coordinator contract source-verified and focused-tested; runtime wiring remains closed
 - 461–470: canonical save model → coordinator/write execution-request boundary added; focused test source added but not executed; runtime wiring remains closed
 - 471–480: complete pre-wiring runtime orchestration seam source-verified and focused-tested; runtime wiring remains closed
+- 481–490: remaining application-side save effects source-mapped and isolated; focused-tested; runtime wiring remains closed
 
 ## 10. Current state
 
-**Current checkpoint: 471–480.**
+**Current checkpoint: 481–490.**
 
-Checkpoint 471–480 established `src/features/lessons/lesson-save-runtime-flow.js` as the tested orchestration seam immediately before application call-site wiring. It preserves the V4.78 order of authorization → editor extraction → item preparation → execution request → coordinator → outcome handling, while keeping runtime systems injected rather than accessed by the module itself.
+Checkpoint 481–490 established `src/features/lessons/lesson-save-runtime-effects.js` as the final application-effects boundary around the proven save coordinator/runtime-flow chain. It preserves the V4.78 validation and persistence error messages and the successful state → calendar refresh → sidebar refresh → success-message sequence. Coordinator-owned persistence, reload, and calendar synchronization are not duplicated.
 
-The focused runtime-flow harness was executed in an isolated local Node test harness: **5 passed, 0 failed**. This was not a full repository `node --test` run, so no full-suite pass is claimed.
-
-Checkpoint 461–470 remains historical: its three focused test cases were added to the branch, but were not executed in that checkpoint.
+The focused effects harness was executed in an isolated local Node test harness: **4 passed, 0 failed**. This was not a full repository `node --test` run, so no full-suite pass is claimed.
 
 Runtime wiring remains **CLOSED**.
 
-The next technical gate is **481–490**: inspect and design the exact legacy `saveLesson()` call-site replacement around this seam, including the remaining V4.78 DOM error/success UI, application state mutation, reload/calendar/sidebar side effects, and any navigation semantics. No wiring should be committed until those responsibilities are source-mapped and a focused runtime adapter harness exists.
+The next technical gate is **491–500**: design and test the exact application integration adapter that will replace the legacy `saveLesson()` call site with the proven runtime-flow + runtime-effects seams. This gate must preserve dependency ownership and call order before any actual legacy call-site replacement is committed.
 
 ## 11. Next-chat startup procedure
 
@@ -210,9 +211,9 @@ Before making code changes, a new chat continuing this project must be able to s
 3. the authoritative V4.78 parity source and that `legacy/index-v4.78.html` is not the parity source;
 4. the parity-first method and why runtime wiring remains closed;
 5. the current checkpoint and exact next technical gate;
-6. what was already proven in checkpoints 371–480 and therefore must not be restarted;
+6. what was already proven in checkpoints 371–490 and therefore must not be restarted;
 7. that the actual repository state must be inspected rather than relying only on chat memory;
 8. that both the handoff and the corresponding `step-X-Y.md` must be updated at checkpoint completion;
 9. that tests may only be claimed when actually executed.
 
-The specific next gate is **481–490: source-map the exact legacy `saveLesson()` call-site replacement around the proven runtime-flow seam, including remaining UI/state/navigation responsibilities and focused tests. Runtime wiring is still closed until that boundary is proven.**
+The specific next gate is **491–500: design and focused-test the exact application integration adapter that will replace the legacy `saveLesson()` call site using the proven runtime-flow and runtime-effects seams. Runtime wiring remains closed until that integration boundary is proven.**

@@ -75,6 +75,7 @@ Important lesson/player modules include:
 - `lesson-test-calendar.js`
 - `lesson-save-post-persistence.js`
 - `lesson-save-coordinator.js`
+- `lesson-save-runtime-adapter.js`
 
 ## 6. Verified player/result parity
 
@@ -99,6 +100,7 @@ Authoritative V4.78 behavior already mapped and extracted:
 - `lesson-test-calendar.js`: pure V4.78 local test-calendar add/update/remove boundary; preserves existing ids, creates new ids through an injected generator, normalizes lesson id to number, and contains no localStorage/UI/state access.
 - `lesson-save-post-persistence.js`: pure V4.78 post-save outcome model; preserves `currentSubject`, keeps `currentLesson` null, resolves the reloaded saved lesson, selects calendar action, and preserves exact success messages without performing runtime side effects.
 - `lesson-save-coordinator.js`: pre-runtime core coordinator composing the proven validation, optional dictation check, deterministic write, reload/post-save resolution, and calendar action contracts. It has no DOM, auth, localStorage, UI, navigation, or application-state access.
+- `lesson-save-runtime-adapter.js`: source-verified V4.78 boundary for parent authorization and editor-state extraction. It isolates the exact parent allow-list decision/message and reads the save editor fields, current lesson id, checked student/current-student fallback, canonical existing subvak spelling, spelling labels, AI fields, and test date. It has no Supabase/UI/navigation/state mutation and does not collect items.
 
 ## 8. Exact V4.78 `saveLesson()` orchestration mapping
 
@@ -118,9 +120,7 @@ The authoritative V4.78 flow is:
 12. refresh test calendar/sidebar
 13. success message
 
-The new coordinator intentionally stops short of application/UI responsibilities. It composes steps 4–11 through injected boundaries and leaves authentication, DOM extraction, subvak lookup, actual reload implementation, state mutation, rendering, sidebar refresh, success/error UI, navigation, and runtime sequencing outside the core.
-
-The extracted validation, dictation, test-calendar, post-persistence, and coordinator boundaries are deliberately not connected to the legacy runtime yet. Runtime wiring remains **CLOSED**.
+The extracted core coordinator composes steps 4–11 through injected boundaries. The runtime adapter now isolates steps 1–3's authentication/editor extraction responsibilities, but is not wired into the legacy runtime. Actual `collectItems()`, UI/state mutation, rendering, sidebar refresh, navigation, and runtime sequencing remain outside the core.
 
 ## 9. Checkpoint history
 
@@ -141,20 +141,19 @@ The extracted validation, dictation, test-calendar, post-persistence, and coordi
 - 401–410: local test-calendar side effect source-verified and focused-tested; runtime wiring remains closed
 - 411–420: post-save state/calendar/message outcome source-verified and focused-tested; runtime wiring remains closed
 - 421–430: final pre-runtime save coordinator source-verified and focused-tested; runtime wiring remains closed
+- 431–440: parent authentication + DOM/editor-state runtime adapter source-verified and focused-tested; runtime wiring remains closed
 
 ## 10. Current state
 
-**Current checkpoint: 421–430.**
+**Current checkpoint: 431–440.**
 
-Checkpoint 421–430 established the smallest pre-runtime save coordinator in `src/features/lessons/lesson-save-coordinator.js`. It composes the already-proven validation, dictation-check, deterministic write, reload/post-save resolution, and test-calendar action contracts without importing or replacing the legacy `saveLesson()` runtime.
+Checkpoint 431–440 established `src/features/lessons/lesson-save-runtime-adapter.js` as the narrow runtime boundary for the remaining V4.78 authentication and editor-state extraction responsibilities. It preserves the exact parent authorization rule/message and the exact save-editor fields while keeping DOM/auth/UI/state out of the core coordinator.
 
-The focused coordinator harness contains five tests covering successful ordering, dictation warning non-blocking behavior, dictation checker failure non-blocking behavior, validation short-circuiting, and persistence failure short-circuiting. The exact coordinator and its focused test content were executed in an isolated local Node test harness: **5 passed, 0 failed**. This was not a full repository `node --test` run, so no full-suite pass is claimed.
+The focused adapter harness contains six tests covering authorization, denial messaging, authorized access, full editor extraction with canonical subvak spelling, spelling defaults, and current-student fallback. The exact adapter and focused test content were executed in an isolated local Node test harness: **6 passed, 0 failed**. This was not a full repository `node --test` run, so no full-suite pass is claimed.
 
-The next technical gate is **431–440**.
+Runtime wiring remains **CLOSED**.
 
-The immediate goal is to source-verify the remaining runtime adapter requirements around **parent authentication and DOM/editor-state extraction**, and define the narrowest adapter contract that can feed the proven save coordinator without moving UI/state responsibilities into the core.
-
-Runtime wiring itself remains CLOSED until that adapter contract and focused tests are proven.
+The next technical gate is **441–450**.
 
 ## 11. Next-chat startup procedure
 
@@ -193,9 +192,9 @@ Before making code changes, a new chat continuing this project must be able to s
 3. the authoritative V4.78 parity source and that `legacy/index-v4.78.html` is not the parity source;
 4. the parity-first method and why runtime wiring remains closed;
 5. the current checkpoint and exact next technical gate;
-6. what was already proven in checkpoints 371–430 and therefore must not be restarted;
+6. what was already proven in checkpoints 371–440 and therefore must not be restarted;
 7. that the actual repository state must be inspected rather than relying only on chat memory;
 8. that both the handoff and the corresponding `step-X-Y.md` must be updated at checkpoint completion;
 9. that tests may only be claimed when actually executed.
 
-The specific next gate is **431–440: source-verify the remaining runtime adapter requirements around parent authentication and DOM/editor-state extraction, and define the narrowest adapter contract that can feed the proven save coordinator without moving UI/state responsibilities into the core**. The next chat must not jump straight to unrelated refactoring or wire the coordinator into the legacy runtime before that adapter contract is proven.
+The specific next gate is **441–450: source-verify the adapter handoff into the existing lesson save model/coordinator, map the extracted draft into the already-proven save payload without moving DOM/auth/UI/state into the core, and build focused contract tests for that handoff. The next chat must not wire the coordinator into the legacy runtime before that handoff contract is proven.**

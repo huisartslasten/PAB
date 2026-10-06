@@ -1,6 +1,7 @@
 // Pure runtime-effects adapter for the V4.78 lesson save flow.
 // It translates the proven save outcome into injected application side effects.
-// No DOM, global state, persistence, rendering, navigation, or localStorage is accessed directly.
+// Persistence/reload/calendar-sync remain owned by the save coordinator.
+// No DOM, global state, rendering, navigation, or localStorage is accessed directly.
 
 export const LESSON_SAVE_VALIDATION_MESSAGE = 'Vul het vak, de lestitel en minstens één item in.';
 
@@ -8,8 +9,6 @@ export function buildLessonSaveRuntimeEffects({
   outcome,
   errorElement,
   state = {},
-  reloadLessons,
-  syncTestCalendar,
   refreshTestCalendar,
   refreshSidebars,
   showMessage
@@ -37,19 +36,6 @@ export function buildLessonSaveRuntimeEffects({
   async function handleComplete() {
     state.currentSubject = outcome.currentSubject;
     state.currentLesson = null;
-
-    if (typeof reloadLessons === 'function') await reloadLessons();
-
-    if (typeof syncTestCalendar === 'function' &&
-        (outcome.testCalendarAction === 'upsert' || outcome.testCalendarAction === 'remove')) {
-      await syncTestCalendar({
-        action: outcome.testCalendarAction,
-        lesson: outcome.savedLesson,
-        lessonId: outcome.lessonId,
-        student: outcome.student,
-        testDate: outcome.testDate
-      });
-    }
 
     if (typeof refreshTestCalendar === 'function') await refreshTestCalendar();
     if (typeof refreshSidebars === 'function') await refreshSidebars();

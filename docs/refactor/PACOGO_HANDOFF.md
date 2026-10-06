@@ -78,6 +78,8 @@ Important lesson/player modules include:
 - `lesson-save-runtime-adapter.js`
 - `lesson-save-adapter.js`
 - `lesson-save-preparation.js`
+- `lesson-save-request.js`
+- `lesson-save-runtime-flow.js`
 
 ## 6. Verified player/result parity
 
@@ -105,6 +107,8 @@ Authoritative V4.78 behavior already mapped and extracted:
 - `lesson-save-runtime-adapter.js`: source-verified V4.78 boundary for parent authorization and editor-state extraction. It isolates the exact parent allow-list decision/message and reads the save editor fields, current lesson id, checked student/current-student fallback, canonical existing subvak spelling, spelling labels, AI fields, and test date. It has no Supabase/UI/navigation/state mutation and does not collect items.
 - `lesson-save-adapter.js`: pure handoff from the runtime/editor draft into the existing canonical `lesson-save-model.js`. It introduces no DOM/auth/persistence/UI/state access and does not recollect or mutate items.
 - `lesson-save-preparation.js`: pure pre-coordinator seam that combines the already-proven `collectLessonItems()` output with the save adapter/model and exposes the normalized items through the coordinator's injected `collectItems` contract. It contains no runtime side effects.
+- `lesson-save-request.js`: pure final handoff from canonical save model to the coordinator/write-service execution contract; preserves id/create semantics, lesson payload, item payload, and test date while copying item objects.
+- `lesson-save-runtime-flow.js`: pure pre-wiring runtime orchestration seam; sequences authorization, draft extraction, preparation, execution-request construction, coordinator invocation, and validation/persistence/completion callbacks without directly accessing runtime systems.
 
 ## 8. Exact V4.78 `saveLesson()` orchestration mapping
 
@@ -124,11 +128,11 @@ The authoritative V4.78 flow is:
 12. refresh test calendar/sidebar
 13. success message
 
-The extracted chain now covers the pure pre-runtime portion through a preparation seam:
+The extracted chain now covers the pure and pre-wiring runtime portions:
 
-`runtime/editor extraction → collectLessonItems → lesson-save-adapter/model → lesson-save-preparation → lesson-save-coordinator`
+`runtime authorization → editor extraction → collectLessonItems → lesson-save-adapter/model → lesson-save-preparation → lesson-save-request → lesson-save-coordinator`
 
-The coordinator still receives persistence/reload/post-persistence/calendar dependencies by injection. Actual DOM/auth/state mutation, rendering, sidebar refresh, navigation, and the legacy `saveLesson()` call site remain outside these modules.
+The coordinator still receives persistence/reload/post-persistence/calendar dependencies by injection. Actual legacy call-site wiring, final DOM error rendering, application-state mutation, sidebar refresh, success UI, navigation, and other runtime side effects remain outside these modules.
 
 ## 9. Checkpoint history
 
@@ -152,18 +156,22 @@ The coordinator still receives persistence/reload/post-persistence/calendar depe
 - 431–440: parent authentication + DOM/editor-state runtime adapter source-verified and focused-tested; runtime wiring remains closed
 - 441–450: runtime draft → canonical lesson-save-model handoff source-verified and focused-tested; runtime wiring remains closed
 - 451–460: complete pre-runtime save preparation seam from editor draft + `collectItems()` into the coordinator contract source-verified and focused-tested; runtime wiring remains closed
+- 461–470: canonical save model → coordinator/write execution-request boundary added; focused test source added but not executed; runtime wiring remains closed
+- 471–480: complete pre-wiring runtime orchestration seam source-verified and focused-tested; runtime wiring remains closed
 
 ## 10. Current state
 
-**Current checkpoint: 451–460.**
+**Current checkpoint: 471–480.**
 
-Checkpoint 451–460 established `src/features/lessons/lesson-save-preparation.js` as the narrow pure seam between the already-proven editor/collector/model boundaries and the already-proven save coordinator. It preserves the V4.78 normalized item payload, source-row ordering, spelling separator, spelling labels, canonical subvak, create/update semantics, AI fields, and test date.
+Checkpoint 471–480 established `src/features/lessons/lesson-save-runtime-flow.js` as the tested orchestration seam immediately before application call-site wiring. It preserves the V4.78 order of authorization → editor extraction → item preparation → execution request → coordinator → outcome handling, while keeping runtime systems injected rather than accessed by the module itself.
 
-The focused preparation harness contains three tests covering collector-to-coordinator mapping, spelling/label preservation, and input immutability. The exact preparation seam and its dependency modules were executed in an isolated local Node test harness: **3 passed, 0 failed**. This was not a full repository `node --test` run, so no full-suite pass is claimed.
+The focused runtime-flow harness was executed in an isolated local Node test harness: **5 passed, 0 failed**. This was not a full repository `node --test` run, so no full-suite pass is claimed.
+
+Checkpoint 461–470 remains historical: its three focused test cases were added to the branch, but were not executed in that checkpoint.
 
 Runtime wiring remains **CLOSED**.
 
-The next technical gate is **461–470**.
+The next technical gate is **481–490**: inspect and design the exact legacy `saveLesson()` call-site replacement around this seam, including the remaining V4.78 DOM error/success UI, application state mutation, reload/calendar/sidebar side effects, and any navigation semantics. No wiring should be committed until those responsibilities are source-mapped and a focused runtime adapter harness exists.
 
 ## 11. Next-chat startup procedure
 
@@ -202,9 +210,9 @@ Before making code changes, a new chat continuing this project must be able to s
 3. the authoritative V4.78 parity source and that `legacy/index-v4.78.html` is not the parity source;
 4. the parity-first method and why runtime wiring remains closed;
 5. the current checkpoint and exact next technical gate;
-6. what was already proven in checkpoints 371–460 and therefore must not be restarted;
+6. what was already proven in checkpoints 371–480 and therefore must not be restarted;
 7. that the actual repository state must be inspected rather than relying only on chat memory;
 8. that both the handoff and the corresponding `step-X-Y.md` must be updated at checkpoint completion;
 9. that tests may only be claimed when actually executed.
 
-The specific next gate is **461–470: source-verify the final dependency injection boundary between the prepared save input and the existing coordinator/write service, including exact error/message propagation and create/update payload parity. Only after that contract is proven should runtime wiring be considered for a later gate.**
+The specific next gate is **481–490: source-map the exact legacy `saveLesson()` call-site replacement around the proven runtime-flow seam, including remaining UI/state/navigation responsibilities and focused tests. Runtime wiring is still closed until that boundary is proven.**

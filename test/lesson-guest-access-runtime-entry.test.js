@@ -15,6 +15,27 @@ function runtime(overrides = {}) {
   return { value, calls };
 }
 
+function createGuestDb() {
+  const calls = [];
+  return {
+    calls,
+    from(table) {
+      calls.push(['from', table]);
+      const chain = {
+        select(value) { calls.push(['select', value]); return chain; },
+        eq(field, value) { calls.push(['eq', field, value]); return chain; },
+        maybeSingle: async () => {
+          calls.push(['maybeSingle']);
+          if (table === 'guest_users') return { data: { id: 7 }, error: null };
+          return { data: null, error: null };
+        },
+        insert(value) { calls.push(['insert', value]); return Promise.resolve({ error: null }); }
+      };
+      return chain;
+    }
+  };
+}
+
 test('entry requires the guest runtime bridge', async () => {
   await assert.rejects(
     executeSetGuestLessonAccess({}, 12, true),
@@ -24,23 +45,13 @@ test('entry requires the guest runtime bridge', async () => {
 
 test('entry delegates the runtime contract and returns completion', async () => {
   const { value, calls } = runtime();
-  const result = await executeSetGuestLessonAccess({
-    ...value,
-    db: {
-      from(table) {
-        assert.equal(table, 'guest_users');
-        return {
-          select() { return this; },
-          eq() { return this; },
-          maybeSingle: async () => ({ data: { id: 7 }, error: null })
-        };
-      }
-    }
-  }, 12, true);
+  const db = createGuestDb();
+  const result = await executeSetGuestLessonAccess({ ...value, db }, 12, true);
   assert.equal(result.ok, true);
   assert.equal(result.stage, 'complete');
   assert.equal(result.guestId, 7);
   assert.deepEqual(calls, [['message', 'Les geactiveerd.', 'success']]);
+  assert.deepEqual(db.calls.slice(-1), [['insert', { guest_id: 7, lesson_id: 12, active: true }]]);
 });
 
 test('entry installs the setGuestLesson global facade', async () => {

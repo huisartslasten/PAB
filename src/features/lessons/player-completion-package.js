@@ -21,7 +21,8 @@ export function createPlayerCompletionPackage(completion = {}) {
   });
 
   const answerRows = buildTestAttemptAnswerRows(answers, {
-    finishedAt: completion.finishedAt
+    finishedAt: completion.finishedAt,
+    questionType: completion.type
   });
 
   const result = createPlayerResult({

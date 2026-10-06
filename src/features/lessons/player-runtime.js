@@ -18,8 +18,8 @@ export function createPlayerRuntime({ db } = {}) {
   } = {}) {
     const completion = createPlayerCompletion({
       lesson: lesson ? { ...lesson, student: student ?? lesson.student } : null,
+      session: { startedAt },
       answers,
-      startedAt,
       finishedAt
     });
 

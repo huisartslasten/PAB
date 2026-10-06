@@ -15,11 +15,18 @@ test('recovery runtime facade publishes readiness and all four public handlers',
   assert.match(photoStorage, /There is deliberately no legacy fallback/);
 });
 
-test('active V4.78 recovery globals remain the exact public handlers until browser proof closes the boundary', () => {
+test('V4.78 recovery globals are fully owned by the refactored runtime facade', () => {
+  assert.match(indexHtml, /function deleteCurrentLesson\(\)/);
   assert.match(indexHtml, /function closeDeleteModal\(\)/);
+  assert.match(indexHtml, /function archiveCurrentLesson\(\)/);
   assert.match(indexHtml, /function closeArchiveModal\(\)/);
-  assert.match(indexHtml, /async function confirmDeleteLesson\(\)/);
-  assert.match(indexHtml, /async function confirmArchiveLesson\(\)/);
-  assert.match(indexHtml, /async function restoreArchivedLesson\(id\)/);
-  assert.match(indexHtml, /async function restoreDeletedLesson\(id\)/);
+  for (const declaration of [
+    'async function confirmDeleteLesson()',
+    'async function confirmArchiveLesson()',
+    'async function restoreArchivedLesson(id)',
+    'async function restoreDeletedLesson(id)'
+  ]) {
+    const escaped = declaration.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&');
+    assert.doesNotMatch(indexHtml, new RegExp(escaped));
+  }
 });

@@ -1,4 +1,5 @@
 // Pure orchestration boundary for the V4.78 saveLesson() completion flow.
+// Contract source: TEST V4.78 backup index.html (blob de4ebcc75b1b333cc985936c86f7c654c818be24).
 // Database persistence, test-date storage, lesson reload, and UI refresh are injected.
 // No DOM access, navigation, or rendering implementation belongs here.
 
@@ -6,6 +7,8 @@ export function createLessonSaveFlow({
   persistence,
   loadLessons,
   findSavedLesson,
+  setCurrentSubject,
+  clearCurrentLesson,
   upsertTestDate,
   removeTestDate,
   renderTestCalendar,
@@ -16,8 +19,12 @@ export function createLessonSaveFlow({
   if (typeof loadLessons !== 'function') throw new Error('loadLessons is required.');
   if (typeof findSavedLesson !== 'function') throw new Error('findSavedLesson is required.');
 
-  async function save({ lessonId = null, student = '', lesson = {}, items = [], testDate = '' } = {}) {
+  async function save({ lessonId = null, student = '', subject = '', lesson = {}, items = [], testDate = '' } = {}) {
     const saved = await persistence.save({ lessonId, lesson, items });
+
+    // Exact V4.78 state transition immediately after successful persistence.
+    setCurrentSubject?.(subject);
+    clearCurrentLesson?.();
 
     await loadLessons();
 

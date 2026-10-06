@@ -90,6 +90,7 @@ test('lesson write service creates lesson before replacing its items', async () 
     { op: 'from', table: 'lesson_items' },
     { op: 'delete', table: 'lesson_items' },
     { op: 'eq-delete', table: 'lesson_items', column: 'lesson_id', value: 41 },
+    { op: 'from', table: 'lesson_items' },
     {
       op: 'insert',
       table: 'lesson_items',

@@ -11,26 +11,30 @@ function createMockDb({ data = [], selectError = null, deleteError = null, inser
       return {
         select(columns) {
           calls.push({ op: 'select', columns });
-          return {
+          const builder = {
             eq(column, value) {
               calls.push({ op: 'eq', column, value });
-              return {
-                order(columnName, options) {
-                  calls.push({ op: 'order', column: columnName, options });
-                  return Promise.resolve({ data, error: selectError });
-                }
-              };
+              return builder;
+            },
+            order(columnName, options) {
+              calls.push({ op: 'order', column: columnName, options });
+              return Promise.resolve({ data, error: selectError });
             }
           };
+          return builder;
         },
         delete() {
           calls.push({ op: 'delete' });
-          return {
+          const builder = {
             eq(column, value) {
               calls.push({ op: 'eq-delete', column, value });
-              return Promise.resolve({ error: deleteError });
+              return builder;
+            },
+            then(resolve, reject) {
+              return Promise.resolve({ error: deleteError }).then(resolve, reject);
             }
           };
+          return builder;
         },
         insert(rows) {
           calls.push({ op: 'insert', rows });
@@ -93,6 +97,7 @@ test('lesson-order service writes local order before remote persistence', async 
     { op: 'from', table: 'lesson_order' },
     { op: 'delete' },
     { op: 'eq-delete', column: 'student', value: 'Zyon' },
+    { op: 'eq-delete', column: 'subject', value: 'Nederlands' },
     { op: 'from', table: 'lesson_order' },
     { op: 'insert', rows: [
       { student: 'Zyon', subject: 'Nederlands', lesson_id: 8, position: 0 },

@@ -51,7 +51,9 @@ function mockDb({ rows = [], error = null, insertError = null, updateError = nul
           calls.push({ op: 'insert', rows: insertRows });
           return {
             select() {
-              return Promise.resolve({ data: insertRows, error: insertError });
+              const selected = Promise.resolve({ data: insertRows, error: insertError });
+              selected.single = () => Promise.resolve({ data: insertRows[0] ?? null, error: insertError });
+              return selected;
             }
           };
         }

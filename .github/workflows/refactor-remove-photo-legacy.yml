@@ -1,0 +1,69 @@
+name: Remove legacy photo lesson function
+
+on:
+  push:
+    branches:
+      - refactor/professional-v1
+    paths:
+      - '.github/workflows/refactor-remove-photo-legacy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  remove-legacy-photo-function:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout refactor branch
+        uses: actions/checkout@v4
+        with:
+          ref: refactor/professional-v1
+
+      - name: Remove exactly one legacy createLessonFromPhoto declaration
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+          start_marker = 'async function createLessonFromPhoto(){'
+          end_marker = 'async function showAddLesson(){'
+          start = text.find(start_marker)
+          end = text.find(end_marker, start + len(start_marker))
+          if start < 0 or end < 0:
+              raise SystemExit('Expected createLessonFromPhoto boundaries were not found exactly.')
+          if text.find(start_marker, start + len(start_marker)) >= 0:
+              raise SystemExit('More than one createLessonFromPhoto declaration found; refusing migration.')
+          block = text[start:end]
+          if block.count("const created=await db.from('lessons').insert") != 1:
+              raise SystemExit('Unexpected legacy createLessonFromPhoto body; refusing migration.')
+          if block.count("showMessage('Les gemaakt uit de foto. Controleer hem gerust nog even.','success');") != 1:
+              raise SystemExit('Unexpected legacy success message; refusing migration.')
+          text = text[:start] + text[end:]
+          if 'async function createLessonFromPhoto(){' in text or 'function createLessonFromPhoto(){' in text:
+              raise SystemExit('Legacy createLessonFromPhoto declaration still exists after removal.')
+          path.write_text(text, encoding='utf-8')
+          print('Removed exactly one legacy createLessonFromPhoto declaration.')
+          PY
+
+      - name: Verify and commit removal
+        run: |
+          test "$(grep -o "async function createLessonFromPhoto()" index.html | wc -l)" -eq 0
+          test "$(grep -o "function createLessonFromPhoto()" index.html | wc -l)" -eq 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --check
+          git commit -m "refactor: remove legacy photo lesson function"
+          git push origin refactor/professional-v1
+
+      - name: Remove this one-time migration workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git rm .github/workflows/refactor-remove-photo-legacy.yml
+          git commit -m "chore: remove one-time photo legacy migration"
+          git push origin refactor/professional-v1

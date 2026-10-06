@@ -18,6 +18,7 @@ function requireRuntime(runtime) {
   for (const key of REQUIRED_KEYS) {
     if (!(key in runtime)) throw new Error(`The lesson-photo runtime bridge is missing: ${key}.`);
   }
+  if (!runtime.db) throw new Error('The lesson-photo runtime bridge is missing: db.');
 }
 
 export async function executeCreateLessonFromPhoto(runtime, input = {}) {

@@ -12,23 +12,7 @@ const testHistoryRuntimeBridge = Object.defineProperties({}, {
     if (el) el.innerHTML = '<div class="card">Toetsgeschiedenis laden...</div>';
   } },
   refreshSidebars: { get: () => refreshPageSidebars },
-  renderAttempts: { get: () => (attempts, studentFilter = '') => {
-    const el = document.getElementById('testHistoryContent');
-    if (!el) return;
-    if (!attempts?.length) {
-      el.innerHTML = '<div class="card empty">' + (studentFilter ? 'Nog geen gemaakte toetsen voor ' + escapeHtml(studentFilter) + '.' : 'Nog geen gemaakte toetsen opgeslagen.') + '</div>';
-      return;
-    }
-    const lessonMap = new Map(lessons.map(l => [Number(l.id), l]));
-    el.innerHTML = attempts.map(a => {
-      const lesson = lessonMap.get(Number(a.lesson_id));
-      const pct = a.total_questions ? Math.round(a.score / a.total_questions * 100) : 0;
-      const errors = Math.max(0, (a.total_questions || 0) - (a.score || 0));
-      const date = a.completed_at ? new Intl.DateTimeFormat('nl-NL', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(a.completed_at)) : 'Onbekende datum';
-      const answers = (a.test_attempt_answers || []).sort((x, y) => x.question_order - y.question_order);
-      return '<details class="test-history-item"><summary><div class="test-history-main"><div><strong>' + escapeHtml(lesson?.subject || 'Toets') + ' — ' + escapeHtml(lesson?.title || ('Les ' + a.lesson_id)) + '</strong><div class="small">' + escapeHtml(a.student) + ' · ' + date + '</div></div><div class="test-history-summary"><span>' + a.total_questions + ' vragen</span><span>' + a.score + ' goed</span><span class="' + (errors ? 'history-errors' : 'history-ok') + '">' + errors + ' fouten</span></div></div></summary><div class="test-history-details"><div class="test-history-score">' + a.score + '/' + a.total_questions + ' goed (' + pct + '%)</div>' + answers.map(x => '<div class="result-item ' + (x.is_correct ? 'correct' : 'incorrect') + '"><strong>' + x.question_order + '. ' + escapeHtml(x.question) + '</strong><br>Antwoord van leerling: ' + escapeHtml(x.given_answer || '—') + '<br>' + (x.is_correct ? '✓ Goed' : '✗ Verwacht: ' + escapeHtml(x.expected_answer || '—')) + '</div>').join('') + '</div></details>';
-    }).join('');
-  } },
+  renderAttempts: { get: () => renderTestHistoryAttempts },
   renderError: { get: () => error => {
     const el = document.getElementById('testHistoryContent');
     if (el) el.innerHTML = '<div class="card message error">De toetsgeschiedenis kon niet worden geladen.</div>';

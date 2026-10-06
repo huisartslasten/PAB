@@ -1,5 +1,6 @@
 name: PacoGO browser refactor proof
 
+# Post-recovery-removal proof trigger; runtime behavior is unchanged.
 on:
   push:
     branches:

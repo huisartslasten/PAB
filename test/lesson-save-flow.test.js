@@ -14,6 +14,8 @@ describe('createLessonSaveFlow', () => {
 
     const flow = createLessonSaveFlow({
       persistence,
+      setCurrentSubject(subject) { order.push(['subject', subject]); },
+      clearCurrentLesson() { order.push('clear-lesson'); },
       async loadLessons() { order.push('load'); },
       findSavedLesson(id, student) {
         order.push(['find', id, student]);
@@ -29,13 +31,14 @@ describe('createLessonSaveFlow', () => {
     const result = await flow.save({
       lessonId: 42,
       student: 'Zyon',
+      subject: 'Rekenen',
       lesson: { title: 'Breuken' },
       items: [{ question: 'Q', answer: 'A' }],
       testDate: '2026-11-11'
     });
 
     expect(order.map(value => Array.isArray(value) ? value[0] : value)).toEqual([
-      'persist', 'load', 'find', 'upsert-date', 'calendar', 'sidebars', 'message'
+      'persist', 'subject', 'clear-lesson', 'load', 'find', 'upsert-date', 'calendar', 'sidebars', 'message'
     ]);
     expect(result.savedLesson).toBe(savedLesson);
     expect(order.at(-1)).toEqual(['message', 'Les opgeslagen en toetsdatum toegevoegd.', 'success']);

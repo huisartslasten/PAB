@@ -33,8 +33,9 @@ function normalizeRules(rules) {
 /**
  * Reconstruct the non-DOM state decisions made by V4.78 addWordRow().
  *
- * When parts are omitted, V4.78 mirrors the number of part controls from the
- * previous row, but clears their text. Answer-part roles are preserved.
+ * Important: V4.78 ignores q/a when questionParts/answerParts are omitted.
+ * It derives the new row from the previous row's part counts/roles and clears
+ * the text. q/a are only effective when explicit part arrays are supplied.
  */
 export function buildWordRowModel({
   q = '',
@@ -55,14 +56,6 @@ export function buildWordRowModel({
     : (Array.isArray(previousAnswerParts) && previousAnswerParts.length
       ? previousAnswerParts.map(part => ({ text: '', role: part?.role || 'answer' }))
       : [{ text: '', role: 'answer' }]);
-
-  if (!questionParts && previousQuestionPartCount === 0 && q !== '') {
-    questions[0] = text(q);
-  }
-
-  if (!answerParts && (!previousAnswerParts || !previousAnswerParts.length) && a !== '') {
-    answers[0].text = text(a);
-  }
 
   return Object.freeze({
     questionParts: questions,

@@ -14,11 +14,11 @@ function mapAnswer(answer = {}) {
   const item = answer?.item || {};
   return {
     itemId: item?.id ?? answer?.itemId ?? null,
-    question: String(item?.question ?? answer?.question ?? '').trim(),
-    value: String(answer?.value ?? '').trim(),
-    expected: String(item?.answer ?? answer?.expected ?? '').trim(),
+    question: String(item?.question ?? answer?.question ?? ''),
+    value: String(answer?.value ?? ''),
+    expected: String(item?.answer ?? answer?.expected ?? ''),
     correct: answer?.correct === true,
-    feedback: String(answer?.feedback ?? '').trim()
+    feedback: String(answer?.feedback ?? '')
   };
 }
 

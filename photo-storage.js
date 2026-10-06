@@ -176,6 +176,27 @@ window.saveLesson = async function saveLessonRuntimeFacade(...args){
   return runtimeSaveLesson(...args);
 };
 
+// Guest lesson access runtime facade: the V4.78 guest assignment handler is
+// exposed synchronously, but execution waits for the refactored guest bootstrap.
+// There is deliberately no legacy fallback after bootstrap failure.
+const lessonGuestAccessRuntimeBridge = Object.defineProperties({}, {
+  requireParent: { get: () => requireParent },
+  currentStudent: { get: () => currentStudent },
+  db: { get: () => db },
+  renderParentStudent: { get: () => renderParentStudent },
+  showMessage: { get: () => showMessage }
+});
+const lessonGuestAccessRuntimeBootstrap = import('./src/features/lessons/lesson-guest-access-runtime-bootstrap.js')
+  .then(({ bootstrapLessonGuestAccessRuntime }) => bootstrapLessonGuestAccessRuntime({
+    runtime: lessonGuestAccessRuntimeBridge,
+    target: window
+  }));
+window.pacoGOLessonGuestAccessRuntimeReady = lessonGuestAccessRuntimeBootstrap;
+window.setGuestLesson = async function setGuestLessonRuntimeFacade(...args){
+  const runtimeHandler = await lessonGuestAccessRuntimeBootstrap;
+  return runtimeHandler.setGuestLesson(...args);
+};
+
 // Recovery runtime facade: the four V4.78 recovery handlers are exposed
 // synchronously, but execution waits for the refactored recovery bootstrap.
 // There is deliberately no legacy fallback after bootstrap failure.

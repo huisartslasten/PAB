@@ -45,7 +45,7 @@ test('test history runtime reports query errors without throwing', async () => {
   assert.equal(result.ok, false);
   assert.equal(result.error, error);
   assert.deepEqual(runtime.calls.slice(-2), [
-    ['listAttempts', ''],
+    'refreshSidebars',
     ['renderError', 'history failed']
   ]);
 });

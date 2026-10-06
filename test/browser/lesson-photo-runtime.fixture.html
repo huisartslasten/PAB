@@ -3,16 +3,16 @@
 <head><meta charset="utf-8"><title>PacoGO photo lesson runtime browser fixture</title></head>
 <body>
 <script>
-var currentStudent=null,currentSubject=null,currentLesson=null,lessons=[],__events=[],__lastDbInsert=null,__lastDbDelete=null,__failItemInsert=false;
+var currentStudent=null,currentSubject=null,currentLesson=null,lessons=[],__events=[],__lastDbInsert=null,__lastDbDelete=null,__failItemInsert=false,__createdLesson=null;
 var requireParent=async()=>{__events.push('authorize');return true};
-var loadLessons=async()=>__events.push('load');
+var loadLessons=async()=>{__events.push('load');lessons=__createdLesson?[__createdLesson]:[]};
 var setCurrentStudent=value=>{currentStudent=value;__events.push('student:'+value)};
 var setCurrentSubject=value=>{currentSubject=value;__events.push('subject:'+value)};
 var setCurrentLesson=value=>{currentLesson=value;__events.push('lesson:'+(value&&value.id||'null'))};
 var showParentDashboard=async()=>__events.push('dashboard');
 var showMessage=(message,type)=>__events.push('message:'+type+':'+message);
 var isParentLoggedIn=()=>true;
-var db={from(table){var state={table,operation:null,filters:[],payload:null};var builder={insert(payload){state.operation='insert';state.payload=payload;if(table==='lessons')return{select(){return{single:async()=>({data:Object.assign({id:42},payload),error:null})}}};__lastDbInsert=state;return Promise.resolve({error:__failItemInsert?new Error('item insert failed'):null})},delete(){state.operation='delete';return{eq:async(column,value)=>{state.filters.push([column,value]);__lastDbDelete=state;return{error:null}}}}};return builder}};
+var db={from(table){var state={table,operation:null,filters:[],payload:null};var builder={insert(payload){state.operation='insert';state.payload=payload;if(table==='lessons')return{select(){return{single:async()=>{__createdLesson=Object.assign({id:42},payload);return{data:__createdLesson,error:null}}}}};__lastDbInsert=state;return Promise.resolve({error:__failItemInsert?new Error('item insert failed'):null})},delete(){state.operation='delete';return{eq:async(column,value)=>{state.filters.push([column,value]);__lastDbDelete=state;return{error:null}}}}};return builder}};
 </script>
 <script src="/photo-storage.js"></script>
 </body>

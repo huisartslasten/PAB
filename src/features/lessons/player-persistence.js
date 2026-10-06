@@ -2,17 +2,28 @@
 // Runtime wiring is intentionally deferred. This module accepts the exact rows
 // prepared by the player and performs only the persistence sequence.
 
-export function createPlayerPersistence(db) {
+export function createPlayerPersistence(db, { clock = () => new Date().toISOString() } = {}) {
   if (!db) throw new Error('A Supabase client is required.');
+  if (typeof clock !== 'function') throw new Error('A persistence clock is required.');
 
   async function saveTestResult({ attempt, answers = [] } = {}) {
     if (!attempt || typeof attempt !== 'object') {
       throw new Error('A test attempt is required.');
     }
 
+    // V4.78 creates completed_at once when the attempt is saved and falls back
+    // to a fresh timestamp for started_at when the caller did not supply one.
+    const completedAt = attempt.completed_at || clock();
+    const startedAt = attempt.started_at || clock();
+    const attemptRow = {
+      ...attempt,
+      started_at: startedAt,
+      completed_at: completedAt
+    };
+
     const { data: savedAttempt, error: attemptError } = await db
       .from('test_attempts')
-      .insert(attempt)
+      .insert(attemptRow)
       .select()
       .single();
 
@@ -23,7 +34,8 @@ export function createPlayerPersistence(db) {
 
     const rows = (Array.isArray(answers) ? answers : []).map(answer => ({
       ...answer,
-      attempt_id: attemptId
+      attempt_id: attemptId,
+      answered_at: answer?.answered_at || clock()
     }));
 
     if (!rows.length) {

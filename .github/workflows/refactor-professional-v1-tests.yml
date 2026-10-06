@@ -1,5 +1,6 @@
 name: PacoGO professional refactor tests
 
+# Post-recovery-removal proof trigger; runtime behavior is unchanged.
 on:
   push:
     branches:

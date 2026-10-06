@@ -90,6 +90,44 @@ test('inactive access with no existing assignment performs no insert but still r
   assert.deepEqual(calls, ['render','message:success:Les gedeactiveerd.']);
 });
 
+test('update failure preserves the exact V4.78 error message and stops refresh', async () => {
+  const calls = [], error = new Error('update failed');
+  const result = await setGuestLessonAccess({
+    authorize: async () => true,
+    currentStudent: 'Gast',
+    lessonId: 5,
+    active: false,
+    findGuest: async () => ({ id: 2 }),
+    findAssignment: async () => ({ id: 9 }),
+    updateAssignment: async () => { throw error; },
+    createAssignment: async () => calls.push('create'),
+    renderParentStudent: async () => calls.push('render'),
+    showMessage: (message, type) => calls.push(`message:${type}:${message}`)
+  });
+  assert.deepEqual(calls, ['message:error:Activeren mislukt: update failed']);
+  assert.equal(result.ok, false);
+  assert.equal(result.stage, 'persistence');
+  assert.equal(result.error, error);
+});
+
+test('insert failure preserves the exact V4.78 error message and stops refresh', async () => {
+  const calls = [];
+  const result = await setGuestLessonAccess({
+    authorize: async () => true,
+    currentStudent: 'Gast',
+    lessonId: 5,
+    active: true,
+    findGuest: async () => ({ id: 2 }),
+    findAssignment: async () => null,
+    updateAssignment: async () => calls.push('update'),
+    createAssignment: async () => ({ error: new Error('insert failed') }),
+    renderParentStudent: async () => calls.push('render'),
+    showMessage: (message, type) => calls.push(`message:${type}:${message}`)
+  });
+  assert.deepEqual(calls, ['message:error:Activeren mislukt: insert failed']);
+  assert.equal(result.stage, 'persistence');
+});
+
 test('guest access runtime rejects missing required boundaries explicitly', async () => {
   await assert.rejects(() => setGuestLessonAccess({}), /A guest-lesson authorization function is required\./);
 });

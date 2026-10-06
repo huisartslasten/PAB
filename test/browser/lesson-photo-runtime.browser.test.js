@@ -71,3 +71,17 @@ test('V4.78 photo lesson creation rolls back the lesson when item insertion fail
   expect(result.message).toBe('item insert failed');
   expect(result.delete).toMatchObject({ table: 'lessons', operation: 'delete', filters: [['id', 42]] });
 });
+
+test('photo legacy implementation is absent while the public facade remains source-wired', async ({ page }) => {
+  const indexResponse = await page.request.get(`${baseURL}/index.html`);
+  const indexSource = await indexResponse.text();
+  expect(indexResponse.ok()).toBe(true);
+  expect(indexSource).not.toMatch(/async function createLessonFromPhoto\s*\(/);
+  expect(indexSource).not.toMatch(/function createLessonFromPhoto\s*\(/);
+
+  const photoStorageResponse = await page.request.get(`${baseURL}/photo-storage.js`);
+  const photoStorageSource = await photoStorageResponse.text();
+  expect(photoStorageResponse.ok()).toBe(true);
+  expect(photoStorageSource).toMatch(/const lessonPhotoRuntimeBootstrap\s*=\s*import\('\.\/src\/features\/lessons\/lesson-photo-runtime-bootstrap\.js'\)/);
+  expect(photoStorageSource).toMatch(/window\.createLessonFromPhoto\s*=\s*async function createLessonFromPhotoRuntimeFacade/);
+});

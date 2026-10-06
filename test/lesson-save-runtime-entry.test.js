@@ -1,7 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { installLessonSaveRuntimeEntry } from '../src/features/lessons/lesson-save-runtime-entry.js';
+import {
+  executeLessonSaveRuntimeEntry,
+  installLessonSaveRuntimeEntry
+} from '../src/features/lessons/lesson-save-runtime-entry.js';
 
 test('runtime entry replaces window.saveLesson and returns the legacy function', () => {
   const legacySaveLesson = async () => 'legacy';
@@ -30,4 +33,11 @@ test('runtime entry installation preserves the legacy function for rollback', ()
   } finally {
     globalThis.window = previousWindow;
   }
+});
+
+test('runtime entry rejects direct module execution without the explicit V4.78 bridge', async () => {
+  await assert.rejects(
+    () => executeLessonSaveRuntimeEntry(),
+    /V4\.78 lesson save runtime bridge is required/
+  );
 });

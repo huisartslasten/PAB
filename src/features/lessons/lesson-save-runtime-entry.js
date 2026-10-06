@@ -62,11 +62,10 @@ export async function executeLessonSaveRuntimeEntry(runtime) {
   const app = requireRuntime(runtime);
   const documentRef = app.document;
   const state = buildRuntimeState(app);
-  const errorElement = documentRef.getElementById('editorError');
-  const writeService = createLessonWriteService(app.db);
+  const getErrorElement = () => documentRef.getElementById('editorError');
 
   const runtimeEffects = buildLessonSaveRuntimeEffects({
-    errorElement,
+    getErrorElement,
     state,
     refreshTestCalendar: async () => app.renderTestCalendar(),
     refreshSidebars: async () => app.refreshPageSidebars(),
@@ -93,34 +92,35 @@ export async function executeLessonSaveRuntimeEntry(runtime) {
       draft,
       editorRows: readEditorRows(documentRef, draft.type)
     }),
-    executeCoordinator: async input => executeLessonSaveCore({
-      draft: input.draft,
-      collectItems: input.collectItems,
-      validate: validateLessonSaveInput,
-      runDictationCheck: async () => app.checkDictationSpelling(),
-      writeLesson: async request => writeService.saveLesson(request),
-      reloadLessons: async () => {
-        await app.loadLessons();
-        return app.lessons;
-      },
-      resolvePostPersistence: resolveLessonSavePostPersistence,
-      syncTestCalendar: async ({ action, lesson, lessonId, student, testDate }) => {
-        if (action === 'upsert') app.upsertTestDate(lessonId, student, testDate, lesson);
-        if (action === 'remove') app.removeTestDate(lessonId, student);
-      },
-      onWarning: async warning => {
-        errorElement.textContent = warning;
-        errorElement.classList.remove('hidden');
-      },
-      onWriteError: async () => {}
-    }),
-    runtimeEffects,
-    onValidationFailure: async result => {
-      if (result?.validation?.errorMessage) {
-        errorElement.textContent = result.validation.errorMessage;
-        errorElement.classList.remove('hidden');
-      }
+    executeCoordinator: async input => {
+      const writeService = createLessonWriteService(app.db);
+      return executeLessonSaveCore({
+        draft: input.draft,
+        collectItems: input.collectItems,
+        validate: validateLessonSaveInput,
+        runDictationCheck: async () => app.checkDictationSpelling(),
+        writeLesson: async request => writeService.saveLesson(request),
+        reloadLessons: async () => {
+          await app.loadLessons();
+          return app.lessons;
+        },
+        resolvePostPersistence: resolveLessonSavePostPersistence,
+        syncTestCalendar: async ({ action, lesson, lessonId, student, testDate }) => {
+          if (action === 'upsert') app.upsertTestDate(lessonId, student, testDate, lesson);
+          if (action === 'remove') app.removeTestDate(lessonId, student);
+        },
+        onWarning: async warning => {
+          const errorElement = getErrorElement();
+          if (errorElement) {
+            errorElement.textContent = warning;
+            errorElement.classList.remove('hidden');
+          }
+        },
+        onWriteError: async () => {}
+      });
     },
+    runtimeEffects,
+    onValidationFailure: async () => {},
     onPersistenceFailure: async () => {}
   });
 }

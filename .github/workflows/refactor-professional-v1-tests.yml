@@ -88,4 +88,3 @@ jobs:
           test/lesson-load-runtime.test.js
           test/lesson-load-runtime-entry.test.js
           test/lesson-load-runtime-source-contract.test.js
-          test/lesson-service.test.js

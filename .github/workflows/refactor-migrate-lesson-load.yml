@@ -1,0 +1,56 @@
+name: PacoGO one-time lesson load migration
+
+on:
+  push:
+    branches:
+      - refactor/professional-v1
+    paths:
+      - '.github/workflows/refactor-migrate-lesson-load.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout refactor branch
+        uses: actions/checkout@v4
+        with:
+          ref: refactor/professional-v1
+          fetch-depth: 1
+
+      - name: Replace legacy loadLessons runtime
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('index.html')
+          source = path.read_text(encoding='utf-8')
+          old = "async function loadLessons(){const {data,error}=await db.from('lessons').select('*, lesson_items(*)').order('id',{ascending:true});if(error){showMessage('Lessen laden mislukt: '+error.message,'error');return}lessons=(data||[]).map(l=>({...l,lesson_items:(l.lesson_items||[]).sort((a,b)=>(a.sort_order??0)-(b.sort_order??0))}));showHome()}"
+          new = """const lessonLoadRuntimeBridge = Object.defineProperties({}, {\n  db: { get: () => db },\n  setLessons: { get: () => value => { lessons = value; } },\n  showMessage: { get: () => showMessage },\n  showHome: { get: () => showHome }\n});\n\nconst lessonLoadRuntimeBootstrap = import('./src/features/lessons/lesson-load-runtime-bootstrap.js')\n  .then(({ bootstrapLessonLoadRuntime }) => bootstrapLessonLoadRuntime({\n    runtime: lessonLoadRuntimeBridge,\n    target: window\n  }));\nwindow.pacoGOLessonLoadRuntimeReady = lessonLoadRuntimeBootstrap;\nasync function loadLessons(){\n  const runtimeLoadLessons = await lessonLoadRuntimeBootstrap;\n  return runtimeLoadLessons();\n}"""
+          if old not in source:
+              raise SystemExit('legacy loadLessons implementation not found; refusing migration')
+          if 'pacoGOLessonLoadRuntimeReady' in source:
+              raise SystemExit('lesson load runtime already wired; refusing duplicate migration')
+          path.write_text(source.replace(old, new, 1), encoding='utf-8')
+          PY
+
+      - name: Verify source migration
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          source = Path('index.html').read_text(encoding='utf-8')
+          assert "pacoGOLessonLoadRuntimeReady" in source
+          assert "lesson-load-runtime-bootstrap.js" in source
+          assert "async function loadLessons(){const {data,error}=await db.from('lessons')" not in source
+          print('lesson load migration verified')
+          PY
+
+      - name: Commit migration
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'refactor: wire lesson loading runtime' || exit 0
+          git push origin refactor/professional-v1

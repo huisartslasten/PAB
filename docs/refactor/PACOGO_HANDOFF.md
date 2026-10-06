@@ -93,32 +93,33 @@ The classic-script runtime bridge exposes V4.78 application dependencies without
 - 551–560: controlled browser proof closed; legacy V4.78 `saveLesson()` deliberately removed from `index.html`; source-contract guard added
 - 561–570: lesson recovery/delete/archive/restore boundary extracted, runtime-wired, focused-tested, browser-proven, and legacy recovery implementations removed from `index.html`
 - 571–580: guest lesson access boundary extracted, runtime-wired, focused-tested, browser-proven, and legacy `setGuestLesson()` implementation removed from `index.html`
+- 581–590: photo-to-lesson creation boundary extracted, runtime-wired, focused-tested, controlled legacy removal completed, and source-contract guard added; post-removal professional/browser proof remains the final validation gate
 
 ## Current state
-The guest lesson access boundary is now fully migrated on `refactor/professional-v1`.
+The guest lesson access boundary is fully migrated on `refactor/professional-v1`.
 
-The proven public guest access path is exclusively:
+The photo-to-lesson creation boundary is now also migrated. The proven public photo path is exclusively:
 
-**classic `window.setGuestLesson` facade → single bootstrap readiness promise → installed guest runtime entry → explicit V4.78 bridge → parent authorization → guest lookup → assignment lookup/update/create → parent-student refresh → success/error message.**
+**classic `window.createLessonFromPhoto` facade → single bootstrap readiness promise → installed photo runtime entry → explicit V4.78 bridge → parent authorization → deterministic lesson/item persistence with rollback → lesson reload/state restoration → optional source-photo persistence → exact success/dashboard effects.**
 
-The legacy V4.78 `async function setGuestLesson(lessonId,active)` declaration has been deliberately removed from `index.html`. Existing call sites continue to use the public facade.
+The photo boundary consists of:
+- `src/features/lessons/lesson-photo-runtime.js` — pure orchestration/behavior contract;
+- `src/features/lessons/lesson-photo-write-service.js` — deterministic lesson/item persistence and rollback;
+- `src/features/lessons/lesson-photo-runtime-entry.js` — classic-script bridge adapter and runtime contract validation;
+- `src/features/lessons/lesson-photo-runtime-bootstrap.js` — explicit dynamic bootstrap/readiness boundary;
+- `photo-storage.js` — live bridge and synchronous public `window.createLessonFromPhoto` facade.
 
-The guest boundary consists of:
-- `src/features/lessons/lesson-guest-access-runtime.js` — pure orchestration/behavior contract;
-- `src/features/lessons/lesson-guest-access-write-service.js` — guest-user and guest-lesson persistence;
-- `src/features/lessons/lesson-guest-access-runtime-entry.js` — classic-script bridge adapter;
-- `src/features/lessons/lesson-guest-access-runtime-bootstrap.js` — explicit dynamic bootstrap/readiness boundary;
-- `photo-storage.js` — live bridge and synchronous public `window.setGuestLesson` facade.
+The legacy V4.78 `async function createLessonFromPhoto()` implementation has been deliberately removed from `index.html`. The controlled one-time migration succeeded in run `37521423151`; it created removal commit `6580f71f515eb9e92ba27ffd00ae0b2e17b6242a` and then deleted its own workflow in commit `25d1b9829dd6fcf283e71447f58ab9699028fab4`.
 
-`test/lesson-guest-access-runtime-source-contract.test.js` guards that `index.html` cannot regain the legacy declaration and that `photo-storage.js` retains the refactored bootstrap/readiness facade.
+`test/lesson-photo-runtime-source-contract.test.js` now guards that `index.html` cannot regain the legacy photo implementation and that `photo-storage.js` retains the single refactored bootstrap/readiness facade without fallback or duplicate bootstrap.
 
-The controlled one-time legacy-removal workflow was deleted immediately after migration and is not part of the permanent architecture.
+The current branch HEAD is `25d1b9829dd6fcf283e71447f58ab9699028fab4` before the latest source-contract/checkpoint documentation commits; subsequent commits are expected to run the normal gates.
 
-### Validation status
-- Post-removal professional Node gate: **success**, run `37517619183`.
-- Post-removal controlled browser proof: **success**, run `37517740123`.
-- Browser proof covers save runtime, recovery runtime, and guest access runtime.
-- The browser workflow temporarily exposed an `npm ci` dependency-install mistake during a proof-trigger edit; this was corrected back to the established `npm install` workflow before the successful run. No application code was changed for that failure.
+## Validation status
+- Controlled photo legacy-removal workflow: **success**, run `37521423151`.
+- Pre-removal corrected browser proof run `37520995116`: **failure caused by an invalid test expectation**, not the runtime; the browser test was corrected in commit `3b33c8c8979f194704a9178e048f99cbbf91f57e`.
+- The controlled removal workflow itself completed successfully, and the one-time workflow was deleted.
+- Post-removal browser proof and professional gate must be verified against the current branch after the new source-contract test commit; do not claim them green until GitHub Actions reports success.
 - No Supabase schema changes.
 - No `main`/LIVE changes.
 - No agenda-import changes.
@@ -126,7 +127,7 @@ The controlled one-time legacy-removal workflow was deleted immediately after mi
 - No visual redesign.
 
 ## Next gate
-Inspect the next remaining legacy-runtime ownership boundary. Do not perform unrelated cleanup, visual redesign, schema changes, agenda-import changes, or new lesson-editor AI work.
+Verify the post-removal professional Node gate and controlled Playwright browser proof against the current branch. If both are green, checkpoint 581–590 is closed. Then inspect the next remaining legacy-runtime ownership boundary.
 
 Apply the same sequence: authoritative V4.78 behavior → responsibility/contract → focused tests → runtime wiring → browser proof → controlled legacy removal → checkpoint.
 

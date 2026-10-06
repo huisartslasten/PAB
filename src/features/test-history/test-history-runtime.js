@@ -38,7 +38,7 @@ export async function showTestHistoryRuntime({
 
   try {
     const attempts = await listAttempts(studentFilter);
-    renderAttempts(attempts || []);
+    renderAttempts(attempts || [], studentFilter);
     return Object.freeze({ ok: true, attempts: attempts || [] });
   } catch (error) {
     renderError(error);

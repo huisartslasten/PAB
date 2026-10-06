@@ -89,30 +89,34 @@ The proven V4.78 save flow is:
 - 521–530: runtime dependency ordering hardened; DOM/DB dependencies deferred past authorization; editor answer fallback corrected; save-request input contract tightened; focused professional gate executed at 70 passed/0 failed; browser execution still pending
 - 531–540: standalone `lesson-write-service` contract promoted into the professional executable gate; GitHub Actions executed **76 passed / 0 failed / 0 skipped**; no production patch or weakened assertion; browser execution still pending
 - 541–550: controlled Playwright browser-proof boundary added; first fixture run failed during initialization; production code was not patched; fixture boundary was corrected
-- 551–560: **real browser proof verified**; GitHub Actions run `37496386784` completed successfully with Chromium, local fixture server, and the V4.78 browser proof all successful
+- 551–560: **controlled browser proof closed and legacy V4.78 `saveLesson()` deliberately removed from `index.html`**; source-contract guard added; one-time removal gate succeeded; migration workflow removed immediately
 
 ## Current state
-**Checkpoint 551–560 is complete. The browser-runtime validation gate is now closed.**
+The browser-runtime validation gate is closed and the legacy monolithic `saveLesson()` implementation has now been removed from `index.html` on `refactor/professional-v1`.
 
-The professional Node gate remains verified at **76 passed / 0 failed / 0 skipped**. The dedicated Playwright workflow has now also been executed successfully in GitHub Actions. It installs Chromium, starts the isolated local fixture, and executes the actual classic `window.saveLesson()` facade through the refactored runtime chain.
-
-The verified browser chain is:
+The proven public save entry is now exclusively:
 
 **classic `window.saveLesson` facade → single bootstrap readiness promise → installed runtime entry → explicit V4.78 bridge → authorization → editor DOM extraction → deterministic item collection → validation → write service → reload/outcome → calendar/sidebar/message effects.**
 
-The first browser attempt failed at fixture runtime initialization. The fixture was corrected at its own boundary and the second run passed. This was not solved by changing `index.html`, weakening production assertions, or adding a legacy fallback.
+The post-removal `index.html` blob is `5ddbef244116b844f0089e3d392f7024f5f90624`.
 
-### Next gate: controlled legacy-runtime replacement
-The browser proof does **not** mean that legacy code may now be deleted blindly. The next step is a source-level audit of the exact V4.78 `saveLesson()` definition and ownership at the legacy call site, followed by the smallest deliberate integration/removal step that preserves the proven entry contract.
+A source-contract test in `test/lesson-save-runtime-source-contract.test.js` now fails if `index.html` ever regains either `async function saveLesson()` or `function saveLesson()`.
 
-Before any deletion:
-- identify the exact authoritative V4.78 implementation;
-- identify every active reference/call site;
-- prove that the browser-tested replacement owns the same public entry contract;
-- preserve an explicit rollback boundary;
-- run the professional Node gate and browser proof again after the integration step.
+The one-time removal workflow succeeded as run `37504724654` and was then deleted. It is not part of the permanent runtime architecture.
 
-If the source audit exposes an architectural mismatch, stop and redesign the boundary. Do not patch the legacy monolith to make the replacement fit.
+### Validation status
+- Pre-removal professional Node gate: **76 passed / 0 failed / 0 skipped**.
+- Controlled browser proof before removal: **success**, run `37496386784`.
+- One-time legacy removal gate: **success**, run `37504724654`.
+- Post-removal professional Node gate: **must be green on the post-removal documentation commit before this checkpoint is considered fully closed**.
+- Post-removal browser proof: **must be green on the post-removal documentation commit before this checkpoint is considered fully closed**.
+
+The first browser attempt failed at fixture runtime initialization. The fixture was corrected at its own boundary and the second run passed. The legacy removal was then performed only after that browser proof existed. No production fallback or patch was introduced.
+
+## Next gate
+Once the post-removal Node gate and browser proof are green, inspect the next remaining legacy-runtime ownership boundary. Do not perform unrelated cleanup, visual redesign, schema changes, agenda-import changes, or new lesson-editor AI work.
+
+If the next source audit exposes an architectural mismatch, stop and redesign the boundary rather than patching the legacy monolith.
 
 ## Safety
 - `main`/LIVE untouched.

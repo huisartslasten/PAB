@@ -71,6 +71,7 @@ Important lesson/player modules include:
 - `lesson-write-service.js`
 - `lesson-save-model.js`
 - `lesson-save-validation.js`
+- `dictation-spellcheck.js`
 
 ## 6. Verified player/result parity
 
@@ -91,6 +92,7 @@ Authoritative V4.78 behavior already mapped and extracted:
 - `lesson-write-service.js`: deterministic persistence boundary preserving create/update ordering; normalizes `hint`, `min_words`, `required_terms`; update lesson first then replace items; create lesson first then insert items; lesson write failures prevent item writes.
 - `lesson-save-model.js`: lesson-level save payload and item normalization; existing subvak spelling is preferred when supplied by orchestration.
 - `lesson-save-validation.js`: pure pre-persistence validation boundary from V4.78; checks student, subject, title, non-empty items; exact V4.78 validation message; no DOM/AI/persistence/UI/navigation/state.
+- `dictation-spellcheck.js`: pure V4.78 dictation-only spelling-check boundary; builds one-based non-empty entries, injects the checker, preserves returned issues, reconstructs the V4.78 warning content and unavailable-check message; no DOM/Supabase/UI/state access. Checker failures are propagated so the future save orchestration can catch them without blocking persistence.
 
 ## 8. Exact V4.78 `saveLesson()` orchestration mapping
 
@@ -112,7 +114,7 @@ The authoritative V4.78 flow is:
 
 The extracted write service deliberately does **not** contain auth, DOM extraction, dictation AI check, test-calendar side effect, reload, rendering, success/error UI, navigation, or state changes.
 
-Runtime wiring remains **CLOSED**. The next orchestration contract must first be source-proven around validation → optional dictation check → deterministic write → test-date side effect → reload/UI/state.
+The extracted validation and dictation boundaries are also deliberately not connected to the legacy runtime yet. Runtime wiring remains **CLOSED**.
 
 ## 9. Checkpoint history
 
@@ -129,14 +131,19 @@ Runtime wiring remains **CLOSED**. The next orchestration contract must first be
 - 361–370: save model/write boundary
 - 371–380: `saveLesson()` call-site mapping
 - 381–390: validation isolated/tested
+- 391–400: dictation-only spelling-check boundary source-verified and focused-tested; runtime wiring remains closed
 
 ## 10. Current state
 
-**Current checkpoint: 381–390.**
+**Current checkpoint: 391–400.**
 
-The next technical gate is **391–400**.
+Checkpoint 391–400 established the authoritative V4.78 dictation-only spelling-check contract and isolated it in `src/features/lessons/dictation-spellcheck.js` without runtime replacement.
 
-The immediate goal is to source-verify the V4.78 **dictation-only spelling-check gate**, including its exact triggering condition and its **non-blocking warning/failure semantics**.
+The committed focused test uses the repository's configured `node --test` contract and covers entry construction, checker input/output, warning formatting, empty issues, and checker failure propagation. The focused seven-test harness was executed with `node --test`: 7 passed, 0 failed. No full repository test-suite pass is claimed.
+
+The next technical gate is **401–410**.
+
+The immediate goal is to source-verify the V4.78 **local test-calendar side effect after successful lesson persistence**, including its exact add/update/remove conditions and ordering relative to reload/UI/state.
 
 Do not jump directly to runtime replacement. First establish the exact source behavior and contract, then build the smallest appropriate boundary and focused tests.
 
@@ -177,9 +184,9 @@ Before making code changes, a new chat continuing this project must be able to s
 3. the authoritative V4.78 parity source and that `legacy/index-v4.78.html` is not the parity source;
 4. the parity-first method and why runtime wiring remains closed;
 5. the current checkpoint and exact next technical gate;
-6. what was already proven in checkpoints 371–390 and therefore must not be restarted;
+6. what was already proven in checkpoints 371–400 and therefore must not be restarted;
 7. that the actual repository state must be inspected rather than relying only on chat memory;
 8. that both the handoff and the corresponding `step-X-Y.md` must be updated at checkpoint completion;
 9. that tests may only be claimed when actually executed.
 
-The specific next gate is **391–400: source-verify the V4.78 dictation-only spelling-check gate, including its exact trigger and its non-blocking warning/failure semantics**. The next chat must not jump straight to runtime replacement or unrelated refactoring.
+The specific next gate is **401–410: source-verify the V4.78 local test-calendar side effect after successful lesson persistence, including its exact add/update/remove conditions and ordering relative to reload/UI/state**. The next chat must not jump straight to runtime replacement or unrelated refactoring.

@@ -22,13 +22,15 @@ export function createLessonSaveFlow({
   async function save({ lessonId = null, student = '', subject = '', lesson = {}, items = [], testDate = '' } = {}) {
     const saved = await persistence.save({ lessonId, lesson, items });
 
-    // Exact V4.78 state transition immediately after successful persistence.
+    // Exact V4.78 state transition immediately after successful persistence:
+    // currentSubject = subject; currentLesson = null; await loadLessons().
     setCurrentSubject?.(subject);
     clearCurrentLesson?.();
 
     await loadLessons();
 
-    const savedLesson = findSavedLesson(saved.lessonId, student);
+    // V4.78 finds the freshly reloaded lesson by id only.
+    const savedLesson = findSavedLesson(saved.lessonId);
     if (savedLesson) {
       if (testDate) {
         upsertTestDate?.(saved.lessonId, student, testDate, savedLesson);

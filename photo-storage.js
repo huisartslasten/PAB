@@ -1,4 +1,5 @@
 /* PacoGO TEST — lesson source photo storage */
+// Professional refactor gate: runtime save ownership is now external to index.html.
 (function(){
   const BUCKET='lesson-photos';
   let currentPhotoPicker=null;

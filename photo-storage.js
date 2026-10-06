@@ -136,3 +136,10 @@
   document.head.appendChild(style);
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ensurePhotoUi);else ensurePhotoUi();
 })();
+
+// TEST/refactor runtime bridge: the legacy function remains in index.html as a
+// rollback reference, while the active window.saveLesson entry is replaced only
+// after the modular V4.78 save boundaries have loaded successfully.
+import('./src/features/lessons/lesson-save-runtime-entry.js')
+  .then(({ installLessonSaveRuntimeEntry }) => installLessonSaveRuntimeEntry())
+  .catch(error => console.error('PacoGO lesson-save runtime bridge failed:', error));

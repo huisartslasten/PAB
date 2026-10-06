@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>PacoGO save runtime browser fixture</title></head>
+<body>
+  <input id="lessonSubject" value="Rekenen">
+  <input id="lessonName" value="Browser proof">
+  <textarea id="lessonExplanation">Controlled browser execution.</textarea>
+  <select id="lessonType"><option value="words" selected>words</option></select>
+  <input id="lessonSubvak" value="Getallen">
+  <input id="lessonAiCheckAnswers" type="checkbox">
+  <input id="lessonAiInstruction" value="">
+  <input id="lessonTestDate" value="">
+  <div id="wordEditor">
+    <div class="editor-row">
+      <div class="word-part-row"><input class="word-q-part" value="zeven"></div>
+      <div class="word-part-row"><input class="word-a-part" value="7"><input class="word-part-role" value="answer"></div>
+    </div>
+  </div>
+  <div id="editorError" class="hidden"></div>
+  <div id="lessonView"><div id="lessonContent"></div></div>
+  <div id="lessonAdminButtons"></div>
+
+  <script>
+    var db = window.__pacoDb;
+    var currentSubject = '';
+    var currentLesson = null;
+    var currentSession = { user: { id: 'browser-parent' } };
+    var PARENT_IDS = new Set(['browser-parent']);
+    var lessons = [];
+    var currentStudent = 'Browser Student';
+    var normalizeSubvakKey = value => String(value || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase('nl-NL');
+    var renderTestCalendar = async () => { window.__events.push('calendar'); };
+    var refreshPageSidebars = async () => { window.__events.push('sidebars'); };
+    var showMessage = async (message, type) => { window.__events.push('message:' + type + ':' + message); };
+    var showHome = () => { window.__events.push('home'); };
+    var loadLessons = async () => { window.__events.push('reload'); lessons = [window.__createdLesson]; return lessons; };
+    var checkDictationSpelling = async () => { window.__events.push('dictation'); return null; };
+    var upsertTestDate = () => { window.__events.push('test-date:upsert'); };
+    var removeTestDate = () => { window.__events.push('test-date:remove'); };
+    var isParentLoggedIn = () => true;
+    var escapeHtml = value => String(value ?? '');
+    window.__events = [];
+    window.__createdLesson = null;
+    window.__pacoDb = {
+      from(table) {
+        const state = { table, op: null, payload: null, id: null };
+        const builder = {
+          insert(payload) { state.op = 'insert'; state.payload = payload; return builder; },
+          update(payload) { state.op = 'update'; state.payload = payload; return builder; },
+          delete() { state.op = 'delete'; return builder; },
+          select() { state.select = true; return builder; },
+          single() { state.single = true; return builder; },
+          eq(column, value) { state.eq = [column, value]; return builder; },
+          order() { return builder; },
+          then(resolve, reject) {
+            try {
+              let result = { data: null, error: null };
+              if (table === 'lessons' && state.op === 'insert') {
+                window.__createdLesson = { ...state.payload, id: 9001 };
+                result.data = window.__createdLesson;
+              } else if (table === 'lesson_items' && state.op === 'insert') {
+                result.data = (Array.isArray(state.payload) ? state.payload : [state.payload]).map((item, index) => ({ ...item, id: 9100 + index }));
+              } else if (table === 'lesson_items' && state.op === 'delete') {
+                result.data = null;
+              }
+              return Promise.resolve(result).then(resolve, reject);
+            } catch (error) { return Promise.reject(error).then(resolve, reject); }
+          }
+        };
+        return builder;
+      }
+    };
+  </script>
+  <script src="/photo-storage.js"></script>
+</body>
+</html>

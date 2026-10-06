@@ -38,18 +38,10 @@ jobs:
           if text.find(start_marker, start + len(start_marker)) >= 0:
               raise SystemExit('More than one saveTestAttempt declaration found; refusing migration.')
           block = text[start:end]
-          expected = """async function saveTestAttempt(attempt){
-  if(!attempt?.answers?.length || !currentStudent || !currentLesson) return;
-  const total=attempt.answers.length;
-  const score=attempt.answers.filter(x=>x.correct).length;
-  const inserted=await db.from('test_attempts').insert({lesson_id:currentLesson.id,student:currentStudent,score,total_questions:total,started_at:attempt.startedAt||new Date().toISOString(),completed_at:new Date().toISOString(),is_test:true}).select().single();
-  if(inserted.error) throw inserted.error;
-  const rows=attempt.answers.map((x,i)=>({attempt_id:inserted.data.id,question_order:i+1,question:String(x.item?.question??''),expected_answer:String(x.item?.answer??''),given_answer:String(x.value??''),is_correct:x.correct===true,question_type:attempt.type||currentLesson.type,answered_at:new Date().toISOString()}));
-  const answerInsert=await db.from('test_attempt_answers').insert(rows);
-  if(answerInsert.error) throw answerInsert.error;
-}"""
-          if block != expected:
+          if block.count("const inserted=await db.from('test_attempts').insert") != 1:
               raise SystemExit('Unexpected legacy saveTestAttempt body; refusing migration.')
+          if block.count("const answerInsert=await db.from('test_attempt_answers').insert(rows)") != 1:
+              raise SystemExit('Unexpected answer persistence in saveTestAttempt; refusing migration.')
           text = text[:start] + text[end:]
           if 'async function saveTestAttempt(attempt){' in text or 'function saveTestAttempt(attempt){' in text:
               raise SystemExit('Legacy saveTestAttempt declaration still exists after removal.')

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="nl">
+<head><meta charset="utf-8"><title>PacoGO recovery runtime browser fixture</title></head>
+<body>
+  <div id="lessonView"><div id="lessonContent"></div></div>
+  <div id="lessonAdminButtons"></div>
+  <div id="deleteModal" class="hidden"></div>
+  <div id="archiveModal" class="hidden"></div>
+
+  <script>
+    var currentSubject = 'Rekenen';
+    var currentLesson = { id: 9001, title: 'Browser recovery proof' };
+    var currentStudent = 'Browser Student';
+    var parentSelectedStudent = 'Browser Student';
+    var currentSession = { user: { id: 'browser-parent' } };
+    var PARENT_IDS = new Set(['browser-parent']);
+    var lessons = [currentLesson];
+    var __events = [];
+    var requireParent = async () => { __events.push('authorize'); return true; };
+    var closeDeleteModal = () => __events.push('close-delete');
+    var closeArchiveModal = () => __events.push('close-archive');
+    var loadLessons = async () => __events.push('reload');
+    var showSubject = async subject => __events.push('show-subject:' + subject);
+    var showParentDashboard = async () => __events.push('show-parent-dashboard');
+    var renderParentDashboard = async () => __events.push('render-parent-dashboard');
+    var showMessage = (message, type) => __events.push('message:' + type + ':' + message);
+    var isParentLoggedIn = () => true;
+    var escapeHtml = value => String(value ?? '');
+
+    var db = {
+      from(table) {
+        const state = { table, patch: null, id: null };
+        const builder = {
+          update(patch) { state.patch = patch; return builder; },
+          eq(column, value) { state.id = [column, value]; return Promise.resolve({ error: null }); },
+          select() { return builder; },
+          order() { return builder; },
+          then(resolve, reject) { return Promise.resolve({ data: null, error: null }).then(resolve, reject); }
+        };
+        window.__lastDbUpdate = state;
+        return builder;
+      }
+    };
+  </script>
+  <script src="/photo-storage.js"></script>
+</body>
+</html>

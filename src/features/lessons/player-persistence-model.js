@@ -39,3 +39,23 @@ export function buildTestAttemptAnswerRows(answers = [], { questionType = 'text'
     };
   });
 }
+
+export function buildTestPersistencePayload(attempt = {}) {
+  const answers = Array.isArray(attempt.answers) ? attempt.answers : [];
+  const correct = answers.filter(answer => answer?.correct === true).length;
+
+  return Object.freeze({
+    attempt: buildTestAttemptRow({
+      lessonId: attempt.lessonId,
+      student: attempt.student,
+      correct,
+      total: answers.length,
+      startedAt: attempt.startedAt,
+      completedAt: attempt.finishedAt,
+      isTest: true
+    }),
+    answers: buildTestAttemptAnswerRows(answers, {
+      questionType: attempt.type
+    })
+  });
+}

@@ -1,6 +1,6 @@
 name: PacoGO browser refactor proof
 
-# Post-recovery-removal proof trigger; runtime behavior is unchanged.
+# Controlled browser proof for the refactored lesson save, recovery, and guest access runtimes.
 on:
   push:
     branches:
@@ -33,13 +33,15 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
       - name: Start local fixture server
-        run: python3 -m http.server 4173 > /tmp/pacogo-browser-server.log 2>&1 &
+        run: |
+          python3 -m http.server 4173 --directory . > /tmp/pacogo-http.log 2>&1 &
+          echo $! > /tmp/pacogo-http.pid
 
       - name: Run V4.78 browser proof
         run: >-

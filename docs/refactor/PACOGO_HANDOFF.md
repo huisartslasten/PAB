@@ -70,6 +70,7 @@ Important lesson/player modules include:
 - `lesson-item-collector.js`
 - `lesson-write-service.js`
 - `lesson-save-model.js`
+- `lesson-save-validation.js`
 
 ## 5. Player/result parity already established
 
@@ -211,6 +212,9 @@ For updates, lesson update occurs before replacing lesson items. For creates, th
 ### `lesson-save-model.js`
 Builds the lesson-level save payload and item normalization. Existing subvak spelling is preferred over the newly entered spelling when supplied by the orchestration layer.
 
+### `lesson-save-validation.js`
+Pure pre-persistence validation boundary reconstructed from V4.78. It checks student, subject, title, and non-empty item collection and preserves the exact V4.78 validation message. It has no DOM, AI, persistence, UI, navigation, or state responsibilities.
+
 ## 8. Exact V4.78 `saveLesson()` orchestration
 
 The authoritative V4.78 function does all of the following in order:
@@ -226,7 +230,7 @@ The authoritative V4.78 function does all of the following in order:
 9. On persistence error, show `Opslaan mislukt: ...` and stop.
 10. On success, update current state and reload lessons.
 11. Add/update/remove the local test-calendar entry according to the test date.
-12. Refresh test calendar and page sidebars.
+12. Refresh the test calendar and page sidebars.
 13. Show the appropriate success message.
 
 The extracted write service deliberately does **not** contain:
@@ -266,16 +270,17 @@ Before wiring, the next orchestration contract must be source-proven around:
 - **351–360:** editor round-trip parity established.
 - **361–370:** exact V4.78 save model and write boundary verified; create/update failure behavior tested.
 - **371–380:** exact `saveLesson()` call-site mapped; persistence separated from orchestration; runtime wiring remains closed.
+- **381–390:** V4.78 pre-persistence validation isolated as `lesson-save-validation.js` and focused-tested; runtime wiring remains closed.
 
 Detailed checkpoint documents live under `docs/refactor/step-*.md`.
 
 ## 11. Current state
 
-Current checkpoint: **371–380**.
+Current checkpoint: **381–390**.
 
-The immediate technical goal is to continue with **381–390**, focusing on the orchestration boundary for the V4.78 lesson-save sequence.
+The immediate technical goal is to continue with **391–400**, focusing on the V4.78 dictation-only spelling-check gate and its non-blocking warning/failure semantics.
 
-Do not jump directly to runtime replacement. First source-verify the remaining orchestration responsibilities and establish focused tests/contracts.
+Do not jump directly to runtime replacement. First source-verify the dictation gate and establish focused tests/contracts.
 
 ## 12. Next-chat startup procedure
 

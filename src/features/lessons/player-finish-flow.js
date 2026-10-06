@@ -1,6 +1,6 @@
 // Deterministic orchestration for the V4.78 finishTest() contract.
-// Rendering, speech cancellation, persistence and activity cleanup are injected.
-// No DOM, HTML escaping, navigation or database implementation belongs here.
+// Rendering, persistence and activity cleanup are injected.
+// No DOM, HTML escaping, speech control, navigation or database implementation belongs here.
 
 import { createPlayerResult } from './player-result.js';
 
@@ -8,7 +8,6 @@ export async function finishPlayerTest({
   attempt = null,
   saveTestAttempt,
   renderResult,
-  cancelSpeech,
   clearActivity
 } = {}) {
   if (!attempt || typeof attempt !== 'object') {
@@ -20,8 +19,6 @@ export async function finishPlayerTest({
   if (typeof renderResult !== 'function') {
     throw new Error('A result renderer is required.');
   }
-
-  cancelSpeech?.();
 
   const answers = Array.isArray(attempt.answers) ? attempt.answers : [];
   const result = createPlayerResult({
@@ -37,16 +34,11 @@ export async function finishPlayerTest({
     finishedAt: attempt.finishedAt ?? null
   });
 
-  let historyError = null;
-  try {
-    await saveTestAttempt(attempt);
-  } catch (error) {
-    // V4.78 still completes and renders the result when history persistence fails.
-    historyError = error;
-  }
-
-  await renderResult(Object.freeze({ result, historyError }));
+  // V4.78 lets persistence errors propagate. It does not render a result after
+  // a failed history save, and it does not clear the active activity in that case.
+  await saveTestAttempt(attempt);
+  await renderResult(Object.freeze({ result }));
   clearActivity?.();
 
-  return Object.freeze({ result, historyError });
+  return Object.freeze({ result });
 }

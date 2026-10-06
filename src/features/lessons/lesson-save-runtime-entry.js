@@ -1,6 +1,10 @@
 // Controlled TEST runtime entry for the V4.78 lesson save flow.
 // This is the only adapter that knows the legacy application globals.
 // The save behavior itself remains in the proven feature boundaries.
+//
+// The legacy page is a classic script while this file is an ES module. Do not
+// resolve classic-script lexical bindings directly from module scope. The
+// classic-script bridge injects the exact V4.78 runtime dependencies instead.
 
 import { executeLessonSaveApplication } from './lesson-save-runtime-integration.js';
 import { requireParentAccess, readLessonEditorDraft } from './lesson-save-runtime-adapter.js';
@@ -12,12 +16,41 @@ import { validateLessonSaveInput } from './lesson-save-validation.js';
 import { resolveLessonSavePostPersistence } from './lesson-save-post-persistence.js';
 import { buildLessonSaveRuntimeEffects } from './lesson-save-runtime-effects.js';
 
-function buildRuntimeState() {
+function requireRuntime(runtime) {
+  if (!runtime || typeof runtime !== 'object') {
+    throw new Error('A V4.78 lesson save runtime bridge is required.');
+  }
+  const required = [
+    'document',
+    'db',
+    'currentSubject',
+    'currentLesson',
+    'currentSession',
+    'PARENT_IDS',
+    'lessons',
+    'currentStudent',
+    'normalizeSubvakKey',
+    'renderTestCalendar',
+    'refreshPageSidebars',
+    'showMessage',
+    'showHome',
+    'loadLessons',
+    'checkDictationSpelling',
+    'upsertTestDate',
+    'removeTestDate'
+  ];
+  for (const key of required) {
+    if (!(key in runtime)) throw new Error(`Missing V4.78 runtime bridge dependency: ${key}.`);
+  }
+  return runtime;
+}
+
+function buildRuntimeState(runtime) {
   return {
-    get currentSubject() { return currentSubject; },
-    set currentSubject(value) { currentSubject = value; },
-    get currentLesson() { return currentLesson; },
-    set currentLesson(value) { currentLesson = value; }
+    get currentSubject() { return runtime.currentSubject; },
+    set currentSubject(value) { runtime.currentSubject = value; },
+    get currentLesson() { return runtime.currentLesson; },
+    set currentLesson(value) { runtime.currentLesson = value; }
   };
 }
 
@@ -25,40 +58,41 @@ function readEditorRows(documentRef, type) {
   return readLessonEditorRows({ documentRef, type });
 }
 
-export async function executeLessonSaveRuntimeEntry() {
-  const documentRef = document;
-  const state = buildRuntimeState();
+export async function executeLessonSaveRuntimeEntry(runtime) {
+  const app = requireRuntime(runtime);
+  const documentRef = app.document;
+  const state = buildRuntimeState(app);
   const errorElement = documentRef.getElementById('editorError');
-  const writeService = createLessonWriteService(db);
+  const writeService = createLessonWriteService(app.db);
 
   const runtimeEffects = buildLessonSaveRuntimeEffects({
     outcome: {
-      currentSubject: currentSubject || '',
-      currentLesson: currentLesson || null,
+      currentSubject: app.currentSubject || '',
+      currentLesson: app.currentLesson || null,
       successMessage: ''
     },
     errorElement,
     state,
-    refreshTestCalendar: async () => renderTestCalendar(),
-    refreshSidebars: async () => refreshPageSidebars(),
-    showMessage: async (message, type) => showMessage(message, type)
+    refreshTestCalendar: async () => app.renderTestCalendar(),
+    refreshSidebars: async () => app.refreshPageSidebars(),
+    showMessage: async (message, type) => app.showMessage(message, type)
   });
 
   return executeLessonSaveApplication({
     authorize: async () => requireParentAccess({
-      session: currentSession,
-      parentIds: PARENT_IDS,
+      session: app.currentSession,
+      parentIds: app.PARENT_IDS,
       onDenied: message => {
-        showMessage(message, 'error');
-        showHome();
+        app.showMessage(message, 'error');
+        app.showHome();
       }
     }),
     readDraft: async () => readLessonEditorDraft({
       documentRef,
-      lessons,
-      currentStudent,
-      currentLesson,
-      normalizeSubvakKey
+      lessons: app.lessons,
+      currentStudent: app.currentStudent,
+      currentLesson: app.currentLesson,
+      normalizeSubvakKey: app.normalizeSubvakKey
     }),
     prepare: async ({ draft }) => prepareLessonSaveCoreInput({
       draft,
@@ -68,16 +102,16 @@ export async function executeLessonSaveRuntimeEntry() {
       draft: input.draft,
       collectItems: input.collectItems,
       validate: validateLessonSaveInput,
-      runDictationCheck: async () => checkDictationSpelling(),
+      runDictationCheck: async () => app.checkDictationSpelling(),
       writeLesson: async request => writeService.saveLesson(request),
       reloadLessons: async () => {
-        await loadLessons();
-        return lessons;
+        await app.loadLessons();
+        return app.lessons;
       },
       resolvePostPersistence: resolveLessonSavePostPersistence,
       syncTestCalendar: async ({ action, lesson, lessonId, student, testDate }) => {
-        if (action === 'upsert') upsertTestDate(lessonId, student, testDate, lesson);
-        if (action === 'remove') removeTestDate(lessonId, student);
+        if (action === 'upsert') app.upsertTestDate(lessonId, student, testDate, lesson);
+        if (action === 'remove') app.removeTestDate(lessonId, student);
       },
       onWarning: async warning => {
         errorElement.textContent = warning;
@@ -96,16 +130,16 @@ export async function executeLessonSaveRuntimeEntry() {
     onComplete: async result => {
       const outcome = result?.outcome;
       if (!outcome) return;
-      currentSubject = outcome.currentSubject;
-      currentLesson = null;
+      app.currentSubject = outcome.currentSubject;
+      app.currentLesson = null;
     }
   });
 }
 
-export function installLessonSaveRuntimeEntry() {
+export function installLessonSaveRuntimeEntry(runtime) {
   const legacySaveLesson = window.saveLesson;
   window.saveLesson = async function saveLessonRuntimeEntry() {
-    return executeLessonSaveRuntimeEntry();
+    return executeLessonSaveRuntimeEntry(runtime);
   };
   return legacySaveLesson;
 }

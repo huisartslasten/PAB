@@ -66,11 +66,6 @@ export async function executeLessonSaveRuntimeEntry(runtime) {
   const writeService = createLessonWriteService(app.db);
 
   const runtimeEffects = buildLessonSaveRuntimeEffects({
-    outcome: {
-      currentSubject: app.currentSubject || '',
-      currentLesson: app.currentLesson || null,
-      successMessage: ''
-    },
     errorElement,
     state,
     refreshTestCalendar: async () => app.renderTestCalendar(),

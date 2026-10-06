@@ -83,7 +83,7 @@ The classic-script runtime bridge exposes V4.78 application dependencies without
 - 581–590: photo-to-lesson creation boundary extracted, runtime-wired, focused-tested, controlled legacy removal completed, source-contract guarded, and controlled browser proof closed
 - 591–600: test-attempt persistence/runtime boundary extracted, runtime-wired, focused-tested, and browser-proven
 - 601–610: lesson-loading runtime boundary extracted, runtime-wired, focused-tested, source-contract guarded, and browser-proven
-- 611–620: lesson-order service/runtime boundary extracted and wired; focused contracts pass; browser proof pending closure
+- 611–620: lesson-order service/runtime boundary extracted, runtime-wired, focused-tested, source-contract guarded, and browser-proven
 
 ## Current state
 The guest lesson access, photo-to-lesson creation, test-attempt completion, lesson-loading, and lesson-order boundaries are migrated on `refactor/professional-v1`.
@@ -121,8 +121,8 @@ The lesson-order contract preserves the V4.78 remote-first/local-fallback behavi
 - Lesson-loading professional gate: **success**, run `37536029041`, job `112517029265`.
 - Lesson-loading browser proof: **success**, run `37535869080`, job `112516489142`.
 - Lesson-order professional gate: **success**, run `37536871075`.
-- Lesson-order browser proof: run `37536895653` is currently **queued**; do not claim browser closure until it completes successfully.
-- Checkpoint documentation: `docs/refactor/step-611-620.md` added with pending browser closure status.
+- Lesson-order browser proof: **success**, run `37536895653`, job `112520098729`.
+- Checkpoint documentation close: commit `b6dcd6dc6567c44b02ca4a800424479ee84cf606`.
 - No Supabase schema changes.
 - No `main`/LIVE changes.
 - No agenda-import changes.
@@ -130,7 +130,7 @@ The lesson-order contract preserves the V4.78 remote-first/local-fallback behavi
 - No visual redesign.
 
 ## Next gate
-Finish checkpoint 611–620 by confirming the queued Chromium browser proof. If it fails, fix the actual boundary/fixture contract rather than weakening assertions. Once browser proof is green, close the checkpoint documentation and inspect the next remaining legacy-runtime ownership boundary directly from authoritative V4.78 source and the current refactor tree.
+Checkpoint 611–620 is closed. Inspect the next remaining legacy-runtime ownership boundary directly from the authoritative V4.78 source and the current `refactor/professional-v1` tree.
 
 Apply the same sequence: authoritative V4.78 behavior → responsibility/contract → focused tests → runtime wiring → browser proof → controlled legacy removal → checkpoint.
 

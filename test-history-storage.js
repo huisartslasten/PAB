@@ -1,3 +1,11 @@
+import { createTestHistoryRenderer } from './src/features/test-history/test-history-renderer.js';
+
+const testHistoryRenderer = createTestHistoryRenderer({
+  getLessons: () => lessons,
+  escapeHtml,
+  documentRef: document
+});
+
 const testHistoryRuntimeBridge = Object.defineProperties({}, {
   db: { get: () => db },
   requireParent: { get: () => requireParent },
@@ -12,7 +20,7 @@ const testHistoryRuntimeBridge = Object.defineProperties({}, {
     if (el) el.innerHTML = '<div class="card">Toetsgeschiedenis laden...</div>';
   } },
   refreshSidebars: { get: () => refreshPageSidebars },
-  renderAttempts: { get: () => renderTestHistoryAttempts },
+  renderAttempts: { get: () => testHistoryRenderer },
   renderError: { get: () => error => {
     const el = document.getElementById('testHistoryContent');
     if (el) el.innerHTML = '<div class="card message error">De toetsgeschiedenis kon niet worden geladen.</div>';

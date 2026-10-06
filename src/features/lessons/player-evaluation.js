@@ -1,12 +1,5 @@
 const normalize = value => String(value ?? '').trim().toLowerCase();
 
-function acceptedAnswers(item) {
-  const parts = Array.isArray(item?.answer_parts)
-    ? item.answer_parts.filter(part => part?.role === 'answer' && String(part.text ?? '').trim())
-    : [];
-  return parts.length ? parts.map(part => String(part.text).trim()) : [String(item?.answer ?? '').trim()];
-}
-
 export function countAnswerWords(value) {
   return String(value ?? '').trim().split(/\s+/).filter(Boolean).length;
 }
@@ -27,7 +20,9 @@ export function checkFixedAnswerRules(item, userAnswer) {
 }
 
 export function evaluateExactAnswer(item, userAnswer) {
-  return acceptedAnswers(item).some(answer => normalize(userAnswer) === normalize(answer));
+  // V4.78 dictation/test evaluation compares the normalized input directly
+  // with item.answer. Do not broaden this to answer_parts here.
+  return normalize(userAnswer) === normalize(item?.answer);
 }
 
 export function evaluateMathAnswer(item, userAnswer) {

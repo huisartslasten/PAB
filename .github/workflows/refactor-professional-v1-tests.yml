@@ -7,6 +7,7 @@ on:
       - refactor/professional-v1
     paths:
       - 'src/features/lessons/**'
+      - 'src/features/test-history/**'
       - 'test/lesson-save-*.test.js'
       - 'test/lesson-write-service.test.js'
       - 'test/lesson-item-collector.test.js'
@@ -21,6 +22,8 @@ on:
       - 'test/lesson-save-runtime-source-contract.test.js'
       - 'test/lesson-guest-access-*.test.js'
       - 'test/lesson-photo-*.test.js'
+      - 'test/test-attempt-*.test.js'
+      - 'test-history-storage.js'
       - 'photo-storage.js'
       - 'index.html'
       - '.github/workflows/refactor-professional-v1-tests.yml'
@@ -75,3 +78,8 @@ jobs:
           test/lesson-photo-runtime.test.js
           test/lesson-photo-runtime-entry.test.js
           test/lesson-photo-runtime-bootstrap.test.js
+          test/test-attempt-write-service.test.js
+          test/test-attempt-runtime.test.js
+          test/test-attempt-runtime-entry.test.js
+          test/test-attempt-runtime-bootstrap.test.js
+          test/test-attempt-runtime-source-contract.test.js

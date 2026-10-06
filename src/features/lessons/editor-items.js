@@ -12,7 +12,7 @@ function normalizeParts(parts = [], fallback = '') {
     .filter(part => part.text);
 }
 
-function buildUniversalItem(row = {}, { numericAnswer = false, spelling = false } = {}) {
+function buildUniversalItem(row = {}, { numericAnswer = false, spelling = false, includeWordRules = false } = {}) {
   const questionParts = Array.isArray(row.question_parts)
     ? row.question_parts.map(text).filter(Boolean)
     : (text(row.question) ? [text(row.question)] : []);
@@ -29,19 +29,22 @@ function buildUniversalItem(row = {}, { numericAnswer = false, spelling = false 
     answer_parts: answerParts
   };
 
-  if (row.hint != null) item.hint = text(row.hint);
-  if (row.min_words != null) item.min_words = Math.max(0, Number(row.min_words) || 0);
-  if (row.required_terms != null) {
-    item.required_terms = Array.isArray(row.required_terms)
-      ? row.required_terms.map(text).filter(Boolean)
-      : text(row.required_terms).split(',').map(text).filter(Boolean);
+  // V4.78 only persisted these fixed-answer rules for Woordtrainer/Eigen les.
+  if (includeWordRules) {
+    if (row.hint != null) item.hint = text(row.hint);
+    if (row.min_words != null) item.min_words = Math.max(0, Number(row.min_words) || 0);
+    if (row.required_terms != null) {
+      item.required_terms = Array.isArray(row.required_terms)
+        ? row.required_terms.map(text).filter(Boolean)
+        : text(row.required_terms).split(',').map(text).filter(Boolean);
+    }
   }
 
   return item;
 }
 
 export function buildWordItem(row = {}) {
-  return buildUniversalItem(row);
+  return buildUniversalItem(row, { includeWordRules: true });
 }
 
 export function buildQuestionItem(row = {}) {
@@ -73,7 +76,8 @@ export function buildItemsForType(type, rows = []) {
     math: buildMathItem,
     spelling: buildSpellingItem
   };
-  const build = builders[type] || builders.words;
+  const build = builders[type];
+  if (!build) return [];
 
   return (Array.isArray(rows) ? rows : [])
     .map((row, index) => {

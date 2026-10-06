@@ -37,7 +37,6 @@
 - Large user files must not be stored in Git/GitHub.
 - **Supabase TEST and Supabase LIVE must remain strictly separated**, just as `refactor/professional-v1` and `main` remain separated.
 - The refactor must not break, blur, or implicitly mix these boundaries.
-- This is a standing architecture principle for PacoGO growth; it does not itself require a runtime-wiring or functionality change.
 
 ## Refactor method
 **authoritative V4.78 source → exact behavior → responsibility/contract → small module/boundary → focused tests → checkpoint → later runtime wiring**
@@ -62,11 +61,12 @@
 - `lesson-save-request.js`: canonical model → coordinator/write execution request; missing model is rejected explicitly.
 - `lesson-save-runtime-flow.js`: authorization → draft extraction → preparation → execution request → coordinator → outcome callbacks.
 - `lesson-save-runtime-effects.js`: validation/persistence error UI and successful state/calendar/sidebar/message effects; DOM error lookup is resolved lazily at execution time and it does not duplicate coordinator-owned persistence/reload/calendar sync.
-- `lesson-save-runtime-integration.js`: final injectable application integration contract; now also normalizes runtime-effect payload ownership.
-- `lesson-save-runtime-entry.js`: controlled TEST entry; receives the legacy runtime explicitly rather than resolving classic-script lexical bindings from ES-module scope; DOM and DB dependencies are deferred until their authorized execution boundaries.
+- `lesson-save-runtime-integration.js`: final injectable application integration contract; runtime-effect payload ownership is explicit.
+- `lesson-save-runtime-entry.js`: controlled TEST entry; receives the legacy runtime explicitly rather than resolving classic-script lexical bindings from ES-module scope; DOM and DB dependencies are deferred until authorized execution boundaries.
 - `lesson-save-runtime-bootstrap.js`: explicit module-loading/readiness boundary; verifies the installed runtime entry and returns it from `pacoGOLessonSaveRuntimeReady`; propagates load/installer failures without legacy fallback.
 - `photo-storage.js`: classic-script boundary injects the live V4.78 runtime bridge and installs the synchronous `saveLesson` facade that waits for the explicit bootstrap readiness contract before invoking the refactored runtime.
-- `test/lesson-save-runtime-source-contract.test.js`: source-level guard for the three-part browser seam: facade → bootstrap readiness → installed runtime entry, plus explicit bridge dependencies and no timeout/fallback.
+- `test/lesson-save-runtime-source-contract.test.js`: source-level guard for facade → bootstrap → installed runtime entry, explicit bridge dependencies, and no timeout/fallback.
+- `test/browser/lesson-save-runtime.browser.test.js`: real-browser proof for the classic `saveLesson` facade and end-to-end refactored save flow using an isolated in-memory Supabase-shaped test double.
 
 ## Authoritative V4.78 saveLesson() order
 1. parent authorization
@@ -112,21 +112,27 @@
 - 511–520: ES-module/classic-script runtime bridge corrected; explicit bootstrap/readiness boundary added; save invocation timing source-verified; synchronous runtime facade added; source-level seam guard added; browser execution still pending
 - 521–530: runtime dependency ordering hardened; DOM/DB dependencies deferred past authorization; editor answer fallback corrected; save-request input contract tightened; focused professional gate executed at 70 passed/0 failed; browser execution still pending
 - 531–540: standalone `lesson-write-service` contract promoted into the professional executable gate; GitHub Actions executed **76 passed / 0 failed / 0 skipped**; no production patch or weakened assertion; browser execution still pending
+- 541–550: controlled Playwright browser-proof boundary added; fixture executes the actual classic `saveLesson` facade against isolated test data; browser workflow result still pending/needs verification
 
 ## Current state
-**Checkpoint 531–540 is complete. The overall runtime-replacement gate remains open.**
+**Checkpoint 541–550 is structurally complete, but the browser proof itself is not yet verified.**
 
-The previously excluded `lesson-write-service.test.js` was re-inspected and found to already contain the correct explicit two-step `lesson_items` boundary: one `from()` for delete and a second `from()` for insert. No test weakening or production workaround was needed.
+The branch now contains a dedicated Playwright workflow that starts a local fixture server, installs Chromium, and executes the V4.78 save facade in a real browser. The fixture does not connect to Supabase; it provides an isolated in-memory test double so the proof covers runtime sequencing without touching TEST/LIVE application data.
 
-The professional GitHub Actions gate now includes `lesson-write-service.test.js`. Run `37494578969` at commit `03d4f6b4bc045bc1c7eb8c04efb1450a4f1aeedd` executed all **76 tests on Node.js 22.23.3 with 76 passed, 0 failed, 0 skipped**. The six write-service tests all passed.
+The intended browser chain is:
 
-The critical browser architecture remains: classic-script facade immediately available → single bootstrap readiness promise → installed refactored runtime entry → explicit V4.78 bridge → authorization-first runtime flow → no legacy fallback.
+**classic `window.saveLesson` facade → single bootstrap readiness promise → installed runtime entry → explicit V4.78 bridge → authorization → editor DOM extraction → deterministic item collection → validation → write service → reload/outcome → calendar/sidebar/message effects.**
 
-**Actual legacy runtime replacement is still gated.** The next required proof is a real browser execution of the V4.78 save path through this facade/bootstrap, including actual save invocation timing, exact save order, Supabase persistence, and success/error effects. Until that proof exists, the legacy `saveLesson()` implementation must not be removed and `main`/LIVE must not be touched.
+The browser workflow was added but its GitHub Actions result has not been independently verified yet. Therefore **do not claim a browser pass**. If it fails, inspect the fixture/test boundary first; do not patch `index.html` or production runtime code merely to satisfy the harness.
+
+The previously verified Node professional gate remains **76 passed / 0 failed / 0 skipped**.
+
+**Actual legacy runtime replacement is still gated.** Do not remove the legacy `saveLesson()` implementation and do not modify `index.html` until the browser proof is genuinely green and the exact V4.78 runtime behavior has been validated through the real facade.
 
 ## Safety
 - `main`/LIVE untouched.
 - No Supabase schema changes.
+- No real Supabase data access from the browser proof.
 - No agenda-import changes.
 - No lesson-editor AI behavior added.
 - No visual redesign.

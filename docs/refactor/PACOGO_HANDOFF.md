@@ -20,6 +20,12 @@
 8. Do not modify agenda-import unless explicitly requested.
 9. Never claim a full `node --test` pass unless actually executed.
 10. Work only on `refactor/professional-v1`.
+11. **Patching is not an allowed refactor method.** Do not solve architectural or migration problems by adding local fixes, exceptions, compatibility shims, duplicated logic, or incremental edits to make the current structure merely work.
+12. **Legacy code is not a repair surface.** Do not modify `index.html` or other legacy runtime code to compensate for an incomplete refactor. Legacy changes are permitted only as a deliberate, final integration/removal step after the replacement boundary has been source-verified, focused-tested, and runtime-validated.
+13. Every proposed change must first identify its V4.78 source behavior, architectural responsibility, target module/boundary, contract, and parity test. If that cannot be stated clearly, stop before coding.
+14. **Refactor Gate:** before implementation, explicitly classify the change as either (a) new/refactored architecture or (b) patch/workaround. If it is (b), do not implement it; redesign the affected boundary instead.
+15. If an architectural mismatch, missing seam, or failed assumption is discovered, **stop and redesign the boundary** rather than patching the symptom. A blocked step is preferable to a workaround.
+16. Tests must prove contracts and behavior, not merely make the current implementation green. Do not weaken assertions or broaden accepted outcomes just to accommodate an uncertain implementation.
 
 ## Architecture / safety boundaries
 - **GitHub and Supabase are strictly separated responsibilities.**
@@ -34,7 +40,9 @@
 - This is a standing architecture principle for PacoGO growth; it does not itself require a runtime-wiring or functionality change.
 
 ## Refactor method
-**authoritative V4.78 source → exact behavior → small module/boundary → focused tests → checkpoint → later runtime wiring**
+**authoritative V4.78 source → exact behavior → responsibility/contract → small module/boundary → focused tests → checkpoint → later runtime wiring**
+
+**Refactor Gate:** before any code change, identify the source behavior, responsibility, target boundary, contract, and proof. If the change would instead patch legacy structure, add a workaround, duplicate behavior, weaken a test, or compensate for an architectural gap, stop and redesign. Do not code around the problem.
 
 ## Proven lesson/editor chain
 - `lesson-choice.js` is active via `choice-flow.js`.

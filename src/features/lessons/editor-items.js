@@ -2,7 +2,7 @@ import { normalizeKey } from '../../utils/text.js';
 
 const text = value => String(value ?? '').trim();
 
-function normalizeParts(parts = [], fallback = '') {
+function normalizeParts(parts, fallback = '') {
   if (!Array.isArray(parts)) {
     const value = text(fallback);
     return value ? [{ text: value, role: 'answer' }] : [];

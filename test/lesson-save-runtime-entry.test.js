@@ -75,6 +75,37 @@ test('runtime entry installation rejects an incomplete bridge before replacing w
   }
 });
 
+test('runtime entry stops at authorization before reading or preparing an unauthorized save', async () => {
+  const calls = [];
+  const runtime = createValidRuntime({
+    currentSession: { user: { id: 'not-a-parent' } },
+    PARENT_IDS: new Set(['parent-1']),
+    showMessage(message, type) { calls.push(['message', message, type]); },
+    showHome() { calls.push(['home']); },
+    document: {
+      getElementById(id) {
+        calls.push(['getElementById', id]);
+        return { value: '', checked: false, classList: { remove() {} } };
+      },
+      querySelector() {
+        calls.push(['querySelector']);
+        return null;
+      }
+    },
+    loadLessons: async () => calls.push(['loadLessons']),
+    renderTestCalendar: () => calls.push(['renderTestCalendar']),
+    refreshPageSidebars: () => calls.push(['refreshPageSidebars'])
+  });
+
+  const result = await executeLessonSaveRuntimeEntry(runtime);
+
+  assert.deepEqual(result, { ok: false, stage: 'authorization' });
+  assert.deepEqual(calls, [
+    ['message', 'Alleen ouders kunnen lessen wijzigen. Log eerst in.', 'error'],
+    ['home']
+  ]);
+});
+
 test('runtime entry rejects direct module execution without the explicit V4.78 bridge', async () => {
   await assert.rejects(
     () => executeLessonSaveRuntimeEntry(),

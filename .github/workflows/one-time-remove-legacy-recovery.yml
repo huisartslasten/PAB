@@ -28,17 +28,17 @@ jobs:
           text = path.read_text(encoding='utf-8')
 
           patterns = [
-              r'\nfunction closeArchiveModal\(\)\{document\.getElementById\(\'archiveModal\'\)\.classList\.add\(\'hidden\'\)\}\nasync function confirmArchiveLesson\(\)\{.*?\n\}\n\n',
+              r'\nasync function confirmArchiveLesson\(\)\{.*?\n\}\n',
               r'\nasync function restoreArchivedLesson\(id\)\{.*?\n\}\n',
               r'\nasync function restoreDeletedLesson\(id\)\{.*?\n\}\n',
-              r'\nfunction deleteCurrentLesson\(\)\{.*?\n\}\nfunction closeDeleteModal\(\)\{document\.getElementById\(\'deleteModal\'\)\.classList\.add\(\'hidden\'\)\}\nasync function confirmDeleteLesson\(\)\{.*?\n\}\n',
+              r'\nasync function confirmDeleteLesson\(\)\{.*?\n\}\n',
           ]
 
           expected = [
-              'closeArchiveModal',
+              'confirmArchiveLesson',
               'restoreArchivedLesson',
               'restoreDeletedLesson',
-              'deleteCurrentLesson/confirmDeleteLesson',
+              'confirmDeleteLesson',
           ]
 
           for label, pattern in zip(expected, patterns):
@@ -48,11 +48,7 @@ jobs:
               text = text[:matches[0].start()] + '\n' + text[matches[0].end():]
 
           forbidden = [
-              'function deleteCurrentLesson(',
               'async function confirmDeleteLesson(',
-              'function closeDeleteModal()',
-              'function archiveCurrentLesson()',
-              'function closeArchiveModal()',
               'async function confirmArchiveLesson(',
               'async function restoreArchivedLesson(',
               'async function restoreDeletedLesson(',
@@ -60,6 +56,16 @@ jobs:
           leftovers = [item for item in forbidden if item in text]
           if leftovers:
               raise SystemExit('Legacy recovery declarations remain: ' + ', '.join(leftovers))
+
+          required_legacy_ui = [
+              'function deleteCurrentLesson()',
+              'function closeDeleteModal()',
+              'function archiveCurrentLesson()',
+              'function closeArchiveModal()',
+          ]
+          missing_ui = [item for item in required_legacy_ui if item not in text]
+          if missing_ui:
+              raise SystemExit('Recovery UI boundary was unexpectedly removed: ' + ', '.join(missing_ui))
 
           path.write_text(text, encoding='utf-8')
 

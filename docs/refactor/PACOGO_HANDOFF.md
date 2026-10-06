@@ -93,12 +93,12 @@ The classic-script runtime bridge exposes V4.78 application dependencies without
 - 551–560: controlled browser proof closed; legacy V4.78 `saveLesson()` deliberately removed from `index.html`; source-contract guard added
 - 561–570: lesson recovery/delete/archive/restore boundary extracted, runtime-wired, focused-tested, browser-proven, and legacy recovery implementations removed from `index.html`
 - 571–580: guest lesson access boundary extracted, runtime-wired, focused-tested, browser-proven, and legacy `setGuestLesson()` implementation removed from `index.html`
-- 581–590: photo-to-lesson creation boundary extracted, runtime-wired, focused-tested, controlled legacy removal completed, and source-contract guard added; post-removal professional/browser proof remains the final validation gate
+- 581–590: photo-to-lesson creation boundary extracted, runtime-wired, focused-tested, controlled legacy removal completed, source-contract guarded, and controlled browser proof closed
 
 ## Current state
 The guest lesson access boundary is fully migrated on `refactor/professional-v1`.
 
-The photo-to-lesson creation boundary is now also migrated. The proven public photo path is exclusively:
+The photo-to-lesson creation boundary is also fully migrated and checkpoint 581–590 is closed. The proven public photo path is exclusively:
 
 **classic `window.createLessonFromPhoto` facade → single bootstrap readiness promise → installed photo runtime entry → explicit V4.78 bridge → parent authorization → deterministic lesson/item persistence with rollback → lesson reload/state restoration → optional source-photo persistence → exact success/dashboard effects.**
 
@@ -111,15 +111,16 @@ The photo boundary consists of:
 
 The legacy V4.78 `async function createLessonFromPhoto()` implementation has been deliberately removed from `index.html`. The controlled one-time migration succeeded in run `37521423151`; it created removal commit `6580f71f515eb9e92ba27ffd00ae0b2e17b6242a` and then deleted its own workflow in commit `25d1b9829dd6fcf283e71447f58ab9699028fab4`.
 
-`test/lesson-photo-runtime-source-contract.test.js` now guards that `index.html` cannot regain the legacy photo implementation and that `photo-storage.js` retains the single refactored bootstrap/readiness facade without fallback or duplicate bootstrap.
+`test/lesson-photo-runtime-source-contract.test.js` guards that `index.html` cannot regain the legacy photo implementation and that `photo-storage.js` retains the single refactored bootstrap/readiness facade without fallback or duplicate bootstrap.
 
-The current branch HEAD is `25d1b9829dd6fcf283e71447f58ab9699028fab4` before the latest source-contract/checkpoint documentation commits; subsequent commits are expected to run the normal gates.
+The final browser fixture correction commit is `ea9ecb281f8f7a45a973de52cad5b6a3408d2588`; it corrected the test fixture to mutate the existing lesson array rather than replace the array reference held by the runtime. It did not alter production behavior.
 
 ## Validation status
 - Controlled photo legacy-removal workflow: **success**, run `37521423151`.
-- Pre-removal corrected browser proof run `37520995116`: **failure caused by an invalid test expectation**, not the runtime; the browser test was corrected in commit `3b33c8c8979f194704a9178e048f99cbbf91f57e`.
-- The controlled removal workflow itself completed successfully, and the one-time workflow was deleted.
-- Post-removal browser proof and professional gate must be verified against the current branch after the new source-contract test commit; do not claim them green until GitHub Actions reports success.
+- Professional refactor gate: **success**, run `37522351036`, job `112470686619`.
+- Controlled Playwright browser proof: **success**, run `37523556598`, job `112474746075`; all browser-proof steps completed successfully.
+- Final photo fixture correction: commit `ea9ecb281f8f7a45a973de52cad5b6a3408d2588`.
+- Checkpoint documentation close: commit `7c142f481d096de3704d65623f5bbfaa2c937310`.
 - No Supabase schema changes.
 - No `main`/LIVE changes.
 - No agenda-import changes.
@@ -127,7 +128,7 @@ The current branch HEAD is `25d1b9829dd6fcf283e71447f58ab9699028fab4` before the
 - No visual redesign.
 
 ## Next gate
-Verify the post-removal professional Node gate and controlled Playwright browser proof against the current branch. If both are green, checkpoint 581–590 is closed. Then inspect the next remaining legacy-runtime ownership boundary.
+Checkpoint 581–590 is closed. Inspect the next remaining legacy-runtime ownership boundary directly from the authoritative V4.78 source and the current `refactor/professional-v1` tree.
 
 Apply the same sequence: authoritative V4.78 behavior → responsibility/contract → focused tests → runtime wiring → browser proof → controlled legacy removal → checkpoint.
 

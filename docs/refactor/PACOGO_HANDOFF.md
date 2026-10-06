@@ -21,6 +21,18 @@
 9. Never claim a full `node --test` pass unless actually executed.
 10. Work only on `refactor/professional-v1`.
 
+## Architecture / safety boundaries
+- **GitHub and Supabase are strictly separated responsibilities.**
+- GitHub contains the software: source code, tests, documentation, checkpoints, and Git history.
+- Supabase contains application data and backend services.
+- Within Supabase, **Database and Storage remain strictly separated**:
+  - Database = structured data, relationships, lessons, results, agenda data, and other relational/application records.
+  - Storage = user files such as photos, videos, audio, and other binary files.
+- Large user files must not be stored in Git/GitHub.
+- **Supabase TEST and Supabase LIVE must remain strictly separated**, just as `refactor/professional-v1` and `main` remain separated.
+- The refactor must not break, blur, or implicitly mix these boundaries.
+- This is a standing architecture principle for PacoGO growth; it does not itself require a runtime-wiring or functionality change.
+
 ## Refactor method
 **authoritative V4.78 source → exact behavior → small module/boundary → focused tests → checkpoint → later runtime wiring**
 

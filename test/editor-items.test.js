@@ -49,3 +49,13 @@ test('extra answer parts remain persisted but are excluded from required answer'
     { text: 'hinttekst', role: 'extra' }
   ]);
 });
+
+test('preserves V4.78 source row order when an earlier row is omitted', () => {
+  const items = buildItemsForType('words', [
+    { question_parts: [], answer_parts: [{ text: 'genegeerd', role: 'answer' }] },
+    { question_parts: ['Tweede vraag'], answer_parts: [{ text: 'tweede antwoord', role: 'answer' }] },
+    { question_parts: ['Derde vraag'], answer_parts: [{ text: 'derde antwoord', role: 'answer' }] }
+  ]);
+
+  assert.deepEqual(items.map(item => item.sort_order), [1, 2]);
+});

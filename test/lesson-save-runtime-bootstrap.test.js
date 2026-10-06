@@ -28,7 +28,7 @@ test('bootstrap publishes readiness and installs the runtime entry exactly once'
 
   const readyEntry = await readiness;
   assert.strictEqual(readyEntry, installed);
-  assert.deepEqual(calls, [['load'], ['install', runtime]]);
+  assert.deepEqual(calls, ['load', ['install', runtime]]);
 });
 
 test('bootstrap rejects a failed module load instead of falling back to legacy save execution', async () => {

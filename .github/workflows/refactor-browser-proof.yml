@@ -8,9 +8,13 @@ on:
     paths:
       - 'index.html'
       - 'photo-storage.js'
+      - 'test-history-storage.js'
       - 'src/features/lessons/**'
+      - 'src/features/test-history/**'
       - 'test/browser/**'
       - 'test/lesson-recovery-runtime-source-contract.test.js'
+      - 'test/lesson-photo-runtime-source-contract.test.js'
+      - 'test/test-attempt-runtime-source-contract.test.js'
       - 'package.json'
       - '.github/workflows/refactor-browser-proof.yml'
   workflow_dispatch:
@@ -50,4 +54,5 @@ jobs:
           test/browser/lesson-recovery-runtime.browser.test.js
           test/browser/lesson-guest-access-runtime.browser.test.js
           test/browser/lesson-photo-runtime.browser.test.js
+          test/browser/test-attempt-runtime.browser.test.js
           --workers=1

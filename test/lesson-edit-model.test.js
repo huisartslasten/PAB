@@ -38,6 +38,15 @@ describe('buildLessonEditItemModels', () => {
     expect(result[0].answerParts).toEqual([{ text: 'Antwoord', role: 'answer' }]);
   });
 
+  it('keeps a words/custom legacy answer as one complete answer part', () => {
+    expect(buildLessonEditItemModels('words', [{
+      question: 'Vraag',
+      answer: 'Eerste regel\nTweede regel'
+    }])[0].answerParts).toEqual([
+      { text: 'Eerste regel\nTweede regel', role: 'answer' }
+    ]);
+  });
+
   it('reconstructs non-word answers using the exact V4.78 separator rules', () => {
     expect(buildLessonEditItemModels('spelling', [{
       question: 'Werkwoord',

@@ -1,0 +1,42 @@
+name: PacoGO browser refactor proof
+
+on:
+  push:
+    branches:
+      - refactor/professional-v1
+    paths:
+      - 'photo-storage.js'
+      - 'src/features/lessons/**'
+      - 'test/browser/**'
+      - 'package.json'
+      - '.github/workflows/refactor-browser-proof.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lesson-save-browser-proof:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout refactor branch
+        uses: actions/checkout@v4
+        with:
+          ref: refactor/professional-v1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Start local fixture server
+        run: python3 -m http.server 4173 > /tmp/pacogo-browser-server.log 2>&1 &
+
+      - name: Run V4.78 browser proof
+        run: npx playwright test test/browser/lesson-save-runtime.browser.test.js --workers=1

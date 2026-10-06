@@ -15,6 +15,7 @@ on:
       - 'test/lesson-recovery-write-service.test.js'
       - 'test/lesson-recovery-runtime.test.js'
       - 'test/lesson-recovery-runtime-entry.test.js'
+      - 'test/lesson-recovery-runtime-bootstrap.test.js'
       - 'test/lesson-save-runtime-source-contract.test.js'
       - 'photo-storage.js'
       - '.github/workflows/refactor-professional-v1-tests.yml'
@@ -58,3 +59,4 @@ jobs:
           test/lesson-recovery-write-service.test.js
           test/lesson-recovery-runtime.test.js
           test/lesson-recovery-runtime-entry.test.js
+          test/lesson-recovery-runtime-bootstrap.test.js

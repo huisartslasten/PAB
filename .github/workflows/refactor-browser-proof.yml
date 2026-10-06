@@ -46,4 +46,5 @@ jobs:
           npx playwright test
           test/browser/lesson-save-runtime.browser.test.js
           test/browser/lesson-recovery-runtime.browser.test.js
+          test/browser/lesson-guest-access-runtime.browser.test.js
           --workers=1

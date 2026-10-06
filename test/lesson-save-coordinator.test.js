@@ -54,7 +54,7 @@ test('runs dictation checking before persistence and continues after a warning',
   const deps = baseDeps({
     runDictationCheck: async () => {
       deps.calls.push('dictation-check');
-      return { warning: 'AI-waarschuwing' };
+      return { issues: [{ row: 1, word: 'Antwooord', reason: 'Mogelijke typefout', suggestion: 'Antwoord' }] };
     },
     onWarning: async warning => {
       deps.calls.push(`warning:${warning}`);
@@ -67,11 +67,11 @@ test('runs dictation checking before persistence and continues after a warning',
   });
 
   assert.equal(result.ok, true);
-  assert.equal(result.warning, 'AI-waarschuwing');
-  assert.deepEqual(deps.calls, ['collect', 'validate', 'dictation-check', 'warning:AI-waarschuwing', 'write', 'reload', 'resolve', 'calendar:upsert']);
+  assert.match(result.warning, /AI-waarschuwing — mogelijke spellingproblemen:/);
+  assert.deepEqual(deps.calls, ['collect', 'validate', 'dictation-check', 'warning:'+result.warning, 'write', 'reload', 'resolve', 'calendar:upsert']);
 });
 
-test('dictation checker failure is non-blocking', async () => {
+test('dictation checker failure is non-blocking and uses the V4.78 unavailable message', async () => {
   const deps = baseDeps({
     runDictationCheck: async () => {
       deps.calls.push('dictation-check');
@@ -88,7 +88,7 @@ test('dictation checker failure is non-blocking', async () => {
   });
 
   assert.equal(result.ok, true);
-  assert.equal(result.warning, 'spellcheck unavailable');
+  assert.equal(result.warning, 'AI-spellingscontrole niet beschikbaar. De les wordt toch opgeslagen; de ouder blijft verantwoordelijk.');
   assert.ok(deps.calls.includes('write'));
 });
 
@@ -100,7 +100,7 @@ test('validation failure stops before dictation and persistence', async () => {
     },
     runDictationCheck: async () => {
       deps.calls.push('dictation-check');
-      return { warning: '' };
+      return { issues: [] };
     }
   });
 

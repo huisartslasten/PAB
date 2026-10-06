@@ -2360,34 +2360,26 @@ async function loadLessons(){
 function renderSubjects(){const el=document.getElementById('subjects');const visibleLessons=lessons.filter(l=>l.student===currentStudent&&!l.archived&&!l.deleted);const groups=groupLessonsBySubject(visibleLessons);const lessonStat=document.getElementById('lessonCountStat');const subjectStat=document.getElementById('subjectCountStat');const progress=document.getElementById('dashboardProgress');if(lessonStat)lessonStat.textContent=visibleLessons.length;if(subjectStat)subjectStat.textContent=groups.length+' '+(groups.length===1?'vak':'vakken');if(progress)progress.style.width=(visibleLessons.length?Math.min(100,20+visibleLessons.length*7):10)+'%';if(!groups.length){el.innerHTML='<div class="empty">Nog geen lessen. Een ouder kan een les toevoegen.</div>';return}el.innerHTML=groups.map(group=>{const s=group.label;const count=group.lessons.length;return '<div class="card subject-card '+subjectClass(s)+'" onclick="showSubject('+jsArg(s)+')"><div><div class="subject-icon">'+subjectIcon(s)+'</div><div class="subject-title">'+escapeHtml(s)+'</div></div><div class="small">'+count+' '+(count===1?'les':'lessen')+' · Bekijk →</div></div>'}).join('')}
 function escapeAttr(v){return escapeHtml(v).replace(/`/g,'&#96;')}
 function jsArg(v){return escapeAttr(JSON.stringify(v))}
-function getLessonOrderKey(student,subject){return 'pacogo-lesson-order-'+String(student||'')+'-'+String(subject||'')}
-function getLocalLessonOrder(student,subject){
-  try{const saved=JSON.parse(localStorage.getItem(getLessonOrderKey(student,subject))||'[]');return Array.isArray(saved)?saved.map(Number):[]}catch(e){return []}
+const lessonOrderRuntimeBridge = Object.defineProperties({}, {
+  db: { get: () => db },
+  storage: { get: () => window.localStorage },
+  isParentLoggedIn: { get: () => isParentLoggedIn }
+});
+
+const lessonOrderRuntimeBootstrap = import('./src/features/lessons/lesson-order-runtime-bootstrap.js')
+  .then(({ bootstrapLessonOrderRuntime }) => bootstrapLessonOrderRuntime({
+    runtime: lessonOrderRuntimeBridge,
+    target: window
+  }));
+window.pacoGOLessonOrderRuntimeReady = lessonOrderRuntimeBootstrap;
+
+async function getOrderedLessons(list, student, subject){
+  const runtime = await lessonOrderRuntimeBootstrap;
+  return runtime.getOrderedLessons(list, student, subject);
 }
-function applyLessonOrder(list,saved){
-  const rank=new Map((Array.isArray(saved)?saved:[]).map((id,i)=>[Number(id),i]));
-  return [...list].sort((a,b)=>{
-    const ar=rank.has(Number(a.id))?rank.get(Number(a.id)):999999;
-    const br=rank.has(Number(b.id))?rank.get(Number(b.id)):999999;
-    return ar-br || Number(a.id)-Number(b.id);
-  });
-}
-async function getOrderedLessons(list,student,subject){
-  const {data,error}=await db.from('lesson_order').select('lesson_id,position').eq('student',student).eq('subject',subject).order('position',{ascending:true});
-  if(!error&&data?.length){
-    return applyLessonOrder(list,data.map(x=>Number(x.lesson_id)));
-  }
-  return applyLessonOrder(list,getLocalLessonOrder(student,subject));
-}
-async function saveLessonOrder(student,subject,list){
-  const ids=list.map(l=>Number(l.id));
-  try{localStorage.setItem(getLessonOrderKey(student,subject),JSON.stringify(ids))}catch(e){}
-  if(!student||!subject||!ids.length||!isParentLoggedIn())return;
-  const del=await db.from('lesson_order').delete().eq('student',student).eq('subject',subject);
-  if(del.error)throw del.error;
-  const rows=ids.map((lesson_id,position)=>({student,subject,lesson_id,position}));
-  const ins=await db.from('lesson_order').insert(rows);
-  if(ins.error)throw ins.error;
+async function saveLessonOrder(student, subject, list){
+  const runtime = await lessonOrderRuntimeBootstrap;
+  return runtime.saveLessonOrder(student, subject, list);
 }
 function normalizeSubvakKey(value){
   return String(value||'').trim().replace(/\s+/g,' ').toLocaleLowerCase('nl-NL');

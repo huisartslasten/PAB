@@ -5,7 +5,7 @@ import {
   buildTestAttemptAnswerRows
 } from '../src/features/lessons/player-persistence-model.js';
 
-test('test attempt row matches the test-history schema contract', () => {
+test('test attempt row matches the V4.78 test-history payload', () => {
   const row = buildTestAttemptRow({
     lessonId: 7,
     student: 'Zyon',
@@ -26,7 +26,7 @@ test('test attempt row matches the test-history schema contract', () => {
   });
 });
 
-test('answer rows preserve order, question, expected answer and learner answer', () => {
+test('answer rows match V4.78 order, values, type and completion timestamp', () => {
   const rows = buildTestAttemptAnswerRows([
     {
       item: { question: 'Capital of France?', answer: 'Paris' },
@@ -43,7 +43,7 @@ test('answer rows preserve order, question, expected answer and learner answer',
 
   assert.deepEqual(rows, [
     {
-      question_order: 0,
+      question_order: 1,
       question: 'Capital of France?',
       expected_answer: 'Paris',
       given_answer: 'Paris',
@@ -52,7 +52,7 @@ test('answer rows preserve order, question, expected answer and learner answer',
       answered_at: '2026-10-05T10:05:00.000Z'
     },
     {
-      question_order: 1,
+      question_order: 2,
       question: '2 + 2',
       expected_answer: '4',
       given_answer: '5',
@@ -63,15 +63,16 @@ test('answer rows preserve order, question, expected answer and learner answer',
   ]);
 });
 
-test('missing optional answer text becomes null instead of an invented value', () => {
+test('V4.78 persists empty expected and given answers as empty strings', () => {
   const [row] = buildTestAttemptAnswerRows([{
     question: 'Vraag',
     value: '',
     expected: '',
     correct: false
-  }]);
+  }], { finishedAt: 'finish' });
 
   assert.equal(row.question, 'Vraag');
-  assert.equal(row.expected_answer, null);
-  assert.equal(row.given_answer, null);
+  assert.equal(row.expected_answer, '');
+  assert.equal(row.given_answer, '');
+  assert.equal(row.answered_at, 'finish');
 });

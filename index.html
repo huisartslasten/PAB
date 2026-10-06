@@ -2530,29 +2530,7 @@ function archiveCurrentLesson(){
   document.getElementById('archiveModal').classList.remove('hidden');
 }
 function closeArchiveModal(){document.getElementById('archiveModal').classList.add('hidden')}
-async function confirmArchiveLesson(){
-  if(!requireParent()||!currentLesson){closeArchiveModal();return}
-  const lessonId=currentLesson.id;
-  const subject=currentSubject;
-  closeArchiveModal();
-  const {error}=await db.from('lessons').update({archived:true}).eq('id',lessonId);
-  if(error){showMessage('Archiveren mislukt: '+error.message,'error');return}
-  currentLesson=null;
-  await loadLessons();
-  currentSubject=subject;
-  showParentDashboard();
-  showMessage('Les gearchiveerd.','success');
-}
 
-async function restoreArchivedLesson(id){
-  if(!requireParent())return;
-  const {error}=await db.from('lessons').update({archived:false,deleted:false}).eq('id',Number(id));
-  if(error){showMessage('Herstellen mislukt: '+error.message,'error');return}
-  await loadLessons();
-  currentStudent=parentSelectedStudent;
-  await renderParentDashboard();
-  showMessage('Les teruggezet.','success');
-}
 function recoveryLessonRow(l,mode){
   const action=mode==='archive'?'restoreArchivedLesson':'restoreDeletedLesson';
   const meta=escapeHtml(l.subject)+' · '+escapeHtml(typeLabel(l.type))+' · '+l.lesson_items.length+' onderdelen';
@@ -2636,13 +2614,6 @@ function showTrash(){
   const sidebar=page?.querySelector('.parent-sidebar');if(sidebar)sidebar.outerHTML=buildParentSideBarHtml();
   document.getElementById('parentManagement').innerHTML='<div class="card">Prullenbak laden...</div>';
   renderRecoveryPage('trash');
-}
-async function restoreDeletedLesson(id){
-  if(!requireParent())return;
-  const {error}=await db.from('lessons').update({deleted:false,archived:false}).eq('id',Number(id));
-  if(error){showMessage('Herstellen uit de prullenbak mislukt: '+error.message,'error');return}
-  await loadLessons();
-  showMessage('Les uit de prullenbak hersteld.','success');
 }
 function openLesson(id){const l=lessons.find(x=>x.id===id);if(!l)return;currentLesson=l;hideAll();document.getElementById('lessonChoice').classList.remove('hidden');document.getElementById('choiceSubject').textContent=l.subject+(l.subvak?' · '+l.subvak:'');document.getElementById('choiceTitle').textContent=l.title;document.getElementById('choiceMeta').textContent=l.subject+(l.subvak?' · '+l.subvak:'')+' · '+typeLabel(l.type)+' · '+l.lesson_items.length+' items';refreshPageSidebars();const g=document.getElementById('choiceGrid');if(l.type==='words'||l.type==='custom'){g.innerHTML='<button class="choice" onclick="startPractice(\''+l.type+'\')"><div class="emoji">'+(l.type==='custom'?'🛠️':'🎯')+'</div><h3>Oefenen</h3><p>Fouten komen later opnieuw terug totdat je ze beheerst.</p></button><button class="choice" onclick="startTest(\''+l.type+'\')"><div class="emoji">📝</div><h3>Toets</h3><p>Alle items één keer, zonder hulp.</p></button><button class="choice" onclick="showLesson()"><div class="emoji">📖</div><h3>Bekijken</h3><p>Bekijk de vragen en antwoorden.</p></button>'}else if(l.type==='dictation'){g.innerHTML='<button class="choice" onclick="startPractice(\'dictation\')"><div class="emoji">✏️</div><h3>Oefenen</h3><p>Luister, typ en herhaal fouten totdat de spelling goed is.</p></button><button class="choice" onclick="startTest(\'dictation\')"><div class="emoji">📝</div><h3>Toets</h3><p>Luister en schrijf alle woorden. Feedback komt pas aan het einde.</p></button><button class="choice" onclick="showLesson()"><div class="emoji">📖</div><h3>Bekijken</h3><p>Bekijk de dicteewoorden.</p></button>'}else if(l.type==='spelling'){g.innerHTML='<button class="choice" onclick="startPractice(\'spelling\')"><div class="emoji">✍️</div><h3>Oefenen</h3><p>Vul beide vormen in.</p></button><button class="choice" onclick="startTest(\'spelling\')"><div class="emoji">📝</div><h3>Toets</h3><p>Vul beide vormen in.</p></button><button class="choice" onclick="showLesson()"><div class="emoji">📖</div><h3>Bekijken</h3><p>Bekijk de vormen.</p></button>'}else if(l.type==='math'){g.innerHTML='<button class="choice" onclick="startPractice(\'math\')"><div class="emoji">🔢</div><h3>Oefenen</h3><p>Los de sommen op en probeer opnieuw wat nog niet goed ging.</p></button><button class="choice" onclick="startTest(\'math\')"><div class="emoji">📝</div><h3>Toets</h3><p>Los alle sommen op.</p></button><button class="choice" onclick="showLesson()"><div class="emoji">📖</div><h3>Bekijken</h3><p>Bekijk de sommen en antwoorden.</p></button>'}else{g.innerHTML='<button class="choice" onclick="startQuestions()"><div class="emoji">❓</div><h3>Vragen maken</h3><p>Beantwoord de vragen en controleer jezelf.</p></button><button class="choice" onclick="showLesson()"><div class="emoji">📖</div><h3>Bekijken</h3><p>Bekijk vragen en antwoorden.</p></button>'}}
 function showLesson(){hideAll();document.getElementById('lessonView').classList.remove('hidden');document.getElementById('lessonTitle').textContent=currentLesson.title;refreshPageSidebars();const admin=isParentLoggedIn();document.getElementById('editLessonButton').classList.toggle('hidden',!admin);document.getElementById('archiveLessonButton').classList.toggle('hidden',!admin||!!currentLesson.archived);document.getElementById('deleteLessonButton').classList.toggle('hidden',!admin);const el=document.getElementById('lessonContent');const explanation=currentLesson.explanation?'<div class="lesson-explanation"><div class="lesson-explanation-title">📖 Uitleg</div>'+escapeHtml(currentLesson.explanation)+'</div>':'';el.innerHTML=explanation+(currentLesson.lesson_items.length?currentLesson.lesson_items.map((it,i)=>{const parts=Array.isArray(it.answer_parts)?it.answer_parts:[];const extra=parts.filter(p=>p&&p.role==='extra'&&String(p.text||'').trim()).map(p=>p.text).join('\n');const required=parts.filter(p=>p&&p.role==='answer'&&String(p.text||'').trim()).map(p=>p.text).join('\n')||it.answer;return `<div class="card" style="margin-bottom:10px"><strong>${i+1}. ${escapeHtml(it.question)}</strong><div style="margin-top:8px;white-space:pre-line">${escapeHtml(required)}</div>${extra?`<div class="lesson-extra-info"><div class="lesson-extra-info-title">💡 Extra informatie</div>${escapeHtml(extra)}</div>`:''}</div>`}).join(''):'<div class="empty">Deze les heeft nog geen items.</div>')
@@ -3393,19 +3364,6 @@ function deleteCurrentLesson(){
   document.getElementById('deleteModal').classList.remove('hidden');
 }
 function closeDeleteModal(){document.getElementById('deleteModal').classList.add('hidden')}
-async function confirmDeleteLesson(){
-  if(!requireParent()||!currentLesson){closeDeleteModal();return}
-  const lessonId=currentLesson.id;
-  const subject=currentSubject;
-  closeDeleteModal();
-  const {error}=await db.from('lessons').update({deleted:true,archived:false}).eq('id',lessonId);
-  if(error){showMessage('Verwijderen mislukt: '+error.message,'error');return}
-  currentLesson=null;
-  await loadLessons();
-  currentSubject=subject;
-  showSubject(subject);
-  showMessage('Les naar de prullenbak verplaatst.','success');
-}
 document.getElementById('deleteModal')?.addEventListener('click',e=>{if(e.target.id==='deleteModal')closeDeleteModal()});
 document.getElementById('archiveModal')?.addEventListener('click',e=>{if(e.target.id==='archiveModal')closeArchiveModal()});
 document.getElementById('agendaEditModal')?.addEventListener('click',e=>{if(e.target.id==='agendaEditModal')closeAgendaEditModal()});

@@ -76,14 +76,12 @@ export function createPlayerRuntimeAdapter({
       questionType: attempt.type
     });
 
-    const saveTestAttempt = ({ attempt: completedAttempt } = {}) =>
-      persistence.saveTestResult({
-        attempt: {
-          ...attemptRow,
-          ...completedAttempt
-        },
-        answers: answerRows
-      });
+    // finishPlayerTest supplies the attempt for sequencing/history-error handling;
+    // the adapter deliberately maps it to the persistence service's exact row contract.
+    const saveTestAttempt = () => persistence.saveTestResult({
+      attempt: attemptRow,
+      answers: answerRows
+    });
 
     return finishPlayerTest({
       attempt,

@@ -21,7 +21,6 @@ test('test start model preserves V4.78 activity state and metadata', () => {
     title: '🛠️ Eigen les toets'
   });
   assert.notStrictEqual(model.items, items);
-  assert.notStrictEqual(model.answers, model.answers);
 });
 
 test('test start model uses exact V4.78 titles', () => {

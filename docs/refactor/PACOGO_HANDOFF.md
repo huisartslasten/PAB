@@ -43,6 +43,8 @@
 - `lesson-save-runtime-flow.js`: authorization → draft extraction → preparation → execution request → coordinator → outcome callbacks.
 - `lesson-save-runtime-effects.js`: validation/persistence error UI and successful state/calendar/sidebar/message effects; does not duplicate coordinator-owned persistence/reload/calendar sync.
 - `lesson-save-runtime-integration.js`: final injectable application integration contract; now also normalizes runtime-effect payload ownership.
+- `lesson-save-runtime-entry.js`: controlled TEST entry; now receives the legacy runtime explicitly rather than resolving classic-script lexical bindings from ES-module scope.
+- `photo-storage.js`: classic-script boundary now injects a live V4.78 runtime bridge into the ES-module save entry.
 
 ## Authoritative V4.78 saveLesson() order
 1. parent authorization
@@ -85,20 +87,20 @@
 - 481–490: application-effects boundary source-mapped/focused-tested; 4 passed/0 failed isolated harness
 - 491–500: application integration contract added/focused-tested; 4 passed/0 failed isolated harness
 - 501–510: application integration payload ownership hardened; isolated harness 2 passed/0 failed
+- 511–520: ES-module/classic-script runtime bridge corrected; focused guard test added; full browser execution still pending
 
 ## Current state
-**Current checkpoint: 501–510.**
+**Current checkpoint: 511–520, not yet fully closed.**
 
-`lesson-save-runtime-integration.js` now composes the proven runtime flow and, when injected, the runtime-effects boundary. It deliberately translates:
-- validation → full validation result;
-- persistence → actual `result.error`;
-- completion → actual `result.outcome`.
+The critical runtime defect found during the 511–520 gate was module-scope visibility: the V4.78 page is a classic script, while `lesson-save-runtime-entry.js` is an ES module. Classic-script top-level lexical bindings such as `currentSubject` and `currentLesson` cannot be assumed to be directly resolvable from ES-module scope.
 
-Compatibility callbacks still receive the original runtime result. This removes the `[object Object]` risk at the persistence-effects boundary and prevents the effects layer from needing knowledge of the runtime-flow wrapper shape.
+The controlled bridge is now explicit. `photo-storage.js`, which already executes in the classic-script environment, captures the V4.78 application bindings through live getters/setters and passes that bridge into `installLessonSaveRuntimeEntry()`. The ES module validates and uses only that injected runtime object.
 
-Focused isolated Node harness for this checkpoint: **2 passed, 0 failed**. This is not a full repository `node --test` run.
+`test/lesson-save-runtime-entry.test.js` now also verifies that direct execution without the explicit bridge is rejected.
 
-**Actual legacy runtime wiring remains CLOSED.** The next gate is the controlled replacement of the legacy `saveLesson()` body/call site using this proven integration contract, with focused tests against the real V4.78 dependencies and exact call order before the legacy implementation is removed.
+A temporary GitHub Actions test workflow was attempted, but GitHub returned zero workflow runs for the TEST branch, so **no CI/full-suite result is claimed**. The temporary workflow was removed.
+
+**Actual legacy runtime replacement is still gated.** Before declaring 511–520 complete or removing the legacy implementation, the next step is a real browser/runtime execution of the V4.78 save path through the new bridge, including the exact save order and success/error effects.
 
 ## Safety
 - `main`/LIVE untouched.

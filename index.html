@@ -3473,17 +3473,6 @@ async function submitTest(){
   activity.index++;
   if(activity.index>=activity.items.length)finishTest();else renderTest();
 }
-async function saveTestAttempt(attempt){
-  if(!attempt?.answers?.length || !currentStudent || !currentLesson) return;
-  const total=attempt.answers.length;
-  const score=attempt.answers.filter(x=>x.correct).length;
-  const inserted=await db.from('test_attempts').insert({lesson_id:currentLesson.id,student:currentStudent,score,total_questions:total,started_at:attempt.startedAt||new Date().toISOString(),completed_at:new Date().toISOString(),is_test:true}).select().single();
-  if(inserted.error) throw inserted.error;
-  const rows=attempt.answers.map((x,i)=>({attempt_id:inserted.data.id,question_order:i+1,question:String(x.item?.question??''),expected_answer:String(x.item?.answer??''),given_answer:String(x.value??''),is_correct:x.correct===true,question_type:attempt.type||currentLesson.type,answered_at:new Date().toISOString()}));
-  const answerInsert=await db.from('test_attempt_answers').insert(rows);
-  if(answerInsert.error) throw answerInsert.error;
-}
-
 async function finishTest(){
   window.speechSynthesis?.cancel();
   const attempt=activity,total=attempt.items.length,correct=attempt.answers.filter(x=>x.correct).length,note=Math.round((correct/total*10)*10)/10;
@@ -3588,6 +3577,7 @@ function insertWordQuestionAfter(button){
   setTimeout(applyV464,300);setTimeout(applyV464,1000);
 })();
 </script>
+  <script src="test-history-storage.js"></script>
   <script src="photo-storage.js"></script>
 </body>
 </html>

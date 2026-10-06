@@ -106,9 +106,15 @@ test('runtime entry stops at authorization before reading or preparing an unauth
   ]);
 });
 
-test('runtime entry lets an authorized save reach preparation and coordinator without legacy saveLesson', async () => {
+test('authorized runtime validates before any Supabase write or post-persistence effect', async () => {
   const calls = [];
+  const db = new Proxy({}, {
+    get() {
+      throw new Error('Supabase must not be touched before validation.');
+    }
+  });
   const runtime = createValidRuntime({
+    db,
     currentSession: { user: { id: 'parent-1' } },
     PARENT_IDS: new Set(['parent-1']),
     currentStudent: 'Zyon',
@@ -146,11 +152,21 @@ test('runtime entry lets an authorized save reach preparation and coordinator wi
 
   const result = await executeLessonSaveRuntimeEntry(runtime);
 
-  assert.equal(result?.ok, false);
-  assert.ok(result?.stage === 'validation' || result?.stage === 'persistence');
+  assert.deepEqual(result, {
+    ok: false,
+    stage: 'validation',
+    validation: {
+      valid: false,
+      errorMessage: 'Vul het vak, de lestitel en minstens één item in.'
+    },
+    items: []
+  });
   assert.ok(calls.some(call => call[0] === 'querySelector'));
   assert.ok(calls.some(call => call[0] === 'getElementById' && call[1] === 'lessonSubject'));
-  assert.ok(!calls.some(call => call[0] === 'showHome'));
+  assert.ok(!calls.some(call => call[0] === 'loadLessons'));
+  assert.ok(!calls.some(call => call[0] === 'renderTestCalendar'));
+  assert.ok(!calls.some(call => call[0] === 'refreshPageSidebars'));
+  assert.ok(!calls.some(call => call[0] === 'message'));
 });
 
 test('runtime entry rejects direct module execution without the explicit V4.78 bridge', async () => {

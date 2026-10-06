@@ -2,6 +2,12 @@
 // This composes already-proven save boundaries without touching DOM, auth,
 // localStorage, rendering, navigation, or application state.
 
+import {
+  buildDictationSpellcheckEntries,
+  buildDictationWarning,
+  DICTATION_SPELLCHECK_UNAVAILABLE_MESSAGE
+} from './dictation-spellcheck.js';
+
 export async function executeLessonSaveCore({
   draft = {},
   validate,
@@ -37,13 +43,13 @@ export async function executeLessonSaveCore({
   if (draft.type === 'dictation' && typeof runDictationCheck === 'function') {
     try {
       const result = await runDictationCheck({
-        entries: items.map((item, index) => ({ row: index + 1, word: String(item.answer || '').trim() })).filter(x => x.word),
+        entries: buildDictationSpellcheckEntries(items.map(item => ({ word: item.answer }))),
         subject: String(draft.subject || '')
       });
-      if (result?.warning) warning = result.warning;
+      warning = buildDictationWarning(result);
       if (warning && typeof onWarning === 'function') await onWarning(warning);
-    } catch (error) {
-      warning = error?.message || 'AI-spellingscontrole niet beschikbaar. De les wordt toch opgeslagen; de ouder blijft verantwoordelijk.';
+    } catch {
+      warning = DICTATION_SPELLCHECK_UNAVAILABLE_MESSAGE;
       if (typeof onWarning === 'function') await onWarning(warning);
     }
   }
@@ -61,9 +67,10 @@ export async function executeLessonSaveCore({
   }
 
   const reloadedLessons = await reloadLessons();
+  const savedLessonId = written?.lesson?.id ?? written?.lessonId ?? draft.lessonId;
   const outcome = resolvePostPersistence({
     lessons: reloadedLessons,
-    lessonId: written?.lesson?.id ?? written?.lessonId ?? draft.lessonId,
+    lessonId: savedLessonId,
     subject: draft.subject || draft.lesson?.subject || '',
     testDate: draft.testDate || ''
   });
@@ -72,7 +79,7 @@ export async function executeLessonSaveCore({
     await syncTestCalendar({
       action: outcome.testCalendarAction,
       lesson: outcome.savedLesson,
-      lessonId: written?.lesson?.id ?? written?.lessonId ?? draft.lessonId,
+      lessonId: savedLessonId,
       student: draft.student || draft.lesson?.student,
       testDate: draft.testDate || ''
     });

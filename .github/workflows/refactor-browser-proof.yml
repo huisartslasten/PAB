@@ -1,6 +1,6 @@
 name: PacoGO browser refactor proof
 
-# Controlled browser proof for the refactored lesson save, recovery, and guest access runtimes.
+# Controlled browser proof for the refactored lesson save, recovery, guest access, and photo lesson runtimes.
 on:
   push:
     branches:
@@ -49,4 +49,5 @@ jobs:
           test/browser/lesson-save-runtime.browser.test.js
           test/browser/lesson-recovery-runtime.browser.test.js
           test/browser/lesson-guest-access-runtime.browser.test.js
+          test/browser/lesson-photo-runtime.browser.test.js
           --workers=1

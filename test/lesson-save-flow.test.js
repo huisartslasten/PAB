@@ -17,8 +17,8 @@ describe('createLessonSaveFlow', () => {
       setCurrentSubject(subject) { order.push(['subject', subject]); },
       clearCurrentLesson() { order.push('clear-lesson'); },
       async loadLessons() { order.push('load'); },
-      findSavedLesson(id, student) {
-        order.push(['find', id, student]);
+      findSavedLesson(id) {
+        order.push(['find', id]);
         return savedLesson;
       },
       upsertTestDate(...args) { order.push(['upsert-date', ...args]); },
@@ -40,6 +40,7 @@ describe('createLessonSaveFlow', () => {
     expect(order.map(value => Array.isArray(value) ? value[0] : value)).toEqual([
       'persist', 'subject', 'clear-lesson', 'load', 'find', 'upsert-date', 'calendar', 'sidebars', 'message'
     ]);
+    expect(order.find(value => Array.isArray(value) && value[0] === 'find')).toEqual(['find', 42]);
     expect(result.savedLesson).toBe(savedLesson);
     expect(order.at(-1)).toEqual(['message', 'Les opgeslagen en toetsdatum toegevoegd.', 'success']);
   });

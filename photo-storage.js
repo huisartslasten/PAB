@@ -197,6 +197,33 @@ window.setGuestLesson = async function setGuestLessonRuntimeFacade(...args){
   return runtimeHandler.setGuestLesson(...args);
 };
 
+// Photo-to-lesson runtime facade: the V4.78 photo lesson creation handler is
+// exposed synchronously, but execution waits for the refactored photo bootstrap.
+// The bridge reads classic-script state live and reuses the existing source-photo
+// storage function; there is deliberately no legacy fallback.
+const lessonPhotoRuntimeBridge = Object.defineProperties({}, {
+  requireParent: { get: () => requireParent },
+  db: { get: () => db },
+  loadLessons: { get: () => loadLessons },
+  lessons: { get: () => lessons },
+  setCurrentStudent: { get: () => value => { currentStudent = value; } },
+  setCurrentSubject: { get: () => value => { currentSubject = value; } },
+  setCurrentLesson: { get: () => value => { currentLesson = value; } },
+  saveSourcePhoto: { get: () => window.saveLessonSourcePhoto },
+  showParentDashboard: { get: () => showParentDashboard },
+  showMessage: { get: () => showMessage }
+});
+const lessonPhotoRuntimeBootstrap = import('./src/features/lessons/lesson-photo-runtime-bootstrap.js')
+  .then(({ bootstrapLessonPhotoRuntime }) => bootstrapLessonPhotoRuntime({
+    runtime: lessonPhotoRuntimeBridge,
+    target: window
+  }));
+window.pacoGOLessonPhotoRuntimeReady = lessonPhotoRuntimeBootstrap;
+window.createLessonFromPhoto = async function createLessonFromPhotoRuntimeFacade(input){
+  const runtimeHandler = await lessonPhotoRuntimeBootstrap;
+  return runtimeHandler(input);
+};
+
 // Recovery runtime facade: the four V4.78 recovery handlers are exposed
 // synchronously, but execution waits for the refactored recovery bootstrap.
 // There is deliberately no legacy fallback after bootstrap failure.

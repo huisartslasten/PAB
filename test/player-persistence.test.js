@@ -186,3 +186,73 @@ test('player persistence skips the database entirely when an attempt has no answ
   assert.deepEqual(result.answers, []);
   assert.deepEqual(calls, []);
 });
+
+test('savePlayerAttempt adapts the domain attempt into exact V4.78 rows', async () => {
+  const inserted = [];
+  const db = {
+    from(table) {
+      return {
+        insert(rows) {
+          inserted.push({ table, rows });
+          return {
+            select() {
+              return {
+                single() {
+                  return Promise.resolve({ data: { id: 44, ...rows }, error: null });
+                }
+              };
+            }
+          };
+        }
+      };
+    }
+  };
+
+  const service = createPlayerPersistence(db, { clock: () => 'clock' });
+  await service.savePlayerAttempt({
+    lessonId: 7,
+    student: 'Zyon',
+    type: 'dictation',
+    startedAt: 'start',
+    finishedAt: 'finish',
+    answers: [
+      { item: { question: 'fiets', answer: 'fiets' }, value: 'fiets', correct: true },
+      { item: { question: 'huis', answer: 'huis' }, value: 'woning', correct: false }
+    ]
+  });
+
+  assert.deepEqual(inserted[0], {
+    table: 'test_attempts',
+    rows: {
+      lesson_id: 7,
+      student: 'Zyon',
+      score: 1,
+      total_questions: 2,
+      started_at: 'start',
+      completed_at: 'finish',
+      is_test: true
+    }
+  });
+  assert.deepEqual(inserted[1].rows, [
+    {
+      question_order: 1,
+      question: 'fiets',
+      expected_answer: 'fiets',
+      given_answer: 'fiets',
+      is_correct: true,
+      question_type: 'dictation',
+      attempt_id: 44,
+      answered_at: 'clock'
+    },
+    {
+      question_order: 2,
+      question: 'huis',
+      expected_answer: 'huis',
+      given_answer: 'woning',
+      is_correct: false,
+      question_type: 'dictation',
+      attempt_id: 44,
+      answered_at: 'clock'
+    }
+  ]);
+});

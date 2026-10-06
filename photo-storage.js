@@ -149,7 +149,7 @@ const lessonSaveRuntimeBridge = Object.defineProperties({}, {
   currentSession: { get: () => currentSession },
   PARENT_IDS: { get: () => PARENT_IDS },
   lessons: { get: () => lessons },
-  currentStudent: { get: () => currentStudent },
+  currentStudent: { get: () => currentStudent, set: value => { currentStudent = value; } },
   normalizeSubvakKey: { get: () => normalizeSubvakKey },
   renderTestCalendar: { get: () => renderTestCalendar },
   refreshPageSidebars: { get: () => refreshPageSidebars },
@@ -174,4 +174,46 @@ window.pacoGOLessonSaveRuntimeReady = lessonSaveRuntimeBootstrap;
 window.saveLesson = async function saveLessonRuntimeFacade(...args){
   const runtimeSaveLesson = await lessonSaveRuntimeBootstrap;
   return runtimeSaveLesson(...args);
+};
+
+// Recovery runtime facade: the four V4.78 recovery handlers are exposed
+// synchronously, but execution waits for the refactored recovery bootstrap.
+// There is deliberately no legacy fallback after bootstrap failure.
+const lessonRecoveryRuntimeBridge = Object.defineProperties({}, {
+  requireParent: { get: () => requireParent },
+  db: { get: () => db },
+  currentLesson: { get: () => currentLesson, set: value => { currentLesson = value; } },
+  currentSubject: { get: () => currentSubject, set: value => { currentSubject = value; } },
+  currentStudent: { get: () => currentStudent, set: value => { currentStudent = value; } },
+  parentSelectedStudent: { get: () => parentSelectedStudent },
+  closeDeleteModal: { get: () => closeDeleteModal },
+  closeArchiveModal: { get: () => closeArchiveModal },
+  loadLessons: { get: () => loadLessons },
+  showSubject: { get: () => showSubject },
+  showParentDashboard: { get: () => showParentDashboard },
+  renderParentDashboard: { get: () => renderParentDashboard },
+  showMessage: { get: () => showMessage }
+});
+
+const lessonRecoveryRuntimeBootstrap = import('./src/features/lessons/lesson-recovery-runtime-bootstrap.js')
+  .then(({ bootstrapLessonRecoveryRuntime }) => bootstrapLessonRecoveryRuntime({
+    runtime: lessonRecoveryRuntimeBridge,
+    target: window
+  }));
+window.pacoGOLessonRecoveryRuntimeReady = lessonRecoveryRuntimeBootstrap;
+window.confirmDeleteLesson = async function confirmDeleteLessonRuntimeFacade(...args){
+  const runtimeHandler = await lessonRecoveryRuntimeBootstrap;
+  return runtimeHandler.confirmDeleteLesson(...args);
+};
+window.confirmArchiveLesson = async function confirmArchiveLessonRuntimeFacade(...args){
+  const runtimeHandler = await lessonRecoveryRuntimeBootstrap;
+  return runtimeHandler.confirmArchiveLesson(...args);
+};
+window.restoreArchivedLesson = async function restoreArchivedLessonRuntimeFacade(...args){
+  const runtimeHandler = await lessonRecoveryRuntimeBootstrap;
+  return runtimeHandler.restoreArchivedLesson(...args);
+};
+window.restoreDeletedLesson = async function restoreDeletedLessonRuntimeFacade(...args){
+  const runtimeHandler = await lessonRecoveryRuntimeBootstrap;
+  return runtimeHandler.restoreDeletedLesson(...args);
 };

@@ -13,7 +13,7 @@ function createRuntime(overrides = {}) {
     setLoading: () => calls.push('setLoading'),
     refreshSidebars: () => calls.push('refreshSidebars'),
     listAttempts: async student => { calls.push(['listAttempts', student]); return [{ id: 1 }]; },
-    renderAttempts: data => calls.push(['renderAttempts', data]),
+    renderAttempts: (data, student) => calls.push(['renderAttempts', data, student]),
     renderError: error => calls.push(['renderError', error.message]),
     ...overrides
   };
@@ -32,7 +32,7 @@ test('test history runtime preserves the V4.78 page lifecycle', async () => {
     'showPage',
     'refreshSidebars',
     ['listAttempts', 'Zyon'],
-    ['renderAttempts', [{ id: 1 }]]
+    ['renderAttempts', [{ id: 1 }], 'Zyon']
   ]);
 });
 

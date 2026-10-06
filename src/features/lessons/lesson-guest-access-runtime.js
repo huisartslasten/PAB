@@ -5,6 +5,17 @@ function requireFunction(value, message) {
   if (typeof value !== 'function') throw new Error(message);
 }
 
+function errorMessage(error) {
+  return String(error?.message || error || 'Onbekende fout.');
+}
+
+function persistenceFailure(error, showMessage) {
+  if (typeof showMessage === 'function') {
+    showMessage('Activeren mislukt: ' + errorMessage(error), 'error');
+  }
+  return Object.freeze({ ok: false, stage: 'persistence', error });
+}
+
 export async function setGuestLessonAccess({
   authorize,
   currentStudent,
@@ -33,10 +44,16 @@ export async function setGuestLessonAccess({
   }
 
   const existing = await findAssignment({ guestId: guest.id, lessonId });
-  if (existing) {
-    await updateAssignment({ assignmentId: existing.id, active });
-  } else if (active) {
-    await createAssignment({ guestId: guest.id, lessonId, active: true });
+  try {
+    if (existing) {
+      const result = await updateAssignment({ assignmentId: existing.id, active });
+      if (result?.error) return persistenceFailure(result.error, showMessage);
+    } else if (active) {
+      const result = await createAssignment({ guestId: guest.id, lessonId, active: true });
+      if (result?.error) return persistenceFailure(result.error, showMessage);
+    }
+  } catch (error) {
+    return persistenceFailure(error, showMessage);
   }
 
   await renderParentStudent();

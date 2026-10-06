@@ -23,6 +23,7 @@ on:
       - 'test/lesson-guest-access-*.test.js'
       - 'test/lesson-photo-*.test.js'
       - 'test/test-attempt-*.test.js'
+      - 'test/lesson-load-*.test.js'
       - 'test-history-storage.js'
       - 'photo-storage.js'
       - 'index.html'
@@ -78,8 +79,13 @@ jobs:
           test/lesson-photo-runtime.test.js
           test/lesson-photo-runtime-entry.test.js
           test/lesson-photo-runtime-bootstrap.test.js
+          test/lesson-photo-runtime-source-contract.test.js
           test/test-attempt-write-service.test.js
           test/test-attempt-runtime.test.js
           test/test-attempt-runtime-entry.test.js
           test/test-attempt-runtime-bootstrap.test.js
           test/test-attempt-runtime-source-contract.test.js
+          test/lesson-load-runtime.test.js
+          test/lesson-load-runtime-entry.test.js
+          test/lesson-load-runtime-source-contract.test.js
+          test/lesson-service.test.js

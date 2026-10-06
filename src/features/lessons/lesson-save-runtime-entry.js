@@ -137,9 +137,10 @@ export async function executeLessonSaveRuntimeEntry(runtime) {
 }
 
 export function installLessonSaveRuntimeEntry(runtime) {
+  const app = requireRuntime(runtime);
   const legacySaveLesson = window.saveLesson;
   window.saveLesson = async function saveLessonRuntimeEntry() {
-    return executeLessonSaveRuntimeEntry(runtime);
+    return executeLessonSaveRuntimeEntry(app);
   };
   return legacySaveLesson;
 }

@@ -59,14 +59,20 @@ export function createPracticeSession(items = [], { shuffle = defaultShuffle } =
   };
 }
 
-export function createTestSession(items = [], { shuffle = defaultShuffle, startedAt = new Date().toISOString() } = {}) {
+export function createTestSession(items = [], {
+  shuffle = defaultShuffle,
+  startedAt = new Date().toISOString(),
+  type = 'words'
+} = {}) {
   const queue = shuffle(normalizeItems(items));
   let index = 0;
   const answers = [];
+  const testType = String(type || 'words');
 
   return {
     get kind() { return 'test'; },
-    get type() { return 'test'; },
+    // V4.78 activity.type is the actual lesson/test type, not the generic kind.
+    get type() { return testType; },
     get items() { return [...queue]; },
     get index() { return index; },
     get current() { return queue[index] || null; },

@@ -71,6 +71,42 @@ test('validation and persistence failures reach only their matching application 
   assert.deepEqual(persistenceCalls, ['persistence']);
 });
 
+test('runtime effects receive the exact boundary payloads and run before compatibility callbacks', async () => {
+  const calls = [];
+  let persistenceError;
+  let completionOutcome;
+
+  const result = await executeLessonSaveApplication({
+    authorize: async () => true,
+    readDraft: async () => ({}),
+    prepare: async () => ({ draft: {}, items: [] }),
+    executeCoordinator: async () => ({ ok: true, stage: 'complete', outcome: { currentSubject: 'Nederlands', successMessage: 'Les opgeslagen.' } }),
+    runtimeEffects: {
+      handleComplete: async outcome => { calls.push('effects:complete'); completionOutcome = outcome; },
+      handlePersistenceFailure: async error => { calls.push('effects:persistence'); persistenceError = error; },
+      handleValidationFailure: async value => { calls.push('effects:validation'); assert.equal(value.stage, 'validation'); }
+    },
+    onComplete: async () => calls.push('compat:complete')
+  });
+
+  assert.equal(result.ok, true);
+  assert.deepEqual(calls, ['effects:complete', 'compat:complete']);
+  assert.deepEqual(completionOutcome, { currentSubject: 'Nederlands', successMessage: 'Les opgeslagen.' });
+
+  const persistenceResult = await executeLessonSaveApplication({
+    authorize: async () => true,
+    readDraft: async () => ({}),
+    prepare: async () => ({ draft: {}, items: [] }),
+    executeCoordinator: async () => ({ ok: false, stage: 'persistence', error: new Error('DB down') }),
+    runtimeEffects: {
+      handlePersistenceFailure: async error => { calls.push('effects:persistence:error'); persistenceError = error; }
+    }
+  });
+
+  assert.equal(persistenceResult.stage, 'persistence');
+  assert.equal(persistenceError.message, 'DB down');
+});
+
 test('missing integration dependencies are rejected by the proven runtime flow', async () => {
   await assert.rejects(
     () => executeLessonSaveApplication({}),

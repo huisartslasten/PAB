@@ -111,19 +111,14 @@
 - 501–510: application integration payload ownership hardened; isolated harness 2 passed/0 failed
 - 511–520: ES-module/classic-script runtime bridge corrected; explicit bootstrap/readiness boundary added; save invocation timing source-verified; synchronous runtime facade added; source-level seam guard added; browser execution still pending
 - 521–530: runtime dependency ordering hardened; DOM/DB dependencies deferred past authorization; editor answer fallback corrected; save-request input contract tightened; focused professional gate executed at 70 passed/0 failed; browser execution still pending
+- 531–540: standalone `lesson-write-service` contract promoted into the professional executable gate; GitHub Actions executed **76 passed / 0 failed / 0 skipped**; no production patch or weakened assertion; browser execution still pending
 
 ## Current state
-**Checkpoint 521–530 is complete. The overall runtime-replacement gate remains open.**
+**Checkpoint 531–540 is complete. The overall runtime-replacement gate remains open.**
 
-The 521–530 boundary review found that the controlled runtime entry was resolving `#editorError` and constructing the lesson write service before the authorization boundary. That was treated as an architectural ordering defect, not patched around. The DOM error dependency is now resolved lazily, and the write service is constructed only when the authorized coordinator execution begins.
+The previously excluded `lesson-write-service.test.js` was re-inspected and found to already contain the correct explicit two-step `lesson_items` boundary: one `from()` for delete and a second `from()` for insert. No test weakening or production workaround was needed.
 
-`editor-items.js` also had a genuine V4.78 fallback bug: a default parameter turned an omitted `answer_parts` field into an empty array, preventing the legacy `answer` fallback from running. That boundary is corrected without changing the deterministic editor contract.
-
-`lesson-save-request.js` now rejects a missing model explicitly instead of silently converting the absence into `{}`.
-
-A dedicated GitHub Actions gate was added for the professional lesson-save refactor. The executed run at commit `c6b51b200e35ec671fa263e8ca2ebad73f369920` ran the focused refactor proof set on Node.js 22.23.3 and produced **70 tests passed, 0 failed, 0 skipped**. This is an actual executed result, not an inferred or local-only claim.
-
-The standalone `lesson-write-service.test.js` was corrected separately to assert the explicit `lesson_items` table boundary. That test was not included in the 70-test executable gate and has not been re-executed after that correction.
+The professional GitHub Actions gate now includes `lesson-write-service.test.js`. Run `37494578969` at commit `03d4f6b4bc045bc1c7eb8c04efb1450a4f1aeedd` executed all **76 tests on Node.js 22.23.3 with 76 passed, 0 failed, 0 skipped**. The six write-service tests all passed.
 
 The critical browser architecture remains: classic-script facade immediately available → single bootstrap readiness promise → installed refactored runtime entry → explicit V4.78 bridge → authorization-first runtime flow → no legacy fallback.
 

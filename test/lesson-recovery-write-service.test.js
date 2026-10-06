@@ -55,9 +55,9 @@ test('archiveLesson preserves the exact V4.78 archive patch', async () => {
   });
 });
 
-test('restoreLesson preserves the exact V4.78 restore patch', async () => {
+test('restoreLesson preserves the exact V4.78 restore patch and Number(id) normalization', async () => {
   const db = makeDb();
-  const outcome = await restoreLesson({ db, lessonId: 9 });
+  const outcome = await restoreLesson({ db, lessonId: '9' });
   assert.deepEqual(db.calls, [
     { operation: 'update', patch: { deleted: false, archived: false } },
     { operation: 'eq', column: 'id', value: 9 }

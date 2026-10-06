@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createLessonWriteService } from '../src/features/lessons/lesson-write-service.js';
 
-function mockDb({ rows = [], insertError = null, updateError = null, deleteError = null, itemInsertError = null } = {}) {
+function mockDb({ rows = [], insertError = null, updateError = null, deleteError = null } = {}) {
   const calls = [];
   return {
     calls,
@@ -13,11 +13,12 @@ function mockDb({ rows = [], insertError = null, updateError = null, deleteError
           calls.push({ op: 'insert', table, payload });
           return {
             select() {
-              return {
-                single() {
-                  return Promise.resolve({ data: rows[0] ?? { id: 41 }, error: insertError });
-                }
-              };
+              if (table === 'lesson_items') {
+                return Promise.resolve({ data: payload, error: insertError });
+              }
+              const selected = Promise.resolve({ data: rows[0] ?? { id: 41 }, error: insertError });
+              selected.single = () => Promise.resolve({ data: rows[0] ?? { id: 41 }, error: insertError });
+              return selected;
             }
           };
         },
@@ -72,6 +73,9 @@ test('lesson write service creates lesson before replacing its items', async () 
   });
 
   assert.deepEqual(result.lesson, { id: 41, title: 'Nieuwe les' });
+  assert.deepEqual(result.items, [{
+    question: 'Vraag', answer: 'Antwoord', hint: '', min_words: 0, required_terms: []
+  }]);
   assert.deepEqual(db.calls, [
     { op: 'from', table: 'lessons' },
     {
@@ -85,7 +89,14 @@ test('lesson write service creates lesson before replacing its items', async () 
     },
     { op: 'from', table: 'lesson_items' },
     { op: 'delete', table: 'lesson_items' },
-    { op: 'eq-delete', table: 'lesson_items', column: 'lesson_id', value: 41 }
+    { op: 'eq-delete', table: 'lesson_items', column: 'lesson_id', value: 41 },
+    {
+      op: 'insert',
+      table: 'lesson_items',
+      payload: [{
+        question: 'Vraag', answer: 'Antwoord', hint: '', min_words: 0, required_terms: [], lesson_id: 41
+      }]
+    }
   ]);
 });
 
@@ -99,7 +110,7 @@ test('lesson write service updates lesson before replacing its items', async () 
     items: []
   });
 
-  assert.deepEqual(db.calls.slice(0, 5), [
+  assert.deepEqual(db.calls, [
     { op: 'from', table: 'lessons' },
     {
       op: 'update',
@@ -111,8 +122,21 @@ test('lesson write service updates lesson before replacing its items', async () 
     },
     { op: 'eq', table: 'lessons', column: 'id', value: 17 },
     { op: 'from', table: 'lesson_items' },
-    { op: 'delete', table: 'lesson_items' }
+    { op: 'delete', table: 'lesson_items' },
+    { op: 'eq-delete', table: 'lesson_items', column: 'lesson_id', value: 17 }
   ]);
+});
+
+test('lesson write service propagates lesson update errors before touching items', async () => {
+  const error = new Error('update failed');
+  const db = mockDb({ updateError: error });
+  const service = createLessonWriteService(db);
+
+  await assert.rejects(
+    () => service.saveLesson({ id: 17, lesson: { student: 'Zyon', subject: 'Rekenen', title: 'Les', type: 'math' }, items: [] }),
+    error
+  );
+  assert.equal(db.calls.some(call => call.op === 'delete'), false);
 });
 
 test('lesson write service preserves the editor item normalization contract', async () => {
@@ -124,9 +148,8 @@ test('lesson write service preserves the editor item normalization contract', as
     items: [{ question: 'Vraag', answer: 'Antwoord', hint: '', min_words: '', required_terms: null }]
   });
 
-  assert.deepEqual(db.calls.slice(-3), [
-    { op: 'from', table: 'lesson_items' },
-    { op: 'delete', table: 'lesson_items' },
-    { op: 'eq-delete', table: 'lesson_items', column: 'lesson_id', value: 41 }
-  ]);
+  const itemInsert = db.calls.find(call => call.op === 'insert' && call.table === 'lesson_items');
+  assert.deepEqual(itemInsert.payload, [{
+    question: 'Vraag', answer: 'Antwoord', hint: '', min_words: 0, required_terms: [], lesson_id: 41
+  }]);
 });

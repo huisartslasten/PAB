@@ -94,6 +94,7 @@ jobs:
           test/lesson-order-runtime.test.js
           test/lesson-order-runtime-source-contract.test.js
           test/test-history-read-service.test.js
+          test/test-history-renderer.test.js
           test/test-history-runtime.test.js
           test/test-history-runtime-entry.test.js
           test/test-history-runtime-bootstrap.test.js

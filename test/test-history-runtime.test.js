@@ -19,7 +19,7 @@ function createRuntime(overrides = {}) {
   };
 }
 
-test('test history runtime preserves the V4.78 page lifecycle', async () => {
+test('test history runtime preserves the V4.78 page lifecycle and student filter', async () => {
   const runtime = createRuntime();
   const result = await showTestHistoryRuntime({ ...runtime, studentFilter: 'Zyon' });
 

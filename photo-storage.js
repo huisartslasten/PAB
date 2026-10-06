@@ -137,9 +137,29 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ensurePhotoUi);else ensurePhotoUi();
 })();
 
-// TEST/refactor runtime bridge: the legacy function remains in index.html as a
-// rollback reference, while the active window.saveLesson entry is replaced only
-// after the modular V4.78 save boundaries have loaded successfully.
+// TEST/refactor runtime bridge: capture the V4.78 classic-script bindings before
+// entering the ES-module boundary. Top-level let/const bindings are intentionally
+// exposed through getters so mutable application state is always read live.
+const lessonSaveRuntimeBridge = Object.defineProperties({}, {
+  document: { get: () => document },
+  db: { get: () => db },
+  currentSubject: { get: () => currentSubject, set: value => { currentSubject = value; } },
+  currentLesson: { get: () => currentLesson, set: value => { currentLesson = value; } },
+  currentSession: { get: () => currentSession },
+  PARENT_IDS: { get: () => PARENT_IDS },
+  lessons: { get: () => lessons },
+  currentStudent: { get: () => currentStudent },
+  normalizeSubvakKey: { get: () => normalizeSubvakKey },
+  renderTestCalendar: { get: () => renderTestCalendar },
+  refreshPageSidebars: { get: () => refreshPageSidebars },
+  showMessage: { get: () => showMessage },
+  showHome: { get: () => showHome },
+  loadLessons: { get: () => loadLessons },
+  checkDictationSpelling: { get: () => checkDictationSpelling },
+  upsertTestDate: { get: () => upsertTestDate },
+  removeTestDate: { get: () => removeTestDate }
+});
+
 import('./src/features/lessons/lesson-save-runtime-entry.js')
-  .then(({ installLessonSaveRuntimeEntry }) => installLessonSaveRuntimeEntry())
+  .then(({ installLessonSaveRuntimeEntry }) => installLessonSaveRuntimeEntry(lessonSaveRuntimeBridge))
   .catch(error => console.error('PacoGO lesson-save runtime bridge failed:', error));

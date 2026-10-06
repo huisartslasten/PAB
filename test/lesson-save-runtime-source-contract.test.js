@@ -19,8 +19,16 @@ test('classic-script save facade is wired through the single bootstrap readiness
   assert.match(source, /const runtimeSaveLesson = await lessonSaveRuntimeBootstrap/);
   assert.match(source, /return runtimeSaveLesson\(\.\.\.args\)/);
 
+  const bootstrapDeclarations = source.match(/const lessonSaveRuntimeBootstrap\s*=/g) || [];
+  assert.equal(bootstrapDeclarations.length, 1, 'the classic-script boundary must create exactly one bootstrap promise');
+
+  const facadeIndex = source.indexOf('window.saveLesson = async function saveLessonRuntimeFacade');
+  const bootstrapIndex = source.indexOf('const lessonSaveRuntimeBootstrap =');
+  assert.ok(bootstrapIndex >= 0 && facadeIndex > bootstrapIndex, 'the facade must be defined from the single bootstrap contract');
+
   assert.doesNotMatch(source, /catch\s*\([^)]*\)\s*\{[^}]*saveLesson\s*\(/s);
   assert.doesNotMatch(source, /setTimeout\([^\n]*saveLesson/s);
+  assert.doesNotMatch(source, /window\.saveLesson\s*=\s*async function[^\{]*\{[^}]*legacy/i);
 });
 
 test('bootstrap contract installs the refactored runtime and exposes only its callable entry', async () => {

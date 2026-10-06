@@ -76,7 +76,10 @@ export function buildItemsForType(type, rows = []) {
   const build = builders[type] || builders.words;
 
   return (Array.isArray(rows) ? rows : [])
-    .map(build)
-    .filter(isMeaningfulItem)
-    .map((item, index) => ({ ...item, sort_order: index }));
+    .map((row, index) => {
+      const item = build(row);
+      return item ? { ...item, sort_order: index } : null;
+    })
+    .filter(Boolean)
+    .filter(isMeaningfulItem);
 }

@@ -116,7 +116,9 @@ The critical runtime defect found during the 511–520 gate was module-scope vis
 
 The controlled bridge is now explicit. `photo-storage.js`, which already executes in the classic-script environment, captures the V4.78 application bindings through live getters/setters and passes that bridge into `installLessonSaveRuntimeEntry()`. The ES module validates and uses only that injected runtime object.
 
-`test/lesson-save-runtime-entry.test.js` now also verifies that direct execution without the explicit bridge is rejected.
+`test/lesson-save-runtime-entry.test.js` verifies that direct execution without the explicit bridge is rejected. The authorized-runtime test was then tightened into a deterministic validation-boundary contract: with an authorized parent, empty editor rows must return the exact V4.78 validation result and must not touch Supabase or execute reload/calendar/sidebar/success effects. A throwing Supabase proxy is used only as a test guard; it is not application code.
+
+**Important:** this focused test source has been added but has not been executed in the available environment. No pass is claimed.
 
 A temporary GitHub Actions test workflow was attempted, but GitHub returned zero workflow runs for the TEST branch, so **no CI/full-suite result is claimed**. The temporary workflow was removed.
 

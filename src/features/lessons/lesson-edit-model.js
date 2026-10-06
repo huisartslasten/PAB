@@ -11,17 +11,32 @@ function partsFromStoredOrLegacy(item = {}, type) {
     ? item.question_parts.slice()
     : [item.question || ''];
 
-  const answerParts = Array.isArray(item.answer_parts) && item.answer_parts.length
-    ? item.answer_parts.map(part => ({
+  if (Array.isArray(item.answer_parts) && item.answer_parts.length) {
+    return {
+      questionParts,
+      answerParts: item.answer_parts.map(part => ({
         text: text(part?.text),
         role: part?.role || 'answer'
       }))
-    : String(item.answer || '')
-        .split(type === 'spelling' ? ' || ' : '\n')
-        .filter(Boolean)
-        .map(value => ({ text: value, role: 'answer' }));
+    };
+  }
 
-  return { questionParts, answerParts };
+  // V4.78 words/custom use the complete legacy answer as one answer part.
+  if (type === 'words' || type === 'custom') {
+    return {
+      questionParts,
+      answerParts: [{ text: item.answer || '', role: 'answer' }]
+    };
+  }
+
+  const separator = type === 'spelling' ? ' || ' : '\n';
+  return {
+    questionParts,
+    answerParts: String(item.answer || '')
+      .split(separator)
+      .filter(Boolean)
+      .map(value => ({ text: value, role: 'answer' }))
+  };
 }
 
 function wordItemModel(item = {}) {

@@ -1,21 +1,18 @@
-name: PacoGO migrate test-attempt runtime
+name: Remove legacy test-attempt persistence
 
 on:
   push:
     branches:
       - refactor/professional-v1
     paths:
-      - 'index.html'
-      - 'test-history-storage.js'
-      - 'src/features/test-history/**'
-      - 'test/test-attempt-*.test.js'
       - '.github/workflows/migrate-test-attempt-runtime.yml'
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  migrate:
+  remove-legacy-test-attempt:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout refactor branch
@@ -23,19 +20,24 @@ jobs:
         with:
           ref: refactor/professional-v1
 
-      - name: Remove exact authoritative V4.78 saveTestAttempt
+      - name: Remove exactly one legacy saveTestAttempt declaration
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           python3 - <<'PY'
           from pathlib import Path
+
           path = Path('index.html')
-          text = path.read_text()
-          start = 'async function saveTestAttempt(attempt){\n'
-          end = '\nasync function finishTest(){'
-          if text.count(start) != 1:
-              raise SystemExit(f'Expected exactly one saveTestAttempt declaration, found {text.count(start)}')
-          i = text.index(start)
-          j = text.index(end, i)
-          block = text[i:j]
+          text = path.read_text(encoding='utf-8')
+          start_marker = 'async function saveTestAttempt(attempt){'
+          end_marker = 'async function finishTest(){'
+          start = text.find(start_marker)
+          end = text.find(end_marker, start + len(start_marker))
+          if start < 0 or end < 0:
+              raise SystemExit('Expected saveTestAttempt boundaries were not found exactly.')
+          if text.find(start_marker, start + len(start_marker)) >= 0:
+              raise SystemExit('More than one saveTestAttempt declaration found; refusing migration.')
+          block = text[start:end]
           expected = """async function saveTestAttempt(attempt){
   if(!attempt?.answers?.length || !currentStudent || !currentLesson) return;
   const total=attempt.answers.length;
@@ -47,34 +49,36 @@ jobs:
   if(answerInsert.error) throw answerInsert.error;
 }"""
           if block != expected:
-              raise SystemExit('Legacy saveTestAttempt differs from authoritative V4.78; stopped.')
-          path.write_text(text[:i] + text[j+1:])
-          text = path.read_text()
-          if 'async function saveTestAttempt(' in text or 'function saveTestAttempt(' in text:
-              raise SystemExit('Legacy saveTestAttempt remains after removal.')
+              raise SystemExit('Unexpected legacy saveTestAttempt body; refusing migration.')
+          text = text[:start] + text[end:]
+          if 'async function saveTestAttempt(attempt){' in text or 'function saveTestAttempt(attempt){' in text:
+              raise SystemExit('Legacy saveTestAttempt declaration still exists after removal.')
           marker = '  <script src="photo-storage.js"></script>'
-          if text.count(marker) != 1 or 'test-history-storage.js' in text:
-              raise SystemExit('Unexpected script markers; stopped.')
-          path.write_text(text.replace(marker, '  <script src="test-history-storage.js"></script>\n' + marker, 1))
-          print('Exact legacy function removed and facade script installed.')
+          if text.count(marker) != 1:
+              raise SystemExit('Expected exactly one photo-storage script marker.')
+          if 'test-history-storage.js' in text:
+              raise SystemExit('Test-history storage script already exists; refusing migration.')
+          text = text.replace(marker, '  <script src="test-history-storage.js"></script>\n' + marker, 1)
+          path.write_text(text, encoding='utf-8')
+          print('Removed exactly one legacy saveTestAttempt declaration and installed the runtime facade.')
           PY
 
-      - name: Verify
+      - name: Verify and commit removal
         run: |
-          grep -q 'test-history-storage.js' index.html
-          ! grep -q 'async function saveTestAttempt(' index.html
-          ! grep -q 'function saveTestAttempt(' index.html
-
-      - name: Commit migration
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          test "$(grep -o "async function saveTestAttempt(attempt)" index.html | wc -l)" -eq 0
+          test "$(grep -o "function saveTestAttempt(attempt)" index.html | wc -l)" -eq 0
+          test "$(grep -o "test-history-storage.js" index.html | wc -l)" -eq 1
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m 'refactor: remove legacy test-attempt persistence'
+          git diff --cached --check
+          git commit -m "refactor: remove legacy test-attempt persistence"
           git push origin refactor/professional-v1
 
-      - name: Remove one-time workflow
+      - name: Remove this one-time migration workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git rm .github/workflows/migrate-test-attempt-runtime.yml
-          git commit -m 'chore: remove one-time test-attempt migration workflow'
+          git commit -m "chore: remove one-time test-attempt migration"
           git push origin refactor/professional-v1

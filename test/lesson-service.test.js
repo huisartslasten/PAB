@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createLessonService } from '../src/services/lesson-service.js';
 
-function mockDb({ rows = [], error = null } = {}) {
+function mockDb({ rows = [], error = null, insertError = null, updateError = null } = {}) {
   const calls = [];
   const result = {
     from(table) {
@@ -30,7 +30,7 @@ function mockDb({ rows = [], error = null } = {}) {
                   calls.push({ op: 'select-after-update', columns });
                   return {
                     single() {
-                      return Promise.resolve({ data: rows[0] ?? null, error });
+                      return Promise.resolve({ data: rows[0] ?? null, error: updateError });
                     }
                   };
                 }
@@ -51,7 +51,7 @@ function mockDb({ rows = [], error = null } = {}) {
           calls.push({ op: 'insert', rows: insertRows });
           return {
             select() {
-              return Promise.resolve({ data: insertRows, error: null });
+              return Promise.resolve({ data: insertRows, error: insertError });
             }
           };
         }
@@ -69,6 +69,58 @@ test('lesson service preserves V4.78 item ordering and query shape', async () =>
   assert.deepEqual(result[0].lesson_items.map(item => item.id), [1, 2]);
   assert.deepEqual(db.calls[1], { op: 'select', columns: '*, lesson_items(*)' });
   assert.deepEqual(db.calls[2], { op: 'order', column: 'id', options: { ascending: true } });
+});
+
+test('lesson service creates a lesson through insert-select-single', async () => {
+  const payload = { title: 'Nieuwe les', student: 'Zyon', type: 'words' };
+  const db = mockDb({ rows: [{ id: 17, ...payload }] });
+  const service = createLessonService(db);
+
+  const result = await service.createLesson(payload);
+
+  assert.deepEqual(result, { id: 17, ...payload });
+  assert.deepEqual(db.calls, [
+    { op: 'from', table: 'lessons' },
+    { op: 'insert', rows: payload }
+  ]);
+});
+
+test('lesson service propagates create errors', async () => {
+  const error = new Error('create failed');
+  const db = mockDb({ insertError: error });
+  const service = createLessonService(db);
+
+  await assert.rejects(
+    () => service.createLesson({ title: 'Nieuwe les' }),
+    error
+  );
+});
+
+test('lesson service updates a lesson through update-filter-select-single', async () => {
+  const payload = { title: 'Aangepaste les', archived: false };
+  const db = mockDb({ rows: [{ id: 17, ...payload }] });
+  const service = createLessonService(db);
+
+  const result = await service.updateLesson(17, payload);
+
+  assert.deepEqual(result, { id: 17, ...payload });
+  assert.deepEqual(db.calls, [
+    { op: 'from', table: 'lessons' },
+    { op: 'update', payload },
+    { op: 'eq', column: 'id', value: 17 },
+    { op: 'select-after-update', columns: '*' }
+  ]);
+});
+
+test('lesson service propagates update errors', async () => {
+  const error = new Error('update failed');
+  const db = mockDb({ updateError: error });
+  const service = createLessonService(db);
+
+  await assert.rejects(
+    () => service.updateLesson(17, { title: 'Aangepaste les' }),
+    error
+  );
 });
 
 test('lesson service exposes archive, trash and restore operations', async () => {

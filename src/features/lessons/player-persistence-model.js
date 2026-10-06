@@ -1,13 +1,8 @@
 // Deterministic database-row builders for lesson-player test history.
-// Contract source: supabase/migrations/20260929140000_create_test_history.sql.
+// Contract source: TEST V4.78 completion -> saveTestAttempt().
 // This module does not perform persistence and does not guess UI/runtime behavior.
 
 const text = value => String(value ?? '').trim();
-
-function toNullableText(value) {
-  const normalized = text(value);
-  return normalized || null;
-}
 
 export function buildTestAttemptRow({
   lessonId,
@@ -33,13 +28,15 @@ export function buildTestAttemptAnswerRows(answers = [], { finishedAt = null } =
   return (Array.isArray(answers) ? answers : []).map((answer, index) => {
     const item = answer?.item || {};
     return {
-      question_order: Number(answer?.questionOrder ?? index) || 0,
+      // V4.78 stores question_order as i + 1.
+      question_order: Number(answer?.questionOrder ?? index + 1) || 0,
       question: text(item.question ?? answer?.question),
-      expected_answer: toNullableText(item.answer ?? answer?.expected),
-      given_answer: toNullableText(answer?.value ?? answer?.givenAnswer),
+      expected_answer: text(item.answer ?? answer?.expected),
+      given_answer: text(answer?.value ?? answer?.givenAnswer),
       is_correct: answer?.correct === true,
       question_type: text(answer?.questionType || item.type || 'text') || 'text',
-      answered_at: answer?.answeredAt || finishedAt || null
+      // V4.78 assigns the completion timestamp to every persisted answer row.
+      answered_at: finishedAt || null
     };
   });
 }

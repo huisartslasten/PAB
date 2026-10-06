@@ -126,13 +126,7 @@ export async function executeLessonSaveRuntimeEntry(runtime) {
         errorElement.classList.remove('hidden');
       }
     },
-    onPersistenceFailure: async () => {},
-    onComplete: async result => {
-      const outcome = result?.outcome;
-      if (!outcome) return;
-      app.currentSubject = outcome.currentSubject;
-      app.currentLesson = null;
-    }
+    onPersistenceFailure: async () => {}
   });
 }
 

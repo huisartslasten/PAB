@@ -1,0 +1,106 @@
+name: PacoGO migrate test-attempt runtime
+
+on:
+  push:
+    branches:
+      - refactor/professional-v1
+    paths:
+      - 'index.html'
+      - 'test-history-storage.js'
+      - 'src/features/test-history/**'
+      - 'test/test-attempt-*.test.js'
+      - '.github/workflows/migrate-test-attempt-runtime.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout refactor branch
+        uses: actions/checkout@v4
+        with:
+          ref: refactor/professional-v1
+
+      - name: Remove only the authoritative V4.78 saveTestAttempt block
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text()
+          start = 'async function saveTestAttempt(attempt){\n'
+          end = '\nasync function finishTest(){'
+          start_count = text.count(start)
+          if start_count != 1:
+              raise SystemExit(f'Expected exactly one saveTestAttempt declaration, found {start_count}')
+          start_index = text.index(start)
+          end_index = text.index(end, start_index)
+          block = text[start_index:end_index]
+
+          expected = '''async function saveTestAttempt(attempt){
+  if(!attempt?.answers?.length || !currentStudent || !currentLesson) return;
+  const total=attempt.answers.length;
+  const score=attempt.answers.filter(x=>x.correct).length;
+  const inserted=await db.from('test_attempts').insert({lesson_id:currentLesson.id,student:currentStudent,score,total_questions:total,started_at:attempt.startedAt||new Date().toISOString(),completed_at:new Date().toISOString(),is_test:true}).select().single();
+  if(inserted.error) throw inserted.error;
+  const rows=attempt.answers.map((x,i)=>({attempt_id:inserted.data.id,question_order:i+1,question:String(x.item?.question??''),expected_answer:String(x.item?.answer??''),given_answer:String(x.value??''),is_correct:x.correct===true,question_type:attempt.type||currentLesson.type,answered_at:new Date().toISOString()}));
+  const answerInsert=await db.from('test_attempt_answers').insert(rows);
+  if(answerInsert.error) throw answerInsert.error;
+}'''
+
+          if block != expected:
+              raise SystemExit('The legacy saveTestAttempt block differs from the authoritative V4.78 source; migration stopped.')
+
+          path.write_text(text[:start_index] + text[end_index+1:])
+          updated = path.read_text()
+          if 'async function saveTestAttempt(' in updated or 'function saveTestAttempt(' in updated:
+              raise SystemExit('Legacy saveTestAttempt declaration still exists after removal.')
+          print('Removed exact authoritative V4.78 saveTestAttempt block.')
+          PY
+
+      - name: Install the single refactored classic-script facade
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('index.html')
+          text = path.read_text()
+          marker = '  <script src="photo-storage.js"></script>'
+          insertion = '  <script src="test-history-storage.js"></script>\n'
+          if text.count(marker) != 1:
+              raise SystemExit('Expected exactly one photo-storage script marker.')
+          if text.count('test-history-storage.js') != 0:
+              raise SystemExit('Test-history storage script is already present; migration stopped.')
+          path.write_text(text.replace(marker, insertion + marker, 1))
+          updated = path.read_text()
+          if updated.count('test-history-storage.js') != 1:
+              raise SystemExit('Expected exactly one test-history storage script after migration.')
+          PY
+
+      - name: Verify migration contract
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          text = Path('index.html').read_text()
+          assert 'async function saveTestAttempt(' not in text
+          assert 'function saveTestAttempt(' not in text
+          assert text.count('test-history-storage.js') == 1
+          assert text.count('photo-storage.js') == 1
+          print('Migration contract verified.')
+          PY
+
+      - name: Commit migration
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'refactor: remove legacy test-attempt persistence'
+          git push origin refactor/professional-v1
+
+      - name: Remove this one-time workflow
+        run: |
+          git rm .github/workflows/migrate-test-attempt-runtime.yml
+          git commit -m 'chore: remove one-time test-attempt migration workflow'
+          git push origin refactor/professional-v1

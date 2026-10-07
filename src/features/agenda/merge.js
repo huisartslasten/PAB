@@ -1,4 +1,4 @@
-import { normalizeAgendaText } from './agenda-domain.js';
+const normalizeAgendaTitleText = value => String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
 
 export function normalizeAgendaDate(value) {
   const raw = String(value || '').trim();
@@ -15,12 +15,12 @@ export function normalizeAgendaDate(value) {
 }
 
 export function agendaTitleWords(value) {
-  return normalizeAgendaText(value).split(/\s+/).map(word => word.trim()).filter(Boolean);
+  return normalizeAgendaTitleText(value).split(/\s+/).filter(Boolean);
 }
 
 export function agendaTitleSimilarity(a, b) {
-  const left = normalizeAgendaText(a);
-  const right = normalizeAgendaText(b);
+  const left = normalizeAgendaTitleText(a);
+  const right = normalizeAgendaTitleText(b);
   if (!left || !right) return 0;
   if (left === right) return 1;
   if (left.includes(right) || right.includes(left)) return 0.94;

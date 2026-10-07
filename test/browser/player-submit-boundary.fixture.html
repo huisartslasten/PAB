@@ -32,7 +32,7 @@
       document.getElementById('testContent').innerHTML = '<input id="testAnswer"><button class="big" type="button">Volgende</button>';
       document.getElementById('testAnswer').dataset.questionId = String(item.id);
     },
-    gradeAnswer: async (expected, given) => ({ correct: expected === given, feedback: '' }),
+    gradeAnswer: async (question, expected, given) => ({ correct: expected === given, feedback: '' }),
     renderResult: async result => { window.__result = result; },
     cancelSpeech: () => {},
     clearActivity: () => {},

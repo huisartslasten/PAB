@@ -31,10 +31,14 @@ test('player runtime entry owns start-render-submit-finish sequencing', async ()
   const doc = documentDouble(['appel']);
   const rendered = [];
   const events = [];
+  const prepared = [];
+  let cancelled = 0;
 
   const entry = createPlayerRuntimeEntry({
     lesson: lesson(),
     student: 'Zyon',
+    prepareTestView: payload => prepared.push(payload),
+    cancelSpeech: () => { cancelled += 1; },
     persistence: {
       async saveTestResult(payload) {
         events.push(['save', payload]);
@@ -66,6 +70,8 @@ test('player runtime entry owns start-render-submit-finish sequencing', async ()
   });
 
   entry.startTest({ startedAt: '2026-10-07T00:00:00.000Z' });
+  assert.equal(cancelled, 1);
+  assert.deepEqual(prepared, [{ type: 'words', lesson: lesson() }]);
   assert.deepEqual(rendered, [['test', 0, 2, 'words', 'q1']]);
 
   const first = await entry.submitTest({ type: 'words' });

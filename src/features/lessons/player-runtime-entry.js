@@ -1,6 +1,6 @@
 // Application runtime entry for the professional lesson player.
-// Composition stays separate from DOM wiring; this entry only starts the
-// application-owned runtime and exposes the canonical submit/finish boundary.
+// Composition stays separate from DOM wiring; this entry owns the application
+// submit boundary and the V4.78 rule that the last answer finishes the test.
 
 import { createApplicationPlayerRuntime } from './player-runtime-composition.js';
 import { createPlayerSubmitBoundary } from './player-submit-boundary.js';
@@ -40,11 +40,20 @@ export function createPlayerRuntimeEntry({
     documentRef
   });
 
+  async function submitTest(options = {}) {
+    const result = await submitBoundary.submitTest(options);
+    if (!result) return null;
+    if (result.done) {
+      return runtime.finishTest();
+    }
+    return result;
+  }
+
   return Object.freeze({
     runtime,
     submitBoundary,
     startTest: options => runtime.startTest(options),
-    submitTest: options => submitBoundary.submitTest(options),
+    submitTest,
     finishTest: options => runtime.finishTest(options),
     retry: () => runtime.retry(),
     back: () => runtime.back()

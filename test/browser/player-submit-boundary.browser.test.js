@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('browser DOM answer flows through canonical player engine and persists', async ({ page }) => {
+test('browser DOM answer flows through runtime entry, auto-finishes, persists and renders result', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/test/browser/player-submit-boundary.fixture.html');
 
   await page.locator('#testAnswer').fill('fruit');
@@ -13,11 +13,9 @@ test('browser DOM answer flows through canonical player engine and persists', as
   });
   await page.locator('#testAnswer').fill('wrong');
   const second = await page.evaluate(() => window.submitTest());
-  expect(second.correct).toBe(false);
+
+  expect(second.result.score).toBe(50);
   expect(await page.evaluate(() => window.playerState())).toMatchObject({ index: 2 });
-
-  await page.evaluate(() => window.finishPlayerTest());
-
   expect(await page.evaluate(() => window.__events[0].attempt)).toMatchObject({
     lesson_id: 42,
     student: 'Zyon',
@@ -26,4 +24,5 @@ test('browser DOM answer flows through canonical player engine and persists', as
     is_test: true
   });
   expect(await page.evaluate(() => window.__events[0].answers.map(x => x.is_correct))).toEqual([true, false]);
+  expect(await page.evaluate(() => window.__result.result.score)).toBe(50);
 });

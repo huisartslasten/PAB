@@ -13,9 +13,7 @@ function lesson() {
 }
 
 function documentDouble() {
-  const controls = {
-    testAnswer: { value: 'fruit', disabled: false }
-  };
+  const controls = { testAnswer: { value: 'fruit', disabled: false } };
   const button = { disabled: false };
   return {
     getElementById(id) { return controls[id] || null; },
@@ -25,26 +23,29 @@ function documentDouble() {
   };
 }
 
-test('runtime entry composes runtime and DOM submit boundary', async () => {
-  const doc = documentDouble();
+test('runtime entry requires application lesson and student context', () => {
+  const documentRef = documentDouble();
+  assert.throws(() => createPlayerRuntimeEntry({ student: 'Zyon', renderResult: () => {}, documentRef }), /A lesson is required/);
+  assert.throws(() => createPlayerRuntimeEntry({ lesson: lesson(), renderResult: () => {}, documentRef }), /A student is required/);
+});
+
+test('runtime entry finishes the test when the canonical submit boundary reaches the last answer', async () => {
+  const documentRef = documentDouble();
   const calls = [];
   const entry = createPlayerRuntimeEntry({
     lesson: lesson(),
     student: 'Zyon',
     persistence: { async saveTestResult(payload) { calls.push(['save', payload]); return payload; } },
     renderResult: async payload => calls.push(['render', payload]),
-    documentRef: doc,
+    documentRef,
     gradeAnswer: async (expected, given) => ({ correct: expected === given })
   });
 
-  entry.startTest({ shuffle: items => items, startedAt: '2026-10-06T00:00:00.000Z' });
+  entry.startTest({ startedAt: '2026-10-06T00:00:00.000Z' });
   const result = await entry.submitTest({ type: 'words' });
 
-  assert.equal(result.correct, true);
+  assert.equal(result.result.score, 100);
   assert.equal(entry.runtime.session.index, 1);
-  assert.equal(doc.controls.testAnswer.disabled, true);
-
-  await entry.finishTest({ finishedAt: '2026-10-06T00:01:00.000Z' });
   assert.equal(calls[0][0], 'save');
   assert.equal(calls[1][0], 'render');
 });

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createTestSession } from '../src/features/lessons/test-engine.js';
 
-const exactGrade = async (expected, given) => ({
+const exactGrade = async (_question, expected, given) => ({
   correct: String(expected).trim().toLowerCase() === String(given).trim().toLowerCase()
 });
 

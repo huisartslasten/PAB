@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="nl">
+<head><meta charset="utf-8"><title>PacoGO player submit browser fixture</title></head>
+<body>
+<div id="testContent"><input id="testAnswer"><button class="big" type="button">Volgende</button></div>
+<script type="module">
+  import { createPlayerRuntimeAdapter } from '/src/features/lessons/player-runtime-adapter.js';
+  import { createPlayerSubmitBoundary } from '/src/features/lessons/player-submit-boundary.js';
+
+  window.__events = [];
+  const persistence = {
+    async saveTestResult(payload) {
+      window.__events.push(payload);
+      return { attempt: { id: 77 }, answers: payload.answers };
+    }
+  };
+  const lesson = {
+    id: 42,
+    title: 'Woordentoets',
+    subject: 'Nederlands',
+    type: 'words',
+    ai_check_answers: true,
+    lesson_items: [
+      { id: 1, question: 'appel', answer: 'fruit' },
+      { id: 2, question: 'peer', answer: 'boom' }
+    ]
+  };
+  const adapter = createPlayerRuntimeAdapter({
+    lesson,
+    student: 'Zyon',
+    persistence,
+    gradeAnswer: async (expected, given) => ({
+      correct: expected === given,
+      feedback: ''
+    }),
+    renderResult: async result => { window.__result = result; },
+    cancelSpeech: () => {},
+    clearActivity: () => {},
+    clock: () => '2026-10-06T00:00:00.000Z'
+  });
+
+  adapter.startTest({
+    items: lesson.lesson_items,
+    shuffle: items => items,
+    startedAt: '2026-10-05T23:00:00.000Z'
+  });
+
+  const boundary = createPlayerSubmitBoundary({ adapter, documentRef: document });
+  window.submitTest = () => boundary.submitTest({ type: lesson.type });
+  window.finishPlayerTest = () => adapter.finishTest({ finishedAt: '2026-10-06T00:00:00.000Z' });
+  window.playerState = () => ({ index: adapter.session.index, answers: adapter.session.answers });
+</script>
+</body>
+</html>

@@ -10,6 +10,7 @@ export function createPlayerRuntimeEntry({
   student = null,
   db = null,
   persistence = null,
+  prepareTestView = () => {},
   renderTest = null,
   renderResult = null,
   cancelSpeech = () => {},
@@ -21,51 +22,28 @@ export function createPlayerRuntimeEntry({
   gradeAnswer = null,
   documentRef = globalThis.document
 } = {}) {
-  const runtime = createApplicationPlayerRuntime({
-    lesson,
-    student,
-    db,
-    persistence,
-    renderResult,
-    cancelSpeech,
-    clearActivity,
-    showLessonChoice,
-    goBack,
-    clock,
-    createSession,
-    gradeAnswer
-  });
-
+  const runtime = createApplicationPlayerRuntime({ lesson, student, db, persistence, renderResult, cancelSpeech, clearActivity, showLessonChoice, goBack, clock, createSession, gradeAnswer });
+  if (typeof prepareTestView !== 'function') throw new Error('A test view preparer is required.');
   if (typeof renderTest !== 'function') throw new Error('A test renderer is required.');
-
-  const submitBoundary = createPlayerSubmitBoundary({
-    adapter: runtime,
-    documentRef
-  });
-
+  const submitBoundary = createPlayerSubmitBoundary({ adapter: runtime, documentRef });
+  function renderCurrentTest() {
+    const session = runtime.session;
+    renderTest({ session, item: session.currentItem(), index: session.index, total: session.total, type: session.type });
+  }
   function startTest(options = {}) {
-    const session = runtime.startTest(options);
-    renderTest({ session, item: session.currentItem() });
+    const type = options.type || lesson.type || 'words';
+    cancelSpeech?.();
+    prepareTestView({ type, lesson });
+    const session = runtime.startTest({ ...options, type });
+    renderCurrentTest();
     return session;
   }
-
   async function submitTest(options = {}) {
     const result = await submitBoundary.submitTest(options);
     if (!result) return null;
-    if (result.done) {
-      return runtime.finishTest();
-    }
-    renderTest({ session: runtime.session, item: runtime.session.currentItem() });
+    if (result.done) return runtime.finishTest({ finishedAt: clock() });
+    renderCurrentTest();
     return result;
   }
-
-  return Object.freeze({
-    runtime,
-    submitBoundary,
-    startTest,
-    submitTest,
-    finishTest: options => runtime.finishTest(options),
-    retry: () => runtime.retry(),
-    back: () => runtime.back()
-  });
+  return Object.freeze({ runtime, submitBoundary, startTest, submitTest, finishTest: options => runtime.finishTest(options), retry: () => runtime.retry(), back: () => runtime.back() });
 }

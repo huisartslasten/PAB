@@ -18,10 +18,10 @@ jobs:
   node-regression:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout refactor branch
+      - name: Checkout exact workflow commit
         uses: actions/checkout@v4
         with:
-          ref: refactor/professional-v1
+          ref: ${{ github.sha }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -47,10 +47,10 @@ jobs:
   browser-regression:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout refactor branch
+      - name: Checkout exact workflow commit
         uses: actions/checkout@v4
         with:
-          ref: refactor/professional-v1
+          ref: ${{ github.sha }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -58,10 +58,7 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
+        run: npm install
 
       - name: Install Chromium
         run: npx playwright install --with-deps chromium

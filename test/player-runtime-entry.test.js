@@ -8,12 +8,15 @@ function lesson() {
     id: 'lesson-1',
     title: 'Dictee',
     type: 'words',
-    lesson_items: [{ id: 'q1', question: 'appel', answer: 'fruit' }]
+    lesson_items: [
+      { id: 'q1', question: 'appel', answer: 'fruit' },
+      { id: 'q2', question: 'peer', answer: 'boom' }
+    ]
   };
 }
 
 function documentDouble() {
-  const controls = { testAnswer: { value: 'fruit', disabled: false } };
+  const controls = { testAnswer: { value: '', disabled: false } };
   const button = { disabled: false };
   return {
     getElementById(id) { return controls[id] || null; },
@@ -23,29 +26,31 @@ function documentDouble() {
   };
 }
 
-test('runtime entry requires application lesson and student context', () => {
+test('runtime entry requires application lesson, student and test renderer context', () => {
   const documentRef = documentDouble();
-  assert.throws(() => createPlayerRuntimeEntry({ student: 'Zyon', renderResult: () => {}, documentRef }), /A lesson is required/);
-  assert.throws(() => createPlayerRuntimeEntry({ lesson: lesson(), renderResult: () => {}, documentRef }), /A student is required/);
+  assert.throws(() => createPlayerRuntimeEntry({ student: 'Zyon', renderResult: () => {}, renderTest: () => {}, documentRef }), /A lesson is required/);
+  assert.throws(() => createPlayerRuntimeEntry({ lesson: lesson(), renderResult: () => {}, renderTest: () => {}, documentRef }), /A student is required/);
+  assert.throws(() => createPlayerRuntimeEntry({ lesson: lesson(), student: 'Zyon', renderResult: () => {}, documentRef }), /A test renderer is required/);
 });
 
-test('runtime entry finishes the test when the canonical submit boundary reaches the last answer', async () => {
+test('runtime entry renders start and next item, then finishes on the last canonical submit', async () => {
   const documentRef = documentDouble();
   const calls = [];
   const entry = createPlayerRuntimeEntry({
     lesson: lesson(),
     student: 'Zyon',
     persistence: { async saveTestResult(payload) { calls.push(['save', payload]); return payload; } },
-    renderResult: async payload => calls.push(['render', payload]),
+    renderTest: ({ item }) => { calls.push(['render-test', item.id]); documentRef.controls.testAnswer.value = item.answer; },
+    renderResult: async payload => calls.push(['render-result', payload]),
     documentRef,
     gradeAnswer: async (expected, given) => ({ correct: expected === given })
   });
 
   entry.startTest({ startedAt: '2026-10-06T00:00:00.000Z' });
-  const result = await entry.submitTest({ type: 'words' });
+  const first = await entry.submitTest({ type: 'words' });
+  const second = await entry.submitTest({ type: 'words' });
 
-  assert.equal(result.result.score, 100);
-  assert.equal(entry.runtime.session.index, 1);
-  assert.equal(calls[0][0], 'save');
-  assert.equal(calls[1][0], 'render');
+  assert.equal(first.correct, true);
+  assert.equal(second.result.score, 100);
+  assert.deepEqual(calls.map(([kind]) => kind), ['render-test', 'render-test', 'save', 'render-result']);
 });

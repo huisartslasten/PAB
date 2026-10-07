@@ -58,7 +58,7 @@ export function createProfessionalPlayerBridge({
         screen.showResult();
         resultRenderer.render(payload);
       },
-      cancelSpeech: () => window.speechSynthesis?.cancel(),
+      cancelSpeech: () => globalThis.window?.speechSynthesis?.cancel?.(),
       stopAiAudio,
       clearActivity,
       showLessonChoice,

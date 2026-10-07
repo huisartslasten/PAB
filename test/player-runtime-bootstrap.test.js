@@ -54,11 +54,12 @@ test('professional player bridge owns the V4.78 test entry seam', async () => {
     escapeHtml: value => String(value),
     speakAiText: async (...args) => { speech.push(args); },
     stopAiAudio: () => audio.push(true),
-    gradeAnswer: async (expected, given) => ({ correct: expected === given, feedback: '' }),
+    gradeAnswer: async (_question, expected, given) => ({ correct: expected === given, feedback: '' }),
     shuffle: items => [...items]
   });
 
-  const entry = bridge.startTest('words');
+  bridge.startTest('words');
+  const entry = bridge.entry;
 
   assert.equal(entry.runtime.session.type, 'words');
   assert.equal(entry.runtime.session.index, 0);

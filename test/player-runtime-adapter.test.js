@@ -15,6 +15,10 @@ function lesson() {
   };
 }
 
+const exactGrade = async (expected, given) => ({
+  correct: String(expected).trim().toLowerCase() === String(given).trim().toLowerCase()
+});
+
 test('player runtime adapter starts a typed V4.78-style test session', () => {
   const adapter = createPlayerRuntimeAdapter({
     lesson: lesson(),
@@ -31,7 +35,7 @@ test('player runtime adapter starts a typed V4.78-style test session', () => {
   assert.equal(session.startedAt != null, true);
 });
 
-test('player runtime adapter grades answers through the canonical test engine before persistence', async () => {
+test('player runtime adapter submits raw answers through the canonical test engine before persistence', async () => {
   const calls = [];
   const persistence = {
     async saveTestResult(payload) {
@@ -43,15 +47,16 @@ test('player runtime adapter grades answers through the canonical test engine be
     lesson: lesson(),
     student: 'Zyon',
     persistence,
+    gradeAnswer: exactGrade,
     cancelSpeech: () => calls.push({ kind: 'cancel' }),
     renderResult: async payload => calls.push({ kind: 'render', payload }),
     clearActivity: () => calls.push({ kind: 'clear' }),
     clock: () => '2026-10-06T00:00:00.000Z'
   });
 
-  const session = adapter.startTest({ shuffle: items => items, startedAt: '2026-10-05T23:00:00.000Z' });
-  assert.equal(session.submit('appel').correct, true);
-  assert.equal(session.submit('bom').correct, false);
+  adapter.startTest({ shuffle: items => items, startedAt: '2026-10-05T23:00:00.000Z' });
+  assert.equal((await adapter.submitAnswer('appel')).correct, true);
+  assert.equal((await adapter.submitAnswer('bom')).correct, false);
 
   const output = await adapter.finishTest();
 
@@ -108,8 +113,8 @@ test('player runtime adapter preserves V4.78 behavior when history save fails', 
   });
 
   const session = adapter.startTest({ shuffle: items => items });
-  assert.equal(session.submit('appel').correct, true);
-  assert.equal(session.submit('boom').correct, true);
+  assert.equal((await adapter.submitAnswer('appel')).correct, true);
+  assert.equal((await adapter.submitAnswer('boom')).correct, true);
 
   const output = await adapter.finishTest();
 

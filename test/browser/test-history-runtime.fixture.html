@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="nl">
+<head><meta charset="utf-8"><title>PacoGO test-history runtime browser fixture</title></head>
+<body>
+<main id="testHistory" class="page hidden">
+  <h1 id="testHistoryGreeting"></h1>
+  <div id="testHistoryContent"></div>
+</main>
+<script>
+var currentStudent='Zyon',currentLesson=null,__historyRows=[],__historyError=null,__events=[];
+var lessons=[
+  {id:101,subject:'Rekenen',title:'Breuken'},
+  {id:102,subject:'Spelling',title:'Themawoorden'}
+];
+function requireParent(){return true;}
+function hideAll(){}
+function refreshPageSidebars(){}
+function escapeHtml(value){return String(value ?? '').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));}
+var db={from(table){
+  __events.push({op:'from',table});
+  var builder={
+    select(columns){__events.push({op:'select',columns});return builder;},
+    order(column,options){__events.push({op:'order',column,options});return builder;},
+    eq(column,value){__events.push({op:'eq',column,value});return builder;},
+    then(resolve,reject){
+      if(__historyError)return Promise.resolve({data:null,error:__historyError}).then(resolve,reject);
+      return Promise.resolve({data:__historyRows,error:null}).then(resolve,reject);
+    }
+  };
+  return builder;
+}};
+</script>
+<script src="/test-history-storage.js"></script>
+</body>
+</html>

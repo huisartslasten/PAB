@@ -4,7 +4,7 @@ function normalize(value) {
   return String(value ?? '').trim().toLowerCase();
 }
 
-function evaluateTestAnswer(type, value, expected) {
+async function evaluateTestAnswer(type, value, expected, { gradeAnswer, aiCheckAnswers = true } = {}) {
   if (type === 'math') return Number(value) === Number(expected);
 
   if (type === 'spelling') {
@@ -16,12 +16,25 @@ function evaluateTestAnswer(type, value, expected) {
     );
   }
 
+  // V4.78 sends ordinary word tests through the AI grader. Custom lessons
+  // use the same path only when AI answer checking is enabled.
+  const useAi = type !== 'custom' || aiCheckAnswers;
+  if (useAi) {
+    if (typeof gradeAnswer !== 'function') {
+      throw new Error('An AI answer grader is required for this V4.78 test type.');
+    }
+    const grading = await gradeAnswer(String(expected ?? ''), String(value ?? ''));
+    return grading?.correct === true;
+  }
+
   return evaluateAnswer(value, expected, normalize).correct;
 }
 
 export function createTestSession(items = [], {
   type = 'words',
-  startedAt = new Date().toISOString()
+  startedAt = new Date().toISOString(),
+  gradeAnswer = null,
+  aiCheckAnswers = true
 } = {}) {
   const source = Array.isArray(items) ? [...items] : [];
   let index = 0;
@@ -30,11 +43,11 @@ export function createTestSession(items = [], {
 
   function currentItem() { return source[index] || null; }
 
-  function submit(answer) {
+  async function submit(answer) {
     if (index >= source.length) return null;
     const item = currentItem();
     const value = String(answer ?? '');
-    const correct = evaluateTestAnswer(testType, value, item?.answer);
+    const correct = await evaluateTestAnswer(testType, value, item?.answer, { gradeAnswer, aiCheckAnswers });
     answers.push({ item, value, correct });
     index += 1;
     return { correct, done: index >= source.length, index, total: source.length };

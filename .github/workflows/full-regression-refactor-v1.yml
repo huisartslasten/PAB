@@ -33,7 +33,6 @@ jobs:
 
       - name: Run maintained Node regression suite
         run: |
-          set -o pipefail
           files=$(find test -maxdepth 1 -type f -name '*.test.js' \
             ! -name 'agenda-merge.test.js' \
             ! -name 'agenda-persistence.test.js' \
@@ -50,15 +49,7 @@ jobs:
             ! -name 'practice-evaluation-runtime-source-contract.test.js' \
             ! -name 'refactor-pure-modules.test.js' \
             ! -name 'word-row-model.test.js' | sort)
-          node --test $files 2>&1 | tee node-regression.log
-
-      - name: Upload Node regression log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: node-regression-log
-          path: node-regression.log
-          if-no-files-found: ignore
+          node --test $files
 
   vitest-regression:
     runs-on: ubuntu-latest
@@ -110,14 +101,4 @@ jobs:
           echo $! > /tmp/pacogo-http.pid
 
       - name: Run complete browser suite
-        run: |
-          set -o pipefail
-          npx playwright test test/browser/*.browser.test.js --workers=1 2>&1 | tee browser-regression.log
-
-      - name: Upload browser regression log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: browser-regression-log
-          path: browser-regression.log
-          if-no-files-found: ignore
+        run: npx playwright test test/browser/*.browser.test.js --workers=1

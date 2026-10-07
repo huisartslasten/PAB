@@ -2072,75 +2072,6 @@ function deleteAgendaItem(id){
   if(!confirm('Deze agenda-afspraak verwijderen?'))return;
   saveCustomAgendaItems(getCustomAgendaItems().filter(x=>x.id!==id));renderAgenda();renderMiniAgenda();
 }
-let agendaWeekStart=null;
-function agendaGetCurrentWeekStart(){const d=new Date();d.setHours(12,0,0,0);return agendaStartOfWeek(d)}
-function agendaSetWeek(date){const d=new Date(date);d.setHours(12,0,0,0);agendaWeekStart=agendaStartOfWeek(d);renderAgenda()}
-function agendaMoveWeek(delta){const base=agendaWeekStart||agendaGetCurrentWeekStart();const d=new Date(base);d.setDate(d.getDate()+delta*7);agendaSetWeek(d)}
-function agendaGoToday(){agendaSetWeek(new Date())}
-function agendaDateRangeLabel(start){return agendaFormatRange(start)}
-function buildAgendaItemsForRender(){
-  const custom=getCustomAgendaItems();
-  const demo=currentStudent==='Testleerling'?agendaDemoItems.map(item=>({...item,date:agendaDateFromOffset(item.offset),id:'demo_'+item.offset,student:currentStudent,source:'demo'})):[];
-  const linkedTests=getTestCalendar()
-    .filter(t=>t.student===currentStudent&&t.date)
-    .map(t=>{
-      const lesson=t.lessonId?lessons.find(l=>Number(l.id)===Number(t.lessonId)&&l.student===currentStudent&&!l.archived):null;
-      return {
-        id:'test_'+String(t.id),
-        date:t.date,
-        type:'test',
-        icon:'📝',
-        title:lesson?(lesson.subject+' — '+lesson.title):((t.subject||'Toets')+' — '+(t.title||'Toets')),
-        meta:lesson?'Toets gekoppeld aan deze PacoGO-les':(t.subject||'Toets'),
-        student:currentStudent,
-        source:'testCalendar',
-        lessonId:lesson?Number(lesson.id):null
-      };
-    });
-  return [...demo,...custom,...linkedTests].sort((a,b)=>new Date(a.date)-new Date(b.date));
-}
-function showAgenda(){
-  if(!currentStudent){showHome();return}
-  document.getElementById('studentDashboard')?.classList.add('hidden');
-  hideAll();document.getElementById('agenda').classList.remove('hidden');
-  agendaWeekStart=agendaWeekStart||agendaGetCurrentWeekStart();
-  renderAgenda();
-}
-function renderAgenda(){
-  const el=document.getElementById('agendaContent');if(!el)return;
-  const allItems=buildAgendaItemsForRender();
-  const start=agendaWeekStart||agendaGetCurrentWeekStart();
-  const todayKey=agendaKey(new Date());
-  const itemsByDay=new Map();
-  for(let i=0;i<7;i++){const d=new Date(start);d.setDate(d.getDate()+i);itemsByDay.set(agendaKey(d),[])}
-  allItems.forEach(item=>{if(itemsByDay.has(item.date))itemsByDay.get(item.date).push(item)});
-  const dayEntries=[...itemsByDay.entries()];
-  const renderDay=(key,items,isWeekend)=>{
-    const d=new Date(key+'T12:00:00'),isToday=key===todayKey;
-    const dayName=d.toLocaleDateString('nl-NL',{weekday:'long'}),dayDate=d.toLocaleDateString('nl-NL',{day:'numeric',month:'short'});
-    const limit=isWeekend?2:3;
-    const visible=items.slice(0,limit);
-    const more=items.length-limit;
-    const events=visible.length?visible.map(item=>{
-      const icon=item.icon||agendaTypeIcon(item.type),custom=String(item.id||'').startsWith('agenda_');
-      return '<div class="agenda-week-event"><div class="agenda-week-event-title">'+icon+' '+escapeHtml(item.title)+'</div><div class="agenda-week-event-meta">'+escapeHtml(item.meta||agendaTypeLabel(item.type))+'</div>'+
-      (item.lesson?'<div class="agenda-event-action"><button onclick="showAgendaPracticeDemo()">🐾 Nu oefenen</button></div>':agendaLessonMatchHtml(item))+
-      (custom?'<div class="agenda-event-actions"><button type="button" class="secondary" onclick="editAgendaItem('+jsArg(item.id)+')">✏️ Bewerken</button><button type="button" class="danger" onclick="deleteAgendaItem('+jsArg(item.id)+')">🗑️ Verwijderen</button></div>':'')+
-      '</div>';
-    }).join(''):'<div class="agenda-day-empty">'+(isWeekend?'Vrije dag 🏠':'Geen afspraken')+'</div>';
-    const moreHtml=more>0?'<div class="agenda-more">+ '+more+' meer</div>':'';
-    return '<div class="agenda-week-day '+(isWeekend?'weekend ':'')+(isToday?'today':'')+'"><div class="agenda-week-day-head"><span class="day-name">'+dayName+'</span><span class="day-date">'+dayDate+'</span>'+(isToday?'<span class="agenda-today-pill">VANDAAG</span>':'')+'</div><div class="agenda-week-events">'+events+'</div>'+moreHtml+'</div>';
-  };
-  const weekdayDays=dayEntries.slice(0,5).map(([key,items])=>renderDay(key,items,false)).join('');
-  const weekendDays=dayEntries.slice(5,7).map(([key,items])=>renderDay(key,items,true)).join('');
-  const isCurrent=agendaKey(start)===agendaKey(agendaGetCurrentWeekStart());
-  const navTop='<div class="agenda-school-week-title"><button class="agenda-week-nav-button" type="button" onclick="agendaMoveWeek(-1)">← Vorige week</button><div class="agenda-school-week-title-center"><strong>📚 Deze schoolweek</strong><span>'+agendaDateRangeLabel(start)+'</span></div><button class="agenda-week-nav-button" type="button" onclick="agendaMoveWeek(1)">Volgende week →</button></div>';
-  const navBottom='<div class="agenda-week-bottom-nav"><button class="agenda-week-nav-button" type="button" onclick="agendaMoveWeek(-1)">← Vorige week</button>'+(!isCurrent?'<button class="agenda-today-button" type="button" onclick="agendaGoToday()">📍 Vandaag</button>':'')+'<button class="agenda-week-nav-button" type="button" onclick="agendaMoveWeek(1)">Volgende week →</button></div>';
-  el.innerHTML='<section class="agenda-school-week">'+navTop+'<div class="agenda-week-days"><div class="agenda-weekday-row">'+weekdayDays+'</div><div class="agenda-weekend-row">'+weekendDays+'</div></div>'+navBottom+'</section>'+
-  '';
-}
-let printCalendarStudent='';
-let printCalendarMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1,12);
 function showPrintCalendar(name=''){
   const parentMode=isParentLoggedIn();
   if(!parentMode&&!currentStudent){showHome();return}
@@ -3563,5 +3494,17 @@ function insertWordQuestionAfter(button){
 </script>
   <script src="test-history-storage.js"></script>
   <script src="photo-storage.js"></script>
+
+  <script type="module">
+    import { installAgendaRuntimeEntry } from '/src/features/agenda/runtime-entry.js';
+    installAgendaRuntimeEntry({
+      storage: window.localStorage,
+      currentStudent: () => currentStudent,
+      lessons: () => lessons,
+      demoItems: () => agendaDemoItems,
+      documentRef: document,
+      onLessonMatch: item => agendaLessonMatchHtml(item)
+    }, window);
+  </script>
 </body>
 </html>

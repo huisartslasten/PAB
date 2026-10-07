@@ -1,3 +1,4 @@
+# One-time migration workflow; it removes itself after a verified successful migration.
 name: Complete agenda runtime migration
 
 on:

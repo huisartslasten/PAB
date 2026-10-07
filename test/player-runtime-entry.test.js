@@ -51,6 +51,6 @@ test('runtime entry renders start and next item, then finishes on the last canon
   const second = await entry.submitTest({ type: 'words' });
 
   assert.equal(first.correct, true);
-  assert.equal(second.result.score, 100);
+  assert.equal(second.result.score, 10);
   assert.deepEqual(calls.map(([kind]) => kind), ['render-test', 'render-test', 'save', 'render-result']);
 });

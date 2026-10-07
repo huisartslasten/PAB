@@ -41,7 +41,13 @@ export function agendaEventsAreDuplicate(a = {}, b = {}) {
   return Boolean(timeA && timeB && timeA === timeB && titleScore >= 0.6);
 }
 
-export function mergeAgendaAiEvents(allEvents = []) {
+export function mergeAgendaAiEvents(existingOrAll = [], candidates = null) {
+  const allEvents = candidates === null
+    ? (Array.isArray(existingOrAll) ? existingOrAll : [])
+    : [
+        ...(Array.isArray(existingOrAll) ? existingOrAll : []),
+        ...(Array.isArray(candidates) ? candidates : [])
+      ];
   const merged = [];
   for (const event of allEvents) {
     const title = String(event?.title || '').trim();

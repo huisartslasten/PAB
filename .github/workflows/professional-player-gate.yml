@@ -61,6 +61,11 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
+      - name: Start local fixture server
+        run: |
+          python3 -m http.server 4173 --directory . > /tmp/pacogo-http.log 2>&1 &
+          echo $! > /tmp/pacogo-http.pid
+
       - name: Run professional player browser proof
         run: >-
           npx playwright test

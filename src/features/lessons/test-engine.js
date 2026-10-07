@@ -16,6 +16,11 @@ async function evaluateTestAnswer(type, value, expected, { gradeAnswer, aiCheckA
     );
   }
 
+  // V4.78 dictee uses deterministic normalized equality. It does not call the AI grader.
+  if (type === 'dictation') {
+    return normalize(value) === normalize(expected);
+  }
+
   const useAi = type !== 'custom' || aiCheckAnswers;
   if (useAi) {
     if (typeof gradeAnswer !== 'function') {

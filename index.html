@@ -3468,24 +3468,6 @@ const professionalPlayerReady = import('./src/features/lessons/player-runtime-bo
 
 window.pacoGOProfessionalPlayerReady = professionalPlayerReady;
 
-const pacoGOAgendaHost = Object.freeze({
-  storage: localStorage,
-  currentStudent: () => currentStudent,
-  lessons: () => lessons,
-  demoItems: () => agendaDemoItems,
-  documentRef: document,
-  onEdit: id => editAgendaItem(id),
-  onDelete: id => deleteAgendaItem(id),
-  onLessonMatch: item => agendaLessonMatchHtml(item),
-  now: () => new Date()
-});
-
-const pacoGOAgendaReady = import('./src/features/agenda/runtime-bootstrap.js')
-  .then(({ bootstrapAgendaRuntime }) => bootstrapAgendaRuntime(pacoGOAgendaHost));
-
-window.pacoGOAgendaReady = pacoGOAgendaReady;
-
-
 async function startTest(type) {
   const bridge = await professionalPlayerReady;
   return bridge.startTest(type);

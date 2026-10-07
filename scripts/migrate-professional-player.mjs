@@ -62,3 +62,4 @@ async function speakTest() {
 const updated = source.slice(0, start) + replacement + source.slice(end);
 fs.writeFileSync(path, updated);
 console.log('Professional player runtime integrated into index.html.');
+// One-time deterministic migration; the workflow removes this file after success.

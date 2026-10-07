@@ -1,0 +1,49 @@
+name: PacoGO Agenda cutover now
+on:
+  push:
+    branches:
+      - refactor/professional-v1
+permissions:
+  contents: write
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refactor/professional-v1
+          fetch-depth: 0
+      - name: Migrate Agenda runtime
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+          if 'function buildAgendaItemsForRender()' not in text:
+              print('Agenda already migrated')
+              raise SystemExit(0)
+          block = re.compile(r'\n?let agendaWeekStart=null;.*?\nfunction showPrintCalendar', re.S)
+          text, count = block.subn('\nfunction showPrintCalendar', text, count=1)
+          if count != 1:
+              raise SystemExit(f'Agenda runtime block count: {count}')
+          stale = re.compile(r'\n?\s*<script type="module">\s*import \{ installAgendaRuntimeEntry \} from \'/src/features/agenda/runtime-entry\.js\';.*?</script>', re.S)
+          text = stale.sub('', text)
+          bridge = '''\n  <script type="module">\n    import { installAgendaRuntimeEntry } from '/src/features/agenda/runtime-entry.js';\n    installAgendaRuntimeEntry({\n      storage: window.localStorage,\n      currentStudent: () => currentStudent,\n      lessons: () => lessons,\n      demoItems: () => agendaDemoItems,\n      documentRef: document,\n      onLessonMatch: item => agendaLessonMatchHtml(item)\n    }, window);\n  </script>\n'''
+          if text.count('</body>') != 1:
+              raise SystemExit(f'Expected one body close, got {text.count("</body>")}')
+          text = text.replace('</body>', bridge + '</body>', 1)
+          path.write_text(text, encoding='utf-8')
+      - name: Verify
+        run: |
+          ! grep -q 'function buildAgendaItemsForRender()' index.html
+          ! grep -q 'function renderAgenda()' index.html
+          ! grep -q 'function showAgenda()' index.html
+          grep -q 'src/features/agenda/runtime-entry.js' index.html
+      - name: Commit migration
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Complete professional agenda runtime migration' || exit 0
+          git push origin HEAD:refactor/professional-v1

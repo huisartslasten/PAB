@@ -23,7 +23,7 @@ export function createAgendaRuntimeEntry(host = {}) {
     agendaGetCurrentWeekStart: () => runtime.getCurrentWeekStart(),
     buildAgendaItemsForRender: student => read.buildAgendaItemsForRender(student),
     getCustomAgendaItems: student => read.getCustomAgendaItems(student),
-    saveCustomAgendaItems: (items, student) => read.customStorage.saveItems(items, student),
+    saveCustomAgendaItems: (items, student = host.currentStudent()) => read.customStorage.saveItems(items, student),
     getTestCalendar: () => read.getTestCalendar(),
     saveTestCalendar: items => read.testCalendar.save(items),
     normalizeAgendaDate: read.normalizeAgendaDate

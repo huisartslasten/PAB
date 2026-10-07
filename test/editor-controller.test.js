@@ -72,7 +72,11 @@ test('new editor save builds the deterministic lesson and item payload', async (
   assert.equal(result.testDate, '2026-11-11');
   assert.equal(result.lesson.testDate, undefined);
   assert.equal(refreshed, true);
-  assert.deepEqual(saved, result);
+  assert.deepEqual(saved, {
+    lesson: result.lesson,
+    lessonId: result.lessonId,
+    testDate: result.testDate
+  });
 });
 
 test('existing editor save passes lessonId through unchanged', async () => {

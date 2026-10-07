@@ -43,7 +43,7 @@ test('runtime entry renders start and next item, then finishes on the last canon
     renderTest: ({ item }) => { calls.push(['render-test', item.id]); documentRef.controls.testAnswer.value = item.answer; },
     renderResult: async payload => calls.push(['render-result', payload]),
     documentRef,
-    gradeAnswer: async (expected, given) => ({ correct: expected === given })
+    gradeAnswer: async (_question, expected, given) => ({ correct: expected === given })
   });
 
   entry.startTest({ startedAt: '2026-10-06T00:00:00.000Z' });

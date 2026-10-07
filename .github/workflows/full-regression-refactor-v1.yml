@@ -19,8 +19,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install dependencies
-        run: npm install
+      - name: Install dependencies without modifying repository files
+        run: npm install --no-package-lock
       - name: Verify complete Agenda runtime boundary
         run: |
           ! grep -q 'function buildAgendaItemsForRender()' index.html

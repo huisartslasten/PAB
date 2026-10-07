@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createAgendaRuntimeEntry } from '../src/features/agenda/runtime-entry.js';
+import { createAgendaRuntimeEntry, installAgendaRuntimeEntry } from '../src/features/agenda/runtime-entry.js';
 
 function storage(seed = {}) {
   const data = new Map(Object.entries(seed).map(([key, value]) => [key, JSON.stringify(value)]));
@@ -35,17 +35,21 @@ test('agenda runtime entry exposes deterministic read and storage boundaries', (
   assert.equal(entry.getTestCalendar()[0].id, 't2');
 });
 
-test('agenda runtime entry installs only the application-facing agenda surface', () => {
+test('agenda runtime entry installs the complete application-facing agenda facade', () => {
   const target = {};
-  const entry = createAgendaRuntimeEntry({
+  const entry = installAgendaRuntimeEntry({
     storage: storage(),
     documentRef: documentRef(),
     currentStudent: () => 'Zyon',
     lessons: () => [],
     demoItems: () => []
-  });
-  target.showAgenda = entry.showAgenda;
-  target.renderAgenda = entry.renderAgenda;
+  }, target);
+  assert.equal(target.pacoGOAgendaRuntime, entry);
   assert.equal(typeof target.showAgenda, 'function');
   assert.equal(typeof target.renderAgenda, 'function');
+  assert.equal(typeof target.buildAgendaItemsForRender, 'function');
+  assert.equal(typeof target.getCustomAgendaItems, 'function');
+  assert.equal(typeof target.saveCustomAgendaItems, 'function');
+  assert.equal(typeof target.getTestCalendar, 'function');
+  assert.equal(typeof target.saveTestCalendar, 'function');
 });

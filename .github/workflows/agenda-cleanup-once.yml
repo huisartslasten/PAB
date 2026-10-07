@@ -1,0 +1,66 @@
+name: agenda-cleanup-once
+
+on:
+  push:
+    branches: [refactor/professional-v1]
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refactor/professional-v1
+          fetch-depth: 1
+
+      - name: Remove temporary bootstrap exactly
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('index.html')
+          text = p.read_text(encoding='utf-8')
+          block = '''const pacoGOAgendaHost = Object.freeze({
+  storage: localStorage,
+  currentStudent: () => currentStudent,
+  lessons: () => lessons,
+  demoItems: () => agendaDemoItems,
+  documentRef: document,
+  onEdit: id => editAgendaItem(id),
+  onDelete: id => deleteAgendaItem(id),
+  onLessonMatch: item => agendaLessonMatchHtml(item),
+  now: () => new Date()
+});
+
+const pacoGOAgendaReady = import('./src/features/agenda/runtime-bootstrap.js')
+  .then(({ bootstrapAgendaRuntime }) => bootstrapAgendaRuntime(pacoGOAgendaHost));
+
+window.pacoGOAgendaReady = pacoGOAgendaReady;
+'''
+          if text.count(block) != 1:
+              raise SystemExit('Expected exactly one temporary Agenda bootstrap block')
+          text = text.replace(block, '', 1)
+          p.write_text(text, encoding='utf-8')
+
+      - name: Verify cleanup
+        run: |
+          ! grep -q 'runtime-bootstrap.js' index.html
+          ! grep -q 'pacoGOAgendaReady' index.html
+          grep -q 'function buildAgendaItemsForRender()' index.html
+
+      - name: Commit cleanup
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Clean temporary Agenda bootstrap seam'
+          git push origin HEAD:refactor/professional-v1
+
+      - name: Remove cleanup runner
+        run: |
+          git rm .github/workflows/agenda-cleanup-once.yml
+          git commit -m 'Remove one-time Agenda cleanup runner'
+          git push origin HEAD:refactor/professional-v1

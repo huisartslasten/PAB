@@ -32,7 +32,7 @@ jobs:
         run: npm install
 
       - name: Run complete Node test suite
-        run: npm test
+        run: node --test test/*.test.js
 
   browser-regression:
     runs-on: ubuntu-latest
@@ -59,4 +59,4 @@ jobs:
           echo $! > /tmp/pacogo-http.pid
 
       - name: Run complete browser suite
-        run: npx playwright test --workers=1
+        run: npx playwright test test/browser/*.browser.test.js --workers=1

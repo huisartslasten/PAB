@@ -41,5 +41,11 @@ export function installAgendaRuntimeEntry(host, target = globalThis) {
   target.agendaGoToday = entry.agendaGoToday;
   target.agendaSetWeek = entry.agendaSetWeek;
   target.agendaGetCurrentWeekStart = entry.agendaGetCurrentWeekStart;
+  target.buildAgendaItemsForRender = entry.buildAgendaItemsForRender;
+  target.getCustomAgendaItems = entry.getCustomAgendaItems;
+  target.saveCustomAgendaItems = entry.saveCustomAgendaItems;
+  target.getTestCalendar = entry.getTestCalendar;
+  target.saveTestCalendar = entry.saveTestCalendar;
+  target.normalizeAgendaDate = entry.normalizeAgendaDate;
   return entry;
 }

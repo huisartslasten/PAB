@@ -41,7 +41,7 @@ test('player runtime entry owns start-render-submit-finish sequencing', async ()
         return payload;
       }
     },
-    renderTest: payload => rendered.push(['test', payload.index, payload.item.id]),
+    renderTest: payload => rendered.push(['test', payload.index, payload.total, payload.type, payload.item.id]),
     renderResult: payload => rendered.push(['result', payload.result.score]),
     documentRef: doc,
     clock: () => '2026-10-07T00:01:00.000Z',
@@ -50,8 +50,9 @@ test('player runtime entry owns start-render-submit-finish sequencing', async ()
       const answers = [];
       return {
         kind: 'test', type: options.type, startedAt: options.startedAt,
-        get currentItem() { return items[index] || null; },
-        get index() { return index; }, get total() { return items.length; },
+        currentItem() { return items[index] || null; },
+        get index() { return index; },
+        get total() { return items.length; },
         get answers() { return [...answers]; },
         async submit(value) {
           const item = items[index];
@@ -65,11 +66,14 @@ test('player runtime entry owns start-render-submit-finish sequencing', async ()
   });
 
   entry.startTest({ startedAt: '2026-10-07T00:00:00.000Z' });
-  assert.deepEqual(rendered, [['test', 0, 'q1']]);
+  assert.deepEqual(rendered, [['test', 0, 2, 'words', 'q1']]);
 
   const first = await entry.submitTest({ type: 'words' });
   assert.equal(first.done, false);
-  assert.deepEqual(rendered, [['test', 0, 'q1'], ['test', 1, 'q2']]);
+  assert.deepEqual(rendered, [
+    ['test', 0, 2, 'words', 'q1'],
+    ['test', 1, 2, 'words', 'q2']
+  ]);
 
   doc.setNextValue('peer');
   const second = await entry.submitTest({ type: 'words' });

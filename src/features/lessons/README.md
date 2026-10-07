@@ -1,18 +1,15 @@
 # Lessons feature
 
-This directory owns lesson-domain behavior during the V4.78 migration.
+This directory owns the professional lesson-domain behavior extracted from the V4.78 application.
 
 ## Rules
-- Preserve existing V4.78 behavior before improving behavior.
+- Preserve V4.78 behavior before improving behavior.
 - Keep DOM rendering separate from Supabase access.
-- Do not introduce AI behavior into the lesson editor.
-- Keep lesson creation, editing, practice, archive/trash and restore semantics compatible with the current site.
-- No database schema changes are part of this extraction.
+- Do not introduce AI behavior into the deterministic lesson editor.
+- Keep lesson creation, editing, practice/player, archive/trash and restore semantics compatible with the current site.
+- No database schema changes are part of this structural refactor.
 
-## Migration order
-1. Read-only lesson data mapping.
-2. Lesson list and subject grouping.
-3. Lesson editor.
-4. Lesson practice/player.
-5. Archive/trash/restore.
-6. Regression comparison against `legacy/index-v4.78.html`.
+## Professional architecture
+The lesson/editor/runtime boundaries are integrated on `refactor/professional-v1`. Player execution is owned by the canonical player runtime modules and application bridge; legacy player ownership has been removed after regression proof.
+
+The authoritative parity source is `backup-test-v478-before-professional-rewrite/index.html`. `legacy/index-v4.78.html` is not the parity source.

@@ -1,0 +1,62 @@
+name: PacoGO full regression refactor v1
+
+on:
+  push:
+    branches:
+      - refactor/professional-v1
+    paths:
+      - '**.js'
+      - '**.html'
+      - 'package.json'
+      - '.github/workflows/full-regression-refactor-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  node-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout refactor branch
+        uses: actions/checkout@v4
+        with:
+          ref: refactor/professional-v1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run complete Node test suite
+        run: npm test
+
+  browser-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout refactor branch
+        uses: actions/checkout@v4
+        with:
+          ref: refactor/professional-v1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Start local fixture server
+        run: |
+          python3 -m http.server 4173 --directory . > /tmp/pacogo-http.log 2>&1 &
+          echo $! > /tmp/pacogo-http.pid
+
+      - name: Run complete browser suite
+        run: npx playwright test --workers=1

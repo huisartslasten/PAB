@@ -3,7 +3,10 @@
 <head><meta charset="utf-8"><title>PacoGO test-attempt runtime browser fixture</title></head>
 <body>
 <script>
-var currentStudent='Zyon',currentLesson={id:42,type:'words'},__events=[];
+var currentStudent='Zyon',currentLesson={id:42,type:'words'},lessons=[],__events=[];
+function requireParent(){return true;}
+function refreshPageSidebars(){}
+function escapeHtml(value){return String(value ?? '').replace(/[&<>\"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[char]));}
 var db={from(table){return{insert(payload){__events.push({table,payload});if(table==='test_attempts')return{select(){return{single:async()=>({data:{id:91},error:null})}}};return Promise.resolve({error:null})}}}};
 </script>
 <script type="module" src="/test-history-storage.js"></script>

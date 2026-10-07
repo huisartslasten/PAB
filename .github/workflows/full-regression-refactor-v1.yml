@@ -79,3 +79,5 @@ jobs:
           status=$(git status --porcelain)
           printf '%s\n' "$status"
           test -z "$status"
+
+# Final verification run: exercise the committed lockfile on its own branch head.

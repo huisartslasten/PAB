@@ -19,7 +19,7 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, 'Complete professional agenda runtime migration') }}
     runs-on: ubuntu-latest
     outputs:
-      commit_sha: ${{ steps.migrate.outputs.commit_sha }}
+      commit_sha: ${{ steps.commit.outputs.commit_sha }}
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
@@ -28,19 +28,16 @@ jobs:
           fetch-depth: 0
 
       - name: Migrate legacy agenda runtime to professional boundary
-        id: migrate
         shell: python
         run: |
           from pathlib import Path
           import re
-          import subprocess
 
           path = Path('index.html')
           text = path.read_text(encoding='utf-8')
 
           if 'function buildAgendaItemsForRender()' not in text:
               print('Agenda runtime already migrated.')
-              subprocess.run(['git', 'rev-parse', 'HEAD'], check=True, stdout=open('/tmp/commit_sha', 'w'))
               raise SystemExit(0)
           if text.count('function buildAgendaItemsForRender()') != 1:
               raise SystemExit('Expected exactly one legacy buildAgendaItemsForRender implementation.')

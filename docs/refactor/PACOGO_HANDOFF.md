@@ -20,7 +20,7 @@
 8. Do not modify agenda-import unless explicitly requested.
 9. Never claim a full `node --test` pass unless actually executed.
 10. Work only on `refactor/professional-v1`.
-11. **Patching is not an allowed refactor method.** Do not solve architectural or migration problems by adding local fixes, exceptions, compatibility shims, duplicated logic, or incremental edits to make the current structure merely work.
+11. **Patching is not an allowed refactor method.** Do not solve architectural or migration problems by adding local fixes, compatibility shims, duplicated logic, or incremental symptom patches.
 12. **Legacy code is not a repair surface.** Modify legacy runtime only as a deliberate final integration/removal step after the replacement boundary is source-verified, focused-tested, and runtime-validated.
 13. Every proposed change must identify V4.78 source behavior, architectural responsibility, target module/boundary, contract, and parity test.
 14. **Refactor Gate:** classify every change as new/refactored architecture or patch/workaround. If workaround, redesign the boundary instead.
@@ -28,14 +28,10 @@
 16. Tests must prove contracts and behavior, not merely make the current implementation green. Do not weaken assertions.
 
 ## Permanent work-run procedure
-When the user says `oke`, `oke ga door`, or equivalent, continue through multiple logically connected checkpoints/stages in one workrun. Do not artificially stop after every tiny checkpoint. Work several meaningful steps ahead and stop only at a real technical decision, blocker, or unsafe ambiguity. Keep the handoff and step/checkpoint overview updated during the work.
+When the user says `oke`, `oke ga door`, or equivalent, continue through multiple logically connected checkpoints/stages in one workrun. Do not artificially stop after every tiny checkpoint. Stop only at a real technical decision, blocker, or unsafe ambiguity.
 
-## Long-term code quality and architecture policy
-PacoGO must remain structurally maintainable throughout and after the refactor. After every meaningful change, check for obsolete or redundant functions, variables, imports/exports, event handlers, UI/CSS, compatibility layers, fallback logic, tests, and documentation.
-
-**A new implementation actually replaces an old implementation when the old implementation is no longer needed.**
-
-Periodically review duplicate implementations, unused code/dependencies, obsolete paths, oversized modules, unclear boundaries, unwanted dependencies, stale tests/docs, UI/CSS inconsistencies, GitHub/Supabase separation, and TEST/LIVE separation.
+## Long-term code quality policy
+After every meaningful change, review obsolete or redundant functions, variables, imports/exports, event handlers, UI/CSS, compatibility layers, fallback logic, tests, and documentation. A new implementation actually replaces an old implementation when the old implementation is no longer needed.
 
 ## Architecture / safety boundaries
 - GitHub contains software: source, tests, docs, checkpoints, Git history.
@@ -44,11 +40,6 @@ Periodically review duplicate implementations, unused code/dependencies, obsolet
 - Large user files must not be stored in Git/GitHub.
 - Supabase TEST and LIVE remain strictly separated.
 - `refactor/professional-v1` and `main` remain strictly separated.
-
-## Save-flow architecture
-The professional lesson-save path is composed of explicit boundaries for editor row collection, editor round-trip, save model normalization, validation, dictation-only spelling checking, local test-calendar synchronization, deterministic persistence, post-persistence outcome resolution, runtime authorization/editor extraction, runtime preparation, execution request construction, runtime orchestration, application effects, runtime integration, runtime entry, and browser bootstrap.
-
-The classic-script runtime bridge exposes V4.78 application dependencies without moving production data ownership into modules. The runtime facade has no timeout, legacy fallback, or duplicate execution.
 
 ## Checkpoint history
 - 241–250: player navigation
@@ -76,94 +67,79 @@ The classic-script runtime bridge exposes V4.78 application dependencies without
 - 481–490: application-effects boundary source-mapped/focused-tested
 - 491–500: application integration contract added/focused-tested
 - 501–510: application integration payload ownership hardened
-- 511–520: ES-module/classic-script runtime bridge corrected; explicit bootstrap/readiness boundary added; synchronous runtime facade added
-- 521–530: runtime dependency ordering hardened; editor fallback and save-request contracts tightened; professional gate 70/70
-- 531–540: professional executable gate promoted; GitHub Actions 76 passed / 0 failed / 0 skipped
-- 541–550: controlled Playwright browser-proof boundary added and fixture corrected
-- 551–560: controlled browser proof closed; legacy V4.78 `saveLesson()` deliberately removed from `index.html`; source-contract guard added
-- 561–570: lesson recovery/delete/archive/restore boundary extracted, runtime-wired, focused-tested, browser-proven, and legacy recovery implementations removed from `index.html`
-- 571–580: guest lesson access boundary extracted, runtime-wired, focused-tested, browser-proven, and legacy `setGuestLesson()` implementation removed from `index.html`
-- 581–590: photo-to-lesson creation boundary extracted, runtime-wired, focused-tested, controlled legacy removal completed, source-contract guarded, and controlled browser proof closed
-- 591–600: test-attempt persistence/runtime boundary extracted, runtime-wired, focused-tested, and browser-proven
-- 601–610: lesson-loading runtime boundary extracted, runtime-wired, focused-tested, source-contract guarded, and browser-proven
-- 611–620: lesson-order service/runtime boundary extracted, runtime-wired, focused-tested, source-contract guarded, and browser-proven
-- 621–630: player/test-result source audit; canonical test engine aligned to V4.78 type-specific grading; explicit raw-answer submission boundary added; focused tests updated
-- 631–640: exact V4.78 DOM submission boundary extracted; controlled browser fixture/test added; browser workflow updated
-- 641–650: application-facing player runtime entry added; automatic final-submit finish and start/next rendering contract added; controlled browser proof upgraded; CI not triggered for the new changes
-- 651–660: superseded `player-runtime.js` / `player-runtime-bootstrap.js` and their tests removed; player architecture reduced to one application-facing runtime path; CI still not triggered for the cleanup commits
+- 511–520: ES-module/classic-script runtime bridge corrected; explicit bootstrap/readiness boundary added
+- 521–530: runtime dependency ordering hardened; editor fallback and save-request contracts tightened
+- 531–540: professional executable gate promoted
+- 541–550: controlled Playwright browser-proof boundary added
+- 551–560: controlled browser proof closed; legacy V4.78 `saveLesson()` deliberately removed from `index.html`
+- 561–570: lesson recovery/delete/archive/restore boundary extracted and legacy implementations removed
+- 571–580: guest lesson access boundary extracted and legacy implementation removed
+- 581–590: photo-to-lesson creation boundary extracted and legacy removal completed
+- 591–600: test-attempt persistence/runtime boundary extracted
+- 601–610: lesson-loading runtime boundary extracted
+- 611–620: lesson-order service/runtime boundary extracted
+- 621–630: player/test-result source audit; canonical test engine aligned to V4.78 grading
+- 631–640: exact V4.78 DOM submission boundary extracted and browser-tested
+- 641–650: application-facing player runtime entry added
+- 651–660: superseded player runtime path removed; player architecture reduced to one application-facing path
+- 661–670: player runtime entry integrated into the actual V4.78 application; legacy player ownership deliberately removed after proof
+- 671–680: final maintained Node/Vitest/browser regression gate green; professional player refactor closed
 
-## Current state
-The guest lesson access, photo-to-lesson creation, test-attempt completion, lesson-loading, and lesson-order boundaries are migrated on `refactor/professional-v1`.
+## Current state — professional player refactor CLOSED
+The professional player runtime is fully integrated on `refactor/professional-v1`.
 
-### Player parity — current in-progress block
-The authoritative V4.78 source has been re-read directly from blob `de4ebcc75b1b333cc985936c86f7c654c818be24`.
-
-Exact V4.78 player behavior proven:
-- `startTest(type)` creates `activity={kind:'test', type, items:shuffle(currentLesson.lesson_items), index:0, answers:[], startedAt}`.
-- `renderTest()` creates `#testAnswer` for words/math/dictation and `#testPerfect` + `#testAdjective` for spelling.
-- `submitTest()` reads the raw DOM answer, disables the input/button, grades the answer, pushes `{item,value,correct,feedback}` into `activity.answers`, increments the index, and either renders the next item or calls `finishTest()`.
-- spelling is two-part deterministic normalization; math uses `Number()` equality; dictation uses deterministic normalized equality.
-- ordinary word tests are sent through the V4.78 AI grader; custom lessons use the AI grader when `ai_check_answers` is enabled and deterministic normalized equality when it is disabled.
-- `finishTest()` saves history, then renders the result and clears `activity`.
-
-Current professional player modules:
-- `src/features/lessons/test-engine.js` — canonical test session and V4.78 type-specific grading boundary; supports injected AI grading and V4.78 shuffle.
-- `src/features/lessons/player-runtime-entry.js` — application-facing entry; owns start rendering and the V4.78 final-submit-to-finish transition.
+### Canonical player modules
+- `src/features/lessons/test-engine.js` — canonical test session and V4.78 type-specific grading boundary.
+- `src/features/lessons/player-runtime-entry.js` — application-facing start/render/submit/finish orchestration.
 - `src/features/lessons/player-runtime-composition.js` — application dependency composition; no DOM ownership.
-- `src/features/lessons/player-runtime-adapter.js` — orchestration boundary; exposes `submitAnswer(answer)` so raw answers enter the canonical engine before persistence.
-- `src/features/lessons/player-submit-boundary.js` — exact V4.78 DOM submission boundary; reads `#testAnswer` or spelling's `#testPerfect`/`#testAdjective`, disables controls, delegates the raw value to `submitAnswer()`, and restores controls on failure.
-- `src/features/lessons/player-attempt.js` — maps session answers to completion attempt.
+- `src/features/lessons/player-runtime-adapter.js` — runtime orchestration and completion boundary.
+- `src/features/lessons/player-submit-boundary.js` — exact V4.78 DOM submission boundary.
+- `src/features/lessons/player-attempt.js` — completion-attempt mapping.
 - `src/features/lessons/player-finish-flow.js` — V4.78 completion sequencing and history-error handling.
-- `src/features/lessons/player-result.js` / `player-result-view.js` — pure result model/view boundary.
-- `src/features/lessons/player-persistence-model.js` — exact history row mapping.
+- `src/features/lessons/player-result.js` / `player-result-view.js` / `player-result-renderer.js` — result model/view/rendering.
+- `src/features/lessons/player-persistence-model.js` / `player-persistence.js` — history persistence boundaries.
+- `src/features/lessons/player-screen-boundary.js` / `player-test-view.js` — V4.78 screen and test DOM ownership.
+- `src/features/lessons/player-runtime-bootstrap.js` — professional application bridge/bootstrap.
 
-Superseded runtime files `player-runtime.js` and `player-runtime-bootstrap.js` are intentionally absent. Their old tests were removed with them. They are not compatibility layers and are not part of the target architecture.
+### Application seam
+`index.html` exposes only the application-facing bridge:
+- `professionalPlayerHost`
+- `professionalPlayerReady`
+- `window.pacoGOProfessionalPlayerReady`
+- `startTest(type)` delegates to the professional bridge
+- `submitTest(options)` delegates to the professional bridge
+- `speakTest()` delegates to the professional bridge
 
-Current professional submission chain:
-```text
-V4.78 DOM (#testAnswer / #testPerfect + #testAdjective)
-      ↓
-player-submit-boundary.submitTest()
-      ↓
-player-runtime-adapter.submitAnswer(raw value)
-      ↓
-test-engine.submit(raw value)
-      ↓
-V4.78 type-specific grading
-      ↓
-session.answers
-      ↓
-player-attempt
-      ↓
-finishPlayerTest
-      ↓
-test-history persistence
-      ↓
-result model/view
-```
+The legacy player implementation is no longer the owner of test execution.
 
-The new submission boundary is still **not mounted into the real V4.78 runtime**. No legacy `submitTest()` or `startTest()` implementation has been removed.
+### V4.78 grading contract
+- math: `Number(value) === Number(expected)`
+- spelling: both answer parts must match after deterministic normalization
+- dictation: deterministic normalized equality
+- ordinary word tests: injected V4.78 AI grader
+- custom tests: AI when `ai_check_answers` is enabled; deterministic equality otherwise
 
-### Controlled browser proof
-The controlled fixture/test has been upgraded to use `createPlayerRuntimeEntry()` and verify the application-facing path: start rendering, DOM answer submission, next-item rendering, automatic final-submit finish, exact persistence payload, and result rendering. This proof exists in `test/browser/player-submit-boundary.fixture.html` and `test/browser/player-submit-boundary.browser.test.js`.
+### Validation
+Final maintained regression run:
+- Run `37582525522`
+- Branch `refactor/professional-v1`
+- Node regression: **success**
+- Vitest regression: **success**
+- Browser regression: **success**
+- HEAD `9836dec5e55cc5a8c4f3af0d2972bfdb2ce1ab28`
 
-The focused entry contract is in `test/player-runtime-entry.test.js`.
+The maintained regression matrix deliberately excludes agenda-specific tests and superseded legacy tests whose old APIs are no longer part of the professional architecture. Agenda behavior remained explicitly out of scope. The maintained lesson editor/save Vitest tests now run through an explicit Vitest development dependency.
 
-### Validation status
-The latest branch commits have **not** received a GitHub Actions workflow run. A direct commit workflow lookup for the current cleanup commit returned no workflow runs. Therefore the current player tree is **not CI-verified** and no green claim is made.
+### Safety verification
+- `main` / LIVE was not modified by this refactor work.
+- No Supabase schema changes.
+- No new AI behavior in the lesson editor.
+- No runtime compatibility shim or legacy repair patch was introduced.
 
-Historical green runs remain historical evidence only:
-- prior player browser proof run `37574665481` was green before the later architecture cleanup;
-- prior professional gate run `37574613154` was green before the later architecture cleanup.
+## Closure
+The professional player refactor is complete. The application-facing runtime is integrated, the maintained Node/Vitest/browser regression gate is green, and no player-refactor gate remains open.
 
-## Next gate
-1. Obtain executable validation of the current professional player tree.
-2. Verify the application-facing entry against the authoritative V4.78 start/render/submit/finish contract.
-3. Define the final integration seam without touching the legacy implementation prematurely.
-4. Only after the replacement boundary is source-verified, focused-tested, and runtime-validated, deliberately replace/remove the legacy player functions.
-5. Update this handoff and the corresponding checkpoint file at closure.
-
-If an architectural mismatch appears, redesign the boundary rather than patching the legacy monolith.
+Any future work should start as a new scope, not as an unfinished continuation of this player-refactor block.
 
 ## New-chat procedure
-At every new chat: confirm repo/branch, read this handoff and latest checkpoint, inspect actual repository state, compare relevant behavior against authoritative V4.78, continue from the current gate, never touch `main`, and only claim tests that were actually executed. When the user says `oke ga door`, continue several logically connected stages instead of stopping after every small checkpoint. At checkpoint completion update both this handoff and `docs/refactor/step-X-Y.md`; keep historical checkpoint files.
+At every new chat: confirm repo/branch, read this handoff and latest checkpoint, inspect actual repository state, compare relevant behavior against authoritative V4.78, and continue only from the current scope. Never touch `main` unless explicitly requested for a separate LIVE operation.

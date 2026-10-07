@@ -60,7 +60,7 @@ jobs:
         run: npx playwright test test/browser/*.browser.test.js --workers=1
       - name: Verify working tree stayed clean
         run: |
-          rm -rf test-results playwright-report
+          rm -rf test-results playwright-report node_modules
           status=$(git status --porcelain)
           printf '%s\n' "$status"
           test -z "$status"

@@ -84,51 +84,74 @@ After every meaningful change, review obsolete or redundant functions, variables
 - 651–660: superseded player runtime path removed; player architecture reduced to one application-facing path
 - 661–670: player runtime entry integrated into the actual V4.78 application; legacy player ownership deliberately removed after proof
 - 671–680: final maintained Node/Vitest/browser regression gate green; professional player refactor closed
+- 681–690: professional Agenda source audit, domain/runtime boundaries, import/review separation, application integration, legacy Agenda removal, and final regression gate green
 
-## Current state — professional player refactor CLOSED
-The professional player runtime is fully integrated on `refactor/professional-v1`.
+## Current state — Professional V1 CLOSED
+Professional V1 consists of the completed Player and Agenda refactor blocks on `refactor/professional-v1`.
 
-### Canonical player modules
-- `src/features/lessons/test-engine.js` — canonical test session and V4.78 type-specific grading boundary.
-- `src/features/lessons/player-runtime-entry.js` — application-facing start/render/submit/finish orchestration.
-- `src/features/lessons/player-runtime-composition.js` — application dependency composition; no DOM ownership.
-- `src/features/lessons/player-runtime-adapter.js` — runtime orchestration and completion boundary.
-- `src/features/lessons/player-submit-boundary.js` — exact V4.78 DOM submission boundary.
-- `src/features/lessons/player-attempt.js` — completion-attempt mapping.
-- `src/features/lessons/player-finish-flow.js` — V4.78 completion sequencing and history-error handling.
-- `src/features/lessons/player-result.js` / `player-result-view.js` / `player-result-renderer.js` — result model/view/rendering.
-- `src/features/lessons/player-persistence-model.js` / `player-persistence.js` — history persistence boundaries.
-- `src/features/lessons/player-screen-boundary.js` / `player-test-view.js` — V4.78 screen and test DOM ownership.
-- `src/features/lessons/player-runtime-bootstrap.js` — professional application bridge/bootstrap.
+### Professional Player — CLOSED
+The professional player runtime is fully integrated.
 
-### Application seam
-`index.html` exposes only the application-facing bridge:
-- `professionalPlayerHost`
-- `professionalPlayerReady`
-- `window.pacoGOProfessionalPlayerReady`
-- `startTest(type)` delegates to the professional bridge
-- `submitTest(options)` delegates to the professional bridge
-- `speakTest()` delegates to the professional bridge
+Canonical modules include:
+- `src/features/lessons/test-engine.js`
+- `src/features/lessons/player-runtime-entry.js`
+- `src/features/lessons/player-runtime-composition.js`
+- `src/features/lessons/player-runtime-adapter.js`
+- `src/features/lessons/player-submit-boundary.js`
+- `src/features/lessons/player-attempt.js`
+- `src/features/lessons/player-finish-flow.js`
+- `src/features/lessons/player-result.js`
+- `src/features/lessons/player-result-view.js`
+- `src/features/lessons/player-result-renderer.js`
+- `src/features/lessons/player-persistence-model.js`
+- `src/features/lessons/player-persistence.js`
+- `src/features/lessons/player-screen-boundary.js`
+- `src/features/lessons/player-test-view.js`
+- `src/features/lessons/player-runtime-bootstrap.js`
 
 The legacy player implementation is no longer the owner of test execution.
 
-### V4.78 grading contract
-- math: `Number(value) === Number(expected)`
-- spelling: both answer parts must match after deterministic normalization
-- dictation: deterministic normalized equality
-- ordinary word tests: injected V4.78 AI grader
-- custom tests: AI when `ai_check_answers` is enabled; deterministic equality otherwise
-
-### Validation
-Final maintained regression run:
-- Run `37582525522`
-- Branch `refactor/professional-v1`
+### Player validation
+- GitHub Actions run `37582525522`
 - Node regression: **success**
 - Vitest regression: **success**
 - Browser regression: **success**
-- HEAD `9836dec5e55cc5a8c4f3af0d2972bfdb2ce1ab28`
+- Validated HEAD at that run: `9836dec5e55cc5a8c4f3af0d2972bfdb2ce1ab28`
 
-The maintained regression matrix deliberately excludes agenda-specific tests and superseded legacy tests whose old APIs are no longer part of the professional architecture. Agenda behavior remained explicitly out of scope. The maintained lesson editor/save Vitest tests now run through an explicit Vitest development dependency.
+### Professional Agenda — CLOSED
+The professional Agenda boundary is integrated and replaces legacy Agenda runtime ownership.
+
+Canonical Agenda areas include:
+- `src/features/agenda/agenda-domain.js`
+- `src/features/agenda/date-normalization.js`
+- `src/features/agenda/read-service.js`
+- `src/features/agenda/runtime.js`
+- `src/features/agenda/runtime-entry.js`
+- `src/features/agenda/custom-actions.js`
+- `src/features/agenda/custom-storage.js`
+- `src/features/agenda/test-calendar.js`
+- `src/features/agenda/import-pipeline.js`
+- `src/features/agenda/review.js`
+- `src/features/agenda/merge.js`
+- `src/features/agenda/persistence.js`
+
+The deterministic Agenda read path is separated from AI/media import. Import follows candidate → review → storage and does not become part of deterministic rendering merely because AI produced a candidate.
+
+The V4.78 agenda composition and duplicate semantics were source-verified before integration.
+
+### Agenda validation
+- GitHub Actions run `37619910344`
+- Job `112787254934` (`agenda-cutover-and-regression`)
+- Node regression: **success**
+- Vitest regression: **success**
+- Browser regression: **success**
+- Legacy Agenda runtime removal/bridge verification: **success**
+
+### Final repository state
+- Final branch HEAD: `21a7ba59962dd66fcf8fc621908b227c683531e4`
+- Final cleanup commit removed temporary workflow-trigger infrastructure only.
+- No fresh regression run is claimed on that cleanup commit; the recorded Player and Agenda runs above are the formal validation evidence.
+- Official closure report: `docs/refactor/PACOGO_PROFESSIONAL_V1_FINAL_REPORT.md`
 
 ### Safety verification
 - `main` / LIVE was not modified by this refactor work.
@@ -137,9 +160,11 @@ The maintained regression matrix deliberately excludes agenda-specific tests and
 - No runtime compatibility shim or legacy repair patch was introduced.
 
 ## Closure
-The professional player refactor is complete. The application-facing runtime is integrated, the maintained Node/Vitest/browser regression gate is green, and no player-refactor gate remains open.
+**Professional V1 is officially closed.**
 
-Any future work should start as a new scope, not as an unfinished continuation of this player-refactor block.
+The Player and Agenda architecture is integrated, the recorded maintained regression gates are green, and no Professional V1 gate remains open within the agreed scope.
+
+Future work must start as a new scope. It must not be treated as unfinished Professional V1 work.
 
 ## New-chat procedure
-At every new chat: confirm repo/branch, read this handoff and latest checkpoint, inspect actual repository state, compare relevant behavior against authoritative V4.78, and continue only from the current scope. Never touch `main` unless explicitly requested for a separate LIVE operation.
+At every new chat: confirm repo/branch, read this handoff and `docs/refactor/PACOGO_PROFESSIONAL_V1_FINAL_REPORT.md`, inspect actual repository state, compare relevant behavior against authoritative V4.78, and continue only from the current scope. Never touch `main` unless explicitly requested for a separate LIVE operation.

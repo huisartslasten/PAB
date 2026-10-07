@@ -1,0 +1,123 @@
+name: PacoGO one-time test-history migration
+
+on:
+  push:
+    branches:
+      - refactor/professional-v1
+    paths:
+      - '.github/workflows/test-history-migration-once.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout refactor branch
+        uses: actions/checkout@v4
+        with:
+          ref: refactor/professional-v1
+
+      - name: Remove legacy test-history implementation with exact guards
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          start_marker = "async function showTestHistory(studentFilter=''){"
+          if text.count(start_marker) != 1:
+              raise SystemExit(f'Expected exactly one legacy test-history function, found {text.count(start_marker)}')
+
+          def find_function_end(source, start):
+              brace = source.find('{', start)
+              if brace < 0:
+                  raise SystemExit('Could not find function opening brace')
+              depth = 1
+              i = brace + 1
+              state = 'code'
+              escaped = False
+              while i < len(source):
+                  c = source[i]
+                  n = source[i + 1] if i + 1 < len(source) else ''
+                  if state == 'code':
+                      if c == '/' and n == '/':
+                          state = 'line_comment'; i += 2; continue
+                      if c == '/' and n == '*':
+                          state = 'block_comment'; i += 2; continue
+                      if c == "'": state = 'single'; i += 1; continue
+                      if c == '"': state = 'double'; i += 1; continue
+                      if c == '`': state = 'template'; i += 1; continue
+                      if c == '{': depth += 1
+                      elif c == '}':
+                          depth -= 1
+                          if depth == 0:
+                              return i + 1
+                      i += 1
+                      continue
+                  if state == 'line_comment':
+                      if c == '\n': state = 'code'
+                      i += 1
+                      continue
+                  if state == 'block_comment':
+                      if c == '*' and n == '/': state = 'code'; i += 2
+                      else: i += 1
+                      continue
+                  if state in ('single', 'double', 'template'):
+                      if escaped:
+                          escaped = False
+                      elif c == '\\':
+                          escaped = True
+                      elif (state == 'single' and c == "'") or (state == 'double' and c == '"') or (state == 'template' and c == '`'):
+                          state = 'code'
+                      i += 1
+                      continue
+              raise SystemExit('Could not find end of legacy test-history function')
+
+          start = text.index(start_marker)
+          end = find_function_end(text, start)
+          text = text[:start] + text[end:]
+
+          old_student = "showTestHistory(currentStudent)"
+          old_plain = "showTestHistory()"
+          if text.count(old_student) != 2:
+              raise SystemExit(f'Expected exactly two student-filter call sites, found {text.count(old_student)}')
+          if text.count(old_plain) != 1:
+              raise SystemExit(f'Expected exactly one parent call site, found {text.count(old_plain)}')
+
+          text = text.replace(old_student, 'showTestHistoryRuntime(currentStudent)')
+          text = text.replace(old_plain, 'showTestHistoryRuntime()')
+
+          forbidden = [
+              start_marker,
+              "let query=db.from('test_attempts').select('id,lesson_id,student,score,total_questions",
+              old_student,
+              'onclick="showTestHistory()"',
+          ]
+          for value in forbidden:
+              if value in text:
+                  raise SystemExit(f'Legacy source remains after migration: {value}')
+
+          if 'showTestHistoryRuntime(currentStudent)' not in text:
+              raise SystemExit('Professional student-filter runtime call is missing')
+          if 'showTestHistoryRuntime()' not in text:
+              raise SystemExit('Professional parent runtime call is missing')
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Run test-history source contract
+        run: node --test test/test-history-runtime-source-contract.test.js
+
+      - name: Commit migration and remove one-time workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html .github/workflows/test-history-migration-once.yml
+          git diff --cached --check
+          git diff --cached --stat
+          git commit -m "refactor(test-history): remove legacy V4.78 implementation"
+          git push origin HEAD:refactor/professional-v1

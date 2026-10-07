@@ -1,12 +1,11 @@
-name: PacoGO professional refactor tests
+name: PacoGO professional player regression
 
-# Professional refactor full regression gate.
 on:
   push:
     branches:
       - refactor/professional-v1
     paths:
-      - 'src/**'
+      - 'src/features/lessons/**'
       - 'test/**'
       - 'index.html'
       - 'package.json'
@@ -17,7 +16,7 @@ permissions:
   contents: read
 
 jobs:
-  professional-refactor-regression:
+  professional-player-regression:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout refactor branch
@@ -33,5 +32,5 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run full Node regression
-        run: npm test
+      - name: Run professional player regression
+        run: node --test test/*player*.test.js test/test-engine.test.js

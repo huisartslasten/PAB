@@ -1,5 +1,6 @@
 import { createAgendaReadService } from './read-service.js';
 
+// Professional Agenda runtime: deterministic V4.78 week composition and navigation.
 function agendaKey(date) {
   const d = new Date(date);
   d.setHours(12, 0, 0, 0);
@@ -102,9 +103,9 @@ export function createAgendaRuntime({
       const events = visible.length
         ? visible.map(item => {
             const custom = String(item.id || '').startsWith('agenda_');
-            const match = item.lessonId ? onLessonMatch(item) : onLessonMatch(item);
+            const match = onLessonMatch(item);
             return `<div class="agenda-week-event">` +
-              `<div class="agenda-week-event-title">${typeIcon(item.type) === item.icon ? item.icon : (item.icon || typeIcon(item.type))} ${escapeHtml(item.title)}</div>` +
+              `<div class="agenda-week-event-title">${item.icon || typeIcon(item.type)} ${escapeHtml(item.title)}</div>` +
               `<div class="agenda-week-event-meta">${escapeHtml(item.meta || typeLabel(item.type))}</div>` +
               `${match || ''}` +
               `${custom ? `<div class="agenda-event-actions"><button type="button" class="secondary agenda-edit" data-agenda-id="${escapeHtml(item.id)}">✏️ Bewerken</button><button type="button" class="danger agenda-delete" data-agenda-id="${escapeHtml(item.id)}">🗑️ Verwijderen</button></div>` : ''}` +

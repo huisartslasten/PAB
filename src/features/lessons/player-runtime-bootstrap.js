@@ -15,6 +15,7 @@ export function createProfessionalPlayerBridge({
   clearActivity,
   escapeHtml,
   speakAiText,
+  stopAiAudio = () => {},
   gradeAnswer,
   shuffle
 } = {}) {
@@ -58,7 +59,7 @@ export function createProfessionalPlayerBridge({
         resultRenderer.render(payload);
       },
       cancelSpeech: () => window.speechSynthesis?.cancel(),
-      stopAiAudio: () => {},
+      stopAiAudio,
       clearActivity,
       showLessonChoice,
       goBack,

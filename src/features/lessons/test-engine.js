@@ -16,8 +16,6 @@ async function evaluateTestAnswer(type, value, expected, { gradeAnswer, aiCheckA
     );
   }
 
-  // V4.78 sends ordinary word tests through the AI grader. Custom lessons
-  // use the same path only when AI answer checking is enabled.
   const useAi = type !== 'custom' || aiCheckAnswers;
   if (useAi) {
     if (typeof gradeAnswer !== 'function') {
@@ -34,9 +32,11 @@ export function createTestSession(items = [], {
   type = 'words',
   startedAt = new Date().toISOString(),
   gradeAnswer = null,
-  aiCheckAnswers = true
+  aiCheckAnswers = true,
+  shuffle = null
 } = {}) {
-  const source = Array.isArray(items) ? [...items] : [];
+  const initial = Array.isArray(items) ? [...items] : [];
+  const source = typeof shuffle === 'function' ? shuffle(initial) : initial;
   let index = 0;
   const answers = [];
   const testType = String(type || 'words');

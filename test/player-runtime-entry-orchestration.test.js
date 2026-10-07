@@ -28,7 +28,7 @@ function documentDouble(values) {
 }
 
 test('player runtime entry owns start-render-submit-finish sequencing', async () => {
-  const doc = documentDouble(['appel']);
+  const doc = documentDouble(['peer']);
   const rendered = [];
   const events = [];
   const prepared = [];

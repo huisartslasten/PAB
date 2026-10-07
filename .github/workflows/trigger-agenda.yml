@@ -1,0 +1,10 @@
+name: Trigger Agenda migration
+on:
+  push:
+    branches:
+      - agenda-actions-trigger-2
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo trigger

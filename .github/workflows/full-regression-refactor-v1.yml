@@ -21,6 +21,8 @@ jobs:
           node-version: 22
       - name: Install dependencies without modifying repository files
         run: npm install --no-package-lock
+      - name: Diagnose dependency audit
+        run: npm audit --json > /tmp/npm-audit.json || true; cat /tmp/npm-audit.json
       - name: Verify complete Agenda runtime boundary
         run: |
           ! grep -q 'function buildAgendaItemsForRender()' index.html

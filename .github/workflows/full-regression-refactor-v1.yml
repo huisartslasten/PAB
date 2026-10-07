@@ -32,7 +32,17 @@ jobs:
         run: npm install
 
       - name: Run complete Node test suite
-        run: node --test test/*.test.js
+        run: |
+          set -o pipefail
+          node --test test/*.test.js 2>&1 | tee node-regression.log
+
+      - name: Upload Node regression log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-regression-log
+          path: node-regression.log
+          if-no-files-found: ignore
 
   browser-regression:
     runs-on: ubuntu-latest
@@ -48,7 +58,10 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
-        run: npm install
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
 
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
@@ -59,4 +72,14 @@ jobs:
           echo $! > /tmp/pacogo-http.pid
 
       - name: Run complete browser suite
-        run: npx playwright test test/browser/*.browser.test.js --workers=1
+        run: |
+          set -o pipefail
+          npx playwright test test/browser/*.browser.test.js --workers=1 2>&1 | tee browser-regression.log
+
+      - name: Upload browser regression log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-regression-log
+          path: browser-regression.log
+          if-no-files-found: ignore

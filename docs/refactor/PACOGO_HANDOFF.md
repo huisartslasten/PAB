@@ -9,6 +9,11 @@
 - Authoritative source blob: `de4ebcc75b1b333cc985936c86f7c654c818be24`.
 - `legacy/index-v4.78.html` is **not** the parity source.
 
+## Mandatory engineering standard
+**Before any implementation, read `docs/engineering/PACOGO_ENGINEERING_STANDARD.md`. Its rules are binding for all PacoGO development.**
+
+The Engineering Standard defines how PacoGO must be built. This handoff defines the current technical state. The two documents have different responsibilities and must both be read when starting a new development chat.
+
 ## Non-negotiable rules
 1. Preserve V4.78 behavior before improving/designing.
 2. No visual redesign during parity work.
@@ -26,6 +31,7 @@
 14. **Refactor Gate:** classify every change as new/refactored architecture or patch/workaround. If workaround, redesign the boundary instead.
 15. If an architectural mismatch, missing seam, or failed assumption is discovered, stop and redesign the boundary rather than patching the symptom.
 16. Tests must prove contracts and behavior, not merely make the current implementation green. Do not weaken assertions.
+17. **Every meaningful update must follow the permanent Engineering Standard, including the readable TEST-version update and the two-code handoff to the user.**
 
 ## Permanent work-run procedure
 When the user says `oke`, `oke ga door`, or equivalent, continue through multiple logically connected checkpoints/stages in one workrun. Do not artificially stop after every tiny checkpoint. Stop only at a real technical decision, blocker, or unsafe ambiguity.
@@ -148,20 +154,23 @@ The V4.78 agenda composition and duplicate semantics were source-verified before
 - Legacy Agenda runtime removal/bridge verification: **success**
 
 ### Final repository state
-- Current branch HEAD: `84c006a21cef66b24c677a9849a6e2cb3bfe1ea6`
-- Latest full regression workflow: GitHub Actions run `37637717369`
-- Latest full regression result: **success**
-- Latest gate: 366 Node tests, 24 Vitest tests, 21 browser tests, Agenda boundary, Player boundary, and working-tree cleanliness all passed.
-- Final cleanup removed generated `node_modules`, Playwright reports, and test-result directories before the working-tree cleanliness assertion; CI does not modify application source.
-- Official closure report: `docs/refactor/PACOGO_PROFESSIONAL_V1_FINAL_REPORT.md`
+- Professional V1 closure was followed by dependency reproducibility/security cleanup on `refactor/professional-v1`.
+- Final branch HEAD: `1fdf792c294f9b654e5fb98e6399782d828f46a5`.
+- Latest full regression workflow: GitHub Actions run `37654163345`.
+- Latest full regression result: **success**.
+- Latest gate: 366 Node tests, 24 Vitest tests, 21 browser tests, Agenda boundary, Player boundary, zero known npm vulnerabilities, and working-tree cleanliness all passed.
+- CI generated and committed a reproducible `package-lock.json` and `npm audit --audit-level=low` passed with zero known vulnerabilities.
+- Final cleanup removes generated test/runtime artifacts before the working-tree cleanliness assertion.
+- Official closure report: `docs/refactor/PACOGO_PROFESSIONAL_V1_FINAL_REPORT.md`.
+- Permanent engineering rules: `docs/engineering/PACOGO_ENGINEERING_STANDARD.md`.
 
-### Dependency hygiene note
-- `package.json` currently has only `@playwright/test` and `vitest` as dev dependencies and no committed `package-lock.json`.
-- CI currently installs with `npm install --no-package-lock`.
-- CI reported 3 npm vulnerabilities during installation. These are dependency-tree findings, not application-code regressions. They should be assessed separately; dependency upgrades must not be made blindly because they can change the tested toolchain.
+### Dependency hygiene
+- `vitest` is pinned to `5.0.3` in `package.json`.
+- The committed lockfile is the reproducibility source for CI installation.
+- Final CI audit is clean with zero known vulnerabilities.
 
 ### Safety verification
-- `main` / LIVE was not modified by this refactor work.
+- `main` / LIVE was not modified by the Professional V1 work or dependency cleanup.
 - No Supabase schema changes.
 - No new AI behavior in the lesson editor.
 - No runtime compatibility shim or legacy repair patch was introduced.
@@ -169,11 +178,31 @@ The V4.78 agenda composition and duplicate semantics were source-verified before
 ## Closure
 **Professional V1 is officially closed.**
 
-The Player and Agenda architecture is integrated, the latest full regression gate is green on the current branch HEAD, and no Professional V1 implementation gate remains open within the agreed scope.
-
-Dependency vulnerability cleanup is a separate maintenance task, not unfinished Professional V1 implementation work.
+The Player and Agenda architecture is integrated, dependency reproducibility/security is clean, the latest full regression gate is green on the current branch HEAD, and no Professional V1 implementation gate remains open within the agreed scope.
 
 Future work must start as a new scope. It must not be treated as unfinished Professional V1 work.
 
-## New-chat procedure
-At every new chat: confirm repo/branch, read this handoff and `docs/refactor/PACOGO_PROFESSIONAL_V1_FINAL_REPORT.md`, inspect actual repository state, compare relevant behavior against authoritative V4.78, and continue only from the current scope. Never touch `main` unless explicitly requested for a separate LIVE operation.
+## New-chat procedure — MANDATORY
+At every new chat:
+
+1. Confirm repository: `huisartslasten/PAB`.
+2. Confirm branch: `refactor/professional-v1`.
+3. Confirm `main` is LIVE and must not be touched.
+4. Read this handoff.
+5. Read `docs/engineering/PACOGO_ENGINEERING_STANDARD.md`.
+6. Inspect the actual repository state before implementation.
+7. Identify the relevant architectural owner/boundary.
+8. Only then begin development.
+
+The Engineering Standard is binding. Do not rely on memory from a previous chat instead of reading it.
+
+## Mandatory update handoff
+After every completed update, the developer must:
+
+1. update and verify the readable TEST version;
+2. report the exact TEST version;
+3. provide the two established PacoGO codes/instructions: push/update to `refactor/professional-v1` and update/refresh/publish the TEST site/runtime;
+4. report what changed and the test/regression status;
+5. confirm `main`/LIVE was not modified.
+
+Never call an update complete without this handoff.

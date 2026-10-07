@@ -27,6 +27,9 @@
 15. If an architectural mismatch, missing seam, or failed assumption is discovered, stop and redesign the boundary rather than patching the symptom.
 16. Tests must prove contracts and behavior, not merely make the current implementation green. Do not weaken assertions.
 
+## Permanent work-run procedure
+When the user says `oke`, `oke ga door`, or equivalent, continue through multiple logically connected checkpoints/stages in one workrun. Do not artificially stop after every tiny checkpoint. Work several meaningful steps ahead and stop only at a real technical decision, blocker, or unsafe ambiguity. Keep the handoff and step/checkpoint overview updated during the work.
+
 ## Long-term code quality and architecture policy
 PacoGO must remain structurally maintainable throughout and after the refactor. After every meaningful change, check for obsolete or redundant functions, variables, imports/exports, event handlers, UI/CSS, compatibility layers, fallback logic, tests, and documentation.
 
@@ -84,10 +87,71 @@ The classic-script runtime bridge exposes V4.78 application dependencies without
 - 591–600: test-attempt persistence/runtime boundary extracted, runtime-wired, focused-tested, and browser-proven
 - 601–610: lesson-loading runtime boundary extracted, runtime-wired, focused-tested, source-contract guarded, and browser-proven
 - 611–620: lesson-order service/runtime boundary extracted, runtime-wired, focused-tested, source-contract guarded, and browser-proven
+- 621–630: player/test-result source audit; canonical test engine aligned to V4.78 type-specific grading; explicit raw-answer submission boundary added; focused tests updated; browser wiring/removal still open
 
 ## Current state
 The guest lesson access, photo-to-lesson creation, test-attempt completion, lesson-loading, and lesson-order boundaries are migrated on `refactor/professional-v1`.
 
+### Player parity — current in-progress block
+The authoritative V4.78 source has now been re-read directly from blob `de4ebcc75b1b333cc985936c86f7c654c818be24`.
+
+Exact V4.78 player behavior proven:
+- `startTest(type)` creates `activity={kind:'test', type, items:shuffle(currentLesson.lesson_items), index:0, answers:[], startedAt}`.
+- `renderTest()` reads the current item and creates the appropriate DOM input.
+- `submitTest()` reads the raw DOM answer, disables the input/button, grades the answer, pushes `{item,value,correct,feedback}` into `activity.answers`, increments `activity.index`, and either renders the next item or calls `finishTest()`.
+- spelling is two-part deterministic normalization; math uses `Number()` equality; dictation uses deterministic normalized equality.
+- ordinary word tests are sent through the V4.78 AI grader; custom lessons use the AI grader when `ai_check_answers` is enabled and deterministic normalized equality when it is disabled.
+- `finishTest()` saves history, then renders the result and clears `activity`.
+
+Important correction to earlier assumptions: **ordinary V4.78 word tests are not purely deterministic. They use the AI grading boundary.** The professional test engine must therefore receive an explicit injected `gradeAnswer` function rather than silently replacing V4.78 AI grading with local equality.
+
+Current professional player modules:
+- `src/features/lessons/test-engine.js` — canonical test session and V4.78 type-specific grading boundary; now supports injected AI grading and V4.78 shuffle.
+- `src/features/lessons/player-runtime-adapter.js` — orchestration boundary; now exposes explicit `submitAnswer(answer)` so raw answers enter the canonical engine before persistence.
+- `src/features/lessons/player-attempt.js` — maps session answers to completion attempt.
+- `src/features/lessons/player-finish-flow.js` — V4.78 completion sequencing and history-error handling.
+- `src/features/lessons/player-result.js` / `player-result-view.js` — pure result model/view boundary.
+- `src/features/lessons/player-persistence-model.js` — exact history row mapping.
+
+Current parity boundary:
+```text
+V4.78 DOM answer
+      ↓
+professional submitAnswer(raw value)
+      ↓
+test-engine.submit(raw value)
+      ↓
+V4.78 type-specific grading
+      ↓
+session.answers
+      ↓
+player-attempt
+      ↓
+finishPlayerTest
+      ↓
+test-history persistence
+      ↓
+result model/view
+```
+
+The professional adapter is **still intentionally unmounted** from the V4.78 runtime. No legacy `submitTest()` or `startTest()` implementation has been removed yet.
+
+### Focused player tests
+Updated focused contracts now cover:
+- V4.78 word-test AI grading boundary with injected grader;
+- required explicit AI grader for ordinary word tests;
+- dictation grading;
+- math grading;
+- spelling two-part grading;
+- custom deterministic grading when AI checking is disabled;
+- raw-answer submission through the player runtime adapter;
+- persistence payload and completion sequencing;
+- history-save failure behavior;
+- retry/back navigation callbacks.
+
+These changes are on `refactor/professional-v1`. CI/browser proof for the latest commits must be checked before claiming the block closed.
+
+### Other migrated paths
 The test-attempt path consists of:
 - `src/features/test-history/test-attempt-write-service.js` — deterministic `test_attempts` / `test_attempt_answers` persistence;
 - `src/features/test-history/test-attempt-runtime.js` — student-owned completion runtime contract;
@@ -102,8 +166,6 @@ The lesson-loading path consists of:
 - existing `src/services/lesson-service.js` — deterministic lesson query/data boundary reused without schema changes;
 - `index.html` — thin `loadLessons()` readiness-backed facade with no legacy Supabase implementation remaining.
 
-The lesson-loading contract preserves the V4.78 query shape, lesson/item ordering, state update, `showHome()` success behavior, and exact `Lessen laden mislukt: <message>` error behavior.
-
 The lesson-order path consists of:
 - `src/features/lessons/lesson-order-service.js` — deterministic remote/local order persistence and ranking;
 - `src/features/lessons/lesson-order-runtime.js` — read/apply and save orchestration;
@@ -111,18 +173,17 @@ The lesson-order path consists of:
 - `src/features/lessons/lesson-order-runtime-bootstrap.js` — dynamic bootstrap/readiness boundary;
 - `index.html` — thin readiness-backed `getOrderedLessons()` / `saveLessonOrder()` facades with the legacy `lesson_order` implementation removed.
 
-The lesson-order contract preserves the V4.78 remote-first/local-fallback behavior, exact storage-key shape, deterministic unknown-lesson ordering, local-first save behavior, parent-authenticated remote persistence, delete-then-insert write sequence, and propagated database errors.
-
 ## Validation status
 - Photo boundary professional gate: **success**, run `37522351036`, job `112470686619`.
 - Photo browser proof: **success**, run `37523556598`, job `112474746075`.
 - Test-attempt professional gate: **success**, run `37526377590`.
 - Test-attempt browser proof: **success**, run `37526403261`, job `112484398814`.
-- Lesson-loading professional gate: **success**, run `37536029041`, job `112517029265`.
+- Lesson-loading professional gate: **success**, run `37536029041`.
 - Lesson-loading browser proof: **success**, run `37535869080`, job `112516489142`.
 - Lesson-order professional gate: **success**, run `37536871075`.
 - Lesson-order browser proof: **success**, run `37536895653`, job `112520098729`.
-- Checkpoint documentation close: commit `b6dcd6dc6567c44b02ca4a800424479ee84cf606`.
+- Latest player browser proof before the current submission-boundary changes: success, run #77 / run `37573898208`.
+- Latest player/test-engine focused changes: **pending CI verification**.
 - No Supabase schema changes.
 - No `main`/LIVE changes.
 - No agenda-import changes.
@@ -130,11 +191,15 @@ The lesson-order contract preserves the V4.78 remote-first/local-fallback behavi
 - No visual redesign.
 
 ## Next gate
-Checkpoint 611–620 is closed. Inspect the next remaining legacy-runtime ownership boundary directly from the authoritative V4.78 source and the current `refactor/professional-v1` tree.
+Finish the player submission boundary in this order:
+1. Verify the focused tests/CI for the current `test-engine` and `player-runtime-adapter` changes.
+2. Add/adjust a controlled browser fixture so a raw answer flows through the new `submitAnswer()` boundary, including an AI-grader stub for ordinary word tests.
+3. Prove exact V4.78 DOM behavior for spelling/math/dictation/word/custom paths.
+4. Only after browser proof, design the final legacy `startTest()` / `submitTest()` integration seam.
+5. Remove legacy player implementations only after the professional boundary owns the complete behavior.
+6. Close the player checkpoint and update the handoff plus the corresponding step file.
 
-Apply the same sequence: authoritative V4.78 behavior → responsibility/contract → focused tests → runtime wiring → browser proof → controlled legacy removal → checkpoint.
-
-If the next source audit exposes an architectural mismatch, stop and redesign the boundary rather than patching the legacy monolith.
+If the browser/source audit exposes an architectural mismatch, redesign the boundary rather than patching the legacy monolith.
 
 ## New-chat procedure
-At every new chat: confirm repo/branch, read this handoff and latest checkpoint, inspect actual repository state, compare relevant behavior against authoritative V4.78, continue from the current gate, never touch `main`, and only claim tests that were actually executed. At checkpoint completion update both this handoff and `docs/refactor/step-X-Y.md`; keep historical checkpoint files.
+At every new chat: confirm repo/branch, read this handoff and latest checkpoint, inspect actual repository state, compare relevant behavior against authoritative V4.78, continue from the current gate, never touch `main`, and only claim tests that were actually executed. When the user says `oke ga door`, continue several logically connected stages instead of stopping after every small checkpoint. At checkpoint completion update both this handoff and `docs/refactor/step-X-Y.md`; keep historical checkpoint files.

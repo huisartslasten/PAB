@@ -71,8 +71,6 @@ jobs:
       lessons: () => lessons,
       demoItems: () => agendaDemoItems,
       documentRef: document,
-      onEdit: id => editAgendaItem(id),
-      onDelete: id => deleteAgendaItem(id),
       onLessonMatch: item => agendaLessonMatchHtml(item)
     }, window);
   </script>

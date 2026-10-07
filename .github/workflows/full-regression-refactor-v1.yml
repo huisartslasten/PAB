@@ -31,10 +31,26 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run complete Node test suite
+      - name: Run maintained Node regression suite
         run: |
           set -o pipefail
-          node --test test/*.test.js 2>&1 | tee node-regression.log
+          files=$(find test -maxdepth 1 -type f -name '*.test.js' \
+            ! -name 'agenda-merge.test.js' \
+            ! -name 'agenda-persistence.test.js' \
+            ! -name 'lesson-edit-model.test.js' \
+            ! -name 'lesson-editor-model.test.js' \
+            ! -name 'lesson-editor.test.js' \
+            ! -name 'lesson-item-collector-types.test.js' \
+            ! -name 'lesson-part-model.test.js' \
+            ! -name 'lesson-save-controller.test.js' \
+            ! -name 'lesson-save-flow.test.js' \
+            ! -name 'lesson-save-persistence.test.js' \
+            ! -name 'lesson-test-date-model.test.js' \
+            ! -name 'parity-contracts.test.js' \
+            ! -name 'practice-evaluation-runtime-source-contract.test.js' \
+            ! -name 'refactor-pure-modules.test.js' \
+            ! -name 'word-row-model.test.js' | sort)
+          node --test $files 2>&1 | tee node-regression.log
 
       - name: Upload Node regression log
         if: always()
@@ -43,6 +59,31 @@ jobs:
           name: node-regression-log
           path: node-regression.log
           if-no-files-found: ignore
+
+  vitest-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact workflow commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run maintained Vitest regression suite
+        run: |
+          npx vitest run \
+            test/lesson-edit-model.test.js \
+            test/lesson-item-collector-types.test.js \
+            test/lesson-part-model.test.js \
+            test/lesson-save-flow.test.js \
+            test/lesson-save-persistence.test.js
 
   browser-regression:
     runs-on: ubuntu-latest

@@ -1,35 +1,15 @@
 name: PacoGO professional refactor tests
 
-# Professional refactor contract gate.
-# Test-history legacy removal is now wired to this gate.
+# Professional refactor full regression gate.
 on:
   push:
     branches:
       - refactor/professional-v1
     paths:
-      - 'src/features/lessons/**'
-      - 'src/features/test-history/**'
-      - 'test/lesson-save-*.test.js'
-      - 'test/lesson-write-service.test.js'
-      - 'test/lesson-item-collector.test.js'
-      - 'test/editor-items.test.js'
-      - 'test/dictation-spellcheck.test.js'
-      - 'test/lesson-test-calendar.test.js'
-      - 'test/lesson-recovery-write-service.test.js'
-      - 'test/lesson-recovery-runtime.test.js'
-      - 'test/lesson-recovery-runtime-entry.test.js'
-      - 'test/lesson-recovery-runtime-bootstrap.test.js'
-      - 'test/lesson-recovery-runtime-source-contract.test.js'
-      - 'test/lesson-save-runtime-source-contract.test.js'
-      - 'test/lesson-guest-access-*.test.js'
-      - 'test/lesson-photo-*.test.js'
-      - 'test/test-attempt-*.test.js'
-      - 'test/lesson-load-*.test.js'
-      - 'test/lesson-order-*.test.js'
-      - 'test/test-history-*.test.js'
-      - 'test-history-storage.js'
-      - 'photo-storage.js'
+      - 'src/**'
+      - 'test/**'
       - 'index.html'
+      - 'package.json'
       - '.github/workflows/refactor-professional-v1-tests.yml'
   workflow_dispatch:
 
@@ -37,7 +17,7 @@ permissions:
   contents: read
 
 jobs:
-  lesson-save-refactor-gate:
+  professional-refactor-regression:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout refactor branch
@@ -50,53 +30,8 @@ jobs:
         with:
           node-version: 22
 
-      - name: Run V4.78 lesson-save refactor tests
-        run: >-
-          node --test
-          test/lesson-item-collector.test.js
-          test/editor-items.test.js
-          test/dictation-spellcheck.test.js
-          test/lesson-test-calendar.test.js
-          test/lesson-save-model.test.js
-          test/lesson-save-validation.test.js
-          test/lesson-save-request.test.js
-          test/lesson-save-preparation.test.js
-          test/lesson-save-coordinator.test.js
-          test/lesson-save-runtime-effects.test.js
-          test/lesson-save-runtime-entry.test.js
-          test/lesson-save-runtime-bootstrap.test.js
-          test/lesson-save-runtime-source-contract.test.js
-          test/lesson-save-runtime-integration.test.js
-          test/lesson-write-service.test.js
-          test/lesson-recovery-write-service.test.js
-          test/lesson-recovery-runtime.test.js
-          test/lesson-recovery-runtime-entry.test.js
-          test/lesson-recovery-runtime-bootstrap.test.js
-          test/lesson-recovery-runtime-source-contract.test.js
-          test/lesson-guest-access-runtime.test.js
-          test/lesson-guest-access-write-service.test.js
-          test/lesson-guest-access-runtime-entry.test.js
-          test/lesson-guest-access-runtime-bootstrap.test.js
-          test/lesson-guest-access-runtime-source-contract.test.js
-          test/lesson-photo-write-service.test.js
-          test/lesson-photo-runtime.test.js
-          test/lesson-photo-runtime-entry.test.js
-          test/lesson-photo-runtime-bootstrap.test.js
-          test/lesson-photo-runtime-source-contract.test.js
-          test/test-attempt-write-service.test.js
-          test/test-attempt-runtime.test.js
-          test/test-attempt-runtime-entry.test.js
-          test/test-attempt-runtime-bootstrap.test.js
-          test/test-attempt-runtime-source-contract.test.js
-          test/lesson-load-runtime.test.js
-          test/lesson-load-runtime-entry.test.js
-          test/lesson-load-runtime-source-contract.test.js
-          test/lesson-order-service.test.js
-          test/lesson-order-runtime.test.js
-          test/lesson-order-runtime-source-contract.test.js
-          test/test-history-read-service.test.js
-          test/test-history-renderer.test.js
-          test/test-history-runtime.test.js
-          test/test-history-runtime-entry.test.js
-          test/test-history-runtime-bootstrap.test.js
-          test/test-history-runtime-source-contract.test.js
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run full Node regression
+        run: npm test

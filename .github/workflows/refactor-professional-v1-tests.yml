@@ -1,6 +1,7 @@
 name: PacoGO professional refactor tests
 
 # Professional refactor contract gate.
+# Test-history legacy removal is now wired to this gate.
 on:
   push:
     branches:

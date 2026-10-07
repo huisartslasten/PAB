@@ -1,7 +1,9 @@
 # Agenda feature
 
-Owns agenda display, custom agenda items, import/review flow and lesson matching during migration.
+Owns the professional Agenda application boundary: deterministic display/composition, custom agenda items, test-calendar integration, lesson matching, and the separate media/AI import-review pipeline.
 
-The existing V4.78 implementation remains the reference until each part has been extracted and regression-checked.
+V4.78 remains the behavioral parity baseline. The professional runtime is now integrated and the legacy Agenda runtime is no longer an owner.
+
+AI/media import follows candidate → review → storage and is kept out of the deterministic read path.
 
 No Supabase schema changes are introduced by this structural refactor.

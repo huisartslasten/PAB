@@ -3444,53 +3444,45 @@ async function checkPractice(){
 }
 function finishPractice(){window.speechSynthesis?.cancel();const total=currentLesson.lesson_items.length;document.getElementById('practiceProgress').innerHTML=`<div class="progress-label"><span>🎉 ${total} / ${total} beheerst</span><span>Klaar!</span></div><div class="progress"><div class="progress-bar" style="width:100%"></div></div>`;document.getElementById('practiceContent').innerHTML=`<div class="result-score">🎉 Klaar!</div><p>Je hebt alle ${total} ${activity.type==='dictation'?'dicteewoorden':'woorden'} goed kunnen maken.</p><button class="big" onclick="showLessonChoice(currentLesson)">Terug naar de les</button>`;activity=null}
 
-function startTest(type){window.speechSynthesis?.cancel();stopAiAudio();activity={kind:'test',type,items:shuffle(currentLesson.lesson_items),index:0,answers:[],startedAt:new Date().toISOString()};hideAll();document.getElementById('test').classList.remove('hidden');document.getElementById('testTitle').textContent=type==='dictation'?'✏️ Dictee toets':type==='custom'?'🛠️ Eigen les toets':'📝 Woordtrainer toets';renderTest()}
-function updateTestProgress(){const total=activity.items.length,i=activity.index;const pct=total?i/total*100:0;document.getElementById('testProgress').innerHTML=`<div class="progress-label"><span>Vraag ${Math.min(i+1,total)} van ${total}</span><span>${i} gemaakt</span></div><div class="progress"><div class="progress-bar" style="width:${pct}%"></div></div>`}
-function renderTest(){updateTestProgress();const item=activity.items[activity.index],el=document.getElementById('testContent');if(activity.type==='spelling'){el.innerHTML='<div class="test-instructions">Vul het voltooid deelwoord en het bijvoeglijk gebruikt voltooid deelwoord in.</div><div class="prompt">'+escapeHtml(item.question)+'</div><div class="field"><label>Voltooid deelwoord</label><input id="testPerfect" class="answer-input" placeholder="bijvoorbeeld opgevoed"></div><div class="field"><label>Bijvoeglijk gebruikt voltooid deelwoord</label><input id="testAdjective" class="answer-input" placeholder="bijvoorbeeld opgevoede"></div><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>';}else if(activity.type==='math'){el.innerHTML=`<div class="test-instructions">Los de som op. Je krijgt pas aan het einde de uitslag.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="testAnswer" class="answer-input" type="number" inputmode="numeric" autofocus autocomplete="off" placeholder="Typ je antwoord"><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>`;document.getElementById('testAnswer')?.focus()}else if(activity.type==='dictation'){el.innerHTML=`<div class="test-instructions">Luister naar het woord en typ precies wat je hoort. Je krijgt pas aan het einde te zien wat goed en fout was.</div><div id="testVoiceStatus" class="small" style="min-height:20px;margin-top:4px"></div><div style="margin:25px"><button class="speaker big" onclick="speakTest()">🔊 Luister</button></div><input id="testAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier het woord in"><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>`;setTimeout(()=>{speakTest();document.getElementById('testAnswer')?.focus()},350)}else{el.innerHTML=`<div class="test-instructions">Typ hier het woord. Je krijgt pas aan het einde de uitslag.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="testAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier het woord in"><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>`;document.getElementById('testAnswer')?.focus()}}
-async function speakTest(){const item=activity?.items?.[activity.index];if(!item)return;await speakAiText(item.answer,'testVoiceStatus')}
-async function submitTest(){
-  const item=activity.items[activity.index];const spellingMode=activity.type==='spelling';const input=spellingMode?document.getElementById('testPerfect'):document.getElementById('testAnswer');const value=spellingMode?document.getElementById('testPerfect')?.value.trim()+' || '+document.getElementById('testAdjective')?.value.trim():input?.value??'';
-  if(!input)return;
-  const nextButton=document.querySelector('#testContent button.big');
-  if(nextButton)nextButton.disabled=true;
-  input.disabled=true;
-  let correct=false,feedback='';
-  try{
-    if(activity.type==='spelling'){const expected=String(item.answer||'').split(' || '),given=value.split(' || ');correct=normalize(given[0])===normalize(expected[0])&&normalize(given[1])===normalize(expected[1]);}else if(activity.type==='math'){
-      correct=Number(value)===Number(item.answer);
-    }else if(activity.type==='dictation'){
-      correct=normalize(value)===normalize(item.answer);
-    }else{
-      const status=document.createElement('div');
-      status.className='feedback';
-      status.textContent='🤖 Even kijken of je antwoord dezelfde betekenis heeft...';
-      input.insertAdjacentElement('afterend',status);
-      const grading=currentLesson?.type==='custom'?(currentLesson.ai_check_answers?await gradeWithAI(item.question,item.answer,value.trim()):{correct:normalize(value)===normalize(item.answer),feedback:''}):await gradeWithAI(item.question,item.answer,value.trim());
-      correct=grading.correct;
-      feedback=grading.feedback||'';
-    }
-  }catch(error){
-    console.error('AI grading error in test:',error);
-    input.disabled=false;
-    if(nextButton)nextButton.disabled=false;
-    const existing=input.parentElement.querySelector('.feedback');
-    if(existing){existing.textContent='⚠️ De AI-beoordeling kon niet worden uitgevoerd. Probeer opnieuw.';existing.className='feedback incorrect';}
-    return;
-  }
-  activity.answers.push({item,value,correct,feedback});
-  activity.index++;
-  if(activity.index>=activity.items.length)finishTest();else renderTest();
+const professionalPlayerHost = Object.freeze({
+  getLesson: () => currentLesson,
+  getStudent: () => currentStudent,
+  db,
+  persistence: null,
+  documentRef: document,
+  hideAll,
+  showLessonChoice: lesson => {
+    if (lesson?.id != null) openLesson(lesson.id);
+  },
+  goBack,
+  clearActivity: () => { activity = null; },
+  escapeHtml,
+  speakAiText,
+  stopAiAudio,
+  gradeAnswer: (...args) => gradeWithAI(...args),
+  shuffle
+});
+
+const professionalPlayerReady = import('./src/features/lessons/player-runtime-bootstrap.js')
+  .then(({ createProfessionalPlayerBridge }) => createProfessionalPlayerBridge(professionalPlayerHost));
+
+window.pacoGOProfessionalPlayerReady = professionalPlayerReady;
+
+async function startTest(type) {
+  const bridge = await professionalPlayerReady;
+  return bridge.startTest(type);
 }
-async function finishTest(){
-  window.speechSynthesis?.cancel();
-  const attempt=activity,total=attempt.items.length,correct=attempt.answers.filter(x=>x.correct).length,note=Math.round((correct/total*10)*10)/10;
-  try{await saveTestAttempt(attempt)}catch(error){console.error('Test history save error:',error);showMessage('⚠️ De toets is klaar, maar kon niet in de toetsgeschiedenis worden opgeslagen.','error')}
-  hideAll();document.getElementById('result').classList.remove('hidden');
-  document.getElementById('resultTitle').textContent=attempt.type==='dictation'?'✏️ Dictee klaar!':'📝 Toets klaar!';
-  document.getElementById('resultScore').textContent=note.toFixed(1);
-  document.getElementById('resultDetails').innerHTML='<p><strong>'+correct+' van '+total+'</strong> goed.</p>'+attempt.answers.map((x,i)=>'<div class="result-item '+(x.correct?'correct':'incorrect')+'"><strong>'+(i+1)+'. '+escapeHtml(x.item.question)+'</strong><br>Jouw antwoord: '+escapeHtml(x.value||'—')+'<br>'+(x.correct?'✓ Goed':'✗ Goed antwoord: '+escapeHtml(x.item.answer))+'</div>').join('');
-  activity=null;
+
+async function submitTest(options = {}) {
+  const bridge = await professionalPlayerReady;
+  return bridge.submitTest(options);
 }
+
+async function speakTest() {
+  const bridge = await professionalPlayerReady;
+  return bridge.speakTest();
+}
+
 
 
 function startQuestions(){activity={kind:'questions',items:shuffle(currentLesson.lesson_items),index:0};hideAll();document.getElementById('practice').classList.remove('hidden');document.getElementById('practiceTitle').textContent='❓ Vragen';renderQuestion()}

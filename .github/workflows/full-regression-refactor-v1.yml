@@ -19,8 +19,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install dependencies without modifying repository files
-        run: npm install --no-package-lock
+      - name: Generate temporary dependency lockfile
+        run: npm install --package-lock-only --ignore-scripts
+      - name: Install dependencies from temporary lockfile
+        run: npm ci --ignore-scripts
       - name: Diagnose dependency audit
         run: npm audit --json > /tmp/npm-audit.json || true; cat /tmp/npm-audit.json
       - name: Verify complete Agenda runtime boundary
@@ -62,7 +64,7 @@ jobs:
         run: npx playwright test test/browser/*.browser.test.js --workers=1
       - name: Verify working tree stayed clean
         run: |
-          rm -rf test-results playwright-report node_modules
+          rm -rf test-results playwright-report node_modules package-lock.json
           status=$(git status --porcelain)
           printf '%s\n' "$status"
           test -z "$status"

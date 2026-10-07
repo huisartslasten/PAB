@@ -3,7 +3,7 @@
 // persistence, rendering, activity cleanup, and navigation callbacks.
 // It is intentionally unmounted from the V4.78 runtime until parity is proven.
 
-import { createTestSession } from './player-session.js';
+import { createTestSession } from './test-engine.js';
 import { createPlayerAttempt } from './player-attempt.js';
 import { finishPlayerTest } from './player-finish-flow.js';
 import {

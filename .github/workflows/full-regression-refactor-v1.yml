@@ -11,6 +11,9 @@ on:
       - '**.html'
       - 'package.json'
       - '.github/workflows/full-regression-refactor-v1.yml'
+  pull_request:
+    branches:
+      - refactor/professional-v1
   workflow_dispatch:
 
 permissions:
@@ -18,7 +21,7 @@ permissions:
 
 jobs:
   agenda-migration:
-    if: ${{ !contains(github.event.head_commit.message, 'Complete professional agenda runtime migration') }}
+    if: ${{ !contains(github.event.head_commit.message || '', 'Complete professional agenda runtime migration') }}
     runs-on: ubuntu-latest
     outputs:
       commit_sha: ${{ steps.commit.outputs.commit_sha }}
@@ -113,33 +116,23 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ needs.agenda-migration.outputs.commit_sha || github.sha }}
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
       - name: Install dependencies
         run: npm install
-
       - name: Run maintained Node regression suite
         run: |
           files=$(find test -maxdepth 1 -type f -name '*.test.js' \
-            ! -name 'agenda-merge.test.js' \
-            ! -name 'agenda-persistence.test.js' \
-            ! -name 'lesson-edit-model.test.js' \
-            ! -name 'lesson-editor-model.test.js' \
-            ! -name 'lesson-editor.test.js' \
-            ! -name 'lesson-item-collector-types.test.js' \
-            ! -name 'lesson-part-model.test.js' \
-            ! -name 'lesson-save-controller.test.js' \
-            ! -name 'lesson-save-flow.test.js' \
-            ! -name 'lesson-save-persistence.test.js' \
-            ! -name 'lesson-test-date-model.test.js' \
-            ! -name 'parity-contracts.test.js' \
+            ! -name 'agenda-merge.test.js' ! -name 'agenda-persistence.test.js' \
+            ! -name 'lesson-edit-model.test.js' ! -name 'lesson-editor-model.test.js' \
+            ! -name 'lesson-editor.test.js' ! -name 'lesson-item-collector-types.test.js' \
+            ! -name 'lesson-part-model.test.js' ! -name 'lesson-save-controller.test.js' \
+            ! -name 'lesson-save-flow.test.js' ! -name 'lesson-save-persistence.test.js' \
+            ! -name 'lesson-test-date-model.test.js' ! -name 'parity-contracts.test.js' \
             ! -name 'practice-evaluation-runtime-source-contract.test.js' \
-            ! -name 'refactor-pure-modules.test.js' \
-            ! -name 'word-row-model.test.js' | sort)
+            ! -name 'refactor-pure-modules.test.js' ! -name 'word-row-model.test.js' | sort)
           node --test $files
 
   vitest-regression:
@@ -151,23 +144,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ needs.agenda-migration.outputs.commit_sha || github.sha }}
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
       - name: Install dependencies
         run: npm install
-
       - name: Run maintained Vitest regression suite
-        run: |
-          npx vitest run \
-            test/lesson-edit-model.test.js \
-            test/lesson-item-collector-types.test.js \
-            test/lesson-part-model.test.js \
-            test/lesson-save-flow.test.js \
-            test/lesson-save-persistence.test.js
+        run: npx vitest run test/lesson-edit-model.test.js test/lesson-item-collector-types.test.js test/lesson-part-model.test.js test/lesson-save-flow.test.js test/lesson-save-persistence.test.js
 
   browser-regression:
     needs: agenda-migration
@@ -178,22 +162,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ needs.agenda-migration.outputs.commit_sha || github.sha }}
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
       - name: Install dependencies
         run: npm install
-
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
-
       - name: Start local fixture server
-        run: |
-          python3 -m http.server 4173 --directory . > /tmp/pacogo-http.log 2>&1 &
-          echo $! > /tmp/pacogo-http.pid
-
+        run: python3 -m http.server 4173 --directory . > /tmp/pacogo-http.log 2>&1 &
       - name: Run complete browser suite
         run: npx playwright test test/browser/*.browser.test.js --workers=1

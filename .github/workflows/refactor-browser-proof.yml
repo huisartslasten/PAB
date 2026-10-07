@@ -61,4 +61,5 @@ jobs:
           test/browser/lesson-order-runtime.browser.test.js
           test/browser/test-history-runtime.browser.test.js
           test/browser/player-submit-boundary.browser.test.js
+          test/browser/player-runtime-integration.browser.test.js
           --workers=1

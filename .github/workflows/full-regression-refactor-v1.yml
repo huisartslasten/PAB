@@ -19,20 +19,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Resolve and lock dependencies
-        run: npm install --package-lock-only --ignore-scripts
-      - name: Capture dependency audit
-        run: npm audit --json > audit.json || true
-      - name: Install exact locked dependencies
-        run: npm ci
-      - name: Publish dependency audit evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: dependency-audit-and-lockfile
-          path: |
-            audit.json
-            package-lock.json
+      - name: Install dependencies without modifying repository files
+        run: npm install --no-package-lock
       - name: Verify complete Agenda runtime boundary
         run: |
           ! grep -q 'function buildAgendaItemsForRender()' index.html
@@ -72,7 +60,7 @@ jobs:
         run: npx playwright test test/browser/*.browser.test.js --workers=1
       - name: Verify working tree stayed clean
         run: |
-          rm -rf test-results playwright-report node_modules audit.json package-lock.json
+          rm -rf test-results playwright-report node_modules
           status=$(git status --porcelain)
           printf '%s\n' "$status"
           test -z "$status"

@@ -1,25 +1,45 @@
-// Agenda feature boundary.
-// Rendering/import logic stays in the V4.78 runtime until exact behavior
-// has been mapped and verified. This module defines the future public API.
+import { createAgendaReadService } from './read-service.js';
+import { createAgendaRuntime } from './runtime.js';
+import { createAgendaRuntimeEntry, installAgendaRuntimeEntry } from './runtime-entry.js';
+
+export { createAgendaReadService, createAgendaRuntime, createAgendaRuntimeEntry, installAgendaRuntimeEntry };
 
 export function createAgendaFeature({
   state,
   storage,
   lessonMatcher,
   render = () => {},
-  notify = () => {}
+  notify = () => {},
+  documentRef = globalThis.document,
+  demoItems = () => [],
+  onEdit = () => {},
+  onDelete = () => {},
+  onLessonMatch = () => '',
+  now = () => new Date()
 } = {}) {
   if (!state) throw new Error('createAgendaFeature requires state');
 
-  const getItems = typeof storage?.getItems === 'function'
-    ? storage.getItems
-    : () => [];
-  const saveItems = typeof storage?.saveItems === 'function'
-    ? storage.saveItems
-    : () => {};
+  const readService = createAgendaReadService({
+    storage,
+    lessons: () => state.lessons || [],
+    currentStudent: () => state.currentStudent || '',
+    demoItems,
+    now
+  });
+  const runtime = createAgendaRuntime({
+    storage,
+    documentRef,
+    currentStudent: () => state.currentStudent || '',
+    lessons: () => state.lessons || [],
+    demoItems,
+    onEdit,
+    onDelete,
+    onLessonMatch,
+    now
+  });
 
   function list() {
-    const items = getItems(state.currentStudent) || [];
+    const items = readService.buildAgendaItemsForRender(state.currentStudent || '');
     render(items);
     return items;
   }
@@ -31,11 +51,11 @@ export function createAgendaFeature({
   }
 
   function save(items) {
-    saveItems(items, state.currentStudent);
+    if (typeof storage?.saveItems === 'function') storage.saveItems(items, state.currentStudent);
     render(items);
     notify({ type: 'agenda-saved', count: items.length });
     return items;
   }
 
-  return { list, matchLesson, save };
+  return Object.freeze({ list, matchLesson, save, readService, runtime });
 }

@@ -148,10 +148,17 @@ The V4.78 agenda composition and duplicate semantics were source-verified before
 - Legacy Agenda runtime removal/bridge verification: **success**
 
 ### Final repository state
-- Final branch HEAD: `21a7ba59962dd66fcf8fc621908b227c683531e4`
-- Final cleanup commit removed temporary workflow-trigger infrastructure only.
-- No fresh regression run is claimed on that cleanup commit; the recorded Player and Agenda runs above are the formal validation evidence.
+- Current branch HEAD: `84c006a21cef66b24c677a9849a6e2cb3bfe1ea6`
+- Latest full regression workflow: GitHub Actions run `37637717369`
+- Latest full regression result: **success**
+- Latest gate: 366 Node tests, 24 Vitest tests, 21 browser tests, Agenda boundary, Player boundary, and working-tree cleanliness all passed.
+- Final cleanup removed generated `node_modules`, Playwright reports, and test-result directories before the working-tree cleanliness assertion; CI does not modify application source.
 - Official closure report: `docs/refactor/PACOGO_PROFESSIONAL_V1_FINAL_REPORT.md`
+
+### Dependency hygiene note
+- `package.json` currently has only `@playwright/test` and `vitest` as dev dependencies and no committed `package-lock.json`.
+- CI currently installs with `npm install --no-package-lock`.
+- CI reported 3 npm vulnerabilities during installation. These are dependency-tree findings, not application-code regressions. They should be assessed separately; dependency upgrades must not be made blindly because they can change the tested toolchain.
 
 ### Safety verification
 - `main` / LIVE was not modified by this refactor work.
@@ -162,7 +169,9 @@ The V4.78 agenda composition and duplicate semantics were source-verified before
 ## Closure
 **Professional V1 is officially closed.**
 
-The Player and Agenda architecture is integrated, the recorded maintained regression gates are green, and no Professional V1 gate remains open within the agreed scope.
+The Player and Agenda architecture is integrated, the latest full regression gate is green on the current branch HEAD, and no Professional V1 implementation gate remains open within the agreed scope.
+
+Dependency vulnerability cleanup is a separate maintenance task, not unfinished Professional V1 implementation work.
 
 Future work must start as a new scope. It must not be treated as unfinished Professional V1 work.
 

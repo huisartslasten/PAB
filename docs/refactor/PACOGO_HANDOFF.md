@@ -87,37 +87,41 @@ The classic-script runtime bridge exposes V4.78 application dependencies without
 - 591–600: test-attempt persistence/runtime boundary extracted, runtime-wired, focused-tested, and browser-proven
 - 601–610: lesson-loading runtime boundary extracted, runtime-wired, focused-tested, source-contract guarded, and browser-proven
 - 611–620: lesson-order service/runtime boundary extracted, runtime-wired, focused-tested, source-contract guarded, and browser-proven
-- 621–630: player/test-result source audit; canonical test engine aligned to V4.78 type-specific grading; explicit raw-answer submission boundary added; focused tests updated; browser wiring/removal still open
+- 621–630: player/test-result source audit; canonical test engine aligned to V4.78 type-specific grading; explicit raw-answer submission boundary added; focused tests updated
+- 631–640: exact V4.78 DOM submission boundary extracted; controlled browser fixture/test added; browser workflow updated; CI currently running
 
 ## Current state
 The guest lesson access, photo-to-lesson creation, test-attempt completion, lesson-loading, and lesson-order boundaries are migrated on `refactor/professional-v1`.
 
 ### Player parity — current in-progress block
-The authoritative V4.78 source has now been re-read directly from blob `de4ebcc75b1b333cc985936c86f7c654c818be24`.
+The authoritative V4.78 source has been re-read directly from blob `de4ebcc75b1b333cc985936c86f7c654c818be24`.
 
 Exact V4.78 player behavior proven:
 - `startTest(type)` creates `activity={kind:'test', type, items:shuffle(currentLesson.lesson_items), index:0, answers:[], startedAt}`.
-- `renderTest()` reads the current item and creates the appropriate DOM input.
-- `submitTest()` reads the raw DOM answer, disables the input/button, grades the answer, pushes `{item,value,correct,feedback}` into `activity.answers`, increments `activity.index`, and either renders the next item or calls `finishTest()`.
+- `renderTest()` creates `#testAnswer` for words/math/dictation and `#testPerfect` + `#testAdjective` for spelling.
+- `submitTest()` reads the raw DOM answer, disables the input/button, grades the answer, pushes `{item,value,correct,feedback}` into `activity.answers`, increments the index, and either renders the next item or calls `finishTest()`.
 - spelling is two-part deterministic normalization; math uses `Number()` equality; dictation uses deterministic normalized equality.
 - ordinary word tests are sent through the V4.78 AI grader; custom lessons use the AI grader when `ai_check_answers` is enabled and deterministic normalized equality when it is disabled.
 - `finishTest()` saves history, then renders the result and clears `activity`.
 
-Important correction to earlier assumptions: **ordinary V4.78 word tests are not purely deterministic. They use the AI grading boundary.** The professional test engine must therefore receive an explicit injected `gradeAnswer` function rather than silently replacing V4.78 AI grading with local equality.
+Important correction: ordinary V4.78 word tests use the AI grading boundary. The professional test engine therefore receives an explicit injected `gradeAnswer` dependency.
 
 Current professional player modules:
-- `src/features/lessons/test-engine.js` — canonical test session and V4.78 type-specific grading boundary; now supports injected AI grading and V4.78 shuffle.
-- `src/features/lessons/player-runtime-adapter.js` — orchestration boundary; now exposes explicit `submitAnswer(answer)` so raw answers enter the canonical engine before persistence.
+- `src/features/lessons/test-engine.js` — canonical test session and V4.78 type-specific grading boundary; supports injected AI grading and V4.78 shuffle.
+- `src/features/lessons/player-runtime-adapter.js` — orchestration boundary; exposes `submitAnswer(answer)` so raw answers enter the canonical engine before persistence.
+- `src/features/lessons/player-submit-boundary.js` — exact V4.78 DOM submission boundary; reads `#testAnswer` or spelling's `#testPerfect`/`#testAdjective`, disables controls, delegates the raw value to `submitAnswer()`, and restores controls on failure.
 - `src/features/lessons/player-attempt.js` — maps session answers to completion attempt.
 - `src/features/lessons/player-finish-flow.js` — V4.78 completion sequencing and history-error handling.
 - `src/features/lessons/player-result.js` / `player-result-view.js` — pure result model/view boundary.
 - `src/features/lessons/player-persistence-model.js` — exact history row mapping.
 
-Current parity boundary:
+Current proven professional submission chain:
 ```text
-V4.78 DOM answer
+V4.78 DOM (#testAnswer / #testPerfect + #testAdjective)
       ↓
-professional submitAnswer(raw value)
+player-submit-boundary.submitTest()
+      ↓
+player-runtime-adapter.submitAnswer(raw value)
       ↓
 test-engine.submit(raw value)
       ↓
@@ -134,22 +138,15 @@ test-history persistence
 result model/view
 ```
 
-The professional adapter is **still intentionally unmounted** from the V4.78 runtime. No legacy `submitTest()` or `startTest()` implementation has been removed yet.
+The new submission boundary is still **not mounted into the real V4.78 runtime**. No legacy `submitTest()` or `startTest()` implementation has been removed.
 
-### Focused player tests
-Updated focused contracts now cover:
-- V4.78 word-test AI grading boundary with injected grader;
-- required explicit AI grader for ordinary word tests;
-- dictation grading;
-- math grading;
-- spelling two-part grading;
-- custom deterministic grading when AI checking is disabled;
-- raw-answer submission through the player runtime adapter;
-- persistence payload and completion sequencing;
-- history-save failure behavior;
-- retry/back navigation callbacks.
+### Controlled browser proof added
+`test/browser/player-submit-boundary.fixture.html` constructs the professional adapter with an injected AI-grader stub and real browser DOM controls matching V4.78. `test/browser/player-submit-boundary.browser.test.js` fills the actual `#testAnswer`, calls the professional DOM boundary, verifies correct/incorrect engine results and then verifies the exact persistence payload after completion.
 
-These changes are on `refactor/professional-v1`. CI/browser proof for the latest commits must be checked before claiming the block closed.
+Focused source tests are in `test/player-submit-boundary.test.js`.
+
+### Current runtime architecture gap
+`player-runtime-bootstrap.js` currently exposes `createPlayerRuntime()` (completion/persistence runtime), not `createPlayerRuntimeAdapter()`. The adapter is therefore intentionally unmounted. Do **not** simply replace the bootstrap target: the next step must first define the correct application-facing composition boundary for lesson state, student, DOM result rendering, navigation, speech cancellation, and persistence. This is an architectural design step, not a patch.
 
 ### Other migrated paths
 The test-attempt path consists of:
@@ -182,8 +179,9 @@ The lesson-order path consists of:
 - Lesson-loading browser proof: **success**, run `37535869080`, job `112516489142`.
 - Lesson-order professional gate: **success**, run `37536871075`.
 - Lesson-order browser proof: **success**, run `37536895653`, job `112520098729`.
-- Latest player browser proof before the current submission-boundary changes: success, run #77 / run `37573898208`.
-- Latest player/test-engine focused changes: **pending CI verification**.
+- Latest player browser proof before current submission-boundary work: success, run `37573898208`.
+- Current player submission-boundary browser proof: **in progress**, run `37574665481` (run #84).
+- Current player focused-test/professional CI verification: **pending/needs direct workflow check**.
 - No Supabase schema changes.
 - No `main`/LIVE changes.
 - No agenda-import changes.
@@ -191,15 +189,14 @@ The lesson-order path consists of:
 - No visual redesign.
 
 ## Next gate
-Finish the player submission boundary in this order:
-1. Verify the focused tests/CI for the current `test-engine` and `player-runtime-adapter` changes.
-2. Add/adjust a controlled browser fixture so a raw answer flows through the new `submitAnswer()` boundary, including an AI-grader stub for ordinary word tests.
-3. Prove exact V4.78 DOM behavior for spelling/math/dictation/word/custom paths.
-4. Only after browser proof, design the final legacy `startTest()` / `submitTest()` integration seam.
-5. Remove legacy player implementations only after the professional boundary owns the complete behavior.
-6. Close the player checkpoint and update the handoff plus the corresponding step file.
+1. Verify the current browser proof and focused CI.
+2. If green, build the **application-facing player composition boundary** rather than mounting the adapter directly into the existing bootstrap.
+3. That composition must explicitly provide: lesson, student, persistence, result rendering, speech cancellation, activity cleanup, retry navigation, back navigation, clock, and AI grading dependency.
+4. Prove `startTest → renderTest → DOM submit → finishTest → result/history` with controlled browser tests.
+5. Only after that design the final legacy `startTest()` / `submitTest()` integration/removal.
+6. Update this handoff and the corresponding checkpoint file at closure.
 
-If the browser/source audit exposes an architectural mismatch, redesign the boundary rather than patching the legacy monolith.
+If an architectural mismatch appears, redesign the boundary rather than patching the legacy monolith.
 
 ## New-chat procedure
 At every new chat: confirm repo/branch, read this handoff and latest checkpoint, inspect actual repository state, compare relevant behavior against authoritative V4.78, continue from the current gate, never touch `main`, and only claim tests that were actually executed. When the user says `oke ga door`, continue several logically connected stages instead of stopping after every small checkpoint. At checkpoint completion update both this handoff and `docs/refactor/step-X-Y.md`; keep historical checkpoint files.

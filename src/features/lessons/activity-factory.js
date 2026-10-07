@@ -2,9 +2,11 @@ import { createPracticeSession } from './practice-engine.js';
 import { createTestSession } from './test-engine.js';
 import { createQuestionSession } from './question-engine.js';
 
-export function createLessonActivity(type, items = []) {
+export function createLessonActivity(type, items = [], options = {}) {
   if (type === 'words' || type === 'dictation') return createPracticeSession(items);
-  if (type === 'test') return createTestSession(items);
+  if (type === 'test' || type === 'custom' || type === 'math' || type === 'spelling') {
+    return createTestSession(items, { ...options, type });
+  }
   if (type === 'questions') return createQuestionSession(items);
   throw new Error(`Onbekend les-activiteitstype: ${type}`);
 }

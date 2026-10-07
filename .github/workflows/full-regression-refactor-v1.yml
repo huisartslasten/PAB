@@ -52,6 +52,11 @@ jobs:
           stale_module = re.compile(r'\n?\s*<script type="module">\s*import \{ installAgendaRuntimeEntry \} from \'/src/features/agenda/runtime-entry\.js\';.*?</script>', re.S)
           text = stale_module.sub('', text)
 
+          stale_bootstrap = re.compile(r'\n?const pacoGOAgendaHost = Object\.freeze\(\{.*?window\.pacoGOAgendaReady = pacoGOAgendaReady;\s*', re.S)
+          text, bootstrap_count = stale_bootstrap.subn('', text, count=1)
+          if bootstrap_count > 1:
+              raise SystemExit(f'Expected at most one temporary Agenda bootstrap seam, removed {bootstrap_count}.')
+
           bridge = '''
   <script type="module">
     import { installAgendaRuntimeEntry } from '/src/features/agenda/runtime-entry.js';

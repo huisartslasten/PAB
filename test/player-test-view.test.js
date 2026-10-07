@@ -17,7 +17,7 @@ function documentDouble() {
 
 test('player test view renders deterministic word test and progress', () => {
   const doc = documentDouble();
-  const view = createPlayerTestView({ documentRef: doc, escapeHtml: value => String(value).replaceAll('<', '&lt;') });
+  const view = createPlayerTestView({ documentRef: doc, escapeHtml: value => String(value).replaceAll('<', '&lt;').replaceAll('>', '&gt;') });
 
   view.render({
     item: { question: '<appel>' },

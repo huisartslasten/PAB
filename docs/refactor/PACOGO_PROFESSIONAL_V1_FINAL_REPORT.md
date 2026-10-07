@@ -29,8 +29,8 @@ The legacy Agenda runtime ownership was removed.
 ## Final validation
 The current branch HEAD was validated by the maintained full regression workflow:
 
-- GitHub Actions run: `37634366676`
-- Head SHA: `60a31d519e27a8c23e321a1accba1a9022ed7890`
+- GitHub Actions run: `37637717369`
+- Head SHA validated by that run: `84c006a21cef66b24c677a9849a6e2cb3bfe1ea6`
 - Result: **success**
 - Node regression: **366 tests passed**
 - Vitest regression: **24 tests passed**
@@ -39,14 +39,23 @@ The current branch HEAD was validated by the maintained full regression workflow
 - Player ownership boundary: **passed**
 - Working tree cleanliness gate: **passed**
 
-The workflow is the canonical final regression gate on `refactor/professional-v1`.
+The workflow is the canonical full regression gate on `refactor/professional-v1`.
 
 ## Final repository state
-Current branch HEAD:
+Current branch HEAD after documentation synchronization:
 
-`60a31d519e27a8c23e321a1accba1a9022ed7890`
+`3ebf03debf6f8f274b675dc6392b4297c5a52cb2`
 
-The latest CI cleanup removes generated `node_modules`, Playwright reports, and test-result directories before the working-tree cleanliness assertion. It does not modify application source during CI.
+This documentation-only commit updates the handoff to the actual validated HEAD and records the latest successful full regression run. It does not change application source.
+
+The regression workflow removes generated `node_modules`, Playwright reports, and test-result directories before the working-tree cleanliness assertion. It does not modify application source during CI.
+
+## Dependency hygiene
+The current `package.json` contains only `@playwright/test` and `vitest` as dev dependencies and there is no committed `package-lock.json`. CI intentionally installs with `npm install --no-package-lock`.
+
+CI reported 3 npm dependency vulnerabilities during installation. These are dependency-tree findings, not evidence of a PacoGO application defect or failed regression. They are solvable, but the correct next step is to identify the exact affected transitive packages and whether safe non-breaking updates exist before changing the tested toolchain.
+
+No blind `npm audit fix` or major dependency upgrade was applied as part of Professional V1 closure.
 
 ## Safety / non-goals
 - `main` / LIVE was not modified.
@@ -56,6 +65,8 @@ The latest CI cleanup removes generated `node_modules`, Playwright reports, and 
 - No UI redesign was introduced as part of the refactor.
 
 ## Final professional assessment
-The agreed Professional V1 scope is **complete and regression-validated on the current HEAD**. There is no remaining Professional V1 implementation gate.
+The agreed Professional V1 scope is **complete and regression-validated**. The current branch is cleanly documented against the latest validated state and there is no remaining Professional V1 implementation gate.
+
+Dependency vulnerability cleanup is a separate maintenance task and should be handled as its own controlled dependency-maintenance scope.
 
 Future features, redesigns, parity changes, or additional refactors must be opened as a new scope rather than treated as unfinished Professional V1 work.

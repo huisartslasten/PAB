@@ -13,6 +13,10 @@ export function createPlayerTestView({
     progress.innerHTML = `<div class="progress-label"><span>Vraag ${Math.min(index + 1, total)} van ${total}</span><span>${index} gemaakt</span></div><div class="progress"><div class="progress-bar" style="width:${pct}%"></div></div>`;
   }
 
+  function focusAnswer() {
+    documentRef.getElementById('testAnswer')?.focus?.();
+  }
+
   function render({ item = null, index = 0, total = 0, type = 'words' } = {}) {
     if (!item) return;
     renderProgress({ index, total });
@@ -26,19 +30,19 @@ export function createPlayerTestView({
 
     if (type === 'math') {
       content.innerHTML = `<div class="test-instructions">Los de som op. Je krijgt pas aan het einde de uitslag.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="testAnswer" class="answer-input" type="number" inputmode="numeric" autofocus autocomplete="off" placeholder="Typ je antwoord"><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>`;
-      documentRef.getElementById('testAnswer')?.focus();
+      focusAnswer();
       return;
     }
 
     if (type === 'dictation') {
       content.innerHTML = `<div class="test-instructions">Luister naar het woord en typ precies wat je hoort. Je krijgt pas aan het einde te zien wat goed en fout was.</div><div id="testVoiceStatus" class="small" style="min-height:20px;margin-top:4px"></div><div style="margin:25px"><button class="speaker big" onclick="speakTest()">🔊 Luister</button></div><input id="testAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier het woord in"><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>`;
       if (typeof speakTest === 'function') setTimeout(() => speakTest(), 350);
-      documentRef.getElementById('testAnswer')?.focus();
+      focusAnswer();
       return;
     }
 
     content.innerHTML = `<div class="test-instructions">Typ hier het woord. Je krijgt pas aan het einde de uitslag.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="testAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier het woord in"><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>`;
-    documentRef.getElementById('testAnswer')?.focus();
+    focusAnswer();
   }
 
   return Object.freeze({ render, renderProgress });

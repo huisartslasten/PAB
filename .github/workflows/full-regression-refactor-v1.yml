@@ -1,5 +1,7 @@
 name: PacoGO full regression refactor v1
 
+# Agenda migration trigger: source-first cutover on the refactor branch only.
+
 on:
   push:
     branches:

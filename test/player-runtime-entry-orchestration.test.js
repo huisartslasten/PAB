@@ -54,20 +54,21 @@ test('player runtime entry owns start-render-submit-finish sequencing', async ()
     documentRef: doc,
     clock: () => '2026-10-07T00:01:00.000Z',
     createSession: (items, options) => {
+      const source = typeof options.shuffle === 'function' ? options.shuffle(items) : items;
       let index = 0;
       const answers = [];
       return {
         kind: 'test', type: options.type, startedAt: options.startedAt,
-        currentItem() { return items[index] || null; },
+        currentItem() { return source[index] || null; },
         get index() { return index; },
-        get total() { return items.length; },
+        get total() { return source.length; },
         get answers() { return [...answers]; },
         async submit(value) {
-          const item = items[index];
+          const item = source[index];
           const correct = value === item.answer;
           answers.push({ item, value, correct });
           index += 1;
-          return { correct, done: index >= items.length, index, total: items.length };
+          return { correct, done: index >= source.length, index, total: source.length };
         }
       };
     }

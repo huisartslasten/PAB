@@ -16,6 +16,9 @@ test('agenda runtime bootstrap installs the application-facing runtime', () => {
   assert.equal(target.pacoGOAgendaRuntime, entry);
   assert.equal(typeof target.showAgenda, 'function');
   assert.equal(typeof target.agendaMoveWeek, 'function');
+  assert.equal(typeof target.buildAgendaItemsForRender, 'function');
+  assert.equal(typeof target.getCustomAgendaItems, 'function');
+  assert.equal(typeof target.getTestCalendar, 'function');
 });
 
 test('agenda runtime bootstrap rejects an incomplete application host', () => {

@@ -1,4 +1,5 @@
 import { createAgendaRuntime } from './runtime.js';
+import { createAgendaCustomActions } from './custom-actions.js';
 
 const REQUIRED = ['storage', 'currentStudent', 'lessons', 'demoItems'];
 
@@ -11,7 +12,14 @@ function requireRuntimeHost(host) {
 
 export function createAgendaRuntimeEntry(host = {}) {
   requireRuntimeHost(host);
-  const runtime = createAgendaRuntime(host);
+  let runtime;
+  const actions = createAgendaCustomActions({
+    storage: host.storage,
+    documentRef: host.documentRef,
+    currentStudent: host.currentStudent,
+    onChanged: () => runtime?.render()
+  });
+  runtime = createAgendaRuntime({ ...host, onEdit: actions.editAgendaItem, onDelete: actions.deleteAgendaItem });
   const read = runtime.readService;
   return Object.freeze({
     runtime,
@@ -24,6 +32,10 @@ export function createAgendaRuntimeEntry(host = {}) {
     buildAgendaItemsForRender: student => read.buildAgendaItemsForRender(student),
     getCustomAgendaItems: student => read.getCustomAgendaItems(student),
     saveCustomAgendaItems: (items, student = host.currentStudent()) => read.customStorage.saveItems(items, student),
+    editAgendaItem: actions.editAgendaItem,
+    closeAgendaEditModal: actions.closeAgendaEditModal,
+    saveAgendaEditModal: actions.saveAgendaEditModal,
+    deleteAgendaItem: actions.deleteAgendaItem,
     getTestCalendar: () => read.getTestCalendar(),
     saveTestCalendar: items => read.testCalendar.save(items),
     normalizeAgendaDate: read.normalizeAgendaDate
@@ -44,6 +56,10 @@ export function installAgendaRuntimeEntry(host, target = globalThis) {
   target.buildAgendaItemsForRender = entry.buildAgendaItemsForRender;
   target.getCustomAgendaItems = entry.getCustomAgendaItems;
   target.saveCustomAgendaItems = entry.saveCustomAgendaItems;
+  target.editAgendaItem = entry.editAgendaItem;
+  target.closeAgendaEditModal = entry.closeAgendaEditModal;
+  target.saveAgendaEditModal = entry.saveAgendaEditModal;
+  target.deleteAgendaItem = entry.deleteAgendaItem;
   target.getTestCalendar = entry.getTestCalendar;
   target.saveTestCalendar = entry.saveTestCalendar;
   target.normalizeAgendaDate = entry.normalizeAgendaDate;

@@ -5,11 +5,14 @@ on:
     branches:
       - refactor/professional-v1
     paths:
+      - 'index.html'
       - 'src/features/lessons/player-*.js'
       - 'src/features/lessons/test-engine.js'
       - 'test/player-*.test.js'
+      - 'test/player-runtime-integration-source-contract.test.js'
       - 'test/browser/player-*.fixture.html'
       - 'test/browser/player-*.spec.js'
+      - 'test/browser/player-runtime-integration.browser.test.js'
       - '.github/workflows/professional-player-gate.yml'
   workflow_dispatch:
 
@@ -35,6 +38,8 @@ jobs:
           node --test
           test/player-runtime-entry-orchestration.test.js
           test/player-runtime-bootstrap.test.js
+          test/player-runtime-integration-source-contract.test.js
+          test/test-engine.test.js
 
   player-browser-proof:
     runs-on: ubuntu-latest
@@ -58,4 +63,8 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run professional player browser proof
-        run: npx playwright test test/browser/player-submit-boundary.spec.js
+        run: >-
+          npx playwright test
+          test/browser/player-submit-boundary.spec.js
+          test/browser/player-runtime-integration.browser.test.js
+          --workers=1

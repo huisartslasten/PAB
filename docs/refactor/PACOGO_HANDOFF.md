@@ -88,7 +88,9 @@ The classic-script runtime bridge exposes V4.78 application dependencies without
 - 601–610: lesson-loading runtime boundary extracted, runtime-wired, focused-tested, source-contract guarded, and browser-proven
 - 611–620: lesson-order service/runtime boundary extracted, runtime-wired, focused-tested, source-contract guarded, and browser-proven
 - 621–630: player/test-result source audit; canonical test engine aligned to V4.78 type-specific grading; explicit raw-answer submission boundary added; focused tests updated
-- 631–640: exact V4.78 DOM submission boundary extracted; controlled browser fixture/test added; browser workflow updated; CI currently running
+- 631–640: exact V4.78 DOM submission boundary extracted; controlled browser fixture/test added; browser workflow updated
+- 641–650: application-facing player runtime entry added; automatic final-submit finish and start/next rendering contract added; controlled browser proof upgraded; CI not triggered for the new changes
+- 651–660: superseded `player-runtime.js` / `player-runtime-bootstrap.js` and their tests removed; player architecture reduced to one application-facing runtime path; CI still not triggered for the cleanup commits
 
 ## Current state
 The guest lesson access, photo-to-lesson creation, test-attempt completion, lesson-loading, and lesson-order boundaries are migrated on `refactor/professional-v1`.
@@ -104,10 +106,10 @@ Exact V4.78 player behavior proven:
 - ordinary word tests are sent through the V4.78 AI grader; custom lessons use the AI grader when `ai_check_answers` is enabled and deterministic normalized equality when it is disabled.
 - `finishTest()` saves history, then renders the result and clears `activity`.
 
-Important correction: ordinary V4.78 word tests use the AI grading boundary. The professional test engine therefore receives an explicit injected `gradeAnswer` dependency.
-
 Current professional player modules:
 - `src/features/lessons/test-engine.js` — canonical test session and V4.78 type-specific grading boundary; supports injected AI grading and V4.78 shuffle.
+- `src/features/lessons/player-runtime-entry.js` — application-facing entry; owns start rendering and the V4.78 final-submit-to-finish transition.
+- `src/features/lessons/player-runtime-composition.js` — application dependency composition; no DOM ownership.
 - `src/features/lessons/player-runtime-adapter.js` — orchestration boundary; exposes `submitAnswer(answer)` so raw answers enter the canonical engine before persistence.
 - `src/features/lessons/player-submit-boundary.js` — exact V4.78 DOM submission boundary; reads `#testAnswer` or spelling's `#testPerfect`/`#testAdjective`, disables controls, delegates the raw value to `submitAnswer()`, and restores controls on failure.
 - `src/features/lessons/player-attempt.js` — maps session answers to completion attempt.
@@ -115,7 +117,9 @@ Current professional player modules:
 - `src/features/lessons/player-result.js` / `player-result-view.js` — pure result model/view boundary.
 - `src/features/lessons/player-persistence-model.js` — exact history row mapping.
 
-Current proven professional submission chain:
+Superseded runtime files `player-runtime.js` and `player-runtime-bootstrap.js` are intentionally absent. Their old tests were removed with them. They are not compatibility layers and are not part of the target architecture.
+
+Current professional submission chain:
 ```text
 V4.78 DOM (#testAnswer / #testPerfect + #testAdjective)
       ↓
@@ -140,61 +144,24 @@ result model/view
 
 The new submission boundary is still **not mounted into the real V4.78 runtime**. No legacy `submitTest()` or `startTest()` implementation has been removed.
 
-### Controlled browser proof added
-`test/browser/player-submit-boundary.fixture.html` constructs the professional adapter with an injected AI-grader stub and real browser DOM controls matching V4.78. `test/browser/player-submit-boundary.browser.test.js` fills the actual `#testAnswer`, calls the professional DOM boundary, verifies correct/incorrect engine results and then verifies the exact persistence payload after completion.
+### Controlled browser proof
+The controlled fixture/test has been upgraded to use `createPlayerRuntimeEntry()` and verify the application-facing path: start rendering, DOM answer submission, next-item rendering, automatic final-submit finish, exact persistence payload, and result rendering. This proof exists in `test/browser/player-submit-boundary.fixture.html` and `test/browser/player-submit-boundary.browser.test.js`.
 
-Focused source tests are in `test/player-submit-boundary.test.js`.
+The focused entry contract is in `test/player-runtime-entry.test.js`.
 
-### Current runtime architecture gap
-`player-runtime-bootstrap.js` currently exposes `createPlayerRuntime()` (completion/persistence runtime), not `createPlayerRuntimeAdapter()`. The adapter is therefore intentionally unmounted. Do **not** simply replace the bootstrap target: the next step must first define the correct application-facing composition boundary for lesson state, student, DOM result rendering, navigation, speech cancellation, and persistence. This is an architectural design step, not a patch.
+### Validation status
+The latest branch commits have **not** received a GitHub Actions workflow run. A direct commit workflow lookup for the current cleanup commit returned no workflow runs. Therefore the current player tree is **not CI-verified** and no green claim is made.
 
-### Other migrated paths
-The test-attempt path consists of:
-- `src/features/test-history/test-attempt-write-service.js` — deterministic `test_attempts` / `test_attempt_answers` persistence;
-- `src/features/test-history/test-attempt-runtime.js` — student-owned completion runtime contract;
-- `src/features/test-history/test-attempt-runtime-entry.js` — runtime state adapter/public handler installation;
-- `src/features/test-history/test-attempt-runtime-bootstrap.js` — explicit dynamic bootstrap/readiness boundary;
-- classic runtime bridge/facade — public `window.saveTestAttempt` path without legacy fallback.
-
-The lesson-loading path consists of:
-- `src/features/lessons/lesson-load-runtime.js` — V4.78 load success/error orchestration;
-- `src/features/lessons/lesson-load-runtime-entry.js` — explicit database/state/UI runtime bridge;
-- `src/features/lessons/lesson-load-runtime-bootstrap.js` — dynamic bootstrap/readiness boundary;
-- existing `src/services/lesson-service.js` — deterministic lesson query/data boundary reused without schema changes;
-- `index.html` — thin `loadLessons()` readiness-backed facade with no legacy Supabase implementation remaining.
-
-The lesson-order path consists of:
-- `src/features/lessons/lesson-order-service.js` — deterministic remote/local order persistence and ranking;
-- `src/features/lessons/lesson-order-runtime.js` — read/apply and save orchestration;
-- `src/features/lessons/lesson-order-runtime-entry.js` — explicit bridge validation and public runtime handlers;
-- `src/features/lessons/lesson-order-runtime-bootstrap.js` — dynamic bootstrap/readiness boundary;
-- `index.html` — thin readiness-backed `getOrderedLessons()` / `saveLessonOrder()` facades with the legacy `lesson_order` implementation removed.
-
-## Validation status
-- Photo boundary professional gate: **success**, run `37522351036`, job `112470686619`.
-- Photo browser proof: **success**, run `37523556598`, job `112474746075`.
-- Test-attempt professional gate: **success**, run `37526377590`.
-- Test-attempt browser proof: **success**, run `37526403261`, job `112484398814`.
-- Lesson-loading professional gate: **success**, run `37536029041`.
-- Lesson-loading browser proof: **success**, run `37535869080`, job `112516489142`.
-- Lesson-order professional gate: **success**, run `37536871075`.
-- Lesson-order browser proof: **success**, run `37536895653`, job `112520098729`.
-- Latest player browser proof before current submission-boundary work: success, run `37573898208`.
-- Current player submission-boundary browser proof: **in progress**, run `37574665481` (run #84).
-- Current player focused-test/professional CI verification: **pending/needs direct workflow check**.
-- No Supabase schema changes.
-- No `main`/LIVE changes.
-- No agenda-import changes.
-- No lesson-editor AI behavior added.
-- No visual redesign.
+Historical green runs remain historical evidence only:
+- prior player browser proof run `37574665481` was green before the later architecture cleanup;
+- prior professional gate run `37574613154` was green before the later architecture cleanup.
 
 ## Next gate
-1. Verify the current browser proof and focused CI.
-2. If green, build the **application-facing player composition boundary** rather than mounting the adapter directly into the existing bootstrap.
-3. That composition must explicitly provide: lesson, student, persistence, result rendering, speech cancellation, activity cleanup, retry navigation, back navigation, clock, and AI grading dependency.
-4. Prove `startTest → renderTest → DOM submit → finishTest → result/history` with controlled browser tests.
-5. Only after that design the final legacy `startTest()` / `submitTest()` integration/removal.
-6. Update this handoff and the corresponding checkpoint file at closure.
+1. Obtain executable validation of the current professional player tree.
+2. Verify the application-facing entry against the authoritative V4.78 start/render/submit/finish contract.
+3. Define the final integration seam without touching the legacy implementation prematurely.
+4. Only after the replacement boundary is source-verified, focused-tested, and runtime-validated, deliberately replace/remove the legacy player functions.
+5. Update this handoff and the corresponding checkpoint file at closure.
 
 If an architectural mismatch appears, redesign the boundary rather than patching the legacy monolith.
 

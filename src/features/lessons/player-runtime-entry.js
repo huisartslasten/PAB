@@ -24,11 +24,11 @@ export function createPlayerRuntimeEntry({
   gradeAnswer = null,
   documentRef = globalThis.document
 } = {}) {
-  const runtime = createApplicationPlayerRuntime({ lesson, student, db, persistence, renderResult, cancelSpeech, clearActivity, showLessonChoice, goBack, clock, createSession, gradeAnswer });
   if (typeof prepareTestView !== 'function') throw new Error('A test view preparer is required.');
   if (typeof renderTest !== 'function') throw new Error('A test renderer is required.');
   if (shuffle !== null && typeof shuffle !== 'function') throw new Error('A shuffle function is required when provided.');
 
+  const runtime = createApplicationPlayerRuntime({ lesson, student, db, persistence, renderResult, cancelSpeech, clearActivity, showLessonChoice, goBack, clock, createSession, gradeAnswer });
   const submitBoundary = createPlayerSubmitBoundary({ adapter: runtime, documentRef });
 
   function renderCurrentTest() {

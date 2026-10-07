@@ -1,7 +1,7 @@
 import { createCustomAgendaStorage } from './custom-storage.js';
 
 function key(date) {
-  const d = new Date(`${date}T12:00:00`);
+  const d = date instanceof Date ? new Date(date) : new Date(`${date}T12:00:00`);
   return [d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-');
 }
 
@@ -15,8 +15,8 @@ export function createAgendaCustomActions({ storage = globalThis.localStorage, d
     if (!item) return false;
     editId = id;
     const period = Boolean(item.periodId) || item.source === 'handmatig-periode';
-    const set = (id, value) => { const element = documentRef?.getElementById(id); if (element) element.value = value ?? ''; };
-    const toggle = (id, hidden) => documentRef?.getElementById(id)?.classList.toggle('hidden', hidden);
+    const set = (elementId, value) => { const element = documentRef?.getElementById(elementId); if (element) element.value = value ?? ''; };
+    const toggle = (elementId, hidden) => documentRef?.getElementById(elementId)?.classList.toggle('hidden', hidden);
     set('agendaEditTitle', item.title);
     set('agendaEditType', item.type || 'other');
     set('agendaEditMeta', item.meta);

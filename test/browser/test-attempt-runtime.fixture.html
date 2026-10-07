@@ -6,6 +6,6 @@
 var currentStudent='Zyon',currentLesson={id:42,type:'words'},__events=[];
 var db={from(table){return{insert(payload){__events.push({table,payload});if(table==='test_attempts')return{select(){return{single:async()=>({data:{id:91},error:null})}}};return Promise.resolve({error:null})}}}};
 </script>
-<script src="/test-history-storage.js"></script>
+<script type="module" src="/test-history-storage.js"></script>
 </body>
 </html>

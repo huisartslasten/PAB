@@ -12,6 +12,7 @@ function requireRuntimeHost(host) {
 export function createAgendaRuntimeEntry(host = {}) {
   requireRuntimeHost(host);
   const runtime = createAgendaRuntime(host);
+  const read = runtime.readService;
   return Object.freeze({
     runtime,
     showAgenda: () => runtime.show(),
@@ -19,7 +20,13 @@ export function createAgendaRuntimeEntry(host = {}) {
     agendaMoveWeek: delta => runtime.moveWeek(delta),
     agendaGoToday: () => runtime.goToday(),
     agendaSetWeek: date => runtime.setWeek(date),
-    agendaGetCurrentWeekStart: () => runtime.getCurrentWeekStart()
+    agendaGetCurrentWeekStart: () => runtime.getCurrentWeekStart(),
+    buildAgendaItemsForRender: student => read.buildAgendaItemsForRender(student),
+    getCustomAgendaItems: student => read.getCustomAgendaItems(student),
+    saveCustomAgendaItems: (items, student) => read.customStorage.saveItems(items, student),
+    getTestCalendar: () => read.getTestCalendar(),
+    saveTestCalendar: items => read.testCalendar.save(items),
+    normalizeAgendaDate: read.normalizeAgendaDate
   });
 }
 

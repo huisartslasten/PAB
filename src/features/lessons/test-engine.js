@@ -4,7 +4,7 @@ function normalize(value) {
   return String(value ?? '').trim().toLowerCase();
 }
 
-async function evaluateTestAnswer(type, value, expected, { gradeAnswer, aiCheckAnswers = true } = {}) {
+async function evaluateTestAnswer(type, item, value, expected, { gradeAnswer, aiCheckAnswers = true } = {}) {
   if (type === 'math') return Number(value) === Number(expected);
 
   if (type === 'spelling') {
@@ -26,7 +26,11 @@ async function evaluateTestAnswer(type, value, expected, { gradeAnswer, aiCheckA
     if (typeof gradeAnswer !== 'function') {
       throw new Error('An AI answer grader is required for this V4.78 test type.');
     }
-    const grading = await gradeAnswer(String(expected ?? ''), String(value ?? ''));
+    const grading = await gradeAnswer(
+      String(item?.question ?? ''),
+      String(expected ?? ''),
+      String(value ?? '')
+    );
     return grading?.correct === true;
   }
 
@@ -52,7 +56,7 @@ export function createTestSession(items = [], {
     if (index >= source.length) return null;
     const item = currentItem();
     const value = String(answer ?? '');
-    const correct = await evaluateTestAnswer(testType, value, item?.answer, { gradeAnswer, aiCheckAnswers });
+    const correct = await evaluateTestAnswer(testType, item, value, item?.answer, { gradeAnswer, aiCheckAnswers });
     answers.push({ item, value, correct });
     index += 1;
     return { correct, done: index >= source.length, index, total: source.length };

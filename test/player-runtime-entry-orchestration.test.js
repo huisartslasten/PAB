@@ -73,7 +73,7 @@ test('player runtime entry owns start-render-submit-finish sequencing', async ()
 
   doc.setNextValue('peer');
   const second = await entry.submitTest({ type: 'words' });
-  assert.equal(second, undefined);
+  assert.equal(second.result.score, 10);
   assert.equal(events.length, 1);
   assert.equal(rendered.at(-1)[0], 'result');
 });

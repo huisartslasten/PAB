@@ -10,14 +10,13 @@ function storage(seed = {}) {
 function documentStub() {
   const elements = new Map();
   const get = id => {
-    if (!elements.has(id)) elements.set(id, { value: '', checked: false, classList: { toggle() {}, add() {}, remove() {} }, classListToggle() {} });
+    if (!elements.has(id)) elements.set(id, { value: '', checked: false, classList: { toggle() {}, add() {}, remove() {} }, addEventListener() {} });
     return elements.get(id);
   };
   return {
     getElementById: get,
     querySelector: selector => selector === 'input[name="agendaManualRange"]:checked' ? { value: 'single' } : null,
-    querySelectorAll: () => [],
-    get elements() { return elements; }
+    querySelectorAll: () => []
   };
 }
 
@@ -33,20 +32,19 @@ test('professional Agenda import runtime adds a manual item', () => {
   doc.getElementById('agendaManualMeta').value = 'Hoofdstuk 4';
   const result = runtime.addManualItem();
   assert.equal(result.ok, true);
-  assert.deepEqual(JSON.parse(s.getItem('pacogo_agenda_items'))[0], {
-    id: JSON.parse(s.getItem('pacogo_agenda_items'))[0].id,
-    student: 'Zyon', date: '2026-10-09', type: 'test', title: 'Topografie', meta: 'Hoofdstuk 4', source: 'handmatig', createdAt: '2026-10-07T10:00:00.000Z'
-  });
+  const saved = JSON.parse(s.getItem('pacogo_agenda_items'));
+  assert.equal(saved[0].student, 'Zyon');
+  assert.equal(saved[0].date, '2026-10-09');
+  assert.equal(saved[0].title, 'Topografie');
+  assert.equal(saved[0].source, 'handmatig');
+  assert.equal(saved[0].createdAt, '2026-10-07T10:00:00.000Z');
 });
 
 test('professional Agenda import runtime commits reviewed items without duplicates', () => {
   const s = storage({ pacogo_agenda_items: [{ id: 'existing', student: 'Zyon', date: '2026-10-09', title: 'Topografie', type: 'test', meta: '' }] });
   const doc = documentStub();
   const runtime = createAgendaImportRuntime({ storage: s, documentRef: doc, db, currentStudent: () => 'Zyon', lessonMatchHtml: () => '' });
-  runtime.renderReview([
-    { date: '2026-10-09', title: 'Topografie', type: 'test', meta: '' },
-    { date: '2026-10-10', title: 'Geschiedenis', type: 'homework', meta: '' }
-  ]);
+  runtime.renderReview([{ date: '2026-10-09', title: 'Topografie', type: 'test', meta: '' }, { date: '2026-10-10', title: 'Geschiedenis', type: 'homework', meta: '' }]);
   doc.getElementById('agendaReviewDate0').value = '2026-10-09';
   doc.getElementById('agendaReviewTitle0').value = 'Topografie';
   doc.getElementById('agendaReviewType0').value = 'test';

@@ -15,10 +15,17 @@ test('practice session repeats until every item is mastered', () => {
   assert.equal(session.remaining, 1);
 });
 
-test('test session records answers and calculates a percentage', () => {
-  const session = createTestSession([{ id: 1, answer: 'Kat' }, { id: 2, answer: 'Hond' }]);
-  assert.equal(session.submit('kat').done, false);
-  assert.equal(session.submit('paard').done, true);
+test('test session records answers and calculates a percentage', async () => {
+  const session = createTestSession([
+    { id: 1, question: 'Dier', answer: 'Kat' },
+    { id: 2, question: 'Dier', answer: 'Hond' }
+  ], {
+    type: 'words',
+    gradeAnswer: async (_question, expected, given) => ({ correct: expected.toLowerCase() === given.toLowerCase() })
+  });
+
+  assert.equal((await session.submit('kat')).done, false);
+  assert.equal((await session.submit('paard')).done, true);
   assert.deepEqual(session.result(), { correct: 1, total: 2, score: 50, answers: session.answers });
 });
 

@@ -9,13 +9,14 @@ function storage(seed = {}) {
 
 function documentStub() {
   const elements = new Map();
+  const createElement = () => ({ value: '', checked: false, innerHTML: '', disabled: false, classList: { toggle() {}, add() {}, remove() {} }, addEventListener() {} });
   const get = id => {
-    if (!elements.has(id)) elements.set(id, { value: '', checked: false, classList: { toggle() {}, add() {}, remove() {} }, addEventListener() {} });
+    if (!elements.has(id)) elements.set(id, createElement());
     return elements.get(id);
   };
   return {
     getElementById: get,
-    querySelector: selector => selector === 'input[name="agendaManualRange"]:checked' ? { value: 'single' } : null,
+    querySelector: selector => selector === 'input[name="agendaManualRange"]:checked' ? get('agendaManualRangeChecked') : null,
     querySelectorAll: () => []
   };
 }

@@ -21,23 +21,14 @@ export function createPlayerRuntimeAdapter({
   showLessonChoice = () => {},
   goBack = () => {},
   clock = () => new Date().toISOString(),
-  createSession = createTestSession
+  createSession = createTestSession,
+  gradeAnswer = null
 } = {}) {
-  if (!lesson || typeof lesson !== 'object') {
-    throw new Error('A lesson is required.');
-  }
-  if (!persistence || typeof persistence.saveTestResult !== 'function') {
-    throw new Error('A player persistence service is required.');
-  }
-  if (typeof renderResult !== 'function') {
-    throw new Error('A result renderer is required.');
-  }
-  if (typeof clock !== 'function') {
-    throw new Error('A player clock is required.');
-  }
-  if (typeof createSession !== 'function') {
-    throw new Error('A test-session factory is required.');
-  }
+  if (!lesson || typeof lesson !== 'object') throw new Error('A lesson is required.');
+  if (!persistence || typeof persistence.saveTestResult !== 'function') throw new Error('A player persistence service is required.');
+  if (typeof renderResult !== 'function') throw new Error('A result renderer is required.');
+  if (typeof clock !== 'function') throw new Error('A player clock is required.');
+  if (typeof createSession !== 'function') throw new Error('A test-session factory is required.');
 
   let session = null;
 
@@ -45,22 +36,27 @@ export function createPlayerRuntimeAdapter({
     items = lesson.lesson_items || [],
     type = lesson.type || 'words',
     startedAt = clock(),
-    shuffle
+    shuffle,
+    aiCheckAnswers = lesson.ai_check_answers !== false
   } = {}) {
-    session = createSession(items, { type, startedAt, ...(shuffle ? { shuffle } : {}) });
+    session = createSession(items, {
+      type,
+      startedAt,
+      gradeAnswer,
+      aiCheckAnswers,
+      ...(shuffle ? { shuffle } : {})
+    });
     return session;
+  }
+
+  async function submitAnswer(answer) {
+    if (!session) throw new Error('No active test session.');
+    return session.submit(answer);
   }
 
   async function finishTest({ finishedAt = clock() } = {}) {
     if (!session) throw new Error('No active test session.');
-
-    const attempt = createPlayerAttempt({
-      lesson,
-      student,
-      session,
-      finishedAt
-    });
-
+    const attempt = createPlayerAttempt({ lesson, student, session, finishedAt });
     const total = attempt.answers.length;
     const correct = attempt.answers.filter(answer => answer?.correct === true).length;
     const attemptRow = buildTestAttemptRow({
@@ -72,37 +68,18 @@ export function createPlayerRuntimeAdapter({
       completedAt: attempt.finishedAt,
       isTest: true
     });
-    const answerRows = buildTestAttemptAnswerRows(attempt.answers, {
-      questionType: attempt.type
-    });
-
-    // finishPlayerTest supplies the attempt for sequencing/history-error handling;
-    // the adapter deliberately maps it to the persistence service's exact row contract.
-    const saveTestAttempt = () => persistence.saveTestResult({
-      attempt: attemptRow,
-      answers: answerRows
-    });
-
-    return finishPlayerTest({
-      attempt,
-      saveTestAttempt,
-      renderResult,
-      cancelSpeech,
-      clearActivity
-    });
+    const answerRows = buildTestAttemptAnswerRows(attempt.answers, { questionType: attempt.type });
+    const saveTestAttempt = () => persistence.saveTestResult({ attempt: attemptRow, answers: answerRows });
+    return finishPlayerTest({ attempt, saveTestAttempt, renderResult, cancelSpeech, clearActivity });
   }
 
-  function retry() {
-    showLessonChoice(lesson);
-  }
-
-  function back() {
-    goBack();
-  }
+  function retry() { showLessonChoice(lesson); }
+  function back() { goBack(); }
 
   return Object.freeze({
     get session() { return session; },
     startTest,
+    submitAnswer,
     finishTest,
     retry,
     back

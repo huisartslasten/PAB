@@ -31,7 +31,7 @@ test('player runtime adapter starts a typed V4.78-style test session', () => {
   assert.equal(session.startedAt != null, true);
 });
 
-test('player runtime adapter maps completion to persistence, result rendering, and cleanup', async () => {
+test('player runtime adapter grades answers through the canonical test engine before persistence', async () => {
   const calls = [];
   const persistence = {
     async saveTestResult(payload) {
@@ -50,8 +50,8 @@ test('player runtime adapter maps completion to persistence, result rendering, a
   });
 
   const session = adapter.startTest({ shuffle: items => items, startedAt: '2026-10-05T23:00:00.000Z' });
-  session.submit({ item: lesson().lesson_items[0], value: 'appel', correct: true });
-  session.submit({ item: lesson().lesson_items[1], value: 'bom', correct: false });
+  assert.equal(session.submit('appel').correct, true);
+  assert.equal(session.submit('bom').correct, false);
 
   const output = await adapter.finishTest();
 
@@ -108,8 +108,8 @@ test('player runtime adapter preserves V4.78 behavior when history save fails', 
   });
 
   const session = adapter.startTest({ shuffle: items => items });
-  session.submit({ item: lesson().lesson_items[0], value: 'appel', correct: true });
-  session.submit({ item: lesson().lesson_items[1], value: 'boom', correct: true });
+  assert.equal(session.submit('appel').correct, true);
+  assert.equal(session.submit('boom').correct, true);
 
   const output = await adapter.finishTest();
 

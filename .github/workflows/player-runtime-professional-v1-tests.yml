@@ -1,0 +1,38 @@
+name: PacoGO professional player runtime tests
+
+on:
+  push:
+    branches:
+      - refactor/professional-v1
+    paths:
+      - 'src/features/lessons/player-*.js'
+      - 'src/features/lessons/test-engine.js'
+      - 'test/player-*.test.js'
+      - 'test/browser/player-*.browser.test.js'
+      - 'test/browser/player-*.fixture.html'
+      - 'package.json'
+      - '.github/workflows/player-runtime-professional-v1-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  player-runtime-contract-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout refactor branch
+        uses: actions/checkout@v4
+        with:
+          ref: refactor/professional-v1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run professional player contract tests
+        run: >-
+          node --test
+          test/player-runtime-entry-orchestration.test.js
+          test/player-runtime-bootstrap.test.js

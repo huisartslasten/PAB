@@ -33,12 +33,16 @@ test('player runtime entry owns start-render-submit-finish sequencing', async ()
   const events = [];
   const prepared = [];
   let cancelled = 0;
+  let aiAudioStopped = 0;
+  let shuffled = 0;
 
   const entry = createPlayerRuntimeEntry({
     lesson: lesson(),
     student: 'Zyon',
     prepareTestView: payload => prepared.push(payload),
     cancelSpeech: () => { cancelled += 1; },
+    stopAiAudio: () => { aiAudioStopped += 1; },
+    shuffle: items => { shuffled += 1; return [...items].reverse(); },
     persistence: {
       async saveTestResult(payload) {
         events.push(['save', payload]);
@@ -71,17 +75,19 @@ test('player runtime entry owns start-render-submit-finish sequencing', async ()
 
   entry.startTest({ startedAt: '2026-10-07T00:00:00.000Z' });
   assert.equal(cancelled, 1);
+  assert.equal(aiAudioStopped, 1);
+  assert.equal(shuffled, 1);
   assert.deepEqual(prepared, [{ type: 'words', lesson: lesson() }]);
-  assert.deepEqual(rendered, [['test', 0, 2, 'words', 'q1']]);
+  assert.deepEqual(rendered, [['test', 0, 2, 'words', 'q2']]);
 
   const first = await entry.submitTest({ type: 'words' });
   assert.equal(first.done, false);
   assert.deepEqual(rendered, [
-    ['test', 0, 2, 'words', 'q1'],
-    ['test', 1, 2, 'words', 'q2']
+    ['test', 0, 2, 'words', 'q2'],
+    ['test', 1, 2, 'words', 'q1']
   ]);
 
-  doc.setNextValue('peer');
+  doc.setNextValue('appel');
   const second = await entry.submitTest({ type: 'words' });
   assert.equal(second.result.score, 10);
   assert.equal(events.length, 1);

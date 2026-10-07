@@ -2,7 +2,7 @@ import { createAgendaRuntime } from './runtime.js';
 import { createAgendaCustomActions } from './custom-actions.js';
 import { createAgendaImportRuntime } from './import-runtime.js';
 
-const REQUIRED = ['storage', 'currentStudent', 'lessons', 'demoItems', 'db'];
+const REQUIRED = ['storage', 'currentStudent', 'lessons', 'demoItems'];
 
 function requireRuntimeHost(host) {
   if (!host || typeof host !== 'object') throw new Error('An agenda runtime host is required.');
@@ -20,7 +20,7 @@ export function createAgendaRuntimeEntry(host = {}) {
     currentStudent: host.currentStudent,
     onChanged: () => runtime?.render()
   });
-  const imports = createAgendaImportRuntime({
+  const imports = host.db?.functions?.invoke ? createAgendaImportRuntime({
     storage: host.storage,
     documentRef: host.documentRef,
     db: host.db,
@@ -28,9 +28,10 @@ export function createAgendaRuntimeEntry(host = {}) {
     setCurrentStudent: host.setCurrentStudent,
     lessonMatchHtml: host.onLessonMatch,
     now: host.now
-  });
+  }) : null;
   runtime = createAgendaRuntime({ ...host, onEdit: actions.editAgendaItem, onDelete: actions.deleteAgendaItem });
   const read = runtime.readService;
+  const importAction = name => (...args) => imports?.[name]?.(...args);
   return Object.freeze({
     runtime,
     imports,
@@ -47,17 +48,17 @@ export function createAgendaRuntimeEntry(host = {}) {
     closeAgendaEditModal: actions.closeAgendaEditModal,
     saveAgendaEditModal: actions.saveAgendaEditModal,
     deleteAgendaItem: actions.deleteAgendaItem,
-    showAgendaImport: imports.showImport,
-    setAgendaImportMode: imports.setMode,
-    handleAgendaMediaFile: imports.handleMediaFile,
-    analyzeAgendaImage: imports.analyzeImage,
-    analyzeAgendaVideo: imports.analyzeVideo,
-    setManualAgendaRange: imports.setManualRange,
-    addManualAgendaItem: imports.addManualItem,
-    saveAgendaImportReview: imports.saveReview,
-    clearAgendaImportReview: imports.clearReview,
-    toggleAgendaReviewMeta: imports.toggleMeta,
-    toggleAllAgendaReviewMeta: imports.toggleAllMeta,
+    showAgendaImport: importAction('showImport'),
+    setAgendaImportMode: importAction('setMode'),
+    handleAgendaMediaFile: importAction('handleMediaFile'),
+    analyzeAgendaImage: importAction('analyzeImage'),
+    analyzeAgendaVideo: importAction('analyzeVideo'),
+    setManualAgendaRange: importAction('setManualRange'),
+    addManualAgendaItem: importAction('addManualItem'),
+    saveAgendaImportReview: importAction('saveReview'),
+    clearAgendaImportReview: importAction('clearReview'),
+    toggleAgendaReviewMeta: importAction('toggleMeta'),
+    toggleAllAgendaReviewMeta: importAction('toggleAllMeta'),
     getTestCalendar: () => read.getTestCalendar(),
     saveTestCalendar: items => read.testCalendar.save(items),
     normalizeAgendaDate: read.normalizeAgendaDate

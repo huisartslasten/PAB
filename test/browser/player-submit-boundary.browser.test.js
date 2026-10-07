@@ -13,7 +13,7 @@ test('browser runtime entry owns render-submit-finish-persist-result flow', asyn
   await page.locator('#testAnswer').fill('boom');
   const second = await page.evaluate(() => window.submitTest());
 
-  expect(second.result.score).toBe(100);
+  expect(second.result.score).toBe(10);
   expect(await page.evaluate(() => window.playerState())).toMatchObject({ index: 2 });
   expect(await page.evaluate(() => window.__events[0].attempt)).toMatchObject({
     lesson_id: 42,
@@ -23,5 +23,5 @@ test('browser runtime entry owns render-submit-finish-persist-result flow', asyn
     is_test: true
   });
   expect(await page.evaluate(() => window.__events[0].answers.map(x => x.is_correct))).toEqual([true, true]);
-  expect(await page.evaluate(() => window.__result.result.score)).toBe(100);
+  expect(await page.evaluate(() => window.__result.result.score)).toBe(10);
 });

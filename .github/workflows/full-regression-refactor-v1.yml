@@ -19,12 +19,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Generate temporary dependency lockfile
+      - name: Generate dependency lockfile
         run: npm install --package-lock-only --ignore-scripts
-      - name: Install dependencies from temporary lockfile
+      - name: Install dependencies from generated lockfile
         run: npm ci --ignore-scripts
-      - name: Diagnose dependency audit
-        run: npm audit --json > /tmp/npm-audit.json || true; cat /tmp/npm-audit.json
+      - name: Verify zero known dependency vulnerabilities
+        run: npm audit --audit-level=low
+      - name: Upload generated dependency lockfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: pacogo-package-lock
+          path: package-lock.json
+          if-no-files-found: error
       - name: Verify complete Agenda runtime boundary
         run: |
           ! grep -q 'function buildAgendaItemsForRender()' index.html
@@ -62,7 +68,7 @@ jobs:
         run: python3 -m http.server 4173 --directory . > /tmp/pacogo-http.log 2>&1 &
       - name: Run browser regression
         run: npx playwright test test/browser/*.browser.test.js --workers=1
-      - name: Verify working tree stayed clean
+      - name: Verify working tree stayed clean apart from generated lockfile
         run: |
           rm -rf test-results playwright-report node_modules package-lock.json
           status=$(git status --porcelain)

@@ -18,9 +18,6 @@
     .practice-choice-tag{padding:6px 10px;border-radius:999px;background:#eaf4ff;color:#126fc9;font-size:12px;font-weight:900}
     .practice-choice-button{border:0;border-radius:14px;padding:11px 17px;background:#1787f2;color:#fff;font:800 15px Nunito;box-shadow:0 4px 0 #0d6fd4;cursor:pointer}
     .practice-choice-button:hover{background:#0d6fd4}
-    .practice-choice-context{margin-bottom:18px;padding:15px 17px;border-radius:16px;background:#fff6df;border:2px solid #f4df9a}
-    .practice-choice-context strong{display:block;font-size:18px}
-    .practice-choice-context span{color:#667894;font-weight:700}
     @media(max-width:700px){.practice-choice-grid{grid-template-columns:1fr}.practice-choice-card{min-height:210px}}
   </style>
 </head>
@@ -33,21 +30,8 @@
     const params = new URLSearchParams(window.location.search);
     const lessonId = params.get('lesson_id') || '';
     const student = params.get('student') || 'Zyon';
-    const subject = params.get('subject') || 'Deze les';
-    const lessonTitle = params.get('title') || 'Oefenen';
-    const itemCount = params.get('items') || '';
     const mount = document.querySelector('#paco-template-mount');
     const content = document.createElement('div');
-
-    const context = document.createElement('div');
-    context.className = 'practice-choice-context';
-    const contextTitle = document.createElement('strong');
-    contextTitle.textContent = lessonTitle;
-    const contextMeta = document.createElement('span');
-    contextMeta.textContent = itemCount ? `${subject} · ${itemCount} onderdelen` : subject;
-    context.appendChild(contextTitle);
-    context.appendChild(contextMeta);
-    content.appendChild(context);
 
     const grid = document.createElement('div');
     grid.className = 'practice-choice-grid';
@@ -117,7 +101,6 @@
         { icon:'📚', label:'Mijn lessen', expanded:true, submenu:[
           { label:'Español' }, { label:'Geschiedenis' }, { label:'Nederlands' }
         ] },
-        { icon:'✏️', label:'Oefenen', active:true },
         { icon:'📝', label:'Toetsen' },
         { icon:'📅', label:'Mijn agenda', expanded:true, submenu:[
           { label:'Agenda invoeren' }, { label:'Maandkalender' }

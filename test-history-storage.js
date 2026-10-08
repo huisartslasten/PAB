@@ -61,8 +61,8 @@ window.saveTestAttempt = async function saveTestAttemptRuntimeFacade(attempt) {
   return runtimeHandler(attempt);
 };
 
-// V5.0 application integration: the practice feature owns LES → OEFENEN navigation.
-setReadableTestVersion('V5.0');
+// V5.2 application integration: the practice feature owns LES → OEFENEN navigation.
+setReadableTestVersion('V5.2');
 const stopLessonPracticeIntegration = installLessonPracticeIntegration({
   getCurrentLesson: () => currentLesson,
   documentRef: document,

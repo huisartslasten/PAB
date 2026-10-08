@@ -40,6 +40,12 @@ function createNavigationItem(item) {
     chevron.className = 'paco-template-nav-chevron';
     chevron.textContent = '›';
     button.appendChild(chevron);
+
+    // Nederlands is a permanent template section: its submenu must remain
+    // expanded and must not depend on hover/focus state.
+    if (String(item.label || '').trim().toLowerCase() === 'nederlands') {
+      group.classList.add('always-open');
+    }
   }
 
   if (typeof item.onClick === 'function') button.addEventListener('click', item.onClick);
@@ -247,6 +253,7 @@ export function createPacoPageTemplate({
   headingWrap.appendChild(heading);
   if (subtitle) {
     const subtitleElement = document.createElement('p');
+    subtitleElement.className = 'paco-template-page-subtitle';
     subtitleElement.textContent = subtitle;
     headingWrap.appendChild(subtitleElement);
   }

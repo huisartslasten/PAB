@@ -41,9 +41,10 @@ function createNavigationItem(item) {
     chevron.textContent = '›';
     button.appendChild(chevron);
 
-    if (item.expanded === true) {
-      group.classList.add('always-open');
-    }
+    // All main navigation groups are permanently expanded in the canonical
+    // PacoGO template. This prevents later navigation items from becoming
+    // inaccessible because a parent group collapsed.
+    group.classList.add('always-open');
   }
 
   if (typeof item.onClick === 'function') button.addEventListener('click', item.onClick);

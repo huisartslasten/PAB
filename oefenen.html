@@ -18,6 +18,8 @@
     .practice-choice-tag{padding:5px 9px;border-radius:999px;background:#eaf4ff;color:#126fc9;font-size:11px;font-weight:900}
     .practice-choice-button{border:0;border-radius:12px;padding:9px 14px;background:#1787f2;color:#fff;font:800 14px Nunito;box-shadow:0 3px 0 #0d6fd4;cursor:pointer}
     .practice-choice-button:hover{background:#0d6fd4}
+    .practice-choice-card:not(.available) .practice-choice-tag{background:#f0f2f5;color:#7b8798}
+    .practice-choice-card.is-loading{opacity:.72}
     @media(max-width:1000px){.practice-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(max-width:700px){.practice-choice-grid{grid-template-columns:1fr}.practice-choice-card{min-height:180px}}
   </style>
@@ -27,6 +29,7 @@
 
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
+    import { createPacoGOApp } from './src/app/bootstrap.js';
 
     const params = new URLSearchParams(window.location.search);
     const lessonId = params.get('lesson_id') || '';
@@ -38,53 +41,57 @@
     grid.className = 'practice-choice-grid';
 
     const cards = [
-      { icon:'🃏', title:'Flashcards', text:'Oefen de inhoud van deze les met korte vraag-en-antwoordkaarten.', available:true },
+      { icon:'🃏', title:'Flashcards', text:'Oefen de inhoud van deze les met korte vraag-en-antwoordkaarten.', available:false },
       { icon:'🎮', title:'Spelletjes', text:'Straks kun je deze les ook oefenen met leuke spelletjes.', available:false },
       { icon:'✏️', title:'Oefenen', text:'Een gerichte oefenvorm voor de inhoud van deze les.', available:false },
       { icon:'❓', title:'Vragen & antwoorden', text:'Oefen met vragen en controleer daarna je antwoord.', available:false },
       { icon:'🔄', title:'Herhalen', text:'Kom terug op onderdelen die je nog extra wilt oefenen.', available:false }
     ];
 
-    cards.forEach(card => {
-      const article = document.createElement('article');
-      article.className = `practice-choice-card${card.available ? ' available' : ''}`;
+    function renderChoices() {
+      grid.replaceChildren();
+      cards.forEach(card => {
+        const article = document.createElement('article');
+        article.className = `practice-choice-card${card.available ? ' available' : ''}${card.loading ? ' is-loading' : ''}`;
 
-      const top = document.createElement('div');
-      const icon = document.createElement('div');
-      icon.className = 'practice-choice-icon';
-      icon.textContent = card.icon;
-      const title = document.createElement('h2');
-      title.textContent = card.title;
-      const text = document.createElement('p');
-      text.textContent = card.text;
-      top.append(icon, title, text);
+        const top = document.createElement('div');
+        const icon = document.createElement('div');
+        icon.className = 'practice-choice-icon';
+        icon.textContent = card.icon;
+        const title = document.createElement('h2');
+        title.textContent = card.title;
+        const text = document.createElement('p');
+        text.textContent = card.text;
+        top.append(icon, title, text);
 
-      const footer = document.createElement('div');
-      footer.className = 'practice-choice-footer';
-      const tag = document.createElement('span');
-      tag.className = 'practice-choice-tag';
-      tag.textContent = card.available ? 'Beschikbaar' : 'Binnenkort';
-      footer.appendChild(tag);
+        const footer = document.createElement('div');
+        footer.className = 'practice-choice-footer';
+        const tag = document.createElement('span');
+        tag.className = 'practice-choice-tag';
+        tag.textContent = card.loading ? 'Laden…' : (card.available ? 'Beschikbaar' : 'Binnenkort');
+        footer.appendChild(tag);
 
-      if (card.available) {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'practice-choice-button';
-        button.textContent = 'Oefenen →';
-        button.addEventListener('click', () => {
-          const target = new URL('flashcards-template.html', window.location.href);
-          if (lessonId) target.searchParams.set('lesson_id', lessonId);
-          target.searchParams.set('student', student);
-          window.location.href = target.toString();
-        });
-        footer.appendChild(button);
-      }
+        if (card.available) {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'practice-choice-button';
+          button.textContent = 'Oefenen →';
+          button.addEventListener('click', () => {
+            const target = new URL('flashcards-template.html', window.location.href);
+            if (lessonId) target.searchParams.set('lesson_id', lessonId);
+            target.searchParams.set('student', student);
+            window.location.href = target.toString();
+          });
+          footer.appendChild(button);
+        }
 
-      article.append(top, footer);
-      grid.appendChild(article);
-    });
+        article.append(top, footer);
+        grid.appendChild(article);
+      });
+    }
 
     content.appendChild(grid);
+    renderChoices();
 
     mountPacoPageTemplate({
       mount,
@@ -109,6 +116,38 @@
       ],
       content
     });
+
+    async function connectLessonToPractice() {
+      const flashcards = cards.find(card => card.title === 'Flashcards');
+      if (!flashcards || !lessonId) return;
+
+      flashcards.loading = true;
+      renderChoices();
+
+      try {
+        const app = createPacoGOApp({ supabaseLib: window.supabase });
+        const lessons = await app.lessons.listAll();
+        const lesson = lessons.find(candidate => String(candidate.id) === String(lessonId));
+        const items = lesson?.lesson_items || [];
+        const validCards = items.filter(item =>
+          String(item?.question || '').trim() && String(item?.answer || '').trim()
+        );
+
+        flashcards.available = validCards.length > 0;
+        flashcards.text = flashcards.available
+          ? 'Oefen de inhoud van deze les met korte vraag-en-antwoordkaarten.'
+          : 'Deze les bevat nog geen complete vraag-en-antwoordkaarten.';
+      } catch (error) {
+        console.error('Practice availability load error:', error);
+        flashcards.available = false;
+        flashcards.text = 'De oefenmogelijkheden van deze les konden niet worden geladen.';
+      } finally {
+        flashcards.loading = false;
+        renderChoices();
+      }
+    }
+
+    connectLessonToPractice();
   </script>
 </body>
 </html>

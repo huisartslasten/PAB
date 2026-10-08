@@ -4,69 +4,169 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PacoGO — Flashcards</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="src/components/page-template.css">
   <style>
-    .flashcards-content { display:grid; gap:18px; }
-    .flashcards-intro { margin:0; color:#52606d; font-size:1rem; }
-    .flashcards-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
-    .flashcard { min-height:180px; border:1px solid #dfe7ef; border-radius:18px; background:#fff; padding:20px; box-shadow:0 5px 16px rgba(38,75,105,.08); display:flex; flex-direction:column; justify-content:space-between; }
-    .flashcard-label { font-size:.82rem; font-weight:800; color:#6b7c8d; text-transform:uppercase; letter-spacing:.04em; }
-    .flashcard-word { margin:14px 0 0; font-family:'Baloo 2',sans-serif; font-size:1.45rem; color:#17324d; }
-    .flashcard-action { align-self:flex-start; border:0; border-radius:12px; padding:9px 14px; font:700 .95rem 'Nunito',sans-serif; color:#fff; background:#2f80ed; cursor:pointer; }
-    @media (max-width:760px){ .flashcards-grid{grid-template-columns:1fr;} }
+    .flashcards-content {
+      display: grid;
+      gap: 18px;
+    }
+
+    .flashcards-intro {
+      margin: 0;
+      color: #667894;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .flashcards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .flashcard-set {
+      min-height: 250px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      background: #fffdf0;
+      border: 2px solid #f4e8a8;
+      border-radius: 24px;
+      box-shadow: 0 8px 0 rgba(16, 43, 87, .08), 0 14px 28px rgba(16, 43, 87, .10);
+      cursor: pointer;
+      transition: transform .15s, box-shadow .15s;
+    }
+
+    .flashcard-set:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 0 rgba(16, 43, 87, .08), 0 16px 30px rgba(16, 43, 87, .13);
+    }
+
+    .flashcard-set-icon {
+      min-height: 116px;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      background: #eef8ff;
+      font-size: 58px;
+    }
+
+    .flashcard-set h2 {
+      margin: 14px 0 2px;
+      font-family: "Baloo 2", Nunito, sans-serif;
+      font-size: 25px;
+      line-height: 1.05;
+      font-weight: 900;
+      color: #102b57;
+    }
+
+    .flashcard-set p {
+      margin: 0;
+      color: #667894;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .flashcard-set-action {
+      margin-top: auto;
+      padding-top: 16px;
+      color: #0d6fd4;
+      font-family: "Baloo 2", Nunito, sans-serif;
+      font-size: 17px;
+      font-weight: 900;
+    }
+
+    @media (max-width: 1050px) {
+      .flashcards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 700px) {
+      .flashcards-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
-  <div class="pacogo-page">
-    <header class="pacogo-top-banner" aria-label="PacoGO">
-      <div class="pacogo-brand">PacoGO</div>
-      <div class="pacogo-dog" aria-hidden="true">🐶</div>
-    </header>
+  <div id="paco-template-mount"></div>
 
-    <div class="pacogo-page-body">
-      <aside class="pacogo-sidebar">
-        <a class="pacogo-back" href="index.html">← Terug</a>
-        <div class="pacogo-greeting">Hoi Zyon! 🐶</div>
-        <nav class="pacogo-nav" aria-label="Hoofdnavigatie">
-          <a href="index.html">Home</a>
-          <a href="#">Mijn lessen</a>
-          <a class="active" href="flashcards-template.html">Flashcards</a>
-          <a href="#">Mijn agenda</a>
-          <a href="#">Beheer</a>
-        </nav>
-      </aside>
+  <script type="module">
+    import { mountPacoPageTemplate } from './src/components/page-template.js';
 
-      <main class="pacogo-middle-field">
-        <section class="pacogo-page-header">
-          <div class="pacogo-page-header-icon" aria-hidden="true">🃏</div>
-          <div>
-            <h1>Flashcards</h1>
-            <p>Oefen woorden, begrippen en thema's met flashcards.</p>
-          </div>
-        </section>
+    const content = document.createElement('div');
+    content.className = 'flashcards-content';
 
-        <section class="flashcards-content" aria-label="Flashcards">
-          <p class="flashcards-intro">Kies een kaart om te oefenen.</p>
-          <div class="flashcards-grid">
-            <article class="flashcard">
-              <div><div class="flashcard-label">Themawoorden</div><h2 class="flashcard-word">Voorbeeldkaart</h2></div>
-              <button class="flashcard-action" type="button">Oefenen</button>
-            </article>
-            <article class="flashcard">
-              <div><div class="flashcard-label">Spelling</div><h2 class="flashcard-word">Nieuwe kaart</h2></div>
-              <button class="flashcard-action" type="button">Oefenen</button>
-            </article>
-            <article class="flashcard">
-              <div><div class="flashcard-label">Begrippen</div><h2 class="flashcard-word">Mijn kaarten</h2></div>
-              <button class="flashcard-action" type="button">Oefenen</button>
-            </article>
-          </div>
-        </section>
-      </main>
-    </div>
-  </div>
+    const intro = document.createElement('p');
+    intro.className = 'flashcards-intro';
+    intro.textContent = 'Kies wat je wilt oefenen met flashcards.';
+    content.appendChild(intro);
+
+    const grid = document.createElement('div');
+    grid.className = 'flashcards-grid';
+
+    const sets = [
+      { icon: '📚', title: 'Themawoorden', text: 'Oefen vraag en antwoord uit je lessen.' },
+      { icon: '✏️', title: 'Spelling', text: 'Oefen woorden waarbij vraag en antwoord duidelijk zijn.' },
+      { icon: '🎓', title: 'Begrippen', text: 'Oefen begrippen en hun betekenis.' }
+    ];
+
+    sets.forEach(set => {
+      const card = document.createElement('article');
+      card.className = 'flashcard-set paco-lesson-card';
+
+      const icon = document.createElement('div');
+      icon.className = 'flashcard-set-icon';
+      icon.textContent = set.icon;
+      card.appendChild(icon);
+
+      const title = document.createElement('h2');
+      title.textContent = set.title;
+      card.appendChild(title);
+
+      const description = document.createElement('p');
+      description.textContent = set.text;
+      card.appendChild(description);
+
+      const action = document.createElement('div');
+      action.className = 'flashcard-set-action';
+      action.textContent = 'Oefenen →';
+      card.appendChild(action);
+
+      grid.appendChild(card);
+    });
+
+    content.appendChild(grid);
+
+    mountPacoPageTemplate({
+      mount: document.querySelector('#paco-template-mount'),
+      backLabel: '← Terug',
+      backAction: () => { window.location.href = 'index.html'; },
+      greeting: 'Hoi Zyon! 🐶',
+      title: 'Flashcards',
+      icon: '🃏',
+      subtitle: 'Oefen woorden, begrippen en thema\'s met flashcards.',
+      navigation: [
+        { icon: '🏠', label: 'Dashboard', onClick: () => { window.location.href = 'index.html'; } },
+        {
+          icon: '📚',
+          label: 'Mijn lessen',
+          submenu: [
+            { label: 'Español' },
+            { label: 'Geschiedenis' },
+            { label: 'Nederlands' }
+          ]
+        },
+        {
+          icon: '📅',
+          label: 'Mijn agenda',
+          submenu: [
+            { label: 'Agenda invoeren' },
+            { label: 'Maandkalender' }
+          ]
+        },
+        { icon: '🃏', label: 'Flashcards', active: true }
+      ],
+      content
+    });
+  </script>
 </body>
 </html>

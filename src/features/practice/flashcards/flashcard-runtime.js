@@ -9,8 +9,7 @@ import {
 export async function mountFlashcardPractice({
   mount,
   lessonId,
-  student = 'Zyon',
-  onBack = null
+  student = 'Zyon'
 } = {}) {
   if (!(mount instanceof HTMLElement)) throw new TypeError('A flashcard mount is required.');
 
@@ -61,9 +60,11 @@ export async function mountFlashcardPractice({
   progress.className = 'flashcard-progress';
   controls.appendChild(progress);
 
-  const card = document.createElement('button');
-  card.type = 'button';
+  const card = document.createElement('article');
   card.className = 'flashcard-card';
+  card.tabIndex = 0;
+  card.setAttribute('role', 'button');
+  card.setAttribute('aria-label', 'Flashcard. Druk op Enter om verder te gaan.');
   content.replaceChildren(controls, card);
 
   const prompt = document.createElement('div');
@@ -83,7 +84,9 @@ export async function mountFlashcardPractice({
     prompt.textContent = current.prompt;
     answer.textContent = current.revealed ? current.answer : '';
     answer.hidden = !current.revealed;
-    hint.textContent = current.revealed ? 'Druk op Enter voor de volgende kaart' : 'Druk op Enter om het antwoord te zien';
+    hint.textContent = current.revealed
+      ? 'Druk op Enter voor de volgende kaart'
+      : 'Druk op Enter om het antwoord te zien';
     progress.textContent = `${current.index + 1} / ${current.total}`;
     reverseButton.setAttribute('aria-pressed', String(reverse));
     reverseButton.textContent = reverse ? '↔ Normaal oefenen' : '↔ Omgekeerd oefenen';
@@ -120,15 +123,8 @@ export async function mountFlashcardPractice({
     handleAdvance();
   });
 
-  document.addEventListener('keydown', event => {
-    if (event.key !== 'Enter' || document.activeElement === reverseButton) return;
-    if (document.activeElement !== card) return;
-    event.preventDefault();
-    handleAdvance();
-  });
-
   render();
   card.focus();
 
-  return { lesson, cards };
+  return { lesson, cards, student };
 }

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — Page Template</title>
+  <link rel="stylesheet" href="src/components/page-template.css">
+</head>
+<body>
+  <div id="paco-template-mount"></div>
+
+  <script type="module">
+    import { mountPacoPageTemplate } from './src/components/page-template.js';
+
+    const content = document.createElement('div');
+    content.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px">
+        <article style="background:#fff6df;border:1px solid #dce9f6;border-radius:22px;padding:20px;min-height:160px;box-shadow:0 8px 22px rgba(16,43,87,.09)">
+          <div style="font-size:46px;background:#eef8ff;border-radius:17px;padding:18px;text-align:center">🏴‍☠️</div>
+          <h2 style="font-family:'Baloo 2',Nunito,sans-serif;margin:14px 0 2px">Geschiedenis</h2>
+          <div style="color:#667894">1 les · Bekijk →</div>
+        </article>
+        <article style="background:#fff6df;border:1px solid #dce9f6;border-radius:22px;padding:20px;min-height:160px;box-shadow:0 8px 22px rgba(16,43,87,.09)">
+          <div style="font-size:46px;background:#eef8ff;border-radius:17px;padding:18px;text-align:center">📚</div>
+          <h2 style="font-family:'Baloo 2',Nunito,sans-serif;margin:14px 0 2px">Nederlands</h2>
+          <div style="color:#667894">5 lessen · Bekijk →</div>
+        </article>
+        <article style="background:#fff6df;border:1px solid #dce9f6;border-radius:22px;padding:20px;min-height:160px;box-shadow:0 8px 22px rgba(16,43,87,.09)">
+          <div style="font-size:46px;background:#eef8ff;border-radius:17px;padding:18px;text-align:center">🎓</div>
+          <h2 style="font-family:'Baloo 2',Nunito,sans-serif;margin:14px 0 2px">Español</h2>
+          <div style="color:#667894">1 les · Bekijk →</div>
+        </article>
+      </div>
+    `;
+
+    mountPacoPageTemplate({
+      mount: document.querySelector('#paco-template-mount'),
+      backLabel: '← Terug',
+      greeting: 'Hoi Zyon! 🐶',
+      title: 'Wat wil je leren?',
+      navigation: [
+        { icon: '🏠', label: 'Home', active: true },
+        { icon: '📖', label: 'Mijn lessen' },
+        { icon: '🎓', label: 'Español' },
+        { icon: '🏴‍☠️', label: 'geschiedenis' },
+        { icon: '📅', label: 'Mijn agenda' },
+        { icon: '📝', label: 'Toetsgeschiedenis' }
+      ],
+      content
+    });
+  </script>
+</body>
+</html>

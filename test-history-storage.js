@@ -59,3 +59,30 @@ window.saveTestAttempt = async function saveTestAttemptRuntimeFacade(attempt) {
   const runtimeHandler = await testAttemptRuntimeBootstrap;
   return runtimeHandler(attempt);
 };
+
+/* Flashcards: LES → OEFENEN → Flashcards. Keep the existing lesson-choice flow. */
+const originalPacoOpenLesson = window.openLesson;
+window.openLesson = function flashcardAwareOpenLesson(id) {
+  const result = originalPacoOpenLesson?.(id);
+  const lesson = lessons.find(item => Number(item.id) === Number(id));
+  if (!lesson) return result;
+
+  const choiceGrid = document.getElementById('choiceGrid');
+  if (!choiceGrid) return result;
+
+  const practiceChoice = [...choiceGrid.querySelectorAll('button.choice')]
+    .find(button => button.querySelector('h3')?.textContent.trim() === 'Oefenen');
+  if (!practiceChoice) return result;
+
+  practiceChoice.onclick = () => {
+    const target = new URL('oefenen.html', window.location.href);
+    target.searchParams.set('lesson_id', String(lesson.id));
+    target.searchParams.set('student', String(lesson.student || currentStudent || 'Zyon'));
+    target.searchParams.set('subject', String(lesson.subject || 'Deze les'));
+    target.searchParams.set('title', String(lesson.title || 'Oefenen'));
+    target.searchParams.set('items', String((lesson.lesson_items || []).length));
+    window.location.href = target.toString();
+  };
+
+  return result;
+};

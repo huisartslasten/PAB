@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — Flashcards</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/components/page-template.css">
+  <style>
+    .flashcards-content { display:grid; gap:18px; }
+    .flashcards-intro { margin:0; color:#52606d; font-size:1rem; }
+    .flashcards-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+    .flashcard { min-height:180px; border:1px solid #dfe7ef; border-radius:18px; background:#fff; padding:20px; box-shadow:0 5px 16px rgba(38,75,105,.08); display:flex; flex-direction:column; justify-content:space-between; }
+    .flashcard-label { font-size:.82rem; font-weight:800; color:#6b7c8d; text-transform:uppercase; letter-spacing:.04em; }
+    .flashcard-word { margin:14px 0 0; font-family:'Baloo 2',sans-serif; font-size:1.45rem; color:#17324d; }
+    .flashcard-action { align-self:flex-start; border:0; border-radius:12px; padding:9px 14px; font:700 .95rem 'Nunito',sans-serif; color:#fff; background:#2f80ed; cursor:pointer; }
+    @media (max-width:760px){ .flashcards-grid{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+  <div class="pacogo-page">
+    <header class="pacogo-top-banner" aria-label="PacoGO">
+      <div class="pacogo-brand">PacoGO</div>
+      <div class="pacogo-dog" aria-hidden="true">🐶</div>
+    </header>
+
+    <div class="pacogo-page-body">
+      <aside class="pacogo-sidebar">
+        <a class="pacogo-back" href="index.html">← Terug</a>
+        <div class="pacogo-greeting">Hoi Zyon! 🐶</div>
+        <nav class="pacogo-nav" aria-label="Hoofdnavigatie">
+          <a href="index.html">Home</a>
+          <a href="#">Mijn lessen</a>
+          <a class="active" href="flashcards-template.html">Flashcards</a>
+          <a href="#">Mijn agenda</a>
+          <a href="#">Beheer</a>
+        </nav>
+      </aside>
+
+      <main class="pacogo-middle-field">
+        <section class="pacogo-page-header">
+          <div class="pacogo-page-header-icon" aria-hidden="true">🃏</div>
+          <div>
+            <h1>Flashcards</h1>
+            <p>Oefen woorden, begrippen en thema's met flashcards.</p>
+          </div>
+        </section>
+
+        <section class="flashcards-content" aria-label="Flashcards">
+          <p class="flashcards-intro">Kies een kaart om te oefenen.</p>
+          <div class="flashcards-grid">
+            <article class="flashcard">
+              <div><div class="flashcard-label">Themawoorden</div><h2 class="flashcard-word">Voorbeeldkaart</h2></div>
+              <button class="flashcard-action" type="button">Oefenen</button>
+            </article>
+            <article class="flashcard">
+              <div><div class="flashcard-label">Spelling</div><h2 class="flashcard-word">Nieuwe kaart</h2></div>
+              <button class="flashcard-action" type="button">Oefenen</button>
+            </article>
+            <article class="flashcard">
+              <div><div class="flashcard-label">Begrippen</div><h2 class="flashcard-word">Mijn kaarten</h2></div>
+              <button class="flashcard-action" type="button">Oefenen</button>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+</html>

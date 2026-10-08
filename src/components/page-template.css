@@ -32,9 +32,9 @@
 .paco-template-nav-item.active { background: #dff0ff; color: var(--paco-blue-dark); }
 .paco-template-nav-icon { width: 27px; flex: 0 0 27px; text-align: center; font-size: 21px; }
 .paco-template-nav-chevron { margin-left: auto; color: var(--paco-blue-dark); font-size: 15px; transition: transform .15s ease; }
-.paco-template-nav-group:hover .paco-template-nav-chevron, .paco-template-nav-group:focus-within .paco-template-nav-chevron { transform: rotate(90deg); }
+.paco-template-nav-group:hover .paco-template-nav-chevron, .paco-template-nav-group:focus-within .paco-template-nav-chevron, .paco-template-nav-group.always-open .paco-template-nav-chevron { transform: rotate(90deg); }
 .paco-template-nav-submenu { display: none; margin: 2px 0 5px 40px; padding: 2px 0 2px 12px; border-left: 2px solid #cde5fa; }
-.paco-template-nav-group:hover .paco-template-nav-submenu, .paco-template-nav-group:focus-within .paco-template-nav-submenu { display: flex; flex-direction: column; gap: 3px; }
+.paco-template-nav-group:hover .paco-template-nav-submenu, .paco-template-nav-group:focus-within .paco-template-nav-submenu, .paco-template-nav-group.always-open .paco-template-nav-submenu { display: flex; flex-direction: column; gap: 3px; }
 .paco-template-nav-subitem { border: 0; border-radius: 11px; padding: 8px 10px; background: transparent; color: var(--paco-text); font-family: "Baloo 2", Nunito, sans-serif; font-size: 15px; font-weight: 800; text-align: left; cursor: pointer; }
 .paco-template-nav-subitem:hover, .paco-template-nav-subitem.active { background: #dff0ff; color: var(--paco-blue-dark); }
 .paco-template-main { min-width: 0; }

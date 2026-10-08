@@ -41,9 +41,7 @@ function createNavigationItem(item) {
     chevron.textContent = '›';
     button.appendChild(chevron);
 
-    // Nederlands is a permanent template section: its submenu must remain
-    // expanded and must not depend on hover/focus state.
-    if (String(item.label || '').trim().toLowerCase() === 'nederlands') {
+    if (item.expanded === true) {
       group.classList.add('always-open');
     }
   }

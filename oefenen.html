@@ -6,19 +6,20 @@
   <title>PacoGO — Oefenen</title>
   <link rel="stylesheet" href="src/components/page-template.css">
   <style>
-    .practice-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
-    .practice-choice-card{min-height:235px;display:flex;flex-direction:column;justify-content:space-between;padding:24px;border:2px solid #dce9f6;border-radius:24px;background:#fff;box-shadow:0 8px 0 rgba(16,43,87,.06),0 14px 28px rgba(16,43,87,.08);transition:.16s}
+    .practice-choice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    .practice-choice-card{min-height:180px;display:flex;flex-direction:column;justify-content:space-between;padding:18px;border:2px solid #dce9f6;border-radius:22px;background:#fff;box-shadow:0 6px 0 rgba(16,43,87,.06),0 10px 22px rgba(16,43,87,.07);transition:.16s}
     .practice-choice-card.available{background:#fffdf0;border-color:#f4e8a8}
-    .practice-choice-card.available:hover{transform:translateY(-3px);box-shadow:0 11px 0 rgba(16,43,87,.07),0 18px 32px rgba(16,43,87,.12)}
-    .practice-choice-icon{height:105px;border-radius:20px;background:#eef8ff;display:flex;align-items:center;justify-content:center;font-size:58px;margin-bottom:18px}
+    .practice-choice-card.available:hover{transform:translateY(-3px);box-shadow:0 9px 0 rgba(16,43,87,.07),0 14px 26px rgba(16,43,87,.1)}
+    .practice-choice-icon{height:72px;border-radius:17px;background:#eef8ff;display:flex;align-items:center;justify-content:center;font-size:42px;margin-bottom:14px}
     .practice-choice-card.available .practice-choice-icon{background:#fff6cf}
-    .practice-choice-card h2{margin:0 0 6px;font-family:"Baloo 2",Nunito,sans-serif;font-size:30px;line-height:1;color:#102b57}
-    .practice-choice-card p{margin:0;color:#667894;font-size:16px;line-height:1.4}
-    .practice-choice-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:20px}
-    .practice-choice-tag{padding:6px 10px;border-radius:999px;background:#eaf4ff;color:#126fc9;font-size:12px;font-weight:900}
-    .practice-choice-button{border:0;border-radius:14px;padding:11px 17px;background:#1787f2;color:#fff;font:800 15px Nunito;box-shadow:0 4px 0 #0d6fd4;cursor:pointer}
+    .practice-choice-card h2{margin:0 0 5px;font-family:"Baloo 2",Nunito,sans-serif;font-size:25px;line-height:1;color:#102b57}
+    .practice-choice-card p{margin:0;color:#667894;font-size:14px;line-height:1.35}
+    .practice-choice-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px}
+    .practice-choice-tag{padding:5px 9px;border-radius:999px;background:#eaf4ff;color:#126fc9;font-size:11px;font-weight:900}
+    .practice-choice-button{border:0;border-radius:12px;padding:9px 14px;background:#1787f2;color:#fff;font:800 14px Nunito;box-shadow:0 3px 0 #0d6fd4;cursor:pointer}
     .practice-choice-button:hover{background:#0d6fd4}
-    @media(max-width:700px){.practice-choice-grid{grid-template-columns:1fr}.practice-choice-card{min-height:210px}}
+    @media(max-width:1000px){.practice-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:700px){.practice-choice-grid{grid-template-columns:1fr}.practice-choice-card{min-height:180px}}
   </style>
 </head>
 <body>

@@ -31,6 +31,27 @@ export function connectLessonPracticeChoice({
   return true;
 }
 
+export function installLessonPracticeIntegration({
+  getCurrentLesson,
+  documentRef = document,
+  locationRef = window.location
+} = {}) {
+  const choiceGrid = documentRef.getElementById('choiceGrid');
+  if (!choiceGrid || typeof getCurrentLesson !== 'function') return () => {};
+
+  const connect = () => connectLessonPracticeChoice({
+    lesson: getCurrentLesson(),
+    documentRef,
+    locationRef
+  });
+
+  const observer = new MutationObserver(connect);
+  observer.observe(choiceGrid, { childList: true, subtree: true });
+  connect();
+
+  return () => observer.disconnect();
+}
+
 export function setReadableTestVersion(version, documentRef = document) {
   const badge = documentRef.querySelector('.version-badge');
   if (badge) badge.textContent = `PacoGO TEST ${version}`;

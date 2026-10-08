@@ -1,5 +1,5 @@
 import { createTestHistoryRenderer } from './src/features/test-history/test-history-renderer.js';
-import { connectLessonPracticeChoice, setReadableTestVersion } from './src/features/practice/lesson-practice-navigation.js';
+import { installLessonPracticeIntegration, setReadableTestVersion } from './src/features/practice/lesson-practice-navigation.js';
 
 const testHistoryRenderer = createTestHistoryRenderer({
   getLessons: () => lessons,
@@ -62,11 +62,10 @@ window.saveTestAttempt = async function saveTestAttemptRuntimeFacade(attempt) {
 };
 
 // V5.0 application integration: the practice feature owns LES → OEFENEN navigation.
-const practiceIntegration = Promise.resolve().then(() => {
-  setReadableTestVersion('V5.0');
-  if (typeof currentLesson !== 'undefined' && currentLesson) {
-    connectLessonPracticeChoice({ lesson: currentLesson });
-  }
+setReadableTestVersion('V5.0');
+const stopLessonPracticeIntegration = installLessonPracticeIntegration({
+  getCurrentLesson: () => currentLesson,
+  documentRef: document,
+  locationRef: window.location
 });
-
-window.pacoGOPracticeIntegrationReady = practiceIntegration;
+window.pacoGOPracticeIntegrationReady = Promise.resolve(stopLessonPracticeIntegration);

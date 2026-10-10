@@ -122,8 +122,3 @@ export function installLessonPracticeIntegration({
 
   return () => observer.disconnect();
 }
-
-export function setReadableTestVersion(version, documentRef = document) {
-  const badge = documentRef.querySelector('.version-badge');
-  if (badge) badge.textContent = `PacoGO TEST ${version}`;
-}

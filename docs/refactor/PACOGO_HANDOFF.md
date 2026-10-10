@@ -91,6 +91,7 @@ After every meaningful change, review obsolete or redundant functions, variables
 - 661–670: player runtime entry integrated into the actual V4.78 application; legacy player ownership deliberately removed after proof
 - 671–680: final maintained Node/Vitest/browser regression gate green; professional player refactor closed
 - 681–690: professional Agenda source audit, domain/runtime boundaries, import/review separation, application integration, legacy Agenda removal, and final regression gate green
+- 691–700: canonical page-template TEST-version ownership added; OEFENEN now receives its readable TEST badge from the shared template
 
 ## Current state — Professional V1 CLOSED
 Professional V1 consists of the completed Player and Agenda refactor blocks on `refactor/professional-v1`.
@@ -153,34 +154,38 @@ The V4.78 agenda composition and duplicate semantics were source-verified before
 - Browser regression: **success**
 - Legacy Agenda runtime removal/bridge verification: **success**
 
-### Final repository state
-- Professional V1 closure was followed by dependency reproducibility/security cleanup on `refactor/professional-v1`.
-- Final branch HEAD: `1fdf792c294f9b654e5fb98e6399782d828f46a5`.
-- Latest full regression workflow: GitHub Actions run `37654163345`.
-- Latest full regression result: **success**.
-- Latest gate: 366 Node tests, 24 Vitest tests, 21 browser tests, Agenda boundary, Player boundary, zero known npm vulnerabilities, and working-tree cleanliness all passed.
-- CI generated and committed a reproducible `package-lock.json` and `npm audit --audit-level=low` passed with zero known vulnerabilities.
-- Final cleanup removes generated test/runtime artifacts before the working-tree cleanliness assertion.
-- Official closure report: `docs/refactor/PACOGO_PROFESSIONAL_V1_FINAL_REPORT.md`.
-- Permanent engineering rules: `docs/engineering/PACOGO_ENGINEERING_STANDARD.md`.
+## Current TEST page-template state
+- TEST version is now owned by `src/components/page-template.js`, not by an individual page or integration script.
+- The canonical template renders `PacoGO TEST V5.8` in its hero for every page that mounts the template.
+- `src/components/page-template.css` owns the badge presentation.
+- OEFENEN already mounts the canonical template, so its readable TEST version is now part of the shared shell.
+- No per-page TEST-version patch should be added.
 
-### Dependency hygiene
+## Important open architectural item for the next chat
+**LESEN still runs from the legacy `index.html` and does not yet mount `mountPacoPageTemplate()`.** Therefore the template-owned scroll-memory behavior cannot yet control LESEN. This must be solved by bringing LESEN itself through the canonical page-template boundary, not by adding another scroll listener or navigation patch to `index.html` or `lesson-practice-navigation.js`.
+
+The next chat must first inspect the actual LESEN runtime boundary and then migrate/integrate that page into the canonical template without duplicating the legacy shell. Do not claim the LESEN scroll-position problem is solved until this structural integration is runtime-verified.
+
+## Final repository state
+- Professional V1 closure was followed by dependency reproducibility/security cleanup on `refactor/professional-v1`.
+- Previous full-regression HEAD before the current V5.x work remains documented above; do not claim a new full regression without executing it.
+- The latest V5.x work is scoped to the new page/practice architecture and has not been represented as Professional V1 closure work.
+
+## Dependency hygiene
 - `vitest` is pinned to `5.0.3` in `package.json`.
 - The committed lockfile is the reproducibility source for CI installation.
-- Final CI audit is clean with zero known vulnerabilities.
+- The previously documented full regression audit was clean; this must not be reused as proof for later changes.
 
-### Safety verification
-- `main` / LIVE was not modified by the Professional V1 work or dependency cleanup.
+## Safety verification
+- `main` / LIVE was not modified by the Professional V1 work or the current V5.x changes.
 - No Supabase schema changes.
 - No new AI behavior in the lesson editor.
-- No runtime compatibility shim or legacy repair patch was introduced.
+- No runtime compatibility shim or legacy repair patch was introduced by the V5.8 template-version change.
 
 ## Closure
 **Professional V1 is officially closed.**
 
-The Player and Agenda architecture is integrated, dependency reproducibility/security is clean, the latest full regression gate is green on the current branch HEAD, and no Professional V1 implementation gate remains open within the agreed scope.
-
-Future work must start as a new scope. It must not be treated as unfinished Professional V1 work.
+The Player and Agenda architecture is integrated. Future work is a new scope and must not be treated as unfinished Professional V1 work.
 
 ## New-chat procedure — MANDATORY
 At every new chat:

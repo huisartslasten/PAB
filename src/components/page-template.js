@@ -3,11 +3,12 @@
  *
  * This is the default structural shell for normal PacoGO pages.
  * Page-specific functionality belongs in the content slot; the shell owns
- * the visual frame: hero banner, left sidebar and middle field.
+ * the visual frame: hero banner, left sidebar, middle field and TEST badge.
  */
 
 const TEMPLATE_SCROLL_KEY_PREFIX = 'pacoGO:template-scroll:';
 const TEMPLATE_SCROLL_CLEANUP_PROPERTY = '__pacoGOTemplateScrollCleanup';
+const PACOGO_TEST_VERSION = 'V5.8';
 
 function templateScrollKey(windowRef) {
   return `${TEMPLATE_SCROLL_KEY_PREFIX}${windowRef.location.pathname}${windowRef.location.search}`;
@@ -113,10 +114,6 @@ function createNavigationItem(item) {
     chevron.className = 'paco-template-nav-chevron';
     chevron.textContent = '›';
     button.appendChild(chevron);
-
-    // All main navigation groups are permanently expanded in the canonical
-    // PacoGO template. This prevents later navigation items from becoming
-    // inaccessible because a parent group collapsed.
     group.classList.add('always-open');
   }
 
@@ -261,7 +258,8 @@ export function createPacoPageTemplate({
   icon = '',
   subtitle = '',
   content = null,
-  className = ''
+  className = '',
+  testVersion = PACOGO_TEST_VERSION
 } = {}) {
   const root = document.createElement('div');
   root.className = `paco-page-template ${className}`.trim();
@@ -273,6 +271,12 @@ export function createPacoPageTemplate({
   heroImage.alt = 'PacoGO Aruba';
   heroImage.className = 'paco-template-hero-image';
   hero.appendChild(heroImage);
+
+  const versionBadge = document.createElement('div');
+  versionBadge.className = 'paco-template-version-badge';
+  versionBadge.textContent = `PacoGO TEST ${testVersion}`;
+  versionBadge.setAttribute('aria-label', `PacoGO TEST ${testVersion}`);
+  hero.appendChild(versionBadge);
   root.appendChild(hero);
 
   const body = document.createElement('div');

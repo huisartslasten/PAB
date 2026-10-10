@@ -33,6 +33,7 @@
     const student = params.get('student') || 'Zyon';
     const mount = document.querySelector('#paco-template-mount');
     const content = document.createElement('div');
+    const goToDashboard = () => { window.location.href = 'index.html'; };
 
     mountPacoPageTemplate({
       mount,
@@ -48,19 +49,15 @@
       icon:'🃏',
       subtitle:'Vraag → antwoord. Druk op Enter om verder te gaan.',
       navigation:[
-        { icon:'🏠', label:'Dashboard', onClick:()=>{window.location.href='index.html';} },
-        { icon:'📚', label:'Mijn lessen', expanded:true, submenu:[
-          { label:'Español' }, { label:'Geschiedenis' }, { label:'Nederlands' }
-        ] },
-        { icon:'✏️', label:'Oefenen', active:false, onClick:()=>{
+        { icon:'🏠', label:'Dashboard', onClick:goToDashboard },
+        { icon:'📚', label:'Mijn lessen', onClick:goToDashboard },
+        { icon:'✏️', label:'Oefenen', onClick:()=>{
           const target=new URL('oefenen.html',window.location.href);
           if(lessonId) target.searchParams.set('lesson_id',lessonId);
           target.searchParams.set('student',student);
           window.location.href=target.toString();
         } },
-        { icon:'📅', label:'Mijn agenda', expanded:true, submenu:[
-          { label:'Agenda invoeren' }, { label:'Maandkalender' }
-        ] },
+        { icon:'📅', label:'Mijn agenda', onClick:goToDashboard },
         { icon:'🃏', label:'Flashcards', active:true }
       ],
       content

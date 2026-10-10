@@ -1,0 +1,3 @@
+[build]
+  command = "node -e \"const fs=require('fs'); const files=['index.html','src/services/supabase-client.js']; const replacements=[['https://ncpkqrvxljxwboavxtak.supabase.co','https://btnhhvtpmuvrpbnkyjnm.supabase.co'],['sb_publishable_skiKpO4UU79zWY7hskHsoA_WQxA6CFc','TEST_SUPABASE_KEY_PLACEHOLDER']]; for (const f of files) { let s=fs.readFileSync(f,'utf8'); for (const [a,b] of replacements) s=s.split(a).join(b); fs.writeFileSync(f,s); }\""
+  publish = "."

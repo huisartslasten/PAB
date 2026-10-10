@@ -21,6 +21,9 @@ test('oefenen uses the canonical shell without dead submenu controls', async ({ 
 
 test('flashcards uses the canonical shell and returns to oefenen', async ({ page }) => {
   await expectCanonicalShell(page, 'flashcards-template.html', 'Flashcards');
-  await expect(page.getByRole('button', { name: 'Oefenen' })).toBeVisible();
+  const oefenenButton = page.getByRole('button', { name: 'Oefenen' });
+  await expect(oefenenButton).toBeVisible();
   await expect(page.getByRole('button', { name: 'Flashcards' })).toBeVisible();
+  await oefenenButton.click();
+  await expect(page).toHaveURL(/\/oefenen\.html(?:\?.*)?$/);
 });

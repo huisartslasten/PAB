@@ -1,5 +1,5 @@
 (async function bootstrapTestHistoryStorage() {
-  const [{ createTestHistoryRenderer }, { installLessonPracticeIntegration, restoreLessonScrollPosition, setReadableTestVersion }] = await Promise.all([
+  const [{ createTestHistoryRenderer }, { installLessonPracticeIntegration, setReadableTestVersion }] = await Promise.all([
     import('./src/features/test-history/test-history-renderer.js'),
     import('./src/features/practice/lesson-practice-navigation.js')
   ]);
@@ -64,14 +64,12 @@
     return runtimeHandler(attempt);
   };
 
-  // V5.6 application integration: the practice feature owns LES → OEFENEN navigation.
-  setReadableTestVersion('V5.6');
-  restoreLessonScrollPosition({ windowRef: window, documentRef: document });
+  // V5.7 application integration: the practice feature owns LES → OEFENEN navigation.
+  setReadableTestVersion('V5.7');
   const stopLessonPracticeIntegration = installLessonPracticeIntegration({
     getCurrentLesson: () => currentLesson,
     documentRef: document,
-    locationRef: window.location,
-    windowRef: window
+    locationRef: window.location
   });
   window.pacoGOPracticeIntegrationReady = Promise.resolve(stopLessonPracticeIntegration);
 })().catch(error => {

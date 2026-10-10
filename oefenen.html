@@ -75,7 +75,7 @@
           const button = document.createElement('button');
           button.type = 'button';
           button.className = 'practice-choice-button';
-          button.textContent = 'Oefenen →';
+          button.textContent = 'Flashcards →';
           button.addEventListener('click', () => {
             const target = new URL('flashcards-template.html', window.location.href);
             if (lessonId) target.searchParams.set('lesson_id', lessonId);
@@ -93,6 +93,8 @@
     content.appendChild(grid);
     renderChoices();
 
+    const goToDashboard = () => { window.location.href = 'index.html'; };
+
     mountPacoPageTemplate({
       mount,
       backLabel: '← Terug',
@@ -105,14 +107,10 @@
       icon: '✏️',
       subtitle: 'Kies hoe je met deze les wilt oefenen.',
       navigation: [
-        { icon:'🏠', label:'Dashboard', onClick:() => { window.location.href='index.html'; } },
-        { icon:'📚', label:'Mijn lessen', expanded:true, submenu:[
-          { label:'Español' }, { label:'Geschiedenis' }, { label:'Nederlands' }
-        ] },
-        { icon:'📝', label:'Toetsen' },
-        { icon:'📅', label:'Mijn agenda', expanded:true, submenu:[
-          { label:'Agenda invoeren' }, { label:'Maandkalender' }
-        ] }
+        { icon:'🏠', label:'Dashboard', onClick:goToDashboard },
+        { icon:'📚', label:'Mijn lessen', onClick:goToDashboard },
+        { icon:'📝', label:'Toetsen', onClick:goToDashboard },
+        { icon:'📅', label:'Mijn agenda', onClick:goToDashboard }
       ],
       content
     });

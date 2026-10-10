@@ -15,7 +15,7 @@ export function addAgendaItems(existing = [], candidates = []) {
 
 export function createAgendaImportItem({ index = 0, student, date, type = 'other', title = 'Agenda-afspraak', meta = '', source = '', createdAt } = {}) {
   return {
-    id: 'agenda_' + Date.now() + '_' + index,
+    id: 'agenda_' + index + '_' + Date.now(),
     student,
     date: normalizeAgendaDate(date),
     type: type || 'other',

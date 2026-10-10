@@ -92,6 +92,7 @@ After every meaningful change, review obsolete or redundant functions, variables
 - 671–680: final maintained Node/Vitest/browser regression gate green; professional player refactor closed
 - 681–690: professional Agenda source audit, domain/runtime boundaries, import/review separation, application integration, legacy Agenda removal, and final regression gate green
 - 691–700: canonical page-template TEST-version ownership added; OEFENEN now receives its readable TEST badge from the shared template
+- 701–710: canonical practice pages cleaned of dead submenu controls; Flashcards navigation made explicit; browser contract added for canonical OEFENEN/Flashcards shell
 
 ## Current state — Professional V1 CLOSED
 Professional V1 consists of the completed Player and Agenda refactor blocks on `refactor/professional-v1`.
@@ -155,21 +156,39 @@ The V4.78 agenda composition and duplicate semantics were source-verified before
 - Legacy Agenda runtime removal/bridge verification: **success**
 
 ## Current TEST page-template state
-- TEST version is now owned by `src/components/page-template.js`, not by an individual page or integration script.
-- The canonical template renders `PacoGO TEST V5.8` in its hero for every page that mounts the template.
+- Current readable TEST version: **V5.10**.
+- TEST version is owned by `src/components/page-template.js`, not by an individual page or integration script.
+- The canonical template renders `PacoGO TEST V5.10` in its hero for every page that mounts the template.
 - `src/components/page-template.css` owns the badge presentation.
-- OEFENEN already mounts the canonical template, so its readable TEST version is now part of the shared shell.
+- OEFENEN mounts the canonical template and visibly shows the V5.10 badge.
+- Flashcards mounts the same canonical template and now has no dead submenu controls.
 - No per-page TEST-version patch should be added.
 
-## Important open architectural item for the next chat
-**LESEN still runs from the legacy `index.html` and does not yet mount `mountPacoPageTemplate()`.** Therefore the template-owned scroll-memory behavior cannot yet control LESEN. This must be solved by bringing LESEN itself through the canonical page-template boundary, not by adding another scroll listener or navigation patch to `index.html` or `lesson-practice-navigation.js`.
+## Current V5.10 practice-page audit
+### Green
+- `refactor/professional-v1` is the active branch.
+- `main` remains LIVE and untouched.
+- Canonical page-template ownership is intact.
+- OEFENEN uses the canonical template and readable TEST V5.10 badge.
+- Flashcards uses the canonical template and readable TEST V5.10 badge.
+- Dead submenu controls were removed from OEFENEN and Flashcards.
+- Flashcards → Oefenen navigation is explicitly wired.
+- Browser coverage exists for the canonical OEFENEN/Flashcards shell and navigation target.
 
-The next chat must first inspect the actual LESEN runtime boundary and then migrate/integrate that page into the canonical template without duplicating the legacy shell. Do not claim the LESEN scroll-position problem is solved until this structural integration is runtime-verified.
+### Still requires runtime proof
+- The full GitHub regression for the latest V5.10 practice-page commits must be observed as successful before declaring the entire audit green.
+- LESSONS still runs from the legacy `index.html`; this is an explicit architectural boundary, not a surface for local repair.
+
+## Important open architectural item
+**LESSONS still runs from the legacy `index.html` and does not yet mount `mountPacoPageTemplate()`.** Therefore the template-owned scroll-memory behavior cannot yet control LESSONS. This must be solved by bringing LESSONS itself through the canonical page-template boundary, not by adding another scroll listener or navigation patch to `index.html` or `lesson-practice-navigation.js`.
+
+The next development stage must first inspect the actual LESSONS runtime boundary and then migrate/integrate that page into the canonical template without duplicating the legacy shell. Do not claim the LESSONS scroll-position problem is solved until this structural integration is runtime-verified.
 
 ## Final repository state
 - Professional V1 closure was followed by dependency reproducibility/security cleanup on `refactor/professional-v1`.
 - Previous full-regression HEAD before the current V5.x work remains documented above; do not claim a new full regression without executing it.
 - The latest V5.x work is scoped to the new page/practice architecture and has not been represented as Professional V1 closure work.
+- Latest branch head after the practice-page browser-contract update: `9f41d33970d001fdd5742c0d9f4311ad404b10be`.
 
 ## Dependency hygiene
 - `vitest` is pinned to `5.0.3` in `package.json`.
@@ -180,7 +199,7 @@ The next chat must first inspect the actual LESEN runtime boundary and then migr
 - `main` / LIVE was not modified by the Professional V1 work or the current V5.x changes.
 - No Supabase schema changes.
 - No new AI behavior in the lesson editor.
-- No runtime compatibility shim or legacy repair patch was introduced by the V5.8 template-version change.
+- No runtime compatibility shim or legacy repair patch was introduced by the V5.10 practice-page work.
 
 ## Closure
 **Professional V1 is officially closed.**

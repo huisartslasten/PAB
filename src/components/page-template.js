@@ -6,6 +6,79 @@
  * the visual frame: hero banner, left sidebar and middle field.
  */
 
+const TEMPLATE_SCROLL_KEY_PREFIX = 'pacoGO:template-scroll:';
+const TEMPLATE_SCROLL_CLEANUP_PROPERTY = '__pacoGOTemplateScrollCleanup';
+
+function templateScrollKey(windowRef) {
+  return `${TEMPLATE_SCROLL_KEY_PREFIX}${windowRef.location.pathname}${windowRef.location.search}`;
+}
+
+export function installPacoTemplateScrollMemory({ windowRef = window, documentRef = document } = {}) {
+  const previousCleanup = windowRef[TEMPLATE_SCROLL_CLEANUP_PROPERTY];
+  if (typeof previousCleanup === 'function') previousCleanup();
+
+  const key = templateScrollKey(windowRef);
+
+  const save = () => {
+    try {
+      windowRef.sessionStorage.setItem(key, String(windowRef.scrollY || 0));
+    } catch (error) {
+      console.warn('Could not save PacoGO template scroll position:', error);
+    }
+  };
+
+  const restore = () => {
+    let savedPosition = null;
+    try {
+      const raw = windowRef.sessionStorage.getItem(key);
+      if (raw !== null) savedPosition = Number(raw);
+    } catch (error) {
+      console.warn('Could not read PacoGO template scroll position:', error);
+    }
+
+    if (!Number.isFinite(savedPosition) || savedPosition <= 0) return;
+
+    let attempts = 0;
+    const startedAt = Date.now();
+    const tryRestore = () => {
+      attempts += 1;
+      const maxScroll = Math.max(0, documentRef.documentElement.scrollHeight - windowRef.innerHeight);
+      const target = Math.min(savedPosition, maxScroll);
+      windowRef.scrollTo(0, target);
+
+      const contentReady = maxScroll >= savedPosition;
+      const timedOut = Date.now() - startedAt >= 2000;
+      if (contentReady || timedOut || attempts >= 60) {
+        try {
+          windowRef.sessionStorage.removeItem(key);
+        } catch (error) {
+          console.warn('Could not clear PacoGO template scroll position:', error);
+        }
+        return;
+      }
+
+      windowRef.requestAnimationFrame(tryRestore);
+    };
+
+    windowRef.requestAnimationFrame(tryRestore);
+  };
+
+  windowRef.addEventListener('pagehide', save);
+  windowRef.addEventListener('pageshow', restore);
+  restore();
+
+  const cleanup = () => {
+    windowRef.removeEventListener('pagehide', save);
+    windowRef.removeEventListener('pageshow', restore);
+    if (windowRef[TEMPLATE_SCROLL_CLEANUP_PROPERTY] === cleanup) {
+      delete windowRef[TEMPLATE_SCROLL_CLEANUP_PROPERTY];
+    }
+  };
+
+  windowRef[TEMPLATE_SCROLL_CLEANUP_PROPERTY] = cleanup;
+  return cleanup;
+}
+
 function nodeFrom(value) {
   if (value instanceof Node) return value;
   if (typeof value === 'string') {
@@ -281,5 +354,6 @@ export function mountPacoPageTemplate(options = {}) {
   delete templateOptions.mount;
   const root = createPacoPageTemplate(templateOptions);
   mount.replaceChildren(root);
+  installPacoTemplateScrollMemory();
   return root;
 }

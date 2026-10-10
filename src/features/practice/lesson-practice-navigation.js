@@ -1,4 +1,5 @@
 const PRACTICE_PAGE = 'oefenen.html';
+const PRACTICE_RETURN_SCROLL_KEY = 'pacoGO:lesson-practice:return-scroll';
 
 export function createLessonPracticeTarget({ lesson, baseUrl }) {
   if (!lesson?.id) throw new Error('A lesson is required to open practice.');
@@ -11,10 +12,49 @@ export function createLessonPracticeTarget({ lesson, baseUrl }) {
   return target;
 }
 
+function rememberLessonScrollPosition(windowRef = window) {
+  try {
+    windowRef.sessionStorage.setItem(PRACTICE_RETURN_SCROLL_KEY, String(windowRef.scrollY || 0));
+  } catch (error) {
+    console.warn('Could not remember lesson scroll position:', error);
+  }
+}
+
+export function restoreLessonScrollPosition({ windowRef = window, documentRef = document } = {}) {
+  let savedPosition = null;
+  try {
+    const raw = windowRef.sessionStorage.getItem(PRACTICE_RETURN_SCROLL_KEY);
+    if (raw !== null) {
+      savedPosition = Number(raw);
+      windowRef.sessionStorage.removeItem(PRACTICE_RETURN_SCROLL_KEY);
+    }
+  } catch (error) {
+    console.warn('Could not read lesson scroll position:', error);
+  }
+
+  if (!Number.isFinite(savedPosition) || savedPosition <= 0) return false;
+
+  let attempts = 0;
+  const restore = () => {
+    attempts += 1;
+    const maxScroll = Math.max(0, documentRef.documentElement.scrollHeight - windowRef.innerHeight);
+    const target = Math.min(savedPosition, maxScroll);
+    windowRef.scrollTo(0, target);
+
+    if (attempts < 10 && maxScroll < savedPosition) {
+      windowRef.requestAnimationFrame(restore);
+    }
+  };
+
+  windowRef.requestAnimationFrame(restore);
+  return true;
+}
+
 export function connectLessonPracticeChoice({
   lesson,
   documentRef = document,
-  locationRef = window.location
+  locationRef = window.location,
+  windowRef = window
 } = {}) {
   const choiceGrid = documentRef.getElementById('choiceGrid');
   if (!choiceGrid || !lesson) return false;
@@ -24,6 +64,7 @@ export function connectLessonPracticeChoice({
   if (!practiceChoice) return false;
 
   practiceChoice.onclick = () => {
+    rememberLessonScrollPosition(windowRef);
     const target = createLessonPracticeTarget({ lesson, baseUrl: locationRef.href });
     locationRef.href = target.toString();
   };
@@ -34,7 +75,8 @@ export function connectLessonPracticeChoice({
 export function installLessonPracticeIntegration({
   getCurrentLesson,
   documentRef = document,
-  locationRef = window.location
+  locationRef = window.location,
+  windowRef = window
 } = {}) {
   const choiceGrid = documentRef.getElementById('choiceGrid');
   if (!choiceGrid || typeof getCurrentLesson !== 'function') return () => {};
@@ -42,7 +84,8 @@ export function installLessonPracticeIntegration({
   const connect = () => connectLessonPracticeChoice({
     lesson: getCurrentLesson(),
     documentRef,
-    locationRef
+    locationRef,
+    windowRef
   });
 
   const observer = new MutationObserver(connect);

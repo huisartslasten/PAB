@@ -12,7 +12,6 @@
 
   const testHistoryRuntimeBridge = Object.defineProperties({}, {
     db: { get: () => db },
-    auth: { get: () => auth },
     requireParent: { get: () => requireParent },
     hideAll: { get: () => hideAll },
     showPage: { get: () => () => document.getElementById('testHistory').classList.remove('hidden') },

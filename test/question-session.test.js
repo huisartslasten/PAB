@@ -12,8 +12,8 @@ test('question session shuffles once and preserves every lesson item', () => {
     current: { id: 2 },
     complete: false
   });
-  assert.deepEqual(session.next(), { id: 1 });
   assert.deepEqual(session.next(), { id: 3 });
+  assert.deepEqual(session.next(), { id: 1 });
   assert.equal(session.next(), null);
   assert.equal(session.getState().complete, true);
 });

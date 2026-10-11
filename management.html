@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — Beheer</title>
+  <link rel="stylesheet" href="src/components/page-template.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .management-page{display:grid;gap:22px}
+    .management-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .management-state{padding:16px 18px;border:1px solid #dce9f6;border-radius:18px;background:#fff;color:#667894}
+    .management-students{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+    .management-student{border:1px solid #dce9f6;border-radius:16px;background:#fff;padding:15px;text-align:left;color:#102b57;font-weight:900;cursor:pointer;box-shadow:0 8px 22px rgba(16,43,87,.07)}
+    .management-student:hover{border-color:#1787f2;background:#eef8ff}
+    .management-section{display:grid;gap:12px}
+    .management-section h2{margin:0;font:800 25px/1.1 "Baloo 2",Nunito,sans-serif;color:#102b57}
+    .management-lesson{padding:16px 18px;border:1px solid #dce9f6;border-radius:16px;background:#fff}
+    .management-lesson h3{margin:0;color:#102b57}
+    .management-lesson p{margin:5px 0 0;color:#667894}
+    .management-feedback{padding:16px 18px;border:1px solid #dce9f6;border-radius:16px;background:#fff}
+    .management-feedback h3{margin:6px 0;color:#102b57}
+    .management-feedback p{margin:0 0 10px;color:#38577d;white-space:pre-wrap}
+    .management-feedback-status{display:inline-block;padding:5px 9px;border-radius:999px;background:#eaf4ff;color:#126fc9;font-size:12px;font-weight:900}
+    @media(max-width:700px){.management-students{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div id="paco-template-mount"></div>
+  <script type="module">
+    import { mountPacoPageTemplate } from './src/components/page-template.js';
+    import { createPacoGOApp } from './src/app/bootstrap.js';
+    import { renderStudentSelection, renderStudentLessons, renderFeedback } from './src/features/management/management-view.js';
+
+    const mount = document.querySelector('#paco-template-mount');
+    const content = document.createElement('div');
+    content.className = 'management-page';
+    const state = document.createElement('div');
+    state.className = 'management-state';
+    state.textContent = 'Beheer laden…';
+    content.appendChild(state);
+
+    const goHome = () => { window.location.href = 'index.html'; };
+    const goLessons = () => { window.location.href = 'lessons.html'; };
+
+    mountPacoPageTemplate({
+      mount,
+      backLabel:'← Dashboard',
+      backAction:goHome,
+      greeting:'PacoGO beheer ⚙️',
+      title:'Beheer',
+      icon:'⚙️',
+      subtitle:'Beheer de lessen per leerling en bekijk feedback.',
+      navigation:[
+        {icon:'🏠',label:'Dashboard',onClick:goHome},
+        {icon:'📚',label:'Mijn lessen',onClick:goLessons},
+        {icon:'⚙️',label:'Beheer',active:true}
+      ],
+      content
+    });
+
+    const app = createPacoGOApp({ supabaseLib: window.supabase });
+    const students = document.createElement('div');
+    students.className = 'management-students';
+    const studentSection = document.createElement('section');
+    studentSection.className = 'management-section';
+    const studentHeading = document.createElement('h2');
+    studentHeading.textContent = 'Leerling';
+    studentSection.append(studentHeading, students);
+
+    const lessons = document.createElement('div');
+    lessons.className = 'management-page';
+    const lessonSection = document.createElement('section');
+    lessonSection.className = 'management-section';
+    const lessonHeading = document.createElement('h2');
+    lessonHeading.textContent = 'Actieve lessen';
+    lessonSection.append(lessonHeading, lessons);
+
+    const feedbackList = document.createElement('div');
+    feedbackList.className = 'management-page';
+    const feedbackSection = document.createElement('section');
+    feedbackSection.className = 'management-section';
+    const feedbackHeading = document.createElement('h2');
+    feedbackHeading.textContent = 'Feedback';
+    feedbackSection.append(feedbackHeading, feedbackList);
+
+    function showSelectedStudent(student) {
+      app.management.selectStudent(student);
+      lessons.replaceChildren();
+      renderStudentLessons(lessons, app.management);
+    }
+
+    try {
+      await app.initializeSession();
+      app.management.getStudents();
+      content.replaceChildren(studentSection, lessonSection, feedbackSection);
+      renderStudentSelection(students, app.management, showSelectedStudent);
+      const selected = app.management.getSelectedStudent() || app.management.getStudents()[0];
+      if (selected) showSelectedStudent(selected);
+      await renderFeedback(feedbackList, app.management);
+    } catch (error) {
+      console.error('Management page load error:', error);
+      state.textContent = app.auth.isParent
+        ? 'Beheer kon niet worden geladen.'
+        : 'Je hebt geen toegang tot Beheer.';
+    }
+  </script>
+</body>
+</html>

@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="src/components/page-template.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    .lesson-view{display:grid;gap:14px}.lesson-meta{padding:15px 17px;border-radius:18px;background:#eef8ff;color:#38577d;font-weight:800}.lesson-item{padding:18px 20px;border:1px solid #dce9f6;border-radius:18px;background:#fff;box-shadow:0 7px 20px rgba(16,43,87,.06)}.lesson-question{font-weight:900;color:#102b57}.lesson-answer{margin-top:9px;white-space:pre-line;line-height:1.5}.empty{padding:18px;border:1px dashed #cdddec;border-radius:18px;color:#667894;background:#fff}
+    .lesson-view{display:grid;gap:14px}.lesson-item{padding:18px 20px;border:1px solid #dce9f6;border-radius:18px;background:#fff;box-shadow:0 7px 20px rgba(16,43,87,.06)}.lesson-question{font-weight:900;color:#102b57}.lesson-answer{margin-top:9px;white-space:pre-line;line-height:1.5}.empty{padding:18px;border:1px dashed #cdddec;border-radius:18px;color:#667894;background:#fff}
   </style>
 </head>
 <body>
@@ -50,15 +50,10 @@
     });
 
     function renderLesson(lesson) {
-      const meta = document.createElement('div');
-      meta.className = 'lesson-meta';
-      meta.textContent = `${lesson.subject || 'Les'} · ${lesson.type || ''} · ${lesson.title || 'Naamloze les'} · ${Array.isArray(lesson.lesson_items) ? lesson.lesson_items.length : 0} items`;
-
       const view = document.createElement('div');
       view.className = 'lesson-view';
-      view.appendChild(meta);
-
       const items = Array.isArray(lesson.lesson_items) ? lesson.lesson_items : [];
+
       if (!items.length) {
         const empty = document.createElement('div');
         empty.className = 'empty';

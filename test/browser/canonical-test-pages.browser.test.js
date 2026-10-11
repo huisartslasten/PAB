@@ -11,6 +11,12 @@ async function expectCanonicalShell(page, path, title) {
   await expect(page.locator('.paco-template-nav-submenu')).toHaveCount(0);
 }
 
+test('dashboard page uses the canonical shell', async ({ page }) => {
+  await expectCanonicalShell(page, 'dashboard.html?student=Zyon', 'Dashboard');
+  await expect(page.locator('.dashboard-page')).toBeVisible();
+  await expect(page.locator('.dashboard-student')).toHaveText('Leerling: Zyon');
+});
+
 test('test page uses the canonical shell', async ({ page }) => {
   await expectCanonicalShell(page, 'test.html', 'Toets');
   await expect(page.locator('#testProgress')).toHaveCount(1);

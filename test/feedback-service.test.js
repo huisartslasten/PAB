@@ -68,13 +68,13 @@ test('feedback service owns the parent_feedback Supabase boundary', async () => 
 
   const created = await service.create({ feedbackType: 'bug', subject: 'Fout', message: 'Testmelding' });
   assert.equal(created.id, 2);
-  assert.equal(created.feedback_type, 'idea');
+  assert.equal(created.feedback_type, 'bug');
 
   const updated = await service.updateStatus(1, 'resolved');
   assert.equal(updated.id, 1);
-  assert.equal(updated.status, 'new');
+  assert.equal(updated.status, 'resolved');
 
-  assert.deepEqual(db.calls.filter(call => call[0] === 'select').length, 2);
+  assert.equal(db.calls.filter(call => call[0] === 'select').length, 3);
   assert.deepEqual(db.calls.filter(call => call[0] === 'insert'), [
     ['insert', { feedback_type: 'bug', subject: 'Fout', message: 'Testmelding' }]
   ]);

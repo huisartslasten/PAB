@@ -40,18 +40,11 @@ export function renderStudentLessons(container, management) {
   return lessons;
 }
 
-export function renderFeedback(container, management) {
+export async function renderFeedback(container, management) {
   if (!container) throw new Error('renderFeedback requires a container.');
   if (!management) throw new Error('renderFeedback requires management.');
 
-  const feedback = management.listFeedback();
-  if (feedback && typeof feedback.then === 'function') {
-    return feedback.then(items => renderFeedbackItems(container, items));
-  }
-  return renderFeedbackItems(container, feedback);
-}
-
-function renderFeedbackItems(container, items = []) {
+  const feedback = await management.listFeedback();
   const labels = {
     idea: '💡 Idee / wens',
     bug: '🐛 Foutmelding',
@@ -59,7 +52,7 @@ function renderFeedbackItems(container, items = []) {
     other: '❓ Anders'
   };
 
-  container.innerHTML = (items || []).map(item => `
+  container.innerHTML = (feedback || []).map(item => `
     <article class="management-feedback" data-feedback-id="${escapeHtml(item.id)}">
       <div><strong>${escapeHtml(labels[item.feedback_type] || item.feedback_type)}</strong></div>
       <h3>${escapeHtml(item.subject)}</h3>
@@ -68,5 +61,5 @@ function renderFeedbackItems(container, items = []) {
     </article>
   `).join('');
 
-  return items || [];
+  return feedback || [];
 }

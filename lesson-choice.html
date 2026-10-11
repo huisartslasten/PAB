@@ -53,27 +53,35 @@
       content
     });
 
+    const targets={
+      practice:'oefenen.html',
+      test:'test.html',
+      view:'lesson-view.html',
+      questions:'questions.html'
+    };
+
+    function navigateToChoice(lesson, choice) {
+      const target=getLessonChoiceTarget(lesson, choice.id);
+      if (!target) return;
+      const path=targets[choice.id];
+      if (!path) throw new Error(`Geen canonieke pagina voor leskeuze: ${choice.id}`);
+      const targetUrl=new URL(path,window.location.href);
+      targetUrl.searchParams.set('lesson_id',String(target.lessonId));
+      targetUrl.searchParams.set('student',student);
+      window.location.href=targetUrl.toString();
+    }
+
     function renderLesson(lesson){
       content.replaceChildren();
       const context=document.createElement('div');context.className='lesson-context';
       context.textContent=`${lesson.subject || 'Les'}${lesson.subvak ? ` · ${lesson.subvak}` : ''} · ${lesson.title || 'Naamloze les'}`;
       const grid=document.createElement('div');grid.className='choice-grid';
       const icons={practice:'✏️',test:'📝',view:'👀',questions:'❓'};
-      const descriptions={practice:'Ga naar de oefenpagina en kies een oefenvorm.',test:'Open de toets voor deze les.',view:'Bekijk de inhoud van deze les.' ,questions:'Maak de vragen bij deze les.'};
+      const descriptions={practice:'Ga naar de oefenpagina en kies een oefenvorm.',test:'Maak alle vragen van de toets en bekijk daarna je resultaat.',view:'Bekijk de uitleg, vragen en antwoorden van deze les.',questions:'Beantwoord de vragen zelf en vergelijk daarna met het voorbeeldantwoord.'};
       getLessonChoiceCards(lesson).forEach(choice=>{
         const card=document.createElement('button');card.type='button';card.className=`choice-card${choice.id==='practice'?' available':''}`;
-        card.innerHTML=`<div><div class="choice-icon">${icons[choice.id]||'📘'}</div><h2>${choice.label}</h2><p>${descriptions[choice.id]||''}</p></div><div class="choice-action">${choice.id==='practice'?'Openen →':'Volgende koppeling →'}</div>`;
-        if(choice.id==='practice') card.addEventListener('click',()=>{
-          const target=getLessonChoiceTarget(lesson, choice.id);
-          const targetUrl=new URL('oefenen.html',window.location.href);
-          targetUrl.searchParams.set('lesson_id',String(target.lessonId));
-          targetUrl.searchParams.set('student',student);
-          targetUrl.searchParams.set('subject',String(lesson.subject||''));
-          targetUrl.searchParams.set('title',String(lesson.title||''));
-          targetUrl.searchParams.set('items',String((lesson.lesson_items||[]).length));
-          window.location.href=targetUrl.toString();
-        });
-        else card.addEventListener('click',()=>{window.location.href='index.html'});
+        card.innerHTML=`<div><div class="choice-icon">${icons[choice.id]||'📘'}</div><h2>${choice.label}</h2><p>${descriptions[choice.id]||''}</p></div><div class="choice-action">Openen →</div>`;
+        card.addEventListener('click',()=>navigateToChoice(lesson,choice));
         grid.appendChild(card);
       });
       content.append(context,grid);

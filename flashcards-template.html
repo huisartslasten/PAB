@@ -34,6 +34,11 @@
     const mount = document.querySelector('#paco-template-mount');
     const content = document.createElement('div');
     const goToDashboard = () => { window.location.href = 'index.html'; };
+    const goLessons = () => {
+      const target = new URL('lessons.html', window.location.href);
+      target.searchParams.set('student', student);
+      window.location.href = target.toString();
+    };
 
     mountPacoPageTemplate({
       mount,
@@ -50,7 +55,7 @@
       subtitle:'Vraag → antwoord. Druk op Enter om verder te gaan.',
       navigation:[
         { icon:'🏠', label:'Dashboard', onClick:goToDashboard },
-        { icon:'📚', label:'Mijn lessen', onClick:goToDashboard },
+        { icon:'📚', label:'Mijn lessen', onClick:goLessons },
         { icon:'✏️', label:'Oefenen', onClick:()=>{
           const target=new URL('oefenen.html',window.location.href);
           if(lessonId) target.searchParams.set('lesson_id',lessonId);

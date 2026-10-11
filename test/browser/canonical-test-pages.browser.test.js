@@ -33,6 +33,12 @@ test('test page uses the canonical shell', async ({ page }) => {
   await expect(page.locator('#result')).toHaveCount(1);
 });
 
+test('test history page uses the canonical shell', async ({ page }) => {
+  await expectCanonicalShell(page, 'test-history.html', 'Toetsgeschiedenis');
+  await expect(page.locator('#historyStudent')).toHaveCount(1);
+  await expect(page.locator('#testHistoryContent')).toHaveCount(1);
+});
+
 test('lesson view uses the canonical shell', async ({ page }) => {
   await expectCanonicalShell(page, 'lesson-view.html', 'Les bekijken');
 });

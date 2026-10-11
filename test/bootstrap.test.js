@@ -13,6 +13,9 @@ function makeSupabaseLib(session = null) {
     auth: {
       getSession: async () => ({ data: { session }, error: null })
     },
+    functions: {
+      invoke: async () => ({ data: { correct: true, feedback: '' }, error: null })
+    },
     from() {
       return {
         select() {
@@ -36,7 +39,7 @@ function makeSupabaseLib(session = null) {
   };
 }
 
-test('application root composes management with canonical lesson, feedback and auth services', async () => {
+test('application root composes management with canonical lesson, feedback, grading, audio and auth services', async () => {
   appState.currentStudent = null;
   appState.lessons = [];
 
@@ -47,6 +50,8 @@ test('application root composes management with canonical lesson, feedback and a
 
   assert.ok(app.lessons);
   assert.ok(app.feedback);
+  assert.ok(app.grading);
+  assert.ok(app.audio);
   assert.ok(app.authSession);
   assert.ok(app.management);
   assert.equal(app.management.listFeedback instanceof Function, true);

@@ -72,8 +72,8 @@
 
     async function load() {
       if (!lessonId) throw new Error('Geen les geselecteerd.');
-      const records = await app.lessons.listAll();
-      const lesson = records.find(item => String(item.id) === String(lessonId));
+      const records = await app.loadLessons();
+      const lesson = app.mapLessons(records).find(item => String(item.id) === String(lessonId));
       if (!lesson) throw new Error('Deze les kon niet worden gevonden.');
 
       const bridge = createProfessionalPlayerBridge({

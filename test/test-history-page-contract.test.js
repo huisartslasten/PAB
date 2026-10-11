@@ -25,3 +25,9 @@ test('test history page keeps its history presentation target explicit', () => {
   assert.match(page, /id="testHistoryContent"/);
   assert.match(page, /id="historyStudent"/);
 });
+
+test('test history page belongs to the canonical management navigation boundary', () => {
+  assert.match(page, /window\.location\.href = 'management\.html'/);
+  assert.match(page, /label:'Beheer'/);
+  assert.match(page, /backLabel: '← Beheer'/);
+});

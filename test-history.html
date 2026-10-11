@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="src/components/page-template.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    .history-shell{width:100%}.history-toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:18px}.history-toolbar label{font-weight:800;color:#173b70}.history-toolbar select{min-width:190px;padding:10px 12px;border:1px solid #cdddec;border-radius:12px;background:#fff;color:#102b57;font:inherit}.history-content{display:grid;gap:12px}.history-loading,.history-error,.history-empty{padding:18px;background:#fff;border:1px solid #dce9f6;border-radius:16px;color:#526784}.history-error{color:#8b2d2d}.card.empty{padding:18px;background:#fff;border:1px solid #dce9f6;border-radius:16px}.test-history-item{background:#fff;border:1px solid #dce9f6;border-radius:16px;overflow:hidden}.test-history-item summary{cursor:pointer;list-style:none;padding:16px 18px}.test-history-item summary::-webkit-details-marker{display:none}.test-history-main{display:flex;justify-content:space-between;gap:18px;align-items:center}.test-history-summary{display:flex;gap:10px;flex-wrap:wrap;font-size:14px}.test-history-summary span{padding:5px 9px;border-radius:999px;background:#edf5fc}.history-errors{color:#9b3b3b}.history-ok{color:#237047}.test-history-details{padding:0 18px 18px}.test-history-score{font-size:20px;font-weight:900;color:#102b57;margin-bottom:12px}.result-item{padding:10px 12px;border-top:1px solid #e8eff6}.result-item.correct{background:#f2fbf6}.result-item.incorrect{background:#fff7f7}.small{color:#667894;line-height:1.45}
+    .history-shell{width:100%}.history-toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:18px}.history-toolbar label{font-weight:800;color:#173b70}.history-toolbar select{min-width:190px;padding:10px 12px;border:1px solid #cdddec;border-radius:12px;background:#fff;color:#102b57;font:inherit}.history-content{display:grid;gap:12px}.history-loading,.history-error{padding:18px;background:#fff;border:1px solid #dce9f6;border-radius:16px;color:#526784}.history-error{color:#8b2d2d}.card.empty{padding:18px;background:#fff;border:1px solid #dce9f6;border-radius:16px}.test-history-item{background:#fff;border:1px solid #dce9f6;border-radius:16px;overflow:hidden}.test-history-item summary{cursor:pointer;list-style:none;padding:16px 18px}.test-history-item summary::-webkit-details-marker{display:none}.test-history-main{display:flex;justify-content:space-between;gap:18px;align-items:center}.test-history-summary{display:flex;gap:10px;flex-wrap:wrap;font-size:14px}.test-history-summary span{padding:5px 9px;border-radius:999px;background:#edf5fc}.history-errors{color:#9b3b3b}.history-ok{color:#237047}.test-history-details{padding:0 18px 18px}.test-history-score{font-size:20px;font-weight:900;color:#102b57;margin-bottom:12px}.result-item{padding:10px 12px;border-top:1px solid #e8eff6}.result-item.correct{background:#f2fbf6}.result-item.incorrect{background:#fff7f7}.small{color:#667894;line-height:1.45}
   </style>
 </head>
 <body>
@@ -48,11 +48,6 @@
       if (requestedStudent) target.searchParams.set('student', requestedStudent);
       window.location.href = target.toString();
     };
-    const goAgenda = () => {
-      const target = new URL('agenda.html', window.location.href);
-      if (requestedStudent) target.searchParams.set('student', requestedStudent);
-      window.location.href = target.toString();
-    };
 
     mountPacoPageTemplate({
       mount,
@@ -65,8 +60,7 @@
       navigation: [
         { icon:'🏠', label:'Dashboard', onClick:goDashboard },
         { icon:'📚', label:'Lessen', onClick:goLessons },
-        { icon:'📝', label:'Toetsgeschiedenis', active:true },
-        { icon:'📅', label:'Agenda', onClick:goAgenda }
+        { icon:'📝', label:'Toetsgeschiedenis', active:true }
       ],
       content
     });
@@ -81,14 +75,24 @@
       historyContent.innerHTML = `<div class="history-error"><strong>De toetsgeschiedenis kon niet worden geladen.</strong><p class="small">${escapeHtml(error?.message || 'Onbekende fout.')}</p></div>`;
     }
 
+    function populateStudentFilter(attempts) {
+      const students = [...new Set((attempts || []).map(attempt => String(attempt.student || '').trim()).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b, 'nl-NL'));
+      studentSelect.replaceChildren(new Option('Alle leerlingen', ''));
+      students.forEach(student => studentSelect.appendChild(new Option(student, student)));
+      if (requestedStudent && students.includes(requestedStudent)) studentSelect.value = requestedStudent;
+    }
+
     async function loadHistory(studentFilter = '') {
       historyContent.innerHTML = '<div class="history-loading">Toetsgeschiedenis laden…</div>';
       try {
         const attempts = await app.testHistory.listAttempts(studentFilter);
         renderAttempts(attempts, studentFilter);
+        return attempts;
       } catch (error) {
         console.error('Test history load error:', error);
         renderError(error);
+        return [];
       }
     }
 
@@ -99,17 +103,10 @@
         return;
       }
 
-      const lessons = await app.loadLessons();
-      const students = [...new Set(lessons.map(lesson => String(lesson.student || '').trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'nl-NL'));
-      students.forEach(student => {
-        const option = document.createElement('option');
-        option.value = student;
-        option.textContent = student;
-        studentSelect.appendChild(option);
-      });
-
-      if (requestedStudent && students.includes(requestedStudent)) studentSelect.value = requestedStudent;
-      await loadHistory(studentSelect.value);
+      await app.loadLessons();
+      const attempts = await loadHistory();
+      populateStudentFilter(attempts);
+      if (requestedStudent && studentSelect.value === requestedStudent) await loadHistory(requestedStudent);
     }
 
     studentSelect.addEventListener('change', async () => {

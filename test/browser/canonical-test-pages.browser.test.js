@@ -26,6 +26,11 @@ test('dashboard page owns the canonical student chooser', async ({ page }) => {
   await expect(page.locator('.student-card').nth(2)).toContainText('Zephon');
 });
 
+test('management page exposes the canonical test history route', async ({ page }) => {
+  await expectCanonicalShell(page, 'management.html', 'Beheer');
+  await expect(page.getByRole('button', { name: 'Toetsgeschiedenis' })).toHaveCount(1);
+});
+
 test('test page uses the canonical shell', async ({ page }) => {
   await expectCanonicalShell(page, 'test.html', 'Toets');
   await expect(page.locator('#testProgress')).toHaveCount(1);

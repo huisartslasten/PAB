@@ -158,20 +158,20 @@ The V4.78 agenda composition and duplicate semantics were source-verified before
 - Legacy Agenda runtime removal/bridge verification: **success**
 
 ## Current TEST page-template state
-- Current readable TEST version: **V5.14**.
+- Current readable TEST version: **V5.12**.
 - TEST version is owned by `src/components/page-template.js`, not by an individual page or integration script.
-- The canonical template renders `PacoGO TEST V5.14` in its hero for every page that mounts the template.
+- The canonical template renders `PacoGO TEST V5.12` in its hero for every page that mounts the template.
 - `src/components/page-template.css` owns the badge presentation.
 - Canonical LESSONS, Leskeuze, Toets, Les bekijken and Vragen maken pages mount the same template.
 - No per-page TEST-version patch should be added.
 
-## Current lesson-page audit
-### Green before the current navigation change
+## Current V5.12 lesson-page audit
+### Green
 - `refactor/professional-v1` is the active branch.
 - `main` remains LIVE and untouched.
 - Canonical page-template ownership is intact.
 - LESSONS is a canonical `lessons.html` page and uses the shared template.
-- LESSONS reads through `app.loadLessons()` and the canonical application lesson mapper/visibility boundary.
+- LESSONS reads through `app.lessons.listAll()` and the canonical lesson mapper/visibility boundary.
 - LESSONS routes into canonical `lesson-choice.html` rather than the legacy lesson UI.
 - Leskeuze derives available actions from `src/features/lessons/choice.js`.
 - Leskeuze routes practice, test, view and questions to canonical page boundaries; it has no `index.html` fallback.
@@ -181,28 +181,27 @@ The V4.78 agenda composition and duplicate semantics were source-verified before
 - Shared HTML escaping is owned by `src/core/html.js`.
 - Focused parity tests cover the reconstructed lesson-view presentation contract and question-session progression/shuffle contract.
 - Full browser coverage includes the canonical test/view/questions shells.
-- Full regression run `e80f2a98146a1cce28ad90342943082cec3b8aff` was green before the current navigation change.
-
-### Current navigation boundary under validation
-- `lessons.html` now routes its Dashboard navigation to the canonical `dashboard.html?student=...` page instead of the legacy `index.html` shell.
-- This change does not replace or invent Agenda/Tests targets; those remain on their existing routes until their canonical targets are source-verified.
-- The current change is intentionally limited to the established canonical Dashboard ownership.
+- Full regression run `38168240096` on TEST head `3f9d22319b86023c6e1c32abd34f7d6653ff1886` completed successfully: Node regression, Vitest regression, Chromium/browser regression and clean-tree verification all passed.
 
 ### Runtime/parity boundary
-- The V4.78 lesson-view/questions parity boundary is source-verified for the reconstructed contracts covered by the focused tests.
+- The previously open V4.78 lesson-view/questions parity boundary is now source-verified for the reconstructed contracts covered by the focused tests.
 - This does **not** claim unverified parity for interactions that are not represented by the V4.78 source contract or current tests.
 - Future parity work must extend the canonical feature boundaries rather than restoring legacy `index.html` ownership or adding page-specific fallbacks.
 
 ## Final repository state
 - Professional V1 closure was followed by the V5.x canonical page architecture work on `refactor/professional-v1`.
-- Current TEST code commit under regression: `397aff0d39b36f5e3cd74e7eac0354c7f2a60d38`.
-- Latest verified green TEST head before the current navigation change: `e80f2a98146a1cce28ad90342943082cec3b8aff`.
-- The current navigation change is not considered complete until its regression gate is green.
+- Latest verified TEST head: `3f9d22319b86023c6e1c32abd34f7d6653ff1886`.
+- Full GitHub Actions regression run: `38168240096` — **success**.
+- Maintained Node regression: **success**.
+- Maintained Vitest regression: **success**.
+- Chromium/browser regression: **success**.
+- Clean-tree gate: **success**.
+- The regression included the canonical lesson-view parity and question-session changes.
 
 ## Dependency hygiene
 - `vitest` is pinned to `5.0.3` in `package.json`.
 - The committed lockfile is the reproducibility source for CI installation.
-- The latest full regression used the committed lockfile and reported zero known dependency vulnerabilities.
+- The full regression used the committed lockfile and reported zero known dependency vulnerabilities.
 
 ## Safety verification
 - `main` / LIVE was not modified by the current work.
@@ -215,7 +214,7 @@ The V4.78 agenda composition and duplicate semantics were source-verified before
 ## Closure
 **Professional V1 is officially closed.**
 
-The Player and Agenda architecture is integrated. The current V5.x work is a subsequent canonical page architecture stage and must not be represented as unfinished Player/Agenda work.
+The Player and Agenda architecture is integrated. The current V5.12 work is a subsequent canonical page architecture stage and must not be represented as unfinished Player/Agenda work.
 
 ## New-chat procedure — MANDATORY
 At every new chat:

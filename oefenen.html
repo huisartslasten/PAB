@@ -134,7 +134,7 @@
         const app = createPacoGOApp({ supabaseLib: window.supabase });
         const lessons = await app.lessons.listAll();
         const lesson = lessons.find(candidate => String(candidate.id) === String(lessonId));
-        const items = lesson?.lesson_items || [];
+        const items = Array.isArray(lesson?.lesson_items) ? lesson.lesson_items : [];
         const validCards = items.filter(item =>
           String(item?.question || '').trim() && String(item?.answer || '').trim()
         );

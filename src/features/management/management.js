@@ -20,16 +20,21 @@ function findScopedLesson(id, student) {
 }
 
 export function createManagement({ auth, lessonService } = {}) {
-  requireParent(auth);
   if (!lessonService) throw new Error('createManagement requires lessonService');
 
+  function assertParent() {
+    requireParent(auth);
+  }
+
   async function loadLessons() {
+    assertParent();
     const lessons = await lessonService.listAll();
     setLessons(lessons);
     return getScopedLessons();
   }
 
   function selectStudent(student) {
+    assertParent();
     const value = String(student ?? '').trim();
     if (!value) throw new Error('A student must be selected.');
     setStudent(value);
@@ -37,18 +42,22 @@ export function createManagement({ auth, lessonService } = {}) {
   }
 
   function getSelectedStudent() {
+    assertParent();
     return appState.currentStudent;
   }
 
   function getScopedLessons() {
+    assertParent();
     return getActiveStudentLessons(appState.lessons, requireStudent());
   }
 
   function getAllScopedLessons() {
+    assertParent();
     return getStudentLessons(appState.lessons, requireStudent());
   }
 
   async function createLesson(payload = {}) {
+    assertParent();
     const student = requireStudent();
     const result = await lessonService.createLesson({ ...payload, student });
     await loadLessons();
@@ -56,6 +65,7 @@ export function createManagement({ auth, lessonService } = {}) {
   }
 
   async function updateLesson(id, payload = {}) {
+    assertParent();
     const student = requireStudent();
     findScopedLesson(id, student);
     const result = await lessonService.updateLesson(id, { ...payload, student });
@@ -69,16 +79,19 @@ export function createManagement({ auth, lessonService } = {}) {
   });
 
   async function archiveLesson(id) {
+    assertParent();
     findScopedLesson(id, requireStudent());
     return recovery.archive(id);
   }
 
   async function moveToTrash(id) {
+    assertParent();
     findScopedLesson(id, requireStudent());
     return recovery.trash(id);
   }
 
   async function restoreLesson(id) {
+    assertParent();
     const lesson = findScopedLesson(id, requireStudent());
     if (!lesson.archived && !lesson.deleted) throw new Error('Lesson is not recoverable.');
     return recovery.restore(id);

@@ -83,8 +83,8 @@
 
     try {
       if (!lessonId) throw new Error('Geen les geselecteerd.');
-      const lessons = await app.lessons.listAll();
-      const lesson = lessons.find(item => String(item.id) === String(lessonId));
+      const records = await app.loadLessons();
+      const lesson = app.mapLessons(records).find(item => String(item.id) === String(lessonId));
       if (!lesson) throw new Error('Deze les kon niet worden gevonden.');
       session = createQuestionSession(Array.isArray(lesson.lesson_items) ? lesson.lesson_items : []);
       renderQuestion();

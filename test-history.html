@@ -104,7 +104,7 @@
       await app.loadLessons();
       const attempts = await loadHistory();
       populateStudentFilter(attempts);
-      if (requestedStudent && studentSelect.value === requestedStudent) await loadHistory(requestedStudent);
+      if (requestedStudent) await loadHistory(requestedStudent);
     }
 
     studentSelect.addEventListener('change', async () => {

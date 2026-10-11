@@ -25,7 +25,7 @@
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
-    import { getLessonChoices } from './src/features/lessons/lesson-choice.js';
+    import { getLessonChoiceCards, getLessonChoiceTarget } from './src/features/lessons/choice.js';
 
     const params=new URLSearchParams(window.location.search);
     const lessonId=params.get('lesson_id')||'';
@@ -60,17 +60,18 @@
       const grid=document.createElement('div');grid.className='choice-grid';
       const icons={practice:'✏️',test:'📝',view:'👀',questions:'❓'};
       const descriptions={practice:'Ga naar de oefenpagina en kies een oefenvorm.',test:'Open de toets voor deze les.',view:'Bekijk de inhoud van deze les.' ,questions:'Maak de vragen bij deze les.'};
-      getLessonChoices(lesson).forEach(choice=>{
+      getLessonChoiceCards(lesson).forEach(choice=>{
         const card=document.createElement('button');card.type='button';card.className=`choice-card${choice.id==='practice'?' available':''}`;
         card.innerHTML=`<div><div class="choice-icon">${icons[choice.id]||'📘'}</div><h2>${choice.label}</h2><p>${descriptions[choice.id]||''}</p></div><div class="choice-action">${choice.id==='practice'?'Openen →':'Volgende koppeling →'}</div>`;
         if(choice.id==='practice') card.addEventListener('click',()=>{
-          const target=new URL('oefenen.html',window.location.href);
-          target.searchParams.set('lesson_id',String(lesson.id));
-          target.searchParams.set('student',student);
-          target.searchParams.set('subject',String(lesson.subject||''));
-          target.searchParams.set('title',String(lesson.title||''));
-          target.searchParams.set('items',String((lesson.lesson_items||[]).length));
-          window.location.href=target.toString();
+          const target=getLessonChoiceTarget(lesson, choice.id);
+          const targetUrl=new URL('oefenen.html',window.location.href);
+          targetUrl.searchParams.set('lesson_id',String(target.lessonId));
+          targetUrl.searchParams.set('student',student);
+          targetUrl.searchParams.set('subject',String(lesson.subject||''));
+          targetUrl.searchParams.set('title',String(lesson.title||''));
+          targetUrl.searchParams.set('items',String((lesson.lesson_items||[]).length));
+          window.location.href=targetUrl.toString();
         });
         else card.addEventListener('click',()=>{window.location.href='index.html'});
         grid.appendChild(card);

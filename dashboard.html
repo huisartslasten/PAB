@@ -21,6 +21,11 @@
     .subject-icon{font-size:42px;margin-bottom:11px}
     .subject-card h3{font-size:21px}
     .subject-card p{margin:6px 0 0;color:#667894}
+    .student-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+    .student-card{border:2px solid #dce9f6;border-radius:20px;background:#fff;padding:20px;text-align:left;color:#102b57;box-shadow:0 8px 22px rgba(16,43,87,.07);cursor:pointer;transition:.16s}
+    .student-card:hover{transform:translateY(-3px);border-color:#1787f2;background:#eef8ff}
+    .student-card h2{font-size:24px}
+    .student-card p{margin:6px 0 0;color:#667894}
     .stat-big{font-size:40px;font-weight:950;color:#102b57;line-height:1}
     .stat-label{margin-top:5px;color:#667894}
     .progress-wrap{margin-top:18px}
@@ -31,7 +36,7 @@
     .dashboard-actions{display:flex;gap:10px;flex-wrap:wrap}
     .dashboard-actions button{font-weight:900}
     @media(max-width:800px){.dashboard-grid{grid-template-columns:1fr}.subject-grid{grid-template-columns:1fr 1fr}}
-    @media(max-width:500px){.subject-grid{grid-template-columns:1fr}}
+    @media(max-width:500px){.subject-grid{grid-template-columns:1fr}.student-grid{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -41,56 +46,89 @@
     import { createPacoGOApp } from './src/app/bootstrap.js';
     import { mapLessonRecords } from './src/features/lessons/lesson-mapper.js';
     import { getDashboardSubjects, getDashboardProgress, getDashboardSubjectIcon } from './src/features/dashboard/view-model.js';
+    import { listStudents, isKnownStudent } from './src/features/students/students.js';
 
     const params = new URLSearchParams(window.location.search);
-    const selectedStudent = params.get('student') || 'Zyon';
+    const requestedStudent = params.get('student') || '';
+    const selectedStudent = isKnownStudent(requestedStudent) ? requestedStudent : '';
     const mount = document.querySelector('#paco-template-mount');
-    const content = document.createElement('div');
-    content.className = 'dashboard-page';
     const app = createPacoGOApp({ supabaseLib: window.supabase });
 
-    const goHome = () => { window.location.href = `dashboard.html?student=${encodeURIComponent(selectedStudent)}`; };
+    const goChooser = () => { window.location.href = 'dashboard.html'; };
+    const goDashboard = student => { window.location.href = `dashboard.html?student=${encodeURIComponent(student)}`; };
     const goLessons = () => { window.location.href = `lessons.html?student=${encodeURIComponent(selectedStudent)}`; };
     const goManage = () => { window.location.href = 'management.html'; };
-    const goStudentChooser = () => { window.location.href = 'dashboard.html'; };
 
-    const toolbar = document.createElement('div');
-    toolbar.className = 'dashboard-actions';
-    const studentLabel = document.createElement('div');
-    studentLabel.className = 'dashboard-student';
-    studentLabel.textContent = `Leerling: ${selectedStudent}`;
-    const switchButton = document.createElement('button');
-    switchButton.type = 'button';
-    switchButton.className = 'secondary';
-    switchButton.textContent = 'Andere leerling';
-    switchButton.addEventListener('click', goStudentChooser);
-    toolbar.append(studentLabel, switchButton);
+    const content = document.createElement('div');
+    content.className = 'dashboard-page';
 
-    const state = document.createElement('div');
-    state.className = 'dashboard-state';
-    state.textContent = 'Dashboard laden…';
-    content.append(toolbar, state);
+    function mountTemplate() {
+      mountPacoPageTemplate({
+        mount,
+        backLabel: selectedStudent ? '← Mijn lessen' : '← Start',
+        backAction: selectedStudent ? goLessons : goChooser,
+        greeting: selectedStudent ? `Hoi ${selectedStudent}! 🐶` : 'PacoGO leren 🐾',
+        title: selectedStudent ? 'Dashboard' : 'Wie gaat er leren?',
+        icon: selectedStudent ? '🏠' : '👦',
+        subtitle: selectedStudent ? 'Bekijk je lessen en zie hoe je ervoor staat.' : 'Kies een leerling om naar het persoonlijke dashboard te gaan.',
+        navigation: selectedStudent ? [
+          {icon:'🏠',label:'Dashboard',active:true,onClick:() => goDashboard(selectedStudent)},
+          {icon:'📚',label:'Mijn lessen',onClick:goLessons},
+          {icon:'⚙️',label:'Beheer',onClick:goManage}
+        ] : [
+          {icon:'🏠',label:'Start',active:true,onClick:goChooser},
+          {icon:'⚙️',label:'Beheer',onClick:goManage}
+        ],
+        content
+      });
+    }
 
-    mountPacoPageTemplate({
-      mount,
-      backLabel:'← Terug',
-      backAction:goLessons,
-      greeting:`Hoi ${selectedStudent}! 🐶`,
-      title:'Dashboard',
-      icon:'🏠',
-      subtitle:'Bekijk je lessen en zie hoe je ervoor staat.',
-      navigation:[
-        {icon:'🏠',label:'Dashboard',active:true,onClick:goHome},
-        {icon:'📚',label:'Mijn lessen',onClick:goLessons},
-        {icon:'⚙️',label:'Beheer',onClick:goManage}
-      ],
-      content
-    });
+    function renderStudentChooser() {
+      content.replaceChildren();
+      const card = document.createElement('article');
+      card.className = 'dashboard-card dashboard-welcome';
+      const heading = document.createElement('h2');
+      heading.textContent = 'Kies je naam';
+      const intro = document.createElement('p');
+      intro.textContent = 'Dan opent jouw persoonlijke dashboard met je eigen lessen en voortgang.';
+      card.append(heading, intro);
 
-    function render(records){
+      const grid = document.createElement('div');
+      grid.className = 'student-grid';
+      grid.style.marginTop = '15px';
+      listStudents().forEach(student => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'student-card';
+        const name = document.createElement('h2');
+        name.textContent = `👦 ${student}`;
+        const description = document.createElement('p');
+        description.textContent = 'Mijn lessen →';
+        button.append(name, description);
+        button.addEventListener('click', () => goDashboard(student));
+        grid.appendChild(button);
+      });
+      card.appendChild(grid);
+      content.appendChild(card);
+    }
+
+    function render(records) {
+      content.replaceChildren();
       const lessons = mapLessonRecords(records);
       const subjects = getDashboardSubjects(lessons, selectedStudent);
       const progress = getDashboardProgress(lessons, selectedStudent, app.mastery);
+
+      const toolbar = document.createElement('div');
+      toolbar.className = 'dashboard-actions';
+      const studentLabel = document.createElement('div');
+      studentLabel.className = 'dashboard-student';
+      studentLabel.textContent = `Leerling: ${selectedStudent}`;
+      const switchButton = document.createElement('button');
+      switchButton.type = 'button';
+      switchButton.className = 'secondary';
+      switchButton.textContent = 'Andere leerling';
+      switchButton.addEventListener('click', goChooser);
+      toolbar.append(studentLabel, switchButton);
 
       const grid = document.createElement('div');
       grid.className = 'dashboard-grid';
@@ -100,7 +138,11 @@
 
       const welcome = document.createElement('article');
       welcome.className = 'dashboard-card dashboard-welcome';
-      welcome.innerHTML = `<h2>Wat wil je leren?</h2><p>Kies hieronder een vak om direct naar je lessen te gaan.</p>`;
+      const welcomeHeading = document.createElement('h2');
+      welcomeHeading.textContent = 'Wat wil je leren?';
+      const welcomeText = document.createElement('p');
+      welcomeText.textContent = 'Kies hieronder een vak om direct naar je lessen te gaan.';
+      welcome.append(welcomeHeading, welcomeText);
       main.appendChild(welcome);
 
       const subjectsCard = document.createElement('article');
@@ -116,9 +158,15 @@
         const card = document.createElement('button');
         card.type = 'button';
         card.className = 'subject-card';
-        const icon = getDashboardSubjectIcon(subject.label);
+        const icon = document.createElement('div');
+        icon.className = 'subject-icon';
+        icon.textContent = getDashboardSubjectIcon(subject.label);
+        const title = document.createElement('h3');
+        title.textContent = subject.label;
         const count = subject.lessons.length;
-        card.innerHTML = `<div class="subject-icon">${icon}</div><h3>${subject.label}</h3><p>${count} ${count === 1 ? 'les' : 'lessen'} · Bekijk →</p>`;
+        const meta = document.createElement('p');
+        meta.textContent = `${count} ${count === 1 ? 'les' : 'lessen'} · Bekijk →`;
+        card.append(icon, title, meta);
         card.addEventListener('click', () => {
           window.location.href = `lessons.html?student=${encodeURIComponent(selectedStudent)}&subject=${encodeURIComponent(subject.label)}`;
         });
@@ -140,25 +188,73 @@
       side.className = 'dashboard-side';
       const progressCard = document.createElement('article');
       progressCard.className = 'dashboard-card';
-      progressCard.innerHTML = `<h3>Jouw voortgang</h3><div class="stat-big" style="margin-top:16px">${progress.lessons}</div><div class="stat-label">lessen beschikbaar</div><div class="progress-wrap"><div class="progress-label"><span>${progress.mastered} van ${progress.items} onderdelen beheerst</span><span>${progress.percent}%</span></div><div class="progress"><div class="progress-bar" style="width:${progress.percent}%"></div></div></div><p class="dashboard-state" style="margin:16px 0 0">Een onderdeel telt als beheerst na 3 goede antwoorden achter elkaar.</p>`;
+      const progressHeading = document.createElement('h3');
+      progressHeading.textContent = 'Jouw voortgang';
+      const lessonCount = document.createElement('div');
+      lessonCount.className = 'stat-big';
+      lessonCount.style.marginTop = '16px';
+      lessonCount.textContent = String(progress.lessons);
+      const lessonLabel = document.createElement('div');
+      lessonLabel.className = 'stat-label';
+      lessonLabel.textContent = 'lessen beschikbaar';
+      const progressWrap = document.createElement('div');
+      progressWrap.className = 'progress-wrap';
+      const progressLabel = document.createElement('div');
+      progressLabel.className = 'progress-label';
+      const masteredLabel = document.createElement('span');
+      masteredLabel.textContent = `${progress.mastered} van ${progress.items} onderdelen beheerst`;
+      const percentLabel = document.createElement('span');
+      percentLabel.textContent = `${progress.percent}%`;
+      progressLabel.append(masteredLabel, percentLabel);
+      const progress = document.createElement('div');
+      progress.className = 'progress';
+      const progressBar = document.createElement('div');
+      progressBar.className = 'progress-bar';
+      progressBar.style.width = `${progress.percent}%`;
+      progress.appendChild(progressBar);
+      progressWrap.append(progressLabel, progress);
+      const masteryNote = document.createElement('p');
+      masteryNote.className = 'dashboard-state';
+      masteryNote.style.margin = '16px 0 0';
+      masteryNote.textContent = 'Een onderdeel telt als beheerst na 3 goede antwoorden achter elkaar.';
+      progressCard.append(progressHeading, lessonCount, lessonLabel, progressWrap, masteryNote);
       side.appendChild(progressCard);
 
       const subjectsCardSide = document.createElement('article');
       subjectsCardSide.className = 'dashboard-card';
-      subjectsCardSide.innerHTML = `<h3>${progress.subjects} ${progress.subjects === 1 ? 'vak' : 'vakken'}</h3><p style="margin:7px 0 0;color:#667894">Actieve vakken voor ${selectedStudent}.</p><div class="dashboard-actions" style="margin-top:14px"><button type="button" class="secondary">📚 Naar mijn lessen</button></div>`;
-      subjectsCardSide.querySelector('button').addEventListener('click', goLessons);
+      const subjectCountHeading = document.createElement('h3');
+      subjectCountHeading.textContent = `${progress.subjects} ${progress.subjects === 1 ? 'vak' : 'vakken'}`;
+      const subjectCountText = document.createElement('p');
+      subjectCountText.style.cssText = 'margin:7px 0 0;color:#667894';
+      subjectCountText.textContent = `Actieve vakken voor ${selectedStudent}.`;
+      const lessonButton = document.createElement('button');
+      lessonButton.type = 'button';
+      lessonButton.className = 'secondary';
+      lessonButton.style.marginTop = '14px';
+      lessonButton.textContent = '📚 Naar mijn lessen';
+      lessonButton.addEventListener('click', goLessons);
+      subjectsCardSide.append(subjectCountHeading, subjectCountText, lessonButton);
       side.appendChild(subjectsCardSide);
 
       grid.append(main, side);
-      content.replaceChildren(toolbar, grid);
+      content.append(toolbar, grid);
     }
 
-    try {
-      const records = await app.lessons.listAll();
-      render(records);
-    } catch (error) {
-      console.error('Dashboard page load error:', error);
-      state.textContent = 'Het dashboard kon niet worden geladen.';
+    mountTemplate();
+    if (!selectedStudent) {
+      renderStudentChooser();
+    } else {
+      const state = document.createElement('div');
+      state.className = 'dashboard-state';
+      state.textContent = 'Dashboard laden…';
+      content.appendChild(state);
+      try {
+        const records = await app.lessons.listAll();
+        render(records);
+      } catch (error) {
+        console.error('Dashboard page load error:', error);
+        state.textContent = 'Het dashboard kon niet worden geladen.';
+      }
     }
   </script>
 </body>

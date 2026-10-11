@@ -13,14 +13,6 @@ function navigateToLessons(target, student, subject = '') {
   target.location.assign(url.toString());
 }
 
-function navigateToLegacyStudentView(target, student, view) {
-  if (!student || !view) return;
-  const url = new URL(LEGACY_PAGE, target.location.href);
-  url.searchParams.set('student', student);
-  url.searchParams.set('view', view);
-  target.location.assign(url.toString());
-}
-
 function waitForFunction(target, name, timeout = 5000) {
   return new Promise(resolve => {
     const startedAt = Date.now();
@@ -43,9 +35,17 @@ function installLegacyStudentViewEntry({ documentRef, target }) {
   const params = new URLSearchParams(target.location.search);
   const student = params.get('student')?.trim() || '';
   const view = params.get('view')?.trim() || '';
-  if (!student || !view || !['agenda', 'tests'].includes(view)) return () => {};
+  if (!view || !['agenda', 'tests', 'beheer'].includes(view)) return () => {};
 
   const openRequestedView = async () => {
+    if (view === 'beheer') {
+      const showParentDashboard = await waitForFunction(target, 'showParentDashboard');
+      if (showParentDashboard) await showParentDashboard();
+      return;
+    }
+
+    if (!student) return;
+
     if (typeof target.selectStudent === 'function') {
       target.selectStudent(student);
     }

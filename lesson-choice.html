@@ -89,8 +89,8 @@
 
     if(!lessonId){content.innerHTML='<div class="choice-state">Geen les geselecteerd.</div>';}
     else try{
-      const lessons=await app.lessons.listAll();
-      const lesson=lessons.find(item=>String(item.id)===String(lessonId));
+      const records=await app.loadLessons();
+      const lesson=app.mapLessons(records).find(item=>String(item.id)===String(lessonId));
       if(!lesson) content.innerHTML='<div class="choice-state">Deze les kon niet worden gevonden.</div>';
       else renderLesson(lesson);
     }catch(error){

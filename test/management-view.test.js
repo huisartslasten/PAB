@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { renderStudentSelection, renderStudentLessons } from '../src/features/management/management-view.js';
+import { renderStudentSelection, renderStudentLessons, renderFeedback } from '../src/features/management/management-view.js';
 
 function createContainer() {
   const listeners = [];
@@ -36,4 +36,19 @@ test('management view renders only lessons supplied by management', () => {
   assert.equal(renderStudentLessons(container, management).length, 1);
   assert.match(container.innerHTML, /Woorden/);
   assert.match(container.innerHTML, /Nederlands · Spelling/);
+});
+
+test('management view renders feedback supplied by management', async () => {
+  const container = createContainer();
+  const management = {
+    async listFeedback() {
+      return [{ id: 7, feedback_type: 'idea', subject: 'Meer oefenen', message: 'Graag extra breuken.', status: 'new' }];
+    }
+  };
+
+  const feedback = await renderFeedback(container, management);
+  assert.equal(feedback.length, 1);
+  assert.match(container.innerHTML, /Meer oefenen/);
+  assert.match(container.innerHTML, /Graag extra breuken\./);
+  assert.match(container.innerHTML, /Idee \/ wens/);
 });

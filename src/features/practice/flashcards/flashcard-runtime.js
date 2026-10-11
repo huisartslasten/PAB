@@ -1,6 +1,5 @@
 import { createPacoGOApp } from '../../../app/bootstrap.js';
 import { hasLessonComponent } from '../../lessons/components.js';
-import { mapLessonRecord } from '../../lessons/lesson-mapper.js';
 import {
   createFlashcardSession,
   getCurrentFlashcard,
@@ -28,9 +27,9 @@ export async function mountFlashcardPractice({
 
   let lesson = null;
   try {
-    const lessons = await app.lessons.listAll();
-    const record = lessons.find(candidate => String(candidate.id) === String(lessonId));
-    lesson = record ? mapLessonRecord(record) : null;
+    const records = await app.loadLessons();
+    const record = app.mapLessons(records).find(candidate => String(candidate.id) === String(lessonId));
+    lesson = record || null;
   } catch (error) {
     loading.textContent = 'De flashcards konden niet worden geladen.';
     console.error(error);

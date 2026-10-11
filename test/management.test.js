@@ -59,6 +59,11 @@ test('management rejects mutations outside the selected student scope', async ()
   assert.deepEqual(service.calls, []);
 });
 
-test('management requires a parent session', () => {
-  assert.throws(() => createManagement({ auth: { isParent: false }, lessonService: makeService() }), /parent session/);
+test('management exposes the boundary without authorizing a non-parent session', async () => {
+  const service = makeService();
+  const management = createManagement({ auth: { isParent: false }, lessonService: service });
+
+  assert.throws(() => management.selectStudent('Zyon'), /parent session/);
+  await assert.rejects(() => management.loadLessons(), /parent session/);
+  assert.deepEqual(service.calls, []);
 });

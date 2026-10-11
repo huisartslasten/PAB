@@ -35,6 +35,14 @@
     .dashboard-state{padding:16px 18px;border:1px solid #dce9f6;border-radius:18px;background:#fff;color:#667894}
     .dashboard-actions{display:flex;gap:10px;flex-wrap:wrap}
     .dashboard-actions button{font-weight:900}
+    .dashboard-agenda{display:grid;gap:10px;margin-top:15px}
+    .dashboard-agenda-item{display:grid;grid-template-columns:auto minmax(0,1fr);gap:11px;align-items:start;padding:12px;border:1px solid #dce9f6;border-radius:15px;background:#f8fbff;text-align:left}
+    .dashboard-agenda-item.is-link{cursor:pointer}
+    .dashboard-agenda-item.is-link:hover{border-color:#1787f2;background:#eef8ff}
+    .agenda-icon{font-size:25px;line-height:1}
+    .agenda-date{font-size:11px;font-weight:900;color:#126fc9;text-transform:uppercase;letter-spacing:.04em}
+    .agenda-title{margin-top:2px;color:#102b57;font-weight:900;line-height:1.25}
+    .agenda-meta{margin-top:3px;color:#667894;font-size:12px;line-height:1.35}
     @media(max-width:800px){.dashboard-grid{grid-template-columns:1fr}.subject-grid{grid-template-columns:1fr 1fr}}
     @media(max-width:500px){.subject-grid{grid-template-columns:1fr}.student-grid{grid-template-columns:1fr}}
   </style>
@@ -45,7 +53,7 @@
     import { mountPacoPageTemplate } from './src/components/page-template.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
     import { setStudent } from './src/core/state.js';
-    import { getDashboardSubjects, getDashboardProgress, getDashboardSubjectIcon } from './src/features/dashboard/view-model.js';
+    import { getDashboardSubjects, getDashboardProgress, getDashboardSubjectIcon, getDashboardAgendaItems } from './src/features/dashboard/view-model.js';
     import { listStudents, isKnownStudent } from './src/features/students/students.js';
 
     const params = new URLSearchParams(window.location.search);
@@ -112,11 +120,74 @@
       content.appendChild(card);
     }
 
+    function formatAgendaDate(value) {
+      const date = new Date(`${String(value).slice(0, 10)}T12:00:00`);
+      if (Number.isNaN(date.getTime())) return String(value || '');
+      return new Intl.DateTimeFormat('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' }).format(date);
+    }
+
+    function agendaItemTarget(item) {
+      if (!item.lessonId) return '';
+      const target = new URL('lesson-choice.html', window.location.href);
+      target.searchParams.set('lesson_id', String(item.lessonId));
+      target.searchParams.set('student', selectedStudent);
+      return target.toString();
+    }
+
+    function renderAgenda(agendaItems) {
+      const card = document.createElement('article');
+      card.className = 'dashboard-card';
+      const heading = document.createElement('h2');
+      heading.textContent = 'Binnenkort';
+      card.appendChild(heading);
+
+      if (!agendaItems.length) {
+        const empty = document.createElement('div');
+        empty.className = 'dashboard-state';
+        empty.style.marginTop = '15px';
+        empty.textContent = 'Geen aankomende agenda-items.';
+        card.appendChild(empty);
+        return card;
+      }
+
+      const list = document.createElement('div');
+      list.className = 'dashboard-agenda';
+      agendaItems.forEach(item => {
+        const target = agendaItemTarget(item);
+        const row = document.createElement(target ? 'button' : 'div');
+        if (target) row.type = 'button';
+        row.className = `dashboard-agenda-item${target ? ' is-link' : ''}`;
+        const icon = document.createElement('div');
+        icon.className = 'agenda-icon';
+        icon.textContent = item.icon;
+        const body = document.createElement('div');
+        const date = document.createElement('div');
+        date.className = 'agenda-date';
+        date.textContent = formatAgendaDate(item.date);
+        const title = document.createElement('div');
+        title.className = 'agenda-title';
+        title.textContent = item.title;
+        body.append(date, title);
+        if (item.meta) {
+          const meta = document.createElement('div');
+          meta.className = 'agenda-meta';
+          meta.textContent = item.meta;
+          body.appendChild(meta);
+        }
+        row.append(icon, body);
+        if (target) row.addEventListener('click', () => { window.location.href = target; });
+        list.appendChild(row);
+      });
+      card.appendChild(list);
+      return card;
+    }
+
     function render(records) {
       content.replaceChildren();
       const lessons = app.mapLessons(records);
       const subjects = getDashboardSubjects(lessons, selectedStudent);
       const progressStats = getDashboardProgress(lessons, selectedStudent, app.mastery);
+      const agendaItems = getDashboardAgendaItems(app.agenda, 4);
 
       const toolbar = document.createElement('div');
       toolbar.className = 'dashboard-actions';
@@ -144,6 +215,8 @@
       welcomeText.textContent = 'Kies hieronder een vak om direct naar je lessen te gaan.';
       welcome.append(welcomeHeading, welcomeText);
       main.appendChild(welcome);
+
+      main.appendChild(renderAgenda(agendaItems));
 
       const subjectsCard = document.createElement('article');
       subjectsCard.className = 'dashboard-card';

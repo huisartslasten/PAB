@@ -1,6 +1,7 @@
 import { createAgendaRuntime } from './runtime.js';
 import { createAgendaCustomActions } from './custom-actions.js';
 import { createAgendaImportRuntime } from './import-runtime.js';
+import { installAuthRuntime } from '../auth/auth-runtime.js';
 
 const REQUIRED = ['storage', 'currentStudent', 'lessons', 'demoItems'];
 
@@ -85,17 +86,19 @@ export function installAgendaRuntimeEntry(host, target = globalThis) {
   target.deleteAgendaItem = entry.deleteAgendaItem;
   target.showAgendaImport = entry.showAgendaImport;
   target.setAgendaImportMode = entry.setAgendaImportMode;
-  target.handleAgendaMediaFile = entry.handleAgendaMediaFile;
-  target.analyzeAgendaImage = entry.analyzeAgendaImage;
-  target.analyzeAgendaVideo = entry.analyzeAgendaVideo;
-  target.setManualAgendaRange = entry.setManualAgendaRange;
-  target.addManualAgendaItem = entry.addManualAgendaItem;
-  target.saveAgendaImportReview = entry.saveAgendaImportReview;
-  target.clearAgendaImportReview = entry.clearAgendaImportReview;
-  target.toggleAgendaReviewMeta = entry.toggleAgendaReviewMeta;
-  target.toggleAllAgendaReviewMeta = entry.toggleAllAgendaReviewMeta;
+  target.handleAgendaMediaFile = entry.handleMediaMediaFile;
+  target.analyzeAgendaImage = entry.analyzeImage;
+  target.analyzeAgendaVideo = entry.analyzeVideo;
+  target.setManualAgendaRange = entry.setManualRange;
+  target.addManualAgendaItem = entry.addManualItem;
+  target.saveAgendaImportReview = entry.saveReview;
+  target.clearAgendaImportReview = entry.clearReview;
+  target.toggleAgendaReviewMeta = entry.toggleMeta;
+  target.toggleAllAgendaReviewMeta = entry.toggleAllMeta;
   target.getTestCalendar = entry.getTestCalendar;
   target.saveTestCalendar = entry.saveTestCalendar;
   target.normalizeAgendaDate = entry.normalizeAgendaDate;
+  const auth = host.db ? installAuthRuntime({ db: host.db, documentRef: host.documentRef, target }) : null;
+  auth?.initialize().catch(error => console.error('PacoGO auth initialization failed:', error));
   return entry;
 }

@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — Mijn lessen</title>
+  <link rel="stylesheet" href="src/components/page-template.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .lessons-page{display:grid;gap:22px}
+    .lessons-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .lessons-student{font-weight:800;color:#38577d}
+    .lessons-state{padding:16px 18px;border:1px solid #dce9f6;border-radius:18px;background:#fff;color:#667894}
+    .subject-grid,.lesson-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px}
+    .subject-card,.lesson-card{border:1px solid #dce9f6;border-radius:20px;background:#fff;box-shadow:0 8px 22px rgba(16,43,87,.07);padding:18px;text-align:left;cursor:pointer;transition:.16s}
+    .subject-card:hover,.lesson-card:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(16,43,87,.11)}
+    .subject-card.active{border-color:#1787f2;background:#eef8ff}
+    .subject-icon{font-size:34px;margin-bottom:12px}
+    .subject-card h2,.lesson-card h2{margin:0;color:#102b57;font:800 21px/1.1 "Baloo 2",Nunito,sans-serif}
+    .subject-card p,.lesson-card p{margin:7px 0 0;color:#667894;line-height:1.4}
+    .lesson-card{min-height:145px}
+    .lesson-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
+    .lesson-badge{padding:5px 9px;border-radius:999px;background:#eaf4ff;color:#126fc9;font-size:11px;font-weight:900}
+    .section-title{margin:0 0 12px;font:800 25px/1.1 "Baloo 2",Nunito,sans-serif;color:#102b57}
+    .back-subjects{border:0;background:#eaf4ff;color:#126fc9;box-shadow:none;padding:9px 13px;font-weight:900;border-radius:12px;cursor:pointer}
+    .back-subjects:hover{background:#dff0ff}
+    @media(max-width:700px){.subject-grid,.lesson-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div id="paco-template-mount"></div>
+  <script type="module">
+    import { mountPacoPageTemplate } from './src/components/page-template.js';
+    import { createPacoGOApp } from './src/app/bootstrap.js';
+    import { mapLessonRecords } from './src/features/lessons/lesson-mapper.js';
+
+    const params = new URLSearchParams(window.location.search);
+    const selectedStudent = params.get('student') || 'Zyon';
+    const selectedSubject = params.get('subject') || '';
+    const mount = document.querySelector('#paco-template-mount');
+    const content = document.createElement('div');
+    content.className = 'lessons-page';
+
+    const app = createPacoGOApp({ supabaseLib: window.supabase });
+
+    const subjectIcons = {
+      nederlands:'📚', rekenen:'🔢', spelling:'✏️', begrijpendlezen:'📖', topografie:'🌍',
+      geschiedenis:'🏛️', aardrijkskunde:'🗺️', natuur:'🌱', engels:'🇬🇧', overig:'🧩'
+    };
+
+    const normalize = value => String(value || '').trim().toLocaleLowerCase('nl-NL');
+    const subjectIcon = subject => subjectIcons[normalize(subject).replaceAll(' ','')] || '📘';
+    const goHome = () => { window.location.href = 'index.html'; };
+    const goLessons = () => { window.location.href = `lessons.html?student=${encodeURIComponent(selectedStudent)}`; };
+
+    const toolbar = document.createElement('div');
+    toolbar.className = 'lessons-toolbar';
+    const studentLabel = document.createElement('div');
+    studentLabel.className = 'lessons-student';
+    studentLabel.textContent = `Leerlingen: ${selectedStudent}`;
+    toolbar.appendChild(studentLabel);
+
+    const state = document.createElement('div');
+    state.className = 'lessons-state';
+    state.textContent = 'Lessen laden…';
+    content.append(toolbar, state);
+
+    mountPacoPageTemplate({
+      mount,
+      backLabel:'← Terug',
+      backAction:() => window.history.length > 1 ? window.history.back() : goHome(),
+      greeting:`Hoi ${selectedStudent}! 🐶`,
+      title:'Mijn lessen',
+      icon:'📚',
+      subtitle:'Kies een vak en open daarna de les die je wilt doen.',
+      navigation:[
+        {icon:'🏠',label:'Dashboard',onClick:goHome},
+        {icon:'📚',label:'Mijn lessen',active:true,onClick:goLessons},
+        {icon:'📝',label:'Toetsen',onClick:goHome},
+        {icon:'📅',label:'Mijn agenda',onClick:goHome}
+      ],
+      content
+    });
+
+    function lessonTarget(lesson){
+      const target = new URL('lesson-choice.html',window.location.href);
+      target.searchParams.set('lesson_id',String(lesson.id));
+      target.searchParams.set('student',selectedStudent);
+      return target.toString();
+    }
+
+    function render(records){
+      const lessons = mapLessonRecords(records).filter(lesson =>
+        normalize(lesson.student || selectedStudent) === normalize(selectedStudent) &&
+        !lesson.deleted && !lesson.archived
+      );
+      const grouped = new Map();
+      lessons.forEach(lesson => {
+        const key = normalize(lesson.subject) || 'overig';
+        if(!grouped.has(key)) grouped.set(key,[]);
+        grouped.get(key).push(lesson);
+      });
+
+      content.replaceChildren(toolbar);
+      if(!selectedSubject){
+        const heading = document.createElement('h2');
+        heading.className='section-title';
+        heading.textContent='Kies een vak';
+        const grid=document.createElement('div');
+        grid.className='subject-grid';
+        [...grouped.entries()].sort((a,b)=>a[0].localeCompare(b[0],'nl')).forEach(([key,items])=>{
+          const card=document.createElement('button');
+          card.type='button';card.className='subject-card';
+          card.innerHTML=`<div class="subject-icon">${subjectIcon(items[0].subject)}</div><h2>${items[0].subject || 'Overig'}</h2><p>${items.length} ${items.length===1?'les':'lessen'}</p>`;
+          card.addEventListener('click',()=>{
+            const url=new URL(window.location.href);url.searchParams.set('subject',items[0].subject || 'Overig');window.location.href=url.toString();
+          });
+          grid.appendChild(card);
+        });
+        content.append(heading,grid);
+        if(!grid.children.length){const empty=document.createElement('div');empty.className='lessons-state';empty.textContent=`Geen actieve lessen gevonden voor ${selectedStudent}.`;content.appendChild(empty);}
+        return;
+      }
+
+      const key=normalize(selectedSubject);
+      const lessonsForSubject=grouped.get(key)||[];
+      const header=document.createElement('div');header.className='lessons-toolbar';
+      const heading=document.createElement('h2');heading.className='section-title';heading.textContent=selectedSubject;
+      const back=document.createElement('button');back.type='button';back.className='back-subjects';back.textContent='← Alle vakken';back.addEventListener('click',goLessons);
+      header.append(heading,back);
+      const grid=document.createElement('div');grid.className='lesson-grid';
+      lessonsForSubject.forEach(lesson=>{
+        const card=document.createElement('button');card.type='button';card.className='lesson-card';
+        const count=Array.isArray(lesson.items)?lesson.items.length:0;
+        card.innerHTML=`<h2>${lesson.title || 'Naamloze les'}</h2><p>${lesson.subvak || 'Les'}</p><div class="lesson-meta"><span class="lesson-badge">${count} ${count===1?'item':'items'}</span>${lesson.type?`<span class="lesson-badge">${lesson.type}</span>`:''}</div>`;
+        card.addEventListener('click',()=>window.location.href=lessonTarget(lesson));
+        grid.appendChild(card);
+      });
+      content.append(header,grid);
+      if(!grid.children.length){const empty=document.createElement('div');empty.className='lessons-state';empty.textContent='Geen actieve lessen gevonden in dit vak.';content.appendChild(empty);}
+    }
+
+    try{
+      const records=await app.lessons.listAll();
+      render(records);
+    }catch(error){
+      console.error('Lessons page load error:',error);
+      state.textContent='De lessen konden niet worden geladen.';
+    }
+  </script>
+</body>
+</html>

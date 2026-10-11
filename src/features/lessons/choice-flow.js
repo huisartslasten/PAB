@@ -1,4 +1,4 @@
-import { getLessonChoices, getLessonChoiceTarget } from './lesson-choice.js';
+import { getLessonChoices, getLessonChoiceTarget } from './choice.js';
 
 export function createLessonChoiceFlow({ open = () => {} } = {}) {
   function choose(lesson, choice) {

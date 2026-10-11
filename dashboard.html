@@ -248,14 +248,13 @@
       state.className = 'dashboard-state';
       state.textContent = 'Dashboard laden…';
       content.appendChild(state);
-      try {
-        setStudent(selectedStudent);
-        const records = await app.loadLessons();
-        render(records);
-      } catch (error) {
-        console.error('Dashboard page load error:', error);
-        state.textContent = 'Het dashboard kon niet worden geladen.';
-      }
+      setStudent(selectedStudent);
+      app.loadLessons()
+        .then(records => render(records))
+        .catch(error => {
+          console.error('Dashboard page load error:', error);
+          state.textContent = 'Het dashboard kon niet worden geladen.';
+        });
     }
   </script>
 </body>

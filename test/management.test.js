@@ -21,13 +21,14 @@ function makeService() {
   };
 }
 
-test('management owns student selection and scoped lesson operations', async () => {
+test('management owns the student roster and scoped lesson operations', async () => {
   appState.currentStudent = null;
   appState.lessons = [];
 
   const service = makeService();
   const management = createManagement({ auth: { isParent: true }, lessonService: service });
 
+  assert.deepEqual(management.getStudents(), ['Zyon', 'Zenith', 'Zephon']);
   management.selectStudent('Zyon');
   assert.equal(management.getSelectedStudent(), 'Zyon');
 
@@ -59,11 +60,14 @@ test('management rejects mutations outside the selected student scope', async ()
   assert.deepEqual(service.calls, []);
 });
 
-test('management exposes the boundary without authorizing a non-parent session', async () => {
+test('management rejects unknown students and non-parent sessions', async () => {
   const service = makeService();
-  const management = createManagement({ auth: { isParent: false }, lessonService: service });
+  const management = createManagement({ auth: { isParent: true }, lessonService: service });
 
-  assert.throws(() => management.selectStudent('Zyon'), /parent session/);
-  await assert.rejects(() => management.loadLessons(), /parent session/);
+  assert.throws(() => management.selectStudent('Onbekend'), /known student/);
+
+  const nonParent = createManagement({ auth: { isParent: false }, lessonService: service });
+  assert.throws(() => nonParent.selectStudent('Zyon'), /parent session/);
+  await assert.rejects(() => nonParent.loadLessons(), /parent session/);
   assert.deepEqual(service.calls, []);
 });

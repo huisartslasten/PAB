@@ -23,6 +23,10 @@ test('lesson choice uses the canonical shell', async ({ page }) => {
   await expectCanonicalShell(page, 'lesson-choice.html?lesson_id=1&student=Zyon', 'Leskeuze');
 });
 
+test('questions uses the canonical shell', async ({ page }) => {
+  await expectCanonicalShell(page, 'questions.html', 'Vragen maken');
+});
+
 test('oefenen uses the canonical shell without dead submenu controls', async ({ page }) => {
   await expectCanonicalShell(page, 'oefenen.html', 'Oefenen');
   await expect(page.getByRole('button', { name: 'Dashboard' })).toBeVisible();

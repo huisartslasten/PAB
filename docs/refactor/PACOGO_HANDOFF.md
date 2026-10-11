@@ -158,9 +158,9 @@ The V4.78 agenda composition and duplicate semantics were source-verified before
 - Legacy Agenda runtime removal/bridge verification: **success**
 
 ## Current TEST page-template state
-- Current readable TEST version: **V5.13**.
+- Current readable TEST version: **V5.14**.
 - TEST version is owned by `src/components/page-template.js`, not by an individual page or integration script.
-- The canonical template renders `PacoGO TEST V5.13` in its hero for every page that mounts the template.
+- The canonical template renders `PacoGO TEST V5.14` in its hero for every page that mounts the template.
 - `src/components/page-template.css` owns the badge presentation.
 - Canonical LESSONS, Leskeuze, Toets, Les bekijken and Vragen maken pages mount the same template.
 - No per-page TEST-version patch should be added.
@@ -195,6 +195,7 @@ The V4.78 agenda composition and duplicate semantics were source-verified before
 
 ## Final repository state
 - Professional V1 closure was followed by the V5.x canonical page architecture work on `refactor/professional-v1`.
+- Current TEST code commit under regression: `3b4aab400e24b35167aa0b8f483abc7bfd044b29`.
 - Latest verified green TEST head before the current navigation change: `e80f2a98146a1cce28ad90342943082cec3b8aff`.
 - The current navigation change is not considered complete until its regression gate is green.
 

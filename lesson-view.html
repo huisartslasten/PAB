@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — Les bekijken</title>
+  <link rel="stylesheet" href="src/components/page-template.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .lesson-view{display:grid;gap:14px}.lesson-meta{padding:15px 17px;border-radius:18px;background:#eef8ff;color:#38577d;font-weight:800}.lesson-explanation{padding:18px 20px;border:1px solid #dce9f6;border-radius:18px;background:#fff}.lesson-explanation-title{font-weight:900;margin-bottom:8px}.lesson-item{padding:18px 20px;border:1px solid #dce9f6;border-radius:18px;background:#fff;box-shadow:0 7px 20px rgba(16,43,87,.06)}.lesson-question{font-weight:900;color:#102b57}.lesson-answer{margin-top:9px;white-space:pre-line;line-height:1.5}.lesson-extra{margin-top:12px;padding:10px 12px;background:#f4f9fd;border-radius:12px;color:#38577d}.empty{padding:18px;border:1px dashed #cdddec;border-radius:18px;color:#667894;background:#fff}
+  </style>
+</head>
+<body>
+  <div id="paco-template-mount"></div>
+  <script type="module">
+    import { mountPacoPageTemplate } from './src/components/page-template.js';
+    import { createPacoGOApp } from './src/app/bootstrap.js';
+    import { escapeHtml } from './src/core/html.js';
+
+    const params = new URLSearchParams(window.location.search);
+    const lessonId = params.get('lesson_id') || '';
+    const student = params.get('student') || 'Zyon';
+    const mount = document.querySelector('#paco-template-mount');
+    const content = document.createElement('div');
+    const app = createPacoGOApp({ supabaseLib: window.supabase });
+
+    const goChoice = () => {
+      const target = new URL('lesson-choice.html', window.location.href);
+      if (lessonId) target.searchParams.set('lesson_id', lessonId);
+      target.searchParams.set('student', student);
+      window.location.href = target.toString();
+    };
+    const goLessons = () => { window.location.href = `lessons.html?student=${encodeURIComponent(student)}`; };
+
+    mountPacoPageTemplate({
+      mount,
+      backLabel:'← Leskeuze',
+      backAction:goChoice,
+      greeting:`Hoi ${student}! 🐶`,
+      title:'Les bekijken',
+      icon:'👀',
+      subtitle:'Bekijk de inhoud van deze les.',
+      navigation:[
+        {icon:'🏠',label:'Dashboard',onClick:goChoice},
+        {icon:'📚',label:'Mijn lessen',active:true,onClick:goLessons},
+        {icon:'📝',label:'Toetsen',onClick:goChoice},
+        {icon:'📅',label:'Mijn agenda',onClick:goChoice}
+      ],
+      content
+    });
+
+    function renderLesson(lesson) {
+      const meta = document.createElement('div');
+      meta.className = 'lesson-meta';
+      meta.textContent = `${lesson.subject || 'Les'}${lesson.subvak ? ` · ${lesson.subvak}` : ''} · ${lesson.title || 'Naamloze les'}`;
+
+      const view = document.createElement('div');
+      view.className = 'lesson-view';
+      view.appendChild(meta);
+
+      if (String(lesson.explanation || '').trim()) {
+        const explanation = document.createElement('section');
+        explanation.className = 'lesson-explanation';
+        explanation.innerHTML = `<div class="lesson-explanation-title">📖 Uitleg</div><div>${escapeHtml(lesson.explanation)}</div>`;
+        view.appendChild(explanation);
+      }
+
+      const items = Array.isArray(lesson.lesson_items) ? lesson.lesson_items : [];
+      if (!items.length) {
+        const empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.textContent = 'Deze les heeft nog geen items.';
+        view.appendChild(empty);
+      } else {
+        items.forEach((item, index) => {
+          const card = document.createElement('article');
+          card.className = 'lesson-item';
+          const parts = Array.isArray(item.answer_parts) ? item.answer_parts : [];
+          const required = parts
+            .filter(part => part && part.role === 'answer' && String(part.text || '').trim())
+            .map(part => part.text)
+            .join('\n') || item.answer || '';
+          const extra = parts
+            .filter(part => part && part.role === 'extra' && String(part.text || '').trim())
+            .map(part => part.text)
+            .join('\n');
+
+          card.innerHTML = `<div class="lesson-question">${index + 1}. ${escapeHtml(item.question)}</div><div class="lesson-answer">${escapeHtml(required)}</div>${extra ? `<div class="lesson-extra"><strong>💡 Extra informatie</strong><div>${escapeHtml(extra)}</div></div>` : ''}`;
+          view.appendChild(card);
+        });
+      }
+
+      content.replaceChildren(view);
+    }
+
+    try {
+      if (!lessonId) throw new Error('Geen les geselecteerd.');
+      const lessons = await app.lessons.listAll();
+      const lesson = lessons.find(item => String(item.id) === String(lessonId));
+      if (!lesson) throw new Error('Deze les kon niet worden gevonden.');
+      renderLesson(lesson);
+    } catch (error) {
+      console.error('Lesson view load error:', error);
+      content.innerHTML = `<div class="empty"><strong>De les kon niet worden geladen.</strong><p>${escapeHtml(error?.message || 'Onbekende fout.')}</p></div>`;
+    }
+  </script>
+</body>
+</html>

@@ -51,6 +51,11 @@ async function installSupabaseFixture(page) {
                 return { data: { session: { user: { id: fixture.parentId } } }, error: null };
               }
             },
+            functions: {
+              async invoke() {
+                return { data: null, error: null };
+              }
+            },
             from(table) {
               let filter = null;
               const query = {

@@ -4,13 +4,14 @@ import { createLessonService } from '../services/lesson-service.js';
 import { createFeedbackService } from '../services/feedback-service.js';
 import { createAnswerGradingService } from '../services/answer-grading-service.js';
 import { createLessonAudioService } from '../services/lesson-audio-service.js';
+import { createMasteryService } from '../services/mastery-service.js';
 import { createAuthState } from '../core/auth.js';
 import { appState } from '../core/state.js';
 import { mapLessonRecords } from '../features/lessons/lesson-mapper.js';
 import { createPhotoStorageService } from '../features/photo-lessons/photo-storage-service.js';
 import { createManagement } from '../features/management/management.js';
 
-export function createPacoGOApp({ supabaseLib = window.supabase, session = null } = {}) {
+export function createPacoGOApp({ supabaseLib = window.supabase, session = null, storage = globalThis.localStorage } = {}) {
   const db = createSupabaseClient(supabaseLib);
   const authSession = createAuthSessionService(db);
   const auth = createAuthState(session);
@@ -18,6 +19,7 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null 
   const feedback = createFeedbackService(db);
   const grading = createAnswerGradingService(db);
   const audio = createLessonAudioService(db);
+  const mastery = createMasteryService({ storage });
   const canManage = () => auth.isParent;
 
   async function initializeSession() {
@@ -37,6 +39,7 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null 
     feedback,
     grading,
     audio,
+    mastery,
     management: createManagement({ auth, lessonService: lessons, feedbackService: feedback }),
     photos: createPhotoStorageService(db, { canManage }),
     mapLessons: mapLessonRecords

@@ -16,10 +16,18 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null 
   const feedback = createFeedbackService(db);
   const canManage = () => auth.isParent;
 
+  async function initializeSession() {
+    if (auth.session) return auth.session;
+    const currentSession = await authSession.getCurrentSession();
+    auth.setSession(currentSession);
+    return currentSession;
+  }
+
   return Object.freeze({
     db,
     auth,
     authSession,
+    initializeSession,
     state: appState,
     lessons,
     feedback,

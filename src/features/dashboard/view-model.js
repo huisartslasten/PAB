@@ -62,3 +62,22 @@ export function getDashboardProgress(lessons = [], student, masteryService) {
     percent: items.length ? Math.round(mastered / items.length * 100) : 0
   });
 }
+
+export function getDashboardAgendaItems(agendaRead, limit = 4, today = new Date()) {
+  if (!agendaRead || typeof agendaRead.buildAgendaItemsForRender !== 'function') return [];
+
+  const todayKey = today.toISOString().slice(0, 10);
+  const items = agendaRead.buildAgendaItemsForRender()
+    .filter(item => String(item?.date || '') >= todayKey)
+    .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
+
+  return items.slice(0, Math.max(0, Number(limit) || 0)).map(item => Object.freeze({
+    id: item.id,
+    date: item.date,
+    type: item.type || 'other',
+    icon: item.icon || '📌',
+    title: String(item.title || 'Agenda-item'),
+    meta: String(item.meta || ''),
+    lessonId: item.lessonId ?? null
+  }));
+}

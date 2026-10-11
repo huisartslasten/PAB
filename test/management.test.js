@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { appState } from '../src/core/state.js';
+import { appState, setLessons } from '../src/core/state.js';
 import { createManagement } from '../src/features/management/management.js';
 
 function makeService() {
@@ -30,13 +30,26 @@ function makeFeedbackService() {
   };
 }
 
+function makeLoadLessons(service) {
+  return async () => {
+    const lessons = await service.listAll();
+    setLessons(lessons);
+    return lessons;
+  };
+}
+
 test('management owns the student roster and scoped lesson operations', async () => {
   appState.currentStudent = null;
   appState.lessons = [];
 
   const service = makeService();
   const feedbackService = makeFeedbackService();
-  const management = createManagement({ auth: { isParent: true }, lessonService: service, feedbackService });
+  const management = createManagement({
+    auth: { isParent: true },
+    lessonService: service,
+    feedbackService,
+    loadLessons: makeLoadLessons(service)
+  });
 
   assert.deepEqual(management.getStudents(), ['Zyon', 'Zenith', 'Zephon']);
   management.selectStudent('Zyon');
@@ -64,7 +77,8 @@ test('management owns parent feedback operations', async () => {
   const management = createManagement({
     auth: { isParent: true },
     lessonService: makeService(),
-    feedbackService
+    feedbackService,
+    loadLessons: async () => []
   });
 
   assert.deepEqual(await management.listFeedback(), [{ id: 1, subject: 'Idee', status: 'new' }]);
@@ -88,7 +102,12 @@ test('management rejects mutations outside the selected student scope', async ()
   appState.lessons = [];
 
   const service = makeService();
-  const management = createManagement({ auth: { isParent: true }, lessonService: service, feedbackService: makeFeedbackService() });
+  const management = createManagement({
+    auth: { isParent: true },
+    lessonService: service,
+    feedbackService: makeFeedbackService(),
+    loadLessons: makeLoadLessons(service)
+  });
   management.selectStudent('Zyon');
   await management.loadLessons();
 
@@ -100,13 +119,21 @@ test('management rejects mutations outside the selected student scope', async ()
 test('management rejects unknown students and non-parent sessions', async () => {
   const service = makeService();
   const feedbackService = makeFeedbackService();
-  const management = createManagement({ auth: { isParent: true }, lessonService: service, feedbackService });
+  const loadLessons = makeLoadLessons(service);
+  const management = createManagement({ auth: { isParent: true }, lessonService: service, feedbackService, loadLessons });
 
   assert.throws(() => management.selectStudent('Onbekend'), /known student/);
 
-  const nonParent = createManagement({ auth: { isParent: false }, lessonService: service, feedbackService });
+  const nonParent = createManagement({ auth: { isParent: false }, lessonService: service, feedbackService, loadLessons });
   assert.throws(() => nonParent.selectStudent('Zyon'), /parent session/);
   await assert.rejects(() => nonParent.loadLessons(), /parent session/);
   await assert.rejects(() => nonParent.listFeedback(), /parent session/);
   assert.deepEqual(service.calls, []);
+});
+
+test('management requires the application lesson-state loader', () => {
+  assert.throws(
+    () => createManagement({ auth: { isParent: true }, lessonService: makeService(), feedbackService: makeFeedbackService() }),
+    /requires loadLessons/
+  );
 });

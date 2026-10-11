@@ -55,12 +55,17 @@ test('application root composes management with canonical lesson, feedback, grad
   assert.ok(app.authSession);
   assert.ok(app.management);
   assert.equal(app.management.listFeedback instanceof Function, true);
+  assert.equal(app.loadLessons instanceof Function, true);
   assert.strictEqual(app.state, appState);
 
-  app.management.selectStudent('Zyon');
-  const lessons = await app.management.loadLessons();
+  const loaded = await app.loadLessons();
+  assert.deepEqual(loaded.map(item => item.id), [1]);
+  assert.deepEqual(appState.lessons.map(item => item.id), [1]);
 
-  assert.deepEqual(lessons.map(item => item.id), [1]);
+  app.management.selectStudent('Zyon');
+  const scoped = await app.management.loadLessons();
+
+  assert.deepEqual(scoped.map(item => item.id), [1]);
   assert.deepEqual(appState.lessons.map(item => item.id), [1]);
 });
 

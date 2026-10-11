@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { getDashboardSubjects, getDashboardProgress, getDashboardSubjectIcon } from '../src/features/dashboard/view-model.js';
+import { getDashboardSubjects, getDashboardProgress, getDashboardSubjectIcon, getDashboardAgendaItems } from '../src/features/dashboard/view-model.js';
 
 const lessons = [
   { id: 1, student: 'Zyon', subject: 'Nederlands', lesson_items: [{ id: 11 }, { id: 12 }] },
@@ -34,4 +34,36 @@ test('dashboard progress derives lesson, item and mastery counts', () => {
 test('dashboard uses a stable icon mapping with a generic fallback', () => {
   assert.equal(getDashboardSubjectIcon('Nederlands'), '📚');
   assert.equal(getDashboardSubjectIcon('Onbekend vak'), '📘');
+});
+
+test('dashboard agenda read model keeps only upcoming items and preserves lesson links', () => {
+  const agendaRead = {
+    buildAgendaItemsForRender: () => [
+      { id: 'past', date: '2026-10-10', title: 'Voorbij', type: 'test' },
+      { id: 'later', date: '2026-10-15', title: 'Toets rekenen', type: 'test', lessonId: 42 },
+      { id: 'soon', date: '2026-10-12', title: 'Huiswerk', type: 'homework', meta: 'Bladzijde 4' },
+      { id: 'latest', date: '2026-10-20', title: 'Lezen', type: 'homework' }
+    ]
+  };
+
+  assert.deepEqual(getDashboardAgendaItems(agendaRead, 2, new Date('2026-10-11T12:00:00Z')), [
+    {
+      id: 'soon',
+      date: '2026-10-12',
+      type: 'homework',
+      icon: '📌',
+      title: 'Huiswerk',
+      meta: 'Bladzijde 4',
+      lessonId: null
+    },
+    {
+      id: 'later',
+      date: '2026-10-15',
+      type: 'test',
+      icon: '📌',
+      title: 'Toets rekenen',
+      meta: '',
+      lessonId: 42
+    }
+  ]);
 });

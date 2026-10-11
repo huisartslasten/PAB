@@ -1,4 +1,4 @@
-import { appState, setLessons, setStudent } from '../../core/state.js';
+import { appState, setStudent } from '../../core/state.js';
 import { getActiveStudentLessons, getStudentLessons } from '../lessons/visibility.js';
 import { createLessonRecovery } from '../lessons/recovery.js';
 import { isKnownStudent, listStudents } from '../students/students.js';
@@ -20,18 +20,18 @@ function findScopedLesson(id, student) {
   return lesson;
 }
 
-export function createManagement({ auth, lessonService, feedbackService } = {}) {
+export function createManagement({ auth, lessonService, feedbackService, loadLessons } = {}) {
   if (!lessonService) throw new Error('createManagement requires lessonService');
   if (!feedbackService) throw new Error('createManagement requires feedbackService');
+  if (typeof loadLessons !== 'function') throw new Error('createManagement requires loadLessons');
 
   function assertParent() {
     requireParent(auth);
   }
 
-  async function loadLessons() {
+  async function refreshLessons() {
     assertParent();
-    const lessons = await lessonService.listAll();
-    setLessons(lessons);
+    await loadLessons();
     return getScopedLessons();
   }
 
@@ -67,7 +67,7 @@ export function createManagement({ auth, lessonService, feedbackService } = {}) 
     assertParent();
     const student = requireStudent();
     const result = await lessonService.createLesson({ ...payload, student });
-    await loadLessons();
+    await refreshLessons();
     return result;
   }
 
@@ -76,13 +76,13 @@ export function createManagement({ auth, lessonService, feedbackService } = {}) 
     const student = requireStudent();
     findScopedLesson(id, student);
     const result = await lessonService.updateLesson(id, { ...payload, student });
-    await loadLessons();
+    await refreshLessons();
     return result;
   }
 
   const recovery = createLessonRecovery({
     lessonService,
-    refresh: loadLessons
+    refresh: refreshLessons
   });
 
   async function archiveLesson(id) {
@@ -123,7 +123,7 @@ export function createManagement({ auth, lessonService, feedbackService } = {}) 
     getStudents,
     selectStudent,
     getSelectedStudent,
-    loadLessons,
+    loadLessons: refreshLessons,
     getScopedLessons,
     getAllScopedLessons,
     createLesson,

@@ -44,7 +44,7 @@
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
-    import { mapLessonRecords } from './src/features/lessons/lesson-mapper.js';
+    import { setStudent } from './src/core/state.js';
     import { getDashboardSubjects, getDashboardProgress, getDashboardSubjectIcon } from './src/features/dashboard/view-model.js';
     import { listStudents, isKnownStudent } from './src/features/students/students.js';
 
@@ -114,7 +114,7 @@
 
     function render(records) {
       content.replaceChildren();
-      const lessons = mapLessonRecords(records);
+      const lessons = app.mapLessons(records);
       const subjects = getDashboardSubjects(lessons, selectedStudent);
       const progressStats = getDashboardProgress(lessons, selectedStudent, app.mastery);
 
@@ -249,7 +249,8 @@
       state.textContent = 'Dashboard laden…';
       content.appendChild(state);
       try {
-        const records = await app.lessons.listAll();
+        setStudent(selectedStudent);
+        const records = await app.loadLessons();
         render(records);
       } catch (error) {
         console.error('Dashboard page load error:', error);

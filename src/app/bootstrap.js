@@ -6,7 +6,7 @@ import { createAnswerGradingService } from '../services/answer-grading-service.j
 import { createLessonAudioService } from '../services/lesson-audio-service.js';
 import { createMasteryService } from '../services/mastery-service.js';
 import { createAuthState } from '../core/auth.js';
-import { appState } from '../core/state.js';
+import { appState, setLessons } from '../core/state.js';
 import { mapLessonRecords } from '../features/lessons/lesson-mapper.js';
 import { createPhotoStorageService } from '../features/photo-lessons/photo-storage-service.js';
 import { createManagement } from '../features/management/management.js';
@@ -33,6 +33,12 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null,
     return currentSession;
   }
 
+  async function loadLessons() {
+    const records = await lessons.listAll();
+    setLessons(records);
+    return records;
+  }
+
   return Object.freeze({
     db,
     auth,
@@ -40,13 +46,14 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null,
     initializeSession,
     state: appState,
     lessons,
+    loadLessons,
     feedback,
     grading,
     audio,
     mastery,
     agenda,
     testHistory,
-    management: createManagement({ auth, lessonService: lessons, feedbackService: feedback }),
+    management: createManagement({ auth, lessonService: lessons, feedbackService: feedback, loadLessons }),
     photos: createPhotoStorageService(db, { canManage }),
     mapLessons: mapLessonRecords
   });

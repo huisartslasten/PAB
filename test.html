@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — Toets</title>
+  <link rel="stylesheet" href="src/components/page-template.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .test-shell{max-width:820px;margin:auto}.test-progress{margin-bottom:20px}.test-content{background:#fff;border:1px solid #dce9f6;border-radius:22px;padding:24px;box-shadow:0 10px 28px rgba(16,43,87,.09)}
+    .test-instructions,.small{color:#667894;line-height:1.45}.prompt{margin:24px 0;font-size:30px;font-weight:900;color:#102b57}.field{margin:14px 0}.field label{display:block;font-weight:800;margin-bottom:7px;color:#173b70}.answer-input{width:100%;padding:14px;border:1px solid #cdddec;border-radius:14px;background:#fff;color:#102b57;font-size:18px}.big{border:0;border-radius:14px;padding:13px 18px;background:#1787f2;color:#fff;font-weight:900;cursor:pointer}.big:disabled{opacity:.6;cursor:wait}.speaker{font-size:18px}.result-card{text-align:center}.result-score{font-size:48px;font-weight:950;color:#102b57}.result-details{text-align:left;margin-top:22px}.result-answer{padding:12px 0;border-bottom:1px solid #e8eff6}.result-answer:last-child{border-bottom:0}.result-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:24px}.result-actions button{border:0;border-radius:14px;padding:11px 16px;font-weight:900;cursor:pointer}.result-actions .primary{background:#1787f2;color:#fff}.result-actions .secondary{background:#eaf4ff;color:#0d6fd4}
+  </style>
+</head>
+<body>
+  <div id="paco-template-mount"></div>
+  <script type="module">
+    import { mountPacoPageTemplate } from './src/components/page-template.js';
+    import { createPacoGOApp } from './src/app/bootstrap.js';
+    import { createProfessionalPlayerBridge } from './src/features/lessons/player-runtime-bootstrap.js';
+    import { escapeHtml } from './src/core/html.js';
+
+    const params = new URLSearchParams(window.location.search);
+    const lessonId = params.get('lesson_id') || '';
+    const student = params.get('student') || 'Zyon';
+    const mount = document.querySelector('#paco-template-mount');
+    const content = document.createElement('div');
+    const app = createPacoGOApp({ supabaseLib: window.supabase });
+
+    const testScreen = document.createElement('main');
+    testScreen.className = 'test-shell';
+    testScreen.innerHTML = '<div id="test" class="test-card hidden"><div id="testProgress" class="test-progress"></div><div id="testContent" class="test-content"></div></div><div id="result" class="result-card hidden"><div class="test-content"><h2 id="resultTitle"></h2><div id="resultScore" class="result-score"></div><div id="resultDetails" class="result-details"></div><div class="result-actions"><button id="retryButton" class="primary" type="button">Nog een keer</button><button id="backButton" class="secondary" type="button">← Leskeuze</button></div></div></div>';
+    content.appendChild(testScreen);
+
+    const goLessons = () => { window.location.href = `lessons.html?student=${encodeURIComponent(student)}`; };
+    const goChoice = () => {
+      const target = new URL('lesson-choice.html', window.location.href);
+      if (lessonId) target.searchParams.set('lesson_id', lessonId);
+      target.searchParams.set('student', student);
+      window.location.href = target.toString();
+    };
+    const hideAll = () => {
+      testScreen.querySelector('#test')?.classList.add('hidden');
+      testScreen.querySelector('#result')?.classList.add('hidden');
+    };
+
+    mountPacoPageTemplate({
+      mount,
+      backLabel: '← Leskeuze',
+      backAction: goChoice,
+      greeting: `Hoi ${student}! 🐶`,
+      title: 'Toets',
+      icon: '📝',
+      subtitle: 'Beantwoord alle vragen. De uitslag komt aan het einde.',
+      navigation: [
+        { icon:'🏠', label:'Dashboard', onClick:goChoice },
+        { icon:'📚', label:'Mijn lessen', onClick:goLessons },
+        { icon:'📝', label:'Toetsen', active:true, onClick:goChoice },
+        { icon:'📅', label:'Mijn agenda', onClick:goChoice }
+      ],
+      content
+    });
+
+    const languageFor = lesson => {
+      const subject = String(lesson?.subject || '').toLowerCase();
+      if (subject.includes('engels') || subject.includes('english')) return 'en';
+      if (subject.includes('spaans') || subject.includes('spanish')) return 'es';
+      if (subject.includes('frans') || subject.includes('french')) return 'fr';
+      if (subject.includes('duits') || subject.includes('german')) return 'de';
+      if (subject.includes('portugees') || subject.includes('portuguese')) return 'pt';
+      return 'nl';
+    };
+
+    async function load() {
+      if (!lessonId) throw new Error('Geen les geselecteerd.');
+      const records = await app.lessons.listAll();
+      const lesson = records.find(item => String(item.id) === String(lessonId));
+      if (!lesson) throw new Error('Deze les kon niet worden gevonden.');
+
+      const bridge = createProfessionalPlayerBridge({
+        getLesson: () => lesson,
+        getStudent: () => student,
+        db: app.db,
+        documentRef: document,
+        hideAll,
+        showLessonChoice: goChoice,
+        goBack: goChoice,
+        clearActivity: () => {},
+        escapeHtml,
+        speakAiText: (text, statusId) => app.audio.speak(text, { language: languageFor(lesson), onStatus: status => { const node = document.getElementById(statusId); if (node) node.textContent = status; } }),
+        stopAiAudio: () => app.audio.stop(),
+        gradeAnswer: app.grading.gradeAnswer
+      });
+
+      window.submitTest = () => bridge.submitTest({ type: lesson.type });
+      window.speakTest = () => bridge.speakTest();
+      document.getElementById('retryButton').addEventListener('click', () => bridge.retry());
+      document.getElementById('backButton').addEventListener('click', goChoice);
+
+      bridge.startTest({ type: lesson.type });
+    }
+
+    try {
+      await load();
+    } catch (error) {
+      console.error('Test load error:', error);
+      content.innerHTML = `<div class="test-content"><strong>De toets kon niet worden geladen.</strong><p class="small">${escapeHtml(error?.message || 'Onbekende fout.')}</p><button class="big" id="loadBack" type="button">← Leskeuze</button></div>`;
+      content.querySelector('#loadBack')?.addEventListener('click', goChoice);
+    }
+  </script>
+</body>
+</html>

@@ -33,6 +33,8 @@
     const mount=document.querySelector('#paco-template-mount');
     const content=document.createElement('div');
     const app=createPacoGOApp({supabaseLib:window.supabase});
+    const goDashboard=()=>{window.location.href=`dashboard.html?student=${encodeURIComponent(student)}`};
+    const goAgenda=()=>{window.location.href=`index.html?view=agenda&student=${encodeURIComponent(student)}`};
     const goHome=()=>{window.location.href='index.html'};
     const goLessons=()=>{window.location.href=`lessons.html?student=${encodeURIComponent(student)}`};
 
@@ -45,10 +47,10 @@
       icon:'📖',
       subtitle:'Kies wat je met deze les wilt doen.',
       navigation:[
-        {icon:'🏠',label:'Dashboard',onClick:goHome},
+        {icon:'🏠',label:'Dashboard',onClick:goDashboard},
         {icon:'📚',label:'Mijn lessen',active:true,onClick:goLessons},
         {icon:'📝',label:'Toetsen',onClick:goHome},
-        {icon:'📅',label:'Mijn agenda',onClick:goHome}
+        {icon:'📅',label:'Mijn agenda',onClick:goAgenda}
       ],
       content
     });

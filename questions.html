@@ -15,6 +15,7 @@
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
+    import { createQuestionSession } from './src/features/lessons/question-session.js';
     import { escapeHtml } from './src/core/html.js';
 
     const params = new URLSearchParams(window.location.search);
@@ -23,7 +24,7 @@
     const mount = document.querySelector('#paco-template-mount');
     const content = document.createElement('div');
     const app = createPacoGOApp({ supabaseLib: window.supabase });
-    const state = { items: [], index: 0 };
+    let session = null;
 
     const goChoice = () => {
       const target = new URL('lesson-choice.html', window.location.href);
@@ -51,11 +52,12 @@
     });
 
     function progress() {
-      return `<div class="progress-wrap"><div class="progress-label"><span>Vraag ${Math.min(state.index + 1, state.items.length)} van ${state.items.length}</span></div><div class="progress"><div class="progress-bar" style="width:${state.items.length ? state.index / state.items.length * 100 : 0}%"></div></div></div>`;
+      const state = session.getState();
+      return `<div class="progress-wrap"><div class="progress-label"><span>Vraag ${Math.min(state.index + 1, state.total)} van ${state.total}</span></div><div class="progress"><div class="progress-bar" style="width:${state.total ? state.index / state.total * 100 : 0}%"></div></div></div>`;
     }
 
     function renderQuestion() {
-      const item = state.items[state.index];
+      const item = session.current();
       if (!item) {
         content.innerHTML = '<div class="question-card"><div class="result-score">Klaar!</div><p class="small" style="text-align:center">Je hebt alle vragen bekeken.</p><div class="actions"><button class="primary" id="doneButton">← Terug naar de les</button></div></div>';
         content.querySelector('#doneButton').addEventListener('click', goChoice);
@@ -67,7 +69,7 @@
     }
 
     function reveal() {
-      const item = state.items[state.index];
+      const item = session.current();
       const answer = content.querySelector('#questionAnswer')?.value || '';
       content.innerHTML = `<div class="questions-shell"><div class="question-card">${progress()}<div class="prompt">${escapeHtml(item.question)}</div><div class="example-answer"><strong>Jouw antwoord:</strong><br>${escapeHtml(answer || '—')}<hr><strong>Voorbeeldantwoord:</strong><br>${escapeHtml(item.answer || '')}</div><div class="actions"><button class="success" id="nextButton">✓ Goed</button><button class="danger" id="nextButtonAlt">✗ Nog niet</button></div></div></div>`;
       content.querySelector('#nextButton').addEventListener('click', next);
@@ -75,7 +77,7 @@
     }
 
     function next() {
-      state.index += 1;
+      session.next();
       renderQuestion();
     }
 
@@ -84,7 +86,7 @@
       const lessons = await app.lessons.listAll();
       const lesson = lessons.find(item => String(item.id) === String(lessonId));
       if (!lesson) throw new Error('Deze les kon niet worden gevonden.');
-      state.items = Array.isArray(lesson.lesson_items) ? lesson.lesson_items : [];
+      session = createQuestionSession(Array.isArray(lesson.lesson_items) ? lesson.lesson_items : []);
       renderQuestion();
     } catch (error) {
       console.error('Questions load error:', error);

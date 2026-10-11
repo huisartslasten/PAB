@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — Vragen maken</title>
+  <link rel="stylesheet" href="src/components/page-template.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .questions-shell{max-width:820px;margin:auto}.progress-wrap{margin-bottom:20px}.question-card{background:#fff;border:1px solid #dce9f6;border-radius:22px;padding:24px;box-shadow:0 10px 28px rgba(16,43,87,.09)}.prompt{font-size:30px;font-weight:900;color:#102b57;margin:18px 0}.answer-input{width:100%;min-height:130px;padding:14px;border:1px solid #cdddec;border-radius:14px;background:#fff;color:#102b57;resize:vertical}.actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px}.actions button{border:0;border-radius:14px;padding:11px 16px;font-weight:900;cursor:pointer}.primary{background:#1787f2;color:#fff}.success{background:#ddf7e5;color:#18743b}.danger{background:#fee5e3;color:#b42318}.example-answer{padding:15px;border-radius:14px;background:#f4f9fd;line-height:1.5}.result-score{font-size:42px;font-weight:950;text-align:center;color:#102b57}.small{color:#667894;line-height:1.45}
+  </style>
+</head>
+<body>
+  <div id="paco-template-mount"></div>
+  <script type="module">
+    import { mountPacoPageTemplate } from './src/components/page-template.js';
+    import { createPacoGOApp } from './src/app/bootstrap.js';
+    import { escapeHtml } from './src/core/html.js';
+
+    const params = new URLSearchParams(window.location.search);
+    const lessonId = params.get('lesson_id') || '';
+    const student = params.get('student') || 'Zyon';
+    const mount = document.querySelector('#paco-template-mount');
+    const content = document.createElement('div');
+    const app = createPacoGOApp({ supabaseLib: window.supabase });
+    const state = { items: [], index: 0 };
+
+    const goChoice = () => {
+      const target = new URL('lesson-choice.html', window.location.href);
+      if (lessonId) target.searchParams.set('lesson_id', lessonId);
+      target.searchParams.set('student', student);
+      window.location.href = target.toString();
+    };
+    const goLessons = () => { window.location.href = `lessons.html?student=${encodeURIComponent(student)}`; };
+
+    mountPacoPageTemplate({
+      mount,
+      backLabel:'← Leskeuze',
+      backAction:goChoice,
+      greeting:`Hoi ${student}! 🐶`,
+      title:'Vragen maken',
+      icon:'❓',
+      subtitle:'Schrijf eerst je eigen antwoord en vergelijk het daarna met het voorbeeldantwoord.',
+      navigation:[
+        {icon:'🏠',label:'Dashboard',onClick:goChoice},
+        {icon:'📚',label:'Mijn lessen',active:true,onClick:goLessons},
+        {icon:'📝',label:'Toetsen',onClick:goChoice},
+        {icon:'📅',label:'Mijn agenda',onClick:goChoice}
+      ],
+      content
+    });
+
+    function progress() {
+      return `<div class="progress-wrap"><div class="progress-label"><span>Vraag ${Math.min(state.index + 1, state.items.length)} van ${state.items.length}</span></div><div class="progress"><div class="progress-bar" style="width:${state.items.length ? state.index / state.items.length * 100 : 0}%"></div></div></div>`;
+    }
+
+    function renderQuestion() {
+      const item = state.items[state.index];
+      if (!item) {
+        content.innerHTML = '<div class="question-card"><div class="result-score">Klaar!</div><p class="small" style="text-align:center">Je hebt alle vragen bekeken.</p><div class="actions"><button class="primary" id="doneButton">← Terug naar de les</button></div></div>';
+        content.querySelector('#doneButton').addEventListener('click', goChoice);
+        return;
+      }
+      content.innerHTML = `<div class="questions-shell"><div class="question-card">${progress()}<div class="prompt">${escapeHtml(item.question)}</div><textarea id="questionAnswer" class="answer-input" placeholder="Schrijf je antwoord..."></textarea><div class="actions"><button class="primary" id="revealButton">Antwoord bekijken</button></div></div></div>`;
+      content.querySelector('#revealButton').addEventListener('click', reveal);
+      content.querySelector('#questionAnswer').focus();
+    }
+
+    function reveal() {
+      const item = state.items[state.index];
+      const answer = content.querySelector('#questionAnswer')?.value || '';
+      content.innerHTML = `<div class="questions-shell"><div class="question-card">${progress()}<div class="prompt">${escapeHtml(item.question)}</div><div class="example-answer"><strong>Jouw antwoord:</strong><br>${escapeHtml(answer || '—')}<hr><strong>Voorbeeldantwoord:</strong><br>${escapeHtml(item.answer || '')}</div><div class="actions"><button class="success" id="nextButton">✓ Goed</button><button class="danger" id="nextButtonAlt">✗ Nog niet</button></div></div></div>`;
+      content.querySelector('#nextButton').addEventListener('click', next);
+      content.querySelector('#nextButtonAlt').addEventListener('click', next);
+    }
+
+    function next() {
+      state.index += 1;
+      renderQuestion();
+    }
+
+    try {
+      if (!lessonId) throw new Error('Geen les geselecteerd.');
+      const lessons = await app.lessons.listAll();
+      const lesson = lessons.find(item => String(item.id) === String(lessonId));
+      if (!lesson) throw new Error('Deze les kon niet worden gevonden.');
+      state.items = Array.isArray(lesson.lesson_items) ? lesson.lesson_items : [];
+      renderQuestion();
+    } catch (error) {
+      console.error('Questions load error:', error);
+      content.innerHTML = `<div class="question-card"><strong>De vragen konden niet worden geladen.</strong><p class="small">${escapeHtml(error?.message || 'Onbekende fout.')}</p><div class="actions"><button class="primary" id="loadBack">← Leskeuze</button></div></div>`;
+      content.querySelector('#loadBack')?.addEventListener('click', goChoice);
+    }
+  </script>
+</body>
+</html>

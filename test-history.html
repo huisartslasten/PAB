@@ -38,11 +38,8 @@
     const historyContent = content.querySelector('#testHistoryContent');
     const studentSelect = content.querySelector('#historyStudent');
 
-    const goDashboard = () => {
-      const target = new URL('dashboard.html', window.location.href);
-      if (requestedStudent) target.searchParams.set('student', requestedStudent);
-      window.location.href = target.toString();
-    };
+    const goManagement = () => { window.location.href = 'management.html'; };
+    const goDashboard = () => { window.location.href = 'dashboard.html'; };
     const goLessons = () => {
       const target = new URL('lessons.html', window.location.href);
       if (requestedStudent) target.searchParams.set('student', requestedStudent);
@@ -51,16 +48,17 @@
 
     mountPacoPageTemplate({
       mount,
-      backLabel: '← Dashboard',
-      backAction: goDashboard,
-      greeting: 'Beheer · Toetsgeschiedenis',
+      backLabel: '← Beheer',
+      backAction: goManagement,
+      greeting: 'PacoGO beheer ⚙️',
       title: 'Toetsgeschiedenis',
       icon: '📝',
       subtitle: 'Bekijk gemaakte toetsen en de antwoorden per vraag.',
       navigation: [
         { icon:'🏠', label:'Dashboard', onClick:goDashboard },
-        { icon:'📚', label:'Lessen', onClick:goLessons },
-        { icon:'📝', label:'Toetsgeschiedenis', active:true }
+        { icon:'📚', label:'Mijn lessen', onClick:goLessons },
+        { icon:'📝', label:'Toetsgeschiedenis', active:true },
+        { icon:'⚙️', label:'Beheer', onClick:goManagement }
       ],
       content
     });

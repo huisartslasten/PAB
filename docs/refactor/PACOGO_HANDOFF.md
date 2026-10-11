@@ -195,7 +195,7 @@ The V4.78 agenda composition and duplicate semantics were source-verified before
 
 ## Final repository state
 - Professional V1 closure was followed by the V5.x canonical page architecture work on `refactor/professional-v1`.
-- Current TEST code commit under regression: `3b4aab400e24b35167aa0b8f483abc7bfd044b29`.
+- Current TEST code commit under regression: `3bfc90762259af1dc970e7710a71c111a0aa9cc2`.
 - Latest verified green TEST head before the current navigation change: `e80f2a98146a1cce28ad90342943082cec3b8aff`.
 - The current navigation change is not considered complete until its regression gate is green.
 

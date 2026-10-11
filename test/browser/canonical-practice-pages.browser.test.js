@@ -19,6 +19,13 @@ test('lessons uses the canonical shell', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Mijn agenda' })).toBeVisible();
 });
 
+test('lessons dashboard navigation targets the canonical dashboard', async ({ page }) => {
+  await page.goto(`${baseUrl}/lessons.html?student=Zyon`);
+  await page.getByRole('button', { name: 'Dashboard' }).click();
+  await expect(page).toHaveURL(/\/dashboard\.html\?student=Zyon$/);
+  await expect(page.locator('.paco-template-main h1')).toHaveText('Dashboard');
+});
+
 test('lesson choice uses the canonical shell', async ({ page }) => {
   await expectCanonicalShell(page, 'lesson-choice.html?lesson_id=1&student=Zyon', 'Leskeuze');
 });

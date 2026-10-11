@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — Leskeuze</title>
+  <link rel="stylesheet" href="src/components/page-template.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .choice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+    .choice-card{min-height:180px;border:2px solid #dce9f6;border-radius:22px;background:#fff;box-shadow:0 7px 20px rgba(16,43,87,.07);padding:19px;text-align:left;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;transition:.16s}
+    .choice-card:hover{transform:translateY(-2px);box-shadow:0 12px 27px rgba(16,43,87,.11)}
+    .choice-icon{height:72px;border-radius:17px;background:#eef8ff;display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:13px}
+    .choice-card h2{margin:0;color:#102b57;font:800 24px/1 "Baloo 2",Nunito,sans-serif}
+    .choice-card p{margin:7px 0 0;color:#667894;line-height:1.4}
+    .choice-action{margin-top:15px;font-size:12px;font-weight:900;color:#126fc9}
+    .choice-card.available{background:#fffdf0;border-color:#f4e8a8}
+    .choice-card.available .choice-icon{background:#fff6cf}
+    .choice-state{padding:16px 18px;border:1px solid #dce9f6;border-radius:18px;background:#fff;color:#667894}
+    .lesson-context{padding:15px 17px;border-radius:18px;background:#eef8ff;color:#38577d;font-weight:800;margin-bottom:18px}
+  </style>
+</head>
+<body>
+  <div id="paco-template-mount"></div>
+  <script type="module">
+    import { mountPacoPageTemplate } from './src/components/page-template.js';
+    import { createPacoGOApp } from './src/app/bootstrap.js';
+    import { getLessonChoices } from './src/features/lessons/lesson-choice.js';
+
+    const params=new URLSearchParams(window.location.search);
+    const lessonId=params.get('lesson_id')||'';
+    const student=params.get('student')||'Zyon';
+    const mount=document.querySelector('#paco-template-mount');
+    const content=document.createElement('div');
+    const app=createPacoGOApp({supabaseLib:window.supabase});
+    const goHome=()=>{window.location.href='index.html'};
+    const goLessons=()=>{window.location.href=`lessons.html?student=${encodeURIComponent(student)}`};
+
+    mountPacoPageTemplate({
+      mount,
+      backLabel:'← Mijn lessen',
+      backAction:goLessons,
+      greeting:`Hoi ${student}! 🐶`,
+      title:'Leskeuze',
+      icon:'📖',
+      subtitle:'Kies wat je met deze les wilt doen.',
+      navigation:[
+        {icon:'🏠',label:'Dashboard',onClick:goHome},
+        {icon:'📚',label:'Mijn lessen',active:true,onClick:goLessons},
+        {icon:'📝',label:'Toetsen',onClick:goHome},
+        {icon:'📅',label:'Mijn agenda',onClick:goHome}
+      ],
+      content
+    });
+
+    function renderLesson(lesson){
+      content.replaceChildren();
+      const context=document.createElement('div');context.className='lesson-context';
+      context.textContent=`${lesson.subject || 'Les'}${lesson.subvak ? ` · ${lesson.subvak}` : ''} · ${lesson.title || 'Naamloze les'}`;
+      const grid=document.createElement('div');grid.className='choice-grid';
+      const icons={practice:'✏️',test:'📝',view:'👀',questions:'❓'};
+      const descriptions={practice:'Ga naar de oefenpagina en kies een oefenvorm.',test:'Open de toets voor deze les.',view:'Bekijk de inhoud van deze les.' ,questions:'Maak de vragen bij deze les.'};
+      getLessonChoices(lesson).forEach(choice=>{
+        const card=document.createElement('button');card.type='button';card.className=`choice-card${choice.id==='practice'?' available':''}`;
+        card.innerHTML=`<div><div class="choice-icon">${icons[choice.id]||'📘'}</div><h2>${choice.label}</h2><p>${descriptions[choice.id]||''}</p></div><div class="choice-action">${choice.id==='practice'?'Openen →':'Volgende koppeling →'}</div>`;
+        if(choice.id==='practice') card.addEventListener('click',()=>{
+          const target=new URL('oefenen.html',window.location.href);
+          target.searchParams.set('lesson_id',String(lesson.id));
+          target.searchParams.set('student',student);
+          target.searchParams.set('subject',String(lesson.subject||''));
+          target.searchParams.set('title',String(lesson.title||''));
+          target.searchParams.set('items',String((lesson.lesson_items||[]).length));
+          window.location.href=target.toString();
+        });
+        else card.addEventListener('click',()=>{window.location.href='index.html'});
+        grid.appendChild(card);
+      });
+      content.append(context,grid);
+    }
+
+    if(!lessonId){content.innerHTML='<div class="choice-state">Geen les geselecteerd.</div>';}
+    else try{
+      const lessons=await app.lessons.listAll();
+      const lesson=lessons.find(item=>String(item.id)===String(lessonId));
+      if(!lesson) content.innerHTML='<div class="choice-state">Deze les kon niet worden gevonden.</div>';
+      else renderLesson(lesson);
+    }catch(error){
+      console.error('Lesson choice load error:',error);
+      content.innerHTML='<div class="choice-state">De les kon niet worden geladen.</div>';
+    }
+  </script>
+</body>
+</html>

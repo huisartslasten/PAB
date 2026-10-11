@@ -133,8 +133,8 @@
 
       try {
         const app = createPacoGOApp({ supabaseLib: window.supabase });
-        const lessons = await app.lessons.listAll();
-        const lesson = app.mapLessons(lessons).find(candidate => String(candidate.id) === String(lessonId));
+        const records = await app.loadLessons();
+        const lesson = app.mapLessons(records).find(candidate => String(candidate.id) === String(lessonId));
 
         flashcards.available = Boolean(lesson && hasLessonComponent(lesson, 'flashcards'));
         if (!flashcards.available) {

@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="src/components/page-template.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    .lesson-view{display:grid;gap:14px}.lesson-item{padding:18px 20px;border:1px solid #dce9f6;border-radius:18px;background:#fff;box-shadow:0 7px 20px rgba(16,43,87,.06)}.lesson-question{font-weight:900;color:#102b57}.lesson-answer{margin-top:9px;white-space:pre-line;line-height:1.5}.empty{padding:18px;border:1px dashed #cdddec;border-radius:18px;color:#667894;background:#fff}
+    .lesson-view{display:grid;gap:14px}.lesson-explanation{padding:15px 17px;border-radius:18px;background:#fffdf0;border:2px solid #f0df9f;line-height:1.5;white-space:pre-line}.lesson-explanation-title{font-weight:900;margin-bottom:6px}.lesson-item{padding:18px 20px;border:1px solid #dce9f6;border-radius:18px;background:#fff;box-shadow:0 7px 20px rgba(16,43,87,.06)}.lesson-question{font-weight:900;color:#102b57}.lesson-answer{margin-top:9px;white-space:pre-line;line-height:1.5}.lesson-extra-info{margin-top:10px;padding:10px 12px;background:#fff6df;border-radius:12px;color:#7a5b00;white-space:pre-line}.lesson-extra-info-title{font-weight:900;margin-bottom:4px}.empty{padding:18px;border:1px dashed #cdddec;border-radius:18px;color:#667894;background:#fff}
   </style>
 </head>
 <body>
@@ -15,6 +15,7 @@
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
+    import { getLessonExplanation, getLessonViewItems } from './src/features/lessons/view-model.js';
     import { escapeHtml } from './src/core/html.js';
 
     const params = new URLSearchParams(window.location.search);
@@ -52,8 +53,15 @@
     function renderLesson(lesson) {
       const view = document.createElement('div');
       view.className = 'lesson-view';
-      const items = Array.isArray(lesson.lesson_items) ? lesson.lesson_items : [];
+      const explanation = getLessonExplanation(lesson);
+      if (explanation) {
+        const explanationCard = document.createElement('div');
+        explanationCard.className = 'lesson-explanation';
+        explanationCard.innerHTML = `<div class="lesson-explanation-title">📖 Uitleg</div>${escapeHtml(explanation)}`;
+        view.appendChild(explanationCard);
+      }
 
+      const items = getLessonViewItems(lesson);
       if (!items.length) {
         const empty = document.createElement('div');
         empty.className = 'empty';
@@ -63,7 +71,7 @@
         items.forEach((item, index) => {
           const card = document.createElement('article');
           card.className = 'lesson-item';
-          card.innerHTML = `<div class="lesson-question">${index + 1}. ${escapeHtml(item.question)}</div><div class="lesson-answer">${escapeHtml(item.answer || '')}</div>`;
+          card.innerHTML = `<div class="lesson-question">${index + 1}. ${escapeHtml(item.question)}</div><div class="lesson-answer">${escapeHtml(item.answer)}</div>${item.extra ? `<div class="lesson-extra-info"><div class="lesson-extra-info-title">💡 Extra informatie</div>${escapeHtml(item.extra)}</div>` : ''}`;
           view.appendChild(card);
         });
       }

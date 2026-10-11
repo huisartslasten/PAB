@@ -1,6 +1,7 @@
 import { appState, setLessons, setStudent } from '../../core/state.js';
 import { getActiveStudentLessons, getStudentLessons } from '../lessons/visibility.js';
 import { createLessonRecovery } from '../lessons/recovery.js';
+import { isKnownStudent, listStudents } from './students.js';
 
 function requireParent(auth) {
   if (!auth?.isParent) throw new Error('Management requires a parent session.');
@@ -36,9 +37,14 @@ export function createManagement({ auth, lessonService } = {}) {
   function selectStudent(student) {
     assertParent();
     const value = String(student ?? '').trim();
-    if (!value) throw new Error('A student must be selected.');
+    if (!value || !isKnownStudent(value)) throw new Error('A known student must be selected.');
     setStudent(value);
     return value;
+  }
+
+  function getStudents() {
+    assertParent();
+    return listStudents();
   }
 
   function getSelectedStudent() {
@@ -98,6 +104,7 @@ export function createManagement({ auth, lessonService } = {}) {
   }
 
   return Object.freeze({
+    getStudents,
     selectStudent,
     getSelectedStudent,
     loadLessons,

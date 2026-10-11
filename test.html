@@ -31,7 +31,9 @@
     testScreen.innerHTML = '<div id="test" class="test-card hidden"><div id="testProgress" class="test-progress"></div><div id="testContent" class="test-content"></div></div><div id="result" class="result-card hidden"><div class="test-content"><h2 id="resultTitle"></h2><div id="resultScore" class="result-score"></div><div id="resultDetails" class="result-details"></div><div class="result-actions"><button id="retryButton" class="primary" type="button">Nog een keer</button><button id="backButton" class="secondary" type="button">← Leskeuze</button></div></div></div>';
     content.appendChild(testScreen);
 
+    const goDashboard = () => { window.location.href = `dashboard.html?student=${encodeURIComponent(student)}`; };
     const goLessons = () => { window.location.href = `lessons.html?student=${encodeURIComponent(student)}`; };
+    const goAgenda = () => { window.location.href = `index.html?view=agenda&student=${encodeURIComponent(student)}`; };
     const goChoice = () => {
       const target = new URL('lesson-choice.html', window.location.href);
       if (lessonId) target.searchParams.set('lesson_id', lessonId);
@@ -52,10 +54,10 @@
       icon: '📝',
       subtitle: 'Beantwoord alle vragen. De uitslag komt aan het einde.',
       navigation: [
-        { icon:'🏠', label:'Dashboard', onClick:goChoice },
+        { icon:'🏠', label:'Dashboard', onClick:goDashboard },
         { icon:'📚', label:'Mijn lessen', onClick:goLessons },
         { icon:'📝', label:'Toetsen', active:true, onClick:goChoice },
-        { icon:'📅', label:'Mijn agenda', onClick:goChoice }
+        { icon:'📅', label:'Mijn agenda', onClick:goAgenda }
       ],
       content
     });

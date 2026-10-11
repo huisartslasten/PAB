@@ -40,7 +40,7 @@ test('management access sends unauthenticated users to login', async () => {
   await runtime.initialize();
   assert.equal(runtime.isParentLoggedIn(), false);
   assert.equal(await runtime.showParentDashboard(), false);
-  assert.deepEqual(harness.calls, [['ui', null], ['login']]);
+  assert.deepEqual(harness.calls, [['ui', null], 'login']);
 });
 
 test('canonical parent ids grant management access', async () => {
@@ -50,7 +50,7 @@ test('canonical parent ids grant management access', async () => {
   assert.equal(runtime.isParentLoggedIn(), true);
   assert.equal(runtime.isCreator(), true);
   assert.equal(await runtime.showParentDashboard(), true);
-  assert.deepEqual(harness.calls, [['ui', SECOND_PARENT_ID], ['dashboard']]);
+  assert.deepEqual(harness.calls, [['ui', SECOND_PARENT_ID], 'dashboard']);
 });
 
 test('login enters management instead of returning to home', async () => {

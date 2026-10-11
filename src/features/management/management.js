@@ -20,8 +20,9 @@ function findScopedLesson(id, student) {
   return lesson;
 }
 
-export function createManagement({ auth, lessonService } = {}) {
+export function createManagement({ auth, lessonService, feedbackService } = {}) {
   if (!lessonService) throw new Error('createManagement requires lessonService');
+  if (!feedbackService) throw new Error('createManagement requires feedbackService');
 
   function assertParent() {
     requireParent(auth);
@@ -103,6 +104,21 @@ export function createManagement({ auth, lessonService } = {}) {
     return recovery.restore(id);
   }
 
+  async function listFeedback() {
+    assertParent();
+    return feedbackService.listAll();
+  }
+
+  async function submitFeedback(payload = {}) {
+    assertParent();
+    return feedbackService.create(payload);
+  }
+
+  async function updateFeedbackStatus(id, status) {
+    assertParent();
+    return feedbackService.updateStatus(id, status);
+  }
+
   return Object.freeze({
     getStudents,
     selectStudent,
@@ -114,6 +130,9 @@ export function createManagement({ auth, lessonService } = {}) {
     updateLesson,
     archiveLesson,
     moveToTrash,
-    restoreLesson
+    restoreLesson,
+    listFeedback,
+    submitFeedback,
+    updateFeedbackStatus
   });
 }

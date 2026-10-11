@@ -32,7 +32,6 @@
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
-    import { mapLessonRecords } from './src/features/lessons/lesson-mapper.js';
     import { getActiveStudentLessons } from './src/features/lessons/visibility.js';
 
     const params = new URLSearchParams(window.location.search);
@@ -95,7 +94,7 @@
     }
 
     function render(records){
-      const lessons = getActiveStudentLessons(mapLessonRecords(records), selectedStudent);
+      const lessons = getActiveStudentLessons(app.mapLessons(records), selectedStudent);
       const grouped = new Map();
       lessons.forEach(lesson => {
         const key = normalize(lesson.subject) || 'overig';
@@ -143,7 +142,7 @@
     }
 
     try{
-      const records=await app.lessons.listAll();
+      const records=await app.loadLessons();
       render(records);
     }catch(error){
       console.error('Lessons page load error:',error);

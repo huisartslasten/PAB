@@ -1,4 +1,5 @@
 import { createSupabaseClient } from '../services/supabase-client.js';
+import { createAuthSessionService } from '../services/auth-session-service.js';
 import { createLessonService } from '../services/lesson-service.js';
 import { createFeedbackService } from '../services/feedback-service.js';
 import { createAuthState } from '../core/auth.js';
@@ -9,6 +10,7 @@ import { createManagement } from '../features/management/management.js';
 
 export function createPacoGOApp({ supabaseLib = window.supabase, session = null } = {}) {
   const db = createSupabaseClient(supabaseLib);
+  const authSession = createAuthSessionService(db);
   const auth = createAuthState(session);
   const lessons = createLessonService(db);
   const feedback = createFeedbackService(db);
@@ -17,6 +19,7 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null 
   return Object.freeze({
     db,
     auth,
+    authSession,
     state: appState,
     lessons,
     feedback,
@@ -26,4 +29,5 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null 
   });
 }
 
-// Not mounted automatically: V4.78 remains the visual/behavioral reference until parity checks pass.
+// The professional runtime composes all domain/data boundaries here.
+// Page modules remain responsible only for presentation and interaction.

@@ -8,7 +8,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     .management-page{display:grid;gap:22px}
-    .management-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
     .management-state{padding:16px 18px;border:1px solid #dce9f6;border-radius:18px;background:#fff;color:#667894}
     .management-students{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
     .management-student{border:1px solid #dce9f6;border-radius:16px;background:#fff;padding:15px;text-align:left;color:#102b57;font-weight:900;cursor:pointer;box-shadow:0 8px 22px rgba(16,43,87,.07)}
@@ -93,11 +92,11 @@
     try {
       await app.initializeSession();
       app.management.getStudents();
-      content.replaceChildren(studentSection, lessonSection, feedbackSection);
       renderStudentSelection(students, app.management, showSelectedStudent);
       const selected = app.management.getSelectedStudent() || app.management.getStudents()[0];
       if (selected) showSelectedStudent(selected);
       await renderFeedback(feedbackList, app.management);
+      content.replaceChildren(studentSection, lessonSection, feedbackSection);
     } catch (error) {
       console.error('Management page load error:', error);
       state.textContent = app.auth.isParent

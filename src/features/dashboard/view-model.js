@@ -1,0 +1,64 @@
+import { getActiveStudentLessons } from '../lessons/visibility.js';
+
+const SUBJECT_ICONS = Object.freeze({
+  nederlands: '📚',
+  engels: '🇬🇧',
+  rekenen: '🔢',
+  spelling: '✏️',
+  begrijpendlezen: '📖',
+  topografie: '🌍',
+  geschiedenis: '🏛️',
+  aardrijkskunde: '🗺️',
+  natuur: '🌱',
+  biologie: '🧬',
+  muziek: '🎵'
+});
+
+function normalizeSubject(value) {
+  return String(value || '').trim().toLocaleLowerCase('nl-NL').replace(/\s+/g, ' ');
+}
+
+export function getDashboardSubjectIcon(subject) {
+  return SUBJECT_ICONS[normalizeSubject(subject).replaceAll(' ', '')] || '📘';
+}
+
+export function getDashboardSubjects(lessons = [], student) {
+  const active = getActiveStudentLessons(lessons, student);
+  const groups = new Map();
+
+  active.forEach(lesson => {
+    const key = normalizeSubject(lesson.subject) || 'overig';
+    if (!groups.has(key)) {
+      groups.set(key, {
+        key,
+        label: String(lesson.subject || 'Overig').trim() || 'Overig',
+        lessons: []
+      });
+    }
+    groups.get(key).lessons.push(lesson);
+  });
+
+  return [...groups.values()].sort((a, b) => a.label.localeCompare(b.label, 'nl'));
+}
+
+export function getDashboardProgress(lessons = [], student, masteryService) {
+  const active = getActiveStudentLessons(lessons, student);
+  const items = active.flatMap(lesson =>
+    (Array.isArray(lesson.lesson_items) ? lesson.lesson_items : []).map(item => ({
+      lessonId: lesson.id,
+      itemId: item.id
+    }))
+  );
+
+  const mastered = masteryService
+    ? items.filter(item => masteryService.get(student, item.lessonId, item.itemId).mastered).length
+    : 0;
+
+  return Object.freeze({
+    lessons: active.length,
+    subjects: getDashboardSubjects(active, student).length,
+    items: items.length,
+    mastered,
+    percent: items.length ? Math.round(mastered / items.length * 100) : 0
+  });
+}

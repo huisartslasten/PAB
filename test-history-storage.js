@@ -1,8 +1,5 @@
 (async function bootstrapTestHistoryStorage() {
-  const [{ createTestHistoryRenderer }, { installLessonPracticeIntegration, installLessonPracticeScrollMemory }] = await Promise.all([
-    import('./src/features/test-history/test-history-renderer.js'),
-    import('./src/features/practice/lesson-practice-navigation.js')
-  ]);
+  const { createTestHistoryRenderer } = await import('./src/features/test-history/test-history-renderer.js');
 
   const testHistoryRenderer = createTestHistoryRenderer({
     getLessons: () => lessons,
@@ -63,19 +60,6 @@
     const runtimeHandler = await testAttemptRuntimeBootstrap;
     return runtimeHandler(attempt);
   };
-
-  // V5.9 application integration: the practice navigation owns LESSEN → OEFENEN scroll state.
-  installLessonPracticeScrollMemory({
-    windowRef: window,
-    documentRef: document
-  });
-  const stopLessonPracticeIntegration = installLessonPracticeIntegration({
-    getCurrentLesson: () => currentLesson,
-    documentRef: document,
-    locationRef: window.location,
-    windowRef: window
-  });
-  window.pacoGOPracticeIntegrationReady = Promise.resolve(stopLessonPracticeIntegration);
 })().catch(error => {
   console.error('PacoGO test-history storage bootstrap failed:', error);
 });

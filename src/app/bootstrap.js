@@ -1,5 +1,6 @@
 import { createSupabaseClient } from '../services/supabase-client.js';
 import { createLessonService } from '../services/lesson-service.js';
+import { createFeedbackService } from '../services/feedback-service.js';
 import { createAuthState } from '../core/auth.js';
 import { appState } from '../core/state.js';
 import { mapLessonRecords } from '../features/lessons/lesson-mapper.js';
@@ -10,6 +11,7 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null 
   const db = createSupabaseClient(supabaseLib);
   const auth = createAuthState(session);
   const lessons = createLessonService(db);
+  const feedback = createFeedbackService(db);
   const canManage = () => auth.isParent;
 
   return Object.freeze({
@@ -17,7 +19,8 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null 
     auth,
     state: appState,
     lessons,
-    management: createManagement({ auth, lessonService: lessons }),
+    feedback,
+    management: createManagement({ auth, lessonService: lessons, feedbackService: feedback }),
     photos: createPhotoStorageService(db, { canManage }),
     mapLessons: mapLessonRecords
   });

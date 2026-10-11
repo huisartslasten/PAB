@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createPacoGOApp } from '../src/app/bootstrap.js';
 import { appState } from '../src/core/state.js';
+import { PARENT_IDS } from '../src/core/auth.js';
 
 function makeSupabaseLib() {
   const lessons = [
@@ -32,17 +33,19 @@ function makeSupabaseLib() {
   };
 }
 
-test('application root composes management with the canonical lesson service and state', async () => {
+test('application root composes management with canonical lesson and feedback services', async () => {
   appState.currentStudent = null;
   appState.lessons = [];
 
   const app = createPacoGOApp({
     supabaseLib: makeSupabaseLib(),
-    session: { user: { id: '5d0e1e5c-1dbe-4909-bd3a-81a1e7b26d09' } }
+    session: { user: { id: PARENT_IDS[0] } }
   });
 
   assert.ok(app.lessons);
+  assert.ok(app.feedback);
   assert.ok(app.management);
+  assert.equal(app.management.listFeedback instanceof Function, true);
   assert.strictEqual(app.state, appState);
 
   app.management.selectStudent('Zyon');

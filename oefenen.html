@@ -31,6 +31,7 @@
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
+    import { hasLessonComponent } from './src/features/lessons/components.js';
 
     const params = new URLSearchParams(window.location.search);
     const lessonId = params.get('lesson_id') || '';
@@ -133,16 +134,12 @@
       try {
         const app = createPacoGOApp({ supabaseLib: window.supabase });
         const lessons = await app.lessons.listAll();
-        const lesson = lessons.find(candidate => String(candidate.id) === String(lessonId));
-        const items = Array.isArray(lesson?.lesson_items) ? lesson.lesson_items : [];
-        const validCards = items.filter(item =>
-          String(item?.question || '').trim() && String(item?.answer || '').trim()
-        );
+        const lesson = app.mapLessons(lessons).find(candidate => String(candidate.id) === String(lessonId));
 
-        flashcards.available = validCards.length > 0;
-        flashcards.text = flashcards.available
-          ? 'Oefen de inhoud van deze les met korte vraag-en-antwoordkaarten.'
-          : 'Deze les bevat nog geen complete vraag-en-antwoordkaarten.';
+        flashcards.available = Boolean(lesson && hasLessonComponent(lesson, 'flashcards'));
+        if (!flashcards.available) {
+          flashcards.text = 'Flashcards zijn geen onderdeel van deze les.';
+        }
       } catch (error) {
         console.error('Practice availability load error:', error);
         flashcards.available = false;

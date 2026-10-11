@@ -1,36 +1,21 @@
-import { normalizeKey } from '../../utils/text.js';
-
-const TESTABLE_TYPES = new Set([
-  'words',
-  'custom',
-  'dictation',
-  'spelling',
-  'math'
-]);
+import { getLessonComponents, getLessonComponentType } from './components.js';
 
 export function getLessonType(lesson = {}) {
-  return normalizeKey(lesson.type || '');
+  return getLessonComponentType(lesson);
 }
 
 export function getLessonChoices(lesson = {}) {
-  const type = getLessonType(lesson);
-  const choices = [];
-
-  if (TESTABLE_TYPES.has(type)) {
-    choices.push(
-      { id: 'practice', label: 'Oefenen' },
-      { id: 'test', label: 'Toets' },
-      { id: 'view', label: 'Bekijken' }
-    );
-    return choices;
-  }
-
-  // V4.78 question-based lessons have no practice/test flow.
-  choices.push(
-    { id: 'questions', label: 'Vragen maken' },
-    { id: 'view', label: 'Bekijken' }
-  );
-  return choices;
+  return getLessonComponents(lesson)
+    .filter(component => ['practice', 'test', 'questions', 'view'].includes(component))
+    .map(id => ({
+      id,
+      label: {
+        practice: 'Oefenen',
+        test: 'Toets',
+        questions: 'Vragen maken',
+        view: 'Bekijken'
+      }[id]
+    }));
 }
 
 export function getLessonChoiceTarget(lesson = {}, choice) {

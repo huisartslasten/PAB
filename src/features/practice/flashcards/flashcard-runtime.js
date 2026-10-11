@@ -1,7 +1,10 @@
 import { createPacoGOApp } from '../../../app/bootstrap.js';
+import { hasLessonComponent } from '../../lessons/components.js';
+import { mapLessonRecord } from '../../lessons/lesson-mapper.js';
 import {
   createFlashcardSession,
   getCurrentFlashcard,
+  getFlashcardCards,
   nextFlashcard,
   revealFlashcard
 } from './flashcard-domain.js';
@@ -26,21 +29,27 @@ export async function mountFlashcardPractice({
   let lesson = null;
   try {
     const lessons = await app.lessons.listAll();
-    lesson = lessons.find(candidate => String(candidate.id) === String(lessonId));
+    const record = lessons.find(candidate => String(candidate.id) === String(lessonId));
+    lesson = record ? mapLessonRecord(record) : null;
   } catch (error) {
     loading.textContent = 'De flashcards konden niet worden geladen.';
     console.error(error);
     return;
   }
 
-  const cards = (lesson?.lesson_items || [])
-    .map(item => ({ question: item.question, answer: item.answer }))
-    .filter(item => String(item.question || '').trim() && String(item.answer || '').trim());
+  if (!lesson) {
+    loading.textContent = 'Deze les kon niet worden gevonden.';
+    return;
+  }
 
-  if (!lesson || !cards.length) {
-    loading.textContent = lesson
-      ? 'Deze les bevat nog geen vraag-en-antwoordkaarten.'
-      : 'Deze les kon niet worden gevonden.';
+  if (!hasLessonComponent(lesson, 'flashcards')) {
+    loading.textContent = 'Flashcards zijn geen onderdeel van deze les.';
+    return;
+  }
+
+  const cards = getFlashcardCards(lesson.items);
+  if (!cards.length) {
+    loading.textContent = 'Deze les bevat nog geen vraag-en-antwoordkaarten.';
     return;
   }
 

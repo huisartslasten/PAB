@@ -9,6 +9,14 @@ function normalizeCard(card) {
   return Object.freeze({ question, answer });
 }
 
+export function getFlashcardCards(items = []) {
+  if (!Array.isArray(items)) return [];
+
+  return items
+    .map(item => ({ question: item?.question, answer: item?.answer }))
+    .filter(card => String(card.question ?? '').trim() && String(card.answer ?? '').trim());
+}
+
 export function createFlashcardSession(cards, options = DEFAULT_OPTIONS) {
   if (!Array.isArray(cards) || cards.length === 0) {
     throw new TypeError('A flashcard session requires at least one card.');

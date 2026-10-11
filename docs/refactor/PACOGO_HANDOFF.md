@@ -93,6 +93,7 @@ After every meaningful change, review obsolete or redundant functions, variables
 - 681–690: professional Agenda source audit, domain/runtime boundaries, import/review separation, application integration, legacy Agenda removal, and final regression gate green
 - 691–700: canonical page-template TEST-version ownership added; OEFENEN now receives its readable TEST badge from the shared template
 - 701–710: canonical practice pages cleaned of dead submenu controls; Flashcards navigation made explicit; browser contract added for canonical OEFENEN/Flashcards shell
+- 711–720: canonical LESSONS page boundary integrated; canonical lesson choice/test/view/questions pages added; grading/audio service boundaries composed; lesson-choice routing no longer falls back to `index.html`; full regression gate green on the resulting TEST head
 
 ## Current state — Professional V1 CLOSED
 Professional V1 consists of the completed Player and Agenda refactor blocks on `refactor/professional-v1`.
@@ -156,55 +157,60 @@ The V4.78 agenda composition and duplicate semantics were source-verified before
 - Legacy Agenda runtime removal/bridge verification: **success**
 
 ## Current TEST page-template state
-- Current readable TEST version: **V5.10**.
+- Current readable TEST version: **V5.12**.
 - TEST version is owned by `src/components/page-template.js`, not by an individual page or integration script.
-- The canonical template renders `PacoGO TEST V5.10` in its hero for every page that mounts the template.
+- The canonical template renders `PacoGO TEST V5.12` in its hero for every page that mounts the template.
 - `src/components/page-template.css` owns the badge presentation.
-- OEFENEN mounts the canonical template and visibly shows the V5.10 badge.
-- Flashcards mounts the same canonical template and now has no dead submenu controls.
+- Canonical LESSONS, Leskeuze, Toets, Les bekijken and Vragen maken pages mount the same template.
 - No per-page TEST-version patch should be added.
 
-## Current V5.10 practice-page audit
+## Current V5.12 lesson-page audit
 ### Green
 - `refactor/professional-v1` is the active branch.
 - `main` remains LIVE and untouched.
 - Canonical page-template ownership is intact.
-- OEFENEN uses the canonical template and readable TEST V5.10 badge.
-- Flashcards uses the canonical template and readable TEST V5.10 badge.
-- Dead submenu controls were removed from OEFENEN and Flashcards.
-- Flashcards → Oefenen navigation is explicitly wired.
-- Browser coverage exists for the canonical OEFENEN/Flashcards shell and navigation target.
+- LESSONS is a canonical `lessons.html` page and uses the shared template.
+- LESSONS reads through `app.lessons.listAll()` and the canonical lesson mapper/visibility boundary.
+- LESSONS routes into canonical `lesson-choice.html` rather than the legacy lesson UI.
+- Leskeuze derives available actions from `src/features/lessons/choice.js`.
+- Leskeuze routes practice, test, view and questions to canonical page boundaries; it has no `index.html` fallback.
+- `test.html` reuses the professional player runtime and application-owned grading/audio services rather than owning a second test engine.
+- `lesson-view.html` and `questions.html` are canonical presentation pages and do not perform direct Supabase access.
+- Shared HTML escaping is owned by `src/core/html.js`.
+- Browser coverage exists for the canonical test/view/questions shells.
+- The latest full regression completed successfully: Node regression, Vitest regression, Chromium/browser regression and clean-tree verification all passed.
 
-### Still requires runtime proof
-- The full GitHub regression for the latest V5.10 practice-page commits must be observed as successful before declaring the entire audit green.
-- LESSONS still runs from the legacy `index.html`; this is an explicit architectural boundary, not a surface for local repair.
-
-## Important open architectural item
-**LESSONS still runs from the legacy `index.html` and does not yet mount `mountPacoPageTemplate()`.** Therefore the template-owned scroll-memory behavior cannot yet control LESSONS. This must be solved by bringing LESSONS itself through the canonical page-template boundary, not by adding another scroll listener or navigation patch to `index.html` or `lesson-practice-navigation.js`.
-
-The next development stage must first inspect the actual LESSONS runtime boundary and then migrate/integrate that page into the canonical template without duplicating the legacy shell. Do not claim the LESSONS scroll-position problem is solved until this structural integration is runtime-verified.
+### Runtime/parity boundary still requiring explicit follow-up
+- The new canonical pages are structurally and browser-tested, but exact behavioral parity for every legacy V4.78 visual interaction on `lesson-view.html` and `questions.html` has not been declared complete beyond the contracts currently covered by tests.
+- Future parity work must extend the canonical feature boundaries rather than restoring legacy `index.html` ownership or adding page-specific fallbacks.
 
 ## Final repository state
-- Professional V1 closure was followed by dependency reproducibility/security cleanup on `refactor/professional-v1`.
-- Previous full-regression HEAD before the current V5.x work remains documented above; do not claim a new full regression without executing it.
-- The latest V5.x work is scoped to the new page/practice architecture and has not been represented as Professional V1 closure work.
-- Latest branch head after the practice-page browser-contract update: `9f41d33970d001fdd5742c0d9f4311ad404b10be`.
+- Professional V1 closure was followed by the V5.x canonical page architecture work on `refactor/professional-v1`.
+- Latest verified TEST head: `8e9ceabdb8ec5733d97d0e496b67567d630d0f73`.
+- Full GitHub Actions regression run: `38166673340` — **success**.
+- Maintained Node regression: **398 tests passed**.
+- Maintained Vitest regression: **24 tests passed**.
+- Browser regression: **28 tests passed**.
+- Clean-tree gate: **success**.
+- The earlier failed browser run was corrected at the canonical test-page error boundary; no workaround or legacy fallback was introduced.
 
 ## Dependency hygiene
 - `vitest` is pinned to `5.0.3` in `package.json`.
 - The committed lockfile is the reproducibility source for CI installation.
-- The previously documented full regression audit was clean; this must not be reused as proof for later changes.
+- The latest full regression used the committed lockfile and reported zero known dependency vulnerabilities.
 
 ## Safety verification
-- `main` / LIVE was not modified by the Professional V1 work or the current V5.x changes.
+- `main` / LIVE was not modified by the current work.
+- No LIVE Supabase changes were made.
 - No Supabase schema changes.
-- No new AI behavior in the lesson editor.
-- No runtime compatibility shim or legacy repair patch was introduced by the V5.10 practice-page work.
+- No new AI behavior was introduced into the deterministic lesson editor.
+- No runtime compatibility shim or legacy repair patch was introduced.
+- Canonical page migration was implemented at the page-template/application boundaries instead of by adding another legacy route or fallback.
 
 ## Closure
 **Professional V1 is officially closed.**
 
-The Player and Agenda architecture is integrated. Future work is a new scope and must not be treated as unfinished Professional V1 work.
+The Player and Agenda architecture is integrated. The current V5.12 work is a subsequent canonical page architecture stage and must not be represented as unfinished Player/Agenda work.
 
 ## New-chat procedure — MANDATORY
 At every new chat:

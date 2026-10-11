@@ -116,7 +116,7 @@
       content.replaceChildren();
       const lessons = mapLessonRecords(records);
       const subjects = getDashboardSubjects(lessons, selectedStudent);
-      const progress = getDashboardProgress(lessons, selectedStudent, app.mastery);
+      const progressStats = getDashboardProgress(lessons, selectedStudent, app.mastery);
 
       const toolbar = document.createElement('div');
       toolbar.className = 'dashboard-actions';
@@ -193,7 +193,7 @@
       const lessonCount = document.createElement('div');
       lessonCount.className = 'stat-big';
       lessonCount.style.marginTop = '16px';
-      lessonCount.textContent = String(progress.lessons);
+      lessonCount.textContent = String(progressStats.lessons);
       const lessonLabel = document.createElement('div');
       lessonLabel.className = 'stat-label';
       lessonLabel.textContent = 'lessen beschikbaar';
@@ -202,17 +202,17 @@
       const progressLabel = document.createElement('div');
       progressLabel.className = 'progress-label';
       const masteredLabel = document.createElement('span');
-      masteredLabel.textContent = `${progress.mastered} van ${progress.items} onderdelen beheerst`;
+      masteredLabel.textContent = `${progressStats.mastered} van ${progressStats.items} onderdelen beheerst`;
       const percentLabel = document.createElement('span');
-      percentLabel.textContent = `${progress.percent}%`;
+      percentLabel.textContent = `${progressStats.percent}%`;
       progressLabel.append(masteredLabel, percentLabel);
-      const progress = document.createElement('div');
-      progress.className = 'progress';
+      const progressTrack = document.createElement('div');
+      progressTrack.className = 'progress';
       const progressBar = document.createElement('div');
       progressBar.className = 'progress-bar';
-      progressBar.style.width = `${progress.percent}%`;
-      progress.appendChild(progressBar);
-      progressWrap.append(progressLabel, progress);
+      progressBar.style.width = `${progressStats.percent}%`;
+      progressTrack.appendChild(progressBar);
+      progressWrap.append(progressLabel, progressTrack);
       const masteryNote = document.createElement('p');
       masteryNote.className = 'dashboard-state';
       masteryNote.style.margin = '16px 0 0';
@@ -223,7 +223,7 @@
       const subjectsCardSide = document.createElement('article');
       subjectsCardSide.className = 'dashboard-card';
       const subjectCountHeading = document.createElement('h3');
-      subjectCountHeading.textContent = `${progress.subjects} ${progress.subjects === 1 ? 'vak' : 'vakken'}`;
+      subjectCountHeading.textContent = `${progressStats.subjects} ${progressStats.subjects === 1 ? 'vak' : 'vakken'}`;
       const subjectCountText = document.createElement('p');
       subjectCountText.style.cssText = 'margin:7px 0 0;color:#667894';
       subjectCountText.textContent = `Actieve vakken voor ${selectedStudent}.`;

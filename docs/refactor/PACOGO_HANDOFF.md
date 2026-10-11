@@ -94,6 +94,7 @@ After every meaningful change, review obsolete or redundant functions, variables
 - 691–700: canonical page-template TEST-version ownership added; OEFENEN now receives its readable TEST badge from the shared template
 - 701–710: canonical practice pages cleaned of dead submenu controls; Flashcards navigation made explicit; browser contract added for canonical OEFENEN/Flashcards shell
 - 711–720: canonical LESSONS page boundary integrated; canonical lesson choice/test/view/questions pages added; grading/audio service boundaries composed; lesson-choice routing no longer falls back to `index.html`; full regression gate green on the resulting TEST head
+- 721+: V4.78 lesson-view/questions presentation parity reconstructed at canonical feature boundaries; focused contracts added; full regression gate green on TEST head `3f9d22319b86023c6e1c32abd34f7d6653ff1886`
 
 ## Current state — Professional V1 CLOSED
 Professional V1 consists of the completed Player and Agenda refactor blocks on `refactor/professional-v1`.
@@ -175,29 +176,32 @@ The V4.78 agenda composition and duplicate semantics were source-verified before
 - Leskeuze derives available actions from `src/features/lessons/choice.js`.
 - Leskeuze routes practice, test, view and questions to canonical page boundaries; it has no `index.html` fallback.
 - `test.html` reuses the professional player runtime and application-owned grading/audio services rather than owning a second test engine.
-- `lesson-view.html` and `questions.html` are canonical presentation pages and do not perform direct Supabase access.
+- `lesson-view.html` is a canonical presentation page. Its V4.78 presentation contract is derived through the lessons feature boundary; the page does not perform direct Supabase access.
+- `questions.html` is a canonical presentation page. Its question-session behavior is owned by the lessons feature boundary; the page does not perform direct Supabase access.
 - Shared HTML escaping is owned by `src/core/html.js`.
-- Browser coverage exists for the canonical test/view/questions shells.
-- The latest full regression completed successfully: Node regression, Vitest regression, Chromium/browser regression and clean-tree verification all passed.
+- Focused parity tests cover the reconstructed lesson-view presentation contract and question-session progression/shuffle contract.
+- Full browser coverage includes the canonical test/view/questions shells.
+- Full regression run `38168240096` on TEST head `3f9d22319b86023c6e1c32abd34f7d6653ff1886` completed successfully: Node regression, Vitest regression, Chromium/browser regression and clean-tree verification all passed.
 
-### Runtime/parity boundary still requiring explicit follow-up
-- The new canonical pages are structurally and browser-tested, but exact behavioral parity for every legacy V4.78 visual interaction on `lesson-view.html` and `questions.html` has not been declared complete beyond the contracts currently covered by tests.
+### Runtime/parity boundary
+- The previously open V4.78 lesson-view/questions parity boundary is now source-verified for the reconstructed contracts covered by the focused tests.
+- This does **not** claim unverified parity for interactions that are not represented by the V4.78 source contract or current tests.
 - Future parity work must extend the canonical feature boundaries rather than restoring legacy `index.html` ownership or adding page-specific fallbacks.
 
 ## Final repository state
 - Professional V1 closure was followed by the V5.x canonical page architecture work on `refactor/professional-v1`.
-- Latest verified TEST head: `8e9ceabdb8ec5733d97d0e496b67567d630d0f73`.
-- Full GitHub Actions regression run: `38166673340` — **success**.
-- Maintained Node regression: **398 tests passed**.
-- Maintained Vitest regression: **24 tests passed**.
-- Browser regression: **28 tests passed**.
+- Latest verified TEST head: `3f9d22319b86023c6e1c32abd34f7d6653ff1886`.
+- Full GitHub Actions regression run: `38168240096` — **success**.
+- Maintained Node regression: **success**.
+- Maintained Vitest regression: **success**.
+- Chromium/browser regression: **success**.
 - Clean-tree gate: **success**.
-- The earlier failed browser run was corrected at the canonical test-page error boundary; no workaround or legacy fallback was introduced.
+- The regression included the canonical lesson-view parity and question-session changes.
 
 ## Dependency hygiene
 - `vitest` is pinned to `5.0.3` in `package.json`.
 - The committed lockfile is the reproducibility source for CI installation.
-- The latest full regression used the committed lockfile and reported zero known dependency vulnerabilities.
+- The full regression used the committed lockfile and reported zero known dependency vulnerabilities.
 
 ## Safety verification
 - `main` / LIVE was not modified by the current work.
@@ -205,7 +209,7 @@ The V4.78 agenda composition and duplicate semantics were source-verified before
 - No Supabase schema changes.
 - No new AI behavior was introduced into the deterministic lesson editor.
 - No runtime compatibility shim or legacy repair patch was introduced.
-- Canonical page migration was implemented at the page-template/application boundaries instead of by adding another legacy route or fallback.
+- Canonical page migration was implemented at the page-template/application/feature boundaries instead of by adding another legacy route or fallback.
 
 ## Closure
 **Professional V1 is officially closed.**
@@ -218,21 +222,6 @@ At every new chat:
 1. Confirm repository: `huisartslasten/PAB`.
 2. Confirm branch: `refactor/professional-v1`.
 3. Confirm `main` is LIVE and must not be touched.
-4. Read this handoff.
-5. Read `docs/engineering/PACOGO_ENGINEERING_STANDARD.md`.
-6. Inspect the actual repository state before implementation.
-7. Identify the relevant architectural owner/boundary.
-8. Only then begin development.
-
-The Engineering Standard is binding. Do not rely on memory from a previous chat instead of reading it.
-
-## Mandatory update handoff
-After every completed update, the developer must:
-
-1. update and verify the readable TEST version;
-2. report the exact TEST version;
-3. provide the two established PacoGO codes/instructions: push/update to `refactor/professional-v1` and update/refresh/publish the TEST site/runtime;
-4. report what changed and the test/regression status;
-5. confirm `main`/LIVE was not modified.
-
-Never call an update complete without this handoff.
+4. Read `docs/engineering/PACOGO_ENGINEERING_STANDARD.md`.
+5. Read this handoff before changing code.
+6. Verify the current TEST head and current regression status before any implementation.

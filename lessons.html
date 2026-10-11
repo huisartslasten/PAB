@@ -33,6 +33,7 @@
     import { mountPacoPageTemplate } from './src/components/page-template.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
     import { mapLessonRecords } from './src/features/lessons/lesson-mapper.js';
+    import { getActiveStudentLessons } from './src/features/lessons/visibility.js';
 
     const params = new URLSearchParams(window.location.search);
     const selectedStudent = params.get('student') || 'Zyon';
@@ -94,10 +95,7 @@
     }
 
     function render(records){
-      const lessons = mapLessonRecords(records).filter(lesson =>
-        normalize(lesson.student || selectedStudent) === normalize(selectedStudent) &&
-        !lesson.deleted && !lesson.archived
-      );
+      const lessons = getActiveStudentLessons(mapLessonRecords(records), selectedStudent);
       const grouped = new Map();
       lessons.forEach(lesson => {
         const key = normalize(lesson.subject) || 'overig';

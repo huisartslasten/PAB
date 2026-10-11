@@ -91,7 +91,7 @@
 
     try {
       await app.initializeSession();
-      app.management.getStudents();
+      await app.management.loadLessons();
       renderStudentSelection(students, app.management, showSelectedStudent);
       const selected = app.management.getSelectedStudent() || app.management.getStudents()[0];
       if (selected) showSelectedStudent(selected);

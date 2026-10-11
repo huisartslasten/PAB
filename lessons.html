@@ -50,7 +50,7 @@
 
     const normalize = value => String(value || '').trim().toLocaleLowerCase('nl-NL');
     const subjectIcon = subject => subjectIcons[normalize(subject).replaceAll(' ','')] || '📘';
-    const goHome = () => { window.location.href = 'index.html'; };
+    const goHome = () => { window.location.href = `dashboard.html?student=${encodeURIComponent(selectedStudent)}`; };
     const goLessons = () => { window.location.href = `lessons.html?student=${encodeURIComponent(selectedStudent)}`; };
     const goAgenda = () => { window.location.href = `index.html?student=${encodeURIComponent(selectedStudent)}&view=agenda`; };
     const goTests = () => { window.location.href = `index.html?student=${encodeURIComponent(selectedStudent)}&view=tests`; };

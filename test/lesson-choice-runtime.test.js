@@ -4,14 +4,14 @@ import assert from 'node:assert/strict';
 import {
   getLessonChoices,
   getLessonChoiceTarget,
-  getLessonType
-} from '../src/features/lessons/lesson-choice.js';
+  getLessonChoiceType
+} from '../src/features/lessons/choice.js';
 
 test('lesson choice recognizes the V4.78 testable lesson types', () => {
   for (const type of ['words', 'custom', 'dictation', 'spelling', 'math']) {
-    assert.equal(getLessonType({ type }), type);
+    assert.equal(getLessonChoiceType({ type }), type);
     assert.deepEqual(
-      getLessonChoices({ type }).map(choice => choice.id),
+      getLessonChoices({ type }),
       ['practice', 'test', 'view']
     );
   }
@@ -19,7 +19,7 @@ test('lesson choice recognizes the V4.78 testable lesson types', () => {
 
 test('lesson choice exposes question flow plus view for other lesson types', () => {
   assert.deepEqual(
-    getLessonChoices({ type: 'questions' }).map(choice => choice.id),
+    getLessonChoices({ type: 'questions' }),
     ['questions', 'view']
   );
 });

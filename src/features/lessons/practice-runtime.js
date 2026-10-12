@@ -75,6 +75,22 @@ export function createPracticeRuntime({
     });
   }
 
+  function completeCurrent(correct, evaluation = null) {
+    if (correct) remaining.delete(current.id);
+    const done = remaining.size === 0;
+    if (done) {
+      finished = true;
+      current = null;
+    }
+    return Object.freeze({
+      correct: correct === true,
+      evaluation,
+      done,
+      current: done ? null : current,
+      snapshot: snapshot()
+    });
+  }
+
   async function submit(userAnswer) {
     if (finished) return Object.freeze({ done: true, snapshot: snapshot() });
     if (!current) pickCurrent();
@@ -85,23 +101,15 @@ export function createPracticeRuntime({
       type,
       aiCheckAnswers
     });
-    const correct = evaluation?.correct === true;
+    return completeCurrent(evaluation?.correct === true, evaluation);
+  }
 
-    if (correct) remaining.delete(current.id);
-
-    const done = remaining.size === 0;
-    if (done) {
-      finished = true;
-      current = null;
-    }
-
-    return Object.freeze({
-      correct,
-      evaluation,
-      done,
-      current: done ? null : current,
-      snapshot: snapshot()
-    });
+  function assess(correct, evaluation = null) {
+    if (finished) return Object.freeze({ done: true, snapshot: snapshot() });
+    if (!current) pickCurrent();
+    if (!current) return Object.freeze({ done: true, snapshot: snapshot() });
+    attempts += 1;
+    return completeCurrent(correct === true, evaluation);
   }
 
   function next() {
@@ -119,6 +127,7 @@ export function createPracticeRuntime({
     start,
     next,
     submit,
+    assess,
     finish,
     snapshot,
     progress,

@@ -2103,32 +2103,48 @@ async function renderCreatorConsole(){
 async function renderCreatorAiRules(){
   const el=document.getElementById('creatorAiRules');
   if(!el)return;
-  const {data,error}=await db.from('creator_ai_rules').select('id,rule_text,enabled').order('id',{ascending:true});
-  if(error){el.innerHTML='<div class="message error">AI-afspraken konden niet worden geladen.</div>';return}
-  if(!data?.length){el.innerHTML='<div class="creator-empty">Nog geen extra AI-afspraken. De vaste AI-regel werkt altijd.</div>';return}
-  el.innerHTML=data.map(rule=>'<div class="creator-rule-row"><input type="checkbox" '+(rule.enabled?'checked':'')+' onchange="toggleCreatorAiRule('+Number(rule.id)+',this.checked)"><label>'+escapeHtml(rule.rule_text)+'</label><button type="button" class="creator-rule-delete" onclick="deleteCreatorAiRule('+Number(rule.id)+')" title="Verwijderen">🗑️</button></div>').join('');
+  try{
+    const data=await window.pacoGOCreatorListAiRules();
+    if(!data?.length){el.innerHTML='<div class="creator-empty">Nog geen extra AI-afspraken. De vaste AI-regel werkt altijd.</div>';return}
+    el.innerHTML=data.map(rule=>'<div class="creator-rule-row"><input type="checkbox" '+(rule.enabled?'checked':'')+' onchange="toggleCreatorAiRule('+Number(rule.id)+',this.checked)"><label>'+escapeHtml(rule.rule_text)+'</label><button type="button" class="creator-rule-delete" onclick="deleteCreatorAiRule('+Number(rule.id)+')" title="Verwijderen">🗑️</button></div>').join('');
+  }catch(error){
+    console.error('Creator AI rules load error:',error);
+    el.innerHTML='<div class="message error">AI-afspraken konden niet worden geladen.</div>';
+  }
 }
 async function addCreatorAiRule(){
   if(!isCreator())return;
   const input=document.getElementById('newCreatorAiRule');
   const text=input?.value.trim()||'';
   if(!text){showMessage('Schrijf eerst een AI-afspraak.','error');return}
-  const {error}=await db.from('creator_ai_rules').insert({rule_text:text,enabled:true});
-  if(error){showMessage('AI-afspraak kon niet worden opgeslagen.','error');return}
-  input.value='';
-  await renderCreatorAiRules();
-  showMessage('AI-afspraak toegevoegd.','success');
+  try{
+    await window.pacoGOCreatorAddAiRule(text);
+    input.value='';
+    await renderCreatorAiRules();
+    showMessage('AI-afspraak toegevoegd.','success');
+  }catch(error){
+    console.error('Creator AI rule save error:',error);
+    showMessage('AI-afspraak kon niet worden opgeslagen.','error');
+  }
 }
 async function toggleCreatorAiRule(id,enabled){
   if(!isCreator())return;
-  const {error}=await db.from('creator_ai_rules').update({enabled,updated_at:new Date().toISOString()}).eq('id',id);
-  if(error)showMessage('AI-afspraak kon niet worden aangepast.','error');
+  try{
+    await window.pacoGOCreatorSetAiRuleEnabled(id,enabled);
+  }catch(error){
+    console.error('Creator AI rule update error:',error);
+    showMessage('AI-afspraak kon niet worden aangepast.','error');
+  }
 }
 async function deleteCreatorAiRule(id){
   if(!isCreator()||!confirm('Deze extra AI-afspraak verwijderen?'))return;
-  const {error}=await db.from('creator_ai_rules').delete().eq('id',id);
-  if(error){showMessage('AI-afspraak kon niet worden verwijderd.','error');return}
-  await renderCreatorAiRules();
+  try{
+    await window.pacoGOCreatorDeleteAiRule(id);
+    await renderCreatorAiRules();
+  }catch(error){
+    console.error('Creator AI rule delete error:',error);
+    showMessage('AI-afspraak kon niet worden verwijderd.','error');
+  }
 }
 async function addCreatorNote(){
   if(!isCreator())return;
@@ -2136,38 +2152,52 @@ async function addCreatorNote(){
   const title=document.getElementById('creatorNoteTitle')?.value.trim()||'';
   const body=document.getElementById('creatorNoteBody')?.value.trim()||'';
   if(!title||!body){showMessage('Vul een onderwerp en notitie in.','error');return}
-  const {error}=await db.from('creator_notes').insert({note_type,title,body,status:'open'});
-  if(error){showMessage('Ontwikkelnotitie kon niet worden opgeslagen.','error');return}
-  document.getElementById('creatorNoteTitle').value='';
-  document.getElementById('creatorNoteBody').value='';
-  await renderCreatorNotes();
-  showMessage('Ontwikkelnotitie opgeslagen.','success');
+  try{
+    await window.pacoGOCreatorAddNote({noteType:note_type,title,body});
+    document.getElementById('creatorNoteTitle').value='';
+    document.getElementById('creatorNoteBody').value='';
+    await renderCreatorNotes();
+    showMessage('Ontwikkelnotitie opgeslagen.','success');
+  }catch(error){
+    console.error('Creator note save error:',error);
+    showMessage('Ontwikkelnotitie kon niet worden opgeslagen.','error');
+  }
 }
 async function renderCreatorNotes(){
   const el=document.getElementById('creatorNotes');
   if(!el)return;
-  const {data,error}=await db.from('creator_notes').select('id,note_type,title,body,status,created_at').order('created_at',{ascending:false});
-  if(error){el.innerHTML='<div class="message error">Ontwikkelnotities konden niet worden geladen.</div>';return}
-  if(!data?.length){el.innerHTML='<div class="creator-empty">Nog geen ontwikkelnotities. Dit wordt jouw plek om problemen en ideeën tijdens het bouwen vast te leggen.</div>';return}
-  const labels={problem:'🐛 Probleem',improvement:'🔧 Verbetering',idea:'💡 Idee',ai_rule:'🤖 AI-afspraak',other:'❓ Anders'};
-  el.innerHTML=data.map(item=>{
-    const date=item.created_at?new Intl.DateTimeFormat('nl-NL',{dateStyle:'medium',timeStyle:'short'}).format(new Date(item.created_at)):'Onbekende datum';
-    return '<div class="creator-note"><div class="creator-note-head"><div><span class="creator-chip '+(item.status==='done'?'done':'')+'">'+escapeHtml(labels[item.note_type]||item.note_type)+'</span><div class="creator-note-meta">'+escapeHtml(date)+'</div></div><span class="creator-chip '+(item.status==='done'?'done':'')+'">'+(item.status==='done'?'✅ Klaar':'🟡 Open')+'</span></div><h3 style="margin:10px 0 0">'+escapeHtml(item.title)+'</h3><div class="creator-note-body">'+escapeHtml(item.body)+'</div><div class="creator-note-actions"><button type="button" class="secondary" onclick="toggleCreatorNoteStatus('+Number(item.id)+')">'+(item.status==='done'?'↩️ Heropenen':'✅ Markeer als klaar')+'</button><button type="button" class="danger" onclick="deleteCreatorNote('+Number(item.id)+')">🗑️ Verwijderen</button></div></div>';
-  }).join('');
+  try{
+    const data=await window.pacoGOCreatorListNotes();
+    if(!data?.length){el.innerHTML='<div class="creator-empty">Nog geen ontwikkelnotities. Dit wordt jouw plek om problemen en ideeën tijdens het bouwen vast te leggen.</div>';return}
+    const labels={problem:'🐛 Probleem',improvement:'🔧 Verbetering',idea:'💡 Idee',ai_rule:'🤖 AI-afspraak',other:'❓ Anders'};
+    el.innerHTML=data.map(item=>{
+      const date=item.created_at?new Intl.DateTimeFormat('nl-NL',{dateStyle:'medium',timeStyle:'short'}).format(new Date(item.created_at)):'Onbekende datum';
+      return '<div class="creator-note"><div class="creator-note-head"><div><span class="creator-chip '+(item.status==='done'?'done':'')+'">'+escapeHtml(labels[item.note_type]||item.note_type)+'</span><div class="creator-note-meta">'+escapeHtml(date)+'</div></div><span class="creator-chip '+(item.status==='done'?'done':'')+'">'+(item.status==='done'?'✅ Klaar':'🟡 Open')+'</span></div><h3 style="margin:10px 0 0">'+escapeHtml(item.title)+'</h3><div class="creator-note-body">'+escapeHtml(item.body)+'</div><div class="creator-note-actions"><button type="button" class="secondary" onclick="toggleCreatorNoteStatus('+Number(item.id)+')">'+(item.status==='done'?'↩️ Heropenen':'✅ Markeer als klaar')+'</button><button type="button" class="danger" onclick="deleteCreatorNote('+Number(item.id)+')">🗑️ Verwijderen</button></div></div>';
+    }).join('');
+  }catch(error){
+    console.error('Creator notes load error:',error);
+    el.innerHTML='<div class="message error">Ontwikkelnotities konden niet worden geladen.</div>';
+  }
 }
 async function toggleCreatorNoteStatus(id){
   if(!isCreator())return;
-  const {data}=await db.from('creator_notes').select('status').eq('id',id).single();
-  if(!data)return;
-  const {error}=await db.from('creator_notes').update({status:data.status==='done'?'open':'done',updated_at:new Date().toISOString()}).eq('id',id);
-  if(error){showMessage('Notitie kon niet worden aangepast.','error');return}
-  await renderCreatorNotes();
+  try{
+    await window.pacoGOCreatorToggleNoteStatus(id);
+    await renderCreatorNotes();
+  }catch(error){
+    console.error('Creator note update error:',error);
+    showMessage('Notitie kon niet worden aangepast.','error');
+  }
 }
 async function deleteCreatorNote(id){
   if(!isCreator()||!confirm('Deze ontwikkelnotitie verwijderen?'))return;
-  const {error}=await db.from('creator_notes').delete().eq('id',id);
-  if(error){showMessage('Notitie kon niet worden verwijderd.','error');return}
-  await renderCreatorNotes();
+  try{
+    await window.pacoGOCreatorDeleteNote(id);
+    await renderCreatorNotes();
+  }catch(error){
+    console.error('Creator note delete error:',error);
+    showMessage('Notitie kon niet worden verwijderd.','error');
+  }
 }
 
 let aiDraft=null;
@@ -2898,6 +2928,7 @@ function insertWordQuestionAfter(button){
   <script type="module">
     import { installAgendaRuntimeEntry } from '/src/features/agenda/runtime-entry.js';
     import { installLessonSaveRuntimeEntry } from '/src/features/lessons/lesson-save-runtime-entry.js';
+    import { installCreatorRuntimeEntry } from '/src/features/creator/creator-runtime-entry.js';
     installAgendaRuntimeEntry({
       storage: window.localStorage,
       currentStudent: () => currentStudent,
@@ -2908,6 +2939,11 @@ function insertWordQuestionAfter(button){
       documentRef: document,
       onLessonMatch: item => agendaLessonMatchHtml(item),
       now: () => new Date()
+    }, window);
+
+    installCreatorRuntimeEntry({
+      db,
+      canCreate: () => isCreator()
     }, window);
 
     installLessonSaveRuntimeEntry({

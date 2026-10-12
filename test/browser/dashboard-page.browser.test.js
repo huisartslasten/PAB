@@ -1,0 +1,16 @@
+import { test, expect } from '@playwright/test';
+
+const baseUrl = 'http://127.0.0.1:4173';
+
+test('dashboard is the canonical student chooser and page boundary', async ({ page }) => {
+  await page.goto(`${baseUrl}/dashboard.html`);
+  await expect(page.locator('.paco-template-version-badge')).toHaveText('PacoGO TEST V5.13');
+  await expect(page.locator('.paco-template-main h1')).toHaveText('Wie gaat er leren?');
+  await expect(page.getByRole('button', { name: /Zyon/ })).toBeVisible();
+
+  await page.getByRole('button', { name: /Zyon/ }).click();
+  await expect(page).toHaveURL(/\/dashboard\.html\?student=Zyon$/);
+  await expect(page.locator('.paco-template-main h1')).toHaveText('Dashboard');
+  await expect(page.getByRole('button', { name: 'Mijn lessen' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Beheer' })).toBeVisible();
+});

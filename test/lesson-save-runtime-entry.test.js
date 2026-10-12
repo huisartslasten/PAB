@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   executeLessonSaveRuntimeEntry,
+  executeLessonSubvakUpdate,
   installLessonSaveRuntimeEntry
 } from '../src/features/lessons/lesson-save-runtime-entry.js';
 
@@ -41,6 +42,7 @@ test('runtime entry replaces window.saveLesson and returns the legacy function',
     assert.strictEqual(returnedLegacy, legacySaveLesson);
     assert.notStrictEqual(globalThis.window.saveLesson, legacySaveLesson);
     assert.equal(globalThis.window.saveLesson.name, 'saveLessonRuntimeEntry');
+    assert.equal(typeof globalThis.window.pacoGOUpdateLessonSubvak, 'function');
   } finally {
     globalThis.window = previousWindow;
   }
@@ -174,4 +176,42 @@ test('runtime entry rejects direct module execution without the explicit V4.78 b
     () => executeLessonSaveRuntimeEntry(),
     /V4\.78 lesson save runtime bridge is required/
   );
+});
+
+test('runtime subvak update authorizes before delegating to the lesson write service', async () => {
+  const calls = [];
+  const db = {
+    from(table) {
+      calls.push(['from', table]);
+      return {
+        update(payload) {
+          calls.push(['update', table, payload]);
+          return {
+            eq(column, value) {
+              calls.push(['eq', table, column, value]);
+              return { select() { return { single: async () => ({ data: { id: value, subvak: payload.subvak }, error: null }) }; } };
+            }
+          };
+        }
+      };
+    }
+  };
+  const runtime = createValidRuntime({
+    db,
+    currentSession: { user: { id: 'parent-1' } },
+    PARENT_IDS: new Set(['parent-1']),
+    loadLessons: async () => calls.push(['loadLessons']),
+    refreshPageSidebars: async () => calls.push(['refreshPageSidebars'])
+  });
+
+  const result = await executeLessonSubvakUpdate(runtime, 17, '  Themawoorden  ');
+
+  assert.deepEqual(result, { id: 17, subvak: 'Themawoorden' });
+  assert.deepEqual(calls, [
+    ['from', 'lessons'],
+    ['update', 'lessons', { subvak: 'Themawoorden' }],
+    ['eq', 'lessons', 'id', 17],
+    ['loadLessons'],
+    ['refreshPageSidebars']
+  ]);
 });

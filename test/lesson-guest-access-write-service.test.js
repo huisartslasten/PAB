@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   findGuestByName,
   findGuestLessonAssignment,
+  listGuestLessonAssignments,
   updateGuestLessonAssignment,
   createGuestLessonAssignment
 } from '../src/features/lessons/lesson-guest-access-write-service.js';
@@ -19,13 +20,13 @@ function dbFor(result) {
   return { db: { from(table) { calls.push(['from', table]); return chain; } }, calls };
 }
 
-test('findGuestByName queries guest_users by name', async () => {
+test('findGuestByName queries the canonical guest_access table by guest_name', async () => {
   const { db, calls } = dbFor({ data: { id: 7 }, error: null });
   assert.deepEqual(await findGuestByName({ db, guestName: 'Zyon' }), { id: 7 });
   assert.deepEqual(calls, [
-    ['from', 'guest_users'],
+    ['from', 'guest_access'],
     ['select', 'id'],
-    ['eq', 'name', 'Zyon'],
+    ['eq', 'guest_name', 'Zyon'],
     ['maybeSingle']
   ]);
 });
@@ -39,6 +40,16 @@ test('findGuestLessonAssignment queries the guest lesson pair', async () => {
     ['eq', 'guest_id', 7],
     ['eq', 'lesson_id', 12],
     ['maybeSingle']
+  ]);
+});
+
+test('listGuestLessonAssignments reads all assignments for the guest', async () => {
+  const { db, calls } = dbFor({ data: [{ id: 11, lesson_id: 12, active: true }], error: null });
+  assert.deepEqual(await listGuestLessonAssignments({ db, guestId: 7 }), [{ id: 11, lesson_id: 12, active: true }]);
+  assert.deepEqual(calls, [
+    ['from', 'guest_lessons'],
+    ['select', 'id,lesson_id,active'],
+    ['eq', 'guest_id', 7]
   ]);
 });
 

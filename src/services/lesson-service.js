@@ -2,6 +2,15 @@
 // It intentionally mirrors the existing V4.78 query shape so behavior can be regression-tested
 // before the old implementation is removed.
 
+function normalizeLessonItems(items = []) {
+  return (Array.isArray(items) ? items : []).map(item => ({
+    ...item,
+    hint: item.hint || '',
+    min_words: Number(item.min_words || 0),
+    required_terms: Array.isArray(item.required_terms) ? item.required_terms : []
+  }));
+}
+
 export function createLessonService(db) {
   if (!db) throw new Error('A Supabase client is required.');
 
@@ -32,6 +41,25 @@ export function createLessonService(db) {
       return data;
     },
 
+    async createLessonWithItems({ lesson: lessonPayload, items = [] } = {}) {
+      const lesson = await this.createLesson(lessonPayload);
+      const normalizedItems = normalizeLessonItems(items);
+
+      if (!normalizedItems.length) {
+        return Object.freeze({ lesson, items: [] });
+      }
+
+      try {
+        const insertedItems = await this.replaceLessonItems(lesson.id, normalizedItems);
+        return Object.freeze({ lesson, items: insertedItems });
+      } catch (error) {
+        // Preserve the existing V4.78 create -> item insert -> rollback contract.
+        // Lesson persistence owns this transaction-like sequence; callers do not.
+        await db.from('lessons').delete().eq('id', lesson.id);
+        throw error;
+      }
+    },
+
     async updateLesson(id, payload) {
       const { data, error } = await db
         .from('lessons')
@@ -47,15 +75,12 @@ export function createLessonService(db) {
       const removed = await db.from('lesson_items').delete().eq('lesson_id', lessonId);
       if (removed.error) throw removed.error;
 
-      if (!items.length) return [];
-
-      const rows = items.map(item => ({
+      const rows = normalizeLessonItems(items).map(item => ({
         ...item,
-        lesson_id: lessonId,
-        hint: item.hint || '',
-        min_words: Number(item.min_words || 0),
-        required_terms: Array.isArray(item.required_terms) ? item.required_terms : []
+        lesson_id: lessonId
       }));
+
+      if (!rows.length) return [];
 
       const { data, error } = await db.from('lesson_items').insert(rows).select();
       if (error) throw error;

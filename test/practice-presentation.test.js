@@ -45,12 +45,16 @@ function presentationFixture(overrides = {}) {
       { id: 'b', question: 'Vraag B', answer: 'Antwoord B' }
     ]
   };
+  const masteryService = {
+    record: () => ({ streak: 0, mastered: false })
+  };
   const shown = [];
   const presentation = createPracticePresentation({
     documentRef,
     windowRef: { setTimeout() {} },
     getLesson: () => lesson,
     getStudent: () => 'Zyon',
+    masteryService,
     shuffle: items => [...items],
     random: () => 0,
     escapeHtml: value => String(value ?? ''),

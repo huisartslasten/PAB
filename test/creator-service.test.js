@@ -16,10 +16,10 @@ function makeHarness() {
       eq(field, value) { state.filters.push([field, value]); calls.push(['eq', table, field, value]); return chain; },
       single: async () => {
         calls.push(['single', table, state.filters]);
-        return responses.get(table) || { data: null, error: null };
+        return responses.get(table)?.single || { data: null, error: null };
       },
       then(resolve, reject) {
-        return Promise.resolve(responses.get(table) || { data: [], error: null }).then(resolve, reject);
+        return Promise.resolve(responses.get(table)?.list || { data: [], error: null }).then(resolve, reject);
       }
     };
     return chain;
@@ -30,17 +30,19 @@ function makeHarness() {
 
 test('creator service owns creator AI rule and note persistence', async () => {
   const harness = makeHarness();
-  harness.responses.set('creator_ai_rules', { data: { id: 1, rule_text: 'Gebruik korte zinnen.', enabled: true }, error: null });
-  harness.responses.set('creator_notes', { data: { id: 2, note_type: 'idea', title: 'Test', body: 'Notitie', status: 'open', created_at: '2026-10-12T00:00:00Z' }, error: null });
+  const rule = { id: 1, rule_text: 'Gebruik korte zinnen.', enabled: true };
+  const note = { id: 2, note_type: 'idea', title: 'Test', body: 'Notitie', status: 'open', created_at: '2026-10-12T00:00:00Z' };
+  harness.responses.set('creator_ai_rules', { list: { data: [rule], error: null }, single: { data: rule, error: null } });
+  harness.responses.set('creator_notes', { list: { data: [note], error: null }, single: { data: note, error: null } });
   const service = createCreatorService(harness.db, { canCreate: () => true });
 
-  assert.deepEqual(await service.listAiRules(), { id: 1, rule_text: 'Gebruik korte zinnen.', enabled: true });
-  assert.deepEqual(await service.addAiRule(' Nieuwe afspraak '), { id: 1, rule_text: 'Gebruik korte zinnen.', enabled: true });
-  assert.deepEqual(await service.setAiRuleEnabled(1, false), { id: 1, rule_text: 'Gebruik korte zinnen.', enabled: true });
+  assert.deepEqual(await service.listAiRules(), [rule]);
+  assert.deepEqual(await service.addAiRule(' Nieuwe afspraak '), rule);
+  assert.deepEqual(await service.setAiRuleEnabled(1, false), rule);
   await service.deleteAiRule(1);
-  assert.deepEqual(await service.listNotes(), { id: 2, note_type: 'idea', title: 'Test', body: 'Notitie', status: 'open', created_at: '2026-10-12T00:00:00Z' });
-  assert.deepEqual(await service.addNote({ noteType: 'idea', title: ' Test ', body: ' Notitie ' }), { id: 2, note_type: 'idea', title: 'Test', body: 'Notitie', status: 'open', created_at: '2026-10-12T00:00:00Z' });
-  assert.deepEqual(await service.toggleNoteStatus(2), { id: 2, note_type: 'idea', title: 'Test', body: 'Notitie', status: 'open', created_at: '2026-10-12T00:00:00Z' });
+  assert.deepEqual(await service.listNotes(), [note]);
+  assert.deepEqual(await service.addNote({ noteType: 'idea', title: ' Test ', body: ' Notitie ' }), note);
+  assert.deepEqual(await service.toggleNoteStatus(2), note);
   await service.deleteNote(2);
 
   assert.ok(harness.calls.some(call => call[0] === 'select' && call[1] === 'creator_ai_rules'));

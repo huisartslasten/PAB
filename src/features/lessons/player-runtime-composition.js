@@ -5,6 +5,7 @@
 import { createPlayerRuntimeAdapter } from './player-runtime-adapter.js';
 import { createPlayerPersistence } from './player-persistence.js';
 import { createAnswerGradingService } from '../../services/answer-grading-service.js';
+import { createPracticeEvaluationRuntimeEntry } from './practice-evaluation-runtime-entry.js';
 
 export function createApplicationPlayerRuntime({
   lesson = null,
@@ -25,6 +26,9 @@ export function createApplicationPlayerRuntime({
 
   const playerPersistence = persistence || createPlayerPersistence(db, { clock });
   const answerGradingService = createAnswerGradingService(db);
+  const practiceEvaluationRuntime = createPracticeEvaluationRuntimeEntry({
+    gradeAnswer: answerGradingService.gradeAnswer
+  });
 
   return createPlayerRuntimeAdapter({
     lesson,
@@ -37,6 +41,6 @@ export function createApplicationPlayerRuntime({
     goBack,
     clock,
     ...(createSession ? { createSession } : {}),
-    gradeAnswer: answerGradingService.gradeAnswer
+    evaluateAnswer: practiceEvaluationRuntime.evaluate
   });
 }

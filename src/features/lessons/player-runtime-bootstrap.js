@@ -25,9 +25,7 @@ export function createProfessionalPlayerBridge({
   if (typeof clearActivity !== 'function') throw new Error('A lesson cleanup function is required.');
   if (typeof escapeHtml !== 'function') throw new Error('An escapeHtml function is required.');
 
-  const lessonAudioService = audioService || createLessonAudioService(db);
-  if (typeof lessonAudioService.speak !== 'function' || typeof lessonAudioService.stop !== 'function') throw new Error('A lesson audio service is required.');
-
+  let lessonAudioService = audioService;
   let entry = null;
   let activeLesson = null;
 
@@ -36,6 +34,7 @@ export function createProfessionalPlayerBridge({
     const session = entry?.runtime?.session;
     const item = session?.currentItem();
     if (!item) return Promise.resolve();
+    if (!lessonAudioService) lessonAudioService = createLessonAudioService(db);
     return lessonAudioService.speak(item.answer, {
       onStatus: status => {
         const node = documentRef?.getElementById?.('testVoiceStatus');
@@ -53,6 +52,7 @@ export function createProfessionalPlayerBridge({
   function buildEntry() {
     activeLesson = getLesson();
     if (!activeLesson || typeof activeLesson !== 'object') throw new Error('No active lesson is available.');
+    if (!lessonAudioService) lessonAudioService = createLessonAudioService(db);
 
     entry = createPlayerRuntimeEntry({
       lesson: activeLesson,

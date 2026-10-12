@@ -12,7 +12,7 @@ function base(overrides = {}) {
     title: 'Foto-les',
     type: 'words',
     pairs: [{ question: 'kat', answer: 'dier' }],
-    persistLesson: async input => { events.push(['persist', input]); return { lesson: { id: 42 } }; },
+    createLessonWithItems: async input => { events.push(['persist', input]); return { lesson: { id: 42 } }; },
     loadLessons: async () => events.push('load'),
     lessons: [{ id: 42, title: 'Foto-les' }],
     setCurrentStudent: value => { state.student = value; events.push(['student', value]); },
@@ -39,6 +39,10 @@ test('photo runtime preserves V4.78 success order and state resolution', async (
   assert.equal(state.subject, 'Themawoorden');
   assert.equal(state.lesson.id, 42);
   assert.deepEqual(events[6], ['message', 'Les gemaakt uit de foto. Controleer hem gerust nog even.', 'success']);
+  assert.deepEqual(events[1], ['persist', {
+    lesson: { student: 'Zyon', subject: 'Themawoorden', title: 'Foto-les', type: 'words' },
+    items: [{ question: 'kat', answer: 'dier' }]
+  }]);
 });
 
 test('photo runtime hard-stops on authorization failure', async () => {

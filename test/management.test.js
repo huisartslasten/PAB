@@ -82,11 +82,11 @@ test('management owns recovery read and restore operations across students', asy
     loadLessons: makeLoadLessons(service)
   });
 
+  management.selectStudent('Zyon');
   await management.loadLessons();
   assert.deepEqual(management.getRecoveryLessons('archive').map(item => item.id), [2]);
   assert.deepEqual(management.getRecoveryLessons('trash').map(item => item.id), [4]);
 
-  management.selectStudent('Zyon');
   await management.restoreLesson(2);
   assert.deepEqual(service.calls, [['restore', 2]]);
   assert.throws(() => management.getRecoveryLessons('unknown'), /Unknown recovery mode/);

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createLessonWriteService } from '../src/features/lessons/lesson-write-service.js';
 
-function mockDb({ rows = [], insertError = null, updateError = null, deleteError = null } = {}) {
+function mockDb({ rows = [], insertError = null, itemInsertError = null, updateError = null, deleteError = null } = {}) {
   const calls = [];
   return {
     calls,
@@ -14,14 +14,13 @@ function mockDb({ rows = [], insertError = null, updateError = null, deleteError
           return {
             select() {
               if (table === 'lesson_items') {
-                return Promise.resolve({ data: payload, error: insertError });
+                return Promise.resolve({ data: payload, error: itemInsertError });
               }
-              const selected = {
+              return {
                 single() {
                   return Promise.resolve({ data: rows[0] ?? { id: 41 }, error: insertError });
                 }
               };
-              return selected;
             }
           };
         },
@@ -103,7 +102,7 @@ test('lesson write service creates a lesson and its items through canonical crea
 
 test('lesson write service rolls back the created lesson when canonical item persistence fails', async () => {
   const itemError = new Error('item insert failed');
-  const db = mockDb({ insertError: itemError, rows: [{ id: 41 }] });
+  const db = mockDb({ itemInsertError: itemError, rows: [{ id: 41 }] });
   const service = createLessonWriteService(db);
 
   await assert.rejects(

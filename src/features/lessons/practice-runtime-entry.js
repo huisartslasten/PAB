@@ -1,17 +1,20 @@
 // Application-facing entry for the modular lesson practice flow.
-// This layer composes practice state with explicit presentation callbacks.
+// This layer composes practice state with presentation and persistence callbacks.
 // It owns orchestration only; answer evaluation remains in the practice
-// evaluation runtime and persistence remains in the lesson services.
+// evaluation runtime and mastery persistence remains in the mastery service.
 
 import { createApplicationPracticeRuntime } from './practice-runtime.js';
+import { createMasteryService } from '../../services/mastery-service.js';
 
 export function createPracticeRuntimeEntry({
   db = null,
   lesson = null,
+  student = null,
   shuffle,
   random,
   evaluateAnswer = null,
   aiCheckAnswers = true,
+  masteryService = null,
   render = null,
   prepare = () => {},
   onAnswer = () => {},
@@ -31,6 +34,7 @@ export function createPracticeRuntimeEntry({
     evaluateAnswer,
     aiCheckAnswers
   });
+  const mastery = masteryService || createMasteryService();
 
   function renderCurrent() {
     render(runtime.snapshot());
@@ -44,16 +48,26 @@ export function createPracticeRuntimeEntry({
     return renderCurrent();
   }
 
+  function next() {
+    const current = runtime.next();
+    renderCurrent();
+    return current;
+  }
+
   async function submit(answer) {
+    const item = runtime.current;
     const result = await runtime.submit(answer);
-    onAnswer(result);
+    const masteryState = student && item
+      ? mastery.record(student, lesson.id, item.id, result.correct === true)
+      : null;
+    const enrichedResult = Object.freeze({ ...result, mastery: masteryState });
+    onAnswer(enrichedResult);
     if (result.done) {
       const snapshot = runtime.snapshot();
       onFinish(snapshot);
-      return Object.freeze({ ...result, snapshot });
+      return Object.freeze({ ...enrichedResult, snapshot });
     }
-    renderCurrent();
-    return result;
+    return enrichedResult;
   }
 
   function finish() {
@@ -65,6 +79,7 @@ export function createPracticeRuntimeEntry({
   return Object.freeze({
     runtime,
     start,
+    next,
     submit,
     finish,
     render: renderCurrent

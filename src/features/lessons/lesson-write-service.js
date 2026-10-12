@@ -4,15 +4,6 @@
 
 import { createLessonService } from '../../services/lesson-service.js';
 
-function normalizeItems(items = []) {
-  return (Array.isArray(items) ? items : []).map(item => ({
-    ...item,
-    hint: item.hint || '',
-    min_words: Number(item.min_words || 0),
-    required_terms: Array.isArray(item.required_terms) ? item.required_terms : []
-  }));
-}
-
 export function createLessonWriteService(db) {
   const lessons = createLessonService(db);
 
@@ -35,13 +26,14 @@ export function createLessonWriteService(db) {
 
     if (id != null) {
       const updated = await lessons.updateLesson(id, payload);
-      const savedItems = await lessons.replaceLessonItems(id, normalizeItems(items));
+      const savedItems = await lessons.replaceLessonItems(id, items);
       return Object.freeze({ lesson: updated, items: savedItems });
     }
 
-    const created = await lessons.createLesson(payload);
-    const savedItems = await lessons.replaceLessonItems(created.id, normalizeItems(items));
-    return Object.freeze({ lesson: created, items: savedItems });
+    return lessons.createLessonWithItems({
+      lesson: payload,
+      items
+    });
   }
 
   return Object.freeze({ saveLesson });

@@ -123,7 +123,7 @@ export function createPracticePresentation({
     const review = `<div class="practice-answer-review"><div class="practice-answer-review-title">Jouw antwoord:</div><div class="practice-answer-review-text">${escapeHtml(answer || '—')}</div>${fixedHtml}</div>`;
     const extra = itemExtraInfo(item, escapeHtml);
     feedback.innerHTML = result.correct
-      ? `${review}<div class="feedback correct">${item.type === 'spelling' ? '✅ Beide goed!' : '✅ Goed!'} ${escapeHtml(result.evaluation?.feedback || '')}</div>${extra}`
+      ? `${review}<div class="feedback correct">${item?.type === 'spelling' ? '✅ Beide goed!' : '✅ Goed!'} ${escapeHtml(result.evaluation?.feedback || '')}</div>${extra}`
       : `${review}<div class="feedback incorrect">❌ ${result.evaluation?.feedback ? escapeHtml(result.evaluation.feedback) : 'Nog niet helemaal. Dit item komt later opnieuw terug.'}</div>${extra}`;
     feedback.className = result.correct ? 'feedback correct' : 'feedback incorrect';
     documentRef.querySelectorAll('#practiceContent button, #practiceContent input, #practiceContent textarea').forEach(control => { control.disabled = true; });
@@ -150,7 +150,7 @@ export function createPracticePresentation({
       student: getStudent(),
       shuffle,
       random,
-      aiCheckAnswers,
+      aiCheckAnswers: lesson.ai_check_answers !== false && aiCheckAnswers,
       render: renderCurrent,
       prepare: () => {},
       onAnswer: () => refreshPageSidebars(),
@@ -181,7 +181,7 @@ export function createPracticePresentation({
     }
     try {
       const result = await entry.submit(answer);
-      renderFeedback(result, item, answer);
+      if (!result.done) renderFeedback(result, item, answer);
       return result;
     } catch (error) {
       console.error('Practice answer error:', error);

@@ -31,13 +31,13 @@ export function createPracticePresentation({
   getLesson,
   getStudent,
   db = null,
+  audioService = null,
   shuffle = items => [...items],
   random = Math.random,
   escapeHtml,
   hideAll,
   showLessonChoice,
   refreshPageSidebars = () => {},
-  stopAiAudio = () => {},
   speechCancel = () => {},
   aiCheckAnswers = true
 } = {}) {
@@ -48,6 +48,8 @@ export function createPracticePresentation({
   if (typeof showLessonChoice !== 'function') throw new Error('A lesson choice navigation function is required.');
   if (typeof shuffle !== 'function') throw new Error('A practice shuffle function is required.');
   if (typeof random !== 'function') throw new Error('A practice random function is required.');
+  if (audioService && typeof audioService.speak !== 'function') throw new Error('A valid lesson audio service is required.');
+  if (audioService && typeof audioService.stop !== 'function') throw new Error('A valid lesson audio service is required.');
 
   let entry = null;
 
@@ -139,7 +141,7 @@ export function createPracticePresentation({
     const lesson = getLesson();
     if (!lesson) return null;
     speechCancel();
-    stopAiAudio();
+    audioService?.stop();
     hideAll();
     const { page, title } = elements();
     page?.classList.remove('hidden');
@@ -212,20 +214,32 @@ export function createPracticePresentation({
     return result;
   }
 
+  async function speakDictation() {
+    if (!entry || !audioService) return null;
+    const item = entry.runtime.current;
+    if (!item) return null;
+    const language = String(getLesson()?.language || 'nl');
+    return audioService.speak(item.question, {
+      language,
+      onStatus: status => {
+        const statusElement = documentRef.getElementById('practiceVoiceStatus');
+        if (statusElement) statusElement.textContent = status;
+      }
+    });
+  }
+
   function cancel() {
     speechCancel();
-    stopAiAudio();
+    audioService?.stop();
     entry = null;
   }
 
   function finish() {
     if (!entry) return null;
-    const snapshot = entry.finish();
-    renderCompletion(snapshot);
-    return snapshot;
+    return entry.finish();
   }
 
-  return Object.freeze({ start, next: nextItem, submit, revealQuestion, assess, finish, cancel, get entry() { return entry; } });
+  return Object.freeze({ start, next: nextItem, submit, revealQuestion, assess, speakDictation, finish, cancel, get entry() { return entry; } });
 }
 
 export function installPracticePresentation(options, target = window) {

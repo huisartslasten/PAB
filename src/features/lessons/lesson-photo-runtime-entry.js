@@ -1,4 +1,4 @@
-import { createLessonFromPhotoPersistence } from './lesson-photo-write-service.js';
+import { createLessonService } from '../../services/lesson-service.js';
 import { createLessonFromPhotoRuntime } from './lesson-photo-runtime.js';
 
 const REQUIRED_KEYS = [
@@ -23,10 +23,11 @@ function requireRuntime(runtime) {
 
 export async function executeCreateLessonFromPhoto(runtime, input = {}) {
   requireRuntime(runtime);
+  const lessonService = createLessonService(runtime.db);
   return createLessonFromPhotoRuntime({
     ...input,
     authorize: runtime.requireParent,
-    persistLesson: values => createLessonFromPhotoPersistence({ db: runtime.db, ...values }),
+    createLessonWithItems: values => lessonService.createLessonWithItems(values),
     loadLessons: runtime.loadLessons,
     lessons: runtime.lessons,
     setCurrentStudent: runtime.setCurrentStudent,

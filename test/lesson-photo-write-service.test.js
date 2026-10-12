@@ -102,4 +102,5 @@ test('photo persistence rejects incomplete input before touching the database', 
     /at least one pair/
   );
   assert.equal(calls, 0);
+  assert.equal(db.from, db.from);
 });

@@ -153,3 +153,107 @@ test('lesson service replaces lesson items with normalized defaults', async () =
     hint: ''
   }]);
 });
+
+test('lesson service owns photo-style lesson creation and preserves normalized item data', async () => {
+  const calls = [];
+  const db = {
+    from(table) {
+      calls.push({ op: 'from', table });
+      return {
+        insert(rows) {
+          calls.push({ op: 'insert', table, rows });
+          const isLesson = table === 'lessons';
+          const data = isLesson ? { id: 31, ...rows } : rows;
+          return {
+            select() {
+              const selected = Promise.resolve({ data: isLesson ? [data] : rows, error: null });
+              selected.single = () => Promise.resolve({ data, error: null });
+              return selected;
+            }
+          };
+        },
+        delete() {
+          calls.push({ op: 'delete', table });
+          return {
+            eq(column, value) {
+              calls.push({ op: 'eq-delete', column, value });
+              return Promise.resolve({ error: null });
+            }
+          };
+        }
+      };
+    }
+  };
+
+  const service = createLessonService(db);
+  const result = await service.createLessonWithItems({
+    lesson: { student: 'Zyon', subject: 'Nederlands', title: 'Foto-les', type: 'words' },
+    items: [{ question: 'Wat betekent kapen?', answer: 'Een schip overnemen', min_words: '', required_terms: null }]
+  });
+
+  assert.equal(result.lesson.id, 31);
+  assert.deepEqual(calls[1], {
+    op: 'insert',
+    table: 'lessons',
+    rows: { student: 'Zyon', subject: 'Nederlands', title: 'Foto-les', type: 'words' }
+  });
+  assert.deepEqual(calls[3].rows, [{
+    question: 'Wat betekent kapen?',
+    answer: 'Een schip overnemen',
+    min_words: 0,
+    required_terms: [],
+    hint: '',
+    lesson_id: 31
+  }]);
+});
+
+test('lesson service rolls back the created lesson when item persistence fails', async () => {
+  const rollbackError = new Error('item insert failed');
+  const calls = [];
+  let insertCount = 0;
+  const db = {
+    from(table) {
+      calls.push({ op: 'from', table });
+      return {
+        insert(rows) {
+          insertCount += 1;
+          calls.push({ op: 'insert', table, rows });
+          return {
+            select() {
+              if (table === 'lessons') {
+                const selected = Promise.resolve({ data: [{ id: 44, ...rows }], error: null });
+                selected.single = () => Promise.resolve({ data: { id: 44, ...rows }, error: null });
+                return selected;
+              }
+              const selected = Promise.resolve({ data: null, error: rollbackError });
+              selected.single = () => Promise.resolve({ data: null, error: rollbackError });
+              return selected;
+            }
+          };
+        },
+        delete() {
+          calls.push({ op: 'delete', table });
+          return {
+            eq(column, value) {
+              calls.push({ op: 'eq-delete', column, value });
+              return Promise.resolve({ error: null });
+            }
+          };
+        }
+      };
+    }
+  };
+
+  const service = createLessonService(db);
+  await assert.rejects(
+    () => service.createLessonWithItems({
+      lesson: { student: 'Zyon', subject: 'Nederlands', title: 'Foto-les', type: 'words' },
+      items: [{ question: 'Vraag', answer: 'Antwoord' }]
+    }),
+    rollbackError
+  );
+
+  assert.equal(insertCount, 2);
+  assert.deepEqual(calls.at(-2), { op: 'delete', table: 'lessons' });
+  assert.deepEqual(calls.at(-1), { op: 'eq-delete', column: 'id', value: 44 });
+});

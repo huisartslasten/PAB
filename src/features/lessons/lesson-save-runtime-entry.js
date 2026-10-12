@@ -125,11 +125,33 @@ export async function executeLessonSaveRuntimeEntry(runtime) {
   });
 }
 
+export async function executeLessonSubvakUpdate(runtime, id, subvak) {
+  const app = requireRuntime(runtime);
+  const authorization = await requireParentAccess({
+    session: app.currentSession,
+    parentIds: app.PARENT_IDS,
+    onDenied: message => {
+      app.showMessage(message, 'error');
+      app.showHome();
+    }
+  });
+  if (!authorization) return { ok: false, stage: 'authorization' };
+
+  const writeService = createLessonWriteService(app.db);
+  const lesson = await writeService.updateLessonSubvak(id, subvak);
+  await app.loadLessons();
+  await app.refreshPageSidebars();
+  return lesson;
+}
+
 export function installLessonSaveRuntimeEntry(runtime) {
   const app = requireRuntime(runtime);
   const legacySaveLesson = window.saveLesson;
   window.saveLesson = async function saveLessonRuntimeEntry() {
     return executeLessonSaveRuntimeEntry(app);
+  };
+  window.pacoGOUpdateLessonSubvak = async function updateLessonSubvakRuntimeEntry(id, subvak) {
+    return executeLessonSubvakUpdate(app, id, subvak);
   };
   return legacySaveLesson;
 }

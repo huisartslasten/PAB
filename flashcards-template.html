@@ -33,7 +33,17 @@
     const student = params.get('student') || 'Zyon';
     const mount = document.querySelector('#paco-template-mount');
     const content = document.createElement('div');
-    const goToDashboard = () => { window.location.href = 'index.html'; };
+    const goDashboard = () => {
+      const target = new URL('dashboard.html', window.location.href);
+      target.searchParams.set('student', student);
+      window.location.href = target.toString();
+    };
+    const goAgenda = () => {
+      const target = new URL('index.html', window.location.href);
+      target.searchParams.set('view', 'agenda');
+      target.searchParams.set('student', student);
+      window.location.href = target.toString();
+    };
     const goLessons = () => {
       const target = new URL('lessons.html', window.location.href);
       target.searchParams.set('student', student);
@@ -54,7 +64,7 @@
       icon:'🃏',
       subtitle:'Vraag → antwoord. Druk op Enter om verder te gaan.',
       navigation:[
-        { icon:'🏠', label:'Dashboard', onClick:goToDashboard },
+        { icon:'🏠', label:'Dashboard', onClick:goDashboard },
         { icon:'📚', label:'Mijn lessen', onClick:goLessons },
         { icon:'✏️', label:'Oefenen', onClick:()=>{
           const target=new URL('oefenen.html',window.location.href);
@@ -62,7 +72,7 @@
           target.searchParams.set('student',student);
           window.location.href=target.toString();
         } },
-        { icon:'📅', label:'Mijn agenda', onClick:goToDashboard },
+        { icon:'📅', label:'Mijn agenda', onClick:goAgenda },
         { icon:'🃏', label:'Flashcards', active:true }
       ],
       content

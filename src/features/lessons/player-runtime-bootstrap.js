@@ -9,36 +9,41 @@ export function createProfessionalPlayerBridge({
   db,
   gradeAnswer = null,
   persistence = null,
+  audioService,
   documentRef = globalThis.document,
   hideAll,
   showLessonChoice,
   goBack,
   clearActivity,
   escapeHtml,
-  speakAiText,
-  stopAiAudio = () => {},
   shuffle
 } = {}) {
   if (typeof getLesson !== 'function') throw new Error('A lesson provider is required.');
   if (typeof getStudent !== 'function') throw new Error('A student provider is required.');
   if (typeof hideAll !== 'function') throw new Error('A screen hide function is required.');
-  if (typeof clearActivity !== 'function') throw new Error('An activity cleanup function is required.');
+  if (typeof clearActivity !== 'function') throw new Error('A lesson cleanup function is required.');
   if (typeof escapeHtml !== 'function') throw new Error('An escapeHtml function is required.');
-  if (typeof speakAiText !== 'function') throw new Error('A speech function is required.');
+  if (!audioService || typeof audioService.speak !== 'function' || typeof audioService.stop !== 'function') throw new Error('A lesson audio service is required.');
 
   let entry = null;
   let activeLesson = null;
 
   const screen = createPlayerScreenBoundary({ documentRef, hideAll });
+  const speakCurrentItem = () => {
+    const session = entry?.runtime?.session;
+    const item = session?.currentItem();
+    if (!item) return Promise.resolve();
+    return audioService.speak(item.answer, {
+      onStatus: status => {
+        const node = documentRef?.getElementById?.('testVoiceStatus');
+        if (node) node.textContent = status;
+      }
+    });
+  };
   const testView = createPlayerTestView({
     documentRef,
     escapeHtml,
-    speakTest: () => {
-      const session = entry?.runtime?.session;
-      const item = session?.currentItem();
-      if (!item) return Promise.resolve();
-      return speakAiText(item.answer, 'testVoiceStatus');
-    }
+    speakTest: speakCurrentItem
   });
   const resultRenderer = createPlayerResultRenderer({ documentRef, escapeHtml });
 
@@ -58,8 +63,8 @@ export function createProfessionalPlayerBridge({
         screen.showResult();
         resultRenderer.render(payload);
       },
-      cancelSpeech: () => globalThis.window?.speechSynthesis?.cancel?.(),
-      stopAiAudio,
+      cancelSpeech: () => {},
+      stopAiAudio: () => audioService.stop(),
       clearActivity,
       showLessonChoice,
       goBack,
@@ -80,10 +85,7 @@ export function createProfessionalPlayerBridge({
   }
 
   async function speakTest() {
-    const session = entry?.runtime?.session;
-    const item = session?.currentItem();
-    if (!item) return;
-    await speakAiText(item.answer, 'testVoiceStatus');
+    await speakCurrentItem();
   }
 
   return Object.freeze({

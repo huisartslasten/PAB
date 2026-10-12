@@ -59,7 +59,7 @@ test('photo persistence creates lesson then inserts ordered items', async () => 
       { lesson_id: 42, question: 'kat', answer: 'dier', sort_order: 0, hint: '', min_words: 0, required_terms: [] },
       { lesson_id: 42, question: 'boom', answer: 'plant', sort_order: 1, hint: '', min_words: 0, required_terms: [] }
     ]]
-  );
+  ]);
 });
 
 test('photo persistence rolls back the lesson when item insertion fails', async () => {

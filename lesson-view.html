@@ -31,6 +31,17 @@
       target.searchParams.set('student', student);
       window.location.href = target.toString();
     };
+    const goDashboard = () => {
+      const target = new URL('dashboard.html', window.location.href);
+      target.searchParams.set('student', student);
+      window.location.href = target.toString();
+    };
+    const goAgenda = () => {
+      const target = new URL('index.html', window.location.href);
+      target.searchParams.set('view', 'agenda');
+      target.searchParams.set('student', student);
+      window.location.href = target.toString();
+    };
     const goLessons = () => { window.location.href = `lessons.html?student=${encodeURIComponent(student)}`; };
 
     mountPacoPageTemplate({
@@ -42,10 +53,10 @@
       icon:'👀',
       subtitle:'Bekijk de inhoud van deze les.',
       navigation:[
-        {icon:'🏠',label:'Dashboard',onClick:goChoice},
+        {icon:'🏠',label:'Dashboard',onClick:goDashboard},
         {icon:'📚',label:'Mijn lessen',active:true,onClick:goLessons},
         {icon:'📝',label:'Toetsen',onClick:goChoice},
-        {icon:'📅',label:'Mijn agenda',onClick:goChoice}
+        {icon:'📅',label:'Mijn agenda',onClick:goAgenda}
       ],
       content
     });

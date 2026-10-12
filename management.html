@@ -50,6 +50,7 @@
     const goDashboard = () => { window.location.href = 'dashboard.html'; };
     const goLessons = () => { window.location.href = 'lessons.html'; };
     const goTestHistory = () => { window.location.href = 'test-history.html'; };
+    const goCreator = () => { window.location.href = 'creator.html'; };
 
     mountPacoPageTemplate({
       mount,
@@ -63,7 +64,8 @@
         {icon:'🏠',label:'Dashboard',onClick:goDashboard},
         {icon:'📚',label:'Mijn lessen',onClick:goLessons},
         {icon:'📝',label:'Toetsgeschiedenis',onClick:goTestHistory},
-        {icon:'⚙️',label:'Beheer',active:true}
+        {icon:'⚙️',label:'Beheer',active:true},
+        {icon:'🧠',label:'Creator Console',onClick:goCreator}
       ],
       content
     });

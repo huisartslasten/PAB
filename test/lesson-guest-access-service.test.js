@@ -15,7 +15,8 @@ function dbFor(result) {
     eq(field, value) { calls.push(['eq', field, value]); return chain; },
     maybeSingle: async () => { calls.push(['maybeSingle']); return result; },
     update(value) { calls.push(['update', value]); return chain; },
-    insert(value) { calls.push(['insert', value]); return chain; }
+    insert(value) { calls.push(['insert', value]); return chain; },
+    then(resolve, reject) { return Promise.resolve(result).then(resolve, reject); }
   };
   return { db: { from(table) { calls.push(['from', table]); return chain; } }, calls };
 }

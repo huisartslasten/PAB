@@ -95,6 +95,7 @@
     content.appendChild(grid);
     renderChoices();
 
+    const goHome = () => { window.location.href = 'index.html'; };
     const goDashboard = () => {
       const target = new URL('dashboard.html', window.location.href);
       target.searchParams.set('student', student);
@@ -128,7 +129,7 @@
       navigation: [
         { icon:'🏠', label:'Dashboard', onClick:goDashboard },
         { icon:'📚', label:'Mijn lessen', onClick:goLessons },
-        { icon:'📝', label:'Toetsen', onClick:goDashboard },
+        { icon:'📝', label:'Toetsen', onClick:goHome },
         { icon:'📅', label:'Mijn agenda', onClick:goAgenda }
       ],
       content

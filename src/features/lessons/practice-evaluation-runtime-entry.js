@@ -46,21 +46,11 @@ export function createPracticeEvaluationRuntimeEntry({ db = null, gradeAnswer: i
     return result(grading?.correct === true, fixedRules, grading?.feedback || '');
   }
 
-  async function gradeAnswer(...args) {
-    return resolveGrading(...args);
-  }
-
-  return Object.freeze({ evaluate, gradeAnswer, getPracticeAnswerParts });
+  return Object.freeze({
+    evaluate,
+    getPracticeAnswerParts
+  });
 }
 
 export const createPracticeEvaluationRuntime = createPracticeEvaluationRuntimeEntry;
 export { countAnswerWords, evaluateFixedAnswerRules } from './practice-evaluation.js';
-
-export function installPracticeEvaluationRuntimeEntry(dependencies, target = globalThis) {
-  if (!target || typeof target !== 'object') throw new Error('A practice evaluation runtime target is required.');
-  const entry = createPracticeEvaluationRuntimeEntry(dependencies);
-  target.pacoGOPracticeEvaluationRuntime = entry;
-  target.pacoGOPracticeEvaluationReady = Promise.resolve(entry);
-  target.pacoGOPracticeEvaluation = (item, userAnswer, options) => entry.evaluate(item, userAnswer, options);
-  return entry;
-}

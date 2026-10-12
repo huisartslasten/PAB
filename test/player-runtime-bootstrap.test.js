@@ -23,6 +23,7 @@ function documentDouble() {
     testTitle: { textContent: '' },
     testProgress: { innerHTML: '' },
     testContent: { innerHTML: '', querySelector() { return null; } },
+    testVoiceStatus: { textContent: '' },
     resultTitle: { textContent: '' },
     resultScore: { textContent: '' },
     resultDetails: { innerHTML: '' }
@@ -41,19 +42,22 @@ test('professional player bridge owns the V4.78 test entry seam', async () => {
   const audio = [];
   const cleanup = [];
   const persistence = { async saveTestResult(payload) { return payload; } };
+  const audioService = {
+    async speak(...args) { speech.push(args); },
+    stop() { audio.push(true); }
+  };
   const bridge = createProfessionalPlayerBridge({
     getLesson: lesson,
     getStudent: () => 'Zyon',
     db: null,
     persistence,
+    audioService,
     documentRef,
     hideAll: () => hidden.push(true),
     showLessonChoice: () => {},
     goBack: () => {},
     clearActivity: () => cleanup.push(true),
     escapeHtml: value => String(value),
-    speakAiText: async (...args) => { speech.push(args); },
-    stopAiAudio: () => audio.push(true),
     gradeAnswer: async (_question, expected, given) => ({ correct: expected === given, feedback: '' }),
     shuffle: items => [...items]
   });

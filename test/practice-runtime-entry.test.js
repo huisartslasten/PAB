@@ -94,3 +94,37 @@ test('practice entry delegates completion to the runtime and finish callback', (
   assert.equal(snapshot.finished, true);
   assert.equal(finished.length, 1);
 });
+
+test('practice entry supports self assessment without invoking answer evaluation', () => {
+  const { calls, evaluateAnswer } = evaluatorCalls();
+  const answers = [];
+  const finished = [];
+  const mastery = masteryService();
+  const runtime = createPracticeRuntimeEntry({
+    lesson: { ...lessonFixture(), type: 'questions' },
+    student: 'Zyon',
+    evaluateAnswer,
+    masteryService: mastery,
+    shuffle: items => [...items],
+    random: () => 0,
+    render: () => {},
+    onAnswer: result => answers.push(result),
+    onFinish: snapshot => finished.push(snapshot)
+  });
+
+  runtime.start();
+  const first = runtime.assess(true);
+
+  assert.equal(first.correct, true);
+  assert.equal(first.done, false);
+  assert.equal(calls.length, 0);
+  assert.deepEqual(mastery.calls[0], { student: 'Zyon', lessonId: 42, itemId: 'a', correct: true });
+  assert.equal(answers.length, 1);
+
+  runtime.next();
+  const second = runtime.assess(false);
+  assert.equal(second.correct, false);
+  assert.equal(second.done, false);
+  assert.equal(mastery.calls[1].correct, false);
+  assert.equal(finished.length, 0);
+});

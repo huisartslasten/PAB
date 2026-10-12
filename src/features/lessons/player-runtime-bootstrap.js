@@ -16,16 +16,14 @@ export function createProfessionalPlayerBridge({
   escapeHtml,
   speakAiText,
   stopAiAudio = () => {},
-  gradeAnswer,
   shuffle
 } = {}) {
   if (typeof getLesson !== 'function') throw new Error('A lesson provider is required.');
   if (typeof getStudent !== 'function') throw new Error('A student provider is required.');
   if (typeof hideAll !== 'function') throw new Error('A screen hide function is required.');
-  if (typeof clearActivity !== 'function') throw new Error('An activity cleanup function is required.');
+  if (typeof clearActivity !== 'function') throw new Error('A activity cleanup function is required.');
   if (typeof escapeHtml !== 'function') throw new Error('An escapeHtml function is required.');
   if (typeof speakAiText !== 'function') throw new Error('A speech function is required.');
-  if (typeof gradeAnswer !== 'function') throw new Error('An answer grader is required.');
 
   let entry = null;
   let activeLesson = null;
@@ -63,7 +61,6 @@ export function createProfessionalPlayerBridge({
       clearActivity,
       showLessonChoice,
       goBack,
-      gradeAnswer,
       shuffle,
       documentRef
     });

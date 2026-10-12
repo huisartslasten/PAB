@@ -10,6 +10,7 @@ export function createApplicationPlayerRuntime({
   lesson = null,
   student = null,
   db = null,
+  gradeAnswer = null,
   persistence = null,
   renderResult = null,
   cancelSpeech = () => {},
@@ -24,7 +25,7 @@ export function createApplicationPlayerRuntime({
   if (typeof renderResult !== 'function') throw new Error('A result renderer is required.');
 
   const playerPersistence = persistence || createPlayerPersistence(db, { clock });
-  const practiceEvaluationRuntime = createPracticeEvaluationRuntimeEntry({ db });
+  const practiceEvaluationRuntime = createPracticeEvaluationRuntimeEntry({ db, gradeAnswer });
 
   return createPlayerRuntimeAdapter({
     lesson,

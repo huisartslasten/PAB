@@ -9,7 +9,7 @@ export async function createLessonFromPhotoRuntime({
   title,
   type,
   pairs,
-  persistLesson,
+  createLessonWithItems,
   loadLessons,
   lessons,
   setCurrentStudent,
@@ -22,7 +22,7 @@ export async function createLessonFromPhotoRuntime({
   showParentDashboard
 } = {}) {
   requireFunction(authorize, 'A photo-lesson authorization function is required.');
-  requireFunction(persistLesson, 'A photo-lesson persistence function is required.');
+  requireFunction(createLessonWithItems, 'A photo-lesson persistence function is required.');
   requireFunction(loadLessons, 'A lesson loader is required.');
   requireFunction(setCurrentStudent, 'A current-student setter is required.');
   requireFunction(setCurrentSubject, 'A current-subject setter is required.');
@@ -31,7 +31,10 @@ export async function createLessonFromPhotoRuntime({
 
   if (!(await authorize())) return Object.freeze({ ok: false, stage: 'authorization' });
 
-  const created = await persistLesson({ student, subject, title, type, pairs });
+  const created = await createLessonWithItems({
+    lesson: { student, subject, title, type },
+    items: pairs
+  });
 
   await loadLessons();
   setCurrentStudent(student);

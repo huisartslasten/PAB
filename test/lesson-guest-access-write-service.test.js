@@ -6,7 +6,7 @@ import {
   listGuestLessonAssignments,
   updateGuestLessonAssignment,
   createGuestLessonAssignment
-} from '../src/features/lessons/lesson-guest-access-write-service.js';
+} from '../src/features/lessons/lesson-guest-access-service.js';
 
 function dbFor(result) {
   const calls = [];

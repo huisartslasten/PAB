@@ -31,6 +31,7 @@ export function createPracticePresentation({
   getLesson,
   getStudent,
   db = null,
+  masteryService = null,
   audioService = null,
   shuffle = items => [...items],
   random = Math.random,
@@ -66,7 +67,7 @@ export function createPracticePresentation({
     const { progress } = snapshot;
     const el = elements().progress;
     if (!el) return;
-    el.innerHTML = `<div class="progress-label"><span>${progress.mastered} / ${progress.total} beheerst</span><span>Nog ${progress.remaining}</span></div><div class="progress"><div class="progress-bar" style="width:${progress.percentage}%"></div></div>`;
+    el.innerHTML = `<div class="progress-label"><span>${progress.mastered} / ${progress.total} beheerst</span><span>Nog ${progress.remaining}</span></div><div class="progress"><div class="progress-bar"><div class="progress-bar" style="width:${progress.percentage}%"></div></div></div>`;
   }
 
   function renderCurrent(snapshot) {
@@ -150,6 +151,7 @@ export function createPracticePresentation({
       db,
       lesson: { ...lesson, type },
       student: getStudent(),
+      masteryService,
       shuffle,
       random,
       aiCheckAnswers: lesson.ai_check_answers !== false && aiCheckAnswers,

@@ -24,7 +24,7 @@ test('creator runtime entry exposes creator actions through the runtime boundary
 
 test('creator runtime entry requires creator authorization function', () => {
   assert.throws(
-    () => installCreatorRuntimeEntry({ db: { from() {} } }, {}),
+    () => installCreatorRuntimeEntry({ db: { from() {} }, canCreate: true }, {}),
     /canCreate function/
   );
 });

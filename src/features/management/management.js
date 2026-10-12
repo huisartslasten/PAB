@@ -1,6 +1,7 @@
 import { appState, setStudent } from '../../core/state.js';
 import { getActiveStudentLessons, getStudentLessons } from '../lessons/visibility.js';
 import { createLessonRecovery } from '../lessons/recovery.js';
+import { getAllArchiveEntries, getAllTrashEntries } from './recovery.js';
 import { isKnownStudent, listStudents } from '../students/students.js';
 
 function requireParent(auth) {
@@ -61,6 +62,13 @@ export function createManagement({ auth, lessonService, feedbackService, loadLes
   function getAllScopedLessons() {
     assertParent();
     return getStudentLessons(appState.lessons, requireStudent());
+  }
+
+  function getRecoveryLessons(mode) {
+    assertParent();
+    if (mode === 'archive') return getAllArchiveEntries(appState.lessons);
+    if (mode === 'trash') return getAllTrashEntries(appState.lessons);
+    throw new Error('Unknown recovery mode.');
   }
 
   async function createLesson(payload = {}) {
@@ -126,6 +134,7 @@ export function createManagement({ auth, lessonService, feedbackService, loadLes
     loadLessons: refreshLessons,
     getScopedLessons,
     getAllScopedLessons,
+    getRecoveryLessons,
     createLesson,
     updateLesson,
     archiveLesson,

@@ -135,3 +135,17 @@ test('practice entry supports self assessment without invoking answer evaluation
   assert.equal(finished.length, 1);
   assert.equal(calls.length, 0);
 });
+
+test('questions entry does not require an evaluator dependency', () => {
+  const runtime = createPracticeRuntimeEntry({
+    lesson: { ...lessonFixture(), type: 'questions' },
+    shuffle: items => [...items],
+    random: () => 0,
+    render: () => {}
+  });
+
+  const started = runtime.start();
+  assert.equal(started.type, 'questions');
+  assert.equal(started.current.id, 'a');
+  assert.equal(runtime.assess(true).correct, true);
+});

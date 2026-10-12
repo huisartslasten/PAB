@@ -14,6 +14,16 @@ function lesson() {
   };
 }
 
+function gradingDb() {
+  return {
+    functions: {
+      async invoke() {
+        return { data: { correct: false, feedback: '' }, error: null };
+      }
+    }
+  };
+}
+
 test('application player composition requires the application-owned lesson context', () => {
   assert.throws(
     () => createApplicationPlayerRuntime({
@@ -44,6 +54,7 @@ test('application player composition wires application dependencies into the pla
   const runtime = createApplicationPlayerRuntime({
     lesson: lesson(),
     student: 'Zyon',
+    db: gradingDb(),
     persistence,
     renderResult: payload => calls.push(['render', payload]),
     cancelSpeech: () => calls.push(['cancel']),

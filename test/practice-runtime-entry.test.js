@@ -127,4 +127,11 @@ test('practice entry supports self assessment without invoking answer evaluation
   assert.equal(second.done, false);
   assert.equal(mastery.calls[1].correct, false);
   assert.equal(finished.length, 0);
+
+  const completed = runtime.assess(true);
+  assert.equal(completed.correct, true);
+  assert.equal(completed.done, true);
+  assert.equal(completed.snapshot.finished, true);
+  assert.equal(finished.length, 1);
+  assert.equal(calls.length, 0);
 });

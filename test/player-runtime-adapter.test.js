@@ -24,7 +24,8 @@ test('player runtime adapter starts a typed V4.78-style test session', () => {
     lesson: lesson(),
     student: 'Zyon',
     persistence: { saveTestResult: async () => ({}) },
-    renderResult: async () => {}
+    renderResult: async () => {},
+    evaluateAnswer: exactGrade
   });
 
   const session = adapter.startTest({ shuffle: items => items });
@@ -47,7 +48,7 @@ test('player runtime adapter submits raw answers through the canonical test engi
     lesson: lesson(),
     student: 'Zyon',
     persistence,
-    gradeAnswer: exactGrade,
+    evaluateAnswer: exactGrade,
     cancelSpeech: () => calls.push({ kind: 'cancel' }),
     renderResult: async payload => calls.push({ kind: 'render', payload }),
     clearActivity: () => calls.push({ kind: 'clear' }),
@@ -103,6 +104,7 @@ test('player runtime adapter preserves V4.78 behavior when history save fails', 
         throw new Error('history unavailable');
       }
     },
+    evaluateAnswer: exactGrade,
     cancelSpeech: () => calls.push('cancel'),
     renderResult: async payload => {
       calls.push('render');
@@ -129,6 +131,7 @@ test('player runtime adapter preserves exact V4.78 result navigation callbacks',
     lesson: lesson(),
     persistence: { saveTestResult: async () => ({}) },
     renderResult: async () => {},
+    evaluateAnswer: exactGrade,
     showLessonChoice: selectedLesson => calls.push(['choice', selectedLesson.id]),
     goBack: () => calls.push(['back'])
   });

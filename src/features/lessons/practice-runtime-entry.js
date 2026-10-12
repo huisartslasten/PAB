@@ -54,9 +54,7 @@ export function createPracticeRuntimeEntry({
     return current;
   }
 
-  async function submit(answer) {
-    const item = runtime.current;
-    const result = await runtime.submit(answer);
+  function enrichResult(result, item) {
     const masteryState = student && item
       ? mastery.record(student, lesson.id, item.id, result.correct === true)
       : null;
@@ -70,6 +68,18 @@ export function createPracticeRuntimeEntry({
     return enrichedResult;
   }
 
+  async function submit(answer) {
+    const item = runtime.current;
+    const result = await runtime.submit(answer);
+    return enrichResult(result, item);
+  }
+
+  function assess(correct, evaluation = null) {
+    const item = runtime.current;
+    const result = runtime.assess(correct, evaluation);
+    return enrichResult(result, item);
+  }
+
   function finish() {
     const snapshot = runtime.finish();
     onFinish(snapshot);
@@ -81,6 +91,7 @@ export function createPracticeRuntimeEntry({
     start,
     next,
     submit,
+    assess,
     finish,
     render: renderCurrent
   });

@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — Creator Console</title>
+  <link rel="stylesheet" href="src/components/page-template.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .creator-page{display:grid;gap:22px}
+    .creator-section{display:grid;gap:14px;padding:20px;border:1px solid #dce9f6;border-radius:18px;background:#fff;box-shadow:0 8px 22px rgba(16,43,87,.07)}
+    .creator-section h2{margin:0;color:#102b57}
+    .creator-form{display:grid;gap:10px}
+    .creator-form input,.creator-form textarea,.creator-form select{box-sizing:border-box;width:100%;padding:11px 12px;border:1px solid #cdddec;border-radius:12px;font:inherit}
+    .creator-form textarea{min-height:110px;resize:vertical}
+    .creator-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .creator-rule,.creator-note{display:grid;gap:10px;padding:14px;border:1px solid #e2ebf4;border-radius:14px;background:#f9fcff}
+    .creator-rule{grid-template-columns:auto 1fr auto;align-items:start}
+    .creator-rule label{color:#38577d;line-height:1.45}
+    .creator-rule input{margin-top:4px}
+    .creator-rule button,.creator-note button{border:0;border-radius:10px;padding:8px 10px;cursor:pointer;font-weight:900}
+    .creator-note-head{display:flex;justify-content:space-between;gap:12px;align-items:start}
+    .creator-chip{display:inline-block;padding:4px 8px;border-radius:999px;background:#eaf4ff;color:#126fc9;font-size:12px;font-weight:900}
+    .creator-chip.done{background:#e9f8ef;color:#16804b}
+    .creator-note-meta{margin-top:5px;color:#667894;font-size:12px}
+    .creator-note-body{white-space:pre-wrap;color:#38577d;line-height:1.5}
+    .creator-empty{padding:12px 14px;color:#667894;background:#f8fbfe;border-radius:12px}
+    .creator-error{padding:12px 14px;color:#b42318;background:#fff0f0;border-radius:12px;font-weight:800}
+    .creator-success{padding:12px 14px;color:#16804b;background:#e9f8ef;border-radius:12px;font-weight:800}
+  </style>
+</head>
+<body>
+  <div id="paco-template-mount"></div>
+  <script type="module">
+    import { mountPacoPageTemplate } from './src/components/page-template.js';
+    import { createPacoGOApp } from './src/app/bootstrap.js';
+
+    const mount = document.querySelector('#paco-template-mount');
+    const content = document.createElement('div');
+    content.className = 'creator-page';
+    const app = createPacoGOApp({ supabaseLib: window.supabase });
+    const goManagement = () => { window.location.href = 'management.html'; };
+    const goDashboard = () => { window.location.href = 'dashboard.html'; };
+
+    mountPacoPageTemplate({
+      mount,
+      backLabel:'← Beheer',
+      backAction:goManagement,
+      greeting:'PacoGO Creator 🧠',
+      title:'Creator Console',
+      icon:'🧠',
+      subtitle:'Beheer extra AI-afspraken en ontwikkelnotities.',
+      navigation:[
+        {icon:'🏠',label:'Dashboard',onClick:goDashboard},
+        {icon:'⚙️',label:'Beheer',onClick:goManagement},
+        {icon:'🧠',label:'Creator Console',active:true}
+      ],
+      content
+    });
+
+    const status = document.createElement('div');
+    const rulesSection = document.createElement('section');
+    rulesSection.className = 'creator-section';
+    const rulesTitle = document.createElement('h2');
+    rulesTitle.textContent = '🤖 AI-afspraken';
+    const rulesForm = document.createElement('form');
+    rulesForm.className = 'creator-form';
+    const ruleInput = document.createElement('input');
+    ruleInput.type = 'text';
+    ruleInput.placeholder = 'Nieuwe extra AI-afspraak';
+    ruleInput.autocomplete = 'off';
+    const ruleActions = document.createElement('div');
+    ruleActions.className = 'creator-actions';
+    const ruleSubmit = document.createElement('button');
+    ruleSubmit.type = 'submit';
+    ruleSubmit.textContent = 'AI-afspraak toevoegen';
+    ruleActions.append(ruleSubmit);
+    rulesForm.append(ruleInput, ruleActions);
+    const rulesList = document.createElement('div');
+    rulesList.className = 'creator-page';
+    rulesSection.append(rulesTitle, rulesForm, rulesList);
+
+    const notesSection = document.createElement('section');
+    notesSection.className = 'creator-section';
+    const notesTitle = document.createElement('h2');
+    notesTitle.textContent = '📝 Ontwikkelnotities';
+    const noteForm = document.createElement('form');
+    noteForm.className = 'creator-form';
+    const noteType = document.createElement('select');
+    [['problem','🐛 Probleem'],['improvement','🔧 Verbetering'],['idea','💡 Idee'],['ai_rule','🤖 AI-afspraak'],['other','❓ Anders']].forEach(([value,label]) => {
+      const option = document.createElement('option'); option.value = value; option.textContent = label; noteType.append(option);
+    });
+    const noteTitle = document.createElement('input');
+    noteTitle.type = 'text'; noteTitle.placeholder = 'Onderwerp';
+    const noteBody = document.createElement('textarea');
+    noteBody.placeholder = 'Notitie';
+    const noteActions = document.createElement('div');
+    noteActions.className = 'creator-actions';
+    const noteSubmit = document.createElement('button');
+    noteSubmit.type = 'submit'; noteSubmit.textContent = 'Notitie opslaan';
+    noteActions.append(noteSubmit);
+    noteForm.append(noteType, noteTitle, noteBody, noteActions);
+    const notesList = document.createElement('div');
+    notesList.className = 'creator-page';
+    notesSection.append(notesTitle, noteForm, notesList);
+
+    content.append(status, rulesSection, notesSection);
+
+    function showStatus(text, error = false) {
+      status.className = error ? 'creator-error' : 'creator-success';
+      status.textContent = text;
+      window.clearTimeout(showStatus.timer);
+      showStatus.timer = window.setTimeout(() => status.replaceChildren(), 3500);
+    }
+
+    function empty(text) {
+      const el = document.createElement('div');
+      el.className = 'creator-empty';
+      el.textContent = text;
+      return el;
+    }
+
+    const labels = { problem:'🐛 Probleem', improvement:'🔧 Verbetering', idea:'💡 Idee', ai_rule:'🤖 AI-afspraak', other:'❓ Anders' };
+
+    async function renderRules() {
+      rulesList.replaceChildren();
+      try {
+        const rules = await app.creator.listAiRules();
+        if (!rules.length) { rulesList.append(empty('Nog geen extra AI-afspraken. De vaste AI-regel werkt altijd.')); return; }
+        rules.forEach(rule => {
+          const row = document.createElement('div'); row.className = 'creator-rule';
+          const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.checked = Boolean(rule.enabled);
+          checkbox.addEventListener('change', async () => {
+            checkbox.disabled = true;
+            try { await app.creator.setAiRuleEnabled(rule.id, checkbox.checked); showStatus('AI-afspraak aangepast.'); }
+            catch (error) { checkbox.checked = !checkbox.checked; showStatus(error?.message || 'AI-afspraak kon niet worden aangepast.', true); }
+            finally { checkbox.disabled = false; }
+          });
+          const label = document.createElement('label'); label.textContent = rule.rule_text;
+          const remove = document.createElement('button'); remove.type = 'button'; remove.textContent = '🗑️'; remove.title = 'Verwijderen';
+          remove.addEventListener('click', async () => {
+            if (!window.confirm('Deze extra AI-afspraak verwijderen?')) return;
+            remove.disabled = true;
+            try { await app.creator.deleteAiRule(rule.id); await renderRules(); showStatus('AI-afspraak verwijderd.'); }
+            catch (error) { remove.disabled = false; showStatus(error?.message || 'AI-afspraak kon niet worden verwijderd.', true); }
+          });
+          row.append(checkbox, label, remove); rulesList.append(row);
+        });
+      } catch (error) { rulesList.append(empty(error?.message || 'AI-afspraken konden niet worden geladen.')); }
+    }
+
+    async function renderNotes() {
+      notesList.replaceChildren();
+      try {
+        const notes = await app.creator.listNotes();
+        if (!notes.length) { notesList.append(empty('Nog geen ontwikkelnotities.')); return; }
+        notes.forEach(note => {
+          const card = document.createElement('article'); card.className = 'creator-note';
+          const head = document.createElement('div'); head.className = 'creator-note-head';
+          const meta = document.createElement('div');
+          const type = document.createElement('span'); type.className = `creator-chip${note.status === 'done' ? ' done' : ''}`; type.textContent = labels[note.note_type] || note.note_type;
+          const date = document.createElement('div'); date.className = 'creator-note-meta'; date.textContent = note.created_at ? new Intl.DateTimeFormat('nl-NL',{dateStyle:'medium',timeStyle:'short'}).format(new Date(note.created_at)) : 'Onbekende datum';
+          meta.append(type, date);
+          const state = document.createElement('span'); state.className = `creator-chip${note.status === 'done' ? ' done' : ''}`; state.textContent = note.status === 'done' ? '✅ Klaar' : '🟡 Open';
+          head.append(meta, state);
+          const title = document.createElement('h3'); title.textContent = note.title;
+          const body = document.createElement('div'); body.className = 'creator-note-body'; body.textContent = note.body;
+          const actions = document.createElement('div'); actions.className = 'creator-actions';
+          const toggle = document.createElement('button'); toggle.type = 'button'; toggle.textContent = note.status === 'done' ? '↩️ Heropenen' : '✅ Markeer als klaar';
+          toggle.addEventListener('click', async () => { toggle.disabled = true; try { await app.creator.toggleNoteStatus(note.id); await renderNotes(); showStatus('Notitie aangepast.'); } catch (error) { toggle.disabled = false; showStatus(error?.message || 'Notitie kon niet worden aangepast.', true); } });
+          const remove = document.createElement('button'); remove.type = 'button'; remove.textContent = '🗑️ Verwijderen';
+          remove.addEventListener('click', async () => { if (!window.confirm('Deze ontwikkelnotitie verwijderen?')) return; remove.disabled = true; try { await app.creator.deleteNote(note.id); await renderNotes(); showStatus('Notitie verwijderd.'); } catch (error) { remove.disabled = false; showStatus(error?.message || 'Notitie kon niet worden verwijderd.', true); } });
+          actions.append(toggle, remove);
+          card.append(head, title, body, actions); notesList.append(card);
+        });
+      } catch (error) { notesList.append(empty(error?.message || 'Ontwikkelnotities konden niet worden geladen.')); }
+    }
+
+    rulesForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      ruleSubmit.disabled = true;
+      try { await app.creator.addAiRule(ruleInput.value); ruleInput.value = ''; await renderRules(); showStatus('AI-afspraak toegevoegd.'); }
+      catch (error) { showStatus(error?.message || 'AI-afspraak kon niet worden opgeslagen.', true); }
+      finally { ruleSubmit.disabled = false; }
+    });
+
+    noteForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      noteSubmit.disabled = true;
+      try { await app.creator.addNote({ noteType: noteType.value, title: noteTitle.value, body: noteBody.value }); noteTitle.value = ''; noteBody.value = ''; await renderNotes(); showStatus('Ontwikkelnotitie opgeslagen.'); }
+      catch (error) { showStatus(error?.message || 'Ontwikkelnotitie kon niet worden opgeslagen.', true); }
+      finally { noteSubmit.disabled = false; }
+    });
+
+    try {
+      await app.initializeSession();
+      if (!app.auth.isCreator) throw new Error('Alleen de hoofdbeheerder heeft toegang tot de Creator Console.');
+      await Promise.all([renderRules(), renderNotes()]);
+    } catch (error) {
+      content.replaceChildren(empty(error?.message || 'Creator Console kon niet worden geladen.'));
+    }
+  </script>
+</body>
+</html>

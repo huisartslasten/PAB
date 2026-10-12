@@ -101,7 +101,7 @@ test('lesson write service rolls back the created lesson when canonical item per
       explanation: '', ai_check_answers: false, ai_instruction: '', editor_labels: null
     } },
     { op: 'from', table: 'lesson_items' },
-    { op: 'insert', table: 'lesson_items', payload: [{ question: 'Vraag', answer: 'Antwoord', lesson_id: 41 }] },
+    { op: 'insert', table: 'lesson_items', payload: [{ question: 'Vraag', answer: 'Antwoord', hint: '', min_words: 0, required_terms: [], lesson_id: 41 }] },
     { op: 'from', table: 'lessons' },
     { op: 'delete', table: 'lessons' },
     { op: 'eq-delete', table: 'lessons', column: 'id', value: 41 }

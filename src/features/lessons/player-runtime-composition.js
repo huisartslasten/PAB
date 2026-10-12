@@ -4,6 +4,7 @@
 
 import { createPlayerRuntimeAdapter } from './player-runtime-adapter.js';
 import { createPlayerPersistence } from './player-persistence.js';
+import { createAnswerGradingService } from '../../services/answer-grading-service.js';
 
 export function createApplicationPlayerRuntime({
   lesson = null,
@@ -16,14 +17,14 @@ export function createApplicationPlayerRuntime({
   showLessonChoice = () => {},
   goBack = () => {},
   clock = () => new Date().toISOString(),
-  createSession,
-  gradeAnswer = null
+  createSession
 } = {}) {
   if (!lesson || typeof lesson !== 'object') throw new Error('A lesson is required.');
   if (!student) throw new Error('A student is required.');
   if (typeof renderResult !== 'function') throw new Error('A result renderer is required.');
 
   const playerPersistence = persistence || createPlayerPersistence(db, { clock });
+  const answerGradingService = createAnswerGradingService(db);
 
   return createPlayerRuntimeAdapter({
     lesson,
@@ -36,6 +37,6 @@ export function createApplicationPlayerRuntime({
     goBack,
     clock,
     ...(createSession ? { createSession } : {}),
-    gradeAnswer
+    gradeAnswer: answerGradingService.gradeAnswer
   });
 }

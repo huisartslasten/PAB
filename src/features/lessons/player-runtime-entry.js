@@ -9,6 +9,7 @@ export function createPlayerRuntimeEntry({
   lesson = null,
   student = null,
   db = null,
+  gradeAnswer = null,
   persistence = null,
   prepareTestView = () => {},
   renderTest = null,
@@ -27,7 +28,7 @@ export function createPlayerRuntimeEntry({
   if (typeof renderTest !== 'function') throw new Error('A test renderer is required.');
   if (shuffle !== null && typeof shuffle !== 'function') throw new Error('A shuffle function is required when provided.');
 
-  const runtime = createApplicationPlayerRuntime({ lesson, student, db, persistence, renderResult, cancelSpeech, clearActivity, showLessonChoice, goBack, clock, createSession });
+  const runtime = createApplicationPlayerRuntime({ lesson, student, db, gradeAnswer, persistence, renderResult, cancelSpeech, clearActivity, showLessonChoice, goBack, clock, createSession });
   const submitBoundary = createPlayerSubmitBoundary({ adapter: runtime, documentRef });
 
   function renderCurrentTest() {

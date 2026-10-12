@@ -16,8 +16,11 @@ function mockDb({ rows = [], insertError = null, updateError = null, deleteError
               if (table === 'lesson_items') {
                 return Promise.resolve({ data: payload, error: insertError });
               }
-              const selected = Promise.resolve({ data: rows[0] ?? { id: 41 }, error: insertError });
-              selected.single = () => Promise.resolve({ data: rows[0] ?? { id: 41 }, error: insertError });
+              const selected = {
+                single() {
+                  return Promise.resolve({ data: rows[0] ?? { id: 41 }, error: insertError });
+                }
+              };
               return selected;
             }
           };
@@ -53,7 +56,7 @@ function mockDb({ rows = [], insertError = null, updateError = null, deleteError
   };
 }
 
-test('lesson write service creates lesson before replacing its items', async () => {
+test('lesson write service creates a lesson and its items through canonical createLessonWithItems ownership', async () => {
   const db = mockDb({ rows: [{ id: 41, title: 'Nieuwe les' }] });
   const service = createLessonWriteService(db);
 
@@ -88,9 +91,6 @@ test('lesson write service creates lesson before replacing its items', async () 
       }
     },
     { op: 'from', table: 'lesson_items' },
-    { op: 'delete', table: 'lesson_items' },
-    { op: 'eq-delete', table: 'lesson_items', column: 'lesson_id', value: 41 },
-    { op: 'from', table: 'lesson_items' },
     {
       op: 'insert',
       table: 'lesson_items',
@@ -98,6 +98,37 @@ test('lesson write service creates lesson before replacing its items', async () 
         question: 'Vraag', answer: 'Antwoord', hint: '', min_words: 0, required_terms: [], lesson_id: 41
       }]
     }
+  ]);
+});
+
+test('lesson write service rolls back the created lesson when canonical item persistence fails', async () => {
+  const itemError = new Error('item insert failed');
+  const db = mockDb({ insertError: itemError, rows: [{ id: 41 }] });
+  const service = createLessonWriteService(db);
+
+  await assert.rejects(
+    () => service.saveLesson({
+      lesson: { student: 'Zyon', subject: 'Rekenen', title: 'Les', type: 'math' },
+      items: [{ question: 'Vraag', answer: 'Antwoord' }]
+    }),
+    itemError
+  );
+
+  assert.deepEqual(db.calls, [
+    { op: 'from', table: 'lessons' },
+    {
+      op: 'insert',
+      table: 'lessons',
+      payload: {
+        student: 'Zyon', subject: 'Rekenen', subvak: undefined, title: 'Les', type: 'math',
+        explanation: '', ai_check_answers: false, ai_instruction: '', editor_labels: null
+      }
+    },
+    { op: 'from', table: 'lesson_items' },
+    { op: 'insert', table: 'lesson_items', payload: [{ question: 'Vraag', answer: 'Antwoord', lesson_id: 41 }] },
+    { op: 'from', table: 'lessons' },
+    { op: 'delete', table: 'lessons' },
+    { op: 'eq-delete', table: 'lessons', column: 'id', value: 41 }
   ]);
 });
 
@@ -152,26 +183,7 @@ test('lesson write service propagates create errors before touching items', asyn
   assert.equal(db.calls.some(call => call.table === 'lesson_items'), false);
 });
 
-test('lesson write service preserves editor item ordering during replacement', async () => {
-  const db = mockDb({ rows: [{ id: 41 }] });
-  const service = createLessonWriteService(db);
-
-  await service.saveLesson({
-    lesson: { student: 'Zyon', subject: 'Nederlands', title: 'Woorden', type: 'words' },
-    items: [
-      { question: 'Eerste', answer: '1', sort_order: 3 },
-      { question: 'Tweede', answer: '2', sort_order: 7 }
-    ]
-  });
-
-  const itemInsert = db.calls.find(call => call.op === 'insert' && call.table === 'lesson_items');
-  assert.deepEqual(itemInsert.payload, [
-    { question: 'Eerste', answer: '1', sort_order: 3, hint: '', min_words: 0, required_terms: [], lesson_id: 41 },
-    { question: 'Tweede', answer: '2', sort_order: 7, hint: '', min_words: 0, required_terms: [], lesson_id: 41 }
-  ]);
-});
-
-test('lesson write service preserves the editor item normalization contract', async () => {
+test('lesson write service delegates item normalization to the lesson service', async () => {
   const db = mockDb({ rows: [{ id: 41 }] });
   const service = createLessonWriteService(db);
 

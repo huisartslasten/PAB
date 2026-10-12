@@ -102,7 +102,7 @@ export function createPracticePresentation({
       return;
     }
 
-    content.innerHTML = `<div class="small">Typ hier het woord.</div>${hintHtml(item, escapeHtml)}<div class="prompt">${escapeHtml(item.question)}</div><input id="practiceAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier een antwoord in"><div id="practiceFeedback" class="feedback"></div><button class="big" onclick="checkPractice()">Controleren</button>`;
+    content.innerHTML = `<div class="small">Typ hier het woord.</div>${hintHtml(item, escapeHtml)}<div class="prompt">${escapeHtml(item.question)}</div><input id="practiceAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier het woord in"><div id="practiceFeedback" class="feedback"></div><button class="big" onclick="checkPractice()">Controleren</button>`;
     documentRef.getElementById('practiceAnswer')?.focus();
   }
 

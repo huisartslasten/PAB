@@ -4,6 +4,7 @@ import { createPracticeRuntimeEntry } from '../src/features/lessons/practice-run
 
 function lessonFixture() {
   return {
+    id: 42,
     type: 'words',
     ai_check_answers: true,
     lesson_items: [
@@ -22,15 +23,29 @@ function evaluatorCalls() {
   return { calls, evaluateAnswer };
 }
 
+function masteryService() {
+  const calls = [];
+  return {
+    calls,
+    record(student, lessonId, itemId, correct) {
+      calls.push({ student, lessonId, itemId, correct });
+      return { streak: correct ? 1 : 0, mastered: false };
+    }
+  };
+}
+
 test('practice entry composes preparation, rendering and runtime state without owning evaluation', async () => {
   const { calls, evaluateAnswer } = evaluatorCalls();
   const renders = [];
   const prepared = [];
   const answers = [];
   const finished = [];
+  const mastery = masteryService();
   const runtime = createPracticeRuntimeEntry({
     lesson: lessonFixture(),
+    student: 'Zyon',
     evaluateAnswer,
+    masteryService: mastery,
     shuffle: items => [...items],
     random: () => 0,
     prepare: context => prepared.push(context),
@@ -48,9 +63,15 @@ test('practice entry composes preparation, rendering and runtime state without o
   const first = await runtime.submit('ster');
   assert.equal(first.correct, true);
   assert.equal(first.done, false);
+  assert.equal(first.mastery.mastered, false);
   assert.equal(calls.length, 1);
   assert.equal(calls[0].options.aiCheckAnswers, true);
   assert.equal(answers.length, 1);
+  assert.deepEqual(mastery.calls[0], { student: 'Zyon', lessonId: 42, itemId: 'a', correct: true });
+
+  assert.equal(runtime.runtime.current.id, 'a');
+  assert.equal(runtime.next().id, 'b');
+  assert.equal(renders.length, 2);
 
   await runtime.submit('satelliet');
   assert.equal(finished.length, 1);

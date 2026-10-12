@@ -22,14 +22,14 @@ export function createPlayerRuntimeAdapter({
   goBack = () => {},
   clock = () => new Date().toISOString(),
   createSession = createTestSession,
-  gradeAnswer = null
+  evaluateAnswer = null
 } = {}) {
   if (!lesson || typeof lesson !== 'object') throw new Error('A lesson is required.');
   if (!persistence || typeof persistence.saveTestResult !== 'function') throw new Error('A player persistence service is required.');
   if (typeof renderResult !== 'function') throw new Error('A result renderer is required.');
   if (typeof clock !== 'function') throw new Error('A player clock is required.');
   if (typeof createSession !== 'function') throw new Error('A test-session factory is required.');
-  if (typeof gradeAnswer !== 'function') throw new Error('An answer grading service is required.');
+  if (typeof evaluateAnswer !== 'function') throw new Error('An answer evaluation service is required.');
 
   let session = null;
 
@@ -43,7 +43,7 @@ export function createPlayerRuntimeAdapter({
     session = createSession(items, {
       type,
       startedAt,
-      gradeAnswer,
+      evaluateAnswer,
       aiCheckAnswers,
       ...(shuffle ? { shuffle } : {})
     });

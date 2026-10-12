@@ -5,7 +5,7 @@ import {
   getPracticeAnswerParts
 } from './practice-evaluation.js';
 
-function resolveGradeAnswer({ db = null, injectedGradeAnswer = null } = {}) {
+function createGradeResolver({ db = null, injectedGradeAnswer = null } = {}) {
   if (typeof injectedGradeAnswer === 'function') return injectedGradeAnswer;
   if (db) return createAnswerGradingService(db).gradeAnswer;
   throw new Error('A Supabase client or answer grading dependency is required.');
@@ -21,8 +21,6 @@ function result(correct, fixedRules, feedback = '', acceptedAnswers = null) {
 }
 
 export function createPracticeEvaluationRuntimeEntry({ db = null, gradeAnswer: injectedGradeAnswer = null } = {}) {
-  const resolveGrading = resolveGradeAnswer({ db, injectedGradeAnswer });
-
   async function evaluate(item, userAnswer, { type = 'words', aiCheckAnswers = true } = {}) {
     const practiceType = String(type || 'words');
 
@@ -38,7 +36,8 @@ export function createPracticeEvaluationRuntimeEntry({ db = null, gradeAnswer: i
       return result(evaluatePracticeDeterministicAnswer('custom', item, userAnswer), fixedRules);
     }
 
-    const grading = await resolveGrading(
+    const gradeAnswer = createGradeResolver({ db, injectedGradeAnswer });
+    const grading = await gradeAnswer(
       String(item?.question ?? ''),
       String(item?.answer ?? ''),
       String(userAnswer ?? '')

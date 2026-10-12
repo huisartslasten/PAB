@@ -21,7 +21,7 @@ test('test session records answers and calculates a percentage', async () => {
     { id: 2, question: 'Dier', answer: 'Hond' }
   ], {
     type: 'words',
-    gradeAnswer: async (_question, expected, given) => ({ correct: expected.toLowerCase() === given.toLowerCase() })
+    evaluateAnswer: async (item, given) => ({ correct: item.answer.toLowerCase() === given.toLowerCase() })
   });
 
   assert.equal((await session.submit('kat')).done, false);

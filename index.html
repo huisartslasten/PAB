@@ -1839,13 +1839,6 @@ function dragLessonLeave(e){
   e.stopPropagation();
   e.currentTarget.classList.remove('drag-over');
 }
-async function updateLessonSubvak(lesson,newSubvak){
-  if(!isParentLoggedIn())throw new Error('Alleen beheer kan lessen naar een ander subvak verplaatsen.');
-  const value=String(newSubvak||'').trim();
-  const {error}=await db.from('lessons').update({subvak:value}).eq('id',lesson.id);
-  if(error)throw error;
-  lesson.subvak=value;
-}
 async function dragLessonDrop(e,targetId){
   if(!isParentLoggedIn()){clearLessonDragState();return}
   e.preventDefault();
@@ -1865,7 +1858,7 @@ async function dragLessonDrop(e,targetId){
   const newSubvak=targetBlock.dataset.subvakLabel==='Zonder subvak'?'':targetBlock.dataset.subvakLabel;
   try{
     if(sourceGroup!==targetGroup||normalizeSubvakKey(sourceLesson.subvak)!==normalizeSubvakKey(newSubvak)){
-      await updateLessonSubvak(sourceLesson,newSubvak);
+      await window.pacoGOUpdateLessonSubvak(sourceLesson.id,newSubvak);
     }
     const rect=target.getBoundingClientRect();
     if(e.clientY>rect.top+rect.height/2)target.after(source);else target.before(source);
@@ -1902,7 +1895,7 @@ async function dragLessonIntoSubvak(e,subvakKey){
   if(!source||!targetGrid||!sourceLesson){clearLessonDragState();return}
   const newSubvak=block.dataset.subvakLabel==='Zonder subvak'?'':block.dataset.subvakLabel;
   try{
-    await updateLessonSubvak(sourceLesson,newSubvak);
+    await window.pacoGOUpdateLessonSubvak(sourceLesson.id,newSubvak);
     targetGrid.appendChild(source);
     await saveLessonOrder(currentStudent,currentSubject,getRenderedLessonOrder().map(id=>lessons.find(l=>Number(l.id)===id)).filter(Boolean));
     const sourceBlock=source.closest('.subvak-block');
@@ -2904,6 +2897,7 @@ function insertWordQuestionAfter(button){
 
   <script type="module">
     import { installAgendaRuntimeEntry } from '/src/features/agenda/runtime-entry.js';
+    import { installLessonSaveRuntimeEntry } from '/src/features/lessons/lesson-save-runtime-entry.js';
     installAgendaRuntimeEntry({
       storage: window.localStorage,
       currentStudent: () => currentStudent,
@@ -2915,6 +2909,28 @@ function insertWordQuestionAfter(button){
       onLessonMatch: item => agendaLessonMatchHtml(item),
       now: () => new Date()
     }, window);
+
+    installLessonSaveRuntimeEntry({
+      document,
+      db,
+      get currentSubject() { return currentSubject; },
+      set currentSubject(value) { currentSubject = value; },
+      get currentLesson() { return currentLesson; },
+      set currentLesson(value) { currentLesson = value; },
+      get currentSession() { return currentSession; },
+      PARENT_IDS,
+      get lessons() { return lessons; },
+      get currentStudent() { return currentStudent; },
+      normalizeSubvakKey,
+      renderTestCalendar,
+      refreshPageSidebars,
+      showMessage,
+      showHome,
+      loadLessons,
+      checkDictationSpelling,
+      upsertTestDate,
+      removeTestDate
+    });
   </script>
 </body>
 </html>

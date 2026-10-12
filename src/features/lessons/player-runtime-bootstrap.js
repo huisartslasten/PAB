@@ -2,6 +2,7 @@ import { createPlayerRuntimeEntry } from './player-runtime-entry.js';
 import { createPlayerScreenBoundary } from './player-screen-boundary.js';
 import { createPlayerTestView } from './player-test-view.js';
 import { createPlayerResultRenderer } from './player-result-renderer.js';
+import { createLessonAudioService } from '../../services/lesson-audio-service.js';
 
 export function createProfessionalPlayerBridge({
   getLesson,
@@ -9,7 +10,7 @@ export function createProfessionalPlayerBridge({
   db,
   gradeAnswer = null,
   persistence = null,
-  audioService,
+  audioService = null,
   documentRef = globalThis.document,
   hideAll,
   showLessonChoice,
@@ -23,7 +24,9 @@ export function createProfessionalPlayerBridge({
   if (typeof hideAll !== 'function') throw new Error('A screen hide function is required.');
   if (typeof clearActivity !== 'function') throw new Error('A lesson cleanup function is required.');
   if (typeof escapeHtml !== 'function') throw new Error('An escapeHtml function is required.');
-  if (!audioService || typeof audioService.speak !== 'function' || typeof audioService.stop !== 'function') throw new Error('A lesson audio service is required.');
+
+  const lessonAudioService = audioService || createLessonAudioService(db);
+  if (typeof lessonAudioService.speak !== 'function' || typeof lessonAudioService.stop !== 'function') throw new Error('A lesson audio service is required.');
 
   let entry = null;
   let activeLesson = null;
@@ -33,7 +36,7 @@ export function createProfessionalPlayerBridge({
     const session = entry?.runtime?.session;
     const item = session?.currentItem();
     if (!item) return Promise.resolve();
-    return audioService.speak(item.answer, {
+    return lessonAudioService.speak(item.answer, {
       onStatus: status => {
         const node = documentRef?.getElementById?.('testVoiceStatus');
         if (node) node.textContent = status;
@@ -64,7 +67,7 @@ export function createProfessionalPlayerBridge({
         resultRenderer.render(payload);
       },
       cancelSpeech: () => {},
-      stopAiAudio: () => audioService.stop(),
+      stopAiAudio: () => lessonAudioService.stop(),
       clearActivity,
       showLessonChoice,
       goBack,

@@ -12,6 +12,7 @@ import { createPhotoStorageService } from '../features/photo-lessons/photo-stora
 import { createManagement } from '../features/management/management.js';
 import { createAgendaReadService } from '../features/agenda/read-service.js';
 import { createTestHistoryReadService } from '../features/test-history/test-history-read-service.js';
+import { createCreatorService } from '../features/creator/creator-service.js';
 
 export function createPacoGOApp({ supabaseLib = window.supabase, session = null, storage = globalThis.localStorage } = {}) {
   const db = createSupabaseClient(supabaseLib);
@@ -25,6 +26,7 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null,
   const agenda = createAgendaReadService({ storage, lessons: () => appState.lessons, currentStudent: () => appState.currentStudent });
   const testHistory = createTestHistoryReadService(db);
   const canManage = () => auth.isParent;
+  const canCreate = () => auth.isCreator;
 
   async function initializeSession() {
     if (auth.session) return auth.session;
@@ -53,6 +55,7 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null,
     mastery,
     agenda,
     testHistory,
+    creator: createCreatorService(db, { canCreate }),
     management: createManagement({ auth, lessonService: lessons, feedbackService: feedback, loadLessons }),
     photos: createPhotoStorageService(db, { canManage }),
     mapLessons: mapLessonRecords

@@ -17,7 +17,6 @@ export function createPracticeRuntime({
 } = {}) {
   if (!lesson || typeof lesson !== 'object') throw new Error('A lesson is required.');
   if (!Array.isArray(lesson.lesson_items)) throw new Error('A lesson with lesson items is required.');
-  if (typeof evaluateAnswer !== 'function') throw new Error('An answer evaluation service is required.');
   if (typeof shuffle !== 'function') throw new Error('A shuffle function is required.');
   if (typeof random !== 'function') throw new Error('A random function is required.');
 
@@ -92,6 +91,9 @@ export function createPracticeRuntime({
   }
 
   async function submit(userAnswer) {
+    if (typeof evaluateAnswer !== 'function') {
+      throw new Error('An answer evaluation service is required for submitted answers.');
+    }
     if (finished) return Object.freeze({ done: true, snapshot: snapshot() });
     if (!current) pickCurrent();
     if (!current) return Object.freeze({ done: true, snapshot: snapshot() });

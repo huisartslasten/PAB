@@ -7,13 +7,14 @@ function makeService() {
   const lessons = [
     { id: 1, student: 'Zyon', title: 'Actief', archived: false, deleted: false },
     { id: 2, student: 'Zyon', title: 'Archief', archived: true, deleted: false },
-    { id: 3, student: 'Zenith', title: 'Andere student', archived: false, deleted: false }
+    { id: 3, student: 'Zenith', title: 'Andere student', archived: false, deleted: false },
+    { id: 4, student: 'Zenith', title: 'Prullenbak', archived: false, deleted: true }
   ];
 
   return {
     calls: [],
     async listAll() { return lessons.map(item => ({ ...item })); },
-    async createLesson(payload) { this.calls.push(['create', payload]); return { id: 4, ...payload }; },
+    async createLesson(payload) { this.calls.push(['create', payload]); return { id: 5, ...payload }; },
     async updateLesson(id, payload) { this.calls.push(['update', id, payload]); return { id, ...payload }; },
     async archive(id) { this.calls.push(['archive', id]); },
     async moveToTrash(id) { this.calls.push(['trash', id]); },
@@ -67,6 +68,28 @@ test('management owns the student roster and scoped lesson operations', async ()
     ['update', 1, { title: 'Bijgewerkt', student: 'Zyon' }],
     ['archive', 1]
   ]);
+});
+
+test('management owns recovery read and restore operations across students', async () => {
+  appState.currentStudent = null;
+  appState.lessons = [];
+
+  const service = makeService();
+  const management = createManagement({
+    auth: { isParent: true },
+    lessonService: service,
+    feedbackService: makeFeedbackService(),
+    loadLessons: makeLoadLessons(service)
+  });
+
+  await management.loadLessons();
+  assert.deepEqual(management.getRecoveryLessons('archive').map(item => item.id), [2]);
+  assert.deepEqual(management.getRecoveryLessons('trash').map(item => item.id), [4]);
+
+  management.selectStudent('Zyon');
+  await management.restoreLesson(2);
+  assert.deepEqual(service.calls, [['restore', 2]]);
+  assert.throws(() => management.getRecoveryLessons('unknown'), /Unknown recovery mode/);
 });
 
 test('management owns parent feedback operations', async () => {

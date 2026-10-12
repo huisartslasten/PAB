@@ -49,9 +49,15 @@ export function createLessonService(db) {
         return Object.freeze({ lesson, items: [] });
       }
 
+      const rows = normalizedItems.map(item => ({
+        ...item,
+        lesson_id: lesson.id
+      }));
+
       try {
-        const insertedItems = await this.replaceLessonItems(lesson.id, normalizedItems);
-        return Object.freeze({ lesson, items: insertedItems });
+        const { data, error } = await db.from('lesson_items').insert(rows).select();
+        if (error) throw error;
+        return Object.freeze({ lesson, items: data || [] });
       } catch (error) {
         // Preserve the existing V4.78 create -> item insert -> rollback contract.
         // Lesson persistence owns this transaction-like sequence; callers do not.

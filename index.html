@@ -2317,9 +2317,16 @@ async function renderParentFeedback(){
       '<div id="feedbackSubmitMessage"></div>'+
     '</div></div>'+
     '<div class="card" style="margin-top:18px"><h3 style="margin-top:0">📥 Binnengekomen feedback</h3><div id="feedbackList" class="feedback-list"><div class="small">Laden...</div></div></div>';
-  const {data,error}=await db.from('parent_feedback').select('id,feedback_type,subject,message,status,created_at').order('created_at',{ascending:false});
+  let data;
+  try{
+    data=await window.pacoGOManagementListFeedback();
+  }catch(error){
+    console.error('Feedback load error:',error);
+    const list=document.getElementById('feedbackList');
+    if(list)list.innerHTML='<div class="message error">De feedback kon niet worden geladen.</div>';
+    return;
+  }
   const list=document.getElementById('feedbackList');
-  if(error){list.innerHTML='<div class="message error">De feedback kon niet worden geladen.</div>';return;}
   if(!data?.length){list.innerHTML='<div class="empty feedback-empty">Nog geen feedback ontvangen.</div>';return;}
   const labels={idea:'💡 Idee / wens',bug:'🐛 Foutmelding',improvement:'🔧 Verbetering',other:'❓ Anders'};
   const statusLabels={new:'🆕 Nieuw','in_progress':'🟡 In behandeling',resolved:'🟢 Opgelost'};
@@ -2335,8 +2342,13 @@ async function submitParentFeedback(){
   const message=document.getElementById('feedbackMessage')?.value.trim()||'';
   const status=document.getElementById('feedbackSubmitMessage');
   if(!subject||!message){if(status){status.innerHTML='<div class="message error">Vul een onderwerp en een bericht in.</div>';}return;}
-  const {error}=await db.from('parent_feedback').insert({feedback_type:type,subject,message});
-  if(error){console.error('Feedback save error:',error);if(status)status.innerHTML='<div class="message error">De feedback kon niet worden opgeslagen.</div>';return;}
+  try{
+    await window.pacoGOManagementSubmitFeedback({feedbackType:type,subject,message});
+  }catch(error){
+    console.error('Feedback save error:',error);
+    if(status)status.innerHTML='<div class="message error">De feedback kon niet worden opgeslagen.</div>';
+    return;
+  }
   await renderParentFeedback();
   const msg=document.getElementById('feedbackSubmitMessage');
   if(msg)msg.innerHTML='<div class="message success">✅ Bedankt! Je feedback is ontvangen.</div>';
@@ -2344,9 +2356,13 @@ async function submitParentFeedback(){
 }
 async function updateParentFeedbackStatus(id,status){
   if(!requireParent())return;
-  const {error}=await db.from('parent_feedback').update({status}).eq('id',id);
-  if(error){console.error('Feedback status error:',error);showMessage('De status kon niet worden aangepast.','error');return;}
-  await renderParentFeedback();
+  try{
+    await window.pacoGOManagementUpdateFeedbackStatus(id,status);
+    await renderParentFeedback();
+  }catch(error){
+    console.error('Feedback status error:',error);
+    showMessage('De status kon niet worden aangepast.','error');
+  }
 }
 async function renderParentStudent(){
   const el=document.getElementById('parentManagement');
@@ -2929,6 +2945,7 @@ function insertWordQuestionAfter(button){
     import { installAgendaRuntimeEntry } from '/src/features/agenda/runtime-entry.js';
     import { installLessonSaveRuntimeEntry } from '/src/features/lessons/lesson-save-runtime-entry.js';
     import { installCreatorRuntimeEntry } from '/src/features/creator/creator-runtime-entry.js';
+    import { installManagementRuntimeEntry } from '/src/features/management/management-runtime-entry.js';
     installAgendaRuntimeEntry({
       storage: window.localStorage,
       currentStudent: () => currentStudent,
@@ -2944,6 +2961,12 @@ function insertWordQuestionAfter(button){
     installCreatorRuntimeEntry({
       db,
       canCreate: () => isCreator()
+    }, window);
+
+    installManagementRuntimeEntry({
+      db,
+      isParent: () => isParentLoggedIn(),
+      loadLessons
     }, window);
 
     installLessonSaveRuntimeEntry({

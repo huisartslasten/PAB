@@ -67,7 +67,7 @@ export function createPracticePresentation({
     const { progress } = snapshot;
     const el = elements().progress;
     if (!el) return;
-    el.innerHTML = `<div class="progress-label"><span>${progress.mastered} / ${progress.total} beheerst</span><span>Nog ${progress.remaining}</span></div><div class="progress"><div class="progress-bar"><div class="progress-bar" style="width:${progress.percentage}%"></div></div></div>`;
+    el.innerHTML = `<div class="progress-label"><span>${progress.mastered} / ${progress.total} beheerst</span><span>Nog ${progress.remaining}</span></div><div class="progress"><div class="progress-bar" style="width:${progress.percentage}%"></div></div>`;
   }
 
   function renderCurrent(snapshot) {
@@ -102,7 +102,7 @@ export function createPracticePresentation({
       return;
     }
 
-    content.innerHTML = `<div class="small">Typ hier het woord.</div>${hintHtml(item, escapeHtml)}<div class="prompt">${escapeHtml(item.question)}</div><input id="practiceAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier het woord in"><div id="practiceFeedback" class="feedback"></div><button class="big" onclick="checkPractice()">Controleren</button>`;
+    content.innerHTML = `<div class="small">Typ hier het woord.</div>${hintHtml(item, escapeHtml)}<div class="prompt">${escapeHtml(item.question)}</div><input id="practiceAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier een antwoord in"><div id="practiceFeedback" class="feedback"></div><button class="big" onclick="checkPractice()">Controleren</button>`;
     documentRef.getElementById('practiceAnswer')?.focus();
   }
 

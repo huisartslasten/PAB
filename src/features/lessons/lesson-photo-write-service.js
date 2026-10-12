@@ -4,6 +4,15 @@ function requireValue(value, message) {
   if (!value) throw new Error(message);
 }
 
+function requireLesson(lesson) {
+  requireValue(lesson && typeof lesson === 'object' ? lesson : null, 'A lesson is required.');
+  requireValue(lesson.student, 'A student is required.');
+  requireValue(lesson.subject, 'A subject is required.');
+  requireValue(lesson.title, 'A lesson title is required.');
+  requireValue(lesson.type, 'A lesson type is required.');
+  return lesson;
+}
+
 function normalizePairs(pairs) {
   if (!Array.isArray(pairs) || pairs.length === 0) throw new Error('A photo lesson requires at least one pair.');
   return pairs.map((pair, index) => ({
@@ -15,22 +24,16 @@ function normalizePairs(pairs) {
 
 export async function createLessonFromPhotoPersistence({
   db,
-  student,
-  subject,
-  title,
-  type,
-  pairs
+  lesson,
+  items
 } = {}) {
   requireValue(db, 'A Supabase client is required.');
-  requireValue(student, 'A student is required.');
-  requireValue(subject, 'A subject is required.');
-  requireValue(title, 'A lesson title is required.');
-  requireValue(type, 'A lesson type is required.');
-
-  const items = normalizePairs(pairs);
+  const canonicalLesson = requireLesson(lesson);
+  const normalizedItems = normalizePairs(items);
   const lessonService = createLessonService(db);
+
   return lessonService.createLessonWithItems({
-    lesson: { student, subject, title, type },
-    items
+    lesson: { ...canonicalLesson },
+    items: normalizedItems
   });
 }

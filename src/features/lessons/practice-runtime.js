@@ -139,10 +139,13 @@ export function createPracticeRuntime({
 }
 
 export function createApplicationPracticeRuntime({ db = null, lesson = null, shuffle, random, evaluateAnswer = null, aiCheckAnswers = true } = {}) {
-  const evaluator = evaluateAnswer || createPracticeEvaluationRuntimeEntry({ db });
+  const type = normalizeType(lesson?.type);
+  const evaluator = evaluateAnswer || (type === 'questions'
+    ? null
+    : createPracticeEvaluationRuntimeEntry({ db }));
   return createPracticeRuntime({
     lesson,
-    evaluateAnswer: evaluator.evaluate,
+    evaluateAnswer: evaluator?.evaluate || evaluator,
     shuffle,
     random,
     aiCheckAnswers

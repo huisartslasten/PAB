@@ -1,12 +1,14 @@
+import { createAnswerGradingService } from '../../services/answer-grading-service.js';
 import {
   evaluateFixedAnswerRules,
   evaluatePracticeDeterministicAnswer,
   getPracticeAnswerParts
 } from './practice-evaluation.js';
 
-function requireHost(host) {
-  if (!host || typeof host !== 'object') throw new Error('A practice evaluation runtime host is required.');
-  if (typeof host.gradeAnswer !== 'function') throw new Error('The practice evaluation runtime host is missing: gradeAnswer.');
+function resolveGradeAnswer({ db = null, gradeAnswer = null } = {}) {
+  if (typeof gradeAnswer === 'function') return gradeAnswer;
+  if (db) return createAnswerGradingService(db).gradeAnswer;
+  throw new Error('A Supabase client or answer grading dependency is required.');
 }
 
 function result(correct, fixedRules, feedback = '', acceptedAnswers = null) {
@@ -18,8 +20,8 @@ function result(correct, fixedRules, feedback = '', acceptedAnswers = null) {
   });
 }
 
-export function createPracticeEvaluationRuntimeEntry(host = {}) {
-  requireHost(host);
+export function createPracticeEvaluationRuntimeEntry({ db = null, gradeAnswer = null } = {}) {
+  const resolveGrading = resolveGradeAnswer({ db, gradeAnswer });
 
   async function evaluate(item, userAnswer, { type = 'words', aiCheckAnswers = true } = {}) {
     const practiceType = String(type || 'words');
@@ -36,7 +38,7 @@ export function createPracticeEvaluationRuntimeEntry(host = {}) {
       return result(evaluatePracticeDeterministicAnswer('custom', item, userAnswer), fixedRules);
     }
 
-    const grading = await host.gradeAnswer(
+    const grading = await resolveGrading(
       String(item?.question ?? ''),
       String(item?.answer ?? ''),
       String(userAnswer ?? '')
@@ -45,7 +47,7 @@ export function createPracticeEvaluationRuntimeEntry(host = {}) {
   }
 
   async function gradeAnswer(...args) {
-    return host.gradeAnswer(...args);
+    return resolveGrading(...args);
   }
 
   return Object.freeze({ evaluate, gradeAnswer, getPracticeAnswerParts });
@@ -54,9 +56,9 @@ export function createPracticeEvaluationRuntimeEntry(host = {}) {
 export const createPracticeEvaluationRuntime = createPracticeEvaluationRuntimeEntry;
 export { countAnswerWords, evaluateFixedAnswerRules } from './practice-evaluation.js';
 
-export function installPracticeEvaluationRuntimeEntry(host, target = globalThis) {
+export function installPracticeEvaluationRuntimeEntry(dependencies, target = globalThis) {
   if (!target || typeof target !== 'object') throw new Error('A practice evaluation runtime target is required.');
-  const entry = createPracticeEvaluationRuntimeEntry(host);
+  const entry = createPracticeEvaluationRuntimeEntry(dependencies);
   target.pacoGOPracticeEvaluationRuntime = entry;
   target.pacoGOPracticeEvaluationReady = Promise.resolve(entry);
   target.pacoGOPracticeEvaluation = (item, userAnswer, options) => entry.evaluate(item, userAnswer, options);

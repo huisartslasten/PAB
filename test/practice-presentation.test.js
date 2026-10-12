@@ -34,11 +34,12 @@ function fakeDocument() {
   };
 }
 
-function presentationFixture() {
+function presentationFixture(overrides = {}) {
   const documentRef = fakeDocument();
   const lesson = {
     id: 42,
     type: 'questions',
+    language: 'nl',
     lesson_items: [
       { id: 'a', question: 'Vraag A', answer: 'Antwoord A' },
       { id: 'b', question: 'Vraag B', answer: 'Antwoord B' }
@@ -54,7 +55,8 @@ function presentationFixture() {
     random: () => 0,
     escapeHtml: value => String(value ?? ''),
     hideAll: () => shown.push('hidden'),
-    showLessonChoice: () => shown.push('lesson-choice')
+    showLessonChoice: () => shown.push('lesson-choice'),
+    ...overrides
   });
   return { documentRef, presentation, shown };
 }
@@ -89,4 +91,24 @@ test('practice presentation keeps completion rendering owned by the entry', () =
 
   assert.equal(completed.done, true);
   assert.match(documentRef.getElementById('practiceContent').innerHTML, /Klaar!/);
+});
+
+test('practice presentation delegates dictation speech to the lesson audio service', async () => {
+  const calls = [];
+  const audioService = {
+    speak: async (text, options) => {
+      calls.push({ text, options });
+    },
+    stop: () => calls.push({ stop: true })
+  };
+  const { presentation } = presentationFixture({ audioService });
+  const lesson = presentation.start('dictation');
+  assert.equal(lesson.current.id, 'a');
+
+  await presentation.speakDictation();
+
+  assert.equal(calls.length, 2);
+  assert.deepEqual(calls[0], { stop: true });
+  assert.equal(calls[1].text, 'Vraag A');
+  assert.equal(calls[1].options.language, 'nl');
 });

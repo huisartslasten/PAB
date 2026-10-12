@@ -15,8 +15,8 @@ function lesson() {
   };
 }
 
-const exactGrade = async (expected, given) => ({
-  correct: String(expected).trim().toLowerCase() === String(given).trim().toLowerCase()
+const exactGrade = async (item, given) => ({
+  correct: String(item?.answer ?? '').trim().toLowerCase() === String(given ?? '').trim().toLowerCase()
 });
 
 test('player runtime adapter starts a typed V4.78-style test session', () => {
@@ -114,7 +114,7 @@ test('player runtime adapter preserves V4.78 behavior when history save fails', 
     clock: () => '2026-10-06T00:00:00.000Z'
   });
 
-  const session = adapter.startTest({ shuffle: items => items });
+  adapter.startTest({ shuffle: items => items });
   assert.equal((await adapter.submitAnswer('appel')).correct, true);
   assert.equal((await adapter.submitAnswer('boom')).correct, true);
 

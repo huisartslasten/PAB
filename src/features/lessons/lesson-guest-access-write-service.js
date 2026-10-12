@@ -1,4 +1,5 @@
-// Pure persistence boundary for V4.78 guest-lesson assignment actions.
+// Pure persistence boundary for the V4.78 guest-lesson assignment actions.
+// The TEST schema uses guest_access as the canonical guest entity.
 // UI, authorization, rendering, state and messages remain outside this service.
 
 function requireDb(db) {
@@ -11,9 +12,9 @@ function requireDb(db) {
 export async function findGuestByName({ db, guestName } = {}) {
   const client = requireDb(db);
   const { data, error } = await client
-    .from('guest_users')
+    .from('guest_access')
     .select('id')
-    .eq('name', guestName)
+    .eq('guest_name', guestName)
     .maybeSingle();
   if (error) throw error;
   return data;
@@ -29,6 +30,16 @@ export async function findGuestLessonAssignment({ db, guestId, lessonId } = {}) 
     .maybeSingle();
   if (error) throw error;
   return data;
+}
+
+export async function listGuestLessonAssignments({ db, guestId } = {}) {
+  const client = requireDb(db);
+  const { data, error } = await client
+    .from('guest_lessons')
+    .select('id,lesson_id,active')
+    .eq('guest_id', guestId);
+  if (error) throw error;
+  return data || [];
 }
 
 export async function updateGuestLessonAssignment({ db, assignmentId, active } = {}) {

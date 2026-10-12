@@ -23,6 +23,12 @@
     .management-feedback-status{display:inline-block;padding:5px 9px;border-radius:999px;background:#eaf4ff;color:#126fc9;font-size:12px;font-weight:900}
     .management-links{display:flex;gap:10px;flex-wrap:wrap}
     .management-link{border:0;border-radius:12px;padding:10px 14px;background:#eaf4ff;color:#126fc9;font-weight:900;cursor:pointer}
+    .management-link:disabled{opacity:.6;cursor:wait}
+    .management-recovery-student{display:grid;gap:12px}
+    .management-recovery-student>h3{margin:0;color:#102b57}
+    .management-recovery-subject{display:grid;gap:10px}
+    .management-recovery-subject h4{margin:0;color:#38577d}
+    .management-recovery-lessons{display:grid;gap:10px}
     @media(max-width:700px){.management-students{grid-template-columns:1fr}}
   </style>
 </head>
@@ -31,7 +37,7 @@
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
-    import { renderStudentSelection, renderStudentLessons, renderFeedback } from './src/features/management/management-view.js';
+    import { renderStudentSelection, renderStudentLessons, renderRecovery, renderFeedback } from './src/features/management/management-view.js';
 
     const mount = document.querySelector('#paco-template-mount');
     const content = document.createElement('div');
@@ -79,6 +85,22 @@
     lessonHeading.textContent = 'Actieve lessen';
     lessonSection.append(lessonHeading, lessons);
 
+    const archive = document.createElement('div');
+    archive.className = 'management-page';
+    const archiveSection = document.createElement('section');
+    archiveSection.className = 'management-section';
+    const archiveHeading = document.createElement('h2');
+    archiveHeading.textContent = 'Archief';
+    archiveSection.append(archiveHeading, archive);
+
+    const trash = document.createElement('div');
+    trash.className = 'management-page';
+    const trashSection = document.createElement('section');
+    trashSection.className = 'management-section';
+    const trashHeading = document.createElement('h2');
+    trashHeading.textContent = 'Prullenbak';
+    trashSection.append(trashHeading, trash);
+
     const feedbackList = document.createElement('div');
     feedbackList.className = 'management-page';
     const feedbackSection = document.createElement('section');
@@ -93,14 +115,22 @@
       renderStudentLessons(lessons, app.management);
     }
 
+    async function refreshRecovery() {
+      archive.replaceChildren();
+      trash.replaceChildren();
+      renderRecovery(archive, app.management, 'archive', refreshRecovery);
+      renderRecovery(trash, app.management, 'trash', refreshRecovery);
+    }
+
     try {
       await app.initializeSession();
       await app.management.loadLessons();
       renderStudentSelection(students, app.management, showSelectedStudent);
       const selected = app.management.getSelectedStudent() || app.management.getStudents()[0];
       if (selected) showSelectedStudent(selected);
+      await refreshRecovery();
       await renderFeedback(feedbackList, app.management);
-      content.replaceChildren(studentSection, lessonSection, feedbackSection);
+      content.replaceChildren(studentSection, lessonSection, archiveSection, trashSection, feedbackSection);
     } catch (error) {
       console.error('Management page load error:', error);
       state.textContent = app.auth.isParent

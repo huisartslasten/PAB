@@ -2,9 +2,10 @@ import { setGuestLessonAccess } from './lesson-guest-access-runtime.js';
 import {
   findGuestByName,
   findGuestLessonAssignment,
+  listGuestLessonAssignments,
   updateGuestLessonAssignment,
   createGuestLessonAssignment
-} from './lesson-guest-access-write-service.js';
+} from './lesson-guest-access-service.js';
 
 const REQUIRED_BRIDGE_KEYS = Object.freeze([
   'requireParent',
@@ -16,12 +17,33 @@ const REQUIRED_BRIDGE_KEYS = Object.freeze([
 
 function requireRuntime(runtime) {
   if (!runtime || typeof runtime !== 'object') {
-    throw new Error('A V4.78 guest-lesson runtime bridge is required.');
+    throw new Error('A V4.78 guest-lesson runtime boundary is required.');
   }
   for (const key of REQUIRED_BRIDGE_KEYS) {
-    if (!(key in runtime)) throw new Error(`The guest-lesson runtime bridge is missing: ${key}.`);
+    if (!(key in runtime)) throw new Error(`The guest-lesson runtime boundary is missing: ${key}.`);
   }
   return runtime;
+}
+
+function requireDb(db) {
+  if (!db || typeof db.from !== 'function') {
+    throw new Error('A guest-lesson database client is required.');
+  }
+  return db;
+}
+
+async function authorizeParent(runtime) {
+  requireRuntime(runtime);
+  return runtime.requireParent();
+}
+
+export async function loadGuestLessonAccess(runtime, guestName = runtime?.currentStudent) {
+  const bridge = requireRuntime(runtime);
+  if (!(await authorizeParent(bridge))) return Object.freeze({ guest: null, assignments: [] });
+  const guest = await findGuestByName({ db: requireDb(bridge.db), guestName });
+  if (!guest) return Object.freeze({ guest: null, assignments: [] });
+  const assignments = await listGuestLessonAssignments({ db: bridge.db, guestId: guest.id });
+  return Object.freeze({ guest, assignments });
 }
 
 export async function executeSetGuestLessonAccess(runtime, lessonId, active) {
@@ -59,5 +81,9 @@ export function installLessonGuestAccessRuntimeEntry(runtime, target = globalThi
     throw new Error('A guest-lesson runtime target is required.');
   }
   target.setGuestLesson = (lessonId, active) => executeSetGuestLessonAccess(runtime, lessonId, active);
-  return Object.freeze({ setGuestLesson: target.setGuestLesson });
+  target.pacoGOLoadGuestLessonAccess = guestName => loadGuestLessonAccess(runtime, guestName);
+  return Object.freeze({
+    setGuestLesson: target.setGuestLesson,
+    loadGuestLessonAccess: target.pacoGOLoadGuestLessonAccess
+  });
 }

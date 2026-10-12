@@ -29,6 +29,7 @@ export function createPlayerRuntimeAdapter({
   if (typeof renderResult !== 'function') throw new Error('A result renderer is required.');
   if (typeof clock !== 'function') throw new Error('A player clock is required.');
   if (typeof createSession !== 'function') throw new Error('A test-session factory is required.');
+  if (typeof gradeAnswer !== 'function') throw new Error('An answer grading service is required.');
 
   let session = null;
 

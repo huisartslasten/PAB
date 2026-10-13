@@ -2,13 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createLessonEditorController } from '../src/features/lessons/editor-controller.js';
 
-function createSaveDraft() {
+function createSaveDraft(resultFactory = input => ({ ok: true, lessonId: input.lessonId ?? 42 })) {
   const calls = [];
   return {
     calls,
     async saveDraft(input) {
       calls.push(input);
-      return { lessonId: input.lessonId ?? 42 };
+      return resultFactory(input);
     }
   };
 }
@@ -118,4 +118,29 @@ test('invalid editor draft does not call persistence or refresh', async () => {
   assert.equal(persistence.calls.length, 0);
   assert.equal(refreshed, false);
   assert.deepEqual(invalid.validation.errors.map(error => error.field), ['student', 'subject', 'title', 'items']);
+});
+
+test('persistence failure does not refresh or report the lesson as saved', async () => {
+  const failure = { ok: false, stage: 'persistence', error: new Error('write failed') };
+  const persistence = createSaveDraft(() => failure);
+  let refreshed = false;
+  let saved = false;
+
+  const controller = createLessonEditorController({
+    saveDraft: persistence.saveDraft,
+    refreshLessons: async () => { refreshed = true; },
+    onSaved: async () => { saved = true; }
+  });
+
+  const result = await controller.save({
+    student: 'Zyon',
+    subject: 'Taal',
+    title: 'Mislukt',
+    type: 'words',
+    items: [{ question: 'a', answer: 'b' }]
+  });
+
+  assert.equal(result, failure);
+  assert.equal(refreshed, false);
+  assert.equal(saved, false);
 });

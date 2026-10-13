@@ -1,3 +1,8 @@
+import {
+  getLessonSubvakGroups,
+  normalizeLessonSubvak
+} from '../lessons/list-view-model.js';
+
 function escapeHtml(value) {
   return String(value ?? '')
     .replaceAll('&', '&amp;')
@@ -5,15 +10,6 @@ function escapeHtml(value) {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#039;');
-}
-
-function normalizeSubvak(value) {
-  return String(value ?? '').trim().replace(/\s+/g, ' ').toLocaleLowerCase('nl-NL');
-}
-
-function subvakLabel(value) {
-  const clean = String(value ?? '').trim().replace(/\s+/g, ' ');
-  return clean || 'Zonder subvak';
 }
 
 function groupByStudentAndSubject(lessons = []) {
@@ -34,16 +30,6 @@ function groupByStudentAndSubject(lessons = []) {
         .sort(([a], [b]) => a.localeCompare(b, 'nl'))
         .map(([subject, items]) => ({ subject, items }))
     }));
-}
-
-function groupBySubvak(lessons = []) {
-  const groups = new Map();
-  lessons.forEach(lesson => {
-    const key = normalizeSubvak(lesson.subvak) || '__geen_subvak__';
-    if (!groups.has(key)) groups.set(key, { key, label: subvakLabel(lesson.subvak), lessons: [] });
-    groups.get(key).lessons.push(lesson);
-  });
-  return [...groups.values()];
 }
 
 export function renderStudentSelection(container, management, onSelect = () => {}) {
@@ -87,7 +73,7 @@ export async function renderStudentLessons(container, management, { onEdit = nul
   container.innerHTML = groups.map(group => `
     <section class="management-subject" data-management-subject="${escapeHtml(group.subject)}">
       <div class="management-subject-heading"><h3>${escapeHtml(group.subject)}</h3><span>Sleep de lessen om te ordenen</span></div>
-      ${groupBySubvak(group.lessons).map(subvak => `
+      ${getLessonSubvakGroups(group.lessons).map(subvak => `
         <section class="management-subvak" data-subvak-label="${escapeHtml(subvak.label)}">
           <h4>${subvak.key === '__geen_subvak__' ? '📚 ' : '📁 '}${escapeHtml(subvak.label)}</h4>
           <div class="management-lessons-grid">
@@ -171,7 +157,7 @@ export async function renderStudentLessons(container, management, { onEdit = nul
         const sourceLesson = management.getScopedLessons().find(item => Number(item.id) === sourceId);
         const targetSubvak = target.closest('.management-subvak')?.dataset.subvakLabel || 'Zonder subvak';
         const newSubvak = targetSubvak === 'Zonder subvak' ? '' : targetSubvak;
-        if (normalizeSubvak(sourceLesson?.subvak) !== normalizeSubvak(newSubvak)) {
+        if (normalizeLessonSubvak(sourceLesson?.subvak) !== normalizeLessonSubvak(newSubvak)) {
           await management.moveLessonToSubvak(sourceId, newSubvak);
         }
         const rect = target.getBoundingClientRect();

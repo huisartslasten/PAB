@@ -6,13 +6,17 @@ const SUBJECT_ICONS = Object.freeze({
   rekenen: '🔢',
   spelling: '✏️',
   begrijpendlezen: '📖',
-  topografie: '🌍',
-  geschiedenis: '🏛️',
-  aardrijkskunde: '🗺️',
-  natuur: '🌱',
+  topografie: '🗺️',
+  geschiedenis: '🏴‍☠️',
+  aardrijkskunde: '🌍',
+  natuur: '🔬',
   biologie: '🧬',
+  frans: '🇫🇷',
+  spaans: '🇪🇸',
   muziek: '🎵',
-  overig: '🧩'
+  lezen: '📖',
+  wetenschap: '🧪',
+  techniek: '⚙️'
 });
 
 const SUBJECT_LABELS = Object.freeze({
@@ -50,7 +54,7 @@ export function getLessonSubjectLabel(value) {
 
 export function getLessonSubjectIcon(subject) {
   const key = normalizeLessonSubject(subject).replaceAll(' ', '');
-  return SUBJECT_ICONS[key] || '📘';
+  return SUBJECT_ICONS[key] || '🎓';
 }
 
 export function normalizeLessonSubvak(value) {

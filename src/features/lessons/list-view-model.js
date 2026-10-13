@@ -53,6 +53,34 @@ export function getLessonSubjectIcon(subject) {
   return SUBJECT_ICONS[key] || '📘';
 }
 
+export function normalizeLessonSubvak(value) {
+  return String(value || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase('nl-NL');
+}
+
+export function getLessonSubvakLabel(value) {
+  const clean = String(value || '').trim().replace(/\s+/g, ' ');
+  return clean || 'Zonder subvak';
+}
+
+export function getLessonSubvakGroups(lessons = []) {
+  const groups = new Map();
+
+  lessons.forEach(lesson => {
+    const raw = String(lesson.subvak || '').trim();
+    const key = normalizeLessonSubvak(raw) || '__geen_subvak__';
+    if (!groups.has(key)) {
+      groups.set(key, {
+        key,
+        label: getLessonSubvakLabel(raw),
+        lessons: []
+      });
+    }
+    groups.get(key).lessons.push(lesson);
+  });
+
+  return [...groups.values()];
+}
+
 export function getLessonSubjectGroups(lessons = [], student) {
   const active = getActiveStudentLessons(lessons, student);
   const groups = new Map();

@@ -32,7 +32,7 @@
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
-    import { getActiveStudentLessons } from './src/features/lessons/visibility.js';
+    import { getLessonSubjectGroups, getLessonSubjectIcon, normalizeLessonSubject } from './src/features/lessons/list-view-model.js';
 
     const params = new URLSearchParams(window.location.search);
     const selectedStudent = params.get('student') || 'Zyon';
@@ -43,13 +43,6 @@
 
     const app = createPacoGOApp({ supabaseLib: window.supabase });
 
-    const subjectIcons = {
-      nederlands:'📚', rekenen:'🔢', spelling:'✏️', begrijpendlezen:'📖', topografie:'🌍',
-      geschiedenis:'🏛️', aardrijkskunde:'🗺️', natuur:'🌱', engels:'🇬🇧', overig:'🧩'
-    };
-
-    const normalize = value => String(value || '').trim().toLocaleLowerCase('nl-NL');
-    const subjectIcon = subject => subjectIcons[normalize(subject).replaceAll(' ','')] || '📘';
     const goHome = () => { window.location.href = `dashboard.html?student=${encodeURIComponent(selectedStudent)}`; };
     const goLessons = () => { window.location.href = `lessons.html?student=${encodeURIComponent(selectedStudent)}`; };
     const goAgenda = () => { window.location.href = `index.html?student=${encodeURIComponent(selectedStudent)}&view=agenda`; };
@@ -94,13 +87,7 @@
     }
 
     function render(records){
-      const lessons = getActiveStudentLessons(app.mapLessons(records), selectedStudent);
-      const grouped = new Map();
-      lessons.forEach(lesson => {
-        const key = normalize(lesson.subject) || 'overig';
-        if(!grouped.has(key)) grouped.set(key,[]);
-        grouped.get(key).push(lesson);
-      });
+      const grouped = getLessonSubjectGroups(app.mapLessons(records), selectedStudent);
 
       content.replaceChildren(toolbar);
       if(!selectedSubject){
@@ -109,12 +96,12 @@
         heading.textContent='Kies een vak';
         const grid=document.createElement('div');
         grid.className='subject-grid';
-        [...grouped.entries()].sort((a,b)=>a[0].localeCompare(b[0],'nl')).forEach(([key,items])=>{
+        grouped.forEach(subject=>{
           const card=document.createElement('button');
           card.type='button';card.className='subject-card';
-          card.innerHTML=`<div class="subject-icon">${subjectIcon(items[0].subject)}</div><h2>${items[0].subject || 'Overig'}</h2><p>${items.length} ${items.length===1?'les':'lessen'}</p>`;
+          card.innerHTML=`<div class="subject-icon">${getLessonSubjectIcon(subject.label)}</div><h2>${subject.label}</h2><p>${subject.lessons.length} ${subject.lessons.length===1?'les':'lessen'}</p>`;
           card.addEventListener('click',()=>{
-            const url=new URL(window.location.href);url.searchParams.set('subject',items[0].subject || 'Overig');window.location.href=url.toString();
+            const url=new URL(window.location.href);url.searchParams.set('subject',subject.label);window.location.href=url.toString();
           });
           grid.appendChild(card);
         });
@@ -123,8 +110,9 @@
         return;
       }
 
-      const key=normalize(selectedSubject);
-      const lessonsForSubject=grouped.get(key)||[];
+      const key=normalizeLessonSubject(selectedSubject);
+      const subject=grouped.find(candidate=>candidate.key===key);
+      const lessonsForSubject=subject?.lessons || [];
       const header=document.createElement('div');header.className='lessons-toolbar';
       const heading=document.createElement('h2');heading.className='section-title';heading.textContent=selectedSubject;
       const back=document.createElement('button');back.type='button';back.className='back-subjects';back.textContent='← Alle vakken';back.addEventListener('click',goLessons);

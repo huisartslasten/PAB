@@ -1,5 +1,5 @@
 import { createPacoGOApp } from '../../../app/bootstrap.js';
-import { hasLessonComponent } from '../../lessons/components.js';
+import { isPracticeModeActive } from '../practice-domain.js';
 import {
   createFlashcardSession,
   getCurrentFlashcard,
@@ -25,6 +25,11 @@ export async function mountFlashcardPractice({
   loading.textContent = 'Flashcards laden…';
   content.appendChild(loading);
 
+  if (!isPracticeModeActive('flashcards')) {
+    loading.textContent = 'Flashcards zijn momenteel niet beschikbaar.';
+    return;
+  }
+
   let lesson = null;
   try {
     const records = await app.loadLessons();
@@ -38,11 +43,6 @@ export async function mountFlashcardPractice({
 
   if (!lesson) {
     loading.textContent = 'Deze les kon niet worden gevonden.';
-    return;
-  }
-
-  if (!hasLessonComponent(lesson, 'flashcards')) {
-    loading.textContent = 'Flashcards zijn geen onderdeel van deze les.';
     return;
   }
 

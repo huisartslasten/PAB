@@ -7,6 +7,15 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
+function normalizeSubvak(value) {
+  return String(value ?? '').trim().replace(/\s+/g, ' ').toLocaleLowerCase('nl-NL');
+}
+
+function subvakLabel(value) {
+  const clean = String(value ?? '').trim().replace(/\s+/g, ' ');
+  return clean || 'Zonder subvak';
+}
+
 function groupByStudentAndSubject(lessons = []) {
   const students = new Map();
   lessons.forEach(lesson => {
@@ -27,6 +36,16 @@ function groupByStudentAndSubject(lessons = []) {
     }));
 }
 
+function groupBySubvak(lessons = []) {
+  const groups = new Map();
+  lessons.forEach(lesson => {
+    const key = normalizeSubvak(lesson.subvak) || '__geen_subvak__';
+    if (!groups.has(key)) groups.set(key, { key, label: subvakLabel(lesson.subvak), lessons: [] });
+    groups.get(key).lessons.push(lesson);
+  });
+  return [...groups.values()];
+}
+
 export function renderStudentSelection(container, management, onSelect = () => {}) {
   if (!container) throw new Error('renderStudentSelection requires a container.');
   if (!management) throw new Error('renderStudentSelection requires management.');
@@ -45,29 +64,147 @@ export function renderStudentSelection(container, management, onSelect = () => {
   return students;
 }
 
-export function renderStudentLessons(container, management, onEdit = null) {
+function clearDragState(container) {
+  container.querySelectorAll('.management-lesson.dragging,.management-lesson.drag-over,.management-subvak.drop-active')
+    .forEach(element => element.classList.remove('dragging', 'drag-over', 'drop-active'));
+}
+
+async function persistSubjectOrder(container, management, subject) {
+  const ids = [...container.querySelectorAll(`[data-management-subject="${CSS.escape(subject)}"] .management-lesson[data-lesson-id]`)]
+    .map(card => Number(card.dataset.lessonId))
+    .filter(Boolean);
+  const current = management.getScopedLessons();
+  const lessons = ids.map(id => current.find(lesson => Number(lesson.id) === id)).filter(Boolean);
+  await management.saveLessonOrder(subject, lessons);
+}
+
+export async function renderStudentLessons(container, management, onEdit = null) {
   if (!container) throw new Error('renderStudentLessons requires a container.');
   if (!management) throw new Error('renderStudentLessons requires management.');
 
-  const lessons = management.getScopedLessons();
-  container.innerHTML = lessons.map(lesson => `
-    <article class="management-lesson" data-lesson-id="${escapeHtml(lesson.id)}">
-      <h3>${escapeHtml(lesson.title)}</h3>
-      <p>${escapeHtml(lesson.subject)}${lesson.subvak ? ` · ${escapeHtml(lesson.subvak)}` : ''}</p>
-      ${typeof onEdit === 'function' ? `<div class="management-links"><button type="button" class="management-link" data-edit-lesson-id="${escapeHtml(lesson.id)}">✏️ Bewerken</button></div>` : ''}
-    </article>
-  `).join('');
+  const groups = await management.getOrderedScopedLessons();
+  container.innerHTML = groups.map(group => `
+    <section class="management-subject" data-management-subject="${escapeHtml(group.subject)}">
+      <div class="management-subject-heading"><h3>${escapeHtml(group.subject)}</h3><span>Sleep de lessen om te ordenen</span></div>
+      ${groupBySubvak(group.lessons).map(subvak => `
+        <section class="management-subvak" data-subvak-label="${escapeHtml(subvak.label)}">
+          <h4>${subvak.key === '__geen_subvak__' ? '📚 ' : '📁 '}${escapeHtml(subvak.label)}</h4>
+          <div class="management-lessons-grid">
+            ${subvak.lessons.map(lesson => `
+              <article class="management-lesson" draggable="true" data-lesson-id="${escapeHtml(lesson.id)}">
+                <div class="management-lesson-main">
+                  <h3>${escapeHtml(lesson.title)}</h3>
+                  <p>${escapeHtml(lesson.subject)}${lesson.subvak ? ` · ${escapeHtml(lesson.subvak)}` : ''}</p>
+                </div>
+                ${typeof onEdit === 'function' ? `<div class="management-links"><button type="button" class="management-link" data-edit-lesson-id="${escapeHtml(lesson.id)}">✏️ Bewerken</button></div>` : ''}
+              </article>
+            `).join('')}
+          </div>
+        </section>
+      `).join('')}
+    </section>
+  `).join('') || '<div class="management-state">Nog geen actieve lessen.</div>';
 
-  if (typeof onEdit === 'function') {
-    container.querySelectorAll('[data-edit-lesson-id]').forEach(button => {
-      button.addEventListener('click', () => {
-        const lesson = lessons.find(item => String(item.id) === String(button.dataset.editLessonId));
-        if (lesson) onEdit(lesson);
-      });
+  container.querySelectorAll('[data-edit-lesson-id]').forEach(button => {
+    button.addEventListener('click', () => {
+      const lesson = management.getScopedLessons().find(item => String(item.id) === String(button.dataset.editLessonId));
+      if (lesson && typeof onEdit === 'function') onEdit(lesson);
     });
-  }
+  });
 
-  return lessons;
+  container.querySelectorAll('.management-lesson').forEach(card => {
+    card.addEventListener('dragstart', event => {
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', card.dataset.lessonId);
+      card.classList.add('dragging');
+    });
+    card.addEventListener('dragover', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      event.dataTransfer.dropEffect = 'move';
+      if (!card.classList.contains('dragging')) card.classList.add('drag-over');
+    });
+    card.addEventListener('dragleave', () => card.classList.remove('drag-over'));
+    card.addEventListener('drop', async event => {
+      event.preventDefault();
+      event.stopPropagation();
+      const sourceId = Number(event.dataTransfer.getData('text/plain'));
+      const targetId = Number(card.dataset.lessonId);
+      if (!sourceId || !targetId || sourceId === targetId) {
+        clearDragState(container);
+        return;
+      }
+      const source = container.querySelector(`[data-lesson-id="${sourceId}"]`);
+      const target = card;
+      const subjectBlock = target.closest('.management-subject');
+      const subject = subjectBlock?.dataset.managementSubject;
+      if (!source || !subject) {
+        clearDragState(container);
+        return;
+      }
+      try {
+        const sourceLesson = management.getScopedLessons().find(item => Number(item.id) === sourceId);
+        const targetSubvak = target.closest('.management-subvak')?.dataset.subvakLabel || 'Zonder subvak';
+        const sourceSubvak = source.closest('.management-subvak')?.dataset.subvakLabel || 'Zonder subvak';
+        const newSubvak = targetSubvak === 'Zonder subvak' ? '' : targetSubvak;
+        if (normalizeSubvak(sourceLesson?.subvak) !== normalizeSubvak(newSubvak)) {
+          await management.moveLessonToSubvak(sourceId, newSubvak);
+        }
+        const rect = target.getBoundingClientRect();
+        if (event.clientY > rect.top + rect.height / 2) target.after(source);
+        else target.before(source);
+        await persistSubjectOrder(container, management, subject);
+        await renderStudentLessons(container, management, onEdit);
+      } catch (error) {
+        console.error('Management lesson reorder error:', error);
+        await renderStudentLessons(container, management, onEdit);
+        throw error;
+      } finally {
+        clearDragState(container);
+      }
+    });
+    card.addEventListener('dragend', () => clearDragState(container));
+  });
+
+  container.querySelectorAll('.management-subvak').forEach(block => {
+    block.addEventListener('dragover', event => {
+      if (event.target.closest('.management-lesson')) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+      block.classList.add('drop-active');
+    });
+    block.addEventListener('dragleave', event => {
+      if (block.contains(event.relatedTarget)) return;
+      block.classList.remove('drop-active');
+    });
+    block.addEventListener('drop', async event => {
+      if (event.target.closest('.management-lesson')) return;
+      event.preventDefault();
+      const sourceId = Number(event.dataTransfer.getData('text/plain'));
+      const source = container.querySelector(`[data-lesson-id="${sourceId}"]`);
+      const subjectBlock = block.closest('.management-subject');
+      const subject = subjectBlock?.dataset.managementSubject;
+      if (!source || !subject) {
+        clearDragState(container);
+        return;
+      }
+      try {
+        const label = block.dataset.subvakLabel || 'Zonder subvak';
+        await management.moveLessonToSubvak(sourceId, label === 'Zonder subvak' ? '' : label);
+        block.querySelector('.management-lessons-grid').appendChild(source);
+        await persistSubjectOrder(container, management, subject);
+        await renderStudentLessons(container, management, onEdit);
+      } catch (error) {
+        console.error('Management lesson subvak move error:', error);
+        await renderStudentLessons(container, management, onEdit);
+        throw error;
+      } finally {
+        clearDragState(container);
+      }
+    });
+  });
+
+  return groups;
 }
 
 export function renderRecovery(container, management, mode, onRestore = async () => {}) {

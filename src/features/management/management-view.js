@@ -45,7 +45,7 @@ export function renderStudentSelection(container, management, onSelect = () => {
   return students;
 }
 
-export function renderStudentLessons(container, management) {
+export function renderStudentLessons(container, management, onEdit = null) {
   if (!container) throw new Error('renderStudentLessons requires a container.');
   if (!management) throw new Error('renderStudentLessons requires management.');
 
@@ -54,8 +54,18 @@ export function renderStudentLessons(container, management) {
     <article class="management-lesson" data-lesson-id="${escapeHtml(lesson.id)}">
       <h3>${escapeHtml(lesson.title)}</h3>
       <p>${escapeHtml(lesson.subject)}${lesson.subvak ? ` · ${escapeHtml(lesson.subvak)}` : ''}</p>
+      ${typeof onEdit === 'function' ? `<div class="management-links"><button type="button" class="management-link" data-edit-lesson-id="${escapeHtml(lesson.id)}">✏️ Bewerken</button></div>` : ''}
     </article>
   `).join('');
+
+  if (typeof onEdit === 'function') {
+    container.querySelectorAll('[data-edit-lesson-id]').forEach(button => {
+      button.addEventListener('click', () => {
+        const lesson = lessons.find(item => String(item.id) === String(button.dataset.editLessonId));
+        if (lesson) onEdit(lesson);
+      });
+    });
+  }
 
   return lessons;
 }
@@ -115,12 +125,7 @@ export async function renderFeedback(container, management) {
   if (!management) throw new Error('renderFeedback requires management.');
 
   const feedback = await management.listFeedback();
-  const labels = {
-    idea: '💡 Idee / wens',
-    bug: '🐛 Foutmelding',
-    improvement: '🔧 Verbetering',
-    other: '❓ Anders'
-  };
+  const labels = { idea: '💡 Idee / wens', bug: '🐛 Foutmelding', improvement: '🔧 Verbetering', other: '❓ Anders' };
 
   container.innerHTML = (feedback || []).map(item => `
     <article class="management-feedback" data-feedback-id="${escapeHtml(item.id)}">

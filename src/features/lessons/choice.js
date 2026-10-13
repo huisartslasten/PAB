@@ -1,4 +1,4 @@
-import { getLessonComponents, getLessonComponentType } from './components.js';
+import { isPracticeModeActive } from '../practice/practice-domain.js';
 
 const CHOICE_LABELS = Object.freeze({
   practice: 'Oefenen',
@@ -7,15 +7,27 @@ const CHOICE_LABELS = Object.freeze({
   view: 'Bekijken'
 });
 
+function normalizeLessonType(lessonOrType = {}) {
+  return typeof lessonOrType === 'string'
+    ? lessonOrType.trim().toLowerCase()
+    : String(lessonOrType?.type || '').trim().toLowerCase();
+}
+
 export function getLessonChoiceType(lessonOrType = {}) {
-  const lesson = typeof lessonOrType === 'string' ? { type: lessonOrType } : lessonOrType;
-  const components = getLessonComponents(lesson);
-  return components.includes('practice') ? getLessonComponentType(lesson) : 'questions';
+  return normalizeLessonType(lessonOrType) === 'questions' ? 'questions' : 'practice';
 }
 
 export function getLessonChoices(lessonOrType = {}) {
-  const lesson = typeof lessonOrType === 'string' ? { type: lessonOrType } : lessonOrType;
-  return getLessonComponents(lesson).filter(component => Object.hasOwn(CHOICE_LABELS, component));
+  const type = normalizeLessonType(lessonOrType);
+
+  if (type === 'questions') {
+    return ['questions', 'view'];
+  }
+
+  const choices = [];
+  if (isPracticeModeActive('flashcards')) choices.push('practice');
+  choices.push('test', 'view');
+  return choices;
 }
 
 export function getLessonChoiceCards(lesson = {}) {

@@ -70,7 +70,8 @@ function clearDragState(container) {
 }
 
 async function persistSubjectOrder(container, management, subject) {
-  const ids = [...container.querySelectorAll(`[data-management-subject="${CSS.escape(subject)}"] .management-lesson[data-lesson-id]`)]
+  const subjectSelector = `[data-management-subject="${CSS.escape(subject)}"]`;
+  const ids = [...container.querySelectorAll(`${subjectSelector} .management-lesson[data-lesson-id]`)]
     .map(card => Number(card.dataset.lessonId))
     .filter(Boolean);
   const current = management.getScopedLessons();
@@ -78,7 +79,7 @@ async function persistSubjectOrder(container, management, subject) {
   await management.saveLessonOrder(subject, lessons);
 }
 
-export async function renderStudentLessons(container, management, onEdit = null) {
+export async function renderStudentLessons(container, management, { onEdit = null, onArchive = null, onDelete = null } = {}) {
   if (!container) throw new Error('renderStudentLessons requires a container.');
   if (!management) throw new Error('renderStudentLessons requires management.');
 
@@ -96,7 +97,11 @@ export async function renderStudentLessons(container, management, onEdit = null)
                   <h3>${escapeHtml(lesson.title)}</h3>
                   <p>${escapeHtml(lesson.subject)}${lesson.subvak ? ` · ${escapeHtml(lesson.subvak)}` : ''}</p>
                 </div>
-                ${typeof onEdit === 'function' ? `<div class="management-links"><button type="button" class="management-link" data-edit-lesson-id="${escapeHtml(lesson.id)}">✏️ Bewerken</button></div>` : ''}
+                <div class="management-links">
+                  ${typeof onEdit === 'function' ? `<button type="button" class="management-link" data-edit-lesson-id="${escapeHtml(lesson.id)}">✏️ Bewerken</button>` : ''}
+                  ${typeof onArchive === 'function' ? `<button type="button" class="management-link" data-archive-lesson-id="${escapeHtml(lesson.id)}">🗄️ Archiveren</button>` : ''}
+                  ${typeof onDelete === 'function' ? `<button type="button" class="management-link danger" data-delete-lesson-id="${escapeHtml(lesson.id)}">🗑️ Verwijderen</button>` : ''}
+                </div>
               </article>
             `).join('')}
           </div>
@@ -109,6 +114,26 @@ export async function renderStudentLessons(container, management, onEdit = null)
     button.addEventListener('click', () => {
       const lesson = management.getScopedLessons().find(item => String(item.id) === String(button.dataset.editLessonId));
       if (lesson && typeof onEdit === 'function') onEdit(lesson);
+    });
+  });
+
+  container.querySelectorAll('[data-archive-lesson-id]').forEach(button => {
+    button.addEventListener('click', async () => {
+      if (typeof onArchive !== 'function') return;
+      const lesson = management.getScopedLessons().find(item => String(item.id) === String(button.dataset.archiveLessonId));
+      if (!lesson) return;
+      button.disabled = true;
+      try { await onArchive(lesson); } finally { button.disabled = false; }
+    });
+  });
+
+  container.querySelectorAll('[data-delete-lesson-id]').forEach(button => {
+    button.addEventListener('click', async () => {
+      if (typeof onDelete !== 'function') return;
+      const lesson = management.getScopedLessons().find(item => String(item.id) === String(button.dataset.deleteLessonId));
+      if (!lesson) return;
+      button.disabled = true;
+      try { await onDelete(lesson); } finally { button.disabled = false; }
     });
   });
 
@@ -145,7 +170,6 @@ export async function renderStudentLessons(container, management, onEdit = null)
       try {
         const sourceLesson = management.getScopedLessons().find(item => Number(item.id) === sourceId);
         const targetSubvak = target.closest('.management-subvak')?.dataset.subvakLabel || 'Zonder subvak';
-        const sourceSubvak = source.closest('.management-subvak')?.dataset.subvakLabel || 'Zonder subvak';
         const newSubvak = targetSubvak === 'Zonder subvak' ? '' : targetSubvak;
         if (normalizeSubvak(sourceLesson?.subvak) !== normalizeSubvak(newSubvak)) {
           await management.moveLessonToSubvak(sourceId, newSubvak);
@@ -154,10 +178,10 @@ export async function renderStudentLessons(container, management, onEdit = null)
         if (event.clientY > rect.top + rect.height / 2) target.after(source);
         else target.before(source);
         await persistSubjectOrder(container, management, subject);
-        await renderStudentLessons(container, management, onEdit);
+        await renderStudentLessons(container, management, { onEdit, onArchive, onDelete });
       } catch (error) {
         console.error('Management lesson reorder error:', error);
-        await renderStudentLessons(container, management, onEdit);
+        await renderStudentLessons(container, management, { onEdit, onArchive, onDelete });
         throw error;
       } finally {
         clearDragState(container);
@@ -193,10 +217,10 @@ export async function renderStudentLessons(container, management, onEdit = null)
         await management.moveLessonToSubvak(sourceId, label === 'Zonder subvak' ? '' : label);
         block.querySelector('.management-lessons-grid').appendChild(source);
         await persistSubjectOrder(container, management, subject);
-        await renderStudentLessons(container, management, onEdit);
+        await renderStudentLessons(container, management, { onEdit, onArchive, onDelete });
       } catch (error) {
         console.error('Management lesson subvak move error:', error);
-        await renderStudentLessons(container, management, onEdit);
+        await renderStudentLessons(container, management, { onEdit, onArchive, onDelete });
         throw error;
       } finally {
         clearDragState(container);

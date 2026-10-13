@@ -15,7 +15,7 @@ export function buildLessonSaveRequest({
     lessonId: draft.lessonId ?? null,
     student: draft.student || '',
     subject: draft.subject || '',
-    enteredSubvak: draft.enteredSubvak || '',
+    enteredSubvak: draft.enteredSubvak ?? draft.subvak ?? '',
     existingSubvak: draft.existingSubvak || '',
     title: draft.title || '',
     type: draft.type || '',

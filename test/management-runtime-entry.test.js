@@ -22,6 +22,13 @@ function createFeedbackDb() {
   return { db, calls };
 }
 
+function makeLessonOrder() {
+  return {
+    async getOrderedLessons(lessons) { return lessons; },
+    async writeOrder(student, subject, lessons) { return { student, subject, lessonIds: lessons.map(lesson => Number(lesson.id)) }; }
+  };
+}
+
 function createRuntime(overrides = {}) {
   const { db, calls } = createFeedbackDb();
   const target = {};
@@ -29,6 +36,7 @@ function createRuntime(overrides = {}) {
     db,
     isParent: () => true,
     loadLessons: async () => {},
+    lessonOrder: makeLessonOrder(),
     ...overrides
   }, target);
   return { db, calls, target, runtime };
@@ -55,6 +63,9 @@ test('management runtime entry exposes the management orchestration surface', as
   assert.equal(typeof runtime.loadLessons, 'function');
   assert.equal(typeof runtime.getScopedLessons, 'function');
   assert.equal(typeof runtime.getAllScopedLessons, 'function');
+  assert.equal(typeof runtime.getOrderedScopedLessons, 'function');
+  assert.equal(typeof runtime.saveLessonOrder, 'function');
+  assert.equal(typeof runtime.moveLessonToSubvak, 'function');
   assert.equal(typeof runtime.getRecoveryLessons, 'function');
   assert.equal(typeof runtime.createLesson, 'function');
   assert.equal(typeof runtime.updateLesson, 'function');
@@ -78,7 +89,7 @@ test('management runtime entry enforces parent authorization before management a
 
 test('management runtime entry rejects missing bridge contracts', () => {
   assert.throws(
-    () => installManagementRuntimeEntry({ db: {}, isParent: true, loadLessons: async () => {} }, {}),
+    () => installManagementRuntimeEntry({ db: {}, isParent: true, loadLessons: async () => {}, lessonOrder: makeLessonOrder() }, {}),
     /isParent function/
   );
 });

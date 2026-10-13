@@ -14,7 +14,6 @@
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
-    import { createManagementRuntime } from './src/features/management/management-runtime-entry.js';
     import { renderStudentSelection, renderStudentLessons, renderRecovery, renderFeedback } from './src/features/management/management-view.js';
 
     const mount=document.querySelector('#paco-template-mount');
@@ -33,7 +32,7 @@
     });
 
     const app=createPacoGOApp({supabaseLib:window.supabase});
-    const management=createManagementRuntime({db:app.db,lessonOrder:app.lessonOrder,isParent:()=>app.auth.isParent,loadLessons:()=>app.loadLessons()});
+    const management=app.management;
     const students=document.createElement('div'); students.className='management-students';
     const studentSection=document.createElement('section'); studentSection.className='management-section';
     const studentHeading=document.createElement('h2'); studentHeading.textContent='Leerling'; studentSection.append(studentHeading,students);

@@ -59,7 +59,13 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null,
     agenda,
     testHistory,
     creator: createCreatorService(db, { canCreate }),
-    management: createManagement({ auth, lessonService: lessons, feedbackService: feedback, loadLessons }),
+    management: createManagement({
+      auth,
+      lessonService: lessons,
+      feedbackService: feedback,
+      lessonOrder,
+      loadLessons
+    }),
     photos: createPhotoStorageService(db, { canManage }),
     mapLessons: mapLessonRecords
   });

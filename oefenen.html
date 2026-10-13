@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PacoGO — Oefenen</title>
   <link rel="stylesheet" href="src/components/page-template.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     .practice-choice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
     .practice-choice-card{min-height:180px;display:flex;flex-direction:column;justify-content:space-between;padding:18px;border:2px solid #dce9f6;border-radius:22px;background:#fff;box-shadow:0 6px 0 rgba(16,43,87,.06),0 10px 22px rgba(16,43,87,.07);transition:.16s}
@@ -20,7 +19,6 @@
     .practice-choice-button{border:0;border-radius:12px;padding:9px 14px;background:#1787f2;color:#fff;font:800 14px Nunito;box-shadow:0 3px 0 #0d6fd4;cursor:pointer}
     .practice-choice-button:hover{background:#0d6fd4}
     .practice-choice-card:not(.available) .practice-choice-tag{background:#f0f2f5;color:#7b8798}
-    .practice-choice-card.is-loading{opacity:.72}
     @media(max-width:1000px){.practice-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(max-width:700px){.practice-choice-grid{grid-template-columns:1fr}.practice-choice-card{min-height:180px}}
   </style>
@@ -30,8 +28,7 @@
 
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
-    import { createPacoGOApp } from './src/app/bootstrap.js';
-    import { hasLessonComponent } from './src/features/lessons/components.js';
+    import { isPracticeModeActive } from './src/features/practice/practice-domain.js';
 
     const params = new URLSearchParams(window.location.search);
     const lessonId = params.get('lesson_id') || '';
@@ -42,8 +39,16 @@
     const grid = document.createElement('div');
     grid.className = 'practice-choice-grid';
 
+    const flashcardsAvailable = Boolean(lessonId && isPracticeModeActive('flashcards'));
     const cards = [
-      { icon:'🃏', title:'Flashcards', text:'Oefen de inhoud van deze les met korte vraag-en-antwoordkaarten.', available:false },
+      {
+        icon:'🃏',
+        title:'Flashcards',
+        text: flashcardsAvailable
+          ? 'Oefen de inhoud van deze les met korte vraag-en-antwoordkaarten.'
+          : 'Flashcards zijn momenteel niet beschikbaar voor deze oefensessie.',
+        available:flashcardsAvailable
+      },
       { icon:'🎮', title:'Spelletjes', text:'Straks kun je deze les ook oefenen met leuke spelletjes.', available:false },
       { icon:'✏️', title:'Oefenen', text:'Een gerichte oefenvorm voor de inhoud van deze les.', available:false },
       { icon:'❓', title:'Vragen & antwoorden', text:'Oefen met vragen en controleer daarna je antwoord.', available:false },
@@ -54,7 +59,7 @@
       grid.replaceChildren();
       cards.forEach(card => {
         const article = document.createElement('article');
-        article.className = `practice-choice-card${card.available ? ' available' : ''}${card.loading ? ' is-loading' : ''}`;
+        article.className = `practice-choice-card${card.available ? ' available' : ''}`;
 
         const top = document.createElement('div');
         const icon = document.createElement('div');
@@ -70,7 +75,7 @@
         footer.className = 'practice-choice-footer';
         const tag = document.createElement('span');
         tag.className = 'practice-choice-tag';
-        tag.textContent = card.loading ? 'Laden…' : (card.available ? 'Beschikbaar' : 'Binnenkort');
+        tag.textContent = card.available ? 'Beschikbaar' : 'Binnenkort';
         footer.appendChild(tag);
 
         if (card.available) {
@@ -80,7 +85,7 @@
           button.textContent = 'Flashcards →';
           button.addEventListener('click', () => {
             const target = new URL('flashcards-template.html', window.location.href);
-            if (lessonId) target.searchParams.set('lesson_id', lessonId);
+            target.searchParams.set('lesson_id', lessonId);
             target.searchParams.set('student', student);
             window.location.href = target.toString();
           });
@@ -134,34 +139,6 @@
       ],
       content
     });
-
-    async function connectLessonToPractice() {
-      const flashcards = cards.find(card => card.title === 'Flashcards');
-      if (!flashcards || !lessonId) return;
-
-      flashcards.loading = true;
-      renderChoices();
-
-      try {
-        const app = createPacoGOApp({ supabaseLib: window.supabase });
-        const records = await app.loadLessons();
-        const lesson = app.mapLessons(records).find(candidate => String(candidate.id) === String(lessonId));
-
-        flashcards.available = Boolean(lesson && hasLessonComponent(lesson, 'flashcards'));
-        if (!flashcards.available) {
-          flashcards.text = 'Flashcards zijn geen onderdeel van deze les.';
-        }
-      } catch (error) {
-        console.error('Practice availability load error:', error);
-        flashcards.available = false;
-        flashcards.text = 'De oefenmogelijkheden van deze les konden niet worden geladen.';
-      } finally {
-        flashcards.loading = false;
-        renderChoices();
-      }
-    }
-
-    connectLessonToPractice();
   </script>
 </body>
 </html>

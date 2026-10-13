@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { getPracticeMode, getPracticeModes, getActivePracticeModes } from '../src/features/practice/practice-domain.js';
+import { getPracticeMode, getPracticeModes, getActivePracticeModes, isPracticeModeActive } from '../src/features/practice/practice-domain.js';
 import { createFlashcardSession, getCurrentFlashcard, nextFlashcard, revealFlashcard } from '../src/features/practice/flashcards/flashcard-domain.js';
 
 test('practice structure exposes Flashcards as the first active mode and Games as planned', () => {
@@ -11,6 +11,8 @@ test('practice structure exposes Flashcards as the first active mode and Games a
   assert.deepEqual(getActivePracticeModes(), [
     { id: 'flashcards', label: 'Flashcards', status: 'active' }
   ]);
+  assert.equal(isPracticeModeActive('flashcards'), true);
+  assert.equal(isPracticeModeActive('games'), false);
   assert.deepEqual(getPracticeMode('games'), {
     id: 'games',
     label: 'Spelletjes',

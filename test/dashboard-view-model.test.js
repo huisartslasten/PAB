@@ -33,7 +33,7 @@ test('dashboard progress derives lesson, item and mastery counts', () => {
 
 test('dashboard uses a stable icon mapping with a generic fallback', () => {
   assert.equal(getDashboardSubjectIcon('Nederlands'), '📚');
-  assert.equal(getDashboardSubjectIcon('Onbekend vak'), '📘');
+  assert.equal(getDashboardSubjectIcon('Onbekend vak'), '🎓');
 });
 
 test('dashboard agenda read model keeps only upcoming items and preserves lesson links', () => {

@@ -22,14 +22,20 @@ function createFeedbackDb() {
   return { db, calls };
 }
 
-test('management runtime entry exposes feedback through the management boundary', async () => {
+function createRuntime(overrides = {}) {
   const { db, calls } = createFeedbackDb();
   const target = {};
   const runtime = installManagementRuntimeEntry({
     db,
     isParent: () => true,
-    loadLessons: async () => {}
+    loadLessons: async () => {},
+    ...overrides
   }, target);
+  return { db, calls, target, runtime };
+}
+
+test('management runtime entry exposes feedback through the management boundary', async () => {
+  const { calls, target, runtime } = createRuntime();
 
   assert.equal(typeof runtime.listFeedback, 'function');
   assert.equal(target.pacoGOManagementListFeedback, runtime.listFeedback);
@@ -40,16 +46,33 @@ test('management runtime entry exposes feedback through the management boundary'
   ]);
 });
 
-test('management runtime entry enforces parent authorization before feedback access', async () => {
-  const { db, calls } = createFeedbackDb();
-  const target = {};
-  const runtime = installManagementRuntimeEntry({
-    db,
-    isParent: () => false,
-    loadLessons: async () => {}
-  }, target);
+test('management runtime entry exposes the management orchestration surface', async () => {
+  const { target, runtime } = createRuntime();
+
+  assert.equal(typeof runtime.getStudents, 'function');
+  assert.equal(typeof runtime.selectStudent, 'function');
+  assert.equal(typeof runtime.getSelectedStudent, 'function');
+  assert.equal(typeof runtime.loadLessons, 'function');
+  assert.equal(typeof runtime.getScopedLessons, 'function');
+  assert.equal(typeof runtime.getAllScopedLessons, 'function');
+  assert.equal(typeof runtime.getRecoveryLessons, 'function');
+  assert.equal(typeof runtime.createLesson, 'function');
+  assert.equal(typeof runtime.updateLesson, 'function');
+  assert.equal(typeof runtime.archiveLesson, 'function');
+  assert.equal(typeof runtime.moveToTrash, 'function');
+  assert.equal(typeof runtime.restoreLesson, 'function');
+  assert.equal(target.pacoGOManagementSelectStudent, runtime.selectStudent);
+
+  assert.deepEqual(runtime.getStudents(), ['Zyon', 'Zenith', 'Zephon']);
+  assert.equal(runtime.selectStudent('Zenith'), 'Zenith');
+  assert.equal(runtime.getSelectedStudent(), 'Zenith');
+});
+
+test('management runtime entry enforces parent authorization before management access', async () => {
+  const { calls, runtime } = createRuntime({ isParent: () => false });
 
   await assert.rejects(() => runtime.listFeedback(), /parent session/);
+  assert.throws(() => runtime.getStudents(), /parent session/);
   assert.deepEqual(calls, []);
 });
 

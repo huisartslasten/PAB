@@ -4,6 +4,15 @@ import { createPacoGOApp } from '../src/app/bootstrap.js';
 import { appState } from '../src/core/state.js';
 import { PARENT_IDS } from '../src/core/auth.js';
 
+function makeStorage() {
+  const values = new Map();
+  return {
+    getItem(key) { return values.get(key) ?? null; },
+    setItem(key, value) { values.set(key, String(value)); },
+    removeItem(key) { values.delete(key); }
+  };
+}
+
 function makeSupabaseLib(session = null) {
   const lessons = [
     { id: 1, student: 'Zyon', archived: false, deleted: false, lesson_items: [] }
@@ -45,7 +54,8 @@ test('application root composes management with canonical lesson, feedback, grad
 
   const app = createPacoGOApp({
     supabaseLib: makeSupabaseLib(),
-    session: { user: { id: PARENT_IDS[0] } }
+    session: { user: { id: PARENT_IDS[0] } },
+    storage: makeStorage()
   });
 
   assert.ok(app.lessons);
@@ -54,6 +64,7 @@ test('application root composes management with canonical lesson, feedback, grad
   assert.ok(app.audio);
   assert.ok(app.authSession);
   assert.ok(app.management);
+  assert.ok(app.lessonOrder);
   assert.equal(app.management.listFeedback instanceof Function, true);
   assert.equal(app.loadLessons instanceof Function, true);
   assert.strictEqual(app.state, appState);
@@ -73,7 +84,8 @@ test('application root initializes the current session through the auth service 
   const session = { user: { id: PARENT_IDS[0] } };
   const app = createPacoGOApp({
     supabaseLib: makeSupabaseLib(session),
-    session: null
+    session: null,
+    storage: makeStorage()
   });
 
   assert.equal(app.auth.isParent, false);
@@ -87,7 +99,8 @@ test('application root initializes the current session through the auth service 
 test('application root exposes management before parent authorization is granted', () => {
   const app = createPacoGOApp({
     supabaseLib: makeSupabaseLib(),
-    session: null
+    session: null,
+    storage: makeStorage()
   });
 
   assert.ok(app.management);

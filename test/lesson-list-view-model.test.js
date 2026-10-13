@@ -34,5 +34,5 @@ test('lesson subject groups contain only active lessons for the selected student
 
 test('lesson subject icons use the canonical mapping and generic fallback', () => {
   assert.equal(getLessonSubjectIcon('Nederlands'), '📚');
-  assert.equal(getLessonSubjectIcon('Onbekend vak'), '📘');
+  assert.equal(getLessonSubjectIcon('Onbekend vak'), '🎓');
 });

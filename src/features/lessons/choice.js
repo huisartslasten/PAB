@@ -1,5 +1,14 @@
 import { isPracticeModeActive } from '../practice/practice-domain.js';
 
+const LESSON_TYPES = Object.freeze([
+  'words',
+  'custom',
+  'dictation',
+  'spelling',
+  'math',
+  'questions'
+]);
+
 const CHOICE_LABELS = Object.freeze({
   practice: 'Oefenen',
   test: 'Toets',
@@ -14,13 +23,14 @@ function normalizeLessonType(lessonOrType = {}) {
 }
 
 export function getLessonChoiceType(lessonOrType = {}) {
-  return normalizeLessonType(lessonOrType) === 'questions' ? 'questions' : 'practice';
+  const type = normalizeLessonType(lessonOrType);
+  return type === 'questions' || !LESSON_TYPES.includes(type) ? 'questions' : 'practice';
 }
 
 export function getLessonChoices(lessonOrType = {}) {
   const type = normalizeLessonType(lessonOrType);
 
-  if (type === 'questions') {
+  if (getLessonChoiceType(type) === 'questions') {
     return ['questions', 'view'];
   }
 

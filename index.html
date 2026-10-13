@@ -2378,11 +2378,16 @@ async function renderParentStudent(){
       '</div>';
     return;
   }
-  const guestRes=await db.from('guest_access').select('id,guest_name,active').eq('guest_name',parentSelectedStudent).maybeSingle();
-  if(guestRes.error||!guestRes.data){el.innerHTML='<div class="card message error">Gastleerling kon niet worden geladen.</div>';return;}
-  const glRes=await db.from('guest_lessons').select('id,lesson_id,active').eq('guest_id',guestRes.data.id);
-  const assignments=glRes.error?[]:(glRes.data||[]);
-  const assigned=new Map(assignments.map(x=>[Number(x.lesson_id),x]));
+  let guestAccess;
+  try{
+    guestAccess=await window.pacoGOLoadGuestLessonAccess(parentSelectedStudent);
+  }catch(error){
+    console.error('Guest lesson access load error:',error);
+    el.innerHTML='<div class="card message error">Gastleerling kon niet worden geladen.</div>';
+    return;
+  }
+  if(!guestAccess?.guest){el.innerHTML='<div class="card message error">Gastleerling kon niet worden geladen.</div>';return;}
+  const assigned=new Map((guestAccess.assignments||[]).map(x=>[Number(x.lesson_id),x]));
   el.innerHTML='<div class="card"><div class="parent-dashboard-head"><div><h2>👤 '+escapeHtml(parentSelectedStudent)+'</h2><div class="small">Activeer hier welke lessen deze gastleerling mag zien.</div></div></div>'+
     '<div>'+lessons.map(l=>parentLessonRow(l,true,!!assigned.get(Number(l.id))&&assigned.get(Number(l.id)).active,assigned.get(Number(l.id))?.id)).join('')+'</div></div>';
 }
@@ -2946,6 +2951,7 @@ function insertWordQuestionAfter(button){
     import { installLessonSaveRuntimeEntry } from '/src/features/lessons/lesson-save-runtime-entry.js';
     import { installCreatorRuntimeEntry } from '/src/features/creator/creator-runtime-entry.js';
     import { installManagementRuntimeEntry } from '/src/features/management/management-runtime-entry.js';
+    import { installLessonGuestAccessRuntimeEntry } from '/src/features/lessons/lesson-guest-access-runtime-entry.js';
     installAgendaRuntimeEntry({
       storage: window.localStorage,
       currentStudent: () => currentStudent,
@@ -2967,6 +2973,14 @@ function insertWordQuestionAfter(button){
       db,
       isParent: () => isParentLoggedIn(),
       loadLessons
+    }, window);
+
+    installLessonGuestAccessRuntimeEntry({
+      db,
+      requireParent,
+      get currentStudent() { return parentSelectedStudent || currentStudent; },
+      renderParentStudent,
+      showMessage
     }, window);
 
     installLessonSaveRuntimeEntry({

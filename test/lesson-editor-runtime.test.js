@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createLessonEditorRuntime } from '../src/features/lessons/lesson-editor-runtime-entry.js';
+import { createLessonEditorApplication } from '../src/features/lessons/lesson-editor-application.js';
 
 function createDb() {
   const calls = [];
@@ -18,9 +18,7 @@ function createDb() {
         };
       }
       if (table === 'lesson_items') {
-        return {
-          insert(payload) { calls.push(['insert-items', payload]); return { select: async () => ({ data: payload, error: null }) }; }
-        };
+        return { insert(payload) { calls.push(['insert-items', payload]); return { select: async () => ({ data: payload, error: null }) }; } };
       }
       throw new Error(`Unexpected table: ${table}`);
     }
@@ -32,12 +30,13 @@ function createStorage() {
   return { getItem: key => data.get(key) ?? null, setItem: (key, value) => data.set(key, value) };
 }
 
-test('lesson editor runtime authorizes parent, persists lesson and syncs test date', async () => {
+test('lesson editor application composes canonical write ownership and test-calendar sync', async () => {
   const db = createDb();
   const storage = createStorage();
-  const runtime = createLessonEditorRuntime({ db, storage, initializeSession: async () => {}, isParent: () => true });
+  let refreshed = 0;
+  const application = createLessonEditorApplication({ db, storage, initializeSession: async () => {}, isParent: () => true, refreshLessons: async () => { refreshed += 1; } });
 
-  const result = await runtime.save({
+  const result = await application.editor.save({
     lessonId: null,
     lesson: { student: 'Zyon', subject: 'Nederlands', title: 'Week 4', type: 'words' },
     items: [{ question: 'Vraag', answer: 'Antwoord', sort_order: 0 }],
@@ -46,16 +45,17 @@ test('lesson editor runtime authorizes parent, persists lesson and syncs test da
 
   assert.equal(result.ok, true);
   assert.equal(result.lessonId, 17);
+  assert.equal(refreshed, 1);
   assert.equal(JSON.parse(storage.getItem('pacogo_test_calendar'))[0].date, '2026-10-20');
   assert.equal(db.calls.some(([kind]) => kind === 'insert-items'), true);
 });
 
-test('lesson editor runtime stops before persistence when user is not a parent', async () => {
+test('lesson editor application blocks persistence for non-parent users', async () => {
   const db = createDb();
   const storage = createStorage();
-  const runtime = createLessonEditorRuntime({ db, storage, initializeSession: async () => {}, isParent: () => false });
+  const application = createLessonEditorApplication({ db, storage, initializeSession: async () => {}, isParent: () => false });
 
-  const result = await runtime.save({ lesson: { student: 'Zyon', subject: 'Nederlands', title: 'Geen toegang', type: 'words' }, items: [] });
+  const result = await application.editor.save({ lesson: { student: 'Zyon', subject: 'Nederlands', title: 'Geen toegang', type: 'words' }, items: [] });
 
   assert.equal(result.ok, false);
   assert.equal(result.stage, 'authorization');

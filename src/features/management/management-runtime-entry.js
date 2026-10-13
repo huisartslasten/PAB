@@ -2,7 +2,7 @@ import { createManagement } from './management.js';
 import { createLessonService } from '../../services/lesson-service.js';
 import { createFeedbackService } from '../../services/feedback-service.js';
 
-const REQUIRED_KEYS = Object.freeze(['db', 'isParent', 'loadLessons']);
+const REQUIRED_KEYS = Object.freeze(['db', 'isParent', 'loadLessons', 'lessonOrder']);
 const MANAGEMENT_ACTIONS = Object.freeze([
   'getStudents',
   'selectStudent',
@@ -10,6 +10,9 @@ const MANAGEMENT_ACTIONS = Object.freeze([
   'loadLessons',
   'getScopedLessons',
   'getAllScopedLessons',
+  'getOrderedScopedLessons',
+  'saveLessonOrder',
+  'moveLessonToSubvak',
   'getRecoveryLessons',
   'createLesson',
   'updateLesson',
@@ -29,6 +32,7 @@ function requireRuntime(runtime) {
     if (!(key in runtime)) throw new Error(`The management runtime bridge is missing: ${key}.`);
   }
   if (!runtime.db) throw new Error('The management runtime bridge is missing: db.');
+  if (!runtime.lessonOrder) throw new Error('The management runtime bridge is missing: lessonOrder.');
   if (typeof runtime.isParent !== 'function') {
     throw new Error('The management runtime bridge is missing: isParent function.');
   }
@@ -50,6 +54,7 @@ export function createManagementRuntime(runtime) {
     },
     lessonService,
     feedbackService,
+    lessonOrder: runtime.lessonOrder,
     loadLessons: runtime.loadLessons
   });
 }
@@ -75,6 +80,9 @@ export function installManagementRuntimeEntry(runtime, target = globalThis) {
     loadLessons: (...args) => executeManagementAction(runtime, 'loadLessons', ...args),
     getScopedLessons: (...args) => executeManagementAction(runtime, 'getScopedLessons', ...args),
     getAllScopedLessons: (...args) => executeManagementAction(runtime, 'getAllScopedLessons', ...args),
+    getOrderedScopedLessons: (...args) => executeManagementAction(runtime, 'getOrderedScopedLessons', ...args),
+    saveLessonOrder: (...args) => executeManagementAction(runtime, 'saveLessonOrder', ...args),
+    moveLessonToSubvak: (...args) => executeManagementAction(runtime, 'moveLessonToSubvak', ...args),
     getRecoveryLessons: (...args) => executeManagementAction(runtime, 'getRecoveryLessons', ...args),
     createLesson: (...args) => executeManagementAction(runtime, 'createLesson', ...args),
     updateLesson: (...args) => executeManagementAction(runtime, 'updateLesson', ...args),
@@ -92,6 +100,9 @@ export function installManagementRuntimeEntry(runtime, target = globalThis) {
   target.pacoGOManagementLoadLessons = entries.loadLessons;
   target.pacoGOManagementGetScopedLessons = entries.getScopedLessons;
   target.pacoGOManagementGetAllScopedLessons = entries.getAllScopedLessons;
+  target.pacoGOManagementGetOrderedScopedLessons = entries.getOrderedScopedLessons;
+  target.pacoGOManagementSaveLessonOrder = entries.saveLessonOrder;
+  target.pacoGOManagementMoveLessonToSubvak = entries.moveLessonToSubvak;
   target.pacoGOManagementGetRecoveryLessons = entries.getRecoveryLessons;
   target.pacoGOManagementCreateLesson = entries.createLesson;
   target.pacoGOManagementUpdateLesson = entries.updateLesson;
@@ -109,6 +120,9 @@ export function installManagementRuntimeEntry(runtime, target = globalThis) {
     loadLessons: target.pacoGOManagementLoadLessons,
     getScopedLessons: target.pacoGOManagementGetScopedLessons,
     getAllScopedLessons: target.pacoGOManagementGetAllScopedLessons,
+    getOrderedScopedLessons: target.pacoGOManagementGetOrderedScopedLessons,
+    saveLessonOrder: target.pacoGOManagementSaveLessonOrder,
+    moveLessonToSubvak: target.pacoGOManagementMoveLessonToSubvak,
     getRecoveryLessons: target.pacoGOManagementGetRecoveryLessons,
     createLesson: target.pacoGOManagementCreateLesson,
     updateLesson: target.pacoGOManagementUpdateLesson,

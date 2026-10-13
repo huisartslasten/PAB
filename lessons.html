@@ -35,7 +35,7 @@
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
-    import { getLessonSubjectGroups, getLessonSubjectIcon, normalizeLessonSubject } from './src/features/lessons/list-view-model.js';
+    import { getLessonSubjectGroups, getLessonSubjectIcon, getLessonSubvakGroups, normalizeLessonSubject } from './src/features/lessons/list-view-model.js';
 
     const params = new URLSearchParams(window.location.search);
     const selectedStudent = params.get('student') || 'Zyon';
@@ -87,15 +87,6 @@
       target.searchParams.set('lesson_id',String(lesson.id));
       target.searchParams.set('student',selectedStudent);
       return target.toString();
-    }
-
-    function normalizeSubvak(value){
-      return String(value || '').trim().replace(/\s+/g,' ').toLocaleLowerCase('nl-NL');
-    }
-
-    function subvakLabel(value){
-      const clean = String(value || '').trim().replace(/\s+/g,' ');
-      return clean || 'Zonder subvak';
     }
 
     function renderLessonCard(lesson){
@@ -157,20 +148,8 @@
       back.addEventListener('click',goLessons);
       header.append(heading,back);
 
-      const groups=[];
-      const byKey=new Map();
-      orderedLessons.forEach(lesson=>{
-        const raw=String(lesson.subvak || '').trim();
-        const key=normalizeSubvak(raw) || '__geen_subvak__';
-        if(!byKey.has(key)){
-          const group={key,label:subvakLabel(raw),lessons:[]};
-          byKey.set(key,group);
-          groups.push(group);
-        }
-        byKey.get(key).lessons.push(lesson);
-      });
-
       content.append(header);
+      const groups=getLessonSubvakGroups(orderedLessons);
       groups.forEach(group=>{
         const section=document.createElement('section');
         section.className='subvak-section';

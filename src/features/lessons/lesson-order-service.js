@@ -54,6 +54,11 @@ export function createLessonOrderService({ db, storage } = {}) {
     return readLocalOrder(student, subject);
   }
 
+  async function getOrderedLessons(list, student, subject) {
+    const saved = await readOrder(student, subject);
+    return applyLessonOrder(list, saved);
+  }
+
   async function writeOrder(student, subject, list, { persistRemote = true } = {}) {
     const ids = (Array.isArray(list) ? list : []).map(lesson => Number(lesson.id));
 
@@ -75,6 +80,7 @@ export function createLessonOrderService({ db, storage } = {}) {
 
   return Object.freeze({
     readOrder,
+    getOrderedLessons,
     writeOrder,
     applyLessonOrder: (list, saved) => applyLessonOrder(list, saved)
   });

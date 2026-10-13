@@ -54,7 +54,7 @@ export function createManagementRuntime(runtime) {
   });
 }
 
-export async function executeManagementAction(runtime, action, ...args) {
+export function executeManagementAction(runtime, action, ...args) {
   const management = createManagementRuntime(runtime);
   if (!MANAGEMENT_ACTIONS.includes(action)) {
     throw new Error(`Unknown management action: ${action}.`);

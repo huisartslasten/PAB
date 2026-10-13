@@ -19,6 +19,8 @@ export function createLessonEditorController({ saveDraft, refreshLessons, onSave
       testDate: request.testDate
     });
 
+    if (!result?.ok) return result || { ok: false, stage: 'persistence' };
+
     if (refreshLessons) await refreshLessons();
 
     const lessonId = result?.lesson?.id ?? result?.lessonId ?? request.lessonId;

@@ -2,7 +2,7 @@ import { createLessonWriteService } from './lesson-write-service.js';
 import { createTestCalendarStorage } from '../agenda/test-calendar.js';
 import { createLessonEditorRuntime } from './lesson-editor-runtime-entry.js';
 
-export function createLessonEditorApplication({ db, storage = globalThis.localStorage, initializeSession, isParent, refreshLessons = null, onSaved = null } = {}) {
+export function createLessonEditorApplication({ db, storage = globalThis.localStorage, initializeSession, isParent, refreshLessons = async () => {}, onSaved = null } = {}) {
   if (!db) throw new Error('Lesson editor application requires db.');
   if (typeof initializeSession !== 'function') throw new Error('Lesson editor application requires initializeSession.');
   if (typeof isParent !== 'function') throw new Error('Lesson editor application requires parent authorization.');
@@ -22,12 +22,11 @@ export function createLessonEditorApplication({ db, storage = globalThis.localSt
     if (testDate) calendar.upsert({ lessonId: savedLessonId, student, date: testDate, lesson: savedLesson });
     else calendar.remove({ lessonId: savedLessonId, student });
 
-    if (typeof refreshLessons === 'function') await refreshLessons();
     return { ok: true, ...written, lessonId: savedLessonId, testDate };
   };
 
   return Object.freeze({
-    editor: createLessonEditorRuntime({ saveDraft, refreshLessons: async () => {} , onSaved }),
+    editor: createLessonEditorRuntime({ saveDraft, refreshLessons, onSaved }),
     saveDraft,
     calendar
   });

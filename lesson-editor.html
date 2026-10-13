@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — Leseditor</title>
+  <link rel="stylesheet" href="src/components/page-template.css">
+  <style>
+    .lesson-editor-page{display:grid;gap:18px}.editor-page-banner{position:relative;overflow:hidden;border-radius:20px;background:#1787f2}.editor-page-banner img{display:block;width:100%;height:auto}.editor-page-banner .banner-label{position:absolute;left:22px;bottom:16px;padding:10px 16px;border-radius:14px;background:rgba(16,43,87,.82);color:#fff;font:900 24px/1 "Baloo 2",Nunito,sans-serif}.editor-main-card{display:grid;gap:16px}.editor-action-row,.editor-bottom-actions{display:flex;gap:10px;flex-wrap:wrap}.editor-student{padding:16px 18px;background:#f4f9fd;border:2px solid #cfe3f3;border-radius:18px}.editor-student-buttons{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.editor-student-choice{display:flex;align-items:center;gap:8px;padding:10px 14px;border:2px solid #cfe3f3;border-radius:14px;background:#fff;font-weight:900;cursor:pointer}.editor-student-choice:has(input:checked){background:#eaf4ff;border-color:#1787f2;color:#126fc9}.editor-top-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.field{margin-bottom:14px}.field label{display:block;font-weight:800;margin-bottom:6px}.field input,.field textarea{width:100%;padding:12px;border:1px solid #cdddec;border-radius:12px;background:#fff;color:#102b57}.field textarea{min-height:100px;resize:vertical}.lesson-type-select{position:relative}.lesson-type-button{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border:2px solid #bfe6ff;border-radius:14px;background:#eef8ff;color:#126fc9;font:900 16px "Baloo 2",Nunito,sans-serif;cursor:pointer}.lesson-type-menu{position:absolute;z-index:20;left:0;right:0;top:calc(100% + 7px);padding:7px;border:2px solid #cfe3f3;border-radius:14px;background:#fff;box-shadow:0 12px 28px rgba(16,43,87,.16)}.lesson-type-menu button{width:100%;display:block;padding:10px 12px;border:0;border-radius:10px;background:#fff;color:#102b57;text-align:left;font:800 15px "Baloo 2",Nunito,sans-serif;cursor:pointer}.lesson-type-menu button:hover{background:#eaf4ff;color:#126fc9}.lesson-type-native,.word-part-role{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none}.lesson-test-date-box,.lesson-ai-box,.spelling-labels-box{padding:16px;border:2px solid #dce9f6;border-radius:18px;background:#f7fbff}.lesson-test-date-toggle{font-weight:900;display:flex;align-items:center;gap:8px}.lesson-ai-instruction{margin-top:12px}.spelling-labels-box h3{margin:0 0 10px;color:#102b57}.editor-row{position:relative;margin:10px 0;padding:18px 18px 16px 58px;border:2px solid #cfe1f0;border-radius:20px;background:#fff;box-shadow:0 5px 12px rgba(16,43,87,.05);counter-increment:editorrow}.editor-row:before{content:counter(editorrow);position:absolute;left:16px;top:18px;width:26px;height:26px;border-radius:50%;background:#dff0ff;color:#126fc9;font-weight:900;display:flex;align-items:center;justify-content:center}.word-parts-section{margin-bottom:18px;padding:14px 16px;background:#fbfdff;border:2px solid #d7e7f5;border-radius:16px}.word-parts-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.word-parts-head label{font-size:17px;font-weight:900;color:#173b70}.word-part-row{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 190px 44px;gap:10px;align-items:center;margin:9px 0}.word-question-parts,.word-answer-parts,.question-answer-parts,.dictation-answer-parts,.math-answer-parts,.spelling-answer-parts{display:flex;flex-direction:column;gap:2px}.word-part-row input{width:100%;min-width:0;padding:10px;border:1px solid #cdddec;border-radius:10px}.word-part-role-select{position:relative}.word-part-role-button{width:100%;height:44px;border:2px solid #bfe6ff;border-radius:14px;background:#eef8ff;color:#126fc9;padding:8px 12px;font-weight:900;display:flex;align-items:center;justify-content:space-between;cursor:pointer}.word-part-role-button.role-extra{background:#fee5e3;border-color:#f4c9c5;color:#b91c1c}.word-part-role-menu{position:absolute;z-index:30;left:0;right:0;top:calc(100% + 6px);padding:6px;border:2px solid #8bcfff;border-radius:14px;background:#fff;box-shadow:0 12px 28px rgba(16,43,87,.16)}.word-part-role-menu button{width:100%;display:block;padding:9px;border:0;border-radius:9px;background:#fff;text-align:left;font-weight:800;cursor:pointer}.word-part-role-menu button:hover{background:#eaf7ff}.word-part-role-menu .role-extra-option{color:#b91c1c}.word-part-remove,.remove-row{border:0;border-radius:12px;background:#fee5e3;color:#b91c1c;box-shadow:none;cursor:pointer}.word-part-remove{width:42px;height:42px}.remove-row{position:absolute;right:12px;top:12px;width:40px;height:40px}.word-add-line,.question-insert-button{border:2px solid #bfe6ff!important;border-radius:12px!important;background:#eef8ff!important;color:#126fc9!important;box-shadow:none!important;font-weight:900!important}.word-add-line-bottom{display:block;margin:8px 0 0 auto}.word-extra-note,.small{font-size:13px;color:#667894}.word-rules-box{padding:13px;border:2px solid #d7e7f5;border-radius:16px;background:#f7fbff}.word-rules-title{font-weight:900;color:#173b70;margin-bottom:10px}.word-rules-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.word-rule-field label,.word-editor-hint label{display:block;font-weight:800;margin-bottom:6px}.word-rule-field input,.word-editor-hint textarea{width:100%;padding:10px;border:1px solid #cdddec;border-radius:10px}.word-editor-hint{margin-top:12px}.word-editor-hint textarea{min-height:76px}.dictation-spellcheck{margin-top:8px;font-size:13px}.date-picker{background:#f7fbff;border:2px solid #dce9f6;border-radius:14px;padding:9px;margin-top:8px;max-width:560px}.date-picker-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.date-picker-title{font:800 20px/1 "Baloo 2",Nunito,sans-serif;color:#102b57}.date-picker-nav{width:40px;height:40px;padding:0;border-radius:12px;background:#eaf4ff;color:#126fc9;box-shadow:none}.date-picker-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.date-picker-weekday{text-align:center;font-size:12px;font-weight:900;color:#667894;padding:4px}.date-picker-day{min-height:42px;padding:6px;border-radius:10px;background:#fff;color:#102b57;border:2px solid transparent;box-shadow:none;font-weight:850}.date-picker-day:hover{background:#eaf7ff;border-color:#8bcfff}.date-picker-day.selected{background:#1787f2;color:#fff;border-color:#0d6fd4}.date-picker-day.today{border-color:#ffc928}.date-picker-day.empty{visibility:hidden}.date-picker-help{font-size:12px;color:#667894;margin-top:8px;text-align:center}.message{padding:12px 14px;border-radius:12px}.message.error{background:#fee5e3;color:#991b1b}.hidden{display:none!important}@media(max-width:900px){.editor-top-grid{grid-template-columns:1fr}}@media(max-width:700px){.editor-page-banner .banner-label{font-size:18px;left:12px;bottom:10px}.word-rules-grid{grid-template-columns:1fr}.word-part-row{grid-template-columns:minmax(0,1fr) 44px;grid-template-areas:"input remove" "role remove"}.word-part-role-select{grid-area:role}.editor-student-buttons{display:grid;grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+  <div id="paco-template-mount"></div>
+  <script type="module">
+    import { mountPacoPageTemplate } from './src/components/page-template.js';
+    import { createPacoGOApp } from './src/app/bootstrap.js';
+    import { createLessonEditorRuntime } from './src/features/lessons/lesson-editor-runtime-entry.js';
+    import { createLessonEditorPage } from './src/features/lessons/lesson-editor-page.js';
+    import { createTestCalendarStorage } from './src/features/agenda/test-calendar.js';
+
+    const params = new URLSearchParams(window.location.search);
+    const lessonId = params.get('lesson_id');
+    const student = params.get('student') || '';
+    const mount = document.querySelector('#paco-template-mount');
+    const content = document.createElement('div');
+    content.className = 'lesson-editor-page';
+    const app = createPacoGOApp({ supabaseLib: window.supabase });
+    const calendar = createTestCalendarStorage(window.localStorage);
+    const runtime = createLessonEditorRuntime({ db: app.db, storage: window.localStorage, initializeSession: () => app.initializeSession(), isParent: () => app.auth.isParent });
+    const goManagement = () => { window.location.href = `management.html${student ? `?student=${encodeURIComponent(student)}` : ''}`; };
+
+    mountPacoPageTemplate({
+      mount, backLabel:'← Beheer', backAction:goManagement, greeting:'PacoGO beheer ⚙️',
+      title:lessonId ? 'Les bewerken' : 'Nieuwe les', icon:'📚',
+      subtitle:'Maak of bewerk een les met de bestaande lesvormen en velden.',
+      navigation:[
+        {icon:'🏠',label:'Dashboard',onClick:()=>{window.location.href='dashboard.html';}},
+        {icon:'📚',label:'Mijn lessen',onClick:()=>{window.location.href=`lessons.html${student ? `?student=${encodeURIComponent(student)}` : ''}`;}},
+        {icon:'⚙️',label:'Beheer',active:true,onClick:goManagement},
+        {icon:'🧠',label:'Creator Console',onClick:()=>{window.location.href='creator.html';}}
+      ], content
+    });
+
+    async function load(){
+      await app.initializeSession();
+      if(!app.auth.isParent){content.textContent='Je hebt geen toegang tot lesbeheer.';return;}
+      let lesson=null;
+      if(lessonId){
+        const records=await app.loadLessons();
+        lesson=app.mapLessons(records).find(item=>String(item.id)===String(lessonId))||null;
+        if(!lesson){content.textContent='Deze les kon niet worden gevonden.';return;}
+        const calendarEntry=calendar.getAll().find(item=>Number(item.lessonId)===Number(lesson.id)&&item.student===lesson.student);
+        lesson={...lesson,testDate:calendarEntry?.date||''};
+      }
+      createLessonEditorPage({root:content,runtime,initialLesson:lesson,student:student||lesson?.student||''});
+    }
+    load().catch(error=>{console.error('Lesson editor load error:',error);content.textContent='De leseditor kon niet worden geladen.';});
+  </script>
+</body>
+</html>

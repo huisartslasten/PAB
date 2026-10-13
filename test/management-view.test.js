@@ -25,15 +25,19 @@ test('management view renders students from the management boundary', () => {
   assert.equal(container.listeners.length, 1);
 });
 
-test('management view renders only lessons supplied by management', () => {
+test('management view renders only lessons supplied by management', async () => {
   const container = createContainer();
   const management = {
+    getOrderedScopedLessons: async () => [{
+      subject: 'Nederlands',
+      lessons: [{ id: '1', title: 'Woorden', subject: 'Nederlands', subvak: 'Spelling' }]
+    }],
     getScopedLessons: () => [
       { id: '1', title: 'Woorden', subject: 'Nederlands', subvak: 'Spelling' }
     ]
   };
 
-  assert.equal(renderStudentLessons(container, management).length, 1);
+  assert.equal((await renderStudentLessons(container, management)).length, 1);
   assert.match(container.innerHTML, /Woorden/);
   assert.match(container.innerHTML, /Nederlands · Spelling/);
 });

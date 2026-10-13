@@ -33,11 +33,23 @@ export function createAuthSessionService(db) {
     return data?.user || null;
   }
 
+  function subscribe(listener) {
+    if (typeof db.auth.onAuthStateChange !== 'function') {
+      throw new Error('createAuthSessionService requires Supabase auth state changes.');
+    }
+    if (typeof listener !== 'function') {
+      throw new Error('Auth session listener is required.');
+    }
+    const result = db.auth.onAuthStateChange(listener);
+    return result?.data?.subscription || null;
+  }
+
   return Object.freeze({
     getCurrentSession,
     signIn,
     signOut,
     requestPasswordReset,
-    updatePassword
+    updatePassword,
+    subscribe
   });
 }

@@ -1,20 +1,32 @@
-import { buildLessonPayload, buildEditorModel } from './editor-model.js';
+import { buildLessonSaveRequest } from './lesson-save-adapter.js';
 import { buildItemsForType } from './editor-items.js';
 import { validateEditorDraft, editorErrorText } from './editor-validation.js';
 
-export function createLessonEditorController({ editorService, refreshLessons, onSaved } = {}) {
-  if (!editorService) throw new Error('editorService is required.');
+export function createLessonEditorController({ saveDraft, refreshLessons, onSaved } = {}) {
+  if (typeof saveDraft !== 'function') throw new Error('saveDraft is required.');
 
   async function save(raw = {}) {
     const type = raw.type || 'words';
-    const lesson = buildLessonPayload(raw);
     const items = buildItemsForType(type, raw.items || []);
-    const validation = validateEditorDraft({ ...lesson, items });
+    const request = buildLessonSaveRequest({ draft: raw, items });
+    const validation = validateEditorDraft({ ...request.lesson, items: request.items });
     if (!validation.valid) return { ok: false, validation, message: editorErrorText(validation) };
 
-    const result = await editorService.saveDraft({ lessonId: raw.lessonId ?? null, lesson, items });
+    const result = await saveDraft({
+      lessonId: request.lessonId,
+      lesson: request.lesson,
+      items: request.items,
+      testDate: request.testDate
+    });
+
     if (refreshLessons) await refreshLessons();
-    const saved = { ...buildEditorModel({ lesson: { ...lesson, id: result.lessonId, lesson_items: items }, testDate: raw.testDate }), lessonId: result.lessonId };
+
+    const lessonId = result?.lesson?.id ?? result?.lessonId ?? request.lessonId;
+    const saved = {
+      lesson: { ...request.lesson, id: lessonId, lesson_items: request.items },
+      lessonId,
+      testDate: request.testDate
+    };
     if (onSaved) await onSaved(saved);
     return { ok: true, ...saved };
   }

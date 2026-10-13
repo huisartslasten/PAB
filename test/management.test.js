@@ -31,6 +31,13 @@ function makeFeedbackService() {
   };
 }
 
+function makeLessonOrder() {
+  return {
+    async getOrderedLessons(lessons) { return lessons; },
+    async writeOrder(student, subject, lessons) { return { student, subject, lessonIds: lessons.map(lesson => Number(lesson.id)) }; }
+  };
+}
+
 function makeLoadLessons(service) {
   return async () => {
     const lessons = await service.listAll();
@@ -39,18 +46,23 @@ function makeLoadLessons(service) {
   };
 }
 
+function createManagementForTest(service = makeService(), overrides = {}) {
+  return createManagement({
+    auth: { isParent: true },
+    lessonService: service,
+    feedbackService: makeFeedbackService(),
+    lessonOrder: makeLessonOrder(),
+    loadLessons: makeLoadLessons(service),
+    ...overrides
+  });
+}
+
 test('management owns the student roster and scoped lesson operations', async () => {
   appState.currentStudent = null;
   appState.lessons = [];
 
   const service = makeService();
-  const feedbackService = makeFeedbackService();
-  const management = createManagement({
-    auth: { isParent: true },
-    lessonService: service,
-    feedbackService,
-    loadLessons: makeLoadLessons(service)
-  });
+  const management = createManagementForTest(service);
 
   assert.deepEqual(management.getStudents(), ['Zyon', 'Zenith', 'Zephon']);
   management.selectStudent('Zyon');
@@ -75,12 +87,7 @@ test('management owns recovery read and restore operations across students', asy
   appState.lessons = [];
 
   const service = makeService();
-  const management = createManagement({
-    auth: { isParent: true },
-    lessonService: service,
-    feedbackService: makeFeedbackService(),
-    loadLessons: makeLoadLessons(service)
-  });
+  const management = createManagementForTest(service);
 
   management.selectStudent('Zyon');
   await management.loadLessons();
@@ -101,6 +108,7 @@ test('management owns parent feedback operations', async () => {
     auth: { isParent: true },
     lessonService: makeService(),
     feedbackService,
+    lessonOrder: makeLessonOrder(),
     loadLessons: async () => []
   });
 
@@ -125,12 +133,7 @@ test('management rejects mutations outside the selected student scope', async ()
   appState.lessons = [];
 
   const service = makeService();
-  const management = createManagement({
-    auth: { isParent: true },
-    lessonService: service,
-    feedbackService: makeFeedbackService(),
-    loadLessons: makeLoadLessons(service)
-  });
+  const management = createManagementForTest(service);
   management.selectStudent('Zyon');
   await management.loadLessons();
 
@@ -143,11 +146,12 @@ test('management rejects unknown students and non-parent sessions', async () => 
   const service = makeService();
   const feedbackService = makeFeedbackService();
   const loadLessons = makeLoadLessons(service);
-  const management = createManagement({ auth: { isParent: true }, lessonService: service, feedbackService, loadLessons });
+  const lessonOrder = makeLessonOrder();
+  const management = createManagement({ auth: { isParent: true }, lessonService: service, feedbackService, lessonOrder, loadLessons });
 
   assert.throws(() => management.selectStudent('Onbekend'), /known student/);
 
-  const nonParent = createManagement({ auth: { isParent: false }, lessonService: service, feedbackService, loadLessons });
+  const nonParent = createManagement({ auth: { isParent: false }, lessonService: service, feedbackService, lessonOrder, loadLessons });
   assert.throws(() => nonParent.selectStudent('Zyon'), /parent session/);
   await assert.rejects(() => nonParent.loadLessons(), /parent session/);
   await assert.rejects(() => nonParent.listFeedback(), /parent session/);
@@ -156,7 +160,12 @@ test('management rejects unknown students and non-parent sessions', async () => 
 
 test('management requires the application lesson-state loader', () => {
   assert.throws(
-    () => createManagement({ auth: { isParent: true }, lessonService: makeService(), feedbackService: makeFeedbackService() }),
+    () => createManagement({
+      auth: { isParent: true },
+      lessonService: makeService(),
+      feedbackService: makeFeedbackService(),
+      lessonOrder: makeLessonOrder()
+    }),
     /requires loadLessons/
   );
 });

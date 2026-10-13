@@ -21,9 +21,14 @@ function findScopedLesson(id, student) {
   return lesson;
 }
 
-export function createManagement({ auth, lessonService, feedbackService, loadLessons } = {}) {
+function normalizeSubject(value) {
+  return String(value ?? '').trim().replace(/\s+/g, ' ').toLocaleLowerCase('nl-NL');
+}
+
+export function createManagement({ auth, lessonService, feedbackService, lessonOrder, loadLessons } = {}) {
   if (!lessonService) throw new Error('createManagement requires lessonService');
   if (!feedbackService) throw new Error('createManagement requires feedbackService');
+  if (!lessonOrder) throw new Error('createManagement requires lessonOrder');
   if (typeof loadLessons !== 'function') throw new Error('createManagement requires loadLessons');
 
   function assertParent() {
@@ -62,6 +67,48 @@ export function createManagement({ auth, lessonService, feedbackService, loadLes
   function getAllScopedLessons() {
     assertParent();
     return getStudentLessons(appState.lessons, requireStudent());
+  }
+
+  async function getOrderedScopedLessons() {
+    assertParent();
+    const student = requireStudent();
+    const lessons = getScopedLessons();
+    const subjects = new Map();
+    lessons.forEach(lesson => {
+      const key = normalizeSubject(lesson.subject);
+      if (!key) return;
+      if (!subjects.has(key)) subjects.set(key, { subject: String(lesson.subject || '').trim(), lessons: [] });
+      subjects.get(key).lessons.push(lesson);
+    });
+
+    const groups = [];
+    for (const group of subjects.values()) {
+      groups.push({
+        subject: group.subject,
+        lessons: await lessonOrder.getOrderedLessons(group.lessons, student, group.subject)
+      });
+    }
+    return groups.sort((a, b) => a.subject.localeCompare(b.subject, 'nl'));
+  }
+
+  async function saveLessonOrder(subject, lessons) {
+    assertParent();
+    const student = requireStudent();
+    const scoped = (Array.isArray(lessons) ? lessons : []).map(lesson => findScopedLesson(lesson.id, student));
+    if (scoped.some(lesson => normalizeSubject(lesson.subject) !== normalizeSubject(subject))) {
+      throw new Error('Lesson order contains a lesson outside the selected subject.');
+    }
+    return lessonOrder.writeOrder(student, String(subject || '').trim(), scoped);
+  }
+
+  async function moveLessonToSubvak(id, subvak = '') {
+    assertParent();
+    const student = requireStudent();
+    const lesson = findScopedLesson(id, student);
+    const value = String(subvak ?? '').trim();
+    const result = await lessonService.updateLesson(id, { subvak: value, student });
+    await refreshLessons();
+    return result;
   }
 
   function getRecoveryLessons(mode) {
@@ -134,6 +181,9 @@ export function createManagement({ auth, lessonService, feedbackService, loadLes
     loadLessons: refreshLessons,
     getScopedLessons,
     getAllScopedLessons,
+    getOrderedScopedLessons,
+    saveLessonOrder,
+    moveLessonToSubvak,
     getRecoveryLessons,
     createLesson,
     updateLesson,

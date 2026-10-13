@@ -14,31 +14,40 @@
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
-    import { createLessonEditorRuntime } from './src/features/lessons/lesson-editor-runtime-entry.js';
+    import { createLessonEditorApplication } from './src/features/lessons/lesson-editor-application.js';
     import { createLessonEditorPage } from './src/features/lessons/lesson-editor-page.js';
-    import { createTestCalendarStorage } from './src/features/agenda/test-calendar.js';
 
-    const params = new URLSearchParams(window.location.search);
-    const lessonId = params.get('lesson_id');
-    const student = params.get('student') || '';
-    const mount = document.querySelector('#paco-template-mount');
-    const content = document.createElement('div');
-    content.className = 'lesson-editor-page';
-    const app = createPacoGOApp({ supabaseLib: window.supabase });
-    const calendar = createTestCalendarStorage(window.localStorage);
-    const runtime = createLessonEditorRuntime({ db: app.db, storage: window.localStorage, initializeSession: () => app.initializeSession(), isParent: () => app.auth.isParent });
-    const goManagement = () => { window.location.href = `management.html${student ? `?student=${encodeURIComponent(student)}` : ''}`; };
+    const params=new URLSearchParams(window.location.search);
+    const lessonId=params.get('lesson_id');
+    const student=params.get('student')||'';
+    const mount=document.querySelector('#paco-template-mount');
+    const content=document.createElement('div');
+    content.className='lesson-editor-page';
+    const app=createPacoGOApp({supabaseLib:window.supabase});
+    const editorApp=createLessonEditorApplication({
+      db:app.db,
+      storage:window.localStorage,
+      initializeSession:()=>app.initializeSession(),
+      isParent:()=>app.auth.isParent,
+      refreshLessons:()=>app.loadLessons()
+    });
+    const goManagement=()=>{window.location.href=`management.html${student?`?student=${encodeURIComponent(student)}`:''}`;};
 
     mountPacoPageTemplate({
-      mount, backLabel:'← Beheer', backAction:goManagement, greeting:'PacoGO beheer ⚙️',
-      title:lessonId ? 'Les bewerken' : 'Nieuwe les', icon:'📚',
+      mount,
+      backLabel:'← Beheer',
+      backAction:goManagement,
+      greeting:'PacoGO beheer ⚙️',
+      title:lessonId?'Les bewerken':'Nieuwe les',
+      icon:'📚',
       subtitle:'Maak of bewerk een les met de bestaande lesvormen en velden.',
       navigation:[
         {icon:'🏠',label:'Dashboard',onClick:()=>{window.location.href='dashboard.html';}},
-        {icon:'📚',label:'Mijn lessen',onClick:()=>{window.location.href=`lessons.html${student ? `?student=${encodeURIComponent(student)}` : ''}`;}},
+        {icon:'📚',label:'Mijn lessen',onClick:()=>{window.location.href=`lessons.html${student?`?student=${encodeURIComponent(student)}`:''}`;}},
         {icon:'⚙️',label:'Beheer',active:true,onClick:goManagement},
         {icon:'🧠',label:'Creator Console',onClick:()=>{window.location.href='creator.html';}}
-      ], content
+      ],
+      content
     });
 
     async function load(){
@@ -49,10 +58,10 @@
         const records=await app.loadLessons();
         lesson=app.mapLessons(records).find(item=>String(item.id)===String(lessonId))||null;
         if(!lesson){content.textContent='Deze les kon niet worden gevonden.';return;}
-        const calendarEntry=calendar.getAll().find(item=>Number(item.lessonId)===Number(lesson.id)&&item.student===lesson.student);
+        const calendarEntry=editorApp.calendar.getAll().find(item=>Number(item.lessonId)===Number(lesson.id)&&item.student===lesson.student);
         lesson={...lesson,testDate:calendarEntry?.date||''};
       }
-      createLessonEditorPage({root:content,runtime,initialLesson:lesson,student:student||lesson?.student||''});
+      createLessonEditorPage({root:content,runtime:editorApp.editor,initialLesson:lesson,student:student||lesson?.student||''});
     }
     load().catch(error=>{console.error('Lesson editor load error:',error);content.textContent='De leseditor kon niet worden geladen.';});
   </script>

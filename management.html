@@ -7,29 +7,7 @@
   <link rel="stylesheet" href="src/components/page-template.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    .management-page{display:grid;gap:22px}
-    .management-state{padding:16px 18px;border:1px solid #dce9f6;border-radius:18px;background:#fff;color:#667894}
-    .management-students{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
-    .management-student{border:1px solid #dce9f6;border-radius:16px;background:#fff;padding:15px;text-align:left;color:#102b57;font-weight:900;cursor:pointer;box-shadow:0 8px 22px rgba(16,43,87,.07)}
-    .management-student:hover{border-color:#1787f2;background:#eef8ff}
-    .management-section{display:grid;gap:12px}
-    .management-section h2{margin:0;font:800 25px/1.1 "Baloo 2",Nunito,sans-serif;color:#102b57}
-    .management-lesson{padding:16px 18px;border:1px solid #dce9f6;border-radius:16px;background:#fff}
-    .management-lesson h3{margin:0;color:#102b57}
-    .management-lesson p{margin:5px 0 0;color:#667894}
-    .management-feedback{padding:16px 18px;border:1px solid #dce9f6;border-radius:16px;background:#fff}
-    .management-feedback h3{margin:6px 0;color:#102b57}
-    .management-feedback p{margin:0 0 10px;color:#38577d;white-space:pre-wrap}
-    .management-feedback-status{display:inline-block;padding:5px 9px;border-radius:999px;background:#eaf4ff;color:#126fc9;font-size:12px;font-weight:900}
-    .management-links{display:flex;gap:10px;flex-wrap:wrap}
-    .management-link{border:0;border-radius:12px;padding:10px 14px;background:#eaf4ff;color:#126fc9;font-weight:900;cursor:pointer}
-    .management-link:disabled{opacity:.6;cursor:wait}
-    .management-recovery-student{display:grid;gap:12px}
-    .management-recovery-student>h3{margin:0;color:#102b57}
-    .management-recovery-subject{display:grid;gap:10px}
-    .management-recovery-subject h4{margin:0;color:#38577d}
-    .management-recovery-lessons{display:grid;gap:10px}
-    @media(max-width:700px){.management-students{grid-template-columns:1fr}}
+    .management-page{display:grid;gap:22px}.management-state{padding:16px 18px;border:1px solid #dce9f6;border-radius:18px;background:#fff;color:#667894}.management-students{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.management-student{border:1px solid #dce9f6;border-radius:16px;background:#fff;padding:15px;text-align:left;color:#102b57;font-weight:900;cursor:pointer;box-shadow:0 8px 22px rgba(16,43,87,.07)}.management-student:hover{border-color:#1787f2;background:#eef8ff}.management-section{display:grid;gap:12px}.management-section h2{margin:0;font:800 25px/1.1 "Baloo 2",Nunito,sans-serif;color:#102b57}.management-section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}.management-lesson{padding:16px 18px;border:1px solid #dce9f6;border-radius:16px;background:#fff}.management-lesson h3{margin:0;color:#102b57}.management-lesson p{margin:5px 0 0;color:#667894}.management-feedback{padding:16px 18px;border:1px solid #dce9f6;border-radius:16px;background:#fff}.management-feedback h3{margin:6px 0;color:#102b57}.management-feedback p{margin:0 0 10px;color:#38577d;white-space:pre-wrap}.management-feedback-status{display:inline-block;padding:5px 9px;border-radius:999px;background:#eaf4ff;color:#126fc9;font-size:12px;font-weight:900}.management-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.management-link{border:0;border-radius:12px;padding:10px 14px;background:#eaf4ff;color:#126fc9;font-weight:900;cursor:pointer}.management-link.primary{background:#1787f2;color:#fff}.management-link:disabled{opacity:.6;cursor:wait}.management-recovery-student{display:grid;gap:12px}.management-recovery-student>h3{margin:0;color:#102b57}.management-recovery-subject{display:grid;gap:10px}.management-recovery-subject h4{margin:0;color:#38577d}.management-recovery-lessons{display:grid;gap:10px}@media(max-width:700px){.management-students{grid-template-columns:1fr}.management-section-heading{align-items:flex-start;flex-direction:column}}
   </style>
 </head>
 <body>
@@ -39,105 +17,59 @@
     import { createPacoGOApp } from './src/app/bootstrap.js';
     import { renderStudentSelection, renderStudentLessons, renderRecovery, renderFeedback } from './src/features/management/management-view.js';
 
-    const mount = document.querySelector('#paco-template-mount');
-    const content = document.createElement('div');
-    content.className = 'management-page';
-    const state = document.createElement('div');
-    state.className = 'management-state';
-    state.textContent = 'Beheer laden…';
-    content.appendChild(state);
-
-    const goDashboard = () => { window.location.href = 'dashboard.html'; };
-    const goLessons = () => { window.location.href = 'lessons.html'; };
-    const goTestHistory = () => { window.location.href = 'test-history.html'; };
-    const goCreator = () => { window.location.href = 'creator.html'; };
+    const mount=document.querySelector('#paco-template-mount');
+    const content=document.createElement('div'); content.className='management-page';
+    const state=document.createElement('div'); state.className='management-state'; state.textContent='Beheer laden…'; content.appendChild(state);
+    const goDashboard=()=>{window.location.href='dashboard.html';};
+    const goLessons=()=>{window.location.href='lessons.html';};
+    const goTestHistory=()=>{window.location.href='test-history.html';};
+    const goCreator=()=>{window.location.href='creator.html';};
 
     mountPacoPageTemplate({
-      mount,
-      backLabel:'← Dashboard',
-      backAction:goDashboard,
-      greeting:'PacoGO beheer ⚙️',
-      title:'Beheer',
-      icon:'⚙️',
-      subtitle:'Beheer de lessen per leerling en bekijk feedback.',
+      mount, backLabel:'← Dashboard', backAction:goDashboard, greeting:'PacoGO beheer ⚙️', title:'Beheer', icon:'⚙️', subtitle:'Beheer de lessen per leerling en open de zelfstandige leseditor.',
       navigation:[
-        {icon:'🏠',label:'Dashboard',onClick:goDashboard},
-        {icon:'📚',label:'Mijn lessen',onClick:goLessons},
-        {icon:'📝',label:'Toetsgeschiedenis',onClick:goTestHistory},
-        {icon:'⚙️',label:'Beheer',active:true},
-        {icon:'🧠',label:'Creator Console',onClick:goCreator}
-      ],
-      content
+        {icon:'🏠',label:'Dashboard',onClick:goDashboard},{icon:'📚',label:'Mijn lessen',onClick:goLessons},{icon:'📝',label:'Toetsgeschiedenis',onClick:goTestHistory},{icon:'⚙️',label:'Beheer',active:true},{icon:'🧠',label:'Creator Console',onClick:goCreator}
+      ], content
     });
 
-    const app = createPacoGOApp({ supabaseLib: window.supabase });
-    const students = document.createElement('div');
-    students.className = 'management-students';
-    const studentSection = document.createElement('section');
-    studentSection.className = 'management-section';
-    const studentHeading = document.createElement('h2');
-    studentHeading.textContent = 'Leerling';
-    studentSection.append(studentHeading, students);
+    const app=createPacoGOApp({supabaseLib:window.supabase});
+    const students=document.createElement('div'); students.className='management-students';
+    const studentSection=document.createElement('section'); studentSection.className='management-section';
+    const studentHeading=document.createElement('h2'); studentHeading.textContent='Leerling'; studentSection.append(studentHeading,students);
 
-    const lessons = document.createElement('div');
-    lessons.className = 'management-page';
-    const lessonSection = document.createElement('section');
-    lessonSection.className = 'management-section';
-    const lessonHeading = document.createElement('h2');
-    lessonHeading.textContent = 'Actieve lessen';
-    lessonSection.append(lessonHeading, lessons);
+    const lessons=document.createElement('div'); lessons.className='management-page';
+    const lessonSection=document.createElement('section'); lessonSection.className='management-section';
+    const lessonHeadingWrap=document.createElement('div'); lessonHeadingWrap.className='management-section-heading';
+    const lessonHeading=document.createElement('h2'); lessonHeading.textContent='Actieve lessen';
+    const createLessonButton=document.createElement('button'); createLessonButton.type='button'; createLessonButton.className='management-link primary'; createLessonButton.textContent='➕ Nieuwe les';
+    lessonHeadingWrap.append(lessonHeading,createLessonButton); lessonSection.append(lessonHeadingWrap,lessons);
 
-    const archive = document.createElement('div');
-    archive.className = 'management-page';
-    const archiveSection = document.createElement('section');
-    archiveSection.className = 'management-section';
-    const archiveHeading = document.createElement('h2');
-    archiveHeading.textContent = 'Archief';
-    archiveSection.append(archiveHeading, archive);
+    const archive=document.createElement('div'); archive.className='management-page';
+    const archiveSection=document.createElement('section'); archiveSection.className='management-section'; const archiveHeading=document.createElement('h2'); archiveHeading.textContent='Archief'; archiveSection.append(archiveHeading,archive);
+    const trash=document.createElement('div'); trash.className='management-page';
+    const trashSection=document.createElement('section'); trashSection.className='management-section'; const trashHeading=document.createElement('h2'); trashHeading.textContent='Prullenbak'; trashSection.append(trashHeading,trash);
+    const feedbackList=document.createElement('div'); feedbackList.className='management-page';
+    const feedbackSection=document.createElement('section'); feedbackSection.className='management-section'; const feedbackHeading=document.createElement('h2'); feedbackHeading.textContent='Feedback'; feedbackSection.append(feedbackHeading,feedbackList);
 
-    const trash = document.createElement('div');
-    trash.className = 'management-page';
-    const trashSection = document.createElement('section');
-    trashSection.className = 'management-section';
-    const trashHeading = document.createElement('h2');
-    trashHeading.textContent = 'Prullenbak';
-    trashSection.append(trashHeading, trash);
+    const openEditor=lesson=>{window.location.href=`lesson-editor.html?lesson_id=${encodeURIComponent(lesson.id)}&student=${encodeURIComponent(lesson.student)}`;};
+    const openNewLesson=()=>{const selected=app.management.getSelectedStudent()||app.management.getStudents()[0]||''; window.location.href=`lesson-editor.html${selected?`?student=${encodeURIComponent(selected)}`:''}`;};
+    createLessonButton.addEventListener('click',openNewLesson);
 
-    const feedbackList = document.createElement('div');
-    feedbackList.className = 'management-page';
-    const feedbackSection = document.createElement('section');
-    feedbackSection.className = 'management-section';
-    const feedbackHeading = document.createElement('h2');
-    feedbackHeading.textContent = 'Feedback';
-    feedbackSection.append(feedbackHeading, feedbackList);
+    function showSelectedStudent(student){app.management.selectStudent(student);lessons.replaceChildren();renderStudentLessons(lessons,app.management,openEditor);}
+    async function refreshRecovery(){archive.replaceChildren();trash.replaceChildren();renderRecovery(archive,app.management,'archive',refreshRecovery);renderRecovery(trash,app.management,'trash',refreshRecovery);}
 
-    function showSelectedStudent(student) {
-      app.management.selectStudent(student);
-      lessons.replaceChildren();
-      renderStudentLessons(lessons, app.management);
-    }
-
-    async function refreshRecovery() {
-      archive.replaceChildren();
-      trash.replaceChildren();
-      renderRecovery(archive, app.management, 'archive', refreshRecovery);
-      renderRecovery(trash, app.management, 'trash', refreshRecovery);
-    }
-
-    try {
+    try{
       await app.initializeSession();
       await app.management.loadLessons();
-      renderStudentSelection(students, app.management, showSelectedStudent);
-      const selected = app.management.getSelectedStudent() || app.management.getStudents()[0];
-      if (selected) showSelectedStudent(selected);
+      renderStudentSelection(students,app.management,showSelectedStudent);
+      const selected=app.management.getSelectedStudent()||app.management.getStudents()[0];
+      if(selected) showSelectedStudent(selected);
       await refreshRecovery();
-      await renderFeedback(feedbackList, app.management);
-      content.replaceChildren(studentSection, lessonSection, archiveSection, trashSection, feedbackSection);
-    } catch (error) {
-      console.error('Management page load error:', error);
-      state.textContent = app.auth.isParent
-        ? 'Beheer kon niet worden geladen.'
-        : 'Je hebt geen toegang tot Beheer.';
+      await renderFeedback(feedbackList,app.management);
+      content.replaceChildren(studentSection,lessonSection,archiveSection,trashSection,feedbackSection);
+    }catch(error){
+      console.error('Management page load error:',error);
+      state.textContent=app.auth.isParent?'Beheer kon niet worden geladen.':'Je hebt geen toegang tot Beheer.';
     }
   </script>
 </body>

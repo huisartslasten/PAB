@@ -1101,7 +1101,7 @@ body{background:#1787f2}
     <div class="topbar"><div><button class="secondary" onclick="showHome()">← Terug</button></div></div>
     <div class="page-heading subject-heading"><div class="page-heading-label">Vak</div><h2 id="subjectTitle"></h2><p>Dit zijn jouw lessen binnen dit vak.</p></div>
     <div id="lessons" class="grid"></div>
-    <div class="row" style="margin-top:18px"><button id="addLessonButton2" class="hidden" onclick="showAddLesson()">➕ Nieuwe les</button></div>
+    <div class="row" style="margin-top:18px"><button id="addLessonButton2" class="hidden" onclick="openLessonEditorPage()">➕ Nieuwe les</button></div>
   </main>
 
   <main id="lessonChoice" class="page hidden">
@@ -1114,7 +1114,7 @@ body{background:#1787f2}
 
   <main id="lessonView" class="page hidden">
     <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 Aan de slag met Paco</div></div>
-    <div class="topbar"><div><button class="secondary" onclick="goBack()">← Terug</button><h2 id="lessonTitle" style="margin-top:14px"></h2></div><div id="lessonAdminButtons" class="row"><button id="editLessonButton" class="hidden" onclick="editCurrentLesson()">✏️ Bewerken</button><button id="archiveLessonButton" class="archive-button hidden" onclick="archiveCurrentLesson()">🗄️ Archiveren</button><button id="deleteLessonButton" class="danger hidden" onclick="deleteCurrentLesson()">🗑️ Verwijderen</button></div></div>
+    <div class="topbar"><div><button class="secondary" onclick="goBack()">← Terug</button><h2 id="lessonTitle" style="margin-top:14px"></h2></div><div id="lessonAdminButtons" class="row"><button id="editLessonButton" class="hidden" onclick="openLessonEditorPage(currentLesson?.id,currentLesson?.student)">✏️ Bewerken</button><button id="archiveLessonButton" class="archive-button hidden" onclick="archiveCurrentLesson()">🗄️ Archiveren</button><button id="deleteLessonButton" class="danger hidden" onclick="deleteCurrentLesson()">🗑️ Verwijderen</button></div></div>
     <div id="lessonContent"></div>
   </main>
 
@@ -1257,30 +1257,6 @@ body{background:#1787f2}
     </div>
   </main>
 
-
-  <main id="editor" class="page hidden">
-    <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label" id="editorBannerLabel">🐾 NIEUWE LES</div></div>
-    <button class="secondary" onclick="goBack()">← Annuleren</button>
-    <div class="page-heading editor-page-heading"><h2 id="editorTitle">Nieuwe les</h2><p>Kies hoe je de les wilt invoeren.</p></div>
-    <div class="card editor-main-card"><div class="editor-action-row"><button class="success" type="button" onclick="saveLesson()">💾 Les opslaan</button><button class="secondary" type="button" onclick="showPhotoLesson()">📸 MAAK LES VAN FOTO</button></div>
-      <div class="editor-student"><strong>Voor welke leerling?</strong><div class="editor-student-buttons"><label class="editor-student-choice"><input type="radio" name="lessonStudent" value="Zyon"><span>Zyon</span></label><label class="editor-student-choice"><input type="radio" name="lessonStudent" value="Zenith"><span>Zenith</span></label><label class="editor-student-choice"><input type="radio" name="lessonStudent" value="Zephon"><span>Zephon</span></label><label class="editor-student-choice"><input type="radio" name="lessonStudent" value="Testleerling"><span>Testleerling</span></label></div></div>
-      <div class="editor-top-grid">
-  <div class="editor-top-left">
-    <div class="field"><label for="lessonSubject">Vak</label><input id="lessonSubject" placeholder="Voer vak in bijvoorbeeld Nederlands"></div>
-    <div class="field"><label for="lessonSubvak">Subvak <span class="small">(optioneel)</span></label><input id="lessonSubvak" placeholder="Bijvoorbeeld Themawoorden of Spelling"></div>
-    <div class="field"><label for="lessonName">Naam van de les</label><input id="lessonName" placeholder="Bijvoorbeeld Week 4"></div>
-  </div>
-  <div class="editor-top-right">
-    <div class="field"><label for="lessonType">Onderdeel</label><div class="lesson-type-select"><button type="button" id="lessonTypeButton" class="lesson-type-button" onclick="toggleLessonTypeMenu()"><span id="lessonTypeButtonText">🎯 Woordtrainer</span><span class="lesson-type-chevron">⌄</span></button><div id="lessonTypeMenu" class="lesson-type-menu hidden"><button type="button" onclick="setLessonType('words')">🎯 Woordtrainer</button><button type="button" onclick="setLessonType('questions')">❓ Vragen</button><button type="button" onclick="setLessonType('dictation')">✏️ Dictee</button><button type="button" onclick="setLessonType('math')">🔢 Rekenen</button><button type="button" onclick="setLessonType('spelling')">✍️ Spelling</button><button type="button" onclick="setLessonType('custom')">🛠️ Eigen les</button></div><select id="lessonType" class="lesson-type-native" tabindex="-1" aria-hidden="true"><option value="words">words</option><option value="questions">questions</option><option value="dictation">dictation</option><option value="math">math</option><option value="spelling">spelling</option><option value="custom">custom</option></select></div></div>
-    <div class="lesson-test-date-box"><label class="lesson-test-date-toggle"><input id="lessonTestDateEnabled" type="checkbox" onchange="toggleLessonTestDate()"> 📅 Toetsdatum instellen</label><div class="small" style="margin-top:5px">Optioneel. Alleen instellen als er al een toetsdatum bekend is.</div><input id="lessonTestDate" type="hidden"><div id="lessonTestDatePicker" class="date-picker lesson-test-date-picker hidden"></div></div>
-    <div class="field"><label for="lessonExplanation">Uitleg <span class="small">(optioneel)</span></label><textarea id="lessonExplanation" placeholder="Leg hier de leerstof of regel uit. Dit wordt apart boven de oefeningen getoond."></textarea></div>
-  </div>
-</div>
-<div id="lessonAiBox" class="card lesson-ai-box hidden"><label class="lesson-test-date-toggle"><input id="lessonAiCheckAnswers" type="checkbox" onchange="toggleLessonAiInstruction()"> 🤖 AI moet het antwoord controleren</label><div class="small" style="margin-top:5px">Zet dit aan als je wilt dat AI bepaalt of het antwoord inhoudelijk goed is.</div><div id="lessonAiInstructionBox" class="lesson-ai-instruction hidden"><div class="field" style="margin:0"><label for="lessonAiInstruction">Instructie voor de AI <span class="small">(optioneel)</span></label><textarea id="lessonAiInstruction" placeholder="Bijvoorbeeld: Een kleine spelfout is niet erg. Het antwoord hoeft niet 100% correct gespeld te zijn als de betekenis duidelijk goed is."></textarea></div></div></div><div id="spellingLabelsEditor" class="card spelling-labels-box hidden"><h3 style="margin:0 0 12px">🏷️ Namen van de onderdelen</h3><div class="small" style="margin-bottom:12px">Deze teksten verschijnen bij het maken, oefenen en de toets.</div><div class="field"><label for="spellingLabelQuestion">Vraag / eerste regel</label><input id="spellingLabelQuestion" value="Werkwoord" oninput="refreshSpellingLabels()"></div><div class="field"><label for="spellingLabelPerfect">Tweede regel</label><input id="spellingLabelPerfect" value="Voltooid deelwoord" oninput="refreshSpellingLabels()"></div><div class="field"><label for="spellingLabelAdjective">Derde regel</label><input id="spellingLabelAdjective" value="Bijvoeglijk gebruikt voltooid deelwoord" oninput="refreshSpellingLabels()"></div></div><div id="wordEditor"></div><div id="questionEditor" class="hidden"></div><div id="dictationEditor" class="hidden"></div><div id="mathEditor" class="hidden"></div><div id="spellingEditor" class="hidden"></div>
-      <div class="row" style="margin-top:18px"><button onclick="addCurrentRow()">➕ Rij toevoegen</button><button class="success" onclick="saveLesson()">💾 Les opslaan</button></div>
-      <div id="editorError" class="message error hidden"></div>
-    </div>
-  </main>
 
   <main id="photoLesson" class="page hidden">
   <div class="page-paco-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label">🐾 FOTO → LES</div></div>
@@ -1938,11 +1914,20 @@ async function showSubject(subject){
   }).join('')+'</div>';
 }
 
+function openLessonEditorPage(lessonId=null,student=currentStudent){
+  if(!requireParent())return;
+  const params=new URLSearchParams();
+  if(lessonId!=null)params.set('lesson_id',String(lessonId));
+  const selectedStudent=student||parentSelectedStudent||'';
+  if(selectedStudent)params.set('student',String(selectedStudent));
+  const query=params.toString();
+  window.location.href='lesson-editor.html'+(query?'?'+query:'');
+}
 function editLessonById(id){
   const l=lessons.find(x=>Number(x.id)===Number(id));
   if(!l||!requireParent())return;
   currentLesson=l;
-  editCurrentLesson();
+  openLessonEditorPage(l.id,l.student);
 }
 function deleteLessonById(id){
   const l=lessons.find(x=>Number(x.id)===Number(id));
@@ -2057,7 +2042,7 @@ function showLessonChoice(l){currentLesson=l;openLesson(l.id)}
 
 let parentSelectedStudent=null;
 async function showParentDashboard(){if(!requireParent())return;hideAll();parentSelectedStudent=null;currentStudent=null;const page=document.getElementById('parentDashboard');page.classList.remove('hidden');page.querySelector('.banner-label').textContent='🐾 BEHEER';const heading=page.querySelector('.parent-dashboard-intro');if(heading)heading.innerHTML='<h2>⚙️ Beheer</h2><p>Kies een leerling om verder te gaan, of print direct de maandkalender.</p>';document.getElementById('parentStudentGrid')?.classList.remove('hidden');renderParentDashboard()}
-function parentStartLesson(){if(!requireParent())return;currentStudent=null;showAddLesson()}
+function parentStartLesson(){if(!requireParent())return;currentStudent=null;openLessonEditorPage()}
 async function renderParentDashboard(){
   const grid=document.getElementById('parentStudentGrid');
   const management=document.getElementById('parentManagement');
@@ -2088,7 +2073,7 @@ function parentStudentCard(name,isGuest=false,guestId=''){
 }
 
 function selectParentStudent(name,isGuest=false,guestId=''){parentSelectedStudent=name;currentStudent=name;showHome()}
-function parentStartLessonForStudent(name){if(!requireParent())return;parentSelectedStudent=name;currentStudent=name;showAddLesson()}
+function parentStartLessonForStudent(name){if(!requireParent())return;parentSelectedStudent=name;currentStudent=name;openLessonEditorPage(null,name)}
 function showParentAgendaForStudent(name){if(!requireParent())return;parentSelectedStudent=name;currentStudent=name;showAgenda()}
 function showParentSubject(name,subject){if(!requireParent())return;parentSelectedStudent=name;currentStudent=name;showSubject(subject)}
 
@@ -2541,182 +2526,6 @@ async function readPhotoLesson(){
     document.getElementById('photoOcrStatus').textContent='⚠️ '+(error.message||'De foto kon niet worden begrepen.');
   }
 }
-async function showAddLesson(){if(photoSessionToken)await cleanupPhotoSession();if(!requireParent())return;currentLesson=null;hideAll();document.getElementById('editor').classList.remove('hidden');document.getElementById('editorTitle').textContent='Nieuwe les';document.getElementById('editorBannerLabel').textContent='🐾 NIEUWE LES';document.getElementById('lessonSubject').value='';document.getElementById('lessonSubvak').value='';document.querySelectorAll('input[name=lessonStudent]').forEach(r=>r.checked=r.value===currentStudent);document.getElementById('lessonName').value='';document.getElementById('lessonExplanation').value='';document.getElementById('lessonType').value='words';document.getElementById('lessonAiCheckAnswers').checked=true;document.getElementById('lessonAiInstruction').value='';toggleLessonAiInstruction();document.getElementById('lessonTestDate').value='';document.getElementById('lessonTestDateEnabled').checked=false;document.getElementById('lessonTestDatePicker').classList.add('hidden');document.getElementById('editorError').classList.add('hidden');setDefaultSpellingLabels();resetEditorRows();changeLessonType();renderDatePicker('lessonTestDatePicker','lessonTestDate','')}
-function setDefaultSpellingLabels(){document.getElementById('spellingLabelQuestion').value='Werkwoord';document.getElementById('spellingLabelPerfect').value='Voltooid deelwoord';document.getElementById('spellingLabelAdjective').value='Bijvoeglijk gebruikt voltooid deelwoord'}
-function getSpellingLabels(){return {question:document.getElementById('spellingLabelQuestion')?.value.trim()||'Werkwoord',perfect:document.getElementById('spellingLabelPerfect')?.value.trim()||'Voltooid deelwoord',adjective:document.getElementById('spellingLabelAdjective')?.value.trim()||'Bijvoeglijk gebruikt voltooid deelwoord'}}
-function resetEditorRows(){document.getElementById('wordEditor').innerHTML='';document.getElementById('questionEditor').innerHTML='';document.getElementById('dictationEditor').innerHTML='';document.getElementById('mathEditor').innerHTML='';document.getElementById('spellingEditor').innerHTML='';addWordRow()}
-function syncLessonTypeButton(){const select=document.getElementById('lessonType'),text=document.getElementById('lessonTypeButtonText');if(!select||!text)return;const labels={words:'🎯 Woordtrainer',questions:'❓ Vragen',dictation:'✏️ Dictee',math:'🔢 Rekenen',spelling:'✍️ Spelling',custom:'🛠️ Eigen les'};text.textContent=labels[select.value]||'🎯 Woordtrainer'}
-function toggleLessonTypeMenu(){document.getElementById('lessonTypeMenu')?.classList.toggle('hidden')}
-function setLessonType(value){const select=document.getElementById('lessonType');if(!select)return;select.value=value;syncLessonTypeButton();document.getElementById('lessonTypeMenu')?.classList.add('hidden');changeLessonType()}
-function changeLessonType(){syncLessonTypeButton();const t=document.getElementById('lessonType').value;const wordMode=t==='words'||t==='custom';document.getElementById('wordEditor').classList.toggle('hidden',!wordMode);document.getElementById('questionEditor').classList.toggle('hidden',t!=='questions');document.getElementById('dictationEditor').classList.toggle('hidden',t!=='dictation');document.getElementById('mathEditor').classList.toggle('hidden',t!=='math');document.getElementById('spellingEditor').classList.toggle('hidden',t!=='spelling');document.getElementById('lessonAiBox').classList.remove('hidden');document.getElementById('spellingLabelsEditor').classList.toggle('hidden',t!=='spelling');toggleLessonAiInstruction();if(t==='questions'&&!document.getElementById('questionEditor').children.length)addQuestionRow();if(wordMode&&!document.getElementById('wordEditor').children.length)addWordRow();if(t==='dictation'&&!document.getElementById('dictationEditor').children.length)addDictationRow();if(t==='math'&&!document.getElementById('mathEditor').children.length)addMathRow();if(t==='spelling'&&!document.getElementById('spellingEditor').children.length)addSpellingRow()}
-function rowHtml(content,kind){return `<div class="editor-row"><button class="remove-row" type="button" onclick="this.parentElement.remove()">✕</button>${content}<button type="button" class="question-insert-button" onclick="insertLessonRowAfter(this)">➕ Vraag hier invoegen</button></div>`}
-function ensureNextLessonRow(el){
-  const row=el?.closest('.editor-row');
-  if(!row)return;
-  const editor=row.parentElement;
-  if(row!==editor.lastElementChild)return;
-  const fields=[...row.querySelectorAll('input,textarea')];
-  const complete=fields.length>0&&fields.every(f=>String(f.value||'').trim());
-  if(complete)addCurrentRow();
-}
-function addWordQuestionPart(row,text=''){row.querySelector('.word-question-parts').insertAdjacentHTML('beforeend',`<div class="word-part-row"><input class="word-q-part" value="${escapeAttr(text)}" oninput="ensureNextLessonRow(this)" placeholder="Vul hier de vraag in"><button type="button" class="word-part-remove" onclick="this.parentElement.remove()">✕</button></div>`)}
-function addUniversalAnswerPart(row,containerClass,inputClass,text='',role='answer',placeholder='Vul hier het antwoord in'){
-  const parts=row.querySelector('.'+containerClass);
-  if(!parts)return;
-  parts.insertAdjacentHTML('beforeend',`<div class="word-part-row"><input class="${inputClass}" value="${escapeAttr(text)}" oninput="ensureNextLessonRow(this)" placeholder="${placeholder}"><select class="word-part-role" aria-hidden="true" tabindex="-1"><option value="answer" ${role==='answer'?'selected':''}>Wordt getoetst</option><option value="extra" ${role==='extra'?'selected':''}>Wordt niet getoetst</option></select><div class="word-part-role-select"><button type="button" class="word-part-role-button ${role==='extra'?'role-extra':''}" onclick="toggleWordPartRoleMenu(this)"><span>${role==='extra'?'Wordt niet getoetst':'Wordt getoetst'}</span><span>⌄</span></button><div class="word-part-role-menu hidden"><button type="button" onclick="setWordPartRole(this,'answer')">Wordt getoetst</button><button type="button" class="role-extra-option" onclick="setWordPartRole(this,'extra')">Wordt niet getoetst</button></div></div><button type="button" class="word-part-remove" onclick="this.parentElement.remove()">✕</button></div>`);
-}
-function addWordAnswerPart(row,text='',role='answer'){
-  const parts=row.querySelector('.word-answer-parts');
-  parts.insertAdjacentHTML('beforeend',`<div class="word-part-row"><input class="word-a-part" value="${escapeAttr(text)}" oninput="ensureNextLessonRow(this)" placeholder="Vul hier het antwoord in"><select class="word-part-role" aria-hidden="true" tabindex="-1"><option value="answer" ${role==='answer'?'selected':''}>Wordt getoetst</option><option value="extra" ${role==='extra'?'selected':''}>Wordt niet getoetst</option></select><div class="word-part-role-select"><button type="button" class="word-part-role-button ${role==='extra'?'role-extra':''}" onclick="toggleWordPartRoleMenu(this)"><span>${role==='extra'?'Wordt niet getoetst':'Wordt getoetst'}</span><span>⌄</span></button><div class="word-part-role-menu hidden"><button type="button" onclick="setWordPartRole(this,'answer')">Wordt getoetst</button><button type="button" class="role-extra-option" onclick="setWordPartRole(this,'extra')">Wordt niet getoetst</button></div></div><button type="button" class="word-part-remove" onclick="this.parentElement.remove()">✕</button></div>`);
-}
-function toggleWordPartRoleMenu(button){
-  const row=button.closest('.word-part-row');
-  document.querySelectorAll('.word-part-role-menu:not(.hidden)').forEach(m=>{if(!row.contains(m))m.classList.add('hidden')});
-  row.querySelector('.word-part-role-menu')?.classList.toggle('hidden');
-}
-function setWordPartRole(button,role){
-  const row=button.closest('.word-part-row');
-  const select=row.querySelector('.word-part-role');
-  const display=row.querySelector('.word-part-role-button');
-  if(select)select.value=role;
-  if(display){display.classList.toggle('role-extra',role==='extra');display.querySelector('span').textContent=role==='extra'?'Wordt niet getoetst':'Wordt getoetst';}
-  row.querySelector('.word-part-role-menu')?.classList.add('hidden');
-
-  // Als de volgende vraag automatisch als kopie is aangemaakt en nog leeg is,
-  // neem dan ook de gekozen toetsstatus mee.
-  const currentLessonRow=row.closest('.editor-row');
-  const nextLessonRow=currentLessonRow?.nextElementSibling;
-  if(currentLessonRow&&nextLessonRow&&nextLessonRow.classList.contains('editor-row')){
-    const nextFields=[...nextLessonRow.querySelectorAll('input,textarea')];
-    const nextIsEmpty=nextFields.length>0&&nextFields.every(f=>!String(f.value||'').trim());
-    if(nextIsEmpty){
-      const currentRoles=[...currentLessonRow.querySelectorAll('.word-part-role')].map(s=>s.closest('.word-part-row'));
-      const nextRoles=[...nextLessonRow.querySelectorAll('.word-part-role')].map(s=>s.closest('.word-part-row'));
-      currentRoles.forEach((part,index)=>{
-        const nextPart=nextRoles[index];
-        const nextSelect=nextPart?.querySelector('.word-part-role');
-        const nextDisplay=nextPart?.querySelector('.word-part-role-button');
-        if(!nextSelect||!nextDisplay)return;
-        const nextRole=part.querySelector('.word-part-role')?.value||'answer';
-        nextSelect.value=nextRole;
-        nextDisplay.classList.toggle('role-extra',nextRole==='extra');
-        const label=nextDisplay.querySelector('span');
-        if(label)label.textContent=nextRole==='extra'?'Wordt niet getoetst':'Wordt getoetst';
-      });
-    }
-  }
-  ensureNextLessonRow(row);
-}
-function addWordRow(q='',a='',questionParts=null,answerParts=null,rules=null){
-  const editor=document.getElementById('wordEditor');
-  const previous=editor.lastElementChild;
-  if(!questionParts){
-    if(previous&&previous.querySelector('.word-q-part'))questionParts=[...previous.querySelectorAll('.word-q-part')].map(()=> '');
-    else questionParts=[''];
-  }
-  if(!answerParts){
-    if(previous&&previous.querySelector('.word-a-part'))answerParts=[...previous.querySelectorAll('.word-a-part')].map(r=>({text:'',role:r.querySelector('.word-part-role')?.value||'answer'}));
-    else answerParts=[{text:'',role:'answer'}];
-  }
-  const row=document.createElement('div');
-  row.className='editor-row';
-  row.innerHTML=`<button class="remove-row" type="button" onclick="this.parentElement.remove()">✕</button>
-    <div class="word-parts-section"><div class="word-parts-head"><label>Vraag</label></div><div class="word-question-parts"></div><button type="button" class="word-add-line word-add-line-bottom" onclick="addWordQuestionPart(this.closest('.editor-row'))">➕ regel</button></div>
-    <div class="word-parts-section"><div class="word-parts-head"><label>Antwoord</label></div><div class="word-answer-parts"></div><button type="button" class="word-add-line word-add-line-bottom" onclick="addWordAnswerPart(this.closest('.editor-row'))">➕ regel</button><div class="word-extra-note">Kies per regel of deze wordt beoordeeld als antwoord of alleen als extra informatie.</div></div>
-    <div class="word-rules-box"><div class="word-rules-title">🎯 Beoordeling van het antwoord</div><div class="word-rules-grid">
-      <div class="word-rule-field word-rule-required"><label>🔎 Verplichte woorden</label><input class="word-item-required-terms" type="text" placeholder="Bijvoorbeeld expert, computers (komma-gescheiden)"></div>
-      <div class="word-rule-field word-rule-min"><label>🔢 Minimum aantal<br>woorden</label><input class="word-item-min-words" type="number" min="0" max="100" value="0" placeholder="0 = geen minimum"></div>
-    </div></div>
-    <div class="word-editor-bottom"><div class="word-editor-hint"><label>💡 Hint</label><textarea class="word-item-hint" placeholder="Bijvoorbeeld: Mijn vader is een ________ op het gebied van computers."></textarea></div><button type="button" class="question-insert-button" onclick="insertWordQuestionAfter(this)">➕ Vraag hier invoegen</button></div>`;
-  editor.appendChild(row);
-  questionParts.forEach((part,i)=>addWordQuestionPart(row,part||''));
-  answerParts.forEach(part=>addWordAnswerPart(row,part?.text||'',part?.role||'answer'));
-  if(rules){
-    row.querySelector('.word-item-hint').value=rules.hint||'';
-    row.querySelector('.word-item-min-words').value=Number.isFinite(Number(rules.min_words))?Number(rules.min_words):0;
-    row.querySelector('.word-item-required-terms').value=Array.isArray(rules.required_terms)?rules.required_terms.join(', '):(rules.required_terms||'');
-  }
-}
-function getWordItemRules(row){
-  const min=Math.max(0,Number(row.querySelector('.word-item-min-words')?.value||0));
-  const required=String(row.querySelector('.word-item-required-terms')?.value||'').split(',').map(x=>x.trim()).filter(Boolean);
-  return {hint:String(row.querySelector('.word-item-hint')?.value||'').trim(),min_words:Number.isFinite(min)?min:0,required_terms:required};
-}
-
-function addQuestionRow(q='',a=''){
-  const editor=document.getElementById('questionEditor');
-  const row=document.createElement('div');row.className='editor-row';
-  row.innerHTML=`<button class="remove-row" type="button" onclick="this.parentElement.remove()">✕</button>
-    <div class="word-parts-section"><div class="word-parts-head"><label>Vraag</label></div><div class="word-question-parts"></div><button type="button" class="word-add-line word-add-line-bottom" onclick="addUniversalQuestionPart(this.closest('.editor-row'))">➕ regel</button></div>
-    <div class="word-parts-section"><div class="word-parts-head"><label>Antwoord</label></div><div class="question-answer-parts"></div><button type="button" class="word-add-line word-add-line-bottom" onclick="addUniversalAnswerPart(this.closest('.editor-row'),'question-answer-parts','question-a-part','','answer','Schrijf hier het antwoord of de uitleg.')">➕ regel</button><div class="word-extra-note">Kies per regel of deze wordt beoordeeld als antwoord of alleen als extra informatie.</div></div>
-    <button type="button" class="question-insert-button" onclick="insertQuestionAfter(this)">➕ Vraag hier invoegen</button>`;
-  editor.appendChild(row);
-  addUniversalQuestionPart(row,q);
-  addUniversalAnswerPart(row,'question-answer-parts','question-a-part',a,'answer','Schrijf hier het antwoord of de uitleg.');
-}
-function addUniversalQuestionPart(row,text=''){
-  const parts=row.querySelector('.word-question-parts');if(!parts)return;
-  parts.insertAdjacentHTML('beforeend',`<div class="word-part-row"><input class="word-q-part" value="${escapeAttr(text)}" oninput="ensureNextLessonRow(this)" placeholder="Vul hier de vraag in"><button type="button" class="word-part-remove" onclick="this.parentElement.remove()">✕</button></div>`);
-}
-function insertQuestionAfter(button){const current=button.closest('.editor-row');if(!current)return;const q=document.createElement('div');q.className='editor-row';q.innerHTML=`<button class="remove-row" type="button" onclick="this.parentElement.remove()">✕</button><div class="word-parts-section"><div class="word-parts-head"><label>Vraag</label></div><div class="word-question-parts"></div><button type="button" class="word-add-line word-add-line-bottom" onclick="addUniversalQuestionPart(this.closest('.editor-row'))">➕ regel</button></div><div class="word-parts-section"><div class="word-parts-head"><label>Antwoord</label></div><div class="question-answer-parts"></div><button type="button" class="word-add-line word-add-line-bottom" onclick="addUniversalAnswerPart(this.closest('.editor-row'),'question-answer-parts','question-a-part','','answer','Schrijf hier het antwoord of de uitleg.')">➕ regel</button><div class="word-extra-note">Kies per regel of deze wordt beoordeeld als antwoord of alleen als extra informatie.</div></div><button type="button" class="question-insert-button" onclick="insertQuestionAfter(this)">➕ Vraag hier invoegen</button>`;current.insertAdjacentElement('afterend',q);addUniversalQuestionPart(q,'');addUniversalAnswerPart(q,'question-answer-parts','question-a-part','','answer','Schrijf hier het antwoord of de uitleg.');q.querySelector('.word-q-part')?.focus()}
-
-function addDictationRow(q='',a='',a2=''){
-  const editor=document.getElementById('dictationEditor'),row=document.createElement('div');row.className='editor-row';
-  row.innerHTML=`<button class="remove-row" type="button" onclick="this.parentElement.remove()">✕</button>
-    <div class="word-parts-section"><div class="word-parts-head"><label>Vraag</label></div><div class="word-question-parts"></div><button type="button" class="word-add-line word-add-line-bottom" onclick="addUniversalQuestionPart(this.closest('.editor-row'))">➕ regel</button></div>
-    <div class="word-parts-section"><div class="word-parts-head"><label>Antwoord</label></div><div class="dictation-answer-parts"></div><button type="button" class="word-add-line word-add-line-bottom" onclick="addUniversalAnswerPart(this.closest('.editor-row'),'dictation-answer-parts','dictation-a-part','','answer','Vul hier het antwoord in')">➕ regel</button><div class="word-extra-note">Kies per regel of deze wordt beoordeeld als antwoord of alleen als extra informatie.</div>
-    <div class="dictation-spellcheck"></div></div>
-    <button type="button" class="question-insert-button" onclick="insertLessonRowAfter(this)">➕ Vraag hier invoegen</button>`;
-  editor.appendChild(row);addUniversalQuestionPart(row,q);addUniversalAnswerPart(row,'dictation-answer-parts','dictation-a-part',a,'answer','Vul hier het antwoord in');if(a2)addUniversalAnswerPart(row,'dictation-answer-parts','dictation-a-part',a2,'answer','Alternatief antwoord');
-}
-function addMathRow(q='',a=''){
-  const editor=document.getElementById('mathEditor'),row=document.createElement('div');row.className='editor-row';
-  row.innerHTML=`<button class="remove-row" type="button" onclick="this.parentElement.remove()">✕</button>
-    <div class="word-parts-section"><div class="word-parts-head"><label>Som</label></div><div class="word-question-parts"></div><button type="button" class="word-add-line word-add-line-bottom" onclick="addUniversalQuestionPart(this.closest('.editor-row'))">➕ regel</button></div>
-    <div class="word-parts-section"><div class="word-parts-head"><label>Antwoord</label></div><div class="math-answer-parts"></div><button type="button" class="word-add-line word-add-line-bottom" onclick="addUniversalAnswerPart(this.closest('.editor-row'),'math-answer-parts','math-a-part','','answer','Bijvoorbeeld 42')">➕ regel</button><div class="word-extra-note">Kies per regel of deze wordt beoordeeld als antwoord of alleen als extra informatie.</div></div>
-    <button type="button" class="question-insert-button" onclick="insertLessonRowAfter(this)">➕ Vraag hier invoegen</button>`;
-  editor.appendChild(row);addUniversalQuestionPart(row,q);addUniversalAnswerPart(row,'math-answer-parts','math-a-part',a,'answer','Bijvoorbeeld 42');
-}
-function refreshSpellingLabels(){const labels=getSpellingLabels();document.querySelectorAll('.spelling-label-question').forEach(e=>e.textContent=labels.question);document.querySelectorAll('.spelling-label-perfect').forEach(e=>e.textContent=labels.perfect);document.querySelectorAll('.spelling-label-adjective').forEach(e=>e.textContent=labels.adjective)}
-function addSpellingRow(q='',perfect='',adjective='',fourth=''){
-  const labels=getSpellingLabels(),editor=document.getElementById('spellingEditor'),row=document.createElement('div');row.className='editor-row';
-  row.innerHTML=`<button class="remove-row" type="button" onclick="this.parentElement.remove()">✕</button>
-    <div class="word-parts-section"><div class="word-parts-head"><label class="spelling-label-question">${escapeHtml(labels.question)}</label></div><div class="word-question-parts"></div><button type="button" class="word-add-line word-add-line-bottom" onclick="addUniversalQuestionPart(this.closest('.editor-row'))">➕ regel</button></div>
-    <div class="word-parts-section"><div class="word-parts-head"><label>Antwoord</label></div><div class="spelling-answer-parts"></div><button type="button" class="word-add-line word-add-line-bottom" onclick="addUniversalAnswerPart(this.closest('.editor-row'),'spelling-answer-parts','spelling-a-part','','answer','Vul hier het antwoord in')">➕ regel</button><div class="word-extra-note">Gebruik de regels voor de verschillende spellingvormen. Kies per regel of deze wordt getoetst.</div></div>
-    <button type="button" class="question-insert-button" onclick="insertLessonRowAfter(this)">➕ Vraag hier invoegen</button>`;
-  editor.appendChild(row);
-  addUniversalQuestionPart(row,q);
-  addUniversalAnswerPart(row,'spelling-answer-parts','spelling-a-part',perfect,'answer',labels.perfect);
-  if(adjective)addUniversalAnswerPart(row,'spelling-answer-parts','spelling-a-part',adjective,'answer',labels.adjective);
-  if(fourth)addUniversalAnswerPart(row,'spelling-answer-parts','spelling-a-part',fourth,'answer','Vierde regel');
-}
-function addCurrentRow(){const t=document.getElementById('lessonType').value;if(t==='words'||t==='custom')addWordRow();else if(t==='questions')addQuestionRow();else if(t==='dictation')addDictationRow();else if(t==='math')addMathRow();else addSpellingRow()}
-function collectItems(){const t=document.getElementById('lessonType').value;let items=[];
-if(t==='words'||t==='custom')document.querySelectorAll('#wordEditor .editor-row').forEach((r,i)=>{
-  const questionParts=[...r.querySelectorAll('.word-q-part')].map(x=>x.value.trim()).filter(Boolean);
-  const answerParts=[...r.querySelectorAll('.word-a-part')].map(x=>({text:x.value.trim(),role:x.closest('.word-part-row')?.querySelector('.word-part-role')?.value||'answer'})).filter(x=>x.text);
-  const required=answerParts.filter(x=>x.role==='answer').map(x=>x.text);
-  const rules=getWordItemRules(r);
-  if(questionParts.length&&required.length)items.push({question:questionParts.join('\n'),answer:required.join('\n'),question_parts:questionParts,answer_parts:answerParts,hint:rules.hint,min_words:rules.min_words,required_terms:rules.required_terms,sort_order:i});
-});
-if(t==='questions')document.querySelectorAll('#questionEditor .editor-row').forEach((r,i)=>{
-  const q=[...r.querySelectorAll('.word-q-part')].map(x=>x.value.trim()).filter(Boolean),parts=[...r.querySelectorAll('.question-a-part')].map(x=>({text:x.value.trim(),role:x.closest('.word-part-row')?.querySelector('.word-part-role')?.value||'answer'})).filter(x=>x.text),required=parts.filter(x=>x.role==='answer').map(x=>x.text);
-  if(q.length&&required.length)items.push({question:q.join('\n'),answer:required.join('\n'),question_parts:q,answer_parts:parts,sort_order:i});
-});
-if(t==='dictation')document.querySelectorAll('#dictationEditor .editor-row').forEach((r,i)=>{
-  const q=[...r.querySelectorAll('.word-q-part')].map(x=>x.value.trim()).filter(Boolean),parts=[...r.querySelectorAll('.dictation-a-part')].map(x=>({text:x.value.trim(),role:x.closest('.word-part-row')?.querySelector('.word-part-role')?.value||'answer'})).filter(x=>x.text),required=parts.filter(x=>x.role==='answer').map(x=>x.text);
-  if(q.length&&required.length)items.push({question:q.join('\n'),answer:required.join('\n'),question_parts:q,answer_parts:parts,sort_order:i});
-});
-if(t==='math')document.querySelectorAll('#mathEditor .editor-row').forEach((r,i)=>{
-  const q=[...r.querySelectorAll('.word-q-part')].map(x=>x.value.trim()).filter(Boolean),parts=[...r.querySelectorAll('.math-a-part')].map(x=>({text:x.value.trim(),role:x.closest('.word-part-row')?.querySelector('.word-part-role')?.value||'answer'})).filter(x=>x.text),required=parts.filter(x=>x.role==='answer').map(x=>x.text);
-  if(q.length&&required.length&&required.every(x=>Number.isFinite(Number(x))))items.push({question:q.join('\n'),answer:required.join('\n'),question_parts:q,answer_parts:parts,sort_order:i});
-});
-if(t==='spelling')document.querySelectorAll('#spellingEditor .editor-row').forEach((r,i)=>{
-  const q=[...r.querySelectorAll('.word-q-part')].map(x=>x.value.trim()).filter(Boolean),parts=[...r.querySelectorAll('.spelling-a-part')].map(x=>({text:x.value.trim(),role:x.closest('.word-part-row')?.querySelector('.word-part-role')?.value||'answer'})).filter(x=>x.text),required=parts.filter(x=>x.role==='answer').map(x=>x.text);
-  if(q.length&&required.length)items.push({question:q.join('\n'),answer:required.join(' || '),question_parts:q,answer_parts:parts,sort_order:i});
-});
-return items}
-const datePickerState={};
 function dateKey(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`}
 function parseDateKey(value){if(!value)return new Date();const [y,m,d]=value.split('-').map(Number);return new Date(y,m-1,d)}
 function monthLabel(d){return new Intl.DateTimeFormat('nl-NL',{month:'long',year:'numeric'}).format(d).replace(/^./,c=>c.toUpperCase())}
@@ -2726,63 +2535,6 @@ function pickDate(containerId,inputId,key){const input=document.getElementById(i
 function getTestDateForLesson(lessonId,student){return getTestCalendar().find(t=>Number(t.lessonId)===Number(lessonId)&&t.student===student)}
 function upsertTestDate(lessonId,student,date,lesson){if(!date)return;const items=getTestCalendar();const idx=items.findIndex(t=>Number(t.lessonId)===Number(lessonId)&&t.student===student);const entry={id:idx>=0?items[idx].id:Date.now().toString(),student,lessonId:Number(lessonId),subject:lesson.subject,title:lesson.title,date};if(idx>=0)items[idx]=entry;else items.push(entry);saveTestCalendar(items)}
 function removeTestDate(lessonId,student){const items=getTestCalendar().filter(t=>!(Number(t.lessonId)===Number(lessonId)&&t.student===student));saveTestCalendar(items)}
-function toggleLessonTestDate(){const enabled=document.getElementById('lessonTestDateEnabled')?.checked;const picker=document.getElementById('lessonTestDatePicker');if(picker)picker.classList.toggle('hidden',!enabled);if(!enabled){const input=document.getElementById('lessonTestDate');if(input)input.value='';}}
-
-async function checkDictationWord(input){
-  const word=String(input?.value||'').trim();
-  const box=input?.closest('.word-parts-section')?.querySelector('.dictation-spellcheck');
-  if(!box)return;
-  box.innerHTML='';
-  if(!word)return;
-  box.textContent='🤖 Spelling controleren...';
-  box.style.color='#667894';
-  try{
-    const row=[...document.querySelectorAll('#dictationEditor .editor-row')].indexOf(input.closest('.editor-row'))+1;
-    const subject=document.getElementById('lessonSubject').value.trim();
-    const {data,error}=await db.functions.invoke('check-dictation-spelling-v1',{body:{entries:[{row,word}],subject}});
-    if(error)throw error;
-    const issue=data?.issues?.[0];
-    if(issue){
-      box.innerHTML='❗ <strong>'+escapeHtml(issue.reason)+'</strong><br>Bedoel je: <strong>'+escapeHtml(issue.suggestion)+'</strong>?';
-      box.style.color='#b91c1c';
-      box.style.fontWeight='800';
-      return;
-    }
-    box.innerHTML='';
-  }catch(error){
-    console.error('Dictation word spelling check error:',error);
-    box.textContent='⚠️ Spellingscontrole kon niet worden uitgevoerd.';
-    box.style.color='#b91c1c';
-  }
-}
-async function checkDictationSpelling(){
-  const rows=[...document.querySelectorAll('#dictationEditor .editor-row')];
-  const entries=rows.map((r,i)=>({row:i+1,word:r.querySelector('.dictation-a-part')?.value.trim()||''})).filter(x=>x.word);
-  if(!entries.length)return {issues:[]};
-  const subject=document.getElementById('lessonSubject').value.trim();
-  const {data,error}=await db.functions.invoke('check-dictation-spelling-v1',{body:{entries,subject}});
-  if(error)throw error;
-  if(!data)throw new Error('Geen antwoord van de spellingscontrole.');
-  return data;
-}
-function toggleLessonAiInstruction(){const check=document.getElementById('lessonAiCheckAnswers'),box=document.getElementById('lessonAiInstructionBox');if(!check||!box)return;box.classList.toggle('hidden',!check.checked)}
-function editCurrentLesson(){if(!requireParent())return;const l=currentLesson;hideAll();document.getElementById('editor').classList.remove('hidden');document.getElementById('editorTitle').textContent='Les bewerken';document.getElementById('editorBannerLabel').textContent='🐾 LES BEWERKEN';document.getElementById('lessonSubject').value=l.subject||'';document.getElementById('lessonSubvak').value=l.subvak||'';document.querySelectorAll('input[name=lessonStudent]').forEach(r=>r.checked=r.value===l.student);document.getElementById('lessonName').value=l.title||'';document.getElementById('lessonExplanation').value=l.explanation||'';document.getElementById('lessonType').value=l.type;document.getElementById('lessonAiCheckAnswers').checked=l.ai_check_answers!==false;document.getElementById('lessonAiInstruction').value=l.ai_instruction||'';toggleLessonAiInstruction();const labels=l.editor_labels&&typeof l.editor_labels==='object'?l.editor_labels:null;document.getElementById('spellingLabelQuestion').value=labels?.question||'Werkwoord';document.getElementById('spellingLabelPerfect').value=labels?.perfect||'Voltooid deelwoord';document.getElementById('spellingLabelAdjective').value=labels?.adjective||'Bijvoeglijk gebruikt voltooid deelwoord';const existingTest=getTestDateForLesson(l.id,l.student);document.getElementById('lessonTestDate').value=existingTest?.date||'';document.getElementById('lessonTestDateEnabled').checked=!!existingTest?.date;document.getElementById('lessonTestDatePicker').classList.toggle('hidden',!existingTest?.date);document.getElementById('wordEditor').innerHTML='';document.getElementById('questionEditor').innerHTML='';document.getElementById('dictationEditor').innerHTML='';document.getElementById('mathEditor').innerHTML='';document.getElementById('spellingEditor').innerHTML='';l.lesson_items.forEach(it=>{
-  if(l.type==='words'||l.type==='custom'){
-    const qp=Array.isArray(it.question_parts)&&it.question_parts.length?it.question_parts:[it.question||''];
-    const ap=Array.isArray(it.answer_parts)&&it.answer_parts.length?it.answer_parts:[{text:it.answer||'',role:'answer'}];
-    addWordRow('', '', qp, ap, {hint:it.hint||'',min_words:it.min_words||0,required_terms:Array.isArray(it.required_terms)?it.required_terms:[]});
-  }else{
-    const qp=Array.isArray(it.question_parts)&&it.question_parts.length?it.question_parts:[it.question||''];
-    const ap=Array.isArray(it.answer_parts)&&it.answer_parts.length?it.answer_parts:String(it.answer||'').split(l.type==='spelling'?' || ':'\\n').filter(Boolean).map(text=>({text,role:'answer'}));
-    const cfg={questions:{editor:'questionEditor',answers:'question-answer-parts',answerClass:'question-a-part',qLabel:'Vraag',answerPlaceholder:'Schrijf hier het antwoord of de uitleg.'},dictation:{editor:'dictationEditor',answers:'dictation-answer-parts',answerClass:'dictation-a-part',qLabel:'Vraag',answerPlaceholder:'Vul hier het antwoord in'},math:{editor:'mathEditor',answers:'math-answer-parts',answerClass:'math-a-part',qLabel:'Som',answerPlaceholder:'Bijvoorbeeld 42'},spelling:{editor:'spellingEditor',answers:'spelling-answer-parts',answerClass:'spelling-a-part',qLabel:getSpellingLabels().question,answerPlaceholder:'Vul hier het antwoord in'}}[l.type];
-    if(!cfg)return;
-    const row=document.createElement('div');row.className='editor-row';
-    row.innerHTML=`<button class="remove-row" type="button" onclick="this.parentElement.remove()">✕</button><div class="word-parts-section"><div class="word-parts-head"><label>'+escapeHtml(cfg.qLabel)+'</label></div><div class="word-question-parts"></div><button type="button" class="word-add-line word-add-line-bottom" onclick="addUniversalQuestionPart(this.closest('.editor-row'))">➕ regel</button></div><div class="word-parts-section"><div class="word-parts-head"><label>Antwoord</label></div><div class="'+cfg.answers+'"></div><button type="button" class="word-add-line word-add-line-bottom" onclick="addUniversalAnswerPart(this.closest('.editor-row'),''+cfg.answers+'',''+cfg.answerClass+'','','answer',''+cfg.answerPlaceholder+'')">➕ regel</button><div class="word-extra-note">Kies per regel of deze wordt beoordeeld als antwoord of alleen als extra informatie.</div>'+(l.type==='dictation'?'<div class="dictation-spellcheck"></div>':'')+'</div><button type="button" class="question-insert-button" onclick="'+(l.type==='questions'?'insertQuestionAfter(this)':'insertLessonRowAfter(this)')+'">➕ Vraag hier invoegen</button>`;
-    document.getElementById(cfg.editor).appendChild(row);
-    qp.forEach(x=>addUniversalQuestionPart(row,x));
-    ap.forEach(x=>addUniversalAnswerPart(row,cfg.answers,cfg.answerClass,x.text||'',x.role||'answer',cfg.answerPlaceholder));
-  }
-});changeLessonType();addCurrentRow();renderDatePicker('lessonTestDatePicker','lessonTestDate',existingTest?.date||'')}
 function deleteCurrentLesson(){
   if(!requireParent())return;
   if(!currentLesson)return;
@@ -2882,76 +2634,15 @@ installPageSidebars();
 document.getElementById('calendarLessonSelect')?.addEventListener('change',updateCalendarLessonNote);
 initializeApp();
 
-/* TEST V4.61 — restore the insert-row handlers used by the editor buttons */
-function insertLessonRowAfter(button){
-  const current=button?.closest('.editor-row');
-  if(!current)return;
-  const editor=current.parentElement;
-  const type=document.getElementById('lessonType')?.value;
-  const makers={
-    words:()=>addWordRow(),
-    custom:()=>addWordRow(),
-    questions:()=>addQuestionRow(),
-    dictation:()=>addDictationRow(),
-    math:()=>addMathRow(),
-    spelling:()=>addSpellingRow()
-  };
-  const maker=makers[type];
-  if(!maker)return;
-  const beforeLast=editor.lastElementChild;
-  maker();
-  const created=editor.lastElementChild;
-  if(!created||created===beforeLast)return;
-  current.insertAdjacentElement('afterend',created);
-  created.querySelector('input,textarea')?.focus();
-}
-function insertWordQuestionAfter(button){
-  const current=button?.closest('.editor-row');
-  const editor=document.getElementById('wordEditor');
-  if(!current||!editor)return;
-  const questionParts=[...current.querySelectorAll('.word-q-part')].map(()=> '');
-  const answerParts=[...current.querySelectorAll('.word-a-part')].map(r=>({text:'',role:r.closest('.word-part-row')?.querySelector('.word-part-role')?.value||'answer'}));
-  const rules={hint:'',min_words:0,required_terms:[]};
-  addWordRow('', '', questionParts.length?questionParts:[''], answerParts.length?answerParts:[{text:'',role:'answer'}], rules);
-  const created=editor.lastElementChild;
-  if(!created||created===current)return;
-  current.insertAdjacentElement('afterend',created);
-  created.querySelector('.word-q-part')?.focus();
-}
-
 </script>
 
 
-<script>
-/* TEST V4.64 — deterministic action-button cleanup/reorder */
-(function(){
-  function norm(t){return (t||'').replace(/[^\p{L}\p{N}]+/gu,' ').trim().toLowerCase();}
-  function findButtons(label){return Array.from(document.querySelectorAll('#editor button')).filter(b=>norm(b.textContent)===label)}
-  function applyV464(){
-    const rowBtn=findButtons('rij toevoegen')[0];
-    const photo=findButtons('maak les van foto')[0];
-    if(rowBtn){
-      rowBtn.classList.add('pg-v464-hidden-row-add');
-      const parent=rowBtn.parentElement;
-      const save=parent&&Array.from(parent.querySelectorAll('button')).find(b=>norm(b.textContent)==='les opslaan');
-      if(save){parent.classList.add('pg-v464-bottom-actions');save.classList.add('pg-v464-save');save.style.order='0';save.style.marginLeft='0'}
-    }
-    if(photo){
-      const parent=photo.parentElement;
-      const save=parent&&Array.from(parent.querySelectorAll('button')).find(b=>norm(b.textContent)==='les opslaan');
-      if(save){parent.classList.add('pg-v464-top-actions');save.classList.add('pg-v464-save');photo.classList.add('pg-v464-photo');parent.insertBefore(save,photo)}
-    }
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',applyV464);else applyV464();
-  setTimeout(applyV464,300);setTimeout(applyV464,1000);
-})();
-</script>
+
   <script src="test-history-storage.js"></script>
   <script src="photo-storage.js"></script>
 
   <script type="module">
     import { installAgendaRuntimeEntry } from '/src/features/agenda/runtime-entry.js';
-    import { installLessonSaveRuntimeEntry } from '/src/features/lessons/lesson-save-runtime-entry.js';
     import { installCreatorRuntimeEntry } from '/src/features/creator/creator-runtime-entry.js';
     import { installManagementRuntimeEntry } from '/src/features/management/management-runtime-entry.js';
     import { installLessonGuestAccessRuntimeEntry } from '/src/features/lessons/lesson-guest-access-runtime-entry.js';
@@ -2986,27 +2677,7 @@ function insertWordQuestionAfter(button){
       showMessage
     }, window);
 
-    installLessonSaveRuntimeEntry({
-      document,
-      db,
-      get currentSubject() { return currentSubject; },
-      set currentSubject(value) { currentSubject = value; },
-      get currentLesson() { return currentLesson; },
-      set currentLesson(value) { currentLesson = value; },
-      get currentSession() { return currentSession; },
-      PARENT_IDS,
-      get lessons() { return lessons; },
-      get currentStudent() { return currentStudent; },
-      normalizeSubvakKey,
-      renderTestCalendar,
-      refreshPageSidebars,
-      showMessage,
-      showHome,
-      loadLessons,
-      checkDictationSpelling,
-      upsertTestDate,
-      removeTestDate
-    });
+
   </script>
 </body>
 </html>

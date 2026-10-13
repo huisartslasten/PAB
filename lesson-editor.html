@@ -16,12 +16,10 @@
     import { createPacoGOApp } from './src/app/bootstrap.js';
     import { createLessonEditorApplication } from './src/features/lessons/lesson-editor-application.js';
     import { createLessonEditorPage } from './src/features/lessons/lesson-editor-page.js';
-    import { createLessonEditorDraftStorage } from './src/features/lessons/lesson-editor-draft-state.js';
 
     const params=new URLSearchParams(window.location.search);
     const lessonId=params.get('lesson_id');
     const student=params.get('student')||'';
-    const mode=params.get('mode')||'';
     const mount=document.querySelector('#paco-template-mount');
     const content=document.createElement('div');
     content.className='lesson-editor-page';
@@ -55,19 +53,15 @@
     async function load(){
       await app.initializeSession();
       if(!app.auth.isParent){content.textContent='Je hebt geen toegang tot lesbeheer.';return;}
-      const draftStorage=createLessonEditorDraftStorage(window.sessionStorage);
-      const handedOffDraft=mode==='ai-review'?draftStorage.read():null;
-      let lesson=handedOffDraft?.lesson ? { ...handedOffDraft.lesson, id: handedOffDraft.lessonId ?? handedOffDraft.lesson?.id ?? null, lesson_items: handedOffDraft.items || handedOffDraft.lesson.lesson_items || [] } : null;
-      const resolvedLessonId=lesson?.id ?? lessonId;
-      if(resolvedLessonId && !handedOffDraft){
+      let lesson=null;
+      if(lessonId){
         const records=await app.loadLessons();
-        lesson=app.mapLessons(records).find(item=>String(item.id)===String(resolvedLessonId))||null;
+        lesson=app.mapLessons(records).find(item=>String(item.id)===String(lessonId))||null;
         if(!lesson){content.textContent='Deze les kon niet worden gevonden.';return;}
         const calendarEntry=editorApp.calendar.getAll().find(item=>Number(item.lessonId)===Number(lesson.id)&&item.student===lesson.student);
         lesson={...lesson,testDate:calendarEntry?.date||''};
       }
       createLessonEditorPage({root:content,runtime:editorApp.editor,initialLesson:lesson,student:student||lesson?.student||''});
-      if(handedOffDraft)draftStorage.clear();
     }
     load().catch(error=>{console.error('Lesson editor load error:',error);content.textContent='De leseditor kon niet worden geladen.';});
   </script>

@@ -1,48 +1,16 @@
-import { getActiveStudentLessons } from '../lessons/visibility.js';
-
-const SUBJECT_ICONS = Object.freeze({
-  nederlands: '📚',
-  engels: '🇬🇧',
-  rekenen: '🔢',
-  spelling: '✏️',
-  begrijpendlezen: '📖',
-  topografie: '🌍',
-  geschiedenis: '🏛️',
-  aardrijkskunde: '🗺️',
-  natuur: '🌱',
-  biologie: '🧬',
-  muziek: '🎵'
-});
-
-function normalizeSubject(value) {
-  return String(value || '').trim().toLocaleLowerCase('nl-NL').replace(/\s+/g, ' ');
-}
+import { getLessonSubjectGroups, getLessonSubjectIcon } from '../lessons/list-view-model.js';
 
 export function getDashboardSubjectIcon(subject) {
-  return SUBJECT_ICONS[normalizeSubject(subject).replaceAll(' ', '')] || '📘';
+  return getLessonSubjectIcon(subject);
 }
 
 export function getDashboardSubjects(lessons = [], student) {
-  const active = getActiveStudentLessons(lessons, student);
-  const groups = new Map();
-
-  active.forEach(lesson => {
-    const key = normalizeSubject(lesson.subject) || 'overig';
-    if (!groups.has(key)) {
-      groups.set(key, {
-        key,
-        label: String(lesson.subject || 'Overig').trim() || 'Overig',
-        lessons: []
-      });
-    }
-    groups.get(key).lessons.push(lesson);
-  });
-
-  return [...groups.values()].sort((a, b) => a.label.localeCompare(b.label, 'nl'));
+  return getLessonSubjectGroups(lessons, student);
 }
 
 export function getDashboardProgress(lessons = [], student, masteryService) {
-  const active = getActiveStudentLessons(lessons, student);
+  const subjects = getLessonSubjectGroups(lessons, student);
+  const active = subjects.flatMap(subject => subject.lessons);
   const items = active.flatMap(lesson =>
     (Array.isArray(lesson.lesson_items) ? lesson.lesson_items : []).map(item => ({
       lessonId: lesson.id,
@@ -56,7 +24,7 @@ export function getDashboardProgress(lessons = [], student, masteryService) {
 
   return Object.freeze({
     lessons: active.length,
-    subjects: getDashboardSubjects(active, student).length,
+    subjects: subjects.length,
     items: items.length,
     mastered,
     percent: items.length ? Math.round(mastered / items.length * 100) : 0

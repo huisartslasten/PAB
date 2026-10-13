@@ -13,6 +13,7 @@ import { createManagement } from '../features/management/management.js';
 import { createAgendaReadService } from '../features/agenda/read-service.js';
 import { createTestHistoryReadService } from '../features/test-history/test-history-read-service.js';
 import { createCreatorService } from '../features/creator/creator-service.js';
+import { createLessonOrderService } from '../features/lessons/lesson-order-service.js';
 
 export function createPacoGOApp({ supabaseLib = window.supabase, session = null, storage = globalThis.localStorage } = {}) {
   const db = createSupabaseClient(supabaseLib);
@@ -23,6 +24,7 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null,
   const grading = createAnswerGradingService(db);
   const audio = createLessonAudioService(db);
   const mastery = createMasteryService({ storage });
+  const lessonOrder = createLessonOrderService({ db, storage });
   const agenda = createAgendaReadService({ storage, lessons: () => appState.lessons, currentStudent: () => appState.currentStudent });
   const testHistory = createTestHistoryReadService(db);
   const canManage = () => auth.isParent;
@@ -48,6 +50,7 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null,
     initializeSession,
     state: appState,
     lessons,
+    lessonOrder,
     loadLessons,
     feedback,
     grading,

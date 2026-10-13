@@ -24,13 +24,13 @@ function normalizeLessonType(lessonOrType = {}) {
 
 export function getLessonChoiceType(lessonOrType = {}) {
   const type = normalizeLessonType(lessonOrType);
-  return type === 'questions' || !LESSON_TYPES.includes(type) ? 'questions' : 'practice';
+  return LESSON_TYPES.includes(type) ? type : 'questions';
 }
 
 export function getLessonChoices(lessonOrType = {}) {
-  const type = normalizeLessonType(lessonOrType);
+  const type = getLessonChoiceType(lessonOrType);
 
-  if (getLessonChoiceType(type) === 'questions') {
+  if (type === 'questions') {
     return ['questions', 'view'];
   }
 

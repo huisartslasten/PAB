@@ -93,5 +93,10 @@ test('auth session service propagates Supabase auth errors', async () => {
 test('auth session service rejects missing auth state subscription support', () => {
   const service = createAuthSessionService({ auth: { getSession: async () => ({ data: { session: null }, error: null }) } });
   assert.throws(() => service.subscribe(() => {}), /auth state changes/);
+});
+
+test('auth session service requires a listener for auth state subscription', () => {
+  const harness = makeAuthHarness();
+  const service = createAuthSessionService(harness.db);
   assert.throws(() => service.subscribe(), /listener/);
 });

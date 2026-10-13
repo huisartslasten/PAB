@@ -4,6 +4,8 @@ import { createAuthSessionService } from '../src/services/auth-session-service.j
 
 function makeAuthHarness() {
   const calls = [];
+  const listeners = [];
+  const subscription = { unsubscribe: () => calls.push(['unsubscribe']) };
   const db = {
     auth: {
       getSession: async () => {
@@ -25,10 +27,15 @@ function makeAuthHarness() {
       updateUser: async payload => {
         calls.push(['updateUser', payload]);
         return { data: { user: { id: 'parent-id' } }, error: null };
+      },
+      onAuthStateChange: listener => {
+        listeners.push(listener);
+        calls.push(['onAuthStateChange']);
+        return { data: { subscription } };
       }
     }
   };
-  return { db, calls };
+  return { db, calls, listeners, subscription };
 }
 
 test('auth session service owns the Supabase auth operations', async () => {
@@ -50,6 +57,19 @@ test('auth session service owns the Supabase auth operations', async () => {
   ]);
 });
 
+test('auth session service owns the Supabase auth-state subscription', () => {
+  const harness = makeAuthHarness();
+  const service = createAuthSessionService(harness.db);
+  const events = [];
+  const returnedSubscription = service.subscribe((event, session) => events.push([event, session]));
+
+  harness.listeners[0]('SIGNED_IN', { user: { id: 'parent-id' } });
+
+  assert.equal(returnedSubscription, harness.subscription);
+  assert.deepEqual(events, [['SIGNED_IN', { user: { id: 'parent-id' } }]]);
+  assert.deepEqual(harness.calls, [['onAuthStateChange']]);
+});
+
 test('auth session service propagates Supabase auth errors', async () => {
   const error = new Error('auth failed');
   const db = {
@@ -68,4 +88,10 @@ test('auth session service propagates Supabase auth errors', async () => {
   await assert.rejects(() => service.signOut(), error);
   await assert.rejects(() => service.requestPasswordReset('a@example.com'), error);
   await assert.rejects(() => service.updatePassword('secret'), error);
+});
+
+test('auth session service rejects missing auth state subscription support', () => {
+  const service = createAuthSessionService({ auth: { getSession: async () => ({ data: { session: null }, error: null }) } });
+  assert.throws(() => service.subscribe(() => {}), /auth state changes/);
+  assert.throws(() => service.subscribe(), /listener/);
 });

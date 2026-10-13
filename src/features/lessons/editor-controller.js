@@ -25,12 +25,13 @@ export function createLessonEditorController({ saveDraft, refreshLessons, onSave
 
     const lessonId = result?.lesson?.id ?? result?.lessonId ?? request.lessonId;
     const saved = {
+      ok: true,
       lesson: { ...request.lesson, id: lessonId, lesson_items: request.items },
       lessonId,
       testDate: request.testDate
     };
     if (onSaved) await onSaved(saved);
-    return { ok: true, ...saved };
+    return saved;
   }
 
   return Object.freeze({ save });

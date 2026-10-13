@@ -22,6 +22,9 @@
     .lesson-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
     .lesson-badge{padding:5px 9px;border-radius:999px;background:#eaf4ff;color:#126fc9;font-size:11px;font-weight:900}
     .section-title{margin:0 0 12px;font:800 25px/1.1 "Baloo 2",Nunito,sans-serif;color:#102b57}
+    .subvak-section{display:grid;gap:10px}
+    .subvak-title{margin:0;font:800 19px/1.1 "Baloo 2",Nunito,sans-serif;color:#38577d}
+    .subvak-title.muted{color:#667894}
     .back-subjects{border:0;background:#eaf4ff;color:#126fc9;box-shadow:none;padding:9px 13px;font-weight:900;border-radius:12px;cursor:pointer}
     .back-subjects:hover{background:#dff0ff}
     @media(max-width:700px){.subject-grid,.lesson-grid{grid-template-columns:1fr}}
@@ -53,7 +56,7 @@
     toolbar.className = 'lessons-toolbar';
     const studentLabel = document.createElement('div');
     studentLabel.className = 'lessons-student';
-    studentLabel.textContent = `Leerlingen: ${selectedStudent}`;
+    studentLabel.textContent = `Leerling: ${selectedStudent}`;
     toolbar.appendChild(studentLabel);
 
     const state = document.createElement('div');
@@ -86,7 +89,26 @@
       return target.toString();
     }
 
-    function render(records){
+    function normalizeSubvak(value){
+      return String(value || '').trim().replace(/\s+/g,' ').toLocaleLowerCase('nl-NL');
+    }
+
+    function subvakLabel(value){
+      const clean = String(value || '').trim().replace(/\s+/g,' ');
+      return clean || 'Zonder subvak';
+    }
+
+    function renderLessonCard(lesson){
+      const card=document.createElement('button');
+      card.type='button';
+      card.className='lesson-card';
+      const count=Array.isArray(lesson.items)?lesson.items.length:0;
+      card.innerHTML=`<h2>${lesson.title || 'Naamloze les'}</h2><p>${lesson.subvak || 'Les'}</p><div class="lesson-meta"><span class="lesson-badge">${count} ${count===1?'item':'items'}</span>${lesson.type?`<span class="lesson-badge">${lesson.type}</span>`:''}</div>`;
+      card.addEventListener('click',()=>window.location.href=lessonTarget(lesson));
+      return card;
+    }
+
+    async function render(records){
       const grouped = getLessonSubjectGroups(app.mapLessons(records), selectedStudent);
 
       content.replaceChildren(toolbar);
@@ -98,43 +120,86 @@
         grid.className='subject-grid';
         grouped.forEach(subject=>{
           const card=document.createElement('button');
-          card.type='button';card.className='subject-card';
+          card.type='button';
+          card.className='subject-card';
           card.innerHTML=`<div class="subject-icon">${getLessonSubjectIcon(subject.label)}</div><h2>${subject.label}</h2><p>${subject.lessons.length} ${subject.lessons.length===1?'les':'lessen'}</p>`;
           card.addEventListener('click',()=>{
-            const url=new URL(window.location.href);url.searchParams.set('subject',subject.label);window.location.href=url.toString();
+            const url=new URL(window.location.href);
+            url.searchParams.set('subject',subject.label);
+            window.location.href=url.toString();
           });
           grid.appendChild(card);
         });
         content.append(heading,grid);
-        if(!grid.children.length){const empty=document.createElement('div');empty.className='lessons-state';empty.textContent=`Geen actieve lessen gevonden voor ${selectedStudent}.`;content.appendChild(empty);}
+        if(!grid.children.length){
+          const empty=document.createElement('div');
+          empty.className='lessons-state';
+          empty.textContent=`Geen actieve lessen gevonden voor ${selectedStudent}.`;
+          content.appendChild(empty);
+        }
         return;
       }
 
       const key=normalizeLessonSubject(selectedSubject);
       const subject=grouped.find(candidate=>candidate.key===key);
       const lessonsForSubject=subject?.lessons || [];
-      const header=document.createElement('div');header.className='lessons-toolbar';
-      const heading=document.createElement('h2');heading.className='section-title';heading.textContent=selectedSubject;
-      const back=document.createElement('button');back.type='button';back.className='back-subjects';back.textContent='← Alle vakken';back.addEventListener('click',goLessons);
+      const orderedLessons=await app.lessonOrder.getOrderedLessons(lessonsForSubject,selectedStudent,subject?.label || selectedSubject);
+
+      const header=document.createElement('div');
+      header.className='lessons-toolbar';
+      const heading=document.createElement('h2');
+      heading.className='section-title';
+      heading.textContent=subject?.label || selectedSubject;
+      const back=document.createElement('button');
+      back.type='button';
+      back.className='back-subjects';
+      back.textContent='← Alle vakken';
+      back.addEventListener('click',goLessons);
       header.append(heading,back);
-      const grid=document.createElement('div');grid.className='lesson-grid';
-      lessonsForSubject.forEach(lesson=>{
-        const card=document.createElement('button');card.type='button';card.className='lesson-card';
-        const count=Array.isArray(lesson.items)?lesson.items.length:0;
-        card.innerHTML=`<h2>${lesson.title || 'Naamloze les'}</h2><p>${lesson.subvak || 'Les'}</p><div class="lesson-meta"><span class="lesson-badge">${count} ${count===1?'item':'items'}</span>${lesson.type?`<span class="lesson-badge">${lesson.type}</span>`:''}</div>`;
-        card.addEventListener('click',()=>window.location.href=lessonTarget(lesson));
-        grid.appendChild(card);
+
+      const groups=[];
+      const byKey=new Map();
+      orderedLessons.forEach(lesson=>{
+        const raw=String(lesson.subvak || '').trim();
+        const key=normalizeSubvak(raw) || '__geen_subvak__';
+        if(!byKey.has(key)){
+          const group={key,label:subvakLabel(raw),lessons:[]};
+          byKey.set(key,group);
+          groups.push(group);
+        }
+        byKey.get(key).lessons.push(lesson);
       });
-      content.append(header,grid);
-      if(!grid.children.length){const empty=document.createElement('div');empty.className='lessons-state';empty.textContent='Geen actieve lessen gevonden in dit vak.';content.appendChild(empty);}
+
+      content.append(header);
+      groups.forEach(group=>{
+        const section=document.createElement('section');
+        section.className='subvak-section';
+        const title=document.createElement('h3');
+        title.className=`subvak-title${group.key==='__geen_subvak__'?' muted':''}`;
+        title.textContent=`${group.key==='__geen_subvak__'?'📚':'📁'} ${group.label}`;
+        const grid=document.createElement('div');
+        grid.className='lesson-grid';
+        group.lessons.forEach(lesson=>grid.appendChild(renderLessonCard(lesson)));
+        section.append(title,grid);
+        content.appendChild(section);
+      });
+
+      if(!groups.length){
+        const empty=document.createElement('div');
+        empty.className='lessons-state';
+        empty.textContent='Geen actieve lessen gevonden in dit vak.';
+        content.appendChild(empty);
+      }
     }
 
     try{
       const records=await app.loadLessons();
-      render(records);
+      await render(records);
     }catch(error){
       console.error('Lessons page load error:',error);
+      content.replaceChildren(toolbar);
       state.textContent='De lessen konden niet worden geladen.';
+      content.appendChild(state);
     }
   </script>
 </body>

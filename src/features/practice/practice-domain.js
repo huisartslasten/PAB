@@ -12,6 +12,10 @@ export function getPracticeMode(modeId) {
   return mode ? { ...mode } : null;
 }
 
+export function isPracticeModeActive(modeId) {
+  return getPracticeMode(modeId)?.status === 'active';
+}
+
 export function getActivePracticeModes() {
   return PRACTICE_MODES
     .filter(mode => mode.status === 'active')

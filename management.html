@@ -1,9 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PacoGO — Beheer</title>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>PacoGO — Beheer</title>
   <link rel="stylesheet" href="src/components/page-template.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
@@ -15,6 +13,7 @@
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
+    import { createManagementRuntime } from './src/features/management/management-runtime-entry.js';
     import { renderStudentSelection, renderStudentLessons, renderRecovery, renderFeedback } from './src/features/management/management-view.js';
 
     const mount=document.querySelector('#paco-template-mount');
@@ -26,46 +25,41 @@
     const goCreator=()=>{window.location.href='creator.html';};
 
     mountPacoPageTemplate({
-      mount, backLabel:'← Dashboard', backAction:goDashboard, greeting:'PacoGO beheer ⚙️', title:'Beheer', icon:'⚙️', subtitle:'Beheer de lessen per leerling en open de zelfstandige leseditor.',
+      mount,backLabel:'← Dashboard',backAction:goDashboard,greeting:'PacoGO beheer ⚙️',title:'Beheer',icon:'⚙️',subtitle:'Beheer de lessen per leerling en open de zelfstandige leseditor.',
       navigation:[
         {icon:'🏠',label:'Dashboard',onClick:goDashboard},{icon:'📚',label:'Mijn lessen',onClick:goLessons},{icon:'📝',label:'Toetsgeschiedenis',onClick:goTestHistory},{icon:'⚙️',label:'Beheer',active:true},{icon:'🧠',label:'Creator Console',onClick:goCreator}
-      ], content
+      ],content
     });
 
     const app=createPacoGOApp({supabaseLib:window.supabase});
+    const management=createManagementRuntime({db:app.db,isParent:()=>app.auth.isParent,loadLessons:()=>app.loadLessons()});
     const students=document.createElement('div'); students.className='management-students';
     const studentSection=document.createElement('section'); studentSection.className='management-section';
     const studentHeading=document.createElement('h2'); studentHeading.textContent='Leerling'; studentSection.append(studentHeading,students);
-
     const lessons=document.createElement('div'); lessons.className='management-page';
     const lessonSection=document.createElement('section'); lessonSection.className='management-section';
     const lessonHeadingWrap=document.createElement('div'); lessonHeadingWrap.className='management-section-heading';
     const lessonHeading=document.createElement('h2'); lessonHeading.textContent='Actieve lessen';
     const createLessonButton=document.createElement('button'); createLessonButton.type='button'; createLessonButton.className='management-link primary'; createLessonButton.textContent='➕ Nieuwe les';
     lessonHeadingWrap.append(lessonHeading,createLessonButton); lessonSection.append(lessonHeadingWrap,lessons);
-
-    const archive=document.createElement('div'); archive.className='management-page';
-    const archiveSection=document.createElement('section'); archiveSection.className='management-section'; const archiveHeading=document.createElement('h2'); archiveHeading.textContent='Archief'; archiveSection.append(archiveHeading,archive);
-    const trash=document.createElement('div'); trash.className='management-page';
-    const trashSection=document.createElement('section'); trashSection.className='management-section'; const trashHeading=document.createElement('h2'); trashHeading.textContent='Prullenbak'; trashSection.append(trashHeading,trash);
-    const feedbackList=document.createElement('div'); feedbackList.className='management-page';
-    const feedbackSection=document.createElement('section'); feedbackSection.className='management-section'; const feedbackHeading=document.createElement('h2'); feedbackHeading.textContent='Feedback'; feedbackSection.append(feedbackHeading,feedbackList);
+    const archive=document.createElement('div'); archive.className='management-page'; const archiveSection=document.createElement('section'); archiveSection.className='management-section'; const archiveHeading=document.createElement('h2'); archiveHeading.textContent='Archief'; archiveSection.append(archiveHeading,archive);
+    const trash=document.createElement('div'); trash.className='management-page'; const trashSection=document.createElement('section'); trashSection.className='management-section'; const trashHeading=document.createElement('h2'); trashHeading.textContent='Prullenbak'; trashSection.append(trashHeading,trash);
+    const feedbackList=document.createElement('div'); feedbackList.className='management-page'; const feedbackSection=document.createElement('section'); feedbackSection.className='management-section'; const feedbackHeading=document.createElement('h2'); feedbackHeading.textContent='Feedback'; feedbackSection.append(feedbackHeading,feedbackList);
 
     const openEditor=lesson=>{window.location.href=`lesson-editor.html?lesson_id=${encodeURIComponent(lesson.id)}&student=${encodeURIComponent(lesson.student)}`;};
-    const openNewLesson=()=>{const selected=app.management.getSelectedStudent()||app.management.getStudents()[0]||''; window.location.href=`lesson-editor.html${selected?`?student=${encodeURIComponent(selected)}`:''}`;};
+    const openNewLesson=()=>{const selected=management.getSelectedStudent()||management.getStudents()[0]||'';window.location.href=`lesson-editor.html${selected?`?student=${encodeURIComponent(selected)}`:''}`;};
     createLessonButton.addEventListener('click',openNewLesson);
-
-    function showSelectedStudent(student){app.management.selectStudent(student);lessons.replaceChildren();renderStudentLessons(lessons,app.management,openEditor);}
-    async function refreshRecovery(){archive.replaceChildren();trash.replaceChildren();renderRecovery(archive,app.management,'archive',refreshRecovery);renderRecovery(trash,app.management,'trash',refreshRecovery);}
+    function showSelectedStudent(student){management.selectStudent(student);lessons.replaceChildren();renderStudentLessons(lessons,management,openEditor);}
+    async function refreshRecovery(){archive.replaceChildren();trash.replaceChildren();renderRecovery(archive,management,'archive',refreshRecovery);renderRecovery(trash,management,'trash',refreshRecovery);}
 
     try{
       await app.initializeSession();
-      await app.management.loadLessons();
-      renderStudentSelection(students,app.management,showSelectedStudent);
-      const selected=app.management.getSelectedStudent()||app.management.getStudents()[0];
+      await management.loadLessons();
+      renderStudentSelection(students,management,showSelectedStudent);
+      const selected=management.getSelectedStudent()||management.getStudents()[0];
       if(selected) showSelectedStudent(selected);
       await refreshRecovery();
-      await renderFeedback(feedbackList,app.management);
+      await renderFeedback(feedbackList,management);
       content.replaceChildren(studentSection,lessonSection,archiveSection,trashSection,feedbackSection);
     }catch(error){
       console.error('Management page load error:',error);

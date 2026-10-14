@@ -52,3 +52,10 @@ test('flashcards uses the canonical shell and returns to oefenen', async ({ page
   await oefenenButton.click();
   await expect(page).toHaveURL(/\/oefenen\.html(?:\?.*)?$/);
 });
+
+test('agenda uses the canonical shell and renders its owned week view', async ({ page }) => {
+  await expectCanonicalShell(page, 'agenda.html?student=Zyon', 'Agenda');
+  await expect(page.locator('[data-agenda-content]')).toBeVisible();
+  await expect(page.locator('[data-agenda-content] .agenda-school-week')).toBeVisible();
+  await expect(page.locator('[data-agenda-content] .agenda-week-day')).toHaveCount(7);
+});

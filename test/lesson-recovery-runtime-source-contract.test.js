@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-const indexHtml = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+const entry = await readFile(new URL('../src/features/lessons/lesson-recovery-runtime-entry.js', import.meta.url), 'utf8');
 const photoStorage = await readFile(new URL('../photo-storage.js', import.meta.url), 'utf8');
 
 test('recovery runtime facade publishes readiness and all four public handlers', () => {
@@ -15,18 +15,21 @@ test('recovery runtime facade publishes readiness and all four public handlers',
   assert.match(photoStorage, /There is deliberately no legacy fallback/);
 });
 
-test('V4.78 recovery globals are fully owned by the refactored runtime facade', () => {
-  assert.match(indexHtml, /function deleteCurrentLesson\(\)/);
-  assert.match(indexHtml, /function closeDeleteModal\(\)/);
-  assert.match(indexHtml, /function archiveCurrentLesson\(\)/);
-  assert.match(indexHtml, /function closeArchiveModal\(\)/);
+test('canonical recovery runtime owns the four recovery handlers outside the legacy page', () => {
+  assert.match(entry, /export async function executeMoveCurrentLessonToTrash\(runtime\)/);
+  assert.match(entry, /export async function executeArchiveCurrentLesson\(runtime\)/);
+  assert.match(entry, /export async function executeRestoreArchivedLesson\(runtime, lessonId\)/);
+  assert.match(entry, /export async function executeRestoreDeletedLesson\(runtime, lessonId\)/);
   for (const declaration of [
-    'async function confirmDeleteLesson()',
-    'async function confirmArchiveLesson()',
-    'async function restoreArchivedLesson(id)',
-    'async function restoreDeletedLesson(id)'
+    'target.confirmDeleteLesson',
+    'target.confirmArchiveLesson',
+    'target.restoreArchivedLesson',
+    'target.restoreDeletedLesson'
   ]) {
-    const escaped = declaration.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&');
-    assert.doesNotMatch(indexHtml, new RegExp(escaped));
+    assert.match(entry, new RegExp(declaration.replace('.', '\\.') + '\\s*='));
   }
+  assert.doesNotMatch(entry, /function deleteCurrentLesson\(\)/);
+  assert.doesNotMatch(entry, /function closeDeleteModal\(\)/);
+  assert.doesNotMatch(entry, /function archiveCurrentLesson\(\)/);
+  assert.doesNotMatch(entry, /function closeArchiveModal\(\)/);
 });

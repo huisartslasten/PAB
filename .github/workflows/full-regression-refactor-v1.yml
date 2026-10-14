@@ -23,15 +23,18 @@ jobs:
         run: npm ci --ignore-scripts
       - name: Verify zero known dependency vulnerabilities
         run: npm audit --audit-level=low
-      - name: Verify complete Agenda runtime boundary
+      - name: Verify canonical Agenda ownership boundary
         run: |
+          test -f src/features/agenda/runtime-entry.js
+          test -f src/features/agenda/runtime.js
+          test -f src/features/agenda/read-service.js
           ! grep -q 'function buildAgendaItemsForRender()' index.html
           ! grep -q 'function renderAgenda()' index.html
           ! grep -q 'function showAgenda()' index.html
           ! grep -q 'function showAgendaImport()' index.html
           ! grep -q 'function analyzeAgendaVideo()' index.html
           ! grep -q 'function saveAgendaImportReview()' index.html
-          test "$(grep -c 'src/features/agenda/runtime-entry.js' index.html)" -eq 1
+          ! grep -q 'src/features/agenda/runtime-entry.js' index.html
       - name: Verify professional Player ownership boundary
         run: |
           grep -q 'professionalPlayerHost' index.html

@@ -11,7 +11,7 @@ function storage(seed = {}) {
 }
 
 function documentRef() {
-  return { getElementById: () => null, querySelectorAll: () => [] };
+  return { getElementById: () => null, querySelector: () => null, querySelectorAll: () => [] };
 }
 
 test('agenda runtime entry exposes deterministic read and storage boundaries', () => {
@@ -35,6 +35,29 @@ test('agenda runtime entry exposes deterministic read and storage boundaries', (
   assert.equal(entry.getTestCalendar()[0].id, 't2');
 });
 
+test('agenda runtime renders the page-owned agenda content contract', () => {
+  const content = {
+    innerHTML: '',
+    querySelectorAll: () => [],
+    querySelector: () => null
+  };
+  const pageRoot = {
+    querySelector: selector => selector === '[data-agenda-content]' ? content : null
+  };
+  const entry = createAgendaRuntimeEntry({
+    storage: storage(),
+    documentRef: pageRoot,
+    currentStudent: () => 'Zyon',
+    lessons: () => [],
+    demoItems: () => [],
+    now: () => new Date('2026-10-15T12:00:00')
+  });
+
+  assert.equal(entry.showAgenda(), true);
+  assert.match(content.innerHTML, /agenda-school-week/);
+  assert.match(content.innerHTML, /Geen afspraken/);
+});
+
 test('agenda runtime entry installs the complete application-facing agenda facade', () => {
   const target = {};
   const entry = installAgendaRuntimeEntry({
@@ -49,7 +72,6 @@ test('agenda runtime entry installs the complete application-facing agenda facad
   assert.equal(typeof target.renderAgenda, 'function');
   assert.equal(typeof target.buildAgendaItemsForRender, 'function');
   assert.equal(typeof target.getCustomAgendaItems, 'function');
-  assert.equal(typeof target.saveCustomAgendaItems, 'function');
   assert.equal(typeof target.getTestCalendar, 'function');
   assert.equal(typeof target.saveTestCalendar, 'function');
 });

@@ -37,12 +37,19 @@ jobs:
           ! grep -q 'src/features/agenda/runtime-entry.js' index.html
       - name: Verify professional Player ownership boundary
         run: |
-          grep -q 'professionalPlayerHost' index.html
-          grep -q 'player-runtime-bootstrap.js' index.html
-          grep -q 'window.pacoGOProfessionalPlayerReady' index.html
+          test -f src/features/lessons/player-runtime-bootstrap.js
+          test -f src/features/lessons/player-runtime-entry.js
+          test -f src/features/lessons/player-runtime-composition.js
+          test -f src/features/lessons/player-screen-boundary.js
+          test -f src/features/lessons/player-submit-boundary.js
+          grep -q 'src/features/lessons/player-runtime-bootstrap.js' test.html
+          grep -q 'createProfessionalPlayerBridge' test.html
           ! grep -q 'function renderTest()' index.html
           ! grep -q 'function updateTestProgress()' index.html
           ! grep -q "activity={kind:'test',type" index.html
+          ! grep -q 'professionalPlayerHost' index.html
+          ! grep -q 'player-runtime-bootstrap.js' index.html
+          ! grep -q 'window.pacoGOProfessionalPlayerReady' index.html
       - name: Run maintained Node regression
         run: |
           files=$(find test -maxdepth 1 -type f -name '*.test.js' \

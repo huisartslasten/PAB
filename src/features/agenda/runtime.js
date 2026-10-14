@@ -1,6 +1,5 @@
 import { createAgendaReadService } from './read-service.js';
 
-// Professional Agenda runtime: deterministic V4.78 week composition and navigation.
 function agendaKey(date) {
   const d = new Date(date);
   d.setHours(12, 0, 0, 0);
@@ -55,6 +54,10 @@ export function createAgendaRuntime({
   const readService = createAgendaReadService({ storage, lessons, currentStudent, demoItems, now });
   let weekStart = null;
 
+  function query(selector) {
+    return documentRef?.querySelector?.(selector) || null;
+  }
+
   function getCurrentWeekStart() {
     return startOfWeek(now());
   }
@@ -77,7 +80,7 @@ export function createAgendaRuntime({
   }
 
   function render() {
-    const element = documentRef?.getElementById('agendaContent');
+    const element = query('[data-agenda-content]');
     if (!element) return false;
     const start = weekStart || getCurrentWeekStart();
     const allItems = readService.buildAgendaItemsForRender();
@@ -143,9 +146,6 @@ export function createAgendaRuntime({
   }
 
   function show() {
-    documentRef?.getElementById('studentDashboard')?.classList.add('hidden');
-    documentRef?.querySelectorAll('.page')?.forEach(page => page.classList.add('hidden'));
-    documentRef?.getElementById('agenda')?.classList.remove('hidden');
     if (!weekStart) weekStart = getCurrentWeekStart();
     return render();
   }

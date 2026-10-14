@@ -13,6 +13,7 @@
   <div id="paco-template-mount"></div>
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
+    import { createPacoNavigation } from './src/components/page-navigation.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
     import { renderStudentSelection, renderStudentLessons, renderRecovery, renderFeedback } from './src/features/management/management-view.js';
 
@@ -20,15 +21,10 @@
     const content=document.createElement('div'); content.className='management-page';
     const state=document.createElement('div'); state.className='management-state'; state.textContent='Beheer laden…'; content.appendChild(state);
     const goDashboard=()=>{window.location.href='dashboard.html';};
-    const goLessons=()=>{window.location.href='lessons.html';};
-    const goTestHistory=()=>{window.location.href='test-history.html';};
-    const goCreator=()=>{window.location.href='creator.html';};
 
     mountPacoPageTemplate({
       mount,backLabel:'← Dashboard',backAction:goDashboard,greeting:'PacoGO beheer ⚙️',title:'Beheer',icon:'⚙️',subtitle:'Beheer de lessen per leerling en open de zelfstandige leseditor.',
-      navigation:[
-        {icon:'🏠',label:'Dashboard',onClick:goDashboard},{icon:'📚',label:'Mijn lessen',onClick:goLessons},{icon:'📝',label:'Toetsgeschiedenis',onClick:goTestHistory},{icon:'⚙️',label:'Beheer',active:true},{icon:'🧠',label:'Creator Console',onClick:goCreator}
-      ],content
+      navigation:createPacoNavigation({active:'management',includeCreator:true}),content
     });
 
     const app=createPacoGOApp({supabaseLib:window.supabase});

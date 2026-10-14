@@ -1,0 +1,75 @@
+/**
+ * PacoGO shared shell navigation.
+ *
+ * The page template owns the visual navigation surface; this module owns the
+ * shared PacoGO route map. Pages provide only context (active route/student)
+ * and never define the navigation structure themselves.
+ */
+
+function go(path, student = '') {
+  const target = new URL(path, window.location.href);
+  if (student) target.searchParams.set('student', student);
+  window.location.href = target.toString();
+}
+
+export function createPacoNavigation({
+  active = '',
+  student = '',
+  includeManagement = true,
+  includeCreator = false,
+  includeAgenda = true
+} = {}) {
+  const items = [
+    {
+      key: 'dashboard',
+      icon: '🏠',
+      label: 'Dashboard',
+      onClick: () => go('dashboard.html', student)
+    },
+    {
+      key: 'lessons',
+      icon: '📚',
+      label: 'Mijn lessen',
+      onClick: () => go('lessons.html', student)
+    }
+  ];
+
+  if (includeAgenda) {
+    items.push({
+      key: 'agenda',
+      icon: '📅',
+      label: 'Agenda',
+      onClick: () => go('agenda.html', student)
+    });
+  }
+
+  items.push({
+    key: 'test-history',
+    icon: '📝',
+    label: 'Toetsgeschiedenis',
+    onClick: () => go('test-history.html', student)
+  });
+
+  if (includeManagement) {
+    items.push({
+      key: 'management',
+      icon: '⚙️',
+      label: 'Beheer',
+      onClick: () => go('management.html')
+    });
+  }
+
+  if (includeCreator) {
+    items.push({
+      key: 'creator',
+      icon: '🧠',
+      label: 'Creator Console',
+      onClick: () => go('creator.html')
+    });
+  }
+
+  return items.map(item => ({
+    ...item,
+    active: item.key === active
+  }));
+}

@@ -2,7 +2,7 @@
 // TEST branch connects directly to the dedicated PacoGO TEST Supabase project.
 
 const SUPABASE_URL = 'https://btnhhvtpmuvrpbnkyjnm.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_skiKpO4UU79zWY7hskHsoA_WQxA6CFc';
+const SUPABASE_KEY = 'sb_publishable_g9VPrXM9Mn-Phf625whFrQ_6CA8yUMH';
 
 export function createSupabaseClient(supabaseLib = window.supabase) {
   if (!supabaseLib?.createClient) {

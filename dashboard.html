@@ -49,6 +49,7 @@
   <div id="paco-template-mount"></div>
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
+    import { createPacoNavigation } from './src/components/page-navigation.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
     import { setStudent } from './src/core/state.js';
     import { getDashboardSubjects, getDashboardProgress, getDashboardSubjectIcon, getDashboardAgendaItems } from './src/features/dashboard/view-model.js';
@@ -63,7 +64,6 @@
     const goChooser = () => { window.location.href = 'dashboard.html'; };
     const goDashboard = student => { window.location.href = `dashboard.html?student=${encodeURIComponent(student)}`; };
     const goLessons = () => { window.location.href = `lessons.html?student=${encodeURIComponent(selectedStudent)}`; };
-    const goManage = () => { window.location.href = 'management.html'; };
 
     const content = document.createElement('div');
     content.className = 'dashboard-page';
@@ -76,14 +76,7 @@
       title: selectedStudent ? 'Dashboard' : 'Wie gaat er leren?',
       icon: selectedStudent ? '🏠' : '👦',
       subtitle: selectedStudent ? 'Bekijk je lessen en zie hoe je ervoor staat.' : 'Kies een leerling om naar het persoonlijke dashboard te gaan.',
-      navigation: selectedStudent ? [
-        {icon:'🏠',label:'Dashboard',active:true,onClick:() => goDashboard(selectedStudent)},
-        {icon:'📚',label:'Mijn lessen',onClick:goLessons},
-        {icon:'⚙️',label:'Beheer',onClick:goManage}
-      ] : [
-        {icon:'🏠',label:'Start',active:true,onClick:goChooser},
-        {icon:'⚙️',label:'Beheer',onClick:goManage}
-      ],
+      navigation: createPacoNavigation({ active: 'dashboard', student: selectedStudent }),
       content
     });
 

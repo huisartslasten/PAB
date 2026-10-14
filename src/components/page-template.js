@@ -8,7 +8,7 @@
 
 const TEMPLATE_SCROLL_KEY_PREFIX = 'pacoGO:template-scroll:';
 const TEMPLATE_SCROLL_CLEANUP_PROPERTY = '__pacoGOTemplateScrollCleanup';
-const PACOGO_TEST_VERSION = 'V5.13';
+const PACOGO_TEST_VERSION = 'V5.2';
 
 function templateScrollKey(windowRef) {
   return `${TEMPLATE_SCROLL_KEY_PREFIX}${windowRef.location.pathname}${windowRef.location.search}`;

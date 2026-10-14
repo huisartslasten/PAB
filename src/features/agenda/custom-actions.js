@@ -8,6 +8,8 @@ function key(date) {
 export function createAgendaCustomActions({ storage = globalThis.localStorage, documentRef = globalThis.document, currentStudent = () => '', onChanged = () => {} } = {}) {
   const customStorage = createCustomAgendaStorage(storage);
   let editId = null;
+  const query = selector => documentRef?.querySelector?.(selector) || null;
+  const byId = id => query(`#${CSS.escape(id)}`);
 
   function editAgendaItem(id) {
     const items = customStorage.getItems(currentStudent());
@@ -15,8 +17,8 @@ export function createAgendaCustomActions({ storage = globalThis.localStorage, d
     if (!item) return false;
     editId = id;
     const period = Boolean(item.periodId) || item.source === 'handmatig-periode';
-    const set = (elementId, value) => { const element = documentRef?.getElementById(elementId); if (element) element.value = value ?? ''; };
-    const toggle = (elementId, hidden) => documentRef?.getElementById(elementId)?.classList.toggle('hidden', hidden);
+    const set = (elementId, value) => { const element = byId(elementId); if (element) element.value = value ?? ''; };
+    const toggle = (elementId, hidden) => byId(elementId)?.classList.toggle('hidden', hidden);
     set('agendaEditTitle', item.title);
     set('agendaEditType', item.type || 'other');
     set('agendaEditMeta', item.meta);
@@ -30,13 +32,13 @@ export function createAgendaCustomActions({ storage = globalThis.localStorage, d
     } else {
       set('agendaEditDate', item.date);
     }
-    documentRef?.getElementById('agendaEditModal')?.classList.remove('hidden');
+    byId('agendaEditModal')?.classList.remove('hidden');
     return true;
   }
 
   function closeAgendaEditModal() {
     editId = null;
-    documentRef?.getElementById('agendaEditModal')?.classList.add('hidden');
+    byId('agendaEditModal')?.classList.add('hidden');
   }
 
   function saveAgendaEditModal() {
@@ -45,7 +47,7 @@ export function createAgendaCustomActions({ storage = globalThis.localStorage, d
     const items = customStorage.getItems(student);
     const item = items.find(entry => entry?.id === editId);
     if (!item) return false;
-    const value = id => String(documentRef?.getElementById(id)?.value || '').trim();
+    const value = id => String(byId(id)?.value || '').trim();
     const title = value('agendaEditTitle');
     if (!title) return false;
     const type = value('agendaEditType') || 'other';
@@ -63,7 +65,7 @@ export function createAgendaCustomActions({ storage = globalThis.localStorage, d
       const created = [];
       const start = new Date(`${startDate}T12:00:00`);
       const end = new Date(`${endDate}T12:00:00`);
-      for (const date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
+      for (const date of new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
         const dateKey = key(date);
         created.push({ ...item, id: `${item.periodId}_${dateKey}`, date: dateKey, title, type, meta, time, periodStart: startDate, periodEnd: endDate });
       }

@@ -1,17 +1,12 @@
-// Authentication/role boundary for the professional PacoGO architecture.
-// The boundary owns the current session and derives access roles from it.
+// Authentication boundary for the professional PacoGO architecture.
+// Session lifecycle is composed here; role membership is owned by auth-authorization.
 
-export const PARENT_IDS = Object.freeze([
-  '5d0e1e5c-1dbe-4909-bd3a-81a1e7b26d09',
-  '418833d5-049a-4ec9-8072-2d48a85f04b1',
-  'f0f92b9c-5eb7-4b78-aca0-1fea615b1999'
-]);
-
-export const CREATOR_IDS = Object.freeze([...PARENT_IDS]);
+import {
+  isParentSession,
+  isCreatorSession
+} from './auth-authorization.js';
 
 export function createAuthState(session = null) {
-  const parentIds = new Set(PARENT_IDS);
-  const creatorIds = new Set(CREATOR_IDS);
   let currentSession = session;
 
   return Object.freeze({
@@ -22,10 +17,10 @@ export function createAuthState(session = null) {
       return Boolean(currentSession);
     },
     get isParent() {
-      return Boolean(currentSession?.user?.id && parentIds.has(currentSession.user.id));
+      return isParentSession(currentSession);
     },
     get isCreator() {
-      return Boolean(currentSession?.user?.id && creatorIds.has(currentSession.user.id));
+      return isCreatorSession(currentSession);
     },
     setSession(nextSession) {
       currentSession = nextSession || null;
@@ -34,10 +29,4 @@ export function createAuthState(session = null) {
   });
 }
 
-export function isParentSession(session) {
-  return Boolean(session?.user?.id && new Set(PARENT_IDS).has(session.user.id));
-}
-
-export function isCreatorSession(session) {
-  return Boolean(session?.user?.id && new Set(CREATOR_IDS).has(session.user.id));
-}
+export { isParentSession, isCreatorSession };

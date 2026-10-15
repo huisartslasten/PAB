@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createPacoGOApp } from '../src/app/bootstrap.js';
 import { appState } from '../src/core/state.js';
-import { PARENT_IDS } from '../src/core/auth.js';
+import { PARENT_IDS } from '../src/core/auth-authorization.js';
 
 function makeStorage() {
   const values = new Map();

@@ -1,4 +1,4 @@
-import { createCreatorService } from './creator-service.js';
+import { createCreatorService } from '../../services/creator-service.js';
 
 const REQUIRED_KEYS = ['db', 'canCreate'];
 

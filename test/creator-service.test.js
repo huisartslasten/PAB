@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createCreatorService } from '../src/features/creator/creator-service.js';
+import { createCreatorService } from '../src/services/creator-service.js';
 
 function makeHarness() {
   const calls = [];

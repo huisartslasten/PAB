@@ -4,8 +4,12 @@ const baseURL = process.env.PACOGO_BROWSER_BASE_URL || 'http://127.0.0.1:4173';
 
 async function openGuestAccess(page) {
   await page.goto(`${baseURL}/test/browser/lesson-guest-access-runtime.fixture.html`);
-  await page.waitForFunction(() => typeof window.setGuestLesson === 'function');
-  await page.evaluate(() => window.pacoGOLessonGuestAccessRuntimeReady);
+  await page.evaluate(async () => {
+    await window.pacoGOLessonGuestAccessRuntimeReady;
+    if (typeof window.setGuestLesson !== 'function') {
+      throw new Error('Guest lesson runtime entry was not installed.');
+    }
+  });
 }
 
 test('V4.78 guest lesson activation executes through the browser facade and bootstrap', async ({ page }) => {

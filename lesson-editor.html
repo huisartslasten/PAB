@@ -13,6 +13,7 @@
   <div id="paco-template-mount"></div>
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
+    import { createPacoNavigation } from './src/components/page-navigation.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
     import { createLessonEditorApplication } from './src/features/lessons/lesson-editor-application.js';
     import { createLessonEditorPage } from './src/features/lessons/lesson-editor-page.js';
@@ -41,12 +42,7 @@
       title:lessonId?'Les bewerken':'Nieuwe les',
       icon:'📚',
       subtitle:'Maak of bewerk een les met de bestaande lesvormen en velden.',
-      navigation:[
-        {icon:'🏠',label:'Dashboard',onClick:()=>{window.location.href='dashboard.html';}},
-        {icon:'📚',label:'Mijn lessen',onClick:()=>{window.location.href=`lessons.html${student?`?student=${encodeURIComponent(student)}`:''}`;}},
-        {icon:'⚙️',label:'Beheer',active:true,onClick:goManagement},
-        {icon:'🧠',label:'Creator Console',onClick:()=>{window.location.href='creator.html';}}
-      ],
+      navigation:createPacoNavigation({active:'management',student,includeCreator:true}),
       content
     });
 

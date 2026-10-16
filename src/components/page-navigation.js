@@ -38,7 +38,7 @@ export function createPacoNavigation({
     items.push({
       key: 'agenda',
       icon: '📅',
-      label: 'Agenda',
+      label: 'Mijn agenda',
       onClick: () => go('agenda.html', student)
     });
   }
@@ -46,7 +46,7 @@ export function createPacoNavigation({
   items.push({
     key: 'test-history',
     icon: '📝',
-    label: 'Toetsgeschiedenis',
+    label: 'Toetsen',
     onClick: () => go('test-history.html', student)
   });
 

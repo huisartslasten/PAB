@@ -16,4 +16,7 @@ test('dashboard is the canonical student chooser and page boundary', async ({ pa
   await expect(page.getByRole('button', { name: '← Mijn lessen' })).toBeVisible();
   await expect(page.getByRole('button', { name: /📚 Mijn lessen/ })).toBeVisible();
   await expect(page.getByRole('button', { name: /⚙️ Beheer/ })).toBeVisible();
+
+  await page.getByRole('button', { name: /⚙️ Beheer/ }).click();
+  await expect(page).toHaveURL(/\/management\.html$/);
 });

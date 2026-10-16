@@ -5,7 +5,7 @@ import { executeCreateLessonFromPhoto, installLessonPhotoRuntimeEntry } from '..
 function runtime() {
   return {
     requireParent: async () => true,
-    db: { from() { throw new Error('db should be replaced by the persistence test seam'); } },
+    lessonService: { createLessonWithItems: async () => ({ lesson: { id: 42 }, items: [] }) },
     loadLessons: async () => {},
     lessons: [{ id: 42 }],
     setCurrentStudent: () => {},
@@ -18,8 +18,8 @@ function runtime() {
 
 test('photo runtime entry rejects missing bridge keys explicitly', async () => {
   await assert.rejects(
-    executeCreateLessonFromPhoto({ ...runtime(), db: undefined }, { student: 'Zyon', subject: 'Rekenen', title: 'Foto', type: 'math', pairs: [{ question: '1+1', answer: '2' }] }),
-    /The lesson-photo runtime bridge is missing: db\./
+    executeCreateLessonFromPhoto({ ...runtime(), lessonService: undefined }, { student: 'Zyon', subject: 'Rekenen', title: 'Foto', type: 'math', pairs: [{ question: '1+1', answer: '2' }] }),
+    /The lesson-photo runtime bridge is missing: lessonService\./
   );
 });
 

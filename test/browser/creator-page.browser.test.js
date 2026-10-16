@@ -9,9 +9,10 @@ test('creator console is a canonical protected page boundary', async ({ page }) 
   await expect(page.locator('.paco-template-version-badge')).toHaveText(expectedVersionBadge);
   await expect(page.locator('.paco-template-main h1')).toHaveText('Creator Console');
   await expect(page.getByText(/Alleen de hoofdbeheerder heeft toegang/)).toBeVisible();
+  await expect(page.getByRole('button', { name: /⚙️ Beheer/ })).toBeVisible();
 });
 
-test('management exposes the canonical creator console destination', async ({ page }) => {
+test('management route remains protected before creator navigation is available', async ({ page }) => {
   await page.goto(`${baseUrl}/management.html`);
-  await expect(page.getByRole('button', { name: /Creator Console/ })).toBeVisible();
+  await expect(page).toHaveURL(/\/auth\.html$/);
 });

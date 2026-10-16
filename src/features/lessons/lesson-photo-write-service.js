@@ -1,5 +1,3 @@
-import { createLessonService } from '../../services/lesson-service.js';
-
 function requireValue(value, message) {
   if (!value) throw new Error(message);
 }
@@ -23,14 +21,16 @@ function normalizePairs(pairs) {
 }
 
 export async function createLessonFromPhotoPersistence({
-  db,
+  lessonService,
   lesson,
   items
 } = {}) {
-  requireValue(db, 'A Supabase client is required.');
+  requireValue(
+    lessonService && typeof lessonService.createLessonWithItems === 'function' ? lessonService : null,
+    'A lesson service is required.'
+  );
   const canonicalLesson = requireLesson(lesson);
   const normalizedItems = normalizePairs(items);
-  const lessonService = createLessonService(db);
 
   return lessonService.createLessonWithItems({
     lesson: { ...canonicalLesson },

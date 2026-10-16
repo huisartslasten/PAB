@@ -6,23 +6,29 @@
  * the visual frame: hero banner, left sidebar, middle field and TEST badge.
  */
 
-const TEMPLATE_SCROLL_KEY_PREFIX = 'pacoGO:template-scroll:';
+const TEMPLATE_SCROLL_KEY = 'pacoGO:template-scroll';
 const TEMPLATE_SCROLL_CLEANUP_PROPERTY = '__pacoGOTemplateScrollCleanup';
 export const PACOGO_TEST_VERSION = 'V5.14';
 
-function templateScrollKey(windowRef) {
-  return `${TEMPLATE_SCROLL_KEY_PREFIX}${windowRef.location.pathname}${windowRef.location.search}`;
+function installManualScrollRestoration(windowRef) {
+  if (!windowRef.history || !('scrollRestoration' in windowRef.history)) return null;
+
+  const previous = windowRef.history.scrollRestoration;
+  windowRef.history.scrollRestoration = 'manual';
+  return () => {
+    windowRef.history.scrollRestoration = previous;
+  };
 }
 
 export function installPacoTemplateScrollMemory({ windowRef = window, documentRef = document } = {}) {
   const previousCleanup = windowRef[TEMPLATE_SCROLL_CLEANUP_PROPERTY];
   if (typeof previousCleanup === 'function') previousCleanup();
 
-  const key = templateScrollKey(windowRef);
+  const restoreHistoryScroll = installManualScrollRestoration(windowRef);
 
   const save = () => {
     try {
-      windowRef.sessionStorage.setItem(key, String(windowRef.scrollY || 0));
+      windowRef.sessionStorage.setItem(TEMPLATE_SCROLL_KEY, String(windowRef.scrollY || 0));
     } catch (error) {
       console.warn('Could not save PacoGO template scroll position:', error);
     }
@@ -31,7 +37,7 @@ export function installPacoTemplateScrollMemory({ windowRef = window, documentRe
   const restore = () => {
     let savedPosition = null;
     try {
-      const raw = windowRef.sessionStorage.getItem(key);
+      const raw = windowRef.sessionStorage.getItem(TEMPLATE_SCROLL_KEY);
       if (raw !== null) savedPosition = Number(raw);
     } catch (error) {
       console.warn('Could not read PacoGO template scroll position:', error);
@@ -51,7 +57,7 @@ export function installPacoTemplateScrollMemory({ windowRef = window, documentRe
       const timedOut = Date.now() - startedAt >= 2000;
       if (contentReady || timedOut || attempts >= 60) {
         try {
-          windowRef.sessionStorage.removeItem(key);
+          windowRef.sessionStorage.removeItem(TEMPLATE_SCROLL_KEY);
         } catch (error) {
           console.warn('Could not clear PacoGO template scroll position:', error);
         }
@@ -71,6 +77,7 @@ export function installPacoTemplateScrollMemory({ windowRef = window, documentRe
   const cleanup = () => {
     windowRef.removeEventListener('pagehide', save);
     windowRef.removeEventListener('pageshow', restore);
+    if (typeof restoreHistoryScroll === 'function') restoreHistoryScroll();
     if (windowRef[TEMPLATE_SCROLL_CLEANUP_PROPERTY] === cleanup) {
       delete windowRef[TEMPLATE_SCROLL_CLEANUP_PROPERTY];
     }

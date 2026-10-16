@@ -34,6 +34,9 @@ test('V4.78 photo lesson creation executes through the canonical runtime entry',
   expect(result.events).toEqual([
     'authorize',
     'load',
+    'student:Zyon',
+    'subject:Themawoorden',
+    'lesson:42',
     'message:success:Les gemaakt uit de foto. Controleer hem gerust nog even.',
     'dashboard'
   ]);

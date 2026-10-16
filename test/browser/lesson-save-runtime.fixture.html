@@ -71,6 +71,13 @@
     };
     var db = window.__pacoDb;
   </script>
-  <script src="/photo-storage.js"></script>
+  <script type="module">
+    import { createLessonService } from '/src/services/lesson-service.js';
+
+    window.lessonService = createLessonService(window.__pacoDb);
+    const script = document.createElement('script');
+    script.src = '/photo-storage.js';
+    document.body.appendChild(script);
+  </script>
 </body>
 </html>

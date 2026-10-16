@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PacoGO — Leseditor</title>
   <link rel="stylesheet" href="src/components/page-template.css">
@@ -25,7 +25,7 @@
     content.className='lesson-editor-page';
     const app=createPacoGOApp({supabaseLib:window.supabase});
     const editorApp=createLessonEditorApplication({
-      db:app.db,
+      lessonService:app.lessons,
       storage:window.localStorage,
       initializeSession:()=>app.initializeSession(),
       isParent:()=>app.auth.isParent,

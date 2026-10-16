@@ -1,5 +1,5 @@
-// Deterministic lesson-order persistence boundary.
-// Contract source: TEST V4.78 getOrderedLessons()/saveLessonOrder().
+// Canonical persistence boundary for V4.78 lesson ordering.
+// Pages/features consume this service; they do not own remote/local order persistence.
 
 function requireDb(db) {
   if (!db || typeof db.from !== 'function') {

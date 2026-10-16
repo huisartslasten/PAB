@@ -7,13 +7,13 @@ import { createLessonAudioService } from '../services/lesson-audio-service.js';
 import { createMasteryService } from '../services/mastery-service.js';
 import { createCreatorService } from '../services/creator-service.js';
 import { createTestHistoryService } from '../services/test-history-service.js';
+import { createLessonOrderService } from '../services/lesson-order-service.js';
 import { createAuthState } from '../core/auth.js';
 import { appState, setLessons } from '../core/state.js';
 import { mapLessonRecords } from '../features/lessons/lesson-mapper.js';
 import { createPhotoStorageService } from '../features/photo-lessons/photo-storage-service.js';
 import { createManagement } from '../features/management/management.js';
 import { createAgendaReadService } from '../features/agenda/read-service.js';
-import { createLessonOrderService } from '../features/lessons/lesson-order-service.js';
 
 export function createPacoGOApp({ supabaseLib = window.supabase, session = null, storage = globalThis.localStorage } = {}) {
   const db = createSupabaseClient(supabaseLib);
@@ -70,6 +70,3 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null,
     mapLessons: mapLessonRecords
   });
 }
-
-// The professional runtime composes all domain/data boundaries here.
-// Page modules remain responsible only for presentation and interaction.

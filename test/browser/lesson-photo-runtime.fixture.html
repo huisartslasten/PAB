@@ -11,16 +11,28 @@ var setCurrentSubject=value=>{currentSubject=value;__events.push('subject:'+valu
 var setCurrentLesson=value=>{currentLesson=value;__events.push('lesson:'+(value&&value.id||'null'))};
 var showParentDashboard=async()=>__events.push('dashboard');
 var showMessage=(message,type)=>__events.push('message:'+type+':'+message);
-var isParentLoggedIn=()=>true;
 var db={from(table){var state={table,operation:null,filters:[],payload:null};var builder={insert(payload){state.operation='insert';state.payload=payload;if(table==='lessons')return{select(){return{single:async()=>{__createdLesson=Object.assign({id:42},payload);return{data:__createdLesson,error:null}}}}};__lastDbInsert=state;return{select:async()=>({data:__failItemInsert?null:[...payload],error:__failItemInsert?new Error('item insert failed'):null})}},delete(){state.operation='delete';return{eq:async(column,value)=>{state.filters.push([column,value]);__lastDbDelete=state;return{error:null}}}}};return builder}};
 </script>
 <script type="module">
   import { createLessonService } from '/src/services/lesson-service.js';
+  import { bootstrapLessonPhotoRuntime } from '/src/features/lessons/lesson-photo-runtime-bootstrap.js';
 
   window.lessonService = createLessonService(window.db);
-  const script = document.createElement('script');
-  script.src = '/photo-storage.js';
-  document.body.appendChild(script);
+  window.pacoGOLessonPhotoRuntimeReady = bootstrapLessonPhotoRuntime({
+    runtime: {
+      requireParent,
+      lessonService: window.lessonService,
+      loadLessons,
+      lessons,
+      setCurrentStudent,
+      setCurrentSubject,
+      setCurrentLesson,
+      showParentDashboard,
+      showMessage
+    },
+    target: window
+  });
+  window.pacoGOLessonPhotoRuntimeReady = window.pacoGOLessonPhotoRuntimeReady.then(() => window.createLessonFromPhotoRuntime);
 </script>
 </body>
 </html>

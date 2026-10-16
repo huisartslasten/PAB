@@ -1,11 +1,11 @@
 // Deterministic write orchestration for the V4.78 lesson editor.
 // Contract source: legacy saveLesson() in TEST V4.78.
-// No DOM work, AI behavior, navigation, or schema changes belong here.
+// No DOM work, Supabase access, AI behavior, navigation, or schema changes belong here.
 
-import { createLessonService } from '../../services/lesson-service.js';
-
-export function createLessonWriteService(db) {
-  const lessons = createLessonService(db);
+export function createLessonWriteService(lessons) {
+  if (!lessons || typeof lessons.updateLesson !== 'function' || typeof lessons.createLessonWithItems !== 'function' || typeof lessons.replaceLessonItems !== 'function') {
+    throw new Error('A canonical lesson service is required.');
+  }
 
   async function saveLesson({
     id = null,

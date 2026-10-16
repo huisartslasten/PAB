@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createLessonOrderService } from '../src/features/lessons/lesson-order-service.js';
+import { createLessonOrderService } from '../src/services/lesson-order-service.js';
 
 function createMockDb(data = []) {
   return {

@@ -2,7 +2,6 @@ import { createPlayerRuntimeEntry } from './player-runtime-entry.js';
 import { createPlayerScreenBoundary } from './player-screen-boundary.js';
 import { createPlayerTestView } from './player-test-view.js';
 import { createPlayerResultRenderer } from './player-result-renderer.js';
-import { createLessonAudioService } from '../../services/lesson-audio-service.js';
 
 export function createProfessionalPlayerBridge({
   getLesson,
@@ -10,7 +9,7 @@ export function createProfessionalPlayerBridge({
   db,
   gradeAnswer = null,
   persistence = null,
-  audioService = null,
+  audioService,
   documentRef = globalThis.document,
   hideAll,
   showLessonChoice,
@@ -21,11 +20,14 @@ export function createProfessionalPlayerBridge({
 } = {}) {
   if (typeof getLesson !== 'function') throw new Error('A lesson provider is required.');
   if (typeof getStudent !== 'function') throw new Error('A student provider is required.');
+  if (!audioService || typeof audioService.speak !== 'function' || typeof audioService.stop !== 'function') {
+    throw new Error('A lesson audio service is required.');
+  }
   if (typeof hideAll !== 'function') throw new Error('A screen hide function is required.');
   if (typeof clearActivity !== 'function') throw new Error('A lesson cleanup function is required.');
   if (typeof escapeHtml !== 'function') throw new Error('An escapeHtml function is required.');
 
-  let lessonAudioService = audioService;
+  const lessonAudioService = audioService;
   let entry = null;
   let activeLesson = null;
 
@@ -34,7 +36,6 @@ export function createProfessionalPlayerBridge({
     const session = entry?.runtime?.session;
     const item = session?.currentItem();
     if (!item) return Promise.resolve();
-    if (!lessonAudioService) lessonAudioService = createLessonAudioService(db);
     return lessonAudioService.speak(item.answer, {
       onStatus: status => {
         const node = documentRef?.getElementById?.('testVoiceStatus');
@@ -52,7 +53,6 @@ export function createProfessionalPlayerBridge({
   function buildEntry() {
     activeLesson = getLesson();
     if (!activeLesson || typeof activeLesson !== 'object') throw new Error('No active lesson is available.');
-    if (!lessonAudioService) lessonAudioService = createLessonAudioService(db);
 
     entry = createPlayerRuntimeEntry({
       lesson: activeLesson,

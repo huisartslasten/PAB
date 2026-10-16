@@ -10,14 +10,14 @@
 
 ## Final state
 
-Professional V1 is closed on the refactor branch. The agreed four-day scope produced a modular lesson/editor/runtime architecture, a professional Player runtime, a professional Agenda runtime, deterministic domain/service boundaries, separate Agenda import/review handling, and removal of superseded legacy runtime ownership.
+Professional V1 is closed on the refactor branch. The agreed scope produced a modular lesson/editor/runtime architecture, a professional Player runtime, a professional Agenda runtime, deterministic domain/service boundaries, separate Agenda import/review handling, shared page navigation, and removal of superseded legacy runtime ownership and duplicate lesson helpers.
 
 ## Verification
 
 The canonical full regression workflow is `.github/workflows/full-regression-refactor-v1.yml`.
 
-Current validated HEAD: `60a31d519e27a8c23e321a1accba1a902ed7890`.
+Current validated HEAD: `1bdbbafa8e5cabbbca6bed8f84f69903889e43ea`.
 
-Final recorded gate: GitHub Actions run `37634366676` — 366 Node tests, 24 Vitest tests, and 21 browser tests passed; Agenda and Player ownership checks passed; working-tree cleanliness passed.
+Final cleanup gate: GitHub Actions run `38916626847` — maintained Node regression, Vitest regression, Agenda ownership, Player ownership, browser regression, and working-tree cleanliness all passed.
 
 The authoritative V4.78 source remains `backup-test-v478-before-professional-rewrite/index.html`.

@@ -144,6 +144,7 @@
 const lessonSaveRuntimeBridge = Object.defineProperties({}, {
   document: { get: () => document },
   db: { get: () => db },
+  lessonService: { get: () => window.lessonService },
   currentSubject: { get: () => currentSubject, set: value => { currentSubject = value; } },
   currentLesson: { get: () => currentLesson, set: value => { currentLesson = value; } },
   currentSession: { get: () => currentSession },
@@ -204,6 +205,7 @@ window.setGuestLesson = async function setGuestLessonRuntimeFacade(...args){
 const lessonPhotoRuntimeBridge = Object.defineProperties({}, {
   requireParent: { get: () => requireParent },
   db: { get: () => db },
+  lessonService: { get: () => window.lessonService },
   loadLessons: { get: () => loadLessons },
   lessons: { get: () => lessons },
   setCurrentStudent: { get: () => value => { currentStudent = value; } },

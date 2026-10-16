@@ -1,4 +1,4 @@
-import { createLessonOrderService } from './lesson-order-service.js';
+import { createLessonOrderService } from '../../services/lesson-order-service.js';
 import { getOrderedLessonsRuntime, saveLessonOrderRuntime } from './lesson-order-runtime.js';
 
 const REQUIRED_KEYS = ['db', 'storage', 'isParentLoggedIn'];

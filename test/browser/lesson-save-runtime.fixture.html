@@ -73,11 +73,35 @@
   </script>
   <script type="module">
     import { createLessonService } from '/src/services/lesson-service.js';
+    import { bootstrapLessonSaveRuntime } from '/src/features/lessons/lesson-save-runtime-bootstrap.js';
 
     window.lessonService = createLessonService(window.__pacoDb);
-    const script = document.createElement('script');
-    script.src = '/photo-storage.js';
-    document.body.appendChild(script);
+    window.pacoGOLessonSaveRuntimeReady = bootstrapLessonSaveRuntime({
+      runtime: {
+        document,
+        db: window.__pacoDb,
+        lessonService: window.lessonService,
+        get currentSubject() { return currentSubject; },
+        set currentSubject(value) { currentSubject = value; },
+        get currentLesson() { return currentLesson; },
+        set currentLesson(value) { currentLesson = value; },
+        get currentSession() { return currentSession; },
+        PARENT_IDS,
+        get lessons() { return lessons; },
+        get currentStudent() { return currentStudent; },
+        set currentStudent(value) { currentStudent = value; },
+        normalizeSubvakKey,
+        renderTestCalendar,
+        refreshPageSidebars,
+        showMessage,
+        showHome,
+        loadLessons,
+        checkDictationSpelling,
+        upsertTestDate,
+        removeTestDate
+      },
+      target: window
+    });
   </script>
 </body>
 </html>

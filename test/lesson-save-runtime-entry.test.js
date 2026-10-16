@@ -84,7 +84,7 @@ test('runtime entry installation rejects an incomplete bridge before replacing w
   try {
     assert.throws(
       () => installLessonSaveRuntimeEntry({ document: {} }),
-      /Missing V4\.78 runtime bridge dependency: document/
+      /Missing V4\.78 runtime bridge dependency: currentSubject/
     );
     assert.strictEqual(globalThis.window.saveLesson, legacySaveLesson);
   } finally {
@@ -118,7 +118,11 @@ test('runtime entry stops at authorization before reading or preparing an unauth
 
 test('authorized runtime validates before any lesson service write or post-persistence effect', async () => {
   const calls = [];
-  const lessonService = new Proxy({}, { get() { throw new Error('Lesson service must not be touched before validation.'); } });
+  const lessonService = {
+    createLessonWithItems() { throw new Error('Lesson service must not write before validation.'); },
+    updateLesson() { throw new Error('Lesson service must not write before validation.'); },
+    replaceLessonItems() { throw new Error('Lesson service must not write before validation.'); }
+  };
   const runtime = createValidRuntime({
     lessonService,
     currentSession: { user: { id: 'parent-1' } },

@@ -61,9 +61,11 @@
           state.textContent='Je hebt geen toegang tot Beheer.';
           return;
         }
+
+        const selected=management.getSelectedStudent()||management.getStudents()[0];
+        if(selected) management.selectStudent(selected);
         await management.loadLessons();
         renderStudentSelection(students,management,student=>{showSelectedStudent(student).catch(error=>console.error('Management student load error:',error));});
-        const selected=management.getSelectedStudent()||management.getStudents()[0];
         if(selected) await showSelectedStudent(selected);
         await refreshRecovery();
         await renderFeedback(feedbackList,management);

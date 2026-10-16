@@ -137,8 +137,9 @@ export async function executeLessonSubvakUpdate(runtime, id, subvak) {
   });
   if (!authorization) return { ok: false, stage: 'authorization' };
 
-  const writeService = createLessonWriteService(app.lessonService);
-  const lesson = await writeService.updateLessonSubvak(id, subvak);
+  const lesson = await app.lessonService.updateLesson(id, {
+    subvak: app.normalizeSubvakKey(subvak)
+  });
   await app.loadLessons();
   await app.refreshPageSidebars();
   return lesson;

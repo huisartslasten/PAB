@@ -34,6 +34,7 @@
   <div id="paco-template-mount"></div>
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
+    import { createPacoNavigation } from './src/components/page-navigation.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
     import { getLessonSubjectGroups, getLessonSubjectIcon, getLessonSubvakGroups, normalizeLessonSubject } from './src/features/lessons/list-view-model.js';
 
@@ -47,10 +48,6 @@
     const app = createPacoGOApp({ supabaseLib: window.supabase });
 
     const goHome = () => { window.location.href = `dashboard.html?student=${encodeURIComponent(selectedStudent)}`; };
-    const goLessons = () => { window.location.href = `lessons.html?student=${encodeURIComponent(selectedStudent)}`; };
-    const goAgenda = () => { window.location.href = `index.html?student=${encodeURIComponent(selectedStudent)}&view=agenda`; };
-    const goTests = () => { window.location.href = `index.html?student=${encodeURIComponent(selectedStudent)}&view=tests`; };
-    const goManage = () => { window.location.href = 'management.html'; };
 
     const toolbar = document.createElement('div');
     toolbar.className = 'lessons-toolbar';
@@ -72,13 +69,7 @@
       title:'Mijn lessen',
       icon:'📚',
       subtitle:'Kies een vak en open daarna de les die je wilt doen.',
-      navigation:[
-        {icon:'🏠',label:'Dashboard',onClick:goHome},
-        {icon:'📚',label:'Mijn lessen',active:true,onClick:goLessons},
-        {icon:'📝',label:'Toetsen',onClick:goTests},
-        {icon:'📅',label:'Mijn agenda',onClick:goAgenda},
-        {icon:'⚙️',label:'Beheer',onClick:goManage}
-      ],
+      navigation:createPacoNavigation({ active:'lessons', student:selectedStudent }),
       content
     });
 
@@ -145,7 +136,7 @@
       back.type='button';
       back.className='back-subjects';
       back.textContent='← Alle vakken';
-      back.addEventListener('click',goLessons);
+      back.addEventListener('click',goHome);
       header.append(heading,back);
 
       content.append(header);

@@ -3,7 +3,7 @@ import { createLessonFromPhotoRuntime } from './lesson-photo-runtime.js';
 
 const REQUIRED_KEYS = [
   'requireParent',
-  'db',
+  'lessonService',
   'loadLessons',
   'lessons',
   'setCurrentStudent',
@@ -18,7 +18,7 @@ function requireRuntime(runtime) {
   for (const key of REQUIRED_KEYS) {
     if (!(key in runtime)) throw new Error(`The lesson-photo runtime bridge is missing: ${key}.`);
   }
-  if (!runtime.db) throw new Error('The lesson-photo runtime bridge is missing: db.');
+  if (!runtime.lessonService) throw new Error('The lesson-photo runtime bridge is missing: lessonService.');
 }
 
 export async function executeCreateLessonFromPhoto(runtime, input = {}) {
@@ -26,7 +26,7 @@ export async function executeCreateLessonFromPhoto(runtime, input = {}) {
   return createLessonFromPhotoRuntime({
     ...input,
     authorize: runtime.requireParent,
-    createLessonWithItems: values => createLessonFromPhotoPersistence({ db: runtime.db, ...values }),
+    createLessonWithItems: values => createLessonFromPhotoPersistence({ lessonService: runtime.lessonService, ...values }),
     loadLessons: runtime.loadLessons,
     lessons: runtime.lessons,
     setCurrentStudent: runtime.setCurrentStudent,

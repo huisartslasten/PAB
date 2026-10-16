@@ -50,27 +50,31 @@
     async function deleteLesson(lesson){if(!window.confirm(`Weet je zeker dat je de les “${lesson.title}” naar de prullenbak wilt verplaatsen?`))return;await management.moveToTrash(lesson.id);await showSelectedStudent(management.getSelectedStudent());await refreshRecovery();}
     async function refreshRecovery(){archive.replaceChildren();trash.replaceChildren();renderRecovery(archive,management,'archive',refreshRecovery);renderRecovery(trash,management,'trash',refreshRecovery);}
 
-    try{
-      const session = await app.initializeSession();
-      if(!session){
-        window.location.href='auth.html';
-        return;
+    async function initializeManagement(){
+      try{
+        const session = await app.initializeSession();
+        if(!session){
+          window.location.href='auth.html';
+          return;
+        }
+        if(!app.auth.isParent){
+          state.textContent='Je hebt geen toegang tot Beheer.';
+          return;
+        }
+        await management.loadLessons();
+        renderStudentSelection(students,management,student=>{showSelectedStudent(student).catch(error=>console.error('Management student load error:',error));});
+        const selected=management.getSelectedStudent()||management.getStudents()[0];
+        if(selected) await showSelectedStudent(selected);
+        await refreshRecovery();
+        await renderFeedback(feedbackList,management);
+        content.replaceChildren(studentSection,lessonSection,archiveSection,trashSection,feedbackSection);
+      }catch(error){
+        console.error('Management page load error:',error);
+        state.textContent='Beheer kon niet worden geladen.';
       }
-      if(!app.auth.isParent){
-        state.textContent='Je hebt geen toegang tot Beheer.';
-        return;
-      }
-      await management.loadLessons();
-      renderStudentSelection(students,management,student=>{showSelectedStudent(student).catch(error=>console.error('Management student load error:',error));});
-      const selected=management.getSelectedStudent()||management.getStudents()[0];
-      if(selected) await showSelectedStudent(selected);
-      await refreshRecovery();
-      await renderFeedback(feedbackList,management);
-      content.replaceChildren(studentSection,lessonSection,archiveSection,trashSection,feedbackSection);
-    }catch(error){
-      console.error('Management page load error:',error);
-      state.textContent=app.auth.isParent?'Beheer kon niet worden geladen.':'Beheer kon niet worden geladen.';
     }
+
+    initializeManagement();
   </script>
 </body>
 </html>

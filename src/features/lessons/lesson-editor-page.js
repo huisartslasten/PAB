@@ -1,5 +1,3 @@
-import { createLessonEditorController } from './editor-controller.js';
-
 const TYPE_LABELS = Object.freeze({
   words: '🎯 Woordtrainer',
   questions: '❓ Vragen',
@@ -119,84 +117,79 @@ function createSpellingRow({ questionParts = [''], answerParts = [{ text: '', ro
     <div class="word-parts-section"><div class="word-parts-head"><label class="spelling-label-question">Werkwoord</label></div><div class="word-question-parts"></div><button type="button" class="word-add-line word-add-line-bottom" data-action="add-question-part">➕ regel</button></div>
     <div class="word-parts-section"><div class="word-parts-head"><label>Antwoord</label></div><div class="spelling-answer-parts"></div><button type="button" class="word-add-line word-add-line-bottom" data-action="add-answer-part">➕ regel</button><div class="word-extra-note">Gebruik de regels voor de verschillende spellingvormen. Kies per regel of deze wordt getoetst.</div></div>`);
   const row = wrapper.firstElementChild;
-  row.dataset.answerClass = 'spelling-answer-parts';
-  row.dataset.answerInputClass = 'spelling-a-part';
-  row.dataset.answerPlaceholder = 'Vul hier het antwoord in';
   questionParts.forEach(part => addQuestionPart(row, part));
-  const labels = getSpellingLabelsFromRow(row.closest('.lesson-editor-page') || document);
-  const defaults = answerParts.length ? answerParts : [{ text: '', role: 'answer' }];
-  defaults.forEach((part, index) => addAnswerPart(row, 'spelling-answer-parts', 'spelling-a-part', part?.text || '', part?.role || 'answer', index === 0 ? labels.perfect : index === 1 ? labels.adjective : 'Vierde regel'));
+  answerParts.forEach(part => addAnswerPart(row, 'spelling-answer-parts', 'spelling-a-part', part?.text || '', part?.role || 'answer'));
   return row;
 }
 
-function getSpellingLabelsFromRow(root) {
-  return {
-    question: text(root.querySelector('#spellingLabelQuestion')?.value) || 'Werkwoord',
-    perfect: text(root.querySelector('#spellingLabelPerfect')?.value) || 'Voltooid deelwoord',
-    adjective: text(root.querySelector('#spellingLabelAdjective')?.value) || 'Bijvoeglijk gebruikt voltooid deelwoord'
-  };
-}
-
-function createRowForType(type, data = {}) {
-  if (type === 'words' || type === 'custom') return createWordRow(data);
-  if (type === 'questions') return createUniversalRow({ answerClass: 'question-answer-parts', answerInputClass: 'question-a-part', answerPlaceholder: 'Schrijf hier het antwoord of de uitleg.', ...data });
-  if (type === 'dictation') return createUniversalRow({ answerClass: 'dictation-answer-parts', answerInputClass: 'dictation-a-part', ...data });
-  if (type === 'math') return createUniversalRow({ answerClass: 'math-answer-parts', answerInputClass: 'math-a-part', answerPlaceholder: 'Bijvoorbeeld 42', ...data });
-  if (type === 'spelling') return createSpellingRow(data);
-  return null;
+function addRow(root, type, data = {}) {
+  const container = getRowsContainer(root, type);
+  if (!container) return null;
+  const row = type === 'words' || type === 'custom'
+    ? createWordRow(data)
+    : type === 'spelling'
+      ? createSpellingRow(data)
+      : createUniversalRow({
+        answerClass: `${type}-answer-parts`,
+        answerInputClass: `${type}-a-part`,
+        answerPlaceholder: type === 'math' ? 'Vul het getal in' : 'Vul hier het antwoord in',
+        questionLabel: type === 'dictation' ? 'Dicteezin' : type === 'math' ? 'Som' : 'Vraag',
+        ...data
+      });
+  container.appendChild(row);
+  return row;
 }
 
 function getRowsContainer(root, type) {
-  const id = type === 'words' || type === 'custom' ? 'wordEditor' : `${type}Editor`;
-  return root.querySelector(`#${id}`);
-}
-
-function clearEditors(root) {
-  ['wordEditor', 'questionEditor', 'dictationEditor', 'mathEditor', 'spellingEditor'].forEach(id => root.querySelector(`#${id}`)?.replaceChildren());
-}
-
-function addRow(root, type, data = {}, index = null) {
-  const container = getRowsContainer(root, type);
-  const row = createRowForType(type, data);
-  if (!container || !row) return null;
-  if (index == null || index >= container.children.length) container.appendChild(row);
-  else container.children[index].insertAdjacentElement('beforebegin', row);
-  return row;
-}
-
-function rowData(row, type) {
-  const questionParts = [...row.querySelectorAll('.word-q-part')].map(input => text(input.value)).filter(Boolean);
-  const inputClass = type === 'words' || type === 'custom' ? 'word-a-part' : `${type === 'questions' ? 'question' : type}-a-part`;
-  const answerParts = [...row.querySelectorAll(`.${inputClass}`)].map(input => ({ text: text(input.value), role: input.closest('.word-part-row')?.querySelector('.word-part-role')?.value || 'answer' })).filter(part => part.text);
-  const data = { question_parts: questionParts, answer_parts: answerParts };
-  if (type === 'words' || type === 'custom') {
-    data.hint = text(row.querySelector('.word-item-hint')?.value);
-    data.min_words = Math.max(0, Number(row.querySelector('.word-item-min-words')?.value || 0));
-    data.required_terms = text(row.querySelector('.word-item-required-terms')?.value).split(',').map(text).filter(Boolean);
-  }
-  return data;
+  const map = { words: '#wordEditor', custom: '#wordEditor', questions: '#questionEditor', dictation: '#dictationEditor', math: '#mathEditor', spelling: '#spellingEditor' };
+  const container = root.querySelector(map[type] || '#wordEditor');
+  if (container && !container.querySelector('.editor-row')) container.style.counterReset = 'editorrow';
+  return container;
 }
 
 function readDraft(root, lessonId) {
-  const type = root.querySelector('#lessonType').value;
-  const editorLabels = type === 'spelling' ? getSpellingLabelsFromRow(root) : null;
+  const type = root.querySelector('#lessonType').value || 'words';
   const student = root.querySelector('input[name="lessonStudent"]:checked')?.value || '';
-  const container = getRowsContainer(root, type);
-  const items = [...(container?.querySelectorAll('.editor-row') || [])].map(row => rowData(row, type));
+  const questionParts = row => [...row.querySelectorAll('.word-q-part')].map(input => input.value.trim()).filter(Boolean);
+  const answerParts = row => [...row.querySelectorAll('.word-a-part, .question-a-part, .dictation-a-part, .math-a-part, .spelling-a-part')].map(input => ({ text: input.value.trim(), role: input.closest('.word-part-row')?.querySelector('.word-part-role')?.value === 'extra' ? 'extra' : 'answer' })).filter(part => part.text);
+  const rows = [...root.querySelectorAll('.editor-row')].map(row => {
+    const item = { question_parts: questionParts(row), answer_parts: answerParts(row) };
+    if (type === 'words' || type === 'custom') {
+      item.hint = row.querySelector('.word-item-hint')?.value.trim() || '';
+      item.min_words = Number(row.querySelector('.word-item-min-words')?.value || 0);
+      item.required_terms = (row.querySelector('.word-item-required-terms')?.value || '').split(',').map(text).filter(Boolean);
+    }
+    return item;
+  });
+  const editorLabels = type === 'spelling' ? {
+    question: root.querySelector('#spellingLabelQuestion')?.value.trim() || 'Werkwoord',
+    perfect: root.querySelector('#spellingLabelPerfect')?.value.trim() || 'Voltooid deelwoord',
+    adjective: root.querySelector('#spellingLabelAdjective')?.value.trim() || 'Bijvoeglijk gebruikt voltooid deelwoord'
+  } : null;
   return {
-    lessonId, student,
-    subject: text(root.querySelector('#lessonSubject').value),
-    enteredSubvak: text(root.querySelector('#lessonSubvak').value),
-    title: text(root.querySelector('#lessonName').value),
-    type, explanation: text(root.querySelector('#lessonExplanation').value),
-    aiCheckAnswers: Boolean(root.querySelector('#lessonAiCheckAnswers').checked),
-    aiInstruction: text(root.querySelector('#lessonAiInstruction').value),
-    editorLabels, testDate: root.querySelector('#lessonTestDate').value || '', items
+    lessonId,
+    student,
+    subject: root.querySelector('#lessonSubject').value.trim(),
+    enteredSubvak: root.querySelector('#lessonSubvak').value.trim(),
+    title: root.querySelector('#lessonName').value.trim(),
+    type,
+    explanation: root.querySelector('#lessonExplanation').value.trim(),
+    aiCheckAnswers: root.querySelector('#lessonAiCheckAnswers').checked,
+    aiInstruction: root.querySelector('#lessonAiInstruction').value.trim(),
+    editorLabels,
+    items: rows,
+    testDate: root.querySelector('#lessonTestDate').value || ''
   };
 }
 
-function dateKey(date) { return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`; }
-function parseDateKey(value) { if (!value) return new Date(); const [year, month, day] = value.split('-').map(Number); return new Date(year, month - 1, day); }
+function dateKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+function parseDateKey(value) {
+  const [year, month, day] = String(value || '').split('-').map(Number);
+  return year && month && day ? new Date(year, month - 1, day) : new Date();
+}
 
 function renderDatePicker(root, selected = '', month = null) {
   const el = root.querySelector('#lessonTestDatePicker');

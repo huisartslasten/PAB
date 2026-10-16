@@ -2,12 +2,12 @@ import { createLessonWriteService } from './lesson-write-service.js';
 import { createTestCalendarStorage } from '../agenda/test-calendar.js';
 import { createLessonEditorRuntime } from './lesson-editor-runtime-entry.js';
 
-export function createLessonEditorApplication({ db, storage = globalThis.localStorage, initializeSession, isParent, refreshLessons = async () => {}, onSaved = null } = {}) {
-  if (!db) throw new Error('Lesson editor application requires db.');
+export function createLessonEditorApplication({ lessonService, storage = globalThis.localStorage, initializeSession, isParent, refreshLessons = async () => {}, onSaved = null } = {}) {
+  if (!lessonService) throw new Error('Lesson editor application requires lesson service.');
   if (typeof initializeSession !== 'function') throw new Error('Lesson editor application requires initializeSession.');
   if (typeof isParent !== 'function') throw new Error('Lesson editor application requires parent authorization.');
 
-  const writeService = createLessonWriteService(db);
+  const writeService = createLessonWriteService(lessonService);
   const calendar = createTestCalendarStorage(storage);
 
   const saveDraft = async ({ lessonId = null, lesson = {}, items = [], testDate = '' } = {}) => {

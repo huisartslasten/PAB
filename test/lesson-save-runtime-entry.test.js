@@ -7,16 +7,35 @@ import {
   installLessonSaveRuntimeEntry
 } from '../src/features/lessons/lesson-save-runtime-entry.js';
 
+function createLessonService() {
+  const calls = [];
+  return {
+    calls,
+    async createLessonWithItems({ lesson, items }) {
+      calls.push(['createLessonWithItems', { lesson, items }]);
+      return { lesson: { ...lesson, id: 17 }, items };
+    },
+    async updateLesson(id, payload) {
+      calls.push(['updateLesson', id, payload]);
+      return { id, ...payload };
+    },
+    async replaceLessonItems(id, items) {
+      calls.push(['replaceLessonItems', id, items]);
+      return items;
+    }
+  };
+}
+
 function createValidRuntime(overrides = {}) {
   const errorElement = { textContent: '', classList: { remove() {} } };
   return {
     document: { getElementById() { return errorElement; } },
-    db: {},
     currentSubject: 'Rekenen',
     currentLesson: null,
     currentSession: null,
     PARENT_IDS: new Set(),
     lessons: [],
+    lessonService: createLessonService(),
     currentStudent: null,
     normalizeSubvakKey: value => String(value ?? '').trim().toLowerCase(),
     renderTestCalendar() {},
@@ -35,10 +54,8 @@ test('runtime entry replaces window.saveLesson and returns the legacy function',
   const legacySaveLesson = async () => 'legacy';
   const previousWindow = globalThis.window;
   globalThis.window = { saveLesson: legacySaveLesson };
-
   try {
     const returnedLegacy = installLessonSaveRuntimeEntry(createValidRuntime());
-
     assert.strictEqual(returnedLegacy, legacySaveLesson);
     assert.notStrictEqual(globalThis.window.saveLesson, legacySaveLesson);
     assert.equal(globalThis.window.saveLesson.name, 'saveLessonRuntimeEntry');
@@ -52,7 +69,6 @@ test('runtime entry installation preserves the legacy function for rollback', ()
   const legacySaveLesson = function legacySaveLesson() {};
   const previousWindow = globalThis.window;
   globalThis.window = { saveLesson: legacySaveLesson };
-
   try {
     const returnedLegacy = installLessonSaveRuntimeEntry(createValidRuntime());
     assert.strictEqual(returnedLegacy, legacySaveLesson);
@@ -65,11 +81,10 @@ test('runtime entry installation rejects an incomplete bridge before replacing w
   const legacySaveLesson = function legacySaveLesson() {};
   const previousWindow = globalThis.window;
   globalThis.window = { saveLesson: legacySaveLesson };
-
   try {
     assert.throws(
       () => installLessonSaveRuntimeEntry({ document: {} }),
-      /Missing V4\.78 runtime bridge dependency: db/
+      /Missing V4\.78 runtime bridge dependency: document/
     );
     assert.strictEqual(globalThis.window.saveLesson, legacySaveLesson);
   } finally {
@@ -85,14 +100,8 @@ test('runtime entry stops at authorization before reading or preparing an unauth
     showMessage(message, type) { calls.push(['message', message, type]); },
     showHome() { calls.push(['home']); },
     document: {
-      getElementById(id) {
-        calls.push(['getElementById', id]);
-        return { value: '', checked: false, classList: { remove() {} } };
-      },
-      querySelector() {
-        calls.push(['querySelector']);
-        return null;
-      }
+      getElementById(id) { calls.push(['getElementById', id]); return { value: '', checked: false, classList: { remove() {} } }; },
+      querySelector() { calls.push(['querySelector']); return null; }
     },
     loadLessons: async () => calls.push(['loadLessons']),
     renderTestCalendar: () => calls.push(['renderTestCalendar']),
@@ -100,7 +109,6 @@ test('runtime entry stops at authorization before reading or preparing an unauth
   });
 
   const result = await executeLessonSaveRuntimeEntry(runtime);
-
   assert.deepEqual(result, { ok: false, stage: 'authorization' });
   assert.deepEqual(calls, [
     ['message', 'Alleen ouders kunnen lessen wijzigen. Log eerst in.', 'error'],
@@ -108,15 +116,11 @@ test('runtime entry stops at authorization before reading or preparing an unauth
   ]);
 });
 
-test('authorized runtime validates before any Supabase write or post-persistence effect', async () => {
+test('authorized runtime validates before any lesson service write or post-persistence effect', async () => {
   const calls = [];
-  const db = new Proxy({}, {
-    get() {
-      throw new Error('Supabase must not be touched before validation.');
-    }
-  });
+  const lessonService = new Proxy({}, { get() { throw new Error('Lesson service must not be touched before validation.'); } });
   const runtime = createValidRuntime({
-    db,
+    lessonService,
     currentSession: { user: { id: 'parent-1' } },
     PARENT_IDS: new Set(['parent-1']),
     currentStudent: 'Zyon',
@@ -124,27 +128,14 @@ test('authorized runtime validates before any Supabase write or post-persistence
       getElementById(id) {
         calls.push(['getElementById', id]);
         const values = {
-          lessonSubject: { value: 'Rekenen' },
-          lessonName: { value: 'Optellen' },
-          lessonExplanation: { value: '' },
-          lessonType: { value: 'words' },
-          lessonSubvak: { value: '' },
-          lessonAiCheckAnswers: { checked: false },
-          lessonAiInstruction: { value: '' },
-          lessonTestDate: { value: '' },
-          editorError: { textContent: '', classList: { remove() {} } }
+          lessonSubject: { value: 'Rekenen' }, lessonName: { value: 'Optellen' }, lessonExplanation: { value: '' },
+          lessonType: { value: 'words' }, lessonSubvak: { value: '' }, lessonAiCheckAnswers: { checked: false },
+          lessonAiInstruction: { value: '' }, lessonTestDate: { value: '' }, editorError: { textContent: '', classList: { remove() {} } }
         };
         return values[id] || { value: '', checked: false, classList: { remove() {} } };
       },
-      querySelector(selector) {
-        calls.push(['querySelector', selector]);
-        if (selector === 'input[name=lessonStudent]:checked') return { value: 'Zyon' };
-        return null;
-      },
-      querySelectorAll(selector) {
-        calls.push(['querySelectorAll', selector]);
-        return [];
-      }
+      querySelector(selector) { calls.push(['querySelector', selector]); if (selector === 'input[name=lessonStudent]:checked') return { value: 'Zyon' }; return null; },
+      querySelectorAll(selector) { calls.push(['querySelectorAll', selector]); return []; }
     },
     loadLessons: async () => calls.push(['loadLessons']),
     renderTestCalendar: () => calls.push(['renderTestCalendar']),
@@ -153,14 +144,10 @@ test('authorized runtime validates before any Supabase write or post-persistence
   });
 
   const result = await executeLessonSaveRuntimeEntry(runtime);
-
   assert.deepEqual(result, {
     ok: false,
     stage: 'validation',
-    validation: {
-      valid: false,
-      errorMessage: 'Vul het vak, de lestitel en minstens één item in.'
-    },
+    validation: { valid: false, errorMessage: 'Vul het vak, de lestitel en minstens één item in.' },
     items: []
   });
   assert.ok(calls.some(call => call[0] === 'querySelector'));
@@ -172,32 +159,21 @@ test('authorized runtime validates before any Supabase write or post-persistence
 });
 
 test('runtime entry rejects direct module execution without the explicit V4.78 bridge', async () => {
-  await assert.rejects(
-    () => executeLessonSaveRuntimeEntry(),
-    /V4\.78 lesson save runtime bridge is required/
-  );
+  await assert.rejects(() => executeLessonSaveRuntimeEntry(), /V4\.78 lesson save runtime bridge is required/);
 });
 
-test('runtime subvak update authorizes before delegating to the lesson write service', async () => {
+test('runtime subvak update authorizes before delegating to the canonical lesson service', async () => {
   const calls = [];
-  const db = {
-    from(table) {
-      calls.push(['from', table]);
-      return {
-        update(payload) {
-          calls.push(['update', table, payload]);
-          return {
-            eq(column, value) {
-              calls.push(['eq', table, column, value]);
-              return { select() { return { single: async () => ({ data: { id: value, subvak: payload.subvak }, error: null }) }; } };
-            }
-          };
-        }
-      };
-    }
+  const lessonService = {
+    async updateLesson(id, payload) {
+      calls.push(['updateLesson', id, payload]);
+      return { id, subvak: payload.subvak };
+    },
+    async createLessonWithItems() {},
+    async replaceLessonItems() {}
   };
   const runtime = createValidRuntime({
-    db,
+    lessonService,
     currentSession: { user: { id: 'parent-1' } },
     PARENT_IDS: new Set(['parent-1']),
     loadLessons: async () => calls.push(['loadLessons']),
@@ -205,12 +181,9 @@ test('runtime subvak update authorizes before delegating to the lesson write ser
   });
 
   const result = await executeLessonSubvakUpdate(runtime, 17, '  Themawoorden  ');
-
   assert.deepEqual(result, { id: 17, subvak: 'Themawoorden' });
   assert.deepEqual(calls, [
-    ['from', 'lessons'],
-    ['update', 'lessons', { subvak: 'Themawoorden' }],
-    ['eq', 'lessons', 'id', 17],
+    ['updateLesson', 17, { subvak: 'Themawoorden' }],
     ['loadLessons'],
     ['refreshPageSidebars']
   ]);

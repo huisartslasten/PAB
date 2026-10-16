@@ -4,14 +4,14 @@ const baseURL = process.env.PACOGO_BROWSER_BASE_URL || 'http://127.0.0.1:4173';
 
 async function openPhotoRuntime(page) {
   await page.goto(`${baseURL}/test/browser/lesson-photo-runtime.fixture.html`);
-  await page.waitForFunction(() => typeof window.createLessonFromPhoto === 'function');
+  await page.waitForFunction(() => typeof window.createLessonFromPhotoRuntime === 'function');
   await page.evaluate(() => window.pacoGOLessonPhotoRuntimeReady);
 }
 
-test('V4.78 photo lesson creation executes through the browser facade and bootstrap', async ({ page }) => {
+test('V4.78 photo lesson creation executes through the canonical runtime entry', async ({ page }) => {
   await openPhotoRuntime(page);
   const result = await page.evaluate(async () => {
-    const value = await window.createLessonFromPhoto({
+    const value = await window.createLessonFromPhotoRuntime({
       student: 'Zyon',
       subject: 'Themawoorden',
       title: 'Foto-les',
@@ -50,7 +50,7 @@ test('V4.78 photo lesson creation rolls back the lesson when item insertion fail
   const result = await page.evaluate(async () => {
     window.__failItemInsert = true;
     try {
-      await window.createLessonFromPhoto({
+      await window.createLessonFromPhotoRuntime({
         student: 'Zyon',
         subject: 'Rekenen',
         title: 'Foto',
@@ -72,16 +72,7 @@ test('V4.78 photo lesson creation rolls back the lesson when item insertion fail
   expect(result.delete).toMatchObject({ table: 'lessons', operation: 'delete', filters: [['id', 42]] });
 });
 
-test('photo legacy implementation is absent while the public facade remains source-wired', async ({ page }) => {
-  const indexResponse = await page.request.get(`${baseURL}/index.html`);
-  const indexSource = await indexResponse.text();
-  expect(indexResponse.ok()).toBe(true);
-  expect(indexSource).not.toMatch(/async function createLessonFromPhoto\s*\(/);
-  expect(indexSource).not.toMatch(/function createLessonFromPhoto\s*\(/);
-
-  const photoStorageResponse = await page.request.get(`${baseURL}/photo-storage.js`);
-  const photoStorageSource = await photoStorageResponse.text();
-  expect(photoStorageResponse.ok()).toBe(true);
-  expect(photoStorageSource).toMatch(/const lessonPhotoRuntimeBootstrap\s*=\s*import\('\.\/src\/features\/lessons\/lesson-photo-runtime-bootstrap\.js'\)/);
-  expect(photoStorageSource).toMatch(/window\.createLessonFromPhoto\s*=\s*async function createLessonFromPhotoRuntimeFacade/);
+test('obsolete root photo storage facade is absent', async ({ page }) => {
+  const response = await page.request.get(`${baseURL}/photo-storage.js`);
+  expect(response.status()).toBe(404);
 });

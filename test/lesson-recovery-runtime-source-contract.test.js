@@ -6,7 +6,7 @@ const bootstrap = await readFile(new URL('../src/features/lessons/lesson-recover
 const entry = await readFile(new URL('../src/features/lessons/lesson-recovery-runtime-entry.js', import.meta.url), 'utf8');
 
 test('recovery runtime is owned by its canonical bootstrap and entry', () => {
-  assert.match(bootstrap, /loadEntry\(\)/);
+  assert.match(bootstrap, /loadRuntimeEntry\(\)/);
   assert.match(bootstrap, /installLessonRecoveryRuntimeEntry\(runtime, target\)/);
   assert.match(entry, /export function installLessonRecoveryRuntimeEntry\(runtime, target = globalThis\)/);
   for (const declaration of [

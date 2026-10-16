@@ -28,6 +28,8 @@ test('test history page keeps its history presentation target explicit', () => {
 
 test('test history page belongs to the canonical management navigation boundary', () => {
   assert.match(page, /window\.location\.href = 'management\.html'/);
-  assert.match(page, /label:'Beheer'/);
+  assert.match(page, /import \{ createPacoNavigation \} from '\.\/src\/components\/page-navigation\.js'/);
+  assert.match(page, /active: 'test-history'/);
+  assert.match(page, /includeAgenda: false/);
   assert.match(page, /backLabel: '← Beheer'/);
 });

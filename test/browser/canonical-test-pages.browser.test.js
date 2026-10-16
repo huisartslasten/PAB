@@ -30,7 +30,7 @@ test('dashboard page owns the canonical student chooser', async ({ page }) => {
 
 test('management page exposes the canonical test history route', async ({ page }) => {
   await expectCanonicalShell(page, 'management.html', 'Beheer');
-  await expect(page.getByRole('button', { name: 'Toetsgeschiedenis' })).toHaveCount(1);
+  await expect(page.getByRole('button', { name: 'Toetsen' })).toHaveCount(1);
 });
 
 test('test page uses the canonical shell', async ({ page }) => {

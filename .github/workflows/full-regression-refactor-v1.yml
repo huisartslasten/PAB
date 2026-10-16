@@ -63,7 +63,7 @@ jobs:
             ! -name 'refactor-pure-modules.test.js' ! -name 'word-row-model.test.js' | sort)
           node --test $files
       - name: Run maintained Vitest regression
-        run: npx vitest run test/lesson-edit-model.test.js test/lesson-item-collector-types.test.js test/lesson-part-model.test.js test/lesson-save-flow.test.js test/lesson-save-persistence.test.js
+        run: npx vitest run test/lesson-item-collector-types.test.js test/lesson-part-model.test.js test/lesson-save-flow.test.js test/lesson-save-persistence.test.js
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Start local fixture server

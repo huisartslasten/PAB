@@ -48,6 +48,7 @@
     const app = createPacoGOApp({ supabaseLib: window.supabase });
 
     const goHome = () => { window.location.href = `dashboard.html?student=${encodeURIComponent(selectedStudent)}`; };
+    const goLessons = () => { window.location.href = `lessons.html?student=${encodeURIComponent(selectedStudent)}`; };
 
     const toolbar = document.createElement('div');
     toolbar.className = 'lessons-toolbar';
@@ -136,7 +137,7 @@
       back.type='button';
       back.className='back-subjects';
       back.textContent='← Alle vakken';
-      back.addEventListener('click',goHome);
+      back.addEventListener('click',goLessons);
       header.append(heading,back);
 
       content.append(header);

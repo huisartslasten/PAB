@@ -13,28 +13,20 @@ async function readSource(relativePath) {
 test('V4.78 monolith no longer contains the legacy createLessonFromPhoto implementation', async () => {
   const source = await readSource('index.html');
 
-  assert.doesNotMatch(source, /async function createLessonFromPhoto\s*\(/, 'the legacy createLessonFromPhoto implementation must be removed from the monolith');
-  assert.doesNotMatch(source, /function createLessonFromPhoto\s*\(/, 'the monolith must not retain another legacy createLessonFromPhoto declaration');
+  assert.doesNotMatch(source, /async function createLessonFromPhoto\s*\(/);
+  assert.doesNotMatch(source, /function createLessonFromPhoto\s*\(/);
 });
 
-test('classic-script photo facade is wired through the single bootstrap readiness contract', async () => {
-  const source = await readSource('photo-storage.js');
+test('photo runtime is owned by its canonical bootstrap and entry', async () => {
+  const bootstrap = await readSource('src/features/lessons/lesson-photo-runtime-bootstrap.js');
+  const entry = await readSource('src/features/lessons/lesson-photo-runtime-entry.js');
 
-  assert.match(source, /const lessonPhotoRuntimeBootstrap\s*=\s*import\('\.\/src\/features\/lessons\/lesson-photo-runtime-bootstrap\.js'\)/);
-  assert.match(source, /window\.pacoGOLessonPhotoRuntimeReady\s*=\s*lessonPhotoRuntimeBootstrap/);
-  assert.match(source, /window\.createLessonFromPhoto\s*=\s*async function createLessonFromPhotoRuntimeFacade/);
-  assert.match(source, /const runtimeHandler = await lessonPhotoRuntimeBootstrap/);
-  assert.match(source, /return runtimeHandler\(input\)/);
-
-  const bootstrapDeclarations = source.match(/const lessonPhotoRuntimeBootstrap\s*=/g) || [];
-  assert.equal(bootstrapDeclarations.length, 1, 'the classic-script boundary must create exactly one photo bootstrap promise');
-
-  const facadeIndex = source.indexOf('window.createLessonFromPhoto = async function createLessonFromPhotoRuntimeFacade');
-  const bootstrapIndex = source.indexOf('const lessonPhotoRuntimeBootstrap =');
-  assert.ok(bootstrapIndex >= 0 && facadeIndex > bootstrapIndex, 'the photo facade must be defined from the single bootstrap contract');
-
-  assert.doesNotMatch(source, /catch\s*\([^)]*\)\s*\{[^}]*createLessonFromPhoto\s*\(/s);
-  assert.doesNotMatch(source, /setTimeout\([^\n]*createLessonFromPhoto/s);
+  assert.match(bootstrap, /loadEntry\(\)/);
+  assert.match(bootstrap, /installLessonPhotoRuntimeEntry\(runtime, target\)/);
+  assert.match(entry, /export function installLessonPhotoRuntimeEntry\(runtime, target = globalThis\)/);
+  assert.match(entry, /target\.createLessonFromPhotoRuntime\s*=/);
+  assert.match(entry, /createLessonFromPhotoPersistence\(\{ lessonService: runtime\.lessonService/);
+  assert.doesNotMatch(entry, /setTimeout/);
 });
 
 // Keep this source contract in the professional refactor gate: photo lesson creation

@@ -2,47 +2,33 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createLessonFromPhotoPersistence } from '../src/features/lessons/lesson-photo-write-service.js';
 
-function makeDb({ createError = null, insertError = null } = {}) {
+function makeLessonService({ createError = null, insertError = null } = {}) {
   const calls = [];
-  const db = {
-    from(table) {
-      calls.push(['from', table]);
-      if (table === 'lessons') {
-        return {
-          insert(payload) {
-            calls.push(['lessons.insert', payload]);
-            return {
-              select() { return { single: async () => ({ data: createError ? null : { id: 42, ...payload }, error: createError }) }; }
-            };
-          },
-          delete() {
-            return { eq: async (...args) => { calls.push(['lessons.delete.eq', ...args]); return { error: null }; } };
-          }
-        };
-      }
-      if (table === 'lesson_items') {
-        return {
-          insert(rows) {
-            calls.push(['lesson_items.insert', rows]);
-            return {
-              select: async () => ({
-                data: insertError ? null : rows.map((row, index) => ({ id: index + 1, ...row })),
-                error: insertError
-              })
-            };
-          }
-        };
-      }
-      throw new Error(`Unexpected table: ${table}`);
+  return {
+    calls,
+    async createLessonWithItems({ lesson, items }) {
+      calls.push(['createLessonWithItems', { lesson, items }]);
+      if (createError) throw createError;
+      if (insertError) throw insertError;
+      return {
+        lesson: { id: 42, ...lesson },
+        items: items.map((item, index) => ({
+          id: index + 1,
+          lesson_id: 42,
+          ...item,
+          hint: '',
+          min_words: 0,
+          required_terms: []
+        }))
+      };
     }
   };
-  return { db, calls };
 }
 
-test('photo persistence creates lesson then inserts ordered items', async () => {
-  const { db, calls } = makeDb();
+test('photo persistence delegates lesson creation and ordered items to the canonical lesson service', async () => {
+  const lessonService = makeLessonService();
   const result = await createLessonFromPhotoPersistence({
-    db,
+    lessonService,
     lesson: { student: 'Zyon', subject: 'Themawoorden', title: 'Foto-les', type: 'words' },
     items: [
       { question: 'kat', answer: 'dier' },
@@ -51,55 +37,72 @@ test('photo persistence creates lesson then inserts ordered items', async () => 
   });
 
   assert.equal(result.lesson.id, 42);
-  assert.deepEqual(calls, [
-    ['from', 'lessons'],
-    ['lessons.insert', { student: 'Zyon', subject: 'Themawoorden', title: 'Foto-les', type: 'words' }],
-    ['from', 'lesson_items'],
-    ['lesson_items.insert', [
-      { lesson_id: 42, question: 'kat', answer: 'dier', sort_order: 0, hint: '', min_words: 0, required_terms: [] },
-      { lesson_id: 42, question: 'boom', answer: 'plant', sort_order: 1, hint: '', min_words: 0, required_terms: [] }
-    ]]
-  ]);
+  assert.deepEqual(lessonService.calls, [[
+    'createLessonWithItems',
+    {
+      lesson: { student: 'Zyon', subject: 'Themawoorden', title: 'Foto-les', type: 'words' },
+      items: [
+        { question: 'kat', answer: 'dier', sort_order: 0 },
+        { question: 'boom', answer: 'plant', sort_order: 1 }
+      ]
+    }
+  ]]);
 });
 
-test('photo persistence rolls back the lesson when item insertion fails', async () => {
-  const itemError = new Error('item insert failed');
-  const { db, calls } = makeDb({ insertError: itemError });
+test('photo persistence propagates canonical lesson-service creation errors', async () => {
+  const error = new Error('lesson creation failed');
+  const lessonService = makeLessonService({ createError: error });
+
   await assert.rejects(
     createLessonFromPhotoPersistence({
-      db,
+      lessonService,
       lesson: { student: 'Zyon', subject: 'Rekenen', title: 'Foto', type: 'math' },
       items: [{ question: '1+1', answer: '2' }]
     }),
-    error => error === itemError
+    failure => failure === error
   );
-  assert.deepEqual(calls.slice(-1)[0], ['lessons.delete.eq', 'id', 42]);
 });
 
-test('photo persistence stops on lesson creation failure', async () => {
-  const createError = new Error('lesson insert failed');
-  const { db, calls } = makeDb({ createError });
+test('photo persistence propagates canonical lesson-service item errors', async () => {
+  const error = new Error('item insert failed');
+  const lessonService = makeLessonService({ insertError: error });
+
   await assert.rejects(
     createLessonFromPhotoPersistence({
-      db,
+      lessonService,
       lesson: { student: 'Zyon', subject: 'Rekenen', title: 'Foto', type: 'math' },
       items: [{ question: '1+1', answer: '2' }]
     }),
-    error => error === createError
+    failure => failure === error
   );
-  assert.equal(calls.some(call => call[0] === 'lesson_items.insert'), false);
 });
 
-test('photo persistence rejects incomplete input before touching the database', async () => {
+test('photo persistence rejects incomplete input before invoking the lesson service', async () => {
   let calls = 0;
-  const db = { from() { calls += 1; throw new Error('should not be called'); } };
+  const lessonService = {
+    createLessonWithItems() {
+      calls += 1;
+      throw new Error('should not be called');
+    }
+  };
+
   await assert.rejects(
     createLessonFromPhotoPersistence({
-      db,
+      lessonService,
       lesson: { student: 'Zyon', subject: 'Rekenen', title: 'Foto', type: 'math' },
       items: []
     }),
     /at least one pair/
   );
   assert.equal(calls, 0);
+});
+
+test('photo persistence requires the canonical lesson service', async () => {
+  await assert.rejects(
+    createLessonFromPhotoPersistence({
+      lesson: { student: 'Zyon', subject: 'Rekenen', title: 'Foto', type: 'math' },
+      items: [{ question: '1+1', answer: '2' }]
+    }),
+    /lesson service is required/
+  );
 });

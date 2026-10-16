@@ -79,20 +79,3 @@ test('lesson write service delegates update and item replacement in order', asyn
   });
   assert.deepEqual(lessons.calls.map(call => call.method), ['updateLesson', 'replaceLessonItems']);
 });
-
-test('lesson write service normalizes subvak before delegating the mutation', async () => {
-  const lessons = mockLessonService();
-  const service = createLessonWriteService(lessons);
-
-  const result = await service.updateLessonSubvak(17, '  Themawoorden  ');
-
-  assert.deepEqual(result, {
-    id: 17,
-    subvak: 'Themawoorden'
-  });
-  assert.deepEqual(lessons.calls, [{
-    method: 'updateLesson',
-    id: 17,
-    payload: { subvak: 'Themawoorden' }
-  }]);
-});

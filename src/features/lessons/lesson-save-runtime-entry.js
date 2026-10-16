@@ -22,12 +22,12 @@ function requireRuntime(runtime) {
   }
   const required = [
     'document',
-    'db',
     'currentSubject',
     'currentLesson',
     'currentSession',
     'PARENT_IDS',
     'lessons',
+    'lessonService',
     'currentStudent',
     'normalizeSubvakKey',
     'renderTestCalendar',
@@ -93,7 +93,7 @@ export async function executeLessonSaveRuntimeEntry(runtime) {
       editorRows: readEditorRows(documentRef, draft.type)
     }),
     executeCoordinator: async input => {
-      const writeService = createLessonWriteService(app.db);
+      const writeService = createLessonWriteService(app.lessonService);
       return executeLessonSaveCore({
         draft: input.draft,
         collectItems: input.collectItems,
@@ -137,7 +137,7 @@ export async function executeLessonSubvakUpdate(runtime, id, subvak) {
   });
   if (!authorization) return { ok: false, stage: 'authorization' };
 
-  const writeService = createLessonWriteService(app.db);
+  const writeService = createLessonWriteService(app.lessonService);
   const lesson = await writeService.updateLessonSubvak(id, subvak);
   await app.loadLessons();
   await app.refreshPageSidebars();

@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 
 const entry = await readFile(new URL('../src/features/lessons/lesson-order-runtime-entry.js', import.meta.url), 'utf8');
 const bootstrap = await readFile(new URL('../src/features/lessons/lesson-order-runtime-bootstrap.js', import.meta.url), 'utf8');
-const service = await readFile(new URL('../src/features/lessons/lesson-order-service.js', import.meta.url), 'utf8');
+const service = await readFile(new URL('../src/services/lesson-order-service.js', import.meta.url), 'utf8');
 
 test('canonical lesson ordering owns runtime delegation and persistence outside the legacy page', () => {
   assert.match(bootstrap, /installLessonOrderRuntimeEntry\(runtime, target\)/);

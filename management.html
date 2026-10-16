@@ -51,7 +51,15 @@
     async function refreshRecovery(){archive.replaceChildren();trash.replaceChildren();renderRecovery(archive,management,'archive',refreshRecovery);renderRecovery(trash,management,'trash',refreshRecovery);}
 
     try{
-      await app.initializeSession();
+      const session = await app.initializeSession();
+      if(!session){
+        window.location.href='auth.html';
+        return;
+      }
+      if(!app.auth.isParent){
+        state.textContent='Je hebt geen toegang tot Beheer.';
+        return;
+      }
       await management.loadLessons();
       renderStudentSelection(students,management,student=>{showSelectedStudent(student).catch(error=>console.error('Management student load error:',error));});
       const selected=management.getSelectedStudent()||management.getStudents()[0];
@@ -61,7 +69,7 @@
       content.replaceChildren(studentSection,lessonSection,archiveSection,trashSection,feedbackSection);
     }catch(error){
       console.error('Management page load error:',error);
-      state.textContent=app.auth.isParent?'Beheer kon niet worden geladen.':'Je hebt geen toegang tot Beheer.';
+      state.textContent=app.auth.isParent?'Beheer kon niet worden geladen.':'Beheer kon niet worden geladen.';
     }
   </script>
 </body>

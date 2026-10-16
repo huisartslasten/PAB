@@ -45,17 +45,17 @@ test('bootstrap contract installs the refactored runtime and exposes only its ca
   assert.doesNotMatch(source, /legacySaveLesson/);
 });
 
-test('runtime entry requires the explicit V4.78 bridge instead of resolving legacy lexical bindings', async () => {
+test('runtime entry requires the explicit V4.78 bridge and canonical lesson service', async () => {
   const source = await readSource('src/features/lessons/lesson-save-runtime-entry.js');
 
   for (const key of [
     'document',
-    'db',
     'currentSubject',
     'currentLesson',
     'currentSession',
     'PARENT_IDS',
     'lessons',
+    'lessonService',
     'currentStudent',
     'normalizeSubvakKey',
     'renderTestCalendar',
@@ -70,6 +70,8 @@ test('runtime entry requires the explicit V4.78 bridge instead of resolving lega
     assert.match(source, new RegExp(`['"]${key}['"]`));
   }
 
+  assert.doesNotMatch(source, /createLessonWriteService\(app\.db\)/);
+  assert.match(source, /createLessonWriteService\(app\.lessonService\)/);
   assert.match(source, /executeLessonSaveRuntimeEntry\(runtime\)/);
   assert.match(source, /window\.saveLesson\s*=\s*async function saveLessonRuntimeEntry/);
 });

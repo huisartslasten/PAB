@@ -28,9 +28,9 @@ test('dashboard page owns the canonical student chooser', async ({ page }) => {
   await expect(page.locator('.student-card').nth(2)).toContainText('Zephon');
 });
 
-test('management page exposes the canonical test history route', async ({ page }) => {
-  await expectCanonicalShell(page, 'management.html', 'Beheer');
-  await expect(page.getByRole('button', { name: 'Toetsen' })).toHaveCount(1);
+test('management page enforces the canonical authentication boundary', async ({ page }) => {
+  await page.goto(`${baseUrl}/management.html`);
+  await expect(page).toHaveURL(/\/auth\.html$/);
 });
 
 test('test page uses the canonical shell', async ({ page }) => {

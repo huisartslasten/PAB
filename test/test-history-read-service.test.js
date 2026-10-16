@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createTestHistoryReadService } from '../src/features/test-history/test-history-read-service.js';
+import { createTestHistoryService } from '../src/services/test-history-service.js';
 
 function createMockDb({ data = [], error = null } = {}) {
   const calls = [];
@@ -33,7 +33,7 @@ function createMockDb({ data = [], error = null } = {}) {
 test('test history service preserves the V4.78 query shape and ordering', async () => {
   const attempts = [{ id: 10, student: 'Zyon' }];
   const db = createMockDb({ data: attempts });
-  const service = createTestHistoryReadService(db);
+  const service = createTestHistoryService(db);
 
   const result = await service.listAttempts();
 
@@ -47,7 +47,7 @@ test('test history service preserves the V4.78 query shape and ordering', async 
 
 test('test history service filters by student when requested', async () => {
   const db = createMockDb({ data: [{ id: 11, student: 'Zenith' }] });
-  const service = createTestHistoryReadService(db);
+  const service = createTestHistoryService(db);
 
   await service.listAttempts('Zenith');
 
@@ -61,7 +61,7 @@ test('test history service filters by student when requested', async () => {
 
 test('test history service propagates database errors', async () => {
   const error = new Error('history failed');
-  const service = createTestHistoryReadService(createMockDb({ error }));
+  const service = createTestHistoryService(createMockDb({ error }));
 
   await assert.rejects(() => service.listAttempts(), error);
 });

@@ -21,7 +21,7 @@
     .subject-card h3{font-size:21px}
     .subject-card p{margin:6px 0 0;color:#667894}
     .student-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
-    .student-card{border:2px solid #dce9f6;border-radius:20px;background:#fff;padding:20px;text-align:left;color:#102b57;box-shadow:0 8px 22px rgba(16,43,87,.07);cursor:pointer;transition:.16s}
+    .student-card{display:block;border:2px solid #dce9f6;border-radius:20px;background:#fff;padding:20px;text-align:left;color:#102b57;box-shadow:0 8px 22px rgba(16,43,87,.07);cursor:pointer;transition:.16s;text-decoration:none}
     .student-card:hover{transform:translateY(-3px);border-color:#1787f2;background:#eef8ff}
     .student-card h2{font-size:24px}
     .student-card p{margin:6px 0 0;color:#667894}
@@ -94,16 +94,16 @@
       grid.className = 'student-grid';
       grid.style.marginTop = '15px';
       listStudents().forEach(student => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'student-card';
+        const link = document.createElement('a');
+        link.className = 'student-card';
+        link.href = `dashboard.html?student=${encodeURIComponent(student)}`;
+        link.setAttribute('aria-label', `Dashboard van ${student}`);
         const name = document.createElement('h2');
         name.textContent = `👦 ${student}`;
         const description = document.createElement('p');
         description.textContent = 'Mijn lessen →';
-        button.append(name, description);
-        button.addEventListener('click', () => goDashboard(student));
-        grid.appendChild(button);
+        link.append(name, description);
+        grid.appendChild(link);
       });
       card.appendChild(grid);
       content.appendChild(card);

@@ -14,6 +14,7 @@
   <div id="paco-template-mount"></div>
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
+    import { createPacoNavigation } from './src/components/page-navigation.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
     import { createTestHistoryRenderer } from './src/features/test-history/test-history-renderer.js';
     import { escapeHtml } from './src/core/html.js';
@@ -39,12 +40,6 @@
     const studentSelect = content.querySelector('#historyStudent');
 
     const goManagement = () => { window.location.href = 'management.html'; };
-    const goDashboard = () => { window.location.href = 'dashboard.html'; };
-    const goLessons = () => {
-      const target = new URL('lessons.html', window.location.href);
-      if (requestedStudent) target.searchParams.set('student', requestedStudent);
-      window.location.href = target.toString();
-    };
 
     mountPacoPageTemplate({
       mount,
@@ -54,12 +49,11 @@
       title: 'Toetsgeschiedenis',
       icon: '📝',
       subtitle: 'Bekijk gemaakte toetsen en de antwoorden per vraag.',
-      navigation: [
-        { icon:'🏠', label:'Dashboard', onClick:goDashboard },
-        { icon:'📚', label:'Mijn lessen', onClick:goLessons },
-        { icon:'📝', label:'Toetsgeschiedenis', active:true },
-        { icon:'⚙️', label:'Beheer', onClick:goManagement }
-      ],
+      navigation: createPacoNavigation({
+        active: 'test-history',
+        student: requestedStudent,
+        includeAgenda: false
+      }),
       content
     });
 

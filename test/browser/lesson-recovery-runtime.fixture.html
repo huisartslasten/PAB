@@ -42,6 +42,30 @@
       }
     };
   </script>
-  <script src="/photo-storage.js"></script>
+  <script type="module">
+    import { bootstrapLessonRecoveryRuntime } from '/src/features/lessons/lesson-recovery-runtime-bootstrap.js';
+
+    window.pacoGOLessonRecoveryRuntimeReady = bootstrapLessonRecoveryRuntime({
+      runtime: {
+        requireParent,
+        db,
+        get currentLesson() { return currentLesson; },
+        set currentLesson(value) { currentLesson = value; },
+        get currentSubject() { return currentSubject; },
+        set currentSubject(value) { currentSubject = value; },
+        get currentStudent() { return currentStudent; },
+        set currentStudent(value) { currentStudent = value; },
+        parentSelectedStudent,
+        closeDeleteModal,
+        closeArchiveModal,
+        loadLessons,
+        showSubject,
+        showParentDashboard,
+        renderParentDashboard,
+        showMessage
+      },
+      target: window
+    });
+  </script>
 </body>
 </html>

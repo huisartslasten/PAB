@@ -36,9 +36,5 @@ export function createLessonWriteService(lessons) {
     });
   }
 
-  async function updateLessonSubvak(id, subvak) {
-    return lessons.updateLesson(id, { subvak: String(subvak ?? '').trim() });
-  }
-
-  return Object.freeze({ saveLesson, updateLessonSubvak });
+  return Object.freeze({ saveLesson });
 }

@@ -43,6 +43,19 @@
       }
     };
   </script>
-  <script src="/photo-storage.js"></script>
+  <script type="module">
+    import { bootstrapLessonGuestAccessRuntime } from '/src/features/lessons/lesson-guest-access-runtime-bootstrap.js';
+
+    window.pacoGOLessonGuestAccessRuntimeReady = bootstrapLessonGuestAccessRuntime({
+      runtime: {
+        requireParent,
+        currentStudent,
+        db,
+        renderParentStudent,
+        showMessage
+      },
+      target: window
+    });
+  </script>
 </body>
 </html>

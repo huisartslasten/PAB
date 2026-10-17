@@ -18,7 +18,8 @@ export function createPacoNavigation({
   student = '',
   includeManagement = true,
   includeCreator = false,
-  includeAgenda = true
+  includeAgenda = true,
+  managementSubmenu = null
 } = {}) {
   const items = [
     {
@@ -70,7 +71,15 @@ export function createPacoNavigation({
       key: 'management',
       icon: '⚙️',
       label: 'Beheer',
-      onClick: () => go('management.html')
+      onClick: () => go('management.html'),
+      ...(Array.isArray(managementSubmenu) && managementSubmenu.length
+        ? {
+            submenu: managementSubmenu.map(item => ({
+              ...item,
+              active: item.active === true
+            }))
+          }
+        : {})
     });
   }
 

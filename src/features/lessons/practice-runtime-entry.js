@@ -26,13 +26,15 @@ export function createPracticeRuntimeEntry({
   if (typeof onAnswer !== 'function') throw new Error('A practice answer callback is required.');
   if (typeof onFinish !== 'function') throw new Error('A practice finish callback is required.');
 
+  const sessionMode = lesson.practiceMode === 'assessment' ? 'single-pass' : 'mastery';
   const runtime = createApplicationPracticeRuntime({
     db,
     lesson,
     shuffle,
     random,
     evaluateAnswer,
-    aiCheckAnswers
+    aiCheckAnswers,
+    sessionMode
   });
   const mastery = masteryService || createMasteryService();
 
@@ -55,7 +57,7 @@ export function createPracticeRuntimeEntry({
   }
 
   function enrichResult(result, item) {
-    const masteryState = student && item
+    const masteryState = sessionMode === 'mastery' && student && item
       ? mastery.record(student, lesson.id, item.id, result.correct === true)
       : null;
     const enrichedResult = Object.freeze({ ...result, mastery: masteryState });

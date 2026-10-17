@@ -74,7 +74,7 @@ function addAnswerPart(row, containerClass, inputClass, value = '', role = 'answ
 }
 
 function rowFrame(content) {
-  return `<div class="editor-row"><button class="remove-row" type="button" data-action="remove-row">✕</button>${content}<button type="button" class="question-insert-button" data-action="insert-row">➕ Vraag hier invoegen</button></div>`;
+  return `<div class="editor-row"><button class="remove-row" type="button" data-action="remove-row">✕</button>${content}<button type="button" class="question-insert-button" data-action="insert-row">➕ Vraag toevoegen</button></div>`;
 }
 
 function createWordRow({ questionParts = [''], answerParts = [{ text: '', role: 'answer' }], rules = null } = {}) {
@@ -257,14 +257,6 @@ function showError(root, message) {
   error.classList.toggle('hidden', !message);
 }
 
-function rowHasQuestion(row) {
-  return [...row.querySelectorAll('.word-q-part')].some(input => text(input.value));
-}
-
-function rowHasAnswer(row) {
-  return [...row.querySelectorAll('.word-a-part, .question-a-part, .dictation-a-part, .math-a-part, .spelling-a-part')].some(input => text(input.value));
-}
-
 function rowTemplateData(row) {
   const questionCount = Math.max(1, row.querySelectorAll('.word-q-part').length);
   const answerInputs = [...row.querySelectorAll('.word-a-part, .question-a-part, .dictation-a-part, .math-a-part, .spelling-a-part')];
@@ -281,14 +273,6 @@ function rowTemplateData(row) {
     answerParts,
     rules
   };
-}
-
-function ensureAutomaticTrailingRow(root, type, row) {
-  const container = row?.parentElement;
-  if (!container || row !== container.lastElementChild || !rowHasQuestion(row) || !rowHasAnswer(row)) return;
-  const data = rowTemplateData(row);
-  const created = addRow(root, type, data);
-  if (created) created.dataset.automatic = 'true';
 }
 
 export function createLessonEditorPage({ root, runtime, initialLesson = null, student = '' } = {}) {
@@ -332,8 +316,15 @@ export function createLessonEditorPage({ root, runtime, initialLesson = null, st
       return;
     }
     if (button.dataset.action === 'insert-row') {
-      const current = button.closest('.editor-row'); const container = current?.parentElement; const created = addRow(root, root.querySelector('#lessonType').value);
-      if (created && current && container) { current.insertAdjacentElement('afterend', created); created.querySelector('input,textarea')?.focus(); }
+      const current = button.closest('.editor-row');
+      const container = current?.parentElement;
+      if (!current || !container) return;
+      const data = rowTemplateData(current);
+      const created = addRow(root, root.querySelector('#lessonType').value, data);
+      if (created) {
+        current.insertAdjacentElement('afterend', created);
+        created.querySelector('input,textarea')?.focus();
+      }
       return;
     }
     if (button.dataset.action === 'add-question-part') { addQuestionPart(button.closest('.editor-row')); return; }
@@ -354,7 +345,6 @@ export function createLessonEditorPage({ root, runtime, initialLesson = null, st
       if (select) select.value = button.dataset.role;
       if (display) { display.classList.toggle('role-extra', button.dataset.role === 'extra'); display.querySelector('span').textContent = button.dataset.role === 'extra' ? 'Wordt niet getoetst' : 'Wordt getoetst'; }
       row?.querySelector('.word-part-role-menu')?.classList.add('hidden');
-      if (row?.closest('.editor-row')) ensureAutomaticTrailingRow(root, root.querySelector('#lessonType').value, row.closest('.editor-row'));
       return;
     }
     if (button.dataset.dateShift) { datePickerMonth = new Date(datePickerMonth.getFullYear(), datePickerMonth.getMonth() + Number(button.dataset.dateShift), 1); renderDatePicker(root, root.querySelector('#lessonTestDate').value, datePickerMonth); return; }
@@ -372,7 +362,6 @@ export function createLessonEditorPage({ root, runtime, initialLesson = null, st
   });
 
   root.addEventListener('input', event => {
-    if (event.target.matches('.word-q-part')) return;
     if (!event.target.id.startsWith('spellingLabel')) return;
     const labels = getSpellingLabelsFromRow(root);
     root.querySelectorAll('.spelling-label-question').forEach(el => { el.textContent = labels.question; });

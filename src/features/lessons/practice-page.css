@@ -49,6 +49,10 @@
   gap: 14px;
 }
 
+.practice-content [data-practice-form] {
+  display: contents;
+}
+
 .practice-content [data-practice-action="submit"] {
   width: min(100%, 420px);
   justify-self: center;

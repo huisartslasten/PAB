@@ -1,7 +1,7 @@
 import { appState, setStudent } from '../../core/state.js';
 import { getActiveStudentLessons, getStudentLessons } from '../lessons/visibility.js';
 import { createLessonRecovery } from '../lessons/recovery.js';
-import { getAllArchiveEntries, getAllTrashEntries } from './recovery.js';
+import { createTrashRecovery, getAllArchiveEntries, getAllTrashEntries } from './recovery.js';
 import { isKnownStudent, listStudents } from '../students/students.js';
 
 function requireParent(auth) {
@@ -140,6 +140,11 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
     refresh: refreshLessons
   });
 
+  const trashRecovery = createTrashRecovery({
+    lessonService,
+    refresh: refreshLessons
+  });
+
   async function archiveLesson(id) {
     assertParent();
     findScopedLesson(id, requireStudent());
@@ -157,6 +162,11 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
     const lesson = findScopedLesson(id, requireStudent());
     if (!lesson.archived && !lesson.deleted) throw new Error('Lesson is not recoverable.');
     return recovery.restore(id);
+  }
+
+  async function emptyTrash() {
+    assertParent();
+    return trashRecovery.emptyTrash();
   }
 
   async function listFeedback() {
@@ -190,6 +200,7 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
     archiveLesson,
     moveToTrash,
     restoreLesson,
+    emptyTrash,
     listFeedback,
     submitFeedback,
     updateFeedbackStatus

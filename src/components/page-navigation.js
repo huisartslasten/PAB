@@ -14,6 +14,7 @@ function go(path, student = '') {
 
 export function createPacoNavigation({
   active = '',
+  activeSubmenu = '',
   student = '',
   includeManagement = true,
   includeCreator = false,
@@ -39,7 +40,21 @@ export function createPacoNavigation({
       key: 'agenda',
       icon: '📅',
       label: 'Mijn agenda',
-      onClick: () => go('agenda.html', student)
+      onClick: () => go('agenda.html', student),
+      submenu: [
+        {
+          key: 'agenda',
+          label: 'Agenda invoeren',
+          active: activeSubmenu === 'agenda',
+          onClick: () => go('agenda.html', student)
+        },
+        {
+          key: 'month-calendar',
+          label: 'Maandkalender',
+          active: activeSubmenu === 'month-calendar',
+          onClick: () => go('month-calendar.html', student)
+        }
+      ]
     });
   }
 

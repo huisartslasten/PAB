@@ -41,6 +41,15 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
     return getScopedLessons();
   }
 
+  async function refreshRecoveryLessons() {
+    assertParent();
+    await loadLessons();
+    return {
+      archive: getAllArchiveEntries(appState.lessons),
+      trash: getAllTrashEntries(appState.lessons)
+    };
+  }
+
   function selectStudent(student) {
     assertParent();
     const value = String(student ?? '').trim();
@@ -137,12 +146,12 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
 
   const recovery = createLessonRecovery({
     lessonService,
-    refresh: refreshLessons
+    refresh: refreshRecoveryLessons
   });
 
   const trashRecovery = createTrashRecovery({
     lessonService,
-    refresh: refreshLessons
+    refresh: refreshRecoveryLessons
   });
 
   async function archiveLesson(id) {
@@ -160,6 +169,14 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
   async function restoreLesson(id) {
     assertParent();
     const lesson = findScopedLesson(id, requireStudent());
+    if (!lesson.archived && !lesson.deleted) throw new Error('Lesson is not recoverable.');
+    return recovery.restore(id);
+  }
+
+  async function restoreRecoveryLesson(id) {
+    assertParent();
+    const lesson = appState.lessons.find(item => String(item?.id) === String(id));
+    if (!lesson) throw new Error('Lesson could not be found.');
     if (!lesson.archived && !lesson.deleted) throw new Error('Lesson is not recoverable.');
     return recovery.restore(id);
   }
@@ -189,6 +206,7 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
     selectStudent,
     getSelectedStudent,
     loadLessons: refreshLessons,
+    loadRecoveryLessons: refreshRecoveryLessons,
     getScopedLessons,
     getAllScopedLessons,
     getOrderedScopedLessons,
@@ -200,6 +218,7 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
     archiveLesson,
     moveToTrash,
     restoreLesson,
+    restoreRecoveryLesson,
     emptyTrash,
     listFeedback,
     submitFeedback,

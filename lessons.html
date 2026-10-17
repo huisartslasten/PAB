@@ -1,202 +1,57 @@
 <!doctype html>
 <html lang="nl">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PacoGO — Mijn lessen</title>
-  <link rel="stylesheet" href="src/components/page-template.css">
-  <link rel="stylesheet" href="src/components/lesson-list.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>PacoGO — Mijn lessen</title>
+  <link rel="stylesheet" href="src/components/page-template.css"><link rel="stylesheet" href="src/components/lesson-list.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    .lessons-page{display:grid;gap:22px}
-    .lessons-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
-    .lessons-state{padding:16px 18px;border:1px solid #dce9f6;border-radius:18px;background:#fff;color:#667894}
-    .subject-grid,.lesson-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px}
-    .lesson-card{display:block;padding:18px;text-align:left;color:inherit;text-decoration:none;min-height:145px}
-    .lesson-card h2{margin:0;color:#102b57;font:800 21px/1.1 "Baloo 2",Nunito,sans-serif}
-    .lesson-card p{margin:7px 0 0;color:#667894;line-height:1.4}
-    .lesson-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
-    .lesson-badge{padding:5px 9px;border-radius:999px;background:#eaf4ff;color:#126fc9;font-size:11px;font-weight:900}
-    .section-title{margin:0 0 12px;font:800 25px/1.1 "Baloo 2",Nunito,sans-serif;color:#102b57}
-    .subvak-section{display:grid;gap:10px}
-    .subvak-title{margin:0;font:800 19px/1.1 "Baloo 2",Nunito,sans-serif;color:#38577d}
-    .subvak-title.muted{color:#667894}
-    .back-subjects{border:0;background:#eaf4ff;color:#126fc9;box-shadow:none;padding:9px 13px;font-weight:900;border-radius:12px;cursor:pointer}
-    .back-subjects:hover{background:#dff0ff}
-    @media(max-width:700px){.subject-grid,.lesson-grid{grid-template-columns:1fr}}
+    .lessons-page{display:grid;gap:22px}.lessons-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}.lessons-state{padding:16px 18px;border:1px solid #dce9f6;border-radius:18px;background:#fff;color:#667894}.subject-grid,.lesson-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px}.lesson-card{display:block;padding:18px;text-align:left;color:inherit;text-decoration:none;min-height:145px}.lesson-card h2{margin:0;color:#102b57;font:800 21px/1.1 "Baloo 2",Nunito,sans-serif}.lesson-card p{margin:7px 0 0;color:#667894;line-height:1.4}.lesson-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}.lesson-badge{padding:5px 9px;border-radius:999px;background:#eaf4ff;color:#126fc9;font-size:11px;font-weight:900}.section-title{margin:0 0 12px;font:800 25px/1.1 "Baloo 2",Nunito,sans-serif;color:#102b57}.subvak-section{display:grid;gap:10px}.subvak-title{margin:0;font:800 19px/1.1 "Baloo 2",Nunito,sans-serif;color:#38577d}.subvak-title.muted{color:#667894}.back-subjects{border:0;background:#eaf4ff;color:#126fc9;box-shadow:none;padding:9px 13px;font-weight:900;border-radius:12px;cursor:pointer}.lesson-management-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.lesson-management-actions button{border:1px solid #cfe3f3;border-radius:10px;background:#f7fbff;color:#126fc9;padding:6px 9px;font-weight:900;cursor:pointer}.lesson-management-actions button.danger{color:#a43d3d;border-color:#efcccc;background:#fff7f7}@media(max-width:700px){.subject-grid,.lesson-grid{grid-template-columns:1fr}}
   </style>
 </head>
-<body>
-  <div id="paco-template-mount"></div>
-  <script type="module">
-    import { mountPacoPageTemplate } from './src/components/page-template.js';
-    import { createPacoNavigation } from './src/components/page-navigation.js';
-    import { createPacoGOApp } from './src/app/bootstrap.js';
-    import { attachLessonDragSorting } from './src/features/lessons/lesson-drag-sort.js';
-    import { getLessonSubjectGroups, getLessonSubjectIcon, getLessonSubvakGroups, normalizeLessonSubject } from './src/features/lessons/list-view-model.js';
+<body><div id="paco-template-mount"></div>
+<script type="module">
+import { mountPacoPageTemplate } from './src/components/page-template.js';
+import { createPacoNavigation } from './src/components/page-navigation.js';
+import { createPacoGOApp } from './src/app/bootstrap.js';
+import { attachLessonDragSorting } from './src/features/lessons/lesson-drag-sort.js';
+import { getLessonSubjectGroups,getLessonSubjectIcon,getLessonSubvakGroups,normalizeLessonSubject } from './src/features/lessons/list-view-model.js';
+import { readViewContext,applyViewContext } from './src/core/view-context.js';
 
-    const params = new URLSearchParams(window.location.search);
-    const selectedStudent = params.get('student') || 'Zyon';
-    const selectedSubject = params.get('subject') || '';
-    const mount = document.querySelector('#paco-template-mount');
-    const content = document.createElement('div');
-    content.className = 'lessons-page paco-template-card';
+const context=readViewContext(new URLSearchParams(window.location.search));
+const selectedStudent=context.student;
+const selectedSubject=new URLSearchParams(window.location.search).get('subject')||'';
+const mount=document.querySelector('#paco-template-mount'); const content=document.createElement('div'); content.className='lessons-page paco-template-card';
+const app=createPacoGOApp({supabaseLib:window.supabase});
+const goHome=()=>{const target=new URL('dashboard.html',window.location.href);if(selectedStudent)target.searchParams.set('viewStudent',selectedStudent);if(context.isManagement)target.searchParams.set('mode','management');window.location.href=target.toString()};
+const goLessons=()=>{const target=new URL('lessons.html',window.location.href);if(selectedStudent)target.searchParams.set('viewStudent',selectedStudent);if(context.isManagement)target.searchParams.set('mode','management');window.location.href=target.toString()};
+const state=document.createElement('div'); state.className='lessons-state'; state.textContent='Lessen laden…'; content.appendChild(state);
 
-    const app = createPacoGOApp({ supabaseLib: window.supabase });
+async function initialize(){
+  await app.initializeSession();
+  if(context.isManagement) applyViewContext(context,{canManage:app.auth.isParent});
+  else applyViewContext(context);
+  if(!selectedStudent) throw new Error('Geen leerling geselecteerd.');
+}
 
-    const goHome = () => { window.location.href = `dashboard.html?student=${encodeURIComponent(selectedStudent)}`; };
-    const goLessons = () => { window.location.href = `lessons.html?student=${encodeURIComponent(selectedStudent)}`; };
+mountPacoPageTemplate({mount,backLabel:'← Terug',backAction:()=>window.history.length>1?window.history.back():goHome(),greeting:`Hoi ${selectedStudent}! 🐶`,title:'Mijn lessen',icon:'📚',subtitle:context.isManagement?'Beheerweergave — je kunt hier leerlinggebonden lessen beheren.':'Kies een vak en open daarna de les die je wilt doen.',navigation:createPacoNavigation({active:'lessons',student:selectedStudent,viewMode:context.mode,includeManagement:true}),content});
 
-    const state = document.createElement('div');
-    state.className = 'lessons-state';
-    state.textContent = 'Lessen laden…';
-    content.appendChild(state);
-
-    mountPacoPageTemplate({
-      mount,
-      backLabel:'← Terug',
-      backAction:() => window.history.length > 1 ? window.history.back() : goHome(),
-      greeting:`Hoi ${selectedStudent}! 🐶`,
-      title:'Mijn lessen',
-      icon:'📚',
-      subtitle:'Kies een vak en open daarna de les die je wilt doen.',
-      navigation:createPacoNavigation({ active:'lessons', student:selectedStudent }),
-      content
-    });
-
-    function lessonTarget(lesson){
-      const target = new URL('lesson-choice.html',window.location.href);
-      target.searchParams.set('lesson_id',String(lesson.id));
-      target.searchParams.set('student',selectedStudent);
-      return target.toString();
-    }
-
-    function renderLessonCard(lesson){
-      const card=document.createElement('a');
-      card.className='paco-lesson-card lesson-card';
-      card.draggable=true;
-      card.dataset.lessonId=String(lesson.id);
-      card.href=lessonTarget(lesson);
-      const count=Array.isArray(lesson.items)?lesson.items.length:0;
-      const heading=document.createElement('h2');
-      heading.textContent=lesson.title || 'Naamloze les';
-      const subvak=document.createElement('p');
-      subvak.textContent=lesson.subvak || 'Les';
-      const meta=document.createElement('div');
-      meta.className='lesson-meta';
-      const countBadge=document.createElement('span');
-      countBadge.className='lesson-badge';
-      countBadge.textContent=`${count} ${count===1?'item':'items'}`;
-      meta.appendChild(countBadge);
-      if(lesson.type){
-        const typeBadge=document.createElement('span');
-        typeBadge.className='lesson-badge';
-        typeBadge.textContent=lesson.type;
-        meta.appendChild(typeBadge);
-      }
-      card.append(heading,subvak,meta);
-      return card;
-    }
-
-    async function render(records){
-      const grouped = getLessonSubjectGroups(app.mapLessons(records), selectedStudent);
-
-      content.replaceChildren();
-      if(!selectedSubject){
-        const heading = document.createElement('h2');
-        heading.className='section-title';
-        heading.textContent='Kies een vak';
-        const grid=document.createElement('div');
-        grid.className='subject-grid';
-        grouped.forEach(subject=>{
-          const card=document.createElement('button');
-          card.type='button';
-          card.className='paco-subject-card';
-          card.innerHTML=`<div class="subject-icon">${getLessonSubjectIcon(subject.label)}</div><h2>${subject.label}</h2><p>${subject.lessons.length} ${subject.lessons.length===1?'les':'lessen'}</p>`;
-          card.addEventListener('click',()=>{
-            const url=new URL(window.location.href);
-            url.searchParams.set('subject',subject.label);
-            window.location.href=url.toString();
-          });
-          grid.appendChild(card);
-        });
-        content.append(heading,grid);
-        if(!grid.children.length){
-          const empty=document.createElement('div');
-          empty.className='lessons-state';
-          empty.textContent=`Geen actieve lessen gevonden voor ${selectedStudent}.`;
-          content.appendChild(empty);
-        }
-        return;
-      }
-
-      const key=normalizeLessonSubject(selectedSubject);
-      const subject=grouped.find(candidate=>candidate.key===key);
-      const lessonsForSubject=subject?.lessons || [];
-      const orderedLessons=await app.lessonOrder.getOrderedLessons(lessonsForSubject,selectedStudent,subject?.label || selectedSubject);
-
-      const header=document.createElement('div');
-      header.className='lessons-toolbar';
-      const heading=document.createElement('h2');
-      heading.className='section-title';
-      heading.textContent=subject?.label || selectedSubject;
-      const back=document.createElement('button');
-      back.type='button';
-      back.className='back-subjects';
-      back.textContent='← Alle vakken';
-      back.addEventListener('click',goLessons);
-      header.append(heading,back);
-
-      content.append(header);
-      const groups=getLessonSubvakGroups(orderedLessons);
-      groups.forEach(group=>{
-        const section=document.createElement('section');
-        section.className='subvak-section';
-        const title=document.createElement('h3');
-        title.className=`subvak-title${group.key==='__geen_subvak__'?' muted':''}`;
-        title.textContent=`${group.key==='__geen_subvak__'?'📚':'📁'} ${group.label}`;
-        const grid=document.createElement('div');
-        grid.className='lesson-grid';
-        group.lessons.forEach(lesson=>grid.appendChild(renderLessonCard(lesson)));
-        section.append(title,grid);
-        content.appendChild(section);
-      });
-
-      if(!groups.length){
-        const empty=document.createElement('div');
-        empty.className='lessons-state';
-        empty.textContent='Geen actieve lessen gevonden in dit vak.';
-        content.appendChild(empty);
-        return;
-      }
-
-      const lessonById=new Map(orderedLessons.map(lesson=>[Number(lesson.id),lesson]));
-      attachLessonDragSorting(content, {
-        selector: '.lesson-card[data-lesson-id][draggable="true"]',
-        onOrderChange: async ({ orderedIds }) => {
-          const reorderedLessons=orderedIds.map(id=>lessonById.get(id)).filter(Boolean);
-          await app.lessonOrder.writeOrder(
-            selectedStudent,
-            subject?.label || selectedSubject,
-            reorderedLessons,
-            { persistRemote:false }
-          );
-        },
-        onError: async error => {
-          console.error('Lessons reorder error:',error);
-          await render(records);
-        }
-      });
-    }
-
-    try{
-      const records=await app.loadLessons();
-      await render(records);
-    }catch(error){
-      console.error('Lessons page load error:',error);
-      content.replaceChildren(state);
-      state.textContent='De lessen konden niet worden geladen.';
-    }
-  </script>
-</body>
-</html>
+function lessonTarget(lesson){const target=new URL('lesson-choice.html',window.location.href);target.searchParams.set('lesson_id',String(lesson.id));target.searchParams.set('viewStudent',selectedStudent);if(context.isManagement)target.searchParams.set('mode','management');return target.toString();}
+function renderLessonCard(lesson){
+  const wrap=document.createElement('div'); wrap.className='paco-lesson-card lesson-card'; wrap.draggable=true; wrap.dataset.lessonId=String(lesson.id);
+  const card=document.createElement('a'); card.href=lessonTarget(lesson); card.style.display='block'; card.style.color='inherit'; card.style.textDecoration='none';
+  const count=Array.isArray(lesson.items)?lesson.items.length:0; const heading=document.createElement('h2');heading.textContent=lesson.title||'Naamloze les';const subvak=document.createElement('p');subvak.textContent=lesson.subvak||'Les';const meta=document.createElement('div');meta.className='lesson-meta';const badge=document.createElement('span');badge.className='lesson-badge';badge.textContent=`${count} ${count===1?'item':'items'}`;meta.appendChild(badge);if(lesson.type){const type=document.createElement('span');type.className='lesson-badge';type.textContent=lesson.type;meta.appendChild(type)}card.append(heading,subvak,meta);wrap.appendChild(card);
+  if(context.isManagement){const actions=document.createElement('div');actions.className='lesson-management-actions';const archive=document.createElement('button');archive.type='button';archive.textContent='Archiveren';archive.addEventListener('click',async event=>{event.preventDefault();event.stopPropagation();await app.management.archiveLesson(lesson.id);await render(currentRecords)});const trash=document.createElement('button');trash.type='button';trash.className='danger';trash.textContent='Prullenbak';trash.addEventListener('click',async event=>{event.preventDefault();event.stopPropagation();await app.management.moveToTrash(lesson.id);await render(currentRecords)});actions.append(archive,trash);wrap.appendChild(actions)}
+  return wrap;
+}
+let currentRecords=[];
+async function render(records){
+  currentRecords=records;
+  const grouped=getLessonSubjectGroups(app.mapLessons(records),selectedStudent); content.replaceChildren();
+  if(!selectedSubject){const heading=document.createElement('h2');heading.className='section-title';heading.textContent='Kies een vak';const grid=document.createElement('div');grid.className='subject-grid';grouped.forEach(subject=>{const card=document.createElement('button');card.type='button';card.className='paco-subject-card';card.innerHTML=`<div class="subject-icon">${getLessonSubjectIcon(subject.label)}</div><h2>${subject.label}</h2><p>${subject.lessons.length} ${subject.lessons.length===1?'les':'lessen'}</p>`;card.addEventListener('click',()=>{const url=new URL(window.location.href);url.searchParams.set('subject',subject.label);window.location.href=url.toString()});grid.appendChild(card)});content.append(heading,grid);if(!grid.children.length){const empty=document.createElement('div');empty.className='lessons-state';empty.textContent=`Geen actieve lessen gevonden voor ${selectedStudent}.`;content.appendChild(empty)}return}
+  const key=normalizeLessonSubject(selectedSubject);const subject=grouped.find(candidate=>candidate.key===key);const lessonsForSubject=subject?.lessons||[];const orderedLessons=await app.lessonOrder.getOrderedLessons(lessonsForSubject,selectedStudent,subject?.label||selectedSubject);
+  const header=document.createElement('div');header.className='lessons-toolbar';const heading=document.createElement('h2');heading.className='section-title';heading.textContent=subject?.label||selectedSubject;const back=document.createElement('button');back.type='button';back.className='back-subjects';back.textContent='← Alle vakken';back.addEventListener('click',goLessons);header.append(heading,back);content.append(header);
+  const groups=getLessonSubvakGroups(orderedLessons);groups.forEach(group=>{const section=document.createElement('section');section.className='subvak-section';const title=document.createElement('h3');title.className=`subvak-title${group.key==='__geen_subvak__'?' muted':''}`;title.textContent=`${group.key==='__geen_subvak__'?'📚':'📁'} ${group.label}`;const grid=document.createElement('div');grid.className='lesson-grid';group.lessons.forEach(lesson=>grid.appendChild(renderLessonCard(lesson)));section.append(title,grid);content.appendChild(section)});
+  if(!groups.length){const empty=document.createElement('div');empty.className='lessons-state';empty.textContent='Geen actieve lessen gevonden in dit vak.';content.appendChild(empty);return}
+  const lessonById=new Map(orderedLessons.map(lesson=>[Number(lesson.id),lesson]));attachLessonDragSorting(content,{selector:'.lesson-card[data-lesson-id][draggable="true"]',onOrderChange:async({orderedIds})=>{const reorderedLessons=orderedIds.map(id=>lessonById.get(id)).filter(Boolean);await (context.isManagement?app.management.saveLessonOrder(subject?.label||selectedSubject,reorderedLessons):app.lessonOrder.writeOrder(selectedStudent,subject?.label||selectedSubject,reorderedLessons,{persistRemote:false}))},onError:async error=>{console.error('Lessons reorder error:',error);await render(records)}});
+}
+try{await initialize();const records=await app.loadLessons();await render(records)}catch(error){console.error('Lessons page load error:',error);content.replaceChildren(state);state.textContent=error.message==='Geen leerling geselecteerd.'?'Selecteer eerst een leerling vanuit Beheer.':'De lessen konden niet worden geladen.'}
+</script></body></html>

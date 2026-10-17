@@ -60,19 +60,18 @@
     import { mountPacoPageTemplate } from './src/components/page-template.js';
     import { createPacoNavigation } from './src/components/page-navigation.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
-    import { setStudent } from './src/core/state.js';
+    import { readViewContext, applyViewContext, buildViewUrl } from './src/core/view-context.js';
     import { getDashboardSubjects, getDashboardProgress, getDashboardSubjectIcon, getDashboardAgendaItems } from './src/features/dashboard/view-model.js';
-    import { listStudents, isKnownStudent } from './src/features/students/students.js';
+    import { listStudents } from './src/features/students/students.js';
 
-    const params = new URLSearchParams(window.location.search);
-    const requestedStudent = params.get('student') || '';
-    const selectedStudent = isKnownStudent(requestedStudent) ? requestedStudent : '';
+    const context = readViewContext(new URLSearchParams(window.location.search));
+    const selectedStudent = context.student;
     const templateMount = document.querySelector('#paco-template-mount');
     const chooserMount = document.querySelector('#paco-chooser-mount');
     const app = createPacoGOApp({ supabaseLib: window.supabase });
 
     const goChooser = () => { window.location.href = 'dashboard.html'; };
-    const goLessons = () => { window.location.href = `lessons.html?student=${encodeURIComponent(selectedStudent)}`; };
+    const goLessons = () => { window.location.href = buildViewUrl('lessons.html', { student: selectedStudent, mode: context.mode }).toString(); };
 
     const content = document.createElement('div');
     content.className = 'dashboard-page';
@@ -107,7 +106,7 @@
       listStudents().forEach(student => {
         const link = document.createElement('a');
         link.className = 'dashboard-chooser-student';
-        link.href = `dashboard.html?student=${encodeURIComponent(student)}`;
+        link.href = buildViewUrl('dashboard.html', { student, mode: 'student' }).toString();
         link.setAttribute('aria-label', `Dashboard van ${student}`);
 
         const name = document.createElement('span');
@@ -140,7 +139,7 @@
         title: 'Dashboard',
         icon: '🏠',
         subtitle: 'Bekijk je lessen en zie hoe je ervoor staat.',
-        navigation: createPacoNavigation({ active: 'dashboard', student: selectedStudent, hideActive: true }),
+        navigation: createPacoNavigation({ active: 'dashboard', student: selectedStudent, viewMode: context.mode, hideActive: true }),
         content
       });
 
@@ -152,9 +151,8 @@
 
       function agendaItemTarget(item) {
         if (!item.lessonId) return '';
-        const target = new URL('lesson-choice.html', window.location.href);
+        const target = buildViewUrl('lesson-choice.html', { student: selectedStudent, mode: context.mode });
         target.searchParams.set('lesson_id', String(item.lessonId));
-        target.searchParams.set('student', selectedStudent);
         return target.toString();
       }
 
@@ -250,7 +248,9 @@
           meta.textContent = `${count} ${count === 1 ? 'les' : 'lessen'} · Bekijk →`;
           card.append(icon, title, meta);
           card.addEventListener('click', () => {
-            window.location.href = `lessons.html?student=${encodeURIComponent(selectedStudent)}&subject=${encodeURIComponent(subject.label)}`;
+            const target = buildViewUrl('lessons.html', { student: selectedStudent, mode: context.mode });
+            target.searchParams.set('subject', subject.label);
+            window.location.href = target.toString();
           });
           subjectGrid.appendChild(card);
         });
@@ -289,7 +289,9 @@
       state.className = 'dashboard-state';
       state.textContent = 'Dashboard laden…';
       content.appendChild(state);
-      setStudent(selectedStudent);
+
+      applyViewContext(context);
+
       app.loadLessons()
         .then(records => render(records))
         .catch(error => {

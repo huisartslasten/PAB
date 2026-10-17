@@ -62,10 +62,10 @@
       navigation:createPacoNavigation({
         active:'management',
         includeCreator:true,
-        managementSubmenu:[
-          {key:'archive',label:'Archief',onClick:()=>scrollToSection('beheer-archief')},
-          {key:'trash',label:'Prullenbak',onClick:()=>scrollToSection('beheer-prullenbak')},
-          {key:'feedback',label:'Feedback',onClick:()=>scrollToSection('beheer-feedback')}
+        managementSections:[
+          {key:'archive',icon:'🗂️',label:'Archief',onClick:()=>scrollToSection('beheer-archief')},
+          {key:'trash',icon:'🗑️',label:'Prullenbak',onClick:()=>scrollToSection('beheer-prullenbak')},
+          {key:'feedback',icon:'💬',label:'Feedback',onClick:()=>scrollToSection('beheer-feedback')}
         ]
       }),
       content

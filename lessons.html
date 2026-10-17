@@ -12,11 +12,9 @@
     .lessons-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
     .lessons-state{padding:16px 18px;border:1px solid #dce9f6;border-radius:18px;background:#fff;color:#667894}
     .subject-grid,.lesson-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px}
-    .lesson-card{display:block;border:1px solid #dce9f6;border-radius:20px;background:#fff;box-shadow:0 8px 22px rgba(16,43,87,.07);padding:18px;text-align:left;cursor:pointer;transition:.16s;color:inherit;text-decoration:none}
-    .lesson-card:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(16,43,87,.11)}
-    .subject-card h2,.lesson-card h2{margin:0;color:#102b57;font:800 21px/1.1 "Baloo 2",Nunito,sans-serif}
-    .subject-card p,.lesson-card p{margin:7px 0 0;color:#667894;line-height:1.4}
-    .lesson-card{min-height:145px}
+    .lesson-card{display:block;padding:18px;text-align:left;color:inherit;text-decoration:none;min-height:145px}
+    .lesson-card h2{margin:0;color:#102b57;font:800 21px/1.1 "Baloo 2",Nunito,sans-serif}
+    .lesson-card p{margin:7px 0 0;color:#667894;line-height:1.4}
     .lesson-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
     .lesson-badge{padding:5px 9px;border-radius:999px;background:#eaf4ff;color:#126fc9;font-size:11px;font-weight:900}
     .section-title{margin:0 0 12px;font:800 25px/1.1 "Baloo 2",Nunito,sans-serif;color:#102b57}
@@ -34,6 +32,7 @@
     import { mountPacoPageTemplate } from './src/components/page-template.js';
     import { createPacoNavigation } from './src/components/page-navigation.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
+    import { attachLessonDragSorting } from './src/features/lessons/lesson-drag-sort.js';
     import { getLessonSubjectGroups, getLessonSubjectIcon, getLessonSubvakGroups, normalizeLessonSubject } from './src/features/lessons/list-view-model.js';
 
     const params = new URLSearchParams(window.location.search);
@@ -74,7 +73,9 @@
 
     function renderLessonCard(lesson){
       const card=document.createElement('a');
-      card.className='lesson-card';
+      card.className='paco-lesson-card lesson-card';
+      card.draggable=true;
+      card.dataset.lessonId=String(lesson.id);
       card.href=lessonTarget(lesson);
       const count=Array.isArray(lesson.items)?lesson.items.length:0;
       const heading=document.createElement('h2');
@@ -166,7 +167,26 @@
         empty.className='lessons-state';
         empty.textContent='Geen actieve lessen gevonden in dit vak.';
         content.appendChild(empty);
+        return;
       }
+
+      const lessonById=new Map(orderedLessons.map(lesson=>[Number(lesson.id),lesson]));
+      attachLessonDragSorting(content, {
+        selector: '.lesson-card[data-lesson-id][draggable="true"]',
+        onOrderChange: async ({ orderedIds }) => {
+          const reorderedLessons=orderedIds.map(id=>lessonById.get(id)).filter(Boolean);
+          await app.lessonOrder.writeOrder(
+            selectedStudent,
+            subject?.label || selectedSubject,
+            reorderedLessons,
+            { persistRemote:false }
+          );
+        },
+        onError: async error => {
+          console.error('Lessons reorder error:',error);
+          await render(records);
+        }
+      });
     }
 
     try{

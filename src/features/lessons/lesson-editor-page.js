@@ -224,7 +224,6 @@ function applyVisibility(root, type) {
 
 function populateEditor(root, lesson, calendarDate = '') {
   const type = lesson?.type || 'words';
-  root.querySelector('[data-title]').textContent = lesson ? 'Les bewerken' : 'Nieuwe les';
   root.querySelector('[data-editor-title]').textContent = lesson ? '🐾 LES BEWERKEN' : '🐾 NIEUWE LES';
   root.querySelector('#lessonSubject').value = lesson?.subject || '';
   root.querySelector('#lessonSubvak').value = lesson?.subvak || '';

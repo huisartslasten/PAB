@@ -16,7 +16,9 @@ async function expectCanonicalShell(page, path, title) {
 test('dashboard page uses the canonical shell for a selected student', async ({ page }) => {
   await expectCanonicalShell(page, 'dashboard.html?student=Zyon', 'Dashboard');
   await expect(page.locator('.dashboard-page')).toBeVisible();
-  await expect(page.locator('.dashboard-student')).toHaveText('Leerling: Zyon');
+  await expect(page.locator('.dashboard-student')).toHaveCount(0);
+  await expect(page.getByText('Andere leerling', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('Jouw voortgang', { exact: true })).toHaveCount(0);
 });
 
 test('dashboard page owns the canonical student chooser', async ({ page }) => {

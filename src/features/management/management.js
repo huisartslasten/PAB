@@ -1,4 +1,4 @@
-import { appState, setStudent } from '../../core/state.js';
+import { appState, getParentSelectedStudent, setParentSelectedStudent } from '../../core/state.js';
 import { getActiveStudentLessons, getStudentLessons } from '../lessons/visibility.js';
 import { createLessonRecovery, createTrashRecovery } from '../lessons/recovery.js';
 import { getAllArchiveEntries, getAllTrashEntries } from './recovery.js';
@@ -9,8 +9,8 @@ function requireParent(auth) {
 }
 
 function requireStudent() {
-  if (!appState.currentStudent) throw new Error('A student must be selected.');
-  return appState.currentStudent;
+  if (!appState.parentSelectedStudent) throw new Error('A student must be selected.');
+  return appState.parentSelectedStudent;
 }
 
 function findScopedLesson(id, student) {
@@ -54,7 +54,7 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
     assertParent();
     const value = String(student ?? '').trim();
     if (!value || !isKnownStudent(value)) throw new Error('A known student must be selected.');
-    setStudent(value);
+    setParentSelectedStudent(value);
     return value;
   }
 
@@ -65,7 +65,7 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
 
   function getSelectedStudent() {
     assertParent();
-    return appState.currentStudent;
+    return getParentSelectedStudent();
   }
 
   function getScopedLessons() {
@@ -113,7 +113,7 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
   async function moveLessonToSubvak(id, subvak = '') {
     assertParent();
     const student = requireStudent();
-    const lesson = findScopedLesson(id, student);
+    findScopedLesson(id, student);
     const value = String(subvak ?? '').trim();
     const result = await lessonService.updateLesson(id, { subvak: value, student });
     await refreshLessons();

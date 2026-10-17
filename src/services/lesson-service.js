@@ -26,6 +26,23 @@ function normalizeLessonItems(items = []) {
 export function createLessonService(db) {
   if (!db) throw new Error('A Supabase client is required.');
 
+  async function permanentlyDelete(id) {
+    const { error: attemptsError } = await db
+      .from('test_attempts')
+      .delete()
+      .eq('lesson_id', id);
+    if (attemptsError) throw attemptsError;
+
+    const { data, error } = await db
+      .from('lessons')
+      .delete()
+      .eq('id', id)
+      .select('id');
+    if (error) throw error;
+
+    return (data || []).length;
+  }
+
   return {
     async listAll() {
       const { data, error } = await db
@@ -125,6 +142,10 @@ export function createLessonService(db) {
       if (error) throw error;
     },
 
+    async permanentlyDelete(id) {
+      return permanentlyDelete(id);
+    },
+
     async emptyTrash() {
       const { data: trashedLessons, error: listError } = await db
         .from('lessons')
@@ -135,22 +156,11 @@ export function createLessonService(db) {
       const lessonIds = (trashedLessons || []).map(lesson => lesson.id);
       if (!lessonIds.length) return 0;
 
-      // Test history is intentionally retained for archived lessons, but the user's
-      // permanent-delete policy explicitly removes it when a lesson leaves the trash.
-      const { error: attemptsError } = await db
-        .from('test_attempts')
-        .delete()
-        .in('lesson_id', lessonIds);
-      if (attemptsError) throw attemptsError;
-
-      const { data: deletedLessons, error: deleteError } = await db
-        .from('lessons')
-        .delete()
-        .in('id', lessonIds)
-        .select('id');
-      if (deleteError) throw deleteError;
-
-      return (deletedLessons || []).length;
+      let deletedCount = 0;
+      for (const lessonId of lessonIds) {
+        deletedCount += await permanentlyDelete(lessonId);
+      }
+      return deletedCount;
     }
   };
 }

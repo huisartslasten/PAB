@@ -1,13 +1,25 @@
-// Lesson data boundary. This is the first domain service extracted from the monolith.
-// It intentionally mirrors the existing V4.78 query shape so behavior can be regression-tested
-// before the old implementation is removed.
+// Lesson data boundary. This is the canonical persistence service for lessons.
+// The TEST schema currently stores only the columns exposed below; domain/editor
+// models may contain richer fields, but persistence must never send unsupported
+// columns to Supabase.
+
+function normalizeLessonPayload(payload = {}) {
+  return {
+    student: payload.student ?? null,
+    subject: payload.subject ?? '',
+    title: payload.title ?? '',
+    type: payload.type ?? '',
+    sort_order: Number(payload.sort_order ?? 0),
+    archived: Boolean(payload.archived ?? false),
+    deleted: Boolean(payload.deleted ?? false)
+  };
+}
 
 function normalizeLessonItems(items = []) {
-  return (Array.isArray(items) ? items : []).map(item => ({
-    ...item,
-    hint: item.hint || '',
-    min_words: Number(item.min_words || 0),
-    required_terms: Array.isArray(item.required_terms) ? item.required_terms : []
+  return (Array.isArray(items) ? items : []).map((item, index) => ({
+    question: String(item.question ?? ''),
+    answer: String(item.answer ?? ''),
+    sort_order: Number(item.sort_order ?? index)
   }));
 }
 
@@ -34,7 +46,7 @@ export function createLessonService(db) {
     async createLesson(payload) {
       const { data, error } = await db
         .from('lessons')
-        .insert(payload)
+        .insert(normalizeLessonPayload(payload))
         .select()
         .single();
       if (error) throw error;
@@ -59,8 +71,7 @@ export function createLessonService(db) {
         if (error) throw error;
         return Object.freeze({ lesson, items: data || [] });
       } catch (error) {
-        // Preserve the existing V4.78 create -> item insert -> rollback contract.
-        // Lesson persistence owns this transaction-like sequence; callers do not.
+        // Lesson persistence owns the existing create -> item insert -> rollback sequence.
         await db.from('lessons').delete().eq('id', lesson.id);
         throw error;
       }
@@ -69,7 +80,7 @@ export function createLessonService(db) {
     async updateLesson(id, payload) {
       const { data, error } = await db
         .from('lessons')
-        .update(payload)
+        .update(normalizeLessonPayload(payload))
         .eq('id', id)
         .select()
         .single();

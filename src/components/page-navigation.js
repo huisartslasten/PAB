@@ -23,6 +23,7 @@ export function createPacoNavigation({
   includeManagement = true,
   includeManagementTools = false,
   includeCreator = false,
+  includeLessons = true,
   includeAgenda = true,
   includeAccount = true,
   hideActive = false
@@ -45,10 +46,11 @@ export function createPacoNavigation({
     });
   }
 
-  items.push(
-    { key: 'dashboard', icon: '🏠', label: 'Dashboard', onClick: () => go('dashboard.html', view) },
-    { key: 'lessons', icon: '📚', label: 'Mijn lessen', onClick: () => go('lessons.html', view) }
-  );
+  items.push({ key: 'dashboard', icon: '🏠', label: 'Dashboard', onClick: () => go('dashboard.html', view) });
+
+  if (includeLessons) {
+    items.push({ key: 'lessons', icon: '📚', label: 'Mijn lessen', onClick: () => go('lessons.html', view) });
+  }
 
   if (includeAgenda) {
     items.push({

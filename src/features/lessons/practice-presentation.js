@@ -187,15 +187,16 @@ export function createPracticePresentation({
   function renderFeedback(result, item, answer) {
     const content = elements().content;
     if (!content) return;
+    const type = entry?.runtime?.type || '';
     const fixed = result.evaluation?.fixedRules;
     const fixedHtml = fixed?.results?.length
       ? `<div class="practice-rule-results"><strong>Vaste beoordelingsregels</strong><br>${fixed.results.map(rule => `${rule.ok ? '✓ ' : '✗ '}${escapeHtml(rule.text)}`).join('<br>')}</div>`
       : '';
     const review = `<div class="practice-answer-review"><div class="practice-answer-review-title">Jouw antwoord:</div><div class="practice-answer-review-text">${escapeHtml(answer || '—')}</div>${fixedHtml}</div>`;
-    const correctAnswer = correctAnswerHtml(item, result.evaluation?.type || '', escapeHtml);
+    const correctAnswer = correctAnswerHtml(item, type, escapeHtml);
     const extra = itemExtraInfo(item, escapeHtml);
     const feedback = result.correct
-      ? `<div class="feedback correct">${item?.type === 'spelling' ? '✅ Beide goed!' : '✅ Goed!'} ${escapeHtml(result.evaluation?.feedback || '')}</div>${extra}`
+      ? `<div class="feedback correct">${type === 'spelling' ? '✅ Beide goed!' : '✅ Goed!'} ${escapeHtml(result.evaluation?.feedback || '')}</div>${extra}`
       : `<div class="feedback incorrect">❌ ${result.evaluation?.feedback ? escapeHtml(result.evaluation.feedback) : 'Nog niet helemaal. Dit item komt later opnieuw terug.'}</div>${extra}`;
     const next = documentRef.createElement('button');
     next.className = 'success';

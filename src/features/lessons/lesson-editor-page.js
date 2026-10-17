@@ -288,7 +288,7 @@ function ensureAutomaticTrailingRow(root, type, row) {
   if (!container || row !== container.lastElementChild || !rowHasQuestion(row) || !rowHasAnswer(row)) return;
   const data = rowTemplateData(row);
   const created = addRow(root, type, data);
-  if (created) created.querySelector('input,textarea')?.focus();
+  if (created) created.dataset.automatic = 'true';
 }
 
 export function createLessonEditorPage({ root, runtime, initialLesson = null, student = '' } = {}) {
@@ -354,6 +354,7 @@ export function createLessonEditorPage({ root, runtime, initialLesson = null, st
       if (select) select.value = button.dataset.role;
       if (display) { display.classList.toggle('role-extra', button.dataset.role === 'extra'); display.querySelector('span').textContent = button.dataset.role === 'extra' ? 'Wordt niet getoetst' : 'Wordt getoetst'; }
       row?.querySelector('.word-part-role-menu')?.classList.add('hidden');
+      if (row?.closest('.editor-row')) ensureAutomaticTrailingRow(root, root.querySelector('#lessonType').value, row.closest('.editor-row'));
       return;
     }
     if (button.dataset.dateShift) { datePickerMonth = new Date(datePickerMonth.getFullYear(), datePickerMonth.getMonth() + Number(button.dataset.dateShift), 1); renderDatePicker(root, root.querySelector('#lessonTestDate').value, datePickerMonth); return; }
@@ -371,10 +372,7 @@ export function createLessonEditorPage({ root, runtime, initialLesson = null, st
   });
 
   root.addEventListener('input', event => {
-    if (event.target.matches('.word-q-part, .word-a-part, .question-a-part, .dictation-a-part, .math-a-part, .spelling-a-part')) {
-      ensureAutomaticTrailingRow(root, root.querySelector('#lessonType').value, event.target.closest('.editor-row'));
-      return;
-    }
+    if (event.target.matches('.word-q-part')) return;
     if (!event.target.id.startsWith('spellingLabel')) return;
     const labels = getSpellingLabelsFromRow(root);
     root.querySelectorAll('.spelling-label-question').forEach(el => { el.textContent = labels.question; });

@@ -45,14 +45,14 @@
     const archive=document.createElement('section');
     archive.className='management-section';
     const archiveHeading=document.createElement('h2');
-    archiveHeading.textContent='Archief — per leerling';
+    archiveHeading.textContent='Archief';
     const archiveList=document.createElement('div');
     archive.append(archiveHeading,archiveList);
 
     const trash=document.createElement('section');
     trash.className='management-section';
     const trashHeading=document.createElement('h2');
-    trashHeading.textContent='Prullenbak — per leerling';
+    trashHeading.textContent='Prullenbak';
     const trashList=document.createElement('div');
     trash.append(trashHeading,trashList);
 
@@ -68,11 +68,23 @@
       await refreshRecovery();
     }
 
+    async function permanentlyDeleteLesson(lesson){
+      const confirmed=await confirmPacoAction({
+        title:'Les definitief verwijderen?',
+        message:`“${lesson.title}” wordt definitief verwijderd. De bijbehorende toetsgeschiedenis wordt ook verwijderd. Dit kan niet ongedaan worden gemaakt.`,
+        confirmLabel:'Definitief verwijderen',
+        cancelLabel:'Annuleren'
+      });
+      if(!confirmed)return;
+      await management.permanentlyDeleteRecoveryLesson(lesson.id);
+      await refreshRecovery();
+    }
+
     async function refreshRecovery(){
       archiveList.replaceChildren();
       trashList.replaceChildren();
       renderRecovery(archiveList,management,'archive',refreshRecovery);
-      renderRecovery(trashList,management,'trash',refreshRecovery,emptyTrash);
+      renderRecovery(trashList,management,'trash',refreshRecovery,emptyTrash,permanentlyDeleteLesson);
     }
 
     async function initialize(){

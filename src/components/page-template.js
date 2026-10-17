@@ -134,7 +134,7 @@ function createNavigationItem(item) {
     item.submenu.forEach(subitem => {
       const subbutton = document.createElement('button');
       subbutton.type = 'button';
-      subbutton.className = 'paco-template-nav-subitem' + (subitem.active ? ' active' : '');
+      subbutton.className = 'paco-template-nav-subitem' + (subitem.active ? ' active' : '') + (item.key === 'management-student' ? ' management-student' : '');
       subbutton.textContent = subitem.label || '';
       if (typeof subitem.onClick === 'function') subbutton.addEventListener('click', subitem.onClick);
       submenu.appendChild(subbutton);

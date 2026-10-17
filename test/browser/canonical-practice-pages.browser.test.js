@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { PACOGO_TEST_VERSION } from '../../src/components/page-template.js';
 
 const baseUrl = 'http://127.0.0.1:4173';
-const expectedVersionBadge = `PacoGO TEST ${PACOGO_TEST_VERSION}`;
+const expectedVersionBadge = PACOGO_TEST_VERSION;
 
 async function expectCanonicalShell(page, path, title) {
   await page.goto(`${baseUrl}/${path}`);

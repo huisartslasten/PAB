@@ -47,11 +47,17 @@ export function createLessonRecovery({ lessonService, refresh = async () => {} }
 export function createTrashRecovery({ lessonService, refresh = async () => {} } = {}) {
   if (!lessonService) throw new Error('createTrashRecovery requires lessonService');
 
+  async function permanentlyDelete(id) {
+    const deletedCount = await lessonService.permanentlyDelete(id);
+    await refresh();
+    return deletedCount;
+  }
+
   async function emptyTrash() {
     const deletedCount = await lessonService.emptyTrash();
     await refresh();
     return deletedCount;
   }
 
-  return Object.freeze({ emptyTrash });
+  return Object.freeze({ permanentlyDelete, emptyTrash });
 }

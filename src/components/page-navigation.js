@@ -48,11 +48,16 @@ export function createPacoNavigation({
 
   items.push({ key: 'dashboard', icon: '🏠', label: 'Dashboard', onClick: () => go('dashboard.html', view) });
 
-  if (includeLessons) {
+  // The management dashboard is a distinct navigation context. It does not
+  // expose student-owned "Mijn lessen" or "Mijn agenda" entry points; those
+  // remain available throughout the canonical student environment.
+  const includeStudentNavigation = !includeManagementStudentSelector;
+
+  if (includeLessons && includeStudentNavigation) {
     items.push({ key: 'lessons', icon: '📚', label: 'Mijn lessen', onClick: () => go('lessons.html', view) });
   }
 
-  if (includeAgenda) {
+  if (includeAgenda && includeStudentNavigation) {
     items.push({
       key: 'agenda', icon: '📅', label: 'Mijn agenda', onClick: () => go('agenda.html', view),
       submenu: [

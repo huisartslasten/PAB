@@ -2,6 +2,7 @@ import {
   getLessonSubvakGroups,
   normalizeLessonSubvak
 } from '../lessons/list-view-model.js';
+import { attachLessonDragSorting } from '../lessons/lesson-drag-sort.js';
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -48,11 +49,6 @@ export function renderStudentSelection(container, management, onSelect = () => {
   });
 
   return students;
-}
-
-function clearDragState(container) {
-  container.querySelectorAll('.management-lesson.dragging,.management-lesson.drag-over,.management-subvak.drop-active')
-    .forEach(element => element.classList.remove('dragging', 'drag-over', 'drop-active'));
 }
 
 async function persistSubjectOrder(container, management, subject) {
@@ -123,57 +119,26 @@ export async function renderStudentLessons(container, management, { onEdit = nul
     });
   });
 
-  container.querySelectorAll('.management-lesson').forEach(card => {
-    card.addEventListener('dragstart', event => {
-      event.dataTransfer.effectAllowed = 'move';
-      event.dataTransfer.setData('text/plain', card.dataset.lessonId);
-      card.classList.add('dragging');
-    });
-    card.addEventListener('dragover', event => {
-      event.preventDefault();
-      event.stopPropagation();
-      event.dataTransfer.dropEffect = 'move';
-      if (!card.classList.contains('dragging')) card.classList.add('drag-over');
-    });
-    card.addEventListener('dragleave', () => card.classList.remove('drag-over'));
-    card.addEventListener('drop', async event => {
-      event.preventDefault();
-      event.stopPropagation();
-      const sourceId = Number(event.dataTransfer.getData('text/plain'));
-      const targetId = Number(card.dataset.lessonId);
-      if (!sourceId || !targetId || sourceId === targetId) {
-        clearDragState(container);
-        return;
-      }
-      const source = container.querySelector(`[data-lesson-id="${sourceId}"]`);
-      const target = card;
+  attachLessonDragSorting(container, {
+    selector: '.management-lesson[data-lesson-id][draggable="true"]',
+    onOrderChange: async ({ sourceId, target }) => {
+      const sourceLesson = management.getScopedLessons().find(item => Number(item.id) === sourceId);
       const subjectBlock = target.closest('.management-subject');
       const subject = subjectBlock?.dataset.managementSubject;
-      if (!source || !subject) {
-        clearDragState(container);
-        return;
+      if (!subject) throw new Error('Lesson subject could not be determined.');
+
+      const targetSubvak = target.closest('.management-subvak')?.dataset.subvakLabel || 'Zonder subvak';
+      const newSubvak = targetSubvak === 'Zonder subvak' ? '' : targetSubvak;
+      if (normalizeLessonSubvak(sourceLesson?.subvak) !== normalizeLessonSubvak(newSubvak)) {
+        await management.moveLessonToSubvak(sourceId, newSubvak);
       }
-      try {
-        const sourceLesson = management.getScopedLessons().find(item => Number(item.id) === sourceId);
-        const targetSubvak = target.closest('.management-subvak')?.dataset.subvakLabel || 'Zonder subvak';
-        const newSubvak = targetSubvak === 'Zonder subvak' ? '' : targetSubvak;
-        if (normalizeLessonSubvak(sourceLesson?.subvak) !== normalizeLessonSubvak(newSubvak)) {
-          await management.moveLessonToSubvak(sourceId, newSubvak);
-        }
-        const rect = target.getBoundingClientRect();
-        if (event.clientY > rect.top + rect.height / 2) target.after(source);
-        else target.before(source);
-        await persistSubjectOrder(container, management, subject);
-        await renderStudentLessons(container, management, { onEdit, onArchive, onDelete });
-      } catch (error) {
-        console.error('Management lesson reorder error:', error);
-        await renderStudentLessons(container, management, { onEdit, onArchive, onDelete });
-        throw error;
-      } finally {
-        clearDragState(container);
-      }
-    });
-    card.addEventListener('dragend', () => clearDragState(container));
+
+      await persistSubjectOrder(container, management, subject);
+    },
+    onError: async error => {
+      console.error('Management lesson reorder error:', error);
+      await renderStudentLessons(container, management, { onEdit, onArchive, onDelete });
+    }
   });
 
   container.querySelectorAll('.management-subvak').forEach(block => {
@@ -194,10 +159,7 @@ export async function renderStudentLessons(container, management, { onEdit = nul
       const source = container.querySelector(`[data-lesson-id="${sourceId}"]`);
       const subjectBlock = block.closest('.management-subject');
       const subject = subjectBlock?.dataset.managementSubject;
-      if (!source || !subject) {
-        clearDragState(container);
-        return;
-      }
+      if (!source || !subject) return;
       try {
         const label = block.dataset.subvakLabel || 'Zonder subvak';
         await management.moveLessonToSubvak(sourceId, label === 'Zonder subvak' ? '' : label);
@@ -207,9 +169,6 @@ export async function renderStudentLessons(container, management, { onEdit = nul
       } catch (error) {
         console.error('Management lesson subvak move error:', error);
         await renderStudentLessons(container, management, { onEdit, onArchive, onDelete });
-        throw error;
-      } finally {
-        clearDragState(container);
       }
     });
   });

@@ -30,6 +30,7 @@
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
     import { createPacoNavigation } from './src/components/page-navigation.js';
+    import { confirmPacoAction } from './src/components/confirm-dialog.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
     import { renderStudentSelection, renderStudentLessons, renderRecovery, renderFeedback } from './src/features/management/management-view.js';
 
@@ -69,8 +70,8 @@
       await renderStudentLessons(lessons,management,{onEdit:openEditor,onArchive:archiveLesson,onDelete:deleteLesson});
       renderStudentSelection(students,management,student=>{showSelectedStudent(student).catch(error=>console.error('Management student load error:',error));});
     }
-    async function archiveLesson(lesson){if(!window.confirm(`Weet je zeker dat je de les “${lesson.title}” wilt archiveren?`))return;await management.archiveLesson(lesson.id);await showSelectedStudent(management.getSelectedStudent());await refreshRecovery();}
-    async function deleteLesson(lesson){if(!window.confirm(`Weet je zeker dat je de les “${lesson.title}” naar de prullenbak wilt verplaatsen?`))return;await management.moveToTrash(lesson.id);await showSelectedStudent(management.getSelectedStudent());await refreshRecovery();}
+    async function archiveLesson(lesson){const confirmed=await confirmPacoAction({title:'Les archiveren?',message:`Weet je zeker dat je de les “${lesson.title}” wilt archiveren?`,confirmLabel:'Archiveren',cancelLabel:'Annuleren'});if(!confirmed)return;await management.archiveLesson(lesson.id);await showSelectedStudent(management.getSelectedStudent());await refreshRecovery();}
+    async function deleteLesson(lesson){const confirmed=await confirmPacoAction({title:'Les verwijderen?',message:`Weet je zeker dat je de les “${lesson.title}” naar de prullenbak wilt verplaatsen?`,confirmLabel:'Verwijderen',cancelLabel:'Annuleren'});if(!confirmed)return;await management.moveToTrash(lesson.id);await showSelectedStudent(management.getSelectedStudent());await refreshRecovery();}
     async function refreshRecovery(){archive.replaceChildren();trash.replaceChildren();renderRecovery(archive,management,'archive',refreshRecovery);renderRecovery(trash,management,'trash',refreshRecovery);}
 
     async function initializeManagement(){

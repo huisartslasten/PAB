@@ -257,6 +257,36 @@ function showError(root, message) {
   error.classList.toggle('hidden', !message);
 }
 
+function rowHasQuestion(row) {
+  return [...row.querySelectorAll('.word-q-part')].some(input => text(input.value));
+}
+
+function rowTemplateData(row) {
+  const questionCount = Math.max(1, row.querySelectorAll('.word-q-part').length);
+  const answerInputs = [...row.querySelectorAll('.word-a-part, .question-a-part, .dictation-a-part, .math-a-part, .spelling-a-part')];
+  const answerParts = answerInputs.length
+    ? answerInputs.map(input => ({ text: '', role: input.closest('.word-part-row')?.querySelector('.word-part-role')?.value === 'extra' ? 'extra' : 'answer' }))
+    : [{ text: '', role: 'answer' }];
+  const rules = {
+    hint: row.querySelector('.word-item-hint')?.value.trim() || '',
+    min_words: Number(row.querySelector('.word-item-min-words')?.value || 0),
+    required_terms: (row.querySelector('.word-item-required-terms')?.value || '').split(',').map(text).filter(Boolean)
+  };
+  return {
+    questionParts: Array.from({ length: questionCount }, () => ''),
+    answerParts,
+    rules
+  };
+}
+
+function ensureAutomaticTrailingRow(root, type, row) {
+  const container = row?.parentElement;
+  if (!container || row !== container.lastElementChild || !rowHasQuestion(row)) return;
+  const data = rowTemplateData(row);
+  const created = addRow(root, type, data);
+  if (created) created.querySelector('input,textarea')?.focus();
+}
+
 export function createLessonEditorPage({ root, runtime, initialLesson = null, student = '' } = {}) {
   if (!root || typeof root !== 'object') throw new Error('Lesson editor page requires a root element.');
   if (!runtime || typeof runtime.save !== 'function') throw new Error('Lesson editor page requires a lesson editor runtime.');
@@ -337,6 +367,10 @@ export function createLessonEditorPage({ root, runtime, initialLesson = null, st
   });
 
   root.addEventListener('input', event => {
+    if (event.target.matches('.word-q-part')) {
+      ensureAutomaticTrailingRow(root, root.querySelector('#lessonType').value, event.target.closest('.editor-row'));
+      return;
+    }
     if (!event.target.id.startsWith('spellingLabel')) return;
     const labels = getSpellingLabelsFromRow(root);
     root.querySelectorAll('.spelling-label-question').forEach(el => { el.textContent = labels.question; });

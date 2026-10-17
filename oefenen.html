@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="src/components/page-template.css">
   <style>
     .practice-menu{display:grid;gap:20px}
-    .practice-context{padding:15px 17px;border-radius:18px;background:#eef8ff;color:#38577d;font-weight:800}
     .practice-mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
     .practice-mode-card{min-height:190px;border:2px solid #dce9f6;border-radius:22px;background:#fff;box-shadow:0 7px 20px rgba(16,43,87,.07);padding:20px;text-align:left;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;transition:.16s}
     .practice-mode-card:hover{transform:translateY(-2px);box-shadow:0 12px 27px rgba(16,43,87,.11)}
@@ -85,10 +84,6 @@
         return;
       }
 
-      const context=document.createElement('div');
-      context.className='practice-context';
-      context.textContent='Kies hieronder een oefenvorm.';
-
       const grid=document.createElement('div');
       grid.className='practice-mode-grid';
       getPracticeModes().forEach(mode=>{
@@ -102,7 +97,7 @@
         if(active && getActivePracticeModes().some(candidate=>candidate.id===mode.id)) card.addEventListener('click',()=>openMode(mode));
         grid.appendChild(card);
       });
-      content.append(context,grid);
+      content.appendChild(grid);
     }
 
     render();

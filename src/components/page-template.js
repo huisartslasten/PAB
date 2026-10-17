@@ -103,7 +103,7 @@ function createNavigationItem(item) {
 
   const button = document.createElement('button');
   button.type = 'button';
-  button.className = 'paco-template-nav-item' + (item.active ? ' active' : '');
+  button.className = 'paco-template-nav-item' + (item.active ? ' active' : '') + (item.key === 'management' ? ' management' : '');
 
   if (item.icon) {
     const iconElement = document.createElement('span');
@@ -281,8 +281,7 @@ export function createPacoPageTemplate({
 
   const versionBadge = document.createElement('div');
   versionBadge.className = 'paco-template-version-badge';
-  versionBadge.textContent = `PacoGO TEST ${testVersion}`;
-  versionBadge.setAttribute('aria-label', `PacoGO TEST ${testVersion}`);
+  versionBadge.textContent = testVersion;
   hero.appendChild(versionBadge);
   root.appendChild(hero);
 
@@ -292,28 +291,26 @@ export function createPacoPageTemplate({
   const sidebar = document.createElement('aside');
   sidebar.className = 'paco-template-sidebar';
 
-  const back = document.createElement('button');
-  back.type = 'button';
-  back.className = 'paco-template-back';
-  back.textContent = backLabel;
-  if (typeof backAction === 'function') back.addEventListener('click', backAction);
-  sidebar.appendChild(back);
+  const backButton = document.createElement('button');
+  backButton.type = 'button';
+  backButton.className = 'paco-template-back';
+  backButton.textContent = backLabel;
+  if (typeof backAction === 'function') backButton.addEventListener('click', backAction);
+  sidebar.appendChild(backButton);
 
   const sidebarCard = document.createElement('div');
   sidebarCard.className = 'paco-template-sidebar-card';
 
-  if (greeting) {
-    const greetingElement = document.createElement('div');
-    greetingElement.className = 'paco-template-greeting';
-    greetingElement.textContent = greeting;
-    sidebarCard.appendChild(greetingElement);
-  }
+  const greetingElement = document.createElement('div');
+  greetingElement.className = 'paco-template-greeting';
+  greetingElement.textContent = greeting;
+  sidebarCard.appendChild(greetingElement);
 
-  const nav = document.createElement('nav');
-  nav.className = 'paco-template-navigation';
-  navigation.forEach(item => nav.appendChild(createNavigationItem(item)));
-  sidebarCard.appendChild(nav);
-
+  const navigationElement = document.createElement('nav');
+  navigationElement.className = 'paco-template-navigation';
+  navigationElement.setAttribute('aria-label', 'PacoGO navigatie');
+  navigation.forEach(item => navigationElement.appendChild(createNavigationItem(item)));
+  sidebarCard.appendChild(navigationElement);
   sidebar.appendChild(sidebarCard);
   body.appendChild(sidebar);
 
@@ -322,25 +319,25 @@ export function createPacoPageTemplate({
 
   const pageHeader = document.createElement('header');
   pageHeader.className = 'paco-template-page-header';
+
   if (icon) {
-    const iconElement = document.createElement('span');
+    const iconElement = document.createElement('div');
     iconElement.className = 'paco-template-page-icon';
     iconElement.textContent = icon;
     pageHeader.appendChild(iconElement);
   }
 
-  const headingWrap = document.createElement('div');
-  headingWrap.className = 'paco-template-page-heading';
-  const heading = document.createElement('h1');
-  heading.textContent = title;
-  headingWrap.appendChild(heading);
+  const heading = document.createElement('div');
+  heading.className = 'paco-template-page-heading';
+  const titleElement = document.createElement('h1');
+  titleElement.textContent = title;
+  heading.appendChild(titleElement);
   if (subtitle) {
     const subtitleElement = document.createElement('p');
-    subtitleElement.className = 'paco-template-page-subtitle';
     subtitleElement.textContent = subtitle;
-    headingWrap.appendChild(subtitleElement);
+    heading.appendChild(subtitleElement);
   }
-  pageHeader.appendChild(headingWrap);
+  pageHeader.appendChild(heading);
   main.appendChild(pageHeader);
 
   const contentElement = document.createElement('section');
@@ -351,20 +348,13 @@ export function createPacoPageTemplate({
 
   body.appendChild(main);
   root.appendChild(body);
-
   return root;
 }
 
-export function mountPacoPageTemplate(options = {}) {
-  const mount = options.mount;
-  if (!(mount instanceof Element)) {
-    throw new Error('mountPacoPageTemplate requires a mount Element');
-  }
-
-  const templateOptions = { ...options };
-  delete templateOptions.mount;
-  const root = createPacoPageTemplate(templateOptions);
-  mount.replaceChildren(root);
+export function mountPacoPageTemplate({ mount, ...options } = {}) {
+  if (!mount) throw new Error('mountPacoPageTemplate requires a mount element');
+  const template = createPacoPageTemplate(options);
+  mount.replaceChildren(template);
   installPacoTemplateScrollMemory();
-  return root;
+  return template;
 }

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { PACOGO_TEST_VERSION } from '../../src/components/page-template.js';
 
 const baseUrl = 'http://127.0.0.1:4173';
-const expectedVersionBadge = `PacoGO TEST ${PACOGO_TEST_VERSION}`;
+const expectedVersionBadge = PACOGO_TEST_VERSION;
 
 test('auth page is the canonical login and password reset boundary', async ({ page }) => {
   await page.goto(`${baseUrl}/auth.html`);

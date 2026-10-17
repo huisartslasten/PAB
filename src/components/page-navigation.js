@@ -1,18 +1,14 @@
 /**
  * PacoGO shared shell navigation.
  *
- * The page template owns the visual navigation surface; this module owns the
- * shared PacoGO route map. Pages provide only context (active route/student)
- * and never define the navigation structure themselves.
+ * This module owns the shared route map and serializes the canonical student
+ * view context. Pages provide only active-route and view-context information.
  */
 
-function go(path, student = '', parentStudent = '') {
+function go(path, { student = '', mode = 'student' } = {}) {
   const target = new URL(path, window.location.href);
-  if (student) target.searchParams.set('student', student);
-  if (parentStudent) {
-    target.searchParams.set('parentStudent', parentStudent);
-    target.searchParams.set('context', 'management');
-  }
+  if (student) target.searchParams.set('viewStudent', student);
+  if (mode === 'management' && student) target.searchParams.set('mode', 'management');
   window.location.href = target.toString();
 }
 
@@ -20,7 +16,7 @@ export function createPacoNavigation({
   active = '',
   activeSubmenu = '',
   student = '',
-  parentStudent = '',
+  viewMode = 'student',
   managementStudents = [],
   onSelectManagementStudent = null,
   includeManagementStudentSelector = false,
@@ -29,6 +25,7 @@ export function createPacoNavigation({
   includeCreator = false,
   includeAgenda = true
 } = {}) {
+  const view = { student, mode: viewMode };
   const items = [];
 
   if (includeManagementStudentSelector) {
@@ -38,7 +35,7 @@ export function createPacoNavigation({
       submenu: managementStudents.map(name => ({
         key: `management-student-${name}`,
         label: name,
-        active: name === parentStudent,
+        active: name === student,
         onClick: () => {
           if (typeof onSelectManagementStudent === 'function') onSelectManagementStudent(name);
         }
@@ -47,85 +44,28 @@ export function createPacoNavigation({
   }
 
   items.push(
-    {
-      key: 'dashboard',
-      icon: '🏠',
-      label: 'Dashboard',
-      onClick: () => go('dashboard.html', student, parentStudent)
-    },
-    {
-      key: 'lessons',
-      icon: '📚',
-      label: 'Mijn lessen',
-      onClick: () => go('lessons.html', student, parentStudent)
-    }
+    { key: 'dashboard', icon: '🏠', label: 'Dashboard', onClick: () => go('dashboard.html', view) },
+    { key: 'lessons', icon: '📚', label: 'Mijn lessen', onClick: () => go('lessons.html', view) }
   );
 
   if (includeAgenda) {
     items.push({
-      key: 'agenda',
-      icon: '📅',
-      label: 'Mijn agenda',
-      onClick: () => go('agenda.html', student, parentStudent),
+      key: 'agenda', icon: '📅', label: 'Mijn agenda', onClick: () => go('agenda.html', view),
       submenu: [
-        {
-          key: 'agenda',
-          label: 'Agenda invoeren',
-          active: activeSubmenu === 'agenda',
-          onClick: () => go('agenda.html', student, parentStudent)
-        },
-        {
-          key: 'month-calendar',
-          label: 'Maandkalender',
-          active: activeSubmenu === 'month-calendar',
-          onClick: () => go('month-calendar.html', student, parentStudent)
-        }
+        { key: 'agenda', label: 'Agenda invoeren', active: activeSubmenu === 'agenda', onClick: () => go('agenda.html', view) },
+        { key: 'month-calendar', label: 'Maandkalender', active: activeSubmenu === 'month-calendar', onClick: () => go('month-calendar.html', view) }
       ]
     });
   }
 
-  items.push({
-    key: 'test-history',
-    icon: '📝',
-    label: 'Toetsen',
-    onClick: () => go('test-history.html', student, parentStudent)
-  });
+  items.push({ key: 'test-history', icon: '📝', label: 'Toetsen', onClick: () => go('test-history.html', view) });
 
-  if (includeManagement) {
-    items.push({
-      key: 'management',
-      icon: '⚙️',
-      label: 'Beheer',
-      onClick: () => go('management.html', '', parentStudent)
-    });
-  }
-
+  if (includeManagement) items.push({ key: 'management', icon: '⚙️', label: 'Beheer', onClick: () => go('management.html') });
   if (includeManagementTools) {
-    items.push({
-      key: 'recovery',
-      icon: '🗂️',
-      label: 'Archief / Prullenbak',
-      onClick: () => go('archive.html', '', parentStudent)
-    });
-    items.push({
-      key: 'feedback',
-      icon: '💬',
-      label: 'Feedback',
-      onClick: () => go('feedback.html', '', parentStudent)
-    });
+    items.push({ key: 'recovery', icon: '🗂️', label: 'Archief / Prullenbak', onClick: () => go('archive.html') });
+    items.push({ key: 'feedback', icon: '💬', label: 'Feedback', onClick: () => go('feedback.html') });
   }
+  if (includeCreator) items.push({ key: 'creator', icon: '🧠', label: 'Creator Console', onClick: () => go('creator.html') });
 
-  if (includeCreator) {
-    items.push({
-      key: 'creator',
-      icon: '🧠',
-      label: 'Creator Console',
-      onClick: () => go('creator.html')
-    });
-  }
-
-  return items.map(item => ({
-    ...item,
-    active: item.key === active
-  }));
+  return items.map(item => ({ ...item, active: item.key === active }));
 }

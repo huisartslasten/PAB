@@ -41,6 +41,13 @@
       window.location.href = target.toString();
     };
 
+    const backToPractice = () => {
+      const target = new URL('oefenen.html', window.location.href);
+      if (lessonId) target.searchParams.set('lesson_id', lessonId);
+      target.searchParams.set('student', student);
+      window.location.href = target.toString();
+    };
+
     const hideAll = () => {
       screen.querySelector('#test')?.classList.add('hidden');
       screen.querySelector('#result')?.classList.add('hidden');
@@ -49,12 +56,7 @@
     mountPacoPageTemplate({
       mount,
       backLabel: '← Oefenen',
-      backAction: () => {
-        const target = new URL('oefenen.html', window.location.href);
-        if (lessonId) target.searchParams.set('lesson_id', lessonId);
-        target.searchParams.set('student', student);
-        window.location.href = target.toString();
-      },
+      backAction: backToPractice,
       greeting: `Hoi ${student}! 🐶`,
       title: 'Oefentoets',
       icon: '📝',
@@ -128,6 +130,8 @@
       lesson = app.mapLessons(records).find(item => String(item.id) === String(lessonId));
       if (!lesson) throw new Error('Deze les kon niet worden gevonden.');
 
+      hideAll();
+      screen.querySelector('#test')?.classList.remove('hidden');
       runtime = createPracticeTestRuntime({ lesson, db: app.db, gradeAnswer: app.grading.gradeAnswer });
       testView = createPlayerTestView({ documentRef: document, escapeHtml, speakTest });
       resultRenderer = createPlayerResultRenderer({ documentRef: document, escapeHtml });

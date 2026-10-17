@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { appState, setLessons } from '../src/core/state.js';
+import { appState, setViewContext, setLessons } from '../src/core/state.js';
 import { createManagement } from '../src/features/management/management.js';
 
 function makeService() {
@@ -18,7 +18,9 @@ function makeService() {
     async updateLesson(id, payload) { this.calls.push(['update', id, payload]); return { id, ...payload }; },
     async archive(id) { this.calls.push(['archive', id]); },
     async moveToTrash(id) { this.calls.push(['trash', id]); },
-    async restore(id) { this.calls.push(['restore', id]); }
+    async restore(id) { this.calls.push(['restore', id]); },
+    async permanentlyDelete(id) { this.calls.push(['permanent-delete', id]); return 1; },
+    async emptyTrash() { this.calls.push(['empty-trash']); return 1; }
   };
 }
 
@@ -58,16 +60,13 @@ function createManagementForTest(service = makeService(), overrides = {}) {
 }
 
 test('management owns the student roster and scoped lesson operations', async () => {
-  appState.currentStudent = null;
+  setViewContext('Zyon', 'management');
   appState.lessons = [];
 
   const service = makeService();
   const management = createManagementForTest(service);
 
   assert.deepEqual(management.getStudents(), ['Zyon', 'Zenith', 'Zephon']);
-  management.selectStudent('Zyon');
-  assert.equal(management.getSelectedStudent(), 'Zyon');
-
   const active = await management.loadLessons();
   assert.deepEqual(active.map(item => item.id), [1]);
   assert.deepEqual(management.getAllScopedLessons().map(item => item.id), [1, 2]);
@@ -83,14 +82,13 @@ test('management owns the student roster and scoped lesson operations', async ()
 });
 
 test('management owns recovery read and restore operations across students', async () => {
-  appState.currentStudent = null;
+  setViewContext('', 'student');
   appState.lessons = [];
 
   const service = makeService();
   const management = createManagementForTest(service);
 
-  management.selectStudent('Zyon');
-  await management.loadLessons();
+  await management.loadRecoveryLessons();
   assert.deepEqual(management.getRecoveryLessons('archive').map(item => item.id), [2]);
   assert.deepEqual(management.getRecoveryLessons('trash').map(item => item.id), [4]);
 
@@ -99,8 +97,21 @@ test('management owns recovery read and restore operations across students', asy
   assert.throws(() => management.getRecoveryLessons('unknown'), /Unknown recovery mode/);
 });
 
+test('management permanently deletes only lessons in the trash', async () => {
+  setViewContext('', 'student');
+  appState.lessons = [];
+
+  const service = makeService();
+  const management = createManagementForTest(service);
+  await management.loadRecoveryLessons();
+
+  await management.permanentlyDeleteRecoveryLesson(4);
+  await assert.rejects(() => management.permanentlyDeleteRecoveryLesson(2), /Only lessons in the trash/);
+  assert.deepEqual(service.calls, [['permanent-delete', 4]]);
+});
+
 test('management owns parent feedback operations', async () => {
-  appState.currentStudent = null;
+  setViewContext('', 'student');
   appState.lessons = [];
 
   const feedbackService = makeFeedbackService();
@@ -129,12 +140,11 @@ test('management owns parent feedback operations', async () => {
 });
 
 test('management rejects mutations outside the selected student scope', async () => {
-  appState.currentStudent = null;
+  setViewContext('Zyon', 'management');
   appState.lessons = [];
 
   const service = makeService();
   const management = createManagementForTest(service);
-  management.selectStudent('Zyon');
   await management.loadLessons();
 
   await assert.rejects(() => management.updateLesson(3, { title: 'Niet toegestaan' }), /outside the selected student scope/);
@@ -142,17 +152,13 @@ test('management rejects mutations outside the selected student scope', async ()
   assert.deepEqual(service.calls, []);
 });
 
-test('management rejects unknown students and non-parent sessions', async () => {
+test('management requires a management context and parent session', async () => {
+  setViewContext('', 'student');
   const service = makeService();
-  const feedbackService = makeFeedbackService();
-  const loadLessons = makeLoadLessons(service);
-  const lessonOrder = makeLessonOrder();
-  const management = createManagement({ auth: { isParent: true }, lessonService: service, feedbackService, lessonOrder, loadLessons });
+  const management = createManagementForTest(service);
+  await management.loadLessons().catch(error => assert.match(error.message, /student must be selected/));
 
-  assert.throws(() => management.selectStudent('Onbekend'), /known student/);
-
-  const nonParent = createManagement({ auth: { isParent: false }, lessonService: service, feedbackService, lessonOrder, loadLessons });
-  assert.throws(() => nonParent.selectStudent('Zyon'), /parent session/);
+  const nonParent = createManagement({ auth: { isParent: false }, lessonService: service, feedbackService: makeFeedbackService(), lessonOrder: makeLessonOrder(), loadLessons: makeLoadLessons(service) });
   await assert.rejects(() => nonParent.loadLessons(), /parent session/);
   await assert.rejects(() => nonParent.listFeedback(), /parent session/);
   assert.deepEqual(service.calls, []);

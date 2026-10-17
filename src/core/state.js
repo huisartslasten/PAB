@@ -4,7 +4,8 @@
 export const appState = {
   session: null,
   currentStudent: null,
-  parentSelectedStudent: null,
+  viewedStudent: null,
+  viewMode: 'student',
   currentSubject: null,
   currentLesson: null,
   lessons: [],
@@ -19,12 +20,10 @@ export function setStudent(student) {
   appState.currentStudent = student;
 }
 
-export function setParentSelectedStudent(student) {
-  appState.parentSelectedStudent = student || null;
-}
-
-export function getParentSelectedStudent() {
-  return appState.parentSelectedStudent;
+export function setViewContext(student, mode = 'student') {
+  appState.viewedStudent = student || null;
+  appState.viewMode = mode === 'management' ? 'management' : 'student';
+  appState.currentStudent = appState.viewedStudent;
 }
 
 export function setLessons(lessons) {

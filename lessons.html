@@ -11,6 +11,7 @@
 <script type="module">
 import { mountPacoPageTemplate } from './src/components/page-template.js';
 import { createPacoNavigation } from './src/components/page-navigation.js';
+import { confirmPacoAction } from './src/components/confirm-dialog.js';
 import { createPacoGOApp } from './src/app/bootstrap.js';
 import { attachLessonDragSorting } from './src/features/lessons/lesson-drag-sort.js';
 import { getLessonSubjectGroups,getLessonSubjectIcon,getLessonSubvakGroups,normalizeLessonSubject } from './src/features/lessons/list-view-model.js';
@@ -23,7 +24,9 @@ const mount=document.querySelector('#paco-template-mount'); const content=docume
 const app=createPacoGOApp({supabaseLib:window.supabase});
 const goHome=()=>{const target=new URL('dashboard.html',window.location.href);if(selectedStudent)target.searchParams.set('viewStudent',selectedStudent);if(context.isManagement)target.searchParams.set('mode','management');window.location.href=target.toString()};
 const goLessons=()=>{const target=new URL('lessons.html',window.location.href);if(selectedStudent)target.searchParams.set('viewStudent',selectedStudent);if(context.isManagement)target.searchParams.set('mode','management');window.location.href=target.toString()};
-const state=document.createElement('div'); state.className='lessons-state'; state.textContent='Lessen laden…'; content.appendChild(state);
+const state=document.createElement('div'); state.className='lessons-state'; state.textContent='Lessen laden…';
+const actionState=document.createElement('div'); actionState.className='lessons-state'; actionState.hidden=true;
+function showActionNotice(message){actionState.textContent=message;actionState.hidden=false;}
 
 async function initialize(){
   await app.initializeSession();
@@ -35,17 +38,41 @@ async function initialize(){
 mountPacoPageTemplate({mount,backLabel:'← Terug',backAction:()=>window.history.length>1?window.history.back():goHome(),greeting:`Hoi ${selectedStudent}! 🐶`,title:'Mijn lessen',icon:'📚',subtitle:context.isManagement?'Beheerweergave — je kunt hier leerlinggebonden lessen beheren.':'Kies een vak en open daarna de les die je wilt doen.',navigation:createPacoNavigation({active:'lessons',student:selectedStudent,viewMode:context.mode,includeManagement:true}),content});
 
 function lessonTarget(lesson){const target=new URL('lesson-choice.html',window.location.href);target.searchParams.set('lesson_id',String(lesson.id));target.searchParams.set('viewStudent',selectedStudent);if(context.isManagement)target.searchParams.set('mode','management');return target.toString();}
+async function archiveLesson(lesson){
+  const confirmed=await confirmPacoAction({title:'Les archiveren?',message:`“${lesson.title}” wordt uit de actieve lessen van ${selectedStudent} gehaald en in het archief geplaatst.`,confirmLabel:'Archiveren',cancelLabel:'Annuleren'});
+  if(!confirmed)return;
+  try{
+    await app.management.archiveLesson(lesson.id);
+    showActionNotice(`“${lesson.title}” is gearchiveerd en uit de actieve lessen verwijderd.`);
+    await render(app.state.lessons);
+  }catch(error){
+    console.error('Lesson archive error:',error);
+    showActionNotice(error?.message || 'De les kon niet worden gearchiveerd.');
+  }
+}
+async function moveLessonToTrash(lesson){
+  const confirmed=await confirmPacoAction({title:'Les naar prullenbak?',message:`“${lesson.title}” wordt uit de actieve lessen van ${selectedStudent} gehaald en naar de prullenbak verplaatst.`,confirmLabel:'Naar prullenbak',cancelLabel:'Annuleren'});
+  if(!confirmed)return;
+  try{
+    await app.management.moveToTrash(lesson.id);
+    showActionNotice(`“${lesson.title}” staat in de prullenbak en is uit de actieve lessen verwijderd.`);
+    await render(app.state.lessons);
+  }catch(error){
+    console.error('Lesson trash error:',error);
+    showActionNotice(error?.message || 'De les kon niet naar de prullenbak worden verplaatst.');
+  }
+}
 function renderLessonCard(lesson){
   const wrap=document.createElement('div'); wrap.className='paco-lesson-card lesson-card'; wrap.draggable=true; wrap.dataset.lessonId=String(lesson.id);
   const card=document.createElement('a'); card.href=lessonTarget(lesson); card.style.display='block'; card.style.color='inherit'; card.style.textDecoration='none';
   const count=Array.isArray(lesson.items)?lesson.items.length:0; const heading=document.createElement('h2');heading.textContent=lesson.title||'Naamloze les';const subvak=document.createElement('p');subvak.textContent=lesson.subvak||'Les';const meta=document.createElement('div');meta.className='lesson-meta';const badge=document.createElement('span');badge.className='lesson-badge';badge.textContent=`${count} ${count===1?'item':'items'}`;meta.appendChild(badge);if(lesson.type){const type=document.createElement('span');type.className='lesson-badge';type.textContent=lesson.type;meta.appendChild(type)}card.append(heading,subvak,meta);wrap.appendChild(card);
-  if(context.isManagement){const actions=document.createElement('div');actions.className='lesson-management-actions';const archive=document.createElement('button');archive.type='button';archive.textContent='Archiveren';archive.addEventListener('click',async event=>{event.preventDefault();event.stopPropagation();await app.management.archiveLesson(lesson.id);await render(currentRecords)});const trash=document.createElement('button');trash.type='button';trash.className='danger';trash.textContent='Prullenbak';trash.addEventListener('click',async event=>{event.preventDefault();event.stopPropagation();await app.management.moveToTrash(lesson.id);await render(currentRecords)});actions.append(archive,trash);wrap.appendChild(actions)}
+  if(context.isManagement){const actions=document.createElement('div');actions.className='lesson-management-actions';const archive=document.createElement('button');archive.type='button';archive.textContent='Archiveren';archive.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();archiveLesson(lesson)});const trash=document.createElement('button');trash.type='button';trash.className='danger';trash.textContent='Prullenbak';trash.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();moveLessonToTrash(lesson)});actions.append(archive,trash);wrap.appendChild(actions)}
   return wrap;
 }
 let currentRecords=[];
 async function render(records){
   currentRecords=records;
-  const grouped=getLessonSubjectGroups(app.mapLessons(records),selectedStudent); content.replaceChildren();
+  const grouped=getLessonSubjectGroups(app.mapLessons(records),selectedStudent); content.replaceChildren(actionState);
   if(!selectedSubject){const heading=document.createElement('h2');heading.className='section-title';heading.textContent='Kies een vak';const grid=document.createElement('div');grid.className='subject-grid';grouped.forEach(subject=>{const card=document.createElement('button');card.type='button';card.className='paco-subject-card';card.innerHTML=`<div class="subject-icon">${getLessonSubjectIcon(subject.label)}</div><h2>${subject.label}</h2><p>${subject.lessons.length} ${subject.lessons.length===1?'les':'lessen'}</p>`;card.addEventListener('click',()=>{const url=new URL(window.location.href);url.searchParams.set('subject',subject.label);window.location.href=url.toString()});grid.appendChild(card)});content.append(heading,grid);if(!grid.children.length){const empty=document.createElement('div');empty.className='lessons-state';empty.textContent=`Geen actieve lessen gevonden voor ${selectedStudent}.`;content.appendChild(empty)}return}
   const key=normalizeLessonSubject(selectedSubject);const subject=grouped.find(candidate=>candidate.key===key);const lessonsForSubject=subject?.lessons||[];const orderedLessons=await app.lessonOrder.getOrderedLessons(lessonsForSubject,selectedStudent,subject?.label||selectedSubject);
   const header=document.createElement('div');header.className='lessons-toolbar';const heading=document.createElement('h2');heading.className='section-title';heading.textContent=subject?.label||selectedSubject;const back=document.createElement('button');back.type='button';back.className='back-subjects';back.textContent='← Alle vakken';back.addEventListener('click',goLessons);header.append(heading,back);content.append(header);

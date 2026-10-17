@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { PACOGO_TEST_VERSION } from '../../src/components/page-template.js';
 
 const baseUrl = 'http://127.0.0.1:4173';
-const expectedVersionBadge = `PacoGO TEST ${PACOGO_TEST_VERSION}`;
+const expectedVersionBadge = PACOGO_TEST_VERSION;
 
 async function expectCanonicalShell(page, path, title) {
   await page.goto(`${baseUrl}/${path}`);
@@ -21,13 +21,15 @@ test('dashboard page uses the canonical shell for a selected student', async ({ 
   await expect(page.getByText('Jouw voortgang', { exact: true })).toHaveCount(0);
 });
 
-test('dashboard page owns the canonical student chooser', async ({ page }) => {
-  await expectCanonicalShell(page, 'dashboard.html', 'Wie gaat er leren?');
-  await expect(page.locator('.student-grid')).toBeVisible();
-  await expect(page.locator('.student-card')).toHaveCount(3);
-  await expect(page.locator('.student-card').nth(0)).toContainText('Zyon');
-  await expect(page.locator('.student-card').nth(1)).toContainText('Zenith');
-  await expect(page.locator('.student-card').nth(2)).toContainText('Zephon');
+test('dashboard start page is outside the canonical shell', async ({ page }) => {
+  await page.goto(`${baseUrl}/dashboard.html`);
+  await expect(page.locator('.paco-template-version-badge')).toHaveCount(0);
+  await expect(page.locator('.paco-template-sidebar')).toHaveCount(0);
+  await expect(page.locator('.dashboard-chooser-title')).toHaveText('Wie gaat er leren?');
+  await expect(page.locator('.dashboard-chooser-student')).toHaveCount(3);
+  await expect(page.getByRole('link', { name: /Dashboard van Zyon/ })).toBeVisible();
+  await expect(page.getByRole('link', { name: /Dashboard van Zenith/ })).toBeVisible();
+  await expect(page.getByRole('link', { name: /Dashboard van Zephon/ })).toBeVisible();
 });
 
 test('management page enforces the canonical authentication boundary', async ({ page }) => {

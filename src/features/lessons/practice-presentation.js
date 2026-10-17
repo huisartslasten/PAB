@@ -1,5 +1,4 @@
 import { createPracticeRuntimeEntry } from './practice-runtime-entry.js';
-import { createMasteryService } from '../../services/mastery-service.js';
 
 function typeTitle(type) {
   if (type === 'dictation') return '✏️ Dictee oefenen';
@@ -174,25 +173,23 @@ export function createPracticePresentation({
   }
 
   function renderFeedback(result, item, answer) {
-    const feedback = documentRef.getElementById('practiceFeedback');
-    if (!feedback) return;
+    const content = elements().content;
+    if (!content) return;
     const fixed = result.evaluation?.fixedRules;
     const fixedHtml = fixed?.results?.length
       ? `<div class="practice-rule-results"><strong>Vaste beoordelingsregels</strong><br>${fixed.results.map(rule => `${rule.ok ? '✓ ' : '✗ '}${escapeHtml(rule.text)}`).join('<br>')}</div>`
       : '';
     const review = `<div class="practice-answer-review"><div class="practice-answer-review-title">Jouw antwoord:</div><div class="practice-answer-review-text">${escapeHtml(answer || '—')}</div>${fixedHtml}</div>`;
     const extra = itemExtraInfo(item, escapeHtml);
-    feedback.innerHTML = result.correct
-      ? `${review}<div class="feedback correct">${item?.type === 'spelling' ? '✅ Beide goed!' : '✅ Goed!'} ${escapeHtml(result.evaluation?.feedback || '')}</div>${extra}`
-      : `${review}<div class="feedback incorrect">❌ ${result.evaluation?.feedback ? escapeHtml(result.evaluation.feedback) : 'Nog niet helemaal. Dit item komt later opnieuw terug.'}</div>${extra}`;
-    feedback.className = result.correct ? 'feedback correct' : 'feedback incorrect';
-    documentRef.querySelectorAll('#practiceContent button, #practiceContent input, #practiceContent textarea').forEach(control => { control.disabled = true; });
-
+    const feedback = result.correct
+      ? `<div class="feedback correct">${item?.type === 'spelling' ? '✅ Beide goed!' : '✅ Goed!'} ${escapeHtml(result.evaluation?.feedback || '')}</div>${extra}`
+      : `<div class="feedback incorrect">❌ ${result.evaluation?.feedback ? escapeHtml(result.evaluation.feedback) : 'Nog niet helemaal. Dit item komt later opnieuw terug.'}</div>${extra}`;
     const next = documentRef.createElement('button');
     next.className = 'big';
     next.textContent = result.done ? 'Klaar' : 'OK → Volgende vraag';
     next.addEventListener('click', () => result.done ? finish() : nextItem());
-    feedback.insertAdjacentElement('afterend', next);
+    content.innerHTML = `${review}${feedback}`;
+    content.appendChild(next);
   }
 
   function start(type) {

@@ -17,9 +17,9 @@ export function createPacoNavigation({
   activeSubmenu = '',
   student = '',
   includeManagement = true,
+  includeManagementTools = false,
   includeCreator = false,
-  includeAgenda = true,
-  managementSections = null
+  includeAgenda = true
 } = {}) {
   const items = [
     {
@@ -73,18 +73,21 @@ export function createPacoNavigation({
       label: 'Beheer',
       onClick: () => go('management.html')
     });
+  }
 
-    if (Array.isArray(managementSections)) {
-      managementSections.forEach(item => {
-        if (!item || !item.label || typeof item.onClick !== 'function') return;
-        items.push({
-          key: item.key || `management-${item.label.toLowerCase()}`,
-          icon: item.icon || '',
-          label: item.label,
-          onClick: item.onClick
-        });
-      });
-    }
+  if (includeManagementTools) {
+    items.push({
+      key: 'recovery',
+      icon: '🗂️',
+      label: 'Archief / Prullenbak',
+      onClick: () => go('archive.html')
+    });
+    items.push({
+      key: 'feedback',
+      icon: '💬',
+      label: 'Feedback',
+      onClick: () => go('feedback.html')
+    });
   }
 
   if (includeCreator) {

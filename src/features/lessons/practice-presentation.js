@@ -102,16 +102,11 @@ export function createPracticePresentation({
 
   function bindSubmit() {
     const content = elements().content;
-    const button = content?.querySelector('[data-practice-action="submit"]');
-    if (!button) return;
-    button.addEventListener('click', () => submit());
-    content.querySelectorAll('input, textarea').forEach(input => {
-      input.addEventListener('keydown', event => {
-        if (event.key !== 'Enter') return;
-        if (input.tagName === 'TEXTAREA' && !event.metaKey && !event.ctrlKey) return;
-        event.preventDefault();
-        button.click();
-      });
+    const form = content?.querySelector('[data-practice-form]');
+    if (!form) return;
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      submit();
     });
   }
 
@@ -146,20 +141,20 @@ export function createPracticePresentation({
     }
 
     if (type === 'spelling') {
-      content.innerHTML = `<div class="small">Vul beide vormen in.</div>${hintHtml(item, escapeHtml)}<div class="prompt">${escapeHtml(item.question)}</div><div class="field"><label>Voltooid deelwoord</label><input id="practicePerfect" class="answer-input" placeholder="bijvoorbeeld opgevoed"></div><div class="field"><label>Bijvoeglijk gebruikt voltooid deelwoord</label><input id="practiceAdjective" class="answer-input" placeholder="bijvoorbeeld opgevoede"></div><div id="practiceFeedback" class="feedback"></div><button class="success" data-practice-action="submit">Controleren</button>`;
+      content.innerHTML = `<form data-practice-form><div class="small">Vul beide vormen in.</div>${hintHtml(item, escapeHtml)}<div class="prompt">${escapeHtml(item.question)}</div><div class="field"><label>Voltooid deelwoord</label><input id="practicePerfect" class="answer-input" placeholder="bijvoorbeeld opgevoed"></div><div class="field"><label>Bijvoeglijk gebruikt voltooid deelwoord</label><input id="practiceAdjective" class="answer-input" placeholder="bijvoorbeeld opgevoede"></div><div id="practiceFeedback" class="feedback"></div><button type="submit" class="success" data-practice-action="submit">Controleren</button></form>`;
       bindCurrentActions();
       return;
     }
 
     if (type === 'math') {
-      content.innerHTML = `<div class="small">Los de som op.</div>${hintHtml(item, escapeHtml)}<div class="prompt">${escapeHtml(item.question)}</div><input id="practiceAnswer" class="answer-input" type="number" inputmode="numeric" autocomplete="off" placeholder="Typ je antwoord"><div id="practiceFeedback" class="feedback"></div><button class="success" data-practice-action="submit">Controleren</button>`;
+      content.innerHTML = `<form data-practice-form><div class="small">Los de som op.</div>${hintHtml(item, escapeHtml)}<div class="prompt">${escapeHtml(item.question)}</div><input id="practiceAnswer" class="answer-input" type="number" inputmode="numeric" autocomplete="off" placeholder="Typ je antwoord"><div id="practiceFeedback" class="feedback"></div><button type="submit" class="success" data-practice-action="submit">Controleren</button></form>`;
       bindCurrentActions();
       documentRef.getElementById('practiceAnswer')?.focus();
       return;
     }
 
     if (type === 'dictation') {
-      content.innerHTML = `<div class="dictation-word">Luister goed en schrijf het woord.</div>${hintHtml(item, escapeHtml)}<div id="practiceVoiceStatus" class="small" style="min-height:20px;margin-top:4px"></div><div style="margin:22px"><button class="secondary speaker" data-practice-action="speak">🔊 Nog een keer</button></div><input id="practiceAnswer" class="answer-input" autocomplete="off" placeholder="Vul hier het woord in"><div id="practiceFeedback" class="feedback"></div><button class="success" data-practice-action="submit">Controleren</button>`;
+      content.innerHTML = `<form data-practice-form><div class="dictation-word">Luister goed en schrijf het woord.</div>${hintHtml(item, escapeHtml)}<div id="practiceVoiceStatus" class="small" style="min-height:20px;margin-top:4px"></div><div style="margin:22px"><button type="button" class="secondary speaker" data-practice-action="speak">🔊 Nog een keer</button></div><input id="practiceAnswer" class="answer-input" autocomplete="off" placeholder="Vul hier het woord in"><div id="practiceFeedback" class="feedback"></div><button type="submit" class="success" data-practice-action="submit">Controleren</button></form>`;
       bindCurrentActions();
       windowRef.setTimeout(() => {
         speakDictation();
@@ -168,7 +163,7 @@ export function createPracticePresentation({
       return;
     }
 
-    content.innerHTML = `<div class="small">Typ hier het woord.</div>${hintHtml(item, escapeHtml)}<div class="prompt">${escapeHtml(item.question)}</div><input id="practiceAnswer" class="answer-input" autocomplete="off" placeholder="Vul hier het woord in"><div id="practiceFeedback" class="feedback"></div><button class="success" data-practice-action="submit">Controleren</button>`;
+    content.innerHTML = `<form data-practice-form><div class="small">Typ hier het woord.</div>${hintHtml(item, escapeHtml)}<div class="prompt">${escapeHtml(item.question)}</div><input id="practiceAnswer" class="answer-input" autocomplete="off" placeholder="Vul hier het woord in"><div id="practiceFeedback" class="feedback"></div><button type="submit" class="success" data-practice-action="submit">Controleren</button></form>`;
     bindCurrentActions();
     documentRef.getElementById('practiceAnswer')?.focus();
   }

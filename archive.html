@@ -45,14 +45,14 @@
     const archive=document.createElement('section');
     archive.className='management-section';
     const archiveHeading=document.createElement('h2');
-    archiveHeading.textContent='Archief';
+    archiveHeading.textContent='Archief — per leerling';
     const archiveList=document.createElement('div');
     archive.append(archiveHeading,archiveList);
 
     const trash=document.createElement('section');
     trash.className='management-section';
     const trashHeading=document.createElement('h2');
-    trashHeading.textContent='Prullenbak';
+    trashHeading.textContent='Prullenbak — per leerling';
     const trashList=document.createElement('div');
     trash.append(trashHeading,trashList);
 
@@ -80,7 +80,7 @@
         const session=await app.initializeSession();
         if(!session){window.location.href='auth.html';return;}
         if(!app.auth.isParent){state.textContent='Je hebt geen toegang tot Archief / Prullenbak.';return;}
-        await management.loadLessons();
+        await management.loadRecoveryLessons();
         await refreshRecovery();
         content.replaceChildren(archive,trash);
       }catch(error){

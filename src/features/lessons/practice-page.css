@@ -34,12 +34,28 @@
 .practice-progress .progress-bar {
   height: 100%;
   border-radius: 999px;
+  background: transparent;
+}
+
+.practice-progress .progress-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
   background: #1787f2;
 }
 
 .practice-content {
   display: grid;
   gap: 14px;
+}
+
+.practice-content [data-practice-action="submit"] {
+  width: min(100%, 420px);
+  justify-self: center;
+}
+
+.practice-content [data-practice-action="submit"].success {
+  font-size: 17px;
 }
 
 .practice-hint {
@@ -135,6 +151,55 @@
 
 .practice-content .feedback {
   margin-top: 4px;
+}
+
+.practice-answer-review,
+.practice-correct-answer {
+  width: min(100%, 760px);
+  justify-self: center;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  border-radius: 16px;
+  line-height: 1.45;
+}
+
+.practice-answer-review {
+  border: 2px solid #dce9f6;
+  background: #f8fbff;
+}
+
+.practice-correct-answer {
+  border: 2px solid #9ed1f8;
+  background: #edf8ff;
+}
+
+.practice-answer-review-title,
+.practice-correct-answer-title {
+  margin-bottom: 4px;
+  color: #102b57;
+  font-family: "Baloo 2", Nunito, sans-serif;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.practice-answer-review-text,
+.practice-correct-answer-text {
+  font-size: 18px;
+  font-weight: 800;
+  white-space: pre-wrap;
+}
+
+.practice-correct-answer-text {
+  color: #0d6fd4;
+}
+
+.practice-content .feedback {
+  width: min(100%, 760px);
+  justify-self: center;
+}
+
+.practice-content > .success {
+  justify-self: center;
 }
 
 .practice-content .question-answer {

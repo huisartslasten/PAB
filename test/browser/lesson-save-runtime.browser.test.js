@@ -22,7 +22,6 @@ test('V4.78 saveLesson executes through the classic facade and bootstrap in a re
     id: 9001,
     student: 'Browser Student',
     subject: 'Rekenen',
-    subvak: 'Getallen',
     title: 'Browser proof',
     type: 'words'
   });

@@ -23,6 +23,12 @@ function findScopedLesson(id, student) {
   return lesson;
 }
 
+function findRecoveryLesson(id) {
+  const lesson = appState.lessons.find(item => String(item?.id) === String(id));
+  if (!lesson || (!lesson.archived && !lesson.deleted)) throw new Error('Lesson is not recoverable.');
+  return lesson;
+}
+
 function normalizeSubject(value) {
   return String(value ?? '').trim().replace(/\s+/g, ' ').toLocaleLowerCase('nl-NL');
 }
@@ -110,7 +116,7 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
 
   async function archiveLesson(id) { assertParent(); findScopedLesson(id, requireStudent()); return recovery.archive(id); }
   async function moveToTrash(id) { assertParent(); findScopedLesson(id, requireStudent()); return recovery.trash(id); }
-  async function restoreLesson(id) { assertParent(); const lesson = findScopedLesson(id, requireStudent()); if (!lesson.archived && !lesson.deleted) throw new Error('Lesson is not recoverable.'); return recovery.restore(id); }
+  async function restoreLesson(id) { assertParent(); findRecoveryLesson(id); return recovery.restore(id); }
   async function permanentlyDeleteRecoveryLesson(id) { assertParent(); const lesson = appState.lessons.find(item => String(item?.id) === String(id)); if (!lesson?.deleted) throw new Error('Only lessons in the trash can be permanently deleted.'); return trashRecovery.permanentlyDelete(id); }
   async function emptyTrash() { assertParent(); return trashRecovery.emptyTrash(); }
   async function listFeedback() { assertParent(); return feedbackService.listAll(); }

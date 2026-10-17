@@ -4,6 +4,9 @@
   --paco-blue: #1787f2;
   --paco-blue-dark: #0d6fd4;
   --paco-blue-soft: #eaf4ff;
+  --paco-yellow: #ffd84d;
+  --paco-yellow-hover: #ffcf24;
+  --paco-yellow-border: #f2c72e;
   --paco-text: #102b57;
   --paco-muted: #667894;
   --paco-border: #cfe3f3;
@@ -31,8 +34,8 @@
 .paco-template-nav-group { position: relative; }
 .paco-template-nav-item { width: 100%; display: flex; align-items: center; gap: 11px; padding: 11px 12px; border-radius: 14px; background: transparent; text-align: left; font-size: 17px; }
 .paco-template-nav-item.active { background: #dff0ff; color: var(--paco-blue-dark); }
-.paco-template-nav-item.management { background: #ffd84d; color: #102b57; }
-.paco-template-nav-item.management:hover { background: #ffcf24; }
+.paco-template-nav-item.management { background: var(--paco-yellow); color: var(--paco-text); }
+.paco-template-nav-item.management:hover { background: var(--paco-yellow-hover); }
 .paco-template-nav-icon { width: 27px; flex: 0 0 27px; text-align: center; font-size: 21px; }
 .paco-template-nav-chevron { margin-left: auto; color: var(--paco-blue-dark); font-size: 15px; transition: transform .15s ease; }
 .paco-template-nav-group:hover .paco-template-nav-chevron, .paco-template-nav-group:focus-within .paco-template-nav-chevron, .paco-template-nav-group.always-open .paco-template-nav-chevron { transform: rotate(90deg); }
@@ -40,21 +43,16 @@
 .paco-template-nav-group:hover .paco-template-nav-submenu, .paco-template-nav-group:focus-within .paco-template-nav-submenu, .paco-template-nav-group.always-open .paco-template-nav-submenu { display: flex; flex-direction: column; gap: 3px; }
 .paco-template-nav-subitem { border: 0; border-radius: 11px; padding: 8px 10px; background: transparent; color: var(--paco-text); font-family: "Baloo 2", Nunito, sans-serif; font-size: 15px; font-weight: 800; text-align: left; cursor: pointer; }
 .paco-template-nav-subitem:hover, .paco-template-nav-subitem.active { background: #dff0ff; color: var(--paco-blue-dark); }
+.paco-template-nav-item.management:hover { color: var(--paco-text); }
 .paco-template-main { min-width: 0; }
 .paco-template-page-header { min-height: 108px; display: flex; align-items: center; gap: 14px; margin: 0 0 22px; padding: 20px 25px; border: 1px solid var(--paco-border); border-radius: 22px; background: #edf8ff; box-shadow: var(--paco-shadow); }
 .paco-template-page-icon { flex: 0 0 auto; font-size: 39px; line-height: 1; }
-.paco-template-page-heading h1 { margin: 0; font-family: "Baloo 2", Nunito, sans-serif; font-size: clamp(30px, 3vw, 42px); line-height: 1; color: #102b57; font-weight: 900; letter-spacing: -.5px; }
+.paco-template-page-heading h1 { margin: 0; font-family: "Baloo 2", Nunito, sans-serif; font-size: clamp(30px, 3vw, 42px); line-height: 1; color: var(--paco-text); font-weight: 900; letter-spacing: -.5px; }
 .paco-template-page-heading p { margin: 7px 0 0; color: var(--paco-muted); font-size: 17px; font-weight: 700; line-height: 1.35; }
 .paco-template-page-content { min-width: 0; color: var(--paco-text); }
-
-/* Shared feature-page heading. Pages may use .page-heading inside the
-   template when they need a secondary heading without placing text on blue. */
 .paco-page-template .page-heading { min-height: 84px; display: flex; flex-direction: column; justify-content: center; margin: 0; padding: 17px 22px; border: 1px solid var(--paco-border); border-radius: 20px; background: #edf8ff; color: var(--paco-text); box-shadow: var(--paco-shadow); }
 .paco-page-template .page-heading h2, .paco-page-template .page-heading h3 { margin: 0; font: 900 28px/1.05 "Baloo 2", Nunito, sans-serif; color: var(--paco-text); }
 .paco-page-template .page-heading p { margin: 6px 0 0; color: var(--paco-muted); font-size: 17px; font-weight: 700; line-height: 1.35; }
-
-/* Shared PacoGO content card. Existing feature cards use this canonical
-   surface so headings, labels and controls never sit directly on blue. */
 .paco-template-card,
 .paco-page-template .card { padding: 20px 22px; border: 1px solid var(--paco-border); border-radius: 22px; background: #fff; color: var(--paco-text); box-shadow: var(--paco-shadow); }
 .paco-template-card h2, .paco-template-card h3, .paco-template-card h4,
@@ -62,9 +60,6 @@
 .paco-template-card label, .paco-page-template .card label { color: var(--paco-text); }
 .paco-template-card .small, .paco-page-template .card .small { color: var(--paco-muted); }
 .paco-page-template .paco-template-page-content strong { color: var(--paco-text); }
-
-/* Shared PacoGO control language. Page-specific markup can use these controls
-   without reimplementing the shell's visual treatment. */
 .paco-page-template button.secondary,
 .paco-page-template button.success { min-height: 46px; padding: 9px 16px; border: 2px solid var(--paco-border); border-radius: 14px; background: #edf8ff; color: var(--paco-blue-dark); font: 800 16px/1.1 "Baloo 2", Nunito, sans-serif; box-shadow: 0 4px 0 rgba(13,111,212,.10), 0 8px 18px rgba(16,43,87,.07); cursor: pointer; transition: transform .15s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease; }
 .paco-page-template button.secondary:hover,
@@ -84,9 +79,15 @@
 .paco-page-template input[type="file"]::file-selector-button { margin-right: 10px; padding: 8px 12px; border: 0; border-radius: 10px; background: #dff0ff; color: var(--paco-blue-dark); font: 800 14px/1 "Baloo 2", Nunito, sans-serif; cursor: pointer; }
 .paco-page-template select { appearance: none; padding-right: 42px; background-color: #fff; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 18 18'%3E%3Cpath d='M4 6.5 9 11.5 14 6.5' fill='none' stroke='%230d6fd4' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 13px center; background-size: 18px; }
 .paco-page-template input[type="text"]:focus, .paco-page-template input[type="date"]:focus, .paco-page-template input[type="time"]:focus, .paco-page-template input[type="file"]:focus, .paco-page-template select:focus, .paco-page-template textarea:focus { outline: 0; border-color: var(--paco-blue); box-shadow: 0 0 0 4px rgba(23,135,242,.12); }
-
 .paco-lesson-card { background: var(--paco-lesson-bg); border: 2px solid var(--paco-lesson-border); border-radius: 24px; box-shadow: var(--paco-lesson-shadow); cursor: pointer; transition: transform .15s, box-shadow .15s; }
 .paco-lesson-card:hover { transform: translateY(-2px); box-shadow: 0 10px 0 rgba(16, 43, 87, .08), 0 16px 30px rgba(16, 43, 87, .13); }
+
+.paco-subject-card { display: block; width: 100%; border: 2px solid var(--paco-yellow-border); border-radius: 20px; background: var(--paco-yellow); box-shadow: var(--paco-shadow); padding: 18px; text-align: left; cursor: pointer; transition: transform .16s, box-shadow .16s, background .16s; color: var(--paco-text); text-decoration: none; }
+.paco-subject-card:hover { transform: translateY(-2px); background: var(--paco-yellow-hover); box-shadow: 0 12px 28px rgba(16, 43, 87, .13); }
+.paco-subject-card:focus-visible { outline: 0; box-shadow: 0 0 0 4px rgba(255, 255, 255, .95), 0 0 0 7px rgba(23, 135, 242, .55), 0 12px 28px rgba(16, 43, 87, .13); }
+.paco-subject-card h2,
+.paco-subject-card p { color: var(--paco-text); }
+.paco-subject-card .subject-icon { font-size: 34px; margin-bottom: 12px; }
 
 .paco-dropdown { position: relative; width: 100%; }
 .paco-dropdown-trigger { width: 100%; min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 0 20px; border: 4px solid var(--paco-blue); border-radius: 22px; background: #edf8ff; color: var(--paco-blue-dark); font-family: "Baloo 2", Nunito, sans-serif; font-size: 25px; line-height: 1; font-weight: 800; text-align: left; cursor: pointer; box-shadow: 0 4px 0 rgba(13, 111, 212, .14), 0 0 0 5px rgba(23, 135, 242, .08); transition: transform .15s ease, background .15s ease, box-shadow .15s ease; }
@@ -94,27 +95,18 @@
 .paco-dropdown-trigger:focus-visible { outline: 0; box-shadow: 0 4px 0 rgba(13, 111, 212, .16), 0 0 0 5px rgba(23, 135, 242, .14); }
 .paco-dropdown-chevron { width: 0; height: 0; flex: 0 0 auto; border-left: 13px solid transparent; border-right: 13px solid transparent; border-top: 14px solid var(--paco-blue-dark); transition: transform .15s ease; }
 .paco-dropdown.open .paco-dropdown-chevron { transform: rotate(180deg); }
-.paco-dropdown-menu { position: absolute; z-index: 50; left: 0; right: 0; top: calc(100% + 8px); display: none; padding: 8px; border: 2px solid #dce9f6; border-radius: 18px; background: #edf8ff; box-shadow: 0 12px 28px rgba(16, 43, 87, .15); }
-.paco-dropdown.open .paco-dropdown-menu { display: block; }
-.paco-dropdown-option { width: 100%; display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 9px 12px; border: 0; border-radius: 12px; background: transparent; color: var(--paco-text); font-family: "Baloo 2", Nunito, sans-serif; font-size: 18px; font-weight: 800; text-align: left; cursor: pointer; }
+.paco-dropdown-menu { position: absolute; z-index: 50; left: 0; right: 0; top: calc(100% + 8px); display: none; padding: 8px; border: 2px solid #dce9f6; border-radius: 18px; background: #edf8ff; box-shadow: 0 12px 28px rgba(16,43,87,.14); }
+.paco-dropdown.open .paco-dropdown-menu { display: grid; gap: 4px; }
+.paco-dropdown-option { border: 0; border-radius: 12px; padding: 12px 14px; background: transparent; color: var(--paco-text); font: 800 16px/1.1 "Baloo 2", Nunito, sans-serif; text-align: left; cursor: pointer; }
 .paco-dropdown-option:hover, .paco-dropdown-option[aria-selected="true"] { background: #dff0ff; color: var(--paco-blue-dark); }
-.paco-dropdown-check { width: 22px; flex: 0 0 22px; font-size: 20px; font-weight: 900; text-align: center; }
 
-.paco-page-template .right-sidebar, .paco-page-template .page-side-right { display: none !important; }
-
-@media (max-width: 900px) {
-  .paco-template-body { width: min(100% - 32px, var(--paco-content-max)); grid-template-columns: 205px minmax(0, 1fr); gap: 14px; }
-  .paco-template-greeting { font-size: 22px; }
+@media (max-width: 1050px) {
+  .paco-template-body { width: min(var(--paco-content-max), calc(100% - 40px)); grid-template-columns: 1fr; }
+  .paco-template-sidebar { position: static; }
+  .paco-template-sidebar-card { max-height: none; }
 }
 @media (max-width: 700px) {
-  .paco-template-body { width: calc(100% - 24px); grid-template-columns: 1fr; gap: 12px; padding-top: 12px; }
-  .paco-template-sidebar { position: static; }
-  .paco-template-sidebar-card { max-height: none; overflow: visible; }
-  .paco-template-navigation { overflow-y: visible; }
-  .paco-template-main { padding: 0; }
-  .paco-template-page-header { margin-bottom: 14px; padding: 17px 18px; }
-  .paco-template-page-heading h1 { font-size: 31px; }
-  .paco-template-version-badge { right: 12px; bottom: 10px; padding: 10px 16px; font-size: 22px; border-width: 3px; }
-  .paco-page-template .page-heading { padding: 15px 18px; }
-  .paco-page-template .page-heading h2, .paco-page-template .page-heading h3 { font-size: 25px; }
+  .paco-template-body { width: min(100% - 20px, var(--paco-content-max)); padding-top: 10px; }
+  .paco-template-page-header { padding: 17px 18px; }
+  .paco-template-version-badge { right: 14px; bottom: 14px; padding: 10px 15px; font-size: 22px; }
 }

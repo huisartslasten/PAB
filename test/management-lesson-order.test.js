@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { appState, setStudent, setLessons } from '../src/core/state.js';
+import { appState, setViewContext, setLessons } from '../src/core/state.js';
 import { createManagement } from '../src/features/management/management.js';
 
 function createFixture() {
@@ -12,7 +12,7 @@ function createFixture() {
   ];
   const writes = [];
   const updates = [];
-  setStudent('Zyon');
+  setViewContext('Zyon', 'management');
   setLessons(lessons);
 
   const management = createManagement({

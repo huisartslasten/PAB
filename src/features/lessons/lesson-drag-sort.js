@@ -6,6 +6,7 @@ export function getLessonCardOrder(container, selector = '[data-lesson-id]') {
 
 export function attachLessonDragSorting(container, {
   selector = '[data-lesson-id][draggable="true"]',
+  allowCrossContainer = true,
   onOrderChange = async () => {},
   onError = async () => {}
 } = {}) {
@@ -49,12 +50,19 @@ export function attachLessonDragSorting(container, {
         return;
       }
 
+      const sourceContainer = source.parentElement;
+      const targetContainer = card.parentElement;
+      if (!allowCrossContainer && sourceContainer !== targetContainer) {
+        clearDragState();
+        return;
+      }
+
       const rect = card.getBoundingClientRect();
       const position = event.clientY > rect.top + rect.height / 2 ? 'after' : 'before';
       if (position === 'after') card.after(source);
       else card.before(source);
 
-      const orderedIds = getLessonCardOrder(container);
+      const orderedIds = getLessonCardOrder(targetContainer);
       try {
         await onOrderChange({ sourceId, targetId, position, orderedIds, source, target: card });
       } catch (error) {

@@ -1,7 +1,7 @@
 import { appState, setStudent } from '../../core/state.js';
 import { getActiveStudentLessons, getStudentLessons } from '../lessons/visibility.js';
-import { createLessonRecovery } from '../lessons/recovery.js';
-import { createTrashRecovery, getAllArchiveEntries, getAllTrashEntries } from './recovery.js';
+import { createLessonRecovery, createTrashRecovery } from '../lessons/recovery.js';
+import { getAllArchiveEntries, getAllTrashEntries } from './recovery.js';
 import { isKnownStudent, listStudents } from '../students/students.js';
 
 function requireParent(auth) {

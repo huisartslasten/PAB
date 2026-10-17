@@ -140,7 +140,7 @@
         title: 'Dashboard',
         icon: '🏠',
         subtitle: 'Bekijk je lessen en zie hoe je ervoor staat.',
-        navigation: createPacoNavigation({ active: 'dashboard', student: selectedStudent }),
+        navigation: createPacoNavigation({ active: 'dashboard', student: selectedStudent, hideActive: true }),
         content
       });
 
@@ -273,29 +273,16 @@
         const subjectCountText = document.createElement('p');
         subjectCountText.style.cssText = 'margin:7px 0 0;color:#667894';
         subjectCountText.textContent = `Actieve vakken voor ${selectedStudent}.`;
-        const lessonButton = document.createElement('button');
-        lessonButton.type = 'button';
-        lessonButton.className = 'secondary';
-        lessonButton.style.marginTop = '14px';
-        lessonButton.textContent = '📚 Naar mijn lessen';
-        lessonButton.addEventListener('click', goLessons);
-        subjectSummary.append(subjectCountHeading, subjectCountText, lessonButton);
+        subjectSummary.append(subjectCountHeading, subjectCountText);
         main.appendChild(subjectSummary);
 
         content.appendChild(main);
       }
 
-      const state = document.createElement('div');
-      state.className = 'dashboard-state';
-      state.textContent = 'Dashboard laden…';
-      content.appendChild(state);
-      setStudent(selectedStudent);
-      app.loadLessons()
-        .then(records => render(records))
-        .catch(error => {
-          console.error('Dashboard page load error:', error);
-          state.textContent = 'Het dashboard kon niet worden geladen.';
-        });
+      app.loadLessons({ student: selectedStudent }).then(render).catch(error => {
+        console.error('Dashboard load failed:', error);
+        content.textContent = 'Het dashboard kon niet worden geladen.';
+      });
     }
   </script>
 </body>

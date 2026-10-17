@@ -78,7 +78,7 @@ export async function renderStudentLessons(container, management, { onEdit = nul
           <h4>${subvak.key === '__geen_subvak__' ? '📚 ' : '📁 '}${escapeHtml(subvak.label)}</h4>
           <div class="management-lessons-grid">
             ${subvak.lessons.map(lesson => `
-              <article class="management-lesson" draggable="true" data-lesson-id="${escapeHtml(lesson.id)}">
+              <article class="management-lesson paco-lesson-card" draggable="true" data-lesson-id="${escapeHtml(lesson.id)}">
                 <div class="management-lesson-main">
                   <h3>${escapeHtml(lesson.title)}</h3>
                   <p>${escapeHtml(lesson.subject)}${lesson.subvak ? ` · ${escapeHtml(lesson.subvak)}` : ''}</p>
@@ -237,7 +237,7 @@ export function renderRecovery(container, management, mode, onRestore = async ()
           <h4>${escapeHtml(subject.subject)}</h4>
           <div class="management-recovery-lessons">
             ${subject.items.map(lesson => `
-              <article class="management-lesson" data-recovery-lesson-id="${escapeHtml(lesson.id)}">
+              <article class="management-lesson paco-lesson-card" data-recovery-lesson-id="${escapeHtml(lesson.id)}">
                 <h3>${escapeHtml(lesson.title)}</h3>
                 <p>${escapeHtml(lesson.subject)}${lesson.subvak ? ` · ${escapeHtml(lesson.subvak)}` : ''}</p>
                 <button type="button" class="management-link management-restore" data-lesson-id="${escapeHtml(lesson.id)}">↩️ Herstellen</button>

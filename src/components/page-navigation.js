@@ -6,9 +6,13 @@
  * and never define the navigation structure themselves.
  */
 
-function go(path, student = '') {
+function go(path, student = '', parentStudent = '') {
   const target = new URL(path, window.location.href);
   if (student) target.searchParams.set('student', student);
+  if (parentStudent) {
+    target.searchParams.set('parentStudent', parentStudent);
+    target.searchParams.set('context', 'management');
+  }
   window.location.href = target.toString();
 }
 
@@ -16,44 +20,65 @@ export function createPacoNavigation({
   active = '',
   activeSubmenu = '',
   student = '',
+  parentStudent = '',
+  managementStudents = [],
+  onSelectManagementStudent = null,
+  includeManagementStudentSelector = false,
   includeManagement = true,
   includeManagementTools = false,
   includeCreator = false,
   includeAgenda = true
 } = {}) {
-  const items = [
+  const items = [];
+
+  if (includeManagementStudentSelector) {
+    items.push({
+      key: 'management-student',
+      label: 'LEERLING',
+      submenu: managementStudents.map(name => ({
+        key: `management-student-${name}`,
+        label: name,
+        active: name === parentStudent,
+        onClick: () => {
+          if (typeof onSelectManagementStudent === 'function') onSelectManagementStudent(name);
+        }
+      }))
+    });
+  }
+
+  items.push(
     {
       key: 'dashboard',
       icon: '🏠',
       label: 'Dashboard',
-      onClick: () => go('dashboard.html', student)
+      onClick: () => go('dashboard.html', student, parentStudent)
     },
     {
       key: 'lessons',
       icon: '📚',
       label: 'Mijn lessen',
-      onClick: () => go('lessons.html', student)
+      onClick: () => go('lessons.html', student, parentStudent)
     }
-  ];
+  );
 
   if (includeAgenda) {
     items.push({
       key: 'agenda',
       icon: '📅',
       label: 'Mijn agenda',
-      onClick: () => go('agenda.html', student),
+      onClick: () => go('agenda.html', student, parentStudent),
       submenu: [
         {
           key: 'agenda',
           label: 'Agenda invoeren',
           active: activeSubmenu === 'agenda',
-          onClick: () => go('agenda.html', student)
+          onClick: () => go('agenda.html', student, parentStudent)
         },
         {
           key: 'month-calendar',
           label: 'Maandkalender',
           active: activeSubmenu === 'month-calendar',
-          onClick: () => go('month-calendar.html', student)
+          onClick: () => go('month-calendar.html', student, parentStudent)
         }
       ]
     });
@@ -63,7 +88,7 @@ export function createPacoNavigation({
     key: 'test-history',
     icon: '📝',
     label: 'Toetsen',
-    onClick: () => go('test-history.html', student)
+    onClick: () => go('test-history.html', student, parentStudent)
   });
 
   if (includeManagement) {
@@ -71,7 +96,7 @@ export function createPacoNavigation({
       key: 'management',
       icon: '⚙️',
       label: 'Beheer',
-      onClick: () => go('management.html')
+      onClick: () => go('management.html', '', parentStudent)
     });
   }
 
@@ -80,13 +105,13 @@ export function createPacoNavigation({
       key: 'recovery',
       icon: '🗂️',
       label: 'Archief / Prullenbak',
-      onClick: () => go('archive.html')
+      onClick: () => go('archive.html', '', parentStudent)
     });
     items.push({
       key: 'feedback',
       icon: '💬',
       label: 'Feedback',
-      onClick: () => go('feedback.html')
+      onClick: () => go('feedback.html', '', parentStudent)
     });
   }
 

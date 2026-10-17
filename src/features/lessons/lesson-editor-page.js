@@ -27,8 +27,6 @@ function normalizeParts(parts, fallback = '') {
 function editorShell() {
   return `
     <div class="editor-page-banner"><img src="pacogo-aruba-hero.png" alt="Paco op Aruba"><div class="banner-label" data-editor-title>🐾 NIEUWE LES</div></div>
-    <div class="editor-toolbar"><button type="button" class="secondary" data-action="cancel">← Annuleren</button></div>
-    <div class="page-heading editor-page-heading"><h2 data-title>Nieuwe les</h2><p>Kies hoe je de les wilt invoeren.</p></div>
     <div class="card editor-main-card">
       <div class="editor-action-row"><button class="success" type="button" data-action="save">💾 Les opslaan</button></div>
       <div class="editor-student"><strong>Voor welke leerling?</strong><div class="editor-student-buttons">
@@ -294,7 +292,6 @@ export function createLessonEditorPage({ root, runtime, initialLesson = null, st
       return;
     }
     if (button.dataset.action === 'toggle-type') { root.querySelector('#lessonTypeMenu').classList.toggle('hidden'); return; }
-    if (button.dataset.action === 'cancel') { window.location.href = `management.html?student=${encodeURIComponent(root.querySelector('input[name="lessonStudent"]:checked')?.value || student || '')}`; return; }
     if (button.dataset.action === 'save') { button.disabled = true; try { await save(); } finally { button.disabled = false; } return; }
     if (button.dataset.action === 'remove-row') {
       const row = button.closest('.editor-row'); const container = row?.parentElement; row?.remove();

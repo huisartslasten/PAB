@@ -30,19 +30,16 @@ const content = document.createElement('div');
 content.className = 'month-calendar-page';
 content.innerHTML = `
   <section class="month-calendar-card" id="monthCalendarCard">
-    <button type="button" class="month-calendar-print" id="monthCalendarPrint">🖨️ Print</button>
-    <h1 class="month-calendar-print-title" id="monthCalendarPrintTitle"></h1>
     <div class="month-calendar-heading">
-      <button type="button" class="month-calendar-nav" id="monthCalendarPrevious">← Vorige maand</button>
       <div class="month-calendar-heading-center">
         <div class="month-calendar-title" id="monthCalendarTitle"></div>
-        <button type="button" class="month-calendar-today" id="monthCalendarToday">📍 Deze maand</button>
       </div>
-      <button type="button" class="month-calendar-nav" id="monthCalendarNext">Volgende maand →</button>
+      <button type="button" class="month-calendar-print" id="monthCalendarPrint" aria-label="Print kalender" title="Print kalender">🖨️</button>
     </div>
     <div id="monthCalendarGrid"></div>
     <div class="month-calendar-footer">
       <button type="button" class="month-calendar-nav" id="monthCalendarPreviousBottom">← Vorige maand</button>
+      <button type="button" class="month-calendar-today" id="monthCalendarToday">📍 Deze maand</button>
       <button type="button" class="month-calendar-nav" id="monthCalendarNextBottom">Volgende maand →</button>
     </div>
   </section>`;
@@ -97,8 +94,6 @@ function render() {
   });
 }
 
-pageRoot.querySelector('#monthCalendarPrevious').addEventListener('click', () => moveMonth(-1));
-pageRoot.querySelector('#monthCalendarNext').addEventListener('click', () => moveMonth(1));
 pageRoot.querySelector('#monthCalendarPreviousBottom').addEventListener('click', () => moveMonth(-1));
 pageRoot.querySelector('#monthCalendarNextBottom').addEventListener('click', () => moveMonth(1));
 pageRoot.querySelector('#monthCalendarToday').addEventListener('click', () => { monthCursor = new Date(); monthCursor.setDate(1); monthCursor.setHours(12, 0, 0, 0); render(); });

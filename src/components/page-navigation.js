@@ -46,7 +46,11 @@ export function createPacoNavigation({
     });
   }
 
-  items.push({ key: 'dashboard', icon: '🏠', label: 'Dashboard', onClick: () => go('dashboard.html', view) });
+  // Beheer has its own dashboard/start context. The dashboard entry here is
+  // the learner dashboard and would incorrectly leave the management context.
+  if (!includeManagementStudentSelector) {
+    items.push({ key: 'dashboard', icon: '🏠', label: 'Dashboard', onClick: () => go('dashboard.html', view) });
+  }
 
   // The management dashboard is a distinct navigation context. It does not
   // expose student-owned "Mijn lessen" or "Mijn agenda" entry points; those

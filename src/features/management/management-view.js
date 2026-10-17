@@ -182,7 +182,7 @@ export async function renderStudentLessons(container, management, { onEdit = nul
   return groups;
 }
 
-export function renderRecovery(container, management, mode, onRestore = async () => {}, onEmptyTrash = async () => {}, onPermanentDelete = async () => {}) {
+export function renderRecovery(container, management, mode, onRestore = async () => {}, onEmptyTrash = async () => {}, onPermanentDelete = async () => {}, onError = async () => {}) {
   if (!container) throw new Error('renderRecovery requires a container.');
   if (!management) throw new Error('renderRecovery requires management.');
   if (mode !== 'archive' && mode !== 'trash') throw new Error('renderRecovery requires a valid mode.');
@@ -220,7 +220,7 @@ export function renderRecovery(container, management, mode, onRestore = async ()
   const emptyButton = container.querySelector('[data-empty-trash]');
   emptyButton?.addEventListener('click', async () => {
     emptyButton.disabled = true;
-    try { await onEmptyTrash(); } finally { emptyButton.disabled = false; }
+    try { await onEmptyTrash(); } catch (error) { await onError(error); } finally { emptyButton.disabled = false; }
   });
 
   container.querySelectorAll('.management-restore').forEach(button => {
@@ -229,9 +229,10 @@ export function renderRecovery(container, management, mode, onRestore = async ()
       if (!lesson) return;
       button.disabled = true;
       try {
-        management.selectStudent(lesson.student);
         await management.restoreLesson(lesson.id);
         await onRestore(lesson);
+      } catch (error) {
+        await onError(error);
       } finally {
         button.disabled = false;
       }
@@ -243,7 +244,7 @@ export function renderRecovery(container, management, mode, onRestore = async ()
       const lesson = lessons.find(item => String(item.id) === String(button.dataset.permanentDeleteLessonId));
       if (!lesson) return;
       button.disabled = true;
-      try { await onPermanentDelete(lesson); } finally { button.disabled = false; }
+      try { await onPermanentDelete(lesson); } catch (error) { await onError(error); } finally { button.disabled = false; }
     });
   });
 

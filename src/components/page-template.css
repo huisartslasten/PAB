@@ -47,6 +47,13 @@
 .paco-template-page-heading p { margin: 7px 0 0; color: var(--paco-muted); font-size: 17px; font-weight: 700; line-height: 1.35; }
 .paco-template-page-content { min-width: 0; color: #fff; }
 
+/* Shared PacoGO content cards. Feature pages use this primitive instead of
+   placing headings, labels or controls directly on the blue page background. */
+.paco-template-card { padding: 20px 22px; border: 1px solid var(--paco-border); border-radius: 22px; background: #fff; color: var(--paco-text); box-shadow: var(--paco-shadow); }
+.paco-template-card h2, .paco-template-card h3, .paco-template-card h4 { color: var(--paco-text); }
+.paco-template-card label { color: var(--paco-text); }
+.paco-template-card .small { color: var(--paco-muted); }
+
 /* Shared PacoGO control language. Page-specific markup can use these controls
    without reimplementing the shell's visual treatment. */
 .paco-page-template button.secondary {

@@ -17,6 +17,11 @@ function createFixture() {
       async restore() {},
       async archive() {},
       async moveToTrash() {},
+      async permanentlyDelete(id) {
+        const index = lessons.findIndex(item => item.id === id);
+        if (index >= 0) lessons.splice(index, 1);
+        return index >= 0 ? 1 : 0;
+      },
       async emptyTrash() {},
       async createLesson() {},
       async updateLesson() {}
@@ -36,7 +41,7 @@ function createFixture() {
     }
   });
 
-  return { management, getLoaded: () => loaded };
+  return { management, lessons, getLoaded: () => loaded };
 }
 
 test('recovery can load all students without selecting a student', async () => {
@@ -49,4 +54,16 @@ test('recovery can load all students without selecting a student', async () => {
   assert.deepEqual(result.trash.map(lesson => lesson.student), ['Zenith']);
   assert.equal(appState.currentStudent, null);
   assert.equal(getLoaded(), 1);
+});
+
+test('recovery can permanently delete one trashed lesson without selecting a student', async () => {
+  appState.currentStudent = null;
+  const { management, lessons } = createFixture();
+
+  await management.loadRecoveryLessons();
+  const deletedCount = await management.permanentlyDeleteRecoveryLesson(2);
+
+  assert.equal(deletedCount, 1);
+  assert.equal(lessons.some(lesson => lesson.id === 2), false);
+  assert.equal(appState.currentStudent, null);
 });

@@ -16,15 +16,13 @@ import { createPacoNavigation } from './src/components/page-navigation.js';
 import { createPacoGOApp } from './src/app/bootstrap.js';
 import { createAgendaRuntimeEntry } from './src/features/agenda/runtime-entry.js';
 import { renderMonthCalendar, formatMonthLabel } from './src/features/agenda/month-calendar-view.js';
-import { listStudents, isKnownStudent } from './src/features/students/students.js';
+import { readViewContext, applyViewContext, buildViewUrl } from './src/core/view-context.js';
 import { setStudent } from './src/core/state.js';
 
-const params = new URLSearchParams(window.location.search);
-const requested = params.get('student') || '';
-const student = isKnownStudent(requested) ? requested : listStudents()[0] || '';
+const context = readViewContext(new URLSearchParams(window.location.search));
+const student = context.student;
 const mount = document.querySelector('#paco-template-mount');
 const app = createPacoGOApp({ supabaseLib: window.supabase });
-setStudent(student);
 
 const content = document.createElement('div');
 content.className = 'month-calendar-page';
@@ -48,12 +46,12 @@ content.innerHTML = `
 mountPacoPageTemplate({
   mount,
   backLabel: '← Mijn agenda',
-  backAction: () => { window.location.href = `agenda.html?student=${encodeURIComponent(student)}`; },
+  backAction: () => { window.location.href = buildViewUrl('agenda.html', { student, mode: context.mode }).toString(); },
   greeting: student ? `Hoi ${student}! 🐾` : 'PacoGO Maandkalender 📅',
   title: 'Maandkalender',
   icon: '📅',
-  subtitle: 'Bekijk je afspraken per maand en print de kalender.',
-  navigation: createPacoNavigation({ active: 'agenda', activeSubmenu: 'month-calendar', student }),
+  subtitle: context.isManagement ? 'Beheerweergave — je beheert hier de agenda van de geselecteerde leerling.' : 'Bekijk je afspraken per maand en print de kalender.',
+  navigation: createPacoNavigation({ active: 'agenda', activeSubmenu: 'month-calendar', student, viewMode: context.mode }),
   content
 });
 
@@ -102,11 +100,16 @@ pageRoot.querySelector('#monthCalendarPrint').addEventListener('click', () => wi
 
 try {
   await app.initializeSession();
+  if (context.isManagement) applyViewContext(context, { canManage: app.auth.isParent });
+  else applyViewContext(context);
+  if (!student) throw new Error('Geen leerling geselecteerd.');
   await app.loadLessons();
   render();
 } catch (error) {
   console.error('PacoGO month calendar initialization failed:', error);
-  pageRoot.querySelector('#monthCalendarGrid').innerHTML = '<div class="agenda-state">De maandkalender kon niet worden geladen.</div>';
+  pageRoot.querySelector('#monthCalendarGrid').innerHTML = error.message === 'Geen leerling geselecteerd.'
+    ? '<div class="agenda-state">Selecteer eerst een leerling vanuit Beheer.</div>'
+    : '<div class="agenda-state">De maandkalender kon niet worden geladen.</div>';
 }
 </script>
 </body>

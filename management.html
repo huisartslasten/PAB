@@ -72,7 +72,19 @@
     }
     async function archiveLesson(lesson){const confirmed=await confirmPacoAction({title:'Les archiveren?',message:`Weet je zeker dat je de les “${lesson.title}” wilt archiveren?`,confirmLabel:'Archiveren',cancelLabel:'Annuleren'});if(!confirmed)return;await management.archiveLesson(lesson.id);await showSelectedStudent(management.getSelectedStudent());await refreshRecovery();}
     async function deleteLesson(lesson){const confirmed=await confirmPacoAction({title:'Les verwijderen?',message:`Weet je zeker dat je de les “${lesson.title}” naar de prullenbak wilt verplaatsen?`,confirmLabel:'Verwijderen',cancelLabel:'Annuleren'});if(!confirmed)return;await management.moveToTrash(lesson.id);await showSelectedStudent(management.getSelectedStudent());await refreshRecovery();}
-    async function refreshRecovery(){archive.replaceChildren();trash.replaceChildren();renderRecovery(archive,management,'archive',refreshRecovery);renderRecovery(trash,management,'trash',refreshRecovery);}
+    async function emptyTrash(){
+      const confirmed=await confirmPacoAction({
+        title:'Prullenbak definitief leegmaken?',
+        message:'Alle lessen in de prullenbak worden definitief verwijderd. De bijbehorende toetsgeschiedenis wordt ook verwijderd. Dit kan niet ongedaan worden gemaakt.',
+        confirmLabel:'Definitief verwijderen',
+        cancelLabel:'Annuleren'
+      });
+      if(!confirmed)return;
+      await management.emptyTrash();
+      await refreshRecovery();
+      await showSelectedStudent(management.getSelectedStudent());
+    }
+    async function refreshRecovery(){archive.replaceChildren();trash.replaceChildren();renderRecovery(archive,management,'archive',refreshRecovery);renderRecovery(trash,management,'trash',refreshRecovery,emptyTrash);}
 
     async function initializeManagement(){
       try{

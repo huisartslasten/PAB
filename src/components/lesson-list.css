@@ -1,0 +1,35 @@
+.paco-subject-card {
+  display: block;
+  width: 100%;
+  border: 2px solid #f2c72e;
+  border-radius: 20px;
+  background: #ffd84d;
+  box-shadow: 0 8px 22px rgba(16, 43, 87, .09);
+  padding: 18px;
+  text-align: left;
+  cursor: pointer;
+  transition: transform .16s, box-shadow .16s, background .16s;
+  color: #102b57;
+  text-decoration: none;
+}
+
+.paco-subject-card:hover {
+  transform: translateY(-2px);
+  background: #ffcf24;
+  box-shadow: 0 12px 28px rgba(16, 43, 87, .13);
+}
+
+.paco-subject-card:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, .95), 0 0 0 7px rgba(23, 135, 242, .55), 0 12px 28px rgba(16, 43, 87, .13);
+}
+
+.paco-subject-card h2,
+.paco-subject-card p {
+  color: #102b57;
+}
+
+.paco-subject-card .subject-icon {
+  font-size: 34px;
+  margin-bottom: 12px;
+}

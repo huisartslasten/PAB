@@ -1,8 +1,8 @@
-import { appState, setViewContext } from '../../core/state.js';
+import { appState } from '../../core/state.js';
 import { getActiveStudentLessons, getStudentLessons } from '../lessons/visibility.js';
 import { createLessonRecovery, createTrashRecovery } from '../lessons/recovery.js';
 import { getAllArchiveEntries, getAllTrashEntries } from './recovery.js';
-import { isKnownStudent, listStudents } from '../students/students.js';
+import { listStudents } from '../students/students.js';
 
 function requireParent(auth) {
   if (!auth?.isParent) throw new Error('Management requires a parent session.');
@@ -54,16 +54,7 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
     };
   }
 
-  function selectStudent(student) {
-    assertParent();
-    const value = String(student ?? '').trim();
-    if (!value || !isKnownStudent(value)) throw new Error('A known student must be selected.');
-    setViewContext(value, 'management');
-    return value;
-  }
-
   function getStudents() { assertParent(); return listStudents(); }
-  function getSelectedStudent() { assertParent(); return appState.viewMode === 'management' ? appState.viewedStudent : null; }
   function getScopedLessons() { assertParent(); return getActiveStudentLessons(appState.lessons, requireStudent()); }
   function getAllScopedLessons() { assertParent(); return getStudentLessons(appState.lessons, requireStudent()); }
 
@@ -125,7 +116,7 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
   async function updateFeedbackStatus(id, status) { assertParent(); return feedbackService.updateStatus(id, status); }
 
   return Object.freeze({
-    getStudents, selectStudent, getSelectedStudent, loadAllLessons, loadLessons: refreshLessons, loadRecoveryLessons: refreshRecoveryLessons,
+    getStudents, loadAllLessons, loadLessons: refreshLessons, loadRecoveryLessons: refreshRecoveryLessons,
     getScopedLessons, getAllScopedLessons, getOrderedScopedLessons, saveLessonOrder, moveLessonToSubvak, getRecoveryLessons,
     createLesson, updateLesson, archiveLesson, moveToTrash, restoreLesson, permanentlyDeleteRecoveryLesson, emptyTrash,
     listFeedback, submitFeedback, updateFeedbackStatus

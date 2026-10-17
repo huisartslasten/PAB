@@ -1,4 +1,5 @@
 import { appState } from '../../core/state.js';
+import { getViewContext } from '../../core/view-context.js';
 import { getActiveStudentLessons, getStudentLessons } from '../lessons/visibility.js';
 import { createLessonRecovery, createTrashRecovery } from '../lessons/recovery.js';
 import { getAllArchiveEntries, getAllTrashEntries } from './recovery.js';
@@ -9,8 +10,9 @@ function requireParent(auth) {
 }
 
 function requireStudent() {
-  if (!appState.viewedStudent || appState.viewMode !== 'management') throw new Error('A student must be selected.');
-  return appState.viewedStudent;
+  const { student, isManagement } = getViewContext();
+  if (!student || !isManagement) throw new Error('A student must be selected.');
+  return student;
 }
 
 function findScopedLesson(id, student) {

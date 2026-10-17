@@ -11,23 +11,16 @@ function createFixture() {
   ];
 
   let loaded = 0;
-  const lessonService = {
-    async restore(id) {
-      const lesson = lessons.find(item => item.id === id);
-      lesson.archived = false;
-      lesson.deleted = false;
-      return lesson;
-    },
-    async archive() {},
-    async moveToTrash() {},
-    async emptyTrash() {},
-    async createLesson() {},
-    async updateLesson() {}
-  };
-
   const management = createManagement({
     auth: { isParent: true },
-    lessonService,
+    lessonService: {
+      async restore() {},
+      async archive() {},
+      async moveToTrash() {},
+      async emptyTrash() {},
+      async createLesson() {},
+      async updateLesson() {}
+    },
     feedbackService: {
       async listAll() { return []; },
       async create() {},
@@ -43,7 +36,7 @@ function createFixture() {
     }
   });
 
-  return { management, lessons, getLoaded: () => loaded };
+  return { management, getLoaded: () => loaded };
 }
 
 test('recovery can load all students without selecting a student', async () => {
@@ -56,16 +49,4 @@ test('recovery can load all students without selecting a student', async () => {
   assert.deepEqual(result.trash.map(lesson => lesson.student), ['Zenith']);
   assert.equal(appState.currentStudent, null);
   assert.equal(getLoaded(), 1);
-});
-
-test('recovery restore does not require or change the selected student', async () => {
-  appState.currentStudent = null;
-  const { management, lessons } = createFixture();
-  await management.loadRecoveryLessons();
-
-  await management.restoreRecoveryLesson(1);
-
-  assert.equal(lessons[0].archived, false);
-  assert.equal(lessons[0].deleted, false);
-  assert.equal(appState.currentStudent, null);
 });

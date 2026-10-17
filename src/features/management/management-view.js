@@ -13,17 +13,23 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
-function groupByStudentAndSubject(lessons = []) {
-  const students = new Map();
+function groupByStudentAndSubject(lessons = [], students = []) {
+  const studentGroups = new Map();
+  students.forEach(student => {
+    const name = String(student ?? '').trim();
+    if (name) studentGroups.set(name, new Map());
+  });
+
   lessons.forEach(lesson => {
     const student = String(lesson.student || 'Onbekende leerling').trim() || 'Onbekende leerling';
     const subject = String(lesson.subject || 'Overig').trim() || 'Overig';
-    if (!students.has(student)) students.set(student, new Map());
-    const subjects = students.get(student);
+    if (!studentGroups.has(student)) studentGroups.set(student, new Map());
+    const subjects = studentGroups.get(student);
     if (!subjects.has(subject)) subjects.set(subject, []);
     subjects.get(subject).push(lesson);
   });
-  return [...students.entries()]
+
+  return [...studentGroups.entries()]
     .sort(([a], [b]) => a.localeCompare(b, 'nl'))
     .map(([student, subjects]) => ({
       student,
@@ -176,25 +182,22 @@ export async function renderStudentLessons(container, management, { onEdit = nul
   return groups;
 }
 
-export function renderRecovery(container, management, mode, onRestore = async () => {}, onEmptyTrash = async () => {}) {
+export function renderRecovery(container, management, mode, onRestore = async () => {}, onEmptyTrash = async () => {}, onPermanentDelete = async () => {}) {
   if (!container) throw new Error('renderRecovery requires a container.');
   if (!management) throw new Error('renderRecovery requires management.');
   if (mode !== 'archive' && mode !== 'trash') throw new Error('renderRecovery requires a valid mode.');
 
   const lessons = management.getRecoveryLessons(mode);
-  if (!lessons.length) {
-    container.innerHTML = `<div class="management-state">${mode === 'archive' ? 'Het archief is leeg.' : 'De prullenbak is leeg.'}</div>`;
-    return [];
-  }
-
-  const emptyTrashButton = mode === 'trash' && typeof onEmptyTrash === 'function'
+  const students = management.getStudents();
+  const emptyTrashButton = mode === 'trash' && lessons.length && typeof onEmptyTrash === 'function'
     ? `<div class="management-links"><button type="button" class="management-link danger" data-empty-trash>🗑️ Prullenbak definitief leegmaken</button></div>`
     : '';
-  const groups = groupByStudentAndSubject(lessons);
+  const groups = groupByStudentAndSubject(lessons, students);
+
   container.innerHTML = `${emptyTrashButton}${groups.map(group => `
     <section class="management-recovery-student">
       <h3>${escapeHtml(group.student)}</h3>
-      ${group.subjects.map(subject => `
+      ${group.subjects.length ? group.subjects.map(subject => `
         <section class="management-recovery-subject">
           <h4>${escapeHtml(subject.subject)}</h4>
           <div class="management-recovery-lessons">
@@ -202,12 +205,15 @@ export function renderRecovery(container, management, mode, onRestore = async ()
               <article class="management-lesson paco-lesson-card" data-recovery-lesson-id="${escapeHtml(lesson.id)}">
                 <h3>${escapeHtml(lesson.title)}</h3>
                 <p>${escapeHtml(lesson.subject)}${lesson.subvak ? ` · ${escapeHtml(lesson.subvak)}` : ''}</p>
-                <button type="button" class="management-link management-restore" data-lesson-id="${escapeHtml(lesson.id)}">↩️ Herstellen</button>
+                <div class="management-links">
+                  <button type="button" class="management-link management-restore" data-lesson-id="${escapeHtml(lesson.id)}">↩️ Herstellen</button>
+                  ${mode === 'trash' && typeof onPermanentDelete === 'function' ? `<button type="button" class="management-link danger management-permanent-delete" data-permanent-delete-lesson-id="${escapeHtml(lesson.id)}">🗑️ Definitief verwijderen</button>` : ''}
+                </div>
               </article>
             `).join('')}
           </div>
         </section>
-      `).join('')}
+      `).join('') : `<div class="management-state">${mode === 'archive' ? 'Geen gearchiveerde lessen.' : 'Geen lessen in de prullenbak.'}</div>`}
     </section>
   `).join('')}`;
 
@@ -229,6 +235,15 @@ export function renderRecovery(container, management, mode, onRestore = async ()
       } finally {
         button.disabled = false;
       }
+    });
+  });
+
+  container.querySelectorAll('.management-permanent-delete').forEach(button => {
+    button.addEventListener('click', async () => {
+      const lesson = lessons.find(item => String(item.id) === String(button.dataset.permanentDeleteLessonId));
+      if (!lesson) return;
+      button.disabled = true;
+      try { await onPermanentDelete(lesson); } finally { button.disabled = false; }
     });
   });
 

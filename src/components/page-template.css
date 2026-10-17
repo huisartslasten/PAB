@@ -45,7 +45,13 @@
 .paco-template-page-icon { flex: 0 0 auto; font-size: 39px; line-height: 1; }
 .paco-template-page-heading h1 { margin: 0; font-family: "Baloo 2", Nunito, sans-serif; font-size: clamp(30px, 3vw, 42px); line-height: 1; color: #102b57; font-weight: 900; letter-spacing: -.5px; }
 .paco-template-page-heading p { margin: 7px 0 0; color: var(--paco-muted); font-size: 17px; font-weight: 700; line-height: 1.35; }
-.paco-template-page-content { min-width: 0; color: #fff; }
+.paco-template-page-content { min-width: 0; color: var(--paco-text); }
+
+/* Shared feature-page heading. Pages may use .page-heading inside the
+   template when they need a secondary heading without placing text on blue. */
+.paco-page-template .page-heading { min-height: 84px; display: flex; flex-direction: column; justify-content: center; margin: 0; padding: 17px 22px; border: 1px solid var(--paco-border); border-radius: 20px; background: #edf8ff; color: var(--paco-text); box-shadow: var(--paco-shadow); }
+.paco-page-template .page-heading h2, .paco-page-template .page-heading h3 { margin: 0; font: 900 28px/1.05 "Baloo 2", Nunito, sans-serif; color: var(--paco-text); }
+.paco-page-template .page-heading p { margin: 6px 0 0; color: var(--paco-muted); font-size: 17px; font-weight: 700; line-height: 1.35; }
 
 /* Shared PacoGO content card. Existing feature cards use this canonical
    surface so headings, labels and controls never sit directly on blue. */
@@ -55,24 +61,20 @@
 .paco-page-template .card h2, .paco-page-template .card h3, .paco-page-template .card h4 { color: var(--paco-text); }
 .paco-template-card label, .paco-page-template .card label { color: var(--paco-text); }
 .paco-template-card .small, .paco-page-template .card .small { color: var(--paco-muted); }
+.paco-page-template .paco-template-page-content strong { color: var(--paco-text); }
 
 /* Shared PacoGO control language. Page-specific markup can use these controls
    without reimplementing the shell's visual treatment. */
-.paco-page-template button.secondary {
-  min-height: 46px;
-  padding: 9px 16px;
-  border: 2px solid var(--paco-border);
-  border-radius: 14px;
-  background: #edf8ff;
-  color: var(--paco-blue-dark);
-  font: 800 16px/1.1 "Baloo 2", Nunito, sans-serif;
-  box-shadow: 0 4px 0 rgba(13,111,212,.10), 0 8px 18px rgba(16,43,87,.07);
-  cursor: pointer;
-  transition: transform .15s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease;
-}
-.paco-page-template button.secondary:hover { transform: translateY(-1px); background: #e2f2ff; border-color: #a9d1f3; box-shadow: 0 5px 0 rgba(13,111,212,.12), 0 10px 20px rgba(16,43,87,.09); }
-.paco-page-template button.secondary:active { transform: translateY(1px); box-shadow: 0 2px 0 rgba(13,111,212,.10), 0 5px 12px rgba(16,43,87,.07); }
+.paco-page-template button.secondary,
+.paco-page-template button.success { min-height: 46px; padding: 9px 16px; border: 2px solid var(--paco-border); border-radius: 14px; background: #edf8ff; color: var(--paco-blue-dark); font: 800 16px/1.1 "Baloo 2", Nunito, sans-serif; box-shadow: 0 4px 0 rgba(13,111,212,.10), 0 8px 18px rgba(16,43,87,.07); cursor: pointer; transition: transform .15s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease; }
+.paco-page-template button.secondary:hover,
+.paco-page-template button.success:hover { transform: translateY(-1px); background: #e2f2ff; border-color: #a9d1f3; box-shadow: 0 5px 0 rgba(13,111,212,.12), 0 10px 20px rgba(16,43,87,.09); }
+.paco-page-template button.secondary:active,
+.paco-page-template button.success:active { transform: translateY(1px); box-shadow: 0 2px 0 rgba(13,111,212,.10), 0 5px 12px rgba(16,43,87,.07); }
+.paco-page-template button.success { background: var(--paco-blue); color: #fff; border-color: var(--paco-blue); box-shadow: 0 4px 0 rgba(13,111,212,.22), 0 8px 18px rgba(16,43,87,.10); }
+.paco-page-template button.success:hover { background: var(--paco-blue-dark); border-color: var(--paco-blue-dark); }
 .paco-page-template button.secondary:focus-visible,
+.paco-page-template button.success:focus-visible,
 .paco-template-back:focus-visible,
 .paco-template-nav-item:focus-visible,
 .paco-template-nav-subitem:focus-visible { outline: 0; box-shadow: 0 0 0 4px rgba(255,255,255,.95), 0 0 0 7px rgba(23,135,242,.55); }
@@ -113,4 +115,6 @@
   .paco-template-page-header { margin-bottom: 14px; padding: 17px 18px; }
   .paco-template-page-heading h1 { font-size: 31px; }
   .paco-template-version-badge { right: 12px; bottom: 10px; padding: 10px 16px; font-size: 22px; border-width: 3px; }
+  .paco-page-template .page-heading { padding: 15px 18px; }
+  .paco-page-template .page-heading h2, .paco-page-template .page-heading h3 { font-size: 25px; }
 }

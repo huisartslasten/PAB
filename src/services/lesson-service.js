@@ -123,6 +123,34 @@ export function createLessonService(db) {
         .update({ archived: false, deleted: false })
         .eq('id', id);
       if (error) throw error;
+    },
+
+    async emptyTrash() {
+      const { data: trashedLessons, error: listError } = await db
+        .from('lessons')
+        .select('id')
+        .eq('deleted', true);
+      if (listError) throw listError;
+
+      const lessonIds = (trashedLessons || []).map(lesson => lesson.id);
+      if (!lessonIds.length) return 0;
+
+      // Test history is intentionally retained for archived lessons, but the user's
+      // permanent-delete policy explicitly removes it when a lesson leaves the trash.
+      const { error: attemptsError } = await db
+        .from('test_attempts')
+        .delete()
+        .in('lesson_id', lessonIds);
+      if (attemptsError) throw attemptsError;
+
+      const { data: deletedLessons, error: deleteError } = await db
+        .from('lessons')
+        .delete()
+        .in('id', lessonIds)
+        .select('id');
+      if (deleteError) throw deleteError;
+
+      return (deletedLessons || []).length;
     }
   };
 }

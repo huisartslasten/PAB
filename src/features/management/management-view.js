@@ -217,7 +217,7 @@ export async function renderStudentLessons(container, management, { onEdit = nul
   return groups;
 }
 
-export function renderRecovery(container, management, mode, onRestore = async () => {}) {
+export function renderRecovery(container, management, mode, onRestore = async () => {}, onEmptyTrash = async () => {}) {
   if (!container) throw new Error('renderRecovery requires a container.');
   if (!management) throw new Error('renderRecovery requires management.');
   if (mode !== 'archive' && mode !== 'trash') throw new Error('renderRecovery requires a valid mode.');
@@ -228,8 +228,11 @@ export function renderRecovery(container, management, mode, onRestore = async ()
     return [];
   }
 
+  const emptyTrashButton = mode === 'trash' && typeof onEmptyTrash === 'function'
+    ? `<div class="management-links"><button type="button" class="management-link danger" data-empty-trash>🗑️ Prullenbak definitief leegmaken</button></div>`
+    : '';
   const groups = groupByStudentAndSubject(lessons);
-  container.innerHTML = groups.map(group => `
+  container.innerHTML = `${emptyTrashButton}${groups.map(group => `
     <section class="management-recovery-student">
       <h3>${escapeHtml(group.student)}</h3>
       ${group.subjects.map(subject => `
@@ -247,7 +250,13 @@ export function renderRecovery(container, management, mode, onRestore = async ()
         </section>
       `).join('')}
     </section>
-  `).join('');
+  `).join('')}`;
+
+  const emptyButton = container.querySelector('[data-empty-trash]');
+  emptyButton?.addEventListener('click', async () => {
+    emptyButton.disabled = true;
+    try { await onEmptyTrash(); } finally { emptyButton.disabled = false; }
+  });
 
   container.querySelectorAll('.management-restore').forEach(button => {
     button.addEventListener('click', async () => {

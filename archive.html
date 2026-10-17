@@ -98,8 +98,8 @@
     async function refreshRecovery(){
       archiveList.replaceChildren();
       trashList.replaceChildren();
-      renderRecovery(archiveList,management,'archive',refreshRecovery,undefined,undefined,handleRecoveryError);
-      renderRecovery(trashList,management,'trash',refreshRecovery,emptyTrash,permanentlyDeleteLesson,handleRecoveryError);
+      renderRecovery(archiveList,management,'archive',handleRestore,undefined,undefined,handleRecoveryError);
+      renderRecovery(trashList,management,'trash',handleRestore,emptyTrash,permanentlyDeleteLesson,handleRecoveryError);
     }
 
     async function handleRestore(lesson){

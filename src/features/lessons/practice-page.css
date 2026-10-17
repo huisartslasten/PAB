@@ -168,11 +168,13 @@
 }
 
 .practice-answer-review {
+  order: 2;
   border: 2px solid #dce9f6;
   background: #f8fbff;
 }
 
 .practice-correct-answer {
+  order: 1;
   border: 2px solid #9ed1f8;
   background: #edf8ff;
 }

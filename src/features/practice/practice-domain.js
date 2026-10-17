@@ -1,5 +1,6 @@
 export const PRACTICE_MODES = Object.freeze([
   Object.freeze({ id: 'flashcards', label: 'Flashcards', status: 'active' }),
+  Object.freeze({ id: 'practice-test', label: 'Oefentoets', status: 'active' }),
   Object.freeze({ id: 'games', label: 'Spelletjes', status: 'planned' })
 ]);
 

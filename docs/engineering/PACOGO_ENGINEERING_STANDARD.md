@@ -43,6 +43,29 @@ For every meaningful feature or architectural change, determine before coding:
 
 Do not start by adding code to the most convenient file.
 
+### 3.1 Mandatory pre-code architecture gate
+
+**No code may be changed until this gate has been completed.**
+
+Before every meaningful code, UI, styling, runtime, or refactor change, the developer must explicitly establish:
+
+1. **Owner** — which existing module, service, feature, component, template, or boundary owns this responsibility?
+2. **Current implementation** — where is the responsibility implemented today?
+3. **Shared users** — which existing pages, flows, lessons, tests, practice modes, or future extension points depend on it?
+4. **Correct change location** — where must the change be made so every current and future consumer receives the correct behavior through the canonical owner?
+5. **Replacement/removal** — which existing local, duplicate, legacy, or obsolete implementation must be removed or replaced as part of the change?
+6. **Patch check** — would the proposed change add a page-specific override, duplicate logic, workaround, fallback, bridge, compatibility layer, or special case merely to make the requested result work? If yes, the change is rejected and the architecture must be resolved first.
+
+The gate must be visible in the development conversation before implementation begins. A valid gate is concise, but it must answer all six points.
+
+For shared behavior, a local page implementation is **not allowed** when a canonical shared owner exists. Changes to templates, shared components, design tokens, shared services, practice engines, lesson systems, navigation, or other reusable boundaries must be made at that owner so existing and future consumers inherit the behavior automatically.
+
+A page-local change is acceptable only when the responsibility is genuinely unique to that page and there is no shared owner or shared contract being bypassed.
+
+If ownership is unclear, the developer must **STOP** and inspect the repository until ownership is established. Do not code first and determine ownership afterward.
+
+After implementation, the developer must verify that the change is actually flowing through the identified owner and has not created a second path or local exception.
+
 ## 4. One canonical owner
 
 Every responsibility must have one clear canonical owner.

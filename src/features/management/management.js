@@ -35,6 +35,12 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
     requireParent(auth);
   }
 
+  async function loadAllLessons() {
+    assertParent();
+    await loadLessons();
+    return appState.lessons;
+  }
+
   async function refreshLessons() {
     assertParent();
     await loadLessons();
@@ -204,6 +210,7 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
     getStudents,
     selectStudent,
     getSelectedStudent,
+    loadAllLessons,
     loadLessons: refreshLessons,
     loadRecoveryLessons: refreshRecoveryLessons,
     getScopedLessons,

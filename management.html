@@ -79,10 +79,12 @@
         if(!session){window.location.href='auth.html';return;}
         if(!app.auth.isParent){state.textContent='Je hebt geen toegang tot Beheer.';return;}
 
+        const selected=management.getSelectedStudent()||management.getStudents()[0];
+        if(selected) management.selectStudent(selected);
         await management.loadLessons();
         renderStudentSelection(students,management,student=>{showSelectedStudent(student).catch(error=>console.error('Management student load error:',error));});
-        lessonHeading.textContent='Actieve lessen';
-        lessons.innerHTML='<div class="management-state">Kies hierboven een leerling om de actieve lessen te beheren.</div>';
+        if(selected) await showSelectedStudent(selected);
+        else lessons.innerHTML='<div class="management-state">Kies hierboven een leerling om de actieve lessen te beheren.</div>';
         await refreshRecovery();
         await renderFeedback(feedbackList,management);
         content.replaceChildren(studentSection,lessonSection,archiveSection,trashSection,feedbackSection);

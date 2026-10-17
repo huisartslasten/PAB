@@ -19,7 +19,7 @@ export function createPacoNavigation({
   includeManagement = true,
   includeCreator = false,
   includeAgenda = true,
-  managementSubmenu = null
+  managementSections = null
 } = {}) {
   const items = [
     {
@@ -71,16 +71,20 @@ export function createPacoNavigation({
       key: 'management',
       icon: '⚙️',
       label: 'Beheer',
-      onClick: () => go('management.html'),
-      ...(Array.isArray(managementSubmenu) && managementSubmenu.length
-        ? {
-            submenu: managementSubmenu.map(item => ({
-              ...item,
-              active: item.active === true
-            }))
-          }
-        : {})
+      onClick: () => go('management.html')
     });
+
+    if (Array.isArray(managementSections)) {
+      managementSections.forEach(item => {
+        if (!item || !item.label || typeof item.onClick !== 'function') return;
+        items.push({
+          key: item.key || `management-${item.label.toLowerCase()}`,
+          icon: item.icon || '',
+          label: item.label,
+          onClick: item.onClick
+        });
+      });
+    }
   }
 
   if (includeCreator) {

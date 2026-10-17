@@ -4,103 +4,63 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PacoGO — Oefenen</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="src/components/page-template.css">
   <style>
-    .practice-choice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-    .practice-choice-card{min-height:180px;display:flex;flex-direction:column;justify-content:space-between;padding:18px;border:2px solid #dce9f6;border-radius:22px;background:#fff;box-shadow:0 6px 0 rgba(16,43,87,.06),0 10px 22px rgba(16,43,87,.07);transition:.16s}
-    .practice-choice-card.available{background:#fffdf0;border-color:#f4e8a8}
-    .practice-choice-card.available:hover{transform:translateY(-3px);box-shadow:0 9px 0 rgba(16,43,87,.07),0 14px 26px rgba(16,43,87,.1)}
-    .practice-choice-icon{height:72px;border-radius:17px;background:#eef8ff;display:flex;align-items:center;justify-content:center;font-size:42px;margin-bottom:14px}
-    .practice-choice-card.available .practice-choice-icon{background:#fff6cf}
-    .practice-choice-card h2{margin:0 0 5px;font-family:"Baloo 2",Nunito,sans-serif;font-size:25px;line-height:1;color:#102b57}
-    .practice-choice-card p{margin:0;color:#667894;font-size:14px;line-height:1.35}
-    .practice-choice-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px}
-    .practice-choice-tag{padding:5px 9px;border-radius:999px;background:#eaf4ff;color:#126fc9;font-size:11px;font-weight:900}
-    .practice-choice-button{border:0;border-radius:12px;padding:9px 14px;background:#1787f2;color:#fff;font:800 14px Nunito;box-shadow:0 3px 0 #0d6fd4;cursor:pointer}
-    .practice-choice-button:hover{background:#0d6fd4}
-    .practice-choice-card:not(.available) .practice-choice-tag{background:#f0f2f5;color:#7b8798}
-    @media(max-width:1000px){.practice-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    @media(max-width:700px){.practice-choice-grid{grid-template-columns:1fr}.practice-choice-card{min-height:180px}}
+    .practice-page-content{display:grid;gap:18px}
+    .practice-progress{min-height:24px;color:#667894;font-family:"Baloo 2",Nunito,sans-serif;font-size:18px;font-weight:800}
+    .practice-progress .progress-label{display:flex;justify-content:space-between;gap:16px;margin-bottom:7px}
+    .practice-progress .progress{height:12px;overflow:hidden;border-radius:999px;background:#e7eef6}
+    .practice-progress .progress-bar{height:100%;border-radius:999px;background:#1787f2}
+    .practice-content{display:grid;gap:18px}
+    .practice-hint{display:flex;align-items:flex-start;gap:12px;justify-content:center;flex-wrap:wrap;margin:4px 0 8px}
+    .practice-hint-button{min-height:48px;padding:10px 20px;border:2px solid #cfe3f3;border-radius:15px;background:#edf8ff;color:#126fc9;font-family:"Baloo 2",Nunito,sans-serif;font-size:17px;font-weight:900;box-shadow:0 3px 0 rgba(16,43,87,.08);cursor:pointer}
+    .practice-hint-button:hover{background:#dff0ff;border-color:#1787f2}
+    .practice-hint-box{max-width:760px;padding:13px 16px;border:2px solid #f0df9a;border-radius:15px;background:#fffdf0;color:#102b57;text-align:left;font-size:16px;line-height:1.45}
+    .practice-hint-box strong{display:block;margin-bottom:3px;font-family:"Baloo 2",Nunito,sans-serif;font-size:17px}
+    .practice-hint-box.hidden{display:none}
+    .practice-loading{min-height:220px;display:grid;place-items:center;padding:30px;border:2px solid #dce9f6;border-radius:24px;background:#fff;color:#667894;font-size:18px;font-weight:800;text-align:center}
+    .practice-question-card{padding:26px;border:2px solid #dce9f6;border-radius:24px;background:#fff}
+    .practice-content .prompt{font-family:"Baloo 2",Nunito,sans-serif;font-size:clamp(30px,4vw,48px);line-height:1.08;font-weight:900;color:#102b57;text-align:center;white-space:pre-wrap}
+    .practice-content .answer-input{min-height:52px;border:2px solid #cfe3f3;border-radius:15px;padding:12px 15px;font:700 18px Nunito,sans-serif}
+    .practice-content .big{min-height:50px;padding:11px 20px;border-radius:15px;font:900 17px Nunito,sans-serif;cursor:pointer}
+    .practice-content .feedback{margin-top:12px}
+    .practice-content .question-answer{padding:20px;border:2px solid #dce9f6;border-radius:18px;background:#f8fbff;line-height:1.55}
+    .practice-content .self-buttons{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:16px}
+    .practice-content .self-buttons button{min-height:50px;padding:10px 22px;border-radius:15px;font:900 17px Nunito,sans-serif;cursor:pointer}
+    @media(max-width:700px){.practice-hint{justify-content:stretch}.practice-hint-button{width:100%}}
   </style>
 </head>
 <body>
   <div id="paco-template-mount"></div>
-
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
-    import { isPracticeModeActive } from './src/features/practice/practice-domain.js';
+    import { createPacoGOApp } from './src/app/bootstrap.js';
+    import { createPracticePresentation } from './src/features/lessons/practice-presentation.js';
+    import { escapeHtml } from './src/utils/text.js';
 
     const params = new URLSearchParams(window.location.search);
     const lessonId = params.get('lesson_id') || '';
     const student = params.get('student') || 'Zyon';
     const mount = document.querySelector('#paco-template-mount');
+    const practiceRoot = document.createElement('div');
+    practiceRoot.id = 'practice';
+    practiceRoot.className = 'practice-page-content';
+
+    const progress = document.createElement('div');
+    progress.id = 'practiceProgress';
+    progress.className = 'practice-progress';
+
     const content = document.createElement('div');
+    content.id = 'practiceContent';
+    content.className = 'practice-content';
 
-    const grid = document.createElement('div');
-    grid.className = 'practice-choice-grid';
+    const loading = document.createElement('div');
+    loading.className = 'practice-loading';
+    loading.textContent = 'Oefenen laden…';
+    content.appendChild(loading);
+    practiceRoot.append(progress, content);
 
-    const flashcardsAvailable = Boolean(lessonId && isPracticeModeActive('flashcards'));
-    const cards = [
-      {
-        icon:'🃏',
-        title:'Flashcards',
-        text: flashcardsAvailable
-          ? 'Oefen de inhoud van deze les met korte vraag-en-antwoordkaarten.'
-          : 'Flashcards zijn momenteel niet beschikbaar voor deze oefensessie.',
-        available:flashcardsAvailable
-      },
-      { icon:'🎮', title:'Spelletjes', text:'Straks kun je deze les ook oefenen met leuke spelletjes.', available:false },
-      { icon:'✏️', title:'Oefenen', text:'Een gerichte oefenvorm voor de inhoud van deze les.', available:false },
-      { icon:'❓', title:'Vragen & antwoorden', text:'Oefen met vragen en controleer daarna je antwoord.', available:false },
-      { icon:'🔄', title:'Herhalen', text:'Kom terug op onderdelen die je nog extra wilt oefenen.', available:false }
-    ];
-
-    function renderChoices() {
-      grid.replaceChildren();
-      cards.forEach(card => {
-        const article = document.createElement('article');
-        article.className = `practice-choice-card${card.available ? ' available' : ''}`;
-
-        const top = document.createElement('div');
-        const icon = document.createElement('div');
-        icon.className = 'practice-choice-icon';
-        icon.textContent = card.icon;
-        const title = document.createElement('h2');
-        title.textContent = card.title;
-        const text = document.createElement('p');
-        text.textContent = card.text;
-        top.append(icon, title, text);
-
-        const footer = document.createElement('div');
-        footer.className = 'practice-choice-footer';
-        const tag = document.createElement('span');
-        tag.className = 'practice-choice-tag';
-        tag.textContent = card.available ? 'Beschikbaar' : 'Binnenkort';
-        footer.appendChild(tag);
-
-        if (card.available) {
-          const button = document.createElement('button');
-          button.type = 'button';
-          button.className = 'practice-choice-button';
-          button.textContent = 'Flashcards →';
-          button.addEventListener('click', () => {
-            const target = new URL('flashcards-template.html', window.location.href);
-            target.searchParams.set('lesson_id', lessonId);
-            target.searchParams.set('student', student);
-            window.location.href = target.toString();
-          });
-          footer.appendChild(button);
-        }
-
-        article.append(top, footer);
-        grid.appendChild(article);
-      });
-    }
-
-    content.appendChild(grid);
-    renderChoices();
-
-    const goHome = () => { window.location.href = 'index.html'; };
     const goDashboard = () => {
       const target = new URL('dashboard.html', window.location.href);
       target.searchParams.set('student', student);
@@ -117,28 +77,64 @@
       target.searchParams.set('student', student);
       window.location.href = target.toString();
     };
+    const goLessonChoice = () => {
+      const target = new URL('lesson-choice.html', window.location.href);
+      if (lessonId) target.searchParams.set('lesson_id', lessonId);
+      target.searchParams.set('student', student);
+      window.location.href = target.toString();
+    };
 
-    mountPacoPageTemplate({
+    const template = mountPacoPageTemplate({
       mount,
-      backLabel: '← Leskeuze',
-      backAction: () => {
-        const target = new URL('lesson-choice.html', window.location.href);
-        if (lessonId) target.searchParams.set('lesson_id', lessonId);
-        target.searchParams.set('student', student);
-        window.location.href = target.toString();
-      },
-      greeting: `Hoi ${student}! 🐶`,
-      title: 'Oefenen',
-      icon: '✏️',
-      subtitle: 'Kies hoe je met deze les wilt oefenen.',
-      navigation: [
+      backLabel:'← Leskeuze',
+      backAction:goLessonChoice,
+      greeting:`Hoi ${student}! 🐶`,
+      title:'Oefenen',
+      icon:'✏️',
+      subtitle:'Oefen deze les stap voor stap.',
+      navigation:[
         { icon:'🏠', label:'Dashboard', onClick:goDashboard },
         { icon:'📚', label:'Mijn lessen', onClick:goLessons },
-        { icon:'📝', label:'Toetsen', onClick:goHome },
+        { icon:'✏️', label:'Oefenen', active:true },
         { icon:'📅', label:'Mijn agenda', onClick:goAgenda }
       ],
-      content
+      content:practiceRoot
     });
+
+    const app = createPacoGOApp({ supabaseLib: window.supabase });
+    const titleElement = template.querySelector('.paco-template-page-header h1');
+    const presentation = createPracticePresentation({
+      documentRef: document,
+      windowRef: window,
+      getLesson: () => window.__pacoGOPracticeLesson || null,
+      getStudent: () => student,
+      db: app.db,
+      masteryService: app.mastery,
+      audioService: app.audio,
+      escapeHtml,
+      hideAll: () => {},
+      showLessonChoice: goLessonChoice,
+      refreshPageSidebars: () => {},
+      speechCancel: () => app.audio.stop(),
+      pageElement: practiceRoot,
+      titleElement,
+      progressElement: progress,
+      contentElement: content
+    });
+
+    try {
+      if (!lessonId) throw new Error('Geen les geselecteerd.');
+      const records = await app.loadLessons();
+      const lesson = app.mapLessons(records).find(candidate => String(candidate.id) === String(lessonId));
+      if (!lesson) throw new Error('Deze les kon niet worden gevonden.');
+      window.__pacoGOPracticeLesson = lesson;
+      content.replaceChildren();
+      presentation.start(lesson.type || 'words');
+    } catch (error) {
+      console.error('Practice load error:', error);
+      progress.replaceChildren();
+      content.innerHTML = `<div class="practice-loading">${escapeHtml(error.message || 'Oefenen kon niet worden geladen.')}</div>`;
+    }
   </script>
 </body>
 </html>

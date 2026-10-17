@@ -18,10 +18,11 @@ import { mountPacoPageTemplate } from './src/components/page-template.js';
 import { createPacoNavigation } from './src/components/page-navigation.js';
 import { createPacoGOApp } from './src/app/bootstrap.js';
 import { createAgendaRuntimeEntry } from './src/features/agenda/runtime-entry.js';
-import { listStudents, isKnownStudent } from './src/features/students/students.js';
-import { setStudent } from './src/core/state.js';
+import { readViewContext, applyViewContext, buildViewUrl } from './src/core/view-context.js';
 
-const params=new URLSearchParams(window.location.search); const requested=params.get('student')||''; const student=isKnownStudent(requested)?requested:listStudents()[0]||''; const mount=document.querySelector('#paco-template-mount'); const app=createPacoGOApp({supabaseLib:window.supabase}); setStudent(student);
+const context=readViewContext(new URLSearchParams(window.location.search));
+const student=context.student;
+const mount=document.querySelector('#paco-template-mount'); const app=createPacoGOApp({supabaseLib:window.supabase});
 const content=document.createElement('div'); content.className='agenda-page'; content.innerHTML=`
 <div class="agenda-toolbar"><div class="agenda-toolbar-actions"><button type="button" class="secondary" id="openAgendaImport">➕ Agenda toevoegen</button><button type="button" class="secondary" id="agendaTodayTop">📍 Vandaag</button></div></div>
 <section class="agenda-card" id="agendaContent" data-agenda-content></section>
@@ -32,15 +33,23 @@ const content=document.createElement('div'); content.className='agenda-page'; co
 <div class="agenda-import-review hidden" id="agendaImportReview"><strong>Controleer de gevonden afspraken</strong><div id="agendaImportReviewList"></div><div class="agenda-toolbar-actions"><button type="button" class="secondary" id="agendaReviewSave">Opslaan</button><button type="button" class="secondary" id="agendaReviewClear">Wissen</button></div></div></section>
 <div class="agenda-modal-backdrop hidden" id="agendaEditModal"><div class="agenda-modal" role="dialog" aria-modal="true"><h2>Agenda-afspraak bewerken</h2><div class="agenda-modal-grid"><label>Titel<input id="agendaEditTitle" type="text"></label><label>Type<select id="agendaEditType"><option value="test">📝 Toets</option><option value="homework">📚 Huiswerk</option><option value="submit">📖 Inleveren</option><option value="activity">🎒 Schoolactiviteit</option><option value="free">🎉 Vrije dag</option><option value="other">📌 Overig</option></select></label><div id="agendaEditSingleFields"><label>Datum<input id="agendaEditDate" type="date"></label></div><div id="agendaEditRangeFields" class="hidden"><div class="agenda-form-grid"><label>Begin<input id="agendaEditStartDate" type="date"></label><label>Einde<input id="agendaEditEndDate" type="date"></label></div></div><label>Tijd<input id="agendaEditTime" type="time"></label><label>Omschrijving<textarea id="agendaEditMeta"></textarea></label></div><div class="agenda-modal-actions"><button type="button" class="secondary" id="agendaEditClose">Annuleren</button><button type="button" class="secondary" id="agendaEditSave">Opslaan</button></div></div></div>`;
 
-mountPacoPageTemplate({mount,backLabel:'← Mijn lessen',backAction:()=>{window.location.href=`lessons.html?student=${encodeURIComponent(student)}`},greeting:student?`Hoi ${student}! 🐾`:'PacoGO Agenda 📅',title:'Agenda',icon:'📅',subtitle:'Bekijk de schoolweek en beheer je afspraken.',navigation:createPacoNavigation({active:'agenda',student}),content});
+mountPacoPageTemplate({mount,backLabel:'← Mijn lessen',backAction:()=>{window.location.href=buildViewUrl('lessons.html',{student,mode:context.mode}).toString()},greeting:student?`Hoi ${student}! 🐾`:'PacoGO Agenda 📅',title:'Agenda',icon:'📅',subtitle:context.isManagement?'Beheerweergave — je beheert hier de agenda van de geselecteerde leerling.':'Bekijk de schoolweek en beheer je afspraken.',navigation:createPacoNavigation({active:'agenda',student,viewMode:context.mode}),content});
 const pageRoot=content;
-const agenda=createAgendaRuntimeEntry({storage:localStorage,documentRef:pageRoot,db:app.db,currentStudent:()=>student,setCurrentStudent:setStudent,lessons:()=>app.state.lessons,demoItems:()=>[],onLessonMatch:item=>item.lessonId?`<button type="button" class="secondary agenda-lesson-link" data-lesson-id="${String(item.lessonId).replaceAll('"','&quot;')}" style="margin-top:7px;padding:5px 8px;border-radius:9px;font-size:11px">📚 Naar les</button>`:'',now:()=>new Date()});
-const bindLessonLinks=()=>pageRoot.querySelectorAll('.agenda-lesson-link').forEach(button=>{if(button.dataset.bound)return;button.dataset.bound='1';button.addEventListener('click',()=>{window.location.href=`lesson-choice.html?lesson_id=${encodeURIComponent(button.dataset.lessonId)}&student=${encodeURIComponent(student)}`})});
+const agenda=createAgendaRuntimeEntry({storage:localStorage,documentRef:pageRoot,db:app.db,currentStudent:()=>student,lessons:()=>app.state.lessons,demoItems:()=>[],onLessonMatch:item=>item.lessonId?`<button type="button" class="secondary agenda-lesson-link" data-lesson-id="${String(item.lessonId).replaceAll('"','&quot;')}" style="margin-top:7px;padding:5px 8px;border-radius:9px;font-size:11px">📚 Naar les</button>`:'',now:()=>new Date()});
+const bindLessonLinks=()=>pageRoot.querySelectorAll('.agenda-lesson-link').forEach(button=>{if(button.dataset.bound)return;button.dataset.bound='1';button.addEventListener('click',()=>{const target=buildViewUrl('lesson-choice.html',{student,mode:context.mode});target.searchParams.set('lesson_id',button.dataset.lessonId);window.location.href=target.toString()})});
 new MutationObserver(bindLessonLinks).observe(pageRoot.querySelector('#agendaContent'),{childList:true,subtree:true});
 pageRoot.querySelector('#agendaTodayTop').addEventListener('click',()=>agenda.agendaGoToday()); pageRoot.querySelector('#openAgendaImport').addEventListener('click',()=>agenda.showAgendaImport()); pageRoot.querySelector('#agendaEditClose').addEventListener('click',agenda.closeAgendaEditModal); pageRoot.querySelector('#agendaEditSave').addEventListener('click',agenda.saveAgendaEditModal);
 pageRoot.querySelector('#agendaModeMedia').addEventListener('click',()=>agenda.setAgendaImportMode('media')); pageRoot.querySelector('#agendaModeManual').addEventListener('click',()=>agenda.setAgendaImportMode('manual')); pageRoot.querySelector('#agendaMediaFile').addEventListener('change',agenda.handleAgendaMediaFile); pageRoot.querySelector('#agendaMediaAnalyzeButton').addEventListener('click',async()=>{if(pageRoot.querySelector('#agendaMediaFile').files?.[0]?.type.startsWith('video/'))await agenda.analyzeAgendaVideo();else await agenda.analyzeAgendaImage()});
 pageRoot.querySelector('#agendaManualAdd').addEventListener('click',()=>{const result=agenda.addManualAgendaItem();const status=pageRoot.querySelector('#agendaManualStatus');status.textContent=result.ok?'Afspraak toegevoegd.':result.message;status.classList.remove('hidden');if(result.ok)agenda.renderAgenda()}); pageRoot.querySelector('#agendaReviewSave').addEventListener('click',()=>{agenda.saveAgendaImportReview();agenda.renderAgenda()}); pageRoot.querySelector('#agendaReviewClear').addEventListener('click',agenda.clearAgendaImportReview); pageRoot.querySelectorAll('input[name="agendaManualRange"]').forEach(input=>input.addEventListener('change',()=>agenda.setManualAgendaRange(input.value)));
-try{await app.initializeSession();await app.loadLessons();agenda.showAgenda()}catch(error){console.error('PacoGO Agenda initialization failed:',error);pageRoot.querySelector('#agendaContent').innerHTML='<div class="agenda-state">De Agenda kon niet worden geladen.</div>'}
+async function initialize(){
+  await app.initializeSession();
+  if(context.isManagement) applyViewContext(context,{canManage:app.auth.isParent});
+  else applyViewContext(context);
+  if(!student) throw new Error('Geen leerling geselecteerd.');
+  await app.loadLessons();
+  agenda.showAgenda();
+}
+try{await initialize()}catch(error){console.error('PacoGO Agenda initialization failed:',error);pageRoot.querySelector('#agendaContent').innerHTML=error.message==='Geen leerling geselecteerd.'?'<div class="agenda-state">Selecteer eerst een leerling vanuit Beheer.</div>':'<div class="agenda-state">De Agenda kon niet worden geladen.</div>'}
 </script>
 </body>
 </html>

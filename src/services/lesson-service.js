@@ -1,7 +1,6 @@
 // Lesson data boundary. This is the canonical persistence service for lessons.
-// The TEST schema currently stores only the columns exposed below; domain/editor
-// models may contain richer fields, but persistence must never send unsupported
-// columns to Supabase.
+// The TEST schema stores the columns exposed below; domain/editor models may
+// contain richer fields, but persistence must never send unsupported columns.
 
 function normalizeLessonPayload(payload = {}) {
   return {
@@ -19,6 +18,7 @@ function normalizeLessonItems(items = []) {
   return (Array.isArray(items) ? items : []).map((item, index) => ({
     question: String(item.question ?? ''),
     answer: String(item.answer ?? ''),
+    hint: String(item.hint ?? ''),
     sort_order: Number(item.sort_order ?? index)
   }));
 }

@@ -6,116 +6,107 @@
   <title>PacoGO — Oefenen</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="src/components/page-template.css">
-  <link rel="stylesheet" href="src/features/lessons/practice-page.css">
+  <style>
+    .practice-menu{display:grid;gap:20px}
+    .practice-context{padding:15px 17px;border-radius:18px;background:#eef8ff;color:#38577d;font-weight:800}
+    .practice-mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+    .practice-mode-card{min-height:190px;border:2px solid #dce9f6;border-radius:22px;background:#fff;box-shadow:0 7px 20px rgba(16,43,87,.07);padding:20px;text-align:left;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;transition:.16s}
+    .practice-mode-card:hover{transform:translateY(-2px);box-shadow:0 12px 27px rgba(16,43,87,.11)}
+    .practice-mode-card.active{background:#fffdf0;border-color:#f4e8a8}
+    .practice-mode-icon{height:72px;border-radius:17px;background:#eef8ff;display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:13px}
+    .practice-mode-card.active .practice-mode-icon{background:#fff6cf}
+    .practice-mode-card h2{margin:0;color:#102b57;font:800 24px/1 "Baloo 2",Nunito,sans-serif}
+    .practice-mode-card p{margin:8px 0 0;color:#667894;line-height:1.4}
+    .practice-mode-action{margin-top:15px;font-size:12px;font-weight:900;color:#126fc9}
+    .practice-mode-card.planned{cursor:default;opacity:.68}
+    .practice-mode-card.planned:hover{transform:none;box-shadow:0 7px 20px rgba(16,43,87,.07)}
+    .practice-mode-card.planned .practice-mode-action{color:#667894}
+    .practice-state{padding:16px 18px;border:1px solid #dce9f6;border-radius:18px;background:#fff;color:#667894}
+    @media(max-width:700px){.practice-mode-grid{grid-template-columns:1fr}}
+  </style>
 </head>
 <body>
   <div id="paco-template-mount"></div>
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
-    import { createPacoGOApp } from './src/app/bootstrap.js';
-    import { createPracticePresentation } from './src/features/lessons/practice-presentation.js';
-    import { escapeHtml } from './src/utils/text.js';
+    import { createPacoNavigation } from './src/components/page-navigation.js';
+    import { getActivePracticeModes, getPracticeModes } from './src/features/practice/practice-domain.js';
 
-    const params = new URLSearchParams(window.location.search);
-    const lessonId = params.get('lesson_id') || '';
-    const student = params.get('student') || 'Zyon';
-    const mount = document.querySelector('#paco-template-mount');
+    const params=new URLSearchParams(window.location.search);
+    const lessonId=params.get('lesson_id')||'';
+    const student=params.get('student')||'Zyon';
+    const mount=document.querySelector('#paco-template-mount');
+    const content=document.createElement('div');
+    content.className='practice-menu';
 
-    const practiceRoot = document.createElement('div');
-    practiceRoot.id = 'practice';
-    practiceRoot.className = 'practice-page-card';
-
-    const progress = document.createElement('div');
-    progress.id = 'practiceProgress';
-    progress.className = 'practice-progress';
-
-    const content = document.createElement('div');
-    content.id = 'practiceContent';
-    content.className = 'practice-content';
-
-    const loading = document.createElement('div');
-    loading.className = 'practice-loading';
-    loading.textContent = 'Oefenen laden…';
-    content.appendChild(loading);
-    practiceRoot.append(progress, content);
-
-    const goDashboard = () => {
-      const target = new URL('dashboard.html', window.location.href);
-      target.searchParams.set('student', student);
-      window.location.href = target.toString();
+    const targetPaths={flashcards:'flashcards-template.html'};
+    const modeMeta={
+      flashcards:{icon:'🃏',description:'Oefen met vraag en antwoord en draai de kaart om als je klaar bent.'},
+      games:{icon:'🎮',description:'Speel leerzame spelletjes met deze les.'}
     };
 
-    const goAgenda = () => {
-      const target = new URL('index.html', window.location.href);
-      target.searchParams.set('view', 'agenda');
-      target.searchParams.set('student', student);
-      window.location.href = target.toString();
+    const goDashboard=()=>{window.location.href=`dashboard.html?student=${encodeURIComponent(student)}`};
+    const goAgenda=()=>{window.location.href=`index.html?view=agenda&student=${encodeURIComponent(student)}`};
+    const goLessons=()=>{window.location.href=`lessons.html?student=${encodeURIComponent(student)}`};
+    const goLessonChoice=()=>{
+      const target=new URL('lesson-choice.html',window.location.href);
+      if(lessonId) target.searchParams.set('lesson_id',lessonId);
+      target.searchParams.set('student',student);
+      window.location.href=target.toString();
     };
 
-    const goLessons = () => {
-      const target = new URL('lessons.html', window.location.href);
-      target.searchParams.set('student', student);
-      window.location.href = target.toString();
-    };
-
-    const goLessonChoice = () => {
-      const target = new URL('lesson-choice.html', window.location.href);
-      if (lessonId) target.searchParams.set('lesson_id', lessonId);
-      target.searchParams.set('student', student);
-      window.location.href = target.toString();
-    };
-
-    const template = mountPacoPageTemplate({
+    mountPacoPageTemplate({
       mount,
       backLabel:'← Leskeuze',
       backAction:goLessonChoice,
       greeting:`Hoi ${student}! 🐶`,
       title:'Oefenen',
       icon:'✏️',
-      subtitle:'Oefen deze les stap voor stap.',
-      navigation:[
-        { icon:'🏠', label:'Dashboard', onClick:goDashboard },
-        { icon:'📚', label:'Mijn lessen', onClick:goLessons },
-        { icon:'✏️', label:'Oefenen', active:true },
-        { icon:'📅', label:'Mijn agenda', onClick:goAgenda }
-      ],
-      content:practiceRoot
+      subtitle:'Kies hoe je deze les wilt oefenen.',
+      navigation:createPacoNavigation({active:'lessons',student}),
+      content
     });
 
-    const app = createPacoGOApp({ supabaseLib: window.supabase });
-    const titleElement = template.querySelector('.paco-template-page-header h1');
-    const presentation = createPracticePresentation({
-      documentRef: document,
-      windowRef: window,
-      getLesson: () => window.__pacoGOPracticeLesson || null,
-      getStudent: () => student,
-      db: app.db,
-      masteryService: app.mastery,
-      audioService: app.audio,
-      escapeHtml,
-      hideAll: () => {},
-      showLessonChoice: goLessonChoice,
-      refreshPageSidebars: () => {},
-      speechCancel: () => app.audio.stop(),
-      pageElement: practiceRoot,
-      titleElement,
-      progressElement: progress,
-      contentElement: content
-    });
-
-    try {
-      if (!lessonId) throw new Error('Geen les geselecteerd.');
-      const records = await app.loadLessons();
-      const lesson = app.mapLessons(records).find(candidate => String(candidate.id) === String(lessonId));
-      if (!lesson) throw new Error('Deze les kon niet worden gevonden.');
-      window.__pacoGOPracticeLesson = lesson;
-      content.replaceChildren();
-      presentation.start(lesson.type || 'words');
-    } catch (error) {
-      console.error('Practice load error:', error);
-      progress.replaceChildren();
-      content.innerHTML = `<div class="practice-loading">${escapeHtml(error.message || 'Oefenen kon niet worden geladen.')}</div>`;
+    function openMode(mode){
+      const path=targetPaths[mode.id];
+      if(!path) return;
+      const target=new URL(path,window.location.href);
+      if(lessonId) target.searchParams.set('lesson_id',lessonId);
+      target.searchParams.set('student',student);
+      window.location.href=target.toString();
     }
+
+    function render(){
+      content.replaceChildren();
+      if(!lessonId){
+        const state=document.createElement('div');
+        state.className='practice-state';
+        state.textContent='Geen les geselecteerd.';
+        content.appendChild(state);
+        return;
+      }
+
+      const context=document.createElement('div');
+      context.className='practice-context';
+      context.textContent='Kies hieronder een oefenvorm.';
+
+      const grid=document.createElement('div');
+      grid.className='practice-mode-grid';
+      getPracticeModes().forEach(mode=>{
+        const active=mode.status==='active';
+        const card=document.createElement('button');
+        card.type='button';
+        card.className=`practice-mode-card${active?' active':' planned'}`;
+        card.disabled=!active;
+        const meta=modeMeta[mode.id]||{icon:'📘',description:''};
+        card.innerHTML=`<div><div class="practice-mode-icon">${meta.icon}</div><h2>${mode.label}</h2><p>${meta.description}</p></div><div class="practice-mode-action">${active?'Openen →':'Binnenkort beschikbaar'}</div>`;
+        if(active && getActivePracticeModes().some(candidate=>candidate.id===mode.id)) card.addEventListener('click',()=>openMode(mode));
+        grid.appendChild(card);
+      });
+      content.append(context,grid);
+    }
+
+    render();
   </script>
 </body>
 </html>

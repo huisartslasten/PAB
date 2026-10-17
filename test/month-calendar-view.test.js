@@ -4,7 +4,8 @@ import { getMonthCalendarCells, groupAgendaItemsByDate, formatMonthLabel } from 
 
 test('month calendar starts on Monday and covers the full month', () => {
   const cells = getMonthCalendarCells(2026, 9);
-  assert.equal(cells[0].key, '2026-09-28');
+  assert.equal(cells[0].key, null);
+  assert.equal(cells[3].key, '2026-10-01');
   assert.equal(cells.filter(cell => cell.key).length, 31);
   assert.equal(cells.at(-1).key, '2026-11-01');
 });

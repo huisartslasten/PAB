@@ -104,9 +104,23 @@ export function createPracticePresentation({
     const content = elements().content;
     const form = content?.querySelector('[data-practice-form]');
     if (!form) return;
-    form.addEventListener('submit', event => {
+    form.addEventListener('submit', async event => {
       event.preventDefault();
-      submit();
+      const button = form.querySelector('[data-practice-action="submit"]');
+      if (button) {
+        button.disabled = true;
+        button.textContent = 'Controleren…';
+        button.setAttribute('aria-busy', 'true');
+      }
+      try {
+        await submit();
+      } finally {
+        if (button?.isConnected) {
+          button.disabled = false;
+          button.textContent = 'Controleren';
+          button.removeAttribute('aria-busy');
+        }
+      }
     });
   }
 
@@ -185,7 +199,8 @@ export function createPracticePresentation({
     const type = entry?.runtime?.type || '';
     const fixed = result.evaluation?.fixedRules;
     const fixedHtml = fixed?.results?.length
-      ? `<div class="practice-rule-results"><strong>Vaste beoordelingsregels</strong><br>${fixed.results.map(rule => `${rule.ok ? '✓ ' : '✗ '}${escapeHtml(rule.text)}`).join('<br>')}</div>`
+      ? `<div class="practice-rule-results"><strong>Vaste beoordelingsregels</strong><br>${fixed.results.map(rule => `${rule.ok ? '✓ ' : '✗ '}${escapeHtml(rule.text)}`).join('<br>')}
+</div>`
       : '';
     const review = `<div class="practice-answer-review"><div class="practice-answer-review-title">Jouw antwoord:</div><div class="practice-answer-review-text">${escapeHtml(answer || '—')}</div>${fixedHtml}</div>`;
     const correctAnswer = correctAnswerHtml(item, type, escapeHtml);

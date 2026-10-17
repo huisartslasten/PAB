@@ -29,7 +29,7 @@
 
     const testScreen = document.createElement('main');
     testScreen.className = 'test-shell';
-    testScreen.innerHTML = '<div id="test" class="test-card hidden"><div id="testProgress" class="test-progress"></div><div id="testContent" class="test-content"></div></div><div id="result" class="result-card hidden"><div class="test-content"><h2 id="resultTitle"></h2><div id="resultScore" class="result-score"></div><div id="resultDetails" class="result-details"></div><div class="result-actions"><button id="retryButton" class="primary" type="button">Nog een keer</button><button id="backButton" class="secondary" type="button">← Leskeuze</button></div></div></div>';
+    testScreen.innerHTML = '<div id="test" class="test-card hidden"><div id="testTitle" class="prompt" style="margin-top:0"></div><div id="testProgress" class="test-progress"></div><div id="testContent" class="test-content"></div></div><div id="result" class="result-card hidden"><div class="test-content"><h2 id="resultTitle"></h2><div id="resultScore" class="result-score"></div><div id="resultDetails" class="result-details"></div><div class="result-actions"><button id="retryButton" class="primary" type="button">Nog een keer</button><button id="backButton" class="secondary" type="button">← Leskeuze</button></div></div></div>';
     content.appendChild(testScreen);
 
     const goChoice = () => {

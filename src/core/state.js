@@ -4,11 +4,11 @@
 export const appState = {
   session: null,
   currentStudent: null,
+  parentSelectedStudent: null,
   currentSubject: null,
   currentLesson: null,
   lessons: [],
-  activity: null,
-  parentSelectedStudent: null
+  activity: null
 };
 
 export function setSession(session) {
@@ -17,6 +17,14 @@ export function setSession(session) {
 
 export function setStudent(student) {
   appState.currentStudent = student;
+}
+
+export function setParentSelectedStudent(student) {
+  appState.parentSelectedStudent = student || null;
+}
+
+export function getParentSelectedStudent() {
+  return appState.parentSelectedStudent;
 }
 
 export function setLessons(lessons) {

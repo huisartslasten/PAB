@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createPacoGOApp } from '../src/app/bootstrap.js';
-import { appState } from '../src/core/state.js';
+import { appState, setViewContext } from '../src/core/state.js';
 import { PARENT_IDS } from '../src/core/auth-authorization.js';
 
 function makeStorage() {
@@ -49,7 +49,7 @@ function makeSupabaseLib(session = null) {
 }
 
 test('application root composes management with canonical lesson, feedback, grading, audio and auth services', async () => {
-  appState.currentStudent = null;
+  setViewContext('', 'student');
   appState.lessons = [];
 
   const app = createPacoGOApp({
@@ -73,7 +73,7 @@ test('application root composes management with canonical lesson, feedback, grad
   assert.deepEqual(loaded.map(item => item.id), [1]);
   assert.deepEqual(appState.lessons.map(item => item.id), [1]);
 
-  app.management.selectStudent('Zyon');
+  setViewContext('Zyon', 'management');
   const scoped = await app.management.loadLessons();
 
   assert.deepEqual(scoped.map(item => item.id), [1]);
@@ -81,6 +81,7 @@ test('application root composes management with canonical lesson, feedback, grad
 });
 
 test('application root initializes the current session through the auth service boundary', async () => {
+  setViewContext('', 'student');
   const session = { user: { id: PARENT_IDS[0] } };
   const app = createPacoGOApp({
     supabaseLib: makeSupabaseLib(session),
@@ -93,10 +94,13 @@ test('application root initializes the current session through the auth service 
 
   assert.deepEqual(currentSession, session);
   assert.equal(app.auth.isParent, true);
-  app.management.selectStudent('Zyon');
+  setViewContext('Zyon', 'management');
+  const scoped = await app.management.loadLessons();
+  assert.deepEqual(scoped.map(item => item.id), [1]);
 });
 
-test('application root exposes management before parent authorization is granted', () => {
+test('application root exposes management before parent authorization is granted', async () => {
+  setViewContext('Zyon', 'management');
   const app = createPacoGOApp({
     supabaseLib: makeSupabaseLib(),
     session: null,
@@ -104,5 +108,5 @@ test('application root exposes management before parent authorization is granted
   });
 
   assert.ok(app.management);
-  assert.throws(() => app.management.selectStudent('Zyon'), /parent session/);
+  await assert.rejects(() => app.management.loadLessons(), /parent session/);
 });

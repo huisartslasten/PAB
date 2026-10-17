@@ -23,7 +23,8 @@ export function createPacoNavigation({
   includeManagement = true,
   includeManagementTools = false,
   includeCreator = false,
-  includeAgenda = true
+  includeAgenda = true,
+  hideActive = false
 } = {}) {
   const view = { student, mode: viewMode };
   const items = [];
@@ -67,5 +68,7 @@ export function createPacoNavigation({
   }
   if (includeCreator) items.push({ key: 'creator', icon: '🧠', label: 'Creator Console', onClick: () => go('creator.html') });
 
-  return items.map(item => ({ ...item, active: item.key === active }));
+  return items
+    .filter(item => !(hideActive && item.key === active))
+    .map(item => ({ ...item, active: item.key === active }));
 }

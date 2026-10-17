@@ -173,14 +173,6 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
     return recovery.restore(id);
   }
 
-  async function restoreRecoveryLesson(id) {
-    assertParent();
-    const lesson = appState.lessons.find(item => String(item?.id) === String(id));
-    if (!lesson) throw new Error('Lesson could not be found.');
-    if (!lesson.archived && !lesson.deleted) throw new Error('Lesson is not recoverable.');
-    return recovery.restore(id);
-  }
-
   async function emptyTrash() {
     assertParent();
     return trashRecovery.emptyTrash();
@@ -218,7 +210,6 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
     archiveLesson,
     moveToTrash,
     restoreLesson,
-    restoreRecoveryLesson,
     emptyTrash,
     listFeedback,
     submitFeedback,

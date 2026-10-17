@@ -29,18 +29,15 @@ setStudent(student);
 const content = document.createElement('div');
 content.className = 'month-calendar-page';
 content.innerHTML = `
-  <div class="month-calendar-toolbar">
-    <div><strong style="color:#102b57;font:900 22px/1.1 'Baloo 2',Nunito,sans-serif">Maandkalender</strong></div>
-    <div class="month-calendar-toolbar-actions">
-      <button type="button" class="secondary" id="monthCalendarToday">📍 Deze maand</button>
-      <button type="button" class="secondary" id="monthCalendarPrint">🖨️ Print deze kalender</button>
-    </div>
-  </div>
   <section class="month-calendar-card" id="monthCalendarCard">
+    <button type="button" class="month-calendar-print" id="monthCalendarPrint">🖨️ Print</button>
     <h1 class="month-calendar-print-title" id="monthCalendarPrintTitle"></h1>
     <div class="month-calendar-heading">
       <button type="button" class="month-calendar-nav" id="monthCalendarPrevious">← Vorige maand</button>
-      <div class="month-calendar-heading-center" id="monthCalendarTitle"></div>
+      <div class="month-calendar-heading-center">
+        <div class="month-calendar-title" id="monthCalendarTitle"></div>
+        <button type="button" class="month-calendar-today" id="monthCalendarToday">📍 Deze maand</button>
+      </div>
       <button type="button" class="month-calendar-nav" id="monthCalendarNext">Volgende maand →</button>
     </div>
     <div id="monthCalendarGrid"></div>

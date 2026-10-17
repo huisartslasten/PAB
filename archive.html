@@ -42,6 +42,9 @@
 
     const app=createPacoGOApp({supabaseLib:window.supabase});
     const management=app.management;
+    const notice=document.createElement('div');
+    notice.className='management-state';
+    notice.hidden=true;
     const archive=document.createElement('section');
     archive.className='management-section';
     const archiveHeading=document.createElement('h2');
@@ -56,6 +59,11 @@
     const trashList=document.createElement('div');
     trash.append(trashHeading,trashList);
 
+    function showNotice(message){
+      notice.textContent=message;
+      notice.hidden=false;
+    }
+
     async function emptyTrash(){
       const confirmed=await confirmPacoAction({
         title:'Prullenbak definitief leegmaken?',
@@ -65,6 +73,7 @@
       });
       if(!confirmed)return;
       await management.emptyTrash();
+      showNotice('De prullenbak is leeggemaakt.');
       await refreshRecovery();
     }
 
@@ -77,14 +86,25 @@
       });
       if(!confirmed)return;
       await management.permanentlyDeleteRecoveryLesson(lesson.id);
+      showNotice(`“${lesson.title}” is definitief verwijderd.`);
       await refreshRecovery();
+    }
+
+    async function handleRecoveryError(error){
+      console.error('Recovery action error:',error);
+      showNotice(error?.message || 'De actie kon niet worden uitgevoerd.');
     }
 
     async function refreshRecovery(){
       archiveList.replaceChildren();
       trashList.replaceChildren();
-      renderRecovery(archiveList,management,'archive',refreshRecovery);
-      renderRecovery(trashList,management,'trash',refreshRecovery,emptyTrash,permanentlyDeleteLesson);
+      renderRecovery(archiveList,management,'archive',refreshRecovery,undefined,undefined,handleRecoveryError);
+      renderRecovery(trashList,management,'trash',refreshRecovery,emptyTrash,permanentlyDeleteLesson,handleRecoveryError);
+    }
+
+    async function handleRestore(lesson){
+      showNotice(`“${lesson.title}” is hersteld en staat weer bij de actieve lessen van ${lesson.student}.`);
+      await refreshRecovery();
     }
 
     async function initialize(){
@@ -94,7 +114,7 @@
         if(!app.auth.isParent){state.textContent='Je hebt geen toegang tot Archief / Prullenbak.';return;}
         await management.loadRecoveryLessons();
         await refreshRecovery();
-        content.replaceChildren(archive,trash);
+        content.replaceChildren(notice,archive,trash);
       }catch(error){
         console.error('Archive page load error:',error);
         state.textContent='Archief / Prullenbak kon niet worden geladen.';

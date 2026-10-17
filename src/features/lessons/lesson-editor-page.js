@@ -53,7 +53,7 @@ function editorShell() {
       <div id="lessonAiBox" class="card lesson-ai-box"><label class="lesson-test-date-toggle"><input id="lessonAiCheckAnswers" type="checkbox"> 🤖 AI moet het antwoord controleren</label><div class="small" style="margin-top:5px">Zet dit aan als je wilt dat AI bepaalt of het antwoord inhoudelijk goed is.</div><div id="lessonAiInstructionBox" class="lesson-ai-instruction"><div class="field" style="margin:0"><label for="lessonAiInstruction">Instructie voor de AI <span class="small">(optioneel)</span></label><textarea id="lessonAiInstruction" placeholder="Bijvoorbeeld: Een kleine spelfout is niet erg. Het antwoord hoeft niet 100% correct gespeld te zijn als de betekenis duidelijk goed is."></textarea></div></div></div>
       <div id="spellingLabelsEditor" class="card spelling-labels-box hidden"><h3>🏷️ Namen van de onderdelen</h3><div class="small">Deze teksten verschijnen bij het maken, oefenen en de toets.</div><div class="field"><label for="spellingLabelQuestion">Vraag / eerste regel</label><input id="spellingLabelQuestion" value="Werkwoord"></div><div class="field"><label for="spellingLabelPerfect">Tweede regel</label><input id="spellingLabelPerfect" value="Voltooid deelwoord"></div><div class="field"><label for="spellingLabelAdjective">Derde regel</label><input id="spellingLabelAdjective" value="Bijvoeglijk gebruikt voltooid deelwoord"></div></div>
       <div id="wordEditor"></div><div id="questionEditor" class="hidden"></div><div id="dictationEditor" class="hidden"></div><div id="mathEditor" class="hidden"></div><div id="spellingEditor" class="hidden"></div>
-      <div class="row editor-bottom-actions"><button type="button" data-action="add-row">➕ Rij toevoegen</button><button class="success" type="button" data-action="save">💾 Les opslaan</button></div>
+      <div class="row editor-bottom-actions"><button class="success" type="button" data-action="save">💾 Les opslaan</button></div>
       <div id="editorError" class="message error hidden"></div>
     </div>`;
 }
@@ -296,7 +296,6 @@ export function createLessonEditorPage({ root, runtime, initialLesson = null, st
     if (button.dataset.action === 'toggle-type') { root.querySelector('#lessonTypeMenu').classList.toggle('hidden'); return; }
     if (button.dataset.action === 'cancel') { window.location.href = `management.html?student=${encodeURIComponent(root.querySelector('input[name="lessonStudent"]:checked')?.value || student || '')}`; return; }
     if (button.dataset.action === 'save') { button.disabled = true; try { await save(); } finally { button.disabled = false; } return; }
-    if (button.dataset.action === 'add-row') { addRow(root, root.querySelector('#lessonType').value); return; }
     if (button.dataset.action === 'remove-row') {
       const row = button.closest('.editor-row'); const container = row?.parentElement; row?.remove();
       if (container && !container.children.length) addRow(root, root.querySelector('#lessonType').value);

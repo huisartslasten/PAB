@@ -75,16 +75,17 @@ test('lesson service preserves V4.78 item ordering and query shape', async () =>
 });
 
 test('lesson service creates a lesson through insert-select-single', async () => {
-  const payload = { title: 'Nieuwe les', student: 'Zyon', type: 'words' };
-  const db = mockDb({ rows: [{ id: 17, ...payload }] });
+  const payload = { title: 'Nieuwe les', student: 'Zyon', subject: '', type: 'words' };
+  const persisted = { ...payload, sort_order: 0, archived: false, deleted: false };
+  const db = mockDb({ rows: [{ id: 17, ...persisted }] });
   const service = createLessonService(db);
 
   const result = await service.createLesson(payload);
 
-  assert.deepEqual(result, { id: 17, ...payload });
+  assert.deepEqual(result, { id: 17, ...persisted });
   assert.deepEqual(db.calls, [
     { op: 'from', table: 'lessons' },
-    { op: 'insert', rows: payload }
+    { op: 'insert', rows: persisted }
   ]);
 });
 
@@ -101,15 +102,24 @@ test('lesson service propagates create errors', async () => {
 
 test('lesson service updates a lesson through update-filter-select-single', async () => {
   const payload = { title: 'Aangepaste les', archived: false };
-  const db = mockDb({ rows: [{ id: 17, ...payload }] });
+  const persisted = {
+    student: null,
+    subject: '',
+    title: 'Aangepaste les',
+    type: '',
+    sort_order: 0,
+    archived: false,
+    deleted: false
+  };
+  const db = mockDb({ rows: [{ id: 17, ...persisted }] });
   const service = createLessonService(db);
 
   const result = await service.updateLesson(17, payload);
 
-  assert.deepEqual(result, { id: 17, ...payload });
+  assert.deepEqual(result, { id: 17, ...persisted });
   assert.deepEqual(db.calls, [
     { op: 'from', table: 'lessons' },
-    { op: 'update', payload },
+    { op: 'update', payload: persisted },
     { op: 'eq', column: 'id', value: 17 },
     { op: 'select-after-update', columns: '*' }
   ]);
@@ -140,17 +150,16 @@ test('lesson service exposes archive, trash and restore operations', async () =>
   ]);
 });
 
-test('lesson service replaces lesson items with normalized defaults', async () => {
+test('lesson service replaces lesson items with normalized TEST-schema fields', async () => {
   const db = mockDb();
   const service = createLessonService(db);
   await service.replaceLessonItems(12, [{ prompt: 'woord', min_words: '', required_terms: null }]);
   const inserted = db.calls.find(call => call.op === 'insert').rows;
   assert.deepEqual(inserted, [{
-    prompt: 'woord',
-    min_words: 0,
-    required_terms: [],
-    lesson_id: 12,
-    hint: ''
+    question: '',
+    answer: '',
+    sort_order: 0,
+    lesson_id: 12
   }]);
 });
 
@@ -195,14 +204,20 @@ test('lesson service owns photo-style lesson creation and preserves normalized i
   assert.deepEqual(calls[1], {
     op: 'insert',
     table: 'lessons',
-    rows: { student: 'Zyon', subject: 'Nederlands', title: 'Foto-les', type: 'words' }
+    rows: {
+      student: 'Zyon',
+      subject: 'Nederlands',
+      title: 'Foto-les',
+      type: 'words',
+      sort_order: 0,
+      archived: false,
+      deleted: false
+    }
   });
   assert.deepEqual(calls[3].rows, [{
     question: 'Wat betekent kapen?',
     answer: 'Een schip overnemen',
-    min_words: 0,
-    required_terms: [],
-    hint: '',
+    sort_order: 0,
     lesson_id: 31
   }]);
 });

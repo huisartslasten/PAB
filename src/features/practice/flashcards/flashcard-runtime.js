@@ -5,7 +5,8 @@ import {
   getCurrentFlashcard,
   getFlashcardCards,
   nextFlashcard,
-  revealFlashcard
+  revealFlashcard,
+  revealFlashcardHint
 } from './flashcard-domain.js';
 
 export async function mountFlashcardPractice({
@@ -83,8 +84,16 @@ export async function mountFlashcardPractice({
   answer.className = 'flashcard-answer';
   card.appendChild(answer);
 
+  const hintButton = document.createElement('button');
+  hintButton.type = 'button';
+  hintButton.className = 'flashcard-hint-button';
+  hintButton.hidden = true;
+  hintButton.textContent = '💡 Hint';
+  card.appendChild(hintButton);
+
   const hint = document.createElement('div');
   hint.className = 'flashcard-hint';
+  hint.hidden = true;
   card.appendChild(hint);
 
   function render() {
@@ -92,9 +101,10 @@ export async function mountFlashcardPractice({
     prompt.textContent = current.prompt;
     answer.textContent = current.revealed ? current.answer : '';
     answer.hidden = !current.revealed;
-    hint.textContent = current.revealed
-      ? 'Druk op Enter voor de volgende kaart'
-      : 'Druk op Enter om het antwoord te zien';
+    hintButton.hidden = !current.hint || current.hintRevealed;
+    hintButton.setAttribute('aria-expanded', String(current.hintRevealed));
+    hint.textContent = current.hintRevealed ? current.hint : '';
+    hint.hidden = !current.hintRevealed;
     progress.textContent = `${current.index + 1} / ${current.total}`;
     reverseButton.setAttribute('aria-pressed', String(reverse));
     reverseButton.textContent = reverse ? '↔ Normaal oefenen' : '↔ Omgekeerd oefenen';
@@ -110,12 +120,21 @@ export async function mountFlashcardPractice({
     const next = nextFlashcard(session);
     if (next === session) {
       hint.textContent = 'Klaar! Druk op terug om de les te verlaten.';
+      hint.hidden = false;
+      hintButton.hidden = true;
       return;
     }
 
     session = next;
     render();
   }
+
+  hintButton.addEventListener('click', event => {
+    event.stopPropagation();
+    session = revealFlashcardHint(session);
+    render();
+    hint.focus();
+  });
 
   reverseButton.addEventListener('click', () => {
     reverse = !reverse;
@@ -124,8 +143,12 @@ export async function mountFlashcardPractice({
     card.focus();
   });
 
-  card.addEventListener('click', handleAdvance);
+  card.addEventListener('click', event => {
+    if (event.target.closest('.flashcard-hint-button')) return;
+    handleAdvance();
+  });
   card.addEventListener('keydown', event => {
+    if (event.target.closest('.flashcard-hint-button')) return;
     if (event.key !== 'Enter' && event.key !== ' ') return;
     event.preventDefault();
     handleAdvance();

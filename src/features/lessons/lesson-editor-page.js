@@ -147,6 +147,13 @@ function getRowsContainer(root, type) {
   return container;
 }
 
+function clearEditors(root) {
+  ['wordEditor', 'questionEditor', 'dictationEditor', 'mathEditor', 'spellingEditor'].forEach(id => {
+    const container = root.querySelector(`#${id}`);
+    if (container) container.replaceChildren();
+  });
+}
+
 function readDraft(root, lessonId) {
   const type = root.querySelector('#lessonType').value || 'words';
   const student = root.querySelector('input[name="lessonStudent"]:checked')?.value || '';

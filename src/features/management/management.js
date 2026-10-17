@@ -1,4 +1,4 @@
-import { appState, getParentSelectedStudent, setParentSelectedStudent } from '../../core/state.js';
+import { appState, setViewContext } from '../../core/state.js';
 import { getActiveStudentLessons, getStudentLessons } from '../lessons/visibility.js';
 import { createLessonRecovery, createTrashRecovery } from '../lessons/recovery.js';
 import { getAllArchiveEntries, getAllTrashEntries } from './recovery.js';
@@ -9,8 +9,8 @@ function requireParent(auth) {
 }
 
 function requireStudent() {
-  if (!appState.parentSelectedStudent) throw new Error('A student must be selected.');
-  return appState.parentSelectedStudent;
+  if (!appState.viewedStudent || appState.viewMode !== 'management') throw new Error('A student must be selected.');
+  return appState.viewedStudent;
 }
 
 function findScopedLesson(id, student) {
@@ -31,9 +31,7 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
   if (!lessonOrder) throw new Error('createManagement requires lessonOrder');
   if (typeof loadLessons !== 'function') throw new Error('createManagement requires loadLessons');
 
-  function assertParent() {
-    requireParent(auth);
-  }
+  function assertParent() { requireParent(auth); }
 
   async function loadAllLessons() {
     assertParent();
@@ -60,29 +58,14 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
     assertParent();
     const value = String(student ?? '').trim();
     if (!value || !isKnownStudent(value)) throw new Error('A known student must be selected.');
-    setParentSelectedStudent(value);
+    setViewContext(value, 'management');
     return value;
   }
 
-  function getStudents() {
-    assertParent();
-    return listStudents();
-  }
-
-  function getSelectedStudent() {
-    assertParent();
-    return getParentSelectedStudent();
-  }
-
-  function getScopedLessons() {
-    assertParent();
-    return getActiveStudentLessons(appState.lessons, requireStudent());
-  }
-
-  function getAllScopedLessons() {
-    assertParent();
-    return getStudentLessons(appState.lessons, requireStudent());
-  }
+  function getStudents() { assertParent(); return listStudents(); }
+  function getSelectedStudent() { assertParent(); return appState.viewMode === 'management' ? appState.viewedStudent : null; }
+  function getScopedLessons() { assertParent(); return getActiveStudentLessons(appState.lessons, requireStudent()); }
+  function getAllScopedLessons() { assertParent(); return getStudentLessons(appState.lessons, requireStudent()); }
 
   async function getOrderedScopedLessons() {
     assertParent();
@@ -95,13 +78,9 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
       if (!subjects.has(key)) subjects.set(key, { subject: String(lesson.subject || '').trim(), lessons: [] });
       subjects.get(key).lessons.push(lesson);
     });
-
     const groups = [];
     for (const group of subjects.values()) {
-      groups.push({
-        subject: group.subject,
-        lessons: await lessonOrder.getOrderedLessons(group.lessons, student, group.subject)
-      });
+      groups.push({ subject: group.subject, lessons: await lessonOrder.getOrderedLessons(group.lessons, student, group.subject) });
     }
     return groups.sort((a, b) => a.subject.localeCompare(b.subject, 'nl'));
   }
@@ -110,9 +89,7 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
     assertParent();
     const student = requireStudent();
     const scoped = (Array.isArray(lessons) ? lessons : []).map(lesson => findScopedLesson(lesson.id, student));
-    if (scoped.some(lesson => normalizeSubject(lesson.subject) !== normalizeSubject(subject))) {
-      throw new Error('Lesson order contains a lesson outside the selected subject.');
-    }
+    if (scoped.some(lesson => normalizeSubject(lesson.subject) !== normalizeSubject(subject))) throw new Error('Lesson order contains a lesson outside the selected subject.');
     return lessonOrder.writeOrder(student, String(subject || '').trim(), scoped);
   }
 
@@ -120,8 +97,7 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
     assertParent();
     const student = requireStudent();
     findScopedLesson(id, student);
-    const value = String(subvak ?? '').trim();
-    const result = await lessonService.updateLesson(id, { subvak: value, student });
+    const result = await lessonService.updateLesson(id, { subvak: String(subvak ?? '').trim(), student });
     await refreshLessons();
     return result;
   }
@@ -133,101 +109,25 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
     throw new Error('Unknown recovery mode.');
   }
 
-  async function createLesson(payload = {}) {
-    assertParent();
-    const student = requireStudent();
-    const result = await lessonService.createLesson({ ...payload, student });
-    await refreshLessons();
-    return result;
-  }
+  async function createLesson(payload = {}) { assertParent(); const student = requireStudent(); const result = await lessonService.createLesson({ ...payload, student }); await refreshLessons(); return result; }
+  async function updateLesson(id, payload = {}) { assertParent(); const student = requireStudent(); findScopedLesson(id, student); const result = await lessonService.updateLesson(id, { ...payload, student }); await refreshLessons(); return result; }
 
-  async function updateLesson(id, payload = {}) {
-    assertParent();
-    const student = requireStudent();
-    findScopedLesson(id, student);
-    const result = await lessonService.updateLesson(id, { ...payload, student });
-    await refreshLessons();
-    return result;
-  }
+  const recovery = createLessonRecovery({ lessonService, refresh: refreshRecoveryLessons });
+  const trashRecovery = createTrashRecovery({ lessonService, refresh: refreshRecoveryLessons });
 
-  const recovery = createLessonRecovery({
-    lessonService,
-    refresh: refreshRecoveryLessons
-  });
-
-  const trashRecovery = createTrashRecovery({
-    lessonService,
-    refresh: refreshRecoveryLessons
-  });
-
-  async function archiveLesson(id) {
-    assertParent();
-    findScopedLesson(id, requireStudent());
-    return recovery.archive(id);
-  }
-
-  async function moveToTrash(id) {
-    assertParent();
-    findScopedLesson(id, requireStudent());
-    return recovery.trash(id);
-  }
-
-  async function restoreLesson(id) {
-    assertParent();
-    const lesson = findScopedLesson(id, requireStudent());
-    if (!lesson.archived && !lesson.deleted) throw new Error('Lesson is not recoverable.');
-    return recovery.restore(id);
-  }
-
-  async function permanentlyDeleteRecoveryLesson(id) {
-    assertParent();
-    const lesson = appState.lessons.find(item => String(item?.id) === String(id));
-    if (!lesson?.deleted) throw new Error('Only lessons in the trash can be permanently deleted.');
-    return trashRecovery.permanentlyDelete(id);
-  }
-
-  async function emptyTrash() {
-    assertParent();
-    return trashRecovery.emptyTrash();
-  }
-
-  async function listFeedback() {
-    assertParent();
-    return feedbackService.listAll();
-  }
-
-  async function submitFeedback(payload = {}) {
-    assertParent();
-    return feedbackService.create(payload);
-  }
-
-  async function updateFeedbackStatus(id, status) {
-    assertParent();
-    return feedbackService.updateStatus(id, status);
-  }
+  async function archiveLesson(id) { assertParent(); findScopedLesson(id, requireStudent()); return recovery.archive(id); }
+  async function moveToTrash(id) { assertParent(); findScopedLesson(id, requireStudent()); return recovery.trash(id); }
+  async function restoreLesson(id) { assertParent(); const lesson = findScopedLesson(id, requireStudent()); if (!lesson.archived && !lesson.deleted) throw new Error('Lesson is not recoverable.'); return recovery.restore(id); }
+  async function permanentlyDeleteRecoveryLesson(id) { assertParent(); const lesson = appState.lessons.find(item => String(item?.id) === String(id)); if (!lesson?.deleted) throw new Error('Only lessons in the trash can be permanently deleted.'); return trashRecovery.permanentlyDelete(id); }
+  async function emptyTrash() { assertParent(); return trashRecovery.emptyTrash(); }
+  async function listFeedback() { assertParent(); return feedbackService.listAll(); }
+  async function submitFeedback(payload = {}) { assertParent(); return feedbackService.create(payload); }
+  async function updateFeedbackStatus(id, status) { assertParent(); return feedbackService.updateStatus(id, status); }
 
   return Object.freeze({
-    getStudents,
-    selectStudent,
-    getSelectedStudent,
-    loadAllLessons,
-    loadLessons: refreshLessons,
-    loadRecoveryLessons: refreshRecoveryLessons,
-    getScopedLessons,
-    getAllScopedLessons,
-    getOrderedScopedLessons,
-    saveLessonOrder,
-    moveLessonToSubvak,
-    getRecoveryLessons,
-    createLesson,
-    updateLesson,
-    archiveLesson,
-    moveToTrash,
-    restoreLesson,
-    permanentlyDeleteRecoveryLesson,
-    emptyTrash,
-    listFeedback,
-    submitFeedback,
-    updateFeedbackStatus
+    getStudents, selectStudent, getSelectedStudent, loadAllLessons, loadLessons: refreshLessons, loadRecoveryLessons: refreshRecoveryLessons,
+    getScopedLessons, getAllScopedLessons, getOrderedScopedLessons, saveLessonOrder, moveLessonToSubvak, getRecoveryLessons,
+    createLesson, updateLesson, archiveLesson, moveToTrash, restoreLesson, permanentlyDeleteRecoveryLesson, emptyTrash,
+    listFeedback, submitFeedback, updateFeedbackStatus
   });
 }

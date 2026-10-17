@@ -261,6 +261,10 @@ function rowHasQuestion(row) {
   return [...row.querySelectorAll('.word-q-part')].some(input => text(input.value));
 }
 
+function rowHasAnswer(row) {
+  return [...row.querySelectorAll('.word-a-part, .question-a-part, .dictation-a-part, .math-a-part, .spelling-a-part')].some(input => text(input.value));
+}
+
 function rowTemplateData(row) {
   const questionCount = Math.max(1, row.querySelectorAll('.word-q-part').length);
   const answerInputs = [...row.querySelectorAll('.word-a-part, .question-a-part, .dictation-a-part, .math-a-part, .spelling-a-part')];
@@ -281,7 +285,7 @@ function rowTemplateData(row) {
 
 function ensureAutomaticTrailingRow(root, type, row) {
   const container = row?.parentElement;
-  if (!container || row !== container.lastElementChild || !rowHasQuestion(row)) return;
+  if (!container || row !== container.lastElementChild || !rowHasQuestion(row) || !rowHasAnswer(row)) return;
   const data = rowTemplateData(row);
   const created = addRow(root, type, data);
   if (created) created.querySelector('input,textarea')?.focus();
@@ -367,7 +371,7 @@ export function createLessonEditorPage({ root, runtime, initialLesson = null, st
   });
 
   root.addEventListener('input', event => {
-    if (event.target.matches('.word-q-part')) {
+    if (event.target.matches('.word-q-part, .word-a-part, .question-a-part, .dictation-a-part, .math-a-part, .spelling-a-part')) {
       ensureAutomaticTrailingRow(root, root.querySelector('#lessonType').value, event.target.closest('.editor-row'));
       return;
     }

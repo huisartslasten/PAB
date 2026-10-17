@@ -13,10 +13,10 @@
     .practice-progress .progress{height:12px;overflow:hidden;border-radius:999px;background:#e7eef6}
     .practice-progress .progress-bar{height:100%;border-radius:999px;background:#1787f2}
     .practice-content{display:grid;gap:18px}
-    .practice-hint{display:flex;align-items:flex-start;gap:12px;justify-content:center;flex-wrap:wrap;margin:4px 0 8px}
+    .practice-hint{display:grid;justify-items:start;gap:10px;margin:4px 0 8px}
     .practice-hint-button{min-height:48px;padding:10px 20px;border:2px solid #cfe3f3;border-radius:15px;background:#edf8ff;color:#126fc9;font-family:"Baloo 2",Nunito,sans-serif;font-size:17px;font-weight:900;box-shadow:0 3px 0 rgba(16,43,87,.08);cursor:pointer}
     .practice-hint-button:hover{background:#dff0ff;border-color:#1787f2}
-    .practice-hint-box{max-width:760px;padding:13px 16px;border:2px solid #f0df9a;border-radius:15px;background:#fffdf0;color:#102b57;text-align:left;font-size:16px;line-height:1.45}
+    .practice-hint-box{width:min(100%,760px);box-sizing:border-box;padding:13px 16px;border:2px solid #f0df9a;border-radius:15px;background:#fffdf0;color:#102b57;text-align:left;font-size:16px;line-height:1.45}
     .practice-hint-box strong{display:block;margin-bottom:3px;font-family:"Baloo 2",Nunito,sans-serif;font-size:17px}
     .practice-hint-box.hidden{display:none}
     .practice-loading{min-height:220px;display:grid;place-items:center;padding:30px;border:2px solid #dce9f6;border-radius:24px;background:#fff;color:#667894;font-size:18px;font-weight:800;text-align:center}
@@ -28,7 +28,7 @@
     .practice-content .question-answer{padding:20px;border:2px solid #dce9f6;border-radius:18px;background:#f8fbff;line-height:1.55}
     .practice-content .self-buttons{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:16px}
     .practice-content .self-buttons button{min-height:50px;padding:10px 22px;border-radius:15px;font:900 17px Nunito,sans-serif;cursor:pointer}
-    @media(max-width:700px){.practice-hint{justify-content:stretch}.practice-hint-button{width:100%}}
+    @media(max-width:700px){.practice-hint{justify-items:stretch}.practice-hint-button{width:100%}}
   </style>
 </head>
 <body>

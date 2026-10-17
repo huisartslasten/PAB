@@ -8,18 +8,17 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     .auth-page{display:grid;gap:18px;max-width:620px;margin:0 auto}
-    .auth-card{padding:22px;border:1px solid #dce9f6;border-radius:18px;background:#fff;box-shadow:0 8px 22px rgba(16,43,87,.07)}
-    .auth-card h2{margin:0 0 8px;color:#102b57}
-    .auth-card p{margin:0 0 18px;color:#667894}
+    .auth-card{display:grid;gap:18px}
+    .auth-card h2{margin:0;color:#102b57;font:800 25px/1.1 "Baloo 2",Nunito,sans-serif}
+    .auth-card p{margin:0;color:#667894;line-height:1.5}
     .auth-form{display:grid;gap:14px}
     .auth-field{display:grid;gap:6px}
     .auth-field label{font-weight:900;color:#38577d}
-    .auth-field input{width:100%;box-sizing:border-box;padding:12px 13px;border:1px solid #cdddec;border-radius:12px;font:inherit}
+    .auth-field input{width:100%;box-sizing:border-box;min-height:46px;padding:9px 12px;border:2px solid #cfe3f3;border-radius:14px;background:#fff;color:#102b57;font:700 15px/1.2 Nunito,sans-serif;box-shadow:0 3px 10px rgba(16,43,87,.04);transition:border-color .15s ease,box-shadow .15s ease,background .15s ease}
+    .auth-field input:focus{outline:0;border-color:#1787f2;box-shadow:0 0 0 4px rgba(23,135,242,.12)}
     .auth-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
-    .auth-message{padding:12px 14px;border-radius:12px;background:#eef8ff;color:#126fc9;font-weight:800}
+    .auth-message{padding:12px 14px;border-radius:14px;background:#eef8ff;color:#126fc9;font-weight:800}
     .auth-message.error{background:#fff0f0;color:#b42318}
-    .auth-link{border:0;background:transparent;color:#126fc9;font-weight:900;cursor:pointer;padding:4px 0;text-align:left}
-    .auth-hidden{display:none}
   </style>
 </head>
 <body>
@@ -27,7 +26,6 @@
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
-    import { escapeHtml } from './src/core/html.js';
 
     const params = new URLSearchParams(window.location.search);
     const resetMode = params.get('mode') === 'reset';
@@ -36,17 +34,18 @@
     content.className = 'auth-page';
     const app = createPacoGOApp({ supabaseLib: window.supabase });
 
-    const goDashboard = () => { window.location.href = 'dashboard.html'; };
+    const goStart = () => { window.location.href = 'dashboard.html'; };
+    const goManagement = () => { window.location.href = 'management.html'; };
 
     mountPacoPageTemplate({
       mount,
-      backLabel:'← Dashboard',
-      backAction:goDashboard,
+      backLabel:'← Start',
+      backAction:goStart,
       greeting:'PacoGO 🔐',
       title:resetMode ? 'Wachtwoord wijzigen' : 'Inloggen',
       icon:'🔐',
       subtitle:resetMode ? 'Stel een nieuw wachtwoord in.' : 'Log in om beheerfuncties te openen.',
-      navigation:[{icon:'🏠',label:'Dashboard',onClick:goDashboard}],
+      navigation:[{icon:'🏠',label:'Start',onClick:goStart}],
       content
     });
 
@@ -74,21 +73,18 @@
     function renderLoggedIn() {
       content.replaceChildren();
       const card = document.createElement('section');
-      card.className = 'auth-card';
+      card.className = 'paco-template-card auth-card';
       const heading = document.createElement('h2');
       heading.textContent = 'Je bent ingelogd';
       const text = document.createElement('p');
       text.textContent = app.auth.isCreator ? 'Je hebt toegang tot de beheeromgeving.' : 'Je sessie is actief.';
       const actions = document.createElement('div');
       actions.className = 'auth-actions';
-      const dashboard = document.createElement('button');
-      dashboard.type = 'button';
-      dashboard.textContent = '🏠 Naar Dashboard';
-      dashboard.onclick = goDashboard;
       const management = document.createElement('button');
       management.type = 'button';
+      management.className = 'success';
       management.textContent = '⚙️ Naar Beheer';
-      management.onclick = () => { window.location.href = 'management.html'; };
+      management.onclick = goManagement;
       const logout = document.createElement('button');
       logout.type = 'button';
       logout.className = 'secondary';
@@ -102,7 +98,7 @@
           content.prepend(message(error?.message || 'Uitloggen mislukt.', true));
         }
       };
-      actions.append(dashboard, management, logout);
+      actions.append(management, logout);
       card.append(heading, text, actions);
       content.append(card);
     }
@@ -110,7 +106,7 @@
     function renderLogin(notice = '') {
       content.replaceChildren();
       const card = document.createElement('section');
-      card.className = 'auth-card';
+      card.className = 'paco-template-card auth-card';
       const heading = document.createElement('h2');
       heading.textContent = 'Inloggen';
       const text = document.createElement('p');
@@ -123,6 +119,7 @@
       actions.className = 'auth-actions';
       const submit = document.createElement('button');
       submit.type = 'submit';
+      submit.className = 'success';
       submit.textContent = 'Inloggen';
       const reset = document.createElement('button');
       reset.type = 'button';
@@ -140,7 +137,7 @@
           const session = await app.authSession.signIn(email.input.value, password.input.value);
           app.auth.setSession(session);
           if (!app.auth.isParent) throw new Error('Dit account heeft geen PacoGO-beheertoegang.');
-          goDashboard();
+          goManagement();
         } catch (error) {
           card.prepend(message(error?.message || 'Inloggen mislukt.', true));
           submit.disabled = false;
@@ -155,7 +152,7 @@
     function renderResetRequest() {
       content.replaceChildren();
       const card = document.createElement('section');
-      card.className = 'auth-card';
+      card.className = 'paco-template-card auth-card';
       const heading = document.createElement('h2');
       heading.textContent = 'Wachtwoord vergeten';
       const text = document.createElement('p');
@@ -172,6 +169,7 @@
       back.onclick = () => renderLogin();
       const submit = document.createElement('button');
       submit.type = 'submit';
+      submit.className = 'success';
       submit.textContent = 'Resetlink sturen';
       form.append(email.wrapper, actions);
       actions.append(back, submit);
@@ -195,7 +193,7 @@
     function renderPasswordUpdate() {
       content.replaceChildren();
       const card = document.createElement('section');
-      card.className = 'auth-card';
+      card.className = 'paco-template-card auth-card';
       const heading = document.createElement('h2');
       heading.textContent = 'Nieuw wachtwoord';
       const text = document.createElement('p');
@@ -208,6 +206,7 @@
       actions.className = 'auth-actions';
       const submit = document.createElement('button');
       submit.type = 'submit';
+      submit.className = 'success';
       submit.textContent = 'Wachtwoord opslaan';
       form.append(password.wrapper, confirm.wrapper, actions);
       actions.append(submit);

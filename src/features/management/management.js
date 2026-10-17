@@ -173,6 +173,13 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
     return recovery.restore(id);
   }
 
+  async function permanentlyDeleteRecoveryLesson(id) {
+    assertParent();
+    const lesson = appState.lessons.find(item => String(item?.id) === String(id));
+    if (!lesson?.deleted) throw new Error('Only lessons in the trash can be permanently deleted.');
+    return trashRecovery.permanentlyDelete(id);
+  }
+
   async function emptyTrash() {
     assertParent();
     return trashRecovery.emptyTrash();
@@ -210,6 +217,7 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
     archiveLesson,
     moveToTrash,
     restoreLesson,
+    permanentlyDeleteRecoveryLesson,
     emptyTrash,
     listFeedback,
     submitFeedback,

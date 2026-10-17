@@ -1,0 +1,21 @@
+.management-page{display:grid;gap:18px}
+.management-section{display:grid;gap:14px;padding:20px;border:1px solid #dce9f6;border-radius:22px;background:#fff;box-shadow:0 8px 22px rgba(16,43,87,.07)}
+.management-state{padding:16px 18px;border:1px solid #dce9f6;border-radius:16px;background:#f7fbff;color:#667894;font-weight:700}
+.management-feedback{padding:16px 18px;border:1px solid #dce9f6;border-radius:16px;background:#fff}
+.management-feedback h3{margin:6px 0;color:#102b57}
+.management-feedback p{margin:0 0 10px;color:#38577d;white-space:pre-wrap}
+.management-feedback-status{display:inline-block;padding:5px 9px;border-radius:999px;background:#eaf4ff;color:#126fc9;font-size:12px;font-weight:900}
+.management-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.management-link{border:0;border-radius:12px;padding:10px 14px;background:#eaf4ff;color:#126fc9;font-weight:900;cursor:pointer}
+.management-link.danger{background:#fee5e3;color:#b91c1c}
+.management-link:disabled{opacity:.6;cursor:wait}
+.management-recovery-student{display:grid;gap:12px}
+.management-recovery-student>h3{margin:0;color:#102b57}
+.management-recovery-subject{display:grid;gap:10px}
+.management-recovery-subject h4{margin:0;color:#38577d}
+.management-recovery-lessons{display:grid;gap:10px}
+.management-recovery-lesson{display:grid;gap:8px}
+.management-recovery-lesson h3{margin:0;color:#102b57}
+.management-recovery-lesson p{margin:0;color:#38577d}
+.management-recovery-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+@media(max-width:800px){.management-recovery-grid{grid-template-columns:1fr}}

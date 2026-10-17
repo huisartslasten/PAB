@@ -8,9 +8,25 @@
     .management-page{display:grid;gap:18px}
     .management-section{display:grid;gap:14px;padding:20px;border:1px solid #dce9f6;border-radius:22px;background:#fff;box-shadow:0 8px 22px rgba(16,43,87,.07)}
     .management-state{padding:16px 18px;border:1px solid #dce9f6;border-radius:16px;background:#f7fbff;color:#667894;font-weight:700}
-    .management-students{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-    .management-student{min-height:64px;border:2px solid #dce9f6;border-radius:16px;background:#edf8ff;padding:14px 16px;text-align:left;color:#102b57;font:800 19px/1.1 "Baloo 2",Nunito,sans-serif;cursor:pointer;box-shadow:0 5px 0 rgba(16,43,87,.05)}
-    .management-student:hover,.management-student[aria-pressed="true"]{border-color:#1787f2;background:#e4f3ff;color:#0d6fd4}
+    .management-student-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    .management-student-card{display:grid;gap:14px;align-content:start;padding:18px;border:2px solid #dce9f6;border-radius:22px;background:#fff;box-shadow:0 8px 22px rgba(16,43,87,.07);min-width:0}
+    .management-student-card-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .management-student-name{border:0;background:none;padding:0;color:#102b57;font:900 25px/1.1 "Baloo 2",Nunito,sans-serif;cursor:pointer;text-align:left}
+    .management-student-name:hover{color:#126fc9}
+    .management-student-open{border:0;background:none;padding:5px 0;color:#126fc9;font:900 14px/1.1 "Baloo 2",Nunito,sans-serif;cursor:pointer;white-space:nowrap}
+    .management-student-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .management-student-action{border:0;border-radius:14px;padding:12px 10px;background:#eaf4ff;color:#126fc9;font:900 15px/1.1 "Baloo 2",Nunito,sans-serif;cursor:pointer}
+    .management-student-action:hover{background:#dff0ff}
+    .management-student-section{display:grid;gap:8px}
+    .management-student-section-label{color:#667894;font:900 13px/1.1 Nunito,sans-serif;letter-spacing:.03em}
+    .management-subject-chips{display:flex;flex-wrap:wrap;gap:7px}
+    .management-subject-chip{padding:7px 10px;border:1px solid #cfe3f3;border-radius:12px;background:#f7fbff;color:#17365f;font:800 14px/1.1 Nunito,sans-serif}
+    .management-student-muted{color:#667894;font-size:13px}
+    .management-student-agenda{padding-top:2px;border-top:1px solid #dce9f6}
+    .management-agenda-preview{display:grid;gap:7px}
+    .management-agenda-preview-item{display:grid;grid-template-columns:62px minmax(0,1fr);gap:8px;align-items:start;padding:7px 0}
+    .management-agenda-date{color:#126fc9;font:900 13px/1.2 Nunito,sans-serif}
+    .management-agenda-title{color:#102b57;font:800 14px/1.25 Nunito,sans-serif;min-width:0}
     .management-section h2{margin:0;font:800 25px/1.1 "Baloo 2",Nunito,sans-serif;color:#102b57}
     .management-section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
     .management-lesson{padding:16px 18px}
@@ -22,7 +38,8 @@
     .management-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.management-link{border:0;border-radius:12px;padding:10px 14px;background:#eaf4ff;color:#126fc9;font-weight:900;cursor:pointer}.management-link.primary{background:#1787f2;color:#fff}.management-link.danger{background:#fee5e3;color:#b91c1c}.management-link:disabled{opacity:.6;cursor:wait}
     .management-recovery-student{display:grid;gap:12px}.management-recovery-student>h3{margin:0;color:#102b57}.management-recovery-subject{display:grid;gap:10px}.management-recovery-subject h4{margin:0;color:#38577d}.management-recovery-lessons{display:grid;gap:10px}
     .management-subject{display:grid;gap:12px}.management-subject-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px}.management-subject-heading h3{margin:0;color:#102b57;font-size:21px}.management-subject-heading span{color:#667894;font-size:13px}.management-subvak{display:grid;gap:8px;padding:12px;border:1px solid #dce9f6;border-radius:16px;background:#f7fbff}.management-subvak.drop-active{border-color:#1787f2;background:#eef8ff}.management-subvak h4{margin:0;color:#38577d}.management-lessons-grid{display:grid;gap:10px;min-height:12px}.management-lesson[draggable="true"]{cursor:grab}.management-lesson.dragging{opacity:.5}.management-lesson.drag-over{border-color:#1787f2;background:#eef8ff}.management-lesson-main{min-width:0}
-    @media(max-width:700px){.management-students{grid-template-columns:1fr}.management-section-heading{align-items:flex-start;flex-direction:column}.management-subject-heading{align-items:flex-start;flex-direction:column}}
+    @media(max-width:900px){.management-student-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:700px){.management-student-cards{grid-template-columns:1fr}.management-section-heading{align-items:flex-start;flex-direction:column}.management-subject-heading{align-items:flex-start;flex-direction:column}.management-student-card-top{align-items:flex-start;flex-direction:column}.management-student-open{padding:0}}
   </style>
 </head>
 <body>
@@ -32,7 +49,9 @@
     import { createPacoNavigation } from './src/components/page-navigation.js';
     import { confirmPacoAction } from './src/components/confirm-dialog.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
-    import { renderStudentSelection, renderStudentLessons, renderRecovery, renderFeedback } from './src/features/management/management-view.js';
+    import { createAgendaRuntimeEntry } from './src/features/agenda/runtime-entry.js';
+    import { renderStudentManagementCards } from './src/features/management/student-card-view.js';
+    import { renderStudentLessons, renderRecovery, renderFeedback } from './src/features/management/management-view.js';
 
     const mount=document.querySelector('#paco-template-mount');
     const content=document.createElement('div'); content.className='management-page';
@@ -40,15 +59,16 @@
     const goDashboard=()=>{window.location.href='dashboard.html';};
 
     mountPacoPageTemplate({
-      mount,backLabel:'← Dashboard',backAction:goDashboard,greeting:'PacoGO beheer ⚙️',title:'Beheer',icon:'⚙️',subtitle:'Beheer de lessen per leerling, herstel lessen en bekijk feedback.',
+      mount,backLabel:'← Dashboard',backAction:goDashboard,greeting:'PacoGO beheer ⚙️',title:'Beheer',icon:'⚙️',subtitle:'Kies een leerling om direct naar de belangrijkste acties en de komende week te gaan.',
       navigation:createPacoNavigation({active:'management',includeCreator:true}),content
     });
 
     const app=createPacoGOApp({supabaseLib:window.supabase});
     const management=app.management;
-    const students=document.createElement('div'); students.className='management-students';
+    const studentCards=document.createElement('div'); studentCards.className='management-student-cards';
     const studentSection=document.createElement('section'); studentSection.className='management-section';
-    const studentHeading=document.createElement('h2'); studentHeading.textContent='Leerling'; studentSection.append(studentHeading,students);
+    const studentHeading=document.createElement('h2'); studentHeading.textContent='Leerlingen'; studentSection.append(studentHeading,studentCards);
+
     const lessons=document.createElement('div');
     const lessonSection=document.createElement('section'); lessonSection.className='management-section';
     const lessonHeadingWrap=document.createElement('div'); lessonHeadingWrap.className='management-section-heading';
@@ -60,15 +80,28 @@
     const feedbackList=document.createElement('div'); const feedbackSection=document.createElement('section'); feedbackSection.className='management-section'; const feedbackHeading=document.createElement('h2'); feedbackHeading.textContent='Feedback'; feedbackSection.append(feedbackHeading,feedbackList);
 
     const openEditor=lesson=>{window.location.href=`lesson-editor.html?lesson_id=${encodeURIComponent(lesson.id)}&student=${encodeURIComponent(lesson.student)}`;};
-    const openNewLesson=()=>{const selected=management.getSelectedStudent(); if(!selected){state.textContent='Kies eerst een leerling.'; return;} window.location.href=`lesson-editor.html?student=${encodeURIComponent(selected)}`;};
+    const openNewLessonFor=student=>{window.location.href=`lesson-editor.html?student=${encodeURIComponent(student)}`;};
+    const openNewLesson=()=>{const selected=management.getSelectedStudent(); if(!selected){state.textContent='Kies eerst een leerling.'; return;} openNewLessonFor(selected);};
+    const openMonthCalendar=student=>{window.location.href=`month-calendar.html?student=${encodeURIComponent(student)}`;};
+    const openStudent=student=>{window.location.href=`dashboard.html?student=${encodeURIComponent(student)}`;};
     createLessonButton.addEventListener('click',openNewLesson);
+
+    const agenda=createAgendaRuntimeEntry({
+      storage:localStorage,
+      documentRef:document,
+      db:app.db,
+      currentStudent:()=>management.getSelectedStudent() || '',
+      lessons:()=>app.state.lessons,
+      demoItems:()=>[],
+      now:()=>new Date()
+    });
 
     async function showSelectedStudent(student){
       management.selectStudent(student);
       lessons.replaceChildren();
       lessonHeading.textContent=`Actieve lessen — ${student}`;
       await renderStudentLessons(lessons,management,{onEdit:openEditor,onArchive:archiveLesson,onDelete:deleteLesson});
-      renderStudentSelection(students,management,student=>{showSelectedStudent(student).catch(error=>console.error('Management student load error:',error));});
+      renderStudentManagementCards(studentCards,{students:management.getStudents(),lessons:app.state.lessons,getAgendaItems:studentName=>agenda.buildAgendaItemsForRender(studentName),onSelect:showSelectedStudent,onCreateLesson:openNewLessonFor,onOpenMonthCalendar:openMonthCalendar,onOpenStudent:openStudent});
     }
     async function archiveLesson(lesson){const confirmed=await confirmPacoAction({title:'Les archiveren?',message:`Weet je zeker dat je de les “${lesson.title}” wilt archiveren?`,confirmLabel:'Archiveren',cancelLabel:'Annuleren'});if(!confirmed)return;await management.archiveLesson(lesson.id);await showSelectedStudent(management.getSelectedStudent());await refreshRecovery();}
     async function deleteLesson(lesson){const confirmed=await confirmPacoAction({title:'Les verwijderen?',message:`Weet je zeker dat je de les “${lesson.title}” naar de prullenbak wilt verplaatsen?`,confirmLabel:'Verwijderen',cancelLabel:'Annuleren'});if(!confirmed)return;await management.moveToTrash(lesson.id);await showSelectedStudent(management.getSelectedStudent());await refreshRecovery();}
@@ -95,7 +128,7 @@
         const selected=management.getSelectedStudent()||management.getStudents()[0];
         if(selected) management.selectStudent(selected);
         await management.loadLessons();
-        renderStudentSelection(students,management,student=>{showSelectedStudent(student).catch(error=>console.error('Management student load error:',error));});
+        renderStudentManagementCards(studentCards,{students:management.getStudents(),lessons:app.state.lessons,getAgendaItems:student=>agenda.buildAgendaItemsForRender(student),onSelect:showSelectedStudent,onCreateLesson:openNewLessonFor,onOpenMonthCalendar:openMonthCalendar,onOpenStudent:openStudent});
         if(selected) await showSelectedStudent(selected);
         else lessons.innerHTML='<div class="management-state">Kies hierboven een leerling om de actieve lessen te beheren.</div>';
         await refreshRecovery();

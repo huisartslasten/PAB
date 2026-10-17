@@ -13,7 +13,8 @@ export function createPracticeRuntime({
   evaluateAnswer = null,
   shuffle = items => [...items],
   random = Math.random,
-  aiCheckAnswers = true
+  aiCheckAnswers = true,
+  sessionMode = 'mastery'
 } = {}) {
   if (!lesson || typeof lesson !== 'object') throw new Error('A lesson is required.');
   if (!Array.isArray(lesson.lesson_items)) throw new Error('A lesson with lesson items is required.');
@@ -54,12 +55,13 @@ export function createPracticeRuntime({
 
   function progress() {
     const total = items.length;
-    const mastered = total - remaining.size;
+    const completed = total - remaining.size;
     return Object.freeze({
       total,
-      mastered,
-      remaining: total - mastered,
-      percentage: total ? mastered / total * 100 : 0
+      mastered: completed,
+      completed,
+      remaining: total - completed,
+      percentage: total ? completed / total * 100 : 0
     });
   }
 
@@ -69,13 +71,15 @@ export function createPracticeRuntime({
       current,
       attempts,
       mode,
+      sessionMode,
       finished,
       progress: progress()
     });
   }
 
   function completeCurrent(correct, evaluation = null) {
-    if (correct) remaining.delete(current.id);
+    const completed = sessionMode === 'single-pass' || correct === true;
+    if (completed) remaining.delete(current.id);
     const done = remaining.size === 0;
     if (done) {
       finished = true;
@@ -134,11 +138,12 @@ export function createPracticeRuntime({
     snapshot,
     progress,
     get current() { return current; },
-    get type() { return type; }
+    get type() { return type; },
+    get sessionMode() { return sessionMode; }
   });
 }
 
-export function createApplicationPracticeRuntime({ db = null, lesson = null, shuffle, random, evaluateAnswer = null, aiCheckAnswers = true } = {}) {
+export function createApplicationPracticeRuntime({ db = null, lesson = null, shuffle, random, evaluateAnswer = null, aiCheckAnswers = true, sessionMode = 'mastery' } = {}) {
   const type = normalizeType(lesson?.type);
   const evaluator = evaluateAnswer || (type === 'questions'
     ? null
@@ -148,6 +153,7 @@ export function createApplicationPracticeRuntime({ db = null, lesson = null, shu
     evaluateAnswer: evaluator?.evaluate || evaluator,
     shuffle,
     random,
-    aiCheckAnswers
+    aiCheckAnswers,
+    sessionMode
   });
 }

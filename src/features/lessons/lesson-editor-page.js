@@ -73,8 +73,8 @@ function addAnswerPart(row, containerClass, inputClass, value = '', role = 'answ
   box.insertAdjacentHTML('beforeend', `<div class="word-part-row"><input class="${inputClass}" value="${esc(value)}" placeholder="${esc(placeholder)}">${roleMarkup(role)}<button type="button" class="word-part-remove" data-action="remove-part">✕</button></div>`);
 }
 
-function rowFrame(content) {
-  return `<div class="editor-row"><button class="remove-row" type="button" data-action="remove-row">✕</button>${content}<button type="button" class="question-insert-button" data-action="insert-row">➕ Vraag toevoegen</button></div>`;
+function rowFrame(content, addLabel = '➕ Vraag toevoegen') {
+  return `<div class="editor-row"><button class="remove-row" type="button" data-action="remove-row">✕</button>${content}<button type="button" class="question-insert-button" data-action="insert-row">${addLabel}</button></div>`;
 }
 
 function createWordRow({ questionParts = [''], answerParts = [{ text: '', role: 'answer' }], rules = null } = {}) {
@@ -109,6 +109,17 @@ function createUniversalRow({ answerClass, answerInputClass, answerPlaceholder =
   return row;
 }
 
+function createDictationRow({ word = '' } = {}) {
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = rowFrame(`
+    <div class="word-parts-section dictation-word-section">
+      <div class="word-parts-head"><label>Dicteewoord</label></div>
+      <div class="dictation-word-field"><input class="dictation-word-input" value="${esc(word)}" placeholder="Voer hier het woord in"></div>
+      <div class="word-extra-note">Dit woord wordt precies zo uitgesproken en is de enige correcte spelling.</div>
+    </div>`, '➕ Woord toevoegen');
+  return wrapper.firstElementChild;
+}
+
 function createSpellingRow({ questionParts = [''], answerParts = [{ text: '', role: 'answer' }] } = {}) {
   const wrapper = document.createElement('div');
   wrapper.innerHTML = rowFrame(`
@@ -125,17 +136,28 @@ function addRow(root, type, data = {}) {
   if (!container) return null;
   const row = type === 'words' || type === 'custom'
     ? createWordRow(data)
-    : type === 'spelling'
-      ? createSpellingRow(data)
-      : createUniversalRow({
-        answerClass: `${type}-answer-parts`,
-        answerInputClass: `${type}-a-part`,
-        answerPlaceholder: type === 'math' ? 'Vul het getal in' : 'Vul hier het antwoord in',
-        questionLabel: type === 'dictation' ? 'Dicteezin' : type === 'math' ? 'Som' : 'Vraag',
-        ...data
-      });
+    : type === 'dictation'
+      ? createDictationRow(data)
+      : type === 'spelling'
+        ? createSpellingRow(data)
+        : createUniversalRow({
+          answerClass: `${type}-answer-parts`,
+          answerInputClass: `${type}-a-part`,
+          answerPlaceholder: type === 'math' ? 'Vul het getal in' : 'Vul hier het antwoord in',
+          questionLabel: type === 'math' ? 'Som' : 'Vraag',
+          ...data
+        });
   container.appendChild(row);
   return row;
+}
+
+function ensureDictationTrailingRow(root) {
+  const container = root.querySelector('#dictationEditor');
+  if (!container) return null;
+  const lastRow = container.lastElementChild;
+  const lastInput = lastRow?.querySelector('.dictation-word-input');
+  if (!lastInput || text(lastInput.value)) return addRow(root, 'dictation');
+  return null;
 }
 
 function getRowsContainer(root, type) {
@@ -155,8 +177,28 @@ function clearEditors(root) {
 function readDraft(root, lessonId) {
   const type = root.querySelector('#lessonType').value || 'words';
   const student = root.querySelector('input[name="lessonStudent"]:checked')?.value || '';
+  if (type === 'dictation') {
+    const rows = [...root.querySelectorAll('#dictationEditor .editor-row')]
+      .map(row => ({ word: row.querySelector('.dictation-word-input')?.value.trim() || '' }))
+      .filter(item => item.word);
+    return {
+      lessonId,
+      student,
+      subject: root.querySelector('#lessonSubject').value.trim(),
+      enteredSubvak: root.querySelector('#lessonSubvak').value.trim(),
+      title: root.querySelector('#lessonName').value.trim(),
+      type,
+      explanation: root.querySelector('#lessonExplanation').value.trim(),
+      aiCheckAnswers: false,
+      aiInstruction: '',
+      editorLabels: null,
+      items: rows,
+      testDate: root.querySelector('#lessonTestDate').value || ''
+    };
+  }
+
   const questionParts = row => [...row.querySelectorAll('.word-q-part')].map(input => input.value.trim()).filter(Boolean);
-  const answerParts = row => [...row.querySelectorAll('.word-a-part, .question-a-part, .dictation-a-part, .math-a-part, .spelling-a-part')].map(input => ({ text: input.value.trim(), role: input.closest('.word-part-row')?.querySelector('.word-part-role')?.value === 'extra' ? 'extra' : 'answer' })).filter(part => part.text);
+  const answerParts = row => [...row.querySelectorAll('.word-a-part, .question-a-part, .math-a-part, .spelling-a-part')].map(input => ({ text: input.value.trim(), role: input.closest('.word-part-row')?.querySelector('.word-part-role')?.value === 'extra' ? 'extra' : 'answer' })).filter(part => part.text);
   const rows = [...root.querySelectorAll('.editor-row')].map(row => {
     const item = { question_parts: questionParts(row), answer_parts: answerParts(row) };
     if (type === 'words' || type === 'custom') {
@@ -219,6 +261,7 @@ function applyVisibility(root, type) {
   const visible = type === 'words' || type === 'custom' ? 'wordEditor' : `${type}Editor`;
   root.querySelector(`#${visible}`)?.classList.remove('hidden');
   root.querySelector('#spellingLabelsEditor')?.classList.toggle('hidden', type !== 'spelling');
+  root.querySelector('#lessonAiBox')?.classList.toggle('hidden', type === 'dictation');
   root.querySelector('#lessonTypeButtonText').textContent = TYPE_LABELS[type] || TYPE_LABELS.words;
 }
 
@@ -244,10 +287,12 @@ function populateEditor(root, lesson, calendarDate = '') {
   clearEditors(root);
   const items = Array.isArray(lesson?.lesson_items) ? lesson.lesson_items : [];
   if (!items.length) addRow(root, type);
-  else items.forEach(item => addRow(root, type, { questionParts: item.question_parts || text(item.question).split('\n'), answerParts: normalizeParts(item.answer_parts, item.answer), rules: item }));
+  else items.forEach(item => addRow(root, type, type === 'dictation'
+    ? { word: text(item.answer || item.word) }
+    : { questionParts: item.question_parts || text(item.question).split('\n'), answerParts: normalizeParts(item.answer_parts, item.answer), rules: item }));
   applyVisibility(root, type);
   renderDatePicker(root, calendarDate, calendarDate ? parseDateKey(calendarDate) : new Date());
-  root.querySelector('#lessonAiInstructionBox').classList.toggle('hidden', !root.querySelector('#lessonAiCheckAnswers').checked);
+  root.querySelector('#lessonAiInstructionBox').classList.toggle('hidden', !root.querySelector('#lessonAiCheckAnswers').checked || type === 'dictation');
 }
 
 function showError(root, message) {
@@ -258,8 +303,9 @@ function showError(root, message) {
 }
 
 function rowTemplateData(row) {
+  if (row.querySelector('.dictation-word-input')) return { word: '' };
   const questionCount = Math.max(1, row.querySelectorAll('.word-q-part').length);
-  const answerInputs = [...row.querySelectorAll('.word-a-part, .question-a-part, .dictation-a-part, .math-a-part, .spelling-a-part')];
+  const answerInputs = [...row.querySelectorAll('.word-a-part, .question-a-part, .math-a-part, .spelling-a-part')];
   const answerParts = answerInputs.length
     ? answerInputs.map(input => ({ text: '', role: input.closest('.word-part-row')?.querySelector('.word-part-role')?.value === 'extra' ? 'extra' : 'answer' }))
     : [{ text: '', role: 'answer' }];
@@ -362,6 +408,11 @@ export function createLessonEditorPage({ root, runtime, initialLesson = null, st
   });
 
   root.addEventListener('input', event => {
+    if (event.target.matches('.dictation-word-input')) {
+      const row = event.target.closest('.editor-row');
+      const container = root.querySelector('#dictationEditor');
+      if (row && container && row === container.lastElementChild && text(event.target.value)) ensureDictationTrailingRow(root);
+    }
     if (!event.target.id.startsWith('spellingLabel')) return;
     const labels = getSpellingLabelsFromRow(root);
     root.querySelectorAll('.spelling-label-question').forEach(el => { el.textContent = labels.question; });

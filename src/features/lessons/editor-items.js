@@ -29,7 +29,6 @@ function buildUniversalItem(row = {}, { numericAnswer = false, spelling = false,
     answer_parts: answerParts
   };
 
-  // V4.78 only persisted these fixed-answer rules for Woordtrainer/Eigen les.
   if (includeWordRules) {
     if (row.hint != null) item.hint = text(row.hint);
     if (row.min_words != null) item.min_words = Math.max(0, Number(row.min_words) || 0);
@@ -52,7 +51,14 @@ export function buildQuestionItem(row = {}) {
 }
 
 export function buildDictationItem(row = {}) {
-  return buildUniversalItem(row);
+  const word = text(row.word ?? row.answer);
+  if (!word) return null;
+  return {
+    question: '',
+    answer: word,
+    question_parts: [],
+    answer_parts: [{ text: word, role: 'answer' }]
+  };
 }
 
 export function buildMathItem(row = {}) {
@@ -63,7 +69,8 @@ export function buildSpellingItem(row = {}) {
   return buildUniversalItem(row, { spelling: true });
 }
 
-export function isMeaningfulItem(item = {}) {
+export function isMeaningfulItem(item = {}, type = 'words') {
+  if (type === 'dictation') return Boolean(normalizeKey(item.answer || ''));
   return Boolean(normalizeKey(item.question || '') && normalizeKey(item.answer || ''));
 }
 
@@ -85,5 +92,5 @@ export function buildItemsForType(type, rows = []) {
       return item ? { ...item, sort_order: index } : null;
     })
     .filter(Boolean)
-    .filter(isMeaningfulItem);
+    .filter(item => isMeaningfulItem(item, type));
 }

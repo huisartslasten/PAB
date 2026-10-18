@@ -99,7 +99,7 @@ test('practice presentation keeps completion rendering owned by the entry', () =
   assert.match(documentRef.getElementById('practiceContent').innerHTML, /Klaar!/);
 });
 
-test('practice presentation delegates dictation speech to the lesson audio service', async () => {
+test('practice presentation delegates dictation speech using the canonical answer word', async () => {
   const calls = [];
   const audioService = {
     speak: async (text, options) => {
@@ -115,6 +115,6 @@ test('practice presentation delegates dictation speech to the lesson audio servi
 
   assert.equal(calls.length, 2);
   assert.deepEqual(calls[0], { stop: true });
-  assert.equal(calls[1].text, 'Vraag A');
+  assert.equal(calls[1].text, 'Antwoord A');
   assert.equal(calls[1].options.language, 'nl');
 });

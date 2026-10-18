@@ -37,137 +37,236 @@
 
     const goStart = () => { window.location.href = 'dashboard.html'; };
     const goManagement = () => { window.location.href = 'management.html'; };
-    const navigation = createPacoNavigation({ currentPage: 'auth', isParent: false, onNavigate: () => {} });
-    mountPacoPageTemplate({
-      mount,
-      title: 'Inloggen',
-      subtitle: 'Meld je aan om verder te gaan.',
-      content,
-      navigation
-    });
 
-    const message = (text, isError = false) => {
-      const node = document.createElement('div');
-      node.className = `auth-message${isError ? ' error' : ''}`;
-      node.textContent = text;
-      return node;
-    };
-
-    function renderLogin() {
-      content.replaceChildren();
-      const card = document.createElement('section');
-      card.className = 'paco-card auth-card';
-      card.innerHTML = '<h2>Welkom bij PacoGO</h2><p>Log in met je e-mailadres en wachtwoord.</p>';
-      const form = document.createElement('form');
-      form.className = 'auth-form';
-      form.innerHTML = '<div class="auth-field"><label for="email">E-mailadres</label><input id="email" name="email" type="email" autocomplete="email" required></div><div class="auth-field"><label for="password">Wachtwoord</label><input id="password" name="password" type="password" autocomplete="current-password" required></div>';
-      const actions = document.createElement('div');
-      actions.className = 'auth-actions';
-      const button = document.createElement('button');
-      button.type = 'submit';
-      button.className = 'paco-button primary';
-      button.textContent = 'Inloggen';
-      actions.appendChild(button);
-      form.appendChild(actions);
-      form.addEventListener('submit', async event => {
-        event.preventDefault();
-        button.disabled = true;
-        try {
-          const { error } = await app.authSession.signIn({
-            email: form.email.value.trim(),
-            password: form.password.value
-          });
-          if (error) throw error;
-          await app.initializeSession();
-          if (app.auth.isParent) goManagement();
-          else goStart();
-        } catch (error) {
-          card.appendChild(message(error?.message || 'Inloggen mislukt.', true));
-          button.disabled = false;
-        }
-      });
-      card.appendChild(form);
-      content.appendChild(card);
+    let session = null;
+    let sessionError = null;
+    try {
+      session = await app.initializeSession();
+    } catch (error) {
+      sessionError = error;
+      console.error('Auth session load error:', error);
     }
 
-    async function initialize() {
-      let sessionError = null;
+    const loggedInAsParent = Boolean(session && app.auth.isParent);
+
+    const logoutFromNavigation = async () => {
       try {
-        await app.initializeSession();
+        await app.authSession.signOut();
+        app.auth.setSession(null);
+        window.location.href = 'auth.html';
       } catch (error) {
-        sessionError = error;
+        content.prepend(message(error?.message || 'Uitloggen mislukt.', true));
       }
-      if (sessionError) {
-        content.replaceChildren(message(sessionError?.message || 'Authenticatie kon niet worden geladen.', true));
-      } else if (resetMode && app.auth.isLoggedIn) {
-        renderPasswordUpdate();
-      } else if (app.auth.isParent) {
-        renderLoggedIn();
-      } else {
-        renderLogin();
-      }
+    };
+
+    const navigation = loggedInAsParent
+      ? createPacoNavigation({
+          includeManagementDashboard: true,
+          includeManagement: false,
+          includeLessons: false,
+          includeAgenda: false,
+          includeAccount: true,
+          accountLabel: 'Uitloggen',
+          onAccountClick: logoutFromNavigation
+        })
+      : [{ icon:'🏠', label:'Start', onClick:goStart }];
+
+    mountPacoPageTemplate({
+      mount,
+      backLabel: loggedInAsParent ? '← Dashboard' : '← Start',
+      backAction: loggedInAsParent ? goManagement : goStart,
+      greeting:'PacoGO 🔐',
+      title:resetMode ? 'Wachtwoord wijzigen' : 'Inloggen',
+      icon:'🔐',
+      subtitle:resetMode ? 'Stel een nieuw wachtwoord in.' : 'Log in om beheerfuncties te openen.',
+      navigation,
+      content
+    });
+
+    function message(text, error = false) {
+      const el = document.createElement('div');
+      el.className = `auth-message${error ? ' error' : ''}`;
+      el.textContent = text;
+      return el;
+    }
+
+    function field(id, label, type, autocomplete) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'auth-field';
+      const labelEl = document.createElement('label');
+      labelEl.htmlFor = id;
+      labelEl.textContent = label;
+      const input = document.createElement('input');
+      input.id = id;
+      input.type = type;
+      input.autocomplete = autocomplete;
+      wrapper.append(labelEl, input);
+      return { wrapper, input };
     }
 
     function renderLoggedIn() {
       content.replaceChildren();
       const card = document.createElement('section');
-      card.className = 'paco-card auth-card';
-      card.innerHTML = '<h2>Je bent al ingelogd</h2><p>Ga verder naar PacoGO of log uit.</p>';
+      card.className = 'paco-template-card auth-card';
+      const heading = document.createElement('h2');
+      heading.textContent = 'Je bent ingelogd';
+      const text = document.createElement('p');
+      text.textContent = app.auth.isCreator ? 'Je hebt toegang tot de beheeromgeving.' : 'Je sessie is actief.';
       const actions = document.createElement('div');
       actions.className = 'auth-actions';
-      const goButton = document.createElement('button');
-      goButton.type = 'button';
-      goButton.className = 'paco-button primary';
-      goButton.textContent = 'Verder';
-      goButton.addEventListener('click', goManagement);
-      const logoutButton = document.createElement('button');
-      logoutButton.type = 'button';
-      logoutButton.className = 'paco-button';
-      logoutButton.textContent = 'Uitloggen';
-      logoutButton.addEventListener('click', async () => {
-        await app.authSession.signOut();
-        app.auth.setSession(null);
-        renderLogin();
-      });
-      actions.append(goButton, logoutButton);
-      card.appendChild(actions);
-      content.appendChild(card);
+      const management = document.createElement('button');
+      management.type = 'button';
+      management.className = 'success';
+      management.textContent = '⚙️ Naar Beheer';
+      management.onclick = goManagement;
+      const logout = document.createElement('button');
+      logout.type = 'button';
+      logout.className = 'secondary';
+      logout.textContent = 'Uitloggen';
+      logout.onclick = logoutFromNavigation;
+      actions.append(management, logout);
+      card.append(heading, text, actions);
+      content.append(card);
+    }
+
+    function renderLogin(notice = '') {
+      content.replaceChildren();
+      const card = document.createElement('section');
+      card.className = 'paco-template-card auth-card';
+      const heading = document.createElement('h2');
+      heading.textContent = 'Inloggen';
+      const text = document.createElement('p');
+      text.textContent = 'Gebruik je PacoGO-account om toegang te krijgen tot beheerfuncties.';
+      const form = document.createElement('form');
+      form.className = 'auth-form';
+      const email = field('authEmail', 'E-mailadres', 'email', 'email');
+      const password = field('authPassword', 'Wachtwoord', 'password', 'current-password');
+      const actions = document.createElement('div');
+      actions.className = 'auth-actions';
+      const submit = document.createElement('button');
+      submit.type = 'submit';
+      submit.className = 'success';
+      submit.textContent = 'Inloggen';
+      const reset = document.createElement('button');
+      reset.type = 'button';
+      reset.className = 'secondary';
+      reset.textContent = 'Wachtwoord vergeten';
+      reset.onclick = renderResetRequest;
+      const status = notice ? message(notice) : null;
+      form.append(email.wrapper, password.wrapper, actions);
+      actions.append(reset, submit);
+      form.onsubmit = async event => {
+        event.preventDefault();
+        status?.remove();
+        submit.disabled = true;
+        try {
+          const session = await app.authSession.signIn(email.input.value, password.input.value);
+          app.auth.setSession(session);
+          if (!app.auth.isParent) throw new Error('Dit account heeft geen PacoGO-beheertoegang.');
+          goManagement();
+        } catch (error) {
+          card.prepend(message(error?.message || 'Inloggen mislukt.', true));
+          submit.disabled = false;
+        }
+      };
+      card.append(heading, text);
+      if (status) card.append(status);
+      card.append(form);
+      content.append(card);
+    }
+
+    function renderResetRequest() {
+      content.replaceChildren();
+      const card = document.createElement('section');
+      card.className = 'paco-template-card auth-card';
+      const heading = document.createElement('h2');
+      heading.textContent = 'Wachtwoord vergeten';
+      const text = document.createElement('p');
+      text.textContent = 'Vul je e-mailadres in. PacoGO stuurt een link om een nieuw wachtwoord te kiezen.';
+      const form = document.createElement('form');
+      form.className = 'auth-form';
+      const email = field('resetEmail', 'E-mailadres', 'email', 'email');
+      const actions = document.createElement('div');
+      actions.className = 'auth-actions';
+      const back = document.createElement('button');
+      back.type = 'button';
+      back.className = 'secondary';
+      back.textContent = 'Terug naar inloggen';
+      back.onclick = () => renderLogin();
+      const submit = document.createElement('button');
+      submit.type = 'submit';
+      submit.className = 'success';
+      submit.textContent = 'Resetlink sturen';
+      form.append(email.wrapper, actions);
+      actions.append(back, submit);
+      form.onsubmit = async event => {
+        event.preventDefault();
+        submit.disabled = true;
+        try {
+          const redirectTo = new URL('auth.html?mode=reset', window.location.href).toString();
+          await app.authSession.requestPasswordReset(email.input.value, redirectTo);
+          card.prepend(message('De resetlink is verstuurd. Controleer je e-mail.'));
+        } catch (error) {
+          card.prepend(message(error?.message || 'De resetlink kon niet worden verstuurd.', true));
+        } finally {
+          submit.disabled = false;
+        }
+      };
+      card.append(heading, text, form);
+      content.append(card);
     }
 
     function renderPasswordUpdate() {
       content.replaceChildren();
       const card = document.createElement('section');
-      card.className = 'paco-card auth-card';
-      card.innerHTML = '<h2>Nieuw wachtwoord</h2><p>Kies een nieuw wachtwoord voor je account.</p>';
+      card.className = 'paco-template-card auth-card';
+      const heading = document.createElement('h2');
+      heading.textContent = 'Nieuw wachtwoord';
+      const text = document.createElement('p');
+      text.textContent = 'Kies een nieuw wachtwoord voor je PacoGO-account.';
       const form = document.createElement('form');
       form.className = 'auth-form';
-      form.innerHTML = '<div class="auth-field"><label for="new-password">Nieuw wachtwoord</label><input id="new-password" type="password" autocomplete="new-password" minlength="8" required></div>';
+      const password = field('newPassword', 'Nieuw wachtwoord', 'password', 'new-password');
+      const confirm = field('newPasswordConfirm', 'Nieuw wachtwoord opnieuw', 'password', 'new-password');
       const actions = document.createElement('div');
       actions.className = 'auth-actions';
-      const button = document.createElement('button');
-      button.type = 'submit';
-      button.className = 'paco-button primary';
-      button.textContent = 'Wachtwoord opslaan';
-      actions.appendChild(button);
-      form.appendChild(actions);
-      form.addEventListener('submit', async event => {
+      const submit = document.createElement('button');
+      submit.type = 'submit';
+      submit.className = 'success';
+      submit.textContent = 'Wachtwoord opslaan';
+      form.append(password.wrapper, confirm.wrapper, actions);
+      actions.append(submit);
+      form.onsubmit = async event => {
         event.preventDefault();
-        button.disabled = true;
-        try {
-          const { error } = await app.authSession.updatePassword(form.querySelector('#new-password').value);
-          if (error) throw error;
-          card.appendChild(message('Je wachtwoord is opgeslagen.'));
-          button.remove();
-        } catch (error) {
-          card.appendChild(message(error?.message || 'Wachtwoord opslaan mislukt.', true));
-          button.disabled = false;
+        if (password.input.value !== confirm.input.value) {
+          card.prepend(message('De wachtwoorden zijn niet gelijk.', true));
+          return;
         }
-      });
-      card.appendChild(form);
-      content.appendChild(card);
+        submit.disabled = true;
+        try {
+          await app.authSession.updatePassword(password.input.value);
+          await app.authSession.signOut();
+          app.auth.setSession(null);
+          renderLogin('Je wachtwoord is gewijzigd. Je kunt opnieuw inloggen.');
+        } catch (error) {
+          card.prepend(message(error?.message || 'Het wachtwoord kon niet worden gewijzigd.', true));
+        } finally {
+          submit.disabled = false;
+        }
+      };
+      card.append(heading, text, form);
+      content.append(card);
     }
 
-    initialize();
+    if (sessionError) {
+      content.replaceChildren(message(sessionError?.message || 'Authenticatie kon niet worden geladen.', true));
+    } else if (resetMode && app.auth.isLoggedIn) {
+      renderPasswordUpdate();
+    } else if (app.auth.isParent) {
+      renderLoggedIn();
+    } else {
+      renderLogin();
+    }
   </script>
 </body>
 </html>

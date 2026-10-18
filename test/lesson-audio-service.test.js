@@ -48,6 +48,29 @@ test('lesson audio requests a blob response and plays it', async () => {
   assert.deepEqual(statuses, ['🔄 AI-stem maken...', 'AI-stem speelt.']);
 });
 
+test('lesson audio reports when the speech function invocation rejects', async () => {
+  const statuses = [];
+  const db = {
+    functions: {
+      invoke: async () => { throw new TypeError('Type error'); }
+    }
+  };
+
+  const service = createLessonAudioService(db, {
+    AudioCtor: function Audio() {},
+    URLRef: { createObjectURL: () => 'blob:test', revokeObjectURL: () => {} }
+  });
+
+  await assert.rejects(
+    service.speak('huis', { onStatus: status => statuses.push(status) }),
+    /Type error/
+  );
+  assert.deepEqual(statuses, [
+    '🔄 AI-stem maken...',
+    '⚠️ AI-stem kon niet worden gemaakt.'
+  ]);
+});
+
 test('lesson audio reports when browser playback is blocked', async () => {
   const statuses = [];
   const db = {

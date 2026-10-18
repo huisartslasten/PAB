@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — Leren</title>
+  <link rel="stylesheet" href="src/components/page-template.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .learning-page{display:grid;gap:15px}.learning-progress{font-weight:900;color:#667894;text-align:center}.learning-card{background:#fff;border:2px solid #dce9f6;border-radius:24px;box-shadow:0 10px 28px rgba(16,43,87,.08);padding:22px;min-height:360px;display:flex;flex-direction:column;justify-content:center}.learning-card h2{margin:0 0 14px;color:#102b57;font:800 28px/1.1 "Baloo 2",Nunito,sans-serif}.learning-content{color:#27496f;line-height:1.7;font-size:18px;white-space:pre-line}.learning-image{width:100%;max-height:330px;object-fit:contain;border-radius:16px;margin-top:18px}.learning-nav{display:flex;justify-content:space-between;gap:10px}.learning-nav button{min-width:130px}.learning-dots{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}.learning-dot{width:10px;height:10px;border:0;border-radius:50%;padding:0;background:#cbdbea}.learning-dot.active{background:#1787f2;transform:scale(1.25)}.learning-empty{padding:20px;background:#fff;border:2px dashed #cfe3f3;border-radius:18px;color:#667894;text-align:center}
+  </style>
+</head>
+<body><div id="paco-template-mount"></div>
+<script type="module">
+import { mountPacoPageTemplate } from './src/components/page-template.js';
+import { createPacoNavigation } from './src/components/page-navigation.js';
+import { createPacoGOApp } from './src/app/bootstrap.js';
+import { readViewContext, applyViewContext, buildViewUrl } from './src/core/view-context.js';
+
+const params=new URLSearchParams(window.location.search);const context=readViewContext(params);const lessonId=params.get('lesson_id');const student=context.student;const mount=document.querySelector('#paco-template-mount');const content=document.createElement('div');const app=createPacoGOApp({supabaseLib:window.supabase});let lesson=null;let cards=[];let index=0;
+const choiceUrl=()=>{const url=buildViewUrl('lesson-choice.html',{student,mode:context.mode});if(lessonId)url.searchParams.set('lesson_id',lessonId);return url.toString()};
+mountPacoPageTemplate({mount,backLabel:'← Leskeuze',backAction:()=>window.location.href=choiceUrl(),greeting:`Hoi ${student}! 🐶`,title:'Leren',icon:'📖',subtitle:'Lees de stof rustig door. Ga kaart voor kaart.',navigation:createPacoNavigation({app,active:'lessons',student,viewMode:context.mode}),content});
+function render(){content.replaceChildren();const page=document.createElement('div');page.className='learning-page';const progress=document.createElement('div');progress.className='learning-progress';progress.textContent=`Kaart ${index+1} van ${cards.length}`;page.append(progress);const card=cards[index];const article=document.createElement('article');article.className='learning-card';article.innerHTML=`<h2>${escape(card.title||'Leerkaart')}</h2><div class="learning-content">${escape(card.content||'')}</div>${card.image?.url?`<img class="learning-image" src="${escape(card.image.url)}" alt="">`:''}`;page.append(article);const dots=document.createElement('div');dots.className='learning-dots';cards.forEach((_,i)=>{const dot=document.createElement('button');dot.type='button';dot.className=`learning-dot${i===index?' active':''}`;dot.title=`Ga naar kaart ${i+1}`;dot.onclick=()=>{index=i;render()};dots.append(dot)});page.append(dots);const nav=document.createElement('div');nav.className='learning-nav';const prev=document.createElement('button');prev.type='button';prev.textContent='← Vorige';prev.disabled=index===0;prev.onclick=()=>{index-=1;render()};const next=document.createElement('button');next.type='button';next.className='success';next.textContent=index===cards.length-1?'Klaar ✓':'Volgende →';next.onclick=()=>{if(index<cards.length-1){index+=1;render()}else window.location.href=choiceUrl()};nav.append(prev,next);page.append(nav);content.append(page)}
+function escape(value){return String(value??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;')}
+async function load(){await app.initializeSession();if(context.isManagement)applyViewContext(context,{canManage:app.auth.isParent});else applyViewContext(context);if(!lessonId||!student)throw new Error('Geen leerling of les geselecteerd.');const records=await app.loadLessons();lesson=app.mapLessons(records).find(item=>String(item.id)===String(lessonId));if(!lesson)throw new Error('Deze les kon niet worden gevonden.');cards=await app.learningContent.listForLesson(lessonId);if(!cards.length){content.innerHTML='<div class="learning-empty"><strong>Deze les heeft nog geen leerkaarten.</strong><br>Vraag je ouder/beheerder om eerst de leerstof toe te voegen.</div>';return}render()}
+load().catch(error=>{console.error('Learning page load error:',error);content.innerHTML=`<div class="learning-empty"><strong>De leerstof kon niet worden geladen.</strong><br>${escape(error?.message||'Onbekende fout.')}</div>`});
+</script></body></html>

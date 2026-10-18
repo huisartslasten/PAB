@@ -59,6 +59,18 @@
   text-align: center;
 }
 
+.double-stake-selected {
+  width: fit-content;
+  margin: 0 auto 10px;
+  padding: 8px 16px;
+  border: 2px solid #2b86df;
+  border-radius: 999px;
+  background: #e6f3ff;
+  color: #126fc9;
+  font: 900 18px/1.2 "Baloo 2", Nunito, sans-serif;
+  text-align: center;
+}
+
 .double-stake-buttons {
   display: flex;
   justify-content: center;
@@ -83,6 +95,17 @@
 .double-stake-button:focus-visible {
   transform: translateY(-1px);
   border-color: #e2bd2e;
+  outline: none;
+}
+
+.double-stake-button.is-selected,
+.double-stake-button.is-selected:hover,
+.double-stake-button.is-selected:focus-visible {
+  border-color: #1478d4;
+  background: #2b8be5;
+  color: #fff;
+  box-shadow: 0 4px 0 rgba(16,43,87,.18);
+  transform: translateY(-1px);
   outline: none;
 }
 

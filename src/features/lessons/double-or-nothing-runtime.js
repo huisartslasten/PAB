@@ -50,6 +50,7 @@ export function createDoubleOrNothingRuntime({ items = [], gradeAnswer } = {}) {
   function chooseStake(amount) {
     if (phase !== 'question') throw new Error('Er kan nu geen inzet worden gekozen.');
     if (index === 0) throw new Error('De eerste vraag heeft geen inzet.');
+    if (score === 0) throw new Error('Bij 0 botjes is deze vraag gratis.');
 
     const value = Number(amount);
     if (!Number.isFinite(value) || value < 0 || value > score) {
@@ -61,10 +62,11 @@ export function createDoubleOrNothingRuntime({ items = [], gradeAnswer } = {}) {
 
   async function submitAnswer(userAnswer) {
     if (phase !== 'question') throw new Error('Deze vraag kan nu niet worden beantwoord.');
-    if (index > 0 && stake == null) throw new Error('Kies eerst hoeveel botjes je waagt.');
+    if (index > 0 && score > 0 && stake == null) throw new Error('Kies eerst hoeveel botjes je waagt.');
 
     const item = questions[index];
-    const usedStake = index === 0 ? FIRST_REWARD : Number(stake);
+    const recoveryRound = index > 0 && score === 0;
+    const usedStake = index === 0 || recoveryRound ? FIRST_REWARD : Number(stake);
     if (!Number.isFinite(usedStake) || usedStake < 0) throw new Error('De inzet is ongeldig.');
 
     // Lock the question before awaiting the grader. This is the domain-level

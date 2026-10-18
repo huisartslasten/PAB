@@ -77,13 +77,14 @@ export function buildQuestionItem(row = {}) {
 }
 
 export function buildDictationItem(row = {}) {
-  const word = text(row.word ?? row.answer);
+  const parts = normalizeParts(row.answer_parts, row.answer ?? row.word);
+  const word = parts.find(part => part.role === 'answer')?.text || text(row.word ?? row.answer);
   if (!word) return null;
   return {
     question: '',
     answer: word,
     question_parts: [],
-    answer_parts: [{ text: word, role: 'answer' }],
+    answer_parts: parts.length ? parts : [{ text: word, role: 'answer' }],
     response_type: 'text',
     answer_options: []
   };

@@ -1,7 +1,8 @@
 export function createPlayerTestView({
   documentRef = globalThis.document,
   escapeHtml,
-  speakTest = null
+  speakTest = null,
+  submitTest = null
 } = {}) {
   if (!documentRef) throw new Error('A document is required.');
   if (typeof escapeHtml !== 'function') throw new Error('An escapeHtml function is required.');
@@ -59,12 +60,9 @@ export function createPlayerTestView({
       return;
     }
 
-    content.innerHTML = `<div class="test-instructions">Typ hier het woord. Je krijgt pas aan het einde de uitslag.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="testAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier het woord in"><div style="height:18px"></div><button class="success" data-practice-action="submit" onclick="submitTest()">Volgende →</button>`;
+    content.innerHTML = `<div class="test-instructions">Typ hier het woord. Je krijgt pas aan het einde de uitslag.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="testAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier het antwoord in"><div style="height:18px"></div><button class="success" data-practice-action="submit" onclick="submitTest()">Volgende →</button>`;
     focusAnswer();
   }
 
-  let submitTest = null;
-  function setSubmitHandler(handler) { submitTest = typeof handler === 'function' ? handler : null; }
-
-  return Object.freeze({ render, renderProgress, setSubmitHandler });
+  return Object.freeze({ render, renderProgress });
 }

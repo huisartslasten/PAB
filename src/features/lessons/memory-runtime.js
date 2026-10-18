@@ -51,7 +51,8 @@ export function createMemoryRuntime({ items = [], random = Math.random } = {}) {
       matchedPairIds: new Set(matchedPairIds),
       phase,
       turnCount,
-      totalPairs: lessonItems.length
+      totalPairs: lessonItems.length,
+      minimumTurns: lessonItems.length
     });
   }
 

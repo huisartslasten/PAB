@@ -32,7 +32,7 @@ export function createDoubleOrNothingView({ documentRef = globalThis.document, e
     }
 
     if (state.score === 0) {
-      box.innerHTML = '<div class="double-free-round">Je hebt 0 🦴. Speel door met inzet <strong>0 🦴</strong>.</div><div class="double-stake-buttons"><button type="button" class="double-stake-button is-selected" data-stake="0" aria-pressed="true">0 🦴</button></div>';
+      box.innerHTML = '<div class="double-free-round">Je hebt 0 🦴. Dit is een gratis herstelvraag. Goed antwoord = <strong>+10 🦴</strong>.</div>';
       return;
     }
 
@@ -56,7 +56,7 @@ export function createDoubleOrNothingView({ documentRef = globalThis.document, e
     renderProgress(state);
     renderStakeOptions(state);
 
-    const disabled = state.index > 0 && state.stake == null;
+    const disabled = state.index > 0 && state.score > 0 && state.stake == null;
     content.innerHTML = `<div class="double-prompt">${escapeHtml(state.item.question || '')}</div><div class="field"><input id="doubleAnswer" class="answer-input" autocomplete="off" placeholder="Typ je antwoord"></div><button class="success" data-practice-action="submit" type="button" ${disabled ? 'disabled' : ''}>Controleren</button>`;
     const input = documentRef.getElementById('doubleAnswer');
     const button = content.querySelector('[data-practice-action="submit"]');

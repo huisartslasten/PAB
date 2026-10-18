@@ -107,14 +107,12 @@ export function createPacoNavigation({
       },
       bind: ({ label, icon }) => {
         const render = session => {
-          app.auth.setSession(session);
-          const loggedIn = app.auth.isLoggedIn;
+          const loggedIn = Boolean(session);
           label.textContent = loggedIn ? 'Uitloggen' : 'Inloggen';
           icon.textContent = loggedIn ? '🚪' : '🔐';
         };
         render(app.auth.session);
-        const subscription = app.authSession.subscribe((_event, session) => render(session));
-        return () => subscription?.unsubscribe?.();
+        return app.auth.subscribe(render).unsubscribe;
       }
     };
     items.push(accountItem);

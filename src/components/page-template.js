@@ -305,8 +305,6 @@ export function createPacoDropdown({
 }
 
 export function createPacoPageTemplate({
-  backLabel = '← Terug',
-  backAction = null,
   greeting = '',
   navigation = [],
   title = '',
@@ -342,8 +340,8 @@ export function createPacoPageTemplate({
   const backButton = document.createElement('button');
   backButton.type = 'button';
   backButton.className = 'paco-template-back';
-  backButton.textContent = backLabel;
-  if (typeof backAction === 'function') backButton.addEventListener('click', backAction);
+  backButton.textContent = '← Terug';
+  backButton.addEventListener('click', () => window.history.back());
   sidebar.appendChild(backButton);
 
   const sidebarCard = document.createElement('div');

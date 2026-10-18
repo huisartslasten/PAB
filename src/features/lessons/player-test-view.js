@@ -24,24 +24,24 @@ export function createPlayerTestView({
     if (!content) throw new Error('The V4.78 test content element is missing.');
 
     if (type === 'spelling') {
-      content.innerHTML = '<div class="test-instructions">Vul het voltooid deelwoord en het bijvoeglijk gebruikt voltooid deelwoord in.</div><div class="prompt">' + escapeHtml(item.question) + '</div><div class="field"><label>Voltooid deelwoord</label><input id="testPerfect" class="answer-input" placeholder="bijvoorbeeld opgevoed"></div><div class="field"><label>Bijvoeglijk gebruikt voltooid deelwoord</label><input id="testAdjective" class="answer-input" placeholder="bijvoorbeeld opgevoede"></div><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>';
+      content.innerHTML = '<div class="test-instructions">Vul het voltooid deelwoord en het bijvoeglijk gebruikt voltooid deelwoord in.</div><div class="prompt">' + escapeHtml(item.question) + '</div><div class="field"><label>Voltooid deelwoord</label><input id="testPerfect" class="answer-input" placeholder="bijvoorbeeld opgevoed"></div><div class="field"><label>Bijvoeglijk gebruikt voltooid deelwoord</label><input id="testAdjective" class="answer-input" placeholder="bijvoorbeeld opgevoede"></div><div style="height:18px"></div><button class="success" onclick="submitTest()">Volgende →</button>';
       return;
     }
 
     if (type === 'math') {
-      content.innerHTML = `<div class="test-instructions">Los de som op. Je krijgt pas aan het einde de uitslag.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="testAnswer" class="answer-input" type="number" inputmode="numeric" autofocus autocomplete="off" placeholder="Typ je antwoord"><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>`;
+      content.innerHTML = `<div class="test-instructions">Los de som op. Je krijgt pas aan het einde de uitslag.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="testAnswer" class="answer-input" type="number" inputmode="numeric" autofocus autocomplete="off" placeholder="Typ je antwoord"><div style="height:18px"></div><button class="success" onclick="submitTest()">Volgende →</button>`;
       focusAnswer();
       return;
     }
 
     if (type === 'dictation') {
-      content.innerHTML = `<div class="test-instructions">Luister naar het woord en typ precies wat je hoort. Je krijgt pas aan het einde te zien wat goed en fout was.</div><div id="testVoiceStatus" class="small" style="min-height:20px;margin-top:4px"></div><div style="margin:25px"><button class="speaker big" onclick="speakTest()">🔊 Luister</button></div><input id="testAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier het woord in"><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>`;
+      content.innerHTML = `<div class="test-instructions">Luister naar het woord en typ precies wat je hoort. Je krijgt pas aan het einde te zien wat goed en fout was.</div><div id="testVoiceStatus" class="small" style="min-height:20px;margin-top:4px"></div><div style="margin:25px"><button class="speaker big" onclick="speakTest()">🔊 Luister</button></div><input id="testAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier het woord in"><div style="height:18px"></div><button class="success" onclick="submitTest()">Volgende →</button>`;
       if (typeof speakTest === 'function') setTimeout(() => speakTest(), 350);
       focusAnswer();
       return;
     }
 
-    content.innerHTML = `<div class="test-instructions">Typ hier het woord. Je krijgt pas aan het einde de uitslag.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="testAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier het woord in"><div style="height:18px"></div><button class="big" onclick="submitTest()">Volgende →</button>`;
+    content.innerHTML = `<form data-practice-form><div class="test-instructions">Typ hier het woord. Je krijgt pas aan het einde de uitslag.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="testAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier het woord in"><div style="height:18px"></div><button class="success" type="submit" onclick="submitTest()">Volgende →</button></form>`;
     focusAnswer();
   }
 

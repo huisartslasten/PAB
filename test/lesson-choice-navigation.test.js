@@ -6,6 +6,6 @@ const lessonChoice = await readFile(new URL('../lesson-choice.html', import.meta
 
 test('lesson choice uses the shared navigation owner', () => {
   assert.match(lessonChoice, /from ['"]\.\/src\/components\/page-navigation\.js['"]/);
-  assert.match(lessonChoice, /createPacoNavigation\(\{app, active:'lessons', student, viewMode: context\.mode\}\)/);
+  assert.match(lessonChoice, /createPacoNavigation\(\{\s*app,\s*active:\s*'lessons',\s*student,\s*viewMode:\s*context\.mode\s*\}\)/);
   assert.doesNotMatch(lessonChoice, /index\.html\?view=agenda/);
 });

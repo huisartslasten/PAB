@@ -76,6 +76,39 @@
   margin-top: 18px;
 }
 
+.flash-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.flash-timing-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.flash-timing-label {
+  font-size: .84rem;
+  font-weight: 700;
+}
+
+.flash-timing-dropdown {
+  min-width: 165px;
+}
+
+.flash-timer {
+  min-width: 120px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .72);
+  font-size: .9rem;
+  font-weight: 800;
+  text-align: center;
+}
+
 .flash-question {
   padding: 22px 20px;
   border-radius: 16px;
@@ -211,6 +244,24 @@
   .flash-stat,
   .flash-finished-stats div {
     padding: 8px 6px;
+  }
+
+  .flash-controls {
+    align-items: stretch;
+  }
+
+  .flash-timing-control {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .flash-timing-dropdown {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .flash-timer {
+    width: 100%;
   }
 
   .flash-options {

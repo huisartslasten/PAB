@@ -63,6 +63,8 @@ test('lesson service persists subvak on create and update', async () => {
     type: 'words'
   });
 
-  assert.equal(db.calls[1].payload.subvak, 'Themawoorden');
-  assert.equal(db.calls[3].payload.subvak, 'Werkwoorden');
+  const inserts = db.calls.filter(call => call.op === 'insert');
+  const updates = db.calls.filter(call => call.op === 'update');
+  assert.equal(inserts[0].payload.subvak, 'Themawoorden');
+  assert.equal(updates[0].payload.subvak, 'Werkwoorden');
 });

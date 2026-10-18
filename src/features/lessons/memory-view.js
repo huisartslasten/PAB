@@ -1,5 +1,5 @@
 export function createMemoryView({ documentRef = document, escapeHtml = value => String(value) } = {}) {
-  function render({ state, onCardSelect, onFinished }) {
+  function render({ state, timingMode = 'manual', onTimingModeChange, onResolveTurn, onCardSelect, onFinished }) {
     const shell = documentRef.createElement('main');
     shell.className = 'memory-shell';
 
@@ -7,6 +7,30 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
     header.className = 'memory-header';
     header.innerHTML = `<div><h1>🧠 MEMORY</h1><p>Vind de vraag en het bijbehorende antwoord.</p></div><div class="memory-turns">Beurten: <strong>${state.turnCount}</strong></div>`;
     shell.appendChild(header);
+
+    const controls = documentRef.createElement('div');
+    controls.className = 'memory-controls';
+    const label = documentRef.createElement('label');
+    label.className = 'memory-timing-label';
+    label.textContent = 'Kaartjes laten zien:';
+    const select = documentRef.createElement('select');
+    select.className = 'memory-timing-select';
+    select.setAttribute('aria-label', 'Tijd dat de kaartjes zichtbaar blijven');
+    [
+      ['manual', 'Klaar met lezen'],
+      ['3', '3 seconden'],
+      ['5', '5 seconden']
+    ].forEach(([value, text]) => {
+      const option = documentRef.createElement('option');
+      option.value = value;
+      option.textContent = text;
+      option.selected = value === timingMode;
+      select.appendChild(option);
+    });
+    select.addEventListener('change', () => onTimingModeChange(select.value));
+    label.appendChild(select);
+    controls.appendChild(label);
+    shell.appendChild(controls);
 
     if (state.phase === 'finished') {
       const finished = documentRef.createElement('div');
@@ -45,8 +69,17 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
     if (state.phase === 'checking') {
       const status = documentRef.createElement('div');
       status.className = 'memory-status';
-      status.textContent = 'Even kijken…';
+      status.textContent = timingMode === 'manual' ? 'Lees rustig de twee kaartjes.' : 'Even kijken…';
       shell.appendChild(status);
+
+      if (timingMode === 'manual') {
+        const button = documentRef.createElement('button');
+        button.type = 'button';
+        button.className = 'memory-primary-button memory-resolve-button';
+        button.textContent = 'Klaar, volgende';
+        button.addEventListener('click', onResolveTurn);
+        shell.appendChild(button);
+      }
     }
 
     return shell;

@@ -27,6 +27,8 @@ export function createPacoNavigation({
   includeLessons = true,
   includeAgenda = true,
   includeAccount = true,
+  accountLabel = 'Inloggen / Uitloggen',
+  onAccountClick = null,
   hideActive = false
 } = {}) {
   const view = { student, mode: viewMode };
@@ -84,7 +86,14 @@ export function createPacoNavigation({
     items.push({ key: 'feedback', icon: '💬', label: 'Feedback', onClick: () => go('feedback.html') });
   }
   if (includeCreator) items.push({ key: 'creator', icon: '🧠', label: 'Creator Console', onClick: () => go('creator.html') });
-  if (includeAccount) items.push({ key: 'account', icon: '🔐', label: 'Inloggen / Uitloggen', onClick: () => go('auth.html') });
+  if (includeAccount) {
+    items.push({
+      key: 'account',
+      icon: accountLabel === 'Uitloggen' ? '🚪' : '🔐',
+      label: accountLabel,
+      onClick: typeof onAccountClick === 'function' ? onAccountClick : () => go('auth.html')
+    });
+  }
 
   return items
     .filter(item => !(hideActive && item.key === active))

@@ -7,12 +7,12 @@
 .memory-timing-label{color:#667894;font-weight:800;white-space:nowrap}
 .memory-timing-dropdown{width:260px}
 .memory-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}
-.memory-card{min-height:130px;border:2px solid #dce9f6;border-radius:18px;background:#eef8ff;color:#102b57;padding:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;font-weight:800;text-align:center;transition:.16s}
+.memory-card{min-height:130px;border:2px solid #dce9f6;border-radius:18px;background:#eef8ff;color:#102b57;padding:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;font-weight:800;text-align:center;transition:.16s;overflow:hidden}
 .memory-card:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 18px rgba(16,43,87,.1)}
 .memory-card.revealed{background:#fffdf0;border-color:#f4e8a8}
 .memory-card.matched{background:#eef9ee;border-color:#b8dfb8}
 .memory-card:disabled{cursor:default}
-.memory-card-back{font-size:42px}
+.memory-card-back-image{display:block;width:100%;height:100%;min-height:104px;object-fit:cover;border-radius:12px}
 .memory-card-type{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#667894}
 .memory-status{text-align:center;margin-top:16px;color:#667894;font-weight:800}
 .memory-finished{text-align:center;padding:30px 10px}

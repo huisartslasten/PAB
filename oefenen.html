@@ -29,6 +29,7 @@
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
     import { createPacoNavigation } from './src/components/page-navigation.js';
+    import { createPacoGOApp } from './src/app/bootstrap.js';
     import { getActivePracticeModes, getPracticeModes } from './src/features/practice/practice-domain.js';
 
     const params=new URLSearchParams(window.location.search);
@@ -36,6 +37,7 @@
     const student=params.get('student')||'Zyon';
     const mount=document.querySelector('#paco-template-mount');
     const content=document.createElement('div');
+    const app=createPacoGOApp({supabaseLib:window.supabase});
     const targetPaths={flashcards:'flashcards-template.html','practice-test':'oefentoets.html'};
     const modeMeta={
       flashcards:{icon:'🃏',description:'Oefen met vraag en antwoord en draai de kaart om als je klaar bent.'},
@@ -61,7 +63,7 @@
       title:'Oefenen',
       icon:'✏️',
       subtitle:'Kies hoe je deze les wilt oefenen.',
-      navigation:createPacoNavigation({app:null,active:'lessons',student,includeAccount:false}),
+      navigation:createPacoNavigation({app,active:'lessons',student}),
       content
     });
 

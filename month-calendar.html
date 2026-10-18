@@ -51,7 +51,7 @@ mountPacoPageTemplate({
   title: 'Maandkalender',
   icon: '📅',
   subtitle: context.isManagement ? 'Beheerweergave — je beheert hier de agenda van de geselecteerde leerling.' : 'Bekijk je afspraken per maand en print de kalender.',
-  navigation: createPacoNavigation({ active: 'agenda', activeSubmenu: 'month-calendar', student, viewMode: context.mode }),
+  navigation: createPacoNavigation({ app, active: 'agenda', activeSubmenu: 'month-calendar', student, viewMode: context.mode }),
   content
 });
 

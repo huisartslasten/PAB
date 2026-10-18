@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { installPacoTemplateSidebarScrollChaining } from '../src/components/page-template.js';
 
-function createHarness({ scrollTop, scrollHeight = 500, clientHeight = 400, scrollY = 200, pageHeight = 1000 } = {}) {
+function createHarness({ scrollTop, scrollHeight = 500, clientHeight = 400, scrollY = 100, pageHeight = 1000 } = {}) {
   const listeners = new Map();
   const navigationElement = {
     scrollTop,

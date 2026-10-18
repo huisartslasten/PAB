@@ -10,7 +10,8 @@ async function expectCanonicalShell(page, path, title) {
   await expect(page.locator('.paco-template-hero')).toBeVisible();
   await expect(page.locator('.paco-template-sidebar')).toBeVisible();
   await expect(page.locator('.paco-template-main h1')).toHaveText(title);
-  await expect(page.locator('.paco-template-nav-submenu')).toHaveCount(0);
+  await expect(page.locator('.paco-template-nav-submenu')).toHaveCount(1);
+  await expect(page.locator('.paco-template-nav-subitem')).toHaveText(['Agenda invoeren', 'Maandkalender']);
 }
 
 test('lessons uses the canonical shell', async ({ page }) => {
@@ -24,7 +25,7 @@ test('lessons uses the canonical shell', async ({ page }) => {
 test('lessons dashboard navigation targets the canonical dashboard', async ({ page }) => {
   await page.goto(`${baseUrl}/lessons.html?student=Zyon`);
   await page.getByRole('button', { name: 'Dashboard' }).click();
-  await expect(page).toHaveURL(/\/dashboard\.html\?student=Zyon$/);
+  await expect(page).toHaveURL(/\/dashboard\.html\?viewStudent=Zyon$/);
   await expect(page.locator('.paco-template-main h1')).toHaveText('Dashboard');
 });
 

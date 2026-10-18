@@ -1,6 +1,6 @@
 // Lesson data boundary. This is the canonical persistence service for lessons.
-// The TEST schema stores the columns exposed below; domain/editor models may
-// contain richer fields, but persistence must never send unsupported columns.
+// The TEST schema stores the lesson columns exposed below; item ordering belongs
+// to lesson_items and must never be sent to the lessons table.
 
 function normalizeLessonPayload(payload = {}) {
   return {
@@ -9,7 +9,6 @@ function normalizeLessonPayload(payload = {}) {
     subvak: payload.subvak ?? '',
     title: payload.title ?? '',
     type: payload.type ?? '',
-    sort_order: Number(payload.sort_order ?? 0),
     archived: Boolean(payload.archived ?? false),
     deleted: Boolean(payload.deleted ?? false)
   };

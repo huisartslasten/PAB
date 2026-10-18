@@ -1,3 +1,5 @@
+import { createPacoDropdown } from '../../components/page-template.js';
+
 // Presentation boundary for Flash Question.
 // Scoring and question progression remain in flash-question-runtime.js.
 
@@ -23,18 +25,63 @@ export function createFlashQuestionView({ documentRef = globalThis.document, esc
     node.innerHTML = `<div class="flash-progress-label"><span>Vraag ${current} van ${state.total}</span><span>${completed} gedaan</span></div><div class="flash-progress"><span style="width:${pct}%"></span></div>`;
   }
 
-  function renderQuestion(state, onAnswer, highScore) {
+  function renderQuestion(state, onAnswer, highScore, { timingMode = 'manual', onTimingModeChange, remainingSeconds = null } = {}) {
     const content = documentRef.getElementById('flashContent');
     if (!content || !state.item) return;
 
     renderStats(state, highScore);
     renderProgress(state);
 
-    content.innerHTML = `<div class="flash-question">${escapeHtml(state.item.question)}</div><div class="flash-options" role="group" aria-label="Antwoordopties">${state.item.options.map((option, index) => `<button type="button" class="flash-option secondary" data-flash-answer="${index}">${escapeHtml(option)}</button>`).join('')}</div>`;
+    const controls = documentRef.createElement('div');
+    controls.className = 'flash-controls';
 
-    content.querySelectorAll('[data-flash-answer]').forEach(button => {
+    const timingControl = documentRef.createElement('div');
+    timingControl.className = 'flash-timing-control';
+    const label = documentRef.createElement('span');
+    label.className = 'flash-timing-label';
+    label.textContent = 'Tijd per vraag:';
+    const dropdown = createPacoDropdown({
+      options: [
+        { value: 'manual', label: 'GEEN TIJDSLIMIET' },
+        { value: '3', label: '3 seconden' },
+        { value: '5', label: '5 seconden' }
+      ],
+      value: timingMode,
+      onChange: nextValue => onTimingModeChange?.(nextValue),
+      className: 'flash-timing-dropdown'
+    });
+    timingControl.appendChild(label);
+    timingControl.appendChild(dropdown.element);
+    controls.appendChild(timingControl);
+
+    const timer = documentRef.createElement('div');
+    timer.className = 'flash-timer';
+    timer.setAttribute('aria-live', 'polite');
+    if (timingMode === 'manual') {
+      timer.textContent = 'Kies rustig je antwoord.';
+    } else {
+      timer.textContent = `${remainingSeconds ?? Number(timingMode)} seconden`;
+    }
+    controls.appendChild(timer);
+
+    content.innerHTML = '';
+    content.appendChild(controls);
+
+    const question = documentRef.createElement('div');
+    question.className = 'flash-question';
+    question.innerHTML = escapeHtml(state.item.question);
+    content.appendChild(question);
+
+    const options = documentRef.createElement('div');
+    options.className = 'flash-options';
+    options.setAttribute('role', 'group');
+    options.setAttribute('aria-label', 'Antwoordopties');
+    options.innerHTML = state.item.options.map((option, index) => `<button type="button" class="flash-option secondary" data-flash-answer="${index}">${escapeHtml(option)}</button>`).join('');
+    content.appendChild(options);
+
+    options.querySelectorAll('[data-flash-answer]').forEach(button => {
       button.addEventListener('click', () => {
-        content.querySelectorAll('[data-flash-answer]').forEach(option => { option.disabled = true; });
+        options.querySelectorAll('[data-flash-answer]').forEach(option => { option.disabled = true; });
         const option = state.item.options[Number(button.dataset.flashAnswer)];
         onAnswer(option);
       });

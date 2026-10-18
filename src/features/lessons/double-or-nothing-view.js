@@ -2,6 +2,20 @@
 // The visual language follows the canonical practice-page structure while adding
 // game-specific bone, record, stake and feedback presentation.
 
+export function buildStakeOptions(score) {
+  const currentScore = Math.floor(Number(score));
+  if (!Number.isFinite(currentScore) || currentScore <= 0) return [];
+
+  const amounts = [];
+  for (let amount = 10; amount < currentScore; amount *= 2) {
+    amounts.push(amount);
+    if (amount > Number.MAX_SAFE_INTEGER / 2) break;
+  }
+
+  amounts.push(currentScore);
+  return [...new Set(amounts)].filter(amount => amount <= currentScore);
+}
+
 export function createDoubleOrNothingView({ documentRef = globalThis.document, escapeHtml } = {}) {
   if (!documentRef) throw new Error('A document is required.');
   if (typeof escapeHtml !== 'function') throw new Error('An escapeHtml function is required.');
@@ -36,9 +50,7 @@ export function createDoubleOrNothingView({ documentRef = globalThis.document, e
       return;
     }
 
-    const amounts = [10, 20, 40, state.score]
-      .filter((value, index, values) => value > 0 && value <= state.score && values.indexOf(value) === index)
-      .sort((a, b) => a - b);
+    const amounts = buildStakeOptions(state.score);
     const selected = state.stake == null ? '' : `<div class="double-stake-selected">Jouw inzet: <strong>${state.stake} 🦴</strong></div>`;
     box.innerHTML = `${selected}<div class="double-stake-title">Hoeveel durf je te wagen?</div><div class="double-stake-buttons">${amounts.map(amount => `<button type="button" class="double-stake-button${amount === state.stake ? ' is-selected' : ''}" data-stake="${amount}" aria-pressed="${amount === state.stake}">${amount} 🦴</button>`).join('')}</div>`;
   }

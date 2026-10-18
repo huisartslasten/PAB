@@ -35,7 +35,7 @@ async function initialize(){
   if(!selectedStudent) throw new Error('Geen leerling geselecteerd.');
 }
 
-mountPacoPageTemplate({mount,backLabel:'← Terug',backAction:()=>window.history.length>1?window.history.back():goHome(),greeting:`Hoi ${selectedStudent}! 🐶`,title:'Mijn lessen',icon:'📚',subtitle:context.isManagement?'Beheerweergave — je kunt hier leerlinggebonden lessen beheren.':'Kies een vak en open daarna de les die je wilt doen.',navigation:createPacoNavigation({active:'lessons',student:selectedStudent,viewMode:context.mode,includeManagement:true}),content});
+mountPacoPageTemplate({mount,backLabel:'← Terug',backAction:()=>window.history.length>1?window.history.back():goHome(),greeting:`Hoi ${selectedStudent}! 🐶`,title:'Mijn lessen',icon:'📚',subtitle:context.isManagement?'Beheerweergave — je kunt hier leerlinggebonden lessen beheren.':'Kies een vak en open daarna de les die je wilt doen.',navigation:createPacoNavigation({app,active:'lessons',student:selectedStudent,viewMode:context.mode,includeManagement:true}),content});
 
 function lessonTarget(lesson){const target=new URL('lesson-choice.html',window.location.href);target.searchParams.set('lesson_id',String(lesson.id));target.searchParams.set('viewStudent',selectedStudent);if(context.isManagement)target.searchParams.set('mode','management');return target.toString();}
 async function archiveLesson(lesson){

@@ -41,7 +41,7 @@ export function createPlayerTestView({
       return;
     }
 
-    content.innerHTML = `<form data-practice-form><div class="test-instructions">Typ hier het woord. Je krijgt pas aan het einde de uitslag.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="testAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier het woord in"><div style="height:18px"></div><button class="success" type="submit" onclick="submitTest()">Volgende →</button></form>`;
+    content.innerHTML = `<div class="test-instructions">Typ hier het woord. Je krijgt pas aan het einde de uitslag.</div><div class="prompt">${escapeHtml(item.question)}</div><input id="testAnswer" class="answer-input" autofocus autocomplete="off" placeholder="Vul hier het woord in"><div style="height:18px"></div><button class="success" onclick="submitTest()">Volgende →</button>`;
     focusAnswer();
   }
 

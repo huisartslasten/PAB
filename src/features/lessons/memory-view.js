@@ -9,17 +9,20 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
 
     const header = documentRef.createElement('div');
     header.className = 'memory-header';
-    header.innerHTML = `<div><h1>🧠 MEMORY</h1><p>Vind de vraag en het bijbehorende antwoord.</p></div><div class="memory-turns">Beurten: <strong>${state.turnCount}</strong></div>`;
+    header.innerHTML = `<div><h1>🧠 MEMORY</h1><p>Vind de vraag en het bijbehorende antwoord.</p></div>`;
     shell.appendChild(header);
 
     const controls = documentRef.createElement('div');
     controls.className = 'memory-controls';
+
+    const timingControl = documentRef.createElement('div');
+    timingControl.className = 'memory-timing-control';
     const label = documentRef.createElement('span');
     label.className = 'memory-timing-label';
     label.textContent = 'Kaartjes laten zien:';
     const dropdown = createPacoDropdown({
       options: [
-        { value: 'manual', label: 'Klaar met lezen' },
+        { value: 'manual', label: 'GEEN TIJDSLIMIET' },
         { value: '3', label: '3 seconden' },
         { value: '5', label: '5 seconden' }
       ],
@@ -27,8 +30,26 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
       onChange: nextValue => onTimingModeChange(nextValue),
       className: 'memory-timing-dropdown'
     });
-    controls.appendChild(label);
-    controls.appendChild(dropdown.element);
+    timingControl.appendChild(label);
+    timingControl.appendChild(dropdown.element);
+    controls.appendChild(timingControl);
+
+    const centerControl = documentRef.createElement('div');
+    centerControl.className = 'memory-center-control';
+    if (state.phase === 'checking' && timingMode === 'manual') {
+      const button = documentRef.createElement('button');
+      button.type = 'button';
+      button.className = 'memory-primary-button memory-resolve-button';
+      button.textContent = 'KLAAR VOLGENDE';
+      button.addEventListener('click', onResolveTurn);
+      centerControl.appendChild(button);
+    }
+    controls.appendChild(centerControl);
+
+    const turns = documentRef.createElement('div');
+    turns.className = 'memory-turns';
+    turns.innerHTML = `Beurten: <strong>${state.turnCount}</strong>`;
+    controls.appendChild(turns);
     shell.appendChild(controls);
 
     if (state.phase === 'finished') {
@@ -76,15 +97,6 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
       status.className = 'memory-status';
       status.textContent = timingMode === 'manual' ? 'Lees rustig de twee kaartjes.' : 'Even kijken…';
       shell.appendChild(status);
-
-      if (timingMode === 'manual') {
-        const button = documentRef.createElement('button');
-        button.type = 'button';
-        button.className = 'memory-primary-button memory-resolve-button';
-        button.textContent = 'Klaar, volgende';
-        button.addEventListener('click', onResolveTurn);
-        shell.appendChild(button);
-      }
     }
 
     return shell;

@@ -4,14 +4,18 @@ import { PACOGO_TEST_VERSION } from '../../src/components/page-template.js';
 const baseUrl = 'http://127.0.0.1:4173';
 const expectedVersionBadge = PACOGO_TEST_VERSION;
 
-async function expectCanonicalShell(page, path, title) {
+async function expectCanonicalShell(page, path, title, { expectAgendaSubmenu = true } = {}) {
   await page.goto(`${baseUrl}/${path}`);
   await expect(page.locator('.paco-template-version-badge')).toHaveText(expectedVersionBadge);
   await expect(page.locator('.paco-template-hero')).toBeVisible();
   await expect(page.locator('.paco-template-sidebar')).toBeVisible();
   await expect(page.locator('.paco-template-main h1')).toHaveText(title);
-  await expect(page.locator('.paco-template-nav-submenu')).toHaveCount(1);
-  await expect(page.locator('.paco-template-nav-subitem')).toHaveText(['Agenda invoeren', 'Maandkalender']);
+  if (expectAgendaSubmenu) {
+    await expect(page.locator('.paco-template-nav-submenu')).toHaveCount(1);
+    await expect(page.locator('.paco-template-nav-subitem')).toHaveText(['Agenda invoeren', 'Maandkalender']);
+  } else {
+    await expect(page.locator('.paco-template-nav-submenu')).toHaveCount(0);
+  }
 }
 
 test('dashboard page uses the canonical shell for a selected student', async ({ page }) => {
@@ -45,8 +49,8 @@ test('test page uses the canonical shell', async ({ page }) => {
   await expect(page.locator('#result')).toHaveCount(1);
 });
 
-test('test history page uses the canonical shell', async ({ page }) => {
-  await expectCanonicalShell(page, 'test-history.html', 'Toetsgeschiedenis');
+test('test history page uses the management shell without student submenu', async ({ page }) => {
+  await expectCanonicalShell(page, 'test-history.html', 'Toetsgeschiedenis', { expectAgendaSubmenu: false });
   await expect(page.locator('#historyStudent')).toHaveCount(1);
   await expect(page.locator('#testHistoryContent')).toHaveCount(1);
 });

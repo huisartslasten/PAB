@@ -30,7 +30,7 @@ export function createFlashQuestionView({ documentRef = globalThis.document, esc
     renderStats(state, highScore);
     renderProgress(state);
 
-    content.innerHTML = `<div class="flash-question">${escapeHtml(state.item.question)}</div><div class="flash-options" role="group" aria-label="Antwoordopties">${state.item.options.map((option, index) => `<button type="button" class="flash-option paco-action-button secondary" data-flash-answer="${index}">${escapeHtml(option)}</button>`).join('')}</div>`;
+    content.innerHTML = `<div class="flash-question">${escapeHtml(state.item.question)}</div><div class="flash-options" role="group" aria-label="Antwoordopties">${state.item.options.map((option, index) => `<button type="button" class="flash-option secondary" data-flash-answer="${index}">${escapeHtml(option)}</button>`).join('')}</div>`;
 
     content.querySelectorAll('[data-flash-answer]').forEach(button => {
       button.addEventListener('click', () => {

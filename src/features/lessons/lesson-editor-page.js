@@ -8,6 +8,12 @@ const TYPE_LABELS = Object.freeze({
 });
 
 const STUDENTS = Object.freeze(['Zyon', 'Zenith', 'Zephon', 'Testleerling']);
+const RESPONSE_LABELS = Object.freeze({
+  text: 'Open antwoord',
+  number: 'Getal',
+  fraction: 'Breuk',
+  multiple_choice: 'Multiple choice'
+});
 const text = value => String(value ?? '').trim();
 const esc = value => String(value ?? '')
   .replaceAll('&', '&amp;')
@@ -22,6 +28,48 @@ function normalizeParts(parts, fallback = '') {
     return value ? [{ text: value, role: 'answer' }] : [];
   }
   return parts.map(part => ({ text: text(part?.text), role: part?.role === 'extra' ? 'extra' : 'answer' })).filter(part => part.text);
+}
+
+function responseTypeFor(type, data = {}) {
+  if (data.responseType) return data.responseType;
+  if (data.response_type) return data.response_type;
+  return type === 'math' ? 'number' : 'text';
+}
+
+function answerOptionsFromItem(item = {}) {
+  return Array.isArray(item.answer_options) ? item.answer_options : [];
+}
+
+function createChoiceOptionsEditor(row, options = [], correct = '') {
+  const box = row.querySelector('.choice-options');
+  if (!box) return;
+  box.innerHTML = '';
+  const values = options.length ? options : ['', ''];
+  values.forEach((value, index) => {
+    const option = document.createElement('div');
+    option.className = 'choice-option-row';
+    option.innerHTML = `<input class="choice-option-input" value="${esc(value)}" placeholder="Antwoordoptie ${index + 1}"><label><input type="radio" name="${row.dataset.choiceName}" class="choice-correct-input"> <span>juist</span></label><button type="button" class="word-part-remove" data-action="remove-choice">✕</button>`;
+    const radio = option.querySelector('.choice-correct-input');
+    radio.checked = text(value) === text(correct);
+    box.appendChild(option);
+  });
+}
+
+function applyResponseMode(row, type, responseType, options = [], correct = '') {
+  row.dataset.responseType = responseType;
+  const mode = row.querySelector('.response-mode');
+  const choiceBox = row.querySelector('.choice-editor');
+  const answerSection = row.querySelector('.standard-answer-section');
+  if (mode) mode.value = responseType;
+  if (choiceBox) choiceBox.classList.toggle('hidden', responseType !== 'multiple_choice');
+  if (answerSection) answerSection.classList.toggle('hidden', responseType === 'multiple_choice');
+  const answerInput = row.querySelector('.math-a-part, .question-a-part');
+  if (answerInput) answerInput.placeholder = responseType === 'fraction'
+    ? 'Bijvoorbeeld 3/4'
+    : responseType === 'number'
+      ? 'Vul het getal in'
+      : 'Vul hier het antwoord in';
+  if (responseType === 'multiple_choice') createChoiceOptionsEditor(row, options, correct);
 }
 
 function editorShell() {
@@ -95,17 +143,21 @@ function createWordRow({ questionParts = [''], answerParts = [{ text: '', role: 
   return row;
 }
 
-function createUniversalRow({ answerClass, answerInputClass, answerPlaceholder = 'Vul hier het antwoord in', questionLabel = 'Vraag', questionParts = [''], answerParts = [{ text: '', role: 'answer' }] } = {}) {
+function createUniversalRow({ answerClass, answerInputClass, answerPlaceholder = 'Vul hier het antwoord in', questionLabel = 'Vraag', questionParts = [''], answerParts = [{ text: '', role: 'answer' }], responseType = 'text', answerOptions = [], correctOption = '' } = {}) {
   const wrapper = document.createElement('div');
   wrapper.innerHTML = rowFrame(`
     <div class="word-parts-section"><div class="word-parts-head"><label>${esc(questionLabel)}</label></div><div class="word-question-parts"></div><button type="button" class="word-add-line word-add-line-bottom" data-action="add-question-part">➕ regel</button></div>
-    <div class="word-parts-section"><div class="word-parts-head"><label>Antwoord</label></div><div class="${answerClass}"></div><button type="button" class="word-add-line word-add-line-bottom" data-action="add-answer-part">➕ regel</button><div class="word-extra-note">Kies per regel of deze wordt beoordeeld als antwoord of alleen als extra informatie.</div>${answerClass === 'dictation-answer-parts' ? '<div class="dictation-spellcheck"></div>' : ''}</div>`);
+    <div class="word-parts-section standard-answer-section"><div class="word-parts-head"><label>Antwoord</label></div><div class="${answerClass}"></div><button type="button" class="word-add-line word-add-line-bottom" data-action="add-answer-part">➕ regel</button><div class="word-extra-note">Kies per regel of deze wordt beoordeeld als antwoord of alleen als extra informatie.</div>${answerClass === 'dictation-answer-parts' ? '<div class="dictation-spellcheck"></div>' : ''}</div>
+    <div class="word-parts-section response-section"><div class="word-parts-head"><label>Antwoordvorm</label></div><select class="response-mode">${Object.entries(RESPONSE_LABELS).map(([value, label]) => `<option value="${value}">${label}</option>`).join('')}</select></div>
+    <div class="word-parts-section choice-editor hidden"><div class="word-parts-head"><label>Antwoordopties</label><button type="button" class="word-add-line" data-action="add-choice">➕ optie</button></div><div class="choice-options"></div><div class="word-extra-note">Vink precies één juiste optie aan.</div></div>`);
   const row = wrapper.firstElementChild;
   row.dataset.answerClass = answerClass;
   row.dataset.answerInputClass = answerInputClass;
   row.dataset.answerPlaceholder = answerPlaceholder;
+  row.dataset.choiceName = `choice-${Math.random().toString(36).slice(2)}`;
   questionParts.forEach(part => addQuestionPart(row, part));
   answerParts.forEach(part => addAnswerPart(row, answerClass, answerInputClass, part?.text || '', part?.role || 'answer', answerPlaceholder));
+  applyResponseMode(row, answerClass === 'math-answer-parts' ? 'math' : 'questions', responseType, answerOptions, correctOption || answerParts.find(part => part?.role !== 'extra')?.text || '');
   return row;
 }
 
@@ -143,7 +195,7 @@ function addRow(root, type, data = {}) {
         : createUniversalRow({
           answerClass: `${type}-answer-parts`,
           answerInputClass: `${type}-a-part`,
-          answerPlaceholder: type === 'math' ? 'Vul het getal in' : 'Vul hier het antwoord in',
+          answerPlaceholder: type === 'math' ? 'Vul het antwoord in' : 'Vul hier het antwoord in',
           questionLabel: type === 'math' ? 'Som' : 'Vraag',
           ...data
         });
@@ -182,25 +234,26 @@ function readDraft(root, lessonId) {
       .map(row => ({ word: row.querySelector('.dictation-word-input')?.value.trim() || '' }))
       .filter(item => item.word);
     return {
-      lessonId,
-      student,
-      subject: root.querySelector('#lessonSubject').value.trim(),
-      enteredSubvak: root.querySelector('#lessonSubvak').value.trim(),
-      title: root.querySelector('#lessonName').value.trim(),
-      type,
-      explanation: root.querySelector('#lessonExplanation').value.trim(),
-      aiCheckAnswers: false,
-      aiInstruction: '',
-      editorLabels: null,
-      items: rows,
-      testDate: root.querySelector('#lessonTestDate').value || ''
+      lessonId, student, subject: root.querySelector('#lessonSubject').value.trim(), enteredSubvak: root.querySelector('#lessonSubvak').value.trim(), title: root.querySelector('#lessonName').value.trim(), type,
+      explanation: root.querySelector('#lessonExplanation').value.trim(), aiCheckAnswers: false, aiInstruction: '', editorLabels: null, items: rows, testDate: root.querySelector('#lessonTestDate').value || ''
     };
   }
 
   const questionParts = row => [...row.querySelectorAll('.word-q-part')].map(input => input.value.trim()).filter(Boolean);
-  const answerParts = row => [...row.querySelectorAll('.word-a-part, .question-a-part, .math-a-part, .spelling-a-part')].map(input => ({ text: input.value.trim(), role: input.closest('.word-part-row')?.querySelector('.word-part-role')?.value === 'extra' ? 'extra' : 'answer' })).filter(part => part.text);
+  const answerParts = row => [...row.querySelectorAll('.word-a-part, .question-a-part, .math-a-part, .spelling-a-part')]
+    .map(input => ({ text: input.value.trim(), role: input.closest('.word-part-row')?.querySelector('.word-part-role')?.value === 'extra' ? 'extra' : 'answer' }))
+    .filter(part => part.text);
   const rows = [...root.querySelectorAll('.editor-row')].map(row => {
-    const item = { question_parts: questionParts(row), answer_parts: answerParts(row) };
+    const responseType = row.dataset.responseType || row.querySelector('.response-mode')?.value || (type === 'math' ? 'number' : 'text');
+    const choiceOptions = [...row.querySelectorAll('.choice-option-input')].map(input => input.value.trim()).filter(Boolean);
+    const correctChoice = row.querySelector('.choice-correct-input:checked')?.closest('.choice-option-row')?.querySelector('.choice-option-input')?.value.trim() || '';
+    const item = {
+      question_parts: questionParts(row),
+      answer_parts: answerParts(row),
+      response_type: responseType,
+      answer_options: responseType === 'multiple_choice' ? choiceOptions : [],
+      correct_option: responseType === 'multiple_choice' ? correctChoice : ''
+    };
     if (type === 'words' || type === 'custom') {
       item.hint = row.querySelector('.word-item-hint')?.value.trim() || '';
       item.min_words = Number(row.querySelector('.word-item-min-words')?.value || 0);
@@ -214,18 +267,8 @@ function readDraft(root, lessonId) {
     adjective: root.querySelector('#spellingLabelAdjective')?.value.trim() || 'Bijvoeglijk gebruikt voltooid deelwoord'
   } : null;
   return {
-    lessonId,
-    student,
-    subject: root.querySelector('#lessonSubject').value.trim(),
-    enteredSubvak: root.querySelector('#lessonSubvak').value.trim(),
-    title: root.querySelector('#lessonName').value.trim(),
-    type,
-    explanation: root.querySelector('#lessonExplanation').value.trim(),
-    aiCheckAnswers: root.querySelector('#lessonAiCheckAnswers').checked,
-    aiInstruction: root.querySelector('#lessonAiInstruction').value.trim(),
-    editorLabels,
-    items: rows,
-    testDate: root.querySelector('#lessonTestDate').value || ''
+    lessonId, student, subject: root.querySelector('#lessonSubject').value.trim(), enteredSubvak: root.querySelector('#lessonSubvak').value.trim(), title: root.querySelector('#lessonName').value.trim(), type,
+    explanation: root.querySelector('#lessonExplanation').value.trim(), aiCheckAnswers: root.querySelector('#lessonAiCheckAnswers').checked, aiInstruction: root.querySelector('#lessonAiInstruction').value.trim(), editorLabels, items: rows, testDate: root.querySelector('#lessonTestDate').value || ''
   };
 }
 
@@ -289,7 +332,14 @@ function populateEditor(root, lesson, calendarDate = '') {
   if (!items.length) addRow(root, type);
   else items.forEach(item => addRow(root, type, type === 'dictation'
     ? { word: text(item.answer || item.word) }
-    : { questionParts: item.question_parts || text(item.question).split('\n'), answerParts: normalizeParts(item.answer_parts, item.answer), rules: item }));
+    : {
+      questionParts: item.question_parts || text(item.question).split('\n'),
+      answerParts: normalizeParts(item.answer_parts, item.answer),
+      rules: item,
+      responseType: item.response_type || (type === 'math' ? 'number' : 'text'),
+      answerOptions: answerOptionsFromItem(item),
+      correctOption: item.response_type === 'multiple_choice' ? item.answer : ''
+    }));
   applyVisibility(root, type);
   renderDatePicker(root, calendarDate, calendarDate ? parseDateKey(calendarDate) : new Date());
   root.querySelector('#lessonAiInstructionBox').classList.toggle('hidden', !root.querySelector('#lessonAiCheckAnswers').checked || type === 'dictation');
@@ -309,15 +359,20 @@ function rowTemplateData(row) {
   const answerParts = answerInputs.length
     ? answerInputs.map(input => ({ text: '', role: input.closest('.word-part-row')?.querySelector('.word-part-role')?.value === 'extra' ? 'extra' : 'answer' }))
     : [{ text: '', role: 'answer' }];
-  const rules = {
-    hint: row.querySelector('.word-item-hint')?.value.trim() || '',
-    min_words: Number(row.querySelector('.word-item-min-words')?.value || 0),
-    required_terms: (row.querySelector('.word-item-required-terms')?.value || '').split(',').map(text).filter(Boolean)
-  };
   return {
     questionParts: Array.from({ length: questionCount }, () => ''),
     answerParts,
-    rules
+    responseType: row.dataset.responseType || row.querySelector('.response-mode')?.value || 'text',
+    answerOptions: [...row.querySelectorAll('.choice-option-input')].map(input => ''),
+    correctOption: ''
+  };
+}
+
+function getSpellingLabelsFromRow(root) {
+  return {
+    question: root.querySelector('#spellingLabelQuestion')?.value.trim() || 'Werkwoord',
+    perfect: root.querySelector('#spellingLabelPerfect')?.value.trim() || 'Voltooid deelwoord',
+    adjective: root.querySelector('#spellingLabelAdjective')?.value.trim() || 'Bijvoeglijk gebruikt voltooid deelwoord'
   };
 }
 
@@ -379,6 +434,21 @@ export function createLessonEditorPage({ root, runtime, initialLesson = null, st
       addAnswerPart(row, row.dataset.answerClass || 'word-answer-parts', row.dataset.answerInputClass || 'word-a-part', '', 'answer', row.dataset.answerPlaceholder || 'Vul hier het antwoord in');
       return;
     }
+    if (button.dataset.action === 'add-choice') {
+      const row = button.closest('.editor-row');
+      const options = [...row.querySelectorAll('.choice-option-input')].map(input => input.value);
+      options.push('');
+      createChoiceOptionsEditor(row, options, row.querySelector('.choice-correct-input:checked')?.closest('.choice-option-row')?.querySelector('.choice-option-input')?.value || '');
+      return;
+    }
+    if (button.dataset.action === 'remove-choice') {
+      const row = button.closest('.editor-row');
+      const option = button.closest('.choice-option-row');
+      const options = [...row.querySelectorAll('.choice-option-input')].filter(input => input !== option?.querySelector('.choice-option-input')).map(input => input.value);
+      const currentCorrect = row.querySelector('.choice-correct-input:checked')?.closest('.choice-option-row')?.querySelector('.choice-option-input')?.value || '';
+      createChoiceOptionsEditor(row, options, currentCorrect);
+      return;
+    }
     if (button.dataset.action === 'remove-part') { button.closest('.word-part-row')?.remove(); return; }
     if (button.dataset.action === 'toggle-role') {
       const row = button.closest('.word-part-row');
@@ -399,6 +469,12 @@ export function createLessonEditorPage({ root, runtime, initialLesson = null, st
 
   root.addEventListener('change', event => {
     if (event.target.id === 'lessonType') applyVisibility(root, event.target.value);
+    if (event.target.classList.contains('response-mode')) {
+      const row = event.target.closest('.editor-row');
+      const currentOptions = [...row.querySelectorAll('.choice-option-input')].map(input => input.value);
+      const currentCorrect = row.querySelector('.choice-correct-input:checked')?.closest('.choice-option-row')?.querySelector('.choice-option-input')?.value || row.querySelector('.math-a-part, .question-a-part')?.value || '';
+      applyResponseMode(row, root.querySelector('#lessonType').value, event.target.value, currentOptions, currentCorrect);
+    }
     if (event.target.id === 'lessonTestDateEnabled') {
       const enabled = event.target.checked;
       root.querySelector('#lessonTestDatePicker').classList.toggle('hidden', !enabled);

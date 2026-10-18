@@ -12,6 +12,7 @@ const LESSON_TYPES = Object.freeze([
 const CHOICE_LABELS = Object.freeze({
   practice: 'Oefenen',
   test: 'Toets',
+  double: 'Double or Nothing',
   questions: 'Vragen maken',
   view: 'Bekijken'
 });
@@ -36,7 +37,7 @@ export function getLessonChoices(lessonOrType = {}) {
 
   const choices = [];
   if (isPracticeModeActive('flashcards')) choices.push('practice');
-  choices.push('test', 'view');
+  choices.push('test', 'double', 'view');
   return choices;
 }
 

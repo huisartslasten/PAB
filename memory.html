@@ -31,6 +31,7 @@
     const view = createMemoryView({ documentRef: document, escapeHtml });
     let timingMode = 'manual';
     let revealTimer = null;
+    let bestScore = null;
 
     const goGames = () => {
       const target = buildViewUrl('games.html', { student, mode: context.mode });
@@ -56,6 +57,12 @@
       const lesson = app.mapLessons(records).find(item => String(item.id) === String(lessonId));
       if (!lesson) throw new Error('Deze les kon niet worden gevonden.');
 
+      bestScore = await app.gameResults.getHighScore({
+        gameKey: 'memory',
+        lessonId,
+        student
+      });
+
       const contextField = createLessonContextField(lesson);
       content.appendChild(contextField);
       const gameMount = document.createElement('div');
@@ -71,11 +78,26 @@
         }
       }
 
-      function resolveTurn() {
+      async function resolveTurn() {
         clearRevealTimer();
         if (runtime.snapshot().phase !== 'checking') return;
-        runtime.resolveTurn();
+        const result = runtime.resolveTurn();
         renderState();
+
+        if (result.phase === 'finished') {
+          await app.gameResults.saveResult({
+            gameKey: 'memory',
+            lessonId,
+            student,
+            score: result.turnCount
+          });
+          bestScore = await app.gameResults.getHighScore({
+            gameKey: 'memory',
+            lessonId,
+            student
+          });
+          renderState();
+        }
       }
 
       function renderState() {
@@ -83,6 +105,7 @@
         clearRevealTimer();
         gameMount.replaceChildren(view.render({
           state,
+          bestScore,
           timingMode,
           onTimingModeChange: nextMode => {
             timingMode = nextMode;

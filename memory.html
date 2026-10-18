@@ -29,6 +29,8 @@
     const content = document.createElement('div');
     const app = createPacoGOApp({ supabaseLib: window.supabase });
     const view = createMemoryView({ documentRef: document, escapeHtml });
+    let timingMode = 'manual';
+    let revealTimer = null;
 
     const goGames = () => {
       const target = buildViewUrl('games.html', { student, mode: context.mode });
@@ -62,10 +64,31 @@
       const items = Array.isArray(lesson.lesson_items) ? lesson.lesson_items : Array.isArray(lesson.items) ? lesson.items : [];
       const runtime = createMemoryRuntime({ items });
 
+      function clearRevealTimer() {
+        if (revealTimer !== null) {
+          window.clearTimeout(revealTimer);
+          revealTimer = null;
+        }
+      }
+
+      function resolveTurn() {
+        clearRevealTimer();
+        if (runtime.snapshot().phase !== 'checking') return;
+        runtime.resolveTurn();
+        renderState();
+      }
+
       function renderState() {
         const state = runtime.snapshot();
+        clearRevealTimer();
         gameMount.replaceChildren(view.render({
           state,
+          timingMode,
+          onTimingModeChange: nextMode => {
+            timingMode = nextMode;
+            renderState();
+          },
+          onResolveTurn: resolveTurn,
           onCardSelect: cardId => {
             runtime.selectCard(cardId);
             renderState();
@@ -76,12 +99,9 @@
           }
         }));
 
-        if (state.phase === 'checking') {
-          window.setTimeout(() => {
-            if (runtime.snapshot().phase !== 'checking') return;
-            runtime.resolveTurn();
-            renderState();
-          }, 1200);
+        if (state.phase === 'checking' && timingMode !== 'manual') {
+          const delay = Number(timingMode) * 1000;
+          revealTimer = window.setTimeout(resolveTurn, delay);
         }
       }
 

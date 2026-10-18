@@ -25,34 +25,45 @@ export function createLessonAudioService(db, { AudioCtor = globalThis.Audio, URL
     stop();
     onStatus?.('🔄 AI-stem maken...');
 
-    const { data, error } = await db.functions.invoke('speak-word-v1', {
-      body: { text: String(text), language: String(language || 'nl') },
-      responseType: 'blob'
-    });
+    let result;
+    try {
+      result = await db.functions.invoke('speak-word-v1', {
+        body: { text: String(text), language: String(language || 'nl') },
+        responseType: 'blob'
+      });
+    } catch (error) {
+      onStatus?.('⚠️ AI-stem kon niet worden gemaakt.');
+      throw error;
+    }
+
+    const { data, error } = result;
     if (error) {
       onStatus?.('⚠️ AI-stem kon niet worden gemaakt.');
       throw error;
     }
     if (!data || typeof AudioCtor !== 'function' || !URLRef?.createObjectURL) {
-      throw new Error('AI-stem leverde geen afspeelbaar audiobestand op.');
+      const error = new Error('AI-stem leverde geen afspeelbaar audiobestand op.');
+      onStatus?.('⚠️ AI-stem kon niet worden afgespeeld.');
+      throw error;
     }
 
-    objectUrl = URLRef.createObjectURL(data);
-    const currentUrl = objectUrl;
-    audio = new AudioCtor(currentUrl);
-    audio.preload = 'auto';
-    audio.onended = () => {
-      if (objectUrl === currentUrl) {
-        URLRef.revokeObjectURL(currentUrl);
-        objectUrl = '';
-        audio = null;
-      }
-    };
-
     try {
+      objectUrl = URLRef.createObjectURL(data);
+      const currentUrl = objectUrl;
+      audio = new AudioCtor(currentUrl);
+      audio.preload = 'auto';
+      audio.onended = () => {
+        if (objectUrl === currentUrl) {
+          URLRef.revokeObjectURL(currentUrl);
+          objectUrl = '';
+          audio = null;
+        }
+      };
+
       await audio.play();
       onStatus?.('AI-stem speelt.');
     } catch (error) {
+      stop();
       onStatus?.('🔊 Klik op Nog een keer om de stem af te spelen.');
       throw error;
     }

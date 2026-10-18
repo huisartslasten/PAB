@@ -57,17 +57,7 @@ export function renderStudentSelection(container, management, onSelect = () => {
   return students;
 }
 
-async function persistSubjectOrder(container, management, subject) {
-  const subjectSelector = `[data-management-subject="${CSS.escape(subject)}"]`;
-  const ids = [...container.querySelectorAll(`${subjectSelector} .management-lesson[data-lesson-id]`)]
-    .map(card => Number(card.dataset.lessonId))
-    .filter(Boolean);
-  const current = management.getScopedLessons();
-  const lessons = ids.map(id => current.find(lesson => Number(lesson.id) === id)).filter(Boolean);
-  await management.saveLessonOrder(subject, lessons);
-}
-
-export async function renderStudentLessons(container, management, { onEdit = null, onArchive = null, onDelete = null } = {}) {
+export async function renderStudentLessons(container, management, { onEdit = null, onLearning = null, onArchive = null, onDelete = null } = {}) {
   if (!container) throw new Error('renderStudentLessons requires a container.');
   if (!management) throw new Error('renderStudentLessons requires management.');
 
@@ -87,6 +77,7 @@ export async function renderStudentLessons(container, management, { onEdit = nul
                 </div>
                 <div class="management-links">
                   ${typeof onEdit === 'function' ? `<button type="button" class="management-link" data-edit-lesson-id="${escapeHtml(lesson.id)}">✏️ Bewerken</button>` : ''}
+                  ${typeof onLearning === 'function' ? `<button type="button" class="management-link" data-learning-lesson-id="${escapeHtml(lesson.id)}">📚 Leerstof</button>` : ''}
                   ${typeof onArchive === 'function' ? `<button type="button" class="management-link" data-archive-lesson-id="${escapeHtml(lesson.id)}">🗄️ Archiveren</button>` : ''}
                   ${typeof onDelete === 'function' ? `<button type="button" class="management-link danger" data-delete-lesson-id="${escapeHtml(lesson.id)}">🗑️ Verwijderen</button>` : ''}
                 </div>
@@ -102,6 +93,13 @@ export async function renderStudentLessons(container, management, { onEdit = nul
     button.addEventListener('click', () => {
       const lesson = management.getScopedLessons().find(item => String(item.id) === String(button.dataset.editLessonId));
       if (lesson && typeof onEdit === 'function') onEdit(lesson);
+    });
+  });
+
+  container.querySelectorAll('[data-learning-lesson-id]').forEach(button => {
+    button.addEventListener('click', () => {
+      const lesson = management.getScopedLessons().find(item => String(item.id) === String(button.dataset.learningLessonId));
+      if (lesson && typeof onLearning === 'function') onLearning(lesson);
     });
   });
 
@@ -143,7 +141,7 @@ export async function renderStudentLessons(container, management, { onEdit = nul
     },
     onError: async error => {
       console.error('Management lesson reorder error:', error);
-      await renderStudentLessons(container, management, { onEdit, onArchive, onDelete });
+      await renderStudentLessons(container, management, { onEdit, onLearning, onArchive, onDelete });
     }
   });
 
@@ -171,10 +169,10 @@ export async function renderStudentLessons(container, management, { onEdit = nul
         await management.moveLessonToSubvak(sourceId, label === 'Zonder subvak' ? '' : label);
         block.querySelector('.management-lessons-grid').appendChild(source);
         await persistSubjectOrder(container, management, subject);
-        await renderStudentLessons(container, management, { onEdit, onArchive, onDelete });
+        await renderStudentLessons(container, management, { onEdit, onLearning, onArchive, onDelete });
       } catch (error) {
         console.error('Management lesson subvak move error:', error);
-        await renderStudentLessons(container, management, { onEdit, onArchive, onDelete });
+        await renderStudentLessons(container, management, { onEdit, onLearning, onArchive, onDelete });
       }
     });
   });
@@ -257,15 +255,3 @@ export async function renderFeedback(container, management) {
 
   const feedback = await management.listFeedback();
   const labels = { idea: '💡 Idee / wens', bug: '🐛 Foutmelding', improvement: '🔧 Verbetering', other: '❓ Anders' };
-
-  container.innerHTML = (feedback || []).map(item => `
-    <article class="management-feedback" data-feedback-id="${escapeHtml(item.id)}">
-      <div><strong>${escapeHtml(labels[item.feedback_type] || item.feedback_type)}</strong></div>
-      <h3>${escapeHtml(item.subject)}</h3>
-      <p>${escapeHtml(item.message)}</p>
-      <span class="management-feedback-status">${escapeHtml(item.status || 'new')}</span>
-    </article>
-  `).join('');
-
-  return feedback || [];
-}

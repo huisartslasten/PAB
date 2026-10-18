@@ -6,6 +6,7 @@ function normalizeLessonPayload(payload = {}) {
   return {
     student: payload.student ?? null,
     subject: payload.subject ?? '',
+    subvak: payload.subvak ?? '',
     title: payload.title ?? '',
     type: payload.type ?? '',
     sort_order: Number(payload.sort_order ?? 0),
@@ -135,10 +136,7 @@ export function createLessonService(db) {
     },
 
     async restore(id) {
-      const { error } = await db
-        .from('lessons')
-        .update({ archived: false, deleted: false })
-        .eq('id', id);
+      const { error } = await db.from('lessons').update({ archived: false, deleted: false }).eq('id', id);
       if (error) throw error;
     },
 

@@ -158,6 +158,7 @@ test('lesson service replaces lesson items with normalized TEST-schema fields', 
   assert.deepEqual(inserted, [{
     question: '',
     answer: '',
+    hint: '',
     sort_order: 0,
     lesson_id: 12
   }]);
@@ -217,6 +218,7 @@ test('lesson service owns photo-style lesson creation and preserves normalized i
   assert.deepEqual(calls[3].rows, [{
     question: 'Wat betekent kapen?',
     answer: 'Een schip overnemen',
+    hint: '',
     sort_order: 0,
     lesson_id: 31
   }]);

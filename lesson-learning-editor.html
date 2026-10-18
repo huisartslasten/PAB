@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — Leerstof bewerken</title>
+  <link rel="stylesheet" href="src/components/page-template.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .learning-editor{display:grid;gap:14px}.learning-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.learning-card{border:2px solid #cfe3f3;border-radius:20px;background:#fff;padding:15px;box-shadow:0 6px 18px rgba(16,43,87,.06)}.learning-card-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}.learning-number{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#dff0ff;color:#126fc9;font-weight:900}.learning-card-title{flex:1;font-weight:900;color:#102b57}.learning-toolbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}.learning-toolbar button{width:auto;padding:7px 10px}.learning-content{min-height:150px;border:1px solid #cfe3f3;border-radius:12px;padding:12px;line-height:1.55;outline:none}.learning-content:focus{border-color:#1787f2;box-shadow:0 0 0 2px #eaf4ff}.learning-content .learning-size-large{font-size:1.35em}.learning-content .learning-size-small{font-size:.8em}.learning-image{margin-top:10px}.learning-image img{display:block;max-width:100%;max-height:240px;border-radius:14px}.learning-image-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.learning-image-actions button{width:auto}.learning-empty,.learning-status{padding:16px;border-radius:16px}.learning-empty{border:2px dashed #cfe3f3;background:#fbfdff;color:#667894;text-align:center}.learning-status{background:#eef8ff;color:#126fc9;font-weight:800}.danger{background:#fff0ef!important;color:#a43d3d!important;border-color:#efcccc!important}
+  </style>
+</head>
+<body><div id="paco-template-mount"></div>
+<script type="module">
+import { mountPacoPageTemplate } from './src/components/page-template.js';
+import { createPacoNavigation } from './src/components/page-navigation.js';
+import { createPacoGOApp } from './src/app/bootstrap.js';
+import { readViewContext, applyViewContext, buildViewUrl } from './src/core/view-context.js';
+
+const params=new URLSearchParams(window.location.search);
+const context=readViewContext(params);
+const lessonId=params.get('lesson_id');
+const mount=document.querySelector('#paco-template-mount');
+const content=document.createElement('div');
+const app=createPacoGOApp({supabaseLib:window.supabase});
+let lesson=null;
+let cards=[];
+
+mountPacoPageTemplate({
+  mount,
+  backLabel:'← Les bewerken',
+  backAction:()=>{const url=buildViewUrl('lesson-editor.html',{student:context.student,mode:context.mode});if(lessonId)url.searchParams.set('lesson_id',lessonId);window.location.href=url.toString()},
+  greeting:'PacoGO beheer ⚙️',
+  title:'Leerstof',
+  icon:'📖',
+  subtitle:'Maak van deze les hapklare leerkaarten met tekst en afbeeldingen.',
+  navigation:createPacoNavigation({app,active:'management',student:context.student,includeCreator:true}),
+  content
+});
+
+function addCard(){cards.push({id:null,title:'',content:'',image_id:null,image:null,pendingFile:null,pendingUrl:null});render()}
+function removeCard(index){const card=cards[index];if(card.pendingUrl)URL.revokeObjectURL(card.pendingUrl);cards.splice(index,1);render()}
+function moveCard(index,direction){const target=index+direction;if(target<0||target>=cards.length)return;[cards[index],cards[target]]=[cards[target],cards[index]];render()}
+function applyFormat(editor,type){editor.focus();if(type==='bold'||type==='italic'){document.execCommand(type,false);return}const selection=window.getSelection();if(!selection?.rangeCount||selection.isCollapsed)return;const range=selection.getRangeAt(0);const span=document.createElement('span');span.className=`learning-size-${type}`;try{span.appendChild(range.extractContents());range.insertNode(span);selection.removeAllRanges();const next=document.createRange();next.selectNodeContents(span);selection.addRange(next)}catch(error){console.error('Learning format error:',error)}}
+function bindImage(card,index,input,preview){input.addEventListener('change',()=>{const file=input.files?.[0];if(!file||!file.type.startsWith('image/'))return;if(card.pendingUrl)URL.revokeObjectURL(card.pendingUrl);card.pendingFile=file;card.pendingUrl=URL.createObjectURL(file);preview.src=card.pendingUrl;preview.hidden=false})}
+function render(){content.replaceChildren();const page=document.createElement('div');page.className='learning-editor';const head=document.createElement('div');head.className='learning-head';const title=document.createElement('div');title.innerHTML=`<h2 style="margin:0;color:#102b57">${escapeHtml(lesson?.title||'Leerstof')}</h2><div class="small">${escapeHtml(lesson?.subject||'')} · ${escapeHtml(lesson?.student||context.student||'')}</div>`;const tools=document.createElement('div');tools.className='learning-toolbar';const add=document.createElement('button');add.type='button';add.className='success';add.textContent='➕ Leerkaart';add.onclick=addCard;const preview=document.createElement('button');preview.type='button';preview.textContent='👀 Bekijken';preview.onclick=()=>{const url=buildViewUrl('lesson-learning.html',{student:context.student,mode:context.mode});url.searchParams.set('lesson_id',lessonId);window.location.href=url.toString()};tools.append(add,preview);head.append(title,tools);page.append(head);
+if(!cards.length){const empty=document.createElement('div');empty.className='learning-empty';empty.innerHTML='<strong>Deze les heeft nog geen leerkaarten.</strong><br>Voeg hieronder de eerste kaart toe.';page.append(empty)}
+cards.forEach((card,index)=>{const article=document.createElement('article');article.className='learning-card';const top=document.createElement('div');top.className='learning-card-head';const number=document.createElement('div');number.className='learning-number';number.textContent=String(index+1);const cardTitle=document.createElement('input');cardTitle.className='learning-card-title';cardTitle.placeholder='Titel van deze leerkaart';cardTitle.value=card.title||'';cardTitle.addEventListener('input',()=>card.title=cardTitle.value);const up=document.createElement('button');up.type='button';up.textContent='↑';up.onclick=()=>moveCard(index,-1);const down=document.createElement('button');down.type='button';down.textContent='↓';down.onclick=()=>moveCard(index,1);const del=document.createElement('button');del.type='button';del.className='danger';del.textContent='Verwijderen';del.onclick=()=>removeCard(index);top.append(number,cardTitle,up,down,del);article.append(top);
+const format=document.createElement('div');format.className='learning-toolbar';[['bold','B'],['italic','I'],['large','Groter'],['small','Kleiner']].forEach(([type,label])=>{const button=document.createElement('button');button.type='button';button.textContent=label;button.onclick=()=>applyFormat(editor,type);format.append(button)});article.append(format);
+const editor=document.createElement('div');editor.className='learning-content';editor.contentEditable='true';editor.innerHTML=card.content||'';editor.addEventListener('input',()=>card.content=editor.innerHTML);article.append(editor);
+const image=document.createElement('div');image.className='learning-image';const previewImage=document.createElement('img');previewImage.alt='';previewImage.hidden=true;if(card.image?.url)previewImage.src=card.image.url;else if(card.pendingUrl){previewImage.src=card.pendingUrl;previewImage.hidden=false}else previewImage.hidden=true;image.append(previewImage);const actions=document.createElement('div');actions.className='learning-image-actions';const input=document.createElement('input');input.type='file';input.accept='image/jpeg,image/png,image/webp';input.hidden=true;const choose=document.createElement('button');choose.type='button';choose.textContent=card.image_id?'Afbeelding vervangen':'Afbeelding toevoegen';choose.onclick=()=>input.click();const remove=document.createElement('button');remove.type='button';remove.className='danger';remove.textContent='Afbeelding verwijderen';remove.hidden=!card.image_id&&!card.pendingFile;remove.onclick=()=>{if(card.pendingUrl)URL.revokeObjectURL(card.pendingUrl);card.pendingFile=null;card.pendingUrl=null;card.image_id=null;card.image=null;render()};actions.append(choose,remove,input);image.append(actions);bindImage(card,index,input,previewImage);article.append(image);page.append(article)});
+const save=document.createElement('button');save.type='button';save.className='success';save.textContent='💾 Leerstof opslaan';save.onclick=saveCards;page.append(save);content.append(page)}
+async function saveCards(){const status=document.createElement('div');status.className='learning-status';status.textContent='Leerstof opslaan…';content.append(status);const uploaded=[];try{for(const card of cards){if(card.pendingFile){const media=await app.learningContent.uploadCardImage(lessonId,card.pendingFile);card.image_id=media.id;uploaded.push(media.id);card.pendingFile=null;if(card.pendingUrl){URL.revokeObjectURL(card.pendingUrl);card.pendingUrl=null}}}await app.learningContent.replaceForLesson(lessonId,cards);cards=await app.learningContent.listForLesson(lessonId);render()}catch(error){for(const id of uploaded){try{await app.learningContent.removeCardImage(id)}catch(cleanupError){console.error('Learning image cleanup error:',cleanupError)}}console.error('Learning content save error:',error);status.textContent=error?.message||'De leerstof kon niet worden opgeslagen.'}}
+function escapeHtml(value){return String(value??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;')}
+async function load(){await app.initializeSession();if(!app.auth.isParent)throw new Error('Je hebt geen toegang tot lesbeheer.');if(!lessonId)throw new Error('Geen les geselecteerd.');if(context.isManagement)applyViewContext(context,{canManage:app.auth.isParent});else applyViewContext(context);const records=await app.loadLessons();lesson=app.mapLessons(records).find(item=>String(item.id)===String(lessonId));if(!lesson)throw new Error('Deze les kon niet worden gevonden.');cards=await app.learningContent.listForLesson(lessonId);render()}
+load().catch(error=>{console.error('Learning editor load error:',error);content.innerHTML=`<div class="learning-empty"><strong>De leerstofeditor kon niet worden geladen.</strong><br>${escapeHtml(error?.message||'Onbekende fout.')}</div>`});
+</script></body></html>

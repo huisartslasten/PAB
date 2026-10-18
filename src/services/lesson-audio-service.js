@@ -26,7 +26,8 @@ export function createLessonAudioService(db, { AudioCtor = globalThis.Audio, URL
     onStatus?.('🔄 AI-stem maken...');
 
     const { data, error } = await db.functions.invoke('speak-word-v1', {
-      body: { text: String(text), language: String(language || 'nl') }
+      body: { text: String(text), language: String(language || 'nl') },
+      responseType: 'blob'
     });
     if (error) {
       onStatus?.('⚠️ AI-stem kon niet worden gemaakt.');
@@ -48,8 +49,13 @@ export function createLessonAudioService(db, { AudioCtor = globalThis.Audio, URL
       }
     };
 
-    await audio.play();
-    onStatus?.('AI-stem speelt.');
+    try {
+      await audio.play();
+      onStatus?.('AI-stem speelt.');
+    } catch (error) {
+      onStatus?.('🔊 Klik op Nog een keer om de stem af te spelen.');
+      throw error;
+    }
   }
 
   return Object.freeze({ speak, stop });

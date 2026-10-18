@@ -1,5 +1,6 @@
 import { createPacoGOApp } from '../../../app/bootstrap.js';
 import { isPracticeModeActive } from '../practice-domain.js';
+import { createLessonContextField } from '../../lessons/lesson-context-view.js';
 import {
   createFlashcardSession,
   getCurrentFlashcard,
@@ -52,6 +53,8 @@ export async function mountFlashcardPractice({
     loading.textContent = 'Deze les bevat nog geen vraag-en-antwoordkaarten.';
     return;
   }
+
+  mount.replaceChildren(createLessonContextField(lesson), content);
 
   let reverse = false;
   let session = createFlashcardSession(cards);

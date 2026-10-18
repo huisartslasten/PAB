@@ -1,8 +1,9 @@
 /**
  * PacoGO shared shell navigation.
  *
- * This module owns the shared route map and serializes the canonical student
- * view context. Pages provide only active-route and view-context information.
+ * This module owns the shared route map and the account entry shown in the
+ * shared sidebar. Pages provide only route/view information and the shared
+ * application context; they do not decide whether the user is logged in.
  */
 
 function go(path, { student = '', mode = 'student' } = {}) {
@@ -12,18 +13,15 @@ function go(path, { student = '', mode = 'student' } = {}) {
   window.location.href = target.toString();
 }
 
-export function createPacoAuthenticatedAccount(app) {
-  return {
-    accountLabel: 'Uitloggen',
-    onAccountClick: async () => {
-      await app.authSession.signOut();
-      app.auth.setSession(null);
-      window.location.href = 'auth.html';
-    }
-  };
+function requireNavigationApp(app, includeAccount) {
+  if (!includeAccount) return;
+  if (!app?.auth || !app?.authSession) {
+    throw new Error('createPacoNavigation requires the application context when includeAccount is enabled.');
+  }
 }
 
 export function createPacoNavigation({
+  app = null,
   active = '',
   activeSubmenu = '',
   student = '',
@@ -38,10 +36,10 @@ export function createPacoNavigation({
   includeLessons = true,
   includeAgenda = true,
   includeAccount = true,
-  accountLabel = 'Inloggen / Uitloggen',
-  onAccountClick = null,
   hideActive = false
 } = {}) {
+  requireNavigationApp(app, includeAccount);
+
   const view = { student, mode: viewMode };
   const items = [];
 
@@ -64,15 +62,10 @@ export function createPacoNavigation({
     items.push({ key: 'management-dashboard', icon: '🏠', label: 'Dashboard', onClick: () => go('management.html') });
   }
 
-  // Beheer has its own dashboard/start context. The dashboard entry here is
-  // the learner dashboard and would incorrectly leave the management context.
   if (!includeManagementStudentSelector && !includeManagementDashboard) {
     items.push({ key: 'dashboard', icon: '🏠', label: 'Dashboard', onClick: () => go('dashboard.html', view) });
   }
 
-  // The management dashboard is a distinct navigation context. It does not
-  // expose student-owned "Mijn lessen" or "Mijn agenda" entry points; those
-  // remain available throughout the canonical student environment.
   const includeStudentNavigation = !includeManagementStudentSelector && !includeManagementDashboard;
 
   if (includeLessons && includeStudentNavigation) {
@@ -97,13 +90,34 @@ export function createPacoNavigation({
     items.push({ key: 'feedback', icon: '💬', label: 'Feedback', onClick: () => go('feedback.html') });
   }
   if (includeCreator) items.push({ key: 'creator', icon: '🧠', label: 'Creator Console', onClick: () => go('creator.html') });
+
   if (includeAccount) {
-    items.push({
+    const accountItem = {
       key: 'account',
-      icon: accountLabel === 'Uitloggen' ? '🚪' : '🔐',
-      label: accountLabel,
-      onClick: typeof onAccountClick === 'function' ? onAccountClick : () => go('auth.html')
-    });
+      icon: app.auth.isLoggedIn ? '🚪' : '🔐',
+      label: app.auth.isLoggedIn ? 'Uitloggen' : 'Inloggen',
+      onClick: async () => {
+        if (!app.auth.isLoggedIn) {
+          go('auth.html');
+          return;
+        }
+        await app.authSession.signOut();
+        app.auth.setSession(null);
+        window.location.href = 'auth.html';
+      },
+      bind: ({ label, icon }) => {
+        const render = session => {
+          app.auth.setSession(session);
+          const loggedIn = app.auth.isLoggedIn;
+          label.textContent = loggedIn ? 'Uitloggen' : 'Inloggen';
+          icon.textContent = loggedIn ? '🚪' : '🔐';
+        };
+        render(app.auth.session);
+        const subscription = app.authSession.subscribe((_event, session) => render(session));
+        return () => subscription?.unsubscribe?.();
+      }
+    };
+    items.push(accountItem);
   }
 
   return items

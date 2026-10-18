@@ -48,7 +48,7 @@ export function buildStudentManagementCardModel({
     const agendaItems = buildAgendaViewModel(getAgendaItems(student), { student, today })
       .upcoming
       .filter(item => String(item.date).slice(0, 10) <= endKey)
-      .sort((a, b) => `${a.date}|${a.title || ''}`.localeCompare(`${b.date}|${a.title || ''}`, 'nl'));
+      .sort((a, b) => `${a.date}|${a.title || ''}`.localeCompare(`${b.date}|${b.title || ''}`, 'nl'));
 
     return {
       student,

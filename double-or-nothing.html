@@ -70,18 +70,17 @@
         items,
         gradeAnswer: (question, answer, value) => app.grading.gradeAnswer(question, answer, value)
       });
-      const storedRecord = recordStore.read(student, lessonId);
 
       function currentState() {
         const state = runtime.snapshot();
+        const storedRecord = recordStore.save(student, lessonId, state.score);
         return { ...state, bestScore: Math.max(storedRecord, state.bestScore) };
       }
 
       function renderState() {
         const state = currentState();
         if (state.phase === 'finished') {
-          recordStore.save(student, lessonId, state.score);
-          view.renderFinished({ ...state, bestScore: recordStore.read(student, lessonId) }, restart, goChoice);
+          view.renderFinished(state, restart, goChoice);
           return;
         }
         if (state.phase === 'result') {

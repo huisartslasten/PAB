@@ -19,7 +19,6 @@
     import { createLessonContextField } from './src/features/lessons/lesson-context-view.js';
     import { createDoubleOrNothingRuntime } from './src/features/lessons/double-or-nothing-runtime.js';
     import { createDoubleOrNothingView } from './src/features/lessons/double-or-nothing-view.js';
-    import { createDoubleOrNothingRecordStore } from './src/features/lessons/double-or-nothing-record.js';
     import { readViewContext, buildViewUrl } from './src/core/view-context.js';
     import { escapeHtml } from './src/core/html.js';
 
@@ -30,7 +29,6 @@
     const mount = document.querySelector('#paco-template-mount');
     const content = document.createElement('div');
     const app = createPacoGOApp({ supabaseLib: window.supabase });
-    const recordStore = createDoubleOrNothingRecordStore();
     const view = createDoubleOrNothingView({ documentRef: document, escapeHtml });
 
     const gameShell = document.createElement('main');
@@ -71,20 +69,39 @@
         gradeAnswer: (question, answer, value) => app.grading.gradeAnswer(question, answer, value)
       });
 
+      let highScore = await app.gameResults.getHighScore({
+        gameKey: 'double_or_nothing',
+        lessonId,
+        student
+      });
+
       function currentState() {
         const state = runtime.snapshot();
-        const storedRecord = recordStore.save(student, lessonId, state.score);
-        return { ...state, bestScore: Math.max(storedRecord, state.bestScore) };
+        return { ...state, bestScore: Math.max(highScore, state.bestScore) };
       }
 
-      function renderState() {
+      async function persistScore(score) {
+        const normalizedScore = Math.max(0, Math.floor(Number(score) || 0));
+        if (normalizedScore <= highScore) return;
+        await app.gameResults.saveResult({
+          gameKey: 'double_or_nothing',
+          lessonId,
+          student,
+          score: normalizedScore
+        });
+        highScore = normalizedScore;
+      }
+
+      async function renderState() {
         const state = currentState();
         if (state.phase === 'finished') {
-          view.renderFinished(state, restart, goChoice);
+          await persistScore(state.score);
+          view.renderFinished({ ...currentState(), bestScore: highScore }, restart, goChoice);
           return;
         }
         if (state.phase === 'result') {
-          view.renderResult(state, () => {
+          await persistScore(state.score);
+          view.renderResult({ ...currentState(), bestScore: highScore }, () => {
             runtime.continueGame();
             renderState();
           });
@@ -96,7 +113,8 @@
         }, async answer => {
           try {
             await runtime.submitAnswer(answer);
-            renderState();
+            await persistScore(runtime.snapshot().score);
+            await renderState();
           } catch (error) {
             const node = document.createElement('div');
             node.className = 'feedback error';

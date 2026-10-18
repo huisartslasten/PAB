@@ -48,13 +48,26 @@
     }
 
     const loggedInAsParent = Boolean(session && app.auth.isParent);
+
+    const logoutFromNavigation = async () => {
+      try {
+        await app.authSession.signOut();
+        app.auth.setSession(null);
+        window.location.href = 'auth.html';
+      } catch (error) {
+        content.prepend(message(error?.message || 'Uitloggen mislukt.', true));
+      }
+    };
+
     const navigation = loggedInAsParent
       ? createPacoNavigation({
           includeManagementDashboard: true,
           includeManagement: false,
           includeLessons: false,
           includeAgenda: false,
-          includeAccount: false
+          includeAccount: true,
+          accountLabel: 'Uitloggen',
+          onAccountClick: logoutFromNavigation
         })
       : [{ icon:'🏠', label:'Start', onClick:goStart }];
 
@@ -110,15 +123,7 @@
       logout.type = 'button';
       logout.className = 'secondary';
       logout.textContent = 'Uitloggen';
-      logout.onclick = async () => {
-        try {
-          await app.authSession.signOut();
-          app.auth.setSession(null);
-          window.location.href = 'auth.html';
-        } catch (error) {
-          content.prepend(message(error?.message || 'Uitloggen mislukt.', true));
-        }
-      };
+      logout.onclick = logoutFromNavigation;
       actions.append(management, logout);
       card.append(heading, text, actions);
       content.append(card);

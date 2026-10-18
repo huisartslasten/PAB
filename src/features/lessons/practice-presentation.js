@@ -199,8 +199,7 @@ export function createPracticePresentation({
     const type = entry?.runtime?.type || '';
     const fixed = result.evaluation?.fixedRules;
     const fixedHtml = fixed?.results?.length
-      ? `<div class="practice-rule-results"><strong>Vaste beoordelingsregels</strong><br>${fixed.results.map(rule => `${rule.ok ? '✓ ' : '✗ '}${escapeHtml(rule.text)}`).join('<br>')}
-</div>`
+      ? `<div class="practice-rule-results"><strong>Vaste beoordelingsregels</strong><br>${fixed.results.map(rule => `${rule.ok ? '✓ ' : '✗ '}${escapeHtml(rule.text)}`).join('<br>')}</div>`
       : '';
     const review = `<div class="practice-answer-review"><div class="practice-answer-review-title">Jouw antwoord:</div><div class="practice-answer-review-text">${escapeHtml(answer || '—')}</div>${fixedHtml}</div>`;
     const correctAnswer = correctAnswerHtml(item, type, escapeHtml);
@@ -306,7 +305,7 @@ export function createPracticePresentation({
     const item = entry.runtime.current;
     if (!item) return null;
     const language = String(getLesson()?.language || 'nl');
-    return audioService.speak(item.question, {
+    return audioService.speak(item.answer, {
       language,
       onStatus: status => {
         const statusElement = documentRef.getElementById('practiceVoiceStatus');

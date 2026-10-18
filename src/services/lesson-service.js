@@ -2,6 +2,8 @@
 // The TEST schema stores the lesson columns exposed below; item ordering belongs
 // to lesson_items and must never be sent to the lessons table.
 
+const RESPONSE_TYPES = new Set(['text', 'number', 'fraction', 'multiple_choice']);
+
 function normalizeLessonPayload(payload = {}) {
   return {
     student: payload.student ?? null,
@@ -14,19 +16,40 @@ function normalizeLessonPayload(payload = {}) {
   };
 }
 
+function normalizeParts(parts = [], fallback = '', defaultRole = 'answer') {
+  if (!Array.isArray(parts)) {
+    const values = String(fallback ?? '').split('\n').map(value => value.trim()).filter(Boolean);
+    return values.map(text => ({ text, role: defaultRole }));
+  }
+  return parts
+    .map(part => ({
+      text: String(part?.text ?? '').trim(),
+      role: part?.role === 'extra' ? 'extra' : 'answer'
+    }))
+    .filter(part => part.text);
+}
+
 function normalizeLessonItems(items = []) {
-  return (Array.isArray(items) ? items : []).map((item, index) => ({
-    question: String(item.question ?? ''),
-    answer: String(item.answer ?? ''),
-    hint: String(item.hint ?? ''),
-    response_type: ['text', 'number', 'fraction', 'multiple_choice'].includes(item.response_type)
-      ? item.response_type
-      : 'text',
-    answer_options: Array.isArray(item.answer_options)
+  return (Array.isArray(items) ? items : []).map((item, index) => {
+    const questionParts = normalizeParts(item.question_parts, item.question);
+    const answerParts = normalizeParts(item.answer_parts, item.answer);
+    const answer = String(item.answer ?? '').trim() || answerParts.filter(part => part.role === 'answer').map(part => part.text).join('\n');
+    const responseType = RESPONSE_TYPES.has(item.response_type) ? item.response_type : 'text';
+    const answerOptions = Array.isArray(item.answer_options)
       ? item.answer_options.map(option => String(option ?? '').trim()).filter(Boolean)
-      : [],
-    sort_order: Number(item.sort_order ?? index)
-  }));
+      : [];
+
+    return {
+      question: String(item.question ?? '').trim() || questionParts.map(part => part.text).join('\n'),
+      answer,
+      question_parts: questionParts,
+      answer_parts: answerParts,
+      hint: String(item.hint ?? ''),
+      response_type: responseType,
+      answer_options: answerOptions,
+      sort_order: Number(item.sort_order ?? index)
+    };
+  });
 }
 
 export function createLessonService(db) {
@@ -94,7 +117,6 @@ export function createLessonService(db) {
         if (error) throw error;
         return Object.freeze({ lesson, items: data || [] });
       } catch (error) {
-        // Lesson persistence owns the existing create -> item insert -> rollback sequence.
         await db.from('lessons').delete().eq('id', lesson.id);
         throw error;
       }

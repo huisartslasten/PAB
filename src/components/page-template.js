@@ -8,6 +8,7 @@
 
 const TEMPLATE_SCROLL_KEY = 'pacoGO:template-scroll';
 const TEMPLATE_SCROLL_CLEANUP_PROPERTY = '__pacoGOTemplateScrollCleanup';
+const TEMPLATE_SIDEBAR_SCROLL_CLEANUP_PROPERTY = '__pacoGOTemplateSidebarScrollCleanup';
 export const PACOGO_TEST_VERSION = 'V5.15';
 
 function installManualScrollRestoration(windowRef) {
@@ -18,6 +19,50 @@ function installManualScrollRestoration(windowRef) {
   return () => {
     windowRef.history.scrollRestoration = previous;
   };
+}
+
+export function installPacoTemplateSidebarScrollChaining({ navigationElement, windowRef = window, documentRef = document } = {}) {
+  if (!navigationElement) throw new Error('installPacoTemplateSidebarScrollChaining requires a navigation element');
+
+  const previousCleanup = windowRef[TEMPLATE_SIDEBAR_SCROLL_CLEANUP_PROPERTY];
+  if (typeof previousCleanup === 'function') previousCleanup();
+
+  const shouldTransfer = event => {
+    if (event.defaultPrevented || event.ctrlKey || event.deltaY === 0) return false;
+
+    const maxScrollTop = Math.max(0, navigationElement.scrollHeight - navigationElement.clientHeight);
+    const atTop = navigationElement.scrollTop <= 1;
+    const atBottom = navigationElement.scrollTop >= maxScrollTop - 1;
+    const scrollingDown = event.deltaY > 0;
+    const scrollingUp = event.deltaY < 0;
+
+    if ((scrollingDown && !atBottom) || (scrollingUp && !atTop)) return false;
+
+    const maxPageScroll = Math.max(0, documentRef.documentElement.scrollHeight - windowRef.innerHeight);
+    const pageScrollY = windowRef.scrollY || windowRef.pageYOffset || 0;
+    const pageCanScroll = scrollingDown ? pageScrollY < maxPageScroll - 1 : pageScrollY > 1;
+    if (!pageCanScroll) return false;
+
+    return true;
+  };
+
+  const onWheel = event => {
+    if (!shouldTransfer(event)) return;
+    event.preventDefault();
+    windowRef.scrollBy(0, event.deltaY);
+  };
+
+  navigationElement.addEventListener('wheel', onWheel, { passive: false });
+
+  const cleanup = () => {
+    navigationElement.removeEventListener('wheel', onWheel);
+    if (windowRef[TEMPLATE_SIDEBAR_SCROLL_CLEANUP_PROPERTY] === cleanup) {
+      delete windowRef[TEMPLATE_SIDEBAR_SCROLL_CLEANUP_PROPERTY];
+    }
+  };
+
+  windowRef[TEMPLATE_SIDEBAR_SCROLL_CLEANUP_PROPERTY] = cleanup;
+  return cleanup;
 }
 
 export function installPacoTemplateScrollMemory({ windowRef = window, documentRef = document } = {}) {
@@ -356,5 +401,6 @@ export function mountPacoPageTemplate({ mount, ...options } = {}) {
   const template = createPacoPageTemplate(options);
   mount.replaceChildren(template);
   installPacoTemplateScrollMemory();
+  installPacoTemplateSidebarScrollChaining({ navigationElement: template.querySelector('.paco-template-navigation') });
   return template;
 }

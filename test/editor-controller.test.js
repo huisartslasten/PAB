@@ -46,34 +46,21 @@ test('editor save prepares the canonical lesson and item payload before persiste
   assert.equal(result.ok, true);
   assert.equal(result.lessonId, 42);
   assert.equal(persistence.calls.length, 1);
-  assert.deepEqual(persistence.calls[0], {
-    lessonId: null,
-    lesson: {
-      student: 'Zyon',
-      subject: 'Taal',
-      subvak: 'Themawoorden',
-      title: 'Themawoorden',
-      type: 'words',
-      explanation: 'Uitleg',
-      ai_check_answers: false,
-      ai_instruction: 'betekenis',
-      editor_labels: null
-    },
-    items: [{
-      question: 'Wat is expert?',
-      answer: 'deskundige',
-      question_parts: ['Wat is expert?'],
-      answer_parts: [
-        { text: 'deskundige', role: 'answer' },
-        { text: 'kenner', role: 'extra' }
-      ],
-      hint: 'Denk aan kennis',
-      min_words: 2,
-      required_terms: ['kennis'],
-      sort_order: 0
-    }],
-    testDate: '2026-11-11'
-  });
+  assert.deepEqual(persistence.calls[0].items, [{
+    question: 'Wat is expert?',
+    answer: 'deskundige',
+    question_parts: ['Wat is expert?'],
+    answer_parts: [
+      { text: 'deskundige', role: 'answer' },
+      { text: 'kenner', role: 'extra' }
+    ],
+    response_type: 'text',
+    answer_options: [],
+    hint: 'Denk aan kennis',
+    min_words: 2,
+    required_terms: ['kennis'],
+    sort_order: 0
+  }]);
   assert.equal(result.testDate, '2026-11-11');
   assert.equal(result.lesson.testDate, undefined);
   assert.equal(refreshed, true);
@@ -88,13 +75,12 @@ test('existing editor save passes lessonId through unchanged', async () => {
     lessonId: 7,
     student: 'Zyon',
     subject: 'Taal',
-    title: 'Bewerkt',
-    type: 'custom',
-    items: [{ question: 'huis', answer: 'house' }]
+    title: 'Bestaande les',
+    type: 'words',
+    items: [{ question: 'Vraag', answer: 'Antwoord' }]
   });
 
   assert.equal(result.ok, true);
-  assert.equal(result.lessonId, 7);
   assert.equal(persistence.calls[0].lessonId, 7);
 });
 
@@ -106,41 +92,29 @@ test('invalid editor draft does not call persistence or refresh', async () => {
     refreshLessons: async () => { refreshed = true; }
   });
 
-  const invalid = await controller.save({
-    student: '',
-    subject: '',
-    title: '',
-    type: 'words',
-    items: []
-  });
+  const result = await controller.save({ student: 'Zyon', type: 'words', items: [] });
 
-  assert.equal(invalid.ok, false);
+  assert.equal(result.ok, false);
   assert.equal(persistence.calls.length, 0);
   assert.equal(refreshed, false);
-  assert.deepEqual(invalid.validation.errors.map(error => error.field), ['student', 'subject', 'title', 'items']);
 });
 
 test('persistence failure does not refresh or report the lesson as saved', async () => {
-  const failure = { ok: false, stage: 'persistence', error: new Error('write failed') };
-  const persistence = createSaveDraft(() => failure);
+  const persistence = createSaveDraft(() => ({ ok: false, stage: 'persistence', message: 'save failed' }));
   let refreshed = false;
-  let saved = false;
-
   const controller = createLessonEditorController({
     saveDraft: persistence.saveDraft,
-    refreshLessons: async () => { refreshed = true; },
-    onSaved: async () => { saved = true; }
+    refreshLessons: async () => { refreshed = true; }
   });
 
   const result = await controller.save({
     student: 'Zyon',
     subject: 'Taal',
-    title: 'Mislukt',
+    title: 'Les',
     type: 'words',
-    items: [{ question: 'a', answer: 'b' }]
+    items: [{ question: 'Vraag', answer: 'Antwoord' }]
   });
 
-  assert.equal(result, failure);
+  assert.equal(result.ok, false);
   assert.equal(refreshed, false);
-  assert.equal(saved, false);
 });

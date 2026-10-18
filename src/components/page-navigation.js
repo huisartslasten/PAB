@@ -12,6 +12,17 @@ function go(path, { student = '', mode = 'student' } = {}) {
   window.location.href = target.toString();
 }
 
+export function createPacoAuthenticatedAccount(app) {
+  return {
+    accountLabel: 'Uitloggen',
+    onAccountClick: async () => {
+      await app.authSession.signOut();
+      app.auth.setSession(null);
+      window.location.href = 'auth.html';
+    }
+  };
+}
+
 export function createPacoNavigation({
   active = '',
   activeSubmenu = '',

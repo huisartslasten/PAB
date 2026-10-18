@@ -21,6 +21,6 @@
 .memory-finished-icon{font-size:54px}
 .memory-finished h2{margin:8px 0 0;color:#102b57;font:800 28px/1 "Baloo 2",Nunito,sans-serif}
 .memory-finished p{color:#667894}
-.memory-primary-button{margin-top:0;border:0;border-radius:14px;background:#126fc9;color:#fff;padding:10px 18px;font-weight:900;cursor:pointer}
+.memory-primary-button{min-width:180px;margin-top:0;border:0;border-radius:14px;background:#126fc9;color:#fff;padding:10px 18px;font-weight:900;cursor:pointer}
 .memory-resolve-button{white-space:nowrap}
 @media(max-width:700px){.memory-header{align-items:flex-start;flex-direction:column}.memory-controls{grid-template-columns:1fr;align-items:stretch;gap:10px}.memory-timing-control{justify-self:stretch;flex-wrap:wrap}.memory-timing-dropdown{width:100%;flex:1 1 180px}.memory-center-control{justify-content:flex-start;min-width:0}.memory-turns{justify-self:start}.memory-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}

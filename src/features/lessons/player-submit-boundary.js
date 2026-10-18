@@ -11,7 +11,14 @@ export function createPlayerSubmitBoundary({
   }
   if (!documentRef) throw new Error('A document is required.');
 
-  async function submitTest({ type = 'words' } = {}) {
+  async function submitTest({ type = 'words', item = null } = {}) {
+    if (item?.response_type === 'multiple_choice') {
+      const content = documentRef.getElementById('testContent');
+      const value = content?.dataset?.selectedAnswer || '';
+      if (!value) return null;
+      return adapter.submitAnswer(value);
+    }
+
     const spellingMode = type === 'spelling';
     const input = spellingMode
       ? documentRef.getElementById('testPerfect')

@@ -70,7 +70,44 @@ test('lesson audio reports when the speech function invocation rejects', async (
   ]);
 });
 
-test('lesson audio reports when browser playback is blocked', async () => {
+test('lesson audio keeps blocked playback available for a user retry', async () => {
+  const statuses = [];
+  let playCount = 0;
+  const db = {
+    functions: {
+      invoke: async () => ({ data: new Blob(['mp3-bytes'], { type: 'application/octet-stream' }), error: null })
+    }
+  };
+  const URLRef = {
+    createObjectURL: () => 'blob:test',
+    revokeObjectURL: () => {}
+  };
+  const AudioCtor = function Audio() {
+    this.play = async () => {
+      playCount += 1;
+      if (playCount === 1) {
+        const error = new Error('autoplay blocked');
+        error.name = 'NotAllowedError';
+        throw error;
+      }
+    };
+    this.pause = () => {};
+  };
+
+  const service = createLessonAudioService(db, { AudioCtor, URLRef });
+
+  await service.speak('huis', { onStatus: status => statuses.push(status) });
+  await service.speak('huis', { onStatus: status => statuses.push(status) });
+
+  assert.equal(playCount, 2);
+  assert.deepEqual(statuses, [
+    '🔄 AI-stem maken...',
+    '🔊 Klik op Nog een keer om de stem af te spelen.',
+    'AI-stem speelt.'
+  ]);
+});
+
+test('lesson audio reports unexpected browser playback errors', async () => {
   const statuses = [];
   const db = {
     functions: {
@@ -82,14 +119,14 @@ test('lesson audio reports when browser playback is blocked', async () => {
     revokeObjectURL: () => {}
   };
   const AudioCtor = function Audio() {
-    this.play = async () => { throw new Error('autoplay blocked'); };
+    this.play = async () => { throw new Error('decode failed'); };
     this.pause = () => {};
   };
 
   const service = createLessonAudioService(db, { AudioCtor, URLRef });
   await assert.rejects(
     service.speak('huis', { onStatus: status => statuses.push(status) }),
-    /autoplay blocked/
+    /decode failed/
   );
-  assert.equal(statuses.at(-1), '🔊 Klik op Nog een keer om de stem af te spelen.');
+  assert.equal(statuses.at(-1), '⚠️ AI-stem kon niet worden afgespeeld.');
 });

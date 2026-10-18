@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PacoGO — Flashcards</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -29,59 +29,44 @@
   <div id="paco-template-mount"></div>
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
+    import { createPacoNavigation } from './src/components/page-navigation.js';
+    import { createPacoGOApp } from './src/app/bootstrap.js';
     import { mountFlashcardPractice } from './src/features/practice/flashcards/flashcard-runtime.js';
+    import { readViewContext, buildViewUrl } from './src/core/view-context.js';
 
     const params = new URLSearchParams(window.location.search);
-    const lessonId = params.get('lesson_id');
-    const student = params.get('student') || 'Zyon';
+    const context = readViewContext(params);
+    const lessonId = params.get('lesson_id') || '';
+    const student = context.student;
     const mount = document.querySelector('#paco-template-mount');
     const content = document.createElement('div');
-    const goDashboard = () => {
-      const target = new URL('dashboard.html', window.location.href);
-      target.searchParams.set('student', student);
-      window.location.href = target.toString();
-    };
-    const goAgenda = () => {
-      const target = new URL('index.html', window.location.href);
-      target.searchParams.set('view', 'agenda');
-      target.searchParams.set('student', student);
-      window.location.href = target.toString();
-    };
+    const app = createPacoGOApp({ supabaseLib: window.supabase });
+
     const goLessons = () => {
-      const target = new URL('lessons.html', window.location.href);
-      target.searchParams.set('student', student);
-      window.location.href = target.toString();
+      window.location.href = buildViewUrl('lessons.html', { student, mode: context.mode }).toString();
     };
 
     mountPacoPageTemplate({
       mount,
       backLabel:'← Oefenen',
       backAction:() => {
-        const target = new URL('oefenen.html', window.location.href);
+        const target = buildViewUrl('oefenen.html', { student, mode: context.mode });
         if (lessonId) target.searchParams.set('lesson_id', lessonId);
-        target.searchParams.set('student', student);
         window.location.href = target.toString();
       },
       greeting:`Hoi ${student}! 🐶`,
       title:'Flashcards',
       icon:'🃏',
       subtitle:'Vraag → antwoord. Druk op Enter om verder te gaan.',
-      navigation:[
-        { icon:'🏠', label:'Dashboard', onClick:goDashboard },
-        { icon:'📚', label:'Mijn lessen', onClick:goLessons },
-        { icon:'✏️', label:'Oefenen', onClick:()=>{
-          const target=new URL('oefenen.html',window.location.href);
-          if(lessonId) target.searchParams.set('lesson_id',lessonId);
-          target.searchParams.set('student',student);
-          window.location.href=target.toString();
-        } },
-        { icon:'📅', label:'Mijn agenda', onClick:goAgenda },
-        { icon:'🃏', label:'Flashcards', active:true }
-      ],
+      navigation:createPacoNavigation({ app, active:'lessons', student, viewMode:context.mode }),
       content
     });
 
-    mountFlashcardPractice({ mount:content, lessonId, student });
+    if (!lessonId || !student) {
+      content.textContent = 'Geen leerling of les geselecteerd.';
+    } else {
+      mountFlashcardPractice({ mount:content, lessonId, student });
+    }
   </script>
 </body>
 </html>

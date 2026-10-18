@@ -1,4 +1,3 @@
-import { createPacoGOApp } from '../../../app/bootstrap.js';
 import { isPracticeModeActive } from '../practice-domain.js';
 import { createLessonContextField } from '../../lessons/lesson-context-view.js';
 import {
@@ -12,12 +11,13 @@ import {
 
 export async function mountFlashcardPractice({
   mount,
+  app,
   lessonId,
   student = 'Zyon'
 } = {}) {
   if (!(mount instanceof HTMLElement)) throw new TypeError('A flashcard mount is required.');
+  if (!app?.loadLessons || !app?.mapLessons) throw new TypeError('A PacoGO application context is required.');
 
-  const app = createPacoGOApp({ supabaseLib: window.supabase });
   const content = document.createElement('div');
   content.className = 'flashcard-practice-content';
   mount.replaceChildren(content);

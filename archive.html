@@ -10,7 +10,7 @@
   <div id="paco-template-mount"></div>
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
-    import { createPacoNavigation } from './src/components/page-navigation.js';
+    import { createPacoNavigation, createPacoAuthenticatedAccount } from './src/components/page-navigation.js';
     import { confirmPacoAction } from './src/components/confirm-dialog.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
     import { renderRecovery } from './src/features/management/management-view.js';
@@ -22,6 +22,8 @@
     state.className='management-state';
     state.textContent='Archief laden…';
     content.appendChild(state);
+    const app=createPacoGOApp({supabaseLib:window.supabase});
+    const accountNavigation=createPacoAuthenticatedAccount(app);
 
     mountPacoPageTemplate({
       mount,
@@ -35,12 +37,12 @@
         active:'recovery',
         includeManagement:true,
         includeManagementTools:true,
-        includeCreator:true
+        includeCreator:true,
+        ...accountNavigation
       }),
       content
     });
 
-    const app=createPacoGOApp({supabaseLib:window.supabase});
     const management=app.management;
     const notice=document.createElement('div');
     notice.className='management-state';

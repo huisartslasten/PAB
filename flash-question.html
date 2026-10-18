@@ -76,6 +76,21 @@
       });
       highScore = highScore == null ? 0 : highScore;
 
+      let timingMode = 'manual';
+      let timerId = null;
+      let timerIntervalId = null;
+
+      function clearQuestionTimer() {
+        if (timerId !== null) {
+          window.clearTimeout(timerId);
+          timerId = null;
+        }
+        if (timerIntervalId !== null) {
+          window.clearInterval(timerIntervalId);
+          timerIntervalId = null;
+        }
+      }
+
       async function persistScore(score) {
         const normalizedScore = Math.max(0, Math.floor(Number(score) || 0));
         if (normalizedScore <= highScore) return;
@@ -88,8 +103,9 @@
         highScore = normalizedScore;
       }
 
-      function renderState() {
+      function renderState({ remainingSeconds = null } = {}) {
         const state = runtime.snapshot();
+        clearQuestionTimer();
         if (state.phase === 'finished') {
           return persistScore(state.score).then(() => {
             view.renderFinished(state, highScore, restart, goGames);
@@ -102,14 +118,44 @@
           });
           return Promise.resolve();
         }
+
         view.renderQuestion(state, answer => {
+          clearQuestionTimer();
           runtime.submitAnswer(answer);
           renderState();
-        }, highScore);
+        }, highScore, {
+          timingMode,
+          remainingSeconds,
+          onTimingModeChange: nextValue => {
+            timingMode = nextValue;
+            renderState();
+          }
+        });
+
+        if (timingMode !== 'manual') {
+          let secondsLeft = Number(timingMode);
+          const updateTimer = () => {
+            const timer = document.querySelector('.flash-timer');
+            if (timer) timer.textContent = `${secondsLeft} ${secondsLeft === 1 ? 'seconde' : 'seconden'}`;
+          };
+          updateTimer();
+          timerIntervalId = window.setInterval(() => {
+            secondsLeft -= 1;
+            if (secondsLeft > 0) {
+              updateTimer();
+            }
+          }, 1000);
+          timerId = window.setTimeout(() => {
+            clearQuestionTimer();
+            runtime.submitAnswer('');
+            renderState();
+          }, secondsLeft * 1000);
+        }
         return Promise.resolve();
       }
 
       function restart() {
+        clearQuestionTimer();
         runtime.start();
         renderState();
       }

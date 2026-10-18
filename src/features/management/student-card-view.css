@@ -17,7 +17,8 @@
 
 .management-student-name,
 .management-student-open,
-.management-student-action {
+.management-student-action,
+.management-student-agenda-link {
   border: 0;
   cursor: pointer;
   font-family: "Baloo 2", Nunito, sans-serif;
@@ -87,7 +88,9 @@
   color: var(--paco-blue-dark);
 }
 
-.management-student-section-link:focus-visible {
+.management-student-section-link:focus-visible,
+.management-student-agenda-link:focus-visible,
+.management-student-calendar-action:focus-visible {
   outline: 3px solid #1787f2;
   outline-offset: 3px;
   border-radius: 8px;
@@ -129,6 +132,31 @@
   font-weight: 700;
 }
 
+.management-student-agenda-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.management-student-agenda-link {
+  min-width: 0;
+  flex: 1;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.management-student-agenda-link:hover .management-student-section-label {
+  color: var(--paco-blue-dark);
+}
+
+.management-student-calendar-action {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
 .management-agenda-preview {
   display: grid;
   gap: 6px;
@@ -156,6 +184,11 @@
 
 @media (max-width: 700px) {
   .management-student-card-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .management-student-agenda-head {
     align-items: flex-start;
     flex-direction: column;
   }

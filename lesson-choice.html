@@ -54,7 +54,7 @@
       content
     });
 
-    const targets = { practice: 'oefenen.html', test: 'test.html', view: 'lesson-view.html', questions: 'questions.html' };
+    const targets = { practice: 'oefenen.html', test: 'test.html', double: 'double-or-nothing.html', view: 'lesson-view.html', questions: 'questions.html' };
 
     function navigateToChoice(lesson, choice) {
       const target = getLessonChoiceTarget(lesson, choice.id);
@@ -71,10 +71,11 @@
       const field = createLessonContextField(lesson);
       const grid = document.createElement('div');
       grid.className = 'choice-grid';
-      const icons = { practice: '✏️', test: '📝', view: '👀', questions: '❓' };
+      const icons = { practice: '✏️', test: '📝', double: '🦴', view: '👀', questions: '❓' };
       const descriptions = {
         practice: 'Ga naar de oefenpagina en kies een oefenvorm.',
         test: 'Maak alle vragen van de toets en bekijk daarna je resultaat.',
+        double: 'Waag botjes, verdien ze erbij en probeer je record te verbreken.',
         view: 'Bekijk de uitleg, vragen en antwoorden van deze les.',
         questions: 'Beantwoord de vragen zelf en vergelijk daarna met het voorbeeldantwoord.'
       };
@@ -82,7 +83,7 @@
       getLessonChoiceCards(lesson).forEach(choice => {
         const card = document.createElement('button');
         card.type = 'button';
-        card.className = `choice-card${choice.id === 'practice' ? ' available' : ''}`;
+        card.className = `choice-card${choice.id === 'practice' || choice.id === 'double' ? ' available' : ''}`;
         card.innerHTML = `<div><div class="choice-icon">${icons[choice.id] || '📘'}</div><h2>${choice.label}</h2><p>${descriptions[choice.id] || ''}</p></div><div class="choice-action">Openen →</div>`;
         card.addEventListener('click', () => navigateToChoice(lesson, choice));
         grid.appendChild(card);

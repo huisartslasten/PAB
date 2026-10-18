@@ -12,6 +12,8 @@ function fakeDocument() {
       value: '',
       classList: { add() {}, remove() {}, toggle() {} },
       focus() {},
+      querySelector() { return null; },
+      querySelectorAll() { return []; },
       insertAdjacentElement(position, child) {
         this.lastInserted = child;
         this.lastInsertPosition = position;

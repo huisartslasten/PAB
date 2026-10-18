@@ -41,9 +41,17 @@ export function createLearningContentService(db, { media = null, canManage = () 
   async function replaceForLesson(lessonId, cards = []) {
     if (!canManage()) throw new Error('Log eerst in als ouder.');
     if (!lessonId) throw new Error('Geen les geselecteerd.');
+    const lessonKey = Number(lessonId);
+    const existing = await db.from('lesson_learning_cards')
+      .select('id')
+      .eq('lesson_id', lessonKey);
+    if (existing.error) throw existing.error;
+    const existingIds = new Set((existing.data || []).map(row => Number(row.id)));
+
     const rows = (Array.isArray(cards) ? cards : [])
       .map((card, index) => ({
-        lesson_id: Number(lessonId),
+        ...(card?.id && existingIds.has(Number(card.id)) ? { id: Number(card.id) } : {}),
+        lesson_id: lessonKey,
         title: String(card?.title ?? '').trim(),
         content: normalizeHtml(card?.content ?? ''),
         image_id: card?.image_id ? Number(card.image_id) : null,
@@ -51,18 +59,19 @@ export function createLearningContentService(db, { media = null, canManage = () 
       }))
       .filter(card => card.title || card.content || card.image_id != null);
 
-    const existing = await db.from('lesson_learning_cards')
-      .select('id,image_id')
-      .eq('lesson_id', Number(lessonId));
-    if (existing.error) throw existing.error;
+    if (rows.length) {
+      const saved = await db.from('lesson_learning_cards').upsert(rows).select(CARD_SELECT);
+      if (saved.error) throw saved.error;
+    }
 
-    const removed = await db.from('lesson_learning_cards').delete().eq('lesson_id', Number(lessonId));
-    if (removed.error) throw removed.error;
-    if (!rows.length) return [];
+    const keptIds = new Set(rows.map(row => Number(row.id)).filter(Boolean));
+    const removedIds = [...existingIds].filter(id => !keptIds.has(id));
+    if (removedIds.length) {
+      const removed = await db.from('lesson_learning_cards').delete().in('id', removedIds).eq('lesson_id', lessonKey);
+      if (removed.error) throw removed.error;
+    }
 
-    const inserted = await db.from('lesson_learning_cards').insert(rows).select(CARD_SELECT);
-    if (inserted.error) throw inserted.error;
-    return inserted.data || [];
+    return listForLesson(lessonKey);
   }
 
   async function uploadCardImage(lessonId, file) {

@@ -1,3 +1,5 @@
+import { listStudents } from '../features/students/students.js';
+
 /**
  * PacoGO shared shell navigation.
  *
@@ -42,13 +44,17 @@ export function createPacoNavigation({
   requireNavigationApp(app, includeAccount);
 
   const view = { student, mode: viewMode };
+  const isManagementView = viewMode === 'management';
+  const showManagementLearnerBar = isManagementView || includeManagementStudentSelector;
+  const showManagementDashboard = isManagementView || includeManagementDashboard;
+  const learners = managementStudents.length ? managementStudents : listStudents();
   const items = [];
 
-  if (includeManagementStudentSelector) {
+  if (showManagementLearnerBar) {
     items.push({
       key: 'management-student',
       label: 'LEERLING',
-      submenu: managementStudents.map(name => ({
+      submenu: learners.map(name => ({
         key: `management-student-${name}`,
         label: name,
         active: name === student,
@@ -63,7 +69,7 @@ export function createPacoNavigation({
     });
   }
 
-  if (includeManagementDashboard) {
+  if (showManagementDashboard) {
     items.push({
       key: 'management-dashboard',
       icon: '🏠',
@@ -72,33 +78,31 @@ export function createPacoNavigation({
     });
   }
 
-  if (!includeManagementStudentSelector && !includeManagementDashboard) {
+  if (!showManagementLearnerBar && !showManagementDashboard) {
     items.push({ key: 'dashboard', icon: '🏠', label: 'Dashboard', onClick: () => go('dashboard.html', view) });
   }
 
-  const includeStudentNavigation = true;
-
-  if (includeLessons && includeStudentNavigation) {
+  if (includeLessons) {
     items.push({
       key: 'lessons',
       icon: '📚',
-      label: viewMode === 'management' ? 'Lessen beheren' : 'Mijn lessen',
+      label: isManagementView ? 'Lessen beheren' : 'Mijn lessen',
       onClick: () => go('lessons.html', view)
     });
   }
 
-  if (includePractice && includeStudentNavigation && viewMode !== 'management') {
+  if (includePractice && !isManagementView) {
     items.push({ key: 'practice', icon: '✏️', label: 'Oefenen', onClick: () => go('oefenen.html', view) });
   }
 
-  if (includeAgenda && includeStudentNavigation) {
+  if (includeAgenda) {
     items.push({
       key: 'agenda',
       icon: '📅',
-      label: viewMode === 'management' ? 'Agenda beheren' : 'Mijn agenda',
+      label: isManagementView ? 'Agenda beheren' : 'Mijn agenda',
       onClick: () => go('agenda.html', view),
       submenu: [
-        { key: 'agenda', label: viewMode === 'management' ? 'Agenda beheren' : 'Agenda invoeren', active: activeSubmenu === 'agenda', onClick: () => go('agenda.html', view) },
+        { key: 'agenda', label: isManagementView ? 'Agenda beheren' : 'Agenda invoeren', active: activeSubmenu === 'agenda', onClick: () => go('agenda.html', view) },
         { key: 'month-calendar', label: 'Maandkalender', active: activeSubmenu === 'month-calendar', onClick: () => go('month-calendar.html', view) }
       ]
     });
@@ -106,7 +110,7 @@ export function createPacoNavigation({
 
   items.push({ key: 'test-history', icon: '📝', label: 'Toetsen', onClick: () => go('test-history.html', view) });
 
-  if (includeManagement) items.push({ key: 'management', icon: '⚙️', label: 'Beheer', onClick: () => go('management.html', view) });
+  if (includeManagement && !isManagementView) items.push({ key: 'management', icon: '⚙️', label: 'Beheer', onClick: () => go('management.html', view) });
   if (includeManagementTools) {
     items.push({ key: 'recovery', icon: '🗂️', label: 'Archief / Prullenbak', onClick: () => go('archive.html', view) });
     items.push({ key: 'feedback', icon: '💬', label: 'Feedback', onClick: () => go('feedback.html', view) });

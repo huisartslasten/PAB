@@ -64,26 +64,37 @@ export function createDoubleOrNothingRuntime({ items = [], gradeAnswer } = {}) {
     if (index > 0 && stake == null) throw new Error('Kies eerst hoeveel botjes je waagt.');
 
     const item = questions[index];
-    const result = await gradeAnswer(item.question, item.answer, userAnswer);
-    const usedStake = index === 0 ? FIRST_REWARD : stake;
-    const previousScore = score;
-    const delta = result.correct ? usedStake : -usedStake;
-    score = Math.max(0, score + delta);
-    bestScore = Math.max(bestScore, score);
-    lastResult = Object.freeze({
-      correct: result.correct === true,
-      feedback: result.feedback || '',
-      expectedAnswer: item.answer,
-      givenAnswer: userAnswer,
-      stake: usedStake,
-      previousScore,
-      score,
-      delta
-    });
-    index += 1;
-    stake = null;
-    phase = index >= questions.length ? 'finished' : 'result';
-    return snapshot();
+    const usedStake = index === 0 ? FIRST_REWARD : Number(stake);
+    if (!Number.isFinite(usedStake) || usedStake < 0) throw new Error('De inzet is ongeldig.');
+
+    // Lock the question before awaiting the grader. This is the domain-level
+    // guard against duplicate clicks and concurrent submissions.
+    phase = 'checking';
+
+    try {
+      const result = await gradeAnswer(item.question, item.answer, userAnswer);
+      const previousScore = score;
+      const delta = result.correct === true ? usedStake : -usedStake;
+      score = Math.max(0, score + delta);
+      bestScore = Math.max(bestScore, score);
+      lastResult = Object.freeze({
+        correct: result.correct === true,
+        feedback: result.feedback || '',
+        expectedAnswer: item.answer,
+        givenAnswer: userAnswer,
+        stake: usedStake,
+        previousScore,
+        score,
+        delta
+      });
+      index += 1;
+      stake = null;
+      phase = index >= questions.length ? 'finished' : 'result';
+      return snapshot();
+    } catch (error) {
+      phase = 'question';
+      throw error;
+    }
   }
 
   function continueGame() {

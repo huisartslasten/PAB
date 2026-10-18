@@ -3,20 +3,24 @@ import assert from 'node:assert/strict';
 import { getPracticeMode, getPracticeModes, getActivePracticeModes, isPracticeModeActive } from '../src/features/practice/practice-domain.js';
 import { createFlashcardSession, getCurrentFlashcard, nextFlashcard, revealFlashcard } from '../src/features/practice/flashcards/flashcard-domain.js';
 
-test('practice structure exposes Flashcards as the first active mode and Games as planned', () => {
+test('practice structure exposes the canonical active practice modes', () => {
   assert.deepEqual(getPracticeModes(), [
     { id: 'flashcards', label: 'Flashcards', status: 'active' },
-    { id: 'games', label: 'Spelletjes', status: 'planned' }
+    { id: 'practice-test', label: 'Oefentoets', status: 'active' },
+    { id: 'games', label: 'Spelletjes', status: 'active' }
   ]);
   assert.deepEqual(getActivePracticeModes(), [
-    { id: 'flashcards', label: 'Flashcards', status: 'active' }
+    { id: 'flashcards', label: 'Flashcards', status: 'active' },
+    { id: 'practice-test', label: 'Oefentoets', status: 'active' },
+    { id: 'games', label: 'Spelletjes', status: 'active' }
   ]);
   assert.equal(isPracticeModeActive('flashcards'), true);
-  assert.equal(isPracticeModeActive('games'), false);
+  assert.equal(isPracticeModeActive('practice-test'), true);
+  assert.equal(isPracticeModeActive('games'), true);
   assert.deepEqual(getPracticeMode('games'), {
     id: 'games',
     label: 'Spelletjes',
-    status: 'planned'
+    status: 'active'
   });
 });
 
@@ -29,6 +33,8 @@ test('flashcard session starts with the question hidden answer', () => {
   assert.deepEqual(getCurrentFlashcard(session), {
     prompt: '7 × 8',
     answer: '56',
+    hint: '',
+    hintRevealed: false,
     revealed: false,
     index: 0,
     total: 2
@@ -48,6 +54,8 @@ test('flashcard reveal then next resets the revealed state', () => {
   assert.deepEqual(getCurrentFlashcard(next), {
     prompt: '6 × 9',
     answer: '54',
+    hint: '',
+    hintRevealed: false,
     revealed: false,
     index: 1,
     total: 2
@@ -63,6 +71,8 @@ test('reverse mode shows the answer first', () => {
   assert.deepEqual(getCurrentFlashcard(session), {
     prompt: '7 × 8',
     answer: 'Wat is 56?',
+    hint: '',
+    hintRevealed: false,
     revealed: false,
     index: 0,
     total: 1

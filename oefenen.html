@@ -17,9 +17,6 @@
     .practice-mode-card h2{margin:0;color:#102b57;font:800 24px/1 "Baloo 2",Nunito,sans-serif}
     .practice-mode-card p{margin:8px 0 0;color:#667894;line-height:1.4}
     .practice-mode-action{margin-top:15px;font-size:12px;font-weight:900;color:#126fc9}
-    .practice-mode-card.planned{cursor:default;opacity:.68}
-    .practice-mode-card.planned:hover{transform:none;box-shadow:0 7px 20px rgba(16,43,87,.07)}
-    .practice-mode-card.planned .practice-mode-action{color:#667894}
     .practice-state{padding:16px 18px;border:1px solid #dce9f6;border-radius:18px;background:#fff;color:#667894}
     @media(max-width:700px){.practice-mode-grid{grid-template-columns:1fr}}
   </style>
@@ -41,7 +38,7 @@
     const mount = document.querySelector('#paco-template-mount');
     const content = document.createElement('div');
     const app = createPacoGOApp({ supabaseLib: window.supabase });
-    const targetPaths = { flashcards: 'flashcards-template.html', 'practice-test': 'oefentoets.html' };
+    const targetPaths = { flashcards: 'flashcards-template.html', 'practice-test': 'oefentoets.html', games: 'games.html' };
     const modeMeta = {
       flashcards: { icon: '🃏', description: 'Oefen met vraag en antwoord en draai de kaart om als je klaar bent.' },
       'practice-test': { icon: '📝', description: 'Maak een oefentoets met alle vragen van deze les.' },
@@ -91,7 +88,7 @@
         const active = mode.status === 'active';
         const card = document.createElement('button');
         card.type = 'button';
-        card.className = `practice-mode-card${active ? ' active' : ' planned'}`;
+        card.className = `practice-mode-card${active ? ' active' : ''}`;
         card.disabled = !active;
         const meta = modeMeta[mode.id] || { icon: '📘', description: '' };
         card.innerHTML = `<div><div class="practice-mode-icon">${meta.icon}</div><h2>${mode.label}</h2><p>${meta.description}</p></div><div class="practice-mode-action">${active ? 'Openen →' : 'Binnenkort beschikbaar'}</div>`;

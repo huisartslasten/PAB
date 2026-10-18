@@ -8,6 +8,11 @@ import {
 
 export function createAuthState(session = null) {
   let currentSession = session;
+  const listeners = new Set();
+
+  function notify() {
+    listeners.forEach(listener => listener(currentSession));
+  }
 
   return Object.freeze({
     get session() {
@@ -24,7 +29,19 @@ export function createAuthState(session = null) {
     },
     setSession(nextSession) {
       currentSession = nextSession || null;
+      notify();
       return currentSession;
+    },
+    subscribe(listener) {
+      if (typeof listener !== 'function') {
+        throw new Error('Auth state listener is required.');
+      }
+      listeners.add(listener);
+      return {
+        unsubscribe() {
+          listeners.delete(listener);
+        }
+      };
     }
   });
 }

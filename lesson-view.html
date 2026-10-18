@@ -18,18 +18,19 @@
     import { createPacoGOApp } from './src/app/bootstrap.js';
     import { getLessonExplanation, getLessonViewItems } from './src/features/lessons/view-model.js';
     import { escapeHtml } from './src/core/html.js';
+    import { readViewContext, applyViewContext, buildViewUrl } from './src/core/view-context.js';
 
     const params = new URLSearchParams(window.location.search);
+    const context = readViewContext(params);
     const lessonId = params.get('lesson_id') || '';
-    const student = params.get('student') || 'Zyon';
+    const student = context.student;
     const mount = document.querySelector('#paco-template-mount');
     const content = document.createElement('div');
     const app = createPacoGOApp({ supabaseLib: window.supabase });
 
     const goChoice = () => {
-      const target = new URL('lesson-choice.html', window.location.href);
+      const target = buildViewUrl('lesson-choice.html', { student, mode: context.mode });
       if (lessonId) target.searchParams.set('lesson_id', lessonId);
-      target.searchParams.set('student', student);
       window.location.href = target.toString();
     };
 
@@ -41,7 +42,7 @@
       title:'Les bekijken',
       icon:'👀',
       subtitle:'Bekijk de inhoud van deze les.',
-      navigation:createPacoNavigation({app,active:'lessons',student}),
+      navigation:createPacoNavigation({app,active:'lessons',student,viewMode:context.mode}),
       content
     });
 
@@ -76,6 +77,10 @@
 
     try {
       if (!lessonId) throw new Error('Geen les geselecteerd.');
+      if (!student) throw new Error('Geen leerling geselecteerd.');
+      await app.initializeSession();
+      if (context.isManagement) applyViewContext(context, { canManage: app.auth.isParent });
+      else applyViewContext(context);
       const records = await app.loadLessons();
       const lesson = app.mapLessons(records).find(item => String(item.id) === String(lessonId));
       if (!lesson) throw new Error('Deze les kon niet worden gevonden.');

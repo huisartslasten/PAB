@@ -19,6 +19,12 @@ function normalizeLessonItems(items = []) {
     question: String(item.question ?? ''),
     answer: String(item.answer ?? ''),
     hint: String(item.hint ?? ''),
+    response_type: ['text', 'number', 'fraction', 'multiple_choice'].includes(item.response_type)
+      ? item.response_type
+      : 'text',
+    answer_options: Array.isArray(item.answer_options)
+      ? item.answer_options.map(option => String(option ?? '').trim()).filter(Boolean)
+      : [],
     sort_order: Number(item.sort_order ?? index)
   }));
 }

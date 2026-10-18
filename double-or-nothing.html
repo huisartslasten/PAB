@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PacoGO — Double or Nothing</title>
   <link rel="stylesheet" href="src/components/page-template.css">
@@ -100,7 +100,6 @@
           return;
         }
         if (state.phase === 'result') {
-          await persistScore(state.score);
           view.renderResult({ ...currentState(), bestScore: highScore }, () => {
             runtime.continueGame();
             renderState();
@@ -113,7 +112,6 @@
         }, async answer => {
           try {
             await runtime.submitAnswer(answer);
-            await persistScore(runtime.snapshot().score);
             await renderState();
           } catch (error) {
             const node = document.createElement('div');

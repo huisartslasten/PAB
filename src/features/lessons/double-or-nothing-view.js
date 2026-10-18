@@ -32,32 +32,50 @@ export function createDoubleOrNothingView({ documentRef = globalThis.document, e
     }
 
     if (state.score === 0) {
-      box.innerHTML = '<div class="double-free-round">Je hebt 0 🦴. Speel door met inzet <strong>0 🦴</strong>.</div><div class="double-stake-buttons"><button type="button" class="double-stake-button" data-stake="0">0 🦴</button></div>';
+      box.innerHTML = '<div class="double-free-round">Je hebt 0 🦴. Speel door met inzet <strong>0 🦴</strong>.</div><div class="double-stake-buttons"><button type="button" class="double-stake-button is-selected" data-stake="0" aria-pressed="true">0 🦴</button></div>';
       return;
     }
 
     const amounts = [10, 20, 40, state.score]
       .filter((value, index, values) => value > 0 && value <= state.score && values.indexOf(value) === index)
       .sort((a, b) => a - b);
-    box.innerHTML = `<div class="double-stake-title">Hoeveel durf je te wagen?</div><div class="double-stake-buttons">${amounts.map(amount => `<button type="button" class="double-stake-button" data-stake="${amount}">${amount} 🦴</button>`).join('')}</div>`;
+    const selected = state.stake == null ? '' : `<div class="double-stake-selected">Jouw inzet: <strong>${state.stake} 🦴</strong></div>`;
+    box.innerHTML = `${selected}<div class="double-stake-title">Hoeveel durf je te wagen?</div><div class="double-stake-buttons">${amounts.map(amount => `<button type="button" class="double-stake-button${amount === state.stake ? ' is-selected' : ''}" data-stake="${amount}" aria-pressed="${amount === state.stake}">${amount} 🦴</button>`).join('')}</div>`;
   }
 
   function renderQuestion(state, onStake, onSubmit) {
     const content = documentRef.getElementById('doubleContent');
     if (!content || !state.item) return;
+
+    // Choosing a stake updates the state and re-renders the question view.
+    // Preserve anything the learner already typed so selecting a stake never
+    // destroys their answer.
+    const existingAnswer = documentRef.getElementById('doubleAnswer')?.value || '';
+
     renderStats(state);
     renderProgress(state);
     renderStakeOptions(state);
 
     const disabled = state.index > 0 && state.stake == null;
-    content.innerHTML = `<div class="double-prompt">${escapeHtml(state.item.question || '')}</div><div class="field"><input id="doubleAnswer" class="answer-input" autocomplete="off" placeholder="Typ je antwoord"></div><button class="success" data-practice-action="submit" type="button" ${disabled ? 'disabled' : ''}>Volgende →</button>`;
+    content.innerHTML = `<div class="double-prompt">${escapeHtml(state.item.question || '')}</div><div class="field"><input id="doubleAnswer" class="answer-input" autocomplete="off" placeholder="Typ je antwoord"></div><button class="success" data-practice-action="submit" type="button" ${disabled ? 'disabled' : ''}>Controleren</button>`;
     const input = documentRef.getElementById('doubleAnswer');
     const button = content.querySelector('[data-practice-action="submit"]');
+    if (input) input.value = existingAnswer;
     boxStakeHandlers(onStake);
     input?.focus?.();
-    button?.addEventListener('click', () => onSubmit(input?.value || ''));
-    input?.addEventListener('keydown', event => {
-      if (event.key === 'Enter' && !button?.disabled) onSubmit(input.value || '');
+    button?.addEventListener('click', async () => {
+      if (button.disabled) return;
+      button.disabled = true;
+      button.textContent = 'Controleren…';
+      await onSubmit(input?.value || '');
+    });
+    input?.addEventListener('keydown', async event => {
+      if (event.key === 'Enter' && !button?.disabled) {
+        event.preventDefault();
+        button.disabled = true;
+        button.textContent = 'Controleren…';
+        await onSubmit(input.value || '');
+      }
     });
   }
 

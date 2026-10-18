@@ -10,11 +10,12 @@ async function expectCanonicalShell(page, path, title) {
   await expect(page.locator('.paco-template-hero')).toBeVisible();
   await expect(page.locator('.paco-template-sidebar')).toBeVisible();
   await expect(page.locator('.paco-template-main h1')).toHaveText(title);
-  await expect(page.locator('.paco-template-nav-submenu')).toHaveCount(0);
+  await expect(page.locator('.paco-template-nav-submenu')).toHaveCount(1);
+  await expect(page.locator('.paco-template-nav-subitem')).toHaveText(['Agenda invoeren', 'Maandkalender']);
 }
 
 test('dashboard page uses the canonical shell for a selected student', async ({ page }) => {
-  await expectCanonicalShell(page, 'dashboard.html?student=Zyon', 'Dashboard');
+  await expectCanonicalShell(page, 'dashboard.html?viewStudent=Zyon', 'Dashboard');
   await expect(page.locator('.dashboard-page')).toBeVisible();
   await expect(page.locator('.dashboard-student')).toHaveCount(0);
   await expect(page.getByText('Andere leerling', { exact: true })).toHaveCount(0);

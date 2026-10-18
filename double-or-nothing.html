@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — Double or Nothing</title>
+  <link rel="stylesheet" href="src/components/page-template.css">
+  <link rel="stylesheet" href="src/features/lessons/lesson-context-view.css">
+  <link rel="stylesheet" href="src/features/lessons/practice-page.css">
+  <link rel="stylesheet" href="src/features/lessons/double-or-nothing.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div id="paco-template-mount"></div>
+  <script type="module">
+    import { mountPacoPageTemplate } from './src/components/page-template.js';
+    import { createPacoNavigation } from './src/components/page-navigation.js';
+    import { createPacoGOApp } from './src/app/bootstrap.js';
+    import { createLessonContextField } from './src/features/lessons/lesson-context-view.js';
+    import { createDoubleOrNothingRuntime } from './src/features/lessons/double-or-nothing-runtime.js';
+    import { createDoubleOrNothingView } from './src/features/lessons/double-or-nothing-view.js';
+    import { createDoubleOrNothingRecordStore } from './src/features/lessons/double-or-nothing-record.js';
+    import { readViewContext, buildViewUrl } from './src/core/view-context.js';
+    import { escapeHtml } from './src/core/html.js';
+
+    const params = new URLSearchParams(window.location.search);
+    const context = readViewContext(params);
+    const lessonId = params.get('lesson_id') || '';
+    const student = context.student;
+    const mount = document.querySelector('#paco-template-mount');
+    const content = document.createElement('div');
+    const app = createPacoGOApp({ supabaseLib: window.supabase });
+    const recordStore = createDoubleOrNothingRecordStore();
+    const view = createDoubleOrNothingView({ documentRef: document, escapeHtml });
+
+    const gameShell = document.createElement('main');
+    gameShell.className = 'practice-page-card';
+    gameShell.innerHTML = `<div class="double-game-head"><h1 class="double-game-title">🐶 DOUBLE OR NOTHING</h1><div class="double-stats"><div class="double-stat"><span class="double-stat-label">Botjes</span><span id="doubleScore" class="double-stat-value">0 🦴</span></div><div class="double-stat"><span class="double-stat-label">Record</span><span id="doubleRecord" class="double-stat-value">0 🏆</span></div><div class="double-stat"><span class="double-stat-label">Maximaal</span><span id="doubleGoal" class="double-stat-value">0 🎯</span></div></div></div><div id="doubleProgress" class="practice-progress"></div><div id="doubleStake"></div><div id="doubleContent" class="practice-content"></div>`;
+    content.appendChild(gameShell);
+
+    const goChoice = () => {
+      const target = buildViewUrl('lesson-choice.html', { student, mode: context.mode });
+      if (lessonId) target.searchParams.set('lesson_id', lessonId);
+      window.location.href = target.toString();
+    };
+
+    mountPacoPageTemplate({
+      mount,
+      backLabel: '← Leskeuze',
+      backAction: goChoice,
+      greeting: `Hoi ${student}! 🐶`,
+      title: 'Double or Nothing',
+      icon: '🦴',
+      subtitle: 'Elke vraag kan je botjes opleveren — of kosten.',
+      navigation: createPacoNavigation({ app, active: 'lessons', student, viewMode: context.mode }),
+      content
+    });
+
+    async function load() {
+      if (!lessonId || !student) throw new Error('Geen leerling of les geselecteerd.');
+      const records = await app.loadLessons();
+      const lesson = app.mapLessons(records).find(item => String(item.id) === String(lessonId));
+      if (!lesson) throw new Error('Deze les kon niet worden gevonden.');
+
+      const contextField = createLessonContextField(lesson);
+      content.insertBefore(contextField, gameShell);
+
+      const items = Array.isArray(lesson.lesson_items) ? lesson.lesson_items : Array.isArray(lesson.items) ? lesson.items : [];
+      const runtime = createDoubleOrNothingRuntime({
+        items,
+        gradeAnswer: (question, answer, value) => app.grading.gradeAnswer(question, answer, value)
+      });
+      const storedRecord = recordStore.read(student, lessonId);
+
+      function currentState() {
+        const state = runtime.snapshot();
+        return { ...state, bestScore: Math.max(storedRecord, state.bestScore) };
+      }
+
+      function renderState() {
+        const state = currentState();
+        if (state.phase === 'finished') {
+          recordStore.save(student, lessonId, state.score);
+          view.renderFinished({ ...state, bestScore: recordStore.read(student, lessonId) }, restart, goChoice);
+          return;
+        }
+        if (state.phase === 'result') {
+          view.renderResult(state, () => {
+            runtime.continueGame();
+            renderState();
+          });
+          return;
+        }
+        view.renderQuestion(state, amount => {
+          runtime.chooseStake(amount);
+          renderState();
+        }, async answer => {
+          try {
+            await runtime.submitAnswer(answer);
+            renderState();
+          } catch (error) {
+            const node = document.createElement('div');
+            node.className = 'feedback error';
+            node.textContent = error?.message || 'Het antwoord kon niet worden verwerkt.';
+            document.getElementById('doubleContent')?.append(node);
+          }
+        });
+      }
+
+      function restart() {
+        runtime.start();
+        renderState();
+      }
+
+      restart();
+    }
+
+    try {
+      await load();
+    } catch (error) {
+      console.error('Double or Nothing load error:', error);
+      const node = document.createElement('div');
+      node.className = 'practice-content';
+      node.innerHTML = `<strong>Double or Nothing kon niet worden geladen.</strong><p class="small">${escapeHtml(error?.message || 'Onbekende fout.')}</p>`;
+      gameShell.replaceChildren(node);
+    }
+  </script>
+</body>
+</html>

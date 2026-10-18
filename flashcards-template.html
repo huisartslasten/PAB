@@ -65,7 +65,7 @@
     if (!lessonId || !student) {
       content.textContent = 'Geen leerling of les geselecteerd.';
     } else {
-      mountFlashcardPractice({ mount:content, lessonId, student });
+      mountFlashcardPractice({ mount:content, app, lessonId, student });
     }
   </script>
 </body>

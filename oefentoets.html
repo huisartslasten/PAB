@@ -17,11 +17,13 @@
     import { createPacoGOApp } from './src/app/bootstrap.js';
     import { createPracticePresentation } from './src/features/lessons/practice-presentation.js';
     import { createLessonContextField } from './src/features/lessons/lesson-context-view.js';
+    import { readViewContext, buildViewUrl } from './src/core/view-context.js';
     import { escapeHtml } from './src/core/html.js';
 
     const params = new URLSearchParams(window.location.search);
+    const context = readViewContext(params);
     const lessonId = params.get('lesson_id') || '';
-    const student = params.get('student') || 'Zyon';
+    const student = context.student;
     const mount = document.querySelector('#paco-template-mount');
     const app = createPacoGOApp({ supabaseLib: window.supabase });
     const content = document.createElement('main');
@@ -29,16 +31,14 @@
     content.innerHTML = '<div id="practiceProgress" class="practice-progress"></div><div id="practiceContent" class="practice-content"></div>';
 
     const goBack = () => {
-      const target = new URL('oefenen.html', window.location.href);
+      const target = buildViewUrl('oefenen.html', { student, mode: context.mode });
       if (lessonId) target.searchParams.set('lesson_id', lessonId);
-      target.searchParams.set('student', student);
       window.location.href = target.toString();
     };
 
     const goLessonChoice = () => {
-      const target = new URL('lesson-choice.html', window.location.href);
+      const target = buildViewUrl('lesson-choice.html', { student, mode: context.mode });
       if (lessonId) target.searchParams.set('lesson_id', lessonId);
-      target.searchParams.set('student', student);
       window.location.href = target.toString();
     };
 
@@ -50,7 +50,7 @@
       title: 'Oefentoets',
       icon: '📝',
       subtitle: 'Beantwoord alle vragen. Je krijgt per vraag feedback, maar de oefentoets telt niet mee als echte toets.',
-      navigation: createPacoNavigation({ app, active: 'lessons', student }),
+      navigation: createPacoNavigation({ app, active: 'lessons', student, viewMode: context.mode }),
       content
     });
 
@@ -64,7 +64,7 @@
     };
 
     try {
-      if (!lessonId) throw new Error('Geen les geselecteerd.');
+      if (!lessonId || !student) throw new Error('Geen leerling of les geselecteerd.');
       const records = await app.loadLessons();
       const lesson = app.mapLessons(records).find(item => String(item.id) === String(lessonId));
       if (!lesson) throw new Error('Deze les kon niet worden gevonden.');

@@ -10,7 +10,7 @@
   <div id="paco-template-mount"></div>
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
-    import { createPacoNavigation, createPacoAuthenticatedAccount } from './src/components/page-navigation.js';
+    import { createPacoNavigation } from './src/components/page-navigation.js';
     import { confirmPacoAction } from './src/components/confirm-dialog.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
     import { renderRecovery } from './src/features/management/management-view.js';
@@ -23,7 +23,6 @@
     state.textContent='Archief laden…';
     content.appendChild(state);
     const app=createPacoGOApp({supabaseLib:window.supabase});
-    const accountNavigation=createPacoAuthenticatedAccount(app);
 
     mountPacoPageTemplate({
       mount,
@@ -34,11 +33,11 @@
       icon:'🗂️',
       subtitle:'Herstel gearchiveerde lessen of verwijder lessen definitief uit de prullenbak.',
       navigation:createPacoNavigation({
+        app,
         active:'recovery',
         includeManagement:true,
         includeManagementTools:true,
-        includeCreator:true,
-        ...accountNavigation
+        includeCreator:true
       }),
       content
     });

@@ -34,6 +34,7 @@ export function createPacoNavigation({
   includeManagementTools = false,
   includeCreator = false,
   includeLessons = true,
+  includePractice = true,
   includeAgenda = true,
   includeAccount = true,
   hideActive = false
@@ -70,6 +71,10 @@ export function createPacoNavigation({
 
   if (includeLessons && includeStudentNavigation) {
     items.push({ key: 'lessons', icon: '📚', label: 'Mijn lessen', onClick: () => go('lessons.html', view) });
+  }
+
+  if (includePractice && includeStudentNavigation) {
+    items.push({ key: 'practice', icon: '✏️', label: 'Oefenen', onClick: () => go('oefenen.html', view) });
   }
 
   if (includeAgenda && includeStudentNavigation) {

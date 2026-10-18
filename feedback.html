@@ -10,7 +10,7 @@
   <div id="paco-template-mount"></div>
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
-    import { createPacoNavigation } from './src/components/page-navigation.js';
+    import { createPacoNavigation, createPacoAuthenticatedAccount } from './src/components/page-navigation.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
     import { renderFeedback } from './src/features/management/management-view.js';
 
@@ -21,6 +21,8 @@
     state.className='management-state';
     state.textContent='Feedback laden…';
     content.appendChild(state);
+    const app=createPacoGOApp({supabaseLib:window.supabase});
+    const accountNavigation=createPacoAuthenticatedAccount(app);
 
     mountPacoPageTemplate({
       mount,
@@ -35,12 +37,12 @@
         includeManagementDashboard:true,
         includeManagement:true,
         includeManagementTools:true,
-        includeCreator:true
+        includeCreator:true,
+        ...accountNavigation
       }),
       content
     });
 
-    const app=createPacoGOApp({supabaseLib:window.supabase});
     const management=app.management;
     const feedbackList=document.createElement('section');
     feedbackList.className='management-section';

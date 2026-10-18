@@ -25,6 +25,7 @@
   <div id="paco-template-mount"></div>
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
+    import { createPacoNavigation } from './src/components/page-navigation.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
 
     const params = new URLSearchParams(window.location.search);
@@ -37,15 +38,35 @@
     const goStart = () => { window.location.href = 'dashboard.html'; };
     const goManagement = () => { window.location.href = 'management.html'; };
 
+    let session = null;
+    let sessionError = null;
+    try {
+      session = await app.initializeSession();
+    } catch (error) {
+      sessionError = error;
+      console.error('Auth session load error:', error);
+    }
+
+    const loggedInAsParent = Boolean(session && app.auth.isParent);
+    const navigation = loggedInAsParent
+      ? createPacoNavigation({
+          includeManagementDashboard: true,
+          includeManagement: false,
+          includeLessons: false,
+          includeAgenda: false,
+          includeAccount: false
+        })
+      : [{ icon:'🏠', label:'Start', onClick:goStart }];
+
     mountPacoPageTemplate({
       mount,
-      backLabel:'← Start',
-      backAction:goStart,
+      backLabel: loggedInAsParent ? '← Dashboard' : '← Start',
+      backAction: loggedInAsParent ? goManagement : goStart,
       greeting:'PacoGO 🔐',
       title:resetMode ? 'Wachtwoord wijzigen' : 'Inloggen',
       icon:'🔐',
       subtitle:resetMode ? 'Stel een nieuw wachtwoord in.' : 'Log in om beheerfuncties te openen.',
-      navigation:[{icon:'🏠',label:'Start',onClick:goStart}],
+      navigation,
       content
     });
 
@@ -93,7 +114,7 @@
         try {
           await app.authSession.signOut();
           app.auth.setSession(null);
-          renderLogin();
+          window.location.href = 'auth.html';
         } catch (error) {
           content.prepend(message(error?.message || 'Uitloggen mislukt.', true));
         }
@@ -232,14 +253,14 @@
       content.append(card);
     }
 
-    try {
-      await app.initializeSession();
-      if (resetMode && app.auth.isLoggedIn) renderPasswordUpdate();
-      else if (app.auth.isParent) renderLoggedIn();
-      else renderLogin();
-    } catch (error) {
-      console.error('Auth page load error:', error);
-      content.replaceChildren(message(error?.message || 'Authenticatie kon niet worden geladen.', true));
+    if (sessionError) {
+      content.replaceChildren(message(sessionError?.message || 'Authenticatie kon niet worden geladen.', true));
+    } else if (resetMode && app.auth.isLoggedIn) {
+      renderPasswordUpdate();
+    } else if (app.auth.isParent) {
+      renderLoggedIn();
+    } else {
+      renderLogin();
     }
   </script>
 </body>

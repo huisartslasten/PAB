@@ -151,6 +151,15 @@ function addRow(root, type, data = {}) {
   return row;
 }
 
+function ensureDictationTrailingRow(root) {
+  const container = root.querySelector('#dictationEditor');
+  if (!container) return null;
+  const lastRow = container.lastElementChild;
+  const lastInput = lastRow?.querySelector('.dictation-word-input');
+  if (!lastInput || text(lastInput.value)) return addRow(root, 'dictation');
+  return null;
+}
+
 function getRowsContainer(root, type) {
   const map = { words: '#wordEditor', custom: '#wordEditor', questions: '#questionEditor', dictation: '#dictationEditor', math: '#mathEditor', spelling: '#spellingEditor' };
   const container = root.querySelector(map[type] || '#wordEditor');
@@ -169,9 +178,9 @@ function readDraft(root, lessonId) {
   const type = root.querySelector('#lessonType').value || 'words';
   const student = root.querySelector('input[name="lessonStudent"]:checked')?.value || '';
   if (type === 'dictation') {
-    const rows = [...root.querySelectorAll('#dictationEditor .editor-row')].map(row => ({
-      word: row.querySelector('.dictation-word-input')?.value.trim() || ''
-    }));
+    const rows = [...root.querySelectorAll('#dictationEditor .editor-row')]
+      .map(row => ({ word: row.querySelector('.dictation-word-input')?.value.trim() || '' }))
+      .filter(item => item.word);
     return {
       lessonId,
       student,
@@ -399,6 +408,11 @@ export function createLessonEditorPage({ root, runtime, initialLesson = null, st
   });
 
   root.addEventListener('input', event => {
+    if (event.target.matches('.dictation-word-input')) {
+      const row = event.target.closest('.editor-row');
+      const container = root.querySelector('#dictationEditor');
+      if (row && container && row === container.lastElementChild && text(event.target.value)) ensureDictationTrailingRow(root);
+    }
     if (!event.target.id.startsWith('spellingLabel')) return;
     const labels = getSpellingLabelsFromRow(root);
     root.querySelectorAll('.spelling-label-question').forEach(el => { el.textContent = labels.question; });

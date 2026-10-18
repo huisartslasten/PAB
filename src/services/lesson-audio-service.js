@@ -28,8 +28,7 @@ export function createLessonAudioService(db, { AudioCtor = globalThis.Audio, URL
     let result;
     try {
       result = await db.functions.invoke('speak-word-v1', {
-        body: { text: String(text), language: String(language || 'nl') },
-        responseType: 'blob'
+        body: { text: String(text), language: String(language || 'nl') }
       });
     } catch (error) {
       onStatus?.('⚠️ AI-stem kon niet worden gemaakt.');
@@ -41,14 +40,15 @@ export function createLessonAudioService(db, { AudioCtor = globalThis.Audio, URL
       onStatus?.('⚠️ AI-stem kon niet worden gemaakt.');
       throw error;
     }
-    if (!data || typeof AudioCtor !== 'function' || !URLRef?.createObjectURL) {
+    if (!data || typeof AudioCtor !== 'function' || !URLRef?.createObjectURL || typeof Blob !== 'function') {
       const error = new Error('AI-stem leverde geen afspeelbaar audiobestand op.');
       onStatus?.('⚠️ AI-stem kon niet worden afgespeeld.');
       throw error;
     }
 
     try {
-      objectUrl = URLRef.createObjectURL(data);
+      const playableData = new Blob([data], { type: 'audio/mpeg' });
+      objectUrl = URLRef.createObjectURL(playableData);
       const currentUrl = objectUrl;
       audio = new AudioCtor(currentUrl);
       audio.preload = 'auto';

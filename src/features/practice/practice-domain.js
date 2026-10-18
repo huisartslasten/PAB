@@ -1,7 +1,26 @@
 export const PRACTICE_MODES = Object.freeze([
   Object.freeze({ id: 'flashcards', label: 'Flashcards', status: 'active' }),
   Object.freeze({ id: 'practice-test', label: 'Oefentoets', status: 'active' }),
-  Object.freeze({ id: 'games', label: 'Spelletjes', status: 'planned' })
+  Object.freeze({ id: 'games', label: 'Spelletjes', status: 'active' })
+]);
+
+export const PRACTICE_GAMES = Object.freeze([
+  Object.freeze({
+    id: 'double-or-nothing',
+    label: 'Double or Nothing',
+    path: 'double-or-nothing.html',
+    icon: '🦴',
+    description: 'Waag botjes, verdien ze erbij en probeer je record te verbreken.',
+    status: 'active'
+  }),
+  Object.freeze({
+    id: 'memory',
+    label: 'Memory',
+    path: 'memory.html',
+    icon: '🧠',
+    description: 'Vind de vraag en het bijbehorende antwoord bij elkaar.',
+    status: 'active'
+  })
 ]);
 
 export function getPracticeModes() {
@@ -21,4 +40,23 @@ export function getActivePracticeModes() {
   return PRACTICE_MODES
     .filter(mode => mode.status === 'active')
     .map(mode => ({ ...mode }));
+}
+
+export function getPracticeGames() {
+  return PRACTICE_GAMES.map(game => ({ ...game }));
+}
+
+export function getPracticeGame(gameId) {
+  const game = PRACTICE_GAMES.find(candidate => candidate.id === gameId);
+  return game ? { ...game } : null;
+}
+
+export function isPracticeGameActive(gameId) {
+  return getPracticeGame(gameId)?.status === 'active';
+}
+
+export function getActivePracticeGames() {
+  return PRACTICE_GAMES
+    .filter(game => game.status === 'active')
+    .map(game => ({ ...game }));
 }

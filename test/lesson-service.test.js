@@ -76,7 +76,7 @@ test('lesson service preserves V4.78 item ordering and query shape', async () =>
 
 test('lesson service creates a lesson through insert-select-single', async () => {
   const payload = { title: 'Nieuwe les', student: 'Zyon', subject: '', type: 'words' };
-  const persisted = { ...payload, sort_order: 0, archived: false, deleted: false };
+  const persisted = { ...payload, subvak: '', archived: false, deleted: false };
   const db = mockDb({ rows: [{ id: 17, ...persisted }] });
   const service = createLessonService(db);
 
@@ -105,9 +105,9 @@ test('lesson service updates a lesson through update-filter-select-single', asyn
   const persisted = {
     student: null,
     subject: '',
+    subvak: '',
     title: 'Aangepaste les',
     type: '',
-    sort_order: 0,
     archived: false,
     deleted: false
   };
@@ -208,9 +208,9 @@ test('lesson service owns photo-style lesson creation and preserves normalized i
     rows: {
       student: 'Zyon',
       subject: 'Nederlands',
+      subvak: '',
       title: 'Foto-les',
       type: 'words',
-      sort_order: 0,
       archived: false,
       deleted: false
     }

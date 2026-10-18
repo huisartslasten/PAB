@@ -48,7 +48,7 @@ export function buildStudentManagementCardModel({
     const agendaItems = buildAgendaViewModel(getAgendaItems(student), { student, today })
       .upcoming
       .filter(item => String(item.date).slice(0, 10) <= endKey)
-      .sort((a, b) => `${a.date}|${a.title || ''}`.localeCompare(`${b.date}|${b.title || ''}`, 'nl'));
+      .sort((a, b) => `${a.date}|${a.title || ''}`.localeCompare(`${a.date}|${a.title || ''}`, 'nl'));
 
     return {
       student,
@@ -68,7 +68,6 @@ export function renderStudentManagementCards(container, {
   onOpenAgenda = () => {},
   onOpenLessons = () => {},
   onOpenMonthCalendar = () => {},
-  onOpenStudent = () => {},
   today = new Date()
 } = {}) {
   if (!container) throw new Error('renderStudentManagementCards requires a container.');
@@ -77,8 +76,7 @@ export function renderStudentManagementCards(container, {
   container.innerHTML = cards.map(card => `
     <article class="management-student-card" data-student-card="${escapeHtml(card.student)}">
       <div class="management-student-card-top">
-        <button type="button" class="management-student-name" data-select-student="${escapeHtml(card.student)}">👦 ${escapeHtml(card.student)}</button>
-        <button type="button" class="management-student-open" data-open-student="${escapeHtml(card.student)}">→ Naar leerling</button>
+        <button type="button" class="management-student-name" data-select-student="${escapeHtml(card.student)}">${escapeHtml(card.student)}</button>
       </div>
 
       <div class="management-student-actions">
@@ -122,9 +120,6 @@ export function renderStudentManagementCards(container, {
   });
   container.querySelectorAll('[data-open-calendar]').forEach(button => {
     button.addEventListener('click', () => onOpenMonthCalendar(button.dataset.openCalendar));
-  });
-  container.querySelectorAll('[data-open-student]').forEach(button => {
-    button.addEventListener('click', () => onOpenStudent(button.dataset.openStudent));
   });
 
   return cards;

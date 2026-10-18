@@ -1,5 +1,7 @@
 import { createPacoDropdown } from '../../components/page-template.js';
 
+const MEMORY_CARD_BACK_IMAGE = 'paco memory.png';
+
 export function createMemoryView({ documentRef = document, escapeHtml = value => String(value) } = {}) {
   function render({ state, timingMode = 'manual', onTimingModeChange, onResolveTurn, onCardSelect, onFinished }) {
     const shell = documentRef.createElement('main');
@@ -53,9 +55,15 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
       button.disabled = state.phase !== 'playing' || state.matchedCardIds.has(card.id);
       if (state.matchedCardIds.has(card.id)) button.classList.add('matched');
       if (visible) button.classList.add('revealed');
-      button.innerHTML = visible
-        ? `<span class="memory-card-type">${card.type === 'question' ? 'Vraag' : 'Antwoord'}</span><span>${escapeHtml(card.value ?? '')}</span>`
-        : '<span class="memory-card-back">?</span>';
+      if (visible) {
+        button.innerHTML = `<span class="memory-card-type">${card.type === 'question' ? 'Vraag' : 'Antwoord'}</span><span>${escapeHtml(card.value ?? '')}</span>`;
+      } else {
+        const image = documentRef.createElement('img');
+        image.className = 'memory-card-back-image';
+        image.src = MEMORY_CARD_BACK_IMAGE;
+        image.alt = 'Paco';
+        button.appendChild(image);
+      }
       if (state.phase === 'playing' && !state.matchedCardIds.has(card.id)) {
         button.addEventListener('click', () => onCardSelect(card.id));
       }

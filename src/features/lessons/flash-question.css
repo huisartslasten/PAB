@@ -1,0 +1,219 @@
+.flash-game-shell {
+  width: min(760px, 100%);
+  margin: 0 auto;
+}
+
+.flash-head {
+  display: grid;
+  gap: 12px;
+}
+
+.flash-title {
+  margin: 0;
+  font-size: clamp(1.35rem, 3vw, 1.9rem);
+}
+
+.flash-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.flash-stat {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 0, 0, .1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .72);
+  text-align: center;
+}
+
+.flash-stat-label {
+  display: block;
+  font-size: .76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.flash-stat-value {
+  display: block;
+  margin-top: 2px;
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.flash-progress-wrap {
+  margin: 14px 0 8px;
+}
+
+.flash-progress-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+  font-size: .84rem;
+  font-weight: 700;
+}
+
+.flash-progress {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .1);
+}
+
+.flash-progress > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: currentColor;
+}
+
+.flash-content {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.flash-question {
+  padding: 22px 20px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .82);
+  font-size: clamp(1.35rem, 4vw, 2rem);
+  font-weight: 800;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.flash-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.flash-option {
+  min-height: 64px;
+  padding: 12px 16px;
+  border: 1px solid rgba(0, 0, 0, .12);
+  border-radius: 14px;
+  background: white;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.flash-option:hover:not(:disabled),
+.flash-option:focus-visible:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.flash-option:disabled {
+  cursor: default;
+  opacity: .7;
+}
+
+.flash-result {
+  min-height: 230px;
+  display: grid;
+  align-content: center;
+  gap: 12px;
+  padding: 28px 20px;
+  border-radius: 18px;
+  text-align: center;
+}
+
+.flash-result.correct {
+  background: rgba(35, 150, 80, .13);
+}
+
+.flash-result.wrong {
+  background: rgba(200, 70, 55, .13);
+}
+
+.flash-result-title {
+  font-size: clamp(2rem, 7vw, 3.4rem);
+  font-weight: 900;
+}
+
+.flash-result-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.flash-result-score {
+  font-size: 1rem;
+}
+
+.flash-next {
+  justify-self: center;
+  min-width: 180px;
+}
+
+.flash-finished {
+  display: grid;
+  gap: 16px;
+  padding: 24px 18px;
+  text-align: center;
+}
+
+.flash-finished-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.flash-final-score {
+  font-size: clamp(2.6rem, 9vw, 4.5rem);
+  font-weight: 900;
+}
+
+.flash-finished-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.flash-finished-stats div {
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .72);
+}
+
+.flash-finished-stats span,
+.flash-finished-stats strong {
+  display: block;
+}
+
+.flash-finished-stats span {
+  font-size: .76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.flash-finished-stats strong {
+  margin-top: 2px;
+  font-size: 1.25rem;
+}
+
+.flash-finished-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 620px) {
+  .flash-stats,
+  .flash-finished-stats {
+    gap: 7px;
+  }
+
+  .flash-stat,
+  .flash-finished-stats div {
+    padding: 8px 6px;
+  }
+
+  .flash-options {
+    grid-template-columns: 1fr;
+  }
+}

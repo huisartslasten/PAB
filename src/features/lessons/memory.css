@@ -7,7 +7,9 @@
 .memory-timing-label{color:#667894;font-weight:800;white-space:nowrap}
 .memory-timing-dropdown{width:210px}
 .memory-center-control{display:flex;align-items:center;justify-content:center;min-width:150px}
-.memory-turns{justify-self:end;padding:10px 14px;border-radius:14px;background:#eef8ff;color:#126fc9;font-weight:800;white-space:nowrap}
+.memory-stats{justify-self:end;display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}
+.memory-stats span{padding:9px 11px;border-radius:12px;background:#eef8ff;color:#667894;font-weight:800;white-space:nowrap}
+.memory-stats strong{color:#126fc9}
 .memory-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}
 .memory-card{min-height:130px;border:2px solid #dce9f6;border-radius:18px;background:#eef8ff;color:#102b57;padding:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;font-weight:800;text-align:center;transition:.16s;overflow:hidden}
 .memory-card:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 18px rgba(16,43,87,.1)}
@@ -23,4 +25,5 @@
 .memory-finished p{color:#667894}
 .memory-primary-button{min-width:180px;margin-top:0;border:0;border-radius:14px;background:#126fc9;color:#fff;padding:10px 18px;font-weight:900;cursor:pointer}
 .memory-resolve-button{white-space:nowrap}
-@media(max-width:700px){.memory-header{align-items:flex-start;flex-direction:column}.memory-controls{grid-template-columns:1fr;align-items:stretch;gap:10px}.memory-timing-control{justify-self:stretch;flex-wrap:wrap}.memory-timing-dropdown{width:100%;flex:1 1 180px}.memory-center-control{justify-content:flex-start;min-width:0}.memory-turns{justify-self:start}.memory-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:1100px){.memory-controls{grid-template-columns:1fr auto}.memory-stats{grid-column:1/-1;justify-self:stretch;justify-content:flex-end}.memory-timing-control{grid-column:1}.memory-center-control{grid-column:2;grid-row:1}}
+@media(max-width:700px){.memory-header{align-items:flex-start;flex-direction:column}.memory-controls{grid-template-columns:1fr;align-items:stretch;gap:10px}.memory-timing-control{grid-column:auto;justify-self:stretch;flex-wrap:wrap}.memory-timing-dropdown{width:100%;flex:1 1 180px}.memory-center-control{grid-column:auto;grid-row:auto;justify-content:flex-start;min-width:0}.memory-stats{grid-column:auto;justify-self:start;justify-content:flex-start;flex-wrap:wrap}.memory-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}

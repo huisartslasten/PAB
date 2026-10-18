@@ -1,6 +1,6 @@
 import { createPacoDropdown } from '../../components/page-template.js';
 
-const MEMORY_CARD_BACK_IMAGE = 'paco memory.png';
+const MEMORY_CARD_BACK_IMAGE = new URL('./paco memory.png', import.meta.url).href;
 
 export function createMemoryView({ documentRef = document, escapeHtml = value => String(value) } = {}) {
   function render({ state, timingMode = 'manual', onTimingModeChange, onResolveTurn, onCardSelect, onFinished }) {

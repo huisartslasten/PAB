@@ -40,12 +40,13 @@ test('a correct stake adds the stake and a wrong stake subtracts it', async () =
   assert.equal(wrong.lastResult.delta, -20);
 });
 
-test('zero bones remains playable with a zero stake', async () => {
+test('zero bones starts a free recovery question that can earn 10 bones', async () => {
   const runtime = createDoubleOrNothingRuntime({
     items: [
       { question: '1+1', answer: '2' },
       { question: '2+2', answer: '4' },
-      { question: '3+3', answer: '6' }
+      { question: '3+3', answer: '6' },
+      { question: '4+4', answer: '8' }
     ],
     gradeAnswer: async (_question, expected, given) => ({ correct: expected === given })
   });
@@ -56,12 +57,15 @@ test('zero bones remains playable with a zero stake', async () => {
   runtime.chooseStake(10);
   await runtime.submitAnswer('wrong');
   runtime.continueGame();
-  runtime.chooseStake(0);
-  const state = await runtime.submitAnswer('6');
 
-  assert.equal(state.score, 0);
-  assert.equal(state.lastResult.stake, 0);
-  assert.equal(state.lastResult.delta, 0);
+  assert.equal(runtime.snapshot().score, 0);
+  assert.equal(runtime.snapshot().stake, null);
+  await assert.rejects(() => runtime.chooseStake(0), /Bij 0 botjes is deze vraag gratis/);
+
+  const state = await runtime.submitAnswer('4');
+  assert.equal(state.score, 10);
+  assert.equal(state.lastResult.stake, 10);
+  assert.equal(state.lastResult.delta, 10);
 });
 
 test('duplicate submissions cannot advance two questions at once', async () => {

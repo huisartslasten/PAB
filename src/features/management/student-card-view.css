@@ -65,15 +65,36 @@
 }
 
 .management-student-section {
-  padding-top: 11px;
+  width: 100%;
+  padding: 11px 0 0;
+  border: 0;
   border-top: 1px solid #dce9f6;
+  background: transparent;
+  text-align: left;
 }
 
 .management-student-section + .management-student-section {
   margin-top: 11px;
 }
 
+.management-student-section-link {
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+
+.management-student-section-link:hover {
+  color: var(--paco-blue-dark);
+}
+
+.management-student-section-link:focus-visible {
+  outline: 3px solid #1787f2;
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
 .management-student-section-label {
+  display: block;
   margin-bottom: 7px;
   color: var(--paco-text);
   font-family: "Baloo 2", Nunito, sans-serif;
@@ -102,6 +123,7 @@
 }
 
 .management-student-muted {
+  display: block;
   color: var(--paco-muted);
   font-size: 14px;
   font-weight: 700;

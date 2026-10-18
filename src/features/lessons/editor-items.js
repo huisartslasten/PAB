@@ -9,7 +9,7 @@ function normalizeParts(parts, fallback = '') {
     return value ? [{ text: value, role: 'answer' }] : [];
   }
   return parts
-    .map(part => ({ text: text(part?.text), role: part?.role === 'extra' ? 'extra' : 'answer' }))
+    .map(part => ({ text: text(typeof part === 'string' ? part : part?.text), role: part?.role === 'extra' ? 'extra' : 'answer' }))
     .filter(part => part.text);
 }
 
@@ -19,9 +19,7 @@ function normalizeResponseType(value, fallback = 'text') {
 }
 
 function normalizeOptions(options) {
-  return (Array.isArray(options) ? options : [])
-    .map(text)
-    .filter(Boolean);
+  return (Array.isArray(options) ? options : []).map(text).filter(Boolean);
 }
 
 function buildUniversalItem(row = {}, { defaultResponseType = 'text', numericAnswer = false, spelling = false, includeWordRules = false } = {}) {
@@ -68,61 +66,39 @@ function buildUniversalItem(row = {}, { defaultResponseType = 'text', numericAns
   return item;
 }
 
-export function buildWordItem(row = {}) {
-  return buildUniversalItem(row, { includeWordRules: true });
-}
-
-export function buildQuestionItem(row = {}) {
-  return buildUniversalItem(row, { defaultResponseType: 'text' });
-}
+export function buildWordItem(row = {}) { return buildUniversalItem(row, { includeWordRules: true }); }
+export function buildQuestionItem(row = {}) { return buildUniversalItem(row, { defaultResponseType: 'text' }); }
 
 export function buildDictationItem(row = {}) {
+  const questionParts = Array.isArray(row.question_parts) ? row.question_parts.map(text).filter(Boolean) : (text(row.question) ? [text(row.question)] : []);
   const parts = normalizeParts(row.answer_parts, row.answer ?? row.word);
   const word = parts.find(part => part.role === 'answer')?.text || text(row.word ?? row.answer);
   if (!word) return null;
   return {
-    question: '',
+    question: questionParts.join('\n'),
     answer: word,
-    question_parts: [],
+    question_parts: questionParts,
     answer_parts: parts.length ? parts : [{ text: word, role: 'answer' }],
     response_type: 'text',
     answer_options: []
   };
 }
 
-export function buildMathItem(row = {}) {
-  return buildUniversalItem(row, { defaultResponseType: 'number', numericAnswer: true });
-}
-
-export function buildSpellingItem(row = {}) {
-  return buildUniversalItem(row, { spelling: true });
-}
+export function buildMathItem(row = {}) { return buildUniversalItem(row, { defaultResponseType: 'number', numericAnswer: true }); }
+export function buildSpellingItem(row = {}) { return buildUniversalItem(row, { spelling: true }); }
 
 export function isMeaningfulItem(item = {}, type = 'words') {
   if (type === 'dictation') return Boolean(normalizeKey(item.answer || ''));
-  if (item.response_type === 'multiple_choice') {
-    return Boolean(normalizeKey(item.question || '') && normalizeKey(item.answer || '') && Array.isArray(item.answer_options) && item.answer_options.length >= 2);
-  }
+  if (item.response_type === 'multiple_choice') return Boolean(normalizeKey(item.question || '') && normalizeKey(item.answer || '') && Array.isArray(item.answer_options) && item.answer_options.length >= 2);
   return Boolean(normalizeKey(item.question || '') && normalizeKey(item.answer || ''));
 }
 
 export function buildItemsForType(type, rows = []) {
-  const builders = {
-    words: buildWordItem,
-    custom: buildWordItem,
-    questions: buildQuestionItem,
-    dictation: buildDictationItem,
-    math: buildMathItem,
-    spelling: buildSpellingItem
-  };
+  const builders = { words: buildWordItem, custom: buildWordItem, questions: buildQuestionItem, dictation: buildDictationItem, math: buildMathItem, spelling: buildSpellingItem };
   const build = builders[type];
   if (!build) return [];
-
-  return (Array.isArray(rows) ? rows : [])
-    .map((row, index) => {
-      const item = build(row);
-      return item ? { ...item, sort_order: index } : null;
-    })
-    .filter(Boolean)
-    .filter(item => isMeaningfulItem(item, type));
+  return (Array.isArray(rows) ? rows : []).map((row, index) => {
+    const item = build(row);
+    return item ? { ...item, sort_order: index } : null;
+  }).filter(Boolean).filter(item => isMeaningfulItem(item, type));
 }

@@ -180,6 +180,16 @@ export async function renderStudentLessons(container, management, { onEdit = nul
   return groups;
 }
 
+async function persistSubjectOrder(container, management, subject) {
+  const subjectSelector = `[data-management-subject="${CSS.escape(subject)}"]`;
+  const ids = [...container.querySelectorAll(`${subjectSelector} .management-lesson[data-lesson-id]`)]
+    .map(card => Number(card.dataset.lessonId))
+    .filter(Boolean);
+  const current = management.getScopedLessons();
+  const lessons = ids.map(id => current.find(lesson => Number(lesson.id) === id)).filter(Boolean);
+  await management.saveLessonOrder(subject, lessons);
+}
+
 export function renderRecovery(container, management, mode, onRestore = async () => {}, onEmptyTrash = async () => {}, onPermanentDelete = async () => {}, onError = async () => {}) {
   if (!container) throw new Error('renderRecovery requires a container.');
   if (!management) throw new Error('renderRecovery requires management.');

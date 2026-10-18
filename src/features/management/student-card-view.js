@@ -65,7 +65,8 @@ export function renderStudentManagementCards(container, {
   getAgendaItems = () => [],
   onSelect = () => {},
   onCreateLesson = () => {},
-  onOpenMonthCalendar = () => {},
+  onOpenAgenda = () => {},
+  onOpenLessons = () => {},
   onOpenStudent = () => {},
   today = new Date()
 } = {}) {
@@ -81,24 +82,24 @@ export function renderStudentManagementCards(container, {
 
       <div class="management-student-actions">
         <button type="button" class="management-student-action" data-create-lesson="${escapeHtml(card.student)}">➕ Les maken</button>
-        <button type="button" class="management-student-action" data-open-calendar="${escapeHtml(card.student)}">🖨️ Maandkalender</button>
+        <button type="button" class="management-student-action" data-open-agenda="${escapeHtml(card.student)}">📅 Agenda</button>
       </div>
 
-      <div class="management-student-section">
-        <div class="management-student-section-label">📚 VAKKEN</div>
-        <div class="management-subject-chips">
+      <button type="button" class="management-student-section management-student-section-link" data-open-lessons="${escapeHtml(card.student)}">
+        <span class="management-student-section-label">📚 VAKKEN</span>
+        <span class="management-subject-chips">
           ${card.subjects.length ? card.subjects.map(subject => `<span class="management-subject-chip">${escapeHtml(subject)}</span>`).join('') : '<span class="management-student-muted">Geen actieve lessen.</span>'}
-        </div>
-      </div>
+        </span>
+      </button>
 
-      <div class="management-student-section management-student-agenda">
-        <div class="management-student-section-label">📅 KOMENDE WEEK</div>
-        ${card.hasAgenda ? `<div class="management-agenda-preview">${card.agendaItems.map(item => `
-          <div class="management-agenda-preview-item">
+      <button type="button" class="management-student-section management-student-agenda management-student-section-link" data-open-agenda="${escapeHtml(card.student)}">
+        <span class="management-student-section-label">📅 KOMENDE WEEK</span>
+        ${card.hasAgenda ? `<span class="management-agenda-preview">${card.agendaItems.map(item => `
+          <span class="management-agenda-preview-item">
             <span class="management-agenda-date">${escapeHtml(formatAgendaDate(item.date))}</span>
             <span class="management-agenda-title">${escapeHtml(item.title || 'Agenda-item')}</span>
-          </div>`).join('')}</div>` : '<div class="management-student-muted">Geen komende agenda-items.</div>'}
-      </div>
+          </span>`).join('')}</span>` : '<span class="management-student-muted">Geen komende agenda-items.</span>'}
+      </button>
     </article>
   `).join('');
 
@@ -108,8 +109,11 @@ export function renderStudentManagementCards(container, {
   container.querySelectorAll('[data-create-lesson]').forEach(button => {
     button.addEventListener('click', () => onCreateLesson(button.dataset.createLesson));
   });
-  container.querySelectorAll('[data-open-calendar]').forEach(button => {
-    button.addEventListener('click', () => onOpenMonthCalendar(button.dataset.openCalendar));
+  container.querySelectorAll('[data-open-agenda]').forEach(button => {
+    button.addEventListener('click', () => onOpenAgenda(button.dataset.openAgenda));
+  });
+  container.querySelectorAll('[data-open-lessons]').forEach(button => {
+    button.addEventListener('click', () => onOpenLessons(button.dataset.openLessons));
   });
   container.querySelectorAll('[data-open-student]').forEach(button => {
     button.addEventListener('click', () => onOpenStudent(button.dataset.openStudent));

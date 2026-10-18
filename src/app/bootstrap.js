@@ -14,7 +14,6 @@ import { appState, setLessons } from '../core/state.js';
 import { getViewContext } from '../core/view-context.js';
 import { mapLessonRecords } from '../features/lessons/lesson-mapper.js';
 import { createPhotoStorageService } from '../features/photo-lessons/photo-storage-service.js';
-import { createLearningContentService } from '../features/lessons/learning-content-service.js';
 import { createManagement } from '../features/management/management.js';
 import { createAgendaReadService } from '../features/agenda/read-service.js';
 
@@ -33,8 +32,6 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null,
   const gameResults = createGameResultService(db);
   const canManage = () => auth.isParent;
   const canCreate = () => auth.isCreator;
-  const photos = createPhotoStorageService(db, { canManage });
-  const learningContent = createLearningContentService(db, { media: photos, canManage });
 
   async function initializeSession() {
     if (auth.session) return auth.session;
@@ -66,9 +63,14 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null,
     testHistory,
     gameResults,
     creator: createCreatorService(db, { canCreate }),
-    management: createManagement({ auth, lessonService: lessons, feedbackService: feedback, lessonOrder, loadLessons }),
-    photos,
-    learningContent,
+    management: createManagement({
+      auth,
+      lessonService: lessons,
+      feedbackService: feedback,
+      lessonOrder,
+      loadLessons
+    }),
+    photos: createPhotoStorageService(db, { canManage }),
     mapLessons: mapLessonRecords
   });
 }

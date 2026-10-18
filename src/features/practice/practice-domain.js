@@ -20,6 +20,14 @@ export const PRACTICE_GAMES = Object.freeze([
     icon: '🧠',
     description: 'Vind de vraag en het bijbehorende antwoord bij elkaar.',
     status: 'active'
+  }),
+  Object.freeze({
+    id: 'flash-question',
+    label: 'Flitsvraag',
+    path: 'flash-question.html',
+    icon: '⚡',
+    description: 'Kies snel het juiste antwoord en oefen alle vragen.',
+    status: 'active'
   })
 ]);
 

@@ -15,7 +15,7 @@ test('flashcard data adapter keeps only complete cards', () => {
       { question: '', answer: 'Two' },
       { question: 'Drie', answer: ' ' }
     ]),
-    [{ question: 'Eén', answer: 'One' }]
+    [{ question: 'Eén', answer: 'One', hint: undefined }]
   );
 });
 

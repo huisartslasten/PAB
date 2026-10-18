@@ -1,3 +1,5 @@
+import { createPacoDropdown } from '../../components/page-template.js';
+
 export function createMemoryView({ documentRef = document, escapeHtml = value => String(value) } = {}) {
   function render({ state, timingMode = 'manual', onTimingModeChange, onResolveTurn, onCardSelect, onFinished }) {
     const shell = documentRef.createElement('main');
@@ -10,26 +12,21 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
 
     const controls = documentRef.createElement('div');
     controls.className = 'memory-controls';
-    const label = documentRef.createElement('label');
+    const label = documentRef.createElement('span');
     label.className = 'memory-timing-label';
     label.textContent = 'Kaartjes laten zien:';
-    const select = documentRef.createElement('select');
-    select.className = 'memory-timing-select';
-    select.setAttribute('aria-label', 'Tijd dat de kaartjes zichtbaar blijven');
-    [
-      ['manual', 'Klaar met lezen'],
-      ['3', '3 seconden'],
-      ['5', '5 seconden']
-    ].forEach(([value, text]) => {
-      const option = documentRef.createElement('option');
-      option.value = value;
-      option.textContent = text;
-      option.selected = value === timingMode;
-      select.appendChild(option);
+    const dropdown = createPacoDropdown({
+      options: [
+        { value: 'manual', label: 'Klaar met lezen' },
+        { value: '3', label: '3 seconden' },
+        { value: '5', label: '5 seconden' }
+      ],
+      value: timingMode,
+      onChange: nextValue => onTimingModeChange(nextValue),
+      className: 'memory-timing-dropdown'
     });
-    select.addEventListener('change', () => onTimingModeChange(select.value));
-    label.appendChild(select);
     controls.appendChild(label);
+    controls.appendChild(dropdown.element);
     shell.appendChild(controls);
 
     if (state.phase === 'finished') {

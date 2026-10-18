@@ -14,6 +14,7 @@
   <div id="paco-template-mount"></div>
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
+    import { createPacoNavigation } from './src/components/page-navigation.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
     import { createQuestionSession } from './src/features/lessons/question-session.js';
     import { escapeHtml } from './src/core/html.js';
@@ -32,7 +33,6 @@
       target.searchParams.set('student', student);
       window.location.href = target.toString();
     };
-    const goLessons = () => { window.location.href = `lessons.html?student=${encodeURIComponent(student)}`; };
 
     mountPacoPageTemplate({
       mount,
@@ -42,12 +42,7 @@
       title:'Vragen maken',
       icon:'❓',
       subtitle:'Schrijf eerst je eigen antwoord en vergelijk het daarna met het voorbeeldantwoord.',
-      navigation:[
-        {icon:'🏠',label:'Dashboard',onClick:goChoice},
-        {icon:'📚',label:'Mijn lessen',active:true,onClick:goLessons},
-        {icon:'📝',label:'Toetsen',onClick:goChoice},
-        {icon:'📅',label:'Mijn agenda',onClick:goChoice}
-      ],
+      navigation:createPacoNavigation({ app, active:'lessons', student }),
       content
     });
 

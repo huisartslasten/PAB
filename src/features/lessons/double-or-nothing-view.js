@@ -1,0 +1,94 @@
+// Presentation boundary for Double or Nothing.
+// The visual language follows the canonical practice-page structure while adding
+// game-specific bone, record, stake and feedback presentation.
+
+export function createDoubleOrNothingView({ documentRef = globalThis.document, escapeHtml } = {}) {
+  if (!documentRef) throw new Error('A document is required.');
+  if (typeof escapeHtml !== 'function') throw new Error('An escapeHtml function is required.');
+
+  function renderStats(state) {
+    const score = documentRef.getElementById('doubleScore');
+    const record = documentRef.getElementById('doubleRecord');
+    const goal = documentRef.getElementById('doubleGoal');
+    if (score) score.textContent = `${state.score} 🦴`;
+    if (record) record.textContent = `${state.bestScore} 🏆`;
+    if (goal) goal.textContent = `${state.maxScore} 🎯`;
+  }
+
+  function renderProgress(state) {
+    const node = documentRef.getElementById('doubleProgress');
+    if (!node) return;
+    const completed = Math.min(state.index, state.total);
+    const pct = state.total ? completed / state.total * 100 : 0;
+    node.innerHTML = `<div class="progress-label"><span>Vraag ${Math.min(state.index + 1, state.total)} van ${state.total}</span><span>${completed} gemaakt</span></div><div class="progress"><div class="progress-bar"><span style="width:${pct}%"></span></div></div>`;
+  }
+
+  function renderStakeOptions(state) {
+    const box = documentRef.getElementById('doubleStake');
+    if (!box) return;
+    if (state.index === 0) {
+      box.innerHTML = '<div class="double-free-round">Deze eerste vraag is gratis. Goed antwoord = <strong>+10 🦴</strong>.</div>';
+      return;
+    }
+
+    if (state.score === 0) {
+      box.innerHTML = '<div class="double-free-round">Je hebt 0 🦴. Je kunt nog steeds verder spelen.</div>';
+      return;
+    }
+
+    const amounts = [10, 20, 40, state.score]
+      .filter((value, index, values) => value > 0 && value <= state.score && values.indexOf(value) === index)
+      .sort((a, b) => a - b);
+    box.innerHTML = `<div class="double-stake-title">Hoeveel durf je te wagen?</div><div class="double-stake-buttons">${amounts.map(amount => `<button type="button" class="double-stake-button" data-stake="${amount}">${amount} 🦴</button>`).join('')}</div>`;
+  }
+
+  function renderQuestion(state, onStake, onSubmit) {
+    const content = documentRef.getElementById('doubleContent');
+    if (!content || !state.item) return;
+    renderStats(state);
+    renderProgress(state);
+    renderStakeOptions(state);
+
+    const disabled = state.index > 0 && state.stake == null;
+    content.innerHTML = `<div class="double-prompt">${escapeHtml(state.item.question || '')}</div><div class="field"><input id="doubleAnswer" class="answer-input" autocomplete="off" placeholder="Typ je antwoord"></div><button class="success" data-practice-action="submit" type="button" ${disabled ? 'disabled' : ''}>Volgende →</button>`;
+    const input = documentRef.getElementById('doubleAnswer');
+    const button = content.querySelector('[data-practice-action="submit"]');
+    boxStakeHandlers(onStake);
+    input?.focus?.();
+    button?.addEventListener('click', () => onSubmit(input?.value || ''));
+    input?.addEventListener('keydown', event => {
+      if (event.key === 'Enter' && !button?.disabled) onSubmit(input.value || '');
+    });
+  }
+
+  function boxStakeHandlers(onStake) {
+    documentRef.querySelectorAll('[data-stake]').forEach(button => {
+      button.addEventListener('click', () => onStake(Number(button.dataset.stake)));
+    });
+  }
+
+  function renderResult(state, onContinue) {
+    renderStats(state);
+    renderProgress(state);
+    const content = documentRef.getElementById('doubleContent');
+    if (!content || !state.lastResult) return;
+    const result = state.lastResult;
+    const heading = result.correct ? '🎉 Goed gedaan!' : '🐶 Oeps!';
+    const delta = result.delta >= 0 ? `+${result.delta}` : `${result.delta}`;
+    content.innerHTML = `<div class="double-feedback ${result.correct ? 'correct' : 'wrong'}"><div class="double-feedback-title">${heading}</div><div>${escapeHtml(result.feedback || (result.correct ? 'Goed antwoord!' : 'Kijk goed naar het juiste antwoord.'))}</div><div class="double-score-change">${delta} 🦴 &nbsp; ${result.previousScore} → ${result.score} 🦴</div></div><div class="practice-correct-answer"><div class="practice-correct-answer-title">Juiste antwoord</div><div class="practice-correct-answer-text">${escapeHtml(result.expectedAnswer)}</div></div><button class="success" data-practice-action="submit" type="button">Volgende →</button>`;
+    content.querySelector('[data-practice-action="submit"]')?.addEventListener('click', onContinue);
+  }
+
+  function renderFinished(state, onRestart, onBack) {
+    renderStats(state);
+    renderProgress(state);
+    const content = documentRef.getElementById('doubleContent');
+    if (!content) return;
+    const title = state.score >= state.maxScore && state.maxScore > 0 ? '🏆 Perfect!' : '🎯 Ronde klaar!';
+    content.innerHTML = `<div class="double-finished"><div class="double-finished-title">${title}</div><div class="double-final-score">${state.score} 🦴</div><p>Je record van deze ronde is <strong>${state.bestScore} 🏆</strong>.</p><div class="double-finished-actions"><button class="success" data-double-restart type="button">Nog een keer</button><button class="secondary" data-double-back type="button">← Leskeuze</button></div></div>`;
+    content.querySelector('[data-double-restart]')?.addEventListener('click', onRestart);
+    content.querySelector('[data-double-back]')?.addEventListener('click', onBack);
+  }
+
+  return Object.freeze({ renderStats, renderProgress, renderQuestion, renderResult, renderFinished });
+}

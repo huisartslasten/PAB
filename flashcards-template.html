@@ -42,10 +42,6 @@
     const content = document.createElement('div');
     const app = createPacoGOApp({ supabaseLib: window.supabase });
 
-    const goLessons = () => {
-      window.location.href = buildViewUrl('lessons.html', { student, mode: context.mode }).toString();
-    };
-
     mountPacoPageTemplate({
       mount,
       backLabel:'← Oefenen',
@@ -58,7 +54,7 @@
       title:'Flashcards',
       icon:'🃏',
       subtitle:'Vraag → antwoord. Druk op Enter om verder te gaan.',
-      navigation:createPacoNavigation({ app, active:'lessons', student, viewMode:context.mode }),
+      navigation:createPacoNavigation({ app, active:'practice', student, viewMode:context.mode }),
       content
     });
 

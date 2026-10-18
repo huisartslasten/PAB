@@ -84,8 +84,12 @@ export function createDoubleOrNothingView({ documentRef = globalThis.document, e
     renderProgress(state);
     const content = documentRef.getElementById('doubleContent');
     if (!content) return;
+    const result = state.lastResult;
     const title = state.score >= state.maxScore && state.maxScore > 0 ? '🏆 Perfect!' : '🎯 Ronde klaar!';
-    content.innerHTML = `<div class="double-finished"><div class="double-finished-title">${title}</div><div class="double-final-score">${state.score} 🦴</div><p>Je record van deze ronde is <strong>${state.bestScore} 🏆</strong>.</p><div class="double-finished-actions"><button class="success" data-double-restart type="button">Nog een keer</button><button class="secondary" data-double-back type="button">← Leskeuze</button></div></div>`;
+    const review = result
+      ? `<div class="double-feedback ${result.correct ? 'correct' : 'wrong'}"><div class="double-feedback-title">${result.correct ? '🎉 Goed gedaan!' : '🐶 Oeps!'}</div><div>${escapeHtml(result.feedback || (result.correct ? 'Goed antwoord!' : 'Kijk goed naar het juiste antwoord.'))}</div><div class="double-score-change">${result.delta >= 0 ? `+${result.delta}` : result.delta} 🦴 &nbsp; ${result.previousScore} → ${result.score} 🦴</div></div><div class="practice-correct-answer"><div class="practice-correct-answer-title">Juiste antwoord</div><div class="practice-correct-answer-text">${escapeHtml(result.expectedAnswer)}</div></div>`
+      : '';
+    content.innerHTML = `<div class="double-finished">${review}<div class="double-finished-title">${title}</div><div class="double-final-score">${state.score} 🦴</div><p>Je beste score voor deze les is <strong>${state.bestScore} 🏆</strong>.</p><div class="double-finished-actions"><button class="success" data-double-restart type="button">Nog een keer</button><button class="secondary" data-double-back type="button">← Leskeuze</button></div></div>`;
     content.querySelector('[data-double-restart]')?.addEventListener('click', onRestart);
     content.querySelector('[data-double-back]')?.addEventListener('click', onBack);
   }

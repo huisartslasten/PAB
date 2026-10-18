@@ -64,6 +64,32 @@ test('zero bones remains playable with a zero stake', async () => {
   assert.equal(state.lastResult.delta, 0);
 });
 
+test('duplicate submissions cannot advance two questions at once', async () => {
+  let release;
+  const grading = new Promise(resolve => { release = resolve; });
+  const runtime = createDoubleOrNothingRuntime({
+    items: [
+      { question: '1+1', answer: '2' },
+      { question: '2+2', answer: '4' },
+      { question: '3+3', answer: '6' }
+    ],
+    gradeAnswer: async () => {
+      await grading;
+      return { correct: true };
+    }
+  });
+
+  runtime.start();
+  const first = runtime.submitAnswer('2');
+  await assert.rejects(() => runtime.submitAnswer('2'), /Deze vraag kan nu niet worden beantwoord/);
+  release();
+  const state = await first;
+
+  assert.equal(state.index, 1);
+  assert.equal(state.score, 10);
+  assert.equal(state.lastResult.delta, 10);
+});
+
 test('maximum possible score doubles after every correct question after the free first question', () => {
   assert.equal(maxScoreFor(0), 0);
   assert.equal(maxScoreFor(1), 10);

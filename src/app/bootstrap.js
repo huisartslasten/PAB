@@ -7,6 +7,7 @@ import { createLessonAudioService } from '../services/lesson-audio-service.js';
 import { createMasteryService } from '../services/mastery-service.js';
 import { createCreatorService } from '../services/creator-service.js';
 import { createTestHistoryService } from '../services/test-history-service.js';
+import { createGameResultService } from '../services/game-result-service.js';
 import { createLessonOrderService } from '../services/lesson-order-service.js';
 import { createAuthState } from '../core/auth.js';
 import { appState, setLessons } from '../core/state.js';
@@ -28,6 +29,7 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null,
   const lessonOrder = createLessonOrderService({ db, storage });
   const agenda = createAgendaReadService({ storage, lessons: () => appState.lessons, currentStudent: () => getViewContext().student });
   const testHistory = createTestHistoryService(db);
+  const gameResults = createGameResultService(db);
   const canManage = () => auth.isParent;
   const canCreate = () => auth.isCreator;
 
@@ -59,6 +61,7 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null,
     mastery,
     agenda,
     testHistory,
+    gameResults,
     creator: createCreatorService(db, { canCreate }),
     management: createManagement({
       auth,

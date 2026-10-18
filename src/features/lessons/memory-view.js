@@ -3,7 +3,7 @@ import { createPacoDropdown } from '../../components/page-template.js';
 const MEMORY_CARD_BACK_IMAGE = new URL('./paco memory.png', import.meta.url).href;
 
 export function createMemoryView({ documentRef = document, escapeHtml = value => String(value) } = {}) {
-  function render({ state, timingMode = 'manual', onTimingModeChange, onResolveTurn, onCardSelect, onFinished }) {
+  function render({ state, bestScore = null, timingMode = 'manual', onTimingModeChange, onResolveTurn, onCardSelect, onFinished }) {
     const shell = documentRef.createElement('main');
     shell.className = 'memory-shell';
 
@@ -46,10 +46,14 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
     }
     controls.appendChild(centerControl);
 
-    const turns = documentRef.createElement('div');
-    turns.className = 'memory-turns';
-    turns.innerHTML = `Beurten: <strong>${state.turnCount}</strong>`;
-    controls.appendChild(turns);
+    const stats = documentRef.createElement('div');
+    stats.className = 'memory-stats';
+    stats.innerHTML = `
+      <span>Beurten: <strong>${state.turnCount}</strong></span>
+      <span>Minimaal: <strong>${state.minimumTurns}</strong></span>
+      <span>Beste: <strong>${bestScore ?? '—'}</strong></span>
+    `;
+    controls.appendChild(stats);
     shell.appendChild(controls);
 
     if (state.phase === 'finished') {

@@ -10,7 +10,7 @@ export function createPlayerTestView({
     const progress = documentRef.getElementById('testProgress');
     if (!progress) throw new Error('The V4.78 test progress element is missing.');
     const pct = total ? index / total * 100 : 0;
-    progress.innerHTML = `<div class="progress-label"><span>Vraag ${Math.min(index + 1, total)} van ${total}</span><span>${index} gemaakt</span></div><div class="progress"><div class="progress-bar" style="width:${pct}%"></div></div>`;
+    progress.innerHTML = `<div class="progress-label"><span>Vraag ${Math.min(index + 1, total)} van ${total}</span><span>${index} gemaakt</span></div><div class="progress"><div class="progress-bar"><span style="width:${pct}%"></span></div></div>`;
   }
 
   function focusAnswer() {

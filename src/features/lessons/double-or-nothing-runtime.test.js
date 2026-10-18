@@ -40,6 +40,30 @@ test('a correct stake adds the stake and a wrong stake subtracts it', async () =
   assert.equal(wrong.lastResult.delta, -20);
 });
 
+test('zero bones remains playable with a zero stake', async () => {
+  const runtime = createDoubleOrNothingRuntime({
+    items: [
+      { question: '1+1', answer: '2' },
+      { question: '2+2', answer: '4' },
+      { question: '3+3', answer: '6' }
+    ],
+    gradeAnswer: async (_question, expected, given) => ({ correct: expected === given })
+  });
+
+  runtime.start();
+  await runtime.submitAnswer('2');
+  runtime.continueGame();
+  runtime.chooseStake(10);
+  await runtime.submitAnswer('wrong');
+  runtime.continueGame();
+  runtime.chooseStake(0);
+  const state = await runtime.submitAnswer('6');
+
+  assert.equal(state.score, 0);
+  assert.equal(state.lastResult.stake, 0);
+  assert.equal(state.lastResult.delta, 0);
+});
+
 test('maximum possible score doubles after every correct question after the free first question', () => {
   assert.equal(maxScoreFor(0), 0);
   assert.equal(maxScoreFor(1), 10);

@@ -33,6 +33,7 @@
   <div id="paco-template-mount"></div>
   <script type="module">
     import { mountPacoPageTemplate } from './src/components/page-template.js';
+    import { createPacoNavigation } from './src/components/page-navigation.js';
     import { createPacoGOApp } from './src/app/bootstrap.js';
 
     const mount = document.querySelector('#paco-template-mount');
@@ -40,7 +41,6 @@
     content.className = 'creator-page';
     const app = createPacoGOApp({ supabaseLib: window.supabase });
     const goManagement = () => { window.location.href = 'management.html'; };
-    const goDashboard = () => { window.location.href = 'dashboard.html'; };
 
     mountPacoPageTemplate({
       mount,
@@ -50,11 +50,13 @@
       title:'Creator Console',
       icon:'🧠',
       subtitle:'Beheer extra AI-afspraken en ontwikkelnotities.',
-      navigation:[
-        {icon:'🏠',label:'Dashboard',onClick:goDashboard},
-        {icon:'⚙️',label:'Beheer',onClick:goManagement},
-        {icon:'🧠',label:'Creator Console',active:true}
-      ],
+      navigation:createPacoNavigation({
+        active:'creator',
+        includeManagementDashboard:true,
+        includeManagement:true,
+        includeManagementTools:true,
+        includeCreator:true
+      }),
       content
     });
 
@@ -169,7 +171,7 @@
           const toggle = document.createElement('button'); toggle.type = 'button'; toggle.textContent = note.status === 'done' ? '↩️ Heropenen' : '✅ Markeer als klaar';
           toggle.addEventListener('click', async () => { toggle.disabled = true; try { await app.creator.toggleNoteStatus(note.id); await renderNotes(); showStatus('Notitie aangepast.'); } catch (error) { toggle.disabled = false; showStatus(error?.message || 'Notitie kon niet worden aangepast.', true); } });
           const remove = document.createElement('button'); remove.type = 'button'; remove.textContent = '🗑️ Verwijderen';
-          remove.addEventListener('click', async () => { if (!window.confirm('Deze ontwikkelnotitie verwijderen?')) return; remove.disabled = true; try { await app.creator.deleteNote(note.id); await renderNotes(); showStatus('Notitie verwijderd.'); } catch (error) { remove.disabled = false; showStatus(error?.message || 'Notitie kon niet worden verwijderd.', true); } });
+          remove.addEventListener('click', async () => { if (!window.confirm('Deze ontwikkelnotitie verwijderen?')) return; remove.disabled = true; try { await app.creator.deleteNote(note.id); await renderNotes(); showStatus('Ontwikkelnotitie verwijderd.'); } catch (error) { remove.disabled = false; showStatus(error?.message || 'Notitie kon niet worden verwijderd.', true); } });
           actions.append(toggle, remove);
           card.append(head, title, body, actions); notesList.append(card);
         });

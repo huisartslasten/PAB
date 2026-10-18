@@ -2,23 +2,24 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createLessonAudioService } from '../src/services/lesson-audio-service.js';
 
-test('lesson audio requests a blob response and plays it', async () => {
+test('lesson audio normalizes the function response to playable mp3 audio', async () => {
   const calls = [];
   const statuses = [];
   const audioInstances = [];
-  const blob = { type: 'audio/mpeg' };
+  const responseBlob = new Blob(['mp3-bytes'], { type: 'application/octet-stream' });
+  let playableBlob = null;
 
   const db = {
     functions: {
       invoke: async (...args) => {
         calls.push(args);
-        return { data: blob, error: null };
+        return { data: responseBlob, error: null };
       }
     }
   };
   const URLRef = {
     createObjectURL: value => {
-      assert.equal(value, blob);
+      playableBlob = value;
       return 'blob:test';
     },
     revokeObjectURL: () => {}
@@ -39,11 +40,9 @@ test('lesson audio requests a blob response and plays it', async () => {
 
   assert.deepEqual(calls, [[
     'speak-word-v1',
-    {
-      body: { text: 'huis', language: 'nl' },
-      responseType: 'blob'
-    }
+    { body: { text: 'huis', language: 'nl' } }
   ]]);
+  assert.equal(playableBlob.type, 'audio/mpeg');
   assert.equal(audioInstances[0].url, 'blob:test');
   assert.deepEqual(statuses, ['🔄 AI-stem maken...', 'AI-stem speelt.']);
 });
@@ -75,7 +74,7 @@ test('lesson audio reports when browser playback is blocked', async () => {
   const statuses = [];
   const db = {
     functions: {
-      invoke: async () => ({ data: {}, error: null })
+      invoke: async () => ({ data: new Blob(['mp3-bytes'], { type: 'application/octet-stream' }), error: null })
     }
   };
   const URLRef = {

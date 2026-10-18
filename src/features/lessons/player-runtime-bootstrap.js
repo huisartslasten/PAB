@@ -46,7 +46,8 @@ export function createProfessionalPlayerBridge({
   const testView = createPlayerTestView({
     documentRef,
     escapeHtml,
-    speakTest: speakCurrentItem
+    speakTest: speakCurrentItem,
+    submitTest: () => entry?.submitTest()
   });
   const resultRenderer = createPlayerResultRenderer({ documentRef, escapeHtml });
 

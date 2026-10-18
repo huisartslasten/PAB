@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PacoGO — Oefenen</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -32,10 +32,12 @@
     import { createPacoGOApp } from './src/app/bootstrap.js';
     import { getActivePracticeModes, getPracticeModes } from './src/features/practice/practice-domain.js';
     import { createLessonContextField } from './src/features/lessons/lesson-context-view.js';
+    import { readViewContext, buildViewUrl } from './src/core/view-context.js';
 
     const params = new URLSearchParams(window.location.search);
+    const context = readViewContext(params);
     const lessonId = params.get('lesson_id') || '';
-    const student = params.get('student') || 'Zyon';
+    const student = context.student;
     const mount = document.querySelector('#paco-template-mount');
     const content = document.createElement('div');
     const app = createPacoGOApp({ supabaseLib: window.supabase });
@@ -47,9 +49,8 @@
     };
 
     const goLessonChoice = () => {
-      const target = new URL('lesson-choice.html', window.location.href);
+      const target = buildViewUrl('lesson-choice.html', { student, mode: context.mode });
       if (lessonId) target.searchParams.set('lesson_id', lessonId);
-      target.searchParams.set('student', student);
       window.location.href = target.toString();
     };
 
@@ -61,16 +62,15 @@
       title: 'Oefenen',
       icon: '✏️',
       subtitle: 'Kies hoe je deze les wilt oefenen.',
-      navigation: createPacoNavigation({ app, active: 'lessons', student }),
+      navigation: createPacoNavigation({ app, active: 'lessons', student, viewMode: context.mode }),
       content
     });
 
     function openMode(mode) {
       const path = targetPaths[mode.id];
       if (!path) return;
-      const target = new URL(path, window.location.href);
+      const target = buildViewUrl(path, { student, mode: context.mode });
       if (lessonId) target.searchParams.set('lesson_id', lessonId);
-      target.searchParams.set('student', student);
       window.location.href = target.toString();
     }
 
@@ -84,8 +84,7 @@
         return;
       }
 
-      content.appendChild(createLessonContextField(lesson));
-
+      const lessonField = createLessonContextField(lesson);
       const grid = document.createElement('div');
       grid.className = 'practice-mode-grid';
       getPracticeModes().forEach(mode => {
@@ -99,10 +98,11 @@
         if (active && getActivePracticeModes().some(candidate => candidate.id === mode.id)) card.addEventListener('click', () => openMode(mode));
         grid.appendChild(card);
       });
-      content.appendChild(grid);
+      lessonField.appendChild(grid);
+      content.appendChild(lessonField);
     }
 
-    if (!lessonId) {
+    if (!lessonId || !student) {
       render(null);
     } else {
       try {

@@ -67,7 +67,7 @@ test('professional player bridge owns the V4.78 test entry seam', async () => {
 
   assert.equal(entry.runtime.session.type, 'words');
   assert.equal(entry.runtime.session.index, 0);
-  assert.equal(documentRef.nodes.testTitle.textContent, '📝 Woordtrainer toets');
+  assert.match(documentRef.nodes.testContent.innerHTML, /appel/);
   assert.equal(hidden.length, 1);
   assert.equal(audio.length, 1);
 

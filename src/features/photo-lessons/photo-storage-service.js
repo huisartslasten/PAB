@@ -9,10 +9,10 @@ export function createPhotoStorageService(db, { canManage = () => true, idFactor
 
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onerror = () => reject(new Error('Foto kon niet worden gelezen.'));
+      reader.onerror = () => reject(new Error('Afbeelding kon niet worden gelezen.'));
       reader.onload = () => {
         const img = new Image();
-        img.onerror = () => reject(new Error('Foto kon niet worden geopend.'));
+        img.onerror = () => reject(new Error('Afbeelding kon niet worden geopend.'));
         img.onload = () => {
           const max = 1800;
           const scale = Math.min(1, max / Math.max(img.naturalWidth || 1, img.naturalHeight || 1));
@@ -21,8 +21,8 @@ export function createPhotoStorageService(db, { canManage = () => true, idFactor
           canvas.height = Math.max(1, Math.round((img.naturalHeight || 1) * scale));
           canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
           canvas.toBlob(blob => {
-            if (!blob) return reject(new Error('Foto kon niet worden verkleind.'));
-            resolve(new File([blob], 'bronfoto.jpg', { type: 'image/jpeg', lastModified: Date.now() }));
+            if (!blob) return reject(new Error('Afbeelding kon niet worden verkleind.'));
+            resolve(new File([blob], 'lesafbeelding.jpg', { type: 'image/jpeg', lastModified: Date.now() }));
           }, 'image/jpeg', 0.82);
         };
         img.src = reader.result;
@@ -33,7 +33,7 @@ export function createPhotoStorageService(db, { canManage = () => true, idFactor
 
   async function uploadForLesson(lessonId, file, createdBy = null) {
     if (!canManage()) throw new Error('Log eerst in als ouder.');
-    if (!lessonId || !file) throw new Error('Geen les of foto geselecteerd.');
+    if (!lessonId || !file) throw new Error('Geen les of afbeelding geselecteerd.');
 
     const prepared = await compressPhoto(file);
     const ext = prepared.type === 'image/png' ? 'png' : 'jpg';
@@ -43,13 +43,12 @@ export function createPhotoStorageService(db, { canManage = () => true, idFactor
       cacheControl: '31536000',
       upsert: false
     });
-
     if (upload.error) throw upload.error;
 
     const inserted = await db.from('lesson_photos').insert({
       lesson_id: Number(lessonId),
       storage_path: path,
-      original_name: file.name || 'bronfoto',
+      original_name: file.name || 'lesafbeelding',
       mime_type: prepared.type,
       size_bytes: prepared.size,
       created_by: createdBy
@@ -62,6 +61,21 @@ export function createPhotoStorageService(db, { canManage = () => true, idFactor
     return inserted.data;
   }
 
+  async function getByIds(ids = [], { signedSeconds = 3600 } = {}) {
+    const wanted = [...new Set((Array.isArray(ids) ? ids : []).map(Number).filter(Boolean))];
+    if (!wanted.length) return [];
+    const result = await db.from('lesson_photos')
+      .select('id,lesson_id,storage_path,original_name,mime_type,size_bytes,created_at')
+      .in('id', wanted);
+    if (result.error) throw result.error;
+    const rows = result.data || [];
+    if (!rows.length) return [];
+    const signed = await db.storage.from(BUCKET).createSignedUrls(rows.map(row => row.storage_path), signedSeconds);
+    if (signed.error) return rows.map(row => ({ ...row, url: '' }));
+    const byPath = new Map((signed.data || []).map(item => [item.path, item.signedUrl || '']));
+    return rows.map(row => ({ ...row, url: byPath.get(row.storage_path) || '' }));
+  }
+
   async function listForLesson(lessonId) {
     if (!lessonId || !canManage()) return [];
     const result = await db.from('lesson_photos')
@@ -69,23 +83,29 @@ export function createPhotoStorageService(db, { canManage = () => true, idFactor
       .eq('lesson_id', Number(lessonId))
       .order('created_at', { ascending: true });
     if (result.error) throw result.error;
-
     const rows = result.data || [];
     if (!rows.length) return [];
-
     const signed = await db.storage.from(BUCKET).createSignedUrls(rows.map(row => row.storage_path), 3600);
     if (signed.error) return rows.map(row => ({ ...row, url: '' }));
     return rows.map((row, index) => ({ ...row, url: signed.data?.[index]?.signedUrl || '' }));
   }
 
-  async function remove(id, path) {
+  async function remove(id, path = null) {
     if (!canManage()) return false;
-    const storageResult = await db.storage.from(BUCKET).remove([path]);
-    if (storageResult.error) throw storageResult.error;
+    let storagePath = path;
+    if (!storagePath) {
+      const found = await db.from('lesson_photos').select('storage_path').eq('id', Number(id)).maybeSingle();
+      if (found.error) throw found.error;
+      storagePath = found.data?.storage_path || null;
+    }
+    if (storagePath) {
+      const storageResult = await db.storage.from(BUCKET).remove([storagePath]);
+      if (storageResult.error) throw storageResult.error;
+    }
     const rowResult = await db.from('lesson_photos').delete().eq('id', Number(id));
     if (rowResult.error) throw rowResult.error;
     return true;
   }
 
-  return Object.freeze({ compressPhoto, uploadForLesson, listForLesson, remove });
+  return Object.freeze({ compressPhoto, uploadForLesson, getByIds, listForLesson, remove });
 }

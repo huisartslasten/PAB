@@ -1,0 +1,20 @@
+.memory-shell{padding:22px;border-radius:24px;background:#fff;box-shadow:0 7px 20px rgba(16,43,87,.07)}
+.memory-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+.memory-header h1{margin:0;color:#102b57;font:800 30px/1 "Baloo 2",Nunito,sans-serif}
+.memory-header p{margin:7px 0 0;color:#667894}
+.memory-turns{padding:10px 14px;border-radius:14px;background:#eef8ff;color:#126fc9;font-weight:800;white-space:nowrap}
+.memory-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}
+.memory-card{min-height:130px;border:2px solid #dce9f6;border-radius:18px;background:#eef8ff;color:#102b57;padding:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;font-weight:800;text-align:center;transition:.16s}
+.memory-card:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 18px rgba(16,43,87,.1)}
+.memory-card.revealed{background:#fffdf0;border-color:#f4e8a8}
+.memory-card.matched{background:#eef9ee;border-color:#b8dfb8}
+.memory-card:disabled{cursor:default}
+.memory-card-back{font-size:42px}
+.memory-card-type{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#667894}
+.memory-status{text-align:center;margin-top:16px;color:#667894;font-weight:800}
+.memory-finished{text-align:center;padding:30px 10px}
+.memory-finished-icon{font-size:54px}
+.memory-finished h2{margin:8px 0 0;color:#102b57;font:800 28px/1 "Baloo 2",Nunito,sans-serif}
+.memory-finished p{color:#667894}
+.memory-primary-button{margin-top:8px;border:0;border-radius:14px;background:#126fc9;color:#fff;padding:12px 18px;font-weight:900;cursor:pointer}
+@media(max-width:700px){.memory-header{align-items:flex-start;flex-direction:column}.memory-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}

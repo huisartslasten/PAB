@@ -13,7 +13,7 @@ function normalizeLessonPayload(payload = {}) {
   };
 }
 
-function normalizeParts(parts = [], fallback = '', defaultRole = 'answer') {
+function normalizeParts(parts = null, fallback = '', defaultRole = 'answer') {
   if (!Array.isArray(parts)) {
     return String(fallback ?? '').split('\n').map(value => value.trim()).filter(Boolean).map(text => ({ text, role: defaultRole }));
   }
@@ -47,7 +47,6 @@ function normalizeLessonItems(items = []) {
 
 export function createLessonService(db) {
   if (!db) throw new Error('A Supabase client is required.');
-
   async function permanentlyDelete(id) {
     const { error: attemptsError } = await db.from('test_attempts').delete().eq('lesson_id', id);
     if (attemptsError) throw attemptsError;
@@ -55,7 +54,6 @@ export function createLessonService(db) {
     if (error) throw error;
     return (data || []).length;
   }
-
   return {
     async listAll() {
       const { data, error } = await db.from('lessons').select('*, lesson_items(*)').order('id', { ascending: true });
@@ -94,18 +92,9 @@ export function createLessonService(db) {
       if (error) throw error;
       return data || [];
     },
-    async archive(id) {
-      const { error } = await db.from('lessons').update({ archived: true }).eq('id', id);
-      if (error) throw error;
-    },
-    async moveToTrash(id) {
-      const { error } = await db.from('lessons').update({ deleted: true, archived: false }).eq('id', id);
-      if (error) throw error;
-    },
-    async restore(id) {
-      const { error } = await db.from('lessons').update({ archived: false, deleted: false }).eq('id', id);
-      if (error) throw error;
-    },
+    async archive(id) { const { error } = await db.from('lessons').update({ archived: true }).eq('id', id); if (error) throw error; },
+    async moveToTrash(id) { const { error } = await db.from('lessons').update({ deleted: true, archived: false }).eq('id', id); if (error) throw error; },
+    async restore(id) { const { error } = await db.from('lessons').update({ archived: false, deleted: false }).eq('id', id); if (error) throw error; },
     async permanentlyDelete(id) { return permanentlyDelete(id); },
     async emptyTrash() {
       const { data: trashedLessons, error: listError } = await db.from('lessons').select('id').eq('deleted', true);

@@ -1,5 +1,5 @@
 export function createMemoryView({ documentRef = document, escapeHtml = value => String(value) } = {}) {
-  function render({ state, onCardSelect, onFinished, onResolve }) {
+  function render({ state, onCardSelect, onFinished }) {
     const shell = documentRef.createElement('main');
     shell.className = 'memory-shell';
 
@@ -47,7 +47,6 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
       status.className = 'memory-status';
       status.textContent = 'Even kijken…';
       shell.appendChild(status);
-      onResolve();
     }
 
     return shell;

@@ -40,14 +40,17 @@ describe('learning content service', () => {
   it('preserves existing card ids while updating order and content', async () => {
     const existing = createQuery({ data: [{ id: 4 }, { id: 5 }], error: null });
     const save = createQuery({ data: [{ id: 4, lesson_id: 10, title: 'A', content: 'B', image_id: null, sort_order: 0, created_at: null }], error: null });
+    const remove = createQuery({ data: [], error: null });
     const read = createQuery({ data: [{ id: 4, lesson_id: 10, title: 'A', content: 'B', image_id: null, sort_order: 0, created_at: null }], error: null });
     const db = { from: vi.fn()
       .mockReturnValueOnce(existing)
       .mockReturnValueOnce(save)
+      .mockReturnValueOnce(remove)
       .mockReturnValueOnce(read) };
     const service = createLearningContentService(db, { canManage: () => true });
     await service.replaceForLesson(10, [{ id: 4, title: 'A', content: 'B' }]);
     expect(save.upsert).toHaveBeenCalledWith([{ id: 4, lesson_id: 10, title: 'A', content: 'B', image_id: null, sort_order: 0 }]);
-    expect(existing.delete).not.toHaveBeenCalled();
+    expect(remove.delete).toHaveBeenCalled();
+    expect(remove.in).toHaveBeenCalledWith('id', [5]);
   });
 });

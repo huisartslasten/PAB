@@ -32,7 +32,7 @@ export function createDoubleOrNothingView({ documentRef = globalThis.document, e
     }
 
     if (state.score === 0) {
-      box.innerHTML = '<div class="double-free-round">Je hebt 0 🦴. Je kunt nog steeds verder spelen.</div>';
+      box.innerHTML = '<div class="double-free-round">Je hebt 0 🦴. Speel door met inzet <strong>0 🦴</strong>.</div><div class="double-stake-buttons"><button type="button" class="double-stake-button" data-stake="0">0 🦴</button></div>';
       return;
     }
 

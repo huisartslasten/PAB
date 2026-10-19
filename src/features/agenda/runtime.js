@@ -129,7 +129,7 @@ export function createAgendaRuntime({
     element.innerHTML = `<section class="agenda-school-week">` +
       `<div class="agenda-school-week-title"><div class="agenda-school-week-title-center"><strong>📚 Deze schoolweek</strong><span>${formatRange(start)}</span></div></div>` +
       `<div class="agenda-week-days"><div class="agenda-weekday-row">${weekdays}</div><div class="agenda-weekend-row">${weekends}</div></div>` +
-      `<div class="agenda-week-bottom-nav"><button class="agenda-week-nav-button agenda-add-button" type="button" data-agenda-add="1">➕ Agenda toevoegen</button><div class="agenda-week-bottom-actions"><button class="agenda-week-nav-button" type="button" data-agenda-week="-1">← Vorige week</button><button class="agenda-week-nav-button agenda-today-button" type="button" data-agenda-today="1">📍 Vandaag</button><button class="agenda-week-nav-button" type="button" data-agenda-week="1">Volgende week →</button></div></div>` +
+      `<div class="agenda-week-bottom-nav"><button class="agenda-week-nav-button agenda-add-button" type="button" data-agenda-add="1">➕ Agenda toevoegen</button><button class="agenda-week-nav-button" type="button" data-agenda-week="-1">← Vorige week</button><button class="agenda-week-nav-button agenda-today-button" type="button" data-agenda-today="1">📍 Vandaag</button><button class="agenda-week-nav-button" type="button" data-agenda-week="1">Volgende week →</button></div>` +
       `</section>`;
 
     element.querySelectorAll('[data-agenda-week]').forEach(button => {

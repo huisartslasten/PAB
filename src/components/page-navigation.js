@@ -58,7 +58,7 @@ export function createPacoNavigation({
   const showManagementDashboard = isManagementView || includeManagementDashboard;
   const showManagementTools = isManagementView || includeManagementTools;
   const showCreator = isManagementView || includeCreator;
-  const showAgenda = isManagementView || includeAgenda;
+  const showAgenda = includeAgenda;
   const learners = managementStudents.length ? managementStudents : listStudents();
   const items = [];
 
@@ -130,7 +130,12 @@ export function createPacoNavigation({
     });
   }
 
-  items.push({ key: 'test-history', icon: '📝', label: 'Toetsgeschiedenis', onClick: () => go(navigate, 'test-history.html', view) });
+  items.push({
+    key: 'test-history',
+    icon: '📝',
+    label: isManagementView ? 'Toetsgeschiedenis' : 'Toetsen',
+    onClick: () => go(navigate, 'test-history.html', view)
+  });
 
   if (includeManagement && !isManagementView) items.push({ key: 'management', icon: '⚙️', label: 'Beheer', onClick: () => go(navigate, 'management.html', view) });
   if (showManagementTools) {

@@ -50,9 +50,9 @@ test('test page uses the canonical shell', async ({ page }) => {
 });
 
 test('test history page uses the management shell without student submenu', async ({ page }) => {
-  await expectCanonicalShell(page, 'test-history.html', 'Toetsgeschiedenis', { expectAgendaSubmenu: false });
-  await expect(page.locator('#historyStudent')).toHaveCount(1);
+  await expectCanonicalShell(page, 'test-history.html?student=Zyon&mode=management', 'Toetsgeschiedenis', { expectAgendaSubmenu: false });
   await expect(page.locator('#testHistoryContent')).toHaveCount(1);
+  await expect(page.getByText('Bekijk de gemaakte toetsen van Zyon.')).toBeVisible();
 });
 
 test('lesson view uses the canonical shell', async ({ page }) => {

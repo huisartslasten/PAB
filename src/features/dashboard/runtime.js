@@ -22,12 +22,15 @@ export function createDashboardRuntime({ app, templateMount, chooserMount, conte
     const hero = documentRef.createElement('header'); hero.className = 'dashboard-chooser-hero';
     const heroImage = documentRef.createElement('img'); heroImage.src = 'pacogo-aruba-hero.png'; heroImage.alt = 'PacoGO Aruba';
     const management = documentRef.createElement('a'); management.className = 'dashboard-management-link'; management.href = buildViewUrl('management.html').toString(); management.textContent = 'Beheer';
+    management.addEventListener('click', event => { event.preventDefault(); navigate(buildViewUrl('management.html')); });
     hero.append(heroImage, management);
     const chooser = documentRef.createElement('section'); chooser.className = 'dashboard-chooser-content';
     const title = documentRef.createElement('h1'); title.className = 'dashboard-chooser-title'; title.textContent = 'Wie gaat er leren?'; chooser.appendChild(title);
     const grid = documentRef.createElement('div'); grid.className = 'dashboard-chooser-students';
     listStudents().forEach(student => {
-      const link = documentRef.createElement('a'); link.className = 'dashboard-chooser-student'; link.href = buildViewUrl('dashboard.html', { student, mode: 'student' }).toString(); link.setAttribute('aria-label', `Dashboard van ${student}`);
+      const target = buildViewUrl('dashboard.html', { student, mode: 'student' });
+      const link = documentRef.createElement('a'); link.className = 'dashboard-chooser-student'; link.href = target.toString(); link.setAttribute('aria-label', `Dashboard van ${student}`);
+      link.addEventListener('click', event => { event.preventDefault(); navigate(target); });
       const name = documentRef.createElement('span'); name.className = 'dashboard-chooser-student-name'; name.textContent = student;
       const label = documentRef.createElement('span'); label.className = 'dashboard-chooser-student-label'; label.textContent = 'Mijn lessen';
       const go = documentRef.createElement('span'); go.className = 'dashboard-chooser-go'; go.textContent = 'GO! →';
@@ -102,7 +105,7 @@ export function createDashboardRuntime({ app, templateMount, chooserMount, conte
   async function mount() {
     if (!selectedStudent) { renderStartPage(); return; }
     chooserMount.replaceChildren();
-    mountPacoPageTemplate({ mount: templateMount, backLabel: '← Start', backAction: goChooser, greeting: `Hoi ${selectedStudent}! 🐶`, title: 'Dashboard', icon: '🏠', subtitle: 'Bekijk je lessen en zie hoe je ervoor staat.', navigation: createPacoNavigation({ app, active: 'dashboard', student: selectedStudent, viewMode: context.mode, hideActive: true }), content });
+    mountPacoPageTemplate({ mount: templateMount, backLabel: '← Start', backAction: goChooser, greeting: `Hoi ${selectedStudent}! 🐶`, title: 'Dashboard', icon: '🏠', subtitle: 'Bekijk je lessen en zie hoe je ervoor staat.', navigation: createPacoNavigation({ app, active: 'dashboard', student: selectedStudent, viewMode: context.mode, hideActive: true, navigate }), content });
     const state = documentRef.createElement('div'); state.className = 'dashboard-state'; state.textContent = 'Dashboard laden…'; content.appendChild(state);
     try { const records = await app.loadLessons(); render(records); }
     catch (error) { console.error('Dashboard page load error:', error); state.textContent = 'Het dashboard kon niet worden geladen.'; }

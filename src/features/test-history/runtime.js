@@ -65,6 +65,7 @@ export function createTestHistoryRuntime({
           active: 'test-history',
           student: requestedStudent,
           viewMode: 'management',
+          includeManagementStudentSelector: false,
           includePractice: false,
           includeAgenda: false,
           navigate

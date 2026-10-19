@@ -25,10 +25,7 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
   const goHome = () => navigate(buildViewUrl('dashboard.html', { student: selectedStudent, mode: context?.mode }));
   const goLessons = () => navigate(buildLessonsUrl());
 
-  function showActionNotice(message) {
-    actionState.textContent = message;
-    actionState.hidden = false;
-  }
+  function showActionNotice(message) { actionState.textContent = message; actionState.hidden = false; }
 
   function lessonTarget(lesson) {
     const target = buildViewUrl('lesson-choice.html', { student: selectedStudent, mode: context?.mode });
@@ -51,27 +48,15 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
   async function archiveLesson(lesson) {
     const confirmed = await confirmPacoAction({ title: 'Les archiveren?', message: `“${lesson.title}” wordt uit de actieve lessen van ${selectedStudent} gehaald en in het archief geplaatst.`, confirmLabel: 'Archiveren', cancelLabel: 'Annuleren' });
     if (!confirmed) return;
-    try {
-      await app.management.archiveLesson(lesson.id);
-      showActionNotice(`“${lesson.title}” is gearchiveerd en uit de actieve lessen verwijderd.`);
-      await render(app.state.lessons);
-    } catch (error) {
-      console.error('Lesson archive error:', error);
-      showActionNotice(error?.message || 'De les kon niet worden gearchiveerd.');
-    }
+    try { await app.management.archiveLesson(lesson.id); showActionNotice(`“${lesson.title}” is gearchiveerd en uit de actieve lessen verwijderd.`); await render(app.state.lessons); }
+    catch (error) { console.error('Lesson archive error:', error); showActionNotice(error?.message || 'De les kon niet worden gearchiveerd.'); }
   }
 
   async function moveLessonToTrash(lesson) {
     const confirmed = await confirmPacoAction({ title: 'Les naar prullenbak?', message: `“${lesson.title}” wordt uit de actieve lessen van ${selectedStudent} gehaald en naar de prullenbak verplaatst.`, confirmLabel: 'Naar prullenbak', cancelLabel: 'Annuleren' });
     if (!confirmed) return;
-    try {
-      await app.management.moveToTrash(lesson.id);
-      showActionNotice(`“${lesson.title}” staat in de prullenbak en is uit de actieve lessen verwijderd.`);
-      await render(app.state.lessons);
-    } catch (error) {
-      console.error('Lesson trash error:', error);
-      showActionNotice(error?.message || 'De les kon niet naar de prullenbak worden verplaatst.');
-    }
+    try { await app.management.moveToTrash(lesson.id); showActionNotice(`“${lesson.title}” staat in de prullenbak en is uit de actieve lessen verwijderd.`); await render(app.state.lessons); }
+    catch (error) { console.error('Lesson trash error:', error); showActionNotice(error?.message || 'De les kon niet naar de prullenbak worden verplaatst.'); }
   }
 
   function renderLessonCard(lesson) {
@@ -81,34 +66,20 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
     wrap.dataset.lessonId = String(lesson.id);
     const card = documentRef.createElement('a');
     card.href = lessonTarget(lesson).toString();
-    card.style.display = 'block';
-    card.style.color = 'inherit';
-    card.style.textDecoration = 'none';
-    const heading = documentRef.createElement('h2');
-    heading.textContent = lesson.title || 'Naamloze les';
-    const subvak = documentRef.createElement('p');
-    subvak.textContent = lesson.subvak || 'Les';
-    card.append(heading, subvak);
-    wrap.appendChild(card);
-    const view = documentRef.createElement('button');
-    view.type = 'button';
-    view.className = 'lesson-view-button';
-    view.textContent = 'Bekijken';
+    card.style.display = 'block'; card.style.color = 'inherit'; card.style.textDecoration = 'none';
+    const heading = documentRef.createElement('h2'); heading.textContent = lesson.title || 'Naamloze les';
+    const subvak = documentRef.createElement('p'); subvak.textContent = lesson.subvak || 'Les';
+    card.append(heading, subvak); wrap.appendChild(card);
+    const view = documentRef.createElement('button'); view.type = 'button'; view.className = 'lesson-view-button'; view.textContent = 'Bekijken';
     view.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); navigate(lessonTarget(lesson)); });
     wrap.appendChild(view);
     if (context?.isManagement) {
-      const actions = documentRef.createElement('div');
-      actions.className = 'lesson-management-actions';
-      const edit = documentRef.createElement('button'); edit.type = 'button'; edit.textContent = 'Bewerken';
-      edit.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); editLesson(lesson); });
-      const learning = documentRef.createElement('button'); learning.type = 'button'; learning.textContent = 'Leerstof';
-      learning.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); editLearning(lesson); });
-      const archive = documentRef.createElement('button'); archive.type = 'button'; archive.textContent = 'Archiveren';
-      archive.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); archiveLesson(lesson); });
-      const trash = documentRef.createElement('button'); trash.type = 'button'; trash.className = 'danger'; trash.textContent = 'Verwijderen';
-      trash.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); moveLessonToTrash(lesson); });
-      actions.append(edit, learning, archive, trash);
-      wrap.appendChild(actions);
+      const actions = documentRef.createElement('div'); actions.className = 'lesson-management-actions';
+      const edit = documentRef.createElement('button'); edit.type = 'button'; edit.textContent = 'Bewerken'; edit.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); editLesson(lesson); });
+      const learning = documentRef.createElement('button'); learning.type = 'button'; learning.textContent = 'Leerstof'; learning.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); editLearning(lesson); });
+      const archive = documentRef.createElement('button'); archive.type = 'button'; archive.textContent = 'Archiveren'; archive.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); archiveLesson(lesson); });
+      const trash = documentRef.createElement('button'); trash.type = 'button'; trash.className = 'danger'; trash.textContent = 'Verwijderen'; trash.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); moveLessonToTrash(lesson); });
+      actions.append(edit, learning, archive, trash); wrap.appendChild(actions);
     }
     return wrap;
   }
@@ -127,9 +98,7 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
         grid.appendChild(card);
       });
       content.append(heading, grid);
-      if (!grid.children.length) {
-        const empty = documentRef.createElement('div'); empty.className = 'lessons-state'; empty.textContent = `Geen actieve lessen gevonden voor ${selectedStudent}.`; content.appendChild(empty);
-      }
+      if (!grid.children.length) { const empty = documentRef.createElement('div'); empty.className = 'lessons-state'; empty.textContent = `Geen actieve lessen gevonden voor ${selectedStudent}.`; content.appendChild(empty); }
       return;
     }
     const key = normalizeLessonSubject(selectedSubject);
@@ -147,9 +116,7 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
       const grid = documentRef.createElement('div'); grid.className = 'lesson-grid'; group.lessons.forEach(lesson => grid.appendChild(renderLessonCard(lesson)));
       section.append(title, grid); content.appendChild(section);
     });
-    if (!groups.length) {
-      const empty = documentRef.createElement('div'); empty.className = 'lessons-state'; empty.textContent = 'Geen actieve lessen gevonden in dit vak.'; content.appendChild(empty); return;
-    }
+    if (!groups.length) { const empty = documentRef.createElement('div'); empty.className = 'lessons-state'; empty.textContent = 'Geen actieve lessen gevonden in dit vak.'; content.appendChild(empty); return; }
     const lessonById = new Map(orderedLessons.map(lesson => [Number(lesson.id), lesson]));
     attachLessonDragSorting(content, {
       selector: '.lesson-card[data-lesson-id][draggable="true"]',
@@ -162,8 +129,6 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
   }
 
   async function mount() {
-    if (context?.isManagement) applyViewContext(context, { canManage: app.auth.isParent });
-    else applyViewContext(context);
     mountPacoPageTemplate({
       mount: templateMount,
       backLabel: '← Dashboard',
@@ -179,6 +144,8 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
     try {
       if (!selectedStudent) throw new Error('Geen leerling geselecteerd.');
       await app.initializeSession();
+      if (context?.isManagement) applyViewContext(context, { canManage: app.auth.isParent });
+      else applyViewContext(context);
       const records = await app.loadLessons();
       state.remove();
       await render(records);

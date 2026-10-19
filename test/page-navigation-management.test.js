@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const navigation = fs.readFileSync(path.join(projectRoot, 'src/components/page-navigation.js'), 'utf8');
 const managementPage = fs.readFileSync(path.join(projectRoot, 'management.html'), 'utf8');
+const managementRuntime = fs.readFileSync(path.join(projectRoot, 'src/features/management/runtime.js'), 'utf8');
 
 test('management navigation uses Dashboard as its management home and owns the student submenu', () => {
   assert.match(navigation, /key: 'management-dashboard',[\s\S]*?label: 'Dashboard'/);
@@ -20,10 +21,13 @@ test('management student submenu contains the canonical student labels from the 
   assert.match(navigation, /key: `management-student-\$\{name\}`/);
 });
 
-test('management page uses the shared template heading contract', () => {
-  assert.match(managementPage, /heading\.className='page-heading'/);
-  assert.match(managementPage, /title\.textContent=selectedStudent\?`Beheer van \$\{selectedStudent\}`:'Beheer'/);
+test('management page delegates its shell and feature composition to the canonical runtime', () => {
+  assert.match(managementPage, /startPacoRuntime/);
   assert.match(managementPage, /src\/features\/management\/management-support\.css/);
+  assert.match(managementRuntime, /mountPacoPageTemplate/);
+  assert.match(managementRuntime, /title\.textContent = selectedStudent \? `Beheer van \$\{selectedStudent\}` : 'Beheer'/);
+  assert.match(managementRuntime, /createPacoNavigation/);
+  assert.match(managementRuntime, /active: 'management-dashboard'/);
 });
 
 test('management test history keeps the shared management view context through the central navigation owner', () => {

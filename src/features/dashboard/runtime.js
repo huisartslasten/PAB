@@ -6,10 +6,14 @@ import { listStudents } from '../students/students.js';
 
 export function createDashboardRuntime({ app, templateMount, chooserMount, context, documentRef = document, navigate } = {}) {
   if (!app) throw new TypeError('Dashboard runtime requires an app.');
-  if (!templateMount || !chooserMount) throw new TypeError('Dashboard runtime requires both mounts.');
+  if (!templateMount) throw new TypeError('Dashboard runtime requires a template mount.');
   if (typeof navigate !== 'function') throw new TypeError('Dashboard runtime requires a navigation owner.');
 
   const selectedStudent = context?.student || '';
+  if (!selectedStudent && !chooserMount) {
+    throw new TypeError('Dashboard chooser requires a chooser mount.');
+  }
+
   const content = documentRef.createElement('div');
   content.className = 'dashboard-page';
 
@@ -104,7 +108,7 @@ export function createDashboardRuntime({ app, templateMount, chooserMount, conte
 
   async function mount() {
     if (!selectedStudent) { renderStartPage(); return; }
-    chooserMount.replaceChildren();
+    if (chooserMount) chooserMount.replaceChildren();
     mountPacoPageTemplate({ mount: templateMount, backLabel: '← Start', backAction: goChooser, greeting: `Hoi ${selectedStudent}! 🐶`, title: 'Dashboard', icon: '🏠', subtitle: 'Bekijk je lessen en zie hoe je ervoor staat.', navigation: createPacoNavigation({ app, active: 'dashboard', student: selectedStudent, viewMode: context.mode, hideActive: true, navigate }), content });
     const state = documentRef.createElement('div'); state.className = 'dashboard-state'; state.textContent = 'Dashboard laden…'; content.appendChild(state);
     try { const records = await app.loadLessons(); render(records); }

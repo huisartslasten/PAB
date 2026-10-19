@@ -146,7 +146,7 @@ export function createPacoNavigation({
       label: app.auth.isLoggedIn ? 'Uitloggen' : 'Inloggen',
       onClick: async () => {
         if (!app.auth.isLoggedIn) {
-          go(navigate, 'auth.html');
+          window.location.href = 'auth.html';
           return;
         }
         const confirmed = await confirmPacoAction({

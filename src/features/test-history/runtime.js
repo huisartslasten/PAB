@@ -1,5 +1,5 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
-import { createPacoNavigation } from '../../components/page-navigation.js';
+import { createPacoManagementNavigation } from '../../components/page-navigation.js';
 import { createTestHistoryRenderer } from './test-history-renderer.js';
 import { escapeHtml } from '../../core/html.js';
 import { buildViewUrl } from '../../core/view-context.js';
@@ -60,15 +60,10 @@ export function createTestHistoryRuntime({
         subtitle: requestedStudent
           ? `Bekijk de gemaakte toetsen van ${requestedStudent}.`
           : 'Bekijk de gemaakte toetsen van alle leerlingen.',
-        navigation: createPacoNavigation({
+        navigation: createPacoManagementNavigation({
           app,
           active: 'test-history',
           student: requestedStudent,
-          viewMode: 'management',
-          includeManagementStudentSelector: false,
-          includeManagementDashboardStudentSubmenu: false,
-          includePractice: false,
-          includeAgenda: false,
           navigate
         }),
         content

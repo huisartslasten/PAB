@@ -16,7 +16,7 @@ async function expectCanonicalShell(page, path, title) {
 
 test('lessons uses the canonical shell', async ({ page }) => {
   await expectCanonicalShell(page, 'lessons.html', 'Mijn lessen');
-  await expect(page.getByRole('button', { name: 'Dashboard' })).toBeVisible();
+  await expect(page.locator('.paco-template-nav-item').filter({ hasText: 'Dashboard' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Mijn lessen' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Toetsen' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Mijn agenda' })).toBeVisible();
@@ -24,7 +24,7 @@ test('lessons uses the canonical shell', async ({ page }) => {
 
 test('lessons dashboard navigation targets the canonical dashboard', async ({ page }) => {
   await page.goto(`${baseUrl}/lessons.html?student=Zyon`);
-  await page.getByRole('button', { name: 'Dashboard' }).click();
+  await page.locator('.paco-template-nav-item').filter({ hasText: 'Dashboard' }).click();
   await expect(page).toHaveURL(/\/dashboard\.html\?viewStudent=Zyon$/);
   await expect(page.locator('.paco-template-main h1')).toHaveText('Dashboard');
 });

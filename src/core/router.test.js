@@ -27,9 +27,26 @@ describe('createPacoRouter', () => {
     expect(route.params.get('viewStudent')).toBe('Zyon');
   });
 
-  it('owns pushState navigation and emits the resulting route', () => {
+  it('owns registered route renderers', () => {
+    const windowRef = createWindow();
+    const renderer = vi.fn();
+    const router = createPacoRouter({ windowRef, routes: { 'dashboard.html': renderer } });
+
+    expect(router.has('dashboard.html')).toBe(true);
+    expect(router.getRenderer(router.getRoute())).toBe(renderer);
+  });
+
+  it('rejects non-function route renderers', () => {
     const windowRef = createWindow();
     const router = createPacoRouter({ windowRef });
+
+    expect(() => router.register('lessons.html', null)).toThrow(TypeError);
+  });
+
+  it('owns pushState navigation and emits the resulting route', () => {
+    const windowRef = createWindow();
+    const renderer = vi.fn();
+    const router = createPacoRouter({ windowRef, routes: { 'lessons.html': renderer } });
     const listener = vi.fn();
     router.onChange(listener);
 
@@ -42,7 +59,8 @@ describe('createPacoRouter', () => {
     );
     expect(listener).toHaveBeenCalledWith(expect.objectContaining({
       path: 'lessons.html',
-      popstate: false
+      popstate: false,
+      renderer
     }));
   });
 

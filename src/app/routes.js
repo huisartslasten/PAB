@@ -7,6 +7,7 @@ import { createTestRuntime } from '../features/lessons/test-runtime.js';
 import { createPracticeMenuRuntime } from '../features/practice/menu-runtime.js';
 import { createFlashcardsPageRuntime } from '../features/practice/flashcards/page-runtime.js';
 import { createAgendaPageRuntime } from '../features/agenda/page-runtime.js';
+import { createMonthCalendarRuntime } from '../features/agenda/month-calendar-runtime.js';
 import { createTestHistoryRuntime } from '../features/test-history/runtime.js';
 import { createManagementRuntime } from '../features/management/runtime.js';
 import { createArchiveRuntime } from '../features/management/archive-runtime.js';
@@ -42,7 +43,8 @@ export function createPacoRouteRegistry({ app, mounts, documentRef = document } 
   routes['test.html'] = defineRoute(({ url, navigate }) => createTestRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/lessons/test.css']);
   routes['oefenen.html'] = defineRoute(({ url, navigate }) => createPracticeMenuRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/practice/practice-menu.css']);
   routes['flashcards-template.html'] = defineRoute(({ url, navigate }) => createFlashcardsPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/practice/flashcards/flashcards.css']);
-  routes['agenda.html'] = defineRoute(({ url, navigate }) => createAgendaPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }));
+  routes['agenda.html'] = defineRoute(({ url, navigate }) => createAgendaPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/agenda/agenda.css']);
+  routes['month-calendar.html'] = defineRoute(({ url, navigate }) => createMonthCalendarRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/agenda/month-calendar.css']);
   routes['test-history.html'] = defineRoute(({ url, navigate }) => createTestHistoryRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/test-history/test-history.css']);
   routes['management.html'] = defineRoute(({ url, navigate }) => createManagementRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/management/management-support.css']);
   routes['archive.html'] = defineRoute(({ url, navigate }) => createArchiveRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/management/management-support.css']);

@@ -3,9 +3,15 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
 const lessonChoice = await readFile(new URL('../lesson-choice.html', import.meta.url), 'utf8');
+const routes = await readFile(new URL('../src/app/routes.js', import.meta.url), 'utf8');
+const runtime = await readFile(new URL('../src/features/lessons/lesson-choice-runtime.js', import.meta.url), 'utf8');
 
-test('lesson choice uses the shared navigation owner', () => {
-  assert.match(lessonChoice, /from ['"]\.\/src\/components\/page-navigation\.js['"]/);
-  assert.match(lessonChoice, /createPacoNavigation\(\{\s*app,\s*active:\s*'lessons',\s*student,\s*viewMode:\s*context\.mode\s*\}\)/);
+test('lesson choice delegates navigation to the canonical runtime and router', () => {
+  assert.match(lessonChoice, /from ['"]\.\/src\/app\/runtime\.js['"]/);
+  assert.match(lessonChoice, /startPacoRuntime\(/);
+  assert.match(routes, /routes\[['"]lesson-choice\.html['"]\]\s*=\s*\(\{ url, navigate \}\)/);
+  assert.match(routes, /createLessonChoiceRuntime/);
+  assert.match(runtime, /createPacoNavigation\(\{[\s\S]*navigate\s*\}\)/);
+  assert.match(runtime, /navigate\(targetFor\(/);
   assert.doesNotMatch(lessonChoice, /index\.html\?view=agenda/);
 });

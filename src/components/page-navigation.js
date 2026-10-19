@@ -1,4 +1,5 @@
 import { listStudents } from '../features/students/students.js';
+import { confirmPacoAction } from './confirm-dialog.js';
 
 /**
  * PacoGO shared shell navigation.
@@ -73,7 +74,7 @@ export function createPacoNavigation({
     items.push({
       key: 'management-dashboard',
       icon: '🏠',
-      label: 'Beheer dashboard',
+      label: 'Dashboard',
       onClick: () => go('management.html', view)
     });
   }
@@ -108,7 +109,7 @@ export function createPacoNavigation({
     });
   }
 
-  items.push({ key: 'test-history', icon: '📝', label: 'Toetsen', onClick: () => go('test-history.html', view) });
+  items.push({ key: 'test-history', icon: '📝', label: 'Toetsgeschiedenis', onClick: () => go('test-history.html', view) });
 
   if (includeManagement && !isManagementView) items.push({ key: 'management', icon: '⚙️', label: 'Beheer', onClick: () => go('management.html', view) });
   if (includeManagementTools) {
@@ -127,6 +128,13 @@ export function createPacoNavigation({
           go('auth.html');
           return;
         }
+        const confirmed = await confirmPacoAction({
+          title: 'Uitloggen?',
+          message: 'Weet je zeker dat je wilt uitloggen?',
+          confirmLabel: 'Ja, uitloggen',
+          cancelLabel: 'Nee'
+        });
+        if (!confirmed) return;
         await app.authSession.signOut();
         app.auth.setSession(null);
         window.location.href = 'auth.html';

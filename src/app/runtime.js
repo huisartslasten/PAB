@@ -20,31 +20,14 @@ export function createPacoRuntime({
   });
   const router = createPacoRouter({ windowRef: window, routes });
 
-  async function renderRoute(route) {
-    if (typeof route?.renderer !== 'function') return null;
-    const runtime = route.renderer(route);
-    if (!runtime || typeof runtime.mount !== 'function') {
-      throw new TypeError(`Paco route renderer for ${route.path} must return a mountable runtime.`);
-    }
-    await runtime.mount();
-    return runtime;
-  }
-
-  return Object.freeze({ app, router, routes, renderRoute });
+  return Object.freeze({ app, router, routes });
 }
 
-export async function startPacoRuntime(options = {}) {
+export function startPacoRuntime(options = {}) {
   const runtime = createPacoRuntime(options);
   const stop = runtime.router.start();
-  const unsubscribe = runtime.router.onChange(route => {
-    void runtime.renderRoute(route);
-  });
-  await runtime.renderRoute(runtime.router.getRoute());
   return Object.freeze({
     ...runtime,
-    stop: () => {
-      unsubscribe();
-      stop();
-    }
+    stop
   });
 }

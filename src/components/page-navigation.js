@@ -181,3 +181,38 @@ export function createPacoNavigation({
     .filter(item => !(hideActive && item.key === active))
     .map(item => ({ ...item, active: item.key === active }));
 }
+
+/**
+ * Canonical management-shell navigation.
+ *
+ * Every management page uses the same sidebar structure. Only the active item,
+ * selected learner and central navigation callback vary per page.
+ */
+export function createPacoManagementNavigation({
+  app,
+  active = '',
+  activeSubmenu = '',
+  student = '',
+  managementStudents = [],
+  onSelectManagementStudent = null,
+  navigate
+} = {}) {
+  return createPacoNavigation({
+    app,
+    active,
+    activeSubmenu,
+    student,
+    viewMode: 'management',
+    managementStudents,
+    onSelectManagementStudent,
+    includeManagementDashboardStudentSubmenu: true,
+    includeManagement: true,
+    includeManagementTools: true,
+    includeCreator: true,
+    includeLessons: true,
+    includePractice: false,
+    includeAgenda: true,
+    includeAccount: true,
+    navigate
+  });
+}

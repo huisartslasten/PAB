@@ -1,8 +1,8 @@
 /**
  * PacoGO central client-side route state and rendering contract.
  *
- * The router owns URL state and route transitions. It does not know feature
- * business logic; callers register the renderer for each route.
+ * The router owns URL state and route transitions. Route renderers own feature
+ * composition and rendering; the router only supplies navigation context.
  */
 
 function normalizePath(path) {
@@ -13,6 +13,7 @@ function normalizePath(path) {
 export function createPacoRouter({ windowRef = window, routes = {} } = {}) {
   const listeners = new Set();
   const routeTable = new Map(Object.entries(routes));
+  let activeRenderer = null;
 
   function resolve(input = windowRef.location.href) {
     const url = input instanceof URL
@@ -30,13 +31,23 @@ export function createPacoRouter({ windowRef = window, routes = {} } = {}) {
     return routeTable.get(route.path) || null;
   }
 
-  function notify(route, { replace = false, popstate = false } = {}) {
+  async function render(route) {
+    const renderer = getRenderer(route);
+    if (typeof renderer !== 'function') return null;
+    const runtime = await renderer({ url: route.url, navigate });
+    activeRenderer = runtime || null;
+    if (runtime && typeof runtime.mount === 'function') await runtime.mount();
+    return runtime;
+  }
+
+  async function notify(route, { replace = false, popstate = false } = {}) {
     const event = { ...route, replace, popstate, renderer: getRenderer(route) };
+    await render(route);
     listeners.forEach(listener => listener(event));
     return event;
   }
 
-  function navigate(input, { replace = false } = {}) {
+  async function navigate(input, { replace = false } = {}) {
     const route = resolve(input);
     const method = replace ? 'replaceState' : 'pushState';
     windowRef.history[method]({}, '', route.url.toString());
@@ -44,14 +55,16 @@ export function createPacoRouter({ windowRef = window, routes = {} } = {}) {
   }
 
   function start() {
-    const onPopState = () => notify(resolve(), { popstate: true });
+    const onPopState = () => { void notify(resolve(), { popstate: true }); };
     windowRef.addEventListener('popstate', onPopState);
+    void notify(resolve());
     return () => windowRef.removeEventListener('popstate', onPopState);
   }
 
   return {
     getRoute: () => resolve(),
     getRenderer,
+    getActiveRenderer: () => activeRenderer,
     has: path => routeTable.has(normalizePath(path)),
     register: (path, renderer) => {
       if (typeof renderer !== 'function') throw new TypeError('A PacoGO route renderer must be a function.');

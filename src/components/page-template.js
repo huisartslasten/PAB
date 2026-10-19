@@ -312,7 +312,9 @@ export function createPacoPageTemplate({
   subtitle = '',
   content = null,
   className = '',
-  testVersion = PACOGO_TEST_VERSION
+  testVersion = PACOGO_TEST_VERSION,
+  backLabel = '← Terug',
+  backAction = null
 } = {}) {
   const root = document.createElement('div');
   root.className = `paco-page-template ${className}`.trim();
@@ -340,8 +342,8 @@ export function createPacoPageTemplate({
   const backButton = document.createElement('button');
   backButton.type = 'button';
   backButton.className = 'paco-template-back';
-  backButton.textContent = '← Terug';
-  backButton.addEventListener('click', () => window.history.back());
+  backButton.textContent = backLabel;
+  backButton.addEventListener('click', typeof backAction === 'function' ? backAction : () => window.history.back());
   sidebar.appendChild(backButton);
 
   const sidebarCard = document.createElement('div');

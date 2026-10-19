@@ -34,7 +34,7 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
     timingControl.appendChild(dropdown.element);
     controls.appendChild(timingControl);
 
-    const centerControl = document.createElement('div');
+    const centerControl = documentRef.createElement('div');
     centerControl.className = 'memory-center-control';
     if (state.phase === 'checking' && timingMode === 'manual') {
       const button = documentRef.createElement('button');

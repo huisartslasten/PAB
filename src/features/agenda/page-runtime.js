@@ -3,21 +3,6 @@ import { createPacoNavigation } from '../../components/page-navigation.js';
 import { createAgendaRuntimeEntry } from './runtime-entry.js';
 import { readViewContext, applyViewContext, buildViewUrl } from '../../core/view-context.js';
 
-const AGENDA_STYLESHEET_ID = 'pacogo-agenda-stylesheet';
-
-async function ensureAgendaStyles(documentRef = document) {
-  if (documentRef.getElementById(AGENDA_STYLESHEET_ID)) return;
-  await new Promise((resolve, reject) => {
-    const link = documentRef.createElement('link');
-    link.id = AGENDA_STYLESHEET_ID;
-    link.rel = 'stylesheet';
-    link.href = 'src/features/agenda/agenda.css';
-    link.onload = resolve;
-    link.onerror = reject;
-    documentRef.head.appendChild(link);
-  });
-}
-
 function createAgendaContent(documentRef) {
   const content = documentRef.createElement('div');
   content.className = 'agenda-page';
@@ -43,6 +28,13 @@ export function createAgendaPageRuntime({ app, templateMount, context, documentR
   const content = createAgendaContent(documentRef);
   let agenda = null;
   let observer = null;
+
+  function goBack() {
+    navigate(buildViewUrl(
+      context?.isManagement ? 'management.html' : 'lessons.html',
+      { student: selectedStudent, mode: context?.mode }
+    ));
+  }
 
   function goLessons() {
     navigate(buildViewUrl('lessons.html', { student: selectedStudent, mode: context.mode }));
@@ -77,35 +69,35 @@ export function createAgendaPageRuntime({ app, templateMount, context, documentR
   }
 
   async function mount() {
-    await ensureAgendaStyles(documentRef);
     if (!selectedStudent) {
       content.replaceChildren();
       const state = documentRef.createElement('div');
       state.className = 'agenda-state';
       state.textContent = 'Selecteer eerst een leerling vanuit Beheer.';
       content.appendChild(state);
-      return;
     }
 
     mountPacoPageTemplate({
       mount: templateMount,
-      backLabel: '← Mijn lessen',
-      backAction: goLessons,
+      backLabel: context?.isManagement ? '← Dashboard' : '← Mijn lessen',
+      backAction: goBack,
       greeting: `${selectedStudent ? `Hoi ${selectedStudent}! 🐾` : 'PacoGO Agenda 📅'}`,
       title: 'Agenda',
       icon: '📅',
-      subtitle: context.isManagement
+      subtitle: context?.isManagement
         ? 'Beheerweergave — je beheert hier de agenda van de geselecteerde leerling.'
         : 'Bekijk de schoolweek en beheer je afspraken.',
       navigation: createPacoNavigation({
         app,
         active: 'agenda',
         student: selectedStudent,
-        viewMode: context.mode,
+        viewMode: context?.mode,
         navigate
       }),
       content
     });
+
+    if (!selectedStudent) return;
 
     agenda = createAgenda();
     observer?.disconnect();

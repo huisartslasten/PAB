@@ -2,6 +2,7 @@ import { createDashboardRuntime } from '../features/dashboard/runtime.js';
 import { createLessonsRuntime } from '../features/lessons/runtime.js';
 import { createAgendaPageRuntime } from '../features/agenda/page-runtime.js';
 import { createTestHistoryRuntime } from '../features/test-history/runtime.js';
+import { createManagementRuntime } from '../features/management/runtime.js';
 import { readViewContext } from '../core/view-context.js';
 
 export function createPacoRouteRegistry({ app, mounts, documentRef = document } = {}) {
@@ -51,6 +52,17 @@ export function createPacoRouteRegistry({ app, mounts, documentRef = document } 
   routes['test-history.html'] = ({ url, navigate }) => {
     const context = readViewContext(url.searchParams);
     return createTestHistoryRuntime({
+      app,
+      templateMount: mounts.templateMount,
+      context,
+      documentRef,
+      navigate
+    });
+  };
+
+  routes['management.html'] = ({ url, navigate }) => {
+    const context = readViewContext(url.searchParams);
+    return createManagementRuntime({
       app,
       templateMount: mounts.templateMount,
       context,

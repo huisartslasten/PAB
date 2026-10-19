@@ -84,7 +84,7 @@ export function createManagementRuntime({
     global.className = 'management-global';
     global.append(
       createAction('🗂️ Archief / Prullenbak', 'Beheer gearchiveerde en verwijderde lessen.', 'archive.html', { requiresStudent: false }),
-      createAction('💬 Feedback', 'Bekijk en beheer feedback.', 'feedback.html', { documentNavigation: true })
+      createAction('💬 Feedback', 'Bekijk en beheer feedback.', 'feedback.html')
     );
     section.appendChild(global);
 

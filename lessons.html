@@ -9,26 +9,9 @@
 </head>
 <body><div id="paco-template-mount"></div>
 <script type="module">
-import { createPacoGOApp } from './src/app/bootstrap.js';
-import { readViewContext } from './src/core/view-context.js';
-import { createLessonsRuntime } from './src/features/lessons/runtime.js';
+import { startPacoRuntime } from './src/app/runtime.js';
 
-const context = readViewContext(new URLSearchParams(window.location.search));
-const selectedSubject = new URLSearchParams(window.location.search).get('subject') || '';
-const mount = document.querySelector('#paco-template-mount');
-const app = createPacoGOApp({ supabaseLib: window.supabase });
-
-// Standalone page navigation remains the current document-navigation owner until
-// the central router mounts this route. The lessons feature itself owns no routing.
-const navigate = target => { window.location.href = target.toString(); };
-
-const lessons = createLessonsRuntime({
-  app,
-  templateMount: mount,
-  context,
-  selectedSubject,
-  navigate
+await startPacoRuntime({
+  templateMount: document.querySelector('#paco-template-mount')
 });
-
-await lessons.mount();
 </script></body></html>

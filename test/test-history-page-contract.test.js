@@ -23,13 +23,20 @@ test('test history page does not depend on legacy global runtime bridges', () =>
 
 test('test history page keeps its history presentation target explicit', () => {
   assert.match(page, /id="testHistoryContent"/);
-  assert.match(page, /id="historyStudent"/);
+  assert.doesNotMatch(page, /id="historyStudent"/);
 });
 
 test('test history page belongs to the canonical management navigation boundary', () => {
-  assert.match(page, /window\.location\.href = 'management\.html'/);
+  assert.match(page, /buildViewUrl\('management\.html'/);
   assert.match(page, /import \{ createPacoNavigation \} from '\.\/src\/components\/page-navigation\.js'/);
   assert.match(page, /active: 'test-history'/);
+  assert.match(page, /viewMode: 'management'/);
   assert.match(page, /includeAgenda: false/);
-  assert.match(page, /backLabel: '← Beheer'/);
+  assert.match(page, /backLabel: '← Dashboard'/);
+});
+
+test('test history page uses the selected management student instead of a second local selector', () => {
+  assert.match(page, /const requestedStudent = context\.student/);
+  assert.match(page, /listAttempts\(requestedStudent\)/);
+  assert.doesNotMatch(page, /populateStudentFilter/);
 });

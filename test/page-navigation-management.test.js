@@ -26,8 +26,8 @@ test('management page uses the shared template heading contract', () => {
   assert.match(managementPage, /src\/features\/management\/management-support\.css/);
 });
 
-test('management test history keeps the shared management view context', () => {
-  assert.match(navigation, /key: 'test-history',[\s\S]*?go\('test-history\.html', view\)/);
+test('management test history keeps the shared management view context through the central navigation owner', () => {
+  assert.match(navigation, /key: 'test-history',[\s\S]*?go\(navigate, 'test-history\.html', view\)/);
 });
 
 test('logout uses the shared confirmation dialog before signing out', () => {

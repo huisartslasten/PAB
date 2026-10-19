@@ -366,23 +366,21 @@ export function createPacoPageTemplate({
   const pageHeader = document.createElement('header');
   pageHeader.className = 'paco-template-page-header';
 
-  if (icon) {
-    const iconElement = document.createElement('div');
-    iconElement.className = 'paco-template-page-icon';
-    iconElement.textContent = icon;
-    pageHeader.appendChild(iconElement);
-  }
+  const iconElement = document.createElement('div');
+  iconElement.className = 'paco-template-page-icon';
+  iconElement.textContent = icon;
+  iconElement.hidden = !icon;
+  pageHeader.appendChild(iconElement);
 
   const heading = document.createElement('div');
   heading.className = 'paco-template-page-heading';
   const titleElement = document.createElement('h1');
   titleElement.textContent = title;
   heading.appendChild(titleElement);
-  if (subtitle) {
-    const subtitleElement = document.createElement('p');
-    subtitleElement.textContent = subtitle;
-    heading.appendChild(subtitleElement);
-  }
+  const subtitleElement = document.createElement('p');
+  subtitleElement.textContent = subtitle;
+  subtitleElement.hidden = !subtitle;
+  heading.appendChild(subtitleElement);
   pageHeader.appendChild(heading);
   main.appendChild(pageHeader);
 
@@ -397,8 +395,58 @@ export function createPacoPageTemplate({
   return root;
 }
 
+function updatePacoPageTemplate(template, {
+  greeting = '',
+  navigation = [],
+  title = '',
+  icon = '',
+  subtitle = '',
+  content = null,
+  backLabel = '← Terug',
+  backAction = null
+} = {}) {
+  if (!template) throw new Error('updatePacoPageTemplate requires a template');
+
+  const backButton = template.querySelector('.paco-template-back');
+  const greetingElement = template.querySelector('.paco-template-greeting');
+  const navigationElement = template.querySelector('.paco-template-navigation');
+  const iconElement = template.querySelector('.paco-template-page-icon');
+  const titleElement = template.querySelector('.paco-template-page-heading h1');
+  const subtitleElement = template.querySelector('.paco-template-page-heading p');
+  const contentElement = template.querySelector('.paco-template-page-content');
+
+  if (!backButton || !greetingElement || !navigationElement || !iconElement || !titleElement || !subtitleElement || !contentElement) {
+    throw new Error('PacoGO page template is missing its canonical shell elements.');
+  }
+
+  backButton.textContent = backLabel;
+  backButton.onclick = typeof backAction === 'function' ? backAction : () => window.history.back();
+  greetingElement.textContent = greeting;
+  navigationElement.replaceChildren(...navigation.map(createNavigationItem));
+  iconElement.textContent = icon;
+  iconElement.hidden = !icon;
+  titleElement.textContent = title;
+  subtitleElement.textContent = subtitle;
+  subtitleElement.hidden = !subtitle;
+
+  const contentNode = nodeFrom(content);
+  contentElement.replaceChildren();
+  if (contentNode) contentElement.appendChild(contentNode);
+
+  return template;
+}
+
 export function mountPacoPageTemplate({ mount, ...options } = {}) {
   if (!mount) throw new Error('mountPacoPageTemplate requires a mount element');
+
+  const existingTemplate = mount.firstElementChild?.classList.contains('paco-page-template')
+    ? mount.firstElementChild
+    : null;
+
+  if (existingTemplate) {
+    return updatePacoPageTemplate(existingTemplate, options);
+  }
+
   const template = createPacoPageTemplate(options);
   mount.replaceChildren(template);
   installPacoTemplateScrollMemory();

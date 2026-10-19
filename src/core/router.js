@@ -34,6 +34,11 @@ export function createPacoRouter({ windowRef = window, routes = {} } = {}) {
   async function render(route) {
     const renderer = getRenderer(route);
     if (typeof renderer !== 'function') return null;
+
+    if (activeRenderer && typeof activeRenderer.destroy === 'function') {
+      await activeRenderer.destroy();
+    }
+
     const runtime = await renderer({ url: route.url, navigate });
     activeRenderer = runtime || null;
     if (runtime && typeof runtime.mount === 'function') await runtime.mount();

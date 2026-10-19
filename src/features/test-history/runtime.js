@@ -2,6 +2,7 @@ import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
 import { createTestHistoryRenderer } from './test-history-renderer.js';
 import { escapeHtml } from '../../core/html.js';
+import { buildViewUrl } from '../../core/view-context.js';
 
 export function createTestHistoryRuntime({
   app,
@@ -54,9 +55,10 @@ export function createTestHistoryRuntime({
       mountPacoPageTemplate({
         mount: templateMount,
         backLabel: '← Dashboard',
-        backAction: () => navigate('management.html', {
-          replace: false
-        }),
+        backAction: () => navigate(buildViewUrl('management.html', {
+          student: requestedStudent,
+          mode: 'management'
+        })),
         greeting: 'PacoGO beheer ⚙️',
         title: 'Toetsgeschiedenis',
         icon: '📝',

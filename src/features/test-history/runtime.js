@@ -1,0 +1,98 @@
+import { mountPacoPageTemplate } from '../../components/page-template.js';
+import { createPacoNavigation } from '../../components/page-navigation.js';
+import { createTestHistoryRenderer } from './test-history-renderer.js';
+import { escapeHtml } from '../../core/html.js';
+
+export function createTestHistoryRuntime({
+  app,
+  templateMount,
+  context,
+  documentRef = document,
+  navigate
+} = {}) {
+  if (!app) throw new TypeError('Test-history runtime requires the application context.');
+  if (!templateMount) throw new TypeError('Test-history runtime requires a template mount.');
+  if (!context) throw new TypeError('Test-history runtime requires a view context.');
+  if (typeof navigate !== 'function') throw new TypeError('Test-history runtime requires central navigation.');
+
+  const requestedStudent = context.student;
+  const content = documentRef.createElement('div');
+  content.className = 'history-shell';
+  content.innerHTML = '<div id="testHistoryContent" class="history-content"><div class="history-loading">Toetsgeschiedenis laden…</div></div>';
+  const historyContent = content.querySelector('#testHistoryContent');
+
+  const renderAttempts = createTestHistoryRenderer({
+    getLessons: () => app.state.lessons,
+    escapeHtml,
+    documentRef
+  });
+
+  const renderError = error => {
+    historyContent.innerHTML = `<div class="history-error"><strong>De toetsgeschiedenis kon niet worden geladen.</strong><p class="small">${escapeHtml(error?.message || 'Onbekende fout.')}</p></div>`;
+  };
+
+  const loadHistory = async () => {
+    if (!requestedStudent) {
+      historyContent.innerHTML = '<div class="history-empty"><strong>Geen leerling geselecteerd.</strong><p class="small">Kies links in de beheeromgeving een leerling om diens toetsgeschiedenis te bekijken.</p></div>';
+      return [];
+    }
+
+    historyContent.innerHTML = '<div class="history-loading">Toetsgeschiedenis laden…</div>';
+    try {
+      const attempts = await app.testHistory.listAttempts(requestedStudent);
+      renderAttempts(attempts, requestedStudent);
+      return attempts;
+    } catch (error) {
+      console.error('Test history load error:', error);
+      renderError(error);
+      return [];
+    }
+  };
+
+  return {
+    async mount() {
+      mountPacoPageTemplate({
+        mount: templateMount,
+        backLabel: '← Dashboard',
+        backAction: () => navigate('management.html', {
+          replace: false
+        }),
+        greeting: 'PacoGO beheer ⚙️',
+        title: 'Toetsgeschiedenis',
+        icon: '📝',
+        subtitle: requestedStudent
+          ? `Bekijk de gemaakte toetsen van ${requestedStudent}.`
+          : 'Kies eerst een leerling in het beheer-dashboard.',
+        navigation: createPacoNavigation({
+          app,
+          active: 'test-history',
+          student: requestedStudent,
+          viewMode: 'management',
+          includePractice: false,
+          includeAgenda: false,
+          navigate
+        }),
+        content
+      });
+
+      try {
+        const session = await app.initializeSession();
+        if (!session || !app.auth.isParent) {
+          historyContent.innerHTML = '<div class="history-error"><strong>Geen toegang.</strong><p class="small">Toetsgeschiedenis is alleen beschikbaar in de beheeromgeving.</p></div>';
+          return;
+        }
+
+        if (!context.isManagement) {
+          historyContent.innerHTML = '<div class="history-error"><strong>Geen beheercontext.</strong><p class="small">Open Toetsgeschiedenis vanuit het beheer-dashboard.</p></div>';
+          return;
+        }
+
+        await app.loadLessons();
+        await loadHistory();
+      } catch (error) {
+        console.error('Test history initialization error:', error);
+        renderError(error);
+      }
+    }
+  };
+}

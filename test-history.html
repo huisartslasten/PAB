@@ -5,105 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PacoGO — Toetsgeschiedenis</title>
   <link rel="stylesheet" href="src/components/page-template.css">
+  <link rel="stylesheet" href="src/features/test-history/test-history.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    .history-shell{width:100%}.history-content{display:grid;gap:12px}.history-loading,.history-error,.history-empty{padding:18px;background:#fff;border:1px solid #dce9f6;border-radius:16px;color:#526784}.history-error{color:#8b2d2d}.test-history-item{background:#fff;border:1px solid #dce9f6;border-radius:16px;overflow:hidden}.test-history-item summary{cursor:pointer;list-style:none;padding:16px 18px}.test-history-item summary::-webkit-details-marker{display:none}.test-history-main{display:flex;justify-content:space-between;gap:18px;align-items:center}.test-history-summary{display:flex;gap:10px;flex-wrap:wrap;font-size:14px}.test-history-summary span{padding:5px 9px;border-radius:999px;background:#edf5fc}.history-errors{color:#9b3b3b}.history-ok{color:#237047}.test-history-details{padding:0 18px 18px}.test-history-score{font-size:20px;font-weight:900;color:#102b57;margin-bottom:12px}.result-item{padding:10px 12px;border-top:1px solid #e8eff6}.result-item.correct{background:#f2fbf6}.result-item.incorrect{background:#fff7f7}.small{color:#667894;line-height:1.45}
-  </style>
 </head>
 <body>
   <div id="paco-template-mount"></div>
   <script type="module">
-    import { mountPacoPageTemplate } from './src/components/page-template.js';
-    import { createPacoNavigation } from './src/components/page-navigation.js';
-    import { createPacoGOApp } from './src/app/bootstrap.js';
-    import { createTestHistoryRenderer } from './src/features/test-history/test-history-renderer.js';
-    import { readViewContext, applyViewContext, buildViewUrl } from './src/core/view-context.js';
-    import { escapeHtml } from './src/core/html.js';
+    import { startPacoRuntime } from './src/app/runtime.js';
 
-    const context = readViewContext(new URLSearchParams(window.location.search));
-    const requestedStudent = context.student;
-    const mount = document.querySelector('#paco-template-mount');
-    const content = document.createElement('div');
-    content.className = 'history-shell';
-    content.innerHTML = '<div id="testHistoryContent" class="history-content"><div class="history-loading">Toetsgeschiedenis laden…</div></div>';
-
-    const app = createPacoGOApp({ supabaseLib: window.supabase });
-    const historyContent = content.querySelector('#testHistoryContent');
-
-    const goManagement = () => {
-      const target = buildViewUrl('management.html', { student: requestedStudent, mode: 'management' });
-      window.location.href = target.toString();
-    };
-
-    mountPacoPageTemplate({
-      mount,
-      backLabel: '← Dashboard',
-      backAction: goManagement,
-      greeting: 'PacoGO beheer ⚙️',
-      title: 'Toetsgeschiedenis',
-      icon: '📝',
-      subtitle: requestedStudent
-        ? `Bekijk de gemaakte toetsen van ${requestedStudent}.`
-        : 'Kies eerst een leerling in het beheer-dashboard.',
-      navigation: createPacoNavigation({
-        app,
-        active: 'test-history',
-        student: requestedStudent,
-        viewMode: 'management',
-        includePractice: false,
-        includeAgenda: false
-      }),
-      content
-    });
-
-    const renderAttempts = createTestHistoryRenderer({
-      getLessons: () => app.state.lessons,
-      escapeHtml,
-      documentRef: document
-    });
-
-    function renderError(error) {
-      historyContent.innerHTML = `<div class="history-error"><strong>De toetsgeschiedenis kon niet worden geladen.</strong><p class="small">${escapeHtml(error?.message || 'Onbekende fout.')}</p></div>`;
-    }
-
-    async function loadHistory() {
-      if (!requestedStudent) {
-        historyContent.innerHTML = '<div class="history-empty"><strong>Geen leerling geselecteerd.</strong><p class="small">Kies links in de beheeromgeving een leerling om diens toetsgeschiedenis te bekijken.</p></div>';
-        return [];
-      }
-
-      historyContent.innerHTML = '<div class="history-loading">Toetsgeschiedenis laden…</div>';
-      try {
-        const attempts = await app.testHistory.listAttempts(requestedStudent);
-        renderAttempts(attempts, requestedStudent);
-        return attempts;
-      } catch (error) {
-        console.error('Test history load error:', error);
-        renderError(error);
-        return [];
-      }
-    }
-
-    async function initialize() {
-      const session = await app.initializeSession();
-      if (!session || !app.auth.isParent) {
-        historyContent.innerHTML = '<div class="history-error"><strong>Geen toegang.</strong><p class="small">Toetsgeschiedenis is alleen beschikbaar in de beheeromgeving.</p></div>';
-        return;
-      }
-
-      if (!context.isManagement) {
-        historyContent.innerHTML = '<div class="history-error"><strong>Geen beheercontext.</strong><p class="small">Open Toetsgeschiedenis vanuit het beheer-dashboard.</p></div>';
-        return;
-      }
-
-      applyViewContext(context, { canManage: app.auth.isParent });
-      await app.loadLessons();
-      await loadHistory();
-    }
-
-    initialize().catch(error => {
-      console.error('Test history initialization error:', error);
-      renderError(error);
+    await startPacoRuntime({
+      templateMount: document.querySelector('#paco-template-mount')
     });
   </script>
 </body>

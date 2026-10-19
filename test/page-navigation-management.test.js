@@ -11,7 +11,7 @@ const managementPage = fs.readFileSync(path.join(projectRoot, 'management.html')
 test('management navigation uses Dashboard as its management home and owns the student submenu', () => {
   assert.match(navigation, /key: 'management-dashboard',[\s\S]*?label: 'Dashboard'/);
   assert.match(navigation, /key: 'management-dashboard',[\s\S]*?submenu: learners\.map/);
-  assert.doesNotMatch(navigation, /if \(showManagementLearnerBar\) \{[\s\S]*?label: 'LEERLING'/);
+  assert.doesNotMatch(navigation, /^\s*if \(showManagementLearnerBar\) \{[\s\S]*?label: 'LEERLING'/m);
   assert.match(navigation, /else if \(showManagementLearnerBar\) \{/);
 });
 

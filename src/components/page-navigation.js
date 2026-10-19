@@ -46,12 +46,31 @@ export function createPacoNavigation({
 
   const view = { student, mode: viewMode };
   const isManagementView = viewMode === 'management';
-  const showManagementLearnerBar = isManagementView || includeManagementStudentSelector;
+  const showManagementLearnerBar = !isManagementView && includeManagementStudentSelector;
   const showManagementDashboard = isManagementView || includeManagementDashboard;
   const learners = managementStudents.length ? managementStudents : listStudents();
   const items = [];
 
-  if (showManagementLearnerBar) {
+  if (showManagementDashboard) {
+    items.push({
+      key: 'management-dashboard',
+      icon: '🏠',
+      label: 'Dashboard',
+      onClick: () => go('management.html', view),
+      submenu: learners.map(name => ({
+        key: `management-student-${name}`,
+        label: name,
+        active: name === student,
+        onClick: () => {
+          if (typeof onSelectManagementStudent === 'function') {
+            onSelectManagementStudent(name);
+          } else {
+            go('management.html', { student: name, mode: 'management' });
+          }
+        }
+      }))
+    });
+  } else if (showManagementLearnerBar) {
     items.push({
       key: 'management-student',
       label: 'LEERLING',
@@ -67,15 +86,6 @@ export function createPacoNavigation({
           }
         }
       }))
-    });
-  }
-
-  if (showManagementDashboard) {
-    items.push({
-      key: 'management-dashboard',
-      icon: '🏠',
-      label: 'Dashboard',
-      onClick: () => go('management.html', view)
     });
   }
 

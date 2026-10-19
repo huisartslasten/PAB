@@ -60,7 +60,11 @@ export function createLearningContentService(db, { media = null, canManage = () 
       .filter(card => card.title || card.content || card.image_id != null);
 
     if (rows.length) {
-      const saved = await db.from('lesson_learning_cards').upsert(rows).select(CARD_SELECT);
+      // PostgREST upsert otherwise defaults omitted columns to null. That would
+      // overwrite the database identity default for new cards and violate id NOT NULL.
+      const saved = await db.from('lesson_learning_cards')
+        .upsert(rows, { defaultToNull: false })
+        .select(CARD_SELECT);
       if (saved.error) throw saved.error;
     }
 

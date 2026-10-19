@@ -1,16 +1,24 @@
+import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
 import { confirmPacoAction } from '../../components/confirm-dialog.js';
-import { buildViewUrl } from '../../core/view-context.js';
+import { applyViewContext, buildViewUrl } from '../../core/view-context.js';
 import { attachLessonDragSorting } from './lesson-drag-sort.js';
 import { getLessonSubjectGroups, getLessonSubjectIcon, getLessonSubvakGroups, normalizeLessonSubject } from './list-view-model.js';
 
-export function createLessonsRuntime({ app, templateMount, contentMount, stateMount, actionStateMount, context, selectedSubject = '', documentRef = document, navigate } = {}) {
+export function createLessonsRuntime({ app, templateMount, context, selectedSubject = '', documentRef = document, navigate } = {}) {
   if (!app) throw new TypeError('Lessons runtime requires an app.');
-  if (!templateMount || !contentMount || !stateMount || !actionStateMount) throw new TypeError('Lessons runtime requires all mounts.');
+  if (!templateMount) throw new TypeError('Lessons runtime requires a template mount.');
   if (typeof navigate !== 'function') throw new TypeError('Lessons runtime requires a navigation owner.');
 
   const selectedStudent = context?.student || '';
-  const content = contentMount;
+  const content = documentRef.createElement('div');
+  content.className = 'lessons-page paco-template-card';
+  const state = documentRef.createElement('div');
+  state.className = 'lessons-state';
+  state.textContent = 'Lessen laden…';
+  const actionState = documentRef.createElement('div');
+  actionState.className = 'lessons-state';
+  actionState.hidden = true;
   let currentRecords = [];
 
   const buildLessonsUrl = () => buildViewUrl('lessons.html', { student: selectedStudent, mode: context?.mode });
@@ -18,8 +26,8 @@ export function createLessonsRuntime({ app, templateMount, contentMount, stateMo
   const goLessons = () => navigate(buildLessonsUrl());
 
   function showActionNotice(message) {
-    actionStateMount.textContent = message;
-    actionStateMount.hidden = false;
+    actionState.textContent = message;
+    actionState.hidden = false;
   }
 
   function lessonTarget(lesson) {
@@ -41,12 +49,7 @@ export function createLessonsRuntime({ app, templateMount, contentMount, stateMo
   }
 
   async function archiveLesson(lesson) {
-    const confirmed = await confirmPacoAction({
-      title: 'Les archiveren?',
-      message: `“${lesson.title}” wordt uit de actieve lessen van ${selectedStudent} gehaald en in het archief geplaatst.`,
-      confirmLabel: 'Archiveren',
-      cancelLabel: 'Annuleren'
-    });
+    const confirmed = await confirmPacoAction({ title: 'Les archiveren?', message: `“${lesson.title}” wordt uit de actieve lessen van ${selectedStudent} gehaald en in het archief geplaatst.`, confirmLabel: 'Archiveren', cancelLabel: 'Annuleren' });
     if (!confirmed) return;
     try {
       await app.management.archiveLesson(lesson.id);
@@ -59,12 +62,7 @@ export function createLessonsRuntime({ app, templateMount, contentMount, stateMo
   }
 
   async function moveLessonToTrash(lesson) {
-    const confirmed = await confirmPacoAction({
-      title: 'Les naar prullenbak?',
-      message: `“${lesson.title}” wordt uit de actieve lessen van ${selectedStudent} gehaald en naar de prullenbak verplaatst.`,
-      confirmLabel: 'Naar prullenbak',
-      cancelLabel: 'Annuleren'
-    });
+    const confirmed = await confirmPacoAction({ title: 'Les naar prullenbak?', message: `“${lesson.title}” wordt uit de actieve lessen van ${selectedStudent} gehaald en naar de prullenbak verplaatst.`, confirmLabel: 'Naar prullenbak', cancelLabel: 'Annuleren' });
     if (!confirmed) return;
     try {
       await app.management.moveToTrash(lesson.id);
@@ -81,7 +79,6 @@ export function createLessonsRuntime({ app, templateMount, contentMount, stateMo
     wrap.className = 'paco-lesson-card lesson-card';
     wrap.draggable = true;
     wrap.dataset.lessonId = String(lesson.id);
-
     const card = documentRef.createElement('a');
     card.href = lessonTarget(lesson).toString();
     card.style.display = 'block';
@@ -93,187 +90,103 @@ export function createLessonsRuntime({ app, templateMount, contentMount, stateMo
     subvak.textContent = lesson.subvak || 'Les';
     card.append(heading, subvak);
     wrap.appendChild(card);
-
     const view = documentRef.createElement('button');
     view.type = 'button';
     view.className = 'lesson-view-button';
     view.textContent = 'Bekijken';
-    view.addEventListener('click', event => {
-      event.preventDefault();
-      event.stopPropagation();
-      navigate(lessonTarget(lesson));
-    });
+    view.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); navigate(lessonTarget(lesson)); });
     wrap.appendChild(view);
-
     if (context?.isManagement) {
       const actions = documentRef.createElement('div');
       actions.className = 'lesson-management-actions';
-      const edit = documentRef.createElement('button');
-      edit.type = 'button';
-      edit.textContent = 'Bewerken';
-      edit.addEventListener('click', event => {
-        event.preventDefault();
-        event.stopPropagation();
-        editLesson(lesson);
-      });
-      const learning = documentRef.createElement('button');
-      learning.type = 'button';
-      learning.textContent = 'Leerstof';
-      learning.addEventListener('click', event => {
-        event.preventDefault();
-        event.stopPropagation();
-        editLearning(lesson);
-      });
-      const archive = documentRef.createElement('button');
-      archive.type = 'button';
-      archive.textContent = 'Archiveren';
-      archive.addEventListener('click', event => {
-        event.preventDefault();
-        event.stopPropagation();
-        archiveLesson(lesson);
-      });
-      const trash = documentRef.createElement('button');
-      trash.type = 'button';
-      trash.className = 'danger';
-      trash.textContent = 'Verwijderen';
-      trash.addEventListener('click', event => {
-        event.preventDefault();
-        event.stopPropagation();
-        moveLessonToTrash(lesson);
-      });
+      const edit = documentRef.createElement('button'); edit.type = 'button'; edit.textContent = 'Bewerken';
+      edit.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); editLesson(lesson); });
+      const learning = documentRef.createElement('button'); learning.type = 'button'; learning.textContent = 'Leerstof';
+      learning.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); editLearning(lesson); });
+      const archive = documentRef.createElement('button'); archive.type = 'button'; archive.textContent = 'Archiveren';
+      archive.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); archiveLesson(lesson); });
+      const trash = documentRef.createElement('button'); trash.type = 'button'; trash.className = 'danger'; trash.textContent = 'Verwijderen';
+      trash.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); moveLessonToTrash(lesson); });
       actions.append(edit, learning, archive, trash);
       wrap.appendChild(actions);
     }
-
     return wrap;
   }
 
   async function render(records) {
     currentRecords = records;
     const grouped = getLessonSubjectGroups(app.mapLessons(records), selectedStudent);
-    content.replaceChildren(actionStateMount);
-
+    content.replaceChildren(actionState);
     if (!selectedSubject) {
-      const heading = documentRef.createElement('h2');
-      heading.className = 'section-title';
-      heading.textContent = 'Kies een vak';
-      const grid = documentRef.createElement('div');
-      grid.className = 'subject-grid';
+      const heading = documentRef.createElement('h2'); heading.className = 'section-title'; heading.textContent = 'Kies een vak';
+      const grid = documentRef.createElement('div'); grid.className = 'subject-grid';
       grouped.forEach(subject => {
-        const card = documentRef.createElement('button');
-        card.type = 'button';
-        card.className = 'paco-subject-card';
+        const card = documentRef.createElement('button'); card.type = 'button'; card.className = 'paco-subject-card';
         card.innerHTML = `<div class="subject-icon">${getLessonSubjectIcon(subject.label)}</div><h2>${subject.label}</h2><p>${subject.lessons.length} ${subject.lessons.length === 1 ? 'les' : 'lessen'}</p>`;
-        card.addEventListener('click', () => {
-          const url = buildLessonsUrl();
-          url.searchParams.set('subject', subject.label);
-          navigate(url);
-        });
+        card.addEventListener('click', () => { const url = buildLessonsUrl(); url.searchParams.set('subject', subject.label); navigate(url); });
         grid.appendChild(card);
       });
       content.append(heading, grid);
       if (!grid.children.length) {
-        const empty = documentRef.createElement('div');
-        empty.className = 'lessons-state';
-        empty.textContent = `Geen actieve lessen gevonden voor ${selectedStudent}.`;
-        content.appendChild(empty);
+        const empty = documentRef.createElement('div'); empty.className = 'lessons-state'; empty.textContent = `Geen actieve lessen gevonden voor ${selectedStudent}.`; content.appendChild(empty);
       }
       return;
     }
-
     const key = normalizeLessonSubject(selectedSubject);
     const subject = grouped.find(candidate => candidate.key === key);
     const lessonsForSubject = subject?.lessons || [];
     const orderedLessons = await app.lessonOrder.getOrderedLessons(lessonsForSubject, selectedStudent, subject?.label || selectedSubject);
-    const header = documentRef.createElement('div');
-    header.className = 'lessons-toolbar';
-    const heading = documentRef.createElement('h2');
-    heading.className = 'section-title';
-    heading.textContent = subject?.label || selectedSubject;
-    const back = documentRef.createElement('button');
-    back.type = 'button';
-    back.className = 'back-subjects';
-    back.textContent = '← Alle vakken';
-    back.addEventListener('click', goLessons);
-    header.append(heading, back);
-    content.append(header);
-
+    const header = documentRef.createElement('div'); header.className = 'lessons-toolbar';
+    const heading = documentRef.createElement('h2'); heading.className = 'section-title'; heading.textContent = subject?.label || selectedSubject;
+    const back = documentRef.createElement('button'); back.type = 'button'; back.className = 'back-subjects'; back.textContent = '← Alle vakken'; back.addEventListener('click', goLessons);
+    header.append(heading, back); content.append(header);
     const groups = getLessonSubvakGroups(orderedLessons);
     groups.forEach(group => {
-      const section = documentRef.createElement('section');
-      section.className = 'subvak-section';
-      const title = documentRef.createElement('h3');
-      title.className = `subvak-title${group.key === '__geen_subvak__' ? ' muted' : ''}`;
-      title.textContent = `${group.key === '__geen_subvak__' ? '📚' : '📁'} ${group.label}`;
-      const grid = documentRef.createElement('div');
-      grid.className = 'lesson-grid';
-      group.lessons.forEach(lesson => grid.appendChild(renderLessonCard(lesson)));
-      section.append(title, grid);
-      content.appendChild(section);
+      const section = documentRef.createElement('section'); section.className = 'subvak-section';
+      const title = documentRef.createElement('h3'); title.className = `subvak-title${group.key === '__geen_subvak__' ? ' muted' : ''}`; title.textContent = `${group.key === '__geen_subvak__' ? '📚' : '📁'} ${group.label}`;
+      const grid = documentRef.createElement('div'); grid.className = 'lesson-grid'; group.lessons.forEach(lesson => grid.appendChild(renderLessonCard(lesson)));
+      section.append(title, grid); content.appendChild(section);
     });
-
     if (!groups.length) {
-      const empty = documentRef.createElement('div');
-      empty.className = 'lessons-state';
-      empty.textContent = 'Geen actieve lessen gevonden in dit vak.';
-      content.appendChild(empty);
-      return;
+      const empty = documentRef.createElement('div'); empty.className = 'lessons-state'; empty.textContent = 'Geen actieve lessen gevonden in dit vak.'; content.appendChild(empty); return;
     }
-
     const lessonById = new Map(orderedLessons.map(lesson => [Number(lesson.id), lesson]));
     attachLessonDragSorting(content, {
       selector: '.lesson-card[data-lesson-id][draggable="true"]',
       onOrderChange: async ({ orderedIds }) => {
         const reorderedLessons = orderedIds.map(id => lessonById.get(id)).filter(Boolean);
-        await (context?.isManagement
-          ? app.management.saveLessonOrder(subject?.label || selectedSubject, reorderedLessons)
-          : app.lessonOrder.writeOrder(selectedStudent, subject?.label || selectedSubject, reorderedLessons, { persistRemote: false }));
+        await (context?.isManagement ? app.management.saveLessonOrder(subject?.label || selectedSubject, reorderedLessons) : app.lessonOrder.writeOrder(selectedStudent, subject?.label || selectedSubject, reorderedLessons, { persistRemote: false }));
       },
-      onError: async error => {
-        console.error('Lessons reorder error:', error);
-        await render(records);
-      }
+      onError: async error => { console.error('Lessons reorder error:', error); await render(records); }
     });
   }
 
-  async function initialize() {
-    await app.initializeSession();
-    if (context?.isManagement) {
-      const { applyViewContext } = await import('../../core/view-context.js');
-      applyViewContext(context, { canManage: app.auth.isParent });
-    } else {
-      const { applyViewContext } = await import('../../core/view-context.js');
-      applyViewContext(context);
-    }
-    if (!selectedStudent) throw new Error('Geen leerling geselecteerd.');
-  }
-
   async function mount() {
-    stateMount.hidden = false;
-    actionStateMount.hidden = true;
-    content.replaceChildren();
+    if (context?.isManagement) applyViewContext(context, { canManage: app.auth.isParent });
+    else applyViewContext(context);
+    mountPacoPageTemplate({
+      mount: templateMount,
+      backLabel: '← Dashboard',
+      backAction: goHome,
+      greeting: `Hoi ${selectedStudent}! 🐶`,
+      title: 'Mijn lessen',
+      icon: '📚',
+      subtitle: context?.isManagement ? 'Beheerweergave — je kunt hier leerlinggebonden lessen beheren.' : 'Kies een vak en open daarna de les die je wilt doen.',
+      navigation: createPacoNavigation({ app, active: 'lessons', student: selectedStudent, viewMode: context?.mode, includeManagement: true }),
+      content
+    });
+    content.appendChild(state);
     try {
-      await initialize();
+      if (!selectedStudent) throw new Error('Geen leerling geselecteerd.');
+      await app.initializeSession();
       const records = await app.loadLessons();
-      stateMount.hidden = true;
+      state.remove();
       await render(records);
     } catch (error) {
       console.error('Lessons page load error:', error);
-      stateMount.hidden = false;
-      stateMount.textContent = error.message === 'Geen leerling geselecteerd.'
-        ? 'Selecteer eerst een leerling vanuit Beheer.'
-        : 'De lessen konden niet worden geladen.';
-      content.replaceChildren(stateMount);
+      state.textContent = error.message === 'Geen leerling geselecteerd.' ? 'Selecteer eerst een leerling vanuit Beheer.' : 'De lessen konden niet worden geladen.';
     }
   }
 
-  const navigation = createPacoNavigation({
-    app,
-    active: 'lessons',
-    student: selectedStudent,
-    viewMode: context?.mode,
-    includeManagement: true
-  });
-
-  return Object.freeze({ mount, render, navigation, content, getRecords: () => currentRecords, goHome, goLessons });
+  return Object.freeze({ mount, render, content, getRecords: () => currentRecords, goHome, goLessons });
 }

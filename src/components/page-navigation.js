@@ -34,7 +34,7 @@ export function createPacoNavigation({
   viewMode = 'student',
   managementStudents = [],
   onSelectManagementStudent = null,
-  includeManagementStudentSelector = true,
+  includeManagementStudentSelector = false,
   includeManagementDashboard = false,
   includeManagement = true,
   includeManagementTools = false,
@@ -68,20 +68,18 @@ export function createPacoNavigation({
       icon: '🏠',
       label: 'Dashboard',
       onClick: () => go(navigate, 'management.html', view),
-      submenu: includeManagementStudentSelector
-        ? learners.map(name => ({
-          key: `management-student-${name}`,
-          label: name,
-          active: name === student,
-          onClick: () => {
-            if (typeof onSelectManagementStudent === 'function') {
-              onSelectManagementStudent(name);
-            } else {
-              go(navigate, 'management.html', { student: name, mode: 'management' });
-            }
+      submenu: learners.map(name => ({
+        key: `management-student-${name}`,
+        label: name,
+        active: name === student,
+        onClick: () => {
+          if (typeof onSelectManagementStudent === 'function') {
+            onSelectManagementStudent(name);
+          } else {
+            go(navigate, 'management.html', { student: name, mode: 'management' });
           }
-        }))
-        : []
+        }
+      }))
     });
   } else if (showManagementLearnerBar) {
     items.push({

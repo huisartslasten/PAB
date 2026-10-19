@@ -6,10 +6,24 @@ import { fileURLToPath } from 'node:url';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const navigation = fs.readFileSync(path.join(projectRoot, 'src/components/page-navigation.js'), 'utf8');
+const managementPage = fs.readFileSync(path.join(projectRoot, 'management.html'), 'utf8');
 
-test('management navigation uses Dashboard as its management home label', () => {
+test('management navigation uses Dashboard as its management home and owns the student submenu', () => {
   assert.match(navigation, /key: 'management-dashboard',[\s\S]*?label: 'Dashboard'/);
-  assert.match(navigation, /label: 'LEERLING'/);
+  assert.match(navigation, /key: 'management-dashboard',[\s\S]*?submenu: learners\.map/);
+  assert.doesNotMatch(navigation, /if \(showManagementLearnerBar\) \{[\s\S]*?label: 'LEERLING'/);
+  assert.match(navigation, /else if \(showManagementLearnerBar\) \{/);
+});
+
+test('management student submenu contains the canonical student labels from the shared student list', () => {
+  assert.match(navigation, /const learners = managementStudents\.length \? managementStudents : listStudents\(\)/);
+  assert.match(navigation, /key: `management-student-\$\{name\}`/);
+});
+
+test('management page uses the shared template heading contract', () => {
+  assert.match(managementPage, /heading\.className='page-heading'/);
+  assert.match(managementPage, /title\.textContent=selectedStudent\?`Beheer van \$\{selectedStudent\}`:'Beheer'/);
+  assert.match(managementPage, /src\/features\/management\/management-support\.css/);
 });
 
 test('management test history keeps the shared management view context', () => {

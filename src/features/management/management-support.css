@@ -1,22 +1,31 @@
 .management-page{display:grid;gap:18px}
-.management-section{display:grid;gap:14px;padding:20px;border:1px solid #dce9f6;border-radius:22px;background:#fff;box-shadow:0 8px 22px rgba(16,43,87,.07)}
-.management-section>h2{margin:0;color:#102b57;font:900 28px/1.05 "Baloo 2",Nunito,sans-serif}
-.management-state{padding:16px 18px;border:1px solid #dce9f6;border-radius:16px;background:#f7fbff;color:#667894;font-weight:700}
-.management-feedback{padding:16px 18px;border:1px solid #dce9f6;border-radius:16px;background:#fff}
-.management-feedback h3{margin:6px 0;color:#102b57;font:800 21px/1.1 "Baloo 2",Nunito,sans-serif}
+.management-section{display:grid;gap:14px;padding:20px;border:1px solid var(--paco-border);border-radius:22px;background:#fff;box-shadow:var(--paco-shadow)}
+.management-state{padding:16px 18px;border:1px solid var(--paco-border);border-radius:16px;background:#f7fbff;color:var(--paco-muted);font-weight:700}
+.management-feedback{padding:16px 18px;border:1px solid var(--paco-border);border-radius:16px;background:#fff}
+.management-feedback h3{margin:6px 0;color:var(--paco-text);font-size:21px;line-height:1.1;font-weight:800}
 .management-feedback p{margin:0 0 10px;color:#38577d;white-space:pre-wrap}
-.management-feedback-status{display:inline-block;padding:5px 9px;border-radius:999px;background:#eaf4ff;color:#126fc9;font-size:12px;font-weight:900}
+.management-feedback-status{display:inline-block;padding:5px 9px;border-radius:999px;background:var(--paco-blue-soft);color:#126fc9;font-size:12px;font-weight:900}
 .management-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-.management-link{border:0;border-radius:12px;padding:10px 14px;background:#eaf4ff;color:#126fc9;font:800 15px/1.1 "Baloo 2",Nunito,sans-serif;cursor:pointer}
+.management-link{border:0;border-radius:12px;padding:10px 14px;background:var(--paco-blue-soft);color:#126fc9;font:800 15px/1.1 "Baloo 2",Nunito,sans-serif;cursor:pointer}
 .management-link.danger{background:#fee5e3;color:#b91c1c}
 .management-link:disabled{opacity:.6;cursor:wait}
+.management-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.management-action{display:grid;gap:5px;text-align:left;border:2px solid var(--paco-border);border-radius:18px;background:#fff;padding:18px;color:var(--paco-text);cursor:pointer;transition:transform .15s ease,border-color .15s ease,background .15s ease,box-shadow .15s ease}
+.management-action:hover:not([disabled]){transform:translateY(-1px);border-color:var(--paco-blue);background:#eef8ff;box-shadow:0 8px 18px rgba(16,43,87,.08)}
+.management-action strong{color:var(--paco-text);font-size:21px;line-height:1.1;font-weight:800}
+.management-action span{color:var(--paco-muted);line-height:1.35}
+.management-action[disabled]{opacity:.55;cursor:not-allowed}
+.management-global{display:flex;gap:10px;flex-wrap:wrap}
+.management-global button{min-height:42px;border:1px solid var(--paco-border);border-radius:12px;background:#f7fbff;color:#126fc9;padding:9px 13px;font:800 15px/1.1 "Baloo 2",Nunito,sans-serif;cursor:pointer}
+.management-global button:hover{background:var(--paco-blue-soft);border-color:#a9d1f3}
 .management-recovery-student{display:grid;gap:12px}
-.management-recovery-student>h3{margin:0;color:#102b57;font:900 24px/1.05 "Baloo 2",Nunito,sans-serif}
+.management-recovery-student>h3{margin:0;color:var(--paco-text);font-size:24px;line-height:1.05;font-weight:900}
 .management-recovery-subject{display:grid;gap:10px}
-.management-recovery-subject h4{margin:0;color:#38577d;font:800 18px/1.1 "Baloo 2",Nunito,sans-serif}
+.management-recovery-subject h4{margin:0;color:#38577d;font-size:18px;line-height:1.1;font-weight:800}
 .management-recovery-lessons{display:grid;gap:10px}
 .management-recovery-lesson{display:grid;gap:8px}
-.management-recovery-lesson h3{margin:0;color:#102b57;font:800 21px/1.1 "Baloo 2",Nunito,sans-serif}
+.management-recovery-lesson h3{margin:0;color:var(--paco-text);font-size:21px;line-height:1.1;font-weight:800}
 .management-recovery-lesson p{margin:0;color:#38577d}
 .management-recovery-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
 @media(max-width:800px){.management-recovery-grid{grid-template-columns:1fr}}
+@media(max-width:700px){.management-actions{grid-template-columns:1fr}}

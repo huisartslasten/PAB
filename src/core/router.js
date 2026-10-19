@@ -1,10 +1,9 @@
 /**
  * PacoGO central client-side route state and rendering contract.
  *
- * The router owns URL state and route transitions. Route renderers own feature
- * composition and rendering; the router only supplies navigation context.
- * Runtime mounts synchronously establish the canonical shell and may continue
- * loading feature data asynchronously afterwards.
+ * The router owns URL state, route transitions and route asset readiness.
+ * Route renderers own feature composition and rendering; the router only
+ * supplies navigation context and makes route styles available before mount.
  */
 
 function normalizePath(path) {
@@ -12,9 +11,65 @@ function normalizePath(path) {
   return value || 'index.html';
 }
 
-export function createPacoRouter({ windowRef = window, routes = {} } = {}) {
+function normalizeStyles(styles) {
+  return [...new Set((Array.isArray(styles) ? styles : []).map(style => String(style || '').trim()).filter(Boolean))];
+}
+
+function createRouteStyleManager(documentRef) {
+  let active = new Map();
+
+  function findStylesheet(href) {
+    const absoluteHref = new URL(href, documentRef.baseURI).toString();
+    return [...documentRef.head.querySelectorAll('link[rel="stylesheet"]')]
+      .find(link => link.href === absoluteHref || link.getAttribute('href') === href) || null;
+  }
+
+  function loadStylesheet(href) {
+    const existing = findStylesheet(href);
+    if (existing) {
+      if (existing.sheet) return Promise.resolve(existing);
+      return new Promise((resolve, reject) => {
+        existing.addEventListener('load', () => resolve(existing), { once: true });
+        existing.addEventListener('error', () => reject(new Error(`Failed to load PacoGO route stylesheet: ${href}`)), { once: true });
+      });
+    }
+
+    const link = documentRef.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    link.dataset.pacoRouteStyle = href;
+
+    return new Promise((resolve, reject) => {
+      link.addEventListener('load', () => resolve(link), { once: true });
+      link.addEventListener('error', () => reject(new Error(`Failed to load PacoGO route stylesheet: ${href}`)), { once: true });
+      documentRef.head.appendChild(link);
+    });
+  }
+
+  async function activate(styles) {
+    const hrefs = normalizeStyles(styles);
+    const next = new Map();
+    const loaded = await Promise.all(hrefs.map(async href => [href, await loadStylesheet(href)]));
+
+    loaded.forEach(([href, link]) => next.set(href, link));
+
+    active.forEach((link, href) => {
+      if (!next.has(href)) link.remove();
+    });
+
+    active = next;
+  }
+
+  return Object.freeze({
+    activate,
+    getActive: () => new Map(active)
+  });
+}
+
+export function createPacoRouter({ windowRef = window, routes = {}, documentRef = windowRef.document || globalThis.document } = {}) {
   const listeners = new Set();
   const routeTable = new Map(Object.entries(routes));
+  const routeStyles = createRouteStyleManager(documentRef);
   let activeRenderer = null;
 
   function resolve(input = windowRef.location.href) {
@@ -30,12 +85,20 @@ export function createPacoRouter({ windowRef = window, routes = {} } = {}) {
   }
 
   function getRenderer(route) {
-    return routeTable.get(route.path) || null;
+    const renderer = routeTable.get(route.path) || null;
+    return typeof renderer === 'function' ? renderer : renderer?.render || null;
+  }
+
+  function getStyles(route) {
+    const renderer = routeTable.get(route.path);
+    return normalizeStyles(typeof renderer === 'function' ? renderer.styles : renderer?.styles);
   }
 
   async function render(route) {
     const renderer = getRenderer(route);
     if (typeof renderer !== 'function') return null;
+
+    await routeStyles.activate(getStyles(route));
 
     if (activeRenderer && typeof activeRenderer.destroy === 'function') {
       await activeRenderer.destroy();
@@ -80,6 +143,7 @@ export function createPacoRouter({ windowRef = window, routes = {} } = {}) {
   return {
     getRoute: () => resolve(),
     getRenderer,
+    getRouteStyles: route => getStyles(typeof route === 'string' ? resolve(route) : route),
     getActiveRenderer: () => activeRenderer,
     has: path => routeTable.has(normalizePath(path)),
     register: (path, renderer) => {

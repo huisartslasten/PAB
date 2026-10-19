@@ -6,12 +6,13 @@ import { fileURLToPath } from 'node:url';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const page = fs.readFileSync(path.join(projectRoot, 'test-history.html'), 'utf8');
+const runtime = fs.readFileSync(path.join(projectRoot, 'src/features/test-history/runtime.js'), 'utf8');
 
-test('test history page uses the canonical page template and application boundary', () => {
-  assert.match(page, /mountPacoPageTemplate/);
-  assert.match(page, /createPacoGOApp/);
-  assert.match(page, /app\.testHistory\.listAttempts/);
-  assert.match(page, /createTestHistoryRenderer/);
+test('test history page uses the canonical runtime and application boundary', () => {
+  assert.match(page, /startPacoRuntime/);
+  assert.match(runtime, /mountPacoPageTemplate/);
+  assert.match(runtime, /app\.testHistory\.listAttempts/);
+  assert.match(runtime, /createTestHistoryRenderer/);
 });
 
 test('test history page does not depend on legacy global runtime bridges', () => {
@@ -19,24 +20,25 @@ test('test history page does not depend on legacy global runtime bridges', () =>
   assert.doesNotMatch(page, /saveTestAttempt/);
   assert.doesNotMatch(page, /test-history-runtime-entry/);
   assert.doesNotMatch(page, /test-attempt-runtime-entry/);
+  assert.doesNotMatch(runtime, /window\.(showTestHistoryRuntime|saveTestAttempt)/);
 });
 
-test('test history page keeps its history presentation target explicit', () => {
-  assert.match(page, /id="testHistoryContent"/);
-  assert.doesNotMatch(page, /id="historyStudent"/);
+test('test history runtime keeps its history presentation target explicit', () => {
+  assert.match(runtime, /id="testHistoryContent"/);
+  assert.doesNotMatch(runtime, /id="historyStudent"/);
 });
 
-test('test history page belongs to the canonical management navigation boundary', () => {
-  assert.match(page, /buildViewUrl\('management\.html'/);
-  assert.match(page, /import \{ createPacoNavigation \} from '\.\/src\/components\/page-navigation\.js'/);
-  assert.match(page, /active: 'test-history'/);
-  assert.match(page, /viewMode: 'management'/);
-  assert.match(page, /includeAgenda: false/);
-  assert.match(page, /backLabel: '← Dashboard'/);
+test('test history runtime belongs to the canonical management navigation boundary', () => {
+  assert.match(runtime, /buildViewUrl\('management\.html'/);
+  assert.match(runtime, /createPacoNavigation/);
+  assert.match(runtime, /active: 'test-history'/);
+  assert.match(runtime, /viewMode: 'management'/);
+  assert.match(runtime, /includeAgenda: false/);
+  assert.match(runtime, /backLabel: '← Dashboard'/);
 });
 
-test('test history page uses the selected management student instead of a second local selector', () => {
-  assert.match(page, /const requestedStudent = context\.student/);
-  assert.match(page, /listAttempts\(requestedStudent\)/);
-  assert.doesNotMatch(page, /populateStudentFilter/);
+test('test history runtime uses the selected management student instead of a second local selector', () => {
+  assert.match(runtime, /const requestedStudent = context\.student/);
+  assert.match(runtime, /listAttempts\(requestedStudent\)/);
+  assert.doesNotMatch(runtime, /populateStudentFilter/);
 });

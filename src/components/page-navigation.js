@@ -1,5 +1,6 @@
 import { listStudents } from '../features/students/students.js';
 import { confirmPacoAction } from './confirm-dialog.js';
+import { buildViewUrl } from '../core/view-context.js';
 
 /**
  * PacoGO shared shell navigation.
@@ -13,10 +14,7 @@ function go(navigate, path, { student = '', mode = 'student' } = {}) {
   if (typeof navigate !== 'function') {
     throw new TypeError('PacoGO shared navigation requires the central navigation owner.');
   }
-  const target = new URL(path, window.location.href);
-  if (student) target.searchParams.set('viewStudent', student);
-  if (mode === 'management' && student) target.searchParams.set('mode', 'management');
-  return navigate(target);
+  return navigate(buildViewUrl(path, { student, mode }));
 }
 
 function requireNavigationApp(app, includeAccount) {
@@ -36,6 +34,7 @@ export function createPacoNavigation({
   onSelectManagementStudent = null,
   includeManagementStudentSelector = false,
   includeManagementDashboard = false,
+  includeManagementDashboardStudentSubmenu = true,
   includeManagement = true,
   includeManagementTools = false,
   includeCreator = false,
@@ -68,7 +67,7 @@ export function createPacoNavigation({
       icon: '🏠',
       label: 'Dashboard',
       onClick: () => go(navigate, 'management.html', view),
-      submenu: learners.map(name => ({
+      submenu: includeManagementDashboardStudentSubmenu ? learners.map(name => ({
         key: `management-student-${name}`,
         label: name,
         active: name === student,
@@ -79,7 +78,7 @@ export function createPacoNavigation({
             go(navigate, 'management.html', { student: name, mode: 'management' });
           }
         }
-      }))
+      })) : []
     });
   } else if (showManagementLearnerBar) {
     items.push({

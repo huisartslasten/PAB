@@ -48,6 +48,7 @@ export function createAgendaRuntime({
   demoItems = () => [],
   onEdit = () => {},
   onDelete = () => {},
+  onAdd = () => {},
   onLessonMatch = () => '',
   now = () => new Date()
 } = {}) {
@@ -125,17 +126,17 @@ export function createAgendaRuntime({
     const entries = [...itemsByDay.entries()];
     const weekdays = entries.slice(0, 5).map(([key, items]) => renderDay(key, items, false)).join('');
     const weekends = entries.slice(5).map(([key, items]) => renderDay(key, items, true)).join('');
-    const current = agendaKey(start) === agendaKey(getCurrentWeekStart());
     element.innerHTML = `<section class="agenda-school-week">` +
       `<div class="agenda-school-week-title"><button class="agenda-week-nav-button" type="button" data-agenda-week="-1">← Vorige week</button><div class="agenda-school-week-title-center"><strong>📚 Deze schoolweek</strong><span>${formatRange(start)}</span></div><button class="agenda-week-nav-button" type="button" data-agenda-week="1">Volgende week →</button></div>` +
       `<div class="agenda-week-days"><div class="agenda-weekday-row">${weekdays}</div><div class="agenda-weekend-row">${weekends}</div></div>` +
-      `<div class="agenda-week-bottom-nav"><button class="agenda-week-nav-button" type="button" data-agenda-week="-1">← Vorige week</button>${current ? '' : '<button class="agenda-today-button" type="button" data-agenda-today="1">📍 Vandaag</button>'}<button class="agenda-week-nav-button" type="button" data-agenda-week="1">Volgende week →</button></div>` +
+      `<div class="agenda-week-bottom-nav"><button class="agenda-week-nav-button agenda-add-button" type="button" data-agenda-add="1">➕ Agenda toevoegen</button><button class="agenda-week-nav-button" type="button" data-agenda-week="-1">← Vorige week</button><button class="agenda-week-nav-button agenda-today-button" type="button" data-agenda-today="1">📍 Vandaag</button><button class="agenda-week-nav-button" type="button" data-agenda-week="1">Volgende week →</button></div>` +
       `</section>`;
 
     element.querySelectorAll('[data-agenda-week]').forEach(button => {
       button.addEventListener('click', () => moveWeek(Number(button.dataset.agendaWeek)));
     });
     element.querySelector('[data-agenda-today]')?.addEventListener('click', goToday);
+    element.querySelector('[data-agenda-add]')?.addEventListener('click', onAdd);
     element.querySelectorAll('.agenda-edit').forEach(button => {
       button.addEventListener('click', () => onEdit(button.dataset.agendaId));
     });

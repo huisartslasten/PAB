@@ -42,8 +42,11 @@ jobs:
           test -f src/features/lessons/player-runtime-composition.js
           test -f src/features/lessons/player-screen-boundary.js
           test -f src/features/lessons/player-submit-boundary.js
-          grep -q 'src/features/lessons/player-runtime-bootstrap.js' test.html
-          grep -q 'createProfessionalPlayerBridge' test.html
+          test -f src/features/lessons/test-runtime.js
+          grep -q 'src/features/lessons/player-runtime-bootstrap.js' src/features/lessons/test-runtime.js
+          grep -q 'createProfessionalPlayerBridge' src/features/lessons/test-runtime.js
+          ! grep -q 'src/features/lessons/player-runtime-bootstrap.js' test.html
+          ! grep -q 'createProfessionalPlayerBridge' test.html
           ! grep -q 'function renderTest()' index.html
           ! grep -q 'function updateTestProgress()' index.html
           ! grep -q "activity={kind:'test',type" index.html

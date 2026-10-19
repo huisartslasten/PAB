@@ -59,7 +59,7 @@ export function createMemoryRuntime({
   let cards = [];
   let firstCardId = null;
   let secondCardId = null;
-  let matchedPairIds = new Set();
+  let matchedCardIds = new Set();
   let phase = 'ready';
   let turnCount = 0;
 
@@ -77,10 +77,7 @@ export function createMemoryRuntime({
       cards: cards.map(card => Object.freeze({ ...card })),
       firstCardId,
       secondCardId,
-      matchedCardIds: new Set(
-        cards.filter(card => matchedPairIds.has(card.pairId)).map(card => card.id)
-      ),
-      matchedPairIds: new Set(matchedPairIds),
+      matchedCardIds: new Set(matchedCardIds),
       phase,
       turnCount,
       totalPairs: lessonItems.length,
@@ -96,7 +93,7 @@ export function createMemoryRuntime({
     cards = createCards(itemsForRound, random);
     firstCardId = null;
     secondCardId = null;
-    matchedPairIds = new Set();
+    matchedCardIds = new Set();
     phase = cards.length ? 'playing' : 'finished';
   }
 
@@ -126,7 +123,7 @@ export function createMemoryRuntime({
 
     const card = findCard(cardId);
     if (!card) throw new Error('De gekozen kaart bestaat niet.');
-    if (matchedPairIds.has(card.pairId)) throw new Error('Deze kaart is al gevonden.');
+    if (matchedCardIds.has(card.id)) throw new Error('Deze kaart is al gevonden.');
     if (card.id === firstCardId) throw new Error('Deze kaart is al gekozen.');
     if (secondCardId) throw new Error('Beide kaarten van deze beurt zijn al gekozen.');
 
@@ -150,10 +147,11 @@ export function createMemoryRuntime({
 
     const matched = firstCard.type !== secondCard.type && firstCard.matchKey === secondCard.matchKey;
     if (matched) {
-      matchedPairIds.add(firstCard.pairId);
+      matchedCardIds.add(firstCard.id);
+      matchedCardIds.add(secondCard.id);
     }
 
-    const complete = matchedPairIds.size === currentRoundItems().length;
+    const complete = matchedCardIds.size === cards.length;
     firstCardId = null;
     secondCardId = null;
     phase = complete

@@ -9,6 +9,7 @@ import { createFlashcardsPageRuntime } from '../features/practice/flashcards/pag
 import { createAgendaPageRuntime } from '../features/agenda/page-runtime.js';
 import { createTestHistoryRuntime } from '../features/test-history/runtime.js';
 import { createManagementRuntime } from '../features/management/runtime.js';
+import { createArchiveRuntime } from '../features/management/archive-runtime.js';
 import { createCreatorRuntime } from '../features/management/creator-runtime.js';
 import { readViewContext } from '../core/view-context.js';
 
@@ -132,6 +133,15 @@ export function createPacoRouteRegistry({ app, mounts, documentRef = document } 
     'src/features/test-history/test-history.css'
   ]);
   routes['management.html'] = defineRoute(({ url, navigate }) => createManagementRuntime({
+    app,
+    templateMount: mounts.templateMount,
+    context: readViewContext(url.searchParams),
+    documentRef,
+    navigate
+  }), [
+    'src/features/management/management-support.css'
+  ]);
+  routes['archive.html'] = defineRoute(({ url, navigate }) => createArchiveRuntime({
     app,
     templateMount: mounts.templateMount,
     context: readViewContext(url.searchParams),

@@ -5,112 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PacoGO — Maandkalender</title>
   <link rel="stylesheet" href="src/components/page-template.css">
-  <link rel="stylesheet" href="src/features/agenda/month-calendar.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-<div id="paco-template-mount"></div>
-<script type="module">
-import { mountPacoPageTemplate } from './src/components/page-template.js';
-import { createPacoNavigation } from './src/components/page-navigation.js';
-import { createPacoGOApp } from './src/app/bootstrap.js';
-import { createAgendaRuntimeEntry } from './src/features/agenda/runtime-entry.js';
-import { renderMonthCalendar, formatMonthLabel } from './src/features/agenda/month-calendar-view.js';
-import { readViewContext, applyViewContext, buildViewUrl } from './src/core/view-context.js';
-import { setStudent } from './src/core/state.js';
+  <div id="paco-template-mount"></div>
+  <script type="module">
+    import { startPacoRuntime } from './src/app/runtime.js';
 
-const context = readViewContext(new URLSearchParams(window.location.search));
-const student = context.student;
-const mount = document.querySelector('#paco-template-mount');
-const app = createPacoGOApp({ supabaseLib: window.supabase });
-
-const content = document.createElement('div');
-content.className = 'month-calendar-page';
-content.innerHTML = `
-  <section class="month-calendar-card" id="monthCalendarCard">
-    <div class="month-calendar-heading">
-      <div class="month-calendar-heading-center">
-        <div class="month-calendar-title" id="monthCalendarTitle"></div>
-      </div>
-      <button type="button" class="month-calendar-print" id="monthCalendarPrint" aria-label="Print kalender" title="Print kalender">🖨️</button>
-    </div>
-    <h1 class="month-calendar-print-title" id="monthCalendarPrintTitle"></h1>
-    <div id="monthCalendarGrid"></div>
-    <div class="month-calendar-footer">
-      <button type="button" class="month-calendar-nav" id="monthCalendarPreviousBottom">← Vorige maand</button>
-      <button type="button" class="month-calendar-today" id="monthCalendarToday">📍 Deze maand</button>
-      <button type="button" class="month-calendar-nav" id="monthCalendarNextBottom">Volgende maand →</button>
-    </div>
-  </section>`;
-
-mountPacoPageTemplate({
-  mount,
-  backLabel: '← Mijn agenda',
-  backAction: () => { window.location.href = buildViewUrl('agenda.html', { student, mode: context.mode }).toString(); },
-  greeting: student ? `Hoi ${student}! 🐾` : 'PacoGO Maandkalender 📅',
-  title: 'Maandkalender',
-  icon: '📅',
-  subtitle: context.isManagement ? 'Beheerweergave — je beheert hier de agenda van de geselecteerde leerling.' : 'Bekijk je afspraken per maand en print de kalender.',
-  navigation: createPacoNavigation({ app, active: 'agenda', activeSubmenu: 'month-calendar', student, viewMode: context.mode }),
-  content
-});
-
-const pageRoot = content;
-const agenda = createAgendaRuntimeEntry({
-  storage: localStorage,
-  documentRef: pageRoot,
-  db: app.db,
-  currentStudent: () => student,
-  setCurrentStudent: setStudent,
-  lessons: () => app.state.lessons,
-  demoItems: () => [],
-  now: () => new Date()
-});
-
-let monthCursor = new Date();
-monthCursor.setDate(1);
-monthCursor.setHours(12, 0, 0, 0);
-
-function moveMonth(delta) {
-  monthCursor.setMonth(monthCursor.getMonth() + Number(delta));
-  render();
-}
-
-function render() {
-  const year = monthCursor.getFullYear();
-  const monthIndex = monthCursor.getMonth();
-  const label = formatMonthLabel(year, monthIndex);
-  pageRoot.querySelector('#monthCalendarTitle').textContent = label;
-  pageRoot.querySelector('#monthCalendarPrintTitle').textContent = `${student ? `${student} — ` : ''}${label}`;
-  const today = new Date();
-  const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-  pageRoot.querySelector('#monthCalendarGrid').innerHTML = renderMonthCalendar({
-    year,
-    monthIndex,
-    items: agenda.runtime.readService.buildAgendaItemsForRender(student),
-    todayKey,
-    escapeHtml: value => String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;')
-  });
-}
-
-pageRoot.querySelector('#monthCalendarPreviousBottom').addEventListener('click', () => moveMonth(-1));
-pageRoot.querySelector('#monthCalendarNextBottom').addEventListener('click', () => moveMonth(1));
-pageRoot.querySelector('#monthCalendarToday').addEventListener('click', () => { monthCursor = new Date(); monthCursor.setDate(1); monthCursor.setHours(12, 0, 0, 0); render(); });
-pageRoot.querySelector('#monthCalendarPrint').addEventListener('click', () => window.print());
-
-try {
-  await app.initializeSession();
-  if (context.isManagement) applyViewContext(context, { canManage: app.auth.isParent });
-  else applyViewContext(context);
-  if (!student) throw new Error('Geen leerling geselecteerd.');
-  await app.loadLessons();
-  render();
-} catch (error) {
-  console.error('PacoGO month calendar initialization failed:', error);
-  pageRoot.querySelector('#monthCalendarGrid').innerHTML = error.message === 'Geen leerling geselecteerd.'
-    ? '<div class="agenda-state">Selecteer eerst een leerling vanuit Beheer.</div>'
-    : '<div class="agenda-state">De maandkalender kon niet worden geladen.</div>';
-}
-</script>
+    await startPacoRuntime({
+      templateMount: document.querySelector('#paco-template-mount')
+    });
+  </script>
 </body>
 </html>

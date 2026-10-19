@@ -16,28 +16,12 @@
   <div id="paco-template-mount"></div>
   <div id="paco-chooser-mount"></div>
   <script type="module">
-    import { createPacoGOApp } from './src/app/bootstrap.js';
-    import { readViewContext } from './src/core/view-context.js';
-    import { createDashboardRuntime } from './src/features/dashboard/runtime.js';
+    import { startPacoRuntime } from './src/app/runtime.js';
 
-    const context = readViewContext(new URLSearchParams(window.location.search));
-    const templateMount = document.querySelector('#paco-template-mount');
-    const chooserMount = document.querySelector('#paco-chooser-mount');
-    const app = createPacoGOApp({ supabaseLib: window.supabase });
-
-    // Standalone page navigation remains owned by the page until the central
-    // router mounts this route. The feature runtime itself never owns routing.
-    const navigate = target => { window.location.href = target.toString(); };
-
-    const dashboard = createDashboardRuntime({
-      app,
-      templateMount,
-      chooserMount,
-      context,
-      navigate
+    await startPacoRuntime({
+      templateMount: document.querySelector('#paco-template-mount'),
+      chooserMount: document.querySelector('#paco-chooser-mount')
     });
-
-    dashboard.mount();
   </script>
 </body>
 </html>

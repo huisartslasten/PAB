@@ -49,8 +49,29 @@ describe('learning content service', () => {
       .mockReturnValueOnce(read) };
     const service = createLearningContentService(db, { canManage: () => true });
     await service.replaceForLesson(10, [{ id: 4, title: 'A', content: 'B' }]);
-    expect(save.upsert).toHaveBeenCalledWith([{ id: 4, lesson_id: 10, title: 'A', content: 'B', image_id: null, sort_order: 0 }]);
+    expect(save.upsert).toHaveBeenCalledWith(
+      [{ id: 4, lesson_id: 10, title: 'A', content: 'B', image_id: null, sort_order: 0 }],
+      { defaultToNull: false }
+    );
     expect(remove.delete).toHaveBeenCalled();
     expect(remove.in).toHaveBeenCalledWith('id', [5]);
+  });
+
+  it('leaves new card ids to the database identity default', async () => {
+    const existing = createQuery({ data: [{ id: 4 }], error: null });
+    const save = createQuery({ data: [{ id: 5, lesson_id: 10, title: 'Nieuw', content: 'B', image_id: null, sort_order: 1, created_at: null }], error: null });
+    const remove = createQuery({ data: [], error: null });
+    const read = createQuery({ data: [{ id: 4 }, { id: 5 }], error: null });
+    const db = { from: vi.fn()
+      .mockReturnValueOnce(existing)
+      .mockReturnValueOnce(save)
+      .mockReturnValueOnce(remove)
+      .mockReturnValueOnce(read) };
+    const service = createLearningContentService(db, { canManage: () => true });
+    await service.replaceForLesson(10, [{ id: 4, title: 'Bestaand', content: 'A' }, { title: 'Nieuw', content: 'B' }]);
+    expect(save.upsert).toHaveBeenCalledWith([
+      { id: 4, lesson_id: 10, title: 'Bestaand', content: 'A', image_id: null, sort_order: 0 },
+      { lesson_id: 10, title: 'Nieuw', content: 'B', image_id: null, sort_order: 1 }
+    ], { defaultToNull: false });
   });
 });

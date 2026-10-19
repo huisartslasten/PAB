@@ -9,11 +9,14 @@ import { confirmPacoAction } from './confirm-dialog.js';
  * application context; they do not decide whether the user is logged in.
  */
 
-function go(path, { student = '', mode = 'student' } = {}) {
+function go(navigate, path, { student = '', mode = 'student' } = {}) {
+  if (typeof navigate !== 'function') {
+    throw new TypeError('PacoGO shared navigation requires the central navigation owner.');
+  }
   const target = new URL(path, window.location.href);
   if (student) target.searchParams.set('viewStudent', student);
   if (mode === 'management' && student) target.searchParams.set('mode', 'management');
-  window.location.href = target.toString();
+  return navigate(target);
 }
 
 function requireNavigationApp(app, includeAccount) {
@@ -40,9 +43,14 @@ export function createPacoNavigation({
   includePractice = true,
   includeAgenda = true,
   includeAccount = true,
-  hideActive = false
+  hideActive = false,
+  navigate
 } = {}) {
   requireNavigationApp(app, includeAccount);
+
+  if (typeof navigate !== 'function') {
+    throw new TypeError('createPacoNavigation requires the central navigation owner.');
+  }
 
   const view = { student, mode: viewMode };
   const isManagementView = viewMode === 'management';
@@ -59,7 +67,7 @@ export function createPacoNavigation({
       key: 'management-dashboard',
       icon: '🏠',
       label: 'Dashboard',
-      onClick: () => go('management.html', view),
+      onClick: () => go(navigate, 'management.html', view),
       submenu: learners.map(name => ({
         key: `management-student-${name}`,
         label: name,
@@ -68,7 +76,7 @@ export function createPacoNavigation({
           if (typeof onSelectManagementStudent === 'function') {
             onSelectManagementStudent(name);
           } else {
-            go('management.html', { student: name, mode: 'management' });
+            go(navigate, 'management.html', { student: name, mode: 'management' });
           }
         }
       }))
@@ -85,7 +93,7 @@ export function createPacoNavigation({
           if (typeof onSelectManagementStudent === 'function') {
             onSelectManagementStudent(name);
           } else {
-            go(window.location.pathname.split('/').pop() || 'dashboard.html', { student: name, mode: 'management' });
+            go(navigate, window.location.pathname.split('/').pop() || 'dashboard.html', { student: name, mode: 'management' });
           }
         }
       }))
@@ -93,7 +101,7 @@ export function createPacoNavigation({
   }
 
   if (!showManagementLearnerBar && !showManagementDashboard) {
-    items.push({ key: 'dashboard', icon: '🏠', label: 'Dashboard', onClick: () => go('dashboard.html', view) });
+    items.push({ key: 'dashboard', icon: '🏠', label: 'Dashboard', onClick: () => go(navigate, 'dashboard.html', view) });
   }
 
   if (includeLessons) {
@@ -101,12 +109,12 @@ export function createPacoNavigation({
       key: 'lessons',
       icon: '📚',
       label: isManagementView ? 'Lessen beheren' : 'Mijn lessen',
-      onClick: () => go('lessons.html', view)
+      onClick: () => go(navigate, 'lessons.html', view)
     });
   }
 
   if (includePractice && !isManagementView) {
-    items.push({ key: 'practice', icon: '✏️', label: 'Oefenen', onClick: () => go('oefenen.html', view) });
+    items.push({ key: 'practice', icon: '✏️', label: 'Oefenen', onClick: () => go(navigate, 'oefenen.html', view) });
   }
 
   if (showAgenda) {
@@ -114,22 +122,22 @@ export function createPacoNavigation({
       key: 'agenda',
       icon: '📅',
       label: isManagementView ? 'Agenda beheren' : 'Mijn agenda',
-      onClick: () => go('agenda.html', view),
+      onClick: () => go(navigate, 'agenda.html', view),
       submenu: [
-        { key: 'agenda', label: isManagementView ? 'Agenda beheren' : 'Agenda invoeren', active: activeSubmenu === 'agenda', onClick: () => go('agenda.html', view) },
-        { key: 'month-calendar', label: 'Maandkalender', active: activeSubmenu === 'month-calendar', onClick: () => go('month-calendar.html', view) }
+        { key: 'agenda', label: isManagementView ? 'Agenda beheren' : 'Agenda invoeren', active: activeSubmenu === 'agenda', onClick: () => go(navigate, 'agenda.html', view) },
+        { key: 'month-calendar', label: 'Maandkalender', active: activeSubmenu === 'month-calendar', onClick: () => go(navigate, 'month-calendar.html', view) }
       ]
     });
   }
 
-  items.push({ key: 'test-history', icon: '📝', label: 'Toetsgeschiedenis', onClick: () => go('test-history.html', view) });
+  items.push({ key: 'test-history', icon: '📝', label: 'Toetsgeschiedenis', onClick: () => go(navigate, 'test-history.html', view) });
 
-  if (includeManagement && !isManagementView) items.push({ key: 'management', icon: '⚙️', label: 'Beheer', onClick: () => go('management.html', view) });
+  if (includeManagement && !isManagementView) items.push({ key: 'management', icon: '⚙️', label: 'Beheer', onClick: () => go(navigate, 'management.html', view) });
   if (showManagementTools) {
-    items.push({ key: 'recovery', icon: '🗂️', label: 'Archief / Prullenbak', onClick: () => go('archive.html', view) });
-    items.push({ key: 'feedback', icon: '💬', label: 'Feedback', onClick: () => go('feedback.html', view) });
+    items.push({ key: 'recovery', icon: '🗂️', label: 'Archief / Prullenbak', onClick: () => go(navigate, 'archive.html', view) });
+    items.push({ key: 'feedback', icon: '💬', label: 'Feedback', onClick: () => go(navigate, 'feedback.html', view) });
   }
-  if (showCreator) items.push({ key: 'creator', icon: '🧠', label: 'Creator Console', onClick: () => go('creator.html', view) });
+  if (showCreator) items.push({ key: 'creator', icon: '🧠', label: 'Creator Console', onClick: () => go(navigate, 'creator.html', view) });
 
   if (includeAccount) {
     const accountItem = {
@@ -138,7 +146,7 @@ export function createPacoNavigation({
       label: app.auth.isLoggedIn ? 'Uitloggen' : 'Inloggen',
       onClick: async () => {
         if (!app.auth.isLoggedIn) {
-          go('auth.html');
+          go(navigate, 'auth.html');
           return;
         }
         const confirmed = await confirmPacoAction({

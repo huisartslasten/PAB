@@ -48,6 +48,9 @@ export function createPacoNavigation({
   const isManagementView = viewMode === 'management';
   const showManagementLearnerBar = !isManagementView && includeManagementStudentSelector;
   const showManagementDashboard = isManagementView || includeManagementDashboard;
+  const showManagementTools = isManagementView || includeManagementTools;
+  const showCreator = isManagementView || includeCreator;
+  const showAgenda = isManagementView || includeAgenda;
   const learners = managementStudents.length ? managementStudents : listStudents();
   const items = [];
 
@@ -106,7 +109,7 @@ export function createPacoNavigation({
     items.push({ key: 'practice', icon: '✏️', label: 'Oefenen', onClick: () => go('oefenen.html', view) });
   }
 
-  if (includeAgenda) {
+  if (showAgenda) {
     items.push({
       key: 'agenda',
       icon: '📅',
@@ -122,11 +125,11 @@ export function createPacoNavigation({
   items.push({ key: 'test-history', icon: '📝', label: 'Toetsgeschiedenis', onClick: () => go('test-history.html', view) });
 
   if (includeManagement && !isManagementView) items.push({ key: 'management', icon: '⚙️', label: 'Beheer', onClick: () => go('management.html', view) });
-  if (includeManagementTools) {
+  if (showManagementTools) {
     items.push({ key: 'recovery', icon: '🗂️', label: 'Archief / Prullenbak', onClick: () => go('archive.html', view) });
     items.push({ key: 'feedback', icon: '💬', label: 'Feedback', onClick: () => go('feedback.html', view) });
   }
-  if (includeCreator) items.push({ key: 'creator', icon: '🧠', label: 'Creator Console', onClick: () => go('creator.html', view) });
+  if (showCreator) items.push({ key: 'creator', icon: '🧠', label: 'Creator Console', onClick: () => go('creator.html', view) });
 
   if (includeAccount) {
     const accountItem = {

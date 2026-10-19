@@ -1,5 +1,6 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
+import { buildViewUrl } from '../../core/view-context.js';
 import { createLessonEditorApplication } from './lesson-editor-application.js';
 import { createLessonEditorPage } from './lesson-editor-page.js';
 
@@ -35,9 +36,7 @@ export function createLessonEditorRuntime({
     refreshLessons: () => app.loadLessons()
   });
 
-  const goManagement = () => navigate('management.html', {
-    replace: false
-  });
+  const goManagement = () => navigate(buildViewUrl('management.html', { student, mode: 'management' }).toString());
 
   mountPacoPageTemplate({
     mount: templateMount,

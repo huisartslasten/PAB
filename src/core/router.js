@@ -3,6 +3,8 @@
  *
  * The router owns URL state and route transitions. Route renderers own feature
  * composition and rendering; the router only supplies navigation context.
+ * Runtime mounts synchronously establish the canonical shell and may continue
+ * loading feature data asynchronously afterwards.
  */
 
 function normalizePath(path) {
@@ -41,7 +43,14 @@ export function createPacoRouter({ windowRef = window, routes = {} } = {}) {
 
     const runtime = await renderer({ url: route.url, navigate });
     activeRenderer = runtime || null;
-    if (runtime && typeof runtime.mount === 'function') await runtime.mount();
+    if (runtime && typeof runtime.mount === 'function') {
+      const mountResult = runtime.mount();
+      if (mountResult && typeof mountResult.catch === 'function') {
+        mountResult.catch(error => {
+          console.error('PacoGO route mount error:', error);
+        });
+      }
+    }
     return runtime;
   }
 

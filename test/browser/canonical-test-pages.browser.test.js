@@ -18,7 +18,7 @@ async function expectManagementSidebar(page) {
     'Zyon',
     'Zenith',
     'Zephon',
-    'Agenda invoeren',
+    'Agenda beheren',
     'Maandkalender'
   ]);
 }

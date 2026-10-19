@@ -4,6 +4,7 @@ import { createLessonChoiceRuntime } from '../features/lessons/lesson-choice-run
 import { createLessonViewRuntime } from '../features/lessons/view-runtime.js';
 import { createQuestionsRuntime } from '../features/lessons/questions-runtime.js';
 import { createTestRuntime } from '../features/lessons/test-runtime.js';
+import { createLessonEditorRuntime } from '../features/lessons/lesson-editor-runtime.js';
 import { createPracticeMenuRuntime } from '../features/practice/menu-runtime.js';
 import { createFlashcardsPageRuntime } from '../features/practice/flashcards/page-runtime.js';
 import { createAgendaPageRuntime } from '../features/agenda/page-runtime.js';
@@ -41,6 +42,7 @@ export function createPacoRouteRegistry({ app, mounts, documentRef = document } 
   routes['lesson-view.html'] = defineRoute(({ url, navigate }) => createLessonViewRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-view.css']);
   routes['questions.html'] = defineRoute(({ url, navigate }) => createQuestionsRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/questions.css']);
   routes['test.html'] = defineRoute(({ url, navigate }) => createTestRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/lessons/test.css']);
+  routes['lesson-editor.html'] = defineRoute(({ url, navigate }) => createLessonEditorRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-editor.css']);
   routes['oefenen.html'] = defineRoute(({ url, navigate }) => createPracticeMenuRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/practice/practice-menu.css']);
   routes['flashcards-template.html'] = defineRoute(({ url, navigate }) => createFlashcardsPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/practice/flashcards/flashcards.css']);
   routes['agenda.html'] = defineRoute(({ url, navigate }) => createAgendaPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/agenda/agenda.css']);

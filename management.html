@@ -3,10 +3,8 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PacoGO — Dashboard</title>
   <link rel="stylesheet" href="src/components/page-template.css">
+  <link rel="stylesheet" href="src/features/management/management-support.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    .management-page{display:grid;gap:18px}.management-section{display:grid;gap:14px;padding:20px;border:1px solid #dce9f6;border-radius:22px;background:#fff;box-shadow:0 8px 22px rgba(16,43,87,.07)}.management-state{padding:16px 18px;border:1px solid #dce9f6;border-radius:16px;background:#f7fbff;color:#667894;font-weight:700}.management-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.management-action{display:grid;gap:5px;text-align:left;border:2px solid #dce9f6;border-radius:18px;background:#fff;padding:18px;color:#102b57;cursor:pointer}.management-action:hover{border-color:#1787f2;background:#eef8ff}.management-action strong{font:800 21px/1.1 "Baloo 2",Nunito,sans-serif}.management-action span{color:#667894;line-height:1.35}.management-action[disabled]{opacity:.55;cursor:not-allowed}.management-global{display:flex;gap:10px;flex-wrap:wrap}.management-global button{border:1px solid #cfe3f3;border-radius:12px;background:#f7fbff;color:#126fc9;padding:9px 13px;font-weight:900;cursor:pointer}@media(max-width:700px){.management-actions{grid-template-columns:1fr}}
-  </style>
 </head>
 <body><div id="paco-template-mount"></div>
 <script type="module">
@@ -82,8 +80,12 @@ async function initializeManagement(){
 
     const section=document.createElement('section');
     section.className='management-section';
-    const heading=document.createElement('h2');
-    heading.textContent=selectedStudent?`Beheer van ${selectedStudent}`:'Beheer';
+
+    const heading=document.createElement('div');
+    heading.className='page-heading';
+    const title=document.createElement('h2');
+    title.textContent=selectedStudent?`Beheer van ${selectedStudent}`:'Beheer';
+    heading.appendChild(title);
     section.appendChild(heading);
 
     const actions=document.createElement('div');

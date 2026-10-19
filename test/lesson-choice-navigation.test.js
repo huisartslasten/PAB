@@ -9,7 +9,7 @@ const runtime = await readFile(new URL('../src/features/lessons/lesson-choice-ru
 test('lesson choice delegates navigation to the canonical runtime and router', () => {
   assert.match(lessonChoice, /from ['"]\.\/src\/app\/runtime\.js['"]/);
   assert.match(lessonChoice, /startPacoRuntime\(/);
-  assert.match(routes, /routes\[['"]lesson-choice\.html['"]\]\s*=\s*\(\{ url, navigate \}\)/);
+  assert.match(routes, /routes\[['"]lesson-choice\.html['"]\]\s*=\s*defineRoute\(\(\{ url, navigate \}\)/);
   assert.match(routes, /createLessonChoiceRuntime/);
   assert.match(runtime, /createPacoNavigation\(\{[\s\S]*navigate\s*\}\)/);
   assert.match(runtime, /navigate\(targetFor\(/);

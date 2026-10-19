@@ -30,10 +30,11 @@ test('test history runtime keeps its history presentation target explicit', () =
 
 test('test history runtime belongs to the canonical management navigation boundary', () => {
   assert.match(runtime, /buildViewUrl\('management\.html'/);
-  assert.match(runtime, /createPacoNavigation/);
+  assert.match(runtime, /createPacoManagementNavigation/);
   assert.match(runtime, /active: 'test-history'/);
-  assert.match(runtime, /viewMode: 'management'/);
-  assert.match(runtime, /includeAgenda: false/);
+  assert.doesNotMatch(runtime, /viewMode: 'management'/);
+  assert.doesNotMatch(runtime, /includeAgenda: false/);
+  assert.doesNotMatch(runtime, /includeManagementDashboardStudentSubmenu: false/);
   assert.match(runtime, /backLabel: '← Dashboard'/);
 });
 

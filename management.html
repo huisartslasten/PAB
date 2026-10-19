@@ -1,119 +1,21 @@
 <!doctype html>
 <html lang="nl">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PacoGO — Dashboard</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PacoGO — Dashboard</title>
   <link rel="stylesheet" href="src/components/page-template.css">
   <link rel="stylesheet" href="src/features/management/management-support.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body><div id="paco-template-mount"></div>
-<script type="module">
-import { mountPacoPageTemplate } from './src/components/page-template.js';
-import { createPacoNavigation } from './src/components/page-navigation.js';
-import { createPacoGOApp } from './src/app/bootstrap.js';
-import { listStudents } from './src/features/students/students.js';
-import { readViewContext, applyViewContext, buildViewUrl } from './src/core/view-context.js';
+<body>
+  <div id="paco-template-mount"></div>
+  <script type="module">
+    import { startPacoRuntime } from './src/app/runtime.js';
 
-const context=readViewContext(new URLSearchParams(window.location.search));
-const selectedStudent=context.student;
-const mount=document.querySelector('#paco-template-mount');
-const content=document.createElement('div');
-content.className='management-page';
-const state=document.createElement('div');
-state.className='management-state';
-state.textContent='Beheer laden…';
-content.appendChild(state);
-const app=createPacoGOApp({supabaseLib:window.supabase});
-const management=app.management;
-
-function go(path){
-  const target=buildViewUrl(path,{student:selectedStudent,mode:'management'});
-  window.location.href=target.toString();
-}
-
-const navigation=createPacoNavigation({
-  app,
-  active:'management-dashboard',
-  includeManagement:false,
-  includeManagementDashboard:true,
-  includeManagementTools:true,
-  includeCreator:true,
-  includeManagementStudentSelector:true,
-  managementStudents:listStudents(),
-  student:selectedStudent,
-  viewMode:'management'
-});
-
-mountPacoPageTemplate({
-  mount,
-  backLabel:'← Start',
-  backAction:()=>{window.location.href='index.html'},
-  greeting:'PacoGO beheer ⚙️',
-  title:'Dashboard',
-  icon:'⚙️',
-  subtitle:selectedStudent?`Je beheert nu de omgeving van ${selectedStudent}.`:'Kies links in de LB een leerling om beheeracties voor die leerling te openen.',
-  navigation,
-  content
-});
-
-function action(label,description,path,requiresStudent=true){
-  const button=document.createElement('button');
-  button.type='button';
-  button.className='management-action';
-  button.disabled=requiresStudent&&!selectedStudent;
-  const strong=document.createElement('strong');
-  strong.textContent=label;
-  const span=document.createElement('span');
-  span.textContent=description;
-  button.append(strong,span);
-  button.addEventListener('click',()=>go(path));
-  return button;
-}
-
-async function initializeManagement(){
-  try{
-    const session=await app.initializeSession();
-    if(!session){window.location.href='auth.html';return;}
-    if(!app.auth.isParent){state.textContent='Je hebt geen toegang tot Beheer.';return;}
-    if(context.isManagement) applyViewContext(context,{canManage:app.auth.isParent});
-    await management.loadAllLessons();
-
-    const section=document.createElement('section');
-    section.className='management-section';
-
-    const heading=document.createElement('div');
-    heading.className='page-heading';
-    const title=document.createElement('h2');
-    title.textContent=selectedStudent?`Beheer van ${selectedStudent}`:'Beheer';
-    heading.appendChild(title);
-    section.appendChild(heading);
-
-    const actions=document.createElement('div');
-    actions.className='management-actions';
-    actions.append(
-      action('🧠 Leerstof beheren','Kies een les en open daarna de leerstofeditor voor die les.','lessons.html'),
-      action('📚 Lessen beheren','Bekijk de lessen van de actieve leerling en bewerk, archiveer of verwijder ze.','lessons.html'),
-      action('➕ Les maken','Maak een nieuwe les voor de actieve leerling.','lesson-editor.html'),
-      action('📅 Agenda','Bekijk en beheer de agenda van de actieve leerling.','agenda.html'),
-      action('🖨️ Maandkalender','Open de maandkalender van de actieve leerling.','month-calendar.html')
-    );
-    section.appendChild(actions);
-
-    const global=document.createElement('div');
-    global.className='management-global';
-    const archive=document.createElement('button');
-    archive.type='button';archive.textContent='🗂️ Archief / Prullenbak';archive.addEventListener('click',()=>go('archive.html'));
-    const feedback=document.createElement('button');
-    feedback.type='button';feedback.textContent='💬 Feedback';feedback.addEventListener('click',()=>go('feedback.html'));
-    global.append(archive,feedback);
-    section.appendChild(global);
-
-    content.replaceChildren(section);
-  }catch(error){
-    console.error('Management page load error:',error);
-    state.textContent='Beheer kon niet worden geladen.';
-  }
-}
-
-initializeManagement();
-</script></body></html>
+    await startPacoRuntime({
+      templateMount: document.querySelector('#paco-template-mount')
+    });
+  </script>
+</body>
+</html>

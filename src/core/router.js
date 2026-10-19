@@ -54,9 +54,11 @@ export function createPacoRouter({ windowRef = window, routes = {} } = {}) {
 
   async function navigate(input, { replace = false } = {}) {
     const route = resolve(input);
+    await render(route);
     const method = replace ? 'replaceState' : 'pushState';
     windowRef.history[method]({}, '', route.url.toString());
-    return notify(route, { replace });
+    listeners.forEach(listener => listener({ ...route, replace, popstate: false, renderer: getRenderer(route) }));
+    return { ...route, replace, popstate: false, renderer: getRenderer(route) };
   }
 
   function start() {

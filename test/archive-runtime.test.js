@@ -28,5 +28,5 @@ test('management dashboard navigates to archive through the shared router', () =
 test('archive runtime owns recovery presentation and actions', () => {
   assert.match(archiveRuntime, /renderRecovery\(archiveList, management, 'archive'/);
   assert.match(archiveRuntime, /renderRecovery\(trashList, management, 'trash'/);
-  assert.match(archiveRuntime, /management\.restoreLesson\|management\.permanentlyDeleteRecoveryLesson\|management\.emptyTrash/);
+  assert.match(archiveRuntime, /management\.(?:restoreLesson|permanentlyDeleteRecoveryLesson|emptyTrash)/);
 });

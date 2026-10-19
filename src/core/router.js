@@ -1,9 +1,8 @@
 /**
- * PacoGO central client-side route state.
+ * PacoGO central client-side route state and rendering contract.
  *
- * The router owns URL state and route transitions. It deliberately does not
- * render pages or know feature-specific business logic; callers register the
- * renderer for each route and receive a normalized URL object.
+ * The router owns URL state and route transitions. It does not know feature
+ * business logic; callers register the renderer for each route.
  */
 
 function normalizePath(path) {
@@ -27,8 +26,12 @@ export function createPacoRouter({ windowRef = window, routes = {} } = {}) {
     };
   }
 
+  function getRenderer(route) {
+    return routeTable.get(route.path) || null;
+  }
+
   function notify(route, { replace = false, popstate = false } = {}) {
-    const event = { ...route, replace, popstate };
+    const event = { ...route, replace, popstate, renderer: getRenderer(route) };
     listeners.forEach(listener => listener(event));
     return event;
   }
@@ -48,8 +51,10 @@ export function createPacoRouter({ windowRef = window, routes = {} } = {}) {
 
   return {
     getRoute: () => resolve(),
+    getRenderer,
     has: path => routeTable.has(normalizePath(path)),
     register: (path, renderer) => {
+      if (typeof renderer !== 'function') throw new TypeError('A PacoGO route renderer must be a function.');
       routeTable.set(normalizePath(path), renderer);
       return () => routeTable.delete(normalizePath(path));
     },

@@ -33,11 +33,6 @@ export function createTestHistoryRuntime({
   };
 
   const loadHistory = async () => {
-    if (!requestedStudent) {
-      historyContent.innerHTML = '<div class="history-empty"><strong>Geen leerling geselecteerd.</strong><p class="small">Kies links in de beheeromgeving een leerling om diens toetsgeschiedenis te bekijken.</p></div>';
-      return [];
-    }
-
     historyContent.innerHTML = '<div class="history-loading">Toetsgeschiedenis laden…</div>';
     try {
       const attempts = await app.testHistory.listAttempts(requestedStudent);
@@ -64,7 +59,7 @@ export function createTestHistoryRuntime({
         icon: '📝',
         subtitle: requestedStudent
           ? `Bekijk de gemaakte toetsen van ${requestedStudent}.`
-          : 'Kies eerst een leerling in het beheer-dashboard.',
+          : 'Bekijk de gemaakte toetsen van alle leerlingen.',
         navigation: createPacoNavigation({
           app,
           active: 'test-history',
@@ -80,12 +75,7 @@ export function createTestHistoryRuntime({
       try {
         const session = await app.initializeSession();
         if (!session || !app.auth.isParent) {
-          historyContent.innerHTML = '<div class="history-error"><strong>Geen toegang.</strong><p class="small">Toetsgeschiedenis is alleen beschikbaar in de beheeromgeving.</p></div>';
-          return;
-        }
-
-        if (!context.isManagement) {
-          historyContent.innerHTML = '<div class="history-error"><strong>Geen beheercontext.</strong><p class="small">Open Toetsgeschiedenis vanuit het beheer-dashboard.</p></div>';
+          historyContent.innerHTML = '<div class="history-error"><strong>Geen toegang.</strong><p class="small">Toetsgeschiedenis is alleen beschikbaar voor beheerders.</p></div>';
           return;
         }
 

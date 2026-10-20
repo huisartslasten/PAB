@@ -1,11 +1,9 @@
+import { clampImageWidth, migrateLegacyPlacement, normalizeImagePlacement } from '../features/learning-material/image-placement.js';
+
 const CARD_SELECT = 'id,learning_topic_id,title,document,sort_order,created_at';
 const DOCUMENT_VERSION = 3;
 const ALLOWED_TAGS = new Set(['B', 'STRONG', 'I', 'EM', 'SPAN', 'P', 'BR', 'UL', 'OL', 'LI', 'DIV']);
 const ALLOWED_SPAN_CLASSES = /^(learning-inline-size)$/;
-const MIN_IMAGE_WIDTH = 20;
-const MAX_IMAGE_WIDTH = 100;
-const MIN_IMAGE_Y = -10000;
-const MAX_IMAGE_Y = 10000;
 
 function normalizeHtml(value) {
   const source = String(value ?? '');
@@ -35,46 +33,6 @@ function normalizeHtml(value) {
     });
   });
   return root.innerHTML.trim();
-}
-
-function clampImageWidth(value) {
-  const n = Number(value);
-  return Number.isFinite(n) ? Math.min(MAX_IMAGE_WIDTH, Math.max(MIN_IMAGE_WIDTH, Math.round(n))) : 100;
-}
-
-function clampImageX(value, width) {
-  const safeWidth = clampImageWidth(width);
-  const max = Math.max(0, 100 - safeWidth);
-  const n = Number(value);
-  return Number.isFinite(n) ? Math.min(max, Math.max(0, Math.round(n))) : Math.round(max / 2);
-}
-
-function clampImageY(value) {
-  const n = Number(value);
-  return Number.isFinite(n) ? Math.min(MAX_IMAGE_Y, Math.max(MIN_IMAGE_Y, Math.round(n))) : 0;
-}
-
-function normalizeImagePlacement(value, width) {
-  const source = value && typeof value === 'object' ? value : {};
-  const safeWidth = clampImageWidth(width);
-  const maxX = Math.max(0, 100 - safeWidth);
-  const wrap = source.wrap === 'none' ? 'none' : 'square';
-  const rawX = clampImageX(source.x, safeWidth);
-  return {
-    mode: 'flow',
-    x: wrap === 'square' ? (rawX > maxX / 2 ? maxX : 0) : rawX,
-    y: wrap === 'square' ? 0 : clampImageY(source.y),
-    wrap
-  };
-}
-
-function migrateLegacyPlacement(value, width) {
-  const source = value && typeof value === 'object' ? value : {};
-  const safeWidth = clampImageWidth(width);
-  const offset = Number(source.offset) || 0;
-  if (source.side === 'right') return normalizeImagePlacement({ x: 100 - safeWidth - offset }, safeWidth);
-  if (source.side === 'left') return normalizeImagePlacement({ x: offset }, safeWidth);
-  return normalizeImagePlacement({ x: 0 }, safeWidth);
 }
 
 function normalizeDocument(input) {

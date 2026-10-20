@@ -10,9 +10,35 @@ function createCardElement(documentRef, index, initial = {}) { const wrapper = d
 function cardIsEmpty(card) { const surface = card.querySelector('.learning-editor-surface'); return !String(surface?.textContent || '').trim() && !String(card.querySelector('.learning-card-title')?.value || '').trim() && !surface?.querySelector('.learning-inline-image'); }
 function renumber(root) { [...root.querySelectorAll('.learning-card')].forEach((card, index) => { card.querySelector('.learning-card-number').textContent = `Kaart ${index + 1}`; }); }
 function ensureTrailing(root) { const mount = root.querySelector('[data-cards]'); const cards = [...mount.children]; if (!cards.length || !cardIsEmpty(cards[cards.length - 1])) mount.appendChild(createCardElement(root.ownerDocument, cards.length)); renumber(root); }
-function fontRange(range, surface) { if (!range.collapsed || range.startContainer.nodeType !== 3) return range; const value = range.startContainer.textContent || ''; let start = range.startOffset; let end = start; while (start > 0 && /\S/.test(value[start - 1])) start--; while (end < value.length && /\S/.test(value[end])) end++; if (start === end) return range; const next = surface.ownerDocument.createRange(); next.setStart(range.startContainer, start); next.setEnd(range.startContainer, end); return next; }
-function adjustFont(surface, delta, selectionBySurface) { const saved = selectionBySurface.get(surface); const selection = surface.ownerDocument.getSelection?.(); const range = saved || (selection?.rangeCount ? selection.getRangeAt(0) : null); if (!range || !surface.contains(range.commonAncestorContainer)) return; const nextRange = fontRange(range, surface); const parent = nextRange.startContainer.nodeType === 1 ? nextRange.startContainer : nextRange.startContainer.parentElement; const current = Number.parseInt(surface.ownerDocument.defaultView?.getComputedStyle(parent || surface).fontSize || '20', 10); const size = Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, (Number.isFinite(current) ? current : 20) + delta)); const span = surface.ownerDocument.createElement('span'); span.className = 'learning-inline-size'; span.style.fontSize = `${size}px`; if (nextRange.collapsed) { span.textContent = '\u200b'; nextRange.insertNode(span); } else { span.appendChild(nextRange.extractContents()); nextRange.insertNode(span); } selectionBySurface.set(surface, nextRange); }
-function pointRange(surface, x, y) { const doc = surface.ownerDocument; if (typeof doc.caretRangeFromPoint === 'function') return doc.caretRangeFromPoint(x, y); if (typeof doc.caretPositionFromPoint === 'function') { const p = doc.caretPositionFromPoint(x, y); if (!p) return null; const range = doc.createRange(); range.setStart(p.offsetNode, p.offset); range.collapse(true); return range; } return null; }
+function adjustFont(surface, delta, selectionBySurface) {
+  const saved = selectionBySurface.get(surface);
+  const selection = surface.ownerDocument.getSelection?.();
+  const range = saved ? saved.cloneRange() : (selection?.rangeCount ? selection.getRangeAt(0).cloneRange() : null);
+  if (!range || !surface.contains(range.commonAncestorContainer)) return;
+  const parent = range.startContainer.nodeType === 1 ? range.startContainer : range.startContainer.parentElement;
+  const current = Number.parseInt(surface.ownerDocument.defaultView?.getComputedStyle(parent || surface).fontSize || '20', 10);
+  const size = Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, (Number.isFinite(current) ? current : 20) + delta));
+  const span = surface.ownerDocument.createElement('span');
+  span.className = 'learning-inline-size';
+  span.style.fontSize = `${size}px`;
+  if (range.collapsed) {
+    span.textContent = '\u200b';
+    range.insertNode(span);
+    const next = surface.ownerDocument.createRange();
+    next.setStartAfter(span);
+    next.collapse(true);
+    selectionBySurface.set(surface, next);
+  } else {
+    const fragment = range.extractContents();
+    span.appendChild(fragment);
+    range.insertNode(span);
+    const next = surface.ownerDocument.createRange();
+    next.selectNodeContents(span);
+    selectionBySurface.set(surface, next);
+  }
+  surface.focus();
+}
+function pointRange(surface, x, y) { const doc = surface.ownerDocument; if (typeof x === 'number' && typeof y === 'number' && typeof doc.caretRangeFromPoint === 'function') return doc.caretRangeFromPoint(x, y); if (typeof x === 'number' && typeof y === 'number' && typeof doc.caretPositionFromPoint === 'function') { const p = doc.caretPositionFromPoint(x, y); if (!p) return null; const range = doc.createRange(); range.setStart(p.offsetNode, p.offset); range.collapse(true); return range; } return null; }
 function placeNode(surface, node, range) { if (!range || !surface.contains(range.commonAncestorContainer)) { surface.append(node, surface.ownerDocument.createTextNode(' ')); return; } range.deleteContents(); range.insertNode(node); node.after(surface.ownerDocument.createTextNode(' ')); }
 function documentModel(surface) { return { version: 1, elements: [...surface.childNodes].flatMap(node => { if (node.nodeType === 3) { const value = node.textContent?.replaceAll('\u200b', '').trim(); return value ? [{ id: crypto.randomUUID(), type: 'text', html: escapeHtml(value) }] : []; } if (node.nodeType !== 1) return []; if (node.matches('.learning-inline-image')) return [{ id: node.dataset.elementId || crypto.randomUUID(), type: 'image', media_id: Number(node.dataset.mediaId), width: clampWidth(node.dataset.width || parseFloat(node.style.width)) }]; const html = (node.outerHTML || '').replaceAll('\u200b', ''); return html.trim() ? [{ id: node.dataset.elementId || crypto.randomUUID(), type: 'text', html }] : []; }) }; }
 
@@ -32,11 +58,29 @@ export function createLearningMaterialEditorPage({ root, topic, cards = [], stud
   cards.forEach(card => addCard(card));
   ensureTrailing(root);
   documentRef.addEventListener('selectionchange', () => { const selection = documentRef.getSelection?.(); if (!selection?.rangeCount) return; const range = selection.getRangeAt(0); const parent = range.commonAncestorContainer?.nodeType === 1 ? range.commonAncestorContainer : range.commonAncestorContainer?.parentElement; const surface = parent?.closest?.('.learning-editor-surface'); if (surface) selectionBySurface.set(surface, range.cloneRange()); });
-  root.addEventListener('mousedown', event => { if (event.target.closest('[data-command]')) event.preventDefault(); });
+  root.addEventListener('pointerdown', event => { if (event.target.closest('[data-command]')) event.preventDefault(); });
   root.addEventListener('click', async event => {
     const image = event.target.closest('.learning-inline-image'); if (image) { root.querySelectorAll('.learning-inline-image.selected').forEach(item => item.classList.remove('selected')); image.classList.add('selected'); }
     const command = event.target.closest('[data-command]');
-    if (command) { const card = command.closest('.learning-card'); const surface = card?.querySelector('.learning-editor-surface'); if (!surface) return; const name = command.dataset.command; if (name === 'image') surface.parentElement.querySelector('.learning-image-input').click(); else if (name === 'image-smaller' || name === 'image-larger') { const selected = surface.querySelector('.learning-inline-image.selected'); if (selected) { const width = clampWidth(Number(selected.dataset.width || 100) + (name === 'image-larger' ? 10 : -10)); selected.dataset.width = width; selected.style.width = `${width}%`; } } else if (name === 'bold' || name === 'italic') { surface.focus(); surface.ownerDocument.execCommand(name, false); } else adjustFont(surface, name === 'increase-font' ? 2 : -2, selectionBySurface); return; }
+    if (command) {
+      const card = command.closest('.learning-card');
+      const surface = card?.querySelector('.learning-editor-surface');
+      if (!surface) return;
+      const name = command.dataset.command;
+      if (name === 'image') {
+        const input = card.querySelector('.learning-image-input');
+        if (input) { if (typeof input.showPicker === 'function') input.showPicker(); else input.click(); }
+      } else if (name === 'image-smaller' || name === 'image-larger') {
+        const selected = surface.querySelector('.learning-inline-image.selected');
+        if (selected) { const width = clampWidth(Number(selected.dataset.width || 100) + (name === 'image-larger' ? 10 : -10)); selected.dataset.width = width; selected.style.width = `${width}%`; }
+      } else if (name === 'bold' || name === 'italic') {
+        surface.focus();
+        const saved = selectionBySurface.get(surface);
+        if (saved) { const selection = surface.ownerDocument.getSelection(); selection.removeAllRanges(); selection.addRange(saved.cloneRange()); }
+        surface.ownerDocument.execCommand(name, false);
+      } else adjustFont(surface, name === 'increase-font' ? 2 : -2, selectionBySurface);
+      return;
+    }
     const action = event.target.closest('[data-action]')?.dataset.action; const card = event.target.closest('.learning-card'); if (action === 'insert-card-after' && card) { const inserted = addCard({}, card.nextElementSibling); inserted.querySelector('.learning-card-title').focus(); } else if (action === 'remove-card' && card) { if (cardsMount.children.length > 1) card.remove(); ensureTrailing(root); } else if (action === 'save-learning') await save();
   });
   root.addEventListener('input', event => { if (event.target.closest('.learning-card')) ensureTrailing(root); });
@@ -47,6 +91,20 @@ export function createLearningMaterialEditorPage({ root, topic, cards = [], stud
   root.addEventListener('drop', async event => { const surface = event.target.closest('.learning-editor-surface'); if (!surface) return; event.preventDefault(); surface.classList.remove('drop-target'); if (draggedImage) { const image = draggedImage; image.remove(); placeNode(surface, image, pointRange(surface, event.clientX, event.clientY)); draggedImage = null; return; } const file = event.dataTransfer?.files?.[0]; if (!file) return; await uploadImage(surface, file, event.clientX, event.clientY); });
   root.addEventListener('change', async event => { if (!event.target.matches('.learning-image-input')) return; const surface = event.target.closest('.learning-card')?.querySelector('.learning-editor-surface'); const file = event.target.files?.[0]; event.target.value = ''; if (surface && file) await uploadImage(surface, file); });
   async function resolveCurrentTopic() { const student = root.querySelector('[data-field="student"]:checked')?.value.trim() || ''; const subject = root.querySelector('[data-field="subject"]').value.trim(); const subvak = root.querySelector('[data-field="subvak"]').value.trim(); if (!student || !subject) throw new Error('Kies eerst een leerling en vul het vak in.'); activeTopic = await learningContent.resolveTopic({ student, subject, subvak }); if (!activeTopic?.id) throw new Error('Het leerstofonderwerp kon niet worden opgeslagen.'); return activeTopic; }
-  async function uploadImage(surface, file, x, y) { if (!/^image\/(jpeg|png|webp)$/i.test(file.type || '')) { showStatus('Gebruik een JPEG, PNG of WebP-afbeelding.', true); return; } try { const topicForUpload = await resolveCurrentTopic(); const uploaded = await learningContent.uploadCardImage(topicForUpload.id, file); const image = documentRef.createElement('img'); image.className = 'learning-inline-image'; image.draggable = true; image.contentEditable = 'false'; image.dataset.mediaId = String(uploaded.id); image.dataset.width = '100'; image.src = uploaded.url || URL.createObjectURL(file); image.alt = uploaded.original_name || 'Afbeelding'; image.style.width = '100%'; placeNode(surface, image, pointRange(surface, x, y)); ensureTrailing(root); } catch (error) { showStatus(error.message || 'De afbeelding kon niet worden toegevoegd.', true); } }
+  async function uploadImage(surface, file, x, y) {
+    const isImage = /^image\/(jpeg|png|webp)$/i.test(file.type || '') || /\.(jpe?g|png|webp)$/i.test(file.name || '');
+    if (!isImage) { showStatus('Gebruik een JPEG, PNG of WebP-afbeelding.', true); return; }
+    try {
+      const topicForUpload = await resolveCurrentTopic();
+      const uploaded = await learningContent.uploadCardImage(topicForUpload.id, file);
+      const image = documentRef.createElement('img');
+      image.className = 'learning-inline-image'; image.draggable = true; image.contentEditable = 'false'; image.dataset.mediaId = String(uploaded.id); image.dataset.width = '100'; image.src = uploaded.url || URL.createObjectURL(file); image.alt = uploaded.original_name || 'Afbeelding'; image.style.width = '100%';
+      const savedSelection = selectionBySurface.get(surface);
+      const range = typeof x === 'number' && typeof y === 'number' ? pointRange(surface, x, y) : savedSelection;
+      placeNode(surface, image, range);
+      ensureTrailing(root);
+      surface.focus();
+    } catch (error) { showStatus(error.message || 'De afbeelding kon niet worden toegevoegd.', true); }
+  }
   async function save() { const subject = root.querySelector('[data-field="subject"]').value.trim(); const subvak = root.querySelector('[data-field="subvak"]').value.trim(); const student = root.querySelector('[data-field="student"]:checked')?.value.trim() || ''; if (!student || !subject) { showStatus('Kies eerst een leerling en vul het vak in.', true); return; } showStatus('Leerstof opslaan…'); try { const topicForSave = await resolveCurrentTopic(); const payload = [...cardsMount.querySelectorAll('.learning-card')].filter(card => !cardIsEmpty(card)).map(card => ({ id: card.dataset.cardId || undefined, title: card.querySelector('.learning-card-title').value.trim(), document: documentModel(card.querySelector('.learning-editor-surface')) })); const saved = await learningContent.replaceForTopic(topicForSave, payload); showStatus('Opgeslagen.'); await onSaved({ topic: { ...topicForSave, student, subject, subvak }, cards: saved }); } catch (error) { console.error('Learning material save error:', error); showStatus(error.message || 'De leerstof kon niet worden opgeslagen.', true); } }
 }

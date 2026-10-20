@@ -30,11 +30,15 @@ function clampY(value) {
 
 function normalizePlacement(value, width) {
   const source = value && typeof value === 'object' ? value : {};
+  const safeWidth = clampWidth(width);
+  const maxX = Math.max(0, 100 - safeWidth);
+  const wrap = source.wrap === 'none' ? 'none' : 'square';
+  const rawX = clampX(source.x, safeWidth);
   return {
     mode: 'flow',
-    x: clampX(source.x, width),
-    y: clampY(source.y),
-    wrap: source.wrap === 'none' ? 'none' : 'square'
+    x: wrap === 'square' ? (rawX > maxX / 2 ? maxX : 0) : rawX,
+    y: wrap === 'square' ? 0 : clampY(source.y),
+    wrap
   };
 }
 
@@ -44,7 +48,7 @@ function imageStyle(placement, width) {
   if (normalized.wrap === 'none') {
     return `width:${safeWidth}%;margin-left:${normalized.x}%;margin-top:${normalized.y}px;`;
   }
-  return `width:${safeWidth}%;margin-left:${normalized.x}%;margin-top:${normalized.y}px;`;
+  return `width:${safeWidth}%;margin-left:${normalized.x === 0 ? 0 : 18}px;margin-right:${normalized.x === 0 ? 18 : 0}px;margin-top:0;`;
 }
 
 function renderDocument(model) {
@@ -52,7 +56,7 @@ function renderDocument(model) {
     if (element?.type === 'image' && element.media_id && element.image?.url) {
       const width = clampWidth(element.size?.width ?? element.width);
       const placement = normalizePlacement(element.placement, width);
-      return `<img class="learning-view-image learning-view-image-${placement.wrap}" src="${escapeHtml(element.image.url)}" alt="${escapeHtml(element.image.original_name || 'Afbeelding')}" style="${imageStyle(placement, width)}">`;
+      return `<img class="learning-view-image learning-view-image-${placement.wrap}" data-x="${placement.x}" src="${escapeHtml(element.image.url)}" alt="${escapeHtml(element.image.original_name || 'Afbeelding')}" style="${imageStyle(placement, width)}">`;
     }
     return element?.type === 'text' ? element.html || '' : '';
   }).join('');

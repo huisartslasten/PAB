@@ -26,10 +26,12 @@
         };
       }
     };
+    const learningTopics = { ensureTopic: async () => ({ id: 1 }) };
 
     const handler = bootstrapLessonLoadRuntime({
       runtime: {
         db,
+        learningTopics,
         setLessons(value) { state.lessons = value; },
         showMessage(text, type) { state.messages.push({ text, type }); },
         showHome() { state.homeCalls += 1; }

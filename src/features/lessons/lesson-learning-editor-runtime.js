@@ -11,71 +11,33 @@ function showMessage(content, message, className = 'message') {
   content.appendChild(box);
 }
 
-export function createLessonLearningEditorRuntime({
-  app,
-  templateMount,
-  context = {},
-  lessonId = '',
-  documentRef = document,
-  navigate
-} = {}) {
-  if (!app) throw new TypeError('Learning editor runtime requires an app.');
-  if (!templateMount) throw new TypeError('Learning editor runtime requires a template mount.');
-  if (typeof navigate !== 'function') throw new TypeError('Learning editor runtime requires central navigation.');
-  if (!lessonId) throw new TypeError('Learning editor runtime requires a lesson id.');
-
+export function createLessonLearningEditorRuntime({ app, templateMount, context = {}, lessonId = '', documentRef = document, navigate } = {}) {
+  if (!app || !templateMount || typeof navigate !== 'function' || !lessonId) throw new TypeError('Learning editor runtime requires app, template mount, navigation and lesson id.');
   const content = documentRef.createElement('div');
   content.className = 'lesson-learning-editor-page';
   const student = context.student || '';
   const viewMode = context.mode || 'management';
-
-  const goLessons = () => {
-    const target = buildViewUrl('lessons.html', { student, mode: 'management' });
-    navigate(target);
-  };
-
-  mountPacoPageTemplate({
-    mount: templateMount,
-    backLabel: '← Lessen',
-    backAction: goLessons,
-    greeting: 'PAB beheer ⚙️',
-    title: 'Leerstof bewerken',
-    icon: '🧠',
-    subtitle: 'Maak schermformaat leerkaarten voor deze les.',
-    navigation: createPacoNavigation({
-      app,
-      active: 'management',
-      student,
-      viewMode,
-      includeCreator: true,
-      navigate
-    }),
-    content
-  });
+  const goLessons = () => navigate(buildViewUrl('lessons.html', { student, mode: 'management' }));
+  mountPacoPageTemplate({ mount: templateMount, backLabel: '← Lessen', backAction: goLessons, greeting: 'PAB beheer ⚙️', title: 'Leerstof bewerken', icon: '🧠', subtitle: 'Maak schermformaat leerkaarten voor deze les.', navigation: createPacoNavigation({ app, active: 'management', student, viewMode, includeCreator: true, navigate }), content });
 
   async function mount() {
     await app.initializeSession();
-    if (!app.auth.isParent) {
-      showMessage(content, 'Je hebt geen toegang tot leerstofbeheer.', 'message error');
-      return;
-    }
-
+    if (!app.auth.isParent) { showMessage(content, 'Je hebt geen toegang tot leerstofbeheer.', 'message error'); return; }
     const records = await app.loadLessons();
     const lesson = app.mapLessons(records).find(item => String(item.id) === String(lessonId)) || null;
-    if (!lesson) {
-      showMessage(content, 'Deze les kon niet worden gevonden.', 'message error');
-      return;
-    }
-
+    if (!lesson) { showMessage(content, 'Deze les kon niet worden gevonden.', 'message error'); return; }
     const cards = await app.learningContent.listForLesson(lesson.id);
     createLessonLearningEditorPage({
       root: content,
       lesson,
       cards,
       learningContent: app.learningContent,
-      documentRef
+      documentRef,
+      onSaved: async () => {
+        const target = buildViewUrl('lesson-learning.html', { lesson_id: lesson.id, student, mode: viewMode, saved: '1' });
+        navigate(target);
+      }
     });
   }
-
   return Object.freeze({ mount });
 }

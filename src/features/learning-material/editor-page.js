@@ -10,32 +10,27 @@ function createCardElement(documentRef, index, initial = {}) { const wrapper = d
 function cardIsEmpty(card) { const surface = card.querySelector('.learning-editor-surface'); return !String(surface?.textContent || '').trim() && !String(card.querySelector('.learning-card-title')?.value || '').trim() && !surface?.querySelector('.learning-inline-image'); }
 function renumber(root) { [...root.querySelectorAll('.learning-card')].forEach((card, index) => { card.querySelector('.learning-card-number').textContent = `Kaart ${index + 1}`; }); }
 function ensureTrailing(root) { const mount = root.querySelector('[data-cards]'); const cards = [...mount.children]; if (!cards.length || !cardIsEmpty(cards[cards.length - 1])) mount.appendChild(createCardElement(root.ownerDocument, cards.length)); renumber(root); }
+function selectionIsInside(surface, range) { return Boolean(range && surface.contains(range.commonAncestorContainer)); }
+function rememberSelection(surface) { const selection = surface.ownerDocument.getSelection?.(); if (!selection?.rangeCount) return null; const range = selection.getRangeAt(0).cloneRange(); if (!selectionIsInside(surface, range)) return null; surface.__learningSelection = range; return range; }
+function restoreSelection(surface, selectionBySurface) { const saved = selectionBySurface.get(surface) || surface.__learningSelection; if (!saved || !selectionIsInside(surface, saved)) return null; const selection = surface.ownerDocument.getSelection?.(); if (!selection) return null; selection.removeAllRanges(); selection.addRange(saved.cloneRange()); return saved.cloneRange(); }
 function adjustFont(surface, delta, selectionBySurface) {
-  const saved = selectionBySurface.get(surface);
-  const selection = surface.ownerDocument.getSelection?.();
-  const range = saved ? saved.cloneRange() : (selection?.rangeCount ? selection.getRangeAt(0).cloneRange() : null);
-  if (!range || !surface.contains(range.commonAncestorContainer)) return;
+  const range = restoreSelection(surface, selectionBySurface);
+  if (!range || range.collapsed) return;
   const parent = range.startContainer.nodeType === 1 ? range.startContainer : range.startContainer.parentElement;
   const current = Number.parseInt(surface.ownerDocument.defaultView?.getComputedStyle(parent || surface).fontSize || '20', 10);
   const size = Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, (Number.isFinite(current) ? current : 20) + delta));
   const span = surface.ownerDocument.createElement('span');
   span.className = 'learning-inline-size';
   span.style.fontSize = `${size}px`;
-  if (range.collapsed) {
-    span.textContent = '\u200b';
-    range.insertNode(span);
-    const next = surface.ownerDocument.createRange();
-    next.setStartAfter(span);
-    next.collapse(true);
-    selectionBySurface.set(surface, next);
-  } else {
-    const fragment = range.extractContents();
-    span.appendChild(fragment);
-    range.insertNode(span);
-    const next = surface.ownerDocument.createRange();
-    next.selectNodeContents(span);
-    selectionBySurface.set(surface, next);
-  }
+  const fragment = range.extractContents();
+  span.appendChild(fragment);
+  range.insertNode(span);
+  const next = surface.ownerDocument.createRange();
+  next.selectNodeContents(span);
+  selectionBySurface.set(surface, next.cloneRange());
+  surface.__learningSelection = next.cloneRange();
+  const selection = surface.ownerDocument.getSelection?.();
+  if (selection) { selection.removeAllRanges(); selection.addRange(next.cloneRange()); }
   surface.focus();
 }
 function pointRange(surface, x, y) { const doc = surface.ownerDocument; if (typeof x === 'number' && typeof y === 'number' && typeof doc.caretRangeFromPoint === 'function') return doc.caretRangeFromPoint(x, y); if (typeof x === 'number' && typeof y === 'number' && typeof doc.caretPositionFromPoint === 'function') { const p = doc.caretPositionFromPoint(x, y); if (!p) return null; const range = doc.createRange(); range.setStart(p.offsetNode, p.offset); range.collapse(true); return range; } return null; }
@@ -57,8 +52,10 @@ export function createLearningMaterialEditorPage({ root, topic, cards = [], stud
   const addCard = (initial = {}, before = null) => { const card = createCardElement(documentRef, cardsMount.children.length, initial); before ? cardsMount.insertBefore(card, before) : cardsMount.appendChild(card); renumber(root); return card; };
   cards.forEach(card => addCard(card));
   ensureTrailing(root);
-  documentRef.addEventListener('selectionchange', () => { const selection = documentRef.getSelection?.(); if (!selection?.rangeCount) return; const range = selection.getRangeAt(0); const parent = range.commonAncestorContainer?.nodeType === 1 ? range.commonAncestorContainer : range.commonAncestorContainer?.parentElement; const surface = parent?.closest?.('.learning-editor-surface'); if (surface) selectionBySurface.set(surface, range.cloneRange()); });
-  root.addEventListener('pointerdown', event => { if (event.target.closest('[data-command]')) event.preventDefault(); });
+  documentRef.addEventListener('selectionchange', () => { const selection = documentRef.getSelection?.(); if (!selection?.rangeCount) return; const range = selection.getRangeAt(0); const parent = range.commonAncestorContainer?.nodeType === 1 ? range.commonAncestorContainer : range.commonAncestorContainer?.parentElement; const surface = parent?.closest?.('.learning-editor-surface'); if (surface) { const saved = range.cloneRange(); selectionBySurface.set(surface, saved); surface.__learningSelection = saved; } });
+  root.addEventListener('pointerup', event => { const surface = event.target.closest('.learning-editor-surface'); if (surface) rememberSelection(surface); });
+  root.addEventListener('keyup', event => { const surface = event.target.closest('.learning-editor-surface'); if (surface) rememberSelection(surface); });
+  root.addEventListener('pointerdown', event => { const command = event.target.closest('[data-command]'); if (!command) return; const card = command.closest('.learning-card'); const surface = card?.querySelector('.learning-editor-surface'); if (surface) rememberSelection(surface); event.preventDefault(); });
   root.addEventListener('click', async event => {
     const image = event.target.closest('.learning-inline-image'); if (image) { root.querySelectorAll('.learning-inline-image.selected').forEach(item => item.classList.remove('selected')); image.classList.add('selected'); }
     const command = event.target.closest('[data-command]');
@@ -74,14 +71,18 @@ export function createLearningMaterialEditorPage({ root, topic, cards = [], stud
         const selected = surface.querySelector('.learning-inline-image.selected');
         if (selected) { const width = clampWidth(Number(selected.dataset.width || 100) + (name === 'image-larger' ? 10 : -10)); selected.dataset.width = width; selected.style.width = `${width}%`; }
       } else if (name === 'bold' || name === 'italic') {
-        surface.focus();
+        restoreSelection(surface, selectionBySurface);
         const saved = selectionBySurface.get(surface);
         if (saved) { const selection = surface.ownerDocument.getSelection(); selection.removeAllRanges(); selection.addRange(saved.cloneRange()); }
         surface.ownerDocument.execCommand(name, false);
       } else adjustFont(surface, name === 'increase-font' ? 2 : -2, selectionBySurface);
       return;
     }
-    const action = event.target.closest('[data-action]')?.dataset.action; const card = event.target.closest('.learning-card'); if (action === 'insert-card-after' && card) { const inserted = addCard({}, card.nextElementSibling); inserted.querySelector('.learning-card-title').focus(); } else if (action === 'remove-card' && card) { if (cardsMount.children.length > 1) card.remove(); ensureTrailing(root); } else if (action === 'save-learning') await save();
+    const action = event.target.closest('[data-action]')?.dataset.action;
+    const card = event.target.closest('.learning-card');
+    if (action === 'insert-card-after' && card) { const inserted = addCard({}, card.nextElementSibling); inserted.querySelector('.learning-card-title').focus(); }
+    else if (action === 'remove-card' && card) { if (cardsMount.children.length > 1) card.remove(); ensureTrailing(root); }
+    else if (action === 'save-learning') await save();
   });
   root.addEventListener('input', event => { if (event.target.closest('.learning-card')) ensureTrailing(root); });
   root.addEventListener('dragstart', event => { const image = event.target.closest('.learning-inline-image'); if (!image) return; draggedImage = image; event.dataTransfer.effectAllowed = 'move'; });
@@ -108,5 +109,21 @@ export function createLearningMaterialEditorPage({ root, topic, cards = [], stud
       surface.focus();
     } catch (error) { showStatus(error.message || 'De afbeelding kon niet worden toegevoegd.', true); }
   }
-  async function save() { const subject = root.querySelector('[data-field="subject"]').value.trim(); const subvak = root.querySelector('[data-field="subvak"]').value.trim(); const student = root.querySelector('[data-field="student"]:checked')?.value.trim() || ''; if (!student || !subject) { showStatus('Kies eerst een leerling en vul het vak in.', true); return; } showStatus('Leerstof opslaan…'); try { const topicForSave = await resolveCurrentTopic(); const payload = [...cardsMount.querySelectorAll('.learning-card')].filter(card => !cardIsEmpty(card)).map(card => ({ id: card.dataset.cardId || undefined, title: card.querySelector('.learning-card-title').value.trim(), document: documentModel(card.querySelector('.learning-editor-surface')) })); const saved = await learningContent.replaceForTopic(topicForSave, payload); showStatus('Opgeslagen.'); await onSaved({ topic: { ...topicForSave, student, subject, subvak }, cards: saved }); } catch (error) { console.error('Learning material save error:', error); showStatus(error.message || 'De leerstof kon niet worden opgeslagen.', true); } }
+  async function save() {
+    const subject = root.querySelector('[data-field="subject"]').value.trim();
+    const subvak = root.querySelector('[data-field="subvak"]').value.trim();
+    const student = root.querySelector('[data-field="student"]:checked')?.value.trim() || '';
+    if (!student || !subject) { showStatus('Kies eerst een leerling en vul het vak in.', true); return; }
+    showStatus('Leerstof opslaan…');
+    try {
+      const topicForSave = await resolveCurrentTopic();
+      const payload = [...cardsMount.querySelectorAll('.learning-card')].filter(card => !cardIsEmpty(card)).map(card => ({ id: card.dataset.cardId || undefined, title: card.querySelector('.learning-card-title').value.trim(), document: documentModel(card.querySelector('.learning-editor-surface')) }));
+      const saved = await learningContent.replaceForTopic(topicForSave, payload);
+      showStatus('Opgeslagen.');
+      await onSaved({ topic: { ...topicForSave, student, subject, subvak }, cards: saved });
+    } catch (error) {
+      console.error('Learning material save error:', error);
+      showStatus(error.message || 'De leerstof kon niet worden opgeslagen.', true);
+    }
+  }
 }

@@ -6,7 +6,7 @@ import { createLessonLearningViewRuntime } from '../features/lessons/lesson-lear
 import { createQuestionsRuntime } from '../features/lessons/questions-runtime.js';
 import { createTestRuntime } from '../features/lessons/test-runtime.js';
 import { createLessonEditorRuntime } from '../features/lessons/lesson-editor-runtime.js';
-import { createLessonLearningEditorRuntime } from '../features/lessons/lesson-learning-editor-runtime.js';
+import { createLearningMaterialEditorRuntime } from '../features/learning-material/editor-runtime.js';
 import { createPracticeMenuRuntime } from '../features/practice/menu-runtime.js';
 import { createGamesRuntime } from '../features/practice/games-runtime.js';
 import { createDoubleOrNothingPageRuntime } from '../features/practice/double-or-nothing/page-runtime.js';
@@ -20,14 +20,11 @@ import { createFeedbackRuntime } from '../features/management/feedback-runtime.j
 import { createCreatorRuntime } from '../features/management/creator-runtime.js';
 import { readViewContext } from '../core/view-context.js';
 
-function defineRoute(renderer, styles = []) {
-  Object.defineProperty(renderer, 'styles', { value: Object.freeze([...styles]), enumerable: false, configurable: false, writable: false });
-  return renderer;
-}
+function defineRoute(renderer, styles = []) { Object.defineProperty(renderer, 'styles', { value: Object.freeze([...styles]), enumerable: false, configurable: false, writable: false }); return renderer; }
 
 export function createPacoRouteRegistry({ app, mounts, documentRef = document } = {}) {
-  if (!app) throw new TypeError('Paco route registry requires an app.');
-  if (!mounts?.templateMount) throw new TypeError('Paco route registry requires a template mount.');
+  if (!app) throw new TypeError('Paco route registry requires app.');
+  if (!mounts?.templateMount) throw new TypeError('Paco route registry requires template mount.');
   const routes = {};
   routes['dashboard.html'] = defineRoute(({ url, navigate }) => createDashboardRuntime({ app, templateMount: mounts.templateMount, chooserMount: mounts.chooserMount, context: readViewContext(url.searchParams), documentRef, navigate }));
   routes['lessons.html'] = defineRoute(({ url, navigate }) => createLessonsRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), selectedSubject: url.searchParams.get('subject') || '', documentRef, navigate }), ['src/components/lesson-list.css']);
@@ -37,7 +34,7 @@ export function createPacoRouteRegistry({ app, mounts, documentRef = document } 
   routes['questions.html'] = defineRoute(({ url, navigate }) => createQuestionsRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/questions.css']);
   routes['test.html'] = defineRoute(({ url, navigate }) => createTestRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/lessons/test.css']);
   routes['lesson-editor.html'] = defineRoute(({ url, navigate }) => createLessonEditorRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-editor.css']);
-  routes['lesson-learning-editor.html'] = defineRoute(({ url, navigate }) => createLessonLearningEditorRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-editor.css', 'src/features/lessons/lesson-learning-editor.css']);
+  routes['learning-material-editor.html'] = defineRoute(({ url, navigate }) => createLearningMaterialEditorRuntime({ app, templateMount: mounts.templateMount, context: { ...readViewContext(url.searchParams), subject: url.searchParams.get('subject') || '', subvak: url.searchParams.get('subvak') || '' }, topicId: url.searchParams.get('topic_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-editor.css', 'src/features/lessons/lesson-learning-editor.css']);
   routes['oefenen.html'] = defineRoute(({ url, navigate }) => createPracticeMenuRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/practice/practice-menu.css']);
   routes['games.html'] = defineRoute(({ url, navigate }) => createGamesRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/practice/games.css']);
   routes['double-or-nothing.html'] = defineRoute(({ url, navigate }) => createDoubleOrNothingPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/double-or-nothing.css']);

@@ -15,6 +15,8 @@ import { getViewContext } from '../core/view-context.js';
 import { mapLessonRecords } from '../features/lessons/lesson-mapper.js';
 import { createPhotoStorageService } from '../features/photo-lessons/photo-storage-service.js';
 import { createLearningContentService } from '../features/lessons/learning-content-service.js';
+import { createLearningTopicService } from '../services/learning-topic-service.js';
+import { createLearningTopicMediaService } from '../services/learning-topic-media-service.js';
 import { createManagement } from '../features/management/management.js';
 import { createAgendaReadService } from '../features/agenda/read-service.js';
 
@@ -22,6 +24,9 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null,
   const db = createSupabaseClient(supabaseLib);
   const authSession = createAuthSessionService(db);
   const auth = createAuthState(session);
+  const canManage = () => auth.isParent;
+  const canCreate = () => auth.isCreator;
+  const learningTopics = createLearningTopicService(db, { canManage });
   const lessons = createLessonService(db);
   const feedback = createFeedbackService(db);
   const grading = createAnswerGradingService(db);
@@ -31,10 +36,9 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null,
   const agenda = createAgendaReadService({ storage, lessons: () => appState.lessons, currentStudent: () => getViewContext().student });
   const testHistory = createTestHistoryService(db);
   const gameResults = createGameResultService(db);
-  const canManage = () => auth.isParent;
-  const canCreate = () => auth.isCreator;
   const photos = createPhotoStorageService(db, { canManage });
-  const learningContent = createLearningContentService(db, { media: photos, canManage });
+  const learningTopicMedia = createLearningTopicMediaService(db, { canManage });
+  const learningContent = createLearningContentService(db, { media: learningTopicMedia, canManage, topics: learningTopics });
 
   async function initializeSession() {
     if (auth.session) return auth.session;
@@ -50,31 +54,10 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null,
   }
 
   return Object.freeze({
-    db,
-    auth,
-    authSession,
-    initializeSession,
-    state: appState,
-    lessons,
-    lessonOrder,
-    loadLessons,
-    feedback,
-    grading,
-    audio,
-    mastery,
-    agenda,
-    testHistory,
-    gameResults,
+    db, auth, authSession, initializeSession, state: appState, lessons, lessonOrder, loadLessons,
+    feedback, grading, audio, mastery, agenda, testHistory, gameResults,
     creator: createCreatorService(db, { canCreate }),
-    management: createManagement({
-      auth,
-      lessonService: lessons,
-      feedbackService: feedback,
-      lessonOrder,
-      loadLessons
-    }),
-    photos,
-    learningContent,
-    mapLessons: mapLessonRecords
+    management: createManagement({ auth, lessonService: lessons, feedbackService: feedback, lessonOrder, loadLessons }),
+    photos, learningTopics, learningTopicMedia, learningContent, mapLessons: mapLessonRecords
   });
 }

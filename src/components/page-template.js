@@ -3,13 +3,13 @@
  *
  * This is the default structural shell for normal PacoGO pages.
  * Page-specific functionality belongs in the content slot; the shell owns
- * the visual frame: hero banner, left sidebar, middle field and TEST badge.
+ * the visual frame: hero banner, left sidebar, middle field and release marker.
  */
 
 const TEMPLATE_SCROLL_KEY = 'pacoGO:template-scroll';
 const TEMPLATE_SCROLL_CLEANUP_PROPERTY = '__pacoGOTemplateScrollCleanup';
 const TEMPLATE_SIDEBAR_SCROLL_CLEANUP_PROPERTY = '__pacoGOTemplateSidebarScrollCleanup';
-export const PACOGO_TEST_VERSION = 'V5.15';
+export const PACOGO_TEST_VERSION = 'V7.0';
 
 function installManualScrollRestoration(windowRef) {
   if (!windowRef.history || !('scrollRestoration' in windowRef.history)) return null;
@@ -326,11 +326,6 @@ export function createPacoPageTemplate({
   heroImage.alt = 'PacoGO Aruba';
   heroImage.className = 'paco-template-hero-image';
   hero.appendChild(heroImage);
-
-  const versionBadge = document.createElement('div');
-  versionBadge.className = 'paco-template-version-badge';
-  versionBadge.textContent = testVersion;
-  hero.appendChild(versionBadge);
   root.appendChild(hero);
 
   const body = document.createElement('div');
@@ -394,64 +389,12 @@ export function createPacoPageTemplate({
 
   body.appendChild(main);
   root.appendChild(body);
+
+  const versionMarker = document.createElement('small');
+  versionMarker.className = 'paco-template-version-badge';
+  versionMarker.textContent = testVersion;
+  versionMarker.style.cssText = 'display:block;width:max-content;margin:-28px auto 10px;padding:0;background:transparent;border:0;border-radius:0;color:rgba(255,255,255,.72);font:600 10px/1 "Nunito",sans-serif;letter-spacing:.4px;box-shadow:none;text-shadow:none;';
+  root.appendChild(versionMarker);
+
   return root;
-}
-
-function updatePacoPageTemplate(template, {
-  greeting = '',
-  navigation = [],
-  title = '',
-  icon = '',
-  subtitle = '',
-  content = null,
-  backLabel = '← Terug',
-  backAction = null
-} = {}) {
-  if (!template) throw new Error('updatePacoPageTemplate requires a template');
-
-  const backButton = template.querySelector('.paco-template-back');
-  const greetingElement = template.querySelector('.paco-template-greeting');
-  const navigationElement = template.querySelector('.paco-template-navigation');
-  const iconElement = template.querySelector('.paco-template-page-icon');
-  const titleElement = template.querySelector('.paco-template-page-heading h1');
-  const subtitleElement = template.querySelector('.paco-template-page-heading p');
-  const contentElement = template.querySelector('.paco-template-page-content');
-
-  if (!backButton || !greetingElement || !navigationElement || !iconElement || !titleElement || !subtitleElement || !contentElement) {
-    throw new Error('PacoGO page template is missing its canonical shell elements.');
-  }
-
-  backButton.textContent = backLabel;
-  backButton.onclick = typeof backAction === 'function' ? backAction : () => window.history.back();
-  greetingElement.textContent = greeting;
-  navigationElement.replaceChildren(...navigation.map(createNavigationItem));
-  iconElement.textContent = icon;
-  iconElement.hidden = !icon;
-  titleElement.textContent = title;
-  subtitleElement.textContent = subtitle;
-  subtitleElement.hidden = !subtitle;
-
-  const contentNode = nodeFrom(content);
-  contentElement.replaceChildren();
-  if (contentNode) contentElement.appendChild(contentNode);
-
-  return template;
-}
-
-export function mountPacoPageTemplate({ mount, ...options } = {}) {
-  if (!mount) throw new Error('mountPacoPageTemplate requires a mount element');
-
-  const existingTemplate = mount.firstElementChild?.classList.contains('paco-page-template')
-    ? mount.firstElementChild
-    : null;
-
-  if (existingTemplate) {
-    return updatePacoPageTemplate(existingTemplate, options);
-  }
-
-  const template = createPacoPageTemplate(options);
-  mount.replaceChildren(template);
-  installPacoTemplateScrollMemory();
-  installPacoTemplateSidebarScrollChaining({ navigationElement: template.querySelector('.paco-template-navigation') });
-  return template;
 }

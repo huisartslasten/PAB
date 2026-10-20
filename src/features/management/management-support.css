@@ -1,5 +1,5 @@
 .management-page{display:grid;gap:18px}
-.management-section{display:grid;gap:14px;padding:20px;border:1px solid var(--paco-border);border-radius:22px;background:#fff;box-shadow:var(--paco-shadow)}
+.management-section{display:grid;gap:18px;padding:20px;border:1px solid var(--paco-border);border-radius:22px;background:#fff;box-shadow:var(--paco-shadow)}
 .management-state{padding:16px 18px;border:1px solid var(--paco-border);border-radius:16px;background:#f7fbff;color:var(--paco-muted);font-weight:700}
 .management-feedback{padding:16px 18px;border:1px solid var(--paco-border);border-radius:16px;background:#fff}
 .management-feedback h3{margin:6px 0;color:var(--paco-text);font-size:21px;line-height:1.1;font-weight:800}
@@ -9,6 +9,8 @@
 .management-link{border:0;border-radius:12px;padding:10px 14px;background:var(--paco-blue-soft);color:#126fc9;font:800 15px/1.1 "Baloo 2",Nunito,sans-serif;cursor:pointer}
 .management-link.danger{background:#fee5e3;color:#b91c1c}
 .management-link:disabled{opacity:.6;cursor:wait}
+.management-tool-group{display:grid;gap:10px;padding:16px;border:1px solid var(--paco-border);border-radius:18px;background:#f7fbff}
+.management-tool-group-title{margin:0;color:var(--paco-text);font-size:22px;line-height:1.1;font-weight:900}
 .management-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .management-action{display:grid;gap:5px;text-align:left;border:2px solid var(--paco-border);border-radius:18px;background:#fff;padding:18px;color:var(--paco-text);cursor:pointer;transition:transform .15s ease,border-color .15s ease,background .15s ease,box-shadow .15s ease}
 .management-action:hover:not([disabled]){transform:translateY(-1px);border-color:var(--paco-blue);background:#eef8ff;box-shadow:0 8px 18px rgba(16,43,87,.08)}

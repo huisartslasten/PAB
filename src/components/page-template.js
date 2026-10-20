@@ -398,3 +398,65 @@ export function createPacoPageTemplate({
 
   return root;
 }
+
+function updatePacoPageTemplate(template, {
+  greeting = '',
+  navigation = [],
+  title = '',
+  icon = '',
+  subtitle = '',
+  content = null,
+  backLabel = '← Terug',
+  backAction = null
+} = {}) {
+  if (!template) throw new Error('updatePacoPageTemplate requires a template');
+
+  const backButton = template.querySelector('.paco-template-back');
+  const greetingElement = template.querySelector('.paco-template-greeting');
+  const navigationElement = template.querySelector('.paco-template-navigation');
+  const iconElement = template.querySelector('.paco-template-page-icon');
+  const titleElement = template.querySelector('.paco-template-page-heading h1');
+  const subtitleElement = template.querySelector('.paco-template-page-heading p');
+  const contentElement = template.querySelector('.paco-template-page-content');
+
+  if (!backButton || !greetingElement || !navigationElement || !iconElement || !titleElement || !subtitleElement || !contentElement) {
+    throw new Error('PacoGO page template is missing its canonical shell elements.');
+  }
+
+  backButton.textContent = backLabel;
+  backButton.onclick = typeof backAction === 'function' ? backAction : () => window.history.back();
+  greetingElement.textContent = greeting;
+  navigationElement.replaceChildren(...navigation.map(createNavigationItem));
+  iconElement.textContent = icon;
+  iconElement.hidden = !icon;
+  titleElement.textContent = title;
+  subtitleElement.textContent = subtitle;
+  subtitleElement.hidden = !subtitle;
+
+  const contentNode = nodeFrom(content);
+  contentElement.replaceChildren();
+  if (contentNode) contentElement.appendChild(contentNode);
+
+  const versionMarker = template.querySelector('.paco-template-version-badge');
+  if (versionMarker) versionMarker.textContent = PACOGO_TEST_VERSION;
+
+  return template;
+}
+
+export function mountPacoPageTemplate({ mount, ...options } = {}) {
+  if (!mount) throw new Error('mountPacoPageTemplate requires a mount element');
+
+  const existingTemplate = mount.firstElementChild?.classList.contains('paco-page-template')
+    ? mount.firstElementChild
+    : null;
+
+  if (existingTemplate) {
+    return updatePacoPageTemplate(existingTemplate, options);
+  }
+
+  const template = createPacoPageTemplate(options);
+  mount.replaceChildren(template);
+  installPacoTemplateScrollMemory();
+  installPacoTemplateSidebarScrollChaining({ navigationElement: template.querySelector('.paco-template-navigation') });
+  return template;
+}

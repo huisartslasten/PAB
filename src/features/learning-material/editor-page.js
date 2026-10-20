@@ -2,7 +2,7 @@ const FONT_SIZE_OPTIONS = [36, 28, 22, 18, 14];
 
 function escapeHtml(value) { return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;'); }
 function clampWidth(value) { const n = Number(value); return Number.isFinite(n) ? Math.min(100, Math.max(20, Math.round(n))) : 100; }
-function toolbarMarkup() { return `<div class="learning-editor-toolbar" role="toolbar"><div class="learning-font-size-choices" role="group" aria-label="Lettergrootte">${FONT_SIZE_OPTIONS.map(size => `<button type="button" class="learning-tool-button learning-font-size-choice" data-command="font-size" data-size="${size}" aria-label="Lettergrootte ${size}px" style="font-size:${size}px;line-height:1">A</button>`).join('')}</div><span class="learning-toolbar-divider"></span><button type="button" class="learning-tool-button" data-command="bold"><strong>B</strong></button><button type="button" class="learning-tool-button" data-command="italic"><em>I</em></button><span class="learning-toolbar-divider"></span><button type="button" class="learning-tool-button" data-command="image">🖼️</button><button type="button" class="learning-tool-button" data-command="image-smaller">▾</button><button type="button" class="learning-tool-button" data-command="image-larger">▴</button></div>`; }
+function toolbarMarkup() { return `<div class="learning-editor-toolbar" role="toolbar"><div class="learning-font-size-choices" role="group" aria-label="Lettergrootte">${FONT_SIZE_OPTIONS.map(size => `<button type="button" class="learning-tool-button learning-font-size-choice${size === 22 ? ' is-active' : ''}" data-command="font-size" data-size="${size}" aria-label="Lettergrootte ${size}px" style="font-size:${size}px;line-height:1">A</button>`).join('')}</div><span class="learning-toolbar-divider"></span><button type="button" class="learning-tool-button" data-command="bold"><strong>B</strong></button><button type="button" class="learning-tool-button" data-command="italic"><em>I</em></button><span class="learning-toolbar-divider"></span><button type="button" class="learning-tool-button" data-command="image">🖼️</button><button type="button" class="learning-tool-button" data-command="image-smaller">▾</button><button type="button" class="learning-tool-button" data-command="image-larger">▴</button></div>`; }
 function cardMarkup(index) { return `<article class="learning-card"><div class="learning-card-header"><div class="learning-card-number">Kaart ${index + 1}</div><button type="button" class="learning-card-remove" data-action="remove-card">✕</button></div>${toolbarMarkup()}<div class="learning-card-body"><input class="learning-card-title" type="text" placeholder="Titel van de kaart (optioneel)"><div class="learning-editor-surface" contenteditable="true" spellcheck="true" data-placeholder="Schrijf hier de leerstof…"></div><input class="learning-image-input" type="file" accept="image/jpeg,image/png,image/webp" hidden><div class="learning-image-help">Sleep een afbeelding naar de plek waar je hem wilt hebben. Je kunt hem daarna opnieuw slepen en groter of kleiner maken.</div></div><div class="learning-card-insert-row"><button type="button" class="question-insert-button" data-action="insert-card-after">➕ Kaart invoegen</button></div></article>`; }
 function renderDocument(model) { return (Array.isArray(model?.elements) ? model.elements : []).map(element => element?.type === 'image' && element.media_id && element.image?.url ? `<img class="learning-inline-image" draggable="true" contenteditable="false" data-media-id="${Number(element.media_id)}" data-width="${clampWidth(element.width)}" src="${escapeHtml(element.image.url)}" alt="${escapeHtml(element.image.original_name || 'Afbeelding')}" style="width:${clampWidth(element.width)}%">` : element?.type === 'text' ? element.html || '' : '').join(''); }
 function createCardElement(documentRef, index, initial = {}) { const wrapper = documentRef.createElement('div'); wrapper.innerHTML = cardMarkup(index); const card = wrapper.firstElementChild; card.dataset.cardId = initial.id ? String(initial.id) : ''; card.querySelector('.learning-card-title').value = initial.title || ''; card.querySelector('.learning-editor-surface').innerHTML = renderDocument(initial.document); return card; }
@@ -30,6 +30,31 @@ function applyFontSize(surface, size, selectionBySurface) {
   surface.focus();
   return true;
 }
+function insertTextWithFontSize(surface, size, data, selectionBySurface) {
+  const selection = surface.ownerDocument.getSelection?.();
+  if (!selection?.rangeCount) return false;
+  const range = selection.getRangeAt(0).cloneRange();
+  if (!selectionIsInside(surface, range)) return false;
+  const container = range.startContainer?.nodeType === 1 ? range.startContainer : range.startContainer?.parentElement;
+  const currentSpan = container?.closest?.('.learning-inline-size');
+  const currentSize = currentSpan ? Number.parseFloat(currentSpan.style.fontSize) : null;
+  if (range.collapsed && currentSpan && currentSize === size) return false;
+  if (range.collapsed && !currentSpan && size === 22) return false;
+  const span = surface.ownerDocument.createElement('span');
+  span.className = 'learning-inline-size';
+  span.style.fontSize = `${size}px`;
+  span.appendChild(surface.ownerDocument.createTextNode(data));
+  range.deleteContents();
+  range.insertNode(span);
+  const next = surface.ownerDocument.createRange();
+  next.setStart(span, span.childNodes.length);
+  next.collapse(true);
+  selection.removeAllRanges();
+  selection.addRange(next);
+  selectionBySurface.set(surface, next.cloneRange());
+  surface.__learningSelection = next.cloneRange();
+  return true;
+}
 function pointRange(surface, x, y) { const doc = surface.ownerDocument; if (typeof x === 'number' && typeof y === 'number' && typeof doc.caretRangeFromPoint === 'function') return doc.caretRangeFromPoint(x, y); if (typeof x === 'number' && typeof y === 'number' && typeof doc.caretPositionFromPoint === 'function') { const p = doc.caretPositionFromPoint(x, y); if (!p) return null; const range = doc.createRange(); range.setStart(p.offsetNode, p.offset); range.collapse(true); return range; } return null; }
 function placeNode(surface, node, range) { if (!range || !surface.contains(range.commonAncestorContainer)) { surface.append(node, surface.ownerDocument.createTextNode(' ')); return; } range.deleteContents(); range.insertNode(node); node.after(surface.ownerDocument.createTextNode(' ')); }
 function documentModel(surface) { return { version: 1, elements: [...surface.childNodes].flatMap(node => { if (node.nodeType === 3) { const value = node.textContent?.replaceAll('\u200b', '').trim(); return value ? [{ id: crypto.randomUUID(), type: 'text', html: escapeHtml(value) }] : []; } if (node.nodeType !== 1) return []; if (node.matches('.learning-inline-image')) return [{ id: node.dataset.elementId || crypto.randomUUID(), type: 'image', media_id: Number(node.dataset.mediaId), width: clampWidth(node.dataset.width || parseFloat(node.style.width)) }]; const html = (node.outerHTML || '').replaceAll('\u200b', ''); return html.trim() ? [{ id: node.dataset.elementId || crypto.randomUUID(), type: 'text', html }] : []; }) }; }
@@ -43,16 +68,23 @@ export function createLearningMaterialEditorPage({ root, topic, cards = [], stud
   const cardsMount = root.querySelector('[data-cards]');
   const status = root.querySelector('[data-status]');
   const selectionBySurface = new WeakMap();
+  const activeFontSizeBySurface = new WeakMap();
   let draggedImage = null;
   let activeTopic = { ...topic };
   const showStatus = (message, error = false) => { status.textContent = message; status.classList.toggle('hidden', !message); status.classList.toggle('error', error); };
-  const addCard = (initial = {}, before = null) => { const card = createCardElement(documentRef, cardsMount.children.length, initial); before ? cardsMount.insertBefore(card, before) : cardsMount.appendChild(card); renumber(root); return card; };
+  const addCard = (initial = {}, before = null) => { const card = createCardElement(documentRef, cardsMount.children.length, initial); before ? cardsMount.insertBefore(card, before) : cardsMount.appendChild(card); const surface = card.querySelector('.learning-editor-surface'); activeFontSizeBySurface.set(surface, 22); renumber(root); return card; };
   cards.forEach(card => addCard(card));
   ensureTrailing(root);
   documentRef.addEventListener('selectionchange', () => { const selection = documentRef.getSelection?.(); if (!selection?.rangeCount) return; const range = selection.getRangeAt(0); const parent = range.commonAncestorContainer?.nodeType === 1 ? range.commonAncestorContainer : range.commonAncestorContainer?.parentElement; const surface = parent?.closest?.('.learning-editor-surface'); if (surface) { const saved = range.cloneRange(); selectionBySurface.set(surface, saved); surface.__learningSelection = saved; } });
   root.addEventListener('pointerup', event => { const surface = event.target.closest('.learning-editor-surface'); if (surface) rememberSelection(surface); });
   root.addEventListener('keyup', event => { const surface = event.target.closest('.learning-editor-surface'); if (surface) rememberSelection(surface); });
   root.addEventListener('pointerdown', event => { const command = event.target.closest('[data-command]'); if (!command) return; const card = command.closest('.learning-card'); const surface = card?.querySelector('.learning-editor-surface'); if (surface) rememberSelection(surface); event.preventDefault(); });
+  root.addEventListener('beforeinput', event => {
+    const surface = event.target.closest('.learning-editor-surface');
+    if (!surface || event.inputType !== 'insertText' || !event.data) return;
+    const size = activeFontSizeBySurface.get(surface) || 22;
+    if (insertTextWithFontSize(surface, size, event.data, selectionBySurface)) event.preventDefault();
+  });
   root.addEventListener('click', async event => {
     const image = event.target.closest('.learning-inline-image'); if (image) { root.querySelectorAll('.learning-inline-image.selected').forEach(item => item.classList.remove('selected')); image.classList.add('selected'); }
     const command = event.target.closest('[data-command]');
@@ -64,6 +96,7 @@ export function createLearningMaterialEditorPage({ root, topic, cards = [], stud
       if (name === 'font-size') {
         const size = Number(command.dataset.size);
         if (Number.isFinite(size)) {
+          activeFontSizeBySurface.set(surface, size);
           const applied = applyFontSize(surface, size, selectionBySurface);
           const toolbar = command.closest('.learning-editor-toolbar');
           toolbar?.querySelectorAll('.learning-font-size-choice').forEach(item => item.classList.remove('is-active'));

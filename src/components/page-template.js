@@ -9,7 +9,7 @@
 const TEMPLATE_SCROLL_KEY = 'pacoGO:template-scroll';
 const TEMPLATE_SCROLL_CLEANUP_PROPERTY = '__pacoGOTemplateScrollCleanup';
 const TEMPLATE_SIDEBAR_SCROLL_CLEANUP_PROPERTY = '__pacoGOTemplateSidebarScrollCleanup';
-export const PACOGO_TEST_VERSION = 'V7.0';
+export const PACOGO_TEST_VERSION = 'V6.0';
 
 function installManualScrollRestoration(windowRef) {
   if (!windowRef.history || !('scrollRestoration' in windowRef.history)) return null;

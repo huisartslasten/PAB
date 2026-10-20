@@ -107,7 +107,7 @@ export function createPacoNavigation({
     items.push({
       key: 'lessons',
       icon: '📚',
-      label: isManagementView ? 'Vakken beheren' : 'Mijn lessen',
+      label: isManagementView ? 'Vakken beheren' : 'Mijn vakken',
       onClick: () => go(navigate, 'lessons.html', view)
     });
   }

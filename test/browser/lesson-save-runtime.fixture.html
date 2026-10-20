@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><title>PacoGO save runtime browser fixture</title></head>
+<head><meta charset="utf-8"><title>PAB save runtime browser fixture</title></head>
 <body>
   <input id="lessonSubject" value="Rekenen">
   <input id="lessonName" value="Browser proof">
@@ -70,12 +70,13 @@
       }
     };
     var db = window.__pacoDb;
+    var learningTopics = { ensureTopic: async () => ({ id: 1 }) };
   </script>
   <script type="module">
     import { createLessonService } from '/src/services/lesson-service.js';
     import { bootstrapLessonSaveRuntime } from '/src/features/lessons/lesson-save-runtime-bootstrap.js';
 
-    window.lessonService = createLessonService(window.__pacoDb);
+    window.lessonService = createLessonService(window.__pacoDb,{ learningTopics: window.learningTopics });
     window.pacoGOLessonSaveRuntimeReady = bootstrapLessonSaveRuntime({
       runtime: {
         document,

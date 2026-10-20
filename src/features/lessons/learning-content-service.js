@@ -12,7 +12,19 @@ function normalizeHtml(value) {
       return;
     }
     [...node.attributes].forEach(attribute => {
-      if (node.tagName === 'SPAN' && attribute.name === 'class' && /^(learning-size-(large|small)|learning-inline-size)$/.test(attribute.value)) return;
+      if (node.tagName !== 'SPAN') {
+        node.removeAttribute(attribute.name);
+        return;
+      }
+      if (attribute.name === 'class' && /^(learning-size-(large|small)|learning-inline-size)$/.test(attribute.value)) return;
+      if (attribute.name === 'style') {
+        const fontSize = String(node.style.fontSize || '').trim();
+        const numeric = Number.parseInt(fontSize, 10);
+        if (/^\d{1,2}px$/.test(fontSize) && numeric >= 12 && numeric <= 48) {
+          node.setAttribute('style', `font-size:${numeric}px`);
+          return;
+        }
+      }
       node.removeAttribute(attribute.name);
     });
   });

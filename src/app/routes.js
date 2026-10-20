@@ -2,6 +2,7 @@ import { createDashboardRuntime } from '../features/dashboard/runtime.js';
 import { createLessonsRuntime } from '../features/lessons/runtime.js';
 import { createLessonChoiceRuntime } from '../features/lessons/lesson-choice-runtime.js';
 import { createLessonViewRuntime } from '../features/lessons/view-runtime.js';
+import { createLessonLearningViewRuntime } from '../features/lessons/lesson-learning-view-runtime.js';
 import { createQuestionsRuntime } from '../features/lessons/questions-runtime.js';
 import { createTestRuntime } from '../features/lessons/test-runtime.js';
 import { createLessonEditorRuntime } from '../features/lessons/lesson-editor-runtime.js';
@@ -20,12 +21,7 @@ import { createCreatorRuntime } from '../features/management/creator-runtime.js'
 import { readViewContext } from '../core/view-context.js';
 
 function defineRoute(renderer, styles = []) {
-  Object.defineProperty(renderer, 'styles', {
-    value: Object.freeze([...styles]),
-    enumerable: false,
-    configurable: false,
-    writable: false
-  });
+  Object.defineProperty(renderer, 'styles', { value: Object.freeze([...styles]), enumerable: false, configurable: false, writable: false });
   return renderer;
 }
 
@@ -33,16 +29,11 @@ export function createPacoRouteRegistry({ app, mounts, documentRef = document } 
   if (!app) throw new TypeError('Paco route registry requires an app.');
   if (!mounts?.templateMount) throw new TypeError('Paco route registry requires a template mount.');
   const routes = {};
-  routes['dashboard.html'] = defineRoute(({ url, navigate }) => {
-    const context = readViewContext(url.searchParams);
-    return createDashboardRuntime({ app, templateMount: mounts.templateMount, chooserMount: mounts.chooserMount, context, documentRef, navigate });
-  });
-  routes['lessons.html'] = defineRoute(({ url, navigate }) => {
-    const context = readViewContext(url.searchParams);
-    return createLessonsRuntime({ app, templateMount: mounts.templateMount, context, selectedSubject: url.searchParams.get('subject') || '', documentRef, navigate });
-  }, ['src/components/lesson-list.css']);
+  routes['dashboard.html'] = defineRoute(({ url, navigate }) => createDashboardRuntime({ app, templateMount: mounts.templateMount, chooserMount: mounts.chooserMount, context: readViewContext(url.searchParams), documentRef, navigate }));
+  routes['lessons.html'] = defineRoute(({ url, navigate }) => createLessonsRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), selectedSubject: url.searchParams.get('subject') || '', documentRef, navigate }), ['src/components/lesson-list.css']);
   routes['lesson-choice.html'] = defineRoute(({ url, navigate }) => createLessonChoiceRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/lesson-choice.css']);
   routes['lesson-view.html'] = defineRoute(({ url, navigate }) => createLessonViewRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-view.css']);
+  routes['lesson-learning.html'] = defineRoute(({ url, navigate }) => createLessonLearningViewRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-learning-view.css']);
   routes['questions.html'] = defineRoute(({ url, navigate }) => createQuestionsRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/questions.css']);
   routes['test.html'] = defineRoute(({ url, navigate }) => createTestRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/lessons/test.css']);
   routes['lesson-editor.html'] = defineRoute(({ url, navigate }) => createLessonEditorRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-editor.css']);

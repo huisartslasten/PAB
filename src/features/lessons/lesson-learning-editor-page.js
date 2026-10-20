@@ -23,6 +23,8 @@ function toolbarMarkup() {
       <button type="button" class="learning-tool-button learning-tool-italic" data-command="italic" title="Cursief"><em>I</em></button>
       <span class="learning-toolbar-divider" aria-hidden="true"></span>
       <button type="button" class="learning-tool-button learning-tool-image" data-command="image" title="Afbeelding toevoegen">🖼️</button>
+      <button type="button" class="learning-tool-button" data-command="image-smaller" title="Geselecteerde afbeelding kleiner">▾</button>
+      <button type="button" class="learning-tool-button" data-command="image-larger" title="Geselecteerde afbeelding groter">▴</button>
     </div>`;
 }
 
@@ -37,11 +39,8 @@ function cardMarkup(index) {
       <div class="learning-card-body">
         <input class="learning-card-title" type="text" placeholder="Titel van de kaart (optioneel)" aria-label="Titel van de kaart">
         <div class="learning-editor-surface" contenteditable="true" spellcheck="true" role="textbox" aria-multiline="true" data-placeholder="Schrijf hier de leerstof…"></div>
-        <div class="learning-image-dropzone" data-action="image-dropzone">
-          <input class="learning-image-input" type="file" accept="image/jpeg,image/png,image/webp" hidden>
-          <div class="learning-image-empty">Sleep hier een afbeelding naartoe, of klik om een afbeelding te kiezen.</div>
-          <div class="learning-image-preview hidden"></div>
-        </div>
+        <input class="learning-image-input" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+        <div class="learning-image-help">Sleep een afbeelding naar de plek waar je hem wilt hebben. Je kunt hem daarna opnieuw slepen en groter of kleiner maken.</div>
       </div>
     </article>`;
 }
@@ -51,38 +50,34 @@ function createCardElement(documentRef, index, initial = {}) {
   wrapper.innerHTML = cardMarkup(index);
   const card = wrapper.firstElementChild;
   card.dataset.cardId = initial.id ? String(initial.id) : '';
-  card.dataset.imageId = initial.image_id ? String(initial.image_id) : '';
   card.querySelector('.learning-card-title').value = initial.title || '';
-  card.querySelector('.learning-editor-surface').innerHTML = initial.content || '';
-  if (initial.image?.url) renderImagePreview(card, initial.image.url, initial.image.original_name || 'Afbeelding');
+  card.querySelector('.learning-editor-surface').innerHTML = renderDocument(initial.document || { version: 1, elements: [] });
   return card;
 }
 
-function renderImagePreview(card, url, alt = 'Afbeelding') {
-  const preview = card.querySelector('.learning-image-preview');
-  const empty = card.querySelector('.learning-image-empty');
-  if (!preview) return;
-  preview.replaceChildren();
-  const image = card.ownerDocument.createElement('img');
-  image.src = url;
-  image.alt = alt;
-  image.loading = 'lazy';
-  const remove = card.ownerDocument.createElement('button');
-  remove.type = 'button';
-  remove.className = 'learning-image-remove';
-  remove.dataset.action = 'remove-image';
-  remove.textContent = 'Afbeelding verwijderen';
-  preview.append(image, remove);
-  preview.classList.remove('hidden');
-  empty?.classList.add('hidden');
+function renderDocument(documentModel) {
+  const elements = Array.isArray(documentModel?.elements) ? documentModel.elements : [];
+  return elements.map(element => {
+    if (element?.type === 'image' && element.media_id && element.image?.url) {
+      const width = clampWidth(element.width);
+      return `<img class="learning-inline-image" draggable="true" contenteditable="false" data-learning-element="image" data-media-id="${Number(element.media_id)}" data-width="${width}" src="${escapeHtml(element.image.url)}" alt="${escapeHtml(element.image.original_name || 'Afbeelding')}" style="width:${width}%">`;
+    }
+    if (element?.type === 'text') return element.html || '';
+    return '';
+  }).join('');
+}
+
+function clampWidth(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return 100;
+  return Math.min(100, Math.max(20, Math.round(numeric)));
 }
 
 function cardIsEmpty(card) {
   const surface = card.querySelector('.learning-editor-surface');
   const title = card.querySelector('.learning-card-title');
-  return !String(surface?.textContent || '').trim()
-    && !String(title?.value || '').trim()
-    && !card.dataset.imageId;
+  const hasImage = Boolean(surface?.querySelector('.learning-inline-image'));
+  return !String(surface?.textContent || '').trim() && !String(title?.value || '').trim() && !hasImage;
 }
 
 function renumberCards(root) {
@@ -101,17 +96,6 @@ function ensureTrailingCard(root) {
     mount.appendChild(createCardElement(root.ownerDocument, cards.length));
   }
   renumberCards(root);
-}
-
-function normalizeCards(root) {
-  return [...root.querySelectorAll('.learning-card')]
-    .filter(card => !cardIsEmpty(card))
-    .map(card => ({
-      id: card.dataset.cardId || null,
-      title: text(card.querySelector('.learning-card-title')?.value),
-      content: String(card.querySelector('.learning-editor-surface')?.innerHTML || '').trim(),
-      image_id: card.dataset.imageId ? Number(card.dataset.imageId) : null
-    }));
 }
 
 function selectedRange(surface) {
@@ -144,8 +128,7 @@ function adjustFontSize(surface, delta) {
   surface.appendChild(probe);
   const current = Number.parseInt(surface.ownerDocument.defaultView?.getComputedStyle(probe).fontSize || '20', 10);
   probe.remove();
-  const size = Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, current + delta));
-  wrapSelection(surface, size);
+  wrapSelection(surface, Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, current + delta)));
 }
 
 function execInlineCommand(surface, command) {
@@ -166,6 +149,63 @@ function readImageFile(file) {
   return file;
 }
 
+function pointRange(surface, x, y) {
+  const doc = surface.ownerDocument;
+  if (typeof doc.caretRangeFromPoint === 'function') return doc.caretRangeFromPoint(x, y);
+  if (typeof doc.caretPositionFromPoint === 'function') {
+    const position = doc.caretPositionFromPoint(x, y);
+    if (!position) return null;
+    const range = doc.createRange();
+    range.setStart(position.offsetNode, position.offset);
+    range.collapse(true);
+    return range;
+  }
+  return null;
+}
+
+function placeNodeAtPoint(surface, node, x, y) {
+  const range = pointRange(surface, x, y);
+  if (range && surface.contains(range.commonAncestorContainer)) {
+    range.deleteContents();
+    range.insertNode(node);
+    const spacer = surface.ownerDocument.createTextNode(' ');
+    node.after(spacer);
+    const next = surface.ownerDocument.createRange();
+    next.setStartAfter(spacer);
+    next.collapse(true);
+    const selection = surface.ownerDocument.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(next);
+    return true;
+  }
+  surface.append(node);
+  surface.append(surface.ownerDocument.createTextNode(' '));
+  return true;
+}
+
+function documentModelFromSurface(surface) {
+  const elements = [];
+  [...surface.childNodes].forEach(node => {
+    if (node.nodeType === 3) {
+      if (node.textContent?.trim()) elements.push({ id: crypto.randomUUID(), type: 'text', html: escapeHtml(node.textContent) });
+      return;
+    }
+    if (node.nodeType !== 1) return;
+    if (node.matches('.learning-inline-image')) {
+      elements.push({
+        id: node.dataset.elementId || crypto.randomUUID(),
+        type: 'image',
+        media_id: Number(node.dataset.mediaId),
+        width: clampWidth(node.dataset.width || parseFloat(node.style.width))
+      });
+      return;
+    }
+    const html = node.outerHTML || '';
+    if (html.trim()) elements.push({ id: node.dataset.elementId || crypto.randomUUID(), type: 'text', html });
+  });
+  return { version: 1, elements };
+}
+
 export function createLessonLearningEditorPage({ root, lesson, cards = [], learningContent, documentRef = document } = {}) {
   if (!root) throw new TypeError('Learning editor page requires a root.');
   if (!lesson) throw new TypeError('Learning editor page requires a lesson.');
@@ -173,16 +213,9 @@ export function createLessonLearningEditorPage({ root, lesson, cards = [], learn
 
   root.innerHTML = `
     <div class="learning-editor-main-card card">
-      <div class="learning-editor-actions">
-        <button class="success" type="button" data-action="save-learning">💾 Leerstof opslaan</button>
-      </div>
+      <div class="learning-editor-actions"><button class="success" type="button" data-action="save-learning">💾 Leerstof opslaan</button></div>
       <section class="learning-editor-meta">
-        <div class="learning-meta-student">
-          <strong>Voor welke leerling?</strong>
-          <div class="editor-student-buttons">
-            ${STUDENTS.map(student => `<span class="editor-student-choice${student === lesson.student ? ' selected' : ''}">${escapeHtml(student)}</span>`).join('')}
-          </div>
-        </div>
+        <div class="learning-meta-student"><strong>Voor welke leerling?</strong><div class="editor-student-buttons">${STUDENTS.map(student => `<span class="editor-student-choice${student === lesson.student ? ' selected' : ''}">${escapeHtml(student)}</span>`).join('')}</div></div>
         <div class="learning-meta-grid">
           <div class="field"><label>Vak</label><input value="${escapeHtml(lesson.subject || '')}" readonly></div>
           <div class="field"><label>Subvak <span class="small">(optioneel)</span></label><input value="${escapeHtml(lesson.subvak || '')}" readonly></div>
@@ -191,10 +224,7 @@ export function createLessonLearningEditorPage({ root, lesson, cards = [], learn
         <div class="learning-meta-note">Deze gegevens horen bij de les. Aanpassingen doe je in de gewone leseditor.</div>
       </section>
       <section class="learning-card-section">
-        <div class="learning-card-intro">
-          <div><h2>Leerstofkaarten</h2><p>Elke kaart is een schermformaat voor uitleg, tekst en beeld.</p></div>
-          <button type="button" class="question-insert-button" data-action="add-card">➕ Kaart invoegen</button>
-        </div>
+        <div class="learning-card-intro"><div><h2>Leerstofkaarten</h2><p>Schrijf, plaats afbeeldingen en sleep ze later naar een andere plek.</p></div><button type="button" class="question-insert-button" data-action="add-card">➕ Kaart invoegen</button></div>
         <div class="learning-cards" data-cards></div>
         <button type="button" class="success learning-add-card-bottom" data-action="add-card">➕ Kaart invoegen</button>
       </section>
@@ -206,6 +236,7 @@ export function createLessonLearningEditorPage({ root, lesson, cards = [], learn
   const status = root.querySelector('[data-status]');
   const uploadedImageIds = new Set();
   let activeCard = null;
+  let draggedImage = null;
 
   const showStatus = (message, isError = false) => {
     status.textContent = message;
@@ -228,46 +259,35 @@ export function createLessonLearningEditorPage({ root, lesson, cards = [], learn
   });
 
   root.addEventListener('click', async event => {
+    const image = event.target.closest('.learning-inline-image');
+    if (image) {
+      root.querySelectorAll('.learning-inline-image.selected').forEach(item => item.classList.remove('selected'));
+      image.classList.add('selected');
+    }
     const commandButton = event.target.closest('[data-command]');
     if (commandButton) {
       const card = commandButton.closest('.learning-card');
       const surface = card?.querySelector('.learning-editor-surface');
       if (!surface) return;
       if (commandButton.dataset.command === 'image') card.querySelector('.learning-image-input')?.click();
-      else execInlineCommand(surface, commandButton.dataset.command);
+      else if (commandButton.dataset.command === 'image-smaller' || commandButton.dataset.command === 'image-larger') {
+        const selected = surface.querySelector('.learning-inline-image.selected');
+        if (selected) {
+          const delta = commandButton.dataset.command === 'image-larger' ? 10 : -10;
+          selected.dataset.width = String(clampWidth(Number(selected.dataset.width || 100) + delta));
+          selected.style.width = `${selected.dataset.width}%`;
+        }
+      } else execInlineCommand(surface, commandButton.dataset.command);
       return;
     }
-
     const action = event.target.closest('[data-action]')?.dataset.action;
     if (!action) return;
     const card = event.target.closest('.learning-card');
-
-    if (action === 'add-card') {
-      addCard();
-      return;
-    }
+    if (action === 'add-card') { addCard(); return; }
     if (action === 'remove-card' && card) {
       if (cardsMount.children.length <= 1) return;
-      const imageId = Number(card.dataset.imageId || 0);
-      if (imageId) uploadedImageIds.add(imageId);
-      card.remove();
-      renumberCards(root);
-      ensureTrailingCard(root);
-      return;
-    }
-    if (action === 'remove-image' && card) {
-      const imageId = Number(card.dataset.imageId || 0);
-      if (imageId) uploadedImageIds.add(imageId);
-      card.dataset.imageId = '';
-      const preview = card.querySelector('.learning-image-preview');
-      const empty = card.querySelector('.learning-image-empty');
-      preview?.classList.add('hidden');
-      empty?.classList.remove('hidden');
-      return;
-    }
-    if (action === 'image-dropzone' && card && !event.target.closest('button')) {
-      card.querySelector('.learning-image-input')?.click();
-      return;
+      card.querySelectorAll('.learning-inline-image').forEach(image => uploadedImageIds.add(Number(image.dataset.mediaId)));
+      card.remove(); ensureTrailingCard(root); return;
     }
     if (action === 'save-learning') await save();
   });
@@ -278,92 +298,115 @@ export function createLessonLearningEditorPage({ root, lesson, cards = [], learn
     if (event.target.matches('.learning-editor-surface, .learning-card-title')) ensureTrailingCard(root);
   });
 
-  root.addEventListener('focusin', event => {
-    activeCard = event.target.closest('.learning-card');
+  root.addEventListener('focusin', event => { activeCard = event.target.closest('.learning-card'); });
+
+  root.addEventListener('dragstart', event => {
+    const image = event.target.closest('.learning-inline-image');
+    if (!image) return;
+    draggedImage = image;
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/x-pab-learning-image', image.dataset.mediaId || '');
+    image.classList.add('dragging');
+  });
+
+  root.addEventListener('dragend', event => {
+    const image = event.target.closest('.learning-inline-image');
+    image?.classList.remove('dragging');
+    draggedImage = null;
+  });
+
+  root.addEventListener('dragover', event => {
+    const surface = event.target.closest('.learning-editor-surface');
+    if (!surface) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = draggedImage ? 'move' : 'copy';
+    surface.classList.add('drop-target');
+  });
+
+  root.addEventListener('dragleave', event => {
+    const surface = event.target.closest('.learning-editor-surface');
+    if (surface && !surface.contains(event.relatedTarget)) surface.classList.remove('drop-target');
+  });
+
+  root.addEventListener('drop', async event => {
+    const surface = event.target.closest('.learning-editor-surface');
+    if (!surface) return;
+    event.preventDefault();
+    surface.classList.remove('drop-target');
+    if (draggedImage) {
+      const image = draggedImage;
+      if (image.closest('.learning-editor-surface') === surface) image.remove();
+      placeNodeAtPoint(surface, image, event.clientX, event.clientY);
+      draggedImage = null;
+      return;
+    }
+    const file = event.dataTransfer?.files?.[0];
+    if (!file) return;
+    try {
+      readImageFile(file);
+      const uploaded = await learningContent.uploadCardImage(lesson.id, file);
+      uploadedImageIds.add(Number(uploaded.id));
+      const image = documentRef.createElement('img');
+      image.className = 'learning-inline-image';
+      image.draggable = true;
+      image.contentEditable = 'false';
+      image.dataset.learningElement = 'image';
+      image.dataset.mediaId = String(uploaded.id);
+      image.dataset.width = '100';
+      image.src = uploaded.url || URL.createObjectURL(file);
+      image.alt = uploaded.original_name || 'Afbeelding';
+      image.style.width = '100%';
+      placeNodeAtPoint(surface, image, event.clientX, event.clientY);
+      ensureTrailingCard(root);
+    } catch (error) { showStatus(error.message || 'De afbeelding kon niet worden toegevoegd.', true); }
   });
 
   root.addEventListener('change', async event => {
     if (!event.target.matches('.learning-image-input')) return;
     const card = event.target.closest('.learning-card');
+    const surface = card?.querySelector('.learning-editor-surface');
     const file = event.target.files?.[0];
     event.target.value = '';
-    if (!card || !file) return;
+    if (!surface || !file) return;
     try {
       readImageFile(file);
-      const oldImageId = Number(card.dataset.imageId || 0);
       const uploaded = await learningContent.uploadCardImage(lesson.id, file);
       uploadedImageIds.add(Number(uploaded.id));
-      card.dataset.imageId = String(uploaded.id);
-      if (oldImageId) uploadedImageIds.add(oldImageId);
-      const loaded = await learningContent.listForLesson(lesson.id);
-      const image = loaded.find(item => Number(item.image_id) === Number(uploaded.id))?.image;
-      renderImagePreview(card, image?.url || URL.createObjectURL(file), uploaded.original_name || 'Afbeelding');
+      const image = documentRef.createElement('img');
+      image.className = 'learning-inline-image';
+      image.draggable = true;
+      image.contentEditable = 'false';
+      image.dataset.learningElement = 'image';
+      image.dataset.mediaId = String(uploaded.id);
+      image.dataset.width = '100';
+      image.src = uploaded.url || URL.createObjectURL(file);
+      image.alt = uploaded.original_name || 'Afbeelding';
+      image.style.width = '100%';
+      placeNodeAtPoint(surface, image, surface.clientWidth / 2, surface.getBoundingClientRect().top + surface.clientHeight - 20);
       ensureTrailingCard(root);
-    } catch (error) {
-      showStatus(error.message || 'De afbeelding kon niet worden toegevoegd.', true);
-    }
-  });
-
-  root.addEventListener('dragover', event => {
-    const zone = event.target.closest('.learning-image-dropzone');
-    if (!zone) return;
-    event.preventDefault();
-    zone.classList.add('drag-over');
-  });
-
-  root.addEventListener('dragleave', event => {
-    const zone = event.target.closest('.learning-image-dropzone');
-    if (zone && !zone.contains(event.relatedTarget)) zone.classList.remove('drag-over');
-  });
-
-  root.addEventListener('drop', async event => {
-    const zone = event.target.closest('.learning-image-dropzone');
-    if (!zone) return;
-    event.preventDefault();
-    zone.classList.remove('drag-over');
-    const card = zone.closest('.learning-card');
-    const file = event.dataTransfer?.files?.[0];
-    if (!card || !file) return;
-    try {
-      readImageFile(file);
-      const oldImageId = Number(card.dataset.imageId || 0);
-      const uploaded = await learningContent.uploadCardImage(lesson.id, file);
-      uploadedImageIds.add(Number(uploaded.id));
-      card.dataset.imageId = String(uploaded.id);
-      if (oldImageId) uploadedImageIds.add(oldImageId);
-      const loaded = await learningContent.listForLesson(lesson.id);
-      const image = loaded.find(item => Number(item.image_id) === Number(uploaded.id))?.image;
-      renderImagePreview(card, image?.url || URL.createObjectURL(file), uploaded.original_name || 'Afbeelding');
-      ensureTrailingCard(root);
-    } catch (error) {
-      showStatus(error.message || 'De afbeelding kon niet worden toegevoegd.', true);
-    }
+    } catch (error) { showStatus(error.message || 'De afbeelding kon niet worden toegevoegd.', true); }
   });
 
   async function save() {
     showStatus('Leerstof opslaan…');
     try {
-      const payload = normalizeCards(root);
-      const originalImages = new Set((cards || []).map(card => Number(card.image_id)).filter(Boolean));
-      const retainedImages = new Set(payload.map(card => Number(card.image_id)).filter(Boolean));
-      const imagesToRemove = new Set([...originalImages].filter(id => !retainedImages.has(id)));
-      for (const id of uploadedImageIds) if (!retainedImages.has(id)) imagesToRemove.add(id);
-
+      const payload = [...cardsMount.querySelectorAll('.learning-card')]
+        .filter(card => !cardIsEmpty(card))
+        .map(card => ({
+          id: card.dataset.cardId || null,
+          title: text(card.querySelector('.learning-card-title')?.value),
+          document: documentModelFromSurface(card.querySelector('.learning-editor-surface'))
+        }));
+      const originalMedia = new Set((cards || []).flatMap(card => (card.document?.elements || []).filter(element => element.type === 'image').map(element => Number(element.media_id))).filter(Boolean));
+      const retainedMedia = new Set(payload.flatMap(card => card.document.elements.filter(element => element.type === 'image').map(element => Number(element.media_id))).filter(Boolean));
+      const imagesToRemove = new Set([...originalMedia].filter(id => !retainedMedia.has(id)));
+      for (const id of uploadedImageIds) if (!retainedMedia.has(id)) imagesToRemove.add(id);
       const saved = await learningContent.replaceForLesson(lesson.id, payload);
       for (const imageId of imagesToRemove) await learningContent.removeCardImage(imageId);
       showStatus(`${saved.length} ${saved.length === 1 ? 'kaart' : 'kaarten'} opgeslagen.`);
       return saved;
-    } catch (error) {
-      console.error('Learning editor save error:', error);
-      showStatus(error.message || 'De leerstof kon niet worden opgeslagen.', true);
-      return null;
-    }
+    } catch (error) { console.error('Learning editor save error:', error); showStatus(error.message || 'De leerstof kon niet worden opgeslagen.', true); return null; }
   }
 
-  return Object.freeze({
-    addCard,
-    save,
-    getCards: () => normalizeCards(root),
-    getActiveCard: () => activeCard
-  });
+  return Object.freeze({ addCard, save, getCards: () => [...cardsMount.querySelectorAll('.learning-card')].map(card => ({ title: text(card.querySelector('.learning-card-title')?.value), document: documentModelFromSurface(card.querySelector('.learning-editor-surface')) })), getActiveCard: () => activeCard });
 }

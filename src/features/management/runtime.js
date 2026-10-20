@@ -58,6 +58,19 @@ export function createManagementRuntime({
     return button;
   };
 
+  const createToolGroup = (title, actions) => {
+    const group = documentRef.createElement('section');
+    group.className = 'management-tool-group';
+    const heading = documentRef.createElement('h3');
+    heading.className = 'management-tool-group-title';
+    heading.textContent = title;
+    const actionGrid = documentRef.createElement('div');
+    actionGrid.className = 'management-actions';
+    actionGrid.append(...actions);
+    group.append(heading, actionGrid);
+    return group;
+  };
+
   function renderManagement() {
     const section = documentRef.createElement('section');
     section.className = 'management-section';
@@ -69,24 +82,20 @@ export function createManagementRuntime({
     heading.appendChild(title);
     section.appendChild(heading);
 
-    const actions = documentRef.createElement('div');
-    actions.className = 'management-actions';
-    actions.append(
-      createAction('🧠 Leerstof beheren', 'Kies een les en open daarna de leerstofeditor voor die les.', 'lessons.html'),
-      createAction('📚 Lessen beheren', 'Bekijk de lessen van de actieve leerling en bewerk, archiveer of verwijder ze.', 'lessons.html'),
-      createAction('➕ Les maken', 'Maak een nieuwe les voor de actieve leerling.', 'lesson-editor.html', { documentNavigation: true }),
-      createAction('📅 Agenda', 'Bekijk en beheer de agenda van de actieve leerling.', 'agenda.html'),
-      createAction('🖨️ Maandkalender', 'Open de maandkalender van de actieve leerling.', 'month-calendar.html', { documentNavigation: true })
+    section.append(
+      createToolGroup('Lesbeheer', [
+        createAction('📚 Les beheren', 'Bekijk de lessen van de actieve leerling en bewerk, archiveer of verwijder ze.', 'lessons.html'),
+        createAction('➕ Les maken', 'Maak een nieuwe les voor de actieve leerling.', 'lesson-editor.html', { documentNavigation: true })
+      ]),
+      createToolGroup('Leerstofbeheer', [
+        createAction('🧠 Leerstof beheren', 'Kies een les en beheer de bestaande leerstofkaarten.', 'lessons.html'),
+        createAction('➕ Leerstof maken', 'Kies een les en maak daar nieuwe leerstofkaarten voor.', 'lessons.html')
+      ]),
+      createToolGroup('Agenda', [
+        createAction('📅 Agenda', 'Bekijk en beheer de agenda van de actieve leerling.', 'agenda.html'),
+        createAction('🖨️ Maandkalender', 'Open de maandkalender van de actieve leerling.', 'month-calendar.html', { documentNavigation: true })
+      ])
     );
-    section.appendChild(actions);
-
-    const global = documentRef.createElement('div');
-    global.className = 'management-global';
-    global.append(
-      createAction('🗂️ Archief / Prullenbak', 'Beheer gearchiveerde en verwijderde lessen.', 'archive.html', { requiresStudent: false }),
-      createAction('💬 Feedback', 'Bekijk en beheer feedback.', 'feedback.html')
-    );
-    section.appendChild(global);
 
     content.replaceChildren(section);
   }

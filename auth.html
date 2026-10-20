@@ -38,52 +38,6 @@
     const goStart = () => { window.location.href = 'dashboard.html'; };
     const goManagement = () => { window.location.href = 'management.html'; };
 
-    let session = null;
-    let sessionError = null;
-    try {
-      session = await app.initializeSession();
-    } catch (error) {
-      sessionError = error;
-      console.error('Auth session load error:', error);
-    }
-
-    const loggedInAsParent = Boolean(session && app.auth.isParent);
-
-    const logoutFromNavigation = async () => {
-      try {
-        await app.authSession.signOut();
-        app.auth.setSession(null);
-        window.location.href = 'auth.html';
-      } catch (error) {
-        content.prepend(message(error?.message || 'Uitloggen mislukt.', true));
-      }
-    };
-
-    const navigation = loggedInAsParent
-      ? createPacoNavigation({
-          app,
-          includeManagementDashboard: true,
-          includeManagement: false,
-          includeLessons: false,
-          includeAgenda: false,
-          includeAccount: true,
-          accountLabel: 'Uitloggen',
-          onAccountClick: logoutFromNavigation
-        })
-      : [{ icon:'🏠', label:'Start', onClick:goStart }];
-
-    mountPacoPageTemplate({
-      mount,
-      backLabel: loggedInAsParent ? '← Dashboard' : '← Start',
-      backAction: loggedInAsParent ? goManagement : goStart,
-      greeting:'PacoGO 🔐',
-      title:resetMode ? 'Wachtwoord wijzigen' : 'Inloggen',
-      icon:'🔐',
-      subtitle:resetMode ? 'Stel een nieuw wachtwoord in.' : 'Log in om beheerfuncties te openen.',
-      navigation,
-      content
-    });
-
     function message(text, error = false) {
       const el = document.createElement('div');
       el.className = `auth-message${error ? ' error' : ''}`;
@@ -103,6 +57,43 @@
       input.autocomplete = autocomplete;
       wrapper.append(labelEl, input);
       return { wrapper, input };
+    }
+
+    function mountShell(loggedInAsParent = false) {
+      const navigation = loggedInAsParent
+        ? createPacoNavigation({
+            app,
+            includeManagementDashboard: true,
+            includeManagement: false,
+            includeLessons: false,
+            includeAgenda: false,
+            includeAccount: true,
+            accountLabel: 'Uitloggen',
+            onAccountClick: logoutFromNavigation
+          })
+        : [{ icon:'🏠', label:'Start', onClick:goStart }];
+
+      mountPacoPageTemplate({
+        mount,
+        backLabel: loggedInAsParent ? '← Dashboard' : '← Start',
+        backAction: loggedInAsParent ? goManagement : goStart,
+        greeting:'PacoGO 🔐',
+        title:resetMode ? 'Wachtwoord wijzigen' : 'Inloggen',
+        icon:'🔐',
+        subtitle:resetMode ? 'Stel een nieuw wachtwoord in.' : 'Log in om beheerfuncties te openen.',
+        navigation,
+        content
+      });
+    }
+
+    async function logoutFromNavigation() {
+      try {
+        await app.authSession.signOut();
+        app.auth.setSession(null);
+        window.location.href = 'auth.html';
+      } catch (error) {
+        content.prepend(message(error?.message || 'Uitloggen mislukt.', true));
+      }
     }
 
     function renderLoggedIn() {
@@ -258,6 +249,23 @@
       card.append(heading, text, form);
       content.append(card);
     }
+
+    // Mount the shared page shell before any network-dependent session lookup.
+    // The auth state still decides the final navigation and content after loading.
+    mountShell(false);
+    content.replaceChildren(message('Authenticatie laden…'));
+
+    let session = null;
+    let sessionError = null;
+    try {
+      session = await app.initializeSession();
+    } catch (error) {
+      sessionError = error;
+      console.error('Auth session load error:', error);
+    }
+
+    const loggedInAsParent = Boolean(session && app.auth.isParent);
+    mountShell(loggedInAsParent);
 
     if (sessionError) {
       content.replaceChildren(message(sessionError?.message || 'Authenticatie kon niet worden geladen.', true));

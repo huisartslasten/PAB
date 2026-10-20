@@ -56,11 +56,15 @@ function clampImageY(value) {
 
 function normalizeImagePlacement(value, width) {
   const source = value && typeof value === 'object' ? value : {};
+  const safeWidth = clampImageWidth(width);
+  const maxX = Math.max(0, 100 - safeWidth);
+  const wrap = source.wrap === 'none' ? 'none' : 'square';
+  const rawX = clampImageX(source.x, safeWidth);
   return {
     mode: 'flow',
-    x: clampImageX(source.x, width),
-    y: clampImageY(source.y),
-    wrap: source.wrap === 'none' ? 'none' : 'square'
+    x: wrap === 'square' ? (rawX > maxX / 2 ? maxX : 0) : rawX,
+    y: wrap === 'square' ? 0 : clampImageY(source.y),
+    wrap
   };
 }
 
@@ -70,7 +74,7 @@ function migrateLegacyPlacement(value, width) {
   const offset = Number(source.offset) || 0;
   if (source.side === 'right') return normalizeImagePlacement({ x: 100 - safeWidth - offset }, safeWidth);
   if (source.side === 'left') return normalizeImagePlacement({ x: offset }, safeWidth);
-  return normalizeImagePlacement({ x: (100 - safeWidth) / 2 }, safeWidth);
+  return normalizeImagePlacement({ x: 0 }, safeWidth);
 }
 
 function normalizeDocument(input) {

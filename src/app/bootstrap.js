@@ -27,7 +27,7 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null,
   const canManage = () => auth.isParent;
   const canCreate = () => auth.isCreator;
   const learningTopics = createLearningTopicService(db, { canManage });
-  const lessons = createLessonService(db);
+  const lessons = createLessonService(db, { learningTopics });
   const feedback = createFeedbackService(db);
   const grading = createAnswerGradingService(db);
   const audio = createLessonAudioService(db);

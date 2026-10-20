@@ -145,14 +145,16 @@ export async function executeLessonSubvakUpdate(runtime, id, subvak) {
   return lesson;
 }
 
-export function installLessonSaveRuntimeEntry(runtime) {
+export function installLessonSaveRuntimeEntry(runtime, target = globalThis) {
   const app = requireRuntime(runtime);
-  const legacySaveLesson = window.saveLesson;
-  window.saveLesson = async function saveLessonRuntimeEntry() {
+  if (!target || typeof target !== 'object') {
+    throw new Error('A lesson save runtime target is required.');
+  }
+  target.saveLesson = async function saveLessonRuntimeEntry() {
     return executeLessonSaveRuntimeEntry(app);
   };
-  window.pacoGOUpdateLessonSubvak = async function updateLessonSubvakRuntimeEntry(id, subvak) {
+  target.pacoGOUpdateLessonSubvak = async function updateLessonSubvakRuntimeEntry(id, subvak) {
     return executeLessonSubvakUpdate(app, id, subvak);
   };
-  return legacySaveLesson;
+  return target.saveLesson;
 }

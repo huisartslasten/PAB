@@ -21,8 +21,8 @@ test('feedback route uses the canonical management runtime and styles', () => {
   assert.match(routeRegistry, /routes\['feedback\.html'\][\s\S]*?src\/features\/management\/management-support\.css/);
 });
 
-test('management dashboard navigates to feedback through the shared router', () => {
-  assert.match(managementRuntime, /createAction\('💬 Feedback',[\s\S]*?'feedback\.html'\)/);
+test('management dashboard does not duplicate feedback navigation', () => {
+  assert.doesNotMatch(managementRuntime, /createAction\('💬 Feedback'/);
   assert.doesNotMatch(managementRuntime, /createAction\('💬 Feedback',[\s\S]*?documentNavigation/);
 });
 

@@ -4,100 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PacoGO — Spelletjes</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="src/components/page-template.css">
-  <link rel="stylesheet" href="src/features/lessons/lesson-context-view.css">
-  <style>
-    .games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
-    .game-card{min-height:210px;border:2px solid #dce9f6;border-radius:22px;background:#fff;box-shadow:0 7px 20px rgba(16,43,87,.07);padding:20px;text-align:left;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;transition:.16s}
-    .game-card:hover{transform:translateY(-2px);box-shadow:0 12px 27px rgba(16,43,87,.11)}
-    .game-icon{height:76px;border-radius:18px;background:#eef8ff;display:flex;align-items:center;justify-content:center;font-size:42px;margin-bottom:14px}
-    .game-card h2{margin:0;color:#102b57;font:800 24px/1 "Baloo 2",Nunito,sans-serif}
-    .game-card p{margin:8px 0 0;color:#667894;line-height:1.4}
-    .game-action{margin-top:15px;font-size:12px;font-weight:900;color:#126fc9}
-    .games-state{padding:16px 18px;border:1px solid #dce9f6;border-radius:18px;background:#fff;color:#667894}
-    @media(max-width:700px){.games-grid{grid-template-columns:1fr}}
-  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div id="paco-template-mount"></div>
   <script type="module">
-    import { mountPacoPageTemplate } from './src/components/page-template.js';
-    import { createPacoNavigation } from './src/components/page-navigation.js';
-    import { createPacoGOApp } from './src/app/bootstrap.js';
-    import { getActivePracticeGames } from './src/features/practice/practice-domain.js';
-    import { createLessonContextField } from './src/features/lessons/lesson-context-view.js';
-    import { readViewContext, buildViewUrl } from './src/core/view-context.js';
-
-    const params = new URLSearchParams(window.location.search);
-    const context = readViewContext(params);
-    const lessonId = params.get('lesson_id') || '';
-    const student = context.student;
-    const mount = document.querySelector('#paco-template-mount');
-    const content = document.createElement('div');
-    const app = createPacoGOApp({ supabaseLib: window.supabase });
-
-    const goPractice = () => {
-      const target = buildViewUrl('oefenen.html', { student, mode: context.mode });
-      if (lessonId) target.searchParams.set('lesson_id', lessonId);
-      window.location.href = target.toString();
-    };
-
-    mountPacoPageTemplate({
-      mount,
-      backLabel: '← Oefenen',
-      backAction: goPractice,
-      greeting: `Hoi ${student}! 🐶`,
-      title: 'Spelletjes',
-      icon: '🎮',
-      subtitle: 'Kies een spelletje voor deze les.',
-      navigation: createPacoNavigation({ app, active: 'lessons', student, viewMode: context.mode }),
-      content
-    });
-
-    function openGame(game) {
-      const target = buildViewUrl(game.path, { student, mode: context.mode });
-      if (lessonId) target.searchParams.set('lesson_id', lessonId);
-      window.location.href = target.toString();
-    }
-
-    function render(lesson) {
-      content.replaceChildren();
-      if (!lessonId || !lesson) {
-        const state = document.createElement('div');
-        state.className = 'games-state';
-        state.textContent = lessonId ? 'Deze les kon niet worden gevonden.' : 'Geen les geselecteerd.';
-        content.appendChild(state);
-        return;
-      }
-
-      const field = createLessonContextField(lesson);
-      const grid = document.createElement('div');
-      grid.className = 'games-grid';
-      getActivePracticeGames().forEach(game => {
-        const card = document.createElement('button');
-        card.type = 'button';
-        card.className = 'game-card';
-        card.innerHTML = `<div><div class="game-icon">${game.icon}</div><h2>${game.label}</h2><p>${game.description}</p></div><div class="game-action">Spelen →</div>`;
-        card.addEventListener('click', () => openGame(game));
-        grid.appendChild(card);
-      });
-      field.appendChild(grid);
-      content.appendChild(field);
-    }
-
-    if (!lessonId || !student) {
-      render(null);
-    } else {
-      try {
-        const records = await app.loadLessons();
-        const lesson = app.mapLessons(records).find(item => String(item.id) === String(lessonId));
-        render(lesson || null);
-      } catch (error) {
-        console.error('Games menu load error:', error);
-        render(null);
-      }
-    }
+    import { startPacoRuntime } from './src/app/runtime.js';
+    await startPacoRuntime({ templateMount: document.querySelector('#paco-template-mount') });
   </script>
 </body>
 </html>

@@ -1,0 +1,9 @@
+.games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.game-card{min-height:210px;border:2px solid #dce9f6;border-radius:22px;background:#fff;box-shadow:0 7px 20px rgba(16,43,87,.07);padding:20px;text-align:left;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;transition:.16s}
+.game-card:hover{transform:translateY(-2px);box-shadow:0 12px 27px rgba(16,43,87,.11)}
+.game-icon{height:76px;border-radius:18px;background:#eef8ff;display:flex;align-items:center;justify-content:center;font-size:42px;margin-bottom:14px}
+.game-card h2{margin:0;color:#102b57;font:800 24px/1 "Baloo 2",Nunito,sans-serif}
+.game-card p{margin:8px 0 0;color:#667894;line-height:1.4}
+.game-action{margin-top:15px;font-size:12px;font-weight:900;color:#126fc9}
+.games-state{padding:16px 18px;border:1px solid #dce9f6;border-radius:18px;background:#fff;color:#667894}
+@media(max-width:700px){.games-grid{grid-template-columns:1fr}}

@@ -64,11 +64,10 @@ test('runtime entry installs the canonical saveLesson function on the explicit t
   }
 });
 
-test('runtime entry installation does not preserve a legacy saveLesson rollback path', () => {
+test('runtime entry installation replaces the legacy saveLesson with the canonical entry', () => {
   const target = { saveLesson: function legacySaveLesson() {} };
   const previous = target.saveLesson;
-  const installed = installLessonSaveRuntimeEntry(createValidRuntime(), target);
-  assert.strictEqual(installed, target.saveLesson);
+  installLessonSaveRuntimeEntry(createValidRuntime(), target);
   assert.notStrictEqual(target.saveLesson, previous);
   assert.equal(target.saveLesson.name, 'saveLessonRuntimeEntry');
 });

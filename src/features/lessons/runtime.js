@@ -53,10 +53,10 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
   }
 
   async function mount() {
-    mountPacoPageTemplate({ mount: templateMount, backLabel: '← Dashboard', backAction: goHome, greeting: `Hoi ${selectedStudent}! 🐶`, title: 'Mijn lessen', icon: '📚', subtitle: context?.isManagement ? 'Beheerweergave — je kunt hier leerlinggebonden lessen beheren.' : 'Kies een vak en open daarna de les die je wilt doen.', navigation: createPacoNavigation({ app, active: 'lessons', student: selectedStudent, viewMode: context?.mode, includeManagement: true, navigate }), content });
+    mountPacoPageTemplate({ mount: templateMount, backLabel: '← Dashboard', backAction: goHome, greeting: `Hoi ${selectedStudent}! 🐶`, title: 'Mijn vakken', icon: '📚', subtitle: context?.isManagement ? 'Beheerweergave — je kunt hier vakken en de bijbehorende lessen beheren.' : 'Kies eerst een vak en open daarna het onderwerp of de les die je wilt doen.', navigation: createPacoNavigation({ app, active: 'lessons', student: selectedStudent, viewMode: context?.mode, includeManagement: true, navigate }), content });
     content.appendChild(state);
     try { if (!selectedStudent) throw new Error('Geen leerling geselecteerd.'); await app.initializeSession(); if (context?.isManagement) applyViewContext(context, { canManage: app.auth.isParent }); else applyViewContext(context); const records = await app.loadLessons(); state.remove(); await render(records); }
-    catch (error) { console.error('Lessons page load error:', error); state.textContent = error.message === 'Geen leerling geselecteerd.' ? 'Selecteer eerst een leerling vanuit Beheer.' : 'De lessen konden niet worden geladen.'; }
+    catch (error) { console.error('Lessons page load error:', error); state.textContent = error.message === 'Geen leerling geselecteerd.' ? 'Selecteer eerst een leerling vanuit Beheer.' : 'De vakken konden niet worden geladen.'; }
   }
 
   return Object.freeze({ mount, render, content, getRecords: () => currentRecords, goHome, goLessons });

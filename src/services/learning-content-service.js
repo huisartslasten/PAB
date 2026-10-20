@@ -1,9 +1,11 @@
 const CARD_SELECT = 'id,learning_topic_id,title,document,sort_order,created_at';
+const DOCUMENT_VERSION = 3;
 const ALLOWED_TAGS = new Set(['B', 'STRONG', 'I', 'EM', 'SPAN', 'P', 'BR', 'UL', 'OL', 'LI', 'DIV']);
 const ALLOWED_SPAN_CLASSES = /^(learning-inline-size)$/;
 const MIN_IMAGE_WIDTH = 20;
 const MAX_IMAGE_WIDTH = 100;
-const MAX_IMAGE_OFFSET = 45;
+const MIN_IMAGE_Y = -10000;
+const MAX_IMAGE_Y = 10000;
 
 function normalizeHtml(value) {
   const source = String(value ?? '');
@@ -40,36 +42,57 @@ function clampImageWidth(value) {
   return Number.isFinite(n) ? Math.min(MAX_IMAGE_WIDTH, Math.max(MIN_IMAGE_WIDTH, Math.round(n))) : 100;
 }
 
-function clampImageOffset(value) {
+function clampImageX(value, width) {
+  const safeWidth = clampImageWidth(width);
+  const max = Math.max(0, 100 - safeWidth);
   const n = Number(value);
-  return Number.isFinite(n) ? Math.min(MAX_IMAGE_OFFSET, Math.max(0, Math.round(n))) : 0;
+  return Number.isFinite(n) ? Math.min(max, Math.max(0, Math.round(n))) : Math.round(max / 2);
 }
 
-function normalizeImagePlacement(value) {
+function clampImageY(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? Math.min(MAX_IMAGE_Y, Math.max(MIN_IMAGE_Y, Math.round(n))) : 0;
+}
+
+function normalizeImagePlacement(value, width) {
   const source = value && typeof value === 'object' ? value : {};
-  const side = source.side === 'left' || source.side === 'right' ? source.side : 'inline';
   return {
-    side,
-    offset: side === 'inline' ? 0 : clampImageOffset(source.offset)
+    mode: 'flow',
+    x: clampImageX(source.x, width),
+    y: clampImageY(source.y),
+    wrap: source.wrap === 'none' ? 'none' : 'square'
   };
+}
+
+function migrateLegacyPlacement(value, width) {
+  const source = value && typeof value === 'object' ? value : {};
+  const safeWidth = clampImageWidth(width);
+  const offset = Number(source.offset) || 0;
+  if (source.side === 'right') return normalizeImagePlacement({ x: 100 - safeWidth - offset }, safeWidth);
+  if (source.side === 'left') return normalizeImagePlacement({ x: offset }, safeWidth);
+  return normalizeImagePlacement({ x: (100 - safeWidth) / 2 }, safeWidth);
 }
 
 function normalizeDocument(input) {
   const source = input && typeof input === 'object' ? input : {};
   const elements = Array.isArray(source.elements) ? source.elements : [];
   return {
-    version: 2,
+    version: DOCUMENT_VERSION,
     elements: elements.map((element, index) => {
       const id = String(element?.id || `element-${index + 1}`);
       if (element?.type === 'image') {
         const mediaId = Number(element.media_id);
         if (!mediaId) return null;
+        const width = clampImageWidth(element.size?.width ?? element.width);
+        const placement = source.version >= DOCUMENT_VERSION
+          ? normalizeImagePlacement(element.placement, width)
+          : migrateLegacyPlacement(element.placement, width);
         return {
           id,
           type: 'image',
           media_id: mediaId,
-          width: clampImageWidth(element.width),
-          placement: normalizeImagePlacement(element.placement)
+          size: { width, unit: 'percent' },
+          placement
         };
       }
       if (element?.type === 'text') {
@@ -86,7 +109,7 @@ function attachImages(cards, images) {
   return cards.map(card => ({
     ...card,
     document: {
-      ...(card.document || { version: 2, elements: [] }),
+      ...(card.document || { version: DOCUMENT_VERSION, elements: [] }),
       elements: (card.document?.elements || []).map(element => element.type === 'image'
         ? { ...element, image: byId.get(Number(element.media_id)) || null }
         : element)

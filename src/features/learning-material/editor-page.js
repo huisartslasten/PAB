@@ -1,36 +1,34 @@
 const FONT_SIZE_OPTIONS = [36, 28, 22, 18, 14];
-
-const IMAGE_LAYOUTS = Object.freeze({
-  inline: Object.freeze({ className: 'learning-image-inline' }),
-  left: Object.freeze({ className: 'learning-image-float-left' }),
-  right: Object.freeze({ className: 'learning-image-float-right' })
-});
+const MIN_IMAGE_WIDTH = 20;
+const MAX_IMAGE_WIDTH = 100;
+const MAX_IMAGE_OFFSET = 45;
 
 function escapeHtml(value) {
-  return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
 }
 
 function clampWidth(value) {
   const n = Number(value);
-  return Number.isFinite(n) ? Math.min(100, Math.max(20, Math.round(n))) : 100;
+  return Number.isFinite(n) ? Math.min(MAX_IMAGE_WIDTH, Math.max(MIN_IMAGE_WIDTH, Math.round(n))) : 100;
 }
 
-function normalizeImageLayout(value) {
-  return Object.prototype.hasOwnProperty.call(IMAGE_LAYOUTS, value) ? value : 'inline';
+function clampOffset(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? Math.min(MAX_IMAGE_OFFSET, Math.max(0, Math.round(n))) : 0;
 }
 
-function imageLayoutForDrop(surface, x) {
-  if (typeof x !== 'number') return 'inline';
-  const rect = surface.getBoundingClientRect();
-  if (!rect.width) return 'inline';
-  const relative = (x - rect.left) / rect.width;
-  if (relative <= 0.35) return 'left';
-  if (relative >= 0.65) return 'right';
-  return 'inline';
-}
-
-function imageClass(layout) {
-  return IMAGE_LAYOUTS[normalizeImageLayout(layout)].className;
+function normalizeImagePlacement(value) {
+  const source = value && typeof value === 'object' ? value : {};
+  const side = source.side === 'left' || source.side === 'right' ? source.side : 'inline';
+  return {
+    side,
+    offset: side === 'inline' ? 0 : clampOffset(source.offset)
+  };
 }
 
 function toolbarMarkup() {
@@ -61,18 +59,30 @@ function cardMarkup(index) {
     <div class="learning-card-body">
       <input class="learning-card-title" type="text" placeholder="Titel van de kaart (optioneel)">
       <div class="learning-editor-surface" contenteditable="true" spellcheck="true" data-placeholder="Schrijf hier de leerstof…"></div>
-      <div class="learning-image-help">Sleep een afbeelding naar de plek waar je hem wilt hebben. Laat hem links, in het midden of rechts vallen om de tekst eromheen te laten lopen. Je kunt hem daarna opnieuw slepen.</div>
+      <div class="learning-image-help">Sleep een afbeelding naar de plek waar je hem wilt hebben. Hij blijft aan die tekstpositie gekoppeld. Sleep aan een hoek om hem groter of kleiner te maken.</div>
     </div>
     <div class="learning-card-insert-row"><button type="button" class="question-insert-button" data-action="insert-card-after">➕ Kaart invoegen</button></div>
   </article>`;
+}
+
+function imageStyle(placement, width) {
+  const normalized = normalizeImagePlacement(placement);
+  const safeWidth = clampWidth(width);
+  if (normalized.side === 'left') return `width:${safeWidth}%;margin-right:${normalized.offset}%;`;
+  if (normalized.side === 'right') return `width:${safeWidth}%;margin-left:${normalized.offset}%;`;
+  return `width:${safeWidth}%;`;
+}
+
+function imageClass(placement) {
+  return `learning-image-position-${normalizeImagePlacement(placement).side}`;
 }
 
 function renderDocument(model) {
   return (Array.isArray(model?.elements) ? model.elements : []).map(element => {
     if (element?.type === 'image' && element.media_id && element.image?.url) {
       const width = clampWidth(element.width);
-      const layout = normalizeImageLayout(element.layout);
-      return `<img class="learning-inline-image ${imageClass(layout)}" draggable="true" contenteditable="false" data-media-id="${Number(element.media_id)}" data-width="${width}" data-layout="${layout}" src="${escapeHtml(element.image.url)}" alt="${escapeHtml(element.image.original_name || 'Afbeelding')}" style="width:${width}%">`;
+      const placement = normalizeImagePlacement(element.placement);
+      return `<img class="learning-inline-image ${imageClass(placement)}" draggable="true" contenteditable="false" data-media-id="${Number(element.media_id)}" data-width="${width}" data-placement-side="${placement.side}" data-placement-offset="${placement.offset}" src="${escapeHtml(element.image.url)}" alt="${escapeHtml(element.image.original_name || 'Afbeelding')}" style="${imageStyle(placement, width)}">`;
     }
     return element?.type === 'text' ? element.html || '' : '';
   }).join('');
@@ -196,10 +206,28 @@ function pointRange(surface, x, y) {
   return null;
 }
 
-function placeNode(surface, node, range, layout = 'inline') {
-  node.dataset.layout = normalizeImageLayout(layout);
-  node.classList.remove(...Object.values(IMAGE_LAYOUTS).map(item => item.className));
-  node.classList.add('learning-inline-image', imageClass(layout));
+function placementFromDrop(surface, x) {
+  const rect = surface.getBoundingClientRect();
+  if (!rect.width || typeof x !== 'number') return { side: 'inline', offset: 0 };
+  const relative = ((x - rect.left) / rect.width) * 100;
+  if (relative < 50) return { side: 'left', offset: clampOffset(relative) };
+  if (relative > 50) return { side: 'right', offset: clampOffset(100 - relative) };
+  return { side: 'inline', offset: 0 };
+}
+
+function applyImagePlacement(node, placement, width = node.dataset.width) {
+  const normalized = normalizeImagePlacement(placement);
+  const safeWidth = clampWidth(width);
+  node.dataset.width = String(safeWidth);
+  node.dataset.placementSide = normalized.side;
+  node.dataset.placementOffset = String(normalized.offset);
+  node.classList.remove('learning-image-position-inline', 'learning-image-position-left', 'learning-image-position-right');
+  node.classList.add(imageClass(normalized));
+  node.style.cssText = imageStyle(normalized, safeWidth);
+}
+
+function placeNode(surface, node, range, placement) {
+  applyImagePlacement(node, placement);
   if (!range || !surface.contains(range.commonAncestorContainer)) {
     surface.append(node, surface.ownerDocument.createTextNode(' '));
     return;
@@ -211,7 +239,7 @@ function placeNode(surface, node, range, layout = 'inline') {
 
 function documentModel(surface) {
   return {
-    version: 1,
+    version: 2,
     elements: [...surface.childNodes].flatMap(node => {
       if (node.nodeType === 3) {
         const value = node.textContent?.replaceAll('\u200b', '').trim();
@@ -224,13 +252,30 @@ function documentModel(surface) {
           type: 'image',
           media_id: Number(node.dataset.mediaId),
           width: clampWidth(node.dataset.width || parseFloat(node.style.width)),
-          layout: normalizeImageLayout(node.dataset.layout)
+          placement: {
+            side: node.dataset.placementSide || 'inline',
+            offset: clampOffset(node.dataset.placementOffset)
+          }
         }];
       }
       const html = (node.outerHTML || '').replaceAll('\u200b', '');
       return html.trim() ? [{ id: node.dataset.elementId || crypto.randomUUID(), type: 'text', html }] : [];
     })
   };
+}
+
+function imageForResize(target) {
+  return target?.closest?.('.learning-inline-image') || null;
+}
+
+function addResizeHandle(documentRef, image) {
+  if (image.parentElement?.querySelector('.learning-image-resize-handle')) return;
+  const handle = documentRef.createElement('button');
+  handle.type = 'button';
+  handle.className = 'learning-image-resize-handle';
+  handle.setAttribute('aria-label', 'Afbeelding vergroten of verkleinen');
+  handle.tabIndex = -1;
+  image.parentElement?.appendChild(handle);
 }
 
 export function createLearningMaterialEditorPage({ root, topic, cards = [], students = [], learningContent, documentRef = document, onSaved } = {}) {
@@ -257,6 +302,7 @@ export function createLearningMaterialEditorPage({ root, topic, cards = [], stud
   const selectionBySurface = new WeakMap();
   const activeFontSizeBySurface = new WeakMap();
   let draggedImage = null;
+  let resizeState = null;
   let activeTopic = { ...topic };
 
   const showStatus = (message, error = false) => {
@@ -320,6 +366,7 @@ export function createLearningMaterialEditorPage({ root, topic, cards = [], stud
     if (image) {
       root.querySelectorAll('.learning-inline-image.selected').forEach(item => item.classList.remove('selected'));
       image.classList.add('selected');
+      addResizeHandle(documentRef, image);
     }
 
     const command = event.target.closest('[data-command]');
@@ -328,14 +375,12 @@ export function createLearningMaterialEditorPage({ root, topic, cards = [], stud
       const surface = card?.querySelector('.learning-editor-surface');
       if (!surface) return;
       const name = command.dataset.command;
-
       if (name === 'font-size') {
         const size = Number(command.dataset.size);
         if (Number.isFinite(size)) {
           activeFontSizeBySurface.set(surface, size);
           const applied = applyFontSize(surface, size, selectionBySurface);
-          const toolbar = command.closest('.learning-editor-toolbar');
-          toolbar?.querySelectorAll('.learning-font-size-choice').forEach(item => item.classList.remove('is-active'));
+          command.closest('.learning-editor-toolbar')?.querySelectorAll('.learning-font-size-choice').forEach(item => item.classList.remove('is-active'));
           command.classList.add('is-active');
           if (!applied) surface.focus();
         }
@@ -343,8 +388,7 @@ export function createLearningMaterialEditorPage({ root, topic, cards = [], stud
         const selected = surface.querySelector('.learning-inline-image.selected');
         if (selected) {
           const width = clampWidth(Number(selected.dataset.width || 100) + (name === 'image-larger' ? 10 : -10));
-          selected.dataset.width = width;
-          selected.style.width = `${width}%`;
+          applyImagePlacement(selected, { side: selected.dataset.placementSide, offset: selected.dataset.placementOffset }, width);
         }
       } else if (name === 'bold' || name === 'italic') {
         restoreSelection(surface, selectionBySurface);
@@ -380,22 +424,20 @@ export function createLearningMaterialEditorPage({ root, topic, cards = [], stud
     const image = event.target.closest('.learning-inline-image');
     if (!image) return;
     draggedImage = image;
+    image.classList.add('is-dragging');
     event.dataTransfer.effectAllowed = 'move';
   });
 
   root.addEventListener('dragend', () => {
+    draggedImage?.classList.remove('is-dragging');
     draggedImage = null;
+    root.querySelectorAll('.learning-editor-surface.drop-target').forEach(surface => surface.classList.remove('drop-target'));
   });
 
   const dropSurfaceFor = event => event.target.closest('.learning-card')?.querySelector('.learning-editor-surface') || null;
-
   const dropContainsImageFile = event => {
     const files = event.dataTransfer?.files;
-    const types = Array.from(event.dataTransfer?.types || []);
-    return Boolean(
-      (files?.length && [...files].some(file => /^(image\/(jpeg|png|webp))$/i.test(file.type || '') || /\.(jpe?g|png|webp)$/i.test(file.name || ''))) ||
-      types.includes('Files')
-    );
+    return Boolean(files?.length && [...files].some(file => /^(image\/(jpeg|png|webp))$/i.test(file.type || '') || /\.(jpe?g|png|webp)$/i.test(file.name || '')));
   };
 
   root.addEventListener('dragover', event => {
@@ -414,50 +456,85 @@ export function createLearningMaterialEditorPage({ root, topic, cards = [], stud
   root.addEventListener('drop', async event => {
     const surface = dropSurfaceFor(event);
     if (!surface) return;
-    const file = event.dataTransfer?.files?.[0];
-    if (!draggedImage && !file) return;
-    event.preventDefault();
-    event.stopPropagation();
     surface.classList.remove('drop-target');
-    const layout = imageLayoutForDrop(surface, event.clientX);
+    event.preventDefault();
+    const range = pointRange(surface, event.clientX, event.clientY);
+    const placement = placementFromDrop(surface, event.clientX);
 
     if (draggedImage) {
-      const image = draggedImage;
-      image.remove();
-      placeNode(surface, image, pointRange(surface, event.clientX, event.clientY), layout);
+      if (draggedImage.parentElement === surface) {
+        const current = draggedImage;
+        current.remove();
+        placeNode(surface, current, range, placement);
+      } else {
+        const current = draggedImage;
+        current.remove();
+        placeNode(surface, current, range, placement);
+      }
+      draggedImage.classList.remove('is-dragging');
+      draggedImage.classList.add('selected');
+      addResizeHandle(documentRef, draggedImage);
       draggedImage = null;
       return;
     }
 
-    if (file) await uploadImage(surface, file, event.clientX, event.clientY, layout);
+    const files = [...(event.dataTransfer?.files || [])].filter(file => /^(image\/(jpeg|png|webp))$/i.test(file.type || '') || /\.(jpe?g|png|webp)$/i.test(file.name || ''));
+    if (files[0]) await uploadImage(surface, files[0], event.clientX, event.clientY);
   });
 
   root.addEventListener('change', async event => {
     const input = event.target.closest('.learning-image-input');
-    if (!input) return;
-    const surface = input.closest('.learning-card')?.querySelector('.learning-editor-surface');
-    const file = input.files?.[0];
+    if (!input?.files?.length) return;
+    const card = input.closest('.learning-card');
+    const surface = card?.querySelector('.learning-editor-surface');
+    if (!surface) return;
+    const saved = selectionBySurface.get(surface) || rememberSelection(surface);
+    await uploadImage(surface, input.files[0]);
+    if (saved) selectionBySurface.set(surface, saved);
     input.value = '';
-    if (surface && file) await uploadImage(surface, file);
+  });
+
+  root.addEventListener('pointerdown', event => {
+    const handle = event.target.closest('.learning-image-resize-handle');
+    if (!handle) return;
+    const image = handle.parentElement?.querySelector('.learning-inline-image');
+    if (!image) return;
+    const surface = image.closest('.learning-editor-surface');
+    if (!surface) return;
+    event.preventDefault();
+    const rect = image.getBoundingClientRect();
+    resizeState = { image, surface, startX: event.clientX, startWidth: rect.width, surfaceWidth: surface.getBoundingClientRect().width };
+    image.classList.add('is-resizing');
+  });
+
+  documentRef.addEventListener('pointermove', event => {
+    if (!resizeState) return;
+    const delta = event.clientX - resizeState.startX;
+    const width = clampWidth(((resizeState.startWidth + delta) / resizeState.surfaceWidth) * 100);
+    applyImagePlacement(resizeState.image, { side: resizeState.image.dataset.placementSide, offset: resizeState.image.dataset.placementOffset }, width);
+  });
+
+  documentRef.addEventListener('pointerup', () => {
+    if (!resizeState) return;
+    resizeState.image.classList.remove('is-resizing');
+    resizeState = null;
   });
 
   async function resolveCurrentTopic() {
-    const student = root.querySelector('[data-field="student"]:checked')?.value.trim() || '';
-    const subject = root.querySelector('[data-field="subject"]').value.trim();
-    const subvak = root.querySelector('[data-field="subvak"]').value.trim();
-    if (!student || !subject) throw new Error('Kies eerst een leerling en vul het vak in.');
-    activeTopic = await learningContent.resolveTopic({ student, subject, subvak });
-    if (!activeTopic?.id) throw new Error('Het leerstofonderwerp kon niet worden opgeslagen.');
-    return activeTopic;
+    const student = root.querySelector('[data-field="student"]:checked')?.value || activeTopic.student || '';
+    const subject = root.querySelector('[data-field="subject"]')?.value.trim() || activeTopic.subject || '';
+    const subvak = root.querySelector('[data-field="subvak"]')?.value.trim() || activeTopic.subvak || '';
+    if (!student || !subject) throw new Error('Kies eerst een leerling en vul een vak in.');
+    activeTopic = { ...activeTopic, student, subject, subvak };
+    return learningContent.resolveTopic(activeTopic);
   }
 
-  async function uploadImage(surface, file, x, y, layout = null) {
-    const isImage = /^image\/(jpeg|png|webp)$/i.test(file.type || '') || /\.(jpe?g|png|webp)$/i.test(file.name || '');
+  async function uploadImage(surface, file, x, y) {
+    const isImage = /^(image\/(jpeg|png|webp))$/i.test(file.type || '') || /\.(jpe?g|png|webp)$/i.test(file.name || '');
     if (!isImage) {
       showStatus('Gebruik een JPEG, PNG of WebP-afbeelding.', true);
       return;
     }
-
     try {
       const topicForUpload = await resolveCurrentTopic();
       const uploaded = await learningContent.uploadCardImage(topicForUpload.id, file);
@@ -466,43 +543,33 @@ export function createLearningMaterialEditorPage({ root, topic, cards = [], stud
       image.draggable = true;
       image.contentEditable = 'false';
       image.dataset.mediaId = String(uploaded.id);
-      image.dataset.width = '100';
-      image.dataset.layout = normalizeImageLayout(layout || (typeof x === 'number' ? imageLayoutForDrop(surface, x) : 'inline'));
       image.src = uploaded.url || URL.createObjectURL(file);
       image.alt = uploaded.original_name || 'Afbeelding';
-      image.style.width = '100%';
       const savedSelection = selectionBySurface.get(surface);
       const range = typeof x === 'number' && typeof y === 'number' ? pointRange(surface, x, y) : savedSelection;
-      placeNode(surface, image, range, image.dataset.layout);
+      placeNode(surface, image, range, typeof x === 'number' ? placementFromDrop(surface, x) : { side: 'inline', offset: 0 });
+      image.classList.add('selected');
+      addResizeHandle(documentRef, image);
       ensureTrailing(root);
       surface.focus();
     } catch (error) {
-      console.error('Learning material image upload error:', error);
       showStatus(error.message || 'De afbeelding kon niet worden toegevoegd.', true);
     }
   }
 
   async function save() {
-    const subject = root.querySelector('[data-field="subject"]').value.trim();
-    const subvak = root.querySelector('[data-field="subvak"]').value.trim();
-    const student = root.querySelector('[data-field="student"]:checked')?.value.trim() || '';
-    if (!student || !subject) {
-      showStatus('Kies eerst een leerling en vul het vak in.', true);
-      return;
-    }
-    showStatus('Leerstof opslaan…');
+    showStatus('Bezig met opslaan…');
     try {
-      const topicForSave = await resolveCurrentTopic();
-      const payload = [...cardsMount.querySelectorAll('.learning-card')]
-        .filter(card => !cardIsEmpty(card))
-        .map(card => ({
-          id: card.dataset.cardId || undefined,
-          title: card.querySelector('.learning-card-title').value.trim(),
-          document: documentModel(card.querySelector('.learning-editor-surface'))
-        }));
-      const saved = await learningContent.replaceForTopic(topicForSave, payload);
+      const resolvedTopic = await resolveCurrentTopic();
+      const payload = [...cardsMount.querySelectorAll('.learning-card')].map(card => ({
+        id: card.dataset.cardId || undefined,
+        title: card.querySelector('.learning-card-title')?.value || '',
+        document: documentModel(card.querySelector('.learning-editor-surface'))
+      })).filter(card => card.title.trim() || card.document.elements.length);
+      const savedCards = await learningContent.replaceForTopic(resolvedTopic, payload);
+      activeTopic = { ...resolvedTopic };
       showStatus('Opgeslagen.');
-      await onSaved({ topic: { ...topicForSave, student, subject, subvak }, cards: saved });
+      await onSaved({ topic: resolvedTopic, cards: savedCards });
     } catch (error) {
       console.error('Learning material save error:', error);
       showStatus(error.message || 'De leerstof kon niet worden opgeslagen.', true);

@@ -8,6 +8,7 @@ const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '
 const navigation = fs.readFileSync(path.join(projectRoot, 'src/components/page-navigation.js'), 'utf8');
 const managementPage = fs.readFileSync(path.join(projectRoot, 'management.html'), 'utf8');
 const managementRuntime = fs.readFileSync(path.join(projectRoot, 'src/features/management/runtime.js'), 'utf8');
+const lessonsRuntime = fs.readFileSync(path.join(projectRoot, 'src/features/lessons/runtime.js'), 'utf8');
 
 test('management navigation uses Dashboard as its management home and owns the student submenu', () => {
   assert.match(navigation, /key: 'management-dashboard',[\s\S]*?label: 'Dashboard'/);
@@ -28,6 +29,12 @@ test('management page delegates its shell and feature composition to the canonic
   assert.match(managementRuntime, /title\.textContent = selectedStudent \? `Beheer van \$\{selectedStudent\}` : 'Beheer'/);
   assert.match(managementRuntime, /createPacoNavigation/);
   assert.match(managementRuntime, /active: 'management-dashboard'/);
+});
+
+test('shared learning navigation uses the canonical Mijn vakken and Vakken beheren terminology', () => {
+  assert.match(navigation, /key: 'lessons',[\s\S]*?label: isManagementView \? 'Vakken beheren' : 'Mijn vakken'/);
+  assert.match(lessonsRuntime, /title: 'Mijn vakken'/);
+  assert.match(lessonsRuntime, /Kies eerst een vak en open daarna het onderwerp of de les/);
 });
 
 test('management test history keeps the shared management view context through the central navigation owner', () => {

@@ -1,5 +1,11 @@
 const FONT_SIZE_OPTIONS = [36, 28, 22, 18, 14];
 
+const IMAGE_LAYOUTS = Object.freeze({
+  inline: Object.freeze({ className: 'learning-image-inline' }),
+  left: Object.freeze({ className: 'learning-image-float-left' }),
+  right: Object.freeze({ className: 'learning-image-float-right' })
+});
+
 function escapeHtml(value) {
   return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
 }
@@ -7,6 +13,24 @@ function escapeHtml(value) {
 function clampWidth(value) {
   const n = Number(value);
   return Number.isFinite(n) ? Math.min(100, Math.max(20, Math.round(n))) : 100;
+}
+
+function normalizeImageLayout(value) {
+  return Object.prototype.hasOwnProperty.call(IMAGE_LAYOUTS, value) ? value : 'inline';
+}
+
+function imageLayoutForDrop(surface, x) {
+  if (typeof x !== 'number') return 'inline';
+  const rect = surface.getBoundingClientRect();
+  if (!rect.width) return 'inline';
+  const relative = (x - rect.left) / rect.width;
+  if (relative <= 0.35) return 'left';
+  if (relative >= 0.65) return 'right';
+  return 'inline';
+}
+
+function imageClass(layout) {
+  return IMAGE_LAYOUTS[normalizeImageLayout(layout)].className;
 }
 
 function toolbarMarkup() {
@@ -37,7 +61,7 @@ function cardMarkup(index) {
     <div class="learning-card-body">
       <input class="learning-card-title" type="text" placeholder="Titel van de kaart (optioneel)">
       <div class="learning-editor-surface" contenteditable="true" spellcheck="true" data-placeholder="Schrijf hier de leerstof…"></div>
-      <div class="learning-image-help">Sleep een afbeelding naar de plek waar je hem wilt hebben. Je kunt hem daarna opnieuw slepen en groter of kleiner maken.</div>
+      <div class="learning-image-help">Sleep een afbeelding naar de plek waar je hem wilt hebben. Laat hem links, in het midden of rechts vallen om de tekst eromheen te laten lopen. Je kunt hem daarna opnieuw slepen.</div>
     </div>
     <div class="learning-card-insert-row"><button type="button" class="question-insert-button" data-action="insert-card-after">➕ Kaart invoegen</button></div>
   </article>`;
@@ -47,7 +71,8 @@ function renderDocument(model) {
   return (Array.isArray(model?.elements) ? model.elements : []).map(element => {
     if (element?.type === 'image' && element.media_id && element.image?.url) {
       const width = clampWidth(element.width);
-      return `<img class="learning-inline-image" draggable="true" contenteditable="false" data-media-id="${Number(element.media_id)}" data-width="${width}" src="${escapeHtml(element.image.url)}" alt="${escapeHtml(element.image.original_name || 'Afbeelding')}" style="width:${width}%">`;
+      const layout = normalizeImageLayout(element.layout);
+      return `<img class="learning-inline-image ${imageClass(layout)}" draggable="true" contenteditable="false" data-media-id="${Number(element.media_id)}" data-width="${width}" data-layout="${layout}" src="${escapeHtml(element.image.url)}" alt="${escapeHtml(element.image.original_name || 'Afbeelding')}" style="width:${width}%">`;
     }
     return element?.type === 'text' ? element.html || '' : '';
   }).join('');
@@ -171,7 +196,10 @@ function pointRange(surface, x, y) {
   return null;
 }
 
-function placeNode(surface, node, range) {
+function placeNode(surface, node, range, layout = 'inline') {
+  node.dataset.layout = normalizeImageLayout(layout);
+  node.classList.remove(...Object.values(IMAGE_LAYOUTS).map(item => item.className));
+  node.classList.add('learning-inline-image', imageClass(layout));
   if (!range || !surface.contains(range.commonAncestorContainer)) {
     surface.append(node, surface.ownerDocument.createTextNode(' '));
     return;
@@ -195,7 +223,8 @@ function documentModel(surface) {
           id: node.dataset.elementId || crypto.randomUUID(),
           type: 'image',
           media_id: Number(node.dataset.mediaId),
-          width: clampWidth(node.dataset.width || parseFloat(node.style.width))
+          width: clampWidth(node.dataset.width || parseFloat(node.style.width)),
+          layout: normalizeImageLayout(node.dataset.layout)
         }];
       }
       const html = (node.outerHTML || '').replaceAll('\u200b', '');
@@ -390,16 +419,17 @@ export function createLearningMaterialEditorPage({ root, topic, cards = [], stud
     event.preventDefault();
     event.stopPropagation();
     surface.classList.remove('drop-target');
+    const layout = imageLayoutForDrop(surface, event.clientX);
 
     if (draggedImage) {
       const image = draggedImage;
       image.remove();
-      placeNode(surface, image, pointRange(surface, event.clientX, event.clientY));
+      placeNode(surface, image, pointRange(surface, event.clientX, event.clientY), layout);
       draggedImage = null;
       return;
     }
 
-    if (file) await uploadImage(surface, file, event.clientX, event.clientY);
+    if (file) await uploadImage(surface, file, event.clientX, event.clientY, layout);
   });
 
   root.addEventListener('change', async event => {
@@ -421,7 +451,7 @@ export function createLearningMaterialEditorPage({ root, topic, cards = [], stud
     return activeTopic;
   }
 
-  async function uploadImage(surface, file, x, y) {
+  async function uploadImage(surface, file, x, y, layout = null) {
     const isImage = /^image\/(jpeg|png|webp)$/i.test(file.type || '') || /\.(jpe?g|png|webp)$/i.test(file.name || '');
     if (!isImage) {
       showStatus('Gebruik een JPEG, PNG of WebP-afbeelding.', true);
@@ -437,12 +467,13 @@ export function createLearningMaterialEditorPage({ root, topic, cards = [], stud
       image.contentEditable = 'false';
       image.dataset.mediaId = String(uploaded.id);
       image.dataset.width = '100';
+      image.dataset.layout = normalizeImageLayout(layout || (typeof x === 'number' ? imageLayoutForDrop(surface, x) : 'inline'));
       image.src = uploaded.url || URL.createObjectURL(file);
       image.alt = uploaded.original_name || 'Afbeelding';
       image.style.width = '100%';
       const savedSelection = selectionBySurface.get(surface);
       const range = typeof x === 'number' && typeof y === 'number' ? pointRange(surface, x, y) : savedSelection;
-      placeNode(surface, image, range);
+      placeNode(surface, image, range, image.dataset.layout);
       ensureTrailing(root);
       surface.focus();
     } catch (error) {
@@ -459,7 +490,6 @@ export function createLearningMaterialEditorPage({ root, topic, cards = [], stud
       showStatus('Kies eerst een leerling en vul het vak in.', true);
       return;
     }
-
     showStatus('Leerstof opslaan…');
     try {
       const topicForSave = await resolveCurrentTopic();

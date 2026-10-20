@@ -11,7 +11,7 @@ import { createPracticeMenuRuntime } from '../features/practice/menu-runtime.js'
 import { createGamesRuntime } from '../features/practice/games-runtime.js';
 import { createDoubleOrNothingPageRuntime } from '../features/practice/double-or-nothing/page-runtime.js';
 import { createFlashcardsPageRuntime } from '../features/practice/flashcards/page-runtime.js';
-import { createAgendaPageRuntime } from '../features/agenda/agenda-runtime.js';
+import { createAgendaPageRuntime } from '../features/agenda/page-runtime.js';
 import { createMonthCalendarRuntime } from '../features/agenda/month-calendar-runtime.js';
 import { createTestHistoryRuntime } from '../features/test-history/runtime.js';
 import { createManagementRuntime } from '../features/management/runtime.js';

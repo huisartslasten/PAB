@@ -12,7 +12,7 @@ function normalizeHtml(value) {
       return;
     }
     [...node.attributes].forEach(attribute => {
-      if (node.tagName === 'SPAN' && attribute.name === 'class' && /^learning-size-(large|small)$/.test(attribute.value)) return;
+      if (node.tagName === 'SPAN' && attribute.name === 'class' && /^(learning-size-(large|small)|learning-inline-size)$/.test(attribute.value)) return;
       node.removeAttribute(attribute.name);
     });
   });
@@ -60,8 +60,6 @@ export function createLearningContentService(db, { media = null, canManage = () 
       .filter(card => card.title || card.content || card.image_id != null);
 
     if (rows.length) {
-      // PostgREST upsert otherwise defaults omitted columns to null. That would
-      // overwrite the database identity default for new cards and violate id NOT NULL.
       const saved = await db.from('lesson_learning_cards')
         .upsert(rows, { defaultToNull: false })
         .select(CARD_SELECT);

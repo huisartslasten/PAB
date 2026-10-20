@@ -21,9 +21,10 @@ export function setStudent(student) {
 }
 
 export function setViewContext(student, mode = 'student') {
-  appState.viewedStudent = student || null;
+  const normalizedStudent = student || '';
+  appState.viewedStudent = normalizedStudent;
   appState.viewMode = mode === 'management' ? 'management' : 'student';
-  appState.currentStudent = appState.viewedStudent;
+  appState.currentStudent = normalizedStudent;
 }
 
 export function setLessons(lessons) {

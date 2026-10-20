@@ -24,7 +24,7 @@ export function bootstrapLessonSaveRuntime({
       if (typeof installLessonSaveRuntimeEntry !== 'function') {
         throw new Error('The lesson save runtime entry installer is unavailable.');
       }
-      installLessonSaveRuntimeEntry(runtime);
+      installLessonSaveRuntimeEntry(runtime, target);
       const installedSaveLesson = target.saveLesson;
       if (typeof installedSaveLesson !== 'function') {
         throw new Error('The lesson save runtime entry did not install saveLesson.');
@@ -32,6 +32,7 @@ export function bootstrapLessonSaveRuntime({
       return installedSaveLesson;
     });
 
+  target.saveLesson = (lesson = {}) => readiness.then(saveLesson => saveLesson(lesson));
   target.pacoGOLessonSaveRuntimeReady = readiness;
 
   return readiness;

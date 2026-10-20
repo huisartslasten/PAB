@@ -1,4 +1,4 @@
-// Canonical domain runtime for the Double or Nothing lesson game.
+// Canonical domain runtime for the Double or Nothing practice game.
 // Presentation and persistence are intentionally kept outside this module.
 
 const FIRST_REWARD = 10;
@@ -64,6 +64,9 @@ export function createDoubleOrNothingRuntime({ items = [], gradeAnswer } = {}) {
     if (phase !== 'question') throw new Error('Deze vraag kan nu niet worden beantwoord.');
     if (index > 0 && score > 0 && stake == null) throw new Error('Kies eerst hoeveel botjes je waagt.');
 
+    const normalizedAnswer = String(userAnswer ?? '').trim();
+    if (!normalizedAnswer) throw new Error('Vul eerst een antwoord in.');
+
     const item = questions[index];
     const recoveryRound = index > 0 && score === 0;
     const usedStake = index === 0 || recoveryRound ? FIRST_REWARD : Number(stake);
@@ -74,7 +77,7 @@ export function createDoubleOrNothingRuntime({ items = [], gradeAnswer } = {}) {
     phase = 'checking';
 
     try {
-      const result = await gradeAnswer(item.question, item.answer, userAnswer);
+      const result = await gradeAnswer(item.question, item.answer, normalizedAnswer);
       const previousScore = score;
       const delta = result.correct === true ? usedStake : -usedStake;
       score = Math.max(0, score + delta);
@@ -83,7 +86,7 @@ export function createDoubleOrNothingRuntime({ items = [], gradeAnswer } = {}) {
         correct: result.correct === true,
         feedback: result.feedback || '',
         expectedAnswer: item.answer,
-        givenAnswer: userAnswer,
+        givenAnswer: normalizedAnswer,
         stake: usedStake,
         previousScore,
         score,

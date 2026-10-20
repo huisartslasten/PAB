@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readViewContext, applyViewContext } from '../src/core/view-context.js';
+import { readViewContext, applyViewContext, buildViewUrl } from '../src/core/view-context.js';
 import { appState } from '../src/core/state.js';
 
 test('student view context accepts a known student', () => {
@@ -17,16 +17,31 @@ test('management view context is explicit and student-scoped', () => {
   assert.equal(context.isManagement, true);
 });
 
+test('management view context remains active without a selected student', () => {
+  const context = readViewContext(new URLSearchParams('mode=management'));
+  assert.equal(context.student, '');
+  assert.equal(context.mode, 'management');
+  assert.equal(context.isManagement, true);
+});
+
 test('unknown students are never accepted as view context', () => {
   const context = readViewContext(new URLSearchParams('viewStudent=Unknown&mode=management'));
   assert.equal(context.student, '');
-  assert.equal(context.isManagement, false);
+  assert.equal(context.isManagement, true);
 });
 
 test('management context requires management permission', () => {
-  const context = readViewContext(new URLSearchParams('viewStudent=Zenith&mode=management'));
+  const context = readViewContext(new URLSearchParams('mode=management'));
   assert.throws(() => applyViewContext(context, { canManage: false }), /management permission/);
   applyViewContext(context, { canManage: true });
-  assert.equal(appState.viewedStudent, 'Zenith');
+  assert.equal(appState.viewedStudent, '');
   assert.equal(appState.viewMode, 'management');
+});
+
+test('management navigation preserves management mode without a selected student', () => {
+  globalThis.window = { location: { href: 'https://example.test/dashboard.html' } };
+  const target = buildViewUrl('agenda.html', { mode: 'management' });
+  assert.equal(target.pathname, '/agenda.html');
+  assert.equal(target.searchParams.get('mode'), 'management');
+  assert.equal(target.searchParams.has('viewStudent'), false);
 });

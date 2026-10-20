@@ -7,112 +7,14 @@
   <link rel="stylesheet" href="src/components/page-template.css">
   <link rel="stylesheet" href="src/features/lessons/lesson-context-view.css">
   <link rel="stylesheet" href="src/features/lessons/practice-page.css">
+  <link rel="stylesheet" href="src/features/lessons/test.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    .test-result-card{text-align:center}.result-score{font-size:48px;font-weight:950;color:#102b57}.result-details{text-align:left;margin-top:22px}.result-answer{padding:12px 0;border-bottom:1px solid #e8eff6}.result-answer:last-child{border-bottom:0}.result-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:24px}.result-actions button{border:0;border-radius:14px;padding:11px 16px;font-weight:900;cursor:pointer}.result-actions .primary{background:#1787f2;color:#fff}.result-actions .secondary{background:#eaf4ff;color:#0d6fd4}
-  </style>
 </head>
 <body>
   <div id="paco-template-mount"></div>
   <script type="module">
-    import { mountPacoPageTemplate } from './src/components/page-template.js';
-    import { createPacoNavigation } from './src/components/page-navigation.js';
-    import { createPacoGOApp } from './src/app/bootstrap.js';
-    import { createProfessionalPlayerBridge } from './src/features/lessons/player-runtime-bootstrap.js';
-    import { createLessonContextField } from './src/features/lessons/lesson-context-view.js';
-    import { readViewContext, buildViewUrl } from './src/core/view-context.js';
-    import { escapeHtml } from './src/core/html.js';
-
-    const params = new URLSearchParams(window.location.search);
-    const context = readViewContext(params);
-    const lessonId = params.get('lesson_id') || '';
-    const student = context.student;
-    const mount = document.querySelector('#paco-template-mount');
-    const content = document.createElement('div');
-    const app = createPacoGOApp({ supabaseLib: window.supabase });
-
-    const testScreen = document.createElement('main');
-    testScreen.className = 'practice-page-card';
-    testScreen.innerHTML = '<div id="test" class="hidden"><div id="testProgress" class="practice-progress"></div><div id="testContent" class="practice-content"></div></div><div id="result" class="test-result-card hidden"><div class="test-result-content"><h2 id="resultTitle"></h2><div id="resultScore" class="result-score"></div><div id="resultDetails" class="result-details"></div><div class="result-actions"><button id="retryButton" class="primary" type="button">Nog een keer</button><button id="backButton" class="secondary" type="button">← Leskeuze</button></div></div></div>';
-    content.appendChild(testScreen);
-
-    const goChoice = () => {
-      const target = buildViewUrl('lesson-choice.html', { student, mode: context.mode });
-      if (lessonId) target.searchParams.set('lesson_id', lessonId);
-      window.location.href = target.toString();
-    };
-    const hideAll = () => {
-      testScreen.querySelector('#test')?.classList.add('hidden');
-      testScreen.querySelector('#result')?.classList.add('hidden');
-    };
-
-    mountPacoPageTemplate({
-      mount,
-      backLabel: '← Leskeuze',
-      backAction: goChoice,
-      greeting: `Hoi ${student}! 🐶`,
-      title: 'Toets',
-      icon: '📝',
-      subtitle: 'Beantwoord alle vragen. De uitslag komt aan het einde.',
-      navigation: createPacoNavigation({ app, active:'lessons', student, viewMode: context.mode }),
-      content
-    });
-
-    const languageFor = lesson => {
-      const subject = String(lesson?.subject || '').toLowerCase();
-      if (subject.includes('engels') || subject.includes('english')) return 'en';
-      if (subject.includes('spaans') || subject.includes('spanish')) return 'es';
-      if (subject.includes('frans') || subject.includes('french')) return 'fr';
-      if (subject.includes('duits') || subject.includes('german')) return 'de';
-      if (subject.includes('portugees') || subject.includes('portuguese')) return 'pt';
-      return 'nl';
-    };
-
-    async function load() {
-      if (!lessonId || !student) throw new Error('Geen leerling of les geselecteerd.');
-      const records = await app.loadLessons();
-      const lesson = app.mapLessons(records).find(item => String(item.id) === String(lessonId));
-      if (!lesson) throw new Error('Deze les kon niet worden gevonden.');
-
-      const contextField = createLessonContextField(lesson);
-      content.insertBefore(contextField, testScreen);
-
-      const bridge = createProfessionalPlayerBridge({
-        getLesson: () => lesson,
-        getStudent: () => student,
-        db: app.db,
-        audioService: app.audio,
-        documentRef: document,
-        hideAll,
-        showLessonChoice: goChoice,
-        goBack: goChoice,
-        clearActivity: () => {},
-        escapeHtml,
-        speakAiText: (text, statusId) => app.audio.speak(text, { language: languageFor(lesson), onStatus: status => { const node = document.getElementById(statusId); if (node) node.textContent = status; } }),
-        stopAiAudio: () => app.audio.stop(),
-        gradeAnswer: app.grading.gradeAnswer
-      });
-
-      window.submitTest = () => bridge.submitTest({ type: lesson.type });
-      window.speakTest = () => bridge.speakTest();
-      document.getElementById('retryButton').addEventListener('click', () => bridge.retry());
-      document.getElementById('backButton').addEventListener('click', goChoice);
-
-      bridge.startTest({ type: lesson.type });
-    }
-
-    try {
-      await load();
-    } catch (error) {
-      console.error('Test load error:', error);
-      const test = testScreen.querySelector('#test');
-      const testContent = testScreen.querySelector('#testContent');
-      test?.classList.remove('hidden');
-      if (testContent) {
-        testContent.innerHTML = `<strong>De toets kon niet worden geladen.</strong><p class="small">${escapeHtml(error?.message || 'Onbekende fout.')}</p><button class="big" id="loadBack" type="button">← Leskeuze</button>`;
-        testContent.querySelector('#loadBack')?.addEventListener('click', goChoice);
-      }
-    }
+    import { startPacoRuntime } from './src/app/runtime.js';
+    await startPacoRuntime({ templateMount: document.querySelector('#paco-template-mount') });
   </script>
 </body>
 </html>

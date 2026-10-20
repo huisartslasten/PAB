@@ -13,7 +13,9 @@ test('dictation item uses one entered word as the canonical answer', () => {
     question: '',
     answer: 'paard',
     question_parts: [],
-    answer_parts: [{ text: 'paard', role: 'answer' }]
+    answer_parts: [{ text: 'paard', role: 'answer' }],
+    response_type: 'text',
+    answer_options: []
   });
 });
 
@@ -42,4 +44,38 @@ test('dictation build keeps exact word order', () => {
     [1, 'fiets'],
     [2, 'huis']
   ]);
+});
+
+test('math keeps every valid row when an item also contains a non-tested explanation answer', () => {
+  const rows = Array.from({ length: 7 }, (_, index) => ({
+    question_parts: [`${index + 1} + ${index + 1} = ?`],
+    answer_parts: [
+      { text: String((index + 1) * 2), role: 'answer' },
+      { text: `Uitleg bij som ${index + 1}`, role: 'extra' }
+    ],
+    response_type: 'number'
+  }));
+
+  const items = buildItemsForType('math', rows);
+
+  assert.equal(items.length, 7);
+  assert.deepEqual(items.map(item => item.sort_order), [0, 1, 2, 3, 4, 5, 6]);
+  assert.deepEqual(items[0].answer_parts, [
+    { text: '2', role: 'answer' },
+    { text: 'Uitleg bij som 1', role: 'extra' }
+  ]);
+});
+
+test('multiple choice requires a selected correct option and preserves its options', () => {
+  const items = buildItemsForType('questions', [{
+    question_parts: ['Welke uitkomst is juist?'],
+    answer_parts: [{ text: '4', role: 'answer' }],
+    response_type: 'multiple_choice',
+    answer_options: ['3', '4', '5'],
+    correct_option: '4'
+  }]);
+
+  assert.equal(items.length, 1);
+  assert.equal(items[0].answer, '4');
+  assert.deepEqual(items[0].answer_options, ['3', '4', '5']);
 });

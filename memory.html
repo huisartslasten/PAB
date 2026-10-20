@@ -116,6 +116,10 @@
             runtime.selectCard(cardId);
             renderState();
           },
+          onNextRound: () => {
+            runtime.startNextRound();
+            renderState();
+          },
           onFinished: () => {
             runtime.start();
             renderState();

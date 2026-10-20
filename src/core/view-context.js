@@ -14,7 +14,7 @@ export function readViewContext(searchParams = new URLSearchParams()) {
   return Object.freeze({
     student,
     mode,
-    isManagement: mode === VIEW_MODES.MANAGEMENT && Boolean(student)
+    isManagement: mode === VIEW_MODES.MANAGEMENT
   });
 }
 
@@ -33,13 +33,13 @@ export function getViewContext() {
   return Object.freeze({
     student: appState.viewedStudent || '',
     mode: appState.viewMode || VIEW_MODES.STUDENT,
-    isManagement: appState.viewMode === VIEW_MODES.MANAGEMENT && Boolean(appState.viewedStudent)
+    isManagement: appState.viewMode === VIEW_MODES.MANAGEMENT
   });
 }
 
 export function buildViewUrl(path, { student = '', mode = VIEW_MODES.STUDENT } = {}) {
   const target = new URL(path, window.location.href);
   if (student) target.searchParams.set('viewStudent', student);
-  if (mode === VIEW_MODES.MANAGEMENT && student) target.searchParams.set('mode', VIEW_MODES.MANAGEMENT);
+  if (mode === VIEW_MODES.MANAGEMENT) target.searchParams.set('mode', VIEW_MODES.MANAGEMENT);
   return target;
 }

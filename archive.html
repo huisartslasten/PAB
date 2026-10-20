@@ -1,128 +1,17 @@
 <!doctype html>
 <html lang="nl">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>PacoGO — Archief / Prullenbak</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — Archief / Prullenbak</title>
   <link rel="stylesheet" href="src/components/page-template.css">
-  <link rel="stylesheet" href="src/features/management/management-support.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div id="paco-template-mount"></div>
   <script type="module">
-    import { mountPacoPageTemplate } from './src/components/page-template.js';
-    import { createPacoNavigation } from './src/components/page-navigation.js';
-    import { confirmPacoAction } from './src/components/confirm-dialog.js';
-    import { createPacoGOApp } from './src/app/bootstrap.js';
-    import { renderRecovery } from './src/features/management/management-view.js';
-
-    const mount=document.querySelector('#paco-template-mount');
-    const content=document.createElement('div');
-    content.className='management-page';
-    const state=document.createElement('div');
-    state.className='management-state';
-    state.textContent='Archief laden…';
-    content.appendChild(state);
-    const app=createPacoGOApp({supabaseLib:window.supabase});
-
-    mountPacoPageTemplate({
-      mount,
-      backLabel:'← Beheer',
-      backAction:()=>{window.location.href='management.html';},
-      greeting:'PacoGO beheer ⚙️',
-      title:'Archief / Prullenbak',
-      icon:'🗂️',
-      subtitle:'Herstel gearchiveerde lessen of verwijder lessen definitief uit de prullenbak.',
-      navigation:createPacoNavigation({
-        app,
-        active:'recovery',
-        includeManagement:true,
-        includeManagementTools:true,
-        includeCreator:true
-      }),
-      content
-    });
-
-    const management=app.management;
-    const notice=document.createElement('div');
-    notice.className='management-state';
-    notice.hidden=true;
-    const archive=document.createElement('section');
-    archive.className='management-section';
-    const archiveHeading=document.createElement('h2');
-    archiveHeading.textContent='Archief';
-    const archiveList=document.createElement('div');
-    archive.append(archiveHeading,archiveList);
-
-    const trash=document.createElement('section');
-    trash.className='management-section';
-    const trashHeading=document.createElement('h2');
-    trashHeading.textContent='Prullenbak';
-    const trashList=document.createElement('div');
-    trash.append(trashHeading,trashList);
-
-    function showNotice(message){
-      notice.textContent=message;
-      notice.hidden=false;
-    }
-
-    async function emptyTrash(){
-      const confirmed=await confirmPacoAction({
-        title:'Prullenbak definitief leegmaken?',
-        message:'Alle lessen in de prullenbak worden definitief verwijderd. De bijbehorende toetsgeschiedenis wordt ook verwijderd. Dit kan niet ongedaan worden gemaakt.',
-        confirmLabel:'Definitief verwijderen',
-        cancelLabel:'Annuleren'
-      });
-      if(!confirmed)return;
-      await management.emptyTrash();
-      showNotice('De prullenbak is leeggemaakt.');
-      await refreshRecovery();
-    }
-
-    async function permanentlyDeleteLesson(lesson){
-      const confirmed=await confirmPacoAction({
-        title:'Les definitief verwijderen?',
-        message:`“${lesson.title}” wordt definitief verwijderd. De bijbehorende toetsgeschiedenis wordt ook verwijderd. Dit kan niet ongedaan worden gemaakt.`,
-        confirmLabel:'Definitief verwijderen',
-        cancelLabel:'Annuleren'
-      });
-      if(!confirmed)return;
-      await management.permanentlyDeleteRecoveryLesson(lesson.id);
-      showNotice(`“${lesson.title}” is definitief verwijderd.`);
-      await refreshRecovery();
-    }
-
-    async function handleRecoveryError(error){
-      console.error('Recovery action error:',error);
-      showNotice(error?.message || 'De actie kon niet worden uitgevoerd.');
-    }
-
-    async function refreshRecovery(){
-      archiveList.replaceChildren();
-      trashList.replaceChildren();
-      renderRecovery(archiveList,management,'archive',handleRestore,undefined,undefined,handleRecoveryError);
-      renderRecovery(trashList,management,'trash',handleRestore,emptyTrash,permanentlyDeleteLesson,handleRecoveryError);
-    }
-
-    async function handleRestore(lesson){
-      showNotice(`“${lesson.title}” is hersteld en staat weer bij de actieve lessen van ${lesson.student}.`);
-      await refreshRecovery();
-    }
-
-    async function initialize(){
-      try{
-        const session=await app.initializeSession();
-        if(!session){window.location.href='auth.html';return;}
-        if(!app.auth.isParent){state.textContent='Je hebt geen toegang tot Archief / Prullenbak.';return;}
-        await management.loadRecoveryLessons();
-        await refreshRecovery();
-        content.replaceChildren(notice,archive,trash);
-      }catch(error){
-        console.error('Archive page load error:',error);
-        state.textContent='Archief / Prullenbak kon niet worden geladen.';
-      }
-    }
-
-    initialize();
+    import { startPacoRuntime } from './src/app/runtime.js';
+    await startPacoRuntime({ templateMount: document.querySelector('#paco-template-mount') });
   </script>
 </body>
 </html>

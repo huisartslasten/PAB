@@ -50,46 +50,36 @@ function createValidRuntime(overrides = {}) {
   };
 }
 
-test('runtime entry replaces window.saveLesson and returns the legacy function', () => {
-  const legacySaveLesson = async () => 'legacy';
+test('runtime entry installs the canonical saveLesson function on the explicit target', () => {
   const previousWindow = globalThis.window;
-  globalThis.window = { saveLesson: legacySaveLesson };
+  const target = { saveLesson: async () => 'previous' };
+  globalThis.window = target;
   try {
-    const returnedLegacy = installLessonSaveRuntimeEntry(createValidRuntime());
-    assert.strictEqual(returnedLegacy, legacySaveLesson);
-    assert.notStrictEqual(globalThis.window.saveLesson, legacySaveLesson);
-    assert.equal(globalThis.window.saveLesson.name, 'saveLessonRuntimeEntry');
-    assert.equal(typeof globalThis.window.pacoGOUpdateLessonSubvak, 'function');
+    const installed = installLessonSaveRuntimeEntry(createValidRuntime(), target);
+    assert.strictEqual(installed, target.saveLesson);
+    assert.equal(target.saveLesson.name, 'saveLessonRuntimeEntry');
+    assert.equal(typeof target.pacoGOUpdateLessonSubvak, 'function');
   } finally {
     globalThis.window = previousWindow;
   }
 });
 
-test('runtime entry installation preserves the legacy function for rollback', () => {
-  const legacySaveLesson = function legacySaveLesson() {};
-  const previousWindow = globalThis.window;
-  globalThis.window = { saveLesson: legacySaveLesson };
-  try {
-    const returnedLegacy = installLessonSaveRuntimeEntry(createValidRuntime());
-    assert.strictEqual(returnedLegacy, legacySaveLesson);
-  } finally {
-    globalThis.window = previousWindow;
-  }
+test('runtime entry installation replaces the legacy saveLesson with the canonical entry', () => {
+  const target = { saveLesson: function legacySaveLesson() {} };
+  const previous = target.saveLesson;
+  installLessonSaveRuntimeEntry(createValidRuntime(), target);
+  assert.notStrictEqual(target.saveLesson, previous);
+  assert.equal(target.saveLesson.name, 'saveLessonRuntimeEntry');
 });
 
-test('runtime entry installation rejects an incomplete bridge before replacing window.saveLesson', () => {
+test('runtime entry installation rejects an incomplete bridge before replacing the target saveLesson', () => {
   const legacySaveLesson = function legacySaveLesson() {};
-  const previousWindow = globalThis.window;
-  globalThis.window = { saveLesson: legacySaveLesson };
-  try {
-    assert.throws(
-      () => installLessonSaveRuntimeEntry({ document: {} }),
-      /Missing V4\.78 runtime bridge dependency: currentSubject/
-    );
-    assert.strictEqual(globalThis.window.saveLesson, legacySaveLesson);
-  } finally {
-    globalThis.window = previousWindow;
-  }
+  const target = { saveLesson: legacySaveLesson };
+  assert.throws(
+    () => installLessonSaveRuntimeEntry({ document: {} }, target),
+    /Missing V4\.78 runtime bridge dependency: currentSubject/
+  );
+  assert.strictEqual(target.saveLesson, legacySaveLesson);
 });
 
 test('runtime entry stops at authorization before reading or preparing an unauthorized save', async () => {

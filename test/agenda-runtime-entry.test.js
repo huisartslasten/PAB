@@ -35,7 +35,7 @@ test('agenda runtime entry exposes deterministic read and storage boundaries', (
   assert.equal(entry.getTestCalendar()[0].id, 't2');
 });
 
-test('agenda runtime renders the page-owned agenda content contract', () => {
+test('agenda runtime renders the canonical bottom navigation contract', () => {
   const content = {
     innerHTML: '',
     querySelectorAll: () => [],
@@ -55,6 +55,10 @@ test('agenda runtime renders the page-owned agenda content contract', () => {
 
   assert.equal(entry.showAgenda(), true);
   assert.match(content.innerHTML, /agenda-school-week/);
+  assert.match(content.innerHTML, /data-agenda-add/);
+  assert.match(content.innerHTML, /data-agenda-today/);
+  assert.match(content.innerHTML, /← Vorige week/);
+  assert.match(content.innerHTML, /Volgende week →/);
   assert.match(content.innerHTML, /Geen afspraken/);
 });
 

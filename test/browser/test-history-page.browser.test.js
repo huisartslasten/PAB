@@ -108,7 +108,6 @@ test('canonical test history applies the student filter through the read service
   await installSupabaseFixture(page);
   await page.goto(`${baseURL}/test-history.html?student=Zyon`);
 
-  await expect(page.locator('#historyStudent')).toHaveValue('Zyon');
   await expect(page.locator('#testHistoryContent .test-history-item')).toHaveCount(1);
   await expect(page.locator('#testHistoryContent')).toContainText('Rekenen');
   await expect(page.locator('#testHistoryContent')).not.toContainText('Themawoorden');

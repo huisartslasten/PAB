@@ -55,13 +55,10 @@ export function createDoubleOrNothingView({ documentRef = globalThis.document, e
     box.innerHTML = `${selected}<div class="double-stake-title">Hoeveel durf je te wagen?</div><div class="double-stake-buttons">${amounts.map(amount => `<button type="button" class="double-stake-button${amount === state.stake ? ' is-selected' : ''}" data-stake="${amount}" aria-pressed="${amount === state.stake}">${amount} 🦴</button>`).join('')}</div>`;
   }
 
-  function renderQuestion(state, onStake, onSubmit) {
+  function renderQuestion(state, onStake, onSubmit, errorMessage = '') {
     const content = documentRef.getElementById('doubleContent');
     if (!content || !state.item) return;
 
-    // Choosing a stake updates the state and re-renders the question view.
-    // Preserve anything the learner already typed so selecting a stake never
-    // destroys their answer.
     const existingAnswer = documentRef.getElementById('doubleAnswer')?.value || '';
 
     renderStats(state);
@@ -69,7 +66,10 @@ export function createDoubleOrNothingView({ documentRef = globalThis.document, e
     renderStakeOptions(state);
 
     const disabled = state.index > 0 && state.score > 0 && state.stake == null;
-    content.innerHTML = `<div class="double-prompt">${escapeHtml(state.item.question || '')}</div><div class="field"><input id="doubleAnswer" class="answer-input" autocomplete="off" placeholder="Typ je antwoord"></div><button class="success" data-practice-action="submit" type="button" ${disabled ? 'disabled' : ''}>Controleren</button>`;
+    const feedback = errorMessage
+      ? `<div class="feedback error" role="alert">${escapeHtml(errorMessage)}</div>`
+      : '';
+    content.innerHTML = `${feedback}<div class="double-prompt">${escapeHtml(state.item.question || '')}</div><div class="field"><input id="doubleAnswer" class="answer-input" autocomplete="off" placeholder="Typ je antwoord"></div><button class="success" data-practice-action="submit" type="button" ${disabled ? 'disabled' : ''}>Controleren</button>`;
     const input = documentRef.getElementById('doubleAnswer');
     const button = content.querySelector('[data-practice-action="submit"]');
     if (input) input.value = existingAnswer;
@@ -119,7 +119,7 @@ export function createDoubleOrNothingView({ documentRef = globalThis.document, e
     const review = result
       ? `<div class="double-feedback ${result.correct ? 'correct' : 'wrong'}"><div class="double-feedback-title">${result.correct ? '🎉 Goed gedaan!' : '🐶 Oeps!'}</div><div>${escapeHtml(result.feedback || (result.correct ? 'Goed antwoord!' : 'Kijk goed naar het juiste antwoord.'))}</div><div class="double-score-change">${result.delta >= 0 ? `+${result.delta}` : result.delta} 🦴 &nbsp; ${result.previousScore} → ${result.score} 🦴</div></div><div class="practice-correct-answer"><div class="practice-correct-answer-title">Juiste antwoord</div><div class="practice-correct-answer-text">${escapeHtml(result.expectedAnswer)}</div></div>`
       : '';
-    content.innerHTML = `<div class="double-finished">${review}<div class="double-finished-title">${title}</div><div class="double-final-score">${state.score} 🦴</div><p>Je beste score voor deze les is <strong>${state.bestScore} 🏆</strong>.</p><div class="double-finished-actions"><button class="success" data-double-restart type="button">Nog een keer</button><button class="secondary" data-double-back type="button">← Leskeuze</button></div></div>`;
+    content.innerHTML = `<div class="double-finished">${review}<div class="double-finished-title">${title}</div><div class="double-final-score">${state.score} 🦴</div><p>Je beste score voor deze les is <strong>${state.bestScore} 🏆</strong>.</p><div class="double-finished-actions"><button class="success" data-double-restart type="button">Nog een keer</button><button class="secondary" data-double-back type="button">← Spelletjes</button></div></div>`;
     content.querySelector('[data-double-restart]')?.addEventListener('click', onRestart);
     content.querySelector('[data-double-back]')?.addEventListener('click', onBack);
   }

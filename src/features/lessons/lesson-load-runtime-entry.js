@@ -1,7 +1,7 @@
 import { loadLessonsRuntime } from './lesson-load-runtime.js';
 import { createLessonService } from '../../services/lesson-service.js';
 
-const REQUIRED_KEYS = ['db', 'setLessons', 'showMessage', 'showHome'];
+const REQUIRED_KEYS = ['db', 'learningTopics', 'setLessons', 'showMessage', 'showHome'];
 
 function requireRuntime(runtime) {
   if (!runtime || typeof runtime !== 'object') {
@@ -12,14 +12,13 @@ function requireRuntime(runtime) {
       throw new Error(`The lesson-load runtime bridge is missing: ${key}.`);
     }
   }
-  if (!runtime.db) {
-    throw new Error('The lesson-load runtime bridge is missing: db.');
-  }
+  if (!runtime.db) throw new Error('The lesson-load runtime bridge is missing: db.');
+  if (!runtime.learningTopics) throw new Error('The lesson-load runtime bridge is missing: learningTopics.');
 }
 
 export async function executeLoadLessons(runtime) {
   requireRuntime(runtime);
-  const service = createLessonService(runtime.db);
+  const service = createLessonService(runtime.db, { learningTopics: runtime.learningTopics });
   return loadLessonsRuntime({
     listLessons: () => service.listAll(),
     setLessons: runtime.setLessons,
@@ -30,9 +29,7 @@ export async function executeLoadLessons(runtime) {
 
 export function installLessonLoadRuntimeEntry(runtime, target = globalThis) {
   requireRuntime(runtime);
-  if (!target || typeof target !== 'object') {
-    throw new Error('A runtime target is required.');
-  }
+  if (!target || typeof target !== 'object') throw new Error('A runtime target is required.');
   target.loadLessonsRuntime = () => executeLoadLessons(runtime);
   return target.loadLessonsRuntime;
 }

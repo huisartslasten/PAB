@@ -15,10 +15,10 @@ test('lesson save runtime is owned by its canonical bootstrap and entry', async 
   const entry = await readSource('src/features/lessons/lesson-save-runtime-entry.js');
 
   assert.match(bootstrap, /loadRuntimeEntry\(\)/);
-  assert.match(bootstrap, /installLessonSaveRuntimeEntry\(runtime\)/);
+  assert.match(bootstrap, /installLessonSaveRuntimeEntry\(runtime, target\)/);
   assert.match(bootstrap, /target\.pacoGOLessonSaveRuntimeReady = readiness/);
-  assert.match(entry, /export function installLessonSaveRuntimeEntry\(runtime\)/);
-  assert.match(entry, /window\.saveLesson\s*=\s*async function saveLessonRuntimeEntry/);
+  assert.match(entry, /export function installLessonSaveRuntimeEntry\(runtime, target = globalThis\)/);
+  assert.match(entry, /target\.saveLesson\s*=\s*async function saveLessonRuntimeEntry/);
   assert.match(entry, /createLessonWriteService\(app\.lessonService\)/);
   assert.doesNotMatch(bootstrap, /setTimeout/);
   assert.doesNotMatch(bootstrap, /legacySaveLesson/);
@@ -52,7 +52,7 @@ test('runtime entry requires the explicit V4.78 bridge and canonical lesson serv
   assert.doesNotMatch(source, /createLessonWriteService\(app\.db\)/);
   assert.match(source, /createLessonWriteService\(app\.lessonService\)/);
   assert.match(source, /executeLessonSaveRuntimeEntry\(runtime\)/);
-  assert.match(source, /window\.saveLesson\s*=\s*async function saveLessonRuntimeEntry/);
+  assert.match(source, /target\.saveLesson\s*=\s*async function saveLessonRuntimeEntry/);
 });
 
 test('V4.78 monolith no longer contains the legacy saveLesson implementation', async () => {

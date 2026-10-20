@@ -1,7 +1,9 @@
 <!doctype html>
 <html lang="nl">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>PacoGO — Feedback</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — Feedback</title>
   <link rel="stylesheet" href="src/components/page-template.css">
   <link rel="stylesheet" href="src/features/management/management-support.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -9,57 +11,8 @@
 <body>
   <div id="paco-template-mount"></div>
   <script type="module">
-    import { mountPacoPageTemplate } from './src/components/page-template.js';
-    import { createPacoNavigation } from './src/components/page-navigation.js';
-    import { createPacoGOApp } from './src/app/bootstrap.js';
-    import { renderFeedback } from './src/features/management/management-view.js';
-
-    const mount=document.querySelector('#paco-template-mount');
-    const content=document.createElement('div');
-    content.className='management-page';
-    const state=document.createElement('div');
-    state.className='management-state';
-    state.textContent='Feedback laden…';
-    content.appendChild(state);
-    const app=createPacoGOApp({supabaseLib:window.supabase});
-
-    mountPacoPageTemplate({
-      mount,
-      backLabel:'← Beheer',
-      backAction:()=>{window.location.href='management.html';},
-      greeting:'PacoGO beheer ⚙️',
-      title:'Feedback',
-      icon:'💬',
-      subtitle:'Bekijk feedback die vanuit PacoGO is ingediend.',
-      navigation:createPacoNavigation({
-        app,
-        active:'feedback',
-        includeManagementDashboard:true,
-        includeManagement:true,
-        includeManagementTools:true,
-        includeCreator:true
-      }),
-      content
-    });
-
-    const management=app.management;
-    const feedbackList=document.createElement('section');
-    feedbackList.className='management-section';
-
-    async function initialize(){
-      try{
-        const session=await app.initializeSession();
-        if(!session){window.location.href='auth.html';return;}
-        if(!app.auth.isParent){state.textContent='Je hebt geen toegang tot Feedback.';return;}
-        await renderFeedback(feedbackList,management);
-        content.replaceChildren(feedbackList);
-      }catch(error){
-        console.error('Feedback page load error:',error);
-        state.textContent='Feedback kon niet worden geladen.';
-      }
-    }
-
-    initialize();
+    import { startPacoRuntime } from './src/app/runtime.js';
+    await startPacoRuntime({ templateMount: document.querySelector('#paco-template-mount') });
   </script>
 </body>
 </html>

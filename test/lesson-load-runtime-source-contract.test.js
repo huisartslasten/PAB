@@ -7,7 +7,7 @@ const bootstrap = fs.readFileSync(new URL('../src/features/lessons/lesson-load-r
 
 test('canonical lesson-load runtime owns lesson loading outside the legacy page', () => {
   assert.match(entry, /export async function executeLoadLessons\(runtime\)/);
-  assert.match(entry, /createLessonService\(runtime\.db\)/);
+  assert.match(entry, /createLessonService\(runtime\.db, \{ learningTopics: runtime\.learningTopics \}\)/);
   assert.match(entry, /loadLessonsRuntime\(/);
   assert.match(entry, /target\.loadLessonsRuntime/);
   assert.match(bootstrap, /installLessonLoadRuntimeEntry\(runtime, target\)/);

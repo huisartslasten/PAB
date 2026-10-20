@@ -49,7 +49,7 @@ export function createPlayerRuntimeEntry({
   }
 
   async function submitTest(options = {}) {
-    const result = await submitBoundary.submitTest(options);
+    const result = await submitBoundary.submitTest({ ...options, item: runtime.session?.currentItem() });
     if (!result) return null;
     if (result.done) return runtime.finishTest({ finishedAt: clock() });
     renderCurrentTest();

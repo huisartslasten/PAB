@@ -2,9 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { executeLoadLessons, installLessonLoadRuntimeEntry } from '../src/features/lessons/lesson-load-runtime-entry.js';
 
+const learningTopics = { ensureTopic: async () => ({ id: 1 }) };
+
 function runtime(overrides = {}) {
   return {
     db: { from() {} },
+    learningTopics,
     setLessons() {},
     showMessage() {},
     showHome() {},
@@ -22,10 +25,13 @@ test('lesson load entry installs a runtime facade on the target', () => {
 test('lesson load entry rejects a missing bridge key', () => {
   const value = runtime();
   delete value.showHome;
-  assert.throws(
-    () => installLessonLoadRuntimeEntry(value, {}),
-    /The lesson-load runtime bridge is missing: showHome\./
-  );
+  assert.throws(() => installLessonLoadRuntimeEntry(value, {}), /The lesson-load runtime bridge is missing: showHome\./);
+});
+
+test('lesson load entry requires the canonical learning topic service', () => {
+  const value = runtime();
+  delete value.learningTopics;
+  assert.throws(() => installLessonLoadRuntimeEntry(value, {}), /The lesson-load runtime bridge is missing: learningTopics\./);
 });
 
 test('lesson load entry delegates to the lesson service and runtime', async () => {
@@ -52,6 +58,7 @@ test('lesson load entry delegates to the lesson service and runtime', async () =
   const state = { lessons: null, home: 0, messages: [] };
   const result = await executeLoadLessons({
     db,
+    learningTopics,
     setLessons(value) { state.lessons = value; },
     showMessage(...args) { state.messages.push(args); },
     showHome() { state.home += 1; }

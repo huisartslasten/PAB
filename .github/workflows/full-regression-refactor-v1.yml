@@ -1,11 +1,11 @@
-name: PacoGO full regression refactor v1
+name: PacoGO full regression — refactor/professional-v1
+
 on:
   push:
     branches:
       - refactor/professional-v1
   workflow_dispatch:
-permissions:
-  contents: read
+
 jobs:
   agenda-cutover-and-regression:
     runs-on: ubuntu-latest
@@ -19,6 +19,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
       - name: Install dependencies from committed lockfile
         run: npm ci --ignore-scripts
       - name: Verify zero known dependency vulnerabilities
@@ -42,8 +43,11 @@ jobs:
           test -f src/features/lessons/player-runtime-composition.js
           test -f src/features/lessons/player-screen-boundary.js
           test -f src/features/lessons/player-submit-boundary.js
-          grep -q 'src/features/lessons/player-runtime-bootstrap.js' test.html
-          grep -q 'createProfessionalPlayerBridge' test.html
+          test -f src/features/lessons/test-runtime.js
+          grep -q "from './player-runtime-bootstrap.js'" src/features/lessons/test-runtime.js
+          grep -q 'createProfessionalPlayerBridge' src/features/lessons/test-runtime.js
+          ! grep -q 'src/features/lessons/player-runtime-bootstrap.js' test.html
+          ! grep -q 'createProfessionalPlayerBridge' test.html
           ! grep -q 'function renderTest()' index.html
           ! grep -q 'function updateTestProgress()' index.html
           ! grep -q "activity={kind:'test',type" index.html
@@ -63,7 +67,7 @@ jobs:
             ! -name 'refactor-pure-modules.test.js' ! -name 'word-row-model.test.js' | sort)
           node --test $files
       - name: Run maintained Vitest regression
-        run: npx vitest run test/lesson-item-collector-types.test.js test/lesson-part-model.test.js test/lesson-save-flow.test.js test/lesson-save-persistence.test.js
+        run: npx vitest run test/lesson-item-collector-types.test.js test/lesson-part-model.test.js test/lesson-save-flow.test.js test/lesson-save-persistence.test.js src/services/learning-content-service.test.js
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Start local fixture server
@@ -76,5 +80,3 @@ jobs:
           status=$(git status --porcelain)
           printf '%s\n' "$status"
           test -z "$status"
-
-# Final verification run: exercise the committed lockfile on its own branch head.

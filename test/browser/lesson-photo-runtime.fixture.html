@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="nl">
-<head><meta charset="utf-8"><title>PacoGO photo lesson runtime browser fixture</title></head>
+<head><meta charset="utf-8"><title>PAB photo lesson runtime browser fixture</title></head>
 <body>
 <script>
 var currentStudent=null,currentSubject=null,currentLesson=null,lessons=[],__events=[],__lastDbInsert=null,__lastDbDelete=null,__failItemInsert=false,__createdLesson=null;
@@ -12,12 +12,13 @@ var setCurrentLesson=value=>{currentLesson=value;__events.push('lesson:'+(value&
 var showParentDashboard=async()=>__events.push('dashboard');
 var showMessage=(message,type)=>__events.push('message:'+type+':'+message);
 var db={from(table){var state={table,operation:null,filters:[],payload:null};var builder={insert(payload){state.operation='insert';state.payload=payload;if(table==='lessons')return{select(){return{single:async()=>{__createdLesson=Object.assign({id:42},payload);return{data:__createdLesson,error:null}}}}};__lastDbInsert=state;return{select:async()=>({data:__failItemInsert?null:[...payload],error:__failItemInsert?new Error('item insert failed'):null})}},delete(){state.operation='delete';return{eq:async(column,value)=>{state.filters.push([column,value]);__lastDbDelete=state;return{error:null}}}}};return builder}};
+var learningTopics={ensureTopic:async()=>({id:1})};
 </script>
 <script type="module">
   import { createLessonService } from '/src/services/lesson-service.js';
   import { bootstrapLessonPhotoRuntime } from '/src/features/lessons/lesson-photo-runtime-bootstrap.js';
 
-  window.lessonService = createLessonService(window.db);
+  window.lessonService = createLessonService(window.db,{ learningTopics: window.learningTopics });
   window.pacoGOLessonPhotoRuntimeReady = bootstrapLessonPhotoRuntime({
     runtime: {
       requireParent,

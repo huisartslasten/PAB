@@ -3,7 +3,7 @@ import { createPacoDropdown } from '../../components/page-template.js';
 const MEMORY_CARD_BACK_IMAGE = new URL('./paco memory.png', import.meta.url).href;
 
 export function createMemoryView({ documentRef = document, escapeHtml = value => String(value) } = {}) {
-  function render({ state, bestScore = null, timingMode = 'manual', onTimingModeChange, onResolveTurn, onCardSelect, onFinished }) {
+  function render({ state, bestScore = null, timingMode = 'manual', onTimingModeChange, onResolveTurn, onCardSelect, onFinished, onNextRound }) {
     const shell = documentRef.createElement('main');
     shell.className = 'memory-shell';
 
@@ -49,12 +49,27 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
     const stats = documentRef.createElement('div');
     stats.className = 'memory-stats';
     stats.innerHTML = `
+      <span>Ronde: <strong>${state.roundNumber}/${state.totalRounds}</strong></span>
       <span>Beurten: <strong>${state.turnCount}</strong></span>
       <span>Minimaal: <strong>${state.minimumTurns}</strong></span>
       <span>Beste: <strong>${bestScore ?? '—'}</strong></span>
     `;
     controls.appendChild(stats);
     shell.appendChild(controls);
+
+    if (state.phase === 'round-finished') {
+      const finished = documentRef.createElement('div');
+      finished.className = 'memory-finished';
+      finished.innerHTML = `<div class="memory-finished-icon">👏</div><h2>Ronde ${state.roundNumber} klaar!</h2><p>${state.roundPairs} paren gevonden. Klaar voor ronde ${state.roundNumber + 1}?</p>`;
+      const button = documentRef.createElement('button');
+      button.type = 'button';
+      button.className = 'memory-primary-button';
+      button.textContent = `Volgende ronde (${state.roundNumber + 1}/${state.totalRounds})`;
+      button.addEventListener('click', onNextRound);
+      finished.appendChild(button);
+      shell.appendChild(finished);
+      return shell;
+    }
 
     if (state.phase === 'finished') {
       const finished = documentRef.createElement('div');

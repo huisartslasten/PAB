@@ -14,15 +14,8 @@ function normalizeLessonPayload(payload = {}) {
 }
 
 function normalizeParts(parts = null, fallback = '', defaultRole = 'answer') {
-  if (!Array.isArray(parts)) {
-    return String(fallback ?? '').split('\n').map(value => value.trim()).filter(Boolean).map(text => ({ text, role: defaultRole }));
-  }
-  return parts
-    .map(part => ({
-      text: String(typeof part === 'string' ? part : part?.text ?? '').trim(),
-      role: part?.role === 'extra' ? 'extra' : 'answer'
-    }))
-    .filter(part => part.text);
+  if (!Array.isArray(parts)) return String(fallback ?? '').split('\n').map(value => value.trim()).filter(Boolean).map(text => ({ text, role: defaultRole }));
+  return parts.map(part => ({ text: String(typeof part === 'string' ? part : part?.text ?? '').trim(), role: part?.role === 'extra' ? 'extra' : 'answer' })).filter(part => part.text);
 }
 
 function normalizeLessonItems(items = []) {
@@ -30,23 +23,19 @@ function normalizeLessonItems(items = []) {
     const questionParts = normalizeParts(item.question_parts, item.question);
     const answerParts = normalizeParts(item.answer_parts, item.answer);
     const answer = String(item.answer ?? '').trim() || answerParts.filter(part => part.role === 'answer').map(part => part.text).join('\n');
-    const responseType = RESPONSE_TYPES.has(item.response_type) ? item.response_type : 'text';
-    const answerOptions = Array.isArray(item.answer_options) ? item.answer_options.map(option => String(option ?? '').trim()).filter(Boolean) : [];
-    return {
-      question: String(item.question ?? '').trim() || questionParts.map(part => part.text).join('\n'),
-      answer,
-      question_parts: questionParts,
-      answer_parts: answerParts,
-      hint: String(item.hint ?? ''),
-      response_type: responseType,
-      answer_options: answerOptions,
-      sort_order: Number(item.sort_order ?? index)
-    };
+    return { question: String(item.question ?? '').trim() || questionParts.map(part => part.text).join('\n'), answer, question_parts: questionParts, answer_parts: answerParts, hint: String(item.hint ?? ''), response_type: RESPONSE_TYPES.has(item.response_type) ? item.response_type : 'text', answer_options: Array.isArray(item.answer_options) ? item.answer_options.map(option => String(option ?? '').trim()).filter(Boolean) : [], sort_order: Number(item.sort_order ?? index) };
   });
 }
 
-export function createLessonService(db) {
+export function createLessonService(db, { learningTopics = null } = {}) {
   if (!db) throw new Error('A Supabase client is required.');
+  if (!learningTopics) throw new Error('Learning topic service is required.');
+
+  async function topicIdFor(payload) {
+    const topic = await learningTopics.ensureTopic({ student: payload.student, subject: payload.subject, subvak: payload.subvak });
+    return Number(topic.id);
+  }
+
   async function permanentlyDelete(id) {
     const { error: attemptsError } = await db.from('test_attempts').delete().eq('lesson_id', id);
     if (attemptsError) throw attemptsError;
@@ -54,6 +43,7 @@ export function createLessonService(db) {
     if (error) throw error;
     return (data || []).length;
   }
+
   return {
     async listAll() {
       const { data, error } = await db.from('lessons').select('*, lesson_items(*)').order('id', { ascending: true });
@@ -61,7 +51,9 @@ export function createLessonService(db) {
       return (data || []).map(lesson => ({ ...lesson, lesson_items: (lesson.lesson_items || []).sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)) }));
     },
     async createLesson(payload) {
-      const { data, error } = await db.from('lessons').insert(normalizeLessonPayload(payload)).select().single();
+      const normalized = normalizeLessonPayload(payload);
+      const learning_topic_id = await topicIdFor(normalized);
+      const { data, error } = await db.from('lessons').insert({ ...normalized, learning_topic_id }).select().single();
       if (error) throw error;
       return data;
     },
@@ -79,7 +71,9 @@ export function createLessonService(db) {
       }
     },
     async updateLesson(id, payload) {
-      const { data, error } = await db.from('lessons').update(normalizeLessonPayload(payload)).eq('id', id).select().single();
+      const normalized = normalizeLessonPayload(payload);
+      const learning_topic_id = await topicIdFor(normalized);
+      const { data, error } = await db.from('lessons').update({ ...normalized, learning_topic_id }).eq('id', id).select().single();
       if (error) throw error;
       return data;
     },

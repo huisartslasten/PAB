@@ -1,9 +1,8 @@
-const MIN_FONT_SIZE = 12;
-const MAX_FONT_SIZE = 48;
+const FONT_SIZE_OPTIONS = [36, 28, 22, 18, 14];
 
 function escapeHtml(value) { return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;'); }
 function clampWidth(value) { const n = Number(value); return Number.isFinite(n) ? Math.min(100, Math.max(20, Math.round(n))) : 100; }
-function toolbarMarkup() { return `<div class="learning-editor-toolbar" role="toolbar"><button type="button" class="learning-tool-button" data-command="decrease-font">A−</button><button type="button" class="learning-tool-button" data-command="increase-font">A+</button><span class="learning-toolbar-divider"></span><button type="button" class="learning-tool-button" data-command="bold"><strong>B</strong></button><button type="button" class="learning-tool-button" data-command="italic"><em>I</em></button><span class="learning-toolbar-divider"></span><button type="button" class="learning-tool-button" data-command="image">🖼️</button><button type="button" class="learning-tool-button" data-command="image-smaller">▾</button><button type="button" class="learning-tool-button" data-command="image-larger">▴</button></div>`; }
+function toolbarMarkup() { return `<div class="learning-editor-toolbar" role="toolbar"><div class="learning-font-size-choices" role="group" aria-label="Lettergrootte">${FONT_SIZE_OPTIONS.map(size => `<button type="button" class="learning-tool-button learning-font-size-choice" data-command="font-size" data-size="${size}" aria-label="Lettergrootte ${size}px" style="font-size:${size}px;line-height:1">A</button>`).join('')}</div><span class="learning-toolbar-divider"></span><button type="button" class="learning-tool-button" data-command="bold"><strong>B</strong></button><button type="button" class="learning-tool-button" data-command="italic"><em>I</em></button><span class="learning-toolbar-divider"></span><button type="button" class="learning-tool-button" data-command="image">🖼️</button><button type="button" class="learning-tool-button" data-command="image-smaller">▾</button><button type="button" class="learning-tool-button" data-command="image-larger">▴</button></div>`; }
 function cardMarkup(index) { return `<article class="learning-card"><div class="learning-card-header"><div class="learning-card-number">Kaart ${index + 1}</div><button type="button" class="learning-card-remove" data-action="remove-card">✕</button></div>${toolbarMarkup()}<div class="learning-card-body"><input class="learning-card-title" type="text" placeholder="Titel van de kaart (optioneel)"><div class="learning-editor-surface" contenteditable="true" spellcheck="true" data-placeholder="Schrijf hier de leerstof…"></div><input class="learning-image-input" type="file" accept="image/jpeg,image/png,image/webp" hidden><div class="learning-image-help">Sleep een afbeelding naar de plek waar je hem wilt hebben. Je kunt hem daarna opnieuw slepen en groter of kleiner maken.</div></div><div class="learning-card-insert-row"><button type="button" class="question-insert-button" data-action="insert-card-after">➕ Kaart invoegen</button></div></article>`; }
 function renderDocument(model) { return (Array.isArray(model?.elements) ? model.elements : []).map(element => element?.type === 'image' && element.media_id && element.image?.url ? `<img class="learning-inline-image" draggable="true" contenteditable="false" data-media-id="${Number(element.media_id)}" data-width="${clampWidth(element.width)}" src="${escapeHtml(element.image.url)}" alt="${escapeHtml(element.image.original_name || 'Afbeelding')}" style="width:${clampWidth(element.width)}%">` : element?.type === 'text' ? element.html || '' : '').join(''); }
 function createCardElement(documentRef, index, initial = {}) { const wrapper = documentRef.createElement('div'); wrapper.innerHTML = cardMarkup(index); const card = wrapper.firstElementChild; card.dataset.cardId = initial.id ? String(initial.id) : ''; card.querySelector('.learning-card-title').value = initial.title || ''; card.querySelector('.learning-editor-surface').innerHTML = renderDocument(initial.document); return card; }
@@ -13,12 +12,9 @@ function ensureTrailing(root) { const mount = root.querySelector('[data-cards]')
 function selectionIsInside(surface, range) { return Boolean(range && surface.contains(range.commonAncestorContainer)); }
 function rememberSelection(surface) { const selection = surface.ownerDocument.getSelection?.(); if (!selection?.rangeCount) return null; const range = selection.getRangeAt(0).cloneRange(); if (!selectionIsInside(surface, range)) return null; surface.__learningSelection = range; return range; }
 function restoreSelection(surface, selectionBySurface) { const saved = selectionBySurface.get(surface) || surface.__learningSelection; if (!saved || !selectionIsInside(surface, saved)) return null; const selection = surface.ownerDocument.getSelection?.(); if (!selection) return null; selection.removeAllRanges(); selection.addRange(saved.cloneRange()); return saved.cloneRange(); }
-function adjustFont(surface, delta, selectionBySurface) {
+function applyFontSize(surface, size, selectionBySurface) {
   const range = restoreSelection(surface, selectionBySurface);
-  if (!range || range.collapsed) return;
-  const parent = range.startContainer.nodeType === 1 ? range.startContainer : range.startContainer.parentElement;
-  const current = Number.parseInt(surface.ownerDocument.defaultView?.getComputedStyle(parent || surface).fontSize || '20', 10);
-  const size = Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, (Number.isFinite(current) ? current : 20) + delta));
+  if (!range || range.collapsed) return false;
   const span = surface.ownerDocument.createElement('span');
   span.className = 'learning-inline-size';
   span.style.fontSize = `${size}px`;
@@ -32,6 +28,7 @@ function adjustFont(surface, delta, selectionBySurface) {
   const selection = surface.ownerDocument.getSelection?.();
   if (selection) { selection.removeAllRanges(); selection.addRange(next.cloneRange()); }
   surface.focus();
+  return true;
 }
 function pointRange(surface, x, y) { const doc = surface.ownerDocument; if (typeof x === 'number' && typeof y === 'number' && typeof doc.caretRangeFromPoint === 'function') return doc.caretRangeFromPoint(x, y); if (typeof x === 'number' && typeof y === 'number' && typeof doc.caretPositionFromPoint === 'function') { const p = doc.caretPositionFromPoint(x, y); if (!p) return null; const range = doc.createRange(); range.setStart(p.offsetNode, p.offset); range.collapse(true); return range; } return null; }
 function placeNode(surface, node, range) { if (!range || !surface.contains(range.commonAncestorContainer)) { surface.append(node, surface.ownerDocument.createTextNode(' ')); return; } range.deleteContents(); range.insertNode(node); node.after(surface.ownerDocument.createTextNode(' ')); }
@@ -64,7 +61,16 @@ export function createLearningMaterialEditorPage({ root, topic, cards = [], stud
       const surface = card?.querySelector('.learning-editor-surface');
       if (!surface) return;
       const name = command.dataset.command;
-      if (name === 'image') {
+      if (name === 'font-size') {
+        const size = Number(command.dataset.size);
+        if (Number.isFinite(size)) {
+          const applied = applyFontSize(surface, size, selectionBySurface);
+          const toolbar = command.closest('.learning-editor-toolbar');
+          toolbar?.querySelectorAll('.learning-font-size-choice').forEach(item => item.classList.remove('is-active'));
+          command.classList.add('is-active');
+          if (!applied) surface.focus();
+        }
+      } else if (name === 'image') {
         const input = card.querySelector('.learning-image-input');
         if (input) { if (typeof input.showPicker === 'function') input.showPicker(); else input.click(); }
       } else if (name === 'image-smaller' || name === 'image-larger') {
@@ -75,7 +81,7 @@ export function createLearningMaterialEditorPage({ root, topic, cards = [], stud
         const saved = selectionBySurface.get(surface);
         if (saved) { const selection = surface.ownerDocument.getSelection(); selection.removeAllRanges(); selection.addRange(saved.cloneRange()); }
         surface.ownerDocument.execCommand(name, false);
-      } else adjustFont(surface, name === 'increase-font' ? 2 : -2, selectionBySurface);
+      }
       return;
     }
     const action = event.target.closest('[data-action]')?.dataset.action;

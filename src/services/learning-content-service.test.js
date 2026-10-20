@@ -13,7 +13,7 @@ describe('learning content service', () => {
     const cards = await service.listForTopic(10);
     expect(cards[0].document.version).toBe(3);
     expect(cards[0].document.elements[0].size).toEqual({ width: 70, unit: 'percent' });
-    expect(cards[0].document.elements[0].placement).toEqual({ mode: 'flow', x: 0, y: 0, wrap: 'square' });
+    expect(cards[0].document.elements[0].placement).toEqual({ mode: 'flow', x: 30, y: 0, wrap: 'square' });
     expect(cards[0].document.elements[0].image.url).toBe('/signed/asia.jpg');
     expect(media.getByIds).toHaveBeenCalledWith([7]);
   });

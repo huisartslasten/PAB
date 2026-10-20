@@ -18,7 +18,7 @@ test('dashboard start page is a standalone student chooser', async ({ page }) =>
   await expect(page.locator('.paco-template-version-badge')).toHaveText(expectedVersionBadge);
   await expect(page.locator('.paco-template-main h1')).toHaveText('Dashboard');
   await expect(page.getByRole('button', { name: '← Start' })).toBeVisible();
-  await expect(page.getByRole('button', { name: /📚 Mijn lessen/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /📚 Mijn vakken/ })).toBeVisible();
   await expect(page.getByRole('button', { name: /⚙️ Beheer/ })).toBeVisible();
 
   await page.getByRole('button', { name: /⚙️ Beheer/ }).click();

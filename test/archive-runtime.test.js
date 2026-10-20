@@ -20,8 +20,8 @@ test('archive route uses the canonical management runtime and styles', () => {
   assert.match(routeRegistry, /routes\['archive\.html'\][\s\S]*?src\/features\/management\/management-support\.css/);
 });
 
-test('management dashboard navigates to archive through the shared router', () => {
-  assert.match(managementRuntime, /createAction\('🗂️ Archief \/ Prullenbak',[\s\S]*?'archive\.html', \{ requiresStudent: false \}\)/);
+test('management dashboard does not duplicate archive navigation', () => {
+  assert.doesNotMatch(managementRuntime, /createAction\('🗂️ Archief \/ Prullenbak'/);
   assert.doesNotMatch(archiveRuntime, /window\.location\.href\s*=\s*['"]management\.html/);
 });
 

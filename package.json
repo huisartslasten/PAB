@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "test:vitest": "vitest run"
+    "test:vitest": "vitest run vitest"
   },
   "devDependencies": {
     "@playwright/test": "^1.55.0",

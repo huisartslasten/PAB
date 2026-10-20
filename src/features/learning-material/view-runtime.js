@@ -16,28 +16,43 @@ function clampWidth(value) {
   return Number.isFinite(n) ? Math.min(100, Math.max(20, Math.round(n))) : 100;
 }
 
-function clampOffset(value) {
+function clampX(value, width) {
+  const safeWidth = clampWidth(width);
+  const max = Math.max(0, 100 - safeWidth);
   const n = Number(value);
-  return Number.isFinite(n) ? Math.min(45, Math.max(0, Math.round(n))) : 0;
+  return Number.isFinite(n) ? Math.min(max, Math.max(0, Math.round(n))) : Math.round(max / 2);
 }
 
-function normalizePlacement(value) {
-  const side = value?.side === 'left' || value?.side === 'right' ? value.side : 'inline';
-  return { side, offset: side === 'inline' ? 0 : clampOffset(value?.offset) };
+function clampY(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? Math.min(10000, Math.max(-10000, Math.round(n))) : 0;
+}
+
+function normalizePlacement(value, width) {
+  const source = value && typeof value === 'object' ? value : {};
+  return {
+    mode: 'flow',
+    x: clampX(source.x, width),
+    y: clampY(source.y),
+    wrap: source.wrap === 'none' ? 'none' : 'square'
+  };
+}
+
+function imageStyle(placement, width) {
+  const safeWidth = clampWidth(width);
+  const normalized = normalizePlacement(placement, safeWidth);
+  if (normalized.wrap === 'none') {
+    return `width:${safeWidth}%;margin-left:${normalized.x}%;margin-top:${normalized.y}px;`;
+  }
+  return `width:${safeWidth}%;margin-left:${normalized.x}%;margin-top:${normalized.y}px;`;
 }
 
 function renderDocument(model) {
   return (Array.isArray(model?.elements) ? model.elements : []).map(element => {
     if (element?.type === 'image' && element.media_id && element.image?.url) {
-      const width = clampWidth(element.width);
-      const placement = normalizePlacement(element.placement);
-      const className = `learning-view-image learning-view-image-${placement.side}`;
-      const margin = placement.side === 'left'
-        ? `margin-right:${Math.min(placement.offset, Math.max(0, 100 - width))}%;`
-        : placement.side === 'right'
-          ? `margin-left:${Math.min(placement.offset, Math.max(0, 100 - width))}%;`
-          : '';
-      return `<img class="${className}" src="${escapeHtml(element.image.url)}" alt="${escapeHtml(element.image.original_name || 'Afbeelding')}" style="width:${width}%;${margin}">`;
+      const width = clampWidth(element.size?.width ?? element.width);
+      const placement = normalizePlacement(element.placement, width);
+      return `<img class="learning-view-image learning-view-image-${placement.wrap}" src="${escapeHtml(element.image.url)}" alt="${escapeHtml(element.image.original_name || 'Afbeelding')}" style="${imageStyle(placement, width)}">`;
     }
     return element?.type === 'text' ? element.html || '' : '';
   }).join('');

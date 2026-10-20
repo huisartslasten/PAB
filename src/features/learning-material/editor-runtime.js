@@ -1,6 +1,6 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
-import { buildViewUrl } from '../../core/view-context.js';
+import { buildViewUrl, getViewContext } from '../../core/view-context.js';
 import { listStudents } from '../students/students.js';
 import { createLearningMaterialEditorPage } from './editor-page.js';
 
@@ -16,8 +16,9 @@ export function createLearningMaterialEditorRuntime({ app, templateMount, contex
   if (!app || !templateMount || typeof navigate !== 'function') throw new TypeError('Learning material editor requires app, template mount and navigation.');
   const content = documentRef.createElement('div');
   content.className = 'lesson-learning-editor-page';
-  const initialStudent = context.student || '';
-  const viewMode = context.mode || 'management';
+  const currentView = getViewContext();
+  const initialStudent = context.student || currentView.student || '';
+  const viewMode = context.mode || currentView.mode || 'management';
   const goManagement = () => navigate(buildViewUrl('management.html', { student: initialStudent, mode: 'management' }));
 
   mountPacoPageTemplate({

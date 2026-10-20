@@ -112,6 +112,15 @@ export function createPacoNavigation({
     });
   }
 
+  if (includePractice && !isManagementView) {
+    items.push({
+      key: 'practice',
+      icon: '📝',
+      label: 'Oefenen',
+      onClick: () => go(navigate, 'oefenen.html', view)
+    });
+  }
+
   if (showAgenda) {
     items.push({
       key: 'agenda',

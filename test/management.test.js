@@ -40,6 +40,17 @@ function makeLessonOrder() {
   };
 }
 
+function makeLearningTopics() {
+  return {
+    async listRecovery() { return []; },
+    async archive() {},
+    async moveToTrash() {},
+    async restore() {},
+    async permanentlyDelete() {},
+    async emptyTrash() {}
+  };
+}
+
 function makeLoadLessons(service) {
   return async () => {
     const lessons = await service.listAll();
@@ -55,6 +66,7 @@ function createManagementForTest(service = makeService(), overrides = {}) {
     feedbackService: makeFeedbackService(),
     lessonOrder: makeLessonOrder(),
     loadLessons: makeLoadLessons(service),
+    learningTopics: makeLearningTopics(),
     ...overrides
   });
 }
@@ -120,7 +132,8 @@ test('management owns parent feedback operations', async () => {
     lessonService: makeService(),
     feedbackService,
     lessonOrder: makeLessonOrder(),
-    loadLessons: async () => []
+    loadLessons: async () => [],
+    learningTopics: makeLearningTopics()
   });
 
   assert.deepEqual(await management.listFeedback(), [{ id: 1, subject: 'Idee', status: 'new' }]);
@@ -158,7 +171,7 @@ test('management requires a management context and parent session', async () => 
   const management = createManagementForTest(service);
   await management.loadLessons().catch(error => assert.match(error.message, /student must be selected/));
 
-  const nonParent = createManagement({ auth: { isParent: false }, lessonService: service, feedbackService: makeFeedbackService(), lessonOrder: makeLessonOrder(), loadLessons: makeLoadLessons(service) });
+  const nonParent = createManagement({ auth: { isParent: false }, lessonService: service, feedbackService: makeFeedbackService(), lessonOrder: makeLessonOrder(), loadLessons: makeLoadLessons(service), learningTopics: makeLearningTopics() });
   await assert.rejects(() => nonParent.loadLessons(), /parent session/);
   await assert.rejects(() => nonParent.listFeedback(), /parent session/);
   assert.deepEqual(service.calls, []);

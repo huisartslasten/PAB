@@ -6,6 +6,8 @@ function normalizeTopicPayload(payload = {}) {
   };
 }
 
+const TOPIC_SELECT = 'id,student,subject,subvak,created_at,archived,deleted';
+
 export function createLearningTopicService(db, { canManage = () => false } = {}) {
   if (!db) throw new Error('A Supabase client is required.');
 
@@ -13,14 +15,14 @@ export function createLearningTopicService(db, { canManage = () => false } = {})
     if (!canManage()) throw new Error('Log eerst in als ouder.');
     const topic = normalizeTopicPayload(payload);
     if (!topic.student || !topic.subject) throw new Error('Een leerling en vak zijn verplicht.');
-    const result = await db.from('learning_topics').upsert(topic, { onConflict: 'student,subject,subvak' }).select('id,student,subject,subvak,created_at').single();
+    const result = await db.from('learning_topics').upsert(topic, { onConflict: 'student,subject,subvak' }).select(TOPIC_SELECT).single();
     if (result.error) throw result.error;
     return result.data;
   }
 
   async function getById(id) {
     if (!id) return null;
-    const result = await db.from('learning_topics').select('id,student,subject,subvak,created_at').eq('id', Number(id)).maybeSingle();
+    const result = await db.from('learning_topics').select(TOPIC_SELECT).eq('id', Number(id)).maybeSingle();
     if (result.error) throw result.error;
     return result.data || null;
   }
@@ -28,7 +30,7 @@ export function createLearningTopicService(db, { canManage = () => false } = {})
   async function getByContext(payload) {
     const topic = normalizeTopicPayload(payload);
     if (!topic.student || !topic.subject) return null;
-    const result = await db.from('learning_topics').select('id,student,subject,subvak,created_at')
+    const result = await db.from('learning_topics').select(TOPIC_SELECT)
       .eq('student', topic.student).eq('subject', topic.subject).eq('subvak', topic.subvak).maybeSingle();
     if (result.error) throw result.error;
     return result.data || null;
@@ -36,11 +38,57 @@ export function createLearningTopicService(db, { canManage = () => false } = {})
 
   async function listForStudent(student) {
     if (!student) return [];
-    const result = await db.from('learning_topics').select('id,student,subject,subvak,created_at')
-      .eq('student', String(student)).order('subject').order('subvak').order('id');
+    const result = await db.from('learning_topics').select(TOPIC_SELECT)
+      .eq('student', String(student)).eq('archived', false).eq('deleted', false)
+      .order('subject').order('subvak').order('id');
     if (result.error) throw result.error;
     return result.data || [];
   }
 
-  return Object.freeze({ normalizeTopicPayload, ensureTopic, getById, getByContext, listForStudent });
+  async function listRecovery(mode) {
+    if (!canManage()) throw new Error('Log eerst in als ouder.');
+    const query = db.from('learning_topics').select(TOPIC_SELECT);
+    const result = mode === 'archive'
+      ? await query.eq('archived', true).eq('deleted', false).order('student').order('subject').order('subvak').order('id')
+      : mode === 'trash'
+        ? await query.eq('deleted', true).order('student').order('subject').order('subvak').order('id')
+        : null;
+    if (!result) throw new Error('Unknown recovery mode.');
+    if (result.error) throw result.error;
+    return result.data || [];
+  }
+
+  async function archive(id) {
+    if (!canManage()) throw new Error('Log eerst in als ouder.');
+    const result = await db.from('learning_topics').update({ archived: true, deleted: false }).eq('id', Number(id));
+    if (result.error) throw result.error;
+  }
+
+  async function moveToTrash(id) {
+    if (!canManage()) throw new Error('Log eerst in als ouder.');
+    const result = await db.from('learning_topics').update({ deleted: true, archived: false }).eq('id', Number(id));
+    if (result.error) throw result.error;
+  }
+
+  async function restore(id) {
+    if (!canManage()) throw new Error('Log eerst in als ouder.');
+    const result = await db.from('learning_topics').update({ archived: false, deleted: false }).eq('id', Number(id));
+    if (result.error) throw result.error;
+  }
+
+  async function permanentlyDelete(id) {
+    if (!canManage()) throw new Error('Log eerst in als ouder.');
+    const result = await db.from('learning_topics').delete().eq('id', Number(id)).select('id');
+    if (result.error) throw result.error;
+    return (result.data || []).length;
+  }
+
+  async function emptyTrash() {
+    if (!canManage()) throw new Error('Log eerst in als ouder.');
+    const result = await db.from('learning_topics').delete().eq('deleted', true).select('id');
+    if (result.error) throw result.error;
+    return (result.data || []).length;
+  }
+
+  return Object.freeze({ normalizeTopicPayload, ensureTopic, getById, getByContext, listForStudent, listRecovery, archive, moveToTrash, restore, permanentlyDelete, emptyTrash });
 }

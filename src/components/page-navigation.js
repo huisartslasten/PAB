@@ -66,7 +66,7 @@ export function createPacoNavigation({
   const view = { student, mode: viewMode };
   const isManagementView = viewMode === 'management';
   const showManagementLearnerBar = !isManagementView && includeManagementStudentSelector;
-  const showManagementDashboard = isManagementView || includeManagementDashboard;
+  const showManagementDashboard = !isManagementView && includeManagementDashboard;
   const showManagementTools = isManagementView || includeManagementTools;
   const showCreator = isManagementView || includeCreator;
   const learners = managementStudents.length ? managementStudents : listStudents();
@@ -126,13 +126,31 @@ export function createPacoNavigation({
     });
   }
 
-  if (!showManagementDashboard) {
-    items.push({
-      key: 'dashboard',
+  items.push({
+    key: 'dashboard',
+    icon: '🏠',
+    label: 'Dashboard',
+    onClick: () => go(navigate, isManagementView ? 'management.html' : 'dashboard.html', view),
+    active: isManagementView ? active === 'dashboard' : active === 'dashboard'
+  });
+
+  if (showManagementDashboard) {
+    items[items.length - 1] = {
+      key: 'management-dashboard',
       icon: '🏠',
       label: 'Dashboard',
-      onClick: () => go(navigate, isManagementView ? 'management.html' : 'dashboard.html', view)
-    });
+      onClick: () => go(navigate, 'management.html', view),
+      active: active === 'management-dashboard',
+      submenu: includeManagementDashboardStudentSubmenu ? learners.map(name => ({
+        key: `management-student-${name}`,
+        label: name,
+        active: name === student,
+        onClick: () => {
+          if (typeof onSelectManagementStudent === 'function') onSelectManagementStudent(name);
+          else go(navigate, 'management.html', { student: name, mode: 'management' });
+        }
+      })) : []
+    };
   }
 
   if (includeLessons) {

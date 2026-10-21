@@ -1,5 +1,5 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
-import { createPacoManagementNavigation } from '../../components/page-navigation.js';
+import { createPacoNavigation } from '../../components/page-navigation.js';
 import { createTestHistoryRenderer } from './test-history-renderer.js';
 import { escapeHtml } from '../../core/html.js';
 import { buildViewUrl } from '../../core/view-context.js';
@@ -50,9 +50,9 @@ export function createTestHistoryRuntime({
       mountPacoPageTemplate({
         mount: templateMount,
         backLabel: '← Dashboard',
-        backAction: () => navigate(buildViewUrl('management.html', {
+        backAction: () => navigate(buildViewUrl(context.mode === 'management' ? 'management.html' : 'dashboard.html', {
           student: requestedStudent,
-          mode: 'management'
+          mode: context.mode
         })),
         greeting: 'PacoGO beheer ⚙️',
         title: 'Toetsgeschiedenis',
@@ -60,10 +60,11 @@ export function createTestHistoryRuntime({
         subtitle: requestedStudent
           ? `Bekijk de gemaakte toetsen van ${requestedStudent}.`
           : 'Bekijk de gemaakte toetsen van alle leerlingen.',
-        navigation: createPacoManagementNavigation({
+        navigation: createPacoNavigation({
           app,
           active: 'test-history',
           student: requestedStudent,
+          viewMode: context.mode,
           navigate
         }),
         content

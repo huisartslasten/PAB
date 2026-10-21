@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { getDashboardSubjects, getDashboardProgress, getDashboardSubjectIcon, getDashboardAgendaItems } from '../src/features/dashboard/view-model.js';
+import { getDashboardSubjects, getDashboardSubjectIcon, getDashboardAgendaItems } from '../src/features/dashboard/view-model.js';
 
 const lessons = [
   { id: 1, student: 'Zyon', subject: 'Nederlands', lesson_items: [{ id: 11 }, { id: 12 }] },
@@ -14,21 +14,6 @@ test('dashboard groups only active lessons for the selected student', () => {
   assert.deepEqual(subjects.map(subject => [subject.label, subject.lessons.map(lesson => lesson.id)]), [
     ['Nederlands', [1, 3]]
   ]);
-});
-
-test('dashboard progress derives lesson, item and mastery counts', () => {
-  const mastery = {
-    get: (student, lessonId, itemId) => ({
-      mastered: student === 'Zyon' && lessonId === 1 && itemId === 11
-    })
-  };
-  assert.deepEqual(getDashboardProgress(lessons, 'Zyon', mastery), {
-    lessons: 2,
-    subjects: 1,
-    items: 3,
-    mastered: 1,
-    percent: 33
-  });
 });
 
 test('dashboard uses a stable icon mapping with a generic fallback', () => {

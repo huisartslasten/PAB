@@ -8,7 +8,7 @@ function normalizeTopicPayload(payload = {}) {
 
 const TOPIC_SELECT = 'id,student,subject,subvak,created_at,archived,deleted';
 
-export function createLearningTopicService(db, { canManage = () => false } = {}) {
+export function createLearningTopicService(db, { canManage = () => false, media = null } = {}) {
   if (!db) throw new Error('A Supabase client is required.');
 
   async function ensureTopic(payload) {
@@ -78,6 +78,7 @@ export function createLearningTopicService(db, { canManage = () => false } = {})
 
   async function permanentlyDelete(id) {
     if (!canManage()) throw new Error('Log eerst in als ouder.');
+    if (media) await media.removeForTopic(id);
     const result = await db.from('learning_topics').delete().eq('id', Number(id)).select('id');
     if (result.error) throw result.error;
     return (result.data || []).length;
@@ -85,9 +86,10 @@ export function createLearningTopicService(db, { canManage = () => false } = {})
 
   async function emptyTrash() {
     if (!canManage()) throw new Error('Log eerst in als ouder.');
-    const result = await db.from('learning_topics').delete().eq('deleted', true).select('id');
-    if (result.error) throw result.error;
-    return (result.data || []).length;
+    const topics = await listRecovery('trash');
+    let deletedCount = 0;
+    for (const topic of topics) deletedCount += await permanentlyDelete(topic.id);
+    return deletedCount;
   }
 
   return Object.freeze({ normalizeTopicPayload, ensureTopic, getById, getByContext, listForStudent, listRecovery, archive, moveToTrash, restore, permanentlyDelete, emptyTrash });

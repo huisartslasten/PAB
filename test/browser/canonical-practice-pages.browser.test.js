@@ -25,7 +25,7 @@ test('lessons uses the canonical shell', async ({ page }) => {
 test('lessons dashboard navigation targets the canonical dashboard', async ({ page }) => {
   await page.goto(`${baseUrl}/lessons.html?student=Zyon`);
   await page.locator('.paco-template-nav-item').filter({ hasText: 'Dashboard' }).click();
-  await expect(page).toHaveURL(/\/dashboard\.html\?viewStudent=Zyon$/);
+  await expect(page).toHaveURL(/\/dashboard\.html\?viewStudent=Zyon&mode=student$/);
   await expect(page.locator('.paco-template-main h1')).toHaveText('Dashboard');
 });
 

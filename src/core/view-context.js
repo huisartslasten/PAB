@@ -40,6 +40,9 @@ export function getViewContext() {
 export function buildViewUrl(path, { student = '', mode = VIEW_MODES.STUDENT } = {}) {
   const target = new URL(path, window.location.href);
   if (student) target.searchParams.set('viewStudent', student);
-  if (mode === VIEW_MODES.MANAGEMENT) target.searchParams.set('mode', VIEW_MODES.MANAGEMENT);
+  else target.searchParams.delete('viewStudent');
+  target.searchParams.delete('student');
+  target.searchParams.delete('context');
+  target.searchParams.set('mode', mode === VIEW_MODES.MANAGEMENT ? VIEW_MODES.MANAGEMENT : VIEW_MODES.STUDENT);
   return target;
 }

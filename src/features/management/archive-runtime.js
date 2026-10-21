@@ -1,7 +1,6 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
 import { confirmPacoAction } from '../../components/confirm-dialog.js';
-import { buildViewUrl } from '../../core/view-context.js';
 import { renderRecovery, renderLearningTopicRecovery } from './management-view.js';
 
 export function createArchiveRuntime({
@@ -151,8 +150,6 @@ export function createArchiveRuntime({
     if (!app.auth.isParent) {
       mountPacoPageTemplate({
         mount: templateMount,
-        backLabel: '← Beheer',
-        backAction: () => navigate(buildViewUrl('management.html')),
         greeting: 'PacoGO beheer ⚙️',
         title: 'Archief / Prullenbak',
         icon: '🗂️',
@@ -171,8 +168,6 @@ export function createArchiveRuntime({
 
     mountPacoPageTemplate({
       mount: templateMount,
-      backLabel: '← Beheer',
-      backAction: () => navigate(buildViewUrl('management.html')),
       greeting: 'PAB beheer ⚙️',
       title: 'Archief / Prullenbak',
       icon: '🗂️',

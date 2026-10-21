@@ -17,6 +17,7 @@ export function createTestHistoryRuntime({
   if (typeof navigate !== 'function') throw new TypeError('Test-history runtime requires central navigation.');
 
   const requestedStudent = context.student;
+  const isManagementView = context.mode === 'management';
   const content = documentRef.createElement('div');
   content.className = 'history-shell';
   content.innerHTML = '<div id="testHistoryContent" class="history-content"><div class="history-loading">Toetsgeschiedenis laden…</div></div>';
@@ -50,11 +51,11 @@ export function createTestHistoryRuntime({
       mountPacoPageTemplate({
         mount: templateMount,
         backLabel: '← Dashboard',
-        backAction: () => navigate(buildViewUrl(context.mode === 'management' ? 'management.html' : 'dashboard.html', {
+        backAction: () => navigate(buildViewUrl(isManagementView ? 'management.html' : 'dashboard.html', {
           student: requestedStudent,
           mode: context.mode
         })),
-        greeting: 'PacoGO beheer ⚙️',
+        greeting: isManagementView ? 'PacoGO beheer ⚙️' : `Hoi ${requestedStudent}! 🐶`,
         title: 'Toetsgeschiedenis',
         icon: '📝',
         subtitle: requestedStudent
@@ -72,7 +73,7 @@ export function createTestHistoryRuntime({
 
       try {
         const session = await app.initializeSession();
-        if (!session || !app.auth.isParent) {
+        if (isManagementView && (!session || !app.auth.isParent)) {
           historyContent.innerHTML = '<div class="history-error"><strong>Geen toegang.</strong><p class="small">Toetsgeschiedenis is alleen beschikbaar voor beheerders.</p></div>';
           return;
         }

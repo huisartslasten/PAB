@@ -23,7 +23,6 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
   let currentTopics = [];
 
   const buildLessonsUrl = () => buildViewUrl('lessons.html', { student: selectedStudent, mode: context?.mode });
-  const goHome = () => navigate(buildViewUrl('dashboard.html', { student: selectedStudent, mode: context?.mode }));
   const goLessons = () => navigate(buildLessonsUrl());
   function showActionNotice(message) { actionState.textContent = message; actionState.hidden = false; }
   function lessonTarget(lesson) {
@@ -189,7 +188,7 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
   }
 
   async function mount() {
-    mountPacoPageTemplate({ mount: templateMount, backLabel: '← Dashboard', backAction: goHome, greeting: `Hoi ${selectedStudent}! 🐶`, title: 'Mijn vakken', icon: '📚', subtitle: context?.isManagement ? 'Beheerweergave — je kunt hier vakken en de bijbehorende lessen beheren.' : 'Kies eerst een vak en open daarna het onderwerp of de les die je wilt doen.', navigation: createPacoNavigation({ app, active: 'lessons', student: selectedStudent, viewMode: context?.mode, includeManagement: true, navigate }), content });
+    mountPacoPageTemplate({ mount: templateMount, greeting: `Hoi ${selectedStudent}! 🐶`, title: 'Mijn vakken', icon: '📚', subtitle: context?.isManagement ? 'Beheerweergave — je kunt hier vakken en de bijbehorende lessen beheren.' : 'Kies eerst een vak en open daarna het onderwerp of de les die je wilt doen.', navigation: createPacoNavigation({ app, active: 'lessons', student: selectedStudent, viewMode: context?.mode, includeManagement: true, navigate }), content });
     content.appendChild(state);
     try {
       if (!selectedStudent) throw new Error('Geen leerling geselecteerd.');
@@ -204,5 +203,5 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
     }
   }
 
-  return Object.freeze({ mount, render, content, getRecords: () => currentRecords, goHome, goLessons });
+  return Object.freeze({ mount, render, content, getRecords: () => currentRecords, goLessons });
 }

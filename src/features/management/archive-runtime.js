@@ -1,8 +1,7 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
 import { confirmPacoAction } from '../../components/confirm-dialog.js';
-import { buildViewUrl } from '../../core/view-context.js';
-import { renderRecovery } from './management-view.js';
+import { renderRecovery, renderLearningTopicRecovery } from './management-view.js';
 
 export function createArchiveRuntime({
   app,
@@ -41,6 +40,20 @@ export function createArchiveRuntime({
   trashHeading.textContent = 'Prullenbak';
   const trashList = documentRef.createElement('div');
   trash.append(trashHeading, trashList);
+
+  const learningArchive = documentRef.createElement('section');
+  learningArchive.className = 'management-section';
+  const learningArchiveHeading = documentRef.createElement('h2');
+  learningArchiveHeading.textContent = 'Leerstof — Archief';
+  const learningArchiveList = documentRef.createElement('div');
+  learningArchive.append(learningArchiveHeading, learningArchiveList);
+
+  const learningTrash = documentRef.createElement('section');
+  learningTrash.className = 'management-section';
+  const learningTrashHeading = documentRef.createElement('h2');
+  learningTrashHeading.textContent = 'Leerstof — Prullenbak';
+  const learningTrashList = documentRef.createElement('div');
+  learningTrash.append(learningTrashHeading, learningTrashList);
 
   const management = app.management;
 
@@ -85,11 +98,46 @@ export function createArchiveRuntime({
     await refreshRecovery();
   }
 
+  async function handleLearningRestore(topic) {
+    showNotice(`“${topic.subject}” is hersteld en staat weer bij de actieve leerstof van ${topic.student}.`);
+    await refreshRecovery();
+  }
+
+  async function permanentlyDeleteLearningTopic(topic) {
+    const confirmed = await confirmPacoAction({
+      title: 'Leerstof definitief verwijderen?',
+      message: `“${topic.subject}${topic.subvak ? ` · ${topic.subvak}` : ''}” wordt definitief verwijderd, inclusief de onderliggende leerstofkaarten. Dit kan niet ongedaan worden gemaakt.`,
+      confirmLabel: 'Definitief verwijderen',
+      cancelLabel: 'Annuleren'
+    });
+    if (!confirmed) return;
+    await management.permanentlyDeleteLearningTopic(topic.id);
+    showNotice(`“${topic.subject}” is definitief verwijderd.`);
+    await refreshRecovery();
+  }
+
+  async function emptyLearningTrash() {
+    const confirmed = await confirmPacoAction({
+      title: 'Leerstof-prullenbak definitief leegmaken?',
+      message: 'Alle leerstofonderwerpen in de prullenbak worden definitief verwijderd, inclusief de onderliggende leerstofkaarten. Dit kan niet ongedaan worden gemaakt.',
+      confirmLabel: 'Definitief verwijderen',
+      cancelLabel: 'Annuleren'
+    });
+    if (!confirmed) return;
+    await management.emptyLearningTopicTrash();
+    showNotice('De leerstof-prullenbak is leeggemaakt.');
+    await refreshRecovery();
+  }
+
   async function refreshRecovery() {
     archiveList.replaceChildren();
     trashList.replaceChildren();
+    learningArchiveList.replaceChildren();
+    learningTrashList.replaceChildren();
     renderRecovery(archiveList, management, 'archive', handleRestore, undefined, undefined, handleRecoveryError);
     renderRecovery(trashList, management, 'trash', handleRestore, emptyTrash, permanentlyDeleteLesson, handleRecoveryError);
+    await renderLearningTopicRecovery(learningArchiveList, management, 'archive', handleLearningRestore, undefined, undefined, handleRecoveryError);
+    await renderLearningTopicRecovery(learningTrashList, management, 'trash', handleLearningRestore, emptyLearningTrash, permanentlyDeleteLearningTopic, handleRecoveryError);
   }
 
   async function mount() {
@@ -102,8 +150,6 @@ export function createArchiveRuntime({
     if (!app.auth.isParent) {
       mountPacoPageTemplate({
         mount: templateMount,
-        backLabel: '← Beheer',
-        backAction: () => navigate(buildViewUrl('management.html')),
         greeting: 'PacoGO beheer ⚙️',
         title: 'Archief / Prullenbak',
         icon: '🗂️',
@@ -122,12 +168,10 @@ export function createArchiveRuntime({
 
     mountPacoPageTemplate({
       mount: templateMount,
-      backLabel: '← Beheer',
-      backAction: () => navigate(buildViewUrl('management.html')),
-      greeting: 'PacoGO beheer ⚙️',
+      greeting: 'PAB beheer ⚙️',
       title: 'Archief / Prullenbak',
       icon: '🗂️',
-      subtitle: 'Herstel gearchiveerde lessen of verwijder lessen definitief uit de prullenbak.',
+      subtitle: 'Herstel of verwijder lessen en leerstofonderwerpen.',
       navigation: createPacoNavigation({
         app,
         active: 'recovery',
@@ -140,7 +184,7 @@ export function createArchiveRuntime({
     try {
       await management.loadRecoveryLessons();
       await refreshRecovery();
-      content.replaceChildren(notice, archive, trash);
+      content.replaceChildren(notice, archive, trash, learningArchive, learningTrash);
     } catch (error) {
       console.error('Archive page load error:', error);
       state.textContent = 'Archief / Prullenbak kon niet worden geladen.';

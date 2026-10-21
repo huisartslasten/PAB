@@ -33,11 +33,12 @@ function normalizeSubject(value) {
   return String(value ?? '').trim().replace(/\s+/g, ' ').toLocaleLowerCase('nl-NL');
 }
 
-export function createManagement({ auth, lessonService, feedbackService, lessonOrder, loadLessons } = {}) {
+export function createManagement({ auth, lessonService, feedbackService, lessonOrder, loadLessons, learningTopics } = {}) {
   if (!lessonService) throw new Error('createManagement requires lessonService');
   if (!feedbackService) throw new Error('createManagement requires feedbackService');
   if (!lessonOrder) throw new Error('createManagement requires lessonOrder');
   if (typeof loadLessons !== 'function') throw new Error('createManagement requires loadLessons');
+  if (!learningTopics) throw new Error('createManagement requires learningTopics');
 
   function assertParent() { requireParent(auth); }
 
@@ -59,6 +60,14 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
     return {
       archive: getAllArchiveEntries(appState.lessons),
       trash: getAllTrashEntries(appState.lessons)
+    };
+  }
+
+  async function refreshRecoveryLearningTopics() {
+    assertParent();
+    return {
+      archive: await learningTopics.listRecovery('archive'),
+      trash: await learningTopics.listRecovery('trash')
     };
   }
 
@@ -119,14 +128,23 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
   async function restoreLesson(id) { assertParent(); findRecoveryLesson(id); return recovery.restore(id); }
   async function permanentlyDeleteRecoveryLesson(id) { assertParent(); const lesson = appState.lessons.find(item => String(item?.id) === String(id)); if (!lesson?.deleted) throw new Error('Only lessons in the trash can be permanently deleted.'); return trashRecovery.permanentlyDelete(id); }
   async function emptyTrash() { assertParent(); return trashRecovery.emptyTrash(); }
+
+  async function archiveLearningTopic(id) { assertParent(); return learningTopics.archive(id); }
+  async function moveLearningTopicToTrash(id) { assertParent(); return learningTopics.moveToTrash(id); }
+  async function restoreLearningTopic(id) { assertParent(); return learningTopics.restore(id); }
+  async function permanentlyDeleteLearningTopic(id) { assertParent(); return learningTopics.permanentlyDelete(id); }
+  async function emptyLearningTopicTrash() { assertParent(); return learningTopics.emptyTrash(); }
+  async function getRecoveryLearningTopics(mode) { assertParent(); return learningTopics.listRecovery(mode); }
+
   async function listFeedback() { assertParent(); return feedbackService.listAll(); }
   async function submitFeedback(payload = {}) { assertParent(); return feedbackService.create(payload); }
   async function updateFeedbackStatus(id, status) { assertParent(); return feedbackService.updateStatus(id, status); }
 
   return Object.freeze({
-    getStudents, loadAllLessons, loadLessons: refreshLessons, loadRecoveryLessons: refreshRecoveryLessons,
+    getStudents, loadAllLessons, loadLessons: refreshLessons, loadRecoveryLessons: refreshRecoveryLessons, refreshRecoveryLearningTopics,
     getScopedLessons, getAllScopedLessons, getOrderedScopedLessons, saveLessonOrder, moveLessonToSubvak, getRecoveryLessons,
     createLesson, updateLesson, archiveLesson, moveToTrash, restoreLesson, permanentlyDeleteRecoveryLesson, emptyTrash,
+    archiveLearningTopic, moveLearningTopicToTrash, restoreLearningTopic, permanentlyDeleteLearningTopic, emptyLearningTopicTrash, getRecoveryLearningTopics,
     listFeedback, submitFeedback, updateFeedbackStatus
   });
 }

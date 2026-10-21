@@ -5,16 +5,28 @@ import { buildViewUrl } from '../core/view-context.js';
 /**
  * PacoGO shared shell navigation.
  *
- * This module owns the shared route map and the account entry shown in the
- * shared sidebar. Pages provide only route/view information and the shared
- * application context; they do not decide whether the user is logged in.
+ * This module owns the shared route map, management/student context and the
+ * account entry shown in the shared sidebar. Pages provide only route/view
+ * information and the shared application context; they do not decide how the
+ * shell behaves.
  */
+
+function currentPage() {
+  return window.location.pathname.split('/').pop() || 'dashboard.html';
+}
 
 function go(navigate, path, { student = '', mode = 'student' } = {}) {
   if (typeof navigate !== 'function') {
     throw new TypeError('PacoGO shared navigation requires the central navigation owner.');
   }
   return navigate(buildViewUrl(path, { student, mode }));
+}
+
+function toggleManagement(navigate, { student = '', isManagementView = false } = {}) {
+  return go(navigate, currentPage(), {
+    student,
+    mode: isManagementView ? 'student' : 'management'
+  });
 }
 
 function requireNavigationApp(app, includeAccount) {
@@ -48,41 +60,29 @@ export function createPacoNavigation({
   requireNavigationApp(app, includeAccount);
 
   if (typeof navigate !== 'function') {
-    throw new TypeError('createPacoNavigation requires the central navigation owner.');
+    throw new TypeError('createPacoNavigation requires a navigation owner.');
   }
 
   const view = { student, mode: viewMode };
   const isManagementView = viewMode === 'management';
   const showManagementLearnerBar = !isManagementView && includeManagementStudentSelector;
-  const showManagementDashboard = isManagementView || includeManagementDashboard;
+  const showManagementDashboard = !isManagementView && includeManagementDashboard;
   const showManagementTools = isManagementView || includeManagementTools;
   const showCreator = isManagementView || includeCreator;
-  const showAgenda = includeAgenda;
   const learners = managementStudents.length ? managementStudents : listStudents();
   const items = [];
 
-  if (showManagementDashboard) {
+  if (isManagementView) {
     items.push({
-      key: 'management-dashboard',
-      icon: '🏠',
-      label: 'Dashboard',
-      onClick: () => go(navigate, 'management.html', view),
-      submenu: includeManagementDashboardStudentSubmenu ? learners.map(name => ({
-        key: `management-student-${name}`,
-        label: name,
-        active: name === student,
-        onClick: () => {
-          if (typeof onSelectManagementStudent === 'function') {
-            onSelectManagementStudent(name);
-          } else {
-            go(navigate, 'management.html', { student: name, mode: 'management' });
-          }
-        }
-      })) : []
+      key: 'management-mode',
+      kind: 'management-mode',
+      label: 'BEHEER',
+      active: true,
+      onClick: () => toggleManagement(navigate, { student, isManagementView: true })
     });
-  } else if (showManagementLearnerBar) {
     items.push({
       key: 'management-student',
+      kind: 'student-context',
       label: 'LEERLING',
       submenu: learners.map(name => ({
         key: `management-student-${name}`,
@@ -92,15 +92,63 @@ export function createPacoNavigation({
           if (typeof onSelectManagementStudent === 'function') {
             onSelectManagementStudent(name);
           } else {
-            go(navigate, window.location.pathname.split('/').pop() || 'dashboard.html', { student: name, mode: 'management' });
+            go(navigate, currentPage(), { student: name, mode: 'management' });
+          }
+        }
+      }))
+    });
+  } else if (includeManagement && app?.auth?.isParent) {
+    items.push({
+      key: 'management-mode',
+      kind: 'management-mode',
+      label: 'BEHEER',
+      onClick: () => toggleManagement(navigate, { student, isManagementView: false })
+    });
+  } else if (showManagementLearnerBar) {
+    items.push({
+      key: 'management-student',
+      kind: 'student-context',
+      label: 'LEERLING',
+      submenu: learners.map(name => ({
+        key: `management-student-${name}`,
+        label: name,
+        active: name === student,
+        onClick: () => {
+          if (typeof onSelectManagementStudent === 'function') {
+            onSelectManagementStudent(name);
+          } else {
+            go(navigate, currentPage(), { student: name, mode: 'student' });
           }
         }
       }))
     });
   }
 
-  if (!showManagementLearnerBar && !showManagementDashboard) {
-    items.push({ key: 'dashboard', icon: '🏠', label: 'Dashboard', onClick: () => go(navigate, 'dashboard.html', view) });
+  items.push({
+    key: 'dashboard',
+    icon: '🏠',
+    label: 'Dashboard',
+    onClick: () => go(navigate, isManagementView ? 'management.html' : 'dashboard.html', view),
+    active: isManagementView ? active === 'dashboard' : active === 'dashboard'
+  });
+
+  if (showManagementDashboard) {
+    items[items.length - 1] = {
+      key: 'management-dashboard',
+      icon: '🏠',
+      label: 'Dashboard',
+      onClick: () => go(navigate, 'management.html', view),
+      active: active === 'management-dashboard',
+      submenu: includeManagementDashboardStudentSubmenu ? learners.map(name => ({
+        key: `management-student-${name}`,
+        label: name,
+        active: name === student,
+        onClick: () => {
+          if (typeof onSelectManagementStudent === 'function') onSelectManagementStudent(name);
+          else go(navigate, 'management.html', { student: name, mode: 'management' });
+        }
+      })) : []
+    };
   }
 
   if (includeLessons) {
@@ -112,16 +160,11 @@ export function createPacoNavigation({
     });
   }
 
-  if (includePractice && !isManagementView) {
-    items.push({
-      key: 'practice',
-      icon: '📝',
-      label: 'Oefenen',
-      onClick: () => go(navigate, 'oefenen.html', view)
-    });
-  }
+  // OEFENEN is intentionally not part of the shared learner LB. There is no
+  // canonical learner workflow behind this entry, so the navigation must not
+  // advertise it until such a workflow has a real owner.
 
-  if (showAgenda) {
+  if (includeAgenda) {
     items.push({
       key: 'agenda',
       icon: '📅',
@@ -141,7 +184,6 @@ export function createPacoNavigation({
     onClick: () => go(navigate, 'test-history.html', view)
   });
 
-  if (includeManagement && !isManagementView) items.push({ key: 'management', icon: '⚙️', label: 'Beheer', onClick: () => go(navigate, 'management.html', view) });
   if (showManagementTools) {
     items.push({ key: 'recovery', icon: '🗂️', label: 'Archief / Prullenbak', onClick: () => go(navigate, 'archive.html', view) });
     items.push({ key: 'feedback', icon: '💬', label: 'Feedback', onClick: () => go(navigate, 'feedback.html', view) });
@@ -184,7 +226,7 @@ export function createPacoNavigation({
 
   return items
     .filter(item => !(hideActive && item.key === active))
-    .map(item => ({ ...item, active: item.key === active }));
+    .map(item => ({ ...item, active: item.active ?? item.key === active }));
 }
 
 /**
@@ -210,8 +252,6 @@ export function createPacoManagementNavigation({
     viewMode: 'management',
     managementStudents,
     onSelectManagementStudent,
-    includeManagementDashboardStudentSubmenu: true,
-    includeManagement: true,
     includeManagementTools: true,
     includeCreator: true,
     includeLessons: true,

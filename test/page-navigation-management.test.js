@@ -10,10 +10,10 @@ const managementPage = fs.readFileSync(path.join(projectRoot, 'management.html')
 const managementRuntime = fs.readFileSync(path.join(projectRoot, 'src/features/management/runtime.js'), 'utf8');
 const lessonsRuntime = fs.readFileSync(path.join(projectRoot, 'src/features/lessons/runtime.js'), 'utf8');
 
-test('management navigation uses Dashboard as its management home and owns the student submenu', () => {
-  assert.match(navigation, /key: 'management-dashboard',[\s\S]*?label: 'Dashboard'/);
-  assert.match(navigation, /key: 'management-dashboard',[\s\S]*?submenu: learners\.map/);
-  assert.doesNotMatch(navigation, /\n\s*if \(showManagementLearnerBar\) \{[\s\S]*?label: 'LEERLING'/);
+test('management navigation uses Dashboard as its management home and owns the student context', () => {
+  assert.match(navigation, /key: 'dashboard',[\s\S]*?label: 'Dashboard'/);
+  assert.match(navigation, /key: 'management-student',[\s\S]*?label: 'LEERLING',[\s\S]*?submenu: learners\.map/);
+  assert.doesNotMatch(navigation, /key: 'management-student-heading'/);
   assert.match(navigation, /else if \(showManagementLearnerBar\) \{/);
 });
 
@@ -28,7 +28,7 @@ test('management page delegates its shell and feature composition to the canonic
   assert.match(managementRuntime, /mountPacoPageTemplate/);
   assert.match(managementRuntime, /title\.textContent = selectedStudent \? `Beheer van \$\{selectedStudent\}` : 'Beheer'/);
   assert.match(managementRuntime, /createPacoNavigation/);
-  assert.match(managementRuntime, /active: 'management-dashboard'/);
+  assert.match(managementRuntime, /active: 'dashboard'/);
 });
 
 test('shared learning navigation uses the canonical Mijn vakken and Vakken beheren terminology', () => {

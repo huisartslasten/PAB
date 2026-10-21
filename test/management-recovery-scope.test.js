@@ -35,6 +35,9 @@ function createFixture() {
       async getOrderedLessons(items) { return items; },
       async writeOrder() {}
     },
+    learningTopics: {
+      listRecovery: async () => ({ archive: [], trash: [] })
+    },
     async loadLessons() {
       loaded += 1;
       appState.lessons = lessons;

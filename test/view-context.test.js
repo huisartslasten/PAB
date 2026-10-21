@@ -39,9 +39,21 @@ test('management context requires management permission', () => {
 });
 
 test('management navigation preserves management mode without a selected student', () => {
-  globalThis.window = { location: { href: 'https://example.test/dashboard.html' } };
+  globalThis.window = { location: { href: 'https://example.test/dashboard.html?mode=management&context=management&student=Zenith' } };
   const target = buildViewUrl('agenda.html', { mode: 'management' });
   assert.equal(target.pathname, '/agenda.html');
   assert.equal(target.searchParams.get('mode'), 'management');
   assert.equal(target.searchParams.has('viewStudent'), false);
+  assert.equal(target.searchParams.has('student'), false);
+  assert.equal(target.searchParams.has('context'), false);
+});
+
+test('student navigation explicitly clears legacy context and writes student mode', () => {
+  globalThis.window = { location: { href: 'https://example.test/test-history.html?mode=management&context=management&student=Zenith' } };
+  const target = buildViewUrl('test-history.html', { student: 'Zenith', mode: 'student' });
+  assert.equal(target.pathname, '/test-history.html');
+  assert.equal(target.searchParams.get('viewStudent'), 'Zenith');
+  assert.equal(target.searchParams.get('mode'), 'student');
+  assert.equal(target.searchParams.has('student'), false);
+  assert.equal(target.searchParams.has('context'), false);
 });

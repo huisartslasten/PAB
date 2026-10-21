@@ -269,3 +269,70 @@ export async function renderFeedback(container, management) {
 
   return feedback || [];
 }
+
+export async function renderLearningTopicRecovery(container, management, mode, onRestore = async () => {}, onEmptyTrash = async () => {}, onPermanentDelete = async () => {}, onError = async () => {}) {
+  if (!container) throw new Error('renderLearningTopicRecovery requires a container.');
+  if (!management) throw new Error('renderLearningTopicRecovery requires management.');
+  if (mode !== 'archive' && mode !== 'trash') throw new Error('renderLearningTopicRecovery requires a valid mode.');
+
+  const topics = await management.getRecoveryLearningTopics(mode);
+  const emptyTrashButton = mode === 'trash' && topics.length && typeof onEmptyTrash === 'function'
+    ? '<div class="management-links"><button type="button" class="management-link danger" data-empty-learning-trash>🗑️ Leerstof-prullenbak definitief leegmaken</button></div>'
+    : '';
+  const groups = new Map();
+  topics.forEach(topic => {
+    const student = String(topic.student || 'Onbekende leerling').trim() || 'Onbekende leerling';
+    const subject = String(topic.subject || 'Overig').trim() || 'Overig';
+    if (!groups.has(student)) groups.set(student, new Map());
+    if (!groups.get(student).has(subject)) groups.get(student).set(subject, []);
+    groups.get(student).get(subject).push(topic);
+  });
+
+  container.innerHTML = `${emptyTrashButton}${[...groups.entries()].sort(([a], [b]) => a.localeCompare(b, 'nl')).map(([student, subjects]) => `
+    <section class="management-recovery-student">
+      <h3>${escapeHtml(student)}</h3>
+      ${[...subjects.entries()].sort(([a], [b]) => a.localeCompare(b, 'nl')).map(([subject, items]) => `
+        <section class="management-recovery-subject">
+          <h4>${escapeHtml(subject)}</h4>
+          <div class="management-recovery-lessons">
+            ${items.map(topic => `
+              <article class="management-lesson paco-lesson-card" data-recovery-learning-topic-id="${escapeHtml(topic.id)}">
+                <h3>🧠 Leerstof</h3>
+                <p>${escapeHtml(topic.subject)}${topic.subvak ? ` · ${escapeHtml(topic.subvak)}` : ''}</p>
+                <div class="management-links">
+                  <button type="button" class="management-link management-learning-restore" data-learning-topic-id="${escapeHtml(topic.id)}">↩️ Herstellen</button>
+                  ${mode === 'trash' && typeof onPermanentDelete === 'function' ? `<button type="button" class="management-link danger management-learning-permanent-delete" data-permanent-delete-learning-topic-id="${escapeHtml(topic.id)}">🗑️ Definitief verwijderen</button>` : ''}
+                </div>
+              </article>
+            `).join('')}
+          </div>
+        </section>
+      `).join('') || `<div class="management-state">Geen ${mode === 'archive' ? 'gearchiveerde' : 'verwijderde'} leerstof.</div>`}
+    </section>
+  `).join('')}`;
+
+  container.querySelector('[data-empty-learning-trash]')?.addEventListener('click', async event => {
+    event.currentTarget.disabled = true;
+    try { await onEmptyTrash(); } catch (error) { await onError(error); } finally { event.currentTarget.disabled = false; }
+  });
+
+  container.querySelectorAll('.management-learning-restore').forEach(button => {
+    button.addEventListener('click', async () => {
+      const topic = topics.find(item => String(item.id) === String(button.dataset.learningTopicId));
+      if (!topic) return;
+      button.disabled = true;
+      try { await management.restoreLearningTopic(topic.id); await onRestore(topic); } catch (error) { await onError(error); } finally { button.disabled = false; }
+    });
+  });
+
+  container.querySelectorAll('.management-learning-permanent-delete').forEach(button => {
+    button.addEventListener('click', async () => {
+      const topic = topics.find(item => String(item.id) === String(button.dataset.permanentDeleteLearningTopicId));
+      if (!topic) return;
+      button.disabled = true;
+      try { await onPermanentDelete(topic); } catch (error) { await onError(error); } finally { button.disabled = false; }
+    });
+  });
+
+  return topics;
+}

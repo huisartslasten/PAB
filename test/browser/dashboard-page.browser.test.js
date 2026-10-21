@@ -14,13 +14,15 @@ test('dashboard start page is a standalone student chooser', async ({ page }) =>
   await expect(page.getByRole('link', { name: /Dashboard van Zephon/ })).toBeVisible();
 
   await page.getByRole('link', { name: /Dashboard van Zyon/ }).click();
-  await expect(page).toHaveURL(/\/dashboard\.html\?viewStudent=Zyon$/);
+  await expect(page).toHaveURL(/\/dashboard\.html\?viewStudent=Zyon&mode=student$/);
   await expect(page.locator('.paco-template-version-badge')).toHaveText(expectedVersionBadge);
   await expect(page.locator('.paco-template-main h1')).toHaveText('Dashboard');
-  await expect(page.getByRole('button', { name: '← Start' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '← Terug' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /🏠 Dashboard/ })).toBeVisible();
   await expect(page.getByRole('button', { name: /📚 Mijn vakken/ })).toBeVisible();
-  await expect(page.getByRole('button', { name: /⚙️ Beheer/ })).toBeVisible();
-
-  await page.getByRole('button', { name: /⚙️ Beheer/ }).click();
-  await expect(page).toHaveURL(/\/auth\.html$/);
+  await expect(page.getByRole('button', { name: /⚙️ Beheer/ })).toHaveCount(0);
+  await expect(page.getByText('Wat wil je leren?', { exact: true })).toHaveCount(0);
+  await expect(page.getByText(/Actieve vakken voor Zyon\./)).toHaveCount(0);
+  await expect(page.getByText('Binnenkort', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Mijn vakken' })).toBeVisible();
 });

@@ -41,7 +41,10 @@ function createFixture() {
         writes.push({ student, subject, ids: list.map(item => Number(item.id)) });
       }
     },
-    loadLessons: async () => appState.lessons
+    loadLessons: async () => appState.lessons,
+    learningTopics: {
+      listRecovery: async () => ({ archive: [], trash: [] })
+    }
   });
 
   return { management, writes, updates };

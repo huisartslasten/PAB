@@ -50,11 +50,6 @@ export function createTestHistoryRuntime({
     async mount() {
       mountPacoPageTemplate({
         mount: templateMount,
-        backLabel: '← Dashboard',
-        backAction: () => navigate(buildViewUrl(isManagementView ? 'management.html' : 'dashboard.html', {
-          student: requestedStudent,
-          mode: context.mode
-        })),
         greeting: isManagementView ? 'PacoGO beheer ⚙️' : `Hoi ${requestedStudent}! 🐶`,
         title: 'Toetsgeschiedenis',
         icon: '📝',

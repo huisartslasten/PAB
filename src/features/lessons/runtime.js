@@ -44,6 +44,9 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
   function editLearning(lesson) {
     const topic = currentTopics.find(item => Number(item.id) === Number(lesson.learning_topic_id));
     if (!topic) return;
+    editLearningTopic(topic);
+  }
+  function editLearningTopic(topic) {
     const target = buildViewUrl('learning-material-editor.html', { student: selectedStudent, mode: 'management', subject: topic.subject, subvak: topic.subvak });
     target.searchParams.set('topic_id', String(topic.id));
     navigate(target);
@@ -59,6 +62,18 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
     if (!confirmed) return;
     try { await app.management.moveToTrash(lesson.id); showActionNotice(`“${lesson.title}” staat in de prullenbak en is uit de actieve lessen verwijderd.`); await render(app.state.lessons, currentTopics); }
     catch (error) { console.error('Lesson trash error:', error); showActionNotice(error?.message || 'De les kon niet naar de prullenbak worden verplaatst.'); }
+  }
+  async function archiveLearningTopic(topic) {
+    const confirmed = await confirmPacoAction({ title: 'Leerstof archiveren?', message: `“${topic.subject}${topic.subvak ? ` · ${topic.subvak}` : ''}” wordt uit de actieve leerstof gehaald en in het archief geplaatst.`, confirmLabel: 'Archiveren', cancelLabel: 'Annuleren' });
+    if (!confirmed) return;
+    try { await app.management.archiveLearningTopic(topic.id); showActionNotice(`“${topic.subject}” is gearchiveerd.`); await reloadContent(); }
+    catch (error) { console.error('Learning topic archive error:', error); showActionNotice(error?.message || 'De leerstof kon niet worden gearchiveerd.'); }
+  }
+  async function moveLearningTopicToTrash(topic) {
+    const confirmed = await confirmPacoAction({ title: 'Leerstof naar prullenbak?', message: `“${topic.subject}${topic.subvak ? ` · ${topic.subvak}` : ''}” wordt uit de actieve leerstof gehaald en naar de prullenbak verplaatst.`, confirmLabel: 'Naar prullenbak', cancelLabel: 'Annuleren' });
+    if (!confirmed) return;
+    try { await app.management.moveLearningTopicToTrash(topic.id); showActionNotice(`“${topic.subject}” staat in de prullenbak.`); await reloadContent(); }
+    catch (error) { console.error('Learning topic trash error:', error); showActionNotice(error?.message || 'De leerstof kon niet naar de prullenbak worden verplaatst.'); }
   }
   function renderLessonCard(lesson) {
     const wrap = documentRef.createElement('div');
@@ -90,14 +105,29 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
     return wrap;
   }
   function renderLearningMaterialCard(topic) {
-    const card = documentRef.createElement('button');
-    card.type = 'button';
+    const card = documentRef.createElement('div');
     card.className = 'paco-lesson-card lesson-card learning-material-card';
-    card.addEventListener('click', () => navigate(learningMaterialTarget(topic)));
+    const view = documentRef.createElement('button'); view.type = 'button'; view.className = 'lesson-view-button'; view.textContent = 'Bekijken';
+    view.addEventListener('click', () => navigate(learningMaterialTarget(topic)));
     const heading = documentRef.createElement('h2'); heading.textContent = '🧠 Leerstof';
     const subvak = documentRef.createElement('p'); subvak.textContent = topic.subvak || 'Zonder subvak';
-    card.append(heading, subvak);
+    card.append(heading, subvak, view);
+    if (context?.isManagement) {
+      const actions = documentRef.createElement('div'); actions.className = 'lesson-management-actions';
+      const edit = documentRef.createElement('button'); edit.type = 'button'; edit.textContent = 'Bewerken';
+      edit.addEventListener('click', event => { event.stopPropagation(); editLearningTopic(topic); });
+      const archive = documentRef.createElement('button'); archive.type = 'button'; archive.textContent = 'Archiveren';
+      archive.addEventListener('click', event => { event.stopPropagation(); archiveLearningTopic(topic); });
+      const trash = documentRef.createElement('button'); trash.type = 'button'; trash.className = 'danger'; trash.textContent = 'Verwijderen';
+      trash.addEventListener('click', event => { event.stopPropagation(); moveLearningTopicToTrash(topic); });
+      actions.append(edit, archive, trash); card.appendChild(actions);
+    }
     return card;
+  }
+
+  async function reloadContent() {
+    const [records, topics] = await Promise.all([app.loadLessons(), app.learningTopics.listForStudent(selectedStudent)]);
+    await render(records, topics);
   }
 
   async function render(records, topics = currentTopics) {

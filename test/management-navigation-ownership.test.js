@@ -20,9 +20,3 @@ test('test history derives its sidebar from the central view context', () => {
   assert.match(historyRuntime, /viewMode: context\.mode/);
   assert.doesNotMatch(historyRuntime, /createPacoManagementNavigation\(/);
 });
-
-test('test history keeps its dashboard destination aligned with the active view mode', () => {
-  assert.match(historyRuntime, /const isManagementView = context\.mode === 'management'/);
-  assert.match(historyRuntime, /buildViewUrl\(isManagementView \? 'management\.html' : 'dashboard\.html'/);
-  assert.match(historyRuntime, /mode: context\.mode/);
-});

@@ -37,7 +37,7 @@ describe('shared PacoGO navigation', () => {
     expect(management.kind).toBe('management-mode');
   });
 
-  it('builds one central management context with learner selection and no OEFENEN entry', () => {
+  it('builds one central management context with Dashboard, learner selection and no OEFENEN entry', () => {
     const items = createPacoNavigation({
       app: createApp({ isParent: true }),
       student: 'Zyon',
@@ -50,6 +50,7 @@ describe('shared PacoGO navigation', () => {
       'management-mode',
       'management-student-heading',
       'management-student',
+      'dashboard',
       'lessons',
       'agenda',
       'test-history',

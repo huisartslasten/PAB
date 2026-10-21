@@ -8,29 +8,6 @@ export function getDashboardSubjects(lessons = [], student) {
   return getLessonSubjectGroups(lessons, student);
 }
 
-export function getDashboardProgress(lessons = [], student, masteryService) {
-  const subjects = getLessonSubjectGroups(lessons, student);
-  const active = subjects.flatMap(subject => subject.lessons);
-  const items = active.flatMap(lesson =>
-    (Array.isArray(lesson.lesson_items) ? lesson.lesson_items : []).map(item => ({
-      lessonId: lesson.id,
-      itemId: item.id
-    }))
-  );
-
-  const mastered = masteryService
-    ? items.filter(item => masteryService.get(student, item.lessonId, item.itemId).mastered).length
-    : 0;
-
-  return Object.freeze({
-    lessons: active.length,
-    subjects: subjects.length,
-    items: items.length,
-    mastered,
-    percent: items.length ? Math.round(mastered / items.length * 100) : 0
-  });
-}
-
 export function getDashboardAgendaItems(agendaRead, limit = 4, today = new Date()) {
   if (!agendaRead || typeof agendaRead.buildAgendaItemsForRender !== 'function') return [];
 

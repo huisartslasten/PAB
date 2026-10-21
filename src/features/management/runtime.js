@@ -1,7 +1,6 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
 import { buildViewUrl } from '../../core/view-context.js';
-import { renderStudentManagementCards } from './student-card-view.js';
 
 export function createManagementRuntime({ app, templateMount, context, documentRef = document, navigate } = {}) {
   if (!app) throw new TypeError('Management runtime requires an app.');
@@ -14,39 +13,9 @@ export function createManagementRuntime({ app, templateMount, context, documentR
   const go = path => navigate(buildViewUrl(path, { student: selectedStudent, mode: 'management' }));
   const createAction = (label, description, path, extra = {}) => { const button = documentRef.createElement('button'); button.type = 'button'; button.className = 'management-action'; button.disabled = extra.requiresStudent !== false && !selectedStudent; const strong = documentRef.createElement('strong'); strong.textContent = label; const span = documentRef.createElement('span'); span.textContent = description; button.append(strong, span); button.addEventListener('click', () => { const target = buildViewUrl(path, { student: selectedStudent, mode: 'management', ...(extra.params || {}) }); if (extra.documentNavigation) window.location.href = target.toString(); else void navigate(target); }); return button; };
   const createToolGroup = (title, actions) => { const group = documentRef.createElement('section'); group.className = 'management-tool-group'; const heading = documentRef.createElement('h3'); heading.className = 'management-tool-group-title'; heading.textContent = title; const actionGrid = documentRef.createElement('div'); actionGrid.className = 'management-actions'; actionGrid.append(...actions); group.append(heading, actionGrid); return group; };
-
-  function renderStudentOverview() {
-    const overview = documentRef.createElement('section');
-    overview.className = 'management-student-overview';
-    const heading = documentRef.createElement('div');
-    heading.className = 'management-student-overview-heading';
-    const title = documentRef.createElement('h3');
-    title.textContent = 'Leerlingen';
-    const subtitle = documentRef.createElement('p');
-    subtitle.textContent = 'Kies een leerling of open direct agenda, vakken of acties.';
-    heading.append(title, subtitle);
-    const cards = documentRef.createElement('div');
-    cards.className = 'management-student-overview-grid';
-    overview.append(heading, cards);
-
-    renderStudentManagementCards(cards, {
-      students: app.management.getStudents(),
-      lessons: app.state.lessons,
-      getAgendaItems: student => app.agenda.buildAgendaItemsForRender(student),
-      onSelect: student => navigate(buildViewUrl('management.html', { student, mode: 'management' })),
-      onCreateLesson: student => navigate(buildViewUrl('lesson-editor.html', { student, mode: 'management' })),
-      onOpenAgenda: student => navigate(buildViewUrl('agenda.html', { student, mode: 'management' })),
-      onOpenLessons: student => navigate(buildViewUrl('lessons.html', { student, mode: 'management' })),
-      onOpenMonthCalendar: student => navigate(buildViewUrl('month-calendar.html', { student, mode: 'management' }))
-    });
-
-    return overview;
-  }
-
   function renderManagement() {
     const section = documentRef.createElement('section'); section.className = 'management-section';
     const heading = documentRef.createElement('div'); heading.className = 'page-heading'; const title = documentRef.createElement('h2'); title.textContent = selectedStudent ? `Beheer van ${selectedStudent}` : 'Beheer'; heading.appendChild(title); section.appendChild(heading);
-    section.appendChild(renderStudentOverview());
     section.append(
       createToolGroup('Lesbeheer', [createAction('📚 Les beheren', 'Bekijk de lessen van de actieve leerling en bewerk, archiveer of verwijder ze.', 'lessons.html'), createAction('➕ Les maken', 'Maak een nieuwe les voor de actieve leerling.', 'lesson-editor.html', { documentNavigation: true })]),
       createToolGroup('Leerstofbeheer', [createAction('🧠 Leerstof beheren', 'Bekijk de leerstof per vak en onderwerp.', 'lessons.html'), createAction('➕ Leerstof maken', 'Open direct de leerstofeditor. Kies daar het vak en onderwerp.', 'learning-material-editor.html', { documentNavigation: true })]),
@@ -54,7 +23,6 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     );
     content.replaceChildren(section);
   }
-
   async function mount() {
     const session = await app.initializeSession(); if (!session) { window.location.href = 'auth.html'; return; }
     if (!app.auth.isParent) { mountPacoPageTemplate({ mount: templateMount, greeting: 'PAB beheer ⚙️', title: 'Beheer', icon: '⚙️', subtitle: 'Je hebt geen toegang tot Beheer.', navigation: createPacoNavigation({ app, active: 'management-mode', student: selectedStudent, viewMode: 'management', navigate }), content }); state.textContent = 'Je hebt geen toegang tot Beheer.'; return; }

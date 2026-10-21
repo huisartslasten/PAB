@@ -80,11 +80,10 @@ export function createPacoNavigation({
       active: true,
       onClick: () => toggleManagement(navigate, { student, isManagementView: true })
     });
-    items.push({ key: 'management-student-heading', kind: 'nav-heading', label: 'LEERLING' });
     items.push({
       key: 'management-student',
       kind: 'student-context',
-      label: student || 'Kies leerling',
+      label: 'LEERLING',
       submenu: learners.map(name => ({
         key: `management-student-${name}`,
         label: name,
@@ -106,11 +105,10 @@ export function createPacoNavigation({
       onClick: () => toggleManagement(navigate, { student, isManagementView: false })
     });
   } else if (showManagementLearnerBar) {
-    items.push({ key: 'management-student-heading', kind: 'nav-heading', label: 'LEERLING' });
     items.push({
       key: 'management-student',
       kind: 'student-context',
-      label: student || 'Kies leerling',
+      label: 'LEERLING',
       submenu: learners.map(name => ({
         key: `management-student-${name}`,
         label: name,

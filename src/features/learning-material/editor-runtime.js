@@ -19,12 +19,9 @@ export function createLearningMaterialEditorRuntime({ app, templateMount, contex
   const currentView = getViewContext();
   const initialStudent = context.student || currentView.student || '';
   const viewMode = context.mode || currentView.mode || 'management';
-  const goManagement = () => navigate(buildViewUrl('management.html', { student: initialStudent, mode: 'management' }));
 
   mountPacoPageTemplate({
     mount: templateMount,
-    backLabel: '← Beheer',
-    backAction: goManagement,
     greeting: 'PAB beheer ⚙️',
     title: 'Leerstof maken',
     icon: '🧠',

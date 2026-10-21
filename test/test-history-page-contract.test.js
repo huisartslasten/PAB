@@ -30,7 +30,7 @@ test('test history runtime keeps its history presentation target explicit', () =
 
 test('test history runtime derives navigation and access from the central view context', () => {
   assert.match(runtime, /const isManagementView = context\.mode === 'management'/);
-  assert.match(runtime, /context\.mode === 'management' \? 'management\.html' : 'dashboard\.html'/);
+  assert.match(runtime, /buildViewUrl\(isManagementView \? 'management\.html' : 'dashboard\.html'/);
   assert.match(runtime, /greeting: isManagementView \? 'PacoGO beheer ⚙️' : `Hoi \$\{requestedStudent\}! 🐶`/);
   assert.match(runtime, /createPacoNavigation/);
   assert.match(runtime, /viewMode: context\.mode/);

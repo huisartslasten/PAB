@@ -45,12 +45,11 @@ test('oefenen uses the canonical shell without dead submenu controls', async ({ 
   await expect(page.getByRole('button', { name: 'Mijn agenda' })).toBeVisible();
 });
 
-test('flashcards uses the canonical shell and returns to oefenen', async ({ page }) => {
+test('flashcards uses the canonical shell without a dead oefenen navigation entry', async ({ page }) => {
   await expectCanonicalShell(page, 'flashcards-template.html', 'Flashcards');
-  const oefenenButton = page.locator('.paco-template-nav-item').filter({ hasText: 'Oefenen' });
-  await expect(oefenenButton).toBeVisible();
-  await oefenenButton.click();
-  await expect(page).toHaveURL(/\/oefenen\.html(?:\?.*)?$/);
+  await expect(page.locator('.paco-template-nav-item').filter({ hasText: 'Oefenen' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Dashboard' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Mijn vakken' })).toBeVisible();
 });
 
 test('agenda uses the canonical shell and renders its owned week view', async ({ page }) => {

@@ -12,8 +12,8 @@ const lessonsRuntime = fs.readFileSync(path.join(projectRoot, 'src/features/less
 
 test('management navigation uses Dashboard as its management home and owns the student context', () => {
   assert.match(navigation, /key: 'dashboard',[\s\S]*?label: 'Dashboard'/);
-  assert.match(navigation, /key: 'management-student-heading',[\s\S]*?label: 'LEERLING'/);
-  assert.match(navigation, /key: 'management-student',[\s\S]*?submenu: learners\.map/);
+  assert.match(navigation, /key: 'management-student',[\s\S]*?label: 'LEERLING',[\s\S]*?submenu: learners\.map/);
+  assert.doesNotMatch(navigation, /key: 'management-student-heading'/);
   assert.match(navigation, /else if \(showManagementLearnerBar\) \{/);
 });
 

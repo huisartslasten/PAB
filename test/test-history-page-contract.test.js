@@ -28,8 +28,10 @@ test('test history runtime keeps its history presentation target explicit', () =
   assert.doesNotMatch(runtime, /id="historyStudent"/);
 });
 
-test('test history runtime derives navigation from the central view context', () => {
+test('test history runtime derives navigation and access from the central view context', () => {
+  assert.match(runtime, /const isManagementView = context\.mode === 'management'/);
   assert.match(runtime, /context\.mode === 'management' \? 'management\.html' : 'dashboard\.html'/);
+  assert.match(runtime, /greeting: isManagementView \? 'PacoGO beheer ⚙️' : `Hoi \$\{requestedStudent\}! 🐶`/);
   assert.match(runtime, /createPacoNavigation/);
   assert.match(runtime, /viewMode: context\.mode/);
   assert.match(runtime, /active: 'test-history'/);
@@ -38,6 +40,7 @@ test('test history runtime derives navigation from the central view context', ()
   assert.doesNotMatch(runtime, /includeAgenda: false/);
   assert.doesNotMatch(runtime, /includeManagementDashboardStudentSubmenu: false/);
   assert.match(runtime, /backLabel: '← Dashboard'/);
+  assert.match(runtime, /if \(isManagementView && \(!session \|\| !app\.auth\.isParent\)\)/);
 });
 
 test('test history runtime uses the selected student context instead of a second local selector', () => {

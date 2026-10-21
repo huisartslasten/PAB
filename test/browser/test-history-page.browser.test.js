@@ -48,7 +48,8 @@ async function installSupabaseFixture(page) {
           return {
             auth: {
               async getSession() {
-                return { data: { session: { user: { id: fixture.parentId } } }, error: null };
+                const guest = new URLSearchParams(window.location.search).get('guest') === '1';
+                return { data: { session: guest ? null : { user: { id: fixture.parentId } } }, error: null };
               }
             },
             functions: {
@@ -117,6 +118,20 @@ test('canonical test history applies the student filter through the read service
     column: 'student',
     value: 'Zyon'
   });
+});
+
+test('canonical test history is a learner view for an unauthenticated student context', async ({ page }) => {
+  await installSupabaseFixture(page);
+  await page.goto(`${baseURL}/test-history.html?viewStudent=Zyon&mode=student&guest=1`);
+
+  await expect(page.locator('.paco-template-greeting')).toHaveText('Hoi Zyon! 🐶');
+  await expect(page.locator('.paco-template-navigation')).toContainText('Mijn vakken');
+  await expect(page.locator('.paco-template-navigation')).toContainText('Mijn agenda');
+  await expect(page.locator('.paco-template-navigation')).toContainText('Toetsen');
+  await expect(page.locator('.paco-template-navigation')).not.toContainText('PacoGO beheer');
+  await expect(page.locator('#testHistoryContent .test-history-item')).toHaveCount(1);
+  await expect(page.locator('#testHistoryContent')).toContainText('Rekenen');
+  await expect(page.locator('#testHistoryContent')).not.toContainText('Geen toegang.');
 });
 
 test('canonical test history renders the filtered empty state', async ({ page }) => {

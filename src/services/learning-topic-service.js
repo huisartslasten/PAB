@@ -15,7 +15,10 @@ export function createLearningTopicService(db, { canManage = () => false, media 
     if (!canManage()) throw new Error('Log eerst in als ouder.');
     const topic = normalizeTopicPayload(payload);
     if (!topic.student || !topic.subject) throw new Error('Een leerling en vak zijn verplicht.');
-    const result = await db.from('learning_topics').upsert(topic, { onConflict: 'student,subject,subvak' }).select(TOPIC_SELECT).single();
+    const result = await db.from('learning_topics').upsert(
+      { ...topic, archived: false, deleted: false },
+      { onConflict: 'student,subject,subvak' }
+    ).select(TOPIC_SELECT).single();
     if (result.error) throw result.error;
     return result.data;
   }

@@ -1,7 +1,7 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
 import { buildViewUrl } from '../../core/view-context.js';
-import { getDashboardSubjects, getDashboardProgress, getDashboardSubjectIcon, getDashboardAgendaItems } from './view-model.js';
+import { getDashboardSubjects, getDashboardSubjectIcon, getDashboardAgendaItems } from './view-model.js';
 import { listStudents } from '../students/students.js';
 
 export function createDashboardRuntime({ app, templateMount, chooserMount, context, documentRef = document, navigate } = {}) {
@@ -16,9 +16,6 @@ export function createDashboardRuntime({ app, templateMount, chooserMount, conte
 
   const content = documentRef.createElement('div');
   content.className = 'dashboard-page';
-
-  const goChooser = () => navigate(buildViewUrl('dashboard.html'));
-  const goLessons = () => navigate(buildViewUrl('lessons.html', { student: selectedStudent, mode: context.mode }));
 
   function renderStartPage() {
     templateMount.replaceChildren(); chooserMount.replaceChildren();
@@ -79,12 +76,8 @@ export function createDashboardRuntime({ app, templateMount, chooserMount, conte
     content.replaceChildren();
     const lessons = app.mapLessons(records);
     const subjects = getDashboardSubjects(lessons, selectedStudent);
-    const progressStats = getDashboardProgress(lessons, selectedStudent, app.mastery);
     const agendaItems = getDashboardAgendaItems(app.agenda, 4);
     const main = documentRef.createElement('section'); main.className = 'dashboard-main';
-    const welcome = documentRef.createElement('article'); welcome.className = 'dashboard-card dashboard-welcome';
-    const welcomeHeading = documentRef.createElement('h2'); welcomeHeading.textContent = 'Wat wil je leren?';
-    const welcomeText = documentRef.createElement('p'); welcomeText.textContent = 'Kies hieronder een vak om direct naar je lessen te gaan.'; welcome.append(welcomeHeading, welcomeText); main.appendChild(welcome);
     main.appendChild(renderAgenda(agendaItems));
     const subjectsCard = documentRef.createElement('article'); subjectsCard.className = 'dashboard-card';
     const heading = documentRef.createElement('h2'); heading.textContent = 'Mijn vakken'; subjectsCard.appendChild(heading);
@@ -99,17 +92,13 @@ export function createDashboardRuntime({ app, templateMount, chooserMount, conte
     if (!subjectGrid.children.length) { const empty = documentRef.createElement('div'); empty.className = 'dashboard-state'; empty.style.marginTop = '15px'; empty.textContent = `Nog geen actieve lessen voor ${selectedStudent}.`; subjectsCard.appendChild(empty); }
     else subjectsCard.appendChild(subjectGrid);
     main.appendChild(subjectsCard);
-    const subjectSummary = documentRef.createElement('article'); subjectSummary.className = 'dashboard-card';
-    const subjectCountHeading = documentRef.createElement('h3'); subjectCountHeading.textContent = `${progressStats.subjects} ${progressStats.subjects === 1 ? 'vak' : 'vakken'}`;
-    const subjectCountText = documentRef.createElement('p'); subjectCountText.style.cssText = 'margin:7px 0 0;color:#667894'; subjectCountText.textContent = `Actieve vakken voor ${selectedStudent}.`;
-    const lessonButton = documentRef.createElement('button'); lessonButton.type = 'button'; lessonButton.className = 'secondary'; lessonButton.style.marginTop = '14px'; lessonButton.textContent = '📚 Naar mijn lessen'; lessonButton.addEventListener('click', goLessons);
-    subjectSummary.append(subjectCountHeading, subjectCountText, lessonButton); main.appendChild(subjectSummary); content.appendChild(main);
+    content.appendChild(main);
   }
 
   async function mount() {
     if (!selectedStudent) { renderStartPage(); return; }
     if (chooserMount) chooserMount.replaceChildren();
-    mountPacoPageTemplate({ mount: templateMount, backLabel: '← Start', backAction: goChooser, greeting: `Hoi ${selectedStudent}! 🐶`, title: 'Dashboard', icon: '🏠', subtitle: 'Bekijk je lessen en zie hoe je ervoor staat.', navigation: createPacoNavigation({ app, active: 'dashboard', student: selectedStudent, viewMode: context.mode, hideActive: true, navigate }), content });
+    mountPacoPageTemplate({ mount: templateMount, greeting: `Hoi ${selectedStudent}! 🐶`, title: 'Dashboard', icon: '🏠', subtitle: 'Bekijk je vakken en wat er binnenkort aankomt.', navigation: createPacoNavigation({ app, active: 'dashboard', student: selectedStudent, viewMode: context.mode, navigate }), content });
     const state = documentRef.createElement('div'); state.className = 'dashboard-state'; state.textContent = 'Dashboard laden…'; content.appendChild(state);
     try { const records = await app.loadLessons(); render(records); }
     catch (error) { console.error('Dashboard page load error:', error); state.textContent = 'Het dashboard kon niet worden geladen.'; }

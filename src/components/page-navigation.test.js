@@ -37,7 +37,7 @@ describe('shared PacoGO navigation', () => {
     expect(management.kind).toBe('management-mode');
   });
 
-  it('builds one central management context with Dashboard, learner selection and no OEFENEN entry', () => {
+  it('renders LEERLING as the single heading for the central management learner selector', () => {
     const items = createPacoNavigation({
       app: createApp({ isParent: true }),
       student: 'Zyon',
@@ -48,7 +48,6 @@ describe('shared PacoGO navigation', () => {
 
     expect(items.map(item => item.key)).toEqual([
       'management-mode',
-      'management-student-heading',
       'management-student',
       'dashboard',
       'lessons',
@@ -59,7 +58,13 @@ describe('shared PacoGO navigation', () => {
       'creator',
       'account'
     ]);
-    expect(items.find(item => item.key === 'management-student').submenu.map(item => item.label)).toEqual(['Zyon', 'Mila']);
+
+    const learner = items.find(item => item.key === 'management-student');
+    expect(learner.label).toBe('LEERLING');
+    expect(learner.submenu.map(item => item.label)).toEqual(['Zyon', 'Mila']);
+    expect(learner.submenu.find(item => item.label === 'Zyon').active).toBe(true);
+    expect(items.some(item => item.key === 'management-student-heading')).toBe(false);
+    expect(items.some(item => item.label === 'Kies leerling')).toBe(false);
     expect(items.some(item => item.key === 'practice')).toBe(false);
   });
 });

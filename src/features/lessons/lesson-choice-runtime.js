@@ -45,7 +45,7 @@ export function createLessonChoiceRuntime({ app, templateMount, context, lessonI
       const records = await app.loadLessons();
       const lesson = app.mapLessons(records).find(item => String(item.id) === String(lessonId));
       if (!lesson) { const state = documentRef.createElement('div'); state.className = 'choice-state'; state.textContent = 'Deze les kon niet worden gevonden.'; content.replaceChildren(state); return; }
-      const cards = await app.learningContent.listForLesson(lesson.id, { includeImages: false });
+      const cards = await app.learningContent.listForTopic(lesson.id, { includeImages: false });
       renderLesson(lesson, cards.length > 0);
     } catch (error) {
       console.error('Lesson choice load error:', error);

@@ -28,17 +28,19 @@ test('test history runtime keeps its history presentation target explicit', () =
   assert.doesNotMatch(runtime, /id="historyStudent"/);
 });
 
-test('test history runtime belongs to the canonical management navigation boundary', () => {
-  assert.match(runtime, /buildViewUrl\('management\.html'/);
-  assert.match(runtime, /createPacoManagementNavigation/);
+test('test history runtime derives navigation from the central view context', () => {
+  assert.match(runtime, /context\.mode === 'management' \? 'management\.html' : 'dashboard\.html'/);
+  assert.match(runtime, /createPacoNavigation/);
+  assert.match(runtime, /viewMode: context\.mode/);
   assert.match(runtime, /active: 'test-history'/);
+  assert.doesNotMatch(runtime, /createPacoManagementNavigation/);
   assert.doesNotMatch(runtime, /viewMode: 'management'/);
   assert.doesNotMatch(runtime, /includeAgenda: false/);
   assert.doesNotMatch(runtime, /includeManagementDashboardStudentSubmenu: false/);
   assert.match(runtime, /backLabel: '← Dashboard'/);
 });
 
-test('test history runtime uses the selected management student instead of a second local selector', () => {
+test('test history runtime uses the selected student context instead of a second local selector', () => {
   assert.match(runtime, /const requestedStudent = context\.student/);
   assert.match(runtime, /listAttempts\(requestedStudent\)/);
   assert.doesNotMatch(runtime, /populateStudentFilter/);

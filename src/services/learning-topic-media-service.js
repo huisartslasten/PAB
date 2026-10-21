@@ -73,5 +73,19 @@ export function createLearningTopicMediaService(db, { canManage = () => false, i
     return true;
   }
 
-  return Object.freeze({ compressPhoto, uploadForTopic, getByIds, remove });
+  async function removeForTopic(topicId) {
+    if (!canManage()) throw new Error('Log eerst in als ouder.');
+    const found = await db.from('learning_topic_media').select('id,storage_path').eq('learning_topic_id', Number(topicId));
+    if (found.error) throw found.error;
+    const rows = found.data || [];
+    if (rows.length) {
+      const storage = await db.storage.from(BUCKET).remove(rows.map(row => row.storage_path));
+      if (storage.error) throw storage.error;
+    }
+    const deleted = await db.from('learning_topic_media').delete().eq('learning_topic_id', Number(topicId));
+    if (deleted.error) throw deleted.error;
+    return rows.length;
+  }
+
+  return Object.freeze({ compressPhoto, uploadForTopic, getByIds, remove, removeForTopic });
 }

@@ -312,9 +312,7 @@ export function createPacoPageTemplate({
   subtitle = '',
   content = null,
   className = '',
-  testVersion = PACOGO_TEST_VERSION,
-  backLabel = '← Terug',
-  backAction = null
+  testVersion = PACOGO_TEST_VERSION
 } = {}) {
   const root = document.createElement('div');
   root.className = `paco-page-template ${className}`.trim();
@@ -337,8 +335,8 @@ export function createPacoPageTemplate({
   const backButton = document.createElement('button');
   backButton.type = 'button';
   backButton.className = 'paco-template-back';
-  backButton.textContent = backLabel;
-  backButton.addEventListener('click', typeof backAction === 'function' ? backAction : () => window.history.back());
+  backButton.textContent = '← Terug';
+  backButton.addEventListener('click', () => window.history.back());
   sidebar.appendChild(backButton);
 
   const sidebarCard = document.createElement('div');
@@ -405,9 +403,7 @@ function updatePacoPageTemplate(template, {
   title = '',
   icon = '',
   subtitle = '',
-  content = null,
-  backLabel = '← Terug',
-  backAction = null
+  content = null
 } = {}) {
   if (!template) throw new Error('updatePacoPageTemplate requires a template');
 
@@ -423,8 +419,8 @@ function updatePacoPageTemplate(template, {
     throw new Error('PacoGO page template is missing its canonical shell elements.');
   }
 
-  backButton.textContent = backLabel;
-  backButton.onclick = typeof backAction === 'function' ? backAction : () => window.history.back();
+  backButton.textContent = '← Terug';
+  backButton.onclick = () => window.history.back();
   greetingElement.textContent = greeting;
   navigationElement.replaceChildren(...navigation.map(createNavigationItem));
   iconElement.textContent = icon;

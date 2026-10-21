@@ -22,6 +22,7 @@ test('test history derives its sidebar from the central view context', () => {
 });
 
 test('test history keeps its dashboard destination aligned with the active view mode', () => {
-  assert.match(historyRuntime, /context\.mode === 'management' \? 'management\.html' : 'dashboard\.html'/);
+  assert.match(historyRuntime, /const isManagementView = context\.mode === 'management'/);
+  assert.match(historyRuntime, /buildViewUrl\(isManagementView \? 'management\.html' : 'dashboard\.html'/);
   assert.match(historyRuntime, /mode: context\.mode/);
 });

@@ -48,6 +48,19 @@ function parseOutput(raw: string) {
   if (!allowedForms.has(type) || !targetText || (type === "saying" && !meaning)) throw new Error("Invalid target");
   return { target: { type, text: targetText, meaning } };
 }
+function upstreamErrorDetails(raw: string) {
+  try {
+    const parsed = JSON.parse(raw);
+    const error = parsed?.error ?? parsed;
+    return {
+      type: text(error?.type, 100),
+      code: text(error?.code, 100),
+      message: text(error?.message, 300)
+    };
+  } catch {
+    return { type: "", code: "", message: "" };
+  }
+}
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
@@ -57,7 +70,11 @@ Deno.serve(async (req: Request) => {
     const request = normalize(await req.json());
     const response = await fetch("https://api.openai.com/v1/responses", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` }, body: JSON.stringify({ model: "gpt-5-mini", input: promptFor(request), max_output_tokens: 500 }) });
     const raw = await response.text();
-    if (!response.ok) return json({ error: "AI-contentgeneratie gaf een fout.", details: `HTTP ${response.status}` }, 502);
+    if (!response.ok) {
+      const details = upstreamErrorDetails(raw);
+      console.error("OpenAI upstream error", { status: response.status, type: details.type, code: details.code, message: details.message });
+      return json({ error: "AI-contentgeneratie gaf een fout.", details: `HTTP ${response.status}` }, 502);
+    }
     const data = JSON.parse(raw);
     const outputText = (data.output ?? []).flatMap((item: any) => item.content ?? []).filter((item: any) => item.type === "output_text" && typeof item.text === "string").map((item: any) => item.text).join("").trim();
     if (!outputText) return json({ error: "OpenAI gaf geen content terug." }, 502);

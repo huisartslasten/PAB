@@ -31,11 +31,7 @@ export function createWordRevealPageRuntime({ app, templateMount, context, lesso
   const gameShell = documentRef.createElement('main');
   gameShell.className = 'practice-page-card wr-page-card';
   gameShell.innerHTML = `
-    <div class="wr-head">
-      <div>
-        <h1 class="wr-title">🐶 WOORDONTHULLER</h1>
-        <p class="wr-subtitle">Beantwoord de lesvragen en ontdek het geheime woord of de zin.</p>
-      </div>
+    <div class="wr-game-head">
       <div class="wr-stats" aria-label="Spelstatistieken">
         <div class="wr-stat"><span>Beurten</span><strong id="wrTurns">0</strong></div>
         <div class="wr-stat"><span>Record</span><strong id="wrRecord">—</strong></div>
@@ -46,13 +42,11 @@ export function createWordRevealPageRuntime({ app, templateMount, context, lesso
       <span class="wr-target-label">Geheim doel</span>
       <div id="wrTarget" class="wr-target"></div>
     </section>
-    <div class="wr-main">
-      <section class="wr-question-panel">
-        <span class="wr-question-label">Lesvraag</span>
-        <div id="wrQuestionArea"></div>
-      </section>
-      <section id="wrFeedback" class="wr-feedback-panel" aria-live="polite"></section>
-    </div>`;
+    <section class="wr-question-panel">
+      <span class="wr-question-label">Lesvraag</span>
+      <div id="wrQuestionArea"></div>
+    </section>
+    <section id="wrFeedback" class="wr-feedback-panel" aria-live="polite"></section>`;
   content.appendChild(gameShell);
 
   const goGames = () => {

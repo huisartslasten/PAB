@@ -47,6 +47,7 @@ export function createTicTacToePageRuntime({ app, templateMount, context, lesson
 
     let highScore = await app.gameResults.getHighScore({ gameKey: 'tic_tac_toe', lessonId, student });
     highScore = highScore == null ? 0 : highScore;
+    let cancelPacoTurn = () => {};
 
     async function persistScore(score) {
       const normalizedScore = Math.max(0, Math.floor(Number(score) || 0));
@@ -56,6 +57,9 @@ export function createTicTacToePageRuntime({ app, templateMount, context, lesson
     }
 
     async function render(errorMessage = '') {
+      cancelPacoTurn();
+      cancelPacoTurn = () => {};
+
       const state = runtime.snapshot();
       const enriched = { ...state, bestScore: Math.max(highScore, state.bestScore) };
       view.renderStats(enriched);
@@ -92,7 +96,9 @@ export function createTicTacToePageRuntime({ app, templateMount, context, lesson
       }
 
       if (enriched.phase === 'paco') {
-        view.renderPacoTurn(enriched, () => { try { runtime.playPacoMove(); } finally { void render(); } });
+        cancelPacoTurn = view.renderPacoTurn(enriched, () => {
+          try { runtime.playPacoMove(); } catch (error) { console.error('Tic-Tac-Toe Paco move error:', error); } finally { void render(); }
+        });
         return;
       }
 

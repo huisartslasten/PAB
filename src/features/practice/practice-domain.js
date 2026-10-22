@@ -28,6 +28,14 @@ export const PRACTICE_GAMES = Object.freeze([
     icon: '⚡',
     description: 'Kies snel het juiste antwoord en oefen alle vragen.',
     status: 'active'
+  }),
+  Object.freeze({
+    id: 'tic-tac-toe',
+    label: 'Tic-Tac-Toe',
+    path: 'tic-tac-toe.html',
+    icon: '⭕',
+    description: 'Beantwoord de vragen en speel jezelf naar drie op een rij.',
+    status: 'active'
   })
 ]);
 

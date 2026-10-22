@@ -47,7 +47,7 @@ export function createPacoRouteRegistry({ app, mounts, documentRef = document } 
   routes['test-history.html'] = defineRoute(({ url, navigate }) => createTestHistoryRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/test-history/test-history.css']);
   routes['management.html'] = defineRoute(({ url, navigate }) => createManagementRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/management/management-support.css']);
   routes['archive.html'] = defineRoute(({ url, navigate }) => createArchiveRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/management/management-support.css']);
-  routes['feedback.html'] = defineRoute(({ url, navigate }) => createFeedbackRuntime({ app, templateMount: mounts.templateMount, documentRef, navigate }), ['src/features/management/creator.css']);
+  routes['feedback.html'] = defineRoute(({ url, navigate }) => createFeedbackRuntime({ app, templateMount: mounts.templateMount, documentRef, navigate }), ['src/features/management/management-support.css']);
   routes['creator.html'] = defineRoute(({ url, navigate }) => createCreatorRuntime({ app, templateMount: mounts.templateMount, documentRef, navigate }), ['src/features/management/creator.css']);
   return Object.freeze(routes);
 }

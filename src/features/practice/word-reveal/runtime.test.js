@@ -50,10 +50,14 @@ test('solving the target before all lesson questions starts another round', asyn
     { question: 'q3', answer: 'a3' }
   ]);
   runtime.startRound({ type: 'word', text: 'ab', meaning: '' });
-  await runtime.submitAnswer('a1');
+
+  const firstQuestion = runtime.snapshot().current;
+  await runtime.submitAnswer(firstQuestion.answer);
   runtime.continueAfterFeedback();
   assert.equal(runtime.snapshot().phase, 'question');
-  await runtime.submitAnswer('a2');
+
+  const secondQuestion = runtime.snapshot().current;
+  await runtime.submitAnswer(secondQuestion.answer);
   assert.equal(runtime.snapshot().phase, 'round-complete');
   assert.equal(runtime.snapshot().remainingCount, 1);
 });

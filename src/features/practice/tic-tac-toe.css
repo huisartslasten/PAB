@@ -220,6 +220,28 @@
   width: 100%;
 }
 
+.ttt-answer-feedback {
+  display: grid;
+  gap: 3px;
+  padding: 8px 12px;
+  border: 2px solid #f0caca;
+  border-radius: 13px;
+  background: #fff6f6;
+  color: #8d2020;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.ttt-answer-feedback strong {
+  font-weight: 900;
+}
+
+.ttt-answer-feedback b {
+  color: #102b57;
+  font-weight: 900;
+}
+
 .ttt-turn {
   min-height: 34px;
   box-sizing: border-box;

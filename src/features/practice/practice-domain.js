@@ -36,6 +36,14 @@ export const PRACTICE_GAMES = Object.freeze([
     icon: '⭕',
     description: 'Beantwoord de vragen en speel jezelf naar drie op een rij.',
     status: 'active'
+  }),
+  Object.freeze({
+    id: 'word-reveal',
+    label: 'Woordonthuller',
+    path: 'word-reveal.html',
+    icon: '🐶',
+    description: 'Beantwoord de lesvragen en onthul een geheim woord of een leerzame zin.',
+    status: 'active'
   })
 ]);
 
@@ -53,9 +61,7 @@ export function isPracticeModeActive(modeId) {
 }
 
 export function getActivePracticeModes() {
-  return PRACTICE_MODES
-    .filter(mode => mode.status === 'active')
-    .map(mode => ({ ...mode }));
+  return PRACTICE_MODES.filter(mode => mode.status === 'active').map(mode => ({ ...mode }));
 }
 
 export function getPracticeGames() {
@@ -72,7 +78,5 @@ export function isPracticeGameActive(gameId) {
 }
 
 export function getActivePracticeGames() {
-  return PRACTICE_GAMES
-    .filter(game => game.status === 'active')
-    .map(game => ({ ...game }));
+  return PRACTICE_GAMES.filter(game => game.status === 'active').map(game => ({ ...game }));
 }

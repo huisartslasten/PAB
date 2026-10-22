@@ -31,7 +31,7 @@ export function createWordRevealRuntime({ items = [], gradeAnswer, random = Math
   let questionQueue = [];
   let current = null;
   let target = null;
-  let revealedCount = 0;
+  let revealedIndices = new Set();
   let turns = 0;
   let phase = 'idle';
   let feedback = null;
@@ -51,7 +51,7 @@ export function createWordRevealRuntime({ items = [], gradeAnswer, random = Math
 
   function startRound(nextTarget) {
     target = normalizeTarget(nextTarget);
-    revealedCount = 0;
+    revealedIndices = new Set();
     feedback = null;
     questionQueue = [];
     phase = remaining.size ? 'question' : 'finished';
@@ -68,21 +68,20 @@ export function createWordRevealRuntime({ items = [], gradeAnswer, random = Math
     return startRound(nextTarget);
   }
 
-  function revealNextLetter() {
-    revealedCount = Math.min(revealedCount + 1, target.revealableIndices.length);
-  }
-
   function completeAfterReveal() {
     if (!remaining.size) {
-      revealedCount = target.revealableIndices.length;
+      revealedIndices = new Set(target.revealableIndices);
       phase = 'finished';
       current = null;
       return;
     }
-    if (revealedCount >= target.revealableIndices.length) {
+    if (revealedIndices.size >= target.revealableIndices.length) {
       phase = 'round-complete';
       current = null;
+      return;
     }
+    phase = 'question';
+    selectNextQuestion();
   }
 
   async function submitAnswer(value) {
@@ -95,14 +94,25 @@ export function createWordRevealRuntime({ items = [], gradeAnswer, random = Math
     remaining.delete(current.index);
     turns += 1;
     feedback = { correct: true, question: current.question, message: String(result?.feedback ?? '').trim() };
-    revealNextLetter();
-    completeAfterReveal();
+    phase = 'reveal-choice';
     return snapshot();
   }
 
   function continueAfterFeedback() {
     feedback = null;
     if (phase === 'question') selectNextQuestion();
+    return snapshot();
+  }
+
+  function revealLetter(index) {
+    if (phase !== 'reveal-choice') throw new Error('Kies nu eerst een letter om te onthullen.');
+    const targetIndex = Number(index);
+    if (!target.revealableIndices.includes(targetIndex)) throw new Error('Deze positie kan niet worden onthuld.');
+    if (revealedIndices.has(targetIndex)) throw new Error('Deze letter is al onthuld.');
+
+    revealedIndices.add(targetIndex);
+    feedback = null;
+    completeAfterReveal();
     return snapshot();
   }
 
@@ -113,20 +123,31 @@ export function createWordRevealRuntime({ items = [], gradeAnswer, random = Math
     const solution = target.text.trim().toLocaleLowerCase('nl-NL');
     if (guess === solution) {
       feedback = { correct: true, guess: true };
-      revealedCount = target.revealableIndices.length;
+      revealedIndices = new Set(target.revealableIndices);
       if (!remaining.size) { phase = 'finished'; current = null; }
       else { phase = 'round-complete'; current = null; }
       return snapshot();
     }
-    feedback = { correct: false, guess: true, studentAnswer: String(value ?? ''), correctAnswer: target.text };
+    feedback = { correct: false, guess: true, studentAnswer: String(value ?? '') };
     return snapshot();
   }
 
   function snapshot() {
-    return Object.freeze({ phase, current, target, revealedCount, turns, remainingCount: remaining.size, totalCount: source.length, completedCount: source.length - remaining.size, feedback });
+    return Object.freeze({
+      phase,
+      current,
+      target,
+      revealedIndices: [...revealedIndices],
+      revealedCount: revealedIndices.size,
+      turns,
+      remainingCount: remaining.size,
+      totalCount: source.length,
+      completedCount: source.length - remaining.size,
+      feedback
+    });
   }
 
-  return Object.freeze({ startRound, restart, submitAnswer, continueAfterFeedback, guessSolution, snapshot });
+  return Object.freeze({ startRound, restart, submitAnswer, continueAfterFeedback, revealLetter, guessSolution, snapshot });
 }
 
 export { normalizeTarget };

@@ -39,10 +39,10 @@ export const PRACTICE_GAMES = Object.freeze([
   }),
   Object.freeze({
     id: 'word-reveal',
-    label: 'Woordonthuller',
+    label: 'Letter Hunt',
     path: 'word-reveal.html',
     icon: '🐶',
-    description: 'Beantwoord de lesvragen en onthul een geheim woord of een leerzame zin.',
+    description: 'Beantwoord de lesvragen, kies zelf letters en onthul het geheime doel.',
     status: 'active'
   })
 ]);

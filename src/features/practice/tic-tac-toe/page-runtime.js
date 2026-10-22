@@ -15,7 +15,7 @@ export function createTicTacToePageRuntime({ app, templateMount, context, lesson
   const content = documentRef.createElement('div');
   const view = createTicTacToeView({ documentRef, escapeHtml });
   const gameShell = documentRef.createElement('main');
-  gameShell.className = 'practice-page-card';
+  gameShell.className = 'practice-page-card ttt-page-card';
   gameShell.innerHTML = `<div class="ttt-game-head"><h1 class="ttt-game-title"><span class="ttt-mark ttt-mark-o">O</span> TIC-TAC-TOE <span class="ttt-mark ttt-mark-x">X</span></h1><div class="ttt-stats"><div class="ttt-stat"><span>Score</span><strong id="tttScore">0 🏆</strong></div><div class="ttt-stat"><span>Record</span><strong id="tttRecord">0 🥇</strong></div><div class="ttt-stat"><span>Vragen</span><strong id="tttProgress">0 van 0</strong></div></div></div><div class="ttt-settings"><div class="ttt-setting"><span class="ttt-setting-label">Modus</span><div id="tttMode"></div></div><div class="ttt-setting"><span class="ttt-setting-label">Paco</span><div id="tttLevel"></div></div></div><div id="ticTacToeBoard" class="ttt-board" aria-label="Tic-Tac-Toe bord"></div><div id="tttContent" class="ttt-content"></div>`;
   content.appendChild(gameShell);
 

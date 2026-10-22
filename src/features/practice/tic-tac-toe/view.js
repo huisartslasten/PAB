@@ -27,17 +27,21 @@ export function createTicTacToeView({ documentRef = globalThis.document, escapeH
   function renderSettings(state, onMode, onLevel) {
     const mode = documentRef.getElementById('tttMode');
     const level = documentRef.getElementById('tttLevel');
-    if (mode) mode.value = state.mode;
-    if (level) level.value = state.aiLevel;
-    mode?.addEventListener('change', () => onMode(mode.value));
-    level?.addEventListener('change', () => onLevel(level.value));
+    if (mode) {
+      mode.value = state.mode;
+      mode.onchange = () => onMode(mode.value);
+    }
+    if (level) {
+      level.value = state.aiLevel;
+      level.onchange = () => onLevel(level.value);
+    }
   }
 
   function renderQuestion(state, onSubmit, errorMessage = '') {
     const content = documentRef.getElementById('tttContent');
     if (!content || !state.item) return;
     const feedback = errorMessage ? `<div class="feedback error" role="alert">${escapeHtml(errorMessage)}</div>` : '';
-    content.innerHTML = `${feedback}<div class="ttt-turn">${state.turn === 'X' ? 'Jij bent aan de beurt' : 'Paco is aan de beurt'}</div><div class="ttt-prompt">${escapeHtml(state.item.question || '')}</div><div class="field"><input id="tttAnswer" class="answer-input" autocomplete="off" placeholder="Typ je antwoord"></div><button class="success" data-ttt-submit type="button">Controleren</button>`;
+    content.innerHTML = `${feedback}<div class="ttt-turn">Jij bent aan de beurt</div><div class="ttt-prompt">${escapeHtml(state.item.question || '')}</div><div class="field"><input id="tttAnswer" class="answer-input" autocomplete="off" placeholder="Typ je antwoord"></div><button class="success" data-ttt-submit type="button">Controleren</button>`;
     const input = documentRef.getElementById('tttAnswer');
     const button = content.querySelector('[data-ttt-submit]');
     input?.focus?.();
@@ -56,7 +60,7 @@ export function createTicTacToeView({ documentRef = globalThis.document, escapeH
     const content = documentRef.getElementById('tttContent');
     if (!content) return;
     content.innerHTML = '<div class="ttt-turn">🐶 Paco denkt na…</div>';
-    window.setTimeout(onPaco, 250);
+    documentRef.defaultView?.setTimeout?.(onPaco, 250);
   }
 
   function renderGameResult(state, onContinue) {

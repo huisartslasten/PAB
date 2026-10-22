@@ -88,7 +88,6 @@ export function createWordRevealRuntime({ items = [], gradeAnswer, random = Math
     feedback = { correct: true, question: current.question, message: String(result?.feedback ?? '').trim() };
     revealNextLetter();
     completeAfterReveal();
-    if (phase === 'question') selectNextQuestion();
     return snapshot();
   }
 

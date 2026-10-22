@@ -9,11 +9,7 @@ function shuffle(values, random = Math.random) {
 
 function normalizeItems(items = []) {
   return (Array.isArray(items) ? items : [])
-    .map((item, index) => ({
-      index,
-      question: String(item?.question ?? '').trim(),
-      answer: String(item?.answer ?? '').trim()
-    }))
+    .map((item, index) => ({ index, question: String(item?.question ?? '').trim(), answer: String(item?.answer ?? '').trim() }))
     .filter(item => item.question && item.answer);
 }
 
@@ -25,17 +21,11 @@ function normalizeTarget(target) {
     return indices;
   }, []);
   if (!revealableIndices.length) throw new Error('Het doel bevat geen onthulbare letters.');
-  return Object.freeze({
-    type: String(target?.type ?? 'word'),
-    text,
-    meaning: String(target?.meaning ?? '').trim(),
-    revealableIndices
-  });
+  return Object.freeze({ type: String(target?.type ?? 'word'), text, meaning: String(target?.meaning ?? '').trim(), revealableIndices });
 }
 
 export function createWordRevealRuntime({ items = [], gradeAnswer, random = Math.random } = {}) {
   if (typeof gradeAnswer !== 'function') throw new TypeError('Word Reveal runtime requires answer grading.');
-
   const source = normalizeItems(items);
   const remaining = new Set(source.map(item => item.index));
   let questionQueue = [];
@@ -51,10 +41,7 @@ export function createWordRevealRuntime({ items = [], gradeAnswer, random = Math
   }
 
   function selectNextQuestion() {
-    if (!remaining.size) {
-      current = null;
-      return null;
-    }
+    if (!remaining.size) { current = null; return null; }
     if (!questionQueue.some(index => remaining.has(index))) refillQuestionQueue();
     const nextIndex = questionQueue.find(index => remaining.has(index));
     questionQueue = questionQueue.filter(index => index !== nextIndex);
@@ -73,12 +60,7 @@ export function createWordRevealRuntime({ items = [], gradeAnswer, random = Math
   }
 
   function revealNextLetter() {
-    revealedCount += 1;
-    if (revealedCount >= target.revealableIndices.length) {
-      revealedCount = target.revealableIndices.length;
-      return true;
-    }
-    return false;
+    revealedCount = Math.min(revealedCount + 1, target.revealableIndices.length);
   }
 
   function completeAfterReveal() {
@@ -96,76 +78,47 @@ export function createWordRevealRuntime({ items = [], gradeAnswer, random = Math
 
   async function submitAnswer(value) {
     if (phase !== 'question' || !current) throw new Error('Geen vraag beschikbaar.');
-
     const result = await gradeAnswer(current.question, current.answer, value);
     if (!result?.correct) {
-      feedback = {
-        correct: false,
-        question: current.question,
-        studentAnswer: String(value ?? ''),
-        correctAnswer: current.answer,
-        message: String(result?.feedback ?? '').trim()
-      };
-      selectNextQuestion();
+      feedback = { correct: false, question: current.question, studentAnswer: String(value ?? ''), correctAnswer: current.answer, message: String(result?.feedback ?? '').trim() };
       return snapshot();
     }
-
     remaining.delete(current.index);
     turns += 1;
-    feedback = {
-      correct: true,
-      question: current.question,
-      message: String(result?.feedback ?? '').trim()
-    };
+    feedback = { correct: true, question: current.question, message: String(result?.feedback ?? '').trim() };
     revealNextLetter();
     completeAfterReveal();
     if (phase === 'question') selectNextQuestion();
     return snapshot();
   }
 
+  function continueAfterFeedback() {
+    feedback = null;
+    if (phase === 'question') selectNextQuestion();
+    return snapshot();
+  }
+
   function guessSolution(value) {
     if (phase !== 'question') throw new Error('Je kunt de oplossing nu niet raden.');
-
     turns += 1;
     const guess = String(value ?? '').trim().toLocaleLowerCase('nl-NL');
     const solution = target.text.trim().toLocaleLowerCase('nl-NL');
     if (guess === solution) {
       feedback = { correct: true, guess: true };
       revealedCount = target.revealableIndices.length;
-      if (!remaining.size) {
-        phase = 'finished';
-        current = null;
-      } else {
-        phase = 'round-complete';
-        current = null;
-      }
+      if (!remaining.size) { phase = 'finished'; current = null; }
+      else { phase = 'round-complete'; current = null; }
       return snapshot();
     }
-
-    feedback = {
-      correct: false,
-      guess: true,
-      studentAnswer: String(value ?? ''),
-      correctAnswer: target.text
-    };
+    feedback = { correct: false, guess: true, studentAnswer: String(value ?? ''), correctAnswer: target.text };
     return snapshot();
   }
 
   function snapshot() {
-    return Object.freeze({
-      phase,
-      current,
-      target,
-      revealedCount,
-      turns,
-      remainingCount: remaining.size,
-      totalCount: source.length,
-      completedCount: source.length - remaining.size,
-      feedback
-    });
+    return Object.freeze({ phase, current, target, revealedCount, turns, remainingCount: remaining.size, totalCount: source.length, completedCount: source.length - remaining.size, feedback });
   }
 
-  return Object.freeze({ startRound, submitAnswer, guessSolution, snapshot });
+  return Object.freeze({ startRound, submitAnswer, continueAfterFeedback, guessSolution, snapshot });
 }
 
 export { normalizeTarget };

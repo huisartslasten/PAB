@@ -27,15 +27,36 @@ test('wrong answer stays open and the same question can be answered later', asyn
   assert.notEqual(runtime.snapshot().current?.index, first.index);
   await runtime.submitAnswer(runtime.snapshot().current.answer);
   assert.equal(runtime.snapshot().remainingCount, 1);
-  assert.equal(runtime.snapshot().revealedCount, 1);
+  assert.equal(runtime.snapshot().revealedCount, 0);
   assert.equal(runtime.snapshot().turns, 1);
+  assert.equal(runtime.snapshot().phase, 'reveal-choice');
   assert.equal(runtime.snapshot().completedCount, 1);
+});
+
+test('a correct answer opens exactly one letter choice and reveals the selected position', async () => {
+  const runtime = createRuntime();
+  runtime.startRound(target);
+  await runtime.submitAnswer(runtime.snapshot().current.answer);
+
+  const stateBeforeReveal = runtime.snapshot();
+  assert.equal(stateBeforeReveal.phase, 'reveal-choice');
+  assert.equal(stateBeforeReveal.revealedCount, 0);
+  assert.deepEqual(stateBeforeReveal.revealedIndices, []);
+
+  const selectedIndex = stateBeforeReveal.target.revealableIndices.at(-1);
+  runtime.revealLetter(selectedIndex);
+  const stateAfterReveal = runtime.snapshot();
+  assert.equal(stateAfterReveal.revealedCount, 1);
+  assert.deepEqual(stateAfterReveal.revealedIndices, [selectedIndex]);
+  assert.equal(stateAfterReveal.phase, 'question');
 });
 
 test('questions are the completion source of truth even when the target is longer', async () => {
   const runtime = createRuntime([{ question: 'q1', answer: 'a1' }]);
   runtime.startRound({ type: 'sentence', text: 'Leren is leuk', meaning: '' });
   await runtime.submitAnswer('a1');
+  assert.equal(runtime.snapshot().phase, 'reveal-choice');
+  runtime.revealLetter(runtime.snapshot().target.revealableIndices[0]);
   const state = runtime.snapshot();
   assert.equal(state.phase, 'finished');
   assert.equal(state.remainingCount, 0);
@@ -53,25 +74,32 @@ test('solving the target before all lesson questions starts another round', asyn
 
   const firstQuestion = runtime.snapshot().current;
   await runtime.submitAnswer(firstQuestion.answer);
-  runtime.continueAfterFeedback();
+  runtime.revealLetter(runtime.snapshot().target.revealableIndices[0]);
   assert.equal(runtime.snapshot().phase, 'question');
 
   const secondQuestion = runtime.snapshot().current;
   await runtime.submitAnswer(secondQuestion.answer);
+  assert.equal(runtime.snapshot().phase, 'reveal-choice');
+  runtime.revealLetter(runtime.snapshot().target.revealableIndices[1]);
   assert.equal(runtime.snapshot().phase, 'round-complete');
   assert.equal(runtime.snapshot().remainingCount, 1);
 });
 
-test('whole-solution guess always costs one turn', () => {
+test('whole-solution guess always costs one turn without revealing the solution when wrong', () => {
   const runtime = createRuntime();
   runtime.startRound(target);
-  const afterWrongGuess = runtime.guessSolution('ander woord');
+  const afterWrongGuess = runtime.guessSolution('sportend');
   assert.equal(afterWrongGuess.turns, 1);
   assert.equal(afterWrongGuess.phase, 'question');
   assert.equal(afterWrongGuess.remainingCount, 2);
+  assert.equal(afterWrongGuess.feedback.correct, false);
+  assert.equal(afterWrongGuess.feedback.correctAnswer, undefined);
+  assert.equal(afterWrongGuess.revealedCount, 0);
 
+  runtime.continueAfterFeedback();
   const afterCorrectGuess = runtime.guessSolution('boom');
-  assert.equal(afterCorrectGuess.turns, 2);
+  assert.equal(afterCorrectGuess.turns, 3);
   assert.equal(afterCorrectGuess.phase, 'round-complete');
   assert.equal(afterCorrectGuess.remainingCount, 2);
+  assert.equal(afterCorrectGuess.revealedCount, afterCorrectGuess.target.revealableIndices.length);
 });

@@ -1,6 +1,11 @@
+import { createPacoDropdown } from '../../../components/page-template.js';
+
 export function createTicTacToeView({ documentRef = globalThis.document, escapeHtml } = {}) {
   if (!documentRef) throw new Error('A document is required.');
   if (typeof escapeHtml !== 'function') throw new Error('An escapeHtml function is required.');
+
+  let modeDropdown = null;
+  let levelDropdown = null;
 
   function renderBoard(state, onCell) {
     const board = documentRef.getElementById('ticTacToeBoard');
@@ -24,16 +29,31 @@ export function createTicTacToeView({ documentRef = globalThis.document, escapeH
     if (progress) progress.textContent = `${Math.min(state.uniqueAnswered, state.totalQuestions)} van ${state.totalQuestions} vragen`;
   }
 
-  function renderSettings(state, onMode, onLevel) {
-    const mode = documentRef.getElementById('tttMode');
-    const level = documentRef.getElementById('tttLevel');
-    if (mode) {
-      mode.value = state.mode;
-      mode.onchange = () => onMode(mode.value);
+  function renderSettings(state, modeOptions, levelOptions, onMode, onLevel) {
+    const modeMount = documentRef.getElementById('tttMode');
+    const levelMount = documentRef.getElementById('tttLevel');
+    if (!modeMount || !levelMount) return;
+
+    if (!modeDropdown) {
+      modeDropdown = createPacoDropdown({
+        options: modeOptions.map(item => ({ value: item.id, label: item.label })),
+        value: state.mode,
+        onChange: onMode
+      });
+      modeMount.replaceChildren(modeDropdown.element);
+    } else {
+      modeDropdown.setValue(state.mode);
     }
-    if (level) {
-      level.value = state.aiLevel;
-      level.onchange = () => onLevel(level.value);
+
+    if (!levelDropdown) {
+      levelDropdown = createPacoDropdown({
+        options: levelOptions.map(item => ({ value: item.id, label: item.label })),
+        value: state.aiLevel,
+        onChange: onLevel
+      });
+      levelMount.replaceChildren(levelDropdown.element);
+    } else {
+      levelDropdown.setValue(state.aiLevel);
     }
   }
 

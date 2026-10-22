@@ -110,7 +110,16 @@ export function createWordRevealPageRuntime({ app, templateMount, context, lesso
     async function render(errorMessage = '') {
       const state = runtime.snapshot();
       view.renderStats(gameShell, state, highScore);
-      view.renderTarget(gameShell, state);
+      view.renderTarget(
+        gameShell,
+        state,
+        state.phase === 'reveal-choice'
+          ? index => {
+              try { runtime.revealLetter(index); void render(); }
+              catch (error) { void render(error?.message || 'De letter kon niet worden onthuld.'); }
+            }
+          : null
+      );
       view.renderFeedback(gameShell, state, () => { runtime.continueAfterFeedback(); void render(); });
 
       if (state.phase === 'finished') {

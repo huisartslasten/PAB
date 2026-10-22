@@ -111,9 +111,12 @@ export function createTicTacToeView({ documentRef = globalThis.document, escapeH
 
   function renderPacoTurn(state, onPaco) {
     const content = documentRef.getElementById('tttContent');
-    if (!content) return;
-    content.innerHTML = '<div class="ttt-turn">🐶 Paco denkt na…</div>';
-    documentRef.defaultView?.setTimeout?.(onPaco, 250);
+    if (!content) return () => {};
+    content.innerHTML = '<div class="ttt-turn ttt-paco-thinking" role="status" aria-live="polite"><span class="ttt-paco-face">🐶</span><span>Paco denkt na<span class="ttt-thinking-dots" aria-hidden="true"><i></i><i></i><i></i></span></span></div>';
+    const timer = documentRef.defaultView?.setTimeout?.(onPaco, 900);
+    return () => {
+      if (timer != null) documentRef.defaultView?.clearTimeout?.(timer);
+    };
   }
 
   function renderGameResult(state, onContinue) {

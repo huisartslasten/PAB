@@ -126,7 +126,7 @@ export function createWordRevealPageRuntime({ app, templateMount, context, lesso
         view.renderFinished(
           gameShell,
           state,
-          () => { runtime.startRound(state.target); void render(); },
+          () => { runtime.restart(state.target); void render(); },
           goGames
         );
         return;

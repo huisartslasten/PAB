@@ -36,16 +36,16 @@ jobs:
           ! grep -q 'function analyzeAgendaVideo()' index.html
           ! grep -q 'function saveAgendaImportReview()' index.html
           ! grep -q 'src/features/agenda/runtime-entry.js' index.html
-      - name: Verify professional Player ownership boundary
+      - name: Verify canonical practice ownership boundary
         run: |
-          test -f src/features/lessons/player-runtime-bootstrap.js
-          test -f src/features/lessons/player-runtime-entry.js
-          test -f src/features/lessons/player-runtime-composition.js
-          test -f src/features/lessons/player-screen-boundary.js
-          test -f src/features/lessons/player-submit-boundary.js
+          test -f src/features/practice/practice-test-runtime.js
+          test -f src/features/lessons/practice-presentation.js
+          test -f src/features/lessons/practice-runtime-entry.js
+          test -f src/features/lessons/practice-runtime.js
           test -f src/features/lessons/test-runtime.js
-          grep -q "from './player-runtime-bootstrap.js'" src/features/lessons/test-runtime.js
-          grep -q 'createProfessionalPlayerBridge' src/features/lessons/test-runtime.js
+          grep -q "from './practice-presentation.js'" src/features/lessons/test-runtime.js
+          grep -q 'createPracticePresentation' src/features/lessons/test-runtime.js
+          ! grep -q 'createProfessionalPlayerBridge' src/features/lessons/test-runtime.js
           ! grep -q 'src/features/lessons/player-runtime-bootstrap.js' test.html
           ! grep -q 'createProfessionalPlayerBridge' test.html
           ! grep -q 'function renderTest()' index.html

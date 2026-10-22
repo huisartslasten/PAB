@@ -21,38 +21,57 @@ export function createWordRevealView({ documentRef = document } = {}) {
     if (!state.target) return;
 
     const revealSet = new Set(state.revealedIndices || state.target.revealableIndices.slice(0, state.revealedCount));
-    [...state.target.text].forEach((character, index) => {
-      if (!state.target.revealableIndices.includes(index)) {
-        const punctuation = createElement(documentRef, 'span', 'wr-target-space');
-        punctuation.textContent = character === ' ' ? '\u00a0' : escapeText(character);
-        targetNode.appendChild(punctuation);
+    let characterOffset = 0;
+
+    [...state.target.text.matchAll(/\S+|\s+/gu)].forEach(match => {
+      const token = match[0];
+      const characters = [...token];
+      const startIndex = characterOffset;
+      characterOffset += characters.length;
+
+      if (/^\s+$/u.test(token)) {
+        const space = createElement(documentRef, 'span', 'wr-target-space');
+        space.textContent = characters.map(() => '\u00a0').join('');
+        targetNode.appendChild(space);
         return;
       }
 
-      const isRevealed = revealSet.has(index);
-      const card = createElement(documentRef, 'span', `wr-letter-card${isRevealed ? ' is-revealed' : ''}${onReveal && !isRevealed ? ' is-selectable' : ''}`);
-      card.setAttribute('aria-hidden', isRevealed ? 'true' : 'false');
-      const front = createElement(documentRef, 'span', 'wr-letter-front');
-      front.textContent = '🐶';
-      const back = createElement(documentRef, 'span', 'wr-letter-back');
-      back.textContent = character;
-      card.append(front, back);
+      const word = createElement(documentRef, 'span', 'wr-target-word');
+      characters.forEach((character, offset) => {
+        const index = startIndex + offset;
+        if (!state.target.revealableIndices.includes(index)) {
+          const punctuation = createElement(documentRef, 'span', 'wr-target-punctuation');
+          punctuation.textContent = escapeText(character);
+          word.appendChild(punctuation);
+          return;
+        }
 
-      if (onReveal && !isRevealed) {
-        card.setAttribute('role', 'button');
-        card.setAttribute('tabindex', '0');
-        card.setAttribute('aria-label', 'Onthul deze letter');
-        const reveal = () => onReveal(index);
-        card.addEventListener('click', reveal);
-        card.addEventListener('keydown', event => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            reveal();
-          }
-        });
-      }
+        const isRevealed = revealSet.has(index);
+        const card = createElement(documentRef, 'span', `wr-letter-card${isRevealed ? ' is-revealed' : ''}${onReveal && !isRevealed ? ' is-selectable' : ''}`);
+        card.setAttribute('aria-hidden', isRevealed ? 'true' : 'false');
+        const front = createElement(documentRef, 'span', 'wr-letter-front');
+        front.textContent = '🐶';
+        const back = createElement(documentRef, 'span', 'wr-letter-back');
+        back.textContent = character;
+        card.append(front, back);
 
-      targetNode.appendChild(card);
+        if (onReveal && !isRevealed) {
+          card.setAttribute('role', 'button');
+          card.setAttribute('tabindex', '0');
+          card.setAttribute('aria-label', 'Onthul deze letter');
+          const reveal = () => onReveal(index);
+          card.addEventListener('click', reveal);
+          card.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              reveal();
+            }
+          });
+        }
+
+        word.appendChild(card);
+      });
+      targetNode.appendChild(word);
     });
   }
 

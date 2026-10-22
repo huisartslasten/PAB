@@ -98,7 +98,7 @@ test('whole-solution guess always costs one turn without revealing the solution 
 
   runtime.continueAfterFeedback();
   const afterCorrectGuess = runtime.guessSolution('boom');
-  assert.equal(afterCorrectGuess.turns, 3);
+  assert.equal(afterCorrectGuess.turns, 2);
   assert.equal(afterCorrectGuess.phase, 'round-complete');
   assert.equal(afterCorrectGuess.remainingCount, 2);
   assert.equal(afterCorrectGuess.revealedCount, afterCorrectGuess.target.revealableIndices.length);

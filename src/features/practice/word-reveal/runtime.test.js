@@ -24,7 +24,7 @@ test('wrong answer stays open and the same question can be answered later', asyn
   assert.equal(runtime.snapshot().feedback.correct, false);
 
   runtime.continueAfterFeedback();
-  assert.equal(runtime.snapshot().current?.index, 1 - first.index);
+  assert.notEqual(runtime.snapshot().current?.index, first.index);
   await runtime.submitAnswer(runtime.snapshot().current.answer);
   assert.equal(runtime.snapshot().remainingCount, 1);
   assert.equal(runtime.snapshot().revealedCount, 1);
@@ -44,13 +44,18 @@ test('questions are the completion source of truth even when the target is longe
 });
 
 test('solving the target before all lesson questions starts another round', async () => {
-  const runtime = createRuntime();
+  const runtime = createRuntime([
+    { question: 'q1', answer: 'a1' },
+    { question: 'q2', answer: 'a2' },
+    { question: 'q3', answer: 'a3' }
+  ]);
   runtime.startRound({ type: 'word', text: 'ab', meaning: '' });
   await runtime.submitAnswer('a1');
+  runtime.continueAfterFeedback();
   assert.equal(runtime.snapshot().phase, 'question');
   await runtime.submitAnswer('a2');
   assert.equal(runtime.snapshot().phase, 'round-complete');
-  assert.equal(runtime.snapshot().remainingCount, 0);
+  assert.equal(runtime.snapshot().remainingCount, 1);
 });
 
 test('whole-solution guess always costs one turn', () => {

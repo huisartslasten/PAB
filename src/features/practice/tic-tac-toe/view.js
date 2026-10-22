@@ -12,20 +12,45 @@ export function createTicTacToeView({ documentRef = globalThis.document, escapeH
 
   let modeDropdown = null;
   let levelDropdown = null;
+  let previousBoard = null;
+  let previousMode = null;
+  let boardRenderToken = 0;
 
   function renderBoard(state, onCell) {
     const board = documentRef.getElementById('ticTacToeBoard');
     if (!board) return;
+
+    const renderToken = ++boardRenderToken;
+    const canFadeInfiniteRemoval = state.mode === 'infinite' && previousMode === 'infinite' && Array.isArray(previousBoard);
+    const fadingIndexes = new Set();
+
+    state.board.forEach((cell, index) => {
+      if (canFadeInfiniteRemoval && !cell && previousBoard[index]?.symbol) fadingIndexes.add(index);
+    });
+
     board.innerHTML = state.board.map((cell, index) => {
-      const symbol = cell?.symbol === 'X' || cell?.symbol === 'O' ? cell.symbol : null;
+      const fadingSymbol = fadingIndexes.has(index) ? previousBoard[index].symbol : null;
+      const symbol = cell?.symbol === 'X' || cell?.symbol === 'O' ? cell.symbol : fadingSymbol;
       const asset = TILE_ASSETS[symbol || 'empty'];
-      const label = symbol ? `${symbol === 'X' ? 'PacoGO X' : 'Paco O'}` : 'Leeg vakje';
-      const disabled = Boolean(cell) || state.phase !== 'choosing' || state.turn !== 'X';
-      return `<button type="button" class="ttt-cell${symbol ? ` is-${symbol.toLowerCase()}` : ''}" data-cell="${index}" aria-label="Vakje ${index + 1}, ${label}" ${disabled ? 'disabled' : ''}><img class="ttt-tile-image" src="${asset}" alt="" draggable="false"></button>`;
+      const isFading = fadingIndexes.has(index);
+      const label = symbol ? `${symbol === 'X' ? 'PacoGO X' : 'Paco O'}${isFading ? ' verdwijnt' : ''}` : 'Leeg vakje';
+      const disabled = Boolean(cell) || isFading || state.phase !== 'choosing' || state.turn !== 'X';
+      return `<button type="button" class="ttt-cell${symbol ? ` is-${symbol.toLowerCase()}` : ''}" data-cell="${index}" aria-label="Vakje ${index + 1}, ${label}" ${disabled ? 'disabled' : ''}><img class="ttt-tile-image${isFading ? ' is-fading-out' : ''}" src="${asset}" alt="" draggable="false"></button>`;
     }).join('');
     board.querySelectorAll('[data-cell]').forEach(button => {
       button.addEventListener('click', () => onCell(Number(button.dataset.cell)));
     });
+
+    previousBoard = state.board.map(cell => cell ? { ...cell } : null);
+    previousMode = state.mode;
+
+    if (fadingIndexes.size) {
+      const animationDelay = 280;
+      documentRef.defaultView?.setTimeout?.(() => {
+        if (renderToken !== boardRenderToken) return;
+        renderBoard(state, onCell);
+      }, animationDelay);
+    }
   }
 
   function renderStats(state) {

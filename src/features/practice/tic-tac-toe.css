@@ -173,6 +173,15 @@
   user-select: none;
 }
 
+.ttt-tile-image.is-fading-out {
+  animation: ttt-tile-fade-out .28s ease forwards;
+}
+
+@keyframes ttt-tile-fade-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(.94); }
+}
+
 .ttt-cell:not(:disabled):hover {
   transform: translateY(-2px);
   filter: brightness(1.02);

@@ -1,21 +1,26 @@
+.ttt-page-card {
+  gap: 10px;
+  padding: 12px 18px 14px;
+}
+
 .ttt-game-head {
   display: grid;
-  gap: 18px;
-  padding: 22px;
+  gap: 9px;
+  padding: 11px 14px;
   border: 2px solid #dce9f6;
-  border-radius: 24px;
+  border-radius: 20px;
   background: linear-gradient(180deg, #f8fbff 0%, #eef7ff 100%);
-  box-shadow: 0 5px 0 rgba(16,43,87,.04);
+  box-shadow: 0 4px 0 rgba(16,43,87,.04);
 }
 
 .ttt-game-title {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   margin: 0;
   color: #102b57;
-  font: 900 clamp(28px, 4vw, 42px)/1 "Baloo 2", Nunito, sans-serif;
+  font: 900 clamp(26px, 3vw, 34px)/1 "Baloo 2", Nunito, sans-serif;
   letter-spacing: .3px;
   text-align: center;
 }
@@ -23,14 +28,14 @@
 .ttt-mark {
   display: inline-grid;
   place-items: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 13px;
-  font: 900 31px/1 Nunito, sans-serif;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  font: 900 25px/1 Nunito, sans-serif;
 }
 
 .ttt-mark-o {
-  border: 4px solid #ef1717;
+  border: 3px solid #ef1717;
   color: #ef1717;
   background: #fff;
 }
@@ -43,17 +48,17 @@
 .ttt-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 8px;
 }
 
 .ttt-stat {
-  min-height: 78px;
+  min-height: 54px;
   display: grid;
   align-content: center;
-  gap: 3px;
-  padding: 11px 14px;
+  gap: 2px;
+  padding: 7px 10px;
   border: 2px solid #e1edf7;
-  border-radius: 18px;
+  border-radius: 14px;
   background: #fff;
   text-align: center;
 }
@@ -61,41 +66,41 @@
 .ttt-stat span {
   display: block;
   color: #667894;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 900;
-  letter-spacing: .7px;
+  letter-spacing: .6px;
   text-transform: uppercase;
 }
 
 .ttt-stat strong {
   display: block;
   color: #102b57;
-  font: 900 23px/1.1 "Baloo 2", Nunito, sans-serif;
+  font: 900 19px/1.05 "Baloo 2", Nunito, sans-serif;
 }
 
 .ttt-settings {
-  width: min(100%, 760px);
+  width: min(100%, 680px);
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  margin: 2px auto 0;
-  padding: 16px;
+  gap: 10px;
+  margin: 0 auto;
+  padding: 9px 12px;
   border: 2px solid #dce9f6;
-  border-radius: 20px;
+  border-radius: 16px;
   background: #f8fbff;
 }
 
 .ttt-setting {
   display: grid;
-  gap: 7px;
+  gap: 4px;
   min-width: 0;
 }
 
 .ttt-setting-label {
   padding-left: 3px;
   color: #173b70;
-  font: 900 14px/1.1 "Baloo 2", Nunito, sans-serif;
-  letter-spacing: .5px;
+  font: 900 11px/1.1 "Baloo 2", Nunito, sans-serif;
+  letter-spacing: .4px;
   text-transform: uppercase;
 }
 
@@ -104,13 +109,13 @@
 }
 
 .ttt-setting .paco-dropdown-trigger {
-  min-height: 52px;
-  border-radius: 15px;
+  min-height: 40px;
+  border-radius: 12px;
   background: #fff;
   color: #102b57;
   border-color: #cfe3f3;
-  box-shadow: 0 4px 0 rgba(16,43,87,.05), 0 0 0 3px rgba(23,135,242,.03);
-  font-size: 17px;
+  box-shadow: 0 3px 0 rgba(16,43,87,.05), 0 0 0 2px rgba(23,135,242,.03);
+  font-size: 15px;
 }
 
 .ttt-setting .paco-dropdown-trigger:hover,
@@ -121,16 +126,16 @@
 
 .ttt-setting .paco-dropdown-menu {
   border-color: #cfe3f3;
-  border-radius: 16px;
+  border-radius: 14px;
   background: #fff;
 }
 
 .ttt-setting .paco-dropdown-option {
-  min-height: 44px;
+  min-height: 40px;
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .ttt-setting .paco-dropdown-option[aria-selected="true"] {
@@ -138,16 +143,16 @@
 }
 
 .ttt-board {
-  width: min(100%, 520px);
-  margin: 2px auto 0;
+  width: min(100%, 390px);
+  margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  padding: 11px;
+  gap: 7px;
+  padding: 8px;
   border: 2px solid #cfe3f3;
-  border-radius: 25px;
+  border-radius: 20px;
   background: #e8f5ff;
-  box-shadow: 0 8px 18px rgba(16,43,87,.08);
+  box-shadow: 0 6px 14px rgba(16,43,87,.07);
 }
 
 .ttt-cell {
@@ -156,7 +161,7 @@
   min-height: 0;
   padding: 0;
   border: 0;
-  border-radius: 18px;
+  border-radius: 14px;
   background: transparent;
   cursor: pointer;
   overflow: hidden;
@@ -195,46 +200,92 @@
 .ttt-cell:disabled { cursor: default; }
 
 .ttt-content {
-  min-height: 150px;
+  min-height: 92px;
   display: grid;
   align-content: start;
-  gap: 12px;
-  margin: 4px auto 0;
-  width: min(100%, 760px);
+  gap: 7px;
+  margin: 0 auto;
+  width: min(100%, 680px);
 }
 
 .ttt-turn {
-  padding: 13px 17px;
+  min-height: 34px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 7px 12px;
   border: 2px solid #cfe3f3;
-  border-radius: 16px;
+  border-radius: 13px;
   background: #edf8ff;
   color: #126fc9;
   text-align: center;
+  font-size: 14px;
   font-weight: 900;
+}
+
+.ttt-paco-thinking {
+  color: #126fc9;
+}
+
+.ttt-paco-face {
+  font-size: 20px;
+  animation: ttt-paco-bounce .65s ease-in-out infinite alternate;
+}
+
+.ttt-thinking-dots {
+  display: inline-flex;
+  gap: 3px;
+  margin-left: 3px;
+  vertical-align: middle;
+}
+
+.ttt-thinking-dots i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .3;
+  animation: ttt-thinking-dot .9s infinite ease-in-out;
+}
+
+.ttt-thinking-dots i:nth-child(2) { animation-delay: .15s; }
+.ttt-thinking-dots i:nth-child(3) { animation-delay: .3s; }
+
+@keyframes ttt-thinking-dot {
+  0%, 60%, 100% { opacity: .25; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-3px); }
+}
+
+@keyframes ttt-paco-bounce {
+  from { transform: translateY(0) rotate(-4deg); }
+  to { transform: translateY(-3px) rotate(4deg); }
 }
 
 .ttt-prompt {
   color: #102b57;
-  font: 900 clamp(30px, 4vw, 48px)/1.05 "Baloo 2", Nunito, sans-serif;
+  font: 900 clamp(24px, 3vw, 34px)/1.02 "Baloo 2", Nunito, sans-serif;
   text-align: center;
   white-space: pre-wrap;
 }
 
 .ttt-content .field {
-  width: min(100%, 560px);
+  width: min(100%, 520px);
   justify-self: center;
 }
 
 .ttt-content .answer-input {
   width: 100%;
-  min-height: 54px;
+  box-sizing: border-box;
+  min-height: 44px;
   border: 2px solid #cfe3f3;
-  border-radius: 15px;
-  padding: 12px 15px;
+  border-radius: 13px;
+  padding: 9px 13px;
   background: #fff;
   color: #102b57;
-  font: 800 18px/1.2 Nunito, sans-serif;
-  box-shadow: 0 3px 10px rgba(16,43,87,.04);
+  font: 800 16px/1.15 Nunito, sans-serif;
+  box-shadow: 0 3px 8px rgba(16,43,87,.04);
 }
 
 .ttt-content .answer-input:focus {
@@ -244,42 +295,63 @@
 }
 
 .ttt-content > .success {
-  width: min(100%, 420px);
+  width: min(100%, 380px);
   justify-self: center;
+  min-height: 42px;
+  padding: 8px 18px;
 }
 
 .ttt-result {
-  padding: 18px;
+  padding: 14px;
   border: 2px solid #dce9f6;
-  border-radius: 20px;
+  border-radius: 17px;
   background: #f8fbff;
   text-align: center;
 }
 
 .ttt-result-title {
   color: #102b57;
-  font: 900 32px/1.1 "Baloo 2", Nunito, sans-serif;
+  font: 900 27px/1.05 "Baloo 2", Nunito, sans-serif;
 }
 
 .ttt-final-score {
-  margin: 8px 0;
+  margin: 5px 0;
   color: #126fc9;
-  font: 900 58px/1 "Baloo 2", Nunito, sans-serif;
+  font: 900 48px/1 "Baloo 2", Nunito, sans-serif;
 }
 
 .ttt-actions {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
-  margin-top: 18px;
+  margin-top: 12px;
 }
 
-.ttt-actions button { min-width: 180px; }
+.ttt-actions button { min-width: 160px; }
+
+@media (max-height: 760px) and (min-width: 701px) {
+  .ttt-page-card { gap: 7px; padding: 8px 14px 10px; }
+  .ttt-game-head { gap: 6px; padding: 8px 12px; }
+  .ttt-game-title { font-size: 28px; }
+  .ttt-mark { width: 30px; height: 30px; font-size: 22px; }
+  .ttt-stat { min-height: 48px; padding: 5px 8px; }
+  .ttt-settings { padding: 7px 10px; }
+  .ttt-board { width: min(100%, 350px); }
+  .ttt-content { min-height: 76px; }
+  .ttt-prompt { font-size: 27px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ttt-paco-face,
+  .ttt-thinking-dots i,
+  .ttt-tile-image.is-fading-out { animation: none; }
+}
 
 @media (max-width: 700px) {
-  .ttt-game-head { padding: 18px 14px; }
+  .ttt-page-card { padding: 10px 12px 14px; }
+  .ttt-game-head { padding: 10px 12px; }
   .ttt-stats, .ttt-settings { grid-template-columns: 1fr; }
-  .ttt-board { gap: 7px; padding: 7px; }
-  .ttt-cell { border-radius: 13px; }
+  .ttt-board { width: min(100%, 360px); gap: 6px; padding: 6px; }
+  .ttt-cell { border-radius: 12px; }
 }

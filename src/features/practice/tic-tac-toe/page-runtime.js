@@ -65,7 +65,7 @@ export function createTicTacToePageRuntime({ app, templateMount, context, lesson
       view.renderSettings(
         enriched,
         TIC_TAC_TOE_MODES,
-        TIC_TAC_TOOE_AI_LEVELS,
+        TIC_TAC_TOE_AI_LEVELS,
         value => { runtime.start({ gameMode: value, level: enriched.aiLevel }); void render(); },
         value => { runtime.start({ gameMode: enriched.mode, level: value }); void render(); }
       );

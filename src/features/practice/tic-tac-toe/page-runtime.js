@@ -16,7 +16,7 @@ export function createTicTacToePageRuntime({ app, templateMount, context, lesson
   const view = createTicTacToeView({ documentRef, escapeHtml });
   const gameShell = documentRef.createElement('main');
   gameShell.className = 'practice-page-card';
-  gameShell.innerHTML = `<div class="ttt-game-head"><h1 class="ttt-game-title">⭕ TIC-TAC-TOE ❌</h1><div class="ttt-stats"><div class="ttt-stat"><span>Score</span><strong id="tttScore">0 🏆</strong></div><div class="ttt-stat"><span>Record</span><strong id="tttRecord">0 🥇</strong></div><div class="ttt-stat"><span>Vragen</span><strong id="tttProgress">0 van 0</strong></div></div></div><div class="ttt-settings"><label>Modus<select id="tttMode">${TIC_TAC_TOE_MODES.map(item => `<option value="${item.id}">${item.label}</option>`).join('')}</select></label><label>Paco<select id="tttLevel">${TIC_TAC_TOE_AI_LEVELS.map(item => `<option value="${item.id}">${item.label}</option>`).join('')}</select></label></div><div id="ticTacToeBoard" class="ttt-board" aria-label="Tic-Tac-Toe bord"></div><div id="tttContent" class="ttt-content"></div>`;
+  gameShell.innerHTML = `<div class="ttt-game-head"><h1 class="ttt-game-title"><span class="ttt-mark ttt-mark-o">O</span> TIC-TAC-TOE <span class="ttt-mark ttt-mark-x">X</span></h1><div class="ttt-stats"><div class="ttt-stat"><span>Score</span><strong id="tttScore">0 🏆</strong></div><div class="ttt-stat"><span>Record</span><strong id="tttRecord">0 🥇</strong></div><div class="ttt-stat"><span>Vragen</span><strong id="tttProgress">0 van 0</strong></div></div></div><div class="ttt-settings"><div class="ttt-setting"><span class="ttt-setting-label">Modus</span><div id="tttMode"></div></div><div class="ttt-setting"><span class="ttt-setting-label">Paco</span><div id="tttLevel"></div></div></div><div id="ticTacToeBoard" class="ttt-board" aria-label="Tic-Tac-Toe bord"></div><div id="tttContent" class="ttt-content"></div>`;
   content.appendChild(gameShell);
 
   const goGames = () => {
@@ -62,7 +62,13 @@ export function createTicTacToePageRuntime({ app, templateMount, context, lesson
       view.renderBoard(enriched, cell => {
         try { runtime.selectCell(cell); void render(); } catch (error) { void render(error?.message || 'Dit vakje kan nu niet worden gekozen.'); }
       });
-      view.renderSettings(enriched, value => { runtime.start({ gameMode: value, level: enriched.aiLevel }); void render(); }, value => { runtime.start({ gameMode: enriched.mode, level: value }); void render(); });
+      view.renderSettings(
+        enriched,
+        TIC_TAC_TOE_MODES,
+        TIC_TAC_TOOE_AI_LEVELS,
+        value => { runtime.start({ gameMode: value, level: enriched.aiLevel }); void render(); },
+        value => { runtime.start({ gameMode: enriched.mode, level: value }); void render(); }
+      );
 
       if (enriched.phase === 'finished') {
         await persistScore(enriched.score);

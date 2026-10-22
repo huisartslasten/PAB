@@ -93,9 +93,9 @@ function strategicValue(board, symbol) {
   return linePotential(board, symbol) + center + corners;
 }
 
-function chooseRookieMove(board) {
+function chooseRookieMove(board, random) {
   const cells = emptyCells(board);
-  return cells[Math.floor(Math.random() * cells.length)];
+  return cells[Math.floor(random() * cells.length)];
 }
 
 function chooseGoatMove(board, mode, nextOrder) {
@@ -119,6 +119,15 @@ function chooseGoatMove(board, mode, nextOrder) {
   return ranked[0].cellIndex;
 }
 
+function shuffleIndices(length, random) {
+  const order = Array.from({ length }, (_, index) => index);
+  for (let index = order.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(random() * (index + 1));
+    [order[index], order[swapIndex]] = [order[swapIndex], order[index]];
+  }
+  return order;
+}
+
 function normalizeMode(mode) {
   return mode === 'infinite' ? 'infinite' : 'classic';
 }
@@ -127,8 +136,9 @@ function normalizeAiLevel(level) {
   return level === 'goat' ? 'goat' : 'rookie';
 }
 
-export function createTicTacToeRuntime({ items = [], gradeAnswer } = {}) {
+export function createTicTacToeRuntime({ items = [], gradeAnswer, random = Math.random } = {}) {
   if (typeof gradeAnswer !== 'function') throw new Error('A gradeAnswer function is required.');
+  if (typeof random !== 'function') throw new Error('A random function is required.');
 
   const questions = normalizeItems(items);
   let mode = 'classic';
@@ -136,7 +146,8 @@ export function createTicTacToeRuntime({ items = [], gradeAnswer } = {}) {
   let board = emptyBoard();
   let turn = 'X';
   let moveOrder = 0;
-  let questionIndex = 0;
+  let questionOrder = [];
+  let questionCursor = 0;
   let uniqueAnswered = 0;
   let totalAnswered = 0;
   let wins = 0;
@@ -147,13 +158,22 @@ export function createTicTacToeRuntime({ items = [], gradeAnswer } = {}) {
   let pendingQuestion = null;
   let lastResult = null;
 
+  function chooseStartingTurn() {
+    return random() < 0.5 ? 'X' : 'O';
+  }
+
+  function beginTurnForNewGame() {
+    turn = chooseStartingTurn();
+    phase = turn === 'X' ? 'choosing' : 'paco';
+  }
+
   function snapshot() {
     return Object.freeze({
       mode,
       aiLevel,
       board: Object.freeze(board.map(cell => cell ? Object.freeze({ ...cell }) : null)),
       turn,
-      questionIndex,
+      questionIndex: pendingQuestion?.questionIndex ?? null,
       uniqueAnswered,
       totalAnswered,
       totalQuestions: questions.length,
@@ -174,30 +194,30 @@ export function createTicTacToeRuntime({ items = [], gradeAnswer } = {}) {
     mode = normalizeMode(gameMode);
     aiLevel = normalizeAiLevel(level);
     board = emptyBoard();
-    turn = 'X';
     moveOrder = 0;
-    questionIndex = 0;
+    questionOrder = shuffleIndices(questions.length, random);
+    questionCursor = 0;
     uniqueAnswered = 0;
     totalAnswered = 0;
     wins = 0;
     draws = 0;
     gamesPlayed = 0;
-    phase = questions.length ? 'choosing' : 'finished';
     selectedCell = null;
     pendingQuestion = null;
     lastResult = null;
+    if (questions.length) beginTurnForNewGame();
+    else { phase = 'finished'; turn = null; }
     return snapshot();
   }
 
   function beginNextGame() {
     board = emptyBoard();
-    turn = 'X';
     moveOrder = 0;
     gamesPlayed += 1;
-    phase = 'choosing';
     selectedCell = null;
     pendingQuestion = null;
     lastResult = null;
+    beginTurnForNewGame();
     return snapshot();
   }
 
@@ -205,6 +225,8 @@ export function createTicTacToeRuntime({ items = [], gradeAnswer } = {}) {
     if (phase !== 'choosing' || turn !== 'X') throw new Error('Je kunt nu geen vakje kiezen.');
     if (!Number.isInteger(cellIndex) || cellIndex < 0 || cellIndex >= BOARD_SIZE) throw new Error('Ongeldig vakje.');
     if (board[cellIndex]) throw new Error('Dit vakje is al bezet.');
+    const questionIndex = questionOrder[questionCursor];
+    if (!Number.isInteger(questionIndex)) throw new Error('Er zijn geen oefenvragen meer beschikbaar.');
     selectedCell = cellIndex;
     pendingQuestion = { questionIndex };
     phase = 'question';
@@ -223,7 +245,7 @@ export function createTicTacToeRuntime({ items = [], gradeAnswer } = {}) {
       const correct = result.correct === true;
       totalAnswered += 1;
       if (uniqueAnswered < questions.length) uniqueAnswered += 1;
-      questionIndex = (questionIndex + 1) % questions.length;
+      questionCursor += 1;
 
       lastResult = Object.freeze({
         correct,
@@ -256,7 +278,7 @@ export function createTicTacToeRuntime({ items = [], gradeAnswer } = {}) {
     if (phase !== 'paco' || turn !== 'O') throw new Error('Paco is nu niet aan de beurt.');
     const cellIndex = aiLevel === 'goat'
       ? chooseGoatMove(board, mode, moveOrder + 1)
-      : chooseRookieMove(board);
+      : chooseRookieMove(board, random);
     if (cellIndex == null) return finishGame('draw');
     moveOrder += 1;
     board = applyMove(board, 'O', cellIndex, mode, moveOrder);

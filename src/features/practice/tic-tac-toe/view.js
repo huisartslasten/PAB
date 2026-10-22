@@ -112,13 +112,44 @@ export function createTicTacToeView({ documentRef = globalThis.document, escapeH
   function renderPacoTurn(state, onPaco) {
     const content = documentRef.getElementById('tttContent');
     if (!content) return () => {};
-    const answerFeedback = state.lastResult?.correct === false
-      ? `<div class="ttt-answer-feedback" role="status"><strong>❌ Niet goed</strong><span>Jouw antwoord: <b>${escapeHtml(state.lastResult.givenAnswer || '')}</b></span><span>Goed antwoord: <b>${escapeHtml(state.lastResult.expectedAnswer || '')}</b></span></div>`
+
+    const answerWasWrong = state.lastResult?.correct === false;
+    const answerFeedback = answerWasWrong
+      ? `<div class="ttt-answer-feedback" role="status"><strong>❌ Niet goed</strong><span>Jouw antwoord: <b>${escapeHtml(state.lastResult.givenAnswer || '')}</b></span><span>Goed antwoord: <b>${escapeHtml(state.lastResult.expectedAnswer || '')}</b></span><button class="success" data-ttt-feedback-continue type="button">OK, verder →</button></div>`
       : '';
-    content.innerHTML = `${answerFeedback}<div class="ttt-turn ttt-paco-thinking" role="status" aria-live="polite"><span class="ttt-paco-face">🐶</span><span>Paco denkt na<span class="ttt-thinking-dots" aria-hidden="true"><i></i><i></i><i></i></span></span></div>`;
-    const timer = documentRef.defaultView?.setTimeout?.(onPaco, 1500);
+
+    const startThinking = () => {
+      content.innerHTML = `${answerFeedback ? `${answerFeedback.replace(/<button[\s\S]*?<\/button>/, '')}` : ''}<div class="ttt-turn ttt-paco-thinking" role="status" aria-live="polite"><span class="ttt-paco-face">🐶</span><span>Paco denkt na<span class="ttt-thinking-dots" aria-hidden="true"><i></i><i></i><i></i></span></span></div>`;
+      const timer = documentRef.defaultView?.setTimeout?.(onPaco, 1500);
+      return () => {
+        if (timer != null) documentRef.defaultView?.clearTimeout?.(timer);
+      };
+    };
+
+    if (!answerWasWrong) return startThinking();
+
+    content.innerHTML = answerFeedback;
+    const continueButton = content.querySelector('[data-ttt-feedback-continue]');
+    continueButton?.focus?.();
+    let cancelThinking = () => {};
+    const continueToPaco = () => {
+      if (continueButton?.disabled) return;
+      if (continueButton) {
+        continueButton.disabled = true;
+        continueButton.textContent = 'Even nadenken…';
+      }
+      cancelThinking = startThinking();
+    };
+    continueButton?.addEventListener('click', continueToPaco);
+    continueButton?.addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        continueToPaco();
+      }
+    });
+
     return () => {
-      if (timer != null) documentRef.defaultView?.clearTimeout?.(timer);
+      cancelThinking();
     };
   }
 

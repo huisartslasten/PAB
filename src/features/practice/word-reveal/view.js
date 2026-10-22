@@ -55,7 +55,7 @@ export function createWordRevealView({ documentRef = document } = {}) {
     input.autocomplete = 'off';
     input.placeholder = 'Typ je antwoord…';
     input.setAttribute('aria-label', 'Antwoord op de vraag');
-    const submit = createElement(documentRef, 'button', 'paco-button wr-primary-button');
+    const submit = createElement(documentRef, 'button', 'success wr-primary-button');
     submit.type = 'submit';
     submit.textContent = 'Controleer →';
     form.append(input, submit);
@@ -71,7 +71,7 @@ export function createWordRevealView({ documentRef = document } = {}) {
     guessInput.autocomplete = 'off';
     guessInput.placeholder = 'Weet je het al? Raad het woord of de zin…';
     guessInput.setAttribute('aria-label', 'Raad de oplossing');
-    const guessButton = createElement(documentRef, 'button', 'paco-button wr-secondary-button');
+    const guessButton = createElement(documentRef, 'button', 'secondary wr-secondary-button');
     guessButton.type = 'submit';
     guessButton.textContent = 'Raad de oplossing';
     guessForm.append(guessInput, guessButton);
@@ -115,7 +115,7 @@ export function createWordRevealView({ documentRef = document } = {}) {
     }
 
     if (state.phase === 'question') {
-      const button = createElement(documentRef, 'button', 'paco-button wr-feedback-button');
+      const button = createElement(documentRef, 'button', 'secondary wr-feedback-button');
       button.type = 'button';
       button.textContent = 'OK, verder →';
       button.addEventListener('click', onContinue);
@@ -138,7 +138,7 @@ export function createWordRevealView({ documentRef = document } = {}) {
       meaning.textContent = `Betekenis: ${state.target.meaning}`;
       panel.appendChild(meaning);
     }
-    const button = createElement(documentRef, 'button', 'paco-button wr-primary-button');
+    const button = createElement(documentRef, 'button', 'success wr-primary-button');
     button.type = 'button';
     button.textContent = 'Volgende ronde →';
     button.addEventListener('click', onNextRound);
@@ -161,11 +161,11 @@ export function createWordRevealView({ documentRef = document } = {}) {
       panel.appendChild(meaning);
     }
     const actions = createElement(documentRef, 'div', 'wr-actions');
-    const restart = createElement(documentRef, 'button', 'paco-button wr-primary-button');
+    const restart = createElement(documentRef, 'button', 'success wr-primary-button');
     restart.type = 'button';
     restart.textContent = 'Nog een keer →';
     restart.addEventListener('click', onRestart);
-    const games = createElement(documentRef, 'button', 'paco-button wr-secondary-button');
+    const games = createElement(documentRef, 'button', 'secondary wr-secondary-button');
     games.type = 'button';
     games.textContent = 'Terug naar spelletjes';
     games.addEventListener('click', onGames);

@@ -177,14 +177,14 @@ export function createWordRevealPageRuntime({ app, templateMount, context, lesso
       backLabel: '← Spelletjes',
       backAction: goGames,
       greeting: `Hoi ${student}! 🐶`,
-      title: 'Woordonthuller',
+      title: 'Letter Hunt',
       icon: '🐶',
       subtitle: 'Beantwoord de vragen uit deze les en onthul het geheime doel.',
       navigation: createPacoNavigation({ app, active: 'lessons', student, viewMode: context?.mode, navigate }),
       content
     });
     try { await load(); }
-    catch (error) { console.error('Word Reveal load error:', error); gameShell.textContent = `Woordonthuller kon niet worden geladen: ${error?.message || 'Onbekende fout.'}`; }
+    catch (error) { console.error('Letter Hunt load error:', error); gameShell.textContent = `Letter Hunt kon niet worden geladen: ${error?.message || 'Onbekende fout.'}`; }
   }
 
   return Object.freeze({ mount, content });

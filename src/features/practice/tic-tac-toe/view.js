@@ -38,7 +38,7 @@ export function createTicTacToeView({ documentRef = globalThis.document, escapeH
       modeDropdown = createPacoDropdown({
         options: modeOptions.map(item => ({ value: item.id, label: item.label })),
         value: state.mode,
-        onChange: onMode
+        onChange: value => onMode(value, levelDropdown?.getValue?.() ?? state.aiLevel)
       });
       modeMount.replaceChildren(modeDropdown.element);
     } else {
@@ -49,7 +49,7 @@ export function createTicTacToeView({ documentRef = globalThis.document, escapeH
       levelDropdown = createPacoDropdown({
         options: levelOptions.map(item => ({ value: item.id, label: item.label })),
         value: state.aiLevel,
-        onChange: onLevel
+        onChange: value => onLevel(value, modeDropdown?.getValue?.() ?? state.mode)
       });
       levelMount.replaceChildren(levelDropdown.element);
     } else {

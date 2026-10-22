@@ -49,9 +49,8 @@ test('management page enforces the canonical authentication boundary', async ({ 
 
 test('test page uses the canonical shell', async ({ page }) => {
   await expectCanonicalShell(page, 'test.html', 'Toets');
-  await expect(page.locator('#testProgress')).toHaveCount(1);
-  await expect(page.locator('#testContent')).toHaveCount(1);
-  await expect(page.locator('#result')).toHaveCount(1);
+  await expect(page.locator('#practiceProgress')).toHaveCount(1);
+  await expect(page.locator('#practiceContent')).toHaveCount(1);
 });
 
 test('test history page uses the canonical stable management sidebar', async ({ page }) => {

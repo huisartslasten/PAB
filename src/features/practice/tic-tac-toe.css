@@ -1,0 +1,150 @@
+.ttt-game-head {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 2px solid #dce9f6;
+  border-radius: 22px;
+  background: #f8fbff;
+}
+
+.ttt-game-title {
+  margin: 0;
+  color: #102b57;
+  font: 900 clamp(28px, 4vw, 42px)/1 "Baloo 2", Nunito, sans-serif;
+  text-align: center;
+}
+
+.ttt-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.ttt-stat {
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: #fff;
+  border: 2px solid #e1edf7;
+  text-align: center;
+}
+
+.ttt-stat span {
+  display: block;
+  color: #667894;
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.ttt-stat strong {
+  display: block;
+  margin-top: 2px;
+  color: #102b57;
+  font: 900 22px/1.1 "Baloo 2", Nunito, sans-serif;
+}
+
+.ttt-settings {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 14px auto 18px;
+  width: min(100%, 760px);
+}
+
+.ttt-settings label {
+  display: grid;
+  gap: 6px;
+  color: #102b57;
+  font: 900 16px/1.2 "Baloo 2", Nunito, sans-serif;
+}
+
+.ttt-board {
+  width: min(100%, 540px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 10px;
+  border-radius: 24px;
+  background: #dff0ff;
+  box-shadow: 0 8px 20px rgba(16,43,87,.08);
+}
+
+.ttt-cell {
+  aspect-ratio: 1;
+  border: 3px solid #cfe3f3;
+  border-radius: 18px;
+  background: #fff;
+  color: #102b57;
+  font: 900 clamp(44px, 9vw, 82px)/1 "Baloo 2", Nunito, sans-serif;
+  cursor: pointer;
+  transition: transform .12s ease, background .12s ease, border-color .12s ease;
+}
+
+.ttt-cell:not(:disabled):hover {
+  transform: translateY(-2px);
+  background: #edf8ff;
+  border-color: #7db9eb;
+}
+
+.ttt-cell:disabled { cursor: default; }
+.ttt-cell.is-x { color: #1787f2; background: #edf8ff; }
+.ttt-cell.is-o { color: #102b57; background: #fff7dc; }
+
+.ttt-content {
+  min-height: 150px;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  margin: 18px auto 0;
+  width: min(100%, 760px);
+}
+
+.ttt-turn {
+  padding: 12px 16px;
+  border: 2px solid #cfe3f3;
+  border-radius: 16px;
+  background: #edf8ff;
+  color: #126fc9;
+  text-align: center;
+  font-weight: 900;
+}
+
+.ttt-prompt {
+  color: #102b57;
+  font: 900 clamp(30px, 4vw, 48px)/1.05 "Baloo 2", Nunito, sans-serif;
+  text-align: center;
+  white-space: pre-wrap;
+}
+
+.ttt-result {
+  text-align: center;
+  padding: 12px;
+}
+
+.ttt-result-title {
+  color: #102b57;
+  font: 900 32px/1.1 "Baloo 2", Nunito, sans-serif;
+}
+
+.ttt-final-score {
+  margin: 8px 0;
+  color: #126fc9;
+  font: 900 58px/1 "Baloo 2", Nunito, sans-serif;
+}
+
+.ttt-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.ttt-actions button { min-width: 180px; }
+
+@media (max-width: 700px) {
+  .ttt-stats, .ttt-settings { grid-template-columns: 1fr; }
+  .ttt-board { gap: 7px; padding: 7px; }
+  .ttt-cell { border-radius: 13px; }
+}

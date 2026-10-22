@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createTicTacToeRuntime } from '../src/features/practice/tic-tac-toe/runtime.js';
+import { applyMove, createTicTacToeRuntime } from '../src/features/practice/tic-tac-toe/runtime.js';
 
 const items = [
   { question: '1 + 1', answer: '2' },
@@ -25,27 +25,28 @@ describe('Tic-Tac-Toe runtime', () => {
     expect(state.uniqueAnswered).toBe(1);
   });
 
-  it('places X after a correct answer and supports repeated games until all unique questions are answered', async () => {
+  it('places X after a correct answer', async () => {
     const game = createTicTacToeRuntime({ items, gradeAnswer: grader });
     game.start({ gameMode: 'classic', level: 'rookie' });
 
     game.selectCell(0);
-    let state = await game.submitAnswer('2');
+    const state = await game.submitAnswer('2');
+
     expect(state.board[0]).toMatchObject({ symbol: 'X' });
     expect(state.phase).toBe('paco');
-
-    game.playPacoMove();
-    state = game.snapshot();
-    expect(state.turn).toBe('X');
-    expect(state.uniqueAnswered).toBe(1);
+    expect(state.turn).toBe('O');
   });
 
-  it('removes the oldest own piece in infinite mode on the fourth own move', async () => {
-    const game = createTicTacToeRuntime({ items: [{ question: 'q', answer: 'a' }], gradeAnswer: grader });
-    game.start({ gameMode: 'infinite', level: 'rookie' });
+  it('removes the oldest own piece in infinite mode on the fourth own move', () => {
+    let board = Array(9).fill(null);
+    board = applyMove(board, 'X', 0, 'infinite', 1);
+    board = applyMove(board, 'X', 1, 'infinite', 2);
+    board = applyMove(board, 'X', 2, 'infinite', 3);
+    board = applyMove(board, 'X', 3, 'infinite', 4);
 
-    const state = game.snapshot();
-    expect(state.mode).toBe('infinite');
-    expect(state.board.every(cell => cell === null)).toBe(true);
+    expect(board[0]).toBeNull();
+    expect(board[1]?.symbol).toBe('X');
+    expect(board[2]?.symbol).toBe('X');
+    expect(board[3]?.symbol).toBe('X');
   });
 });

@@ -14,7 +14,7 @@ function grader(question, answer, value) {
 
 describe('Tic-Tac-Toe runtime', () => {
   it('keeps the chosen square empty after a wrong answer and gives Paco the turn', async () => {
-    const game = createTicTacToeRuntime({ items, gradeAnswer: grader });
+    const game = createTicTacToeRuntime({ items, gradeAnswer: grader, random: () => 0.9 });
     game.start({ gameMode: 'classic', level: 'rookie' });
     game.selectCell(0);
     const state = await game.submitAnswer('wrong');
@@ -26,7 +26,7 @@ describe('Tic-Tac-Toe runtime', () => {
   });
 
   it('places X after a correct answer', async () => {
-    const game = createTicTacToeRuntime({ items, gradeAnswer: grader });
+    const game = createTicTacToeRuntime({ items, gradeAnswer: grader, random: () => 0.9 });
     game.start({ gameMode: 'classic', level: 'rookie' });
 
     game.selectCell(0);
@@ -48,5 +48,21 @@ describe('Tic-Tac-Toe runtime', () => {
     expect(board[1]?.symbol).toBe('X');
     expect(board[2]?.symbol).toBe('X');
     expect(board[3]?.symbol).toBe('X');
+  });
+
+  it('can randomly let Paco start a new game', () => {
+    const game = createTicTacToeRuntime({ items, gradeAnswer: grader, random: () => 0.9 });
+    const state = game.start({ gameMode: 'classic', level: 'rookie' });
+
+    expect(state.turn).toBe('O');
+    expect(state.phase).toBe('paco');
+  });
+
+  it('shuffles the question order instead of always using the first lesson item', () => {
+    const game = createTicTacToeRuntime({ items, gradeAnswer: grader, random: () => 0 });
+    game.start({ gameMode: 'classic', level: 'rookie' });
+    const state = game.selectCell(0);
+
+    expect(state.item?.question).toBe('2 + 2');
   });
 });

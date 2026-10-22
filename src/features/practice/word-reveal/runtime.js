@@ -59,6 +59,15 @@ export function createWordRevealRuntime({ items = [], gradeAnswer, random = Math
     return snapshot();
   }
 
+  function restart(nextTarget) {
+    remaining.clear();
+    source.forEach(item => remaining.add(item.index));
+    questionQueue = [];
+    current = null;
+    turns = 0;
+    return startRound(nextTarget);
+  }
+
   function revealNextLetter() {
     revealedCount = Math.min(revealedCount + 1, target.revealableIndices.length);
   }
@@ -117,7 +126,7 @@ export function createWordRevealRuntime({ items = [], gradeAnswer, random = Math
     return Object.freeze({ phase, current, target, revealedCount, turns, remainingCount: remaining.size, totalCount: source.length, completedCount: source.length - remaining.size, feedback });
   }
 
-  return Object.freeze({ startRound, submitAnswer, continueAfterFeedback, guessSolution, snapshot });
+  return Object.freeze({ startRound, restart, submitAnswer, continueAfterFeedback, guessSolution, snapshot });
 }
 
 export { normalizeTarget };

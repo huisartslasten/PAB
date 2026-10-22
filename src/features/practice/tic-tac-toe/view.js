@@ -112,7 +112,10 @@ export function createTicTacToeView({ documentRef = globalThis.document, escapeH
   function renderPacoTurn(state, onPaco) {
     const content = documentRef.getElementById('tttContent');
     if (!content) return () => {};
-    content.innerHTML = '<div class="ttt-turn ttt-paco-thinking" role="status" aria-live="polite"><span class="ttt-paco-face">🐶</span><span>Paco denkt na<span class="ttt-thinking-dots" aria-hidden="true"><i></i><i></i><i></i></span></span></div>';
+    const answerFeedback = state.lastResult?.correct === false
+      ? `<div class="ttt-answer-feedback" role="status"><strong>❌ Niet goed</strong><span>Jouw antwoord: <b>${escapeHtml(state.lastResult.givenAnswer || '')}</b></span><span>Goed antwoord: <b>${escapeHtml(state.lastResult.expectedAnswer || '')}</b></span></div>`
+      : '';
+    content.innerHTML = `${answerFeedback}<div class="ttt-turn ttt-paco-thinking" role="status" aria-live="polite"><span class="ttt-paco-face">🐶</span><span>Paco denkt na<span class="ttt-thinking-dots" aria-hidden="true"><i></i><i></i><i></i></span></span></div>`;
     const timer = documentRef.defaultView?.setTimeout?.(onPaco, 1500);
     return () => {
       if (timer != null) documentRef.defaultView?.clearTimeout?.(timer);

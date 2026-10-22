@@ -12,21 +12,24 @@ function createRuntime(items = [{ question: 'q1', answer: 'a1' }, { question: 'q
   });
 }
 
-test('wrong answer does not complete the question and correct answer reveals one letter', async () => {
+test('wrong answer stays open and the same question can be answered later', async () => {
   const runtime = createRuntime();
   runtime.startRound(target);
   const first = runtime.snapshot().current;
 
   await runtime.submitAnswer('fout');
   assert.equal(runtime.snapshot().remainingCount, 2);
-  assert.notEqual(runtime.snapshot().current?.index, undefined);
+  assert.equal(runtime.snapshot().current.index, first.index);
+  assert.equal(runtime.snapshot().turns, 0);
+  assert.equal(runtime.snapshot().feedback.correct, false);
 
+  runtime.continueAfterFeedback();
+  assert.equal(runtime.snapshot().current?.index, 1 - first.index);
   await runtime.submitAnswer(runtime.snapshot().current.answer);
   assert.equal(runtime.snapshot().remainingCount, 1);
   assert.equal(runtime.snapshot().revealedCount, 1);
   assert.equal(runtime.snapshot().turns, 1);
   assert.equal(runtime.snapshot().completedCount, 1);
-  assert.ok(first);
 });
 
 test('questions are the completion source of truth even when the target is longer', async () => {
@@ -51,7 +54,7 @@ test('solving the target before all lesson questions starts another round', asyn
 });
 
 test('whole-solution guess always costs one turn', () => {
-  const runtime = createRuntime([{ question: 'q1', answer: 'a1' }, { question: 'q2', answer: 'a2' }]);
+  const runtime = createRuntime();
   runtime.startRound(target);
   const afterWrongGuess = runtime.guessSolution('ander woord');
   assert.equal(afterWrongGuess.turns, 1);
@@ -60,6 +63,6 @@ test('whole-solution guess always costs one turn', () => {
 
   const afterCorrectGuess = runtime.guessSolution('boom');
   assert.equal(afterCorrectGuess.turns, 2);
-  assert.equal(afterCorrectGuess.phase, 'question');
+  assert.equal(afterCorrectGuess.phase, 'round-complete');
   assert.equal(afterCorrectGuess.remainingCount, 2);
 });

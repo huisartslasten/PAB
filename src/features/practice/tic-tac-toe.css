@@ -83,13 +83,14 @@
 
 .ttt-settings {
   grid-column: 1;
+  grid-row: 2;
   width: 100%;
   box-sizing: border-box;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin: 0;
-  align-self: center;
+  align-self: start;
   padding: 12px;
   border: 2px solid #dce9f6;
   border-radius: 16px;
@@ -150,8 +151,10 @@
 
 .ttt-board {
   grid-column: 2;
+  grid-row: 2 / span 2;
   width: min(100%, 500px);
   margin: 0 auto;
+  align-self: start;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
@@ -207,13 +210,14 @@
 .ttt-cell:disabled { cursor: default; }
 
 .ttt-content {
-  grid-column: 1 / -1;
+  grid-column: 1;
+  grid-row: 3;
   min-height: 92px;
   display: grid;
   align-content: start;
   gap: 7px;
-  margin: 0 auto;
-  width: min(100%, 680px);
+  margin: 0;
+  width: 100%;
 }
 
 .ttt-turn {
@@ -362,8 +366,9 @@
   .ttt-settings,
   .ttt-board,
   .ttt-content { grid-column: 1; }
-  .ttt-settings { width: min(100%, 680px); margin: 0 auto; }
-  .ttt-board { width: min(100%, 460px); }
+  .ttt-settings { grid-row: 2; width: min(100%, 680px); margin: 0 auto; }
+  .ttt-board { grid-row: 3; width: min(100%, 460px); }
+  .ttt-content { grid-row: 4; width: min(100%, 680px); margin: 0 auto; }
 }
 
 @media (max-width: 700px) {

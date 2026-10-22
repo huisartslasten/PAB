@@ -1,5 +1,11 @@
 import { createPacoDropdown } from '../../../components/page-template.js';
 
+const TILE_ASSETS = Object.freeze({
+  empty: './src/features/practice/tic-tac-toe/assets/tile-empty.webp',
+  X: './src/features/practice/tic-tac-toe/assets/tile-x.webp',
+  O: './src/features/practice/tic-tac-toe/assets/tile-o.webp'
+});
+
 export function createTicTacToeView({ documentRef = globalThis.document, escapeHtml } = {}) {
   if (!documentRef) throw new Error('A document is required.');
   if (typeof escapeHtml !== 'function') throw new Error('An escapeHtml function is required.');
@@ -11,9 +17,11 @@ export function createTicTacToeView({ documentRef = globalThis.document, escapeH
     const board = documentRef.getElementById('ticTacToeBoard');
     if (!board) return;
     board.innerHTML = state.board.map((cell, index) => {
-      const label = cell?.symbol === 'X' ? 'X' : cell?.symbol === 'O' ? 'O' : '';
+      const symbol = cell?.symbol === 'X' || cell?.symbol === 'O' ? cell.symbol : null;
+      const asset = TILE_ASSETS[symbol || 'empty'];
+      const label = symbol ? `${symbol === 'X' ? 'PacoGO X' : 'Paco O'}` : 'Leeg vakje';
       const disabled = Boolean(cell) || state.phase !== 'choosing' || state.turn !== 'X';
-      return `<button type="button" class="ttt-cell${cell ? ` is-${cell.symbol.toLowerCase()}` : ''}" data-cell="${index}" aria-label="Vakje ${index + 1}${label ? `, ${label}` : ''}" ${disabled ? 'disabled' : ''}>${label}</button>`;
+      return `<button type="button" class="ttt-cell${symbol ? ` is-${symbol.toLowerCase()}` : ''}" data-cell="${index}" aria-label="Vakje ${index + 1}, ${label}" ${disabled ? 'disabled' : ''}><img class="ttt-tile-image" src="${asset}" alt="" draggable="false"></button>`;
     }).join('');
     board.querySelectorAll('[data-cell]').forEach(button => {
       button.addEventListener('click', () => onCell(Number(button.dataset.cell)));

@@ -15,12 +15,12 @@ export function createWordRevealView({ documentRef = document } = {}) {
     root.querySelector('#wrProgress').textContent = `${state.completedCount} van ${state.totalCount}`;
   }
 
-  function renderTarget(root, state) {
+  function renderTarget(root, state, onReveal = null) {
     const targetNode = root.querySelector('#wrTarget');
     targetNode.replaceChildren();
     if (!state.target) return;
 
-    const revealSet = new Set(state.target.revealableIndices.slice(0, state.revealedCount));
+    const revealSet = new Set(state.revealedIndices || state.target.revealableIndices.slice(0, state.revealedCount));
     [...state.target.text].forEach((character, index) => {
       if (!state.target.revealableIndices.includes(index)) {
         const punctuation = createElement(documentRef, 'span', 'wr-target-space');
@@ -29,13 +29,29 @@ export function createWordRevealView({ documentRef = document } = {}) {
         return;
       }
 
-      const card = createElement(documentRef, 'span', `wr-letter-card${revealSet.has(index) ? ' is-revealed' : ''}`);
-      card.setAttribute('aria-hidden', 'true');
+      const isRevealed = revealSet.has(index);
+      const card = createElement(documentRef, 'span', `wr-letter-card${isRevealed ? ' is-revealed' : ''}${onReveal && !isRevealed ? ' is-selectable' : ''}`);
+      card.setAttribute('aria-hidden', isRevealed ? 'true' : 'false');
       const front = createElement(documentRef, 'span', 'wr-letter-front');
       front.textContent = '🐶';
       const back = createElement(documentRef, 'span', 'wr-letter-back');
       back.textContent = character;
       card.append(front, back);
+
+      if (onReveal && !isRevealed) {
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('aria-label', 'Onthul deze letter');
+        const reveal = () => onReveal(index);
+        card.addEventListener('click', reveal);
+        card.addEventListener('keydown', event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            reveal();
+          }
+        });
+      }
+
       targetNode.appendChild(card);
     });
   }
@@ -93,9 +109,12 @@ export function createWordRevealView({ documentRef = document } = {}) {
     feedbackNode.replaceChildren();
     if (!state.feedback) return;
 
+    const titleText = state.feedback.correct
+      ? (state.feedback.guess ? 'Goed geraden!' : state.phase === 'reveal-choice' ? 'Goed gedaan! Kies een letter.' : 'Goed gedaan!')
+      : state.feedback.guess ? 'Nog niet goed. Probeer verder.' : 'Nog niet goed';
     const feedback = createElement(documentRef, 'div', `wr-feedback ${state.feedback.correct ? 'is-correct' : 'is-wrong'}`);
     const title = createElement(documentRef, 'strong', 'wr-feedback-title');
-    title.textContent = state.feedback.correct ? (state.feedback.guess ? 'Goed geraden!' : 'Goed gedaan!') : 'Nog niet goed';
+    title.textContent = titleText;
     feedback.appendChild(title);
 
     if (state.feedback.studentAnswer) {
@@ -103,7 +122,7 @@ export function createWordRevealView({ documentRef = document } = {}) {
       answer.textContent = `Jouw antwoord: ${state.feedback.studentAnswer}`;
       feedback.appendChild(answer);
     }
-    if (state.feedback.correctAnswer) {
+    if (state.feedback.correctAnswer && !state.feedback.guess) {
       const correct = createElement(documentRef, 'div', 'wr-feedback-line');
       correct.textContent = `Goed antwoord: ${state.feedback.correctAnswer}`;
       feedback.appendChild(correct);

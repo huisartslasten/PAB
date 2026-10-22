@@ -1,6 +1,7 @@
 const corsHeaders = {"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"authorization, x-client-info, apikey, content-type","Access-Control-Allow-Methods":"POST, OPTIONS"};
 const allowedTypes = new Set(["practice_target"]);
 const allowedForms = new Set(["word","sentence","saying"]);
+const AI_MODEL = "gpt-5.6-terra";
 const json = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 const text = (value: unknown, max = 2000) => String(value ?? "").trim().slice(0, max);
 function normalize(body: any) {
@@ -68,7 +69,7 @@ Deno.serve(async (req: Request) => {
     const apiKey = Deno.env.get("OPENAI_API_KEY");
     if (!apiKey) return json({ error: "OPENAI_API_KEY ontbreekt in Supabase." }, 500);
     const request = normalize(await req.json());
-    const response = await fetch("https://api.openai.com/v1/responses", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` }, body: JSON.stringify({ model: "gpt-5-mini", input: promptFor(request), max_output_tokens: 500 }) });
+    const response = await fetch("https://api.openai.com/v1/responses", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` }, body: JSON.stringify({ model: AI_MODEL, input: promptFor(request), max_output_tokens: 500 }) });
     const raw = await response.text();
     if (!response.ok) {
       const details = upstreamErrorDetails(raw);

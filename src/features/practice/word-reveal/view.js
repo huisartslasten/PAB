@@ -50,7 +50,7 @@ export function createWordRevealView({ documentRef = document } = {}) {
         const card = createElement(documentRef, 'span', `wr-letter-card${isRevealed ? ' is-revealed' : ''}${onReveal && !isRevealed ? ' is-selectable' : ''}`);
         card.setAttribute('aria-hidden', isRevealed ? 'true' : 'false');
         const front = createElement(documentRef, 'span', 'wr-letter-front');
-        front.textContent = '🐶';
+        front.setAttribute('aria-hidden', 'true');
         const back = createElement(documentRef, 'span', 'wr-letter-back');
         back.textContent = character;
         card.append(front, back);

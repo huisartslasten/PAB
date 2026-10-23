@@ -94,13 +94,14 @@
 
 .wr-letter-card {
   position: relative;
-  width: 48px;
-  height: 58px;
+  width: 56px;
+  height: 56px;
   display: inline-grid;
   place-items: center;
-  border-radius: 11px;
+  border-radius: 16px;
   perspective: 500px;
   flex: 0 0 auto;
+  transform: translateZ(0);
 }
 
 .wr-letter-front,
@@ -109,26 +110,35 @@
   inset: 0;
   display: grid;
   place-items: center;
+  overflow: hidden;
   border-radius: inherit;
-  border: 2px solid #cfe3f3;
-  box-shadow: 0 3px 8px rgba(16,43,87,.06);
+  border: 2px solid #d5e4e8;
+  box-shadow: 0 4px 10px rgba(16,43,87,.08);
   backface-visibility: hidden;
-  transition: transform .35s ease;
+  transition: transform .35s ease, box-shadow .2s ease;
 }
 
 .wr-letter-front {
-  background: #fff;
-  font-size: 1.15rem;
+  background: #f4f8f7 url('./word-reveal/assets/letter-hunt-tile-back.webp') center / cover no-repeat;
 }
 
 .wr-letter-back {
-  background: #edf8ff;
-  color: #102b57;
-  font-size: 1.65rem;
-  font-weight: 900;
+  background: #fff9ef;
+  border-color: #eadfca;
+  color: #173b70;
+  font: 900 1.7rem/1 "Baloo 2", Nunito, sans-serif;
   transform: rotateY(180deg);
 }
 
+.wr-letter-card.is-selectable { cursor: pointer; }
+.wr-letter-card.is-selectable:hover .wr-letter-front {
+  box-shadow: 0 6px 13px rgba(16,43,87,.12);
+  transform: translateY(-2px);
+}
+.wr-letter-card.is-selectable:focus-visible {
+  outline: 3px solid #9bc9e8;
+  outline-offset: 3px;
+}
 .wr-letter-card.is-revealed .wr-letter-front { transform: rotateY(180deg); }
 .wr-letter-card.is-revealed .wr-letter-back { transform: rotateY(360deg); }
 .wr-target-space { width: 10px; flex: 0 0 10px; }
@@ -265,7 +275,7 @@
   .wr-game-head { gap: 6px; padding: 8px 12px; }
   .wr-stat { min-height: 48px; padding: 5px 8px; }
   .wr-target-panel { min-height: 270px; }
-  .wr-letter-card { width: 44px; height: 54px; }
+  .wr-letter-card { width: 52px; height: 52px; }
 }
 
 @media (max-width: 900px) {
@@ -285,7 +295,7 @@
   .wr-game-head { padding: 10px 12px; }
   .wr-stats { grid-template-columns: 1fr; }
   .wr-target-panel { min-height: 220px; padding: 12px; }
-  .wr-letter-card { width: 40px; height: 50px; }
+  .wr-letter-card { width: 48px; height: 48px; }
   .wr-question { min-height: 58px; font-size: 27px; }
   .wr-answer-form,
   .wr-guess-form { flex-direction: column; }

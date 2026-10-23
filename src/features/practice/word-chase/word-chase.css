@@ -30,6 +30,7 @@
 .wc-dropdown { min-width: 150px; }
 
 .wc-target-panel {
+  position: relative;
   grid-column: 2;
   grid-row: 2 / span 2;
   min-height: 310px;

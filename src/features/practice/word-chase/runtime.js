@@ -1,4 +1,4 @@
-import { isFiveLetterWord, normalizeWord, pickWord, getWordDictionary } from './dictionary.js';
+import { isFiveLetterWord, normalizeWord, pickWord, getSecretWordDictionary } from './dictionary.js';
 
 function normalizeItems(items = []) {
   return (Array.isArray(items) ? items : [])
@@ -29,7 +29,7 @@ export function createWordChaseRuntime({ items = [], gradeAnswer, difficulty = '
 
   const source = normalizeItems(items);
   const revealCount = revealCountForDifficulty(difficulty);
-  const targetPoolSize = getWordDictionary().length;
+  const targetPoolSize = getSecretWordDictionary().length;
   let target = '';
   let usedTargets = new Set();
   let revealedIndices = new Set();

@@ -37,7 +37,7 @@ export function createFlashView({ documentRef = globalThis.document, escapeHtml 
     label.textContent = 'Tijd per vraag:';
     const dropdown = createPacoDropdown({
       options: [
-        { value: 'manual', label: 'GEEN TIJDSLIMITIET' },
+        { value: 'manual', label: 'GEEN TIJDSLIMIET' },
         { value: '3', label: '3 seconden' },
         { value: '5', label: '5 seconden' }
       ],
@@ -87,7 +87,9 @@ export function createFlashView({ documentRef = globalThis.document, escapeHtml 
     const title = correct ? '✓ GOED!' : '✕ FOUT';
     const explanation = correct ? 'Goed antwoord!' : `Het juiste antwoord is: ${escapeHtml(result.expectedAnswer)}`;
     const resultClass = correct ? 'practice-correct-answer' : 'practice-answer-review';
-    content.innerHTML = `<section class="${resultClass}" aria-live="polite"><div class="practice-correct-answer-title">${title}</div><div class="practice-correct-answer-text">${explanation}</div><div class="flash-result-score">Score: <strong>${state.score}</strong> / ${state.maxScore}</div></section><button type="button" class="big success flash-next" data-flash-next>Volgende →</button>`;
+    const titleClass = correct ? 'practice-correct-answer-title' : 'practice-answer-review-title';
+    const textClass = correct ? 'practice-correct-answer-text' : 'practice-answer-review-text';
+    content.innerHTML = `<section class="${resultClass}" aria-live="polite"><div class="${titleClass}">${title}</div><div class="${textClass}">${explanation}</div><div class="flash-result-score">Score: <strong>${state.score}</strong> / ${state.maxScore}</div></section><button type="button" class="big success flash-next" data-flash-next>Volgende →</button>`;
     content.querySelector('[data-flash-next]')?.addEventListener('click', onContinue);
   }
 

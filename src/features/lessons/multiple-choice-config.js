@@ -26,11 +26,12 @@ export function validateMultipleChoiceOptions({ options = [], correctOption = ''
     : [];
   const correct = String(correctOption ?? '').trim();
   const errors = [];
+  const normalizedKeys = normalizedOptions.map(value => value.toLocaleLowerCase('nl-NL'));
 
   if (normalizedOptions.length < MIN_OPTION_COUNT) errors.push('Vul minstens twee antwoordopties in.');
   if (!correct) errors.push('Kies een correct antwoord.');
-  if (correct && !normalizedOptions.includes(correct)) errors.push('Het correcte antwoord moet tussen de antwoordopties staan.');
-  if (new Set(normalizedOptions).size !== normalizedOptions.length) errors.push('Elke antwoordoptie moet uniek zijn.');
+  if (correct && !normalizedKeys.includes(correct.toLocaleLowerCase('nl-NL'))) errors.push('Het correcte antwoord moet tussen de antwoordopties staan.');
+  if (new Set(normalizedKeys).size !== normalizedKeys.length) errors.push('Elke antwoordoptie moet uniek zijn.');
 
   return Object.freeze({
     valid: errors.length === 0,

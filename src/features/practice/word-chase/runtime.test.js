@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createWordChaseRuntime } from './runtime.js';
-import { getWordDictionary, isFiveLetterWord } from './dictionary.js';
+import { getWordDictionary, isFiveLetterWord } from '../word-games/dictionary.js';
 
 const items = [
   { question: '2 + 2', answer: '4' },

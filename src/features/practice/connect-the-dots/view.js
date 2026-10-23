@@ -6,16 +6,11 @@ export function createConnectTheDotsView({ documentRef = document } = {}) {
     board.style.setProperty('--ctd-columns', state.columns);
     board.style.setProperty('--ctd-rows', state.rows);
 
-    const lines = new Map(state.edges.map(edge => [edge.key, edge]));
-    const boxOwners = new Map(state.boxes.map(box => [box.index, box.owner]));
-    const width = (state.columns - 1) * 2;
-    const height = (state.rows - 1) * 2;
-
     state.boxes.forEach(box => {
       const cell = documentRef.createElement('div');
       cell.className = `ctd-box${box.owner ? ` is-${box.owner.toLowerCase()}` : ''}`;
-      cell.style.gridColumn = `${box.column * 2 + 1}`;
-      cell.style.gridRow = `${box.row * 2 + 1}`;
+      cell.style.gridColumn = `${box.column * 2 + 2}`;
+      cell.style.gridRow = `${box.row * 2 + 2}`;
       board.appendChild(cell);
     });
 
@@ -25,13 +20,15 @@ export function createConnectTheDotsView({ documentRef = document } = {}) {
       button.className = `ctd-line ctd-line-${edge.orientation}${edge.owner ? ` is-${edge.owner.toLowerCase()}` : ''}`;
       button.disabled = Boolean(edge.owner) || state.phase !== 'choosing' || state.turn !== 'X';
       button.setAttribute('aria-label', edge.orientation === 'horizontal' ? 'Horizontale lijn' : 'Verticale lijn');
-      if (!edge.owner && state.phase === 'choosing' && state.turn === 'X') button.addEventListener('click', () => handlers.onEdge?.(edge.key));
+      if (!edge.owner && state.phase === 'choosing' && state.turn === 'X') {
+        button.addEventListener('click', () => handlers.onEdge?.(edge.key));
+      }
       if (edge.orientation === 'horizontal') {
-        button.style.gridColumn = `${edge.column * 2 + 1} / span 2`;
+        button.style.gridColumn = `${edge.column * 2 + 2}`;
         button.style.gridRow = `${edge.row * 2 + 1}`;
       } else {
         button.style.gridColumn = `${edge.column * 2 + 1}`;
-        button.style.gridRow = `${edge.row * 2 + 1} / span 2`;
+        button.style.gridRow = `${edge.row * 2 + 2}`;
       }
       board.appendChild(button);
     });

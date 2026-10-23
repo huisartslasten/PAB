@@ -28,7 +28,19 @@ export function createLexoPageRuntime({ app, templateMount, context, lessonId = 
       <label class="lexo-difficulty-control">Niveau<div id="lexoDifficultySelect"></div></label>
     </header>
     <section class="lexo-grid-panel" aria-label="Letterveld">
-      <div id="lexoRules" class="lexo-rules" aria-label="Uitleg van LEXO"></div>
+      <button id="lexoHelpButton" class="lexo-help-button" type="button" aria-label="Hoe speel je LEXO?" aria-haspopup="dialog">?</button>
+      <dialog id="lexoHelpDialog" class="lexo-help-dialog" aria-labelledby="lexoHelpTitle">
+        <div class="lexo-help-content">
+          <div>
+            <span class="lexo-help-kicker">UITLEG</span>
+            <h2 id="lexoHelpTitle">Zo speel je LEXO</h2>
+          </div>
+          <p>Maak woorden door letters <strong>horizontaal, verticaal of diagonaal</strong> met elkaar te verbinden.</p>
+          <p>Je mag een letter binnen één woord niet opnieuw gebruiken.</p>
+          <p><strong>Langere woorden leveren meer punten op.</strong></p>
+          <button id="lexoHelpClose" class="secondary" type="button">Begrepen</button>
+        </div>
+      </dialog>
       <div id="lexoGrid" class="lexo-grid"></div>
       <p class="lexo-grid-hint">ROOKIE: 2 hulpletters · GOAT: 1 hulpletter</p>
     </section>
@@ -38,6 +50,7 @@ export function createLexoPageRuntime({ app, templateMount, context, lessonId = 
     </section>
     <section id="lexoFeedback" class="lexo-feedback-panel" aria-live="polite"></section>`;
   content.appendChild(gameShell);
+  view.bindHelp(gameShell);
 
   const goGames = () => {
     const target = buildViewUrl('games.html', { student, mode: context?.mode });
@@ -94,7 +107,6 @@ export function createLexoPageRuntime({ app, templateMount, context, lessonId = 
     async function render(errorMessage = '') {
       const state = runtime.snapshot();
       view.renderStats(gameShell, state, highScore);
-      view.renderRules(gameShell);
       view.renderGrid(gameShell, state);
       view.renderDifficulty(gameShell, difficulty, value => { void changeDifficulty(value); });
       view.renderFeedback(gameShell, state, () => { void continueAfterFeedback(); });

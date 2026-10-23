@@ -6,6 +6,7 @@ const WORDS = [
 const NORMALIZED_WORDS = Object.freeze([...new Set(WORDS.map(value => String(value).trim().toLocaleLowerCase('nl-NL')))]
   .filter(word => /^[a-z]+$/.test(word) && [...word].length >= 3));
 const DICTIONARY = new Set(NORMALIZED_WORDS);
+const FIVE_LETTER_WORDS = Object.freeze(NORMALIZED_WORDS.filter(word => [...word].length === 5));
 
 export function normalizeWord(value) {
   return String(value ?? '').trim().toLocaleLowerCase('nl-NL');
@@ -25,5 +26,16 @@ export function getWordDictionary() {
 }
 
 export function getFiveLetterDictionary() {
-  return NORMALIZED_WORDS.filter(word => [...word].length === 5);
+  return FIVE_LETTER_WORDS.slice();
+}
+
+export function getSecretWordDictionary() {
+  return FIVE_LETTER_WORDS.slice();
+}
+
+export function pickWord(random = Math.random, excludedWords = []) {
+  const excluded = new Set((Array.isArray(excludedWords) ? excludedWords : [excludedWords]).map(normalizeWord));
+  const candidates = FIVE_LETTER_WORDS.filter(word => !excluded.has(word));
+  const pool = candidates.length ? candidates : FIVE_LETTER_WORDS;
+  return pool[Math.floor(Math.max(0, Math.min(0.999999, Number(random()) || 0)) * pool.length)];
 }

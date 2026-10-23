@@ -1,5 +1,5 @@
 import { normalizeKey } from '../../utils/text.js';
-import { normalizeMultipleChoiceConfig } from './multiple-choice-config.js';
+import { normalizeMultipleChoiceConfig, validateMultipleChoiceOptions } from './multiple-choice-config.js';
 
 const text = value => String(value ?? '').trim();
 const RESPONSE_TYPES = new Set(['text', 'number', 'fraction', 'multiple_choice']);
@@ -37,8 +37,9 @@ function buildUniversalItem(row = {}, { defaultResponseType = 'text', numericAns
   let answer = spelling ? required.join(' || ') : required.join('\n');
   if (responseType === 'multiple_choice') {
     const correctOption = text(row.correct_option ?? row.correctOption ?? answer);
-    if (!correctOption || answerOptions.length < 2 || !answerOptions.includes(correctOption)) return null;
-    answer = correctOption;
+    const optionValidation = validateMultipleChoiceOptions({ options: answerOptions, correctOption });
+    if (!optionValidation.valid) return null;
+    answer = optionValidation.correctOption;
   } else if (!required.length) {
     return null;
   }

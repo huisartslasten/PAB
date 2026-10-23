@@ -1,3 +1,5 @@
+import { createPacoDropdown } from '../../../components/page-template.js';
+
 function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
 
 function makeButton(documentRef, label, className = '') {
@@ -40,7 +42,7 @@ export function createLexoView({ documentRef = document } = {}) {
       hint.textContent = 'Dictee: luister goed en typ het antwoord.';
       question.appendChild(hint);
       if (typeof onSpeak === 'function') {
-        const speak = makeButton(documentRef, '🔊 Luister', 'lexo-speak');
+        const speak = makeButton(documentRef, '🔊 Luister', 'secondary');
         speak.addEventListener('click', () => { void onSpeak(); });
         question.appendChild(speak);
       }
@@ -58,7 +60,7 @@ export function createLexoView({ documentRef = document } = {}) {
     input.className = 'lexo-answer-input';
     input.placeholder = 'Jouw antwoord';
     input.setAttribute('aria-label', 'Antwoord op de oefenvraag');
-    const button = makeButton(documentRef, 'Controleer', 'lexo-submit');
+    const button = makeButton(documentRef, 'Controleer →', 'success');
     button.type = 'submit';
     form.append(input, button);
     form.addEventListener('submit', event => {
@@ -84,7 +86,7 @@ export function createLexoView({ documentRef = document } = {}) {
     input.className = 'lexo-word-input';
     input.placeholder = 'Typ een woord';
     input.setAttribute('aria-label', 'Woord uit het letterveld');
-    const button = makeButton(documentRef, 'Woord', 'lexo-submit');
+    const button = makeButton(documentRef, 'Woord →', 'success');
     button.type = 'submit';
     form.append(input, button);
     form.addEventListener('submit', event => {
@@ -108,12 +110,12 @@ export function createLexoView({ documentRef = document } = {}) {
     box.textContent = message || (state.feedback.correct ? 'Goed!' : 'Nog niet.');
     feedback.appendChild(box);
     if (state.feedback.type === 'word' && state.feedback.correct && state.phase !== 'finished') {
-      const button = makeButton(documentRef, 'Verder →', 'lexo-continue');
+      const button = makeButton(documentRef, 'Verder →', 'secondary');
       button.addEventListener('click', onContinue);
       feedback.appendChild(button);
       button.focus({ preventScroll: true });
     } else if (state.feedback.type === 'exercise' && !state.feedback.correct) {
-      const button = makeButton(documentRef, 'Verder →', 'lexo-continue');
+      const button = makeButton(documentRef, 'Verder →', 'secondary');
       button.addEventListener('click', onContinue);
       feedback.appendChild(button);
       button.focus({ preventScroll: true });
@@ -127,9 +129,9 @@ export function createLexoView({ documentRef = document } = {}) {
     title.textContent = 'LEXO klaar!';
     const text = documentRef.createElement('p');
     text.textContent = `Je vond ${state.foundWords.length} ${state.foundWords.length === 1 ? 'woord' : 'woorden'} en scoorde ${state.score} punten.`;
-    const restart = makeButton(documentRef, 'Opnieuw', 'lexo-continue');
+    const restart = makeButton(documentRef, 'Nog een keer →', 'success');
     restart.addEventListener('click', onRestart);
-    const games = makeButton(documentRef, '← Spelletjes', 'lexo-secondary');
+    const games = makeButton(documentRef, 'Terug naar spelletjes', 'secondary');
     games.addEventListener('click', onGames);
     area.append(title, text, restart, games);
   }
@@ -137,17 +139,16 @@ export function createLexoView({ documentRef = document } = {}) {
   function renderDifficulty(root, difficulty, onChange) {
     const mount = root.querySelector('#lexoDifficultySelect');
     clear(mount);
-    const select = documentRef.createElement('select');
-    select.className = 'lexo-select';
-    [['rookie','ROOKIE'],['goat','GOAT']].forEach(([value, label]) => {
-      const option = documentRef.createElement('option');
-      option.value = value;
-      option.textContent = label;
-      option.selected = value === difficulty;
-      select.appendChild(option);
+    const dropdown = createPacoDropdown({
+      options: [
+        { value: 'rookie', label: 'ROOKIE — 2 letters' },
+        { value: 'goat', label: 'GOAT — 1 letter' }
+      ],
+      value: difficulty,
+      onChange,
+      className: 'lexo-dropdown'
     });
-    select.addEventListener('change', () => onChange(select.value));
-    mount.appendChild(select);
+    mount.appendChild(dropdown.element);
   }
 
   return Object.freeze({ renderStats, renderGrid, renderQuestion, renderWordInput, renderFeedback, renderFinished, renderDifficulty });

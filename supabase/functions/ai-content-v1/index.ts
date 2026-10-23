@@ -12,7 +12,7 @@ function normalize(body: any) {
   if (!allowedTypes.has(contentType)) throw new Error("Unsupported content type.");
 
   if (contentType === "multiple_choice_distractors") {
-    const optionCount = Math.min(7, Math.max(1, Math.round(Number(body?.optionCount) || 1)));
+    const optionCount = Math.min(8, Math.max(2, Math.round(Number(body?.optionCount) || 4)));
     return {
       contentType,
       locale: text(body?.locale, 20) || "nl-NL",
@@ -24,7 +24,8 @@ function normalize(body: any) {
         lessonType: text(body?.context?.lessonType, 100),
         theme: text(body?.context?.theme, 200)
       },
-      optionCount
+      optionCount,
+      distractorCount: optionCount - 1
     };
   }
 
@@ -49,7 +50,7 @@ function promptFor(request: any) {
       `Vak: ${request.subject || "onbekend"}`,
       `Subvak: ${request.subvak || "onbekend"}`,
       `Lescontext: ${JSON.stringify(request.context)}`,
-      `Aantal foute opties: ${request.optionCount}`,
+      `Aantal foute opties: ${request.distractorCount}`,
       "Elke optie moet inhoudelijk anders zijn, plausibel klinken en duidelijk fout zijn voor deze vraag.",
       "Bij spelling/dictee: maak realistische bijna-goede spelfouten, maar gebruik nooit de correcte spelling.",
       "Geef ALLEEN JSON: {\"options\":[\"...\"]}"
@@ -91,8 +92,8 @@ function parseOutput(raw: string, request: any) {
       seen.add(key);
       options.push(option);
     }
-    if (options.length < request.optionCount) throw new Error("AI returned too few valid distractors");
-    return { options: options.slice(0, request.optionCount) };
+    if (options.length < request.distractorCount) throw new Error("AI returned too few valid distractors");
+    return { options: options.slice(0, request.distractorCount) };
   }
 
   const target = parsed?.target;
@@ -125,7 +126,7 @@ Deno.serve(async (req: Request) => {
     if (request.contentType === "multiple_choice_distractors" && (!request.question || !request.correctAnswer)) {
       return json({ error: "Multiple-choice vraag en correct antwoord zijn verplicht." }, 400);
     }
-    const response = await fetch("https://api.openai.com/v1/responses", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` }, body: JSON.stringify({ model: AI_MODEL, input: promptFor(request), max_output_tokens: request.contentType === "multiple_choice_distractors" ? 500 : 500 }) });
+    const response = await fetch("https://api.openai.com/v1/responses", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` }, body: JSON.stringify({ model: AI_MODEL, input: promptFor(request), max_output_tokens: 500 }) });
     const raw = await response.text();
     if (!response.ok) {
       const details = upstreamErrorDetails(raw);

@@ -1,6 +1,5 @@
-import { mountPacoPageTemplate, createPacoDropdown } from '../../../components/page-template.js';
+import { mountPacoPageTemplate } from '../../../components/page-template.js';
 import { createPacoNavigation } from '../../../components/page-navigation.js';
-import { createLessonContextField } from '../../lessons/lesson-context-view.js';
 import { createPracticeGameTemplate, PRACTICE_PACO_THINKING_DELAY_MS, schedulePacoTurn } from '../practice-game-template.js';
 import { createConnectTheDotsRuntime } from './runtime.js';
 import { createConnectTheDotsView } from './view.js';
@@ -42,7 +41,7 @@ export function createConnectTheDotsPageRuntime({ app, templateMount, context, l
     highScore = score;
   }
 
-  function setThinking(state) {
+  function setThinking() {
     gameArea.replaceChildren();
     const panel = documentRef.createElement('div');
     panel.className = 'ctd-thinking';
@@ -54,14 +53,14 @@ export function createConnectTheDotsPageRuntime({ app, templateMount, context, l
   }
 
   async function renderState(state) {
-    shell.querySelector('.practice-game-stats').replaceChildren(...statsFrom(state).map(stat => {
+    shell.element.querySelector('.practice-game-stats').replaceChildren(...statsFrom(state).map(stat => {
       const node = documentRef.createElement('div'); node.className = 'practice-game-stat';
       const label = documentRef.createElement('span'); label.textContent = stat.label;
       const value = documentRef.createElement('strong'); value.textContent = stat.value;
       node.append(label, value); return node;
     }));
 
-    if (state.phase === 'paco') { setThinking(state); return; }
+    if (state.phase === 'paco') { setThinking(); return; }
     thinkingCancel?.(); thinkingCancel = null;
     if (state.phase === 'question') {
       view.renderQuestion(exercise, state, async answer => { try { errorMessage = ''; await renderState(await runtime.submitAnswer(answer)); } catch (error) { errorMessage = error?.message || 'Het antwoord kon niet worden verwerkt.'; await renderState(runtime.snapshot()); } }, errorMessage);
@@ -95,7 +94,6 @@ export function createConnectTheDotsPageRuntime({ app, templateMount, context, l
   }
 
   async function mount() {
-    const contextField = lessonId ? null : null;
     const shellContent = documentRef.createElement('div');
     shellContent.className = 'ctd-content';
     gameArea = documentRef.createElement('div'); gameArea.className = 'ctd-game-area';

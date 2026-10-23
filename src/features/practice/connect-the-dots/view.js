@@ -24,11 +24,11 @@ export function createConnectTheDotsView({ documentRef = document } = {}) {
         button.addEventListener('click', () => handlers.onEdge?.(edge.key));
       }
       if (edge.orientation === 'horizontal') {
-        button.style.gridColumn = `${edge.column * 2 + 2}`;
+        button.style.gridColumn = `${edge.column * 2 + 2} / span 2`;
         button.style.gridRow = `${edge.row * 2 + 1}`;
       } else {
         button.style.gridColumn = `${edge.column * 2 + 1}`;
-        button.style.gridRow = `${edge.row * 2 + 2}`;
+        button.style.gridRow = `${edge.row * 2 + 2} / span 2`;
       }
       board.appendChild(button);
     });

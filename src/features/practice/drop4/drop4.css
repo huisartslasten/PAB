@@ -10,8 +10,8 @@
 .drop4-setting .paco-dropdown { width: 100%; }
 .drop4-setting .paco-dropdown-trigger { min-height: 40px; border-radius: 12px; background: #fff; color: #102b57; border-color: #cfe3f3; box-shadow: 0 3px 0 rgba(16,43,87,.05); font-size: 15px; }
 .drop4-setting .paco-dropdown-trigger:hover, .drop4-setting .paco-dropdown.open .paco-dropdown-trigger { background: #edf8ff; border-color: #1787f2; }
-.drop4-board { grid-column: 2; grid-row: 2 / span 2; width: min(100%, 500px); margin: 0 auto; display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; padding: 11px; border: 2px solid #cfe3f3; border-radius: 22px; background: #1787f2; box-shadow: 0 7px 16px rgba(16,43,87,.09); }
-.drop4-cell { position: relative; align-self: start; aspect-ratio: 1 / 1; min-width: 0; min-height: 0; padding: 5px; border: 0; border-radius: 50%; background: #fff; cursor: default; box-shadow: inset 0 0 0 2px rgba(16,43,87,.05); }
+.drop4-board { grid-column: 2; grid-row: 2 / span 2; width: min(100%, 500px); margin: 0 auto; box-sizing: border-box; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: repeat(6, minmax(0, 1fr)); aspect-ratio: 7 / 6; gap: 7px; padding: 11px; border: 2px solid #cfe3f3; border-radius: 22px; background: #1787f2; box-shadow: 0 7px 16px rgba(16,43,87,.09); }
+.drop4-cell { width: 100%; height: 100%; min-width: 0; min-height: 0; box-sizing: border-box; padding: 0; border: 0; border-radius: 50%; background: #fff; cursor: default; box-shadow: inset 0 0 0 2px rgba(16,43,87,.05); }
 .drop4-cell[data-column]:not(:disabled) { cursor: pointer; box-shadow: inset 0 0 0 3px rgba(255,255,255,.9), 0 0 0 3px rgba(255,255,255,.12); }
 .drop4-cell[data-column]:not(:disabled):hover { transform: translateY(-2px); }
 .drop4-cell:focus-visible { outline: 0; box-shadow: 0 0 0 4px rgba(255,255,255,.9); }
@@ -42,4 +42,4 @@
 @media (max-height: 760px) and (min-width: 901px) { .drop4-page-card { gap: 7px 14px; padding: 8px 14px 10px; } .drop4-board { gap: 6px; padding: 9px; } .drop4-content { min-height: 76px; } }
 @media (prefers-reduced-motion: reduce) { .drop4-paco-face, .drop4-thinking-dots i { animation: none; } }
 @media (max-width: 900px) { .drop4-page-card { grid-template-columns: 1fr; } .drop4-game-head, .drop4-settings, .drop4-board, .drop4-content { grid-column: 1; } .drop4-settings { grid-row: 2; } .drop4-board { grid-row: 3; width: min(100%, 500px); } .drop4-content { grid-row: 4; width: min(100%, 680px); margin: 0 auto; } }
-@media (max-width: 700px) { .drop4-page-card { padding: 10px 12px 14px; } .drop4-stats { grid-template-columns: 1fr; } .drop4-board { gap: 5px; padding: 6px; } .drop4-cell { padding: 4px; } }
+@media (max-width: 700px) { .drop4-page-card { padding: 10px 12px 14px; } .drop4-stats { grid-template-columns: 1fr; } .drop4-board { gap: 5px; padding: 6px; } .drop4-cell { padding: 0; } }

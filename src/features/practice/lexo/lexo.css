@@ -66,6 +66,7 @@
 .lexo-dropdown { min-width: 165px; }
 
 .lexo-grid-panel {
+  position: relative;
   grid-column: 2;
   grid-row: 2 / span 2;
   min-height: 310px;
@@ -81,29 +82,82 @@
   text-align: center;
 }
 
-.lexo-rules {
-  width: min(100%, 440px);
-  padding: 10px 13px;
-  border: 2px solid #d3e5f4;
-  border-radius: 14px;
+.lexo-help-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 2px solid #b9d8ef;
+  border-radius: 50%;
   background: #fff;
-  color: #173b70;
-  text-align: left;
-  line-height: 1.35;
+  color: #1b5f91;
+  font: 900 18px/1 "Baloo 2", Nunito, sans-serif;
+  cursor: pointer;
+  box-shadow: 0 3px 7px rgba(16,43,87,.08);
+  transition: transform .15s ease, background-color .15s ease, border-color .15s ease;
 }
 
-.lexo-rules strong {
-  display: block;
-  margin-bottom: 3px;
+.lexo-help-button:hover,
+.lexo-help-button:focus-visible {
+  background: #f4fbff;
+  border-color: #7fb9e3;
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.lexo-help-button:focus-visible {
+  box-shadow: 0 0 0 3px rgba(91,164,218,.22);
+}
+
+.lexo-help-dialog {
+  width: min(440px, calc(100vw - 32px));
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  background: transparent;
   color: #102b57;
-  font-size: 14px;
+  box-shadow: 0 18px 50px rgba(16,43,87,.22);
 }
 
-.lexo-rules p {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 700;
+.lexo-help-dialog::backdrop { background: rgba(16,43,87,.28); }
+
+.lexo-help-content {
+  display: grid;
+  gap: 10px;
+  padding: 22px;
+  border: 2px solid #cfe3f3;
+  border-radius: 20px;
+  background: #fff;
+  text-align: left;
 }
+
+.lexo-help-kicker {
+  color: #5d8eb5;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.lexo-help-content h2 {
+  margin: 1px 0 0;
+  color: #102b57;
+  font: 900 24px/1.05 "Baloo 2", Nunito, sans-serif;
+}
+
+.lexo-help-content p {
+  margin: 0;
+  color: #385579;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.lexo-help-content button { justify-self: start; margin-top: 4px; }
 
 .lexo-grid {
   display: grid;

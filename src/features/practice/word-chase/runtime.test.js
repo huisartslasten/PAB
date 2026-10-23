@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createWordChaseRuntime } from './runtime.js';
+import { getWordDictionary, isFiveLetterWord } from './dictionary.js';
 
 const items = [
   { question: '2 + 2', answer: '4' },
@@ -31,6 +32,11 @@ describe('Word Chase runtime', () => {
     expect(runtime.snapshot().phase).toBe('word');
   });
 
+  it('accepts common five-letter Dutch guesses such as lopen', () => {
+    expect(isFiveLetterWord('lopen')).toBe(true);
+    expect(getWordDictionary().length).toBeGreaterThan(250);
+  });
+
   it('rejects non-dictionary words', async () => {
     const runtime = createWordChaseRuntime({ items, gradeAnswer: grader, difficulty: 'rookie', random: () => 0 });
     runtime.startWord('appel');
@@ -44,6 +50,15 @@ describe('Word Chase runtime', () => {
     const runtime = createWordChaseRuntime({ items, gradeAnswer: grader, difficulty: 'rookie', random: () => 0 });
     expect(runtime.evaluateGuess('appel', 'appel')).toEqual(['correct', 'correct', 'correct', 'correct', 'correct']);
     expect(runtime.evaluateGuess('appel', 'palen')).toEqual(['present', 'present', 'absent', 'correct', 'present']);
+  });
+
+  it('does not immediately repeat a secret word', () => {
+    const runtime = createWordChaseRuntime({ items, gradeAnswer: grader, difficulty: 'rookie', random: () => 0 });
+    runtime.startWord('appel');
+    const first = runtime.snapshot().target;
+    runtime.startWord();
+    const second = runtime.snapshot().target;
+    expect(second).not.toBe(first);
   });
 
   it('returns to exercise questions after a wrong word and eventually finishes', async () => {

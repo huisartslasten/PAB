@@ -47,13 +47,13 @@ test('AI content service rejects invalid target responses', async () => {
   );
 });
 
-test('AI content service requests distractors without allowing the AI to own the correct answer', async () => {
+test('AI content service requests only the wrong options for a total option count', async () => {
   let captured = null;
   const supabase = {
     functions: {
       async invoke(name, options) {
         captured = { name, options };
-        return { data: { options: ['Parijs', 'Berlijn', 'Rome', 'Amsterdam'] }, error: null };
+        return { data: { options: ['Parijs', 'Berlijn', 'Rome'] }, error: null };
       }
     }
   };
@@ -70,6 +70,7 @@ test('AI content service requests distractors without allowing the AI to own the
   assert.equal(captured.options.body.contentType, CONTENT_TYPES.MULTIPLE_CHOICE_DISTRACTORS);
   assert.equal(captured.options.body.correctAnswer, 'Amsterdam');
   assert.equal(captured.options.body.optionCount, 4);
+  assert.equal(captured.options.body.distractorCount, 3);
   assert.deepEqual(result, ['Parijs', 'Berlijn', 'Rome']);
 });
 

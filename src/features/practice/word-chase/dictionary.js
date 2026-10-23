@@ -1,10 +1,10 @@
 const WORDS = [
-  'aarde','avond','appel','armen','audio','baken','basis','beeld','beest','begin','beide','beren','besje','beste','beton','bomen','boven','brand','brein','broek','brood','buurt','cavia','circa','datum','deken','dicht','droom','druif','eerst','engel','fiets','flink','fluit','fruit','geest','geven','gloed','glans','groot','groep','haast','halen','haren','haven','hekel','hemel','hondje','hoofd','hoort','hotel','jager','jasje','jeugd','kaart','kamer','kansje','keren','keuze','koken','koren','kracht','kunst','laden','lager','lezen','licht','liefs','lucht','maart','maken','maten','media','meter','mezen','moeder','motor','muren','muziek','nacht','naast','negen','nooit','onder','oogst','ouder','paard','panda','papier','plein','plant','plaat','plank','plein','prima','radio','regen','reken','rente','robot','ronde','ruimte','samen','schat','school','stoel','storm','straat','stuur','taart','talen','tante','teken','tempo','tenen','tiger','touwt','trein','trots','tweede','vader','varen','vaten','verre','vloer','vogel','vuren','water','wereld','weten','wilde','windje','wonen','woord','zacht','zagen','zomer','zonen','zwaar','zweet','zwaar'
+  'aarde','actie','ademt','adres','afval','afwas','alarm','alias','ander','angst','appel','arena','arend','armen','audio','avond','award','badge','baken','balen','banjo','basis','bedje','beeld','beest','begin','beide','beren','beste','beton','beter','bever','bewijs','bezig','bocht','bodem','boete','bonus','boord','bomen','boven','brand','brein','broek','brood','broer','bruin','buurt','cavia','circa','clown','cobra','datum','deken','deugd','dicht','diner','disco','droom','druif','eerst','egel','eieren','eigen','einde','eland','engel','enter','extra','feest','fiets','flink','fluit','focus','foto','fruit','gebak','geest','geven','geitje','geluk','geluid','gilet','gloed','glans','glazen','gluur','groot','groep','haard','haast','halen','halve','hamer','haren','harde','hartje','haven','hazen','hekel','hemel','hekje','helder','hinde','hobby','hondje','hoofd','hoort','hotel','huizen','humor','ieder','idee','indruk','inzet','ijsje','jager','jasje','jeugd','joker','jonge','juist','kaart','kabel','kamer','kano','kans','kansje','katje','kegel','kenner','kerst','kersje','keten','keuze','klein','klomp','klokje','knoop','koekje','koken','komst','konijn','koren','kracht','kraan','krant','krans','kruis','kunst','lachen','ladder','lager','lampje','later','leest','lepel','lenen','leren','lezen','lever','licht','liefs','liefde','lijst','lijnt','limon','lopen','loper','loods','lucht','luier','maart','macht','maken','mango','markt','massa','matig','maten','media','mens','meisje','meter','metro','micro','model','molen','motor','mouwt','muren','muisje','muziek','nacht','naast','negen','nooit','nodig','noord','norma','nylon','onder','oogje','oogst','opera','ouder','paard','panda','panne','papier','peper','peren','piano','pizza','plaats','plant','plaat','plank','plein','ploeg','pluis','poort','praat','prima','prijs','proef','radio','regen','regel','reken','rente','rivier','robot','roest','ronde','rozen','ruimte','ruzie','samen','sapje','schat','schelp','schijn','school','schoon','score','schip','slapen','slimste','snoepje','snelst','sport','spoor','stoel','stofje','storm','straat','strik','stuur','taart','tafel','talen','tante','tapijt','teken','tegel','tempo','tenen','tennis','terug','thuis','tijger','tiger','touwt','trein','trend','trots','trui','trouw','typen','vader','vaker','varen','vaten','vecht','veilig','veer','veren','verft','verre','video','vloer','vlieg','vogel','volop','volgen','vuren','water','wapen','wazen','wereld','wezen','weten','wielt','wilde','wijzer','winkel','winnen','winter','wonen','woord','zacht','zadel','zagen','zalen','zandje','zebra','zomer','zonen','zoute','zwaar','zweet','zwerk','zucht'
 ];
 
 const NORMALIZED_WORDS = Object.freeze(
   [...new Set(WORDS.map(word => word.toLocaleLowerCase('nl-NL')))]
-    .filter(word => [...word].length === 5)
+    .filter(word => [...word].length === 5 && /^[a-z]+$/.test(word))
 );
 const DICTIONARY = new Set(NORMALIZED_WORDS);
 
@@ -21,9 +21,9 @@ export function getWordDictionary() {
   return NORMALIZED_WORDS.slice();
 }
 
-export function pickWord(random = Math.random, exclude = '') {
-  const excluded = normalizeWord(exclude);
-  const candidates = NORMALIZED_WORDS.filter(word => word !== excluded);
+export function pickWord(random = Math.random, excludedWords = []) {
+  const excluded = new Set((Array.isArray(excludedWords) ? excludedWords : [excludedWords]).map(normalizeWord));
+  const candidates = NORMALIZED_WORDS.filter(word => !excluded.has(word));
   const pool = candidates.length ? candidates : NORMALIZED_WORDS;
   return pool[Math.floor(Math.max(0, Math.min(0.999999, Number(random()) || 0)) * pool.length)];
 }

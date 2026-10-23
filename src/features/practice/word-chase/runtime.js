@@ -1,4 +1,4 @@
-import { isFiveLetterWord, normalizeWord, pickWord } from './dictionary.js';
+import { isFiveLetterWord, normalizeWord, pickWord, getWordDictionary } from './dictionary.js';
 
 function normalizeItems(items = []) {
   return (Array.isArray(items) ? items : [])
@@ -29,7 +29,9 @@ export function createWordChaseRuntime({ items = [], gradeAnswer, difficulty = '
 
   const source = normalizeItems(items);
   const revealCount = revealCountForDifficulty(difficulty);
+  const targetPoolSize = getWordDictionary().length;
   let target = '';
+  let usedTargets = new Set();
   let revealedIndices = new Set();
   let remaining = new Set(source.map(item => item.index));
   let questionQueue = [];
@@ -64,10 +66,19 @@ export function createWordChaseRuntime({ items = [], gradeAnswer, difficulty = '
     revealedIndices = new Set(indices);
   }
 
+  function chooseTarget() {
+    if (usedTargets.size >= targetPoolSize) usedTargets = new Set();
+    const candidate = pickWord(random, [...usedTargets]);
+    if (!candidate) throw new Error('Word Chase heeft geen geheime woorden beschikbaar.');
+    usedTargets.add(candidate);
+    return candidate;
+  }
+
   function startWord(nextTarget = '') {
-    const candidate = normalizeWord(nextTarget) || pickWord(random, target);
+    const candidate = normalizeWord(nextTarget) || chooseTarget();
     if (!isFiveLetterWord(candidate)) throw new Error('Word Chase heeft een geldig vijfletterwoord nodig.');
     target = candidate;
+    if (nextTarget) usedTargets.add(candidate);
     revealedIndices = new Set();
     revealInitialLetters();
     wordAttempts = 0;
@@ -81,6 +92,7 @@ export function createWordChaseRuntime({ items = [], gradeAnswer, difficulty = '
     questionQueue = [];
     current = null;
     target = '';
+    usedTargets = new Set();
     revealedIndices = new Set();
     turns = 0;
     wordAttempts = 0;

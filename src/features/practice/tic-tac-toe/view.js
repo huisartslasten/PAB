@@ -1,4 +1,5 @@
 import { createPacoDropdown } from '../../../components/page-template.js';
+import { schedulePacoTurn } from '../practice-game-template.js';
 
 const TILE_ASSETS = Object.freeze({
   empty: './src/features/practice/tic-tac-toe/assets/tile-empty.webp',
@@ -120,10 +121,10 @@ export function createTicTacToeView({ documentRef = globalThis.document, escapeH
 
     const startThinking = () => {
       content.innerHTML = `${answerFeedback ? `${answerFeedback.replace(/<button[\s\S]*?<\/button>/, '')}` : ''}<div class="ttt-turn ttt-paco-thinking" role="status" aria-live="polite"><span class="ttt-paco-face">🐶</span><span>Paco denkt na<span class="ttt-thinking-dots" aria-hidden="true"><i></i><i></i><i></i></span></span></div>`;
-      const timer = documentRef.defaultView?.setTimeout?.(onPaco, 1500);
-      return () => {
-        if (timer != null) documentRef.defaultView?.clearTimeout?.(timer);
-      };
+      return schedulePacoTurn({
+        windowRef: documentRef.defaultView,
+        onTurn: onPaco
+      });
     };
 
     if (!answerWasWrong) return startThinking();

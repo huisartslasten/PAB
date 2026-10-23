@@ -18,6 +18,16 @@ export function createLexoView({ documentRef = document } = {}) {
     root.querySelector('#lexoProgress').textContent = `${state.completedCount} van ${state.totalCount}`;
   }
 
+  function renderRules(root) {
+    const area = root.querySelector('#lexoRules');
+    clear(area);
+    const title = documentRef.createElement('strong');
+    title.textContent = 'Zo speel je LEXO';
+    const rules = documentRef.createElement('p');
+    rules.textContent = 'Maak woorden door letters horizontaal, verticaal of diagonaal met elkaar te verbinden. Je mag een letter binnen één woord niet opnieuw gebruiken. Langere woorden leveren meer punten op.';
+    area.append(title, rules);
+  }
+
   function renderGrid(root, state) {
     const grid = root.querySelector('#lexoGrid');
     clear(grid);
@@ -151,5 +161,5 @@ export function createLexoView({ documentRef = document } = {}) {
     mount.appendChild(dropdown.element);
   }
 
-  return Object.freeze({ renderStats, renderGrid, renderQuestion, renderWordInput, renderFeedback, renderFinished, renderDifficulty });
+  return Object.freeze({ renderStats, renderRules, renderGrid, renderQuestion, renderWordInput, renderFeedback, renderFinished, renderDifficulty });
 }

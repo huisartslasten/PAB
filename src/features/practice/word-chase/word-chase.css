@@ -25,6 +25,7 @@
 .wc-stat { min-height: 48px; display: grid; align-content: center; gap: 2px; padding: 6px 9px; border: 2px solid #e1edf7; border-radius: 13px; background: #fff; text-align: center; }
 .wc-stat span, .wc-label { color: #667894; font-size: 10px; font-weight: 900; letter-spacing: .6px; text-transform: uppercase; }
 .wc-stat strong { color: #102b57; font: 900 17px/1.05 "Baloo 2", Nunito, sans-serif; }
+.wc-controls { display: flex; align-items: end; gap: 10px; flex-wrap: wrap; }
 .wc-difficulty-control { display: grid; gap: 3px; color: #173b70; font-size: 11px; font-weight: 900; text-transform: uppercase; }
 .wc-difficulty-control select { min-width: 150px; }
 
@@ -86,7 +87,8 @@
   .wc-page-card { padding: 10px 12px 14px; }
   .wc-head { flex-direction: column; align-items: stretch; }
   .wc-stats { grid-template-columns: 1fr 1fr; }
-  .wc-difficulty-control select { width: 100%; }
+  .wc-controls { display: grid; grid-template-columns: 1fr 1fr; }
+  .wc-difficulty-control select { width: 100%; min-width: 0; }
   .wc-tile { width: 50px; height: 50px; }
   .wc-answer-form, .wc-word-form { flex-direction: column; }
   .wc-answer-form button, .wc-word-form button, .wc-word-form input { width: 100%; max-width: none; }

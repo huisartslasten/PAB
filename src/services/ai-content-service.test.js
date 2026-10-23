@@ -46,3 +46,47 @@ test('AI content service rejects invalid target responses', async () => {
     /unsupported target type/
   );
 });
+
+test('AI content service requests distractors without allowing the AI to own the correct answer', async () => {
+  let captured = null;
+  const supabase = {
+    functions: {
+      async invoke(name, options) {
+        captured = { name, options };
+        return { data: { options: ['Parijs', 'Berlijn', 'Rome', 'Amsterdam'] }, error: null };
+      }
+    }
+  };
+
+  const service = createAiContentService({ supabase });
+  const result = await service.generateMultipleChoiceDistractors({
+    question: 'Wat is de hoofdstad van Nederland?',
+    correctAnswer: 'Amsterdam',
+    optionCount: 4,
+    subject: 'Aardrijkskunde'
+  });
+
+  assert.equal(captured.name, 'ai-content-v1');
+  assert.equal(captured.options.body.contentType, CONTENT_TYPES.MULTIPLE_CHOICE_DISTRACTORS);
+  assert.equal(captured.options.body.correctAnswer, 'Amsterdam');
+  assert.equal(captured.options.body.optionCount, 4);
+  assert.deepEqual(result, ['Parijs', 'Berlijn', 'Rome']);
+});
+
+test('AI content service removes duplicate distractors and the correct answer', async () => {
+  const supabase = {
+    functions: {
+      async invoke() {
+        return { data: { options: ['4', '5', '5', ' 4 '] }, error: null };
+      }
+    }
+  };
+
+  const result = await createAiContentService({ supabase }).generateMultipleChoiceDistractors({
+    question: 'Wat is 2 + 2?',
+    correctAnswer: '4',
+    optionCount: 3
+  });
+
+  assert.deepEqual(result, ['5']);
+});

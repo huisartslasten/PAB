@@ -1,5 +1,5 @@
 const corsHeaders = {"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"authorization, x-client-info, apikey, content-type","Access-Control-Allow-Methods":"POST, OPTIONS"};
-const allowedTypes = new Set(["practice_target"]);
+const allowedTypes = new Set(["practice_target", "multiple_choice_distractors"]);
 const allowedForms = new Set(["word","sentence","saying"]);
 const AI_MODEL = "gpt-5.6-terra";
 const json = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -10,6 +10,24 @@ function normalize(body: any) {
   const constraints = body?.constraints ?? {};
   const contentType = text(body?.contentType, 100);
   if (!allowedTypes.has(contentType)) throw new Error("Unsupported content type.");
+
+  if (contentType === "multiple_choice_distractors") {
+    const optionCount = Math.min(7, Math.max(1, Math.round(Number(body?.optionCount) || 1)));
+    return {
+      contentType,
+      locale: text(body?.locale, 20) || "nl-NL",
+      question: text(body?.question, 1000),
+      correctAnswer: text(body?.correctAnswer, 1000),
+      subject: text(body?.subject, 100),
+      subvak: text(body?.subvak, 100),
+      context: {
+        lessonType: text(body?.context?.lessonType, 100),
+        theme: text(body?.context?.theme, 200)
+      },
+      optionCount
+    };
+  }
+
   const forms = Array.isArray(constraints.targetForms) ? constraints.targetForms.filter((v: unknown) => allowedForms.has(String(v))) : ["word","sentence","saying"];
   return {
     contentType,
@@ -19,7 +37,25 @@ function normalize(body: any) {
     constraints: { remainingQuestionCount: Math.max(0, Number(constraints.remainingQuestionCount) || 0), maxCharacters: Math.min(120, Math.max(1, Number(constraints.maxCharacters) || 80)), targetForms: forms.length ? forms : ["word"] }
   };
 }
-function promptFor(request: ReturnType<typeof normalize>) {
+function promptFor(request: any) {
+  if (request.contentType === "multiple_choice_distractors") {
+    return [
+      "Je bent de centrale educatieve contentgenerator van PAB.",
+      "Genereer alleen plausibele FOUTE antwoordopties voor een bestaande multiple-choice vraag.",
+      "Het door de gebruiker opgegeven correcte antwoord is al vastgesteld en mag NIET worden vervangen, aangepast of opnieuw gegenereerd.",
+      "Gebruik de vraag, het correcte antwoord en de context om realistische afleiders te maken.",
+      `Vraag: ${request.question}`,
+      `Correct antwoord: ${request.correctAnswer}`,
+      `Vak: ${request.subject || "onbekend"}`,
+      `Subvak: ${request.subvak || "onbekend"}`,
+      `Lescontext: ${JSON.stringify(request.context)}`,
+      `Aantal foute opties: ${request.optionCount}`,
+      "Elke optie moet inhoudelijk anders zijn, plausibel klinken en duidelijk fout zijn voor deze vraag.",
+      "Bij spelling/dictee: maak realistische bijna-goede spelfouten, maar gebruik nooit de correcte spelling.",
+      "Geef ALLEEN JSON: {\"options\":[\"...\"]}"
+    ].join("\n");
+  }
+
   return [
     "Je bent de centrale educatieve contentgenerator van PAB.",
     "Maak veilige, positieve Nederlandse oefencontent voor basisschoolleerlingen.",
@@ -39,9 +75,26 @@ function promptFor(request: ReturnType<typeof normalize>) {
     "Gebruik meaning als lege string voor word en sentence."
   ].join("\n");
 }
-function parseOutput(raw: string) {
+function parseOutput(raw: string, request: any) {
   let parsed: any;
   try { parsed = JSON.parse(raw); } catch { const match = raw.match(/\{[\s\S]*\}/); if (!match) throw new Error("Invalid JSON"); parsed = JSON.parse(match[0]); }
+
+  if (request.contentType === "multiple_choice_distractors") {
+    const rawOptions = Array.isArray(parsed?.options) ? parsed.options : [];
+    const seen = new Set<string>();
+    const options: string[] = [];
+    const correct = request.correctAnswer.toLocaleLowerCase("nl-NL");
+    for (const value of rawOptions) {
+      const option = text(value, 500);
+      const key = option.toLocaleLowerCase("nl-NL");
+      if (!option || key === correct || seen.has(key)) continue;
+      seen.add(key);
+      options.push(option);
+    }
+    if (options.length < request.optionCount) throw new Error("AI returned too few valid distractors");
+    return { options: options.slice(0, request.optionCount) };
+  }
+
   const target = parsed?.target;
   const type = text(target?.type, 30);
   const targetText = text(target?.text, 120);
@@ -69,7 +122,10 @@ Deno.serve(async (req: Request) => {
     const apiKey = Deno.env.get("OPENAI_API_KEY");
     if (!apiKey) return json({ error: "OPENAI_API_KEY ontbreekt in Supabase." }, 500);
     const request = normalize(await req.json());
-    const response = await fetch("https://api.openai.com/v1/responses", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` }, body: JSON.stringify({ model: AI_MODEL, input: promptFor(request), max_output_tokens: 500 }) });
+    if (request.contentType === "multiple_choice_distractors" && (!request.question || !request.correctAnswer)) {
+      return json({ error: "Multiple-choice vraag en correct antwoord zijn verplicht." }, 400);
+    }
+    const response = await fetch("https://api.openai.com/v1/responses", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` }, body: JSON.stringify({ model: AI_MODEL, input: promptFor(request), max_output_tokens: request.contentType === "multiple_choice_distractors" ? 500 : 500 }) });
     const raw = await response.text();
     if (!response.ok) {
       const details = upstreamErrorDetails(raw);
@@ -79,6 +135,6 @@ Deno.serve(async (req: Request) => {
     const data = JSON.parse(raw);
     const outputText = (data.output ?? []).flatMap((item: any) => item.content ?? []).filter((item: any) => item.type === "output_text" && typeof item.text === "string").map((item: any) => item.text).join("").trim();
     if (!outputText) return json({ error: "OpenAI gaf geen content terug." }, 502);
-    try { return json(parseOutput(outputText)); } catch { return json({ error: "AI-content kon niet worden gelezen." }, 502); }
+    try { return json(parseOutput(outputText, request)); } catch { return json({ error: "AI-content kon niet worden gelezen." }, 502); }
   } catch { return json({ error: "AI-contentgeneratie kon niet worden uitgevoerd." }, 500); }
 });

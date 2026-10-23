@@ -87,6 +87,27 @@ export function buildDictationItem(row = {}) {
   const parts = normalizeParts(row.answer_parts, row.answer ?? row.word);
   const word = parts.find(part => part.role === 'answer')?.text || text(row.word ?? row.answer);
   if (!word) return null;
+  const responseType = normalizeResponseType(row.response_type ?? row.responseType, 'text');
+  const answerOptions = normalizeOptions(row.answer_options ?? row.answerOptions);
+
+  if (responseType === 'multiple_choice') {
+    const correctOption = text(row.correct_option ?? row.correctOption ?? word);
+    const optionValidation = validateMultipleChoiceOptions({ options: answerOptions, correctOption });
+    if (!optionValidation.valid) return null;
+    return {
+      question: questionParts.join('\n'),
+      answer: optionValidation.correctOption,
+      question_parts: questionParts,
+      answer_parts: parts.length ? parts : [{ text: word, role: 'answer' }],
+      response_type: 'multiple_choice',
+      answer_options: optionValidation.options,
+      multiple_choice_config: {
+        enabled: true,
+        optionCount: normalizeMultipleChoiceConfig(row.multiple_choice_config ?? row.multipleChoiceConfig ?? { enabled: true, optionCount: optionValidation.options.length }).optionCount
+      }
+    };
+  }
+
   return {
     question: questionParts.join('\n'),
     answer: word,

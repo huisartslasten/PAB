@@ -96,6 +96,16 @@ test('multiple choice rejects duplicate options in the shared policy', () => {
   assert.equal(result.errors.includes('Elke antwoordoptie moet uniek zijn.'), true);
 });
 
+test('multiple choice rejects duplicates that differ only by letter case', () => {
+  const result = validateMultipleChoiceOptions({
+    options: ['Parijs', 'Londen', 'parijs', 'Rome'],
+    correctOption: 'Parijs'
+  });
+
+  assert.equal(result.valid, false);
+  assert.equal(result.errors.includes('Elke antwoordoptie moet uniek zijn.'), true);
+});
+
 test('multiple choice builder uses the shared option policy', () => {
   const items = buildItemsForType('questions', [{
     question_parts: ['Welke stad is de hoofdstad van Frankrijk?'],

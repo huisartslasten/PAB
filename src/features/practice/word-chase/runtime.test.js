@@ -43,7 +43,7 @@ describe('Word Chase runtime', () => {
   it('marks green and yellow positions correctly', () => {
     const runtime = createWordChaseRuntime({ items, gradeAnswer: grader, difficulty: 'rookie', random: () => 0 });
     expect(runtime.evaluateGuess('appel', 'appel')).toEqual(['correct', 'correct', 'correct', 'correct', 'correct']);
-    expect(runtime.evaluateGuess('appel', 'palen')).toEqual(['present', 'present', 'present', 'absent', 'absent']);
+    expect(runtime.evaluateGuess('appel', 'palen')).toEqual(['present', 'present', 'absent', 'correct', 'present']);
   });
 
   it('returns to exercise questions after a wrong word and eventually finishes', async () => {

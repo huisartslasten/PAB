@@ -1,5 +1,5 @@
 import { createPacoDropdown } from '../../../components/page-template.js';
-import { createPracticeGameHelp } from '../practice-game-help.js';
+import { mountPracticeGameHelp } from '../practice-game-help.js';
 
 function el(documentRef, tag, className = '') {
   const node = documentRef.createElement(tag);
@@ -18,7 +18,7 @@ export function createWordChaseView({ documentRef = document } = {}) {
   function renderTarget(root, state) {
     const panel = root.querySelector('.wc-target-panel');
     if (!panel.querySelector('.practice-game-help')) {
-      const help = createPracticeGameHelp({
+      mountPracticeGameHelp(panel, {
         documentRef,
         title: 'Zo speel je Word Chase',
         paragraphs: [
@@ -27,7 +27,6 @@ export function createWordChaseView({ documentRef = document } = {}) {
           'Groen = juiste letter op de juiste plek. Geel = juiste letter, maar op de verkeerde plek.'
         ]
       });
-      panel.appendChild(help.element);
     }
 
     const node = root.querySelector('#wcTarget');

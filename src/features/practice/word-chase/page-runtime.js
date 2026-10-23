@@ -25,12 +25,20 @@ export function createWordChasePageRuntime({ app, templateMount, context, lesson
         <div class="wc-stat"><span>Record</span><strong id="wcRecord">—</strong></div>
         <div class="wc-stat"><span>Vragen</span><strong id="wcProgress">0 van 0</strong></div>
       </div>
-      <label class="wc-difficulty-control">Niveau
-        <select id="wcDifficultySelect" class="paco-dropdown">
-          <option value="rookie">ROOKIE — 2 letters</option>
-          <option value="goat">GOAT — 1 letter</option>
-        </select>
-      </label>
+      <div class="wc-controls">
+        <label class="wc-difficulty-control">Niveau
+          <select id="wcDifficultySelect" class="paco-dropdown">
+            <option value="rookie">ROOKIE — 2 letters</option>
+            <option value="goat">GOAT — 1 letter</option>
+          </select>
+        </label>
+        <label class="wc-difficulty-control">Oefenvorm
+          <select id="wcExerciseModeSelect" class="paco-dropdown">
+            <option value="question">VRAAG</option>
+            <option value="dictation">DICTEE</option>
+          </select>
+        </label>
+      </div>
     </header>
     <section class="wc-target-panel" aria-label="Geheim woord">
       <span class="wc-label">Geheim woord</span>
@@ -71,6 +79,7 @@ export function createWordChasePageRuntime({ app, templateMount, context, lesson
     }
 
     let difficulty = 'rookie';
+    let exerciseMode = 'question';
     let runtime = null;
     let highScore = null;
     let scoreGameKey = GAME_KEYS[difficulty];
@@ -87,11 +96,22 @@ export function createWordChasePageRuntime({ app, templateMount, context, lesson
       highScore = normalized;
     }
 
+    async function speakCurrentAnswer() {
+      const state = runtime?.snapshot();
+      if (!state?.current?.answer || typeof app.audio?.speak !== 'function') return;
+      try {
+        await app.audio.speak(state.current.answer, { language: 'nl' });
+      } catch (error) {
+        await render(error?.message || 'De dicteestem kon niet worden afgespeeld.');
+      }
+    }
+
     async function render(errorMessage = '') {
       const state = runtime.snapshot();
       view.renderStats(gameShell, state, highScore);
       view.renderTarget(gameShell, state);
       view.renderDifficulty(gameShell, difficulty, value => { void changeDifficulty(value); });
+      view.renderExerciseMode(gameShell, exerciseMode, value => { exerciseMode = value; void render(); });
       view.renderFeedback(gameShell, state, () => { void continueFromFeedback(); });
 
       if (state.phase === 'finished') {
@@ -123,7 +143,8 @@ export function createWordChasePageRuntime({ app, templateMount, context, lesson
             try { runtime.submitWord(value); void render(); }
             catch (error) { void render(error?.message || 'Het woord kon niet worden verwerkt.'); }
           },
-          errorMessage
+          errorMessage,
+          { exerciseMode, onSpeak: speakCurrentAnswer }
         );
       }
     }

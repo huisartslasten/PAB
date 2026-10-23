@@ -89,16 +89,29 @@ export function createPracticeGameTemplate({
   if (gameArea) gameAreaElement.appendChild(gameArea);
   mainArea.appendChild(gameAreaElement);
 
+  const sideArea = documentRef.createElement('div');
+  sideArea.className = 'practice-game-side';
+
   const exerciseElement = documentRef.createElement('section');
   exerciseElement.className = 'practice-game-exercise';
   if (exercise) exerciseElement.appendChild(exercise);
-  mainArea.appendChild(exerciseElement);
+  sideArea.appendChild(exerciseElement);
 
   const feedbackElement = documentRef.createElement('section');
   feedbackElement.className = 'practice-game-feedback';
   if (feedback) feedbackElement.appendChild(feedback);
-  mainArea.appendChild(feedbackElement);
+  sideArea.appendChild(feedbackElement);
 
+  mainArea.appendChild(sideArea);
   root.appendChild(mainArea);
-  return { element: root, dropdown };
+
+  return Object.freeze({
+    element: root,
+    dropdown,
+    statsElement,
+    gameAreaElement,
+    sideArea,
+    exerciseElement,
+    feedbackElement
+  });
 }

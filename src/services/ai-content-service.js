@@ -44,8 +44,7 @@ function normalizeRequest(request = {}) {
 }
 
 function normalizeDistractorRequest(request = {}) {
-  const context = request.context || {};
-  const count = Math.max(1, Math.min(7, Math.round(Number(request.optionCount ?? request.count) || 1)));
+  const optionCount = Math.max(2, Math.min(8, Math.round(Number(request.optionCount) || 4)));
   return Object.freeze({
     contentType: CONTENT_TYPES.MULTIPLE_CHOICE_DISTRACTORS,
     locale: normalizeString(request.locale) || 'nl-NL',
@@ -54,10 +53,11 @@ function normalizeDistractorRequest(request = {}) {
     subject: normalizeString(request.subject),
     subvak: normalizeString(request.subvak),
     context: Object.freeze({
-      lessonType: normalizeString(context.lessonType ?? request.lessonType),
-      theme: normalizeString(context.theme ?? request.theme)
+      lessonType: normalizeString(request.context?.lessonType ?? request.lessonType),
+      theme: normalizeString(request.context?.theme ?? request.theme)
     }),
-    optionCount: count
+    optionCount,
+    distractorCount: optionCount - 1
   });
 }
 

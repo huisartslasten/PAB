@@ -5,6 +5,11 @@ import {
   buildItemsForType,
   isMeaningfulItem
 } from './editor-items.js';
+import {
+  inheritMultipleChoiceConfig,
+  normalizeMultipleChoiceConfig,
+  MULTIPLE_CHOICE_LIMITS
+} from './multiple-choice-config.js';
 
 test('dictation item uses one entered word as the canonical answer', () => {
   const item = buildDictationItem({ word: 'paard' });
@@ -78,4 +83,28 @@ test('multiple choice requires a selected correct option and preserves its optio
   assert.equal(items.length, 1);
   assert.equal(items[0].answer, '4');
   assert.deepEqual(items[0].answer_options, ['3', '4', '5']);
+});
+
+test('multiple choice config has a bounded default option count', () => {
+  assert.deepEqual(normalizeMultipleChoiceConfig({ enabled: true }), {
+    enabled: true,
+    optionCount: MULTIPLE_CHOICE_LIMITS.defaultOptionCount
+  });
+  assert.deepEqual(normalizeMultipleChoiceConfig({ enabled: true, optionCount: 1 }), {
+    enabled: true,
+    optionCount: MULTIPLE_CHOICE_LIMITS.minOptionCount
+  });
+  assert.deepEqual(normalizeMultipleChoiceConfig({ enabled: true, optionCount: 99 }), {
+    enabled: true,
+    optionCount: MULTIPLE_CHOICE_LIMITS.maxOptionCount
+  });
+});
+
+test('multiple choice inheritance copies configuration only', () => {
+  const previous = { enabled: true, optionCount: 6, question: 'oude vraag', answer: 'juist' };
+  const inherited = inheritMultipleChoiceConfig(previous);
+
+  assert.deepEqual(inherited, { enabled: true, optionCount: 6 });
+  assert.equal('question' in inherited, false);
+  assert.equal('answer' in inherited, false);
 });

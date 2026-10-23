@@ -17,10 +17,10 @@
 .practice-game-controls { display: flex; align-items: center; justify-content: center; gap: 9px; flex-wrap: wrap; }
 .practice-game-control-label { color: #173b70; font: 900 12px/1 "Baloo 2", Nunito, sans-serif; letter-spacing: .5px; text-transform: uppercase; }
 .practice-game-difficulty .paco-dropdown-trigger { min-height: 40px; border-radius: 12px; }
-.practice-game-main { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr); gap: 18px; align-items: start; }
+.practice-game-main { display: grid; grid-template-columns: minmax(280px, .8fr) minmax(0, 1.2fr); grid-template-areas: "side game"; gap: 18px; align-items: start; }
 .practice-game-area, .practice-game-exercise, .practice-game-feedback, .practice-game-side { min-width: 0; }
-.practice-game-area { display: grid; gap: 12px; }
-.practice-game-side { display: grid; gap: 12px; }
+.practice-game-area { grid-area: game; display: grid; gap: 12px; }
+.practice-game-side { grid-area: side; display: grid; gap: 12px; }
 .practice-game-exercise, .practice-game-feedback { display: grid; gap: 12px; }
 .practice-game-feedback:empty { display: none; }
 .practice-game-help { position: absolute; top: 12px; right: 12px; z-index: 2; }
@@ -77,7 +77,7 @@
 .practice-content > .success { order: 4; }
 @media (max-width: 760px) {
   .practice-page-card { padding: 22px 18px 24px; border-radius: 22px; }
-  .practice-game-main { grid-template-columns: 1fr; }
+  .practice-game-main { grid-template-columns: 1fr; grid-template-areas: "side" "game"; }
   .practice-game-stats { gap: 7px; }
 }
 @media (max-width: 700px) { .practice-hint { justify-items: stretch; } .practice-hint-button { width: 100%; } }

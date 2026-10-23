@@ -1,4 +1,4 @@
-import { createPracticeGameTemplate, PRACTICE_DIFFICULTIES } from './practice-game-template.js';
+import { createPracticeGameTemplate, PRACTICE_DIFFICULTIES, PRACTICE_PACO_THINKING_DELAY_MS, schedulePacoTurn } from './practice-game-template.js';
 
 function createDocument() {
   return document;
@@ -31,5 +31,31 @@ describe('practice game template', () => {
 
     expect(element.querySelector('.practice-game-area').textContent).toContain('LEXO');
     expect(element.querySelector('.practice-game-exercise').textContent).toContain('Lesvraag');
+  });
+
+  test('owns the shared three-second Paco thinking delay', () => {
+    let scheduledDelay = null;
+    let callback = null;
+    let clearedTimer = null;
+    const windowRef = {
+      setTimeout(handler, delay) {
+        callback = handler;
+        scheduledDelay = delay;
+        return 42;
+      },
+      clearTimeout(timer) {
+        clearedTimer = timer;
+      }
+    };
+
+    let called = false;
+    const cancel = schedulePacoTurn({ windowRef, onTurn: () => { called = true; } });
+    expect(PRACTICE_PACO_THINKING_DELAY_MS).toBe(3000);
+    expect(scheduledDelay).toBe(3000);
+    expect(called).toBe(false);
+    callback();
+    expect(called).toBe(true);
+    cancel();
+    expect(clearedTimer).toBe(42);
   });
 });

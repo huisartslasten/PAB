@@ -11,10 +11,11 @@
 .drop4-setting .paco-dropdown-trigger { min-height: 40px; border-radius: 12px; background: #fff; color: #102b57; border-color: #cfe3f3; box-shadow: 0 3px 0 rgba(16,43,87,.05); font-size: 15px; }
 .drop4-setting .paco-dropdown-trigger:hover, .drop4-setting .paco-dropdown.open .paco-dropdown-trigger { background: #edf8ff; border-color: #1787f2; }
 .drop4-board { grid-column: 2; grid-row: 2 / span 2; width: min(100%, 500px); margin: 0 auto; box-sizing: border-box; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: repeat(6, minmax(0, 1fr)); aspect-ratio: 7 / 6; gap: 7px; padding: 11px; border: 2px solid #cfe3f3; border-radius: 22px; background: #1787f2; box-shadow: 0 7px 16px rgba(16,43,87,.09); }
-.drop4-cell { width: 100%; height: 100%; min-width: 0; min-height: 0; box-sizing: border-box; padding: 0; border: 0; border-radius: 50%; background: #fff; cursor: default; box-shadow: inset 0 0 0 2px rgba(16,43,87,.05); }
-.drop4-cell[data-column]:not(:disabled) { cursor: pointer; box-shadow: inset 0 0 0 3px rgba(255,255,255,.9), 0 0 0 3px rgba(255,255,255,.12); }
-.drop4-cell[data-column]:not(:disabled):hover { transform: translateY(-2px); }
-.drop4-cell:focus-visible { outline: 0; box-shadow: 0 0 0 4px rgba(255,255,255,.9); }
+.drop4-cell { appearance: none; -webkit-appearance: none; width: 100%; height: 100%; min-width: 0; min-height: 0; box-sizing: border-box; padding: 0; border: 0; border-radius: 50%; background: transparent; cursor: default; box-shadow: none; }
+.drop4-cell[data-column]:not(:disabled) { cursor: pointer; }
+.drop4-cell[data-column]:not(:disabled):hover .drop4-disc { transform: translateY(-2px); }
+.drop4-cell:focus-visible { outline: 0; box-shadow: none; }
+.drop4-cell:focus-visible .drop4-disc { box-shadow: 0 0 0 4px rgba(255,255,255,.9); }
 .drop4-disc { display: block; width: 100%; height: 100%; border-radius: 50%; background: #fff; transition: transform .12s ease, background .15s ease; }
 .drop4-cell.is-x .drop4-disc { background: #ef1717; box-shadow: inset 0 -4px 0 rgba(120,0,0,.13); }
 .drop4-cell.is-o .drop4-disc { background: #ffd33d; box-shadow: inset 0 -4px 0 rgba(140,100,0,.13); }

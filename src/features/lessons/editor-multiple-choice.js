@@ -85,13 +85,13 @@ export async function generateMultipleChoiceDistractors(row, { generate, context
   if (!draft.enabled) throw new Error('Multiple choice is not enabled.');
   if (!draft.correctAnswer) throw new Error('Vul eerst het juiste antwoord in.');
   const question = [...row.querySelectorAll('.word-q-part')].map(input => text(input.value)).filter(Boolean).join('\n');
-  if (!question && context.lessonType !== 'dictation') throw new Error('Vul eerst de vraag in.');
+  if (!question) throw new Error('Vul eerst de vraag in.');
 
   const button = row.querySelector('[data-action="generate-distractors"]');
   if (button) { button.disabled = true; button.dataset.generating = 'true'; button.textContent = 'Bezig…'; }
   try {
     const options = await generate({
-      question: question || 'Dictee: kies de juiste spelling.',
+      question,
       correctAnswer: draft.correctAnswer,
       optionCount: draft.optionCount,
       subject: context.subject || '',

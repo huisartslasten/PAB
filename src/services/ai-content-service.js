@@ -1,5 +1,6 @@
 const CONTENT_TYPES = Object.freeze({
-  PRACTICE_TARGET: 'practice_target'
+  PRACTICE_TARGET: 'practice_target',
+  MULTIPLE_CHOICE_DISTRACTORS: 'multiple_choice_distractors'
 });
 
 const TARGET_FORMS = new Set(['word', 'sentence', 'saying']);
@@ -42,6 +43,24 @@ function normalizeRequest(request = {}) {
   });
 }
 
+function normalizeDistractorRequest(request = {}) {
+  const context = request.context || {};
+  const count = Math.max(1, Math.min(7, Math.round(Number(request.optionCount ?? request.count) || 1)));
+  return Object.freeze({
+    contentType: CONTENT_TYPES.MULTIPLE_CHOICE_DISTRACTORS,
+    locale: normalizeString(request.locale) || 'nl-NL',
+    question: normalizeString(request.question),
+    correctAnswer: normalizeString(request.correctAnswer ?? request.correct_answer),
+    subject: normalizeString(request.subject),
+    subvak: normalizeString(request.subvak),
+    context: Object.freeze({
+      lessonType: normalizeString(context.lessonType ?? request.lessonType),
+      theme: normalizeString(context.theme ?? request.theme)
+    }),
+    optionCount: count
+  });
+}
+
 function normalizeTargetResponse(data = {}) {
   const target = data?.target || data;
   const type = normalizeString(target?.type);
@@ -59,6 +78,24 @@ function normalizeTargetResponse(data = {}) {
   });
 }
 
+function normalizeDistractorResponse(data = {}, correctAnswer = '') {
+  const raw = Array.isArray(data?.options) ? data.options : [];
+  const correct = normalizeString(correctAnswer);
+  const seen = new Set();
+  const options = [];
+
+  for (const value of raw) {
+    const option = normalizeString(value);
+    const key = option.toLocaleLowerCase('nl-NL');
+    if (!option || key === correct.toLocaleLowerCase('nl-NL') || seen.has(key)) continue;
+    seen.add(key);
+    options.push(option);
+  }
+
+  if (options.length < 1) throw new Error('AI returned no valid distractors.');
+  return Object.freeze(options);
+}
+
 export function createAiContentService({ supabase } = {}) {
   if (!supabase?.functions?.invoke) throw new TypeError('AI content service requires Supabase Functions.');
 
@@ -70,6 +107,15 @@ export function createAiContentService({ supabase } = {}) {
       const { data, error } = await supabase.functions.invoke('ai-content-v1', { body: normalized });
       if (error) throw error;
       return normalizeTargetResponse(data);
+    },
+
+    async generateMultipleChoiceDistractors(request) {
+      const normalized = normalizeDistractorRequest(request);
+      if (!normalized.question) throw new Error('A multiple-choice question is required.');
+      if (!normalized.correctAnswer) throw new Error('A correct answer is required before generating distractors.');
+      const { data, error } = await supabase.functions.invoke('ai-content-v1', { body: normalized });
+      if (error) throw error;
+      return normalizeDistractorResponse(data, normalized.correctAnswer);
     }
   });
 }

@@ -103,7 +103,7 @@ export function createConnectTheDotsPageRuntime({ app, templateMount, context, l
     feedback = documentRef.createElement('div'); feedback.className = 'ctd-feedback-area';
     shellContent.append(gameArea, exercise, feedback);
     const controls = documentRef.createElement('div'); controls.className = 'ctd-controls';
-    const shell = createPracticeGameTemplate({ documentRef, className: 'ctd-page-card', stats: [{ label: 'Jij', value: '0' }, { label: 'Paco', value: '0' }, { label: 'Vakjes', value: '0' }], difficulty: 'rookie', onDifficultyChange: level => { const state = runtime.start({ level }); void renderState(state); }, controls });
+    shell = createPracticeGameTemplate({ documentRef, className: 'ctd-page-card', stats: [{ label: 'Jij', value: '0' }, { label: 'Paco', value: '0' }, { label: 'Vakjes', value: '0' }], difficulty: 'rookie', onDifficultyChange: level => { const state = runtime.start({ level }); void renderState(state); }, controls });
     shell.element.querySelector('.practice-game-main').replaceChildren(gameArea, exercise, feedback);
     content.appendChild(shell.element);
     window.setTimeout(() => { void load().catch(error => { console.error('Connect the Dots load error:', error); content.textContent = `Connect the Dots kon niet worden geladen: ${error?.message || 'Onbekende fout.'}`; }); }, 0);

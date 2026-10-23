@@ -8,6 +8,7 @@ import {
 import {
   inheritMultipleChoiceConfig,
   normalizeMultipleChoiceConfig,
+  validateMultipleChoiceOptions,
   MULTIPLE_CHOICE_LIMITS
 } from './multiple-choice-config.js';
 
@@ -83,6 +84,38 @@ test('multiple choice requires a selected correct option and preserves its optio
   assert.equal(items.length, 1);
   assert.equal(items[0].answer, '4');
   assert.deepEqual(items[0].answer_options, ['3', '4', '5']);
+});
+
+test('multiple choice rejects duplicate options in the shared policy', () => {
+  const result = validateMultipleChoiceOptions({
+    options: ['Parijs', 'Londen', 'Parijs', 'Rome'],
+    correctOption: 'Parijs'
+  });
+
+  assert.equal(result.valid, false);
+  assert.equal(result.errors.includes('Elke antwoordoptie moet uniek zijn.'), true);
+});
+
+test('multiple choice builder uses the shared option policy', () => {
+  const items = buildItemsForType('questions', [{
+    question_parts: ['Welke stad is de hoofdstad van Frankrijk?'],
+    answer_parts: [{ text: 'Parijs', role: 'answer' }],
+    response_type: 'multiple_choice',
+    answer_options: ['Parijs', 'Londen', 'Rome', 'Berlijn'],
+    correct_option: 'Parijs'
+  }]);
+
+  assert.equal(items.length, 1);
+
+  const invalid = buildItemsForType('questions', [{
+    question_parts: ['Welke stad is de hoofdstad van Frankrijk?'],
+    answer_parts: [{ text: 'Parijs', role: 'answer' }],
+    response_type: 'multiple_choice',
+    answer_options: ['Parijs', 'Londen', 'Londen', 'Berlijn'],
+    correct_option: 'Parijs'
+  }]);
+
+  assert.equal(invalid.length, 0);
 });
 
 test('multiple choice config has a bounded default option count', () => {

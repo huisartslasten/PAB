@@ -18,7 +18,9 @@
 .practice-game-control-label { color: #173b70; font: 900 12px/1 "Baloo 2", Nunito, sans-serif; letter-spacing: .5px; text-transform: uppercase; }
 .practice-game-difficulty .paco-dropdown-trigger { min-height: 40px; border-radius: 12px; }
 .practice-game-main { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr); gap: 18px; align-items: start; }
-.practice-game-area, .practice-game-exercise, .practice-game-feedback { min-width: 0; }
+.practice-game-area, .practice-game-exercise, .practice-game-feedback, .practice-game-side { min-width: 0; }
+.practice-game-area { display: grid; gap: 12px; }
+.practice-game-side { display: grid; gap: 12px; }
 .practice-game-exercise, .practice-game-feedback { display: grid; gap: 12px; }
 .practice-game-feedback:empty { display: none; }
 .practice-game-help { position: absolute; top: 12px; right: 12px; z-index: 2; }

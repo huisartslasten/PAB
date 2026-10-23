@@ -12,6 +12,24 @@ export const PRACTICE_DIFFICULTIES = Object.freeze([
   Object.freeze({ value: 'goat', label: 'GOAT' })
 ]);
 
+/**
+ * Shared Paco timing policy. Games may customize the visual presentation of
+ * the thinking state, but the actual delay before Paco moves is owned here.
+ */
+export const PRACTICE_PACO_THINKING_DELAY_MS = 3000;
+
+export function schedulePacoTurn({
+  windowRef = globalThis.window,
+  onTurn,
+  delayMs = PRACTICE_PACO_THINKING_DELAY_MS
+} = {}) {
+  if (typeof onTurn !== 'function') throw new Error('An onTurn function is required.');
+  if (!windowRef || typeof windowRef.setTimeout !== 'function') throw new Error('A window with setTimeout is required.');
+
+  const timer = windowRef.setTimeout(onTurn, delayMs);
+  return () => windowRef.clearTimeout(timer);
+}
+
 export function createPracticeGameTemplate({
   documentRef = document,
   className = '',

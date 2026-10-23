@@ -27,16 +27,10 @@ export function createWordChasePageRuntime({ app, templateMount, context, lesson
       </div>
       <div class="wc-controls">
         <label class="wc-difficulty-control">Niveau
-          <select id="wcDifficultySelect" class="paco-dropdown">
-            <option value="rookie">ROOKIE — 2 letters</option>
-            <option value="goat">GOAT — 1 letter</option>
-          </select>
+          <div id="wcDifficultySelect"></div>
         </label>
         <label class="wc-difficulty-control">Oefenvorm
-          <select id="wcExerciseModeSelect" class="paco-dropdown">
-            <option value="question">VRAAG</option>
-            <option value="dictation">DICTEE</option>
-          </select>
+          <div id="wcExerciseModeSelect"></div>
         </label>
       </div>
     </header>

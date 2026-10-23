@@ -24,7 +24,7 @@ export function createWordChaseView({ documentRef = document } = {}) {
     });
   }
 
-  function renderQuestion(root, state, onSubmit, errorMessage = '') {
+  function renderQuestion(root, state, onExerciseSubmit, onWordSubmit, errorMessage = '') {
     const node = root.querySelector('#wcQuestionArea');
     node.replaceChildren();
     if (!state.current) return;
@@ -46,7 +46,7 @@ export function createWordChaseView({ documentRef = document } = {}) {
       form.append(input, button);
       form.addEventListener('submit', event => {
         event.preventDefault();
-        onSubmit(input.value);
+        onExerciseSubmit(input.value);
       });
       node.appendChild(form);
     } else if (state.phase === 'word') {
@@ -66,7 +66,7 @@ export function createWordChaseView({ documentRef = document } = {}) {
       form.append(input, button);
       form.addEventListener('submit', event => {
         event.preventDefault();
-        onSubmit(input.value);
+        onWordSubmit(input.value);
       });
       node.appendChild(form);
     }

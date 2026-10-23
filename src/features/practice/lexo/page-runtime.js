@@ -28,6 +28,7 @@ export function createLexoPageRuntime({ app, templateMount, context, lessonId = 
       <label class="lexo-difficulty-control">Niveau<div id="lexoDifficultySelect"></div></label>
     </header>
     <section class="lexo-grid-panel" aria-label="Letterveld">
+      <div id="lexoRules" class="lexo-rules" aria-label="Uitleg van LEXO"></div>
       <div id="lexoGrid" class="lexo-grid"></div>
       <p class="lexo-grid-hint">ROOKIE: 2 hulpletters · GOAT: 1 hulpletter</p>
     </section>
@@ -93,6 +94,7 @@ export function createLexoPageRuntime({ app, templateMount, context, lessonId = 
     async function render(errorMessage = '') {
       const state = runtime.snapshot();
       view.renderStats(gameShell, state, highScore);
+      view.renderRules(gameShell);
       view.renderGrid(gameShell, state);
       view.renderDifficulty(gameShell, difficulty, value => { void changeDifficulty(value); });
       view.renderFeedback(gameShell, state, () => { void continueAfterFeedback(); });

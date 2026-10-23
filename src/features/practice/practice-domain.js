@@ -9,7 +9,8 @@ export const PRACTICE_GAMES = Object.freeze([
   Object.freeze({ id: 'memory', label: 'Memory', path: 'memory.html', icon: '🧠', description: 'Vind de vraag en het bijbehorende antwoord bij elkaar.', status: 'active' }),
   Object.freeze({ id: 'flash-question', label: 'Flash', path: 'flash-question.html', icon: '⚡', description: 'Kies snel het juiste antwoord en oefen alle vragen.', status: 'active' }),
   Object.freeze({ id: 'tic-tac-toe', label: 'Tic-Tac-Toe', path: 'tic-tac-toe.html', icon: '⭕', description: 'Beantwoord de vragen en speel jezelf naar drie op een rij.', status: 'active' }),
-  Object.freeze({ id: 'word-reveal', label: 'Letter Hunt', path: 'word-reveal.html', icon: '🐶', description: 'Beantwoord de lesvragen, kies zelf letters en onthul het geheime doel.', status: 'active' })
+  Object.freeze({ id: 'word-reveal', label: 'Letter Hunt', path: 'word-reveal.html', icon: '🐶', description: 'Beantwoord de lesvragen, kies zelf letters en onthul het geheime doel.', status: 'active' }),
+  Object.freeze({ id: 'word-chase', label: 'Word Chase', path: 'word-chase.html', icon: '🏃', description: 'Beantwoord de lesvragen en jaag op een geheim woord van vijf letters.', status: 'active' })
 ]);
 
 export function getPracticeModes() { return PRACTICE_MODES.map(mode => ({ ...mode })); }

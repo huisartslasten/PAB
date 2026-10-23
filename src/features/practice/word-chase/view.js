@@ -143,6 +143,7 @@ export function createWordChaseView({ documentRef = document } = {}) {
     button.addEventListener('click', onContinue);
     panel.appendChild(button);
     node.appendChild(panel);
+    button.focus({ preventScroll: true });
   }
 
   function renderFinished(root, state, onRestart, onGames) {

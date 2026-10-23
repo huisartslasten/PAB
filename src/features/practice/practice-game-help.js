@@ -50,3 +50,13 @@ export function createPracticeGameHelp({ documentRef = document, title, paragrap
 
   return Object.freeze({ element: wrapper, button, dialog, open });
 }
+
+export function mountPracticeGameHelp(parent, options = {}) {
+  if (!parent || typeof parent.appendChild !== 'function') {
+    throw new TypeError('mountPracticeGameHelp requires a DOM parent.');
+  }
+
+  const help = createPracticeGameHelp(options);
+  parent.appendChild(help.element);
+  return help;
+}

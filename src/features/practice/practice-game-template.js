@@ -84,11 +84,6 @@ export function createPracticeGameTemplate({
   const mainArea = documentRef.createElement('div');
   mainArea.className = 'practice-game-main';
 
-  const gameAreaElement = documentRef.createElement('section');
-  gameAreaElement.className = 'practice-game-area';
-  if (gameArea) gameAreaElement.appendChild(gameArea);
-  mainArea.appendChild(gameAreaElement);
-
   const sideArea = documentRef.createElement('div');
   sideArea.className = 'practice-game-side';
 
@@ -102,7 +97,11 @@ export function createPracticeGameTemplate({
   if (feedback) feedbackElement.appendChild(feedback);
   sideArea.appendChild(feedbackElement);
 
-  mainArea.appendChild(sideArea);
+  const gameAreaElement = documentRef.createElement('section');
+  gameAreaElement.className = 'practice-game-area';
+  if (gameArea) gameAreaElement.appendChild(gameArea);
+
+  mainArea.append(sideArea, gameAreaElement);
   root.appendChild(mainArea);
 
   return Object.freeze({

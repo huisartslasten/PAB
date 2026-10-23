@@ -103,12 +103,12 @@ export function createWordChaseView({ documentRef = document } = {}) {
       line.textContent = `Goed antwoord: ${state.feedback.correctAnswer}`;
       panel.appendChild(line);
     }
-    if (state.feedback.type === 'word' && state.feedback.evaluation) {
+    if (state.feedback.type === 'word' && state.feedback.evaluation && state.feedback.guess) {
       const line = el(documentRef, 'div', 'wc-evaluation');
-      state.feedback.evaluation.forEach(status => {
-        const marker = el(documentRef, 'span', `wc-evaluation-marker ${status}`);
-        marker.textContent = status === 'correct' ? '●' : status === 'present' ? '●' : '○';
-        line.appendChild(marker);
+      [...state.feedback.guess].forEach((letter, index) => {
+        const tile = el(documentRef, 'span', `wc-evaluation-tile ${state.feedback.evaluation[index]}`);
+        tile.textContent = letter.toUpperCase();
+        line.appendChild(tile);
       });
       panel.appendChild(line);
     }

@@ -1,0 +1,164 @@
+function el(documentRef, tag, className = '') {
+  const node = documentRef.createElement(tag);
+  if (className) node.className = className;
+  return node;
+}
+
+export function createWordChaseView({ documentRef = document } = {}) {
+  function renderStats(root, state, highScore) {
+    root.querySelector('#wcDifficulty').textContent = state.difficulty === 'rookie' ? 'ROOKIE' : 'GOAT';
+    root.querySelector('#wcTurns').textContent = String(state.turns);
+    root.querySelector('#wcRecord').textContent = highScore == null ? '—' : String(highScore);
+    root.querySelector('#wcProgress').textContent = `${state.completedCount} van ${state.totalCount}`;
+  }
+
+  function renderTarget(root, state) {
+    const node = root.querySelector('#wcTarget');
+    node.replaceChildren();
+    if (!state.target) return;
+    const revealed = new Set(state.revealedIndices);
+    [...state.target].forEach((letter, index) => {
+      const tile = el(documentRef, 'span', `wc-tile ${revealed.has(index) ? 'is-revealed' : 'is-hidden'}`);
+      tile.textContent = revealed.has(index) ? letter.toUpperCase() : '';
+      node.appendChild(tile);
+    });
+  }
+
+  function renderQuestion(root, state, onSubmit, errorMessage = '') {
+    const node = root.querySelector('#wcQuestionArea');
+    node.replaceChildren();
+    if (!state.current) return;
+
+    const question = el(documentRef, 'div', 'wc-question');
+    question.textContent = state.current.question;
+    node.appendChild(question);
+
+    if (state.phase === 'question') {
+      const form = el(documentRef, 'form', 'wc-answer-form');
+      const input = el(documentRef, 'input', 'wc-answer-input');
+      input.type = 'text';
+      input.autocomplete = 'off';
+      input.placeholder = 'Typ je antwoord…';
+      input.setAttribute('aria-label', 'Antwoord op de oefenvraag');
+      const button = el(documentRef, 'button', 'success');
+      button.type = 'submit';
+      button.textContent = 'Controleer →';
+      form.append(input, button);
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        onSubmit(input.value);
+      });
+      node.appendChild(form);
+    } else if (state.phase === 'word') {
+      const hint = el(documentRef, 'div', 'wc-word-hint');
+      hint.textContent = 'Goed! Typ nu een geldig Nederlands woord van 5 letters.';
+      node.appendChild(hint);
+      const form = el(documentRef, 'form', 'wc-word-form');
+      const input = el(documentRef, 'input', 'wc-word-input');
+      input.type = 'text';
+      input.maxLength = 5;
+      input.autocomplete = 'off';
+      input.placeholder = '5 letters…';
+      input.setAttribute('aria-label', 'Raad een woord van vijf letters');
+      const button = el(documentRef, 'button', 'success');
+      button.type = 'submit';
+      button.textContent = 'Raad →';
+      form.append(input, button);
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        onSubmit(input.value);
+      });
+      node.appendChild(form);
+    }
+
+    if (errorMessage) {
+      const error = el(documentRef, 'div', 'wc-error');
+      error.textContent = errorMessage;
+      node.appendChild(error);
+    }
+  }
+
+  function renderFeedback(root, state, onContinue) {
+    const node = root.querySelector('#wcFeedback');
+    node.replaceChildren();
+    if (!state.feedback) return;
+
+    let title = 'Nog niet goed';
+    if (state.feedback.type === 'exercise' && state.feedback.correct) title = 'Goed gedaan!';
+    if (state.feedback.type === 'word' && state.feedback.correct) title = 'Woord gevonden! 🎉';
+    if (state.feedback.invalid) title = 'Dat woord staat niet in het woordenboek.';
+
+    const panel = el(documentRef, 'div', `wc-feedback ${state.feedback.correct ? 'is-correct' : 'is-wrong'}`);
+    const strong = el(documentRef, 'strong');
+    strong.textContent = title;
+    panel.appendChild(strong);
+
+    if (state.feedback.studentAnswer) {
+      const line = el(documentRef, 'div');
+      line.textContent = `Jouw antwoord: ${state.feedback.studentAnswer}`;
+      panel.appendChild(line);
+    }
+    if (state.feedback.correctAnswer) {
+      const line = el(documentRef, 'div');
+      line.textContent = `Goed antwoord: ${state.feedback.correctAnswer}`;
+      panel.appendChild(line);
+    }
+    if (state.feedback.type === 'word' && state.feedback.evaluation) {
+      const line = el(documentRef, 'div', 'wc-evaluation');
+      state.feedback.evaluation.forEach(status => {
+        const marker = el(documentRef, 'span', `wc-evaluation-marker ${status}`);
+        marker.textContent = status === 'correct' ? '●' : status === 'present' ? '●' : '○';
+        line.appendChild(marker);
+      });
+      panel.appendChild(line);
+    }
+    if (state.feedback.type === 'word' && !state.feedback.correct && !state.feedback.invalid) {
+      const line = el(documentRef, 'div');
+      line.textContent = 'Groen = juiste plek. Geel = juiste letter, verkeerde plek.';
+      panel.appendChild(line);
+    }
+    if (state.feedback.message) {
+      const line = el(documentRef, 'div');
+      line.textContent = state.feedback.message;
+      panel.appendChild(line);
+    }
+
+    const button = el(documentRef, 'button', 'secondary');
+    button.type = 'button';
+    button.textContent = 'Verder →';
+    button.addEventListener('click', onContinue);
+    panel.appendChild(button);
+    node.appendChild(panel);
+  }
+
+  function renderFinished(root, state, onRestart, onGames) {
+    const node = root.querySelector('#wcQuestionArea');
+    node.replaceChildren();
+    const panel = el(documentRef, 'div', 'wc-finished');
+    const title = el(documentRef, 'strong');
+    title.textContent = 'Les uitgespeeld! 🏆';
+    const text = el(documentRef, 'span');
+    text.textContent = `Alle oefenvragen zijn goed beantwoord in ${state.turns} beurten.`;
+    const actions = el(documentRef, 'div', 'wc-actions');
+    const restart = el(documentRef, 'button', 'success');
+    restart.type = 'button';
+    restart.textContent = 'Nog een keer →';
+    restart.addEventListener('click', onRestart);
+    const games = el(documentRef, 'button', 'secondary');
+    games.type = 'button';
+    games.textContent = 'Terug naar spelletjes';
+    games.addEventListener('click', onGames);
+    actions.append(restart, games);
+    panel.append(title, text, actions);
+    node.appendChild(panel);
+  }
+
+  function renderDifficulty(root, difficulty, onChange) {
+    const select = root.querySelector('#wcDifficultySelect');
+    if (!select) return;
+    select.value = difficulty;
+    select.onchange = () => onChange(select.value);
+  }
+
+  return Object.freeze({ renderStats, renderTarget, renderQuestion, renderFeedback, renderFinished, renderDifficulty });
+}

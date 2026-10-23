@@ -8,22 +8,33 @@
   background: #fff;
   box-shadow: 0 8px 0 rgba(16,43,87,.06), 0 14px 28px rgba(16,43,87,.08);
 }
+.practice-game-template { gap: 16px; }
+.practice-game-header { display: grid; gap: 12px; position: relative; }
+.practice-game-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.practice-game-stat { min-height: 58px; display: grid; align-content: center; gap: 2px; padding: 8px 12px; border: 2px solid #e1edf7; border-radius: 15px; background: #f8fbff; text-align: center; }
+.practice-game-stat span { color: #667894; font-size: 10px; font-weight: 900; letter-spacing: .7px; text-transform: uppercase; }
+.practice-game-stat strong { color: #102b57; font: 900 21px/1.05 "Baloo 2", Nunito, sans-serif; }
+.practice-game-controls { display: flex; align-items: center; justify-content: center; gap: 9px; flex-wrap: wrap; }
+.practice-game-control-label { color: #173b70; font: 900 12px/1 "Baloo 2", Nunito, sans-serif; letter-spacing: .5px; text-transform: uppercase; }
+.practice-game-difficulty .paco-dropdown-trigger { min-height: 40px; border-radius: 12px; }
+.practice-game-main { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr); gap: 18px; align-items: start; }
+.practice-game-area, .practice-game-exercise, .practice-game-feedback { min-width: 0; }
+.practice-game-exercise, .practice-game-feedback { display: grid; gap: 12px; }
+.practice-game-feedback:empty { display: none; }
+.practice-game-help { position: absolute; top: 12px; right: 12px; z-index: 2; }
+.practice-game-help-button { width: 34px; height: 34px; display: grid; place-items: center; padding: 0; border: 2px solid #b9d8ef; border-radius: 50%; background: #fff; color: #1b5f91; font: 900 19px/1 "Baloo 2", Nunito, sans-serif; cursor: pointer; box-shadow: 0 3px 7px rgba(16,43,87,.08); transition: transform .15s ease, background-color .15s ease, border-color .15s ease; }
+.practice-game-help-button:hover, .practice-game-help-button:focus-visible { background: #f4fbff; border-color: #7fb9e3; transform: translateY(-1px); outline: none; }
+.practice-game-help-button:focus-visible { box-shadow: 0 0 0 3px rgba(91,164,218,.22); }
+.practice-game-help-dialog { width: min(440px, calc(100vw - 32px)); margin: auto; padding: 0; border: 0; border-radius: 20px; background: transparent; color: #102b57; box-shadow: 0 18px 50px rgba(16,43,87,.22); }
+.practice-game-help-dialog::backdrop { background: rgba(16,43,87,.28); }
+.practice-game-help-content { display: grid; gap: 10px; padding: 22px; border: 2px solid #cfe3f3; border-radius: 20px; background: #fff; text-align: left; }
+.practice-game-help-kicker { color: #5d8eb5; font-size: 10px; font-weight: 900; letter-spacing: 1px; }
+.practice-game-help-content h2 { margin: 1px 0 0; color: #102b57; font: 900 24px/1.05 "Baloo 2", Nunito, sans-serif; }
+.practice-game-help-content p { margin: 0; color: #385579; font-size: 14px; font-weight: 700; line-height: 1.45; }
+.practice-game-help-content button { justify-self: start; margin-top: 4px; }
 
-.practice-progress {
-  min-height: 24px;
-  color: #667894;
-  font-family: "Baloo 2", Nunito, sans-serif;
-  font-size: 18px;
-  font-weight: 800;
-}
-
-.practice-progress .progress-label {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 7px;
-}
-
+.practice-progress { min-height: 24px; color: #667894; font-family: "Baloo 2", Nunito, sans-serif; font-size: 18px; font-weight: 800; }
+.practice-progress .progress-label { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 7px; }
 .practice-progress .progress { height: 12px; overflow: hidden; border-radius: 999px; background: #e7eef6; }
 .practice-progress .progress-bar { height: 100%; border-radius: 999px; background: transparent; }
 .practice-progress .progress-bar span { display: block; height: 100%; border-radius: 999px; background: #1787f2; }
@@ -31,8 +42,7 @@
 .practice-content [data-practice-form] { display: contents; }
 .practice-content [data-practice-action="submit"] { width: min(100%, 420px); justify-self: center; }
 .practice-content [data-practice-action="submit"].success { font-size: 17px; }
-.practice-content .test-instructions,
-.practice-content .small { width: min(100%, 760px); justify-self: center; color: #667894; line-height: 1.45; }
+.practice-content .test-instructions, .practice-content .small { width: min(100%, 760px); justify-self: center; color: #667894; line-height: 1.45; }
 .practice-content .test-instructions { text-align: center; font-weight: 800; }
 .practice-content .field { width: min(100%, 760px); justify-self: center; }
 .practice-content .field label { display: block; margin-bottom: 7px; color: #173b70; font-weight: 800; }
@@ -48,43 +58,24 @@
 .practice-content .answer-input { width: 100%; box-sizing: border-box; min-height: 52px; border: 2px solid #cfe3f3; border-radius: 15px; padding: 12px 15px; font: 700 18px Nunito, sans-serif; }
 .practice-content .big { min-height: 50px; padding: 11px 20px; border-radius: 15px; font: 900 17px Nunito, sans-serif; cursor: pointer; }
 .practice-content .feedback { margin-top: 4px; }
-.practice-answer-review,
-.practice-correct-answer { width: min(100%, 760px); justify-self: center; box-sizing: border-box; padding: 14px 16px; border-radius: 16px; line-height: 1.45; }
+.practice-answer-review, .practice-correct-answer { width: min(100%, 760px); justify-self: center; box-sizing: border-box; padding: 14px 16px; border-radius: 16px; line-height: 1.45; }
 .practice-answer-review { border: 2px solid #dce9f6; background: #f8fbff; }
 .practice-correct-answer { border: 2px solid #9ed1f8; background: #edf8ff; }
-.practice-answer-review-title,
-.practice-correct-answer-title { margin-bottom: 4px; color: #102b57; font-family: "Baloo 2", Nunito, sans-serif; font-size: 17px; font-weight: 900; }
-.practice-answer-review-text,
-.practice-correct-answer-text { font-size: 18px; font-weight: 800; white-space: pre-wrap; }
+.practice-answer-review-title, .practice-correct-answer-title { margin-bottom: 4px; color: #102b57; font-family: "Baloo 2", Nunito, sans-serif; font-size: 17px; font-weight: 900; }
+.practice-answer-review-text, .practice-correct-answer-text { font-size: 18px; font-weight: 800; white-space: pre-wrap; }
 .practice-correct-answer-text { color: #0d6fd4; }
 .practice-content .feedback { width: min(100%, 760px); justify-self: center; }
 .practice-content > .success { justify-self: center; }
 .practice-content .question-answer { padding: 18px; border: 2px solid #dce9f6; border-radius: 18px; background: #f8fbff; line-height: 1.55; }
 .practice-content .self-buttons { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
 .practice-content .self-buttons button { min-height: 50px; padding: 10px 22px; border-radius: 15px; font: 900 17px Nunito, sans-serif; cursor: pointer; }
-
-/* Shared help control for standard practice games. */
-.practice-game-help { position: absolute; top: 12px; right: 12px; z-index: 2; }
-.practice-game-help-button { width: 34px; height: 34px; display: grid; place-items: center; padding: 0; border: 2px solid #b9d8ef; border-radius: 50%; background: #fff; color: #1b5f91; font: 900 19px/1 "Baloo 2", Nunito, sans-serif; cursor: pointer; box-shadow: 0 3px 7px rgba(16,43,87,.08); transition: transform .15s ease, background-color .15s ease, border-color .15s ease; }
-.practice-game-help-button:hover,
-.practice-game-help-button:focus-visible { background: #f4fbff; border-color: #7fb9e3; transform: translateY(-1px); outline: none; }
-.practice-game-help-button:focus-visible { box-shadow: 0 0 0 3px rgba(91,164,218,.22); }
-.practice-game-help-dialog { width: min(440px, calc(100vw - 32px)); margin: auto; padding: 0; border: 0; border-radius: 20px; background: transparent; color: #102b57; box-shadow: 0 18px 50px rgba(16,43,87,.22); }
-.practice-game-help-dialog::backdrop { background: rgba(16,43,87,.28); }
-.practice-game-help-content { display: grid; gap: 10px; padding: 22px; border: 2px solid #cfe3f3; border-radius: 20px; background: #fff; text-align: left; }
-.practice-game-help-kicker { color: #5d8eb5; font-size: 10px; font-weight: 900; letter-spacing: 1px; }
-.practice-game-help-content h2 { margin: 1px 0 0; color: #102b57; font: 900 24px/1.05 "Baloo 2", Nunito, sans-serif; }
-.practice-game-help-content p { margin: 0; color: #385579; font-size: 14px; font-weight: 700; line-height: 1.45; }
-.practice-game-help-content button { justify-self: start; margin-top: 4px; }
-
-@media (max-width: 700px) {
-  .practice-page-card { padding: 22px 18px 24px; border-radius: 22px; }
-  .practice-hint { justify-items: stretch; }
-  .practice-hint-button { width: 100%; }
-}
-
-/* Practice-result presentation order: only the two answer blocks are swapped. */
 .practice-content .practice-correct-answer { order: 1; }
 .practice-content .practice-answer-review { order: 2; }
 .practice-content .feedback { order: 3; }
 .practice-content > .success { order: 4; }
+@media (max-width: 760px) {
+  .practice-page-card { padding: 22px 18px 24px; border-radius: 22px; }
+  .practice-game-main { grid-template-columns: 1fr; }
+  .practice-game-stats { gap: 7px; }
+}
+@media (max-width: 700px) { .practice-hint { justify-items: stretch; } .practice-hint-button { width: 100%; } }

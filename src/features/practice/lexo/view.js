@@ -18,14 +18,18 @@ export function createLexoView({ documentRef = document } = {}) {
     root.querySelector('#lexoProgress').textContent = `${state.completedCount} van ${state.totalCount}`;
   }
 
-  function renderRules(root) {
-    const area = root.querySelector('#lexoRules');
-    clear(area);
-    const title = documentRef.createElement('strong');
-    title.textContent = 'Zo speel je LEXO';
-    const rules = documentRef.createElement('p');
-    rules.textContent = 'Maak woorden door letters horizontaal, verticaal of diagonaal met elkaar te verbinden. Je mag een letter binnen één woord niet opnieuw gebruiken. Langere woorden leveren meer punten op.';
-    area.append(title, rules);
+  function bindHelp(root) {
+    const button = root.querySelector('#lexoHelpButton');
+    const dialog = root.querySelector('#lexoHelpDialog');
+    const close = root.querySelector('#lexoHelpClose');
+    if (!button || !dialog || !close || button.dataset.bound === 'true') return;
+
+    button.dataset.bound = 'true';
+    button.addEventListener('click', () => dialog.showModal());
+    close.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', event => {
+      if (event.target === dialog) dialog.close();
+    });
   }
 
   function renderGrid(root, state) {
@@ -161,5 +165,5 @@ export function createLexoView({ documentRef = document } = {}) {
     mount.appendChild(dropdown.element);
   }
 
-  return Object.freeze({ renderStats, renderRules, renderGrid, renderQuestion, renderWordInput, renderFeedback, renderFinished, renderDifficulty });
+  return Object.freeze({ bindHelp, renderStats, renderGrid, renderQuestion, renderWordInput, renderFeedback, renderFinished, renderDifficulty });
 }

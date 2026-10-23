@@ -29,9 +29,6 @@ export function createWordChasePageRuntime({ app, templateMount, context, lesson
         <label class="wc-difficulty-control">Niveau
           <div id="wcDifficultySelect"></div>
         </label>
-        <label class="wc-difficulty-control">Oefenvorm
-          <div id="wcExerciseModeSelect"></div>
-        </label>
       </div>
     </header>
     <section class="wc-target-panel" aria-label="Geheim woord">
@@ -72,8 +69,8 @@ export function createWordChasePageRuntime({ app, templateMount, context, lesson
       return;
     }
 
+    const exerciseMode = lesson.type === 'dictation' ? 'dictation' : 'question';
     let difficulty = 'rookie';
-    let exerciseMode = 'question';
     let runtime = null;
     let highScore = null;
     let scoreGameKey = GAME_KEYS[difficulty];
@@ -105,7 +102,6 @@ export function createWordChasePageRuntime({ app, templateMount, context, lesson
       view.renderStats(gameShell, state, highScore);
       view.renderTarget(gameShell, state);
       view.renderDifficulty(gameShell, difficulty, value => { void changeDifficulty(value); });
-      view.renderExerciseMode(gameShell, exerciseMode, value => { exerciseMode = value; void render(); });
       view.renderFeedback(gameShell, state, () => { void continueFromFeedback(); });
 
       if (state.phase === 'finished') {

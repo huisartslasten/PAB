@@ -1,17 +1,35 @@
 export function createConnectTheDotsView({ documentRef = document } = {}) {
   function render(root, state, handlers = {}) {
     root.replaceChildren();
+
     const board = documentRef.createElement('div');
     board.className = 'ctd-board';
     board.style.setProperty('--ctd-columns', state.columns);
     board.style.setProperty('--ctd-rows', state.rows);
 
+    const inner = documentRef.createElement('div');
+    inner.className = 'ctd-board-inner';
+
+    const horizontalStep = 100 / (state.columns - 1);
+    const verticalStep = 100 / (state.rows - 1);
+
+    const setPosition = (element, { left, top, width = 0, height = 0 }) => {
+      element.style.left = `${left}%`;
+      element.style.top = `${top}%`;
+      if (width) element.style.width = `${width}%`;
+      if (height) element.style.height = `${height}%`;
+    };
+
     state.boxes.forEach(box => {
       const cell = documentRef.createElement('div');
       cell.className = `ctd-box${box.owner ? ` is-${box.owner.toLowerCase()}` : ''}`;
-      cell.style.gridColumn = `${box.column * 2 + 2}`;
-      cell.style.gridRow = `${box.row * 2 + 2}`;
-      board.appendChild(cell);
+      setPosition(cell, {
+        left: box.column * horizontalStep,
+        top: box.row * verticalStep,
+        width: horizontalStep,
+        height: verticalStep
+      });
+      inner.appendChild(cell);
     });
 
     state.edges.forEach(edge => {
@@ -23,26 +41,36 @@ export function createConnectTheDotsView({ documentRef = document } = {}) {
       if (!edge.owner && state.phase === 'choosing' && state.turn === 'X') {
         button.addEventListener('click', () => handlers.onEdge?.(edge.key));
       }
+
       if (edge.orientation === 'horizontal') {
-        button.style.gridColumn = `${edge.column * 2 + 2} / span 2`;
-        button.style.gridRow = `${edge.row * 2 + 1}`;
+        setPosition(button, {
+          left: edge.column * horizontalStep,
+          top: edge.row * verticalStep,
+          width: horizontalStep
+        });
       } else {
-        button.style.gridColumn = `${edge.column * 2 + 1}`;
-        button.style.gridRow = `${edge.row * 2 + 2} / span 2`;
+        setPosition(button, {
+          left: edge.column * horizontalStep,
+          top: edge.row * verticalStep,
+          height: verticalStep
+        });
       }
-      board.appendChild(button);
+      inner.appendChild(button);
     });
 
     for (let row = 0; row < state.rows; row += 1) {
       for (let column = 0; column < state.columns; column += 1) {
         const dot = documentRef.createElement('span');
         dot.className = 'ctd-dot';
-        dot.style.gridColumn = `${column * 2 + 1}`;
-        dot.style.gridRow = `${row * 2 + 1}`;
-        board.appendChild(dot);
+        setPosition(dot, {
+          left: column * horizontalStep,
+          top: row * verticalStep
+        });
+        inner.appendChild(dot);
       }
     }
 
+    board.appendChild(inner);
     root.appendChild(board);
 
     const status = documentRef.createElement('div');

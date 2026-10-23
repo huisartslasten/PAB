@@ -2,6 +2,11 @@ const corsHeaders = {"Access-Control-Allow-Origin":"*","Access-Control-Allow-Hea
 const allowedTypes = new Set(["practice_target", "multiple_choice_distractors"]);
 const allowedForms = new Set(["word","sentence","saying"]);
 const AI_MODEL = "gpt-5.6-terra";
+const multipleChoiceContextPolicies = Object.freeze({
+  default: Object.freeze({ requiresQuestion: true }),
+  dictation: Object.freeze({ requiresQuestion: false })
+});
+const multipleChoiceContextPolicy = (lessonType: string) => multipleChoiceContextPolicies[lessonType as keyof typeof multipleChoiceContextPolicies] ?? multipleChoiceContextPolicies.default;
 const json = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 const text = (value: unknown, max = 2000) => String(value ?? "").trim().slice(0, max);
 function normalize(body: any) {
@@ -45,7 +50,7 @@ function promptFor(request: any) {
       "Genereer alleen plausibele FOUTE antwoordopties voor een bestaande multiple-choice vraag.",
       "Het door de gebruiker opgegeven correcte antwoord is al vastgesteld en mag NIET worden vervangen, aangepast of opnieuw gegenereerd.",
       "Gebruik de vraag, het correcte antwoord en de context om realistische afleiders te maken.",
-      `Vraag: ${request.question}`,
+      request.question ? `Vraag: ${request.question}` : "Vraag: (dicteecontext; gebruik het correcte woord als vaste referentie)",
       `Correct antwoord: ${request.correctAnswer}`,
       `Vak: ${request.subject || "onbekend"}`,
       `Subvak: ${request.subvak || "onbekend"}`,
@@ -123,8 +128,8 @@ Deno.serve(async (req: Request) => {
     const apiKey = Deno.env.get("OPENAI_API_KEY");
     if (!apiKey) return json({ error: "OPENAI_API_KEY ontbreekt in Supabase." }, 500);
     const request = normalize(await req.json());
-    if (request.contentType === "multiple_choice_distractors" && (!request.question || !request.correctAnswer)) {
-      return json({ error: "Multiple-choice vraag en correct antwoord zijn verplicht." }, 400);
+    if (request.contentType === "multiple_choice_distractors" && (!request.correctAnswer || (multipleChoiceContextPolicy(request.context.lessonType).requiresQuestion && !request.question))) {
+      return json({ error: "Multiple-choice context en correct antwoord zijn verplicht." }, 400);
     }
     const response = await fetch("https://api.openai.com/v1/responses", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` }, body: JSON.stringify({ model: AI_MODEL, input: promptFor(request), max_output_tokens: 500 }) });
     const raw = await response.text();

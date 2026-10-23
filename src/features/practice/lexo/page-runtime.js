@@ -3,7 +3,7 @@ import { createPacoNavigation } from '../../../components/page-navigation.js';
 import { createLessonContextField } from '../../lessons/lesson-context-view.js';
 import { createLexoRuntime } from './runtime.js';
 import { createLexoView } from './view.js';
-import { createPracticeGameHelp } from '../practice-game-help.js';
+import { mountPracticeGameHelp } from '../practice-game-help.js';
 import { buildViewUrl } from '../../../core/view-context.js';
 
 const GAME_KEYS = Object.freeze({ rookie: 'lexo_rookie', goat: 'lexo_goat' });
@@ -38,7 +38,7 @@ export function createLexoPageRuntime({ app, templateMount, context, lessonId = 
     </section>
     <section id="lexoFeedback" class="lexo-feedback-panel" aria-live="polite"></section>`;
   content.appendChild(gameShell);
-  const help = createPracticeGameHelp({
+  mountPracticeGameHelp(gameShell.querySelector('.lexo-grid-panel'), {
     documentRef,
     title: 'Zo speel je LEXO',
     paragraphs: [
@@ -47,7 +47,6 @@ export function createLexoPageRuntime({ app, templateMount, context, lessonId = 
       'Langere woorden leveren meer punten op.'
     ]
   });
-  gameShell.querySelector('.lexo-grid-panel').appendChild(help.element);
 
   const goGames = () => {
     const target = buildViewUrl('games.html', { student, mode: context?.mode });

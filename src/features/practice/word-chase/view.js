@@ -26,13 +26,13 @@ export function createWordChaseView({ documentRef = document } = {}) {
     });
   }
 
-  function renderQuestion(root, state, onExerciseSubmit, onWordSubmit, errorMessage = '', { exerciseMode = 'question', onSpeak = null } = {}) {
+  function renderQuestion(root, state, onExerciseSubmit, onWordSubmit, errorMessage = '', { isDictation = false, onSpeak = null } = {}) {
     const node = root.querySelector('#wcQuestionArea');
     node.replaceChildren();
     if (!state.current) return;
 
     if (state.phase === 'question') {
-      if (exerciseMode === 'dictation') {
+      if (isDictation) {
         const hint = el(documentRef, 'div', 'wc-word-hint');
         hint.textContent = 'Dictee: luister goed en typ het antwoord.';
         node.appendChild(hint);
@@ -52,7 +52,7 @@ export function createWordChaseView({ documentRef = document } = {}) {
       input.type = 'text';
       input.autocomplete = 'off';
       input.placeholder = 'Typ je antwoord…';
-      input.setAttribute('aria-label', exerciseMode === 'dictation' ? 'Typ het gedicteerde antwoord' : 'Antwoord op de oefenvraag');
+      input.setAttribute('aria-label', isDictation ? 'Typ het gedicteerde antwoord' : 'Antwoord op de oefenvraag');
       const button = el(documentRef, 'button', 'success');
       button.type = 'submit';
       button.textContent = 'Controleer →';
@@ -186,21 +186,5 @@ export function createWordChaseView({ documentRef = document } = {}) {
     mount.appendChild(dropdown.element);
   }
 
-  function renderExerciseMode(root, mode, onChange) {
-    const mount = root.querySelector('#wcExerciseModeSelect');
-    if (!mount) return;
-    mount.replaceChildren();
-    const dropdown = createPacoDropdown({
-      options: [
-        { value: 'question', label: 'VRAAG' },
-        { value: 'dictation', label: 'DICTEE' }
-      ],
-      value: mode,
-      onChange,
-      className: 'wc-dropdown'
-    });
-    mount.appendChild(dropdown.element);
-  }
-
-  return Object.freeze({ renderStats, renderTarget, renderQuestion, renderFeedback, renderFinished, renderDifficulty, renderExerciseMode });
+  return Object.freeze({ renderStats, renderTarget, renderQuestion, renderFeedback, renderFinished, renderDifficulty });
 }

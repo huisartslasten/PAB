@@ -137,12 +137,22 @@ export function createDrop4Runtime({ items = [], gradeAnswer, random = Math.rand
   let questionCursor = 0;
   let uniqueAnswered = 0;
   let totalAnswered = 0;
+  let answeredQuestionIndices = new Set();
   let playerTurns = 0;
   let selectedColumn = null;
   let pendingQuestion = null;
   let lastResult = null;
 
   function chooseStartingTurn() { return random() < 0.5 ? 'X' : 'O'; }
+
+  function nextQuestionIndex() {
+    if (!questions.length) return null;
+    if (questionCursor >= questionOrder.length) {
+      questionOrder = shuffledIndices(questions.length, random);
+      questionCursor = 0;
+    }
+    return questionOrder[questionCursor];
+  }
 
   function snapshot() {
     return Object.freeze({
@@ -174,6 +184,7 @@ export function createDrop4Runtime({ items = [], gradeAnswer, random = Math.rand
     questionCursor = 0;
     uniqueAnswered = 0;
     totalAnswered = 0;
+    answeredQuestionIndices = new Set();
     playerTurns = 0;
     selectedColumn = null;
     pendingQuestion = null;
@@ -185,8 +196,8 @@ export function createDrop4Runtime({ items = [], gradeAnswer, random = Math.rand
   function selectColumn(column) {
     if (phase !== 'choosing' || turn !== 'X') throw new Error('Je kunt nu geen kolom kiezen.');
     if (!availableColumns(board).includes(column)) throw new Error('Deze kolom is vol.');
-    const questionIndex = questionOrder[questionCursor];
-    if (!Number.isInteger(questionIndex)) throw new Error('Er zijn geen oefenvragen meer beschikbaar.');
+    const questionIndex = nextQuestionIndex();
+    if (!Number.isInteger(questionIndex)) throw new Error('Er zijn geen oefenvragen beschikbaar.');
     selectedColumn = column;
     pendingQuestion = { questionIndex };
     phase = 'question';
@@ -204,7 +215,8 @@ export function createDrop4Runtime({ items = [], gradeAnswer, random = Math.rand
       const result = await gradeAnswer(item.question, item.answer, normalizedAnswer);
       const correct = result.correct === true;
       totalAnswered += 1;
-      uniqueAnswered += 1;
+      answeredQuestionIndices.add(pendingQuestion.questionIndex);
+      uniqueAnswered = answeredQuestionIndices.size;
       questionCursor += 1;
       lastResult = Object.freeze({ correct, feedback: result.feedback || '', expectedAnswer: item.answer, givenAnswer: normalizedAnswer, column: selectedColumn });
 

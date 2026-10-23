@@ -1,6 +1,6 @@
 .ctd-page-card { position: relative; }
 .ctd-page-card .practice-game-area { min-width: 0; }
-.ctd-board { position: relative; aspect-ratio: 1 / 1; width: min(100%, 560px); margin: 0 auto; padding: clamp(14px, 2vw, 22px); box-sizing: border-box; border: 2px solid #cfe3f3; border-radius: 24px; background: #edf8ff; box-shadow: 0 7px 16px rgba(16,43,87,.09); }
+.ctd-board { position: relative; aspect-ratio: 1 / 1; width: min(100%, 420px); margin: 0 auto; padding: clamp(14px, 2vw, 22px); box-sizing: border-box; border: 2px solid #cfe3f3; border-radius: 24px; background: #edf8ff; box-shadow: 0 7px 16px rgba(16,43,87,.09); }
 .ctd-board-inner { position: absolute; inset: clamp(14px, 2vw, 22px); }
 .ctd-dot, .ctd-line, .ctd-box { position: absolute; box-sizing: border-box; }
 .ctd-dot { width: clamp(12px, 2.3vw, 18px); height: clamp(12px, 2.3vw, 18px); transform: translate(-50%, -50%); border-radius: 50%; background: #102b57; box-shadow: 0 2px 0 rgba(16,43,87,.14); z-index: 3; pointer-events: none; }
@@ -24,4 +24,4 @@
 .ctd-feedback strong { color: #102b57; font: 900 20px/1.1 "Baloo 2", Nunito, sans-serif; }
 .ctd-finished { display: grid; gap: 8px; padding: 18px; border: 2px solid #dce9f6; border-radius: 16px; background: #f8fbff; text-align: center; }
 .ctd-finished strong { color: #102b57; font: 900 24px/1.1 "Baloo 2", Nunito, sans-serif; }
-@media (max-width: 760px) { .ctd-board { width: min(100%, 520px); } .ctd-answer-form { grid-template-columns: 1fr; } }
+@media (max-width: 760px) { .ctd-board { width: min(100%, 400px); } .ctd-answer-form { grid-template-columns: 1fr; } }

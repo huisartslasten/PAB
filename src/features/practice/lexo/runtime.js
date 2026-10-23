@@ -103,13 +103,19 @@ export function createLexoRuntime({ items = [], gradeAnswer, difficulty = 'rooki
       phase = 'finished';
       current = null;
     } else {
-      nextQuestion();
+      phase = 'word-feedback';
+      current = null;
     }
     return snapshot();
   }
 
   function continueAfterWordResult() {
-    feedback = null;
+    if (phase === 'word-feedback') {
+      feedback = null;
+      nextQuestion();
+    } else {
+      feedback = null;
+    }
     return snapshot();
   }
 

@@ -1,4 +1,4 @@
-import { isFiveLetterWord, normalizeWord, pickWord, getSecretWordDictionary } from './dictionary.js';
+import { isFiveLetterWord, normalizeWord, pickWord, getSecretWordDictionary } from '../word-games/dictionary.js';
 
 function normalizeItems(items = []) {
   return (Array.isArray(items) ? items : [])
@@ -42,9 +42,7 @@ export function createWordChaseRuntime({ items = [], gradeAnswer, difficulty = '
   let feedback = null;
 
   function refillQuestionQueue() {
-    const indices = remaining.size
-      ? [...remaining]
-      : source.map(item => item.index);
+    const indices = remaining.size ? [...remaining] : source.map(item => item.index);
     questionQueue = shuffle(indices, random);
   }
 
@@ -106,17 +104,9 @@ export function createWordChaseRuntime({ items = [], gradeAnswer, difficulty = '
     turns += 1;
     const result = await gradeAnswer(current.question, current.answer, value);
     if (!result?.correct) {
-      feedback = {
-        type: 'exercise',
-        correct: false,
-        question: current.question,
-        studentAnswer: String(value ?? ''),
-        correctAnswer: current.answer,
-        message: String(result?.feedback ?? '').trim()
-      };
+      feedback = { type: 'exercise', correct: false, question: current.question, studentAnswer: String(value ?? ''), correctAnswer: current.answer, message: String(result?.feedback ?? '').trim() };
       return snapshot();
     }
-
     remaining.delete(current.index);
     feedback = { type: 'exercise', correct: true, message: String(result?.feedback ?? '').trim() };
     phase = 'word';
@@ -136,7 +126,6 @@ export function createWordChaseRuntime({ items = [], gradeAnswer, difficulty = '
       feedback = { type: 'word', correct: false, invalid: true, studentAnswer: String(value ?? '') };
       return snapshot();
     }
-
     wordAttempts += 1;
     if (guess === target) {
       feedback = { type: 'word', correct: true, guess, target };
@@ -149,7 +138,6 @@ export function createWordChaseRuntime({ items = [], gradeAnswer, difficulty = '
       }
       return snapshot();
     }
-
     feedback = { type: 'word', correct: false, guess, evaluation: evaluateGuess(guess, target) };
     nextQuestion();
     return snapshot();
@@ -180,21 +168,7 @@ export function createWordChaseRuntime({ items = [], gradeAnswer, difficulty = '
   }
 
   function snapshot() {
-    return Object.freeze({
-      phase,
-      difficulty,
-      revealCount,
-      target,
-      revealedIndices: [...revealedIndices],
-      current,
-      turns,
-      wordAttempts,
-      remainingCount: remaining.size,
-      totalCount: source.length,
-      completedCount: source.length - remaining.size,
-      feedback,
-      scoreUnit: scoreForDifficulty(difficulty)
-    });
+    return Object.freeze({ phase, difficulty, revealCount, target, revealedIndices: [...revealedIndices], current, turns, wordAttempts, remainingCount: remaining.size, totalCount: source.length, completedCount: source.length - remaining.size, feedback, scoreUnit: scoreForDifficulty(difficulty) });
   }
 
   return Object.freeze({ restart, startWord, submitExerciseAnswer, continueAfterExerciseFeedback, submitWord, continueAfterWordResult, snapshot, evaluateGuess });

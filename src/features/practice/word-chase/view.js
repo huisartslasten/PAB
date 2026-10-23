@@ -24,22 +24,33 @@ export function createWordChaseView({ documentRef = document } = {}) {
     });
   }
 
-  function renderQuestion(root, state, onExerciseSubmit, onWordSubmit, errorMessage = '') {
+  function renderQuestion(root, state, onExerciseSubmit, onWordSubmit, errorMessage = '', { exerciseMode = 'question', onSpeak = null } = {}) {
     const node = root.querySelector('#wcQuestionArea');
     node.replaceChildren();
     if (!state.current) return;
 
-    const question = el(documentRef, 'div', 'wc-question');
-    question.textContent = state.current.question;
-    node.appendChild(question);
-
     if (state.phase === 'question') {
+      if (exerciseMode === 'dictation') {
+        const hint = el(documentRef, 'div', 'wc-word-hint');
+        hint.textContent = 'Dictee: luister goed en typ het antwoord.';
+        node.appendChild(hint);
+        const listen = el(documentRef, 'button', 'secondary');
+        listen.type = 'button';
+        listen.textContent = '🔊 Luister';
+        listen.addEventListener('click', () => onSpeak?.());
+        node.appendChild(listen);
+      } else {
+        const question = el(documentRef, 'div', 'wc-question');
+        question.textContent = state.current.question;
+        node.appendChild(question);
+      }
+
       const form = el(documentRef, 'form', 'wc-answer-form');
       const input = el(documentRef, 'input', 'wc-answer-input');
       input.type = 'text';
       input.autocomplete = 'off';
       input.placeholder = 'Typ je antwoord…';
-      input.setAttribute('aria-label', 'Antwoord op de oefenvraag');
+      input.setAttribute('aria-label', exerciseMode === 'dictation' ? 'Typ het gedicteerde antwoord' : 'Antwoord op de oefenvraag');
       const button = el(documentRef, 'button', 'success');
       button.type = 'submit';
       button.textContent = 'Controleer →';
@@ -50,6 +61,9 @@ export function createWordChaseView({ documentRef = document } = {}) {
       });
       node.appendChild(form);
     } else if (state.phase === 'word') {
+      const question = el(documentRef, 'div', 'wc-question');
+      question.textContent = state.current.question;
+      node.appendChild(question);
       const hint = el(documentRef, 'div', 'wc-word-hint');
       hint.textContent = 'Goed! Typ nu een geldig Nederlands woord van 5 letters.';
       node.appendChild(hint);
@@ -160,5 +174,12 @@ export function createWordChaseView({ documentRef = document } = {}) {
     select.onchange = () => onChange(select.value);
   }
 
-  return Object.freeze({ renderStats, renderTarget, renderQuestion, renderFeedback, renderFinished, renderDifficulty });
+  function renderExerciseMode(root, mode, onChange) {
+    const select = root.querySelector('#wcExerciseModeSelect');
+    if (!select) return;
+    select.value = mode;
+    select.onchange = () => onChange(select.value);
+  }
+
+  return Object.freeze({ renderStats, renderTarget, renderQuestion, renderFeedback, renderFinished, renderDifficulty, renderExerciseMode });
 }

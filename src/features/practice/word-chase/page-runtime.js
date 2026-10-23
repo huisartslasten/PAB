@@ -69,7 +69,7 @@ export function createWordChasePageRuntime({ app, templateMount, context, lesson
       return;
     }
 
-    const exerciseMode = lesson.type === 'dictation' ? 'dictation' : 'question';
+    const isDictation = lesson.type === 'dictation';
     let difficulty = 'rookie';
     let runtime = null;
     let highScore = null;
@@ -134,7 +134,7 @@ export function createWordChasePageRuntime({ app, templateMount, context, lesson
             catch (error) { void render(error?.message || 'Het woord kon niet worden verwerkt.'); }
           },
           errorMessage,
-          { exerciseMode, onSpeak: speakCurrentAnswer }
+          { isDictation, onSpeak: speakCurrentAnswer }
         );
       }
     }

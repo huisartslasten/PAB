@@ -3,6 +3,7 @@ import { createPacoNavigation } from '../../../components/page-navigation.js';
 import { createLessonContextField } from '../../lessons/lesson-context-view.js';
 import { createLexoRuntime } from './runtime.js';
 import { createLexoView } from './view.js';
+import { createPracticeGameHelp } from '../practice-game-help.js';
 import { buildViewUrl } from '../../../core/view-context.js';
 
 const GAME_KEYS = Object.freeze({ rookie: 'lexo_rookie', goat: 'lexo_goat' });
@@ -28,19 +29,6 @@ export function createLexoPageRuntime({ app, templateMount, context, lessonId = 
       <label class="lexo-difficulty-control">Niveau<div id="lexoDifficultySelect"></div></label>
     </header>
     <section class="lexo-grid-panel" aria-label="Letterveld">
-      <button id="lexoHelpButton" class="lexo-help-button" type="button" aria-label="Hoe speel je LEXO?" aria-haspopup="dialog">?</button>
-      <dialog id="lexoHelpDialog" class="lexo-help-dialog" aria-labelledby="lexoHelpTitle">
-        <div class="lexo-help-content">
-          <div>
-            <span class="lexo-help-kicker">UITLEG</span>
-            <h2 id="lexoHelpTitle">Zo speel je LEXO</h2>
-          </div>
-          <p>Maak woorden door letters <strong>horizontaal, verticaal of diagonaal</strong> met elkaar te verbinden.</p>
-          <p>Je mag een letter binnen één woord niet opnieuw gebruiken.</p>
-          <p><strong>Langere woorden leveren meer punten op.</strong></p>
-          <button id="lexoHelpClose" class="secondary" type="button">Begrepen</button>
-        </div>
-      </dialog>
       <div id="lexoGrid" class="lexo-grid"></div>
       <p class="lexo-grid-hint">ROOKIE: 2 hulpletters · GOAT: 1 hulpletter</p>
     </section>
@@ -50,7 +38,16 @@ export function createLexoPageRuntime({ app, templateMount, context, lessonId = 
     </section>
     <section id="lexoFeedback" class="lexo-feedback-panel" aria-live="polite"></section>`;
   content.appendChild(gameShell);
-  view.bindHelp(gameShell);
+  const help = createPracticeGameHelp({
+    documentRef,
+    title: 'Zo speel je LEXO',
+    paragraphs: [
+      'Maak woorden door letters horizontaal, verticaal of diagonaal met elkaar te verbinden.',
+      'Je mag een letter binnen één woord niet opnieuw gebruiken.',
+      'Langere woorden leveren meer punten op.'
+    ]
+  });
+  gameShell.querySelector('.lexo-grid-panel').appendChild(help.element);
 
   const goGames = () => {
     const target = buildViewUrl('games.html', { student, mode: context?.mode });

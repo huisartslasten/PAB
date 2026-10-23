@@ -1,7 +1,5 @@
 .ctd-page-card { position: relative; }
-.ctd-content { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr); gap: 18px; align-items: start; }
-.ctd-game-area { display: grid; gap: 12px; min-width: 0; }
-.ctd-exercise, .ctd-feedback-area { display: grid; gap: 12px; }
+.ctd-page-card .practice-game-area { min-width: 0; }
 .ctd-board { display: grid; grid-template-columns: repeat(calc(var(--ctd-columns) * 2 - 1), minmax(0, 1fr)); grid-template-rows: repeat(calc(var(--ctd-rows) * 2 - 1), minmax(0, 1fr)); gap: 0; aspect-ratio: 1 / 1; width: min(100%, 560px); margin: 0 auto; padding: clamp(14px, 2vw, 22px); box-sizing: border-box; border: 2px solid #cfe3f3; border-radius: 24px; background: #edf8ff; box-shadow: 0 7px 16px rgba(16,43,87,.09); }
 .ctd-dot { width: clamp(12px, 2.3vw, 18px); aspect-ratio: 1; align-self: center; justify-self: center; border-radius: 50%; background: #102b57; box-shadow: 0 2px 0 rgba(16,43,87,.14); z-index: 3; }
 .ctd-line { min-width: 10px; min-height: 10px; padding: 0; border: 0; border-radius: 999px; background: transparent; cursor: pointer; z-index: 2; transition: background .12s ease, transform .12s ease; }
@@ -13,8 +11,7 @@
 .ctd-box { border-radius: 10px; background: transparent; z-index: 1; }
 .ctd-box.is-x { background: rgba(23,135,242,.18); }
 .ctd-box.is-o { background: rgba(239,23,23,.15); }
-.ctd-status, .ctd-thinking { min-height: 52px; display: grid; place-items: center; padding: 10px 16px; border: 2px solid #dce9f6; border-radius: 16px; background: #f8fbff; color: #173b70; font-weight: 900; text-align: center; }
-.ctd-thinking { min-height: 140px; font: 900 24px/1.1 "Baloo 2", Nunito, sans-serif; }
+.ctd-status { min-height: 52px; display: grid; place-items: center; padding: 10px 16px; border: 2px solid #dce9f6; border-radius: 16px; background: #f8fbff; color: #173b70; font-weight: 900; text-align: center; }
 .ctd-question { padding: 16px; border: 2px solid #dce9f6; border-radius: 16px; background: #f8fbff; color: #102b57; font: 900 22px/1.2 "Baloo 2", Nunito, sans-serif; text-align: center; }
 .ctd-answer-form { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
 .ctd-answer-form input { width: 100%; min-height: 50px; box-sizing: border-box; border: 2px solid #cfe3f3; border-radius: 14px; padding: 10px 14px; font: 700 17px Nunito, sans-serif; }
@@ -25,4 +22,4 @@
 .ctd-feedback strong { color: #102b57; font: 900 20px/1.1 "Baloo 2", Nunito, sans-serif; }
 .ctd-finished { display: grid; gap: 8px; padding: 18px; border: 2px solid #dce9f6; border-radius: 16px; background: #f8fbff; text-align: center; }
 .ctd-finished strong { color: #102b57; font: 900 24px/1.1 "Baloo 2", Nunito, sans-serif; }
-@media (max-width: 760px) { .ctd-content { grid-template-columns: 1fr; } .ctd-board { width: min(100%, 520px); } .ctd-answer-form { grid-template-columns: 1fr; } }
+@media (max-width: 760px) { .ctd-board { width: min(100%, 520px); } .ctd-answer-form { grid-template-columns: 1fr; } }

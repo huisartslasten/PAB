@@ -9,6 +9,7 @@ export const PRACTICE_GAMES = Object.freeze([
   Object.freeze({ id: 'memory', label: 'Memory', path: 'memory.html', icon: '🧠', description: 'Vind de vraag en het bijbehorende antwoord bij elkaar.', status: 'active' }),
   Object.freeze({ id: 'flash-question', label: 'Flash', path: 'flash-question.html', icon: '⚡', description: 'Kies snel het juiste antwoord en oefen alle vragen.', status: 'active' }),
   Object.freeze({ id: 'tic-tac-toe', label: 'Tic-Tac-Toe', path: 'tic-tac-toe.html', icon: '⭕', description: 'Beantwoord de vragen en speel jezelf naar drie op een rij.', status: 'active' }),
+  Object.freeze({ id: 'drop4', label: 'DROP4', path: 'drop4.html', icon: '🔴', description: 'Beantwoord de vragen en probeer vier stenen op een rij te krijgen.', status: 'active' }),
   Object.freeze({ id: 'word-reveal', label: 'Letter Hunt', path: 'word-reveal.html', icon: '🐶', description: 'Beantwoord de lesvragen, kies zelf letters en onthul het geheime doel.', status: 'active' }),
   Object.freeze({ id: 'word-chase', label: 'Word Chase', path: 'word-chase.html', icon: '🏃', description: 'Beantwoord de lesvragen en jaag op een geheim woord van vijf letters.', status: 'active' }),
   Object.freeze({ id: 'lexo', label: 'LEXO', path: 'lexo.html', icon: '🔤', description: 'Beantwoord de lesvragen en maak zoveel mogelijk woorden met zestien letters.', status: 'active' })

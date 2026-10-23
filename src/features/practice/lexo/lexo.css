@@ -81,6 +81,30 @@
   text-align: center;
 }
 
+.lexo-rules {
+  width: min(100%, 440px);
+  padding: 10px 13px;
+  border: 2px solid #d3e5f4;
+  border-radius: 14px;
+  background: #fff;
+  color: #173b70;
+  text-align: left;
+  line-height: 1.35;
+}
+
+.lexo-rules strong {
+  display: block;
+  margin-bottom: 3px;
+  color: #102b57;
+  font-size: 14px;
+}
+
+.lexo-rules p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .lexo-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(58px, 78px));

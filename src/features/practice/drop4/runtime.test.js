@@ -36,3 +36,15 @@ test('DROP4 counts learner turns needed for a win', async () => {
   await runtime.submitAnswer('2');
   assert.equal(runtime.snapshot().playerTurns, 1);
 });
+
+test('DROP4 cycles its randomized question deck when a game needs more turns than questions', async () => {
+  const runtime = createDrop4Runtime({ items: [items[0]], gradeAnswer: correct, random: () => 0 });
+  runtime.start();
+  for (let turn = 0; turn < 2; turn += 1) {
+    if (runtime.snapshot().turn === 'O') runtime.playPacoMove();
+    runtime.selectColumn(turn);
+    await runtime.submitAnswer('2');
+  }
+  assert.equal(runtime.snapshot().totalAnswered, 2);
+  assert.equal(runtime.snapshot().uniqueAnswered, 1);
+});

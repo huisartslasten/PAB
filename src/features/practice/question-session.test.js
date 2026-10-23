@@ -1,3 +1,5 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
 import { createPracticeQuestionSession } from './question-session.js';
 
 const items = [
@@ -8,52 +10,39 @@ const items = [
   { question: 'E', answer: 'e' }
 ];
 
-describe('createPracticeQuestionSession', () => {
-  test('retries a wrong question after the remaining first-pass questions', () => {
-    const session = createPracticeQuestionSession(items, { random: () => 0.5 });
-    const seen = [];
-    const first = session.next();
-    seen.push(first.question);
-    session.record(true);
-    const second = session.next();
-    seen.push(second.question);
-    session.record(true);
-    const third = session.next();
-    seen.push(third.question);
-    session.record(false);
-    const fourth = session.next();
-    seen.push(fourth.question);
-    session.record(true);
-    const fifth = session.next();
-    seen.push(fifth.question);
-    session.record(true);
-    const retry = session.next();
-    expect(seen).toHaveLength(5);
-    expect(retry.question).toBe(third.question);
-  });
+test('shared question session retries a wrong question after the remaining first-pass questions', () => {
+  const session = createPracticeQuestionSession(items, { random: () => 0.5 });
+  const seen = [];
+  for (let index = 0; index < 5; index += 1) {
+    const item = session.next();
+    seen.push(item.question);
+    session.record(index === 2 ? false : true);
+  }
+  const retry = session.next();
+  assert.equal(seen.length, 5);
+  assert.equal(retry.question, seen[2]);
+});
 
-  test('starts a new cycle after every question is correct', () => {
-    const session = createPracticeQuestionSession(items, { random: () => 0.5 });
-    for (let index = 0; index < items.length; index += 1) {
-      expect(session.next()).not.toBeNull();
-      session.record(true);
-    }
-    expect(session.snapshot().cycleComplete).toBe(true);
-    const next = session.next();
-    expect(next).not.toBeNull();
-    expect(session.snapshot().cycle).toBe(2);
-  });
+test('shared question session starts a new cycle after every question is correct', () => {
+  const session = createPracticeQuestionSession(items, { random: () => 0.5 });
+  for (let index = 0; index < items.length; index += 1) {
+    assert.ok(session.next());
+    session.record(true);
+  }
+  assert.equal(session.snapshot().cycleComplete, true);
+  assert.ok(session.next());
+  assert.equal(session.snapshot().cycle, 2);
+});
 
-  test('keeps a wrong question pending until it is answered correctly', () => {
-    const session = createPracticeQuestionSession(items, { random: () => 0.5 });
-    for (let index = 0; index < items.length - 1; index += 1) {
-      session.next();
-      session.record(index === 1 ? false : true);
-    }
-    let current = session.next();
-    expect(current).not.toBeNull();
-    session.record(false);
-    current = session.next();
-    expect(current).not.toBeNull();
-  });
+test('shared question session keeps a wrong question pending until it is correct', () => {
+  const session = createPracticeQuestionSession(items, { random: () => 0.5 });
+  const wrong = session.next();
+  session.record(false);
+  for (let index = 0; index < items.length - 1; index += 1) {
+    const item = session.next();
+    assert.ok(item);
+    session.record(true);
+  }
+  const retry = session.next();
+  assert.equal(retry.question, wrong.question);
 });

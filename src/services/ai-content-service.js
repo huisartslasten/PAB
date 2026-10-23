@@ -4,9 +4,17 @@ const CONTENT_TYPES = Object.freeze({
 });
 
 const TARGET_FORMS = new Set(['word', 'sentence', 'saying']);
+const MULTIPLE_CHOICE_CONTEXT_POLICIES = Object.freeze({
+  default: Object.freeze({ requiresQuestion: true }),
+  dictation: Object.freeze({ requiresQuestion: false })
+});
 
 function normalizeString(value) {
   return String(value ?? '').trim();
+}
+
+function multipleChoiceContextPolicy(lessonType) {
+  return MULTIPLE_CHOICE_CONTEXT_POLICIES[normalizeString(lessonType)] || MULTIPLE_CHOICE_CONTEXT_POLICIES.default;
 }
 
 function normalizeRequest(request = {}) {
@@ -111,7 +119,9 @@ export function createAiContentService({ supabase } = {}) {
 
     async generateMultipleChoiceDistractors(request) {
       const normalized = normalizeDistractorRequest(request);
-      if (!normalized.question) throw new Error('A multiple-choice question is required.');
+      if (multipleChoiceContextPolicy(normalized.context.lessonType).requiresQuestion && !normalized.question) {
+        throw new Error('A multiple-choice question is required.');
+      }
       if (!normalized.correctAnswer) throw new Error('A correct answer is required before generating distractors.');
       const { data, error } = await supabase.functions.invoke('ai-content-v1', { body: normalized });
       if (error) throw error;
@@ -120,4 +130,4 @@ export function createAiContentService({ supabase } = {}) {
   });
 }
 
-export { CONTENT_TYPES };
+export { CONTENT_TYPES, MULTIPLE_CHOICE_CONTEXT_POLICIES };

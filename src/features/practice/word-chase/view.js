@@ -1,4 +1,5 @@
 import { createPacoDropdown } from '../../../components/page-template.js';
+import { createPracticeGameHelp } from '../practice-game-help.js';
 
 function el(documentRef, tag, className = '') {
   const node = documentRef.createElement(tag);
@@ -15,6 +16,20 @@ export function createWordChaseView({ documentRef = document } = {}) {
   }
 
   function renderTarget(root, state) {
+    const panel = root.querySelector('.wc-target-panel');
+    if (!panel.querySelector('.practice-game-help')) {
+      const help = createPracticeGameHelp({
+        documentRef,
+        title: 'Zo speel je Word Chase',
+        paragraphs: [
+          'Beantwoord eerst de lesvraag goed. Daarna kun je het geheime woord van vijf letters raden.',
+          'ROOKIE geeft twee letters van het geheime woord prijs. GOAT geeft één letter prijs.',
+          'Groen = juiste letter op de juiste plek. Geel = juiste letter, maar op de verkeerde plek.'
+        ]
+      });
+      panel.appendChild(help.element);
+    }
+
     const node = root.querySelector('#wcTarget');
     node.replaceChildren();
     if (!state.target) return;

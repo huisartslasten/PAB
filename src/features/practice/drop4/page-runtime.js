@@ -1,7 +1,7 @@
 import { mountPacoPageTemplate } from '../../../components/page-template.js';
 import { createPacoNavigation } from '../../../components/page-navigation.js';
 import { createLessonContextField } from '../../lessons/lesson-context-view.js';
-import { createPracticeGameHelp } from '../practice-game-help.js';
+import { mountPracticeGameHelp } from '../practice-game-help.js';
 import { createDrop4Runtime, DROP4_AI_LEVELS } from './runtime.js';
 import { createDrop4View } from './view.js';
 import { buildViewUrl } from '../../../core/view-context.js';
@@ -18,7 +18,7 @@ export function createDrop4PageRuntime({ app, templateMount, context, lessonId =
   const gameShell = documentRef.createElement('main');
   gameShell.className = 'practice-page-card drop4-page-card';
   gameShell.innerHTML = `<div class="drop4-game-head"><h1 class="drop4-game-title">DROP4</h1><div class="drop4-stats"><div class="drop4-stat"><span>Score</span><strong id="drop4Score">—</strong></div><div class="drop4-stat"><span>Record</span><strong id="drop4Record">— 🥇</strong></div><div class="drop4-stat"><span>Vragen</span><strong id="drop4Progress">0 vragen</strong></div></div></div><div class="drop4-settings"><span class="drop4-setting-label">Paco</span><div id="drop4Level" class="drop4-setting"></div></div><div id="drop4Board" class="drop4-board" aria-label="DROP4 bord"></div><div id="drop4Content" class="drop4-content"></div>`;
-  gameShell.querySelector('.drop4-game-head')?.appendChild(createPracticeGameHelp({
+  mountPracticeGameHelp(gameShell.querySelector('.drop4-game-head'), {
     documentRef,
     title: 'Zo speel je DROP4',
     paragraphs: [
@@ -27,7 +27,7 @@ export function createDrop4PageRuntime({ app, templateMount, context, lessonId =
       'Wie begint wordt iedere ronde willekeurig bepaald. Paco denkt even na voordat hij zijn zet doet.',
       'Je score is het aantal van jouw beurten dat je nodig had om te winnen. Lager is beter. Verlies levert geen score op.'
     ]
-  }));
+  });
   content.appendChild(gameShell);
 
   const goGames = () => {

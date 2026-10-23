@@ -1,3 +1,5 @@
+import { createPacoDropdown } from '../../../components/page-template.js';
+
 function el(documentRef, tag, className = '') {
   const node = documentRef.createElement(tag);
   if (className) node.className = className;
@@ -169,17 +171,35 @@ export function createWordChaseView({ documentRef = document } = {}) {
   }
 
   function renderDifficulty(root, difficulty, onChange) {
-    const select = root.querySelector('#wcDifficultySelect');
-    if (!select) return;
-    select.value = difficulty;
-    select.onchange = () => onChange(select.value);
+    const mount = root.querySelector('#wcDifficultySelect');
+    if (!mount) return;
+    mount.replaceChildren();
+    const dropdown = createPacoDropdown({
+      options: [
+        { value: 'rookie', label: 'ROOKIE — 2 letters' },
+        { value: 'goat', label: 'GOAT — 1 letter' }
+      ],
+      value: difficulty,
+      onChange,
+      className: 'wc-dropdown'
+    });
+    mount.appendChild(dropdown.element);
   }
 
   function renderExerciseMode(root, mode, onChange) {
-    const select = root.querySelector('#wcExerciseModeSelect');
-    if (!select) return;
-    select.value = mode;
-    select.onchange = () => onChange(select.value);
+    const mount = root.querySelector('#wcExerciseModeSelect');
+    if (!mount) return;
+    mount.replaceChildren();
+    const dropdown = createPacoDropdown({
+      options: [
+        { value: 'question', label: 'VRAAG' },
+        { value: 'dictation', label: 'DICTEE' }
+      ],
+      value: mode,
+      onChange,
+      className: 'wc-dropdown'
+    });
+    mount.appendChild(dropdown.element);
   }
 
   return Object.freeze({ renderStats, renderTarget, renderQuestion, renderFeedback, renderFinished, renderDifficulty, renderExerciseMode });

@@ -1,5 +1,5 @@
 import { createPacoDropdown } from '../../../components/page-template.js';
-import { createPracticeGameHelp } from '../practice-game-help.js';
+import { schedulePacoTurn } from '../practice-game-template.js';
 
 export function createDrop4View({ documentRef = globalThis.document, escapeHtml } = {}) {
   if (!documentRef) throw new Error('A document is required.');
@@ -75,8 +75,10 @@ export function createDrop4View({ documentRef = globalThis.document, escapeHtml 
 
     const startThinking = () => {
       content.innerHTML = `${answerFeedback ? answerFeedback.replace(/<button[\s\S]*?<\/button>/, '') : ''}<div class="drop4-turn drop4-paco-thinking" role="status" aria-live="polite"><span class="drop4-paco-face">🐶</span><span>Paco denkt na<span class="drop4-thinking-dots" aria-hidden="true"><i></i><i></i><i></i></span></span></div>`;
-      const timer = documentRef.defaultView?.setTimeout?.(onPaco, 1500);
-      return () => { if (timer != null) documentRef.defaultView?.clearTimeout?.(timer); };
+      return schedulePacoTurn({
+        windowRef: documentRef.defaultView,
+        onTurn: onPaco
+      });
     };
 
     if (!answerWasWrong) return startThinking();

@@ -85,8 +85,6 @@ export async function generateMultipleChoiceDistractors(row, { generate, context
   if (!draft.enabled) throw new Error('Multiple choice is not enabled.');
   if (!draft.correctAnswer) throw new Error('Vul eerst het juiste antwoord in.');
   const question = [...row.querySelectorAll('.word-q-part')].map(input => text(input.value)).filter(Boolean).join('\n');
-  const lessonType = text(context.lessonType);
-  if (!question && lessonType !== 'dictation') throw new Error('Vul eerst de vraag in.');
 
   const button = row.querySelector('[data-action="generate-distractors"]');
   if (button) { button.disabled = true; button.dataset.generating = 'true'; button.textContent = 'Bezig…'; }

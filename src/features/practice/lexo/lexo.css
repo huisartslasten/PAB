@@ -1,33 +1,205 @@
-.lexo-page-card { display: grid; gap: 1rem; }
-.lexo-head { display: flex; justify-content: space-between; align-items: end; gap: 1rem; flex-wrap: wrap; }
-.lexo-stats { display: grid; grid-template-columns: repeat(4, minmax(90px, 1fr)); gap: .65rem; flex: 1; }
-.lexo-stat { padding: .7rem .8rem; border-radius: 12px; background: var(--paco-surface-muted, #f3f5f7); text-align: center; }
-.lexo-stat span { display: block; font-size: .78rem; opacity: .7; }
-.lexo-stat strong { display: block; margin-top: .15rem; font-size: 1.05rem; }
-.lexo-difficulty-control { display: grid; gap: .3rem; font-weight: 700; }
-.lexo-select { min-width: 120px; }
-.lexo-grid-panel { display: grid; justify-items: center; gap: .65rem; padding: 1rem; }
-.lexo-grid { display: grid; grid-template-columns: repeat(4, minmax(58px, 78px)); gap: .55rem; }
-.lexo-tile { display: grid; place-items: center; aspect-ratio: 1; border-radius: 14px; background: var(--paco-surface-muted, #f1f3f5); box-shadow: inset 0 0 0 2px rgba(0,0,0,.08); font-size: clamp(1.8rem, 6vw, 2.6rem); font-weight: 800; }
+.lexo-page-card {
+  display: grid;
+  grid-template-columns: minmax(280px, .9fr) minmax(390px, 1.1fr);
+  gap: 12px 18px;
+  padding: 12px 18px 16px;
+}
+
+.lexo-head,
+.lexo-grid-panel,
+.lexo-question-panel,
+.lexo-feedback-panel { min-width: 0; }
+
+.lexo-head {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 2px solid #dce9f6;
+  border-radius: 18px;
+  background: #f8fbff;
+}
+
+.lexo-stats {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.lexo-stat {
+  min-height: 48px;
+  display: grid;
+  align-content: center;
+  gap: 2px;
+  padding: 6px 9px;
+  border: 2px solid #e1edf7;
+  border-radius: 13px;
+  background: #fff;
+  text-align: center;
+}
+
+.lexo-stat span,
+.lexo-label {
+  color: #667894;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+}
+
+.lexo-stat strong {
+  color: #102b57;
+  font: 900 17px/1.05 "Baloo 2", Nunito, sans-serif;
+}
+
+.lexo-difficulty-control {
+  display: grid;
+  gap: 3px;
+  color: #173b70;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.lexo-dropdown { min-width: 165px; }
+
+.lexo-grid-panel {
+  grid-column: 2;
+  grid-row: 2 / span 2;
+  min-height: 310px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 18px;
+  border: 2px solid #cfe3f3;
+  border-radius: 20px;
+  background: #e8f5ff;
+  text-align: center;
+}
+
+.lexo-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(58px, 78px));
+  gap: 7px;
+}
+
+.lexo-tile {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border: 3px solid #bdd2e4;
+  border-radius: 13px;
+  background: #fff;
+  color: #102b57;
+  font: 900 2rem/1 "Baloo 2", Nunito, sans-serif;
+  box-shadow: 0 4px 9px rgba(16,43,87,.08);
+}
+
 .lexo-tile.is-hint { box-shadow: inset 0 0 0 4px #8ac6ff; }
-.lexo-grid-hint { margin: 0; font-size: .82rem; opacity: .7; }
-.lexo-question-panel { padding: 1rem; border-radius: 16px; background: var(--paco-surface-muted, #f7f8fa); }
-.lexo-label { display: block; margin-bottom: .65rem; font-weight: 800; }
-.lexo-question-text, .lexo-word-prompt { font-size: 1.25rem; font-weight: 700; line-height: 1.35; }
-.lexo-dictation-hint { margin: 0 0 .75rem; font-weight: 700; }
-.lexo-answer-form, .lexo-word-form { display: flex; gap: .6rem; margin-top: 1rem; }
-.lexo-answer-input, .lexo-word-input { flex: 1; min-width: 0; padding: .8rem .9rem; border: 1px solid #cbd1d8; border-radius: 10px; font: inherit; }
-.lexo-submit, .lexo-continue, .lexo-secondary, .lexo-speak { border: 0; border-radius: 10px; padding: .75rem 1rem; font: inherit; font-weight: 800; cursor: pointer; }
-.lexo-feedback-panel { min-height: 2.5rem; }
-.lexo-feedback { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: .75rem .9rem; border-radius: 12px; font-weight: 700; }
-.lexo-feedback.is-correct { background: #e5f6e8; }
-.lexo-feedback.is-wrong { background: #fff0f0; }
-.lexo-feedback button { flex: 0 0 auto; }
-.lexo-speak { margin-bottom: .5rem; }
-@media (max-width: 680px) {
-  .lexo-stats { grid-template-columns: repeat(2, 1fr); width: 100%; }
-  .lexo-head { align-items: stretch; }
-  .lexo-difficulty-control { width: 100%; }
-  .lexo-answer-form, .lexo-word-form { flex-direction: column; }
+
+.lexo-grid-hint {
+  margin: 0;
+  color: #667894;
+  font-weight: 800;
+}
+
+.lexo-question-panel {
+  grid-column: 1;
+  grid-row: 2;
+  display: grid;
+  align-content: start;
+  gap: 9px;
+  padding: 15px;
+  border: 2px solid #dce9f6;
+  border-radius: 18px;
+  background: #f8fbff;
+}
+
+.lexo-question-text,
+.lexo-word-prompt {
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  color: #102b57;
+  font: 900 clamp(24px, 3vw, 34px)/1.05 "Baloo 2", Nunito, sans-serif;
+}
+
+.lexo-dictation-hint {
+  margin: 0;
+  color: #173b70;
+  font-weight: 800;
+}
+
+.lexo-answer-form,
+.lexo-word-form {
+  display: flex;
+  gap: 8px;
+}
+
+.lexo-answer-input,
+.lexo-word-input {
+  min-width: 0;
+  flex: 1;
+}
+
+.lexo-word-input {
+  max-width: 220px;
+  letter-spacing: 2px;
+  text-transform: lowercase;
+}
+
+.lexo-feedback-panel {
+  grid-column: 1;
+  grid-row: 3;
+  min-height: 88px;
+}
+
+.lexo-feedback-panel:empty { display: none; }
+
+.lexo-feedback {
+  display: grid;
+  gap: 8px;
+  padding: 11px 14px;
+  border: 2px solid #dce9f6;
+  border-radius: 15px;
+  background: #fff;
+  color: #102b57;
+  line-height: 1.35;
+}
+
+.lexo-feedback.is-correct { border-color: #b8ddf8; background: #edf8ff; }
+.lexo-feedback.is-wrong { border-color: #f0caca; background: #fff6f6; }
+
+.lexo-submit,
+.lexo-continue,
+.lexo-secondary,
+.lexo-speak { cursor: pointer; }
+
+@media (max-width: 900px) {
+  .lexo-page-card { grid-template-columns: 1fr; }
+  .lexo-head,
+  .lexo-grid-panel,
+  .lexo-question-panel,
+  .lexo-feedback-panel { grid-column: 1; }
+  .lexo-head { grid-row: 1; }
+  .lexo-grid-panel { grid-row: 2; min-height: 250px; }
+  .lexo-question-panel { grid-row: 3; }
+  .lexo-feedback-panel { grid-row: 4; }
+}
+
+@media (max-width: 700px) {
+  .lexo-page-card { padding: 10px 12px 14px; }
+  .lexo-head { flex-direction: column; align-items: stretch; }
+  .lexo-stats { grid-template-columns: 1fr 1fr; }
+  .lexo-dropdown { min-width: 0; }
   .lexo-grid { grid-template-columns: repeat(4, minmax(48px, 1fr)); width: min(100%, 340px); }
+  .lexo-answer-form,
+  .lexo-word-form { flex-direction: column; }
+  .lexo-answer-form button,
+  .lexo-word-form button,
+  .lexo-word-form input { width: 100%; max-width: none; }
 }

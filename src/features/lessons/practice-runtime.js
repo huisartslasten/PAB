@@ -29,6 +29,10 @@ export function createPracticeRuntime({
   let attempts = 0;
   let mode = null;
   let finished = false;
+  let startedAt = null;
+  let finishedAt = null;
+  let answerSequence = 0;
+  let answers = [];
 
   function start() {
     queue = cloneItems(shuffle(items));
@@ -37,6 +41,10 @@ export function createPracticeRuntime({
     attempts = 0;
     mode = null;
     finished = items.length === 0;
+    startedAt = new Date().toISOString();
+    finishedAt = finished ? startedAt : null;
+    answerSequence = 0;
+    answers = [];
     return snapshot();
   }
 
@@ -45,6 +53,7 @@ export function createPracticeRuntime({
     const candidates = queue.filter(item => remaining.has(item.id));
     if (!candidates.length) {
       finished = true;
+      finishedAt = new Date().toISOString();
       current = null;
       return null;
     }
@@ -73,16 +82,31 @@ export function createPracticeRuntime({
       mode,
       sessionMode,
       finished,
+      startedAt,
+      finishedAt,
+      answers: answers.map(answer => ({ ...answer })),
       progress: progress()
     });
   }
 
-  function completeCurrent(correct, evaluation = null) {
+  function completeCurrent(correct, evaluation = null, givenAnswer = '') {
+    answerSequence += 1;
+    answers.push({
+      questionOrder: answerSequence,
+      question: current.question ?? '',
+      expected: current.answer ?? '',
+      value: String(givenAnswer ?? ''),
+      correct: correct === true,
+      item: current,
+      questionType: current.response_type || type
+    });
+
     const completed = sessionMode === 'single-pass' || correct === true;
     if (completed) remaining.delete(current.id);
     const done = remaining.size === 0;
     if (done) {
       finished = true;
+      finishedAt = new Date().toISOString();
       current = null;
     }
     return Object.freeze({
@@ -107,7 +131,7 @@ export function createPracticeRuntime({
       type,
       aiCheckAnswers
     });
-    return completeCurrent(evaluation?.correct === true, evaluation);
+    return completeCurrent(evaluation?.correct === true, evaluation, userAnswer);
   }
 
   function assess(correct, evaluation = null) {
@@ -115,7 +139,7 @@ export function createPracticeRuntime({
     if (!current) pickCurrent();
     if (!current) return Object.freeze({ done: true, snapshot: snapshot() });
     attempts += 1;
-    return completeCurrent(correct === true, evaluation);
+    return completeCurrent(correct === true, evaluation, '');
   }
 
   function next() {
@@ -125,6 +149,7 @@ export function createPracticeRuntime({
 
   function finish() {
     finished = true;
+    finishedAt = finishedAt || new Date().toISOString();
     current = null;
     return snapshot();
   }

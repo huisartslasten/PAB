@@ -36,11 +36,11 @@ export function createMillionairePageRuntime({ app, templateMount, context, docu
     try {
       const records = await app.loadLessons();
       const lessons = app.mapLessons(records);
-      const passedLessonIds = await app.practiceResults.listPassedLessonIds(student);
-      const eligibleLessons = lessons.filter(lesson => !lesson.archived && !lesson.deleted && passedLessonIds.includes(Number(lesson.id)));
+      const unlockedLessonIds = await app.challengeUnlock.listUnlockedLessonIds(student, 'millionaire');
+      const eligibleLessons = lessons.filter(lesson => !lesson.archived && !lesson.deleted && unlockedLessonIds.includes(Number(lesson.id)));
 
       if (!eligibleLessons.length) {
-        content.innerHTML = '<div class="millionaire-question-card"><h2>Challenge nog niet vrijgespeeld</h2><p>Rond eerst een relevante oefentoets succesvol af. Daarna verschijnt Millionaire op je dashboard.</p></div>';
+        content.innerHTML = '<div class="millionaire-question-card"><h2>Challenge nog niet vrijgespeeld</h2><p>Rond eerst een relevante oefentoets met de vereiste score af. Daarna verschijnt Millionaire op je dashboard.</p></div>';
         return;
       }
 
@@ -61,7 +61,12 @@ export function createMillionairePageRuntime({ app, templateMount, context, docu
         return;
       }
 
-      const runtime = createMillionaireRuntime({ questions, distractorService: app.aiContent });
+      const configuration = await app.challengeConfiguration.get('millionaire');
+      const runtime = createMillionaireRuntime({
+        questions,
+        distractorService: app.aiContent,
+        configuration
+      });
 
       async function render() {
         const state = runtime.snapshot();

@@ -61,12 +61,7 @@ export function createMillionairePageRuntime({ app, templateMount, context, docu
         return;
       }
 
-      const configuration = await app.challengeConfiguration.get('millionaire');
-      const runtime = createMillionaireRuntime({
-        questions,
-        distractorService: app.aiContent,
-        configuration
-      });
+      const runtime = createMillionaireRuntime({ questions, distractorService: app.aiContent });
 
       async function render() {
         const state = runtime.snapshot();

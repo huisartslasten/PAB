@@ -77,7 +77,7 @@ test('practice entry composes preparation, rendering and runtime state without o
   assert.equal(finished.length, 1);
 });
 
-test('practice entry delegates completion to the runtime and finish callback', () => {
+test('practice entry delegates completion to the runtime and finish callback', async () => {
   const finished = [];
   const runtime = createPracticeRuntimeEntry({
     lesson: lessonFixture(),
@@ -89,13 +89,13 @@ test('practice entry delegates completion to the runtime and finish callback', (
   });
 
   runtime.start();
-  const snapshot = runtime.finish();
+  const snapshot = await runtime.finish();
 
   assert.equal(snapshot.finished, true);
   assert.equal(finished.length, 1);
 });
 
-test('practice entry supports self assessment without invoking answer evaluation', () => {
+test('practice entry supports self assessment without invoking answer evaluation', async () => {
   const { calls, evaluateAnswer } = evaluatorCalls();
   const answers = [];
   const finished = [];
@@ -113,7 +113,7 @@ test('practice entry supports self assessment without invoking answer evaluation
   });
 
   runtime.start();
-  const first = runtime.assess(true);
+  const first = await runtime.assess(true);
 
   assert.equal(first.correct, true);
   assert.equal(first.done, false);
@@ -122,13 +122,13 @@ test('practice entry supports self assessment without invoking answer evaluation
   assert.equal(answers.length, 1);
 
   runtime.next();
-  const second = runtime.assess(false);
+  const second = await runtime.assess(false);
   assert.equal(second.correct, false);
   assert.equal(second.done, false);
   assert.equal(mastery.calls[1].correct, false);
   assert.equal(finished.length, 0);
 
-  const completed = runtime.assess(true);
+  const completed = await runtime.assess(true);
   assert.equal(completed.correct, true);
   assert.equal(completed.done, true);
   assert.equal(completed.snapshot.finished, true);
@@ -136,7 +136,41 @@ test('practice entry supports self assessment without invoking answer evaluation
   assert.equal(calls.length, 0);
 });
 
-test('questions entry does not require an evaluator dependency', () => {
+test('assessment completion persists the completed test through the shared persistence boundary', async () => {
+  const saves = [];
+  const persistence = {
+    async savePlayerAttempt(attempt) {
+      saves.push(attempt);
+      return { attempt: { id: 99 }, answers: attempt.answers };
+    }
+  };
+  const runtime = createPracticeRuntimeEntry({
+    lesson: { ...lessonFixture(), practiceMode: 'assessment' },
+    student: 'Zyon',
+    evaluateAnswer: async () => ({ correct: true }),
+    persistence,
+    masteryService: masteryService(),
+    shuffle: items => [...items],
+    random: () => 0,
+    render: () => {},
+    onFinish: () => {}
+  });
+
+  runtime.start();
+  await runtime.submit('ster');
+  runtime.next();
+  const result = await runtime.submit('satelliet');
+
+  assert.equal(result.done, true);
+  assert.equal(saves.length, 1);
+  assert.equal(saves[0].lessonId, 42);
+  assert.equal(saves[0].student, 'Zyon');
+  assert.equal(saves[0].answers.length, 2);
+  assert.equal(saves[0].answers[0].correct, true);
+  assert.equal(saves[0].answers[1].correct, true);
+});
+
+test('questions entry does not require an evaluator dependency', async () => {
   const runtime = createPracticeRuntimeEntry({
     lesson: { ...lessonFixture(), type: 'questions' },
     shuffle: items => [...items],
@@ -147,5 +181,5 @@ test('questions entry does not require an evaluator dependency', () => {
   const started = runtime.start();
   assert.equal(started.type, 'questions');
   assert.equal(started.current.id, 'a');
-  assert.equal(runtime.assess(true).correct, true);
+  assert.equal((await runtime.assess(true)).correct, true);
 });

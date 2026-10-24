@@ -22,6 +22,14 @@ test('Millionaire uses lesson questions and keeps lifelines in game state', asyn
 
   runtime.choose('4');
   state = runtime.snapshot();
-  assert.equal(state.finished, true);
+  assert.equal(state.finished, false);
   assert.equal(state.prize, 100);
+
+  for (let question = 1; question < 11; question += 1) {
+    await runtime.next();
+    runtime.choose('4');
+  }
+  state = runtime.snapshot();
+  assert.equal(state.finished, true);
+  assert.equal(state.prize, 1000000);
 });

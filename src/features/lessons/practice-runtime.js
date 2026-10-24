@@ -14,7 +14,8 @@ export function createPracticeRuntime({
   shuffle = items => [...items],
   random = Math.random,
   aiCheckAnswers = true,
-  sessionMode = 'mastery'
+  sessionMode = 'mastery',
+  clock = () => new Date().toISOString()
 } = {}) {
   if (!lesson || typeof lesson !== 'object') throw new Error('A lesson is required.');
   if (!Array.isArray(lesson.lesson_items)) throw new Error('A lesson with lesson items is required.');
@@ -41,7 +42,7 @@ export function createPracticeRuntime({
     attempts = 0;
     mode = null;
     finished = items.length === 0;
-    startedAt = new Date().toISOString();
+    startedAt = clock();
     finishedAt = finished ? startedAt : null;
     answerSequence = 0;
     answers = [];
@@ -53,7 +54,7 @@ export function createPracticeRuntime({
     const candidates = queue.filter(item => remaining.has(item.id));
     if (!candidates.length) {
       finished = true;
-      finishedAt = new Date().toISOString();
+      finishedAt = clock();
       current = null;
       return null;
     }
@@ -106,7 +107,7 @@ export function createPracticeRuntime({
     const done = remaining.size === 0;
     if (done) {
       finished = true;
-      finishedAt = new Date().toISOString();
+      finishedAt = clock();
       current = null;
     }
     return Object.freeze({
@@ -149,7 +150,7 @@ export function createPracticeRuntime({
 
   function finish() {
     finished = true;
-    finishedAt = finishedAt || new Date().toISOString();
+    finishedAt = finishedAt || clock();
     current = null;
     return snapshot();
   }
@@ -168,7 +169,7 @@ export function createPracticeRuntime({
   });
 }
 
-export function createApplicationPracticeRuntime({ db = null, lesson = null, shuffle, random, evaluateAnswer = null, aiCheckAnswers = true, sessionMode = 'mastery' } = {}) {
+export function createApplicationPracticeRuntime({ db = null, lesson = null, shuffle, random, evaluateAnswer = null, aiCheckAnswers = true, sessionMode = 'mastery', clock = () => new Date().toISOString() } = {}) {
   const type = normalizeType(lesson?.type);
   const evaluator = evaluateAnswer || (type === 'questions'
     ? null
@@ -179,6 +180,7 @@ export function createApplicationPracticeRuntime({ db = null, lesson = null, shu
     shuffle,
     random,
     aiCheckAnswers,
-    sessionMode
+    sessionMode,
+    clock
   });
 }

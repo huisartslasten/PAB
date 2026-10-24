@@ -240,11 +240,6 @@ export function createPracticePresentation({
     return entry.start();
   }
 
-  function nextItem() {
-    if (!entry) return null;
-    return entry.next();
-  }
-
   async function submit() {
     if (!entry) return null;
     const snapshot = entry.runtime.snapshot();
@@ -283,14 +278,14 @@ export function createPracticePresentation({
     content.innerHTML = `${hintHtml(item, escapeHtml)}<div class="prompt">${escapeHtml(item.question)}</div><div class="question-answer"><strong>Jouw antwoord:</strong><br>${escapeHtml(answer || '—')}<hr><strong>Voorbeeldantwoord:</strong><br>${escapeHtml(item.answer)}</div><div class="self-buttons"><button class="success" data-question-result="true">✓ Goed</button><button class="danger" data-question-result="false">✗ Nog niet</button></div>`;
     bindHint();
     content.querySelectorAll('[data-question-result]').forEach(button => {
-      button.addEventListener('click', () => assess(button.dataset.questionResult === 'true'));
+      button.addEventListener('click', () => { void assess(button.dataset.questionResult === 'true'); });
     });
     return { item, answer };
   }
 
-  function assess(correct) {
+  async function assess(correct) {
     if (!entry) return null;
-    const result = entry.assess(correct);
+    const result = await entry.assess(correct);
     if (result.done) return result;
     const content = elements().content;
     if (content) {
@@ -320,7 +315,7 @@ export function createPracticePresentation({
     entry = null;
   }
 
-  function finish() {
+  async function finish() {
     if (!entry) return null;
     return entry.finish();
   }

@@ -1,4 +1,4 @@
-// Canonical domain runtime for the Memory lesson game.
+// Canonical domain runtime for the Memory practice game.
 // Lesson data loading and presentation are intentionally kept outside this module.
 
 const DEFAULT_MAX_PAIRS_PER_ROUND = 6;
@@ -25,33 +25,15 @@ function shuffle(values, random) {
 
 function createCards(items, random = Math.random) {
   const cards = [];
-
   normalizeItems(items).forEach((item, pairIndex) => {
     const matchKey = normalizeMatchKey(item.answer);
-    cards.push({
-      id: `${pairIndex}:question`,
-      pairId: pairIndex,
-      type: 'question',
-      value: item.question,
-      matchKey
-    });
-    cards.push({
-      id: `${pairIndex}:answer`,
-      pairId: pairIndex,
-      type: 'answer',
-      value: item.answer,
-      matchKey
-    });
+    cards.push({ id: `${pairIndex}:question`, pairId: pairIndex, type: 'question', value: item.question, matchKey });
+    cards.push({ id: `${pairIndex}:answer`, pairId: pairIndex, type: 'answer', value: item.answer, matchKey });
   });
-
   return shuffle(cards, random);
 }
 
-export function createMemoryRuntime({
-  items = [],
-  random = Math.random,
-  maxPairsPerRound = DEFAULT_MAX_PAIRS_PER_ROUND
-} = {}) {
+export function createMemoryRuntime({ items = [], random = Math.random, maxPairsPerRound = DEFAULT_MAX_PAIRS_PER_ROUND } = {}) {
   const lessonItems = normalizeItems(items);
   const roundSize = Math.max(1, Math.floor(Number(maxPairsPerRound) || DEFAULT_MAX_PAIRS_PER_ROUND));
   let roundPlan = [];
@@ -63,15 +45,8 @@ export function createMemoryRuntime({
   let phase = 'ready';
   let turnCount = 0;
 
-  function currentRoundItems() {
-    const start = roundIndex * roundSize;
-    return roundPlan.slice(start, start + roundSize);
-  }
-
-  function totalRounds() {
-    return Math.ceil(roundPlan.length / roundSize);
-  }
-
+  function currentRoundItems() { return roundPlan.slice(roundIndex * roundSize, roundIndex * roundSize + roundSize); }
+  function totalRounds() { return Math.ceil(roundPlan.length / roundSize); }
   function snapshot() {
     return Object.freeze({
       cards: cards.map(card => Object.freeze({ ...card })),
@@ -87,16 +62,13 @@ export function createMemoryRuntime({
       minimumTurns: lessonItems.length
     });
   }
-
   function beginCurrentRound() {
-    const itemsForRound = currentRoundItems();
-    cards = createCards(itemsForRound, random);
+    cards = createCards(currentRoundItems(), random);
     firstCardId = null;
     secondCardId = null;
     matchedCardIds = new Set();
     phase = cards.length ? 'playing' : 'finished';
   }
-
   function start() {
     roundPlan = shuffle(lessonItems, random);
     roundIndex = 0;
@@ -104,63 +76,37 @@ export function createMemoryRuntime({
     beginCurrentRound();
     return snapshot();
   }
-
   function startNextRound() {
-    if (phase !== 'round-finished') {
-      throw new Error('Er is geen volgende ronde beschikbaar.');
-    }
+    if (phase !== 'round-finished') throw new Error('Er is geen volgende ronde beschikbaar.');
     roundIndex += 1;
     beginCurrentRound();
     return snapshot();
   }
-
-  function findCard(cardId) {
-    return cards.find(card => card.id === cardId) || null;
-  }
-
+  function findCard(cardId) { return cards.find(card => card.id === cardId) || null; }
   function selectCard(cardId) {
     if (phase !== 'playing') throw new Error('Er kan nu geen kaart worden gekozen.');
-
     const card = findCard(cardId);
     if (!card) throw new Error('De gekozen kaart bestaat niet.');
     if (matchedCardIds.has(card.id)) throw new Error('Deze kaart is al gevonden.');
     if (card.id === firstCardId) throw new Error('Deze kaart is al gekozen.');
     if (secondCardId) throw new Error('Beide kaarten van deze beurt zijn al gekozen.');
-
-    if (!firstCardId) {
-      firstCardId = card.id;
-      return snapshot();
-    }
-
-    secondCardId = card.id;
-    turnCount += 1;
-    phase = 'checking';
+    if (!firstCardId) firstCardId = card.id;
+    else { secondCardId = card.id; turnCount += 1; phase = 'checking'; }
     return snapshot();
   }
-
   function resolveTurn() {
     if (phase !== 'checking') throw new Error('Er is geen beurt om te controleren.');
-
     const firstCard = findCard(firstCardId);
     const secondCard = findCard(secondCardId);
     if (!firstCard || !secondCard) throw new Error('De huidige beurt is ongeldig.');
-
     const matched = firstCard.type !== secondCard.type && firstCard.matchKey === secondCard.matchKey;
-    if (matched) {
-      matchedCardIds.add(firstCard.id);
-      matchedCardIds.add(secondCard.id);
-    }
-
+    if (matched) { matchedCardIds.add(firstCard.id); matchedCardIds.add(secondCard.id); }
     const complete = matchedCardIds.size === cards.length;
     firstCardId = null;
     secondCardId = null;
-    phase = complete
-      ? (roundIndex + 1 < totalRounds() ? 'round-finished' : 'finished')
-      : 'playing';
-
+    phase = complete ? (roundIndex + 1 < totalRounds() ? 'round-finished' : 'finished') : 'playing';
     return Object.freeze({ ...snapshot(), matched });
   }
-
   return Object.freeze({ start, startNextRound, selectCard, resolveTurn, snapshot });
 }
 

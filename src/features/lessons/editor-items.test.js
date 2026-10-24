@@ -5,6 +5,12 @@ import {
   buildItemsForType,
   isMeaningfulItem
 } from './editor-items.js';
+import {
+  inheritMultipleChoiceConfig,
+  normalizeMultipleChoiceConfig,
+  validateMultipleChoiceOptions,
+  MULTIPLE_CHOICE_LIMITS
+} from './multiple-choice-config.js';
 
 test('dictation item uses one entered word as the canonical answer', () => {
   const item = buildDictationItem({ word: 'paard' });
@@ -78,4 +84,70 @@ test('multiple choice requires a selected correct option and preserves its optio
   assert.equal(items.length, 1);
   assert.equal(items[0].answer, '4');
   assert.deepEqual(items[0].answer_options, ['3', '4', '5']);
+});
+
+test('multiple choice rejects duplicate options in the shared policy', () => {
+  const result = validateMultipleChoiceOptions({
+    options: ['Parijs', 'Londen', 'Parijs', 'Rome'],
+    correctOption: 'Parijs'
+  });
+
+  assert.equal(result.valid, false);
+  assert.equal(result.errors.includes('Elke antwoordoptie moet uniek zijn.'), true);
+});
+
+test('multiple choice rejects duplicates that differ only by letter case', () => {
+  const result = validateMultipleChoiceOptions({
+    options: ['Parijs', 'Londen', 'parijs', 'Rome'],
+    correctOption: 'Parijs'
+  });
+
+  assert.equal(result.valid, false);
+  assert.equal(result.errors.includes('Elke antwoordoptie moet uniek zijn.'), true);
+});
+
+test('multiple choice builder uses the shared option policy', () => {
+  const items = buildItemsForType('questions', [{
+    question_parts: ['Welke stad is de hoofdstad van Frankrijk?'],
+    answer_parts: [{ text: 'Parijs', role: 'answer' }],
+    response_type: 'multiple_choice',
+    answer_options: ['Parijs', 'Londen', 'Rome', 'Berlijn'],
+    correct_option: 'Parijs'
+  }]);
+
+  assert.equal(items.length, 1);
+
+  const invalid = buildItemsForType('questions', [{
+    question_parts: ['Welke stad is de hoofdstad van Frankrijk?'],
+    answer_parts: [{ text: 'Parijs', role: 'answer' }],
+    response_type: 'multiple_choice',
+    answer_options: ['Parijs', 'Londen', 'Londen', 'Berlijn'],
+    correct_option: 'Parijs'
+  }]);
+
+  assert.equal(invalid.length, 0);
+});
+
+test('multiple choice config has a bounded default option count', () => {
+  assert.deepEqual(normalizeMultipleChoiceConfig({ enabled: true }), {
+    enabled: true,
+    optionCount: MULTIPLE_CHOICE_LIMITS.defaultOptionCount
+  });
+  assert.deepEqual(normalizeMultipleChoiceConfig({ enabled: true, optionCount: 1 }), {
+    enabled: true,
+    optionCount: MULTIPLE_CHOICE_LIMITS.minOptionCount
+  });
+  assert.deepEqual(normalizeMultipleChoiceConfig({ enabled: true, optionCount: 99 }), {
+    enabled: true,
+    optionCount: MULTIPLE_CHOICE_LIMITS.maxOptionCount
+  });
+});
+
+test('multiple choice inheritance copies configuration only', () => {
+  const previous = { enabled: true, optionCount: 6, question: 'oude vraag', answer: 'juist' };
+  const inherited = inheritMultipleChoiceConfig(previous);
+
+  assert.deepEqual(inherited, { enabled: true, optionCount: 6 });
+  assert.equal('question' in inherited, false);
+  assert.equal('answer' in inherited, false);
 });

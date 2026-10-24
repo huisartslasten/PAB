@@ -1,9 +1,6 @@
-import { createPacoDropdown } from '../../components/page-template.js';
+import { createPacoDropdown } from '../../../components/page-template.js';
 
-// Presentation boundary for Flash Question.
-// Scoring and question progression remain in flash-question-runtime.js.
-
-export function createFlashQuestionView({ documentRef = globalThis.document, escapeHtml } = {}) {
+export function createFlashView({ documentRef = globalThis.document, escapeHtml } = {}) {
   if (!documentRef) throw new Error('A document is required.');
   if (typeof escapeHtml !== 'function') throw new Error('An escapeHtml function is required.');
 
@@ -22,19 +19,17 @@ export function createFlashQuestionView({ documentRef = globalThis.document, esc
     const completed = state.phase === 'finished' ? state.total : state.index;
     const current = state.total ? Math.min(state.index + 1, state.total) : 0;
     const pct = state.total ? completed / state.total * 100 : 0;
-    node.innerHTML = `<div class="flash-progress-label"><span>Vraag ${current} van ${state.total}</span><span>${completed} gedaan</span></div><div class="flash-progress"><span style="width:${pct}%"></span></div>`;
+    node.innerHTML = `<div class="progress-label"><span>Vraag ${current} van ${state.total}</span><span>${completed} gedaan</span></div><div class="progress"><div class="progress-bar"><span style="width:${pct}%"></span></div></div>`;
   }
 
   function renderQuestion(state, onAnswer, highScore, { timingMode = 'manual', onTimingModeChange, remainingSeconds = null } = {}) {
     const content = documentRef.getElementById('flashContent');
     if (!content || !state.item) return;
-
     renderStats(state, highScore);
     renderProgress(state);
 
     const controls = documentRef.createElement('div');
     controls.className = 'flash-controls';
-
     const timingControl = documentRef.createElement('div');
     timingControl.className = 'flash-timing-control';
     const label = documentRef.createElement('span');
@@ -57,18 +52,14 @@ export function createFlashQuestionView({ documentRef = globalThis.document, esc
     const timer = documentRef.createElement('div');
     timer.className = 'flash-timer';
     timer.setAttribute('aria-live', 'polite');
-    if (timingMode === 'manual') {
-      timer.textContent = 'Kies rustig je antwoord.';
-    } else {
-      timer.textContent = `${remainingSeconds ?? Number(timingMode)} seconden`;
-    }
+    timer.textContent = timingMode === 'manual' ? 'Kies rustig je antwoord.' : `${remainingSeconds ?? Number(timingMode)} seconden`;
     controls.appendChild(timer);
 
     content.innerHTML = '';
     content.appendChild(controls);
 
     const question = documentRef.createElement('div');
-    question.className = 'flash-question';
+    question.className = 'prompt flash-question';
     question.innerHTML = escapeHtml(state.item.question);
     content.appendChild(question);
 
@@ -76,14 +67,12 @@ export function createFlashQuestionView({ documentRef = globalThis.document, esc
     options.className = 'flash-options';
     options.setAttribute('role', 'group');
     options.setAttribute('aria-label', 'Antwoordopties');
-    options.innerHTML = state.item.options.map((option, index) => `<button type="button" class="flash-option secondary" data-flash-answer="${index}">${escapeHtml(option)}</button>`).join('');
+    options.innerHTML = state.item.options.map((option, index) => `<button type="button" class="big secondary flash-option" data-flash-answer="${index}">${escapeHtml(option)}</button>`).join('');
     content.appendChild(options);
-
     options.querySelectorAll('[data-flash-answer]').forEach(button => {
       button.addEventListener('click', () => {
         options.querySelectorAll('[data-flash-answer]').forEach(option => { option.disabled = true; });
-        const option = state.item.options[Number(button.dataset.flashAnswer)];
-        onAnswer(option);
+        onAnswer(state.item.options[Number(button.dataset.flashAnswer)]);
       });
     });
   }
@@ -91,30 +80,27 @@ export function createFlashQuestionView({ documentRef = globalThis.document, esc
   function renderResult(state, highScore, onContinue) {
     const content = documentRef.getElementById('flashContent');
     if (!content || !state.lastResult) return;
-
     renderStats(state, highScore);
     renderProgress(state);
     const result = state.lastResult;
-    const title = result.correct ? '✓ GOED!' : '✕ FOUT';
-    const className = result.correct ? 'correct' : 'wrong';
-    const explanation = result.correct
-      ? 'Goed antwoord!'
-      : `Het juiste antwoord is: ${escapeHtml(result.expectedAnswer)}`;
-
-    content.innerHTML = `<section class="flash-result ${className}" aria-live="polite"><div class="flash-result-title">${title}</div><div class="flash-result-text">${explanation}</div><div class="flash-result-score">Score: <strong>${state.score}</strong> / ${state.maxScore}</div></section><button type="button" class="success flash-next" data-flash-next>Volgende →</button>`;
+    const correct = result.correct;
+    const title = correct ? '✓ GOED!' : '✕ FOUT';
+    const explanation = correct ? 'Goed antwoord!' : `Het juiste antwoord is: ${escapeHtml(result.expectedAnswer)}`;
+    const resultClass = correct ? 'practice-correct-answer' : 'practice-answer-review';
+    const titleClass = correct ? 'practice-correct-answer-title' : 'practice-answer-review-title';
+    const textClass = correct ? 'practice-correct-answer-text' : 'practice-answer-review-text';
+    content.innerHTML = `<section class="${resultClass}" aria-live="polite"><div class="${titleClass}">${title}</div><div class="${textClass}">${explanation}</div><div class="flash-result-score">Score: <strong>${state.score}</strong> / ${state.maxScore}</div></section><button type="button" class="big success flash-next" data-flash-next>Volgende →</button>`;
     content.querySelector('[data-flash-next]')?.addEventListener('click', onContinue);
   }
 
   function renderFinished(state, highScore, onRestart, onBack) {
     const content = documentRef.getElementById('flashContent');
     if (!content) return;
-
     const finalHighScore = Math.max(Number(highScore) || 0, state.score);
     renderStats(state, finalHighScore);
     renderProgress(state);
     const perfect = state.maxScore > 0 && state.score === state.maxScore;
-
-    content.innerHTML = `<section class="flash-finished"><div class="flash-finished-title">${perfect ? '🏆 Perfect!' : '🎯 Ronde klaar!'}</div><div class="flash-final-score">${state.score} / ${state.maxScore}</div><div class="flash-finished-stats"><div><span>Score</span><strong>${state.score}</strong></div><div><span>Maximum</span><strong>${state.maxScore}</strong></div><div><span>High score</span><strong>${finalHighScore}</strong></div></div><div class="flash-finished-actions"><button type="button" class="success" data-flash-restart>Nog een keer</button><button type="button" class="secondary" data-flash-back>← Spelletjes</button></div></section>`;
+    content.innerHTML = `<section class="flash-finished"><div class="flash-finished-title">${perfect ? '🏆 Perfect!' : '🎯 Ronde klaar!'}</div><div class="flash-final-score">${state.score} / ${state.maxScore}</div><div class="flash-finished-stats"><div><span>Score</span><strong>${state.score}</strong></div><div><span>Maximum</span><strong>${state.maxScore}</strong></div><div><span>High score</span><strong>${finalHighScore}</strong></div></div><div class="flash-finished-actions"><button type="button" class="big success" data-flash-restart>Nog een keer</button><button type="button" class="big secondary" data-flash-back>← Spelletjes</button></div></section>`;
     content.querySelector('[data-flash-restart]')?.addEventListener('click', onRestart);
     content.querySelector('[data-flash-back]')?.addEventListener('click', onBack);
   }

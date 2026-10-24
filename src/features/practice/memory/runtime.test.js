@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createMemoryRuntime } from '../src/features/lessons/memory-runtime.js';
+import { createMemoryRuntime } from './runtime.js';
 
 test('Memory matches duplicate answer values by their meaning, not by card identity', () => {
   const runtime = createMemoryRuntime({

@@ -8,26 +8,34 @@ function shuffle(values, random = Math.random) {
 }
 
 const PRIZES = Object.freeze([0, 100, 500, 1000, 5000, 10000, 25000, 50000, 100000, 250000, 500000, 1000000]);
+const QUESTION_COUNT = PRIZES.length - 1;
+
+function buildQuestionBank(questions, random) {
+  const source = questions.filter(item => item?.question && item?.answer);
+  if (!source.length) return [];
+  const bank = [];
+  while (bank.length < QUESTION_COUNT) bank.push(source[bank.length % source.length]);
+  return shuffle(bank, random);
+}
 
 export function createMillionaireRuntime({ questions = [], distractorService = null, random = Math.random } = {}) {
-  let bank = shuffle(questions.filter(item => item?.question && item?.answer), random);
+  const sourceQuestions = questions.filter(item => item?.question && item?.answer);
+  let bank = buildQuestionBank(sourceQuestions, random);
   let index = 0;
   let score = 0;
   let finished = false;
   let lifelines = { fiftyFifty: true, askSomeone: true, askAudience: true };
   let current = null;
-  let options = [];
   let activeOptions = [];
   let message = '';
 
   function start() {
-    bank = shuffle(bank, random);
+    bank = buildQuestionBank(sourceQuestions, random);
     index = 0;
     score = 0;
     finished = bank.length === 0;
     lifelines = { fiftyFifty: true, askSomeone: true, askAudience: true };
     current = null;
-    options = [];
     activeOptions = [];
     message = '';
     return snapshot();
@@ -55,8 +63,7 @@ export function createMillionaireRuntime({ questions = [], distractorService = n
       finished = true;
       return snapshot();
     }
-    options = await buildOptions(current);
-    activeOptions = [...options];
+    activeOptions = await buildOptions(current);
     message = '';
     return snapshot();
   }
@@ -71,7 +78,7 @@ export function createMillionaireRuntime({ questions = [], distractorService = n
     }
     score = PRIZES[Math.min(index + 1, PRIZES.length - 1)];
     index += 1;
-    if (score >= 1000000 || index >= bank.length) {
+    if (score >= 1000000) {
       finished = true;
       message = '🎉 1.000.000 botjes!';
       return snapshot();

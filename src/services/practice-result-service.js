@@ -27,21 +27,20 @@ export function createPracticeResultService(db) {
     const { data, error } = await query;
     if (error) throw error;
 
-    const latestByLesson = new Map();
+    const passedByLesson = new Map();
     for (const attempt of Array.isArray(data) ? data : []) {
+      if (!isPassed(attempt)) continue;
       const key = `${attempt.student || ''}:${attempt.lesson_id}`;
-      if (!latestByLesson.has(key)) latestByLesson.set(key, attempt);
+      if (!passedByLesson.has(key)) passedByLesson.set(key, attempt);
     }
 
-    return [...latestByLesson.values()]
-      .filter(isPassed)
-      .map(attempt => Object.freeze({
-        lessonId: attempt.lesson_id,
-        student: attempt.student,
-        score: Number(attempt.score) || 0,
-        totalQuestions: Number(attempt.total_questions) || 0,
-        completedAt: attempt.completed_at || null
-      }));
+    return [...passedByLesson.values()].map(attempt => Object.freeze({
+      lessonId: attempt.lesson_id,
+      student: attempt.student,
+      score: Number(attempt.score) || 0,
+      totalQuestions: Number(attempt.total_questions) || 0,
+      completedAt: attempt.completed_at || null
+    }));
   }
 
   async function listPassedLessonIds(student = '') {

@@ -3,6 +3,7 @@ import { createPacoNavigation } from '../../components/page-navigation.js';
 import { buildViewUrl } from '../../core/view-context.js';
 import { getDashboardSubjects, getDashboardSubjectIcon, getDashboardAgendaItems } from './view-model.js';
 import { listStudents } from '../students/students.js';
+import { buildAvailableChallenges } from '../challenges/challenge-registry.js';
 
 export function createDashboardRuntime({ app, templateMount, chooserMount, context, documentRef = document, navigate } = {}) {
   if (!app) throw new TypeError('Dashboard runtime requires an app.');
@@ -72,12 +73,39 @@ export function createDashboardRuntime({ app, templateMount, chooserMount, conte
     card.appendChild(list); return card;
   }
 
-  function render(records) {
+  function renderChallenges(availableChallenges, lessonMap) {
+    if (!availableChallenges.length) return null;
+    const card = documentRef.createElement('article'); card.className = 'dashboard-card dashboard-challenges-card';
+    const heading = documentRef.createElement('h2'); heading.textContent = '🏆 CHALLENGES'; card.appendChild(heading);
+    const intro = documentRef.createElement('p'); intro.className = 'dashboard-challenges-intro'; intro.textContent = 'Speciale uitdagingen die je hebt vrijgespeeld met je leerresultaten.'; card.appendChild(intro);
+    const grid = documentRef.createElement('div'); grid.className = 'dashboard-challenge-grid';
+    availableChallenges.forEach(challenge => {
+      const target = buildViewUrl(challenge.route, { student: selectedStudent, mode: context.mode });
+      const item = documentRef.createElement('button'); item.type = 'button'; item.className = 'dashboard-challenge-card';
+      const icon = documentRef.createElement('div'); icon.className = 'dashboard-challenge-icon'; icon.textContent = challenge.icon;
+      const title = documentRef.createElement('h3'); title.textContent = challenge.title;
+      const unlocked = documentRef.createElement('div'); unlocked.className = 'dashboard-challenge-lessons';
+      const unique = [];
+      challenge.unlockedLessons.forEach(lesson => { const key = String(lesson.id); if (!unique.includes(key)) unique.push(key); });
+      const names = unique.map(key => lessonMap.get(Number(key))).filter(Boolean).map(lesson => `${lesson.subject || 'Les'}${lesson.title ? ` — ${lesson.title}` : ''}`);
+      unlocked.textContent = names.length > 1 ? `Vrijgespeeld: ${names.length} leergebieden` : `Vrijgespeeld: ${names[0] || 'jouw leerstof'}`;
+      const description = documentRef.createElement('p'); description.textContent = challenge.description;
+      const start = documentRef.createElement('span'); start.className = 'dashboard-challenge-start'; start.textContent = 'START MILLIONAIRE →';
+      item.append(icon, title, unlocked, description, start); item.addEventListener('click', () => navigate(target)); grid.appendChild(item);
+    });
+    card.appendChild(grid);
+    return card;
+  }
+
+  function render(records, availableChallenges = []) {
     content.replaceChildren();
     const lessons = app.mapLessons(records);
+    const lessonMap = new Map(lessons.map(lesson => [Number(lesson.id), lesson]));
     const subjects = getDashboardSubjects(lessons, selectedStudent);
     const agendaItems = getDashboardAgendaItems(app.agenda, 4);
     const main = documentRef.createElement('section'); main.className = 'dashboard-main';
+    const challenges = renderChallenges(availableChallenges, lessonMap);
+    if (challenges) main.appendChild(challenges);
     main.appendChild(renderAgenda(agendaItems));
     const subjectsCard = documentRef.createElement('article'); subjectsCard.className = 'dashboard-card';
     const heading = documentRef.createElement('h2'); heading.textContent = 'Mijn vakken'; subjectsCard.appendChild(heading);
@@ -100,7 +128,12 @@ export function createDashboardRuntime({ app, templateMount, chooserMount, conte
     if (chooserMount) chooserMount.replaceChildren();
     mountPacoPageTemplate({ mount: templateMount, greeting: `Hoi ${selectedStudent}! 🐶`, title: 'Dashboard', icon: '🏠', subtitle: 'Bekijk je vakken en wat er binnenkort aankomt.', navigation: createPacoNavigation({ app, active: 'dashboard', student: selectedStudent, viewMode: context.mode, navigate }), content });
     const state = documentRef.createElement('div'); state.className = 'dashboard-state'; state.textContent = 'Dashboard laden…'; content.appendChild(state);
-    try { const records = await app.loadLessons(); render(records); }
+    try {
+      const records = await app.loadLessons();
+      const passedLessonIds = await app.practiceResults.listPassedLessonIds(selectedStudent);
+      const activeLessons = app.mapLessons(records).filter(lesson => !lesson.archived && !lesson.deleted && passedLessonIds.includes(Number(lesson.id)));
+      render(records, buildAvailableChallenges(activeLessons));
+    }
     catch (error) { console.error('Dashboard page load error:', error); state.textContent = 'Het dashboard kon niet worden geladen.'; }
   }
 

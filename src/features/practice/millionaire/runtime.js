@@ -34,9 +34,7 @@ export function createMillionaireRuntime({ questions = [], distractorService = n
   }
 
   async function buildOptions(item) {
-    const existing = Array.isArray(item.answer_options)
-      ? item.answer_options.filter(Boolean).map(String)
-      : [];
+    const existing = Array.isArray(item.answer_options) ? item.answer_options.filter(Boolean).map(String) : [];
     if (existing.length >= 2) return shuffle([...new Set([String(item.answer), ...existing])], random).slice(0, 4);
     if (!distractorService) throw new Error('De centrale MC-distractorservice is niet beschikbaar.');
     const distractors = await distractorService.generateMultipleChoiceDistractors({
@@ -96,7 +94,7 @@ export function createMillionaireRuntime({ questions = [], distractorService = n
   function useAskSomeone() {
     if (!lifelines.askSomeone || !current) return snapshot();
     lifelines = { ...lifelines, askSomeone: false };
-    const likely = Math.random() < 0.72 ? current.answer : activeOptions.find(option => String(option) !== String(current.answer));
+    const likely = random() < 0.72 ? current.answer : activeOptions.find(option => String(option) !== String(current.answer));
     message = `📞 Vraag iemand: ${likely || current.answer}`;
     return snapshot();
   }

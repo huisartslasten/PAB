@@ -37,7 +37,8 @@ export function createPracticeRuntimeEntry({
     random,
     evaluateAnswer,
     aiCheckAnswers,
-    sessionMode
+    sessionMode,
+    clock
   });
   const mastery = masteryService || createMasteryService();
   const testPersistence = sessionMode === 'single-pass'

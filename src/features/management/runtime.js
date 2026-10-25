@@ -15,12 +15,15 @@ export function createManagementRuntime({ app, templateMount, context, documentR
   function renderManagement() {
     const section = documentRef.createElement('section'); section.className = 'management-section';
     const heading = documentRef.createElement('div'); heading.className = 'page-heading'; const title = documentRef.createElement('h2'); title.textContent = selectedStudent ? `Beheer van ${selectedStudent}` : 'Beheer'; heading.appendChild(title); section.appendChild(heading);
-    section.append(
+    const groups = [
       createToolGroup('Lesbeheer', [createAction('📚 Les beheren', 'Bekijk de lessen van de actieve leerling en bewerk, archiveer of verwijder ze.', 'lessons.html'), createAction('➕ Les maken', 'Maak een nieuwe les voor de actieve leerling.', 'lesson-editor.html', { documentNavigation: true })]),
       createToolGroup('Leerstofbeheer', [createAction('🧠 Leerstof beheren', 'Bekijk de leerstof per vak en onderwerp.', 'lessons.html'), createAction('➕ Leerstof maken', 'Open direct de leerstofeditor. Kies daar het vak en onderwerp.', 'learning-material-editor.html', { documentNavigation: true })]),
-      createToolGroup('Challengebeheer', [createAction('🎯 Challenge-instellingen', 'Beheer centraal welke Challenges actief zijn en hoe vrijspelen, AI en spelregels werken.', 'challenge-settings.html', { requiresStudent: false })]),
       createToolGroup('Agenda', [createAction('📅 Agenda', 'Bekijk en beheer de agenda van de actieve leerling.', 'agenda.html'), createAction('🖨️ Maandkalender', 'Open de maandkalender van de actieve leerling.', 'month-calendar.html', { documentNavigation: true })])
-    );
+    ];
+    if (app.auth.isMainAdministrator) {
+      groups.splice(2, 0, createToolGroup('Challengebeheer', [createAction('🎯 Challenge-instellingen', 'Beheer centraal welke Challenges actief zijn en hoe vrijspelen, AI en spelregels werken.', 'challenge-settings.html', { requiresStudent: false })]));
+    }
+    section.append(...groups);
     content.replaceChildren(section);
   }
   async function mount() {

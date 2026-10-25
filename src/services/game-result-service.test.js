@@ -2,54 +2,67 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createGameResultService } from './game-result-service.js';
 
-function createQuery(data, error = null) {
-  const filters = [];
+function createQuery({ data = null, error = null, filters = [] } = {}) {
   const query = {
+    filters,
+    insertPayload: null,
     select() { return query; },
-    eq(column, value) { filters.push(['eq', column, value]); return query; },
-    is(column, value) { filters.push(['is', column, value]); return query; },
-    order(column, options) { filters.push(['order', column, options]); return query; },
-    limit(value) { filters.push(['limit', value]); return query; },
+    eq(column, value) {
+      query.filters.push(['eq', column, value]);
+      return query;
+    },
+    is(column, value) {
+      query.filters.push(['is', column, value]);
+      return query;
+    },
+    order(column, options) {
+      query.filters.push(['order', column, options]);
+      return query;
+    },
+    limit(value) {
+      query.filters.push(['limit', value]);
+      return query;
+    },
     maybeSingle: async () => ({ data, error }),
-    insert(payload) { query.insertPayload = payload; return query; }
+    insert(payload) {
+      query.insertPayload = payload;
+      return Promise.resolve({ error });
+    }
   };
   return query;
 }
 
 test('game results can be saved without a lesson scope', async () => {
-  const calls = [];
+  const resultQuery = createQuery();
   const db = {
     from(table) {
-      calls.push(table);
-      if (table === 'games') return createQuery({ id: 7, score_direction: 'high' });
-      const query = createQuery(null);
-      const originalInsert = query.insert;
-      query.insert = payload => {
-        originalInsert(payload);
-        return { ...query, then: undefined };
-      };
-      return query;
+      if (table === 'games') return createQuery({ data: { id: 7, score_direction: 'high' } });
+      return resultQuery;
     }
   };
 
   const service = createGameResultService(db);
-  await assert.rejects(
-    () => service.saveResult({ gameKey: 'math-skill-addition', student: 'Paco', score: 8 }),
-    /then|error|undefined/
-  );
+  const score = await service.saveResult({
+    gameKey: 'math-skill-addition',
+    student: 'Paco',
+    score: 8
+  });
 
-  assert.deepEqual(calls, ['games', 'game_results']);
+  assert.equal(score, 8);
+  assert.deepEqual(resultQuery.insertPayload, {
+    game_id: 7,
+    lesson_id: null,
+    student: 'Paco',
+    score: 8
+  });
 });
 
-test('game result reads use null lesson scope for independent activities', async () => {
-  const queries = [];
+test('independent game results read with null lesson scope', async () => {
+  const resultQuery = createQuery({ data: { score: 12 } });
   const db = {
     from(table) {
-      const query = table === 'games'
-        ? createQuery({ id: 7, score_direction: 'high' })
-        : createQuery({ score: 12 });
-      queries.push({ table, query });
-      return query;
+      if (table === 'games') return createQuery({ data: { id: 7, score_direction: 'high' } });
+      return resultQuery;
     }
   };
 
@@ -60,25 +73,17 @@ test('game result reads use null lesson scope for independent activities', async
   });
 
   assert.equal(score, 12);
-  const resultQuery = queries.find(entry => entry.table === 'game_results').query;
-  assert.deepEqual(
-    resultQuery.__filters,
-    undefined
-  );
+  assert.ok(resultQuery.filters.some(([operator, column, value]) =>
+    operator === 'is' && column === 'lesson_id' && value === null
+  ));
 });
 
 test('lesson-scoped game results still accept a lesson id', async () => {
-  const filters = [];
+  const resultQuery = createQuery({ data: { score: 4 } });
   const db = {
     from(table) {
-      if (table === 'games') return createQuery({ id: 9, score_direction: 'high' });
-      const query = createQuery({ score: 4 });
-      const originalEq = query.eq;
-      query.eq = (column, value) => {
-        filters.push(['eq', column, value]);
-        return originalEq(column, value);
-      };
-      return query;
+      if (table === 'games') return createQuery({ data: { id: 9, score_direction: 'high' } });
+      return resultQuery;
     }
   };
 
@@ -90,5 +95,7 @@ test('lesson-scoped game results still accept a lesson id', async () => {
   });
 
   assert.equal(score, 4);
-  assert.ok(filters.some(([operator, column, value]) => operator === 'eq' && column === 'lesson_id' && value === 42));
+  assert.ok(resultQuery.filters.some(([operator, column, value]) =>
+    operator === 'eq' && column === 'lesson_id' && value === 42
+  ));
 });

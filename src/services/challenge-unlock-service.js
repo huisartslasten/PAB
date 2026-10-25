@@ -8,7 +8,7 @@ function normalizeMinimumScore(value) {
 }
 
 export function meetsAssessmentUnlockPolicy(attempt, unlockPolicy = {}) {
-  const total = Number(attempt?.total_questions) || 0;
+  const total = Number(attempt?.totalQuestions) || 0;
   const score = Number(attempt?.score) || 0;
   if (total <= 0) return false;
 

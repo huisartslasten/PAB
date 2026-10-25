@@ -27,7 +27,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
         ]),
         createToolGroup('Skillbeheer', [
           createAction('🧮 Skills beheren', 'Bepaal per leerling welke reken-Skills beschikbaar zijn.', 'skill-settings.html'),
-          createAction('🛠️ Skills maken', 'Maak en bewerk centraal hoe reken-Skills werken.', 'skill-editor.html', { requiresStudent: false })
+          createAction('➕ Skills maken', 'Maak en bewerk centraal hoe reken-Skills werken.', 'skill-editor.html', { requiresStudent: false })
         ])
       );
     }

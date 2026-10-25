@@ -4,7 +4,7 @@ import { buildViewUrl } from '../core/view-context.js';
 
 function currentPage() { return window.location.pathname.split('/').pop() || 'dashboard.html'; }
 function go(navigate, path, { student = '', mode = 'student' } = {}) { if (typeof navigate !== 'function') throw new TypeError('PacoGO shared navigation requires the central navigation owner.'); return navigate(buildViewUrl(path, { student, mode })); }
-function toggleManagement(navigate, { student = '', isManagementView = false } = {}) { return go(navigate, currentPage(), { student, mode: isManagementView ? 'student' : 'management' }); }
+function toggleManagement(navigate, { student = '', isManagementView = false } = {}) { return go(navigate, isManagementView ? 'dashboard.html' : 'management.html', { student, mode: isManagementView ? 'student' : 'management' }); }
 function requireNavigationApp(app, includeAccount) { if (!includeAccount) return; if (!app?.auth || !app?.authSession) throw new Error('createPacoNavigation requires the application context when includeAccount is enabled.'); }
 
 export function createPacoNavigation({ app = null, active = '', activeSubmenu = '', student = '', viewMode = 'student', managementStudents = [], onSelectManagementStudent = null, includeManagementStudentSelector = false, includeManagementDashboard = false, includeManagementDashboardStudentSubmenu = true, includeManagement = true, includeManagementTools = false, includeCreator = false, includeLessons = true, includePractice = true, includeSkills = true, includeAgenda = true, includeAccount = true, hideActive = false, navigate } = {}) {

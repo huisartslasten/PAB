@@ -1,48 +1,59 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createMathQuestion, createMathSession, evaluateMathAnswer } from './math-domain.js';
+import { createMathQuestion, createMathSession, createMixedMathQuestion, evaluateMathAnswer } from './math-domain.js';
 
-test('addition generates a simple positive sum', () => {
-  const question = createMathQuestion('addition', () => 0);
+test('addition easy profile generates a result within its profile', () => {
+  const question = createMathQuestion('addition-easy', () => 0);
   assert.equal(question.operation, 'addition');
+  assert.equal(question.profileId, 'addition-easy');
   assert.equal(question.a, 1);
   assert.equal(question.b, 1);
   assert.equal(question.answer, 2);
+  assert.ok(question.answer <= 20);
 });
 
-test('subtraction never generates a negative result', () => {
+test('addition 1.000 profile can generate larger sums without exceeding its result limit', () => {
+  const question = createMathQuestion('addition-1000', () => 0.999);
+  assert.equal(question.operation, 'addition');
+  assert.ok(question.answer <= 1000);
+  assert.ok(question.answer > 100);
+});
+
+test('subtraction profiles never generate a negative result', () => {
   for (let index = 0; index < 50; index += 1) {
-    const question = createMathQuestion('subtraction');
+    const question = createMathQuestion('subtraction-1000');
     assert.ok(question.answer >= 0);
+    assert.ok(question.answer <= 1000);
     assert.ok(question.a >= question.b);
   }
 });
 
-test('multiplication stays within the speed-practice range', () => {
+test('multiplication profiles stay within their configured factor range', () => {
   for (let index = 0; index < 50; index += 1) {
-    const question = createMathQuestion('multiplication');
-    assert.ok(question.a >= 2 && question.a <= 10);
-    assert.ok(question.b >= 2 && question.b <= 10);
+    const question = createMathQuestion('multiplication-1-10');
+    assert.ok(question.a >= 1 && question.a <= 10);
+    assert.ok(question.b >= 1 && question.b <= 10);
   }
 });
 
-test('mixed questions use one registered operation', () => {
-  const question = createMathQuestion('mixed', () => 0.5);
-  assert.ok(['addition', 'subtraction', 'multiplication'].includes(question.operation));
+test('mixed questions use one selected profile', () => {
+  const question = createMixedMathQuestion(['addition-easy', 'multiplication-1-10'], () => 0);
+  assert.ok(['addition-easy', 'multiplication-1-10'].includes(question.profileId));
 });
 
 test('typed answer evaluation gives one point only for the exact answer', () => {
-  const question = createMathQuestion('addition', () => 0);
+  const question = createMathQuestion('addition-easy', () => 0);
   assert.deepEqual(evaluateMathAnswer(question, '2'), { correct: true, answered: true });
   assert.deepEqual(evaluateMathAnswer(question, '3'), { correct: false, answered: true });
   assert.deepEqual(evaluateMathAnswer(question, ''), { correct: false, answered: false });
 });
 
 test('math session keeps score and advances to a new question', () => {
-  const session = createMathSession({ operation: 'addition', durationSeconds: 180, random: () => 0 });
+  const session = createMathSession({ profileId: 'addition-easy', durationSeconds: 180, random: () => 0 });
   assert.equal(session.durationSeconds, 180);
   assert.equal(session.score, 0);
   assert.equal(session.answered, 0);
+  assert.equal(session.profileId, 'addition-easy');
 
   const first = session.question;
   assert.equal(session.answer(String(first.answer)).correct, true);

@@ -9,9 +9,20 @@
 .management-link{border:0;border-radius:12px;padding:10px 14px;background:var(--paco-blue-soft);color:#126fc9;font:800 15px/1.1 "Baloo 2",Nunito,sans-serif;cursor:pointer}
 .management-link.danger{background:#fee5e3;color:#b91c1c}
 .management-link:disabled{opacity:.6;cursor:wait}
+.skill-editor-card{display:grid;gap:18px}
+.skill-editor-title{margin:0;color:var(--paco-text);font:900 30px/1.05 "Baloo 2",Nunito,sans-serif}
+.skill-editor-field{display:grid;gap:7px;margin:0;color:var(--paco-text)}
+.skill-editor-field>strong{font:800 16px/1.1 "Baloo 2",Nunito,sans-serif;color:var(--paco-text)}
+.skill-editor-field input[type="text"],.skill-editor-field input[type="number"]{width:100%;min-height:54px;border:2px solid var(--paco-border);border-radius:14px;padding:11px 14px;background:#fff;color:var(--paco-text);font:700 17px/1.2 Nunito,sans-serif;box-shadow:0 3px 10px rgba(16,43,87,.04)}
+.skill-editor-field input[type="number"]{font:800 18px/1.2 "Baloo 2",Nunito,sans-serif}
+.skill-editor-field input:focus{outline:0;border-color:var(--paco-blue);box-shadow:0 0 0 4px rgba(23,135,242,.12)}
+.skill-editor-operation{padding-bottom:2px}
+.skill-editor-check{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;border:1px solid var(--paco-border);border-radius:14px;background:#f7fbff;color:var(--paco-text)}
+.skill-editor-check strong{font:800 16px/1.1 "Baloo 2",Nunito,sans-serif}
+.skill-editor-check input{width:22px;height:22px;accent-color:var(--paco-blue)}
 .skill-range-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.skill-range-grid .management-link{min-width:0;padding:14px 16px}
-.skill-range-grid input{width:100%;min-height:44px;box-sizing:border-box;padding:8px 10px;font-size:17px}
+.skill-editor-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-top:4px}
+.skill-config-status{color:var(--paco-muted);font-weight:800}
 .management-tool-group{display:grid;gap:10px;padding:16px;border:1px solid var(--paco-border);border-radius:18px;background:#f7fbff}
 .management-tool-group-title{margin:0;color:var(--paco-text);font-size:22px;line-height:1.1;font-weight:900}
 .management-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}

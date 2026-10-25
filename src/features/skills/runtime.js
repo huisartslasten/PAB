@@ -182,7 +182,9 @@ export function createSkillsRuntime({ app, templateMount, context, skillId = '',
     mountPacoPageTemplate({ mount: templateMount, backLabel: '← Skills', backAction: goSkills, greeting: `Hoi ${student}! 🐶`, title: skill ? skill.title : 'Skills', icon: '⚡', subtitle: skill ? 'Los zoveel mogelijk sommen goed op voordat de tijd om is.' : 'Zelfstandig oefenen, altijd beschikbaar.', navigation: createPacoNavigation({ app, active: 'skills', student, viewMode: context?.mode, navigate }), content });
     if (!skill) { renderMenu(); return; }
     highScore = student ? await resultService.getHighScore({ gameKey: skill.gameKey, student }).catch(() => null) : null;
-    session = createMathSession({ durationSeconds: Number(durationSeconds), operation: skill.operation });
+    session = skill.profileIds
+      ? createMathSession({ durationSeconds: Number(durationSeconds), mixedProfileIds: skill.profileIds })
+      : createMathSession({ durationSeconds: Number(durationSeconds), profileId: skill.profileId });
     renderActivity();
   }
 

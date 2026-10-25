@@ -20,12 +20,12 @@ export function createPacoNavigation({ app = null, active = '', activeSubmenu = 
   const items = [];
 
   if (isManagementView) {
-    items.push({ key: 'management-mode', kind: 'management-mode', label: 'BEHEER', active: true, onClick: () => toggleManagement(navigate, { student, isManagementView: true }) });
-    items.push({ key: 'management-student', kind: 'student-context', label: 'LEERLING', submenu: learners.map(name => ({ key: `management-student-${name}`, label: name, active: name === student, onClick: () => typeof onSelectManagementStudent === 'function' ? onSelectManagementStudent(name) : go(navigate, currentPage(), { student: name, mode: 'management' }) })) });
+    items.push({ key: 'management-mode', kind: 'management-mode', label: 'Beheer', active: true, onClick: () => toggleManagement(navigate, { student, isManagementView: true }) });
+    items.push({ key: 'management-student', kind: 'student-context', label: 'Leerling', submenu: learners.map(name => ({ key: `management-student-${name}`, label: name, active: name === student, onClick: () => typeof onSelectManagementStudent === 'function' ? onSelectManagementStudent(name) : go(navigate, currentPage(), { student: name, mode: 'management' }) })) });
   } else if (includeManagement && app?.auth?.isParent) {
-    items.push({ key: 'management-mode', kind: 'management-mode', label: 'BEHEER', onClick: () => toggleManagement(navigate, { student, isManagementView: false }) });
+    items.push({ key: 'management-mode', kind: 'management-mode', label: 'Beheer', onClick: () => toggleManagement(navigate, { student, isManagementView: false }) });
   } else if (showManagementLearnerBar) {
-    items.push({ key: 'management-student', kind: 'student-context', label: 'LEERLING', submenu: learners.map(name => ({ key: `management-student-${name}`, label: name, active: name === student, onClick: () => typeof onSelectManagementStudent === 'function' ? onSelectManagementStudent(name) : go(navigate, currentPage(), { student: name, mode: 'student' }) })) });
+    items.push({ key: 'management-student', kind: 'student-context', label: 'Leerling', submenu: learners.map(name => ({ key: `management-student-${name}`, label: name, active: name === student, onClick: () => typeof onSelectManagementStudent === 'function' ? onSelectManagementStudent(name) : go(navigate, currentPage(), { student: name, mode: 'student' }) })) });
   }
 
   items.push({ key: 'dashboard', icon: '🏠', label: 'Dashboard', onClick: () => go(navigate, isManagementView ? 'management.html' : 'dashboard.html', view), active: active === 'dashboard' });

@@ -1,4 +1,4 @@
-import { mountPacoPageTemplate } from '../../components/page-template.js';
+import { createPacoDropdown, mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
 import { buildViewUrl } from '../../core/view-context.js';
 import { createGameResultService } from '../../services/game-result-service.js';
@@ -45,52 +45,136 @@ export function createSkillsRuntime({ app, templateMount, context, skillId = '',
 
   function renderMenu() {
     content.replaceChildren();
-    const intro = documentRef.createElement('p'); intro.className = 'skills-intro'; intro.textContent = 'Kies een vaardigheid. Je kunt deze altijd opnieuw doen.'; content.appendChild(intro);
-    const section = documentRef.createElement('section'); section.className = 'skills-section';
-    const heading = documentRef.createElement('h2'); heading.textContent = 'Rekenen'; section.appendChild(heading);
-    const grid = documentRef.createElement('div'); grid.className = 'skills-grid';
+    const card = documentRef.createElement('section');
+    card.className = 'paco-template-card';
+    const heading = documentRef.createElement('h2');
+    heading.textContent = 'Rekenen';
+    card.appendChild(heading);
+
     listSkillsByCategory('math').forEach(skill => {
-      const card = documentRef.createElement('button'); card.type = 'button'; card.className = 'skill-card';
-      const title = documentRef.createElement('strong'); title.textContent = skill.title;
-      const description = documentRef.createElement('span'); description.textContent = skill.description;
-      const action = documentRef.createElement('em'); action.textContent = 'Start →';
-      card.append(title, description, action); card.addEventListener('click', () => openSkill(skill.id)); grid.appendChild(card);
+      const button = documentRef.createElement('button');
+      button.type = 'button';
+      button.className = 'paco-subject-card';
+      const title = documentRef.createElement('h3');
+      title.textContent = skill.title;
+      const description = documentRef.createElement('p');
+      description.textContent = skill.description;
+      const action = documentRef.createElement('strong');
+      action.textContent = 'Start →';
+      button.append(title, description, action);
+      button.addEventListener('click', () => openSkill(skill.id));
+      card.appendChild(button);
     });
-    section.appendChild(grid); content.appendChild(section);
+    content.appendChild(card);
   }
 
   function renderActivity() {
     content.replaceChildren();
     const skill = getSkillDefinition(skillId);
     if (!skill) return renderMenu();
-    const shell = documentRef.createElement('section'); shell.className = 'skill-activity';
-    const controls = documentRef.createElement('div'); controls.className = 'skill-controls';
-    const durationLabel = documentRef.createElement('label'); durationLabel.textContent = 'Tijd';
-    const durationSelect = documentRef.createElement('select');
-    SKILL_DURATIONS_SECONDS.forEach(seconds => { const option = documentRef.createElement('option'); option.value = String(seconds); option.textContent = formatDuration(seconds); option.selected = seconds === Number(durationSeconds); durationSelect.appendChild(option); });
-    durationSelect.addEventListener('change', () => openSkill(skill.id, Number(durationSelect.value)));
-    durationLabel.appendChild(durationSelect); controls.appendChild(durationLabel); shell.appendChild(controls);
 
-    const stats = documentRef.createElement('div'); stats.className = 'skill-stats';
-    const time = documentRef.createElement('strong'); const score = documentRef.createElement('strong'); time.className = 'skill-time'; score.className = 'skill-score'; stats.append(time, score); shell.appendChild(stats);
-    const question = documentRef.createElement('div'); question.className = 'skill-question';
-    const form = documentRef.createElement('form'); const input = documentRef.createElement('input'); input.type = 'number'; input.inputMode = 'numeric'; input.autocomplete = 'off'; input.className = 'skill-answer'; input.setAttribute('aria-label', 'Antwoord');
-    const submit = documentRef.createElement('button'); submit.type = 'submit'; submit.textContent = 'OK'; form.append(input, submit); question.appendChild(form); shell.appendChild(question);
-    const best = documentRef.createElement('p'); best.className = 'skill-best'; best.textContent = highScore == null ? 'Beste score: —' : `Beste score: ${highScore}`; shell.appendChild(best);
+    const card = documentRef.createElement('section');
+    card.className = 'paco-template-card';
+
+    const controls = documentRef.createElement('div');
+    const durationLabel = documentRef.createElement('label');
+    durationLabel.textContent = 'Tijd';
+    const dropdown = createPacoDropdown({
+      options: SKILL_DURATIONS_SECONDS.map(seconds => ({ value: String(seconds), label: formatDuration(seconds) })),
+      value: String(durationSeconds),
+      onChange: value => openSkill(skill.id, Number(value))
+    });
+    durationLabel.appendChild(dropdown.element);
+    controls.appendChild(durationLabel);
+    card.appendChild(controls);
+
+    const stats = documentRef.createElement('p');
+    const time = documentRef.createElement('strong');
+    const score = documentRef.createElement('strong');
+    stats.append('Tijd: ', time, ' · Score: ', score);
+    card.appendChild(stats);
+
+    const question = documentRef.createElement('div');
+    const prompt = documentRef.createElement('h2');
+    question.appendChild(prompt);
+
+    const form = documentRef.createElement('form');
+    const input = documentRef.createElement('input');
+    input.type = 'number';
+    input.inputMode = 'numeric';
+    input.autocomplete = 'off';
+    input.className = 'paco-template-input-lg';
+    input.setAttribute('aria-label', 'Antwoord');
+    const submit = documentRef.createElement('button');
+    submit.type = 'submit';
+    submit.className = 'success';
+    submit.textContent = 'OK';
+    form.append(input, submit);
+    question.appendChild(form);
+    card.appendChild(question);
+
+    const best = documentRef.createElement('p');
+    best.className = 'small';
+    best.textContent = highScore == null ? 'Beste score: —' : `Beste score: ${highScore}`;
+    card.appendChild(best);
 
     const startedAt = Date.now();
-    function update() { const elapsed = Math.max(0, Math.floor((Date.now() - startedAt) / 1000)); const remaining = Math.max(0, session.durationSeconds - elapsed); time.textContent = `⏱ ${remaining}s`; score.textContent = `⭐ ${session.score}`; if (remaining <= 0) void finishSkill(); }
-    function renderQuestion() { question.firstChild?.remove(); const prompt = documentRef.createElement('div'); prompt.className = 'skill-prompt'; prompt.textContent = session.question.text; question.prepend(prompt); }
-    form.addEventListener('submit', event => { event.preventDefault(); if (finished) return; const result = session.answer(input.value); if (result.answered) session.nextQuestion(); input.value = ''; renderQuestion(); update(); input.focus(); });
-    renderQuestion(); update(); timerId = window.setInterval(update, 250); input.focus(); content.appendChild(shell);
+    function update() {
+      const elapsed = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
+      const remaining = Math.max(0, session.durationSeconds - elapsed);
+      time.textContent = `${remaining}s`;
+      score.textContent = String(session.score);
+      if (remaining <= 0) void finishSkill();
+    }
+    function renderQuestion() { prompt.textContent = session.question.text; }
+
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      if (finished) return;
+      const result = session.answer(input.value);
+      if (result.answered) session.nextQuestion();
+      input.value = '';
+      renderQuestion();
+      update();
+      input.focus();
+    });
+
+    renderQuestion();
+    update();
+    timerId = window.setInterval(update, 250);
+    input.focus();
+    content.appendChild(card);
   }
 
   function renderResult() {
-    content.replaceChildren(); const skill = getSkillDefinition(skillId); const result = documentRef.createElement('section'); result.className = 'skill-result';
-    const heading = documentRef.createElement('h2'); heading.textContent = 'Klaar!'; const score = documentRef.createElement('p'); score.className = 'skill-result-score'; score.textContent = String(session.score); const label = documentRef.createElement('p'); label.textContent = 'goede antwoorden'; result.append(heading, score, label);
-    if (highScore != null) { const best = documentRef.createElement('p'); best.textContent = `Beste score: ${highScore}`; result.appendChild(best); }
-    const retry = documentRef.createElement('button'); retry.type = 'button'; retry.textContent = 'Opnieuw'; retry.addEventListener('click', () => openSkill(skill.id, session.durationSeconds));
-    const back = documentRef.createElement('button'); back.type = 'button'; back.textContent = 'Terug naar Skills'; back.addEventListener('click', goSkills); result.append(retry, back); content.appendChild(result);
+    content.replaceChildren();
+    const skill = getSkillDefinition(skillId);
+    const card = documentRef.createElement('section');
+    card.className = 'paco-template-card';
+    const heading = documentRef.createElement('h2');
+    heading.textContent = 'Klaar!';
+    const score = documentRef.createElement('h2');
+    score.textContent = String(session.score);
+    const label = documentRef.createElement('p');
+    label.textContent = 'goede antwoorden';
+    card.append(heading, score, label);
+    if (highScore != null) {
+      const best = documentRef.createElement('p');
+      best.textContent = `Beste score: ${highScore}`;
+      card.appendChild(best);
+    }
+    const retry = documentRef.createElement('button');
+    retry.type = 'button';
+    retry.className = 'success';
+    retry.textContent = 'Opnieuw';
+    retry.addEventListener('click', () => openSkill(skill.id, session.durationSeconds));
+    const back = documentRef.createElement('button');
+    back.type = 'button';
+    back.className = 'secondary';
+    back.textContent = 'Terug naar Skills';
+    back.addEventListener('click', goSkills);
+    card.append(retry, back);
+    content.appendChild(card);
   }
 
   async function mount() {

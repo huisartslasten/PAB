@@ -2,7 +2,15 @@ import { mountPacoPageTemplate, createPacoDropdown } from '../../components/page
 import { createPacoNavigation } from '../../components/page-navigation.js';
 import { getMathOperationPolicy } from '../skills/math/math-profile-registry.js';
 
-const OPERATION_LABELS = Object.freeze({ addition: 'Optellen', subtraction: 'Aftrekken', multiplication: 'Vermenigvuldigen' });
+const OPERATION_LABELS = Object.freeze({
+  addition: 'Optellen',
+  subtraction: 'Aftrekken',
+  multiplication: 'Vermenigvuldigen',
+  division: 'Delen',
+  fraction: 'Breuken'
+});
+
+const FRACTION_OPERATION_LABELS = Object.freeze({ addition: 'Optellen', subtraction: 'Aftrekken', multiplication: 'Vermenigvuldigen', division: 'Delen' });
 
 function inputField(documentRef, label, value, type = 'text') {
   const wrapper = documentRef.createElement('label');
@@ -11,6 +19,35 @@ function inputField(documentRef, label, value, type = 'text') {
   const input = documentRef.createElement('input'); input.type = type; input.value = value == null ? '' : String(value);
   wrapper.append(caption, input);
   return { wrapper, input };
+}
+
+function defaultRange(min = 1, max = 10) { return { min, max }; }
+function defaultDefinition(operation = 'addition') {
+  if (operation === 'fraction') return { kind: 'math', operation, fractionOperation: 'addition', fractionOperands: [{ numerator: defaultRange(1, 9), denominator: defaultRange(2, 10) }, { numerator: defaultRange(1, 9), denominator: defaultRange(2, 10) }], simplifyAnswer: true };
+  if (operation === 'division') return { kind: 'math', operation, operands: [defaultRange(1, 100), defaultRange(1, 10)], remainderAllowed: false };
+  return { kind: 'math', operation, operands: [defaultRange(1, 10), defaultRange(1, 10)] };
+}
+
+function ensureDefinitionShape(definition) {
+  const operation = OPERATION_LABELS[definition?.operation] ? definition.operation : 'addition';
+  const next = defaultDefinition(operation);
+  if (definition?.kind === 'math' && definition.operation === operation) Object.assign(next, definition);
+  return next;
+}
+
+function rangeEditor(documentRef, section, draft, path, label) {
+  const range = path.reduce((value, key) => value?.[key], draft.definition);
+  const normalized = range || defaultRange();
+  if (!range) {
+    let target = draft.definition;
+    path.slice(0, -1).forEach(key => { target[key] ||= {}; target = target[key]; });
+    target[path[path.length - 1]] = normalized;
+  }
+  const min = inputField(documentRef, `${label} — minimum`, normalized.min, 'number');
+  const max = inputField(documentRef, `${label} — maximum`, normalized.max, 'number');
+  min.input.addEventListener('input', () => { normalized.min = Number(min.input.value); });
+  max.input.addEventListener('input', () => { normalized.max = Number(max.input.value); });
+  section.append(min.wrapper, max.wrapper);
 }
 
 export function createSkillEditorRuntime({ app, templateMount, context, documentRef = document, navigate } = {}) {
@@ -26,29 +63,42 @@ export function createSkillEditorRuntime({ app, templateMount, context, document
     const source = skills.find(item => item.id === selectedId) || skills[0];
     if (!source) { content.textContent = 'Er zijn nog geen Skills beschikbaar.'; return; }
     selectedId = source.id;
-    const draft = { ...source, definition: { ...(source.definition || {}) } };
+    const draft = { ...source, definition: ensureDefinitionShape({ ...(source.definition || {}) }) };
     content.replaceChildren();
     const section = documentRef.createElement('section'); section.className = 'management-section';
     const heading = documentRef.createElement('div'); heading.className = 'page-heading'; const title = documentRef.createElement('h2'); title.textContent = 'Skill editor'; heading.appendChild(title); section.appendChild(heading);
     const selectorLabel = documentRef.createElement('label'); selectorLabel.className = 'management-link'; const selectorCaption = documentRef.createElement('strong'); selectorCaption.textContent = 'Skill'; const selector = documentRef.createElement('select');
-    skills.forEach(item => { const option = documentRef.createElement('option'); option.value = item.id; option.textContent = `${OPERATION_LABELS[item.definition?.operation] || 'Gemengd'} — ${item.title}`; option.selected = item.id === selectedId; selector.appendChild(option); });
+    skills.forEach(item => { const option = documentRef.createElement('option'); option.value = item.id; option.textContent = item.title; option.selected = item.id === selectedId; selector.appendChild(option); });
     selector.addEventListener('change', () => { selectedId = selector.value; renderEditor(); }); selectorLabel.append(selectorCaption, selector); section.appendChild(selectorLabel);
     const name = inputField(documentRef, 'Naam', draft.title); const description = inputField(documentRef, 'Beschrijving', draft.description); section.append(name.wrapper, description.wrapper);
     name.input.addEventListener('input', () => { draft.title = name.input.value; }); description.input.addEventListener('input', () => { draft.description = description.input.value; });
-    const definition = draft.definition;
-    if (definition.kind === 'math' && getMathOperationPolicy(definition.operation)) {
-      const operation = documentRef.createElement('label'); operation.className = 'management-link'; const opCaption = documentRef.createElement('strong'); opCaption.textContent = 'Bewerking';
-      const dropdown = createPacoDropdown({ options: Object.entries(OPERATION_LABELS).map(([value, label]) => ({ value, label })), value: definition.operation, onChange: value => { draft.definition.operation = value; renderEditor(); } });
-      operation.append(opCaption, dropdown.element); section.appendChild(operation);
-      getMathOperationPolicy(definition.operation).fields.forEach(field => {
-        const fieldLabel = field === 'operandMin' ? 'Minimum getal' : field === 'resultMax' ? 'Maximale uitkomst' : field === 'factorMin' ? 'Kleinste factor' : 'Grootste factor';
-        const fieldInput = inputField(documentRef, fieldLabel, definition[field], 'number');
-        fieldInput.input.addEventListener('input', () => { draft.definition[field] = Number(fieldInput.input.value); });
-        section.appendChild(fieldInput.wrapper);
-      });
-    } else if (definition.kind === 'mixed') {
-      const note = documentRef.createElement('p'); note.textContent = 'Gemengd is een samenstelling van rekenprofielen. De selectie voor leerlingen blijft in Skillbeheer.'; section.appendChild(note);
+
+    const operation = documentRef.createElement('label'); operation.className = 'management-link'; const opCaption = documentRef.createElement('strong'); opCaption.textContent = 'Bewerking';
+    const dropdown = createPacoDropdown({ options: Object.entries(OPERATION_LABELS).map(([value, label]) => ({ value, label })), value: draft.definition.operation, onChange: value => { draft.definition = defaultDefinition(value); renderEditor(); } });
+    operation.append(opCaption, dropdown.element); section.appendChild(operation);
+
+    if (draft.definition.operation === 'fraction') {
+      const fractionOperation = documentRef.createElement('label'); fractionOperation.className = 'management-link'; const caption = documentRef.createElement('strong'); caption.textContent = 'Bewerking met breuken';
+      const fractionDropdown = createPacoDropdown({ options: Object.entries(FRACTION_OPERATION_LABELS).map(([value, label]) => ({ value, label })), value: draft.definition.fractionOperation || 'addition', onChange: value => { draft.definition.fractionOperation = value; renderEditor(); } });
+      fractionOperation.append(caption, fractionDropdown.element); section.appendChild(fractionOperation);
+      rangeEditor(documentRef, section, draft, ['fractionOperands', 0, 'numerator'], 'Linker teller');
+      rangeEditor(documentRef, section, draft, ['fractionOperands', 0, 'denominator'], 'Linker noemer');
+      rangeEditor(documentRef, section, draft, ['fractionOperands', 1, 'numerator'], 'Rechter teller');
+      rangeEditor(documentRef, section, draft, ['fractionOperands', 1, 'denominator'], 'Rechter noemer');
+      const simplify = documentRef.createElement('label'); simplify.className = 'management-link'; const simplifyText = documentRef.createElement('strong'); simplifyText.textContent = 'Antwoord vereenvoudigen'; const checkbox = documentRef.createElement('input'); checkbox.type = 'checkbox'; checkbox.checked = draft.definition.simplifyAnswer !== false; checkbox.addEventListener('change', () => { draft.definition.simplifyAnswer = checkbox.checked; }); simplify.append(simplifyText, checkbox); section.appendChild(simplify);
+    } else {
+      rangeEditor(documentRef, section, draft, ['operands', 0], draft.definition.operation === 'division' ? 'Deler? Nee — eerste getal' : 'Eerste getal');
+      rangeEditor(documentRef, section, draft, ['operands', 1], draft.definition.operation === 'division' ? 'Tweede getal' : 'Tweede getal');
+      if (draft.definition.operation === 'addition') {
+        const resultMax = inputField(documentRef, 'Maximale uitkomst', draft.definition.resultMax, 'number');
+        resultMax.input.addEventListener('input', () => { draft.definition.resultMax = resultMax.input.value === '' ? undefined : Number(resultMax.input.value); });
+        section.appendChild(resultMax.wrapper);
+      }
+      if (draft.definition.operation === 'division') {
+        const remainder = documentRef.createElement('label'); remainder.className = 'management-link'; const remainderText = documentRef.createElement('strong'); remainderText.textContent = 'Rest toestaan'; const checkbox = documentRef.createElement('input'); checkbox.type = 'checkbox'; checkbox.checked = draft.definition.remainderAllowed === true; checkbox.addEventListener('change', () => { draft.definition.remainderAllowed = checkbox.checked; }); remainder.append(remainderText, checkbox); section.appendChild(remainder);
+      }
     }
+
     const actions = documentRef.createElement('div'); actions.className = 'management-links'; const save = documentRef.createElement('button'); save.type = 'button'; save.className = 'success'; save.textContent = 'Skill opslaan'; const status = documentRef.createElement('span'); status.className = 'skill-config-status'; actions.append(save, status); section.appendChild(actions);
     save.addEventListener('click', async () => { save.disabled = true; status.textContent = 'Opslaan…'; try { const saved = await app.skillDefinitions.save(draft); skills = skills.map(item => item.id === saved.id ? saved : item); status.textContent = 'Skill opgeslagen.'; } catch (error) { console.error('Skill definition save error:', error); status.textContent = error?.message || 'Opslaan mislukt.'; } finally { save.disabled = false; } });
     content.appendChild(section);

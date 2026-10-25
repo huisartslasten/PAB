@@ -10,7 +10,6 @@ export function createManagementRuntime({ app, templateMount, context, documentR
   const selectedStudent = context.student || '';
   const content = documentRef.createElement('div'); content.className = 'management-page';
   const state = documentRef.createElement('div'); state.className = 'management-state'; state.textContent = 'Beheer laden…'; content.appendChild(state);
-  const go = path => navigate(buildViewUrl(path, { student: selectedStudent, mode: 'management' }));
   const createAction = (label, description, path, extra = {}) => { const button = documentRef.createElement('button'); button.type = 'button'; button.className = 'management-action'; button.disabled = extra.requiresStudent !== false && !selectedStudent; const strong = documentRef.createElement('strong'); strong.textContent = label; const span = documentRef.createElement('span'); span.textContent = description; button.append(strong, span); button.addEventListener('click', () => { const target = buildViewUrl(path, { student: selectedStudent, mode: 'management', ...(extra.params || {}) }); if (extra.documentNavigation) window.location.href = target.toString(); else void navigate(target); }); return button; };
   const createToolGroup = (title, actions) => { const group = documentRef.createElement('section'); group.className = 'management-tool-group'; const heading = documentRef.createElement('h3'); heading.className = 'management-tool-group-title'; heading.textContent = title; const actionGrid = documentRef.createElement('div'); actionGrid.className = 'management-actions'; actionGrid.append(...actions); group.append(heading, actionGrid); return group; };
   function renderManagement() {
@@ -19,6 +18,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     section.append(
       createToolGroup('Lesbeheer', [createAction('📚 Les beheren', 'Bekijk de lessen van de actieve leerling en bewerk, archiveer of verwijder ze.', 'lessons.html'), createAction('➕ Les maken', 'Maak een nieuwe les voor de actieve leerling.', 'lesson-editor.html', { documentNavigation: true })]),
       createToolGroup('Leerstofbeheer', [createAction('🧠 Leerstof beheren', 'Bekijk de leerstof per vak en onderwerp.', 'lessons.html'), createAction('➕ Leerstof maken', 'Open direct de leerstofeditor. Kies daar het vak en onderwerp.', 'learning-material-editor.html', { documentNavigation: true })]),
+      createToolGroup('Challengebeheer', [createAction('🎯 Challenge-instellingen', 'Beheer centraal welke Challenges actief zijn en hoe vrijspelen, AI en spelregels werken.', 'challenge-settings.html', { requiresStudent: false })]),
       createToolGroup('Agenda', [createAction('📅 Agenda', 'Bekijk en beheer de agenda van de actieve leerling.', 'agenda.html'), createAction('🖨️ Maandkalender', 'Open de maandkalender van de actieve leerling.', 'month-calendar.html', { documentNavigation: true })])
     );
     content.replaceChildren(section);

@@ -1,14 +1,25 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
 import { getMathProfile, listMathProfiles, listMathProfilesByOperation } from './math-profile-registry.js';
 
-const assert = (condition, message) => {
-  if (!condition) throw new Error(message);
-};
+test('addition profiles include easy and larger ranges', () => {
+  const profiles = listMathProfiles();
+  assert.ok(profiles.some((profile) => profile.id === 'addition-easy'));
+  assert.equal(getMathProfile('addition-1000')?.resultMax, 1000);
+  assert.equal(getMathProfile('addition-10000')?.resultMax, 10000);
+});
 
-const profiles = listMathProfiles();
-assert(profiles.some((profile) => profile.id === 'addition-1000' && profile.maxResult === 1000), 'Addition to 1.000 must be available.');
-assert(profiles.some((profile) => profile.id === 'addition-easy'), 'Easy addition must remain available alongside harder profiles.');
-assert(listMathProfilesByOperation('subtraction').every((profile) => profile.operation === 'subtraction'), 'Operation filtering must remain scoped.');
-assert(getMathProfile('multiplication-1-10')?.maxFactor === 10, 'Multiplication profile must expose its configuration.');
-assert(getMathProfile('unknown') === null, 'Unknown profiles must resolve to null.');
+test('operation filtering stays scoped', () => {
+  assert.ok(listMathProfilesByOperation('subtraction').every((profile) => profile.operation === 'subtraction'));
+});
 
-console.log('Math profile registry smoke test passed.');
+test('multiplication profiles expose their factor ranges', () => {
+  assert.deepEqual(getMathProfile('multiplication-easy'), {
+    id: 'multiplication-easy', operation: 'multiplication', label: 'Makkelijk', factorMin: 2, factorMax: 5
+  });
+  assert.equal(getMathProfile('multiplication-1-10')?.factorMax, 10);
+});
+
+test('unknown profiles resolve to null', () => {
+  assert.equal(getMathProfile('unknown'), null);
+});

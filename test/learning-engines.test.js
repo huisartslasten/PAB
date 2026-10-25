@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createPracticeSession } from '../src/features/lessons/practice-engine.js';
 import { createTestSession } from '../src/features/lessons/test-engine.js';
-import { createQuestionSession } from '../src/features/lessons/question-engine.js';
+import { createQuestionSession } from '../src/features/lessons/question-session.js';
 
 test('practice session repeats until every item is mastered', () => {
   const session = createPracticeSession([{ id: 1, answer: 'Kat' }, { id: 2, answer: 'Hond' }]);
@@ -29,13 +29,16 @@ test('test session records answers and calculates a percentage', async () => {
   assert.deepEqual(session.result(), { correct: 1, total: 2, score: 50, answers: session.answers });
 });
 
-test('question session shows the entered answer together with the expected answer', () => {
-  const session = createQuestionSession([{ id: 1, question: 'Vraag', answer: 'Voorbeeld' }]);
-  assert.deepEqual(session.reveal('Mijn antwoord'), {
-    item: { id: 1, question: 'Vraag', answer: 'Voorbeeld' },
-    answer: 'Mijn antwoord',
-    expected: 'Voorbeeld'
-  });
-  assert.equal(session.next(true).done, true);
-  assert.deepEqual(session.results[0].selfAssessment, true);
+test('question session owns question ordering and progression', () => {
+  const session = createQuestionSession([
+    { id: 1, question: 'Vraag 1', answer: 'Voorbeeld 1' },
+    { id: 2, question: 'Vraag 2', answer: 'Voorbeeld 2' }
+  ], { random: () => 0 });
+
+  assert.equal(session.current().id, 1);
+  assert.equal(session.getState().complete, false);
+  assert.equal(session.next().id, 2);
+  assert.equal(session.getState().index, 1);
+  assert.equal(session.next(), null);
+  assert.equal(session.getState().complete, true);
 });

@@ -58,7 +58,7 @@ export function createSkillEditorRuntime({ app, templateMount, context, createMo
 
   function createMathDraft() {
     const id = `math-${crypto.randomUUID()}`;
-    return { id, category: 'math', title: 'Nieuwe Skill', description: '', definition: defaultDefinition('addition'), enabled: true, sortOrder: skills.length ? Math.max(...skills.map(item => item.sortOrder || 0)) + 10 : 10 };
+    return { id, category: 'math', title: OPERATION_LABELS.addition, description: '', definition: defaultDefinition('addition'), enabled: true, sortOrder: skills.length ? Math.max(...skills.map(item => item.sortOrder || 0)) + 10 : 10 };
   }
 
   function renderEditor() {
@@ -82,7 +82,13 @@ export function createSkillEditorRuntime({ app, templateMount, context, createMo
 
     const operation = documentRef.createElement('label'); operation.className = 'skill-editor-field skill-editor-operation';
     const opCaption = documentRef.createElement('strong'); opCaption.textContent = 'Bewerking';
-    const dropdown = createPacoDropdown({ options: Object.entries(OPERATION_LABELS).map(([value, label]) => ({ value, label })), value: draft.definition.operation, onChange: value => { draft.definition = defaultDefinition(value); renderEditor(); } });
+    const dropdown = createPacoDropdown({ options: Object.entries(OPERATION_LABELS).map(([value, label]) => ({ value, label })), value: draft.definition.operation, onChange: value => {
+      draft.definition = defaultDefinition(value);
+      if (createMode) {
+        skills = skills.map(item => item.id === source.id ? { ...item, title: OPERATION_LABELS[value], definition: draft.definition } : item);
+      }
+      renderEditor();
+    } });
     operation.append(opCaption, dropdown.element); section.appendChild(operation);
 
     const name = inputField(documentRef, 'Naam', draft.title); const description = inputField(documentRef, 'Beschrijving', draft.description); section.append(name.wrapper, description.wrapper);

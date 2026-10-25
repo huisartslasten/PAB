@@ -22,12 +22,12 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     ];
     if (app.auth.isMainAdministrator) {
       groups.splice(2, 0,
-        createToolGroup('Challengebeheer', [
-          createAction('🎯 Challenge-instellingen', 'Beheer centraal welke Challenges actief zijn en hoe vrijspelen, AI en spelregels werken.', 'challenge-settings.html', { requiresStudent: false })
-        ]),
         createToolGroup('Skillbeheer', [
           createAction('🧮 Skills beheren', 'Bepaal per leerling welke reken-Skills beschikbaar zijn.', 'skill-settings.html'),
           createAction('➕ Skills maken', 'Maak en bewerk centraal hoe reken-Skills werken.', 'skill-editor.html', { requiresStudent: false })
+        ]),
+        createToolGroup('Challengebeheer', [
+          createAction('🎯 Challenge-instellingen', 'Beheer centraal welke Challenges actief zijn en hoe vrijspelen, AI en spelregels werken.', 'challenge-settings.html', { requiresStudent: false })
         ])
       );
     }

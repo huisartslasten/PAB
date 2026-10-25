@@ -148,7 +148,7 @@ function createNavigationItem(item) {
 
   const button = document.createElement('button');
   button.type = 'button';
-  button.className = 'paco-template-nav-item' + (item.active ? ' active' : '') + (item.key === 'management' ? ' management' : '');
+  button.className = 'paco-template-nav-item' + (item.active ? ' active' : '') + (item.kind === 'management-mode' ? ' management' : '');
 
   let iconElement = null;
   if (item.icon) {
@@ -391,7 +391,6 @@ export function createPacoPageTemplate({
   const versionMarker = document.createElement('small');
   versionMarker.className = 'paco-template-version-badge';
   versionMarker.textContent = testVersion;
-  versionMarker.style.cssText = 'display:block;width:max-content;margin:-28px auto 10px;padding:0;background:transparent;border:0;border-radius:0;color:rgba(255,255,255,.72);font:600 10px/1 "Nunito",sans-serif;letter-spacing:.4px;box-shadow:none;text-shadow:none;';
   root.appendChild(versionMarker);
 
   return root;

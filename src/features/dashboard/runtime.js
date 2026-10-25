@@ -3,7 +3,7 @@ import { createPacoNavigation } from '../../components/page-navigation.js';
 import { buildViewUrl } from '../../core/view-context.js';
 import { getDashboardSubjects, getDashboardSubjectIcon, getDashboardAgendaItems } from './view-model.js';
 import { listStudents } from '../students/students.js';
-import { buildAvailableChallenges } from '../challenges/challenge-registry.js';
+import { buildAvailableChallenges, listChallengeDefinitions } from '../challenges/challenge-registry.js';
 
 export function createDashboardRuntime({ app, templateMount, chooserMount, context, documentRef = document, navigate } = {}) {
   if (!app) throw new TypeError('Dashboard runtime requires an app.');
@@ -130,9 +130,12 @@ export function createDashboardRuntime({ app, templateMount, chooserMount, conte
     const state = documentRef.createElement('div'); state.className = 'dashboard-state'; state.textContent = 'Dashboard laden…'; content.appendChild(state);
     try {
       const records = await app.loadLessons();
-      const passedLessonIds = await app.practiceResults.listPassedLessonIds(selectedStudent);
-      const activeLessons = app.mapLessons(records).filter(lesson => !lesson.archived && !lesson.deleted && passedLessonIds.includes(Number(lesson.id)));
-      render(records, buildAvailableChallenges(activeLessons));
+      const lessons = app.mapLessons(records).filter(lesson => !lesson.archived && !lesson.deleted);
+      const unlockedChallenges = await Promise.all(listChallengeDefinitions().map(async challenge => {
+        const unlockedLessonIds = await app.challengeUnlock.listUnlockedLessonIds(selectedStudent, challenge.id);
+        return [challenge.id, lessons.filter(lesson => unlockedLessonIds.includes(Number(lesson.id)))];
+      }));
+      render(records, buildAvailableChallenges(new Map(unlockedChallenges)));
     }
     catch (error) { console.error('Dashboard page load error:', error); state.textContent = 'Het dashboard kon niet worden geladen.'; }
   }

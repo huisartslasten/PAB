@@ -63,7 +63,7 @@ export function createChallengeConfigurationRuntime({ app, templateMount, docume
     content.replaceChildren(section);
   }
 
-  function renderConfiguration(configuration) {
+  function renderConfiguration(configuration, configurations, onSelect) {
     const unlock = { ...(configuration.unlock || {}) };
     const ai = { ...(configuration.ai || {}) };
     const distractors = { ...(ai.distractors || {}) };
@@ -78,6 +78,20 @@ export function createChallengeConfigurationRuntime({ app, templateMount, docume
     title.textContent = `Challenge: ${configuration.challengeKey}`;
     heading.appendChild(title);
     section.appendChild(heading);
+
+    if (configurations.length > 1) {
+      const selector = documentRef.createElement('select');
+      selector.className = 'challenge-config-selector';
+      configurations.forEach(item => {
+        const option = documentRef.createElement('option');
+        option.value = item.challengeKey;
+        option.textContent = item.challengeKey;
+        option.selected = item.challengeKey === configuration.challengeKey;
+        selector.appendChild(option);
+      });
+      selector.addEventListener('change', () => onSelect(selector.value));
+      section.insertBefore(createField(documentRef, 'Challenge', selector), section.firstChild);
+    }
 
     const form = documentRef.createElement('form');
     form.className = 'challenge-config-form';
@@ -123,12 +137,15 @@ export function createChallengeConfigurationRuntime({ app, templateMount, docume
     const gameTitle = documentRef.createElement('h3');
     gameTitle.textContent = 'Spel';
     const questionCount = createNumberInput(documentRef, game.questionCount ?? 11, 1, 100);
+    const fiftyFifty = createCheckbox(documentRef, '50/50', lifelines.fiftyFifty);
+    const askSomeone = createCheckbox(documentRef, 'Vraag iemand', lifelines.askSomeone);
+    const askAudience = createCheckbox(documentRef, 'Publiek', lifelines.askAudience);
     gameGroup.append(
       gameTitle,
       createField(documentRef, 'Aantal vragen', questionCount),
-      createCheckbox(documentRef, '50/50', lifelines.fiftyFifty),
-      createCheckbox(documentRef, 'Vraag iemand', lifelines.askSomeone),
-      createCheckbox(documentRef, 'Publiek', lifelines.askAudience)
+      fiftyFifty,
+      askSomeone,
+      askAudience
     );
 
     const actions = documentRef.createElement('div');
@@ -158,18 +175,20 @@ export function createChallengeConfigurationRuntime({ app, templateMount, docume
           questionCount: numberValue(questionCount.value, game.questionCount ?? 11),
           lifelines: {
             ...lifelines,
-            fiftyFifty: gameGroup.querySelectorAll('input[type="checkbox"]')[0]?.checked ?? false,
-            askSomeone: gameGroup.querySelectorAll('input[type="checkbox"]')[1]?.checked ?? false,
-            askAudience: gameGroup.querySelectorAll('input[type="checkbox"]')[2]?.checked ?? false
+            fiftyFifty: fiftyFifty.querySelector('input')?.checked ?? false,
+            askSomeone: askSomeone.querySelector('input')?.checked ?? false,
+            askAudience: askAudience.querySelector('input')?.checked ?? false
           }
         };
-        await app.challengeConfiguration.save(configuration.challengeKey, {
+        const saved = await app.challengeConfiguration.save(configuration.challengeKey, {
           enabled: enabled.querySelector('input')?.checked ?? false,
           unlock: { ...unlock, minimumScore: numberValue(minimumScore.value, unlock.minimumScore ?? 10) },
           ai: { ...nextAi, distractors: nextDistractors },
           game: nextGame
         });
         status.textContent = 'Opgeslagen.';
+        const index = configurations.findIndex(item => item.challengeKey === saved.challengeKey);
+        if (index >= 0) configurations[index] = saved;
       } catch (error) {
         console.error('Challenge configuration save error:', error);
         status.textContent = error?.message || 'Opslaan mislukt.';
@@ -203,7 +222,11 @@ export function createChallengeConfigurationRuntime({ app, templateMount, docume
         state.textContent = 'Er zijn nog geen Challenge-configuraties beschikbaar.';
         return;
       }
-      renderConfiguration(configurations[0]);
+      const renderSelected = challengeKey => {
+        const selected = configurations.find(item => item.challengeKey === challengeKey) || configurations[0];
+        renderConfiguration(selected, configurations, renderSelected);
+      };
+      renderSelected(configurations[0].challengeKey);
     } catch (error) {
       console.error('Challenge configuration load error:', error);
       state.textContent = 'Challenge-instellingen konden niet worden geladen.';

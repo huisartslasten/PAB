@@ -1,9 +1,17 @@
 // Canonical read boundary for assessment results used by Challenges.
-// Assessment persistence is read here; Challenge unlock rules are evaluated by
-// challenge-unlock-service, never by Challenge pages or runtimes.
+// Assessment persistence is read here; Challenge unlock rules remain owned by
+// challenge-unlock-service. The database RPC is a narrow read capability that
+// returns only lesson ids which meet the requested assessment threshold.
 
 function requireDb(db) {
-  if (!db || typeof db.from !== 'function') throw new Error('A Supabase client is required.');
+  if (!db || typeof db.from !== 'function' || typeof db.rpc !== 'function') {
+    throw new Error('A Supabase client with table and RPC access is required.');
+  }
+}
+
+function normalizeMinimumScore(value) {
+  const score = Number(value);
+  return Number.isFinite(score) && score >= 0 ? score : 0;
 }
 
 export function createPracticeResultService(db) {
@@ -43,5 +51,24 @@ export function createPracticeResultService(db) {
     return [...new Set(results.map(result => Number(result.lessonId)).filter(Number.isFinite))];
   }
 
-  return Object.freeze({ listAssessments, listPassedAssessments, listPassedLessonIds });
+  async function listLessonIdsMeetingScore(student = '', minimumScore = 0) {
+    const { data, error } = await db.rpc('list_student_passed_test_lesson_ids', {
+      p_student: String(student || '').trim(),
+      p_minimum_score: normalizeMinimumScore(minimumScore)
+    });
+    if (error) throw error;
+
+    return [...new Set(
+      (Array.isArray(data) ? data : [])
+        .map(row => Number(row?.lesson_id))
+        .filter(Number.isFinite)
+    )];
+  }
+
+  return Object.freeze({
+    listAssessments,
+    listPassedAssessments,
+    listPassedLessonIds,
+    listLessonIdsMeetingScore
+  });
 }

@@ -40,7 +40,7 @@ function rangeEditor(documentRef, section, draft, path, label) {
   section.append(min.wrapper, max.wrapper);
 }
 
-export function createSkillEditorRuntime({ app, templateMount, context, documentRef = document, navigate } = {}) {
+export function createSkillEditorRuntime({ app, templateMount, context, createMode = false, category = 'math', documentRef = document, navigate } = {}) {
   if (!app) throw new TypeError('Skill editor runtime requires an app.');
   if (!templateMount) throw new TypeError('Skill editor runtime requires a template mount.');
   if (typeof navigate !== 'function') throw new TypeError('Skill editor runtime requires a navigation owner.');
@@ -49,10 +49,9 @@ export function createSkillEditorRuntime({ app, templateMount, context, document
   let skills = []; let selectedId = '';
   const goBack = () => navigate(new URL(`management.html?student=${encodeURIComponent(context?.student || '')}&mode=management`, window.location.href));
   function renderDenied() { const section = documentRef.createElement('section'); section.className = 'management-section'; const title = documentRef.createElement('h2'); title.textContent = 'Skill editor'; const message = documentRef.createElement('p'); message.textContent = 'Alleen de hoofdbeheerder kan Skills bewerken.'; section.append(title, message); content.replaceChildren(section); }
-  function createNewSkill() {
+  function createMathDraft() {
     const id = `math-${crypto.randomUUID()}`;
-    const skill = { id, category: 'math', title: 'Nieuwe Skill', description: '', definition: defaultDefinition('addition'), enabled: true, sortOrder: skills.length ? Math.max(...skills.map(item => item.sortOrder || 0)) + 10 : 10 };
-    skills = [...skills, skill]; selectedId = id; renderEditor();
+    return { id, category: 'math', title: 'Nieuwe Skill', description: '', definition: defaultDefinition('addition'), enabled: true, sortOrder: skills.length ? Math.max(...skills.map(item => item.sortOrder || 0)) + 10 : 10 };
   }
   function renderEditor() {
     const source = skills.find(item => item.id === selectedId) || skills[0];
@@ -61,13 +60,14 @@ export function createSkillEditorRuntime({ app, templateMount, context, document
     const draft = { ...source, definition: ensureDefinitionShape({ ...(source.definition || {}) }) };
     content.replaceChildren();
     const section = documentRef.createElement('section'); section.className = 'management-section';
-    const heading = documentRef.createElement('div'); heading.className = 'page-heading'; const title = documentRef.createElement('h2'); title.textContent = 'Skill editor'; heading.appendChild(title); section.appendChild(heading);
-    const selectorActions = documentRef.createElement('div'); selectorActions.className = 'management-links';
-    const selectorLabel = documentRef.createElement('label'); selectorLabel.className = 'management-link'; const selectorCaption = documentRef.createElement('strong'); selectorCaption.textContent = 'Skill'; const selector = documentRef.createElement('select');
-    skills.forEach(item => { const option = documentRef.createElement('option'); option.value = item.id; option.textContent = item.title; option.selected = item.id === selectedId; selector.appendChild(option); });
-    selector.addEventListener('change', () => { selectedId = selector.value; renderEditor(); }); selectorLabel.append(selectorCaption, selector);
-    const newSkill = documentRef.createElement('button'); newSkill.type = 'button'; newSkill.className = 'secondary'; newSkill.textContent = 'Nieuwe Skill'; newSkill.addEventListener('click', createNewSkill);
-    selectorActions.append(selectorLabel, newSkill); section.appendChild(selectorActions);
+    const heading = documentRef.createElement('div'); heading.className = 'page-heading'; const title = documentRef.createElement('h2'); title.textContent = createMode ? 'Rekenen — nieuwe Skill' : 'Skill editor'; heading.appendChild(title); section.appendChild(heading);
+
+    if (!createMode) {
+      const selectorLabel = documentRef.createElement('label'); selectorLabel.className = 'management-link'; const selectorCaption = documentRef.createElement('strong'); selectorCaption.textContent = 'Skill'; const selector = documentRef.createElement('select');
+      skills.forEach(item => { const option = documentRef.createElement('option'); option.value = item.id; option.textContent = item.title; option.selected = item.id === selectedId; selector.appendChild(option); });
+      selector.addEventListener('change', () => { selectedId = selector.value; renderEditor(); }); selectorLabel.append(selectorCaption, selector); section.appendChild(selectorLabel);
+    }
+
     const name = inputField(documentRef, 'Naam', draft.title); const description = inputField(documentRef, 'Beschrijving', draft.description); section.append(name.wrapper, description.wrapper);
     name.input.addEventListener('input', () => { draft.title = name.input.value; }); description.input.addEventListener('input', () => { draft.description = description.input.value; });
 
@@ -104,8 +104,19 @@ export function createSkillEditorRuntime({ app, templateMount, context, document
   async function mount() {
     const session = await app.initializeSession(); if (!session) { window.location.href = 'auth.html'; return; }
     if (!app.auth.isMainAdministrator) { renderDenied(); return; }
-    mountPacoPageTemplate({ mount: templateMount, backLabel: '← Beheer', backAction: goBack, greeting: 'PAB beheer ⚙️', title: 'Skill editor', icon: '🧮', subtitle: 'Bewerk centraal hoe reken-Skills werken.', navigation: createPacoNavigation({ app, active: 'dashboard', student: context?.student || '', viewMode: 'management', includeManagementTools: false, includeCreator: false, navigate }), content });
-    try { skills = await app.skillDefinitions.list({ category: 'math' }); selectedId = context?.skill || skills[0]?.id || ''; renderEditor(); } catch (error) { console.error('Skill definition load error:', error); state.textContent = 'Skill editor kon niet worden geladen.'; }
+    if (createMode && category !== 'math') { state.textContent = 'Deze Skill-editor is nog niet beschikbaar.'; return; }
+    mountPacoPageTemplate({ mount: templateMount, backLabel: '← Beheer', backAction: goBack, greeting: 'PAB beheer ⚙️', title: createMode ? 'Skill maken' : 'Skill editor', icon: '🧮', subtitle: createMode ? 'Stel de nieuwe reken-Skill in.' : 'Bewerk centraal hoe reken-Skills werken.', navigation: createPacoNavigation({ app, active: 'dashboard', student: context?.student || '', viewMode: 'management', includeManagementTools: false, includeCreator: false, navigate }), content });
+    try {
+      skills = await app.skillDefinitions.list({ category: 'math' });
+      if (createMode) {
+        const draft = createMathDraft();
+        skills = [...skills, draft];
+        selectedId = draft.id;
+      } else {
+        selectedId = context?.skill || skills[0]?.id || '';
+      }
+      renderEditor();
+    } catch (error) { console.error('Skill definition load error:', error); state.textContent = 'Skill editor kon niet worden geladen.'; }
   }
   return Object.freeze({ mount, content });
 }

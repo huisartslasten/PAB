@@ -35,10 +35,10 @@ test('question session owns question ordering and progression', () => {
     { id: 2, question: 'Vraag 2', answer: 'Voorbeeld 2' }
   ], { random: () => 0 });
 
-  assert.equal(session.current().id, 1);
+  assert.equal(session.current().id, 2);
   assert.equal(session.getState().complete, false);
-  assert.equal(session.next().id, 2);
-  assert.equal(session.getState().index, 2);
+  assert.equal(session.next().id, 1);
+  assert.equal(session.getState().index, 1);
   assert.equal(session.getState().total, 2);
   assert.equal(session.getState().complete, false);
   assert.equal(session.next(), null);

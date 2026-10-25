@@ -1,32 +1,25 @@
-const OPERATION_RANGES = Object.freeze({
-  addition: Object.freeze({ min: 1, max: 20 }),
-  subtraction: Object.freeze({ min: 10, max: 50 }),
-  multiplication: Object.freeze({ min: 2, max: 10 })
-});
+import { getMathProfile, listMathProfiles } from './math-profile-registry.js';
 
 function randomInt(min, max, random = Math.random) {
   return Math.floor(random() * (max - min + 1)) + min;
 }
 
-function createAddition(random) {
-  const range = OPERATION_RANGES.addition;
-  const a = randomInt(range.min, range.max, random);
-  const b = randomInt(range.min, range.max, random);
-  return Object.freeze({ operation: 'addition', a, b, answer: a + b, text: `${a} + ${b}` });
+function createAddition(profile, random) {
+  const a = randomInt(profile.operandMin, profile.resultMax - profile.operandMin, random);
+  const b = randomInt(profile.operandMin, profile.resultMax - a, random);
+  return Object.freeze({ operation: 'addition', profileId: profile.id, a, b, answer: a + b, text: `${a} + ${b}` });
 }
 
-function createSubtraction(random) {
-  const range = OPERATION_RANGES.subtraction;
-  const a = randomInt(range.min, range.max, random);
-  const b = randomInt(0, a, random);
-  return Object.freeze({ operation: 'subtraction', a, b, answer: a - b, text: `${a} - ${b}` });
+function createSubtraction(profile, random) {
+  const a = randomInt(profile.operandMin, profile.resultMax, random);
+  const b = randomInt(profile.operandMin, a, random);
+  return Object.freeze({ operation: 'subtraction', profileId: profile.id, a, b, answer: a - b, text: `${a} - ${b}` });
 }
 
-function createMultiplication(random) {
-  const range = OPERATION_RANGES.multiplication;
-  const a = randomInt(range.min, range.max, random);
-  const b = randomInt(range.min, range.max, random);
-  return Object.freeze({ operation: 'multiplication', a, b, answer: a * b, text: `${a} × ${b}` });
+function createMultiplication(profile, random) {
+  const a = randomInt(profile.factorMin, profile.factorMax, random);
+  const b = randomInt(profile.factorMin, profile.factorMax, random);
+  return Object.freeze({ operation: 'multiplication', profileId: profile.id, a, b, answer: a * b, text: `${a} × ${b}` });
 }
 
 const GENERATORS = Object.freeze({
@@ -35,15 +28,18 @@ const GENERATORS = Object.freeze({
   multiplication: createMultiplication
 });
 
-export function createMathQuestion(operation, random = Math.random) {
-  const key = String(operation ?? '').trim();
-  if (key === 'mixed') {
-    const operations = Object.keys(GENERATORS);
-    return GENERATORS[operations[randomInt(0, operations.length - 1, random)]](random);
-  }
-  const generator = GENERATORS[key];
-  if (!generator) throw new Error(`Unsupported math operation: ${key}`);
-  return generator(random);
+export function createMathQuestion(profileId, random = Math.random) {
+  const key = String(profileId ?? '').trim();
+  const profile = getMathProfile(key);
+  if (!profile) throw new Error(`Unsupported math profile: ${key}`);
+  const generator = GENERATORS[profile.operation];
+  return generator(profile, random);
+}
+
+export function createMixedMathQuestion(profileIds, random = Math.random) {
+  const ids = [...new Set((profileIds || []).map((id) => String(id).trim()).filter(Boolean))];
+  if (!ids.length) throw new Error('At least one math profile is required for mixed practice.');
+  return createMathQuestion(ids[randomInt(0, ids.length - 1, random)], random);
 }
 
 export function evaluateMathAnswer(question, value) {
@@ -56,17 +52,23 @@ export function evaluateMathAnswer(question, value) {
   });
 }
 
-export function createMathSession({ durationSeconds = 180, operation, random = Math.random } = {}) {
+export function createMathSession({ durationSeconds = 180, profileId, mixedProfileIds, random = Math.random } = {}) {
   const duration = Number(durationSeconds);
   if (!Number.isInteger(duration) || duration <= 0) throw new Error('A positive duration is required.');
-  let question = createMathQuestion(operation, random);
+  const mixed = Array.isArray(mixedProfileIds);
+  if (!profileId && !mixed) throw new Error('A math profile is required.');
+  const createQuestion = mixed
+    ? () => createMixedMathQuestion(mixedProfileIds, random)
+    : () => createMathQuestion(profileId, random);
+  let question = createQuestion();
   let score = 0;
   let answered = 0;
   let correct = 0;
 
   return Object.freeze({
     durationSeconds: duration,
-    operation,
+    profileId: profileId || null,
+    mixedProfileIds: mixed ? [...mixedProfileIds] : null,
     get score() { return score; },
     get answered() { return answered; },
     get correct() { return correct; },
@@ -83,8 +85,12 @@ export function createMathSession({ durationSeconds = 180, operation, random = M
       return result;
     },
     nextQuestion() {
-      question = createMathQuestion(operation, random);
+      question = createQuestion();
       return question;
     }
   });
+}
+
+export function listDefaultMixedProfileIds() {
+  return listMathProfiles().map((profile) => profile.id);
 }

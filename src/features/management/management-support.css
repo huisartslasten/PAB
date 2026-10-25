@@ -37,6 +37,22 @@
 .skill-config-actions button{min-height:46px}
 .skill-config-status{color:var(--paco-muted);font-weight:800}
 
+.skill-management-catalog,.skill-config-assignment{display:grid;gap:20px}
+.skill-management-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.skill-management-toolbar h2,.skill-config-assignment h2{margin:0;color:var(--paco-text);font:900 30px/1.05 "Baloo 2",Nunito,sans-serif}
+.skill-management-toolbar p,.skill-config-assignment>p{margin:4px 0 0;color:var(--paco-muted);font-weight:700}
+.skill-management-group{display:grid;gap:12px}
+.skill-management-group>h3{margin:0;color:var(--paco-text);font:900 23px/1.05 "Baloo 2",Nunito,sans-serif}
+.skill-management-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.skill-management-card{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:16px;padding:18px}
+.skill-management-card-body{min-width:0}
+.skill-management-card-body h3{margin:0;color:var(--paco-text);font:900 21px/1.1 "Baloo 2",Nunito,sans-serif}
+.skill-management-card-body p{margin:5px 0 9px;color:#38577d;line-height:1.35}
+.skill-management-status{display:inline-flex;width:max-content;padding:4px 9px;border-radius:999px;background:#e4f7e9;color:#19743b;font-size:12px;font-weight:900}
+.skill-management-status.is-disabled{background:#eef1f5;color:#607086}
+.skill-management-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+@media(max-width:900px){.skill-management-grid{grid-template-columns:1fr}}
+
 .management-tool-group{display:grid;gap:10px;padding:16px;border:1px solid var(--paco-border);border-radius:18px;background:#f7fbff}
 .management-tool-group-title{margin:0;color:var(--paco-text);font-size:22px;line-height:1.1;font-weight:900}
 .management-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
@@ -59,4 +75,4 @@
 .management-recovery-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
 @media(max-width:800px){.management-recovery-grid{grid-template-columns:1fr}}
 @media(max-width:700px){.management-actions{grid-template-columns:1fr}}
-@media(max-width:620px){.skill-editor-range-grid,.skill-config-choices{grid-template-columns:1fr}}
+@media(max-width:620px){.skill-editor-range-grid,.skill-config-choices{grid-template-columns:1fr}.skill-management-card{grid-template-columns:1fr}.skill-management-actions{justify-content:flex-start}}

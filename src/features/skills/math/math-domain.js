@@ -1,5 +1,3 @@
-import { getMathProfile, listMathProfiles } from './math-profile-registry.js';
-
 function randomInt(min, max, random = Math.random) {
   return Math.floor(random() * (max - min + 1)) + min;
 }
@@ -22,75 +20,52 @@ function createMultiplication(profile, random) {
   return Object.freeze({ operation: 'multiplication', profileId: profile.id, a, b, answer: a * b, text: `${a} × ${b}` });
 }
 
-const GENERATORS = Object.freeze({
-  addition: createAddition,
-  subtraction: createSubtraction,
-  multiplication: createMultiplication
-});
+const GENERATORS = Object.freeze({ addition: createAddition, subtraction: createSubtraction, multiplication: createMultiplication });
 
-export function createMathQuestion(profileId, random = Math.random) {
-  const key = String(profileId ?? '').trim();
-  const profile = getMathProfile(key);
-  if (!profile) throw new Error(`Unsupported math profile: ${key}`);
-  const generator = GENERATORS[profile.operation];
-  return generator(profile, random);
+function normalizeProfile(profile) {
+  const value = profile && typeof profile === 'object' ? profile : null;
+  if (!value?.id || !value?.definition?.operation) throw new Error('A valid math profile is required.');
+  return Object.freeze({ id: String(value.id), ...value.definition });
 }
 
-export function createMixedMathQuestion(profileIds, random = Math.random) {
-  const ids = [...new Set((profileIds || []).map((id) => String(id).trim()).filter(Boolean))];
-  if (!ids.length) throw new Error('At least one math profile is required for mixed practice.');
-  return createMathQuestion(ids[randomInt(0, ids.length - 1, random)], random);
+export function createMathQuestion(profile, random = Math.random) {
+  const normalized = normalizeProfile(profile);
+  const generator = GENERATORS[normalized.operation];
+  if (!generator) throw new Error(`Unsupported math operation: ${normalized.operation}`);
+  return generator(normalized, random);
+}
+
+export function createMixedMathQuestion(profiles, random = Math.random) {
+  const normalized = [...new Map((profiles || []).map(profile => [String(profile?.id || ''), profile]).filter(([id]) => id)) .values()];
+  if (!normalized.length) throw new Error('At least one math profile is required for mixed practice.');
+  return createMathQuestion(normalized[randomInt(0, normalized.length - 1, random)], random);
 }
 
 export function evaluateMathAnswer(question, value) {
   const normalized = String(value ?? '').trim();
   if (!normalized) return Object.freeze({ correct: false, answered: false });
   const numeric = Number(normalized);
-  return Object.freeze({
-    correct: Number.isFinite(numeric) && numeric === question.answer,
-    answered: true
-  });
+  return Object.freeze({ correct: Number.isFinite(numeric) && numeric === question.answer, answered: true });
 }
 
-export function createMathSession({ durationSeconds = 180, profileId, mixedProfileIds, random = Math.random } = {}) {
+export function createMathSession({ durationSeconds = 180, profile, mixedProfiles, random = Math.random } = {}) {
   const duration = Number(durationSeconds);
   if (!Number.isInteger(duration) || duration <= 0) throw new Error('A positive duration is required.');
-  const mixed = Array.isArray(mixedProfileIds);
-  if (!profileId && !mixed) throw new Error('A math profile is required.');
-  const createQuestion = mixed
-    ? () => createMixedMathQuestion(mixedProfileIds, random)
-    : () => createMathQuestion(profileId, random);
+  if (!profile && !Array.isArray(mixedProfiles)) throw new Error('A math profile is required.');
+  const createQuestion = Array.isArray(mixedProfiles) ? () => createMixedMathQuestion(mixedProfiles, random) : () => createMathQuestion(profile, random);
   let question = createQuestion();
   let score = 0;
   let answered = 0;
   let correct = 0;
-
   return Object.freeze({
     durationSeconds: duration,
-    profileId: profileId || null,
-    mixedProfileIds: mixed ? [...mixedProfileIds] : null,
+    profileId: profile?.id || null,
+    mixedProfileIds: Array.isArray(mixedProfiles) ? mixedProfiles.map(item => item.id) : null,
     get score() { return score; },
     get answered() { return answered; },
     get correct() { return correct; },
     get question() { return question; },
-    answer(value) {
-      const result = evaluateMathAnswer(question, value);
-      if (result.answered) {
-        answered += 1;
-        if (result.correct) {
-          correct += 1;
-          score += 1;
-        }
-      }
-      return result;
-    },
-    nextQuestion() {
-      question = createQuestion();
-      return question;
-    }
+    answer(value) { const result = evaluateMathAnswer(question, value); if (result.answered) { answered += 1; if (result.correct) { correct += 1; score += 1; } } return result; },
+    nextQuestion() { question = createQuestion(); return question; }
   });
-}
-
-export function listDefaultMixedProfileIds() {
-  return listMathProfiles().map((profile) => profile.id);
 }

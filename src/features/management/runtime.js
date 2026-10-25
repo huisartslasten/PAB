@@ -4,7 +4,7 @@ import { buildViewUrl } from '../../core/view-context.js';
 
 export function createManagementRuntime({ app, templateMount, context, documentRef = document, navigate } = {}) {
   if (!app) throw new TypeError('Management runtime requires an app.');
-  if (!templateMount) throw new TypeError('Management runtime requires a template mount.');
+  if (!templateMount) throw new TypeError('Management runtime requires template mount.');
   if (!context) throw new TypeError('Management runtime requires a view context.');
   if (typeof navigate !== 'function') throw new TypeError('Management runtime requires a navigation owner.');
   const selectedStudent = context.student || '';
@@ -24,7 +24,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
       groups.splice(2, 0,
         createToolGroup('Skillbeheer', [
           createAction('🧮 Skills beheren', 'Bepaal per leerling welke reken-Skills beschikbaar zijn.', 'skill-settings.html'),
-          createAction('➕ Skills maken', 'Maak en bewerk centraal hoe reken-Skills werken.', 'skill-editor.html', { requiresStudent: false })
+          createAction('➕ Skills maken', 'Kies eerst welk type Skill je wilt maken.', 'skill-create.html', { requiresStudent: false })
         ]),
         createToolGroup('Challengebeheer', [
           createAction('🎯 Challenge-instellingen', 'Beheer centraal welke Challenges actief zijn en hoe vrijspelen, AI en spelregels werken.', 'challenge-settings.html', { requiresStudent: false })

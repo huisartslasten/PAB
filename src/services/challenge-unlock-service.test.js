@@ -2,14 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createChallengeUnlockService, meetsAssessmentUnlockPolicy } from './challenge-unlock-service.js';
 
-test('assessment unlock policy uses configured minimum score', () => {
-  assert.equal(meetsAssessmentUnlockPolicy({ score: 8, total_questions: 10 }, { type: 'assessment-score', minimumScore: 8 }), true);
-  assert.equal(meetsAssessmentUnlockPolicy({ score: 7, total_questions: 10 }, { type: 'assessment-score', minimumScore: 8 }), false);
+test('assessment unlock policy uses the canonical assessment result contract', () => {
+  assert.equal(meetsAssessmentUnlockPolicy({ score: 8, totalQuestions: 10 }, { type: 'assessment-score', minimumScore: 8 }), true);
+  assert.equal(meetsAssessmentUnlockPolicy({ score: 7, totalQuestions: 10 }, { type: 'assessment-score', minimumScore: 8 }), false);
 });
 
 test('assessment unlock policy rejects invalid assessment totals', () => {
-  assert.equal(meetsAssessmentUnlockPolicy({ score: 10, total_questions: 0 }, { type: 'assessment-score', minimumScore: 8 }), false);
-  assert.equal(meetsAssessmentUnlockPolicy({ score: 10, total_questions: 10 }, { type: 'unsupported', minimumScore: 8 }), false);
+  assert.equal(meetsAssessmentUnlockPolicy({ score: 10, totalQuestions: 0 }, { type: 'assessment-score', minimumScore: 8 }), false);
+  assert.equal(meetsAssessmentUnlockPolicy({ score: 10, totalQuestions: 10 }, { type: 'unsupported', minimumScore: 8 }), false);
 });
 
 test('challenge unlock service resolves lesson ids through central configuration', async () => {

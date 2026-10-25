@@ -1,7 +1,8 @@
 // Canonical read boundary for assessment results used by Challenges.
 // Assessment persistence is read here; Challenge unlock rules remain owned by
 // challenge-unlock-service. The database RPC is a narrow read capability that
-// returns only lesson ids which meet the requested assessment threshold.
+// returns only lesson ids which meet the requested assessment threshold and
+// explicitly allowed lesson types.
 
 function requireDb(db) {
   if (!db || typeof db.from !== 'function' || typeof db.rpc !== 'function') {
@@ -12,6 +13,11 @@ function requireDb(db) {
 function normalizeMinimumScore(value) {
   const score = Number(value);
   return Number.isFinite(score) && score >= 0 ? score : 0;
+}
+
+function normalizeAllowedLessonTypes(value) {
+  if (!Array.isArray(value)) return [];
+  return [...new Set(value.map(item => String(item || '').trim()).filter(Boolean))];
 }
 
 export function createPracticeResultService(db) {
@@ -51,10 +57,14 @@ export function createPracticeResultService(db) {
     return [...new Set(results.map(result => Number(result.lessonId)).filter(Number.isFinite))];
   }
 
-  async function listLessonIdsMeetingScore(student = '', minimumScore = 0) {
+  async function listLessonIdsMeetingScore(student = '', minimumScore = 0, allowedLessonTypes = []) {
+    const normalizedLessonTypes = normalizeAllowedLessonTypes(allowedLessonTypes);
+    if (!normalizedLessonTypes.length) return [];
+
     const { data, error } = await db.rpc('list_student_passed_test_lesson_ids', {
       p_student: String(student || '').trim(),
-      p_minimum_score: normalizeMinimumScore(minimumScore)
+      p_minimum_score: normalizeMinimumScore(minimumScore),
+      p_allowed_lesson_types: normalizedLessonTypes
     });
     if (error) throw error;
 

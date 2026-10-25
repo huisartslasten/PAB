@@ -7,6 +7,11 @@ function normalizeMinimumScore(value) {
   return Number.isFinite(score) && score >= 0 ? score : 0;
 }
 
+function normalizeAllowedLessonTypes(value) {
+  if (!Array.isArray(value)) return [];
+  return [...new Set(value.map(item => String(item || '').trim()).filter(Boolean))];
+}
+
 export function createChallengeUnlockService({ challengeConfiguration, practiceResults }) {
   if (!challengeConfiguration || !practiceResults) {
     throw new Error('Challenge configuration and practice results services are required.');
@@ -20,7 +25,10 @@ export function createChallengeUnlockService({ challengeConfiguration, practiceR
     if (type !== 'assessment-score') return [];
 
     const minimumScore = normalizeMinimumScore(configuration.unlock?.minimumScore);
-    return practiceResults.listLessonIdsMeetingScore(student, minimumScore);
+    const allowedLessonTypes = normalizeAllowedLessonTypes(configuration.unlock?.allowedLessonTypes);
+    if (!allowedLessonTypes.length) return [];
+
+    return practiceResults.listLessonIdsMeetingScore(student, minimumScore, allowedLessonTypes);
   }
 
   return Object.freeze({ listUnlockedLessonIds });

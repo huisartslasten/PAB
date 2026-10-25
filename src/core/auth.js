@@ -1,8 +1,9 @@
-// Authentication boundary for the professional PacoGO architecture.
+// Authentication boundary for the professional PAB architecture.
 // Session lifecycle is composed here; role membership is owned by auth-authorization.
 
 import {
   isParentSession,
+  isMainAdministratorSession,
   isCreatorSession
 } from './auth-authorization.js';
 
@@ -23,6 +24,9 @@ export function createAuthState(session = null) {
     },
     get isParent() {
       return isParentSession(currentSession);
+    },
+    get isMainAdministrator() {
+      return isMainAdministratorSession(currentSession);
     },
     get isCreator() {
       return isCreatorSession(currentSession);
@@ -46,4 +50,8 @@ export function createAuthState(session = null) {
   });
 }
 
-export { isParentSession, isCreatorSession };
+export {
+  isParentSession,
+  isMainAdministratorSession,
+  isCreatorSession
+};

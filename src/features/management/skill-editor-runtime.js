@@ -1,24 +1,14 @@
 import { mountPacoPageTemplate, createPacoDropdown } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
-import { getMathOperationPolicy } from '../skills/math/math-profile-registry.js';
 
-const OPERATION_LABELS = Object.freeze({
-  addition: 'Optellen',
-  subtraction: 'Aftrekken',
-  multiplication: 'Vermenigvuldigen',
-  division: 'Delen',
-  fraction: 'Breuken'
-});
-
+const OPERATION_LABELS = Object.freeze({ addition: 'Optellen', subtraction: 'Aftrekken', multiplication: 'Vermenigvuldigen', division: 'Delen', fraction: 'Breuken' });
 const FRACTION_OPERATION_LABELS = Object.freeze({ addition: 'Optellen', subtraction: 'Aftrekken', multiplication: 'Vermenigvuldigen', division: 'Delen' });
 
 function inputField(documentRef, label, value, type = 'text') {
-  const wrapper = documentRef.createElement('label');
-  wrapper.className = 'management-link';
+  const wrapper = documentRef.createElement('label'); wrapper.className = 'management-link';
   const caption = documentRef.createElement('strong'); caption.textContent = label;
   const input = documentRef.createElement('input'); input.type = type; input.value = value == null ? '' : String(value);
-  wrapper.append(caption, input);
-  return { wrapper, input };
+  wrapper.append(caption, input); return { wrapper, input };
 }
 
 function defaultRange(min = 1, max = 10) { return { min, max }; }
@@ -59,6 +49,11 @@ export function createSkillEditorRuntime({ app, templateMount, context, document
   let skills = []; let selectedId = '';
   const goBack = () => navigate(new URL(`management.html?student=${encodeURIComponent(context?.student || '')}&mode=management`, window.location.href));
   function renderDenied() { const section = documentRef.createElement('section'); section.className = 'management-section'; const title = documentRef.createElement('h2'); title.textContent = 'Skill editor'; const message = documentRef.createElement('p'); message.textContent = 'Alleen de hoofdbeheerder kan Skills bewerken.'; section.append(title, message); content.replaceChildren(section); }
+  function createNewSkill() {
+    const id = `math-${crypto.randomUUID()}`;
+    const skill = { id, category: 'math', title: 'Nieuwe Skill', description: '', definition: defaultDefinition('addition'), enabled: true, sortOrder: skills.length ? Math.max(...skills.map(item => item.sortOrder || 0)) + 10 : 10 };
+    skills = [...skills, skill]; selectedId = id; renderEditor();
+  }
   function renderEditor() {
     const source = skills.find(item => item.id === selectedId) || skills[0];
     if (!source) { content.textContent = 'Er zijn nog geen Skills beschikbaar.'; return; }
@@ -67,9 +62,12 @@ export function createSkillEditorRuntime({ app, templateMount, context, document
     content.replaceChildren();
     const section = documentRef.createElement('section'); section.className = 'management-section';
     const heading = documentRef.createElement('div'); heading.className = 'page-heading'; const title = documentRef.createElement('h2'); title.textContent = 'Skill editor'; heading.appendChild(title); section.appendChild(heading);
+    const selectorActions = documentRef.createElement('div'); selectorActions.className = 'management-links';
     const selectorLabel = documentRef.createElement('label'); selectorLabel.className = 'management-link'; const selectorCaption = documentRef.createElement('strong'); selectorCaption.textContent = 'Skill'; const selector = documentRef.createElement('select');
     skills.forEach(item => { const option = documentRef.createElement('option'); option.value = item.id; option.textContent = item.title; option.selected = item.id === selectedId; selector.appendChild(option); });
-    selector.addEventListener('change', () => { selectedId = selector.value; renderEditor(); }); selectorLabel.append(selectorCaption, selector); section.appendChild(selectorLabel);
+    selector.addEventListener('change', () => { selectedId = selector.value; renderEditor(); }); selectorLabel.append(selectorCaption, selector);
+    const newSkill = documentRef.createElement('button'); newSkill.type = 'button'; newSkill.className = 'secondary'; newSkill.textContent = 'Nieuwe Skill'; newSkill.addEventListener('click', createNewSkill);
+    selectorActions.append(selectorLabel, newSkill); section.appendChild(selectorActions);
     const name = inputField(documentRef, 'Naam', draft.title); const description = inputField(documentRef, 'Beschrijving', draft.description); section.append(name.wrapper, description.wrapper);
     name.input.addEventListener('input', () => { draft.title = name.input.value; }); description.input.addEventListener('input', () => { draft.description = description.input.value; });
 
@@ -87,8 +85,8 @@ export function createSkillEditorRuntime({ app, templateMount, context, document
       rangeEditor(documentRef, section, draft, ['fractionOperands', 1, 'denominator'], 'Rechter noemer');
       const simplify = documentRef.createElement('label'); simplify.className = 'management-link'; const simplifyText = documentRef.createElement('strong'); simplifyText.textContent = 'Antwoord vereenvoudigen'; const checkbox = documentRef.createElement('input'); checkbox.type = 'checkbox'; checkbox.checked = draft.definition.simplifyAnswer !== false; checkbox.addEventListener('change', () => { draft.definition.simplifyAnswer = checkbox.checked; }); simplify.append(simplifyText, checkbox); section.appendChild(simplify);
     } else {
-      rangeEditor(documentRef, section, draft, ['operands', 0], draft.definition.operation === 'division' ? 'Deler? Nee — eerste getal' : 'Eerste getal');
-      rangeEditor(documentRef, section, draft, ['operands', 1], draft.definition.operation === 'division' ? 'Tweede getal' : 'Tweede getal');
+      rangeEditor(documentRef, section, draft, ['operands', 0], draft.definition.operation === 'division' ? 'Deeltal' : 'Eerste getal');
+      rangeEditor(documentRef, section, draft, ['operands', 1], draft.definition.operation === 'division' ? 'Deler' : 'Tweede getal');
       if (draft.definition.operation === 'addition') {
         const resultMax = inputField(documentRef, 'Maximale uitkomst', draft.definition.resultMax, 'number');
         resultMax.input.addEventListener('input', () => { draft.definition.resultMax = resultMax.input.value === '' ? undefined : Number(resultMax.input.value); });

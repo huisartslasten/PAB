@@ -21,7 +21,10 @@ export function createManagementRuntime({ app, templateMount, context, documentR
       createToolGroup('Agenda', [createAction('📅 Agenda', 'Bekijk en beheer de agenda van de actieve leerling.', 'agenda.html'), createAction('🖨️ Maandkalender', 'Open de maandkalender van de actieve leerling.', 'month-calendar.html', { documentNavigation: true })])
     ];
     if (app.auth.isMainAdministrator) {
-      groups.splice(2, 0, createToolGroup('Challengebeheer', [createAction('🎯 Challenge-instellingen', 'Beheer centraal welke Challenges actief zijn en hoe vrijspelen, AI en spelregels werken.', 'challenge-settings.html', { requiresStudent: false })]));
+      groups.splice(2, 0, createToolGroup('Challengebeheer', [
+        createAction('🎯 Challenge-instellingen', 'Beheer centraal welke Challenges actief zijn en hoe vrijspelen, AI en spelregels werken.', 'challenge-settings.html', { requiresStudent: false }),
+        createAction('🧮 Skillbeheer', 'Bepaal per leerling welke reken-Skills beschikbaar zijn.', 'skill-settings.html')
+      ]));
     }
     section.append(...groups);
     content.replaceChildren(section);

@@ -19,6 +19,7 @@ export function createSkillsRuntime({ app, templateMount, context, skillId = '',
   let session = null;
   let finished = false;
   let highScore = null;
+  let assignments = [];
 
   const goSkills = () => navigate(buildViewUrl('skills.html', { student, mode: context?.mode }));
   const openSkill = (id, duration = DEFAULT_SKILL_DURATION_SECONDS) => {
@@ -29,6 +30,12 @@ export function createSkillsRuntime({ app, templateMount, context, skillId = '',
   };
 
   function stopTimer() { if (timerId != null) window.clearInterval(timerId); timerId = null; }
+
+  function isEnabled(skill) { return assignments.some(item => item.skillId === skill.id && item.enabled); }
+  function enabledMixedProfiles(skill) {
+    const enabled = new Set(assignments.filter(item => item.enabled).map(item => item.skillId));
+    return skill.profileIds.filter(profileId => enabled.has(profileId));
+  }
 
   async function finishSkill() {
     if (finished || !session) return;
@@ -51,7 +58,7 @@ export function createSkillsRuntime({ app, templateMount, context, skillId = '',
     heading.textContent = 'Rekenen';
     card.appendChild(heading);
 
-    listSkillsByCategory('math').forEach(skill => {
+    listSkillsByCategory('math').filter(isEnabled).forEach(skill => {
       const button = documentRef.createElement('button');
       button.type = 'button';
       button.className = 'paco-subject-card';
@@ -65,6 +72,11 @@ export function createSkillsRuntime({ app, templateMount, context, skillId = '',
       button.addEventListener('click', () => openSkill(skill.id));
       card.appendChild(button);
     });
+    if (!card.querySelector('.paco-subject-card')) {
+      const message = documentRef.createElement('p');
+      message.textContent = 'Er zijn nog geen Skills voor deze leerling beschikbaar.';
+      card.appendChild(message);
+    }
     content.appendChild(card);
   }
 
@@ -180,11 +192,24 @@ export function createSkillsRuntime({ app, templateMount, context, skillId = '',
   async function mount() {
     const skill = getSkillDefinition(skillId);
     mountPacoPageTemplate({ mount: templateMount, backLabel: '← Skills', backAction: goSkills, greeting: `Hoi ${student}! 🐶`, title: skill ? skill.title : 'Skills', icon: '⚡', subtitle: skill ? 'Los zoveel mogelijk sommen goed op voordat de tijd om is.' : 'Zelfstandig oefenen, altijd beschikbaar.', navigation: createPacoNavigation({ app, active: 'skills', student, viewMode: context?.mode, navigate }), content });
+    if (!student) { renderMenu(); return; }
+    try {
+      assignments = await app.skillConfiguration.listForStudent(student);
+    } catch (error) {
+      console.error('Skill assignment load error:', error);
+      content.textContent = 'De Skills konden niet worden geladen.';
+      return;
+    }
     if (!skill) { renderMenu(); return; }
-    highScore = student ? await resultService.getHighScore({ gameKey: skill.gameKey, student }).catch(() => null) : null;
-    session = skill.profileIds
-      ? createMathSession({ durationSeconds: Number(durationSeconds), mixedProfileIds: skill.profileIds })
-      : createMathSession({ durationSeconds: Number(durationSeconds), profileId: skill.profileId });
+    if (!isEnabled(skill)) { renderMenu(); return; }
+    highScore = await resultService.getHighScore({ gameKey: skill.gameKey, student }).catch(() => null);
+    if (skill.profileIds) {
+      const mixedProfiles = enabledMixedProfiles(skill);
+      if (!mixedProfiles.length) { content.textContent = 'Voor Gemengd zijn nog geen rekenprofielen geselecteerd.'; return; }
+      session = createMathSession({ durationSeconds: Number(durationSeconds), mixedProfileIds: mixedProfiles });
+    } else {
+      session = createMathSession({ durationSeconds: Number(durationSeconds), profileId: skill.profileId });
+    }
     renderActivity();
   }
 

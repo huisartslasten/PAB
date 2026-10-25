@@ -59,7 +59,7 @@ export function evaluateMathAnswer(question, value) {
 export function createMathSession({ durationSeconds = 180, operation, random = Math.random } = {}) {
   const duration = Number(durationSeconds);
   if (!Number.isInteger(duration) || duration <= 0) throw new Error('A positive duration is required.');
-  const firstQuestion = createMathQuestion(operation, random);
+  let question = createMathQuestion(operation, random);
   let score = 0;
   let answered = 0;
   let correct = 0;
@@ -70,9 +70,9 @@ export function createMathSession({ durationSeconds = 180, operation, random = M
     get score() { return score; },
     get answered() { return answered; },
     get correct() { return correct; },
-    question: firstQuestion,
+    get question() { return question; },
     answer(value) {
-      const result = evaluateMathAnswer(firstQuestion, value);
+      const result = evaluateMathAnswer(question, value);
       if (result.answered) {
         answered += 1;
         if (result.correct) {
@@ -83,7 +83,8 @@ export function createMathSession({ durationSeconds = 180, operation, random = M
       return result;
     },
     nextQuestion() {
-      return createMathQuestion(operation, random);
+      question = createMathQuestion(operation, random);
+      return question;
     }
   });
 }

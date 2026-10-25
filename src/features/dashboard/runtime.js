@@ -82,8 +82,10 @@ export function createDashboardRuntime({ app, templateMount, chooserMount, conte
     availableChallenges.forEach(challenge => {
       const target = buildViewUrl(challenge.route, { student: selectedStudent, mode: context.mode });
       const item = documentRef.createElement('button'); item.type = 'button'; item.className = 'dashboard-challenge-card';
+      const header = documentRef.createElement('div'); header.className = 'dashboard-challenge-header';
       const icon = documentRef.createElement('div'); icon.className = 'dashboard-challenge-icon'; icon.textContent = challenge.icon;
       const title = documentRef.createElement('h3'); title.textContent = challenge.title;
+      header.append(icon, title);
       const unlocked = documentRef.createElement('div'); unlocked.className = 'dashboard-challenge-lessons';
       const unique = [];
       challenge.unlockedLessons.forEach(lesson => { const key = String(lesson.id); if (!unique.includes(key)) unique.push(key); });
@@ -91,7 +93,7 @@ export function createDashboardRuntime({ app, templateMount, chooserMount, conte
       unlocked.textContent = names.length > 1 ? `Vrijgespeeld: ${names.length} leergebieden` : `Vrijgespeeld: ${names[0] || 'jouw leerstof'}`;
       const description = documentRef.createElement('p'); description.textContent = challenge.description;
       const start = documentRef.createElement('span'); start.className = 'dashboard-challenge-start'; start.textContent = 'START MILLIONAIRE →';
-      item.append(icon, title, unlocked, description, start); item.addEventListener('click', () => navigate(target)); grid.appendChild(item);
+      item.append(header, unlocked, description, start); item.addEventListener('click', () => navigate(target)); grid.appendChild(item);
     });
     card.appendChild(grid);
     return card;
@@ -104,9 +106,6 @@ export function createDashboardRuntime({ app, templateMount, chooserMount, conte
     const subjects = getDashboardSubjects(lessons, selectedStudent);
     const agendaItems = getDashboardAgendaItems(app.agenda, 4);
     const main = documentRef.createElement('section'); main.className = 'dashboard-main';
-    const challenges = renderChallenges(availableChallenges, lessonMap);
-    if (challenges) main.appendChild(challenges);
-    main.appendChild(renderAgenda(agendaItems));
     const subjectsCard = documentRef.createElement('article'); subjectsCard.className = 'dashboard-card';
     const heading = documentRef.createElement('h2'); heading.textContent = 'Mijn vakken'; subjectsCard.appendChild(heading);
     const subjectGrid = documentRef.createElement('div'); subjectGrid.className = 'subject-grid'; subjectGrid.style.marginTop = '15px';
@@ -119,7 +118,11 @@ export function createDashboardRuntime({ app, templateMount, chooserMount, conte
     });
     if (!subjectGrid.children.length) { const empty = documentRef.createElement('div'); empty.className = 'dashboard-state'; empty.style.marginTop = '15px'; empty.textContent = `Nog geen actieve lessen voor ${selectedStudent}.`; subjectsCard.appendChild(empty); }
     else subjectsCard.appendChild(subjectGrid);
+
+    main.appendChild(renderAgenda(agendaItems));
     main.appendChild(subjectsCard);
+    const challenges = renderChallenges(availableChallenges, lessonMap);
+    if (challenges) main.appendChild(challenges);
     content.appendChild(main);
   }
 

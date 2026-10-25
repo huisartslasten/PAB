@@ -1,8 +1,8 @@
 const SKILL_DEFINITIONS = Object.freeze([
-  Object.freeze({ id: 'math-subtraction', category: 'math', title: 'Aftellen', description: 'Zo snel mogelijk sommen met aftrekken oplossen.', operation: 'subtraction', answerMode: 'typed', route: 'skills.html' }),
-  Object.freeze({ id: 'math-addition', category: 'math', title: 'Optellen', description: 'Zo snel mogelijk sommen met optellen oplossen.', operation: 'addition', answerMode: 'typed', route: 'skills.html' }),
-  Object.freeze({ id: 'math-multiplication', category: 'math', title: 'Vermenigvuldigen', description: 'Oefen vlot rekenen met eenvoudige vermenigvuldigingen.', operation: 'multiplication', answerMode: 'typed', route: 'skills.html' }),
-  Object.freeze({ id: 'math-mixed', category: 'math', title: 'Gemengd', description: 'Een mix van optellen, aftrekken en vermenigvuldigen.', operation: 'mixed', answerMode: 'typed', route: 'skills.html' })
+  Object.freeze({ id: 'math-subtraction', category: 'math', title: 'Aftellen', description: 'Zo snel mogelijk sommen met aftrekken oplossen.', operation: 'subtraction', answerMode: 'typed', gameKey: 'math-skill-subtraction', route: 'skills.html' }),
+  Object.freeze({ id: 'math-addition', category: 'math', title: 'Optellen', description: 'Zo snel mogelijk sommen met optellen oplossen.', operation: 'addition', answerMode: 'typed', gameKey: 'math-skill-addition', route: 'skills.html' }),
+  Object.freeze({ id: 'math-multiplication', category: 'math', title: 'Vermenigvuldigen', description: 'Oefen vlot rekenen met eenvoudige vermenigvuldigingen.', operation: 'multiplication', answerMode: 'typed', gameKey: 'math-skill-multiplication', route: 'skills.html' }),
+  Object.freeze({ id: 'math-mixed', category: 'math', title: 'Gemengd', description: 'Een mix van optellen, aftrekken en vermenigvuldigen.', operation: 'mixed', answerMode: 'typed', gameKey: 'math-skill-mixed', route: 'skills.html' })
 ]);
 
 export const SKILL_DURATIONS_SECONDS = Object.freeze([60, 120, 180, 300]);

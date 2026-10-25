@@ -37,7 +37,10 @@ function rangeEditor(documentRef, section, draft, path, label) {
   const max = inputField(documentRef, `${label} — maximum`, normalized.max, 'number');
   min.input.addEventListener('input', () => { normalized.min = Number(min.input.value); });
   max.input.addEventListener('input', () => { normalized.max = Number(max.input.value); });
-  section.append(min.wrapper, max.wrapper);
+  const row = documentRef.createElement('div');
+  row.className = 'skill-range-grid';
+  row.append(min.wrapper, max.wrapper);
+  section.appendChild(row);
 }
 
 export function createSkillEditorRuntime({ app, templateMount, context, createMode = false, category = 'math', documentRef = document, navigate } = {}) {
@@ -68,12 +71,12 @@ export function createSkillEditorRuntime({ app, templateMount, context, createMo
       selector.addEventListener('change', () => { selectedId = selector.value; renderEditor(); }); selectorLabel.append(selectorCaption, selector); section.appendChild(selectorLabel);
     }
 
-    const name = inputField(documentRef, 'Naam', draft.title); const description = inputField(documentRef, 'Beschrijving', draft.description); section.append(name.wrapper, description.wrapper);
-    name.input.addEventListener('input', () => { draft.title = name.input.value; }); description.input.addEventListener('input', () => { draft.description = description.input.value; });
-
     const operation = documentRef.createElement('label'); operation.className = 'management-link'; const opCaption = documentRef.createElement('strong'); opCaption.textContent = 'Bewerking';
     const dropdown = createPacoDropdown({ options: Object.entries(OPERATION_LABELS).map(([value, label]) => ({ value, label })), value: draft.definition.operation, onChange: value => { draft.definition = defaultDefinition(value); renderEditor(); } });
     operation.append(opCaption, dropdown.element); section.appendChild(operation);
+
+    const name = inputField(documentRef, 'Naam', draft.title); const description = inputField(documentRef, 'Beschrijving', draft.description); section.append(name.wrapper, description.wrapper);
+    name.input.addEventListener('input', () => { draft.title = name.input.value; }); description.input.addEventListener('input', () => { draft.description = description.input.value; });
 
     if (draft.definition.operation === 'fraction') {
       const fractionOperation = documentRef.createElement('label'); fractionOperation.className = 'management-link'; const caption = documentRef.createElement('strong'); caption.textContent = 'Bewerking met breuken';

@@ -9,6 +9,9 @@
 .management-link{border:0;border-radius:12px;padding:10px 14px;background:var(--paco-blue-soft);color:#126fc9;font:800 15px/1.1 "Baloo 2",Nunito,sans-serif;cursor:pointer}
 .management-link.danger{background:#fee5e3;color:#b91c1c}
 .management-link:disabled{opacity:.6;cursor:wait}
+.skill-range-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.skill-range-grid .management-link{min-width:0;padding:14px 16px}
+.skill-range-grid input{width:100%;min-height:44px;box-sizing:border-box;padding:8px 10px;font-size:17px}
 .management-tool-group{display:grid;gap:10px;padding:16px;border:1px solid var(--paco-border);border-radius:18px;background:#f7fbff}
 .management-tool-group-title{margin:0;color:var(--paco-text);font-size:22px;line-height:1.1;font-weight:900}
 .management-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
@@ -31,3 +34,4 @@
 .management-recovery-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
 @media(max-width:800px){.management-recovery-grid{grid-template-columns:1fr}}
 @media(max-width:700px){.management-actions{grid-template-columns:1fr}}
+@media(max-width:620px){.skill-range-grid{grid-template-columns:1fr}}

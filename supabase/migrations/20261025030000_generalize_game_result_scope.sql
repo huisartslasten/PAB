@@ -7,3 +7,11 @@ alter table public.game_results
 
 create index game_results_game_student_idx
   on public.game_results (game_id, student);
+
+insert into public.games (key, name)
+values
+  ('math-skill-subtraction', 'Skill Rekenen — Aftellen'),
+  ('math-skill-addition', 'Skill Rekenen — Optellen'),
+  ('math-skill-multiplication', 'Skill Rekenen — Vermenigvuldigen'),
+  ('math-skill-mixed', 'Skill Rekenen — Gemengd')
+on conflict (key) do nothing;

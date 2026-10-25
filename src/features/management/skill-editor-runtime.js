@@ -37,10 +37,7 @@ function rangeEditor(documentRef, section, draft, path, label) {
   const max = inputField(documentRef, `${label} — maximum`, normalized.max, 'number');
   min.input.addEventListener('input', () => { normalized.min = Number(min.input.value); });
   max.input.addEventListener('input', () => { normalized.max = Number(max.input.value); });
-  const row = documentRef.createElement('div');
-  row.className = 'skill-range-grid';
-  row.append(min.wrapper, max.wrapper);
-  section.appendChild(row);
+  const row = documentRef.createElement('div'); row.className = 'skill-range-grid'; row.append(min.wrapper, max.wrapper); section.appendChild(row);
 }
 
 export function createSkillEditorRuntime({ app, templateMount, context, createMode = false, category = 'math', documentRef = document, navigate } = {}) {
@@ -71,45 +68,28 @@ export function createSkillEditorRuntime({ app, templateMount, context, createMo
     const draft = { ...source, definition: ensureDefinitionShape({ ...(source.definition || {}) }) };
     content.replaceChildren();
 
-    const section = documentRef.createElement('section');
-    section.className = 'paco-template-card skill-editor-card';
-    const title = documentRef.createElement('h2');
-    title.className = 'skill-editor-title';
-    title.textContent = createMode ? 'Rekenen — nieuwe Skill' : 'Skill editor';
-    section.appendChild(title);
+    const section = documentRef.createElement('section'); section.className = 'paco-template-card skill-editor-card';
+    const title = documentRef.createElement('h2'); title.className = 'skill-editor-title'; title.textContent = createMode ? 'Rekenen — nieuwe Skill' : 'Skill editor'; section.appendChild(title);
 
     if (!createMode) {
-      const selector = inputField(documentRef, 'Skill', '', 'text');
-      selector.input.removeAttribute('type');
-      selector.input.type = 'text';
-      selector.input.readOnly = true;
-      selector.input.value = skills.find(item => item.id === selectedId)?.title || '';
-      selector.wrapper.classList.add('skill-editor-context');
-      selector.wrapper.addEventListener('click', () => {
-        const current = skills.find(item => item.id === selectedId);
-        if (!current) return;
-        const index = skills.findIndex(item => item.id === current.id);
-        const next = skills[(index + 1) % skills.length];
-        if (next) { selectedId = next.id; renderEditor(); }
-      });
-      section.appendChild(selector.wrapper);
+      const selectorLabel = documentRef.createElement('label'); selectorLabel.className = 'skill-editor-field';
+      const selectorCaption = documentRef.createElement('strong'); selectorCaption.textContent = 'Skill';
+      const selector = documentRef.createElement('select');
+      skills.forEach(item => { const option = documentRef.createElement('option'); option.value = item.id; option.textContent = item.title; option.selected = item.id === selectedId; selector.appendChild(option); });
+      selector.addEventListener('change', () => { selectedId = selector.value; renderEditor(); });
+      selectorLabel.append(selectorCaption, selector); section.appendChild(selectorLabel);
     }
 
-    const operation = documentRef.createElement('label');
-    operation.className = 'skill-editor-field skill-editor-operation';
+    const operation = documentRef.createElement('label'); operation.className = 'skill-editor-field skill-editor-operation';
     const opCaption = documentRef.createElement('strong'); opCaption.textContent = 'Bewerking';
     const dropdown = createPacoDropdown({ options: Object.entries(OPERATION_LABELS).map(([value, label]) => ({ value, label })), value: draft.definition.operation, onChange: value => { draft.definition = defaultDefinition(value); renderEditor(); } });
     operation.append(opCaption, dropdown.element); section.appendChild(operation);
 
-    const name = inputField(documentRef, 'Naam', draft.title);
-    const description = inputField(documentRef, 'Beschrijving', draft.description);
-    section.append(name.wrapper, description.wrapper);
-    name.input.addEventListener('input', () => { draft.title = name.input.value; });
-    description.input.addEventListener('input', () => { draft.description = description.input.value; });
+    const name = inputField(documentRef, 'Naam', draft.title); const description = inputField(documentRef, 'Beschrijving', draft.description); section.append(name.wrapper, description.wrapper);
+    name.input.addEventListener('input', () => { draft.title = name.input.value; }); description.input.addEventListener('input', () => { draft.description = description.input.value; });
 
     if (draft.definition.operation === 'fraction') {
-      const fractionOperation = documentRef.createElement('label'); fractionOperation.className = 'skill-editor-field';
-      const caption = documentRef.createElement('strong'); caption.textContent = 'Bewerking met breuken';
+      const fractionOperation = documentRef.createElement('label'); fractionOperation.className = 'skill-editor-field'; const caption = documentRef.createElement('strong'); caption.textContent = 'Bewerking met breuken';
       const fractionDropdown = createPacoDropdown({ options: Object.entries(FRACTION_OPERATION_LABELS).map(([value, label]) => ({ value, label })), value: draft.definition.fractionOperation || 'addition', onChange: value => { draft.definition.fractionOperation = value; renderEditor(); } });
       fractionOperation.append(caption, fractionDropdown.element); section.appendChild(fractionOperation);
       rangeEditor(documentRef, section, draft, ['fractionOperands', 0, 'numerator'], 'Linker teller');
@@ -130,9 +110,7 @@ export function createSkillEditorRuntime({ app, templateMount, context, createMo
       }
     }
 
-    const actions = documentRef.createElement('div'); actions.className = 'skill-editor-actions';
-    const save = documentRef.createElement('button'); save.type = 'button'; save.className = 'success'; save.textContent = 'Skill opslaan';
-    const status = documentRef.createElement('span'); status.className = 'skill-config-status'; actions.append(save, status); section.appendChild(actions);
+    const actions = documentRef.createElement('div'); actions.className = 'skill-editor-actions'; const save = documentRef.createElement('button'); save.type = 'button'; save.className = 'success'; save.textContent = 'Skill opslaan'; const status = documentRef.createElement('span'); status.className = 'skill-config-status'; actions.append(save, status); section.appendChild(actions);
     save.addEventListener('click', async () => { save.disabled = true; status.textContent = 'Opslaan…'; try { const saved = await app.skillDefinitions.save(draft); skills = skills.map(item => item.id === saved.id ? saved : item); status.textContent = 'Skill opgeslagen.'; } catch (error) { console.error('Skill definition save error:', error); status.textContent = error?.message || 'Opslaan mislukt.'; } finally { save.disabled = false; } });
     content.appendChild(section);
   }
@@ -144,13 +122,8 @@ export function createSkillEditorRuntime({ app, templateMount, context, createMo
     mountPacoPageTemplate({ mount: templateMount, backLabel: '← Beheer', backAction: goBack, greeting: 'PAB beheer ⚙️', title: createMode ? 'Skill maken' : 'Skill editor', icon: '🧮', subtitle: createMode ? 'Stel de nieuwe reken-Skill in.' : 'Bewerk centraal hoe reken-Skills werken.', navigation: createPacoNavigation({ app, active: 'dashboard', student: context?.student || '', viewMode: 'management', includeManagementTools: false, includeCreator: false, navigate }), content });
     try {
       skills = await app.skillDefinitions.list({ category: 'math' });
-      if (createMode) {
-        const draft = createMathDraft();
-        skills = [...skills, draft];
-        selectedId = draft.id;
-      } else {
-        selectedId = context?.skill || skills[0]?.id || '';
-      }
+      if (createMode) { const draft = createMathDraft(); skills = [...skills, draft]; selectedId = draft.id; }
+      else { selectedId = context?.skill || skills[0]?.id || ''; }
       renderEditor();
     } catch (error) { console.error('Skill definition load error:', error); state.textContent = 'Skill editor kon niet worden geladen.'; }
   }

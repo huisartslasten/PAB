@@ -39,6 +39,8 @@ test('question session owns question ordering and progression', () => {
   assert.equal(session.getState().complete, false);
   assert.equal(session.next().id, 2);
   assert.equal(session.getState().index, 2);
+  assert.equal(session.getState().total, 2);
+  assert.equal(session.getState().complete, false);
   assert.equal(session.next(), null);
   assert.equal(session.getState().complete, true);
 });

@@ -8,7 +8,7 @@ export function createDoubleOrNothingRuntime({ items = [], gradeAnswer, random =
   if (typeof gradeAnswer !== 'function') throw new Error('A gradeAnswer function is required.');
   const questions = normalizeItems(items); const questionSession = createPracticeQuestionSession(questions, { random });
   let score = 0; let bestScore = 0; let stake = null; let phase = questions.length ? 'question' : 'finished'; let lastResult = null;
-  function snapshot() { const qs = questionSession.snapshot(); return Object.freeze({ index: qs.currentIndex, total: questions.length, score, bestScore, stake, phase, lastResult, maxScore: maxScoreFor(questions.length), item: questionSession.current(), questionCycle: qs.cycle, questionCycleComplete: qs.cycleComplete }); }
+  function snapshot() { const qs = questionSession.snapshot(); return Object.freeze({ index: qs.currentIndex ?? qs.attemptedCount, total: questions.length, score, bestScore, stake, phase, lastResult, maxScore: maxScoreFor(questions.length), item: questionSession.current(), questionCycle: qs.cycle, questionCycleComplete: qs.cycleComplete }); }
   function start() { questionSession.start(); score = 0; bestScore = 0; stake = null; phase = questions.length ? 'question' : 'finished'; lastResult = null; if (questions.length) questionSession.next(); return snapshot(); }
   function chooseStake(amount) {
     if (phase !== 'question') throw new Error('Er kan nu geen inzet worden gekozen.');

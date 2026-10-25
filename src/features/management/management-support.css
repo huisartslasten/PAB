@@ -21,6 +21,20 @@
 .skill-editor-check{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:54px;padding:12px 14px;border:2px solid var(--paco-border);border-radius:14px;background:#fff;color:var(--paco-text);font:800 16px/1.1 "Baloo 2",Nunito,sans-serif}
 .skill-editor-check input{width:22px;height:22px;accent-color:var(--paco-blue)}
 .skill-editor-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-top:4px}
+.skill-config-page{display:grid;gap:18px}
+.skill-config-student{padding:18px 20px}
+.skill-config-student-field{display:grid;gap:8px}
+.skill-config-student-field>span{color:var(--paco-text);font:800 17px/1.1 "Baloo 2",Nunito,sans-serif}
+.skill-config-student .paco-dropdown-trigger{min-height:58px}
+.skill-config-group{display:grid;gap:18px}
+.skill-config-group h2{margin:0;font:900 27px/1.05 "Baloo 2",Nunito,sans-serif;color:var(--paco-text)}
+.skill-config-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.skill-config-choice{min-width:0;display:flex;align-items:center;gap:11px;min-height:54px;padding:11px 14px;border:2px solid var(--paco-border);border-radius:14px;background:#edf8ff;color:var(--paco-blue-dark);font:800 16px/1.15 "Baloo 2",Nunito,sans-serif;cursor:pointer;transition:border-color .15s ease,background .15s ease,box-shadow .15s ease}
+.skill-config-choice:hover{border-color:#a9d1f3;background:#e2f2ff;box-shadow:0 4px 12px rgba(16,43,87,.06)}
+.skill-config-choice input{width:20px;height:20px;flex:0 0 20px;accent-color:var(--paco-blue)}
+.skill-config-choice:has(input:checked){border-color:#9ecbf0;background:#dff0ff}
+.skill-config-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.skill-config-actions button{min-height:46px}
 .skill-config-status{color:var(--paco-muted);font-weight:800}
 
 .management-tool-group{display:grid;gap:10px;padding:16px;border:1px solid var(--paco-border);border-radius:18px;background:#f7fbff}
@@ -45,4 +59,4 @@
 .management-recovery-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
 @media(max-width:800px){.management-recovery-grid{grid-template-columns:1fr}}
 @media(max-width:700px){.management-actions{grid-template-columns:1fr}}
-@media(max-width:620px){.skill-editor-range-grid{grid-template-columns:1fr}}
+@media(max-width:620px){.skill-editor-range-grid,.skill-config-choices{grid-template-columns:1fr}}

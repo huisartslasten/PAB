@@ -1,5 +1,6 @@
 import { mountPacoPageTemplate, createPacoDropdown } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
+import { buildViewUrl } from '../../core/view-context.js';
 
 const SKILL_TYPES = Object.freeze([
   { value: 'math', label: 'Rekenen', description: 'Maak een Skill voor getallen en bewerkingen.', editor: 'skill-editor.html' }
@@ -16,7 +17,7 @@ export function createSkillCreationRuntime({ app, templateMount, context, docume
   state.textContent = 'Skill maken laden…';
   content.appendChild(state);
 
-  const goBack = () => navigate(new URL(`management.html?student=${encodeURIComponent(context?.student || '')}&mode=management`, window.location.href));
+  const goBack = () => navigate(buildViewUrl('skills.html', { student: context?.student || '', mode: 'management' }));
 
   function render() {
     content.replaceChildren();
@@ -78,13 +79,13 @@ export function createSkillCreationRuntime({ app, templateMount, context, docume
 
     mountPacoPageTemplate({
       mount: templateMount,
-      backLabel: '← Beheer',
+      backLabel: '← Skills',
       backAction: goBack,
       greeting: 'PAB beheer ⚙️',
       title: 'Skill maken',
       icon: '➕',
       subtitle: 'Kies eerst welk type Skill je wilt maken.',
-      navigation: createPacoNavigation({ app, active: 'dashboard', student: context?.student || '', viewMode: 'management', includeManagementTools: false, includeCreator: false, navigate }),
+      navigation: createPacoNavigation({ app, active: 'skills', student: context?.student || '', viewMode: 'management', includeManagementTools: true, includeCreator: false, navigate }),
       content
     });
     render();

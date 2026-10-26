@@ -35,11 +35,12 @@ export function createContentManagementActions({ entityType, item, handlers = {}
   if (typeof handlers.delete !== 'function') throw new TypeError(`Management ${entityType} actions require a delete handler.`);
 
   return Object.freeze([
-    Object.freeze({ key: 'edit', label: 'Bewerken', danger: false, onClick: () => handlers.edit(item) }),
+    Object.freeze({ key: 'edit', label: 'Bewerken', danger: false, management: true, onClick: () => handlers.edit(item) }),
     Object.freeze({
       key: 'archive',
       label: 'Archiveren',
       danger: false,
+      management: true,
       onClick: async () => {
         const confirmed = await confirmPacoAction({
           title: policy.archiveTitle,
@@ -56,6 +57,7 @@ export function createContentManagementActions({ entityType, item, handlers = {}
       key: 'delete',
       label: 'Verwijderen',
       danger: true,
+      management: true,
       onClick: async () => {
         const confirmed = await confirmPacoAction({
           title: policy.deleteTitle,
@@ -69,6 +71,28 @@ export function createContentManagementActions({ entityType, item, handlers = {}
       }
     })
   ]);
+}
+
+export function appendContentManagementActions({ documentRef = document, container, actions = [] } = {}) {
+  if (!container) throw new TypeError('appendContentManagementActions requires a container.');
+  const actionBar = documentRef.createElement('div');
+  actionBar.className = 'management-links';
+  actions.forEach(action => {
+    if (typeof action?.onClick !== 'function') return;
+    const button = documentRef.createElement('button');
+    button.type = 'button';
+    button.className = action.danger ? 'management-link danger' : 'management-link';
+    button.textContent = action.label || 'Actie';
+    button.addEventListener('click', async event => {
+      event.preventDefault();
+      event.stopPropagation();
+      button.disabled = true;
+      try { await action.onClick(event); } finally { button.disabled = false; }
+    });
+    actionBar.appendChild(button);
+  });
+  if (actionBar.children.length) container.appendChild(actionBar);
+  return actionBar;
 }
 
 export { MANAGEMENT_ACTION_POLICIES };

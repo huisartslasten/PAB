@@ -1,5 +1,6 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
+import { createPacoTile, createPacoTileGrid } from '../../components/paco-tile.js';
 import { createActivityCardGrid } from '../../components/activity-card-grid.js';
 import { buildViewUrl } from '../../core/view-context.js';
 import { getDashboardSubjects, getDashboardSubjectIcon, getDashboardAgendaItems } from './view-model.js';
@@ -110,13 +111,23 @@ export function createDashboardRuntime({ app, templateMount, chooserMount, conte
     const main = documentRef.createElement('section'); main.className = 'dashboard-main';
     const subjectsCard = documentRef.createElement('article'); subjectsCard.className = 'dashboard-card';
     const heading = documentRef.createElement('h2'); heading.textContent = 'Mijn vakken'; subjectsCard.appendChild(heading);
-    const subjectGrid = documentRef.createElement('div'); subjectGrid.className = 'subject-grid'; subjectGrid.style.marginTop = '15px';
+    const subjectGrid = createPacoTileGrid({ documentRef });
+    subjectGrid.style.marginTop = '15px';
     subjects.forEach(subject => {
-      const card = documentRef.createElement('button'); card.type = 'button'; card.className = 'paco-subject-card';
-      const icon = documentRef.createElement('div'); icon.className = 'subject-icon'; icon.textContent = getDashboardSubjectIcon(subject.label);
-      const title = documentRef.createElement('h3'); title.textContent = subject.label;
-      const count = subject.lessons.length; const meta = documentRef.createElement('p'); meta.textContent = `${count} ${count === 1 ? 'les' : 'lessen'} · Bekijk →`;
-      card.append(icon, title, meta); card.addEventListener('click', () => { const target = buildViewUrl('lessons.html', { student: selectedStudent, mode: context.mode }); target.searchParams.set('subject', subject.label); navigate(target); }); subjectGrid.appendChild(card);
+      const count = subject.lessons.length;
+      const tile = createPacoTile({
+        documentRef,
+        title: subject.label,
+        icon: getDashboardSubjectIcon(subject.label),
+        meta: `${count} ${count === 1 ? 'les' : 'lessen'}`,
+        actionLabel: 'Bekijk →',
+        onActivate: () => {
+          const target = buildViewUrl('lessons.html', { student: selectedStudent, mode: context.mode });
+          target.searchParams.set('subject', subject.label);
+          navigate(target);
+        }
+      });
+      subjectGrid.appendChild(tile);
     });
     if (!subjectGrid.children.length) { const empty = documentRef.createElement('div'); empty.className = 'dashboard-state'; empty.style.marginTop = '15px'; empty.textContent = `Nog geen actieve lessen voor ${selectedStudent}.`; subjectsCard.appendChild(empty); }
     else subjectsCard.appendChild(subjectGrid);

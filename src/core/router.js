@@ -9,7 +9,7 @@
 const BASE_ROUTE_STYLES = Object.freeze(['src/components/paco-tile.css']);
 
 function normalizePath(path) {
-  const value = String(path || '/').replace(/^\\/+/, '');
+  const value = String(path || '/').replace(/^\/+/, '');
   return value || 'index.html';
 }
 

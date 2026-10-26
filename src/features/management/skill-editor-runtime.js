@@ -175,7 +175,7 @@ export function createSkillEditorRuntime({ app, templateMount, context, createMo
         checkbox.type = 'checkbox';
         checkbox.checked = draft.definition.remainderAllowed === true;
         checkbox.addEventListener('change', () => { draft.definition.remainderAllowed = checkbox.checked; });
-        remainder.append(remainderText, checkbox);
+        remainder.append(simplifyText, checkbox);
         section.appendChild(remainder);
       }
     }
@@ -198,7 +198,12 @@ export function createSkillEditorRuntime({ app, templateMount, context, createMo
         const payload = { ...draft, title: draft.title.trim() || operationName };
         const saved = await app.skillDefinitions.save(payload);
         skills = skills.map(item => item.id === saved.id ? saved : item);
-        status.textContent = 'Skill opgeslagen.';
+        if (createMode && context?.student) {
+          await app.skillConfiguration.saveForStudent(context.student, [{ skillId: saved.id, enabled: true }]);
+          status.textContent = `Skill opgeslagen en beschikbaar gemaakt voor ${context.student}.`;
+        } else {
+          status.textContent = 'Skill opgeslagen.';
+        }
       } catch (error) {
         console.error('Skill definition save error:', error);
         status.textContent = error?.message || 'Opslaan mislukt.';

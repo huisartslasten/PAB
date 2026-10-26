@@ -64,7 +64,7 @@ export function createSkillEditorRuntime({ app, templateMount, context, createMo
   let skills = [];
   let selectedId = '';
 
-  const goBack = () => navigate(new URL(`management.html?student=${encodeURIComponent(context?.student || '')}&mode=management`, window.location.href));
+  const goBack = () => navigate(new URL(`skills.html?viewStudent=${encodeURIComponent(context?.student || '')}`, window.location.href), { managementCapability: 'skill.manage' });
 
   function renderDenied() {
     const section = documentRef.createElement('section');
@@ -223,13 +223,13 @@ export function createSkillEditorRuntime({ app, templateMount, context, createMo
 
     mountPacoPageTemplate({
       mount: templateMount,
-      backLabel: '← Beheer',
+      backLabel: '← Skills',
       backAction: goBack,
       greeting: 'PAB beheer ⚙️',
       title: createMode ? 'Skill maken' : 'Skill editor',
       icon: '🧮',
       subtitle: createMode ? 'Stel de nieuwe reken-Skill in.' : 'Bewerk centraal hoe reken-Skills werken.',
-      navigation: createPacoNavigation({ app, active: 'dashboard', student: context?.student || '', viewMode: 'management', includeManagementTools: false, includeCreator: false, navigate }),
+      navigation: createPacoNavigation({ app, active: 'skills', student: context?.student || '', includeManagementTools: false, includeCreator: false, navigate }),
       content
     });
 

@@ -1,3 +1,5 @@
+import { difficultyForMillionaireStep } from '../../lessons/question-difficulty.js';
+
 function shuffle(values, random = Math.random) {
   const result = [...values];
   for (let index = result.length - 1; index > 0; index -= 1) {
@@ -28,6 +30,7 @@ export function createMillionaireRuntime({ questions = [], distractorService = n
   let current = null;
   let activeOptions = [];
   let message = '';
+  let currentDifficulty = null;
 
   function start() {
     bank = buildQuestionBank(sourceQuestions, random);
@@ -37,11 +40,14 @@ export function createMillionaireRuntime({ questions = [], distractorService = n
     lifelines = { fiftyFifty: true, askSomeone: true, askAudience: true };
     current = null;
     activeOptions = [];
+    currentDifficulty = null;
     message = '';
     return snapshot();
   }
 
   async function buildOptions(item) {
+    const difficulty = difficultyForMillionaireStep(item, index, bank.length);
+    currentDifficulty = difficulty;
     const existing = Array.isArray(item.answer_options) ? item.answer_options.filter(Boolean).map(String) : [];
     if (existing.length >= 2) return shuffle([...new Set([String(item.answer), ...existing])], random).slice(0, 4);
     if (!distractorService) throw new Error('De centrale MC-distractorservice is niet beschikbaar.');
@@ -50,6 +56,7 @@ export function createMillionaireRuntime({ questions = [], distractorService = n
       correctAnswer: item.answer,
       subject: item.subject,
       subvak: item.subvak,
+      difficulty,
       context: { lessonType: item.type || 'questions', theme: item.title || item.subject },
       optionCount: 4
     });
@@ -85,6 +92,7 @@ export function createMillionaireRuntime({ questions = [], distractorService = n
     }
     current = null;
     activeOptions = [];
+    currentDifficulty = null;
     message = 'Goed!';
     return snapshot();
   }
@@ -130,6 +138,7 @@ export function createMillionaireRuntime({ questions = [], distractorService = n
       nextPrize: PRIZES[Math.min(index + 1, PRIZES.length - 1)],
       questionNumber: current ? index + 1 : index,
       totalQuestions: bank.length,
+      difficulty: currentDifficulty,
       current,
       options: [...activeOptions],
       lifelines: { ...lifelines },

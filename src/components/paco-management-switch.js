@@ -39,13 +39,16 @@ function buildCurrentPageManagementUrl() {
 export function installPacoManagementSwitch({ templateMount, navigation = [], documentRef = document } = {}) {
   if (!templateMount) throw new TypeError('installPacoManagementSwitch requires templateMount.');
 
-  ensureStylesheet(documentRef);
-
+  const canManage = hasManagementAccess(navigation);
   const hero = templateMount.querySelector('.paco-template-hero');
   if (!hero) return null;
 
   const existing = hero.querySelector('.paco-template-management-switch');
   if (existing) return existing;
+
+  if (!canManage) return null;
+
+  ensureStylesheet(documentRef);
 
   const button = documentRef.createElement('button');
   button.type = 'button';
@@ -54,14 +57,12 @@ export function installPacoManagementSwitch({ templateMount, navigation = [], do
   button.setAttribute('aria-label', 'Beheer op deze pagina');
   button.title = 'Beheer op deze pagina';
 
-  const canManage = hasManagementAccess(navigation);
   const isManagement = new URL(window.location.href).searchParams.get('mode') === 'management';
-  button.dataset.enabled = String(canManage);
-  button.dataset.active = String(canManage && isManagement);
-  button.setAttribute('aria-pressed', String(canManage && isManagement));
+  button.dataset.enabled = 'true';
+  button.dataset.active = String(isManagement);
+  button.setAttribute('aria-pressed', String(isManagement));
 
   button.addEventListener('click', () => {
-    if (!canManage) return;
     window.location.assign(buildCurrentPageManagementUrl().toString());
   });
 

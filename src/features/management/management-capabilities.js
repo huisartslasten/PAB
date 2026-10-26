@@ -48,15 +48,15 @@ const PAGE_CAPABILITIES = Object.freeze({
 });
 
 const CAPABILITIES = Object.freeze({
-  'lesson.manage': Object.freeze({ id: 'lesson.manage', entityType: 'lesson', group: 'Lesbeheer', label: '📚 Les beheren', description: 'Bekijk en beheer de lessen van de actieve leerling.', requiresStudent: true, target: ({ student }) => buildTarget('lessons.html', { student }) }),
-  'lesson.create': Object.freeze({ id: 'lesson.create', entityType: 'lesson', group: 'Lesbeheer', label: '➕ Les maken', description: 'Maak een nieuwe les voor de actieve leerling.', requiresStudent: true, target: ({ student }) => buildTarget('lesson-editor.html', { student }) }),
-  'learningTopic.manage': Object.freeze({ id: 'learningTopic.manage', entityType: 'learningTopic', group: 'Leerstofbeheer', label: '🧠 Leerstof beheren', description: 'Bekijk de leerstof per vak en onderwerp.', requiresStudent: true, target: ({ student }) => buildTarget('lessons.html', { student }) }),
-  'learningTopic.create': Object.freeze({ id: 'learningTopic.create', entityType: 'learningTopic', group: 'Leerstofbeheer', label: '➕ Leerstof maken', description: 'Open de centrale leerstofeditor.', requiresStudent: true, target: ({ student }) => buildTarget('learning-material-editor.html', { student }) }),
-  'agenda.manage': Object.freeze({ id: 'agenda.manage', entityType: 'agenda', group: 'Agenda', label: '📅 Agenda', description: 'Bekijk en beheer de agenda van de actieve leerling.', requiresStudent: true, target: ({ student }) => buildTarget('agenda.html', { student }) }),
-  'monthCalendar.manage': Object.freeze({ id: 'monthCalendar.manage', entityType: 'monthCalendar', group: 'Agenda', label: '🖨️ Maandkalender', description: 'Open de maandkalender van de actieve leerling.', requiresStudent: true, target: ({ student }) => buildTarget('month-calendar.html', { student }) }),
-  'skill.manage': Object.freeze({ id: 'skill.manage', entityType: 'skill', group: 'Skillbeheer', label: '🧮 Skills beheren', description: 'Beheer Skills en bepaal per leerling welke Skills beschikbaar zijn.', requiresStudent: true, authorize: isMainAdministrator, target: ({ student }) => buildTarget('skills.html', { student }) }),
-  'skill.create': Object.freeze({ id: 'skill.create', entityType: 'skill', group: 'Skillbeheer', label: '➕ Skill maken', description: 'Kies welk type Skill je wilt maken.', requiresStudent: false, authorize: isMainAdministrator, target: ({ student }) => buildTarget('skill-create.html', { student }) }),
-  'challenge.configure': Object.freeze({ id: 'challenge.configure', entityType: 'challenge', group: 'Challengebeheer', label: '🎯 Challenge-instellingen', description: 'Beheer centraal de Challenge-configuratie.', requiresStudent: false, authorize: isMainAdministrator, target: () => buildTarget('challenge-settings.html') })
+  'lesson.manage': Object.freeze({ id: 'lesson.manage', entityType: 'lesson', page: 'lessons', group: 'Lesbeheer', label: '📚 Les beheren', description: 'Bekijk en beheer de lessen van de actieve leerling.', requiresStudent: true, target: ({ student }) => buildTarget('lessons.html', { student }) }),
+  'lesson.create': Object.freeze({ id: 'lesson.create', entityType: 'lesson', page: 'lesson-editor', group: 'Lesbeheer', label: '➕ Les maken', description: 'Maak een nieuwe les voor de actieve leerling.', requiresStudent: true, target: ({ student }) => buildTarget('lesson-editor.html', { student }) }),
+  'learningTopic.manage': Object.freeze({ id: 'learningTopic.manage', entityType: 'learningTopic', page: 'lessons', group: 'Leerstofbeheer', label: '🧠 Leerstof beheren', description: 'Bekijk de leerstof per vak en onderwerp.', requiresStudent: true, target: ({ student }) => buildTarget('lessons.html', { student }) }),
+  'learningTopic.create': Object.freeze({ id: 'learningTopic.create', entityType: 'learningTopic', page: 'learning-material-editor', group: 'Leerstofbeheer', label: '➕ Leerstof maken', description: 'Open de centrale leerstofeditor.', requiresStudent: true, target: ({ student }) => buildTarget('learning-material-editor.html', { student }) }),
+  'agenda.manage': Object.freeze({ id: 'agenda.manage', entityType: 'agenda', page: 'agenda', group: 'Agenda', label: '📅 Agenda', description: 'Bekijk en beheer de agenda van de actieve leerling.', requiresStudent: true, target: ({ student }) => buildTarget('agenda.html', { student }) }),
+  'monthCalendar.manage': Object.freeze({ id: 'monthCalendar.manage', entityType: 'monthCalendar', page: 'month-calendar', group: 'Agenda', label: '🖨️ Maandkalender', description: 'Open de maandkalender van de actieve leerling.', requiresStudent: true, target: ({ student }) => buildTarget('month-calendar.html', { student }) }),
+  'skill.manage': Object.freeze({ id: 'skill.manage', entityType: 'skill', page: 'skills', group: 'Skillbeheer', label: '🧮 Skills beheren', description: 'Beheer Skills en bepaal per leerling welke Skills beschikbaar zijn.', requiresStudent: true, authorize: isMainAdministrator, target: ({ student }) => buildTarget('skills.html', { student }) }),
+  'skill.create': Object.freeze({ id: 'skill.create', entityType: 'skill', page: 'skill-create', group: 'Skillbeheer', label: '➕ Skill maken', description: 'Kies welk type Skill je wilt maken.', requiresStudent: false, authorize: isMainAdministrator, target: ({ student }) => buildTarget('skill-create.html', { student }) }),
+  'challenge.configure': Object.freeze({ id: 'challenge.configure', entityType: 'challenge', page: 'challenge-settings', group: 'Challengebeheer', label: '🎯 Challenge-instellingen', description: 'Beheer centraal de Challenge-configuratie.', requiresStudent: false, authorize: isMainAdministrator, target: () => buildTarget('challenge-settings.html') })
 });
 
 const ITEM_ACTIONS = Object.freeze({
@@ -99,17 +99,37 @@ export function createManagementCapabilities({ auth, management, eventTarget = g
     }));
   }
 
+  function emitPageState(page, active) {
+    eventTarget?.dispatchEvent?.(new CustomEvent('paco:management-visibility-change', { detail: { page, active: Boolean(active) } }));
+  }
+
   function setPageActive(page, active) {
     if (!page) return false;
     if (active) activePages.add(page); else activePages.delete(page);
-    eventTarget?.dispatchEvent?.(new CustomEvent('paco:management-visibility-change', { detail: { page, active: Boolean(active) } }));
+    emitPageState(page, active);
     return Boolean(active);
+  }
+
+  function clearPageActivity() {
+    [...activePages].forEach(page => emitPageState(page, false));
+    activePages.clear();
+  }
+
+  function activateForNavigation(capabilityId) {
+    const capability = CAPABILITIES[capabilityId];
+    if (!capability?.page) return false;
+    clearPageActivity();
+    activePages.add(capability.page);
+    emitPageState(capability.page, true);
+    return true;
   }
 
   return Object.freeze({
     getAvailableForPage,
     getActionsForItem,
     setPageActive,
+    clearPageActivity,
+    activateForNavigation,
     isPageActive: page => activePages.has(page),
     listPageCapabilityIds: page => Object.freeze([...(PAGE_CAPABILITIES[page] || [])]),
     listCapabilityIds: () => Object.freeze(Object.keys(CAPABILITIES))

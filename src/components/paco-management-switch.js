@@ -47,7 +47,7 @@ function createCapabilityPanel({ documentRef, capabilities, navigate, button }) 
     action.setAttribute('role', 'menuitem');
     action.addEventListener('click', () => {
       if (!capability.target) return;
-      navigate(capability.target);
+      navigate(capability.target, { managementCapability: capability.id });
       panel.hidden = true;
       button.setAttribute('aria-expanded', 'false');
     });

@@ -19,7 +19,11 @@ export function createPacoRuntime({
     mounts: { templateMount, chooserMount },
     documentRef
   });
-  const router = createPacoRouter({ windowRef: window, routes });
+  const router = createPacoRouter({
+    windowRef: window,
+    routes,
+    managementCapabilities: app.managementCapabilities
+  });
 
   router.onChange(() => {
     installPacoManagementSwitch({

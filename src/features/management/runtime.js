@@ -28,7 +28,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     button.append(strong, span);
     button.addEventListener('click', () => {
       if (!capability.target || button.disabled) return;
-      void navigate(capability.target);
+      void navigate(capability.target, { managementCapability: capability.id });
     });
     return button;
   }

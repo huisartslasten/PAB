@@ -29,11 +29,11 @@ function createRouteStyleManager(documentRef) {
   function loadStylesheet(href) {
     const existing = findStylesheet(href);
     if (existing) {
-      if (existing.sheet) return Promise.resolve(existing);
-      return new Promise((resolve, reject) => {
-        existing.addEventListener('load', () => resolve(existing), { once: true });
-        existing.addEventListener('error', () => reject(new Error(`Failed to load PacoGO route stylesheet: ${href}`)), { once: true });
-      });
+      // Stylesheets declared by the page are already part of the document
+      // lifecycle. Do not wait on a second readiness signal that may already
+      // have fired before the router starts; the router only waits on styles
+      // that it creates itself below.
+      return Promise.resolve(existing);
     }
 
     const link = documentRef.createElement('link');

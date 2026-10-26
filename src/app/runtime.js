@@ -22,7 +22,12 @@ export function createPacoRuntime({
   const router = createPacoRouter({ windowRef: window, routes });
 
   router.onChange(() => {
-    installPacoManagementSwitch({ templateMount, app, router, documentRef });
+    installPacoManagementSwitch({
+      templateMount,
+      app,
+      navigate: router.navigate,
+      documentRef
+    });
   });
 
   return Object.freeze({ app, router, routes });

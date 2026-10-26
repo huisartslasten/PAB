@@ -6,10 +6,15 @@ function createContainer() {
   const listeners = [];
   return {
     innerHTML: '',
-    querySelectorAll() {
-      return [
-        { dataset: { student: 'Zyon' }, addEventListener: (event, handler) => listeners.push([event, handler]) }
-      ];
+    addEventListener: (event, handler) => listeners.push([event, handler]),
+    removeEventListener: () => {},
+    querySelectorAll(selector) {
+      if (selector === '[data-student]') {
+        return [
+          { dataset: { student: 'Zyon' }, addEventListener: (event, handler) => listeners.push([event, handler]) }
+        ];
+      }
+      return [];
     },
     listeners
   };

@@ -39,9 +39,12 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
   if (!lessonOrder) throw new Error('createManagement requires lessonOrder');
   if (typeof loadLessons !== 'function') throw new Error('createManagement requires loadLessons');
   if (!learningTopics) throw new Error('createManagement requires learningTopics');
-  if (!skillDefinitions) throw new Error('createManagement requires skillDefinitions');
 
   function assertParent() { requireParent(auth); }
+  function requireSkillDefinitions() {
+    if (!skillDefinitions) throw new Error('Skill management requires skillDefinitions.');
+    return skillDefinitions;
+  }
 
   async function loadAllLessons() {
     assertParent();
@@ -74,9 +77,10 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
 
   async function refreshRecoverySkills() {
     assertParent();
+    const skills = requireSkillDefinitions();
     return {
-      archive: await skillDefinitions.listRecovery('archive'),
-      trash: await skillDefinitions.listRecovery('trash')
+      archive: await skills.listRecovery('archive'),
+      trash: await skills.listRecovery('trash')
     };
   }
 
@@ -145,12 +149,12 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
   async function emptyLearningTopicTrash() { assertParent(); return learningTopics.emptyTrash(); }
   async function getRecoveryLearningTopics(mode) { assertParent(); return learningTopics.listRecovery(mode); }
 
-  async function archiveSkill(id) { assertParent(); return skillDefinitions.archive(id); }
-  async function moveSkillToTrash(id) { assertParent(); return skillDefinitions.moveToTrash(id); }
-  async function restoreSkillFromArchive(id) { assertParent(); return skillDefinitions.restoreFromArchive(id); }
-  async function restoreSkillFromTrash(id) { assertParent(); return skillDefinitions.restoreFromTrash(id); }
-  async function permanentlyDeleteSkill(id) { assertParent(); return skillDefinitions.permanentlyDelete(id); }
-  async function getRecoverySkills(mode) { assertParent(); return skillDefinitions.listRecovery(mode); }
+  async function archiveSkill(id) { assertParent(); return requireSkillDefinitions().archive(id); }
+  async function moveSkillToTrash(id) { assertParent(); return requireSkillDefinitions().moveToTrash(id); }
+  async function restoreSkillFromArchive(id) { assertParent(); return requireSkillDefinitions().restoreFromArchive(id); }
+  async function restoreSkillFromTrash(id) { assertParent(); return requireSkillDefinitions().restoreFromTrash(id); }
+  async function permanentlyDeleteSkill(id) { assertParent(); return requireSkillDefinitions().permanentlyDelete(id); }
+  async function getRecoverySkills(mode) { assertParent(); return requireSkillDefinitions().listRecovery(mode); }
 
   async function listFeedback() { assertParent(); return feedbackService.listAll(); }
   async function submitFeedback(payload = {}) { assertParent(); return feedbackService.create(payload); }

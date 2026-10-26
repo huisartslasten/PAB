@@ -87,16 +87,19 @@ export function createPacoTile({
   if (Array.isArray(actions) && actions.length) {
     const actionBar = documentRef.createElement('div');
     actionBar.className = 'paco-tile-actions';
-    actions.forEach(({ label, onClick, danger = false }) => {
+    actions.forEach(({ label, onClick, danger = false, management = false }) => {
       if (typeof onClick !== 'function') return;
       const button = documentRef.createElement('button');
       button.type = 'button';
-      button.className = danger ? 'paco-tile-small-action danger' : 'paco-tile-small-action';
+      button.className = management
+        ? (danger ? 'management-link danger' : 'management-link')
+        : (danger ? 'paco-tile-small-action danger' : 'paco-tile-small-action');
       button.textContent = label || 'Actie';
-      button.addEventListener('click', event => {
+      button.addEventListener('click', async event => {
         event.preventDefault();
         event.stopPropagation();
-        onClick(event);
+        button.disabled = true;
+        try { await onClick(event); } finally { button.disabled = false; }
       });
       actionBar.appendChild(button);
     });

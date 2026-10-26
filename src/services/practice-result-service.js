@@ -2,7 +2,7 @@
 // Assessment persistence is read here; Challenge unlock rules remain owned by
 // challenge-unlock-service. The database RPC is a narrow read capability that
 // returns only lesson ids which meet the requested assessment threshold and
-// explicitly allowed lesson types.
+// configured lesson-type policy. The wildcard '*' means all lesson types.
 
 function requireDb(db) {
   if (!db || typeof db.from !== 'function' || typeof db.rpc !== 'function') {

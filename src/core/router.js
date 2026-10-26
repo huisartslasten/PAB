@@ -6,6 +6,8 @@
  * supplies navigation context and makes route styles available before mount.
  */
 
+const BASE_ROUTE_STYLES = Object.freeze(['src/components/paco-tile.css']);
+
 function normalizePath(path) {
   const value = String(path || '/').replace(/^\/+/, '');
   return value || 'index.html';
@@ -91,7 +93,10 @@ export function createPacoRouter({ windowRef = window, routes = {}, documentRef 
 
   function getStyles(route) {
     const renderer = routeTable.get(route.path);
-    return normalizeStyles(typeof renderer === 'function' ? renderer.styles : renderer?.styles);
+    return normalizeStyles([
+      ...BASE_ROUTE_STYLES,
+      ...(typeof renderer === 'function' ? renderer.styles : renderer?.styles || [])
+    ]);
   }
 
   async function render(route) {

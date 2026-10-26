@@ -147,8 +147,8 @@ export function createArchiveRuntime({
       restore.textContent = 'Herstellen';
       restore.addEventListener('click', async () => {
         try {
-          if (kind === 'archive') await app.skillDefinitions.restoreFromArchive(skill.id);
-          else await app.skillDefinitions.restoreFromTrash(skill.id);
+          if (kind === 'archive') await management.restoreSkillFromArchive(skill.id);
+          else await management.restoreSkillFromTrash(skill.id);
           showNotice(`“${skill.title}” is hersteld.`);
           await refreshRecovery();
         } catch (error) { await handleRecoveryError(error); }
@@ -163,7 +163,7 @@ export function createArchiveRuntime({
           const confirmed = await confirmPacoAction({ title: 'Skill definitief verwijderen?', message: `“${skill.title}” wordt definitief verwijderd. Dit kan niet ongedaan worden gemaakt.`, confirmLabel: 'Definitief verwijderen', cancelLabel: 'Annuleren' });
           if (!confirmed) return;
           try {
-            await app.skillDefinitions.permanentlyDelete(skill.id);
+            await management.permanentlyDeleteSkill(skill.id);
             showNotice(`“${skill.title}” is definitief verwijderd.`);
             await refreshRecovery();
           } catch (error) { await handleRecoveryError(error); }
@@ -184,8 +184,8 @@ export function createArchiveRuntime({
     renderRecovery(trashList, management, 'trash', handleRestore, emptyTrash, permanentlyDeleteLesson, handleRecoveryError);
     await renderLearningTopicRecovery(learningArchiveList, management, 'archive', handleLearningRestore, undefined, undefined, handleRecoveryError);
     await renderLearningTopicRecovery(learningTrashList, management, 'trash', handleLearningRestore, emptyLearningTrash, permanentlyDeleteLearningTopic, handleRecoveryError);
-    renderSkillRecovery(skillArchiveList, await app.skillDefinitions.listRecovery('archive'), 'archive');
-    renderSkillRecovery(skillTrashList, await app.skillDefinitions.listRecovery('trash'), 'trash');
+    renderSkillRecovery(skillArchiveList, await management.getRecoverySkills('archive'), 'archive');
+    renderSkillRecovery(skillTrashList, await management.getRecoverySkills('trash'), 'trash');
   }
 
   async function mount() {

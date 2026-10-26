@@ -88,12 +88,6 @@ export function createSkillsRuntime({ app, templateMount, context, skillId = '',
     const back = documentRef.createElement('button'); back.type = 'button'; back.className = 'secondary'; back.textContent = 'Terug naar Skills'; back.addEventListener('click', goSkills); card.append(retry, back); content.appendChild(card);
   }
 
-  function skillEditorTarget(skillId) {
-    const target = buildViewUrl('skill-editor.html', { student, mode: 'management' });
-    target.searchParams.set('skill_id', String(skillId));
-    return target;
-  }
-
   function renderSkillManagementCard(skill) {
     const card = documentRef.createElement('article');
     card.className = 'skill-management-card paco-template-card';

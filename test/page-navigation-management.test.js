@@ -11,10 +11,11 @@ const managementRuntime = fs.readFileSync(path.join(projectRoot, 'src/features/m
 const lessonsRuntime = fs.readFileSync(path.join(projectRoot, 'src/features/lessons/runtime.js'), 'utf8');
 
 test('management navigation uses Dashboard as its management home and owns the student context', () => {
-  assert.match(navigation, /key: 'dashboard',[\s\S]*?label: 'Dashboard'/);
+  assert.match(navigation, /key: 'management-dashboard',[\s\S]*?label: 'Dashboard'/);
+  assert.match(navigation, /includeManagementStudentSelector = false/);
+  assert.match(navigation, /const showManagementLearnerBar = includeManagementStudentSelector/);
   assert.match(navigation, /key: 'management-student',[\s\S]*?label: 'LEERLING',[\s\S]*?submenu: learners\.map/);
   assert.doesNotMatch(navigation, /key: 'management-student-heading'/);
-  assert.match(navigation, /else if \(showManagementLearnerBar\) \{/);
 });
 
 test('management student submenu contains the canonical student labels from the shared student list', () => {
@@ -31,14 +32,17 @@ test('management page delegates its shell and feature composition to the canonic
   assert.match(managementRuntime, /active: 'dashboard'/);
 });
 
-test('shared learning navigation uses the canonical Mijn vakken and Vakken beheren terminology', () => {
-  assert.match(navigation, /key: 'lessons',[\s\S]*?label: isManagementView \? 'Vakken beheren' : 'Mijn vakken'/);
+test('shared learning navigation uses the canonical Mijn vakken terminology', () => {
+  assert.match(navigation, /key: 'lessons',[\s\S]*?label: 'Mijn vakken'/);
+  assert.doesNotMatch(navigation, /isManagementView/);
   assert.match(lessonsRuntime, /title: 'Mijn vakken'/);
   assert.match(lessonsRuntime, /Kies eerst een vak en open daarna het onderwerp of de les/);
 });
 
-test('management test history keeps the shared management view context through the central navigation owner', () => {
-  assert.match(navigation, /key: 'test-history',[\s\S]*?go\(navigate, 'test-history\.html', view\)/);
+test('management test history keeps the selected student context through the central navigation owner', () => {
+  assert.match(navigation, /key: 'test-history',[\s\S]*?go\(navigate, 'test-history\.html', \{ student \}\)/);
+  assert.doesNotMatch(navigation, /viewMode:/);
+  assert.doesNotMatch(navigation, /isManagementView/);
 });
 
 test('logout uses the shared confirmation dialog before signing out', () => {

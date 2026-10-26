@@ -106,6 +106,7 @@ export function createPacoTile({
   if (draggable) {
     const handle = documentRef.createElement('button');
     handle.type = 'button';
+    handle.draggable = true;
     handle.className = 'paco-tile-drag-handle';
     handle.setAttribute('aria-label', 'Tegel verslepen');
     handle.title = 'Verslepen';

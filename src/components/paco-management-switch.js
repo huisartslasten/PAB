@@ -2,8 +2,8 @@
  * Shared management capability trigger for the page template.
  *
  * The page template owns placement. Authentication owns authorization.
- * The central management capability registry owns available actions.
- * This component only presents those actions for the current page/context.
+ * The central management capability registry owns available actions and the
+ * page-local management visibility state. This component only presents it.
  */
 
 const STYLE_HREF = 'src/components/paco-management-switch.css';
@@ -69,8 +69,9 @@ export function installPacoManagementSwitch({ templateMount, app = null, navigat
   if (existing) existing.closest('.paco-management-capability-wrap')?.remove();
   if (!canManage || !app?.managementCapabilities) return null;
 
+  const page = currentPageKey();
   const capabilities = app.managementCapabilities.getAvailableForPage({
-    page: currentPageKey(),
+    page,
     student: currentStudent()
   });
   if (!capabilities.length) return null;
@@ -94,6 +95,7 @@ export function installPacoManagementSwitch({ templateMount, app = null, navigat
     const nextOpen = panel.hidden;
     panel.hidden = !nextOpen;
     button.setAttribute('aria-expanded', String(nextOpen));
+    app.managementCapabilities.setPageActive(page, nextOpen);
   });
 
   wrap.append(button, panel);

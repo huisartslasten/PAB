@@ -93,8 +93,8 @@ export function createDashboardRuntime({ app, templateMount, chooserMount, conte
     const grid = createActivityCardGrid({
       items,
       documentRef,
-      gridClassName: 'dashboard-challenge-grid',
-      cardClassName: 'dashboard-challenge-card',
+      gridClassName: 'activity-card-grid dashboard-challenge-grid',
+      cardClassName: 'activity-card dashboard-challenge-card',
       onOpen: challenge => navigate(buildViewUrl(challenge.route, { student: selectedStudent, mode: context.mode }))
     });
     card.appendChild(grid);

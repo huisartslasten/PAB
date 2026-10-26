@@ -97,7 +97,6 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
       documentRef,
       title: 'Leerstof',
       description: topic.subvak || 'Zonder subvak',
-      icon: '🧠',
       actionLabel: 'Bekijken',
       onActivate: () => navigate(learningMaterialTarget(topic)),
       actions: context?.isManagement ? [

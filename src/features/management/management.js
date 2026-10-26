@@ -33,12 +33,13 @@ function normalizeSubject(value) {
   return String(value ?? '').trim().replace(/\s+/g, ' ').toLocaleLowerCase('nl-NL');
 }
 
-export function createManagement({ auth, lessonService, feedbackService, lessonOrder, loadLessons, learningTopics } = {}) {
+export function createManagement({ auth, lessonService, feedbackService, lessonOrder, loadLessons, learningTopics, skillDefinitions } = {}) {
   if (!lessonService) throw new Error('createManagement requires lessonService');
   if (!feedbackService) throw new Error('createManagement requires feedbackService');
   if (!lessonOrder) throw new Error('createManagement requires lessonOrder');
   if (typeof loadLessons !== 'function') throw new Error('createManagement requires loadLessons');
   if (!learningTopics) throw new Error('createManagement requires learningTopics');
+  if (!skillDefinitions) throw new Error('createManagement requires skillDefinitions');
 
   function assertParent() { requireParent(auth); }
 
@@ -68,6 +69,14 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
     return {
       archive: await learningTopics.listRecovery('archive'),
       trash: await learningTopics.listRecovery('trash')
+    };
+  }
+
+  async function refreshRecoverySkills() {
+    assertParent();
+    return {
+      archive: await skillDefinitions.listRecovery('archive'),
+      trash: await skillDefinitions.listRecovery('trash')
     };
   }
 
@@ -136,15 +145,23 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
   async function emptyLearningTopicTrash() { assertParent(); return learningTopics.emptyTrash(); }
   async function getRecoveryLearningTopics(mode) { assertParent(); return learningTopics.listRecovery(mode); }
 
+  async function archiveSkill(id) { assertParent(); return skillDefinitions.archive(id); }
+  async function moveSkillToTrash(id) { assertParent(); return skillDefinitions.moveToTrash(id); }
+  async function restoreSkillFromArchive(id) { assertParent(); return skillDefinitions.restoreFromArchive(id); }
+  async function restoreSkillFromTrash(id) { assertParent(); return skillDefinitions.restoreFromTrash(id); }
+  async function permanentlyDeleteSkill(id) { assertParent(); return skillDefinitions.permanentlyDelete(id); }
+  async function getRecoverySkills(mode) { assertParent(); return skillDefinitions.listRecovery(mode); }
+
   async function listFeedback() { assertParent(); return feedbackService.listAll(); }
   async function submitFeedback(payload = {}) { assertParent(); return feedbackService.create(payload); }
   async function updateFeedbackStatus(id, status) { assertParent(); return feedbackService.updateStatus(id, status); }
 
   return Object.freeze({
-    getStudents, loadAllLessons, loadLessons: refreshLessons, loadRecoveryLessons: refreshRecoveryLessons, refreshRecoveryLearningTopics,
+    getStudents, loadAllLessons, loadLessons: refreshLessons, loadRecoveryLessons: refreshRecoveryLessons, refreshRecoveryLearningTopics, refreshRecoverySkills,
     getScopedLessons, getAllScopedLessons, getOrderedScopedLessons, saveLessonOrder, moveLessonToSubvak, getRecoveryLessons,
     createLesson, updateLesson, archiveLesson, moveToTrash, restoreLesson, permanentlyDeleteRecoveryLesson, emptyTrash,
     archiveLearningTopic, moveLearningTopicToTrash, restoreLearningTopic, permanentlyDeleteLearningTopic, emptyLearningTopicTrash, getRecoveryLearningTopics,
+    archiveSkill, moveSkillToTrash, restoreSkillFromArchive, restoreSkillFromTrash, permanentlyDeleteSkill, getRecoverySkills,
     listFeedback, submitFeedback, updateFeedbackStatus
   });
 }

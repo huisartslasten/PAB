@@ -33,3 +33,28 @@ test('Millionaire uses lesson questions and keeps lifelines in game state', asyn
   assert.equal(state.finished, true);
   assert.equal(state.prize, 1000000);
 });
+
+test('Millionaire progresses from hard to harder challenge content', async () => {
+  const calls = [];
+  const runtime = createMillionaireRuntime({
+    questions: [
+      { question: 'Vraag 1', answer: 'A' },
+      { question: 'Vraag 2', answer: 'B' }
+    ],
+    distractorService: {
+      async generateMultipleChoiceDistractors(request) {
+        calls.push(request.difficulty);
+        return ['X', 'Y', 'Z'];
+      }
+    },
+    random: () => 0.1
+  });
+
+  runtime.start();
+  await runtime.next();
+  assert.equal(runtime.snapshot().difficulty, 'hard');
+  runtime.choose(runtime.snapshot().current.answer);
+  await runtime.next();
+  assert.equal(runtime.snapshot().difficulty, 'harder');
+  assert.deepEqual(calls, ['hard', 'harder']);
+});

@@ -2,8 +2,8 @@ import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
 import { createPacoTile, createPacoTileGrid } from '../../components/paco-tile.js';
 import { attachPacoTileSorting } from '../../components/paco-tile-sort.js';
-import { confirmPacoAction } from '../../components/confirm-dialog.js';
 import { applyViewContext, buildViewUrl } from '../../core/view-context.js';
+import { createContentManagementActions } from '../management/content-management-actions.js';
 import { getLessonSubjectGroups, getLessonSubjectIcon, getSubjectSubvakGroups, normalizeLessonSubject } from './list-view-model.js';
 
 export function createLessonsRuntime({ app, templateMount, context, selectedSubject = '', documentRef = document, navigate } = {}) {
@@ -52,30 +52,33 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
     navigate(target);
   }
   async function archiveLesson(lesson) {
-    const confirmed = await confirmPacoAction({ title: 'Les archiveren?', message: `“${lesson.title}” wordt uit de actieve lessen van ${selectedStudent} gehaald en in het archief geplaatst.`, confirmLabel: 'Archiveren', cancelLabel: 'Annuleren' });
-    if (!confirmed) return;
     try { await app.management.archiveLesson(lesson.id); showActionNotice(`“${lesson.title}” is gearchiveerd en uit de actieve lessen verwijderd.`); await render(app.state.lessons, currentTopics); }
     catch (error) { console.error('Lesson archive error:', error); showActionNotice(error?.message || 'De les kon niet worden gearchiveerd.'); }
   }
   async function moveLessonToTrash(lesson) {
-    const confirmed = await confirmPacoAction({ title: 'Les naar prullenbak?', message: `“${lesson.title}” wordt uit de actieve lessen van ${selectedStudent} gehaald en naar de prullenbak verplaatst.`, confirmLabel: 'Naar prullenbak', cancelLabel: 'Annuleren' });
-    if (!confirmed) return;
     try { await app.management.moveToTrash(lesson.id); showActionNotice(`“${lesson.title}” staat in de prullenbak en is uit de actieve lessen verwijderd.`); await render(app.state.lessons, currentTopics); }
     catch (error) { console.error('Lesson trash error:', error); showActionNotice(error?.message || 'De les kon niet naar de prullenbak worden verplaatst.'); }
   }
   async function archiveLearningTopic(topic) {
-    const confirmed = await confirmPacoAction({ title: 'Leerstof archiveren?', message: `“${topic.subject}${topic.subvak ? ` · ${topic.subvak}` : ''}” wordt uit de actieve leerstof gehaald en in het archief geplaatst.`, confirmLabel: 'Archiveren', cancelLabel: 'Annuleren' });
-    if (!confirmed) return;
     try { await app.management.archiveLearningTopic(topic.id); showActionNotice(`“${topic.subject}” is gearchiveerd.`); await reloadContent(); }
     catch (error) { console.error('Learning topic archive error:', error); showActionNotice(error?.message || 'De leerstof kon niet worden gearchiveerd.'); }
   }
   async function moveLearningTopicToTrash(topic) {
-    const confirmed = await confirmPacoAction({ title: 'Leerstof naar prullenbak?', message: `“${topic.subject}${topic.subvak ? ` · ${topic.subvak}` : ''}” wordt uit de actieve leerstof gehaald en naar de prullenbak verplaatst.`, confirmLabel: 'Naar prullenbak', cancelLabel: 'Annuleren' });
-    if (!confirmed) return;
     try { await app.management.moveLearningTopicToTrash(topic.id); showActionNotice(`“${topic.subject}” staat in de prullenbak.`); await reloadContent(); }
     catch (error) { console.error('Learning topic trash error:', error); showActionNotice(error?.message || 'De leerstof kon niet naar de prullenbak worden verplaatst.'); }
   }
   function renderLessonCard(lesson) {
+    const actions = context?.isManagement
+      ? createContentManagementActions({
+          entityType: 'lesson',
+          item: lesson,
+          handlers: {
+            edit: editLesson,
+            archive: archiveLesson,
+            delete: moveLessonToTrash
+          }
+        })
+      : [];
     return createPacoTile({
       documentRef,
       title: lesson.title || 'Naamloze les',
@@ -84,26 +87,28 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
       onActivate: () => navigate(lessonTarget(lesson)),
       draggable: true,
       dragId: lesson.id,
-      actions: context?.isManagement ? [
-        { label: 'Bewerken', onClick: () => editLesson(lesson) },
-        { label: 'Leerstof', onClick: () => editLearning(lesson) },
-        { label: 'Archiveren', onClick: () => archiveLesson(lesson) },
-        { label: 'Verwijderen', danger: true, onClick: () => moveLessonToTrash(lesson) }
-      ] : []
+      actions
     });
   }
   function renderLearningMaterialCard(topic) {
+    const actions = context?.isManagement
+      ? createContentManagementActions({
+          entityType: 'learningTopic',
+          item: topic,
+          handlers: {
+            edit: editLearningTopic,
+            archive: archiveLearningTopic,
+            delete: moveLearningTopicToTrash
+          }
+        })
+      : [];
     return createPacoTile({
       documentRef,
       title: 'Leerstof',
       description: topic.subvak || 'Zonder subvak',
       actionLabel: 'Bekijken',
       onActivate: () => navigate(learningMaterialTarget(topic)),
-      actions: context?.isManagement ? [
-        { label: 'Bewerken', onClick: () => editLearningTopic(topic) },
-        { label: 'Archiveren', onClick: () => archiveLearningTopic(topic) },
-        { label: 'Verwijderen', danger: true, onClick: () => moveLearningTopicToTrash(topic) }
-      ] : []
+      actions
     });
   }
 

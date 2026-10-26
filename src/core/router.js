@@ -1,9 +1,9 @@
 /**
  * PacoGO central client-side route state and rendering contract.
  *
- * The router owns URL state, route transitions and route asset readiness.
+ * The router owns URL state, route transitions and route asset activation.
  * Route renderers own feature composition and rendering; the router only
- * supplies navigation context and makes route styles available before mount.
+ * supplies navigation context and activates route styles before mount.
  */
 
 const BASE_ROUTE_STYLES = Object.freeze(['src/components/paco-tile.css']);
@@ -26,34 +26,22 @@ function createRouteStyleManager(documentRef) {
       .find(link => link.href === absoluteHref || link.getAttribute('href') === href) || null;
   }
 
-  function loadStylesheet(href) {
+  function activateStylesheet(href) {
     const existing = findStylesheet(href);
-    if (existing) {
-      // Stylesheets declared by the page are already part of the document
-      // lifecycle. Do not wait on a second readiness signal that may already
-      // have fired before the router starts; the router only waits on styles
-      // that it creates itself below.
-      return Promise.resolve(existing);
-    }
+    if (existing) return existing;
 
     const link = documentRef.createElement('link');
     link.rel = 'stylesheet';
     link.href = href;
     link.dataset.pacoRouteStyle = href;
-
-    return new Promise((resolve, reject) => {
-      link.addEventListener('load', () => resolve(link), { once: true });
-      link.addEventListener('error', () => reject(new Error(`Failed to load PacoGO route stylesheet: ${href}`)), { once: true });
-      documentRef.head.appendChild(link);
-    });
+    documentRef.head.appendChild(link);
+    return link;
   }
 
   async function activate(styles) {
     const hrefs = normalizeStyles(styles);
     const next = new Map();
-    const loaded = await Promise.all(hrefs.map(async href => [href, await loadStylesheet(href)]));
-
-    loaded.forEach(([href, link]) => next.set(href, link));
+    hrefs.forEach(href => next.set(href, activateStylesheet(href)));
 
     active.forEach((link, href) => {
       if (!next.has(href)) link.remove();

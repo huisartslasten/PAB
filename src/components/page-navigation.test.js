@@ -24,33 +24,32 @@ describe('shared PacoGO navigation', () => {
     expect(items.some(item => item.label === 'Oefenen')).toBe(false);
   });
 
-  it('exposes the management mode control to management users in the learner view', () => {
+  it('does not expose a management mode control in normal navigation', () => {
     const items = createPacoNavigation({
       app: createApp({ isParent: true }),
       student: 'Zyon',
       navigate: () => {}
     });
 
-    const management = items.find(item => item.key === 'management-mode');
-    expect(management).toBeDefined();
-    expect(management.label).toBe('BEHEER');
-    expect(management.kind).toBe('management-mode');
+    expect(items.some(item => item.key === 'management-mode')).toBe(false);
+    expect(items.some(item => item.label === 'BEHEER')).toBe(false);
   });
 
-  it('renders LEERLING as the single heading for the central management learner selector', () => {
+  it('renders central management tools explicitly without switching navigation mode', () => {
     const items = createPacoNavigation({
       app: createApp({ isParent: true }),
       student: 'Zyon',
-      viewMode: 'management',
+      includeManagementDashboard: true,
+      includeManagementTools: true,
+      includeCreator: true,
       managementStudents: ['Zyon', 'Mila'],
       navigate: () => {}
     });
 
     expect(items.map(item => item.key)).toEqual([
-      'management-mode',
-      'management-student',
-      'dashboard',
+      'management-dashboard',
       'lessons',
+      'skills',
       'agenda',
       'test-history',
       'recovery',
@@ -59,10 +58,11 @@ describe('shared PacoGO navigation', () => {
       'account'
     ]);
 
-    const learner = items.find(item => item.key === 'management-student');
-    expect(learner.label).toBe('LEERLING');
-    expect(learner.submenu.map(item => item.label)).toEqual(['Zyon', 'Mila']);
-    expect(learner.submenu.find(item => item.label === 'Zyon').active).toBe(true);
+    const dashboard = items.find(item => item.key === 'management-dashboard');
+    expect(dashboard.label).toBe('Dashboard');
+    expect(dashboard.submenu.map(item => item.label)).toEqual(['Zyon', 'Mila']);
+    expect(dashboard.submenu.find(item => item.label === 'Zyon').active).toBe(true);
+    expect(items.some(item => item.key === 'management-mode')).toBe(false);
     expect(items.some(item => item.key === 'management-student-heading')).toBe(false);
     expect(items.some(item => item.label === 'Kies leerling')).toBe(false);
     expect(items.some(item => item.key === 'practice')).toBe(false);

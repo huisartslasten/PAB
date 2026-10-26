@@ -1,7 +1,7 @@
 // Canonical persistence boundary for per-student Skill configuration.
 // Management owns writes; learner-facing Skills consume the same assignments.
 
-import { isKnownStudent } from '../features/students/students.js';
+import { isKnownStudent } from '../core/student-registry.js';
 
 function requireDb(db) {
   if (!db || typeof db.from !== 'function') throw new Error('A Supabase client is required.');

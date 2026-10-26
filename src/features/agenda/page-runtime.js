@@ -46,7 +46,9 @@ export function createAgendaPageRuntime({ app, templateMount, context, documentR
       link.dataset.bound = '1';
       link.addEventListener('click', event => {
         event.preventDefault();
-        navigate(new URL(link.href, globalThis.location?.href || 'http://localhost/'));
+        const target = buildViewUrl('lesson-choice.html', { student: selectedStudent, mode: context.mode });
+        target.searchParams.set('lesson_id', link.dataset.lessonId);
+        navigate(target);
       });
     });
   }
@@ -64,7 +66,7 @@ export function createAgendaPageRuntime({ app, templateMount, context, documentR
         if (!item.lessonId) return '';
         const target = buildViewUrl('lesson-choice.html', { student: selectedStudent, mode: context.mode });
         target.searchParams.set('lesson_id', item.lessonId);
-        return `<a class="agenda-lesson-link" href="${target.toString().replaceAll('"', '&quot;')}">Naar les</a>`;
+        return `<a class="agenda-lesson-link" data-lesson-id="${String(item.lessonId).replaceAll('"', '&quot;')}" href="${target.toString().replaceAll('"', '&quot;')}">Naar les</a>`;
       },
       now: () => new Date()
     });

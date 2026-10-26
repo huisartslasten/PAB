@@ -1,6 +1,7 @@
 import { createPacoGOApp } from './bootstrap.js';
 import { createPacoRouter } from '../core/router.js';
 import { createPacoRouteRegistry } from './routes.js';
+import { installPacoManagementSwitch } from '../components/paco-management-switch.js';
 
 export function createPacoRuntime({
   supabaseLib = window.supabase,
@@ -19,6 +20,10 @@ export function createPacoRuntime({
     documentRef
   });
   const router = createPacoRouter({ windowRef: window, routes });
+
+  router.onChange(() => {
+    installPacoManagementSwitch({ templateMount, app, router, documentRef });
+  });
 
   return Object.freeze({ app, router, routes });
 }

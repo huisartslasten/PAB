@@ -11,8 +11,9 @@
   width: 260px;
   min-width: 260px;
   max-width: 260px;
-  min-height: 190px;
-  height: auto;
+  height: 210px;
+  min-height: 210px;
+  box-sizing: border-box;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -151,12 +152,12 @@
 .paco-tile-placeholder {
   width: 260px;
   min-width: 260px;
-  min-height: 190px;
-  height: auto;
+  height: 210px;
+  min-height: 210px;
+  box-sizing: border-box;
   border: 3px dashed var(--paco-blue, #1787f2);
   border-radius: 22px;
   background: rgba(234,244,255,.75);
-  box-sizing: border-box;
   transition: opacity .1s ease;
 }
 

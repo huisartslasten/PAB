@@ -56,6 +56,7 @@ test('editor save prepares the canonical lesson and item payload before persiste
     ],
     response_type: 'text',
     answer_options: [],
+    difficulty: null,
     hint: 'Denk aan kennis',
     min_words: 2,
     required_terms: ['kennis'],

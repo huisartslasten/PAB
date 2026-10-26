@@ -1,4 +1,4 @@
-import { listStudents } from '../features/students/students.js';
+import { listStudents } from '../core/student-registry.js';
 import { confirmPacoAction } from './confirm-dialog.js';
 import { buildViewUrl } from '../core/view-context.js';
 

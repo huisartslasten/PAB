@@ -114,7 +114,7 @@ test('lesson service replaces lesson items with normalized TEST-schema fields', 
   await createService(db).replaceLessonItems(12, [{ prompt: 'woord', min_words: '', required_terms: null }]);
   assert.deepEqual(db.calls.find(call => call.op === 'insert').rows, [{
     question: '', answer: '', question_parts: [], answer_parts: [], hint: '', response_type: 'text',
-    answer_options: [], sort_order: 0, lesson_id: 12
+    answer_options: [], difficulty: null, sort_order: 0, lesson_id: 12
   }]);
 });
 
@@ -147,7 +147,7 @@ test('lesson service owns photo-style lesson creation and preserves normalized i
     question: 'Wat betekent kapen?', answer: 'Een schip overnemen',
     question_parts: [{ text: 'Wat betekent kapen?', role: 'answer' }],
     answer_parts: [{ text: 'Een schip overnemen', role: 'answer' }],
-    hint: '', response_type: 'text', answer_options: [], sort_order: 0, lesson_id: 31
+    hint: '', response_type: 'text', answer_options: [], difficulty: null, sort_order: 0, lesson_id: 31
   }]);
 });
 

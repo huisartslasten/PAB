@@ -12,6 +12,7 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
   if (typeof navigate !== 'function') throw new TypeError('Lessons runtime requires navigation.');
 
   const selectedStudent = context?.student || '';
+  const pageKey = 'lessons';
   const content = documentRef.createElement('div');
   content.className = 'lessons-page paco-template-card';
   const state = documentRef.createElement('div');
@@ -25,6 +26,7 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
 
   const buildLessonsUrl = () => buildViewUrl('lessons.html', { student: selectedStudent, mode: context?.mode });
   const goLessons = () => navigate(buildLessonsUrl());
+  const isManagementActive = () => app.managementCapabilities?.isPageActive(pageKey) === true;
   function showActionNotice(message) { actionState.textContent = message; actionState.hidden = false; }
   function lessonTarget(lesson) {
     const target = buildViewUrl('lesson-choice.html', { student: selectedStudent, mode: context?.mode });
@@ -32,50 +34,22 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
     return target;
   }
   function learningMaterialTarget(topic) {
-    const target = buildViewUrl('learning-material.html', { student: selectedStudent, mode: context?.mode || 'management', subject: topic.subject || '', subvak: topic.subvak || '' });
+    const target = buildViewUrl('learning-material.html', { student: selectedStudent, mode: context?.mode, subject: topic.subject || '', subvak: topic.subvak || '' });
     target.searchParams.set('topic_id', String(topic.id));
     return target;
   }
-  function editLesson(lesson) {
-    const target = buildViewUrl('lesson-editor.html', { student: selectedStudent, mode: context?.mode });
-    target.searchParams.set('lesson_id', String(lesson.id));
-    navigate(target);
-  }
-  function editLearning(lesson) {
-    const topic = currentTopics.find(item => Number(item.id) === Number(lesson.learning_topic_id));
-    if (!topic) return;
-    editLearningTopic(topic);
-  }
-  function editLearningTopic(topic) {
-    const target = buildViewUrl('learning-material-editor.html', { student: selectedStudent, mode: 'management', subject: topic.subject, subvak: topic.subvak });
-    target.searchParams.set('topic_id', String(topic.id));
-    navigate(target);
-  }
-  async function archiveLesson(lesson) {
-    try { await app.management.archiveLesson(lesson.id); showActionNotice(`“${lesson.title}” is gearchiveerd en uit de actieve lessen verwijderd.`); await render(app.state.lessons, currentTopics); }
-    catch (error) { console.error('Lesson archive error:', error); showActionNotice(error?.message || 'De les kon niet worden gearchiveerd.'); }
-  }
-  async function moveLessonToTrash(lesson) {
-    try { await app.management.moveToTrash(lesson.id); showActionNotice(`“${lesson.title}” staat in de prullenbak en is uit de actieve lessen verwijderd.`); await render(app.state.lessons, currentTopics); }
-    catch (error) { console.error('Lesson trash error:', error); showActionNotice(error?.message || 'De les kon niet naar de prullenbak worden verplaatst.'); }
-  }
-  async function archiveLearningTopic(topic) {
-    try { await app.management.archiveLearningTopic(topic.id); showActionNotice(`“${topic.subject}” is gearchiveerd.`); await reloadContent(); }
-    catch (error) { console.error('Learning topic archive error:', error); showActionNotice(error?.message || 'De leerstof kon niet worden gearchiveerd.'); }
-  }
-  async function moveLearningTopicToTrash(topic) {
-    try { await app.management.moveLearningTopicToTrash(topic.id); showActionNotice(`“${topic.subject}” staat in de prullenbak.`); await reloadContent(); }
-    catch (error) { console.error('Learning topic trash error:', error); showActionNotice(error?.message || 'De leerstof kon niet naar de prullenbak worden verplaatst.'); }
-  }
+
   function renderLessonCard(lesson) {
-    const actions = context?.isManagement
+    const actions = isManagementActive()
       ? createContentManagementActions({
+          app,
           entityType: 'lesson',
           item: lesson,
-          handlers: {
-            edit: editLesson,
-            archive: archiveLesson,
-            delete: moveLessonToTrash
+          student: selectedStudent,
+          navigate,
+          onChanged: async () => {
+            showActionNotice(`“${lesson.title}” is gewijzigd.`);
+            await reloadContent();
           }
         })
       : [];
@@ -90,15 +64,18 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
       actions
     });
   }
+
   function renderLearningMaterialCard(topic) {
-    const actions = context?.isManagement
+    const actions = isManagementActive()
       ? createContentManagementActions({
+          app,
           entityType: 'learningTopic',
           item: topic,
-          handlers: {
-            edit: editLearningTopic,
-            archive: archiveLearningTopic,
-            delete: moveLearningTopicToTrash
+          student: selectedStudent,
+          navigate,
+          onChanged: async () => {
+            showActionNotice(`“${topic.subject}” is gewijzigd.`);
+            await reloadContent();
           }
         })
       : [];
@@ -174,22 +151,28 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
       selector: '.paco-tile[data-paco-tile-id][draggable="true"]',
       onOrderChange: async ({ orderedIds }) => {
         const reorderedLessons = orderedIds.map(id => lessonById.get(Number(id))).filter(Boolean);
-        await (context?.isManagement ? app.management.saveLessonOrder(subject?.label || selectedSubject, reorderedLessons) : app.lessonOrder.writeOrder(selectedStudent, subject?.label || selectedSubject, reorderedLessons, { persistRemote: false }));
+        await (isManagementActive() ? app.management.saveLessonOrder(subject?.label || selectedSubject, reorderedLessons) : app.lessonOrder.writeOrder(selectedStudent, subject?.label || selectedSubject, reorderedLessons, { persistRemote: false }));
       },
       onError: async error => { console.error('Lessons reorder error:', error); await render(records, topics); }
     });
   }
 
   async function mount() {
-    mountPacoPageTemplate({ mount: templateMount, greeting: `Hoi ${selectedStudent}! 🐶`, title: 'Mijn vakken', icon: '📚', subtitle: context?.isManagement ? 'Beheerweergave — je kunt hier vakken en de bijbehorende lessen beheren.' : 'Kies eerst een vak en open daarna het onderwerp of de les die je wilt doen.', navigation: createPacoNavigation({ app, active: 'lessons', student: selectedStudent, viewMode: context?.mode, includeManagement: true, navigate }), content });
+    mountPacoPageTemplate({ mount: templateMount, greeting: `Hoi ${selectedStudent}! 🐶`, title: 'Mijn vakken', icon: '📚', subtitle: 'Kies eerst een vak en open daarna het onderwerp of de les die je wilt doen.', navigation: createPacoNavigation({ app, active: 'lessons', student: selectedStudent, viewMode: context?.mode, includeManagement: true, navigate }), content });
     content.appendChild(state);
     try {
       if (!selectedStudent) throw new Error('Geen leerling geselecteerd.');
       await app.initializeSession();
-      if (context?.isManagement) applyViewContext(context, { canManage: app.auth.isParent }); else applyViewContext(context);
+      applyViewContext(context);
       const [records, topics] = await Promise.all([app.loadLessons(), app.learningTopics.listForStudent(selectedStudent)]);
       state.remove();
       await render(records, topics);
+
+      const eventTarget = documentRef.defaultView || window;
+      eventTarget.addEventListener('paco:management-visibility-change', event => {
+        if (event.detail?.page !== pageKey) return;
+        void render(currentRecords, currentTopics);
+      });
     } catch (error) {
       console.error('Lessons page load error:', error);
       state.textContent = error.message === 'Geen leerling geselecteerd.' ? 'Selecteer eerst een leerling vanuit Beheer.' : 'De vakken konden niet worden geladen.';

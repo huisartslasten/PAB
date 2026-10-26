@@ -39,8 +39,8 @@ export function createPacoRuntime({
 
 export async function startPacoRuntime(options = {}) {
   const runtime = createPacoRuntime(options);
-  await runtime.app.initializeSession();
   const stop = runtime.router.start();
+  await runtime.app.initializeSession();
   return Object.freeze({
     ...runtime,
     stop

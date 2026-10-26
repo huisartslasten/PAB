@@ -1,9 +1,9 @@
 import { appState } from '../../core/state.js';
 import { getViewContext } from '../../core/view-context.js';
+import { listStudents } from '../../core/student-registry.js';
 import { getActiveStudentLessons, getStudentLessons } from '../lessons/visibility.js';
 import { createLessonRecovery, createTrashRecovery } from '../lessons/recovery.js';
 import { getAllArchiveEntries, getAllTrashEntries } from './recovery.js';
-import { listStudents } from '../students/students.js';
 
 function requireParent(auth) {
   if (!auth?.isParent) throw new Error('Management requires a parent session.');

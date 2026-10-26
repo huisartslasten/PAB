@@ -31,7 +31,7 @@ export function createPacoNavigation({ app = null, active = '', activeSubmenu = 
   items.push({ key: 'dashboard', icon: '🏠', label: 'Dashboard', onClick: () => go(navigate, isManagementView ? 'management.html' : 'dashboard.html', view), active: active === 'dashboard' });
   if (showManagementDashboard) items[items.length - 1] = { key: 'management-dashboard', icon: '🏠', label: 'Dashboard', onClick: () => go(navigate, 'management.html', view), active: active === 'management-dashboard', submenu: includeManagementDashboardStudentSubmenu ? learners.map(name => ({ key: `management-student-${name}`, label: name, active: name === student, onClick: () => typeof onSelectManagementStudent === 'function' ? onSelectManagementStudent(name) : go(navigate, 'management.html', { student: name, mode: 'management' }) })) : [] };
   if (includeLessons) items.push({ key: 'lessons', icon: '📚', label: isManagementView ? 'Vakken beheren' : 'Mijn vakken', onClick: () => go(navigate, 'lessons.html', view) });
-  if (includeSkills && !isManagementView) items.push({ key: 'skills', icon: '⚡', label: 'Skills', onClick: () => go(navigate, 'skills.html', view) });
+  if (includeSkills) items.push({ key: 'skills', icon: '⚡', label: isManagementView ? 'Skills beheren' : 'Skills', onClick: () => go(navigate, 'skills.html', view) });
   if (includeAgenda) items.push({ key: 'agenda', icon: '📅', label: isManagementView ? 'Agenda beheren' : 'Mijn agenda', onClick: () => go(navigate, 'agenda.html', view), submenu: [
     { key: 'agenda', label: isManagementView ? 'Agenda beheren' : 'Agenda invoeren', active: activeSubmenu === 'agenda', onClick: () => go(navigate, 'agenda.html', view) },
     { key: 'month-calendar', label: 'Maandkalender', active: activeSubmenu === 'month-calendar', onClick: () => go(navigate, 'month-calendar.html', view) }
@@ -47,5 +47,5 @@ export function createPacoNavigation({ app = null, active = '', activeSubmenu = 
 }
 
 export function createPacoManagementNavigation({ app, active = '', activeSubmenu = '', student = '', managementStudents = [], onSelectManagementStudent = null, navigate } = {}) {
-  return createPacoNavigation({ app, active, activeSubmenu, student, viewMode: 'management', managementStudents, onSelectManagementStudent, includeManagementTools: true, includeCreator: true, includeLessons: true, includeSkills: false, includePractice: false, includeAgenda: true, includeAccount: true, navigate });
+  return createPacoNavigation({ app, active, activeSubmenu, student, viewMode: 'management', managementStudents, onSelectManagementStudent, includeManagementTools: true, includeCreator: true, includeLessons: true, includeSkills: true, includePractice: false, includeAgenda: true, includeAccount: true, navigate });
 }

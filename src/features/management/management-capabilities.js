@@ -77,7 +77,7 @@ const ITEM_ACTIONS = Object.freeze({
   ])
 });
 
-export function createManagementCapabilities({ auth, management, eventTarget = window } = {}) {
+export function createManagementCapabilities({ auth, management, eventTarget = globalThis } = {}) {
   requireManagement(management);
   const activePages = new Set();
 

@@ -1,5 +1,3 @@
-import { installPacoManagementSwitch } from './paco-management-switch.js';
-
 /**
  * PacoGO canonical page template.
  *
@@ -395,7 +393,6 @@ export function createPacoPageTemplate({
   versionMarker.textContent = testVersion;
   root.appendChild(versionMarker);
 
-  installPacoManagementSwitch({ templateMount: root, navigation });
   return root;
 }
 
@@ -438,7 +435,6 @@ function updatePacoPageTemplate(template, {
   const versionMarker = template.querySelector('.paco-template-version-badge');
   if (versionMarker) versionMarker.textContent = PACOGO_TEST_VERSION;
 
-  installPacoManagementSwitch({ templateMount: template, navigation });
   return template;
 }
 

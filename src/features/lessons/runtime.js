@@ -1,8 +1,9 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
+import { createPacoTile, createPacoTileGrid } from '../../components/paco-tile.js';
+import { attachPacoTileSorting } from '../../components/paco-tile-sort.js';
 import { confirmPacoAction } from '../../components/confirm-dialog.js';
 import { applyViewContext, buildViewUrl } from '../../core/view-context.js';
-import { attachLessonDragSorting } from './lesson-drag-sort.js';
 import { getLessonSubjectGroups, getLessonSubjectIcon, getSubjectSubvakGroups, normalizeLessonSubject } from './list-view-model.js';
 
 export function createLessonsRuntime({ app, templateMount, context, selectedSubject = '', documentRef = document, navigate } = {}) {
@@ -75,53 +76,36 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
     catch (error) { console.error('Learning topic trash error:', error); showActionNotice(error?.message || 'De leerstof kon niet naar de prullenbak worden verplaatst.'); }
   }
   function renderLessonCard(lesson) {
-    const wrap = documentRef.createElement('div');
-    wrap.className = 'paco-lesson-card lesson-card';
-    wrap.draggable = true;
-    wrap.dataset.lessonId = String(lesson.id);
-    const card = documentRef.createElement('a');
-    card.href = lessonTarget(lesson).toString();
-    card.style.display = 'block'; card.style.color = 'inherit'; card.style.textDecoration = 'none';
-    card.addEventListener('click', event => { event.preventDefault(); navigate(lessonTarget(lesson)); });
-    const heading = documentRef.createElement('h2'); heading.textContent = lesson.title || 'Naamloze les';
-    const subvak = documentRef.createElement('p'); subvak.textContent = lesson.subvak || 'Les';
-    card.append(heading, subvak); wrap.appendChild(card);
-    const view = documentRef.createElement('button'); view.type = 'button'; view.className = 'lesson-view-button'; view.textContent = 'Bekijken';
-    view.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); navigate(lessonTarget(lesson)); });
-    wrap.appendChild(view);
-    if (context?.isManagement) {
-      const actions = documentRef.createElement('div'); actions.className = 'lesson-management-actions';
-      const edit = documentRef.createElement('button'); edit.type = 'button'; edit.textContent = 'Bewerken';
-      edit.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); editLesson(lesson); });
-      const learning = documentRef.createElement('button'); learning.type = 'button'; learning.textContent = 'Leerstof';
-      learning.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); editLearning(lesson); });
-      const archive = documentRef.createElement('button'); archive.type = 'button'; archive.textContent = 'Archiveren';
-      archive.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); archiveLesson(lesson); });
-      const trash = documentRef.createElement('button'); trash.type = 'button'; trash.className = 'danger'; trash.textContent = 'Verwijderen';
-      trash.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); moveLessonToTrash(lesson); });
-      actions.append(edit, learning, archive, trash); wrap.appendChild(actions);
-    }
-    return wrap;
+    return createPacoTile({
+      documentRef,
+      title: lesson.title || 'Naamloze les',
+      description: lesson.subvak || 'Les',
+      actionLabel: 'Bekijken',
+      onActivate: () => navigate(lessonTarget(lesson)),
+      draggable: true,
+      dragId: lesson.id,
+      actions: context?.isManagement ? [
+        { label: 'Bewerken', onClick: () => editLesson(lesson) },
+        { label: 'Leerstof', onClick: () => editLearning(lesson) },
+        { label: 'Archiveren', onClick: () => archiveLesson(lesson) },
+        { label: 'Verwijderen', danger: true, onClick: () => moveLessonToTrash(lesson) }
+      ] : []
+    });
   }
   function renderLearningMaterialCard(topic) {
-    const card = documentRef.createElement('div');
-    card.className = 'paco-lesson-card lesson-card learning-material-card';
-    const view = documentRef.createElement('button'); view.type = 'button'; view.className = 'lesson-view-button'; view.textContent = 'Bekijken';
-    view.addEventListener('click', () => navigate(learningMaterialTarget(topic)));
-    const heading = documentRef.createElement('h2'); heading.textContent = '🧠 Leerstof';
-    const subvak = documentRef.createElement('p'); subvak.textContent = topic.subvak || 'Zonder subvak';
-    card.append(heading, subvak, view);
-    if (context?.isManagement) {
-      const actions = documentRef.createElement('div'); actions.className = 'lesson-management-actions';
-      const edit = documentRef.createElement('button'); edit.type = 'button'; edit.textContent = 'Bewerken';
-      edit.addEventListener('click', event => { event.stopPropagation(); editLearningTopic(topic); });
-      const archive = documentRef.createElement('button'); archive.type = 'button'; archive.textContent = 'Archiveren';
-      archive.addEventListener('click', event => { event.stopPropagation(); archiveLearningTopic(topic); });
-      const trash = documentRef.createElement('button'); trash.type = 'button'; trash.className = 'danger'; trash.textContent = 'Verwijderen';
-      trash.addEventListener('click', event => { event.stopPropagation(); moveLearningTopicToTrash(topic); });
-      actions.append(edit, archive, trash); card.appendChild(actions);
-    }
-    return card;
+    return createPacoTile({
+      documentRef,
+      title: 'Leerstof',
+      description: topic.subvak || 'Zonder subvak',
+      icon: '🧠',
+      actionLabel: 'Bekijken',
+      onActivate: () => navigate(learningMaterialTarget(topic)),
+      actions: context?.isManagement ? [
+        { label: 'Bewerken', onClick: () => editLearningTopic(topic) },
+        { label: 'Archiveren', onClick: () => archiveLearningTopic(topic) },
+        { label: 'Verwijderen', danger: true, onClick: () => moveLearningTopicToTrash(topic) }
+      ] : []
+    });
   }
 
   async function reloadContent() {
@@ -138,14 +122,19 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
 
     if (!selectedSubject) {
       const heading = documentRef.createElement('h2'); heading.className = 'section-title'; heading.textContent = 'Kies een vak';
-      const grid = documentRef.createElement('div'); grid.className = 'subject-grid';
+      const grid = createPacoTileGrid({ documentRef, className: 'subject-grid' });
       grouped.forEach(subject => {
-        const card = documentRef.createElement('button'); card.type = 'button'; card.className = 'paco-subject-card';
         const lessonCount = subject.lessons.length;
         const topicCount = subject.topics.length;
         const counts = [lessonCount ? `${lessonCount} ${lessonCount === 1 ? 'les' : 'lessen'}` : '', topicCount ? `${topicCount} ${topicCount === 1 ? 'leerstofonderwerp' : 'leerstofonderwerpen'}` : ''].filter(Boolean).join(' · ');
-        card.innerHTML = `<div class="subject-icon">${getLessonSubjectIcon(subject.label)}</div><h2>${subject.label}</h2><p>${counts || 'Nog geen inhoud'}</p>`;
-        card.addEventListener('click', () => { const url = buildLessonsUrl(); url.searchParams.set('subject', subject.label); navigate(url); });
+        const card = createPacoTile({
+          documentRef,
+          title: subject.label,
+          description: counts || 'Nog geen inhoud',
+          icon: getLessonSubjectIcon(subject.label),
+          actionLabel: 'Openen',
+          onActivate: () => { const url = buildLessonsUrl(); url.searchParams.set('subject', subject.label); navigate(url); }
+        });
         grid.appendChild(card);
       });
       content.append(heading, grid);
@@ -167,7 +156,7 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
     groups.forEach(group => {
       const section = documentRef.createElement('section'); section.className = 'subvak-section';
       const title = documentRef.createElement('h3'); title.className = `subvak-title${group.key === '__geen_subvak__' ? ' muted' : ''}`; title.textContent = `${group.key === '__geen_subvak__' ? '📚' : '📁'} ${group.label}`;
-      const grid = documentRef.createElement('div'); grid.className = 'lesson-grid';
+      const grid = createPacoTileGrid({ documentRef, className: 'lesson-grid' });
       group.lessons.forEach(lesson => grid.appendChild(renderLessonCard(lesson)));
       group.topics.forEach(topic => grid.appendChild(renderLearningMaterialCard(topic)));
       section.append(title, grid); content.appendChild(section);
@@ -177,10 +166,10 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
 
     const lessonById = new Map(orderedLessons.map(lesson => [Number(lesson.id), lesson]));
     if (!orderedLessons.length) return;
-    attachLessonDragSorting(content, {
-      selector: '.lesson-card[data-lesson-id][draggable="true"]',
+    attachPacoTileSorting(content, {
+      selector: '.paco-tile[data-paco-tile-id][draggable="true"]',
       onOrderChange: async ({ orderedIds }) => {
-        const reorderedLessons = orderedIds.map(id => lessonById.get(id)).filter(Boolean);
+        const reorderedLessons = orderedIds.map(id => lessonById.get(Number(id))).filter(Boolean);
         await (context?.isManagement ? app.management.saveLessonOrder(subject?.label || selectedSubject, reorderedLessons) : app.lessonOrder.writeOrder(selectedStudent, subject?.label || selectedSubject, reorderedLessons, { persistRemote: false }));
       },
       onError: async error => { console.error('Lessons reorder error:', error); await render(records, topics); }

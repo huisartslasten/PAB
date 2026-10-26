@@ -27,7 +27,67 @@ The handoff describes **where PacoGO is**. This document describes **how PacoGO 
 - Do not create temporary, backup, test, recovery, or duplicate branches unless there is a documented technical reason and the branch can be removed when its purpose is complete.
 - Never force-push or rewrite history as a shortcut.
 
-## 3. Architecture before implementation
+## 3. Mandatory development flow
+
+Every meaningful PacoGO change MUST follow this sequence:
+
+**PAB CHANGE INTAKE → PAB ARCHITECTURE GATE → PAB IMPLEMENTATION PLAN → IMPLEMENTATION → PAB VERIFICATION GATE → FINAL VERIFICATION**
+
+No step may be skipped because a change is small, obvious, urgent, local, or technically easy.
+
+The developer must not jump directly from a user request to a file, page, component, service, database change, workaround, or implementation.
+
+### 3.1 PAB Change Intake
+
+Before choosing an implementation location, establish:
+
+- what the user actually wants to achieve;
+- the desired behavior/result;
+- existing functionality that may be affected;
+- whether this is new functionality, a change, refactor, or bugfix;
+- the domains/features that may be affected;
+- repository, branch, and environment.
+
+The Change Intake does **not** select the implementation location. That belongs to the Architecture Gate.
+
+### 3.2 PAB Architecture Gate
+
+Before code changes, the developer must explicitly establish the six architecture-gate answers defined in section 4. If any answer is unclear, implementation MUST STOP until the repository has been inspected and ownership is established.
+
+### 3.3 PAB Implementation Plan
+
+Before implementation, state:
+
+- the canonical owner to extend/change;
+- affected modules and boundaries;
+- the responsibility that changes;
+- what will be replaced, moved, or removed;
+- shared consumers that must be checked;
+- required tests and verification;
+- how duplicate ownership will be prevented;
+- how future extension remains possible.
+
+If implementation reveals that the Architecture Gate was wrong, STOP and return to the Architecture Gate. Do not solve the discrepancy with a local patch.
+
+### 3.4 PAB Verification Gate
+
+After implementation, but before declaring the change complete, verify:
+
+1. intended functionality;
+2. the complete user flow;
+3. existing consumers of the same shared modules;
+4. relevant automated tests;
+5. regression behavior;
+6. canonical ownership and dependency boundaries;
+7. the exact TEST branch and environment.
+
+### 3.5 Final Verification
+
+Only after the Verification Gate passes may the change be reported as complete. Final Verification must include the required TEST version/readability check, CI/security status applicable to the change, cleanup review, and confirmation that `main`/LIVE was not modified.
+
+The exact handoff requirements are defined in sections 11–13.
+
+## 4. Architecture before implementation
 
 For every meaningful feature or architectural change, determine before coding:
 
@@ -43,7 +103,7 @@ For every meaningful feature or architectural change, determine before coding:
 
 Do not start by adding code to the most convenient file.
 
-### 3.1 Mandatory pre-code architecture gate
+### 4.1 Mandatory pre-code architecture gate
 
 **No code may be changed until this gate has been completed.**
 
@@ -66,7 +126,7 @@ If ownership is unclear, the developer must **STOP** and inspect the repository 
 
 After implementation, the developer must verify that the change is actually flowing through the identified owner and has not created a second path or local exception.
 
-## 4. One canonical owner
+## 5. One canonical owner
 
 Every responsibility must have one clear canonical owner.
 
@@ -74,7 +134,7 @@ Do not create parallel implementations, duplicate services, competing runtime pa
 
 When an existing implementation is replaced, the old implementation must be removed once the replacement is proven.
 
-## 5. No patch culture
+## 6. No patch culture
 
 Patching is not an architectural strategy.
 
@@ -90,7 +150,7 @@ Do not solve structural problems with:
 
 If the boundary is wrong, stop and redesign the boundary.
 
-## 6. Legacy code
+## 7. Legacy code
 
 Legacy code is not a repair surface.
 
@@ -98,7 +158,7 @@ A legacy implementation may be touched only when it is part of a deliberate, pro
 
 Do not blindly patch the legacy monolith.
 
-## 7. Scope discipline
+## 8. Scope discipline
 
 A feature must have a defined scope.
 
@@ -109,7 +169,7 @@ If unrelated problems are discovered during implementation:
 
 Do not let one feature become an uncontrolled refactor.
 
-## 8. Tests are contracts
+## 9. Tests are contracts
 
 Tests must prove intended behavior and architectural contracts, not merely make the current implementation green.
 
@@ -120,7 +180,7 @@ Tests must prove intended behavior and architectural contracts, not merely make 
 - Run the full regression gate when required by the change.
 - Never claim a test passed unless it was actually executed.
 
-## 9. Mandatory cleanup
+## 10. Mandatory cleanup
 
 After every meaningful change, explicitly review for:
 
@@ -137,7 +197,7 @@ After every meaningful change, explicitly review for:
 
 A new implementation is not considered a replacement while the old implementation is unnecessarily alive.
 
-## 10. Architecture decisions
+## 11. Architecture decisions
 
 Important architectural decisions must be recorded as short Architecture Decision Records under `docs/decisions/`.
 
@@ -151,7 +211,7 @@ An ADR should state:
 
 Do not create an ADR for trivial UI or implementation details.
 
-## 11. Definition of DONE
+## 12. Definition of DONE
 
 A meaningful feature is not DONE merely because it works locally.
 
@@ -170,7 +230,7 @@ DONE means, as applicable:
 11. the readable TEST version has been updated and verified;
 12. the user has received the two required post-update codes.
 
-## 12. Mandatory readable TEST version
+## 13. Mandatory readable TEST version
 
 After **every completed update**, the readable TEST version shown in the TEST application must be updated to identify the build the user is actually reviewing.
 
@@ -184,7 +244,7 @@ Before reporting the update as complete:
 
 Never report an update as complete while the TEST version still identifies an older build.
 
-## 13. Mandatory two-code handoff
+## 14. Mandatory two-code handoff
 
 After **every completed update**, the developer must provide the user with the two required codes/instructions used in the established PacoGO workflow:
 
@@ -200,7 +260,7 @@ These must be given after the update, together with:
 
 If the update is not actually ready for handoff, do not present the two codes as a completed delivery.
 
-## 14. New-chat protocol
+## 15. New-chat protocol
 
 Every new development chat must begin from the repository state, not from memory alone.
 
@@ -216,7 +276,7 @@ Required sequence:
 
 A new chat must not assume that an earlier chat's description of the codebase is still accurate without checking the repository.
 
-## 15. AI/developer behavior rule
+## 16. AI/developer behavior rule
 
 The developer is responsible for protecting the architecture, even when the requested shortcut would be faster.
 
@@ -224,7 +284,27 @@ If a requested approach would introduce a patch, duplicate ownership, architectu
 
 The developer must never trade long-term cleanliness for short-term convenience without an explicit architectural decision.
 
-## 16. The core rule
+## 17. Architecture enforcement
+
+PAB must technically enforce architecture rules wherever they can be expressed reliably as machine-checkable contracts.
+
+Use, where appropriate:
+
+- architecture tests;
+- dependency-boundary tests;
+- ownership checks;
+- static analysis/linting;
+- import/dependency restrictions;
+- CI checks against duplicate ownership;
+- CI checks against prohibited legacy/fallback routes.
+
+Do not create superficial tests that merely inspect filenames or reproduce the written policy. An enforcement rule is valid only when it protects an actual architectural boundary.
+
+Before adding a new enforcement rule, identify the boundary it protects, the canonical owner, the prohibited dependency/path, and the legitimate existing consumers. If that information is not yet clear, STOP and resolve the architecture first.
+
+A green test never justifies a bad boundary.
+
+## 18. The core rule
 
 > **PacoGO may never grow faster than we can understand and maintain it.**
 

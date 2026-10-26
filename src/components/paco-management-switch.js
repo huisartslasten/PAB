@@ -1,11 +1,10 @@
 /**
  * Canonical page-level management switch for the shared PacoGO template.
  *
- * The template owns the hero; this component owns the reusable switch behavior
- * and delegates navigation to the canonical router/view-context boundary.
+ * The page template owns the switch placement. The navigation contract owns
+ * management authorization; this component only switches the current page
+ * between its normal and management context.
  */
-
-import { buildViewUrl, VIEW_MODES } from '../core/view-context.js';
 
 const STYLE_HREF = 'src/components/paco-management-switch.css';
 
@@ -20,33 +19,33 @@ function ensureStylesheet(documentRef) {
   documentRef.head.appendChild(link);
 }
 
-function isManagementRoute(route) {
-  return route.params?.get('mode') === VIEW_MODES.MANAGEMENT || route.params?.get('context') === VIEW_MODES.MANAGEMENT;
+function hasManagementAccess(navigation = []) {
+  return navigation.some(item => item?.kind === 'management-mode');
 }
 
-export function installPacoManagementSwitch({ templateMount, app, router, documentRef = document } = {}) {
+function buildCurrentPageManagementUrl() {
+  const url = new URL(window.location.href);
+  const isManagement = url.searchParams.get('mode') === 'management' || url.searchParams.get('context') === 'management';
+  const student = url.searchParams.get('viewStudent') || url.searchParams.get('student') || '';
+
+  url.searchParams.delete('context');
+  url.searchParams.set('mode', isManagement ? 'student' : 'management');
+  if (student) url.searchParams.set('student', student);
+  else url.searchParams.delete('student');
+  url.searchParams.delete('viewStudent');
+  return url;
+}
+
+export function installPacoManagementSwitch({ templateMount, navigation = [], documentRef = document } = {}) {
   if (!templateMount) throw new TypeError('installPacoManagementSwitch requires templateMount.');
-  if (!app?.auth) throw new TypeError('installPacoManagementSwitch requires app.auth.');
-  if (!router?.getRoute || !router?.navigate) throw new TypeError('installPacoManagementSwitch requires the canonical router.');
 
   ensureStylesheet(documentRef);
 
   const hero = templateMount.querySelector('.paco-template-hero');
   if (!hero) return null;
 
-  const updateState = button => {
-    const canManage = Boolean(app.auth.isParent);
-    const isManagement = isManagementRoute(router.getRoute());
-    button.dataset.enabled = String(canManage);
-    button.dataset.active = String(isManagement && canManage);
-    button.setAttribute('aria-pressed', String(isManagement && canManage));
-  };
-
   const existing = hero.querySelector('.paco-template-management-switch');
-  if (existing) {
-    updateState(existing);
-    return existing;
-  }
+  if (existing) return existing;
 
   const button = documentRef.createElement('button');
   button.type = 'button';
@@ -55,17 +54,17 @@ export function installPacoManagementSwitch({ templateMount, app, router, docume
   button.setAttribute('aria-label', 'Beheer op deze pagina');
   button.title = 'Beheer op deze pagina';
 
-  button.addEventListener('click', () => {
-    if (!app.auth.isParent) return;
+  const canManage = hasManagementAccess(navigation);
+  const isManagement = new URL(window.location.href).searchParams.get('mode') === 'management';
+  button.dataset.enabled = String(canManage);
+  button.dataset.active = String(canManage && isManagement);
+  button.setAttribute('aria-pressed', String(canManage && isManagement));
 
-    const route = router.getRoute();
-    const student = route.params?.get('viewStudent') || route.params?.get('student') || '';
-    const nextMode = isManagementRoute(route) ? VIEW_MODES.STUDENT : VIEW_MODES.MANAGEMENT;
-    const target = buildViewUrl(route.url, { student, mode: nextMode });
-    void router.navigate(target);
+  button.addEventListener('click', () => {
+    if (!canManage) return;
+    window.location.assign(buildCurrentPageManagementUrl().toString());
   });
 
   hero.appendChild(button);
-  updateState(button);
   return button;
 }

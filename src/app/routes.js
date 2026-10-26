@@ -1,79 +1,241 @@
-import { createDashboardRuntime } from '../features/dashboard/runtime.js';
-import { createLessonsRuntime } from '../features/lessons/runtime.js';
-import { createLessonChoiceRuntime } from '../features/lessons/lesson-choice-runtime.js';
-import { createLessonViewRuntime } from '../features/lessons/view-runtime.js';
-import { createLessonLearningViewRuntime } from '../features/lessons/lesson-learning-view-runtime.js';
-import { createQuestionsRuntime } from '../features/lessons/questions-runtime.js';
-import { createTestRuntime } from '../features/lessons/test-runtime.js';
-import { createLessonEditorRuntime } from '../features/lessons/lesson-editor-runtime.js';
-import { createLearningMaterialEditorRuntime } from '../features/learning-material/editor-runtime.js';
-import { createLearningMaterialViewRuntime } from '../features/learning-material/view-runtime.js';
-import { createPracticeMenuRuntime } from '../features/practice/menu-runtime.js';
-import { createPracticeTestRuntime } from '../features/practice/practice-test-runtime.js';
-import { createGamesRuntime } from '../features/practice/games-runtime.js';
-import { createDoubleOrNothingPageRuntime } from '../features/practice/double-or-nothing/page-runtime.js';
-import { createMillionairePageRuntime } from '../features/practice/millionaire/page-runtime.js';
-import { createTicTacToePageRuntime } from '../features/practice/tic-tac-toe/page-runtime.js';
-import { createDrop4PageRuntime } from '../features/practice/drop4/page-runtime.js';
-import { createConnectTheDotsPageRuntime } from '../features/practice/connect-the-dots/page-runtime.js';
-import { createWordRevealPageRuntime } from '../features/practice/word-reveal/page-runtime.js';
-import { createWordChasePageRuntime } from '../features/practice/word-chase/page-runtime.js';
-import { createLexoPageRuntime } from '../features/practice/lexo/page-runtime.js';
-import { createMemoryPageRuntime } from '../features/practice/memory/page-runtime.js';
-import { createFlashPageRuntime } from '../features/practice/flash/page-runtime.js';
-import { createFlashcardsPageRuntime } from '../features/practice/flashcards/page-runtime.js';
-import { createSkillsRuntime } from '../features/skills/runtime.js';
-import { createAgendaPageRuntime } from '../features/agenda/page-runtime.js';
-import { createMonthCalendarRuntime } from '../features/agenda/month-calendar-runtime.js';
-import { createTestHistoryRuntime } from '../features/test-history/runtime.js';
-import { createManagementRuntime } from '../features/management/runtime.js';
-import { createChallengeConfigurationRuntime } from '../features/management/challenge-configuration-runtime.js';
-import { createSkillCreationRuntime } from '../features/management/skill-creation-runtime.js';
-import { createSkillEditorRuntime } from '../features/management/skill-editor-runtime.js';
-import { createArchiveRuntime } from '../features/management/archive-runtime.js';
-import { createFeedbackRuntime } from '../features/management/feedback-runtime.js';
-import { createCreatorRuntime } from '../features/management/creator-runtime.js';
 import { readViewContext } from '../core/view-context.js';
 
-function defineRoute(renderer, styles = []) { Object.defineProperty(renderer, 'styles', { value: Object.freeze([...styles]), enumerable: false, configurable: false, writable: false }); return renderer; }
+function defineRoute(renderer, styles = []) {
+  Object.defineProperty(renderer, 'styles', {
+    value: Object.freeze([...styles]),
+    enumerable: false,
+    configurable: false,
+    writable: false
+  });
+  return renderer;
+}
+
+function defineLazyRoute(loadModule, exportName, buildArgs, styles = []) {
+  return defineRoute(async context => {
+    const module = await loadModule();
+    const factory = module?.[exportName];
+    if (typeof factory !== 'function') {
+      throw new TypeError(`PacoGO route module does not expose ${exportName}.`);
+    }
+    return factory(buildArgs(context));
+  }, styles);
+}
 
 export function createPacoRouteRegistry({ app, mounts, documentRef = document } = {}) {
-  if (!app) throw new TypeError('Paco route registry requires an app.'); if (!mounts?.templateMount) throw new TypeError('Paco route registry requires template mount.');
+  if (!app) throw new TypeError('Paco route registry requires an app.');
+  if (!mounts?.templateMount) throw new TypeError('Paco route registry requires template mount.');
+
   const routes = {};
-  routes['dashboard.html'] = defineRoute(({ url, navigate }) => createDashboardRuntime({ app, templateMount: mounts.templateMount, chooserMount: mounts.chooserMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/dashboard/dashboard.css']);
-  routes['lessons.html'] = defineRoute(({ url, navigate }) => createLessonsRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), selectedSubject: url.searchParams.get('subject') || '', documentRef, navigate }), ['src/components/lesson-list.css']);
-  routes['lesson-choice.html'] = defineRoute(({ url, navigate }) => createLessonChoiceRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/lesson-choice.css']);
-  routes['lesson-view.html'] = defineRoute(({ url, navigate }) => createLessonViewRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-view.css']);
-  routes['lesson-learning.html'] = defineRoute(({ url, navigate }) => createLessonLearningViewRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-learning-view.css']);
-  routes['learning-material.html'] = defineRoute(({ url, navigate }) => createLearningMaterialViewRuntime({ app, templateMount: mounts.templateMount, context: { ...readViewContext(url.searchParams), subject: url.searchParams.get('subject') || '', subvak: url.searchParams.get('subvak') || '' }, topicId: url.searchParams.get('topic_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-learning-view.css']);
-  routes['questions.html'] = defineRoute(({ url, navigate }) => createQuestionsRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/questions.css']);
-  routes['test.html'] = defineRoute(({ url, navigate }) => createTestRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/lessons/test.css']);
-  routes['lesson-editor.html'] = defineRoute(({ url, navigate }) => createLessonEditorRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-editor.css']);
-  routes['learning-material-editor.html'] = defineRoute(({ url, navigate }) => createLearningMaterialEditorRuntime({ app, templateMount: mounts.templateMount, context: { ...readViewContext(url.searchParams), subject: url.searchParams.get('subject') || '', subvak: url.searchParams.get('subvak') || '' }, topicId: url.searchParams.get('topic_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-editor.css', 'src/features/learning-material/editor.css']);
-  routes['oefenen.html'] = defineRoute(({ url, navigate }) => createPracticeMenuRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/practice/practice-menu.css']);
-  routes['oefentoets.html'] = defineRoute(({ url, navigate }) => createPracticeTestRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css']);
-  routes['games.html'] = defineRoute(({ url, navigate }) => createGamesRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/practice/games.css']);
-  routes['skills.html'] = defineRoute(({ url, navigate }) => createSkillsRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), skillId: url.searchParams.get('skill') || '', durationSeconds: Number(url.searchParams.get('duration') || 180), documentRef, navigate }));
-  routes['double-or-nothing.html'] = defineRoute(({ url, navigate }) => createDoubleOrNothingPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/double-or-nothing.css']);
-  routes['millionaire.html'] = defineRoute(({ url, navigate }) => createMillionairePageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/millionaire/millionaire.css']);
-  routes['memory.html'] = defineRoute(({ url, navigate }) => createMemoryPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/memory/memory.css']);
-  routes['flash-question.html'] = defineRoute(({ url, navigate }) => createFlashPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/flash/flash.css']);
-  routes['tic-tac-toe.html'] = defineRoute(({ url, navigate }) => createTicTacToePageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/tic-tac-toe.css']);
-  routes['drop4.html'] = defineRoute(({ url, navigate }) => createDrop4PageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/drop4/drop4.css']);
-  routes['connect-the-dots.html'] = defineRoute(({ url, navigate }) => createConnectTheDotsPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/connect-the-dots/connect-the-dots.css']);
-  routes['word-reveal.html'] = defineRoute(({ url, navigate }) => createWordRevealPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/word-reveal.css']);
-  routes['word-chase.html'] = defineRoute(({ url, navigate }) => createWordChasePageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/word-chase/word-chase.css']);
-  routes['lexo.html'] = defineRoute(({ url, navigate }) => createLexoPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/lexo/lexo.css']);
-  routes['flashcards-template.html'] = defineRoute(({ url, navigate }) => createFlashcardsPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/practice/flashcards/flashcards.css']);
-  routes['agenda.html'] = defineRoute(({ url, navigate }) => createAgendaPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/agenda/agenda.css']);
-  routes['month-calendar.html'] = defineRoute(({ url, navigate }) => createMonthCalendarRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/agenda/month-calendar.css']);
-  routes['test-history.html'] = defineRoute(({ url, navigate }) => createTestHistoryRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/management/management-support.css']);
-  routes['management.html'] = defineRoute(({ url, navigate }) => createManagementRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/management/management-support.css']);
-  routes['challenge-settings.html'] = defineRoute(({ navigate }) => createChallengeConfigurationRuntime({ app, templateMount: mounts.templateMount, documentRef, navigate }), ['src/features/management/management-support.css', 'src/features/management/challenge-configuration.css']);
-  routes['skill-create.html'] = defineRoute(({ url, navigate }) => createSkillCreationRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/management/management-support.css']);
-  routes['skill-editor.html'] = defineRoute(({ url, navigate }) => createSkillEditorRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), createMode: url.searchParams.get('create') === '1', category: url.searchParams.get('category') || 'math', documentRef, navigate }), ['src/features/management/management-support.css']);
-  routes['archive.html'] = defineRoute(({ url, navigate }) => createArchiveRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/management/management-support.css']);
-  routes['feedback.html'] = defineRoute(({ url, navigate }) => createFeedbackRuntime({ app, templateMount: mounts.templateMount, documentRef, navigate }), ['src/features/management/management-support.css']);
-  routes['creator.html'] = defineRoute(({ url, navigate }) => createCreatorRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/management/management-support.css', 'src/features/management/creator.css']);
+
+  routes['dashboard.html'] = defineLazyRoute(
+    () => import('../features/dashboard/runtime.js'),
+    'createDashboardRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, chooserMount: mounts.chooserMount, context: readViewContext(url.searchParams), documentRef, navigate }),
+    ['src/features/dashboard/dashboard.css']
+  );
+  routes['lessons.html'] = defineLazyRoute(
+    () => import('../features/lessons/runtime.js'),
+    'createLessonsRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), selectedSubject: url.searchParams.get('subject') || '', documentRef, navigate }),
+    ['src/components/lesson-list.css']
+  );
+  routes['lesson-choice.html'] = defineLazyRoute(
+    () => import('../features/lessons/lesson-choice-runtime.js'),
+    'createLessonChoiceRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }),
+    ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/lesson-choice.css']
+  );
+  routes['lesson-view.html'] = defineLazyRoute(
+    () => import('../features/lessons/view-runtime.js'),
+    'createLessonViewRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }),
+    ['src/features/lessons/lesson-view.css']
+  );
+  routes['lesson-learning.html'] = defineLazyRoute(
+    () => import('../features/lessons/lesson-learning-view-runtime.js'),
+    'createLessonLearningViewRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }),
+    ['src/features/lessons/lesson-learning-view.css']
+  );
+  routes['learning-material.html'] = defineLazyRoute(
+    () => import('../features/learning-material/view-runtime.js'),
+    'createLearningMaterialViewRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: { ...readViewContext(url.searchParams), subject: url.searchParams.get('subject') || '', subvak: url.searchParams.get('subvak') || '' }, topicId: url.searchParams.get('topic_id') || '', documentRef, navigate }),
+    ['src/features/lessons/lesson-learning-view.css']
+  );
+  routes['questions.html'] = defineLazyRoute(
+    () => import('../features/lessons/questions-runtime.js'),
+    'createQuestionsRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }),
+    ['src/features/lessons/questions.css']
+  );
+  routes['test.html'] = defineLazyRoute(
+    () => import('../features/lessons/test-runtime.js'),
+    'createTestRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }),
+    ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/lessons/test.css']
+  );
+  routes['lesson-editor.html'] = defineLazyRoute(
+    () => import('../features/lessons/lesson-editor-runtime.js'),
+    'createLessonEditorRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }),
+    ['src/features/lessons/lesson-editor.css']
+  );
+  routes['learning-material-editor.html'] = defineLazyRoute(
+    () => import('../features/learning-material/editor-runtime.js'),
+    'createLearningMaterialEditorRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: { ...readViewContext(url.searchParams), subject: url.searchParams.get('subject') || '', subvak: url.searchParams.get('subvak') || '' }, topicId: url.searchParams.get('topic_id') || '', documentRef, navigate }),
+    ['src/features/lessons/lesson-editor.css', 'src/features/learning-material/editor.css']
+  );
+  routes['oefenen.html'] = defineLazyRoute(
+    () => import('../features/practice/menu-runtime.js'),
+    'createPracticeMenuRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }),
+    ['src/features/lessons/lesson-context-view.css', 'src/features/practice/practice-menu.css']
+  );
+  routes['oefentoets.html'] = defineLazyRoute(
+    () => import('../features/practice/practice-test-runtime.js'),
+    'createPracticeTestRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }),
+    ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css']
+  );
+  routes['games.html'] = defineLazyRoute(
+    () => import('../features/practice/games-runtime.js'),
+    'createGamesRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }),
+    ['src/features/lessons/lesson-context-view.css', 'src/features/practice/games.css']
+  );
+  routes['skills.html'] = defineLazyRoute(
+    () => import('../features/skills/runtime.js'),
+    'createSkillsRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), skillId: url.searchParams.get('skill') || '', durationSeconds: Number(url.searchParams.get('duration') || 180), documentRef, navigate })
+  );
+  routes['double-or-nothing.html'] = defineLazyRoute(
+    () => import('../features/practice/double-or-nothing/page-runtime.js'),
+    'createDoubleOrNothingPageRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }),
+    ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/double-or-nothing.css']
+  );
+  routes['millionaire.html'] = defineLazyRoute(
+    () => import('../features/practice/millionaire/page-runtime.js'),
+    'createMillionairePageRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }),
+    ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/millionaire/millionaire.css']
+  );
+  routes['memory.html'] = defineLazyRoute(
+    () => import('../features/practice/memory/page-runtime.js'),
+    'createMemoryPageRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }),
+    ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/memory/memory.css']
+  );
+  routes['flash-question.html'] = defineLazyRoute(
+    () => import('../features/practice/flash/page-runtime.js'),
+    'createFlashPageRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }),
+    ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/flash/flash.css']
+  );
+  routes['tic-tac-toe.html'] = defineLazyRoute(
+    () => import('../features/practice/tic-tac-toe/page-runtime.js'),
+    'createTicTacToePageRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }),
+    ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/tic-tac-toe.css']
+  );
+  routes['drop4.html'] = defineLazyRoute(
+    () => import('../features/practice/drop4/page-runtime.js'),
+    'createDrop4PageRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }),
+    ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/drop4/drop4.css']
+  );
+  routes['connect-the-dots.html'] = defineLazyRoute(
+    () => import('../features/practice/connect-the-dots/page-runtime.js'),
+    'createConnectTheDotsPageRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }),
+    ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/connect-the-dots/connect-the-dots.css']
+  );
+  routes['word-reveal.html'] = defineLazyRoute(
+    () => import('../features/practice/word-reveal/page-runtime.js'),
+    'createWordRevealPageRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }),
+    ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/word-reveal.css']
+  );
+  routes['word-chase.html'] = defineLazyRoute(
+    () => import('../features/practice/word-chase/page-runtime.js'),
+    'createWordChasePageRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }),
+    ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/word-chase/word-chase.css']
+  );
+  routes['lexo.html'] = defineLazyRoute(
+    () => import('../features/practice/lexo/page-runtime.js'),
+    'createLexoPageRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }),
+    ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/lexo/lexo.css']
+  );
+  routes['flashcards-template.html'] = defineLazyRoute(
+    () => import('../features/practice/flashcards/page-runtime.js'),
+    'createFlashcardsPageRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }),
+    ['src/features/lessons/lesson-context-view.css', 'src/features/practice/flashcards/flashcards.css']
+  );
+  routes['agenda.html'] = defineLazyRoute(
+    () => import('../features/agenda/page-runtime.js'),
+    'createAgendaPageRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }),
+    ['src/features/agenda/agenda.css']
+  );
+  routes['month-calendar.html'] = defineLazyRoute(
+    () => import('../features/agenda/month-calendar-runtime.js'),
+    'createMonthCalendarRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }),
+    ['src/features/agenda/month-calendar.css']
+  );
+  routes['test-history.html'] = defineLazyRoute(
+    () => import('../features/test-history/runtime.js'),
+    'createTestHistoryRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }),
+    ['src/features/management/management-support.css']
+  );
+  routes['management.html'] = defineLazyRoute(
+    () => import('../features/management/runtime.js'),
+    'createManagementRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }),
+    ['src/features/management/management-support.css']
+  );
+  routes['challenge-settings.html'] = defineLazyRoute(
+    () => import('../features/management/challenge-configuration-runtime.js'),
+    'createChallengeConfigurationRuntime',
+    ({ navigate }) => ({ app, templateMount: mounts.templateMount, documentRef, navigate }),
+    ['src/features/management/management-support.css', 'src/features/management/challenge-configuration.css']
+  );
+  routes['skill-create.html'] = defineLazyRoute(
+    () => import('../features/management/skill-creation-runtime.js'),
+    'createSkillCreationRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }),
+    ['src/features/management/management-support.css']
+  );
+  routes['skill-editor.html'] = defineLazyRoute(
+    () => import('../features/management/skill-editor-runtime.js'),
+    'createSkillEditorRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), createMode: url.searchParams.get('create') === '1', category: url.searchParams.get('category') || 'math', documentRef, navigate }),
+    ['src/features/management/management-support.css']
+  );
+  routes['archive.html'] = defineLazyRoute(
+    () => import('../features/management/archive-runtime.js'),
+    'createArchiveRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }),
+    ['src/features/management/management-support.css']
+  );
+  routes['feedback.html'] = defineLazyRoute(
+    () => import('../features/management/feedback-runtime.js'),
+    'createFeedbackRuntime',
+    ({ navigate }) => ({ app, templateMount: mounts.templateMount, documentRef, navigate }),
+    ['src/features/management/management-support.css']
+  );
+  routes['creator.html'] = defineLazyRoute(
+    () => import('../features/management/creator-runtime.js'),
+    'createCreatorRuntime',
+    ({ url, navigate }) => ({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }),
+    ['src/features/management/management-support.css', 'src/features/management/creator.css']
+  );
+
   return Object.freeze(routes);
 }

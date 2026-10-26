@@ -9,9 +9,10 @@
 .paco-tile {
   position: relative;
   width: 260px;
-  height: 190px;
   min-width: 260px;
   max-width: 260px;
+  min-height: 190px;
+  height: auto;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -149,8 +150,9 @@
 
 .paco-tile-placeholder {
   width: 260px;
-  height: 190px;
   min-width: 260px;
+  min-height: 190px;
+  height: auto;
   border: 3px dashed var(--paco-blue, #1787f2);
   border-radius: 22px;
   background: rgba(234,244,255,.75);

@@ -18,7 +18,10 @@ export function createSkillsRuntime({ app, templateMount, context, skillId = '',
   const student = context?.student || '';
   const content = documentRef.createElement('div');
   const resultService = createGameResultService(app.db);
+  const managementEventTarget = documentRef.defaultView || globalThis;
   let timerId = null; let session = null; let finished = false; let highScore = null; let assignments = []; let skills = [];
+  let managementVisible = app.managementCapabilities?.isPageActive('skills') === true;
+  let sessionReady = false;
 
   const goSkills = () => navigate(buildViewUrl('skills.html', { student, mode: context?.mode }));
   const openSkill = (id, duration = DEFAULT_SKILL_DURATION_SECONDS) => { const target = buildViewUrl('skills.html', { student, mode: context?.mode }); target.searchParams.set('skill', id); target.searchParams.set('duration', String(duration)); return navigate(target); };
@@ -101,13 +104,12 @@ export function createSkillsRuntime({ app, templateMount, context, skillId = '',
     const status = documentRef.createElement('span'); status.className = `skill-management-status${skill.enabled ? '' : ' is-disabled'}`; status.textContent = skill.enabled ? 'Actief' : 'Uitgeschakeld';
     body.append(heading, description, status);
     const actions = createContentManagementActions({
+      app,
       entityType: 'skill',
       item: skill,
-      handlers: {
-        edit: item => navigate(skillEditorTarget(item.id)),
-        archive: async item => { await app.management.archiveSkill(item.id); await refreshManagement(); },
-        delete: async item => { await app.management.moveSkillToTrash(item.id); await refreshManagement(); }
-      }
+      student,
+      navigate,
+      onChanged: refreshManagement
     });
     appendContentManagementActions({ documentRef, container: card, actions });
     card.insertBefore(body, card.lastElementChild);
@@ -161,7 +163,10 @@ export function createSkillsRuntime({ app, templateMount, context, skillId = '',
     const catalog = documentRef.createElement('section'); catalog.className = 'paco-template-card skill-management-catalog';
     const toolbar = documentRef.createElement('div'); toolbar.className = 'skill-management-toolbar';
     const title = documentRef.createElement('div'); const heading = documentRef.createElement('h2'); heading.textContent = 'Skills'; const subtitle = documentRef.createElement('p'); subtitle.textContent = 'Beheer Skills met dezelfde centrale beheeracties als lessen en leerstof.'; title.append(heading, subtitle);
-    const create = documentRef.createElement('button'); create.type = 'button'; create.className = 'success'; create.textContent = '➕ Skill maken'; create.addEventListener('click', () => navigate(buildViewUrl('skill-create.html', { student, mode: 'management' })));
+    const create = documentRef.createElement('button'); create.type = 'button'; create.className = 'success'; create.textContent = '➕ Skill maken'; create.addEventListener('click', () => {
+      const capability = app.managementCapabilities.getAvailableForPage({ page: 'skills', student }).find(item => item.id === 'skill.create');
+      if (capability?.target) navigate(capability.target, { managementCapability: capability.id });
+    });
     toolbar.append(title, create); catalog.appendChild(toolbar);
 
     const groups = new Map();
@@ -176,46 +181,79 @@ export function createSkillsRuntime({ app, templateMount, context, skillId = '',
     if (assignment) content.appendChild(assignment);
   }
 
+  async function renderStudentExperience() {
+    stopTimer();
+    session = null;
+    finished = false;
+    highScore = null;
+    if (!student) {
+      skills = await app.skillDefinitions.list({ category: 'math' });
+      renderMenu();
+      return;
+    }
+    skills = await app.skillDefinitions.list({ category: 'math' });
+    assignments = await app.skillConfiguration.listForStudent(student);
+    const selected = skills.find(item => item.id === skillId);
+    if (!selected || !isEnabled(selected)) { renderMenu(); return; }
+    highScore = await resultService.getHighScore({ gameKey: `math-skill-${selected.id}`, student }).catch(() => null);
+    if (selected.definition?.kind === 'mixed') {
+      const mixedProfiles = enabledMixedProfiles(selected);
+      if (!mixedProfiles.length) { content.textContent = 'Voor Gemengd zijn nog geen rekenprofielen geselecteerd.'; return; }
+      session = createMathSession({ durationSeconds: Number(durationSeconds), mixedProfiles });
+    } else {
+      session = createMathSession({ durationSeconds: Number(durationSeconds), profile: selected });
+    }
+    renderActivity();
+  }
+
+  async function refreshCurrentView() {
+    if (!sessionReady) return;
+    if (managementVisible) {
+      stopTimer();
+      session = null;
+      finished = false;
+      await refreshManagement();
+      return;
+    }
+    await renderStudentExperience();
+  }
+
+  const onManagementVisibilityChange = event => {
+    if (event?.detail?.page !== 'skills') return;
+    managementVisible = Boolean(event.detail.active);
+    void refreshCurrentView().catch(error => {
+      console.error('Skills management visibility error:', error);
+      content.textContent = 'De Skills konden niet worden geladen.';
+    });
+  };
+
   async function mount() {
     mountPacoPageTemplate({
       mount: templateMount,
       greeting: `Hoi ${student}! 🐶`,
-      title: context?.isManagement ? 'Skills' : 'Skills',
+      title: 'Skills',
       icon: '⚡',
-      subtitle: context?.isManagement ? 'Beheerweergave — Skills bewerken, archiveren, verwijderen en per leerling beschikbaar maken.' : 'Zelfstandig oefenen, altijd beschikbaar.',
+      subtitle: 'Zelfstandig oefenen, altijd beschikbaar.',
       navigation: createPacoNavigation({ app, active: 'skills', student, viewMode: context?.mode, includeManagement: true, navigate }),
       content
     });
 
+    managementEventTarget.addEventListener?.('paco:management-visibility-change', onManagementVisibilityChange);
+
     try {
       await app.initializeSession();
-      if (context?.isManagement) {
-        await refreshManagement();
-        return;
-      }
-      if (!student) {
-        skills = await app.skillDefinitions.list({ category: 'math' });
-        renderMenu();
-        return;
-      }
-      skills = await app.skillDefinitions.list({ category: 'math' });
-      assignments = await app.skillConfiguration.listForStudent(student);
-      const selected = skills.find(item => item.id === skillId);
-      if (!selected || !isEnabled(selected)) { renderMenu(); return; }
-      highScore = await resultService.getHighScore({ gameKey: `math-skill-${selected.id}`, student }).catch(() => null);
-      if (selected.definition?.kind === 'mixed') {
-        const mixedProfiles = enabledMixedProfiles(selected);
-        if (!mixedProfiles.length) { content.textContent = 'Voor Gemengd zijn nog geen rekenprofielen geselecteerd.'; return; }
-        session = createMathSession({ durationSeconds: Number(durationSeconds), mixedProfiles });
-      } else {
-        session = createMathSession({ durationSeconds: Number(durationSeconds), profile: selected });
-      }
-      renderActivity();
+      sessionReady = true;
+      await refreshCurrentView();
     } catch (error) {
       console.error('Skills page load error:', error);
       content.textContent = 'De Skills konden niet worden geladen.';
     }
   }
 
-  return Object.freeze({ mount, content });
+  function destroy() {
+    managementEventTarget.removeEventListener?.('paco:management-visibility-change', onManagementVisibilityChange);
+    stopTimer();
+  }
+
+  return Object.freeze({ mount, destroy, content });
 }

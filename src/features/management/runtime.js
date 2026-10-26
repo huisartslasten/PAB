@@ -84,13 +84,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     }
 
     mountPacoPageTemplate({ mount: templateMount, greeting: 'PAB beheer ⚙️', title: 'Dashboard', icon: '⚙️', subtitle: selectedStudent ? `Je beheert nu de omgeving van ${selectedStudent}.` : 'Kies links in de LB een leerling om beheeracties voor die leerling te openen.', navigation: createPacoNavigation({ app, active: 'dashboard', student: selectedStudent, viewMode: 'management', includeManagementTools: false, includeCreator: false, navigate }), content });
-    try {
-      await app.management.loadAllLessons();
-      renderManagement();
-    } catch (error) {
-      console.error('Management page load error:', error);
-      state.textContent = 'Beheer kon niet worden geladen.';
-    }
+    renderManagement();
   }
 
   return Object.freeze({ mount, content, render: renderManagement });

@@ -10,18 +10,17 @@ function requireManagement(management) {
   if (!management) throw new TypeError('Management capabilities require the management service.');
 }
 
-function requireParent(auth) {
-  if (auth?.isParent !== true) return false;
-  return true;
+function canManage(auth) {
+  return auth?.isParent === true;
 }
 
-function buildTarget(path, { student = '', mode = 'student', extra = {} } = {}) {
+function buildTarget(path, { student = '', extra = {} } = {}) {
   const url = new URL(path, window.location.href);
   if (student) url.searchParams.set('viewStudent', student);
   else url.searchParams.delete('viewStudent');
   url.searchParams.delete('student');
   url.searchParams.delete('context');
-  url.searchParams.set('mode', mode === 'management' ? 'management' : 'student');
+  url.searchParams.delete('mode');
   Object.entries(extra).forEach(([key, value]) => {
     if (value === '' || value == null) url.searchParams.delete(key);
     else url.searchParams.set(key, String(value));
@@ -43,35 +42,35 @@ const CAPABILITIES = Object.freeze({
     id: 'lesson.create',
     entityType: 'lesson',
     label: 'Les maken',
-    target: ({ student }) => buildTarget('lesson-editor.html', { student, mode: 'student' })
+    target: ({ student }) => buildTarget('lesson-editor.html', { student })
   }),
   'skill.create': Object.freeze({
     id: 'skill.create',
     entityType: 'skill',
     label: 'Skill maken',
-    target: ({ student }) => buildTarget('skill-create.html', { student, mode: 'student' })
+    target: ({ student }) => buildTarget('skill-create.html', { student })
   }),
   'learningTopic.create': Object.freeze({
     id: 'learningTopic.create',
     entityType: 'learningTopic',
     label: 'Leerstof maken',
-    target: ({ student }) => buildTarget('learning-material-editor.html', { student, mode: 'student' })
+    target: ({ student }) => buildTarget('learning-material-editor.html', { student })
   })
 });
 
 const ITEM_ACTIONS = Object.freeze({
   lesson: Object.freeze([
-    Object.freeze({ id: 'lesson.edit', label: 'Bewerken', target: ({ item, student }) => buildTarget('lesson-editor.html', { student: student || item?.student, mode: 'student', extra: { lesson_id: item?.id } }) }),
+    Object.freeze({ id: 'lesson.edit', label: 'Bewerken', target: ({ item, student }) => buildTarget('lesson-editor.html', { student: student || item?.student, extra: { lesson_id: item?.id } }) }),
     Object.freeze({ id: 'lesson.archive', label: 'Archiveren', execute: ({ management, item }) => management.archiveLesson(item.id), requiresConfirmation: true }),
     Object.freeze({ id: 'lesson.delete', label: 'Verwijderen', execute: ({ management, item }) => management.moveToTrash(item.id), requiresConfirmation: true, danger: true })
   ]),
   learningTopic: Object.freeze([
-    Object.freeze({ id: 'learningTopic.edit', label: 'Bewerken', target: ({ item, student }) => buildTarget('learning-material-editor.html', { student: student || item?.student, mode: 'student', extra: { topic_id: item?.id } }) }),
+    Object.freeze({ id: 'learningTopic.edit', label: 'Bewerken', target: ({ item, student }) => buildTarget('learning-material-editor.html', { student: student || item?.student, extra: { topic_id: item?.id } }) }),
     Object.freeze({ id: 'learningTopic.archive', label: 'Archiveren', execute: ({ management, item }) => management.archiveLearningTopic(item.id), requiresConfirmation: true }),
     Object.freeze({ id: 'learningTopic.delete', label: 'Verwijderen', execute: ({ management, item }) => management.moveLearningTopicToTrash(item.id), requiresConfirmation: true, danger: true })
   ]),
   skill: Object.freeze([
-    Object.freeze({ id: 'skill.edit', label: 'Bewerken', target: ({ item, student }) => buildTarget('skill-editor.html', { student: student || item?.student, mode: 'student', extra: { skill: item?.id } }) }),
+    Object.freeze({ id: 'skill.edit', label: 'Bewerken', target: ({ item, student }) => buildTarget('skill-editor.html', { student: student || item?.student, extra: { skill: item?.id } }) }),
     Object.freeze({ id: 'skill.archive', label: 'Archiveren', execute: ({ management, item }) => management.archiveSkill(item.id), requiresConfirmation: true }),
     Object.freeze({ id: 'skill.delete', label: 'Verwijderen', execute: ({ management, item }) => management.moveSkillToTrash(item.id), requiresConfirmation: true, danger: true })
   ])
@@ -80,12 +79,8 @@ const ITEM_ACTIONS = Object.freeze({
 export function createManagementCapabilities({ auth, management } = {}) {
   requireManagement(management);
 
-  function canManage() {
-    return requireParent(auth);
-  }
-
   function getAvailableForPage({ page = '', student = '' } = {}) {
-    if (!canManage()) return [];
+    if (!canManage(auth)) return [];
     const ids = PAGE_CAPABILITIES[page] || [];
     return ids.map(id => CAPABILITIES[id]).filter(Boolean).map(capability => Object.freeze({
       ...capability,
@@ -94,7 +89,7 @@ export function createManagementCapabilities({ auth, management } = {}) {
   }
 
   function getActionsForItem({ entityType, item = null, student = '' } = {}) {
-    if (!canManage() || !item) return [];
+    if (!canManage(auth) || !item) return [];
     return (ITEM_ACTIONS[entityType] || []).map(action => Object.freeze({
       ...action,
       target: typeof action.target === 'function' ? action.target({ item, student }) : undefined,

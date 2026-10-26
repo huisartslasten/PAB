@@ -87,6 +87,16 @@ export function createSkillDefinitionService(db, { canConfigure = () => false } 
     return normalizeSkill(data);
   }
 
+  async function saveOrder(orderedIds) {
+    requireAdministrator(canConfigure);
+    if (!Array.isArray(orderedIds)) throw new Error('Een Skill-volgorde is vereist.');
+    const updates = orderedIds.map((id, index) => ({ id: String(id), sort_order: index }));
+    await Promise.all(updates.map(async ({ id, sort_order }) => {
+      const { error } = await db.from('skill_definitions').update({ sort_order, updated_at: new Date().toISOString() }).eq('id', id);
+      if (error) throw error;
+    }));
+  }
+
   async function updateLifecycle(id, patch) {
     requireAdministrator(canConfigure);
     const key = String(id ?? '').trim();
@@ -120,7 +130,7 @@ export function createSkillDefinitionService(db, { canConfigure = () => false } 
     if (error) throw error;
   }
 
-  return Object.freeze({ list, listRecovery, get, save, archive, restoreFromArchive, moveToTrash, restoreFromTrash, permanentlyDelete });
+  return Object.freeze({ list, listRecovery, get, save, saveOrder, archive, restoreFromArchive, moveToTrash, restoreFromTrash, permanentlyDelete });
 }
 
 export { normalizeSkill };

@@ -20,6 +20,10 @@ function ensureStylesheet(documentRef) {
   documentRef.head.appendChild(link);
 }
 
+function isManagementRoute(route) {
+  return route.params?.get('mode') === VIEW_MODES.MANAGEMENT || route.params?.get('context') === VIEW_MODES.MANAGEMENT;
+}
+
 export function installPacoManagementSwitch({ templateMount, app, router, documentRef = document } = {}) {
   if (!templateMount) throw new TypeError('installPacoManagementSwitch requires templateMount.');
   if (!app?.auth) throw new TypeError('installPacoManagementSwitch requires app.auth.');
@@ -30,8 +34,19 @@ export function installPacoManagementSwitch({ templateMount, app, router, docume
   const hero = templateMount.querySelector('.paco-template-hero');
   if (!hero) return null;
 
+  const updateState = button => {
+    const canManage = Boolean(app.auth.isParent);
+    const isManagement = isManagementRoute(router.getRoute());
+    button.dataset.enabled = String(canManage);
+    button.dataset.active = String(isManagement && canManage);
+    button.setAttribute('aria-pressed', String(isManagement && canManage));
+  };
+
   const existing = hero.querySelector('.paco-template-management-switch');
-  if (existing) return existing;
+  if (existing) {
+    updateState(existing);
+    return existing;
+  }
 
   const button = documentRef.createElement('button');
   button.type = 'button';
@@ -40,29 +55,17 @@ export function installPacoManagementSwitch({ templateMount, app, router, docume
   button.setAttribute('aria-label', 'Beheer op deze pagina');
   button.title = 'Beheer op deze pagina';
 
-  const updateState = () => {
-    const canManage = Boolean(app.auth.isParent);
-    const route = router.getRoute();
-    const isManagement = route.params?.get('mode') === VIEW_MODES.MANAGEMENT || route.params?.get('context') === VIEW_MODES.MANAGEMENT;
-
-    button.dataset.enabled = String(canManage);
-    button.dataset.active = String(isManagement && canManage);
-    button.setAttribute('aria-pressed', String(isManagement && canManage));
-  };
-
   button.addEventListener('click', () => {
     if (!app.auth.isParent) return;
 
     const route = router.getRoute();
-    const isManagement = route.params?.get('mode') === VIEW_MODES.MANAGEMENT || route.params?.get('context') === VIEW_MODES.MANAGEMENT;
     const student = route.params?.get('viewStudent') || route.params?.get('student') || '';
-    const nextMode = isManagement ? VIEW_MODES.STUDENT : VIEW_MODES.MANAGEMENT;
+    const nextMode = isManagementRoute(route) ? VIEW_MODES.STUDENT : VIEW_MODES.MANAGEMENT;
     const target = buildViewUrl(route.url, { student, mode: nextMode });
     void router.navigate(target);
   });
 
-  app.auth.subscribe(updateState);
   hero.appendChild(button);
-  updateState();
+  updateState(button);
   return button;
 }

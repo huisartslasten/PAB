@@ -9,15 +9,8 @@ function createDb() {
     upsert: vi.fn(payload => { query.payload = payload; return query; }),
     select: vi.fn(() => query)
   };
-  query.then = undefined;
   query.upsertResult = { data: [{ id: 101, student: 'Zephon', skill_id: 'math-test', enabled: true, settings: {}, updated_at: '2026-10-25T00:00:00Z', created_at: '2026-10-25T00:00:00Z' }], error: null };
-  query.single = undefined;
-  query[Symbol.asyncIterator] = undefined;
-  query.select.mockImplementation(() => query);
-  query.upsert.mockImplementation(payload => {
-    query.payload = payload;
-    return { ...query, then: (resolve) => resolve(query.upsertResult) };
-  });
+  query.then = (resolve) => resolve(query.upsertResult);
   return { from: vi.fn(() => query), query };
 }
 

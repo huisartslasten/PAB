@@ -10,8 +10,8 @@ function requireParent(auth) {
 }
 
 function requireStudent() {
-  const { student, isManagement } = getViewContext();
-  if (!student || !isManagement) throw new Error('A student must be selected.');
+  const { student } = getViewContext();
+  if (!student) throw new Error('A student must be selected.');
   return student;
 }
 

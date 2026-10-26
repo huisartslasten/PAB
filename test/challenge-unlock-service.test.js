@@ -31,6 +31,33 @@ test('Challenge unlock service passes the configured lesson-type allowlist to pr
   assert.deepEqual(calls, [['Zyon', 4, ['dictation']]]);
 });
 
+test('Challenge unlock service can configure all lesson types as valid test sources', async () => {
+  const calls = [];
+  const service = createChallengeUnlockService({
+    challengeConfiguration: {
+      async get() {
+        return {
+          enabled: true,
+          unlock: {
+            type: 'assessment-score',
+            minimumScore: 4,
+            allowedLessonTypes: ['*']
+          }
+        };
+      }
+    },
+    practiceResults: {
+      async listLessonIdsMeetingScore(student, minimumScore, allowedLessonTypes) {
+        calls.push([student, minimumScore, allowedLessonTypes]);
+        return [20, 39];
+      }
+    }
+  });
+
+  assert.deepEqual(await service.listUnlockedLessonIds('Zenith', 'millionaire'), [20, 39]);
+  assert.deepEqual(calls, [['Zenith', 4, ['*']]]);
+});
+
 test('Challenge unlock service does not unlock when no source types are configured', async () => {
   let calls = 0;
   const service = createChallengeUnlockService({

@@ -60,7 +60,7 @@ function createWindow(documentRef) {
   };
 }
 
-test('router loads the target route stylesheet before mounting its runtime', async () => {
+test('router loads the shared tile stylesheet and target route stylesheet before mounting', async () => {
   const documentRef = createFakeDocument();
   const windowRef = createWindow(documentRef);
   const events = [];
@@ -69,7 +69,7 @@ test('router loads the target route stylesheet before mounting its runtime', asy
   const lessonChoice = ({ navigate }) => ({
     mount() {
       events.push('mount');
-      assert.equal(documentRef.head.querySelectorAll('link[rel="stylesheet"]').length, 1);
+      assert.equal(documentRef.head.querySelectorAll('link[rel="stylesheet"]').length, 2);
     }
   });
   Object.defineProperty(lessonChoice, 'styles', {
@@ -83,10 +83,10 @@ test('router loads the target route stylesheet before mounting its runtime', asy
   events.push('after');
 
   assert.deepEqual(events, ['before', 'mount', 'after']);
-  assert.deepEqual(router.getRouteStyles('/lesson-choice.html'), ['src/features/lessons/lesson-choice.css']);
+  assert.deepEqual(router.getRouteStyles('/lesson-choice.html'), ['src/components/paco-tile.css', 'src/features/lessons/lesson-choice.css']);
 });
 
-test('router removes route styles that are no longer owned by the active route', async () => {
+test('router removes route styles while keeping the shared tile stylesheet active', async () => {
   const documentRef = createFakeDocument();
   const windowRef = createWindow(documentRef);
   const routes = {};
@@ -107,5 +107,5 @@ test('router removes route styles that are no longer owned by the active route',
     .querySelectorAll('link[rel="stylesheet"]')
     .map(link => link.getAttribute('href'));
 
-  assert.deepEqual(hrefs, ['src/features/lessons/questions.css']);
+  assert.deepEqual(hrefs, ['src/components/paco-tile.css', 'src/features/lessons/questions.css']);
 });

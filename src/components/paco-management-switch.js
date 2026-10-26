@@ -1,9 +1,9 @@
 /**
- * Canonical management switch for the shared PacoGO page template.
+ * Shared management capability trigger for the page template.
  *
  * The page template owns placement. Authentication owns authorization.
- * The shared router owns view transitions; this component only requests
- * the current page in the other supported view mode.
+ * The central management capability registry owns available actions.
+ * This component only presents those actions for the current page/context.
  */
 
 const STYLE_HREF = 'src/components/paco-management-switch.css';
@@ -23,39 +23,62 @@ function hasManagementAccess({ app } = {}) {
   return app?.auth?.isParent === true;
 }
 
-function buildCurrentPageManagementUrl() {
-  const url = new URL(window.location.href);
-  const isManagement = url.searchParams.get('mode') === 'management' || url.searchParams.get('context') === 'management';
-  const student = url.searchParams.get('viewStudent') || url.searchParams.get('student') || '';
+function currentPageKey() {
+  const page = window.location.pathname.split('/').pop() || 'dashboard.html';
+  return page.replace(/\.html$/i, '');
+}
 
-  url.searchParams.delete('context');
-  url.searchParams.set('mode', isManagement ? 'student' : 'management');
-  if (student) url.searchParams.set('viewStudent', student);
-  else url.searchParams.delete('viewStudent');
-  url.searchParams.delete('student');
-  return url;
+function currentStudent() {
+  const url = new URL(window.location.href);
+  return url.searchParams.get('viewStudent') || url.searchParams.get('student') || '';
+}
+
+function createCapabilityPanel({ documentRef, capabilities, navigate, button }) {
+  const panel = documentRef.createElement('div');
+  panel.className = 'paco-management-capability-panel';
+  panel.hidden = true;
+  panel.setAttribute('role', 'menu');
+
+  capabilities.forEach(capability => {
+    const action = documentRef.createElement('button');
+    action.type = 'button';
+    action.className = 'paco-management-capability-action';
+    action.textContent = capability.label;
+    action.setAttribute('role', 'menuitem');
+    action.addEventListener('click', () => {
+      if (!capability.target) return;
+      navigate(capability.target);
+      panel.hidden = true;
+      button.setAttribute('aria-expanded', 'false');
+    });
+    panel.appendChild(action);
+  });
+
+  return panel;
 }
 
 export function installPacoManagementSwitch({ templateMount, app = null, navigate = null, documentRef = document } = {}) {
   if (!templateMount) throw new TypeError('installPacoManagementSwitch requires templateMount.');
-  if (navigate !== null && typeof navigate !== 'function') throw new TypeError('installPacoManagementSwitch requires the central navigation owner.');
+  if (typeof navigate !== 'function') throw new TypeError('installPacoManagementSwitch requires the central navigation owner.');
 
   const canManage = hasManagementAccess({ app });
   const pageHeader = templateMount.querySelector('.paco-template-page-header');
   if (!pageHeader) return null;
 
   const existing = pageHeader.querySelector('.paco-template-management-switch');
-  if (existing && !canManage) {
-    existing.remove();
-    return null;
-  }
-  if (existing) {
-    if (navigate) existing.__pacoNavigate = navigate;
-    return existing;
-  }
-  if (!canManage || !navigate) return null;
+  if (existing) existing.closest('.paco-management-capability-wrap')?.remove();
+  if (!canManage || !app?.managementCapabilities) return null;
+
+  const capabilities = app.managementCapabilities.getAvailableForPage({
+    page: currentPageKey(),
+    student: currentStudent()
+  });
+  if (!capabilities.length) return null;
 
   ensureStylesheet(documentRef);
+
+  const wrap = documentRef.createElement('div');
+  wrap.className = 'paco-management-capability-wrap';
 
   const button = documentRef.createElement('button');
   button.type = 'button';
@@ -63,21 +86,17 @@ export function installPacoManagementSwitch({ templateMount, app = null, navigat
   button.textContent = 'Beheer';
   button.setAttribute('aria-label', 'Beheer op deze pagina');
   button.title = 'Beheer op deze pagina';
-  button.__pacoNavigate = navigate;
+  button.setAttribute('aria-expanded', 'false');
+  button.setAttribute('aria-haspopup', 'menu');
 
-  const updateState = () => {
-    const isManagement = new URL(window.location.href).searchParams.get('mode') === 'management';
-    button.dataset.enabled = 'true';
-    button.dataset.active = String(isManagement);
-    button.setAttribute('aria-pressed', String(isManagement));
-  };
-
-  updateState();
+  const panel = createCapabilityPanel({ documentRef, capabilities, navigate, button });
   button.addEventListener('click', () => {
-    const nextUrl = buildCurrentPageManagementUrl();
-    button.__pacoNavigate(nextUrl);
+    const nextOpen = panel.hidden;
+    panel.hidden = !nextOpen;
+    button.setAttribute('aria-expanded', String(nextOpen));
   });
 
-  pageHeader.appendChild(button);
+  wrap.append(button, panel);
+  pageHeader.appendChild(wrap);
   return button;
 }

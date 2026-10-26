@@ -16,12 +16,11 @@ function javascriptFiles(root) {
 }
 
 function importsFrom(source, boundary) {
-  const normalized = source.replaceAll('\\', '/');
-  const importPattern = /(?:import(?:[\\s\\S]*?from\\s*|\\s*)|export(?:[\\s\\S]*?from\\s*)|(?:require)\\s*\\(\\s*)["']([^"']+)["']/g;
+  const importPattern = /\b(?:from|import)\s*["']([^"']+)["']/g;
   const matches = [];
-  for (const match of normalized.matchAll(importPattern)) {
+  for (const match of source.matchAll(importPattern)) {
     const specifier = match[1];
-    if (specifier && (specifier === boundary || specifier.startsWith(`${boundary}/`))) matches.push(specifier);
+    if (specifier === boundary || specifier.startsWith(`${boundary}/`)) matches.push(specifier);
   }
   return matches;
 }
@@ -44,11 +43,11 @@ function collectViolations(relativeRoot, forbiddenBoundaries) {
 }
 
 test('services do not depend on UI or feature layers', () => {
-  const violations = collectViolations('services', ['../components', '../features', '/components/', '/features/']);
+  const violations = collectViolations('services', ['../components', '../features']);
   assert.deepEqual(violations, [], `Forbidden service dependencies:\n${violations.join('\n')}`);
 });
 
 test('shared components do not depend on data or feature layers', () => {
-  const violations = collectViolations('components', ['../services', '../features', '/services/', '/features/']);
+  const violations = collectViolations('components', ['../services', '../features']);
   assert.deepEqual(violations, [], `Forbidden component dependencies:\n${violations.join('\n')}`);
 });

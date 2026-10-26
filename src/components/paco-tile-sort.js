@@ -1,5 +1,5 @@
 /**
- * Canonical drag-and-drop behavior for PacoGO tile grids.
+ * Canonical drag-and-drop behavior for Paco tile grids.
  *
  * This module only manages interaction and visual ordering. The feature that
  * owns the data decides what to persist through onOrderChange.
@@ -7,6 +7,8 @@
 
 export function attachPacoTileSorting(container, {
   selector = '.paco-tile[data-paco-tile-id][draggable="true"]',
+  gridSelector = '.paco-tile-grid',
+  dragHandleSelector = '.paco-tile-drag-handle',
   onOrderChange = null,
   onError = null
 } = {}) {
@@ -14,7 +16,7 @@ export function attachPacoTileSorting(container, {
 
   const tiles = () => [...container.querySelectorAll(selector)];
   const grids = () => {
-    const found = [...container.querySelectorAll('.paco-tile-grid')];
+    const found = [...container.querySelectorAll(gridSelector)];
     return found.length ? found : [container];
   };
   let dragged = null;
@@ -44,7 +46,7 @@ export function attachPacoTileSorting(container, {
   };
 
   const resolveGrid = (x, y, eventTarget) => {
-    const direct = eventTarget?.closest?.('.paco-tile-grid');
+    const direct = eventTarget?.closest?.(gridSelector);
     if (direct && container.contains(direct)) return direct;
     return grids().find(grid => {
       const rect = grid.getBoundingClientRect();
@@ -100,6 +102,8 @@ export function attachPacoTileSorting(container, {
     event.preventDefault();
     if (!placeholder) return cleanup();
 
+    const sourceId = dragged.dataset.pacoTileId || '';
+    const targetGrid = placeholder.parentElement;
     placeholder.replaceWith(dragged);
     const reorderedIds = collectOrderedIds();
     const changed = originalIds.join('|') !== reorderedIds.join('|');
@@ -107,7 +111,7 @@ export function attachPacoTileSorting(container, {
     if (!changed || typeof onOrderChange !== 'function') return;
 
     try {
-      await onOrderChange({ orderedIds: reorderedIds });
+      await onOrderChange({ orderedIds: reorderedIds, sourceId, targetGrid });
     } catch (error) {
       if (typeof onError === 'function') await onError(error);
     }
@@ -116,7 +120,7 @@ export function attachPacoTileSorting(container, {
   const onDragStart = event => {
     const tile = event.target.closest(selector);
     if (!tile || !container.contains(tile)) return;
-    if (!event.target.closest('.paco-tile-drag-handle')) {
+    if (!event.target.closest(dragHandleSelector)) {
       event.preventDefault();
       return;
     }

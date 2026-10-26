@@ -13,28 +13,47 @@ export function attachPacoTileSorting(container, {
   if (!container) throw new TypeError('attachPacoTileSorting requires a container.');
 
   const tiles = () => [...container.querySelectorAll(selector)];
-  const grid = container.querySelector('.paco-tile-grid') || container;
+  const grids = () => {
+    const found = [...container.querySelectorAll('.paco-tile-grid')];
+    return found.length ? found : [container];
+  };
   let dragged = null;
   let placeholder = null;
+  let activeGrid = null;
+  let originalIds = [];
+
+  const collectOrderedIds = () => tiles().map(tile => tile.dataset.pacoTileId).filter(Boolean);
 
   const cleanup = () => {
     tiles().forEach(tile => tile.classList.remove('dragging'));
+    grids().forEach(grid => grid.classList.remove('paco-tile-grid--sorting'));
     placeholder?.remove();
     placeholder = null;
-    grid.classList.remove('paco-tile-grid--sorting');
+    activeGrid = null;
     dragged = null;
+    originalIds = [];
   };
 
-  const ensurePlaceholder = () => {
-    if (placeholder) return placeholder;
-    placeholder = grid.ownerDocument.createElement('div');
-    placeholder.className = 'paco-tile-placeholder';
-    placeholder.setAttribute('aria-hidden', 'true');
+  const ensurePlaceholder = grid => {
+    if (!placeholder) {
+      placeholder = grid.ownerDocument.createElement('div');
+      placeholder.className = 'paco-tile-placeholder';
+      placeholder.setAttribute('aria-hidden', 'true');
+    }
     return placeholder;
   };
 
-  const insertionTarget = (x, y) => {
-    const candidates = tiles().filter(tile => tile !== dragged);
+  const resolveGrid = (x, y, eventTarget) => {
+    const direct = eventTarget?.closest?.('.paco-tile-grid');
+    if (direct && container.contains(direct)) return direct;
+    return grids().find(grid => {
+      const rect = grid.getBoundingClientRect();
+      return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+    }) || activeGrid || grids()[0];
+  };
+
+  const insertionTarget = (grid, x, y) => {
+    const candidates = [...grid.querySelectorAll(selector)].filter(tile => tile !== dragged);
     if (!candidates.length) return { before: null };
 
     let nearest = null;
@@ -57,10 +76,14 @@ export function attachPacoTileSorting(container, {
     return { before: nearest, insertBefore: before };
   };
 
-  const placePlaceholder = (x, y) => {
+  const placePlaceholder = (x, y, eventTarget) => {
     if (!dragged) return;
-    const target = insertionTarget(x, y);
-    const holder = ensurePlaceholder();
+    const grid = resolveGrid(x, y, eventTarget);
+    activeGrid = grid;
+    grids().forEach(item => item.classList.toggle('paco-tile-grid--sorting', item === grid));
+    const target = insertionTarget(grid, x, y);
+    const holder = ensurePlaceholder(grid);
+
     if (!target.before) {
       if (grid.lastElementChild !== holder) grid.appendChild(holder);
       return;
@@ -75,21 +98,11 @@ export function attachPacoTileSorting(container, {
   const finish = async event => {
     if (!dragged) return;
     event.preventDefault();
-    const holder = placeholder;
-    if (!holder) return cleanup();
+    if (!placeholder) return cleanup();
 
-    const orderedIds = [...grid.children]
-      .filter(element => element !== holder && element.matches(selector))
-      .map(element => element.dataset.pacoTileId)
-      .filter(Boolean);
-
-    holder.replaceWith(dragged);
-    const reorderedIds = [...grid.children]
-      .filter(element => element.matches(selector))
-      .map(element => element.dataset.pacoTileId)
-      .filter(Boolean);
-
-    const changed = orderedIds.join('|') !== reorderedIds.join('|');
+    placeholder.replaceWith(dragged);
+    const reorderedIds = collectOrderedIds();
+    const changed = originalIds.join('|') !== reorderedIds.join('|');
     cleanup();
     if (!changed || typeof onOrderChange !== 'function') return;
 
@@ -108,8 +121,8 @@ export function attachPacoTileSorting(container, {
       return;
     }
     dragged = tile;
+    originalIds = collectOrderedIds();
     tile.classList.add('dragging');
-    grid.classList.add('paco-tile-grid--sorting');
     event.dataTransfer.effectAllowed = 'move';
     event.dataTransfer.setData('text/plain', tile.dataset.pacoTileId || '');
   };
@@ -118,7 +131,7 @@ export function attachPacoTileSorting(container, {
     if (!dragged) return;
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
-    placePlaceholder(event.clientX, event.clientY);
+    placePlaceholder(event.clientX, event.clientY, event.target);
   };
 
   const onDrop = event => { void finish(event); };

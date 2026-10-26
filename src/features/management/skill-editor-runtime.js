@@ -175,7 +175,7 @@ export function createSkillEditorRuntime({ app, templateMount, context, createMo
         checkbox.type = 'checkbox';
         checkbox.checked = draft.definition.remainderAllowed === true;
         checkbox.addEventListener('change', () => { draft.definition.remainderAllowed = checkbox.checked; });
-        remainder.append(simplifyText, checkbox);
+        remainder.append(remainderText, checkbox);
         section.appendChild(remainder);
       }
     }

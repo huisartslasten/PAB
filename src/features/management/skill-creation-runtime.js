@@ -1,6 +1,5 @@
 import { mountPacoPageTemplate, createPacoDropdown } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
-import { buildViewUrl } from '../../core/view-context.js';
 
 const SKILL_TYPES = Object.freeze([
   { value: 'math', label: 'Rekenen', description: 'Maak een Skill voor getallen en bewerkingen.', editor: 'skill-editor.html' }
@@ -17,7 +16,7 @@ export function createSkillCreationRuntime({ app, templateMount, context, docume
   state.textContent = 'Skill maken laden…';
   content.appendChild(state);
 
-  const goBack = () => navigate(buildViewUrl('skills.html', { student: context?.student || '', mode: 'management' }));
+  const goBack = () => navigate(new URL(`skills.html?viewStudent=${encodeURIComponent(context?.student || '')}`, window.location.href), { managementCapability: 'skill.manage' });
 
   function render() {
     content.replaceChildren();
@@ -44,11 +43,10 @@ export function createSkillCreationRuntime({ app, templateMount, context, docume
         const selected = SKILL_TYPES.find(item => item.value === value);
         if (!selected) return;
         const target = new URL(selected.editor, window.location.href);
-        target.searchParams.set('student', context?.student || '');
-        target.searchParams.set('mode', 'management');
+        if (context?.student) target.searchParams.set('viewStudent', context.student);
         target.searchParams.set('create', '1');
         target.searchParams.set('category', selected.value);
-        navigate(target);
+        navigate(target, { managementCapability: 'skill.create' });
       }
     });
 
@@ -85,7 +83,7 @@ export function createSkillCreationRuntime({ app, templateMount, context, docume
       title: 'Skill maken',
       icon: '➕',
       subtitle: 'Kies eerst welk type Skill je wilt maken.',
-      navigation: createPacoNavigation({ app, active: 'skills', student: context?.student || '', viewMode: 'management', includeManagementTools: true, includeCreator: false, navigate }),
+      navigation: createPacoNavigation({ app, active: 'skills', student: context?.student || '', includeManagementTools: false, includeCreator: false, navigate }),
       content
     });
     render();

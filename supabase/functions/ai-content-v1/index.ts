@@ -1,6 +1,7 @@
 const corsHeaders = {"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"authorization, x-client-info, apikey, content-type","Access-Control-Allow-Methods":"POST, OPTIONS"};
 const allowedTypes = new Set(["practice_target", "multiple_choice_distractors"]);
 const allowedForms = new Set(["word","sentence","saying"]);
+const allowedDifficulties = new Set(["hard", "harder"]);
 const AI_MODEL = "gpt-5.6-terra";
 const multipleChoiceContextPolicies = Object.freeze({
   default: Object.freeze({ requiresQuestion: true }),
@@ -18,6 +19,8 @@ function normalize(body: any) {
 
   if (contentType === "multiple_choice_distractors") {
     const optionCount = Math.min(8, Math.max(2, Math.round(Number(body?.optionCount) || 4)));
+    const difficulty = text(body?.difficulty, 20) || "hard";
+    if (!allowedDifficulties.has(difficulty)) throw new Error("Unsupported distractor difficulty.");
     return {
       contentType,
       locale: text(body?.locale, 20) || "nl-NL",
@@ -25,6 +28,7 @@ function normalize(body: any) {
       correctAnswer: text(body?.correctAnswer, 1000),
       subject: text(body?.subject, 100),
       subvak: text(body?.subvak, 100),
+      difficulty,
       context: {
         lessonType: text(body?.context?.lessonType, 100),
         theme: text(body?.context?.theme, 200)
@@ -45,18 +49,20 @@ function normalize(body: any) {
 }
 function promptFor(request: any) {
   if (request.contentType === "multiple_choice_distractors") {
+    const difficultyInstruction = request.difficulty === "harder"
+      ? "MOEILIJKER: maak afleiders die inhoudelijk zeer dicht bij het correcte antwoord liggen. Gebruik subtiele betekenisverschillen, plausibele verwisselingen of zeer realistische bijna-fouten. De leerling moet de vraag echt begrijpen om het juiste antwoord te kiezen."
+      : "MOEILIJK: maak plausibele afleiders die duidelijk genoeg fout zijn, maar niet meteen wegvallen door lengte, woordsoort of oppervlakkige vorm.";
     return [
       "Je bent de centrale educatieve contentgenerator van PAB.",
       "Genereer alleen plausibele FOUTE antwoordopties voor een bestaande multiple-choice vraag.",
-      "Het door de gebruiker opgegeven correcte antwoord is al vastgesteld en mag NIET worden vervangen, aangepast of opnieuw gegenereerd.",
-      "Gebruik de vraag, het correcte antwoord en de context om realistische afleiders te maken.",
+      "Het correcte antwoord staat vast en mag NIET worden vervangen of aangepast.",
+      difficultyInstruction,
       request.question ? `Vraag: ${request.question}` : "Vraag: (dicteecontext; gebruik het correcte woord als vaste referentie)",
       `Correct antwoord: ${request.correctAnswer}`,
       `Vak: ${request.subject || "onbekend"}`,
       `Subvak: ${request.subvak || "onbekend"}`,
       `Lescontext: ${JSON.stringify(request.context)}`,
       `Aantal foute opties: ${request.distractorCount}`,
-      "Elke optie moet inhoudelijk anders zijn, plausibel klinken en duidelijk fout zijn voor deze vraag.",
       "Bij spelling/dictee: maak realistische bijna-goede spelfouten, maar gebruik nooit de correcte spelling.",
       "Geef ALLEEN JSON: {\"options\":[\"...\"]}"
     ].join("\n");
@@ -112,14 +118,8 @@ function upstreamErrorDetails(raw: string) {
   try {
     const parsed = JSON.parse(raw);
     const error = parsed?.error ?? parsed;
-    return {
-      type: text(error?.type, 100),
-      code: text(error?.code, 100),
-      message: text(error?.message, 300)
-    };
-  } catch {
-    return { type: "", code: "", message: "" };
-  }
+    return { type: text(error?.type, 100), code: text(error?.code, 100), message: text(error?.message, 300) };
+  } catch { return { type: "", code: "", message: "" }; }
 }
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });

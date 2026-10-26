@@ -41,13 +41,12 @@ export function createAgendaPageRuntime({ app, templateMount, context, documentR
   }
 
   function bindLessonLinks() {
-    content.querySelectorAll('.agenda-lesson-link').forEach(button => {
-      if (button.dataset.bound) return;
-      button.dataset.bound = '1';
-      button.addEventListener('click', () => {
-        const target = buildViewUrl('lesson-choice.html', { student: selectedStudent, mode: context.mode });
-        target.searchParams.set('lesson_id', button.dataset.lessonId);
-        navigate(target);
+    content.querySelectorAll('.agenda-lesson-link').forEach(link => {
+      if (link.dataset.bound) return;
+      link.dataset.bound = '1';
+      link.addEventListener('click', event => {
+        event.preventDefault();
+        navigate(new URL(link.href, globalThis.location?.href || 'http://localhost/'));
       });
     });
   }
@@ -61,9 +60,12 @@ export function createAgendaPageRuntime({ app, templateMount, context, documentR
       lessons: () => app.state.lessons,
       demoItems: () => [],
       onAdd: () => agenda?.showAgendaImport(),
-      onLessonMatch: item => item.lessonId
-        ? `<button type="button" class="secondary agenda-lesson-link" data-lesson-id="${String(item.lessonId).replaceAll('"', '&quot;')}" style="margin-top:7px;padding:5px 8px;border-radius:9px;font-size:11px">📚 Naar les</button>`
-        : '',
+      onLessonMatch: item => {
+        if (!item.lessonId) return '';
+        const target = buildViewUrl('lesson-choice.html', { student: selectedStudent, mode: context.mode });
+        target.searchParams.set('lesson_id', item.lessonId);
+        return `<a class="agenda-lesson-link" href="${target.toString().replaceAll('"', '&quot;')}">Naar les</a>`;
+      },
       now: () => new Date()
     });
   }

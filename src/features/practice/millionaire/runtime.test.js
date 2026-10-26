@@ -34,13 +34,13 @@ test('Millionaire uses lesson questions and keeps lifelines in game state', asyn
   assert.equal(state.prize, 1000000);
 });
 
-test('Millionaire progresses from hard to harder challenge content', async () => {
+test('Millionaire sends the canonical 40/40/20 difficulty progression to the distractor service', async () => {
   const calls = [];
   const runtime = createMillionaireRuntime({
-    questions: [
-      { question: 'Vraag 1', answer: 'A' },
-      { question: 'Vraag 2', answer: 'B' }
-    ],
+    questions: Array.from({ length: 10 }, (_, index) => ({
+      question: `Vraag ${index + 1}`,
+      answer: String(index + 1)
+    })),
     distractorService: {
       async generateMultipleChoiceDistractors(request) {
         calls.push(request.difficulty);
@@ -51,10 +51,15 @@ test('Millionaire progresses from hard to harder challenge content', async () =>
   });
 
   runtime.start();
-  await runtime.next();
-  assert.equal(runtime.snapshot().difficulty, 'hard');
-  runtime.choose(runtime.snapshot().current.answer);
-  await runtime.next();
-  assert.equal(runtime.snapshot().difficulty, 'harder');
-  assert.deepEqual(calls, ['hard', 'harder']);
+  for (let index = 0; index < 10; index += 1) {
+    await runtime.next();
+    assert.equal(runtime.snapshot().difficulty, index < 4 ? 'hard' : index < 8 ? 'harder' : 'expert');
+    runtime.choose(runtime.snapshot().current.answer);
+  }
+
+  assert.deepEqual(calls, [
+    'hard', 'hard', 'hard', 'hard',
+    'harder', 'harder', 'harder', 'harder',
+    'expert', 'expert'
+  ]);
 });

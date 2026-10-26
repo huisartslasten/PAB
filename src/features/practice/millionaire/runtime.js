@@ -1,4 +1,4 @@
-import { difficultyForMillionaireStep } from '../../lessons/question-difficulty.js';
+import { difficultyForChallengeStep } from '../../challenges/challenge-difficulty.js';
 
 function shuffle(values, random = Math.random) {
   const result = [...values];
@@ -46,7 +46,7 @@ export function createMillionaireRuntime({ questions = [], distractorService = n
   }
 
   async function buildOptions(item) {
-    const difficulty = difficultyForMillionaireStep(item, index, bank.length);
+    const difficulty = difficultyForChallengeStep('millionaire', index, bank.length);
     currentDifficulty = difficulty;
     const existing = Array.isArray(item.answer_options) ? item.answer_options.filter(Boolean).map(String) : [];
     if (existing.length >= 2) return shuffle([...new Set([String(item.answer), ...existing])], random).slice(0, 4);

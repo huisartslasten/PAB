@@ -52,7 +52,8 @@ function buildUniversalItem(row = {}, { defaultResponseType = 'text', numericAns
     question_parts: questionParts,
     answer_parts: answerParts,
     response_type: responseType,
-    answer_options: responseType === 'multiple_choice' ? answerOptions : []
+    answer_options: responseType === 'multiple_choice' ? answerOptions : [],
+    difficulty: row.difficulty ?? null
   };
 
   if (responseType === 'multiple_choice') {
@@ -114,7 +115,8 @@ export function buildDictationItem(row = {}) {
     question_parts: questionParts,
     answer_parts: parts.length ? parts : [{ text: word, role: 'answer' }],
     response_type: 'text',
-    answer_options: []
+    answer_options: [],
+    difficulty: row.difficulty ?? null
   };
 }
 

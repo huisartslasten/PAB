@@ -23,7 +23,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     if (app.auth.isMainAdministrator) {
       groups.splice(2, 0,
         createToolGroup('Skillbeheer', [
-          createAction('🧮 Skills beheren', 'Bepaal per leerling welke reken-Skills beschikbaar zijn.', 'skill-settings.html'),
+          createAction('🧮 Skills beheren', 'Bepaal per leerling welke reken-Skills beschikbaar zijn.', 'skills.html'),
           createAction('➕ Skills maken', 'Kies eerst welk type Skill je wilt maken.', 'skill-create.html', { requiresStudent: false })
         ]),
         createToolGroup('Challengebeheer', [

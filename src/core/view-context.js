@@ -1,5 +1,5 @@
 import { appState, setViewContext } from './state.js';
-import { isKnownStudent } from '../features/students/students.js';
+import { isKnownStudent } from './student-registry.js';
 
 export function readViewContext(searchParams = new URLSearchParams()) {
   const requestedStudent = searchParams.get('viewStudent') || searchParams.get('student') || '';

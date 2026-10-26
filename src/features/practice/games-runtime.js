@@ -1,5 +1,6 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
+import { createActivityCardGrid } from '../../components/activity-card-grid.js';
 import { getActivePracticeGames } from './practice-domain.js';
 import { createLessonContextField } from '../lessons/lesson-context-view.js';
 import { buildViewUrl } from '../../core/view-context.js';
@@ -35,18 +36,15 @@ export function createGamesRuntime({ app, templateMount, context, lessonId = '',
     }
 
     const field = createLessonContextField(lesson, { documentRef });
-    const grid = documentRef.createElement('div');
-    grid.className = 'games-grid';
-
-    getActivePracticeGames().forEach(game => {
-      const card = documentRef.createElement('button');
-      card.type = 'button';
-      card.className = 'game-card';
-      card.innerHTML = `<div><div class="game-icon">${game.icon}</div><h2>${game.label}</h2><p>${game.description}</p></div><div class="game-action">Spelen →</div>`;
-      card.addEventListener('click', () => openGame(game));
-      grid.appendChild(card);
+    const grid = createActivityCardGrid({
+      items: getActivePracticeGames().map(game => ({
+        ...game,
+        title: game.label,
+        actionLabel: 'Spelen →'
+      })),
+      documentRef,
+      onOpen: openGame
     });
-
     field.appendChild(grid);
     content.appendChild(field);
   }

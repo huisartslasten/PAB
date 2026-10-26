@@ -41,10 +41,10 @@ export function installPacoManagementSwitch({ templateMount, app = null, navigat
   if (!templateMount) throw new TypeError('installPacoManagementSwitch requires templateMount.');
 
   const canManage = hasManagementAccess({ app, navigation });
-  const hero = templateMount.querySelector('.paco-template-hero');
-  if (!hero) return null;
+  const pageHeader = templateMount.querySelector('.paco-template-page-header');
+  if (!pageHeader) return null;
 
-  const existing = hero.querySelector('.paco-template-management-switch');
+  const existing = pageHeader.querySelector('.paco-template-management-switch');
   if (existing && !canManage) {
     existing.remove();
     return null;
@@ -70,6 +70,6 @@ export function installPacoManagementSwitch({ templateMount, app = null, navigat
     window.location.assign(buildCurrentPageManagementUrl().toString());
   });
 
-  hero.appendChild(button);
+  pageHeader.appendChild(button);
   return button;
 }

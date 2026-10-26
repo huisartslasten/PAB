@@ -24,16 +24,12 @@ function hasManagementAccess({ app, navigation = [] } = {}) {
   return navigation.some(item => item?.kind === 'management-mode');
 }
 
-function buildCurrentPageManagementUrl() {
-  const url = new URL(window.location.href);
-  const isManagement = url.searchParams.get('mode') === 'management' || url.searchParams.get('context') === 'management';
-  const student = url.searchParams.get('viewStudent') || url.searchParams.get('student') || '';
+function buildManagementUrl() {
+  const url = new URL('management.html', window.location.href);
+  const current = new URL(window.location.href);
+  const student = current.searchParams.get('viewStudent') || current.searchParams.get('student') || '';
 
-  url.searchParams.delete('context');
-  url.searchParams.set('mode', isManagement ? 'student' : 'management');
   if (student) url.searchParams.set('student', student);
-  else url.searchParams.delete('student');
-  url.searchParams.delete('viewStudent');
   return url;
 }
 
@@ -61,13 +57,13 @@ export function installPacoManagementSwitch({ templateMount, app = null, navigat
   button.setAttribute('aria-label', 'Beheer op deze pagina');
   button.title = 'Beheer op deze pagina';
 
-  const isManagement = new URL(window.location.href).searchParams.get('mode') === 'management';
+  const isManagement = new URL(window.location.href).pathname.endsWith('/management.html');
   button.dataset.enabled = 'true';
   button.dataset.active = String(isManagement);
   button.setAttribute('aria-pressed', String(isManagement));
 
   button.addEventListener('click', () => {
-    window.location.assign(buildCurrentPageManagementUrl().toString());
+    window.location.assign(buildManagementUrl().toString());
   });
 
   pageHeader.appendChild(button);

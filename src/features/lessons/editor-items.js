@@ -1,5 +1,6 @@
 import { normalizeKey } from '../../utils/text.js';
 import { normalizeMultipleChoiceConfig, validateMultipleChoiceOptions } from './multiple-choice-config.js';
+import { normalizeQuestionDifficulty } from './question-difficulty.js';
 
 const text = value => String(value ?? '').trim();
 const RESPONSE_TYPES = new Set(['text', 'number', 'fraction', 'multiple_choice']);
@@ -52,7 +53,8 @@ function buildUniversalItem(row = {}, { defaultResponseType = 'text', numericAns
     question_parts: questionParts,
     answer_parts: answerParts,
     response_type: responseType,
-    answer_options: responseType === 'multiple_choice' ? answerOptions : []
+    answer_options: responseType === 'multiple_choice' ? answerOptions : [],
+    difficulty: normalizeQuestionDifficulty(row.difficulty)
   };
 
   if (responseType === 'multiple_choice') {
@@ -101,6 +103,7 @@ export function buildDictationItem(row = {}) {
       answer_parts: parts.length ? parts : [{ text: word, role: 'answer' }],
       response_type: 'multiple_choice',
       answer_options: optionValidation.options,
+      difficulty: normalizeQuestionDifficulty(row.difficulty),
       multiple_choice_config: {
         enabled: true,
         optionCount: normalizeMultipleChoiceConfig(row.multiple_choice_config ?? row.multipleChoiceConfig ?? { enabled: true, optionCount: optionValidation.options.length }).optionCount
@@ -114,7 +117,8 @@ export function buildDictationItem(row = {}) {
     question_parts: questionParts,
     answer_parts: parts.length ? parts : [{ text: word, role: 'answer' }],
     response_type: 'text',
-    answer_options: []
+    answer_options: [],
+    difficulty: normalizeQuestionDifficulty(row.difficulty)
   };
 }
 

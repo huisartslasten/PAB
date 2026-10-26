@@ -1,9 +1,9 @@
 /**
- * Canonical page-level management switch for the shared PacoGO template.
+ * Canonical management switch for the shared PacoGO page template.
  *
- * The page template owns the switch placement. The navigation contract owns
- * management authorization; this component only switches the current page
- * between its normal and management context.
+ * The page template owns placement. Authentication owns authorization.
+ * Navigation is only a presentation input and is never the source of truth
+ * for whether the current user may manage.
  */
 
 const STYLE_HREF = 'src/components/paco-management-switch.css';
@@ -19,7 +19,8 @@ function ensureStylesheet(documentRef) {
   documentRef.head.appendChild(link);
 }
 
-function hasManagementAccess(navigation = []) {
+function hasManagementAccess({ app, navigation = [] } = {}) {
+  if (typeof app?.auth?.isParent === 'boolean') return app.auth.isParent;
   return navigation.some(item => item?.kind === 'management-mode');
 }
 
@@ -36,16 +37,19 @@ function buildCurrentPageManagementUrl() {
   return url;
 }
 
-export function installPacoManagementSwitch({ templateMount, navigation = [], documentRef = document } = {}) {
+export function installPacoManagementSwitch({ templateMount, app = null, navigation = [], documentRef = document } = {}) {
   if (!templateMount) throw new TypeError('installPacoManagementSwitch requires templateMount.');
 
-  const canManage = hasManagementAccess(navigation);
+  const canManage = hasManagementAccess({ app, navigation });
   const hero = templateMount.querySelector('.paco-template-hero');
   if (!hero) return null;
 
   const existing = hero.querySelector('.paco-template-management-switch');
+  if (existing && !canManage) {
+    existing.remove();
+    return null;
+  }
   if (existing) return existing;
-
   if (!canManage) return null;
 
   ensureStylesheet(documentRef);

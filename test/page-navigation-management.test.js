@@ -11,7 +11,9 @@ const managementRuntime = fs.readFileSync(path.join(projectRoot, 'src/features/m
 const lessonsRuntime = fs.readFileSync(path.join(projectRoot, 'src/features/lessons/runtime.js'), 'utf8');
 
 test('management navigation uses Dashboard as its management home and owns the student context', () => {
-  assert.match(navigation, /key: 'management-dashboard',[\s\S]*?label: 'Dashboard'/);
+  assert.match(navigation, /const showManagementDashboard = includeManagementDashboard/);
+  assert.match(navigation, /key: 'dashboard',[\s\S]*?label: 'Dashboard'/);
+  assert.match(navigation, /if \(showManagementDashboard\) \{[\s\S]*?items\[items\.length - 1\]\.key = 'management-dashboard'/);
   assert.match(navigation, /includeManagementStudentSelector = false/);
   assert.match(navigation, /const showManagementLearnerBar = includeManagementStudentSelector/);
   assert.match(navigation, /key: 'management-student',[\s\S]*?label: 'LEERLING',[\s\S]*?submenu: learners\.map/);

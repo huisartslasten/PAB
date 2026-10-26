@@ -1,6 +1,5 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
-import { buildViewUrl } from '../../core/view-context.js';
 import { createLessonEditorApplication } from './lesson-editor-application.js';
 import { createLessonEditorPage } from './lesson-editor-page.js';
 import { createLessonEditorAi } from './lesson-editor-ai.js';
@@ -28,7 +27,6 @@ export function createLessonEditorRuntime({
   const content = documentRef.createElement('div');
   content.className = 'lesson-editor-page';
   const student = context.student || '';
-  const viewMode = context.mode || 'student';
   const editorApp = createLessonEditorApplication({
     lessonService: app.lessons,
     storage: globalThis.localStorage,
@@ -38,7 +36,7 @@ export function createLessonEditorRuntime({
   });
   const editorAi = createLessonEditorAi({ aiContent: app.aiContent });
 
-  const goManagement = () => navigate(buildViewUrl('management.html', { student, mode: 'management' }).toString());
+  const goManagement = () => navigate('management.html', { managementCapability: 'lesson.manage' });
 
   mountPacoPageTemplate({
     mount: templateMount,
@@ -48,7 +46,7 @@ export function createLessonEditorRuntime({
     title: lessonId ? 'Les bewerken' : 'Nieuwe les',
     icon: '📚',
     subtitle: 'Maak of bewerk een les met de bestaande lesvormen en velden.',
-    navigation: createPacoNavigation({ app, active: 'management', student, viewMode, includeCreator: true, navigate }),
+    navigation: createPacoNavigation({ app, active: 'management-dashboard', student, includeManagementDashboard: true, includeCreator: true, navigate }),
     content
   });
 

@@ -21,7 +21,8 @@ test('dictation item uses one entered word as the canonical answer', () => {
     question_parts: [],
     answer_parts: [{ text: 'paard', role: 'answer' }],
     response_type: 'text',
-    answer_options: []
+    answer_options: [],
+    difficulty: null
   });
 });
 
@@ -31,6 +32,11 @@ test('dictation item accepts existing answer data when hydrating an older lesson
   assert.equal(item.answer, 'vriend');
   assert.deepEqual(item.question_parts, []);
   assert.deepEqual(item.answer_parts, [{ text: 'vriend', role: 'answer' }]);
+});
+
+test('dictation item preserves an explicit difficulty', () => {
+  const item = buildDictationItem({ word: 'vriend', difficulty: 'harder' });
+  assert.equal(item.difficulty, 'harder');
 });
 
 test('dictation rows without a word are not saved', () => {

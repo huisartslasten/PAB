@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createPacoNavigation } from './page-navigation.js';
+import { createPacoNavigation, createPacoManagementNavigation } from './page-navigation.js';
 
 function createApp({ isParent = false } = {}) {
   return {
@@ -52,6 +52,20 @@ describe('shared PacoGO navigation', () => {
 
     expect(items.some(item => item.key === 'management-mode')).toBe(false);
     expect(items.some(item => item.label === 'BEHEER')).toBe(false);
+  });
+
+  it('provides the central management dashboard with the full learner selector', () => {
+    const items = createPacoManagementNavigation({
+      app: createApp({ isParent: true }),
+      student: 'Zyon',
+      managementStudents: ['Zyon', 'Mila'],
+      navigate: () => {}
+    });
+
+    const dashboard = items.find(item => item.key === 'management-dashboard');
+    expect(dashboard.label).toBe('Dashboard');
+    expect(dashboard.submenu.map(item => item.label)).toEqual(['Zyon', 'Mila']);
+    expect(dashboard.submenu.find(item => item.label === 'Zyon').active).toBe(true);
   });
 
   it('renders central management tools explicitly without switching navigation mode', () => {

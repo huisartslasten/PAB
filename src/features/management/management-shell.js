@@ -31,6 +31,7 @@ export function createManagementShell({
     includeManagementDashboard = true,
     includeManagementTools = true,
     includeCreator = true,
+    viewMode = 'management',
     backLabel = '← Beheer'
   } = {}) {
     const session = await app.initializeSession();
@@ -51,7 +52,7 @@ export function createManagementShell({
           includeCreator,
           managementStudents,
           active,
-          viewMode: 'management',
+          viewMode,
           navigate
         })
       : [];

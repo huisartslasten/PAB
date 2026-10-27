@@ -40,18 +40,21 @@ export function createManagementShell({
       return { authorized: false, reason: 'unauthenticated' };
     }
 
-    const navigation = createPacoNavigation({
-      app,
-      student,
-      includeManagement: false,
-      includeManagementDashboard,
-      includeManagementTools,
-      includeCreator,
-      managementStudents,
-      active,
-      viewMode: 'management',
-      navigate
-    });
+    const authorized = Boolean(app.auth?.isParent);
+    const navigation = authorized
+      ? createPacoNavigation({
+          app,
+          student,
+          includeManagement: false,
+          includeManagementDashboard,
+          includeManagementTools,
+          includeCreator,
+          managementStudents,
+          active,
+          viewMode: 'management',
+          navigate
+        })
+      : [];
 
     const backAction = () => navigate(buildViewUrl('management.html'));
 
@@ -62,16 +65,14 @@ export function createManagementShell({
       greeting: 'PacoGO beheer ⚙️',
       title,
       icon,
-      subtitle,
+      subtitle: authorized ? subtitle : `Je hebt geen toegang tot ${title || 'deze beheerpagina'}.`,
       navigation,
       content
     });
 
-    if (!app.auth?.isParent) {
-      return { authorized: false, reason: 'forbidden' };
-    }
-
-    return { authorized: true };
+    return authorized
+      ? { authorized: true }
+      : { authorized: false, reason: 'forbidden' };
   }
 
   return Object.freeze({ mount });

@@ -4,7 +4,7 @@ import { createPacoTile, createPacoTileGrid } from '../../components/paco-tile.j
 import { createActivityCardGrid } from '../../components/activity-card-grid.js';
 import { buildViewUrl } from '../../core/view-context.js';
 import { getDashboardSubjects, getDashboardSubjectIcon, getDashboardAgendaItems } from './view-model.js';
-import { listStudents } from '../students/students.js';
+import { listStudents } from '../../core/student-registry.js';
 import { buildAvailableChallenges, listChallengeDefinitions } from '../challenges/challenge-registry.js';
 
 export function createDashboardRuntime({ app, templateMount, chooserMount, context, documentRef = document, navigate } = {}) {

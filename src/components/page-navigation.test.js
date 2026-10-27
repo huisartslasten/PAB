@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createPacoNavigation, createPacoManagementNavigation } from './page-navigation.js';
+import { createPacoNavigation, createPacoManagementNavigation, createPacoNavigationItem } from './page-navigation.js';
 
 function createApp({ isParent = false } = {}) {
   return {
@@ -100,5 +100,21 @@ describe('shared PacoGO navigation', () => {
     expect(items.some(item => item.key === 'management-student-heading')).toBe(false);
     expect(items.some(item => item.label === 'Kies leerling')).toBe(false);
     expect(items.some(item => item.key === 'practice')).toBe(false);
+  });
+
+  it('owns navigation item rendering centrally', () => {
+    const root = createPacoNavigationItem({
+      key: 'agenda',
+      label: 'Mijn agenda',
+      icon: '📅',
+      active: true,
+      submenu: [{ key: 'agenda', label: 'Agenda invoeren', active: true }]
+    });
+
+    expect(root.className).toBe('paco-template-nav-group always-open');
+    expect(root.querySelector('.paco-template-nav-item').textContent).toContain('Mijn agenda');
+    expect(root.querySelector('.paco-template-nav-item').classList.contains('active')).toBe(true);
+    expect(root.querySelector('.paco-template-nav-subitem').textContent).toBe('Agenda invoeren');
+    expect(root.querySelector('.paco-template-nav-subitem').classList.contains('active')).toBe(true);
   });
 });

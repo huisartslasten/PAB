@@ -1,9 +1,9 @@
 /**
  * PacoGO central client-side route state and rendering contract.
  *
- * The router owns URL state, route transitions and route asset activation.
+ * The router owns URL state, route transitions and route asset readiness.
  * Route renderers own feature composition and rendering; the router only
- * supplies navigation context and activates route styles before mount.
+ * supplies navigation context and makes route styles available before mount.
  */
 
 const BASE_ROUTE_STYLES = Object.freeze(['src/components/paco-tile.css']);
@@ -26,22 +26,34 @@ function createRouteStyleManager(documentRef) {
       .find(link => link.href === absoluteHref || link.getAttribute('href') === href) || null;
   }
 
-  function activateStylesheet(href) {
+  function loadStylesheet(href) {
     const existing = findStylesheet(href);
-    if (existing) return existing;
+    if (existing) {
+      if (existing.sheet) return Promise.resolve(existing);
+      return new Promise((resolve, reject) => {
+        existing.addEventListener('load', () => resolve(existing), { once: true });
+        existing.addEventListener('error', () => reject(new Error(`Failed to load PacoGO route stylesheet: ${href}`)), { once: true });
+      });
+    }
 
     const link = documentRef.createElement('link');
     link.rel = 'stylesheet';
     link.href = href;
     link.dataset.pacoRouteStyle = href;
-    documentRef.head.appendChild(link);
-    return link;
+
+    return new Promise((resolve, reject) => {
+      link.addEventListener('load', () => resolve(link), { once: true });
+      link.addEventListener('error', () => reject(new Error(`Failed to load PacoGO route stylesheet: ${href}`)), { once: true });
+      documentRef.head.appendChild(link);
+    });
   }
 
   async function activate(styles) {
     const hrefs = normalizeStyles(styles);
     const next = new Map();
-    hrefs.forEach(href => next.set(href, activateStylesheet(href)));
+    const loaded = await Promise.all(hrefs.map(async href => [href, await loadStylesheet(href)]));
+
+    loaded.forEach(([href, link]) => next.set(href, link));
 
     active.forEach((link, href) => {
       if (!next.has(href)) link.remove();
@@ -106,7 +118,12 @@ export function createPacoRouter({ windowRef = window, routes = {}, documentRef 
     const runtime = await renderer({ url: route.url, navigate });
     activeRenderer = runtime || null;
     if (runtime && typeof runtime.mount === 'function') {
-      await runtime.mount();
+      const mountResult = runtime.mount();
+      if (mountResult && typeof mountResult.catch === 'function') {
+        mountResult.catch(error => {
+          console.error('PacoGO route mount error:', error);
+        });
+      }
     }
     return runtime;
   }
@@ -129,14 +146,14 @@ export function createPacoRouter({ windowRef = window, routes = {}, documentRef 
     return { ...route, replace, popstate: false, managementCapability, renderer: getRenderer(route) };
   }
 
-  async function start() {
+  function start() {
     const onPopState = () => {
       const managementCapability = windowRef.history.state?.pacoManagementCapability || '';
       void notify(resolve(), { popstate: true, managementCapability });
     };
     windowRef.addEventListener('popstate', onPopState);
     const managementCapability = windowRef.history.state?.pacoManagementCapability || '';
-    await notify(resolve(), { managementCapability });
+    void notify(resolve(), { managementCapability });
     return () => windowRef.removeEventListener('popstate', onPopState);
   }
 

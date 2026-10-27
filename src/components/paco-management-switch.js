@@ -1,9 +1,10 @@
 /**
  * Shared management capability trigger for the page template.
  *
- * The page template owns placement. Authentication owns authorization.
- * The central management capability registry owns available actions and the
- * page-local management visibility state. This component only presents it.
+ * The page template owns placement. The central management capability registry
+ * owns authorization, available capabilities/actions and page-local management
+ * visibility state. This component is only a presentation consumer of that
+ * engine; it must not reproduce management policy or rights logic.
  */
 
 const STYLE_HREF = 'src/components/paco-management-switch.css';
@@ -17,10 +18,6 @@ function ensureStylesheet(documentRef) {
   link.href = STYLE_HREF;
   link.dataset.pacoManagementSwitch = STYLE_HREF;
   documentRef.head.appendChild(link);
-}
-
-function hasManagementAccess({ app } = {}) {
-  return app?.auth?.isParent === true;
 }
 
 function currentPageKey() {
@@ -60,14 +57,13 @@ function createCapabilityPanel({ documentRef, capabilities, navigate, button }) 
 export function installPacoManagementSwitch({ templateMount, app = null, navigate = null, documentRef = document } = {}) {
   if (!templateMount) throw new TypeError('installPacoManagementSwitch requires templateMount.');
   if (typeof navigate !== 'function') throw new TypeError('installPacoManagementSwitch requires the central navigation owner.');
+  if (!app?.managementCapabilities) return null;
 
-  const canManage = hasManagementAccess({ app });
   const pageHeader = templateMount.querySelector('.paco-template-page-header');
   if (!pageHeader) return null;
 
   const existing = pageHeader.querySelector('.paco-template-management-switch');
   if (existing) existing.closest('.paco-management-capability-wrap')?.remove();
-  if (!canManage || !app?.managementCapabilities) return null;
 
   const page = currentPageKey();
   const capabilities = app.managementCapabilities.getAvailableForPage({

@@ -39,12 +39,8 @@ export function createPacoRuntime({
 
 export async function startPacoRuntime(options = {}) {
   const runtime = createPacoRuntime(options);
-  const stop = await runtime.router.start();
-
-  void runtime.app.initializeSession().catch(error => {
-    console.error('PacoGO session initialization error:', error);
-  });
-
+  await runtime.app.initializeSession();
+  const stop = runtime.router.start();
   return Object.freeze({
     ...runtime,
     stop

@@ -9,7 +9,10 @@ function createApp({ isParent = false } = {}) {
       session: {},
       subscribe: () => ({ unsubscribe() {} })
     },
-    authSession: { signOut: async () => {} }
+    authSession: { signOut: async () => {} },
+    managementCapabilities: {
+      getAvailableForPage: ({ page, student }) => page === 'management' && isParent && student ? [{}] : []
+    }
   };
 }
 
@@ -22,6 +25,22 @@ describe('shared PacoGO navigation', () => {
 
     expect(items.some(item => item.key === 'practice')).toBe(false);
     expect(items.some(item => item.label === 'Oefenen')).toBe(false);
+  });
+
+  it('exposes Beheer in learner navigation only when the management engine grants access', () => {
+    const parentItems = createPacoNavigation({
+      app: createApp({ isParent: true }),
+      student: 'Zyon',
+      navigate: () => {}
+    });
+    const learnerItems = createPacoNavigation({
+      app: createApp({ isParent: false }),
+      student: 'Zyon',
+      navigate: () => {}
+    });
+
+    expect(parentItems.some(item => item.key === 'management' && item.label === 'Beheer')).toBe(true);
+    expect(learnerItems.some(item => item.key === 'management')).toBe(false);
   });
 
   it('does not expose a management mode control in normal navigation', () => {
@@ -39,6 +58,7 @@ describe('shared PacoGO navigation', () => {
     const items = createPacoNavigation({
       app: createApp({ isParent: true }),
       student: 'Zyon',
+      includeManagement: false,
       includeManagementDashboard: true,
       includeManagementTools: true,
       includeCreator: true,

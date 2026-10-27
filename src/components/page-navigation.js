@@ -57,3 +57,55 @@ export function createPacoNavigation({ app = null, active = '', activeSubmenu = 
 export function createPacoManagementNavigation({ app, active = '', activeSubmenu = '', student = '', managementStudents = [], onSelectManagementStudent = null, navigate } = {}) {
   return createPacoNavigation({ app, active, activeSubmenu, student, managementStudents, onSelectManagementStudent, includeManagementDashboard: true, includeManagement: false, includeManagementTools: true, includeCreator: true, includeLessons: true, includeSkills: true, includePractice: false, includeAgenda: true, includeAccount: true, navigate });
 }
+
+export function createPacoNavigationItem(item) {
+  const group = document.createElement('div');
+  group.className = 'paco-template-nav-group';
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'paco-template-nav-item' + (item.active ? ' active' : '') + (item.kind === 'management-mode' ? ' management' : '');
+
+  let iconElement = null;
+  if (item.icon) {
+    iconElement = document.createElement('span');
+    iconElement.className = 'paco-template-nav-icon';
+    iconElement.textContent = item.icon;
+    button.appendChild(iconElement);
+  }
+
+  const label = document.createElement('span');
+  label.textContent = item.label || '';
+  button.appendChild(label);
+
+  if (Array.isArray(item.submenu) && item.submenu.length) {
+    const chevron = document.createElement('span');
+    chevron.className = 'paco-template-nav-chevron';
+    chevron.textContent = '›';
+    button.appendChild(chevron);
+    group.classList.add('always-open');
+  }
+
+  if (typeof item.onClick === 'function') button.addEventListener('click', item.onClick);
+  group.appendChild(button);
+
+  if (Array.isArray(item.submenu) && item.submenu.length) {
+    const submenu = document.createElement('div');
+    submenu.className = 'paco-template-nav-submenu';
+
+    item.submenu.forEach(subitem => {
+      const subbutton = document.createElement('button');
+      subbutton.type = 'button';
+      subbutton.className = 'paco-template-nav-subitem' + (subitem.active ? ' active' : '') + (item.key === 'management-student' ? ' management-student' : '');
+      subbutton.textContent = subitem.label || '';
+      if (typeof subitem.onClick === 'function') subbutton.addEventListener('click', subitem.onClick);
+      submenu.appendChild(subbutton);
+    });
+
+    group.appendChild(submenu);
+  }
+
+  if (typeof item.bind === 'function') item.bind({ button, label, icon: iconElement });
+
+  return group;
+}

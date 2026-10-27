@@ -1,7 +1,7 @@
 import { mountPacoPageTemplate } from '../../../components/page-template.js';
 import { createPacoNavigation } from '../../../components/page-navigation.js';
 import { createLessonContextField } from '../../lessons/lesson-context-view.js';
-import { getStudentLearningProfile } from '../../students/students.js';
+import { getStudentLearningProfile } from '../../../core/student-registry.js';
 import { createWordRevealRuntime } from './runtime.js';
 import { createWordRevealView } from './view.js';
 import { buildViewUrl } from '../../../core/view-context.js';

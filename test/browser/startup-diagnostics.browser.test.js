@@ -4,6 +4,14 @@ const baseUrl = 'http://127.0.0.1:4173';
 
 test('diagnose canonical runtime startup errors', async ({ page }) => {
   const diagnostics = [];
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Network.enable');
+  cdp.on('Network.requestWillBeSent', event => {
+    if (!event.request.url.endsWith('/src/features/students/students.js')) return;
+    const frames = event.initiator?.stack?.callFrames || [];
+    const importer = frames.find(frame => frame.url)?.url || event.initiator?.url || 'unknown';
+    diagnostics.push(`module.initiator: ${importer}`);
+  });
   page.on('pageerror', error => diagnostics.push(`pageerror: ${error.stack || error.message}`));
   page.on('console', message => {
     if (message.type() === 'error') diagnostics.push(`console.error: ${message.text()}`);

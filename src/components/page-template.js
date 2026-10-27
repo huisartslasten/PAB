@@ -1,3 +1,5 @@
+import { createPacoNavigationItem } from './page-navigation.js';
+
 /**
  * PacoGO canonical page template.
  *
@@ -140,58 +142,6 @@ function nodeFrom(value) {
     return template.content.firstElementChild || document.createTextNode(value);
   }
   return null;
-}
-
-function createNavigationItem(item) {
-  const group = document.createElement('div');
-  group.className = 'paco-template-nav-group';
-
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = 'paco-template-nav-item' + (item.active ? ' active' : '') + (item.kind === 'management-mode' ? ' management' : '');
-
-  let iconElement = null;
-  if (item.icon) {
-    iconElement = document.createElement('span');
-    iconElement.className = 'paco-template-nav-icon';
-    iconElement.textContent = item.icon;
-    button.appendChild(iconElement);
-  }
-
-  const label = document.createElement('span');
-  label.textContent = item.label || '';
-  button.appendChild(label);
-
-  if (Array.isArray(item.submenu) && item.submenu.length) {
-    const chevron = document.createElement('span');
-    chevron.className = 'paco-template-nav-chevron';
-    chevron.textContent = '›';
-    button.appendChild(chevron);
-    group.classList.add('always-open');
-  }
-
-  if (typeof item.onClick === 'function') button.addEventListener('click', item.onClick);
-  group.appendChild(button);
-
-  if (Array.isArray(item.submenu) && item.submenu.length) {
-    const submenu = document.createElement('div');
-    submenu.className = 'paco-template-nav-submenu';
-
-    item.submenu.forEach(subitem => {
-      const subbutton = document.createElement('button');
-      subbutton.type = 'button';
-      subbutton.className = 'paco-template-nav-subitem' + (subitem.active ? ' active' : '') + (item.key === 'management-student' ? ' management-student' : '');
-      subbutton.textContent = subitem.label || '';
-      if (typeof subitem.onClick === 'function') subbutton.addEventListener('click', subitem.onClick);
-      submenu.appendChild(subbutton);
-    });
-
-    group.appendChild(submenu);
-  }
-
-  if (typeof item.bind === 'function') item.bind({ button, label, icon: iconElement });
-
-  return group;
 }
 
 export function createPacoDropdown({
@@ -350,7 +300,7 @@ export function createPacoPageTemplate({
   const navigationElement = document.createElement('nav');
   navigationElement.className = 'paco-template-navigation';
   navigationElement.setAttribute('aria-label', 'PacoGO navigatie');
-  navigation.forEach(item => navigationElement.appendChild(createNavigationItem(item)));
+  navigation.forEach(item => navigationElement.appendChild(createPacoNavigationItem(item)));
   sidebarCard.appendChild(navigationElement);
   sidebar.appendChild(sidebarCard);
   body.appendChild(sidebar);
@@ -421,7 +371,7 @@ function updatePacoPageTemplate(template, {
   backButton.textContent = '← Terug';
   backButton.onclick = () => window.history.back();
   greetingElement.textContent = greeting;
-  navigationElement.replaceChildren(...navigation.map(createNavigationItem));
+  navigationElement.replaceChildren(...navigation.map(createPacoNavigationItem));
   iconElement.textContent = icon;
   iconElement.hidden = !icon;
   titleElement.textContent = title;

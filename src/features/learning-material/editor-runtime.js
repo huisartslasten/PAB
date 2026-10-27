@@ -1,7 +1,7 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
 import { buildViewUrl } from '../../core/view-context.js';
-import { listStudents } from '../students/students.js';
+import { listStudents } from '../../core/student-registry.js';
 import { createLearningMaterialEditorPage } from './editor-page.js';
 
 function showMessage(content, message, className = 'message') {

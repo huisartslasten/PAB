@@ -1,4 +1,5 @@
 import { createPacoNavigationItem } from './page-navigation.js';
+import { createPacoDropdown } from './design-system.js';
 
 /**
  * PacoGO canonical page template.

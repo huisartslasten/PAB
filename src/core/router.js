@@ -106,12 +106,7 @@ export function createPacoRouter({ windowRef = window, routes = {}, documentRef 
     const runtime = await renderer({ url: route.url, navigate });
     activeRenderer = runtime || null;
     if (runtime && typeof runtime.mount === 'function') {
-      const mountResult = runtime.mount();
-      if (mountResult && typeof mountResult.catch === 'function') {
-        mountResult.catch(error => {
-          console.error('PacoGO route mount error:', error);
-        });
-      }
+      await runtime.mount();
     }
     return runtime;
   }

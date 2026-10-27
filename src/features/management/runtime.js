@@ -1,5 +1,5 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
-import { createPacoNavigation } from '../../components/page-navigation.js';
+import { createPacoManagementNavigation, createPacoNavigation } from '../../components/page-navigation.js';
 
 export function createManagementRuntime({ app, templateMount, context, documentRef = document, navigate } = {}) {
   if (!app) throw new TypeError('Management runtime requires an app.');
@@ -83,7 +83,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
       return;
     }
 
-    mountPacoPageTemplate({ mount: templateMount, greeting: 'PAB beheer ⚙️', title: 'Dashboard', icon: '⚙️', subtitle: selectedStudent ? `Je beheert nu de omgeving van ${selectedStudent}.` : 'Kies links in de LB een leerling om beheeracties voor die leerling te openen.', navigation: createPacoNavigation({ app, active: 'dashboard', student: selectedStudent, includeManagement: false, includeManagementTools: false, includeCreator: false, navigate }), content });
+    mountPacoPageTemplate({ mount: templateMount, greeting: 'PAB beheer ⚙️', title: 'Dashboard', icon: '⚙️', subtitle: selectedStudent ? `Je beheert nu de omgeving van ${selectedStudent}.` : 'Kies links in de LB een leerling om beheeracties voor die leerling te openen.', navigation: createPacoManagementNavigation({ app, active: 'dashboard', student: selectedStudent, navigate }), content });
     renderManagement();
   }
 

@@ -134,14 +134,14 @@ export function createPacoRouter({ windowRef = window, routes = {}, documentRef 
     return { ...route, replace, popstate: false, managementCapability, renderer: getRenderer(route) };
   }
 
-  function start() {
+  async function start() {
     const onPopState = () => {
       const managementCapability = windowRef.history.state?.pacoManagementCapability || '';
       void notify(resolve(), { popstate: true, managementCapability });
     };
     windowRef.addEventListener('popstate', onPopState);
     const managementCapability = windowRef.history.state?.pacoManagementCapability || '';
-    void notify(resolve(), { managementCapability });
+    await notify(resolve(), { managementCapability });
     return () => windowRef.removeEventListener('popstate', onPopState);
   }
 

@@ -47,10 +47,13 @@ export function createPacoNavigation({ app = null, active = '', activeSubmenu = 
     items.push({ key: 'feedback', icon: '💬', label: 'Feedback', onClick: () => go(navigate, 'feedback.html', { student }) });
   }
   if (includeCreator) items.push({ key: 'creator', icon: '🧠', label: 'Creator Console', onClick: () => go(navigate, 'creator.html', { student }) });
+  if (includeManagement && student && app?.managementCapabilities?.getAvailableForPage({ page: 'management', student }).length) {
+    items.push({ key: 'management', icon: '⚙️', label: 'Beheer', onClick: () => go(navigate, 'management.html', { student }) });
+  }
   if (includeAccount) items.push({ key: 'account', icon: app.auth.isLoggedIn ? '🚪' : '🔐', label: app.auth.isLoggedIn ? 'Uitloggen' : 'Inloggen', onClick: async () => { if (!app.auth.isLoggedIn) { window.location.href = 'auth.html'; return; } const confirmed = await confirmPacoAction({ title: 'Uitloggen?', message: 'Weet je zeker dat je wilt uitloggen?', confirmLabel: 'Ja, uitloggen', cancelLabel: 'Nee' }); if (!confirmed) return; await app.authSession.signOut(); app.auth.setSession(null); window.location.href = 'auth.html'; }, bind: ({ label, icon }) => { const render = session => { const loggedIn = Boolean(session); label.textContent = loggedIn ? 'Uitloggen' : 'Inloggen'; icon.textContent = loggedIn ? '🚪' : '🔐'; }; render(app.auth.session); return app.auth.subscribe(render).unsubscribe; } });
   return items.filter(item => !(hideActive && item.key === active)).map(item => ({ ...item, active: item.active ?? item.key === active }));
 }
 
 export function createPacoManagementNavigation({ app, active = '', activeSubmenu = '', student = '', managementStudents = [], onSelectManagementStudent = null, navigate } = {}) {
-  return createPacoNavigation({ app, active, activeSubmenu, student, managementStudents, onSelectManagementStudent, includeManagementDashboard: true, includeManagementTools: true, includeCreator: true, includeLessons: true, includeSkills: true, includePractice: false, includeAgenda: true, includeAccount: true, navigate });
+  return createPacoNavigation({ app, active, activeSubmenu, student, managementStudents, onSelectManagementStudent, includeManagementDashboard: true, includeManagement: false, includeManagementTools: true, includeCreator: true, includeLessons: true, includeSkills: true, includePractice: false, includeAgenda: true, includeAccount: true, navigate });
 }

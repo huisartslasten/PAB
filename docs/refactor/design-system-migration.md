@@ -90,9 +90,24 @@ No compatibility re-export, fallback, bridge, duplicate runtime implementation, 
 
 The Design System must own generic visual primitives. Pages and feature modules should consume those primitives rather than define competing implementations.
 
+## TEST-branch consumer sweep
+
+The first controlled sweep inspected the current TEST branch directly rather than relying on default-branch code search.
+
+Verified files:
+
+- `src/features/management/management-view.js` — no Page Template import and no dropdown ownership/implementation found in the inspected module.
+- `src/features/management/management.js` — no Page Template import in the inspected module.
+- `src/features/management/creator-runtime.js` — consumes `mountPacoPageTemplate` and `createPacoNavigation`; no dropdown import in the inspected module.
+- `src/features/agenda/page-runtime.js` — consumes `mountPacoPageTemplate` and `createPacoNavigation`; no dropdown import in the inspected module.
+- `src/features/lessons/lesson-editor-page.js` — inspected editor module; no Page Template dropdown import in the inspected module.
+- `test/page-template-back-navigation.test.js` — directly reads the Page Template source for page-shell behavior; it does not import the dropdown.
+
+This sweep is **not yet the complete consumer inventory**. In particular, the earlier regression failure proves that at least one consumer exists somewhere in the TEST branch, so no dropdown ownership change is allowed yet.
+
 ## PAB Implementation Plan
 
-The next implementation unit is **not** a runtime cutover. First complete the TEST-branch consumer inventory for the dropdown and generic CSS primitives. Only then perform a direct, single-owner migration for one primitive at a time, with regression verification after each ownership move.
+The next implementation unit is **not** a runtime cutover. Continue the TEST-branch consumer inventory until the known dropdown dependency and the CSS primitive consumers can be named explicitly. Only then perform a direct, single-owner migration for one primitive at a time, with regression verification after each ownership move.
 
 This keeps PacoGO working throughout the migration and avoids building a dormant duplicate implementation.
 

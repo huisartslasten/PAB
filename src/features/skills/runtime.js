@@ -4,7 +4,6 @@ import { createPacoTile, createPacoTileGrid } from '../../components/paco-tile.j
 import { buildViewUrl } from '../../core/view-context.js';
 import { createGameResultService } from '../../services/game-result-service.js';
 import { appendContentManagementActions, createContentManagementActions } from '../management/content-management-actions.js';
-import { listStudents } from '../students/students.js';
 import { createMathSession } from './math/math-domain.js';
 import { DEFAULT_SKILL_DURATION_SECONDS, SKILL_DURATIONS_SECONDS } from './skills-registry.js';
 
@@ -12,7 +11,7 @@ function formatDuration(seconds) { return `${Math.round(seconds / 60)} min`; }
 
 export function createSkillsRuntime({ app, templateMount, context, skillId = '', durationSeconds = DEFAULT_SKILL_DURATION_SECONDS, documentRef = document, navigate } = {}) {
   if (!app) throw new TypeError('Skills runtime requires an app.');
-  if (!templateMount) throw new TypeError('Skills runtime requires a template mount.');
+  if (!templateMount) throw new TypeError('Skills runtime requires template mount.');
   if (typeof navigate !== 'function') throw new TypeError('Skills runtime requires a navigation owner.');
 
   const student = context?.student || '';

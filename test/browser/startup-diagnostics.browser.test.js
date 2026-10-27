@@ -8,6 +8,12 @@ test('diagnose canonical runtime startup errors', async ({ page }) => {
   page.on('console', message => {
     if (message.type() === 'error') diagnostics.push(`console.error: ${message.text()}`);
   });
+  page.on('response', response => {
+    if (response.status() === 404) diagnostics.push(`http.404: ${response.url()}`);
+  });
+  page.on('requestfailed', request => {
+    diagnostics.push(`request.failed: ${request.url()} :: ${request.failure()?.errorText || 'unknown'}`);
+  });
 
   await page.goto(`${baseUrl}/games.html?student=Zyon`);
   await page.waitForTimeout(1000);

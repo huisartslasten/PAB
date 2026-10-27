@@ -78,12 +78,12 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     const session = await app.initializeSession();
     if (!session) { window.location.href = 'auth.html'; return; }
     if (!app.auth.isParent) {
-      mountPacoPageTemplate({ mount: templateMount, greeting: 'PAB beheer ⚙️', title: 'Beheer', icon: '⚙️', subtitle: 'Je hebt geen toegang tot Beheer.', navigation: createPacoNavigation({ app, active: 'dashboard', student: selectedStudent, includeManagementTools: false, includeCreator: false, navigate }), content });
+      mountPacoPageTemplate({ mount: templateMount, greeting: 'PAB beheer ⚙️', title: 'Beheer', icon: '⚙️', subtitle: 'Je hebt geen toegang tot Beheer.', navigation: createPacoNavigation({ app, active: 'dashboard', student: selectedStudent, includeManagement: false, includeManagementTools: false, includeCreator: false, navigate }), content });
       state.textContent = 'Je hebt geen toegang tot Beheer.';
       return;
     }
 
-    mountPacoPageTemplate({ mount: templateMount, greeting: 'PAB beheer ⚙️', title: 'Dashboard', icon: '⚙️', subtitle: selectedStudent ? `Je beheert nu de omgeving van ${selectedStudent}.` : 'Kies links in de LB een leerling om beheeracties voor die leerling te openen.', navigation: createPacoNavigation({ app, active: 'dashboard', student: selectedStudent, includeManagementTools: false, includeCreator: false, navigate }), content });
+    mountPacoPageTemplate({ mount: templateMount, greeting: 'PAB beheer ⚙️', title: 'Dashboard', icon: '⚙️', subtitle: selectedStudent ? `Je beheert nu de omgeving van ${selectedStudent}.` : 'Kies links in de LB een leerling om beheeracties voor die leerling te openen.', navigation: createPacoNavigation({ app, active: 'dashboard', student: selectedStudent, includeManagement: false, includeManagementTools: false, includeCreator: false, navigate }), content });
     renderManagement();
   }
 

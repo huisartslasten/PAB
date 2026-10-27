@@ -37,6 +37,7 @@ export function createFeedbackRuntime({
   async function mount() {
     const shellState = await shell.mount({
       active: 'feedback',
+      viewMode: 'management',
       title: 'Feedback',
       icon: '💬',
       subtitle: 'Bekijk feedback die vanuit PacoGO is ingediend.',

@@ -8,7 +8,7 @@
 import { createPacoDropdown } from '../../components/design-system.js';
 
 export const PRACTICE_DIFFICULTIES = Object.freeze([
-  Object.freeze({ value: 'rookie', label: 'ROOKIE' }),
+  Object.freeze({ value: 'rookie', label: 'NOOB' }),
   Object.freeze({ value: 'goat', label: 'GOAT' })
 ]);
 

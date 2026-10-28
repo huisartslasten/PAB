@@ -13,6 +13,108 @@
   --paco-shadow: 0 8px 22px rgba(16, 43, 87, .09);
 }
 
+/*
+ * PacoGO Design System — Buttons
+ *
+ * Canonical owner for generic button primitives. Feature components may
+ * compose these classes, but must not redefine generic button behavior.
+ */
+.paco-btn {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font: 700 16px/1.2 Nunito, sans-serif;
+  min-height: 44px;
+  padding: 10px 16px;
+  text-decoration: none;
+  transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease, color .15s ease, transform .08s ease;
+  user-select: none;
+  vertical-align: middle;
+}
+
+.paco-btn:focus-visible {
+  outline: 3px solid rgba(23, 135, 242, .28);
+  outline-offset: 2px;
+}
+
+.paco-btn:disabled,
+.paco-btn[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: .55;
+}
+
+.paco-btn:not(:disabled):not([aria-disabled="true"]):active {
+  transform: translateY(1px);
+}
+
+.paco-btn--primary {
+  background: var(--paco-blue);
+  border-color: var(--paco-blue);
+  color: #fff;
+}
+
+.paco-btn--primary:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--paco-blue-dark);
+  border-color: var(--paco-blue-dark);
+}
+
+.paco-btn--secondary {
+  background: #fff;
+  border-color: var(--paco-border);
+  color: var(--paco-text);
+}
+
+.paco-btn--secondary:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--paco-blue-soft);
+  border-color: var(--paco-blue);
+}
+
+.paco-btn--accent {
+  background: var(--paco-yellow);
+  border-color: var(--paco-yellow-border);
+  color: var(--paco-text);
+}
+
+.paco-btn--accent:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--paco-yellow-hover);
+  border-color: var(--paco-yellow-border);
+}
+
+.paco-btn--danger {
+  background: #fff;
+  border-color: #d95c5c;
+  color: #a62d2d;
+}
+
+.paco-btn--danger:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: #fff0f0;
+  border-color: #c94747;
+}
+
+.paco-btn--small {
+  border-radius: 10px;
+  font-size: 14px;
+  min-height: 36px;
+  padding: 8px 12px;
+}
+
+.paco-btn--large {
+  border-radius: 14px;
+  font-size: 18px;
+  min-height: 52px;
+  padding: 12px 20px;
+}
+
+.paco-btn--block {
+  width: 100%;
+}
+
 .paco-dropdown {
   position: relative;
   width: 100%;

@@ -13,215 +13,47 @@
   --paco-shadow: 0 8px 22px rgba(16, 43, 87, .09);
 }
 
-/*
- * PacoGO Design System — Cards
- *
- * Canonical owner for the generic card surface. Feature components compose
- * this primitive and keep their own domain-specific layout and behavior.
- */
-.card {
-  padding: 20px 22px;
-  border: 1px solid var(--paco-border);
-  border-radius: 22px;
-  background: #fff;
-  color: var(--paco-text);
-  box-shadow: var(--paco-shadow);
-}
+/* PacoGO Design System — Cards */
+.card { padding:20px 22px; border:1px solid var(--paco-border); border-radius:22px; background:#fff; color:var(--paco-text); box-shadow:var(--paco-shadow); }
+.card h2,.card h3,.card h4 { color:var(--paco-text); }
+.card label { color:var(--paco-text); }
+.card .small { color:var(--paco-muted); }
 
-.card h2,
-.card h3,
-.card h4 {
-  color: var(--paco-text);
-}
+/* PacoGO Design System — Buttons */
+.paco-btn { appearance:none; border:1px solid transparent; border-radius:12px; box-sizing:border-box; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; font:700 16px/1.2 Nunito,sans-serif; min-height:44px; padding:10px 16px; text-decoration:none; transition:background-color .15s ease,border-color .15s ease,box-shadow .15s ease,color .15s ease,transform .08s ease; user-select:none; vertical-align:middle; }
+.paco-btn:focus-visible { outline:3px solid rgba(23,135,242,.28); outline-offset:2px; }
+.paco-btn:disabled,.paco-btn[aria-disabled="true"] { cursor:not-allowed; opacity:.55; }
+.paco-btn:not(:disabled):not([aria-disabled="true"]):active { transform:translateY(1px); }
+.paco-btn--primary { background:var(--paco-blue); border-color:var(--paco-blue); color:#fff; }
+.paco-btn--primary:hover:not(:disabled):not([aria-disabled="true"]) { background:var(--paco-blue-dark); border-color:var(--paco-blue-dark); }
+.paco-btn--secondary { background:#fff; border-color:var(--paco-border); color:var(--paco-text); }
+.paco-btn--secondary:hover:not(:disabled):not([aria-disabled="true"]) { background:var(--paco-blue-soft); border-color:var(--paco-blue); }
+.paco-btn--accent { background:var(--paco-yellow); border-color:var(--paco-yellow-border); color:var(--paco-text); }
+.paco-btn--accent:hover:not(:disabled):not([aria-disabled="true"]) { background:var(--paco-yellow-hover); border-color:var(--paco-yellow-border); }
+.paco-btn--danger { background:#fff; border-color:#d95c5c; color:#a62d2d; }
+.paco-btn--danger:hover:not(:disabled):not([aria-disabled="true"]) { background:#fff0f0; border-color:#c94747; }
+.paco-btn--small { border-radius:10px; font-size:14px; min-height:36px; padding:8px 12px; }
+.paco-btn--large { border-radius:14px; font-size:18px; min-height:52px; padding:12px 20px; }
+.paco-btn--block { width:100%; }
 
-.card label {
-  color: var(--paco-text);
-}
+/* PacoGO Design System — Dropdown */
+.paco-dropdown { position:relative; width:100%; }
+.paco-dropdown-trigger { width:100%; min-height:46px; display:flex; align-items:center; justify-content:space-between; gap:10px; border:2px solid var(--paco-blue); border-radius:14px; padding:9px 12px; background:#fff; color:var(--paco-text); font:800 15px/1.2 Nunito,sans-serif; cursor:pointer; }
+.paco-dropdown-trigger:hover { border-color:var(--paco-blue-dark); }
+.paco-dropdown-trigger:focus-visible { outline:0; box-shadow:0 0 0 4px rgba(255,255,255,.95),0 0 0 7px rgba(23,135,242,.55); }
+.paco-dropdown-chevron { flex:0 0 auto; color:var(--paco-blue-dark); transition:transform .15s ease; }
+.paco-dropdown.open .paco-dropdown-chevron { transform:rotate(180deg); }
+.paco-dropdown-menu { position:absolute; left:0; right:0; top:calc(100% + 6px); z-index:100; max-height:280px; overflow-y:auto; padding:6px; border:1px solid var(--paco-border); border-radius:14px; background:#fff; box-shadow:var(--paco-shadow); }
+.paco-dropdown-option { width:100%; display:flex; align-items:center; justify-content:space-between; gap:10px; border:0; border-radius:10px; padding:9px 11px; background:transparent; color:var(--paco-text); font:700 14px/1.2 Nunito,sans-serif; text-align:left; cursor:pointer; }
+.paco-dropdown-option:hover,.paco-dropdown-option[aria-selected="true"] { background:var(--paco-blue-soft); color:var(--paco-blue-dark); }
+.paco-dropdown-check { flex:0 0 auto; color:var(--paco-blue-dark); }
 
-.card .small {
-  color: var(--paco-muted);
-}
-
-/*
- * PacoGO Design System — Buttons
- *
- * Canonical owner for generic button primitives. Feature components may
- * compose these classes, but must not redefine generic button behavior.
- */
-.paco-btn {
-  appearance: none;
-  border: 1px solid transparent;
-  border-radius: 12px;
-  box-sizing: border-box;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font: 700 16px/1.2 Nunito, sans-serif;
-  min-height: 44px;
-  padding: 10px 16px;
-  text-decoration: none;
-  transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease, color .15s ease, transform .08s ease;
-  user-select: none;
-  vertical-align: middle;
-}
-
-.paco-btn:focus-visible {
-  outline: 3px solid rgba(23, 135, 242, .28);
-  outline-offset: 2px;
-}
-
-.paco-btn:disabled,
-.paco-btn[aria-disabled="true"] {
-  cursor: not-allowed;
-  opacity: .55;
-}
-
-.paco-btn:not(:disabled):not([aria-disabled="true"]):active {
-  transform: translateY(1px);
-}
-
-.paco-btn--primary {
-  background: var(--paco-blue);
-  border-color: var(--paco-blue);
-  color: #fff;
-}
-
-.paco-btn--primary:hover:not(:disabled):not([aria-disabled="true"]) {
-  background: var(--paco-blue-dark);
-  border-color: var(--paco-blue-dark);
-}
-
-.paco-btn--secondary {
-  background: #fff;
-  border-color: var(--paco-border);
-  color: var(--paco-text);
-}
-
-.paco-btn--secondary:hover:not(:disabled):not([aria-disabled="true"]) {
-  background: var(--paco-blue-soft);
-  border-color: var(--paco-blue);
-}
-
-.paco-btn--accent {
-  background: var(--paco-yellow);
-  border-color: var(--paco-yellow-border);
-  color: var(--paco-text);
-}
-
-.paco-btn--accent:hover:not(:disabled):not([aria-disabled="true"]) {
-  background: var(--paco-yellow-hover);
-  border-color: var(--paco-yellow-border);
-}
-
-.paco-btn--danger {
-  background: #fff;
-  border-color: #d95c5c;
-  color: #a62d2d;
-}
-
-.paco-btn--danger:hover:not(:disabled):not([aria-disabled="true"]) {
-  background: #fff0f0;
-  border-color: #c94747;
-}
-
-.paco-btn--small {
-  border-radius: 10px;
-  font-size: 14px;
-  min-height: 36px;
-  padding: 8px 12px;
-}
-
-.paco-btn--large {
-  border-radius: 14px;
-  font-size: 18px;
-  min-height: 52px;
-  padding: 12px 20px;
-}
-
-.paco-btn--block {
-  width: 100%;
-}
-
-.paco-dropdown {
-  position: relative;
-  width: 100%;
-}
-
-.paco-dropdown-trigger {
-  width: 100%;
-  min-height: 46px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  border: 2px solid var(--paco-blue);
-  border-radius: 14px;
-  padding: 9px 12px;
-  background: #fff;
-  color: var(--paco-text);
-  font: 800 15px/1.2 Nunito, sans-serif;
-  cursor: pointer;
-}
-
-.paco-dropdown-trigger:hover {
-  border-color: var(--paco-blue-dark);
-}
-
-.paco-dropdown-trigger:focus-visible {
-  outline: 0;
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, .95), 0 0 0 7px rgba(23, 135, 242, .55);
-}
-
-.paco-dropdown-chevron {
-  flex: 0 0 auto;
-  color: var(--paco-blue-dark);
-  transition: transform .15s ease;
-}
-
-.paco-dropdown.open .paco-dropdown-chevron {
-  transform: rotate(180deg);
-}
-
-.paco-dropdown-menu {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: calc(100% + 6px);
-  z-index: 100;
-  max-height: 280px;
-  overflow-y: auto;
-  padding: 6px;
-  border: 1px solid var(--paco-border);
-  border-radius: 14px;
-  background: #fff;
-  box-shadow: var(--paco-shadow);
-}
-
-.paco-dropdown-option {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  border: 0;
-  border-radius: 10px;
-  padding: 9px 11px;
-  background: transparent;
-  color: var(--paco-text);
-  font: 700 14px/1.2 Nunito, sans-serif;
-  text-align: left;
-  cursor: pointer;
-}
-
-.paco-dropdown-option:hover,
-.paco-dropdown-option[aria-selected="true"] {
-  background: var(--paco-blue-soft);
-  color: var(--paco-blue-dark);
-}
-
-.paco-dropdown-check {
-  flex: 0 0 auto;
-  color: var(--paco-blue-dark);
-}
+/* PacoGO Design System — Form controls */
+.paco-form-control,
+.paco-page-template input[type="text"],.paco-page-template input[type="date"],.paco-page-template input[type="time"],.paco-page-template input[type="file"],.paco-page-template select,.paco-page-template textarea { width:100%; min-height:46px; border:2px solid var(--paco-border); border-radius:14px; padding:9px 12px; background:#fff; color:var(--paco-text); font:700 15px/1.2 Nunito,sans-serif; box-shadow:0 3px 10px rgba(16,43,87,.04); transition:border-color .15s ease,box-shadow .15s ease,background .15s ease; }
+.paco-form-control:focus,.paco-page-template input[type="text"]:focus,.paco-page-template input[type="date"]:focus,.paco-page-template input[type="time"]:focus,.paco-page-template input[type="file"]:focus,.paco-page-template select:focus,.paco-page-template textarea:focus { outline:0; border-color:var(--paco-blue); box-shadow:0 0 0 4px rgba(23,135,242,.12); background:#fbfdff; }
+.paco-form-control--large { min-height:58px; padding:11px 14px; font:800 17px/1.2 "Baloo 2",Nunito,sans-serif; }
+.paco-page-template textarea { min-height:90px; resize:vertical; }
+.paco-page-template input[type="file"] { padding:5px; }
+.paco-page-template input[type="file"]::file-selector-button { margin-right:10px; padding:8px 12px; border:0; border-radius:10px; background:#dff0ff; color:var(--paco-blue-dark); font:800 14px/1 "Baloo 2",Nunito,sans-serif; cursor:pointer; }
+.paco-page-template select { appearance:none; padding-right:42px; background-color:#fff; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 18 18'%3E%3Cpath d='M4 6.5 9 11.5 14 6.5' fill='none' stroke='%230d6fd4' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 13px center; background-size:18px; }

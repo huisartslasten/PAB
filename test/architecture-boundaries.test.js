@@ -51,3 +51,9 @@ test('shared components do not depend on data or feature layers', () => {
   const violations = collectViolations('components', ['../services', '../features']);
   assert.deepEqual(violations, [], `Forbidden component dependencies:\n${violations.join('\n')}`);
 });
+
+test('dropdown primitive is owned by the Design System', () => {
+  const violations = collectViolations('.', ['../components/page-template.js'])
+    .filter((entry) => entry.includes('createPacoDropdown'));
+  assert.deepEqual(violations, [], `Stale dropdown consumers:\n${violations.join('\n')}`);
+});

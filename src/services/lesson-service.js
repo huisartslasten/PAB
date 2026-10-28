@@ -1,5 +1,6 @@
 // Lesson data boundary. This is the canonical persistence service for lessons.
 const RESPONSE_TYPES = new Set(['text', 'number', 'fraction', 'multiple_choice']);
+const DIFFICULTIES = new Set(['hard', 'harder']);
 
 function normalizeLessonPayload(payload = {}) {
   return {
@@ -18,12 +19,27 @@ function normalizeParts(parts = null, fallback = '', defaultRole = 'answer') {
   return parts.map(part => ({ text: String(typeof part === 'string' ? part : part?.text ?? '').trim(), role: part?.role === 'extra' ? 'extra' : 'answer' })).filter(part => part.text);
 }
 
+function normalizeDifficulty(value) {
+  const normalized = String(value ?? '').trim().toLowerCase();
+  return DIFFICULTIES.has(normalized) ? normalized : null;
+}
+
 function normalizeLessonItems(items = []) {
   return (Array.isArray(items) ? items : []).map((item, index) => {
     const questionParts = normalizeParts(item.question_parts, item.question);
     const answerParts = normalizeParts(item.answer_parts, item.answer);
     const answer = String(item.answer ?? '').trim() || answerParts.filter(part => part.role === 'answer').map(part => part.text).join('\n');
-    return { question: String(item.question ?? '').trim() || questionParts.map(part => part.text).join('\n'), answer, question_parts: questionParts, answer_parts: answerParts, hint: String(item.hint ?? ''), response_type: RESPONSE_TYPES.has(item.response_type) ? item.response_type : 'text', answer_options: Array.isArray(item.answer_options) ? item.answer_options.map(option => String(option ?? '').trim()).filter(Boolean) : [], sort_order: Number(item.sort_order ?? index) };
+    return {
+      question: String(item.question ?? '').trim() || questionParts.map(part => part.text).join('\n'),
+      answer,
+      question_parts: questionParts,
+      answer_parts: answerParts,
+      hint: String(item.hint ?? ''),
+      response_type: RESPONSE_TYPES.has(item.response_type) ? item.response_type : 'text',
+      answer_options: Array.isArray(item.answer_options) ? item.answer_options.map(option => String(option ?? '').trim()).filter(Boolean) : [],
+      difficulty: normalizeDifficulty(item.difficulty),
+      sort_order: Number(item.sort_order ?? index)
+    };
   });
 }
 

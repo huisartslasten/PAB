@@ -13,12 +13,12 @@ test('answer grading service owns the grade-answer-v2 function call', async () =
     }
   });
 
-  const result = await service.gradeAnswer('vraag', 'antwoord', 'Antwoord');
+  const result = await service.gradeAnswer('vraag', 'antwoord', 'anders');
 
   assert.deepEqual(result, { correct: true, feedback: 'Goed gedaan.' });
   assert.deepEqual(calls, [{
     name: 'grade-answer-v2',
-    options: { body: { question: 'vraag', correctAnswer: 'antwoord', userAnswer: 'Antwoord' } }
+    options: { body: { question: 'vraag', correctAnswer: 'antwoord', userAnswer: 'anders' } }
   }]);
 });
 
@@ -28,5 +28,5 @@ test('answer grading service propagates function errors', async () => {
     functions: { async invoke() { return { data: null, error }; } }
   });
 
-  await assert.rejects(() => service.gradeAnswer('vraag', 'antwoord', 'Antwoord'), error);
+  await assert.rejects(() => service.gradeAnswer('vraag', 'antwoord', 'anders'), error);
 });

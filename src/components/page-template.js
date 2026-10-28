@@ -1,3 +1,5 @@
+import { createPacoNavigationItem } from './page-navigation.js';
+
 /**
  * PacoGO canonical page template.
  *
@@ -142,168 +144,6 @@ function nodeFrom(value) {
   return null;
 }
 
-function createNavigationItem(item) {
-  const group = document.createElement('div');
-  group.className = 'paco-template-nav-group';
-
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = 'paco-template-nav-item' + (item.active ? ' active' : '') + (item.key === 'management' ? ' management' : '');
-
-  let iconElement = null;
-  if (item.icon) {
-    iconElement = document.createElement('span');
-    iconElement.className = 'paco-template-nav-icon';
-    iconElement.textContent = item.icon;
-    button.appendChild(iconElement);
-  }
-
-  const label = document.createElement('span');
-  label.textContent = item.label || '';
-  button.appendChild(label);
-
-  if (Array.isArray(item.submenu) && item.submenu.length) {
-    const chevron = document.createElement('span');
-    chevron.className = 'paco-template-nav-chevron';
-    chevron.textContent = '›';
-    button.appendChild(chevron);
-    group.classList.add('always-open');
-  }
-
-  if (typeof item.onClick === 'function') button.addEventListener('click', item.onClick);
-  group.appendChild(button);
-
-  if (Array.isArray(item.submenu) && item.submenu.length) {
-    const submenu = document.createElement('div');
-    submenu.className = 'paco-template-nav-submenu';
-
-    item.submenu.forEach(subitem => {
-      const subbutton = document.createElement('button');
-      subbutton.type = 'button';
-      subbutton.className = 'paco-template-nav-subitem' + (subitem.active ? ' active' : '') + (item.key === 'management-student' ? ' management-student' : '');
-      subbutton.textContent = subitem.label || '';
-      if (typeof subitem.onClick === 'function') subbutton.addEventListener('click', subitem.onClick);
-      submenu.appendChild(subbutton);
-    });
-
-    group.appendChild(submenu);
-  }
-
-  if (typeof item.bind === 'function') item.bind({ button, label, icon: iconElement });
-
-  return group;
-}
-
-export function createPacoDropdown({
-  label = '',
-  options = [],
-  value = null,
-  onChange = null,
-  className = ''
-} = {}) {
-  const root = document.createElement('div');
-  root.className = `paco-dropdown ${className}`.trim();
-
-  const trigger = document.createElement('button');
-  trigger.type = 'button';
-  trigger.className = 'paco-dropdown-trigger';
-  trigger.setAttribute('aria-haspopup', 'listbox');
-  trigger.setAttribute('aria-expanded', 'false');
-
-  const triggerLabel = document.createElement('span');
-  triggerLabel.className = 'paco-dropdown-label';
-
-  const chevron = document.createElement('span');
-  chevron.className = 'paco-dropdown-chevron';
-  chevron.setAttribute('aria-hidden', 'true');
-
-  trigger.appendChild(triggerLabel);
-  trigger.appendChild(chevron);
-  root.appendChild(trigger);
-
-  const menu = document.createElement('div');
-  menu.className = 'paco-dropdown-menu';
-  menu.setAttribute('role', 'listbox');
-  root.appendChild(menu);
-
-  let selectedValue = value ?? (options[0]?.value ?? '');
-
-  const selectedOption = () => options.find(option => option.value === selectedValue) || options[0];
-
-  function render() {
-    const selected = selectedOption();
-    triggerLabel.textContent = selected?.label ?? label;
-    menu.replaceChildren();
-
-    options.forEach(option => {
-      const optionButton = document.createElement('button');
-      optionButton.type = 'button';
-      optionButton.className = 'paco-dropdown-option';
-      optionButton.setAttribute('role', 'option');
-      optionButton.setAttribute('aria-selected', String(option.value === selectedValue));
-
-      const check = document.createElement('span');
-      check.className = 'paco-dropdown-check';
-      check.textContent = option.value === selectedValue ? '✓' : '';
-      check.setAttribute('aria-hidden', 'true');
-
-      const text = document.createElement('span');
-      text.textContent = option.label || '';
-
-      optionButton.appendChild(check);
-      optionButton.appendChild(text);
-
-      optionButton.addEventListener('click', () => {
-        selectedValue = option.value;
-        render();
-        close();
-        if (typeof onChange === 'function') onChange(selectedValue, option);
-      });
-
-      menu.appendChild(optionButton);
-    });
-  }
-
-  function open() {
-    root.classList.add('open');
-    trigger.setAttribute('aria-expanded', 'true');
-  }
-
-  function close() {
-    root.classList.remove('open');
-    trigger.setAttribute('aria-expanded', 'false');
-  }
-
-  trigger.addEventListener('click', event => {
-    event.stopPropagation();
-    root.classList.contains('open') ? close() : open();
-  });
-
-  root.addEventListener('keydown', event => {
-    if (event.key === 'Escape') {
-      close();
-      trigger.focus();
-    }
-  });
-
-  document.addEventListener('click', event => {
-    if (!root.contains(event.target)) close();
-  });
-
-  render();
-
-  return {
-    element: root,
-    getValue: () => selectedValue,
-    setValue: nextValue => {
-      selectedValue = nextValue;
-      render();
-    },
-    open,
-    close
-  };
-}
-
 export function createPacoPageTemplate({
   greeting = '',
   navigation = [],
@@ -350,7 +190,7 @@ export function createPacoPageTemplate({
   const navigationElement = document.createElement('nav');
   navigationElement.className = 'paco-template-navigation';
   navigationElement.setAttribute('aria-label', 'PacoGO navigatie');
-  navigation.forEach(item => navigationElement.appendChild(createNavigationItem(item)));
+  navigation.forEach(item => navigationElement.appendChild(createPacoNavigationItem(item)));
   sidebarCard.appendChild(navigationElement);
   sidebar.appendChild(sidebarCard);
   body.appendChild(sidebar);
@@ -391,7 +231,6 @@ export function createPacoPageTemplate({
   const versionMarker = document.createElement('small');
   versionMarker.className = 'paco-template-version-badge';
   versionMarker.textContent = testVersion;
-  versionMarker.style.cssText = 'display:block;width:max-content;margin:-28px auto 10px;padding:0;background:transparent;border:0;border-radius:0;color:rgba(255,255,255,.72);font:600 10px/1 "Nunito",sans-serif;letter-spacing:.4px;box-shadow:none;text-shadow:none;';
   root.appendChild(versionMarker);
 
   return root;
@@ -422,7 +261,7 @@ function updatePacoPageTemplate(template, {
   backButton.textContent = '← Terug';
   backButton.onclick = () => window.history.back();
   greetingElement.textContent = greeting;
-  navigationElement.replaceChildren(...navigation.map(createNavigationItem));
+  navigationElement.replaceChildren(...navigation.map(createPacoNavigationItem));
   iconElement.textContent = icon;
   iconElement.hidden = !icon;
   titleElement.textContent = title;

@@ -1,8 +1,8 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
-import { buildViewUrl } from '../../core/view-context.js';
 import { createLessonEditorApplication } from './lesson-editor-application.js';
 import { createLessonEditorPage } from './lesson-editor-page.js';
+import { createLessonEditorAi } from './lesson-editor-ai.js';
 
 function showMessage(content, message, className = 'message') {
   content.innerHTML = '';
@@ -27,7 +27,6 @@ export function createLessonEditorRuntime({
   const content = documentRef.createElement('div');
   content.className = 'lesson-editor-page';
   const student = context.student || '';
-  const viewMode = context.mode || 'student';
   const editorApp = createLessonEditorApplication({
     lessonService: app.lessons,
     storage: globalThis.localStorage,
@@ -35,8 +34,9 @@ export function createLessonEditorRuntime({
     isParent: () => app.auth.isParent,
     refreshLessons: () => app.loadLessons()
   });
+  const editorAi = createLessonEditorAi({ aiContent: app.aiContent });
 
-  const goManagement = () => navigate(buildViewUrl('management.html', { student, mode: 'management' }).toString());
+  const goManagement = () => navigate('management.html', { managementCapability: 'lesson.manage' });
 
   mountPacoPageTemplate({
     mount: templateMount,
@@ -46,42 +46,22 @@ export function createLessonEditorRuntime({
     title: lessonId ? 'Les bewerken' : 'Nieuwe les',
     icon: '📚',
     subtitle: 'Maak of bewerk een les met de bestaande lesvormen en velden.',
-    navigation: createPacoNavigation({
-      app,
-      active: 'management',
-      student,
-      viewMode,
-      includeCreator: true,
-      navigate
-    }),
+    navigation: createPacoNavigation({ app, active: 'management-dashboard', student, includeManagementDashboard: true, includeCreator: true, navigate }),
     content
   });
 
   async function mount() {
     await app.initializeSession();
-    if (!app.auth.isParent) {
-      showMessage(content, 'Je hebt geen toegang tot lesbeheer.', 'message error');
-      return;
-    }
-
+    if (!app.auth.isParent) { showMessage(content, 'Je hebt geen toegang tot lesbeheer.', 'message error'); return; }
     let lesson = null;
     if (lessonId) {
       const records = await app.loadLessons();
       lesson = app.mapLessons(records).find(item => String(item.id) === String(lessonId)) || null;
-      if (!lesson) {
-        showMessage(content, 'Deze les kon niet worden gevonden.', 'message error');
-        return;
-      }
+      if (!lesson) { showMessage(content, 'Deze les kon niet worden gevonden.', 'message error'); return; }
       const calendarEntry = editorApp.calendar.getAll().find(item => Number(item.lessonId) === Number(lesson.id) && item.student === lesson.student);
       lesson = { ...lesson, testDate: calendarEntry?.date || '' };
     }
-
-    createLessonEditorPage({
-      root: content,
-      runtime: editorApp.editor,
-      initialLesson: lesson,
-      student: student || lesson?.student || ''
-    });
+    createLessonEditorPage({ root: content, runtime: editorApp.editor, ai: editorAi, initialLesson: lesson, student: student || lesson?.student || '' });
   }
 
   return Object.freeze({ mount });

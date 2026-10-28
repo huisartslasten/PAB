@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createPacoNavigation } from './page-navigation.js';
+import { createPacoNavigation, createPacoManagementNavigation, createPacoNavigationItem } from './page-navigation.js';
 
 function createApp({ isParent = false } = {}) {
   return {
@@ -9,7 +9,10 @@ function createApp({ isParent = false } = {}) {
       session: {},
       subscribe: () => ({ unsubscribe() {} })
     },
-    authSession: { signOut: async () => {} }
+    authSession: { signOut: async () => {} },
+    managementCapabilities: {
+      getAvailableForPage: ({ page, student }) => page === 'management' && isParent && student ? [{}] : []
+    }
   };
 }
 
@@ -24,33 +27,63 @@ describe('shared PacoGO navigation', () => {
     expect(items.some(item => item.label === 'Oefenen')).toBe(false);
   });
 
-  it('exposes the management mode control to management users in the learner view', () => {
+  it('exposes Beheer in learner navigation only when the management engine grants access', () => {
+    const parentItems = createPacoNavigation({
+      app: createApp({ isParent: true }),
+      student: 'Zyon',
+      navigate: () => {}
+    });
+    const learnerItems = createPacoNavigation({
+      app: createApp({ isParent: false }),
+      student: 'Zyon',
+      navigate: () => {}
+    });
+
+    expect(parentItems.some(item => item.key === 'management' && item.label === 'Beheer')).toBe(true);
+    expect(learnerItems.some(item => item.key === 'management')).toBe(false);
+  });
+
+  it('does not expose a management mode control in normal navigation', () => {
     const items = createPacoNavigation({
       app: createApp({ isParent: true }),
       student: 'Zyon',
       navigate: () => {}
     });
 
-    const management = items.find(item => item.key === 'management-mode');
-    expect(management).toBeDefined();
-    expect(management.label).toBe('BEHEER');
-    expect(management.kind).toBe('management-mode');
+    expect(items.some(item => item.key === 'management-mode')).toBe(false);
+    expect(items.some(item => item.label === 'BEHEER')).toBe(false);
   });
 
-  it('renders LEERLING as the single heading for the central management learner selector', () => {
+  it('provides the central management dashboard with the full learner selector', () => {
+    const items = createPacoManagementNavigation({
+      app: createApp({ isParent: true }),
+      student: 'Zyon',
+      managementStudents: ['Zyon', 'Mila'],
+      navigate: () => {}
+    });
+
+    const dashboard = items.find(item => item.key === 'management-dashboard');
+    expect(dashboard.label).toBe('Dashboard');
+    expect(dashboard.submenu.map(item => item.label)).toEqual(['Zyon', 'Mila']);
+    expect(dashboard.submenu.find(item => item.label === 'Zyon').active).toBe(true);
+  });
+
+  it('renders central management tools explicitly without switching navigation mode', () => {
     const items = createPacoNavigation({
       app: createApp({ isParent: true }),
       student: 'Zyon',
-      viewMode: 'management',
+      includeManagement: false,
+      includeManagementDashboard: true,
+      includeManagementTools: true,
+      includeCreator: true,
       managementStudents: ['Zyon', 'Mila'],
       navigate: () => {}
     });
 
     expect(items.map(item => item.key)).toEqual([
-      'management-mode',
-      'management-student',
-      'dashboard',
+      'management-dashboard',
       'lessons',
+      'skills',
       'agenda',
       'test-history',
       'recovery',
@@ -59,12 +92,29 @@ describe('shared PacoGO navigation', () => {
       'account'
     ]);
 
-    const learner = items.find(item => item.key === 'management-student');
-    expect(learner.label).toBe('LEERLING');
-    expect(learner.submenu.map(item => item.label)).toEqual(['Zyon', 'Mila']);
-    expect(learner.submenu.find(item => item.label === 'Zyon').active).toBe(true);
+    const dashboard = items.find(item => item.key === 'management-dashboard');
+    expect(dashboard.label).toBe('Dashboard');
+    expect(dashboard.submenu.map(item => item.label)).toEqual(['Zyon', 'Mila']);
+    expect(dashboard.submenu.find(item => item.label === 'Zyon').active).toBe(true);
+    expect(items.some(item => item.key === 'management-mode')).toBe(false);
     expect(items.some(item => item.key === 'management-student-heading')).toBe(false);
     expect(items.some(item => item.label === 'Kies leerling')).toBe(false);
     expect(items.some(item => item.key === 'practice')).toBe(false);
+  });
+
+  it('owns navigation item rendering centrally', () => {
+    const root = createPacoNavigationItem({
+      key: 'agenda',
+      label: 'Mijn agenda',
+      icon: '📅',
+      active: true,
+      submenu: [{ key: 'agenda', label: 'Agenda invoeren', active: true }]
+    });
+
+    expect(root.className).toBe('paco-template-nav-group always-open');
+    expect(root.querySelector('.paco-template-nav-item').textContent).toContain('Mijn agenda');
+    expect(root.querySelector('.paco-template-nav-item').classList.contains('active')).toBe(true);
+    expect(root.querySelector('.paco-template-nav-subitem').textContent).toBe('Agenda invoeren');
+    expect(root.querySelector('.paco-template-nav-subitem').classList.contains('active')).toBe(true);
   });
 });

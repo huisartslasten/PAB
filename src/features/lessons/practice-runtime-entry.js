@@ -5,6 +5,7 @@
 
 import { createApplicationPracticeRuntime } from './practice-runtime.js';
 import { createMasteryService } from '../../services/mastery-service.js';
+import { createPlayerPersistence } from './player-persistence.js';
 
 export function createPracticeRuntimeEntry({
   db = null,
@@ -15,6 +16,8 @@ export function createPracticeRuntimeEntry({
   evaluateAnswer = null,
   aiCheckAnswers = true,
   masteryService = null,
+  persistence = null,
+  clock = () => new Date().toISOString(),
   render = null,
   prepare = () => {},
   onAnswer = () => {},
@@ -34,9 +37,13 @@ export function createPracticeRuntimeEntry({
     random,
     evaluateAnswer,
     aiCheckAnswers,
-    sessionMode
+    sessionMode,
+    clock
   });
   const mastery = masteryService || createMasteryService();
+  const testPersistence = sessionMode === 'single-pass'
+    ? (persistence || (db ? createPlayerPersistence(db, { clock }) : null))
+    : null;
 
   function renderCurrent() {
     render(runtime.snapshot());
@@ -56,7 +63,7 @@ export function createPracticeRuntimeEntry({
     return current;
   }
 
-  function enrichResult(result, item) {
+  async function enrichResult(result, item) {
     const masteryState = sessionMode === 'mastery' && student && item
       ? mastery.record(student, lesson.id, item.id, result.correct === true)
       : null;
@@ -64,7 +71,17 @@ export function createPracticeRuntimeEntry({
     onAnswer(enrichedResult);
     if (result.done) {
       const snapshot = runtime.snapshot();
-      onFinish(snapshot);
+      if (testPersistence) {
+        await testPersistence.savePlayerAttempt({
+          lessonId: lesson.id,
+          student,
+          type: lesson.type,
+          startedAt: snapshot.startedAt,
+          finishedAt: snapshot.finishedAt,
+          answers: snapshot.answers
+        });
+      }
+      await onFinish(snapshot);
       return Object.freeze({ ...enrichedResult, snapshot });
     }
     return enrichedResult;
@@ -76,15 +93,25 @@ export function createPracticeRuntimeEntry({
     return enrichResult(result, item);
   }
 
-  function assess(correct, evaluation = null) {
+  async function assess(correct, evaluation = null) {
     const item = runtime.current;
     const result = runtime.assess(correct, evaluation);
     return enrichResult(result, item);
   }
 
-  function finish() {
+  async function finish() {
     const snapshot = runtime.finish();
-    onFinish(snapshot);
+    if (testPersistence && snapshot.answers.length) {
+      await testPersistence.savePlayerAttempt({
+        lessonId: lesson.id,
+        student,
+        type: lesson.type,
+        startedAt: snapshot.startedAt,
+        finishedAt: snapshot.finishedAt,
+        answers: snapshot.answers
+      });
+    }
+    await onFinish(snapshot);
     return snapshot;
   }
 

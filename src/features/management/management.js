@@ -1,17 +1,17 @@
 import { appState } from '../../core/state.js';
 import { getViewContext } from '../../core/view-context.js';
+import { listStudents } from '../../core/student-registry.js';
 import { getActiveStudentLessons, getStudentLessons } from '../lessons/visibility.js';
 import { createLessonRecovery, createTrashRecovery } from '../lessons/recovery.js';
 import { getAllArchiveEntries, getAllTrashEntries } from './recovery.js';
-import { listStudents } from '../students/students.js';
 
 function requireParent(auth) {
   if (!auth?.isParent) throw new Error('Management requires a parent session.');
 }
 
 function requireStudent() {
-  const { student, isManagement } = getViewContext();
-  if (!student || !isManagement) throw new Error('A student must be selected.');
+  const { student } = getViewContext();
+  if (!student) throw new Error('A student must be selected.');
   return student;
 }
 
@@ -33,7 +33,7 @@ function normalizeSubject(value) {
   return String(value ?? '').trim().replace(/\s+/g, ' ').toLocaleLowerCase('nl-NL');
 }
 
-export function createManagement({ auth, lessonService, feedbackService, lessonOrder, loadLessons, learningTopics } = {}) {
+export function createManagement({ auth, lessonService, feedbackService, lessonOrder, loadLessons, learningTopics, skillDefinitions } = {}) {
   if (!lessonService) throw new Error('createManagement requires lessonService');
   if (!feedbackService) throw new Error('createManagement requires feedbackService');
   if (!lessonOrder) throw new Error('createManagement requires lessonOrder');
@@ -41,6 +41,10 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
   if (!learningTopics) throw new Error('createManagement requires learningTopics');
 
   function assertParent() { requireParent(auth); }
+  function requireSkillDefinitions() {
+    if (!skillDefinitions) throw new Error('Skill management requires skillDefinitions.');
+    return skillDefinitions;
+  }
 
   async function loadAllLessons() {
     assertParent();
@@ -68,6 +72,15 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
     return {
       archive: await learningTopics.listRecovery('archive'),
       trash: await learningTopics.listRecovery('trash')
+    };
+  }
+
+  async function refreshRecoverySkills() {
+    assertParent();
+    const skills = requireSkillDefinitions();
+    return {
+      archive: await skills.listRecovery('archive'),
+      trash: await skills.listRecovery('trash')
     };
   }
 
@@ -136,15 +149,23 @@ export function createManagement({ auth, lessonService, feedbackService, lessonO
   async function emptyLearningTopicTrash() { assertParent(); return learningTopics.emptyTrash(); }
   async function getRecoveryLearningTopics(mode) { assertParent(); return learningTopics.listRecovery(mode); }
 
+  async function archiveSkill(id) { assertParent(); return requireSkillDefinitions().archive(id); }
+  async function moveSkillToTrash(id) { assertParent(); return requireSkillDefinitions().moveToTrash(id); }
+  async function restoreSkillFromArchive(id) { assertParent(); return requireSkillDefinitions().restoreFromArchive(id); }
+  async function restoreSkillFromTrash(id) { assertParent(); return requireSkillDefinitions().restoreFromTrash(id); }
+  async function permanentlyDeleteSkill(id) { assertParent(); return requireSkillDefinitions().permanentlyDelete(id); }
+  async function getRecoverySkills(mode) { assertParent(); return requireSkillDefinitions().listRecovery(mode); }
+
   async function listFeedback() { assertParent(); return feedbackService.listAll(); }
   async function submitFeedback(payload = {}) { assertParent(); return feedbackService.create(payload); }
   async function updateFeedbackStatus(id, status) { assertParent(); return feedbackService.updateStatus(id, status); }
 
   return Object.freeze({
-    getStudents, loadAllLessons, loadLessons: refreshLessons, loadRecoveryLessons: refreshRecoveryLessons, refreshRecoveryLearningTopics,
+    getStudents, loadAllLessons, loadLessons: refreshLessons, loadRecoveryLessons: refreshRecoveryLessons, refreshRecoveryLearningTopics, refreshRecoverySkills,
     getScopedLessons, getAllScopedLessons, getOrderedScopedLessons, saveLessonOrder, moveLessonToSubvak, getRecoveryLessons,
     createLesson, updateLesson, archiveLesson, moveToTrash, restoreLesson, permanentlyDeleteRecoveryLesson, emptyTrash,
     archiveLearningTopic, moveLearningTopicToTrash, restoreLearningTopic, permanentlyDeleteLearningTopic, emptyLearningTopicTrash, getRecoveryLearningTopics,
+    archiveSkill, moveSkillToTrash, restoreSkillFromArchive, restoreSkillFromTrash, permanentlyDeleteSkill, getRecoverySkills,
     listFeedback, submitFeedback, updateFeedbackStatus
   });
 }

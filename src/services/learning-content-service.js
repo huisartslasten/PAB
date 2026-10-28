@@ -1,5 +1,3 @@
-import { clampImageWidth, migrateLegacyPlacement, normalizeImagePlacement } from '../features/learning-material/image-placement.js';
-
 const CARD_SELECT = 'id,learning_topic_id,title,document,sort_order,created_at';
 const DOCUMENT_VERSION = 3;
 const ALLOWED_TAGS = new Set(['B', 'STRONG', 'I', 'EM', 'SPAN', 'P', 'BR', 'UL', 'OL', 'LI', 'DIV']);
@@ -35,53 +33,57 @@ function normalizeHtml(value) {
   return root.innerHTML.trim();
 }
 
-function normalizeDocument(input) {
-  const source = input && typeof input === 'object' ? input : {};
-  const elements = Array.isArray(source.elements) ? source.elements : [];
-  return {
-    version: DOCUMENT_VERSION,
-    elements: elements.map((element, index) => {
-      const id = String(element?.id || `element-${index + 1}`);
-      if (element?.type === 'image') {
-        const mediaId = Number(element.media_id);
-        if (!mediaId) return null;
-        const width = clampImageWidth(element.size?.width ?? element.width);
-        const placement = source.version >= DOCUMENT_VERSION
-          ? normalizeImagePlacement(element.placement, width)
-          : migrateLegacyPlacement(element.placement, width);
-        return {
-          id,
-          type: 'image',
-          media_id: mediaId,
-          size: { width, unit: 'percent' },
-          placement
-        };
-      }
-      if (element?.type === 'text') {
-        const html = normalizeHtml(element.html || '');
-        return html ? { id, type: 'text', html } : null;
-      }
-      return null;
-    }).filter(Boolean)
-  };
-}
-
-function attachImages(cards, images) {
-  const byId = new Map(images.map(image => [Number(image.id), image]));
-  return cards.map(card => ({
-    ...card,
-    document: {
-      ...(card.document || { version: DOCUMENT_VERSION, elements: [] }),
-      elements: (card.document?.elements || []).map(element => element.type === 'image'
-        ? { ...element, image: byId.get(Number(element.media_id)) || null }
-        : element)
-    }
-  }));
-}
-
-export function createLearningContentService(db, { media = null, canManage = () => false, topics = null } = {}) {
+export function createLearningContentService(db, { media = null, canManage = () => false, topics = null, imagePlacement = null } = {}) {
   if (!db) throw new Error('Supabase client ontbreekt.');
   if (!topics) throw new Error('Learning topic service ontbreekt.');
+  if (!imagePlacement?.clampImageWidth || !imagePlacement?.migrateLegacyPlacement || !imagePlacement?.normalizeImagePlacement) {
+    throw new Error('Learning image placement owner ontbreekt.');
+  }
+  const { clampImageWidth, migrateLegacyPlacement, normalizeImagePlacement } = imagePlacement;
+
+  function normalizeDocument(input) {
+    const source = input && typeof input === 'object' ? input : {};
+    const elements = Array.isArray(source.elements) ? source.elements : [];
+    return {
+      version: DOCUMENT_VERSION,
+      elements: elements.map((element, index) => {
+        const id = String(element?.id || `element-${index + 1}`);
+        if (element?.type === 'image') {
+          const mediaId = Number(element.media_id);
+          if (!mediaId) return null;
+          const width = clampImageWidth(element.size?.width ?? element.width);
+          const placement = source.version >= DOCUMENT_VERSION
+            ? normalizeImagePlacement(element.placement, width)
+            : migrateLegacyPlacement(element.placement, width);
+          return {
+            id,
+            type: 'image',
+            media_id: mediaId,
+            size: { width, unit: 'percent' },
+            placement
+          };
+        }
+        if (element?.type === 'text') {
+          const html = normalizeHtml(element.html || '');
+          return html ? { id, type: 'text', html } : null;
+        }
+        return null;
+      }).filter(Boolean)
+    };
+  }
+
+  function attachImages(cards, images) {
+    const byId = new Map(images.map(image => [Number(image.id), image]));
+    return cards.map(card => ({
+      ...card,
+      document: {
+        ...(card.document || { version: DOCUMENT_VERSION, elements: [] }),
+        elements: (card.document?.elements || []).map(element => element.type === 'image'
+          ? { ...element, image: byId.get(Number(element.media_id)) || null }
+          : element)
+      }
+    }));
+  }
 
   async function resolveTopic(topicOrContext) {
     if (typeof topicOrContext === 'object' && topicOrContext?.id) return topics.getById(topicOrContext.id);

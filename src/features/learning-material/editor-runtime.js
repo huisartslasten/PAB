@@ -1,7 +1,7 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
-import { buildViewUrl, getViewContext } from '../../core/view-context.js';
-import { listStudents } from '../students/students.js';
+import { buildViewUrl } from '../../core/view-context.js';
+import { listStudents } from '../../core/student-registry.js';
 import { createLearningMaterialEditorPage } from './editor-page.js';
 
 function showMessage(content, message, className = 'message') {
@@ -16,9 +16,7 @@ export function createLearningMaterialEditorRuntime({ app, templateMount, contex
   if (!app || !templateMount || typeof navigate !== 'function') throw new TypeError('Learning material editor requires app, template mount and navigation.');
   const content = documentRef.createElement('div');
   content.className = 'lesson-learning-editor-page';
-  const currentView = getViewContext();
-  const initialStudent = context.student || currentView.student || '';
-  const viewMode = context.mode || currentView.mode || 'management';
+  const initialStudent = context.student || '';
 
   mountPacoPageTemplate({
     mount: templateMount,
@@ -26,7 +24,7 @@ export function createLearningMaterialEditorRuntime({ app, templateMount, contex
     title: 'Leerstof maken',
     icon: '🧠',
     subtitle: 'Maak leerstof rechtstreeks voor een leerling, vak en onderwerp.',
-    navigation: createPacoNavigation({ app, active: 'management', student: initialStudent, viewMode: 'management', includeCreator: true, navigate }),
+    navigation: createPacoNavigation({ app, active: 'management-dashboard', student: initialStudent, includeManagementDashboard: true, includeCreator: true, navigate }),
     content
   });
 
@@ -63,7 +61,6 @@ export function createLearningMaterialEditorRuntime({ app, templateMount, contex
             student: savedTopic.student,
             subject: savedTopic.subject,
             subvak: savedTopic.subvak,
-            mode: viewMode,
             saved: '1'
           });
           navigate(target);

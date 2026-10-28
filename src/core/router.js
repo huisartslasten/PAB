@@ -6,6 +6,8 @@
  * supplies navigation context and makes route styles available before mount.
  */
 
+const BASE_ROUTE_STYLES = Object.freeze(['src/components/paco-tile.css']);
+
 function normalizePath(path) {
   const value = String(path || '/').replace(/^\/+/, '');
   return value || 'index.html';
@@ -66,7 +68,7 @@ function createRouteStyleManager(documentRef) {
   });
 }
 
-export function createPacoRouter({ windowRef = window, routes = {}, documentRef = windowRef.document || globalThis.document } = {}) {
+export function createPacoRouter({ windowRef = window, routes = {}, documentRef = windowRef.document || globalThis.document, managementCapabilities = null } = {}) {
   const listeners = new Set();
   const routeTable = new Map(Object.entries(routes));
   const routeStyles = createRouteStyleManager(documentRef);
@@ -91,7 +93,16 @@ export function createPacoRouter({ windowRef = window, routes = {}, documentRef 
 
   function getStyles(route) {
     const renderer = routeTable.get(route.path);
-    return normalizeStyles(typeof renderer === 'function' ? renderer.styles : renderer?.styles);
+    return normalizeStyles([
+      ...BASE_ROUTE_STYLES,
+      ...(typeof renderer === 'function' ? renderer.styles : renderer?.styles || [])
+    ]);
+  }
+
+  function prepareManagementNavigation(capabilityId = '') {
+    if (!managementCapabilities) return;
+    if (capabilityId) managementCapabilities.activateForNavigation(capabilityId);
+    else managementCapabilities.clearPageActivity();
   }
 
   async function render(route) {
@@ -117,26 +128,32 @@ export function createPacoRouter({ windowRef = window, routes = {}, documentRef 
     return runtime;
   }
 
-  async function notify(route, { replace = false, popstate = false } = {}) {
-    const event = { ...route, replace, popstate, renderer: getRenderer(route) };
+  async function notify(route, { replace = false, popstate = false, managementCapability = '' } = {}) {
+    prepareManagementNavigation(managementCapability);
+    const event = { ...route, replace, popstate, managementCapability, renderer: getRenderer(route) };
     await render(route);
     listeners.forEach(listener => listener(event));
     return event;
   }
 
-  async function navigate(input, { replace = false } = {}) {
+  async function navigate(input, { replace = false, managementCapability = '' } = {}) {
     const route = resolve(input);
+    prepareManagementNavigation(managementCapability);
     await render(route);
     const method = replace ? 'replaceState' : 'pushState';
-    windowRef.history[method]({}, '', route.url.toString());
-    listeners.forEach(listener => listener({ ...route, replace, popstate: false, renderer: getRenderer(route) }));
-    return { ...route, replace, popstate: false, renderer: getRenderer(route) };
+    windowRef.history[method]({ pacoManagementCapability: managementCapability || null }, '', route.url.toString());
+    listeners.forEach(listener => listener({ ...route, replace, popstate: false, managementCapability, renderer: getRenderer(route) }));
+    return { ...route, replace, popstate: false, managementCapability, renderer: getRenderer(route) };
   }
 
   function start() {
-    const onPopState = () => { void notify(resolve(), { popstate: true }); };
+    const onPopState = () => {
+      const managementCapability = windowRef.history.state?.pacoManagementCapability || '';
+      void notify(resolve(), { popstate: true, managementCapability });
+    };
     windowRef.addEventListener('popstate', onPopState);
-    void notify(resolve());
+    const managementCapability = windowRef.history.state?.pacoManagementCapability || '';
+    void notify(resolve(), { managementCapability });
     return () => windowRef.removeEventListener('popstate', onPopState);
   }
 

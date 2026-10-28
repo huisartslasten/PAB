@@ -67,7 +67,7 @@ function presentationFixture(overrides = {}) {
   return { documentRef, presentation, shown };
 }
 
-test('practice presentation delegates Questions state and self-assessment to the runtime entry', () => {
+test('practice presentation delegates Questions state and self-assessment to the runtime entry', async () => {
   const { documentRef, presentation } = presentationFixture();
 
   const started = presentation.start('questions');
@@ -79,7 +79,7 @@ test('practice presentation delegates Questions state and self-assessment to the
   assert.equal(revealed.item.id, 'a');
   assert.match(documentRef.getElementById('practiceContent').innerHTML, /Mijn antwoord/);
 
-  const assessed = presentation.assess(true);
+  const assessed = await presentation.assess(true);
   assert.equal(assessed.correct, true);
   assert.equal(assessed.done, false);
 
@@ -88,12 +88,12 @@ test('practice presentation delegates Questions state and self-assessment to the
   assert.match(documentRef.getElementById('practiceContent').innerHTML, /Vraag B/);
 });
 
-test('practice presentation keeps completion rendering owned by the entry', () => {
+test('practice presentation keeps completion rendering owned by the entry', async () => {
   const { documentRef, presentation } = presentationFixture();
   presentation.start('questions');
-  presentation.assess(true);
+  await presentation.assess(true);
   presentation.next();
-  const completed = presentation.assess(true);
+  const completed = await presentation.assess(true);
 
   assert.equal(completed.done, true);
   assert.match(documentRef.getElementById('practiceContent').innerHTML, /Klaar!/);

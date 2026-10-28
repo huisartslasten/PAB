@@ -12,13 +12,10 @@ async function expectCanonicalShell(page, path, title) {
   await expect(page.locator('.paco-template-main h1')).toHaveText(title);
 }
 
-async function expectManagementSidebar(page) {
-  await expect(page.locator('.paco-template-nav-submenu')).toHaveCount(2);
+async function expectSharedSidebar(page) {
+  await expect(page.locator('.paco-template-nav-submenu')).toHaveCount(1);
   await expect(page.locator('.paco-template-nav-subitem')).toHaveText([
-    'Zyon',
-    'Zenith',
-    'Zephon',
-    'Agenda beheren',
+    'Agenda invoeren',
     'Maandkalender'
   ]);
 }
@@ -49,14 +46,13 @@ test('management page enforces the canonical authentication boundary', async ({ 
 
 test('test page uses the canonical shell', async ({ page }) => {
   await expectCanonicalShell(page, 'test.html', 'Toets');
-  await expect(page.locator('#testProgress')).toHaveCount(1);
-  await expect(page.locator('#testContent')).toHaveCount(1);
-  await expect(page.locator('#result')).toHaveCount(1);
+  await expect(page.locator('#practiceProgress')).toHaveCount(1);
+  await expect(page.locator('#practiceContent')).toHaveCount(1);
 });
 
-test('test history page uses the canonical stable management sidebar', async ({ page }) => {
-  await expectCanonicalShell(page, 'test-history.html?student=Zyon&mode=management', 'Toetsgeschiedenis');
-  await expectManagementSidebar(page);
+test('test history page uses the canonical shared sidebar', async ({ page }) => {
+  await expectCanonicalShell(page, 'test-history.html?viewStudent=Zyon', 'Toetsgeschiedenis');
+  await expectSharedSidebar(page);
   await expect(page.locator('#testHistoryContent')).toHaveCount(1);
   await expect(page.getByText('Bekijk de gemaakte toetsen van Zyon.')).toBeVisible();
 });

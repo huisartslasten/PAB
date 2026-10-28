@@ -57,6 +57,9 @@ async function installSupabaseFixture(page) {
                 return { data: null, error: null };
               }
             },
+            rpc() {
+              return Promise.resolve({ data: [], error: null });
+            },
             from(table) {
               let filter = null;
               const query = {

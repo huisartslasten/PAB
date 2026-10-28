@@ -36,16 +36,16 @@ jobs:
           ! grep -q 'function analyzeAgendaVideo()' index.html
           ! grep -q 'function saveAgendaImportReview()' index.html
           ! grep -q 'src/features/agenda/runtime-entry.js' index.html
-      - name: Verify professional Player ownership boundary
+      - name: Verify canonical practice ownership boundary
         run: |
-          test -f src/features/lessons/player-runtime-bootstrap.js
-          test -f src/features/lessons/player-runtime-entry.js
-          test -f src/features/lessons/player-runtime-composition.js
-          test -f src/features/lessons/player-screen-boundary.js
-          test -f src/features/lessons/player-submit-boundary.js
+          test -f src/features/practice/practice-test-runtime.js
+          test -f src/features/lessons/practice-presentation.js
+          test -f src/features/lessons/practice-runtime-entry.js
+          test -f src/features/lessons/practice-runtime.js
           test -f src/features/lessons/test-runtime.js
-          grep -q "from './player-runtime-bootstrap.js'" src/features/lessons/test-runtime.js
-          grep -q 'createProfessionalPlayerBridge' src/features/lessons/test-runtime.js
+          grep -q "from './practice-presentation.js'" src/features/lessons/test-runtime.js
+          grep -q 'createPracticePresentation' src/features/lessons/test-runtime.js
+          ! grep -q 'createProfessionalPlayerBridge' src/features/lessons/test-runtime.js
           ! grep -q 'src/features/lessons/player-runtime-bootstrap.js' test.html
           ! grep -q 'createProfessionalPlayerBridge' test.html
           ! grep -q 'function renderTest()' index.html
@@ -54,6 +54,8 @@ jobs:
           ! grep -q 'professionalPlayerHost' index.html
           ! grep -q 'player-runtime-bootstrap.js' index.html
           ! grep -q 'window.pacoGOProfessionalPlayerReady' index.html
+      - name: Run architecture boundary tests
+        run: node --test test/architecture-boundaries.test.js
       - name: Run maintained Node regression
         run: |
           files=$(find test -maxdepth 1 -type f -name '*.test.js' \
@@ -64,10 +66,11 @@ jobs:
             ! -name 'lesson-save-flow.test.js' ! -name 'lesson-save-persistence.test.js' \
             ! -name 'lesson-test-date-model.test.js' ! -name 'parity-contracts.test.js' \
             ! -name 'practice-evaluation-runtime-source-contract.test.js' \
-            ! -name 'refactor-pure-modules.test.js' ! -name 'word-row-model.test.js' | sort)
+            ! -name 'refactor-pure-modules.test.js' ! -name 'word-row-model.test.js' \
+            ! -name 'skill-definition-service.test.js' ! -name 'skill-configuration-service.test.js' | sort)
           node --test $files
       - name: Run maintained Vitest regression
-        run: npx vitest run test/lesson-item-collector-types.test.js test/lesson-part-model.test.js test/lesson-save-flow.test.js test/lesson-save-persistence.test.js src/services/learning-content-service.test.js
+        run: npx vitest run test/lesson-item-collector-types.test.js test/lesson-part-model.test.js test/lesson-save-flow.test.js test/lesson-save-persistence.test.js src/services/learning-content-service.test.js test/skill-definition-service.test.js test/skill-configuration-service.test.js
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Start local fixture server

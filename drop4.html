@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — DROP4</title>
+  <link rel="stylesheet" href="src/components/page-template.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div id="paco-template-mount"></div>
+  <script type="module">
+    import { startPacoRuntime } from './src/app/runtime.js';
+    await startPacoRuntime({ templateMount: document.querySelector('#paco-template-mount') });
+  </script>
+</body>
+</html>

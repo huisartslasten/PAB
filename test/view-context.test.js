@@ -6,54 +6,39 @@ import { appState } from '../src/core/state.js';
 test('student view context accepts a known student', () => {
   const context = readViewContext(new URLSearchParams('viewStudent=Zenith'));
   assert.equal(context.student, 'Zenith');
-  assert.equal(context.mode, 'student');
-  assert.equal(context.isManagement, false);
+  assert.deepEqual(Object.keys(context), ['student']);
 });
 
-test('management view context is explicit and student-scoped', () => {
+test('legacy management mode is ignored by the view context', () => {
   const context = readViewContext(new URLSearchParams('viewStudent=Zenith&mode=management'));
   assert.equal(context.student, 'Zenith');
-  assert.equal(context.mode, 'management');
-  assert.equal(context.isManagement, true);
+  assert.deepEqual(Object.keys(context), ['student']);
 });
 
-test('management view context remains active without a selected student', () => {
+test('management mode without a student no longer creates a management context', () => {
   const context = readViewContext(new URLSearchParams('mode=management'));
   assert.equal(context.student, '');
-  assert.equal(context.mode, 'management');
-  assert.equal(context.isManagement, true);
+  assert.deepEqual(Object.keys(context), ['student']);
 });
 
 test('unknown students are never accepted as view context', () => {
   const context = readViewContext(new URLSearchParams('viewStudent=Unknown&mode=management'));
   assert.equal(context.student, '');
-  assert.equal(context.isManagement, true);
 });
 
-test('management context requires management permission', () => {
-  const context = readViewContext(new URLSearchParams('mode=management'));
-  assert.throws(() => applyViewContext(context, { canManage: false }), /management permission/);
-  applyViewContext(context, { canManage: true });
-  assert.equal(appState.viewedStudent, '');
-  assert.equal(appState.viewMode, 'management');
+test('applyViewContext only updates the canonical student context', () => {
+  const context = readViewContext(new URLSearchParams('viewStudent=Zenith&mode=management'));
+  applyViewContext(context);
+  assert.equal(appState.viewedStudent, 'Zenith');
+  assert.equal(appState.currentStudent, 'Zenith');
 });
 
-test('management navigation preserves management mode without a selected student', () => {
-  globalThis.window = { location: { href: 'https://example.test/dashboard.html?mode=management&context=management&student=Zenith' } };
-  const target = buildViewUrl('agenda.html', { mode: 'management' });
-  assert.equal(target.pathname, '/agenda.html');
-  assert.equal(target.searchParams.get('mode'), 'management');
-  assert.equal(target.searchParams.has('viewStudent'), false);
-  assert.equal(target.searchParams.has('student'), false);
-  assert.equal(target.searchParams.has('context'), false);
-});
-
-test('student navigation explicitly clears legacy context and writes student mode', () => {
+test('navigation clears legacy management parameters and keeps student context', () => {
   globalThis.window = { location: { href: 'https://example.test/test-history.html?mode=management&context=management&student=Zenith' } };
-  const target = buildViewUrl('test-history.html', { student: 'Zenith', mode: 'student' });
+  const target = buildViewUrl('test-history.html', { student: 'Zenith' });
   assert.equal(target.pathname, '/test-history.html');
   assert.equal(target.searchParams.get('viewStudent'), 'Zenith');
-  assert.equal(target.searchParams.get('mode'), 'student');
   assert.equal(target.searchParams.has('student'), false);
   assert.equal(target.searchParams.has('context'), false);
+  assert.equal(target.searchParams.has('mode'), false);
 });

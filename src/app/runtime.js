@@ -1,6 +1,7 @@
 import { createPacoGOApp } from './bootstrap.js';
 import { createPacoRouter } from '../core/router.js';
 import { createPacoRouteRegistry } from './routes.js';
+import { installPacoManagementSwitch } from '../components/paco-management-switch.js';
 
 export function createPacoRuntime({
   supabaseLib = window.supabase,
@@ -18,14 +19,32 @@ export function createPacoRuntime({
     mounts: { templateMount, chooserMount },
     documentRef
   });
-  const router = createPacoRouter({ windowRef: window, routes });
+  const router = createPacoRouter({
+    windowRef: window,
+    routes,
+    managementCapabilities: app.managementCapabilities
+  });
+
+  router.onChange(() => {
+    installPacoManagementSwitch({
+      templateMount,
+      app,
+      navigate: router.navigate,
+      documentRef
+    });
+  });
 
   return Object.freeze({ app, router, routes });
 }
 
-export function startPacoRuntime(options = {}) {
+export async function startPacoRuntime(options = {}) {
   const runtime = createPacoRuntime(options);
   const stop = runtime.router.start();
+
+  void runtime.app.initializeSession().catch(error => {
+    console.error('PacoGO session initialization error:', error);
+  });
+
   return Object.freeze({
     ...runtime,
     stop

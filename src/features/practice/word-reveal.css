@@ -1,0 +1,309 @@
+.wr-page-card {
+  grid-template-columns: minmax(280px, .9fr) minmax(390px, 1.1fr);
+  gap: 10px 18px;
+  padding: 12px 18px 14px;
+}
+
+.wr-game-head {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 9px;
+  padding: 11px 14px;
+  border: 2px solid #dce9f6;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #f8fbff 0%, #eef7ff 100%);
+  box-shadow: 0 4px 0 rgba(16,43,87,.04);
+}
+
+.wr-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.wr-stat {
+  min-height: 54px;
+  display: grid;
+  align-content: center;
+  gap: 2px;
+  padding: 7px 10px;
+  border: 2px solid #e1edf7;
+  border-radius: 14px;
+  background: #fff;
+  text-align: center;
+}
+
+.wr-stat span {
+  display: block;
+  color: #667894;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+}
+
+.wr-stat strong {
+  display: block;
+  color: #102b57;
+  font: 900 19px/1.05 "Baloo 2", Nunito, sans-serif;
+}
+
+.wr-target-panel {
+  grid-column: 2;
+  grid-row: 2 / span 2;
+  min-width: 0;
+  min-height: 310px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0;
+  padding: 16px;
+  border: 2px solid #cfe3f3;
+  border-radius: 20px;
+  background: #e8f5ff;
+  box-shadow: 0 6px 14px rgba(16,43,87,.07);
+  text-align: center;
+}
+
+.wr-target-label,
+.wr-question-label {
+  display: block;
+  margin-bottom: 10px;
+  color: #173b70;
+  font: 900 11px/1.1 "Baloo 2", Nunito, sans-serif;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+}
+
+.wr-target {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 7px 5px;
+  min-height: 120px;
+}
+
+.wr-target-word {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.wr-letter-card {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 16px;
+  perspective: 500px;
+  flex: 0 0 auto;
+  transform: translateZ(0);
+}
+
+.wr-letter-front,
+.wr-letter-back {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: inherit;
+  border: 2px solid #d5e4e8;
+  box-shadow: 0 4px 10px rgba(16,43,87,.08);
+  backface-visibility: hidden;
+  transition: transform .35s ease, box-shadow .2s ease;
+}
+
+.wr-letter-front {
+  background: #f4f8f7 url('./word-reveal/assets/letter-hunt-tile-back.webp') center / cover no-repeat;
+}
+
+.wr-letter-back {
+  background: #fff9ef;
+  border-color: #eadfca;
+  color: #173b70;
+  font: 900 1.7rem/1 "Baloo 2", Nunito, sans-serif;
+  transform: rotateY(180deg);
+}
+
+.wr-letter-card.is-selectable { cursor: pointer; }
+.wr-letter-card.is-selectable:hover .wr-letter-front {
+  box-shadow: 0 6px 13px rgba(16,43,87,.12);
+  transform: translateY(-2px);
+}
+.wr-letter-card.is-selectable:focus-visible {
+  outline: 3px solid #9bc9e8;
+  outline-offset: 3px;
+}
+.wr-letter-card.is-revealed .wr-letter-front { transform: rotateY(180deg); }
+.wr-letter-card.is-revealed .wr-letter-back { transform: rotateY(360deg); }
+.wr-target-space { width: 10px; flex: 0 0 10px; }
+.wr-target-punctuation { display: inline-grid; place-items: center; min-width: 10px; }
+
+.wr-question-panel {
+  grid-column: 1;
+  grid-row: 2;
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 14px;
+  border: 2px solid #dce9f6;
+  border-radius: 18px;
+  background: #f8fbff;
+}
+
+.wr-question-label { margin-bottom: 0; }
+
+.wr-question {
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  color: #102b57;
+  font: 900 clamp(24px, 3vw, 34px)/1.05 "Baloo 2", Nunito, sans-serif;
+}
+
+.wr-answer-form,
+.wr-guess-form {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.wr-answer-input,
+.wr-guess-input {
+  min-width: 0;
+  flex: 1;
+}
+
+.wr-primary-button,
+.wr-secondary-button,
+.wr-feedback-button {
+  white-space: nowrap;
+}
+
+.wr-inline-error {
+  margin-top: 2px;
+  color: #8d2020;
+  font-weight: 800;
+}
+
+.wr-feedback-panel {
+  grid-column: 1;
+  grid-row: 3;
+  min-width: 0;
+  min-height: 92px;
+  display: grid;
+  align-content: start;
+}
+
+.wr-feedback-panel:empty { display: none; }
+
+.wr-feedback {
+  display: grid;
+  gap: 5px;
+  padding: 11px 14px;
+  border: 2px solid #dce9f6;
+  border-radius: 15px;
+  background: #fff;
+  color: #102b57;
+  line-height: 1.35;
+}
+
+.wr-feedback.is-wrong {
+  border-color: #f0caca;
+  background: #fff6f6;
+  color: #8d2020;
+}
+
+.wr-feedback.is-correct {
+  border-color: #b8ddf8;
+  background: #edf8ff;
+}
+
+.wr-feedback-title {
+  font: 900 20px/1.05 "Baloo 2", Nunito, sans-serif;
+}
+
+.wr-feedback-line { line-height: 1.4; }
+.wr-feedback-button { justify-self: start; margin-top: 3px; }
+
+.wr-round-complete,
+.wr-finished,
+.wr-loading {
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  text-align: center;
+}
+
+.wr-round-complete strong,
+.wr-finished strong {
+  color: #102b57;
+  font: 900 27px/1.05 "Baloo 2", Nunito, sans-serif;
+}
+
+.wr-meaning {
+  max-width: 680px;
+  line-height: 1.45;
+}
+
+.wr-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.wr-loading {
+  color: #667894;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+@media (max-height: 760px) and (min-width: 901px) {
+  .wr-page-card { gap: 7px 14px; padding: 8px 14px 10px; }
+  .wr-game-head { gap: 6px; padding: 8px 12px; }
+  .wr-stat { min-height: 48px; padding: 5px 8px; }
+  .wr-target-panel { min-height: 270px; }
+  .wr-letter-card { width: 52px; height: 52px; }
+}
+
+@media (max-width: 900px) {
+  .wr-page-card { grid-template-columns: 1fr; }
+  .wr-game-head,
+  .wr-target-panel,
+  .wr-question-panel,
+  .wr-feedback-panel { grid-column: 1; }
+  .wr-game-head { grid-row: 1; }
+  .wr-target-panel { grid-row: 2; min-height: 250px; }
+  .wr-question-panel { grid-row: 3; }
+  .wr-feedback-panel { grid-row: 4; }
+}
+
+@media (max-width: 700px) {
+  .wr-page-card { padding: 10px 12px 14px; }
+  .wr-game-head { padding: 10px 12px; }
+  .wr-stats { grid-template-columns: 1fr; }
+  .wr-target-panel { min-height: 220px; padding: 12px; }
+  .wr-letter-card { width: 48px; height: 48px; }
+  .wr-question { min-height: 58px; font-size: 27px; }
+  .wr-answer-form,
+  .wr-guess-form { flex-direction: column; }
+  .wr-answer-form button,
+  .wr-guess-form button { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wr-letter-front,
+  .wr-letter-back { transition: none; }
+}

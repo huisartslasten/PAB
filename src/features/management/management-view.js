@@ -2,7 +2,7 @@ import {
   getLessonSubvakGroups,
   normalizeLessonSubvak
 } from '../lessons/list-view-model.js';
-import { attachLessonDragSorting } from '../lessons/lesson-drag-sort.js';
+import { attachPacoTileSorting } from '../../components/paco-tile-sort.js';
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -78,10 +78,11 @@ export async function renderStudentLessons(container, management, { onEdit = nul
       ${getLessonSubvakGroups(group.lessons).map(subvak => `
         <section class="management-subvak" data-subvak-label="${escapeHtml(subvak.label)}">
           <h4>${subvak.key === '__geen_subvak__' ? '📚 ' : '📁 '}${escapeHtml(subvak.label)}</h4>
-          <div class="management-lessons-grid">
+          <div class="management-lessons-grid paco-tile-grid">
             ${subvak.lessons.map(lesson => `
-              <article class="management-lesson paco-lesson-card" draggable="true" data-lesson-id="${escapeHtml(lesson.id)}">
-                <div class="management-lesson-main">
+              <article class="management-lesson paco-lesson-card paco-tile" draggable="true" data-lesson-id="${escapeHtml(lesson.id)}" data-paco-tile-id="${escapeHtml(lesson.id)}">
+                <button type="button" class="paco-tile-drag-handle" aria-label="Les verplaatsen" draggable="true">⋮⋮</button>
+                <div class="management-lesson-main paco-tile-body">
                   <h3>${escapeHtml(lesson.title)}</h3>
                   <p>${escapeHtml(lesson.subject)}${lesson.subvak ? ` · ${escapeHtml(lesson.subvak)}` : ''}</p>
                 </div>
@@ -125,18 +126,20 @@ export async function renderStudentLessons(container, management, { onEdit = nul
     });
   });
 
-  attachLessonDragSorting(container, {
-    selector: '.management-lesson[data-lesson-id][draggable="true"]',
-    onOrderChange: async ({ sourceId, target }) => {
-      const sourceLesson = management.getScopedLessons().find(item => Number(item.id) === sourceId);
-      const subjectBlock = target.closest('.management-subject');
+  attachPacoTileSorting(container, {
+    selector: '.management-lesson[data-lesson-id][data-paco-tile-id][draggable="true"]',
+    gridSelector: '.management-lessons-grid',
+    dragHandleSelector: '.paco-tile-drag-handle',
+    onOrderChange: async ({ sourceId, targetGrid }) => {
+      const sourceLesson = management.getScopedLessons().find(item => Number(item.id) === Number(sourceId));
+      const subjectBlock = targetGrid?.closest('.management-subject');
       const subject = subjectBlock?.dataset.managementSubject;
       if (!subject) throw new Error('Lesson subject could not be determined.');
 
-      const targetSubvak = target.closest('.management-subvak')?.dataset.subvakLabel || 'Zonder subvak';
+      const targetSubvak = targetGrid.closest('.management-subvak')?.dataset.subvakLabel || 'Zonder subvak';
       const newSubvak = targetSubvak === 'Zonder subvak' ? '' : targetSubvak;
       if (normalizeLessonSubvak(sourceLesson?.subvak) !== normalizeLessonSubvak(newSubvak)) {
-        await management.moveLessonToSubvak(sourceId, newSubvak);
+        await management.moveLessonToSubvak(Number(sourceId), newSubvak);
       }
 
       await persistSubjectOrder(container, management, subject);
@@ -145,38 +148,6 @@ export async function renderStudentLessons(container, management, { onEdit = nul
       console.error('Management lesson reorder error:', error);
       await renderStudentLessons(container, management, { onEdit, onArchive, onDelete });
     }
-  });
-
-  container.querySelectorAll('.management-subvak').forEach(block => {
-    block.addEventListener('dragover', event => {
-      if (event.target.closest('.management-lesson')) return;
-      event.preventDefault();
-      event.dataTransfer.dropEffect = 'move';
-      block.classList.add('drop-active');
-    });
-    block.addEventListener('dragleave', event => {
-      if (block.contains(event.relatedTarget)) return;
-      block.classList.remove('drop-active');
-    });
-    block.addEventListener('drop', async event => {
-      if (event.target.closest('.management-lesson')) return;
-      event.preventDefault();
-      const sourceId = Number(event.dataTransfer.getData('text/plain'));
-      const source = container.querySelector(`[data-lesson-id="${sourceId}"]`);
-      const subjectBlock = block.closest('.management-subject');
-      const subject = subjectBlock?.dataset.managementSubject;
-      if (!source || !subject) return;
-      try {
-        const label = block.dataset.subvakLabel || 'Zonder subvak';
-        await management.moveLessonToSubvak(sourceId, label === 'Zonder subvak' ? '' : label);
-        block.querySelector('.management-lessons-grid').appendChild(source);
-        await persistSubjectOrder(container, management, subject);
-        await renderStudentLessons(container, management, { onEdit, onArchive, onDelete });
-      } catch (error) {
-        console.error('Management lesson subvak move error:', error);
-        await renderStudentLessons(container, management, { onEdit, onArchive, onDelete });
-      }
-    });
   });
 
   return groups;

@@ -34,6 +34,7 @@ function makeSupabaseLib(session = null) {
         }
       };
     },
+    rpc: async () => ({ data: [], error: null }),
     storage: {
       from() {
         return {};

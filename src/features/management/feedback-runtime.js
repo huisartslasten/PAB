@@ -1,6 +1,4 @@
-import { mountPacoPageTemplate } from '../../components/page-template.js';
-import { createPacoNavigation } from '../../components/page-navigation.js';
-import { buildViewUrl } from '../../core/view-context.js';
+import { createManagementShell } from './management-shell.js';
 import { renderFeedback } from './management-view.js';
 
 export function createFeedbackRuntime({
@@ -29,6 +27,7 @@ export function createFeedbackRuntime({
   feedbackSection.appendChild(feedbackList);
 
   const management = app.management;
+  const shell = createManagementShell({ app, templateMount, navigate, documentRef });
 
   async function refreshFeedback() {
     feedbackList.replaceChildren();
@@ -36,49 +35,19 @@ export function createFeedbackRuntime({
   }
 
   async function mount() {
-    const session = await app.initializeSession();
-    if (!session) {
-      window.location.href = 'auth.html';
-      return;
-    }
-
-    if (!app.auth.isParent) {
-      mountPacoPageTemplate({
-        mount: templateMount,
-        backLabel: '← Beheer',
-        backAction: () => navigate(buildViewUrl('management.html')),
-        greeting: 'PacoGO beheer ⚙️',
-        title: 'Feedback',
-        icon: '💬',
-        subtitle: 'Je hebt geen toegang tot Feedback.',
-        navigation: createPacoNavigation({
-          app,
-          active: 'feedback',
-          viewMode: 'management',
-          navigate
-        }),
-        content
-      });
-      state.textContent = 'Je hebt geen toegang tot Feedback.';
-      return;
-    }
-
-    mountPacoPageTemplate({
-      mount: templateMount,
-      backLabel: '← Beheer',
-      backAction: () => navigate(buildViewUrl('management.html')),
-      greeting: 'PacoGO beheer ⚙️',
+    const shellState = await shell.mount({
+      active: 'feedback',
+      viewMode: 'management',
       title: 'Feedback',
       icon: '💬',
       subtitle: 'Bekijk feedback die vanuit PacoGO is ingediend.',
-      navigation: createPacoNavigation({
-        app,
-        active: 'feedback',
-        viewMode: 'management',
-        navigate
-      }),
       content
     });
+
+    if (!shellState?.authorized) {
+      state.textContent = 'Je hebt geen toegang tot Feedback.';
+      return;
+    }
 
     try {
       await refreshFeedback();

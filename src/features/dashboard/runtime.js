@@ -1,8 +1,11 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
+import { createPacoTile, createPacoTileGrid } from '../../components/paco-tile.js';
+import { createActivityCardGrid } from '../../components/activity-card-grid.js';
 import { buildViewUrl } from '../../core/view-context.js';
 import { getDashboardSubjects, getDashboardSubjectIcon, getDashboardAgendaItems } from './view-model.js';
-import { listStudents } from '../students/students.js';
+import { listStudents } from '../../core/student-registry.js';
+import { buildAvailableChallenges, listChallengeDefinitions } from '../challenges/challenge-registry.js';
 
 export function createDashboardRuntime({ app, templateMount, chooserMount, context, documentRef = document, navigate } = {}) {
   if (!app) throw new TypeError('Dashboard runtime requires an app.');
@@ -10,9 +13,7 @@ export function createDashboardRuntime({ app, templateMount, chooserMount, conte
   if (typeof navigate !== 'function') throw new TypeError('Dashboard runtime requires a navigation owner.');
 
   const selectedStudent = context?.student || '';
-  if (!selectedStudent && !chooserMount) {
-    throw new TypeError('Dashboard chooser requires a chooser mount.');
-  }
+  if (!selectedStudent && !chooserMount) throw new TypeError('Dashboard chooser requires a chooser mount.');
 
   const content = documentRef.createElement('div');
   content.className = 'dashboard-page';
@@ -72,26 +73,69 @@ export function createDashboardRuntime({ app, templateMount, chooserMount, conte
     card.appendChild(list); return card;
   }
 
-  function render(records) {
+  function renderChallenges(availableChallenges, lessonMap) {
+    if (!availableChallenges.length) return null;
+    const card = documentRef.createElement('article'); card.className = 'dashboard-card dashboard-challenges-card';
+    const heading = documentRef.createElement('h2'); heading.textContent = '🏆 CHALLENGES'; card.appendChild(heading);
+    const intro = documentRef.createElement('p'); intro.className = 'dashboard-challenges-intro'; intro.textContent = 'Speciale uitdagingen die je hebt vrijgespeeld met je leerresultaten.'; card.appendChild(intro);
+
+    const items = availableChallenges.map(challenge => {
+      const unique = [];
+      challenge.unlockedLessons.forEach(lesson => { const key = String(lesson.id); if (!unique.includes(key)) unique.push(key); });
+      const names = unique.map(key => lessonMap.get(Number(key))).filter(Boolean).map(lesson => `${lesson.subject || 'Les'}${lesson.title ? ` — ${lesson.title}` : ''}`);
+      return {
+        ...challenge,
+        title: challenge.title,
+        actionLabel: 'START MILLIONAIRE →',
+        description: `${names.length > 1 ? `Vrijgespeeld: ${names.length} leergebieden.` : `Vrijgespeeld: ${names[0] || 'jouw leerstof'}.`} ${challenge.description}`
+      };
+    });
+
+    const grid = createActivityCardGrid({
+      items,
+      documentRef,
+      gridClassName: 'activity-card-grid dashboard-challenge-grid',
+      cardClassName: 'activity-card dashboard-challenge-card',
+      onOpen: challenge => navigate(buildViewUrl(challenge.route, { student: selectedStudent, mode: context.mode }))
+    });
+    card.appendChild(grid);
+    return card;
+  }
+
+  function render(records, availableChallenges = []) {
     content.replaceChildren();
     const lessons = app.mapLessons(records);
+    const lessonMap = new Map(lessons.map(lesson => [Number(lesson.id), lesson]));
     const subjects = getDashboardSubjects(lessons, selectedStudent);
     const agendaItems = getDashboardAgendaItems(app.agenda, 4);
     const main = documentRef.createElement('section'); main.className = 'dashboard-main';
-    main.appendChild(renderAgenda(agendaItems));
     const subjectsCard = documentRef.createElement('article'); subjectsCard.className = 'dashboard-card';
     const heading = documentRef.createElement('h2'); heading.textContent = 'Mijn vakken'; subjectsCard.appendChild(heading);
-    const subjectGrid = documentRef.createElement('div'); subjectGrid.className = 'subject-grid'; subjectGrid.style.marginTop = '15px';
+    const subjectGrid = createPacoTileGrid({ documentRef });
+    subjectGrid.style.marginTop = '15px';
     subjects.forEach(subject => {
-      const card = documentRef.createElement('button'); card.type = 'button'; card.className = 'paco-subject-card';
-      const icon = documentRef.createElement('div'); icon.className = 'subject-icon'; icon.textContent = getDashboardSubjectIcon(subject.label);
-      const title = documentRef.createElement('h3'); title.textContent = subject.label;
-      const count = subject.lessons.length; const meta = documentRef.createElement('p'); meta.textContent = `${count} ${count === 1 ? 'les' : 'lessen'} · Bekijk →`;
-      card.append(icon, title, meta); card.addEventListener('click', () => { const target = buildViewUrl('lessons.html', { student: selectedStudent, mode: context.mode }); target.searchParams.set('subject', subject.label); navigate(target); }); subjectGrid.appendChild(card);
+      const count = subject.lessons.length;
+      const tile = createPacoTile({
+        documentRef,
+        title: subject.label,
+        icon: getDashboardSubjectIcon(subject.label),
+        meta: `${count} ${count === 1 ? 'les' : 'lessen'}`,
+        actionLabel: 'Bekijk →',
+        onActivate: () => {
+          const target = buildViewUrl('lessons.html', { student: selectedStudent, mode: context.mode });
+          target.searchParams.set('subject', subject.label);
+          navigate(target);
+        }
+      });
+      subjectGrid.appendChild(tile);
     });
     if (!subjectGrid.children.length) { const empty = documentRef.createElement('div'); empty.className = 'dashboard-state'; empty.style.marginTop = '15px'; empty.textContent = `Nog geen actieve lessen voor ${selectedStudent}.`; subjectsCard.appendChild(empty); }
     else subjectsCard.appendChild(subjectGrid);
+
+    main.appendChild(renderAgenda(agendaItems));
     main.appendChild(subjectsCard);
+    const challenges = renderChallenges(availableChallenges, lessonMap);
+    if (challenges) main.appendChild(challenges);
     content.appendChild(main);
   }
 
@@ -100,8 +144,15 @@ export function createDashboardRuntime({ app, templateMount, chooserMount, conte
     if (chooserMount) chooserMount.replaceChildren();
     mountPacoPageTemplate({ mount: templateMount, greeting: `Hoi ${selectedStudent}! 🐶`, title: 'Dashboard', icon: '🏠', subtitle: 'Bekijk je vakken en wat er binnenkort aankomt.', navigation: createPacoNavigation({ app, active: 'dashboard', student: selectedStudent, viewMode: context.mode, navigate }), content });
     const state = documentRef.createElement('div'); state.className = 'dashboard-state'; state.textContent = 'Dashboard laden…'; content.appendChild(state);
-    try { const records = await app.loadLessons(); render(records); }
-    catch (error) { console.error('Dashboard page load error:', error); state.textContent = 'Het dashboard kon niet worden geladen.'; }
+    try {
+      const records = await app.loadLessons();
+      const lessons = app.mapLessons(records).filter(lesson => !lesson.archived && !lesson.deleted);
+      const unlockedChallenges = await Promise.all(listChallengeDefinitions().map(async challenge => {
+        const unlockedLessonIds = await app.challengeUnlock.listUnlockedLessonIds(selectedStudent, challenge.id);
+        return [challenge.id, lessons.filter(lesson => unlockedLessonIds.includes(Number(lesson.id)))];
+      }));
+      render(records, buildAvailableChallenges(new Map(unlockedChallenges)));
+    } catch (error) { console.error('Dashboard page load error:', error); state.textContent = 'Het dashboard kon niet worden geladen.'; }
   }
 
   return Object.freeze({ mount, render, renderStartPage, content });

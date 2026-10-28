@@ -17,3 +17,11 @@ test('Double or Nothing uses the canonical shell and remains openable without a 
   await expect(page.locator('.paco-template-main h1')).toHaveText('Double or Nothing');
   await expect(page.getByText('Geen les geselecteerd.')).toBeVisible();
 });
+
+test('Word Chase uses the canonical shell and remains openable without a lesson selection', async ({ page }) => {
+  await page.goto(`${baseUrl}/word-chase.html?student=Zyon`);
+  await expect(page.locator('.paco-template-hero')).toBeVisible();
+  await expect(page.locator('.paco-template-sidebar')).toBeVisible();
+  await expect(page.locator('.paco-template-main h1')).toHaveText('Word Chase');
+  await expect(page.getByText('Geen les geselecteerd.')).toBeVisible();
+});

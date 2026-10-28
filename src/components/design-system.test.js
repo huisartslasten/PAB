@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import { createPacoDropdown } from './design-system.js';
 
@@ -36,5 +37,20 @@ describe('createPacoDropdown', () => {
     dropdown.element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
 
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
+  });
+});
+
+describe('PacoGO button primitives', () => {
+  it('are owned by the Design System stylesheet', () => {
+    const css = fs.readFileSync(new URL('./design-system.css', import.meta.url), 'utf8');
+
+    expect(css).toContain('.paco-btn {');
+    expect(css).toContain('.paco-btn--primary');
+    expect(css).toContain('.paco-btn--secondary');
+    expect(css).toContain('.paco-btn--accent');
+    expect(css).toContain('.paco-btn--danger');
+    expect(css).toContain('.paco-btn--small');
+    expect(css).toContain('.paco-btn--large');
+    expect(css).toContain('.paco-btn--block');
   });
 });

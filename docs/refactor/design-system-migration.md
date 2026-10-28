@@ -1,6 +1,6 @@
 # PacoGO — Design System Migration Inventory
 
-Status: form control cutover implemented on TEST; full regression pending
+Status: form controls verified green on TEST; file/remove controls are next
 Branch: `refactor/professional-v1`
 
 ## Purpose
@@ -51,12 +51,23 @@ No fallback, bridge, duplicate owner, page-specific copy or temporary bypass was
 | Design tokens | Design System | Migrated |
 | Generic buttons | Design System | Migrated |
 | Generic cards | Design System | Migrated |
-| Form controls | Design System | **Implemented; verification pending** |
+| Form controls | Design System | **Migrated and verified green** |
 | File/remove controls | Page Template | Parked for next cutover |
 
 ## PAB Implementation Plan
 
-The form-control implementation is complete on TEST. The next step is full verification. After green verification, file/remove controls are the next Design System migration unit.
+The form-control implementation and full regression are complete on TEST. File/remove controls are the next Design System migration unit.
+
+The sequence remains:
+
+1. dropdown — migrated;
+2. design tokens — migrated;
+3. generic buttons — migrated;
+4. generic cards — migrated;
+5. form controls — migrated and verified green;
+6. file/remove controls — next.
+
+Each migration is direct and single-owner. No bridge or duplicate implementation is permitted.
 
 ## PAB Verification Gate
 
@@ -65,4 +76,8 @@ Source-level ownership checks are locked in `src/components/design-system.test.j
 - form-control primitives exist in Design System;
 - generic input/date/time/textarea/select styling no longer exists in Page Template.
 
-Final verification is the full PacoGO regression workflow on `refactor/professional-v1`.
+The full PacoGO regression workflow on `refactor/professional-v1` passed for the form-control cutover.
+
+## Next architecture gate
+
+Before touching file/remove controls, inventory their current selectors and consumers separately. Do not absorb `.paco-template-file-button`, `.paco-template-file-input` or `.paco-template-remove-button` into the generic form-control migration merely because they are visually related; their ownership must be decided as the next migration unit.

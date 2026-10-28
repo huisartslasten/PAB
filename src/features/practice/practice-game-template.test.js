@@ -5,10 +5,11 @@ function createDocument() {
 }
 
 describe('practice game template', () => {
-  test('provides the canonical rookie/goat difficulty selector', () => {
+  test('provides the canonical noob/goat difficulty selector', () => {
     const { element, dropdown } = createPracticeGameTemplate({ documentRef: createDocument() });
 
     expect(PRACTICE_DIFFICULTIES.map(option => option.value)).toEqual(['rookie', 'goat']);
+    expect(PRACTICE_DIFFICULTIES.map(option => option.label)).toEqual(['NOOB', 'GOAT']);
     expect(element.querySelector('.practice-game-header')).not.toBeNull();
     expect(element.querySelector('.practice-game-stats')).not.toBeNull();
     expect(element.querySelector('.practice-game-area')).not.toBeNull();

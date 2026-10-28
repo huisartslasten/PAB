@@ -1,6 +1,6 @@
 # PacoGO — Design System Migration Inventory
 
-Status: dropdown cutover completed; remaining primitives parked pending consumer inventory
+Status: generic card cutover implemented on TEST; full regression pending
 Branch: `refactor/professional-v1`
 
 ## Purpose
@@ -31,36 +31,46 @@ Test branch: `refactor/professional-v1`.
 
 ### 2. Current implementation
 
-The first migrated primitive is the shared PacoGO dropdown. Its canonical owner is now the Design System. Page Template no longer exports or implements `createPacoDropdown()`.
+The migrated primitives are now owned by the Design System:
 
-The Design System currently contains:
+- dropdown runtime and styling in `src/components/design-system.js` / `src/components/design-system.css`;
+- generic button primitives in `src/components/design-system.css`;
+- generic card surface in `src/components/design-system.css`.
 
-- `createPacoDropdown()` in `src/components/design-system.js`;
-- dropdown styling in `src/components/design-system.css`.
+The generic card was previously styled by `src/components/page-template.css` through `.card` and `.paco-template-card`. Those generic card rules were removed from Page Template and moved to the Design System.
 
-`src/components/page-template.css` loads the Design System stylesheet so existing page-template consumers receive the same visual styling without introducing feature-specific imports.
+`src/components/page-template.css` loads the Design System stylesheet so existing page-template consumers receive the shared primitive without feature-specific imports.
 
 ### 3. Shared consumers
 
-The confirmed runtime consumer for the dropdown is:
+Confirmed consumers for the card cutover include:
 
-- `src/features/practice/memory/view.js` — imports `createPacoDropdown()` directly from the Design System and uses it for the Memory timing selector.
+- existing page-template `.card` consumers, which continue to use the canonical `.card` primitive now owned by the Design System;
+- `src/components/activity-card-grid.js`, where activity cards now compose `.card` with `.activity-card`.
 
-The previous attempted cutover had missed this consumer because the current implementation lives under `src/features/practice/memory`, not the older lessons location.
+Activity-card layout, icon treatment, content hierarchy and interaction remain owned by `activity-card-grid`; only the generic card surface is shared.
 
 ### 4. Architectural destination
 
-The Design System owns generic visual primitives. Page Template remains responsible for page composition and shell structure.
+The Design System owns the generic card surface: padding, border, radius, background, text color, shadow and generic card content defaults.
 
-Concrete components such as `PacoTile`, activity cards, navigation, editor controls and management-specific UI remain their own component/feature responsibilities and are not converted into generic Design System primitives merely because they are visual.
+Concrete components remain their own owners. In particular:
+
+- `PacoTile` remains tile/domain-specific;
+- `activity-card-grid` remains activity-card-specific and composes the generic card;
+- management student cards remain management-specific because their blue surface and layout are domain-specific;
+- navigation, editor controls and other feature UI are not converted merely because they are visually card-like.
 
 ### 5. Legacy/local implementation removed
 
-For the dropdown cutover:
+For the generic card cutover:
 
-- `createPacoDropdown()` was removed from `src/components/page-template.js`;
-- `.paco-dropdown*` styling was removed from `src/components/page-template.css`;
-- no compatibility re-export remains in Page Template.
+- generic `.card` styling was removed from `src/components/page-template.css`;
+- unused `.paco-template-card` styling was removed from `src/components/page-template.css`;
+- the canonical `.card` styling now lives in `src/components/design-system.css`;
+- activity cards now explicitly compose the canonical `.card` primitive.
+
+No second card runtime or local generic-card implementation was introduced.
 
 ### 6. Patchwork check
 
@@ -70,8 +80,10 @@ The migration introduces no:
 - fallback import;
 - duplicate runtime implementation;
 - bridge between old and new owners;
-- page-specific copy;
+- page-specific generic-card copy;
 - temporary redirect or bypass.
+
+The feature-specific activity-card rules are retained only where they express activity-card behavior/layout rather than generic card styling.
 
 ## Migration rule
 
@@ -89,40 +101,41 @@ For each shared UI responsibility:
 
 | Responsibility | Current canonical owner | Consumer inventory | Status |
 |---|---|---|---|
-| Dropdown | Design System | Memory runtime + Design System tests | **Migrated; verification pending** |
-| Generic buttons | `src/components/page-template.css` | Not yet complete | Parked |
-| Generic cards | `src/components/page-template.css` | Not yet complete | Parked |
+| Dropdown | Design System | Memory runtime + Design System tests | **Migrated** |
+| Design tokens | Design System | shared visual consumers | **Migrated** |
+| Generic buttons | Design System | shared button consumers + Design System tests | **Migrated** |
+| Generic cards | Design System | page-template `.card` consumers + activity cards + Design System tests | **Implemented; verification pending** |
 | Form controls | `src/components/page-template.css` | Not yet complete | Parked |
 | File/remove controls | `src/components/page-template.css` | Not yet complete | Parked |
-| Design tokens | `src/components/page-template.css` | Not yet complete | Parked |
 
 ## PAB Implementation Plan
 
-The next implementation unit is the verification of the dropdown cutover. Once the full regression is green, continue with the next primitive only after its TEST-branch consumer inventory is complete.
+The card implementation unit is complete on TEST and is ready for verification.
 
 The order remains:
 
 1. dropdown — migrated;
-2. design tokens;
-3. generic buttons;
-4. generic cards;
-5. form controls;
-6. file/remove controls.
+2. design tokens — migrated;
+3. generic buttons — migrated;
+4. generic cards — implemented; verify now;
+5. form controls — next after green verification;
+6. file/remove controls — later.
 
 Each migration is direct and single-owner. No bridge or duplicate implementation is permitted.
 
 ## PAB Verification Gate
 
-For the dropdown cutover, the source-level architecture checks are complete:
+Source-level checks prepared for the card cutover:
 
-- Memory imports the new Design System owner;
-- Page Template no longer exports `createPacoDropdown()`;
-- dropdown styling no longer resides in `page-template.css`;
-- the Design System has dedicated runtime and stylesheet ownership;
-- dedicated dropdown tests were added.
+- generic card styling exists in `src/components/design-system.css`;
+- generic card styling no longer resides in `src/components/page-template.css`;
+- activity cards compose `.card` with `.activity-card`;
+- activity-card-specific layout remains in `activity-card-grid.css`;
+- dedicated Design System card ownership test was added;
+- dedicated activity-card composition test was added.
 
-The repository's full-regression workflow is configured to run on pushes to `refactor/professional-v1`, but no workflow run is currently visible for the latest commit. Therefore the full regression is **not claimed green** yet.
+The final verification is the repository's full regression workflow on `refactor/professional-v1`. It must pass before this card cutover is considered green and before moving to form controls.
 
 ## Current decision
 
-The dropdown ownership migration is implemented on TEST and is the only primitive moved in this unit. The next step is verification. No further Design System primitive should be migrated until this cutover has a green full regression.
+Generic Cards are implemented on TEST with a single canonical Design System owner. The next step is the full verification run. No further Design System primitive should be migrated until this cutover has a green full regression.

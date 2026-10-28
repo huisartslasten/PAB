@@ -1,4 +1,5 @@
-import { mountPacoPageTemplate, createPacoDropdown } from '../../components/page-template.js';
+import { mountPacoPageTemplate } from '../../components/page-template.js';
+import { createPacoDropdown } from '../../components/design-system.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
 
 const OPERATION_LABELS = Object.freeze({ addition: 'Optellen', subtraction: 'Aftrekken', multiplication: 'Vermenigvuldigen', division: 'Delen', fraction: 'Breuken' });

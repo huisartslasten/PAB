@@ -5,7 +5,7 @@
  * area and domain behavior; the surrounding practice layout stays shared.
  */
 
-import { createPacoDropdown } from '../../components/page-template.js';
+import { createPacoDropdown } from '../../components/design-system.js';
 
 export const PRACTICE_DIFFICULTIES = Object.freeze([
   Object.freeze({ value: 'rookie', label: 'ROOKIE' }),
@@ -56,7 +56,7 @@ export function createPracticeGameTemplate({
     statLabel.textContent = label;
     const statValue = documentRef.createElement('strong');
     statValue.textContent = value;
-    stat.append(statLabel, statValue);
+    statsElement.append(statLabel, statValue);
     statsElement.appendChild(stat);
   });
   header.appendChild(statsElement);

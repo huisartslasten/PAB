@@ -1,4 +1,4 @@
-import { createPacoDropdown } from '../../../components/page-template.js';
+import { createPacoDropdown } from '../../../components/design-system.js';
 import { schedulePacoTurn } from '../practice-game-template.js';
 
 const TILE_ASSETS = Object.freeze({

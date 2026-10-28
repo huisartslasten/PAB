@@ -4,18 +4,6 @@
 @import url("./design-system.css");
 
 :root {
-  --paco-blue: #1787f2;
-  --paco-blue-dark: #0d6fd4;
-  --paco-blue-soft: #eaf4ff;
-  --paco-yellow: #ffd84d;
-  --paco-yellow-hover: #ffcf24;
-  --paco-yellow-border: #f2c72e;
-  --paco-yellow-soft: #fff3b0;
-  --paco-yellow-soft-hover: #ffe98a;
-  --paco-text: #102b57;
-  --paco-muted: #667894;
-  --paco-border: #cfe3f3;
-  --paco-shadow: 0 8px 22px rgba(16, 43, 87, .09);
   --paco-sidebar-width: 235px;
   --paco-content-max: 1440px;
   --paco-lesson-bg: #fffdf0;

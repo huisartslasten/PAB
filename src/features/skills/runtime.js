@@ -1,4 +1,5 @@
-import { createPacoDropdown, mountPacoPageTemplate } from '../../components/page-template.js';
+import { createPacoDropdown } from '../../components/design-system.js';
+import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
 import { createPacoTile, createPacoTileGrid } from '../../components/paco-tile.js';
 import { buildViewUrl } from '../../core/view-context.js';

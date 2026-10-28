@@ -45,77 +45,26 @@ De architectuur-roadmap is:
 
 ---
 
-## Wat er in deze chat is gedaan
-
-We zijn bezig met het afronden van het Design System als centrale owner van generieke visuele primitives.
-
-De eerste concrete migratie was de **PacoGO dropdown**.
-
-### Dropdown-migratie — afgerond
-
-De dropdown is rechtstreeks verhuisd naar het Design System:
-
-- `src/components/design-system.js` bevat `createPacoDropdown()`;
-- `src/components/design-system.css` bevat de `.paco-dropdown*` styling;
-- `src/components/page-template.js` implementeert/exporteert `createPacoDropdown()` niet meer;
-- `src/components/page-template.css` bevat de dropdown-styling niet meer en laadt het Design System stylesheet;
-- alle bekende runtime-consumers zijn rechtstreeks gemigreerd naar de Design System owner;
-- er is een Design System-test voor de dropdown;
-- de architecture boundary test controleert dat consumers niet terugvallen op `page-template.js` voor de dropdown.
-
-Belangrijk: er is **geen compatibility re-export, fallback, bridge, duplicate implementation, redirect of pagina-specifieke workaround** toegevoegd.
-
-De dropdown is dus geen tijdelijke migratie-oplossing; de Design System owner is daadwerkelijk de canonieke owner.
-
-## Belangrijke recente CI-les
-
-Tijdens deze migratie was CI eerst rood omdat nog niet alle directe consumers waren gemigreerd. Dat is inhoudelijk onderzocht en opgelost door de echte consumers naar de canonieke owner te migreren.
-
-Er is dus **niet** gekozen voor een re-export vanuit `page-template.js` om de tests snel groen te krijgen.
-
-De huidige status is volgens de laatste verificatie van de gebruiker: **CI groen**.
-
-Als CI later weer rood wordt:
-
-1. bepaal eerst exact welke architectuur- of regressiefout optreedt;
-2. zoek de werkelijke owner/consumer/root cause;
-3. los het architectonisch correct op;
-4. voeg nooit een workaround toe alleen om CI groen te maken;
-5. claim geen groene status zonder daadwerkelijke verificatie.
-
-Een groene test is nooit een reden om een ownershipprobleem te maskeren.
-
----
-
 ## Waar staan we nu binnen Design System?
 
-De dropdown is afgerond. **Design System zelf is nog niet afgerond.**
-
-De resterende Design System-verantwoordelijkheden moeten nog systematisch worden geïnventariseerd en, waar ze werkelijk generieke shared primitives zijn, centraal worden gemaakt.
-
-De huidige bekende inventaris is:
+De Design System-migratie is systematisch uitgevoerd voor de bekende generieke visuele primitives:
 
 | Primitive / verantwoordelijkheid | Status |
 |---|---|
 | Dropdown | ✅ Gemigreerd |
-| Design tokens | 🟡 Nog onderzoeken/migreren |
-| Generieke buttons | 🟡 Nog onderzoeken/migreren |
-| Generieke cards | 🟡 Nog onderzoeken/migreren |
-| Form controls | 🟡 Nog onderzoeken/migreren |
-| File/remove controls | 🟡 Nog onderzoeken/migreren |
+| Design tokens | ✅ Gemigreerd |
+| Generieke buttons | ✅ Gemigreerd |
+| Generieke cards | ✅ Gemigreerd |
+| Form controls | ✅ Gemigreerd en geverifieerd groen |
+| File/remove controls | ✅ Architecture gate afgerond; geen aparte migratie nodig |
 
-Dit is **geen opdracht om deze zes dingen blind één voor één te verplaatsen**.
+Dit betekent **niet** dat ieder visueel element automatisch Design System-owned wordt.
 
-Eerst moet per verantwoordelijkheid worden vastgesteld:
+De file/remove gate is bewust gesloten zonder nieuwe primitive: de actieve learning-material editor heeft eigen image-picker en remove/image-placement interactie in `src/features/learning-material/editor-page.js` en `src/features/learning-material/editor.css`. Dat is feature-owned composition en mag niet kunstmatig worden geëxtraheerd naar een generieke file/remove component.
 
-- is dit werkelijk een generieke Design System primitive?
-- wie is nu de canonical owner?
-- waar wordt het gebruikt?
-- welke concrete componenten hebben een eigen ownershipgrens?
-- welke bestaande styling/implementatie moet worden vervangen?
-- wat is de juiste architecturale bestemming?
+Generieke file-input presentation valt al onder het Design System form-control primitive. Generieke button presentation valt al onder de Design System button primitives. Feature-specifieke upload, image placement en deletion behavior blijven bij de learning-material feature owner.
 
-Een concreet component zoals een tile, activity card, lesson card, sidebar of dialog wordt niet automatisch Design System-owned omdat het visueel is. Het kan een eigen component owner houden en alleen Design System primitives/tokens consumeren.
+Dit voorkomt duplicate ownership en een kunstmatige abstraction layer.
 
 ---
 
@@ -160,13 +109,13 @@ Als de huidige architectuur de gewenste oplossing niet goed ondersteunt: **stop 
 
 ## Volgende concrete stap
 
-De volgende chat moet **niet zomaar de volgende primitive gaan verplaatsen**.
-
-Start met een gerichte **Design System consumer/ownership inventory** van de resterende generieke UI-verantwoordelijkheden, te beginnen met de bekende styling in `src/components/page-template.css` en de concrete consumers daarvan.
+Phase 1 item 4 is nog niet als geheel gesloten. De volgende stap is een gerichte **Design System consumer/ownership inventory** van de resterende generieke UI-verantwoordelijkheden, te beginnen met de actuele styling in `src/components/page-template.css` en de concrete consumers daarvan.
 
 Doel:
 
-> Vaststellen welke delen werkelijk generieke Design System primitives zijn en welke delen terecht bij Page Template, concrete components of features blijven.
+> Vaststellen welke resterende delen werkelijk generieke Design System primitives zijn en welke delen terecht bij Page Template, concrete components of features blijven.
+
+De eerste concrete kandidaat die zichtbaar blijft in Page Template is de legacy-achtige `button.secondary` / `button.success` styling. Deze mag niet blind worden vervangen: eerst consumers, ownership en overlap met de bestaande `.paco-btn*` primitives vaststellen.
 
 Daarna per gevonden responsibility:
 

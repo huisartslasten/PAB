@@ -53,7 +53,17 @@ test('shared components do not depend on data or feature layers', () => {
 });
 
 test('dropdown primitive is owned by the Design System', () => {
-  const violations = collectViolations('.', ['../components/page-template.js'])
-    .filter((entry) => entry.includes('createPacoDropdown'));
+  const root = SRC_ROOT;
+  const violations = [];
+  const importPattern = /import\s*\{[^}]*\bcreatePacoDropdown\b[^}]*\}\s*from\s*["']([^"']+\/components\/page-template\.js)["']/g;
+
+  for (const file of javascriptFiles(root)) {
+    const source = fs.readFileSync(file, 'utf8');
+    const relativeFile = path.relative(process.cwd(), file).replaceAll('\\', '/');
+    for (const match of source.matchAll(importPattern)) {
+      violations.push(`${relativeFile} -> ${match[1]}`);
+    }
+  }
+
   assert.deepEqual(violations, [], `Stale dropdown consumers:\n${violations.join('\n')}`);
 });

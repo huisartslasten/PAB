@@ -1,4 +1,4 @@
-import { createPacoDropdown } from '../../../components/page-template.js';
+import { createPacoDropdown } from '../../../components/design-system.js';
 import { mountPracticeGameHelp } from '../practice-game-help.js';
 
 function el(documentRef, tag, className = '') {

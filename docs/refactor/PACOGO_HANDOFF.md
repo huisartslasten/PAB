@@ -33,14 +33,16 @@ The user explicitly wants the work to continue with the same engineering discipl
 - `main` is LIVE and must not be modified during normal development.
 - TEST is the environment for development and manual validation.
 
-Current verified TEST head:
+Verification state:
 
-- SHA: `0f101482e735554805257739bfec058cbd533286`
+- Last verified **application-code** head: `0f101482e735554805257739bfec058cbd533286`
+- Current branch head after this documentation-only handoff update: `52f2f32a888af993ff49dbc9671a5c24b887145e`
 - Current readable TEST version: **V7.0**
-- Full regression: GitHub Actions run **#2262**, run ID `40737838219`
+- Full regression for the application-code head: GitHub Actions run **#2262**, run ID `40737838219`
 - Result: **success / green**
+- The handoff commits after that regression contain documentation only; they do not change application behavior.
 
-The latest green run covered the maintained Node regression, Vitest regression, Chromium/browser regression, architecture boundary checks and clean-tree verification.
+The latest green application regression covered the maintained Node regression, Vitest regression, Chromium/browser regression, architecture boundary checks and clean-tree verification.
 
 ---
 
@@ -181,8 +183,6 @@ The missing work is to define and enforce clean boundaries between generic visua
 ---
 
 ## Phase 2 — Content Architecture — NEXT
-
-**This is where the next chat must begin.**
 
 5. **Central Editor Framework**
 6. **Lesson Element Registry**
@@ -366,7 +366,7 @@ No data migration was introduced.
 
 ---
 
-# 5. Current visual/design observation — DO NOT TURN THIS INTO A SIDE-REFactor
+# 5. Current visual/design observation — DO NOT TURN THIS INTO A SIDE-REFACTOR
 
 During manual testing the user noticed that some ordinary pages currently place dark text directly on the blue page canvas, while the LIVE version of `Mijn vakken` has a more layered visual composition.
 
@@ -607,11 +607,13 @@ The architecture must be understood first.
 
 **Phase 1 is closed and green.**
 
-The current TEST branch is stable at:
+The last verified application-code head is:
 
 `0f101482e735554805257739bfec058cbd533286`
 
-Full regression #2262 is green.
+The current branch contains only the subsequent documentation handoff commit(s) on top of that verified application state.
+
+Full regression #2262 is green for the application-code head.
 
 The four manual findings from the final Phase 1 test pass were resolved centrally.
 

@@ -24,6 +24,12 @@ describe('createPacoDropdown', () => {
     dropdown.element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
   });
+
+  it('keeps dropdown menus hidden until the dropdown is open', () => {
+    const css = fs.readFileSync(new URL('./design-system.css', import.meta.url), 'utf8');
+    expect(css).toContain('.paco-dropdown-menu { display:none;');
+    expect(css).toContain('.paco-dropdown.open .paco-dropdown-menu { display:block; }');
+  });
 });
 
 describe('PacoGO button primitives', () => {

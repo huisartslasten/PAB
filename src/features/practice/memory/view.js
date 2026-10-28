@@ -1,4 +1,4 @@
-import { createPacoDropdown } from '../../../components/page-template.js';
+import { createPacoDropdown } from '../../../components/design-system.js';
 
 const MEMORY_CARD_BACK_IMAGE = new URL('./paco memory.png', import.meta.url).href;
 

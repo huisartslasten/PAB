@@ -1,4 +1,4 @@
-import { createPacoDropdown } from '../../../components/page-template.js';
+import { createPacoDropdown } from '../../../components/design-system.js';
 
 function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
 

@@ -1,4 +1,4 @@
-import { createPacoDropdown } from '../../../components/page-template.js';
+import { createPacoDropdown } from '../../../components/design-system.js';
 
 export function createFlashView({ documentRef = globalThis.document, escapeHtml } = {}) {
   if (!documentRef) throw new Error('A document is required.');

@@ -157,11 +157,7 @@ export function createSkillsRuntime({ app, templateMount, context, skillId = '',
     const catalog = documentRef.createElement('section'); catalog.className = 'paco-template-card skill-management-catalog';
     const toolbar = documentRef.createElement('div'); toolbar.className = 'skill-management-toolbar';
     const title = documentRef.createElement('div'); const heading = documentRef.createElement('h2'); heading.textContent = 'Skills'; const subtitle = documentRef.createElement('p'); subtitle.textContent = 'Beheer Skills met dezelfde centrale beheeracties als lessen en leerstof.'; title.append(heading, subtitle);
-    const create = documentRef.createElement('button'); create.type = 'button'; create.className = 'success'; create.textContent = '➕ Skill maken'; create.addEventListener('click', () => {
-      const capability = app.managementCapabilities.getAvailableForPage({ page: 'skills', student }).find(item => item.id === 'skill.create');
-      if (capability?.target) navigate(capability.target, { managementCapability: capability.id });
-    });
-    toolbar.append(title, create); catalog.appendChild(toolbar);
+    toolbar.append(title); catalog.appendChild(toolbar);
 
     const groups = new Map();
     skills.filter(skill => !skill.archivedAt && !skill.trashedAt).forEach(skill => { const category = skill.category || 'other'; if (!groups.has(category)) groups.set(category, []); groups.get(category).push(skill); });

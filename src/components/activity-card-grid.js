@@ -5,7 +5,7 @@ export function createActivityCardGrid({ items = [], documentRef = document, onO
   (Array.isArray(items) ? items : []).forEach(item => {
     const card = documentRef.createElement('button');
     card.type = 'button';
-    card.className = cardClassName;
+    card.className = ['card', cardClassName].filter(Boolean).join(' ');
 
     const body = documentRef.createElement('div');
     const icon = documentRef.createElement('div');

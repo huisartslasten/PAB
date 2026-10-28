@@ -54,3 +54,17 @@ describe('PacoGO button primitives', () => {
     expect(css).toContain('.paco-btn--block');
   });
 });
+
+describe('PacoGO card primitive', () => {
+  it('is owned by the Design System stylesheet and not the Page Template stylesheet', () => {
+    const designSystemCss = fs.readFileSync(new URL('./design-system.css', import.meta.url), 'utf8');
+    const pageTemplateCss = fs.readFileSync(new URL('./page-template.css', import.meta.url), 'utf8');
+
+    expect(designSystemCss).toContain('.card {');
+    expect(designSystemCss).toContain('.card h2');
+    expect(designSystemCss).toContain('.card label');
+    expect(designSystemCss).toContain('.card .small');
+    expect(pageTemplateCss).not.toContain('.paco-page-template .card');
+    expect(pageTemplateCss).not.toContain('.paco-template-card');
+  });
+});

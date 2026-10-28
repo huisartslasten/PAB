@@ -14,6 +14,35 @@
 }
 
 /*
+ * PacoGO Design System — Cards
+ *
+ * Canonical owner for the generic card surface. Feature components compose
+ * this primitive and keep their own domain-specific layout and behavior.
+ */
+.card {
+  padding: 20px 22px;
+  border: 1px solid var(--paco-border);
+  border-radius: 22px;
+  background: #fff;
+  color: var(--paco-text);
+  box-shadow: var(--paco-shadow);
+}
+
+.card h2,
+.card h3,
+.card h4 {
+  color: var(--paco-text);
+}
+
+.card label {
+  color: var(--paco-text);
+}
+
+.card .small {
+  color: var(--paco-muted);
+}
+
+/*
  * PacoGO Design System — Buttons
  *
  * Canonical owner for generic button primitives. Feature components may

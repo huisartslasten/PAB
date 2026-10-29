@@ -1,6 +1,7 @@
 import { mountPacoPageTemplate } from '../../../components/page-template.js';
 import { createPacoNavigation } from '../../../components/page-navigation.js';
 import { createLessonContextField } from '../../lessons/lesson-context-view.js';
+import { createPracticeGameTemplate } from '../practice-game-template.js';
 import { createFlashRuntime } from './runtime.js';
 import { createFlashView } from './view.js';
 import { buildViewUrl } from '../../../core/view-context.js';
@@ -13,10 +14,20 @@ export function createFlashPageRuntime({ app, templateMount, context, lessonId =
   const student = context?.student || '';
   const content = documentRef.createElement('div');
   const view = createFlashView({ documentRef, escapeHtml });
-  const gameShell = documentRef.createElement('main');
-  gameShell.className = 'practice-page-card flash-game-shell';
-  gameShell.innerHTML = '<div class="flash-head"><h1 class="flash-title">⚡ FLASH</h1><div class="flash-stats"><div class="flash-stat"><span class="flash-stat-label">Score</span><span id="flashScore" class="flash-stat-value">0</span></div><div class="flash-stat"><span class="flash-stat-label">Maximum</span><span id="flashMaximum" class="flash-stat-value">0</span></div><div class="flash-stat"><span class="flash-stat-label">High score</span><span id="flashHighScore" class="flash-stat-value">0</span></div></div></div><div id="flashProgress" class="practice-progress"></div><div id="flashContent" class="practice-content flash-content"></div>';
-  content.appendChild(gameShell);
+  const gameArea = documentRef.createElement('div');
+  gameArea.innerHTML = '<div id="flashProgress" class="practice-progress"></div><div id="flashContent" class="practice-content flash-content"></div>';
+  const gameTemplate = createPracticeGameTemplate({
+    documentRef,
+    className: 'flash-game-template',
+    showDifficulty: false,
+    stats: [
+      { id: 'score', label: 'Score', value: '0' },
+      { id: 'maximum', label: 'Maximum', value: '0' },
+      { id: 'highScore', label: 'High score', value: '0' }
+    ],
+    gameArea
+  });
+  content.appendChild(gameTemplate.element);
 
   const goGames = () => {
     const target = buildViewUrl('games.html', { student, mode: context?.mode });
@@ -30,7 +41,7 @@ export function createFlashPageRuntime({ app, templateMount, context, lessonId =
     const lesson = app.mapLessons(records).find(item => String(item.id) === String(lessonId));
     if (!lesson) throw new Error('Deze les kon niet worden gevonden.');
     const contextField = createLessonContextField(lesson, { documentRef });
-    content.insertBefore(contextField, gameShell);
+    content.insertBefore(contextField, gameTemplate.element);
     const items = Array.isArray(lesson.lesson_items) ? lesson.lesson_items : Array.isArray(lesson.items) ? lesson.items : [];
     const runtime = createFlashRuntime({ items });
     let highScore = await app.gameResults.getHighScore({ gameKey: 'flash_question', lessonId, student });
@@ -83,7 +94,7 @@ export function createFlashPageRuntime({ app, templateMount, context, lessonId =
       if (timingMode !== 'manual') {
         let secondsLeft = Number(timingMode);
         const updateTimer = () => {
-          const timer = documentRef.querySelector('.flash-timer');
+          const timer = gameTemplate.element.querySelector('.flash-timer');
           if (timer) timer.textContent = `${secondsLeft} ${secondsLeft === 1 ? 'seconde' : 'seconden'}`;
         };
         updateTimer();
@@ -135,7 +146,7 @@ export function createFlashPageRuntime({ app, templateMount, context, lessonId =
       const node = documentRef.createElement('div');
       node.className = 'practice-content';
       node.innerHTML = `<strong>Flash kon niet worden geladen.</strong><p class="small">${escapeHtml(error?.message || 'Onbekende fout.')}</p>`;
-      gameShell.replaceChildren(node);
+      gameTemplate.element.replaceChildren(node);
     }
   }
 

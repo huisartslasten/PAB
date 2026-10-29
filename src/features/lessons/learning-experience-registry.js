@@ -31,7 +31,7 @@ const PRACTICE_MODE_IDS = Object.freeze(Object.keys(PRACTICE_MODE_DEFINITIONS));
 const CAPABILITY_MATRIX = Object.freeze({
   'dictation:words': Object.freeze(['dictation', 'flashcards', 'memory', 'practice-test', 'games']),
   'dictation:sentences': Object.freeze(['dictation', 'flashcards', 'memory', 'practice-test']),
-  'words:words': Object.freeze(['flashcards', 'memory', 'practice-test', 'games']),
+  'words:words': Object.freeze(['flashcards', 'practice-test', 'games']),
   'questions:questions': Object.freeze(['flashcards', 'practice-test']),
   'math:math': Object.freeze(['flashcards', 'practice-test']),
   'spelling:spelling': Object.freeze(['flashcards', 'practice-test']),
@@ -80,6 +80,23 @@ export function getPracticeModesForLesson({ lessonType = '', contentKind = '' } 
       .map(candidate => getPracticeModeDefinition(candidate.id))
       .filter(Boolean)
   );
+}
+
+export function getPracticeSelectionCopy({ contentKind = '', hasMultipleContentKinds = false } = {}) {
+  const definition = getContentDefinition(contentKind);
+  if (hasMultipleContentKinds) {
+    return Object.freeze({
+      subtitle: 'Kies eerst WAT je wilt oefenen en daarna HOE.',
+      heading: 'WAT wil je oefenen?',
+      description: 'Kies eerst welk onderdeel van deze les je wilt oefenen.'
+    });
+  }
+
+  return Object.freeze({
+    subtitle: 'Kies de oefenvorm.',
+    heading: `HOE wil je ${definition?.label?.toLowerCase() || 'dit'} oefenen?`,
+    description: 'Kies de oefenvorm.'
+  });
 }
 
 export function isPracticeCapabilityAvailable({ lessonType, contentKind, mode } = {}) {

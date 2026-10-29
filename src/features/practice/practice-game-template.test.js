@@ -42,6 +42,18 @@ describe('practice game template', () => {
     expect(element.querySelector('.paco-dropdown-label').textContent).toBe('GOAT');
   });
 
+  test('can omit the shared difficulty control when a game has its own game-specific control', () => {
+    const { element, dropdown } = createPracticeGameTemplate({
+      documentRef: createDocument(),
+      showDifficulty: false,
+      controls: document.createElement('div')
+    });
+
+    expect(dropdown).toBeNull();
+    expect(element.querySelector('.practice-game-difficulty')).toBeNull();
+    expect(element.querySelector('.practice-game-controls')).not.toBeNull();
+  });
+
   test('supports game-specific content without changing the shell', () => {
     const gameArea = document.createElement('div');
     gameArea.textContent = 'LEXO';

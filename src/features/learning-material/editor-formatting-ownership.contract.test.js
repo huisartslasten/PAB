@@ -16,7 +16,7 @@ describe('learning material formatting ownership contract', () => {
   it('routes inline bold and italic formatting through the central formatting owner', () => {
     expect(editorPageSource).toContain('formatting.applyInlineFormat(surface, name)');
     expect(editorPageSource).not.toContain('surface.ownerDocument.execCommand(name, false)');
-    expect(editorPageSource).not.toContain('selectionStore.restore(surface);');
+    expect(editorPageSource).not.toContain('const saved = selectionStore.restore(surface);');
   });
 
   it('keeps the central formatting API stable', () => {

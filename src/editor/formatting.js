@@ -5,6 +5,47 @@ function normalizeFontSize(size, fallback = DEFAULT_FONT_SIZE) {
   return Number.isFinite(value) && value > 0 ? value : fallback;
 }
 
+function textNodes(fragment) {
+  const nodes = [];
+  const visit = node => {
+    if (node.nodeType === 3) {
+      if (String(node.textContent || '').replaceAll('\u200b', '').trim()) nodes.push(node);
+      return;
+    }
+    node.childNodes?.forEach(visit);
+  };
+  visit(fragment);
+  return nodes;
+}
+
+function hasAncestorTag(node, tagName) {
+  const expected = String(tagName).toUpperCase();
+  let current = node?.parentNode;
+  while (current) {
+    if (current.nodeType === 1 && current.tagName === expected) return true;
+    current = current.parentNode;
+  }
+  return false;
+}
+
+function unwrapTag(fragment, tagName) {
+  const expected = String(tagName).toUpperCase();
+  const elements = [];
+  const visit = node => {
+    if (node.nodeType === 1) {
+      if (node.tagName === expected) elements.push(node);
+      [...node.childNodes].forEach(visit);
+    }
+  };
+  visit(fragment);
+  elements.forEach(element => {
+    const parent = element.parentNode;
+    if (!parent) return;
+    while (element.firstChild) parent.insertBefore(element.firstChild, element);
+    element.remove();
+  });
+}
+
 export function createEditorFormatting({ selectionStore, defaultFontSize = DEFAULT_FONT_SIZE } = {}) {
   if (!selectionStore || typeof selectionStore.restore !== 'function' || typeof selectionStore.remember !== 'function') {
     throw new TypeError('Editor formatting requires a selection store.');
@@ -68,20 +109,47 @@ export function createEditorFormatting({ selectionStore, defaultFontSize = DEFAU
 
   function applyInlineFormat(surface, command) {
     const name = String(command || '').trim().toLowerCase();
-    if (!['bold', 'italic'].includes(name) || !surface?.ownerDocument) return false;
+    const tagName = name === 'bold' ? 'strong' : name === 'italic' ? 'em' : '';
+    if (!tagName || !surface?.ownerDocument) return false;
 
     const range = selectionStore.restore(surface);
     if (!range || range.collapsed || !surface.contains(range.commonAncestorContainer)) return false;
 
-    const selection = surface.ownerDocument.getSelection?.();
-    if (!selection) return false;
-    selection.removeAllRanges();
-    selection.addRange(range.cloneRange());
+    const fragment = range.cloneContents();
+    const nodes = textNodes(fragment);
+    if (!nodes.length) return false;
+    const alreadyFormatted = nodes.every(node => hasAncestorTag(node, tagName));
 
-    const applied = surface.ownerDocument.execCommand(name, false);
+    const selected = range.extractContents();
+    if (alreadyFormatted) {
+      unwrapTag(selected, tagName);
+    } else {
+      const wrapper = surface.ownerDocument.createElement(tagName);
+      wrapper.appendChild(selected);
+      const replacement = surface.ownerDocument.createDocumentFragment();
+      replacement.appendChild(wrapper);
+      range.insertNode(replacement);
+      const next = surface.ownerDocument.createRange();
+      next.selectNodeContents(wrapper);
+      const selection = surface.ownerDocument.getSelection?.();
+      if (selection) {
+        selection.removeAllRanges();
+        selection.addRange(next.cloneRange());
+      }
+      selectionStore.remember(surface);
+      surface.focus?.();
+      return true;
+    }
+
+    range.insertNode(selected);
+    const selection = surface.ownerDocument.getSelection?.();
+    if (selection) {
+      selection.removeAllRanges();
+      selection.addRange(range.cloneRange());
+    }
     selectionStore.remember(surface);
     surface.focus?.();
-    return applied !== false;
+    return true;
   }
 
   return Object.freeze({

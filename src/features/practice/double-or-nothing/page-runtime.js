@@ -63,7 +63,7 @@ export function createDoubleOrNothingPageRuntime({ app, templateMount, context, 
     });
 
     let highScore = await app.gameResults.getHighScore({
-      gameKey: 'double_or_nothing',
+      gameKey: 'double-or-nothing',
       lessonId,
       student
     });
@@ -77,7 +77,7 @@ export function createDoubleOrNothingPageRuntime({ app, templateMount, context, 
       const normalizedScore = Math.max(0, Math.floor(Number(score) || 0));
       if (normalizedScore <= highScore) return;
       await app.gameResults.saveResult({
-        gameKey: 'double_or_nothing',
+        gameKey: 'double-or-nothing',
         lessonId,
         student,
         score: normalizedScore

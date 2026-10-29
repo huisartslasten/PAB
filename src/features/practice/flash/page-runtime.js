@@ -13,7 +13,6 @@ export function createFlashPageRuntime({ app, templateMount, context, lessonId =
   if (typeof navigate !== 'function') throw new TypeError('Flash runtime requires a navigation owner.');
   const student = context?.student || '';
   const content = documentRef.createElement('div');
-  const view = createFlashView({ documentRef, escapeHtml });
   const gameArea = documentRef.createElement('div');
   gameArea.innerHTML = '<div id="flashProgress" class="practice-progress"></div><div id="flashContent" class="practice-content flash-content"></div>';
   const gameTemplate = createPracticeGameTemplate({
@@ -27,6 +26,7 @@ export function createFlashPageRuntime({ app, templateMount, context, lessonId =
     ],
     gameArea
   });
+  const view = createFlashView({ documentRef, escapeHtml, root: gameTemplate.element });
   content.appendChild(gameTemplate.element);
 
   const goGames = () => {

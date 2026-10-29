@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { getPracticeModesForLesson } from '../src/features/lessons/learning-experience-registry.js';
+import { getPracticeModesForLesson, getPracticeSelectionCopy } from '../src/features/lessons/learning-experience-registry.js';
 import { createFlashcardSession, getCurrentFlashcard, nextFlashcard, revealFlashcard } from '../src/features/practice/flashcards/flashcard-domain.js';
 
 test('practice structure exposes the canonical active practice modes', () => {
@@ -11,6 +11,26 @@ test('practice structure exposes the canonical active practice modes', () => {
     { id: 'practice-test', label: 'Oefentoets', description: 'Maak een oefentoets met deze lesstof.' },
     { id: 'games', label: 'Spelletjes', description: 'Oefen de les spelenderwijs.' }
   ]);
+
+  assert.deepEqual(getPracticeModesForLesson({ lessonType: 'words', contentKind: 'words' }), [
+    { id: 'flashcards', label: 'Flashcards', description: 'Oefen vraag en antwoord met kaarten.' },
+    { id: 'practice-test', label: 'Oefentoets', description: 'Maak een oefentoets met deze lesstof.' },
+    { id: 'games', label: 'Spelletjes', description: 'Oefen de les spelenderwijs.' }
+  ]);
+});
+
+test('practice selection copy is owned by the experience registry', () => {
+  assert.deepEqual(getPracticeSelectionCopy({ contentKind: 'words', hasMultipleContentKinds: false }), {
+    subtitle: 'Kies de oefenvorm.',
+    heading: 'HOE wil je woorden oefenen?',
+    description: 'Kies de oefenvorm.'
+  });
+
+  assert.deepEqual(getPracticeSelectionCopy({ hasMultipleContentKinds: true }), {
+    subtitle: 'Kies eerst WAT je wilt oefenen en daarna HOE.',
+    heading: 'WAT wil je oefenen?',
+    description: 'Kies eerst welk onderdeel van deze les je wilt oefenen.'
+  });
 });
 
 test('flashcard session starts with the question hidden answer', () => {

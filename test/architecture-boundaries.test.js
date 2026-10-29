@@ -4,6 +4,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 const SRC_ROOT = path.resolve('src');
+const REPO_ROOT = path.resolve('.');
 
 function javascriptFiles(root) {
   const files = [];
@@ -68,21 +69,20 @@ test('dropdown primitive is owned by the Design System', () => {
   assert.deepEqual(violations, [], `Stale dropdown consumers:\n${violations.join('\n')}`);
 });
 
-test('canonical shared owners exist exactly once', () => {
-  const ownership = [
-    ['agenda runtime', 'src/features/agenda/runtime.js'],
-    ['practice test runtime', 'src/features/practice/practice-test-runtime.js'],
-    ['practice presentation', 'src/features/lessons/practice-presentation.js'],
-    ['test runtime', 'src/features/lessons/test-runtime.js'],
-    ['test-history runtime', 'src/features/test-history/runtime.js'],
-    ['notification model', 'src/core/notification-model.js'],
+test('canonical owners do not have a second legacy owner', () => {
+  const forbiddenOwners = [
+    'test-history-storage.js',
+    'src/core/notification-model-v2.js',
+    'src/core/notification-model-101.js',
+    'tools/fix-editor-layout-v453.sh',
+    'tools/integrate-source-photo-v474.sh',
+    'tools/rebuild-editor-v468.sh',
+    'tools/rebuild-editor-v469.sh',
+    'tools/rebuild-editor-v470.sh',
+    'tools/rebuild-editor-v471.sh',
+    'tools/restore-v476-editor-styles.sh',
   ];
 
-  const allFiles = javascriptFiles(SRC_ROOT);
-  for (const [name, canonicalPath] of ownership) {
-    const canonicalFile = path.resolve(canonicalPath);
-    assert.equal(fs.existsSync(canonicalFile), true, `Missing canonical owner for ${name}: ${canonicalPath}`);
-    const matches = allFiles.filter((file) => file === canonicalFile);
-    assert.equal(matches.length, 1, `Canonical owner for ${name} must exist exactly once: ${canonicalPath}`);
-  }
+  const present = forbiddenOwners.filter((relativePath) => fs.existsSync(path.join(REPO_ROOT, relativePath)));
+  assert.deepEqual(present, [], `Forbidden duplicate/legacy owners detected:\n${present.join('\n')}`);
 });

@@ -5,12 +5,14 @@ export function createActivityCardGrid({ items = [], documentRef = document, onO
   (Array.isArray(items) ? items : []).forEach(item => {
     const card = documentRef.createElement('button');
     card.type = 'button';
-    card.className = ['card', cardClassName].filter(Boolean).join(' ');
+    card.className = ['card', cardClassName, item.locked ? 'is-locked' : ''].filter(Boolean).join(' ');
+    card.disabled = item.locked === true;
+    if (item.locked) card.setAttribute('aria-disabled', 'true');
 
     const body = documentRef.createElement('div');
     const icon = documentRef.createElement('div');
     icon.className = 'activity-card-icon';
-    icon.textContent = item.icon || '';
+    icon.textContent = item.locked ? '🔒' : (item.icon || '');
 
     const title = documentRef.createElement('h2');
     title.textContent = item.title || item.label || '';
@@ -25,7 +27,7 @@ export function createActivityCardGrid({ items = [], documentRef = document, onO
     action.textContent = item.actionLabel || actionLabel;
 
     card.append(body, action);
-    if (typeof onOpen === 'function') card.addEventListener('click', () => onOpen(item));
+    if (!item.locked && typeof onOpen === 'function') card.addEventListener('click', () => onOpen(item));
     grid.appendChild(card);
   });
 

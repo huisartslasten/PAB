@@ -139,6 +139,22 @@ export function createPracticeMenuRuntime({ app, templateMount, context, lessonI
   }
 
   async function mount() {
+    let initialLesson = null;
+    if (lessonId && student) {
+      try {
+        const records = await app.loadLessons();
+        initialLesson = app.mapLessons(records).find(item => String(item.id) === String(lessonId)) || null;
+      } catch (error) {
+        console.error('Practice menu load error:', error);
+      }
+    }
+
+    const initialContentKinds = initialLesson ? getLessonContentKinds(initialLesson) : [];
+    const subtitle = getPracticeSelectionCopy({
+      contentKind: initialContentKinds.length === 1 ? initialContentKinds[0] : '',
+      hasMultipleContentKinds: initialContentKinds.length > 1
+    }).subtitle;
+
     mountPacoPageTemplate({
       mount: templateMount,
       backLabel: '← Leskeuze',
@@ -146,18 +162,12 @@ export function createPracticeMenuRuntime({ app, templateMount, context, lessonI
       greeting: `Hoi ${student}! 🐶`,
       title: 'Oefenen',
       icon: '✏️',
-      subtitle: 'Kies eerst WAT je wilt oefenen en daarna HOE.',
+      subtitle,
       navigation: createPacoNavigation({ app, active: 'practice', student, viewMode: context?.mode, navigate }),
       content
     });
-    if (!lessonId || !student) { render(null); return; }
-    try {
-      const records = await app.loadLessons();
-      render(app.mapLessons(records).find(item => String(item.id) === String(lessonId)) || null);
-    } catch (error) {
-      console.error('Practice menu load error:', error);
-      render(null);
-    }
+
+    render(initialLesson);
   }
 
   return Object.freeze({ mount, content });

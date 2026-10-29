@@ -37,6 +37,7 @@ export function createPracticeGameTemplate({
   difficulty = 'rookie',
   difficultyOptions = PRACTICE_DIFFICULTIES,
   onDifficultyChange = null,
+  showDifficulty = true,
   gameArea = null,
   exercise = null,
   feedback = null,
@@ -67,21 +68,24 @@ export function createPracticeGameTemplate({
   const controlBar = documentRef.createElement('div');
   controlBar.className = 'practice-game-controls';
 
-  const difficultyLabel = documentRef.createElement('span');
-  difficultyLabel.className = 'practice-game-control-label';
-  difficultyLabel.textContent = 'Niveau';
-  controlBar.appendChild(difficultyLabel);
+  let dropdown = null;
+  if (showDifficulty) {
+    const difficultyLabel = documentRef.createElement('span');
+    difficultyLabel.className = 'practice-game-control-label';
+    difficultyLabel.textContent = 'Niveau';
+    controlBar.appendChild(difficultyLabel);
 
-  const dropdown = createPacoDropdown({
-    options: difficultyOptions,
-    value: difficulty,
-    onChange: onDifficultyChange,
-    className: 'practice-game-difficulty'
-  });
-  controlBar.appendChild(dropdown.element);
+    dropdown = createPacoDropdown({
+      options: difficultyOptions,
+      value: difficulty,
+      onChange: onDifficultyChange,
+      className: 'practice-game-difficulty'
+    });
+    controlBar.appendChild(dropdown.element);
+  }
 
   if (controls) controlBar.appendChild(controls);
-  header.appendChild(controlBar);
+  if (controlBar.childElementCount) header.appendChild(controlBar);
   root.appendChild(header);
 
   const mainArea = documentRef.createElement('div');

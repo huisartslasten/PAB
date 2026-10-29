@@ -1,4 +1,4 @@
-import { buildItemsForType } from './editor-items.js';
+import { buildItemsForType } from './element-registry.js';
 
 const text = value => String(value ?? '').trim();
 

@@ -35,6 +35,7 @@ export function createPracticeGameTemplate({
   className = '',
   stats = [],
   difficulty = 'rookie',
+  difficultyOptions = PRACTICE_DIFFICULTIES,
   onDifficultyChange = null,
   gameArea = null,
   exercise = null,
@@ -72,7 +73,7 @@ export function createPracticeGameTemplate({
   controlBar.appendChild(difficultyLabel);
 
   const dropdown = createPacoDropdown({
-    options: PRACTICE_DIFFICULTIES,
+    options: difficultyOptions,
     value: difficulty,
     onChange: onDifficultyChange,
     className: 'practice-game-difficulty'

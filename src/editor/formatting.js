@@ -46,12 +46,40 @@ function unwrapTag(fragment, tagName) {
   });
 }
 
+function normalizeInlineState(state = {}) {
+  return {
+    bold: Boolean(state.bold),
+    italic: Boolean(state.italic),
+  };
+}
+
 export function createEditorFormatting({ selectionStore, defaultFontSize = DEFAULT_FONT_SIZE } = {}) {
   if (!selectionStore || typeof selectionStore.restore !== 'function' || typeof selectionStore.remember !== 'function') {
     throw new TypeError('Editor formatting requires a selection store.');
   }
 
   const baseFontSize = normalizeFontSize(defaultFontSize);
+  const activeInlineFormats = new WeakMap();
+
+  function inlineState(surface) {
+    return normalizeInlineState(activeInlineFormats.get(surface));
+  }
+
+  function setInlineFormat(surface, command, active) {
+    const name = String(command || '').trim().toLowerCase();
+    if (!surface || !['bold', 'italic'].includes(name)) return false;
+    const state = inlineState(surface);
+    state[name] = Boolean(active);
+    activeInlineFormats.set(surface, state);
+    return state[name];
+  }
+
+  function toggleInlineFormat(surface, command) {
+    const state = inlineState(surface);
+    const name = String(command || '').trim().toLowerCase();
+    if (!['bold', 'italic'].includes(name)) return false;
+    return setInlineFormat(surface, name, !state[name]);
+  }
 
   function applyFontSize(surface, size) {
     const range = selectionStore.restore(surface);
@@ -87,19 +115,32 @@ export function createEditorFormatting({ selectionStore, defaultFontSize = DEFAU
     if (!surface.contains?.(range.commonAncestorContainer)) return false;
 
     const safeSize = normalizeFontSize(size, baseFontSize);
+    const state = inlineState(surface);
+    const fontSpan = surface.ownerDocument.createElement('span');
+    fontSpan.style.fontSize = `${safeSize}px`;
+    let target = fontSpan;
+    if (state.bold) {
+      const strong = surface.ownerDocument.createElement('strong');
+      target.appendChild(strong);
+      target = strong;
+    }
+    if (state.italic) {
+      const em = surface.ownerDocument.createElement('em');
+      target.appendChild(em);
+      target = em;
+    }
+    target.appendChild(surface.ownerDocument.createTextNode(data));
+
     const currentSpan = container.closest('span[style*="font-size"]');
     const currentSize = currentSpan ? Number.parseFloat(currentSpan.style.fontSize) : null;
-    if (range.collapsed && currentSpan && currentSize === safeSize) return false;
-    if (range.collapsed && !currentSpan && safeSize === baseFontSize) return false;
+    if (range.collapsed && currentSpan && currentSize === safeSize && !state.bold && !state.italic) return false;
+    if (range.collapsed && !currentSpan && safeSize === baseFontSize && !state.bold && !state.italic) return false;
 
-    const span = surface.ownerDocument.createElement('span');
-    span.style.fontSize = `${safeSize}px`;
-    span.appendChild(surface.ownerDocument.createTextNode(data));
     range.deleteContents();
-    range.insertNode(span);
+    range.insertNode(fontSpan);
 
     const next = surface.ownerDocument.createRange();
-    next.setStart(span, span.childNodes.length);
+    next.setStart(target, target.childNodes.length);
     next.collapse(true);
     selection.removeAllRanges();
     selection.addRange(next);
@@ -157,5 +198,8 @@ export function createEditorFormatting({ selectionStore, defaultFontSize = DEFAU
     applyFontSize,
     insertTextWithFontSize,
     applyInlineFormat,
+    toggleInlineFormat,
+    setInlineFormat,
+    inlineState,
   });
 }

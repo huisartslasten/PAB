@@ -1,6 +1,5 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
-import { getActivePracticeModes } from './practice-domain.js';
 import { getContentDefinition, getLessonContentKinds, getPracticeModesForLesson } from '../lessons/learning-experience-registry.js';
 import { createLessonContextField } from '../lessons/lesson-context-view.js';
 import { buildViewUrl } from '../../core/view-context.js';
@@ -103,9 +102,7 @@ export function createPracticeMenuRuntime({ app, templateMount, context, lessonI
     heading.innerHTML = `<button type="button" class="practice-selection-back">← Ander onderdeel</button><h2>HOE wil je ${definition?.label?.toLowerCase() || 'dit'} oefenen?</h2><p>Kies de oefenvorm.</p>`;
     heading.querySelector('.practice-selection-back')?.addEventListener('click', renderContentStep);
 
-    const activeIds = new Set(getActivePracticeModes().map(mode => mode.id));
-    const modes = getPracticeModesForLesson({ lessonType: lesson.type, contentKind: selectedContentKind })
-      .filter(mode => activeIds.has(mode.id));
+    const modes = getPracticeModesForLesson({ lessonType: lesson.type, contentKind: selectedContentKind });
     const cards = modes.map(mode => {
       const [icon, description] = MODE_META[mode.id] || ['📘', mode.description];
       return createCard({ icon, title: mode.label, description, onClick: () => openMode(mode) });

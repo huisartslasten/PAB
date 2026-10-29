@@ -4,6 +4,7 @@ import { createLessonContextField } from '../../lessons/lesson-context-view.js';
 import { getStudentLearningProfile } from '../../../core/student-registry.js';
 import { createWordRevealRuntime } from './runtime.js';
 import { createWordRevealView } from './view.js';
+import { createPracticeGameTemplate } from '../practice-game-template.js';
 import { buildViewUrl } from '../../../core/view-context.js';
 
 const GAME_KEY = 'word_reveal';
@@ -28,37 +29,61 @@ export function createWordRevealPageRuntime({ app, templateMount, context, lesso
   const profile = getStudentLearningProfile(student) || { id: student, level: 'beginner' };
   const content = documentRef.createElement('div');
   const view = createWordRevealView({ documentRef });
-  const gameShell = documentRef.createElement('main');
-  gameShell.className = 'practice-page-card wr-page-card';
-  gameShell.innerHTML = `
-    <div class="wr-game-head">
-      <div class="wr-stats" aria-label="Spelstatistieken">
-        <div class="wr-stat"><span>Beurten</span><strong id="wrTurns">0</strong></div>
-        <div class="wr-stat"><span>Record</span><strong id="wrRecord">—</strong></div>
-        <div class="wr-stat"><span>Vragen</span><strong id="wrProgress">0 van 0</strong></div>
-      </div>
-    </div>
-    <section class="wr-target-panel" aria-label="Geheim doel">
-      <span class="wr-target-label">Geheim doel</span>
-      <div id="wrTarget" class="wr-target"></div>
-    </section>
-    <section class="wr-question-panel">
-      <span class="wr-question-label">Lesvraag</span>
-      <div id="wrQuestionArea"></div>
-    </section>
-    <section id="wrFeedback" class="wr-feedback-panel" aria-live="polite"></section>`;
-  content.appendChild(gameShell);
+
+  const gameArea = documentRef.createElement('div');
+  const targetPanel = documentRef.createElement('section');
+  targetPanel.className = 'wr-target-panel';
+  targetPanel.setAttribute('aria-label', 'Geheim doel');
+  const targetLabel = documentRef.createElement('span');
+  targetLabel.className = 'wr-target-label';
+  targetLabel.textContent = 'Geheim doel';
+  const target = documentRef.createElement('div');
+  target.id = 'wrTarget';
+  target.className = 'wr-target';
+  targetPanel.append(targetLabel, target);
+  gameArea.appendChild(targetPanel);
+
+  const exercise = documentRef.createElement('div');
+  const questionPanel = documentRef.createElement('section');
+  questionPanel.className = 'wr-question-panel';
+  const questionLabel = documentRef.createElement('span');
+  questionLabel.className = 'wr-question-label';
+  questionLabel.textContent = 'Lesvraag';
+  const questionArea = documentRef.createElement('div');
+  questionArea.id = 'wrQuestionArea';
+  questionPanel.append(questionLabel, questionArea);
+  exercise.appendChild(questionPanel);
+
+  const feedback = documentRef.createElement('section');
+  feedback.id = 'wrFeedback';
+  feedback.className = 'wr-feedback-panel';
+  feedback.setAttribute('aria-live', 'polite');
+
+  const gameTemplate = createPracticeGameTemplate({
+    documentRef,
+    className: 'wr-game-template',
+    stats: [
+      { id: 'score', label: 'Beurten', value: '0' },
+      { id: 'record', label: 'Record', value: '—' },
+      { id: 'progress', label: 'Vragen', value: '0 van 0' }
+    ],
+    showDifficulty: false,
+    gameArea,
+    exercise,
+    feedback
+  });
+  content.appendChild(gameTemplate.element);
 
   const goGames = () => {
-    const target = buildViewUrl('games.html', { student, mode: context?.mode });
-    if (lessonId) target.searchParams.set('lesson_id', lessonId);
-    return navigate(target);
+    const targetUrl = buildViewUrl('games.html', { student, mode: context?.mode });
+    if (lessonId) targetUrl.searchParams.set('lesson_id', lessonId);
+    return navigate(targetUrl);
   };
 
   async function load() {
     if (!lessonId || !student) {
-      gameShell.replaceChildren();
-      gameShell.textContent = !student ? 'Geen leerling geselecteerd.' : 'Geen les geselecteerd.';
+      gameTemplate.element.replaceChildren();
+      gameTemplate.element.textContent = !student ? 'Geen leerling geselecteerd.' : 'Geen les geselecteerd.';
       return;
     }
 
@@ -67,7 +92,7 @@ export function createWordRevealPageRuntime({ app, templateMount, context, lesso
     if (!lesson) throw new Error('Deze les kon niet worden gevonden.');
 
     const contextField = createLessonContextField(lesson, { documentRef });
-    content.insertBefore(contextField, gameShell);
+    content.insertBefore(contextField, gameTemplate.element);
 
     const items = Array.isArray(lesson.lesson_items) ? lesson.lesson_items : Array.isArray(lesson.items) ? lesson.items : [];
     const runtime = createWordRevealRuntime({
@@ -88,8 +113,8 @@ export function createWordRevealPageRuntime({ app, templateMount, context, lesso
     async function generateRound() {
       const state = runtime.snapshot();
       if (!state.remainingCount) return;
-      view.renderLoading(gameShell, 'Paco bedenkt een mooi doel…');
-      const target = await app.aiContent.generateLearningContent({
+      view.renderLoading(gameTemplate.element, 'Paco bedenkt een mooi doel…');
+      const generatedTarget = await app.aiContent.generateLearningContent({
         contentType: 'practice_target',
         locale: 'nl-NL',
         learner: { id: profile.id, name: student, level: profile.level },
@@ -102,16 +127,16 @@ export function createWordRevealPageRuntime({ app, templateMount, context, lesso
         },
         constraints: targetConstraints(state.remainingCount, profile.level)
       });
-      runtime.startRound(target);
+      runtime.startRound(generatedTarget);
       started = true;
       await render();
     }
 
     async function render(errorMessage = '') {
       const state = runtime.snapshot();
-      view.renderStats(gameShell, state, highScore);
+      view.renderStats(gameTemplate.element, state, highScore);
       view.renderTarget(
-        gameShell,
+        gameTemplate.element,
         state,
         state.phase === 'reveal-choice'
           ? index => {
@@ -120,14 +145,14 @@ export function createWordRevealPageRuntime({ app, templateMount, context, lesso
             }
           : null
       );
-      view.renderFeedback(gameShell, state, () => { runtime.continueAfterFeedback(); void render(); });
+      view.renderFeedback(gameTemplate.element, state, () => { runtime.continueAfterFeedback(); void render(); });
 
       if (state.phase === 'finished') {
         await saveScore(state.turns);
-        view.renderStats(gameShell, state, highScore);
-        view.renderTarget(gameShell, state);
+        view.renderStats(gameTemplate.element, state, highScore);
+        view.renderTarget(gameTemplate.element, state);
         view.renderFinished(
-          gameShell,
+          gameTemplate.element,
           state,
           () => { runtime.restart(state.target); void render(); },
           goGames
@@ -136,13 +161,13 @@ export function createWordRevealPageRuntime({ app, templateMount, context, lesso
       }
 
       if (state.phase === 'round-complete') {
-        view.renderRoundComplete(gameShell, state, () => { void generateRound().catch(error => render(error?.message || 'De volgende ronde kon niet worden gestart.')); });
+        view.renderRoundComplete(gameTemplate.element, state, () => { void generateRound().catch(error => render(error?.message || 'De volgende ronde kon niet worden gestart.')); });
         return;
       }
 
       if (state.phase === 'question' && !state.feedback) {
         view.renderQuestion(
-          gameShell,
+          gameTemplate.element,
           state,
           async answer => {
             try { await runtime.submitAnswer(answer); await render(); }
@@ -158,13 +183,13 @@ export function createWordRevealPageRuntime({ app, templateMount, context, lesso
       }
 
       if (state.phase === 'question' && state.feedback) {
-        const node = gameShell.querySelector('#wrQuestionArea');
+        const node = gameTemplate.element.querySelector('#wrQuestionArea');
         if (node) node.replaceChildren();
       }
     }
 
     if (!items.length) {
-      gameShell.querySelector('#wrQuestionArea').textContent = 'Deze les bevat nog geen vragen.';
+      gameTemplate.element.querySelector('#wrQuestionArea').textContent = 'Deze les bevat nog geen vragen.';
       return;
     }
 
@@ -184,7 +209,7 @@ export function createWordRevealPageRuntime({ app, templateMount, context, lesso
       content
     });
     try { await load(); }
-    catch (error) { console.error('Letter Hunt load error:', error); gameShell.textContent = `Letter Hunt kon niet worden geladen: ${error?.message || 'Onbekende fout.'}`; }
+    catch (error) { console.error('Letter Hunt load error:', error); gameTemplate.element.textContent = `Letter Hunt kon niet worden geladen: ${error?.message || 'Onbekende fout.'}`; }
   }
 
   return Object.freeze({ mount, content });

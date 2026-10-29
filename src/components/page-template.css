@@ -4,6 +4,9 @@
 @import url("./paco-tile.css");
 @import url("./design-system.css");
 
+/* Keep the shared shell hidden until its canonical template exists. This prevents a flash of unstyled route content on every page. */
+body:not(:has(.paco-page-template)) { visibility:hidden; }
+
 :root { --paco-sidebar-width: 235px; --paco-content-max: 1440px; --paco-lesson-bg: #fffdf0; --paco-lesson-border: #f4e8a8; --paco-lesson-shadow: 0 8px 0 rgba(16,43,87,.08), 0 14px 28px rgba(16,43,87,.10); }
 .paco-page-template { min-height:100vh; margin:0; background:var(--paco-blue); color:var(--paco-text); font-family:Nunito,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
 .paco-page-template,.paco-page-template * { box-sizing:border-box; }

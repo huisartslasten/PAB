@@ -1,20 +1,21 @@
 import { createPacoDropdown } from '../../../components/design-system.js';
 
-export function createFlashView({ documentRef = globalThis.document, escapeHtml } = {}) {
+export function createFlashView({ documentRef = globalThis.document, escapeHtml, root = documentRef } = {}) {
   if (!documentRef) throw new Error('A document is required.');
   if (typeof escapeHtml !== 'function') throw new Error('An escapeHtml function is required.');
+  const scope = root || documentRef;
 
   function renderStats(state, highScore) {
-    const score = documentRef.getElementById('flashScore');
-    const maximum = documentRef.getElementById('flashMaximum');
-    const record = documentRef.getElementById('flashHighScore');
+    const score = scope.querySelector('[data-stat="score"] strong');
+    const maximum = scope.querySelector('[data-stat="maximum"] strong');
+    const record = scope.querySelector('[data-stat="highScore"] strong');
     if (score) score.textContent = String(state.score);
     if (maximum) maximum.textContent = String(state.maxScore);
     if (record) record.textContent = highScore == null ? '0' : String(highScore);
   }
 
   function renderProgress(state) {
-    const node = documentRef.getElementById('flashProgress');
+    const node = scope.querySelector('#flashProgress');
     if (!node) return;
     const completed = state.phase === 'finished' ? state.total : state.index;
     const current = state.total ? Math.min(state.index + 1, state.total) : 0;
@@ -23,7 +24,7 @@ export function createFlashView({ documentRef = globalThis.document, escapeHtml 
   }
 
   function renderQuestion(state, onAnswer, highScore, { timingMode = 'manual', onTimingModeChange, remainingSeconds = null } = {}) {
-    const content = documentRef.getElementById('flashContent');
+    const content = scope.querySelector('#flashContent');
     if (!content || !state.item) return;
     renderStats(state, highScore);
     renderProgress(state);
@@ -78,7 +79,7 @@ export function createFlashView({ documentRef = globalThis.document, escapeHtml 
   }
 
   function renderResult(state, highScore, onContinue) {
-    const content = documentRef.getElementById('flashContent');
+    const content = scope.querySelector('#flashContent');
     if (!content || !state.lastResult) return;
     renderStats(state, highScore);
     renderProgress(state);
@@ -94,7 +95,7 @@ export function createFlashView({ documentRef = globalThis.document, escapeHtml 
   }
 
   function renderFinished(state, highScore, onRestart, onBack) {
-    const content = documentRef.getElementById('flashContent');
+    const content = scope.querySelector('#flashContent');
     if (!content) return;
     const finalHighScore = Math.max(Number(highScore) || 0, state.score);
     renderStats(state, finalHighScore);

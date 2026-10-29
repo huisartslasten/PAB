@@ -1,4 +1,5 @@
 import { createPracticeRuntimeEntry } from './practice-runtime-entry.js';
+import { filterLessonItemsByContentKind } from './lesson-content-model.js';
 
 function typeTitle(type) {
   if (type === 'dictation') return '✏️ Dictee oefenen';
@@ -126,8 +127,9 @@ export function createPracticePresentation({
 
     const isMath = type === 'math';
     const isDictation = type === 'dictation';
+    const dictationPrompt = snapshot.contentKind === 'sentences' ? 'Luister goed en schrijf de hele zin.' : 'Luister goed en schrijf het woord.';
     content.innerHTML = isDictation
-      ? `<form data-practice-form><div class="dictation-word">Luister goed en schrijf het woord.</div>${hintHtml(item, escapeHtml)}<div id="practiceVoiceStatus" class="small" style="min-height:20px;margin-top:4px"></div><div style="margin:22px"><button type="button" class="secondary speaker" data-practice-action="speak">🔊 Nog een keer</button></div><input id="practiceAnswer" class="answer-input" autocomplete="off"><div id="practiceFeedback" class="feedback"></div><button type="submit" class="success" data-practice-action="submit">Controleren</button></form>`
+      ? `<form data-practice-form><div class="dictation-word">${dictationPrompt}</div>${hintHtml(item, escapeHtml)}<div id="practiceVoiceStatus" class="small" style="min-height:20px;margin-top:4px"></div><div style="margin:22px"><button type="button" class="secondary speaker" data-practice-action="speak">🔊 Nog een keer</button></div><input id="practiceAnswer" class="answer-input" autocomplete="off"><div id="practiceFeedback" class="feedback"></div><button type="submit" class="success" data-practice-action="submit">Controleren</button></form>`
       : `<form data-practice-form><div class="small">${isMath ? 'Los de som op.' : 'Typ hier het woord.'}</div>${hintHtml(item, escapeHtml)}<div class="prompt">${escapeHtml(item.question)}</div><input id="practiceAnswer" class="answer-input" ${isMath ? 'type="number" inputmode="numeric"' : ''} autocomplete="off"><div id="practiceFeedback" class="feedback"></div><button type="submit" class="success" data-practice-action="submit">Controleren</button></form>`;
     bindCurrentActions();
     documentRef.getElementById('practiceAnswer')?.focus();
@@ -138,7 +140,7 @@ export function createPracticePresentation({
     const content = elements().content;
     if (!content) return;
     const total = snapshot.progress.total;
-    content.innerHTML = `<div class="result-score">🎉 Klaar!</div><p>Je hebt alle ${total} ${snapshot.type === 'dictation' ? 'dicteewoorden' : snapshot.type === 'questions' ? 'vragen bekeken' : 'onderdelen'} doorlopen.</p><button class="success" data-practice-action="back-to-lesson">Terug naar de les</button>`;
+    content.innerHTML = `<div class="result-score">🎉 Klaar!</div><p>Je hebt alle ${total} ${snapshot.type === 'dictation' ? 'dictee-items' : snapshot.type === 'questions' ? 'vragen bekeken' : 'onderdelen'} doorlopen.</p><button class="success" data-practice-action="back-to-lesson">Terug naar de les</button>`;
     content.querySelector('[data-practice-action="back-to-lesson"]')?.addEventListener('click', () => showLessonChoice());
     const progress = elements().progress;
     if (progress) progress.innerHTML = `<div class="progress-label"><span>🎉 ${snapshot.progress.mastered} / ${snapshot.progress.total} beheerst</span><span>Klaar!</span></div><div class="progress"><div class="progress-bar"><span style="width:100%"></span></div></div>`;
@@ -161,7 +163,7 @@ export function createPracticePresentation({
     content.appendChild(next);
   }
 
-  function start(type) {
+  function start(type, contentKind = '') {
     const lesson = getLesson();
     if (!lesson) return null;
     speechCancel();
@@ -170,9 +172,18 @@ export function createPracticePresentation({
     const { page, title } = elements();
     page?.classList.remove('hidden');
     if (title) title.textContent = typeTitle(type);
+
+    const filteredItems = filterLessonItemsByContentKind(lesson, contentKind);
+    const practiceLesson = {
+      ...lesson,
+      items: filteredItems,
+      lesson_items: filteredItems,
+      contentKind
+    };
+
     entry = createPracticeRuntimeEntry({
       db,
-      lesson: { ...lesson, type },
+      lesson: { ...practiceLesson, type },
       student: getStudent(),
       masteryService,
       shuffle,
@@ -183,7 +194,8 @@ export function createPracticePresentation({
       onAnswer: () => refreshPageSidebars(),
       onFinish: renderCompletion
     });
-    return entry.start();
+    const snapshot = entry.start();
+    return { ...snapshot, contentKind };
   }
 
   async function submit() {

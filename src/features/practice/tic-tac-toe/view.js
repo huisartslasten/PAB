@@ -7,28 +7,44 @@ const TILE_ASSETS = Object.freeze({
   O: './src/features/practice/tic-tac-toe/assets/tile-o.webp'
 });
 
-export function createTicTacToeView({ documentRef = globalThis.document, escapeHtml } = {}) {
+export function createTicTacToeView({ documentRef = globalThis.document, escapeHtml, root = null } = {}) {
   if (!documentRef) throw new Error('A document is required.');
   if (typeof escapeHtml !== 'function') throw new Error('An escapeHtml function is required.');
 
+  const scope = root || documentRef;
   let modeDropdown = null;
-  let levelDropdown = null;
   let previousBoard = null;
   let previousMode = null;
   let boardRenderToken = 0;
+  const find = selector => scope.querySelector(selector);
+
+  function createModeControl(modeOptions, onMode) {
+    modeDropdown = createPacoDropdown({
+      options: modeOptions.map(item => ({ value: item.id, label: item.label })),
+      value: modeOptions[0]?.id,
+      onChange: onMode,
+      className: 'ttt-mode-dropdown'
+    });
+    const wrapper = documentRef.createElement('div');
+    wrapper.className = 'ttt-mode-control';
+    const label = documentRef.createElement('span');
+    label.className = 'ttt-mode-label';
+    label.textContent = 'Modus';
+    wrapper.append(label, modeDropdown.element);
+    return wrapper;
+  }
+
+  function setModeValue(value) { modeDropdown?.setValue(value); }
 
   function renderBoard(state, onCell) {
-    const board = documentRef.getElementById('ticTacToeBoard');
+    const board = find('#ticTacToeBoard');
     if (!board) return;
-
     const renderToken = ++boardRenderToken;
     const canFadeInfiniteRemoval = state.mode === 'infinite' && previousMode === 'infinite' && Array.isArray(previousBoard);
     const fadingIndexes = new Set();
-
     state.board.forEach((cell, index) => {
       if (canFadeInfiniteRemoval && !cell && previousBoard[index]?.symbol) fadingIndexes.add(index);
     });
-
     board.innerHTML = state.board.map((cell, index) => {
       const fadingSymbol = fadingIndexes.has(index) ? previousBoard[index].symbol : null;
       const symbol = cell?.symbol === 'X' || cell?.symbol === 'O' ? cell.symbol : fadingSymbol;
@@ -38,65 +54,32 @@ export function createTicTacToeView({ documentRef = globalThis.document, escapeH
       const disabled = Boolean(cell) || isFading || state.phase !== 'choosing' || state.turn !== 'X';
       return `<button type="button" class="ttt-cell${symbol ? ` is-${symbol.toLowerCase()}` : ''}" data-cell="${index}" aria-label="Vakje ${index + 1}, ${label}" ${disabled ? 'disabled' : ''}><img class="ttt-tile-image${isFading ? ' is-fading-out' : ''}" src="${asset}" alt="" draggable="false"></button>`;
     }).join('');
-    board.querySelectorAll('[data-cell]').forEach(button => {
-      button.addEventListener('click', () => onCell(Number(button.dataset.cell)));
-    });
-
+    board.querySelectorAll('[data-cell]').forEach(button => button.addEventListener('click', () => onCell(Number(button.dataset.cell))));
     previousBoard = state.board.map(cell => cell ? { ...cell } : null);
     previousMode = state.mode;
-
     if (fadingIndexes.size) {
-      const animationDelay = 280;
       documentRef.defaultView?.setTimeout?.(() => {
         if (renderToken !== boardRenderToken) return;
         renderBoard(state, onCell);
-      }, animationDelay);
+      }, 280);
     }
   }
 
   function renderStats(state) {
-    const score = documentRef.getElementById('tttScore');
-    const record = documentRef.getElementById('tttRecord');
-    const progress = documentRef.getElementById('tttProgress');
+    const score = find('[data-stat="score"] strong');
+    const record = find('[data-stat="record"] strong');
+    const progress = find('[data-stat="progress"] strong');
     if (score) score.textContent = `${state.wins} 🏆`;
     if (record) record.textContent = `${state.bestScore} 🥇`;
     if (progress) progress.textContent = `${Math.min(state.uniqueAnswered, state.totalQuestions)} van ${state.totalQuestions} vragen`;
   }
 
-  function renderSettings(state, modeOptions, levelOptions, onMode, onLevel) {
-    const modeMount = documentRef.getElementById('tttMode');
-    const levelMount = documentRef.getElementById('tttLevel');
-    if (!modeMount || !levelMount) return;
-
-    if (!modeDropdown) {
-      modeDropdown = createPacoDropdown({
-        options: modeOptions.map(item => ({ value: item.id, label: item.label })),
-        value: state.mode,
-        onChange: value => onMode(value, levelDropdown?.getValue?.() ?? state.aiLevel)
-      });
-      modeMount.replaceChildren(modeDropdown.element);
-    } else {
-      modeDropdown.setValue(state.mode);
-    }
-
-    if (!levelDropdown) {
-      levelDropdown = createPacoDropdown({
-        options: levelOptions.map(item => ({ value: item.id, label: item.label })),
-        value: state.aiLevel,
-        onChange: value => onLevel(value, modeDropdown?.getValue?.() ?? state.mode)
-      });
-      levelMount.replaceChildren(levelDropdown.element);
-    } else {
-      levelDropdown.setValue(state.aiLevel);
-    }
-  }
-
   function renderQuestion(state, onSubmit, errorMessage = '') {
-    const content = documentRef.getElementById('tttContent');
+    const content = find('#tttContent');
     if (!content || !state.item) return;
     const feedback = errorMessage ? `<div class="feedback error" role="alert">${escapeHtml(errorMessage)}</div>` : '';
     content.innerHTML = `${feedback}<div class="ttt-turn">Jij bent aan de beurt</div><div class="ttt-prompt">${escapeHtml(state.item.question || '')}</div><div class="field"><input id="tttAnswer" class="answer-input" autocomplete="off" placeholder="Typ je antwoord"></div><button class="success" data-ttt-submit type="button">Controleren</button>`;
-    const input = documentRef.getElementById('tttAnswer');
+    const input = content.querySelector('#tttAnswer');
     const button = content.querySelector('[data-ttt-submit]');
     input?.focus?.();
     const submit = async () => {
@@ -105,57 +88,35 @@ export function createTicTacToeView({ documentRef = globalThis.document, escapeH
       await onSubmit(input?.value || '');
     };
     button?.addEventListener('click', submit);
-    input?.addEventListener('keydown', event => {
-      if (event.key === 'Enter') { event.preventDefault(); void submit(); }
-    });
+    input?.addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); void submit(); } });
   }
 
   function renderPacoTurn(state, onPaco) {
-    const content = documentRef.getElementById('tttContent');
+    const content = find('#tttContent');
     if (!content) return () => {};
-
     const answerWasWrong = state.lastResult?.correct === false;
-    const answerFeedback = answerWasWrong
-      ? `<div class="ttt-answer-feedback" role="status"><strong>❌ Niet goed</strong><span>Jouw antwoord: <b>${escapeHtml(state.lastResult.givenAnswer || '')}</b></span><span>Goed antwoord: <b>${escapeHtml(state.lastResult.expectedAnswer || '')}</b></span><button class="success" data-ttt-feedback-continue type="button">OK, verder →</button></div>`
-      : '';
-
+    const answerFeedback = answerWasWrong ? `<div class="ttt-answer-feedback" role="status"><strong>❌ Niet goed</strong><span>Jouw antwoord: <b>${escapeHtml(state.lastResult.givenAnswer || '')}</b></span><span>Goed antwoord: <b>${escapeHtml(state.lastResult.expectedAnswer || '')}</b></span><button class="success" data-ttt-feedback-continue type="button">OK, verder →</button></div>` : '';
     const startThinking = () => {
-      content.innerHTML = `${answerFeedback ? `${answerFeedback.replace(/<button[\s\S]*?<\/button>/, '')}` : ''}<div class="ttt-turn ttt-paco-thinking" role="status" aria-live="polite"><span class="ttt-paco-face">🐶</span><span>Paco denkt na<span class="ttt-thinking-dots" aria-hidden="true"><i></i><i></i><i></i></span></span></div>`;
-      return schedulePacoTurn({
-        windowRef: documentRef.defaultView,
-        onTurn: onPaco
-      });
+      content.innerHTML = `${answerFeedback ? answerFeedback.replace(/<button[\s\S]*?<\/button>/, '') : ''}<div class="ttt-turn ttt-paco-thinking" role="status" aria-live="polite"><span class="ttt-paco-face">🐶</span><span>Paco denkt na<span class="ttt-thinking-dots" aria-hidden="true"><i></i><i></i><i></i></span></span></div>`;
+      return schedulePacoTurn({ windowRef: documentRef.defaultView, onTurn: onPaco });
     };
-
     if (!answerWasWrong) return startThinking();
-
     content.innerHTML = answerFeedback;
     const continueButton = content.querySelector('[data-ttt-feedback-continue]');
     continueButton?.focus?.();
     let cancelThinking = () => {};
     const continueToPaco = () => {
       if (continueButton?.disabled) return;
-      if (continueButton) {
-        continueButton.disabled = true;
-        continueButton.textContent = 'Even nadenken…';
-      }
+      if (continueButton) { continueButton.disabled = true; continueButton.textContent = 'Even nadenken…'; }
       cancelThinking = startThinking();
     };
     continueButton?.addEventListener('click', continueToPaco);
-    continueButton?.addEventListener('keydown', event => {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        continueToPaco();
-      }
-    });
-
-    return () => {
-      cancelThinking();
-    };
+    continueButton?.addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); continueToPaco(); } });
+    return () => cancelThinking();
   }
 
   function renderGameResult(state, onContinue) {
-    const content = documentRef.getElementById('tttContent');
+    const content = find('#tttContent');
     if (!content) return;
     const result = state.lastResult?.gameResult;
     const title = result === 'X' ? '🏆 Jij wint!' : result === 'O' ? '🐶 Paco wint!' : '🤝 Gelijkspel!';
@@ -165,7 +126,7 @@ export function createTicTacToeView({ documentRef = globalThis.document, escapeH
   }
 
   function renderFinished(state, onRestart, onBack) {
-    const content = documentRef.getElementById('tttContent');
+    const content = find('#tttContent');
     if (!content) return;
     const result = state.lastResult?.gameResult;
     const title = result === 'X' ? '🏆 Jij wint!' : result === 'O' ? '🐶 Paco wint!' : '🤝 Gelijkspel!';
@@ -174,5 +135,5 @@ export function createTicTacToeView({ documentRef = globalThis.document, escapeH
     content.querySelector('[data-ttt-back]')?.addEventListener('click', onBack);
   }
 
-  return Object.freeze({ renderBoard, renderStats, renderSettings, renderQuestion, renderPacoTurn, renderGameResult, renderFinished });
+  return Object.freeze({ createModeControl, setModeValue, renderBoard, renderStats, renderQuestion, renderPacoTurn, renderGameResult, renderFinished });
 }

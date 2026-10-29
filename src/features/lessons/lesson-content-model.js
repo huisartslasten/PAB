@@ -1,4 +1,4 @@
-import { getLessonContentKinds, normalizeContentKind } from './learning-experience-registry.js';
+import { normalizeContentKind } from './learning-experience-registry.js';
 
 const text = value => String(value ?? '').trim();
 
@@ -57,5 +57,13 @@ export function filterLessonItemsByContentKind(lesson = {}, contentKind = '') {
     return items.filter(item => normalizeContentKind(item?.content_data?.content_kind ?? item?.content_data?.kind) === kind);
   }
 
-  return getLessonContentKinds(lesson).includes(kind) ? [...items] : [];
+  const defaultKinds = {
+    dictation: ['words', 'sentences'],
+    words: ['words'],
+    questions: ['questions'],
+    math: ['math'],
+    spelling: ['spelling'],
+    custom: ['custom']
+  };
+  return (defaultKinds[String(lesson?.type ?? '').trim().toLowerCase()] || []).includes(kind) ? [...items] : [];
 }

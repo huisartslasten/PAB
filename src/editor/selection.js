@@ -2,7 +2,7 @@ function selectionIsInside(surface, range) {
   return Boolean(range && surface?.contains(range.commonAncestorContainer));
 }
 
-export function createEditorSelectionStore() {
+export function createEditorSelectionStore({ documentRef = globalThis.document } = {}) {
   const selections = new WeakMap();
 
   function remember(surface) {
@@ -39,7 +39,7 @@ export function createEditorSelectionStore() {
   }
 
   function captureDocumentSelection() {
-    const selection = document?.getSelection?.();
+    const selection = documentRef?.getSelection?.();
     if (!selection?.rangeCount) return null;
     const range = selection.getRangeAt(0);
     const parent = range.commonAncestorContainer?.nodeType === 1

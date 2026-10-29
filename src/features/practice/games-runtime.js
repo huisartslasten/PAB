@@ -25,7 +25,7 @@ export function createGamesRuntime({ app, templateMount, context, lessonId = '',
     return navigate(target);
   };
 
-  function render(lesson) {
+  function render(lesson, access = []) {
     content.replaceChildren();
     if (!lessonId || !lesson) {
       const state = documentRef.createElement('div');
@@ -35,13 +35,24 @@ export function createGamesRuntime({ app, templateMount, context, lessonId = '',
       return;
     }
 
+    const accessByGame = new Map(access.map(record => [record.gameKey, record]));
+    const progress = access[0] || { creditedTests: 0, requiredTests: 10, minimumScore: 9 };
     const field = createLessonContextField(lesson, { documentRef });
     const grid = createActivityCardGrid({
-      items: getActivePracticeGames().map(game => ({
-        ...game,
-        title: game.label,
-        actionLabel: 'Spelen →'
-      })),
+      items: getActivePracticeGames().map(game => {
+        const state = accessByGame.get(game.id);
+        const unlocked = state?.unlocked === true;
+        const locked = !unlocked;
+        return {
+          ...game,
+          title: game.label,
+          locked,
+          description: locked
+            ? `🔒 ${game.label} — ${progress.creditedTests} / ${progress.requiredTests} toetsen behaald — Nog ${Math.max(0, progress.requiredTests - progress.creditedTests)} toets${progress.requiredTests - progress.creditedTests === 1 ? '' : 'en'} met minimaal een ${progress.minimumScore}.`
+            : game.description,
+          actionLabel: locked ? 'Vergrendeld' : 'Spelen →'
+        };
+      }),
       documentRef,
       onOpen: openGame
     });
@@ -52,8 +63,6 @@ export function createGamesRuntime({ app, templateMount, context, lessonId = '',
   async function mount() {
     mountPacoPageTemplate({
       mount: templateMount,
-      backLabel: '← Oefenen',
-      backAction: goPractice,
       greeting: `Hoi ${student}! 🐶`,
       title: 'Spelletjes',
       icon: '🎮',
@@ -68,9 +77,12 @@ export function createGamesRuntime({ app, templateMount, context, lessonId = '',
     }
 
     try {
-      const records = await app.loadLessons();
+      const [records, access] = await Promise.all([
+        app.loadLessons(),
+        app.gameAccess.getAccess(student)
+      ]);
       const lesson = app.mapLessons(records).find(item => String(item.id) === String(lessonId));
-      render(lesson || null);
+      render(lesson || null, access);
     } catch (error) {
       console.error('Games menu load error:', error);
       render(null);

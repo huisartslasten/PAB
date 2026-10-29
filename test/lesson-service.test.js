@@ -107,7 +107,7 @@ test('lesson service replaces lesson items with normalized TEST-schema fields', 
   const db = mockDb();
   await createService(db).replaceLessonItems(12, [{ prompt: 'woord', min_words: '', required_terms: null }]);
   assert.deepEqual(db.calls.find(call => call.op === 'insert').rows, [{
-    question: '', answer: '', question_parts: [], answer_parts: [], hint: '', response_type: 'text',
+    question: '', answer: '', question_parts: [], answer_parts: [], content_data: null, hint: '', response_type: 'text',
     answer_options: [], difficulty: null, sort_order: 0, lesson_id: 12
   }]);
 });

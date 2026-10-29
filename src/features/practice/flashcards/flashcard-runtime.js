@@ -1,5 +1,6 @@
 import { isPracticeModeActive } from '../practice-domain.js';
 import { createLessonContextField } from '../../lessons/lesson-context-view.js';
+import { filterLessonItemsByContentKind } from '../../lessons/lesson-content-model.js';
 import {
   createFlashcardSession,
   getCurrentFlashcard,
@@ -13,7 +14,8 @@ export async function mountFlashcardPractice({
   mount,
   app,
   lessonId,
-  student = 'Zyon'
+  student = 'Zyon',
+  contentKind = ''
 } = {}) {
   if (!(mount instanceof HTMLElement)) throw new TypeError('A flashcard mount is required.');
   if (!app?.loadLessons || !app?.mapLessons) throw new TypeError('A PacoGO application context is required.');
@@ -48,9 +50,10 @@ export async function mountFlashcardPractice({
     return;
   }
 
-  const cards = getFlashcardCards(lesson.items);
+  const filteredItems = filterLessonItemsByContentKind(lesson, contentKind);
+  const cards = getFlashcardCards(filteredItems);
   if (!cards.length) {
-    loading.textContent = 'Deze les bevat nog geen vraag-en-antwoordkaarten.';
+    loading.textContent = 'Dit onderdeel bevat nog geen vraag-en-antwoordkaarten.';
     return;
   }
 
@@ -160,5 +163,5 @@ export async function mountFlashcardPractice({
   render();
   card.focus();
 
-  return { lesson, cards, student };
+  return { lesson, cards, student, contentKind };
 }

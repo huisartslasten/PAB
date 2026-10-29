@@ -39,16 +39,6 @@ import { readViewContext } from '../core/view-context.js';
 
 function defineRoute(renderer, styles = []) { Object.defineProperty(renderer, 'styles', { value: Object.freeze([...styles]), enumerable: false, configurable: false, writable: false }); return renderer; }
 
-function defineGameRoute(gameKey, renderer, styles = []) {
-  return defineRoute(async ({ url, navigate }) => {
-    const context = readViewContext(url.searchParams);
-    const lessonId = url.searchParams.get('lesson_id') || '';
-    const allowed = await guardGameRoute({ app: renderer.app, gameKey, context, lessonId, navigate });
-    if (!allowed) return null;
-    return renderer.create({ url, context, lessonId, navigate });
-  }, styles);
-}
-
 export function createPacoRouteRegistry({ app, mounts, documentRef = document } = {}) {
   if (!app) throw new TypeError('Paco route registry requires an app.'); if (!mounts?.templateMount) throw new TypeError('Paco route registry requires template mount.');
   const routes = {};
@@ -75,7 +65,7 @@ export function createPacoRouteRegistry({ app, mounts, documentRef = document } 
   routes['games.html'] = defineRoute(({ url, navigate }) => createGamesRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/practice/games.css']);
   routes['skills.html'] = defineRoute(({ url, navigate }) => createSkillsRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), skillId: url.searchParams.get('skill') || '', durationSeconds: Number(url.searchParams.get('duration') || 180), documentRef, navigate }));
   routes['double-or-nothing.html'] = game('double-or-nothing', ({ context, lessonId, navigate }) => createDoubleOrNothingPageRuntime({ app, templateMount: mounts.templateMount, context, lessonId, documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/double-or-nothing.css']);
-  routes['millionaire.html'] = game('millionaire', ({ context, navigate }) => createMillionairePageRuntime({ app, templateMount: mounts.templateMount, context, documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/millionaire/millionaire.css']);
+  routes['millionaire.html'] = defineRoute(({ url, navigate }) => createMillionairePageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/millionaire/millionaire.css']);
   routes['memory.html'] = game('memory', ({ context, lessonId, navigate }) => createMemoryPageRuntime({ app, templateMount: mounts.templateMount, context, lessonId, documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/memory/memory.css']);
   routes['flash-question.html'] = game('flash-question', ({ context, lessonId, navigate }) => createFlashPageRuntime({ app, templateMount: mounts.templateMount, context, lessonId, documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/flash/flash.css']);
   routes['tic-tac-toe.html'] = game('tic-tac-toe', ({ context, navigate }) => createTicTacToePageRuntime({ app, templateMount: mounts.templateMount, context, documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/tic-tac-toe.css']);

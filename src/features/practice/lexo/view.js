@@ -1,6 +1,6 @@
-import { createPacoDropdown } from '../../../components/design-system.js';
-
-function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+function clear(node) {
+  while (node.firstChild) node.removeChild(node.firstChild);
+}
 
 function makeButton(documentRef, label, className = '') {
   const button = documentRef.createElement('button');
@@ -12,14 +12,14 @@ function makeButton(documentRef, label, className = '') {
 
 export function createLexoView({ documentRef = document } = {}) {
   function renderStats(root, state, highScore) {
-    root.querySelector('#lexoDifficulty').textContent = state.difficulty.toUpperCase();
-    root.querySelector('#lexoScore').textContent = String(state.score);
-    root.querySelector('#lexoRecord').textContent = highScore == null ? '—' : String(highScore);
-    root.querySelector('#lexoProgress').textContent = `${state.completedCount} van ${state.totalCount}`;
+    root.querySelector('[data-stat="score"] strong').textContent = String(state.score);
+    root.querySelector('[data-stat="record"] strong').textContent = highScore == null ? '—' : String(highScore);
+    root.querySelector('[data-stat="progress"] strong').textContent = `${state.completedCount} van ${state.totalCount}`;
   }
 
   function renderGrid(root, state) {
     const grid = root.querySelector('#lexoGrid');
+    if (!grid) return;
     clear(grid);
     const revealed = new Set(state.anchorPath.slice(0, state.revealedCount));
     state.grid.forEach((letter, index) => {
@@ -33,6 +33,7 @@ export function createLexoView({ documentRef = document } = {}) {
 
   function renderQuestion(root, state, onAnswer, { isDictation = false, onSpeak = null } = {}) {
     const area = root.querySelector('#lexoQuestionArea');
+    if (!area) return;
     clear(area);
     const question = documentRef.createElement('div');
     question.className = 'lexo-question';
@@ -74,6 +75,7 @@ export function createLexoView({ documentRef = document } = {}) {
 
   function renderWordInput(root, state, onWord) {
     const area = root.querySelector('#lexoQuestionArea');
+    if (!area) return;
     clear(area);
     const prompt = documentRef.createElement('div');
     prompt.className = 'lexo-word-prompt';
@@ -99,6 +101,7 @@ export function createLexoView({ documentRef = document } = {}) {
 
   function renderFeedback(root, state, onContinue) {
     const feedback = root.querySelector('#lexoFeedback');
+    if (!feedback) return;
     clear(feedback);
     if (!state.feedback) return;
     const box = documentRef.createElement('div');
@@ -124,6 +127,7 @@ export function createLexoView({ documentRef = document } = {}) {
 
   function renderFinished(root, state, onRestart, onGames) {
     const area = root.querySelector('#lexoQuestionArea');
+    if (!area) return;
     clear(area);
     const title = documentRef.createElement('h2');
     title.textContent = 'LEXO klaar!';
@@ -136,20 +140,5 @@ export function createLexoView({ documentRef = document } = {}) {
     area.append(title, text, restart, games);
   }
 
-  function renderDifficulty(root, difficulty, onChange) {
-    const mount = root.querySelector('#lexoDifficultySelect');
-    clear(mount);
-    const dropdown = createPacoDropdown({
-      options: [
-        { value: 'rookie', label: 'ROOKIE — 2 letters' },
-        { value: 'goat', label: 'GOAT — 1 letter' }
-      ],
-      value: difficulty,
-      onChange,
-      className: 'lexo-dropdown'
-    });
-    mount.appendChild(dropdown.element);
-  }
-
-  return Object.freeze({ renderStats, renderGrid, renderQuestion, renderWordInput, renderFeedback, renderFinished, renderDifficulty });
+  return Object.freeze({ renderStats, renderGrid, renderQuestion, renderWordInput, renderFeedback, renderFinished });
 }

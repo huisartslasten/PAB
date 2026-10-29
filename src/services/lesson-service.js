@@ -43,14 +43,8 @@ function normalizeLessonItems(items = []) {
   });
 }
 
-export function createLessonService(db, { learningTopics = null } = {}) {
+export function createLessonService(db) {
   if (!db) throw new Error('A Supabase client is required.');
-  if (!learningTopics) throw new Error('Learning topic service is required.');
-
-  async function topicIdFor(payload) {
-    const topic = await learningTopics.ensureTopic({ student: payload.student, subject: payload.subject, subvak: payload.subvak });
-    return Number(topic.id);
-  }
 
   async function permanentlyDelete(id) {
     const { error: attemptsError } = await db.from('test_attempts').delete().eq('lesson_id', id);
@@ -68,8 +62,7 @@ export function createLessonService(db, { learningTopics = null } = {}) {
     },
     async createLesson(payload) {
       const normalized = normalizeLessonPayload(payload);
-      const learning_topic_id = await topicIdFor(normalized);
-      const { data, error } = await db.from('lessons').insert({ ...normalized, learning_topic_id }).select().single();
+      const { data, error } = await db.from('lessons').insert(normalized).select().single();
       if (error) throw error;
       return data;
     },
@@ -88,8 +81,7 @@ export function createLessonService(db, { learningTopics = null } = {}) {
     },
     async updateLesson(id, payload) {
       const normalized = normalizeLessonPayload(payload);
-      const learning_topic_id = await topicIdFor(normalized);
-      const { data, error } = await db.from('lessons').update({ ...normalized, learning_topic_id }).eq('id', id).select().single();
+      const { data, error } = await db.from('lessons').update(normalized).eq('id', id).select().single();
       if (error) throw error;
       return data;
     },

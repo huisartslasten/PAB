@@ -2,12 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createLessonService } from '../src/services/lesson-service.js';
 
-const learningTopics = {
-  async ensureTopic(payload) { return { id: 99, ...payload }; }
-};
-
 function createService(db) {
-  return createLessonService(db, { learningTopics });
+  return createLessonService(db);
 }
 
 function mockDb({ rows = [], error = null, insertError = null, updateError = null } = {}) {
@@ -29,32 +25,29 @@ function mockDb({ rows = [], error = null, insertError = null, updateError = nul
         },
         update(payload) {
           calls.push({ op: 'update', payload });
-          return {
-            eq(column, value) {
-              calls.push({ op: 'eq', column, value });
-              return {
-                select(columns = '*') {
-                  calls.push({ op: 'select-after-update', columns });
-                  return { single() { return Promise.resolve({ data: rows[0] ?? null, error: updateError }); } };
-                }
-              };
-            }
-          };
+          return { eq(column, value) {
+            calls.push({ op: 'eq', column, value });
+            return { select(columns = '*') {
+              calls.push({ op: 'select-after-update', columns });
+              return { single() { return Promise.resolve({ data: rows[0] ?? null, error: updateError }); } };
+            } };
+          } };
         },
         delete() {
           calls.push({ op: 'delete' });
-          return { eq(column, value) { calls.push({ op: 'eq-delete', column, value }); return Promise.resolve({ error: null }); } };
+          return { eq(column, value) {
+            calls.push({ op: 'eq-delete', column, value });
+            return Promise.resolve({ error: null });
+          } };
         },
         insert(insertRows) {
           calls.push({ op: 'insert', rows: insertRows });
-          return {
-            select() {
-              const selectedRow = rows[0] ?? (Array.isArray(insertRows) ? insertRows[0] : insertRows);
-              const selected = Promise.resolve({ data: Array.isArray(insertRows) ? insertRows : [insertRows], error: insertError });
-              selected.single = () => Promise.resolve({ data: selectedRow, error: insertError });
-              return selected;
-            }
-          };
+          return { select() {
+            const selectedRow = rows[0] ?? (Array.isArray(insertRows) ? insertRows[0] : insertRows);
+            const selected = Promise.resolve({ data: Array.isArray(insertRows) ? insertRows : [insertRows], error: insertError });
+            selected.single = () => Promise.resolve({ data: selectedRow, error: insertError });
+            return selected;
+          } };
         }
       };
     }
@@ -69,13 +62,13 @@ test('lesson service preserves item ordering and query shape', async () => {
   assert.deepEqual(db.calls[2], { op: 'order', column: 'id', options: { ascending: true } });
 });
 
-test('lesson service creates a lesson through the canonical topic owner', async () => {
-  const payload = { title: 'Nieuwe les', student: 'Zyon', subject: '', type: 'words' };
-  const persisted = { student: 'Zyon', subject: '', subvak: '', title: 'Nieuwe les', type: 'words', archived: false, deleted: false, learning_topic_id: 99 };
+test('lesson service creates lessons without creating learning topics', async () => {
+  const persisted = { student: 'Zyon', subject: '', subvak: '', title: 'Nieuwe les', type: 'words', archived: false, deleted: false };
   const db = mockDb({ rows: [{ id: 17, ...persisted }] });
-  const result = await createService(db).createLesson(payload);
+  const result = await createService(db).createLesson({ title: 'Nieuwe les', student: 'Zyon', subject: '', type: 'words' });
   assert.deepEqual(result, { id: 17, ...persisted });
   assert.deepEqual(db.calls[1], { op: 'insert', rows: persisted });
+  assert.equal('learning_topic_id' in db.calls[1].rows, false);
 });
 
 test('lesson service propagates create errors', async () => {
@@ -84,12 +77,13 @@ test('lesson service propagates create errors', async () => {
   await assert.rejects(() => createService(db).createLesson({ title: 'Nieuwe les' }), error);
 });
 
-test('lesson service updates a lesson through the canonical topic owner', async () => {
-  const persisted = { student: null, subject: '', subvak: '', title: 'Aangepaste les', type: '', archived: false, deleted: false, learning_topic_id: 99 };
+test('lesson service updates lessons without creating learning topics', async () => {
+  const persisted = { student: null, subject: '', subvak: '', title: 'Aangepaste les', type: '', archived: false, deleted: false };
   const db = mockDb({ rows: [{ id: 17, ...persisted }] });
   const result = await createService(db).updateLesson(17, { title: 'Aangepaste les', archived: false });
   assert.deepEqual(result, { id: 17, ...persisted });
   assert.deepEqual(db.calls[1], { op: 'update', payload: persisted });
+  assert.equal('learning_topic_id' in db.calls[1].payload, false);
 });
 
 test('lesson service propagates update errors', async () => {
@@ -118,40 +112,7 @@ test('lesson service replaces lesson items with normalized TEST-schema fields', 
   }]);
 });
 
-test('lesson service owns photo-style lesson creation and preserves normalized item data', async () => {
-  const calls = [];
-  const db = {
-    from(table) {
-      calls.push({ op: 'from', table });
-      return {
-        insert(rows) {
-          calls.push({ op: 'insert', table, rows });
-          const data = table === 'lessons' ? { id: 31, ...rows } : rows;
-          return { select() {
-            const selected = Promise.resolve({ data: table === 'lessons' ? [data] : rows, error: null });
-            selected.single = () => Promise.resolve({ data, error: null });
-            return selected;
-          } };
-        },
-        delete() { calls.push({ op: 'delete', table }); return { eq(column, value) { calls.push({ op: 'eq-delete', column, value }); return Promise.resolve({ error: null }); } }; }
-      };
-    }
-  };
-  const result = await createService(db).createLessonWithItems({
-    lesson: { student: 'Zyon', subject: 'Nederlands', title: 'Foto-les', type: 'words' },
-    items: [{ question: 'Wat betekent kapen?', answer: 'Een schip overnemen' }]
-  });
-  assert.equal(result.lesson.id, 31);
-  assert.equal(calls[1].rows.learning_topic_id, 99);
-  assert.deepEqual(calls[3].rows, [{
-    question: 'Wat betekent kapen?', answer: 'Een schip overnemen',
-    question_parts: [{ text: 'Wat betekent kapen?', role: 'answer' }],
-    answer_parts: [{ text: 'Een schip overnemen', role: 'answer' }],
-    hint: '', response_type: 'text', answer_options: [], difficulty: null, sort_order: 0, lesson_id: 31
-  }]);
-});
-
-test('lesson service rolls back the created lesson when item persistence fails', async () => {
+test('lesson service rolls back a created lesson when item persistence fails', async () => {
   const rollbackError = new Error('item insert failed');
   const calls = [];
   let insertCount = 0;
@@ -177,7 +138,10 @@ test('lesson service rolls back the created lesson when item persistence fails',
       };
     }
   };
-  await assert.rejects(() => createService(db).createLessonWithItems({ lesson: { student: 'Zyon', subject: 'Nederlands', title: 'Foto-les', type: 'words' }, items: [{ question: 'Vraag', answer: 'Antwoord' }] }), rollbackError);
+  await assert.rejects(() => createService(db).createLessonWithItems({
+    lesson: { student: 'Zyon', subject: 'Nederlands', title: 'Foto-les', type: 'words' },
+    items: [{ question: 'Vraag', answer: 'Antwoord' }]
+  }), rollbackError);
   assert.equal(insertCount, 2);
   assert.deepEqual(calls.at(-2), { op: 'delete', table: 'lessons' });
   assert.deepEqual(calls.at(-1), { op: 'eq-delete', column: 'id', value: 44 });

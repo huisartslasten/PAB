@@ -65,12 +65,22 @@ export function createEditorFormatting({ selectionStore, defaultFontSize = DEFAU
     return normalizeInlineState(activeInlineFormats.get(surface));
   }
 
+  function updateToolbarState(surface) {
+    const state = inlineState(surface);
+    const toolbar = surface?.closest?.('.learning-card')?.querySelector?.('.learning-editor-toolbar');
+    if (!toolbar) return;
+    for (const name of ['bold', 'italic']) {
+      toolbar.querySelector(`[data-command="${name}"]`)?.classList.toggle('is-active', state[name]);
+    }
+  }
+
   function setInlineFormat(surface, command, active) {
     const name = String(command || '').trim().toLowerCase();
     if (!surface || !['bold', 'italic'].includes(name)) return false;
     const state = inlineState(surface);
     state[name] = Boolean(active);
     activeInlineFormats.set(surface, state);
+    updateToolbarState(surface);
     return state[name];
   }
 
@@ -154,7 +164,13 @@ export function createEditorFormatting({ selectionStore, defaultFontSize = DEFAU
     if (!tagName || !surface?.ownerDocument) return false;
 
     const range = selectionStore.restore(surface);
-    if (!range || range.collapsed || !surface.contains(range.commonAncestorContainer)) return false;
+    if (!range || !surface.contains(range.commonAncestorContainer)) return false;
+
+    if (range.collapsed) {
+      toggleInlineFormat(surface, name);
+      surface.focus?.();
+      return true;
+    }
 
     const fragment = range.cloneContents();
     const nodes = textNodes(fragment);
@@ -177,6 +193,7 @@ export function createEditorFormatting({ selectionStore, defaultFontSize = DEFAU
         selection.removeAllRanges();
         selection.addRange(next.cloneRange());
       }
+      toggleInlineFormat(surface, name);
       selectionStore.remember(surface);
       surface.focus?.();
       return true;
@@ -188,6 +205,7 @@ export function createEditorFormatting({ selectionStore, defaultFontSize = DEFAU
       selection.removeAllRanges();
       selection.addRange(range.cloneRange());
     }
+    toggleInlineFormat(surface, name);
     selectionStore.remember(surface);
     surface.focus?.();
     return true;

@@ -13,11 +13,18 @@ describe('learning material formatting ownership contract', () => {
     expect(editorPageSource).toContain('formatting.insertTextWithFontSize(surface, size, event.data)');
   });
 
+  it('routes inline bold and italic formatting through the central formatting owner', () => {
+    expect(editorPageSource).toContain('formatting.applyInlineFormat(surface, name)');
+    expect(editorPageSource).not.toContain('surface.ownerDocument.execCommand(name, false)');
+    expect(editorPageSource).not.toContain('selectionStore.restore(surface);');
+  });
+
   it('keeps the central formatting API stable', () => {
     const selectionStore = { restore: () => null, remember: () => null };
     const formatting = createEditorFormatting({ selectionStore });
     expect(formatting.defaultFontSize).toBe(22);
     expect(typeof formatting.applyFontSize).toBe('function');
     expect(typeof formatting.insertTextWithFontSize).toBe('function');
+    expect(typeof formatting.applyInlineFormat).toBe('function');
   });
 });

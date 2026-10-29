@@ -4,8 +4,8 @@
 @import url("./paco-tile.css");
 @import url("./design-system.css");
 
-/* Keep the shared shell hidden until its canonical template exists. This prevents a flash of unstyled route content on every page. */
-body:not(:has(.paco-page-template)) { visibility:hidden; }
+/* Keep the shared page hidden until the canonical page or chooser mount has rendered. This prevents a flash of unstyled route content without special-casing individual pages. */
+body:has(#paco-template-mount:empty):not(:has(#paco-chooser-mount:not(:empty))) { visibility:hidden; }
 
 :root { --paco-sidebar-width: 235px; --paco-content-max: 1440px; --paco-lesson-bg: #fffdf0; --paco-lesson-border: #f4e8a8; --paco-lesson-shadow: 0 8px 0 rgba(16,43,87,.08), 0 14px 28px rgba(16,43,87,.10); }
 .paco-page-template { min-height:100vh; margin:0; background:var(--paco-blue); color:var(--paco-text); font-family:Nunito,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
@@ -23,35 +23,3 @@ body:not(:has(.paco-page-template)) { visibility:hidden; }
 .paco-template-navigation { min-height:0; flex:1 1 auto; display:flex; flex-direction:column; gap:4px; overflow-y:auto; overscroll-behavior:auto; padding-right:4px; scrollbar-width:thin; }
 .paco-template-nav-group { position:relative; }
 .paco-template-nav-item { width:100%; display:flex; align-items:center; gap:11px; padding:11px 12px; border-radius:14px; background:transparent; text-align:left; font-size:17px; }
-.paco-template-nav-item.active { background:#dff0ff; color:var(--paco-blue-dark); }
-.paco-template-nav-item.management { background:var(--paco-yellow-soft); color:var(--paco-text); }
-.paco-template-nav-item.management.active { background:var(--paco-yellow); }
-.paco-template-nav-item.management:hover { background:var(--paco-yellow-soft-hover); }
-.paco-template-nav-item.management.active:hover { background:var(--paco-yellow-hover); }
-.paco-template-nav-icon { width:27px; flex:0 0 27px; text-align:center; font-size:21px; }
-.paco-template-nav-chevron { margin-left:auto; color:var(--paco-blue-dark); font-size:15px; transition:transform .15s ease; }
-.paco-template-nav-group:hover .paco-template-nav-chevron,.paco-template-nav-group:focus-within .paco-template-nav-chevron,.paco-template-nav-group.always-open .paco-template-nav-chevron { transform:rotate(90deg); }
-.paco-template-nav-submenu { display:none; margin:2px 0 5px 40px; padding:2px 0 2px 12px; border-left:2px solid #cde5fa; }
-.paco-template-nav-group:hover .paco-template-nav-submenu,.paco-template-nav-group:focus-within .paco-template-nav-submenu,.paco-template-nav-group.always-open .paco-template-nav-submenu { display:flex; flex-direction:column; gap:3px; }
-.paco-template-nav-subitem { border:0; border-radius:11px; padding:10px 12px; background:transparent; color:var(--paco-text); font-family:"Baloo 2",Nunito,sans-serif; font-size:16px; font-weight:800; line-height:1.2; text-align:left; cursor:pointer; }
-.paco-template-nav-subitem:hover,.paco-template-nav-subitem.active { background:#dff0ff; color:var(--paco-blue-dark); }
-.paco-template-nav-subitem.management-student.active { background:var(--paco-blue); color:#fff; box-shadow:0 4px 10px rgba(13,111,212,.18); }
-.paco-template-nav-subitem.management-student:hover { background:#dff0ff; color:var(--paco-blue-dark); }
-.paco-template-nav-item.management:hover { color:var(--paco-text); }
-.paco-template-main { min-width:0; }
-.paco-template-page-header { min-height:108px; display:flex; align-items:center; gap:14px; margin:0 0 22px; padding:20px 25px; border:1px solid var(--paco-border); border-radius:22px; background:#edf8ff; box-shadow:var(--paco-shadow); }
-.paco-template-page-icon { flex:0 0 auto; font-size:39px; line-height:1; }
-.paco-template-page-heading h1 { margin:0; font-family:"Baloo 2",Nunito,sans-serif; font-size:clamp(30px,3vw,42px); line-height:1; color:var(--paco-text); font-weight:900; letter-spacing:-.5px; }
-.paco-template-page-heading p { margin:7px 0 0; color:var(--paco-muted); font-size:17px; font-weight:700; line-height:1.35; }
-.paco-template-page-content { min-width:0; color:var(--paco-text); }
-.paco-page-template .page-heading { min-height:84px; display:flex; flex-direction:column; justify-content:center; margin:0; padding:17px 22px; border:1px solid var(--paco-border); border-radius:20px; background:#edf8ff; color:var(--paco-text); box-shadow:var(--paco-shadow); }
-.paco-page-template .page-heading h2,.paco-page-template .page-heading h3 { margin:0; font:900 28px/1.05 "Baloo 2",Nunito,sans-serif; color:var(--paco-text); }
-.paco-page-template .page-heading p { margin:6px 0 0; color:var(--paco-muted); font-size:17px; font-weight:700; line-height:1.35; }
-.paco-page-template .paco-template-page-content strong { color:var(--paco-text); }
-.paco-page-template button.secondary,.paco-page-template button.success { min-height:46px; padding:9px 16px; border:2px solid var(--paco-border); border-radius:14px; background:#edf8ff; color:var(--paco-blue-dark); font:800 16px/1.1 "Baloo 2",Nunito,sans-serif; box-shadow:0 4px 0 rgba(13,111,212,.10),0 8px 18px rgba(16,43,87,.07); cursor:pointer; }
-.paco-page-template button.secondary:hover,.paco-page-template button.success:hover { background:#e2f2ff; border-color:#a9d1f3; }
-.paco-page-template button.success { background:var(--paco-blue); color:#fff; border-color:var(--paco-blue); }
-.paco-page-template button.success:hover { background:var(--paco-blue-dark); border-color:var(--paco-blue-dark); }
-.paco-page-template button.secondary:focus-visible,.paco-page-template button.success:focus-visible,.paco-template-back:focus-visible,.paco-template-nav-item:focus-visible,.paco-template-nav-subitem:focus-visible { outline:0; box-shadow:0 0 0 4px rgba(255,255,255,.95),0 0 0 7px rgba(23,135,242,.55); }
-@media(max-width:900px){.paco-template-body{width:min(var(--paco-content-max),calc(100% - 28px));grid-template-columns:1fr}.paco-template-sidebar{position:static}.paco-template-sidebar-card{max-height:none}.paco-template-navigation{overflow:visible}.paco-template-nav-submenu{display:flex}.paco-template-page-header{margin-bottom:16px}.paco-template-version-badge{right:16px;bottom:14px;padding:10px 15px;font-size:22px}}
-@media(max-width:560px){.paco-template-body{width:calc(100% - 18px);padding-top:9px}.paco-template-page-header{padding:16px 17px}.paco-template-page-icon{font-size:32px}.paco-template-page-heading h1{font-size:30px}.paco-template-page-heading p{font-size:15px}.paco-template-version-badge{right:10px;bottom:10px;font-size:18px;padding:8px 12px}}

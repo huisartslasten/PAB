@@ -13,6 +13,7 @@ describe('central editor formatting ownership contract', () => {
     expect(formatting.defaultFontSize).toBe(22);
     expect(typeof formatting.applyFontSize).toBe('function');
     expect(typeof formatting.insertTextWithFontSize).toBe('function');
+    expect(typeof formatting.applyInlineFormat).toBe('function');
     expect(Object.isFrozen(formatting)).toBe(true);
   });
 });

@@ -6,6 +6,10 @@ export async function guardGameRoute({ app, gameKey, context, lessonId = '', nav
   if (!game) throw new Error(`Unknown game route: ${gameKey}`);
   if (game.id === 'double-or-nothing') return true;
 
+  // A game page without a lesson is a valid canonical shell state, but it is
+  // not a playable context. The page runtime itself stops before loading play data.
+  if (!lessonId) return true;
+
   const student = context?.student || '';
   if (!student) return false;
 
@@ -14,7 +18,7 @@ export async function guardGameRoute({ app, gameKey, context, lessonId = '', nav
   if (state?.unlocked === true) return true;
 
   const target = buildViewUrl('games.html', { student, mode: context?.mode });
-  if (lessonId) target.searchParams.set('lesson_id', lessonId);
+  target.searchParams.set('lesson_id', lessonId);
   if (typeof navigate === 'function') await navigate(target);
   return false;
 }

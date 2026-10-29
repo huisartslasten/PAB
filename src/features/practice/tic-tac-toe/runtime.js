@@ -11,7 +11,7 @@ export const TIC_TAC_TOE_MODES = Object.freeze([
   Object.freeze({ id: 'infinite', label: 'INFINITE', description: 'Je oudste teken verdwijnt zodra je een vierde eigen teken plaatst.' })
 ]);
 export const TIC_TAC_TOE_AI_LEVELS = Object.freeze([
-  Object.freeze({ id: 'rookie', label: 'ROOKIE' }), Object.freeze({ id: 'goat', label: 'GOAT' })
+  Object.freeze({ value: 'rookie', label: 'ROOKIE' }), Object.freeze({ value: 'goat', label: 'GOAT' })
 ]);
 function normalizeItems(items) { return (Array.isArray(items) ? items : []).filter(item => item && typeof item === 'object'); }
 function emptyBoard() { return Array(BOARD_SIZE).fill(null); }

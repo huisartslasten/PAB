@@ -56,7 +56,7 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null,
   const skillDefinitions = createSkillDefinitionService(db, { canConfigure: canConfigureSkills });
   const aiContent = createAiContentService({ supabase: db });
   const photos = createPhotoStorageService(db, { canManage });
-  const learningContent = createLearningContentService({ media: learningTopicMedia, canManage, topics: learningTopics, imagePlacement });
+  const learningContent = createLearningContentService(db, { media: learningTopicMedia, canManage, topics: learningTopics, imagePlacement });
 
   async function initializeSession() {
     if (auth.session) return auth.session;

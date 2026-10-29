@@ -2,6 +2,7 @@ import { mountPacoPageTemplate } from '../../../components/page-template.js';
 import { createPacoNavigation } from '../../../components/page-navigation.js';
 import { createLessonContextField } from '../../lessons/lesson-context-view.js';
 import { filterLessonItemsByContentKind } from '../../lessons/lesson-content-model.js';
+import { buildMemoryItems } from './content-adapter.js';
 import { createMemoryRuntime } from './runtime.js';
 import { createMemoryView } from './view.js';
 import { createPracticeGameTemplate } from '../practice-game-template.js';
@@ -89,7 +90,10 @@ export function createMemoryPageRuntime({ app, templateMount, context, lessonId 
     });
     content.appendChild(gameTemplate.element);
 
-    const items = filterLessonItemsByContentKind(lesson, contentKind);
+    const items = buildMemoryItems({
+      items: filterLessonItemsByContentKind(lesson, contentKind),
+      contentKind
+    });
     const runtime = createMemoryRuntime({ items });
 
     async function resolveTurn() {
@@ -115,6 +119,7 @@ export function createMemoryPageRuntime({ app, templateMount, context, lessonId 
         onTimingModeChange: nextMode => { timingMode = nextMode; renderState(); },
         onResolveTurn: resolveTurn,
         onCardSelect: cardId => { runtime.selectCard(cardId); renderState(); },
+        onPlayAudio: audioText => app.audio?.speak(audioText, { language: 'nl' }),
         onNextRound: () => { runtime.startNextRound(); renderState(); },
         onFinished: () => { runtime.start(); renderState(); }
       });

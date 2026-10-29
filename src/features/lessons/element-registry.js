@@ -87,16 +87,14 @@ export function buildQuestionItem(row = {}) { return buildUniversalItem(row, { d
 export function buildDictationItem(row = {}) {
   const questionParts = Array.isArray(row.question_parts) ? row.question_parts.map(text).filter(Boolean) : (text(row.question) ? [text(row.question)] : []);
   const contentKind = text(row.content_kind ?? row.contentKind) || 'words';
-  const answerPart = Array.isArray(row.answer_parts)
-    ? row.answer_parts.find(part => part?.role !== 'extra')
-    : null;
+  const parts = normalizeParts(row.answer_parts, row.answer ?? row.word);
+  const answerPart = parts.find(part => part.role === 'answer');
   const doelwoord = text(row.doelwoord ?? row.targetWord ?? row.word ?? answerPart?.text ?? row.answer);
   const zin = text(row.zin ?? row.sentence);
   const content = buildDictationContent({ contentKind, doelwoord, zin });
   if (!content) return null;
 
   const prompt = getDictationPrompt(content);
-  const parts = normalizeParts(row.answer_parts, prompt);
   const answer = prompt;
   const responseType = normalizeResponseType(row.response_type ?? row.responseType, 'text');
   const answerOptions = normalizeOptions(row.answer_options ?? row.answerOptions);
@@ -139,4 +137,32 @@ export function isMeaningfulItem(item = {}, type = 'words') {
   if (type === 'dictation') return Boolean(normalizeKey(item.answer || '') && item.content_data);
   if (item.response_type === 'multiple_choice') return Boolean(normalizeKey(item.question || '') && normalizeKey(item.answer || '') && Array.isArray(item.answer_options) && item.answer_options.length >= 2);
   return Boolean(normalizeKey(item.question || '') && normalizeKey(item.answer || ''));
+}
+
+const ELEMENT_BUILDERS = Object.freeze({
+  words: buildWordItem,
+  custom: buildWordItem,
+  questions: buildQuestionItem,
+  dictation: buildDictationItem,
+  math: buildMathItem,
+  spelling: buildSpellingItem
+});
+
+export function getLessonElementDefinition(type) {
+  const normalizedType = text(type);
+  const build = ELEMENT_BUILDERS[normalizedType];
+  return build ? Object.freeze({ type: normalizedType, build }) : null;
+}
+
+export function listLessonElementDefinitions() {
+  return Object.freeze(Object.entries(ELEMENT_BUILDERS).map(([type, build]) => Object.freeze({ type, build })));
+}
+
+export function buildItemsForType(type, rows = []) {
+  const definition = getLessonElementDefinition(type);
+  if (!definition) return [];
+  return (Array.isArray(rows) ? rows : []).map((row, index) => {
+    const item = definition.build(row);
+    return item ? { ...item, sort_order: index } : null;
+  }).filter(Boolean).filter(item => isMeaningfulItem(item, type));
 }

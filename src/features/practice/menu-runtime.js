@@ -98,10 +98,9 @@ export function createPracticeMenuRuntime({ app, templateMount, context, lessonI
   function renderPracticeStep() {
     content.replaceChildren();
     const field = createLessonContextField(lesson, { documentRef });
-    const copy = getPracticeSelectionCopy({ contentKind: selectedContentKind, hasMultipleContentKinds });
     const heading = documentRef.createElement('div');
     heading.className = 'practice-selection-heading';
-    heading.innerHTML = `${hasMultipleContentKinds ? '<button type="button" class="practice-selection-back">← Ander onderdeel</button>' : ''}<h2>${copy.heading}</h2><p>${copy.description}</p>`;
+    heading.innerHTML = `${hasMultipleContentKinds ? '<button type="button" class="practice-selection-back">← Ander onderdeel</button>' : ''}`;
     heading.querySelector('.practice-selection-back')?.addEventListener('click', renderContentStep);
 
     const modes = getPracticeModesForLesson({ lessonType: lesson.type, contentKind: selectedContentKind });

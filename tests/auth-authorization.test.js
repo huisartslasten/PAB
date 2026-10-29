@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  CREATOR_IDS,
+  PARENT_IDS,
   isParentSession,
   isMainAdministratorSession,
   isCreatorSession
@@ -34,4 +36,18 @@ test('unknown user has no management role', () => {
   assert.equal(isParentSession(session), false);
   assert.equal(isCreatorSession(session), false);
   assert.equal(isMainAdministratorSession(session), false);
+});
+
+test('authorization policy preserves the existing creator membership', () => {
+  assert.deepEqual(CREATOR_IDS, PARENT_IDS);
+});
+
+test('authorization policy does not authorize by editable user metadata', () => {
+  assert.equal(isParentSession({
+    user: {
+      id: UNKNOWN_ID,
+      user_metadata: { role: 'parent' },
+      app_metadata: { role: 'parent' }
+    }
+  }), false);
 });

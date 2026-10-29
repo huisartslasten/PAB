@@ -66,9 +66,28 @@ export function createEditorFormatting({ selectionStore, defaultFontSize = DEFAU
     return true;
   }
 
+  function applyInlineFormat(surface, command) {
+    const name = String(command || '').trim().toLowerCase();
+    if (!['bold', 'italic'].includes(name) || !surface?.ownerDocument) return false;
+
+    const range = selectionStore.restore(surface);
+    if (!range || range.collapsed || !surface.contains(range.commonAncestorContainer)) return false;
+
+    const selection = surface.ownerDocument.getSelection?.();
+    if (!selection) return false;
+    selection.removeAllRanges();
+    selection.addRange(range.cloneRange());
+
+    const applied = surface.ownerDocument.execCommand(name, false);
+    selectionStore.remember(surface);
+    surface.focus?.();
+    return applied !== false;
+  }
+
   return Object.freeze({
     defaultFontSize: baseFontSize,
     applyFontSize,
     insertTextWithFontSize,
+    applyInlineFormat,
   });
 }

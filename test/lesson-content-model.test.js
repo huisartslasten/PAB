@@ -1,5 +1,5 @@
-import { buildDictationContent, getDictationPrompt, normalizeLessonContent } from './lesson-content-model.js';
-import { getPracticeCapabilities, getLessonExperienceMatrix } from './learning-experience-registry.js';
+import { buildDictationContent, getDictationPrompt, normalizeLessonContent } from '../src/features/lessons/lesson-content-model.js';
+import { getPracticeCapabilities, getLessonExperienceMatrix } from '../src/features/lessons/learning-experience-registry.js';
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);

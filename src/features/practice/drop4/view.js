@@ -7,8 +7,7 @@ export function createDrop4View({ documentRef = globalThis.document, escapeHtml,
 
   const scope = root || documentRef;
   let levelDropdown = null;
-
-  function find(selector) { return scope.querySelector(selector); }
+  const find = selector => scope.querySelector(selector);
 
   function renderBoard(state, onColumn) {
     const board = find('#drop4Board');
@@ -27,7 +26,7 @@ export function createDrop4View({ documentRef = globalThis.document, escapeHtml,
   function renderStats(state) {
     const score = find('[data-stat="score"] strong');
     const record = find('[data-stat="record"] strong');
-    const progress = find('#drop4Progress');
+    const progress = find('[data-stat="progress"] strong');
     if (score) score.textContent = state.score == null ? '—' : `${state.score} 🏆`;
     if (record) record.textContent = state.bestScore == null ? '— 🥇' : `${state.bestScore} 🥇`;
     if (progress) progress.textContent = `${state.uniqueAnswered} vragen`;

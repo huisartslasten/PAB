@@ -1,4 +1,3 @@
-import { createPacoDropdown } from '../../../components/design-system.js';
 import { schedulePacoTurn } from '../practice-game-template.js';
 
 export function createDrop4View({ documentRef = globalThis.document, escapeHtml, root = null } = {}) {
@@ -6,7 +5,6 @@ export function createDrop4View({ documentRef = globalThis.document, escapeHtml,
   if (typeof escapeHtml !== 'function') throw new Error('An escapeHtml function is required.');
 
   const scope = root || documentRef;
-  let levelDropdown = null;
   const find = selector => scope.querySelector(selector);
 
   function renderBoard(state, onColumn) {
@@ -30,15 +28,6 @@ export function createDrop4View({ documentRef = globalThis.document, escapeHtml,
     if (score) score.textContent = state.score == null ? '—' : `${state.score} 🏆`;
     if (record) record.textContent = state.bestScore == null ? '— 🥇' : `${state.bestScore} 🥇`;
     if (progress) progress.textContent = `${state.uniqueAnswered} vragen`;
-  }
-
-  function renderSettings(state, levelOptions, onLevel) {
-    const mount = find('#drop4Level');
-    if (!mount) return;
-    if (!levelDropdown) {
-      levelDropdown = createPacoDropdown({ options: levelOptions.map(item => ({ value: item.id, label: item.label })), value: state.aiLevel, onChange: onLevel });
-      mount.replaceChildren(levelDropdown.element);
-    } else levelDropdown.setValue(state.aiLevel);
   }
 
   function renderQuestion(state, onSubmit, errorMessage = '') {
@@ -84,5 +73,5 @@ export function createDrop4View({ documentRef = globalThis.document, escapeHtml,
     content.querySelector('[data-drop4-back]')?.addEventListener('click', onBack);
   }
 
-  return Object.freeze({ renderBoard, renderStats, renderSettings, renderQuestion, renderPacoTurn, renderGameResult });
+  return Object.freeze({ renderBoard, renderStats, renderQuestion, renderPacoTurn, renderGameResult });
 }

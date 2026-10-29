@@ -28,6 +28,7 @@ import { createMonthCalendarRuntime } from '../features/agenda/month-calendar-ru
 import { createTestHistoryRuntime } from '../features/test-history/runtime.js';
 import { createManagementRuntime } from '../features/management/runtime.js';
 import { createChallengeConfigurationRuntime } from '../features/management/challenge-configuration-runtime.js';
+import { createGameAccessRuntime } from '../features/management/game-access-runtime.js';
 import { createSkillCreationRuntime } from '../features/management/skill-creation-runtime.js';
 import { createSkillEditorRuntime } from '../features/management/skill-editor-runtime.js';
 import { createArchiveRuntime } from '../features/management/archive-runtime.js';
@@ -70,6 +71,7 @@ export function createPacoRouteRegistry({ app, mounts, documentRef = document } 
   routes['test-history.html'] = defineRoute(({ url, navigate }) => createTestHistoryRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/management/management-support.css']);
   routes['management.html'] = defineRoute(({ url, navigate }) => createManagementRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/management/management-support.css']);
   routes['challenge-settings.html'] = defineRoute(({ navigate }) => createChallengeConfigurationRuntime({ app, templateMount: mounts.templateMount, documentRef, navigate }), ['src/features/management/management-support.css', 'src/features/management/challenge-configuration.css']);
+  routes['game-access.html'] = defineRoute(({ url, navigate }) => createGameAccessRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/management/management-support.css', 'src/features/management/challenge-configuration.css']);
   routes['skill-create.html'] = defineRoute(({ url, navigate }) => createSkillCreationRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/management/management-support.css']);
   routes['skill-editor.html'] = defineRoute(({ url, navigate }) => createSkillEditorRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), createMode: url.searchParams.get('create') === '1', category: url.searchParams.get('category') || 'math', documentRef, navigate }), ['src/features/management/management-support.css']);
   routes['archive.html'] = defineRoute(({ url, navigate }) => createArchiveRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/management/management-support.css']);

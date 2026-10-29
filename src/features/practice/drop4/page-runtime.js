@@ -15,6 +15,7 @@ export function createDrop4PageRuntime({ app, templateMount, context, lessonId =
 
   const student = context?.student || '';
   const content = documentRef.createElement('div');
+  let handleDifficultyChange = null;
   const gameArea = documentRef.createElement('div');
   gameArea.innerHTML = '<div id="drop4Board" class="drop4-board" aria-label="DROP4 bord"></div><div id="drop4Content" class="drop4-content"></div>';
   const gameTemplate = createPracticeGameTemplate({
@@ -26,6 +27,7 @@ export function createDrop4PageRuntime({ app, templateMount, context, lessonId =
     ],
     difficulty: 'rookie',
     difficultyOptions: DROP4_AI_LEVELS,
+    onDifficultyChange: value => handleDifficultyChange?.(value),
     gameArea
   });
   const view = createDrop4View({ documentRef, escapeHtml, root: gameTemplate.element });
@@ -112,7 +114,7 @@ export function createDrop4PageRuntime({ app, templateMount, context, lessonId =
       }
     }
 
-    gameTemplate.dropdown.setValue('rookie');
+    handleDifficultyChange = value => { runtime.start({ level: value }); void render(); };
     runtime.start({ level: 'rookie' });
     await render();
   }

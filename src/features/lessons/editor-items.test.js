@@ -14,7 +14,7 @@ import {
 
 test('dictation item uses one entered word as the canonical answer', () => {
   const item = buildDictationItem({ word: 'paard' });
-  assert.deepEqual(item, { question: '', answer: 'paard', question_parts: [], answer_parts: [{ text: 'paard', role: 'answer' }], response_type: 'text', answer_options: [] });
+  assert.deepEqual(item, { question: '', answer: 'paard', question_parts: [], answer_parts: [{ text: 'paard', role: 'answer' }], response_type: 'text', answer_options: [], content_data: { schema: 1, kind: 'language', content_kind: 'words', doelwoord: 'paard', zin: '' }, difficulty: null });
 });
 
 test('dictation item accepts existing answer data when hydrating an older lesson', () => {
@@ -22,16 +22,37 @@ test('dictation item accepts existing answer data when hydrating an older lesson
   assert.equal(item.answer, 'vriend');
   assert.deepEqual(item.question_parts, []);
   assert.deepEqual(item.answer_parts, [{ text: 'vriend', role: 'answer' }]);
+  assert.deepEqual(item.content_data, { schema: 1, kind: 'language', content_kind: 'words', doelwoord: 'vriend', zin: '' });
+});
+
+test('sentence dictation keeps the target word and entered sentence as one content item', () => {
+  const item = buildDictationItem({
+    content_kind: 'sentences',
+    doelwoord: 'vrienden',
+    zin: 'Gisteren speelde ik buiten met mijn vrienden.'
+  });
+  assert.equal(item.answer, 'Gisteren speelde ik buiten met mijn vrienden.');
+  assert.deepEqual(item.content_data, {
+    schema: 1,
+    kind: 'language',
+    content_kind: 'sentences',
+    doelwoord: 'vrienden',
+    zin: 'Gisteren speelde ik buiten met mijn vrienden.'
+  });
+});
+
+test('sentence dictation requires the sentence while retaining the target word', () => {
+  assert.equal(buildDictationItem({ content_kind: 'sentences', doelwoord: 'vrienden', zin: '' }), null);
 });
 
 test('dictation rows without a word are not saved', () => {
   assert.equal(buildDictationItem({ word: '   ' }), null);
-  assert.equal(isMeaningfulItem({ question: '', answer: '   ' }, 'dictation'), false);
+  assert.equal(isMeaningfulItem({ question: '', answer: '   ', content_data: null }, 'dictation'), false);
 });
 
 test('dictation build keeps exact word order', () => {
   const items = buildItemsForType('dictation', [{ word: 'appel' }, { word: 'fiets' }, { word: 'huis' }]);
-  assert.deepEqual(items.map(item => [item.sort_order, item.answer]), [[0, 'appel'], [1, 'fiets'], [2, 'huis']]);
+  assert.deepEqual(items.map(item => [item.sort_order, item.answer]), [['0', 'appel'], ['1', 'fiets'], ['2', 'huis']].map(([sort, answer]) => [Number(sort), answer]));
 });
 
 test('math keeps every valid row when an item also contains a non-tested explanation answer', () => {

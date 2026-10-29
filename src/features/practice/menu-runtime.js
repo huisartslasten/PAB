@@ -123,6 +123,14 @@ export function createPracticeMenuRuntime({ app, templateMount, context, lessonI
       content.appendChild(state);
       return;
     }
+
+    const contentKinds = getLessonContentKinds(lesson);
+    if (contentKinds.length === 1) {
+      selectedContentKind = contentKinds[0];
+      renderPracticeStep();
+      return;
+    }
+
     renderContentStep();
   }
 

@@ -100,6 +100,7 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
       className: 'memory-timing-dropdown'
     });
     dropdown.element.dataset.memoryTimingDropdown = 'true';
+    dropdown.element.setValue = dropdown.setValue;
     control.append(label, dropdown.element);
     return control;
   }

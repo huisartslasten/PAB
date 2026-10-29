@@ -11,6 +11,7 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
     onTimingModeChange,
     onResolveTurn,
     onCardSelect,
+    onPlayAudio,
     onFinished,
     onNextRound
   }) {
@@ -26,8 +27,23 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
         button.disabled = state.phase !== 'playing' || state.matchedCardIds.has(card.id);
         if (state.matchedCardIds.has(card.id)) button.classList.add('matched');
         if (visible) button.classList.add('revealed');
+
         if (visible) {
-          button.innerHTML = `<span class="memory-card-type">${card.type === 'question' ? 'Vraag' : 'Antwoord'}</span><span>${escapeHtml(card.value ?? '')}</span>`;
+          const type = documentRef.createElement('span');
+          type.className = 'memory-card-type';
+          type.textContent = card.type === 'audio' ? 'Luisteren' : card.type === 'text' ? 'Geschreven' : (card.type === 'question' ? 'Vraag' : 'Antwoord');
+          button.appendChild(type);
+
+          if (card.audioText) {
+            const audioAction = documentRef.createElement('span');
+            audioAction.className = 'memory-card-audio';
+            audioAction.textContent = '🔊 Luister';
+            button.appendChild(audioAction);
+          } else {
+            const value = documentRef.createElement('span');
+            value.textContent = card.value;
+            button.appendChild(value);
+          }
         } else {
           const image = documentRef.createElement('img');
           image.className = 'memory-card-back-image';
@@ -35,7 +51,23 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
           image.alt = 'Paco';
           button.appendChild(image);
         }
-        if (state.phase === 'playing' && !state.matchedCardIds.has(card.id)) button.addEventListener('click', () => onCardSelect(card.id));
+
+        if (state.phase === 'playing' && !state.matchedCardIds.has(card.id)) {
+          button.addEventListener('click', () => onCardSelect(card.id));
+        }
+        if (visible && card.audioText) {
+          const audioButton = documentRef.createElement('button');
+          audioButton.type = 'button';
+          audioButton.className = 'memory-card-audio-button';
+          audioButton.textContent = '🔊';
+          audioButton.title = 'Laat de kaart opnieuw horen';
+          audioButton.setAttribute('aria-label', 'Laat de kaart opnieuw horen');
+          audioButton.addEventListener('click', event => {
+            event.stopPropagation();
+            onPlayAudio(card.audioText);
+          });
+          button.appendChild(audioButton);
+        }
         grid.appendChild(button);
       });
     }

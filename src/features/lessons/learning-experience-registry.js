@@ -29,9 +29,9 @@ const PRACTICE_MODE_DEFINITIONS = Object.freeze({
 const PRACTICE_MODE_IDS = Object.freeze(Object.keys(PRACTICE_MODE_DEFINITIONS));
 
 const CAPABILITY_MATRIX = Object.freeze({
-  'dictation:words': Object.freeze(['dictation', 'flashcards', 'memory', 'games', 'practice-test']),
+  'dictation:words': Object.freeze(['dictation', 'flashcards', 'memory', 'practice-test', 'games']),
   'dictation:sentences': Object.freeze(['dictation', 'flashcards', 'memory', 'practice-test']),
-  'words:words': Object.freeze(['flashcards', 'memory', 'games', 'practice-test']),
+  'words:words': Object.freeze(['flashcards', 'memory', 'practice-test', 'games']),
   'questions:questions': Object.freeze(['flashcards', 'practice-test']),
   'math:math': Object.freeze(['flashcards', 'practice-test']),
   'spelling:spelling': Object.freeze(['flashcards', 'practice-test']),

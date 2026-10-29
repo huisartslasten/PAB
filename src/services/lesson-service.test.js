@@ -8,7 +8,7 @@ function createDbStub() {
     select: () => ({ single: async () => result }),
     order: async () => result,
     eq: () => ({ select: () => ({ single: async () => result }), delete: async () => result }),
-    insert: async () => result,
+    insert: () => ({ select: () => ({ single: async () => result }) }),
     update: () => ({ eq: () => ({ select: () => ({ single: async () => result }) }) }),
     delete: () => ({ eq: () => ({ select: async () => result }) })
   });
@@ -16,7 +16,7 @@ function createDbStub() {
     calls,
     from(table) {
       calls.push(table);
-      return chain({ data: [{ id: 1 }], error: null });
+      return chain({ data: { id: 1 }, error: null });
     }
   };
 }

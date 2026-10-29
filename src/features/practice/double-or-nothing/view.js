@@ -1,6 +1,6 @@
 // Presentation boundary for Double or Nothing.
-// The visual language follows the canonical practice-page structure while adding
-// game-specific bone, record, stake and feedback presentation.
+// The shared practice shell owns the surrounding layout. This view owns only
+// Double or Nothing-specific content inside that shell.
 
 export function buildStakeOptions(score) {
   const currentScore = Math.floor(Number(score));
@@ -16,21 +16,24 @@ export function buildStakeOptions(score) {
   return [...new Set(amounts)].filter(amount => amount <= currentScore);
 }
 
-export function createDoubleOrNothingView({ documentRef = globalThis.document, escapeHtml } = {}) {
+export function createDoubleOrNothingView({ documentRef = globalThis.document, escapeHtml, root = null } = {}) {
   if (!documentRef) throw new Error('A document is required.');
   if (typeof escapeHtml !== 'function') throw new Error('An escapeHtml function is required.');
 
+  const scope = () => root || documentRef;
+  const query = selector => scope().querySelector(selector);
+
   function renderStats(state) {
-    const score = documentRef.getElementById('doubleScore');
-    const record = documentRef.getElementById('doubleRecord');
-    const goal = documentRef.getElementById('doubleGoal');
+    const score = query('[data-stat="score"] strong');
+    const record = query('[data-stat="record"] strong');
+    const goal = query('[data-stat="goal"] strong');
     if (score) score.textContent = `${state.score} 🦴`;
     if (record) record.textContent = `${state.bestScore} 🏆`;
     if (goal) goal.textContent = `${state.maxScore} 🎯`;
   }
 
   function renderProgress(state) {
-    const node = documentRef.getElementById('doubleProgress');
+    const node = query('#doubleProgress');
     if (!node) return;
     const completed = Math.min(state.index, state.total);
     const pct = state.total ? completed / state.total * 100 : 0;
@@ -38,7 +41,7 @@ export function createDoubleOrNothingView({ documentRef = globalThis.document, e
   }
 
   function renderStakeOptions(state) {
-    const box = documentRef.getElementById('doubleStake');
+    const box = query('#doubleStake');
     if (!box) return;
     if (state.index === 0) {
       box.innerHTML = '<div class="double-free-round">Deze eerste vraag is gratis. Goed antwoord = <strong>+10 🦴</strong>.</div>';
@@ -56,10 +59,10 @@ export function createDoubleOrNothingView({ documentRef = globalThis.document, e
   }
 
   function renderQuestion(state, onStake, onSubmit, errorMessage = '') {
-    const content = documentRef.getElementById('doubleContent');
+    const content = query('#doubleContent');
     if (!content || !state.item) return;
 
-    const existingAnswer = documentRef.getElementById('doubleAnswer')?.value || '';
+    const existingAnswer = query('#doubleAnswer')?.value || '';
 
     renderStats(state);
     renderProgress(state);
@@ -70,7 +73,7 @@ export function createDoubleOrNothingView({ documentRef = globalThis.document, e
       ? `<div class="feedback error" role="alert">${escapeHtml(errorMessage)}</div>`
       : '';
     content.innerHTML = `${feedback}<div class="double-prompt">${escapeHtml(state.item.question || '')}</div><div class="field"><input id="doubleAnswer" class="answer-input" autocomplete="off" placeholder="Typ je antwoord"></div><button class="success" data-practice-action="submit" type="button" ${disabled ? 'disabled' : ''}>Controleren</button>`;
-    const input = documentRef.getElementById('doubleAnswer');
+    const input = query('#doubleAnswer');
     const button = content.querySelector('[data-practice-action="submit"]');
     if (input) input.value = existingAnswer;
     boxStakeHandlers(onStake);
@@ -92,7 +95,7 @@ export function createDoubleOrNothingView({ documentRef = globalThis.document, e
   }
 
   function boxStakeHandlers(onStake) {
-    documentRef.querySelectorAll('[data-stake]').forEach(button => {
+    scope().querySelectorAll('[data-stake]').forEach(button => {
       button.addEventListener('click', () => onStake(Number(button.dataset.stake)));
     });
   }
@@ -100,7 +103,7 @@ export function createDoubleOrNothingView({ documentRef = globalThis.document, e
   function renderResult(state, onContinue) {
     renderStats(state);
     renderProgress(state);
-    const content = documentRef.getElementById('doubleContent');
+    const content = query('#doubleContent');
     if (!content || !state.lastResult) return;
     const result = state.lastResult;
     const heading = result.correct ? '🎉 Goed gedaan!' : '🐶 Oeps!';
@@ -112,7 +115,7 @@ export function createDoubleOrNothingView({ documentRef = globalThis.document, e
   function renderFinished(state, onRestart, onBack) {
     renderStats(state);
     renderProgress(state);
-    const content = documentRef.getElementById('doubleContent');
+    const content = query('#doubleContent');
     if (!content) return;
     const result = state.lastResult;
     const title = state.score >= state.maxScore && state.maxScore > 0 ? '🏆 Perfect!' : '🎯 Ronde klaar!';

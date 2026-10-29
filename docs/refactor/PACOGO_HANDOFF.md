@@ -2,625 +2,358 @@
 
 ## 0. READ THIS FIRST
 
-This file is the handoff for the next PacoGO development chat.
+Continue as if you are the same developer who worked on PacoGO before. Do not restart the architecture from scratch.
 
-**Continue as if you are the same careful developer who worked on this project before. Do not restart the architecture from scratch and do not improvise a faster path.**
+Project: **PacoGO**  
+Repository: **`huisartslasten/PAB`**  
+TEST branch: **`refactor/professional-v1`**  
+LIVE branch: **`main`**
 
-The user explicitly wants the work to continue with the same engineering discipline:
-
-- secure, careful repository inspection before implementation;
-- gedegen onderzoek before coding;
-- explicit ownership and architecture decisions;
-- no patchwork;
-- no duplicate ownership;
-- no local workaround when a shared owner exists;
-- tests as contracts, not as excuses to make bad architecture green;
-- continue autonomously through logically connected work;
-- only report a testing milestone when testing actually starts/completes;
-- never claim tests passed unless they were actually executed;
-- give the user the required post-update handoff information after completed updates.
-
-**The next chat must start Phase 2. Do not reopen Phase 1 unless the repository itself proves that a Phase 1 boundary is broken.**
-
----
-
-# 1. Project identity
-
-- Product/project: **PacoGO**
-- Repository: **`huisartslasten/PAB`**
-- TEST/development branch: **`refactor/professional-v1`**
-- LIVE branch: **`main`**
-- `main` is LIVE and must not be modified during normal development.
-- TEST is the environment for development and manual validation.
-
-Verification state:
-
-- Last verified **application-code** head: `0f101482e735554805257739bfec058cbd533286`
-- Current branch head after this documentation-only handoff update: `52f2f32a888af993ff49dbc9671a5c24b887145e`
-- Current readable TEST version: **V7.0**
-- Full regression for the application-code head: GitHub Actions run **#2262**, run ID `40737838219`
-- Result: **success / green**
-- The handoff commits after that regression contain documentation only; they do not change application behavior.
-
-The latest green application regression covered the maintained Node regression, Vitest regression, Chromium/browser regression, architecture boundary checks and clean-tree verification.
-
----
-
-# 2. Mandatory engineering rules
-
-The permanent engineering standard is binding:
-
-`docs/engineering/PACOGO_ENGINEERING_STANDARD.md`
-
-Read it before meaningful implementation. The following rules are especially important and are non-negotiable.
-
-## Mandatory development flow
-
-Every meaningful change follows exactly:
+Mandatory development flow for every meaningful change:
 
 **PAB CHANGE INTAKE → PAB ARCHITECTURE GATE → PAB IMPLEMENTATION PLAN → IMPLEMENTATION → PAB VERIFICATION GATE → FINAL VERIFICATION**
 
-No step is skipped because something looks small, obvious, local, urgent or easy.
+No patchwork, duplicate ownership, fallback, workaround, bridge, bypass, local copy or page-specific exception. One canonical owner per responsibility. Never claim tests passed unless they actually ran.
 
-## Architecture before code
-
-Before changing code, explicitly establish:
-
-1. **Canonical owner** — who owns this responsibility?
-2. **Current implementation** — where does it live now?
-3. **Shared consumers** — which pages/features/modules use it?
-4. **Correct architectural location** — where should the change actually live?
-5. **Replacement/removal** — what old/local/duplicate implementation must disappear?
-6. **Patch check** — does the proposed solution introduce a patch, workaround, fallback, bridge, bypass, duplicate logic, legacy coupling or special case?
-
-If ownership is unclear: **STOP and inspect the repository.**
-
-## No patchwork
-
-Never solve an architectural problem with:
-
-- a page-specific CSS override;
-- a local copy of shared logic;
-- a second service/runtime;
-- a fallback route;
-- a compatibility bridge;
-- a workaround;
-- duplicated business logic;
-- a temporary solution that becomes permanent;
-- editing legacy code merely to make the new path work.
-
-If the boundary is wrong, redesign the boundary first.
-
-## One canonical owner
-
-Every responsibility has one owner.
-
-Pages own presentation/composition and user interaction.
-Services/modules/features own domain logic, data and shared functionality.
-Design System owns generic visual primitives/tokens.
-Domain components own domain-specific composition.
-
-Do not move responsibility to a convenient file merely because it is easy.
-
-## Legacy
-
-Legacy is not a repair surface.
-
-The old implementation may only be touched as part of a deliberate, proven integration/removal step. Do not patch legacy code to compensate for an incomplete new architecture.
-
-## Tests
-
-Tests must prove intended contracts and architecture.
-
-- Never weaken assertions to make CI green.
-- Add/update tests when behavior changes.
-- Run focused tests before integration where appropriate.
-- Run the full regression gate when required.
-- Never claim a test passed unless it actually ran.
-- A green test never justifies a bad architecture.
-
-## Scope
-
-Do not silently expand a phase because an unrelated improvement is visible.
-
-Record unrelated observations and handle them in the phase where they belong.
+After every tested implementation, report:
+- commit SHA;
+- what that commit contains;
+- status ⏳ / 🟢 / 🔴;
+- the actual regression/test run when available.
 
 ---
 
-# 3. The multi-phase PacoGO plan
+# 1. Phase status
 
-This is the roadmap that must now be followed.
+## Phase 1 — Central Foundation — 🟢 CLOSED
 
-## Phase 1 — Central Foundation — CLOSED
+- Page Shell / Template
+- Navigation Registry
+- Management Shell
+- Design System
 
-1. Page Shell / Template — **GREEN / CLOSED**
-2. Navigation Registry — **GREEN / CLOSED**
-3. Management Shell — **GREEN / CLOSED**
-4. Design System — **GREEN / CLOSED**
+The Design System owns generic visual primitives/tokens. It does **not** automatically own domain-specific practice/game layout.
 
-Phase 1 established the central foundation. It did **not** mean that every domain-specific CSS file or feature had to disappear.
+## Phase 2 — Content Architecture — 🟢 CLOSED
 
-That distinction is important.
+- Central Editor Framework
+- Lesson Element Registry
+- Learning Material Element Registry
 
-The Design System owns generic primitives/tokens. Practice, Lessons, Editors, Management, Agenda and other domains may still own domain-specific composition until their own phase is reached.
+Canonical generic editor ownership is under `src/editor/` with element registry, selection, formatting and toolbar owners. Lesson-specific ownership is under `src/features/lessons/element-registry.js`. Learning-material element ownership is under `src/features/learning-material/element-registry.js`.
 
-### Phase 1 Design System work completed
+Latest Phase 2 consumer/contract commit:
+`614b253436b105a0e67b707ef9c4513d11856bc4`
 
-The central Design System now owns the generic visual foundation, including the shared visual tokens and the generic controls/primitives that were identified as genuinely reusable.
+The user confirmed the Phase 2 work green. Do not reopen Phase 2 unless repository evidence proves a boundary is broken.
 
-General shared tokens moved out of the Page Template into the Design System, including:
+## Phase 3 — Practice — 🟡 RESEARCHED, NOT IMPLEMENTED
 
-- `--paco-blue`
-- `--paco-blue-dark`
-- `--paco-blue-soft`
-- `--paco-yellow`
-- `--paco-yellow-hover`
-- `--paco-yellow-border`
-- `--paco-yellow-soft`
-- `--paco-yellow-soft-hover`
-- `--paco-text`
-- `--paco-muted`
-- `--paco-border`
-- `--paco-shadow`
+Planned sequence:
 
-The Page Template keeps only genuinely shell-specific tokens such as sidebar/content dimensions and lesson-shell-specific presentation.
+1. **Game Registry**
+2. **Practice Template**
+3. **Challenge Registry**
 
-The Design System also owns the canonical generic form-control/button/card primitives that were verified during Phase 1.
+The purpose is the spelletjes/practice architecture. The user explicitly wants the common practice UI — including layout and buttons — to become shared, while unique game mechanics remain game-owned.
 
-### Important Phase 1 lesson
-
-Do **not** interpret “central Design System” as “all feature CSS must be moved into `design-system.css`.”
-
-For example:
-
-- Practice/game layout is domain-owned.
-- Lesson choice composition is lesson-domain-owned.
-- Game-specific controls/feedback/layout are practice/game-owned.
-- Editors retain editor-domain responsibility.
-
-The missing work is to define and enforce clean boundaries between generic visual primitives and domain-specific composition in the appropriate later phases.
+**No Phase 3 implementation has been made in this research pass.**
 
 ---
 
-## Phase 2 — Content Architecture — NEXT
+# 2. Phase 3 research result
 
-5. **Central Editor Framework**
-6. **Lesson Element Registry**
-7. **Learning Material Element Registry**
+The user asked us to establish exactly:
 
-Do not jump to Phase 3 before Phase 2 is architecturally established unless the user explicitly changes the plan or a dependency requires a documented decision.
+1. Which games exist now?
+2. Which parts are duplicated?
+3. Where is the shared practice flow?
+4. Which code is wrongly local owner of layout/buttons/feedback/state?
+5. What existing parts can form the Practice Template?
+6. How are challenges currently linked to games?
+7. What legacy code should ultimately disappear/move?
 
-### Phase 2 goal
+The repository was inspected specifically for these questions.
 
-Create a canonical content architecture so that lesson/editor/learning-material behavior has one understandable ownership model and can be extended without page-specific implementations.
+## 2.1 Current games
 
-### Phase 2 working principles
+`src/features/practice/practice-domain.js` currently exposes **9 active games**:
 
-- First inspect the current editor/lesson/learning-material implementations.
-- Map existing ownership and dependencies before choosing files.
-- Identify duplicate or legacy element implementations.
-- Define the canonical registry/owner before migrating consumers.
-- Do not create a second editor framework next to an existing one.
-- Do not patch existing pages to make a future registry appear to work.
-- Migrate consumers through the canonical boundary.
-- Remove superseded ownership after the replacement is proven.
-- Add architecture/ownership tests where the boundary can be reliably enforced.
+1. `double-or-nothing` — Double or Nothing
+2. `memory` — Memory
+3. `flash-question` — Flash
+4. `tic-tac-toe` — Tic-Tac-Toe
+5. `drop4` — DROP4
+6. `connect-the-dots` — Connect the Dots
+7. `word-reveal` — Letter Hunt
+8. `word-chase` — Word Chase
+9. `lexo` — LEXO
 
-### Phase 2 likely areas to inspect first
+The same file also defines the three practice modes:
 
-Relevant active pages from the page inventory include:
+- Flashcards
+- Oefentoets
+- Spelletjes
 
-- `lessons.html`
-- `lesson-choice.html`
-- `lesson-view.html`
-- `lesson-learning.html`
-- `learning-material.html`
-- `questions.html`
-- `lesson-editor.html`
-- `learning-material-editor.html`
-- `test.html`
+`games-runtime.js` currently consumes `getActivePracticeGames()` and builds the game menu from this catalog. Therefore `practice-domain.js` already contains **registry-like game ownership**. Do not create a second Game Registry without first deciding whether this existing catalog should be promoted/refactored into the canonical owner.
 
-Relevant feature areas include:
+## 2.2 What is duplicated across games
 
-- `src/features/lessons/`
-- `src/features/learning-material/`
-- editor-related components/modules
-- shared content/lesson element code
+Inspection of representative game runtimes (including Double or Nothing, Memory, Tic-Tac-Toe, DROP4, LEXO and Word Chase) confirms substantial repeated ownership in individual `page-runtime.js` files.
 
-Do not assume these are the final owners merely because the files exist. Verify the actual runtime/import ownership first.
+Commonly repeated responsibilities include:
+
+- creating the game shell/card;
+- creating the game header;
+- title/icon/subtitle composition;
+- statistics/progress areas;
+- difficulty/settings controls;
+- game content mount points;
+- question/exercise area;
+- feedback area;
+- lesson context insertion;
+- loading/error states;
+- mounting the generic Paco page shell/navigation;
+- back-to-games navigation;
+- common render lifecycle orchestration;
+- restart/finished flow around the game runtime;
+- in several games, Paco-turn timing/presentation.
+
+The exact unique game board/content remains different, which is correct. The duplicated **surrounding practice shell** is the architectural problem Phase 3 should address.
+
+Examples verified directly:
+
+- `src/features/practice/double-or-nothing/page-runtime.js` creates its own game card, header, stats, content mounts, settings and lifecycle.
+- `src/features/practice/lexo/page-runtime.js` creates its own header/stats/difficulty/question/feedback shell.
+- `src/features/practice/tic-tac-toe/page-runtime.js` creates its own header/stats/settings/board/content shell.
+- `src/features/practice/word-chase/page-runtime.js` creates its own header/stats/settings/target/question/feedback shell.
+- DROP4 similarly constructs its own shell and stats/settings/content areas.
+
+This confirms the user's observation: **the games currently own too much of the surrounding practice UI.**
+
+## 2.3 Where the shared practice flow currently lives
+
+There are already several partial shared owners, but they are not yet one clean practice-game architecture.
+
+### `src/features/practice/question-session.js`
+
+This is an existing canonical shared practice service for reusable question sequencing. It owns the common question-cycle behavior used by practice games.
+
+Do not rebuild question sequencing inside the Game Registry or Practice Template.
+
+### `src/features/practice/practice-domain.js`
+
+This owns the current practice-mode and game catalog. It is already the source used by the games menu.
+
+It is therefore the strongest current candidate for the Game Registry boundary, but the Architecture Gate must decide whether to evolve this owner or introduce a new boundary around it. Do not create duplicate catalogs.
+
+### `src/features/practice/practice-game-template.js`
+
+**Important discovery:** a canonical-looking Practice Game Template already exists in the TEST branch.
+
+It currently exports:
+
+- `createPracticeGameTemplate()`
+- `PRACTICE_DIFFICULTIES`
+- `PRACTICE_PACO_THINKING_DELAY_MS`
+- `schedulePacoTurn()`
+
+The template creates a shared shell containing:
+
+- `practice-game-header`
+- `practice-game-stats`
+- `practice-game-controls`
+- difficulty control
+- `practice-game-main`
+- `practice-game-side`
+- `practice-game-exercise`
+- `practice-game-feedback`
+- `practice-game-area`
+
+It deliberately accepts `gameArea`, `exercise`, `feedback` and `controls` as game-specific content.
+
+It also already centralizes the three-second Paco thinking delay.
+
+Its own contract test is `src/features/practice/practice-game-template.test.js` and verifies the shared shell and the three-second delay.
+
+**Critical next-step finding:** this template exists, but the inspected representative game page runtimes are still constructing their own shells instead of consuming it. So the repository currently contains the beginnings of the intended Practice Template, but it is **not yet proven as the canonical consumer boundary**.
+
+This is exactly the kind of existing architecture we should strengthen rather than build a second template beside it.
+
+## 2.4 What is currently local ownership and should move/shared
+
+The following responsibilities are strong candidates for shared Practice Template ownership after the Architecture Gate confirms them:
+
+- practice-game outer card/layout;
+- common header structure;
+- common stats/progress presentation;
+- common controls/difficulty presentation where genuinely shared;
+- question/exercise container;
+- feedback container;
+- common practice lifecycle/state framing;
+- shared Paco timing policy;
+- shared responsive practice-game structure.
+
+The individual game should retain:
+
+- its board/game area;
+- unique game mechanics;
+- game rules;
+- game-specific scoring rules;
+- turns/win conditions;
+- unique controls that are genuinely game-specific;
+- unique visual presentation inside its game area.
+
+The goal is **not** to make all games mechanically identical. The goal is to stop each game from rebuilding the same practice shell.
+
+## 2.5 What can form the Practice Template
+
+The existing `src/features/practice/practice-game-template.js` is the obvious starting point.
+
+It is already structurally aligned with the desired ownership model: it owns the surrounding shell while receiving game-specific areas as inputs.
+
+However, before using it as the final canonical owner, the next chat must inspect:
+
+- its commit/history/context;
+- its CSS consumers;
+- which games already consume any of its classes/functions;
+- whether its current API is sufficient for all nine games;
+- whether some responsibilities currently inside it actually belong elsewhere;
+- whether any existing shared practice CSS already expresses the same structure.
+
+Do **not** create another `practice-template.js` or another game shell.
+
+## 2.6 Challenge architecture and linkage to games
+
+There is already a canonical challenge registry:
+
+`src/features/challenges/challenge-registry.js`
+
+It currently contains exactly one registered challenge:
+
+- `millionaire`
+
+It provides:
+
+- `listChallengeDefinitions()`
+- `getChallengeDefinition()`
+- `buildAvailableChallenges()`
+
+The registry builds availability from unlocked lessons keyed by challenge ID.
+
+Its tests prove that locked challenges are hidden and unlocked Millionaire lessons are surfaced.
+
+**No evidence was found that the current Challenge Registry is a registry of the nine normal practice games.** It is a separate challenge domain and currently represents Millionaire.
+
+Therefore Phase 3 must **not create a second challenge registry**. The Architecture Gate should determine whether this existing registry needs to be generalized/expanded to become the planned Challenge Registry milestone, while preserving its current ownership.
+
+`src/features/challenges/challenge-difficulty.js` is another existing challenge policy owner and should not be duplicated.
+
+The current repository evidence does not show a clean general mapping such as “game X owns challenge type Y” through the Challenge Registry. The normal practice games currently receive lesson items directly in their runtimes and use their own game runtimes to decide how those items are played.
+
+So the challenge/game relationship still needs a deliberate architecture decision rather than a guessed migration.
+
+## 2.7 Legacy code / what should disappear
+
+The important distinction is that the duplicated practice shell is mostly in **active current game implementations**, not simply in an isolated legacy folder.
+
+Therefore the intended removal is not “patch legacy until it works.” Instead:
+
+- migrate each active game to the canonical Practice Template;
+- remove the duplicated local shell/layout/flow ownership from that game's `page-runtime.js` only after the new owner is proven;
+- keep the game runtime/view responsible for unique mechanics/presentation;
+- remove superseded duplicate CSS and helper code when no consumer remains;
+- keep `page-template.js` for the generic Paco page shell/navigation responsibility rather than turning it into the Practice Template;
+- preserve `question-session.js` as the shared question sequencing owner;
+- preserve/evolve the existing challenge registry rather than replacing it with a parallel implementation.
+
+There is currently **no justification to modify a generic legacy implementation merely to make Phase 3 work**.
 
 ---
 
-## Phase 3 — Practice — NOT STARTED
+# 3. Architectural conclusion for Phase 3
 
-8. Game Registry
-9. Practice Template
-10. Challenge Registry — same catalog
-
-This phase is where practice/game architecture is intentionally taken further.
-
-Important: a central Practice Template already exists. Do not replace it with another practice system. Extend and consolidate the existing canonical owner.
-
-The shared practice template currently owns shared practice behavior such as:
-
-- practice shell/presentation contract;
-- shared difficulty catalog;
-- shared Paco thinking delay/scheduling;
-- common practice-game structure.
-
-The user-facing difficulty label was changed centrally from **ROOKIE** to **NOOB** while retaining the underlying `rookie` value so that no data migration was introduced.
-
----
-
-## Phase 4 — Cleanup — NOT STARTED
-
-11. Legacy modules verwijderen
-12. Oude versioned modules verwijderen
-13. Oude editor-tools verwijderen
-14. Dubbele tests consolideren
-
-Cleanup is not an excuse to patch legacy first. Reference/dependency/workflow checks must happen before deletion.
-
-Known legacy decisions:
-
-- `feedback.html` is old functionality to discard and rebuild later.
-- `photo-phone.html` is old/broken legacy and must be rebuilt, not repaired/migrated.
-- `photo-upload.html` is old/broken legacy and must be rebuilt, not repaired/migrated.
-- There is no separate current dedicated “beheer console” HTML page in the refactor tree; old management-console behavior is not to be resurrected as a second shell.
-- Old `tools/*v453-v476*.sh` files are legacy signals; inspect references/workflows/config before removal.
-
----
-
-## Phase 5 — Enforcement — NOT STARTED
-
-15. Architecture tests
-16. Ownership tests
-17. CI rules preventing duplicate ownership
-
-Enforcement must protect real architectural boundaries. Do not add superficial tests merely because a policy document mentions something.
-
----
-
-# 4. Phase 1 manual-test findings and final fixes
-
-Before closing Phase 1, the user manually tested the TEST site and found four concrete issues. All four were fixed centrally and the full regression was green afterward.
-
-## 4.1 Practice/game dropdown
-
-### Problem
-The time/difficulty dropdown opened but did not close correctly.
-
-### Correct owner
-Design System dropdown styling in:
-
-`src/components/design-system.css`
-
-### Fix
-The dropdown menu now has an explicit default hidden state and only becomes visible when its canonical open state is active.
-
-This was fixed at the shared Design System owner, not in individual games.
-
----
-
-## 4.2 Memory game lesson context
-
-### Problem
-Memory showed:
-
-`Geen leerling of les geselecteerd.`
-
-The route did not pass the selected `lesson_id` through to the memory runtime.
-
-### Correct owner
-Central application route composition in:
-
-`src/app/routes.js`
-
-### Fix
-The memory route now reads `lesson_id` from the query parameters and passes it into `createMemoryRuntime()`.
-
-No memory-page fallback or local workaround was added.
-
-During implementation an accidental stylesheet-path typo was introduced and immediately corrected; `word-reveal` points to its correct practice stylesheet again.
-
----
-
-## 4.3 Skills duplicate “Skill maken”
-
-### Problem
-The Skills page showed a duplicate `Skill maken` entry: one from the central management switch and one from the Skills page itself.
-
-### Correct owner
-Central management capability/switch:
-
-- `src/components/management-switch.js`
-- `src/features/management/management-capabilities.js`
-
-### Fix
-The page-local `Skill maken` button was removed from `src/features/skills/runtime.js`.
-
-The central Management switch is now the single owner/entry point.
-
-This is an important ownership precedent: if a capability is already registered centrally, do not recreate its entry locally.
-
----
-
-## 4.4 ROOKIE → NOOB
-
-### Problem
-The user wanted the visible practice difficulty label `ROOKIE` changed to `NOOB`.
-
-### Correct owner
-Shared practice template:
-
-`src/features/practice/practice-game-template.js`
-
-### Fix
-The visible label is now `NOOB`; the underlying value remains `rookie`.
-
-The test was updated to lock the labels to:
-
-`NOOB`, `GOAT`
-
-No data migration was introduced.
-
----
-
-# 5. Current visual/design observation — DO NOT TURN THIS INTO A SIDE-REFACTOR
-
-During manual testing the user noticed that some ordinary pages currently place dark text directly on the blue page canvas, while the LIVE version of `Mijn vakken` has a more layered visual composition.
-
-The useful LIVE reference is conceptually:
+The research now establishes the following direction strongly enough for the Architecture Gate:
 
 ```text
-PacoGO blue canvas
-    ↓
-light page header
-    ↓
-light content surface
-    ↓
-cream/soft cards
+                    PRACTICE
+                       │
+       ┌───────────────┼────────────────┐
+       │               │                │
+ Practice Template  Game Registry   Challenge Registry
+       │               │                │
+ shared shell       9 active games    challenge domain
+ layout/buttons     + metadata        (currently Millionaire)
+ feedback/progress      │
+ lifecycle              └── unique game mechanics
+
+ question-session.js remains a separate shared question-cycle owner
 ```
 
-The user also showed that Practice/game pages and Lesson Choice already have their own appropriate feature surfaces. They should **not** receive a new generic white wrapper automatically, because that could create double surfaces/backgrounds.
+The most important finding is that **the intended Practice Template is already partly present in `practice-game-template.js`**. The next work should therefore be an evidence-based integration of that existing owner, not creation of a competing template.
 
-### Architectural conclusion
+Likewise, the existing `practice-domain.js` is already the game catalog used by the menu, so the Game Registry milestone should likely evolve that ownership rather than create a second catalog — but this must be explicitly decided in the Architecture Gate.
 
-This is **not a Phase 1 emergency refactor**.
-
-The correct future model is a surface hierarchy in which:
-
-- Design System owns generic surface primitives/tokens;
-- page/template owns page composition;
-- Lessons owns lesson-specific composition;
-- Practice owns practice/game composition;
-- Editors own editor composition;
-- Management owns management composition.
-
-Do not solve this by adding `background: white` or text-color overrides to individual pages.
-
-The user explicitly decided to continue following the multi-phase plan rather than pull later-phase work forward merely because this visual inconsistency is visible.
-
-Therefore:
-
-**PARK THIS OBSERVATION. Continue Phase 2.**
-
-When Phase 2/3 reaches the relevant content/practice boundaries, revisit the surface hierarchy as part of the correct architecture work.
+The existing Challenge Registry is already canonical for challenges and must not be duplicated.
 
 ---
 
-# 6. Page architecture inventory
+# 4. Next chat — exact next steps
 
-The canonical page inventory is:
+Do not implement immediately. Start with:
 
-`docs/refactor/page-inventory.md`
+## PAB Change Intake
 
-It identifies 39 root-level HTML pages and the current runtime/template ownership.
+State the desired result: one shared practice-game architecture where common layout/buttons/feedback/progress/lifecycle are shared and each game retains unique mechanics.
 
-Key architectural facts:
+## PAB Architecture Gate
 
-- `src/components/page-template.js` owns the shared Page Template.
-- `src/app/routes.js` is the canonical runtime route mapping.
-- Active application pages use the shared Page Template.
-- Feature runtimes/modules own domain behavior.
-- Design System owns generic visual primitives/tokens.
-- Domain components retain domain-specific composition.
-- Legacy pages are not patched into the new architecture.
+Explicitly determine:
 
-Important active groups:
+1. canonical owner for the Game Registry;
+2. canonical owner for the Practice Template;
+3. canonical owner for the Challenge Registry;
+4. exact current consumers of each;
+5. exact CSS ownership;
+6. which local game shell code is to be removed after migration;
+7. how challenge definitions relate to game practice without inventing a mapping;
+8. whether `practice-game-template.js` can become the canonical Practice Template as-is or needs architectural refinement.
 
-### Core learning flow
+At minimum inspect all nine game folders/runtimes enough to separate genuinely shared responsibility from game-specific responsibility.
 
-`dashboard.html` → `lessons.html` → `lesson-choice.html` → `lesson-view.html` / `lesson-learning.html` → `questions.html` / `test.html`
+Then produce the PAB Implementation Plan before touching code.
 
-### Learning material
+Likely migration principle:
 
-`learning-material.html` and `learning-material-editor.html`
+**shared shell first → one game migrated as proof → contract test → regression → remaining games migrated → duplicate ownership removed → Challenge Registry work.**
 
-### Practice/games
-
-`oefenen.html`, `oefentoets.html`, `games.html`, `skills.html` and individual game pages.
-
-### Management
-
-`management.html` is the canonical management page/shell. Other management routes are separate feature routes, not duplicate management shells.
+But this is a planning direction only. Do not skip the Architecture Gate.
 
 ---
 
-# 7. Canonical ownership facts already established
+# 5. Do not do these things
 
-## Page shell
-
-Owner:
-
-`src/components/page-template.js`
-
-Do not create another page shell.
-
-## Navigation
-
-Owner:
-
-`src/components/page-navigation.js`
-
-Do not recreate navigation locally.
-
-## Management shell/switch
-
-Owners:
-
-- `src/features/management/management-shell.js`
-- `src/components/management-switch.js`
-- `src/features/management/management-capabilities.js`
-
-Do not add page-local management capability controls when the central capability registry already owns the action.
-
-## Design System
-
-Owners:
-
-- `src/components/design-system.js`
-- `src/components/design-system.css`
-
-Generic visual primitives/tokens belong here.
-
-Do not blindly move domain-specific CSS here.
-
-## Practice
-
-Canonical shared practice owner:
-
-`src/features/practice/practice-game-template.js`
-
-Practice/game-specific composition stays with Practice until Phase 3 consolidates it further.
-
-## Lessons
-
-Lesson behavior/composition is owned by the Lessons feature boundaries. Do not bypass them with page-local Supabase calls or local duplicate logic.
-
-## Learning material
-
-Learning-material behavior is owned by the learning-material feature boundaries. Phase 2 is specifically responsible for making this architecture more explicit and extensible.
+- Do not create a second Game Registry beside `practice-domain.js` without proving the need.
+- Do not create a second Practice Template beside `practice-game-template.js`.
+- Do not create a second Challenge Registry.
+- Do not move all practice CSS into the Design System.
+- Do not move game mechanics into the Practice Template.
+- Do not force every game into identical mechanics.
+- Do not patch individual games with special-case CSS or fallbacks.
+- Do not preserve duplicate local shell ownership just because tests are green.
+- Do not modify LIVE `main` during development.
+- Do not claim a test passed unless it actually ran.
 
 ---
 
-# 8. Important existing architecture/test work
+# 6. Current status
 
-The repository already contains architecture and regression work from the earlier refactor stages. Do not undo it or recreate superseded paths.
+**Phase 1:** 🟢 CLOSED  
+**Phase 2:** 🟢 CLOSED / user-confirmed green  
+**Phase 3:** 🟡 RESEARCH COMPLETE / Architecture Gate still to be formally performed / no Phase 3 implementation in this research pass
 
-Notable established areas include:
+The key conclusion is now proven from the repository:
 
-- canonical lesson player/runtime boundaries;
-- Agenda domain/runtime/persistence/import boundaries;
-- canonical Page Template;
-- canonical navigation;
-- canonical Management shell/switch;
-- canonical Lessons page boundaries;
-- canonical lesson-choice/test/view/questions boundaries;
-- shared HTML escaping;
-- practice ownership boundary;
-- design-system ownership boundary;
-- page inventory;
-- design-system migration documentation;
-- architecture boundary tests;
-- full Node/Vitest/browser regression.
+> The games currently own too much of the surrounding practice UI. A shared Practice Template is already partially present and should be strengthened/used as the canonical owner. The Game Registry should build on the existing practice game catalog, and the existing Challenge Registry must remain the canonical challenge owner.
 
-Use the repository as the source of truth. This handoff is a guide, not a substitute for inspection.
-
----
-
-# 9. New-chat startup protocol
-
-When the next chat starts:
-
-1. Confirm repository is `huisartslasten/PAB`.
-2. Confirm branch is `refactor/professional-v1`.
-3. Confirm `main` is LIVE and must not be touched.
-4. Read `docs/engineering/PACOGO_ENGINEERING_STANDARD.md`.
-5. Read this `docs/refactor/PACOGO_HANDOFF.md`.
-6. Inspect the actual current repository state and branch head.
-7. Check current CI/regression status.
-8. **Begin with Phase 2 — Content Architecture.**
-9. Start with **PAB Change Intake** for Phase 2.
-10. Perform the **PAB Architecture Gate** before selecting implementation files.
-11. Then produce the **PAB Implementation Plan**.
-12. Only then implement.
-13. Verify focused contracts, integration and regression.
-14. Clean obsolete paths/duplicates where the phase requires it.
-15. Do not touch LIVE.
-
-The next chat should not ask the user to repeat this handoff unless the repository contains contradictory evidence.
-
----
-
-# 10. Working style expected from the next chat
-
-The user prefers autonomous, connected work rather than a stream of tiny progress messages.
-
-When the user says `oke`, `ga door`, or equivalent:
-
-- continue through logically connected architecture/implementation/verification steps;
-- do not stop after every tiny step;
-- do not send “I will continue” messages without doing the work;
-- report when testing actually starts or completes;
-- stop for genuine architectural ambiguity, unsafe assumptions, blockers or a decision that requires the user.
-
-The user is particularly sensitive to patchwork because previous development chats repeatedly introduced small fixes that later required repair. The correct response is not to patch faster; it is to inspect ownership and fix the canonical boundary once.
-
-**The goal is to make the user feel that development is simply continuing from the previous careful chat, not starting over with a new developer who has forgotten the rules.**
-
----
-
-# 11. Immediate next mission
-
-## START PHASE 2 — CONTENT ARCHITECTURE
-
-First target:
-
-**Central Editor Framework**
-
-Before coding, investigate and map:
-
-- current lesson editor runtime;
-- current learning-material editor runtime;
-- shared editor controls/components;
-- lesson element creation/render/save boundaries;
-- learning-material element boundaries;
-- any duplicate/legacy editor utilities;
-- existing tests/contracts;
-- route/application wiring;
-- which responsibility is genuinely shared and which is domain-specific.
-
-Then determine the canonical owner and the correct registry/framework boundary.
-
-Do **not** start by editing `lesson-editor.html`, `learning-material-editor.html` or an arbitrary CSS/module file.
-
-Do **not** create a new editor framework beside the current one.
-
-Do **not** patch the existing editor to “look central”.
-
-The architecture must be understood first.
-
----
-
-# 12. Current closure statement
-
-**Phase 1 is closed and green.**
-
-The last verified application-code head is:
-
-`0f101482e735554805257739bfec058cbd533286`
-
-The current branch contains only the subsequent documentation handoff commit(s) on top of that verified application state.
-
-Full regression #2262 is green for the application-code head.
-
-The four manual findings from the final Phase 1 test pass were resolved centrally.
-
-No LIVE change was made.
-
-The next developer/chat must now continue with:
-
-> **Phase 2 — Content Architecture → Central Editor Framework**
-
-while following the permanent PAB engineering rules above.
+Continue from this exact point. Do not restart the project history and do not reopen closed phases without repository evidence.

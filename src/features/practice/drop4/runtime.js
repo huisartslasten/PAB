@@ -6,8 +6,8 @@ const BOARD_SIZE = COLUMNS * ROWS;
 const WIN_LENGTH = 4;
 
 export const DROP4_AI_LEVELS = Object.freeze([
-  Object.freeze({ id: 'rookie', label: 'ROOKIE' }),
-  Object.freeze({ id: 'goat', label: 'GOAT' })
+  Object.freeze({ value: 'rookie', label: 'ROOKIE' }),
+  Object.freeze({ value: 'goat', label: 'GOAT' })
 ]);
 
 function emptyBoard() { return Array(BOARD_SIZE).fill(null); }

@@ -10,9 +10,9 @@ function escapeText(value) {
 
 export function createWordRevealView({ documentRef = document } = {}) {
   function renderStats(root, state, highScore) {
-    root.querySelector('#wrTurns').textContent = String(state.turns);
-    root.querySelector('#wrRecord').textContent = highScore == null ? '—' : String(highScore);
-    root.querySelector('#wrProgress').textContent = `${state.completedCount} van ${state.totalCount}`;
+    root.querySelector('[data-stat="score"] strong').textContent = String(state.turns);
+    root.querySelector('[data-stat="record"] strong').textContent = highScore == null ? '—' : String(highScore);
+    root.querySelector('[data-stat="progress"] strong').textContent = `${state.completedCount} van ${state.totalCount}`;
   }
 
   function renderTarget(root, state, onReveal = null) {

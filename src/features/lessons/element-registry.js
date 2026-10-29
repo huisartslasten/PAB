@@ -129,12 +129,30 @@ export function isMeaningfulItem(item = {}, type = 'words') {
   return Boolean(normalizeKey(item.question || '') && normalizeKey(item.answer || ''));
 }
 
+const ELEMENT_BUILDERS = Object.freeze({
+  words: buildWordItem,
+  custom: buildWordItem,
+  questions: buildQuestionItem,
+  dictation: buildDictationItem,
+  math: buildMathItem,
+  spelling: buildSpellingItem
+});
+
+export function getLessonElementDefinition(type) {
+  const normalizedType = text(type);
+  const build = ELEMENT_BUILDERS[normalizedType];
+  return build ? Object.freeze({ type: normalizedType, build }) : null;
+}
+
+export function listLessonElementDefinitions() {
+  return Object.freeze(Object.entries(ELEMENT_BUILDERS).map(([type, build]) => Object.freeze({ type, build })));
+}
+
 export function buildItemsForType(type, rows = []) {
-  const builders = { words: buildWordItem, custom: buildWordItem, questions: buildQuestionItem, dictation: buildDictationItem, math: buildMathItem, spelling: buildSpellingItem };
-  const build = builders[type];
-  if (!build) return [];
+  const definition = getLessonElementDefinition(type);
+  if (!definition) return [];
   return (Array.isArray(rows) ? rows : []).map((row, index) => {
-    const item = build(row);
+    const item = definition.build(row);
     return item ? { ...item, sort_order: index } : null;
   }).filter(Boolean).filter(item => isMeaningfulItem(item, type));
 }

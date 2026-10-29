@@ -5,17 +5,53 @@ function createDocument() {
 }
 
 describe('practice game template', () => {
-  test('provides the canonical noob/goat difficulty selector', () => {
-    const { element, dropdown } = createPracticeGameTemplate({ documentRef: createDocument() });
+  test('provides the canonical noob/goat difficulty selector and shared stats shell', () => {
+    const { element, dropdown } = createPracticeGameTemplate({
+      documentRef: createDocument(),
+      stats: [
+        { id: 'score', label: 'Score', value: '10' },
+        { id: 'record', label: 'Record', value: '20' }
+      ]
+    });
 
     expect(PRACTICE_DIFFICULTIES.map(option => option.value)).toEqual(['rookie', 'goat']);
     expect(PRACTICE_DIFFICULTIES.map(option => option.label)).toEqual(['NOOB', 'GOAT']);
     expect(element.querySelector('.practice-game-header')).not.toBeNull();
     expect(element.querySelector('.practice-game-stats')).not.toBeNull();
+    expect(element.querySelector('[data-stat="score"] strong').textContent).toBe('10');
+    expect(element.querySelector('[data-stat="record"] strong').textContent).toBe('20');
     expect(element.querySelector('.practice-game-area')).not.toBeNull();
     expect(element.querySelector('.practice-game-exercise')).not.toBeNull();
     expect(element.querySelector('.practice-game-feedback')).not.toBeNull();
     expect(dropdown.getValue()).toBe('rookie');
+  });
+
+  test('allows a game to provide its difficulty labels while keeping selector ownership shared', () => {
+    const customOptions = [
+      { value: 'rookie', label: 'ROOKIE' },
+      { value: 'goat', label: 'GOAT' }
+    ];
+    const { element, dropdown } = createPracticeGameTemplate({
+      documentRef: createDocument(),
+      difficultyOptions: customOptions,
+      difficulty: 'goat'
+    });
+
+    expect(element.querySelector('.practice-game-controls')).not.toBeNull();
+    expect(dropdown.getValue()).toBe('goat');
+    expect(element.querySelector('.paco-dropdown-label').textContent).toBe('GOAT');
+  });
+
+  test('can omit the shared difficulty control when a game has its own game-specific control', () => {
+    const { element, dropdown } = createPracticeGameTemplate({
+      documentRef: createDocument(),
+      showDifficulty: false,
+      controls: document.createElement('div')
+    });
+
+    expect(dropdown).toBeNull();
+    expect(element.querySelector('.practice-game-difficulty')).toBeNull();
+    expect(element.querySelector('.practice-game-controls')).not.toBeNull();
   });
 
   test('supports game-specific content without changing the shell', () => {

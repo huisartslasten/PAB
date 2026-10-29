@@ -1,5 +1,5 @@
 import { buildLessonSaveRequest } from './lesson-save-adapter.js';
-import { buildItemsForType } from './editor-items.js';
+import { buildItemsForType } from './element-registry.js';
 import { validateEditorDraft, editorErrorText } from './editor-validation.js';
 
 export function createLessonEditorController({ saveDraft, refreshLessons, onSaved } = {}) {

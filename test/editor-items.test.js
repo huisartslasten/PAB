@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildItemsForType } from '../src/features/lessons/editor-items.js';
+import { buildItemsForType } from '../src/features/lessons/element-registry.js';
 
 const cases = [
   ['words', { question_parts: ['Wat is expert?'], answer_parts: [{ text: 'deskundige', role: 'answer' }, { text: 'kenner', role: 'extra' }], hint: 'Denk aan kennis', min_words: 2, required_terms: ['kennis'] }, 'deskundige'],

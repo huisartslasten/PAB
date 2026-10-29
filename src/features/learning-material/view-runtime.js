@@ -1,6 +1,7 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
 import { buildViewUrl } from '../../core/view-context.js';
+import { normalizeLearningMaterialElement } from './element-registry.js';
 import { clampImageWidth, normalizeImagePlacement, placementStyle } from './image-placement.js';
 
 function escapeHtml(value) {
@@ -13,14 +14,16 @@ function escapeHtml(value) {
 }
 
 function renderDocument(model) {
-  return (Array.isArray(model?.elements) ? model.elements : []).map(element => {
-    if (element?.type === 'image' && element.media_id && element.image?.url) {
-      const width = clampImageWidth(element.size?.width ?? element.width);
-      const placement = normalizeImagePlacement(element.placement, width);
-      return `<img class="learning-view-image learning-view-image-${placement.wrap}" data-x="${placement.x}" src="${escapeHtml(element.image.url)}" alt="${escapeHtml(element.image.original_name || 'Afbeelding')}" style="${placementStyle(placement, width)}">`;
-    }
-    return element?.type === 'text' ? element.html || '' : '';
-  }).join('');
+  return (Array.isArray(model?.elements) ? model.elements : [])
+    .map(element => normalizeLearningMaterialElement(element))
+    .map(element => {
+      if (element?.type === 'image' && element.media_id && element.image?.url) {
+        const width = clampImageWidth(element.size?.width ?? element.width);
+        const placement = normalizeImagePlacement(element.placement, width);
+        return `<img class="learning-view-image learning-view-image-${placement.wrap}" data-x="${placement.x}" src="${escapeHtml(element.image.url)}" alt="${escapeHtml(element.image.original_name || 'Afbeelding')}" style="${placementStyle(placement, width)}">`;
+      }
+      return element?.type === 'text' ? element.html || '' : '';
+    }).join('');
 }
 
 function showMessage(content, message, className = 'message') {

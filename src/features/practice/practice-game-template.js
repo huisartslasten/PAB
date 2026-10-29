@@ -35,7 +35,9 @@ export function createPracticeGameTemplate({
   className = '',
   stats = [],
   difficulty = 'rookie',
+  difficultyOptions = PRACTICE_DIFFICULTIES,
   onDifficultyChange = null,
+  showDifficulty = true,
   gameArea = null,
   exercise = null,
   feedback = null,
@@ -49,14 +51,16 @@ export function createPracticeGameTemplate({
 
   const statsElement = documentRef.createElement('div');
   statsElement.className = 'practice-game-stats';
-  stats.forEach(({ label = '', value = '' } = {}) => {
+  stats.forEach(({ label = '', value = '', id = '' } = {}) => {
     const stat = documentRef.createElement('div');
     stat.className = 'practice-game-stat';
+    if (id) stat.dataset.stat = id;
+
     const statLabel = documentRef.createElement('span');
     statLabel.textContent = label;
     const statValue = documentRef.createElement('strong');
     statValue.textContent = value;
-    statsElement.append(statLabel, statValue);
+    stat.append(statLabel, statValue);
     statsElement.appendChild(stat);
   });
   header.appendChild(statsElement);
@@ -64,21 +68,24 @@ export function createPracticeGameTemplate({
   const controlBar = documentRef.createElement('div');
   controlBar.className = 'practice-game-controls';
 
-  const difficultyLabel = documentRef.createElement('span');
-  difficultyLabel.className = 'practice-game-control-label';
-  difficultyLabel.textContent = 'Niveau';
-  controlBar.appendChild(difficultyLabel);
+  let dropdown = null;
+  if (showDifficulty) {
+    const difficultyLabel = documentRef.createElement('span');
+    difficultyLabel.className = 'practice-game-control-label';
+    difficultyLabel.textContent = 'Niveau';
+    controlBar.appendChild(difficultyLabel);
 
-  const dropdown = createPacoDropdown({
-    options: PRACTICE_DIFFICULTIES,
-    value: difficulty,
-    onChange: onDifficultyChange,
-    className: 'practice-game-difficulty'
-  });
-  controlBar.appendChild(dropdown.element);
+    dropdown = createPacoDropdown({
+      options: difficultyOptions,
+      value: difficulty,
+      onChange: onDifficultyChange,
+      className: 'practice-game-difficulty'
+    });
+    controlBar.appendChild(dropdown.element);
+  }
 
   if (controls) controlBar.appendChild(controls);
-  header.appendChild(controlBar);
+  if (controlBar.childElementCount) header.appendChild(controlBar);
   root.appendChild(header);
 
   const mainArea = documentRef.createElement('div');

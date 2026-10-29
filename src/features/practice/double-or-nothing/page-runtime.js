@@ -3,6 +3,7 @@ import { createPacoNavigation } from '../../../components/page-navigation.js';
 import { createLessonContextField } from '../../lessons/lesson-context-view.js';
 import { createDoubleOrNothingRuntime } from './runtime.js';
 import { createDoubleOrNothingView } from './view.js';
+import { createPracticeGameTemplate } from '../practice-game-template.js';
 import { buildViewUrl } from '../../../core/view-context.js';
 import { escapeHtml } from '../../../core/html.js';
 
@@ -13,11 +14,20 @@ export function createDoubleOrNothingPageRuntime({ app, templateMount, context, 
 
   const student = context?.student || '';
   const content = documentRef.createElement('div');
-  const view = createDoubleOrNothingView({ documentRef, escapeHtml });
-  const gameShell = documentRef.createElement('main');
-  gameShell.className = 'practice-page-card';
-  gameShell.innerHTML = `<div class="double-game-head"><h1 class="double-game-title">🐶 DOUBLE OR NOTHING</h1><div class="double-stats"><div class="double-stat"><span class="double-stat-label">Botjes</span><span id="doubleScore" class="double-stat-value">0 🦴</span></div><div class="double-stat"><span class="double-stat-label">Record</span><span id="doubleRecord" class="double-stat-value">0 🏆</span></div><div class="double-stat"><span class="double-stat-label">Maximaal</span><span id="doubleGoal" class="double-stat-value">0 🎯</span></div></div></div><div id="doubleProgress" class="practice-progress"></div><div id="doubleStake"></div><div id="doubleContent" class="practice-content"></div>`;
-  content.appendChild(gameShell);
+  const gameArea = documentRef.createElement('div');
+  gameArea.innerHTML = '<div id="doubleProgress" class="practice-progress"></div><div id="doubleStake"></div><div id="doubleContent" class="practice-content"></div>';
+
+  const gameTemplate = createPracticeGameTemplate({
+    documentRef,
+    stats: [
+      { id: 'score', label: 'Botjes', value: '0 🦴' },
+      { id: 'record', label: 'Record', value: '0 🏆' },
+      { id: 'goal', label: 'Maximaal', value: '0 🎯' }
+    ],
+    gameArea
+  });
+  const view = createDoubleOrNothingView({ documentRef, escapeHtml, root: gameTemplate.element });
+  content.appendChild(gameTemplate.element);
 
   const goGames = () => {
     const target = buildViewUrl('games.html', { student, mode: context?.mode });
@@ -26,11 +36,11 @@ export function createDoubleOrNothingPageRuntime({ app, templateMount, context, 
   };
 
   function renderEmptyState(message) {
-    gameShell.replaceChildren();
+    gameTemplate.element.replaceChildren();
     const state = documentRef.createElement('div');
     state.className = 'practice-content';
     state.textContent = message;
-    gameShell.appendChild(state);
+    gameTemplate.element.appendChild(state);
   }
 
   async function load() {
@@ -44,7 +54,7 @@ export function createDoubleOrNothingPageRuntime({ app, templateMount, context, 
     if (!lesson) throw new Error('Deze les kon niet worden gevonden.');
 
     const contextField = createLessonContextField(lesson, { documentRef });
-    content.insertBefore(contextField, gameShell);
+    content.insertBefore(contextField, gameTemplate.element);
 
     const items = Array.isArray(lesson.lesson_items) ? lesson.lesson_items : Array.isArray(lesson.items) ? lesson.items : [];
     const runtime = createDoubleOrNothingRuntime({

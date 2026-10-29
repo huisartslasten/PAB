@@ -4,6 +4,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 const SRC_ROOT = path.resolve('src');
+const REPO_ROOT = path.resolve('.');
 
 function javascriptFiles(root) {
   const files = [];
@@ -66,4 +67,22 @@ test('dropdown primitive is owned by the Design System', () => {
   }
 
   assert.deepEqual(violations, [], `Stale dropdown consumers:\n${violations.join('\n')}`);
+});
+
+test('canonical owners do not have a second legacy owner', () => {
+  const forbiddenOwners = [
+    'test-history-storage.js',
+    'src/core/notification-model-v2.js',
+    'src/core/notification-model-101.js',
+    'tools/fix-editor-layout-v453.sh',
+    'tools/integrate-source-photo-v474.sh',
+    'tools/rebuild-editor-v468.sh',
+    'tools/rebuild-editor-v469.sh',
+    'tools/rebuild-editor-v470.sh',
+    'tools/rebuild-editor-v471.sh',
+    'tools/restore-v476-editor-styles.sh',
+  ];
+
+  const present = forbiddenOwners.filter((relativePath) => fs.existsSync(path.join(REPO_ROOT, relativePath)));
+  assert.deepEqual(present, [], `Forbidden duplicate/legacy owners detected:\n${present.join('\n')}`);
 });

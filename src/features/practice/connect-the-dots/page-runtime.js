@@ -21,7 +21,6 @@ export function createConnectTheDotsPageRuntime({ app, templateMount, context, l
   let gameArea = null;
   let exercise = null;
   let feedback = null;
-  let statsElement = null;
   let thinkingCancel = () => {};
   let highScore = null;
   let items = [];
@@ -30,22 +29,12 @@ export function createConnectTheDotsPageRuntime({ app, templateMount, context, l
   const goGames = () => navigate(buildViewUrl('games.html', { student, mode: context?.mode, lesson_id: lessonId }));
 
   function renderStats(state) {
-    const stats = [
-      { label: 'Jij', value: String(state.playerBoxes) },
-      { label: 'Paco', value: String(state.pacoBoxes) },
-      { label: 'Vakjes', value: String(state.totalBoxes) }
-    ];
-
-    statsElement.replaceChildren(...stats.map(({ label, value }) => {
-      const node = documentRef.createElement('div');
-      node.className = 'practice-game-stat';
-      const statLabel = documentRef.createElement('span');
-      statLabel.textContent = label;
-      const statValue = documentRef.createElement('strong');
-      statValue.textContent = value;
-      node.append(statLabel, statValue);
-      return node;
-    }));
+    const player = shell.element.querySelector('[data-stat="player"] strong');
+    const paco = shell.element.querySelector('[data-stat="paco"] strong');
+    const boxes = shell.element.querySelector('[data-stat="boxes"] strong');
+    if (player) player.textContent = String(state.playerBoxes);
+    if (paco) paco.textContent = String(state.pacoBoxes);
+    if (boxes) boxes.textContent = String(state.totalBoxes);
   }
 
   async function saveScore(state) {
@@ -168,9 +157,9 @@ export function createConnectTheDotsPageRuntime({ app, templateMount, context, l
       documentRef,
       className: 'ctd-page-card',
       stats: [
-        { label: 'Jij', value: '0' },
-        { label: 'Paco', value: '0' },
-        { label: 'Vakjes', value: '0' }
+        { id: 'player', label: 'Jij', value: '0' },
+        { id: 'paco', label: 'Paco', value: '0' },
+        { id: 'boxes', label: 'Vakjes', value: '0' }
       ],
       difficulty: 'rookie',
       onDifficultyChange: level => {
@@ -183,7 +172,6 @@ export function createConnectTheDotsPageRuntime({ app, templateMount, context, l
       feedback
     });
 
-    statsElement = shell.statsElement;
     mountPacoPageTemplate({
       mount: templateMount,
       backLabel: '← Spelletjes',

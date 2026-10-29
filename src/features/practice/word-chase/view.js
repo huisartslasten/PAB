@@ -1,3 +1,4 @@
+import { createPacoDropdown } from '../../../components/design-system.js';
 import { mountPracticeGameHelp } from '../practice-game-help.js';
 
 function el(documentRef, tag, className = '') {
@@ -8,9 +9,10 @@ function el(documentRef, tag, className = '') {
 
 export function createWordChaseView({ documentRef = document } = {}) {
   function renderStats(root, state, highScore) {
-    root.querySelector('[data-stat="score"] strong').textContent = String(state.turns);
-    root.querySelector('[data-stat="record"] strong').textContent = highScore == null ? '—' : String(highScore);
-    root.querySelector('[data-stat="progress"] strong').textContent = `${state.completedCount} van ${state.totalCount}`;
+    root.querySelector('#wcDifficulty').textContent = state.difficulty === 'rookie' ? 'ROOKIE' : 'GOAT';
+    root.querySelector('#wcTurns').textContent = String(state.turns);
+    root.querySelector('#wcRecord').textContent = highScore == null ? '—' : String(highScore);
+    root.querySelector('#wcProgress').textContent = `${state.completedCount} van ${state.totalCount}`;
   }
 
   function renderTarget(root, state) {
@@ -182,5 +184,21 @@ export function createWordChaseView({ documentRef = document } = {}) {
     node.appendChild(panel);
   }
 
-  return Object.freeze({ renderStats, renderTarget, renderQuestion, renderFeedback, renderFinished });
+  function renderDifficulty(root, difficulty, onChange) {
+    const mount = root.querySelector('#wcDifficultySelect');
+    if (!mount) return;
+    mount.replaceChildren();
+    const dropdown = createPacoDropdown({
+      options: [
+        { value: 'rookie', label: 'ROOKIE — 2 letters' },
+        { value: 'goat', label: 'GOAT — 1 letter' }
+      ],
+      value: difficulty,
+      onChange,
+      className: 'wc-dropdown'
+    });
+    mount.appendChild(dropdown.element);
+  }
+
+  return Object.freeze({ renderStats, renderTarget, renderQuestion, renderFeedback, renderFinished, renderDifficulty });
 }

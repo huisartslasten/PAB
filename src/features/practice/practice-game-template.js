@@ -49,14 +49,16 @@ export function createPracticeGameTemplate({
 
   const statsElement = documentRef.createElement('div');
   statsElement.className = 'practice-game-stats';
-  stats.forEach(({ label = '', value = '' } = {}) => {
+  stats.forEach(({ label = '', value = '', id = '' } = {}) => {
     const stat = documentRef.createElement('div');
     stat.className = 'practice-game-stat';
+    if (id) stat.dataset.stat = id;
+
     const statLabel = documentRef.createElement('span');
     statLabel.textContent = label;
     const statValue = documentRef.createElement('strong');
     statValue.textContent = value;
-    statsElement.append(statLabel, statValue);
+    stat.append(statLabel, statValue);
     statsElement.appendChild(stat);
   });
   header.appendChild(statsElement);

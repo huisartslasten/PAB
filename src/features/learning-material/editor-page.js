@@ -60,7 +60,7 @@ export function createLearningMaterialEditorPage({ root, topic, cards = [], stud
     if (command) {
       const card = command.closest('.learning-card'); const surface = card?.querySelector('.learning-editor-surface'); if (!surface) return; const name = command.dataset.command;
       if (name === 'font-size') { const size = Number(command.dataset.size); if (Number.isFinite(size)) { activeFontSizeBySurface.set(surface, size); const applied = formatting.applyFontSize(surface, size); command.closest('.learning-editor-toolbar')?.querySelectorAll('.learning-font-size-choice').forEach(item => item.classList.remove('is-active')); command.classList.add('is-active'); if (!applied) surface.focus(); } }
-      else if (name === 'bold' || name === 'italic') { const saved = selectionStore.restore(surface); if (saved) { const selection = surface.ownerDocument.getSelection(); selection.removeAllRanges(); selection.addRange(saved.cloneRange()); } surface.ownerDocument.execCommand(name, false); selectionStore.remember(surface); }
+      else if (name === 'bold' || name === 'italic') formatting.applyInlineFormat(surface, name);
       return;
     }
     const action = event.target.closest('[data-action]')?.dataset.action; const card = event.target.closest('.learning-card');

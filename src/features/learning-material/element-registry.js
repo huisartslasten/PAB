@@ -1,8 +1,6 @@
 import { createEditorElementRegistry } from '../../editor/element-registry.js';
 import { clampImageWidth, normalizeImagePlacement } from './image-placement.js';
 
-const text = value => String(value ?? '').trim();
-
 function normalizeTextElement(element = {}) {
   const html = String(element.html ?? '').replaceAll('\u200b', '').trim();
   if (!html) return null;

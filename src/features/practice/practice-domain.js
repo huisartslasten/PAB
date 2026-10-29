@@ -1,9 +1,7 @@
 import { getPacoGames, getPacoGame, getActivePacoGames, PACOGO_GAMES } from '../../services/game-catalog.js';
 
 export const PRACTICE_MODES = Object.freeze([
-  Object.freeze({ id: 'dictation', label: 'Dictee', status: 'active' }),
   Object.freeze({ id: 'flashcards', label: 'Flashcards', status: 'active' }),
-  Object.freeze({ id: 'memory', label: 'Memory', status: 'active' }),
   Object.freeze({ id: 'games', label: 'Spelletjes', status: 'active' }),
   Object.freeze({ id: 'practice-test', label: 'Oefentoets', status: 'active' })
 ]);

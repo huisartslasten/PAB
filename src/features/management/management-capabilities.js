@@ -10,25 +10,14 @@ function requireManagement(management) {
   if (!management) throw new TypeError('Management capabilities require the management service.');
 }
 
-function canManage(auth) {
-  return auth?.isParent === true;
-}
-
-function isMainAdministrator(auth) {
-  return auth?.isMainAdministrator === true;
-}
+function canManage(auth) { return auth?.isParent === true; }
+function isMainAdministrator(auth) { return auth?.isMainAdministrator === true; }
 
 function buildTarget(path, { student = '', extra = {} } = {}) {
   const url = new URL(path, window.location.href);
-  if (student) url.searchParams.set('viewStudent', student);
-  else url.searchParams.delete('viewStudent');
-  url.searchParams.delete('student');
-  url.searchParams.delete('context');
-  url.searchParams.delete('mode');
-  Object.entries(extra).forEach(([key, value]) => {
-    if (value === '' || value == null) url.searchParams.delete(key);
-    else url.searchParams.set(key, String(value));
-  });
+  if (student) url.searchParams.set('viewStudent', student); else url.searchParams.delete('viewStudent');
+  url.searchParams.delete('student'); url.searchParams.delete('context'); url.searchParams.delete('mode');
+  Object.entries(extra).forEach(([key, value]) => { if (value === '' || value == null) url.searchParams.delete(key); else url.searchParams.set(key, String(value)); });
   return url.toString();
 }
 
@@ -37,7 +26,7 @@ const PAGE_CAPABILITIES = Object.freeze({
     'lesson.manage', 'lesson.create',
     'learningTopic.manage', 'learningTopic.create',
     'agenda.manage', 'monthCalendar.manage',
-    'skill.manage', 'skill.create', 'challenge.configure'
+    'skill.manage', 'skill.create', 'challenge.configure', 'game.access'
   ]),
   lessons: Object.freeze(['lesson.create', 'learningTopic.create']),
   'lesson-editor': Object.freeze(['lesson.create']),
@@ -53,10 +42,11 @@ const CAPABILITIES = Object.freeze({
   'learningTopic.manage': Object.freeze({ id: 'learningTopic.manage', entityType: 'learningTopic', page: 'lessons', group: 'Leerstofbeheer', label: '🧠 Leerstof beheren', description: 'Bekijk de leerstof per vak en onderwerp.', requiresStudent: true, target: ({ student }) => buildTarget('lessons.html', { student }) }),
   'learningTopic.create': Object.freeze({ id: 'learningTopic.create', entityType: 'learningTopic', page: 'learning-material-editor', group: 'Leerstofbeheer', label: '➕ Leerstof maken', description: 'Open de centrale leerstofeditor.', requiresStudent: true, target: ({ student }) => buildTarget('learning-material-editor.html', { student }) }),
   'agenda.manage': Object.freeze({ id: 'agenda.manage', entityType: 'agenda', page: 'agenda', group: 'Agenda', label: '📅 Agenda', description: 'Bekijk en beheer de agenda van de actieve leerling.', requiresStudent: true, target: ({ student }) => buildTarget('agenda.html', { student }) }),
-  'monthCalendar.manage': Object.freeze({ id: 'monthCalendar.manage', entityType: 'monthCalendar', page: 'month-calendar', group: 'Agenda', label: '🖨️ Maandkalender', description: 'Open de maandkalender van de actieve leerling.', requiresStudent: true, target: ({ student }) => buildTarget('month-calendar.html', { student }) }),
+  'monthCalendar.manage': Object.freeze({ id: 'monthCalendar.manage', entityType: 'monthCalendar', page: 'monthCalendar', group: 'Agenda', label: '🖨️ Maandkalender', description: 'Open de maandkalender van de actieve leerling.', requiresStudent: true, target: ({ student }) => buildTarget('month-calendar.html', { student }) }),
   'skill.manage': Object.freeze({ id: 'skill.manage', entityType: 'skill', page: 'skills', group: 'Skillbeheer', label: '🧮 Skills beheren', description: 'Beheer Skills en bepaal per leerling welke Skills beschikbaar zijn.', requiresStudent: true, authorize: isMainAdministrator, target: ({ student }) => buildTarget('skills.html', { student }) }),
   'skill.create': Object.freeze({ id: 'skill.create', entityType: 'skill', page: 'skill-create', group: 'Skillbeheer', label: '➕ Skill maken', description: 'Kies welk type Skill je wilt maken.', requiresStudent: false, authorize: isMainAdministrator, target: ({ student }) => buildTarget('skill-create.html', { student }) }),
-  'challenge.configure': Object.freeze({ id: 'challenge.configure', entityType: 'challenge', page: 'challenge-settings', group: 'Challengebeheer', label: '🎯 Challenge-instellingen', description: 'Beheer centraal de Challenge-configuratie.', requiresStudent: false, authorize: isMainAdministrator, target: () => buildTarget('challenge-settings.html') })
+  'challenge.configure': Object.freeze({ id: 'challenge.configure', entityType: 'challenge', page: 'challenge-settings', group: 'Challengebeheer', label: '🎯 Challenge-instellingen', description: 'Beheer centraal de Challenge-configuratie.', requiresStudent: false, authorize: isMainAdministrator, target: () => buildTarget('challenge-settings.html') }),
+  'game.access': Object.freeze({ id: 'game.access', entityType: 'gameAccess', page: 'game-access', group: 'Spelbeheer', label: '🎮 Spelvrijgave', description: 'Beheer centraal de spelcriteria en spelvrijgave van de actieve leerling.', requiresStudent: true, authorize: isMainAdministrator, target: ({ student }) => buildTarget('game-access.html', { student }) })
 });
 
 const ITEM_ACTIONS = Object.freeze({
@@ -80,58 +70,18 @@ const ITEM_ACTIONS = Object.freeze({
 export function createManagementCapabilities({ auth, management, eventTarget = globalThis } = {}) {
   requireManagement(management);
   const activePages = new Set();
-
-  function isAuthorized(capability) {
-    return canManage(auth) && (!capability.authorize || capability.authorize(auth));
-  }
-
+  function isAuthorized(capability) { return canManage(auth) && (!capability.authorize || capability.authorize(auth)); }
   function getAvailableForPage({ page = '', student = '' } = {}) {
     const ids = PAGE_CAPABILITIES[page] || [];
     return ids.map(id => CAPABILITIES[id]).filter(Boolean).filter(isAuthorized).filter(capability => !capability.requiresStudent || Boolean(student)).map(capability => Object.freeze({ ...capability, target: capability.target({ student }) }));
   }
-
   function getActionsForItem({ entityType, item = null, student = '' } = {}) {
     if (!canManage(auth) || !item) return [];
-    return (ITEM_ACTIONS[entityType] || []).map(action => Object.freeze({
-      ...action,
-      target: typeof action.target === 'function' ? action.target({ item, student }) : undefined,
-      execute: typeof action.execute === 'function' ? () => action.execute({ management, item, student }) : undefined
-    }));
+    return (ITEM_ACTIONS[entityType] || []).map(action => Object.freeze({ ...action, target: typeof action.target === 'function' ? action.target({ item, student }) : undefined, execute: typeof action.execute === 'function' ? () => action.execute({ management, item, student }) : undefined }));
   }
-
-  function emitPageState(page, active) {
-    eventTarget?.dispatchEvent?.(new CustomEvent('paco:management-visibility-change', { detail: { page, active: Boolean(active) } }));
-  }
-
-  function setPageActive(page, active) {
-    if (!page) return false;
-    if (active) activePages.add(page); else activePages.delete(page);
-    emitPageState(page, active);
-    return Boolean(active);
-  }
-
-  function clearPageActivity() {
-    [...activePages].forEach(page => emitPageState(page, false));
-    activePages.clear();
-  }
-
-  function activateForNavigation(capabilityId) {
-    const capability = CAPABILITIES[capabilityId];
-    if (!capability?.page) return false;
-    clearPageActivity();
-    activePages.add(capability.page);
-    emitPageState(capability.page, true);
-    return true;
-  }
-
-  return Object.freeze({
-    getAvailableForPage,
-    getActionsForItem,
-    setPageActive,
-    clearPageActivity,
-    activateForNavigation,
-    isPageActive: page => activePages.has(page),
-    listPageCapabilityIds: page => Object.freeze([...(PAGE_CAPABILITIES[page] || [])]),
-    listCapabilityIds: () => Object.freeze(Object.keys(CAPABILITIES))
-  });
+  function emitPageState(page, active) { eventTarget?.dispatchEvent?.(new CustomEvent('paco:management-visibility-change', { detail: { page, active: Boolean(active) } })); }
+  function setPageActive(page, active) { if (!page) return false; if (active) activePages.add(page); else activePages.delete(page); emitPageState(page, active); return Boolean(active); }
+  function clearPageActivity() { [...activePages].forEach(page => emitPageState(page, false)); activePages.clear(); }
+  function activateForNavigation(capabilityId) { const capability = CAPABILITIES[capabilityId]; if (!capability?.page) return false; clearPageActivity(); activePages.add(capability.page); emitPageState(capability.page, true); return true; }
+  return Object.freeze({ getAvailableForPage, getActionsForItem, setPageActive, clearPageActivity, activateForNavigation, isPageActive: page => activePages.has(page), listPageCapabilityIds: page => Object.freeze([...(PAGE_CAPABILITIES[page] || [])]), listCapabilityIds: () => Object.freeze(Object.keys(CAPABILITIES)) });
 }

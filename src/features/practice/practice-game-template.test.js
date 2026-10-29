@@ -26,6 +26,22 @@ describe('practice game template', () => {
     expect(dropdown.getValue()).toBe('rookie');
   });
 
+  test('allows a game to provide its difficulty labels while keeping selector ownership shared', () => {
+    const customOptions = [
+      { value: 'rookie', label: 'ROOKIE' },
+      { value: 'goat', label: 'GOAT' }
+    ];
+    const { element, dropdown } = createPracticeGameTemplate({
+      documentRef: createDocument(),
+      difficultyOptions: customOptions,
+      difficulty: 'goat'
+    });
+
+    expect(element.querySelector('.practice-game-controls')).not.toBeNull();
+    expect(dropdown.getValue()).toBe('goat');
+    expect(element.querySelector('.paco-dropdown-label').textContent).toBe('GOAT');
+  });
+
   test('supports game-specific content without changing the shell', () => {
     const gameArea = document.createElement('div');
     gameArea.textContent = 'LEXO';

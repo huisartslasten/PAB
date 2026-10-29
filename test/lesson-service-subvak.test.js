@@ -2,8 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createLessonService } from '../src/services/lesson-service.js';
 
-const learningTopics = { async ensureTopic(payload) { return { id: 99, ...payload }; } };
-
 function mockDb(rows = []) {
   const calls = [];
   return {
@@ -27,9 +25,9 @@ function mockDb(rows = []) {
   };
 }
 
-test('lesson service persists subvak through the canonical topic owner on create and update', async () => {
+test('lesson service persists subvak directly on lessons without creating a learning topic', async () => {
   const db = mockDb();
-  const service = createLessonService(db, { learningTopics });
+  const service = createLessonService(db);
 
   await service.createLesson({ student: 'Zyon', subject: 'Nederlands', subvak: 'Themawoorden', title: 'Week 4', type: 'words' });
   await service.updateLesson(17, { student: 'Zyon', subject: 'Nederlands', subvak: 'Werkwoorden', title: 'Week 5', type: 'words' });
@@ -38,6 +36,6 @@ test('lesson service persists subvak through the canonical topic owner on create
   const updates = db.calls.filter(call => call.op === 'update');
   assert.equal(inserts[0].payload.subvak, 'Themawoorden');
   assert.equal(updates[0].payload.subvak, 'Werkwoorden');
-  assert.equal(inserts[0].payload.learning_topic_id, 99);
-  assert.equal(updates[0].payload.learning_topic_id, 99);
+  assert.equal('learning_topic_id' in inserts[0].payload, false);
+  assert.equal('learning_topic_id' in updates[0].payload, false);
 });

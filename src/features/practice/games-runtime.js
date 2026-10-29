@@ -12,6 +12,8 @@ export function createGamesRuntime({ app, templateMount, context, lessonId = '',
 
   const student = context?.student || '';
   const content = documentRef.createElement('div');
+  let access = [];
+  let lesson = null;
 
   const goPractice = () => {
     const target = buildViewUrl('oefenen.html', { student, mode: context?.mode });
@@ -25,7 +27,30 @@ export function createGamesRuntime({ app, templateMount, context, lessonId = '',
     return navigate(target);
   };
 
-  function render(lesson, access = []) {
+  async function handleGame(game) {
+    const state = access.find(record => record.gameKey === game.id);
+    if (state?.unlocked === true) return openGame(game);
+
+    const progress = access[0] || { creditedTests: 0, requiredTests: 10 };
+    if (progress.creditedTests < progress.requiredTests) return;
+
+    try {
+      access = await app.gameAccess.claimUnlock({ student, gameKey: game.id });
+      render();
+    } catch (error) {
+      console.error('Game unlock error:', error);
+      renderError(error);
+    }
+  }
+
+  function renderError(error) {
+    const message = documentRef.createElement('div');
+    message.className = 'games-state';
+    message.textContent = error?.message || 'Het spel kon niet worden vrijgespeeld.';
+    content.replaceChildren(message);
+  }
+
+  function render() {
     content.replaceChildren();
     if (!lessonId || !lesson) {
       const state = documentRef.createElement('div');
@@ -37,24 +62,27 @@ export function createGamesRuntime({ app, templateMount, context, lessonId = '',
 
     const accessByGame = new Map(access.map(record => [record.gameKey, record]));
     const progress = access[0] || { creditedTests: 0, requiredTests: 10, minimumScore: 9 };
+    const canUnlock = progress.creditedTests >= progress.requiredTests;
     const field = createLessonContextField(lesson, { documentRef });
     const grid = createActivityCardGrid({
       items: getActivePracticeGames().map(game => {
         const state = accessByGame.get(game.id);
         const unlocked = state?.unlocked === true;
         const locked = !unlocked;
+        const unlockable = locked && game.id !== 'double-or-nothing' && canUnlock;
         return {
           ...game,
           title: game.label,
           locked,
+          unlockable,
           description: locked
-            ? `🔒 ${game.label} — ${progress.creditedTests} / ${progress.requiredTests} toetsen behaald — Nog ${Math.max(0, progress.requiredTests - progress.creditedTests)} toets${progress.requiredTests - progress.creditedTests === 1 ? '' : 'en'} met minimaal een ${progress.minimumScore}.`
+            ? `🔒 ${game.label} — ${progress.creditedTests} / ${progress.requiredTests} toetsen behaald — ${unlockable ? 'Vrijspelen: kies dit spel.' : `Nog ${Math.max(0, progress.requiredTests - progress.creditedTests)} toets${progress.requiredTests - progress.creditedTests === 1 ? '' : 'en'} met minimaal een ${progress.minimumScore}.`}`
             : game.description,
-          actionLabel: locked ? 'Vergrendeld' : 'Spelen →'
+          actionLabel: locked ? (unlockable ? 'Vrijspelen →' : 'Vergrendeld') : 'Spelen →'
         };
       }),
       documentRef,
-      onOpen: openGame
+      onOpen: handleGame
     });
     field.appendChild(grid);
     content.appendChild(field);
@@ -72,20 +100,21 @@ export function createGamesRuntime({ app, templateMount, context, lessonId = '',
     });
 
     if (!lessonId || !student) {
-      render(null);
+      render();
       return;
     }
 
     try {
-      const [records, access] = await Promise.all([
+      const [records, gameAccess] = await Promise.all([
         app.loadLessons(),
         app.gameAccess.getAccess(student)
       ]);
-      const lesson = app.mapLessons(records).find(item => String(item.id) === String(lessonId));
-      render(lesson || null, access);
+      lesson = app.mapLessons(records).find(item => String(item.id) === String(lessonId)) || null;
+      access = gameAccess;
+      render();
     } catch (error) {
       console.error('Games menu load error:', error);
-      render(null);
+      renderError(error);
     }
   }
 

@@ -11,6 +11,7 @@ import { createLearningMaterialViewRuntime } from '../features/learning-material
 import { createPracticeMenuRuntime } from '../features/practice/menu-runtime.js';
 import { createPracticeTestRuntime } from '../features/practice/practice-test-runtime.js';
 import { createGamesRuntime } from '../features/practice/games-runtime.js';
+import { guardGameRoute } from '../features/practice/game-route-guard.js';
 import { createDoubleOrNothingPageRuntime } from '../features/practice/double-or-nothing/page-runtime.js';
 import { createMillionairePageRuntime } from '../features/practice/millionaire/page-runtime.js';
 import { createTicTacToePageRuntime } from '../features/practice/tic-tac-toe/page-runtime.js';
@@ -38,9 +39,27 @@ import { readViewContext } from '../core/view-context.js';
 
 function defineRoute(renderer, styles = []) { Object.defineProperty(renderer, 'styles', { value: Object.freeze([...styles]), enumerable: false, configurable: false, writable: false }); return renderer; }
 
+function defineGameRoute(gameKey, renderer, styles = []) {
+  return defineRoute(async ({ url, navigate }) => {
+    const context = readViewContext(url.searchParams);
+    const lessonId = url.searchParams.get('lesson_id') || '';
+    const allowed = await guardGameRoute({ app: renderer.app, gameKey, context, lessonId, navigate });
+    if (!allowed) return null;
+    return renderer.create({ url, context, lessonId, navigate });
+  }, styles);
+}
+
 export function createPacoRouteRegistry({ app, mounts, documentRef = document } = {}) {
   if (!app) throw new TypeError('Paco route registry requires an app.'); if (!mounts?.templateMount) throw new TypeError('Paco route registry requires template mount.');
   const routes = {};
+  const game = (gameKey, factory, styles) => defineRoute(async ({ url, navigate }) => {
+    const context = readViewContext(url.searchParams);
+    const lessonId = url.searchParams.get('lesson_id') || '';
+    const allowed = await guardGameRoute({ app, gameKey, context, lessonId, navigate });
+    if (!allowed) return null;
+    return factory({ url, context, lessonId, navigate });
+  }, styles);
+
   routes['dashboard.html'] = defineRoute(({ url, navigate }) => createDashboardRuntime({ app, templateMount: mounts.templateMount, chooserMount: mounts.chooserMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/dashboard/dashboard.css']);
   routes['lessons.html'] = defineRoute(({ url, navigate }) => createLessonsRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), selectedSubject: url.searchParams.get('subject') || '', documentRef, navigate }), ['src/components/lesson-list.css']);
   routes['lesson-choice.html'] = defineRoute(({ url, navigate }) => createLessonChoiceRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/lesson-choice.css']);
@@ -55,16 +74,16 @@ export function createPacoRouteRegistry({ app, mounts, documentRef = document } 
   routes['oefentoets.html'] = defineRoute(({ url, navigate }) => createPracticeTestRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css']);
   routes['games.html'] = defineRoute(({ url, navigate }) => createGamesRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/practice/games.css']);
   routes['skills.html'] = defineRoute(({ url, navigate }) => createSkillsRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), skillId: url.searchParams.get('skill') || '', durationSeconds: Number(url.searchParams.get('duration') || 180), documentRef, navigate }));
-  routes['double-or-nothing.html'] = defineRoute(({ url, navigate }) => createDoubleOrNothingPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/double-or-nothing.css']);
-  routes['millionaire.html'] = defineRoute(({ url, navigate }) => createMillionairePageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/millionaire/millionaire.css']);
-  routes['memory.html'] = defineRoute(({ url, navigate }) => createMemoryPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/memory/memory.css']);
-  routes['flash-question.html'] = defineRoute(({ url, navigate }) => createFlashPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/flash/flash.css']);
-  routes['tic-tac-toe.html'] = defineRoute(({ url, navigate }) => createTicTacToePageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/tic-tac-toe.css']);
-  routes['drop4.html'] = defineRoute(({ url, navigate }) => createDrop4PageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/drop4/drop4.css']);
-  routes['connect-the-dots.html'] = defineRoute(({ url, navigate }) => createConnectTheDotsPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/connect-the-dots/connect-the-dots.css']);
-  routes['word-reveal.html'] = defineRoute(({ url, navigate }) => createWordRevealPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/word-reveal.css']);
-  routes['word-chase.html'] = defineRoute(({ url, navigate }) => createWordChasePageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/word-chase/word-chase.css']);
-  routes['lexo.html'] = defineRoute(({ url, navigate }) => createLexoPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/lexo/lexo.css']);
+  routes['double-or-nothing.html'] = game('double-or-nothing', ({ context, lessonId, navigate }) => createDoubleOrNothingPageRuntime({ app, templateMount: mounts.templateMount, context, lessonId, documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/double-or-nothing.css']);
+  routes['millionaire.html'] = game('millionaire', ({ context, navigate }) => createMillionairePageRuntime({ app, templateMount: mounts.templateMount, context, documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/millionaire/millionaire.css']);
+  routes['memory.html'] = game('memory', ({ context, lessonId, navigate }) => createMemoryPageRuntime({ app, templateMount: mounts.templateMount, context, lessonId, documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/memory/memory.css']);
+  routes['flash-question.html'] = game('flash-question', ({ context, lessonId, navigate }) => createFlashPageRuntime({ app, templateMount: mounts.templateMount, context, lessonId, documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/flash/flash.css']);
+  routes['tic-tac-toe.html'] = game('tic-tac-toe', ({ context, navigate }) => createTicTacToePageRuntime({ app, templateMount: mounts.templateMount, context, documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/tic-tac-toe.css']);
+  routes['drop4.html'] = game('drop4', ({ context, lessonId, navigate }) => createDrop4PageRuntime({ app, templateMount: mounts.templateMount, context, lessonId, documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/drop4/drop4.css']);
+  routes['connect-the-dots.html'] = game('connect-the-dots', ({ context, lessonId, navigate }) => createConnectTheDotsPageRuntime({ app, templateMount: mounts.templateMount, context, lessonId, documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/connect-the-dots/connect-the-dots.css']);
+  routes['word-reveal.html'] = game('word-reveal', ({ context, lessonId, navigate }) => createWordRevealPageRuntime({ app, templateMount: mounts.templateMount, context, lessonId, documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/word-reveal.css']);
+  routes['word-chase.html'] = game('word-chase', ({ context, lessonId, navigate }) => createWordChasePageRuntime({ app, templateMount: mounts.templateMount, context, lessonId, documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/word-chase/word-chase.css']);
+  routes['lexo.html'] = game('lexo', ({ context, lessonId, navigate }) => createLexoPageRuntime({ app, templateMount: mounts.templateMount, context, lessonId, documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/lexo/lexo.css']);
   routes['flashcards-template.html'] = defineRoute(({ url, navigate }) => createFlashcardsPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/practice/flashcards/flashcards.css']);
   routes['agenda.html'] = defineRoute(({ url, navigate }) => createAgendaPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/agenda/agenda.css']);
   routes['month-calendar.html'] = defineRoute(({ url, navigate }) => createMonthCalendarRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/agenda/month-calendar.css']);

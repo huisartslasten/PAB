@@ -1,13 +1,14 @@
 import { mountPacoPageTemplate } from '../../../components/page-template.js';
 import { createPacoNavigation } from '../../../components/page-navigation.js';
 import { createLessonContextField } from '../../lessons/lesson-context-view.js';
+import { filterLessonItemsByContentKind } from '../../lessons/lesson-content-model.js';
 import { createMemoryRuntime } from './runtime.js';
 import { createMemoryView } from './view.js';
 import { createPracticeGameTemplate } from '../practice-game-template.js';
 import { buildViewUrl } from '../../../core/view-context.js';
 import { escapeHtml } from '../../../core/html.js';
 
-export function createMemoryPageRuntime({ app, templateMount, context, lessonId = '', documentRef = document, navigate } = {}) {
+export function createMemoryPageRuntime({ app, templateMount, context, lessonId = '', contentKind = '', documentRef = document, navigate } = {}) {
   if (!app) throw new TypeError('Memory runtime requires an app.');
   if (!templateMount) throw new TypeError('Memory runtime requires a template mount.');
   if (typeof navigate !== 'function') throw new TypeError('Memory runtime requires a navigation owner.');
@@ -22,6 +23,7 @@ export function createMemoryPageRuntime({ app, templateMount, context, lessonId 
   const goGames = () => {
     const target = buildViewUrl('games.html', { student, mode: context?.mode });
     if (lessonId) target.searchParams.set('lesson_id', lessonId);
+    if (contentKind) target.searchParams.set('content_kind', contentKind);
     return navigate(target);
   };
 
@@ -87,7 +89,7 @@ export function createMemoryPageRuntime({ app, templateMount, context, lessonId 
     });
     content.appendChild(gameTemplate.element);
 
-    const items = Array.isArray(lesson.lesson_items) ? lesson.lesson_items : Array.isArray(lesson.items) ? lesson.items : [];
+    const items = filterLessonItemsByContentKind(lesson, contentKind);
     const runtime = createMemoryRuntime({ items });
 
     async function resolveTurn() {

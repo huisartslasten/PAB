@@ -1,9 +1,12 @@
+import { createPacoDropdown } from '../../../components/design-system.js';
+
 const MEMORY_CARD_BACK_IMAGE = new URL('./paco memory.png', import.meta.url).href;
 
 export function createMemoryView({ documentRef = document, escapeHtml = value => String(value) } = {}) {
   function render({
     root,
     state,
+    bestScore = null,
     timingMode = 'manual',
     onTimingModeChange,
     onResolveTurn,
@@ -32,9 +35,7 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
           image.alt = 'Paco';
           button.appendChild(image);
         }
-        if (state.phase === 'playing' && !state.matchedCardIds.has(card.id)) {
-          button.addEventListener('click', () => onCardSelect(card.id));
-        }
+        if (state.phase === 'playing' && !state.matchedCardIds.has(card.id)) button.addEventListener('click', () => onCardSelect(card.id));
         grid.appendChild(button);
       });
     }
@@ -58,7 +59,7 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
     if (round) round.textContent = `${state.roundNumber}/${state.totalRounds}`;
     if (turns) turns.textContent = String(state.turnCount);
     if (minimum) minimum.textContent = String(state.minimumTurns);
-    if (record) record.textContent = '—';
+    if (record) record.textContent = bestScore == null ? '—' : String(bestScore);
 
     const finished = scope.querySelector('[data-memory-finished]');
     if (finished) {
@@ -73,14 +74,13 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
     if (roundFinished) {
       roundFinished.hidden = state.phase !== 'round-finished';
       if (state.phase === 'round-finished') {
-        roundFinished.querySelector('[data-memory-round-finished-text]').textContent = `Ronde ${state.roundNumber} klaar! ${state.roundPairs} paren gevonden. Klaar voor ronde ${state.roundNumber + 1}?`;
+        roundFinished.querySelector('[data-memory-round-finished-text]').textContent = `${state.roundPairs} paren gevonden. Klaar voor ronde ${state.roundNumber + 1}?`;
         roundFinished.querySelector('[data-memory-next-button]').textContent = `Volgende ronde (${state.roundNumber + 1}/${state.totalRounds})`;
         roundFinished.querySelector('[data-memory-next-button]').onclick = onNextRound;
       }
     }
 
-    const timingDropdown = scope.querySelector('[data-memory-timing]');
-    timingDropdown?.setValue?.(timingMode);
+    scope.querySelector('[data-memory-timing-dropdown]')?.setValue?.(timingMode);
   }
 
   function createTimingControl({ timingMode = 'manual', onTimingModeChange }) {
@@ -89,17 +89,18 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
     const label = documentRef.createElement('span');
     label.className = 'memory-timing-label';
     label.textContent = 'Kaartjes laten zien:';
-    const select = documentRef.createElement('select');
-    select.dataset.memoryTiming = 'true';
-    [['manual', 'GEEN TIJDSLIMIET'], ['3', '3 seconden'], ['5', '5 seconden']].forEach(([value, text]) => {
-      const option = documentRef.createElement('option');
-      option.value = value;
-      option.textContent = text;
-      option.selected = value === timingMode;
-      select.appendChild(option);
+    const dropdown = createPacoDropdown({
+      options: [
+        { value: 'manual', label: 'GEEN TIJDSLIMIET' },
+        { value: '3', label: '3 seconden' },
+        { value: '5', label: '5 seconden' }
+      ],
+      value: timingMode,
+      onChange: onTimingModeChange,
+      className: 'memory-timing-dropdown'
     });
-    select.addEventListener('change', () => onTimingModeChange(select.value));
-    control.append(label, select);
+    dropdown.element.dataset.memoryTimingDropdown = 'true';
+    control.append(label, dropdown.element);
     return control;
   }
 

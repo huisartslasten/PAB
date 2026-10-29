@@ -24,6 +24,11 @@ function normalizeDifficulty(value) {
   return DIFFICULTIES.has(normalized) ? normalized : null;
 }
 
+function normalizeContentData(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  return value;
+}
+
 function normalizeLessonItems(items = []) {
   return (Array.isArray(items) ? items : []).map((item, index) => {
     const questionParts = normalizeParts(item.question_parts, item.question);
@@ -34,6 +39,7 @@ function normalizeLessonItems(items = []) {
       answer,
       question_parts: questionParts,
       answer_parts: answerParts,
+      content_data: normalizeContentData(item.content_data),
       hint: String(item.hint ?? ''),
       response_type: RESPONSE_TYPES.has(item.response_type) ? item.response_type : 'text',
       answer_options: Array.isArray(item.answer_options) ? item.answer_options.map(option => String(option ?? '').trim()).filter(Boolean) : [],

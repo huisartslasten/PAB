@@ -1,6 +1,6 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
-import { getContentDefinition, getLessonContentKinds, getPracticeModesForLesson } from '../lessons/learning-experience-registry.js';
+import { getContentDefinition, getLessonContentKinds, getPracticeModesForLesson, getPracticeSelectionCopy } from '../lessons/learning-experience-registry.js';
 import { createLessonContextField } from '../lessons/lesson-context-view.js';
 import { buildViewUrl } from '../../core/view-context.js';
 
@@ -38,6 +38,7 @@ export function createPracticeMenuRuntime({ app, templateMount, context, lessonI
   const content = documentRef.createElement('div');
   let lesson = null;
   let selectedContentKind = '';
+  let hasMultipleContentKinds = false;
 
   const goChoice = () => {
     const target = buildViewUrl('lesson-choice.html', { student, mode: context?.mode });
@@ -71,9 +72,10 @@ export function createPracticeMenuRuntime({ app, templateMount, context, lessonI
   function renderContentStep() {
     content.replaceChildren();
     const field = createLessonContextField(lesson, { documentRef });
+    const copy = getPracticeSelectionCopy({ hasMultipleContentKinds: true });
     const heading = documentRef.createElement('div');
     heading.className = 'practice-selection-heading';
-    heading.innerHTML = '<h2>WAT wil je oefenen?</h2><p>Kies eerst welk onderdeel van deze les je wilt oefenen.</p>';
+    heading.innerHTML = `<h2>${copy.heading}</h2><p>${copy.description}</p>`;
 
     const cards = getLessonContentKinds(lesson).map(kind => {
       const definition = getContentDefinition(kind);
@@ -96,10 +98,10 @@ export function createPracticeMenuRuntime({ app, templateMount, context, lessonI
   function renderPracticeStep() {
     content.replaceChildren();
     const field = createLessonContextField(lesson, { documentRef });
-    const definition = getContentDefinition(selectedContentKind);
+    const copy = getPracticeSelectionCopy({ contentKind: selectedContentKind, hasMultipleContentKinds });
     const heading = documentRef.createElement('div');
     heading.className = 'practice-selection-heading';
-    heading.innerHTML = `<button type="button" class="practice-selection-back">← Ander onderdeel</button><h2>HOE wil je ${definition?.label?.toLowerCase() || 'dit'} oefenen?</h2><p>Kies de oefenvorm.</p>`;
+    heading.innerHTML = `${hasMultipleContentKinds ? '<button type="button" class="practice-selection-back">← Ander onderdeel</button>' : ''}<h2>${copy.heading}</h2><p>${copy.description}</p>`;
     heading.querySelector('.practice-selection-back')?.addEventListener('click', renderContentStep);
 
     const modes = getPracticeModesForLesson({ lessonType: lesson.type, contentKind: selectedContentKind });
@@ -115,6 +117,7 @@ export function createPracticeMenuRuntime({ app, templateMount, context, lessonI
   function render(nextLesson) {
     lesson = nextLesson;
     selectedContentKind = '';
+    hasMultipleContentKinds = false;
     content.replaceChildren();
     if (!lessonId || !lesson) {
       const state = documentRef.createElement('div');
@@ -125,7 +128,8 @@ export function createPracticeMenuRuntime({ app, templateMount, context, lessonI
     }
 
     const contentKinds = getLessonContentKinds(lesson);
-    if (contentKinds.length === 1) {
+    hasMultipleContentKinds = contentKinds.length > 1;
+    if (!hasMultipleContentKinds) {
       selectedContentKind = contentKinds[0];
       renderPracticeStep();
       return;

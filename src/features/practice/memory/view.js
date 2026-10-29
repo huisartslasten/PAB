@@ -36,8 +36,23 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
 
           if (card.audioText) {
             const audioAction = documentRef.createElement('span');
-            audioAction.className = 'memory-card-audio';
-            audioAction.textContent = '🔊 Luister';
+            audioAction.className = 'memory-card-audio-button';
+            audioAction.textContent = '🔊';
+            audioAction.title = 'Laat de kaart opnieuw horen';
+            audioAction.setAttribute('aria-label', 'Laat de kaart opnieuw horen');
+            audioAction.setAttribute('role', 'button');
+            audioAction.tabIndex = 0;
+            const playAudio = event => {
+              event.stopPropagation();
+              onPlayAudio(card.audioText);
+            };
+            audioAction.addEventListener('click', playAudio);
+            audioAction.addEventListener('keydown', event => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                playAudio(event);
+              }
+            });
             button.appendChild(audioAction);
           } else {
             const value = documentRef.createElement('span');
@@ -54,19 +69,6 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
 
         if (state.phase === 'playing' && !state.matchedCardIds.has(card.id)) {
           button.addEventListener('click', () => onCardSelect(card.id));
-        }
-        if (visible && card.audioText) {
-          const audioButton = documentRef.createElement('button');
-          audioButton.type = 'button';
-          audioButton.className = 'memory-card-audio-button';
-          audioButton.textContent = '🔊';
-          audioButton.title = 'Laat de kaart opnieuw horen';
-          audioButton.setAttribute('aria-label', 'Laat de kaart opnieuw horen');
-          audioButton.addEventListener('click', event => {
-            event.stopPropagation();
-            onPlayAudio(card.audioText);
-          });
-          button.appendChild(audioButton);
         }
         grid.appendChild(button);
       });

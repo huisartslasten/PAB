@@ -1,12 +1,17 @@
 import { mountPacoPageTemplate } from '../../../components/page-template.js';
 import { createPacoNavigation } from '../../../components/page-navigation.js';
 import { createLessonContextField } from '../../lessons/lesson-context-view.js';
+import { createPracticeGameTemplate } from '../practice-game-template.js';
 import { createLexoRuntime } from './runtime.js';
 import { createLexoView } from './view.js';
 import { mountPracticeGameHelp } from '../practice-game-help.js';
 import { buildViewUrl } from '../../../core/view-context.js';
 
 const GAME_KEYS = Object.freeze({ rookie: 'lexo_rookie', goat: 'lexo_goat' });
+const LEXO_DIFFICULTIES = Object.freeze([
+  Object.freeze({ value: 'rookie', label: 'ROOKIE — 2 letters' }),
+  Object.freeze({ value: 'goat', label: 'GOAT — 1 letter' })
+]);
 
 export function createLexoPageRuntime({ app, templateMount, context, lessonId = '', documentRef = document, navigate } = {}) {
   if (!app) throw new TypeError('LEXO runtime requires an app.');
@@ -16,29 +21,30 @@ export function createLexoPageRuntime({ app, templateMount, context, lessonId = 
   const student = context?.student || '';
   const content = documentRef.createElement('div');
   const view = createLexoView({ documentRef });
-  const gameShell = documentRef.createElement('main');
-  gameShell.className = 'practice-page-card lexo-page-card';
-  gameShell.innerHTML = `
-    <header class="lexo-head">
-      <div class="lexo-stats" aria-label="Spelstatistieken">
-        <div class="lexo-stat"><span>Niveau</span><strong id="lexoDifficulty">ROOKIE</strong></div>
-        <div class="lexo-stat"><span>Punten</span><strong id="lexoScore">0</strong></div>
-        <div class="lexo-stat"><span>Record</span><strong id="lexoRecord">—</strong></div>
-        <div class="lexo-stat"><span>Vragen</span><strong id="lexoProgress">0 van 0</strong></div>
-      </div>
-      <label class="lexo-difficulty-control">Niveau<div id="lexoDifficultySelect"></div></label>
-    </header>
-    <section class="lexo-grid-panel" aria-label="Letterveld">
-      <div id="lexoGrid" class="lexo-grid"></div>
-      <p class="lexo-grid-hint">ROOKIE: 2 hulpletters · GOAT: 1 hulpletter</p>
-    </section>
-    <section class="lexo-question-panel">
-      <span class="lexo-label">Lesvraag</span>
-      <div id="lexoQuestionArea"></div>
-    </section>
-    <section id="lexoFeedback" class="lexo-feedback-panel" aria-live="polite"></section>`;
-  content.appendChild(gameShell);
-  mountPracticeGameHelp(gameShell.querySelector('.lexo-grid-panel'), {
+  const gameArea = documentRef.createElement('div');
+  gameArea.innerHTML = '<div id="lexoGrid" class="lexo-grid"></div><p class="lexo-grid-hint">ROOKIE: 2 hulpletters · GOAT: 1 hulpletter</p>';
+  const exercise = documentRef.createElement('div');
+  exercise.innerHTML = '<span class="lexo-label">Lesvraag</span><div id="lexoQuestionArea"></div>';
+  const feedback = documentRef.createElement('div');
+  feedback.id = 'lexoFeedback';
+  feedback.setAttribute('aria-live', 'polite');
+  const gameTemplate = createPracticeGameTemplate({
+    documentRef,
+    className: 'lexo-game-template',
+    difficulty: 'rookie',
+    difficultyOptions: LEXO_DIFFICULTIES,
+    stats: [
+      { id: 'score', label: 'Punten', value: '0' },
+      { id: 'record', label: 'Record', value: '—' },
+      { id: 'progress', label: 'Vragen', value: '0 van 0' }
+    ],
+    onDifficultyChange: value => { void changeDifficulty(value); },
+    gameArea,
+    exercise,
+    feedback
+  });
+  content.appendChild(gameTemplate.element);
+  mountPracticeGameHelp(gameTemplate.element.querySelector('.practice-game-area'), {
     documentRef,
     title: 'Zo speel je LEXO',
     paragraphs: [
@@ -54,10 +60,14 @@ export function createLexoPageRuntime({ app, templateMount, context, lessonId = 
     return navigate(target);
   };
 
+  let difficulty = 'rookie';
+  let runtime = null;
+  let highScore = null;
+
   async function load() {
     if (!lessonId || !student) {
-      gameShell.replaceChildren();
-      gameShell.textContent = !student ? 'Geen leerling geselecteerd.' : 'Geen les geselecteerd.';
+      gameTemplate.element.replaceChildren();
+      gameTemplate.element.textContent = !student ? 'Geen leerling geselecteerd.' : 'Geen les geselecteerd.';
       return;
     }
 
@@ -66,18 +76,15 @@ export function createLexoPageRuntime({ app, templateMount, context, lessonId = 
     if (!lesson) throw new Error('Deze les kon niet worden gevonden.');
 
     const contextField = createLessonContextField(lesson, { documentRef });
-    content.insertBefore(contextField, gameShell);
+    content.insertBefore(contextField, gameTemplate.element);
 
     const items = Array.isArray(lesson.lesson_items) ? lesson.lesson_items : Array.isArray(lesson.items) ? lesson.items : [];
     if (!items.length) {
-      gameShell.querySelector('#lexoQuestionArea').textContent = 'Deze les bevat nog geen vragen.';
+      gameTemplate.element.querySelector('#lexoQuestionArea').textContent = 'Deze les bevat nog geen vragen.';
       return;
     }
 
     const isDictation = lesson.type === 'dictation';
-    let difficulty = 'rookie';
-    let runtime = null;
-    let highScore = null;
 
     async function loadHighScore() {
       highScore = await app.gameResults.getHighScore({ gameKey: GAME_KEYS[difficulty], lessonId, student });
@@ -102,20 +109,24 @@ export function createLexoPageRuntime({ app, templateMount, context, lessonId = 
 
     async function render(errorMessage = '') {
       const state = runtime.snapshot();
-      view.renderStats(gameShell, state, highScore);
-      view.renderGrid(gameShell, state);
-      view.renderDifficulty(gameShell, difficulty, value => { void changeDifficulty(value); });
-      view.renderFeedback(gameShell, state, () => { void continueAfterFeedback(); });
+      view.renderStats(gameTemplate.element, state, highScore);
+      view.renderGrid(gameTemplate.element, state);
+      view.renderFeedback(gameTemplate.element, state, () => { void continueAfterFeedback(); });
+
+      if (errorMessage) {
+        const feedbackNode = gameTemplate.element.querySelector('#lexoFeedback');
+        if (feedbackNode) feedbackNode.textContent = errorMessage;
+      }
 
       if (state.phase === 'finished') {
         await saveScore(state.score);
-        view.renderStats(gameShell, state, highScore);
-        view.renderFinished(gameShell, state, () => { void restartGame(); }, goGames);
+        view.renderStats(gameTemplate.element, state, highScore);
+        view.renderFinished(gameTemplate.element, state, () => { void restartGame(); }, goGames);
         return;
       }
 
       if (state.phase === 'word') {
-        view.renderWordInput(gameShell, state, value => {
+        view.renderWordInput(gameTemplate.element, state, value => {
           try { runtime.submitWord(value); void render(); }
           catch (error) { void render(error?.message || 'Het woord kon niet worden verwerkt.'); }
         });
@@ -124,7 +135,7 @@ export function createLexoPageRuntime({ app, templateMount, context, lessonId = 
 
       if (state.phase === 'question') {
         view.renderQuestion(
-          gameShell,
+          gameTemplate.element,
           state,
           async answer => {
             try { await runtime.submitExerciseAnswer(answer); await render(); }
@@ -177,7 +188,7 @@ export function createLexoPageRuntime({ app, templateMount, context, lessonId = 
     });
     void load().catch(error => {
       console.error('LEXO load error:', error);
-      gameShell.textContent = `LEXO kon niet worden geladen: ${error?.message || 'Onbekende fout.'}`;
+      gameTemplate.element.textContent = `LEXO kon niet worden geladen: ${error?.message || 'Onbekende fout.'}`;
     });
   }
 

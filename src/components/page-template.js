@@ -105,15 +105,15 @@ function ensureManagementTopbarStyles(documentRef) {
   style.id = MANAGEMENT_TOPBAR_STYLE_ID;
   style.textContent = `
     .paco-management-topbar{position:sticky;top:0;z-index:1000;display:flex;align-items:center;gap:12px;min-height:58px;padding:8px 18px;background:rgba(255,255,255,.97);border-bottom:1px solid rgba(30,45,38,.12);box-shadow:0 2px 10px rgba(20,35,28,.06);backdrop-filter:blur(8px);font-family:Nunito,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-    .paco-management-topbar-brand{font-weight:800;letter-spacing:.2px;white-space:nowrap}
-    .paco-management-topbar-mode{font-size:11px;font-weight:800;letter-spacing:1px;color:#6c786f;margin-right:8px}
-    .paco-management-topbar-students{display:flex;align-items:center;gap:6px;flex:1;min-width:0;overflow-x:auto}
+    .paco-management-topbar-left{display:flex;align-items:center;gap:12px;min-width:0;flex:1;overflow:hidden}
+    .paco-management-topbar-dashboard{flex:0 0 auto}
+    .paco-management-topbar-students{display:flex;align-items:center;gap:6px;min-width:0;overflow-x:auto}
     .paco-management-topbar-button{border:1px solid #d6dfd9;background:#fff;color:#34463b;border-radius:8px;padding:8px 12px;font:inherit;font-size:13px;font-weight:700;white-space:nowrap;cursor:pointer}
     .paco-management-topbar-button:hover{background:#f1f5f2}
     .paco-management-topbar-button.active{background:#e7f0ea;border-color:#c5d5ca;color:#1f3929}
-    .paco-management-topbar-learner{margin-left:auto}.paco-management-topbar-logout{margin-left:0}.paco-management-topbar-spacer{flex:0}
+    .paco-management-topbar-logout{flex:0 0 auto;margin-left:12px}
     .paco-page-template.management-template .paco-template-hero{margin-top:0}
-    @media(max-width:760px){.paco-management-topbar{gap:7px;padding:7px 10px}.paco-management-topbar-brand{font-size:14px}.paco-management-topbar-mode{display:none}.paco-management-topbar-button{padding:7px 9px;font-size:12px}}
+    @media(max-width:760px){.paco-management-topbar{gap:7px;padding:7px 10px}.paco-management-topbar-left{gap:7px}.paco-management-topbar-button{padding:7px 9px;font-size:12px}.paco-management-topbar-logout{margin-left:7px}}
   `;
   documentRef.head.appendChild(style);
 }
@@ -123,20 +123,51 @@ export function createPacoManagementTopbar({ topbar, documentRef }) {
   ensureManagementTopbarStyles(documentRef);
   const bar = documentRef.createElement('header');
   bar.className = 'paco-management-topbar';
-  const brand = documentRef.createElement('div'); brand.className = 'paco-management-topbar-brand'; brand.textContent = 'PacoGO'; bar.appendChild(brand);
-  const mode = documentRef.createElement('div'); mode.className = 'paco-management-topbar-mode'; mode.textContent = 'BEHEER'; bar.appendChild(mode);
-  const students = documentRef.createElement('div'); students.className = 'paco-management-topbar-students'; students.setAttribute('aria-label', 'Leerlingen');
+
+  const left = documentRef.createElement('div');
+  left.className = 'paco-management-topbar-left';
+
+  if (typeof topbar.onDashboard === 'function') {
+    const dashboard = documentRef.createElement('button');
+    dashboard.type = 'button';
+    dashboard.className = 'paco-management-topbar-button paco-management-topbar-dashboard' + (topbar.dashboardActive ? ' active' : '');
+    dashboard.textContent = 'Dashboard';
+    dashboard.addEventListener('click', topbar.onDashboard);
+    left.appendChild(dashboard);
+  }
+
+  const students = documentRef.createElement('div');
+  students.className = 'paco-management-topbar-students';
+  students.setAttribute('aria-label', 'Leerlingen');
   (topbar.students || []).forEach(student => {
-    const button = documentRef.createElement('button'); button.type = 'button'; button.className = 'paco-management-topbar-button' + (student.active ? ' active' : ''); button.textContent = student.label;
+    const button = documentRef.createElement('button');
+    button.type = 'button';
+    button.className = 'paco-management-topbar-button' + (student.active ? ' active' : '');
+    button.textContent = student.label;
     if (typeof student.onClick === 'function') button.addEventListener('click', student.onClick);
     students.appendChild(button);
   });
-  bar.appendChild(students);
+  left.appendChild(students);
+
   if (typeof topbar.onViewStudent === 'function') {
-    const learner = documentRef.createElement('button'); learner.type = 'button'; learner.className = 'paco-management-topbar-button paco-management-topbar-learner'; learner.textContent = 'Bekijk als leerling'; learner.disabled = !topbar.canViewStudent; learner.addEventListener('click', topbar.onViewStudent); bar.appendChild(learner);
+    const learner = documentRef.createElement('button');
+    learner.type = 'button';
+    learner.className = 'paco-management-topbar-button paco-management-topbar-learner';
+    learner.textContent = 'Bekijk als leerling';
+    learner.disabled = !topbar.canViewStudent;
+    learner.addEventListener('click', topbar.onViewStudent);
+    left.appendChild(learner);
   }
+
+  bar.appendChild(left);
+
   if (typeof topbar.onLogout === 'function') {
-    const logout = documentRef.createElement('button'); logout.type = 'button'; logout.className = 'paco-management-topbar-button paco-management-topbar-logout'; logout.textContent = 'Uitloggen'; logout.addEventListener('click', topbar.onLogout); bar.appendChild(logout);
+    const logout = documentRef.createElement('button');
+    logout.type = 'button';
+    logout.className = 'paco-management-topbar-button paco-management-topbar-logout';
+    logout.textContent = 'Uitloggen';
+    logout.addEventListener('click', topbar.onLogout);
+    bar.appendChild(logout);
   }
   return bar;
 }

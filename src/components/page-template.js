@@ -104,7 +104,7 @@ function ensureManagementTopbarStyles(documentRef) {
   const style = documentRef.createElement('style');
   style.id = MANAGEMENT_TOPBAR_STYLE_ID;
   style.textContent = `
-    .paco-management-topbar{position:sticky;top:0;z-index:1000;display:flex;align-items:center;gap:12px;min-height:58px;padding:8px 18px;background:rgba(255,255,255,.97);border-bottom:1px solid rgba(30,45,38,.12);box-shadow:0 2px 10px rgba(20,35,28,.06);backdrop-filter:blur(8px)}
+    .paco-management-topbar{position:sticky;top:0;z-index:1000;display:flex;align-items:center;gap:12px;min-height:58px;padding:8px 18px;background:rgba(255,255,255,.97);border-bottom:1px solid rgba(30,45,38,.12);box-shadow:0 2px 10px rgba(20,35,28,.06);backdrop-filter:blur(8px);font-family:Nunito,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
     .paco-management-topbar-brand{font-weight:800;letter-spacing:.2px;white-space:nowrap}
     .paco-management-topbar-mode{font-size:11px;font-weight:800;letter-spacing:1px;color:#6c786f;margin-right:8px}
     .paco-management-topbar-students{display:flex;align-items:center;gap:6px;flex:1;min-width:0;overflow-x:auto}

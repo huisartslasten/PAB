@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 
 const navigationSource = readFileSync(new URL('../src/components/page-navigation.js', import.meta.url), 'utf8');
 const historyRuntime = readFileSync(new URL('../src/features/test-history/runtime.js', import.meta.url), 'utf8');
+const managementRuntime = readFileSync(new URL('../src/features/management/runtime.js', import.meta.url), 'utf8');
 
 const managementNavigationSource = navigationSource.slice(
   navigationSource.indexOf('export function createPacoManagementNavigation('),
@@ -19,6 +20,28 @@ test('shared navigation owns one stable management sidebar profile', () => {
   assert.doesNotMatch(managementNavigationSource, /path: 'archive\.html'/);
   assert.match(managementNavigationSource, /const goFilter = nextFilter => go\(navigate, 'management\.html'/);
   assert.doesNotMatch(managementNavigationSource, /label: 'Creator Console'/);
+});
+
+test('management runtime renders every management sidebar filter in its canonical section', () => {
+  for (const filter of [
+    'dashboard', 'vakken', 'lessons', 'learning-material', 'tests', 'skills',
+    'planning', 'agenda', 'month-calendar', 'extra', 'challenges', 'games',
+    'beheer', 'archive', 'trash'
+  ]) {
+    assert.match(managementRuntime, new RegExp(`${filter.replace(/[.*+?^${}()|[\\]\\]/g, '\\\\$&')}:`));
+  }
+
+  assert.match(managementRuntime, /const show = \(\.\.\.filters\) => showAll \|\| filters\.includes\(filter\);/);
+  assert.match(managementRuntime, /show\('vakken', 'lessons'\)/);
+  assert.match(managementRuntime, /show\('vakken', 'learning-material'\)/);
+  assert.match(managementRuntime, /show\('vakken', 'tests'\)/);
+  assert.match(managementRuntime, /show\('vakken', 'skills'\)/);
+  assert.match(managementRuntime, /show\('planning', 'agenda'\)/);
+  assert.match(managementRuntime, /show\('planning', 'month-calendar'\)/);
+  assert.match(managementRuntime, /show\('extra', 'challenges'\)/);
+  assert.match(managementRuntime, /show\('extra', 'games'\)/);
+  assert.match(managementRuntime, /show\('beheer', 'archive'\)/);
+  assert.match(managementRuntime, /show\('beheer', 'trash'\)/);
 });
 
 test('test history derives its sidebar from the central navigation owner', () => {

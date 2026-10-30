@@ -34,6 +34,24 @@ test('Rock Paper Scissors uses the canonical answer -> choice -> reveal sequence
   assert.equal(state.phase, 'question');
 });
 
+test('The final question still shows the result before the round finishes', () => {
+  const runtime = createRockPaperScissorsRuntime({
+    items: [{ question: '1 + 1', answer: '2' }],
+    random: () => 0
+  });
+
+  runtime.start();
+  runtime.submitAnswer('2');
+  runtime.choose('rock');
+
+  const revealed = runtime.reveal();
+  assert.equal(revealed.phase, 'result');
+  assert.equal(revealed.lastResult.rpsResult, 'draw');
+
+  const finished = runtime.continueGame();
+  assert.equal(finished.phase, 'finished');
+});
+
 test('A wrong answer scores zero while the RPS result is still revealed', () => {
   const runtime = createRockPaperScissorsRuntime({
     items: [

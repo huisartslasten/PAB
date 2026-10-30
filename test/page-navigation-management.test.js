@@ -34,6 +34,16 @@ test('management page delegates its shell and feature composition to the canonic
   assert.match(managementRuntime, /topbar: createManagementTopbar\(/);
 });
 
+test('management LB is a filter and keeps every management destination inside the canonical management dashboard', () => {
+  assert.match(navigation, /const goFilter = nextFilter => go\(navigate, 'management\.html', \{ student, mode: 'management', managementFilter: nextFilter \}\)/);
+  assert.match(navigation, /onClick: \(\) => goFilter\(child\.filter\)/);
+  assert.doesNotMatch(navigation, /onClick: \(\) => goChild\(child\)/);
+  assert.doesNotMatch(navigation, /const goChild = child =>/);
+  assert.doesNotMatch(navigation, /path: 'lessons\.html'/);
+  assert.doesNotMatch(navigation, /path: 'skills\.html'/);
+  assert.doesNotMatch(navigation, /path: 'agenda\.html'/);
+});
+
 test('shared learning navigation keeps learner presentation and explicit management presentation in the canonical lessons owner', () => {
   assert.match(navigation, /key: 'lessons',[\s\S]*?label: 'Mijn vakken'/);
   assert.doesNotMatch(navigation, /isManagementView/);

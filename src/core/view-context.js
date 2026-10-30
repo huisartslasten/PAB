@@ -26,7 +26,8 @@ export function applyViewContext(context) {
 }
 
 export function getViewContext() {
-  const params = new URLSearchParams(window.location.search);
+  const search = typeof window !== 'undefined' && window.location ? window.location.search : '';
+  const params = new URLSearchParams(search);
   const mode = params.get('mode') === VIEW_MODES.MANAGEMENT ? VIEW_MODES.MANAGEMENT : VIEW_MODES.STUDENT;
   return Object.freeze({
     student: appState.viewedStudent || '',

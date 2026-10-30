@@ -3,9 +3,9 @@ import { confirmPacoAction } from './confirm-dialog.js';
 import { buildViewUrl } from '../core/view-context.js';
 
 function currentPage() { return window.location.pathname.split('/').pop() || 'dashboard.html'; }
-function go(navigate, path, { student = '', managementFilter = '', extra = {}, managementCapability = '' } = {}) {
+function go(navigate, path, { student = '', mode = '', managementFilter = '', extra = {}, managementCapability = '' } = {}) {
   if (typeof navigate !== 'function') throw new TypeError('PacoGO shared navigation requires the central navigation owner.');
-  return navigate(buildViewUrl(path, { student, managementFilter, extra }), { managementCapability });
+  return navigate(buildViewUrl(path, { student, mode, managementFilter, extra }), { managementCapability });
 }
 function requireNavigationApp(app, includeAccount) { if (!includeAccount) return; if (!app?.auth || !app?.authSession) throw new Error('createPacoNavigation requires the application context when includeAccount is enabled.'); }
 
@@ -53,8 +53,8 @@ export function createPacoNavigation({ app = null, active = '', activeSubmenu = 
 
 export function createPacoManagementNavigation({ app, active = '', activeSubmenu = '', student = '', managementStudents = [], navigate } = {}) {
   const filter = new URLSearchParams(window.location.search).get('managementFilter') || 'dashboard';
-  const goFilter = nextFilter => go(navigate, 'management.html', { student, managementFilter: nextFilter });
-  const goChild = child => go(navigate, child.path, { student, managementFilter: child.filter, managementCapability: child.capability || '' });
+  const goFilter = nextFilter => go(navigate, 'management.html', { student, mode: 'management', managementFilter: nextFilter });
+  const goChild = child => go(navigate, child.path, { student, mode: 'management', managementFilter: child.filter, managementCapability: child.capability || '' });
   const makeGroup = (key, label, children) => ({
     key,
     label,

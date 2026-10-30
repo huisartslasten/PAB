@@ -76,3 +76,21 @@
 @media(max-width:800px){.management-recovery-grid{grid-template-columns:1fr}}
 @media(max-width:700px){.management-actions{grid-template-columns:1fr}}
 @media(max-width:620px){.skill-editor-range-grid,.skill-config-choices{grid-template-columns:1fr}.skill-management-card{grid-template-columns:1fr}.skill-management-actions{justify-content:flex-start}}
+
+/* New central management dashboard UI. */
+.management-dashboard{display:grid;gap:24px}
+.management-dashboard-notice{padding:16px 18px;border:1px solid var(--paco-border);border-radius:16px;background:#fff8e8;color:#765a19;font-weight:800}
+.management-dashboard-section{display:grid;gap:13px}
+.management-dashboard-section>h2{margin:0;color:var(--paco-text);font-size:25px;line-height:1.1;font-weight:900}
+.management-dashboard-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.management-dashboard-card{display:grid;gap:10px;min-height:170px;padding:20px;border:1px solid var(--paco-border);border-radius:20px;background:#fff;box-shadow:var(--paco-shadow)}
+.management-dashboard-card h3{margin:0;color:var(--paco-text);font-size:22px;line-height:1.1;font-weight:900}
+.management-dashboard-card p{margin:0;color:var(--paco-muted);line-height:1.4}
+.management-dashboard-card-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:auto}
+.management-dashboard-card-primary,.management-dashboard-card-secondary{min-height:40px;border-radius:11px;padding:8px 12px;font:800 14px/1.1 "Baloo 2",Nunito,sans-serif;cursor:pointer}
+.management-dashboard-card-primary{border:0;background:var(--paco-blue);color:#fff}
+.management-dashboard-card-secondary{border:1px solid var(--paco-border);background:#fff;color:var(--paco-text)}
+.management-dashboard-card-primary:hover:not([disabled]),.management-dashboard-card-secondary:hover:not([disabled]){filter:brightness(.97)}
+.management-dashboard-card-primary[disabled],.management-dashboard-card-secondary[disabled]{opacity:.5;cursor:not-allowed}
+@media(max-width:1050px){.management-dashboard-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.management-dashboard-grid{grid-template-columns:1fr}}

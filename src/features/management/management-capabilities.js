@@ -9,10 +9,11 @@
 function requireManagement(management) { if (!management) throw new TypeError('Management capabilities require the management service.'); }
 function canManage(auth) { return auth?.isParent === true; }
 function isMainAdministrator(auth) { return auth?.isMainAdministrator === true; }
-function buildTarget(path, { student = '', extra = {} } = {}) {
+function buildTarget(path, { student = '', mode = 'management', extra = {} } = {}) {
   const url = new URL(path, window.location.href);
   if (student) url.searchParams.set('viewStudent', student); else url.searchParams.delete('viewStudent');
-  url.searchParams.delete('student'); url.searchParams.delete('context'); url.searchParams.delete('mode');
+  if (mode) url.searchParams.set('mode', mode); else url.searchParams.delete('mode');
+  url.searchParams.delete('student'); url.searchParams.delete('context');
   Object.entries(extra).forEach(([key, value]) => { if (value === '' || value == null) url.searchParams.delete(key); else url.searchParams.set(key, String(value)); });
   return url.toString();
 }
@@ -54,7 +55,7 @@ const ITEM_ACTIONS = Object.freeze({
   skill: Object.freeze([
     Object.freeze({ id: 'skill.edit', label: 'Bewerken', target: ({ item, student }) => buildTarget('skill-editor.html', { student: student || item?.student, extra: { skill: item?.id } }) }),
     Object.freeze({ id: 'skill.archive', label: 'Archiveren', execute: ({ management, item }) => management.archiveSkill(item.id), requiresConfirmation: true, confirmation: Object.freeze({ title: 'Skill archiveren?', message: item => `“${item.title}” wordt uit de actieve Skills gehaald en in het archief geplaatst.`, confirmLabel: 'Archiveren', cancelLabel: 'Annuleren' }) }),
-    Object.freeze({ id: 'skill.delete', label: 'Verwijderen', execute: ({ management, item }) => management.moveSkillToTrash(item.id), requiresConfirmation: true, danger: true, confirmation: Object.freeze({ title: 'Skill naar prullenbak?', message: item => `“${item.title}” wordt uit de actieve Skills gehaald en naar de prullenbak verplaatst.`, confirmLabel: 'Naar prullenbak', cancelLabel: 'Annuleren' }) })
+    Object.freeze({ id: 'skill.delete', label: 'Verwijderen', execute: ({ management, item }) => management.moveSkillToTrash(item.id), requiresConfirmation: true, danger: true, confirmation: Object.freeze({ title: 'Skill naar prullenbak?', message: item => `“${item.title}” wordt uit de actieve Skills gehaald en in het archief geplaatst.`, confirmLabel: 'Naar prullenbak', cancelLabel: 'Annuleren' }) })
   ])
 });
 

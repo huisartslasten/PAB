@@ -3,9 +3,9 @@ import { confirmPacoAction } from './confirm-dialog.js';
 import { buildViewUrl } from '../core/view-context.js';
 
 function currentPage() { return window.location.pathname.split('/').pop() || 'dashboard.html'; }
-function go(navigate, path, { student = '', managementFilter = '', extra = {} } = {}) {
+function go(navigate, path, { student = '', managementFilter = '', extra = {}, managementCapability = '' } = {}) {
   if (typeof navigate !== 'function') throw new TypeError('PacoGO shared navigation requires the central navigation owner.');
-  return navigate(buildViewUrl(path, { student, managementFilter, extra }));
+  return navigate(buildViewUrl(path, { student, managementFilter, extra }), { managementCapability });
 }
 function requireNavigationApp(app, includeAccount) { if (!includeAccount) return; if (!app?.auth || !app?.authSession) throw new Error('createPacoNavigation requires the application context when includeAccount is enabled.'); }
 
@@ -54,7 +54,7 @@ export function createPacoNavigation({ app = null, active = '', activeSubmenu = 
 export function createPacoManagementNavigation({ app, active = '', activeSubmenu = '', student = '', managementStudents = [], navigate } = {}) {
   const filter = new URLSearchParams(window.location.search).get('managementFilter') || 'dashboard';
   const goFilter = nextFilter => go(navigate, 'management.html', { student, managementFilter: nextFilter });
-  const goChild = (path, nextFilter = '') => go(navigate, path, { student, managementFilter: nextFilter });
+  const goChild = child => go(navigate, child.path, { student, managementFilter: child.filter, managementCapability: child.capability || '' });
   const makeGroup = (key, label, children) => ({
     key,
     label,
@@ -62,8 +62,8 @@ export function createPacoManagementNavigation({ app, active = '', activeSubmenu
     submenu: children.map(child => ({
       key: child.key,
       label: child.label,
-      active: false,
-      onClick: () => goChild(child.path, child.filter)
+      active: child.filter === filter,
+      onClick: () => goChild(child)
     })),
     onClick: () => goFilter(key)
   });
@@ -71,18 +71,18 @@ export function createPacoManagementNavigation({ app, active = '', activeSubmenu
   return [
     { key: 'management-dashboard', icon: '🏠', label: 'Dashboard', active: filter === 'dashboard', onClick: () => goFilter('dashboard') },
     makeGroup('vakken', 'Vakken', [
-      { key: 'lessons', label: 'Lessen', filter: 'lessons', path: 'lessons.html' },
-      { key: 'learning-material', label: 'Leerstof', filter: 'learning-material', path: 'lessons.html' },
+      { key: 'lessons', label: 'Lessen', filter: 'lessons', path: 'lessons.html', capability: 'lesson.manage' },
+      { key: 'learning-material', label: 'Leerstof', filter: 'learning-material', path: 'lessons.html', capability: 'learningTopic.manage' },
       { key: 'tests', label: 'Toetsen', filter: 'tests', path: 'test-history.html' },
-      { key: 'skills', label: 'Skills', filter: 'skills', path: 'skills.html' }
+      { key: 'skills', label: 'Skills', filter: 'skills', path: 'skills.html', capability: 'skill.manage' }
     ]),
     makeGroup('planning', 'Planning', [
-      { key: 'agenda', label: 'Agenda', filter: 'agenda', path: 'agenda.html' },
-      { key: 'month-calendar', label: 'Maandkalender', filter: 'month-calendar', path: 'month-calendar.html' }
+      { key: 'agenda', label: 'Agenda', filter: 'agenda', path: 'agenda.html', capability: 'agenda.manage' },
+      { key: 'month-calendar', label: 'Maandkalender', filter: 'month-calendar', path: 'month-calendar.html', capability: 'monthCalendar.manage' }
     ]),
     makeGroup('extra', 'Extra', [
-      { key: 'challenges', label: 'Challenges', filter: 'challenges', path: 'challenge-settings.html' },
-      { key: 'games', label: 'Spelletjes', filter: 'games', path: 'game-access.html' }
+      { key: 'challenges', label: 'Challenges', filter: 'challenges', path: 'challenge-settings.html', capability: 'challenge.configure' },
+      { key: 'games', label: 'Spelletjes', filter: 'games', path: 'game-access.html', capability: 'game.access' }
     ]),
     makeGroup('beheer', 'Beheer', [
       { key: 'archive', label: 'Archief', filter: 'archive', path: 'archive.html' },

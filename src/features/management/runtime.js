@@ -2,7 +2,7 @@ import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoManagementNavigation } from '../../components/page-navigation.js';
 import { listStudents } from '../../core/student-registry.js';
 import { buildViewUrl } from '../../core/view-context.js';
-import { confirmPacoAction } from '../../components/confirm-dialog.js';
+import { createManagementTopbar } from './management-context.js';
 
 const FILTER_LABELS = Object.freeze({ dashboard: 'Dashboard', vakken: 'Vakken', planning: 'Planning', extra: 'Extra', beheer: 'Beheer' });
 const FILTER_CAPABILITIES = Object.freeze({ vakken: ['lesson.manage', 'lesson.create', 'learningTopic.manage', 'learningTopic.create', 'skill.manage', 'skill.create'] });
@@ -43,7 +43,7 @@ function createCard(documentRef, { title, description, actionLabel = 'Openen', o
 function capabilityMap(capabilities) { return new Map(capabilities.map(capability => [capability.id, capability])); }
 
 export function createManagementRuntime({ app, templateMount, context, documentRef = document, navigate } = {}) {
-  if (!app) throw new TypeError('Management runtime requires an app.');
+  if (!app) throw new TypeError('Management runtime requires app.');
   if (!templateMount) throw new TypeError('Management runtime requires template mount.');
   if (!context) throw new TypeError('Management runtime requires a view context.');
   if (typeof navigate !== 'function') throw new TypeError('Management runtime requires a navigation owner.');
@@ -55,33 +55,6 @@ export function createManagementRuntime({ app, templateMount, context, documentR
   content.className = 'management-dashboard';
 
   function go(path, extra = {}) { return navigate(buildViewUrl(path, { student: selectedStudent, extra })); }
-
-  function viewSelectedStudent() {
-    if (!selectedStudent) return;
-    navigate(buildViewUrl('dashboard.html', { student: selectedStudent, mode: 'student' }));
-  }
-
-  async function logout() {
-    if (!app.auth?.isLoggedIn) { window.location.href = 'auth.html'; return; }
-    const confirmed = await confirmPacoAction({ title: 'Uitloggen?', message: 'Weet je zeker dat je wilt uitloggen?', confirmLabel: 'Ja, uitloggen', cancelLabel: 'Nee' });
-    if (!confirmed) return;
-    await app.authSession.signOut();
-    app.auth.setSession(null);
-    window.location.href = 'auth.html';
-  }
-
-  function buildTopbar() {
-    return {
-      students: listStudents().map(name => ({
-        label: name,
-        active: name === selectedStudent,
-        onClick: () => navigate(buildViewUrl('management.html', { student: name, managementFilter: filter }))
-      })),
-      canViewStudent: Boolean(selectedStudent),
-      onViewStudent: viewSelectedStudent,
-      onLogout: logout
-    };
-  }
 
   function renderSection(title, cards) {
     if (!cards.length) return;
@@ -106,9 +79,9 @@ export function createManagementRuntime({ app, templateMount, context, documentR
       description,
       actionLabel: capability ? 'Beheren' : 'Niet beschikbaar',
       disabled: !capability,
-      onClick: capability ? () => navigate(capability.target) : null,
+      onClick: capability ? () => navigate(capability.target, { managementCapability: capability.id }) : null,
       secondaryLabel: createCapability ? createCapability.label.replace(/^➕\s*/, '+ ') : '',
-      onSecondaryClick: createCapability ? () => navigate(createCapability.target) : null
+      onSecondaryClick: createCapability ? () => navigate(createCapability.target, { managementCapability: createCapability.id }) : null
     });
   }
 
@@ -168,7 +141,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     mountPacoPageTemplate({
       mount: templateMount,
       className: 'management-template',
-      topbar: buildTopbar(),
+      topbar: createManagementTopbar({ app, student: selectedStudent, managementFilter: filter, navigate }),
       greeting: 'PacoGO beheer ⚙️',
       title: FILTER_LABELS[filter],
       icon: '⚙️',

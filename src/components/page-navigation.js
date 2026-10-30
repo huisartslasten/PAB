@@ -21,7 +21,8 @@ export function createPacoNavigation({ app = null, active = '', activeSubmenu = 
     items.push({ key: 'management-student', kind: 'student-context', label: 'LEERLING', submenu: learners.map(name => ({ key: `management-student-${name}`, label: name, active: name === student, onClick: () => typeof onSelectManagementStudent === 'function' ? onSelectManagementStudent(name) : go(navigate, currentPage(), { student: name }) })) });
   }
 
-  const urlMode = new URL(window.location.href).searchParams.get('mode') || '';
+  const currentUrl = typeof window !== 'undefined' ? new URL(window.location.href) : null;
+  const urlMode = currentUrl?.searchParams.get('mode') || '';
   const isManagementViewingStudent = Boolean(app?.auth?.isParent && student && urlMode === 'student');
   const showDashboard = !isManagementViewingStudent;
   const showAccount = !isManagementViewingStudent;

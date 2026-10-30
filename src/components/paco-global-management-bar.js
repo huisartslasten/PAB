@@ -1,18 +1,18 @@
 import { createPacoManagementTopbar } from './page-template.js';
-import { createManagementTopbar } from '../features/management/management-context.js';
 import { readViewContext } from '../core/view-context.js';
 
 const GLOBAL_BAR_ID = 'paco-global-management-bar';
 
 /**
- * Canonical authenticated management context bar.
+ * Global presentation host for the authenticated management context bar.
  *
- * Placement is global and route-independent; management-context owns the
- * learner switching, learner perspective and logout actions.
+ * The management feature supplies the context actions; this shared component
+ * owns only DOM placement so the bar survives page-template replacement.
  */
-export async function syncPacoGlobalManagementBar({ app, navigate, documentRef = document } = {}) {
+export async function syncPacoGlobalManagementBar({ app, navigate, createTopbar, documentRef = document } = {}) {
   if (!app) throw new TypeError('Global management bar requires app.');
   if (typeof navigate !== 'function') throw new TypeError('Global management bar requires navigation owner.');
+  if (typeof createTopbar !== 'function') throw new TypeError('Global management bar requires a topbar factory.');
 
   const existing = documentRef.getElementById(GLOBAL_BAR_ID);
   const session = await app.initializeSession();
@@ -24,7 +24,7 @@ export async function syncPacoGlobalManagementBar({ app, navigate, documentRef =
 
   const url = new URL(window.location.href);
   const context = readViewContext(url.searchParams);
-  const topbar = createManagementTopbar({
+  const topbar = createTopbar({
     app,
     student: context.student,
     managementFilter: context.managementFilter || 'dashboard',

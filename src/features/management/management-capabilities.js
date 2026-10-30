@@ -55,7 +55,7 @@ const ITEM_ACTIONS = Object.freeze({
   skill: Object.freeze([
     Object.freeze({ id: 'skill.edit', label: 'Bewerken', target: ({ item, student }) => buildTarget('skill-editor.html', { student: student || item?.student, extra: { skill: item?.id } }) }),
     Object.freeze({ id: 'skill.archive', label: 'Archiveren', execute: ({ management, item }) => management.archiveSkill(item.id), requiresConfirmation: true, confirmation: Object.freeze({ title: 'Skill archiveren?', message: item => `“${item.title}” wordt uit de actieve Skills gehaald en in het archief geplaatst.`, confirmLabel: 'Archiveren', cancelLabel: 'Annuleren' }) }),
-    Object.freeze({ id: 'skill.delete', label: 'Verwijderen', execute: ({ management, item }) => management.moveSkillToTrash(item.id), requiresConfirmation: true, danger: true, confirmation: Object.freeze({ title: 'Skill naar prullenbak?', message: item => `“${item.title}” wordt uit de actieve Skills gehaald en in het archief geplaatst.`, confirmLabel: 'Naar prullenbak', cancelLabel: 'Annuleren' }) })
+    Object.freeze({ id: 'skill.delete', label: 'Verwijderen', execute: ({ management, item }) => management.moveSkillToTrash(item.id), requiresConfirmation: true, danger: true, confirmation: Object.freeze({ title: 'Skill naar prullenbak?', message: item => `“${item.title}” wordt uit de actieve Skills gehaald en naar de prullenbak verplaatst.`, confirmLabel: 'Naar prullenbak', cancelLabel: 'Annuleren' }) })
   ])
 });
 

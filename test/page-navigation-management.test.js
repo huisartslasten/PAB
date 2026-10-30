@@ -29,9 +29,9 @@ test('management page delegates its shell and feature composition to the canonic
   assert.match(managementPage, /startPacoRuntime/);
   assert.match(managementPage, /src\/features\/management\/management-support\.css/);
   assert.match(managementRuntime, /mountPacoPageTemplate/);
-  assert.match(managementRuntime, /title\.textContent = selectedStudent \? `Beheer van \$\{selectedStudent\}` : 'Beheer'/);
-  assert.match(managementRuntime, /createPacoNavigation/);
-  assert.match(managementRuntime, /active: 'dashboard'/);
+  assert.match(managementRuntime, /title: FILTER_LABELS\[filter\]/);
+  assert.match(managementRuntime, /createPacoManagementNavigation/);
+  assert.match(managementRuntime, /topbar: buildTopbar\(\)/);
 });
 
 test('shared learning navigation uses the canonical Mijn vakken terminology', () => {

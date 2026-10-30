@@ -44,6 +44,20 @@ export function createRockPaperScissorsView({ documentRef = globalThis.document,
     });
   }
 
+  function renderFeedback(state, highScore, onContinue) {
+    const content = scope.querySelector('[data-rps-content]');
+    if (!content || !state.lastResult) return;
+    renderStats(state, highScore);
+    renderProgress(state);
+    const title = state.lastResult.correct ? '✓ GOED!' : '✕ FOUT';
+    const text = state.lastResult.correct
+      ? 'Goed beantwoord! Je mag nu Rock, Paper of Scissors spelen.'
+      : `Het juiste antwoord is: ${escapeHtml(state.lastResult.expectedAnswer)}`;
+    const buttonLabel = state.lastResult.correct ? 'Speel Rock, Paper of Scissors →' : 'Volgende vraag →';
+    content.innerHTML = `<section class="rps-answer-feedback ${state.lastResult.correct ? 'is-correct' : 'is-wrong'}"><div class="rps-answer-feedback-title">${title}</div><div class="rps-answer-feedback-text">${text}</div><button type="button" class="big ${state.lastResult.correct ? 'success' : 'secondary'}" data-rps-feedback-next>${buttonLabel}</button></section>`;
+    content.querySelector('[data-rps-feedback-next]')?.addEventListener('click', onContinue);
+  }
+
   function renderChoice(state, onChoice, highScore) {
     const content = scope.querySelector('[data-rps-content]');
     if (!content) return;
@@ -72,10 +86,10 @@ export function createRockPaperScissorsView({ documentRef = globalThis.document,
     if (!content || !state.lastResult) return;
     renderStats(state, highScore);
     renderProgress(state);
-    const answerTitle = state.lastResult.correct ? '✓ GOED!' : '✕ FOUT';
     const rpsTitle = state.lastResult.rpsResult === 'draw' ? 'Gelijkspel!' : state.lastResult.rpsResult === 'win' ? 'Jij wint!' : 'Paco wint!';
     const rpsText = `Jij: ${LABELS[state.playerChoice]} · Paco: ${LABELS[state.pacoChoice]}`;
-    content.innerHTML = `<div class="rps-question-label">REVEAL</div><div class="rps-reveal-stage"><div class="rps-card"><img src="${ROCK_PAPER_SCISSORS_ASSETS[state.playerChoice]}" alt="Jouw ${LABELS[state.playerChoice]} kaart"><span>JIJ</span></div><div class="rps-versus">VS</div><div class="rps-card"><img src="${ROCK_PAPER_SCISSORS_ASSETS[state.pacoChoice]}" alt="Paco ${LABELS[state.pacoChoice]} kaart"><span>PACO</span></div></div><section class="rps-result"><div class="rps-answer-result ${state.lastResult.correct ? 'is-correct' : 'is-wrong'}"><strong>${answerTitle}</strong><span>${state.lastResult.correct ? '1 punt verdiend.' : `Het juiste antwoord is: ${escapeHtml(state.lastResult.expectedAnswer)}`}</span></div><div class="rps-duel-result"><strong>${rpsTitle}</strong><span>${rpsText}</span></div><div class="rps-score-line">Score: <strong>${state.score}</strong> / ${state.maxScore}</div></section><button type="button" class="big success" data-rps-next>Volgende vraag →</button>`;
+    const pointsText = state.lastResult.delta === 2 ? '+2 punten' : state.lastResult.delta === 1 ? '+1 punt' : '+0 punten';
+    content.innerHTML = `<div class="rps-question-label">RESULTAAT</div><div class="rps-reveal-stage"><div class="rps-card"><img src="${ROCK_PAPER_SCISSORS_ASSETS[state.playerChoice]}" alt="Jouw ${LABELS[state.playerChoice]} kaart"><span>JIJ</span></div><div class="rps-versus">VS</div><div class="rps-card"><img src="${ROCK_PAPER_SCISSORS_ASSETS[state.pacoChoice]}" alt="Paco ${LABELS[state.pacoChoice]} kaart"><span>PACO</span></div></div><section class="rps-result"><div class="rps-duel-result"><strong>${rpsTitle}</strong><span>${rpsText}</span></div><div class="rps-score-line">${pointsText} · Score: <strong>${state.score}</strong> / ${state.maxScore}</div></section><button type="button" class="big success" data-rps-next>Volgende vraag →</button>`;
     content.querySelector('[data-rps-next]')?.addEventListener('click', onContinue);
   }
 
@@ -91,5 +105,5 @@ export function createRockPaperScissorsView({ documentRef = globalThis.document,
     content.querySelector('[data-rps-back]')?.addEventListener('click', onBack);
   }
 
-  return Object.freeze({ renderStats, renderProgress, renderQuestion, renderChoice, renderReveal, renderResult, renderFinished });
+  return Object.freeze({ renderStats, renderProgress, renderQuestion, renderFeedback, renderChoice, renderReveal, renderResult, renderFinished });
 }

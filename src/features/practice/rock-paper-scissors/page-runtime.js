@@ -69,6 +69,10 @@ export function createRockPaperScissorsPageRuntime({ app, templateMount, context
         view.renderQuestion(state, answer => { runtime.submitAnswer(answer); renderState(); }, highScore);
         return;
       }
+      if (state.phase === 'feedback') {
+        view.renderFeedback(state, highScore, () => { runtime.continueAfterFeedback(); renderState(); });
+        return;
+      }
       if (state.phase === 'choice') {
         view.renderChoice(state, choice => { runtime.choose(choice); renderState(); }, highScore);
         return;

@@ -10,10 +10,10 @@ test('shared navigation owns one stable management sidebar profile', () => {
   assert.match(navigationSource, /const showManagementDashboard = includeManagementDashboard/);
   assert.match(navigationSource, /key: 'dashboard',[\s\S]*?label: 'Dashboard'/);
   assert.match(navigationSource, /if \(showManagementDashboard\) \{[\s\S]*?items\[items\.length - 1\]\.key = 'management-dashboard'/);
-  assert.match(navigationSource, /includeManagementTools: true/);
-  assert.match(navigationSource, /includeCreator: true/);
-  assert.match(navigationSource, /includeAgenda: true/);
-  assert.match(navigationSource, /includePractice: false/);
+  assert.match(navigationSource, /makeGroup\('beheer', 'Beheer'/);
+  assert.match(navigationSource, /key: 'archive',[\s\S]*?filter: 'archive',[\s\S]*?path: 'archive\.html'/);
+  assert.match(navigationSource, /key: 'trash',[\s\S]*?filter: 'trash',[\s\S]*?path: 'archive\.html'/);
+  assert.doesNotMatch(navigationSource, /label: 'Creator Console'/);
 });
 
 test('test history derives its sidebar from the central navigation owner', () => {

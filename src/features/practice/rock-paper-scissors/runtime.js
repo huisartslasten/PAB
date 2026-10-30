@@ -121,14 +121,19 @@ export function createRockPaperScissorsRuntime({ items = [], random = Math.rando
   function reveal() {
     if (phase !== 'reveal') throw new Error('De kaarten kunnen nu niet worden onthuld.');
     const rpsResult = getRpsResult(playerChoice, pacoChoice);
-    const complete = questionSession.snapshot().cycleComplete;
     lastResult = Object.freeze({ ...lastResult, rpsResult });
-    phase = complete ? 'finished' : 'result';
+    // The reveal is its own visible step, including on the final question.
+    // Completion is handled only after the learner has seen the result.
+    phase = 'result';
     return snapshot();
   }
 
   function continueGame() {
     if (phase !== 'result') throw new Error('Er is geen volgende vraag beschikbaar.');
+    if (questionSession.snapshot().cycleComplete) {
+      phase = 'finished';
+      return snapshot();
+    }
     const item = questionSession.next();
     if (!item) throw new Error('Er zijn geen oefenvragen beschikbaar.');
     currentIndex = questions.indexOf(item);

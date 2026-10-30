@@ -31,14 +31,16 @@ test('management page delegates its shell and feature composition to the canonic
   assert.match(managementRuntime, /mountPacoPageTemplate/);
   assert.match(managementRuntime, /title: FILTER_LABELS\[filter\]/);
   assert.match(managementRuntime, /createPacoManagementNavigation/);
-  assert.match(managementRuntime, /topbar: buildTopbar\(\)/);
+  assert.match(managementRuntime, /topbar: createManagementTopbar\(/);
 });
 
-test('shared learning navigation uses the canonical Mijn vakken terminology', () => {
+test('shared learning navigation keeps learner presentation and explicit management presentation in the canonical lessons owner', () => {
   assert.match(navigation, /key: 'lessons',[\s\S]*?label: 'Mijn vakken'/);
   assert.doesNotMatch(navigation, /isManagementView/);
-  assert.match(lessonsRuntime, /title: 'Mijn vakken'/);
-  assert.match(lessonsRuntime, /Kies eerst een vak en open daarna het onderwerp of de les/);
+  assert.match(lessonsRuntime, /isManagementContext = context\?\.mode === 'management'/);
+  assert.match(lessonsRuntime, /title: isManagementContext \? 'Lessen' : 'Mijn vakken'/);
+  assert.match(lessonsRuntime, /subtitle: isManagementContext \? `Beheer de lessen en leerstof van \$\{selectedStudent\}\.`/);
+  assert.match(lessonsRuntime, /createManagementTopbar/);
 });
 
 test('management test history keeps the selected student context through the central navigation owner', () => {

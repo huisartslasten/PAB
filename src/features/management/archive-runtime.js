@@ -3,6 +3,8 @@ import { createPacoNavigation } from '../../components/page-navigation.js';
 import { confirmPacoAction } from '../../components/confirm-dialog.js';
 import { renderRecovery, renderLearningTopicRecovery } from './management-view.js';
 
+const RECOVERY_MODES = Object.freeze({ ALL: 'all', ARCHIVE: 'archive', TRASH: 'trash' });
+
 export function createArchiveRuntime({
   app,
   templateMount,
@@ -15,6 +17,7 @@ export function createArchiveRuntime({
   if (!context) throw new TypeError('Archive runtime requires a view context.');
   if (typeof navigate !== 'function') throw new TypeError('Archive runtime requires a navigation owner.');
 
+  const recovery = Object.values(RECOVERY_MODES).includes(context.recovery) ? context.recovery : RECOVERY_MODES.ALL;
   const content = documentRef.createElement('div');
   content.className = 'management-page';
 
@@ -180,12 +183,16 @@ export function createArchiveRuntime({
     trashList.replaceChildren();
     learningArchiveList.replaceChildren();
     learningTrashList.replaceChildren();
-    renderRecovery(archiveList, management, 'archive', handleRestore, undefined, undefined, handleRecoveryError);
-    renderRecovery(trashList, management, 'trash', handleRestore, emptyTrash, permanentlyDeleteLesson, handleRecoveryError);
-    await renderLearningTopicRecovery(learningArchiveList, management, 'archive', handleLearningRestore, undefined, undefined, handleRecoveryError);
-    await renderLearningTopicRecovery(learningTrashList, management, 'trash', handleLearningRestore, emptyLearningTrash, permanentlyDeleteLearningTopic, handleRecoveryError);
-    renderSkillRecovery(skillArchiveList, await management.getRecoverySkills('archive'), 'archive');
-    renderSkillRecovery(skillTrashList, await management.getRecoverySkills('trash'), 'trash');
+    if (recovery === RECOVERY_MODES.ALL || recovery === RECOVERY_MODES.ARCHIVE) {
+      renderRecovery(archiveList, management, 'archive', handleRestore, undefined, undefined, handleRecoveryError);
+      await renderLearningTopicRecovery(learningArchiveList, management, 'archive', handleLearningRestore, undefined, undefined, handleRecoveryError);
+      renderSkillRecovery(skillArchiveList, await management.getRecoverySkills('archive'), 'archive');
+    }
+    if (recovery === RECOVERY_MODES.ALL || recovery === RECOVERY_MODES.TRASH) {
+      renderRecovery(trashList, management, 'trash', handleRestore, emptyTrash, permanentlyDeleteLesson, handleRecoveryError);
+      await renderLearningTopicRecovery(learningTrashList, management, 'trash', handleLearningRestore, emptyLearningTrash, permanentlyDeleteLearningTopic, handleRecoveryError);
+      renderSkillRecovery(skillTrashList, await management.getRecoverySkills('trash'), 'trash');
+    }
   }
 
   async function mount() {
@@ -197,12 +204,22 @@ export function createArchiveRuntime({
       return;
     }
 
-    mountPacoPageTemplate({ mount: templateMount, greeting: 'PAB beheer ⚙️', title: 'Archief / Prullenbak', icon: '🗂️', subtitle: 'Herstel of verwijder lessen, leerstofonderwerpen en Skills.', navigation: createPacoNavigation({ app, active: 'recovery', viewMode: 'management', navigate }), content });
+    const title = recovery === RECOVERY_MODES.ARCHIVE ? 'Archief' : recovery === RECOVERY_MODES.TRASH ? 'Prullenbak' : 'Archief / Prullenbak';
+    const subtitle = recovery === RECOVERY_MODES.ARCHIVE
+      ? 'Herstel gearchiveerde lessen, leerstofonderwerpen en Skills.'
+      : recovery === RECOVERY_MODES.TRASH
+        ? 'Herstel of verwijder lessen, leerstofonderwerpen en Skills uit de prullenbak.'
+        : 'Herstel of verwijder lessen, leerstofonderwerpen en Skills.';
+
+    mountPacoPageTemplate({ mount: templateMount, greeting: 'PAB beheer ⚙️', title, icon: '🗂️', subtitle, navigation: createPacoNavigation({ app, active: 'recovery', viewMode: 'management', navigate }), content });
 
     try {
       await management.loadRecoveryLessons();
       await refreshRecovery();
-      content.replaceChildren(notice, archive, trash, learningArchive, learningTrash, skillArchive, skillTrash);
+      const sections = [notice];
+      if (recovery === RECOVERY_MODES.ALL || recovery === RECOVERY_MODES.ARCHIVE) sections.push(archive, learningArchive, skillArchive);
+      if (recovery === RECOVERY_MODES.ALL || recovery === RECOVERY_MODES.TRASH) sections.push(trash, learningTrash, skillTrash);
+      content.replaceChildren(...sections);
     } catch (error) {
       console.error('Archive page load error:', error);
       state.textContent = 'Archief / Prullenbak kon niet worden geladen.';

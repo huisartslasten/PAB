@@ -31,7 +31,7 @@ test('management page delegates its shell and feature composition to the canonic
   assert.match(managementRuntime, /mountPacoPageTemplate/);
   assert.match(managementRuntime, /title: FILTER_LABELS\[filter\]/);
   assert.match(managementRuntime, /createPacoManagementNavigation/);
-  assert.match(managementRuntime, /topbar: createManagementTopbar\(/);
+  assert.doesNotMatch(managementRuntime, /topbar: createManagementTopbar\(/);
 });
 
 test('management LB is a filter and keeps every management destination inside the canonical management dashboard', () => {

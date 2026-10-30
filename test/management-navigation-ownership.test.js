@@ -5,15 +5,18 @@ import { readFileSync } from 'node:fs';
 const navigationSource = readFileSync(new URL('../src/components/page-navigation.js', import.meta.url), 'utf8');
 const historyRuntime = readFileSync(new URL('../src/features/test-history/runtime.js', import.meta.url), 'utf8');
 
+const managementNavigationSource = navigationSource.slice(
+  navigationSource.indexOf('export function createPacoManagementNavigation('),
+  navigationSource.indexOf('export function createPacoNavigationItem(')
+);
+
 test('shared navigation owns one stable management sidebar profile', () => {
-  assert.match(navigationSource, /export function createPacoManagementNavigation\(/);
-  assert.match(navigationSource, /const showManagementDashboard = includeManagementDashboard/);
-  assert.match(navigationSource, /key: 'dashboard',[\s\S]*?label: 'Dashboard'/);
-  assert.match(navigationSource, /if \(showManagementDashboard\) \{[\s\S]*?items\[items\.length - 1\]\.key = 'management-dashboard'/);
-  assert.match(navigationSource, /makeGroup\('beheer', 'Beheer'/);
-  assert.match(navigationSource, /key: 'archive',[\s\S]*?filter: 'archive',[\s\S]*?path: 'archive\.html'/);
-  assert.match(navigationSource, /key: 'trash',[\s\S]*?filter: 'trash',[\s\S]*?path: 'archive\.html'/);
-  assert.doesNotMatch(navigationSource, /label: 'Creator Console'/);
+  assert.match(managementNavigationSource, /export function createPacoManagementNavigation\(/);
+  assert.match(managementNavigationSource, /key: 'management-dashboard',[\s\S]*?label: 'Dashboard'/);
+  assert.match(managementNavigationSource, /makeGroup\('beheer', 'Beheer'/);
+  assert.match(managementNavigationSource, /key: 'archive',[\s\S]*?filter: 'archive',[\s\S]*?path: 'archive\.html'/);
+  assert.match(managementNavigationSource, /key: 'trash',[\s\S]*?filter: 'trash',[\s\S]*?path: 'archive\.html'/);
+  assert.doesNotMatch(managementNavigationSource, /label: 'Creator Console'/);
 });
 
 test('test history derives its sidebar from the central navigation owner', () => {

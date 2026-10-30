@@ -56,6 +56,11 @@ export function createManagementRuntime({ app, templateMount, context, documentR
 
   function go(path, extra = {}) { return navigate(buildViewUrl(path, { student: selectedStudent, extra })); }
 
+  function viewSelectedStudent() {
+    if (!selectedStudent) return;
+    navigate(buildViewUrl('dashboard.html', { student: selectedStudent, mode: 'student' }));
+  }
+
   async function logout() {
     if (!app.auth?.isLoggedIn) { window.location.href = 'auth.html'; return; }
     const confirmed = await confirmPacoAction({ title: 'Uitloggen?', message: 'Weet je zeker dat je wilt uitloggen?', confirmLabel: 'Ja, uitloggen', cancelLabel: 'Nee' });
@@ -72,6 +77,8 @@ export function createManagementRuntime({ app, templateMount, context, documentR
         active: name === selectedStudent,
         onClick: () => navigate(buildViewUrl('management.html', { student: name, managementFilter: filter }))
       })),
+      canViewStudent: Boolean(selectedStudent),
+      onViewStudent: viewSelectedStudent,
       onLogout: logout
     };
   }

@@ -144,8 +144,8 @@ export function createManagementRuntime({ app, templateMount, context, documentR
 
     if (filter === 'dashboard' || filter === 'beheer') {
       renderSection('Beheer', [
-        createCard(documentRef, { title: 'Archief', description: 'Bekijk items die uit de actieve omgeving zijn gearchiveerd.', actionLabel: 'Archief openen', onClick: () => go('archive.html') }),
-        createCard(documentRef, { title: 'Prullenbak', description: 'Open de bestaande centrale herstel- en prullenbakfunctie.', actionLabel: 'Prullenbak openen', onClick: () => go('archive.html') })
+        createCard(documentRef, { title: 'Archief', description: 'Bekijk items die uit de actieve omgeving zijn gearchiveerd.', actionLabel: 'Archief openen', onClick: () => go('archive.html', { recovery: 'archive' }) }),
+        createCard(documentRef, { title: 'Prullenbak', description: 'Open de bestaande centrale herstel- en prullenbakfunctie.', actionLabel: 'Prullenbak openen', onClick: () => go('archive.html', { recovery: 'trash' }) })
       ]);
     }
   }

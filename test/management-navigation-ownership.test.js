@@ -61,6 +61,7 @@ test('management runtime renders every management sidebar filter in its canonica
 
 test('authenticated management context bar is owned globally, not by an individual page', () => {
   assert.match(pageTemplate, /export function createPacoManagementTopbar\(/);
+  assert.match(pageTemplate, /\.paco-management-topbar\{[^}]*font-family:Nunito/);
   assert.match(globalManagementBar, /createPacoManagementTopbar\(/);
   assert.match(globalManagementBar, /createTopbar/);
   assert.match(globalManagementBar, /app\.auth\?\.isParent/);

@@ -3,20 +3,18 @@ import assert from 'node:assert/strict';
 import { createRockPaperScissorsRuntime, getRpsResult, ROCK_PAPER_SCISSORS_CHOICES } from '../src/features/practice/rock-paper-scissors/runtime.js';
 
 test('Rock Paper Scissors uses the canonical answer -> choice -> reveal sequence', () => {
-  const randomValues = [0, 0.99, 0.5, 0.25, 0.75, 0.1];
-  let index = 0;
-  const random = () => randomValues[index++ % randomValues.length];
   const runtime = createRockPaperScissorsRuntime({
     items: [
       { id: 1, question: '2 + 2', answer: '4' },
       { id: 2, question: 'Hoofdstad van Frankrijk?', answer: 'Parijs' }
     ],
-    random
+    random: () => 0
   });
 
   let state = runtime.start();
   assert.equal(state.phase, 'question');
   assert.ok(ROCK_PAPER_SCISSORS_CHOICES.includes(state.pacoChoice));
+  assert.equal(state.pacoChoice, 'rock');
 
   state = runtime.submitAnswer('4');
   assert.equal(state.phase, 'choice');

@@ -118,7 +118,7 @@ function ensureManagementTopbarStyles(documentRef) {
   documentRef.head.appendChild(style);
 }
 
-function createManagementTopbar({ topbar, documentRef }) {
+export function createPacoManagementTopbar({ topbar, documentRef }) {
   if (!topbar) return null;
   ensureManagementTopbarStyles(documentRef);
   const bar = documentRef.createElement('header');
@@ -149,7 +149,7 @@ function nodeFrom(value) {
 
 export function createPacoPageTemplate({ greeting = '', navigation = [], title = '', icon = '', subtitle = '', content = null, className = '', topbar = null, testVersion = PACOGO_TEST_VERSION } = {}) {
   const root = document.createElement('div'); root.className = `paco-page-template ${className}`.trim();
-  const managementTopbar = createManagementTopbar({ topbar, documentRef: document }); if (managementTopbar) root.appendChild(managementTopbar);
+  const managementTopbar = createPacoManagementTopbar({ topbar, documentRef: document }); if (managementTopbar) root.appendChild(managementTopbar);
   const hero = document.createElement('header'); hero.className = 'paco-template-hero';
   const heroImage = document.createElement('img'); heroImage.src = 'pacogo-aruba-hero.png'; heroImage.alt = 'PacoGO Aruba'; heroImage.className = 'paco-template-hero-image'; hero.appendChild(heroImage); root.appendChild(hero);
   const body = document.createElement('div'); body.className = 'paco-template-body';
@@ -177,7 +177,7 @@ function updatePacoPageTemplate(template, { greeting = '', navigation = [], titl
 
   const existingTopbar = template.querySelector('.paco-management-topbar');
   if (topbar) {
-    const nextTopbar = createManagementTopbar({ topbar, documentRef: document });
+    const nextTopbar = createPacoManagementTopbar({ topbar, documentRef: document });
     if (existingTopbar && nextTopbar) existingTopbar.replaceWith(nextTopbar); else if (!existingTopbar && nextTopbar) template.prepend(nextTopbar);
   } else if (existingTopbar) {
     existingTopbar.remove();

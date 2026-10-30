@@ -4,12 +4,13 @@ import { isKnownStudent } from './student-registry.js';
 export function readViewContext(searchParams = new URLSearchParams()) {
   const requestedStudent = searchParams.get('viewStudent') || searchParams.get('student') || '';
   const student = isKnownStudent(requestedStudent) ? requestedStudent : '';
-  return Object.freeze({ student });
+  const managementFilter = searchParams.get('managementFilter') || 'dashboard';
+  return Object.freeze({ student, managementFilter });
 }
 
 export function applyViewContext(context) {
   const next = readViewContext(new URLSearchParams(
-    `viewStudent=${encodeURIComponent(context?.student || '')}`
+    `viewStudent=${encodeURIComponent(context?.student || '')}&managementFilter=${encodeURIComponent(context?.managementFilter || 'dashboard')}`
   ));
   setViewContext(next.student);
   return next;
@@ -17,16 +18,23 @@ export function applyViewContext(context) {
 
 export function getViewContext() {
   return Object.freeze({
-    student: appState.viewedStudent || ''
+    student: appState.viewedStudent || '',
+    managementFilter: new URLSearchParams(window.location.search).get('managementFilter') || 'dashboard'
   });
 }
 
-export function buildViewUrl(path, { student = '' } = {}) {
+export function buildViewUrl(path, { student = '', managementFilter = '', extra = {} } = {}) {
   const target = new URL(path, window.location.href);
   if (student) target.searchParams.set('viewStudent', student);
   else target.searchParams.delete('viewStudent');
+  if (managementFilter) target.searchParams.set('managementFilter', managementFilter);
+  else target.searchParams.delete('managementFilter');
   target.searchParams.delete('student');
   target.searchParams.delete('context');
   target.searchParams.delete('mode');
+  Object.entries(extra).forEach(([key, value]) => {
+    if (value === '' || value == null) target.searchParams.delete(key);
+    else target.searchParams.set(key, String(value));
+  });
   return target;
 }

@@ -23,9 +23,9 @@ export function createPacoNavigation({ app = null, active = '', activeSubmenu = 
 
   const currentUrl = typeof window !== 'undefined' ? new URL(window.location.href) : null;
   const urlMode = currentUrl?.searchParams.get('mode') || '';
-  const isManagementViewingStudent = Boolean(app?.auth?.isParent && student && urlMode === 'student');
-  const showDashboard = !isManagementViewingStudent;
-  const showAccount = !isManagementViewingStudent;
+  const hideLearnerSidebarContext = Boolean(app?.auth?.isParent && student && urlMode === 'student');
+  const showDashboard = !hideLearnerSidebarContext;
+  const showAccount = !hideLearnerSidebarContext;
 
   if (showDashboard) {
     items.push({

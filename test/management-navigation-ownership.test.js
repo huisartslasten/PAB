@@ -14,8 +14,10 @@ test('shared navigation owns one stable management sidebar profile', () => {
   assert.match(managementNavigationSource, /export function createPacoManagementNavigation\(/);
   assert.match(managementNavigationSource, /key: 'management-dashboard',[\s\S]*?label: 'Dashboard'/);
   assert.match(managementNavigationSource, /makeGroup\('beheer', 'Beheer'/);
-  assert.match(managementNavigationSource, /key: 'archive',[\s\S]*?filter: 'archive',[\s\S]*?path: 'archive\.html'/);
-  assert.match(managementNavigationSource, /key: 'trash',[\s\S]*?filter: 'trash',[\s\S]*?path: 'archive\.html'/);
+  assert.match(managementNavigationSource, /key: 'archive',[\s\S]*?filter: 'archive'/);
+  assert.match(managementNavigationSource, /key: 'trash',[\s\S]*?filter: 'trash'/);
+  assert.doesNotMatch(managementNavigationSource, /path: 'archive\.html'/);
+  assert.match(managementNavigationSource, /const goFilter = nextFilter => go\(navigate, 'management\.html'/);
   assert.doesNotMatch(managementNavigationSource, /label: 'Creator Console'/);
 });
 

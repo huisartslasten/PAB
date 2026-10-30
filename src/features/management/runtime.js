@@ -2,7 +2,6 @@ import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoManagementNavigation } from '../../components/page-navigation.js';
 import { listStudents } from '../../core/student-registry.js';
 import { buildViewUrl } from '../../core/view-context.js';
-import { createManagementTopbar } from './management-context.js';
 
 const FILTER_LABELS = Object.freeze({
   dashboard: 'Dashboard',
@@ -149,7 +148,6 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     mountPacoPageTemplate({
       mount: templateMount,
       className: 'management-template',
-      topbar: createManagementTopbar({ app, student: selectedStudent, managementFilter: filter, navigate }),
       greeting: 'PacoGO beheer ⚙️',
       title: FILTER_LABELS[filter],
       icon: '⚙️',

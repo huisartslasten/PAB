@@ -36,7 +36,10 @@ test('Rock Paper Scissors uses the canonical answer -> choice -> reveal sequence
 
 test('A wrong answer scores zero while the RPS result is still revealed', () => {
   const runtime = createRockPaperScissorsRuntime({
-    items: [{ question: '1 + 1', answer: '2' }],
+    items: [
+      { question: '1 + 1', answer: '2' },
+      { question: '2 + 2', answer: '4' }
+    ],
     random: () => 0
   });
 
@@ -47,10 +50,13 @@ test('A wrong answer scores zero while the RPS result is still revealed', () => 
   assert.equal(state.score, 0);
 
   const revealed = runtime.reveal();
-  assert.equal(revealed.phase, 'finished');
+  assert.equal(revealed.phase, 'result');
   assert.equal(revealed.score, 0);
   assert.equal(revealed.lastResult.correct, false);
-  assert.equal(revealed.lastResult.rpsResult, 'win');
+  assert.equal(revealed.lastResult.rpsResult, 'loss');
+
+  const next = runtime.continueGame();
+  assert.equal(next.phase, 'question');
 });
 
 test('RPS outcome rules are deterministic', () => {

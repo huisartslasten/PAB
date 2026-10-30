@@ -54,15 +54,16 @@ export function createPacoNavigation({ app = null, active = '', activeSubmenu = 
 export function createPacoManagementNavigation({ app, active = '', activeSubmenu = '', student = '', managementStudents = [], navigate } = {}) {
   const filter = new URLSearchParams(window.location.search).get('managementFilter') || 'dashboard';
   const goFilter = nextFilter => go(navigate, 'management.html', { student, managementFilter: nextFilter });
+  const goChild = (path, nextFilter = '') => go(navigate, path, { student, managementFilter: nextFilter });
   const makeGroup = (key, label, children) => ({
     key,
     label,
-    active: filter === key,
+    active: filter === key || children.some(child => child.filter === filter),
     submenu: children.map(child => ({
       key: child.key,
       label: child.label,
-      active: filter === child.filter,
-      onClick: () => goFilter(child.filter)
+      active: false,
+      onClick: () => goChild(child.path, child.filter)
     })),
     onClick: () => goFilter(key)
   });
@@ -70,22 +71,22 @@ export function createPacoManagementNavigation({ app, active = '', activeSubmenu
   return [
     { key: 'management-dashboard', icon: '🏠', label: 'Dashboard', active: filter === 'dashboard', onClick: () => goFilter('dashboard') },
     makeGroup('vakken', 'Vakken', [
-      { key: 'lessons', label: 'Lessen', filter: 'lessons' },
-      { key: 'learning-material', label: 'Leerstof', filter: 'learning-material' },
-      { key: 'tests', label: 'Toetsen', filter: 'tests' },
-      { key: 'skills', label: 'Skills', filter: 'skills' }
+      { key: 'lessons', label: 'Lessen', filter: 'lessons', path: 'lessons.html' },
+      { key: 'learning-material', label: 'Leerstof', filter: 'learning-material', path: 'lessons.html' },
+      { key: 'tests', label: 'Toetsen', filter: 'tests', path: 'test-history.html' },
+      { key: 'skills', label: 'Skills', filter: 'skills', path: 'skills.html' }
     ]),
     makeGroup('planning', 'Planning', [
-      { key: 'agenda', label: 'Agenda', filter: 'agenda' },
-      { key: 'month-calendar', label: 'Maandkalender', filter: 'month-calendar' }
+      { key: 'agenda', label: 'Agenda', filter: 'agenda', path: 'agenda.html' },
+      { key: 'month-calendar', label: 'Maandkalender', filter: 'month-calendar', path: 'month-calendar.html' }
     ]),
     makeGroup('extra', 'Extra', [
-      { key: 'challenges', label: 'Challenges', filter: 'challenges' },
-      { key: 'games', label: 'Spelletjes', filter: 'games' }
+      { key: 'challenges', label: 'Challenges', filter: 'challenges', path: 'challenge-settings.html' },
+      { key: 'games', label: 'Spelletjes', filter: 'games', path: 'game-access.html' }
     ]),
     makeGroup('beheer', 'Beheer', [
-      { key: 'archive', label: 'Archief', filter: 'archive' },
-      { key: 'trash', label: 'Prullenbak', filter: 'trash' }
+      { key: 'archive', label: 'Archief', filter: 'archive', path: 'archive.html' },
+      { key: 'trash', label: 'Prullenbak', filter: 'trash', path: 'archive.html' }
     ])
   ];
 }

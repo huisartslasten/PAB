@@ -5,12 +5,14 @@ import { createPacoNavigationItem } from './page-navigation.js';
  *
  * This is the default structural shell for normal PacoGO pages.
  * Page-specific functionality belongs in the content slot; the shell owns
- * the visual frame: hero banner, left sidebar, middle field and release marker.
+ * the visual frame: optional management context bar, hero banner, left sidebar,
+ * middle field and release marker.
  */
 
 const TEMPLATE_SCROLL_KEY = 'pacoGO:template-scroll';
 const TEMPLATE_SCROLL_CLEANUP_PROPERTY = '__pacoGOTemplateScrollCleanup';
 const TEMPLATE_SIDEBAR_SCROLL_CLEANUP_PROPERTY = '__pacoGOTemplateSidebarScrollCleanup';
+const MANAGEMENT_TOPBAR_STYLE_ID = 'pacogo-management-topbar-styles';
 export const PACOGO_TEST_VERSION = 'V7.0';
 
 function installManualScrollRestoration(windowRef) {
@@ -134,6 +136,101 @@ export function installPacoTemplateScrollMemory({ windowRef = window, documentRe
   return cleanup;
 }
 
+function ensureManagementTopbarStyles(documentRef) {
+  if (documentRef.getElementById(MANAGEMENT_TOPBAR_STYLE_ID)) return;
+  const style = documentRef.createElement('style');
+  style.id = MANAGEMENT_TOPBAR_STYLE_ID;
+  style.textContent = `
+    .paco-management-topbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 58px;
+      padding: 8px 18px;
+      background: rgba(255,255,255,.97);
+      border-bottom: 1px solid rgba(30,45,38,.12);
+      box-shadow: 0 2px 10px rgba(20,35,28,.06);
+      backdrop-filter: blur(8px);
+    }
+    .paco-management-topbar-brand { font-weight: 800; letter-spacing: .2px; white-space: nowrap; }
+    .paco-management-topbar-mode { font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #6c786f; margin-right: 8px; }
+    .paco-management-topbar-students { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; overflow-x: auto; }
+    .paco-management-topbar-button {
+      border: 1px solid #d6dfd9;
+      background: #fff;
+      color: #34463b;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .paco-management-topbar-button:hover { background: #f1f5f2; }
+    .paco-management-topbar-button.active { background: #e7f0ea; border-color: #c5d5ca; color: #1f3929; }
+    .paco-management-topbar-logout { margin-left: auto; }
+    .paco-management-topbar-spacer { flex: 1; }
+    .paco-page-template.management-template .paco-template-hero { margin-top: 0; }
+    @media (max-width: 760px) {
+      .paco-management-topbar { gap: 7px; padding: 7px 10px; }
+      .paco-management-topbar-brand { font-size: 14px; }
+      .paco-management-topbar-mode { display: none; }
+      .paco-management-topbar-button { padding: 7px 9px; font-size: 12px; }
+    }
+  `;
+  documentRef.head.appendChild(style);
+}
+
+function createManagementTopbar({ topbar, documentRef }) {
+  if (!topbar) return null;
+  ensureManagementTopbarStyles(documentRef);
+
+  const bar = documentRef.createElement('header');
+  bar.className = 'paco-management-topbar';
+
+  const brand = documentRef.createElement('div');
+  brand.className = 'paco-management-topbar-brand';
+  brand.textContent = 'PacoGO';
+  bar.appendChild(brand);
+
+  const mode = documentRef.createElement('div');
+  mode.className = 'paco-management-topbar-mode';
+  mode.textContent = 'BEHEER';
+  bar.appendChild(mode);
+
+  const students = documentRef.createElement('div');
+  students.className = 'paco-management-topbar-students';
+  students.setAttribute('aria-label', 'Leerlingen');
+  (topbar.students || []).forEach(student => {
+    const button = documentRef.createElement('button');
+    button.type = 'button';
+    button.className = 'paco-management-topbar-button' + (student.active ? ' active' : '');
+    button.textContent = student.label;
+    if (typeof student.onClick === 'function') button.addEventListener('click', student.onClick);
+    students.appendChild(button);
+  });
+  bar.appendChild(students);
+
+  const spacer = documentRef.createElement('div');
+  spacer.className = 'paco-management-topbar-spacer';
+  bar.appendChild(spacer);
+
+  if (typeof topbar.onLogout === 'function') {
+    const logout = documentRef.createElement('button');
+    logout.type = 'button';
+    logout.className = 'paco-management-topbar-button paco-management-topbar-logout';
+    logout.textContent = 'Uitloggen';
+    logout.addEventListener('click', topbar.onLogout);
+    bar.appendChild(logout);
+  }
+
+  return bar;
+}
+
 function nodeFrom(value) {
   if (value instanceof Node) return value;
   if (typeof value === 'string') {
@@ -152,10 +249,14 @@ export function createPacoPageTemplate({
   subtitle = '',
   content = null,
   className = '',
+  topbar = null,
   testVersion = PACOGO_TEST_VERSION
 } = {}) {
   const root = document.createElement('div');
   root.className = `paco-page-template ${className}`.trim();
+
+  const managementTopbar = createManagementTopbar({ topbar, documentRef: document });
+  if (managementTopbar) root.appendChild(managementTopbar);
 
   const hero = document.createElement('header');
   hero.className = 'paco-template-hero';
@@ -242,7 +343,8 @@ function updatePacoPageTemplate(template, {
   title = '',
   icon = '',
   subtitle = '',
-  content = null
+  content = null,
+  topbar = null
 } = {}) {
   if (!template) throw new Error('updatePacoPageTemplate requires a template');
 
@@ -256,6 +358,13 @@ function updatePacoPageTemplate(template, {
 
   if (!backButton || !greetingElement || !navigationElement || !iconElement || !titleElement || !subtitleElement || !contentElement) {
     throw new Error('PacoGO page template is missing its canonical shell elements.');
+  }
+
+  if (topbar) {
+    const existingTopbar = template.querySelector('.paco-management-topbar');
+    const nextTopbar = createManagementTopbar({ topbar, documentRef: document });
+    if (existingTopbar && nextTopbar) existingTopbar.replaceWith(nextTopbar);
+    else if (!existingTopbar && nextTopbar) template.prepend(nextTopbar);
   }
 
   backButton.textContent = '← Terug';

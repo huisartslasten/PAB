@@ -21,18 +21,25 @@ export function createPacoNavigation({ app = null, active = '', activeSubmenu = 
     items.push({ key: 'management-student', kind: 'student-context', label: 'LEERLING', submenu: learners.map(name => ({ key: `management-student-${name}`, label: name, active: name === student, onClick: () => typeof onSelectManagementStudent === 'function' ? onSelectManagementStudent(name) : go(navigate, currentPage(), { student: name }) })) });
   }
 
-  items.push({
-    key: 'dashboard',
-    icon: '🏠',
-    label: 'Dashboard',
-    onClick: () => go(navigate, showManagementDashboard ? 'management.html' : 'dashboard.html', { student }),
-    active: active === 'dashboard' || active === 'management-dashboard'
-  });
-  if (showManagementDashboard) {
-    items[items.length - 1].key = 'management-dashboard';
-    items[items.length - 1].active = active === 'management-dashboard';
-    if (includeManagementDashboardStudentSubmenu) {
-      items[items.length - 1].submenu = learners.map(name => ({ key: `management-student-${name}`, label: name, active: name === student, onClick: () => typeof onSelectManagementStudent === 'function' ? onSelectManagementStudent(name) : go(navigate, 'management.html', { student: name }) }));
+  const urlMode = new URL(window.location.href).searchParams.get('mode') || '';
+  const isManagementViewingStudent = Boolean(app?.auth?.isParent && student && urlMode === 'student');
+  const showDashboard = !isManagementViewingStudent;
+  const showAccount = !isManagementViewingStudent;
+
+  if (showDashboard) {
+    items.push({
+      key: 'dashboard',
+      icon: '🏠',
+      label: 'Dashboard',
+      onClick: () => go(navigate, showManagementDashboard ? 'management.html' : 'dashboard.html', { student }),
+      active: active === 'dashboard' || active === 'management-dashboard'
+    });
+    if (showManagementDashboard) {
+      items[items.length - 1].key = 'management-dashboard';
+      items[items.length - 1].active = active === 'management-dashboard';
+      if (includeManagementDashboardStudentSubmenu) {
+        items[items.length - 1].submenu = learners.map(name => ({ key: `management-student-${name}`, label: name, active: name === student, onClick: () => typeof onSelectManagementStudent === 'function' ? onSelectManagementStudent(name) : go(navigate, 'management.html', { student: name }) }));
+      }
     }
   }
   if (includeLessons) items.push({ key: 'lessons', icon: '📚', label: 'Mijn vakken', onClick: () => go(navigate, 'lessons.html', { student }) });
@@ -47,7 +54,7 @@ export function createPacoNavigation({ app = null, active = '', activeSubmenu = 
   if (includeManagement && student && app?.managementCapabilities?.getAvailableForPage({ page: 'management', student }).length) {
     items.push({ key: 'management', icon: '⚙️', label: 'Beheer', onClick: () => go(navigate, 'management.html', { student }) });
   }
-  if (includeAccount) items.push({ key: 'account', icon: app.auth.isLoggedIn ? '🚪' : '🔐', label: app.auth.isLoggedIn ? 'Uitloggen' : 'Inloggen', onClick: async () => { if (!app.auth.isLoggedIn) { window.location.href = 'auth.html'; return; } const confirmed = await confirmPacoAction({ title: 'Uitloggen?', message: 'Weet je zeker dat je wilt uitloggen?', confirmLabel: 'Ja, uitloggen', cancelLabel: 'Nee' }); if (!confirmed) return; await app.authSession.signOut(); app.auth.setSession(null); window.location.href = 'auth.html'; }, bind: ({ label, icon }) => { const render = session => { const loggedIn = Boolean(session); label.textContent = loggedIn ? 'Uitloggen' : 'Inloggen'; icon.textContent = loggedIn ? '🚪' : '🔐'; }; render(app.auth.session); return app.auth.subscribe(render).unsubscribe; } });
+  if (showAccount && includeAccount) items.push({ key: 'account', icon: app.auth.isLoggedIn ? '🚪' : '🔐', label: app.auth.isLoggedIn ? 'Uitloggen' : 'Inloggen', onClick: async () => { if (!app.auth.isLoggedIn) { window.location.href = 'auth.html'; return; } const confirmed = await confirmPacoAction({ title: 'Uitloggen?', message: 'Weet je zeker dat je wilt uitloggen?', confirmLabel: 'Ja, uitloggen', cancelLabel: 'Nee' }); if (!confirmed) return; await app.authSession.signOut(); app.auth.setSession(null); window.location.href = 'auth.html'; }, bind: ({ label, icon }) => { const render = session => { const loggedIn = Boolean(session); label.textContent = loggedIn ? 'Uitloggen' : 'Inloggen'; icon.textContent = loggedIn ? '🚪' : '🔐'; }; render(app.auth.session); return app.auth.subscribe(render).unsubscribe; } });
   return items.filter(item => !(hideActive && item.key === active)).map(item => ({ ...item, active: item.active ?? item.key === active }));
 }
 

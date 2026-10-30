@@ -5,9 +5,9 @@ import { confirmPacoAction } from '../../components/confirm-dialog.js';
 /**
  * Canonical management context actions shared by management pages.
  *
- * The management context owns learner switching, learner-perspective entry and
- * logout. Individual feature runtimes own only their page content and domain
- * behavior.
+ * The management context owns dashboard navigation, learner switching,
+ * learner-perspective entry and logout. Individual feature runtimes own only
+ * their page content and domain behavior.
  */
 export function createManagementTopbar({ app, student = '', managementFilter = 'dashboard', navigate } = {}) {
   if (!app) throw new TypeError('Management topbar requires app.');
@@ -30,12 +30,22 @@ export function createManagementTopbar({ app, student = '', managementFilter = '
     window.location.href = 'auth.html';
   }
 
+  function goDashboard() {
+    navigate(buildViewUrl('management.html', {
+      student,
+      mode: 'management',
+      managementFilter: 'dashboard'
+    }));
+  }
+
   function viewSelectedStudent() {
     if (!student) return;
     navigate(buildViewUrl('dashboard.html', { student, mode: 'student' }));
   }
 
   return Object.freeze({
+    onDashboard: goDashboard,
+    dashboardActive: managementFilter === 'dashboard',
     students: listStudents().map(name => ({
       label: name,
       active: name === student,

@@ -47,6 +47,12 @@ function getRpsResult(playerChoice, pacoChoice) {
   return BEATS[playerChoice] === pacoChoice ? 'win' : 'loss';
 }
 
+function getRpsScore(rpsResult) {
+  if (rpsResult === 'win') return 2;
+  if (rpsResult === 'draw') return 1;
+  return 0;
+}
+
 export function createRockPaperScissorsRuntime({ items = [], random = Math.random } = {}) {
   if (typeof random !== 'function') throw new TypeError('A random function is required.');
 
@@ -69,7 +75,7 @@ export function createRockPaperScissorsRuntime({ items = [], random = Math.rando
       index: currentIndex,
       total: questions.length,
       score,
-      maxScore: questions.length,
+      maxScore: questions.length * 2,
       phase,
       item: currentQuestion(),
       playerChoice,
@@ -101,17 +107,34 @@ export function createRockPaperScissorsRuntime({ items = [], random = Math.rando
     const item = currentQuestion();
     const givenAnswer = normalizeAnswer(userAnswer);
     const correct = givenAnswer === item.answer;
-    const previousScore = score;
-    const delta = correct ? 1 : 0;
-    score += delta;
     questionSession.record(correct);
-    lastResult = Object.freeze({ correct, expectedAnswer: item.answer, givenAnswer, previousScore, score, delta });
+    lastResult = Object.freeze({ correct, expectedAnswer: item.answer, givenAnswer });
+    phase = 'feedback';
+    return snapshot();
+  }
+
+  function continueAfterFeedback() {
+    if (phase !== 'feedback') throw new Error('Er is geen antwoordfeedback beschikbaar.');
+    if (!lastResult?.correct) {
+      if (questionSession.snapshot().cycleComplete) {
+        phase = 'finished';
+        return snapshot();
+      }
+      const item = questionSession.next();
+      if (!item) throw new Error('Er zijn geen oefenvragen beschikbaar.');
+      currentIndex = questions.indexOf(item);
+      playerChoice = null;
+      pacoChoice = ROCK_PAPER_SCISSORS_CHOICES[Math.floor(random() * ROCK_PAPER_SCISSORS_CHOICES.length)];
+      lastResult = null;
+      phase = 'question';
+      return snapshot();
+    }
     phase = 'choice';
     return snapshot();
   }
 
   function choose(playerSelection) {
-    if (phase !== 'choice') throw new Error('Kies eerst een antwoord op de vraag.');
+    if (phase !== 'choice') throw new Error('Beantwoord eerst de vraag goed.');
     if (!ROCK_PAPER_SCISSORS_CHOICES.includes(playerSelection)) throw new Error('Ongeldige keuze.');
     playerChoice = playerSelection;
     phase = 'reveal';
@@ -121,9 +144,10 @@ export function createRockPaperScissorsRuntime({ items = [], random = Math.rando
   function reveal() {
     if (phase !== 'reveal') throw new Error('De kaarten kunnen nu niet worden onthuld.');
     const rpsResult = getRpsResult(playerChoice, pacoChoice);
-    lastResult = Object.freeze({ ...lastResult, rpsResult });
-    // The reveal is its own visible step, including on the final question.
-    // Completion is handled only after the learner has seen the result.
+    const delta = getRpsScore(rpsResult);
+    const previousScore = score;
+    score += delta;
+    lastResult = Object.freeze({ ...lastResult, rpsResult, previousScore, delta, score });
     phase = 'result';
     return snapshot();
   }
@@ -144,7 +168,7 @@ export function createRockPaperScissorsRuntime({ items = [], random = Math.rando
     return snapshot();
   }
 
-  return Object.freeze({ start, submitAnswer, choose, reveal, continueGame, snapshot });
+  return Object.freeze({ start, submitAnswer, continueAfterFeedback, choose, reveal, continueGame, snapshot });
 }
 
-export { buildQuestions, getRpsResult, normalizeAnswer };
+export { buildQuestions, getRpsResult, getRpsScore, normalizeAnswer };

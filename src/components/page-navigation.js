@@ -54,7 +54,6 @@ export function createPacoNavigation({ app = null, active = '', activeSubmenu = 
 export function createPacoManagementNavigation({ app, active = '', activeSubmenu = '', student = '', managementStudents = [], navigate } = {}) {
   const filter = new URLSearchParams(window.location.search).get('managementFilter') || 'dashboard';
   const goFilter = nextFilter => go(navigate, 'management.html', { student, mode: 'management', managementFilter: nextFilter });
-  const goChild = child => go(navigate, child.path, { student, mode: 'management', managementFilter: child.filter, managementCapability: child.capability || '' });
   const makeGroup = (key, label, children) => ({
     key,
     label,
@@ -63,7 +62,7 @@ export function createPacoManagementNavigation({ app, active = '', activeSubmenu
       key: child.key,
       label: child.label,
       active: child.filter === filter,
-      onClick: () => goChild(child)
+      onClick: () => goFilter(child.filter)
     })),
     onClick: () => goFilter(key)
   });
@@ -71,22 +70,22 @@ export function createPacoManagementNavigation({ app, active = '', activeSubmenu
   return [
     { key: 'management-dashboard', icon: '🏠', label: 'Dashboard', active: filter === 'dashboard', onClick: () => goFilter('dashboard') },
     makeGroup('vakken', 'Vakken', [
-      { key: 'lessons', label: 'Lessen', filter: 'lessons', path: 'lessons.html', capability: 'lesson.manage' },
-      { key: 'learning-material', label: 'Leerstof', filter: 'learning-material', path: 'lessons.html', capability: 'learningTopic.manage' },
-      { key: 'tests', label: 'Toetsen', filter: 'tests', path: 'test-history.html' },
-      { key: 'skills', label: 'Skills', filter: 'skills', path: 'skills.html', capability: 'skill.manage' }
+      { key: 'lessons', label: 'Lessen', filter: 'lessons' },
+      { key: 'learning-material', label: 'Leerstof', filter: 'learning-material' },
+      { key: 'tests', label: 'Toetsen', filter: 'tests' },
+      { key: 'skills', label: 'Skills', filter: 'skills' }
     ]),
     makeGroup('planning', 'Planning', [
-      { key: 'agenda', label: 'Agenda', filter: 'agenda', path: 'agenda.html', capability: 'agenda.manage' },
-      { key: 'month-calendar', label: 'Maandkalender', filter: 'month-calendar', path: 'month-calendar.html', capability: 'monthCalendar.manage' }
+      { key: 'agenda', label: 'Agenda', filter: 'agenda' },
+      { key: 'month-calendar', label: 'Maandkalender', filter: 'month-calendar' }
     ]),
     makeGroup('extra', 'Extra', [
-      { key: 'challenges', label: 'Challenges', filter: 'challenges', path: 'challenge-settings.html', capability: 'challenge.configure' },
-      { key: 'games', label: 'Spelletjes', filter: 'games', path: 'game-access.html', capability: 'game.access' }
+      { key: 'challenges', label: 'Challenges', filter: 'challenges' },
+      { key: 'games', label: 'Spelletjes', filter: 'games' }
     ]),
     makeGroup('beheer', 'Beheer', [
-      { key: 'archive', label: 'Archief', filter: 'archive', path: 'archive.html' },
-      { key: 'trash', label: 'Prullenbak', filter: 'trash', path: 'archive.html' }
+      { key: 'archive', label: 'Archief', filter: 'archive' },
+      { key: 'trash', label: 'Prullenbak', filter: 'trash' }
     ])
   ];
 }

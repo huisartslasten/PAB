@@ -23,12 +23,24 @@ test('shared navigation owns one stable management sidebar profile', () => {
 });
 
 test('management runtime renders every management sidebar filter in its canonical section', () => {
-  for (const filter of [
-    'dashboard', 'vakken', 'lessons', 'learning-material', 'tests', 'skills',
-    'planning', 'agenda', 'month-calendar', 'extra', 'challenges', 'games',
-    'beheer', 'archive', 'trash'
+  for (const filterDeclaration of [
+    "dashboard: 'Dashboard'",
+    "vakken: 'Vakken'",
+    "lessons: 'Lessen'",
+    "'learning-material': 'Leerstof'",
+    "tests: 'Toetsen'",
+    "skills: 'Skills'",
+    "planning: 'Planning'",
+    "agenda: 'Agenda'",
+    "'month-calendar': 'Maandkalender'",
+    "extra: 'Extra'",
+    "challenges: 'Challenges'",
+    "games: 'Spelletjes'",
+    "beheer: 'Beheer'",
+    "archive: 'Archief'",
+    "trash: 'Prullenbak'"
   ]) {
-    assert.match(managementRuntime, new RegExp(`${filter.replace(/[.*+?^${}()|[\\]\\]/g, '\\\\$&')}:`));
+    assert.ok(managementRuntime.includes(filterDeclaration), `Missing filter declaration: ${filterDeclaration}`);
   }
 
   assert.match(managementRuntime, /const show = \(\.\.\.filters\) => showAll \|\| filters\.includes\(filter\);/);

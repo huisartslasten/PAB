@@ -3,9 +3,9 @@ import { confirmPacoAction } from './confirm-dialog.js';
 import { buildViewUrl } from '../core/view-context.js';
 
 function currentPage() { return window.location.pathname.split('/').pop() || 'dashboard.html'; }
-function go(navigate, path, { student = '' } = {}) {
+function go(navigate, path, { student = '', managementFilter = '', extra = {} } = {}) {
   if (typeof navigate !== 'function') throw new TypeError('PacoGO shared navigation requires the central navigation owner.');
-  return navigate(buildViewUrl(path, { student }));
+  return navigate(buildViewUrl(path, { student, managementFilter, extra }));
 }
 function requireNavigationApp(app, includeAccount) { if (!includeAccount) return; if (!app?.auth || !app?.authSession) throw new Error('createPacoNavigation requires the application context when includeAccount is enabled.'); }
 
@@ -42,10 +42,7 @@ export function createPacoNavigation({ app = null, active = '', activeSubmenu = 
     { key: 'month-calendar', label: 'Maandkalender', active: activeSubmenu === 'month-calendar', onClick: () => go(navigate, 'month-calendar.html', { student }) }
   ] });
   items.push({ key: 'test-history', icon: '📝', label: 'Toetsen', onClick: () => go(navigate, 'test-history.html', { student }) });
-  if (includeManagementTools) {
-    items.push({ key: 'recovery', icon: '🗂️', label: 'Archief / Prullenbak', onClick: () => go(navigate, 'archive.html', { student }) });
-    items.push({ key: 'feedback', icon: '💬', label: 'Feedback', onClick: () => go(navigate, 'feedback.html', { student }) });
-  }
+  if (includeManagementTools) items.push({ key: 'recovery', icon: '🗂️', label: 'Archief / Prullenbak', onClick: () => go(navigate, 'archive.html', { student }) });
   if (includeCreator) items.push({ key: 'creator', icon: '🧠', label: 'Creator Console', onClick: () => go(navigate, 'creator.html', { student }) });
   if (includeManagement && student && app?.managementCapabilities?.getAvailableForPage({ page: 'management', student }).length) {
     items.push({ key: 'management', icon: '⚙️', label: 'Beheer', onClick: () => go(navigate, 'management.html', { student }) });
@@ -54,8 +51,43 @@ export function createPacoNavigation({ app = null, active = '', activeSubmenu = 
   return items.filter(item => !(hideActive && item.key === active)).map(item => ({ ...item, active: item.active ?? item.key === active }));
 }
 
-export function createPacoManagementNavigation({ app, active = '', activeSubmenu = '', student = '', managementStudents = [], onSelectManagementStudent = null, navigate } = {}) {
-  return createPacoNavigation({ app, active, activeSubmenu, student, managementStudents, onSelectManagementStudent, includeManagementDashboard: true, includeManagement: false, includeManagementTools: true, includeCreator: true, includeLessons: true, includeSkills: true, includePractice: false, includeAgenda: true, includeAccount: true, navigate });
+export function createPacoManagementNavigation({ app, active = '', activeSubmenu = '', student = '', managementStudents = [], navigate } = {}) {
+  const filter = new URLSearchParams(window.location.search).get('managementFilter') || 'dashboard';
+  const goFilter = nextFilter => go(navigate, 'management.html', { student, managementFilter: nextFilter });
+  const makeGroup = (key, label, children) => ({
+    key,
+    label,
+    active: filter === key,
+    submenu: children.map(child => ({
+      key: child.key,
+      label: child.label,
+      active: filter === child.filter,
+      onClick: () => goFilter(child.filter)
+    })),
+    onClick: () => goFilter(key)
+  });
+
+  return [
+    { key: 'management-dashboard', icon: '🏠', label: 'Dashboard', active: filter === 'dashboard', onClick: () => goFilter('dashboard') },
+    makeGroup('vakken', 'Vakken', [
+      { key: 'lessons', label: 'Lessen', filter: 'lessons' },
+      { key: 'learning-material', label: 'Leerstof', filter: 'learning-material' },
+      { key: 'tests', label: 'Toetsen', filter: 'tests' },
+      { key: 'skills', label: 'Skills', filter: 'skills' }
+    ]),
+    makeGroup('planning', 'Planning', [
+      { key: 'agenda', label: 'Agenda', filter: 'agenda' },
+      { key: 'month-calendar', label: 'Maandkalender', filter: 'month-calendar' }
+    ]),
+    makeGroup('extra', 'Extra', [
+      { key: 'challenges', label: 'Challenges', filter: 'challenges' },
+      { key: 'games', label: 'Spelletjes', filter: 'games' }
+    ]),
+    makeGroup('beheer', 'Beheer', [
+      { key: 'archive', label: 'Archief', filter: 'archive' },
+      { key: 'trash', label: 'Prullenbak', filter: 'trash' }
+    ])
+  ];
 }
 
 export function createPacoNavigationItem(item) {
@@ -96,7 +128,7 @@ export function createPacoNavigationItem(item) {
     item.submenu.forEach(subitem => {
       const subbutton = document.createElement('button');
       subbutton.type = 'button';
-      subbutton.className = 'paco-template-nav-subitem' + (subitem.active ? ' active' : '') + (item.key === 'management-student' ? ' management-student' : '');
+      subbutton.className = 'paco-template-nav-subitem' + (subitem.active ? ' active' : '');
       subbutton.textContent = subitem.label || '';
       if (typeof subitem.onClick === 'function') subbutton.addEventListener('click', subitem.onClick);
       submenu.appendChild(subbutton);

@@ -24,6 +24,7 @@ import { createLexoPageRuntime } from '../features/practice/lexo/page-runtime.js
 import { createMemoryPageRuntime } from '../features/practice/memory/page-runtime.js';
 import { createFlashPageRuntime } from '../features/practice/flash/page-runtime.js';
 import { createFlashcardsPageRuntime } from '../features/practice/flashcards/page-runtime.js';
+import { createRockPaperScissorsPageRuntime } from '../features/practice/rock-paper-scissors/page-runtime.js';
 import { createSkillsRuntime } from '../features/skills/runtime.js';
 import { createAgendaPageRuntime } from '../features/agenda/page-runtime.js';
 import { createMonthCalendarRuntime } from '../features/agenda/month-calendar-runtime.js';
@@ -76,6 +77,7 @@ export function createPacoRouteRegistry({ app, mounts, documentRef = document } 
   routes['word-reveal.html'] = game('word-reveal', ({ context, lessonId, navigate }) => createWordRevealPageRuntime({ app, templateMount: mounts.templateMount, context, lessonId, documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/word-reveal.css']);
   routes['word-chase.html'] = game('word-chase', ({ context, lessonId, navigate }) => createWordChasePageRuntime({ app, templateMount: mounts.templateMount, context, lessonId, documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css']);
   routes['lexo.html'] = game('lexo', ({ context, lessonId, navigate }) => createLexoPageRuntime({ app, templateMount: mounts.templateMount, context, lessonId, documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/lexo/lexo.css']);
+  routes['rock-paper-scissors.html'] = game('rock-paper-scissors', ({ context, lessonId, navigate }) => createRockPaperScissorsPageRuntime({ app, templateMount: mounts.templateMount, context, lessonId, documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/rock-paper-scissors/rock-paper-scissors.css']);
   routes['flashcards-template.html'] = defineRoute(({ url, navigate }) => createFlashcardsPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', contentKind: url.searchParams.get('content_kind') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/practice/flashcards/flashcards.css']);
   routes['agenda.html'] = defineRoute(({ url, navigate }) => createAgendaPageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/agenda/agenda.css']);
   routes['month-calendar.html'] = defineRoute(({ url, navigate }) => createMonthCalendarRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/agenda/month-calendar.css']);

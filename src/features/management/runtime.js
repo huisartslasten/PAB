@@ -4,8 +4,23 @@ import { listStudents } from '../../core/student-registry.js';
 import { buildViewUrl } from '../../core/view-context.js';
 import { createManagementTopbar } from './management-context.js';
 
-const FILTER_LABELS = Object.freeze({ dashboard: 'Dashboard', vakken: 'Vakken', planning: 'Planning', extra: 'Extra', beheer: 'Beheer' });
-const FILTER_CAPABILITIES = Object.freeze({ vakken: ['lesson.manage', 'lesson.create', 'learningTopic.manage', 'learningTopic.create', 'skill.manage', 'skill.create'] });
+const FILTER_LABELS = Object.freeze({
+  dashboard: 'Dashboard',
+  vakken: 'Vakken',
+  lessons: 'Lessen',
+  'learning-material': 'Leerstof',
+  tests: 'Toetsen',
+  skills: 'Skills',
+  planning: 'Planning',
+  agenda: 'Agenda',
+  'month-calendar': 'Maandkalender',
+  extra: 'Extra',
+  challenges: 'Challenges',
+  games: 'Spelletjes',
+  beheer: 'Beheer',
+  archive: 'Archief',
+  trash: 'Prullenbak'
+});
 
 function createCard(documentRef, { title, description, actionLabel = 'Openen', onClick, secondaryLabel = '', onSecondaryClick = null, disabled = false } = {}) {
   const card = documentRef.createElement('article');
@@ -89,8 +104,9 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     content.replaceChildren();
     const allCapabilities = app.managementCapabilities.getAvailableForPage({ page: 'management', student: selectedStudent });
     const capabilities = capabilityMap(allCapabilities);
-    const filtered = filter === 'vakken' ? new Set(FILTER_CAPABILITIES.vakken) : null;
     const hasStudent = Boolean(selectedStudent);
+    const showAll = filter === 'dashboard';
+    const show = (...filters) => showAll || filters.includes(filter);
 
     if (!hasStudent) {
       const notice = documentRef.createElement('div');
@@ -99,35 +115,27 @@ export function createManagementRuntime({ app, templateMount, context, documentR
       content.appendChild(notice);
     }
 
-    if (filter === 'dashboard' || filter === 'vakken') {
-      const cards = [];
-      if (!filtered || filtered.has('lesson.manage')) cards.push(createManagementCard('lesson.manage', 'Lessen', 'Bekijk, bewerk, archiveer of verwijder lessen.', capabilities));
-      if (!filtered || filtered.has('learningTopic.manage')) cards.push(createManagementCard('learningTopic.manage', 'Leerstof', 'Beheer de leerstof van de actieve leerling.', capabilities));
-      if (!filtered || filtered.has('skill.manage')) cards.push(createManagementCard('skill.manage', 'Skills', 'Beheer Skills voor de actieve leerling.', capabilities));
-      if (!filtered || filter === 'vakken') cards.push(createCard(documentRef, { title: 'Toetsen', description: 'Bekijk de toetsgeschiedenis van de actieve leerling.', actionLabel: 'Toetsen bekijken', disabled: !hasStudent, onClick: () => go('test-history.html') }));
-      renderSection('Vakken', cards);
-    }
+    const vakkenCards = [];
+    if (show('vakken', 'lessons')) vakkenCards.push(createManagementCard('lesson.manage', 'Lessen', 'Bekijk, bewerk, archiveer of verwijder lessen.', capabilities));
+    if (show('vakken', 'learning-material')) vakkenCards.push(createManagementCard('learningTopic.manage', 'Leerstof', 'Beheer de leerstof van de actieve leerling.', capabilities));
+    if (show('vakken', 'tests')) vakkenCards.push(createCard(documentRef, { title: 'Toetsen', description: 'Bekijk de toetsgeschiedenis van de actieve leerling.', actionLabel: 'Toetsen bekijken', disabled: !hasStudent, onClick: () => go('test-history.html') }));
+    if (show('vakken', 'skills')) vakkenCards.push(createManagementCard('skill.manage', 'Skills', 'Beheer Skills voor de actieve leerling.', capabilities));
+    renderSection('Vakken', vakkenCards);
 
-    if (filter === 'dashboard' || filter === 'planning') {
-      renderSection('Planning', [
-        createCard(documentRef, { title: 'Agenda', description: 'Bekijk en beheer de agenda van de actieve leerling.', actionLabel: 'Agenda openen', disabled: !hasStudent, onClick: () => go('agenda.html') }),
-        createCard(documentRef, { title: 'Maandkalender', description: 'Open de maandkalender van de actieve leerling.', actionLabel: 'Maandkalender openen', disabled: !hasStudent, onClick: () => go('month-calendar.html') })
-      ]);
-    }
+    const planningCards = [];
+    if (show('planning', 'agenda')) planningCards.push(createCard(documentRef, { title: 'Agenda', description: 'Bekijk en beheer de agenda van de actieve leerling.', actionLabel: 'Agenda openen', disabled: !hasStudent, onClick: () => go('agenda.html') }));
+    if (show('planning', 'month-calendar')) planningCards.push(createCard(documentRef, { title: 'Maandkalender', description: 'Open de maandkalender van de actieve leerling.', actionLabel: 'Maandkalender openen', disabled: !hasStudent, onClick: () => go('month-calendar.html') }));
+    renderSection('Planning', planningCards);
 
-    if (filter === 'dashboard' || filter === 'extra') {
-      renderSection('Extra', [
-        createCard(documentRef, { title: 'Challenges', description: 'Open de centrale Challenge-instellingen.', actionLabel: 'Challenges openen', onClick: () => go('challenge-settings.html') }),
-        createCard(documentRef, { title: 'Spelletjes', description: 'Beheer de spelvrijgave van de actieve leerling.', actionLabel: 'Spelletjes openen', disabled: !hasStudent, onClick: () => go('game-access.html') })
-      ]);
-    }
+    const extraCards = [];
+    if (show('extra', 'challenges')) extraCards.push(createCard(documentRef, { title: 'Challenges', description: 'Open de centrale Challenge-instellingen.', actionLabel: 'Challenges openen', onClick: () => go('challenge-settings.html') }));
+    if (show('extra', 'games')) extraCards.push(createCard(documentRef, { title: 'Spelletjes', description: 'Beheer de spelvrijgave van de actieve leerling.', actionLabel: 'Spelletjes openen', disabled: !hasStudent, onClick: () => go('game-access.html') }));
+    renderSection('Extra', extraCards);
 
-    if (filter === 'dashboard' || filter === 'beheer') {
-      renderSection('Beheer', [
-        createCard(documentRef, { title: 'Archief', description: 'Bekijk items die uit de actieve omgeving zijn gearchiveerd.', actionLabel: 'Archief openen', onClick: () => go('archive.html', { recovery: 'archive' }) }),
-        createCard(documentRef, { title: 'Prullenbak', description: 'Open de bestaande centrale herstel- en prullenbakfunctie.', actionLabel: 'Prullenbak openen', onClick: () => go('archive.html', { recovery: 'trash' }) })
-      ]);
-    }
+    const beheerCards = [];
+    if (show('beheer', 'archive')) beheerCards.push(createCard(documentRef, { title: 'Archief', description: 'Bekijk items die uit de actieve omgeving zijn gearchiveerd.', actionLabel: 'Archief openen', onClick: () => go('archive.html', { recovery: 'archive' }) }));
+    if (show('beheer', 'trash')) beheerCards.push(createCard(documentRef, { title: 'Prullenbak', description: 'Open de bestaande centrale herstel- en prullenbakfunctie.', actionLabel: 'Prullenbak openen', onClick: () => go('archive.html', { recovery: 'trash' }) }));
+    renderSection('Beheer', beheerCards);
   }
 
   async function mount() {

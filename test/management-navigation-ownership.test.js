@@ -5,6 +5,9 @@ import { readFileSync } from 'node:fs';
 const navigationSource = readFileSync(new URL('../src/components/page-navigation.js', import.meta.url), 'utf8');
 const historyRuntime = readFileSync(new URL('../src/features/test-history/runtime.js', import.meta.url), 'utf8');
 const managementRuntime = readFileSync(new URL('../src/features/management/runtime.js', import.meta.url), 'utf8');
+const globalManagementBar = readFileSync(new URL('../src/components/paco-global-management-bar.js', import.meta.url), 'utf8');
+const appRuntime = readFileSync(new URL('../src/app/runtime.js', import.meta.url), 'utf8');
+const pageTemplate = readFileSync(new URL('../src/components/page-template.js', import.meta.url), 'utf8');
 
 const managementNavigationSource = navigationSource.slice(
   navigationSource.indexOf('export function createPacoManagementNavigation('),
@@ -54,6 +57,17 @@ test('management runtime renders every management sidebar filter in its canonica
   assert.match(managementRuntime, /show\('extra', 'games'\)/);
   assert.match(managementRuntime, /show\('beheer', 'archive'\)/);
   assert.match(managementRuntime, /show\('beheer', 'trash'\)/);
+});
+
+test('authenticated management context bar is owned globally, not by an individual page', () => {
+  assert.match(pageTemplate, /export function createPacoManagementTopbar\(/);
+  assert.match(globalManagementBar, /createManagementTopbar\(/);
+  assert.match(globalManagementBar, /createPacoManagementTopbar\(/);
+  assert.match(globalManagementBar, /app\.auth\?\.isParent/);
+  assert.match(globalManagementBar, /documentRef\.body\.prepend\(next\)/);
+  assert.match(appRuntime, /syncPacoGlobalManagementBar\(/);
+  assert.doesNotMatch(managementRuntime, /createManagementTopbar\(/);
+  assert.doesNotMatch(managementRuntime, /topbar:/);
 });
 
 test('test history derives its sidebar from the central navigation owner', () => {

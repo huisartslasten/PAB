@@ -1,0 +1,90 @@
+{
+  "schema_version": "0.1",
+  "status": "candidate",
+  "epistemic_status": "[O]",
+  "purpose": "Pre-specify the executable analysis mapping from six focal claims to observations, C3 coding, alternatives and C4/C5 readiness decisions.",
+  "synthetic_or_empirical": "design_only",
+  "analysis_order": ["provenance", "missingness", "coverage", "coding_reliability", "evidence_quality_and_independence", "variation", "alternative_explanations", "c4_readiness"],
+  "claims": [
+    {
+      "claim_id": "A1.C1",
+      "development_id": "A1.D1",
+      "task_ids": ["A1-T01", "A1-T02", "A1-T04"],
+      "evidence_target_ids": ["A1.ET1"],
+      "primary_dimensions": ["representation", "surface_familiarity", "prompt_level", "process_status"],
+      "required_observation_pattern": "Target evidence should be observable across at least two task forms and remain interpretable under the planned familiarity countertask.",
+      "alternatives": ["task_familiarity", "representation_familiarity", "language_or_prompt_comprehension"],
+      "c4_failure_conditions": ["one_task_form_only", "process_evidence_missing", "countertask_unavailable", "provenance_incomplete"]
+    },
+    {
+      "claim_id": "A1.C2",
+      "development_id": "A1.D2",
+      "task_ids": ["A1-T03", "A1-T05"],
+      "evidence_target_ids": ["A1.ET2"],
+      "primary_dimensions": ["representation", "language_context", "prompt_level", "transfer"],
+      "required_observation_pattern": "Target relation should be observable across representations with reduced language dependence; interpretation remains limited if representation-specific knowledge is not separable.",
+      "alternatives": ["representation_specific_knowledge", "language_or_prompt_comprehension"],
+      "c4_failure_conditions": ["single_representation_only", "language_effect_unmeasured", "process_evidence_missing"]
+    },
+    {
+      "claim_id": "B1.C1",
+      "development_id": "B1.D1",
+      "task_ids": ["B1-T01", "B1-T02", "B1-T04"],
+      "evidence_target_ids": ["B1.ET1"],
+      "primary_dimensions": ["representation", "item_familiarity", "surface_context", "process_status"],
+      "required_observation_pattern": "Operation reasoning should be visible beyond a familiar item surface and across quantity/symbolic forms.",
+      "alternatives": ["item_familiarity", "memorisation", "task_surface_cueing"],
+      "c4_failure_conditions": ["memorisation_countertask_missing", "operation_reasoning_not_observable", "one_surface_only"]
+    },
+    {
+      "claim_id": "B1.C2",
+      "development_id": "B1.D2",
+      "task_ids": ["B1-T03", "B1-T05"],
+      "evidence_target_ids": ["B1.ET2"],
+      "primary_dimensions": ["magnitude", "strategy_variation", "prompt_level", "independence_status"],
+      "required_observation_pattern": "Strategy evidence should be examined across magnitude variation and compared between prompted and independent performance.",
+      "alternatives": ["calculation_fluency_only", "prompt_dependence", "cueing"],
+      "c4_failure_conditions": ["no_independent_observation", "no_magnitude_variation", "prompt_dependence_unmeasured"]
+    },
+    {
+      "claim_id": "FR2.C1",
+      "development_id": "FR2.D1",
+      "task_ids": ["FR2-T01", "FR2-T02", "FR2-T04"],
+      "evidence_target_ids": ["FR2.ET1"],
+      "primary_dimensions": ["representation", "surface_familiarity", "cueing", "process_status"],
+      "required_observation_pattern": "Equivalence recognition should be examined in area and symbolic forms and under altered surface presentation.",
+      "alternatives": ["surface_similarity", "surface_familiarity", "cueing"],
+      "c4_failure_conditions": ["single_representation_only", "surface_countertask_missing", "justification_unobserved"]
+    },
+    {
+      "claim_id": "FR2.C2",
+      "development_id": "FR2.D2",
+      "task_ids": ["FR2-T03", "FR2-T05"],
+      "evidence_target_ids": ["FR2.ET3"],
+      "primary_dimensions": ["representation", "language_context", "transfer", "process_status"],
+      "required_observation_pattern": "Equivalence reasoning should remain interpretable across representation change and low-language presentation, with language effects explicitly tracked.",
+      "alternatives": ["representation_specific_familiarity", "language_comprehension"],
+      "c4_failure_conditions": ["no_transfer_instance", "language_context_missing", "process_evidence_missing"]
+    }
+  ],
+  "descriptive_outputs": [
+    "observation_count_by_claim",
+    "observation_count_by_evidence_target",
+    "missingness_by_required_field",
+    "task_and_variation_coverage",
+    "target_match_distribution",
+    "performance_and_process_distribution",
+    "independence_distribution",
+    "evidence_quality_distribution",
+    "contradiction_frequency",
+    "alternative_explanation_frequency",
+    "double_coding_agreement_and_confusion_matrices",
+    "c4_readiness_state_by_claim"
+  ],
+  "c5_boundary": {
+    "first_pilot_role": "measurement readiness and repeated-observation preparation",
+    "minimum_temporal_requirement": "At least two time points or an explicitly justified alternative design.",
+    "not_allowed": ["treating cross-sectional differences as developmental order", "treating prediction as proof of prerequisite", "automatic ordering of D1<D2<D3", "automatic registry promotion"]
+  },
+  "decision_states": ["FEASIBILITY_ONLY", "INDETERMINATE", "SUPPORTS_CANDIDATE_WITHIN_SCOPE", "CONTRADICTS_CANDIDATE_WITHIN_SCOPE", "REVISE_PROTOCOL"]
+}

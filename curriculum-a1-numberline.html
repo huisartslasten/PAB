@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — A1 Getallenlijn</title>
+  <style>
+    :root{font-family:Nunito,system-ui,sans-serif;color:#102b57;background:#f5f9fd}
+    body{margin:0;padding:32px;min-height:100vh;box-sizing:border-box}
+    main{max-width:980px;margin:0 auto;display:grid;gap:18px}
+    .card{background:#fff;border:1px solid #d8e7f4;border-radius:22px;padding:24px;box-shadow:0 8px 24px rgba(16,43,87,.07)}
+    h1,h2{margin:0} h1{font-size:30px} h2{font-size:21px}
+    .muted{color:#647894;line-height:1.5}
+    .task{display:grid;gap:8px}
+    .target{font-size:28px;font-weight:900;text-align:center;padding:16px;border-radius:16px;background:#eef7ff}
+    .number-line-host{margin-top:10px;border:2px solid #d8e7f4;border-radius:18px;padding:14px;background:#fbfdff}
+    .pacogo-number-line{color:#1787f2;outline:none;cursor:crosshair;touch-action:none}
+    .pacogo-number-line:focus{box-shadow:0 0 0 4px rgba(23,135,242,.12);border-radius:12px}
+    .pacogo-number-line-value{text-align:center;display:block;font-weight:900;color:#38577d;padding:4px}
+    .actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+    button{border:0;border-radius:14px;padding:12px 20px;font:900 15px Nunito,system-ui,sans-serif;cursor:pointer;background:#1787f2;color:#fff}
+    button.secondary{background:#eaf2f8;color:#38577d}
+    button:disabled{opacity:.5;cursor:not-allowed}
+    .result{display:grid;gap:8px}
+    .result pre{margin:0;white-space:pre-wrap;background:#f5f9fd;border-radius:14px;padding:14px;font:700 13px/1.5 ui-monospace,monospace}
+    .status{font-weight:900;padding:12px 14px;border-radius:14px;background:#eef8ff;color:#126fc9}
+    .status.error{background:#fff0f0;color:#b42318}
+  </style>
+</head>
+<body>
+<main>
+  <section class="card task">
+    <div class="muted">PacoGO • A1 • Getallen representeren en verbinden</div>
+    <h1>Zet het getal op de juiste plek</h1>
+    <p class="muted">Plaats de stip op de getallenlijn. Kies daarna voor controleren.</p>
+    <div id="target" class="target">7</div>
+    <div id="numberLine" class="number-line-host"></div>
+    <div class="actions">
+      <button id="submit" type="button">Controleren</button>
+      <button id="reset" class="secondary" type="button">Opnieuw</button>
+    </div>
+  </section>
+  <section class="card result">
+    <h2>Wat PacoGO heeft waargenomen</h2>
+    <div id="status" class="status">Klaar om te oefenen.</div>
+    <pre id="trace">Nog geen observatie.</pre>
+  </section>
+</main>
+<script type="module">
+  import { createCurriculumRegistry } from './pacogo-engine/curriculum-registry.js';
+  import { createNumberLine } from './pacogo-engine/number-line.js';
+  import { createNumberLineRenderer } from './pacogo-engine/number-line-renderer.js';
+  import { createNumberLineController } from './pacogo-engine/number-line-controller.js';
+
+  const targetValue = 7;
+  const numberLine = createNumberLine({ min: 0, max: 10, step: 1 });
+  const taskSet = await fetch('./docs/curriculum/PacoGO_Pilot_TaskSet_v0.1.json').then(response => response.json());
+  const registryConfig = await fetch('./docs/curriculum/PacoGO_Curriculum_Registry_v0.2.json').then(response => response.json());
+  const task = taskSet.tasks.find(item => item.task_id === 'A1-T01');
+  const registry = createCurriculumRegistry(registryConfig);
+
+  let controller;
+  let renderer;
+  const host = document.querySelector('#numberLine');
+  const status = document.querySelector('#status');
+  const trace = document.querySelector('#trace');
+
+  function mountInteraction() {
+    renderer = createNumberLineRenderer({
+      mount: host,
+      numberLine,
+      onPositionChange: placement => controller?.updatePlacement(placement)
+    });
+    controller = createNumberLineController({
+      numberLine,
+      task,
+      studentKey: 'browser-synthetic-student',
+      renderer,
+      targetValue,
+      tolerance: 0,
+      provenance: { page: 'curriculum-a1-numberline.html' }
+    });
+  }
+
+  mountInteraction();
+
+  document.querySelector('#submit').addEventListener('click', () => {
+    try {
+      const { evaluation, observation } = controller.submit();
+      const cycle = registry.runSkillCycle({
+        studentKey: observation.student_key,
+        skillId: observation.skill_id,
+        observation,
+        priorEvidence: [],
+        asOf: observation.observed_at
+      });
+      status.textContent = evaluation.correct
+        ? `Goed geplaatst. De observatie gaat door naar de PacoGO-leerengine. Volgende stap: ${cycle.next?.action || 'bepalen'}.`
+        : `Nog niet goed geplaatst. De leerengine ontvangt ook deze foutieve observatie als informatie.`;
+      trace.textContent = JSON.stringify({
+        observation_id: observation.observation_id,
+        registry_version: registry.registry_version,
+        evidence_count: cycle.evidence.length,
+        development: cycle.development,
+        mastery: cycle.mastery,
+        next: cycle.next,
+        decision: cycle.decision_trace.decision,
+        interaction_event_count: observation.interaction_events.length
+      }, null, 2);
+      document.querySelector('#submit').disabled = true;
+    } catch (error) {
+      status.textContent = error.message;
+      status.className = 'status error';
+    }
+  });
+
+  document.querySelector('#reset').addEventListener('click', () => {
+    controller = null;
+    status.className = 'status';
+    status.textContent = 'Nieuwe poging gestart.';
+    trace.textContent = 'Nog geen observatie.';
+    document.querySelector('#submit').disabled = false;
+    mountInteraction();
+  });
+</script>
+</body>
+</html>

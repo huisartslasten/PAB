@@ -54,6 +54,7 @@ test('C6 → C7 → C8 real vertical slice preserves the actual engine contracts
     observed_at: '2026-11-02T10:00:00Z',
     c6_result: c6,
     c7_result: { ...c7Input, ...c7Trace },
+    claim_id: 'A1.C1',
     supporting_evidence_ids: ['E1', 'E2', 'E3']
   });
 

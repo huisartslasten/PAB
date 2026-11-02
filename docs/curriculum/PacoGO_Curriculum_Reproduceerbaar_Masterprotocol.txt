@@ -1,0 +1,285 @@
+PACOGO CURRICULUM — REPRODUCEERBAARHEID / MASTERPROTOCOL
+Versie: 1.0
+
+DOEL
+De PacoGO Curriculum-ontwikkeling mag nooit afhankelijk zijn van één ChatGPT-chatgeschiedenis. Dit bestand is onderdeel van de duurzame projectdocumentatie in de repository. Een nieuwe ChatGPT-sessie moet PacoGO op basis van de repo-documentatie kunnen overnemen.
+
+============================================================
+1. HOOFDREGEL
+============================================================
+
+De chatgeschiedenis is NIET de bron van waarheid.
+De duurzame projectbestanden zijn de bron van waarheid.
+
+Minimaal moeten bestaan:
+- Master / architectuur
+- Method / werkwijze
+- Status / actuele stand
+- Decision Log / beslissingen
+- Sources / wetenschappelijke bronnen
+- Transfer / overdracht tussen chats
+- inhoudelijke domeinbestanden, bijvoorbeeld Rekenen en later Taal
+
+============================================================
+2. PACOGO MASTERARCHITECTUUR
+============================================================
+
+SKILL
+→ DEVELOPMENT
+→ DEVELOPMENTAL CLAIM
+→ EVIDENCE TARGET
+→ TASK MODEL
+→ TASK
+→ PERFORMANCE
+→ EVIDENCE
+→ EVIDENCE QUALITY
+→ DEVELOPMENT INFERENCE
+→ MASTERY
+→ DECISION
+→ NEXT ACTION
+→ NEW EVIDENCE
+→ MODEL REVISION
+
+Vaste begripsregels:
+- development ≠ task complexity
+- evidence ≠ score
+- mastery ≠ developmental position
+- correct ≠ automatisch mastery
+- development ≠ automatisch lineaire fase
+- prerequisites zijn hypotheses totdat empirisch ondersteund
+- leeftijd is context, geen rechtstreeks bewijs van ontwikkeling
+- AI mag niet zelfstandig curriculum-, development- of masteryregels verzinnen
+
+Epistemische labels:
+[W] = rechtstreeks ondersteund door wetenschappelijke literatuur
+[S] = PacoGO-synthese
+[O] = ontwerpkeuze
+
+Statuslabels:
+Candidate / Supported / Validated
+
+============================================================
+3. METHODIEK — WAT BIJ ELK NIEUW DOMEIN OPNIEUW GEBEURT
+============================================================
+
+Een nieuw vakgebied begint inhoudelijk opnieuw. De wetenschappelijke methode wordt niet opnieuw uitgevonden.
+
+Volgorde:
+A. domein afbakenen
+B. wetenschappelijke modellen onderzoeken
+C. kandidaat-skills formuleren
+D. kandidaat-developments formuleren
+E. claims formuleren
+F. evidence targets bepalen
+G. task models ontwerpen
+H. complexiteit modelleren
+I. masteryvoorwaarden formuleren
+J. cross-skill relaties formuleren
+K. empirische validatie ontwerpen
+L. curriculum herzien op basis van data
+M. technische implementatie
+
+Voorbeeld:
+REKENEN → eigen inhoudelijke modellen + bestaande PacoGO-methodiek
+TAAL → eigen inhoudelijke modellen + bestaande PacoGO-methodiek
+
+============================================================
+4. REKENEN — HUIDIGE BASIS
+============================================================
+
+32 kandidaat-skills:
+A1–A6 getalstructuur/getalbegrip
+B1–B5 bewerkingen
+FR1–FR2 breuken
+VR1–VR5 verhoudingen/percentages
+MG1–MG6 meten
+MGK1–MGK3 meetkunde/ruimtelijk
+PA1–PA3 patronen/algebraïsch denken
+GK1–GK2 gegevens/data
+
+Cross-cutting lagen:
+1. mathematical thinking / working
+2. math language / tools
+3. attitude / reflection
+4. application / transfer
+
+Deze architectuur is kandidaat en moet empirisch worden getoetst.
+
+============================================================
+5. EMPIRISCHE VALIDATIE
+============================================================
+
+C1 Pilot design
+C2 Student data model
+C3 Evidence coding
+C4 Development classification
+C5 Developmental ordering
+C6 Mastery decisions
+C7 Longitudinal validation
+C8 Model comparison
+C9 Bias, context & language
+C10 Curriculum revision
+
+PacoGO is niet empirisch bewezen alleen omdat het model logisch of wetenschappelijk geïnspireerd is.
+Ontwikkelingsmodellen zijn kandidaat-hypothesen totdat data ze ondersteunen.
+
+============================================================
+6. REGELS VOOR NIEUWE SKILLS / SUBSKILLS
+============================================================
+
+Als nieuw materiaal verschijnt:
+1. Maak niet automatisch een nieuwe top-level skill.
+2. Controleer eerst of het binnen een bestaande skill past.
+3. Als het past: werk claim/evidence target/task model/subskill uit.
+4. Alleen een nieuwe top-level skill als het construct inhoudelijk onvoldoende gedekt wordt.
+5. Controleer daarna gevolgen voor relaties, mastery en validatie.
+6. Noem niets bewezen zonder empirisch bewijs.
+
+============================================================
+7. CURRICULUMSTANDAARDEN
+============================================================
+
+SLO en vergelijkbare standaarden zijn curriculumkader en context.
+Ze bepalen niet automatisch PacoGO-skills, developmental stages, masterycriteria of empirische ontwikkelingsvolgorde.
+
+Relatie:
+CURRICULUMDOEL
+→ PACOGO CONSTRUCT/SKILL
+→ DEVELOPMENT/CLAIM
+→ EVIDENCE TARGET
+→ TASK
+
+Niet:
+CURRICULUMDOEL = SKILL = DEVELOPMENT
+
+============================================================
+8. BRONNENREGISTRATIE
+============================================================
+
+Elke belangrijke wetenschappelijke claim moet traceerbaar zijn.
+Registreer minimaal:
+- auteur
+- jaar
+- titel
+- DOI/URL indien beschikbaar
+- PacoGO-onderdeel
+- exacte claim die wordt ondersteund
+- status [W]/[S]/[O]
+
+============================================================
+9. DECISION LOG
+============================================================
+
+Iedere belangrijke ontwerpbeslissing krijgt:
+DATUM
+BESLISSING
+WAAROM
+WETENSCHAPPELIJKE BASIS
+ALTERNATIEVEN
+STATUS
+GEVOLG VOOR BESTAANDE ARCHITECTUUR
+MOET LATER EMPIRISCH GETEST WORDEN? JA/NEE
+
+Oude beslissingen worden niet stil verwijderd; wijzigingen blijven reconstrueerbaar.
+
+============================================================
+10. STATUSDOCUMENT
+============================================================
+
+Het statusdocument bevat de actuele stand:
+- DONE
+- CURRENT
+- NEXT
+- DO NOT REDO
+- OPEN QUESTIONS
+
+Wanneer iets wordt herzien, wordt de reden vastgelegd in de Decision Log.
+
+============================================================
+11. OVERDRACHT TUSSEN CHATS
+============================================================
+
+Een transferbestand is geen gewone samenvatting van de laatste chat.
+Het moet een nieuwe sessie zelfstandig kunnen laten reconstrueren:
+A. doel
+B. wetenschappelijke uitgangspunten
+C. architectuur
+D. afgeronde onderdelen
+E. kandidaatonderdelen
+F. empirisch te onderzoeken onderdelen
+G. leidende bestanden/bronnen
+H. exacte huidige stap
+I. wat NIET opnieuw moet
+J. eerstvolgende concrete stap
+K. instructie om de regie te bewaren
+
+============================================================
+12. VERPLICHTE REGEL VOOR ELKE VOLGENDE CHAT
+============================================================
+
+DE VOLGENDE CHAT MOET DIT BESTAND ALS LEVEND DOCUMENT BESCHOUWEN.
+
+Bij het overnemen van PacoGO moet de nieuwe sessie:
+1. dit bestand lezen;
+2. de huidige repo-status controleren;
+3. bepalen wat sinds de vorige sessie is veranderd;
+4. dit masterprotocol bijwerken als de methode, architectuur of reproduceerbaarheid is verbeterd;
+5. de actuele status/transferdocumentatie bijwerken wanneer de sessie eindigt of wanneer een grote mijlpaal is bereikt.
+
+Dus: niet alleen een overdracht maken, maar ook de repo-documentatie onderhouden.
+
+============================================================
+13. STARTINSTRUCTIE VOOR EEN NIEUWE CHAT
+============================================================
+
+Je neemt de regie over PacoGO Curriculum.
+Gebruik de repository-documentatie als bron van waarheid.
+Lees eerst Master, Method, Status, Decision Log, Sources, Transfer en relevante domeinbestanden.
+Reconstrueer doel, architectuur, besluiten, kandidaatmodellen, open vragen en exacte huidige stap.
+Begin NIET opnieuw met eerder afgeronde stappen.
+Neem zelfstandig de eerstvolgende logische stap.
+
+Werk wetenschappelijk voorzichtig:
+[W] = literatuur
+[S] = PacoGO-synthese
+[O] = ontwerpkeuze
+Candidate / Supported / Validated correct gebruiken.
+
+Ik ben chaotisch en wil niet steeds de procesregie geven. Neem daarom zelf de regie over.
+Geef na een grote stap een korte conclusie en de volgende stap.
+
+Bij het einde van de sessie: update de relevante repo-documentatie, inclusief dit Masterprotocol als dat nodig is.
+
+============================================================
+14. BACKUPREGEL
+============================================================
+
+Er mag nooit één enkele chat of één enkel bestand nodig zijn om PacoGO te begrijpen.
+
+Minimaal:
+1. repositorykopie
+2. onafhankelijke externe backup
+
+De chat is een werkomgeving.
+De repository is het duurzame geheugen van PacoGO.
+
+============================================================
+15. UITEINDELIJK DOEL
+============================================================
+
+Het doel is een reproduceerbaar systeem waarin:
+
+CURRICULUM
+→ ASSESSMENT
+→ EVIDENCE
+→ DEVELOPMENT
+→ MASTERY
+→ DECISION
+→ INSTRUCTION
+→ NEW EVIDENCE
+
+één samenhangende, empirisch toetsbare architectuur vormt.
+
+Een nieuwe onderzoeker, ontwikkelaar of ChatGPT-sessie moet het project kunnen overnemen zonder afhankelijk te zijn van de oorspronkelijke chatgeschiedenis.
+
+EINDE MASTERPROTOCOL

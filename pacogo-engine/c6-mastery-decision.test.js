@@ -37,6 +37,11 @@ test('C6 classifies all satisfied gates with supported inference as mastered', (
   assert.equal(classifyMasteryAssessment(baseAssessment()), MASTERY_STATES.MASTERED);
 });
 
+test('C6 allows observed coverage to exceed the minimum required coverage', () => {
+  const assessment = baseAssessment({ coverage_count: 6, required_coverage_count: 4 });
+  assert.equal(classifyMasteryAssessment(assessment), MASTERY_STATES.MASTERED);
+});
+
 test('C6 does not use a single score as a mastery shortcut', () => {
   const assessment = baseAssessment({
     score: 1,
@@ -88,12 +93,9 @@ test('C6 reports not assessed without usable evidence assessment', () => {
   assert.equal(classifyMasteryAssessment(assessment), MASTERY_STATES.NOT_ASSESSED);
 });
 
-test('C6 requires explicit supported developmental inference for mastery', () => {
+test('C6 reports insufficient evidence when developmental inference remains uncertain', () => {
   const assessment = baseAssessment({ developmental_inference_status: 'UNCERTAIN' });
-  assert.throws(
-    () => classifyMasteryAssessment(assessment),
-    /cannot be MASTERED without a SUPPORTED developmental inference/
-  );
+  assert.equal(classifyMasteryAssessment(assessment), MASTERY_STATES.INSUFFICIENT_EVIDENCE);
 });
 
 test('C6 never authorizes runtime mastery writes or automatic next actions', () => {

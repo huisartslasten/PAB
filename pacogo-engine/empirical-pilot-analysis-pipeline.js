@@ -24,10 +24,9 @@ function buildReliabilitySummaryByClaim(observations, codingRecords, reliability
   const codingByClaim = groupCodingByClaim(observations, codingRecords);
   const summaries = {};
 
-  for (const [claimId, records] of Object.entries(codingByClaim)) {
-    const declared = reliabilityByClaim[claimId];
+  for (const [claimId, declared] of Object.entries(reliabilityByClaim)) {
     assert(declared && typeof declared === 'object', `Missing explicit coding-reliability review for ${claimId}.`);
-    const summary = buildDoubleCodingSummary(records);
+    const summary = buildDoubleCodingSummary(codingByClaim[claimId] || []);
     summaries[claimId] = {
       ...declared,
       double_coded_pair_count: summary.double_coded_observation_count,

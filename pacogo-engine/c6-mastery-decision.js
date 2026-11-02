@@ -50,7 +50,6 @@ function validateMasteryAssessment(assessment) {
 
   assert(Number.isInteger(assessment.coverage_count) && assessment.coverage_count >= 0, `C6 assessment ${assessment.claim_id} requires non-negative integer coverage_count.`);
   assert(Number.isInteger(assessment.required_coverage_count) && assessment.required_coverage_count > 0, `C6 assessment ${assessment.claim_id} requires positive required_coverage_count.`);
-  assert(assessment.coverage_count <= assessment.required_coverage_count, `C6 assessment ${assessment.claim_id} cannot exceed required_coverage_count.`);
 
   return true;
 }
@@ -80,7 +79,9 @@ function classifyMasteryAssessment(assessment) {
     return MASTERY_STATES.NOT_YET_MASTERED;
   }
 
-  assert(assessment.developmental_inference_status === 'SUPPORTED', `C6 assessment ${assessment.claim_id} cannot be MASTERED without a SUPPORTED developmental inference.`);
+  if (assessment.developmental_inference_status !== 'SUPPORTED') {
+    return MASTERY_STATES.INSUFFICIENT_EVIDENCE;
+  }
 
   return MASTERY_STATES.MASTERED;
 }

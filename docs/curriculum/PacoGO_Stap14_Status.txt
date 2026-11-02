@@ -4,7 +4,7 @@ Branch: refactor/professional-v1
 Wetenschappelijke status: Candidate
 
 DOEL
-De technische curriculum-engine is voorzien van traceerbaarheid, onzekerheid, alternatieve verklaringen en validation hooks. Het empirische validatiekader is vastgelegd en C1-C3 is nu geoperationaliseerd tot en met een concrete pre-specified task set, synthetische testdataset en pilot-ready collection package.
+De technische curriculum-engine is voorzien van traceerbaarheid, onzekerheid, alternatieve verklaringen en validation hooks. Het empirische validatiekader is vastgelegd en C1-C3 is geoperationaliseerd tot en met een concrete pre-specified task set, synthetische testdataset en pilot-ready collection package.
 
 AFGEROND
 1. Longitudinal State uitgebreid met observed/missing evidence targets, contradictions, unresolved developments, alternative explanations en validation-hook status.
@@ -24,6 +24,10 @@ AFGEROND
 15. De eerste interface-audit van dataset → engine liet een concreet technisch verschil zien: pilotcodering staat genest onder `coding`, terwijl de generieke engine genormaliseerde velden verwacht. Dit is opgelost met `pacogo-engine/pilot-coder.js`, zonder de wetenschappelijke coderingsregels te wijzigen.
 16. Adaptertests toegevoegd voor de volledige set van 9 synthetische observaties, inclusief prompted/independent, contradiction, indeterminate en alternative-explanation fixtures.
 17. Pilot Task Package v0.1 toegevoegd met collectievolgorde, uitvoeringsregels, data-quality gates, coderingsvolgorde en voorwaarden voor overgang naar C4.
+18. Tijdens de end-to-end audit zijn ID-mismatches tussen registry en pilot task/dataset gevonden en gecorrigeerd: registry gebruikt canoniek `A1.D1`/`A1.ET1`-achtige IDs; pilotbestanden gebruiken nu exact dezelfde IDs.
+19. De pilot adapter is aangescherpt zodat alleen `PRESENT` als engine-evidence telt. `ABSENT` en `INDETERMINATE` behouden hun gecodeerde kwaliteit voor provenance, maar leveren geen evidence aan de generieke inferentie-engine.
+20. Next-action selectie is technisch gecorrigeerd zodat de huidige observatie eerst wordt verwerkt en daarna pas de actuele evidence gap wordt gebruikt voor de volgende taak.
+21. Een expliciete end-to-end synthetische runtime-test is toegevoegd: `pilot-coder → curriculum registry → longitudinal state → decision trace`, inclusief checks op evidence-status, contradictions, alternative explanations, provenance en validation hooks.
 
 WAT DIT WEL BEWIJST
 - technische traceerbaarheid;
@@ -33,7 +37,8 @@ WAT DIT WEL BEWIJST
 - een expliciet en reproduceerbaar kader voor toekomstig empirisch onderzoek;
 - een vaste task set en synthetische fixtures;
 - een expliciete adapter tussen pilotcodering en de generieke engine;
-- een pilot-ready collectie- en coderingspakket.
+- een pilot-ready collectie- en coderingspakket;
+- dat de eerder gevonden technische interfaceproblemen expliciet zijn gemaakt en gecorrigeerd in de bronbestanden.
 
 WAT DIT NIET BEWIJST
 - geen constructvaliditeit;
@@ -43,16 +48,16 @@ WAT DIT NIET BEWIJST
 - geen empirische replicatie;
 - geen Supported/Validated status;
 - synthetische testdata zijn geen leerlingdata en geen wetenschappelijk bewijs;
-- de synthetische dataset is in deze omgeving nog niet als uitvoerende Node-test gedraaid; de fixtures en uitvoerbare test zijn wel vastgelegd.
+- de nieuwe end-to-end synthetische runtime-test is in deze omgeving nog niet daadwerkelijk uitgevoerd; de test is wel als uitvoerbare Node-test vastgelegd.
 
 CURRENT
-De C1-C3-methodologische laag en het pilot collection package zijn voldoende gespecificeerd om echte pilotdata te kunnen verzamelen zonder de onderzoeksregels tijdens de verzameling te verzinnen. De technische dataset→coding-interface is expliciet gemaakt. De volgende stap is een echte end-to-end runtime-test van de synthetische dataset wanneer de repository in een Node-omgeving wordt uitgevoerd.
+De C1-C3-methodologische laag en het pilot collection package zijn voldoende gespecificeerd om echte pilotdata te kunnen verzamelen zonder de onderzoeksregels tijdens de verzameling te verzinnen. De dataset→coding-interface, canonieke IDs en evidence-statussemantiek zijn nu expliciet afgestemd op de registry/runtime. De repository bevat bovendien een bestaande GitHub Actions regression workflow die `node --test pacogo-engine/*.test.js` uitvoert bij pushes naar de DEV-branch. Een daadwerkelijke groene CI-run is in deze sessie niet geverifieerd en wordt daarom niet als testresultaat geclaimd.
 
 NEXT — GROTE BLOK
-1. End-to-end uitvoeren van alle synthetische observaties via pilot-coder → curriculum registry runtime → longitudinal state → decision trace.
-2. Controleren dat elk fixturetype de verwachte technische uitkomst geeft.
-3. Eventuele runtime-mismatches repareren zonder wetenschappelijke regels achteraf te wijzigen.
-4. Daarna C4 operationaliseren: development classification, met expliciete toetsing van ontwikkelingsonderscheidingen.
+1. Werkelijke CI/runtime-uitvoering van de volledige curriculum-engine tests controleren.
+2. Als de runtime groen is: C1-C3 technisch sluiten en de empirische grens expliciet behouden.
+3. Daarna C4 operationaliseren: development classification, met expliciete toetsing van ontwikkelingsonderscheidingen.
+4. Vervolgens pas C5/C6 enzovoort volgens het empirical validation protocol.
 5. A1/B1/FR2 blijven Candidate totdat empirische criteria daadwerkelijk zijn gehaald.
 
 DO NOT REDO

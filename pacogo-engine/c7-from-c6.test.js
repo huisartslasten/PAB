@@ -61,6 +61,13 @@ test('C7 adapter rejects a missing C6 claim result', () => {
   );
 });
 
+test('C7 adapter rejects an inconsistent C6 claim identifier', () => {
+  assert.throws(
+    () => validateC6ResultForC7(c6Result({ claim_id: 'A1.C2' }), 'A1.C1'),
+    /inconsistent claim_id/
+  );
+});
+
 test('C7 adapter rejects an invalid C6 mastery state', () => {
   assert.throws(
     () => validateC6ResultForC7(c6Result({ mastery_state: 'GUESS' }), 'A1.C1'),
@@ -113,6 +120,25 @@ test('C7 adapter rejects invalid ordering or alternative states', () => {
   assert.throws(
     () => validateC7OrderingAndAlternativeInputs({ ordering_state: 'SUPPORTED', alternative_state: 'UNKNOWN' }),
     /Invalid C7 alternative_state/
+  );
+});
+
+test('C7 adapter enforces ordering and alternative validation at the build boundary', () => {
+  assert.throws(
+    () => buildC7InputFromC6(baseAdapterInput({ ordering_state: 'UNKNOWN' })),
+    /Invalid C7 ordering_state/
+  );
+
+  assert.throws(
+    () => buildC7InputFromC6(baseAdapterInput({ alternative_state: 'UNKNOWN' })),
+    /Invalid C7 alternative_state/
+  );
+});
+
+test('C7 adapter rejects missing supporting evidence ids explicitly', () => {
+  assert.throws(
+    () => buildC7InputFromC6(baseAdapterInput({ supporting_evidence_ids: undefined })),
+    /supporting_evidence_ids/
   );
 });
 

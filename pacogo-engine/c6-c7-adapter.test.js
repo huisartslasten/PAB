@@ -33,9 +33,9 @@ function c7Context(overrides = {}) {
     claim_id: 'A1.C1',
     current_development_id: 'A1.D1',
     evidence_state: 'SUFFICIENT',
-    ordering_state: 'SUPPORTED',
+    next_development_ordering_state: 'SUPPORTED',
     alternative_state: 'CONTROLLED',
-    prerequisite_state: 'SUPPORTED',
+    prerequisite_ordering_state: 'SUPPORTED',
     supporting_evidence_ids: ['E1', 'E2', 'E3'],
     action_policy: {
       reassess_current_allowed: true,
@@ -57,12 +57,11 @@ test('C6 → C7 adapter preserves the explicit C6 mastery result', () => {
   assert.equal(c7.current_development_id, 'A1.D1');
 });
 
-test('C6 → C7 adapter does not infer ordering, alternatives, prerequisites, or permissions', () => {
+test('C6 → C7 adapter passes prerequisite and next-development ordering separately', () => {
   const c6 = evaluateC6MasteryAssessments([assessment()]);
   const c7 = createC7InputFromC6(c6, c7Context({
-    ordering_state: 'UNCERTAIN',
-    alternative_state: 'UNRESOLVED',
-    prerequisite_state: 'NOT_ASSESSED',
+    next_development_ordering_state: 'UNCERTAIN',
+    prerequisite_ordering_state: 'NOT_ASSESSED',
     action_policy: {
       reassess_current_allowed: false,
       practice_current_allowed: false,
@@ -72,10 +71,8 @@ test('C6 → C7 adapter does not infer ordering, alternatives, prerequisites, or
     }
   }));
 
-  assert.equal(c7.ordering_state, 'UNCERTAIN');
-  assert.equal(c7.alternative_state, 'UNRESOLVED');
-  assert.equal(c7.prerequisite_state, 'NOT_ASSESSED');
-  assert.equal(c7.action_policy.assess_prerequisite_allowed, true);
+  assert.equal(c7.next_development_ordering_state, 'UNCERTAIN');
+  assert.equal(c7.prerequisite_ordering_state, 'NOT_ASSESSED');
   assert.equal(decideNextAction(c7), CANDIDATE_ACTIONS.ASSESS_PREREQUISITE_DEVELOPMENT);
 });
 

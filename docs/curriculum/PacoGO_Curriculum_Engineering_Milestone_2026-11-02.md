@@ -131,55 +131,59 @@ De ordering-matrix bevat momenteel 10 candidate relations over de bestaande A1/B
 
 De bestaande `candidate_order`-velden blijven voorlopig een **hypothese-index**. C5 verandert de registry niet en promoveert geen ordering-claim automatisch.
 
-## 7. C1-C3 — eerste empirische onderzoekslaag
+## 7. C1-C3 — empirische onderzoekslaag
 
-Nu C4 en C5 vooraf gespecificeerde onderzoeksvragen hebben, is de eerste empirische infrastructuurlaag vastgelegd:
+De voorbereidende empirische infrastructuur is nu als één keten vastgelegd:
 
 - `docs/curriculum/PacoGO_C1_Pilot_Design_v0.1.md`
 - `docs/curriculum/PacoGO_C2_Student_Data_Model_v0.1.md`
 - `docs/curriculum/PacoGO_C3_Evidence_Coding_Specification_v0.1.md`
+- bestaand aanvullend analyseplan: `docs/curriculum/PacoGO_C1_C3_Analysis_Plan_v0.1.md`
 
-### C1 — pilot design
-
-C1 definieert hoe een pilot onderscheid kan maken tussen feasibility, discriminating evidence, variation, transfer en repeated observations. De primaire validatie-eenheid blijft de **claim**.
-
-C1 vereist onder andere vooraf vastgelegde claims/evidence targets, defining versus confirmatory observations, meerdere taakinstanties, relevante variatie, counter-patterns, instructie/exposure metadata en expliciete analyse-gates.
-
-### C2 — student data model
+C1 definieert de pilotopzet en de scheiding tussen feasibility, discriminating, variation, transfer en repeated observations.
 
 C2 scheidt:
 
 `learner/context → task instance → interaction/observation → evidence assessment → inference → decision`
 
-Raw observations blijven behouden en worden niet overschreven door latere interpretaties. Missingness, instruction/exposure en provenance worden expliciet vastgelegd.
+Raw observations blijven behouden. Missingness, instruction/exposure en provenance worden expliciet vastgelegd.
 
-Het model ondersteunt longitudinale analyse maar beweert zelf geen temporal ordering, prediction, prerequisite of causaliteit.
+C3 maakt expliciet onderscheid tussen target match, correctness, process evidence, quality, contradiction, independence/prompting en alternative explanations. Human coding krijgt een reliability-plan.
 
-### C3 — evidence coding
+C1-C3 blijven design-only; er is nog geen leerlingstudie uitgevoerd.
 
-C3 maakt expliciet onderscheid tussen:
+## 8. Eerste empirische pilotmanifest
 
-- target match;
-- correctness/performance;
-- process evidence;
-- evidence quality;
-- contradiction;
-- independence/prompting;
-- alternative explanations.
+De volgende stap is nu geconcretiseerd in:
 
-Human coding krijgt een afzonderlijk reliability-plan. Een correct antwoord wordt niet automatisch als developmental evidence gecodeerd.
+`docs/curriculum/PacoGO_Empirical_Pilot_Manifest_v0.1.json`
 
-### Wetenschappelijke status C1-C3
+Het manifest selecteert voor de **eerste pilot** zes focal claims:
 
-C1-C3 zijn **design-only**. Er is nog geen leerlingstudie uitgevoerd en er is geen empirische claim ondersteund of gevalideerd.
+- A1.C1 / A1.D1
+- A1.C2 / A1.D2
+- B1.C1 / B1.D1
+- B1.C2 / B1.D2
+- FR2.C1 / FR2.D1
+- FR2.C2 / FR2.D2
 
-## 8. Wetenschappelijke status
+De hogere ontwikkelingen A1.D3, B1.D3, B1.D4 en FR2.D3 zijn bewust uit de eerste pilot gehouden. Dat is scopebeperking en geen negatieve ontwikkelingsclaim.
+
+Het manifest koppelt per claim concrete pilot-taken, evidence targets, alternatieve verklaringen en vereiste procesinformatie. Het definieert drie onderzoeksfasen:
+
+- W0 feasibility;
+- W1 baseline/discrimination;
+- W2+ repeated measurement.
+
+Het legt ook vast dat C5-ordering pas kan worden onderzocht wanneer voldoende herhaalde observaties beschikbaar zijn en dat prediction niet automatisch prerequisite-status betekent.
+
+## 9. Wetenschappelijke status
 
 A1, B1 en FR2 blijven representatieve kandidaat-/prototypeconstructen.
 
-C4 en C5 zijn onderzoeks- en testinstrumenten. C1-C3 zijn de voorbereidende empirische onderzoeksinfrastructuur. Geen van deze lagen is op zichzelf empirische curriculumvalidatie.
+C1-C5 zijn onderzoeks- en testinstrumenten/designlagen. Geen van deze lagen is empirische curriculumvalidatie.
 
-Deze technische milestones bewijzen NIET dat:
+Deze milestones bewijzen NIET dat:
 
 - de skillafbakening empirisch correct is;
 - de developmental ordering correct is;
@@ -189,12 +193,18 @@ Deze technische milestones bewijzen NIET dat:
 - A1 of FR2 definitieve curriculuminhoud zijn;
 - de C4- of C5-patronen daadwerkelijk in leerlingdata voorkomen.
 
-## 9. Volgende stap
+## 10. CI / branchstatus
 
-De designlaag C1-C5 staat nu. De volgende stap is **niet** een nieuwe runtime-skill bouwen.
+Voor de eerdere technische curriculumregressie is CI-run `41442702755` volledig groen bevestigd.
 
-De volgende grote inhoudelijke stap is het samenstellen van een eerste **empirische pilotmanifest**: welke concrete A1/B1/FR2 claims worden als eerste onderzocht, welke C4/C5 tasks worden daarvoor gebruikt, welke observations nodig zijn, welke alternatieven worden getoetst en welke data per leerling/wave moeten worden verzameld.
+De huidige branch `refactor/professional-v1` staat op commit `5419fd695446f84fb59fff53abaa7963d22c97ca` in de huidige branchgeschiedenis; de nieuwe pilotmanifest- en milestone-commit volgt daar direct op.
 
-Pas daarna is het zinvol om daadwerkelijke empirische dataverzameling en eventuele Supabase TEST-persistentie voor onderzoeksdata te bouwen. Als persistence wordt geraakt, blijft de bestaande Supabase TEST-regel verplicht.
+Omdat deze branch direct wordt bijgewerkt en de bestaande workflow op PR-context draait, is een **draft PR #17** geopend uitsluitend om CI-validatie mogelijk te maken. De PR is niet gemerged; MAIN/LIVE is daardoor niet gewijzigd.
 
-Nieuwe runtime-domeinen worden alleen toegevoegd wanneer ze een duidelijke onderzoeks- of architectuurfunctie hebben; niet om simpelweg meer demo-skills te produceren.
+## 11. Volgende grote stap
+
+De designfase is nu voldoende uitgewerkt om naar een echte empirische voorbereiding te gaan.
+
+De volgende stap is **geen nieuwe runtime-skill**. Eerst moet de pilotmanifest technisch/inhoudelijk uitvoerbaar worden gemaakt: observation-export, coderingsdataset, task-instance registratie en reproduceerbare pilotanalyse. Pas wanneer dat klaar is, kan daadwerkelijke leerlingdata worden verzameld.
+
+Als onderzoeksdata naar Supabase worden geschreven, wordt dat uitsluitend op **PacoGO TEST** gedaan en volgens de bestaande Supabase TEST-regel. MAIN/LIVE blijft buiten deze onderzoeksfase.

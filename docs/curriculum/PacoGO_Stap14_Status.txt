@@ -4,50 +4,31 @@ Branch: refactor/professional-v1
 Wetenschappelijke status: Candidate
 
 DOEL
-De technische curriculum-engine is nu voorzien van traceerbaarheid, onzekerheid, alternatieve verklaringen en validation hooks. De volgende stap was het expliciet maken van de empirische regels waarmee curriculumclaims ooit van Candidate naar Supported en daarna eventueel naar Validated kunnen bewegen.
+De technische curriculum-engine is nu voorzien van traceerbaarheid, onzekerheid, alternatieve verklaringen en validation hooks. Daarna is het empirische validatiekader vastgelegd en nu is C1-C3 daadwerkelijk geoperationaliseerd als reproduceerbaar pilotontwerp.
 
 AFGEROND
-1. Longitudinal State uitgebreid met:
-   - observed/missing evidence targets;
-   - contradictions;
-   - unresolved developments;
-   - alternative explanations;
-   - validation-hook status.
-
+1. Longitudinal State uitgebreid met observed/missing evidence targets, contradictions, unresolved developments, alternative explanations en validation-hook status.
 2. Decision Trace uitgebreid met dezelfde onzekerheidsinformatie.
-
-3. Generiek validation-hook framework toegevoegd:
-   - C1 t/m C10;
-   - standaardstatus NOT_RUN;
-   - optionele scope-configuratie;
-   - geen automatische promotie van Candidate naar Supported/Validated.
-
+3. Generiek validation-hook framework C1-C10 toegevoegd; standaard NOT_RUN; geen automatische promotie.
 4. Supabase persistent schema uitgebreid met alternative_explanations en validation_hooks.
-
-5. Canonieke migratiebestanden voor longitudinal state/decision trace en de Step-14 uitbreiding zijn in de repository aanwezig.
-
-6. A1/B1/FR2 registry-runtime tests uitgebreid met:
-   - validation-hook aanwezigheid;
-   - alternative explanation propagation;
-   - trace propagation.
-
-7. Empirical Validation Protocol v0.1 toegevoegd:
-   - claim is de primaire validatie-eenheid;
-   - expliciete evidence classes;
-   - Candidate -> Supported gate;
-   - Supported -> Validated gate;
-   - C1-C10 inhoudelijk gedefinieerd;
-   - geen automatische statuspromotie;
-   - scope en beperkingen verplicht.
-
-8. Machine-readable Empirical Validation Registry v0.1 toegevoegd:
-   - C1-C10 criteria;
-   - toepasselijkheid per claimtype;
-   - claim-level validation record schema;
-   - promotiegates;
-   - A1/B1/FR2 blijven Candidate.
-
-9. Masterprotocol bijgewerkt van v1.1 naar v1.2 zodat de empirische validatielaag onderdeel is van de duurzame reproduceerbare projectmethode.
+5. Canonieke migratiebestanden voor longitudinal state/decision trace en Step-14 uitbreiding aanwezig.
+6. A1/B1/FR2 registry-runtime tests uitgebreid met validation hooks, alternative explanations en trace propagation.
+7. Empirical Validation Protocol v0.1 toegevoegd met claim-level Candidate -> Supported -> Validated gates.
+8. Machine-readable Empirical Validation Registry v0.1 toegevoegd.
+9. Masterprotocol bijgewerkt naar v1.2.
+10. C1 Pilot Protocol v0.1 toegevoegd:
+    - measurement-development pilot, geen effectiviteitsbewijs;
+    - pre-specified hypotheses;
+    - sampling/scope registratie;
+    - observation unit Student × Time × Task × Response × Evidence;
+    - taakvariatie;
+    - response-process evidence;
+    - rater/coder procedure;
+    - analyse- en revisiesequentie;
+    - stopping/revision rules.
+11. C2 Pilot Data Schema v0.1 toegevoegd met versioned provenance, performance, context, coding en privacy/integrity rules.
+12. C3 Evidence Coding Manual v0.1 toegevoegd met reproduceerbare codes voor evidence status, target match, quality, independence, contradiction en alternative explanations.
+13. De pilotopzet is inhoudelijk afgestemd op algemene testing/measurement-principes: eerst construct/measurement-evidence voldoende interpreteerbaar maken, daarna zwaardere validiteitsclaims toetsen. [W]/[S] bronnen worden in het protocol zelf traceerbaar gehouden.
 
 WAT DIT WEL BEWIJST
 - technische traceerbaarheid;
@@ -55,7 +36,7 @@ WAT DIT WEL BEWIJST
 - expliciete opslag van onzekerheid;
 - ondersteuning voor competing explanations;
 - een expliciet en reproduceerbaar kader voor toekomstig empirisch onderzoek;
-- een machine-readable plaats waar validatiestatus per claim kan worden bijgehouden.
+- een concreet pilotontwerp en data/coderingscontract voor C1-C3.
 
 WAT DIT NIET BEWIJST
 - geen constructvaliditeit;
@@ -66,14 +47,15 @@ WAT DIT NIET BEWIJST
 - geen Supported/Validated status.
 
 CURRENT
-De technische infrastructuur en het empirische validatiekader zijn voorbereid. De inhoudelijke empirische fase moet nog beginnen.
+De methodologische laag is nu ver genoeg uitgewerkt om een eerste echte pilotdataset te kunnen verzamelen/coderen zonder de onderzoeksregels tijdens het verzamelen te verzinnen.
 
 NEXT — GROTE BLOK
-C1-C3 daadwerkelijk operationaliseren voor een reproduceerbare pilot:
-1. vooraf specificeren welke claims en scope worden getest;
-2. een leerling-/taakdatamodel voor de pilot vastleggen;
-3. een reproduceerbaar evidence-coderingsprotocol maken;
-4. daarna C4-C6 op representatieve claims empirisch testen.
+De volgende stap is het bouwen van de **eerste concrete pilotdataset en pilot-task set** voor A1, B1 en FR2, inclusief:
+1. pre-specified taakvarianten;
+2. verwachte evidence per taak;
+3. counter/alternative-explanation tasks;
+4. coderingsfixtures;
+5. een kleine synthetische dataset om de volledige C1-C3 keten technisch te doorlopen voordat echte leerlingdata worden gebruikt.
 
 DO NOT REDO
 - opnieuw de generieke engine ontwerpen;

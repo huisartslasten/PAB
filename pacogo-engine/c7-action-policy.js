@@ -1,4 +1,4 @@
-import { CANDIDATE_ACTIONS } from './c7-next-action-decision.js';
+import { CANDIDATE_ACTIONS } from './c7-contracts.js';
 
 const POLICY_FIELDS = Object.freeze({
   reassess_current_allowed: CANDIDATE_ACTIONS.REASSESS_CURRENT_DEVELOPMENT,
@@ -29,19 +29,11 @@ function listAuthorizedC7Actions(policy) {
 
 function assertCandidateActionAuthorized(policy, candidateAction) {
   validateC7ActionPolicy(policy);
-  assert(
-    Object.values(CANDIDATE_ACTIONS).includes(candidateAction),
-    `Invalid C7 candidate action: ${candidateAction}`
-  );
+  assert(Object.values(CANDIDATE_ACTIONS).includes(candidateAction), `Invalid C7 candidate action: ${candidateAction}`);
   if (candidateAction === CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE) return true;
   const authorized = listAuthorizedC7Actions(policy);
   assert(authorized.includes(candidateAction), `C7 candidate action is not authorized: ${candidateAction}`);
   return true;
 }
 
-export {
-  POLICY_FIELDS,
-  validateC7ActionPolicy,
-  listAuthorizedC7Actions,
-  assertCandidateActionAuthorized
-};
+export { POLICY_FIELDS, validateC7ActionPolicy, listAuthorizedC7Actions, assertCandidateActionAuthorized };

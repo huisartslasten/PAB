@@ -17,7 +17,6 @@ function validateC6ResultForC7(c6Result, claimId) {
   assert(masteryResult && typeof masteryResult === 'object', `C7 requires a C6 result for claim ${claimId}.`);
   assert(Object.values(MASTERY_STATES).includes(masteryResult.mastery_state), `Invalid C6 mastery state for C7: ${masteryResult.mastery_state}`);
   assert(typeof masteryResult.development_id === 'string' && masteryResult.development_id.length > 0, `C6 result ${claimId} requires development_id.`);
-  assert(Array.isArray(masteryResult.evidence_count) === false, `C6 result ${claimId} has invalid evidence_count.`);
   assert(Number.isInteger(masteryResult.evidence_count) && masteryResult.evidence_count >= 0, `C6 result ${claimId} requires non-negative evidence_count.`);
 
   return masteryResult;

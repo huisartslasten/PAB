@@ -1,5 +1,6 @@
-import { runCycle, chooseNextAction } from './prototype.js';
+import { runCycle } from './prototype.js';
 import { deriveLongitudinalState, explainDecision, createDecisionTrace } from './longitudinal-state.js';
+import { evaluateValidationHooks } from './validation-hooks.js';
 
 function assertArray(value, label) {
   if (!Array.isArray(value)) throw new TypeError(`${label} must be an array`);
@@ -49,6 +50,12 @@ function createCurriculumRegistry(config) {
         state: state || { missing_evidence_targets: skill.evidence_targets.map((target) => target.id) },
         taskModels: skill.task_models || []
       });
+      const validationHooks = evaluateValidationHooks({
+        hookIds: skill.validation_hook_ids,
+        evidence: cycle.evidence,
+        state: cycle,
+        context: skill.validation_hooks
+      });
       const longitudinalState = deriveLongitudinalState({
         studentKey,
         skillId,
@@ -58,10 +65,10 @@ function createCurriculumRegistry(config) {
         development: cycle.development,
         mastery: cycle.mastery,
         priorState,
+        validationHooks,
         asOf
       });
-      const nextAction = chooseNextAction(longitudinalState, skill.task_models || []);
-      const decision = explainDecision({ state: longitudinalState, decisionRules: skill.decision_rules, nextAction });
+      const decision = explainDecision({ state: longitudinalState, decisionRules: skill.decision_rules, nextAction: cycle.next });
       const trace = createDecisionTrace({
         studentKey,
         skillId,
@@ -71,7 +78,7 @@ function createCurriculumRegistry(config) {
         observationIds: cycle.evidence.map((item) => item.id || item.task_instance_id).filter(Boolean),
         createdAt: asOf
       });
-      return { ...cycle, next: nextAction, longitudinal_state: longitudinalState, decision_trace: trace };
+      return { ...cycle, longitudinal_state: longitudinalState, decision_trace: trace };
     }
   });
 }

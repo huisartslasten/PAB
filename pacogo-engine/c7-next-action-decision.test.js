@@ -6,7 +6,8 @@ import {
   decideNextAction,
   evaluateC7NextActionDecision,
   traceNextActionDecision,
-  validateNextActionDecisionInput
+  validateNextActionDecisionInput,
+  validateNextActionDecisionTrace
 } from './c7-next-action-decision.js';
 
 function baseInput(overrides = {}) {
@@ -42,24 +43,15 @@ test('C7 rejects malformed evidence identifiers instead of silently accepting th
 });
 
 test('C7 holds when evidence is insufficient', () => {
-  assert.equal(
-    decideNextAction(baseInput({ evidence_state: 'INSUFFICIENT' })),
-    CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE
-  );
+  assert.equal(decideNextAction(baseInput({ evidence_state: 'INSUFFICIENT' })), CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE);
 });
 
 test('C7 holds when mastery is not assessed', () => {
-  assert.equal(
-    decideNextAction(baseInput({ mastery_state: 'NOT ASSESSED' })),
-    CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE
-  );
+  assert.equal(decideNextAction(baseInput({ mastery_state: 'NOT ASSESSED' })), CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE);
 });
 
 test('C7 reassesses the current development when contradiction remains', () => {
-  assert.equal(
-    decideNextAction(baseInput({ mastery_state: 'CONTRADICTORY' })),
-    CANDIDATE_ACTIONS.REASSESS_CURRENT_DEVELOPMENT
-  );
+  assert.equal(decideNextAction(baseInput({ mastery_state: 'CONTRADICTORY' })), CANDIDATE_ACTIONS.REASSESS_CURRENT_DEVELOPMENT);
 });
 
 test('C7 does not reassess when the explicit action policy forbids it', () => {
@@ -73,13 +65,10 @@ test('C7 does not reassess when the explicit action policy forbids it', () => {
 });
 
 test('C7 practices the current development when it is not yet mastered', () => {
-  assert.equal(
-    decideNextAction(baseInput({ mastery_state: 'NOT YET MASTERED' })),
-    CANDIDATE_ACTIONS.PRACTICE_CURRENT_DEVELOPMENT
-  );
+  assert.equal(decideNextAction(baseInput({ mastery_state: 'NOT YET MASTERED' })), CANDIDATE_ACTIONS.PRACTICE_CURRENT_DEVELOPMENT);
 });
 
-test('C7 does not infer practice from policy when current practice is not authorized', () => {
+test('C7 does not infer practice when current practice is not authorized', () => {
   assert.equal(
     decideNextAction(baseInput({
       mastery_state: 'NOT YET MASTERED',
@@ -90,16 +79,11 @@ test('C7 does not infer practice from policy when current practice is not author
 });
 
 test('C7 assesses an uncertain prerequisite before advancing', () => {
-  assert.equal(
-    decideNextAction(baseInput({ prerequisite_state: 'UNCERTAIN' })),
-    CANDIDATE_ACTIONS.ASSESS_PREREQUISITE_DEVELOPMENT
-  );
+  assert.equal(decideNextAction(baseInput({ prerequisite_state: 'UNCERTAIN' })), CANDIDATE_ACTIONS.ASSESS_PREREQUISITE_DEVELOPMENT);
 });
 
 test('C7 assesses an unassessed prerequisite before advancing', () => {
-  const trace = traceNextActionDecision(baseInput({ prerequisite_state: 'NOT_ASSESSED' }));
-
-  assert.deepEqual(trace, {
+  assert.deepEqual(traceNextActionDecision(baseInput({ prerequisite_state: 'NOT_ASSESSED' })), {
     candidate_action: CANDIDATE_ACTIONS.ASSESS_PREREQUISITE_DEVELOPMENT,
     decision_reason: DECISION_REASONS.PREREQUISITE_NOT_ASSESSED,
     decision_gate: 'A4'
@@ -117,9 +101,7 @@ test('C7 holds when prerequisite assessment is not authorized', () => {
 });
 
 test('C7 blocks next-development action when prerequisite support is absent', () => {
-  const trace = traceNextActionDecision(baseInput({ prerequisite_state: 'NOT_SUPPORTED' }));
-
-  assert.deepEqual(trace, {
+  assert.deepEqual(traceNextActionDecision(baseInput({ prerequisite_state: 'NOT_SUPPORTED' })), {
     candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE,
     decision_reason: DECISION_REASONS.PREREQUISITE_NOT_SUPPORTED,
     decision_gate: 'A4'
@@ -127,9 +109,7 @@ test('C7 blocks next-development action when prerequisite support is absent', ()
 });
 
 test('C7 blocks next-development action when ordering is not supported', () => {
-  const trace = traceNextActionDecision(baseInput({ ordering_state: 'NOT_SUPPORTED' }));
-
-  assert.deepEqual(trace, {
+  assert.deepEqual(traceNextActionDecision(baseInput({ ordering_state: 'NOT_SUPPORTED' })), {
     candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE,
     decision_reason: DECISION_REASONS.ORDERING_NOT_SUPPORTED,
     decision_gate: 'A4'
@@ -137,9 +117,7 @@ test('C7 blocks next-development action when ordering is not supported', () => {
 });
 
 test('C7 blocks next-development action when ordering remains uncertain', () => {
-  const trace = traceNextActionDecision(baseInput({ ordering_state: 'UNCERTAIN' }));
-
-  assert.deepEqual(trace, {
+  assert.deepEqual(traceNextActionDecision(baseInput({ ordering_state: 'UNCERTAIN' })), {
     candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE,
     decision_reason: DECISION_REASONS.ORDERING_UNCERTAIN,
     decision_gate: 'A4'
@@ -147,15 +125,10 @@ test('C7 blocks next-development action when ordering remains uncertain', () => 
 });
 
 test('C7 can practice the next development only when explicitly authorized', () => {
-  assert.equal(
-    decideNextAction(baseInput({
-      action_policy: { ...baseInput().action_policy, practice_next_allowed: true }
-    })),
-    CANDIDATE_ACTIONS.PRACTICE_NEXT_DEVELOPMENT
-  );
+  assert.equal(decideNextAction(baseInput()), CANDIDATE_ACTIONS.PRACTICE_NEXT_DEVELOPMENT);
 });
 
-test('C7 falls back to assessment of the next development when practice is not authorized', () => {
+test('C7 falls back to assessment when next practice is not authorized', () => {
   assert.equal(
     decideNextAction(baseInput({
       action_policy: { ...baseInput().action_policy, practice_next_allowed: false, assess_next_allowed: true }
@@ -176,16 +149,28 @@ test('C7 holds when neither next-development action is authorized', () => {
 test('C7 validates explicit action policy instead of silently inventing permissions', () => {
   const input = baseInput();
   delete input.action_policy.practice_next_allowed;
+  assert.throws(() => validateNextActionDecisionInput(input), /practice_next_allowed/);
+});
+
+test('C7 validates action/reason coherence in the decision trace', () => {
+  assert.equal(validateNextActionDecisionTrace({
+    candidate_action: CANDIDATE_ACTIONS.PRACTICE_NEXT_DEVELOPMENT,
+    decision_reason: DECISION_REASONS.NEXT_PRACTICE_AUTHORIZED,
+    decision_gate: 'A6'
+  }), true);
+
   assert.throws(
-    () => validateNextActionDecisionInput(input),
-    /practice_next_allowed/
+    () => validateNextActionDecisionTrace({
+      candidate_action: CANDIDATE_ACTIONS.PRACTICE_NEXT_DEVELOPMENT,
+      decision_reason: DECISION_REASONS.NEXT_ASSESSMENT_AUTHORIZED,
+      decision_gate: 'A6'
+    }),
+    /action\/reason combination/
   );
 });
 
 test('C7 exposes the gate and reason that produced the candidate action', () => {
-  const trace = traceNextActionDecision(baseInput({ evidence_state: 'INSUFFICIENT' }));
-
-  assert.deepEqual(trace, {
+  assert.deepEqual(traceNextActionDecision(baseInput({ evidence_state: 'INSUFFICIENT' })), {
     candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE,
     decision_reason: DECISION_REASONS.INSUFFICIENT_EVIDENCE,
     decision_gate: 'A2'

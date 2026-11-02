@@ -96,6 +96,36 @@ test('C7 assesses an uncertain prerequisite before advancing', () => {
   );
 });
 
+test('C7 assesses an unassessed prerequisite before advancing', () => {
+  const trace = traceNextActionDecision(baseInput({ prerequisite_state: 'NOT_ASSESSED' }));
+
+  assert.deepEqual(trace, {
+    candidate_action: CANDIDATE_ACTIONS.ASSESS_PREREQUISITE_DEVELOPMENT,
+    decision_reason: DECISION_REASONS.PREREQUISITE_NOT_ASSESSED,
+    decision_gate: 'A4'
+  });
+});
+
+test('C7 holds when prerequisite assessment is not authorized', () => {
+  assert.equal(
+    decideNextAction(baseInput({
+      prerequisite_state: 'NOT_ASSESSED',
+      action_policy: { ...baseInput().action_policy, assess_prerequisite_allowed: false }
+    })),
+    CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE
+  );
+});
+
+test('C7 blocks next-development action when ordering is not supported', () => {
+  const trace = traceNextActionDecision(baseInput({ ordering_state: 'NOT_SUPPORTED' }));
+
+  assert.deepEqual(trace, {
+    candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE,
+    decision_reason: DECISION_REASONS.ORDERING_NOT_SUPPORTED,
+    decision_gate: 'A4'
+  });
+});
+
 test('C7 can practice the next development only when explicitly authorized', () => {
   assert.equal(
     decideNextAction(baseInput({

@@ -2,8 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   CANDIDATE_ACTIONS,
+  DECISION_REASONS,
   decideNextAction,
   evaluateC7NextActionDecision,
+  traceNextActionDecision,
   validateNextActionDecisionInput
 } from './c7-next-action-decision.js';
 
@@ -30,6 +32,13 @@ function baseInput(overrides = {}) {
 
 test('C7 accepts a complete decision input contract', () => {
   assert.equal(validateNextActionDecisionInput(baseInput()), true);
+});
+
+test('C7 rejects malformed evidence identifiers instead of silently accepting them', () => {
+  assert.throws(
+    () => validateNextActionDecisionInput(baseInput({ supporting_evidence_ids: ['E1', ''] })),
+    /supporting_evidence_ids/
+  );
 });
 
 test('C7 holds when evidence is insufficient', () => {
@@ -123,13 +132,25 @@ test('C7 validates explicit action policy instead of silently inventing permissi
   );
 });
 
-test('C7 decision output preserves evidence and blocks runtime mutation and automatic advancement', () => {
+test('C7 exposes the gate and reason that produced the candidate action', () => {
+  const trace = traceNextActionDecision(baseInput({ evidence_state: 'INSUFFICIENT' }));
+
+  assert.deepEqual(trace, {
+    candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE,
+    decision_reason: DECISION_REASONS.INSUFFICIENT_EVIDENCE,
+    decision_gate: 'A2'
+  });
+});
+
+test('C7 output preserves evidence and blocks runtime mutation and automatic advancement', () => {
   const input = baseInput();
   const result = evaluateC7NextActionDecision(input);
 
   assert.equal(result.claim_id, 'A1.C1');
   assert.equal(result.current_development_id, 'A1.D1');
   assert.equal(result.candidate_action, CANDIDATE_ACTIONS.PRACTICE_NEXT_DEVELOPMENT);
+  assert.equal(result.decision_reason, DECISION_REASONS.NEXT_PRACTICE_AUTHORIZED);
+  assert.equal(result.decision_gate, 'A6');
   assert.deepEqual(result.supporting_evidence_ids, ['E1', 'E2', 'E3']);
   assert.equal(result.registry_promotion_allowed, false);
   assert.equal(result.runtime_state_mutation_allowed, false);

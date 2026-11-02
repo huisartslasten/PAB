@@ -1,10 +1,10 @@
-PacoGO Curriculum — Stap 14 Status
+PacoGO Curriculum — Step 14 / Empirical Validation Layer Status
 Datum: 2026-11-02
 Branch: refactor/professional-v1
 Wetenschappelijke status: Candidate
 
 DOEL
-Decision Trace en Longitudinal State uitbreiden zodat het systeem niet alleen een beslissing kan uitvoeren, maar ook expliciet kan laten zien welke onzekerheid en alternatieve verklaringen aanwezig waren en welke validatie nog nodig is.
+De technische curriculum-engine is nu voorzien van traceerbaarheid, onzekerheid, alternatieve verklaringen en validation hooks. De volgende stap was het expliciet maken van de empirische regels waarmee curriculumclaims ooit van Candidate naar Supported en daarna eventueel naar Validated kunnen bewegen.
 
 AFGEROND
 1. Longitudinal State uitgebreid met:
@@ -24,26 +24,59 @@ AFGEROND
 
 4. Supabase persistent schema uitgebreid met alternative_explanations en validation_hooks.
 
-5. Canonieke migratiebestanden voor longitudinal state/decision trace en de Step-14 uitbreiding zijn nu ook in de repository aanwezig.
+5. Canonieke migratiebestanden voor longitudinal state/decision trace en de Step-14 uitbreiding zijn in de repository aanwezig.
 
 6. A1/B1/FR2 registry-runtime tests uitgebreid met:
    - validation-hook aanwezigheid;
    - alternative explanation propagation;
    - trace propagation.
 
+7. Empirical Validation Protocol v0.1 toegevoegd:
+   - claim is de primaire validatie-eenheid;
+   - expliciete evidence classes;
+   - Candidate -> Supported gate;
+   - Supported -> Validated gate;
+   - C1-C10 inhoudelijk gedefinieerd;
+   - geen automatische statuspromotie;
+   - scope en beperkingen verplicht.
+
+8. Machine-readable Empirical Validation Registry v0.1 toegevoegd:
+   - C1-C10 criteria;
+   - toepasselijkheid per claimtype;
+   - claim-level validation record schema;
+   - promotiegates;
+   - A1/B1/FR2 blijven Candidate.
+
+9. Masterprotocol bijgewerkt van v1.1 naar v1.2 zodat de empirische validatielaag onderdeel is van de duurzame reproduceerbare projectmethode.
+
 WAT DIT WEL BEWIJST
 - technische traceerbaarheid;
 - reproduceerbare provenance per curriculumversie;
 - expliciete opslag van onzekerheid;
 - ondersteuning voor competing explanations;
-- technische voorbereiding op empirische validatie.
+- een expliciet en reproduceerbaar kader voor toekomstig empirisch onderzoek;
+- een machine-readable plaats waar validatiestatus per claim kan worden bijgehouden.
 
 WAT DIT NIET BEWIJST
 - geen constructvaliditeit;
 - geen ontwikkelingsvaliditeit;
 - geen valide mastery cut scores;
 - geen bewezen effectiviteit van next-action keuzes;
+- geen empirische replicatie;
 - geen Supported/Validated status.
 
-VOLGENDE GROTE BLOK
-De volgende stap is niet nog meer runtime-logica omwille van de techniek. Eerst moet de empirische validatie-laag worden geconcretiseerd: per curriculumclaim vastleggen welk bewijs nodig is om Candidate -> Supported en vervolgens eventueel Supported -> Validated te rechtvaardigen. Daarna kunnen C1-C10 echte, expliciet gedefinieerde validatiecriteria krijgen.
+CURRENT
+De technische infrastructuur en het empirische validatiekader zijn voorbereid. De inhoudelijke empirische fase moet nog beginnen.
+
+NEXT — GROTE BLOK
+C1-C3 daadwerkelijk operationaliseren voor een reproduceerbare pilot:
+1. vooraf specificeren welke claims en scope worden getest;
+2. een leerling-/taakdatamodel voor de pilot vastleggen;
+3. een reproduceerbaar evidence-coderingsprotocol maken;
+4. daarna C4-C6 op representatieve claims empirisch testen.
+
+DO NOT REDO
+- opnieuw de generieke engine ontwerpen;
+- opnieuw A1/B1/FR2 als losse hard-coded logica bouwen;
+- Candidate verwarren met Supported/Validated;
+- technische testresultaten gebruiken als bewijs van curriculumvaliditeit.

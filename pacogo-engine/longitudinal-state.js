@@ -2,6 +2,28 @@ function unique(values) {
   return [...new Set(values.filter(Boolean))];
 }
 
+function collectAlternativeExplanations(evidence = []) {
+  const alternatives = [];
+  for (const item of evidence) {
+    const candidates = item.alternative_explanations || item.assessment?.alternative_explanations || [];
+    if (!Array.isArray(candidates)) continue;
+    for (const candidate of candidates) {
+      if (typeof candidate === 'string' && candidate.trim()) {
+        alternatives.push({ label: candidate.trim(), source_event_id: item.id || item.task_instance_id || null });
+      } else if (candidate && typeof candidate === 'object' && candidate.label) {
+        alternatives.push({ ...candidate, source_event_id: candidate.source_event_id || item.id || item.task_instance_id || null });
+      }
+    }
+  }
+  const seen = new Set();
+  return alternatives.filter((item) => {
+    const key = `${item.label}|${item.source_event_id || ''}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function deriveLongitudinalState({
   studentKey,
   skillId,
@@ -11,6 +33,7 @@ function deriveLongitudinalState({
   development = [],
   mastery,
   priorState = null,
+  validationHooks = {},
   asOf = new Date().toISOString()
 }) {
   if (!studentKey) throw new Error('studentKey is required');
@@ -27,6 +50,7 @@ function deriveLongitudinalState({
   const unresolvedDevelopments = development
     .filter((item) => item.status === 'Uncertain' || item.status === 'Contradictory')
     .map((item) => item.development_id);
+  const alternatives = collectAlternativeExplanations(observations);
 
   const lastObservedAt = observations
     .map((item) => item.observed_at)
@@ -45,11 +69,14 @@ function deriveLongitudinalState({
     uncertainty: {
       unresolved_developments: unique(unresolvedDevelopments),
       contradiction_count: contradictions.length,
-      contradiction_ids: contradictions.map((item) => item.id || item.task_instance_id || null).filter(Boolean)
+      contradiction_ids: contradictions.map((item) => item.id || item.task_instance_id || null).filter(Boolean),
+      alternative_explanation_count: alternatives.length
     },
     configured_evidence_targets: configuredTargets,
     observed_targets: observedTargets,
     missing_evidence_targets: missingTargets,
+    alternative_explanations: alternatives,
+    validation_hooks: validationHooks,
     last_observed_at: lastObservedAt
   });
 }
@@ -62,6 +89,8 @@ function explainDecision({ state, decisionRules = {}, nextAction }) {
   let decisionType = 'fill_missing_evidence_coverage';
   if (uncertainty.contradiction_count > 0 && priorities.includes('resolve_developmental_uncertainty')) {
     decisionType = 'resolve_developmental_uncertainty';
+  } else if (uncertainty.alternative_explanation_count > 0 && priorities.includes('resolve_alternative_explanations')) {
+    decisionType = 'resolve_alternative_explanations';
   } else if (masteryStatus === 'MASTERED') {
     decisionType = 'confirm_mastery';
   } else if (state.mastery?.variation < 2 && priorities.includes('test_variation_and_stability')) {
@@ -76,6 +105,8 @@ function explainDecision({ state, decisionRules = {}, nextAction }) {
     evidence_targets: state.observed_targets,
     missing_evidence_targets: state.missing_evidence_targets,
     uncertainty,
+    alternative_explanations: state.alternative_explanations,
+    validation_hooks: state.validation_hooks,
     mastery_status: masteryStatus,
     next_action: nextAction || null
   });
@@ -96,9 +127,11 @@ function createDecisionTrace({ studentKey, skillId, registryVersion, state, deci
       mastery: state.mastery,
       uncertainty: state.uncertainty
     },
+    alternative_explanations: state.alternative_explanations,
+    validation_hooks: state.validation_hooks,
     decision,
     created_at: createdAt
   });
 }
 
-export { deriveLongitudinalState, explainDecision, createDecisionTrace };
+export { deriveLongitudinalState, explainDecision, createDecisionTrace, collectAlternativeExplanations };

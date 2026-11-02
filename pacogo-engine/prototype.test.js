@@ -47,7 +47,7 @@ const result = engine.runCycle({
 });
 
 assert.equal(result.development[0].status, 'Supported');
-assert.equal(result.mastery.status, 'INSUFFICIENT EVIDENCE');
+assert.equal(result.mastery.status, 'NOT YET MASTERED');
 assert.equal(result.next.task_model_id, 'A1.TM3');
 assert.deepEqual(result.next.expected_evidence, ['A1.ET4']);
 

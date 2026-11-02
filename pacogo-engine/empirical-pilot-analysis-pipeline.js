@@ -51,7 +51,7 @@ function runEmpiricalPilotAnalysis({ dataset, manifest, taskSet, analysis, relia
 
   const pilotResult = analysePilot({
     observations: snapshot.observations,
-    codingRecords: snapshot.codingRecords,
+    codingRecords: snapshot.coding_records,
     manifest,
     taskSet,
     analysis
@@ -59,7 +59,7 @@ function runEmpiricalPilotAnalysis({ dataset, manifest, taskSet, analysis, relia
 
   const reliabilitySummaryByClaim = buildReliabilitySummaryByClaim(
     snapshot.observations,
-    snapshot.codingRecords,
+    snapshot.coding_records,
     reliabilityByClaim
   );
 
@@ -70,7 +70,7 @@ function runEmpiricalPilotAnalysis({ dataset, manifest, taskSet, analysis, relia
 
   const report = buildPilotAnalysisReport({
     observations: snapshot.observations,
-    codingRecords: snapshot.codingRecords,
+    codingRecords: snapshot.coding_records,
     analysisResult: pilotResult
   });
 

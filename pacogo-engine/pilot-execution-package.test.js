@@ -36,6 +36,7 @@ test('pilot execution package is deterministic and preserves research boundaries
 test('pilot execution package rejects registry drift before export', async () => {
   const fixture = await readJson('docs/curriculum/PacoGO_W0_Feasibility_Fixture_v0.1.json');
   const invalid = structuredClone(fixture);
+  invalid.task_instances[0].registry_version = 'drifted-version';
   invalid.observations[0].registry_version = 'drifted-version';
 
   assert.throws(() => buildPilotExecutionPackage({

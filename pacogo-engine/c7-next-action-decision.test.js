@@ -116,12 +116,32 @@ test('C7 holds when prerequisite assessment is not authorized', () => {
   );
 });
 
+test('C7 blocks next-development action when prerequisite support is absent', () => {
+  const trace = traceNextActionDecision(baseInput({ prerequisite_state: 'NOT_SUPPORTED' }));
+
+  assert.deepEqual(trace, {
+    candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE,
+    decision_reason: DECISION_REASONS.PREREQUISITE_NOT_SUPPORTED,
+    decision_gate: 'A4'
+  });
+});
+
 test('C7 blocks next-development action when ordering is not supported', () => {
   const trace = traceNextActionDecision(baseInput({ ordering_state: 'NOT_SUPPORTED' }));
 
   assert.deepEqual(trace, {
     candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE,
     decision_reason: DECISION_REASONS.ORDERING_NOT_SUPPORTED,
+    decision_gate: 'A4'
+  });
+});
+
+test('C7 blocks next-development action when ordering remains uncertain', () => {
+  const trace = traceNextActionDecision(baseInput({ ordering_state: 'UNCERTAIN' }));
+
+  assert.deepEqual(trace, {
+    candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE,
+    decision_reason: DECISION_REASONS.ORDERING_UNCERTAIN,
     decision_gate: 'A4'
   });
 });

@@ -1,8 +1,8 @@
 {
   "protocol_id": "C7-NEXT-ACTION-DECISION",
-  "version": "0.1",
+  "version": "0.2",
   "status": "candidate_validation_matrix",
-  "purpose": "Deterministic validation matrix for C7 candidate next-action decisions.",
+  "purpose": "Deterministic validation matrix for C7 candidate next-action decisions using explicit prerequisite and next-development ordering domains.",
   "safety": {
     "registry_promotion_allowed": false,
     "runtime_state_mutation_allowed": false,
@@ -57,36 +57,36 @@
     {
       "id": "C7-T07",
       "description": "Uncertain prerequisite requires prerequisite assessment",
-      "overrides": {"prerequisite_state": "UNCERTAIN"},
+      "overrides": {"prerequisite_ordering_state": "UNCERTAIN"},
       "expected": {"candidate_action": "ASSESS_PREREQUISITE_DEVELOPMENT", "decision_gate": "A4"}
     },
     {
       "id": "C7-T08",
       "description": "Unassessed prerequisite requires prerequisite assessment",
-      "overrides": {"prerequisite_state": "NOT_ASSESSED"},
+      "overrides": {"prerequisite_ordering_state": "NOT_ASSESSED"},
       "expected": {"candidate_action": "ASSESS_PREREQUISITE_DEVELOPMENT", "decision_gate": "A4"}
     },
     {
       "id": "C7-T09",
       "description": "Unsupported prerequisite blocks next-development action",
-      "overrides": {"prerequisite_state": "NOT_SUPPORTED"},
+      "overrides": {"prerequisite_ordering_state": "NOT_SUPPORTED"},
       "expected": {"candidate_action": "HOLD_FOR_MORE_EVIDENCE", "decision_gate": "A4"}
     },
     {
       "id": "C7-T10",
-      "description": "Unsupported ordering blocks next-development action",
-      "overrides": {"ordering_state": "NOT_SUPPORTED"},
+      "description": "Unsupported next-development ordering blocks next-development action",
+      "overrides": {"next_development_ordering_state": "NOT_SUPPORTED"},
       "expected": {"candidate_action": "HOLD_FOR_MORE_EVIDENCE", "decision_gate": "A4"}
     },
     {
       "id": "C7-T11",
-      "description": "Uncertain ordering blocks next-development action",
-      "overrides": {"ordering_state": "UNCERTAIN"},
+      "description": "Uncertain next-development ordering blocks next-development action",
+      "overrides": {"next_development_ordering_state": "UNCERTAIN"},
       "expected": {"candidate_action": "HOLD_FOR_MORE_EVIDENCE", "decision_gate": "A4"}
     },
     {
       "id": "C7-T12",
-      "description": "Supported ordering permits explicitly authorized next practice",
+      "description": "Supported next-development ordering permits explicitly authorized next practice",
       "overrides": {},
       "expected": {"candidate_action": "PRACTICE_NEXT_DEVELOPMENT", "decision_gate": "A6"}
     },
@@ -105,6 +105,15 @@
         "action_policy": {"practice_next_allowed": false, "assess_next_allowed": false}
       },
       "expected": {"candidate_action": "HOLD_FOR_MORE_EVIDENCE", "decision_gate": "A6"}
+    },
+    {
+      "id": "C7-T15",
+      "description": "Next-development uncertainty does not block an independently supported prerequisite assessment",
+      "overrides": {
+        "next_development_ordering_state": "UNCERTAIN",
+        "prerequisite_ordering_state": "NOT_ASSESSED"
+      },
+      "expected": {"candidate_action": "ASSESS_PREREQUISITE_DEVELOPMENT", "decision_gate": "A4"}
     }
   ]
 }

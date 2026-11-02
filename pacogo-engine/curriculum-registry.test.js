@@ -28,7 +28,10 @@ for (const skillId of ['A1', 'B1', 'FR2']) {
   });
   assert.equal(result.assessment.relevant, true);
   assert.equal(result.development[0].status, 'Supported');
-  assert.equal(result.mastery.status, 'INSUFFICIENT EVIDENCE');
+  // INSUFFICIENT EVIDENCE means no usable evidence. Once relevant evidence
+  // exists but mastery criteria are not yet met, the engine reports
+  // NOT YET MASTERED.
+  assert.equal(result.mastery.status, 'NOT YET MASTERED');
   assert.equal(result.next.action_type, 'TASK');
   assert.equal(result.longitudinal_state.curriculum_registry_version, registry.registry_version);
   assert.equal(result.decision_trace.curriculum_registry_version, registry.registry_version);

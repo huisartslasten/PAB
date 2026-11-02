@@ -1,0 +1,59 @@
+{
+  "schema_version": "0.1",
+  "registry_version": "0.1.0-candidate",
+  "status": "candidate",
+  "epistemic_status": ["[O]"],
+  "protocol": "docs/curriculum/PacoGO_Empirical_Validation_Protocol_v0.1.md",
+  "promotion": {
+    "candidate_to_supported": {
+      "rule": "all_applicable_required_criteria_satisfied",
+      "requires_scope": true,
+      "requires_auditable_provenance": true,
+      "requires_alternative_explanation_review": true,
+      "requires_limitations": true,
+      "automatic": false
+    },
+    "supported_to_validated": {
+      "rule": "replication_and_scope_appropriate_stronger_validation",
+      "requires_independent_or_separated_replication": true,
+      "requires_out_of_sample_when_predictive": true,
+      "requires_model_comparison_when_explanatory": true,
+      "requires_context_language_review_when_applicable": true,
+      "automatic": false
+    }
+  },
+  "criteria": [
+    {"id":"C1","name":"Pilot design","domain":"design","default_status":"NOT_RUN","required_for":"applicable_claims"},
+    {"id":"C2","name":"Student data model","domain":"data_provenance","default_status":"NOT_RUN","required_for":"applicable_claims"},
+    {"id":"C3","name":"Evidence coding","domain":"measurement","default_status":"NOT_RUN","required_for":"applicable_claims"},
+    {"id":"C4","name":"Development classification","domain":"construct_development","default_status":"NOT_RUN","required_for":"development_claims"},
+    {"id":"C5","name":"Developmental ordering","domain":"developmental_sequence","default_status":"NOT_RUN","required_for":"ordering_claims"},
+    {"id":"C6","name":"Mastery decisions","domain":"mastery","default_status":"NOT_RUN","required_for":"mastery_claims"},
+    {"id":"C7","name":"Longitudinal validation","domain":"longitudinal","default_status":"NOT_RUN","required_for":"progression_or_prediction_claims"},
+    {"id":"C8","name":"Model comparison","domain":"comparison","default_status":"NOT_RUN","required_for":"explanatory_or_decision_comparison_claims"},
+    {"id":"C9","name":"Bias, context & language","domain":"fairness_context","default_status":"NOT_RUN","required_for":"applicable_claims"},
+    {"id":"C10","name":"Curriculum revision","domain":"revision","default_status":"NOT_RUN","required_for":"all_claims_with_empirical_findings"}
+  ],
+  "claim_validation_record_schema": {
+    "claim_id":"string",
+    "claim_text":"string",
+    "curriculum_registry_version":"string",
+    "validation_status":"Candidate|Supported|Validated",
+    "scope": {"population":"string","context":"string","language":"string"},
+    "applicable_criteria":["C1"],
+    "criterion_results":[{"criterion_id":"C1","status":"NOT_RUN|IN_PROGRESS|SUPPORTED|LIMITED|FAILED","evidence_ids":[],"notes":"string"}],
+    "evidence_records":[],
+    "alternative_explanations":[],
+    "contradictions":[],
+    "limitations":[],
+    "replication": {"status":"NOT_RUN|PARTIAL|REPLICATED","independent_or_separated":false},
+    "revision_decision":"KEEP|MODIFY|SPLIT|MERGE|NARROW|SIMPLIFY|REJECT|NOT_YET",
+    "review_record":"string",
+    "updated_at":"timestamp"
+  },
+  "seed_claim_status": {
+    "A1":"Candidate",
+    "B1":"Candidate",
+    "FR2":"Candidate"
+  }
+}

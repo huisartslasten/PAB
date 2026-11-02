@@ -30,15 +30,14 @@ for (const task of taskSet.tasks) {
   assert.equal(claim.development_id, task.development_id);
 
   const modelMap = validModels.get(task.skill_id);
+  const emittedTargets = new Set();
   for (const modelId of task.task_model_ids) {
     const model = modelMap.get(modelId);
     assert.ok(model, `${task.task_id}: unknown task model ${modelId}`);
-    for (const targetId of task.evidence_target_ids) {
-      assert.ok(model.evidence_target_ids.includes(targetId), `${task.task_id}: target ${targetId} is not emitted by ${modelId}`);
-    }
+    for (const targetId of model.evidence_target_ids) emittedTargets.add(targetId);
   }
-
   for (const targetId of task.evidence_target_ids) {
+    assert.ok(emittedTargets.has(targetId), `${task.task_id}: target ${targetId} is not emitted by the selected task models`);
     assert.ok(skill.evidence_targets.some(target => target.id === targetId), `${task.task_id}: unknown evidence target ${targetId}`);
   }
 

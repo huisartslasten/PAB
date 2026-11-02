@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — FR2 Breukequivalentie</title>
+  <style>
+    :root{font-family:Nunito,system-ui,sans-serif;color:#102b57;background:#f5f9fd}
+    body{margin:0;padding:32px;min-height:100vh;box-sizing:border-box}
+    main{max-width:980px;margin:0 auto;display:grid;gap:18px}
+    .card{background:#fff;border:1px solid #d8e7f4;border-radius:22px;padding:24px;box-shadow:0 8px 24px rgba(16,43,87,.07)}
+    h1,h2{margin:0} h1{font-size:30px} h2{font-size:21px}
+    .muted{color:#647894;line-height:1.5}
+    .target{display:flex;align-items:center;justify-content:center;gap:10px;font-size:28px;font-weight:900;padding:18px;border-radius:16px;background:#eef7ff}
+    .fraction{display:inline-grid;grid-template-rows:1fr 2px 1fr;min-width:58px;text-align:center;line-height:1.1}
+    .fraction .bar{background:currentColor}
+    .options{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+    .option{min-height:120px;border:2px solid #d8e7f4;border-radius:18px;background:#fbfdff;color:#102b57;cursor:pointer;font:900 20px Nunito,system-ui,sans-serif}
+    .option.selected{border-color:#1787f2;background:#eef7ff;box-shadow:0 0 0 4px rgba(23,135,242,.12)}
+    .actions{display:flex;justify-content:center;gap:10px;margin-top:16px}
+    button{border:0;border-radius:14px;padding:12px 20px;font:900 15px Nunito,system-ui,sans-serif;cursor:pointer;background:#1787f2;color:#fff}
+    button:disabled{opacity:.5;cursor:not-allowed}
+    .status{font-weight:900;padding:12px 14px;border-radius:14px;background:#eef8ff;color:#126fc9}
+    .status.error{background:#fff0f0;color:#b42318}
+    pre{margin:10px 0 0;white-space:pre-wrap;background:#f5f9fd;border-radius:14px;padding:14px;font:700 13px/1.5 ui-monospace,monospace}
+  </style>
+</head>
+<body>
+<main>
+  <section class="card">
+    <div class="muted">PacoGO • FR2 • Breukequivalentie herkennen en gebruiken</div>
+    <h1>Welke breuk heeft dezelfde waarde?</h1>
+    <p class="muted">Kies de breuk die dezelfde waarde vertegenwoordigt als de doelbreuk.</p>
+    <div class="target"><span class="fraction"><span>1</span><span class="bar"></span><span>2</span></span></div>
+    <div id="options" class="options"></div>
+    <div class="actions"><button id="submit" type="button">Controleren</button></div>
+  </section>
+  <section class="card">
+    <h2>Wat PacoGO heeft waargenomen</h2>
+    <div id="status" class="status">Kies eerst een antwoord.</div>
+    <pre id="trace">Nog geen observatie.</pre>
+  </section>
+</main>
+<script type="module">
+  import { createCurriculumRegistry } from './pacogo-engine/curriculum-registry.js';
+  import { createFractionEquivalenceController } from './pacogo-engine/fraction-equivalence-controller.js';
+
+  const registryConfig = await fetch('./docs/curriculum/PacoGO_Curriculum_Registry_v0.2.json').then(response => response.json());
+  const taskSet = await fetch('./docs/curriculum/PacoGO_Pilot_TaskSet_v0.1.json').then(response => response.json());
+  const registry = createCurriculumRegistry(registryConfig);
+  const task = taskSet.tasks.find(item => item.task_id === 'FR2-T02');
+  const options = [
+    { id: 'opt-a', fraction: { numerator: 3, denominator: 5 } },
+    { id: 'opt-b', fraction: { numerator: 4, denominator: 8 } },
+    { id: 'opt-c', fraction: { numerator: 2, denominator: 3 } }
+  ];
+  const controller = createFractionEquivalenceController({
+    task,
+    studentKey: 'browser-synthetic-fr2',
+    renderer: {},
+    targetFraction: { numerator: 1, denominator: 2 },
+    options,
+    provenance: { page: 'curriculum-fr2-fractions.html' }
+  });
+
+  const optionLabel = fraction => `<span class="fraction"><span>${fraction.numerator}</span><span class="bar"></span><span>${fraction.denominator}</span></span>`;
+  const optionHost = document.querySelector('#options');
+  const status = document.querySelector('#status');
+  const trace = document.querySelector('#trace');
+
+  options.forEach(option => {
+    const button = document.createElement('button');
+    button.className = 'option';
+    button.type = 'button';
+    button.dataset.optionId = option.id;
+    button.innerHTML = optionLabel(option.fraction);
+    button.addEventListener('click', () => {
+      controller.selectOption(option.id, 'browser');
+      optionHost.querySelectorAll('.option').forEach(item => item.classList.toggle('selected', item === button));
+      status.textContent = 'Antwoord geselecteerd. Controleer wanneer je klaar bent.';
+    });
+    optionHost.appendChild(button);
+  });
+
+  document.querySelector('#submit').addEventListener('click', () => {
+    try {
+      const { evaluation, observation } = controller.submit();
+      const cycle = registry.runSkillCycle({
+        studentKey: observation.student_key,
+        skillId: observation.skill_id,
+        observation,
+        priorEvidence: [],
+        asOf: observation.observed_at
+      });
+      status.textContent = evaluation.correct
+        ? `Goed. De observatie gaat door naar de PacoGO-leerengine. Volgende stap: ${cycle.next?.action || 'bepalen'}.`
+        : 'Niet equivalent. Ook deze observatie gaat als informatie naar de leerengine.';
+      trace.textContent = JSON.stringify({
+        observation_id: observation.observation_id,
+        registry_version: registry.registry_version,
+        evidence_count: cycle.evidence.length,
+        mastery: cycle.mastery,
+        next: cycle.next,
+        decision: cycle.decision_trace.decision,
+        interaction_event_count: observation.interaction_events.length
+      }, null, 2);
+      document.querySelector('#submit').disabled = true;
+    } catch (error) {
+      status.textContent = error.message;
+      status.className = 'status error';
+    }
+  });
+</script>
+</body>
+</html>

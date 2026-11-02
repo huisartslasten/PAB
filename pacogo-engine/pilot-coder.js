@@ -14,6 +14,11 @@ function normalizePilotObservation(raw) {
   const codedQuality = Number(coding.quality);
   const evidenceStatus = coding.evidence_status;
 
+  // Preserve the pilot observation identity at the engine boundary. The
+  // decision trace is required to point back to the immutable observation.
+  const observationId = raw.observation_id || raw.id;
+  if (!observationId) throw new TypeError('observation.observation_id is required');
+
   // The pilot codebook distinguishes observed evidence from absent or
   // indeterminate evidence. The generic engine represents that distinction
   // through evidence=true/false, so only PRESENT coding contributes quality.
@@ -21,6 +26,8 @@ function normalizePilotObservation(raw) {
 
   const normalized = {
     ...raw,
+    id: observationId,
+    observation_id: observationId,
     quality: engineQuality,
     coded_quality: codedQuality,
     contradiction: Boolean(coding.contradiction),

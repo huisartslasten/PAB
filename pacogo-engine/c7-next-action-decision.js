@@ -61,6 +61,8 @@ function assert(condition, message) {
 
 function validateNextActionDecisionInput(input) {
   assert(input && typeof input === 'object', 'C7 next-action decision input must be an object.');
+  assert(!Object.hasOwn(input, 'ordering_state'), 'C7 no longer accepts ambiguous ordering_state; provide next_development_ordering_state.');
+  assert(!Object.hasOwn(input, 'prerequisite_state'), 'C7 no longer accepts ambiguous prerequisite_state; provide prerequisite_ordering_state.');
   assert(typeof input.claim_id === 'string' && input.claim_id.length > 0, 'C7 input requires claim_id.');
   assert(typeof input.current_development_id === 'string' && input.current_development_id.length > 0, 'C7 input requires current_development_id.');
   assert(typeof input.mastery_state === 'string' && VALID_MASTERY_STATES.has(input.mastery_state), `Invalid C7 mastery_state: ${input.mastery_state}`);

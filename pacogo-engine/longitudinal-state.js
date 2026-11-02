@@ -7,6 +7,7 @@ function deriveLongitudinalState({
   skillId,
   registryVersion,
   evidence = [],
+  evidenceTargetIds = [],
   development = [],
   mastery,
   priorState = null,
@@ -17,15 +18,15 @@ function deriveLongitudinalState({
   if (!registryVersion) throw new Error('registryVersion is required');
 
   const observations = evidence.filter((item) => item.assessment);
+  const observedTargets = unique(
+    observations.filter((item) => item.assessment.evidence).map((item) => item.evidence_target_id)
+  );
+  const configuredTargets = unique(evidenceTargetIds);
+  const missingTargets = configuredTargets.filter((id) => !observedTargets.includes(id));
   const contradictions = observations.filter((item) => item.assessment.contradiction);
   const unresolvedDevelopments = development
     .filter((item) => item.status === 'Uncertain' || item.status === 'Contradictory')
     .map((item) => item.development_id);
-  const missingTargets = unique(
-    (priorState?.missing_evidence_targets || []).concat(
-      observations.map((item) => item.evidence_target_id)
-    )
-  );
 
   const lastObservedAt = observations
     .map((item) => item.observed_at)
@@ -46,16 +47,14 @@ function deriveLongitudinalState({
       contradiction_count: contradictions.length,
       contradiction_ids: contradictions.map((item) => item.id || item.task_instance_id || null).filter(Boolean)
     },
-    observed_targets: unique(observations.filter((item) => item.assessment.evidence).map((item) => item.evidence_target_id)),
+    configured_evidence_targets: configuredTargets,
+    observed_targets: observedTargets,
+    missing_evidence_targets: missingTargets,
     last_observed_at: lastObservedAt
   });
 }
 
-function explainDecision({
-  state,
-  decisionRules = {},
-  nextAction
-}) {
+function explainDecision({ state, decisionRules = {}, nextAction }) {
   const uncertainty = state.uncertainty || {};
   const masteryStatus = state.mastery?.status || 'INSUFFICIENT EVIDENCE';
   const priorities = decisionRules.priority_order || [];
@@ -75,21 +74,14 @@ function explainDecision({
     priority_order: priorities,
     evidence_count: state.evidence_count,
     evidence_targets: state.observed_targets,
+    missing_evidence_targets: state.missing_evidence_targets,
     uncertainty,
     mastery_status: masteryStatus,
     next_action: nextAction || null
   });
 }
 
-function createDecisionTrace({
-  studentKey,
-  skillId,
-  registryVersion,
-  state,
-  decision,
-  observationIds = [],
-  createdAt = new Date().toISOString()
-}) {
+function createDecisionTrace({ studentKey, skillId, registryVersion, state, decision, observationIds = [], createdAt = new Date().toISOString() }) {
   if (!studentKey || !skillId || !registryVersion) {
     throw new Error('studentKey, skillId and registryVersion are required');
   }
@@ -109,8 +101,4 @@ function createDecisionTrace({
   });
 }
 
-export {
-  deriveLongitudinalState,
-  explainDecision,
-  createDecisionTrace
-};
+export { deriveLongitudinalState, explainDecision, createDecisionTrace };

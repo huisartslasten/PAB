@@ -97,6 +97,8 @@ geen verantwoordelijke kandidaatactie
 
 De exacte keuze tussen assessen en oefenen moet door een expliciet aangeleverde action policy worden bepaald; C7 raadt dit niet zelf uit prestatiegegevens.
 
+Elke decision trace moet intern coherent zijn: `candidate_action`, `decision_reason` en `decision_gate` moeten samen een geldige C7-combinatie vormen. Een trace die deze contractuele samenhang niet heeft, mag niet als C7-uitkomst worden teruggegeven.
+
 ## 6. Belangrijke grens
 
 C7 is nadrukkelijk niet hetzelfde als een aanbevelingsalgoritme dat zelfstandig nieuwe onderwijsstappen bedenkt.
@@ -106,7 +108,8 @@ C7 mag:
 - expliciete state combineren;
 - expliciete candidate actions vergelijken;
 - redenen en gebruikte evidence zichtbaar maken;
-- een deterministische kandidaatactie opleveren.
+- een deterministische kandidaatactie opleveren;
+- de interne coherentie van de decision trace controleren.
 
 C7 mag niet:
 

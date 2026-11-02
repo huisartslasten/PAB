@@ -1,13 +1,5 @@
+import { CANDIDATE_ACTIONS } from './c7-contracts.js';
 import { validateC7ActionPolicy } from './c7-action-policy.js';
-
-const CANDIDATE_ACTIONS = Object.freeze({
-  REASSESS_CURRENT_DEVELOPMENT: 'REASSESS_CURRENT_DEVELOPMENT',
-  PRACTICE_CURRENT_DEVELOPMENT: 'PRACTICE_CURRENT_DEVELOPMENT',
-  ASSESS_PREREQUISITE_DEVELOPMENT: 'ASSESS_PREREQUISITE_DEVELOPMENT',
-  ASSESS_NEXT_DEVELOPMENT: 'ASSESS_NEXT_DEVELOPMENT',
-  PRACTICE_NEXT_DEVELOPMENT: 'PRACTICE_NEXT_DEVELOPMENT',
-  HOLD_FOR_MORE_EVIDENCE: 'HOLD_FOR_MORE_EVIDENCE'
-});
 
 const DECISION_REASONS = Object.freeze({
   INVALID_OR_INCOMPLETE_STATE: 'INVALID_OR_INCOMPLETE_STATE',
@@ -38,18 +30,12 @@ const VALID_TRACE_GATES = new Set(['A2', 'A3', 'A4', 'A5', 'A6']);
 
 const VALID_TRACE_REASON_BY_ACTION = Object.freeze({
   HOLD_FOR_MORE_EVIDENCE: new Set([
-    DECISION_REASONS.INSUFFICIENT_EVIDENCE,
-    DECISION_REASONS.MASTERY_NOT_ASSESSED,
-    DECISION_REASONS.ORDERING_NOT_ASSESSED,
-    DECISION_REASONS.ORDERING_NOT_SUPPORTED,
-    DECISION_REASONS.ORDERING_UNCERTAIN,
-    DECISION_REASONS.ALTERNATIVES_NOT_ASSESSED,
-    DECISION_REASONS.CONTRADICTION_REQUIRES_REASSESSMENT,
-    DECISION_REASONS.ALTERNATIVES_UNRESOLVED,
-    DECISION_REASONS.CURRENT_PRACTICE_NOT_AUTHORIZED,
-    DECISION_REASONS.PREREQUISITE_ASSESSMENT_NOT_AUTHORIZED,
-    DECISION_REASONS.PREREQUISITE_NOT_SUPPORTED,
-    DECISION_REASONS.NEXT_ACTION_NOT_AUTHORIZED
+    DECISION_REASONS.INSUFFICIENT_EVIDENCE, DECISION_REASONS.MASTERY_NOT_ASSESSED,
+    DECISION_REASONS.ORDERING_NOT_ASSESSED, DECISION_REASONS.ORDERING_NOT_SUPPORTED,
+    DECISION_REASONS.ORDERING_UNCERTAIN, DECISION_REASONS.ALTERNATIVES_NOT_ASSESSED,
+    DECISION_REASONS.CONTRADICTION_REQUIRES_REASSESSMENT, DECISION_REASONS.ALTERNATIVES_UNRESOLVED,
+    DECISION_REASONS.CURRENT_PRACTICE_NOT_AUTHORIZED, DECISION_REASONS.PREREQUISITE_ASSESSMENT_NOT_AUTHORIZED,
+    DECISION_REASONS.PREREQUISITE_NOT_SUPPORTED, DECISION_REASONS.NEXT_ACTION_NOT_AUTHORIZED
   ]),
   REASSESS_CURRENT_DEVELOPMENT: new Set([DECISION_REASONS.CONTRADICTION_REQUIRES_REASSESSMENT, DECISION_REASONS.ALTERNATIVES_UNRESOLVED]),
   PRACTICE_CURRENT_DEVELOPMENT: new Set([DECISION_REASONS.CURRENT_DEVELOPMENT_NOT_MASTERED]),
@@ -58,9 +44,7 @@ const VALID_TRACE_REASON_BY_ACTION = Object.freeze({
   PRACTICE_NEXT_DEVELOPMENT: new Set([DECISION_REASONS.NEXT_PRACTICE_AUTHORIZED])
 });
 
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
+function assert(condition, message) { if (!condition) throw new Error(message); }
 
 function validateNextActionDecisionInput(input) {
   assert(input && typeof input === 'object', 'C7 next-action decision input must be an object.');
@@ -83,56 +67,36 @@ function validateNextActionDecisionTrace(trace) {
   assert(Object.values(CANDIDATE_ACTIONS).includes(trace.candidate_action), `Invalid C7 candidate_action: ${trace.candidate_action}`);
   assert(Object.values(DECISION_REASONS).includes(trace.decision_reason), `Invalid C7 decision_reason: ${trace.decision_reason}`);
   assert(VALID_TRACE_GATES.has(trace.decision_gate), `Invalid C7 decision_gate: ${trace.decision_gate}`);
-  const allowedReasons = VALID_TRACE_REASON_BY_ACTION[trace.candidate_action];
-  assert(allowedReasons.has(trace.decision_reason), 'C7 decision trace contains an invalid action/reason combination.');
+  assert(VALID_TRACE_REASON_BY_ACTION[trace.candidate_action].has(trace.decision_reason), 'C7 decision trace contains an invalid action/reason combination.');
   return true;
 }
 
 function traceNextActionDecision(input) {
   validateNextActionDecisionInput(input);
-  const policy = input.action_policy;
+  const p = input.action_policy;
   let trace;
-
-  if (input.evidence_state !== 'SUFFICIENT') {
-    trace = { candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: DECISION_REASONS.INSUFFICIENT_EVIDENCE, decision_gate: 'A2' };
-  } else if (input.mastery_state === 'INSUFFICIENT EVIDENCE' || input.mastery_state === 'NOT ASSESSED') {
-    trace = { candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: DECISION_REASONS.MASTERY_NOT_ASSESSED, decision_gate: 'A3' };
-  } else if (input.ordering_state === 'NOT_ASSESSED') {
-    trace = { candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: DECISION_REASONS.ORDERING_NOT_ASSESSED, decision_gate: 'A4' };
-  } else if (input.alternative_state === 'NOT_ASSESSED') {
-    trace = { candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: DECISION_REASONS.ALTERNATIVES_NOT_ASSESSED, decision_gate: 'A5' };
-  } else if (input.mastery_state === 'CONTRADICTORY') {
-    trace = { candidate_action: policy.reassess_current_allowed ? CANDIDATE_ACTIONS.REASSESS_CURRENT_DEVELOPMENT : CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: DECISION_REASONS.CONTRADICTION_REQUIRES_REASSESSMENT, decision_gate: 'A5' };
-  } else if (input.alternative_state === 'UNRESOLVED') {
-    trace = { candidate_action: policy.reassess_current_allowed ? CANDIDATE_ACTIONS.REASSESS_CURRENT_DEVELOPMENT : CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: DECISION_REASONS.ALTERNATIVES_UNRESOLVED, decision_gate: 'A5' };
-  } else if (input.mastery_state === 'NOT YET MASTERED') {
-    trace = { candidate_action: policy.practice_current_allowed ? CANDIDATE_ACTIONS.PRACTICE_CURRENT_DEVELOPMENT : CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: policy.practice_current_allowed ? DECISION_REASONS.CURRENT_DEVELOPMENT_NOT_MASTERED : DECISION_REASONS.CURRENT_PRACTICE_NOT_AUTHORIZED, decision_gate: 'A6' };
-  } else if (input.mastery_state === 'MASTERED' && input.prerequisite_state === 'UNCERTAIN') {
-    trace = { candidate_action: policy.assess_prerequisite_allowed ? CANDIDATE_ACTIONS.ASSESS_PREREQUISITE_DEVELOPMENT : CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: policy.assess_prerequisite_allowed ? DECISION_REASONS.PREREQUISITE_UNCERTAIN : DECISION_REASONS.PREREQUISITE_ASSESSMENT_NOT_AUTHORIZED, decision_gate: 'A4' };
-  } else if (input.mastery_state === 'MASTERED' && input.prerequisite_state === 'NOT_ASSESSED') {
-    trace = { candidate_action: policy.assess_prerequisite_allowed ? CANDIDATE_ACTIONS.ASSESS_PREREQUISITE_DEVELOPMENT : CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: policy.assess_prerequisite_allowed ? DECISION_REASONS.PREREQUISITE_NOT_ASSESSED : DECISION_REASONS.PREREQUISITE_ASSESSMENT_NOT_AUTHORIZED, decision_gate: 'A4' };
-  } else if (input.mastery_state === 'MASTERED' && input.prerequisite_state === 'NOT_SUPPORTED') {
-    trace = { candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: DECISION_REASONS.PREREQUISITE_NOT_SUPPORTED, decision_gate: 'A4' };
-  } else if (input.mastery_state === 'MASTERED' && input.ordering_state === 'NOT_SUPPORTED') {
-    trace = { candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: DECISION_REASONS.ORDERING_NOT_SUPPORTED, decision_gate: 'A4' };
-  } else if (input.mastery_state === 'MASTERED' && input.ordering_state === 'UNCERTAIN') {
-    trace = { candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: DECISION_REASONS.ORDERING_UNCERTAIN, decision_gate: 'A4' };
-  } else if (input.mastery_state === 'MASTERED' && input.ordering_state === 'SUPPORTED') {
-    if (policy.practice_next_allowed) {
-      trace = { candidate_action: CANDIDATE_ACTIONS.PRACTICE_NEXT_DEVELOPMENT, decision_reason: DECISION_REASONS.NEXT_PRACTICE_AUTHORIZED, decision_gate: 'A6' };
-    } else if (policy.assess_next_allowed) {
-      trace = { candidate_action: CANDIDATE_ACTIONS.ASSESS_NEXT_DEVELOPMENT, decision_reason: DECISION_REASONS.NEXT_ASSESSMENT_AUTHORIZED, decision_gate: 'A6' };
-    }
+  if (input.evidence_state !== 'SUFFICIENT') trace = { candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: DECISION_REASONS.INSUFFICIENT_EVIDENCE, decision_gate: 'A2' };
+  else if (input.mastery_state === 'INSUFFICIENT EVIDENCE' || input.mastery_state === 'NOT ASSESSED') trace = { candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: DECISION_REASONS.MASTERY_NOT_ASSESSED, decision_gate: 'A3' };
+  else if (input.ordering_state === 'NOT_ASSESSED') trace = { candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: DECISION_REASONS.ORDERING_NOT_ASSESSED, decision_gate: 'A4' };
+  else if (input.alternative_state === 'NOT_ASSESSED') trace = { candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: DECISION_REASONS.ALTERNATIVES_NOT_ASSESSED, decision_gate: 'A5' };
+  else if (input.mastery_state === 'CONTRADICTORY') trace = { candidate_action: p.reassess_current_allowed ? CANDIDATE_ACTIONS.REASSESS_CURRENT_DEVELOPMENT : CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: DECISION_REASONS.CONTRADICTION_REQUIRES_REASSESSMENT, decision_gate: 'A5' };
+  else if (input.alternative_state === 'UNRESOLVED') trace = { candidate_action: p.reassess_current_allowed ? CANDIDATE_ACTIONS.REASSESS_CURRENT_DEVELOPMENT : CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: DECISION_REASONS.ALTERNATIVES_UNRESOLVED, decision_gate: 'A5' };
+  else if (input.mastery_state === 'NOT YET MASTERED') trace = { candidate_action: p.practice_current_allowed ? CANDIDATE_ACTIONS.PRACTICE_CURRENT_DEVELOPMENT : CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: p.practice_current_allowed ? DECISION_REASONS.CURRENT_DEVELOPMENT_NOT_MASTERED : DECISION_REASONS.CURRENT_PRACTICE_NOT_AUTHORIZED, decision_gate: 'A6' };
+  else if (input.mastery_state === 'MASTERED' && input.prerequisite_state === 'UNCERTAIN') trace = { candidate_action: p.assess_prerequisite_allowed ? CANDIDATE_ACTIONS.ASSESS_PREREQUISITE_DEVELOPMENT : CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: p.assess_prerequisite_allowed ? DECISION_REASONS.PREREQUISITE_UNCERTAIN : DECISION_REASONS.PREREQUISITE_ASSESSMENT_NOT_AUTHORIZED, decision_gate: 'A4' };
+  else if (input.mastery_state === 'MASTERED' && input.prerequisite_state === 'NOT_ASSESSED') trace = { candidate_action: p.assess_prerequisite_allowed ? CANDIDATE_ACTIONS.ASSESS_PREREQUISITE_DEVELOPMENT : CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: p.assess_prerequisite_allowed ? DECISION_REASONS.PREREQUISITE_NOT_ASSESSED : DECISION_REASONS.PREREQUISITE_ASSESSMENT_NOT_AUTHORIZED, decision_gate: 'A4' };
+  else if (input.mastery_state === 'MASTERED' && input.prerequisite_state === 'NOT_SUPPORTED') trace = { candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: DECISION_REASONS.PREREQUISITE_NOT_SUPPORTED, decision_gate: 'A4' };
+  else if (input.mastery_state === 'MASTERED' && input.ordering_state === 'NOT_SUPPORTED') trace = { candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: DECISION_REASONS.ORDERING_NOT_SUPPORTED, decision_gate: 'A4' };
+  else if (input.mastery_state === 'MASTERED' && input.ordering_state === 'UNCERTAIN') trace = { candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: DECISION_REASONS.ORDERING_UNCERTAIN, decision_gate: 'A4' };
+  else if (input.mastery_state === 'MASTERED' && input.ordering_state === 'SUPPORTED') {
+    if (p.practice_next_allowed) trace = { candidate_action: CANDIDATE_ACTIONS.PRACTICE_NEXT_DEVELOPMENT, decision_reason: DECISION_REASONS.NEXT_PRACTICE_AUTHORIZED, decision_gate: 'A6' };
+    else if (p.assess_next_allowed) trace = { candidate_action: CANDIDATE_ACTIONS.ASSESS_NEXT_DEVELOPMENT, decision_reason: DECISION_REASONS.NEXT_ASSESSMENT_AUTHORIZED, decision_gate: 'A6' };
   }
-
   if (!trace) trace = { candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE, decision_reason: DECISION_REASONS.NEXT_ACTION_NOT_AUTHORIZED, decision_gate: 'A6' };
   validateNextActionDecisionTrace(trace);
   return trace;
 }
 
-function decideNextAction(input) {
-  return traceNextActionDecision(input).candidate_action;
-}
+function decideNextAction(input) { return traceNextActionDecision(input).candidate_action; }
 
 function evaluateC7NextActionDecision(input) {
   const trace = traceNextActionDecision(input);
@@ -150,16 +114,4 @@ function evaluateC7NextActionDecision(input) {
   };
 }
 
-export {
-  CANDIDATE_ACTIONS,
-  DECISION_REASONS,
-  VALID_MASTERY_STATES,
-  VALID_EVIDENCE_STATES,
-  VALID_ORDERING_STATES,
-  VALID_ALTERNATIVE_STATES,
-  validateNextActionDecisionInput,
-  validateNextActionDecisionTrace,
-  traceNextActionDecision,
-  decideNextAction,
-  evaluateC7NextActionDecision
-};
+export { CANDIDATE_ACTIONS, DECISION_REASONS, VALID_MASTERY_STATES, VALID_EVIDENCE_STATES, VALID_ORDERING_STATES, VALID_ALTERNATIVE_STATES, validateNextActionDecisionInput, validateNextActionDecisionTrace, traceNextActionDecision, decideNextAction, evaluateC7NextActionDecision };

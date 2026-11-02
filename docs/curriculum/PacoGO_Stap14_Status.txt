@@ -4,7 +4,7 @@ Branch: refactor/professional-v1
 Wetenschappelijke status: Candidate
 
 DOEL
-De technische curriculum-engine is voorzien van traceerbaarheid, onzekerheid, alternatieve verklaringen en validation hooks. Het empirische validatiekader is vastgelegd en C1-C3 is nu geoperationaliseerd tot en met een concrete pre-specified task set en synthetische testdataset.
+De technische curriculum-engine is voorzien van traceerbaarheid, onzekerheid, alternatieve verklaringen en validation hooks. Het empirische validatiekader is vastgelegd en C1-C3 is nu geoperationaliseerd tot en met een concrete pre-specified task set, synthetische testdataset en pilot-ready collection package.
 
 AFGEROND
 1. Longitudinal State uitgebreid met observed/missing evidence targets, contradictions, unresolved developments, alternative explanations en validation-hook status.
@@ -16,22 +16,14 @@ AFGEROND
 7. Empirical Validation Protocol v0.1 toegevoegd met claim-level Candidate -> Supported -> Validated gates.
 8. Machine-readable Empirical Validation Registry v0.1 toegevoegd.
 9. Masterprotocol bijgewerkt naar v1.2.
-10. C1 Pilot Protocol v0.1 toegevoegd:
-    - measurement-development pilot, geen effectiviteitsbewijs;
-    - pre-specified hypotheses;
-    - sampling/scope registratie;
-    - observation unit Student × Time × Task × Response × Evidence;
-    - taakvariatie;
-    - response-process evidence;
-    - rater/coder procedure;
-    - analyse- en revisiesequentie;
-    - stopping/revision rules.
-11. C2 Pilot Data Schema v0.1 toegevoegd met versioned provenance, performance, context, coding en privacy/integrity rules.
-12. C3 Evidence Coding Manual v0.1 toegevoegd met reproduceerbare codes voor evidence status, target match, quality, independence, contradiction en alternative explanations.
-13. De pilotopzet is inhoudelijk afgestemd op algemene testing/measurement-principes: eerst construct/measurement-evidence voldoende interpreteerbaar maken, daarna zwaardere validiteitsclaims toetsen.
-14. Concrete pre-specified pilot task set v0.1 toegevoegd voor A1, B1 en FR2, met task→claim→development→evidence-target koppeling, variatie, promptniveau, response-process eisen en counter/alternative-explanation tasks.
-15. Synthetische pilotdataset v0.1 toegevoegd met fixtures voor PRESENT, ABSENT, INDETERMINATE, contradiction, alternative explanations, variation, prompted/independent en target mismatch. Dataset is expliciet niet-empirisch.
-16. C1-C3 artifact test specification v0.1 toegevoegd met reproduceerbare integriteitscontroles voor de pilotartefacten.
+10. C1 Pilot Protocol v0.1 toegevoegd.
+11. C2 Pilot Data Schema v0.1 toegevoegd.
+12. C3 Evidence Coding Manual v0.1 toegevoegd.
+13. Concrete pre-specified pilot task set v0.1 toegevoegd voor A1, B1 en FR2, met task→claim→development→evidence-target koppeling, variatie, promptniveau, response-process eisen en counter/alternative-explanation tasks.
+14. Synthetische pilotdataset v0.1 toegevoegd met fixtures voor PRESENT, ABSENT, INDETERMINATE, contradiction, alternative explanations, variation, prompted/independent en target mismatch. Dataset is expliciet niet-empirisch.
+15. De eerste interface-audit van dataset → engine liet een concreet technisch verschil zien: pilotcodering staat genest onder `coding`, terwijl de generieke engine genormaliseerde velden verwacht. Dit is opgelost met `pacogo-engine/pilot-coder.js`, zonder de wetenschappelijke coderingsregels te wijzigen.
+16. Adaptertests toegevoegd voor de volledige set van 9 synthetische observaties, inclusief prompted/independent, contradiction, indeterminate en alternative-explanation fixtures.
+17. Pilot Task Package v0.1 toegevoegd met collectievolgorde, uitvoeringsregels, data-quality gates, coderingsvolgorde en voorwaarden voor overgang naar C4.
 
 WAT DIT WEL BEWIJST
 - technische traceerbaarheid;
@@ -39,8 +31,9 @@ WAT DIT WEL BEWIJST
 - expliciete opslag van onzekerheid;
 - ondersteuning voor competing explanations;
 - een expliciet en reproduceerbaar kader voor toekomstig empirisch onderzoek;
-- een concreet pilotontwerp en data/coderingscontract voor C1-C3;
-- een eerste vaste task set en synthetische fixtures waarmee de C1-C3 keten technisch kan worden getest.
+- een vaste task set en synthetische fixtures;
+- een expliciete adapter tussen pilotcodering en de generieke engine;
+- een pilot-ready collectie- en coderingspakket.
 
 WAT DIT NIET BEWIJST
 - geen constructvaliditeit;
@@ -49,16 +42,18 @@ WAT DIT NIET BEWIJST
 - geen bewezen effectiviteit van next-action keuzes;
 - geen empirische replicatie;
 - geen Supported/Validated status;
-- synthetische testdata zijn geen leerlingdata en geen wetenschappelijk bewijs.
+- synthetische testdata zijn geen leerlingdata en geen wetenschappelijk bewijs;
+- de synthetische dataset is in deze omgeving nog niet als uitvoerende Node-test gedraaid; de fixtures en uitvoerbare test zijn wel vastgelegd.
 
 CURRENT
-De methodologische laag is nu ver genoeg uitgewerkt om een eerste echte pilotdataset te kunnen verzamelen/coderen zonder de onderzoeksregels tijdens het verzamelen te verzinnen. De task set en synthetische fixtures zijn nu vooraf vastgelegd zodat technische problemen vóór echte dataverzameling kunnen worden opgespoord.
+De C1-C3-methodologische laag en het pilot collection package zijn voldoende gespecificeerd om echte pilotdata te kunnen verzamelen zonder de onderzoeksregels tijdens de verzameling te verzinnen. De technische dataset→coding-interface is expliciet gemaakt. De volgende stap is een echte end-to-end runtime-test van de synthetische dataset wanneer de repository in een Node-omgeving wordt uitgevoerd.
 
 NEXT — GROTE BLOK
-1. De synthetische dataset daadwerkelijk door de C1-C3 technische keten laten lopen en de fixtures controleren tegen task set + data schema + coding manual.
-2. Eventuele schema-/engine-mismatches repareren zonder de wetenschappelijke regels achteraf aan te passen.
-3. Daarna een eerste **echte pilot-ready task package** maken: definitieve taakdefinities, scoring/coderingsinstructies en dataverzamelingsformulier voor één gecontroleerde pilot.
-4. Pas daarna C4 operationaliseren: development classification, zonder A1/B1/FR2 voortijdig als bewezen ontwikkelingsstructuren te behandelen.
+1. End-to-end uitvoeren van alle synthetische observaties via pilot-coder → curriculum registry runtime → longitudinal state → decision trace.
+2. Controleren dat elk fixturetype de verwachte technische uitkomst geeft.
+3. Eventuele runtime-mismatches repareren zonder wetenschappelijke regels achteraf te wijzigen.
+4. Daarna C4 operationaliseren: development classification, met expliciete toetsing van ontwikkelingsonderscheidingen.
+5. A1/B1/FR2 blijven Candidate totdat empirische criteria daadwerkelijk zijn gehaald.
 
 DO NOT REDO
 - opnieuw de generieke engine ontwerpen;

@@ -117,7 +117,7 @@ De browserregressie rapporteerde geen browser errors.
 
 ## 6. C5 — developmental ordering en prerequisites
 
-Na C4 is nu een aparte C5-laag toegevoegd. C5 is bewust **niet** als uitbreiding van C4 of als runtime-regel gebouwd.
+Na C4 is een aparte C5-laag toegevoegd. C5 is bewust **niet** als uitbreiding van C4 of als runtime-regel gebouwd.
 
 Toegevoegd:
 
@@ -125,28 +125,59 @@ Toegevoegd:
 - `docs/curriculum/PacoGO_C5_Ordering_Hypothesis_Matrix_v0.1.json`
 - `pacogo-engine/c5-ordering-matrix.test.js`
 
-C5 maakt expliciet onderscheid tussen:
+C5 maakt expliciet onderscheid tussen task order, temporal precedence, prediction, prerequisite/necessary condition, causal/instructional relation en correlation/shared cause.
 
-- task order;
-- temporal precedence;
-- prediction;
-- prerequisite/necessary condition;
-- causal/instructional relation;
-- correlation/shared cause.
+De ordering-matrix bevat momenteel 10 candidate relations over de bestaande A1/B1/FR2 developments. De relaties zijn uitsluitend hypotheses. Er wordt bewust geen totale lineaire volgorde afgedwongen: partiële ordening, wederkerigheid, parallelle ontwikkeling en meerdere routes blijven mogelijke empirische uitkomsten.
 
-Het protocol vereist longitudinale of passende herhaalde metingen voor temporele claims, expliciete alternatieve modellen, controle van task difficulty/familiarity/representation/language/context/instruction exposure en strengere criteria voor prerequisite- en causale claims.
+De bestaande `candidate_order`-velden blijven voorlopig een **hypothese-index**. C5 verandert de registry niet en promoveert geen ordering-claim automatisch.
 
-De ordering-matrix bevat momenteel **10 candidate relations** over de bestaande A1/B1/FR2 developments. De relaties zijn uitsluitend hypotheses. Er wordt bewust geen totale lineaire volgorde afgedwongen: partiële ordening, wederkerigheid, parallelle ontwikkeling en meerdere routes blijven mogelijke empirische uitkomsten.
+## 7. C1-C3 — eerste empirische onderzoekslaag
 
-De C5-validator controleert onder andere registry-consistentie, unieke relaties, geldige relation types, dekking van alle bestaande developments, aanwezigheid van alternatieve modellen en het ontbreken van gevalideerde/causale claims in de design-only matrix.
+Nu C4 en C5 vooraf gespecificeerde onderzoeksvragen hebben, is de eerste empirische infrastructuurlaag vastgelegd:
 
-Belangrijk: de bestaande `candidate_order`-velden in de curriculum registry blijven voorlopig bestaan als **hypothese-index**. C5 verandert de registry niet en promoveert geen enkele ordering-claim automatisch.
+- `docs/curriculum/PacoGO_C1_Pilot_Design_v0.1.md`
+- `docs/curriculum/PacoGO_C2_Student_Data_Model_v0.1.md`
+- `docs/curriculum/PacoGO_C3_Evidence_Coding_Specification_v0.1.md`
 
-## 7. Wetenschappelijke status
+### C1 — pilot design
+
+C1 definieert hoe een pilot onderscheid kan maken tussen feasibility, discriminating evidence, variation, transfer en repeated observations. De primaire validatie-eenheid blijft de **claim**.
+
+C1 vereist onder andere vooraf vastgelegde claims/evidence targets, defining versus confirmatory observations, meerdere taakinstanties, relevante variatie, counter-patterns, instructie/exposure metadata en expliciete analyse-gates.
+
+### C2 — student data model
+
+C2 scheidt:
+
+`learner/context → task instance → interaction/observation → evidence assessment → inference → decision`
+
+Raw observations blijven behouden en worden niet overschreven door latere interpretaties. Missingness, instruction/exposure en provenance worden expliciet vastgelegd.
+
+Het model ondersteunt longitudinale analyse maar beweert zelf geen temporal ordering, prediction, prerequisite of causaliteit.
+
+### C3 — evidence coding
+
+C3 maakt expliciet onderscheid tussen:
+
+- target match;
+- correctness/performance;
+- process evidence;
+- evidence quality;
+- contradiction;
+- independence/prompting;
+- alternative explanations.
+
+Human coding krijgt een afzonderlijk reliability-plan. Een correct antwoord wordt niet automatisch als developmental evidence gecodeerd.
+
+### Wetenschappelijke status C1-C3
+
+C1-C3 zijn **design-only**. Er is nog geen leerlingstudie uitgevoerd en er is geen empirische claim ondersteund of gevalideerd.
+
+## 8. Wetenschappelijke status
 
 A1, B1 en FR2 blijven representatieve kandidaat-/prototypeconstructen.
 
-C4 en C5 zijn onderzoeks- en testinstrumenten; geen van beide is empirische curriculumvalidatie.
+C4 en C5 zijn onderzoeks- en testinstrumenten. C1-C3 zijn de voorbereidende empirische onderzoeksinfrastructuur. Geen van deze lagen is op zichzelf empirische curriculumvalidatie.
 
 Deze technische milestones bewijzen NIET dat:
 
@@ -158,12 +189,12 @@ Deze technische milestones bewijzen NIET dat:
 - A1 of FR2 definitieve curriculuminhoud zijn;
 - de C4- of C5-patronen daadwerkelijk in leerlingdata voorkomen.
 
-## 8. Volgende stap
+## 9. Volgende stap
 
-De technische basis voor claimdiscriminatie (C4) en ordering/prerequisite-hypothesen (C5) staat nu als reproduceerbare designlaag.
+De designlaag C1-C5 staat nu. De volgende stap is **niet** een nieuwe runtime-skill bouwen.
 
-De volgende inhoudelijke stap is **niet** automatisch meer runtime-domeinen bouwen. Eerst moet worden bepaald welke C5-relaties en onderliggende developmental claims voldoende wetenschappelijke onderbouwing hebben om daadwerkelijk empirisch te testen, en vervolgens moet een eerste C1-C3 leerlingdata/pilot-opzet worden gekoppeld aan de vooraf gespecificeerde C4/C5 evidence targets.
+De volgende grote inhoudelijke stap is het samenstellen van een eerste **empirische pilotmanifest**: welke concrete A1/B1/FR2 claims worden als eerste onderzocht, welke C4/C5 tasks worden daarvoor gebruikt, welke observations nodig zijn, welke alternatieven worden getoetst en welke data per leerling/wave moeten worden verzameld.
+
+Pas daarna is het zinvol om daadwerkelijke empirische dataverzameling en eventuele Supabase TEST-persistentie voor onderzoeksdata te bouwen. Als persistence wordt geraakt, blijft de bestaande Supabase TEST-regel verplicht.
 
 Nieuwe runtime-domeinen worden alleen toegevoegd wanneer ze een duidelijke onderzoeks- of architectuurfunctie hebben; niet om simpelweg meer demo-skills te produceren.
-
-Alle verdere technische uitbreidingen blijven onderworpen aan de Supabase TEST-regel wanneer persistence/dataflow wordt geraakt.

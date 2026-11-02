@@ -54,6 +54,8 @@ jobs:
           ! grep -q 'professionalPlayerHost' index.html
           ! grep -q 'player-runtime-bootstrap.js' index.html
           ! grep -q 'window.pacoGOProfessionalPlayerReady' index.html
+      - name: Run curriculum engine regression
+        run: node --test pacogo-engine/*.test.js
       - name: Run architecture boundary tests
         run: node --test test/architecture-boundaries.test.js
       - name: Run maintained Node regression

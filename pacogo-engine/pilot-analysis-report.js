@@ -13,11 +13,11 @@ function addCount(map, key, value) {
   map[key][value] = (map[key][value] || 0) + 1;
 }
 
-function buildConfusionMatrix(records, leftKey, rightKey) {
+function buildPairwiseConfusionMatrix(pairs, leftKey, rightKey) {
   const matrix = {};
-  for (const record of records) {
-    const left = record[leftKey];
-    const right = record[rightKey];
+  for (const pair of pairs) {
+    const left = pair.first[leftKey];
+    const right = pair.second[rightKey];
     if (left === undefined || right === undefined) continue;
     if (!matrix[left]) matrix[left] = {};
     matrix[left][right] = (matrix[left][right] || 0) + 1;
@@ -25,45 +25,54 @@ function buildConfusionMatrix(records, leftKey, rightKey) {
   return matrix;
 }
 
-function buildDoubleCodingSummary(codingRecords) {
-  const byObservation = new Map();
+function buildDoubleCodingPairs(codingRecords) {
+  const groups = new Map();
   for (const record of codingRecords) {
-    if (!byObservation.has(record.observation_id)) byObservation.set(record.observation_id, []);
-    byObservation.get(record.observation_id).push(record);
+    const key = `${record.observation_id}::${record.coding_round}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(record);
   }
 
   const pairs = [];
-  for (const [observationId, records] of byObservation) {
-    if (records.length < 2) continue;
-    const [first, second] = records;
-    pairs.push({
-      observation_id: observationId,
-      target_match_agree: first.target_match === second.target_match,
-      performance_status_agree: first.performance_status === second.performance_status,
-      process_status_agree: first.process_status === second.process_status,
-      independence_status_agree: first.independence_status === second.independence_status,
-      evidence_quality_agree: first.evidence_quality === second.evidence_quality
-    });
+  const unpaired = [];
+  for (const [key, records] of groups) {
+    const coders = new Set(records.map(record => record.coder_id));
+    if (records.length !== 2 || coders.size !== 2) {
+      unpaired.push({
+        group: key,
+        record_count: records.length,
+        coder_count: coders.size
+      });
+      continue;
+    }
+    const ordered = [...records].sort((a, b) => a.coder_id.localeCompare(b.coder_id));
+    pairs.push({ first: ordered[0], second: ordered[1] });
   }
+  return { pairs, unpaired };
+}
 
+function buildDoubleCodingSummary(codingRecords) {
+  const { pairs, unpaired } = buildDoubleCodingPairs(codingRecords);
   const agreement = key => {
     if (!pairs.length) return null;
-    return pairs.filter(pair => pair[key]).length / pairs.length;
+    return pairs.filter(pair => pair.first[key] === pair.second[key]).length / pairs.length;
   };
 
   return {
     double_coded_observation_count: pairs.length,
+    unpaired_group_count: unpaired.length,
+    unpaired_groups: unpaired,
     agreement_rate: {
-      target_match: agreement('target_match_agree'),
-      performance_status: agreement('performance_status_agree'),
-      process_status: agreement('process_status_agree'),
-      independence_status: agreement('independence_status_agree'),
-      evidence_quality: agreement('evidence_quality_agree')
+      target_match: agreement('target_match'),
+      performance_status: agreement('performance_status'),
+      process_status: agreement('process_status'),
+      independence_status: agreement('independence_status'),
+      evidence_quality: agreement('evidence_quality')
     },
     confusion_matrices: {
-      target_match: buildConfusionMatrix(codingRecords, 'target_match', 'target_match'),
-      performance_status: buildConfusionMatrix(codingRecords, 'performance_status', 'performance_status'),
-      process_status: buildConfusionMatrix(codingRecords, 'process_status', 'process_status')
+      target_match: buildPairwiseConfusionMatrix(pairs, 'target_match', 'target_match'),
+      performance_status: buildPairwiseConfusionMatrix(pairs, 'performance_status', 'performance_status'),
+      process_status: buildPairwiseConfusionMatrix(pairs, 'process_status', 'process_status')
     }
   };
 }
@@ -132,4 +141,4 @@ function buildPilotAnalysisReport({ observations, codingRecords, analysisResult 
   };
 }
 
-export { buildPilotAnalysisReport, buildDoubleCodingSummary };
+export { buildPilotAnalysisReport, buildDoubleCodingSummary, buildDoubleCodingPairs };

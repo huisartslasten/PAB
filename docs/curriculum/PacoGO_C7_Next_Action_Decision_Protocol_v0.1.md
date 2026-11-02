@@ -52,7 +52,7 @@ De C6-uitkomst moet expliciet worden meegenomen. `MASTERED`, `NOT YET MASTERED`,
 
 ### A4 — Developmental ordering support
 
-Een actie die een volgende development veronderstelt mag alleen worden voorgesteld wanneer de relevante ordering-hypothese expliciet voldoende ondersteund is binnen de toepasselijke scope.
+Een actie die een volgende development of prerequisite veronderstelt mag alleen worden voorgesteld wanneer de relevante ordering-hypothese expliciet voldoende ondersteund is binnen de toepasselijke scope. `NOT_ASSESSED`, `UNCERTAIN` en `NOT_SUPPORTED` blokkeren een actie die deze ordering nodig heeft.
 
 ### A5 — Alternative explanation control
 
@@ -81,8 +81,12 @@ onopgeloste contradictie
 mastery niet bereikt + current-development practice passend
 → PRACTICE_CURRENT_DEVELOPMENT
 
-prerequisite onzeker of niet aangetoond
-→ ASSESS_PREREQUISITE_DEVELOPMENT
+prerequisite onzeker, niet beoordeeld of niet ondersteund
+→ ASSESS_PREREQUISITE_DEVELOPMENT of HOLD_FOR_MORE_EVIDENCE,
+  afhankelijk van expliciete action policy
+
+next development ordering niet ondersteund, onzeker of niet beoordeeld
+→ HOLD_FOR_MORE_EVIDENCE
 
 next development ordering voldoende ondersteund
 → kandidaat voor ASSESS_NEXT_DEVELOPMENT of PRACTICE_NEXT_DEVELOPMENT

@@ -139,9 +139,25 @@ function runCycle({
 }) {
   const assessment = assessEvidence(observation, evidenceRule);
   const evidence = [...priorEvidence, { ...observation, assessment }];
+
+  // Next-action selection must use the evidence state after the current
+  // observation has been assessed. Otherwise a newly observed target can
+  // incorrectly remain in the information-gap list.
+  const observedTargets = new Set(
+    evidence
+      .filter((item) => item.assessment.evidence)
+      .map((item) => item.evidence_target_id)
+      .filter(Boolean)
+  );
+  const effectiveState = {
+    ...(state || {}),
+    missing_evidence_targets: (state?.missing_evidence_targets || [])
+      .filter((targetId) => !observedTargets.has(targetId))
+  };
+
   const development = inferDevelopment(evidence, developmentRules);
   const mastery = inferMastery(evidence, masteryRule);
-  const next = chooseNextAction(state, taskModels);
+  const next = chooseNextAction(effectiveState, taskModels);
 
   return { assessment, evidence, development, mastery, next };
 }

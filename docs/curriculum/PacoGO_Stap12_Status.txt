@@ -1,0 +1,80 @@
+PACOGO CURRICULUM — STAP 12 STATUS
+Datum: 2026-11-02
+Branch: refactor/professional-v1
+
+Stap 12 = versioned Curriculum Registry + Student Evidence Store rond de bestaande engine-contracten.
+
+DONE
+- Versioned curriculum registry contract toegevoegd.
+- Representatieve registry seed toegevoegd voor A1, B1 en FR2.
+- Registry status blijft Candidate; geen curriculumclaim is hierdoor empirisch Supported of Validated geworden.
+- Generieke runtime-adapter toegevoegd: dezelfde engine-code verwerkt A1, B1 en FR2 via configuratie.
+- Prototype-runtime aangepast zodat task models meerdere evidence targets kunnen adresseren.
+- Student Evidence Store contract toegevoegd als append-only prototype.
+- Supabase TEST uitgebreid met curriculum_registry_versions en student_evidence.
+- Registry seed geregistreerd in Supabase TEST als pacogo-curriculum / 0.2.0-seed.
+- Integratietests toegevoegd voor A1/B1/FR2 + evidence store.
+- Lokale Node test-run gecontroleerd: 2 test files, 2/2 passed.
+
+NIEUWE BESTANDEN
+- docs/curriculum/PacoGO_Curriculum_Registry_v0.2.json
+- supabase/migrations/20261101230000_create_curriculum_registry_and_student_evidence.sql
+- pacogo-engine/curriculum-registry.js
+- pacogo-engine/student-evidence-store.js
+- pacogo-engine/curriculum-registry.test.js
+
+GEWIJZIGD
+- pacogo-engine/prototype.js
+- pacogo-engine/prototype.test.js
+
+KERNCONCLUSIE
+De architectuurgrens is nu niet alleen conceptueel maar ook technisch als registry/evidence-contract vastgelegd:
+
+VERSIONED CURRICULUM REGISTRY
+→ SKILL-SPECIFIEKE CONFIGURATIE
+→ GENERIEKE ENGINE
+→ OBSERVATION
+→ EVIDENCE ASSESSMENT
+→ DEVELOPMENTAL INFERENCE
+→ MASTERY
+→ NEXT ACTION
+
+De engine bevat geen inhoudelijke A1-, B1- of FR2-logica. De skill-inhoud en regels zitten in de registry-configuratie.
+
+WETENSCHAPPELIJKE STATUS
+- Onderliggende curriculum/development/mastery-modellen: Candidate.
+- Registry/engine software-architectuur: Candidate technical design.
+- Werkende tests bewijzen alleen technische uitvoerbaarheid binnen deze prototype-scope.
+- Er is GEEN empirische Validated-status toegekend.
+- Geen Supported-status claimen op basis van deze implementatie.
+
+SUPABASE
+- Alleen PacoGO TEST is aangepast.
+- MAIN/LIVE is niet aangepast.
+- curriculum_registry_versions is versie-gebaseerd en verwijst naar een source-controlled config.
+- student_evidence is append-only op dit niveau; decision traces en longitudinale state worden bewust nog niet opgeslagen.
+
+CURRENT
+De technische registry/evidence-basis is aanwezig en door dezelfde runtime getest voor A1, B1 en FR2.
+
+NEXT
+1. Decision Trace toevoegen zonder de bestaande engine-contracten te breken.
+2. Longitudinal State Update toevoegen op basis van opgeslagen evidence.
+3. Daarna evidence rules, contradicties/alternatieve verklaringen en onzekerheidsrepresentatie verder declaratief maken.
+4. Vervolgens validation hooks voor C1-C10.
+
+DO NOT REDO
+- A1 vertical slice
+- B1 vertical slice
+- FR2 vertical slice
+- generieke engine-audit
+- B10 integratiemodel
+- registry/evidence basis uit deze stap
+
+OPEN QUESTIONS
+- Hoe worden contradicties en alternatieve verklaringen expliciet en traceerbaar opgeslagen?
+- Hoe wordt onzekerheid opgeslagen zonder schijnprecisie?
+- Hoe wordt next-action ranking empirisch gevalideerd?
+- Hoe worden cross-skill bijdragen en double counting beheerst?
+
+EINDE STAP 12 STATUS

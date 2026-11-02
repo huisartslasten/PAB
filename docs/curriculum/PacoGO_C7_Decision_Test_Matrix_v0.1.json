@@ -1,0 +1,98 @@
+{
+  "protocol_id": "C7-NEXT-ACTION-DECISION",
+  "version": "0.1",
+  "status": "candidate_validation_matrix",
+  "purpose": "Deterministic validation matrix for C7 candidate next-action decisions.",
+  "safety": {
+    "registry_promotion_allowed": false,
+    "runtime_state_mutation_allowed": false,
+    "automatic_learner_advancement_allowed": false,
+    "automatic_mastery_write_allowed": false
+  },
+  "base_context": {
+    "claim_id": "A1.C1",
+    "current_development_id": "A1.D1",
+    "supporting_evidence_ids": ["E1", "E2", "E3"]
+  },
+  "scenarios": [
+    {
+      "id": "C7-T01",
+      "description": "Insufficient evidence blocks action",
+      "overrides": {"evidence_state": "INSUFFICIENT"},
+      "expected": {"candidate_action": "HOLD_FOR_MORE_EVIDENCE", "decision_gate": "A2"}
+    },
+    {
+      "id": "C7-T02",
+      "description": "Mastery not assessed blocks action",
+      "overrides": {"mastery_state": "NOT ASSESSED"},
+      "expected": {"candidate_action": "HOLD_FOR_MORE_EVIDENCE", "decision_gate": "A3"}
+    },
+    {
+      "id": "C7-T03",
+      "description": "Contradictory mastery triggers reassessment",
+      "overrides": {"mastery_state": "CONTRADICTORY"},
+      "expected": {"candidate_action": "REASSESS_CURRENT_DEVELOPMENT", "decision_gate": "A5"}
+    },
+    {
+      "id": "C7-T04",
+      "description": "Unresolved alternatives trigger reassessment",
+      "overrides": {"alternative_state": "UNRESOLVED"},
+      "expected": {"candidate_action": "REASSESS_CURRENT_DEVELOPMENT", "decision_gate": "A5"}
+    },
+    {
+      "id": "C7-T05",
+      "description": "Current development not mastered leads to current practice when authorized",
+      "overrides": {"mastery_state": "NOT YET MASTERED"},
+      "expected": {"candidate_action": "PRACTICE_CURRENT_DEVELOPMENT", "decision_gate": "A6"}
+    },
+    {
+      "id": "C7-T06",
+      "description": "Current practice is blocked when not authorized",
+      "overrides": {
+        "mastery_state": "NOT YET MASTERED",
+        "action_policy": {"practice_current_allowed": false}
+      },
+      "expected": {"candidate_action": "HOLD_FOR_MORE_EVIDENCE", "decision_gate": "A6"}
+    },
+    {
+      "id": "C7-T07",
+      "description": "Uncertain prerequisite requires prerequisite assessment",
+      "overrides": {"prerequisite_state": "UNCERTAIN"},
+      "expected": {"candidate_action": "ASSESS_PREREQUISITE_DEVELOPMENT", "decision_gate": "A4"}
+    },
+    {
+      "id": "C7-T08",
+      "description": "Unassessed prerequisite requires prerequisite assessment",
+      "overrides": {"prerequisite_state": "NOT_ASSESSED"},
+      "expected": {"candidate_action": "ASSESS_PREREQUISITE_DEVELOPMENT", "decision_gate": "A4"}
+    },
+    {
+      "id": "C7-T09",
+      "description": "Unsupported ordering blocks next-development action",
+      "overrides": {"ordering_state": "NOT_SUPPORTED"},
+      "expected": {"candidate_action": "HOLD_FOR_MORE_EVIDENCE", "decision_gate": "A4"}
+    },
+    {
+      "id": "C7-T10",
+      "description": "Supported ordering permits explicitly authorized next practice",
+      "overrides": {},
+      "expected": {"candidate_action": "PRACTICE_NEXT_DEVELOPMENT", "decision_gate": "A6"}
+    },
+    {
+      "id": "C7-T11",
+      "description": "Next assessment is selected when next practice is not authorized",
+      "overrides": {
+        "action_policy": {"practice_next_allowed": false, "assess_next_allowed": true}
+      },
+      "expected": {"candidate_action": "ASSESS_NEXT_DEVELOPMENT", "decision_gate": "A6"}
+    },
+    {
+      "id": "C7-T12",
+      "description": "No authorized next action produces hold",
+      "overrides": {
+        "action_policy": {"practice_next_allowed": false, "assess_next_allowed": false}
+      },
+      "expected": {"candidate_action": "HOLD_FOR_MORE_EVIDENCE", "decision_gate": "A6"}
+    }
+  ]
+}

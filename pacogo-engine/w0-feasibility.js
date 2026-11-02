@@ -11,6 +11,7 @@ function mapBy(items, key) {
 
 function validateW0Structure({ fixture, manifest, taskSet }) {
   assert(fixture && fixture.synthetic_or_empirical === 'synthetic_fixture', 'W0 fixture must be explicitly synthetic.');
+  assert(typeof fixture.study_id === 'string' && fixture.study_id.length > 0, 'W0 fixture must declare a study_id.');
   assert(fixture.wave_id === 'W0', 'W0 fixture must use wave W0.');
   assert(fixture.registry_version === manifest.registry_version, 'W0 fixture registry version must match the manifest.');
 
@@ -24,6 +25,7 @@ function validateW0Structure({ fixture, manifest, taskSet }) {
     seenTaskInstances.add(instance.task_instance_id);
     const task = taskMap.get(instance.task_id);
     assert(task, `W0 task instance ${instance.task_instance_id} references unknown task ${instance.task_id}.`);
+    assert(instance.study_id === fixture.study_id, `W0 task instance ${instance.task_instance_id} has study-id drift.`);
     assert(instance.wave_id === 'W0', `W0 task instance ${instance.task_instance_id} has a non-W0 wave.`);
     assert(instance.registry_version === manifest.registry_version, `W0 task instance ${instance.task_instance_id} has registry drift.`);
   }
@@ -35,6 +37,7 @@ function validateW0Structure({ fixture, manifest, taskSet }) {
     const claim = claimMap.get(observation.claim_id);
     assert(task, `W0 observation ${observation.observation_id} references unknown task ${observation.task_id}.`);
     assert(claim, `W0 observation ${observation.observation_id} references unknown claim ${observation.claim_id}.`);
+    assert(observation.study_id === fixture.study_id, `W0 observation ${observation.observation_id} has study-id drift.`);
     assert(observation.wave_id === 'W0', `W0 observation ${observation.observation_id} has a non-W0 wave.`);
     assert(observation.task_id === task.task_id, `W0 observation ${observation.observation_id} task contract mismatch.`);
     assert(observation.claim_id === task.claim_id, `W0 observation ${observation.observation_id} claim contract mismatch.`);

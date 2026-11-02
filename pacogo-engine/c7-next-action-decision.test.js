@@ -169,6 +169,45 @@ test('C7 validates action/reason coherence in the decision trace', () => {
   );
 });
 
+test('C7 rejects invalid trace gates', () => {
+  assert.throws(
+    () => validateNextActionDecisionTrace({
+      candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE,
+      decision_reason: DECISION_REASONS.INSUFFICIENT_EVIDENCE,
+      decision_gate: 'A7'
+    }),
+    /decision_gate/
+  );
+});
+
+test('C7 rejects invalid action/reason combinations even when the gate is valid', () => {
+  assert.throws(
+    () => validateNextActionDecisionTrace({
+      candidate_action: CANDIDATE_ACTIONS.PRACTICE_CURRENT_DEVELOPMENT,
+      decision_reason: DECISION_REASONS.NEXT_PRACTICE_AUTHORIZED,
+      decision_gate: 'A6'
+    }),
+    /action\/reason combination/
+  );
+});
+
+test('C7 decision trace is deterministic for identical input', () => {
+  const input = baseInput({ prerequisite_state: 'UNCERTAIN' });
+  const first = traceNextActionDecision(input);
+  const second = traceNextActionDecision(input);
+
+  assert.deepEqual(second, first);
+});
+
+test('C7 decision evaluation does not mutate its input state', () => {
+  const input = baseInput({ prerequisite_state: 'NOT_ASSESSED' });
+  const snapshot = structuredClone(input);
+
+  evaluateC7NextActionDecision(input);
+
+  assert.deepEqual(input, snapshot);
+});
+
 test('C7 exposes the gate and reason that produced the candidate action', () => {
   assert.deepEqual(traceNextActionDecision(baseInput({ evidence_state: 'INSUFFICIENT' })), {
     candidate_action: CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE,

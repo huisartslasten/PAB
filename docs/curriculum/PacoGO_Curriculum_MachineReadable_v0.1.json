@@ -1,0 +1,52 @@
+{
+  "schema_version": "0.1",
+  "status": "candidate",
+  "epistemic_status": "[S]/[O]",
+  "skill": {
+    "id": "A1",
+    "name": "Getallen representeren en verbinden",
+    "definition": "Een getal herkennen, weergeven en verbinden met andere representaties van hetzelfde getal.",
+    "developments": [
+      {"id":"A1.D1","name":"Representational meaning","definition":"Een getal/hoeveelheid als betekenisvolle representatie herkennen.","candidate_order":1},
+      {"id":"A1.D2","name":"Mapping","definition":"Dezelfde numerieke waarde tussen representaties kunnen koppelen.","candidate_order":2},
+      {"id":"A1.D3","name":"Coordination","definition":"Meerdere representaties doelgericht en flexibel kunnen coördineren.","candidate_order":3}
+    ]
+  },
+  "claims": [
+    {"id":"A1.C1","development_id":"A1.D1","definition":"De leerling kan een numerieke representatie betekenisvol identificeren."},
+    {"id":"A1.C2","development_id":"A1.D2","definition":"De leerling kan representaties van dezelfde waarde correct aan elkaar koppelen."},
+    {"id":"A1.C3","development_id":"A1.D3","definition":"De leerling kan meerdere representaties zelfstandig coördineren."}
+  ],
+  "evidence_targets": [
+    {"id":"A1.ET1","claim_id":"A1.C1","definition":"Correcte identificatie van waarde/hoeveelheid."},
+    {"id":"A1.ET2","claim_id":"A1.C2","definition":"Correcte mapping tussen twee representaties."},
+    {"id":"A1.ET3","claim_id":"A1.C3","definition":"Consistente coördinatie van meerdere representaties."},
+    {"id":"A1.ET4","claim_id":"A1.C2","definition":"Mapping blijft correct wanneer representatie of taakvorm verandert."},
+    {"id":"A1.ET5","claim_id":"A1.C3","definition":"Zelfstandige keuze of combinatie van representaties."}
+  ],
+  "task_models": [
+    {"id":"A1.TM1","evidence_target_ids":["A1.ET1"],"primary_development":"A1.D1","information_value":1,"instructional_relevance":1},
+    {"id":"A1.TM2","evidence_target_ids":["A1.ET2"],"primary_development":"A1.D2","information_value":2,"instructional_relevance":2},
+    {"id":"A1.TM3","evidence_target_ids":["A1.ET4"],"primary_development":"A1.D2","information_value":3,"instructional_relevance":2},
+    {"id":"A1.TM4","evidence_target_ids":["A1.ET3","A1.ET5"],"primary_development":"A1.D3","information_value":3,"instructional_relevance":3}
+  ],
+  "mastery_rules": {
+    "status": "prototype-only",
+    "min_independent_observations": 2,
+    "min_variation_keys": 2,
+    "min_evidence_targets": 2,
+    "min_quality": 0.8,
+    "max_unresolved_contradictions": 0,
+    "note": "These thresholds are design parameters, not empirically validated cut scores."
+  },
+  "decision_rules": {
+    "priority_order": [
+      "resolve_developmental_uncertainty",
+      "fill_missing_evidence_coverage",
+      "test_variation_and_stability",
+      "test_independent_coordination",
+      "confirm_mastery"
+    ],
+    "information_gain": "candidate design concept; no validated numeric metric"
+  }
+}

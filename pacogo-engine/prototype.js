@@ -99,15 +99,20 @@ function inferMastery(evidence, rule) {
 function chooseNextAction(state, taskModels) {
   const candidates = taskModels
     .filter((task) =>
-      state.missing_evidence_targets.includes(task.evidence_target_id)
+      task.evidence_target_ids.some((id) => state.missing_evidence_targets.includes(id))
     )
-    .map((task) => ({
-      task_model_id: task.id,
-      action_type: 'TASK',
-      expected_evidence: task.evidence_target_id,
-      priority:
-        (task.instructional_relevance || 0) + (task.information_value || 0)
-    }))
+    .map((task) => {
+      const matchedTargets = task.evidence_target_ids.filter((id) =>
+        state.missing_evidence_targets.includes(id)
+      );
+      return {
+        task_model_id: task.id,
+        action_type: 'TASK',
+        expected_evidence: matchedTargets,
+        priority:
+          (task.instructional_relevance || 0) + (task.information_value || 0)
+      };
+    })
     .sort((a, b) => b.priority - a.priority);
 
   if (!candidates.length) {
@@ -128,16 +133,12 @@ function runCycle({
   evidenceRule,
   developmentRules,
   masteryRule,
-  priorEvidence,
+  priorEvidence = [],
   state,
   taskModels
 }) {
   const assessment = assessEvidence(observation, evidenceRule);
-  const evidence = [
-    ...priorEvidence,
-    { ...observation, assessment }
-  ];
-
+  const evidence = [...priorEvidence, { ...observation, assessment }];
   const development = inferDevelopment(evidence, developmentRules);
   const mastery = inferMastery(evidence, masteryRule);
   const next = chooseNextAction(state, taskModels);
@@ -145,7 +146,7 @@ function runCycle({
   return { assessment, evidence, development, mastery, next };
 }
 
-module.exports = {
+export {
   assessEvidence,
   inferDevelopment,
   inferMastery,

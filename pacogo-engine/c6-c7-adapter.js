@@ -1,4 +1,3 @@
-import { MASTERY_STATES, evaluateC6MasteryAssessments } from './c6-mastery-decision.js';
 import { VALID_MASTERY_STATES, validateNextActionDecisionInput } from './c7-next-action-decision.js';
 
 function assert(condition, message) {
@@ -48,12 +47,7 @@ function createC7InputFromC6(c6Result, options) {
   return c7Input;
 }
 
-function buildC6ResultForTesting(assessment) {
-  return evaluateC6MasteryAssessments([assessment]);
-}
-
 export {
   validateC6SafetyBoundary,
-  createC7InputFromC6,
-  buildC6ResultForTesting
+  createC7InputFromC6
 };

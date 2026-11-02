@@ -1,4 +1,4 @@
-import { runCycle } from './prototype.js';
+import { runCycle, chooseNextAction } from './prototype.js';
 import { deriveLongitudinalState, explainDecision, createDecisionTrace } from './longitudinal-state.js';
 
 function assertArray(value, label) {
@@ -54,12 +54,14 @@ function createCurriculumRegistry(config) {
         skillId,
         registryVersion: config.registry_version,
         evidence: cycle.evidence,
+        evidenceTargetIds: skill.evidence_targets.map((target) => target.id),
         development: cycle.development,
         mastery: cycle.mastery,
         priorState,
         asOf
       });
-      const decision = explainDecision({ state: longitudinalState, decisionRules: skill.decision_rules, nextAction: cycle.next });
+      const nextAction = chooseNextAction(longitudinalState, skill.task_models || []);
+      const decision = explainDecision({ state: longitudinalState, decisionRules: skill.decision_rules, nextAction });
       const trace = createDecisionTrace({
         studentKey,
         skillId,
@@ -69,7 +71,7 @@ function createCurriculumRegistry(config) {
         observationIds: cycle.evidence.map((item) => item.id || item.task_instance_id).filter(Boolean),
         createdAt: asOf
       });
-      return { ...cycle, longitudinal_state: longitudinalState, decision_trace: trace };
+      return { ...cycle, next: nextAction, longitudinal_state: longitudinalState, decision_trace: trace };
     }
   });
 }

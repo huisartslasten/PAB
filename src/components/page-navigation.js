@@ -1,6 +1,6 @@
 import { listStudents } from '../core/student-registry.js';
 import { confirmPacoAction } from './confirm-dialog.js';
-import { buildViewUrl } from '../core/view-context.js';
+import { buildViewUrl, readViewContext } from '../core/view-context.js';
 
 function currentPage() { return window.location.pathname.split('/').pop() || 'dashboard.html'; }
 function go(navigate, path, { student = '', mode = '', managementFilter = '', extra = {}, managementCapability = '' } = {}) {
@@ -22,8 +22,8 @@ export function createPacoNavigation({ app = null, active = '', activeSubmenu = 
   }
 
   const currentUrl = typeof window !== 'undefined' ? new URL(window.location.href) : null;
-  const urlMode = currentUrl?.searchParams.get('mode') || '';
-  const hideLearnerSidebarContext = Boolean(app?.auth?.isParent && student && urlMode === 'student');
+  const viewContext = readViewContext(currentUrl?.searchParams || new URLSearchParams());
+  const hideLearnerSidebarContext = Boolean(app?.auth?.isParent && student && viewContext.mode === 'student');
   const showDashboard = !hideLearnerSidebarContext;
   const showAccount = !hideLearnerSidebarContext;
 

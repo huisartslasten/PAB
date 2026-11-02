@@ -4,31 +4,50 @@ Branch: refactor/professional-v1
 
 Stap 11 = eerste verticale prototype.
 
-A1 is eerder als eerste verticale doorsnede uitgewerkt.
-B1 — Optellen is nu volledig uitgewerkt als verticale prototype-engine in:
+DONE
+- A1 — Getallen representeren en verbinden: volledige vertical slice + adversarial test.
+- B1 — Optellen: volledige vertical slice.
+- FR2 — Breukequivalentie: volledige vertical slice.
+- Generieke engine-audit over A1 + B1 + FR2.
+- Generieke architectuur behouden: één engine, skill-specifieke curriculumconfiguratie.
+- Machine-readable A1 curriculumconfiguratie toegevoegd.
+- Eerste generieke engine-runtime toegevoegd.
+- Prototype-tests toegevoegd en lokaal syntactisch/functioneel gecontroleerd tijdens ontwikkeling.
 
-docs/curriculum/PacoGO_Vertical_Prototype_B1_Optellen.md
+Nieuwe bestanden:
+- docs/curriculum/PacoGO_Curriculum_MachineReadable_v0.1.json
+- docs/curriculum/PacoGO_Engine_Spec_v0.1.md
+- pacogo-engine/prototype.js
+- pacogo-engine/prototype.test.js
 
-De volledige keten is getest:
+KERNCONCLUSIE
+A1, B1 en FR2 verschillen inhoudelijk sterk maar kunnen door dezelfde generieke runtime-keten worden verwerkt:
 SKILL → DEVELOPMENT → CLAIM → EVIDENCE TARGET → TASK MODEL → TASK INSTANCE → PERFORMANCE → OBSERVATION → EVIDENCE → EVIDENCE ASSESSMENT → DEVELOPMENTAL INFERENCE → MASTERY → DECISION → NEXT ACTION.
 
-Ook uitgevoerd:
-- concrete prototype-taskset;
-- evidenceprofielen;
-- masteryvoorwaarden;
-- automatische next-action regels;
-- scenario's;
-- adversarial stresstest;
-- empirische validatieagenda.
+De engine bevat geen A1/B1/FR2-inhoud. Die hoort in curriculumconfiguratie.
 
-Status:
-Candidate vertical prototype.
+STATUS
+Candidate technical prototype.
+De runtime en configuratieregels zijn ontwerp/prototype en niet empirisch gevalideerd.
 
-Belangrijk:
-de automatische regels zijn ontwerp-/prototype-regels en niet empirisch gevalideerd.
+CURRENT
+De grens tussen curriculumlaag en generieke engine is nu voldoende scherp voor de volgende technische stap.
 
-VOLGENDE GROTE STAP:
-FR2 — Breukequivalentie herkennen en gebruiken.
+NEXT
+Bouw een versioned Curriculum Registry + Student Evidence Store rond hetzelfde contract en laat A1, B1 en FR2 daadwerkelijk door één runtime lopen met dezelfde code.
+Daarna: decision trace en longitudinale state-update.
 
-Doel daarvan:
-testen of de verticale architectuur generiek is voor een relationele/conceptuele skill en niet alleen werkt voor optellen.
+DO NOT REDO
+- A1 vertical slice
+- B1 vertical slice
+- FR2 vertical slice
+- generieke engine-audit
+- SLO 10–18 mapping
+- B10 integratiemodel
+
+OPEN QUESTIONS
+- Hoe worden evidence rules volledig declaratief gemaakt?
+- Hoe modelleren we contradicties en alternatieve verklaringen zonder verborgen interpretatie?
+- Hoe wordt onzekerheid opgeslagen zonder schijnprecisie?
+- Hoe wordt next-action ranking empirisch gevalideerd?
+- Hoe worden cross-skill bijdragen en double counting beheerst?

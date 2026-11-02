@@ -1,0 +1,69 @@
+import { summarizeStudentDevelopment } from './c8-student-model.js';
+import { validateVerticalLearningSlice } from './c9-vertical-validation.js';
+
+function assert(condition, message) {
+  if (!condition) throw new Error(message);
+}
+
+function buildC8Observation({ learner_id, scope_id, observed_at, c6_result, c7_result, supporting_evidence_ids = [] }) {
+  assert(c6_result && typeof c6_result === 'object', 'C8/C9 adapter requires a C6 result.');
+  assert(c7_result && typeof c7_result === 'object', 'C8/C9 adapter requires a C7 result.');
+  assert(c6_result.claim_id === c7_result.claim_id, 'C8/C9 adapter requires C6 and C7 claim_id alignment.');
+  assert(c6_result.development_id === c7_result.current_development_id || c6_result.development_id === c7_result.development_id, 'C8/C9 adapter requires C6 and C7 development alignment.');
+
+  return {
+    observation_id: `OBS-${observed_at}`,
+    learner_id,
+    claim_id: c6_result.claim_id,
+    development_id: c6_result.development_id,
+    scope_id,
+    observed_at,
+    mastery_state: c6_result.mastery_state,
+    evidence_state: c6_result.evidence_count > 0 ? 'SUFFICIENT' : 'NOT_ASSESSED',
+    next_action: c7_result.candidate_action,
+    supporting_evidence_ids: [...supporting_evidence_ids]
+  };
+}
+
+function buildC8SummaryFromDecision({ learner_id, scope_id, observed_at, c6_result, c7_result, supporting_evidence_ids = [] }) {
+  const observation = buildC8Observation({ learner_id, scope_id, observed_at, c6_result, c7_result, supporting_evidence_ids });
+  return summarizeStudentDevelopment({
+    learner_id,
+    claim_id: c6_result.claim_id,
+    development_id: c6_result.development_id,
+    scope_id,
+    observations: [observation]
+  });
+}
+
+function validateFirstVerticalSlice({ learner_id, scope_id, observed_at, curriculum, skill, development, claim, tasks, evidence, evidence_assessments, c6_result, c7_result, supporting_evidence_ids = [] }) {
+  const c8_summary = buildC8SummaryFromDecision({ learner_id, scope_id, observed_at, c6_result, c7_result, supporting_evidence_ids });
+  return validateVerticalLearningSlice({
+    learner_id,
+    claim_id: c6_result.claim_id,
+    development_id: c6_result.development_id,
+    scope_id,
+    curriculum,
+    skill: { ...skill, learner_id, claim_id: c6_result.claim_id, development_id: c6_result.development_id, scope_id },
+    development: { ...development, learner_id, claim_id: c6_result.claim_id, development_id: c6_result.development_id, scope_id },
+    claim: { ...claim, learner_id, claim_id: c6_result.claim_id, development_id: c6_result.development_id, scope_id },
+    tasks,
+    evidence,
+    evidence_assessments,
+    c6_result: { ...c6_result, learner_id, scope_id },
+    c7_result: {
+      ...c7_result,
+      learner_id,
+      claim_id: c6_result.claim_id,
+      development_id: c6_result.development_id,
+      scope_id
+    },
+    c8_summary
+  });
+}
+
+export {
+  buildC8Observation,
+  buildC8SummaryFromDecision,
+  validateFirstVerticalSlice
+};

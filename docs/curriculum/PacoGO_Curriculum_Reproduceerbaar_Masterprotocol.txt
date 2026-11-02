@@ -1,5 +1,5 @@
 PACOGO CURRICULUM — REPRODUCEERBAARHEID / MASTERPROTOCOL
-Versie: 1.0
+Versie: 1.1
 
 DOEL
 De PacoGO Curriculum-ontwikkeling mag nooit afhankelijk zijn van één ChatGPT-chatgeschiedenis. Dit bestand is onderdeel van de duurzame projectdocumentatie in de repository. Een nieuwe ChatGPT-sessie moet PacoGO op basis van de repo-documentatie kunnen overnemen.
@@ -93,7 +93,7 @@ B1–B5 bewerkingen
 FR1–FR2 breuken
 VR1–VR5 verhoudingen/percentages
 MG1–MG6 meten
-MGK1–MGK3 meetkunde/ruimtelijk
+MGK1–MG3 meetkunde/ruimtelijk
 PA1–PA3 patronen/algebraïsch denken
 GK1–GK2 gegevens/data
 
@@ -282,4 +282,36 @@ CURRICULUM
 
 Een nieuwe onderzoeker, ontwikkelaar of ChatGPT-sessie moet het project kunnen overnemen zonder afhankelijk te zijn van de oorspronkelijke chatgeschiedenis.
 
+============================================================
+16. TECHNISCHE CONSEQUENTIE NA DE VERTICALE PROTOTYPES
+============================================================
+
+Na A1, B1 en FR2 is een kandidaat-generieke enginegrens vastgesteld:
+
+ENGINE
+- verwerkt observaties;
+- bouwt claim-relative evidence assessments;
+- maakt developmental inferences volgens configuratie;
+- berekent prototype mastery states volgens configuratie;
+- kiest een volgende actie volgens expliciete decision rules.
+
+CURRICULUMCONFIGURATIE
+- definieert skill/development/claims/evidence targets;
+- definieert task models;
+- definieert evidence rules;
+- definieert mastery rules;
+- definieert decision priorities.
+
+De engine mag geen inhoudelijke kennis over A1, B1 of FR2 bevatten.
+
+Eerste machine-readable configuratie:
+docs/curriculum/PacoGO_Curriculum_MachineReadable_v0.1.json
+
+Eerste runtime-prototype:
+pacogo-engine/prototype.js
+
+Dit is een technische ontwerp-/prototypebeslissing [O]. Het is geen empirische validatie van de onderliggende curriculumclaims.
+
+============================================================
 EINDE MASTERPROTOCOL
+============================================================

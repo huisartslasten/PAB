@@ -4,7 +4,7 @@ Branch: refactor/professional-v1
 Wetenschappelijke status: Candidate
 
 DOEL
-De technische curriculum-engine is nu voorzien van traceerbaarheid, onzekerheid, alternatieve verklaringen en validation hooks. Daarna is het empirische validatiekader vastgelegd en nu is C1-C3 daadwerkelijk geoperationaliseerd als reproduceerbaar pilotontwerp.
+De technische curriculum-engine is voorzien van traceerbaarheid, onzekerheid, alternatieve verklaringen en validation hooks. Het empirische validatiekader is vastgelegd en C1-C3 is nu geoperationaliseerd tot en met een concrete pre-specified task set en synthetische testdataset.
 
 AFGEROND
 1. Longitudinal State uitgebreid met observed/missing evidence targets, contradictions, unresolved developments, alternative explanations en validation-hook status.
@@ -28,7 +28,10 @@ AFGEROND
     - stopping/revision rules.
 11. C2 Pilot Data Schema v0.1 toegevoegd met versioned provenance, performance, context, coding en privacy/integrity rules.
 12. C3 Evidence Coding Manual v0.1 toegevoegd met reproduceerbare codes voor evidence status, target match, quality, independence, contradiction en alternative explanations.
-13. De pilotopzet is inhoudelijk afgestemd op algemene testing/measurement-principes: eerst construct/measurement-evidence voldoende interpreteerbaar maken, daarna zwaardere validiteitsclaims toetsen. [W]/[S] bronnen worden in het protocol zelf traceerbaar gehouden.
+13. De pilotopzet is inhoudelijk afgestemd op algemene testing/measurement-principes: eerst construct/measurement-evidence voldoende interpreteerbaar maken, daarna zwaardere validiteitsclaims toetsen.
+14. Concrete pre-specified pilot task set v0.1 toegevoegd voor A1, B1 en FR2, met task→claim→development→evidence-target koppeling, variatie, promptniveau, response-process eisen en counter/alternative-explanation tasks.
+15. Synthetische pilotdataset v0.1 toegevoegd met fixtures voor PRESENT, ABSENT, INDETERMINATE, contradiction, alternative explanations, variation, prompted/independent en target mismatch. Dataset is expliciet niet-empirisch.
+16. C1-C3 artifact test specification v0.1 toegevoegd met reproduceerbare integriteitscontroles voor de pilotartefacten.
 
 WAT DIT WEL BEWIJST
 - technische traceerbaarheid;
@@ -36,7 +39,8 @@ WAT DIT WEL BEWIJST
 - expliciete opslag van onzekerheid;
 - ondersteuning voor competing explanations;
 - een expliciet en reproduceerbaar kader voor toekomstig empirisch onderzoek;
-- een concreet pilotontwerp en data/coderingscontract voor C1-C3.
+- een concreet pilotontwerp en data/coderingscontract voor C1-C3;
+- een eerste vaste task set en synthetische fixtures waarmee de C1-C3 keten technisch kan worden getest.
 
 WAT DIT NIET BEWIJST
 - geen constructvaliditeit;
@@ -44,21 +48,21 @@ WAT DIT NIET BEWIJST
 - geen valide mastery cut scores;
 - geen bewezen effectiviteit van next-action keuzes;
 - geen empirische replicatie;
-- geen Supported/Validated status.
+- geen Supported/Validated status;
+- synthetische testdata zijn geen leerlingdata en geen wetenschappelijk bewijs.
 
 CURRENT
-De methodologische laag is nu ver genoeg uitgewerkt om een eerste echte pilotdataset te kunnen verzamelen/coderen zonder de onderzoeksregels tijdens het verzamelen te verzinnen.
+De methodologische laag is nu ver genoeg uitgewerkt om een eerste echte pilotdataset te kunnen verzamelen/coderen zonder de onderzoeksregels tijdens het verzamelen te verzinnen. De task set en synthetische fixtures zijn nu vooraf vastgelegd zodat technische problemen vóór echte dataverzameling kunnen worden opgespoord.
 
 NEXT — GROTE BLOK
-De volgende stap is het bouwen van de **eerste concrete pilotdataset en pilot-task set** voor A1, B1 en FR2, inclusief:
-1. pre-specified taakvarianten;
-2. verwachte evidence per taak;
-3. counter/alternative-explanation tasks;
-4. coderingsfixtures;
-5. een kleine synthetische dataset om de volledige C1-C3 keten technisch te doorlopen voordat echte leerlingdata worden gebruikt.
+1. De synthetische dataset daadwerkelijk door de C1-C3 technische keten laten lopen en de fixtures controleren tegen task set + data schema + coding manual.
+2. Eventuele schema-/engine-mismatches repareren zonder de wetenschappelijke regels achteraf aan te passen.
+3. Daarna een eerste **echte pilot-ready task package** maken: definitieve taakdefinities, scoring/coderingsinstructies en dataverzamelingsformulier voor één gecontroleerde pilot.
+4. Pas daarna C4 operationaliseren: development classification, zonder A1/B1/FR2 voortijdig als bewezen ontwikkelingsstructuren te behandelen.
 
 DO NOT REDO
 - opnieuw de generieke engine ontwerpen;
 - opnieuw A1/B1/FR2 als losse hard-coded logica bouwen;
 - Candidate verwarren met Supported/Validated;
-- technische testresultaten gebruiken als bewijs van curriculumvaliditeit.
+- technische testresultaten gebruiken als bewijs van curriculumvaliditeit;
+- synthetische data behandelen als empirische leerlingdata.

@@ -82,7 +82,7 @@ assert.equal(observation.correctness, true);
 assert.equal(cycle.assessment.evidence, true);
 assert.equal(cycle.assessment.quality, 1);
 assert.equal(cycle.evidence[0].observation_id, observation.observation_id);
-assert.equal(cycle.longitudinal_state.registry_version, curriculum.registry_version);
+assert.equal(cycle.longitudinal_state.curriculum_registry_version, curriculum.registry_version);
 assert.ok(cycle.decision_trace.observation_ids.includes(observation.observation_id));
 assert.equal(cycle.mastery.status, 'NOT YET MASTERED');
 

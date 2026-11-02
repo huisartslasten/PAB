@@ -11,19 +11,28 @@ function normalizePilotObservation(raw) {
   assertObject(raw.context, 'observation.context');
 
   const coding = raw.coding;
+  const codedQuality = Number(coding.quality);
+  const evidenceStatus = coding.evidence_status;
+
+  // The pilot codebook distinguishes observed evidence from absent or
+  // indeterminate evidence. The generic engine represents that distinction
+  // through evidence=true/false, so only PRESENT coding contributes quality.
+  const engineQuality = evidenceStatus === 'PRESENT' ? codedQuality : 0;
+
   const normalized = {
     ...raw,
-    quality: Number(coding.quality),
+    quality: engineQuality,
+    coded_quality: codedQuality,
     contradiction: Boolean(coding.contradiction),
     independent: coding.independence === 'INDEPENDENT',
     variation_key: raw.context.variation_key,
     relevant: coding.evidence_target_match === 'MATCH',
-    evidence_status: coding.evidence_status,
+    evidence_status: evidenceStatus,
     evidence_target_match: coding.evidence_target_match,
     alternative_explanations: coding.alternative_explanations || []
   };
 
-  if (!Number.isFinite(normalized.quality) || normalized.quality < 0 || normalized.quality > 1) {
+  if (!Number.isFinite(codedQuality) || codedQuality < 0 || codedQuality > 1) {
     throw new TypeError(`invalid coding quality for ${raw.observation_id}`);
   }
 

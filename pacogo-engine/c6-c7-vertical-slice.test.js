@@ -43,9 +43,9 @@ test('C6 to C7 vertical slice preserves the mastery decision and produces a cand
     c6_result: c6,
     claim_id: 'A1.C1',
     evidence_state: 'SUFFICIENT',
-    ordering_state: 'SUPPORTED',
+    next_development_ordering_state: 'SUPPORTED',
     alternative_state: 'CONTROLLED',
-    prerequisite_state: 'SUPPORTED',
+    prerequisite_ordering_state: 'SUPPORTED',
     supporting_evidence_ids: ['E1', 'E2', 'E3'],
     action_policy: actionPolicy
   });
@@ -73,9 +73,9 @@ test('C6 to C7 vertical slice stops when C6 does not establish mastery', () => {
     c6_result: c6,
     claim_id: 'A1.C1',
     evidence_state: 'SUFFICIENT',
-    ordering_state: 'SUPPORTED',
+    next_development_ordering_state: 'SUPPORTED',
     alternative_state: 'CONTROLLED',
-    prerequisite_state: 'SUPPORTED',
+    prerequisite_ordering_state: 'SUPPORTED',
     supporting_evidence_ids: ['E1', 'E2'],
     action_policy: actionPolicy
   });
@@ -86,16 +86,16 @@ test('C6 to C7 vertical slice stops when C6 does not establish mastery', () => {
   assert.equal(trace.candidate_action, CANDIDATE_ACTIONS.HOLD_FOR_MORE_EVIDENCE);
 });
 
-test('C6 to C7 vertical slice blocks advancement when ordering is not supported', () => {
+test('C6 to C7 vertical slice blocks advancement when next-development ordering is not supported', () => {
   const c6 = evaluateC6MasteryAssessments([masteryAssessment()]);
 
   const c7Input = buildC7InputFromC6({
     c6_result: c6,
     claim_id: 'A1.C1',
     evidence_state: 'SUFFICIENT',
-    ordering_state: 'NOT_SUPPORTED',
+    next_development_ordering_state: 'NOT_SUPPORTED',
     alternative_state: 'CONTROLLED',
-    prerequisite_state: 'SUPPORTED',
+    prerequisite_ordering_state: 'SUPPORTED',
     supporting_evidence_ids: ['E1', 'E2', 'E3'],
     action_policy: actionPolicy
   });

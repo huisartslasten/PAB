@@ -33,9 +33,9 @@ function baseAdapterInput(overrides = {}) {
     c6_result: c6Result(),
     claim_id: 'A1.C1',
     evidence_state: 'SUFFICIENT',
-    ordering_state: 'SUPPORTED',
+    next_development_ordering_state: 'SUPPORTED',
     alternative_state: 'CONTROLLED',
-    prerequisite_state: 'SUPPORTED',
+    prerequisite_ordering_state: 'SUPPORTED',
     supporting_evidence_ids: ['E1', 'E2', 'E3'],
     action_policy: {
       reassess_current_allowed: true,
@@ -99,34 +99,44 @@ test('C7 adapter carries C6 mastery state and development without recomputing ma
   assert.equal(input.mastery_state, 'NOT YET MASTERED');
 });
 
-test('C7 adapter preserves explicit ordering, alternatives and prerequisite state', () => {
+test('C7 adapter preserves explicit ordering domains, alternatives and prerequisite state', () => {
   const input = buildC7InputFromC6(baseAdapterInput({
-    ordering_state: 'UNCERTAIN',
+    next_development_ordering_state: 'UNCERTAIN',
     alternative_state: 'UNRESOLVED',
-    prerequisite_state: 'NOT_ASSESSED'
+    prerequisite_ordering_state: 'NOT_ASSESSED'
   }));
 
-  assert.equal(input.ordering_state, 'UNCERTAIN');
+  assert.equal(input.next_development_ordering_state, 'UNCERTAIN');
   assert.equal(input.alternative_state, 'UNRESOLVED');
-  assert.equal(input.prerequisite_state, 'NOT_ASSESSED');
+  assert.equal(input.prerequisite_ordering_state, 'NOT_ASSESSED');
 });
 
 test('C7 adapter rejects invalid ordering or alternative states', () => {
   assert.throws(
-    () => validateC7OrderingAndAlternativeInputs({ ordering_state: 'UNKNOWN', alternative_state: 'CONTROLLED' }),
-    /Invalid C7 ordering_state/
+    () => validateC7OrderingAndAlternativeInputs({ next_development_ordering_state: 'UNKNOWN', prerequisite_ordering_state: 'SUPPORTED', alternative_state: 'CONTROLLED' }),
+    /Invalid C7 next_development_ordering_state/
   );
 
   assert.throws(
-    () => validateC7OrderingAndAlternativeInputs({ ordering_state: 'SUPPORTED', alternative_state: 'UNKNOWN' }),
+    () => validateC7OrderingAndAlternativeInputs({ next_development_ordering_state: 'SUPPORTED', prerequisite_ordering_state: 'UNKNOWN', alternative_state: 'CONTROLLED' }),
+    /Invalid C7 prerequisite_ordering_state/
+  );
+
+  assert.throws(
+    () => validateC7OrderingAndAlternativeInputs({ next_development_ordering_state: 'SUPPORTED', prerequisite_ordering_state: 'SUPPORTED', alternative_state: 'UNKNOWN' }),
     /Invalid C7 alternative_state/
   );
 });
 
 test('C7 adapter enforces ordering and alternative validation at the build boundary', () => {
   assert.throws(
-    () => buildC7InputFromC6(baseAdapterInput({ ordering_state: 'UNKNOWN' })),
-    /Invalid C7 ordering_state/
+    () => buildC7InputFromC6(baseAdapterInput({ next_development_ordering_state: 'UNKNOWN' })),
+    /Invalid C7 next_development_ordering_state/
+  );
+
+  assert.throws(
+    () => buildC7InputFromC6(baseAdapterInput({ prerequisite_ordering_state: 'UNKNOWN' })),
+    /Invalid C7 prerequisite_ordering_state/
   );
 
   assert.throws(

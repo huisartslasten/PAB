@@ -87,7 +87,7 @@ function runW0Feasibility({ fixture, manifest, taskSet, analysis, reliabilityByC
     dataset_validation: validation,
     deterministic_snapshot: true,
     pipeline_status: pipelineResult.status,
-    c4_measurement_gate_state: pipelineResult.c4_measurement_gate.overall_measurement_gate_state,
+    c4_measurement_gate_state: pipelineResult.c4_measurement_gate.all_claims_ready_for_c4 ? 'READY_FOR_C4' : 'REVISE_PROTOCOL',
     boundaries: pipelineResult.boundaries
   };
 }

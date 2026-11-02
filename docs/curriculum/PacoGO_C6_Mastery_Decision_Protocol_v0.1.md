@@ -33,7 +33,7 @@ De kandidaatregel gebruikt zeven afzonderlijk zichtbare voorwaarden:
 6. **M6 Variatie** — het patroon houdt stand over vooraf gedefinieerde relevante taak-/representatievariatie.
 7. **M7 Contradictiecontrole** — relevante tegenstrijdige evidence is afwezig of voldoende verklaard binnen de scope.
 
-De engine krijgt de eisen voor coverage en scope expliciet aangeleverd. Er worden geen verborgen drempels toegevoegd.
+De engine krijgt de eisen voor coverage en scope expliciet aangeleverd. Er worden geen verborgen drempels toegevoegd. De waargenomen coverage mag hoger zijn dan de minimale vereiste coverage; de vereiste waarde is een ondergrens, geen bovengrens.
 
 ## 4. Uitkomsten
 
@@ -55,7 +55,7 @@ Er is voldoende informatie om een mastery-beslissing te nemen, maar minstens é�
 
 ### INSUFFICIENT EVIDENCE
 
-Een noodzakelijke gate kan nog niet betrouwbaar worden beoordeeld, bijvoorbeeld doordat coverage of stabiliteit nog onvoldoende is vastgesteld.
+Een noodzakelijke gate of inference kan nog niet betrouwbaar worden beoordeeld, bijvoorbeeld doordat coverage, stabiliteit of developmental inference nog onvoldoende is vastgesteld.
 
 ### CONTRADICTORY
 
@@ -88,7 +88,7 @@ geen assessment
 onopgeloste contradictie
 → CONTRADICTORY
 
-vereiste evidence ontbreekt / gate niet bepaalbaar
+vereiste evidence / gate / inference ontbreekt of is niet bepaalbaar
 → INSUFFICIENT EVIDENCE
 
 één of meer expliciet beoordeelde gates falen

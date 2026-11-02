@@ -44,6 +44,18 @@ test('W0 rejects a fixture that is not explicitly synthetic', async () => {
   assert.throws(() => validateW0Structure(invalid), /explicitly synthetic/);
 });
 
+test('W0 requires an explicit study context and consistent study identifiers', async () => {
+  const input = await loadW0();
+
+  const missingStudy = structuredClone(input);
+  delete missingStudy.fixture.study_id;
+  assert.throws(() => validateW0Structure(missingStudy), /study_id/);
+
+  const driftedStudy = structuredClone(input);
+  driftedStudy.fixture.observations[0].study_id = 'W0-OTHER-STUDY';
+  assert.throws(() => validateW0Structure(driftedStudy), /study-id drift/);
+});
+
 test('W0 requires independent double coding for every observation', async () => {
   const input = await loadW0();
   const invalid = structuredClone(input);

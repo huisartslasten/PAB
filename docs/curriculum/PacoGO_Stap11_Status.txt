@@ -1,0 +1,34 @@
+PacoGO CURRICULUM — STAP 11 STATUS
+Datum: 2026-11-01
+Branch: refactor/professional-v1
+
+Stap 11 = eerste verticale prototype.
+
+A1 is eerder als eerste verticale doorsnede uitgewerkt.
+B1 — Optellen is nu volledig uitgewerkt als verticale prototype-engine in:
+
+docs/curriculum/PacoGO_Vertical_Prototype_B1_Optellen.md
+
+De volledige keten is getest:
+SKILL → DEVELOPMENT → CLAIM → EVIDENCE TARGET → TASK MODEL → TASK INSTANCE → PERFORMANCE → OBSERVATION → EVIDENCE → EVIDENCE ASSESSMENT → DEVELOPMENTAL INFERENCE → MASTERY → DECISION → NEXT ACTION.
+
+Ook uitgevoerd:
+- concrete prototype-taskset;
+- evidenceprofielen;
+- masteryvoorwaarden;
+- automatische next-action regels;
+- scenario's;
+- adversarial stresstest;
+- empirische validatieagenda.
+
+Status:
+Candidate vertical prototype.
+
+Belangrijk:
+de automatische regels zijn ontwerp-/prototype-regels en niet empirisch gevalideerd.
+
+VOLGENDE GROTE STAP:
+FR2 — Breukequivalentie herkennen en gebruiken.
+
+Doel daarvan:
+testen of de verticale architectuur generiek is voor een relationele/conceptuele skill en niet alleen werkt voor optellen.

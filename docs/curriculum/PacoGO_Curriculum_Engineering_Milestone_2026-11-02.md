@@ -114,38 +114,75 @@ FR2 gebruikt dezelfde generieke interaction contracten:
 
 De concrete interactie is anders dan A1: selectie van een equivalente breuk in plaats van plaatsing op een getallenlijn.
 
-De FR2-browserverticale slice is opgenomen in de bestaande volledige browserregressie en de laatste volledige CI-run `41441801539` is groen:
+De FR2-browserverticale slice is opgenomen in de bestaande volledige browserregressie en is groen gevalideerd in de volledige CI-regressie.
 
+## 5. C4 — discriminating task set
+
+Na A1 en FR2 is niet nog een derde parallel interactie-framework gebouwd. De volgende stap is verschoven naar de wetenschappelijke vraag: **kunnen kandidaat-ontwikkelingsinterpretaties worden onderscheiden van plausibele alternatieve verklaringen?**
+
+Daarvoor is toegevoegd:
+
+- `docs/curriculum/PacoGO_C4_Discriminating_TaskSet_v0.1.json`
+- `pacogo-engine/c4-task-set.test.js`
+
+De C4-taskset is een **candidate/design-only** artefact. Het is geen gevalideerde curriculum-meting en wijzigt de curriculum registry niet.
+
+De set bevat momenteel **19 discriminating tasks over 10 candidate developments** en is gekoppeld aan de bestaande registry-, development-, claim-, task-model- en evidence-target-ID's.
+
+De taakdefinities bevatten expliciet:
+
+- evidence targets;
+- relevante task models;
+- variation metadata;
+- positieve patroonverwachting;
+- counter-pattern;
+- plausibele alternatieve model families;
+- process requirement waar relevant;
+- contrastrelaties waar relevant.
+
+De validator controleert bovendien dat iedere bestaande registry development minimaal één C4 discriminating task heeft en dat de evidence targets via de geselecteerde task-model-unie technisch kunnen worden geproduceerd.
+
+Een eerste validatorfout werd ontdekt en uitsluitend in de validator gecorrigeerd: evidence targets mogen afkomstig zijn uit de **unie van de geselecteerde task models**, niet noodzakelijk uit ieder afzonderlijk model. Daarna slaagde de volledige testset.
+
+### C4 CI-validatie
+
+Volledige CI-run: `41442702755`.
+
+Resultaat:
+
+- C4 task-set regression: PASS — 19 tasks / 10 developments
 - curriculum engine regression: PASS
 - architecture boundary tests: PASS
-- maintained Node regression: PASS
-- maintained Vitest regression: PASS
-- browser regression: PASS
+- maintained Node regression: PASS — 503 tests
+- maintained Vitest regression: PASS — 21 tests
+- browser regression: PASS — 45 tests
 - working tree clean: PASS
 
-## 5. Wetenschappelijke status
+De browserregressie rapporteerde geen browser errors.
+
+## 6. Wetenschappelijke status
 
 A1, B1 en FR2 blijven representatieve kandidaat-/prototypeconstructen.
 
-Deze technische milestone bewijst alleen dat de voorgestelde interaction/engine-architectuur technisch over meerdere domeinen kan worden toegepast.
+De C4-taskset is een onderzoeks- en testinstrument om kandidaatmodellen later te kunnen vergelijken; het is zelf geen empirische validatie.
 
-Het bewijst NIET dat:
+Deze technische milestones bewijzen NIET dat:
 
 - de skillafbakening empirisch correct is;
 - de developmental ordering correct is;
 - de masterycriteria optimaal zijn;
 - de next-action regels empirisch gevalideerd zijn;
-- A1 of FR2 definitieve curriculuminhoud zijn.
+- A1 of FR2 definitieve curriculuminhoud zijn;
+- de C4-positieve patronen daadwerkelijk in leerlingdata voorkomen.
 
 De volledige curriculumkaart blijft het uiteindelijke inhoudelijke doel.
 
-## 6. Volgende technische stap
+## 7. Volgende technische/inhoudelijke stap
 
-De generieke interaction boundary is nu door twee verschillende interactietypen beproefd:
+De technische architectuur is inmiddels beproefd met twee verschillende interactietypen en C4 heeft een eerste formele discriminatie-laag gekregen.
 
-- A1: directe ruimtelijke plaatsing
-- FR2: symbolische equivalentieselectie
+De volgende stap is daarom inhoudelijk: de C4-taskset koppelen aan het bredere **claim → development → alternative explanation → discriminating evidence**-onderzoek en bepalen welke claims eerst extern/wetenschappelijk onderbouwd moeten worden voordat ze als curriculumstructuur mogen worden vastgezet.
 
-De volgende uitbreiding moet daarom niet opnieuw een parallel interaction framework bouwen. Nieuwe domeinen moeten dezelfde generieke contracten en enginegrenzen gebruiken, met domeinspecifieke interaction/evaluation adapters waar nodig.
+Nieuwe runtime-domeinen worden alleen toegevoegd wanneer ze een duidelijke onderzoeks- of architectuurfunctie hebben; niet om simpelweg meer demo-skills te produceren.
 
 Alle verdere technische uitbreidingen blijven onderworpen aan de Supabase TEST-regel wanneer persistence/dataflow wordt geraakt.

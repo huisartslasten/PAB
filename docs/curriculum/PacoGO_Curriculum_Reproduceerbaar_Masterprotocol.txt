@@ -1,5 +1,5 @@
 PACOGO CURRICULUM — REPRODUCEERBAARHEID / MASTERPROTOCOL
-Versie: 1.1
+Versie: 1.2
 
 DOEL
 De PacoGO Curriculum-ontwikkeling mag nooit afhankelijk zijn van één ChatGPT-chatgeschiedenis. Dit bestand is onderdeel van de duurzame projectdocumentatie in de repository. Een nieuwe ChatGPT-sessie moet PacoGO op basis van de repo-documentatie kunnen overnemen.
@@ -122,6 +122,14 @@ C10 Curriculum revision
 
 PacoGO is niet empirisch bewezen alleen omdat het model logisch of wetenschappelijk geïnspireerd is.
 Ontwikkelingsmodellen zijn kandidaat-hypothesen totdat data ze ondersteunen.
+
+Het concrete protocol staat in:
+- docs/curriculum/PacoGO_Empirical_Validation_Protocol_v0.1.md
+- docs/curriculum/PacoGO_Empirical_Validation_Registry_v0.1.json
+
+De primaire validatie-eenheid is de claim. Candidate → Supported vereist vooraf bepaalde, toepasselijke empirische criteria met auditeerbare provenance, onderzoek naar alternatieve verklaringen en expliciete beperkingen. Supported → Validated vereist daarnaast sterkere toetsing, waaronder onafhankelijke/gescheiden replicatie en waar toepasselijk out-of-sample, modelvergelijking en context-/taalonderzoek.
+
+Geen enkele statuspromotie mag automatisch uit learner-performance of runtime-uitvoering volgen.
 
 ============================================================
 6. REGELS VOOR NIEUWE SKILLS / SUBSKILLS

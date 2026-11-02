@@ -19,11 +19,18 @@ function validateC6ResultForC7(c6Result, claimId) {
 
   const masteryResult = c6Result.mastery_state_by_claim[claimId];
   assert(masteryResult && typeof masteryResult === 'object', `C7 requires a C6 result for claim ${claimId}.`);
+  assert(masteryResult.claim_id === claimId, `C6 result ${claimId} has inconsistent claim_id.`);
   assert(Object.values(MASTERY_STATES).includes(masteryResult.mastery_state), `Invalid C6 mastery state for C7: ${masteryResult.mastery_state}`);
   assert(typeof masteryResult.development_id === 'string' && masteryResult.development_id.length > 0, `C6 result ${claimId} requires development_id.`);
   assert(Number.isInteger(masteryResult.evidence_count) && masteryResult.evidence_count >= 0, `C6 result ${claimId} requires non-negative evidence_count.`);
 
   return masteryResult;
+}
+
+function validateC7OrderingAndAlternativeInputs({ ordering_state, alternative_state }) {
+  assert(VALID_ORDERING_STATES.has(ordering_state), `Invalid C7 ordering_state: ${ordering_state}`);
+  assert(VALID_ALTERNATIVE_STATES.has(alternative_state), `Invalid C7 alternative_state: ${alternative_state}`);
+  return true;
 }
 
 function buildC7InputFromC6({
@@ -37,6 +44,8 @@ function buildC7InputFromC6({
   action_policy
 }) {
   const masteryResult = validateC6ResultForC7(c6_result, claim_id);
+  validateC7OrderingAndAlternativeInputs({ ordering_state, alternative_state });
+  assert(Array.isArray(supporting_evidence_ids), 'C7 adapter requires supporting_evidence_ids.');
 
   const input = {
     claim_id,
@@ -52,12 +61,6 @@ function buildC7InputFromC6({
 
   validateNextActionDecisionInput(input);
   return input;
-}
-
-function validateC7OrderingAndAlternativeInputs({ ordering_state, alternative_state }) {
-  assert(VALID_ORDERING_STATES.has(ordering_state), `Invalid C7 ordering_state: ${ordering_state}`);
-  assert(VALID_ALTERNATIVE_STATES.has(alternative_state), `Invalid C7 alternative_state: ${alternative_state}`);
-  return true;
 }
 
 export {

@@ -8,9 +8,9 @@ const BASE_INPUT = {
   current_development_id: matrix.base_context.current_development_id,
   mastery_state: 'MASTERED',
   evidence_state: 'SUFFICIENT',
-  ordering_state: 'SUPPORTED',
+  next_development_ordering_state: 'SUPPORTED',
   alternative_state: 'CONTROLLED',
-  prerequisite_state: 'SUPPORTED',
+  prerequisite_ordering_state: 'SUPPORTED',
   supporting_evidence_ids: [...matrix.base_context.supporting_evidence_ids],
   action_policy: {
     reassess_current_allowed: true,

@@ -68,6 +68,20 @@ test('C7 adapter rejects an invalid C6 mastery state', () => {
   );
 });
 
+test('C7 adapter rejects a C6 result that enables automatic next action', () => {
+  assert.throws(
+    () => validateC6ResultForC7({ ...c6Result(), automatic_next_action_allowed: true }, 'A1.C1'),
+    /automatic next-action selection to remain blocked/
+  );
+});
+
+test('C7 adapter rejects a C6 result that enables runtime mastery writes', () => {
+  assert.throws(
+    () => validateC6ResultForC7({ ...c6Result(), runtime_mastery_write_allowed: true }, 'A1.C1'),
+    /runtime mastery writes to remain blocked/
+  );
+});
+
 test('C7 adapter carries C6 mastery state and development without recomputing mastery', () => {
   const input = buildC7InputFromC6(baseAdapterInput({
     c6_result: c6Result({ mastery_state: 'NOT YET MASTERED' })

@@ -90,6 +90,17 @@ test('C7 assesses an unassessed prerequisite before advancing', () => {
   });
 });
 
+test('C7 evaluates prerequisite assessment before blocking on uncertain next-development ordering', () => {
+  assert.deepEqual(traceNextActionDecision(baseInput({
+    ordering_state: 'UNCERTAIN',
+    prerequisite_state: 'NOT_ASSESSED'
+  })), {
+    candidate_action: CANDIDATE_ACTIONS.ASSESS_PREREQUISITE_DEVELOPMENT,
+    decision_reason: DECISION_REASONS.PREREQUISITE_NOT_ASSESSED,
+    decision_gate: 'A4'
+  });
+});
+
 test('C7 holds when prerequisite assessment is not authorized', () => {
   assert.equal(
     decideNextAction(baseInput({

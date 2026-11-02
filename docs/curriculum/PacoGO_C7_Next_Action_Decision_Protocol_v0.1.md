@@ -112,7 +112,35 @@ De C6 → C7 adapter mag uitsluitend een gevalideerde C6-uitkomst doorgeven wann
 
 Ordering, alternatives, prerequisite-status en action policy blijven expliciete inputs van C7. De adapter mag deze niet uit C6-resultaten afleiden.
 
-## 7. Belangrijke grens
+## 7. Eerste verticale C6 → C7 slice
+
+De eerste technische verticale slice loopt volledig deterministisch door de twee lagen:
+
+```text
+C6 mastery assessment
+        ↓
+C6 mastery_state_by_claim
+        ↓
+C6 safety-boundary validation
+        ↓
+C7 input adapter
+        ↓
+C7 ordering / alternative / prerequisite gates
+        ↓
+C7 decision trace
+        ↓
+candidate next-action
+```
+
+Deze slice heeft drie minimale veiligheidsgevallen:
+
+1. **C6 = MASTERED + ordering SUPPORTED** → C7 mag, mits action policy dit toestaat, een next-development kandidaat opleveren.
+2. **C6 ≠ MASTERED** → C7 mag geen next-development advancement voorstellen.
+3. **ordering = NOT_SUPPORTED** → C7 moet een next-development actie blokkeren.
+
+De verticale slice verandert geen runtime-state en voert geen automatische learner advancement uit. Het doel is uitsluitend aantonen dat de contracten tussen C6 en C7 technisch op elkaar aansluiten.
+
+## 8. Belangrijke grens
 
 C7 is nadrukkelijk niet hetzelfde als een aanbevelingsalgoritme dat zelfstandig nieuwe onderwijsstappen bedenkt.
 
@@ -133,7 +161,7 @@ C7 mag niet:
 - automatisch een leerling laten doorgaan;
 - runtime-state muteren.
 
-## 8. Empirische vragen
+## 9. Empirische vragen
 
 C7 moet later empirisch worden getoetst op onder meer:
 

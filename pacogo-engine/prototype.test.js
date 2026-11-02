@@ -1,5 +1,5 @@
-const assert = require('assert');
-const engine = require('./prototype');
+import assert from 'node:assert/strict';
+import * as engine from './prototype.js';
 
 const evidenceRule = {
   relevance: (observation) => observation.target_hit,
@@ -23,7 +23,7 @@ const masteryRule = {
 const taskModels = [
   {
     id: 'A1.TM3',
-    evidence_target_id: 'A1.ET4',
+    evidence_target_ids: ['A1.ET4'],
     instructional_relevance: 1,
     information_value: 2
   }
@@ -49,6 +49,7 @@ const result = engine.runCycle({
 assert.equal(result.development[0].status, 'Supported');
 assert.equal(result.mastery.status, 'INSUFFICIENT EVIDENCE');
 assert.equal(result.next.task_model_id, 'A1.TM3');
+assert.deepEqual(result.next.expected_evidence, ['A1.ET4']);
 
 const contradiction = engine.assessEvidence(
   { target_hit: true, correct: false },

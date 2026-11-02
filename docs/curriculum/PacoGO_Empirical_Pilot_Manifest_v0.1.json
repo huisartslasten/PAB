@@ -1,0 +1,142 @@
+{
+  "schema_version": "0.1",
+  "status": "candidate",
+  "epistemic_status": "[O]",
+  "purpose": "Pre-specified first empirical pilot manifest linking C1-C3 measurement work to selected C4/C5 hypotheses.",
+  "synthetic_or_empirical": "design_only",
+  "registry_version": "0.2.0-seed",
+  "not_a_validated_curriculum_measure": true,
+  "scope": {
+    "skills": ["A1", "B1", "FR2"],
+    "focal_developments": [
+      "A1.D1", "A1.D2",
+      "B1.D1", "B1.D2",
+      "FR2.D1", "FR2.D2"
+    ],
+    "excluded_from_first_pilot": [
+      "A1.D3", "B1.D3", "B1.D4", "FR2.D3"
+    ],
+    "exclusion_reason": "First pilot prioritises observability and discriminating measurement before higher-order integration/transfer claims are tested. Exclusion is scope control, not a negative developmental claim."
+  },
+  "focal_claims": [
+    {
+      "claim_id": "A1.C1",
+      "development_id": "A1.D1",
+      "task_ids": ["A1-T01", "A1-T02", "A1-T04"],
+      "evidence_targets": ["A1.ET1"],
+      "primary_alternatives": ["task_familiarity", "representation_familiarity", "language_or_prompt_comprehension"],
+      "required_process": true
+    },
+    {
+      "claim_id": "A1.C2",
+      "development_id": "A1.D2",
+      "task_ids": ["A1-T03", "A1-T05"],
+      "evidence_targets": ["A1.ET2"],
+      "primary_alternatives": ["representation_specific_knowledge", "language_or_prompt_comprehension"],
+      "required_process": true
+    },
+    {
+      "claim_id": "B1.C1",
+      "development_id": "B1.D1",
+      "task_ids": ["B1-T01", "B1-T02", "B1-T04"],
+      "evidence_targets": ["B1.ET1"],
+      "primary_alternatives": ["item_familiarity", "memorisation", "task_surface_cueing"],
+      "required_process": true
+    },
+    {
+      "claim_id": "B1.C2",
+      "development_id": "B1.D2",
+      "task_ids": ["B1-T03", "B1-T05"],
+      "evidence_targets": ["B1.ET2"],
+      "primary_alternatives": ["calculation_fluency_only", "prompt_dependence"],
+      "required_process": true
+    },
+    {
+      "claim_id": "FR2.C1",
+      "development_id": "FR2.D1",
+      "task_ids": ["FR2-T01", "FR2-T02", "FR2-T04"],
+      "evidence_targets": ["FR2.ET1"],
+      "primary_alternatives": ["surface_similarity", "surface_familiarity", "cueing"],
+      "required_process": true
+    },
+    {
+      "claim_id": "FR2.C2",
+      "development_id": "FR2.D2",
+      "task_ids": ["FR2-T03", "FR2-T05"],
+      "evidence_targets": ["FR2.ET3"],
+      "primary_alternatives": ["representation_specific_familiarity", "language_comprehension"],
+      "required_process": true
+    }
+  ],
+  "waves": [
+    {
+      "wave_id": "W0",
+      "role": "feasibility",
+      "purpose": "Check task comprehension, interaction logging, observation completeness and coding manual clarity.",
+      "confirmatory": false,
+      "claim_support_allowed": false
+    },
+    {
+      "wave_id": "W1",
+      "role": "baseline_discrimination",
+      "purpose": "Collect independent observations across the focal task set and planned variation.",
+      "confirmatory": true,
+      "claim_support_allowed": "within_protocol_scope_only"
+    },
+    {
+      "wave_id": "W2_plus",
+      "role": "repeated_measurement",
+      "purpose": "Collect repeated observations needed to assess stability and prepare C5 temporal analyses.",
+      "confirmatory": true,
+      "claim_support_allowed": "within_protocol_scope_only"
+    }
+  ],
+  "required_observation_fields": [
+    "learner_id",
+    "study_id",
+    "wave_id",
+    "task_instance_id",
+    "registry_version",
+    "skill_id",
+    "development_id",
+    "claim_id",
+    "evidence_target_ids",
+    "task_model_id",
+    "variation_metadata",
+    "interaction_events",
+    "response",
+    "performance_status",
+    "process_status",
+    "prompt_level",
+    "instruction_exposure",
+    "language_context",
+    "technical_quality",
+    "observed_at"
+  ],
+  "c3_coding_requirements": {
+    "double_coding": true,
+    "preserve_independent_codes": true,
+    "preserve_adjudication": true,
+    "required_dimensions": ["target_match", "performance_status", "process_status", "independence_status", "quality", "contradiction", "alternative_explanation_flags"]
+  },
+  "c4_readiness_gate": [
+    "provenance_complete",
+    "evidence_targets_observable",
+    "coding_reliability_acceptable_for_protocol",
+    "multiple_task_instances_per_focal_claim",
+    "relevant_variation_present",
+    "critical_process_evidence_available",
+    "material_alternatives_explicitly_tested_or_remaining_as_limitations"
+  ],
+  "c5_readiness": {
+    "required": true,
+    "minimum_condition": "Repeated observations across at least two time points or another design explicitly justified for the ordering question.",
+    "important_boundary": "Prediction does not by itself establish prerequisite status; prerequisite claims require stronger evidence than temporal association or predictive association."
+  },
+  "decision_policy": {
+    "no_automatic_registry_promotion": true,
+    "no_automatic_mastery_rule_change": true,
+    "candidate_status_until_empirical_review": true,
+    "possible_outcomes": ["FEASIBILITY_ONLY", "INDETERMINATE", "SUPPORTS_CANDIDATE_WITHIN_SCOPE", "CONTRADICTS_CANDIDATE_WITHIN_SCOPE", "REVISE_PROTOCOL"]
+  }
+}

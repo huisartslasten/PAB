@@ -1,0 +1,422 @@
+PACOGO CURRICULUM — CHAT TRANSFER
+Datum: 2026-11-02
+Doel: naadloze overdracht naar de volgende ChatGPT-sessie
+Branch: refactor/professional-v1
+MAIN/LIVE: NIET AANRAKEN
+
+============================================================
+1. WAAR WE ZIJN
+============================================================
+
+PacoGO Curriculum is niet meer alleen een curriculumdocumentatieproject. De wetenschappelijke/curriculumlaag, de generieke learning engine en de eerste empirische validatie-infrastructuur bestaan inmiddels als samenhangend prototype.
+
+De cruciale volgende stap is nu de brug naar echte leerlinginteractie.
+
+De centrale architectuur is:
+
+CURRICULUM
+→ SKILL
+→ DEVELOPMENT
+→ CLAIM
+→ EVIDENCE TARGET
+→ TASK MODEL
+→ TASK INSTANCE
+→ INTERACTION
+→ OBSERVATION
+→ EVIDENCE
+→ DEVELOPMENT INFERENCE
+→ MASTERY
+→ DECISION
+→ NEXT ACTION
+
+De huidige technische focus is de eerste volledige verticale slice:
+
+A1 GETALLEN REPRESENTEREN EN VERBINDEN
+→ GETALLENLIJN
+→ BROWSERINTERACTIE
+→ OBSERVATIE
+→ ENGINE
+
+Dit is bewust gedaan voordat we tientallen afzonderlijke skill-apps gaan bouwen.
+
+============================================================
+2. BELANGRIJKSTE BESLISSING VAN DEZE FASE
+============================================================
+
+We gaan NIET voor iedere skill een aparte technische mini-app bouwen.
+
+We bouwen eerst een herbruikbare interaction architecture.
+
+Voorbeelden van toekomstige interaction families:
+- SELECT
+- MATCH
+- SORT
+- ORDER
+- LABEL
+- DRAG
+- PLACE_ON_AXIS
+- MOVE_MARKER
+- DRAW
+- RESIZE
+- SPLIT
+- COMBINE
+- GROUP
+- ROTATE
+- REARRANGE
+- SET_TIME
+- MOVE_HAND
+- SEQUENCE_EVENTS
+- SET_DURATION
+- TYPE_VALUE
+- SELECT_SYMBOL
+- COMPLETE_EXPRESSION
+
+De getallenlijn is de eerste concrete implementatie omdat die inhoudelijk goed past bij A1 en technisch een goede test is van de architectuur.
+
+Belangrijk:
+interaction complexity ≠ development
+interaction data ≠ automatisch evidence
+correct antwoord ≠ automatisch mastery
+
+============================================================
+3. WAT IN DEZE SESSIE IS GEBOUWD
+============================================================
+
+A. Generiek interaction contract
+Bestand:
+pacogo-engine/interaction-contract.js
+
+Bevat:
+- createTaskInstance()
+- createInteractionEvent()
+- createObservation()
+
+De observatie bewaart onder andere:
+- observation_id
+- student_key
+- task IDs
+- task definition version
+- skill/development/claim
+- evidence targets
+- response
+- correctness
+- performance
+- context
+- provenance
+- interaction_events
+
+B. Generieke getallenlijn-interactie
+Bestand:
+pacogo-engine/number-line.js
+
+Bevat:
+- createNumberLine()
+- valueToPosition()
+- positionToValue()
+- snapPosition()
+- evaluatePlacement()
+
+C. Browser renderer
+Bestand:
+pacogo-engine/number-line-renderer.js
+
+Render van de getallenlijn in de browser met:
+- SVG
+- marker
+- pointer interaction
+- keyboard ArrowLeft/ArrowRight
+- readout
+
+D. Browser controller / observation adapter
+Bestand:
+pacogo-engine/number-line-controller.js
+
+Verbindt:
+interaction → events → observation
+
+Het maakt een task instance, registreert events en maakt bij submit een observation met provenance.
+
+E. Eerste browserpagina
+Bestand:
+curriculum-a1-numberline.html
+
+Dit is een eerste echte A1 verticale slice.
+De pagina laadt:
+- curriculum registry
+- pilot task set
+- number-line interaction
+- renderer
+- controller
+- registry engine
+
+De pagina laat een leerling 7 plaatsen op 0–10 en stuurt daarna de observatie door naar de curriculum engine.
+
+F. Tests
+Toegevoegd:
+- pacogo-engine/interaction-contract.test.js
+- pacogo-engine/number-line.test.js
+- pacogo-engine/number-line-controller.test.js
+- pacogo-engine/number-line-vertical.test.js
+- test/browser/curriculum-a1-numberline.browser.test.js
+
+G. Architectuurdocument
+Bestand:
+docs/curriculum/PacoGO_Interaction_Architecture_v0.1.md
+
+Dit document beschrijft de scheiding tussen curriculum, interaction layer, observation boundary en learning engine.
+
+============================================================
+4. WAT AL BESTOND EN NIET OPNIEUW MOET WORDEN GEDAAN
+============================================================
+
+NIET OPNIEUW ONTWERPEN:
+
+1. Curriculum Registry
+   docs/curriculum/PacoGO_Curriculum_Registry_v0.2.json
+
+2. Generic engine
+   pacogo-engine/prototype.js
+   pacogo-engine/curriculum-registry.js
+
+3. Student evidence store
+   pacogo-engine/student-evidence-store.js
+
+4. Longitudinal state / decision trace
+   pacogo-engine/longitudinal-state.js
+
+5. Validation hooks
+   pacogo-engine/validation-hooks.js
+
+6. Empirical validation protocol
+   docs/curriculum/PacoGO_Empirical_Validation_Protocol_v0.1.md
+
+7. C1–C3 pilot protocol / schema / coding manual
+
+8. C4 development validation protocol
+   docs/curriculum/PacoGO_C4_Development_Validation_Protocol_v0.1.md
+
+9. C4 comparison model
+   docs/curriculum/PacoGO_C4_Development_Comparison_Model_v0.1.md
+
+10. C4 Claim Test Matrix
+   gebruik het bestaande bestand in docs/curriculum/ en controleer de exacte bestandsnaam indien nodig.
+
+11. Reproduceerbaar Masterprotocol
+   docs/curriculum/PacoGO_Curriculum_Reproduceerbaar_Masterprotocol.txt
+
+De wetenschappelijke status blijft:
+A1/B1/FR2 = Candidate.
+De technische engine is een prototype en technische werking is GEEN empirische validatie.
+
+============================================================
+5. EMPIRISCHE REGELS DIE BLIJVEN GELDEN
+============================================================
+
+Gebruik:
+[W] = rechtstreeks ondersteund door wetenschappelijke literatuur
+[S] = PacoGO-synthese
+[O] = ontwerpkeuze
+
+Status:
+Candidate / Supported / Validated
+
+Geen automatische promotie.
+
+Developmentele claims moeten worden onderscheiden van:
+- task difficulty
+- task familiarity
+- representation-specific performance
+- prompting/language/context
+- memorization/cueing
+
+C4 onderzoekt of een ontwikkelingsinterpretatie de data beter verklaart dan plausibele alternatieve verklaringen.
+C5 onderzoekt ontwikkelingsordening afzonderlijk.
+
+Mastery is niet hetzelfde als ontwikkelingspositie.
+
+============================================================
+6. HUIDIGE TECHNISCHE STATUS
+============================================================
+
+De eerste interaction architecture is technisch aanwezig.
+
+De volledige browser vertical slice is geschreven, maar nog NIET als definitief groen verklaard.
+
+Er is een actuele GitHub Actions-run gestart op de nieuwste wijzigingen.
+De meest recente gecontroleerde run:
+- workflow: PacoGO full regression — refactor/professional-v1
+- run: 41440318555
+- head SHA: f4b6038e3f6b417bf73596c1e3855faa144217a2
+- status tijdens controle: in_progress, daarna faalde stap 8
+- stap 8: Run curriculum engine regression = FAILURE
+- browser regression is daardoor overgeslagen.
+
+Dit betekent NIET automatisch dat de nieuwe browsercode fout is. Eerst moet de concrete fout van de curriculum-engine regression worden opgehaald en gerepareerd.
+
+BELANGRIJK:
+Claim nooit dat de nieuwste wijzigingen groen zijn zonder een afgeronde succesvolle CI-run.
+
+============================================================
+7. EXACTE VOLGENDE STAP
+============================================================
+
+De volgende ChatGPT-sessie moet NIET opnieuw beginnen met curriculumtheorie.
+
+DOE IN DEZE VOLGORDE:
+
+STAP 1 — CI FAILURE ISOLEREN
+- controleer de laatste workflow run op branch refactor/professional-v1;
+- lees de output van "Run curriculum engine regression";
+- bepaal exact welke test faalt en waarom;
+- repareer alleen de echte oorzaak;
+- voeg indien nodig een gerichte regression test toe;
+- voer opnieuw volledige regressie uit.
+
+STAP 2 — BROWSER VERTICAL SLICE GROEN MAKEN
+Pas als de curriculum-engine tests groen zijn:
+- browser test laten draaien;
+- controleren dat de browser daadwerkelijk een observation produceert;
+- controleren dat observation_id behouden blijft;
+- controleren dat curriculum_registry_version behouden blijft;
+- controleren dat evidence wordt opgebouwd;
+- controleren dat mastery NIET uit één correcte observatie naar MASTERED springt;
+- controleren dat decision/next action wordt geproduceerd.
+
+STAP 3 — VERTICAL SLICE ALS ARCHITECTUURTEST BESCHOUWEN
+De eerste echte keten moet aantoonbaar werken:
+
+curriculum
+→ task model
+→ task instance
+→ browser interaction
+→ interaction events
+→ observation
+→ evidence
+→ inference
+→ mastery
+→ decision
+→ next action
+
+STAP 4 — PAS DAARNA HERBRUIKBAARHEID TESTEN
+Daarna niet meteen tientallen skills bouwen.
+Bouw een tweede domein, bij voorkeur FR2/breuken, met zoveel mogelijk dezelfde interaction architecture.
+
+Waarom breuken?
+Omdat hiermee getest wordt of de architecture echt generiek is en niet stiekem alleen een getallenlijn-engine is.
+
+STAP 5 — DAARNA VERDER
+Pas nadat A1 + tweede domein technisch werken:
+- interaction families verder abstraheren;
+- browser event collector verder generaliseren;
+- observation adapters generaliseren;
+- daarna pas meer skills aansluiten.
+
+============================================================
+8. WAT NIET MOET GEBEUREN
+============================================================
+
+NIET:
+- MAIN/LIVE aanpassen;
+- nieuwe branches maken;
+- honderden skill-specifieke mini-apps bouwen;
+- empirische validatie claimen omdat tests groen zijn;
+- C5 uitwerken alleen omdat C4-documentatie bestaat;
+- bestaande curriculumarchitectuur opnieuw ontwerpen;
+- synthetic data als echte learner data behandelen;
+- security warnings wijzigen die bewust buiten scope zijn;
+- CI groen noemen voordat de run daadwerkelijk succesvol is.
+
+============================================================
+9. REPO- EN SUPABASE-STATUS
+============================================================
+
+Branch:
+refactor/professional-v1
+
+MAIN/LIVE:
+niet aanraken.
+
+Supabase bevat inmiddels de echte infrastructuur voor:
+- curriculum_registry_versions
+- student_evidence
+- student_longitudinal_state
+- curriculum_decision_trace
+
+Een eerdere synthetic Supabase smoke test is volledig teruggedraaid.
+Er horen geen synthetic pilotrecords als permanente learner data in Supabase te staan.
+
+Bestaande migrations zijn correct en mogen niet opnieuw worden uitgevonden:
+- 20261101230000_create_curriculum_registry_and_student_evidence.sql
+- 20261102040237_create_curriculum_decision_trace_and_longitudinal_state.sql
+- 20261102043000_add_uncertainty_and_validation_hooks.sql
+
+Bewuste security warnings blijven buiten scope.
+
+============================================================
+10. BELANGRIJKE MENTALE MODELLERING VOOR DE VOLGENDE CHAT
+============================================================
+
+De huidige situatie moet worden gezien als:
+
+WETENSCHAPPELIJKE LAAG
+        ↓
+CURRICULUMMODEL
+        ↓
+GENERIEKE LEARNING ENGINE
+        ↓
+INTERACTION ARCHITECTURE
+        ↓
+EERSTE ECHTE VERTICALE SLICE
+        ↓
+[NU HIER]
+
+De grootste ontbrekende laag was tot nu toe de echte learner interaction.
+Die wordt nu gebouwd.
+
+De bedoeling is niet een mooie demo te maken.
+De bedoeling is een herbruikbare technische en wetenschappelijke keten te bewijzen.
+
+============================================================
+11. REGIE-INSTRUCTIE VOOR DE VOLGENDE CHAT
+============================================================
+
+Neem de regie over.
+De gebruiker wil niet iedere kleine processtap hoeven bepalen.
+Werk in GROTE COHERENTE BLOKKEN.
+
+Bij een technische fout:
+1. zelf onderzoeken;
+2. echte oorzaak vaststellen;
+3. repareren;
+4. testen;
+5. pas daarna rapporteren.
+
+Niet steeds tussendoor vragen wat de gebruiker wil.
+
+De gebruiker is bang dat de chatlimiet wordt bereikt. Houd daarom rapportages compact en gebruik deze repository-documentatie als geheugen.
+
+Als de chat opnieuw wordt overgenomen:
+- lees dit transferbestand;
+- lees het Masterprotocol;
+- controleer de actuele DEV branch;
+- controleer de laatste CI-run;
+- ga direct verder bij STAP 1.
+
+============================================================
+12. EINDE VAN DEZE OVERDRACHT
+============================================================
+
+HUIDIGE POSITIE:
+A1 number-line vertical slice gebouwd.
+
+ACTUELE BLOKKER:
+curriculum-engine regression faalt in de nieuwste CI-run.
+
+EERSTE ACTIE VOLGENDE CHAT:
+CI failure uitlezen → oorzaak repareren → volledige regressie opnieuw draaien.
+
+DAARNA:
+browser vertical slice groen maken → tweede domein gebruiken om interaction architecture te valideren.
+
+DOEL:
+PacoGO moet uiteindelijk een reproduceerbaar systeem worden waarin curriculum, assessment, evidence, development, mastery, decision en instruction één empirisch toetsbare architectuur vormen.

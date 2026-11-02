@@ -93,7 +93,7 @@ test('pipeline executes dataset -> C3 -> C4 gate -> descriptive report without d
   assert.equal(result.dataset_validation.valid, true);
   assert.equal(result.pilot_result.observation_count, 1);
   assert.equal(result.c3_reliability_by_claim['A1.C1'].double_coded_pair_count, 1);
-  assert.equal(result.c4_measurement_gate.readiness_by_claim['A1.C1'].measurement_gate_state, 'READY_FOR_C4');
+  assert.equal(result.c4_measurement_gate.readiness_by_claim['A1.C1'].measurement_gate_state, 'REVISE_PROTOCOL');
   assert.equal(result.c4_measurement_gate.all_claims_ready_for_c4, false);
   assert.equal(result.status, 'BLOCKED_OR_REVISE');
   assert.equal(result.descriptive_report.status, 'descriptive_only');

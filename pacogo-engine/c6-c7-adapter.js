@@ -20,9 +20,9 @@ function createC7InputFromC6(c6Result, options) {
   assert(typeof options.claim_id === 'string' && options.claim_id.length > 0, 'C6 → C7 requires claim_id.');
   assert(typeof options.current_development_id === 'string' && options.current_development_id.length > 0, 'C6 → C7 requires current_development_id.');
   assert(typeof options.evidence_state === 'string', 'C6 → C7 requires explicit evidence_state.');
-  assert(typeof options.ordering_state === 'string', 'C6 → C7 requires explicit ordering_state.');
+  assert(typeof options.next_development_ordering_state === 'string', 'C6 → C7 requires explicit next_development_ordering_state.');
   assert(typeof options.alternative_state === 'string', 'C6 → C7 requires explicit alternative_state.');
-  assert(typeof options.prerequisite_state === 'string', 'C6 → C7 requires explicit prerequisite_state.');
+  assert(typeof options.prerequisite_ordering_state === 'string', 'C6 → C7 requires explicit prerequisite_ordering_state.');
   assert(Array.isArray(options.supporting_evidence_ids), 'C6 → C7 requires supporting_evidence_ids.');
   assert(options.action_policy && typeof options.action_policy === 'object', 'C6 → C7 requires explicit action_policy.');
 
@@ -36,9 +36,9 @@ function createC7InputFromC6(c6Result, options) {
     current_development_id: options.current_development_id,
     mastery_state: masteryResult.mastery_state,
     evidence_state: options.evidence_state,
-    ordering_state: options.ordering_state,
+    next_development_ordering_state: options.next_development_ordering_state,
     alternative_state: options.alternative_state,
-    prerequisite_state: options.prerequisite_state,
+    prerequisite_ordering_state: options.prerequisite_ordering_state,
     supporting_evidence_ids: [...options.supporting_evidence_ids],
     action_policy: { ...options.action_policy }
   };

@@ -1,0 +1,49 @@
+PacoGO Curriculum — Stap 14 Status
+Datum: 2026-11-02
+Branch: refactor/professional-v1
+Wetenschappelijke status: Candidate
+
+DOEL
+Decision Trace en Longitudinal State uitbreiden zodat het systeem niet alleen een beslissing kan uitvoeren, maar ook expliciet kan laten zien welke onzekerheid en alternatieve verklaringen aanwezig waren en welke validatie nog nodig is.
+
+AFGEROND
+1. Longitudinal State uitgebreid met:
+   - observed/missing evidence targets;
+   - contradictions;
+   - unresolved developments;
+   - alternative explanations;
+   - validation-hook status.
+
+2. Decision Trace uitgebreid met dezelfde onzekerheidsinformatie.
+
+3. Generiek validation-hook framework toegevoegd:
+   - C1 t/m C10;
+   - standaardstatus NOT_RUN;
+   - optionele scope-configuratie;
+   - geen automatische promotie van Candidate naar Supported/Validated.
+
+4. Supabase persistent schema uitgebreid met alternative_explanations en validation_hooks.
+
+5. Canonieke migratiebestanden voor longitudinal state/decision trace en de Step-14 uitbreiding zijn nu ook in de repository aanwezig.
+
+6. A1/B1/FR2 registry-runtime tests uitgebreid met:
+   - validation-hook aanwezigheid;
+   - alternative explanation propagation;
+   - trace propagation.
+
+WAT DIT WEL BEWIJST
+- technische traceerbaarheid;
+- reproduceerbare provenance per curriculumversie;
+- expliciete opslag van onzekerheid;
+- ondersteuning voor competing explanations;
+- technische voorbereiding op empirische validatie.
+
+WAT DIT NIET BEWIJST
+- geen constructvaliditeit;
+- geen ontwikkelingsvaliditeit;
+- geen valide mastery cut scores;
+- geen bewezen effectiviteit van next-action keuzes;
+- geen Supported/Validated status.
+
+VOLGENDE GROTE BLOK
+De volgende stap is niet nog meer runtime-logica omwille van de techniek. Eerst moet de empirische validatie-laag worden geconcretiseerd: per curriculumclaim vastleggen welk bewijs nodig is om Candidate -> Supported en vervolgens eventueel Supported -> Validated te rechtvaardigen. Daarna kunnen C1-C10 echte, expliciet gedefinieerde validatiecriteria krijgen.

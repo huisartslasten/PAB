@@ -32,6 +32,7 @@ for (const skillId of ['A1', 'B1', 'FR2']) {
   assert.equal(result.next.action_type, 'TASK');
   assert.equal(result.longitudinal_state.curriculum_registry_version, registry.registry_version);
   assert.equal(result.decision_trace.curriculum_registry_version, registry.registry_version);
+  assert.equal(result.longitudinal_state.validation_hooks.C1.status, 'NOT_RUN');
 }
 
 const skill = registry.getSkill('A1');
@@ -46,6 +47,22 @@ const longitudinal = registry.runSkillCycle({
 assert.equal(longitudinal.longitudinal_state.evidence_count, 2);
 assert.deepEqual(longitudinal.longitudinal_state.observed_targets.sort(), ['A1.ET1', 'A1.ET2']);
 assert.equal(longitudinal.decision_trace.decision.next_action.action_type, 'TASK');
+
+const alternative = registry.runSkillCycle({
+  studentKey: 'seed-student',
+  skillId: 'FR2',
+  observation: {
+    id: 'FR2-alt-1', evidence_target_id: 'FR2.ET3', quality: 0.9,
+    contradiction: false, independent: true, variation_key: 'visual-1',
+    alternative_explanations: [{ label: 'Correct answer may reflect a memorized pair rather than equivalence reasoning.' }],
+    observed_at: '2026-11-02T11:00:00Z'
+  },
+  priorEvidence: [],
+  asOf: '2026-11-02T11:00:00Z'
+});
+assert.equal(alternative.longitudinal_state.uncertainty.alternative_explanation_count, 1);
+assert.equal(alternative.longitudinal_state.alternative_explanations[0].label.includes('memorized pair'), true);
+assert.equal(alternative.decision_trace.alternative_explanations.length, 1);
 
 const store = createStudentEvidenceStore();
 store.append({ student_key: 'seed-student', curriculum_registry_version: registry.registry_version, skill_id: 'A1', development_id: 'A1.D1', evidence_target_id: 'A1.ET1', observation: { quality: 1 }, evidence_assessment: { evidence: true } });

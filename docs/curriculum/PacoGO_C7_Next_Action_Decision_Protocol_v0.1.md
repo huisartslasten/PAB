@@ -99,7 +99,20 @@ De exacte keuze tussen assessen en oefenen moet door een expliciet aangeleverde 
 
 Elke decision trace moet intern coherent zijn: `candidate_action`, `decision_reason` en `decision_gate` moeten samen een geldige C7-combinatie vormen. Een trace die deze contractuele samenhang niet heeft, mag niet als C7-uitkomst worden teruggegeven.
 
-## 6. Belangrijke grens
+## 6. C6 → C7 handoff
+
+De C6-uitkomst is de bron voor de mastery-state van C7. C7 mag de mastery-state niet opnieuw berekenen of reconstrueren uit onderliggende scores.
+
+De C6 → C7 adapter mag uitsluitend een gevalideerde C6-uitkomst doorgeven wanneer de C6-safetygrenzen actief blijven:
+
+- `registry_promotion_allowed = false`;
+- `runtime_mastery_write_allowed = false`;
+- `developmental_ordering_inference_allowed = false`;
+- `automatic_next_action_allowed = false`.
+
+Ordering, alternatives, prerequisite-status en action policy blijven expliciete inputs van C7. De adapter mag deze niet uit C6-resultaten afleiden.
+
+## 7. Belangrijke grens
 
 C7 is nadrukkelijk niet hetzelfde als een aanbevelingsalgoritme dat zelfstandig nieuwe onderwijsstappen bedenkt.
 
@@ -120,7 +133,7 @@ C7 mag niet:
 - automatisch een leerling laten doorgaan;
 - runtime-state muteren.
 
-## 7. Empirische vragen
+## 8. Empirische vragen
 
 C7 moet later empirisch worden getoetst op onder meer:
 

@@ -12,6 +12,10 @@ function validateC6ResultForC7(c6Result, claimId) {
   assert(c6Result && typeof c6Result === 'object', 'C7 requires a C6 result object.');
   assert(c6Result.mastery_state_by_claim && typeof c6Result.mastery_state_by_claim === 'object', 'C7 requires C6 mastery_state_by_claim.');
   assert(typeof claimId === 'string' && claimId.length > 0, 'C7 adapter requires claim_id.');
+  assert(c6Result.registry_promotion_allowed === false, 'C7 requires C6 registry promotion to remain blocked.');
+  assert(c6Result.runtime_mastery_write_allowed === false, 'C7 requires C6 runtime mastery writes to remain blocked.');
+  assert(c6Result.developmental_ordering_inference_allowed === false, 'C7 requires C6 developmental ordering inference to remain blocked.');
+  assert(c6Result.automatic_next_action_allowed === false, 'C7 requires C6 automatic next-action selection to remain blocked.');
 
   const masteryResult = c6Result.mastery_state_by_claim[claimId];
   assert(masteryResult && typeof masteryResult === 'object', `C7 requires a C6 result for claim ${claimId}.`);

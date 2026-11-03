@@ -5,6 +5,15 @@ import { runW0Feasibility, validateW0Structure } from './w0-feasibility.js';
 
 const readJson = async path => JSON.parse(await readFile(new URL(`../${path}`, import.meta.url), 'utf8'));
 
+function makeW0Review() {
+  return {
+    task_comprehension: { status: 'PASS', evidence_count: 3, notes: 'reviewed' },
+    interaction_logging: { status: 'PASS', evidence_count: 3, notes: 'reviewed' },
+    observation_completeness: { status: 'PASS', evidence_count: 3, notes: 'reviewed' },
+    coding_manual_clarity: { status: 'PASS', evidence_count: 2, notes: 'reviewed' }
+  };
+}
+
 async function loadW0() {
   const [fixture, manifest, taskSet, analysis] = await Promise.all([
     readJson('docs/curriculum/PacoGO_W0_Feasibility_Fixture_v0.1.json'),
@@ -15,7 +24,7 @@ async function loadW0() {
   const reliabilityByClaim = Object.fromEntries(
     manifest.focal_claims.map(claim => [claim.claim_id, { status: 'ACCEPTABLE_FOR_PILOT_CODING' }])
   );
-  return { fixture, manifest, taskSet, analysis, reliabilityByClaim };
+  return { fixture, manifest, taskSet, analysis, reliabilityByClaim, w0FeasibilityReview: makeW0Review() };
 }
 
 test('W0 executes the synthetic end-to-end feasibility chain deterministically', async () => {

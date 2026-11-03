@@ -1,5 +1,9 @@
 # PacoGO Curriculum — Current Handoff
 
+> **HANDOFF IS THE CROSS-CHAT SOURCE OF TRUTH.** Every new chat working on PacoGO Curriculum must read this file first. It must not assume that prior chat history is available.
+>
+> **MANDATORY HANDOFF MAINTENANCE:** After every significant curriculum, scientific, architectural, engineering or product decision, and after every completed major phase, this handoff must be reviewed and updated before that chat closes the phase. The update must reflect the current project position, completed work, decisions, open research questions, next concrete step and latest verified regression/commit status. The handoff is not a historical note; it is the current transferable project state.
+
 ## 1. Project position
 
 PacoGO is being developed as a learning/curriculum platform. The curriculum engine is the scientific decision layer; the learner-facing product and visual learning interfaces are built later on top of it.
@@ -145,76 +149,66 @@ Planned order:
 2. Generalise the architecture with B1.
 3. Generalise again with FR2.
 4. Expand the curriculum into concrete mathematical domains such as number lines, clocks, fractions, measurement, quantities and ratios.
-5. Build the Learning Interface System.
+5. Complete the scientific-validation specification before the runtime starts collecting research-critical data.
+6. Build the Learning Interface System with the validation data requirements already designed into its data contract.
 
 B1 and FR2 do not need to be rebuilt at the same depth as A1. A1 is the construction/proof case; B1 and FR2 primarily test whether the same engine generalises across different mathematical domains.
 
-## 7. Scientific validation — mandatory future work
+## 7. Scientific validation — mandatory future workstream
 
-Important status distinction:
+**Important:** Completing the curriculum engine, curriculum content and Learning Interface System does **not** mean PacoGO is scientifically validated. It means PacoGO has a scientifically grounded, explicit and testable model.
 
-Completing C1–C9, the curriculum content and the Learning Interface System will produce a **scientifically grounded, testable system**, not a scientifically validated system. Empirical validation still has to be performed with real learner data.
+A dedicated scientific-validation workstream must therefore be completed before claiming empirical validation.
 
-The next research-oriented phase must therefore explicitly determine what is required to validate PacoGO scientifically. A future chat taking over this handoff must treat this as a concrete workstream, not as an optional discussion.
+### Required next research task
 
-### Required future investigation
+The next curriculum/research chat must **investigate what is scientifically required to validate PacoGO**, rather than assuming the current design is already validated.
 
-Before the Learning Interface System is too deeply implemented, investigate and specify a formal:
+That investigation must determine, at minimum:
+- which scientific claims PacoGO is actually making;
+- which hypotheses follow from those claims;
+- which constructs need to be measured;
+- which reliability studies are required;
+- which forms of validity need to be investigated;
+- how C4/C5 developmental claims can be empirically tested;
+- how C6 mastery decisions can be externally validated;
+- how C7 next-action decisions can be evaluated;
+- how learner-state predictions can be validated longitudinally;
+- how Learning Interfaces can be evaluated for learning and transfer rather than merely usability;
+- which independent/external measures are needed so PacoGO does not validate itself against itself;
+- which sample, study, comparison and longitudinal designs are appropriate;
+- what statistical/measurement analyses are required;
+- how replication/generalisation should be handled;
+- what child-data privacy, consent, ethics and research-governance requirements apply.
 
-**`PacoGO Validation Data Specification v0.1`**
+The investigation must be evidence-based and may challenge or revise the current PacoGO architecture where the scientific requirements show that a different design is necessary.
 
-The purpose is to determine, from the scientific claims and validation questions already defined in C1–C9, exactly what PacoGO must collect so that those claims can later be empirically tested.
+### Required deliverable
 
-The next chat must:
-1. Research the appropriate scientific validation framework for PacoGO's claims, curriculum model, mastery decisions, developmental ordering and next-action decisions.
-2. Identify the validation questions and hypotheses that must be tested.
-3. Determine the evidence required for reliability, construct validity, criterion/concurrent validity, predictive validity, developmental/longitudinal validity, transfer/generalisation and (where appropriate) causal/effectiveness claims.
-4. Determine which external or independent measures are needed so PacoGO does not validate itself against its own outputs.
-5. Determine the required learner, task, interaction, evidence, inference, decision, outcome and study metadata.
-6. Determine which data must be collected during feasibility, discriminating, validation and longitudinal phases.
-7. Determine which variables are essential, which are optional, and which should explicitly NOT be collected because they do not answer a scientific question.
-8. Determine the required study design, sampling considerations, comparison/control conditions where appropriate, measurement reliability procedures, missing-data handling and analysis strategy at a high level.
-9. Map every required research variable back to the PacoGO runtime/data architecture so the system can capture it correctly from the beginning.
-10. Identify privacy, consent, child-data and ethical requirements that affect the validation data model; do not assume that technically available telemetry is automatically appropriate to collect.
-11. Produce the formal Validation Data Specification and any required architecture changes before proceeding too far with Learning Interface implementation.
+Create:
+`docs/curriculum/PacoGO_Validation_Data_Specification_v0.1.md`
 
-### Core principle
+This specification must map:
 
-For every collected variable, the future validation design should be able to answer:
+`scientific question → hypothesis → construct → required variable/data → source → measurement moment → analysis → validation criterion → interpretation`
 
-> **Which scientific question does this data allow us to answer?**
+It must distinguish:
+- data required for product functionality;
+- data required for curriculum/engine decisions;
+- data required specifically for scientific validation;
+- data that should **not** be collected because it has no defensible research purpose.
 
-If there is no defensible scientific purpose, the variable should not be added merely because it is technically measurable.
+The specification must be designed **before** the Learning Interface System locks its runtime/evidence data contract, so that PacoGO does not later need to rebuild interfaces merely to make scientific validation possible.
 
-### Validation data layers to investigate
+### Scientific status language
 
-At minimum, investigate whether the validation design requires data across these layers:
-- learner/context
-- study/wave/session
-- curriculum/skill/development/claim
-- task definition and task instance
-- raw learner performance and interaction
-- prompts/help/independence
-- evidence and C3 coding
-- C5 developmental-ordering evidence
-- C6 mastery evidence and decision gates
-- C7 next-action decision
-- C8 learner state over time
-- later learner outcomes
-- independent/external validation measures
-- Learning Interface identity/configuration and interaction data
-- transfer/generalisation outcomes
-- research metadata, missingness and protocol deviations
+Until empirical studies have actually been conducted, PacoGO should be described as:
+- scientifically grounded;
+- scientifically designed;
+- empirically testable;
+- not yet scientifically validated.
 
-This list is a starting hypothesis, **not yet the final specification**. The next validation-focused work must research, challenge and refine it rather than simply accepting it.
-
-### Scientific validation loop
-
-The intended empirical loop is:
-
-`theoretical model → curriculum/task design → learner data → evidence → statistical analysis → model evaluation → model revision → new data → replication/generalisation`
-
-The outcome is allowed to be that a PacoGO hypothesis is unsupported. The purpose of validation is to test the model honestly, not to manufacture evidence that PacoGO works.
+Do not use “scientifically validated” merely because C1–C9 are implemented.
 
 ## 8. Learning Interface System — architectural direction
 
@@ -258,36 +252,31 @@ C6–C9 did not require Supabase schema/runtime changes. The work remains in the
 
 ## 11. Latest verified regression state
 
-Latest completed Full Regression:
+Latest known complete Full Regression:
 - Run: `2730`
 - Commit: `0c32eccaae7041e82b8031a3938b9b2bfb1b8056`
 - Message: `Curriculum: complete C6 to C9 vertical prototype test`
 - Branch: `refactor/professional-v1`
 - Status: **GREEN**
 
-Verified green stages included:
-- curriculum engine regression
-- architecture boundary tests
-- maintained Node regression
-- maintained Vitest regression
-- browser regression
-- working-tree cleanliness
-
-A subsequent handoff-document commit may trigger the next Full Regression; that regression must be checked before any further build work.
+Subsequent handoff-only commits must trigger/check the next Full Regression before further build work is considered verified. Never infer green status from an earlier commit.
 
 ## 12. Current mental model
 
-The project is now best understood as three layers:
+The project is now best understood as four connected layers/workstreams:
 
 `CURRICULUM / SCIENTIFIC ENGINE`
 → determines what the learner needs and what evidence means
 
+`SCIENTIFIC VALIDATION PROGRAM`
+→ determines how we will empirically test whether those claims and decisions are valid
+
 `LEARNING INTERFACE SYSTEM`
-→ provides reusable, beautiful, interactive learning instruments
+→ provides reusable, beautiful, interactive learning instruments and captures the required evidence/data
 
 `PACOGO DELUXE / UPPER TIER`
 → later provides the larger visual world in which those learning instruments live
 
 The intended strategy is:
 
-**build the brain → prove the vertical chain → determine the scientific validation requirements → build the reusable learning instruments with validation built in → then build the larger Deluxe world.**
+**build the brain → prove the vertical chain → define how the brain will be scientifically validated → build reusable learning instruments with that validation contract → empirically validate with real learners → then build the larger Deluxe world.**

@@ -109,7 +109,24 @@ test('buildPilotExecutionExport validates and deterministically snapshots the ex
 
   assert.equal(exported.export_status, 'validated');
   assert.equal(exported.dataset_validation.valid, true);
+  assert.equal(exported.synthetic_or_empirical, 'empirical');
+  assert.equal(exported.study_id, 'PILOT-001');
+  assert.equal(exported.wave_id, 'W0');
+  assert.equal(exported.registry_version, '0.2.0-seed');
   assert.deepEqual(exported.task_instances.map(item => item.task_instance_id), ['INST-001']);
   assert.deepEqual(exported.observations.map(item => item.observation_id), ['OBS-001']);
   assert.equal(exported.scientific_boundary, 'execution_export_only');
+});
+
+test('buildPilotExecutionExport rejects mixed study, wave or registry provenance', () => {
+  const first = registerTaskInstance({ assignment: assignment({ task_instance_id: 'INST-001' }), taskSet, instanceId: 'INST-001' });
+  const second = registerTaskInstance({ assignment: assignment({ task_instance_id: 'INST-002', wave_id: 'W1' }), taskSet, instanceId: 'INST-002' });
+  assert.throws(
+    () => buildPilotExecutionExport({
+      taskInstances: [first, second],
+      observations: [],
+      codingRecords: []
+    }),
+    /one wave_id/
+  );
 });

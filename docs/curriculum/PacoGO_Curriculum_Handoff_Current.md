@@ -44,8 +44,11 @@ Completed:
 - `docs/curriculum/PacoGO_Validation_Data_Specification_v0.1.md`
 - `docs/curriculum/PacoGO_Scientific_Validation_Protocol_v0.1.md`
 - W2 repeated-measurement protocol and W2 analysis contract.
+- `docs/curriculum/PacoGO_Construct_Specific_Validation_Design_v0.1.md`
 
 The validation specification distinguishes product, curriculum-engine and scientific-validation data, defines external validation requirements, reliability, longitudinal validation, mastery validation, next-action validation, learner-state validation, Learning Interface validation, privacy/child-data governance and replication.
+
+The construct-specific design now establishes the next research layer: A1 construct hypotheses and candidate independent-measure families; B1/FR2 construct boundaries; reliability/measurement-error design principles; longitudinal design constraints; study-specific power/precision policy; preregistration boundaries; ethics/data-governance requirements; and explicit gates before Learning Interface runtime contracts are scientifically frozen.
 
 The scientific protocol is a design baseline, not evidence that PacoGO is scientifically validated. PacoGO remains scientifically grounded, designed and empirically testable, but not empirically validated.
 
@@ -82,34 +85,42 @@ Interfaces must separate pedagogical/function state from visual/rendering state 
 The interface runtime contract must preserve the mapping:
 `interaction → observable event → evidence target → coding dimension → validation dataset field`.
 
+The current scientific design explicitly says not to freeze construct-specific evidence fields, mastery thresholds or scientific interpretations until the corresponding construct has passed the research readiness gates.
+
 ## 8. Supabase
 
 No Supabase schema/runtime change is required for the current scientific validation design work. Change Supabase only for a real persistence/runtime contract requirement.
 
 ## 9. Current scientific next step
 
-The next major research/engineering phase is to convert the validation baseline into construct-specific protocol designs. This requires evidence-based decisions about:
-- external measures per construct;
-- reliability coefficients and thresholds appropriate to each decision;
-- longitudinal measurement occasions and spacing;
-- sample-size/power or precision justification;
-- preregistration and confirmatory/exploratory separation;
-- independent assessment and transfer measures;
-- analysis and robustness plans;
-- ethics, consent/assent, privacy and research governance;
-- replication/generalisation criteria.
+The next major research/engineering phase is to turn the construct-specific design into a study-ready A1 protocol. This requires:
+- exact age/population scope;
+- exact independent measures;
+- primary hypotheses and estimands;
+- measurement occasions and spacing;
+- reliability design;
+- longitudinal model candidates;
+- mastery criterion design;
+- sample-size/power/precision analysis;
+- preregistration plan;
+- ethics/privacy/governance plan;
+- confirmatory/exploratory separation.
 
-These decisions should be resolved before freezing the Learning Interface evidence/runtime contract.
+B1 and FR2 should receive the same construct-specific treatment before candidate promotion.
 
 ## 10. Latest verified regression state
 
 Latest user-confirmed complete Full Regression:
-- Commit: `be4d34dc13b2c0d2951b6f3a4a7d469a52bcd98f`
+- Commit: `f14fadb6cb6e3b7cd882928ec8619dbdffd836f5`
 - Branch: `refactor/professional-v1`
 - Status: **GREEN** (user-confirmed)
+
+Current HEAD after the construct-specific design work:
+- Commit: `54e173674c4e55f262d1c7a3dad61a54a81b634f`
+- Full Regression: **NOT YET VERIFIED**
 
 Automated GitHub workflow/status data has not been available for the recent commits through the connector, so no stronger CI claim is made.
 
 ## 11. Strategy
 
-**Build the brain → prove the vertical chain → define how the brain will be scientifically validated → build reusable learning instruments with that validation contract → empirically validate with real learners → then build the larger Deluxe world.**
+**Build the brain → prove the vertical chain → define how the brain will be scientifically validated → define construct-specific study designs → build reusable learning instruments with that validation contract → empirically validate with real learners → then build the larger Deluxe world.**

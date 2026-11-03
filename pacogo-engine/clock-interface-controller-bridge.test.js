@@ -23,6 +23,28 @@ test('clock bridge sends digital interface time to controller and locks after su
   assert.equal(locked, true);
 });
 
+test('clock bridge follows the interface representation when it changes outside the bridge', () => {
+  const calls = [];
+  let interfaceRepresentation = 'digital';
+  const interfaceInstance = {
+    setTime: () => {},
+    getRepresentation: () => interfaceRepresentation,
+    lock: () => {}
+  };
+  const controller = {
+    setAnalogTime: (time) => calls.push(['analog', time]),
+    setDigitalTime: (time) => calls.push(['digital', time]),
+    submit: () => ({ correct: true })
+  };
+
+  const bridge = createClockInterfaceControllerBridge({ interfaceInstance, controller, representation: 'digital' });
+  interfaceRepresentation = 'analog';
+  bridge.setTime({ hour: 8, minute: 35 });
+
+  assert.equal(bridge.getRepresentation(), 'analog');
+  assert.deepEqual(calls, [['analog', { hour: 8, minute: 35 }]]);
+});
+
 test('clock bridge supports analog representation when controller provides it', () => {
   let selected = null;
   const interfaceInstance = { setTime: () => {}, lock: () => {} };

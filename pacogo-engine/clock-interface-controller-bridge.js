@@ -11,6 +11,17 @@ function createClockInterfaceControllerBridge({ interfaceInstance, controller, r
 
   let activeRepresentation = representation;
 
+  const getActiveRepresentation = () => {
+    const current = typeof interfaceInstance.getRepresentation === 'function'
+      ? interfaceInstance.getRepresentation()
+      : activeRepresentation;
+    if (!['analog', 'digital'].includes(current)) {
+      throw new TypeError('interface representation must be analog or digital');
+    }
+    activeRepresentation = current;
+    return current;
+  };
+
   const setRepresentation = (nextRepresentation) => {
     if (!['analog', 'digital'].includes(nextRepresentation)) {
       throw new TypeError('representation must be analog or digital');
@@ -22,7 +33,8 @@ function createClockInterfaceControllerBridge({ interfaceInstance, controller, r
   };
 
   const setTime = ({ hour, minute }) => {
-    if (activeRepresentation === 'analog') {
+    const representationInUse = getActiveRepresentation();
+    if (representationInUse === 'analog') {
       if (typeof controller.setAnalogTime !== 'function') throw new TypeError('controller does not support analog time');
       controller.setAnalogTime({ hour, minute });
     } else {
@@ -37,7 +49,7 @@ function createClockInterfaceControllerBridge({ interfaceInstance, controller, r
     return result;
   };
 
-  return Object.freeze({ setTime, setRepresentation, submit, getRepresentation: () => activeRepresentation });
+  return Object.freeze({ setTime, setRepresentation, submit, getRepresentation: getActiveRepresentation });
 }
 
 export { createClockInterfaceControllerBridge };

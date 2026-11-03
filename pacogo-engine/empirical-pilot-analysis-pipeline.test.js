@@ -72,7 +72,16 @@ function makeReliability(manifest) {
   }]));
 }
 
-test('pipeline executes dataset -> C3 -> C4 gate -> descriptive report without developmental inference', async () => {
+function makeW0Review() {
+  return {
+    task_comprehension: { status: 'PASS', evidence_count: 3, notes: 'reviewed' },
+    interaction_logging: { status: 'PASS', evidence_count: 3, notes: 'reviewed' },
+    observation_completeness: { status: 'PASS', evidence_count: 3, notes: 'reviewed' },
+    coding_manual_clarity: { status: 'PASS', evidence_count: 2, notes: 'reviewed' }
+  };
+}
+
+test('pipeline executes W0 -> dataset -> C3 -> C4 gate -> descriptive report without developmental inference', async () => {
   const manifest = await readJson('docs/curriculum/PacoGO_Empirical_Pilot_Manifest_v0.1.json');
   const taskSet = await readJson('docs/curriculum/PacoGO_Pilot_TaskSet_v0.1.json');
   const analysis = await readJson('docs/curriculum/PacoGO_Empirical_Pilot_Analysis_v0.1.json');
@@ -87,9 +96,11 @@ test('pipeline executes dataset -> C3 -> C4 gate -> descriptive report without d
     manifest,
     taskSet,
     analysis,
-    reliabilityByClaim: makeReliability(manifest)
+    reliabilityByClaim: makeReliability(manifest),
+    w0FeasibilityReview: makeW0Review()
   });
 
+  assert.equal(result.w0_feasibility.outcome, 'FEASIBLE');
   assert.equal(result.dataset_validation.valid, true);
   assert.equal(result.pilot_result.observation_count, 1);
   assert.equal(result.c3_reliability_by_claim['A1.C1'].double_coded_pair_count, 1);
@@ -119,7 +130,8 @@ test('pipeline refuses to invent missing coding-reliability decisions', async ()
       manifest,
       taskSet,
       analysis,
-      reliabilityByClaim: reliability
+      reliabilityByClaim: reliability,
+      w0FeasibilityReview: makeW0Review()
     }),
     /exactly all manifest focal claims/
   );

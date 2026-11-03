@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — B1 Strategievariatie</title>
+  <style>
+    :root{font-family:Nunito,system-ui,sans-serif;color:#102b57;background:#f5f9fd}
+    body{margin:0;padding:32px;min-height:100vh;box-sizing:border-box}
+    main{max-width:860px;margin:0 auto;display:grid;gap:18px}
+    .card{background:#fff;border:1px solid #d8e7f4;border-radius:22px;padding:24px;box-shadow:0 8px 24px rgba(16,43,87,.07)}
+    h1,h2{margin:0} h1{font-size:30px} h2{font-size:21px}
+    .muted{color:#647894;line-height:1.5}
+    .problem{text-align:center;font-size:36px;font-weight:900;padding:22px;border-radius:16px;background:#eef7ff;margin:18px 0}
+    .strategies{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .strategy{padding:14px;border:2px solid #d8e7f4;border-radius:16px;background:#fbfdff;color:#102b57;cursor:pointer;font:900 16px Nunito,system-ui,sans-serif}
+    .strategy.selected{border-color:#1787f2;background:#eef7ff}
+    textarea{width:100%;min-height:90px;box-sizing:border-box;padding:12px;border:2px solid #d8e7f4;border-radius:14px;font:700 16px/1.5 Nunito,system-ui,sans-serif;resize:vertical}
+    .answer{display:flex;justify-content:center;gap:10px;margin-top:16px}
+    input{width:120px;padding:12px;border:2px solid #d8e7f4;border-radius:14px;font:900 20px Nunito,system-ui,sans-serif;text-align:center}
+    button.submit{border:0;border-radius:14px;padding:12px 20px;font:900 15px Nunito,system-ui,sans-serif;cursor:pointer;background:#1787f2;color:#fff}
+    button:disabled{opacity:.5;cursor:not-allowed}
+    .status{font-weight:900;padding:12px 14px;border-radius:14px;background:#eef8ff;color:#126fc9}
+    .status.error{background:#fff0f0;color:#b42318}
+    pre{margin:10px 0 0;white-space:pre-wrap;background:#f5f9fd;border-radius:14px;padding:14px;font:700 13px/1.5 ui-monospace,monospace}
+  </style>
+</head>
+<body>
+<main>
+  <section class="card">
+    <div class="muted">PacoGO • B1 • Optellen • T03</div>
+    <h1>Welke strategie werkt hier?</h1>
+    <p class="muted">Los drie sommen met verschillende groottes op. Kies steeds de strategie die je gebruikt en leg kort uit hoe je die toepast.</p>
+    <div class="problem" id="problem"></div>
+    <div class="strategies" id="strategies"></div>
+    <div style="margin-top:18px">
+      <label class="muted" for="explanation">Jouw uitleg</label>
+      <textarea id="explanation" placeholder="Leg kort uit hoe je deze som aanpakt." aria-label="Uitleg"></textarea>
+    </div>
+    <div class="answer"><input id="answer" inputmode="numeric" aria-label="Antwoord"><button class="submit" id="submit" type="button">Volgende</button></div>
+  </section>
+  <section class="card">
+    <h2>Wat PacoGO heeft waargenomen</h2>
+    <div id="status" class="status">Som 1 van 3.</div>
+    <pre id="trace">Nog geen observaties.</pre>
+  </section>
+</main>
+<script type="module">
+  import { createAdditionController } from './pacogo-engine/addition-controller.js';
+  import { createBrowserVerticalSliceRuntime } from './pacogo-engine/browser-vertical-slice.js';
+  import { createCurriculumRegistry } from './pacogo-engine/curriculum-registry.js';
+
+  const registryConfig = await fetch('./docs/curriculum/PacoGO_Curriculum_Registry_v0.2.json').then(response => response.json());
+  const taskSet = await fetch('./docs/curriculum/PacoGO_Pilot_TaskSet_v0.1.json').then(response => response.json());
+  const registry = createCurriculumRegistry(registryConfig);
+  const runtime = createBrowserVerticalSliceRuntime({ registry, taskSet });
+  const taskId = 'B1-T03';
+  const task = runtime.getTask(taskId);
+  const strategyOptions = [
+    { id: 'count-on', label: 'Verder tellen' },
+    { id: 'make-ten', label: 'Eerst naar tien' }
+  ];
+  const items = [
+    { addends: [6, 3], expectedAnswer: 9 },
+    { addends: [17, 8], expectedAnswer: 25 },
+    { addends: [46, 27], expectedAnswer: 73 }
+  ];
+
+  const state = { index: 0, observations: [], cycles: [] };
+  const studentKey = 'browser-synthetic-b1-t03';
+  const problem = document.querySelector('#problem');
+  const status = document.querySelector('#status');
+  const trace = document.querySelector('#trace');
+  const strategyHost = document.querySelector('#strategies');
+  const explanationInput = document.querySelector('#explanation');
+  const answerInput = document.querySelector('#answer');
+  const submitButton = document.querySelector('#submit');
+
+  let controller = null;
+  let selectedButton = null;
+
+  function renderItem() {
+    const item = items[state.index];
+    problem.textContent = `${item.addends[0]} + ${item.addends[1]} = ?`;
+    strategyHost.replaceChildren();
+    selectedButton = null;
+    explanationInput.value = '';
+    answerInput.value = '';
+    submitButton.textContent = state.index === items.length - 1 ? 'Afronden' : 'Volgende';
+    status.className = 'status';
+    status.textContent = `Som ${state.index + 1} van ${items.length}. Kies een strategie.`;
+
+    controller = createAdditionController({
+      task,
+      studentKey,
+      renderer: {},
+      addends: item.addends,
+      expectedAnswer: item.expectedAnswer,
+      strategyOptions,
+      representation: 'quantity_groups',
+      responseType: 'quantity_addition',
+      provenance: {
+        page: 'curriculum-b1-strategy-variation.html',
+        sequence_index: state.index + 1
+      }
+    });
+
+    strategyOptions.forEach(strategy => {
+      const button = document.createElement('button');
+      button.className = 'strategy';
+      button.type = 'button';
+      button.textContent = strategy.label;
+      button.addEventListener('click', () => {
+        try {
+          controller.selectStrategy(strategy.id, 'browser');
+          selectedButton = button;
+          strategyHost.querySelectorAll('.strategy').forEach(item => item.classList.toggle('selected', item === button));
+          status.textContent = `Strategie gekozen: ${strategy.label}. Geef je antwoord en uitleg.`;
+        } catch (error) {
+          status.textContent = error.message;
+          status.className = 'status error';
+        }
+      });
+      strategyHost.appendChild(button);
+    });
+  }
+
+  submitButton.addEventListener('click', () => {
+    try {
+      if (!selectedButton) throw new Error('Kies eerst een strategie.');
+      const explanation = explanationInput.value.trim();
+      if (!explanation) throw new Error('Geef eerst een korte uitleg.');
+
+      const { evaluation, observation } = controller.submit(answerInput.value, explanation);
+      const priorEvidence = state.cycles.at(-1)?.evidence || [];
+      const cycle = runtime.runTaskObservation({ taskId, observation, priorEvidence });
+      state.observations.push(observation);
+      state.cycles.push(cycle);
+
+      if (state.index < items.length - 1) {
+        status.textContent = evaluation.correct
+          ? 'Goed. De volgende som heeft een andere grootte.'
+          : 'Deze poging is vastgelegd. Probeer de volgende som.';
+        trace.textContent = JSON.stringify({
+          completed_items: state.observations.length,
+          strategy_ids: state.observations.map(item => item.response.strategy_id),
+          representations: state.observations.map(item => item.performance.representation),
+          evidence_count_last_cycle: cycle.evidence.length,
+          next: cycle.next
+        }, null, 2);
+        state.index += 1;
+        renderItem();
+        return;
+      }
+
+      status.textContent = evaluation.correct
+        ? 'Klaar. Alle drie de observaties zijn naar de leerengine gestuurd.'
+        : 'Klaar. Alle drie de observaties zijn vastgelegd.';
+      trace.textContent = JSON.stringify({
+        completed_items: state.observations.length,
+        strategy_ids: state.observations.map(item => item.response.strategy_id),
+        addends: state.observations.map(item => item.response.addends),
+        observation_ids: state.observations.map(item => item.observation_id),
+        evidence_count_last_cycle: cycle.evidence.length,
+        mastery: cycle.mastery,
+        next: cycle.next,
+        decision: cycle.decision_trace.decision,
+        interaction_event_counts: state.observations.map(item => item.interaction_events.length)
+      }, null, 2);
+      submitButton.disabled = true;
+      answerInput.disabled = true;
+      explanationInput.disabled = true;
+      strategyHost.querySelectorAll('button').forEach(button => button.disabled = true);
+    } catch (error) {
+      status.textContent = error.message;
+      status.className = 'status error';
+    }
+  });
+
+  renderItem();
+</script>
+</body>
+</html>

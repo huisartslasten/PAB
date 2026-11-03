@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — B1 Optellen</title>
+  <style>
+    :root{font-family:Nunito,system-ui,sans-serif;color:#102b57;background:#f5f9fd}
+    body{margin:0;padding:32px;min-height:100vh;box-sizing:border-box}
+    main{max-width:980px;margin:0 auto;display:grid;gap:18px}
+    .card{background:#fff;border:1px solid #d8e7f4;border-radius:22px;padding:24px;box-shadow:0 8px 24px rgba(16,43,87,.07)}
+    h1,h2{margin:0} h1{font-size:30px} h2{font-size:21px}
+    .muted{color:#647894;line-height:1.5}
+    .problem{text-align:center;font-size:32px;font-weight:900;padding:16px;border-radius:16px;background:#eef7ff}
+    .groups{display:flex;justify-content:center;align-items:center;gap:26px;margin:22px 0}
+    .group{display:grid;grid-template-columns:repeat(5,28px);gap:7px;min-height:63px;align-content:center}
+    .dot{width:28px;height:28px;border-radius:50%;background:#1787f2}
+    .plus{font-size:30px;font-weight:900}
+    .strategies{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .strategy{padding:14px;border:2px solid #d8e7f4;border-radius:16px;background:#fbfdff;color:#102b57;cursor:pointer;font:900 16px Nunito,system-ui,sans-serif}
+    .strategy.selected{border-color:#1787f2;background:#eef7ff}
+    .answer{display:flex;justify-content:center;gap:10px;margin-top:16px}
+    input{width:120px;padding:12px;border:2px solid #d8e7f4;border-radius:14px;font:900 20px Nunito,system-ui,sans-serif;text-align:center}
+    button.submit{border:0;border-radius:14px;padding:12px 20px;font:900 15px Nunito,system-ui,sans-serif;cursor:pointer;background:#1787f2;color:#fff}
+    button:disabled{opacity:.5;cursor:not-allowed}
+    .status{font-weight:900;padding:12px 14px;border-radius:14px;background:#eef8ff;color:#126fc9}
+    .status.error{background:#fff0f0;color:#b42318}
+    pre{margin:10px 0 0;white-space:pre-wrap;background:#f5f9fd;border-radius:14px;padding:14px;font:700 13px/1.5 ui-monospace,monospace}
+  </style>
+</head>
+<body>
+<main>
+  <section class="card">
+    <div class="muted">PacoGO • B1 • Optellen</div>
+    <h1>Combineer de hoeveelheden</h1>
+    <p class="muted">Kijk naar de twee hoeveelheden, kies een strategie en geef het antwoord.</p>
+    <div class="problem">7 + 5 = ?</div>
+    <div class="groups" aria-label="Twee hoeveelheden">
+      <div class="group" id="groupA"></div><div class="plus">+</div><div class="group" id="groupB"></div>
+    </div>
+    <div class="strategies" id="strategies"></div>
+    <div class="answer"><input id="answer" inputmode="numeric" aria-label="Antwoord"><button class="submit" id="submit" type="button">Controleren</button></div>
+  </section>
+  <section class="card">
+    <h2>Wat PacoGO heeft waargenomen</h2>
+    <div id="status" class="status">Kies een strategie en geef een antwoord.</div>
+    <pre id="trace">Nog geen observatie.</pre>
+  </section>
+</main>
+<script type="module">
+  import { createCurriculumRegistry } from './pacogo-engine/curriculum-registry.js';
+  import { createAdditionController } from './pacogo-engine/addition-controller.js';
+
+  const registryConfig = await fetch('./docs/curriculum/PacoGO_Curriculum_Registry_v0.2.json').then(response => response.json());
+  const taskSet = await fetch('./docs/curriculum/PacoGO_Pilot_TaskSet_v0.1.json').then(response => response.json());
+  const registry = createCurriculumRegistry(registryConfig);
+  const task = taskSet.tasks.find(item => item.task_id === 'B1-T01');
+  const addends = [7, 5];
+  const strategyOptions = [
+    { id: 'count-on', label: 'Verder tellen' },
+    { id: 'make-ten', label: 'Eerst naar tien' }
+  ];
+  const controller = createAdditionController({
+    task,
+    studentKey: 'browser-synthetic-b1',
+    renderer: {},
+    addends,
+    expectedAnswer: 12,
+    strategyOptions,
+    provenance: { page: 'curriculum-b1-addition.html' }
+  });
+
+  const status = document.querySelector('#status');
+  const trace = document.querySelector('#trace');
+
+  for (const count of addends) {
+    const host = document.querySelector(count === addends[0] ? '#groupA' : '#groupB');
+    for (let i = 0; i < count; i += 1) {
+      const dot = document.createElement('span');
+      dot.className = 'dot';
+      dot.setAttribute('aria-hidden', 'true');
+      host.appendChild(dot);
+    }
+  }
+
+  const strategyHost = document.querySelector('#strategies');
+  strategyOptions.forEach(strategy => {
+    const button = document.createElement('button');
+    button.className = 'strategy';
+    button.type = 'button';
+    button.textContent = strategy.label;
+    button.addEventListener('click', () => {
+      controller.selectStrategy(strategy.id, 'browser');
+      strategyHost.querySelectorAll('.strategy').forEach(item => item.classList.toggle('selected', item === button));
+      status.textContent = `Strategie gekozen: ${strategy.label}. Geef nu je antwoord.`;
+    });
+    strategyHost.appendChild(button);
+  });
+
+  document.querySelector('#submit').addEventListener('click', () => {
+    try {
+      const { evaluation, observation } = controller.submit(document.querySelector('#answer').value);
+      const cycle = registry.runSkillCycle({
+        studentKey: observation.student_key,
+        skillId: observation.skill_id,
+        observation,
+        priorEvidence: [],
+        asOf: observation.observed_at
+      });
+      status.textContent = evaluation.correct
+        ? `Goed. De observatie gaat door naar de PacoGO-leerengine. Volgende stap: ${cycle.next?.action || 'bepalen'}.`
+        : 'Nog niet goed. Ook deze observatie gaat als informatie naar de leerengine.';
+      trace.textContent = JSON.stringify({
+        observation_id: observation.observation_id,
+        registry_version: registry.registry_version,
+        evidence_count: cycle.evidence.length,
+        development: cycle.development,
+        mastery: cycle.mastery,
+        next: cycle.next,
+        decision: cycle.decision_trace.decision,
+        interaction_event_count: observation.interaction_events.length
+      }, null, 2);
+      document.querySelector('#submit').disabled = true;
+    } catch (error) {
+      status.textContent = error.message;
+      status.className = 'status error';
+    }
+  });
+</script>
+</body>
+</html>

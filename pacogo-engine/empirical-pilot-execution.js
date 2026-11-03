@@ -59,15 +59,28 @@ function recordRawObservation({ observation, taskInstances }) {
   return observation;
 }
 
-function buildPilotExecutionExport({ taskInstances, observations, codingRecords }) {
+function buildPilotExecutionExport({ taskInstances, observations, codingRecords, synthetic_or_empirical = 'empirical' }) {
   const dataset = { taskInstances, observations, codingRecords };
   const validation = validatePilotDataset(dataset);
   const snapshot = buildPilotDatasetSnapshot(dataset);
+  assert(synthetic_or_empirical === 'synthetic_fixture' || synthetic_or_empirical === 'empirical', 'Execution export provenance must be synthetic_fixture or empirical.');
+  assert(snapshot.task_instances.length > 0, 'Execution export requires at least one task instance.');
+
+  const [firstInstance] = snapshot.task_instances;
+  for (const instance of snapshot.task_instances) {
+    assert(instance.study_id === firstInstance.study_id, 'Execution export must contain one study_id.');
+    assert(instance.wave_id === firstInstance.wave_id, 'Execution export must contain one wave_id.');
+    assert(instance.registry_version === firstInstance.registry_version, 'Execution export must contain one registry_version.');
+  }
 
   return {
     export_version: '0.1',
     export_status: 'validated',
     scientific_boundary: 'execution_export_only',
+    synthetic_or_empirical,
+    study_id: firstInstance.study_id,
+    wave_id: firstInstance.wave_id,
+    registry_version: firstInstance.registry_version,
     dataset_validation: validation,
     ...snapshot
   };

@@ -28,6 +28,7 @@ function createAdditionController({ task, studentKey, renderer, addends, expecte
   const startedAt = new Date().toISOString();
   let selectedStrategy = null;
   let submittedAnswer = null;
+  let submitted = false;
 
   const record = (eventType, payload) => {
     events.push(createInteractionEvent({
@@ -45,6 +46,7 @@ function createAdditionController({ task, studentKey, renderer, addends, expecte
   });
 
   const selectStrategy = (strategyId, source = 'renderer') => {
+    if (submitted) throw new Error('Addition task has already been submitted');
     const strategy = strategyOptions.find(item => item.id === strategyId);
     if (!strategy) throw new Error(`Unknown addition strategy: ${strategyId}`);
     selectedStrategy = strategyId;
@@ -53,6 +55,7 @@ function createAdditionController({ task, studentKey, renderer, addends, expecte
   };
 
   const submit = (answer) => {
+    if (submitted) throw new Error('Addition task has already been submitted');
     if (selectedStrategy === null) throw new Error('No addition strategy has been selected');
     assertFiniteNumber(Number(answer), 'answer');
     submittedAnswer = Number(answer);
@@ -65,6 +68,7 @@ function createAdditionController({ task, studentKey, renderer, addends, expecte
       correct
     });
 
+    submitted = true;
     const observedAt = new Date().toISOString();
     const observation = createObservation({
       taskInstance,
@@ -123,7 +127,8 @@ function createAdditionController({ task, studentKey, renderer, addends, expecte
     selectStrategy,
     submit,
     getSelectedStrategy: () => selectedStrategy,
-    getSubmittedAnswer: () => submittedAnswer
+    getSubmittedAnswer: () => submittedAnswer,
+    isSubmitted: () => submitted
   });
 }
 

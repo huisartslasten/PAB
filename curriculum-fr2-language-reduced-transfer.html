@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — FR2 Taalarme overdracht</title>
+  <style>
+    :root{font-family:Nunito,system-ui,sans-serif;color:#102b57;background:#f5f9fd}
+    body{margin:0;padding:32px;min-height:100vh;box-sizing:border-box}
+    main{max-width:980px;margin:0 auto;display:grid;gap:18px}
+    .card{background:#fff;border:1px solid #d8e7f4;border-radius:22px;padding:24px;box-shadow:0 8px 24px rgba(16,43,87,.07)}
+    h1,h2{margin:0} h1{font-size:30px} h2{font-size:21px}
+    .muted{color:#647894;line-height:1.5}
+    .visual{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center;margin:24px 0}
+    .fraction{font-size:34px;font-weight:900;text-align:center}
+    .bar{width:min(300px,100%);height:54px;border:3px solid #102b57;border-radius:14px;overflow:hidden;display:grid;grid-template-columns:repeat(6,1fr);background:#fff}
+    .bar span{border-right:2px solid #102b57}.bar span:last-child{border-right:0}.bar .filled{background:#8bc7f7}
+    .arrow{font-size:34px;font-weight:900}
+    .options{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+    .option{padding:16px;border:2px solid #d8e7f4;border-radius:16px;background:#fbfdff;color:#102b57;cursor:pointer;font:900 18px Nunito,system-ui,sans-serif}
+    .option.selected{border-color:#1787f2;background:#eef7ff}
+    textarea{width:100%;box-sizing:border-box;min-height:90px;margin-top:16px;padding:12px;border:2px solid #d8e7f4;border-radius:14px;font:700 16px Nunito,system-ui,sans-serif;resize:vertical}
+    button.submit{border:0;border-radius:14px;padding:12px 20px;margin-top:12px;font:900 15px Nunito,system-ui,sans-serif;cursor:pointer;background:#1787f2;color:#fff}
+    button:disabled{opacity:.5;cursor:not-allowed}
+    .status{font-weight:900;padding:12px 14px;border-radius:14px;background:#eef8ff;color:#126fc9}
+    .status.error{background:#fff0f0;color:#b42318}
+    pre{margin:10px 0 0;white-space:pre-wrap;background:#f5f9fd;border-radius:14px;padding:14px;font:700 13px/1.5 ui-monospace,monospace}
+    @media (max-width:700px){.visual{grid-template-columns:1fr}.arrow{text-align:center}.options{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main>
+  <section class="card">
+    <div class="muted">PacoGO • FR2 • Taalarme overdracht</div>
+    <h1>Welke hoort bij dezelfde hoeveelheid?</h1>
+    <p class="muted">Kijk eerst alleen naar de afbeelding. Kies de breuk die dezelfde hoeveelheid laat zien. Vertel daarna in je eigen woorden waarom.</p>
+    <div class="visual">
+      <div class="bar" aria-label="Vier van zes gelijke delen zijn gevuld">
+        <span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="filled"></span><span></span><span></span>
+      </div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="fraction">?</div>
+    </div>
+    <div class="options" id="options"></div>
+    <textarea id="explanation" aria-label="Uitleg" placeholder="Leg in je eigen woorden uit waarom de waarden gelijk zijn."></textarea>
+    <button class="submit" id="submit" type="button">Controleren</button>
+  </section>
+  <section class="card">
+    <h2>Wat PacoGO heeft waargenomen</h2>
+    <div id="status" class="status">Kies eerst een breuk en leg daarna je redenering uit.</div>
+    <pre id="trace">Nog geen observatie.</pre>
+  </section>
+</main>
+<script type="module">
+  import { createFractionEquivalenceController } from './pacogo-engine/fraction-equivalence-controller.js';
+  import { createBrowserVerticalSliceRuntime } from './pacogo-engine/browser-vertical-slice.js';
+  import { createCurriculumRegistry } from './pacogo-engine/curriculum-registry.js';
+
+  const registryConfig = await fetch('./docs/curriculum/PacoGO_Curriculum_Registry_v0.2.json').then(response => response.json());
+  const taskSet = await fetch('./docs/curriculum/PacoGO_Pilot_TaskSet_v0.1.json').then(response => response.json());
+  const registry = createCurriculumRegistry(registryConfig);
+  const runtime = createBrowserVerticalSliceRuntime({ registry, taskSet });
+  const taskId = 'FR2-T05';
+  const task = runtime.getTask(taskId);
+  const options = [
+    { id: 'two-thirds', label: '2/3', fraction: { numerator: 2, denominator: 3 } },
+    { id: 'four-sixths', label: '4/6', fraction: { numerator: 4, denominator: 6 } },
+    { id: 'three-fifths', label: '3/5', fraction: { numerator: 3, denominator: 5 } }
+  ];
+  const controller = createFractionEquivalenceController({
+    task,
+    studentKey: 'browser-synthetic-fr2',
+    renderer: {},
+    targetFraction: { numerator: 4, denominator: 6 },
+    options,
+    representation: 'low_language_visual_transfer',
+    responseType: 'language_reduced_equivalence_transfer',
+    provenance: { page: 'curriculum-fr2-language-reduced-transfer.html' }
+  });
+
+  const status = document.querySelector('#status');
+  const trace = document.querySelector('#trace');
+  const optionHost = document.querySelector('#options');
+  const submit = document.querySelector('#submit');
+
+  options.forEach(option => {
+    const button = document.createElement('button');
+    button.className = 'option';
+    button.type = 'button';
+    button.textContent = option.label;
+    button.addEventListener('click', () => {
+      try {
+        controller.selectOption(option.id, 'browser');
+        optionHost.querySelectorAll('.option').forEach(item => item.classList.toggle('selected', item === button));
+        status.className = 'status';
+        status.textContent = `Je koos ${option.label}. Leg nu uit wat hetzelfde blijft.`;
+      } catch (error) {
+        status.className = 'status error';
+        status.textContent = error.message;
+      }
+    });
+    optionHost.appendChild(button);
+  });
+
+  submit.addEventListener('click', () => {
+    try {
+      const explanation = document.querySelector('#explanation').value.trim() || null;
+      const { evaluation, observation } = controller.submit(explanation, 'browser');
+      const cycle = runtime.runTaskObservation({ taskId, observation });
+      status.className = 'status';
+      status.textContent = evaluation.correct
+        ? `Goed. Je herkende dezelfde waarde. Volgende stap: ${cycle.next?.action || 'bepalen'}.`
+        : 'Deze keuze is vastgelegd als informatie voor de leerengine.';
+      trace.textContent = JSON.stringify({
+        observation_id: observation.observation_id,
+        task_id: taskId,
+        variation_key: observation.variation_key,
+        response_type: observation.response.type,
+        selected_fraction: observation.response.selected_fraction,
+        explanation: observation.response.explanation,
+        representation: observation.performance.representation,
+        language_reduced: true,
+        evidence_count: cycle.evidence.length,
+        development: cycle.development,
+        mastery: cycle.mastery,
+        next: cycle.next,
+        decision: cycle.decision_trace.decision,
+        interaction_event_types: observation.interaction_events.map(event => event.event_type)
+      }, null, 2);
+      submit.disabled = true;
+      optionHost.querySelectorAll('.option').forEach(button => { button.disabled = true; });
+    } catch (error) {
+      status.className = 'status error';
+      status.textContent = error.message;
+    }
+  });
+</script>
+</body>
+</html>

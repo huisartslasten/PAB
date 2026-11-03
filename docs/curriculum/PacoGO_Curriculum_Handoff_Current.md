@@ -69,38 +69,53 @@ The interface runtime contract must preserve:
 
 ## 8. Current engineering implementation
 
-A1 Number Line and FR2 Fraction Equivalence already demonstrate browser → interaction controller → observation → curriculum registry → learner-state/decision flow.
+A1 Number Line, B1 Addition and FR2 Fraction Equivalence now demonstrate the same browser vertical-slice bridge:
+`browser interaction → interaction controller → observation → shared browser runtime → curriculum registry → learner-state/decision flow`.
 
-Generalisation slices completed:
+Reusable engine components:
 - `pacogo-engine/addition-controller.js` — reusable B1 quantity-addition interaction controller;
-- `pacogo-engine/addition-controller.test.js` — evidence/interaction contract test;
-- `curriculum-b1-addition.html` — B1 browser vertical slice using B1-T01;
+- `pacogo-engine/addition-controller.test.js` — B1 evidence/interaction contract test;
 - `pacogo-engine/fraction-equivalence-controller.js` — reusable FR2 equivalence interaction controller;
 - `pacogo-engine/fraction-equivalence-controller.test.js` — FR2 evidence/interaction contract test;
-- FR2 controller lifecycle now explicitly prevents duplicate submission after an observation has been emitted.
+- `pacogo-engine/browser-vertical-slice.js` — shared browser-to-registry runtime for task resolution and observation submission;
+- `pacogo-engine/browser-vertical-slice.test.js` — runtime delegation, task lookup, duplicate-task and input-contract tests.
 
-The B1/FR2 slices capture task identity, evidence target, interaction events, learner response, provenance and variation through the shared interaction/observation contract. No Supabase change was required.
+Browser vertical slices using the shared runtime:
+- `curriculum-a1-numberline.html` — A1-T01;
+- `curriculum-b1-addition.html` — B1-T01;
+- `curriculum-fr2-fraction-equivalence.html` — FR2-T01.
+
+The three pages no longer duplicate direct curriculum-registry task lookup / observation-cycle wiring. The page layer remains responsible for presentation and interaction wiring; curriculum execution is delegated through the shared runtime.
+
+FR2 controller lifecycle explicitly prevents duplicate submission after an observation has been emitted.
+
+No Supabase change was required for this browser-runtime generalisation.
 
 ## 9. Current next engineering step
 
-Continue generalising the browser/engine vertical slice across the candidate curriculum without duplicating curriculum logic in pages. Prefer reusable Learning Interface/controller contracts and keep page code thin. Do not add scientific claims or freeze construct-specific mastery rules from synthetic browser data.
+The first shared browser vertical-slice generalisation across A1, B1 and FR2 is complete. Next, continue from the shared runtime boundary rather than adding more page-specific curriculum logic. Strengthen reusable Learning Interface/controller contracts where a real architectural gap is demonstrated, and only then expand the vertical slice to additional task/development coverage.
+
+Do not add scientific claims or freeze construct-specific mastery rules from synthetic browser data.
 
 ## 10. Latest regression state
 
-Latest user-confirmed complete Full Regression before the latest FR2 controller change:
-- Commit: `b2eb42c527e4d0e924f928de8bbf29f55d4eefbb`
+Latest user-confirmed Full Regression:
+- Commit: `43840bc7e81bf1ad4e11bc1308215a55fa2fc365`
 - Branch: `refactor/professional-v1`
 - Status: **GREEN** (user-confirmed)
 
-Latest engineering commits:
-- `8e2a2772cf7e93172ebb5581f70cfc5413c002ee` — FR2 controller test
-- `c3d6c82c41acc27511ee7cbde37965d460659330` — FR2 duplicate-submission lifecycle contract
+Recent engineering commits:
+- `2843e2c5383e02da1c1147d6db19a9c0e114baea` — shared browser vertical slice runtime;
+- `6595e78572866f61f1cdf5e459709c7e61bb8bea` — shared runtime contract tests;
+- `75613901a4c28f69ae28fede42c1d744a7dcdc91` — A1 page migrated to shared runtime;
+- `2836df542afbd26482383ff6388666aac18ef0fa` — B1 page migrated to shared runtime;
+- `43840bc7e81bf1ad4e11bc1308215a55fa2fc365` — FR2 page migrated to shared runtime.
 
-The isolated FR2 controller test is designed to pass after the lifecycle correction. Full Regression on `c3d6c82c41acc27511ee7cbde37965d460659330` is not yet independently verified through available GitHub/CI status data.
+GitHub status data is not currently exposing CI results for these commits; the latest regression state above is therefore explicitly recorded as user-confirmed rather than independently verified by GitHub status.
 
 ## 11. Supabase
 
-No Supabase schema/runtime change is required for the current B1/FR2 browser vertical-slice work. Change Supabase only for a real persistence/runtime contract requirement.
+No Supabase schema/runtime change is required for the current browser vertical-slice work. Change Supabase only for a real persistence/runtime contract requirement.
 
 ## 12. Strategy
 

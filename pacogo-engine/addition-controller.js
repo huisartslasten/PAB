@@ -1,0 +1,130 @@
+import { createInteractionEvent, createObservation, createTaskInstance } from './interaction-contract.js';
+
+function assertFiniteNumber(value, label) {
+  if (!Number.isFinite(value)) throw new TypeError(`${label} must be a finite number`);
+}
+
+function createAdditionController({ task, studentKey, renderer, addends, expectedAnswer, strategyOptions = [], provenance = {} }) {
+  if (!task || !renderer || !Array.isArray(addends) || addends.length < 2) {
+    throw new TypeError('task, renderer and at least two addends are required');
+  }
+  addends.forEach((value, index) => assertFiniteNumber(value, `addends[${index}]`));
+  assertFiniteNumber(expectedAnswer, 'expectedAnswer');
+  if (!Array.isArray(strategyOptions) || strategyOptions.length === 0) {
+    throw new TypeError('strategyOptions must contain at least one strategy');
+  }
+
+  const taskInstance = createTaskInstance({
+    taskId: task.task_id,
+    taskModelId: task.task_model_id,
+    skillId: task.skill_id,
+    developmentId: task.development_id,
+    claimId: task.claim_id,
+    evidenceTargetIds: task.evidence_target_ids,
+    taskDefinitionVersion: '0.1'
+  });
+
+  const events = [];
+  const startedAt = new Date().toISOString();
+  let selectedStrategy = null;
+  let submittedAnswer = null;
+
+  const record = (eventType, payload) => {
+    events.push(createInteractionEvent({
+      taskInstanceId: taskInstance.task_instance_id,
+      eventType,
+      at: new Date().toISOString(),
+      payload
+    }));
+  };
+
+  record('task_presented', {
+    addends: [...addends],
+    representation: 'quantity_groups',
+    strategy_option_count: strategyOptions.length
+  });
+
+  const selectStrategy = (strategyId, source = 'renderer') => {
+    const strategy = strategyOptions.find(item => item.id === strategyId);
+    if (!strategy) throw new Error(`Unknown addition strategy: ${strategyId}`);
+    selectedStrategy = strategyId;
+    record('strategy_selected', { strategy_id: strategyId, source });
+    return strategy;
+  };
+
+  const submit = (answer) => {
+    if (selectedStrategy === null) throw new Error('No addition strategy has been selected');
+    assertFiniteNumber(Number(answer), 'answer');
+    submittedAnswer = Number(answer);
+    const correct = submittedAnswer === expectedAnswer;
+    record('addition_submitted', {
+      addends: [...addends],
+      submitted_answer: submittedAnswer,
+      expected_answer: expectedAnswer,
+      strategy_id: selectedStrategy,
+      correct
+    });
+
+    const observedAt = new Date().toISOString();
+    const observation = createObservation({
+      taskInstance,
+      studentKey,
+      response: {
+        type: 'quantity_addition',
+        addends: [...addends],
+        submitted_answer: submittedAnswer,
+        expected_answer: expectedAnswer,
+        strategy_id: selectedStrategy
+      },
+      correctness: correct,
+      events,
+      performance: {
+        observed_at: observedAt,
+        response_time_ms: Math.max(0, Date.parse(observedAt) - Date.parse(startedAt)),
+        attempts: 1,
+        hints: 0,
+        strategy: selectedStrategy,
+        representation: 'quantity_groups'
+      },
+      context: {
+        language: 'nl',
+        setting: 'browser_vertical_slice',
+        prompt_level: task.prompt_level || 'none',
+        task_variant: task.variation_key,
+        variation_key: task.variation_key
+      },
+      provenance: {
+        source: 'browser_interaction',
+        source_event_id: events.at(-1)?.event_id,
+        task_definition_version: '0.1',
+        collector_version: '0.1',
+        ...provenance
+      }
+    });
+
+    return {
+      evaluation: { correct, submitted_answer: submittedAnswer, expected_answer: expectedAnswer },
+      observation: {
+        ...observation,
+        quality: correct ? 1 : 0,
+        relevant: true,
+        contradiction: false,
+        independent: true,
+        variation_key: task.variation_key
+      }
+    };
+  };
+
+  return Object.freeze({
+    taskInstance,
+    events,
+    startedAt,
+    record,
+    selectStrategy,
+    submit,
+    getSelectedStrategy: () => selectedStrategy,
+    getSubmittedAnswer: () => submittedAnswer
+  });
+}
+
+export { createAdditionController };

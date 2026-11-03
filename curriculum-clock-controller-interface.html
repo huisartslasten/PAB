@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PacoGO — Clock controller vertical slice</title>
+<style>
+:root{font-family:Nunito,system-ui,sans-serif;color:#17345f;background:#edf5fb}
+body{margin:0;padding:28px;min-height:100vh;background:linear-gradient(145deg,#eaf5ff,#f8fbff)}
+main{max-width:980px;margin:auto;background:#fff;border:1px solid #d9e8f5;border-radius:28px;padding:30px;box-shadow:0 24px 70px rgba(33,73,112,.13)}
+h1{margin:0 0 10px;font-size:36px}p{color:#627994;line-height:1.6}.task{margin:22px 0;padding:18px;border-radius:18px;background:#eef7fd;font-weight:900;font-size:20px;text-align:center}.actions{text-align:center;margin-top:18px}.actions button{border:0;border-radius:13px;padding:12px 20px;font:900 15px Nunito;cursor:pointer;background:#1687e8;color:#fff}.status{margin-top:18px;padding:14px;border-radius:15px;background:#f4f8fb;font-weight:900}.trace{margin-top:14px;background:#f4f8fb;border-radius:15px;padding:14px;white-space:pre-wrap;font:700 12px/1.5 ui-monospace,monospace}
+</style>
+</head>
+<body><main>
+<h1>Klok — Learning Interface → Controller</h1>
+<p>Dit is de technische vertical slice: de visuele Learning Interface blijft verantwoordelijk voor de interactie; de Clock Controller maakt daar de observeerbare leerprestatie van.</p>
+<div class="task">Zet de klok op 08:35 en controleer daarna je antwoord.</div>
+<div id="clock-interface"></div>
+<div class="actions"><button id="submit" type="button">Controleer tijd</button></div>
+<div id="status" class="status">Nog geen observatie.</div>
+<pre id="trace" class="trace">Nog geen observation.</pre>
+</main>
+<script type="module">
+import { createClockLearningInterface } from './pacogo-engine/clock-learning-interface.js';
+import { createClockController } from './pacogo-engine/clock-controller.js';
+import { createClockInterfaceControllerBridge } from './pacogo-engine/clock-interface-controller-bridge.js';
+
+const targetTime = { hour: 8, minute: 35 };
+const task = {
+  task_id: 'CLOCK-T01', task_model_id: 'CLOCK.TM1', skill_id: 'CLOCK',
+  development_id: 'CLOCK.D1', claim_id: 'CLOCK.C1',
+  evidence_target_ids: ['CLOCK.ET1'], variation_key: 'analog_to_digital', prompt_level: 'none'
+};
+
+const status = document.querySelector('#status');
+const trace = document.querySelector('#trace');
+const controller = createClockController({ task, studentKey: 'browser-synthetic-clock', targetTime, mode: 'analog_to_digital', provenance: { page: 'curriculum-clock-controller-interface.html' } });
+const clock = createClockLearningInterface({
+  mount: document.querySelector('#clock-interface'),
+  initialTime: { hour: 8, minute: 0 },
+  mode: 'analog_to_digital',
+  onInteraction: (event) => {
+    bridge.setTime(event.payload.time);
+    status.textContent = `Interactie ontvangen: ${event.event_type}`;
+  }
+});
+const bridge = createClockInterfaceControllerBridge({ interfaceInstance: clock, controller, representation: 'digital' });
+
+document.querySelector('#submit').addEventListener('click', () => {
+  try {
+    const result = bridge.submit();
+    status.textContent = result.correct ? 'Goed. De controller heeft de observatie gemaakt.' : 'Nog niet goed. De controller heeft de observatie gemaakt.';
+    trace.textContent = JSON.stringify({ observation_id: result.observation.observation_id, correctness: result.observation.correctness, representation: result.observation.response.representation, event_count: result.observation.interaction_events.length }, null, 2);
+    document.querySelector('#submit').disabled = true;
+  } catch (error) {
+    status.textContent = error.message;
+  }
+});
+</script>
+</body>
+</html>

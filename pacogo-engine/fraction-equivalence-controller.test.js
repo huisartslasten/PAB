@@ -30,6 +30,8 @@ assert.equal(result.observation.response.selected_option_id, 'eq');
 assert.equal(result.observation.context.variation_key, 'area_model_equivalence_independent');
 assert.ok(result.observation.interaction_events.some(event => event.event_type === 'option_selected'));
 assert.ok(result.observation.interaction_events.some(event => event.event_type === 'equivalence_submitted'));
-assert.throws(() => controller.submit(), /No fraction option has been selected/);
+assert.equal(controller.isSubmitted(), true);
+assert.throws(() => controller.submit(), /Fraction task has already been submitted/);
+assert.throws(() => controller.selectOption('neq', 'test'), /Fraction task has already been submitted/);
 
 console.log('PacoGO FR2 fraction equivalence controller passed.');

@@ -45,10 +45,13 @@ Completed:
 - `docs/curriculum/PacoGO_Scientific_Validation_Protocol_v0.1.md`
 - W2 repeated-measurement protocol and W2 analysis contract.
 - `docs/curriculum/PacoGO_Construct_Specific_Validation_Design_v0.1.md`
+- `docs/curriculum/PacoGO_A1_Study_Protocol_v0.1.md`
 
 The validation specification distinguishes product, curriculum-engine and scientific-validation data, defines external validation requirements, reliability, longitudinal validation, mastery validation, next-action validation, learner-state validation, Learning Interface validation, privacy/child-data governance and replication.
 
-The construct-specific design now establishes the next research layer: A1 construct hypotheses and candidate independent-measure families; B1/FR2 construct boundaries; reliability/measurement-error design principles; longitudinal design constraints; study-specific power/precision policy; preregistration boundaries; ethics/data-governance requirements; and explicit gates before Learning Interface runtime contracts are scientifically frozen.
+The construct-specific design establishes A1 construct hypotheses and candidate independent-measure families; B1/FR2 construct boundaries; reliability/measurement-error design principles; longitudinal design constraints; study-specific power/precision policy; preregistration boundaries; ethics/data-governance requirements; and explicit gates before Learning Interface runtime contracts are scientifically frozen.
+
+The A1 study protocol now turns that design into a study-ready structure: research questions, independent-measure strategy, primary outcomes/estimands, three-wave longitudinal minimum, reliability design, sampling/power requirements, model-comparison boundaries, mastery and Learning Interface validation boundaries, confounders and governance. It remains study-ready but not preregistration-ready until population, exact measures, timing and power calculations are frozen.
 
 The scientific protocol is a design baseline, not evidence that PacoGO is scientifically validated. PacoGO remains scientifically grounded, designed and empirically testable, but not empirically validated.
 
@@ -93,34 +96,34 @@ No Supabase schema/runtime change is required for the current scientific validat
 
 ## 9. Current scientific next step
 
-The next major research/engineering phase is to turn the construct-specific design into a study-ready A1 protocol. This requires:
-- exact age/population scope;
-- exact independent measures;
+The next major research/engineering phase is to make the A1 study protocol preregistration-ready. This requires:
+- exact age/population and language scope;
+- exact independent measures and feasibility/licensing review;
 - primary hypotheses and estimands;
-- measurement occasions and spacing;
-- reliability design;
-- longitudinal model candidates;
+- exact measurement occasions and spacing;
+- reliability coefficient choices matched to variable types;
+- longitudinal model candidates and comparison criteria;
 - mastery criterion design;
-- sample-size/power/precision analysis;
+- sample-size/power/precision calculations;
 - preregistration plan;
 - ethics/privacy/governance plan;
 - confirmatory/exploratory separation.
 
-B1 and FR2 should receive the same construct-specific treatment before candidate promotion.
+After A1 is sufficiently specified, B1 and FR2 should receive the same construct-specific treatment before candidate promotion. Learning Interface runtime implementation follows only when the research evidence contract is sufficiently frozen for the intended study.
 
 ## 10. Latest verified regression state
 
 Latest user-confirmed complete Full Regression:
-- Commit: `f14fadb6cb6e3b7cd882928ec8619dbdffd836f5`
+- Commit: `54e173674c4e55f262d1c7a3dad61a54a81b634f`
 - Branch: `refactor/professional-v1`
 - Status: **GREEN** (user-confirmed)
 
-Current HEAD after the construct-specific design work:
-- Commit: `54e173674c4e55f262d1c7a3dad61a54a81b634f`
+Current HEAD after the A1 study protocol:
+- Commit: `ee56d9b8146bd97b4a71216fb79545925da7c4b0`
 - Full Regression: **NOT YET VERIFIED**
 
 Automated GitHub workflow/status data has not been available for the recent commits through the connector, so no stronger CI claim is made.
 
 ## 11. Strategy
 
-**Build the brain → prove the vertical chain → define how the brain will be scientifically validated → define construct-specific study designs → build reusable learning instruments with that validation contract → empirically validate with real learners → then build the larger Deluxe world.**
+**Build the brain → prove the vertical chain → define how the brain will be scientifically validated → define construct-specific study designs → make A1 study-ready → freeze the research evidence contract → build reusable learning instruments → empirically validate with real learners → then build the larger Deluxe world.**

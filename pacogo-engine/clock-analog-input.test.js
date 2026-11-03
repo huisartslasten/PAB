@@ -14,9 +14,14 @@ test('clock analog input maps minute hand angles to five-minute increments', () 
   assert.equal(minuteFromAngle(359), 0);
 });
 
-test('clock analog input maps hour hand while preserving 12-hour period', () => {
+test('clock analog input reads the current hour until the next hour mark', () => {
   assert.equal(hourFromAngle(255, 8), 8);
+  assert.equal(hourFromAngle(269.999, 8), 8);
+  assert.equal(hourFromAngle(270, 8), 9);
   assert.equal(hourFromAngle(255, 20), 20);
+  assert.equal(hourFromAngle(269.999, 20), 20);
+  assert.equal(hourFromAngle(270, 20), 21);
+  assert.equal(hourFromAngle(359, 8), 11);
   assert.equal(hourFromAngle(0, 8), 0);
   assert.equal(hourFromAngle(0, 20), 12);
 });

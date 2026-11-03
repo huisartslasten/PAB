@@ -9,7 +9,8 @@ function minuteFromAngle(angle) {
 
 function hourFromAngle(angle, currentHour = 12) {
   if (!Number.isInteger(currentHour) || currentHour < 0 || currentHour > 23) throw new RangeError('currentHour must be an integer from 0 to 23');
-  const hour12 = Math.round(normalizeAngle(angle) / 30) % 12;
+  // The hour changes only when the hand reaches the next hour mark.
+  const hour12 = Math.floor(normalizeAngle(angle) / 30) % 12;
   const period = currentHour >= 12 ? 12 : 0;
   return (hour12 + period) % 24;
 }

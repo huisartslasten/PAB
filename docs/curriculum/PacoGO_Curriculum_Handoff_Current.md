@@ -69,7 +69,7 @@ The interface runtime contract must preserve:
 
 ## 8. Current engineering implementation
 
-A1 Number Line, B1 Addition and FR2 Fraction Equivalence now demonstrate the same browser vertical-slice bridge:
+A1 Number Line, B1 Addition and FR2 Fraction Equivalence demonstrate the same browser vertical-slice bridge:
 `browser interaction → interaction controller → observation → shared browser runtime → curriculum registry → learner-state/decision flow`.
 
 Reusable engine components:
@@ -78,14 +78,17 @@ Reusable engine components:
 - `pacogo-engine/fraction-equivalence-controller.js` — reusable FR2 equivalence interaction controller;
 - `pacogo-engine/fraction-equivalence-controller.test.js` — FR2 evidence/interaction contract test;
 - `pacogo-engine/browser-vertical-slice.js` — shared browser-to-registry runtime for task resolution and observation submission;
-- `pacogo-engine/browser-vertical-slice.test.js` — runtime delegation, task lookup, duplicate-task and input-contract tests.
+- `pacogo-engine/browser-vertical-slice.test.js` — runtime delegation, task lookup, duplicate-task, task/skill binding and input-contract tests.
 
-Browser vertical slices using the shared runtime:
+The browser runtime now exposes `runTaskObservation({ taskId, observation, ... })`. This is the stronger page-to-engine contract: the runtime resolves the task and rejects an observation whose `skill_id` does not match that task. Pages therefore cannot accidentally submit evidence under a different task skill after resolving a task.
+
+Browser vertical slices using the shared runtime/task-bound contract:
 - `curriculum-a1-numberline.html` — A1-T01;
 - `curriculum-b1-addition.html` — B1-T01;
-- `curriculum-fr2-fraction-equivalence.html` — FR2-T01.
+- `curriculum-fr2-fraction-equivalence.html` — FR2-T01;
+- `curriculum-fr2-fractions.html` — FR2-T02.
 
-The three pages no longer duplicate direct curriculum-registry task lookup / observation-cycle wiring. The page layer remains responsible for presentation and interaction wiring; curriculum execution is delegated through the shared runtime.
+All four browser slices route their observation submission through `runTaskObservation`; page code remains responsible for presentation and interaction wiring, while curriculum task identity and registry execution remain centralized.
 
 FR2 controller lifecycle explicitly prevents duplicate submission after an observation has been emitted.
 
@@ -93,23 +96,24 @@ No Supabase change was required for this browser-runtime generalisation.
 
 ## 9. Current next engineering step
 
-The first shared browser vertical-slice generalisation across A1, B1 and FR2 is complete. Next, continue from the shared runtime boundary rather than adding more page-specific curriculum logic. Strengthen reusable Learning Interface/controller contracts where a real architectural gap is demonstrated, and only then expand the vertical slice to additional task/development coverage.
+The task-bound browser runtime contract is now established across the existing A1/B1/FR2 browser slices. Next, continue from the reusable Learning Interface/controller boundary and expand coverage to additional task/development forms only when the underlying interaction contract is actually reusable. Do not add page-specific curriculum execution logic.
 
 Do not add scientific claims or freeze construct-specific mastery rules from synthetic browser data.
 
 ## 10. Latest regression state
 
 Latest user-confirmed Full Regression:
-- Commit: `43840bc7e81bf1ad4e11bc1308215a55fa2fc365`
+- Commit: `5b0821348427f036034d7fb4623bf34a9d8f2a8c`
 - Branch: `refactor/professional-v1`
 - Status: **GREEN** (user-confirmed)
 
-Recent engineering commits:
+Recent engineering milestone commits include:
 - `2843e2c5383e02da1c1147d6db19a9c0e114baea` — shared browser vertical slice runtime;
 - `6595e78572866f61f1cdf5e459709c7e61bb8bea` — shared runtime contract tests;
 - `75613901a4c28f69ae28fede42c1d744a7dcdc91` — A1 page migrated to shared runtime;
 - `2836df542afbd26482383ff6388666aac18ef0fa` — B1 page migrated to shared runtime;
-- `43840bc7e81bf1ad4e11bc1308215a55fa2fc365` — FR2 page migrated to shared runtime.
+- `43840bc7e81bf1ad4e11bc1308215a55fa2fc365` — FR2 primary page migrated to shared runtime;
+- `5b0821348427f036034d7fb4623bf34a9d8f2a8c` — task-bound browser runtime contract and browser-slice migration milestone.
 
 GitHub status data is not currently exposing CI results for these commits; the latest regression state above is therefore explicitly recorded as user-confirmed rather than independently verified by GitHub status.
 

@@ -46,14 +46,18 @@ Completed:
 - W2 repeated-measurement protocol and W2 analysis contract.
 - `docs/curriculum/PacoGO_Construct_Specific_Validation_Design_v0.1.md`
 - `docs/curriculum/PacoGO_A1_Study_Protocol_v0.1.md`
+- `docs/curriculum/PacoGO_A1_Preregistration_Readiness_Specification_v0.1.md`
+- `docs/curriculum/PacoGO_A1_Population_Instrument_Selection_Record_v0.1.md`
 
 The validation specification distinguishes product, curriculum-engine and scientific-validation data, defines external validation requirements, reliability, longitudinal validation, mastery validation, next-action validation, learner-state validation, Learning Interface validation, privacy/child-data governance and replication.
 
 The construct-specific design establishes A1 construct hypotheses and candidate independent-measure families; B1/FR2 construct boundaries; reliability/measurement-error design principles; longitudinal design constraints; study-specific power/precision policy; preregistration boundaries; ethics/data-governance requirements; and explicit gates before Learning Interface runtime contracts are scientifically frozen.
 
-The A1 study protocol now turns that design into a study-ready structure: research questions, independent-measure strategy, primary outcomes/estimands, three-wave longitudinal minimum, reliability design, sampling/power requirements, model-comparison boundaries, mastery and Learning Interface validation boundaries, confounders and governance. It remains study-ready but not preregistration-ready until population, exact measures, timing and power calculations are frozen.
+The A1 study protocol turns that design into a study-ready structure: research questions, independent-measure strategy, primary outcomes/estimands, three-wave longitudinal minimum, reliability design, sampling/power requirements, model-comparison boundaries, mastery and Learning Interface validation boundaries, confounders and governance.
 
-The scientific protocol is a design baseline, not evidence that PacoGO is scientifically validated. PacoGO remains scientifically grounded, designed and empirically testable, but not empirically validated.
+The A1 preregistration-readiness layer now defines what can be frozen without inventing parameters and narrows the external-measure search space. The population/instrument selection record establishes an early-number-development feasibility envelope and retains number-line estimation, independent magnitude comparison and a broad mathematics criterion as the strongest current measurement package, while keeping exact age/grade, language, exact instruments, licensing, wave spacing and power assumptions explicitly unresolved.
+
+The scientific protocol remains a design baseline, not evidence that PacoGO is scientifically validated. PacoGO remains scientifically grounded, designed and empirically testable, but not empirically validated.
 
 ## 6. W2 / C5 boundary
 
@@ -96,18 +100,18 @@ No Supabase schema/runtime change is required for the current scientific validat
 
 ## 9. Current scientific next step
 
-The next major research/engineering phase is to make the A1 study protocol preregistration-ready. This requires:
-- exact age/population and language scope;
-- exact independent measures and feasibility/licensing review;
-- primary hypotheses and estimands;
-- exact measurement occasions and spacing;
-- reliability coefficient choices matched to variable types;
-- longitudinal model candidates and comparison criteria;
-- mastery criterion design;
-- sample-size/power/precision calculations;
-- preregistration plan;
-- ethics/privacy/governance plan;
-- confirmatory/exploratory separation.
+The next major research/engineering phase is **formal population selection + exact instrument feasibility/licensing review**, followed by power/precision analysis and the formal A1 preregistration.
+
+The current selection record deliberately does not invent:
+- exact age/grade;
+- administration language;
+- exact independent instruments/task forms;
+- commercial licensing feasibility;
+- exact wave spacing;
+- primary statistical model;
+- power assumptions.
+
+These must be frozen from the intended learner population and measurement package.
 
 After A1 is sufficiently specified, B1 and FR2 should receive the same construct-specific treatment before candidate promotion. Learning Interface runtime implementation follows only when the research evidence contract is sufficiently frozen for the intended study.
 
@@ -118,8 +122,8 @@ Latest user-confirmed complete Full Regression:
 - Branch: `refactor/professional-v1`
 - Status: **GREEN** (user-confirmed)
 
-Current HEAD after the A1 study protocol:
-- Commit: `ee56d9b8146bd97b4a71216fb79545925da7c4b0`
+Current HEAD after the A1 population/instrument selection block:
+- Commit: `dbc90c3dae739d340d7b81de4a5a58a36cca334d` followed by handoff update commit below.
 - Full Regression: **NOT YET VERIFIED**
 
 Automated GitHub workflow/status data has not been available for the recent commits through the connector, so no stronger CI claim is made.

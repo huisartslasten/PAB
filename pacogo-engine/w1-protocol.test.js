@@ -144,7 +144,7 @@ test('W1 protocol rejects missing variation coverage', () => {
 
 test('W1 protocol rejects non-independent double coding', () => {
   const input = buildSyntheticW1();
-  input.execution.coding_records[1].independence_status = 'prompted';
+  input.execution.coding_records[1].independence_status = 'standardised_prompt';
   assert.throws(
     () => validateW1ProtocolExecution({ ...input, w0Outcome: 'FEASIBLE' }),
     /contains non-independent coding/

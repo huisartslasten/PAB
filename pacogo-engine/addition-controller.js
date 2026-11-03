@@ -46,6 +46,7 @@ function createAdditionController({
   let selectedStrategy = null;
   let submittedAnswer = null;
   let submitted = false;
+  let promptedExampleRecorded = false;
 
   const record = (eventType, payload) => {
     events.push(createInteractionEvent({
@@ -59,8 +60,40 @@ function createAdditionController({
   record('task_presented', {
     addends: [...addends],
     representation,
-    strategy_option_count: strategyOptions.length
+    strategy_option_count: strategyOptions.length,
+    prompt_level: task.prompt_level || 'none'
   });
+
+  const recordPromptedExample = ({
+    addends: promptedAddends,
+    answer,
+    strategyId,
+    prompt,
+    explanation: promptedExplanation = null
+  }) => {
+    if (submitted) throw new Error('Addition task has already been submitted');
+    if (promptedExampleRecorded) throw new Error('Prompted example has already been recorded');
+    if (!Array.isArray(promptedAddends) || promptedAddends.length < 2) {
+      throw new TypeError('prompted example requires at least two addends');
+    }
+    promptedAddends.forEach((value, index) => assertFiniteNumber(value, `promptedAddends[${index}]`));
+    assertFiniteNumber(Number(answer), 'prompted example answer');
+    if (typeof strategyId !== 'string' || !strategyId.trim()) {
+      throw new TypeError('prompted example strategyId must be a non-empty string');
+    }
+    if (typeof prompt !== 'string' || !prompt.trim()) {
+      throw new TypeError('prompted example prompt must be a non-empty string');
+    }
+
+    promptedExampleRecorded = true;
+    record('prompted_example_completed', {
+      addends: [...promptedAddends],
+      submitted_answer: Number(answer),
+      strategy_id: strategyId,
+      prompt,
+      explanation: promptedExplanation
+    });
+  };
 
   const selectStrategy = (strategyId, source = 'renderer') => {
     if (submitted) throw new Error('Addition task has already been submitted');
@@ -74,6 +107,9 @@ function createAdditionController({
   const submit = (answer, submittedExplanation = explanation) => {
     if (submitted) throw new Error('Addition task has already been submitted');
     if (selectedStrategy === null) throw new Error('No addition strategy has been selected');
+    if (task.variation_key === 'prompted_to_independent' && !promptedExampleRecorded) {
+      throw new Error('Prompted example is required before independent submission');
+    }
     assertFiniteNumber(Number(answer), 'answer');
     submittedAnswer = Number(answer);
     const correct = submittedAnswer === expectedAnswer;
@@ -83,7 +119,8 @@ function createAdditionController({
       expected_answer: expectedAnswer,
       strategy_id: selectedStrategy,
       explanation: submittedExplanation,
-      correct
+      correct,
+      prompt_level: 'none'
     });
 
     submitted = true;
@@ -107,12 +144,13 @@ function createAdditionController({
         attempts: 1,
         hints: 0,
         strategy: selectedStrategy,
-        representation
+        representation,
+        prompted_example: promptedExampleRecorded
       },
       context: {
         language: 'nl',
         setting: 'browser_vertical_slice',
-        prompt_level: task.prompt_level || 'none',
+        prompt_level: 'none',
         task_variant: task.variation_key,
         variation_key: task.variation_key
       },
@@ -143,6 +181,7 @@ function createAdditionController({
     events,
     startedAt,
     record,
+    recordPromptedExample,
     selectStrategy,
     submit,
     getSelectedStrategy: () => selectedStrategy,

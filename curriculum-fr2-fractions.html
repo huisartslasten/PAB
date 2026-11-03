@@ -50,7 +50,8 @@
   const taskSet = await fetch('./docs/curriculum/PacoGO_Pilot_TaskSet_v0.1.json').then(response => response.json());
   const registry = createCurriculumRegistry(registryConfig);
   const runtime = createBrowserVerticalSliceRuntime({ registry, taskSet });
-  const task = runtime.getTask('FR2-T02');
+  const taskId = 'FR2-T02';
+  const task = runtime.getTask(taskId);
   const options = [
     { id: 'opt-a', fraction: { numerator: 3, denominator: 5 } },
     { id: 'opt-b', fraction: { numerator: 4, denominator: 8 } },
@@ -92,7 +93,7 @@
   document.querySelector('#submit').addEventListener('click', () => {
     try {
       const { evaluation, observation } = controller.submit();
-      const cycle = runtime.runObservation({ observation });
+      const cycle = runtime.runTaskObservation({ taskId, observation });
       status.textContent = evaluation.correct
         ? `Goed. De observatie gaat door naar de PacoGO-leerengine. Volgende stap: ${cycle.next?.action || 'bepalen'}.`
         : 'Niet equivalent. Ook deze observatie gaat als informatie naar de leerengine.';

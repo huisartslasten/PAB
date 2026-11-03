@@ -48,6 +48,7 @@
 </main>
 <script type="module">
   import { createCurriculumRegistry } from './pacogo-engine/curriculum-registry.js';
+  import { createBrowserVerticalSliceRuntime } from './pacogo-engine/browser-vertical-slice.js';
   import { createNumberLine } from './pacogo-engine/number-line.js';
   import { createNumberLineRenderer } from './pacogo-engine/number-line-renderer.js';
   import { createNumberLineController } from './pacogo-engine/number-line-controller.js';
@@ -56,8 +57,9 @@
   const numberLine = createNumberLine({ min: 0, max: 10, step: 1 });
   const taskSet = await fetch('./docs/curriculum/PacoGO_Pilot_TaskSet_v0.1.json').then(response => response.json());
   const registryConfig = await fetch('./docs/curriculum/PacoGO_Curriculum_Registry_v0.2.json').then(response => response.json());
-  const task = taskSet.tasks.find(item => item.task_id === 'A1-T01');
   const registry = createCurriculumRegistry(registryConfig);
+  const runtime = createBrowserVerticalSliceRuntime({ registry, taskSet });
+  const task = runtime.getTask('A1-T01');
 
   let controller;
   let renderer;
@@ -87,13 +89,7 @@
   document.querySelector('#submit').addEventListener('click', () => {
     try {
       const { evaluation, observation } = controller.submit();
-      const cycle = registry.runSkillCycle({
-        studentKey: observation.student_key,
-        skillId: observation.skill_id,
-        observation,
-        priorEvidence: [],
-        asOf: observation.observed_at
-      });
+      const cycle = runtime.runObservation({ observation, priorEvidence: [] });
       status.textContent = evaluation.correct
         ? `Goed geplaatst. De observatie gaat door naar de PacoGO-leerengine. Volgende stap: ${cycle.next?.action || 'bepalen'}.`
         : `Nog niet goed geplaatst. De leerengine ontvangt ook deze foutieve observatie als informatie.`;

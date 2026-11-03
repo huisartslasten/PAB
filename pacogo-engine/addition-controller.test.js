@@ -39,15 +39,41 @@ assert.equal(result.observation.claim_id, 'B1.C1');
 assert.equal(result.observation.evidence_target_id, 'B1.ET1');
 assert.equal(result.observation.response.strategy_id, 'make-ten');
 assert.equal(result.observation.context.variation_key, 'quantity_addition_independent');
+assert.equal(result.observation.performance.representation, 'quantity_groups');
 assert.ok(result.observation.interaction_events.some(event => event.event_type === 'strategy_selected'));
 assert.ok(result.observation.interaction_events.some(event => event.event_type === 'addition_submitted'));
 assert.equal(controller.isSubmitted(), true);
 assert.throws(() => controller.submit(12), /Addition task has already been submitted/);
 assert.throws(() => controller.selectStrategy('count-on'), /Addition task has already been submitted/);
 
+const symbolicTask = {
+  ...task,
+  task_id: 'B1-T02',
+  variation_key: 'symbolic_addition_independent'
+};
+const symbolicController = createAdditionController({
+  task: symbolicTask,
+  studentKey: 'synthetic-b1-2',
+  renderer: {},
+  addends: [8, 7],
+  expectedAnswer: 15,
+  strategyOptions,
+  representation: 'symbolic_expression',
+  responseType: 'symbolic_addition',
+  provenance: { test: true }
+});
+
+symbolicController.selectStrategy('make-ten', 'test');
+const symbolicResult = symbolicController.submit(15, '8 + 7 is addition because two quantities are combined.');
+assert.equal(symbolicResult.evaluation.correct, true);
+assert.equal(symbolicResult.observation.response.type, 'symbolic_addition');
+assert.equal(symbolicResult.observation.response.explanation, '8 + 7 is addition because two quantities are combined.');
+assert.equal(symbolicResult.observation.performance.representation, 'symbolic_expression');
+assert.equal(symbolicResult.observation.interaction_events.at(-1).payload.explanation, '8 + 7 is addition because two quantities are combined.');
+
 const emptyController = createAdditionController({
   task,
-  studentKey: 'synthetic-b1-2',
+  studentKey: 'synthetic-b1-3',
   renderer: {},
   addends: [7, 5],
   expectedAnswer: 12,

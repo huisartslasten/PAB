@@ -92,6 +92,7 @@ const promptedController = createAdditionController({
   provenance: { test: true }
 });
 
+promptedController.selectStrategy('make-ten', 'independent-test');
 assert.throws(() => promptedController.submit(42), /Prompted example is required before independent submission/);
 promptedController.recordPromptedExample({
   addends: [20, 10],
@@ -99,7 +100,6 @@ promptedController.recordPromptedExample({
   strategyId: 'make-ten',
   prompt: 'Gebruik eerst het tiental als tussenstap.'
 });
-promptedController.selectStrategy('make-ten', 'independent-test');
 const promptedResult = promptedController.submit(42, '23 + 19 combineert twee hoeveelheden; ik gebruik een tussenstap naar een tiental.');
 assert.equal(promptedResult.evaluation.correct, true);
 assert.equal(promptedResult.observation.development_id, 'B1.D2');

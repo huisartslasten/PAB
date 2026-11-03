@@ -1,8 +1,18 @@
 import { createInteractionEvent, createObservation, createTaskInstance } from './interaction-contract.js';
 
-function createRepresentationMatchController({ task, studentKey, renderer, targetValue, options, representation = 'representation_match', responseType = 'representation_match', provenance = {} }) {
-  if (!task || !studentKey || !renderer) throw new TypeError('task, studentKey and renderer are required');
+function createRepresentationMatchController({
+  task,
+  studentKey,
+  targetValue,
+  options,
+  representation = 'representation_match',
+  responseType = 'representation_match',
+  match = Object.is,
+  provenance = {}
+}) {
+  if (!task || !studentKey) throw new TypeError('task and studentKey are required');
   if (!Array.isArray(options) || options.length === 0) throw new TypeError('options must be a non-empty array');
+  if (typeof match !== 'function') throw new TypeError('match must be a function');
 
   const taskInstance = createTaskInstance({
     taskId: task.task_id,
@@ -32,7 +42,7 @@ function createRepresentationMatchController({ task, studentKey, renderer, targe
 
   const selectOption = (option) => {
     if (submitted) throw new Error('Representation match task has already been submitted');
-    if (!options.includes(option)) throw new Error('Selected option is not available');
+    if (!options.some((candidate) => match(candidate, option))) throw new Error('Selected option is not available');
     selectedOption = option;
     record('option_selected', { option });
   };
@@ -42,7 +52,7 @@ function createRepresentationMatchController({ task, studentKey, renderer, targe
     if (selectedOption === null) throw new Error('No representation option has been selected');
     if (explanation !== null && typeof explanation !== 'string') throw new TypeError('explanation must be a string or null');
 
-    const correct = selectedOption === targetValue;
+    const correct = match(selectedOption, targetValue);
     record('mapping_submitted', { option: selectedOption, target_value: targetValue, correct, explanation });
     submitted = true;
 
@@ -86,7 +96,7 @@ function createRepresentationMatchController({ task, studentKey, renderer, targe
       correct,
       observation: {
         ...observation,
-        quality: correct ? 1 : 0,
+        quality: 1,
         relevant: true,
         contradiction: false,
         independent: true,

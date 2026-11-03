@@ -51,7 +51,8 @@ function createClockLearningInterface({
       <div class="pacogo-clock__visual">
         <div class="pacogo-clock__face" role="img" aria-label="Analoge klok">
           <span class="pacogo-clock__tick t0"></span><span class="pacogo-clock__tick t1"></span><span class="pacogo-clock__tick t2"></span><span class="pacogo-clock__tick t3"></span>
-          <span class="pacogo-clock__cycle" aria-hidden="true"></span>\n          <span class="pacogo-clock__number n12">12</span><span class="pacogo-clock__number n3">3</span><span class="pacogo-clock__number n6">6</span><span class="pacogo-clock__number n9">9</span>
+          <span class="pacogo-clock__cycle" aria-hidden="true"></span>
+          <span class="pacogo-clock__number n12">12</span><span class="pacogo-clock__number n3">3</span><span class="pacogo-clock__number n6">6</span><span class="pacogo-clock__number n9">9</span>
           <span class="pacogo-clock__hand pacogo-clock__hand--hour" data-hand="hour" aria-label="Uurwijzer"></span>
           <span class="pacogo-clock__hand pacogo-clock__hand--minute" data-hand="minute" aria-label="Minutenwijzer"></span><span class="pacogo-clock__pin"></span>
         </div>
@@ -69,7 +70,8 @@ function createClockLearningInterface({
     </div>`;
 
   const root=mount.querySelector('.pacogo-clock'),face=mount.querySelector('.pacogo-clock__face');
-  const hourHand=mount.querySelector('.pacogo-clock__hand--hour'),minuteHand=mount.querySelector('.pacogo-clock__hand--minute');\n  const cycleLabel=mount.querySelector('.pacogo-clock__cycle');
+  const hourHand=mount.querySelector('.pacogo-clock__hand--hour'),minuteHand=mount.querySelector('.pacogo-clock__hand--minute');
+  const cycleLabel=mount.querySelector('.pacogo-clock__cycle');
   const digital=mount.querySelector('.pacogo-clock__digital'),digitalLabel=mount.querySelector('.pacogo-clock__digital-label');
   const optionsContainer=mount.querySelector('.pacogo-clock__options'),hourInput=mount.querySelector('.pacogo-clock__hour');
   const minuteInput=mount.querySelector('.pacogo-clock__minute'),controls=mount.querySelector('.pacogo-clock__controls');
@@ -90,7 +92,9 @@ function createClockLearningInterface({
 
   const render=()=>{
     const analogTime=getAnalogTime(),digitalTime=getDigitalTime();
-    hourHand.style.transform=`translateX(-50%) rotate(${(analogTime.hour%12)*30+analogTime.minute*.5}deg)`;\n    cycleLabel.textContent=formatEtmaalHalf(analogTime);\n    face.dataset.etmaalHalf=analogTime.hour < 12 ? 'first' : 'second';
+    hourHand.style.transform=`translateX(-50%) rotate(${(analogTime.hour%12)*30+analogTime.minute*.5}deg)`;
+    cycleLabel.textContent=formatEtmaalHalf(analogTime);
+    face.dataset.etmaalHalf=analogTime.hour < 12 ? 'first' : 'second';
     minuteHand.style.transform=`translateX(-50%) rotate(${analogTime.minute*6}deg)`;
     face.hidden=isDigitalMatchSource;
     digital.hidden=isMatching&&!isDigitalMatchSource;
@@ -104,7 +108,8 @@ function createClockLearningInterface({
       if(optionRepresentation==='digital_time'){
         button.textContent=formatDigitalTime(option.time);button.setAttribute('aria-label',`Digitale tijd ${formatDigitalTime(option.time)}`);
       }else{
-        const optionFace=document.createElement('span');optionFace.className='pacogo-clock__option-face';optionFace.setAttribute('aria-hidden','true');\n        const optionCycle=document.createElement('span');optionCycle.className='pacogo-clock__option-cycle';optionCycle.textContent=formatEtmaalHalf(option.time);
+        const optionFace=document.createElement('span');optionFace.className='pacogo-clock__option-face';optionFace.setAttribute('aria-hidden','true');
+        const optionCycle=document.createElement('span');optionCycle.className='pacogo-clock__option-cycle';optionCycle.textContent=formatEtmaalHalf(option.time);
         const optionHour=document.createElement('span');optionHour.className='pacogo-clock__option-hand pacogo-clock__option-hand--hour';
         optionHour.style.transform=`translateX(-50%) rotate(${(option.time.hour%12)*30+option.time.minute*.5}deg)`;
         const optionMinute=document.createElement('span');optionMinute.className='pacogo-clock__option-hand pacogo-clock__option-hand--minute';

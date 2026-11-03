@@ -4,7 +4,18 @@ function assertFiniteNumber(value, label) {
   if (!Number.isFinite(value)) throw new TypeError(`${label} must be a finite number`);
 }
 
-function createAdditionController({ task, studentKey, renderer, addends, expectedAnswer, strategyOptions = [], provenance = {} }) {
+function createAdditionController({
+  task,
+  studentKey,
+  renderer,
+  addends,
+  expectedAnswer,
+  strategyOptions = [],
+  representation = 'quantity_groups',
+  responseType = 'quantity_addition',
+  explanation = null,
+  provenance = {}
+}) {
   if (!task || !renderer || !Array.isArray(addends) || addends.length < 2) {
     throw new TypeError('task, renderer and at least two addends are required');
   }
@@ -12,6 +23,12 @@ function createAdditionController({ task, studentKey, renderer, addends, expecte
   assertFiniteNumber(expectedAnswer, 'expectedAnswer');
   if (!Array.isArray(strategyOptions) || strategyOptions.length === 0) {
     throw new TypeError('strategyOptions must contain at least one strategy');
+  }
+  if (typeof representation !== 'string' || !representation.trim()) {
+    throw new TypeError('representation must be a non-empty string');
+  }
+  if (typeof responseType !== 'string' || !responseType.trim()) {
+    throw new TypeError('responseType must be a non-empty string');
   }
 
   const taskInstance = createTaskInstance({
@@ -41,7 +58,7 @@ function createAdditionController({ task, studentKey, renderer, addends, expecte
 
   record('task_presented', {
     addends: [...addends],
-    representation: 'quantity_groups',
+    representation,
     strategy_option_count: strategyOptions.length
   });
 
@@ -54,7 +71,7 @@ function createAdditionController({ task, studentKey, renderer, addends, expecte
     return strategy;
   };
 
-  const submit = (answer) => {
+  const submit = (answer, submittedExplanation = explanation) => {
     if (submitted) throw new Error('Addition task has already been submitted');
     if (selectedStrategy === null) throw new Error('No addition strategy has been selected');
     assertFiniteNumber(Number(answer), 'answer');
@@ -65,6 +82,7 @@ function createAdditionController({ task, studentKey, renderer, addends, expecte
       submitted_answer: submittedAnswer,
       expected_answer: expectedAnswer,
       strategy_id: selectedStrategy,
+      explanation: submittedExplanation,
       correct
     });
 
@@ -74,11 +92,12 @@ function createAdditionController({ task, studentKey, renderer, addends, expecte
       taskInstance,
       studentKey,
       response: {
-        type: 'quantity_addition',
+        type: responseType,
         addends: [...addends],
         submitted_answer: submittedAnswer,
         expected_answer: expectedAnswer,
-        strategy_id: selectedStrategy
+        strategy_id: selectedStrategy,
+        explanation: submittedExplanation
       },
       correctness: correct,
       events,
@@ -88,7 +107,7 @@ function createAdditionController({ task, studentKey, renderer, addends, expecte
         attempts: 1,
         hints: 0,
         strategy: selectedStrategy,
-        representation: 'quantity_groups'
+        representation
       },
       context: {
         language: 'nl',

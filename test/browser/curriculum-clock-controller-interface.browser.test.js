@@ -38,3 +38,21 @@ test('Clock analog hand interaction reaches the controller and creates evidence'
   expect(trace.representation).toBe('analog_time');
   expect(trace.event_count).toBeGreaterThanOrEqual(3);
 });
+
+test('Clock digital time setting reaches the controller and creates evidence', async ({ page }) => {
+  await page.goto(pageUrl);
+  await expect(page.locator('.pacogo-clock__digital')).toHaveText('08:00');
+
+  await page.locator('.pacogo-clock__hour').fill('8');
+  await page.locator('.pacogo-clock__minute').fill('35');
+  await page.getByRole('button', { name: 'Zet tijd' }).click();
+
+  await expect(page.locator('.pacogo-clock__digital')).toHaveText('08:35');
+  await page.getByRole('button', { name: 'Controleer tijd' }).click();
+  await expect(page.locator('#status')).toContainText('Goed');
+
+  const trace = JSON.parse(await page.locator('#trace').textContent());
+  expect(trace.correctness).toBe(true);
+  expect(trace.representation).toBe('digital_time');
+  expect(trace.event_count).toBeGreaterThanOrEqual(3);
+});

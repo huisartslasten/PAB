@@ -41,93 +41,66 @@ B1 — Optellen and FR2 — Breukequivalentie herkennen en gebruiken remain cand
 ## 5. Scientific validation — completed design baseline
 
 Completed:
-- `docs/curriculum/PacoGO_Validation_Data_Specification_v0.1.md`
-- `docs/curriculum/PacoGO_Scientific_Validation_Protocol_v0.1.md`
-- W2 repeated-measurement protocol and W2 analysis contract.
-- `docs/curriculum/PacoGO_Construct_Specific_Validation_Design_v0.1.md`
-- `docs/curriculum/PacoGO_A1_Study_Protocol_v0.1.md`
-- `docs/curriculum/PacoGO_A1_Preregistration_Readiness_Specification_v0.1.md`
-- `docs/curriculum/PacoGO_A1_Population_Instrument_Selection_Record_v0.1.md`
-
-The validation specification distinguishes product, curriculum-engine and scientific-validation data, defines external validation requirements, reliability, longitudinal validation, mastery validation, next-action validation, learner-state validation, Learning Interface validation, privacy/child-data governance and replication.
-
-The construct-specific design establishes A1 construct hypotheses and candidate independent-measure families; B1/FR2 construct boundaries; reliability/measurement-error design principles; longitudinal design constraints; study-specific power/precision policy; preregistration boundaries; ethics/data-governance requirements; and explicit gates before Learning Interface runtime contracts are scientifically frozen.
-
-The A1 study protocol turns that design into a study-ready structure: research questions, independent-measure strategy, primary outcomes/estimands, three-wave longitudinal minimum, reliability design, sampling/power requirements, model-comparison boundaries, mastery and Learning Interface validation boundaries, confounders and governance.
-
-The A1 preregistration-readiness layer now defines what can be frozen without inventing parameters and narrows the external-measure search space. The population/instrument selection record establishes an early-number-development feasibility envelope and retains number-line estimation, independent magnitude comparison and a broad mathematics criterion as the strongest current measurement package, while keeping exact age/grade, language, exact instruments, licensing, wave spacing and power assumptions explicitly unresolved.
+- validation data specification;
+- scientific validation protocol;
+- W2 repeated-measurement protocol and analysis contract;
+- construct-specific validation design;
+- A1 study protocol;
+- A1 preregistration-readiness specification;
+- A1 population/instrument selection gate.
 
 The scientific protocol remains a design baseline, not evidence that PacoGO is scientifically validated. PacoGO remains scientifically grounded, designed and empirically testable, but not empirically validated.
 
 ## 6. W2 / C5 boundary
 
-W2 is design-only longitudinal readiness infrastructure.
-
-W2 permits analysis of repeated measurement and temporal association when the protocol requirements are satisfied. Developmental ordering, prerequisite inference, causal inference, mastery classification, registry promotion and mastery-rule changes remain explicitly blocked.
-
-Current W2 analysis contract requires:
-- provenance;
-- timepoint coverage;
-- within-learner repetition;
-- measurement consistency;
-- missingness/attrition;
-- task variation;
-- temporal association;
-- alternative explanations;
-- C5 ordering readiness.
-
-At least three time points are required by the W2 ordering-readiness contract before an ordering design can be considered; even then the scientific inference remains blocked until the required empirical protocol and validation evidence exist.
+W2 is design-only longitudinal readiness infrastructure. Developmental ordering, prerequisite inference, causal inference, mastery classification, registry promotion and mastery-rule changes remain explicitly blocked.
 
 ## 7. Learning Interface System
 
 Build reusable pedagogical instruments, not one traditional lesson per skill.
-
-Examples: Number Line, Clock, Fraction, Quantity/Number Representation, Measurement, Ratio.
 
 Conceptual chain:
 `skill → development → required interaction forms → Learning Interface(s) → task/evidence`
 
 Interfaces must separate pedagogical/function state from visual/rendering state and remain ready for future PacoGO Deluxe / Upper Tier integration.
 
-The interface runtime contract must preserve the mapping:
+The interface runtime contract must preserve:
 `interaction → observable event → evidence target → coding dimension → validation dataset field`.
 
-The current scientific design explicitly says not to freeze construct-specific evidence fields, mastery thresholds or scientific interpretations until the corresponding construct has passed the research readiness gates.
+## 8. Current engineering implementation
 
-## 8. Supabase
+A1 Number Line and FR2 Fraction Equivalence already demonstrate browser → interaction controller → observation → curriculum registry → learner-state/decision flow.
 
-No Supabase schema/runtime change is required for the current scientific validation design work. Change Supabase only for a real persistence/runtime contract requirement.
+New generalisation slice completed:
+- `pacogo-engine/addition-controller.js` — reusable B1 quantity-addition interaction controller;
+- `pacogo-engine/addition-controller.test.js` — evidence/interaction contract test;
+- `curriculum-b1-addition.html` — B1 browser vertical slice using B1-T01.
 
-## 9. Current scientific next step
+The B1 slice captures strategy choice, answer, interaction events, task identity, evidence target, provenance and variation, then sends the observation through the same curriculum registry path as A1/FR2. No Supabase change was required.
 
-The next major research/engineering phase is **formal population selection + exact instrument feasibility/licensing review**, followed by power/precision analysis and the formal A1 preregistration.
+## 9. Current next engineering step
 
-The current selection record deliberately does not invent:
-- exact age/grade;
-- administration language;
-- exact independent instruments/task forms;
-- commercial licensing feasibility;
-- exact wave spacing;
-- primary statistical model;
-- power assumptions.
+Continue generalising the browser/engine vertical slice across the candidate curriculum without duplicating curriculum logic in pages. Prefer reusable Learning Interface/controller contracts and keep page code thin. Do not add scientific claims or freeze construct-specific mastery rules from synthetic browser data.
 
-These must be frozen from the intended learner population and measurement package.
+## 10. Latest regression state
 
-After A1 is sufficiently specified, B1 and FR2 should receive the same construct-specific treatment before candidate promotion. Learning Interface runtime implementation follows only when the research evidence contract is sufficiently frozen for the intended study.
-
-## 10. Latest verified regression state
-
-Latest user-confirmed complete Full Regression:
-- Commit: `54e173674c4e55f262d1c7a3dad61a54a81b634f`
+Latest user-confirmed complete Full Regression before the B1 build:
+- Commit: `11ec9bc5bb0cabe9c24ba7a469521d003c837851`
 - Branch: `refactor/professional-v1`
 - Status: **GREEN** (user-confirmed)
 
-Current HEAD after the A1 population/instrument selection block:
-- Commit: `dbc90c3dae739d340d7b81de4a5a58a36cca334d` followed by handoff update commit below.
-- Full Regression: **NOT YET VERIFIED**
+B1 implementation commits:
+- `513236407ad5ac98d86deeb026748340208a3796` — addition controller
+- `c83be2b1b08806717d296ce1362547e28af1f808` — controller test correction
+- `5bfd5edf0554fa709697bb375735113795498caa` — B1 browser vertical slice
 
-Automated GitHub workflow/status data has not been available for the recent commits through the connector, so no stronger CI claim is made.
+Isolated B1 controller test: **PASS** in a local reconstructed test harness.
+Full Regression on the final B1 commit has **not been independently verified** through the available GitHub/CI tooling.
 
-## 11. Strategy
+## 11. Supabase
 
-**Build the brain → prove the vertical chain → define how the brain will be scientifically validated → define construct-specific study designs → make A1 study-ready → freeze the research evidence contract → build reusable learning instruments → empirically validate with real learners → then build the larger Deluxe world.**
+No Supabase schema/runtime change is required for the B1 browser vertical slice. Change Supabase only for a real persistence/runtime contract requirement.
+
+## 12. Strategy
+
+**Build the brain → prove the vertical chain → build reusable Learning Interfaces/controllers → connect multiple curriculum cases through the same engine → empirically validate with real learners → then build the larger Deluxe world.**

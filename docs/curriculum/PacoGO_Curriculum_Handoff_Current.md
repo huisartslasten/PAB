@@ -1,282 +1,115 @@
 # PacoGO Curriculum — Current Handoff
 
-> **HANDOFF IS THE CROSS-CHAT SOURCE OF TRUTH.** Every new chat working on PacoGO Curriculum must read this file first. It must not assume that prior chat history is available.
->
-> **MANDATORY HANDOFF MAINTENANCE:** After every significant curriculum, scientific, architectural, engineering or product decision, and after every completed major phase, this handoff must be reviewed and updated before that chat closes the phase. The update must reflect the current project position, completed work, decisions, open research questions, next concrete step and latest verified regression/commit status. The handoff is not a historical note; it is the current transferable project state.
+> **HANDOFF IS THE CROSS-CHAT SOURCE OF TRUTH.** Every new chat working on PacoGO Curriculum must read this file first.
 
-## 1. Project position
+## 1. Current position
 
-PacoGO is being developed as a learning/curriculum platform. The curriculum engine is the scientific decision layer; the learner-facing product and visual learning interfaces are built later on top of it.
+PacoGO is a learning/curriculum platform. The curriculum engine is the scientific decision layer; learner-facing Learning Interfaces are built on top of it.
 
-Current working branch:
-- `refactor/professional-v1`
-- `main` / LIVE must not be touched.
+Working branch: `refactor/professional-v1`  
+`main` / LIVE must not be touched.
 
-## 2. Mandatory engineering workflow
+## 2. Engineering workflow
 
-Before every build step:
-1. Check Full Regression.
-2. If green, proceed.
-3. If red, stop building.
-4. Isolate the exact root cause.
-5. Determine whether the cause is code, test, architecture contract, data/schema, or CI/environment.
-6. Never guess and never patch around the symptom.
-7. Design the proper underlying solution.
-8. Implement.
-9. Run Full Regression again.
-10. Continue only when green.
+Before every build step: Full Regression → green means build → red means stop and isolate the exact root cause → classify cause → design the proper underlying solution → implement → Full Regression again. Never guess or symptom-patch. Tests are changed only when demonstrably incorrect or when an intentional contract change has been correctly designed.
 
-Tests must never be changed merely to make a regression green. A test is changed only when it is demonstrably incorrect or when an intentional contract change has been correctly designed and implemented.
+Always report the exact commit tested and the actual regression result.
 
-## 3. Completed scientific curriculum engine
+## 3. Scientific curriculum engine
 
 C1–C9 are complete.
 
-### C1 — Pilot / claim validation design
-- Claim is the primary validation unit.
-- Feasibility, discriminating and longitudinal phases are separated.
-- Claims, evidence, task models, coding and exclusions are pre-specified.
-
-### C2 — Student data model
 Core chain:
-`learner/context → task instance → interaction/observation → evidence assessment → inference → decision`
+`curriculum → skill → development → claim → task → learner performance → evidence → evidence assessment → inference → mastery → next action → learner state → validation`
 
-### C3 — Evidence coding
-Evidence coding covers target match, performance, process, evidence quality, contradiction, prompting/independence, alternatives and reliability.
+- C1: claim-centred validation design; feasibility, discriminating and longitudinal phases separated.
+- C2: learner/context → task instance → interaction/observation → evidence assessment → inference → decision.
+- C3: evidence coding includes target match, performance, process, quality, contradiction, prompting/independence, alternatives and reliability.
+- C4: discriminating tasks and readiness gates; 19 tasks over 10 developments, model families M0–M4.
+- C5: developmental ordering distinguished from sequence, temporal precedence, prediction, prerequisite and causality; alternatives, invariance, longitudinal design and model comparison explicit.
+- C6: mastery is claim/development/scope/time bounded; seven gates; no automatic promotion.
+- C7: prerequisite ordering and next-development ordering remain separate.
+- C8: observed evidence, inference, mastery and decision remain distinct over time.
+- C9: validates the complete vertical chain and explicit claim selection at multi-claim boundaries.
 
-### C4 — Discriminating tasks
-- 19 discriminating tasks over 10 developments.
-- Model families M0–M4.
-- Measurement/readiness gates prevent premature developmental inference.
+## 4. Curriculum cases
 
-### C5 — Developmental ordering
-Ordering is distinguished from sequence, temporal precedence, prediction, prerequisite and causality. Alternatives, measurement invariance, longitudinal designs and model comparison are explicit. C5 remains candidate/design evidence; it does not automatically promote registry structure or mastery rules.
+A1 — Getallen representeren en verbinden is the construction/reference case.
 
-### C6 — Mastery decision
-Mastery is claim-specific, development-specific, scope-specific and time-bounded.
+B1 — Optellen and FR2 — Breukequivalentie herkennen en gebruiken remain candidate generalisation cases. Registry presence is not empirical promotion.
 
-Seven gates:
-1. relevance
-2. quality
-3. coverage
-4. stability
-5. independence
-6. variation
-7. contradiction control
+## 5. Scientific validation — completed design baseline
 
-Possible outcomes:
-- `MASTERED`
-- `NOT YET MASTERED`
-- `INSUFFICIENT EVIDENCE`
-- `CONTRADICTORY`
-- `NOT ASSESSED`
+Completed:
+- `docs/curriculum/PacoGO_Validation_Data_Specification_v0.1.md`
+- `docs/curriculum/PacoGO_Scientific_Validation_Protocol_v0.1.md`
+- W2 repeated-measurement protocol and W2 analysis contract.
 
-C6 does not automatically promote registry entries, write runtime mastery, infer developmental ordering or select the next action.
+The validation specification distinguishes product, curriculum-engine and scientific-validation data, defines external validation requirements, reliability, longitudinal validation, mastery validation, next-action validation, learner-state validation, Learning Interface validation, privacy/child-data governance and replication.
 
-### C7 — Next-action decision
-C7 separates two ordering domains:
-- `prerequisite_ordering_state`
-- `next_development_ordering_state`
+The scientific protocol is a design baseline, not evidence that PacoGO is scientifically validated. PacoGO remains scientifically grounded, designed and empirically testable, but not empirically validated.
 
-Prerequisite uncertainty must not block prerequisite assessment merely because next-development ordering is uncertain.
+## 6. W2 / C5 boundary
 
-Decision order:
-1. general evidence/mastery/alternative gates
-2. prerequisite candidate
-3. only if prerequisite is supported: next-development candidate
-4. produce the allowed next action or hold state
+W2 is design-only longitudinal readiness infrastructure.
 
-### C8 — Student model / learning status over time
-C8 connects evidence/mastery decisions to a learner-state representation over time. It preserves the distinction between observed evidence, inference, mastery state and decision. C8 does not turn a single observation into permanent truth and does not bypass C6/C7 evidence requirements.
+W2 permits analysis of repeated measurement and temporal association when the protocol requirements are satisfied. Developmental ordering, prerequisite inference, causal inference, mastery classification, registry promotion and mastery-rule changes remain explicitly blocked.
 
-### C9 — Validation / chain integrity
-C9 validates the complete vertical decision chain and makes the C6→C9 boundary explicit. Claim selection is explicit when a multi-claim C6 result enters the C8/C9 layer; C8/C9 must not silently choose an arbitrary claim.
+Current W2 analysis contract requires:
+- provenance;
+- timepoint coverage;
+- within-learner repetition;
+- measurement consistency;
+- missingness/attrition;
+- task variation;
+- temporal association;
+- alternative explanations;
+- C5 ordering readiness.
 
-## 4. First complete vertical prototype
+At least three time points are required by the W2 ordering-readiness contract before an ordering design can be considered; even then the scientific inference remains blocked until the required empirical protocol and validation evidence exist.
 
-The first vertical prototype now exists as an executable/tested chain:
+## 7. Learning Interface System
 
-`curriculum → skill → development → claim → discriminating task → learner performance → evidence → evidence assessment → C5 ordering → C6 mastery → C7 next action → C8 learner state → C9 validation`
+Build reusable pedagogical instruments, not one traditional lesson per skill.
 
-First concrete curriculum slice:
-- A1 — Getallen representeren en verbinden
-- D1 — Representational meaning
-- Claim: `A1.C1`
+Examples: Number Line, Clock, Fraction, Quantity/Number Representation, Measurement, Ratio.
 
-This is the scientific/engine vertical slice. It is not yet a learner-facing lesson or polished visual interface.
-
-## 5. Candidate curriculum registry
-
-### A1 — Getallen representeren en verbinden
-Developments:
-- D1 Representational meaning
-- D2 Mapping
-- D3 Coordination
-
-Claims:
-- A1.C1 / A1.D1
-- A1.C2 / A1.D2
-
-### B1 — Optellen
-Developments:
-- D1 Samenvoegen begrijpen
-- D2 Optelling als getalrelatie uitvoeren
-- D3 Strategisch en flexibel optellen
-- D4 Geïntegreerd optellen
-
-Claims:
-- B1.C1 / B1.D1
-- B1.C2 / B1.D2
-
-### FR2 — Breukequivalentie herkennen en gebruiken
-Developments:
-- D1 Equivalentie herkennen
-- D2 Equivalentie verklaren
-- D3 Equivalentie functioneel gebruiken
-
-Claims:
-- FR2.C1 / FR2.D1
-- FR2.C2 / FR2.D2
-
-All registry entries remain candidate status. They are not empirically promoted merely because they exist in the registry.
-
-## 6. What comes next
-
-The scientific engine does not need another C-layer immediately. The next work is curriculum generalisation and substantive curriculum content.
-
-Planned order:
-1. Complete/deepen A1 as the first reference skill/curriculum slice.
-2. Generalise the architecture with B1.
-3. Generalise again with FR2.
-4. Expand the curriculum into concrete mathematical domains such as number lines, clocks, fractions, measurement, quantities and ratios.
-5. Complete the scientific-validation specification before the runtime starts collecting research-critical data.
-6. Build the Learning Interface System with the validation data requirements already designed into its data contract.
-
-B1 and FR2 do not need to be rebuilt at the same depth as A1. A1 is the construction/proof case; B1 and FR2 primarily test whether the same engine generalises across different mathematical domains.
-
-## 7. Scientific validation — mandatory future workstream
-
-**Important:** Completing the curriculum engine, curriculum content and Learning Interface System does **not** mean PacoGO is scientifically validated. It means PacoGO has a scientifically grounded, explicit and testable model.
-
-A dedicated scientific-validation workstream must therefore be completed before claiming empirical validation.
-
-### Required next research task
-
-The next curriculum/research chat must **investigate what is scientifically required to validate PacoGO**, rather than assuming the current design is already validated.
-
-That investigation must determine, at minimum:
-- which scientific claims PacoGO is actually making;
-- which hypotheses follow from those claims;
-- which constructs need to be measured;
-- which reliability studies are required;
-- which forms of validity need to be investigated;
-- how C4/C5 developmental claims can be empirically tested;
-- how C6 mastery decisions can be externally validated;
-- how C7 next-action decisions can be evaluated;
-- how learner-state predictions can be validated longitudinally;
-- how Learning Interfaces can be evaluated for learning and transfer rather than merely usability;
-- which independent/external measures are needed so PacoGO does not validate itself against itself;
-- which sample, study, comparison and longitudinal designs are appropriate;
-- what statistical/measurement analyses are required;
-- how replication/generalisation should be handled;
-- what child-data privacy, consent, ethics and research-governance requirements apply.
-
-The investigation must be evidence-based and may challenge or revise the current PacoGO architecture where the scientific requirements show that a different design is necessary.
-
-### Required deliverable
-
-Create:
-`docs/curriculum/PacoGO_Validation_Data_Specification_v0.1.md`
-
-This specification must map:
-
-`scientific question → hypothesis → construct → required variable/data → source → measurement moment → analysis → validation criterion → interpretation`
-
-It must distinguish:
-- data required for product functionality;
-- data required for curriculum/engine decisions;
-- data required specifically for scientific validation;
-- data that should **not** be collected because it has no defensible research purpose.
-
-The specification must be designed **before** the Learning Interface System locks its runtime/evidence data contract, so that PacoGO does not later need to rebuild interfaces merely to make scientific validation possible.
-
-### Scientific status language
-
-Until empirical studies have actually been conducted, PacoGO should be described as:
-- scientifically grounded;
-- scientifically designed;
-- empirically testable;
-- not yet scientifically validated.
-
-Do not use “scientifically validated” merely because C1–C9 are implemented.
-
-## 8. Learning Interface System — architectural direction
-
-Important product decision:
-
-PacoGO should not create a separate fixed “lesson” for every mathematical topic. Instead, build reusable, high-quality Learning Interfaces that skills can compose.
-
-Examples:
-- Number Line Interface
-- Clock Interface
-- Fraction Interface
-- Quantity / Number Representation Interface
-- Measurement Interface
-- Ratio Interface
-
-One skill may use multiple interfaces. One interface may be reused by many skills.
-
-Conceptually:
-
+Conceptual chain:
 `skill → development → required interaction forms → Learning Interface(s) → task/evidence`
 
-The interfaces must be designed as learning instruments, not generic widgets. They should support interaction, feedback, state and evidence capture while remaining reusable across skills.
+Interfaces must separate pedagogical/function state from visual/rendering state and remain ready for future PacoGO Deluxe / Upper Tier integration.
 
-## 9. PacoGO Deluxe / Upper Tier constraint
+The interface runtime contract must preserve the mapping:
+`interaction → observable event → evidence target → coding dimension → validation dataset field`.
 
-The Learning Interface System must be Deluxe-ready from the beginning.
+## 8. Supabase
 
-Do not build polished interfaces in a way that later requires rebuilding them for the PacoGO Deluxe / Upper Tier world.
+No Supabase schema/runtime change is required for the current scientific validation design work. Change Supabase only for a real persistence/runtime contract requirement.
 
-Separate:
-- pedagogical/function layer: state, interactions, learner actions, outputs/evidence
-- visual/rendering layer: PacoGO visual language, animation, presentation, themes and future Deluxe integration
+## 9. Current scientific next step
 
-The same learning interface should be capable of being presented inside the future PacoGO Deluxe visual shell without changing the underlying curriculum logic.
+The next major research/engineering phase is to convert the validation baseline into construct-specific protocol designs. This requires evidence-based decisions about:
+- external measures per construct;
+- reliability coefficients and thresholds appropriate to each decision;
+- longitudinal measurement occasions and spacing;
+- sample-size/power or precision justification;
+- preregistration and confirmatory/exploratory separation;
+- independent assessment and transfer measures;
+- analysis and robustness plans;
+- ethics, consent/assent, privacy and research governance;
+- replication/generalisation criteria.
 
-PacoGO Deluxe is intentionally later. First establish the curriculum engine, curriculum content and reusable Learning Interface System correctly.
+These decisions should be resolved before freezing the Learning Interface evidence/runtime contract.
 
-## 10. Supabase
+## 10. Latest verified regression state
 
-C6–C9 did not require Supabase schema/runtime changes. The work remains in the curriculum/engine and validation layers. Supabase should only be changed when a real persistence/runtime contract requires it.
-
-## 11. Latest verified regression state
-
-Latest known complete Full Regression:
-- Run: `2730`
-- Commit: `0c32eccaae7041e82b8031a3938b9b2bfb1b8056`
-- Message: `Curriculum: complete C6 to C9 vertical prototype test`
+Latest user-confirmed complete Full Regression:
+- Commit: `be4d34dc13b2c0d2951b6f3a4a7d469a52bcd98f`
 - Branch: `refactor/professional-v1`
-- Status: **GREEN**
+- Status: **GREEN** (user-confirmed)
 
-Subsequent handoff-only commits must trigger/check the next Full Regression before further build work is considered verified. Never infer green status from an earlier commit.
+Automated GitHub workflow/status data has not been available for the recent commits through the connector, so no stronger CI claim is made.
 
-## 12. Current mental model
+## 11. Strategy
 
-The project is now best understood as four connected layers/workstreams:
-
-`CURRICULUM / SCIENTIFIC ENGINE`
-→ determines what the learner needs and what evidence means
-
-`SCIENTIFIC VALIDATION PROGRAM`
-→ determines how we will empirically test whether those claims and decisions are valid
-
-`LEARNING INTERFACE SYSTEM`
-→ provides reusable, beautiful, interactive learning instruments and captures the required evidence/data
-
-`PACOGO DELUXE / UPPER TIER`
-→ later provides the larger visual world in which those learning instruments live
-
-The intended strategy is:
-
-**build the brain → prove the vertical chain → define how the brain will be scientifically validated → build reusable learning instruments with that validation contract → empirically validate with real learners → then build the larger Deluxe world.**
+**Build the brain → prove the vertical chain → define how the brain will be scientifically validated → build reusable learning instruments with that validation contract → empirically validate with real learners → then build the larger Deluxe world.**

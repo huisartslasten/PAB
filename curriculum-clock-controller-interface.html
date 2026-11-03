@@ -68,7 +68,7 @@ const clock = createClockLearningInterface({
   targetTime,
   initialTime: mode === 'digital_to_analog' ? { hour: 8, minute: 0 } : null,
   mode,
-  options,
+  options: mode === 'match_representations' ? options : [],
   onInteraction: (event) => {
     if (event.payload.option_id) bridge.selectRepresentation(event.payload.option_id);
     else if (event.payload.time) bridge.setTime(event.payload.time);

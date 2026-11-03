@@ -42,13 +42,15 @@
   </section>
 </main>
 <script type="module">
-  import { createCurriculumRegistry } from './pacogo-engine/curriculum-registry.js';
   import { createFractionEquivalenceController } from './pacogo-engine/fraction-equivalence-controller.js';
+  import { createBrowserVerticalSliceRuntime } from './pacogo-engine/browser-vertical-slice.js';
+  import { createCurriculumRegistry } from './pacogo-engine/curriculum-registry.js';
 
   const registryConfig = await fetch('./docs/curriculum/PacoGO_Curriculum_Registry_v0.2.json').then(response => response.json());
   const taskSet = await fetch('./docs/curriculum/PacoGO_Pilot_TaskSet_v0.1.json').then(response => response.json());
   const registry = createCurriculumRegistry(registryConfig);
-  const task = taskSet.tasks.find(item => item.task_id === 'FR2-T02');
+  const runtime = createBrowserVerticalSliceRuntime({ registry, taskSet });
+  const task = runtime.getTask('FR2-T02');
   const options = [
     { id: 'opt-a', fraction: { numerator: 3, denominator: 5 } },
     { id: 'opt-b', fraction: { numerator: 4, denominator: 8 } },
@@ -75,9 +77,14 @@
     button.dataset.optionId = option.id;
     button.innerHTML = optionLabel(option.fraction);
     button.addEventListener('click', () => {
-      controller.selectOption(option.id, 'browser');
-      optionHost.querySelectorAll('.option').forEach(item => item.classList.toggle('selected', item === button));
-      status.textContent = 'Antwoord geselecteerd. Controleer wanneer je klaar bent.';
+      try {
+        controller.selectOption(option.id, 'browser');
+        optionHost.querySelectorAll('.option').forEach(item => item.classList.toggle('selected', item === button));
+        status.textContent = 'Antwoord geselecteerd. Controleer wanneer je klaar bent.';
+      } catch (error) {
+        status.textContent = error.message;
+        status.className = 'status error';
+      }
     });
     optionHost.appendChild(button);
   });
@@ -85,13 +92,7 @@
   document.querySelector('#submit').addEventListener('click', () => {
     try {
       const { evaluation, observation } = controller.submit();
-      const cycle = registry.runSkillCycle({
-        studentKey: observation.student_key,
-        skillId: observation.skill_id,
-        observation,
-        priorEvidence: [],
-        asOf: observation.observed_at
-      });
+      const cycle = runtime.runObservation({ observation });
       status.textContent = evaluation.correct
         ? `Goed. De observatie gaat door naar de PacoGO-leerengine. Volgende stap: ${cycle.next?.action || 'bepalen'}.`
         : 'Niet equivalent. Ook deze observatie gaat als informatie naar de leerengine.';

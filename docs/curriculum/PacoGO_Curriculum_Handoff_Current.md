@@ -98,53 +98,55 @@ FR2 controller lifecycle explicitly prevents duplicate submission after an obser
 
 Clock is a reusable Learning Interface prototype, not a registered curriculum skill. The `CLOCK-*` task IDs and `CLOCK` skill/claim/evidence identifiers in its browser demonstration are synthetic fixture identifiers only. They are not curriculum registry entries, learner evidence from real students, or scientific validation. Do not promote them into the curriculum registry without a separately defined curriculum skill, development, claim, task model and evidence targets.
 
-Current technical components:
-- `pacogo-engine/clock-controller.js` — validates clock times and creates observation/evidence records for the synthetic technical fixture;
+Technical components:
+- `pacogo-engine/clock-task-contract.js` — defines and validates distinct clock task forms;
+- `pacogo-engine/clock-controller.js` — records task-specific clock responses and evidence;
 - `pacogo-engine/clock-analog-input.js` — maps pointer angles to hour/minute values, including hour-boundary behavior;
 - `pacogo-engine/clock-learning-interface.js` and `pacogo-engine/clock-learning-interface.css` — reusable analog/digital clock presentation and response interaction;
-- `pacogo-engine/clock-interface-controller-bridge.js` — routes the response to the matching controller input boundary;
+- `pacogo-engine/clock-interface-controller-bridge.js` — routes time-entry, hand-setting and representation-choice responses to their controller boundaries;
 - `curriculum-clock-controller-interface.html` — browser vertical-slice demonstration.
 
-The Clock interface now separates source representation from response representation. The two representations no longer mirror each other live during a task:
-- `analog_to_digital`: presents a fixed analog source clock; learner enters the digital response;
-- `digital_to_analog`: presents a fixed digital source time; learner sets the analog clock hands.
+Three pedagogically distinct task contracts are now explicit:
 
-The task mode determines the response representation. The bridge reads that response representation from the interface, preventing stale or independently maintained representation state.
+1. `read_analog_time`: analog clock as source; learner enters a digital time. The controller accepts a digital response and records `read_time`.
+2. `set_analog_clock`: digital time as source; learner manipulates the analog clock hands. The controller accepts an analog response and records `set_time`.
+3. `match_representations`: analog clock as source; learner selects the equivalent digital time from options. The task contract requires at least two options, unique option IDs and exactly one option equivalent to the target time. The controller records the selected option ID and time separately.
 
-Browser regression verifies both directions end to end:
-- analog source → digital answer → digital observation;
-- digital source → analog hand setting → analog observation.
+The matching interface displays the analog source and digital options without revealing the answer. It records both correct and incorrect selections as distinct observations. The interface/controller boundary keeps the three response types separate: digital time entry, analog clock manipulation and representation choice.
 
-The analog hour-hand calculation uses hour-mark boundaries rather than rounding to the nearest hour. These are technical interaction tests only; they do not validate learning, developmental ordering or mastery claims.
+The two conversion directions are also tested end to end:
+- analog source → digital answer;
+- digital source → analog hand setting.
+
+The analog hour-hand calculation uses hour-mark boundaries rather than rounding to the nearest hour. These browser interactions are technical integration tests only; they do not validate learning, developmental ordering or mastery claims.
 
 No Supabase change was required for the browser-runtime and Clock Learning Interface work.
 
 ## 9. Current next engineering step
 
-Continue the reusable Learning Interface/controller work without inventing a Clock curriculum skill. Define and test additional Clock task variants only when their pedagogical goal, source representation, response representation, interaction form and evidence meaning are explicit and reusable. In particular, distinguish reading, setting and mapping rather than treating them as interchangeable.
+Continue Clock Learning Interface development only where a distinct pedagogical interaction is specified. The current matching demonstration uses an analog source and digital choices; assess whether the reverse matching direction (digital source → analog choices) is pedagogically useful and can share the same contract without conflating reading, setting and matching.
 
 Then assess whether the same interface/controller separation generalises to another Learning Interface. Do not add page-specific curriculum execution logic.
 
-Do not add scientific claims or freeze construct-specific mastery rules from synthetic browser data.
+Do not invent a Clock curriculum skill, add scientific claims or freeze construct-specific mastery rules from synthetic browser data.
 
 ## 10. Latest regression state
 
 Latest independently verified Full Regression:
-- Commit: `7fb1206b36bb91e6fa89e3c2f119d42b4884ebf1`
+- Commit: `9600a2df56aa7dd061748617f79c0cb75732446c`
 - Branch: `refactor/professional-v1`
-- Full Regression run: #2852 / ID `41699036138`
-- Status: **GREEN** (all jobs and steps succeeded).
-
-Latest browser proof for the same commit:
-- Run #626 / ID `41699036566`
-- Status: **GREEN**.
+- Full Regression run: #2858 / ID `41701512650`
+- Status: **GREEN** (curriculum engine, architecture, Node, Vitest, browser regression and working-tree checks all succeeded).
 
 Recent Clock milestone commits:
 - `2c6f8ff99e7b21bdc8235efd2b0ff39b5c7f7a77` — correct analog hour-hand boundary calculation;
 - `15fcb0c1695845d5bbf46fc857da31a1ca5b8805` — Clock browser vertical slice and separated stylesheet;
 - `89f57cde009c5cb3bfd401ce94aeca4d75bacf65` — bridge follows the interface's current response representation;
 - `e00464383354d814285ee04f3f6689f45cf52922` — browser regression covers digital time setting;
-- `7fb1206b36bb91e6fa89e3c2f119d42b4884ebf1` — source and response representations are separated by task mode.
+- `7fb1206b36bb91e6fa89e3c2f119d42b4884ebf1` — source and response representations are separated by task mode;
+- `899feba93ec5fc3ddb7b3023c3bda8787c5dff56` — distinct pedagogical task contracts;
+- `d028f17c51356fb3eb703bcec14926ddd7a79ea8` — controller response/evidence tied to task type;
+- `9600a2df56aa7dd061748617f79c0cb75732446c` — visual matching task and end-to-end browser coverage.
 
 ## 11. Supabase
 

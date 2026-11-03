@@ -71,12 +71,15 @@ The interface runtime contract must preserve:
 
 A1 Number Line and FR2 Fraction Equivalence already demonstrate browser → interaction controller → observation → curriculum registry → learner-state/decision flow.
 
-New generalisation slice completed:
+Generalisation slices completed:
 - `pacogo-engine/addition-controller.js` — reusable B1 quantity-addition interaction controller;
 - `pacogo-engine/addition-controller.test.js` — evidence/interaction contract test;
-- `curriculum-b1-addition.html` — B1 browser vertical slice using B1-T01.
+- `curriculum-b1-addition.html` — B1 browser vertical slice using B1-T01;
+- `pacogo-engine/fraction-equivalence-controller.js` — reusable FR2 equivalence interaction controller;
+- `pacogo-engine/fraction-equivalence-controller.test.js` — FR2 evidence/interaction contract test;
+- FR2 controller lifecycle now explicitly prevents duplicate submission after an observation has been emitted.
 
-The B1 slice captures strategy choice, answer, interaction events, task identity, evidence target, provenance and variation, then sends the observation through the same curriculum registry path as A1/FR2. No Supabase change was required.
+The B1/FR2 slices capture task identity, evidence target, interaction events, learner response, provenance and variation through the shared interaction/observation contract. No Supabase change was required.
 
 ## 9. Current next engineering step
 
@@ -84,22 +87,20 @@ Continue generalising the browser/engine vertical slice across the candidate cur
 
 ## 10. Latest regression state
 
-Latest user-confirmed complete Full Regression before the B1 build:
-- Commit: `11ec9bc5bb0cabe9c24ba7a469521d003c837851`
+Latest user-confirmed complete Full Regression before the latest FR2 controller change:
+- Commit: `b2eb42c527e4d0e924f928de8bbf29f55d4eefbb`
 - Branch: `refactor/professional-v1`
 - Status: **GREEN** (user-confirmed)
 
-B1 implementation commits:
-- `513236407ad5ac98d86deeb026748340208a3796` — addition controller
-- `c83be2b1b08806717d296ce1362547e28af1f808` — controller test correction
-- `5bfd5edf0554fa709697bb375735113795498caa` — B1 browser vertical slice
+Latest engineering commits:
+- `8e2a2772cf7e93172ebb5581f70cfc5413c002ee` — FR2 controller test
+- `c3d6c82c41acc27511ee7cbde37965d460659330` — FR2 duplicate-submission lifecycle contract
 
-Isolated B1 controller test: **PASS** in a local reconstructed test harness.
-Full Regression on the final B1 commit has **not been independently verified** through the available GitHub/CI tooling.
+The isolated FR2 controller test is designed to pass after the lifecycle correction. Full Regression on `c3d6c82c41acc27511ee7cbde37965d460659330` is not yet independently verified through available GitHub/CI status data.
 
 ## 11. Supabase
 
-No Supabase schema/runtime change is required for the B1 browser vertical slice. Change Supabase only for a real persistence/runtime contract requirement.
+No Supabase schema/runtime change is required for the current B1/FR2 browser vertical-slice work. Change Supabase only for a real persistence/runtime contract requirement.
 
 ## 12. Strategy
 

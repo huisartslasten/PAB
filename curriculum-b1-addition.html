@@ -56,7 +56,8 @@
   const taskSet = await fetch('./docs/curriculum/PacoGO_Pilot_TaskSet_v0.1.json').then(response => response.json());
   const registry = createCurriculumRegistry(registryConfig);
   const runtime = createBrowserVerticalSliceRuntime({ registry, taskSet });
-  const task = runtime.getTask('B1-T01');
+  const taskId = 'B1-T01';
+  const task = runtime.getTask(taskId);
   const addends = [7, 5];
   const strategyOptions = [
     { id: 'count-on', label: 'Verder tellen' },
@@ -102,7 +103,7 @@
   document.querySelector('#submit').addEventListener('click', () => {
     try {
       const { evaluation, observation } = controller.submit(document.querySelector('#answer').value);
-      const cycle = runtime.runObservation({ observation });
+      const cycle = runtime.runTaskObservation({ taskId, observation });
       status.textContent = evaluation.correct
         ? `Goed. De observatie gaat door naar de PacoGO-leerengine. Volgende stap: ${cycle.next?.action || 'bepalen'}.`
         : 'Nog niet goed. Ook deze observatie gaat als informatie naar de leerengine.';

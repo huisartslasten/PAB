@@ -69,7 +69,8 @@ function createClockController({ task, studentKey, targetTime, mode = null, prov
     mode: resolvedMode,
     task_type: taskType,
     source_representation: contract.sourceRepresentation,
-    response_representation: contract.responseRepresentation
+    response_representation: contract.responseRepresentation,
+    option_representation: contract.optionRepresentation || null
   });
 
   const assertActive = () => {
@@ -146,7 +147,7 @@ function createClockController({ task, studentKey, targetTime, mode = null, prov
         representation: response.type,
         source_representation: contract.sourceRepresentation,
         response_representation: contract.responseRepresentation,
-        ...(isMatchingTask ? { selected_option_id: response.option_id } : {})
+        ...(isMatchingTask ? { option_representation: contract.optionRepresentation, selected_option_id: response.option_id } : {})
       },
       correctness: correct,
       events,

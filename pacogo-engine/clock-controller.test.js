@@ -89,9 +89,39 @@ test('representation matching records the selected option and whether its time i
   assert.equal(result.correct, true);
   assert.equal(result.observation.response.type, 'clock_representation_match');
   assert.equal(result.observation.response.selected_option_id, 'option-b');
+  assert.equal(result.observation.response.source_representation, 'analog_clock');
+  assert.equal(result.observation.response.option_representation, 'digital_time');
   assert.equal(result.observation.response.selected_time.minute, 35);
   assert.equal(result.observation.performance.strategy, 'match_representations');
   assert.ok(result.observation.interaction_events.some((event) => event.event_type === 'representation_option_selected'));
+});
+
+
+test('digital source matching records analog options in the observation contract', () => {
+  const controller = createClockController({
+    task: {
+      ...baseTask,
+      task_id: 'CLOCK-T05',
+      task_type: 'match_representations',
+      source_representation: 'digital_time',
+      variation_key: 'match_representations',
+      options: [
+        { option_id: 'option-a', time: { hour: 8, minute: 30 } },
+        { option_id: 'option-b', time: { hour: 8, minute: 35 } },
+        { option_id: 'option-c', time: { hour: 9, minute: 35 } }
+      ]
+    },
+    studentKey: 'synthetic-clock-match-reverse',
+    targetTime: { hour: 8, minute: 35 },
+    mode: 'match_representations'
+  });
+  controller.selectRepresentation('option-b');
+  const result = controller.submit();
+
+  assert.equal(result.correct, true);
+  assert.equal(result.observation.response.source_representation, 'digital_time');
+  assert.equal(result.observation.response.option_representation, 'analog_clock');
+  assert.equal(result.observation.response.selected_option_id, 'option-b');
 });
 
 test('incorrect time reading is preserved as incorrect evidence', () => {

@@ -46,6 +46,37 @@ test('browser vertical slice resolves tasks and delegates observations to regist
   }]);
 });
 
+test('browser vertical slice binds task identity to observation skill', () => {
+  const calls = [];
+  const registry = {
+    runSkillCycle(input) {
+      calls.push(input);
+      return { ok: true };
+    }
+  };
+  const taskSet = { tasks: [{ task_id: 'FR2-T02', skill_id: 'FR2-D2' }] };
+  const runtime = createBrowserVerticalSliceRuntime({ registry, taskSet });
+
+  const observation = {
+    student_key: 'student-1',
+    skill_id: 'FR2-D2',
+    observed_at: '2026-11-03T10:00:00Z'
+  };
+
+  assert.deepEqual(runtime.runTaskObservation({ taskId: 'FR2-T02', observation }), { ok: true });
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].skillId, 'FR2-D2');
+
+  assert.throws(
+    () => runtime.runTaskObservation({
+      taskId: 'FR2-T02',
+      observation: { ...observation, skill_id: 'FR2-D1' }
+    }),
+    /observation skill does not match task FR2-T02/
+  );
+  assert.equal(calls.length, 1);
+});
+
 test('browser vertical slice rejects invalid task sets and observations', () => {
   assert.throws(
     () => createBrowserVerticalSliceRuntime({ registry: {}, taskSet: { tasks: [] } }),

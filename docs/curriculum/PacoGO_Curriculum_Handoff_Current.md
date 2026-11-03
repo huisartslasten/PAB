@@ -110,9 +110,9 @@ Three pedagogically distinct task contracts are now explicit:
 
 1. `read_analog_time`: analog clock as source; learner enters a digital time. The controller accepts a digital response and records `read_time`.
 2. `set_analog_clock`: digital time as source; learner manipulates the analog clock hands. The controller accepts an analog response and records `set_time`.
-3. `match_representations`: analog clock as source; learner selects the equivalent digital time from options. The task contract requires at least two options, unique option IDs and exactly one option equivalent to the target time. The controller records the selected option ID and time separately.
+3. `match_representations`: the source may be an analog clock or a digital time; the learner selects an equivalent representation from options. The task contract requires at least two options, unique option IDs and exactly one option equivalent to the target time. It derives the option representation as the opposite of the source representation. The controller records source representation, response type, option representation, selected option ID and selected time.
 
-The matching interface displays the analog source and digital options without revealing the answer. It records both correct and incorrect selections as distinct observations. The interface/controller boundary keeps the three response types separate: digital time entry, analog clock manipulation and representation choice.
+The matching interface works in both directions: analog source → digital-time options, and digital source → analog-clock options. Analog options are rendered as mini clock faces; the source answer is not revealed. Both correct and incorrect selections are recorded as distinct observations. The controller now persists the option representation in the observation instead of leaving it implicit. The interface/controller boundary keeps the three response types separate: digital time entry, analog clock manipulation and representation choice.
 
 The two conversion directions are also tested end to end:
 - analog source → digital answer;
@@ -124,7 +124,7 @@ No Supabase change was required for the browser-runtime and Clock Learning Inter
 
 ## 9. Current next engineering step
 
-Continue Clock Learning Interface development only where a distinct pedagogical interaction is specified. The current matching demonstration uses an analog source and digital choices; assess whether the reverse matching direction (digital source → analog choices) is pedagogically useful and can share the same contract without conflating reading, setting and matching.
+Continue Clock Learning Interface development only where a distinct pedagogical interaction is specified. Both matching directions now share one validated contract. Next, review the pedagogical progression and task parameters (e.g. time precision, hour-cycle conventions and representations) before implementing more variants. Keep reading, setting and matching separate; do not infer developmental ordering from these synthetic demonstrations.
 
 Then assess whether the same interface/controller separation generalises to another Learning Interface. Do not add page-specific curriculum execution logic.
 
@@ -133,9 +133,9 @@ Do not invent a Clock curriculum skill, add scientific claims or freeze construc
 ## 10. Latest regression state
 
 Latest independently verified Full Regression:
-- Commit: `9600a2df56aa7dd061748617f79c0cb75732446c`
+- Commit: `7be8e1da515794f8e4e98d2d2c6542be980afa54`
 - Branch: `refactor/professional-v1`
-- Full Regression run: #2858 / ID `41701512650`
+- Full Regression run: #2861 / ID `41703153983`
 - Status: **GREEN** (curriculum engine, architecture, Node, Vitest, browser regression and working-tree checks all succeeded).
 
 Recent Clock milestone commits:
@@ -146,7 +146,9 @@ Recent Clock milestone commits:
 - `7fb1206b36bb91e6fa89e3c2f119d42b4884ebf1` — source and response representations are separated by task mode;
 - `899feba93ec5fc3ddb7b3023c3bda8787c5dff56` — distinct pedagogical task contracts;
 - `d028f17c51356fb3eb703bcec14926ddd7a79ea8` — controller response/evidence tied to task type;
-- `9600a2df56aa7dd061748617f79c0cb75732446c` — visual matching task and end-to-end browser coverage.
+- `9600a2df56aa7dd061748617f79c0cb75732446c` — visual matching task and end-to-end browser coverage;
+- `cfdf3338ac0800716e5ffa4b8e61ddb476123599` — bidirectional source/option representations in the matching interface;
+- `7be8e1da515794f8e4e98d2d2c6542be980afa54` — controller persists the matching option representation in evidence.
 
 ## 11. Supabase
 

@@ -2,6 +2,7 @@ import { validatePilotDataset, buildPilotDatasetSnapshot } from './empirical-pil
 import { analysePilot } from './empirical-pilot.js';
 import { buildDoubleCodingSummary, buildPilotAnalysisReport } from './pilot-analysis-report.js';
 import { evaluateC4Readiness } from './c4-readiness-gate.js';
+import { evaluateW0Feasibility } from './w0-feasibility-gate.js';
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -44,10 +45,11 @@ function assertClaimCompleteness(manifest, reliabilityByClaim) {
   assert(JSON.stringify(claimIds) === JSON.stringify(suppliedIds), 'Coding-reliability reviews must cover exactly all manifest focal claims.');
 }
 
-function runEmpiricalPilotAnalysis({ dataset, manifest, taskSet, analysis, reliabilityByClaim }) {
+function runEmpiricalPilotAnalysis({ dataset, manifest, taskSet, analysis, reliabilityByClaim, w0FeasibilityReview }) {
   const validation = validatePilotDataset(dataset);
   const snapshot = buildPilotDatasetSnapshot(dataset);
   assertClaimCompleteness(manifest, reliabilityByClaim);
+  const w0Feasibility = evaluateW0Feasibility({ review: w0FeasibilityReview });
 
   const pilotResult = analysePilot({
     observations: snapshot.observations,
@@ -77,6 +79,7 @@ function runEmpiricalPilotAnalysis({ dataset, manifest, taskSet, analysis, relia
   return {
     pipeline_version: '0.1',
     status: c4Gate.all_claims_ready_for_c4 ? 'READY_FOR_C4' : 'BLOCKED_OR_REVISE',
+    w0_feasibility: w0Feasibility,
     dataset_validation: validation,
     dataset_snapshot: snapshot,
     pilot_result: pilotResult,

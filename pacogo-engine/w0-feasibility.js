@@ -56,7 +56,7 @@ function validateW0Structure({ fixture, manifest, taskSet }) {
   }
 }
 
-function runW0Feasibility({ fixture, manifest, taskSet, analysis, reliabilityByClaim }) {
+function runW0Feasibility({ fixture, manifest, taskSet, analysis, reliabilityByClaim, w0FeasibilityReview }) {
   validateW0Structure({ fixture, manifest, taskSet });
   const dataset = {
     taskInstances: fixture.task_instances,
@@ -73,9 +73,11 @@ function runW0Feasibility({ fixture, manifest, taskSet, analysis, reliabilityByC
     manifest,
     taskSet,
     analysis,
-    reliabilityByClaim
+    reliabilityByClaim,
+    w0FeasibilityReview
   });
 
+  assert(pipelineResult.w0_feasibility.outcome === 'FEASIBLE', 'W0 feasibility review must be explicitly FEASIBLE before W1 protocol preparation.');
   assert(pipelineResult.descriptive_report.status === 'descriptive_only', 'W0 analysis must remain descriptive-only.');
   assert(pipelineResult.boundaries.registry_promotion_allowed === false, 'W0 must not promote curriculum registry candidates.');
   assert(pipelineResult.boundaries.mastery_rule_change_allowed === false, 'W0 must not change mastery rules.');

@@ -72,7 +72,16 @@ test('blocks C4 readiness when a claim lacks acceptable coding reliability', () 
 test('requires an explicit W1 analysis result', () => {
   assert.throws(
     () => runW1C4Readiness({
-      w1AnalysisResult: { status: 'W1_ANALYSIS_COMPLETE', descriptive_report: { status: 'descriptive_only' } },
+      w1AnalysisResult: {
+        status: 'W1_ANALYSIS_COMPLETE',
+        descriptive_report: { status: 'descriptive_only' },
+        scientific_boundary: {
+          developmental_ordering_allowed: false,
+          prerequisite_inference_allowed: false,
+          mastery_classification_allowed: false,
+          registry_promotion_allowed: false
+        }
+      },
       reliabilityByClaim: buildReliability()
     }),
     /pilot_result must contain c4_readiness_state_by_claim/

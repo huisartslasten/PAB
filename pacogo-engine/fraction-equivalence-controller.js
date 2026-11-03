@@ -19,6 +19,7 @@ function createFractionEquivalenceController({ task, studentKey, renderer, targe
   const events = [];
   const startedAt = new Date().toISOString();
   let selectedOptionId = null;
+  let submitted = false;
 
   const record = (eventType, payload) => {
     events.push(createInteractionEvent({
@@ -32,6 +33,7 @@ function createFractionEquivalenceController({ task, studentKey, renderer, targe
   record('task_presented', { target_fraction: targetFraction, option_count: options.length });
 
   const selectOption = (optionId, source = 'renderer') => {
+    if (submitted) throw new Error('Fraction task has already been submitted');
     const option = options.find(item => item.id === optionId);
     if (!option) throw new Error(`Unknown fraction option: ${optionId}`);
     selectedOptionId = optionId;
@@ -40,6 +42,7 @@ function createFractionEquivalenceController({ task, studentKey, renderer, targe
   };
 
   const submit = () => {
+    if (submitted) throw new Error('Fraction task has already been submitted');
     if (!selectedOptionId) throw new Error('No fraction option has been selected');
     const selected = options.find(item => item.id === selectedOptionId);
     const correct = areEquivalentFractions(targetFraction, selected.fraction);
@@ -49,6 +52,7 @@ function createFractionEquivalenceController({ task, studentKey, renderer, targe
       target_fraction: targetFraction,
       correct
     });
+    submitted = true;
 
     const observedAt = new Date().toISOString();
     const observation = createObservation({
@@ -106,7 +110,8 @@ function createFractionEquivalenceController({ task, studentKey, renderer, targe
     record,
     selectOption,
     submit,
-    getSelectedOptionId: () => selectedOptionId
+    getSelectedOptionId: () => selectedOptionId,
+    isSubmitted: () => submitted
   });
 }
 

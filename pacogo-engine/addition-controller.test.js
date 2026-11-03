@@ -41,6 +41,9 @@ assert.equal(result.observation.response.strategy_id, 'make-ten');
 assert.equal(result.observation.context.variation_key, 'quantity_addition_independent');
 assert.ok(result.observation.interaction_events.some(event => event.event_type === 'strategy_selected'));
 assert.ok(result.observation.interaction_events.some(event => event.event_type === 'addition_submitted'));
+assert.equal(controller.isSubmitted(), true);
+assert.throws(() => controller.submit(12), /Addition task has already been submitted/);
+assert.throws(() => controller.selectStrategy('count-on'), /Addition task has already been submitted/);
 
 const emptyController = createAdditionController({
   task,

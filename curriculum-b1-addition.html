@@ -48,13 +48,15 @@
   </section>
 </main>
 <script type="module">
-  import { createCurriculumRegistry } from './pacogo-engine/curriculum-registry.js';
   import { createAdditionController } from './pacogo-engine/addition-controller.js';
+  import { createBrowserVerticalSliceRuntime } from './pacogo-engine/browser-vertical-slice.js';
+  import { createCurriculumRegistry } from './pacogo-engine/curriculum-registry.js';
 
   const registryConfig = await fetch('./docs/curriculum/PacoGO_Curriculum_Registry_v0.2.json').then(response => response.json());
   const taskSet = await fetch('./docs/curriculum/PacoGO_Pilot_TaskSet_v0.1.json').then(response => response.json());
   const registry = createCurriculumRegistry(registryConfig);
-  const task = taskSet.tasks.find(item => item.task_id === 'B1-T01');
+  const runtime = createBrowserVerticalSliceRuntime({ registry, taskSet });
+  const task = runtime.getTask('B1-T01');
   const addends = [7, 5];
   const strategyOptions = [
     { id: 'count-on', label: 'Verder tellen' },
@@ -100,13 +102,7 @@
   document.querySelector('#submit').addEventListener('click', () => {
     try {
       const { evaluation, observation } = controller.submit(document.querySelector('#answer').value);
-      const cycle = registry.runSkillCycle({
-        studentKey: observation.student_key,
-        skillId: observation.skill_id,
-        observation,
-        priorEvidence: [],
-        asOf: observation.observed_at
-      });
+      const cycle = runtime.runObservation({ observation });
       status.textContent = evaluation.correct
         ? `Goed. De observatie gaat door naar de PacoGO-leerengine. Volgende stap: ${cycle.next?.action || 'bepalen'}.`
         : 'Nog niet goed. Ook deze observatie gaat als informatie naar de leerengine.';

@@ -3,6 +3,8 @@ import { createClockLearningInterface, formatDigitalTime } from './clock-learnin
 const mount = document.querySelector('#clock-interface');
 const status = document.querySelector('#status');
 const trace = document.querySelector('#trace');
+const params = new URLSearchParams(window.location.search);
+const mode = params.get('mode') === 'digital_to_analog' ? 'digital_to_analog' : 'analog_to_digital';
 
 const targetTime = { hour: 8, minute: 35 };
 const interactions = [];
@@ -10,26 +12,34 @@ const interactions = [];
 const clock = createClockLearningInterface({
   mount,
   targetTime,
-  initialTime: { hour: 8, minute: 35 },
-  mode: 'analog_to_digital',
+  initialTime: mode === 'digital_to_analog' ? { hour: 8, minute: 0 } : null,
+  mode,
   onInteraction: (event) => {
     interactions.push(event);
-    status.textContent = `Tijd ingesteld op ${formatDigitalTime(event.payload.time)}.`;
+    const time = event.payload.time;
+    status.textContent = time
+      ? `Tijd ingesteld op ${formatDigitalTime(time)}.`
+      : 'Nog geen antwoord ingesteld.';
     trace.textContent = JSON.stringify({
       interface: 'clock',
       mode: event.payload.mode,
       event_type: event.event_type,
       interaction_count: interactions.length,
-      time: event.payload.time
+      response_representation: event.payload.representation,
+      response_time: time
     }, null, 2);
   }
 });
 
 document.querySelector('#correct').addEventListener('click', () => {
   const time = clock.getTime();
+  if (!time) {
+    status.textContent = 'Stel eerst de tijd in.';
+    return;
+  }
   const correct = time.hour === targetTime.hour && time.minute === targetTime.minute;
   status.textContent = correct
-    ? 'Goed: analoge en digitale tijd geven dezelfde tijd weer.'
-    : `Kijk nog eens goed naar de koppeling met de digitale tijd (${formatDigitalTime(targetTime)}).`;
+    ? 'Goed: de twee representaties komen overeen.'
+    : `Kijk nog eens naar de opdracht: ${formatDigitalTime(targetTime)}.`;
   clock.lock();
 });

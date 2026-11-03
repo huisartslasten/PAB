@@ -9,32 +9,22 @@ function createClockInterfaceControllerBridge({ interfaceInstance, controller, r
     throw new TypeError('representation must be analog or digital');
   }
 
-  let activeRepresentation = representation;
+  let fallbackRepresentation = representation;
 
-  const getActiveRepresentation = () => {
+  const getRepresentation = () => {
     const current = typeof interfaceInstance.getRepresentation === 'function'
       ? interfaceInstance.getRepresentation()
-      : activeRepresentation;
+      : fallbackRepresentation;
     if (!['analog', 'digital'].includes(current)) {
-      throw new TypeError('interface representation must be analog or digital');
+      throw new TypeError('interface response representation must be analog or digital');
     }
-    activeRepresentation = current;
+    fallbackRepresentation = current;
     return current;
   };
 
-  const setRepresentation = (nextRepresentation) => {
-    if (!['analog', 'digital'].includes(nextRepresentation)) {
-      throw new TypeError('representation must be analog or digital');
-    }
-    if (typeof interfaceInstance.setRepresentation === 'function') {
-      interfaceInstance.setRepresentation(nextRepresentation, 'controller_bridge');
-    }
-    activeRepresentation = nextRepresentation;
-  };
-
   const setTime = ({ hour, minute }) => {
-    const representationInUse = getActiveRepresentation();
-    if (representationInUse === 'analog') {
+    const responseRepresentation = getRepresentation();
+    if (responseRepresentation === 'analog') {
       if (typeof controller.setAnalogTime !== 'function') throw new TypeError('controller does not support analog time');
       controller.setAnalogTime({ hour, minute });
     } else {
@@ -49,7 +39,7 @@ function createClockInterfaceControllerBridge({ interfaceInstance, controller, r
     return result;
   };
 
-  return Object.freeze({ setTime, setRepresentation, submit, getRepresentation: getActiveRepresentation });
+  return Object.freeze({ setTime, submit, getRepresentation });
 }
 
 export { createClockInterfaceControllerBridge };

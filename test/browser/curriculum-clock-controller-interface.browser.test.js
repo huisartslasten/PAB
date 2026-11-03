@@ -2,13 +2,34 @@ import { test, expect } from '@playwright/test';
 
 const pageUrl = 'http://127.0.0.1:4173/curriculum-clock-controller-interface.html';
 
-test('Clock analog hand interaction reaches the controller and creates evidence', async ({ page }) => {
+test('Clock analog source is read and answered through digital input', async ({ page }) => {
   await page.goto(pageUrl);
   const face = page.locator('.pacogo-clock__face');
-  await expect(face).toBeVisible();
-  await expect(page.locator('.pacogo-clock__digital')).toHaveText('08:00');
+  await expect(face).toHaveAttribute('aria-label', 'Analoge klok: 08:35');
+  await expect(page.locator('.pacogo-clock__digital')).toHaveText('--:--');
+  await expect(page.locator('.pacogo-clock__controls')).toBeVisible();
 
-  await page.getByRole('button', { name: 'Analoog' }).click();
+  await page.locator('.pacogo-clock__hour').fill('8');
+  await page.locator('.pacogo-clock__minute').fill('35');
+  await page.getByRole('button', { name: 'Zet tijd' }).click();
+
+  await expect(page.locator('.pacogo-clock__digital')).toHaveText('08:35');
+  await page.getByRole('button', { name: 'Controleer tijd' }).click();
+  await expect(page.locator('#status')).toContainText('Goed');
+
+  const trace = JSON.parse(await page.locator('#trace').textContent());
+  expect(trace.correctness).toBe(true);
+  expect(trace.representation).toBe('digital_time');
+  expect(trace.event_count).toBeGreaterThanOrEqual(3);
+});
+
+test('Clock digital source is set and answered through analog hand interaction', async ({ page }) => {
+  await page.goto(`${pageUrl}?mode=digital_to_analog`);
+  const face = page.locator('.pacogo-clock__face');
+  await expect(page.locator('.pacogo-clock__digital')).toHaveText('08:35');
+  await expect(face).toHaveAttribute('aria-label', 'Analoge klok: 08:00');
+  await expect(page.locator('.pacogo-clock__controls')).toBeHidden();
+
   const faceBox = await face.boundingBox();
   const minuteHandBox = await page.locator('[data-hand="minute"]').boundingBox();
   if (!faceBox || !minuteHandBox) throw new Error('Clock face or minute hand is not visible');
@@ -29,6 +50,7 @@ test('Clock analog hand interaction reaches the controller and creates evidence'
   await page.mouse.move(target.x, target.y, { steps: 8 });
   await page.mouse.up();
 
+  await expect(face).toHaveAttribute('aria-label', 'Analoge klok: 08:35');
   await expect(page.locator('.pacogo-clock__digital')).toHaveText('08:35');
   await page.getByRole('button', { name: 'Controleer tijd' }).click();
   await expect(page.locator('#status')).toContainText('Goed');
@@ -36,23 +58,5 @@ test('Clock analog hand interaction reaches the controller and creates evidence'
   const trace = JSON.parse(await page.locator('#trace').textContent());
   expect(trace.correctness).toBe(true);
   expect(trace.representation).toBe('analog_time');
-  expect(trace.event_count).toBeGreaterThanOrEqual(3);
-});
-
-test('Clock digital time setting reaches the controller and creates evidence', async ({ page }) => {
-  await page.goto(pageUrl);
-  await expect(page.locator('.pacogo-clock__digital')).toHaveText('08:00');
-
-  await page.locator('.pacogo-clock__hour').fill('8');
-  await page.locator('.pacogo-clock__minute').fill('35');
-  await page.getByRole('button', { name: 'Zet tijd' }).click();
-
-  await expect(page.locator('.pacogo-clock__digital')).toHaveText('08:35');
-  await page.getByRole('button', { name: 'Controleer tijd' }).click();
-  await expect(page.locator('#status')).toContainText('Goed');
-
-  const trace = JSON.parse(await page.locator('#trace').textContent());
-  expect(trace.correctness).toBe(true);
-  expect(trace.representation).toBe('digital_time');
   expect(trace.event_count).toBeGreaterThanOrEqual(3);
 });

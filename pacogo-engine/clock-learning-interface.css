@@ -2,9 +2,6 @@
 .pacogo-clock__header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .pacogo-clock__header strong{display:block;font-size:22px;font-weight:1000}
 .pacogo-clock__hint{display:block;margin-top:4px;color:#627994;font-size:14px}
-.pacogo-clock__switch{display:flex;gap:8px;padding:5px;border-radius:14px;background:#e5f0f8}
-.pacogo-clock__representation{border:0;border-radius:10px;padding:10px 15px;font:900 14px Nunito,system-ui,sans-serif;color:#42627e;background:transparent;cursor:pointer}
-.pacogo-clock__representation[aria-pressed=true]{background:#fff;color:#176fb4;box-shadow:0 3px 10px rgba(33,73,112,.1)}
 .pacogo-clock__visual{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center}
 .pacogo-clock__face{position:relative;width:min(100%,330px);aspect-ratio:1;margin:auto;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#e9f5fc);border:12px solid #fff;box-shadow:0 18px 35px rgba(34,80,120,.18),inset 0 0 0 3px #d2e5f1;touch-action:none;user-select:none}
 .pacogo-clock__face:before{content:"";position:absolute;inset:13px;border-radius:50%;border:2px dashed #b9d3e4;pointer-events:none}
@@ -22,11 +19,13 @@
 .pacogo-clock__hand:active{cursor:grabbing}
 .pacogo-clock__hand--hour{z-index:2;width:11px;height:30%;background:#214a70}
 .pacogo-clock__hand--minute{z-index:3;width:9px;height:40%;background:#1687e8}
+.pacogo-clock__face[data-interactive=false] .pacogo-clock__hand{pointer-events:none;cursor:default}
 .pacogo-clock__pin{position:absolute;z-index:4;left:50%;top:50%;width:18px;height:18px;transform:translate(-50%,-50%);border-radius:50%;background:#1687e8;border:4px solid #fff;box-shadow:0 2px 8px rgba(20,70,110,.25);pointer-events:none}
 .pacogo-clock__digital-card{display:grid;gap:12px}
 .pacogo-clock__digital-label{text-align:center;color:#54728d;font-size:14px;font-weight:900}
 .pacogo-clock__digital{font-size:clamp(58px,9vw,92px);font-weight:1000;letter-spacing:.04em;color:#173f68;text-align:center;padding:24px 10px;border-radius:24px;background:#fff;box-shadow:0 15px 35px rgba(34,80,120,.12);font-variant-numeric:tabular-nums}
 .pacogo-clock__controls{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;align-items:end}
+.pacogo-clock__controls[hidden]{display:none}
 .pacogo-clock__controls label{display:grid;gap:6px;font-size:13px;font-weight:900;color:#54728d}
 .pacogo-clock__controls input{width:92px;border:2px solid #cfe1ee;border-radius:13px;padding:11px;font:900 18px Nunito,system-ui,sans-serif;text-align:center;background:#fff;color:#17345f}
 .pacogo-clock__colon{font-weight:1000;font-size:20px;padding-bottom:10px}

@@ -2,11 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createClockInterfaceControllerBridge } from './clock-interface-controller-bridge.js';
 
-test('clock bridge sends digital interface time to controller and locks after submit', () => {
+test('clock bridge sends time to the controller using the interface response representation', () => {
   const calls = [];
   let locked = false;
   const interfaceInstance = {
     setTime: () => {},
+    getRepresentation: () => 'digital',
     lock: () => { locked = true; }
   };
   const controller = {
@@ -23,12 +24,11 @@ test('clock bridge sends digital interface time to controller and locks after su
   assert.equal(locked, true);
 });
 
-test('clock bridge follows the interface representation when it changes outside the bridge', () => {
+test('clock bridge follows the interface task mode instead of a stale fallback representation', () => {
   const calls = [];
-  let interfaceRepresentation = 'digital';
   const interfaceInstance = {
     setTime: () => {},
-    getRepresentation: () => interfaceRepresentation,
+    getRepresentation: () => 'analog',
     lock: () => {}
   };
   const controller = {
@@ -38,28 +38,13 @@ test('clock bridge follows the interface representation when it changes outside 
   };
 
   const bridge = createClockInterfaceControllerBridge({ interfaceInstance, controller, representation: 'digital' });
-  interfaceRepresentation = 'analog';
   bridge.setTime({ hour: 8, minute: 35 });
 
   assert.equal(bridge.getRepresentation(), 'analog');
   assert.deepEqual(calls, [['analog', { hour: 8, minute: 35 }]]);
 });
 
-test('clock bridge supports analog representation when controller provides it', () => {
-  let selected = null;
-  const interfaceInstance = { setTime: () => {}, lock: () => {} };
-  const controller = {
-    setAnalogTime: (time) => { selected = time; },
-    submit: () => ({ correct: false })
-  };
-
-  const bridge = createClockInterfaceControllerBridge({ interfaceInstance, controller, representation: 'analog' });
-  bridge.setTime({ hour: 17, minute: 20 });
-
-  assert.deepEqual(selected, { hour: 17, minute: 20 });
-});
-
-test('clock bridge rejects unsupported representation', () => {
+test('clock bridge rejects unsupported fallback representation', () => {
   assert.throws(
     () => createClockInterfaceControllerBridge({
       interfaceInstance: { setTime: () => {}, lock: () => {} },

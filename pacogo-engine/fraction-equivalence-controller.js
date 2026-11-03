@@ -1,9 +1,24 @@
 import { createInteractionEvent, createObservation, createTaskInstance } from './interaction-contract.js';
 import { areEquivalentFractions } from './fraction-equivalence.js';
 
-function createFractionEquivalenceController({ task, studentKey, renderer, targetFraction, options, provenance = {} }) {
+function createFractionEquivalenceController({
+  task,
+  studentKey,
+  renderer,
+  targetFraction,
+  options,
+  representation = 'symbolic_fraction',
+  responseType = 'fraction_equivalence_selection',
+  provenance = {}
+}) {
   if (!task || !renderer || !targetFraction || !Array.isArray(options) || options.length < 2) {
     throw new TypeError('task, renderer, targetFraction and at least two options are required');
+  }
+  if (typeof representation !== 'string' || !representation.trim()) {
+    throw new TypeError('representation must be a non-empty string');
+  }
+  if (typeof responseType !== 'string' || !responseType.trim()) {
+    throw new TypeError('responseType must be a non-empty string');
   }
 
   const taskInstance = createTaskInstance({
@@ -30,7 +45,11 @@ function createFractionEquivalenceController({ task, studentKey, renderer, targe
     }));
   };
 
-  record('task_presented', { target_fraction: targetFraction, option_count: options.length });
+  record('task_presented', {
+    target_fraction: targetFraction,
+    option_count: options.length,
+    representation
+  });
 
   const selectOption = (optionId, source = 'renderer') => {
     if (submitted) throw new Error('Fraction task has already been submitted');
@@ -41,16 +60,21 @@ function createFractionEquivalenceController({ task, studentKey, renderer, targe
     return option;
   };
 
-  const submit = () => {
+  const submit = (explanation = null, explanationSource = 'renderer') => {
     if (submitted) throw new Error('Fraction task has already been submitted');
     if (!selectedOptionId) throw new Error('No fraction option has been selected');
+    if (explanation !== null && typeof explanation !== 'string') {
+      throw new TypeError('explanation must be a string or null');
+    }
     const selected = options.find(item => item.id === selectedOptionId);
     const correct = areEquivalentFractions(targetFraction, selected.fraction);
     record('equivalence_submitted', {
       option_id: selected.id,
       selected_fraction: selected.fraction,
       target_fraction: targetFraction,
-      correct
+      correct,
+      explanation,
+      explanation_source: explanation === null ? null : explanationSource
     });
     submitted = true;
 
@@ -59,10 +83,11 @@ function createFractionEquivalenceController({ task, studentKey, renderer, targe
       taskInstance,
       studentKey,
       response: {
-        type: 'fraction_equivalence_selection',
+        type: responseType,
         target_fraction: targetFraction,
         selected_option_id: selected.id,
-        selected_fraction: selected.fraction
+        selected_fraction: selected.fraction,
+        explanation
       },
       correctness: correct,
       events,
@@ -72,7 +97,7 @@ function createFractionEquivalenceController({ task, studentKey, renderer, targe
         attempts: 1,
         hints: 0,
         strategy: 'select_equivalent_fraction',
-        representation: 'symbolic_fraction'
+        representation
       },
       context: {
         language: 'nl',

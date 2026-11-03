@@ -9,7 +9,7 @@ async function buildFixture() {
   const manifest = await loadJson('../docs/curriculum/PacoGO_Empirical_Pilot_Manifest_v0.1.json');
   const analysis = await loadJson('../docs/curriculum/PacoGO_Empirical_Pilot_Analysis_v0.1.json');
   const protocol = await loadJson('../docs/curriculum/PacoGO_Empirical_Pilot_W1_Protocol_v0.1.json');
-  const taskSet = await loadJson('../docs/curriculum/PacoGO_Empirical_Pilot_TaskSet_v0.1.json');
+  const taskSet = await loadJson('../docs/curriculum/PacoGO_Pilot_TaskSet_v0.1.json');
 
   const taskInstances = [];
   const observations = [];

@@ -59,7 +59,8 @@
   const registryConfig = await fetch('./docs/curriculum/PacoGO_Curriculum_Registry_v0.2.json').then(response => response.json());
   const registry = createCurriculumRegistry(registryConfig);
   const runtime = createBrowserVerticalSliceRuntime({ registry, taskSet });
-  const task = runtime.getTask('A1-T01');
+  const taskId = 'A1-T01';
+  const task = runtime.getTask(taskId);
 
   let controller;
   let renderer;
@@ -89,7 +90,7 @@
   document.querySelector('#submit').addEventListener('click', () => {
     try {
       const { evaluation, observation } = controller.submit();
-      const cycle = runtime.runObservation({ observation, priorEvidence: [] });
+      const cycle = runtime.runTaskObservation({ taskId, observation, priorEvidence: [] });
       status.textContent = evaluation.correct
         ? `Goed geplaatst. De observatie gaat door naar de PacoGO-leerengine. Volgende stap: ${cycle.next?.action || 'bepalen'}.`
         : `Nog niet goed geplaatst. De leerengine ontvangt ook deze foutieve observatie als informatie.`;

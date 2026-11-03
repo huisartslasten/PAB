@@ -23,3 +23,5 @@ test('clock task mode fixes source and response representations for all task for
     /mode must be analog_to_digital, digital_to_analog or match_representations/
   );
 });
+
+test('analog clock representation identifies the first or second twelve hours of the etmaal', () => {\n  assert.equal(formatEtmaalHalf({ hour: 0 }), '00:00–11:59');\n  assert.equal(formatEtmaalHalf({ hour: 8 }), '00:00–11:59');\n  assert.equal(formatEtmaalHalf({ hour: 11 }), '00:00–11:59');\n  assert.equal(formatEtmaalHalf({ hour: 12 }), '12:00–23:59');\n  assert.equal(formatEtmaalHalf({ hour: 20 }), '12:00–23:59');\n  assert.equal(formatEtmaalHalf({ hour: 23 }), '12:00–23:59');\n  assert.throws(() => formatEtmaalHalf({ hour: 24 }), /hour must be an integer/);\n});\n

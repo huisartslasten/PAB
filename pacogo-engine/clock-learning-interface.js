@@ -1,3 +1,5 @@
+import { angleFromPointer, minuteFromAngle, hourFromAngle } from './clock-analog-input.js';
+
 function formatDigitalTime({ hour, minute }) {
   return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
 }
@@ -21,6 +23,7 @@ function createClockLearningInterface({
   let time = { ...initialTime };
   let activeRepresentation = representation;
   let locked = false;
+  let activeHand = null;
 
   const emit = (eventType, payload = {}) => {
     onInteraction({
@@ -44,8 +47,8 @@ function createClockLearningInterface({
           <span class="pacogo-clock__tick t0"></span><span class="pacogo-clock__tick t1"></span><span class="pacogo-clock__tick t2"></span><span class="pacogo-clock__tick t3"></span>
           <span class="pacogo-clock__number n12">12</span><span class="pacogo-clock__number n3">3</span>
           <span class="pacogo-clock__number n6">6</span><span class="pacogo-clock__number n9">9</span>
-          <span class="pacogo-clock__hand pacogo-clock__hand--hour"></span>
-          <span class="pacogo-clock__hand pacogo-clock__hand--minute"></span>
+          <span class="pacogo-clock__hand pacogo-clock__hand--hour" data-hand="hour" aria-label="Uurwijzer"></span>
+          <span class="pacogo-clock__hand pacogo-clock__hand--minute" data-hand="minute" aria-label="Minutenwijzer"></span>
           <span class="pacogo-clock__pin"></span>
         </div>
         <div class="pacogo-clock__digital-card">
@@ -72,6 +75,7 @@ function createClockLearningInterface({
   const apply = mount.querySelector('.pacogo-clock__apply');
   const mapping = mount.querySelector('.pacogo-clock__mapping');
   const representationButtons = [...mount.querySelectorAll('.pacogo-clock__representation')];
+  const handElements = [hourHand, minuteHand];
 
   const render = () => {
     const minuteAngle = time.minute * 6;
@@ -109,6 +113,15 @@ function createClockLearningInterface({
     emit('representation_changed', { source });
   };
 
+  const setAnalogHand = (hand, angle, source = 'analog_hand') => {
+    if (locked) throw new Error('Clock learning interface is locked');
+    if (!['hour', 'minute'].includes(hand)) throw new TypeError('hand must be hour or minute');
+    const nextTime = hand === 'minute'
+      ? { ...time, minute: minuteFromAngle(angle) }
+      : { ...time, hour: hourFromAngle(angle, time.hour) };
+    setTime(nextTime, source);
+  };
+
   const lock = () => {
     locked = true;
     hourInput.disabled = true;
@@ -132,11 +145,31 @@ function createClockLearningInterface({
     });
   });
 
+  handElements.forEach((handElement) => {
+    handElement.style.touchAction = 'none';
+    handElement.addEventListener('pointerdown', (event) => {
+      if (locked) return;
+      activeHand = handElement.dataset.hand;
+      handElement.setPointerCapture(event.pointerId);
+    });
+    handElement.addEventListener('pointermove', (event) => {
+      if (!activeHand || locked || !handElement.hasPointerCapture(event.pointerId)) return;
+      const angle = angleFromPointer({ clientX: event.clientX, clientY: event.clientY, rect: face.getBoundingClientRect() });
+      setAnalogHand(activeHand, angle, 'analog_drag');
+    });
+    handElement.addEventListener('pointerup', (event) => {
+      if (handElement.hasPointerCapture(event.pointerId)) handElement.releasePointerCapture(event.pointerId);
+      activeHand = null;
+    });
+    handElement.addEventListener('pointercancel', () => { activeHand = null; });
+  });
+
   render();
 
   return Object.freeze({
     getTime: () => ({ ...time }),
     setTime,
+    setAnalogHand,
     getRepresentation: () => activeRepresentation,
     setRepresentation,
     lock,

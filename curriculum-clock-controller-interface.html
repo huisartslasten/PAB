@@ -14,10 +14,10 @@ h1{margin:0 0 10px;font-size:36px}p{color:#627994;line-height:1.6}.task{margin:2
 </head>
 <body><main>
 <h1>Klok — Learning Interface → Controller</h1>
-<p>De Learning Interface presenteert één representatie als opdracht en verzamelt het antwoord via de andere representatie. De controller registreert de gekozen antwoordvorm.</p>
+<p>Drie taakvormen gebruiken dezelfde klokinterface, maar verzamelen verschillende leerhandelingen: tijd aflezen, een klok instellen en representaties koppelen.</p>
 <div class="task" id="task-prompt">Lees de analoge klok en voer de digitale tijd in.</div>
 <div id="clock-interface"></div>
-<div class="actions"><button id="submit" type="button">Controleer tijd</button></div>
+<div class="actions"><button id="submit" type="button">Controleer antwoord</button></div>
 <div id="status" class="status">Nog geen observatie.</div>
 <pre id="trace" class="trace">Nog geen observation.</pre>
 </main>
@@ -28,51 +28,71 @@ import { createClockInterfaceControllerBridge } from './pacogo-engine/clock-inte
 
 const targetTime = { hour: 8, minute: 35 };
 const params = new URLSearchParams(window.location.search);
-const mode = params.get('mode') === 'digital_to_analog' ? 'digital_to_analog' : 'analog_to_digital';
-const responseRepresentation = mode === 'analog_to_digital' ? 'digital' : 'analog';
+const requestedMode = params.get('mode');
+const mode = ['digital_to_analog', 'match_representations'].includes(requestedMode) ? requestedMode : 'analog_to_digital';
+const taskType = mode === 'analog_to_digital' ? 'read_analog_time'
+  : mode === 'digital_to_analog' ? 'set_analog_clock' : 'match_representations';
+const responseRepresentation = mode === 'analog_to_digital' ? 'digital'
+  : mode === 'digital_to_analog' ? 'analog' : 'choice';
+const options = [
+  { option_id: 'option-a', time: { hour: 8, minute: 30 } },
+  { option_id: 'option-b', time: { hour: 8, minute: 35 } },
+  { option_id: 'option-c', time: { hour: 9, minute: 35 } }
+];
 const task = {
-  task_id: mode === 'analog_to_digital' ? 'CLOCK-T01' : 'CLOCK-T02',
+  task_id: mode === 'analog_to_digital' ? 'CLOCK-READ-01'
+    : mode === 'digital_to_analog' ? 'CLOCK-SET-01' : 'CLOCK-MATCH-01',
+  task_type: taskType,
   task_model_id: 'CLOCK.TM1', skill_id: 'CLOCK',
   development_id: 'CLOCK.D1', claim_id: 'CLOCK.C1',
-  evidence_target_ids: ['CLOCK.ET1'], variation_key: mode, prompt_level: 'none'
+  evidence_target_ids: ['CLOCK.ET1'], variation_key: taskType,
+  prompt_level: 'none',
+  ...(mode === 'match_representations' ? { options } : {})
 };
 
 const status = document.querySelector('#status');
 const trace = document.querySelector('#trace');
 document.querySelector('#task-prompt').textContent = mode === 'analog_to_digital'
   ? 'Lees de analoge klok en voer de digitale tijd in.'
-  : 'Lees de digitale opdracht en stel de analoge klok in.';
+  : mode === 'digital_to_analog'
+    ? 'Lees de digitale opdracht en stel de analoge klok in.'
+    : 'Welke digitale tijd hoort bij deze analoge klok?';
 
 const controller = createClockController({
   task, studentKey: 'browser-synthetic-clock', targetTime, mode,
   provenance: { page: 'curriculum-clock-controller-interface.html' }
 });
+let bridge;
 const clock = createClockLearningInterface({
   mount: document.querySelector('#clock-interface'),
   targetTime,
   initialTime: mode === 'digital_to_analog' ? { hour: 8, minute: 0 } : null,
   mode,
+  options,
   onInteraction: (event) => {
-    if (event.payload.time) bridge.setTime(event.payload.time);
-    status.textContent = event.payload.time
-      ? `Interactie ontvangen: ${event.event_type}`
-      : 'Nog geen antwoord ingesteld.';
+    if (event.payload.option_id) bridge.selectRepresentation(event.payload.option_id);
+    else if (event.payload.time) bridge.setTime(event.payload.time);
+    status.textContent = event.payload.option_id
+      ? 'Keuze ontvangen.'
+      : event.payload.time ? 'Interactie ontvangen.' : 'Nog geen antwoord ingesteld.';
   }
 });
-const bridge = createClockInterfaceControllerBridge({ interfaceInstance: clock, controller, representation: responseRepresentation });
+bridge = createClockInterfaceControllerBridge({ interfaceInstance: clock, controller, representation: responseRepresentation });
 
 document.querySelector('#submit').addEventListener('click', () => {
   try {
-    if (!clock.getTime()) {
-      status.textContent = 'Stel eerst een antwoord in.';
+    if (!clock.hasResponse()) {
+      status.textContent = 'Geef eerst een antwoord.';
       return;
     }
     const result = bridge.submit();
     status.textContent = result.correct ? 'Goed. De controller heeft de observatie gemaakt.' : 'Nog niet goed. De controller heeft de observatie gemaakt.';
     trace.textContent = JSON.stringify({
       observation_id: result.observation.observation_id,
+      task_type: result.observation.response.task_type,
       correctness: result.observation.correctness,
       representation: result.observation.response.representation,
+      selected_option_id: result.observation.response.selected_option_id || null,
       event_count: result.observation.interaction_events.length
     }, null, 2);
     document.querySelector('#submit').disabled = true;

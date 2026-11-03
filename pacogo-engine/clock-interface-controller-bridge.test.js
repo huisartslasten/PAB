@@ -24,7 +24,7 @@ test('clock bridge sends time to the controller using the interface response rep
   assert.equal(locked, true);
 });
 
-test('clock bridge follows the interface task mode instead of a stale fallback representation', () => {
+test('clock bridge routes analog time to the analog controller boundary', () => {
   const calls = [];
   const interfaceInstance = {
     setTime: () => {},
@@ -33,15 +33,28 @@ test('clock bridge follows the interface task mode instead of a stale fallback r
   };
   const controller = {
     setAnalogTime: (time) => calls.push(['analog', time]),
-    setDigitalTime: (time) => calls.push(['digital', time]),
     submit: () => ({ correct: true })
   };
-
-  const bridge = createClockInterfaceControllerBridge({ interfaceInstance, controller, representation: 'digital' });
+  const bridge = createClockInterfaceControllerBridge({ interfaceInstance, controller });
   bridge.setTime({ hour: 8, minute: 35 });
-
-  assert.equal(bridge.getRepresentation(), 'analog');
   assert.deepEqual(calls, [['analog', { hour: 8, minute: 35 }]]);
+});
+
+test('clock bridge routes a matching option to the controller choice boundary', () => {
+  const calls = [];
+  const interfaceInstance = {
+    setTime: () => {},
+    getRepresentation: () => 'choice',
+    lock: () => {}
+  };
+  const controller = {
+    selectRepresentation: (optionId) => calls.push(optionId),
+    submit: () => ({ correct: true })
+  };
+  const bridge = createClockInterfaceControllerBridge({ interfaceInstance, controller, representation: 'choice' });
+  bridge.selectRepresentation('option-b');
+  assert.deepEqual(calls, ['option-b']);
+  assert.throws(() => bridge.setTime({ hour: 8, minute: 35 }), /Use selectRepresentation/);
 });
 
 test('clock bridge rejects unsupported fallback representation', () => {
@@ -51,6 +64,6 @@ test('clock bridge rejects unsupported fallback representation', () => {
       controller: { submit: () => ({}) },
       representation: 'both'
     }),
-    /representation must be analog or digital/
+    /representation must be analog, digital or choice/
   );
 });

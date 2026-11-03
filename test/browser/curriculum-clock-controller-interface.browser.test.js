@@ -14,10 +14,11 @@ test('Clock analog source is read and answered through digital input', async ({ 
   await page.getByRole('button', { name: 'Zet tijd' }).click();
 
   await expect(page.locator('.pacogo-clock__digital')).toHaveText('08:35');
-  await page.getByRole('button', { name: 'Controleer tijd' }).click();
+  await page.getByRole('button', { name: 'Controleer antwoord' }).click();
   await expect(page.locator('#status')).toContainText('Goed');
 
   const trace = JSON.parse(await page.locator('#trace').textContent());
+  expect(trace.task_type).toBe('read_analog_time');
   expect(trace.correctness).toBe(true);
   expect(trace.representation).toBe('digital_time');
   expect(trace.event_count).toBeGreaterThanOrEqual(3);
@@ -51,12 +52,45 @@ test('Clock digital source is set and answered through analog hand interaction',
   await page.mouse.up();
 
   await expect(face).toHaveAttribute('aria-label', 'Analoge klok: 08:35');
-  await expect(page.locator('.pacogo-clock__digital')).toHaveText('08:35');
-  await page.getByRole('button', { name: 'Controleer tijd' }).click();
+  await page.getByRole('button', { name: 'Controleer antwoord' }).click();
   await expect(page.locator('#status')).toContainText('Goed');
 
   const trace = JSON.parse(await page.locator('#trace').textContent());
+  expect(trace.task_type).toBe('set_analog_clock');
   expect(trace.correctness).toBe(true);
   expect(trace.representation).toBe('analog_time');
   expect(trace.event_count).toBeGreaterThanOrEqual(3);
+});
+
+test('Clock representation matching selects and records the equivalent digital time', async ({ page }) => {
+  await page.goto(`${pageUrl}?mode=match_representations`);
+  const face = page.locator('.pacogo-clock__face');
+  await expect(face).toHaveAttribute('aria-label', 'Analoge klok: 08:35');
+  await expect(page.locator('.pacogo-clock__options')).toBeVisible();
+  await expect(page.locator('.pacogo-clock__option')).toHaveCount(3);
+
+  const correctOption = page.locator('.pacogo-clock__option[data-option-id="option-b"]');
+  await correctOption.click();
+  await expect(correctOption).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'Controleer antwoord' }).click();
+  await expect(page.locator('#status')).toContainText('Goed');
+
+  const trace = JSON.parse(await page.locator('#trace').textContent());
+  expect(trace.task_type).toBe('match_representations');
+  expect(trace.correctness).toBe(true);
+  expect(trace.representation).toBe('representation_choice');
+  expect(trace.selected_option_id).toBe('option-b');
+  expect(trace.event_count).toBeGreaterThanOrEqual(3);
+});
+
+test('Clock representation matching preserves an incorrect selection as incorrect evidence', async ({ page }) => {
+  await page.goto(`${pageUrl}?mode=match_representations`);
+  await page.locator('.pacogo-clock__option[data-option-id="option-a"]').click();
+  await page.getByRole('button', { name: 'Controleer antwoord' }).click();
+  await expect(page.locator('#status')).toContainText('Nog niet goed');
+
+  const trace = JSON.parse(await page.locator('#trace').textContent());
+  expect(trace.task_type).toBe('match_representations');
+  expect(trace.correctness).toBe(false);
+  expect(trace.selected_option_id).toBe('option-a');
 });

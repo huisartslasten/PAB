@@ -1,18 +1,21 @@
 import { angleFromPointer, minuteFromAngle, hourFromAngle } from './clock-analog-input.js';
+import { validateClockTaskDefinition } from './clock-task-contract.js';
 
 function formatDigitalTime({ hour, minute }) {
   return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
 }
 
 function assertClockMode(mode) {
-  if (!['analog_to_digital', 'digital_to_analog'].includes(mode)) {
-    throw new TypeError('mode must be analog_to_digital or digital_to_analog');
+  if (!['analog_to_digital', 'digital_to_analog', 'match_representations'].includes(mode)) {
+    throw new TypeError('mode must be analog_to_digital, digital_to_analog or match_representations');
   }
 }
 
 function responseRepresentationForMode(mode) {
   assertClockMode(mode);
-  return mode === 'analog_to_digital' ? 'digital' : 'analog';
+  if (mode === 'analog_to_digital') return 'digital';
+  if (mode === 'digital_to_analog') return 'analog';
+  return 'choice';
 }
 
 function assertTime({ hour, minute }) {
@@ -25,6 +28,7 @@ function createClockLearningInterface({
   targetTime,
   initialTime = { hour: 12, minute: 0 },
   mode = 'analog_to_digital',
+  options = [],
   onInteraction = () => {}
 }) {
   if (!(mount instanceof HTMLElement)) throw new TypeError('mount must be an HTMLElement');
@@ -34,9 +38,21 @@ function createClockLearningInterface({
   assertTime(targetTime);
   if (initialTime !== null) assertTime(initialTime);
 
+  if (mode === 'match_representations') {
+    validateClockTaskDefinition({
+      task_id: 'CLOCK-INTERFACE-MATCH',
+      task_type: 'match_representations',
+      target_time: targetTime,
+      options
+    });
+  } else if (options.length) {
+    throw new TypeError('options are only accepted for match_representations');
+  }
+
   const target = { ...targetTime };
   const responseRepresentation = responseRepresentationForMode(mode);
   let responseTime = mode === 'digital_to_analog' ? { ...(initialTime || { hour: 12, minute: 0 }) } : null;
+  let selectedOptionId = null;
   let locked = false;
   let activeHand = null;
 
@@ -71,6 +87,7 @@ function createClockLearningInterface({
         <div class="pacogo-clock__digital-card">
           <div class="pacogo-clock__digital-label"></div>
           <div class="pacogo-clock__digital" aria-live="polite"></div>
+          <div class="pacogo-clock__options" role="group" aria-label="Kies de bijpassende digitale tijd"></div>
         </div>
       </div>
       <div class="pacogo-clock__controls">
@@ -88,6 +105,7 @@ function createClockLearningInterface({
   const minuteHand = mount.querySelector('.pacogo-clock__hand--minute');
   const digital = mount.querySelector('.pacogo-clock__digital');
   const digitalLabel = mount.querySelector('.pacogo-clock__digital-label');
+  const optionsContainer = mount.querySelector('.pacogo-clock__options');
   const hourInput = mount.querySelector('.pacogo-clock__hour');
   const minuteInput = mount.querySelector('.pacogo-clock__minute');
   const controls = mount.querySelector('.pacogo-clock__controls');
@@ -96,7 +114,7 @@ function createClockLearningInterface({
   const hint = mount.querySelector('.pacogo-clock__hint');
   const handElements = [hourHand, minuteHand];
 
-  const getAnalogTime = () => mode === 'analog_to_digital' ? target : responseTime;
+  const getAnalogTime = () => mode === 'digital_to_analog' ? responseTime : target;
   const getDigitalTime = () => mode === 'digital_to_analog' ? target : responseTime;
 
   const render = () => {
@@ -108,7 +126,26 @@ function createClockLearningInterface({
     hourHand.style.transform = `translateX(-50%) rotate(${hourAngle}deg)`;
     minuteHand.style.transform = `translateX(-50%) rotate(${minuteAngle}deg)`;
     digital.textContent = digitalTime ? formatDigitalTime(digitalTime) : '--:--';
-    digitalLabel.textContent = mode === 'digital_to_analog' ? 'Digitale opdracht' : 'Jouw digitale antwoord';
+    digital.hidden = mode === 'match_representations';
+    digitalLabel.textContent = mode === 'digital_to_analog'
+      ? 'Digitale opdracht'
+      : mode === 'match_representations' ? 'Kies de passende digitale tijd' : 'Jouw digitale antwoord';
+    optionsContainer.hidden = mode !== 'match_representations';
+    optionsContainer.replaceChildren();
+    if (mode === 'match_representations') {
+      for (const option of options) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'pacogo-clock__option';
+        button.textContent = formatDigitalTime(option.time);
+        button.dataset.optionId = option.option_id;
+        button.setAttribute('aria-pressed', String(selectedOptionId === option.option_id));
+        button.disabled = locked;
+        if (selectedOptionId === option.option_id) button.classList.add('is-selected');
+        button.addEventListener('click', () => selectRepresentation(option.option_id));
+        optionsContainer.append(button);
+      }
+    }
     hourInput.value = responseTime ? responseTime.hour : '';
     minuteInput.value = responseTime ? responseTime.minute : '';
     controls.hidden = mode !== 'analog_to_digital';
@@ -116,10 +153,14 @@ function createClockLearningInterface({
     face.dataset.interactive = String(mode === 'digital_to_analog');
     hint.textContent = mode === 'analog_to_digital'
       ? 'Lees de analoge klok en voer de digitale tijd in.'
-      : 'Lees de digitale opdracht en stel de analoge klok in.';
+      : mode === 'digital_to_analog'
+        ? 'Lees de digitale opdracht en stel de analoge klok in.'
+        : 'Bekijk de analoge klok en kies de bijpassende digitale tijd.';
     mapping.textContent = mode === 'analog_to_digital'
       ? 'Bron: analoog  →  Antwoord: digitaal'
-      : 'Bron: digitaal  →  Antwoord: analoog';
+      : mode === 'digital_to_analog'
+        ? 'Bron: digitaal  →  Antwoord: analoog'
+        : 'Herken dezelfde tijd in twee voorstellingen';
   };
 
   const setTime = ({ hour, minute }, source = 'digital_input') => {
@@ -145,12 +186,23 @@ function createClockLearningInterface({
     emit('time_changed', { source, hand });
   };
 
+  const selectRepresentation = (optionId) => {
+    if (locked) throw new Error('Clock learning interface is locked');
+    if (mode !== 'match_representations') throw new Error('Representation selection is only available for matching tasks');
+    const option = options.find((candidate) => candidate.option_id === optionId);
+    if (!option) throw new RangeError(`Unknown clock representation option: ${optionId}`);
+    selectedOptionId = optionId;
+    render();
+    emit('representation_selected', { option_id: optionId, selected_time: { ...option.time } });
+  };
+
   const lock = () => {
     locked = true;
     hourInput.disabled = true;
     minuteInput.disabled = true;
     apply.disabled = true;
     root.dataset.locked = 'true';
+    optionsContainer.querySelectorAll('button').forEach((button) => { button.disabled = true; });
   };
 
   apply.addEventListener('click', () => {
@@ -184,8 +236,11 @@ function createClockLearningInterface({
 
   return Object.freeze({
     getTime: () => (responseTime ? { ...responseTime } : null),
+    hasResponse: () => mode === 'match_representations' ? selectedOptionId !== null : responseTime !== null,
+    getSelectedOptionId: () => selectedOptionId,
     setTime,
     setAnalogHand,
+    selectRepresentation,
     getRepresentation: () => responseRepresentation,
     lock,
     isLocked: () => locked,

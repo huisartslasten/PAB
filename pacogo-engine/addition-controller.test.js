@@ -71,6 +71,50 @@ assert.equal(symbolicResult.observation.response.explanation, '8 + 7 is addition
 assert.equal(symbolicResult.observation.performance.representation, 'symbolic_expression');
 assert.equal(symbolicResult.observation.interaction_events.at(-1).payload.explanation, '8 + 7 is addition because two quantities are combined.');
 
+const promptedTask = {
+  ...task,
+  task_id: 'B1-T05',
+  development_id: 'B1.D2',
+  claim_id: 'B1.C2',
+  evidence_target_ids: ['B1.ET2'],
+  variation_key: 'prompted_to_independent',
+  prompt_level: 'minimal'
+};
+const promptedController = createAdditionController({
+  task: promptedTask,
+  studentKey: 'synthetic-b1-5',
+  renderer: {},
+  addends: [23, 19],
+  expectedAnswer: 42,
+  strategyOptions,
+  representation: 'quantity_groups',
+  responseType: 'prompted_to_independent_addition',
+  provenance: { test: true }
+});
+
+assert.throws(() => promptedController.submit(42), /Prompted example is required before independent submission/);
+promptedController.recordPromptedExample({
+  addends: [20, 10],
+  answer: 30,
+  strategyId: 'make-ten',
+  prompt: 'Gebruik eerst het tiental als tussenstap.'
+});
+promptedController.selectStrategy('make-ten', 'independent-test');
+const promptedResult = promptedController.submit(42, '23 + 19 combineert twee hoeveelheden; ik gebruik een tussenstap naar een tiental.');
+assert.equal(promptedResult.evaluation.correct, true);
+assert.equal(promptedResult.observation.development_id, 'B1.D2');
+assert.equal(promptedResult.observation.claim_id, 'B1.C2');
+assert.equal(promptedResult.observation.independent, true);
+assert.equal(promptedResult.observation.performance.prompted_example, true);
+assert.equal(promptedResult.observation.context.prompt_level, 'none');
+assert.ok(promptedResult.observation.interaction_events.some(event => event.event_type === 'prompted_example_completed'));
+assert.throws(() => promptedController.recordPromptedExample({
+  addends: [30, 10],
+  answer: 40,
+  strategyId: 'count-on',
+  prompt: 'Gebruik een tussenstap.'
+}), /Addition task has already been submitted/);
+
 const emptyController = createAdditionController({
   task,
   studentKey: 'synthetic-b1-3',

@@ -69,12 +69,13 @@ test('blocks C4 readiness when a claim lacks acceptable coding reliability', () 
   assert.equal(result.c4_readiness.readiness_by_claim['FR2.C2'].measurement_gate_state, 'BLOCKED_BY_CODING_RELIABILITY');
 });
 
-test('requires an explicit W1 analysis result', () => {
+test('requires an explicit W1 C4 readiness payload', () => {
   assert.throws(
     () => runW1C4Readiness({
       w1AnalysisResult: {
         status: 'W1_ANALYSIS_COMPLETE',
         descriptive_report: { status: 'descriptive_only' },
+        pilot_result: {},
         scientific_boundary: {
           developmental_ordering_allowed: false,
           prerequisite_inference_allowed: false,
@@ -84,6 +85,6 @@ test('requires an explicit W1 analysis result', () => {
       },
       reliabilityByClaim: buildReliability()
     }),
-    /pilot_result must contain c4_readiness_state_by_claim/
+    /pilotResult must contain c4_readiness_state_by_claim/
   );
 });

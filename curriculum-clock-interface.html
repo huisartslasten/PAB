@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PacoGO — Clock Learning Interface</title>
+<style>
+:root{font-family:Nunito,system-ui,sans-serif;color:#17345f;background:#edf5fb}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:28px;background:radial-gradient(circle at 20% 10%,#fff 0,transparent 32%),linear-gradient(145deg,#eaf5ff,#f8fbff)}
+main{max-width:1040px;margin:auto}.shell{background:rgba(255,255,255,.9);border:1px solid #d9e8f5;border-radius:30px;padding:30px;box-shadow:0 24px 70px rgba(33,73,112,.13)}
+.eyebrow{font-size:13px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#4e83ad}.intro{max-width:700px}h1{font-size:38px;line-height:1.05;margin:8px 0 12px}.intro p{margin:0;color:#627994;line-height:1.6}
+.interface-card{margin-top:26px;border-radius:26px;padding:26px;background:linear-gradient(180deg,#f8fcff,#eef7fd);border:1px solid #d9e9f5}
+.pacogo-clock{display:grid;gap:24px}.pacogo-clock__visual{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center}.pacogo-clock__face{position:relative;width:min(100%,330px);aspect-ratio:1;margin:auto;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#e9f5fc);border:12px solid #fff;box-shadow:0 18px 35px rgba(34,80,120,.18),inset 0 0 0 3px #d2e5f1}
+.pacogo-clock__face:before{content:"";position:absolute;inset:13px;border-radius:50%;border:2px dashed #b9d3e4}.pacogo-clock__number{position:absolute;font-size:25px;font-weight:1000;color:#214a70}.n12{top:12px;left:50%;transform:translateX(-50%)}.n3{right:17px;top:50%;transform:translateY(-50%)}.n6{bottom:12px;left:50%;transform:translateX(-50%)}.n9{left:17px;top:50%;transform:translateY(-50%)}
+.pacogo-clock__hand{position:absolute;left:50%;bottom:50%;transform-origin:50% 100%;border-radius:10px 10px 4px 4px}.pacogo-clock__hand--hour{width:11px;height:30%;background:#214a70}.pacogo-clock__hand--minute{width:7px;height:40%;background:#1687e8}.pacogo-clock__pin{position:absolute;left:50%;top:50%;width:18px;height:18px;transform:translate(-50%,-50%);border-radius:50%;background:#1687e8;border:4px solid #fff;box-shadow:0 2px 8px rgba(20,70,110,.25)}
+.pacogo-clock__digital{font-size:clamp(58px,9vw,92px);font-weight:1000;letter-spacing:.04em;color:#173f68;text-align:center;padding:24px;border-radius:24px;background:#fff;box-shadow:0 15px 35px rgba(34,80,120,.12);font-variant-numeric:tabular-nums}.pacogo-clock__mapping{text-align:center;font-weight:900;color:#427295;font-size:18px}
+.pacogo-clock__controls{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;align-items:end}.pacogo-clock__controls label{display:grid;gap:6px;font-size:13px;font-weight:900;color:#54728d}.pacogo-clock__controls input{width:92px;border:2px solid #cfe1ee;border-radius:13px;padding:11px;font:900 18px Nunito;text-align:center;background:#fff;color:#17345f}.pacogo-clock__apply,#correct{border:0;border-radius:13px;padding:12px 18px;font:900 15px Nunito;cursor:pointer;background:#1687e8;color:#fff;box-shadow:0 8px 18px rgba(22,135,232,.2)}button:disabled{opacity:.5;cursor:not-allowed}
+.feedback{margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:#fff;border:1px solid #dbe9f4;border-radius:20px;padding:18px}.panel h2{font-size:17px;margin:0 0 10px}.status{font-weight:900;color:#1680cf;min-height:44px}.trace{margin:0;background:#f4f8fb;border-radius:13px;padding:12px;white-space:pre-wrap;font:700 12px/1.5 ui-monospace,monospace;color:#48657c}
+@media(max-width:720px){body{padding:14px}.shell{padding:20px}.pacogo-clock__visual,.feedback{grid-template-columns:1fr}h1{font-size:30px}}
+</style>
+</head>
+<body><main><section class="shell"><div class="intro"><div class="eyebrow">PacoGO Learning Interface</div><h1>Klok: analoog ↔ digitaal</h1><p>Één pedagogisch instrument met twee representaties. De leerling ziet de wijzers én de digitale tijd en leert de twee vormen met elkaar verbinden.</p></div>
+<section class="interface-card"><div id="clock-interface"></div></section>
+<div style="display:flex;justify-content:center;margin-top:18px"><button id="correct" type="button">Controleer tijd</button></div>
+<section class="feedback"><div class="panel"><h2>Feedback</h2><div id="status" class="status">Zet de tijd en kijk naar de koppeling tussen beide representaties.</div></div><div class="panel"><h2>Interaction trace</h2><pre id="trace">Nog geen interactie.</pre></div></section>
+</section></main><script type="module" src="./pacogo-engine/clock-learning-interface-demo.js"></script></body></html>

@@ -1,4 +1,5 @@
 import { createInteractionEvent, createObservation, createTaskInstance } from './interaction-contract.js';
+import { validateClockTaskDefinition } from './clock-task-contract.js';
 
 function assertTime(hour, minute) {
   if (!Number.isInteger(hour) || hour < 0 || hour > 23) throw new TypeError('hour must be an integer from 0 to 23');
@@ -10,11 +11,35 @@ function normalizeTime({ hour, minute }) {
   return { hour, minute };
 }
 
-function createClockController({ task, studentKey, targetTime, mode = 'analog_to_digital', provenance = {} }) {
+const MODE_BY_TASK_TYPE = Object.freeze({
+  read_analog_time: 'analog_to_digital',
+  set_analog_clock: 'digital_to_analog',
+  match_representations: 'match_representations'
+});
+
+function createClockController({ task, studentKey, targetTime, mode = null, provenance = {} }) {
   if (!task || !studentKey) throw new TypeError('task and studentKey are required');
   if (!targetTime || typeof targetTime !== 'object') throw new TypeError('targetTime is required');
 
   const normalizedTarget = normalizeTime(targetTime);
+  const taskType = task.task_type || (
+    mode === 'digital_to_analog' ? 'set_analog_clock'
+      : mode === 'match_representations' ? 'match_representations'
+        : 'read_analog_time'
+  );
+  const resolvedMode = mode || MODE_BY_TASK_TYPE[taskType];
+  const expectedMode = MODE_BY_TASK_TYPE[taskType];
+  if (!expectedMode) throw new TypeError(`Unsupported clock task type: ${taskType}`);
+  if (resolvedMode !== expectedMode) {
+    throw new TypeError(`Clock task type ${taskType} requires mode ${expectedMode}`);
+  }
+
+  const taskDefinition = {
+    ...task,
+    task_type: taskType,
+    target_time: normalizedTarget
+  };
+  const contract = validateClockTaskDefinition(taskDefinition);
   const taskInstance = createTaskInstance({
     taskId: task.task_id,
     taskModelId: task.task_model_id,
@@ -39,40 +64,89 @@ function createClockController({ task, studentKey, targetTime, mode = 'analog_to
     }));
   };
 
-  record('task_presented', { target_time: normalizedTarget, mode });
+  record('task_presented', {
+    target_time: normalizedTarget,
+    mode: resolvedMode,
+    task_type: taskType,
+    source_representation: contract.sourceRepresentation,
+    response_representation: contract.responseRepresentation
+  });
+
+  const assertActive = () => {
+    if (submitted) throw new Error('Clock task has already been submitted');
+  };
 
   const setAnalogTime = ({ hour, minute }) => {
-    if (submitted) throw new Error('Clock task has already been submitted');
+    assertActive();
+    if (taskType !== 'set_analog_clock') {
+      throw new Error('Analog time is only the response for set_analog_clock tasks');
+    }
     const time = normalizeTime({ hour, minute });
     response = { type: 'analog_time', ...time };
     record('analog_time_set', time);
   };
 
   const setDigitalTime = ({ hour, minute }) => {
-    if (submitted) throw new Error('Clock task has already been submitted');
+    assertActive();
+    if (taskType !== 'read_analog_time') {
+      throw new Error('Digital time is only the response for read_analog_time tasks');
+    }
     const time = normalizeTime({ hour, minute });
     response = { type: 'digital_time', ...time };
     record('digital_time_set', time);
   };
 
-  const submit = () => {
-    if (submitted) throw new Error('Clock task has already been submitted');
-    if (!response) throw new Error('No clock time has been set');
+  const selectRepresentation = (optionId) => {
+    assertActive();
+    if (taskType !== 'match_representations') {
+      throw new Error('Representation selection is only available for match_representations tasks');
+    }
+    if (typeof optionId !== 'string' || !optionId.trim()) {
+      throw new TypeError('optionId is required');
+    }
+    const selectedOption = taskDefinition.options.find((option) => option.option_id === optionId);
+    if (!selectedOption) throw new RangeError(`Unknown clock representation option: ${optionId}`);
+    response = {
+      type: 'representation_choice',
+      option_id: selectedOption.option_id,
+      hour: selectedOption.time.hour,
+      minute: selectedOption.time.minute
+    };
+    record('representation_option_selected', {
+      option_id: selectedOption.option_id,
+      selected_time: selectedOption.time
+    });
+  };
 
-    const correct = response.hour === normalizedTarget.hour && response.minute === normalizedTarget.minute;
-    record('clock_submitted', { response, target_time: normalizedTarget, correct });
+  const submit = () => {
+    assertActive();
+    if (!response) throw new Error('No clock response has been set');
+
+    const selectedTime = { hour: response.hour, minute: response.minute };
+    const correct = selectedTime.hour === normalizedTarget.hour && selectedTime.minute === normalizedTarget.minute;
+    record('clock_submitted', {
+      task_type: taskType,
+      response,
+      target_time: normalizedTarget,
+      correct
+    });
     submitted = true;
 
     const observedAt = new Date().toISOString();
+    const isMatchingTask = taskType === 'match_representations';
     const observation = createObservation({
       taskInstance,
       studentKey,
       response: {
-        type: 'clock_time',
-        mode,
+        type: isMatchingTask ? 'clock_representation_match' : 'clock_time',
+        task_type: taskType,
+        mode: resolvedMode,
         target_time: normalizedTarget,
-        selected_time: { hour: response.hour, minute: response.minute },
-        representation: response.type
+        selected_time: selectedTime,
+        representation: response.type,
+        source_representation: contract.sourceRepresentation,
+        response_representation: contract.responseRepresentation,
+        ...(isMatchingTask ? { selected_option_id: response.option_id } : {})
       },
       correctness: correct,
       events,
@@ -81,16 +155,18 @@ function createClockController({ task, studentKey, targetTime, mode = 'analog_to
         response_time_ms: Math.max(0, Date.parse(observedAt) - Date.parse(startedAt)),
         attempts: 1,
         hints: 0,
-        strategy: 'represent_time',
-        representation: response.type
+        strategy: contract.pedagogicalAction,
+        representation: response.type,
+        task_type: taskType
       },
       context: {
         language: 'nl',
         setting: 'browser_vertical_slice',
         prompt_level: task.prompt_level || 'none',
-        task_variant: task.variation_key,
-        variation_key: task.variation_key,
-        clock_mode: mode
+        task_variant: task.variation_key || taskType,
+        variation_key: task.variation_key || taskType,
+        clock_mode: resolvedMode,
+        clock_task_type: taskType
       },
       provenance: {
         source: 'browser_interaction',
@@ -109,7 +185,7 @@ function createClockController({ task, studentKey, targetTime, mode = 'analog_to
         relevant: true,
         contradiction: false,
         independent: true,
-        variation_key: task.variation_key
+        variation_key: task.variation_key || taskType
       }
     };
   };
@@ -119,8 +195,11 @@ function createClockController({ task, studentKey, targetTime, mode = 'analog_to
     events,
     startedAt,
     targetTime: normalizedTarget,
+    taskType,
+    contract,
     setAnalogTime,
     setDigitalTime,
+    selectRepresentation,
     submit,
     isSubmitted: () => submitted
   });

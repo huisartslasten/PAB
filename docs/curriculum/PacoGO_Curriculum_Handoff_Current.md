@@ -272,20 +272,47 @@ No Supabase schema/runtime change is required for the current browser vertical-s
 
 **Build the brain → prove the vertical chain → build reusable Learning Interfaces/controllers → connect multiple curriculum cases through the same engine → empirically validate with real learners → then build the larger Deluxe world.**
 
-## 14. Adaptive instruction — mandatory product/architecture requirement (2026-11-04)
+## 14. Adaptive instruction — future expansion requirement (2026-11-04)
 
-The product owner explicitly identified that school instructional methods differ between schools/teachers. A fixed PacoGO teaching method could conflict with the learner's classroom method and cause confusion. This requirement is cross-interface and must not be treated as a Fraction-only concern.
+The product owner confirmed the strategic direction:
 
-Required design principles:
-- adapt explanations and instructional procedures to the method actually used by the learner's school/classroom, rather than assuming a universal method;
-- method knowledge must be grounded in confirmed parent/teacher input or school materials, with source/provenance and confidence/unknown state;
-- do not infer the school's method solely from how a learner answers or interacts;
-- when the method is unknown or uncertain, do not claim school alignment or teach an unverified conflicting procedure; use a carefully bounded conceptual/visual explanation or seek confirmation when needed;
-- separate the fixed curriculum objective (existing SLO-based skills/goals) from school-specific instructional method and from the reusable Learning Interface;
-- design a reusable Adaptive Instruction Layer that can select/configure method-specific explanations, examples, representations, notation and feedback across interfaces without rebuilding each interface;
-- preserve curriculum, claim, evidence-target and mastery contracts. This requirement does not authorize curriculum redesign or changes to existing SLO mappings/skills.
+**PacoGO must be architecturally prepared for future school-method-aware instruction, but this is not a prerequisite for the first operational learning version. The immediate priority is to complete the existing curriculum and learner-learning flow so Zyon can start using PacoGO.**
 
-**Implementation gate:** do not implement method-specific instruction or feedback in Fraction or other Learning Interfaces until the adaptive-instruction design, method-source/provenance model, unknown-state behavior and interface integration contract have been specified and reviewed. Existing curriculum content remains unchanged.
+Keep the following principles in the architecture from the beginning:
+- separate the fixed curriculum objective from the instructional method and from the reusable Learning Interface;
+- do not hardwire one universal school method into the curriculum engine or an interface;
+- keep Learning Interfaces reusable and configurable so future method-specific explanations, examples, representations, notation and feedback can be added without rebuilding the interfaces;
+- keep pedagogical/function behavior, interaction/state/evidence behavior and visual/rendering behavior separated;
+- preserve the existing curriculum, SLO, skill, development, claim, evidence and mastery contracts.
+
+**Scope now:** architecture awareness and clean boundaries only. Do not build the Adaptive Instruction Layer, detailed Method Profile model, source/provenance subsystem, selection rules or method-specific interface integration as part of the immediate curriculum work. Do not let this become a separate blocking project.
+
+**Deferred future work:** when the core curriculum and initial learner experience are ready, return to:
+1. confirm which school method/edition applies to a learner and topic;
+2. design a proportionate method profile and source/provenance handling;
+3. define confirmed/provisional/unknown/conflicting behavior;
+4. define how method-specific instruction configures reusable Learning Interfaces;
+5. test generality with more than one school method.
+The existing workbook evidence for De wereld in getallen, Version 4 (2009), Group 8, Minimum 8b is useful as a future first case, but does not establish the complete teacher instruction method. Do not claim classroom alignment until adequately confirmed.
+
+When method information is unknown or uncertain, PacoGO may still provide correct, bounded conceptual/visual explanation, but must not claim that it matches the school's method or invent a school-specific procedure.
+
+This is a future product/architecture requirement, not permission to change curriculum content, SLO mapping, skills, developments, claims, evidence targets, mastery criteria, learner-state contracts or Supabase. No implementation is authorized by this handoff entry.
+
+## 15. Immediate product priority — get Zyon learning
+
+The immediate delivery priority is to finish the existing curriculum and the minimum complete learner-facing flow so Zyon can begin using PacoGO. Do not expand the scope into a separate adaptive-instruction project.
+
+Prioritise the existing roadmap in this order:
+1. complete/review the current curriculum and its existing evidence/decision contracts without redesigning the defined curriculum;
+2. complete the learner-state and next-action flow needed for a usable learning cycle;
+3. deliver the necessary reusable Learning Interfaces and browser learning flow;
+4. provide clear, correct explanations, with visual explanation especially important for mathematics;
+5. keep architecture boundaries ready for future Adaptive Instruction, but defer its detailed design and implementation.
+
+An imperfect or not-yet-school-method-specific explanation is acceptable for the first operational version if it is mathematically correct, understandable and honest about not necessarily matching the classroom method. The explanation can be improved later without changing the curriculum engine.
+
+**Next concrete step after this handoff update:** resume the existing curriculum/evidence work already identified in Section 13: review the C3 Canonical Codebook Reconciliation Proposal as an evidence/measurement contract only. Preserve the curriculum boundary; ask the product owner before any decision that would affect curriculum meaning or SLO alignment.
 
 ## 13. Current C3 reconciliation proposal and curriculum boundary (2026-11-04)
 
@@ -306,7 +333,7 @@ If a proposed evidence/codebook/runtime change appears to require changing a ski
 
 **Latest verified baseline before this handoff update:**
 - Branch: `refactor/professional-v1`
-- Commit: `019822cdfa230d91e6c48608b444e4b4f2a84697`
-- Full Regression run: #2890 / ID `41818169953`
+- Commit: `bed45c993cc1a0f8423c1891b61fcc4726836f2e`
+- Full Regression run: #2891 / ID `41819730230`
 - Status: **GREEN** — GitHub Actions reports `completed / success` for this exact commit.
 - This handoff update is a new commit and requires its own Full Regression.

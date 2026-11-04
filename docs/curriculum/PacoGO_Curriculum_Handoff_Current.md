@@ -331,6 +331,21 @@ If a proposed evidence/codebook/runtime change appears to require changing a ski
 
 **Next concrete step:** review the C3 reconciliation proposal as a measurement/evidence contract only. Any unresolved question that touches curriculum meaning or SLO alignment must be brought to the product owner before any design decision or implementation. Only after explicit approval of the evidence contract may a canonical codebook/schema implementation be considered.
 
+**Synthetic C3 anchor exercise completed:** `docs/curriculum/PacoGO_C3_Synthetic_Codebook_Anchor_Exercise_v0.1.md` (commit `7d70780bab042748222986b6c249bdfddf2dbc32`). The six synthetic cases were used for a conceptual review of codebook boundaries, not for empirical coder-reliability testing.
+
+Findings to carry into the reconciliation:
+- Keep task-to-target alignment distinct from the response-to-target relation.
+- Separate raw process availability/missingness, coded evidence status and coding workflow state; values such as `NOT_COLLECTED`, `TECHNICAL_FAILURE` and `NO_RESPONSE` describe different raw situations and must not be collapsed into evidence absence.
+- Keep correctness, evidence quality, independence and contradiction as distinct judgements. A correct answer does not automatically establish reasoning quality or mastery.
+- Record assistance as observed events before deriving any target-specific independence judgement.
+- Contradiction is target-specific; incorrectness, missing process, prompting or task mismatch do not automatically constitute contradiction.
+- Define non-response handling in advance; a no-response event is not automatically evidence absence.
+- Preserve one immutable raw response observation, with separate traceable target-specific assessments where needed.
+
+The exercise does **not** establish inter-rater agreement, coder reliability, quality-scale calibration, construct validity, mastery validity or next-action validity. Do not choose a final quality scale, reliability coefficient or threshold from these synthetic cases.
+
+**Next concrete step:** revise the C3 reconciliation proposal to incorporate these boundaries, then prepare a blinded coder packet and a separate adjudication key. Actual independent human coding will still be required to estimate coding reliability. Do not change runtime, curriculum mappings, mastery rules, schemas or Supabase as part of this documentation step.
+
 **Latest verified baseline before this handoff update:**
 - Branch: `refactor/professional-v1`
 - Commit: `bed45c993cc1a0f8423c1891b61fcc4726836f2e`

@@ -1,0 +1,29 @@
+name: Double or Nothing LIVE regression
+
+on:
+  push:
+    branches:
+      - release/double-or-nothing-round-counter
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/features/practice/double-or-nothing/**'
+      - '.github/workflows/double-or-nothing-live-regression.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  double-or-nothing-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release candidate
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run Double or Nothing regression tests
+        run: node --test src/features/practice/double-or-nothing/runtime.test.js

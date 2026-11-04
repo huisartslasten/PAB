@@ -191,16 +191,40 @@ The audit reviewed FR2-T01–T05 against the registry, pilot task set, C3 coding
 
 Keep the five pages as synthetic technical demonstrations only. Do not use their generated observations as independently coded pilot evidence. Do not change FR2 registry mappings, C3 coding rules, mastery logic or Supabase as part of this audit.
 
-**Next concrete step:** create and review a versioned FR2 Task–Evidence Alignment Specification resolving target cardinality, raw observation versus C3 coding, T01/T02 explanation intent, T03/T05 ET4 coverage, T04 countertask purpose, and T05 language condition. Only then decide and implement any curriculum/task/runtime changes.
+**Specification created:** `docs/curriculum/PacoGO_FR2_Task_Evidence_Alignment_Specification_v0.1.md`. It proposes an immutable raw observation with separate target-specific C3 assessments; one response remains one observation even when assessed against multiple targets. It identifies the Pilot_DataSchema v0.2 singular-field versus Empirical_Observation_Schema v0.1 array-field mismatch. It proposes T01/T02 remain recognition tasks unless deliberately redesigned for ET2; T03 must not claim ET4 stability without a linked contrast; T04 needs a genuine surface-cue countertask for ET2/ET6; T05 needs an operationalised language condition and matched comparison. ET6 is treated as contradiction/counterevidence, not positive mastery evidence. These are candidate design decisions requiring review, not approved mapping or schema changes.
+
+**Next concrete step:** review/approve or revise the v0.1 specification. Do not change registry mappings, task pages, runtime, coding rules or Supabase until the contract is approved.
+
+## 9B. FR2 Task–Evidence Alignment Specification
+
+Specification: `docs/curriculum/PacoGO_FR2_Task_Evidence_Alignment_Specification_v0.1.md`.
+
+Created as candidate design-only work after Full Regression #2884 was verified GREEN on baseline commit `3e9b9158f8042eca678deb7c550b997a0c46f1bf`.
+
+Key proposed boundaries:
+- one learner response = one immutable raw observation;
+- separate target-specific C3 assessment records, with coder/codebook provenance;
+- one observation assessed against multiple targets is still one observation and is not multiple independent evidence;
+- task-model target lists are opportunities, not automatic target assessments;
+- resolve the singular target/coding fields in Pilot_DataSchema v0.2 against the array target linkage in Empirical_Observation_Schema v0.1 before creating a new canonical schema version;
+- T01/T02 explanations remain raw supplementary process data unless the task is deliberately redesigned for ET2/ET3;
+- T03 cannot claim ET4 stability without a linked contrast across representation conditions;
+- T04 needs a true surface-cue countertask to elicit ET2 and potentially ET6;
+- T05 needs an operationalised language manipulation and matched comparison;
+- ET6 is contradiction/counterevidence, not positive mastery evidence;
+- current browser tasks remain synthetic; no real learner data, registry, runtime, coding-rule or Supabase changes are authorised by this specification.
+
+**Current gate:** review and approve/revise the specification before implementation. The specification and this handoff update require Full Regression verification.
 
 ## 10. Latest regression state
 
-Latest independently verified Full Regression:
-- Commit: `4ca239fb27febc9d9f09922873f451dc1e7effb2`
+Latest independently verified Full Regression at the start of the FR2 alignment specification work:
+- Commit: `3e9b9158f8042eca678deb7c550b997a0c46f1bf`
 - Branch: `refactor/professional-v1`
-- Full Regression run: #2883 / ID `41770074197`
-- Status: **GREEN** (all 17 steps succeeded, including curriculum engine, architecture boundaries, maintained Node/Vitest regression, all 52 browser tests and clean working tree).
-- This regression verified the handoff update that recorded FR2-T03–T05 and the corrected #2882 result.
+- Full Regression run: #2884 / ID `41770424879`
+- Status: **GREEN** (all 15 workflow steps succeeded, including curriculum engine, architecture boundaries, maintained Node/Vitest regression, browser regression and clean working tree).
+
+The specification and this handoff update are newer documentation changes. Their exact final commit and Full Regression result must replace this baseline entry after the next regression completes.
 
 FR2-T03–T05 integration and regression correction:
 - Implementation commit: `91e6c21e64888fdde4b427ea4b008be2fd13ed50` added the mixed-representation configuration, grid target layout and three FR2 task pages.

@@ -120,11 +120,17 @@ The two conversion directions are also tested end to end:
 
 The analog hour-hand calculation uses hour-mark boundaries rather than rounding to the nearest hour. These browser interactions are technical integration tests only; they do not validate learning, developmental ordering or mastery claims.
 
+The most recent Clock accessibility change attempted to add an etmaal-half label but replaced the existing accessible labels. That change caused Full Regression #2868 to fail. The change was reverted as one coherent three-file restoration commit. Existing browser tests were preserved unchanged. The established accessible labels are restored:
+- large clock: `Analoge klok: 08:35`;
+- small clock option: `Analoge tijd 08:35`.
+
 No Supabase change was required for the browser-runtime and Clock Learning Interface work.
 
 ## 9. Current next engineering step
 
-Continue Clock Learning Interface development only where a distinct pedagogical interaction is specified. Both matching directions now share one validated contract. Next, review the pedagogical progression and task parameters (e.g. time precision, hour-cycle conventions and representations) before implementing more variants. Keep reading, setting and matching separate; do not infer developmental ordering from these synthetic demonstrations.
+The last attempted etmaal-half indicator must be redesigned without replacing existing accessible names. The intended design is an additional description (for example, via `aria-describedby`) that supplements the existing labels. Before implementation, inspect the exact restored DOM and browser-test contracts, then design the description lifecycle for both the large clock and mini clock options. Keep the existing accessible labels byte-for-byte intact and do not weaken or rewrite existing browser tests.
+
+The next build step is permitted only from a green Full Regression baseline. Do not add more Clock variants until the etmaal-description contract is correctly implemented and verified.
 
 Then assess whether the same interface/controller separation generalises to another Learning Interface. Do not add page-specific curriculum execution logic.
 
@@ -133,22 +139,18 @@ Do not invent a Clock curriculum skill, add scientific claims or freeze construc
 ## 10. Latest regression state
 
 Latest independently verified Full Regression:
-- Commit: `7be8e1da515794f8e4e98d2d2c6542be980afa54`
+- Commit: `abd0eaa5588c84293f403dd98c5aea6c3393a137`
 - Branch: `refactor/professional-v1`
-- Full Regression run: #2861 / ID `41703153983`
-- Status: **GREEN** (curriculum engine, architecture, Node, Vitest, browser regression and working-tree checks all succeeded).
+- Full Regression run: #2869 / ID `41763003507`
+- Status: **GREEN** (all 15 steps succeeded: dependency vulnerability check, Agenda/practice ownership boundaries, curriculum engine, architecture, Node, Vitest, Chromium browser regression and clean working tree).
 
-Recent Clock milestone commits:
-- `2c6f8ff99e7b21bdc8235efd2b0ff39b5c7f7a77` — correct analog hour-hand boundary calculation;
-- `15fcb0c1695845d5bbf46fc857da31a1ca5b8805` — Clock browser vertical slice and separated stylesheet;
-- `89f57cde009c5cb3bfd401ce94aeca4d75bacf65` — bridge follows the interface's current response representation;
-- `e00464383354d814285ee04f3f6689f45cf52922` — browser regression covers digital time setting;
-- `7fb1206b36bb91e6fa89e3c2f119d42b4884ebf1` — source and response representations are separated by task mode;
-- `899feba93ec5fc3ddb7b3023c3bda8787c5dff56` — distinct pedagogical task contracts;
-- `d028f17c51356fb3eb703bcec14926ddd7a79ea8` — controller response/evidence tied to task type;
-- `9600a2df56aa7dd061748617f79c0cb75732446c` — visual matching task and end-to-end browser coverage;
-- `cfdf3338ac0800716e5ffa4b8e61ddb476123599` — bidirectional source/option representations in the matching interface;
-- `7be8e1da515794f8e4e98d2d2c6542be980afa54` — controller persists the matching option representation in evidence.
+Previous failed run:
+- Commit: `96581da09090aaf1925a7710767d52a1fd3dfa1a`
+- Full Regression run: #2868 / ID `41719356966`
+- Status: **RED**.
+
+Restoration commit:
+- `abd0eaa5588c84293f403dd98c5aea6c3393a137` — restored the three Clock interface files to the last green baseline while preserving the existing browser tests.
 
 ## 11. Supabase
 

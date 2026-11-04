@@ -183,14 +183,24 @@ Important scientific/evidence boundary retained:
 
 Do not alter curriculum mastery rules or add a Supabase migration without a genuine persistence/runtime requirement. Do not add more Clock variants or invent a Clock curriculum skill.
 
+## 9A. FR2 task/evidence alignment audit and next step
+
+Audit document: `docs/curriculum/PacoGO_FR2_Task_Evidence_Alignment_Audit_v0.1.md`.
+
+The audit reviewed FR2-T01–T05 against the registry, pilot task set, C3 coding specification, C4 discriminating task set and current Fraction controller path. It found unresolved task-model/evidence-target mismatches (notably TM2/ET3–ET4 and TM5/ET2–ET6), an incomplete language-reduced condition for T05, and a boundary in the synthetic demo where the controller emits provisional evidence-assessment fields directly from correctness.
+
+Keep the five pages as synthetic technical demonstrations only. Do not use their generated observations as independently coded pilot evidence. Do not change FR2 registry mappings, C3 coding rules, mastery logic or Supabase as part of this audit.
+
+**Next concrete step:** create and review a versioned FR2 Task–Evidence Alignment Specification resolving target cardinality, raw observation versus C3 coding, T01/T02 explanation intent, T03/T05 ET4 coverage, T04 countertask purpose, and T05 language condition. Only then decide and implement any curriculum/task/runtime changes.
+
 ## 10. Latest regression state
 
 Latest independently verified Full Regression:
-- Commit: `cd235ae7364c828dfa15dec9725fa3cee4747567`
+- Commit: `4ca239fb27febc9d9f09922873f451dc1e7effb2`
 - Branch: `refactor/professional-v1`
-- Full Regression run: #2882 / ID `41769932499`
+- Full Regression run: #2883 / ID `41770074197`
 - Status: **GREEN** (all 17 steps succeeded, including curriculum engine, architecture boundaries, maintained Node/Vitest regression, all 52 browser tests and clean working tree).
-- No separate Browser proof workflow was triggered for this commit; the complete browser suite passed inside Full Regression #2882.
+- This regression verified the handoff update that recorded FR2-T03–T05 and the corrected #2882 result.
 
 FR2-T03–T05 integration and regression correction:
 - Implementation commit: `91e6c21e64888fdde4b427ea4b008be2fd13ed50` added the mixed-representation configuration, grid target layout and three FR2 task pages.

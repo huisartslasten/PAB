@@ -128,23 +128,26 @@ No Supabase change was required for the browser-runtime and Clock Learning Inter
 
 ## 9. Current next engineering step
 
-The last attempted etmaal-half indicator must be redesigned without replacing existing accessible names. The intended design is an additional description (for example, via `aria-describedby`) that supplements the existing labels. Before implementation, inspect the exact restored DOM and browser-test contracts, then design the description lifecycle for both the large clock and mini clock options. Keep the existing accessible labels byte-for-byte intact and do not weaken or rewrite existing browser tests.
+The accessibility-description implementation is committed but is not yet regression-verified. It adds a separate `aria-describedby` description to the large analog clock and each analog mini-clock option. Existing accessible names remain unchanged (`Analoge klok: 08:35` and `Analoge tijd 08:35`).
 
-The next build step is permitted only from a green Full Regression baseline. Do not add more Clock variants until the etmaal-description contract is correctly implemented and verified.
+The description explicitly states the 12-hour ambiguity: a hand position such as 08:35 can represent either 08:35 or 20:35. It does not falsely assign a morning/evening half from the analog face alone. The description nodes are visually hidden but available to assistive technology, and their content is refreshed on each render. Browser regression assertions were added while preserving the original assertions.
 
-Then assess whether the same interface/controller separation generalises to another Learning Interface. Do not add page-specific curriculum execution logic.
+Next action: verify the Full Regression for the current branch head. If red, stop and isolate the exact failure before any further edits. If green, inspect whether the same interface/controller separation generalises to another Learning Interface. Do not add page-specific curriculum execution logic.
 
 Do not invent a Clock curriculum skill, add scientific claims or freeze construct-specific mastery rules from synthetic browser data.
 
 ## 10. Latest regression state
 
 Latest independently verified Full Regression:
-- Commit: `abd0eaa5588c84293f403dd98c5aea6c3393a137`
+- Commit: `6d0754e4354215ddd8bb5f98642b4d6e3c5d908b`
 - Branch: `refactor/professional-v1`
-- Full Regression run: #2869 / ID `41763003507`
-- Status: **GREEN** (all 15 steps succeeded: dependency vulnerability check, Agenda/practice ownership boundaries, curriculum engine, architecture, Node, Vitest, Chromium browser regression and clean working tree).
+- Full Regression run: #2870 / ID `41763589505`
+- Status: **GREEN** (all 15 steps succeeded).
 
-Previous failed run:
+Current implementation commit:
+- `1d48c526583eeff133fd36abb1ccbc419c802189` — adds supplementary Clock descriptions and browser assertions. This commit has not yet had a Full Regression run; do not treat it as green.
+
+Earlier failed run:
 - Commit: `96581da09090aaf1925a7710767d52a1fd3dfa1a`
 - Full Regression run: #2868 / ID `41719356966`
 - Status: **RED**.

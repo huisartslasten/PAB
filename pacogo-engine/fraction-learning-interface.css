@@ -1,0 +1,25 @@
+.pacogo-fraction-interface{display:grid;gap:16px;color:#102b57}
+.pacogo-fraction-interface__title{margin:0;font-size:24px}
+.pacogo-fraction-interface__target{display:grid;justify-items:center;gap:12px;padding:18px;border-radius:16px;background:#eef7ff}
+.pacogo-fraction-interface__label,.pacogo-fraction-interface__options-label{font-weight:800}
+.pacogo-fraction-interface__options-label{margin:0}
+.pacogo-fraction-interface__options{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.pacogo-fraction-interface__option{min-height:110px;display:grid;place-items:center;padding:14px;border:2px solid #d8e7f4;border-radius:16px;background:#fbfdff;color:#102b57;cursor:pointer;font:inherit}
+.pacogo-fraction-interface__option.is-selected{border-color:#1787f2;background:#eef7ff;box-shadow:0 0 0 3px rgba(23,135,242,.12)}
+.pacogo-fraction-interface__option:focus-visible,.pacogo-fraction-interface__submit:focus-visible,.pacogo-fraction-interface__explanation:focus-visible{outline:3px solid #1787f2;outline-offset:3px}
+.pacogo-fraction-interface__response{display:grid;gap:8px}
+.pacogo-fraction-interface__explanation-label{display:grid;gap:8px;font-weight:700}
+.pacogo-fraction-interface__explanation{width:100%;box-sizing:border-box;border:1px solid #b8cbe0;border-radius:12px;padding:12px;font:inherit;resize:vertical}
+.pacogo-fraction-interface__submit{justify-self:start;border:0;border-radius:14px;padding:12px 20px;background:#1787f2;color:#fff;font:inherit;font-weight:800;cursor:pointer}
+.pacogo-fraction-interface__submit:disabled,.pacogo-fraction-interface__option:disabled{opacity:.55;cursor:not-allowed}
+.pacogo-fraction-interface__status{margin:0;padding:10px 12px;border-radius:12px;background:#eef8ff;color:#126fc9;font-weight:700}
+.pacogo-fraction-interface__status.is-error{background:#fff0f0;color:#b42318}
+.pacogo-fraction-representation{display:inline-grid;justify-items:center;align-items:center}
+.pacogo-fraction-representation--symbolic{grid-template-rows:auto 2px auto;min-width:52px;font-size:26px;font-weight:900;line-height:1.1}
+.pacogo-fraction-divider{width:100%;height:2px;background:currentColor}
+.pacogo-fraction-representation--area{width:min(100%,320px)}
+.pacogo-fraction-cells{display:grid;width:100%;min-height:54px;border:2px solid #102b57;border-radius:8px;overflow:hidden;background:#fff}
+.pacogo-fraction-cell{border-right:1px solid #102b57;background:#fff}
+.pacogo-fraction-cell:last-child{border-right:0}
+.pacogo-fraction-cell.is-shaded{background:#b8dcfa}
+@media(max-width:600px){.pacogo-fraction-interface__options{grid-template-columns:repeat(2,minmax(0,1fr))}}

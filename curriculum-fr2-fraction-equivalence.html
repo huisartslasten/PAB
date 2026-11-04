@@ -20,7 +20,7 @@
 <main>
   <section class="card">
     <div class="muted">PacoGO • FR2 • Breukequivalentie</div>
-    <h1>Breuken vergelijken met modellen</h1>
+    <h1>Welke breuk heeft dezelfde waarde?</h1>
     <p class="muted">Vergelijk de verdeelde vlakken. Elk model heeft even grote delen binnen hetzelfde geheel.</p>
     <div id="fraction-interface"></div>
   </section>
@@ -43,6 +43,7 @@
   const runtime = createBrowserVerticalSliceRuntime({ registry, taskSet });
   const taskId = "FR2-T01";
   const task = runtime.getTask(taskId);
+  const responseProcessRequired = task.response_process_required === true;
   const config = {
     targetFraction: { numerator: 1, denominator: 2 },
     options: [
@@ -50,8 +51,8 @@
       { id: "neq-3-4", fraction: { numerator: 3, denominator: 4 } }
     ],
     representation: "area_model",
-    responseProcessRequired: true,
-    labels: { title: "Welke breuk heeft dezelfde waarde?", explanation: "Leg uit hoe je kunt zien dat de breuken even groot zijn." }
+    responseProcessRequired,
+    labels: { title: "Vergelijk de modellen", explanation: "Leg uit hoe je kunt zien dat de breuken even groot zijn." }
   };
   const controller = createFractionEquivalenceController({
     task, studentKey: "browser-synthetic-fr2", renderer: {},
@@ -87,7 +88,7 @@
     }
   });
   bridge = createFractionInterfaceControllerBridge({
-    interfaceInstance, controller, responseProcessRequired: config.responseProcessRequired
+    interfaceInstance, controller, responseProcessRequired
   });
 </script>
 </body>

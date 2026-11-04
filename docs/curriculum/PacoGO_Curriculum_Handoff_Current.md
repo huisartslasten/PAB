@@ -88,9 +88,12 @@ Browser vertical slices using the shared runtime/task-bound contract:
 - `curriculum-a1-numberline.html` — A1-T01;
 - `curriculum-b1-addition.html` — B1-T01;
 - `curriculum-fr2-fraction-equivalence.html` — FR2-T01;
-- `curriculum-fr2-fractions.html` — FR2-T02.
+- `curriculum-fr2-fractions.html` — FR2-T02;
+- `curriculum-fr2-representation-transfer.html` — FR2-T03;
+- `curriculum-fr2-surface-countertask.html` — FR2-T04;
+- `curriculum-fr2-language-reduced-transfer.html` — FR2-T05.
 
-All four browser slices route their observation submission through `runTaskObservation`; page code cannot accidentally submit evidence under a different task skill after resolving a task.
+All seven browser slices route their observation submission through `runTaskObservation`; page code cannot accidentally submit evidence under a different task skill after resolving a task.
 
 FR2 controller lifecycle explicitly prevents duplicate submission after an observation has been emitted.
 
@@ -143,13 +146,23 @@ Clock remains a reusable interface prototype, not a registered curriculum skill.
 
 Design document: `docs/curriculum/PacoGO_Fraction_Learning_Interface_Design_v0.1.md`.
 
-The Fraction interface is implemented as one reusable instrument shared by FR2-T01 and FR2-T02. It includes:
+The Fraction interface is implemented as one reusable instrument shared by FR2-T01–T05. It includes:
 - renderer-independent interface contract and configuration;
-- `area_model` renderer for FR2-T01;
-- `symbolic_fraction` renderer for FR2-T02;
+- `area_model` and `symbolic_fraction` renderers;
+- separate `targetRepresentation` and `optionRepresentation` settings for mixed-representation tasks;
+- `bar` and `grid` area-model target layouts;
 - shared option-selection and learner-justification state;
 - bridge to the existing Fraction evidence controller;
 - task-bound observation submission through `runTaskObservation({ taskId, observation })`.
+
+Task coverage:
+- FR2-T01: area-model target and area-model options;
+- FR2-T02: symbolic target and symbolic options;
+- FR2-T03: area-model target and symbolic options for representation transfer;
+- FR2-T04: grid area-model target and symbolic options for a changed visual surface;
+- FR2-T05: area-model target and symbolic options for language-reduced visual transfer.
+
+The task-oriented representation label is stored separately by the controller for the observation. It is not passed as a visual renderer setting. The fix for this boundary is commit `cd235ae7364c828dfa15dec9725fa3cee4747567`.
 
 Implementation components:
 - `pacogo-engine/fraction-learning-interface-contract.js`;
@@ -158,7 +171,7 @@ Implementation components:
 - `pacogo-engine/fraction-interface-controller-bridge.js`;
 - `pacogo-engine/fraction-learning-interface.css`;
 - `pacogo-engine/fraction-learning-interface.test.js`;
-- integrated pages `curriculum-fr2-fraction-equivalence.html` (FR2-T01) and `curriculum-fr2-fractions.html` (FR2-T02).
+- integrated pages `curriculum-fr2-fraction-equivalence.html` (FR2-T01), `curriculum-fr2-fractions.html` (FR2-T02), `curriculum-fr2-representation-transfer.html` (FR2-T03), `curriculum-fr2-surface-countertask.html` (FR2-T04) and `curriculum-fr2-language-reduced-transfer.html` (FR2-T05).
 
 The architecture separates pedagogical/function configuration, interaction/state, and visual/rendering. FR2 task IDs, evidence IDs and curriculum execution remain outside the reusable interface. The required-justification behavior is derived from the task contract, not hardcoded in the interface.
 
@@ -173,11 +186,17 @@ Do not alter curriculum mastery rules or add a Supabase migration without a genu
 ## 10. Latest regression state
 
 Latest independently verified Full Regression:
-- Commit: `3b7f69163778c231368885c658a16bc55a0aa394`
+- Commit: `cd235ae7364c828dfa15dec9725fa3cee4747567`
 - Branch: `refactor/professional-v1`
-- Full Regression run: #2879 / ID `41765807295`
-- Status: **GREEN** (all 15 steps succeeded, including curriculum engine, architecture boundaries, maintained Node/Vitest regression, browser regression and clean working tree).
-- Additional browser proof: #630 / ID `41765807280`, same commit, **GREEN**.
+- Full Regression run: #2882 / ID `41769932499`
+- Status: **GREEN** (all 17 steps succeeded, including curriculum engine, architecture boundaries, maintained Node/Vitest regression, all 52 browser tests and clean working tree).
+- No separate Browser proof workflow was triggered for this commit; the complete browser suite passed inside Full Regression #2882.
+
+FR2-T03–T05 integration and regression correction:
+- Implementation commit: `91e6c21e64888fdde4b427ea4b008be2fd13ed50` added the mixed-representation configuration, grid target layout and three FR2 task pages.
+- Full Regression #2881 / ID `41767508513` was **RED**: 49 tests passed; the three new T03–T05 browser tests failed because task-oriented representation labels were incorrectly passed into the interface's visual representation field.
+- Root-cause correction: `cd235ae7364c828dfa15dec9725fa3cee4747567` separates `controllerRepresentation` from visual interface configuration in all three pages. The controller continues to preserve the task-oriented representation in the observation.
+- Full Regression #2882 verified the correction: all 52 browser tests passed and the working tree was clean.
 
 Fraction implementation:
 - Initial implementation: `48c1bb1e01b8ab95c55b40c3d9259c9840a32059`.

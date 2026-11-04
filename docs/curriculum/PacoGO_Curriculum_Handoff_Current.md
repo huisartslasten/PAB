@@ -126,30 +126,58 @@ The most recent Clock accessibility change attempted to add an etmaal-half label
 
 No Supabase change was required for the browser-runtime and Clock Learning Interface work.
 
-## 9. Current next engineering step
+## 9. Current Learning Interface work and next step
 
-The accessibility-description implementation is committed but is not yet regression-verified. It adds a separate `aria-describedby` description to the large analog clock and each analog mini-clock option. Existing accessible names remain unchanged (`Analoge klok: 08:35` and `Analoge tijd 08:35`).
+### Clock
 
-The description explicitly states the 12-hour ambiguity: a hand position such as 08:35 can represent either 08:35 or 20:35. It does not falsely assign a morning/evening half from the analog face alone. The description nodes are visually hidden but available to assistive technology, and their content is refreshed on each render. Browser regression assertions were added while preserving the original assertions.
+The Clock Learning Interface is technically complete as a reusable browser prototype. It supports:
+- analog source → digital time entry;
+- digital source → analog hand setting;
+- matching representations in both directions;
+- task-specific interaction/evidence recording;
+- accessible descriptions that communicate the 12-hour ambiguity without replacing the established accessible names.
 
-Architecture audit after Full Regression #2872 (commit `997f90249c846e3cef350bad038cecc46674e992`): the Clock currently has a reusable presentation module and a separate controller/bridge, but this separation has not yet generalised to a second Learning Interface. `learning-interface-contract.js` is currently a standalone state-container helper; the Clock and Fraction runtime do not consume it. FR2-T01 and FR2-T02 still build their option presentation and event wiring directly inside their HTML pages, while using a separate fraction controller. The two pages duplicate parts of the presentation logic.
+Clock remains a reusable interface prototype, not a registered curriculum skill. Its identifiers and browser demonstrations are synthetic fixtures, not real learner evidence or scientific validation.
 
-Important curriculum-contract finding: FR2-T01 and FR2-T02 both declare `response_process_required: true` and require a representation-based/equivalence justification. Their current browser pages do not collect a learner justification, even though the controller can accept an optional explanation. Do not treat the current FR2 pages as a complete pedagogical reference or silently mark this requirement satisfied.
+### Fraction — design completed, implementation not started
 
-Next action: design the Fraction Learning Interface as the second generalisation case before implementation. Define its pedagogical inputs and required learner response process from the FR2 task contracts; separate the representation/rendering layer from selection/interaction state and from the existing fraction evidence controller. Preserve the shared browser vertical-slice runtime and task-bound observation submission. Do not promote curriculum claims or alter mastery logic. Do not add page-specific curriculum execution logic.
+Design document: `docs/curriculum/PacoGO_Fraction_Learning_Interface_Design_v0.1.md`.
 
-Do not invent a Clock curriculum skill, add scientific claims or freeze construct-specific mastery rules from synthetic browser data.
+The Fraction interface is the second generalisation case. One reusable interface will support at least:
+- `area_model` rendering for FR2-T01;
+- `symbolic_fraction` rendering for FR2-T02;
+- shared selection and learner-justification interaction state;
+- a bridge to the existing fraction evidence controller;
+- task-bound submission through `runTaskObservation({ taskId, observation })`.
+
+The architecture separates pedagogical/function configuration, interaction/state, and visual/rendering. FR2 task IDs, evidence IDs and curriculum execution remain outside the reusable interface.
+
+Important findings preserved in the design:
+- FR2-T01 and FR2-T02 require a learner justification (`response_process_required: true`), but their current pages do not collect one.
+- The current FR2-T01 page does not communicate the area-model comparison cleanly; the target relationship is effectively exposed in its static model.
+- FR2-T01/T02 currently map to FR2.ET1 (recognition) while requesting justification. This is an open curriculum/evidence alignment question. Preserve raw explanation data, but do not silently map it to FR2.ET3 or infer explanatory mastery.
+- Correct selection and explanation quality must remain separate. Do not automatically score free-text explanations or infer misconceptions from them.
+
+Next engineering step: after the design commit has a green Full Regression, implement the renderer-independent Fraction interface contract, then the area-model and symbolic renderers, interaction state and controller bridge. Integrate FR2-T01 and FR2-T02 through the same interface. Add tests for required justification, raw response preservation, representation correctness, accessibility, task binding and duplicate submission. Do not alter curriculum mastery rules or add a Supabase migration without a genuine persistence/runtime requirement.
+
+Do not add more Clock variants or invent a Clock curriculum skill.
 
 ## 10. Latest regression state
 
 Latest independently verified Full Regression:
-- Commit: `997f90249c846e3cef350bad038cecc46674e992`
+- Commit: `4cb246dd7a59a7d0ad1dcc9783491956d1a74432`
 - Branch: `refactor/professional-v1`
-- Full Regression run: #2872 / ID `41764559388`
+- Full Regression run: #2873 / ID `41764776951`
 - Status: **GREEN** (all 15 steps succeeded, including curriculum engine, architecture boundaries, maintained Node/Vitest regression, browser regression and clean working tree).
 
-Clock accessibility implementation commit:
-- `1d48c526583eeff133fd36abb1ccbc419c802189` — adds supplementary Clock descriptions and browser assertions. Its dedicated browser proof run #629 / ID `41764521463` is **GREEN**; the full regression for branch head is recorded above.
+New Fraction design document commit:
+- `2a69eacddbedf3fd88f542de7e93bb53427d779d`
+- Design-only change; no implementation code changed.
+- Full Regression for this commit has not yet been observed. Do not begin implementation until the design commit and the handoff update commit have passed Full Regression.
+
+Earlier Clock accessibility implementation:
+- `1d48c526583eeff133fd36abb1ccbc419c802189` — supplementary Clock descriptions and browser assertions; dedicated browser proof #629 / ID `41764521463` was **GREEN**.
+- The full regression for the subsequent branch head is recorded above.
 
 Earlier failed run:
 - Commit: `96581da09090aaf1925a7710767d52a1fd3dfa1a`

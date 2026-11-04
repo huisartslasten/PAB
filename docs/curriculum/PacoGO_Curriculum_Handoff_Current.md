@@ -139,41 +139,52 @@ The Clock Learning Interface is technically complete as a reusable browser proto
 
 Clock remains a reusable interface prototype, not a registered curriculum skill. Its identifiers and browser demonstrations are synthetic fixtures, not real learner evidence or scientific validation.
 
-### Fraction — design completed, implementation not started
+### Fraction — reusable interface implemented
 
 Design document: `docs/curriculum/PacoGO_Fraction_Learning_Interface_Design_v0.1.md`.
 
-The Fraction interface is the second generalisation case. One reusable interface will support at least:
-- `area_model` rendering for FR2-T01;
-- `symbolic_fraction` rendering for FR2-T02;
-- shared selection and learner-justification interaction state;
-- a bridge to the existing fraction evidence controller;
-- task-bound submission through `runTaskObservation({ taskId, observation })`.
+The Fraction interface is implemented as one reusable instrument shared by FR2-T01 and FR2-T02. It includes:
+- renderer-independent interface contract and configuration;
+- `area_model` renderer for FR2-T01;
+- `symbolic_fraction` renderer for FR2-T02;
+- shared option-selection and learner-justification state;
+- bridge to the existing Fraction evidence controller;
+- task-bound observation submission through `runTaskObservation({ taskId, observation })`.
 
-The architecture separates pedagogical/function configuration, interaction/state, and visual/rendering. FR2 task IDs, evidence IDs and curriculum execution remain outside the reusable interface.
+Implementation components:
+- `pacogo-engine/fraction-learning-interface-contract.js`;
+- `pacogo-engine/fraction-learning-interface-renderers.js`;
+- `pacogo-engine/fraction-learning-interface.js`;
+- `pacogo-engine/fraction-interface-controller-bridge.js`;
+- `pacogo-engine/fraction-learning-interface.css`;
+- `pacogo-engine/fraction-learning-interface.test.js`;
+- integrated pages `curriculum-fr2-fraction-equivalence.html` (FR2-T01) and `curriculum-fr2-fractions.html` (FR2-T02).
 
-Important findings preserved in the design:
-- FR2-T01 and FR2-T02 require a learner justification (`response_process_required: true`), but their current pages do not collect one.
-- The current FR2-T01 page does not communicate the area-model comparison cleanly; the target relationship is effectively exposed in its static model.
-- FR2-T01/T02 currently map to FR2.ET1 (recognition) while requesting justification. This is an open curriculum/evidence alignment question. Preserve raw explanation data, but do not silently map it to FR2.ET3 or infer explanatory mastery.
-- Correct selection and explanation quality must remain separate. Do not automatically score free-text explanations or infer misconceptions from them.
+The architecture separates pedagogical/function configuration, interaction/state, and visual/rendering. FR2 task IDs, evidence IDs and curriculum execution remain outside the reusable interface. The required-justification behavior is derived from the task contract, not hardcoded in the interface.
 
-Next engineering step: after the design commit has a green Full Regression, implement the renderer-independent Fraction interface contract, then the area-model and symbolic renderers, interaction state and controller bridge. Integrate FR2-T01 and FR2-T02 through the same interface. Add tests for required justification, raw response preservation, representation correctness, accessibility, task binding and duplicate submission. Do not alter curriculum mastery rules or add a Supabase migration without a genuine persistence/runtime requirement.
+The browser regression verifies that submission is blocked when required explanation is absent, that the learner's raw explanation is preserved in the observation, and that successful interaction does not automatically award mastery. The existing controller/runtime and curriculum decision boundaries remain authoritative.
 
-Do not add more Clock variants or invent a Clock curriculum skill.
+Important scientific/evidence boundary retained:
+- FR2-T01/T02 currently map to FR2.ET1 (recognition) while requesting justification. This remains an open curriculum/evidence alignment question. Preserve raw explanation data, but do not silently map it to FR2.ET3 or infer explanatory mastery.
+- Correct selection and explanation quality remain separate. Do not automatically score free-text explanations or infer misconceptions from them.
+
+Do not alter curriculum mastery rules or add a Supabase migration without a genuine persistence/runtime requirement. Do not add more Clock variants or invent a Clock curriculum skill.
 
 ## 10. Latest regression state
 
 Latest independently verified Full Regression:
-- Commit: `4cb246dd7a59a7d0ad1dcc9783491956d1a74432`
+- Commit: `3b7f69163778c231368885c658a16bc55a0aa394`
 - Branch: `refactor/professional-v1`
-- Full Regression run: #2873 / ID `41764776951`
+- Full Regression run: #2879 / ID `41765807295`
 - Status: **GREEN** (all 15 steps succeeded, including curriculum engine, architecture boundaries, maintained Node/Vitest regression, browser regression and clean working tree).
+- Additional browser proof: #630 / ID `41765807280`, same commit, **GREEN**.
 
-New Fraction design document commit:
-- `2a69eacddbedf3fd88f542de7e93bb53427d779d`
-- Design-only change; no implementation code changed.
-- Full Regression for this commit has not yet been observed. Do not begin implementation until the design commit and the handoff update commit have passed Full Regression.
+Fraction implementation:
+- Initial implementation: `48c1bb1e01b8ab95c55b40c3d9259c9840a32059`.
+- Regression #2876 / ID `41765452365` was **RED**. The failure exposed a page heading contract mismatch; inspection also found the FR2-T02 browser test did not exercise the required explanation contract.
+- Root-cause corrections: `02b32891997ace53c2bce04f621725fbf22799d2` and `45a3cb74c5288cc15d061dd0430189a713daf249` restored the established page heading and derived the explanation requirement from task data.
+- Test correction: `3b7f69163778c231368885c658a16bc55a0aa394` updates the browser test to exercise the real interface selector, verify missing explanations are rejected, submit an actual explanation, and verify raw explanation preservation and no automatic mastery.
+- The corrected implementation and browser test passed Full Regression #2879 and browser proof #630.
 
 Earlier Clock accessibility implementation:
 - `1d48c526583eeff133fd36abb1ccbc419c802189` — supplementary Clock descriptions and browser assertions; dedicated browser proof #629 / ID `41764521463` was **GREEN**.

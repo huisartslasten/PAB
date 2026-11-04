@@ -4,6 +4,9 @@ const pageUrl='http://127.0.0.1:4173/curriculum-clock-controller-interface.html'
 test('Clock analog source is read and answered through digital input',async({page})=>{
  await page.goto(pageUrl);const face=page.locator('.pacogo-clock__face');
  await expect(face).toHaveAttribute('aria-label','Analoge klok: 08:35');
+ const faceDescriptionId=await face.getAttribute('aria-describedby');
+ expect(faceDescriptionId).toBeTruthy();
+ await expect(page.locator(`#${faceDescriptionId}`)).toHaveText('Deze wijzerstand kan zowel 08:35 als 20:35 betekenen.');
  await expect(page.locator('.pacogo-clock__digital')).toHaveText('--:--');
  await expect(page.locator('.pacogo-clock__controls')).toBeVisible();
  await page.locator('.pacogo-clock__hour').fill('8');await page.locator('.pacogo-clock__minute').fill('35');
@@ -24,6 +27,7 @@ test('Clock digital source is set and answered through analog hand interaction',
  const target={x:faceBox.x+faceBox.width/2+Math.sin(angle)*radius,y:faceBox.y+faceBox.height/2-Math.cos(angle)*radius};
  await page.mouse.move(start.x,start.y);await page.mouse.down();await page.mouse.move(target.x,target.y,{steps:8});await page.mouse.up();
  await expect(face).toHaveAttribute('aria-label','Analoge klok: 08:35');
+ await expect(page.locator(`#${await face.getAttribute('aria-describedby')}`)).toHaveText('Deze wijzerstand kan zowel 08:35 als 20:35 betekenen.');
  await page.getByRole('button',{name:'Controleer antwoord'}).click();await expect(page.locator('#status')).toContainText('Goed');
  const trace=JSON.parse(await page.locator('#trace').textContent());
  expect(trace.task_type).toBe('set_analog_clock');expect(trace.correctness).toBe(true);expect(trace.representation).toBe('analog_time');expect(trace.event_count).toBeGreaterThanOrEqual(3);
@@ -49,6 +53,9 @@ test('Clock digital source can be matched to an analog clock option',async({page
  await expect(page.locator('.pacogo-clock__option-face')).toHaveCount(3);
  const choice=page.locator('.pacogo-clock__option[data-option-id="option-b"]');
  await expect(choice).toHaveAttribute('aria-label','Analoge tijd 08:35');
+ const optionDescriptionId=await choice.getAttribute('aria-describedby');
+ expect(optionDescriptionId).toBeTruthy();
+ await expect(page.locator(`#${optionDescriptionId}`)).toHaveText('Deze wijzerstand kan zowel 08:35 als 20:35 betekenen.');
  await choice.click();await page.getByRole('button',{name:'Controleer antwoord'}).click();
  await expect(page.locator('#status')).toContainText('Goed');
  const trace=JSON.parse(await page.locator('#trace').textContent());

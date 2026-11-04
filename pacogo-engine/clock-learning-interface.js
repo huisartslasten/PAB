@@ -2,6 +2,11 @@ import { angleFromPointer, minuteFromAngle, hourFromAngle } from './clock-analog
 import { validateClockTaskDefinition } from './clock-task-contract.js';
 
 function formatDigitalTime({ hour, minute }) { return `${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`; }
+function describeAnalogClockTime({ hour, minute }) {
+  const dialHour = hour % 12;
+  return `Deze wijzerstand kan zowel ${formatDigitalTime({hour:dialHour,minute})} als ${formatDigitalTime({hour:dialHour+12,minute})} betekenen.`;
+}
+let clockDescriptionInstanceSequence = 0;
 function assertClockMode(mode) {
   if (!['analog_to_digital','digital_to_analog','match_representations'].includes(mode)) throw new TypeError('mode must be analog_to_digital, digital_to_analog or match_representations');
 }
@@ -30,6 +35,7 @@ function createClockLearningInterface({
 
   const target={...targetTime};
   const responseRepresentation=responseRepresentationForMode(mode);
+  const descriptionPrefix=`pacogo-clock-${++clockDescriptionInstanceSequence}`;
   const optionRepresentation=taskContract?.optionRepresentation||null;
   let responseTime=mode==='digital_to_analog'?{...(initialTime||{hour:12,minute:0})}:null;
   let selectedOptionId=null,locked=false,activeHand=null;
@@ -65,6 +71,11 @@ function createClockLearningInterface({
     </div>`;
 
   const root=mount.querySelector('.pacogo-clock'),face=mount.querySelector('.pacogo-clock__face');
+  const faceDescription=document.createElement('span');
+  faceDescription.id=`${descriptionPrefix}-face-description`;
+  faceDescription.className='pacogo-clock__sr-only';
+  mount.append(faceDescription);
+  face.setAttribute('aria-describedby',faceDescription.id);
   const hourHand=mount.querySelector('.pacogo-clock__hand--hour'),minuteHand=mount.querySelector('.pacogo-clock__hand--minute');
   const digital=mount.querySelector('.pacogo-clock__digital'),digitalLabel=mount.querySelector('.pacogo-clock__digital-label');
   const optionsContainer=mount.querySelector('.pacogo-clock__options'),hourInput=mount.querySelector('.pacogo-clock__hour');
@@ -93,7 +104,7 @@ function createClockLearningInterface({
     digital.textContent=digitalTime?formatDigitalTime(digitalTime):'--:--';
     digitalLabel.textContent=mode==='digital_to_analog'||isDigitalMatchSource?'Digitale opdracht':isMatching?'Kies de passende digitale tijd':'Jouw digitale antwoord';
     optionsContainer.hidden=!isMatching;optionsContainer.replaceChildren();
-    if(isMatching) for(const option of options){
+    if(isMatching) for(const [optionIndex,option] of options.entries()){
       const button=document.createElement('button');button.type='button';button.className='pacogo-clock__option';
       button.dataset.optionId=option.option_id;button.setAttribute('aria-pressed',String(selectedOptionId===option.option_id));
       button.disabled=locked;if(selectedOptionId===option.option_id)button.classList.add('is-selected');
@@ -108,12 +119,19 @@ function createClockLearningInterface({
         optionFace.append(optionHour,optionMinute);button.append(optionFace);
         button.setAttribute('aria-label',`Analoge tijd ${formatDigitalTime(option.time)}`);
       }
+      const optionDescription=document.createElement('span');
+      optionDescription.id=`${descriptionPrefix}-option-${optionIndex+1}-description`;
+      optionDescription.className='pacogo-clock__sr-only';
+      optionDescription.textContent=describeAnalogClockTime(option.time);
+      button.setAttribute('aria-describedby',optionDescription.id);
+      button.append(optionDescription);
       button.addEventListener('click',()=>selectRepresentation(option.option_id));optionsContainer.append(button);
     }
     hourInput.value=responseTime?responseTime.hour:'';
     minuteInput.value=responseTime?responseTime.minute:'';
     controls.hidden=mode!=='analog_to_digital';
     face.setAttribute('aria-label',`Analoge klok: ${formatDigitalTime(analogTime)}`);
+    faceDescription.textContent=describeAnalogClockTime(analogTime);
     face.dataset.interactive=String(mode==='digital_to_analog');
     hint.textContent=mode==='analog_to_digital'?'Lees de analoge klok en voer de digitale tijd in.':
       mode==='digital_to_analog'?'Lees de digitale opdracht en stel de analoge klok in.':

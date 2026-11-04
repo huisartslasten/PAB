@@ -39,10 +39,10 @@
   const taskId = "FR2-T05";
   const task = runtime.getTask(taskId);
   const responseProcessRequired = task.response_process_required === true;
+  const controllerRepresentation = "low_language_visual_transfer";
   const config = {
     targetFraction: {"numerator":4,"denominator":6},
     options: [{"id":"two-thirds","label":"2/3","fraction":{"numerator":2,"denominator":3}},{"id":"four-sixths","label":"4/6","fraction":{"numerator":4,"denominator":6}},{"id":"three-fifths","label":"3/5","fraction":{"numerator":3,"denominator":5}}],
-    representation: "low_language_visual_transfer",
     targetRepresentation: "area_model",
     optionRepresentation: "symbolic_fraction",
     targetLayout: "bar",
@@ -55,7 +55,7 @@
   const controller = createFractionEquivalenceController({
     task, studentKey: "browser-synthetic-fr2", renderer: {},
     targetFraction: config.targetFraction, options: config.options,
-    representation: config.representation, responseType: "language_reduced_equivalence_transfer",
+    representation: controllerRepresentation, responseType: "language_reduced_equivalence_transfer",
     provenance: { page: "fr2-t05-learning-interface" }
   });
   let bridge;

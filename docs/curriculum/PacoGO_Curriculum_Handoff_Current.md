@@ -344,11 +344,25 @@ Findings to carry into the reconciliation:
 
 The exercise does **not** establish inter-rater agreement, coder reliability, quality-scale calibration, construct validity, mastery validity or next-action validity. Do not choose a final quality scale, reliability coefficient or threshold from these synthetic cases.
 
-**Next concrete step:** revise the C3 reconciliation proposal to incorporate these boundaries, then prepare a blinded coder packet and a separate adjudication key. Actual independent human coding will still be required to estimate coding reliability. Do not change runtime, curriculum mappings, mastery rules, schemas or Supabase as part of this documentation step.
+**Next concrete step:** prepare a blinded coder packet and a separate adjudication key from proposal v0.2. Coders must receive the packet without the key and code independently before any discussion. Record disagreements and revise anchors transparently. This synthetic exercise can assess usability/feasibility only; it is not empirical learner validation. Do not change runtime, curriculum mappings, mastery rules, schemas or Supabase.
+
+**C3 reconciliation proposal revised to v0.2:** `docs/curriculum/PacoGO_C3_Canonical_Codebook_Reconciliation_Proposal_v0.2.md` (commit `dff0733b5cce3e2d971e8bb11b6437a533e9cf3d`). The v0.1 proposal remains historical. Version 0.2 incorporates the six-case synthetic anchor exercise and makes the evidence/measurement boundaries more explicit:
+- task-instance alignment and response-to-target relation are separate candidate dimensions;
+- raw process collection/availability, target-specific evidence status and coding workflow/readiness are separate;
+- `NO_RESPONSE` is a raw event, not automatically evidence absence;
+- objective correctness, evidence status, quality, independence and contradiction remain distinct;
+- assistance is recorded as observed events before a target-specific independence judgement;
+- contradiction is target-specific and requires traceable rationale;
+- one immutable response observation may have separate target-specific assessments; coder records and adjudication remain versioned and traceable;
+- the quality scale, final category anchors, reliability coefficient/threshold, coder design and canonical schema/cardinality remain unresolved.
+
+**Approval boundary:** v0.2 is a candidate design proposal only, not an approved canonical codebook. No curriculum/SLO/skill/development/claim/evidence-target/mastery meaning, registry, task mapping, runtime, learner-state, schema, persistence or Supabase change is authorized. The singular-versus-array schema conflict remains open. Synthetic FR2/browser cases remain technical fixtures, not empirical learner data or validation.
+
+**Next concrete step:** prepare a blinded coder packet and a separate adjudication key. The packet must not expose the key; independent coding must precede discussion/adjudication. Use results only to assess clarity/feasibility and revise anchors; actual coder reliability requires an appropriately designed human-coder study.
 
 **Latest verified baseline before this handoff update:**
 - Branch: `refactor/professional-v1`
-- Commit: `bed45c993cc1a0f8423c1891b61fcc4726836f2e`
-- Full Regression run: #2891 / ID `41819730230`
-- Status: **GREEN** — GitHub Actions reports `completed / success` for this exact commit.
+- Commit: `dff0733b5cce3e2d971e8bb11b6437a533e9cf3d`
+- Full Regression run: #2895 / ID `41838914744`
+- Status: **GREEN** — GitHub Actions reports `completed / success` for this exact commit; all 15 workflow steps succeeded, including browser regression and clean-working-tree verification.
 - This handoff update is a new commit and requires its own Full Regression.

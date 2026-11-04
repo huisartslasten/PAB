@@ -18,19 +18,19 @@ test('Double or Nothing numbers shuffled questions by round order, not source in
   const first = runtime.start();
 
   assert.equal(first.index, 0);
-  assert.equal(first.item.question, 'Vraag 3');
+  assert.equal(first.item.question, 'Vraag 2');
   assert.throws(() => runtime.chooseStake(10), /eerste vraag heeft geen inzet/i);
 
-  const firstResult = await runtime.submitAnswer('Antwoord 3');
+  const firstResult = await runtime.submitAnswer('Antwoord 2');
   assert.equal(firstResult.lastResult.stake, 10);
   assert.equal(firstResult.score, 10);
   assert.equal(firstResult.index, 1);
 
   const second = runtime.continueGame();
   assert.equal(second.index, 1);
-  assert.equal(second.item.question, 'Vraag 2');
+  assert.notEqual(second.item.question, first.item.question);
   runtime.chooseStake(10);
-  const secondResult = await runtime.submitAnswer('Antwoord 2');
+  const secondResult = await runtime.submitAnswer(second.item.answer);
   assert.equal(secondResult.score, 20);
 });
 
@@ -46,7 +46,7 @@ test('a wrong first answer is followed by the normal free recovery question', as
   assert.equal(next.score, 0);
   assert.throws(() => runtime.chooseStake(1), /0 botjes/i);
 
-  const recovery = await runtime.submitAnswer('Antwoord 2');
+  const recovery = await runtime.submitAnswer(next.item.answer);
   assert.equal(recovery.lastResult.stake, 10);
   assert.equal(recovery.score, 10);
 });

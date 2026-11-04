@@ -260,3 +260,27 @@ No Supabase schema/runtime change is required for the current browser vertical-s
 ## 12. Strategy
 
 **Build the brain → prove the vertical chain → build reusable Learning Interfaces/controllers → connect multiple curriculum cases through the same engine → empirically validate with real learners → then build the larger Deluxe world.**
+
+## 13. Current C3 reconciliation proposal and curriculum boundary (2026-11-04)
+
+**Curriculum content is a fixed project boundary for this work.** Existing skills are based on the SLO core goals and intermediate goals. Do not recreate, rewrite, restructure, replace or independently reinterpret the curriculum, skills, developments, learning progression, SLO alignment or mastery criteria. The current work concerns the technical/scientific handling of observations and evidence for the already-defined curriculum; it is not a curriculum redesign.
+
+If a proposed evidence/codebook/runtime change appears to require changing a skill, development, SLO mapping, learning progression, claim meaning or mastery criterion, stop and ask the product owner before proceeding. Do not resolve such questions by making an independent design choice.
+
+**C3 reconciliation proposal:** `docs/curriculum/PacoGO_C3_Canonical_Codebook_Reconciliation_Proposal_v0.1.md`.
+
+- This is a design-only proposal to reconcile inconsistent terminology across the current C3 specification, Evidence Coding Manual and Pilot_DataSchema.
+- It distinguishes task-to-target alignment from response-to-target relation; raw process availability/missingness from coded evidence status and coding workflow readiness; correctness from evidence interpretation; and assistance events from target-specific independence judgement.
+- It proposes explicit contradiction states and separate, traceable target-specific assessments linked to an immutable task-instance response episode.
+- It does not select a final quality scale, reliability statistic or universal threshold. Those require a defined measurement design and empirical feasibility work.
+- The proposal is not an approved canonical codebook and does not authorize runtime, registry, task mapping, curriculum, mastery, learner-state, schema or Supabase changes.
+- The FR2 T01–T05 observations remain synthetic technical demonstrations. The proposal does not validate PacoGO or establish learner mastery.
+
+**Next concrete step:** review the C3 reconciliation proposal as a measurement/evidence contract only. Any unresolved question that touches curriculum meaning or SLO alignment must be brought to the product owner before any design decision or implementation. Only after explicit approval of the evidence contract may a canonical codebook/schema implementation be considered.
+
+**Latest verified baseline before this handoff update:**
+- Branch: `refactor/professional-v1`
+- Commit: `a3c2b26fbec40b6613652576fdc9f2d7b35667eb`
+- Full Regression run ID: `41817906418`
+- Status: **GREEN** — all workflow steps completed successfully, including curriculum engine, architecture boundary, Node/Vitest, browser regression and clean working tree.
+- This handoff update is a new commit and requires its own Full Regression. Replace this baseline with the exact handoff commit and verified result once that run completes.

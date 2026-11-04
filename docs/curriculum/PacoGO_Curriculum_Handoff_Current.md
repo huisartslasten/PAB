@@ -202,11 +202,13 @@ Specification: `docs/curriculum/PacoGO_FR2_Task_Evidence_Alignment_Specification
 Created as candidate design-only work after Full Regression #2884 was verified GREEN on baseline commit `3e9b9158f8042eca678deb7c550b997a0c46f1bf`.
 
 Key proposed boundaries:
-- one learner response = one immutable raw observation;
+- one administered task-instance response episode = one immutable raw observation, including ordered attempts/events; separately administered bundle instances get separate observations linked by a contrast-set/bundle identifier;
+- raw process availability is separate from C3 coded evidence status;
 - separate target-specific C3 assessment records, with coder/codebook provenance;
 - one observation assessed against multiple targets is still one observation and is not multiple independent evidence;
 - task-model target lists are opportunities, not automatic target assessments;
 - resolve the singular target/coding fields in Pilot_DataSchema v0.2 against the array target linkage in Empirical_Observation_Schema v0.1 before creating a new canonical schema version;
+- a second source-level inconsistency was found: C3 specification v0.1, Evidence Coding Manual v0.1 and Pilot_DataSchema v0.2 differ in target-match categories, evidence/process status, quality scale and independence granularity. These must be reconciled in a versioned canonical codebook/schema; do not silently select or translate categories;
 - T01/T02 explanations remain raw supplementary process data unless the task is deliberately redesigned for ET2/ET3;
 - T03 cannot claim ET4 stability without a linked contrast across representation conditions;
 - T04 needs a true surface-cue countertask to elicit ET2 and potentially ET6;
@@ -214,7 +216,7 @@ Key proposed boundaries:
 - ET6 is contradiction/counterevidence, not positive mastery evidence;
 - current browser tasks remain synthetic; no real learner data, registry, runtime, coding-rule or Supabase changes are authorised by this specification.
 
-**Current gate:** review and approve/revise the specification before implementation. The specification and this handoff update require Full Regression verification.
+**Current gate:** reconcile the C3 codebook vocabulary/scales and observation unit, then review and approve/revise the specification before implementation. The specification and this handoff update require Full Regression verification.
 
 ## 10. Latest regression state
 

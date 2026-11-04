@@ -132,20 +132,24 @@ The accessibility-description implementation is committed but is not yet regress
 
 The description explicitly states the 12-hour ambiguity: a hand position such as 08:35 can represent either 08:35 or 20:35. It does not falsely assign a morning/evening half from the analog face alone. The description nodes are visually hidden but available to assistive technology, and their content is refreshed on each render. Browser regression assertions were added while preserving the original assertions.
 
-Next action: verify the Full Regression for the current branch head. If red, stop and isolate the exact failure before any further edits. If green, inspect whether the same interface/controller separation generalises to another Learning Interface. Do not add page-specific curriculum execution logic.
+Architecture audit after Full Regression #2872 (commit `997f90249c846e3cef350bad038cecc46674e992`): the Clock currently has a reusable presentation module and a separate controller/bridge, but this separation has not yet generalised to a second Learning Interface. `learning-interface-contract.js` is currently a standalone state-container helper; the Clock and Fraction runtime do not consume it. FR2-T01 and FR2-T02 still build their option presentation and event wiring directly inside their HTML pages, while using a separate fraction controller. The two pages duplicate parts of the presentation logic.
+
+Important curriculum-contract finding: FR2-T01 and FR2-T02 both declare `response_process_required: true` and require a representation-based/equivalence justification. Their current browser pages do not collect a learner justification, even though the controller can accept an optional explanation. Do not treat the current FR2 pages as a complete pedagogical reference or silently mark this requirement satisfied.
+
+Next action: design the Fraction Learning Interface as the second generalisation case before implementation. Define its pedagogical inputs and required learner response process from the FR2 task contracts; separate the representation/rendering layer from selection/interaction state and from the existing fraction evidence controller. Preserve the shared browser vertical-slice runtime and task-bound observation submission. Do not promote curriculum claims or alter mastery logic. Do not add page-specific curriculum execution logic.
 
 Do not invent a Clock curriculum skill, add scientific claims or freeze construct-specific mastery rules from synthetic browser data.
 
 ## 10. Latest regression state
 
 Latest independently verified Full Regression:
-- Commit: `6d0754e4354215ddd8bb5f98642b4d6e3c5d908b`
+- Commit: `997f90249c846e3cef350bad038cecc46674e992`
 - Branch: `refactor/professional-v1`
-- Full Regression run: #2870 / ID `41763589505`
-- Status: **GREEN** (all 15 steps succeeded).
+- Full Regression run: #2872 / ID `41764559388`
+- Status: **GREEN** (all 15 steps succeeded, including curriculum engine, architecture boundaries, maintained Node/Vitest regression, browser regression and clean working tree).
 
-Current implementation commit:
-- `1d48c526583eeff133fd36abb1ccbc419c802189` — adds supplementary Clock descriptions and browser assertions. This commit has not yet had a Full Regression run; do not treat it as green.
+Clock accessibility implementation commit:
+- `1d48c526583eeff133fd36abb1ccbc419c802189` — adds supplementary Clock descriptions and browser assertions. Its dedicated browser proof run #629 / ID `41764521463` is **GREEN**; the full regression for branch head is recorded above.
 
 Earlier failed run:
 - Commit: `96581da09090aaf1925a7710767d52a1fd3dfa1a`

@@ -58,6 +58,8 @@ jobs:
         run: node --test pacogo-engine/*.test.js
       - name: Run architecture boundary tests
         run: node --test test/architecture-boundaries.test.js
+      - name: Run Double or Nothing runtime regression
+        run: node --test src/features/practice/double-or-nothing/runtime.test.js
       - name: Run maintained Node regression
         run: |
           files=$(find test -maxdepth 1 -type f -name '*.test.js' \

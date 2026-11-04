@@ -66,6 +66,17 @@ Conceptual chain:
 
 Interfaces must separate pedagogical/function state from visual/rendering state and remain ready for future PacoGO Deluxe / Upper Tier integration.
 
+**Adaptive instruction is a core product and architecture requirement.** Schools and teachers may use different instructional methods, representations, terminology, notation and solution procedures for the same curriculum objective. PacoGO must not assume one universal school method or impose an unverified alternative that may conflict with the learner's classroom instruction.
+
+The instructional layer must therefore be adaptable to the method actually used by the learner, with method information grounded in confirmed sources such as parent/teacher input or supplied school materials. Learner interaction may provide clues but must not, by itself, be treated as proof of the school's method. Method profiles need provenance and an explicit uncertainty/unknown state. When the method is unknown or uncertain, PacoGO must not claim alignment or invent a school-specific procedure; it should use a carefully chosen conceptual/visual explanation that does not falsely present itself as the classroom method, or seek confirmation where the choice materially affects instruction.
+
+Keep these concerns distinct:
+- **Curriculum:** what the learner is expected to learn; existing SLO-based skills and goals remain unchanged.
+- **Instructional method:** how the school/teacher teaches the content, including method-specific steps, terminology and notation.
+- **Learning Interface:** the reusable pedagogical instrument through which PacoGO presents, practises and captures interaction/evidence; it may support multiple instructional approaches without duplicating the whole interface.
+
+The future Adaptive Instruction Layer selects and configures the appropriate explanation, examples, representations, notation and feedback while preserving the same curriculum objective and evidence boundaries. This requirement applies across Learning Interfaces (including Fraction, Clock, Number Line, Measurement and Ratio), not only to fractions. It must be designed before method-specific teaching/feedback is implemented in an interface. This is a product/architecture requirement, not permission to change existing skills, SLO mappings, claims, evidence targets or mastery criteria.
+
 The interface runtime contract must preserve:
 `interaction → observable event → evidence target → coding dimension → validation dataset field`.
 
@@ -261,6 +272,21 @@ No Supabase schema/runtime change is required for the current browser vertical-s
 
 **Build the brain → prove the vertical chain → build reusable Learning Interfaces/controllers → connect multiple curriculum cases through the same engine → empirically validate with real learners → then build the larger Deluxe world.**
 
+## 14. Adaptive instruction — mandatory product/architecture requirement (2026-11-04)
+
+The product owner explicitly identified that school instructional methods differ between schools/teachers. A fixed PacoGO teaching method could conflict with the learner's classroom method and cause confusion. This requirement is cross-interface and must not be treated as a Fraction-only concern.
+
+Required design principles:
+- adapt explanations and instructional procedures to the method actually used by the learner's school/classroom, rather than assuming a universal method;
+- method knowledge must be grounded in confirmed parent/teacher input or school materials, with source/provenance and confidence/unknown state;
+- do not infer the school's method solely from how a learner answers or interacts;
+- when the method is unknown or uncertain, do not claim school alignment or teach an unverified conflicting procedure; use a carefully bounded conceptual/visual explanation or seek confirmation when needed;
+- separate the fixed curriculum objective (existing SLO-based skills/goals) from school-specific instructional method and from the reusable Learning Interface;
+- design a reusable Adaptive Instruction Layer that can select/configure method-specific explanations, examples, representations, notation and feedback across interfaces without rebuilding each interface;
+- preserve curriculum, claim, evidence-target and mastery contracts. This requirement does not authorize curriculum redesign or changes to existing SLO mappings/skills.
+
+**Implementation gate:** do not implement method-specific instruction or feedback in Fraction or other Learning Interfaces until the adaptive-instruction design, method-source/provenance model, unknown-state behavior and interface integration contract have been specified and reviewed. Existing curriculum content remains unchanged.
+
 ## 13. Current C3 reconciliation proposal and curriculum boundary (2026-11-04)
 
 **Curriculum content is a fixed project boundary for this work.** Existing skills are based on the SLO core goals and intermediate goals. Do not recreate, rewrite, restructure, replace or independently reinterpret the curriculum, skills, developments, learning progression, SLO alignment or mastery criteria. The current work concerns the technical/scientific handling of observations and evidence for the already-defined curriculum; it is not a curriculum redesign.
@@ -280,7 +306,7 @@ If a proposed evidence/codebook/runtime change appears to require changing a ski
 
 **Latest verified baseline before this handoff update:**
 - Branch: `refactor/professional-v1`
-- Commit: `a3c2b26fbec40b6613652576fdc9f2d7b35667eb`
-- Full Regression run ID: `41817906418`
-- Status: **GREEN** — all workflow steps completed successfully, including curriculum engine, architecture boundary, Node/Vitest, browser regression and clean working tree.
-- This handoff update is a new commit and requires its own Full Regression. Replace this baseline with the exact handoff commit and verified result once that run completes.
+- Commit: `019822cdfa230d91e6c48608b444e4b4f2a84697`
+- Full Regression run: #2890 / ID `41818169953`
+- Status: **GREEN** — GitHub Actions reports `completed / success` for this exact commit.
+- This handoff update is a new commit and requires its own Full Regression.

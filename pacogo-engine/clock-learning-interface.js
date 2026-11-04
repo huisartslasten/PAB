@@ -2,10 +2,6 @@ import { angleFromPointer, minuteFromAngle, hourFromAngle } from './clock-analog
 import { validateClockTaskDefinition } from './clock-task-contract.js';
 
 function formatDigitalTime({ hour, minute }) { return `${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`; }
-function formatEtmaalHalf({ hour }) {
-  if (!Number.isInteger(hour) || hour < 0 || hour > 23) throw new RangeError('hour must be an integer from 0 to 23');
-  return hour < 12 ? '00:00–11:59' : '12:00–23:59';
-}
 function assertClockMode(mode) {
   if (!['analog_to_digital','digital_to_analog','match_representations'].includes(mode)) throw new TypeError('mode must be analog_to_digital, digital_to_analog or match_representations');
 }
@@ -51,7 +47,6 @@ function createClockLearningInterface({
       <div class="pacogo-clock__visual">
         <div class="pacogo-clock__face" role="img" aria-label="Analoge klok">
           <span class="pacogo-clock__tick t0"></span><span class="pacogo-clock__tick t1"></span><span class="pacogo-clock__tick t2"></span><span class="pacogo-clock__tick t3"></span>
-          <span class="pacogo-clock__cycle" aria-hidden="true"></span>
           <span class="pacogo-clock__number n12">12</span><span class="pacogo-clock__number n3">3</span><span class="pacogo-clock__number n6">6</span><span class="pacogo-clock__number n9">9</span>
           <span class="pacogo-clock__hand pacogo-clock__hand--hour" data-hand="hour" aria-label="Uurwijzer"></span>
           <span class="pacogo-clock__hand pacogo-clock__hand--minute" data-hand="minute" aria-label="Minutenwijzer"></span><span class="pacogo-clock__pin"></span>
@@ -71,7 +66,6 @@ function createClockLearningInterface({
 
   const root=mount.querySelector('.pacogo-clock'),face=mount.querySelector('.pacogo-clock__face');
   const hourHand=mount.querySelector('.pacogo-clock__hand--hour'),minuteHand=mount.querySelector('.pacogo-clock__hand--minute');
-  const cycleLabel=mount.querySelector('.pacogo-clock__cycle');
   const digital=mount.querySelector('.pacogo-clock__digital'),digitalLabel=mount.querySelector('.pacogo-clock__digital-label');
   const optionsContainer=mount.querySelector('.pacogo-clock__options'),hourInput=mount.querySelector('.pacogo-clock__hour');
   const minuteInput=mount.querySelector('.pacogo-clock__minute'),controls=mount.querySelector('.pacogo-clock__controls');
@@ -93,8 +87,6 @@ function createClockLearningInterface({
   const render=()=>{
     const analogTime=getAnalogTime(),digitalTime=getDigitalTime();
     hourHand.style.transform=`translateX(-50%) rotate(${(analogTime.hour%12)*30+analogTime.minute*.5}deg)`;
-    cycleLabel.textContent=formatEtmaalHalf(analogTime);
-    face.dataset.etmaalHalf=analogTime.hour < 12 ? 'first' : 'second';
     minuteHand.style.transform=`translateX(-50%) rotate(${analogTime.minute*6}deg)`;
     face.hidden=isDigitalMatchSource;
     digital.hidden=isMatching&&!isDigitalMatchSource;
@@ -109,20 +101,19 @@ function createClockLearningInterface({
         button.textContent=formatDigitalTime(option.time);button.setAttribute('aria-label',`Digitale tijd ${formatDigitalTime(option.time)}`);
       }else{
         const optionFace=document.createElement('span');optionFace.className='pacogo-clock__option-face';optionFace.setAttribute('aria-hidden','true');
-        const optionCycle=document.createElement('span');optionCycle.className='pacogo-clock__option-cycle';optionCycle.textContent=formatEtmaalHalf(option.time);
         const optionHour=document.createElement('span');optionHour.className='pacogo-clock__option-hand pacogo-clock__option-hand--hour';
         optionHour.style.transform=`translateX(-50%) rotate(${(option.time.hour%12)*30+option.time.minute*.5}deg)`;
         const optionMinute=document.createElement('span');optionMinute.className='pacogo-clock__option-hand pacogo-clock__option-hand--minute';
         optionMinute.style.transform=`translateX(-50%) rotate(${option.time.minute*6}deg)`;
-        optionFace.append(optionCycle,optionHour,optionMinute);button.append(optionFace);
-        button.setAttribute('aria-label',`Analoge klok, ${formatEtmaalHalf(option.time)}`);
+        optionFace.append(optionHour,optionMinute);button.append(optionFace);
+        button.setAttribute('aria-label',`Analoge tijd ${formatDigitalTime(option.time)}`);
       }
       button.addEventListener('click',()=>selectRepresentation(option.option_id));optionsContainer.append(button);
     }
     hourInput.value=responseTime?responseTime.hour:'';
     minuteInput.value=responseTime?responseTime.minute:'';
     controls.hidden=mode!=='analog_to_digital';
-    face.setAttribute('aria-label',`Analoge klok, ${formatEtmaalHalf(analogTime)}`);
+    face.setAttribute('aria-label',`Analoge klok: ${formatDigitalTime(analogTime)}`);
     face.dataset.interactive=String(mode==='digital_to_analog');
     hint.textContent=mode==='analog_to_digital'?'Lees de analoge klok en voer de digitale tijd in.':
       mode==='digital_to_analog'?'Lees de digitale opdracht en stel de analoge klok in.':
@@ -164,4 +155,4 @@ function createClockLearningInterface({
     getRepresentation:()=>responseRepresentation,lock,isLocked:()=>locked,getTargetTime:()=>({...target})
   });
 }
-export { createClockLearningInterface, formatDigitalTime, formatEtmaalHalf, assertClockMode, responseRepresentationForMode };
+export { createClockLearningInterface, formatDigitalTime, assertClockMode, responseRepresentationForMode };

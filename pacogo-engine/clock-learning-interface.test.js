@@ -2,7 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   formatDigitalTime,
-  formatEtmaalHalf,
   assertClockMode,
   responseRepresentationForMode
 } from './clock-learning-interface.js';
@@ -23,14 +22,4 @@ test('clock task mode fixes source and response representations for all task for
     () => assertClockMode('text'),
     /mode must be analog_to_digital, digital_to_analog or match_representations/
   );
-});
-
-test('analog clock representation identifies the first or second twelve hours of the etmaal', () => {
-  assert.equal(formatEtmaalHalf({ hour: 0 }), '00:00–11:59');
-  assert.equal(formatEtmaalHalf({ hour: 8 }), '00:00–11:59');
-  assert.equal(formatEtmaalHalf({ hour: 11 }), '00:00–11:59');
-  assert.equal(formatEtmaalHalf({ hour: 12 }), '12:00–23:59');
-  assert.equal(formatEtmaalHalf({ hour: 20 }), '12:00–23:59');
-  assert.equal(formatEtmaalHalf({ hour: 23 }), '12:00–23:59');
-  assert.throws(() => formatEtmaalHalf({ hour: 24 }), /hour must be an integer/);
 });

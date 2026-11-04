@@ -366,3 +366,29 @@ The exercise does **not** establish inter-rater agreement, coder reliability, qu
 - Full Regression run: #2895 / ID `41838914744`
 - Status: **GREEN** — GitHub Actions reports `completed / success` for this exact commit; all 15 workflow steps succeeded, including browser regression and clean-working-tree verification.
 - This handoff update is a new commit and requires its own Full Regression.
+
+## 16. C3 blinded synthetic coding exercise materials (2026-11-04)
+
+Two companion documents have been added as design/feasibility materials:
+
+- `docs/curriculum/PacoGO_C3_Blinded_Synthetic_Coder_Packet_v0.1.md` — commit `3eb0f7e2a1e7b9b5ee4d0f6e33d96c1d22c998d1`. Contains six synthetic cases, candidate coding dimensions/labels, a coding-record template and an independent lock protocol. It intentionally contains no suggested answers.
+- `docs/curriculum/PacoGO_C3_Synthetic_Coder_Adjudication_Key_v0.1.md` — commit `9dd3c86f29d57121144010565612802793c32d8a`. Restricted companion for the coordinator/adjudicator. Do not distribute to coders until their independent coding records have been submitted and locked.
+
+**Handling and next step:**
+1. Give coders only the blinded packet, never the adjudication key.
+2. Have each coder code all six cases independently, using only the supplied case facts.
+3. Preserve and lock each original coder record before any discussion.
+4. Compare disagreements by dimension and target. Keep unresolved boundaries unresolved; do not force agreement or invent thresholds.
+5. Create separate, linked adjudication records. Never overwrite original coding.
+6. Use findings only to assess clarity, category overlap and feasibility, then revise candidate anchors transparently.
+
+This is a small synthetic feasibility exercise only. It does not establish human-coder reliability, empirical learner validity, construct validity, mastery validity or next-action validity. The proposal v0.2 remains unapproved; no canonical codebook, curriculum, registry, task mapping, runtime, learner-state, schema, persistence or Supabase change is authorized.
+
+**Latest verified Full Regression:**
+- Branch: `refactor/professional-v1`
+- Commit: `9dd3c86f29d57121144010565612802793c32d8a`
+- Full Regression run: #2898 / ID `41850579247`
+- Status: **GREEN** — GitHub Actions reports `completed / success`; all 18 job steps succeeded, including curriculum engine, architecture boundaries, maintained Node/Vitest regression, browser regression and clean-working-tree verification.
+- The preceding run #2897 (ID `41850531446`) was superseded by #2898 on the newer branch head; #2898 is the authoritative result for the adjudication-key commit.
+
+**Next concrete step:** after the handoff update passes its own Full Regression, conduct the independent human coding exercise using the blinded packet, then adjudicate disagreements with the restricted key. Do not implement the canonical codebook/schema or change runtime/Supabase until the evidence contract has been explicitly reviewed and approved.

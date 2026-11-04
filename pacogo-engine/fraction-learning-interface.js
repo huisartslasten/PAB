@@ -26,7 +26,7 @@ function createFractionLearningInterface({
   const targetLabel = document.createElement("span");
   targetLabel.className = "pacogo-fraction-interface__label";
   targetLabel.textContent = settings.labels.target;
-  target.append(targetLabel, renderFractionRepresentation(settings.targetFraction, settings.representation, settings.labels.target));
+  target.append(targetLabel, renderFractionRepresentation(settings.targetFraction, settings.targetRepresentation, settings.labels.target, { layout: settings.targetLayout }));
   const optionsLabel = document.createElement("h3");
   optionsLabel.className = "pacogo-fraction-interface__options-label";
   optionsLabel.textContent = settings.labels.options;
@@ -46,7 +46,7 @@ function createFractionLearningInterface({
     button.type = "button";
     button.className = "pacogo-fraction-interface__option";
     button.setAttribute("aria-pressed", "false");
-    button.append(renderFractionRepresentation(option.fraction, settings.representation, "Antwoordoptie"));
+    button.append(renderFractionRepresentation(option.fraction, settings.optionRepresentation, "Antwoordoptie"));
     button.addEventListener("click", () => {
       if (locked) return;
       selectedOptionId = option.id;

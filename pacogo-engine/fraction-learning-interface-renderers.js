@@ -1,4 +1,4 @@
-function renderFractionRepresentation(fraction, representation, label = "Breuk") {
+function renderFractionRepresentation(fraction, representation, label = "Breuk", options = {}) {
   const wrapper = document.createElement("span");
   wrapper.className = "pacogo-fraction-representation";
   if (representation === "symbolic_fraction") {
@@ -19,11 +19,15 @@ function renderFractionRepresentation(fraction, representation, label = "Breuk")
   }
   if (representation !== "area_model") throw new TypeError("unsupported fraction representation");
   wrapper.classList.add("pacogo-fraction-representation--area");
+  const layout = options.layout || "bar";
+  if (!["bar", "grid"].includes(layout)) throw new TypeError("unsupported area model layout");
+  wrapper.dataset.layout = layout;
   wrapper.setAttribute("role", "img");
   wrapper.setAttribute("aria-label", label + ": " + fraction.numerator + " van " + fraction.denominator + " gelijke delen");
   const cells = document.createElement("span");
   cells.className = "pacogo-fraction-cells";
-  cells.style.gridTemplateColumns = "repeat(" + fraction.denominator + ", minmax(0, 1fr))";
+  const columns = layout === "grid" ? Math.min(fraction.denominator, Math.ceil(Math.sqrt(fraction.denominator))) : fraction.denominator;
+  cells.style.gridTemplateColumns = "repeat(" + columns + ", minmax(0, 1fr))";
   for (let index = 0; index < fraction.denominator; index += 1) {
     const cell = document.createElement("span");
     cell.className = index < fraction.numerator ? "pacogo-fraction-cell is-shaded" : "pacogo-fraction-cell";

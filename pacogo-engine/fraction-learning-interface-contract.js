@@ -9,6 +9,9 @@ function createFractionLearningInterfaceConfig({
   targetFraction,
   options,
   representation = "symbolic_fraction",
+  targetRepresentation = representation,
+  optionRepresentation = representation,
+  targetLayout = "bar",
   responseProcessRequired = false,
   labels = {}
 }) {
@@ -16,8 +19,13 @@ function createFractionLearningInterfaceConfig({
   if (!Array.isArray(options) || options.length < 2) {
     throw new TypeError("at least two fraction options are required");
   }
-  if (!["area_model", "symbolic_fraction"].includes(representation)) {
-    throw new TypeError("representation must be area_model or symbolic_fraction");
+  const supportedRepresentations = ["area_model", "symbolic_fraction"];
+  if (![representation, targetRepresentation, optionRepresentation].every(value => supportedRepresentations.includes(value))) {
+    throw new TypeError("representation, targetRepresentation and optionRepresentation must be area_model or symbolic_fraction");
+  }
+  if (!["bar", "grid"].includes(targetLayout)) throw new TypeError("targetLayout must be bar or grid");
+  if (targetLayout === "grid" && targetRepresentation !== "area_model") {
+    throw new TypeError("targetLayout grid requires an area_model target");
   }
   if (typeof responseProcessRequired !== "boolean") {
     throw new TypeError("responseProcessRequired must be a boolean");
@@ -41,6 +49,9 @@ function createFractionLearningInterfaceConfig({
     targetFraction: Object.freeze({ numerator: targetFraction.numerator, denominator: targetFraction.denominator }),
     options: Object.freeze(safeOptions),
     representation,
+    targetRepresentation,
+    optionRepresentation,
+    targetLayout,
     responseProcessRequired,
     labels: Object.freeze({
       title: labels.title || "Welke breuk heeft dezelfde waarde?",

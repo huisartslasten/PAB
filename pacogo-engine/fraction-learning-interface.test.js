@@ -13,8 +13,36 @@ const areaConfig = createFractionLearningInterfaceConfig({
 });
 assert.equal(areaConfig.interfaceId, "fraction");
 assert.equal(areaConfig.representation, "area_model");
+assert.equal(areaConfig.targetRepresentation, "area_model");
+assert.equal(areaConfig.optionRepresentation, "area_model");
+assert.equal(areaConfig.targetLayout, "bar");
 assert.equal(areaConfig.responseProcessRequired, true);
 assert.equal(areaConfig.options.length, 2);
+const mixedConfig = createFractionLearningInterfaceConfig({
+  targetFraction: { numerator: 2, denominator: 3 },
+  options: [
+    { id: "eq", fraction: { numerator: 4, denominator: 6 } },
+    { id: "neq", fraction: { numerator: 3, denominator: 5 } }
+  ],
+  targetRepresentation: "area_model",
+  optionRepresentation: "symbolic_fraction",
+  targetLayout: "grid",
+  responseProcessRequired: true
+});
+assert.equal(mixedConfig.targetRepresentation, "area_model");
+assert.equal(mixedConfig.optionRepresentation, "symbolic_fraction");
+assert.equal(mixedConfig.targetLayout, "grid");
+assert.throws(() => createFractionLearningInterfaceConfig({
+  targetFraction: { numerator: 1, denominator: 2 },
+  options: [{ id: "a", fraction: { numerator: 1, denominator: 2 } }, { id: "b", fraction: { numerator: 2, denominator: 4 } }],
+  targetRepresentation: "unknown"
+}), /targetRepresentation/);
+assert.throws(() => createFractionLearningInterfaceConfig({
+  targetFraction: { numerator: 1, denominator: 2 },
+  options: [{ id: "a", fraction: { numerator: 1, denominator: 2 } }, { id: "b", fraction: { numerator: 2, denominator: 4 } }],
+  targetRepresentation: "symbolic_fraction",
+  targetLayout: "grid"
+}), /requires an area_model/);
 assert.throws(() => createFractionLearningInterfaceConfig({
   targetFraction: { numerator: 1, denominator: 2 },
   options: [{ id: "same", fraction: { numerator: 1, denominator: 2 } }, { id: "same", fraction: { numerator: 2, denominator: 4 } }]

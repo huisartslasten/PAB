@@ -1,6 +1,6 @@
 # PacoGO Fraction Learning Interface — Design v0.1
 
-Status: architecture design decision; implementation not yet started.
+Status: architecture baseline implemented for FR2-T01–T05; see implementation addendum.
 Branch: `refactor/professional-v1`
 Design baseline: Full Regression #2873, commit `4cb246dd7a59a7d0ad1dcc9783491956d1a74432`.
 
@@ -101,3 +101,19 @@ The first browser integration should generalise FR2-T01 and FR2-T02 through the 
 6. Run Full Regression on the exact implementation commit. If red, stop and isolate the root cause; do not patch tests to force green.
 
 No Supabase change is anticipated: the current work is a browser interaction/evidence-contract extension, not a persistence/runtime schema change.
+
+
+## 8. Implementation addendum — mixed representations and task coverage
+
+The reusable interface supports separate `targetRepresentation` and `optionRepresentation` settings. The original single `representation` remains the backward-compatible default for both. One task can therefore show an area model as its target and symbolic fractions as candidate answers.
+
+The target area-model renderer also supports a grid layout for a changed visual surface. Layout changes do not alter fraction values, controller response types, task identity or evidence routing.
+
+The shared interface is used by all five FR2 pilot browser tasks:
+- FR2-T01: area-model target and area-model options;
+- FR2-T02: symbolic target and symbolic options;
+- FR2-T03: area-model target and symbolic options for representation transfer;
+- FR2-T04: grid area-model target and symbolic options for the surface-change countertask;
+- FR2-T05: area-model target and symbolic options for language-reduced visual transfer.
+
+Each task obtains the explanation requirement from its task-set record. Browser tests verify mixed-representation rendering, required explanation, raw explanation preservation, task-bound observation submission and absence of automatic mastery promotion. These are synthetic browser integration fixtures, not empirical validation.

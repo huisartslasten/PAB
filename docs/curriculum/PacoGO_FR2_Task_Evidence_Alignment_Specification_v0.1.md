@@ -61,7 +61,7 @@ A task model describes the intended evidence opportunity for a family of tasks. 
 
 ### 3.2 Layer B — immutable raw observation
 
-Create one raw observation for one learner response to one administered task instance. It should preserve, where available:
+Create one raw observation for one administered task-instance response episode. The episode includes the learner's response and its ordered attempts/events for that instance; it is not automatically one database record per click or per retry. If a task bundle contains separately administered instances, each instance receives its own observation and the bundle links them through a pre-specified contrast-set/bundle identifier. This unit must be fixed in the canonical schema before implementation. It should preserve, where available:
 - stable observation and task-instance IDs;
 - learner pseudonymous key, session and observed time;
 - exact registry and task-definition versions;
@@ -114,6 +114,27 @@ Rules:
 - Keep ET6 contradiction evidence attached to the same relevant observation/claim context; it is not a second learner response or an extra independent positive observation.
 
 This logical model is compatible in principle with the array-based target linkage in `PacoGO_Empirical_Observation_Schema_v0.1.json`, but it is not yet represented consistently in `PacoGO_Pilot_DataSchema_v0.2.json`, which has singular `evidence_target_id` and singular `coding_record` fields. Do not silently choose one schema or patch the runtime. Before implementation, define a new versioned canonical data contract with explicit observation-to-target-assessment cardinality and migration/compatibility rules. No Supabase change is authorized by this specification.
+
+### 3.5 C3 codebook and schema vocabulary is not yet canonical
+
+The reviewed source documents contain unresolved differences. This specification does not choose one vocabulary or scale by convenience.
+
+| Dimension | C3 specification v0.1 | Evidence Coding Manual v0.1 | Pilot DataSchema v0.2 | Required resolution |
+|---|---|---|---|---|
+| Target match | `direct / partial / indirect / none` | `MATCH / MISMATCH / UNCLEAR` | `MATCH / MISMATCH / UNCLEAR / NOT_CODED` | Define whether match quality is categorical, graded, or two separate dimensions. Preserve the distinction between task-design mismatch and degree of target alignment. |
+| Evidence/process status | Process: `present / absent / ambiguous / not_collected`; separate C3 decision states | Evidence: `PRESENT / ABSENT / INDETERMINATE / NOT_CODED` | Coding status: `PRESENT / ABSENT / INDETERMINATE / NOT_CODED` | Separate raw process availability from coded evidence status and from whether coding has been performed. |
+| Quality | `0 / .25 / .50 / .75 / 1.00` | `0 / .5 / 1.0` | Numeric, no allowed values specified | Decide whether these are alternative protocol stages or conflicting scales; version and calibrate before confirmatory use. |
+| Independence | Independent, standardised prompt, non-standard prompt, direct instruction, unresolved contamination | `INDEPENDENT / PROMPTED / DEPENDENT / UNKNOWN` | Same four broad categories as manual | Decide whether prompt exposure and inferred independence are separate fields; retain actual assistance events as raw data. |
+| Contradiction | Boolean concept with examples | Boolean concept with examples | `true / false / null` | Define when null means not coded versus not applicable, and keep contradiction distinct from incorrect performance. |
+
+Further distinctions that must be preserved:
+- Raw `process_status` describes whether process material was collected/observable; it is not the C3 coder's judgement that required reasoning is present or absent.
+- `NOT_CODED` means coding has not been performed. `NOT_COLLECTED` means the relevant raw process was not collected. They are not interchangeable.
+- `INDETERMINATE` means a coder cannot decide from available material; it is not equivalent to missing data.
+- The numeric quality value is an evidence-quality judgement, not learner ability and not correctness.
+- The C3 specification's decision states (`NOT_RUN`, `FEASIBILITY_ONLY`, `CODING_UNRELIABLE`, `INDETERMINATE`, `READY_FOR_INFERENCE`) describe readiness of the coding process, not a learner's evidence status.
+
+**Blocking rule:** before implementing the new observation/assessment contract, create an explicitly versioned canonical C3 coding codebook/schema that resolves these differences, states which fields are raw versus coded, and specifies calibration/reliability requirements. Do not silently translate old codes, collapse categories, or select the finer scale as if it were already approved. Historical candidate documents remain preserved and referenced by version.
 
 ## 4. FR2 evidence-target interpretation
 
@@ -214,15 +235,16 @@ T01–T05 do not assess ET5. A future task should require the learner to use equ
 
 The following must be reviewed and explicitly approved before runtime or schema work begins:
 
-1. **Raw observation and assessment model:** approve the immutable observation plus target-specific C3 assessment structure.
+1. **Raw observation and assessment model:** approve the immutable task-instance response-episode plus target-specific C3 assessment structure, including the treatment of retries and bundled instances.
 2. **Canonical schema:** resolve the singular fields in Pilot_DataSchema v0.2 versus the array linkage in Empirical_Observation_Schema v0.1; define a new version rather than silently mutating either.
-3. **T01/T02:** confirm whether they remain recognition tasks with supplementary explanations, or are redesigned to assess ET2.
-4. **T03:** decide whether it remains ET3/TM3 or becomes a matched ET3+ET4 task bundle under TM2.
-5. **T04:** approve a genuine surface-cue countertask that elicits ET2 and, where applicable, ET6.
-6. **T05:** approve a defined language manipulation, response metadata and matched comparison.
-7. **ET6:** confirm its role as contradiction/counterevidence and prohibit treating it as positive mastery evidence.
-8. **Versioning and traceability:** specify task, registry, schema, codebook and coding-record version relationships.
-9. **Synthetic/empirical separation:** ensure synthetic browser outputs cannot enter the empirical coding pipeline as if independently coded learner evidence.
+3. **Canonical C3 codebook:** reconcile target-match categories, evidence/process status, quality scale, independence/prompting and contradiction missingness across C3 specification v0.1, Evidence Coding Manual v0.1 and Pilot_DataSchema v0.2. Keep the existing candidate versions as historical records.
+4. **T01/T02:** confirm whether they remain recognition tasks with supplementary explanations, or are redesigned to assess ET2.
+5. **T03:** decide whether it remains ET3/TM3 or becomes a matched ET3+ET4 task bundle under TM2.
+6. **T04:** approve a genuine surface-cue countertask that elicits ET2 and, where applicable, ET6.
+7. **T05:** approve a defined language manipulation, response metadata and matched comparison.
+8. **ET6:** confirm its role as contradiction/counterevidence and prohibit treating it as positive mastery evidence.
+9. **Versioning and traceability:** specify task, registry, schema, codebook and coding-record version relationships.
+10. **Synthetic/empirical separation:** ensure synthetic browser outputs cannot enter the empirical coding pipeline as if independently coded learner evidence.
 
 After approval, implementation must proceed in a separate change set. Add contract tests for raw-response immutability, task-instance versioning, per-target assessment traceability, multiple-target non-duplication, missingness, coder provenance and contrast-set linkage. Then run Full Regression on the exact implementation commit.
 
@@ -239,4 +261,4 @@ This specification does not:
 
 ## 9. Next concrete step
 
-Review and approve (or revise) this specification as a curriculum/evidence contract. Only after that approval should the project create a separately versioned task-set/schema change proposal and implement the smallest necessary runtime changes. The current FR2 pages remain synthetic demonstrations in the meantime.
+First reconcile the C3 codebook vocabulary/scales and the raw observation unit. Then review and approve (or revise) this specification as a curriculum/evidence contract. Only after those contracts are approved should the project create a separately versioned task-set/schema change proposal and implement the smallest necessary runtime changes. The current FR2 pages remain synthetic demonstrations in the meantime.

@@ -280,16 +280,27 @@ $test$;
 
 -- Learner identity cannot be reassigned through direct table updates.
 do $test$
+declare
+  v_updated_rows integer;
 begin
-  begin
-    update public.student_longitudinal_state
-    set student_key = current_setting('test.learner_b')
+  update public.student_longitudinal_state
+  set student_key = current_setting('test.learner_b')
+  where student_key = current_setting('test.learner_a')
+    and skill_id = 'TEST-SKILL-A';
+
+  get diagnostics v_updated_rows = row_count;
+
+  if v_updated_rows <> 0 then
+    raise exception 'Direct learner-state reassignment changed % rows', v_updated_rows;
+  end if;
+
+  if not exists (
+    select 1 from public.student_longitudinal_state
     where student_key = current_setting('test.learner_a')
-      and skill_id = 'TEST-SKILL-A';
-    raise exception 'Direct learner-state reassignment unexpectedly succeeded';
-  exception
-    when insufficient_privilege then null;
-  end;
+      and skill_id = 'TEST-SKILL-A'
+  ) then
+    raise exception 'Learner state was not preserved after denied reassignment';
+  end if;
 end;
 $test$;
 

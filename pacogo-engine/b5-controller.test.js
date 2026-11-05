@@ -34,7 +34,7 @@ test('process tasks preserve each intermediate response separately from the fina
   assert.equal(result.evaluation.correct,true,task.task_id);
   assert.deepEqual(result.observation.response.submitted_steps,steps);
   assert.equal(result.observation.response.submitted_answer,task.expected_answer);
-  assert.equal(result.observation.events.filter(x=>x.event_type==='process_step_submitted').length,task.process_steps.length);
+  assert.equal(result.observation.interaction_events.filter(x=>x.event_type==='process_step_submitted').length,task.process_steps.length);
  }
 });
 

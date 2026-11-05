@@ -426,8 +426,8 @@ The product owner confirmed that the immediate goal is to make PacoGO usable so 
 ### Engineering status at this handoff update
 
 - Working branch: `refactor/professional-v1`; `main` is LIVE and must not be touched.
-- Latest verified implementation commit: `c53c694958df9bd4b9384c1a4991506aa772e9a0`.
-- Full Regression run #2906 / ID `41951693692` on that exact commit: **GREEN** (`completed / success`); all 19 workflow steps succeeded, including curriculum engine tests, maintained Node/Vitest tests, browser regression and clean-working-tree verification.
+- Latest verified branch head before this handoff update: `9d1e2dff26b369961caa620dcc074ed867f2eb59`.
+- Full Regression run #2908 / ID `41952047708` on that exact commit: **GREEN** (`completed / success`); all 19 workflow steps succeeded, including curriculum engine tests, maintained Node/Vitest tests, browser regression and clean-working-tree verification.
 - The implementation is a browser demonstration with session-only evidence; it does not persist learner history. No Supabase changes were made.
 - This handoff update is a new repository commit and must receive its own Full Regression. Replace this baseline with the exact handoff-update commit and its actual run result after verification.
 
@@ -485,6 +485,33 @@ Initial coverage:
 
 The learner page accepts an ordinary numeric answer without a strategy choice or written explanation. It processes the response through the existing browser runtime and registry. The current route is a session-only demonstration: evidence is accumulated in memory for that page session and is not persisted after closing/reloading. No Supabase or curriculum registry changes were made. The task sequence is an initial practice sequence, not yet a fully adaptive next-action selector.
 
-**Next concrete step:** add and run browser-level coverage for the operational learner route and catalogue-to-registry mapping. Then complete the broader B1 learner task coverage and only afterward assess the minimum learner-state persistence/runtime requirement. Keep B1.D3–D4, TM2 alignment, adaptive support triggers and Supabase changes out of scope until their contracts are explicitly designed.
+**Focused verification completed:** catalogue-to-registry alignment and the full browser learner route are covered by `pacogo-engine/addition-learner-catalogue.test.js` and `test/browser/curriculum-b1-learner.browser.test.js`. Full Regression #2908 / ID `41952047708` is **GREEN** on commit `9d1e2dff26b369961caa620dcc074ed867f2eb59`. The earlier #2907 failure was caused by an incorrect registry-version value in the new catalogue; the catalogue metadata was corrected without changing tests or curriculum contracts.
 
-**Verification:** this implementation commit was verified by Full Regression #2906 / ID `41951693692`, **GREEN**. The handoff update and additional focused browser/catalogue tests require their own Full Regression.
+**Next concrete step:** define the learner ownership and row-access contract before connecting the learner route to persistent storage. Only after that contract is reviewed should a TEST-only persistence service and synthetic Supabase smoke test be implemented. Keep B1.D3–D4, TM2 multi-target alignment, adaptive support triggers and LIVE Supabase out of scope until their contracts are explicitly designed.
+
+
+## 20. Learner persistence and privacy gate
+
+A read-only inspection was performed against the connected **PacoGO TEST** Supabase project after the operational B1 browser route passed regression.
+
+### Verified TEST database state
+
+- The curriculum registry and learner persistence migrations are applied in TEST.
+- `public.curriculum_registry_versions` contains the candidate registry `pacogo-curriculum` version `0.2.0-seed`, sourced from `docs/curriculum/PacoGO_Curriculum_Registry_v0.2.json`.
+- The current row counts are zero for `student_evidence`, `student_longitudinal_state` and `curriculum_decision_trace`.
+- The existing evidence table stores one singular `evidence_target_id`. The initial B1 learner tasks deliberately use single-target task models B1.TM1 and B1.TM3. Do not use B1.TM2 until its multi-target contract is reconciled; do not manufacture multiple independent evidence records from one answer.
+- The current learner route does not call Supabase. Its evidence is session-only in memory. Therefore no Supabase smoke/write test was needed for the current implementation; the inspection was read-only and no database records were created.
+
+### Privacy/authorization blocker
+
+The current TEST RLS policies on these learner tables grant all authenticated users unrestricted row-level SELECT/INSERT access, and unrestricted SELECT/INSERT/UPDATE access to longitudinal state where applicable (`USING true` / `WITH CHECK true`). They do not scope records to a parent/owner or to a learner relationship. The application currently has a local student roster and parent-session allowlist, but no database-backed learner ownership mapping that RLS can enforce.
+
+**Decision:** do not connect real learner activity to these tables yet. Before persistence, define a stable pseudonymous learner key and an explicit owner/membership relation, then design row-level policies so an authenticated user can access only learners they are authorized to manage. Do not use child display names as evidence identifiers. This is a privacy/runtime contract decision, not permission to patch existing security warnings. No RLS, migration, auth, TEST or LIVE database changes were made.
+
+Supabase security advisors also reported pre-existing warnings for exposed SECURITY DEFINER RPC execution and disabled leaked-password protection. These were observed only and left unchanged; they are not silently included in this learner-persistence change.
+
+### Next step
+
+Prepare and review the learner ownership/persistence contract before implementing any database writes. Once approved, implement against **TEST only**, use synthetic/pseudonymous test identities, verify the full registry → observation/evidence → longitudinal state → decision trace chain, and remove all synthetic records after the smoke test. Do not use real learner data in engineering tests and do not modify LIVE.
+
+**Latest verified Full Regression before this handoff update:** branch `refactor/professional-v1`, commit `9d1e2dff26b369961caa620dcc074ed867f2eb59`, run #2908 / ID `41952047708`, **GREEN**. This handoff update requires its own Full Regression.

@@ -1101,3 +1101,35 @@ Prepare a consolidated contract reconciliation covering raw response episode, ta
 
 ### Volgende concrete stap
 Voer de dependency-audit uit van de oude Skills-implementatie: inventariseer imports, routes, tests, HTML-pagina's, services, migrations, schema- en datagebruik. Classificeer ieder onderdeel als actief, gedeeld, legacy maar nog contract-/data-afhankelijk, of aantoonbaar ongebruikt. Verwijder niets op basis van alleen een ontbrekende centrale route; Supabase-tabellen blijven buiten scope totdat data- en dependency-gebruik aantoonbaar zijn onderzocht.
+
+
+## 36. Legacy Skills dependency-audit en eerste veilige opruiming — 2026-11-05
+
+### Vastgestelde code-afhankelijkheden
+- De centrale router registreert uitsluitend `skills.html` voor de nieuwe curriculumgedreven Skills-runtime.
+- `skill-create.html` en `skill-editor.html` starten de algemene Paco-runtime, maar hebben geen eigen route in `src/app/routes.js`.
+- De oude management runtimes zijn niet door de centrale route geregistreerd.
+- De oude editor verwacht `app.skillDefinitions` en `app.skillConfiguration`; deze services worden niet door `src/app/bootstrap.js` opgebouwd of teruggegeven.
+- De oude services en hun geïsoleerde tests blijven behouden: de bijbehorende tabellen bevatten bestaande gegevens.
+- De oude math-domain helpers en tests blijven behouden totdat alle importrelaties en opvolging expliciet zijn afgesloten. De nieuwe Skills-runtime importeert deze helpers niet.
+
+### Eerste opruiming
+- Verwijderd: niet-geregistreerde legacy HTML-pagina's `skill-create.html` en `skill-editor.html`.
+- Verwijderd: niet-geregistreerde management runtimes `skill-creation-runtime.js` en `skill-editor-runtime.js`.
+- Behouden: centrale `skills.html`, nieuwe curriculum-runtime, gedeelde managementomgeving, oude services/tests als historische contracten, math-domain helpers/tests, curriculum-engine en learner-state.
+- Geen Supabase-schema, tabel, rij of migratie gewijzigd.
+
+### Alleen-lezen databasecontrole — PacoGO TEST
+- `skill_definitions`: 13 rijen, waaronder twee aangepaste definities naast de oorspronkelijke catalogus.
+- `skill_assignments`: 37 rijen verdeeld over drie learner-profielen; één assignment betreft de aangepaste Skill Breuken.
+- `game_results`: 5 rijen over drie game keys (`double-or-nothing`, `flash-question`, `word-reveal`).
+- Oude Skill-data is niet leeg en wordt niet verwijderd.
+- Nieuwe engine-tabellen bevatten eveneens `skill_id`-kolommen in evidence, longitudinal state en decision trace. Dit zijn aparte curriculumcontracten.
+- De productie-Supabase-omgeving is niet gewijzigd.
+
+### Verificatie en vervolgstap
+- Branch: `refactor/professional-v1`.
+- Parent commit: `886c9da63347c6d595f730cb1d60fe4deeda3c5b`.
+- Full Regression op parent: #3013 / run ID `42083415081`, completed GREEN.
+- Cleanup-commit: verificatie pending.
+- Volgende stap: Full Regression op cleanup-commit; bij groen resterende import-/contractaudit afronden. Migreer of archiveer bestaande Skill-data uitsluitend na een expliciet ontworpen dataovergang. Behoud `game_results` en nieuwe curriculumtabellen.

@@ -72,6 +72,6 @@ store.append({ student_key: 'seed-student', curriculum_registry_version: registr
 store.append({ student_key: 'seed-student', curriculum_registry_version: registry.registry_version, skill_id: 'FR2', development_id: 'FR2.D1', evidence_target_id: 'FR2.ET1', observation: { quality: 1 }, evidence_assessment: { evidence: true } });
 assert.equal(store.count(), 2);
 assert.equal(store.list({ student_key: 'seed-student', skill_id: 'A1' }).length, 1);
-assert.equal(store.list({ student_key: 'seed-student', curriculum_registry_version: '0.2.0-seed' }).length, 2);
+assert.equal(store.list({ student_key: 'seed-student', curriculum_registry_version: registry.registry_version }).length, 2);
 
 console.log('PacoGO registry + evidence + longitudinal decision tests passed.');

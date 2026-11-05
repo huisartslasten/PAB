@@ -229,16 +229,17 @@
       "prompt_level": "none",
       "response_process_required": false,
       "representation": "symbolic",
-      "response_type": "numeric_division",
+      "response_type": "quotient_remainder",
       "operation_type": "symbolic",
       "dividend": 29,
       "divisor": 4,
-      "expected_answer": 7.25,
+      "expected_answer": 7,
       "quantity_model": null,
       "strategy_options": [],
       "check_required": false,
       "check_methods": [],
-      "display_expression": "29 ÷ 4"
+      "display_expression": "29 ÷ 4",
+      "expected_remainder": 1
     },
     {
       "task_id": "B4-L10",
@@ -255,16 +256,17 @@
       "prompt_level": "none",
       "response_process_required": false,
       "representation": "symbolic",
-      "response_type": "numeric_division",
+      "response_type": "quotient_remainder",
       "operation_type": "symbolic",
       "dividend": 26,
       "divisor": 6,
-      "expected_answer": 4.3333333333,
+      "expected_answer": 4,
       "quantity_model": null,
       "strategy_options": [],
       "check_required": false,
       "check_methods": [],
-      "display_expression": "26 ÷ 6"
+      "display_expression": "26 ÷ 6",
+      "expected_remainder": 2
     },
     {
       "task_id": "B4-L11",
@@ -321,7 +323,7 @@
     {
       "task_id": "B4-L13",
       "title": "Flexibel delen",
-      "instruction": "Reken uit: 960 ÷  Des?",
+      "instruction": "Reken uit: 960 ÷ 12. Kies een aanpak en controleer je quotiënt.",
       "skill_id": "B4",
       "development_id": "B4.D7",
       "claim_id": "B4.C7",
@@ -341,12 +343,12 @@
       "quantity_model": null,
       "strategy_options": [
         {
-          "id": "decompose",
-          "label": "960 ÷ 10 ÷ 1,2 (niet handig)"
-        },
-        {
           "id": "known_multiple",
           "label": "12 × 8 = 96, dus 12 × 80 = 960"
+        },
+        {
+          "id": "decompose",
+          "label": "960 ÷ 3 = 320 en 320 ÷ 4 = 80"
         }
       ],
       "check_required": true,

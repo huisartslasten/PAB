@@ -1,0 +1,430 @@
+{
+  "schema_version": "0.1",
+  "status": "operational_candidate",
+  "purpose": "Separate learner-practice catalogue for the complete candidate B2 subtraction developmental line. This catalogue is not the C1-C3 pilot measurement task set.",
+  "synthetic_or_empirical": "operational_practice_definition",
+  "skill_id": "B2",
+  "curriculum_registry_version": "0.3.0-candidate",
+  "tasks": [
+    {
+      "task_id": "B2-L01",
+      "title": "Wegnemen op de getallenlijn",
+      "instruction": "Je begint met 14. Er gaan 5 af. Waar kom je uit?",
+      "skill_id": "B2",
+      "development_id": "B2.D1",
+      "claim_id": "B2.C1",
+      "evidence_target_ids": [
+        "B2.ET1"
+      ],
+      "task_model_id": "B2.TM1",
+      "variation_key": "take_away_small_numberline",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "number_line",
+      "response_type": "number_line_placement",
+      "operation_type": "take_away",
+      "minuend": 14,
+      "subtrahend": 5,
+      "expected_answer": 9,
+      "number_line": {
+        "min": 0,
+        "max": 20,
+        "step": 1
+      },
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": []
+    },
+    {
+      "task_id": "B2-L02",
+      "title": "Wat blijft er over?",
+      "instruction": "Je hebt 53 punten en geeft er 18 weg. Hoeveel houd je over?",
+      "skill_id": "B2",
+      "development_id": "B2.D1",
+      "claim_id": "B2.C1",
+      "evidence_target_ids": [
+        "B2.ET2"
+      ],
+      "task_model_id": "B2.TM1",
+      "variation_key": "take_away_two_digit_context",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic",
+      "response_type": "numeric_subtraction",
+      "operation_type": "take_away",
+      "minuend": 53,
+      "subtrahend": 18,
+      "expected_answer": 35,
+      "number_line": null,
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": []
+    },
+    {
+      "task_id": "B2-L03",
+      "title": "Het verschil bepalen",
+      "instruction": "Wat is het verschil tussen 14 en 9?",
+      "skill_id": "B2",
+      "development_id": "B2.D2",
+      "claim_id": "B2.C2",
+      "evidence_target_ids": [
+        "B2.ET3"
+      ],
+      "task_model_id": "B2.TM2",
+      "variation_key": "difference_small_numberline",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "number_line",
+      "response_type": "number_line_placement",
+      "operation_type": "difference",
+      "minuend": 14,
+      "subtrahend": 9,
+      "expected_answer": 5,
+      "number_line": {
+        "min": 0,
+        "max": 20,
+        "step": 1
+      },
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": []
+    },
+    {
+      "task_id": "B2-L04",
+      "title": "Verschil bij grotere waarden",
+      "instruction": "Wat is het verschil tussen 62 en 38?",
+      "skill_id": "B2",
+      "development_id": "B2.D2",
+      "claim_id": "B2.C2",
+      "evidence_target_ids": [
+        "B2.ET4"
+      ],
+      "task_model_id": "B2.TM2",
+      "variation_key": "difference_two_digit_symbolic",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic",
+      "response_type": "numeric_subtraction",
+      "operation_type": "difference",
+      "minuend": 62,
+      "subtrahend": 38,
+      "expected_answer": 24,
+      "number_line": null,
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": []
+    },
+    {
+      "task_id": "B2-L05",
+      "title": "Aanvullen tot 12",
+      "instruction": "Je staat op 7. Hoeveel moet erbij om op 12 te komen?",
+      "skill_id": "B2",
+      "development_id": "B2.D3",
+      "claim_id": "B2.C3",
+      "evidence_target_ids": [
+        "B2.ET5"
+      ],
+      "task_model_id": "B2.TM3",
+      "variation_key": "complement_small_numberline",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "number_line",
+      "response_type": "number_line_placement",
+      "operation_type": "complement",
+      "minuend": 12,
+      "subtrahend": 7,
+      "expected_answer": 5,
+      "number_line": {
+        "min": 0,
+        "max": 15,
+        "step": 1
+      },
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": []
+    },
+    {
+      "task_id": "B2-L06",
+      "title": "Aanvullen tot 50",
+      "instruction": "Je hebt 28. Hoeveel ontbreekt er tot 50?",
+      "skill_id": "B2",
+      "development_id": "B2.D3",
+      "claim_id": "B2.C3",
+      "evidence_target_ids": [
+        "B2.ET6"
+      ],
+      "task_model_id": "B2.TM3",
+      "variation_key": "complement_two_digit",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic",
+      "response_type": "numeric_subtraction",
+      "operation_type": "complement",
+      "minuend": 50,
+      "subtrahend": 28,
+      "expected_answer": 22,
+      "number_line": null,
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": []
+    },
+    {
+      "task_id": "B2-L07",
+      "title": "Aftrekken als afstand",
+      "instruction": "Laat op de getallenlijn zien waar 42 - 17 uitkomt.",
+      "skill_id": "B2",
+      "development_id": "B2.D4",
+      "claim_id": "B2.C4",
+      "evidence_target_ids": [
+        "B2.ET7"
+      ],
+      "task_model_id": "B2.TM4",
+      "variation_key": "relation_numberline_42_17",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "number_line",
+      "response_type": "number_line_placement",
+      "operation_type": "relation",
+      "minuend": 42,
+      "subtrahend": 17,
+      "expected_answer": 25,
+      "number_line": {
+        "min": 0,
+        "max": 50,
+        "step": 1
+      },
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": []
+    },
+    {
+      "task_id": "B2-L08",
+      "title": "De relatie in cijfers",
+      "instruction": "Reken uit: 64 - 28.",
+      "skill_id": "B2",
+      "development_id": "B2.D4",
+      "claim_id": "B2.C4",
+      "evidence_target_ids": [
+        "B2.ET8"
+      ],
+      "task_model_id": "B2.TM4",
+      "variation_key": "relation_symbolic_64_28",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic",
+      "response_type": "numeric_subtraction",
+      "operation_type": "relation",
+      "minuend": 64,
+      "subtrahend": 28,
+      "expected_answer": 36,
+      "number_line": null,
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": []
+    },
+    {
+      "task_id": "B2-L09",
+      "title": "Aftrekken structureren",
+      "instruction": "Reken uit: 62 - 29. Kies eerst een aanpak.",
+      "skill_id": "B2",
+      "development_id": "B2.D5",
+      "claim_id": "B2.C5",
+      "evidence_target_ids": [
+        "B2.ET9"
+      ],
+      "task_model_id": "B2.TM5",
+      "variation_key": "structure_compensation_62_29",
+      "prompt_level": "none",
+      "response_process_required": true,
+      "representation": "symbolic",
+      "response_type": "numeric_subtraction",
+      "operation_type": "structure",
+      "minuend": 62,
+      "subtrahend": 29,
+      "expected_answer": 33,
+      "number_line": null,
+      "strategy_options": [
+        {
+          "id": "compensation",
+          "label": "Afronden en corrigeren"
+        },
+        {
+          "id": "decomposition",
+          "label": "Ontleden"
+        }
+      ],
+      "check_required": false,
+      "check_methods": []
+    },
+    {
+      "task_id": "B2-L10",
+      "title": "Ontleden of compenseren",
+      "instruction": "Reken uit: 105 - 48. Kies een aanpak die de berekening overzichtelijk maakt.",
+      "skill_id": "B2",
+      "development_id": "B2.D5",
+      "claim_id": "B2.C5",
+      "evidence_target_ids": [
+        "B2.ET10"
+      ],
+      "task_model_id": "B2.TM5",
+      "variation_key": "structure_decomposition_105_48",
+      "prompt_level": "none",
+      "response_process_required": true,
+      "representation": "symbolic",
+      "response_type": "numeric_subtraction",
+      "operation_type": "structure",
+      "minuend": 105,
+      "subtrahend": 48,
+      "expected_answer": 57,
+      "number_line": null,
+      "strategy_options": [
+        {
+          "id": "decomposition",
+          "label": "Ontleden"
+        },
+        {
+          "id": "complement",
+          "label": "Aanvullen"
+        }
+      ],
+      "check_required": false,
+      "check_methods": []
+    },
+    {
+      "task_id": "B2-L11",
+      "title": "Grotere getallen",
+      "instruction": "Reken uit: 1200 - 475.",
+      "skill_id": "B2",
+      "development_id": "B2.D6",
+      "claim_id": "B2.C6",
+      "evidence_target_ids": [
+        "B2.ET11"
+      ],
+      "task_model_id": "B2.TM6",
+      "variation_key": "larger_whole_numbers",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic",
+      "response_type": "numeric_subtraction",
+      "operation_type": "larger_number",
+      "minuend": 1200,
+      "subtrahend": 475,
+      "expected_answer": 725,
+      "number_line": null,
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": []
+    },
+    {
+      "task_id": "B2-L12",
+      "title": "Decimale getallen",
+      "instruction": "Reken uit: 8,5 - 2,75.",
+      "skill_id": "B2",
+      "development_id": "B2.D6",
+      "claim_id": "B2.C6",
+      "evidence_target_ids": [
+        "B2.ET12"
+      ],
+      "task_model_id": "B2.TM6",
+      "variation_key": "decimal_place_value",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic",
+      "response_type": "numeric_subtraction",
+      "operation_type": "decimal",
+      "minuend": 8.5,
+      "subtrahend": 2.75,
+      "expected_answer": 5.75,
+      "number_line": null,
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": []
+    },
+    {
+      "task_id": "B2-L13",
+      "title": "Kies en controleer",
+      "instruction": "Reken uit: 1000 - 398. Kies een aanpak en controleer je antwoord.",
+      "skill_id": "B2",
+      "development_id": "B2.D7",
+      "claim_id": "B2.C7",
+      "evidence_target_ids": [
+        "B2.ET13"
+      ],
+      "task_model_id": "B2.TM7",
+      "variation_key": "flexible_compensation_check",
+      "prompt_level": "none",
+      "response_process_required": true,
+      "representation": "symbolic",
+      "response_type": "numeric_subtraction",
+      "operation_type": "flexible",
+      "minuend": 1000,
+      "subtrahend": 398,
+      "expected_answer": 602,
+      "number_line": null,
+      "strategy_options": [
+        {
+          "id": "compensation",
+          "label": "Afronden en corrigeren"
+        },
+        {
+          "id": "decomposition",
+          "label": "Ontleden"
+        }
+      ],
+      "check_required": true,
+      "check_methods": [
+        {
+          "id": "inverse_addition",
+          "label": "Controleren met optellen"
+        },
+        {
+          "id": "estimation",
+          "label": "Controleren met een schatting"
+        }
+      ]
+    },
+    {
+      "task_id": "B2-L14",
+      "title": "Aftrekken in een situatie",
+      "instruction": "Er zijn 83 kaarten. 47 kaarten worden uitgedeeld. Hoeveel blijven er over? Kies een aanpak en controleer je antwoord.",
+      "skill_id": "B2",
+      "development_id": "B2.D7",
+      "claim_id": "B2.C7",
+      "evidence_target_ids": [
+        "B2.ET14"
+      ],
+      "task_model_id": "B2.TM7",
+      "variation_key": "contextual_subtraction_check",
+      "prompt_level": "none",
+      "response_process_required": true,
+      "representation": "symbolic",
+      "response_type": "numeric_subtraction",
+      "operation_type": "context",
+      "minuend": 83,
+      "subtrahend": 47,
+      "expected_answer": 36,
+      "number_line": null,
+      "strategy_options": [
+        {
+          "id": "decomposition",
+          "label": "Ontleden"
+        },
+        {
+          "id": "complement",
+          "label": "Aanvullen"
+        }
+      ],
+      "check_required": true,
+      "check_methods": [
+        {
+          "id": "inverse_addition",
+          "label": "Controleren met optellen"
+        },
+        {
+          "id": "estimation",
+          "label": "Controleren met een schatting"
+        }
+      ]
+    }
+  ]
+}

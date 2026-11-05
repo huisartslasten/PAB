@@ -61,6 +61,7 @@ test('B1 learner practice provisions an owned profile and persists each atomic l
     };
 
     const db = {
+      functions: { invoke: async () => ({ data: null, error: null }) },
       auth: {
         getSession: async () => ({ data: { session: { user: { id: parentUserId } } }, error: null }),
         onAuthStateChange: () => ({ data: { subscription: { unsubscribe() {} } } }),

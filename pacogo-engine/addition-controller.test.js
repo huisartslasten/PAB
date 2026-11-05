@@ -126,3 +126,40 @@ const emptyController = createAdditionController({
 assert.throws(() => emptyController.submit(12), /No addition strategy has been selected/);
 
 console.log('PacoGO B1 addition controller passed.');
+
+
+const learnerTask = {
+  ...task,
+  task_id: 'B1-L01',
+  variation_key: 'learner_quantity_groups_small',
+  response_process_required: false
+};
+const learnerController = createAdditionController({
+  task: learnerTask,
+  studentKey: 'learner-session',
+  renderer: {},
+  addends: [7, 5],
+  expectedAnswer: 12,
+  strategyOptions: [],
+  provenance: { test: true, mode: 'operational_learner_practice' }
+});
+const learnerResult = learnerController.submit(12);
+assert.equal(learnerResult.evaluation.correct, true);
+assert.equal(learnerResult.observation.response.strategy_id, null);
+assert.equal(learnerResult.observation.performance.strategy, null);
+assert.equal(learnerResult.observation.response.explanation, null);
+assert.equal(
+  learnerResult.observation.interaction_events.some(event => event.event_type === 'strategy_selected'),
+  false
+);
+assert.throws(
+  () => createAdditionController({
+    task: { ...learnerTask, response_process_required: true },
+    studentKey: 'learner-session',
+    renderer: {},
+    addends: [7, 5],
+    expectedAnswer: 12,
+    strategyOptions: []
+  }),
+  /strategyOptions must contain at least one strategy/
+);

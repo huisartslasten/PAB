@@ -426,10 +426,10 @@ The product owner confirmed that the immediate goal is to make PacoGO usable so 
 ### Engineering status at this handoff update
 
 - Working branch: `refactor/professional-v1`; `main` is LIVE and must not be touched.
-- Latest verified branch head before this handoff update: `83ca4272012a2106e98f86afb1ad6a467732278a`.
-- Full Regression run #2904 / ID `41949304774` on that exact commit: **GREEN** (`completed / success`); all 19 workflow steps succeeded, including browser regression and clean-working-tree verification.
+- Latest verified implementation commit: `c53c694958df9bd4b9384c1a4991506aa772e9a0`.
+- Full Regression run #2906 / ID `41951693692` on that exact commit: **GREEN** (`completed / success`); all 19 workflow steps succeeded, including curriculum engine tests, maintained Node/Vitest tests, browser regression and clean-working-tree verification.
+- The implementation is a browser demonstration with session-only evidence; it does not persist learner history. No Supabase changes were made.
 - This handoff update is a new repository commit and must receive its own Full Regression. Replace this baseline with the exact handoff-update commit and its actual run result after verification.
-- No implementation work or Supabase change is included in this handoff update.
 
 
 ## 18. B1 learner-delivery audit — separation of pilot tasks and learner practice
@@ -465,3 +465,26 @@ This separation is an implementation boundary for the Zyon-first learner experie
 Build the first operational B1 learner task catalogue and reusable Addition learning flow, beginning with the already-defined B1.D1–D2 task models and preserving the ability to add B1.D3–D4 tasks against the existing registry contracts. Then verify the complete browser learner cycle before expanding to the next skill.
 
 No code or Supabase changes are included in this audit/handoff update.
+
+
+## 19. First operational B1 Addition learner route
+
+Implementation commit: `c53c694958df9bd4b9384c1a4991506aa772e9a0`.
+
+A separate operational learner-practice path now exists alongside the unchanged C1-C3 Pilot Task Set:
+- `docs/curriculum/PacoGO_B1_Learner_Task_Catalogue_v0.1.json` is the operational practice catalogue. It references only existing B1 registry contracts.
+- `curriculum-b1-learner.html` is the first learner-facing browser route.
+- `pacogo-engine/addition-learning-interface-contract.js` provides a renderer-independent task/view model.
+- `pacogo-engine/addition-learning-interface.js` renders quantity groups and symbolic addition without owning curriculum or evidence decisions.
+- `pacogo-engine/addition-controller.js` accepts direct answers when and only when the operational task explicitly sets `response_process_required: false`. Process-required tasks retain the existing strategy-selection requirement; absent process data remains null rather than being inferred from correctness.
+
+Initial coverage:
+- B1.D1 via B1.TM1 / B1.ET1: combine represented quantities.
+- B1.D2 via B1.TM3 / B1.ET3: execute symbolic addition, with two task variants.
+- The catalogue intentionally does not use B1.TM2 because its registry contract targets both ET1 and ET2 while the current observation contract exposes one singular evidence-target field. Do not manufacture multiple independent observations from one answer or change the C3/schema boundary to work around this. TM2 remains open for a separately designed contract-aligned task.
+
+The learner page accepts an ordinary numeric answer without a strategy choice or written explanation. It processes the response through the existing browser runtime and registry. The current route is a session-only demonstration: evidence is accumulated in memory for that page session and is not persisted after closing/reloading. No Supabase or curriculum registry changes were made. The task sequence is an initial practice sequence, not yet a fully adaptive next-action selector.
+
+**Next concrete step:** add and run browser-level coverage for the operational learner route and catalogue-to-registry mapping. Then complete the broader B1 learner task coverage and only afterward assess the minimum learner-state persistence/runtime requirement. Keep B1.D3–D4, TM2 alignment, adaptive support triggers and Supabase changes out of scope until their contracts are explicitly designed.
+
+**Verification:** this implementation commit was verified by Full Regression #2906 / ID `41951693692`, **GREEN**. The handoff update and additional focused browser/catalogue tests require their own Full Regression.

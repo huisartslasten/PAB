@@ -22,8 +22,8 @@
     button:disabled{opacity:.5;cursor:not-allowed}
     .status{font-weight:800;padding:12px 14px;border-radius:14px;background:#eef8ff;color:#126fc9;line-height:1.5}
     .status.error{background:#fff0f0;color:#b42318}
-    pre{margin:10px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;background:#f5f9fd;border-radius:14px;padding:14px;font:700 12px/1.5 ui-monospace,monospace}
-    .progress{font-size:14px;color:#647894;font-weight:800}
+    .progress{font-size:14px;color:#647894;font-weight:800;margin:14px 0}
+    #sessionSummary{font-size:14px;color:#647894}
   </style>
 </head>
 <body>
@@ -35,11 +35,7 @@
     <div id="progress" class="progress">Oefening laden…</div>
     <div id="exercise"></div>
     <div id="feedback" class="status" role="status" aria-live="polite">Je kunt beginnen.</div>
-  </section>
-  <section class="card">
-    <h2>Je oefenronde</h2>
-    <p class="muted">Je antwoorden worden in deze oefenronde gebruikt om de volgende oefening te bepalen. Deze demonstratie bewaart nog geen voortgang na het sluiten of vernieuwen van de pagina.</p>
-    <pre id="trace">Nog geen antwoord gegeven.</pre>
+    <p id="sessionSummary">Nog geen antwoorden verwerkt.</p>
   </section>
 </main>
 <script type="module">
@@ -55,7 +51,6 @@
   ]);
   const registry = createCurriculumRegistry(registryConfig);
   const runtime = createBrowserVerticalSliceRuntime({ registry, taskSet: catalogue });
-  const skill = registry.getSkill('B1');
   const tasks = catalogue.tasks;
   const learnerEvidence = [];
   let priorState = null;
@@ -64,7 +59,7 @@
 
   const exerciseHost = document.querySelector('#exercise');
   const feedback = document.querySelector('#feedback');
-  const trace = document.querySelector('#trace');
+  const sessionSummary = document.querySelector('#sessionSummary');
   const progress = document.querySelector('#progress');
 
   function showTask() {
@@ -81,7 +76,7 @@
       responseType: task.response_type,
       provenance: { page: 'curriculum-b1-learner.html', catalogue_version: catalogue.schema_version }
     });
-    progress.textContent = `Oefening ${taskIndex + 1} van ${tasks.length} • ${task.development_id}`;
+    progress.textContent = `Oefening ${taskIndex + 1} van ${tasks.length}`;
     feedback.className = 'status';
     feedback.textContent = 'Vul je antwoord in.';
     renderAdditionLearningInterface({
@@ -99,18 +94,11 @@
           learnerEvidence.splice(0, learnerEvidence.length, ...cycle.evidence);
           priorState = cycle.longitudinal_state;
           feedback.textContent = evaluation.correct
-            ? 'Goed gedaan. Je antwoord is verwerkt. Op naar de volgende oefening.'
-            : 'Dank je. Deze poging is ook verwerkt. We oefenen verder met een andere som.';
-          trace.textContent = JSON.stringify({
-            observation_id: observation.observation_id,
-            task_model_id: task.task_model_id,
-            development: cycle.development,
-            mastery: cycle.mastery,
-            next_action: cycle.next,
-            observations_in_session: learnerEvidence.length
-          }, null, 2);
-          const form = exerciseHost.querySelector('form');
-          form.querySelector('button').disabled = true;
+            ? 'Goed gedaan. Je antwoord is verwerkt.'
+            : 'Dank je. Deze poging is ook verwerkt. We oefenen verder.';
+          const count = learnerEvidence.length;
+          sessionSummary.textContent = `${count} ${count === 1 ? 'antwoord' : 'antwoorden'} verwerkt in deze oefenronde.`;
+          exerciseHost.querySelector('form button').disabled = true;
           if (taskIndex < tasks.length - 1) {
             const nextButton = document.createElement('button');
             nextButton.type = 'button';
@@ -124,7 +112,7 @@
             progress.textContent = 'Oefenronde afgerond';
             const done = document.createElement('p');
             done.className = 'muted';
-            done.textContent = 'Je hebt alle oefeningen gedaan. Je antwoorden zijn alleen in deze sessie bewaard.';
+            done.textContent = 'Je hebt alle oefeningen gedaan. Je voortgang wordt in deze demonstratie niet bewaard na het sluiten van de pagina.';
             exerciseHost.appendChild(done);
           }
         } catch (error) {

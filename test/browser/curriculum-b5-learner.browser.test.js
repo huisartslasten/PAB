@@ -62,7 +62,7 @@ test('B5 learner route completes twelve process-aware tasks and persists observa
     const prompt=taskPrompts[id];await page.getByLabel(prompt).fill(String(value));
    }
    await page.getByLabel('Eindantwoord').fill(String(data.answer));
-   if(data.check_answer!==undefined){const methodLabel=data.check_method==='recalculate'?'De uitgaven opnieuw berekenen':'Terugrekenen: uitgaven + wisselgeld';const methodPrompt=data.check_method==='recalculate'?'Bereken de totale uitgaven opnieuw. Hoeveel kosten de kaartjes en snack samen?':'Tel de totale uitgaven en het wisselgeld bij elkaar op. Welk bedrag krijg je?';await page.getByRole('button',{name:methodLabel,exact:true}).click();await page.getByLabel(methodPrompt).fill(String(data.check_answer));}
+   if(data.check_answer!==undefined){const reverseLabel='Terugrekenen: uitgaven + wisselgeld';const reversePrompt='Tel de totale uitgaven en het wisselgeld bij elkaar op. Welk bedrag krijg je?';await page.getByRole('button',{name:reverseLabel,exact:true}).click();await expect(page.getByLabel(reversePrompt)).toBeVisible();const methodLabel=data.check_method==='recalculate'?'De uitgaven opnieuw berekenen':reverseLabel;const methodPrompt=data.check_method==='recalculate'?'Bereken de totale uitgaven opnieuw. Hoeveel kosten de kaartjes en snack samen?':reversePrompt;await page.getByRole('button',{name:methodLabel,exact:true}).click();await expect(page.getByLabel(methodPrompt)).toBeVisible();await page.getByLabel(methodPrompt).fill(String(data.check_answer));}
   }
   await page.getByRole('button',{name:'Controleren',exact:true}).click();
   await expect(page.locator('#feedback')).toContainText('antwoord is opgeslagen');

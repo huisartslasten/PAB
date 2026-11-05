@@ -1016,6 +1016,7 @@ Reconcile the canonical C3 codebook and observation/event schema, then explicitl
 Prepare a consolidated contract reconciliation covering raw response episode, task support condition, help request/support delivery events, target-specific assessment cardinality, schema versioning and history compatibility. Then make the explicit B1.ET7 curriculum-contract decision. No implementation until those decisions are approved and Full Regression is green on the exact current HEAD.
 
 ### Verification
-- Task support C3 addendum commit: `abb071ac49d6f0b3385dc138dd92bd890c8a8733`.
-- Handoff update commit and resulting Full Regression: pending.
+- Task support C3 addendum commit: `abb071ac49d6f0b3385dc138dd92bd890c8a8733`; Full Regression #2997 / run ID `42033059236` completed GREEN on that exact commit.
+- Handoff update commit: `3ab6ab665c03d33713ee544c530be4b11703ab5a`; Full Regression #2998 / run ID `42033100117` completed GREEN on that exact commit.
+- Branch HEAD was verified as `3ab6ab665c03d33713ee544c530be4b11703ab5a` after #2998. `main` remains untouched.
 - No runtime, registry, catalogue, learner data or Supabase changes.

@@ -31,23 +31,34 @@ test('B5 learner route completes twelve process-aware tasks and persists observa
  await page.getByRole('button',{name:'Leerling toevoegen'}).click();
  await page.getByRole('button',{name:'Leerling kiezen: Leerling B5'}).click();
  await expect(page.locator('#exerciseCard h1')).toHaveText('Bewerkingen combineren oefenen');
- const correctChoices=['5 × 4 + 3','36 verdelen in 6 gelijke delen en daarna 2 erbij','4 × 6 + 3','2 × 8 + 5','4 × 20 + 4 × 3','5 × 12 − 5 × 2','5 × 12 − 8'];
- const stepAnswers=[
-  {steps:{first:8},answer:24},
-  {steps:{parentheses:11},answer:44},
-  {steps:{division:9,multiplication:18},answer:27},
-  {steps:{multiplication:48},answer:52},
-  null,null,null,
-  {steps:{cards:24,spent:28},answer:2,check_answer:30}
- ];
- for(let i=0;i<12;i++){
+ const taskIds=['B5-L01','B5-L02','B5-L03','B5-L04','B5-L05','B5-L06','B5-L07','B5-L08','B5-L09','B5-L10','B5-L11','B5-L12'];
+ const choiceAnswers={
+  'B5-L01':'5 × 4 + 3',
+  'B5-L02':'36 verdelen in 6 gelijke delen en daarna 2 erbij',
+  'B5-L03':'4 × 6 + 3',
+  'B5-L04':'2 × 8 + 5',
+  'B5-L09':'4 × 20 + 4 × 3',
+  'B5-L10':'5 × 12 − 5 × 2',
+  'B5-L11':'5 × 12 − 8'
+ };
+ const processAnswers={
+  'B5-L05':{steps:{first:8},answer:24},
+  'B5-L06':{steps:{parentheses:11},answer:44},
+  'B5-L07':{steps:{division:9,multiplication:18},answer:27},
+  'B5-L08':{steps:{multiplication:48},answer:52},
+  'B5-L12':{steps:{cards:24,spent:28},answer:2,check_answer:30}
+ };
+ const expectedTaskIds=[...Object.keys(choiceAnswers),...Object.keys(processAnswers)].sort();
+ expect([...taskIds].sort()).toEqual(expectedTaskIds);
+ for(let i=0;i<taskIds.length;i++){
+  const taskId=taskIds[i];
   await expect(page.locator('#progress')).toContainText('Oefening '+(i+1)+' van 12');
-  if([0,1,2,3,8,9,10].includes(i)){
-   const option=correctChoices[i];await page.getByRole('button',{name:option,exact:true}).click();
+  if(Object.hasOwn(choiceAnswers,taskId)){
+   await page.getByRole('button',{name:choiceAnswers[taskId],exact:true}).click();
   }else{
-   const data=stepAnswers[i-4];
+   const data=processAnswers[taskId];
    for(const [id,value] of Object.entries(data.steps)){
-    const taskPrompts={first:'Wat is de uitkomst van de eerste bewerking: 48 ÷ 6?',parentheses:'Wat is 8 + 3?',division:'Wat is 72 ÷ 8?',multiplication:i===6?'Wat is 6 × 3?':'Wat is 4 × 12?',cards:'Wat kosten de 3 kaartjes samen?',spent:'Hoeveel geef je in totaal uit, inclusief de snack?'};
+    const taskPrompts={first:'Wat is de uitkomst van de eerste bewerking: 48 ÷ 6?',parentheses:'Wat is 8 + 3?',division:'Wat is 72 ÷ 8?',multiplication:taskId==='B5-L07'?'Wat is 6 × 3?':'Wat is 4 × 12?',cards:'Wat kosten de 3 kaartjes samen?',spent:'Hoeveel geef je in totaal uit, inclusief de snack?'};
     const prompt=taskPrompts[id];await page.getByLabel(prompt).fill(String(value));
    }
    await page.getByLabel('Eindantwoord').fill(String(data.answer));

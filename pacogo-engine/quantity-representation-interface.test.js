@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createQuantityRepresentationModel } from './quantity-representation-interface.js';
+import { createQuantityRepresentationModel } from './quantity-representation-model.js';
 
 test('equal-groups representation preserves group count, group size and total',()=>{
  const model=createQuantityRepresentationModel({mode:'equal-groups',groups:4,items_per_group:3});

@@ -18,6 +18,7 @@ test('shared navigation owns one stable management sidebar profile', () => {
   assert.match(managementNavigationSource, /export function createPacoManagementNavigation\(/);
   assert.match(managementNavigationSource, /key: 'management-dashboard',[\s\S]*?label: 'Dashboard'/);
   assert.match(managementNavigationSource, /makeGroup\('beheer', 'Beheer'/);
+  assert.doesNotMatch(managementNavigationSource, /label: 'Skills', filter: 'skills'/);
   assert.match(managementNavigationSource, /key: 'archive',[\s\S]*?filter: 'archive'/);
   assert.match(managementNavigationSource, /key: 'trash',[\s\S]*?filter: 'trash'/);
   assert.doesNotMatch(managementNavigationSource, /path: 'archive\.html'/);
@@ -32,7 +33,6 @@ test('management runtime renders every management sidebar filter in its canonica
     "lessons: 'Lessen'",
     "'learning-material': 'Leerstof'",
     "tests: 'Toetsen'",
-    "skills: 'Skills'",
     "planning: 'Planning'",
     "agenda: 'Agenda'",
     "'month-calendar': 'Maandkalender'",
@@ -50,7 +50,7 @@ test('management runtime renders every management sidebar filter in its canonica
   assert.match(managementRuntime, /show\('vakken', 'lessons'\)/);
   assert.match(managementRuntime, /show\('vakken', 'learning-material'\)/);
   assert.match(managementRuntime, /show\('vakken', 'tests'\)/);
-  assert.match(managementRuntime, /show\('vakken', 'skills'\)/);
+  assert.doesNotMatch(managementRuntime, /skill\.manage|skill\.create|show\('vakken', 'skills'\)/);
   assert.match(managementRuntime, /show\('planning', 'agenda'\)/);
   assert.match(managementRuntime, /show\('planning', 'month-calendar'\)/);
   assert.match(managementRuntime, /show\('extra', 'challenges'\)/);

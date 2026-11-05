@@ -81,7 +81,6 @@ export function createPacoManagementNavigation({ app, active = '', activeSubmenu
       { key: 'lessons', label: 'Lessen', filter: 'lessons' },
       { key: 'learning-material', label: 'Leerstof', filter: 'learning-material' },
       { key: 'tests', label: 'Toetsen', filter: 'tests' },
-      { key: 'skills', label: 'Skills', filter: 'skills' }
     ]),
     makeGroup('planning', 'Planning', [
       { key: 'agenda', label: 'Agenda', filter: 'agenda' },

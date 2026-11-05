@@ -13,8 +13,6 @@ import { createGameResultService } from '../services/game-result-service.js';
 import { createGameAccessService } from '../services/game-access-service.js';
 import { createChallengeConfigurationService } from '../services/challenge-configuration-service.js';
 import { createChallengeUnlockService } from '../services/challenge-unlock-service.js';
-import { createSkillConfigurationService } from '../services/skill-configuration-service.js';
-import { createSkillDefinitionService } from '../services/skill-definition-service.js';
 import { createLessonOrderService } from '../services/lesson-order-service.js';
 import { createAiContentService } from '../services/ai-content-service.js';
 import { createAuthState } from '../core/auth.js';
@@ -38,7 +36,6 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null,
   const canManage = () => auth.isParent;
   const canCreate = () => auth.isCreator;
   const canConfigureChallenges = () => auth.isMainAdministrator;
-  const canConfigureSkills = () => auth.isMainAdministrator;
   const learningTopicMedia = createLearningTopicMediaService(db, { canManage });
   const learningTopics = createLearningTopicService(db, { canManage, media: learningTopicMedia });
   const lessons = createLessonService(db, { learningTopics });
@@ -54,8 +51,6 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null,
   const gameAccess = createGameAccessService(db);
   const challengeConfiguration = createChallengeConfigurationService(db, { canConfigure: canConfigureChallenges });
   const challengeUnlock = createChallengeUnlockService({ challengeConfiguration, practiceResults });
-  const skillConfiguration = createSkillConfigurationService(db, { canConfigure: canConfigureSkills });
-  const skillDefinitions = createSkillDefinitionService(db, { canConfigure: canConfigureSkills });
   const aiContent = createAiContentService({ supabase: db });
   const photos = createPhotoStorageService(db, { canManage });
   const learningContent = createLearningContentService(db, { media: learningTopicMedia, canManage, topics: learningTopics, imagePlacement });
@@ -73,13 +68,13 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null,
     return records;
   }
 
-  const management = createManagement({ auth, lessonService: lessons, feedbackService: feedback, lessonOrder, loadLessons, learningTopics, skillDefinitions });
+  const management = createManagement({ auth, lessonService: lessons, feedbackService: feedback, lessonOrder, loadLessons, learningTopics });
   const managementCapabilities = createManagementCapabilities({ auth, management });
 
   return Object.freeze({
     db, auth, authSession, learnerCurriculum, initializeSession, state: appState, lessons, lessonOrder, loadLessons,
     feedback, grading, audio, mastery, agenda, testHistory, practiceResults, gameResults, gameAccess,
-    challengeConfiguration, challengeUnlock, skillConfiguration, skillDefinitions, aiContent,
+    challengeConfiguration, challengeUnlock, aiContent,
     creator: createCreatorService(db, { canCreate }), management, managementCapabilities,
     photos, learningTopics, learningTopicMedia, learningContent, mapLessons: mapLessonRecords
   });

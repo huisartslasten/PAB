@@ -19,11 +19,9 @@ function buildTarget(path, { student = '', mode = 'management', extra = {} } = {
 }
 
 const PAGE_CAPABILITIES = Object.freeze({
-  management: Object.freeze(['lesson.manage', 'lesson.create', 'learningTopic.manage', 'learningTopic.create', 'agenda.manage', 'monthCalendar.manage', 'skill.manage', 'skill.create', 'challenge.configure', 'game.access']),
+  management: Object.freeze(['lesson.manage', 'lesson.create', 'learningTopic.manage', 'learningTopic.create', 'agenda.manage', 'monthCalendar.manage', 'challenge.configure', 'game.access']),
   lessons: Object.freeze(['lesson.create', 'learningTopic.create']),
   'lesson-editor': Object.freeze(['lesson.create']),
-  skills: Object.freeze(['skill.create']),
-  'skill-editor': Object.freeze(['skill.create']),
   'learning-material': Object.freeze(['learningTopic.create']),
   'learning-material-editor': Object.freeze(['learningTopic.create'])
 });
@@ -35,8 +33,6 @@ const CAPABILITIES = Object.freeze({
   'learningTopic.create': Object.freeze({ id: 'learningTopic.create', entityType: 'learningTopic', page: 'learning-material-editor', group: 'Leerstofbeheer', label: '➕ Leerstof maken', description: 'Open de centrale leerstofeditor.', requiresStudent: true, target: ({ student }) => buildTarget('learning-material-editor.html', { student }) }),
   'agenda.manage': Object.freeze({ id: 'agenda.manage', entityType: 'agenda', page: 'agenda', group: 'Agenda', label: '📅 Agenda', description: 'Bekijk en beheer de agenda van de actieve leerling.', requiresStudent: true, target: ({ student }) => buildTarget('agenda.html', { student }) }),
   'monthCalendar.manage': Object.freeze({ id: 'monthCalendar.manage', entityType: 'monthCalendar', page: 'month-calendar', group: 'Agenda', label: '🖨️ Maandkalender', description: 'Open de maandkalender van de actieve leerling.', requiresStudent: true, target: ({ student }) => buildTarget('month-calendar.html', { student }) }),
-  'skill.manage': Object.freeze({ id: 'skill.manage', entityType: 'skill', page: 'skills', group: 'Skillbeheer', label: '🧮 Skills beheren', description: 'Beheer Skills en bepaal per leerling welke Skills beschikbaar zijn.', requiresStudent: true, authorize: isMainAdministrator, target: ({ student }) => buildTarget('skills.html', { student }) }),
-  'skill.create': Object.freeze({ id: 'skill.create', entityType: 'skill', page: 'skill-create', group: 'Skillbeheer', label: '➕ Skill maken', description: 'Kies welk type Skill je wilt maken.', requiresStudent: false, authorize: isMainAdministrator, target: ({ student }) => buildTarget('skill-create.html', { student }) }),
   'challenge.configure': Object.freeze({ id: 'challenge.configure', entityType: 'challenge', page: 'challenge-settings', group: 'Challengebeheer', label: '🎯 Challenge-instellingen', description: 'Beheer centraal de Challenge-configuratie.', requiresStudent: false, authorize: isMainAdministrator, target: () => buildTarget('challenge-settings.html') }),
   'game.access': Object.freeze({ id: 'game.access', entityType: 'gameAccess', page: 'game-access', group: 'Spelbeheer', label: '🎮 Spelvrijgave', description: 'Beheer centraal de spelcriteria en spelvrijgave van de actieve leerling.', requiresStudent: true, authorize: isMainAdministrator, target: ({ student }) => buildTarget('game-access.html', { student }) })
 });
@@ -52,11 +48,6 @@ const ITEM_ACTIONS = Object.freeze({
     Object.freeze({ id: 'learningTopic.archive', label: 'Archiveren', execute: ({ management, item }) => management.archiveLearningTopic(item.id), requiresConfirmation: true, confirmation: Object.freeze({ title: 'Leerstof archiveren?', message: item => `“${item.subject}${item.subvak ? ` · ${item.subvak}` : ''}” wordt uit de actieve leerstof gehaald en in het archief geplaatst.`, confirmLabel: 'Archiveren', cancelLabel: 'Annuleren' }) }),
     Object.freeze({ id: 'learningTopic.delete', label: 'Verwijderen', execute: ({ management, item }) => management.moveLearningTopicToTrash(item.id), requiresConfirmation: true, danger: true, confirmation: Object.freeze({ title: 'Leerstof naar prullenbak?', message: item => `“${item.subject}${item.subvak ? ` · ${item.subvak}` : ''}” wordt uit de actieve leerstof gehaald en naar de prullenbak verplaatst.`, confirmLabel: 'Naar prullenbak', cancelLabel: 'Annuleren' }) })
   ]),
-  skill: Object.freeze([
-    Object.freeze({ id: 'skill.edit', label: 'Bewerken', target: ({ item, student }) => buildTarget('skill-editor.html', { student: student || item?.student, extra: { skill: item?.id } }) }),
-    Object.freeze({ id: 'skill.archive', label: 'Archiveren', execute: ({ management, item }) => management.archiveSkill(item.id), requiresConfirmation: true, confirmation: Object.freeze({ title: 'Skill archiveren?', message: item => `“${item.title}” wordt uit de actieve Skills gehaald en in het archief geplaatst.`, confirmLabel: 'Archiveren', cancelLabel: 'Annuleren' }) }),
-    Object.freeze({ id: 'skill.delete', label: 'Verwijderen', execute: ({ management, item }) => management.moveSkillToTrash(item.id), requiresConfirmation: true, danger: true, confirmation: Object.freeze({ title: 'Skill naar prullenbak?', message: item => `“${item.title}” wordt uit de actieve Skills gehaald en naar de prullenbak verplaatst.`, confirmLabel: 'Naar prullenbak', cancelLabel: 'Annuleren' }) })
-  ])
 });
 
 export function createManagementCapabilities({ auth, management, eventTarget = globalThis } = {}) {

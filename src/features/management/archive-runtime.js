@@ -58,20 +58,6 @@ export function createArchiveRuntime({
   const learningTrashList = documentRef.createElement('div');
   learningTrash.append(learningTrashHeading, learningTrashList);
 
-  const skillArchive = documentRef.createElement('section');
-  skillArchive.className = 'management-section';
-  const skillArchiveHeading = documentRef.createElement('h2');
-  skillArchiveHeading.textContent = 'Skills — Archief';
-  const skillArchiveList = documentRef.createElement('div');
-  skillArchive.append(skillArchiveHeading, skillArchiveList);
-
-  const skillTrash = documentRef.createElement('section');
-  skillTrash.className = 'management-section';
-  const skillTrashHeading = documentRef.createElement('h2');
-  skillTrashHeading.textContent = 'Skills — Prullenbak';
-  const skillTrashList = documentRef.createElement('div');
-  skillTrash.append(skillTrashHeading, skillTrashList);
-
   const management = app.management;
 
   function showNotice(message) {
@@ -126,58 +112,6 @@ export function createArchiveRuntime({
     await refreshRecovery();
   }
 
-  function renderSkillRecovery(list, skills, kind) {
-    list.replaceChildren();
-    if (!skills.length) {
-      const empty = documentRef.createElement('div');
-      empty.className = 'management-state';
-      empty.textContent = kind === 'archive' ? 'Geen Skills in het archief.' : 'Geen Skills in de prullenbak.';
-      list.appendChild(empty);
-      return;
-    }
-    skills.forEach(skill => {
-      const row = documentRef.createElement('div');
-      row.className = 'management-recovery-lesson';
-      const title = documentRef.createElement('h3');
-      title.textContent = skill.title;
-      const meta = documentRef.createElement('p');
-      meta.textContent = `${skill.category || 'Overig'}${skill.description ? ` · ${skill.description}` : ''}`;
-      const actions = documentRef.createElement('div');
-      actions.className = 'management-links';
-      const restore = documentRef.createElement('button');
-      restore.type = 'button';
-      restore.className = 'management-link';
-      restore.textContent = 'Herstellen';
-      restore.addEventListener('click', async () => {
-        try {
-          if (kind === 'archive') await management.restoreSkillFromArchive(skill.id);
-          else await management.restoreSkillFromTrash(skill.id);
-          showNotice(`“${skill.title}” is hersteld.`);
-          await refreshRecovery();
-        } catch (error) { await handleRecoveryError(error); }
-      });
-      actions.appendChild(restore);
-      if (kind === 'trash') {
-        const remove = documentRef.createElement('button');
-        remove.type = 'button';
-        remove.className = 'management-link danger';
-        remove.textContent = 'Definitief verwijderen';
-        remove.addEventListener('click', async () => {
-          const confirmed = await confirmPacoAction({ title: 'Skill definitief verwijderen?', message: `“${skill.title}” wordt definitief verwijderd. Dit kan niet ongedaan worden gemaakt.`, confirmLabel: 'Definitief verwijderen', cancelLabel: 'Annuleren' });
-          if (!confirmed) return;
-          try {
-            await management.permanentlyDeleteSkill(skill.id);
-            showNotice(`“${skill.title}” is definitief verwijderd.`);
-            await refreshRecovery();
-          } catch (error) { await handleRecoveryError(error); }
-        });
-        actions.appendChild(remove);
-      }
-      row.append(title, meta, actions);
-      list.appendChild(row);
-    });
-  }
-
   async function refreshRecovery() {
     archiveList.replaceChildren();
     trashList.replaceChildren();
@@ -186,12 +120,10 @@ export function createArchiveRuntime({
     if (recovery === RECOVERY_MODES.ALL || recovery === RECOVERY_MODES.ARCHIVE) {
       renderRecovery(archiveList, management, 'archive', handleRestore, undefined, undefined, handleRecoveryError);
       await renderLearningTopicRecovery(learningArchiveList, management, 'archive', handleLearningRestore, undefined, undefined, handleRecoveryError);
-      renderSkillRecovery(skillArchiveList, await management.getRecoverySkills('archive'), 'archive');
     }
     if (recovery === RECOVERY_MODES.ALL || recovery === RECOVERY_MODES.TRASH) {
       renderRecovery(trashList, management, 'trash', handleRestore, emptyTrash, permanentlyDeleteLesson, handleRecoveryError);
       await renderLearningTopicRecovery(learningTrashList, management, 'trash', handleLearningRestore, emptyLearningTrash, permanentlyDeleteLearningTopic, handleRecoveryError);
-      renderSkillRecovery(skillTrashList, await management.getRecoverySkills('trash'), 'trash');
     }
   }
 
@@ -206,10 +138,10 @@ export function createArchiveRuntime({
 
     const title = recovery === RECOVERY_MODES.ARCHIVE ? 'Archief' : recovery === RECOVERY_MODES.TRASH ? 'Prullenbak' : 'Archief / Prullenbak';
     const subtitle = recovery === RECOVERY_MODES.ARCHIVE
-      ? 'Herstel gearchiveerde lessen, leerstofonderwerpen en Skills.'
+      ? 'Herstel gearchiveerde lessen en leerstofonderwerpen.'
       : recovery === RECOVERY_MODES.TRASH
-        ? 'Herstel of verwijder lessen, leerstofonderwerpen en Skills uit de prullenbak.'
-        : 'Herstel of verwijder lessen, leerstofonderwerpen en Skills.';
+        ? 'Herstel of verwijder lessen en leerstofonderwerpen uit de prullenbak.'
+        : 'Herstel of verwijder lessen en leerstofonderwerpen.';
 
     mountPacoPageTemplate({ mount: templateMount, greeting: 'PAB beheer ⚙️', title, icon: '🗂️', subtitle, navigation: createPacoNavigation({ app, active: 'recovery', viewMode: 'management', navigate }), content });
 
@@ -217,8 +149,8 @@ export function createArchiveRuntime({
       await management.loadRecoveryLessons();
       await refreshRecovery();
       const sections = [notice];
-      if (recovery === RECOVERY_MODES.ALL || recovery === RECOVERY_MODES.ARCHIVE) sections.push(archive, learningArchive, skillArchive);
-      if (recovery === RECOVERY_MODES.ALL || recovery === RECOVERY_MODES.TRASH) sections.push(trash, learningTrash, skillTrash);
+      if (recovery === RECOVERY_MODES.ALL || recovery === RECOVERY_MODES.ARCHIVE) sections.push(archive, learningArchive);
+      if (recovery === RECOVERY_MODES.ALL || recovery === RECOVERY_MODES.TRASH) sections.push(trash, learningTrash);
       content.replaceChildren(...sections);
     } catch (error) {
       console.error('Archive page load error:', error);

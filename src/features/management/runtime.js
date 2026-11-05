@@ -9,7 +9,6 @@ const FILTER_LABELS = Object.freeze({
   lessons: 'Lessen',
   'learning-material': 'Leerstof',
   tests: 'Toetsen',
-  skills: 'Skills',
   planning: 'Planning',
   agenda: 'Agenda',
   'month-calendar': 'Maandkalender',
@@ -86,7 +85,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
 
   function createManagementCard(id, title, description, capabilityById) {
     const capability = capabilityById.get(id);
-    const createId = id === 'lesson.manage' ? 'lesson.create' : id === 'learningTopic.manage' ? 'learningTopic.create' : id === 'skill.manage' ? 'skill.create' : '';
+    const createId = id === 'lesson.manage' ? 'lesson.create' : id === 'learningTopic.manage' ? 'learningTopic.create' : '';
     const createCapability = createId ? capabilityById.get(createId) : null;
     return createCard(documentRef, {
       title,
@@ -118,7 +117,6 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     if (show('vakken', 'lessons')) vakkenCards.push(createManagementCard('lesson.manage', 'Lessen', 'Bekijk, bewerk, archiveer of verwijder lessen.', capabilities));
     if (show('vakken', 'learning-material')) vakkenCards.push(createManagementCard('learningTopic.manage', 'Leerstof', 'Beheer de leerstof van de actieve leerling.', capabilities));
     if (show('vakken', 'tests')) vakkenCards.push(createCard(documentRef, { title: 'Toetsen', description: 'Bekijk de toetsgeschiedenis van de actieve leerling.', actionLabel: 'Toetsen bekijken', disabled: !hasStudent, onClick: () => go('test-history.html') }));
-    if (show('vakken', 'skills')) vakkenCards.push(createManagementCard('skill.manage', 'Skills', 'Beheer Skills voor de actieve leerling.', capabilities));
     renderSection('Vakken', vakkenCards);
 
     const planningCards = [];

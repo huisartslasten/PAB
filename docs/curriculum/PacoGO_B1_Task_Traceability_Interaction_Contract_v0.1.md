@@ -158,3 +158,21 @@ B. a distinct evidence target that needs explicit task-model mapping;
 C. removed from operational B1 claims pending a better construct definition.
 
 Do not choose among these by convenience. Inspect the C1–C9 evidence/coding architecture and the scientific validation baseline first, then document the rationale and test implications.
+
+
+## 11. Cross-check against C3 evidence coding and validation data design
+
+The C3 coding documents were inspected after identifying the ET7 gap:
+- `PacoGO_Evidence_Coding_Manual_v0.1.md` defines independence as INDEPENDENT, PROMPTED, DEPENDENT or UNKNOWN and states that observable evidence, not coder assumptions, must be coded.
+- `PacoGO_C3_Evidence_Coding_Specification_v0.1.md` treats independence as a required coding dimension and requires the protocol to specify which independence categories count for a claim.
+- `PacoGO_Validation_Data_Specification_v0.1.md` requires prompt/instruction exposure and evidence-quality/alternative-explanation indicators when tied to a research question.
+
+This supports treating independence as a cross-cutting coding dimension in the evidence-coding architecture. It does **not** establish that B1.ET7 is formally intended to be cross-cutting, nor does it resolve why ET7 is listed as a B1 evidence target but omitted from all B1 task models. That relationship remains an explicit contract question. Do not remove ET7, attach it to TM4, or create a new task model by inference.
+
+### Provisional finding
+- Cross-cutting independence coding is supported by C3.
+- B1-specific mapping of ET7 is unresolved.
+- The learner controller's hardcoded `independent: true` is inconsistent with the C3 requirement to classify independence from observed assistance/prompting.
+- A future implementation should record actual prompt/instruction exposure and preserve UNKNOWN when it cannot be established. It must not default an unobserved learner process to INDEPENDENT.
+
+The next curriculum decision should reconcile the B1 registry/task-model contract with the C3 coding model and document the intended role of ET7 before runtime changes.

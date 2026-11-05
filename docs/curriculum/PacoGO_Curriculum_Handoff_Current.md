@@ -312,7 +312,7 @@ Prioritise the existing roadmap in this order:
 
 An imperfect or not-yet-school-method-specific explanation is acceptable for the first operational version if it is mathematically correct, understandable and honest about not necessarily matching the classroom method. The explanation can be improved later without changing the curriculum engine.
 
-**Next concrete step after this handoff update:** resume the existing curriculum/evidence work already identified in Section 13: review the C3 Canonical Codebook Reconciliation Proposal as an evidence/measurement contract only. Preserve the curriculum boundary; ask the product owner before any decision that would affect curriculum meaning or SLO alignment.
+**Next concrete step:** follow the Zyon-first delivery plan in Section 17. The C3 evidence/codebook work is not the immediate delivery priority.
 
 ## 13. Current C3 reconciliation proposal and curriculum boundary (2026-11-04)
 
@@ -358,7 +358,7 @@ The exercise does **not** establish inter-rater agreement, coder reliability, qu
 
 **Approval boundary:** v0.2 is a candidate design proposal only, not an approved canonical codebook. No curriculum/SLO/skill/development/claim/evidence-target/mastery meaning, registry, task mapping, runtime, learner-state, schema, persistence or Supabase change is authorized. The singular-versus-array schema conflict remains open. Synthetic FR2/browser cases remain technical fixtures, not empirical learner data or validation.
 
-**Next concrete step:** prepare a blinded coder packet and a separate adjudication key. The packet must not expose the key; independent coding must precede discussion/adjudication. Use results only to assess clarity/feasibility and revise anchors; actual coder reliability requires an appropriately designed human-coder study.
+**Historical next step — deferred:** the blinded coder packet and adjudication key were prepared, but the exercise is paused pending review against the initial product decision in Section 17. Do not ask coders to complete the existing packet as-is.
 
 **Latest verified baseline before this handoff update:**
 - Branch: `refactor/professional-v1`
@@ -392,3 +392,41 @@ This is a small synthetic feasibility exercise only. It does not establish human
 - The preceding run #2897 (ID `41850531446`) was superseded by #2898 on the newer branch head; #2898 is the authoritative result for the adjudication-key commit.
 
 **Next concrete step:** after the handoff update passes its own Full Regression, conduct the independent human coding exercise using the blinded packet, then adjudicate disagreements with the restricted key. Do not implement the canonical codebook/schema or change runtime/Supabase until the evidence contract has been explicitly reviewed and approved.
+
+
+## 17. Zyon-first delivery plan and initial learner interaction policy (2026-11-04)
+
+The product owner confirmed that the immediate goal is to make PacoGO usable so Zyon can begin strengthening his mathematics. Zyon is currently halfway through group 6. The practical priority is to help him recover and strengthen the relevant arithmetic skills, not to extend design/research work unnecessarily.
+
+### Product decisions for the initial operational version
+
+- The already fully developed SLO curriculum remains the source of truth. Do not redo, rewrite, restructure or reinterpret the existing SLO goals, skills, developments, claims, evidence targets or mastery criteria.
+- For the initial learner experience, learners are **not required to explain or justify every answer**. PacoGO should accept ordinary answer/performance evidence from relevant tasks.
+- Evidence should accumulate across multiple relevant tasks and variants. Repeated successful performance can contribute stronger evidence over time; one correct answer must not automatically award mastery. Existing mastery criteria and decision contracts remain authoritative and must not be replaced with an invented shortcut.
+- If a learner repeatedly has difficulty, PacoGO should be able to offer targeted teaching support, preferably visual and step-by-step for mathematics, followed by another opportunity to practise/apply. The exact trigger and support-selection logic are not yet specified; do not invent these or silently change mastery criteria.
+- Keep assessment and teaching support distinct: performance evidence informs assessment/mastery under the existing contracts; instructional support responds to observed difficulty. Optional explanations or additional process evidence may be added later where useful, but are not a general learner requirement.
+- Preserve architectural room for future school-method-aware instruction and multiple ways of presenting/explaining a skill. This is a later enhancement, not a blocker for the first usable version. For now, provide mathematically correct, understandable explanations without claiming they match a particular school's method unless confirmed.
+
+### Immediate work sequence
+
+1. **Inventory existing skills and implementation.** Inspect the current SLO-based curriculum/registry and related task definitions. Produce a grounded overview of which existing skills are complete, partial or not yet implemented; which Learning Interfaces/tasks already support them; and what is missing for a learner to use them. This is an inventory, not a curriculum redesign.
+2. **Complete the remaining skills.** Work through the existing SLO skills and their already-defined contracts. Prioritise the skills needed for Zyon's current learning needs where the existing curriculum allows; do not invent a new skill sequence or alter mastery criteria.
+3. **Reuse and complete Learning Interfaces.** Prefer existing reusable interfaces (including Number Line, Addition and Fraction) and add only the genuinely missing interaction/presentation needed by the existing skills.
+4. **Complete the minimum learner learning cycle.** A learner must be able to receive a skill/task, respond, have performance recorded and processed under the existing contracts, see progress and receive a suitable next task/action.
+5. **Add initial explanatory support.** Provide clear, mathematically correct explanations, visual and stepwise where appropriate, especially when the learner is having difficulty. Keep the trigger logic explicit and do not let explanations become mandatory response fields.
+6. **Test with Zyon and improve.** Validate that he can start, practise, understand the support and continue. Use observed practical gaps to prioritise improvements.
+
+### Deferred work and C3 packet status
+
+- Pause the independent human-coder exercise for now. The existing synthetic packet includes learner-explanation scenarios and must be reviewed/revised before it is used; do not ask the product owner or other coders to complete it as-is.
+- C3 reconciliation, canonical codebook/schema decisions, extended coder reliability work and scientific validation remain future work unless a genuine immediate runtime requirement makes a specific bounded part necessary.
+- Detailed Adaptive Instruction Layer, school-method profiles/provenance and method-specific interface configuration remain deferred.
+- Do not make Supabase changes unless an actual persistence/runtime contract change requires them.
+
+### Engineering status at this handoff update
+
+- Working branch: `refactor/professional-v1`; `main` is LIVE and must not be touched.
+- Baseline commit before this handoff update: `9d6cbabb0b437a4105591032f76a56890b8cb53c`.
+- Full Regression run #2903 / ID `41903117899` on that exact commit: **GREEN** (`completed / success`).
+- This handoff update is a new repository commit and must receive its own Full Regression. Replace this baseline with the exact handoff-update commit and its actual run result after verification.
+- No implementation work or Supabase change is included in this handoff update.

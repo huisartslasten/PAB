@@ -1160,3 +1160,9 @@ Voer de dependency-audit uit van de oude Skills-implementatie: inventariseer imp
 - Before removing the two persistence services, design a non-destructive data disposition for custom definitions, learner assignments, and the three orphan `math-mixed` rows; distinguish archive/export from deletion.
 - Keep `game_results`, game-access tables, curriculum engine tables, and learner state unchanged.
 - No Supabase DDL/DML was performed; production project untouched.
+
+
+### Regression-verificatie van sectie 37
+- Full Regression #3016 / run ID `42104475497`: completed GREEN op exact commit `60da68d22845442ffc183add4c40ed6a825b74f7`.
+- De handoff met deze bevindingen is inhoudelijk geverifieerd op die commit.
+- Er is geen applicatiecode of database aangepast in deze auditstap.

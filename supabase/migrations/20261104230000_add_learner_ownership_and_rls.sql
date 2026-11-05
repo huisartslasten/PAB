@@ -230,6 +230,17 @@ alter table public.curriculum_decision_trace
     and jsonb_typeof(validation_hooks) = 'object'
   );
 
+-- Remove every pre-existing permissive learner-data policy. PostgreSQL combines
+-- permissive policies with OR, so leaving even one USING (true) policy would
+-- nullify the ownership boundary below.
+drop policy if exists student_evidence_select_authenticated on public.student_evidence;
+drop policy if exists student_evidence_insert_authenticated on public.student_evidence;
+drop policy if exists "authenticated can read longitudinal state" on public.student_longitudinal_state;
+drop policy if exists "authenticated can insert longitudinal state" on public.student_longitudinal_state;
+drop policy if exists "authenticated can update longitudinal state" on public.student_longitudinal_state;
+drop policy if exists "authenticated can read decision traces" on public.curriculum_decision_trace;
+drop policy if exists "authenticated can insert decision traces" on public.curriculum_decision_trace;
+
 create policy student_evidence_select_linked_guardians
   on public.student_evidence
   for select to authenticated
@@ -291,9 +302,9 @@ begin
   end if;
 
   if p_skill_id is null or length(btrim(p_skill_id)) = 0
-     or jsonb_typeof(p_evidence) <> 'object'
-     or jsonb_typeof(p_state) <> 'object'
-     or jsonb_typeof(p_decision_trace) <> 'object'
+     or jsonb_typeof(p_evidence) is distinct from 'object'
+     or jsonb_typeof(p_state) is distinct from 'object'
+     or jsonb_typeof(p_decision_trace) is distinct from 'object'
      or jsonb_typeof(coalesce(p_evidence -> 'performance', '{}'::jsonb)) <> 'object'
      or jsonb_typeof(coalesce(p_evidence -> 'observation', '{}'::jsonb)) <> 'object'
      or jsonb_typeof(coalesce(p_evidence -> 'evidence_assessment', '{}'::jsonb)) <> 'object'

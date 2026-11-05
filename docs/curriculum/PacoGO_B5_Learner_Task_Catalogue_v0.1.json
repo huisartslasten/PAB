@@ -1,0 +1,334 @@
+{
+  "schema_version": "0.1",
+  "status": "operational_candidate",
+  "purpose": "Afzonderlijke oefencatalogus voor de volledige kandidaat-ontwikkelingslijn van B5 Bewerkingen combineren en structureren. Dit is niet de C1-C3 pilot-meettaakset.",
+  "synthetic_or_empirical": "operational_practice_definition",
+  "skill_id": "B5",
+  "curriculum_registry_version": "0.6.0-candidate",
+  "tasks": [
+    {
+      "task_id": "B5-L01",
+      "title": "Welke bewerkingen horen erbij?",
+      "instruction": "Er staan 5 doosjes met elk 4 potloden en daarnaast liggen 3 losse potloden. Welke som past hierbij?",
+      "skill_id": "B5",
+      "development_id": "B5.D1",
+      "claim_id": "B5.C1",
+      "evidence_target_ids": [
+        "B5.ET1"
+      ],
+      "task_model_id": "B5.TM1",
+      "variation_key": "b5_structure_boxes",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "response_type": "choice",
+      "choice_options": [
+        {
+          "id": "a",
+          "label": "5 × 4 + 3"
+        },
+        {
+          "id": "b",
+          "label": "5 × (4 + 3)"
+        },
+        {
+          "id": "c",
+          "label": "5 + 4 × 3"
+        }
+      ],
+      "expected_choice_id": "a",
+      "display_expression": "5 doosjes van 4, plus 3 losse"
+    },
+    {
+      "task_id": "B5-L02",
+      "title": "De som begrijpen",
+      "instruction": "Wat betekent 36 ÷ 6 + 2?",
+      "skill_id": "B5",
+      "development_id": "B5.D1",
+      "claim_id": "B5.C1",
+      "evidence_target_ids": [
+        "B5.ET2"
+      ],
+      "task_model_id": "B5.TM1",
+      "variation_key": "b5_structure_divide_add",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "response_type": "choice",
+      "choice_options": [
+        {
+          "id": "a",
+          "label": "36 verdelen in 6 gelijke delen en daarna 2 erbij"
+        },
+        {
+          "id": "b",
+          "label": "36 verdelen in 6 gelijke delen en daarna 2 keer zoveel nemen"
+        },
+        {
+          "id": "c",
+          "label": "36 verdelen in 6 + 2 gelijke delen"
+        }
+      ],
+      "expected_choice_id": "a",
+      "display_expression": "36 ÷ 6 + 2"
+    },
+    {
+      "task_id": "B5-L03",
+      "title": "Van situatie naar som",
+      "instruction": "Vier boeken kosten elk €6. De bezorging kost €3. Welke som berekent het totaal?",
+      "skill_id": "B5",
+      "development_id": "B5.D2",
+      "claim_id": "B5.C2",
+      "evidence_target_ids": [
+        "B5.ET3"
+      ],
+      "task_model_id": "B5.TM2",
+      "variation_key": "b5_context_books_delivery",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "response_type": "choice",
+      "choice_options": [
+        {
+          "id": "a",
+          "label": "4 × 6 + 3"
+        },
+        {
+          "id": "b",
+          "label": "4 × (6 + 3)"
+        },
+        {
+          "id": "c",
+          "label": "4 + 6 × 3"
+        }
+      ],
+      "expected_choice_id": "a",
+      "display_expression": "4 boeken × €6, plus €3 bezorging"
+    },
+    {
+      "task_id": "B5-L04",
+      "title": "De groepering behouden",
+      "instruction": "Twee dienbladen hebben elk 8 glazen. Daarna worden er nog 5 glazen bijgeplaatst. Welke som past?",
+      "skill_id": "B5",
+      "development_id": "B5.D2",
+      "claim_id": "B5.C2",
+      "evidence_target_ids": [
+        "B5.ET4"
+      ],
+      "task_model_id": "B5.TM2",
+      "variation_key": "b5_context_trays",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "response_type": "choice",
+      "choice_options": [
+        {
+          "id": "a",
+          "label": "2 × 8 + 5"
+        },
+        {
+          "id": "b",
+          "label": "2 × (8 + 5)"
+        },
+        {
+          "id": "c",
+          "label": "2 + 8 × 5"
+        }
+      ],
+      "expected_choice_id": "a",
+      "display_expression": "2 dienbladen van 8, plus 5 glazen"
+    },
+    {
+      "task_id": "B5-L05",
+      "title": "Volgorde van bewerkingen",
+      "instruction": "Reken uit. Vermenigvuldigen gaat vóór optellen.",
+      "skill_id": "B5",
+      "development_id": "B5.D3",
+      "claim_id": "B5.C3",
+      "evidence_target_ids": [
+        "B5.ET5"
+      ],
+      "task_model_id": "B5.TM3",
+      "variation_key": "b5_precedence_mult_add",
+      "prompt_level": "none",
+      "response_type": "numeric",
+      "expression": "8 + 3 × 4",
+      "expected_answer": 20,
+      "operation_expression": "8 + 3 × 4"
+    },
+    {
+      "task_id": "B5-L06",
+      "title": "Haakjes veranderen de volgorde",
+      "instruction": "Reken uit wat tussen haakjes staat eerst uit.",
+      "skill_id": "B5",
+      "development_id": "B5.D3",
+      "claim_id": "B5.C3",
+      "evidence_target_ids": [
+        "B5.ET6"
+      ],
+      "task_model_id": "B5.TM3",
+      "variation_key": "b5_precedence_parentheses",
+      "prompt_level": "none",
+      "response_type": "numeric",
+      "expression": "(8 + 3) × 4",
+      "expected_answer": 44,
+      "operation_expression": "(8 + 3) × 4"
+    },
+    {
+      "task_id": "B5-L07",
+      "title": "Twee bewerkingen uitvoeren",
+      "instruction": "Reken de samengestelde som uit. Vermenigvuldigen en delen gaan vóór optellen en aftrekken.",
+      "skill_id": "B5",
+      "development_id": "B5.D4",
+      "claim_id": "B5.C4",
+      "evidence_target_ids": [
+        "B5.ET7"
+      ],
+      "task_model_id": "B5.TM4",
+      "variation_key": "b5_evaluate_mixed",
+      "prompt_level": "none",
+      "response_type": "numeric",
+      "expression": "72 ÷ 8 + 6 × 3",
+      "expected_answer": 27,
+      "operation_expression": "72 ÷ 8 + 6 × 3"
+    },
+    {
+      "task_id": "B5-L08",
+      "title": "Tussenstappen goed gebruiken",
+      "instruction": "Reken uit en houd de bewerkingen in de juiste volgorde.",
+      "skill_id": "B5",
+      "development_id": "B5.D4",
+      "claim_id": "B5.C4",
+      "evidence_target_ids": [
+        "B5.ET8"
+      ],
+      "task_model_id": "B5.TM4",
+      "variation_key": "b5_intermediate_subtract",
+      "prompt_level": "none",
+      "response_type": "numeric",
+      "expression": "100 − 4 × 12",
+      "expected_answer": 52,
+      "operation_expression": "100 − 4 × 12"
+    },
+    {
+      "task_id": "B5-L09",
+      "title": "Gelijkwaardige sommen",
+      "instruction": "Welke som heeft dezelfde waarde als 4 × (20 + 3)?",
+      "skill_id": "B5",
+      "development_id": "B5.D5",
+      "claim_id": "B5.C5",
+      "evidence_target_ids": [
+        "B5.ET9"
+      ],
+      "task_model_id": "B5.TM5",
+      "variation_key": "b5_equivalent_distributive_add",
+      "prompt_level": "none",
+      "response_type": "choice",
+      "choice_options": [
+        {
+          "id": "a",
+          "label": "4 × 20 + 4 × 3"
+        },
+        {
+          "id": "b",
+          "label": "4 × 20 + 3"
+        },
+        {
+          "id": "c",
+          "label": "4 × 20 × 3"
+        }
+      ],
+      "expected_choice_id": "a",
+      "display_expression": "4 × (20 + 3)"
+    },
+    {
+      "task_id": "B5-L10",
+      "title": "Waarde behouden",
+      "instruction": "Welke som heeft dezelfde waarde als 5 × (12 − 2)?",
+      "skill_id": "B5",
+      "development_id": "B5.D5",
+      "claim_id": "B5.C5",
+      "evidence_target_ids": [
+        "B5.ET10"
+      ],
+      "task_model_id": "B5.TM5",
+      "variation_key": "b5_equivalent_distributive_sub",
+      "prompt_level": "none",
+      "response_type": "choice",
+      "choice_options": [
+        {
+          "id": "a",
+          "label": "5 × 12 − 5 × 2"
+        },
+        {
+          "id": "b",
+          "label": "5 × 12 − 2"
+        },
+        {
+          "id": "c",
+          "label": "5 × (12 + 2)"
+        }
+      ],
+      "expected_choice_id": "a",
+      "display_expression": "5 × (12 − 2)"
+    },
+    {
+      "task_id": "B5-L11",
+      "title": "De juiste structuur kiezen",
+      "instruction": "Er zijn 5 pakken met elk 12 stiften. Er worden 8 stiften gebruikt. Welke som berekent hoeveel stiften overblijven?",
+      "skill_id": "B5",
+      "development_id": "B5.D6",
+      "claim_id": "B5.C6",
+      "evidence_target_ids": [
+        "B5.ET11"
+      ],
+      "task_model_id": "B5.TM6",
+      "variation_key": "b5_integrated_packs_used",
+      "prompt_level": "none",
+      "response_type": "choice",
+      "choice_options": [
+        {
+          "id": "a",
+          "label": "5 × 12 − 8"
+        },
+        {
+          "id": "b",
+          "label": "5 × (12 − 8)"
+        },
+        {
+          "id": "c",
+          "label": "5 + 12 − 8"
+        }
+      ],
+      "expected_choice_id": "a",
+      "display_expression": "5 pakken × 12 stiften, 8 gebruikt"
+    },
+    {
+      "task_id": "B5-L12",
+      "title": "Een samengestelde som controleren",
+      "instruction": "Drie kaartjes kosten elk €8 en een snack kost €4. Je betaalt €30. Welke som berekent hoeveel geld je terugkrijgt?",
+      "skill_id": "B5",
+      "development_id": "B5.D6",
+      "claim_id": "B5.C6",
+      "evidence_target_ids": [
+        "B5.ET12"
+      ],
+      "task_model_id": "B5.TM6",
+      "variation_key": "b5_integrated_change",
+      "prompt_level": "none",
+      "response_type": "choice",
+      "choice_options": [
+        {
+          "id": "a",
+          "label": "30 − (3 × 8 + 4)"
+        },
+        {
+          "id": "b",
+          "label": "30 − 3 × (8 + 4)"
+        },
+        {
+          "id": "c",
+          "label": "(30 − 3) × 8 + 4"
+        }
+      ],
+      "expected_choice_id": "a",
+      "display_expression": "€30 − (3 kaartjes × €8 + €4 snack)"
+    }
+  ]
+}

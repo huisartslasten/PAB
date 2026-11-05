@@ -174,3 +174,42 @@ This document does not:
 - implement or deploy new learner tasks.
 
 Status remains candidate design. Empirical validation requires separate learner-data research and validation work.
+
+
+## 11. Runtime capability audit — 2026-11-05
+
+The current B1 learner route and addition interface were inspected before authoring tasks.
+
+### Confirmed current capabilities
+- The route loads registry file `PacoGO_Curriculum_Registry_v0.4.json` and the B1 learner catalogue v0.1, then constructs the shared browser vertical-slice runtime.
+- The addition interface contract currently accepts only `quantity_groups` and `symbolic_expression` representations.
+- The renderer displays quantity groups as individual dots or a symbolic expression. It does not currently render number lines, money/receipt contexts, decimal-place alignment, estimation/checking steps or strategy selection.
+- The answer input is configured as numeric with integer step 1.
+- The addition controller can record strategy selection and prompted examples, but the current B1 route supplies `strategyOptions: []` and the renderer has no strategy-selection or prompted-example interaction.
+- The controller supports numeric addends and a numeric expected answer. Its observation currently records `independent: true` and prompt level `none` as fixed values; this cannot substantiate ET7 or distinguish supported/prompted performance without a designed interaction contract.
+- The shared runtime verifies that task IDs exist in the loaded catalogue and that observation skill ID matches task skill ID. It delegates skill inference to the curriculum registry.
+
+### Design implications — blockers, not permission to patch
+1. Do not add decimal tasks until decimal input precision/step, display, parsing and scoring are explicitly specified and tested.
+2. Do not add strategy/checking tasks until the learner interaction captures the selected strategy and checking action as observable events. A hidden controller method is not evidence if the UI cannot invoke it.
+3. Do not claim ET7 independence while the controller hardcodes `independent: true`. Independence/prompt provenance must come from the actual task interaction and be represented in the observation contract.
+4. Do not claim ET2 via number-line or quantity-to-equation conversion until the renderer supports those representations and the task records the learner's representation response, rather than only showing an equation and accepting a final number.
+5. Do not claim ET6/ET8 from a changed story wrapper alone. The task pair/variant design must identify what is held constant, what varies, and whether the evidence target is robustness or transfer.
+6. Do not treat multi-addend contextual arithmetic as transfer automatically; the arithmetic target must be separated from reading/data demands.
+
+### Required next design artifact
+Before implementing new learner tasks, produce a B1 task-level traceability and interaction contract that maps each candidate task to:
+- primary claim and evidence target(s);
+- task model;
+- representation and response format supported by the interface;
+- learner-visible action(s);
+- observable event(s) and coding dimensions;
+- prompt/independence semantics;
+- scoring and task-specific correctness;
+- intended variation and what it tests;
+- incidental reading/context demands;
+- automated contract tests.
+
+The first implementation slice should be the smallest complete vertical slice that can genuinely capture its declared evidence. Prefer a supported D1/D2 extension if it closes a real coverage gap without pretending to cover D3/D4. D3/D4 should follow only after the interaction/evidence contracts are implemented and tested.
+
+No runtime code, learner catalogue, route, database or Supabase schema was changed in this audit.

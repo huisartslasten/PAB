@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
-import registryConfig from '../docs/curriculum/PacoGO_Curriculum_Registry_v0.3.json' with { type: 'json' };
+import registryConfig from '../docs/curriculum/PacoGO_Curriculum_Registry_v0.4.json' with { type: 'json' };
 import { createCurriculumRegistry } from './curriculum-registry.js';
 import { createStudentEvidenceStore } from './student-evidence-store.js';
 
 const registry = createCurriculumRegistry(registryConfig);
-assert.deepEqual(registry.listSkills().map((skill) => skill.id), ['A1', 'B1', 'B2', 'FR2']);
+assert.deepEqual(registry.listSkills().map((skill) => skill.id), ['A1', 'B1', 'B2', 'B3', 'FR2']);
 
-for (const skillId of ['A1', 'B1', 'B2', 'FR2']) {
+for (const skillId of ['A1', 'B1', 'B2', 'B3', 'FR2']) {
   const skill = registry.getSkill(skillId);
   const firstTarget = skill.evidence_targets[0];
   const firstDevelopment = skill.development_rules[0].development_id;

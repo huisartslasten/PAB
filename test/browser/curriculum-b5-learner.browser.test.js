@@ -47,7 +47,7 @@ test('B5 learner route completes twelve process-aware tasks and persists observa
   }else{
    const data=stepAnswers[i-4];
    for(const [id,value] of Object.entries(data.steps)){
-    const taskPrompts={first:'Wat is de uitkomst van de eerste bewerking: 48 ÷ 6?',parentheses:'Wat is 8 + 3?',division:'Wat is 72 ÷ 8?',multiplication:i===7?'Wat is 4 × 12?':null,cards:'Wat kosten de 3 kaartjes samen?',spent:'Hoeveel geef je in totaal uit, inclusief de snack?'};
+    const taskPrompts={first:'Wat is de uitkomst van de eerste bewerking: 48 ÷ 6?',parentheses:'Wat is 8 + 3?',division:'Wat is 72 ÷ 8?',multiplication:i===6?'Wat is 6 × 3?':'Wat is 4 × 12?',cards:'Wat kosten de 3 kaartjes samen?',spent:'Hoeveel geef je in totaal uit, inclusief de snack?'};
     const prompt=taskPrompts[id];await page.getByLabel(prompt).fill(String(value));
    }
    await page.getByLabel('Eindantwoord').fill(String(data.answer));

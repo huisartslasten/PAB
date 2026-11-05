@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PacoGO — Aftrekken oefenen</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{font-family:Nunito,system-ui,sans-serif;color:#102b57;background:#f5f9fd}
+body{margin:0;padding:24px;min-height:100vh;box-sizing:border-box}
+main{max-width:860px;margin:0 auto;display:grid;gap:18px}
+.card{background:#fff;border:1px solid #d8e7f4;border-radius:22px;padding:24px;box-shadow:0 8px 24px rgba(16,43,87,.07)}
+h1{margin:0 0 10px}.muted{color:#647894;line-height:1.5}
+.status{font-weight:800;padding:12px 14px;border-radius:14px;background:#eef8ff;color:#126fc9;line-height:1.5}
+.status.error{background:#fff0f0;color:#b42318}
+.progress{font-size:14px;color:#647894;font-weight:800;margin:14px 0}
+.expression{font-size:34px;font-weight:900;text-align:center;padding:18px;border-radius:16px;background:#eef7ff;margin:16px 0}
+.answer-row,.option-group,#learnerList{display:flex;justify-content:center;align-items:end;gap:10px;flex-wrap:wrap;margin:14px 0}
+label{display:grid;gap:7px;font-weight:800}
+input{width:190px;box-sizing:border-box;padding:12px;border:2px solid #d8e7f4;border-radius:14px;font:900 22px Nunito,system-ui,sans-serif}
+button{border:0;border-radius:14px;padding:13px 20px;font:900 15px Nunito,system-ui,sans-serif;cursor:pointer;background:#1787f2;color:#fff;margin:4px}
+button.secondary{background:#eaf2f8;color:#38577d}
+button[aria-pressed="true"]{background:#0b5fba;box-shadow:0 0 0 3px rgba(23,135,242,.18)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.number-line-host{margin:16px 0;border:2px solid #d8e7f4;border-radius:18px;padding:14px;background:#fbfdff}
+.pacogo-number-line{color:#1787f2;outline:none;cursor:crosshair;touch-action:none}
+.pacogo-number-line-value{text-align:center;display:block;font-weight:900;color:#38577d;padding:4px}
+#createLearnerForm{display:flex;align-items:end;gap:10px;flex-wrap:wrap;margin-top:18px}
+#exerciseCard[hidden],#learnerSetup[hidden]{display:none}
+</style>
+</head>
+<body><main>
+<section class="card" id="learnerSetup">
+<div class="muted">PacoGO • Rekenen • B2</div><h1>Wie gaat oefenen?</h1>
+<p class="muted">Kies een leerlingprofiel. De voortgang wordt gekoppeld aan het ingelogde ouderaccount.</p>
+<div id="setupStatus" class="status" role="status" aria-live="polite">Ouderaccount controleren…</div>
+<div id="learnerList"></div>
+<form id="createLearnerForm"><label for="learnerName">Nieuw leerlingprofiel<input id="learnerName" maxlength="80" autocomplete="off" placeholder="Naam leerling" required></label><button type="submit">Leerling toevoegen</button></form>
+</section>
+<section class="card" id="exerciseCard" hidden>
+<div class="muted" id="selectedLearnerLabel">PacoGO • Rekenen • Aftrekken</div><h1>Aftrekken oefenen</h1>
+<p class="muted">Geef meestal direct je antwoord. Bij enkele oefeningen kies je ook een aanpak of controle.</p>
+<div id="progress" class="progress"></div><div id="exercise"></div>
+<div id="feedback" class="status" role="status" aria-live="polite">Je kunt beginnen.</div>
+<p id="sessionSummary" class="muted"></p><p class="muted"><a href="curriculum-b1-learner.html">Terug naar optellen</a></p>
+</section>
+</main>
+<script type="module">
+import { createPacoGOApp } from './src/app/bootstrap.js';
+import { createCurriculumRegistry } from './pacogo-engine/curriculum-registry.js';
+import { createBrowserVerticalSliceRuntime } from './pacogo-engine/browser-vertical-slice.js';
+import { createNumberLine } from './pacogo-engine/number-line.js';
+import { createNumberLineRenderer } from './pacogo-engine/number-line-renderer.js';
+import { createNumberLineController } from './pacogo-engine/number-line-controller.js';
+import { createSubtractionController } from './pacogo-engine/subtraction-controller.js';
+
+const app=createPacoGOApp({supabaseLib:window.supabase});
+const $=selector=>document.querySelector(selector);
+const setupCard=$('#learnerSetup'),setupStatus=$('#setupStatus'),learnerList=$('#learnerList');
+const form=$('#createLearnerForm'),nameInput=$('#learnerName'),exerciseCard=$('#exerciseCard');
+const exercise=$('#exercise'),feedback=$('#feedback'),summary=$('#sessionSummary'),progress=$('#progress');
+let catalogue,skill,runtime,registryVersionId,learner,priorEvidence=[],priorState=null,taskIndex=0,pending=null;
+
+function setupError(error){setupStatus.className='status error';setupStatus.textContent=error?.message||'De leerlingomgeving kon niet worden geladen.';}
+function learnerButton(item){
+ const button=document.createElement('button');button.type='button';button.textContent='Oefenen met '+item.display_name;
+ button.setAttribute('aria-label','Leerling kiezen: '+item.display_name);button.addEventListener('click',()=>start(item));learnerList.append(button);
+}
+async function refreshLearners(){
+ learnerList.replaceChildren();const rows=await app.learnerCurriculum.listLearners();
+ setupStatus.className='status';setupStatus.textContent=rows.length?'Kies het leerlingprofiel voor deze oefenronde.':'Maak eerst een leerlingprofiel aan om de voortgang veilig te bewaren.';
+ rows.forEach(learnerButton);
+}
+form.addEventListener('submit',async event=>{
+ event.preventDefault();const displayName=nameInput.value.trim();if(!displayName)return;
+ const submit=form.querySelector('button');submit.disabled=true;
+ try{await app.learnerCurriculum.createLearnerProfile(displayName);nameInput.value='';await refreshLearners();}
+ catch(error){setupError(error);}finally{submit.disabled=false;}
+});
+async function start(item){
+ setupStatus.className='status';setupStatus.textContent='Opgeslagen voortgang laden…';
+ learnerList.querySelectorAll('button').forEach(button=>button.disabled=true);
+ try{
+  const history=await app.learnerCurriculum.loadLearningHistory({learnerKey:item.learner_key,registryVersionId,skillId:catalogue.skill_id});
+  learner=item;priorEvidence=history.priorEvidence;priorState=history.priorState;taskIndex=0;pending=null;
+  setupCard.hidden=true;exerciseCard.hidden=false;
+  $('#selectedLearnerLabel').textContent='PacoGO • '+item.display_name+' • Rekenen • Aftrekken';
+  summary.textContent=priorEvidence.length+' eerder opgeslagen antwoorden geladen.';showTask();
+ }catch(error){setupError(error);learnerList.querySelectorAll('button').forEach(button=>button.disabled=false);}
+}
+function finish(evaluation,cycle){
+ exercise.querySelector('[data-retry]')?.remove();priorEvidence=cycle.evidence;priorState=cycle.longitudinal_state;pending=null;
+ feedback.className='status';feedback.textContent=evaluation.correct?'Goed gedaan. Je antwoord is opgeslagen.':'Ook deze poging is opgeslagen. We oefenen verder.';
+ summary.textContent=priorEvidence.length+' antwoorden veilig opgeslagen voor '+learner.display_name+'.';
+ if(taskIndex<catalogue.tasks.length-1){
+  const next=document.createElement('button');next.type='button';next.textContent='Volgende oefening';
+  next.addEventListener('click',()=>{taskIndex+=1;showTask();});exercise.append(next);
+ }else{progress.textContent='Oefenronde afgerond';const done=document.createElement('p');done.className='muted';done.textContent='Je hebt de oefeningen gedaan. Je voortgang is opgeslagen.';exercise.append(done);}
+}
+async function persist(){
+ if(!pending)return;const retry=exercise.querySelector('[data-retry]');if(retry)retry.disabled=true;
+ try{
+  await app.learnerCurriculum.persistLearningCycle({learnerKey:learner.learner_key,registryVersionId,skillId:catalogue.skill_id,
+   observation:pending.observation,evidenceAssessment:pending.cycle.assessment,
+   longitudinalState:pending.cycle.longitudinal_state,decisionTrace:pending.cycle.decision_trace});
+  finish(pending.evaluation,pending.cycle);
+ }catch(error){
+  feedback.className='status error';feedback.textContent='Je antwoord is nog niet opgeslagen. Probeer opnieuw.';
+  if(!retry){const button=document.createElement('button');button.type='button';button.dataset.retry='true';button.textContent='Opnieuw opslaan';button.addEventListener('click',persist);exercise.append(button);}
+  else retry.disabled=false;
+ }
+}
+function saveObservation(task,result){
+ try{
+  const cycle=runtime.runTaskObservation({taskId:task.task_id,observation:result.observation,priorEvidence,
+   state:priorState||{missing_evidence_targets:skill.evidence_targets.map(item=>item.id)},priorState});
+  pending={evaluation:result.evaluation,observation:result.observation,cycle};
+  exercise.querySelectorAll('button').forEach(button=>button.disabled=true);persist();
+ }catch(error){feedback.className='status error';feedback.textContent=error.message;}
+}
+function addOptions(host,options,kind,select){
+ if(!options?.length)return;
+ const heading=document.createElement('p');heading.className='muted';heading.textContent=kind==='strategy'?'Kies een aanpak':'Hoe controleer je?';host.append(heading);
+ const group=document.createElement('div');group.className='option-group';
+ options.forEach(option=>{
+  const button=document.createElement('button');button.type='button';button.className='secondary';button.textContent=option.label;button.setAttribute('aria-pressed','false');
+  button.addEventListener('click',()=>{group.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed','false'));button.setAttribute('aria-pressed','true');select(option.id);});
+  group.append(button);
+ });host.append(group);
+}
+function showTask(){
+ const task=catalogue.tasks[taskIndex];exercise.replaceChildren();progress.textContent='Oefening '+(taskIndex+1)+' van '+catalogue.tasks.length;
+ feedback.className='status';feedback.textContent=task.instruction;
+ const instruction=document.createElement('p');instruction.className='muted';instruction.textContent=task.instruction;exercise.append(instruction);
+ if(task.representation==='number_line'){
+  const host=document.createElement('div');host.className='number-line-host';exercise.append(host);
+  const line=createNumberLine(task.number_line);let controller;
+  const renderer=createNumberLineRenderer({mount:host,numberLine:line,onPositionChange:placement=>controller?.updatePlacement(placement)});
+  controller=createNumberLineController({numberLine:line,task,studentKey:learner.learner_key,renderer,targetValue:task.expected_answer,tolerance:0,
+   provenance:{page:'curriculum-b2-learner.html',catalogue_version:catalogue.schema_version}});
+  const submit=document.createElement('button');submit.type='button';submit.textContent='Controleren';
+  submit.addEventListener('click',()=>{try{saveObservation(task,controller.submit());}catch(error){feedback.className='status error';feedback.textContent=error.message;}});
+  exercise.append(submit);return;
+ }
+ const expression=document.createElement('div');expression.className='expression';
+ expression.textContent=task.operation_type==='complement'?task.subtrahend+' + ? = '+task.minuend:
+  task.operation_type==='difference'?'Verschil tussen '+task.minuend+' en '+task.subtrahend:task.minuend+' − '+task.subtrahend+' = ?';
+ exercise.append(expression);
+ const controller=createSubtractionController({task,studentKey:learner.learner_key,renderer:{},provenance:{page:'curriculum-b2-learner.html',catalogue_version:catalogue.schema_version}});
+ const answerRow=document.createElement('div');answerRow.className='answer-row';
+ const label=document.createElement('label');label.htmlFor='answerInput';label.textContent='Wat is het antwoord?';
+ const input=document.createElement('input');input.id='answerInput';input.type='number';input.step='any';input.autocomplete='off';label.append(input);answerRow.append(label);exercise.append(answerRow);
+ addOptions(exercise,task.strategy_options,'strategy',id=>controller.selectStrategy(id));
+ addOptions(exercise,task.check_methods,'check',id=>controller.selectCheckMethod(id));
+ const submit=document.createElement('button');submit.type='button';submit.textContent='Controleren';
+ submit.addEventListener('click',()=>{try{if(!input.value.trim())throw new Error('Vul eerst je antwoord in.');saveObservation(task,controller.submit(input.value));}
+  catch(error){feedback.className='status error';feedback.textContent=error.message;}});
+ exercise.append(submit);
+}
+try{
+ const session=await app.initializeSession();
+ if(!session||!app.auth.isParent){window.location.replace('auth.html?returnTo=curriculum-b2-learner.html');}
+ else{
+  const [config,loaded]=await Promise.all([
+   fetch('./docs/curriculum/PacoGO_Curriculum_Registry_v0.3.json').then(r=>{if(!r.ok)throw new Error('Curriculum registry kon niet worden geladen.');return r.json();}),
+   fetch('./docs/curriculum/PacoGO_B2_Learner_Task_Catalogue_v0.1.json').then(r=>{if(!r.ok)throw new Error('B2-oefencatalogus kon niet worden geladen.');return r.json();})
+  ]);
+  catalogue=loaded;const registry=createCurriculumRegistry(config);skill=registry.getSkill(catalogue.skill_id);
+  runtime=createBrowserVerticalSliceRuntime({registry,taskSet:catalogue});
+  registryVersionId=await app.learnerCurriculum.getRegistryVersionId('pacogo-curriculum',catalogue.curriculum_registry_version);
+  await refreshLearners();
+ }
+}catch(error){setupError(error);}
+</script>
+</body></html>

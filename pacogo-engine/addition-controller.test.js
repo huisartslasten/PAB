@@ -32,7 +32,8 @@ const result = controller.submit(12);
 
 assert.equal(result.evaluation.correct, true);
 assert.equal(result.observation.quality, 1);
-assert.equal(result.observation.independent, true);
+assert.equal(result.observation.independent, false);
+assert.equal(result.observation.independence_status, 'UNKNOWN');
 assert.equal(result.observation.skill_id, 'B1');
 assert.equal(result.observation.development_id, 'B1.D1');
 assert.equal(result.observation.claim_id, 'B1.C1');
@@ -104,7 +105,8 @@ const promptedResult = promptedController.submit(42, '23 + 19 combineert twee ho
 assert.equal(promptedResult.evaluation.correct, true);
 assert.equal(promptedResult.observation.development_id, 'B1.D2');
 assert.equal(promptedResult.observation.claim_id, 'B1.C2');
-assert.equal(promptedResult.observation.independent, true);
+assert.equal(promptedResult.observation.independent, false);
+assert.equal(promptedResult.observation.independence_status, 'UNKNOWN');
 assert.equal(promptedResult.observation.performance.prompted_example, true);
 assert.equal(promptedResult.observation.context.prompt_level, 'none');
 assert.ok(promptedResult.observation.interaction_events.some(event => event.event_type === 'prompted_example_completed'));

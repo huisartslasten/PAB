@@ -263,7 +263,7 @@ revoke all on public.learner_profiles,
   public.student_longitudinal_state,
   public.curriculum_decision_trace,
   public.curriculum_registry_versions
-from anon, authenticated;
+from public, anon, authenticated;
 
 grant select, insert, update on public.learner_profiles to authenticated;
 grant select on public.learner_guardians to authenticated;

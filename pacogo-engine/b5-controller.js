@@ -19,7 +19,7 @@ export function createB5Controller({task,studentKey,renderer={},provenance={}}){
  if(task.response_type==='choice'&&!choices.length)throw new TypeError('A choice B5 task needs choice_options.');
  const taskInstance=createTaskInstance({taskId:task.task_id,taskModelId:task.task_model_id,skillId:task.skill_id,developmentId:task.development_id,claimId:task.claim_id,evidenceTargetIds:task.evidence_target_ids,taskDefinitionVersion:'0.3'});
  const events=[],startedAt=Date.now();let selectedCheck=null,submitted=false;
- const record=(eventType,payload)=>events.push(createInteractionEvent({taskInstanceId:instance.task_instance_id,eventType,at:new Date().toISOString(),payload}));
+ const record=(eventType,payload)=>events.push(createInteractionEvent({taskInstanceId:taskInstance.task_instance_id,eventType,at:new Date().toISOString(),payload}));
  record('task_presented',{expression:task.expression||task.display_expression,response_type:task.response_type,response_process_required:processRequired,check_required:checkRequired});
  function selectCheckMethod(id,source='learner'){
   if(submitted)throw new Error('B5 task has already been submitted');

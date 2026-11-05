@@ -791,3 +791,49 @@ This section supersedes Section 26's next-step priority of building B4. B4 is no
 - Branch: `refactor/professional-v1`. `main` remains LIVE and untouched.
 - Next concrete step: review the division task wording/visual progression against the learner's actual grade-six needs, then continue with B5 only after its SLO scope and existing registry dependencies are inspected. Do not assume B4 candidate order or mastery parameters are validated.
 - Continue the legacy Skills/Skill Editor dependency and history inventory before removing legacy routes or data. Multi-guardian invitations, account recovery, correction, deletion and retention remain open before production.
+
+
+## 28. B5 Bewerkingen combineren en structureren — eerste learner-practice kandidaat
+
+Deze sectie actualiseert de status na B4. B5 is nu als afzonderlijke candidate skill en geauthenticeerde learner-practice route gebouwd. De bestaande SLO-mapping blijft leidend; deze implementatie wijzigt geen goedgekeurde curriculumdoelen, claims, evidence targets of masterycriteria.
+
+### Curriculum en oefencatalogus
+
+- Registry: `docs/curriculum/PacoGO_Curriculum_Registry_v0.6.json`, versie `0.6.0-candidate`.
+- B5 bevat zes kandidaatontwikkelingen (B5.D1–B5.D6), zes claims (B5.C1–B5.C6), twaalf evidence targets (B5.ET1–B5.ET12) en zes task models (B5.TM1–B5.TM6).
+- Afzonderlijke oefencatalogus: `docs/curriculum/PacoGO_B5_Learner_Task_Catalogue_v0.5.json`, met twaalf taken, twee per ontwikkeling. De catalogus heeft eigen schema_version `0.5` en verwijst expliciet naar registry `0.6.0-candidate`; dit zijn twee afzonderlijke versienummers.
+- B5 oefent het herkennen en representeren van samengestelde bewerkingen, rekenvolgorde, uitvoering met tussenresultaten, gelijkwaardige herstructurering en flexibele controle.
+- B5-L05 controleert expliciet links-naar-rechts rekenen bij bewerkingen met gelijke voorrang.
+- B5-L12 registreert de tussenstappen en de gekozen controlemethode. De twee controlemethoden hebben elk een eigen prompt en verwacht antwoord: terugrekenen (30) en uitgaven opnieuw berekenen (28).
+- De zes ontwikkelingsstappen en hun volgorde blijven kandidaat-hypothesen; zij zijn niet empirisch gevalideerd. Registry masteryparameters zijn prototype-only en de learner route toont geen masterybeslissing.
+
+### Learner route en technische grenzen
+
+- Toegevoegd: `curriculum-b5-learner.html`, aangesloten op de bestaande ouderauthenticatie, learner-profielen, geschiedenis en atomic persistence-service.
+- Toegevoegd: `pacogo-engine/b5-controller.js` en controller-tests voor taakgebonden antwoorden, tussenstappen en controlemethoden.
+- De route gebruikt de gedeelde browser vertical-slice runtime en registreert de observaties onder de bijbehorende B5-taskidentiteit.
+- Browserregressie gebruikt een synthetische Supabase-testdouble. Er zijn geen echte learner-profielen of leerlingobservaties aangemaakt.
+- Geen Supabase-schemawijziging of migratie uitgevoerd.
+
+### Root cause en oplossing
+
+- Full Regression #2978 op commit `f9c8e41f793744fd2c53e6ccd258ffaac2c30f65` faalde uitsluitend in de B5-browserregressie.
+- De controlemethode-handler wijzigde `checkLabel.textContent`. Omdat het input-element in dat label was genest, verwijderde deze DOM-operatie ook het invoerveld. Playwright kon het veld daarna niet meer via zijn toegankelijke labelnaam vinden.
+- Oplossing: labeltekst en input zijn nu afzonderlijke DOM-kinderen; bij methodekeuze wordt alleen de tekstnode aangepast. De browser-test controleert dat het veld beschikbaar blijft bij het wisselen tussen beide methoden.
+- Geen curriculumcontract of bestaande testverwachting is afgezwakt.
+
+### Verificatie
+
+- Oplossingscommit: `77139b1482a7ebd34bae18e58c1654193026f147`.
+- Testversterkingscommit: `b5aeb8e10bd2df54b714218fd2bdbcc28cd8668a`.
+- Full Regression #2980 / run ID `42022760597`, exact commit `b5aeb8e10bd2df54b714218fd2bdbcc28cd8668a`: **GREEN**. Alle stappen zijn geslaagd, inclusief curriculum-engine, architectuurgrenzen, Double or Nothing, maintained Node, Vitest, browserregressie en clean working tree.
+- Dedicated browser proof #646 / run ID `42022760747`, dezelfde commit: **GREEN**.
+- Branch: `refactor/professional-v1`; branch head bij verificatie: `b5aeb8e10bd2df54b714218fd2bdbcc28cd8668a`. `main` is niet gewijzigd.
+
+### Huidige status en volgende stap
+
+- De B5-route is een eerste werkende practice-kandidaat, geen empirisch gevalideerde leerlijn en geen bewijs dat alle rekenvaardigheden van groep 6 zijn afgedekt.
+- Laat de route nu inhoudelijk beoordelen op begrijpelijkheid, taakbelasting en aansluiting bij Zyons huidige rekenwerk. Verzamel eerst echte ouder-/leerkrachtinformatie over de gebruikte schoolmethode voordat methode-specifieke instructie of feedback wordt toegevoegd.
+- Houd uitleg/ondersteuning gescheiden van beoordeling; een juist antwoord op één taak kent geen mastery toe.
+- Volgende technische stap pas na een nieuwe groene Full Regression: inspecteer de bestaande SLO-scope en de resterende mapped skills om de eerstvolgende noodzakelijke skill te bepalen. Geen willekeurige extra interface of Supabase-wijziging toevoegen.
+- Scientific Validation blijft een afzonderlijke toekomstige werkstroom. Synthetische browserobservaties zijn geen leerlingdata en leveren geen empirische validatie.

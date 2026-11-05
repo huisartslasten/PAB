@@ -15,16 +15,17 @@ export function createB5Controller({task,studentKey,renderer={},provenance={}}){
  const checkMethods=Array.isArray(task.check_methods)?task.check_methods:[];
  const checkRequired=task.check_required===true;
  if(processRequired&&!steps.length)throw new TypeError('A process-required B5 task needs process_steps.');
- if(checkRequired&&(!checkMethods.length||!Number.isFinite(Number(task.expected_check_answer))))throw new TypeError('A check-required B5 task needs check methods and an expected check answer.');
+ if(checkRequired&&(!checkMethods.length||checkMethods.some(method=>!method.id||!method.label||!method.prompt?.trim()||!Number.isFinite(Number(method.expected_answer)))))throw new TypeError('A check-required B5 task needs a prompt and expected answer for every check method.');
  if(task.response_type==='choice'&&!choices.length)throw new TypeError('A choice B5 task needs choice_options.');
  const taskInstance=createTaskInstance({taskId:task.task_id,taskModelId:task.task_model_id,skillId:task.skill_id,developmentId:task.development_id,claimId:task.claim_id,evidenceTargetIds:task.evidence_target_ids,taskDefinitionVersion:'0.3'});
- const events=[],startedAt=Date.now();let selectedCheck=null,submitted=false;
+ const events=[],startedAt=Date.now();let selectedCheck=null,selectedCheckMethod=null,submitted=false;
  const record=(eventType,payload)=>events.push(createInteractionEvent({taskInstanceId:taskInstance.task_instance_id,eventType,at:new Date().toISOString(),payload}));
  record('task_presented',{expression:task.expression||task.display_expression,response_type:task.response_type,response_process_required:processRequired,check_required:checkRequired});
  function selectCheckMethod(id,source='learner'){
   if(submitted)throw new Error('B5 task has already been submitted');
-  if(!checkMethods.some(x=>x.id===id))throw new Error(`Unknown B5 check method: ${id}`);
-  selectedCheck=id;record('check_method_selected',{check_method_id:id,source});
+  const method=checkMethods.find(x=>x.id===id);
+  if(!method)throw new Error(`Unknown B5 check method: ${id}`);
+  selectedCheck=id;selectedCheckMethod=method;record('check_method_selected',{check_method_id:id,source,expected_check_answer:Number(method.expected_answer)});
  }
  function submit(input){
   if(submitted)throw new Error('B5 task has already been submitted');
@@ -52,11 +53,11 @@ export function createB5Controller({task,studentKey,renderer={},provenance={}}){
     if(!selectedCheck)throw new Error('Kies eerst hoe je het antwoord controleert.');
     if(input.check_answer===undefined||String(input.check_answer).trim()==='')throw new TypeError('Vul ook de uitkomst van je controle in.');
     checkAnswer=finite(input.check_answer,'check_answer');
-    checkCorrect=close(checkAnswer,Number(task.expected_check_answer),Number(task.tolerance??1e-9));
-    record('result_check_submitted',{check_method_id:selectedCheck,submitted_check_answer:checkAnswer,expected_check_answer:Number(task.expected_check_answer),correct:checkCorrect});
+    checkCorrect=close(checkAnswer,Number(selectedCheckMethod.expected_answer),Number(task.tolerance??1e-9));
+    record('result_check_submitted',{check_method_id:selectedCheck,submitted_check_answer:checkAnswer,expected_check_answer:Number(selectedCheckMethod.expected_answer),correct:checkCorrect});
    }
    correct=stepsCorrect&&answerCorrect&&checkCorrect;
-   response={type:'numeric_with_steps',expression:task.expression,submitted_steps:submittedSteps,expected_steps:task.expected_steps||{},submitted_answer:answer,expected_answer:Number(task.expected_answer),check_method_id:selectedCheck,submitted_check_answer:checkAnswer,expected_check_answer:task.expected_check_answer};
+   response={type:'numeric_with_steps',expression:task.expression,submitted_steps:submittedSteps,expected_steps:task.expected_steps||{},submitted_answer:answer,expected_answer:Number(task.expected_answer),check_method_id:selectedCheck,submitted_check_answer:checkAnswer,expected_check_answer:selectedCheckMethod?.expected_answer??null};
    evaluation={correct,steps_correct:stepsCorrect,answer_correct:answerCorrect,check_correct:checkCorrect,submitted_steps:submittedSteps,submitted_answer:answer,submitted_check_answer:checkAnswer};
   }else{
    const answer=finite(input,'answer');correct=close(answer,Number(task.expected_answer),Number(task.tolerance??1e-9));

@@ -1134,3 +1134,29 @@ Voer de dependency-audit uit van de oude Skills-implementatie: inventariseer imp
 - Cleanup-commit: `ac80edd2d0d6a1a28c57f513fcae730df2dc0d8f`; Full Regression #3014 / run ID `42103326026`, completed GREEN op exact deze commit.
 - De vier verwijderde legacybestanden zijn op de cleanup-commit afwezig geverifieerd.
 - Volgende stap: Full Regression op cleanup-commit; bij groen resterende import-/contractaudit afronden. Migreer of archiveer bestaande Skill-data uitsluitend na een expliciet ontworpen dataovergang. Behoud `game_results` en nieuwe curriculumtabellen.
+
+
+## 37. Legacy Skill-data audit — orphan assignments and migration boundary — 2026-11-05
+
+### Exact TEST database findings (read-only)
+- `skill_definitions`: 13 rows; all 13 are enabled, none archived or trashed.
+- `skill_assignments`: 37 rows; 28 enabled and 9 disabled.
+- Three enabled assignments (`Zyon`, `Zenith`, `Zephon`) point to `math-mixed`, for which no definition exists.
+- The `math-mixed` definition was explicitly deleted by migration `20261025070000_refine_skill_math_definitions.sql`; the old assignment migration had inserted those assignments, and no foreign key or cleanup migration removed them.
+- Two custom definitions exist: `optellen tot 30` (no assignment) and `Breuken` (assigned to Zenith). Their IDs and definitions do not prove equivalence to curriculum skill IDs; do not map them automatically to B1 or FR2.
+- `game_results`: 5 rows for `double-or-nothing`, `flash-question`, and `word-reveal`; no math/legacy-skill game result rows.
+- `game_access_state` contains only `lexo`, `memory`, `rock-paper-scissors`, and `word-chase`; no legacy math Skill game keys.
+- The old `skill_assignments` table has no FK to `skill_definitions`; this explains why orphan assignment rows remain.
+- Curriculum engine `skill_id` columns in `student_evidence`, `student_longitudinal_state`, and `curriculum_decision_trace` are separate contracts and must not be merged with legacy IDs.
+
+### Code contract findings
+- `skill-definition-service.js` and `skill-configuration-service.js` are not constructed in the active app bootstrap. Their only confirmed direct imports in the inspected code are their isolated Vitest tests.
+- The definition service includes list/get/save/archive/trash/permanent-delete operations. The configuration service reads and upserts per-student assignments but does not reconcile or delete stale assignments.
+- The active Skills route imports only the new curriculum-driven runtime. The old timed math-domain/session helpers are not imported by that runtime.
+- The two old services and their tests are retained temporarily to preserve an inspectable path for non-destructive extraction/migration of the 13 definitions and 37 assignments. Do not reattach them to the new Skills runtime.
+
+### Decision / next step
+- Do not delete or rewrite any TEST data. Do not create automatic B1/FR2 mappings.
+- Before removing the two persistence services, design a non-destructive data disposition for custom definitions, learner assignments, and the three orphan `math-mixed` rows; distinguish archive/export from deletion.
+- Keep `game_results`, game-access tables, curriculum engine tables, and learner state unchanged.
+- No Supabase DDL/DML was performed; production project untouched.

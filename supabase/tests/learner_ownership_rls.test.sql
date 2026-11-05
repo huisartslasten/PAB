@@ -247,6 +247,10 @@ begin
     when check_violation then null;
   end;
 
+  if coalesce(current_setting('app.pacogo_learning_cycle_write', true), '') <> '' then
+    raise exception 'Learning-cycle write capability leaked after failed RPC';
+  end if;
+
   if exists (
     select 1 from public.student_evidence
     where student_key = current_setting('test.learner_a')

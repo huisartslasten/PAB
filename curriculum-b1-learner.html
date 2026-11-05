@@ -53,6 +53,7 @@
     <div id="exercise"></div>
     <div id="feedback" class="status" role="status" aria-live="polite">Je kunt beginnen.</div>
     <p id="sessionSummary">Je opgeslagen voortgang wordt geladen.</p>
+    <p class="muted"><a href="curriculum-b2-learner.html">Ook aftrekken oefenen</a></p>
   </section>
 </main>
 <script type="module">
@@ -265,7 +266,7 @@
       window.location.replace('auth.html?returnTo=curriculum-b1-learner.html');
     } else {
       const [registryConfig, loadedCatalogue] = await Promise.all([
-        fetch('./docs/curriculum/PacoGO_Curriculum_Registry_v0.2.json').then(response => {
+        fetch('./docs/curriculum/PacoGO_Curriculum_Registry_v0.3.json').then(response => {
           if (!response.ok) throw new Error('Curriculum registry kon niet worden geladen.');
           return response.json();
         }),

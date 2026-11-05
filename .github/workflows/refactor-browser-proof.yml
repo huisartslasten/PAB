@@ -12,6 +12,7 @@ on:
       - 'src/features/lessons/**'
       - 'src/features/test-history/**'
       - 'test/browser/**'
+      - 'test/skills-runtime.browser.test.js'
       - 'test/lesson-recovery-runtime-source-contract.test.js'
       - 'test/lesson-photo-runtime-source-contract.test.js'
       - 'test/lesson-load-runtime-source-contract.test.js'
@@ -60,4 +61,5 @@ jobs:
           test/browser/test-history-page.browser.test.js
           test/browser/player-submit-boundary.browser.test.js
           test/browser/player-runtime-integration.browser.test.js
+          test/browser/skills-runtime.browser.test.js
           --workers=1

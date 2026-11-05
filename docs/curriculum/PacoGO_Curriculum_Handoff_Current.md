@@ -902,3 +902,40 @@ This section supersedes earlier handoff statements that describe the executable 
 - Added a runtime capability audit to `PacoGO_B1_Task_Coverage_Specification_v0.1.md`. It is design documentation only; no runtime/catalogue/route/database/Supabase changes were made.
 - Next step: create B1 task-level traceability + interaction contract, then choose the smallest complete vertical slice. D3/D4 tasks must wait until their evidence is actually captured. Do not widen the catalogue by adding tasks the UI cannot faithfully execute.
 - Documentation commit for runtime audit: `0f82e7dd6004b58412aa22db46561bf923b78ce6`; Full Regression for this commit is pending.
+
+
+## 30. B1 task traceability and ET7 contract review — 2026-11-05
+
+### Verified starting point
+- Branch: `refactor/professional-v1`; never touch LIVE `main`.
+- Current HEAD before this documentation phase: `aecb1944874f0401a8c7e712c6305e49327345b0`.
+- Full Regression #2991 / run ID `42028335668` is GREEN on exact commit `aecb1944874f0401a8c7e712c6305e49327345b0`. This includes the browser regression and clean working-tree verification.
+
+### New design artifact
+- Added `docs/curriculum/PacoGO_B1_Task_Traceability_Interaction_Contract_v0.1.md`.
+- It maps candidate B1 task families to existing developments, claims, task models and evidence targets, and specifies learner-visible interactions, observation requirements, coding constraints and acceptance criteria.
+- This is design-only. No executable tasks, learner catalogue, route, engine code, database or Supabase schema changed.
+
+### ET7 finding
+- B1.ET7 (zelfstandigheid) exists in the B1 registry under C3, but none of the six existing B1 task models maps to ET7. The catalogue contract test requires task evidence targets to exactly match the selected task model, so ET7 cannot be added to a task catalogue entry without changing an underlying contract.
+- C3 documents independently define independence as a cross-cutting evidence-coding dimension with statuses INDEPENDENT, PROMPTED, DEPENDENT and UNKNOWN, and require prompt/instruction exposure to be observed. This supports cross-cutting independence coding generally but does not prove that B1.ET7 was intended to be cross-cutting or resolve its omission from B1 task models.
+- The B1 addition controller currently hardcodes `independent: true`, which does not satisfy C3's requirement to classify from observed assistance/prompt exposure. It must not be used to claim ET7 or independent performance when the interaction does not capture the relevant conditions.
+- Provisional finding: cross-cutting independence coding is supported by C3; B1-specific ET7 mapping remains unresolved. Do not remove ET7, attach it to TM4, or create a new task model by inference.
+
+### Runtime capability and candidate task design
+- Current B1 UI supports only quantity groups and symbolic expression, with integer-step numeric response. It does not yet support number-line/representation mapping, decimal input, strategy selection, explicit checking, or designed robustness/transfer pairs.
+- Controller has internal strategy/prompted-example methods but current learner route does not expose those interactions.
+- B1 traceability artifact distinguishes Q1 (quantity composition, TM1/ET1), R1 (representation mapping, TM2/ET1+ET2), S1 (whole-number execution, TM3/ET3), D1 (decimal execution, TM3/ET3), ST1 (strategy/checking, TM4/ET4+ET5), V1 (robustness, TM5/ET6) and T1 (transfer, TM6/ET8). These are candidate families, not approved catalogue tasks.
+- Do not add catalogue entries for capabilities the UI cannot execute and the observation contract cannot evidence.
+
+### Next concrete step
+1. Resolve the B1-specific meaning/mapping of ET7 against the C3 coding architecture and registry contract. This is a curriculum-contract decision, not a code patch.
+2. If that decision requires changes, design and test the underlying contract before implementation.
+3. Then select the smallest complete learner-facing vertical slice whose UI and event capture genuinely support its declared evidence target. A D1 quantity-group extension is the most immediately supported candidate; do not pretend it closes D3/D4.
+4. Before any code build, verify Full Regression on the exact current branch HEAD. If red, stop and isolate the root cause.
+
+### Verification after documentation update
+- Traceability artifact initial commit: `4f2299766c5e63c51d74b0e978fd089c788f2099`.
+- ET7/C3 cross-check amendment: `885c594b7f88b9f12514d38571c65f1cdb3233e4`.
+- Handoff update commit: pending at time of writing.
+- Full Regression on final resulting HEAD: pending. Do not report green until verified.

@@ -133,7 +133,7 @@ test('B1 learner practice provisions an owned profile and persists each atomic l
   await expect(page.getByRole('button', { name: 'Leerling kiezen: Leerling A' })).toBeVisible();
   await page.getByRole('button', { name: 'Leerling kiezen: Leerling A' }).click();
 
-  await expect(page.locator('h1')).toHaveText('We gaan optellen');
+  await expect(page.locator('#exerciseCard h1')).toHaveText('We gaan optellen');
   await expect(page.locator('#progress')).toContainText('Oefening 1 van 3');
   await expect(page.locator('.quantity-group')).toHaveCount(2);
   await expect(page.locator('textarea')).toHaveCount(0);

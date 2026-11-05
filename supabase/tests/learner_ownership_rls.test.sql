@@ -54,19 +54,6 @@ select public.persist_curriculum_learning_cycle(
   '{"observation_ids":[],"inference":{"status":"insufficient"},"decision":{"next_action":"continue"}}'::jsonb
 );
 
--- Parent A records one complete learning cycle for learner A.
-select set_config('request.jwt.claim.sub', 'a1000000-0000-4000-8000-000000000001', true);
-select set_config('request.jwt.claims',
-  '{"sub":"a1000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
-select public.persist_curriculum_learning_cycle(
-  current_setting('test.learner_a'),
-  current_setting('test.registry_id')::uuid,
-  'TEST-SKILL-A',
-  '{"source_event_id":"rls-test-event-a","performance":{"correct":true},"observation":{"response":12},"evidence_assessment":{"status":"observed"}}'::jsonb,
-  '{"state":{"status":"in_progress"},"last_observed_at":"2026-11-04T12:00:00Z"}'::jsonb,
-  '{"observation_ids":[],"inference":{"status":"insufficient"},"decision":{"next_action":"continue"}}'::jsonb
-);
-
 -- Parent B also sees only its own learner and records.
 do $test$
 begin
@@ -91,6 +78,19 @@ begin
   end if;
 end;
 $test$;
+
+-- Parent A records one complete learning cycle for learner A.
+select set_config('request.jwt.claim.sub', 'a1000000-0000-4000-8000-000000000001', true);
+select set_config('request.jwt.claims',
+  '{"sub":"a1000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
+select public.persist_curriculum_learning_cycle(
+  current_setting('test.learner_a'),
+  current_setting('test.registry_id')::uuid,
+  'TEST-SKILL-A',
+  '{"source_event_id":"rls-test-event-a","performance":{"correct":true},"observation":{"response":12},"evidence_assessment":{"status":"observed"}}'::jsonb,
+  '{"state":{"status":"in_progress"},"last_observed_at":"2026-11-04T12:00:00Z"}'::jsonb,
+  '{"observation_ids":[],"inference":{"status":"insufficient"},"decision":{"next_action":"continue"}}'::jsonb
+);
 
 -- Parent A sees its own learner and data, but cannot see Parent B's learner or data.
 do $test$

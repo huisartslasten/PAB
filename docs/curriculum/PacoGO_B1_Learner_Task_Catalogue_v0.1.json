@@ -13,19 +13,14 @@
       "skill_id": "B1",
       "development_id": "B1.D1",
       "claim_id": "B1.C1",
-      "evidence_target_ids": [
-        "B1.ET1"
-      ],
+      "evidence_target_ids": ["B1.ET1"],
       "task_model_id": "B1.TM1",
       "variation_key": "learner_quantity_groups_small",
       "prompt_level": "none",
       "response_process_required": false,
       "representation": "quantity_groups",
       "response_type": "quantity_addition",
-      "addends": [
-        7,
-        5
-      ],
+      "addends": [7, 5],
       "expected_answer": 12
     },
     {
@@ -35,19 +30,14 @@
       "skill_id": "B1",
       "development_id": "B1.D2",
       "claim_id": "B1.C2",
-      "evidence_target_ids": [
-        "B1.ET3"
-      ],
+      "evidence_target_ids": ["B1.ET3"],
       "task_model_id": "B1.TM3",
       "variation_key": "learner_symbolic_execution_two_digit_a",
       "prompt_level": "none",
       "response_process_required": false,
       "representation": "symbolic_expression",
       "response_type": "symbolic_addition",
-      "addends": [
-        28,
-        17
-      ],
+      "addends": [28, 17],
       "expected_answer": 45
     },
     {
@@ -57,20 +47,32 @@
       "skill_id": "B1",
       "development_id": "B1.D2",
       "claim_id": "B1.C2",
-      "evidence_target_ids": [
-        "B1.ET3"
-      ],
+      "evidence_target_ids": ["B1.ET3"],
       "task_model_id": "B1.TM3",
       "variation_key": "learner_symbolic_execution_two_digit_b",
       "prompt_level": "none",
       "response_process_required": false,
       "representation": "symbolic_expression",
       "response_type": "symbolic_addition",
-      "addends": [
-        46,
-        28
-      ],
+      "addends": [46, 28],
       "expected_answer": 74
+    },
+    {
+      "task_id": "B1-L04",
+      "title": "Tel de hoeveelheden bij elkaar",
+      "instruction": "Bekijk beide groepen. Hoeveel zijn het samen?",
+      "skill_id": "B1",
+      "development_id": "B1.D1",
+      "claim_id": "B1.C1",
+      "evidence_target_ids": ["B1.ET1"],
+      "task_model_id": "B1.TM1",
+      "variation_key": "learner_quantity_groups_medium",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "quantity_groups",
+      "response_type": "quantity_addition",
+      "addends": [9, 6],
+      "expected_answer": 15
     }
   ]
 }

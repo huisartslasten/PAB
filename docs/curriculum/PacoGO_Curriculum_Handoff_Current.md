@@ -837,3 +837,42 @@ Deze sectie actualiseert de status na B4. B5 is nu als afzonderlijke candidate s
 - Houd uitleg/ondersteuning gescheiden van beoordeling; een juist antwoord op één taak kent geen mastery toe.
 - Volgende technische stap pas na een nieuwe groene Full Regression: inspecteer de bestaande SLO-scope en de resterende mapped skills om de eerstvolgende noodzakelijke skill te bepalen. Geen willekeurige extra interface of Supabase-wijziging toevoegen.
 - Scientific Validation blijft een afzonderlijke toekomstige werkstroom. Synthetische browserobservaties zijn geen leerlingdata en leveren geen empirische validatie.
+
+
+## 29. B1 task coverage specification — 2026-11-05
+
+This section supersedes earlier handoff statements that describe the executable registry as containing only A1, B1 and FR2, or that still name B4 as the next skill build. See the later B2–B5 sections and the current registry v0.6.0-candidate.
+
+### Current verified repository position before this documentation change
+- Branch: `refactor/professional-v1`; `main` remains LIVE and must not be touched.
+- Branch HEAD before this documentation change: `b3898f46cf4f21576c5e4b90cef284211b5315c9`.
+- Full Regression #2983 / run ID `42023370351`, exact commit `b3898f46cf4f21576c5e4b90cef284211b5315c9`: GREEN.
+- Dedicated browser proof #647 / run ID `42023370323`, same exact commit: GREEN.
+- The latest regression above was checked before the B1 specification documentation commit. It does not verify subsequent documentation commits until rerun on the final resulting HEAD.
+
+### B1 source and model review
+- Current curriculum registry: `docs/curriculum/PacoGO_Curriculum_Registry_v0.6.json`, registry version `0.6.0-candidate`.
+- B1 remains the existing skill Optellen with four developments and four claims. Its existing evidence targets include relation/representation/execution, strategy, checking, independence, robustness and transfer.
+- Current practice catalogue: `docs/curriculum/PacoGO_B1_Learner_Task_Catalogue_v0.1.json`, with only B1-L01–L03. It currently covers one small-quantity task and two symbolic two-digit addition tasks; it contains no operational task for B1.D3 or B1.D4.
+- The catalogue declares registry version `0.4.0-candidate`, while the current registry is `0.6.0-candidate`. Do not mechanically change the pointer. Compare B1 model versions and inspect runtime/persistence compatibility before revising the catalogue.
+- The SLO mapping remains `docs/curriculum/PacoGO_Curriculum_Rekenen_SLO_10-18_Mapping.md`. KD10A includes whole/decimal numbers, operations, strategy/rekenvorm choice, mental calculation, estimation and written calculation. These do not automatically become separate skills.
+
+### New specification
+- Added `docs/curriculum/PacoGO_B1_Task_Coverage_Specification_v0.1.md`.
+- This is an analysis/design specification only. It proposes task families mapped to existing B1 developments, claims, evidence targets and task models.
+- It identifies missing operational coverage of D3/D4 and ET2/ET4/ET5/ET6/ET7/ET8 in the current three-task catalogue.
+- It preserves existing skill/development/claim/evidence/task-model and mastery contracts. No executable tasks, runtime code, interface, learner data or Supabase schema were changed.
+- The specification is grounded in the supplied Minimum 8B and Extra 8B workbooks and the supplied Basis 8B Theme 7 pages only. It does not infer unseen Basis workbook themes.
+- The specification explicitly avoids imposing a universal written algorithm. A method-specific interface requires verified school-method information and must preserve the adaptive instruction architecture.
+
+### Next concrete step
+1. Compare the B1 skill object in registry v0.4 and v0.6 and determine whether the model contract changed.
+2. Inspect the B1 learner route/runtime version compatibility and persisted evidence/task references.
+3. Produce a task-level traceability design covering D3/D4 and the uncovered evidence targets before authoring executable tasks.
+4. Do not change the registry, catalogue version pointer, mastery rules or Supabase until the compatibility and contract analysis supports it.
+5. Before the next build, verify Full Regression on the exact current branch HEAD. A green run on the prior commit is not a substitute.
+
+### Verification after this handoff update
+- Specification commit: `068d431b3a3ccc3c765935b1349dd00887505fc6`.
+- Handoff update commit: pending at the time of writing.
+- Full Regression for the final documentation commit: pending; do not report green until actually verified.

@@ -1081,3 +1081,23 @@ Prepare a consolidated contract reconciliation covering raw response episode, ta
 ### Handoff-verificatie
 - Runtime replacement commit: `8b96642107087c5b66f8ac883f83258a1f103f76`; Full Regression #3009 GREEN.
 - Handoff/route-styles update commit: pending; Full Regression pending.
+
+
+## 35. Centrale Skills-route browserverificatie — 2026-11-05
+
+### Resultaat
+- De browser-test voor de centrale Skills-route is toegevoegd en uitgevoerd.
+- De test start nu vanaf `/skills.html`, zodat het relatieve curriculum-registry-pad vanuit de applicatieroot wordt opgelost.
+- De centrale Skills-route toont A1, B1 en FR2 en behoudt de learner-context (`viewStudent` en `mode`) bij navigatie.
+- De eerdere mislukking op commit `eedc698` kwam door de testfixture-URL onder `/docs/curriculum/`; daardoor werd het relatieve registry-pad verkeerd opgebouwd. Dit was een testopstellingsfout, niet een vastgestelde runtimefout.
+- Er is geen legacy code, Supabase-tabel of learner-data verwijderd.
+
+### Verificatie op exacte commit
+- Branch: `refactor/professional-v1`.
+- Commit: `6a076cd2d9855d80cd1e5545030ca09ea484fa5b`.
+- Full Regression #3012 / run ID `42079579031`: completed GREEN op exact deze commit.
+- Browser Proof #651 / run ID `42079578874`: completed GREEN op exact deze commit.
+- LIVE `main` is niet gewijzigd.
+
+### Volgende concrete stap
+Voer de dependency-audit uit van de oude Skills-implementatie: inventariseer imports, routes, tests, HTML-pagina's, services, migrations, schema- en datagebruik. Classificeer ieder onderdeel als actief, gedeeld, legacy maar nog contract-/data-afhankelijk, of aantoonbaar ongebruikt. Verwijder niets op basis van alleen een ontbrekende centrale route; Supabase-tabellen blijven buiten scope totdat data- en dependency-gebruik aantoonbaar zijn onderzocht.

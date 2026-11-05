@@ -1,4 +1,5 @@
 import { createSupabaseClient } from '../services/supabase-client.js';
+import { createLearnerCurriculumService } from '../services/learner-curriculum-service.js';
 import { createAuthSessionService } from '../services/auth-session-service.js';
 import { createLessonService } from '../services/lesson-service.js';
 import { createFeedbackService } from '../services/feedback-service.js';
@@ -32,6 +33,7 @@ import * as imagePlacement from '../features/learning-material/image-placement.j
 export function createPacoGOApp({ supabaseLib = window.supabase, session = null, storage = globalThis.localStorage } = {}) {
   const db = createSupabaseClient(supabaseLib);
   const authSession = createAuthSessionService(db);
+  const learnerCurriculum = createLearnerCurriculumService(db);
   const auth = createAuthState(session);
   const canManage = () => auth.isParent;
   const canCreate = () => auth.isCreator;
@@ -75,7 +77,7 @@ export function createPacoGOApp({ supabaseLib = window.supabase, session = null,
   const managementCapabilities = createManagementCapabilities({ auth, management });
 
   return Object.freeze({
-    db, auth, authSession, initializeSession, state: appState, lessons, lessonOrder, loadLessons,
+    db, auth, authSession, learnerCurriculum, initializeSession, state: appState, lessons, lessonOrder, loadLessons,
     feedback, grading, audio, mastery, agenda, testHistory, practiceResults, gameResults, gameAccess,
     challengeConfiguration, challengeUnlock, skillConfiguration, skillDefinitions, aiContent,
     creator: createCreatorService(db, { canCreate }), management, managementCapabilities,

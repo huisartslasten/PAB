@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PacoGO — Optellen oefenen</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     :root{font-family:Nunito,system-ui,sans-serif;color:#102b57;background:#f5f9fd}
     body{margin:0;padding:24px;min-height:100vh;box-sizing:border-box}
@@ -17,57 +18,210 @@
     .addition-equation{font-size:36px;font-weight:900;padding:20px 28px;border-radius:16px;background:#eef7ff}
     .addition-answer-form{display:flex;align-items:end;justify-content:center;gap:12px;flex-wrap:wrap}
     label{display:grid;gap:7px;font-weight:800}
-    input{width:140px;padding:12px;border:2px solid #d8e7f4;border-radius:14px;font:900 22px Nunito,system-ui,sans-serif;text-align:center}
-    button{border:0;border-radius:14px;padding:13px 20px;font:900 15px Nunito,system-ui,sans-serif;cursor:pointer;background:#1787f2;color:#fff}
+    input{width:180px;max-width:100%;box-sizing:border-box;padding:12px;border:2px solid #d8e7f4;border-radius:14px;font:900 20px Nunito,system-ui,sans-serif}
+    button{border:0;border-radius:14px;padding:13px 20px;font:900 15px Nunito,system-ui,sans-serif;cursor:pointer;background:#1787f2;color:#fff;margin:4px}
     button:disabled{opacity:.5;cursor:not-allowed}
     .status{font-weight:800;padding:12px 14px;border-radius:14px;background:#eef8ff;color:#126fc9;line-height:1.5}
     .status.error{background:#fff0f0;color:#b42318}
     .progress{font-size:14px;color:#647894;font-weight:800;margin:14px 0}
     #sessionSummary{font-size:14px;color:#647894}
+    #learnerList{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+    #createLearnerForm{display:flex;align-items:end;gap:10px;flex-wrap:wrap;margin-top:18px}
+    #exerciseCard[hidden],#learnerSetup[hidden]{display:none}
   </style>
 </head>
 <body>
 <main>
-  <section class="card">
+  <section class="card" id="learnerSetup">
     <div class="muted">PacoGO • Rekenen • Optellen</div>
+    <h1>Wie gaat oefenen?</h1>
+    <p class="muted">Kies een leerlingprofiel. Profielen zijn gekoppeld aan het ingelogde ouderaccount.</p>
+    <div id="setupStatus" class="status" role="status" aria-live="polite">Ouderaccount controleren…</div>
+    <div id="learnerList"></div>
+    <form id="createLearnerForm">
+      <label for="learnerName">Nieuw leerlingprofiel</label>
+      <input id="learnerName" name="learnerName" autocomplete="off" maxlength="80" placeholder="Naam leerling" required>
+      <button type="submit">Leerling toevoegen</button>
+    </form>
+  </section>
+
+  <section class="card" id="exerciseCard" hidden>
+    <div class="muted" id="selectedLearnerLabel">PacoGO • Rekenen • Optellen</div>
     <h1>We gaan optellen</h1>
     <p class="muted">Geef gewoon je antwoord. Je hoeft niet uit te leggen hoe je hebt gerekend.</p>
     <div id="progress" class="progress">Oefening laden…</div>
     <div id="exercise"></div>
     <div id="feedback" class="status" role="status" aria-live="polite">Je kunt beginnen.</div>
-    <p id="sessionSummary">Nog geen antwoorden verwerkt.</p>
+    <p id="sessionSummary">Je opgeslagen voortgang wordt geladen.</p>
   </section>
 </main>
 <script type="module">
+  import { createPacoGOApp } from './src/app/bootstrap.js';
   import { createAdditionController } from './pacogo-engine/addition-controller.js';
   import { createAdditionLearningInterfaceModel } from './pacogo-engine/addition-learning-interface-contract.js';
   import { renderAdditionLearningInterface } from './pacogo-engine/addition-learning-interface.js';
   import { createBrowserVerticalSliceRuntime } from './pacogo-engine/browser-vertical-slice.js';
   import { createCurriculumRegistry } from './pacogo-engine/curriculum-registry.js';
 
-  const [registryConfig, catalogue] = await Promise.all([
-    fetch('./docs/curriculum/PacoGO_Curriculum_Registry_v0.2.json').then(response => response.json()),
-    fetch('./docs/curriculum/PacoGO_B1_Learner_Task_Catalogue_v0.1.json').then(response => response.json())
-  ]);
-  const registry = createCurriculumRegistry(registryConfig);
-  const runtime = createBrowserVerticalSliceRuntime({ registry, taskSet: catalogue });
-  const tasks = catalogue.tasks;
-  const learnerEvidence = [];
-  let priorState = null;
-  let taskIndex = 0;
-  let controller = null;
-
+  const app = createPacoGOApp({ supabaseLib: window.supabase });
+  const setupCard = document.querySelector('#learnerSetup');
+  const setupStatus = document.querySelector('#setupStatus');
+  const learnerList = document.querySelector('#learnerList');
+  const createLearnerForm = document.querySelector('#createLearnerForm');
+  const learnerName = document.querySelector('#learnerName');
+  const exerciseCard = document.querySelector('#exerciseCard');
   const exerciseHost = document.querySelector('#exercise');
   const feedback = document.querySelector('#feedback');
   const sessionSummary = document.querySelector('#sessionSummary');
   const progress = document.querySelector('#progress');
 
+  let registry;
+  let catalogue;
+  let runtime;
+  let skill;
+  let registryVersionId;
+  let selectedLearner;
+  let priorEvidence = [];
+  let priorState = null;
+  let taskIndex = 0;
+  let pendingCycle = null;
+
+  function showSetupError(error) {
+    setupStatus.className = 'status error';
+    setupStatus.textContent = error?.message || 'De leerlingomgeving kon niet worden geladen.';
+  }
+
+  function addLearnerButton(learner) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = `Oefenen met ${learner.display_name}`;
+    button.setAttribute('aria-label', `Leerling kiezen: ${learner.display_name}`);
+    button.addEventListener('click', () => startPractice(learner));
+    learnerList.appendChild(button);
+  }
+
+  async function refreshLearners() {
+    learnerList.replaceChildren();
+    const learners = await app.learnerCurriculum.listLearners();
+    if (!learners.length) {
+      setupStatus.className = 'status';
+      setupStatus.textContent = 'Maak eerst een leerlingprofiel aan om de oefenvoortgang veilig te bewaren.';
+    } else {
+      setupStatus.className = 'status';
+      setupStatus.textContent = 'Kies het leerlingprofiel voor deze oefenronde.';
+      learners.forEach(addLearnerButton);
+    }
+  }
+
+  createLearnerForm.addEventListener('submit', async event => {
+    event.preventDefault();
+    const displayName = learnerName.value.trim();
+    if (!displayName) return;
+    const submit = createLearnerForm.querySelector('button[type="submit"]');
+    submit.disabled = true;
+    try {
+      await app.learnerCurriculum.createLearnerProfile(displayName);
+      learnerName.value = '';
+      await refreshLearners();
+    } catch (error) {
+      showSetupError(error);
+    } finally {
+      submit.disabled = false;
+    }
+  });
+
+  async function startPractice(learner) {
+    setupStatus.className = 'status';
+    setupStatus.textContent = 'Opgeslagen voortgang laden…';
+    learnerList.querySelectorAll('button').forEach(button => { button.disabled = true; });
+    try {
+      const history = await app.learnerCurriculum.loadLearningHistory({
+        learnerKey: learner.learner_key,
+        registryVersionId,
+        skillId: catalogue.skill_id
+      });
+      selectedLearner = learner;
+      priorEvidence = history.priorEvidence;
+      priorState = history.priorState;
+      taskIndex = 0;
+      pendingCycle = null;
+      setupCard.hidden = true;
+      exerciseCard.hidden = false;
+      document.querySelector('#selectedLearnerLabel').textContent = `PacoGO • ${learner.display_name} • Rekenen • Optellen`;
+      sessionSummary.textContent = `${priorEvidence.length} eerder opgeslagen ${priorEvidence.length === 1 ? 'antwoord' : 'antwoorden'} geladen.`;
+      showTask();
+    } catch (error) {
+      showSetupError(error);
+      learnerList.querySelectorAll('button').forEach(button => { button.disabled = false; });
+    }
+  }
+
+  function finishTask(evaluation, cycle) {
+    exerciseHost.querySelector('[data-retry-persistence]')?.remove();
+    priorEvidence = cycle.evidence;
+    priorState = cycle.longitudinal_state;
+    pendingCycle = null;
+    feedback.className = 'status';
+    feedback.textContent = evaluation.correct
+      ? 'Goed gedaan. Je antwoord is opgeslagen.'
+      : 'Dank je. Ook deze poging is opgeslagen. We oefenen verder.';
+    const count = priorEvidence.length;
+    sessionSummary.textContent = `${count} ${count === 1 ? 'antwoord' : 'antwoorden'} veilig opgeslagen voor ${selectedLearner.display_name}.`;
+    if (taskIndex < catalogue.tasks.length - 1) {
+      const nextButton = document.createElement('button');
+      nextButton.type = 'button';
+      nextButton.textContent = 'Volgende oefening';
+      nextButton.addEventListener('click', () => {
+        taskIndex += 1;
+        showTask();
+      });
+      exerciseHost.appendChild(nextButton);
+    } else {
+      progress.textContent = 'Oefenronde afgerond';
+      const done = document.createElement('p');
+      done.className = 'muted';
+      done.textContent = 'Je hebt alle oefeningen gedaan. Je voortgang is opgeslagen.';
+      exerciseHost.appendChild(done);
+    }
+  }
+
+  async function persistPendingCycle() {
+    if (!pendingCycle) return;
+    const retryButton = exerciseHost.querySelector('[data-retry-persistence]');
+    if (retryButton) retryButton.disabled = true;
+    try {
+      await app.learnerCurriculum.persistLearningCycle({
+        learnerKey: selectedLearner.learner_key,
+        registryVersionId,
+        skillId: catalogue.skill_id,
+        observation: pendingCycle.observation,
+        evidenceAssessment: pendingCycle.cycle.assessment,
+        longitudinalState: pendingCycle.cycle.longitudinal_state,
+        decisionTrace: pendingCycle.cycle.decision_trace
+      });
+      finishTask(pendingCycle.evaluation, pendingCycle.cycle);
+    } catch (error) {
+      feedback.className = 'status error';
+      feedback.textContent = 'Je antwoord is nog niet opgeslagen. Probeer opnieuw.';
+      if (!retryButton) {
+        const retry = document.createElement('button');
+        retry.type = 'button';
+        retry.dataset.retryPersistence = 'true';
+        retry.textContent = 'Opnieuw opslaan';
+        retry.addEventListener('click', persistPendingCycle);
+        exerciseHost.appendChild(retry);
+      } else {
+        retryButton.disabled = false;
+      }
+    }
+  }
+
   function showTask() {
-    const task = tasks[taskIndex];
+    const task = catalogue.tasks[taskIndex];
     const model = createAdditionLearningInterfaceModel({ task });
-    controller = createAdditionController({
+    const controller = createAdditionController({
       task,
-      studentKey: 'local-practice-session',
+      studentKey: selectedLearner.learner_key,
       renderer: {},
       addends: task.addends,
       expectedAnswer: task.expected_answer,
@@ -76,7 +230,7 @@
       responseType: task.response_type,
       provenance: { page: 'curriculum-b1-learner.html', catalogue_version: catalogue.schema_version }
     });
-    progress.textContent = `Oefening ${taskIndex + 1} van ${tasks.length}`;
+    progress.textContent = `Oefening ${taskIndex + 1} van ${catalogue.tasks.length}`;
     feedback.className = 'status';
     feedback.textContent = 'Vul je antwoord in.';
     renderAdditionLearningInterface({
@@ -88,33 +242,15 @@
           const cycle = runtime.runTaskObservation({
             taskId: task.task_id,
             observation,
-            priorEvidence: learnerEvidence,
+            priorEvidence,
+            state: priorState || {
+              missing_evidence_targets: skill.evidence_targets.map(target => target.id)
+            },
             priorState
           });
-          learnerEvidence.splice(0, learnerEvidence.length, ...cycle.evidence);
-          priorState = cycle.longitudinal_state;
-          feedback.textContent = evaluation.correct
-            ? 'Goed gedaan. Je antwoord is verwerkt.'
-            : 'Dank je. Deze poging is ook verwerkt. We oefenen verder.';
-          const count = learnerEvidence.length;
-          sessionSummary.textContent = `${count} ${count === 1 ? 'antwoord' : 'antwoorden'} verwerkt in deze oefenronde.`;
+          pendingCycle = { evaluation, observation, cycle };
           exerciseHost.querySelector('form button').disabled = true;
-          if (taskIndex < tasks.length - 1) {
-            const nextButton = document.createElement('button');
-            nextButton.type = 'button';
-            nextButton.textContent = 'Volgende oefening';
-            nextButton.addEventListener('click', () => {
-              taskIndex += 1;
-              showTask();
-            });
-            exerciseHost.appendChild(nextButton);
-          } else {
-            progress.textContent = 'Oefenronde afgerond';
-            const done = document.createElement('p');
-            done.className = 'muted';
-            done.textContent = 'Je hebt alle oefeningen gedaan. Je voortgang wordt in deze demonstratie niet bewaard na het sluiten van de pagina.';
-            exerciseHost.appendChild(done);
-          }
+          persistPendingCycle();
         } catch (error) {
           feedback.className = 'status error';
           feedback.textContent = error.message;
@@ -123,7 +259,34 @@
     });
   }
 
-  showTask();
+  try {
+    const session = await app.initializeSession();
+    if (!session || !app.auth.isParent) {
+      window.location.replace('auth.html?returnTo=curriculum-b1-learner.html');
+    } else {
+      const [registryConfig, loadedCatalogue] = await Promise.all([
+        fetch('./docs/curriculum/PacoGO_Curriculum_Registry_v0.2.json').then(response => {
+          if (!response.ok) throw new Error('Curriculum registry kon niet worden geladen.');
+          return response.json();
+        }),
+        fetch('./docs/curriculum/PacoGO_B1_Learner_Task_Catalogue_v0.1.json').then(response => {
+          if (!response.ok) throw new Error('De B1-oefencatalogus kon niet worden geladen.');
+          return response.json();
+        })
+      ]);
+      catalogue = loadedCatalogue;
+      registry = createCurriculumRegistry(registryConfig);
+      skill = registry.getSkill(catalogue.skill_id);
+      runtime = createBrowserVerticalSliceRuntime({ registry, taskSet: catalogue });
+      registryVersionId = await app.learnerCurriculum.getRegistryVersionId(
+        'pacogo-curriculum',
+        catalogue.curriculum_registry_version
+      );
+      await refreshLearners();
+    }
+  } catch (error) {
+    showSetupError(error);
+  }
 </script>
 </body>
 </html>

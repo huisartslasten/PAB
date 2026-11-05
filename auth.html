@@ -30,6 +30,7 @@
 
     const params = new URLSearchParams(window.location.search);
     const resetMode = params.get('mode') === 'reset';
+    const returnTo = params.get('returnTo') === 'curriculum-b1-learner.html' ? 'curriculum-b1-learner.html' : null;
     const mount = document.querySelector('#paco-template-mount');
     const content = document.createElement('div');
     content.className = 'auth-page';
@@ -37,6 +38,7 @@
 
     const goStart = () => { window.location.href = 'dashboard.html'; };
     const goManagement = () => { window.location.href = 'management.html'; };
+    const goAfterLogin = () => { window.location.href = returnTo || 'management.html'; };
 
     function message(text, error = false) {
       const el = document.createElement('div');
@@ -155,7 +157,7 @@
           const session = await app.authSession.signIn(email.input.value, password.input.value);
           app.auth.setSession(session);
           if (!app.auth.isParent) throw new Error('Dit account heeft geen PacoGO-beheertoegang.');
-          goManagement();
+          goAfterLogin();
         } catch (error) {
           card.prepend(message(error?.message || 'Inloggen mislukt.', true));
           submit.disabled = false;
@@ -271,6 +273,8 @@
       content.replaceChildren(message(sessionError?.message || 'Authenticatie kon niet worden geladen.', true));
     } else if (resetMode && app.auth.isLoggedIn) {
       renderPasswordUpdate();
+    } else if (app.auth.isParent && returnTo) {
+      window.location.replace(returnTo);
     } else if (app.auth.isParent) {
       renderLoggedIn();
     } else {

@@ -937,5 +937,44 @@ This section supersedes earlier handoff statements that describe the executable 
 ### Verification after documentation update
 - Traceability artifact initial commit: `4f2299766c5e63c51d74b0e978fd089c788f2099`.
 - ET7/C3 cross-check amendment: `885c594b7f88b9f12514d38571c65f1cdb3233e4`.
-- Handoff update commit: pending at time of writing.
-- Full Regression on final resulting HEAD: pending. Do not report green until verified.
+- Handoff update commit: `aabcf83e81887e89c1c1f79445ac8115a62efe95`.
+- Full Regression #2994 / run ID `42029018689` completed GREEN on exact resulting HEAD `aabcf83e81887e89c1c1f79445ac8115a62efe95`; all 19 regression steps succeeded, including browser regression and clean working-tree verification.
+
+
+## 31. Task support conditions and independence contract — 2026-11-05
+
+### Verified starting point
+- Branch: `refactor/professional-v1`; `main` remains LIVE and untouched.
+- Starting HEAD: `aabcf83e81887e89c1c1f79445ac8115a62efe95`.
+- Full Regression #2994 / run ID `42029018689` was GREEN on that exact starting commit.
+
+### Design decision proposed
+- Ordinary learning/practice tasks permit help-seeking by default.
+- A task may explicitly declare an independent-performance condition before the learner starts.
+- Planned task condition, learner help request, support actually delivered, and C3 independence assessment are separate concepts.
+- A help request alone does not mean assistance was delivered and does not automatically mean PROMPTED or DEPENDENT.
+- Target-relevant assistance delivered during an independent-performance attempt prevents coding the affected target as INDEPENDENT. Preserve the raw response and correctness.
+- If the learner switches to supported practice, that continuation must be a distinct attempt; do not merge it with or overwrite the independent attempt.
+- Neutral interface clarification must be distinguished from mathematical assistance that supplies target reasoning.
+- Missing/incomplete support-event capture must result in UNKNOWN, never assumed INDEPENDENT.
+- Existing C3 candidate categories INDEPENDENT, PROMPTED, DEPENDENT and UNKNOWN are retained pending canonical codebook reconciliation.
+
+### Design artifact
+- Added `docs/curriculum/PacoGO_Task_Support_Conditions_and_Independence_Contract_v0.1.md`.
+- This is a candidate design only. It does not change B1 developments, claims, evidence targets, task models, ET7 mapping, mastery rules, learner catalogue, runtime, learner data or Supabase.
+- B1.ET7 remains unresolved: it is present under C3 but not mapped by any of the six B1 task models. This proposal clarifies operational conditions but does not infer a registry mapping.
+
+### Implementation blockers retained
+1. B1 addition controller currently hardcodes `independent: true`, `prompt_level: none` and `hints: 0`; these cannot substantiate independence.
+2. Observation contract/schema mismatch remains: runtime emits singular `evidence_target_id`, Empirical Observation Schema v0.1 specifies `evidence_target_ids`, Pilot DataSchema v0.2 uses singular target fields.
+3. C3 Evidence Coding Specification v0.1, Evidence Coding Manual v0.1 and Pilot DataSchema v0.2 have differing prompt/independence vocabularies; canonical versioned codebook/schema reconciliation is required before event-to-code implementation.
+4. Existing B1 catalogue validation still requires exact task-model/evidence-target matching.
+5. B1 learner UI does not yet expose a complete help-request/support-delivery interaction.
+
+### Next concrete step
+Reconcile the canonical C3 codebook and observation/event schema, then explicitly resolve the B1.ET7 curriculum-contract role. Before any runtime, registry, catalogue or persistence implementation, run Full Regression on the exact current HEAD; if red, stop and isolate the root cause.
+
+### Verification
+- Design artifact commit: `86003d46f58179f970f2c78cf272890ba35087b0`.
+- Handoff update and its verification: pending.
+- No runtime, registry, catalogue, learner-data or Supabase changes have been made.

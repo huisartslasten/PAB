@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('central Skills route renders A1, B1 and FR2 and preserves learner context', async ({ page }) => {
-  await page.goto('http://127.0.0.1:4173/docs/curriculum/PacoGO_Curriculum_Registry_v0.6.json');
+  await page.goto('http://127.0.0.1:4173/skills.html', { waitUntil: 'domcontentloaded' });
 
   const result = await page.evaluate(async () => {
     const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');

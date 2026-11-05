@@ -1,9 +1,9 @@
 {
   "schema_version": "0.2",
-  "registry_version": "0.5.0-candidate",
+  "registry_version": "0.6.0-candidate",
   "status": "candidate",
   "epistemic_status": "[S]/[O]",
-  "source": "A1/B1/B2/B3/FR2 candidate curriculum registry and B10 engine contract",
+  "source": "A1/B1/B2/B3/B4/B5/FR2 candidate curriculum registry and B10 engine contract",
   "skills": [
     {
       "id": "A1",
@@ -1342,6 +1342,255 @@
         "max_unresolved_contradictions": 0,
         "status": "prototype-only",
         "note": "Kandidaatparameters voor technische consistentie; geen empirisch gevalideerde mastery-cut-scores. De B4-oefenroute presenteert geen masterybeslissing aan de leerling."
+      },
+      "decision_rules": {
+        "priority_order": [
+          "resolve_developmental_uncertainty",
+          "fill_missing_evidence_coverage",
+          "test_variation_and_stability",
+          "test_independent_coordination",
+          "confirm_mastery"
+        ]
+      }
+    },
+    {
+      "id": "B5",
+      "name": "Bewerkingen combineren en structureren",
+      "definition": "Meerdere rekenkundige bewerkingen als samenhangende structuur begrijpen, representeren, in de juiste onderlinge relatie uitvoeren en doelgericht controleren.",
+      "developments": [
+        {
+          "id": "B5.D1",
+          "name": "Samengestelde bewerkingen herkennen",
+          "definition": "Herkennen dat een rekenopgave uit samenhangende bewerkingen bestaat en bepalen welke hoeveelheden en bewerkingen bij elkaar horen.",
+          "candidate_order": 1
+        },
+        {
+          "id": "B5.D2",
+          "name": "Situaties als bewerkingsstructuur representeren",
+          "definition": "Een situatie met meerdere bewerkingen omzetten naar een passende samengestelde rekennotatie, met behoud van de relaties en groepering.",
+          "candidate_order": 2
+        },
+        {
+          "id": "B5.D3",
+          "name": "Volgorde en afhankelijkheid interpreteren",
+          "definition": "Begrijpen welke bewerkingen eerst moeten worden uitgevoerd door haakjes en de afgesproken rekenvolgorde correct te interpreteren.",
+          "candidate_order": 3
+        },
+        {
+          "id": "B5.D4",
+          "name": "Samengestelde bewerkingen uitvoeren",
+          "definition": "Een samengestelde berekening in de juiste volgorde uitvoeren en tussenresultaten correct behouden.",
+          "candidate_order": 4
+        },
+        {
+          "id": "B5.D5",
+          "name": "Bewerkingsstructuren gelijkwaardig herstructureren",
+          "definition": "Een samengestelde bewerkingsstructuur herkennen of omzetten naar een gelijkwaardige structuur zonder de waarde te veranderen.",
+          "candidate_order": 5
+        },
+        {
+          "id": "B5.D6",
+          "name": "Bewerkingen flexibel combineren en controleren",
+          "definition": "In gevarieerde situaties een passende samengestelde structuur selecteren en de uitkomst doelgericht controleren.",
+          "candidate_order": 6
+        }
+      ],
+      "claims": [
+        {
+          "id": "B5.C1",
+          "development_id": "B5.D1",
+          "definition": "De leerling kan herkennen welke bewerkingen en hoeveelheden in een samengestelde rekenstructuur met elkaar samenhangen."
+        },
+        {
+          "id": "B5.C2",
+          "development_id": "B5.D2",
+          "definition": "De leerling kan een situatie met meerdere bewerkingen correct representeren in een samengestelde rekennotatie."
+        },
+        {
+          "id": "B5.C3",
+          "development_id": "B5.D3",
+          "definition": "De leerling kan de onderlinge volgorde en afhankelijkheid van bewerkingen correct interpreteren."
+        },
+        {
+          "id": "B5.C4",
+          "development_id": "B5.D4",
+          "definition": "De leerling kan een samengestelde berekening correct uitvoeren met behoud van tussenresultaten."
+        },
+        {
+          "id": "B5.C5",
+          "development_id": "B5.D5",
+          "definition": "De leerling kan gelijkwaardige samengestelde bewerkingsstructuren herkennen of construeren met behoud van waarde."
+        },
+        {
+          "id": "B5.C6",
+          "development_id": "B5.D6",
+          "definition": "De leerling kan in gevarieerde situaties een passende samengestelde bewerkingsstructuur kiezen en de uitkomst controleren."
+        }
+      ],
+      "evidence_targets": [
+        {
+          "id": "B5.ET1",
+          "claim_id": "B5.C1",
+          "definition": "Correct herkennen welke bewerkingen in een samengestelde structuur voorkomen."
+        },
+        {
+          "id": "B5.ET2",
+          "claim_id": "B5.C1",
+          "definition": "Correct interpreteren hoe de hoeveelheden en bewerkingen onderling samenhangen."
+        },
+        {
+          "id": "B5.ET3",
+          "claim_id": "B5.C2",
+          "definition": "Een contextuele situatie koppelen aan de juiste samengestelde bewerkingsnotatie."
+        },
+        {
+          "id": "B5.ET4",
+          "claim_id": "B5.C2",
+          "definition": "Groepering en relaties behouden bij het representeren van een samengestelde situatie."
+        },
+        {
+          "id": "B5.ET5",
+          "claim_id": "B5.C3",
+          "definition": "De afgesproken voorrangsrelatie tussen haakjes, vermenigvuldigen/delen en optellen/aftrekken correct toepassen."
+        },
+        {
+          "id": "B5.ET6",
+          "claim_id": "B5.C3",
+          "definition": "Bewerkingen met gelijke voorrang in de afgesproken volgorde interpreteren."
+        },
+        {
+          "id": "B5.ET7",
+          "claim_id": "B5.C4",
+          "definition": "Een samengestelde berekening correct uitvoeren."
+        },
+        {
+          "id": "B5.ET8",
+          "claim_id": "B5.C4",
+          "definition": "Tussenresultaten correct gebruiken zonder de oorspronkelijke bewerkingsrelatie te veranderen."
+        },
+        {
+          "id": "B5.ET9",
+          "claim_id": "B5.C5",
+          "definition": "Een gelijkwaardige herstructurering van een samengestelde bewerking herkennen."
+        },
+        {
+          "id": "B5.ET10",
+          "claim_id": "B5.C5",
+          "definition": "Waarde behouden bij het herstructureren van een samengestelde bewerking."
+        },
+        {
+          "id": "B5.ET11",
+          "claim_id": "B5.C6",
+          "definition": "Een passende samengestelde bewerkingsstructuur selecteren in een gevarieerde situatie."
+        },
+        {
+          "id": "B5.ET12",
+          "claim_id": "B5.C6",
+          "definition": "De uitkomst van een samengestelde berekening passend controleren."
+        }
+      ],
+      "task_models": [
+        {
+          "id": "B5.TM1",
+          "evidence_target_ids": [
+            "B5.ET1",
+            "B5.ET2"
+          ],
+          "primary_development": "B5.D1",
+          "information_value": 1,
+          "instructional_relevance": 1
+        },
+        {
+          "id": "B5.TM2",
+          "evidence_target_ids": [
+            "B5.ET3",
+            "B5.ET4"
+          ],
+          "primary_development": "B5.D2",
+          "information_value": 2,
+          "instructional_relevance": 2
+        },
+        {
+          "id": "B5.TM3",
+          "evidence_target_ids": [
+            "B5.ET5",
+            "B5.ET6"
+          ],
+          "primary_development": "B5.D3",
+          "information_value": 2,
+          "instructional_relevance": 2
+        },
+        {
+          "id": "B5.TM4",
+          "evidence_target_ids": [
+            "B5.ET7",
+            "B5.ET8"
+          ],
+          "primary_development": "B5.D4",
+          "information_value": 2,
+          "instructional_relevance": 2
+        },
+        {
+          "id": "B5.TM5",
+          "evidence_target_ids": [
+            "B5.ET9",
+            "B5.ET10"
+          ],
+          "primary_development": "B5.D5",
+          "information_value": 3,
+          "instructional_relevance": 3
+        },
+        {
+          "id": "B5.TM6",
+          "evidence_target_ids": [
+            "B5.ET11",
+            "B5.ET12"
+          ],
+          "primary_development": "B5.D6",
+          "information_value": 3,
+          "instructional_relevance": 3
+        }
+      ],
+      "development_rules": [
+        {
+          "development_id": "B5.D1",
+          "support_threshold": 1
+        },
+        {
+          "development_id": "B5.D2",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B5.D3",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B5.D4",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B5.D5",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B5.D6",
+          "support_threshold": 2
+        }
+      ],
+      "evidence_rule": {
+        "relevance": "target_match",
+        "quality_field": "quality",
+        "default_quality": 0,
+        "contradiction_field": "contradiction"
+      },
+      "mastery_rules": {
+        "min_independent_observations": 2,
+        "min_variation_keys": 2,
+        "min_evidence_targets": 2,
+        "min_quality": 0.8,
+        "max_unresolved_contradictions": 0,
+        "status": "prototype-only",
+        "note": "Kandidaatparameters voor technische consistentie; geen empirisch gevalideerde mastery-cut-scores. De B5-oefenroute presenteert geen masterybeslissing aan de leerling."
       },
       "decision_rules": {
         "priority_order": [

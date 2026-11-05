@@ -130,12 +130,16 @@ When the school method is unknown, PacoGO must not present an invented procedure
 
 The current B1 learner catalogue v0.1 declares `curriculum_registry_version: 0.4.0-candidate`, while the current repository registry is `0.6.0-candidate`.
 
+The B1 skill object was compared directly between registry 0.4 and 0.6. Its B1 definition, four developments, four claims, eight evidence targets, six task models, development rules, evidence rule, mastery rules and decision rules are identical in the two files. This confirms that the B1 model itself did not change across these registry versions.
+
+However, the B1 learner route explicitly fetches `PacoGO_Curriculum_Registry_v0.4.json` and looks up the registered version using the catalogue's `0.4.0-candidate` value. The registry version is also passed to learner-history loading and persistence. Therefore the version pointer is not merely decorative metadata: it participates in runtime selection and learner-state/history scoping.
+
 Do not update this pointer mechanically. Before a catalogue revision or learner-route integration:
-- compare B1's model in registry 0.4 and 0.6;
-- determine whether the B1 contract is identical or materially changed;
-- inspect route/runtime version validation and any persisted task/evidence references;
-- document whether the catalogue can safely target registry 0.6;
-- preserve historical catalogue/registry compatibility where required.
+- inspect TEST registration/read-back for registry 0.6;
+- inspect existing B1 persisted history/evidence by registry version;
+- determine whether switching the route to 0.6 would split or strand prior history;
+- decide whether compatibility requires preserving the v0.4 route or migrating/reconciling state through an explicit designed path;
+- update the route, catalogue and tests together only after the persistence/runtime contract is understood.
 
 No Supabase change is implied by this specification.
 

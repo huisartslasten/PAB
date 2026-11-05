@@ -68,7 +68,7 @@ select public.persist_curriculum_learning_cycle(
 );
 
 -- Parent B also sees only its own learner and records.
-do $
+do $test$
 begin
   if not exists (
     select 1 from public.learner_profiles
@@ -90,10 +90,10 @@ begin
     raise exception 'Parent B evidence isolation failed';
   end if;
 end;
-$;
+$test$;
 
 -- Parent A sees its own learner and data, but cannot see Parent B's learner or data.
-do $$
+do $test$
 begin
   if not exists (
     select 1 from public.learner_profiles
@@ -133,10 +133,10 @@ begin
     raise exception 'Parent A can read Parent B state or decision trace';
   end if;
 end;
-$$;
+$test$;
 
 -- Parent A cannot add itself to Parent B's learner or persist for Parent B.
-do $$
+do $test$
 begin
   begin
     insert into public.learner_guardians (
@@ -165,7 +165,7 @@ begin
     when insufficient_privilege then null;
   end;
 end;
-$$;
+$test$;
 
 -- Replaying the same event is idempotent: one evidence row and one trace row.
 select public.persist_curriculum_learning_cycle(
@@ -177,7 +177,7 @@ select public.persist_curriculum_learning_cycle(
   '{"observation_ids":[],"inference":{"status":"insufficient"},"decision":{"next_action":"continue"}}'::jsonb
 );
 
-do $$
+do $test$
 begin
   if (select count(*) from public.student_evidence
       where student_key = current_setting('test.learner_a')
@@ -191,7 +191,7 @@ begin
     raise exception 'Duplicate decision trace was stored more than once';
   end if;
 end;
-$$;
+$test$;
 
 -- A malformed final trace constraint must roll back evidence and state writes too.
 select set_config(
@@ -205,7 +205,7 @@ select set_config(
   true
 );
 
-do $$
+do $test$
 begin
   begin
     perform public.persist_curriculum_learning_cycle(
@@ -246,10 +246,10 @@ begin
     raise exception 'Longitudinal state changed despite failed learning-cycle transaction';
   end if;
 end;
-$$;
+$test$;
 
 -- Learner identity cannot be reassigned through direct table updates.
-do $$
+do $test$
 begin
   begin
     update public.student_longitudinal_state
@@ -261,11 +261,11 @@ begin
     when insufficient_privilege then null;
   end;
 end;
-$$;
+$test$;
 
 -- Anonymous role has no table privileges even before row-level policy evaluation.
 reset role;
-do $$
+do $test$
 begin
   if has_table_privilege('anon', 'public.student_evidence', 'SELECT')
      or has_table_privilege('anon', 'public.student_longitudinal_state', 'SELECT')
@@ -274,6 +274,6 @@ begin
     raise exception 'Anonymous role retains learner-data table privileges';
   end if;
 end;
-$$;
+$test$;
 
 rollback;

@@ -30,7 +30,7 @@
 
     const params = new URLSearchParams(window.location.search);
     const resetMode = params.get('mode') === 'reset';
-    const returnTo = ['curriculum-b1-learner.html', 'curriculum-b2-learner.html'].includes(params.get('returnTo')) ? params.get('returnTo') : null;
+    const returnTo = ['curriculum-b1-learner.html', 'curriculum-b2-learner.html', 'curriculum-b3-learner.html'].includes(params.get('returnTo')) ? params.get('returnTo') : null;
     const mount = document.querySelector('#paco-template-mount');
     const content = document.createElement('div');
     content.className = 'auth-page';

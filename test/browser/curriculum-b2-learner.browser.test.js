@@ -16,7 +16,7 @@ test('B2 learner route practices all seven candidate developments and persists e
     const rowsFor = table => {
       if (table === 'learner_profiles') return state.profiles;
       if (table === 'curriculum_registry_versions') return [{
-        id: registryVersionId, registry_key: 'pacogo-curriculum', version: '0.3.0-candidate'
+        id: registryVersionId, registry_key: 'pacogo-curriculum', version: '0.4.0-candidate'
       }];
       if (table === 'student_evidence') return state.evidence;
       if (table === 'student_longitudinal_state') return state.longitudinalStates;
@@ -96,6 +96,7 @@ test('B2 learner route practices all seven candidate developments and persists e
   await page.getByRole('button', { name: 'Leerling toevoegen' }).click();
   await page.getByRole('button', { name: 'Leerling kiezen: Leerling B2' }).click();
   await expect(page.locator('#exerciseCard h1')).toHaveText('Aftrekken oefenen');
+  await expect(page.getByRole('link', { name: 'Vermenigvuldigen oefenen' })).toBeVisible();
 
   const tasks = [
     { kind: 'line', min: 0, max: 20, answer: 9 },

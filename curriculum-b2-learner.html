@@ -41,7 +41,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <p class="muted">Geef meestal direct je antwoord. Bij enkele oefeningen kies je ook een aanpak of controle.</p>
 <div id="progress" class="progress"></div><div id="exercise"></div>
 <div id="feedback" class="status" role="status" aria-live="polite">Je kunt beginnen.</div>
-<p id="sessionSummary" class="muted"></p><p class="muted"><a href="curriculum-b1-learner.html">Terug naar optellen</a></p>
+<p id="sessionSummary" class="muted"></p><p class="muted"><a href="curriculum-b1-learner.html">Terug naar optellen</a> · <a href="curriculum-b3-learner.html">Vermenigvuldigen oefenen</a></p>
 </section>
 </main>
 <script type="module">
@@ -161,7 +161,7 @@ try{
  if(!session||!app.auth.isParent){window.location.replace('auth.html?returnTo=curriculum-b2-learner.html');}
  else{
   const [config,loaded]=await Promise.all([
-   fetch('./docs/curriculum/PacoGO_Curriculum_Registry_v0.3.json').then(r=>{if(!r.ok)throw new Error('Curriculum registry kon niet worden geladen.');return r.json();}),
+   fetch('./docs/curriculum/PacoGO_Curriculum_Registry_v0.4.json').then(r=>{if(!r.ok)throw new Error('Curriculum registry kon niet worden geladen.');return r.json();}),
    fetch('./docs/curriculum/PacoGO_B2_Learner_Task_Catalogue_v0.1.json').then(r=>{if(!r.ok)throw new Error('B2-oefencatalogus kon niet worden geladen.');return r.json();})
   ]);
   catalogue=loaded;const registry=createCurriculumRegistry(config);skill=registry.getSkill(catalogue.skill_id);

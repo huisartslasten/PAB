@@ -52,7 +52,7 @@ test('B1 learner practice provisions an owned profile and persists each atomic l
         return [{
           id: '89f1de87-2a2c-413b-a635-490fdef2c6e3',
           registry_key: 'pacogo-curriculum',
-          version: '0.3.0-candidate'
+          version: '0.4.0-candidate'
         }];
       }
       if (table === 'student_evidence') return state.evidence;
@@ -135,6 +135,7 @@ test('B1 learner practice provisions an owned profile and persists each atomic l
 
   await expect(page.locator('#exerciseCard h1')).toHaveText('We gaan optellen');
   await expect(page.getByRole('link', { name: 'Ook aftrekken oefenen' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Vermenigvuldigen oefenen' })).toBeVisible();
   await expect(page.locator('#progress')).toContainText('Oefening 1 van 3');
   await expect(page.locator('.quantity-group')).toHaveCount(2);
   await expect(page.locator('textarea')).toHaveCount(0);

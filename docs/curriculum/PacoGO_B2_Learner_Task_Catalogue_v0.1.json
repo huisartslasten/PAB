@@ -4,7 +4,7 @@
   "purpose": "Separate learner-practice catalogue for the complete candidate B2 subtraction developmental line. This catalogue is not the C1-C3 pilot measurement task set.",
   "synthetic_or_empirical": "operational_practice_definition",
   "skill_id": "B2",
-  "curriculum_registry_version": "0.3.0-candidate",
+  "curriculum_registry_version": "0.4.0-candidate",
   "tasks": [
     {
       "task_id": "B2-L01",

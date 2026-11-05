@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { createB5Controller } from './b5-controller.js';
 
-const cataloguePath=new URL('../docs/curriculum/PacoGO_B5_Learner_Task_Catalogue_v0.4.json',import.meta.url);
+const cataloguePath=new URL('../docs/curriculum/PacoGO_B5_Learner_Task_Catalogue_v0.5.json',import.meta.url);
 const catalogue=JSON.parse(readFileSync(fileURLToPath(cataloguePath),'utf8'));
 
 function controller(task){
@@ -46,14 +46,27 @@ test('B5 equal-precedence task requires left-to-right intermediate evidence',()=
  assert.equal(result.evaluation.correct,true);
 });
 
-test('B5 final task requires a selected check method and a correct check result',()=>{
- const task=catalogue.tasks.find(x=>x.task_id==='B5-L12'),c=controller(task);
- assert.throws(()=>c.submit({steps:{cards:24,spent:28},answer:2,check_answer:30}),/Kies eerst/);
- c.selectCheckMethod('reverse_addition');
- const result=c.submit({steps:{cards:24,spent:28},answer:2,check_answer:30});
- assert.equal(result.evaluation.correct,true);
- assert.equal(result.observation.response.submitted_check_answer,30);
- assert.equal(result.observation.response.check_method_id,'reverse_addition');
+test('B5 final task evaluates each selected check method against its own expected result',()=>{
+ const task=catalogue.tasks.find(x=>x.task_id==='B5-L12');
+ const payload={steps:{cards:24,spent:28},answer:2};
+ const reverse=controller(task);
+ assert.throws(()=>reverse.submit({...payload,check_answer:30}),/Kies eerst/);
+ reverse.selectCheckMethod('reverse_addition');
+ const reverseResult=reverse.submit({...payload,check_answer:30});
+ assert.equal(reverseResult.evaluation.correct,true);
+ assert.equal(reverseResult.observation.response.expected_check_answer,30);
+ assert.equal(reverseResult.observation.response.check_method_id,'reverse_addition');
+ const recalculate=controller(task);
+ recalculate.selectCheckMethod('recalculate');
+ const recalculateResult=recalculate.submit({...payload,check_answer:28});
+ assert.equal(recalculateResult.evaluation.correct,true);
+ assert.equal(recalculateResult.observation.response.expected_check_answer,28);
+ assert.equal(recalculateResult.observation.response.check_method_id,'recalculate');
+ const incorrect=controller(task);
+ incorrect.selectCheckMethod('recalculate');
+ const incorrectResult=incorrect.submit({...payload,check_answer:30});
+ assert.equal(incorrectResult.evaluation.correct,false);
+ assert.equal(incorrectResult.evaluation.check_correct,false);
 });
 
 test('incorrect intermediate or checking results remain observable as incorrect attempts',()=>{

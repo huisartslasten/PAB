@@ -515,3 +515,12 @@ Supabase security advisors also reported pre-existing warnings for exposed SECUR
 Prepare and review the learner ownership/persistence contract before implementing any database writes. Once approved, implement against **TEST only**, use synthetic/pseudonymous test identities, verify the full registry → observation/evidence → longitudinal state → decision trace chain, and remove all synthetic records after the smoke test. Do not use real learner data in engineering tests and do not modify LIVE.
 
 **Latest verified Full Regression before this handoff update:** branch `refactor/professional-v1`, commit `9d1e2dff26b369961caa620dcc074ed867f2eb59`, run #2908 / ID `41952047708`, **GREEN**. This handoff update requires its own Full Regression.
+
+
+## 21. Learner ownership contract
+
+Design candidate created: docs/curriculum/PacoGO_Learner_Ownership_and_Persistence_Contract_v0.1.md. No database or application changes have been made. The proposal uses opaque learner UUIDs, explicit guardian membership and database-enforced row access. Existing broad TEST access policies remain a blocker. Any implementation must be reviewed, tested on the development branch, and applied to PacoGO TEST only. LIVE is out of scope.
+
+Latest verified baseline before the contract document: commit 06c3f93bba20fd0117d328c42a44be231c18ec18, Full Regression #2909 / 41952400604, GREEN. The contract and handoff commits require their own Full Regression.
+
+Next step: review the contract, then re-inspect TEST and implement the membership schema and access tests. No real learner records in engineering tests.

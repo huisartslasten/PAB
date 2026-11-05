@@ -976,5 +976,46 @@ Reconcile the canonical C3 codebook and observation/event schema, then explicitl
 
 ### Verification
 - Design artifact commit: `86003d46f58179f970f2c78cf272890ba35087b0`.
-- Handoff update and its verification: pending.
+- Handoff update commit: `b3f722ff8390944f1af3db943297bdf0d8ee4747`.
+- Full Regression #2996 / run ID `42030868182` completed GREEN on exact commit `b3f722ff8390944f1af3db943297bdf0d8ee4747`.
 - No runtime, registry, catalogue, learner-data or Supabase changes have been made.
+
+
+## 32. Task support condition integrated with C3 design — 2026-11-05
+
+### Verified starting point
+- Branch: `refactor/professional-v1`; `main` remains LIVE and untouched.
+- Starting HEAD: `b3f722ff8390944f1af3db943297bdf0d8ee4747`.
+- Full Regression #2996 / run ID `42030868182` completed GREEN on that exact commit.
+
+### C3 source review
+- Reviewed C3 Canonical Codebook Reconciliation Proposal v0.1 and v0.2, C3 Evidence Coding Specification v0.1, Evidence Coding Manual v0.1, Pilot_DataSchema v0.2, Empirical_Observation_Schema v0.1, synthetic anchor packet/adjudication guidance and C1-C3 test specification.
+- C3 proposal v0.2 already separates actual assistance events from target-specific independence judgement. It explicitly leaves PROMPTED versus DEPENDENT operational boundary unresolved.
+- The additional missing product concept is the planned task support condition, which must be separate from help-seeking, actual delivered support and C3 coding.
+
+### New addendum
+- Added `docs/curriculum/PacoGO_Task_Support_Condition_C3_Addendum_v0.1.md`.
+- Ordinary learning/practice defaults to help permitted.
+- Independent performance is explicitly declared and communicated before the attempt.
+- A help request is not equivalent to delivered assistance.
+- Delivered support is recorded as an event; neutral interface clarification must be distinguished from target-relevant mathematical assistance.
+- Supported continuation after an independent attempt is a separate attempt/response episode.
+- Existing C3 target-specific independence coding is retained as the candidate measurement layer; no new parallel independence vocabulary is introduced.
+- A single primary task field `support_condition` is proposed conceptually to avoid redundant flags. Legacy missing-field interpretation requires versioned backward-compatibility review before implementation.
+- This addendum does not approve a canonical schema/codebook, choose PROMPTED/DEPENDENT boundary, or resolve B1.ET7.
+
+### Remaining blockers
+1. Reconcile runtime singular `evidence_target_id`, Empirical Observation Schema v0.1 array `evidence_target_ids`, and Pilot DataSchema v0.2 singular target/coding fields.
+2. Approve canonical assistance event representation and target-relevance anchors.
+3. Resolve PROMPTED versus DEPENDENT with explicit coder anchors; synthetic examples do not establish reliability.
+4. Define attempt boundary and backward compatibility for task definitions lacking `support_condition`.
+5. Resolve B1.ET7 curriculum/task-model relationship before emitting ET7 evidence.
+6. Do not infer a Supabase migration; persistence changes require a demonstrated approved runtime-contract need.
+
+### Next concrete step
+Prepare a consolidated contract reconciliation covering raw response episode, task support condition, help request/support delivery events, target-specific assessment cardinality, schema versioning and history compatibility. Then make the explicit B1.ET7 curriculum-contract decision. No implementation until those decisions are approved and Full Regression is green on the exact current HEAD.
+
+### Verification
+- Task support C3 addendum commit: `abb071ac49d6f0b3385dc138dd92bd890c8a8733`.
+- Handoff update commit and resulting Full Regression: pending.
+- No runtime, registry, catalogue, learner data or Supabase changes.

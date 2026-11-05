@@ -79,6 +79,7 @@ test('B3 multiplication route renders reusable quantity models and persists all 
  await page.getByRole('button',{name:'Leerling kiezen: Leerling B3'}).click();
  await expect(page.locator('#exerciseCard h1')).toHaveText('Vermenigvuldigen oefenen');
  await expect(page.getByRole('link',{name:'Aftrekken'})).toBeVisible();
+ await expect(page.getByRole('link',{name:'Delen'})).toBeVisible();
 
  const tasks=[
   {kind:'model',answer:12,model:'dot',count:12},

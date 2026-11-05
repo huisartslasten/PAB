@@ -743,3 +743,51 @@ This section supersedes Section 25's next-step priority of building B3 and its s
 - Before any parent-facing mastery display, implement and validate the C6 mastery protocol and explicit coverage/scope requirements. Current runtime mastery parameters remain prototype-only.
 - Continue the legacy Skills/Skill Editor dependency and history inventory before retiring legacy routes or data.
 - Multi-guardian invitations, account recovery, correction, deletion and retention remain open before production.
+
+## 27. B4 Delen and Division Representation interface
+
+This section supersedes Section 26's next-step priority of building B4. B4 is now implemented as a candidate curriculum model and authenticated learner practice route. B3 and B4 remain separate skills with a strong inverse relationship; neither is a rigid prerequisite for the other.
+
+### Curriculum model and practice catalogue
+
+- Added B4 to `docs/curriculum/PacoGO_Curriculum_Registry_v0.5.json`.
+- B4 contains seven candidate developments, seven claims, fourteen evidence targets and seven task models.
+- The candidate developmental line covers equal sharing, grouping, division representations, the inverse multiplication relationship, quotient and remainder, larger/decimal values, and flexible/checkable division.
+- Added fourteen practice tasks, two per development. Most accept a direct numeric answer; quotient-and-remainder tasks capture the two values separately. Strategy selection and checking are required only where the task contract explicitly requests them.
+- The order is a candidate developmental hypothesis, not an empirically established fixed sequence. B3 supports B4 through the inverse relationship but is not a rigid prerequisite. B5 remains a separate integrative skill.
+- Candidate mastery parameters remain prototype-only. The B4 practice route does not display a mastery verdict.
+
+### Division Representation Learning Interface
+
+- Added a reusable pedagogical model and renderer for two distinct division meanings:
+  - equal sharing: the number of groups is known and the amount per group is unknown;
+  - grouping: the amount per group is known and the number of groups is unknown.
+- Components are separated into `division-representation-model.js`, `division-representation-renderer.js` and the stable composition entry point `division-representation-interface.js`.
+- Added `division-controller.js` to capture numeric answers, quotient/remainder, optional strategy and check choices, and incorrect attempts as observations. It does not decide mastery.
+- The visual model does not reveal the unknown answer. It is a display-oriented first implementation; richer learner manipulation belongs in a separate interaction/state layer.
+
+### Learner route and navigation
+
+- Added `curriculum-b4-learner.html` with parent authentication, profile selection/creation, prior-state loading and atomic persistence through the shared learner service.
+- The route uses registry `0.5.0-candidate` and the fourteen-task B4 catalogue. It records fourteen synthetic task cycles in browser regression; tests use a Supabase test double and create no real learner records.
+- B3 continues to use registry `0.4.0-candidate`; its route links to B4 so the learner can move between the related skills. B4 links back to B3.
+- No countdown timer was added. The B4 route accepts direct answers unless a task explicitly requires a strategy/check.
+
+### Supabase TEST registration
+
+- Registered `pacogo-curriculum@0.5.0-candidate` in PacoGO TEST only.
+- Row ID: `a16cc3d9-5715-4c22-8d9e-094f7082d07c`.
+- Supersedes `0.4.0-candidate` (row `f4b7b7e1-8d28-45de-9a6b-3c51f9d2a4e7`).
+- Source: `docs/curriculum/PacoGO_Curriculum_Registry_v0.5.json`.
+- SHA-256 of the exact source file: `fdc3712704304d563b2b1db0620dd089d8b328724d5a4d1b2416781d95a7f422`.
+- TEST read-back confirms six skill models and B4 presence. No schema migration was required.
+- Learner profiles, guardian links, evidence, longitudinal state and decision traces remain empty; no real learner data has been created. LIVE was not touched.
+
+### Verification and current next step
+
+- Full Regression #2953 / run ID `42016251309`, exact commit `5cefc2237602439bda7d9dfb7ff71b0e1343c8cd`: **GREEN**.
+- Dedicated B4 browser proof run #640 / ID `42016251705`, same exact commit: **GREEN**.
+- The B4 browser test covers all fourteen tasks, both division representation modes, quotient/remainder capture and the synthetic persistence cycle. The full regression includes the maintained Node, Vitest, architecture and browser checks.
+- Branch: `refactor/professional-v1`. `main` remains LIVE and untouched.
+- Next concrete step: review the division task wording/visual progression against the learner's actual grade-six needs, then continue with B5 only after its SLO scope and existing registry dependencies are inspected. Do not assume B4 candidate order or mastery parameters are validated.
+- Continue the legacy Skills/Skill Editor dependency and history inventory before removing legacy routes or data. Multi-guardian invitations, account recovery, correction, deletion and retention remain open before production.

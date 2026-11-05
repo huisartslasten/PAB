@@ -22,16 +22,17 @@ test('learner persistence uses opaque UUID keys and explicit guardian ownership'
 });
 
 test('learner data policies are scoped and replace the old permissive policies', () => {
-  for (const policy of [
-    'student_evidence_select_authenticated',
-    'student_evidence_insert_authenticated',
-    'authenticated can read longitudinal state',
-    'authenticated can insert longitudinal state',
-    'authenticated can update longitudinal state',
-    'authenticated can read decision traces',
-    'authenticated can insert decision traces'
-  ]) {
-    assert.match(migration, new RegExp('drop policy if exists ' + policy.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'));
+  const droppedPolicies = [
+    'drop policy if exists student_evidence_select_authenticated',
+    'drop policy if exists student_evidence_insert_authenticated',
+    'drop policy if exists "authenticated can read longitudinal state"',
+    'drop policy if exists "authenticated can insert longitudinal state"',
+    'drop policy if exists "authenticated can update longitudinal state"',
+    'drop policy if exists "authenticated can read decision traces"',
+    'drop policy if exists "authenticated can insert decision traces"'
+  ];
+  for (const policySql of droppedPolicies) {
+    assert.ok(migration.toLowerCase().includes(policySql.toLowerCase()), `Missing policy removal: ${policySql}`);
   }
 
   assert.match(migration, /private\.is_learner_guardian\(student_key\)/);

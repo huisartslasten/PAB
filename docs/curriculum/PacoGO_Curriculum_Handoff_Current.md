@@ -1020,3 +1020,24 @@ Prepare a consolidated contract reconciliation covering raw response episode, ta
 - Handoff update commit: `3ab6ab665c03d33713ee544c530be4b11703ab5a`; Full Regression #2998 / run ID `42033100117` completed GREEN on that exact commit.
 - Branch HEAD was verified as `3ab6ab665c03d33713ee544c530be4b11703ab5a` after #2998. `main` remains untouched.
 - No runtime, registry, catalogue, learner data or Supabase changes.
+
+## 33. C3 observation/event contract reconciliation — 2026-11-05
+
+### Verified design result
+- Added `docs/curriculum/PacoGO_C3_Consolidated_Observation_Event_Coding_Contract_Reconciliation_v0.1.md`.
+- The reconciliation consolidates the conflicting C3 source contracts without silently choosing a canonical schema or codebook.
+- It distinguishes the administered task/response episode, raw interaction and assistance events, target-specific assessments, coding provenance, and downstream inference.
+- It records ten unresolved decisions (D1–D10), their dependencies and a proposed resolution order.
+- It preserves the key boundary that one response episode remains one observation even when multiple evidence targets are assessed; those assessments do not become multiple independent observations.
+- It explicitly leaves unresolved the singular-versus-array schema conflict, quality scale, target-alignment vocabulary, assistance coding anchors, PROMPTED/DEPENDENT boundary, historical compatibility and B1.ET7.
+- This is design/reconciliation documentation only. No runtime, registry, learner catalogue, learner data, persistence or Supabase changes were made.
+
+### Verification
+- Reconciliation document commit: `831f547d204388d1ab16ae34fa8d260bef303c30`.
+- Full Regression #3000 / run ID `42036785672` completed **GREEN** (`completed / success`) on that exact commit.
+- Branch verified as `refactor/professional-v1` at that commit; `main` remains untouched.
+
+### Next concrete step
+- Do not start another broad C3 documentation cycle.
+- Resolve only the B1.ET7 curriculum-contract question against the current registry and historical B1 prototype. Present the alternatives and consequences; do not remove ET7, map it to TM4/TM7 or add a task model without an explicit decision.
+- After that decision, return to the smallest useful B1 learner-facing task slice for Zyon, starting from the already supported quantity-composition task family. Before any code build, run Full Regression on the exact current HEAD; if green, implement one complete task interaction and its observation path, then rerun Full Regression.

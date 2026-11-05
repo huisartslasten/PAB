@@ -127,7 +127,7 @@ test('B2 learner route practices all seven candidate developments and persists e
     }
     if (task.strategy) await page.getByRole('button', { name: task.strategy, exact: true }).click();
     if (task.check) await page.getByRole('button', { name: task.check, exact: true }).click();
-    await page.getByRole('button', { name: 'Controleren' }).click();
+    await page.getByRole('button', { name: 'Controleren', exact: true }).click();
     await expect(page.locator('#feedback')).toContainText('antwoord is opgeslagen');
     if (index < tasks.length - 1) await page.getByRole('button', { name: 'Volgende oefening' }).click();
   }

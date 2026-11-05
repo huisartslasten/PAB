@@ -30,7 +30,12 @@
       "strategy_options": [],
       "check_required": false,
       "check_methods": [],
-      "display_expression": "none"
+      "display_expression": "none",
+      "division_model": {
+        "mode": "sharing",
+        "total": 12,
+        "group_count": 3
+      }
     },
     {
       "task_id": "B4-L02",
@@ -56,7 +61,12 @@
       "strategy_options": [],
       "check_required": false,
       "check_methods": [],
-      "display_expression": "none"
+      "display_expression": "none",
+      "division_model": {
+        "mode": "sharing",
+        "total": 20,
+        "group_count": 5
+      }
     },
     {
       "task_id": "B4-L03",
@@ -82,7 +92,12 @@
       "strategy_options": [],
       "check_required": false,
       "check_methods": [],
-      "display_expression": "none"
+      "display_expression": "none",
+      "division_model": {
+        "mode": "grouping",
+        "total": 18,
+        "items_per_group": 3
+      }
     },
     {
       "task_id": "B4-L04",
@@ -108,12 +123,17 @@
       "strategy_options": [],
       "check_required": false,
       "check_methods": [],
-      "display_expression": "none"
+      "display_expression": "none",
+      "division_model": {
+        "mode": "grouping",
+        "total": 24,
+        "items_per_group": 4
+      }
     },
     {
       "task_id": "B4-L05",
       "title": "Deling representeren",
-      "instruction": "Er zijn 15 appels voor 5 manden. Welke deling past bij de situatie?",
+      "instruction": "15 appels worden gelijk verdeeld over 5 manden. Hoeveel appels zitten er in elke mand?",
       "skill_id": "B4",
       "development_id": "B4.D3",
       "claim_id": "B4.C3",
@@ -139,7 +159,7 @@
     {
       "task_id": "B4-L06",
       "title": "Betekenis van de deling",
-      "instruction": "Bij 28 ÷ 7 = 4: wat betekent de 4 in deze deling?",
+      "instruction": "Bij 28 ÷ 7 = 4: hoeveel groepjes van 7 zitten er in 28?",
       "skill_id": "B4",
       "development_id": "B4.D3",
       "claim_id": "B4.C3",

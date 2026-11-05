@@ -28,6 +28,9 @@ test('B4 keeps equal-sharing and grouping division meanings distinct and B3 inve
 test('B4 practice catalogue covers fourteen unique tasks across all seven developments and evidence targets',()=>{
  const skill=createCurriculumRegistry(registryConfig).getSkill('B4');
  assert.equal(b4Catalogue.skill_id,'B4');assert.equal(b4Catalogue.curriculum_registry_version,registryConfig.registry_version);
+ assert.match(b4Catalogue.tasks[4].instruction,/Hoeveel appels zitten er in elke mand/);
+ assert.match(b4Catalogue.tasks[5].instruction,/hoeveel groepjes van 7/);
+ assert.deepEqual(b4Catalogue.tasks.slice(0,4).map(x=>x.division_model.mode),['sharing','sharing','grouping','grouping']);
  assert.equal(b4Catalogue.tasks.length,14);assert.equal(new Set(b4Catalogue.tasks.map(x=>x.task_id)).size,14);
  assert.equal(new Set(b4Catalogue.tasks.map(x=>x.variation_key)).size,14);
  assert.deepEqual([...new Set(b4Catalogue.tasks.map(x=>x.development_id))].sort(),skill.developments.map(x=>x.id).sort());

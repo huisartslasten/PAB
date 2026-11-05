@@ -1,6 +1,6 @@
 # PacoGO Learner Ownership and Persistence Contract v0.1
 
-Status: implemented in the repository and applied to PacoGO TEST only. The learner-facing application is not yet connected to this persistence contract. LIVE remains untouched.
+Status: database ownership and persistence are implemented in the repository and applied to PacoGO TEST only. The authenticated B1 learner adapter is now implemented in the repository and verified by Full Regression #2937. No real learner profiles or activity records have been created in TEST; LIVE remains untouched.
 
 ## Core proposal
 
@@ -31,7 +31,7 @@ Use two synthetic guardian accounts and two synthetic learners. Prove cross-guar
 
 ## Privacy and open decisions
 
-Do not put display names in evidence, events, provenance, logs or analytics. Define correction, deletion and retention procedures before production use. Multi-guardian invitation and membership management remain deferred. The TEST integration suite uses synthetic identities inside a rolled-back transaction; the learner tables contain zero rows after testing. The learner-facing application still needs an authenticated provisioning and persistence adapter before real learner activity is connected.
+Do not put display names in evidence, events, provenance, logs or analytics. Define correction, deletion and retention procedures before production use. Multi-guardian invitation and membership management remain deferred. The TEST integration suite uses synthetic identities inside a rolled-back transaction; the learner tables contain zero rows after testing. The authenticated B1 adapter now exists in the repository, but no real parent has created a learner profile and no real learner activity has been connected.
 
 ## Scope exclusions
 
@@ -60,3 +60,24 @@ The three learner data tables now reference learner profiles. Their RLS policies
 Integration test: `supabase/tests/learner_ownership_rls.test.sql`. It passed against PacoGO TEST with two synthetic parent accounts and two synthetic learners. It verifies cross-account read/write denial, membership self-enrollment denial, direct-write denial, anonymous privilege denial, event idempotency, atomic rollback and blocked learner-key reassignment. The test transaction rolled back all fixtures; post-test counts are zero for synthetic auth users, learner profiles, guardian memberships, evidence, longitudinal state and decision traces.
 
 Full Regression #2932 / ID `41958684853` on repository commit `bf08558b4ec02ce1b5f787008db3cfe0ae4ca0c3`: **GREEN**. The migration and SQL integration test were applied/run against TEST after the repository regression. No LIVE changes were made.
+
+
+## Application adapter implementation
+
+The authenticated learner application adapter is implemented in the repository:
+
+- `src/services/learner-curriculum-service.js` owns profile listing/creation, curriculum registry lookup, learner evidence/state restoration and the RPC payload for atomic persistence.
+- `src/app/bootstrap.js` exposes the service through the canonical application composition root.
+- `curriculum-b1-learner.html` requires a parent session, lets the parent create/select a profile, uses its opaque UUID as the engine student key, restores prior B1 evidence/state, and persists each completed answer through `persist_curriculum_learning_cycle`.
+- `auth.html` supports a fixed, allowlisted return to the B1 route after login.
+- Failed persistence can be retried using the same source event ID. The database RPC's existing idempotency contract prevents duplicate evidence/trace records if a response is lost after a successful write.
+- The route preserves direct-answer practice. It does not introduce a countdown timer, alter SLO claims, change mastery criteria, or infer mastery from the practice UI.
+
+Tests:
+- `test/learner-curriculum-service.test.js` covers service contract and data mapping.
+- `test/browser/curriculum-b1-learner.browser.test.js` covers parent session, profile creation/selection, practice flow, persistence and retry using a synthetic Supabase test double.
+- Full Regression #2937 / ID `41960343382` on commit `2238de47355bbbed4817252603c070242236ca17`: **GREEN**.
+
+The TEST registry row for `pacogo-curriculum@0.2.0-seed` was checked read-only. It exists with status `candidate`. The learner profile table still contains zero rows. No new TEST database writes were made for this application step, and LIVE was not touched.
+
+The B1 catalogue is still only a three-task operational practice slice. It is not the complete SLO developmental line or a complete grade-six recovery curriculum. The next curriculum work must continue to develop the canonical SLO skills along their full developmental lines.

@@ -603,3 +603,40 @@ Applied TEST migration history:
 - Full Regression #2932 / ID `41958684853`: **GREEN**.
 - The contract document update and this handoff update are repository changes and require their own Full Regression.
 - `main` remains LIVE and untouched.
+
+
+## 24. Authenticated B1 learner route connected to learner persistence
+
+This section supersedes Section 23's first remaining-work item and the earlier statement that the B1 browser learner route was not connected to persistence. The database ownership contract remains as documented in Section 23; no additional database migration was needed for this application step.
+
+### Implemented in the repository
+
+- Added `src/services/learner-curriculum-service.js` as the application service boundary for learner profiles, registry-version lookup, history restoration and atomic learning-cycle persistence. Exposed it through `createPacoGOApp` in `src/app/bootstrap.js`.
+- The B1 learner route now requires a logged-in PacoGO parent session. If no parent session is present, it sends the user to `auth.html?returnTo=curriculum-b1-learner.html`. The auth page accepts only this fixed return destination; arbitrary redirect URLs are not accepted.
+- The parent can list profiles visible through database RLS and create a learner profile through `create_learner_profile`. The database creates the authenticated owner membership atomically. The route does not import or convert the old display-name-based static roster; a parent must deliberately create each profile.
+- The engine receives the opaque UUID learner key, never the display name. On selection, the route loads the learner's B1 evidence and longitudinal state, reconstructs the assessed evidence records expected by the curriculum engine, and resumes the learning cycle.
+- Each submitted answer runs through the existing B1 curriculum engine and is saved through `persist_curriculum_learning_cycle`. Evidence, longitudinal state and decision trace remain one atomic database operation. A failed network/save attempt can be retried with the same source event ID, relying on the existing idempotency contract.
+- Direct-answer practice remains unchanged: the learner can enter an answer without explaining a strategy. No countdown timer or new mastery rule was added.
+
+### Verification
+
+- Added service tests in `test/learner-curriculum-service.test.js` for profile listing/provisioning, exact registry-version lookup, evidence/state restoration, RPC payload mapping, and rejection of display names or mismatched learner/skill identities.
+- Updated `test/browser/curriculum-b1-learner.browser.test.js` to exercise parent authentication, learner profile creation/selection, all three B1 practice tasks, atomic persistence, and retry after a simulated save failure. Browser tests use a synthetic Supabase client; they do not create real learner data.
+- Read-only inspection of PacoGO TEST confirmed curriculum registry `pacogo-curriculum@0.2.0-seed` exists with status `candidate` (registry row `89f1de87-2a2c-413b-a635-490fdef2c6e3`). The learner profile count remains zero. No new database writes or migrations were applied in this application step.
+- Full Regression #2937 / run ID `41960343382`, exact commit `2238de47355bbbed4817252603c070242236ca17`: **GREEN**, including the full browser regression. A first browser run exposed an incomplete test Supabase mock; after completing the mock, a selector ambiguity in the test was corrected to scope the assertion to the visible exercise card. No application behavior was weakened to make tests pass.
+
+### Boundaries and next steps
+
+1. The B1 browser route is now connected in the repository, but no real parent has yet created a learner profile and no real learner activity has been persisted. Do not create real learner records as part of an engineering smoke test.
+2. The existing B1 catalogue remains a three-task operational practice slice, not a claim that the full SLO developmental line or grade-six recovery curriculum is complete. Continue expanding canonical SLO skills and their full developmental lines without changing approved claims or mastery criteria.
+3. Continue the legacy Skills/Skill Editor dependency and history inventory before removing any legacy route or data. The new SLO skills, registry and Learning Interface work remain canonical.
+4. Multi-guardian invitations, account recovery, correction, deletion and retention remain open before production. No client deletion pathway has been added.
+5. Keep all work on `refactor/professional-v1`. `main` remains LIVE and untouched.
+
+### Latest verified engineering baseline before this handoff update
+
+- Branch: `refactor/professional-v1`
+- Commit: `2238de47355bbbed4817252603c070242236ca17`
+- Full Regression #2937 / ID `41960343382`: **GREEN**.
+- This handoff and the corresponding learner-persistence contract update require their own Full Regression.
+- LIVE remains untouched.

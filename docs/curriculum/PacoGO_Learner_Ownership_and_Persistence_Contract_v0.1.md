@@ -68,16 +68,16 @@ The authenticated learner application adapter is implemented in the repository:
 
 - `src/services/learner-curriculum-service.js` owns profile listing/creation, curriculum registry lookup, learner evidence/state restoration and the RPC payload for atomic persistence.
 - `src/app/bootstrap.js` exposes the service through the canonical application composition root.
-- `curriculum-b1-learner.html` requires a parent session, lets the parent create/select a profile, uses its opaque UUID as the engine student key, restores prior B1 evidence/state, and persists each completed answer through `persist_curriculum_learning_cycle`.
-- `auth.html` supports a fixed, allowlisted return to the B1 route after login.
+- `curriculum-b1-learner.html` and `curriculum-b2-learner.html` require a parent session, let the parent create/select a profile, use its opaque UUID as the engine student key, restore skill-specific evidence/state, and persist each completed answer through `persist_curriculum_learning_cycle`.
+- `auth.html` supports fixed, allowlisted returns to the B1 and B2 routes after login.
 - Failed persistence can be retried using the same source event ID. The database RPC's existing idempotency contract prevents duplicate evidence/trace records if a response is lost after a successful write.
-- The route preserves direct-answer practice. It does not introduce a countdown timer, alter SLO claims, change mastery criteria, or infer mastery from the practice UI.
+- The routes preserve direct-answer practice and do not introduce a countdown timer or alter SLO claims/mastery criteria. They do not display a mastery verdict to the learner; the engine still stores prototype-only candidate inference in longitudinal state, which is not empirically validated and must not be presented as validated mastery.
 
 Tests:
 - `test/learner-curriculum-service.test.js` covers service contract and data mapping.
-- `test/browser/curriculum-b1-learner.browser.test.js` covers parent session, profile creation/selection, practice flow, persistence and retry using a synthetic Supabase test double.
+- `test/browser/curriculum-b1-learner.browser.test.js` covers the B1 parent/profile/practice/persistence flow and retry using a synthetic Supabase test double. `test/browser/curriculum-b2-learner.browser.test.js` covers all fourteen B2 practice tasks and persistence using a synthetic Supabase test double.
 - Full Regression #2937 / ID `41960343382` on commit `2238de47355bbbed4817252603c070242236ca17`: **GREEN**.
 
-The TEST registry row for `pacogo-curriculum@0.2.0-seed` was checked read-only. It exists with status `candidate`. The learner profile table still contains zero rows. No new TEST database writes were made for this application step, and LIVE was not touched.
+The TEST registry row `pacogo-curriculum@0.3.0-candidate` was inserted and verified. It supersedes `0.2.0-seed`, includes B2, and is sourced from `docs/curriculum/PacoGO_Curriculum_Registry_v0.3.json`. This was a registry-data insert only; no schema migration was required. Learner profiles, guardian links, evidence, longitudinal state and decision traces remain at zero rows. LIVE was not touched.
 
-The B1 catalogue is still only a three-task operational practice slice. It is not the complete SLO developmental line or a complete grade-six recovery curriculum. The next curriculum work must continue to develop the canonical SLO skills along their full developmental lines.
+The B1 catalogue remains a three-task operational practice slice. B2 now has a fourteen-task operational practice catalogue across its seven candidate developments. Neither catalogue is an empirically validated curriculum or a complete grade-six recovery curriculum. The SLO mapping remains the source of truth; the executable registry currently contains A1, B1, B2 and FR2. Continue implementing the remaining mapped skills along their full developmental lines.

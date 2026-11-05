@@ -640,3 +640,50 @@ This section supersedes Section 23's first remaining-work item and the earlier s
 - Full Regression #2937 / ID `41960343382`: **GREEN**.
 - This handoff and the corresponding learner-persistence contract update require their own Full Regression.
 - LIVE remains untouched.
+
+
+## 25. B2 Aftrekken — complete candidate skill and learner practice route
+
+This section supersedes Section 24's statement that the B1 route is the only authenticated learner route and its next-step priority of building the application adapter. The application adapter is now shared by B1 and B2. The learner ownership/RLS contract in Section 23 remains unchanged.
+
+### Curriculum model
+
+- Added `B2 Aftrekken` to `docs/curriculum/PacoGO_Curriculum_Registry_v0.3.json`.
+- B2 contains seven candidate developments, seven claims, fourteen evidence targets and seven task models. The model preserves three distinct meanings: wegemen/rest bepalen, verschil bepalen and aanvullen tot een doelwaarde.
+- The remaining candidate developments cover representeren, structureren, grotere gehele en decimale getallen, and flexibel/controlerend aftrekken.
+- The developmental order is explicitly a candidate hypothesis, not an empirically proven fixed sequence. B1 and B2 have a strong inverse relationship and can develop in parallel; B2 does not impose full B1 mastery as a prerequisite. B5 remains a separate integrative skill, not a final B2 development.
+- Strategies and algorithms are task approaches, not separate skills. Most practice items accept a direct answer. Strategy selection/checking is requested only in selected structural and flexible-control tasks.
+- The B2 catalogue is an operational practice candidate, not the C1–C3 pilot measurement set. Registry mastery parameters remain prototype-only; the B2 learner route does not display a mastery verdict.
+
+### Learner route and Learning Interface
+
+- Added `curriculum-b2-learner.html`, using the existing authenticated learner service and ownership/RLS contract.
+- The route covers fourteen practice tasks across all seven B2 developments. It uses the existing reusable Number Line interface for take-away, difference, complement and relation tasks; symbolic direct-answer input is used for other tasks.
+- Added `pacogo-engine/subtraction-controller.js` and tests for answer capture, optional strategy selection, required checks and retention of incorrect attempts as observations.
+- B1 and B2 routes now both use registry `0.3.0-candidate`; the B1 catalogue/page and its browser test were moved to this same registry version. The routes link to one another.
+- Browser regression verifies the B2 parent/profile flow, all fourteen tasks, strategy/check selection, and persistence of fourteen synthetic learning cycles. It uses a synthetic Supabase test double and creates no real learner data.
+
+### Supabase TEST registry registration
+
+- Added registry version `pacogo-curriculum@0.3.0-candidate` to PacoGO TEST only.
+- TEST row ID: `f7feaed6-f46f-445b-838c-c1f3dad9d749`.
+- It supersedes `0.2.0-seed` (row `89f1de87-2a2c-413b-a635-490fdef2c6e3`).
+- Source: `docs/curriculum/PacoGO_Curriculum_Registry_v0.3.json`.
+- SHA-256 of the exact source file: `4ba39fed03b5d8e82c0f3c08f01354301e0e66c82e899fe0a0e9e5ed0866926a`.
+- The TEST config was read back and confirmed to contain four skills including B2. No schema migration was required.
+- Learner profiles, guardian links, evidence, longitudinal state and decision traces remain at zero rows. No real learner data has been created. LIVE was not touched.
+
+### Verification
+
+- Full Regression #2944 / run ID `41962659190`, exact commit `7734ea3c92011d982c21d00d55ba8b672df8a5a2`: **GREEN**, including browser regression.
+- The preceding red runs were isolated to stale test fixtures/selectors: the B1 registry test still imported v0.2, and the B2 browser test used a non-exact button-name selector. The fixtures were aligned to v0.3 and the submit selector made exact. No application behavior or curriculum contract was weakened.
+- Branch: `refactor/professional-v1`. `main` remains LIVE and untouched.
+
+### Current curriculum implementation status and next step
+
+- The SLO mapping remains the source of truth and contains the full mapped skill set. The executable registry currently contains four skill models: A1, B1, B2 and FR2. Do not redo the SLO mapping; continue implementing the remaining mapped skills.
+- B1 has a three-task operational practice slice. B2 now has a fourteen-task practice catalogue. These are usable vertical slices, not empirically validated curricula or proof that every mastery claim is valid.
+- Next concrete curriculum build: B3 Vermenigvuldigen, using its existing SLO scope and full candidate developmental line. Preserve the distinction between multiplication's equal-groups/array/repeated-addition meanings, structural relations and flexible strategy use; do not turn strategies into separate skills.
+- Before any parent-facing mastery display, implement and validate the C6 mastery protocol and its explicit coverage/scope requirements. Current runtime mastery parameters remain prototype-only.
+- Continue the legacy Skills/Skill Editor dependency and history inventory before retiring legacy routes or data.
+- Multi-guardian invitations, account recovery, correction, deletion and retention remain open before production.

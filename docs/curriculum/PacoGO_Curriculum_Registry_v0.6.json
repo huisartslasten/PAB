@@ -1,0 +1,1606 @@
+{
+  "schema_version": "0.2",
+  "registry_version": "0.6.0-candidate",
+  "status": "candidate",
+  "epistemic_status": "[S]/[O]",
+  "source": "A1/B1/B2/B3/B4/B5/FR2 candidate curriculum registry and B10 engine contract",
+  "skills": [
+    {
+      "id": "A1",
+      "name": "Getallen representeren en verbinden",
+      "definition": "Een getal herkennen, weergeven en verbinden met andere representaties van hetzelfde getal.",
+      "developments": [
+        {
+          "id": "A1.D1",
+          "name": "Representational meaning",
+          "definition": "Een getal/hoeveelheid als betekenisvolle representatie herkennen.",
+          "candidate_order": 1
+        },
+        {
+          "id": "A1.D2",
+          "name": "Mapping",
+          "definition": "Dezelfde numerieke waarde tussen representaties kunnen koppelen.",
+          "candidate_order": 2
+        },
+        {
+          "id": "A1.D3",
+          "name": "Coordination",
+          "definition": "Meerdere representaties doelgericht en flexibel kunnen coördineren.",
+          "candidate_order": 3
+        }
+      ],
+      "claims": [
+        {
+          "id": "A1.C1",
+          "development_id": "A1.D1",
+          "definition": "De leerling kan een numerieke representatie betekenisvol identificeren."
+        },
+        {
+          "id": "A1.C2",
+          "development_id": "A1.D2",
+          "definition": "De leerling kan representaties van dezelfde waarde correct aan elkaar koppelen."
+        },
+        {
+          "id": "A1.C3",
+          "development_id": "A1.D3",
+          "definition": "De leerling kan meerdere representaties zelfstandig coördineren."
+        }
+      ],
+      "evidence_targets": [
+        {
+          "id": "A1.ET1",
+          "claim_id": "A1.C1",
+          "definition": "Correcte identificatie van waarde/hoeveelheid."
+        },
+        {
+          "id": "A1.ET2",
+          "claim_id": "A1.C2",
+          "definition": "Correcte mapping tussen twee representaties."
+        },
+        {
+          "id": "A1.ET3",
+          "claim_id": "A1.C3",
+          "definition": "Consistente coördinatie van meerdere representaties."
+        },
+        {
+          "id": "A1.ET4",
+          "claim_id": "A1.C2",
+          "definition": "Mapping blijft correct wanneer representatie of taakvorm verandert."
+        },
+        {
+          "id": "A1.ET5",
+          "claim_id": "A1.C3",
+          "definition": "Zelfstandige keuze of combinatie van representaties."
+        }
+      ],
+      "task_models": [
+        {
+          "id": "A1.TM1",
+          "evidence_target_ids": [
+            "A1.ET1"
+          ],
+          "primary_development": "A1.D1",
+          "information_value": 1,
+          "instructional_relevance": 1
+        },
+        {
+          "id": "A1.TM2",
+          "evidence_target_ids": [
+            "A1.ET2"
+          ],
+          "primary_development": "A1.D2",
+          "information_value": 2,
+          "instructional_relevance": 2
+        },
+        {
+          "id": "A1.TM3",
+          "evidence_target_ids": [
+            "A1.ET4"
+          ],
+          "primary_development": "A1.D2",
+          "information_value": 3,
+          "instructional_relevance": 2
+        },
+        {
+          "id": "A1.TM4",
+          "evidence_target_ids": [
+            "A1.ET3",
+            "A1.ET5"
+          ],
+          "primary_development": "A1.D3",
+          "information_value": 3,
+          "instructional_relevance": 3
+        }
+      ],
+      "development_rules": [
+        {
+          "development_id": "A1.D1",
+          "support_threshold": 1
+        },
+        {
+          "development_id": "A1.D2",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "A1.D3",
+          "support_threshold": 2
+        }
+      ],
+      "evidence_rule": {
+        "relevance": "target_match",
+        "quality_field": "quality",
+        "default_quality": 0,
+        "contradiction_field": "contradiction"
+      },
+      "mastery_rules": {
+        "min_independent_observations": 2,
+        "min_variation_keys": 2,
+        "min_evidence_targets": 2,
+        "min_quality": 0.8,
+        "max_unresolved_contradictions": 0
+      },
+      "decision_rules": {
+        "priority_order": [
+          "resolve_developmental_uncertainty",
+          "fill_missing_evidence_coverage",
+          "test_variation_and_stability",
+          "test_independent_coordination",
+          "confirm_mastery"
+        ]
+      }
+    },
+    {
+      "id": "B1",
+      "name": "Optellen",
+      "definition": "Twee of meer hoeveelheden/getallen samenvoegen en de totale waarde bepalen.",
+      "developments": [
+        {
+          "id": "B1.D1",
+          "name": "Samenvoegen begrijpen",
+          "definition": "Begrijpen dat hoeveelheden kunnen worden samengevoegd en dat de totale hoeveelheid de som representeert.",
+          "candidate_order": 1
+        },
+        {
+          "id": "B1.D2",
+          "name": "Optelling als getalrelatie uitvoeren",
+          "definition": "Optellingen representeren en uitvoeren met verschillende getalgroottes en representaties.",
+          "candidate_order": 2
+        },
+        {
+          "id": "B1.D3",
+          "name": "Strategisch en flexibel optellen",
+          "definition": "Een passende aanpak kiezen, uitvoeren en controleren wanneer meerdere oplossingsroutes mogelijk zijn.",
+          "candidate_order": 3
+        },
+        {
+          "id": "B1.D4",
+          "name": "Geïntegreerd optellen",
+          "definition": "Optellen betrouwbaar en flexibel toepassen onder variërende representaties, getalgroottes en contexten.",
+          "candidate_order": 4
+        }
+      ],
+      "claims": [
+        {
+          "id": "B1.C1",
+          "development_id": "B1.D1",
+          "definition": "De leerling kan de relatie tussen afzonderlijke hoeveelheden en hun totale hoeveelheid betekenisvol representeren."
+        },
+        {
+          "id": "B1.C2",
+          "development_id": "B1.D2",
+          "definition": "De leerling kan een optelling correct uitvoeren en de relatie tussen termen en som behouden."
+        },
+        {
+          "id": "B1.C3",
+          "development_id": "B1.D3",
+          "definition": "De leerling kan passend een strategie kiezen en het resultaat controleren."
+        },
+        {
+          "id": "B1.C4",
+          "development_id": "B1.D4",
+          "definition": "De leerling herkent en gebruikt dezelfde optelrelatie onder relevante variatie."
+        }
+      ],
+      "evidence_targets": [
+        {
+          "id": "B1.ET1",
+          "claim_id": "B1.C1",
+          "definition": "Relatiebegrip tussen delen en geheel."
+        },
+        {
+          "id": "B1.ET2",
+          "claim_id": "B1.C2",
+          "definition": "Representatie van de optelrelatie."
+        },
+        {
+          "id": "B1.ET3",
+          "claim_id": "B1.C2",
+          "definition": "Correcte uitvoering van de optelling."
+        },
+        {
+          "id": "B1.ET4",
+          "claim_id": "B1.C3",
+          "definition": "Gekozen aanpak en strategie."
+        },
+        {
+          "id": "B1.ET5",
+          "claim_id": "B1.C3",
+          "definition": "Controle van het resultaat."
+        },
+        {
+          "id": "B1.ET6",
+          "claim_id": "B1.C4",
+          "definition": "Robuustheid bij variatie."
+        },
+        {
+          "id": "B1.ET7",
+          "claim_id": "B1.C3",
+          "definition": "Zelfstandigheid."
+        },
+        {
+          "id": "B1.ET8",
+          "claim_id": "B1.C4",
+          "definition": "Transfer naar andere representatie of context."
+        }
+      ],
+      "task_models": [
+        {
+          "id": "B1.TM1",
+          "evidence_target_ids": [
+            "B1.ET1"
+          ],
+          "primary_development": "B1.D1",
+          "information_value": 1,
+          "instructional_relevance": 1
+        },
+        {
+          "id": "B1.TM2",
+          "evidence_target_ids": [
+            "B1.ET1",
+            "B1.ET2"
+          ],
+          "primary_development": "B1.D2",
+          "information_value": 2,
+          "instructional_relevance": 2
+        },
+        {
+          "id": "B1.TM3",
+          "evidence_target_ids": [
+            "B1.ET3"
+          ],
+          "primary_development": "B1.D2",
+          "information_value": 2,
+          "instructional_relevance": 2
+        },
+        {
+          "id": "B1.TM4",
+          "evidence_target_ids": [
+            "B1.ET4",
+            "B1.ET5"
+          ],
+          "primary_development": "B1.D3",
+          "information_value": 3,
+          "instructional_relevance": 3
+        },
+        {
+          "id": "B1.TM5",
+          "evidence_target_ids": [
+            "B1.ET6"
+          ],
+          "primary_development": "B1.D4",
+          "information_value": 3,
+          "instructional_relevance": 3
+        },
+        {
+          "id": "B1.TM6",
+          "evidence_target_ids": [
+            "B1.ET8"
+          ],
+          "primary_development": "B1.D4",
+          "information_value": 3,
+          "instructional_relevance": 3
+        }
+      ],
+      "development_rules": [
+        {
+          "development_id": "B1.D1",
+          "support_threshold": 1
+        },
+        {
+          "development_id": "B1.D2",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B1.D3",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B1.D4",
+          "support_threshold": 2
+        }
+      ],
+      "evidence_rule": {
+        "relevance": "target_match",
+        "quality_field": "quality",
+        "default_quality": 0,
+        "contradiction_field": "contradiction"
+      },
+      "mastery_rules": {
+        "min_independent_observations": 2,
+        "min_variation_keys": 2,
+        "min_evidence_targets": 2,
+        "min_quality": 0.8,
+        "max_unresolved_contradictions": 0
+      },
+      "decision_rules": {
+        "priority_order": [
+          "resolve_developmental_uncertainty",
+          "fill_missing_evidence_coverage",
+          "test_variation_and_stability",
+          "test_independent_coordination",
+          "confirm_mastery"
+        ]
+      }
+    },
+    {
+      "id": "B2",
+      "name": "Aftrekken",
+      "definition": "Een verschil of verandering tussen hoeveelheden of waarden bepalen door te begrijpen wat overblijft, wat het verschil is of hoeveel moet worden aangevuld.",
+      "developments": [
+        {
+          "id": "B2.D1",
+          "name": "Wegnemen en rest bepalen",
+          "definition": "Begrijpen dat een hoeveelheid kan afnemen en bepalen wat overblijft na het wegnemen.",
+          "candidate_order": 1
+        },
+        {
+          "id": "B2.D2",
+          "name": "Verschil tussen hoeveelheden bepalen",
+          "definition": "Het verschil tussen twee hoeveelheden bepalen als afstand of relatie, zonder de situatie uitsluitend als wegnemen te behandelen.",
+          "candidate_order": 2
+        },
+        {
+          "id": "B2.D3",
+          "name": "Aanvullen tot een doelwaarde",
+          "definition": "Een ontbrekende hoeveelheid bepalen door vanaf een gegeven waarde aan te vullen tot een doelwaarde.",
+          "candidate_order": 3
+        },
+        {
+          "id": "B2.D4",
+          "name": "Aftrekrelaties representeren",
+          "definition": "De relatie tussen beginwaarde, afname, rest of verschil betekenisvol representeren met concrete, visuele, getallenlijn- en symbolische vormen.",
+          "candidate_order": 4
+        },
+        {
+          "id": "B2.D5",
+          "name": "Aftrekken structureren",
+          "definition": "Aftrekrelaties doelgericht structureren door ontleden, hergroeperen of compenseren, met behoud van de numerieke waarde.",
+          "candidate_order": 5
+        },
+        {
+          "id": "B2.D6",
+          "name": "Aftrekken bij grotere getallen en getaltypen",
+          "definition": "Aftrekken correct uitvoeren bij grotere gehele en decimale getallen, met behoud van plaatswaarde en betekenis.",
+          "candidate_order": 6
+        },
+        {
+          "id": "B2.D7",
+          "name": "Flexibel en gecontroleerd aftrekken",
+          "definition": "Een passende aanpak kiezen, het resultaat uitvoeren en controleren, en de aftrekrelatie toepassen onder gevarieerde taak- en contextcondities.",
+          "candidate_order": 7
+        }
+      ],
+      "claims": [
+        {
+          "id": "B2.C1",
+          "development_id": "B2.D1",
+          "definition": "De leerling kan bepalen wat overblijft wanneer een hoeveelheid wordt verminderd en de relatie tussen beginhoeveelheid, afname en rest betekenisvol representeren."
+        },
+        {
+          "id": "B2.C2",
+          "development_id": "B2.D2",
+          "definition": "De leerling kan het verschil tussen twee hoeveelheden bepalen als een relatie of afstand tussen beide waarden."
+        },
+        {
+          "id": "B2.C3",
+          "development_id": "B2.D3",
+          "definition": "De leerling kan een ontbrekende hoeveelheid bepalen door aan te vullen vanaf een gegeven waarde tot een doelwaarde."
+        },
+        {
+          "id": "B2.C4",
+          "development_id": "B2.D4",
+          "definition": "De leerling kan een aftrekrelatie in verschillende representaties weergeven en de onderliggende relatie daarbij behouden."
+        },
+        {
+          "id": "B2.C5",
+          "development_id": "B2.D5",
+          "definition": "De leerling kan een aftrekrelatie structureren met ontleden, hergroeperen of compenseren zonder de waarde te veranderen."
+        },
+        {
+          "id": "B2.C6",
+          "development_id": "B2.D6",
+          "definition": "De leerling kan aftrekkingen met grotere gehele en decimale getallen correct uitvoeren met behoud van plaatswaarde."
+        },
+        {
+          "id": "B2.C7",
+          "development_id": "B2.D7",
+          "definition": "De leerling kan een passende aftrekaanpak kiezen, uitvoeren en het resultaat controleren in gevarieerde situaties."
+        }
+      ],
+      "evidence_targets": [
+        {
+          "id": "B2.ET1",
+          "claim_id": "B2.C1",
+          "definition": "Correct bepalen van de resterende hoeveelheid na een gegeven afname."
+        },
+        {
+          "id": "B2.ET2",
+          "claim_id": "B2.C1",
+          "definition": "De beginhoeveelheid, afname en rest correct aan elkaar relateren."
+        },
+        {
+          "id": "B2.ET3",
+          "claim_id": "B2.C2",
+          "definition": "Correct bepalen van het verschil tussen twee gegeven hoeveelheden."
+        },
+        {
+          "id": "B2.ET4",
+          "claim_id": "B2.C2",
+          "definition": "Het verschil correct blijven bepalen wanneer volgorde, representatie of context verandert."
+        },
+        {
+          "id": "B2.ET5",
+          "claim_id": "B2.C3",
+          "definition": "Correct bepalen van de ontbrekende hoeveelheid tot een doelwaarde."
+        },
+        {
+          "id": "B2.ET6",
+          "claim_id": "B2.C3",
+          "definition": "De aanvulrelatie tussen startwaarde, ontbrekende hoeveelheid en doelwaarde correct representeren."
+        },
+        {
+          "id": "B2.ET7",
+          "claim_id": "B2.C4",
+          "definition": "De aftrekrelatie correct representeren in een getallenlijn, model of symbolische notatie."
+        },
+        {
+          "id": "B2.ET8",
+          "claim_id": "B2.C4",
+          "definition": "Dezelfde aftrekrelatie behouden bij omzetting tussen representaties."
+        },
+        {
+          "id": "B2.ET9",
+          "claim_id": "B2.C5",
+          "definition": "Een aftrekbewerking correct structureren door getallen te ontleden of te hergroeperen."
+        },
+        {
+          "id": "B2.ET10",
+          "claim_id": "B2.C5",
+          "definition": "Een structurele transformatie of compensatie toepassen met behoud van de uitkomst."
+        },
+        {
+          "id": "B2.ET11",
+          "claim_id": "B2.C6",
+          "definition": "Grotere gehele getallen correct aftrekken met behoud van plaatswaarde."
+        },
+        {
+          "id": "B2.ET12",
+          "claim_id": "B2.C6",
+          "definition": "Decimale getallen correct aftrekken met behoud van de waarde per plaats."
+        },
+        {
+          "id": "B2.ET13",
+          "claim_id": "B2.C7",
+          "definition": "Een passende aanpak kiezen die past bij de aftrekrelatie en de taakconditie."
+        },
+        {
+          "id": "B2.ET14",
+          "claim_id": "B2.C7",
+          "definition": "Het resultaat controleren met bijvoorbeeld de inverse optelrelatie of een schatting."
+        }
+      ],
+      "task_models": [
+        {
+          "id": "B2.TM1",
+          "evidence_target_ids": [
+            "B2.ET1",
+            "B2.ET2"
+          ],
+          "primary_development": "B2.D1",
+          "information_value": 1,
+          "instructional_relevance": 1
+        },
+        {
+          "id": "B2.TM2",
+          "evidence_target_ids": [
+            "B2.ET3",
+            "B2.ET4"
+          ],
+          "primary_development": "B2.D2",
+          "information_value": 2,
+          "instructional_relevance": 2
+        },
+        {
+          "id": "B2.TM3",
+          "evidence_target_ids": [
+            "B2.ET5",
+            "B2.ET6"
+          ],
+          "primary_development": "B2.D3",
+          "information_value": 2,
+          "instructional_relevance": 2
+        },
+        {
+          "id": "B2.TM4",
+          "evidence_target_ids": [
+            "B2.ET7",
+            "B2.ET8"
+          ],
+          "primary_development": "B2.D4",
+          "information_value": 2,
+          "instructional_relevance": 2
+        },
+        {
+          "id": "B2.TM5",
+          "evidence_target_ids": [
+            "B2.ET9",
+            "B2.ET10"
+          ],
+          "primary_development": "B2.D5",
+          "information_value": 3,
+          "instructional_relevance": 3
+        },
+        {
+          "id": "B2.TM6",
+          "evidence_target_ids": [
+            "B2.ET11",
+            "B2.ET12"
+          ],
+          "primary_development": "B2.D6",
+          "information_value": 3,
+          "instructional_relevance": 3
+        },
+        {
+          "id": "B2.TM7",
+          "evidence_target_ids": [
+            "B2.ET13",
+            "B2.ET14"
+          ],
+          "primary_development": "B2.D7",
+          "information_value": 3,
+          "instructional_relevance": 3
+        }
+      ],
+      "development_rules": [
+        {
+          "development_id": "B2.D1",
+          "support_threshold": 1
+        },
+        {
+          "development_id": "B2.D2",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B2.D3",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B2.D4",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B2.D5",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B2.D6",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B2.D7",
+          "support_threshold": 2
+        }
+      ],
+      "evidence_rule": {
+        "relevance": "target_match",
+        "quality_field": "quality",
+        "default_quality": 0,
+        "contradiction_field": "contradiction"
+      },
+      "mastery_rules": {
+        "min_independent_observations": 2,
+        "min_variation_keys": 2,
+        "min_evidence_targets": 2,
+        "min_quality": 0.8,
+        "max_unresolved_contradictions": 0,
+        "status": "prototype-only",
+        "note": "Kandidaatparameters voor technische consistentie; geen empirisch gevalideerde mastery-cut-scores. De B2-oefenroute presenteert geen masterybeslissing aan de leerling."
+      },
+      "decision_rules": {
+        "priority_order": [
+          "resolve_developmental_uncertainty",
+          "fill_missing_evidence_coverage",
+          "test_variation_and_stability",
+          "test_independent_coordination",
+          "confirm_mastery"
+        ]
+      }
+    },
+    {
+      "id": "B3",
+      "name": "Vermenigvuldigen",
+      "definition": "Gelijke groepen, herhaalde hoeveelheden en multiplicatieve relaties begrijpen, representeren en gebruiken om producten en verhoudingen te bepalen.",
+      "developments": [
+        {
+          "id": "B3.D1",
+          "name": "Gelijke hoeveelheden herkennen",
+          "definition": "Herkennen dat meerdere groepen of eenheden dezelfde hoeveelheid bevatten.",
+          "candidate_order": 1
+        },
+        {
+          "id": "B3.D2",
+          "name": "Gelijke groepen en arrays begrijpen",
+          "definition": "De relatie tussen aantal groepen/rijen, hoeveelheid per groep/kolom en het totale aantal begrijpen en representeren.",
+          "candidate_order": 2
+        },
+        {
+          "id": "B3.D3",
+          "name": "Herhaald optellen verbinden met vermenigvuldigen",
+          "definition": "Herhaalde gelijke hoeveelheden herkennen als een multiplicatieve relatie en deze interpreteren met factoren en product.",
+          "candidate_order": 3
+        },
+        {
+          "id": "B3.D4",
+          "name": "Multiplicatieve relaties structureren",
+          "definition": "Producten structureren met factorontleding, distributiviteit en andere waardebehoudende relaties.",
+          "candidate_order": 4
+        },
+        {
+          "id": "B3.D5",
+          "name": "Vermenigvuldigen met grotere getallen",
+          "definition": "Multiplicatieve relaties uitvoeren met grotere gehele getallen met behoud van plaatswaarde en structuur.",
+          "candidate_order": 5
+        },
+        {
+          "id": "B3.D6",
+          "name": "Vermenigvuldigen met verschillende getaltypen en representaties",
+          "definition": "Multiplicatieve relaties correct interpreteren en uitvoeren bij gehele en decimale getallen en wisselende representaties.",
+          "candidate_order": 6
+        },
+        {
+          "id": "B3.D7",
+          "name": "Flexibel en gecontroleerd vermenigvuldigen",
+          "definition": "Een passende aanpak kiezen, multiplicatieve relaties flexibel gebruiken en producten controleren in gevarieerde situaties.",
+          "candidate_order": 7
+        }
+      ],
+      "claims": [
+        {
+          "id": "B3.C1",
+          "development_id": "B3.D1",
+          "definition": "De leerling kan gelijke hoeveelheden of eenheden herkennen en vaststellen welke aantallen gelijk zijn."
+        },
+        {
+          "id": "B3.C2",
+          "development_id": "B3.D2",
+          "definition": "De leerling kan gelijke groepen of arrays representeren en het totaal relateren aan groepsaantal en hoeveelheid per groep."
+        },
+        {
+          "id": "B3.C3",
+          "development_id": "B3.D3",
+          "definition": "De leerling kan herhaalde gelijke hoeveelheden verbinden met een multiplicatieve relatie en de factoren en het product interpreteren."
+        },
+        {
+          "id": "B3.C4",
+          "development_id": "B3.D4",
+          "definition": "De leerling kan multiplicatieve relaties structureren met factorontleding en waardebehoudende eigenschappen."
+        },
+        {
+          "id": "B3.C5",
+          "development_id": "B3.D5",
+          "definition": "De leerling kan producten van grotere gehele getallen correct bepalen met behoud van plaatswaarde en multiplicatieve structuur."
+        },
+        {
+          "id": "B3.C6",
+          "development_id": "B3.D6",
+          "definition": "De leerling kan vermenigvuldigingsrelaties correct gebruiken bij gehele en decimale getallen en verschillende representaties."
+        },
+        {
+          "id": "B3.C7",
+          "development_id": "B3.D7",
+          "definition": "De leerling kan een passende vermenigvuldigingsaanpak kiezen, uitvoeren en het product controleren in gevarieerde situaties."
+        }
+      ],
+      "evidence_targets": [
+        {
+          "id": "B3.ET1",
+          "claim_id": "B3.C1",
+          "definition": "Gelijke hoeveelheden of eenheden correct herkennen."
+        },
+        {
+          "id": "B3.ET2",
+          "claim_id": "B3.C1",
+          "definition": "Het aantal gelijke groepen en de hoeveelheid per groep correct identificeren."
+        },
+        {
+          "id": "B3.ET3",
+          "claim_id": "B3.C2",
+          "definition": "Een array of rechthoekmodel correct interpreteren in rijen, kolommen en totaal."
+        },
+        {
+          "id": "B3.ET4",
+          "claim_id": "B3.C2",
+          "definition": "Het product correct bepalen vanuit het aantal rijen en kolommen, ook bij gewijzigde oriëntatie."
+        },
+        {
+          "id": "B3.ET5",
+          "claim_id": "B3.C3",
+          "definition": "Een herhaalde optelstructuur herkennen en verbinden met de bijbehorende vermenigvuldigingsrelatie."
+        },
+        {
+          "id": "B3.ET6",
+          "claim_id": "B3.C3",
+          "definition": "Factoren en product correct interpreteren in een concrete of symbolische situatie."
+        },
+        {
+          "id": "B3.ET7",
+          "claim_id": "B3.C4",
+          "definition": "Een product structureren door een factor te ontleden en deelproducten samen te nemen."
+        },
+        {
+          "id": "B3.ET8",
+          "claim_id": "B3.C4",
+          "definition": "Een waardebehoudende multiplicatieve transformatie toepassen en de productrelatie behouden."
+        },
+        {
+          "id": "B3.ET9",
+          "claim_id": "B3.C5",
+          "definition": "Grotere gehele getallen correct vermenigvuldigen."
+        },
+        {
+          "id": "B3.ET10",
+          "claim_id": "B3.C5",
+          "definition": "Plaatswaarde en multiplicatieve structuur behouden bij grotere producten."
+        },
+        {
+          "id": "B3.ET11",
+          "claim_id": "B3.C6",
+          "definition": "Een product met decimale factoren correct bepalen."
+        },
+        {
+          "id": "B3.ET12",
+          "claim_id": "B3.C6",
+          "definition": "De betekenis en schaal van een product met decimale getallen correct interpreteren."
+        },
+        {
+          "id": "B3.ET13",
+          "claim_id": "B3.C7",
+          "definition": "Een passende aanpak kiezen op basis van factoren, getalstructuur en taakconditie."
+        },
+        {
+          "id": "B3.ET14",
+          "claim_id": "B3.C7",
+          "definition": "Een product controleren met bijvoorbeeld de inverse deelrelatie, een bekende productrelatie of een schatting."
+        }
+      ],
+      "task_models": [
+        {
+          "id": "B3.TM1",
+          "evidence_target_ids": [
+            "B3.ET1",
+            "B3.ET2"
+          ],
+          "primary_development": "B3.D1",
+          "information_value": 1,
+          "instructional_relevance": 1
+        },
+        {
+          "id": "B3.TM2",
+          "evidence_target_ids": [
+            "B3.ET3",
+            "B3.ET4"
+          ],
+          "primary_development": "B3.D2",
+          "information_value": 2,
+          "instructional_relevance": 2
+        },
+        {
+          "id": "B3.TM3",
+          "evidence_target_ids": [
+            "B3.ET5",
+            "B3.ET6"
+          ],
+          "primary_development": "B3.D3",
+          "information_value": 2,
+          "instructional_relevance": 2
+        },
+        {
+          "id": "B3.TM4",
+          "evidence_target_ids": [
+            "B3.ET7",
+            "B3.ET8"
+          ],
+          "primary_development": "B3.D4",
+          "information_value": 3,
+          "instructional_relevance": 3
+        },
+        {
+          "id": "B3.TM5",
+          "evidence_target_ids": [
+            "B3.ET9",
+            "B3.ET10"
+          ],
+          "primary_development": "B3.D5",
+          "information_value": 3,
+          "instructional_relevance": 3
+        },
+        {
+          "id": "B3.TM6",
+          "evidence_target_ids": [
+            "B3.ET11",
+            "B3.ET12"
+          ],
+          "primary_development": "B3.D6",
+          "information_value": 3,
+          "instructional_relevance": 3
+        },
+        {
+          "id": "B3.TM7",
+          "evidence_target_ids": [
+            "B3.ET13",
+            "B3.ET14"
+          ],
+          "primary_development": "B3.D7",
+          "information_value": 3,
+          "instructional_relevance": 3
+        }
+      ],
+      "development_rules": [
+        {
+          "development_id": "B3.D1",
+          "support_threshold": 1
+        },
+        {
+          "development_id": "B3.D2",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B3.D3",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B3.D4",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B3.D5",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B3.D6",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B3.D7",
+          "support_threshold": 2
+        }
+      ],
+      "evidence_rule": {
+        "relevance": "target_match",
+        "quality_field": "quality",
+        "default_quality": 0,
+        "contradiction_field": "contradiction"
+      },
+      "mastery_rules": {
+        "min_independent_observations": 2,
+        "min_variation_keys": 2,
+        "min_evidence_targets": 2,
+        "min_quality": 0.8,
+        "max_unresolved_contradictions": 0,
+        "status": "prototype-only",
+        "note": "Kandidaatparameters voor technische consistentie; geen empirisch gevalideerde mastery-cut-scores. De B3-oefenroute presenteert geen masterybeslissing aan de leerling."
+      },
+      "decision_rules": {
+        "priority_order": [
+          "resolve_developmental_uncertainty",
+          "fill_missing_evidence_coverage",
+          "test_variation_and_stability",
+          "test_independent_coordination",
+          "confirm_mastery"
+        ]
+      }
+    },
+    {
+      "id": "FR2",
+      "name": "Breukequivalentie herkennen en gebruiken",
+      "definition": "Herkennen wanneer verschillende breuken dezelfde waarde vertegenwoordigen en deze equivalentie gebruiken.",
+      "developments": [
+        {
+          "id": "FR2.D1",
+          "name": "Equivalentie herkennen",
+          "definition": "Herkennen dat verschillende breuken dezelfde hoeveelheid/waarde kunnen representeren.",
+          "candidate_order": 1
+        },
+        {
+          "id": "FR2.D2",
+          "name": "Equivalentie verklaren",
+          "definition": "Equivalentie onderbouwen via representatie, verhouding of andere betekenisvolle redenering.",
+          "candidate_order": 2
+        },
+        {
+          "id": "FR2.D3",
+          "name": "Equivalentie functioneel gebruiken",
+          "definition": "Equivalentie doelgericht gebruiken om te vergelijken, representeren, rekenen of een probleem eenvoudiger te maken.",
+          "candidate_order": 3
+        }
+      ],
+      "claims": [
+        {
+          "id": "FR2.C1",
+          "development_id": "FR2.D1",
+          "definition": "De leerling kan equivalentie tussen twee breuken herkennen."
+        },
+        {
+          "id": "FR2.C2",
+          "development_id": "FR2.D2",
+          "definition": "De leerling kan equivalentie betekenisvol onderbouwen."
+        },
+        {
+          "id": "FR2.C3",
+          "development_id": "FR2.D3",
+          "definition": "De leerling kan equivalentie inzetten als hulpmiddel voor een ander doel."
+        }
+      ],
+      "evidence_targets": [
+        {
+          "id": "FR2.ET1",
+          "claim_id": "FR2.C1",
+          "definition": "Correcte herkenning van equivalente en niet-equivalente paren."
+        },
+        {
+          "id": "FR2.ET2",
+          "claim_id": "FR2.C1",
+          "definition": "Onderscheid tussen equivalentie en oppervlakkige overeenkomst."
+        },
+        {
+          "id": "FR2.ET3",
+          "claim_id": "FR2.C2",
+          "definition": "Representatie- of redeneerbewijs dat dezelfde waarde wordt bedoeld."
+        },
+        {
+          "id": "FR2.ET4",
+          "claim_id": "FR2.C2",
+          "definition": "Equivalentie blijft correct onder gewijzigde representatie."
+        },
+        {
+          "id": "FR2.ET5",
+          "claim_id": "FR2.C3",
+          "definition": "Functioneel gebruik van equivalentie zonder expliciete aanwijzing."
+        },
+        {
+          "id": "FR2.ET6",
+          "claim_id": "FR2.C2",
+          "definition": "Contradictorisch bewijs bij correcte uitkomst maar foutieve redenering."
+        }
+      ],
+      "task_models": [
+        {
+          "id": "FR2.TM1",
+          "evidence_target_ids": [
+            "FR2.ET1"
+          ],
+          "primary_development": "FR2.D1",
+          "information_value": 1,
+          "instructional_relevance": 1
+        },
+        {
+          "id": "FR2.TM2",
+          "evidence_target_ids": [
+            "FR2.ET3",
+            "FR2.ET4"
+          ],
+          "primary_development": "FR2.D2",
+          "information_value": 3,
+          "instructional_relevance": 2
+        },
+        {
+          "id": "FR2.TM3",
+          "evidence_target_ids": [
+            "FR2.ET3"
+          ],
+          "primary_development": "FR2.D2",
+          "information_value": 2,
+          "instructional_relevance": 2
+        },
+        {
+          "id": "FR2.TM4",
+          "evidence_target_ids": [
+            "FR2.ET5"
+          ],
+          "primary_development": "FR2.D3",
+          "information_value": 3,
+          "instructional_relevance": 3
+        },
+        {
+          "id": "FR2.TM5",
+          "evidence_target_ids": [
+            "FR2.ET2",
+            "FR2.ET6"
+          ],
+          "primary_development": "FR2.D2",
+          "information_value": 3,
+          "instructional_relevance": 3
+        }
+      ],
+      "development_rules": [
+        {
+          "development_id": "FR2.D1",
+          "support_threshold": 1
+        },
+        {
+          "development_id": "FR2.D2",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "FR2.D3",
+          "support_threshold": 2
+        }
+      ],
+      "evidence_rule": {
+        "relevance": "target_match",
+        "quality_field": "quality",
+        "default_quality": 0,
+        "contradiction_field": "contradiction"
+      },
+      "mastery_rules": {
+        "min_independent_observations": 2,
+        "min_variation_keys": 2,
+        "min_evidence_targets": 2,
+        "min_quality": 0.8,
+        "max_unresolved_contradictions": 0
+      },
+      "decision_rules": {
+        "priority_order": [
+          "resolve_developmental_uncertainty",
+          "fill_missing_evidence_coverage",
+          "test_variation_and_stability",
+          "test_independent_coordination",
+          "confirm_mastery"
+        ]
+      }
+    },
+    {
+      "id": "B4",
+      "name": "Delen",
+      "definition": "Een hoeveelheid of waarde verdelen of groeperen en de delingsrelatie begrijpen, representeren en gebruiken om quotiënten en ontbrekende factoren te bepalen.",
+      "developments": [
+        {
+          "id": "B4.D1",
+          "name": "Gelijke hoeveelheden eerlijk verdelen",
+          "definition": "Deel een geheel in gelijke delen en bepaal hoeveel ieder deel krijgt.",
+          "candidate_order": 1
+        },
+        {
+          "id": "B4.D2",
+          "name": "Groeperen en het aantal groepen bepalen",
+          "definition": "Bepaal hoeveel gelijke groepen van een gegeven grootte in een hoeveelheid passen.",
+          "candidate_order": 2
+        },
+        {
+          "id": "B4.D3",
+          "name": "Deling representeren en interpreteren",
+          "definition": "Verbind deelcontexten, groepen, modellen en de symbolische delingsnotatie.",
+          "candidate_order": 3
+        },
+        {
+          "id": "B4.D4",
+          "name": "Deling verbinden met vermenigvuldiging",
+          "definition": "Gebruik de inverse relatie en het ontbrekende-factorverband om delingen te begrijpen.",
+          "candidate_order": 4
+        },
+        {
+          "id": "B4.D5",
+          "name": "Quotiënt en rest betekenisvol bepalen",
+          "definition": "Bepaal quotient en rest en interpreteer wat de rest betekent binnen de situatie.",
+          "candidate_order": 5
+        },
+        {
+          "id": "B4.D6",
+          "name": "Delen met grotere en decimale getallen",
+          "definition": "Behoud plaatswaarde en waarde bij delingen met grotere gehele en decimale getallen.",
+          "candidate_order": 6
+        },
+        {
+          "id": "B4.D7",
+          "name": "Flexibel en gecontroleerd delen",
+          "definition": "Kies een passende deelstrategie en controleer de uitkomst met inverse relaties, schatten of context.",
+          "candidate_order": 7
+        }
+      ],
+      "claims": [
+        {
+          "id": "B4.C1",
+          "development_id": "B4.D1",
+          "definition": "De leerling kan een hoeveelheid eerlijk verdelen in gelijke delen en de hoeveelheid per deel bepalen."
+        },
+        {
+          "id": "B4.C2",
+          "development_id": "B4.D2",
+          "definition": "De leerling kan bepalen hoeveel gelijke groepen van een gegeven grootte in een hoeveelheid passen."
+        },
+        {
+          "id": "B4.C3",
+          "development_id": "B4.D3",
+          "definition": "De leerling kan deling betekenisvol representeren en de relatie tussen deeltal, deler en quotiënt interpreteren."
+        },
+        {
+          "id": "B4.C4",
+          "development_id": "B4.D4",
+          "definition": "De leerling kan deling verbinden met vermenigvuldiging en een ontbrekende factor bepalen."
+        },
+        {
+          "id": "B4.C5",
+          "development_id": "B4.D5",
+          "definition": "De leerling kan een quotiënt en eventuele rest correct bepalen en de rest in context interpreteren."
+        },
+        {
+          "id": "B4.C6",
+          "development_id": "B4.D6",
+          "definition": "De leerling kan delingen met grotere gehele en decimale getallen uitvoeren met behoud van plaatswaarde en waarde."
+        },
+        {
+          "id": "B4.C7",
+          "development_id": "B4.D7",
+          "definition": "De leerling kan een passende deelstrategie kiezen, uitvoeren en de uitkomst controleren in gevarieerde situaties."
+        }
+      ],
+      "evidence_targets": [
+        {
+          "id": "B4.ET1",
+          "claim_id": "B4.C1",
+          "definition": "Een geheel correct verdelen in gelijke delen."
+        },
+        {
+          "id": "B4.ET2",
+          "claim_id": "B4.C1",
+          "definition": "De hoeveelheid per deel correct bepalen."
+        },
+        {
+          "id": "B4.ET3",
+          "claim_id": "B4.C2",
+          "definition": "Het aantal gelijke groepen van een gegeven grootte correct bepalen."
+        },
+        {
+          "id": "B4.ET4",
+          "claim_id": "B4.C2",
+          "definition": "Onderscheid maken tussen hoeveelheid per groep en aantal groepen."
+        },
+        {
+          "id": "B4.ET5",
+          "claim_id": "B4.C3",
+          "definition": "Een delingssituatie correct representeren met een passend model."
+        },
+        {
+          "id": "B4.ET6",
+          "claim_id": "B4.C3",
+          "definition": "De relatie tussen deeltal, deler en quotiënt correct interpreteren."
+        },
+        {
+          "id": "B4.ET7",
+          "claim_id": "B4.C4",
+          "definition": "Een deling verbinden met de bijbehorende vermenigvuldigingsrelatie."
+        },
+        {
+          "id": "B4.ET8",
+          "claim_id": "B4.C4",
+          "definition": "Een ontbrekende factor correct bepalen vanuit een product."
+        },
+        {
+          "id": "B4.ET9",
+          "claim_id": "B4.C5",
+          "definition": "Quotiënt en rest correct bepalen."
+        },
+        {
+          "id": "B4.ET10",
+          "claim_id": "B4.C5",
+          "definition": "De rest passend interpreteren binnen de context."
+        },
+        {
+          "id": "B4.ET11",
+          "claim_id": "B4.C6",
+          "definition": "Een deling met grotere gehele of decimale getallen correct uitvoeren."
+        },
+        {
+          "id": "B4.ET12",
+          "claim_id": "B4.C6",
+          "definition": "Plaatswaarde en schaal van het quotiënt correct behouden en interpreteren."
+        },
+        {
+          "id": "B4.ET13",
+          "claim_id": "B4.C7",
+          "definition": "Een passende aanpak kiezen op basis van getalstructuur en taakconditie."
+        },
+        {
+          "id": "B4.ET14",
+          "claim_id": "B4.C7",
+          "definition": "Een quotiënt controleren met vermenigvuldiging, schatting of context."
+        }
+      ],
+      "task_models": [
+        {
+          "id": "B4.TM1",
+          "evidence_target_ids": [
+            "B4.ET1",
+            "B4.ET2"
+          ],
+          "primary_development": "B4.D1",
+          "information_value": 1,
+          "instructional_relevance": 1
+        },
+        {
+          "id": "B4.TM2",
+          "evidence_target_ids": [
+            "B4.ET3",
+            "B4.ET4"
+          ],
+          "primary_development": "B4.D2",
+          "information_value": 1,
+          "instructional_relevance": 1
+        },
+        {
+          "id": "B4.TM3",
+          "evidence_target_ids": [
+            "B4.ET5",
+            "B4.ET6"
+          ],
+          "primary_development": "B4.D3",
+          "information_value": 2,
+          "instructional_relevance": 2
+        },
+        {
+          "id": "B4.TM4",
+          "evidence_target_ids": [
+            "B4.ET7",
+            "B4.ET8"
+          ],
+          "primary_development": "B4.D4",
+          "information_value": 2,
+          "instructional_relevance": 2
+        },
+        {
+          "id": "B4.TM5",
+          "evidence_target_ids": [
+            "B4.ET9",
+            "B4.ET10"
+          ],
+          "primary_development": "B4.D5",
+          "information_value": 3,
+          "instructional_relevance": 3
+        },
+        {
+          "id": "B4.TM6",
+          "evidence_target_ids": [
+            "B4.ET11",
+            "B4.ET12"
+          ],
+          "primary_development": "B4.D6",
+          "information_value": 3,
+          "instructional_relevance": 3
+        },
+        {
+          "id": "B4.TM7",
+          "evidence_target_ids": [
+            "B4.ET13",
+            "B4.ET14"
+          ],
+          "primary_development": "B4.D7",
+          "information_value": 3,
+          "instructional_relevance": 3
+        }
+      ],
+      "development_rules": [
+        {
+          "development_id": "B4.D1",
+          "support_threshold": 1
+        },
+        {
+          "development_id": "B4.D2",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B4.D3",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B4.D4",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B4.D5",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B4.D6",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B4.D7",
+          "support_threshold": 2
+        }
+      ],
+      "evidence_rule": {
+        "relevance": "target_match",
+        "quality_field": "quality",
+        "default_quality": 0,
+        "contradiction_field": "contradiction"
+      },
+      "mastery_rules": {
+        "min_independent_observations": 2,
+        "min_variation_keys": 2,
+        "min_evidence_targets": 2,
+        "min_quality": 0.8,
+        "max_unresolved_contradictions": 0,
+        "status": "prototype-only",
+        "note": "Kandidaatparameters voor technische consistentie; geen empirisch gevalideerde mastery-cut-scores. De B4-oefenroute presenteert geen masterybeslissing aan de leerling."
+      },
+      "decision_rules": {
+        "priority_order": [
+          "resolve_developmental_uncertainty",
+          "fill_missing_evidence_coverage",
+          "test_variation_and_stability",
+          "test_independent_coordination",
+          "confirm_mastery"
+        ]
+      }
+    },
+    {
+      "id": "B5",
+      "name": "Bewerkingen combineren en structureren",
+      "definition": "Meerdere rekenkundige bewerkingen als samenhangende structuur begrijpen, representeren, in de juiste onderlinge relatie uitvoeren en doelgericht controleren.",
+      "developments": [
+        {
+          "id": "B5.D1",
+          "name": "Samengestelde bewerkingen herkennen",
+          "definition": "Herkennen dat een rekenopgave uit samenhangende bewerkingen bestaat en bepalen welke hoeveelheden en bewerkingen bij elkaar horen.",
+          "candidate_order": 1
+        },
+        {
+          "id": "B5.D2",
+          "name": "Situaties als bewerkingsstructuur representeren",
+          "definition": "Een situatie met meerdere bewerkingen omzetten naar een passende samengestelde rekennotatie, met behoud van de relaties en groepering.",
+          "candidate_order": 2
+        },
+        {
+          "id": "B5.D3",
+          "name": "Volgorde en afhankelijkheid interpreteren",
+          "definition": "Begrijpen welke bewerkingen eerst moeten worden uitgevoerd door haakjes en de afgesproken rekenvolgorde correct te interpreteren.",
+          "candidate_order": 3
+        },
+        {
+          "id": "B5.D4",
+          "name": "Samengestelde bewerkingen uitvoeren",
+          "definition": "Een samengestelde berekening in de juiste volgorde uitvoeren en tussenresultaten correct behouden.",
+          "candidate_order": 4
+        },
+        {
+          "id": "B5.D5",
+          "name": "Bewerkingsstructuren gelijkwaardig herstructureren",
+          "definition": "Een samengestelde bewerkingsstructuur herkennen of omzetten naar een gelijkwaardige structuur zonder de waarde te veranderen.",
+          "candidate_order": 5
+        },
+        {
+          "id": "B5.D6",
+          "name": "Bewerkingen flexibel combineren en controleren",
+          "definition": "In gevarieerde situaties een passende samengestelde structuur selecteren en de uitkomst doelgericht controleren.",
+          "candidate_order": 6
+        }
+      ],
+      "claims": [
+        {
+          "id": "B5.C1",
+          "development_id": "B5.D1",
+          "definition": "De leerling kan herkennen welke bewerkingen en hoeveelheden in een samengestelde rekenstructuur met elkaar samenhangen."
+        },
+        {
+          "id": "B5.C2",
+          "development_id": "B5.D2",
+          "definition": "De leerling kan een situatie met meerdere bewerkingen correct representeren in een samengestelde rekennotatie."
+        },
+        {
+          "id": "B5.C3",
+          "development_id": "B5.D3",
+          "definition": "De leerling kan de onderlinge volgorde en afhankelijkheid van bewerkingen correct interpreteren."
+        },
+        {
+          "id": "B5.C4",
+          "development_id": "B5.D4",
+          "definition": "De leerling kan een samengestelde berekening correct uitvoeren met behoud van tussenresultaten."
+        },
+        {
+          "id": "B5.C5",
+          "development_id": "B5.D5",
+          "definition": "De leerling kan gelijkwaardige samengestelde bewerkingsstructuren herkennen of construeren met behoud van waarde."
+        },
+        {
+          "id": "B5.C6",
+          "development_id": "B5.D6",
+          "definition": "De leerling kan in gevarieerde situaties een passende samengestelde bewerkingsstructuur kiezen en de uitkomst controleren."
+        }
+      ],
+      "evidence_targets": [
+        {
+          "id": "B5.ET1",
+          "claim_id": "B5.C1",
+          "definition": "Correct herkennen welke bewerkingen in een samengestelde structuur voorkomen."
+        },
+        {
+          "id": "B5.ET2",
+          "claim_id": "B5.C1",
+          "definition": "Correct interpreteren hoe de hoeveelheden en bewerkingen onderling samenhangen."
+        },
+        {
+          "id": "B5.ET3",
+          "claim_id": "B5.C2",
+          "definition": "Een contextuele situatie koppelen aan de juiste samengestelde bewerkingsnotatie."
+        },
+        {
+          "id": "B5.ET4",
+          "claim_id": "B5.C2",
+          "definition": "Groepering en relaties behouden bij het representeren van een samengestelde situatie."
+        },
+        {
+          "id": "B5.ET5",
+          "claim_id": "B5.C3",
+          "definition": "De afgesproken voorrangsrelatie tussen haakjes, vermenigvuldigen/delen en optellen/aftrekken correct toepassen."
+        },
+        {
+          "id": "B5.ET6",
+          "claim_id": "B5.C3",
+          "definition": "Bewerkingen met gelijke voorrang in de afgesproken volgorde interpreteren."
+        },
+        {
+          "id": "B5.ET7",
+          "claim_id": "B5.C4",
+          "definition": "Een samengestelde berekening correct uitvoeren."
+        },
+        {
+          "id": "B5.ET8",
+          "claim_id": "B5.C4",
+          "definition": "Tussenresultaten correct gebruiken zonder de oorspronkelijke bewerkingsrelatie te veranderen."
+        },
+        {
+          "id": "B5.ET9",
+          "claim_id": "B5.C5",
+          "definition": "Een gelijkwaardige herstructurering van een samengestelde bewerking herkennen."
+        },
+        {
+          "id": "B5.ET10",
+          "claim_id": "B5.C5",
+          "definition": "Waarde behouden bij het herstructureren van een samengestelde bewerking."
+        },
+        {
+          "id": "B5.ET11",
+          "claim_id": "B5.C6",
+          "definition": "Een passende samengestelde bewerkingsstructuur selecteren in een gevarieerde situatie."
+        },
+        {
+          "id": "B5.ET12",
+          "claim_id": "B5.C6",
+          "definition": "De uitkomst van een samengestelde berekening passend controleren."
+        }
+      ],
+      "task_models": [
+        {
+          "id": "B5.TM1",
+          "evidence_target_ids": [
+            "B5.ET1",
+            "B5.ET2"
+          ],
+          "primary_development": "B5.D1",
+          "information_value": 1,
+          "instructional_relevance": 1
+        },
+        {
+          "id": "B5.TM2",
+          "evidence_target_ids": [
+            "B5.ET3",
+            "B5.ET4"
+          ],
+          "primary_development": "B5.D2",
+          "information_value": 1,
+          "instructional_relevance": 1
+        },
+        {
+          "id": "B5.TM3",
+          "evidence_target_ids": [
+            "B5.ET5",
+            "B5.ET6"
+          ],
+          "primary_development": "B5.D3",
+          "information_value": 2,
+          "instructional_relevance": 2
+        },
+        {
+          "id": "B5.TM4",
+          "evidence_target_ids": [
+            "B5.ET7",
+            "B5.ET8"
+          ],
+          "primary_development": "B5.D4",
+          "information_value": 2,
+          "instructional_relevance": 2
+        },
+        {
+          "id": "B5.TM5",
+          "evidence_target_ids": [
+            "B5.ET9",
+            "B5.ET10"
+          ],
+          "primary_development": "B5.D5",
+          "information_value": 3,
+          "instructional_relevance": 3
+        },
+        {
+          "id": "B5.TM6",
+          "evidence_target_ids": [
+            "B5.ET11",
+            "B5.ET12"
+          ],
+          "primary_development": "B5.D6",
+          "information_value": 3,
+          "instructional_relevance": 3
+        }
+      ],
+      "development_rules": [
+        {
+          "development_id": "B5.D1",
+          "support_threshold": 1
+        },
+        {
+          "development_id": "B5.D2",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B5.D3",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B5.D4",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B5.D5",
+          "support_threshold": 2
+        },
+        {
+          "development_id": "B5.D6",
+          "support_threshold": 2
+        }
+      ],
+      "evidence_rule": {
+        "relevance": "target_match",
+        "quality_field": "quality",
+        "default_quality": 0,
+        "contradiction_field": "contradiction"
+      },
+      "mastery_rules": {
+        "min_independent_observations": 2,
+        "min_variation_keys": 2,
+        "min_evidence_targets": 2,
+        "min_quality": 0.8,
+        "max_unresolved_contradictions": 0,
+        "status": "prototype-only",
+        "note": "Kandidaatparameters voor technische consistentie; geen empirisch gevalideerde mastery-cut-scores. De B5-oefenroute presenteert geen masterybeslissing aan de leerling."
+      },
+      "decision_rules": {
+        "priority_order": [
+          "resolve_developmental_uncertainty",
+          "fill_missing_evidence_coverage",
+          "test_variation_and_stability",
+          "test_independent_coordination",
+          "confirm_mastery"
+        ]
+      }
+    }
+  ]
+}

@@ -37,7 +37,7 @@ test('B4 practice catalogue covers fourteen unique tasks across all seven develo
   assert.ok(skill.claims.some(x=>x.id===task.claim_id));
   const model=skill.task_models.find(x=>x.id===task.task_model_id);assert.ok(model);
   assert.ok(task.evidence_target_ids.every(id=>model.evidence_target_ids.includes(id)));
-  assert.ok(Math.abs(task.dividend/task.divisor-task.expected_answer)<1e-7 || task.development_id==='B4.D5');
+  if(task.response_type==='quotient_remainder'){assert.equal(task.expected_answer,Math.floor(task.dividend/task.divisor));assert.equal(task.expected_remainder,task.dividend%task.divisor);}else{assert.ok(Math.abs(task.dividend/task.divisor-task.expected_answer)<1e-7);}
   if(task.response_process_required)assert.ok(task.strategy_options.length>0);
   if(task.check_required)assert.ok(task.check_methods.length>0);
  }

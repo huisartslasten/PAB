@@ -184,7 +184,7 @@ exception
     perform pg_catalog.set_config('app.pacogo_learning_cycle_write', '', true);
     raise;
 end;
-$;
+$$;
 
 revoke all on function public.persist_curriculum_learning_cycle(text, uuid, text, jsonb, jsonb, jsonb) from public, anon;
 grant execute on function public.persist_curriculum_learning_cycle(text, uuid, text, jsonb, jsonb, jsonb) to authenticated;

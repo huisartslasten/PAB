@@ -21,8 +21,9 @@ function createAdditionController({
   }
   addends.forEach((value, index) => assertFiniteNumber(value, `addends[${index}]`));
   assertFiniteNumber(expectedAnswer, 'expectedAnswer');
-  if (!Array.isArray(strategyOptions) || strategyOptions.length === 0) {
-    throw new TypeError('strategyOptions must contain at least one strategy');
+  const processRequired = task.response_process_required !== false;
+  if (!Array.isArray(strategyOptions) || (processRequired && strategyOptions.length === 0)) {
+    throw new TypeError('strategyOptions must contain at least one strategy when process capture is required');
   }
   if (typeof representation !== 'string' || !representation.trim()) {
     throw new TypeError('representation must be a non-empty string');
@@ -61,6 +62,7 @@ function createAdditionController({
     addends: [...addends],
     representation,
     strategy_option_count: strategyOptions.length,
+    response_process_required: processRequired,
     prompt_level: task.prompt_level || 'none'
   });
 
@@ -106,7 +108,7 @@ function createAdditionController({
 
   const submit = (answer, submittedExplanation = explanation) => {
     if (submitted) throw new Error('Addition task has already been submitted');
-    if (selectedStrategy === null) throw new Error('No addition strategy has been selected');
+    if (processRequired && selectedStrategy === null) throw new Error('No addition strategy has been selected');
     if (task.variation_key === 'prompted_to_independent' && !promptedExampleRecorded) {
       throw new Error('Prompted example is required before independent submission');
     }

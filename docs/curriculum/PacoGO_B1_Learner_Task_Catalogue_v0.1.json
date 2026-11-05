@@ -1,0 +1,61 @@
+{
+  "schema_version": "0.1",
+  "status": "operational_candidate",
+  "purpose": "Separate learner-practice catalogue for the first B1 Addition learning cycle. This catalogue is not the C1-C3 pilot measurement task set.",
+  "synthetic_or_empirical": "operational_practice_definition",
+  "skill_id": "B1",
+  "curriculum_registry_version": "0.2.0",
+  "tasks": [
+    {
+      "task_id": "B1-L01",
+      "title": "Hoeveel zijn het samen?",
+      "instruction": "Bekijk de twee hoeveelheden. Hoeveel zijn het samen?",
+      "skill_id": "B1",
+      "development_id": "B1.D1",
+      "claim_id": "B1.C1",
+      "evidence_target_ids": ["B1.ET1"],
+      "task_model_id": "B1.TM1",
+      "variation_key": "learner_quantity_groups_small",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "quantity_groups",
+      "response_type": "quantity_addition",
+      "addends": [7, 5],
+      "expected_answer": 12
+    },
+    {
+      "task_id": "B1-L02",
+      "title": "Reken de som uit",
+      "instruction": "Reken de optelling uit.",
+      "skill_id": "B1",
+      "development_id": "B1.D2",
+      "claim_id": "B1.C2",
+      "evidence_target_ids": ["B1.ET3"],
+      "task_model_id": "B1.TM3",
+      "variation_key": "learner_symbolic_execution_two_digit_a",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic_expression",
+      "response_type": "symbolic_addition",
+      "addends": [28, 17],
+      "expected_answer": 45
+    },
+    {
+      "task_id": "B1-L03",
+      "title": "Nog een optelling",
+      "instruction": "Reken deze optelling uit.",
+      "skill_id": "B1",
+      "development_id": "B1.D2",
+      "claim_id": "B1.C2",
+      "evidence_target_ids": ["B1.ET3"],
+      "task_model_id": "B1.TM3",
+      "variation_key": "learner_symbolic_execution_two_digit_b",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic_expression",
+      "response_type": "symbolic_addition",
+      "addends": [46, 28],
+      "expected_answer": 74
+    }
+  ]
+}

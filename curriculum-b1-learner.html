@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — Optellen oefenen</title>
+  <style>
+    :root{font-family:Nunito,system-ui,sans-serif;color:#102b57;background:#f5f9fd}
+    body{margin:0;padding:24px;min-height:100vh;box-sizing:border-box}
+    main{max-width:820px;margin:0 auto;display:grid;gap:18px}
+    .card{background:#fff;border:1px solid #d8e7f4;border-radius:22px;padding:24px;box-shadow:0 8px 24px rgba(16,43,87,.07)}
+    h1,h2{margin:0 0 10px}.muted{color:#647894;line-height:1.5}
+    .addition-visual{display:flex;justify-content:center;align-items:center;gap:22px;min-height:110px;margin:22px 0}
+    .quantity-group{display:grid;grid-template-columns:repeat(5,18px);gap:6px;align-content:center}
+    .quantity-dot{width:18px;height:18px;border-radius:50%;background:#1787f2}
+    .addition-plus{font-size:28px;font-weight:900}
+    .addition-equation{font-size:36px;font-weight:900;padding:20px 28px;border-radius:16px;background:#eef7ff}
+    .addition-answer-form{display:flex;align-items:end;justify-content:center;gap:12px;flex-wrap:wrap}
+    label{display:grid;gap:7px;font-weight:800}
+    input{width:140px;padding:12px;border:2px solid #d8e7f4;border-radius:14px;font:900 22px Nunito,system-ui,sans-serif;text-align:center}
+    button{border:0;border-radius:14px;padding:13px 20px;font:900 15px Nunito,system-ui,sans-serif;cursor:pointer;background:#1787f2;color:#fff}
+    button:disabled{opacity:.5;cursor:not-allowed}
+    .status{font-weight:800;padding:12px 14px;border-radius:14px;background:#eef8ff;color:#126fc9;line-height:1.5}
+    .status.error{background:#fff0f0;color:#b42318}
+    pre{margin:10px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;background:#f5f9fd;border-radius:14px;padding:14px;font:700 12px/1.5 ui-monospace,monospace}
+    .progress{font-size:14px;color:#647894;font-weight:800}
+  </style>
+</head>
+<body>
+<main>
+  <section class="card">
+    <div class="muted">PacoGO • Rekenen • Optellen</div>
+    <h1>We gaan optellen</h1>
+    <p class="muted">Geef gewoon je antwoord. Je hoeft niet uit te leggen hoe je hebt gerekend.</p>
+    <div id="progress" class="progress">Oefening laden…</div>
+    <div id="exercise"></div>
+    <div id="feedback" class="status" role="status" aria-live="polite">Je kunt beginnen.</div>
+  </section>
+  <section class="card">
+    <h2>Je oefenronde</h2>
+    <p class="muted">Je antwoorden worden in deze oefenronde gebruikt om de volgende oefening te bepalen. Deze demonstratie bewaart nog geen voortgang na het sluiten of vernieuwen van de pagina.</p>
+    <pre id="trace">Nog geen antwoord gegeven.</pre>
+  </section>
+</main>
+<script type="module">
+  import { createAdditionController } from './pacogo-engine/addition-controller.js';
+  import { createAdditionLearningInterfaceModel } from './pacogo-engine/addition-learning-interface-contract.js';
+  import { renderAdditionLearningInterface } from './pacogo-engine/addition-learning-interface.js';
+  import { createBrowserVerticalSliceRuntime } from './pacogo-engine/browser-vertical-slice.js';
+  import { createCurriculumRegistry } from './pacogo-engine/curriculum-registry.js';
+
+  const [registryConfig, catalogue] = await Promise.all([
+    fetch('./docs/curriculum/PacoGO_Curriculum_Registry_v0.2.json').then(response => response.json()),
+    fetch('./docs/curriculum/PacoGO_B1_Learner_Task_Catalogue_v0.1.json').then(response => response.json())
+  ]);
+  const registry = createCurriculumRegistry(registryConfig);
+  const runtime = createBrowserVerticalSliceRuntime({ registry, taskSet: catalogue });
+  const skill = registry.getSkill('B1');
+  const tasks = catalogue.tasks;
+  const learnerEvidence = [];
+  let priorState = null;
+  let taskIndex = 0;
+  let controller = null;
+
+  const exerciseHost = document.querySelector('#exercise');
+  const feedback = document.querySelector('#feedback');
+  const trace = document.querySelector('#trace');
+  const progress = document.querySelector('#progress');
+
+  function showTask() {
+    const task = tasks[taskIndex];
+    const model = createAdditionLearningInterfaceModel({ task });
+    controller = createAdditionController({
+      task,
+      studentKey: 'local-practice-session',
+      renderer: {},
+      addends: task.addends,
+      expectedAnswer: task.expected_answer,
+      strategyOptions: [],
+      representation: task.representation,
+      responseType: task.response_type,
+      provenance: { page: 'curriculum-b1-learner.html', catalogue_version: catalogue.schema_version }
+    });
+    progress.textContent = `Oefening ${taskIndex + 1} van ${tasks.length} • ${task.development_id}`;
+    feedback.className = 'status';
+    feedback.textContent = 'Vul je antwoord in.';
+    renderAdditionLearningInterface({
+      root: exerciseHost,
+      model,
+      onSubmit: answer => {
+        try {
+          const { evaluation, observation } = controller.submit(answer);
+          const cycle = runtime.runTaskObservation({
+            taskId: task.task_id,
+            observation,
+            priorEvidence: learnerEvidence,
+            priorState
+          });
+          learnerEvidence.splice(0, learnerEvidence.length, ...cycle.evidence);
+          priorState = cycle.longitudinal_state;
+          feedback.textContent = evaluation.correct
+            ? 'Goed gedaan. Je antwoord is verwerkt. Op naar de volgende oefening.'
+            : 'Dank je. Deze poging is ook verwerkt. We oefenen verder met een andere som.';
+          trace.textContent = JSON.stringify({
+            observation_id: observation.observation_id,
+            task_model_id: task.task_model_id,
+            development: cycle.development,
+            mastery: cycle.mastery,
+            next_action: cycle.next,
+            observations_in_session: learnerEvidence.length
+          }, null, 2);
+          const form = exerciseHost.querySelector('form');
+          form.querySelector('button').disabled = true;
+          if (taskIndex < tasks.length - 1) {
+            const nextButton = document.createElement('button');
+            nextButton.type = 'button';
+            nextButton.textContent = 'Volgende oefening';
+            nextButton.addEventListener('click', () => {
+              taskIndex += 1;
+              showTask();
+            });
+            exerciseHost.appendChild(nextButton);
+          } else {
+            progress.textContent = 'Oefenronde afgerond';
+            const done = document.createElement('p');
+            done.className = 'muted';
+            done.textContent = 'Je hebt alle oefeningen gedaan. Je antwoorden zijn alleen in deze sessie bewaard.';
+            exerciseHost.appendChild(done);
+          }
+        } catch (error) {
+          feedback.className = 'status error';
+          feedback.textContent = error.message;
+        }
+      }
+    });
+  }
+
+  showTask();
+</script>
+</body>
+</html>

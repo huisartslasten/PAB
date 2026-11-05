@@ -172,7 +172,8 @@ function createAdditionController({
         quality: correct ? 1 : 0,
         relevant: true,
         contradiction: false,
-        independent: true,
+        independent: false,
+        independence_status: 'UNKNOWN',
         variation_key: task.variation_key
       }
     };

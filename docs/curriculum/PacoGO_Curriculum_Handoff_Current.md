@@ -1190,3 +1190,41 @@ Voer de dependency-audit uit van de oude Skills-implementatie: inventariseer imp
 ### Verificatie
 - Ontwerpdocument en deze handoff-wijziging worden geverifieerd met Full Regression op de resulterende commit.
 - Branch blijft `refactor/professional-v1`; LIVE `main` en productie-Supabase blijven onaangeroerd.
+
+
+## 39. Legacy Skills dependency proof — 2026-11-05
+
+### Exact-branch inventory completed
+Audited the current branch at commit `9657fed4c65177fc8f607f90732588c87f74fa9f` across:
+- 351 production/source JavaScript and MJS files;
+- 64 HTML pages;
+- 193 JavaScript/MJS/TypeScript test files;
+- all 57 Supabase SQL migrations.
+
+The scan covered the legacy table names, old service names and constructors, old runtime/page names, legacy math-session helpers and `math-skill-` game keys.
+
+### Findings and classification
+- The active `skills.html` route uses the curriculum-driven `src/features/skills/runtime.js`. The active route registry does not register the removed legacy Skill Editor pages.
+- The active app bootstrap does not construct or expose `createSkillDefinitionService` or `createSkillConfigurationService`. Their remaining direct imports are their dedicated service tests. Those tests are explicitly included in the maintained Vitest regression, so the service/test pair remains a deliberate test dependency until a separately approved retirement step.
+- The old `math-domain.js` session/question helpers are not imported by the central Skills runtime. Their remaining `createMathSession` references are within the legacy module and its dedicated test. Keep both until the retirement decision explicitly covers their test contract.
+- `game-result-service.test.js` contains a `math-skill-addition` fixture for the generic game-result service. This is a test fixture, not an active Skills runtime dependency. The TEST database inventory found no matching legacy math Skill game-result rows.
+- Legacy `skill_definitions` / `skill_assignments` references in SQL are confined to their historical creation/refinement/recovery/privilege migrations. Later curriculum-engine migrations use `skill_id` for separate evidence, longitudinal-state and decision-trace contracts; these must not be treated as legacy Skill-table dependencies.
+- No additional legacy service, route, page or table references were found in the audited source, HTML, test or migration inventory.
+
+### Database and data-retention boundary
+- The prior read-only TEST catalog audit found no foreign keys, triggers, views, materialized views or database functions referencing the legacy Skill tables.
+- Existing RLS policies on the legacy tables remain database dependencies. The public-read policy on `skill_assignments` and the public-read policy on `skill_definitions` are security findings requiring a separately designed ownership/security decision; do not silently alter them as part of code retirement.
+- Preserve all 13 legacy definitions and 37 assignments, including the two custom definitions and three unresolved `math-mixed` orphan assignments. No data export, DDL, DML, policy change or production Supabase access was performed.
+- The dormant-data disposition in section 38 remains authoritative. Physical data retirement is not required for retirement of obsolete learner-facing code.
+
+### Decision and next gate
+- **Stage A application dependency inventory is complete** for the audited source, HTML, tests and migrations on this exact branch commit.
+- This does not authorize deletion of database rows, schema, RLS policies, shared game data or curriculum-engine learner-state.
+- Next: verify Full Regression on the current branch head, then make a separate Stage B decision about retiring the isolated legacy service/math modules and their tests while leaving dormant database data intact. Do not combine code retirement with data retirement.
+- No application code, tests, schema, migrations or data were changed in this audit.
+
+### Verification status
+- Branch: `refactor/professional-v1`.
+- Audited base commit: `9657fed4c65177fc8f607f90732588c87f74fa9f`.
+- Full Regression #3018 was reported GREEN by the user, but a new run on the post-handoff commit is still required. No new regression is claimed here.
+- LIVE `main` remains untouched.

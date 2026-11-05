@@ -1,4 +1,4 @@
--- Integration test for 20261104230000_add_learner_ownership_and_rls.sql.
+-- Integration test for 20261105024754_add_learner_ownership_and_rls.sql.
 -- Run as the database owner against PacoGO TEST after applying that migration.
 -- All synthetic auth users, learner profiles and learner records are rolled back.
 begin;
@@ -91,6 +91,32 @@ select public.persist_curriculum_learning_cycle(
   '{"state":{"status":"in_progress"},"last_observed_at":"2026-11-04T12:00:00Z"}'::jsonb,
   '{"observation_ids":[],"inference":{"status":"insufficient"},"decision":{"next_action":"continue"}}'::jsonb
 );
+
+-- The RPC clears its transaction-local write capability before returning.
+-- Direct table writes in the same transaction must still be rejected by RLS.
+do $test$
+begin
+  if coalesce(current_setting('app.pacogo_learning_cycle_write', true), '') <> '' then
+    raise exception 'Learning-cycle write capability leaked after RPC return';
+  end if;
+
+  begin
+    insert into public.student_evidence (
+      student_key, curriculum_registry_version_id, skill_id,
+      performance, observation, evidence_assessment, source_event_id
+    ) values (
+      current_setting('test.learner_a'),
+      current_setting('test.registry_id')::uuid,
+      'TEST-SKILL-A',
+      '{}'::jsonb, '{}'::jsonb, '{}'::jsonb,
+      'rls-direct-write'
+    );
+    raise exception 'Direct evidence insert unexpectedly succeeded';
+  exception
+    when insufficient_privilege then null;
+  end;
+end;
+$test$;
 
 -- Parent A sees its own learner and data, but cannot see Parent B's learner or data.
 do $test$

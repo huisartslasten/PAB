@@ -426,7 +426,42 @@ The product owner confirmed that the immediate goal is to make PacoGO usable so 
 ### Engineering status at this handoff update
 
 - Working branch: `refactor/professional-v1`; `main` is LIVE and must not be touched.
-- Baseline commit before this handoff update: `9d6cbabb0b437a4105591032f76a56890b8cb53c`.
-- Full Regression run #2903 / ID `41903117899` on that exact commit: **GREEN** (`completed / success`).
+- Latest verified branch head before this handoff update: `83ca4272012a2106e98f86afb1ad6a467732278a`.
+- Full Regression run #2904 / ID `41949304774` on that exact commit: **GREEN** (`completed / success`); all 19 workflow steps succeeded, including browser regression and clean-working-tree verification.
 - This handoff update is a new repository commit and must receive its own Full Regression. Replace this baseline with the exact handoff-update commit and its actual run result after verification.
 - No implementation work or Supabase change is included in this handoff update.
+
+
+## 18. B1 learner-delivery audit — separation of pilot tasks and learner practice
+
+The B1 audit was performed against the current registry, pilot task set, addition controller, shared browser runtime and five existing B1 demonstration pages.
+
+### Verified findings
+
+- The current registry defines B1.D1–D4 and B1.TM1–TM6, with the existing claims and evidence targets B1.ET1–ET8.
+- The C1–C3 Pilot Task Set is explicitly `design_only` and its tasks are measurement-development fixtures, not an operational learner task catalogue. All five B1 pilot tasks currently set `response_process_required: true`.
+- The five B1 browser pages are synthetic demonstrations using synthetic student keys. They do not constitute a complete learner-facing B1 flow or persistent learner history.
+- Pilot task coverage currently uses only B1.TM1 and B1.TM2. It does not provide tasks for registry task models B1.TM3–TM6 (direct execution, strategic choice/checking, robustness under variation, and transfer).
+- Several demonstration-page labels/prompts do not align cleanly with their pilot task mapping. In particular, the strategy-variation page is mapped to B1.ET2/TM2 rather than the registry's B1.ET4/TM4; it therefore must not be treated as evidence that the strategic-choice task model is implemented.
+- The current addition controller requires a strategy selection for every submission. Some pages additionally require a written explanation. This conflicts with the approved initial learner policy that ordinary answers must be accepted and explanations must not be mandatory for every answer.
+- The legacy B1 prototype document describes seven task models, while the current registry defines six. The registry remains the active technical contract; do not silently add or restore a seventh task model.
+- The browser vertical-slice runtime delegates to the curriculum registry, but the inspected student evidence store is in-memory only. The current B1 pages do not demonstrate persistent learner history or a complete learner-state experience.
+
+### Architecture decision
+
+Keep the C1–C3 Pilot Task Set unchanged as a design-only measurement fixture. Do not weaken its process requirements or repurpose it as the learner's everyday practice list.
+
+Create a separate operational learner task catalogue that references the existing B1 registry task models and evidence targets without changing curriculum definitions, claims, evidence-target meanings, mastery criteria or the pilot measurement set. In the operational learner flow:
+- a learner can submit an ordinary answer without a written explanation;
+- strategy/process capture is optional except where a specific task is intentionally designed to observe that process;
+- missing process remains unknown and must not be inferred from correctness;
+- instructional support and practice remain distinct from evidence assessment and mastery;
+- tasks use existing registry IDs and task-model boundaries.
+
+This separation is an implementation boundary for the Zyon-first learner experience. It does not approve changes to C3 coding rules, evidence schema, registry mappings or Supabase.
+
+### Next concrete step
+
+Build the first operational B1 learner task catalogue and reusable Addition learning flow, beginning with the already-defined B1.D1–D2 task models and preserving the ability to add B1.D3–D4 tasks against the existing registry contracts. Then verify the complete browser learner cycle before expanding to the next skill.
+
+No code or Supabase changes are included in this audit/handoff update.

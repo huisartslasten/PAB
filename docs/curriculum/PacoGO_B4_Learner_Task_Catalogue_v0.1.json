@@ -1,0 +1,410 @@
+{
+  "schema_version": "0.1",
+  "status": "operational_candidate",
+  "purpose": "Afzonderlijke oefencatalogus voor de volledige kandidaat-ontwikkelingslijn van B4 Delen. Dit is niet de C1-C3 pilot-meettaakset.",
+  "synthetic_or_empirical": "operational_practice_definition",
+  "skill_id": "B4",
+  "curriculum_registry_version": "0.5.0-candidate",
+  "tasks": [
+    {
+      "task_id": "B4-L01",
+      "title": "Gelijk verdelen",
+      "instruction": "12 koekjes worden eerlijk verdeeld over 3 kinderen. Hoeveel krijgt ieder?",
+      "skill_id": "B4",
+      "development_id": "B4.D1",
+      "claim_id": "B4.C1",
+      "evidence_target_ids": [
+        "B4.ET1"
+      ],
+      "task_model_id": "B4.TM1",
+      "variation_key": "b4_1_sharing",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "share",
+      "response_type": "numeric_division",
+      "operation_type": "share",
+      "dividend": 12,
+      "divisor": 3,
+      "expected_answer": 4,
+      "quantity_model": null,
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "none"
+    },
+    {
+      "task_id": "B4-L02",
+      "title": "Verdelen in gelijke delen",
+      "instruction": "20 fiches worden verdeeld over 5 teams. Hoeveel fiches krijgt elk team?",
+      "skill_id": "B4",
+      "development_id": "B4.D1",
+      "claim_id": "B4.C1",
+      "evidence_target_ids": [
+        "B4.ET2"
+      ],
+      "task_model_id": "B4.TM1",
+      "variation_key": "b4_2_sharing",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "share",
+      "response_type": "numeric_division",
+      "operation_type": "share",
+      "dividend": 20,
+      "divisor": 5,
+      "expected_answer": 4,
+      "quantity_model": null,
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "none"
+    },
+    {
+      "task_id": "B4-L03",
+      "title": "Hoeveel groepjes?",
+      "instruction": "Er zijn 18 knikkers. In elk zakje passen 3 knikkers. Hoeveel zakjes zijn nodig?",
+      "skill_id": "B4",
+      "development_id": "B4.D2",
+      "claim_id": "B4.C2",
+      "evidence_target_ids": [
+        "B4.ET3"
+      ],
+      "task_model_id": "B4.TM2",
+      "variation_key": "b4_3_grouping",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "group",
+      "response_type": "numeric_division",
+      "operation_type": "group",
+      "dividend": 18,
+      "divisor": 3,
+      "expected_answer": 6,
+      "quantity_model": null,
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "none"
+    },
+    {
+      "task_id": "B4-L04",
+      "title": "Groepsgrootte vergelijken",
+      "instruction": "24 potloden worden in groepjes van 4 gelegd. Hoeveel groepjes ontstaan?",
+      "skill_id": "B4",
+      "development_id": "B4.D2",
+      "claim_id": "B4.C2",
+      "evidence_target_ids": [
+        "B4.ET4"
+      ],
+      "task_model_id": "B4.TM2",
+      "variation_key": "b4_4_grouping",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "group",
+      "response_type": "numeric_division",
+      "operation_type": "group",
+      "dividend": 24,
+      "divisor": 4,
+      "expected_answer": 6,
+      "quantity_model": null,
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "none"
+    },
+    {
+      "task_id": "B4-L05",
+      "title": "Deling representeren",
+      "instruction": "Er zijn 15 appels voor 5 manden. Welke deling past bij de situatie?",
+      "skill_id": "B4",
+      "development_id": "B4.D3",
+      "claim_id": "B4.C3",
+      "evidence_target_ids": [
+        "B4.ET5"
+      ],
+      "task_model_id": "B4.TM3",
+      "variation_key": "b4_5_representation",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic",
+      "response_type": "numeric_division",
+      "operation_type": "symbolic",
+      "dividend": 15,
+      "divisor": 5,
+      "expected_answer": 3,
+      "quantity_model": null,
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "15 ÷ 5 = ?"
+    },
+    {
+      "task_id": "B4-L06",
+      "title": "Betekenis van de deling",
+      "instruction": "Bij 28 ÷ 7 = 4: wat betekent de 4 in deze deling?",
+      "skill_id": "B4",
+      "development_id": "B4.D3",
+      "claim_id": "B4.C3",
+      "evidence_target_ids": [
+        "B4.ET6"
+      ],
+      "task_model_id": "B4.TM3",
+      "variation_key": "b4_6_representation",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic",
+      "response_type": "numeric_division",
+      "operation_type": "symbolic",
+      "dividend": 28,
+      "divisor": 7,
+      "expected_answer": 4,
+      "quantity_model": null,
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "28 ÷ 7 = ?"
+    },
+    {
+      "task_id": "B4-L07",
+      "title": "Ontbrekende factor",
+      "instruction": "Welke factor ontbreekt? 6 × ? = 42. Gebruik de delingsrelatie.",
+      "skill_id": "B4",
+      "development_id": "B4.D4",
+      "claim_id": "B4.C4",
+      "evidence_target_ids": [
+        "B4.ET7"
+      ],
+      "task_model_id": "B4.TM4",
+      "variation_key": "b4_7_inverse",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic",
+      "response_type": "numeric_division",
+      "operation_type": "symbolic",
+      "dividend": 42,
+      "divisor": 6,
+      "expected_answer": 7,
+      "quantity_model": null,
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "42 ÷ 6 = ?"
+    },
+    {
+      "task_id": "B4-L08",
+      "title": "Delen en vermenigvuldigen",
+      "instruction": "Reken uit: 72 ÷ 8. Controleer eventueel met een keersom.",
+      "skill_id": "B4",
+      "development_id": "B4.D4",
+      "claim_id": "B4.C4",
+      "evidence_target_ids": [
+        "B4.ET8"
+      ],
+      "task_model_id": "B4.TM4",
+      "variation_key": "b4_8_inverse",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic",
+      "response_type": "numeric_division",
+      "operation_type": "symbolic",
+      "dividend": 72,
+      "divisor": 8,
+      "expected_answer": 9,
+      "quantity_model": null,
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "72 ÷ 8 = ?"
+    },
+    {
+      "task_id": "B4-L09",
+      "title": "Delen met rest",
+      "instruction": "Er zijn 29 kinderen. In een busje passen 4 kinderen. Hoeveel volle busjes en hoeveel kinderen blijven over?",
+      "skill_id": "B4",
+      "development_id": "B4.D5",
+      "claim_id": "B4.C5",
+      "evidence_target_ids": [
+        "B4.ET9"
+      ],
+      "task_model_id": "B4.TM5",
+      "variation_key": "b4_9_remainder",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic",
+      "response_type": "numeric_division",
+      "operation_type": "symbolic",
+      "dividend": 29,
+      "divisor": 4,
+      "expected_answer": 7.25,
+      "quantity_model": null,
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "29 ÷ 4"
+    },
+    {
+      "task_id": "B4-L10",
+      "title": "Rest interpreteren",
+      "instruction": "Je hebt 26 koekjes en verpakt ze per 6. Hoeveel volle zakjes kun je maken en hoeveel koekjes blijven over?",
+      "skill_id": "B4",
+      "development_id": "B4.D5",
+      "claim_id": "B4.C5",
+      "evidence_target_ids": [
+        "B4.ET10"
+      ],
+      "task_model_id": "B4.TM5",
+      "variation_key": "b4_10_remainder",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic",
+      "response_type": "numeric_division",
+      "operation_type": "symbolic",
+      "dividend": 26,
+      "divisor": 6,
+      "expected_answer": 4.3333333333,
+      "quantity_model": null,
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "26 ÷ 6"
+    },
+    {
+      "task_id": "B4-L11",
+      "title": "Grotere getallen delen",
+      "instruction": "Reken uit: 864 ÷ 8.",
+      "skill_id": "B4",
+      "development_id": "B4.D6",
+      "claim_id": "B4.C6",
+      "evidence_target_ids": [
+        "B4.ET11"
+      ],
+      "task_model_id": "B4.TM6",
+      "variation_key": "b4_11_decimal",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic",
+      "response_type": "numeric_division",
+      "operation_type": "symbolic",
+      "dividend": 864,
+      "divisor": 8,
+      "expected_answer": 108,
+      "quantity_model": null,
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "864 ÷ 8 = ?"
+    },
+    {
+      "task_id": "B4-L12",
+      "title": "Decimale deling",
+      "instruction": "Reken uit: 7,2 ÷ 0,6.",
+      "skill_id": "B4",
+      "development_id": "B4.D6",
+      "claim_id": "B4.C6",
+      "evidence_target_ids": [
+        "B4.ET12"
+      ],
+      "task_model_id": "B4.TM6",
+      "variation_key": "b4_12_decimal",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic",
+      "response_type": "numeric_division",
+      "operation_type": "symbolic",
+      "dividend": 7.2,
+      "divisor": 0.6,
+      "expected_answer": 12,
+      "quantity_model": null,
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "7,2 ÷ 0,6 = ?"
+    },
+    {
+      "task_id": "B4-L13",
+      "title": "Flexibel delen",
+      "instruction": "Reken uit: 960 ÷  Des?",
+      "skill_id": "B4",
+      "development_id": "B4.D7",
+      "claim_id": "B4.C7",
+      "evidence_target_ids": [
+        "B4.ET13"
+      ],
+      "task_model_id": "B4.TM7",
+      "variation_key": "b4_13_flexible",
+      "prompt_level": "none",
+      "response_process_required": true,
+      "representation": "symbolic",
+      "response_type": "numeric_division",
+      "operation_type": "symbolic",
+      "dividend": 960,
+      "divisor": 12,
+      "expected_answer": 80,
+      "quantity_model": null,
+      "strategy_options": [
+        {
+          "id": "decompose",
+          "label": "960 ÷ 10 ÷ 1,2 (niet handig)"
+        },
+        {
+          "id": "known_multiple",
+          "label": "12 × 8 = 96, dus 12 × 80 = 960"
+        }
+      ],
+      "check_required": true,
+      "check_methods": [
+        {
+          "id": "multiplication",
+          "label": "Controleren met vermenigvuldiging"
+        },
+        {
+          "id": "estimate",
+          "label": "Controleren met een schatting"
+        }
+      ],
+      "display_expression": "960 ÷ 12 = ?"
+    },
+    {
+      "task_id": "B4-L14",
+      "title": "Delen in context",
+      "instruction": "Een school verdeelt 1.248 boeken gelijk over 12 klassen. Hoeveel boeken krijgt elke klas?",
+      "skill_id": "B4",
+      "development_id": "B4.D7",
+      "claim_id": "B4.C7",
+      "evidence_target_ids": [
+        "B4.ET14"
+      ],
+      "task_model_id": "B4.TM7",
+      "variation_key": "b4_14_flexible",
+      "prompt_level": "none",
+      "response_process_required": true,
+      "representation": "symbolic",
+      "response_type": "numeric_division",
+      "operation_type": "symbolic",
+      "dividend": 1248,
+      "divisor": 12,
+      "expected_answer": 104,
+      "quantity_model": null,
+      "strategy_options": [
+        {
+          "id": "decompose",
+          "label": "1.200 ÷ 12 + 48 ÷ 12"
+        },
+        {
+          "id": "known_multiple",
+          "label": "12 × 100 en daarna de rest"
+        }
+      ],
+      "check_required": true,
+      "check_methods": [
+        {
+          "id": "multiplication",
+          "label": "Controleren met vermenigvuldiging"
+        },
+        {
+          "id": "estimate",
+          "label": "Controleren met een schatting"
+        }
+      ],
+      "display_expression": "1.248 ÷ 12 = ?"
+    }
+  ]
+}

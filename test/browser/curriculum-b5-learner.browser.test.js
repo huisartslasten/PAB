@@ -31,6 +31,7 @@ test('B5 learner route completes twelve process-aware tasks and persists observa
  await page.getByRole('button',{name:'Leerling toevoegen'}).click();
  await page.getByRole('button',{name:'Leerling kiezen: Leerling B5'}).click();
  await expect(page.locator('#exerciseCard h1')).toHaveText('Bewerkingen combineren oefenen');
+ await expect(page.locator('#selectedLearnerLabel')).toHaveText('PacoGO • Leerling B5 • Rekenen • Bewerkingen combineren');
  const taskIds=['B5-L01','B5-L02','B5-L03','B5-L04','B5-L05','B5-L06','B5-L07','B5-L08','B5-L09','B5-L10','B5-L11','B5-L12'];
  const choiceAnswers={
   'B5-L01':'5 × 4 + 3',

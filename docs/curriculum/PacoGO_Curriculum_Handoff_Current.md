@@ -1041,3 +1041,43 @@ Prepare a consolidated contract reconciliation covering raw response episode, ta
 - Do not start another broad C3 documentation cycle.
 - Resolve only the B1.ET7 curriculum-contract question against the current registry and historical B1 prototype. Present the alternatives and consequences; do not remove ET7, map it to TM4/TM7 or add a task model without an explicit decision.
 - After that decision, return to the smallest useful B1 learner-facing task slice for Zyon, starting from the already supported quantity-composition task family. Before any code build, run Full Regression on the exact current HEAD; if green, implement one complete task interaction and its observation path, then rerun Full Regression.
+
+
+## 34. Centrale Skills-ingang — legacy runtime vervangen — 2026-11-05
+
+### Startpunt en verificatie
+- Branch: `refactor/professional-v1`; LIVE `main` niet aangeraakt.
+- Startcommit: `4f17b8c2565a0b46170a88cc1d65403f92cbe866`.
+- Full Regression #3008 / run ID `42076550855` was GREEN op die exacte commit.
+- Na vervanging van de runtime: commit `8b96642107087c5b66f8ac883f83258a1f103f76`.
+- Full Regression #3009 / run ID `42077377663` completed GREEN op exact `8b96642107087c5b66f8ac883f83258a1f103f76`.
+
+### Uitgevoerd
+- `src/features/skills/runtime.js` is vervangen: geen oude timed arithmetic sessies, score/high-score, oude Skill-definitions/configuration of `math-skill-*` opslag meer.
+- De centrale ingang leest `docs/curriculum/PacoGO_Curriculum_Registry_v0.6.json` en toont A1, B1 en FR2.
+- De centrale ingang verwijst naar de bestaande learner/curriculum-pagina's:
+  - A1 → `curriculum-a1-numberline.html`
+  - B1 → `curriculum-b1-learner.html`
+  - FR2 → `curriculum-fr2-fractions.html`
+- Statusverschil is expliciet: B1 gebruikt leerlingprofielen en opgeslagen voortgang; A1 en FR2 zijn prototypes zonder gekoppelde leerlingvoortgang.
+- Toegevoegd: `test/skills-runtime-source-contract.test.js`, die registrybinding, bestemmingen, statusonderscheid en afwezigheid van legacy timed-practice-afhankelijkheden controleert.
+- De route `skills.html` blijft bestaan en wijst naar de nieuwe runtime.
+- De oude Supabase-tabellen zijn niet verwijderd; `game_results` en gedeelde game-functionaliteit blijven behouden.
+
+### Vervolgcontrole
+- De nieuwe centrale runtime is broncode- en regressiegetest; de test bewijst niet dat alle drie de learner-pagina's al dezelfde persistente learner-flow hebben.
+- De A1- en FR2-prototypes gebruiken momenteel synthetische student keys en mogen niet als echte opgeslagen leerlingvoortgang worden gepresenteerd.
+- De route krijgt de gedeelde tile-stylesheet mee.
+- Nog uit te voeren: browsermatige controle van `skills.html` via de centrale router, verificatie van navigatie/contextbehoud, en volledige afhankelijkheidsaudit vóór verwijdering van legacy services, tabellen of oude pagina-assets.
+- Verwijder geen oude Supabase-tabellen zonder data- en dependency-audit.
+- Pas na die audit kunnen oude servicebestanden, oude skillpagina's, math-domain helpers/tests en legacy tabellen gecontroleerd worden verwijderd.
+
+### Volgende concrete stap
+1. Browser-test de centrale Skills-route inclusief navigatie naar A1, B1 en FR2 en controleer contextbehoud.
+2. Inventariseer alle resterende imports/verwijzingen naar `skill_definitions`, `skill_assignments`, oude runtime helpers en legacy pagina's.
+3. Verwijder alleen aantoonbaar ongebruikte code in een coherente cleanup-commit; behoud gedeelde game-resultaten en de nieuwe curriculum-engine.
+4. Daarna terug naar B1 learner-facing werk voor Zyon; B1.ET7 en C3/schema-contract blockers blijven ongewijzigd en mogen niet worden omzeild.
+
+### Handoff-verificatie
+- Runtime replacement commit: `8b96642107087c5b66f8ac883f83258a1f103f76`; Full Regression #3009 GREEN.
+- Handoff/route-styles update commit: pending; Full Regression pending.

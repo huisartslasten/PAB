@@ -1121,7 +1121,7 @@ Voer de dependency-audit uit van de oude Skills-implementatie: inventariseer imp
 
 ### Alleen-lezen databasecontrole — PacoGO TEST
 - `skill_definitions`: 13 rijen, waaronder twee aangepaste definities naast de oorspronkelijke catalogus.
-- `skill_assignments`: 37 rijen verdeeld over drie learner-profielen; één assignment betreft de aangepaste Skill Breuken.
+- `skill_assignments`: 37 rijen verdeeld over drie learner-profielen; één assignment betreft de aangepaste Skill Breuken. Alle 37 rijen zijn aanwezig; 28 assignments zijn enabled en 9 disabled.
 - `game_results`: 5 rijen over drie game keys (`double-or-nothing`, `flash-question`, `word-reveal`).
 - Oude Skill-data is niet leeg en wordt niet verwijderd.
 - Nieuwe engine-tabellen bevatten eveneens `skill_id`-kolommen in evidence, longitudinal state en decision trace. Dit zijn aparte curriculumcontracten.
@@ -1131,5 +1131,6 @@ Voer de dependency-audit uit van de oude Skills-implementatie: inventariseer imp
 - Branch: `refactor/professional-v1`.
 - Parent commit: `886c9da63347c6d595f730cb1d60fe4deeda3c5b`.
 - Full Regression op parent: #3013 / run ID `42083415081`, completed GREEN.
-- Cleanup-commit: verificatie pending.
+- Cleanup-commit: `ac80edd2d0d6a1a28c57f513fcae730df2dc0d8f`; Full Regression #3014 / run ID `42103326026`, completed GREEN op exact deze commit.
+- De vier verwijderde legacybestanden zijn op de cleanup-commit afwezig geverifieerd.
 - Volgende stap: Full Regression op cleanup-commit; bij groen resterende import-/contractaudit afronden. Migreer of archiveer bestaande Skill-data uitsluitend na een expliciet ontworpen dataovergang. Behoud `game_results` en nieuwe curriculumtabellen.

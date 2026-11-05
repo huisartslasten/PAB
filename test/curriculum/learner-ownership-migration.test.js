@@ -3,11 +3,15 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const migration = readFileSync(
-  new URL('../../supabase/migrations/20261104230000_add_learner_ownership_and_rls.sql', import.meta.url),
+  new URL('../../supabase/migrations/20261105024754_add_learner_ownership_and_rls.sql', import.meta.url),
   'utf8'
 );
 const databaseTest = readFileSync(
   new URL('../../supabase/tests/learner_ownership_rls.test.sql', import.meta.url),
+  'utf8'
+);
+const writeBoundaryMigration = readFileSync(
+  new URL('../../supabase/migrations/20261105030000_switch_learning_cycle_to_invoker.sql', import.meta.url),
   'utf8'
 );
 
@@ -42,16 +46,20 @@ test('learner data policies are scoped and replace the old permissive policies',
   assert.doesNotMatch(migration, /create policy[\s\S]{0,260}?using\s*\(\s*true\s*\)/i);
 });
 
-test('learning-cycle persistence is atomic, idempotent and not directly writable', () => {
-  assert.match(migration, /create or replace function public\.persist_curriculum_learning_cycle/);
-  assert.match(migration, /security definer[\s\S]*?set search_path = ''/);
-  assert.match(migration, /private\.is_learner_guardian\(p_student_key\)/);
-  assert.match(migration, /source_event_id is required for idempotency/);
-  assert.match(migration, /on conflict \(student_key, source_event_id\)/);
-  assert.match(migration, /revoke all on function public\.persist_curriculum_learning_cycle[\s\S]*?from public, anon/);
-  assert.match(migration, /grant execute on function public\.persist_curriculum_learning_cycle[\s\S]*?to authenticated/);
-  assert.match(migration, /add constraint curriculum_decision_trace_json_shapes_check/);
-  assert.doesNotMatch(migration, /grant\s+(?:insert|update|all)[\s\S]{0,120}?public\.student_evidence\s+to authenticated/i);
+test('learning-cycle persistence is atomic, idempotent and invoker-scoped by RLS', () => {
+  assert.match(writeBoundaryMigration, /create or replace function public\\.persist_curriculum_learning_cycle/);
+  assert.match(writeBoundaryMigration, /security invoker[\\s\\S]*?set search_path = ''/);
+  assert.match(writeBoundaryMigration, /pg_catalog\\.set_config\\([\\s\\S]*?app\\.pacogo_learning_cycle_write/);
+  assert.match(writeBoundaryMigration, /set_config\\('app\\.pacogo_learning_cycle_write', '', true\\)/);
+  assert.match(writeBoundaryMigration, /private\\.is_learner_guardian\\(p_student_key\\)/);
+  assert.match(writeBoundaryMigration, /on conflict \\(student_key, source_event_id\\)/);
+  assert.match(writeBoundaryMigration, /create policy student_evidence_insert_guardian_cycle/);
+  assert.match(writeBoundaryMigration, /create policy student_longitudinal_state_update_guardian_cycle/);
+  assert.match(writeBoundaryMigration, /grant insert on public\\.student_evidence to authenticated/);
+  assert.match(writeBoundaryMigration, /grant insert, update on public\\.student_longitudinal_state to authenticated/);
+  assert.match(writeBoundaryMigration, /revoke all on function public\\.persist_curriculum_learning_cycle[\\s\\S]*?from public, anon/);
+  assert.match(writeBoundaryMigration, /grant execute on function public\\.persist_curriculum_learning_cycle[\\s\\S]*?to authenticated/);
+  assert.doesNotMatch(writeBoundaryMigration, /security definer/i);
 });
 
 test('migration refuses to invent mappings for orphan learner keys', () => {
@@ -71,5 +79,7 @@ test('database integration test covers two isolated parent accounts and rollback
   assert.match(databaseTest, /Evidence survived a failed learning-cycle transaction/);
   assert.match(databaseTest, /Longitudinal state changed despite failed learning-cycle transaction/);
   assert.match(databaseTest, /Anonymous role retains learner-data table privileges/);
+  assert.match(databaseTest, /Direct evidence insert unexpectedly succeeded/);
+  assert.match(databaseTest, /Learning-cycle write capability leaked after RPC return/);
   assert.match(databaseTest, /rollback;/i);
 });

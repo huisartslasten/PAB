@@ -891,3 +891,14 @@ This section supersedes earlier handoff statements that describe the executable 
 - This means no B1 evidence/history rows currently exist in those TEST tables, but the runtime still pins the B1 route to v0.4 and the catalogue to v0.4. The registry v0.6 is not available in TEST yet. Do not switch the route/catalogue until registry registration and runtime compatibility are deliberately designed and verified.
 - No database writes, migrations, or schema changes were made.
 - The B1 coverage specification now records the registry comparison, route pinning and TEST read-only audit.
+
+
+### B1 runtime capability audit — 2026-11-05
+- Full Regression #2989 / run ID `42026197894` is GREEN on exact pre-audit commit `180b0a0b5fe4929d66fb78d79cff4de49f5a8e78`. This verified the preceding handoff and B1 TEST-audit documentation. It does not yet verify the runtime-audit documentation commit below.
+- Inspected `curriculum-b1-learner.html`, `pacogo-engine/addition-controller.js`, `addition-learning-interface-contract.js`, `addition-learning-interface.js` and `browser-vertical-slice.js`.
+- Current addition interface only accepts `quantity_groups` and `symbolic_expression`. Renderer currently shows quantity dots or a symbolic equation and an integer-step answer input. It has no number-line, decimal-place, money-context, estimation/checking or strategy-selection UI.
+- Controller has internal strategy/prompted-example recording methods, but the current route supplies no strategy options and the current renderer cannot invoke these interactions. Controller observation currently hardcodes `independent: true` and prompt level `none`; this cannot substantiate ET7 or prompted-vs-independent distinctions.
+- Therefore new catalogue entries alone would be misleading for decimal, strategy, checking, representation-conversion, independence, robustness or transfer claims. These need end-to-end learner interaction and observation contracts first.
+- Added a runtime capability audit to `PacoGO_B1_Task_Coverage_Specification_v0.1.md`. It is design documentation only; no runtime/catalogue/route/database/Supabase changes were made.
+- Next step: create B1 task-level traceability + interaction contract, then choose the smallest complete vertical slice. D3/D4 tasks must wait until their evidence is actually captured. Do not widen the catalogue by adding tasks the UI cannot faithfully execute.
+- Documentation commit for runtime audit: `0f82e7dd6004b58412aa22db46561bf923b78ce6`; Full Regression for this commit is pending.

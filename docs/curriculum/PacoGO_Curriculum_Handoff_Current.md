@@ -550,3 +550,56 @@ A read-only inspection of PacoGO TEST found 13 enabled `public.skill_definitions
 **Next concrete step:** continue the canonical SLO learner experience and build a complete legacy-module dependency inventory before any deletion. Keep this as a product/architecture decision; no legacy routes, skill data, Supabase schema or learner records have been deleted or changed yet.
 
 **Latest verified engineering baseline:** branch `refactor/professional-v1`, commit `8f29b5c54d9332e2500827c877144296f16d019f`, Full Regression #2911 / ID `41952974495`, **GREEN**. The handoff update documenting this decision requires its own Full Regression.
+
+## 23. Learner ownership and persistence implemented in TEST
+
+This section supersedes the earlier "no database changes" status in Sections 20–21. The ownership/persistence contract is now implemented in the repository and applied to **PacoGO TEST only**. LIVE was not modified.
+
+### Implemented architecture
+
+- `public.learner_profiles` stores a display label separately from the opaque UUID-string `learner_key). The curriculum engine continues to receive `student_key` as a string.
+- `public.learner_guardians` ties a learner to an authenticated `auth.users` account. Profile creation creates the initial owner membership atomically. Client-side membership insertion/update/deletion is closed. Additional guardians require a separately designed invitation flow.
+- Existing `student_evidence`, `student_longitudinal_state` and `curriculum_decision_trace` now reference learner profiles. Migration preflight stops rather than guessing if any old key lacks a profile. At migration time all three tables had zero rows.
+- RLS read access is scoped to linked guardians. Evidence and decision traces are append-only to normal clients. Longitudinal state is readable by linked guardians and can be written only through the atomic learning-cycle operation.
+- `public.persist_curriculum_learning_cycle` is SECURITY INVOKER. It validates current guardian membership and writes evidence, longitudinal state and decision trace atomically with idempotency by `source_event_id`. A transaction-local write context allows the function's RLS-protected writes and is explicitly cleared on both success and error. Direct writes outside that operation are denied.
+- Narrow SECURITY DEFINER helper/trigger functions are placed in the non-exposed `private` schema. The public persistence RPC is not SECURITY DEFINER.
+- Normal clients have no DELETE privilege for learner profiles or learner history. Retention, correction and deletion flows must be designed before production use.
+
+### Repository migrations
+
+- `supabase/migrations/20261105024754_add_learner_ownership_and_rls.sql`
+- `supabase/migrations/20261105030000_switch_learning_cycle_to_invoker.sql`
+- `supabase/migrations/20261105040000_clear_learning_cycle_capability_on_error.sql`
+- `supabase/migrations/20261105030001_factor_learner_write_context_policy.sql`
+
+Applied TEST migration history:
+
+- `20261105024754` — `add_learner_ownership_and_rls`
+- `20261105025422` — `switch_learning_cycle_to_invoker`
+- `20261105025725` — `clear_learning_cycle_capability_on_error`
+- `20261105030018` — `factor_learner_write_context_policy`
+
+### Verification
+
+- SQL integration test: `supabase/tests/learner_ownership_rls.test.sql`.
+- Two synthetic parent accounts and two synthetic learners were used.
+- Verified: both parents can read only their own learner/data; cross-guardian persistence is denied; direct membership self-enrollment is denied; direct table writes and learner-key reassignment are denied; anonymous table privileges are absent; duplicate event replay is idempotent; a failed learning-cycle write leaves no partial evidence/state/trace.
+- All fixtures ran inside a transaction and were rolled back. Post-test counts are zero for synthetic auth users, learner profiles, guardian memberships, evidence, longitudinal state and decision traces.
+- Security Advisor no longer reports the new public persistence RPC as SECURITY DEFINER. Remaining SECURITY DEFINER warnings relate to pre-existing game-access/test-history functions; leaked-password protection remains a pre-existing Auth warning and was not changed here.
+- The four new write-context RLS performance warnings were removed by factoring the request-constant predicate into a private helper. Remaining advisor findings are pre-existing.
+
+### Remaining work and gates
+
+1. Build the authenticated application adapter that provisions profiles through `create_learner_profile`, uses opaque learner keys instead of display names for evidence, and calls `persist_curriculum_learning_cycle`. The current browser learner route is still session-only and is not yet connected to Supabase.
+2. Test the adapter and full learner cycle using synthetic accounts before any real learner data is used.
+3. Design additional-guardian invitations, account recovery, correction, deletion and retention before production.
+4. Continue completing the existing SLO skills along their full developmental lines and retire the legacy Skills/Skill Editor only after dependency and data-history checks. The old countdown clock is not the default skill interaction; time pressure remains an optional task mode.
+5. Keep the new SLO registry, skill/development/claim/task contracts and Learning Interfaces. Do not remove them as part of legacy-module retirement.
+
+### Engineering baseline before this handoff update
+
+- Branch: `refactor/professional-v1`
+- Commit: `bf08558b4ec02ce1b5f787008db3cfe0ae4ca0c3`
+- Full Regression #2932 / ID `41958684853`: **GREEN**.
+- The contract document update and this handoff update are repository changes and require their own Full Regression.
+- `main` remains LIVE and untouched.

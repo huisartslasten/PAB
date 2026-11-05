@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import registryConfig from '../docs/curriculum/PacoGO_Curriculum_Registry_v0.2.json' with { type: 'json' };
+import registryConfig from '../docs/curriculum/PacoGO_Curriculum_Registry_v0.3.json' with { type: 'json' };
 import catalogue from '../docs/curriculum/PacoGO_B1_Learner_Task_Catalogue_v0.1.json' with { type: 'json' };
 import { createCurriculumRegistry } from './curriculum-registry.js';
 

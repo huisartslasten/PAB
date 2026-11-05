@@ -141,6 +141,12 @@ Do not update this pointer mechanically. Before a catalogue revision or learner-
 - decide whether compatibility requires preserving the v0.4 route or migrating/reconciling state through an explicit designed path;
 - update the route, catalogue and tests together only after the persistence/runtime contract is understood.
 
+TEST read-only verification (2026-11-05):
+- `pacogo-curriculum` versions registered in TEST are 0.2.0-seed, 0.3.0-candidate, 0.4.0-candidate and 0.5.0-candidate. Registry 0.6.0-candidate is not registered in TEST.
+- B1-linked rows in `student_evidence`, `student_longitudinal_state` and `curriculum_decision_trace` were zero for every registered version queried.
+- This removes the immediate risk of existing B1 evidence rows being stranded in TEST, but it does not make a version switch safe by itself: 0.6 must first be registered, and route/runtime/version integration still requires a deliberate change and regression.
+- No writes or migrations were performed. The query was read-only and scoped to PacoGO TEST.
+
 No Supabase change is implied by this specification.
 
 ## 9. Acceptance criteria for the next design step

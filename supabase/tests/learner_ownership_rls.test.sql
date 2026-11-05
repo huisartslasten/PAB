@@ -67,6 +67,31 @@ select public.persist_curriculum_learning_cycle(
   '{"observation_ids":[],"inference":{"status":"insufficient"},"decision":{"next_action":"continue"}}'::jsonb
 );
 
+-- Parent B also sees only its own learner and records.
+do $
+begin
+  if not exists (
+    select 1 from public.learner_profiles
+    where learner_key = current_setting('test.learner_b')
+  ) or exists (
+    select 1 from public.learner_profiles
+    where learner_key = current_setting('test.learner_a')
+  ) then
+    raise exception 'Parent B learner-profile isolation failed';
+  end if;
+
+  if not exists (
+    select 1 from public.student_evidence
+    where student_key = current_setting('test.learner_b')
+  ) or exists (
+    select 1 from public.student_evidence
+    where student_key = current_setting('test.learner_a')
+  ) then
+    raise exception 'Parent B evidence isolation failed';
+  end if;
+end;
+$;
+
 -- Parent A sees its own learner and data, but cannot see Parent B's learner or data.
 do $$
 begin

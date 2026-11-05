@@ -46,7 +46,7 @@ test('B5 learner route completes twelve process-aware tasks and persists observa
   'B5-L06':{steps:{parentheses:11},answer:44},
   'B5-L07':{steps:{division:9,multiplication:18},answer:27},
   'B5-L08':{steps:{multiplication:48},answer:52},
-  'B5-L12':{steps:{cards:24,spent:28},answer:2,check_answer:30}
+  'B5-L12':{steps:{cards:24,spent:28},answer:2,check_method:'recalculate',check_answer:28}
  };
  const expectedTaskIds=[...Object.keys(choiceAnswers),...Object.keys(processAnswers)].sort();
  expect([...taskIds].sort()).toEqual(expectedTaskIds);
@@ -62,7 +62,7 @@ test('B5 learner route completes twelve process-aware tasks and persists observa
     const prompt=taskPrompts[id];await page.getByLabel(prompt).fill(String(value));
    }
    await page.getByLabel('Eindantwoord').fill(String(data.answer));
-   if(data.check_answer!==undefined){await page.getByRole('button',{name:'Terugrekenen: uitgaven + wisselgeld',exact:true}).click();await page.getByLabel('Tel je uitgaven en je wisselgeld bij elkaar op. Wat is het totaal?').fill(String(data.check_answer));}
+   if(data.check_answer!==undefined){const methodLabel=data.check_method==='recalculate'?'De uitgaven opnieuw berekenen':'Terugrekenen: uitgaven + wisselgeld';const methodPrompt=data.check_method==='recalculate'?'Bereken de totale uitgaven opnieuw. Hoeveel kosten de kaartjes en snack samen?':'Tel de totale uitgaven en het wisselgeld bij elkaar op. Welk bedrag krijg je?';await page.getByRole('button',{name:methodLabel,exact:true}).click();await page.getByLabel(methodPrompt).fill(String(data.check_answer));}
   }
   await page.getByRole('button',{name:'Controleren',exact:true}).click();
   await expect(page.locator('#feedback')).toContainText('antwoord is opgeslagen');
@@ -74,6 +74,6 @@ test('B5 learner route completes twelve process-aware tasks and persists observa
  expect(saved.profiles).toHaveLength(1);expect(saved.evidence).toHaveLength(12);expect(saved.states).toHaveLength(1);expect(saved.traces).toHaveLength(12);
  expect(saved.evidence.every(x=>x.skill_id==='B5'&&x.student_key===learnerKey)).toBe(true);
  expect(saved.evidence[4].observation.response.submitted_steps).toEqual({first:8});
- expect(saved.evidence[11].observation.response.submitted_check_answer).toBe(30);
+ expect(saved.evidence[11].observation.response.submitted_check_answer).toBe(28);expect(saved.evidence[11].observation.response.expected_check_answer).toBe(28);expect(saved.evidence[11].observation.response.check_method_id).toBe('recalculate');
  expect(errors).toEqual([]);
 });

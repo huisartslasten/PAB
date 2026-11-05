@@ -524,3 +524,29 @@ Design candidate created: docs/curriculum/PacoGO_Learner_Ownership_and_Persisten
 Latest verified baseline before the contract document: commit 06c3f93bba20fd0117d328c42a44be231c18ec18, Full Regression #2909 / 41952400604, GREEN. The contract and handoff commits require their own Full Regression.
 
 Next step: review the contract, then re-inspect TEST and implement the membership schema and access tests. No real learner records in engineering tests.
+
+## 22. Canonical SLO skills and retirement of legacy Skills module
+
+The product owner clarified the intended skills architecture:
+
+- The **new SLO-based curriculum skills remain** and become the sole canonical skills structure in PacoGO. They must follow the complete SLO developmental line, not only the learner's current school level or a short practice range.
+- The existing legacy Skills module and its legacy Skill Editor are obsolete and are to be retired. They must not remain as a parallel way to define, edit, assign or track skills.
+- The legacy exercise presentation built around a continuously decreasing countdown clock is no longer the default interaction model. Time pressure is an optional future practice/challenge mode, not a defining property of a skill, a required learner condition, or a mastery criterion.
+- A curriculum skill describes the learning objective and its developmental progression. The engine's developments, claims, tasks, evidence and mastery contracts remain authoritative. Learning Interfaces and task variants provide multiple pedagogical and interaction forms for the same skill/development.
+- Do not remove the new curriculum skills, registry, task contracts, or Learning Interface work when retiring the legacy module.
+
+### Legacy data and migration boundary
+
+A read-only inspection of PacoGO TEST found 13 enabled `public.skill_definitions`, 37 `public.skill_assignments` (28 enabled), and 3 assignments whose `skill_id` has no matching definition. The current legacy UI/runtime includes `skills.html`, `skill-create.html`, `skill-editor.html` and management runtimes. These data are not to be deleted blindly: first identify any useful source content, determine whether any legacy assignments/results are still referenced by active learner journeys, and map only what is semantically compatible to the SLO registry. Preserve historical records where deletion would lose useful history. No Supabase writes or schema changes were made during this inspection.
+
+### Retirement sequence
+
+1. Inventory all legacy skill routes, navigation links, runtime entry points, database readers/writers, assignments and dependent reporting/game flows.
+2. Establish the replacement learner route and the SLO-skill developmental-line coverage needed before removing learner-facing access.
+3. Remove legacy skill creation/editing and parallel assignment pathways from the application; retain or migrate data only under an explicit compatibility plan.
+4. Verify that timer behavior is optional and isolated to a task/practice mode; it must not affect evidence assessment or mastery unless an existing approved task contract explicitly defines a timed condition.
+5. Remove legacy schema/data only after dependency and historical-data checks, with TEST-only migration and regression verification. Never modify LIVE as part of this work.
+
+**Next concrete step:** continue the canonical SLO learner experience and build a complete legacy-module dependency inventory before any deletion. Keep this as a product/architecture decision; no legacy routes, skill data, Supabase schema or learner records have been deleted or changed yet.
+
+**Latest verified engineering baseline:** branch `refactor/professional-v1`, commit `8f29b5c54d9332e2500827c877144296f16d019f`, Full Regression #2911 / ID `41952974495`, **GREEN**. The handoff update documenting this decision requires its own Full Regression.

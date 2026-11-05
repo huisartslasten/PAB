@@ -687,3 +687,59 @@ This section supersedes Section 24's statement that the B1 route is the only aut
 - Before any parent-facing mastery display, implement and validate the C6 mastery protocol and its explicit coverage/scope requirements. Current runtime mastery parameters remain prototype-only.
 - Continue the legacy Skills/Skill Editor dependency and history inventory before retiring legacy routes or data.
 - Multi-guardian invitations, account recovery, correction, deletion and retention remain open before production.
+
+
+## 26. B3 Vermenigvuldigen and Quantity Representation interface
+
+This section supersedes Section 25's next-step priority of building B3 and its statement that the executable registry contains four skills. B3 is now implemented as a candidate skill model and authenticated practice route. The SLO mapping remains the source of truth; it is not being redone.
+
+### Curriculum model
+
+- Added `B3 Vermenigvuldigen` to `docs/curriculum/PacoGO_Curriculum_Registry_v0.4.json`.
+- B3 contains seven candidate developments, seven claims, fourteen evidence targets and seven task models.
+- The developmental line covers: equal quantities, equal groups and arrays, multiplicative relationships, structuring products, larger whole numbers, decimal numbers/representations, and flexible/controlled multiplication.
+- Repeated addition is an early representation of equal groups, not the full definition or endpoint of multiplication.
+- Multiplicative structure, factors and product remain central. Tables/product fluency, doubling, halving, decomposition and compensation are knowledge/strategies within B3, not separate skills.
+- B3 and B4 are distinct skills with a strong inverse relationship; neither is encoded as a rigid prerequisite for the other. B1 supports the additive-to-multiplicative transition. B5 remains a separate integrative skill.
+- Development order remains a candidate hypothesis, not an empirically established linear sequence. Registry mastery parameters remain prototype-only.
+
+### Quantity Representation Learning Interface
+
+- Added the reusable Quantity Representation interface for equal groups and rectangular arrays.
+- The architecture separates the pure pedagogical/function model (`quantity-representation-model.js`), visual renderer (`quantity-representation-renderer.js`) and stable composition entry point (`quantity-representation-interface.js`).
+- The first implementation is display-only: groups/arrays are rendered accessibly, while B3's controller owns answer/strategy/check events and observation construction. The interface does not score, choose evidence targets or infer mastery.
+- Added `docs/curriculum/PacoGO_Quantity_Representation_Interface_Design_v0.1.md`. Future manipulation must add a separate interaction/state layer; it must not entangle pedagogical configuration with rendering. The separation supports future Deluxe renderer replacement.
+
+### Learner route
+
+- Added `curriculum-b3-learner.html` with parent authentication, profile selection/creation, prior-state loading and atomic persistence through the existing learner service.
+- Fourteen practice tasks cover all seven B3 developments. The first six use equal-group or array visuals; later tasks use direct numeric answers. Strategy selection is required only for structural/flexible tasks, and checking is required only for the final flexible tasks. No countdown timer was added.
+- Added `pacogo-engine/multiplication-controller.js` and controller tests.
+- B1, B2 and B3 learner routes now all use registry `0.4.0-candidate`, link to the other active practice routes, and share the same authenticated learner persistence contract.
+- Browser regression covers the B3 profile flow, all fourteen tasks, visual group/array counts, strategy/check capture and persistence of fourteen synthetic learning cycles. It uses a test double and creates no real learner data.
+
+### Supabase TEST registration
+
+- Added `pacogo-curriculum@0.4.0-candidate` to PacoGO TEST only.
+- Row ID: `f4b7b7e1-8d28-45de-9a6b-3c51f9d2a4e7`.
+- Supersedes `0.3.0-candidate` (row `f7feaed6-f46f-445b-838c-c1f3dad9d749`).
+- Source: `docs/curriculum/PacoGO_Curriculum_Registry_v0.4.json`.
+- SHA-256 of exact source file: `7aaea07eb7d9d0b6b895f46ca1b99c4b8229505556d7313f023cad8994ce5132`.
+- TEST read-back confirms five skill models and B3 presence. No schema migration was required.
+- Learner profiles, guardian links, evidence, longitudinal state and decision traces remain at zero rows. No real learner data has been created. LIVE was not touched.
+
+### Verification
+
+- Full Regression #2947 / run ID `41963789534`, exact route commit `de69ddfaca4f12924fc8ebce64b70b5aef5654e4`: **GREEN**, including B3 browser regression.
+- Full Regression #2948 / run ID `41964073687`, exact interface-separation commit `995ae42b15c401902f2466a468a1d34162ca7522`: **GREEN**, including Node, Vitest, architecture and browser regression.
+- Branch: `refactor/professional-v1`. `main` remains LIVE and unchanged at `9ddb18aaafec265f2239bb68b05723468c5607f9`.
+
+### Current implementation and next step
+
+- The complete SLO mapping remains the source of truth. The executable registry currently contains five skill models: A1, B1, B2, B3 and FR2. Continue implementing the remaining mapped skills; do not repeat the SLO mapping.
+- B1 has a three-task operational practice slice; B2 and B3 each have fourteen-task operational practice catalogues. These are candidate practice implementations, not empirical validation or a complete grade-six recovery curriculum.
+- Next concrete curriculum build: **B4 Delen**, preserving its full developmental line and its strong inverse relationship with B3 without creating a rigid prerequisite.
+- B5 remains the separate integrative skill for combining and structuring operations.
+- Before any parent-facing mastery display, implement and validate the C6 mastery protocol and explicit coverage/scope requirements. Current runtime mastery parameters remain prototype-only.
+- Continue the legacy Skills/Skill Editor dependency and history inventory before retiring legacy routes or data.
+- Multi-guardian invitations, account recovery, correction, deletion and retention remain open before production.

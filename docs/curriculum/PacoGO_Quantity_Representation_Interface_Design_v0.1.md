@@ -68,3 +68,17 @@ The first browser integration verifies the visual group/cell counts, accessible 
 - Add alternate renderers without changing the quantity model contract.
 - Evaluate whether the same interface can support addition, subtraction, division and area contexts without conflating their task meanings.
 - Validate accessibility, visual clarity and learner interpretation with real users before treating the interface as scientifically validated.
+
+
+## 6. Implementation addendum — B3 first reusable quantity renderer
+
+The first implementation is in use in `curriculum-b3-learner.html`:
+
+- The pure model and visual renderer are separate modules, exposed through the stable interface entry point.
+- Equal groups render as distinct groups of dots; arrays render as a row/column grid. Both preserve the two factors and the total in the pedagogical model.
+- The renderer is display-only. B3's controller separately records the learner's numeric answer, selected strategy where required, selected check method where required, and task-bound events.
+- The B3 browser regression covers six model-based tasks and eight symbolic tasks, then verifies persistence for all fourteen tasks.
+- Full Regression #2947 / ID `41963789534` on route commit `de69ddfaca4f12924fc8ebce64b70b5aef5654e4`: **GREEN**.
+- The pure-model/renderer separation was verified by Full Regression #2948 / ID `41964073687` on commit `995ae42b15c401902f2466a468a1d34162ca7522`: **GREEN**.
+
+The visual implementation is a technical/pedagogical candidate. Accessibility, clarity and learning effects still require evaluation with real learners; browser fixtures are not empirical validation.

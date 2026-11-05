@@ -132,7 +132,29 @@ export function createDashboardRuntime({ app, templateMount, chooserMount, conte
     if (!subjectGrid.children.length) { const empty = documentRef.createElement('div'); empty.className = 'dashboard-state'; empty.style.marginTop = '15px'; empty.textContent = `Nog geen actieve lessen voor ${selectedStudent}.`; subjectsCard.appendChild(empty); }
     else subjectsCard.appendChild(subjectGrid);
 
+    const curriculumPracticeCard = documentRef.createElement('article');
+    curriculumPracticeCard.className = 'dashboard-card';
+    const curriculumPracticeHeading = documentRef.createElement('h2');
+    curriculumPracticeHeading.textContent = 'Rekenen oefenen';
+    const curriculumPracticeGrid = createPacoTileGrid({ documentRef });
+    curriculumPracticeGrid.style.marginTop = '15px';
+    const fractionPreviewTarget = buildViewUrl('curriculum-fr2-fractions.html', {
+      student: selectedStudent,
+      mode: context.mode
+    });
+    curriculumPracticeGrid.appendChild(createPacoTile({
+      documentRef,
+      title: 'Breuken',
+      description: 'Bekijk een eerste interactieve oefening over gelijkwaardige breuken.',
+      icon: '½',
+      meta: 'Voorbeeld · voortgang nog niet opgeslagen',
+      actionLabel: 'Bekijk voorbeeld →',
+      onActivate: () => documentRef.defaultView.location.assign(fractionPreviewTarget.toString())
+    }));
+    curriculumPracticeCard.append(curriculumPracticeHeading, curriculumPracticeGrid);
+
     main.appendChild(renderAgenda(agendaItems));
+    main.appendChild(curriculumPracticeCard);
     main.appendChild(subjectsCard);
     const challenges = renderChallenges(availableChallenges, lessonMap);
     if (challenges) main.appendChild(challenges);

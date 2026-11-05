@@ -1166,3 +1166,27 @@ Voer de dependency-audit uit van de oude Skills-implementatie: inventariseer imp
 - Full Regression #3016 / run ID `42104475497`: completed GREEN op exact commit `60da68d22845442ffc183add4c40ed6a825b74f7`.
 - De handoff met deze bevindingen is inhoudelijk geverifieerd op die commit.
 - Er is geen applicatiecode of database aangepast in deze auditstap.
+
+
+## 38. Legacy Skills data disposition plan v0.1 — 2026-11-05
+
+### Regression baseline
+- Full Regression #3017 / run ID `42109605705`: completed GREEN op exact commit `38e61e26facc1d39ce56b07f48be4ffd3bbc4cdc`.
+
+### Ontwerp vastgelegd
+- Nieuw ontwerpdocument: `docs/curriculum/PacoGO_Legacy_Skills_Data_Disposition_Plan_v0.1.md`.
+- Standaardbesluit: legacy Skills-data blijft dormant en ongewijzigd in de bestaande tabellen; dataretirement is geen voorwaarde om de oude learner-appcode uit te faseren.
+- De 13 definities en 37 assignments zijn als aparte datacategorieën beschreven. Custom `optellen tot 30` en `Breuken` blijven herkenbaar; de drie `math-mixed`-orphan assignments blijven behouden en expliciet unresolved.
+- Geen automatische mapping naar A1/B1/FR2; geen vermenging met curriculum-engine `skill_id`-contracten.
+- Shared game data, game-access tabellen, historische migraties en curriculum learner-state blijven buiten scope.
+- Het document definieert een lossless backup/restore protocol en gefaseerde retirement. Geen export is uitgevoerd; geen DDL/DML is uitgevoerd.
+
+### Grenzen en open punten
+- De volledige branch-specifieke code dependency scan is nog niet afgerond; GitHub code search dekt alleen de default branch en is hiervoor geen bewijs.
+- De database audit moet voor een eventuele fysieke dataretirement nog object-/trigger-/policy-/view-/function-afhankelijkheden volledig controleren.
+- Retentie, restricted backup-locatie en eventuele latere handmatige curriculumbeoordeling van custom Skills zijn open beslissingen.
+- Volgende concrete stap: complete current-branch dependency proof uitvoeren vóór verwijdering van services, math modules of tests.
+
+### Verificatie
+- Ontwerpdocument en deze handoff-wijziging worden geverifieerd met Full Regression op de resulterende commit.
+- Branch blijft `refactor/professional-v1`; LIVE `main` en productie-Supabase blijven onaangeroerd.

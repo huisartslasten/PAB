@@ -883,3 +883,11 @@ This section supersedes earlier handoff statements that describe the executable 
 - The B1 learner route nevertheless explicitly fetches registry file v0.4 and resolves the registered version using the catalogue's `0.4.0-candidate` value. That version is also passed to learner-history loading and persistence. The pointer is therefore an active runtime/persistence contract, not merely descriptive metadata.
 - Before changing B1 to registry v0.6, inspect TEST registration/read-back for v0.6 and existing B1 evidence/history by registry version. Determine whether switching versions would split or strand history. Preserve v0.4 compatibility or design an explicit migration/reconciliation path; do not silently switch the route.
 - The B1 coverage specification was amended to record this finding. No route, catalogue, registry or Supabase changes were made.
+
+
+### PacoGO TEST version/history read-only audit
+- Supabase TEST project was inspected read-only. Registered `pacogo-curriculum` versions are `0.2.0-seed`, `0.3.0-candidate`, `0.4.0-candidate` and `0.5.0-candidate`; `0.6.0-candidate` is not registered in TEST at this point.
+- B1-linked row counts in `student_evidence`, `student_longitudinal_state` and `curriculum_decision_trace` were zero for each registered version queried.
+- This means no B1 evidence/history rows currently exist in those TEST tables, but the runtime still pins the B1 route to v0.4 and the catalogue to v0.4. The registry v0.6 is not available in TEST yet. Do not switch the route/catalogue until registry registration and runtime compatibility are deliberately designed and verified.
+- No database writes, migrations, or schema changes were made.
+- The B1 coverage specification now records the registry comparison, route pinning and TEST read-only audit.

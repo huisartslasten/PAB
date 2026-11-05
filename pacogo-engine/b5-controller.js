@@ -17,7 +17,7 @@ export function createB5Controller({task,studentKey,renderer={},provenance={}}){
  if(processRequired&&!steps.length)throw new TypeError('A process-required B5 task needs process_steps.');
  if(checkRequired&&(!checkMethods.length||!Number.isFinite(Number(task.expected_check_answer))))throw new TypeError('A check-required B5 task needs check methods and an expected check answer.');
  if(task.response_type==='choice'&&!choices.length)throw new TypeError('A choice B5 task needs choice_options.');
- const instance=createTaskInstance({taskId:task.task_id,taskModelId:task.task_model_id,skillId:task.skill_id,developmentId:task.development_id,claimId:task.claim_id,evidenceTargetIds:task.evidence_target_ids,taskDefinitionVersion:'0.3'});
+ const taskInstance=createTaskInstance({taskId:task.task_id,taskModelId:task.task_model_id,skillId:task.skill_id,developmentId:task.development_id,claimId:task.claim_id,evidenceTargetIds:task.evidence_target_ids,taskDefinitionVersion:'0.3'});
  const events=[],startedAt=Date.now();let selectedCheck=null,submitted=false;
  const record=(eventType,payload)=>events.push(createInteractionEvent({taskInstanceId:instance.task_instance_id,eventType,at:new Date().toISOString(),payload}));
  record('task_presented',{expression:task.expression||task.display_expression,response_type:task.response_type,response_process_required:processRequired,check_required:checkRequired});

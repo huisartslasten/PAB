@@ -397,8 +397,8 @@ This is a small synthetic feasibility exercise only. It does not establish human
 ## 17. Zyon-first delivery plan and initial learner interaction policy (2026-11-04)
 
 The product owner confirmed that the immediate goal is to make PacoGO usable so Zyon can begin strengthening his mathematics. Zyon is currently halfway through group 6. The practical priority is to help him recover and strengthen the relevant arithmetic skills, not to extend design/research work unnecessarily.
-### Product decisions for the initial operational version
 
+### Product decisions for the initial operational version
 - The already fully developed SLO curriculum remains the source of truth. Do not redo, rewrite, restructure or reinterpret the existing SLO goals, skills, developments, claims, evidence targets or mastery criteria.
 - For the initial learner experience, learners are **not required to explain or justify every answer**. PacoGO should accept ordinary answer/performance evidence from relevant tasks.
 - Evidence should accumulate across multiple relevant tasks and variants. Repeated successful performance can contribute stronger evidence over time; one correct answer must not automatically award mastery. Existing mastery criteria and decision contracts remain authoritative and must not be replaced with an invented shortcut.
@@ -797,8 +797,7 @@ This section supersedes Section 26's next-step priority of building B4. B4 is no
 Deze sectie actualiseert de status na B4. B5 is nu als afzonderlijke candidate skill en geauthenticeerde learner-practice route gebouwd. De bestaande SLO-mapping blijft leidend; deze implementatie wijzigt geen goedgekeurde curriculumdoelen, claims, evidence targets of masterycriteria.
 
 ### Curriculum en oefencatalogus
-- Registry: `docs/curriculum/PacoGO_Curriculum_Registry_v0.6.json`, versie `0.6.0-candidate`.
-- B5 bevat zes kandidaatontwikkelingen (B5.D1–B5.D6), zes claims (B5.C1–B5.C6), twaalf evidence targets (B5.ET1–B5.ET12) en zes task models (B5.TM1–B5.TM6).
+- Registry: `docs/curriculum/PacoGO_Curriculum_Registry_v0.6.json`, versie `0.6.0-candidate`.- B5 bevat zes kandidaatontwikkelingen (B5.D1–B5.D6), zes claims (B5.C1–B5.C6), twaalf evidence targets (B5.ET1–B5.ET12) en zes task models (B5.TM1–B5.TM6).
 - Afzonderlijke oefencatalogus: `docs/curriculum/PacoGO_B5_Learner_Task_Catalogue_v0.5.json`, met twaalf taken, twee per ontwikkeling. De catalogus heeft eigen schema_version `0.5` en verwijst expliciet naar registry `0.6.0-candidate`; dit zijn twee afzonderlijke versienummers.
 - B5 oefent het herkennen en representeren van samengestelde bewerkingen, rekenvolgorde, uitvoering met tussenresultaten, gelijkwaardige herstructurering en flexibele controle.
 - B5-L05 controleert expliciet links-naar-rechts rekenen bij bewerkingen met gelijke voorrang.
@@ -1195,9 +1194,9 @@ Voer de dependency-audit uit van de oude Skills-implementatie: inventariseer imp
 ### Exact-branch inventory completed
 Audited the current branch at commit `9657fed4c65177fc8f607f90732588c87f74fa9f` across:
 - 351 production/source JavaScript and MJS files;
-- 64 HTML pages;- 193 JavaScript/MJS/TypeScript test files;
+- 64 HTML pages;
+- 193 JavaScript/MJS/TypeScript test files;
 - all 57 Supabase SQL migrations.
-
 The scan covered the legacy table names, old service names and constructors, old runtime/page names, legacy math-session helpers and `math-skill-` game keys.
 
 ### Findings and classification

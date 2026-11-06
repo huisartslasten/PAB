@@ -1921,3 +1921,54 @@ Design and test a canonical multi-target evidence contract: how one learner inte
 - Starting commit for this finding: `e7c6bdf553b99a1a03b6bcc770921ec200fe7c49`.
 - Full Regression #3054 / run ID `42268591207`: GREEN on that exact starting commit; all 19 workflow steps completed successfully, including browser regression and clean-tree verification.
 - This handoff update itself requires Full Regression on its resulting exact commit. No post-update GREEN status is claimed until that run completes.
+
+
+
+## 58. B1 multi-target readiness review and verified gate — 2026-11-06
+
+### Regression gate completed before further design work
+- Branch: `refactor/professional-v1`.
+- Handoff finding commit: `e68f7aeb0f363699508f1ee838c41e589157880a`.
+- Full Regression #3055 / run ID `42271228515`: GREEN on that exact handoff commit.
+- Verification-only commit with the same tree: `9b0ba488f0fee3dc06f160fa32ac974055c63bf0`.
+- Full Regression #3056 / run ID `42272241927`: GREEN on that exact branch HEAD; all 19 workflow steps passed, including Node, Vitest, Chromium/browser regression and clean-working-tree verification.
+- LIVE `main` was not changed.
+
+### Existing design work located — do not recreate
+The branch already contains the following candidate design work:
+- `PacoGO_Multi_Target_Task_Evidence_Contract_v0.1.md`;
+- `PacoGO_Multi_Target_Evidence_Architecture_Reconciliation_v0.1.md`;
+- `PacoGO_Observation_Cardinality_Legacy_Compatibility_Decision_v0.1.md`;
+- `PacoGO_Integrated_Multi_Target_Decision_Contract_v0.2.md`;
+- `PacoGO_Multi_Target_Decision_Review_v0.1.md`;
+- `PacoGO_C3_Canonical_Codebook_Reconciliation_Proposal_v0.2.md`;
+- `PacoGO_Scope_and_Time_Window_Lifecycle_Contract_v0.1.md`;
+- C6, C7, C8 v0.2 and C9 v0.2 protocol/design files.
+
+The accepted logical direction in the candidate documents is one immutable raw observation per separately administered attempt, linked to zero or more separately justified target assessments. Target assessments retain their registry-resolved claim/development ownership. Shared source-observation identity prevents target expansion from inflating independent-observation counts.
+
+These documents remain proposals requiring owner review. In particular, the integrated v0.2 contract is explicitly NOT approved for implementation; its O1–O9 decisions remain open. C3 v0.2, scope/time-window v0.1, C8 v0.2 and C9 v0.2 also remain unapproved design proposals. Do not treat their presence or recommendations as approval.
+
+### Current implementation gaps reconfirmed
+- `createTaskInstance` stores a primary scalar claim/development and an evidence-target array.
+- `createObservation` exposes only the first target as scalar `evidence_target_id`.
+- `curriculum-registry.js` assesses relevance against one scalar target.
+- `prototype.js` emits one assessment/evidence projection, one skill-cycle development/mastery result and one next-action result.
+- `learner-curriculum-service.js` reads/writes one skill-scoped state and sends scalar claim/development/target columns alongside JSONB observation/assessment payloads.
+- The current product persistence/read path therefore does not implement the six-part branch fan-out proposed by C6–C9. JSONB preservation of raw response data alone does not solve inference, branch identity, history or compatibility.
+- No runtime, test, registry, catalogue, SQL/RPC/RLS, Supabase or learner-data changes were made in this review.
+
+### Task identity correction
+The operational B1 catalogue v0.2 already assigns:
+- B1-L06 to 34 + 25, mapped to B1.D2 / B1.C2 / B1.TM3 / B1.ET3;
+- B1-L07 to 126 + 37, mapped to the same existing TM3/ET3 contract.
+
+Therefore the older provisional B1 representation-mapping design's use of B1-L06 is stale and must not be reused. Preserve B1-L01–L07 unchanged. The representation-mapping task must receive the next unused identity, currently B1-L08, after a final repository-wide collision check at implementation time.
+
+### Next concrete step
+Complete owner review of `PacoGO_Integrated_Multi_Target_Decision_Contract_v0.2.md` together with its O1–O9 decision table, using the existing `PacoGO_Multi_Target_Decision_Review_v0.1.md` recommendations as input. Review C3 v0.2 and the scope/time-window lifecycle proposal as explicit separate scientific/product decisions. Reconcile the task-ID correction to B1-L08 in the representation-mapping design.
+
+Do not implement the B1 multi-target learner task, inference fan-out, read-model or persistence changes until the relevant contracts are explicitly approved and the remaining consumer/security/atomicity gates are closed. No C1–C9 meaning, curriculum mapping, mastery threshold, old Skill, lesson, learner profile, test history, game or unrelated Supabase area may be changed.
+
+### Verification of this handoff update
+This handoff update is a repository change and requires Full Regression on its exact resulting commit. No post-update GREEN status is claimed until that exact-commit run completes.

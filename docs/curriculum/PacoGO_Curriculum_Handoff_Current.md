@@ -1459,3 +1459,41 @@ Review the integrated contract and resolve its open decisions O1–O7, starting 
 - Full Regression #3029 was GREEN on `4ee28ee8aa24261adaa04ac2ab6418cfecf1e867`.
 - The new combined documentation commit requires its own Full Regression result; no result is claimed until that run completes on its exact commit.
 - Branch remains `refactor/professional-v1`; LIVE `main` and Supabase remain untouched.
+
+
+## 47. Multi-target decision review and staged evidence lifecycle — 2026-11-06
+
+### Verification baseline
+- Full Regression #3031 / run ID `42230443621` completed GREEN on exact commit `ac01f16538639537d0a91940c936c224fc4965b1`.
+- All workflow steps passed, including browser regression and clean working-tree verification.
+- Review document created after that baseline: `docs/curriculum/PacoGO_Multi_Target_Decision_Review_v0.1.md`.
+- Review document commit: `be1e3b9070deaea79e6e227fe3c709a404f9fb9b`.
+
+### Important architecture correction
+- The raw observation ingestion cannot require all C3 coder assessments to exist in the same transaction. C3 v0.2 explicitly supports independent coder records, multiple coding rounds, later adjudication and versioned recoding.
+- Separate lifecycle stages are now recommended: (1) immutable observation ingestion, (2) append-only target assessment/coder batches, (3) C6–C9 decision evaluation against a frozen assessment snapshot/version.
+- Atomicity and idempotency apply separately to each stage. Later legitimate coder batches must not conflict with or mutate the original raw observation.
+- One observation remains one source episode regardless of target/coder cardinality.
+
+### O1–O7 review disposition
+- O1: recommend normalized target-assessment and coder-provenance relations; keep raw observation payload in the parent JSONB record. Owner approval and exact relation design remain required.
+- O2: recommend branch-keyed state projection plus append-only decision history; skill-level state remains derived. Exact concurrency/read model remains open.
+- O3: recommend versioned canonical serialization of the six-part tuple and a SHA-256 surrogate while retaining all six inspectable fields. Byte-level test vectors remain required.
+- O4: recommend a read-only legacy adapter; scalar target/claim/development projection only when exactly one target assessment is present. Full consumer classification remains required.
+- O5: unresolved. A separate Scope and Time-Window Lifecycle Contract is required. Current C6 defines scope/window as explicit inputs but not their lifecycle; C8 currently lacks time-window identity.
+- O6: unresolved. C3 codebook v0.2 remains a candidate. Explicit scientific/product-owner decisions in its Section 13 remain required.
+- O7: recommend separate idempotency boundaries for raw observation ingestion, immutable assessment batches and decision evaluations. Same-key/different-payload conflicts reject; later coding is appended as a new versioned batch.
+
+### Next concrete step
+Author the Scope and Time-Window Lifecycle Contract and reconcile C8's time-window identity. In parallel, obtain explicit C3 v0.2 owner decisions. Do not implement runtime or persistence until these are approved and the integrated contract is updated.
+
+### Boundaries
+- No code, tests, catalogue, registry, curriculum content, schema, SQL, RPC, RLS, Supabase, learner data or LIVE `main` changed.
+- B1-L06 remains unimplemented.
+- Existing C6 gates, C7 candidate actions, mastery thresholds and C1–C9 meanings remain unchanged.
+- Branch remains `refactor/professional-v1`.
+
+### Verification
+- The review is documentation-only and must be verified by Full Regression on the resulting combined commit after this handoff update.
+- Latest verified Full Regression at the time of this handoff update: #3031 GREEN on `ac01f16538639537d0a91940c936c224fc4965b1`.
+- No GREEN status is claimed for the new review/handoff commit until its own exact-commit run completes.

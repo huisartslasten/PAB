@@ -136,7 +136,7 @@ test('B1 learner practice provisions an owned profile and persists each atomic l
   await expect(page.locator('#exerciseCard h1')).toHaveText('We gaan optellen');
   await expect(page.getByRole('link', { name: 'Ook aftrekken oefenen' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Vermenigvuldigen oefenen' })).toBeVisible();
-  await expect(page.locator('#progress')).toContainText('Oefening 1 van 5');
+  await expect(page.locator('#progress')).toContainText('Oefening 1 van 7');
   await expect(page.locator('.quantity-group')).toHaveCount(2);
   await expect(page.locator('textarea')).toHaveCount(0);
 
@@ -151,7 +151,7 @@ test('B1 learner practice provisions an owned profile and persists each atomic l
   await expect(page.locator('#sessionSummary')).toContainText('1 antwoord veilig opgeslagen');
 
   await page.getByRole('button', { name: 'Volgende oefening' }).click();
-  await expect(page.locator('#progress')).toContainText('Oefening 2 van 5');
+  await expect(page.locator('#progress')).toContainText('Oefening 2 van 7');
   await expect(page.locator('.addition-equation')).toHaveText('28 + 17 = ?');
   await page.locator('input[aria-label="Wat is de som?"]').fill('45');
   await page.getByRole('button', { name: 'Controleren' }).click();
@@ -159,27 +159,40 @@ test('B1 learner practice provisions an owned profile and persists each atomic l
   await expect(page.locator('#sessionSummary')).toContainText('2 antwoorden veilig opgeslagen');
 
   await page.getByRole('button', { name: 'Volgende oefening' }).click();
-  await expect(page.locator('#progress')).toContainText('Oefening 3 van 5');
+  await expect(page.locator('#progress')).toContainText('Oefening 3 van 7');
   await expect(page.locator('.addition-equation')).toHaveText('46 + 28 = ?');
   await page.locator('input[aria-label="Wat is de som?"]').fill('74');
   await page.getByRole('button', { name: 'Controleren' }).click();
   await expect(page.locator('#feedback')).toContainText('antwoord is opgeslagen');
   await page.getByRole('button', { name: 'Volgende oefening' }).click();
-  await expect(page.locator('#progress')).toContainText('Oefening 4 van 5');
+  await expect(page.locator('#progress')).toContainText('Oefening 4 van 7');
   await expect(page.locator('.quantity-group')).toHaveCount(2);
   await expect(page.locator('.quantity-dot')).toHaveCount(15);
   await page.locator('input[aria-label="Wat is de som?"]').fill('15');
   await page.getByRole('button', { name: 'Controleren' }).click();
   await expect(page.locator('#feedback')).toContainText('antwoord is opgeslagen');
   await page.getByRole('button', { name: 'Volgende oefening' }).click();
-  await expect(page.locator('#progress')).toContainText('Oefening 5 van 5');
+  await expect(page.locator('#progress')).toContainText('Oefening 5 van 7');
   await expect(page.locator('.quantity-group')).toHaveCount(3);
   await expect(page.locator('.quantity-dot')).toHaveCount(9);
   await page.locator('input[aria-label="Wat is de som?"]').fill('9');
   await page.getByRole('button', { name: 'Controleren' }).click();
   await expect(page.locator('#feedback')).toContainText('antwoord is opgeslagen');
+  await page.getByRole('button', { name: 'Volgende oefening' }).click();
+  await expect(page.locator('#progress')).toContainText('Oefening 6 van 7');
+  await expect(page.locator('.addition-equation')).toHaveText('34 + 25 = ?');
+  await page.locator('input[aria-label="Wat is de som?"]').fill('59');
+  await page.getByRole('button', { name: 'Controleren' }).click();
+  await expect(page.locator('#feedback')).toContainText('antwoord is opgeslagen');
+
+  await page.getByRole('button', { name: 'Volgende oefening' }).click();
+  await expect(page.locator('#progress')).toContainText('Oefening 7 van 7');
+  await expect(page.locator('.addition-equation')).toHaveText('126 + 37 = ?');
+  await page.locator('input[aria-label="Wat is de som?"]').fill('163');
+  await page.getByRole('button', { name: 'Controleren' }).click();
+  await expect(page.locator('#feedback')).toContainText('antwoord is opgeslagen');
   await expect(page.locator('#progress')).toHaveText('Oefenronde afgerond');
-  await expect(page.locator('#sessionSummary')).toContainText('5 antwoorden veilig opgeslagen');
+  await expect(page.locator('#sessionSummary')).toContainText('7 antwoorden veilig opgeslagen');
 
   const persisted = await page.evaluate(() => ({
     profiles: window.__pacoTestDb.profiles,
@@ -188,9 +201,9 @@ test('B1 learner practice provisions an owned profile and persists each atomic l
     traces: window.__pacoTestDb.traces
   }));
   expect(persisted.profiles).toHaveLength(1);
-  expect(persisted.evidence).toHaveLength(5);
+  expect(persisted.evidence).toHaveLength(7);
   expect(persisted.states).toHaveLength(1);
-  expect(persisted.traces).toHaveLength(5);
+  expect(persisted.traces).toHaveLength(7);
   expect(persisted.evidence.every(row => row.student_key === learnerKey)).toBe(true);
   expect(persisted.evidence.every(row => row.student_key !== 'Leerling A')).toBe(true);
   const firstObservation = persisted.evidence[0].observation;

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import registryConfig from '../docs/curriculum/PacoGO_Curriculum_Registry_v0.4.json' with { type: 'json' };
-import catalogue from '../docs/curriculum/PacoGO_B1_Learner_Task_Catalogue_v0.1.json' with { type: 'json' };
+import catalogue from '../docs/curriculum/PacoGO_B1_Learner_Task_Catalogue_v0.2.json' with { type: 'json' };
 import { createCurriculumRegistry } from './curriculum-registry.js';
 
 test('operational B1 learner tasks use exact existing registry contracts', () => {
@@ -43,4 +43,32 @@ test('three-group quantity composition stays within the existing TM1/ET1 contrac
   assert.equal(task.task_model_id, 'B1.TM1');
   assert.deepEqual(task.evidence_target_ids, ['B1.ET1']);
   assert.equal(task.response_process_required, false);
+});
+
+
+test('B1 D2 adds distinct whole-number size and regrouping variation within TM3/ET3', () => {
+  const noRegrouping = catalogue.tasks.find(task => task.task_id === 'B1-L06');
+  const largerRegrouping = catalogue.tasks.find(task => task.task_id === 'B1-L07');
+
+  assert.ok(noRegrouping);
+  assert.ok(largerRegrouping);
+  assert.deepEqual(noRegrouping.addends, [34, 25]);
+  assert.equal(noRegrouping.expected_answer, 59);
+  assert.match(noRegrouping.variation_key, /two_digit_no_regrouping/);
+  assert.deepEqual(largerRegrouping.addends, [126, 37]);
+  assert.equal(largerRegrouping.expected_answer, 163);
+  assert.match(largerRegrouping.variation_key, /three_digit_regrouping/);
+
+  for (const task of [noRegrouping, largerRegrouping]) {
+    assert.equal(task.development_id, 'B1.D2');
+    assert.equal(task.claim_id, 'B1.C2');
+    assert.equal(task.task_model_id, 'B1.TM3');
+    assert.deepEqual(task.evidence_target_ids, ['B1.ET3']);
+    assert.equal(task.response_process_required, false);
+  }
+
+  const ids = catalogue.tasks.map(task => task.task_id);
+  const variations = catalogue.tasks.map(task => task.variation_key);
+  assert.equal(new Set(ids).size, ids.length);
+  assert.equal(new Set(variations).size, variations.length);
 });

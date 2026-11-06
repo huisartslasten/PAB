@@ -1387,3 +1387,45 @@ Complete the scalar-field and learner-state consumer inventory, then specify the
 - Design starting commit: `1ab93d17c0afbc782b10641c36e38824ac201578`.
 - New design artifact and this handoff update require Full Regression on their resulting commit.
 - Branch remains `refactor/professional-v1`; LIVE `main` and Supabase remain untouched.
+
+
+## 45. Integrated multi-target decision contract — 2026-11-06
+
+### Design artifact created — candidate only
+- New artifact: `docs/curriculum/PacoGO_Integrated_Multi_Target_Decision_Contract_v0.1.md`.
+- Design commit: `4ee28ee8aa24261adaa04ac2ab6418cfecf1e867`.
+- Starting baseline: Full Regression #3028 / run ID `42221996232`, GREEN on `59383d44022b926ae885daef7c6d7d74bb79272e`.
+
+### Reconciled logical contract
+- One administered task attempt remains one immutable raw observation.
+- One observation may have zero or more separately justified target-specific C3 assessments.
+- Each target assessment resolves its own claim/development through the exact registry version.
+- Canonical C6–C9 branch identity is the six-part tuple: learner key, registry-version ID, claim ID, development ID, scope ID and time-window ID.
+- C6 output must be a collection of fully identified branch results, not a map keyed only by claim ID. A legacy map adapter may be used only when claim-to-branch mapping is unambiguous; ambiguity must fail closed.
+- C7 consumes the exact C6 branch. C8 retains separate histories by that same branch identity. C9 validates one branch at a time while preserving shared source-observation references.
+- Multiple target assessments from one source observation never increase independent-observation counts.
+- Persistence must represent one source observation and multiple branch assessments/traces atomically; event replay with conflicting payload/branch sets must fail rather than silently return an earlier result.
+
+### Confirmed implementation gaps
+- `interaction-contract.js` requires one claim/development and copies only the first target into the observation.
+- Registry/prototype inference, mastery and next-action currently run once at skill level with scalar target/development attribution.
+- C6 groups results by claim ID although it validates development/scope/time-window.
+- C7 adapter does not enforce the complete six-part branch identity.
+- C8/C9 do not validate registry-version and time-window identity.
+- Learner service and persistence RPC write one evidence row, one skill-level state and one decision trace per source event.
+- Existing scalar target/claim/development columns, skill-level state uniqueness and event-only trace uniqueness cannot represent the proposed multi-branch semantics without an approved compatibility design.
+
+### Open decisions and implementation boundary
+- JSONB assessment collection versus normalized target-assessment relation remains open pending C3 coder/round/adjudication requirements.
+- Physical branch-state persistence model, branch-ID canonical serialization, legacy read projections, scope/time-window lifecycle and RPC replay comparison remain open.
+- C3 codebook v0.2 remains a proposal; no unresolved evidence vocabulary, quality scale or independence boundary is approved by this artifact.
+- No runtime, tests, catalogue, registry, schema, migration, Supabase, learner data or LIVE `main` changes are authorized.
+- B1-L06 remains unimplemented.
+
+### Next concrete step
+Complete the remaining exact-branch consumer inventory, including all scalar-field reads/writes, SQL constraints and RPC callers, then review this v0.1 contract and resolve O1–O7. Do not begin implementation until the logical contract and required C3 boundaries are approved.
+
+### Verification
+- The design artifact was created on `refactor/professional-v1`.
+- This handoff update and design artifact require Full Regression on the resulting commit. No regression result is claimed until the run completes on that exact commit.
+- LIVE `main` and Supabase remain untouched.

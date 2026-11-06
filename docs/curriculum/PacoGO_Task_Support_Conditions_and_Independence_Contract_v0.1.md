@@ -9,6 +9,23 @@ Baseline: Full Regression #2994 GREEN on aabcf83e81887e89c1c1f79445ac8115a62efe9
 
 Ordinary learning/practice tasks permit help-seeking by default. A task may explicitly declare an independent-performance condition. The task condition is declared before the learner starts; actual help requests and actual assistance are captured as separate events. C3 codes the resulting evidence. A task label alone never proves independence.
 
+## Owner-confirmed product decision — practice, mid-test and test
+
+This interaction policy is now explicitly selected for the PacoGO learner experience:
+
+- **Oefenen (supported practice):** the learner may ask PacoGO for help, including explanation, hints or examples. Asking for help is a normal learning action and is not a failure.
+- **Tussentoets:** an independent assessment of a smaller, explicitly defined part of an existing skill/development/claim. The learner is told before starting that this is an independent attempt and that content help is not available during it.
+- **Toets:** an independent assessment over a broader part of the existing learning objective/scope. The same no-content-help condition is communicated before starting.
+- **Help request during a tussentoets or toets:** the independent attempt ends immediately. PacoGO records the attempt and the help request, marks the assessment as ended/incomplete (not as a failed learner or an incorrect answer), and returns the learner to supported practice. Any subsequent supported work is a separate practice attempt and must not be merged into the ended assessment attempt.
+- A request is recorded separately from support actually delivered. A help request alone is not evidence that help was received. The assessment nevertheless ends on the request, because that is the selected product interaction policy.
+- Neutral interface clarification (for example, how to enter an answer) remains distinct from content help and is handled under the approved operational distinction; it must not silently supply target reasoning.
+
+**Assessment ownership:** PacoGO is the single operational assessor in the learner product. It evaluates the recorded evidence using the existing curriculum contracts and mastery decision process. No second human assessor or parallel rating workflow is introduced into ordinary learner use.
+
+A tussentoets or toets is an **afnamevorm**, not a new skill, development, evidence target or mastery rule. The smaller/broader scope is selected from existing curriculum definitions. Existing C6 mastery gates, evidence requirements and scope boundaries remain authoritative; one completed assessment or one correct response does not automatically award mastery.
+
+This is an owner-confirmed product interaction decision. It does not by itself approve runtime implementation, event/schema changes, registry changes, new thresholds or Supabase persistence. Those require their own contract review and the normal regression-first workflow.
+
 ## Rules
 
 ### Ordinary learning/practice
@@ -53,7 +70,7 @@ Conceptual only; final field names and schema require C3 reconciliation:
 - help request policy: allowed | ends_independent_attempt
 - target assistance policy: permitted | prohibited
 
-An independent-performance condition implies that target-relevant assistance is prohibited during that attempt. Whether a help request immediately ends the attempt or pauses it is a product decision still to specify. The request and any delivered support must always be recorded separately.
+An independent-performance condition implies that target-relevant assistance is prohibited during that attempt. Under the owner-confirmed product policy, a content-help request immediately ends a tussentoets or toets; PacoGO records the request and the assessment as ended/incomplete, then returns the learner to supported practice as a separate attempt. The request and any delivered support are still recorded separately.
 
 ## Evidence and inference boundaries
 

@@ -1808,3 +1808,56 @@ Continue the B1 build from the verified baseline. First identify the smallest co
 
 ### Verification of this handoff update
 This documentation update is a repository change. Full Regression must run on the exact commit created by this update. Do not claim post-update GREEN until that exact-commit workflow completes.
+
+
+## 55. B1 supported-practice interaction — first implementation slice — 2026-11-06
+
+### Implemented
+The first B1 learner-practice support slice is implemented on top of the existing addition controller and learner route.
+
+New reusable interaction component:
+- `pacogo-engine/task-support-controller.js`
+- `pacogo-engine/task-support-controller.test.js`
+
+B1 pedagogical support content:
+- `pacogo-engine/addition-support-content.js`
+- `pacogo-engine/addition-support-content.test.js`
+
+Integrated:
+- `pacogo-engine/addition-controller.js`
+- `pacogo-engine/addition-learning-interface.js`
+- `curriculum-b1-learner.html`
+- `pacogo-engine/addition-controller.test.js`
+- `test/browser/curriculum-b1-learner.browser.test.js`
+
+The learner can request and receive a conceptual explanation, hint or worked example during supported practice. Content is versioned by content ID/version and avoids prescribing a school-specific calculation algorithm. The interaction records separate immutable-in-observation events for:
+- `help_requested`;
+- `support_delivered`;
+- `help_request_dismissed`;
+- `help_request_unresolved` when the task is submitted before requested support is delivered.
+
+The actual delivered content and support type are preserved in the event payload. A help request is not treated as delivered assistance. The recorded hint count reflects delivered hint events. When support was delivered, the legacy prompt-level field is left null rather than falsely asserting `none`.
+
+### Preserved boundaries
+- B1 skill/development/claim/evidence-target/task-model definitions are unchanged.
+- ET7 remains unresolved and is not claimed by this slice.
+- Raw support events are captured; no target-specific C3 independence classification is derived from them.
+- Observation independence remains `UNKNOWN`; support does not automatically change correctness, mastery or next-action rules.
+- C1–C9 contracts, curriculum registry, learner-history schema, Supabase, lessons, learner profiles and unrelated modules are unchanged.
+- No Supabase migration or data operation was required.
+- Independent tussentoets/toets runtime and incomplete-assessment persistence are not yet implemented. They remain gated by the unresolved event/observation contract; do not represent them as complete.
+
+### Regression and commit
+- Implementation commit: `f9081bf36c4f0e5950c107bb9086138011f76c17`.
+- Initial Full Regression #3050 exposed an integration wiring error in `addition-controller.js`; the exact cause was isolated and corrected without changing tests to hide the failure.
+- Corrective commit: `8f9ebb070e5d04968e3e63a87e5544b6e1f2b7cb`.
+- Full Regression #3051 / run ID `42267647378`: GREEN on that exact corrective commit.
+- All 19 workflow steps passed, including maintained Node, Vitest, 58 browser tests and clean-working-tree verification.
+- Additional lesson-save browser proof #654 completed successfully on the implementation commit.
+- LIVE `main` was not changed.
+
+### Next concrete step
+Continue the B1 operational module by extending meaningful task coverage along the existing B1 developmental line, preserving B1-L01–L05 identities and all existing curriculum contracts. Keep the supported-practice event path reusable. Resolve the B1/C3 observation and support-condition contract before implementing independent tussentoets/toets attempt persistence or deriving independence judgements. Do not change registry mastery or Supabase merely to accelerate task coverage.
+
+### Verification of this handoff update
+This handoff update is a repository change and requires Full Regression on its exact resulting commit. No post-update GREEN status is claimed until that exact-commit run completes.

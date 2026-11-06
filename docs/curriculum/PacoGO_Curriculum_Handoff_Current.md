@@ -397,7 +397,6 @@ This is a small synthetic feasibility exercise only. It does not establish human
 ## 17. Zyon-first delivery plan and initial learner interaction policy (2026-11-04)
 
 The product owner confirmed that the immediate goal is to make PacoGO usable so Zyon can begin strengthening his mathematics. Zyon is currently halfway through group 6. The practical priority is to help him recover and strengthen the relevant arithmetic skills, not to extend design/research work unnecessarily.
-
 ### Product decisions for the initial operational version
 
 - The already fully developed SLO curriculum remains the source of truth. Do not redo, rewrite, restructure or reinterpret the existing SLO goals, skills, developments, claims, evidence targets or mastery criteria.
@@ -798,7 +797,6 @@ This section supersedes Section 26's next-step priority of building B4. B4 is no
 Deze sectie actualiseert de status na B4. B5 is nu als afzonderlijke candidate skill en geauthenticeerde learner-practice route gebouwd. De bestaande SLO-mapping blijft leidend; deze implementatie wijzigt geen goedgekeurde curriculumdoelen, claims, evidence targets of masterycriteria.
 
 ### Curriculum en oefencatalogus
-
 - Registry: `docs/curriculum/PacoGO_Curriculum_Registry_v0.6.json`, versie `0.6.0-candidate`.
 - B5 bevat zes kandidaatontwikkelingen (B5.D1–B5.D6), zes claims (B5.C1–B5.C6), twaalf evidence targets (B5.ET1–B5.ET12) en zes task models (B5.TM1–B5.TM6).
 - Afzonderlijke oefencatalogus: `docs/curriculum/PacoGO_B5_Learner_Task_Catalogue_v0.5.json`, met twaalf taken, twee per ontwikkeling. De catalogus heeft eigen schema_version `0.5` en verwijst expliciet naar registry `0.6.0-candidate`; dit zijn twee afzonderlijke versienummers.
@@ -1197,8 +1195,7 @@ Voer de dependency-audit uit van de oude Skills-implementatie: inventariseer imp
 ### Exact-branch inventory completed
 Audited the current branch at commit `9657fed4c65177fc8f607f90732588c87f74fa9f` across:
 - 351 production/source JavaScript and MJS files;
-- 64 HTML pages;
-- 193 JavaScript/MJS/TypeScript test files;
+- 64 HTML pages;- 193 JavaScript/MJS/TypeScript test files;
 - all 57 Supabase SQL migrations.
 
 The scan covered the legacy table names, old service names and constructors, old runtime/page names, legacy math-session helpers and `math-skill-` game keys.
@@ -1542,3 +1539,51 @@ Reconcile C8 and C9 into explicit versioned proposals using the full six-part id
 ### Verification
 - Latest verified Full Regression before this design change: #3033 GREEN on `663d434804ba113cb0f3a4e46d2d96ba4da3d365`.
 - Scope contract commit and this handoff update require Full Regression on the resulting combined commit. No GREEN status is claimed until that exact-commit run completes.
+
+
+
+## 49. C8/C9 full branch identity and snapshot reconciliation — 2026-11-06
+
+### Exact starting verification
+- Full Regression #3035 / run ID `42242645809` completed GREEN on exact commit `a98c46458d1d14ee55ae73b8dd977abe5ad86953`.
+- Full Regression #3034 / run ID `42242618808` completed GREEN on exact commit `ad5b6808210c18f17bd94c20025a5b26f76e3353`.
+- Both runs completed all steps successfully, including curriculum-engine, architecture, maintained Node, Vitest, browser regression and clean-working-tree verification.
+
+### New versioned C8/C9 proposals
+- Added `docs/curriculum/PacoGO_C8_Student_Model_Learning_Status_Protocol_v0.2.md`.
+  - Commit: `3fe9410f4bf106a43e56646c11f61efa39d3f2ae`.
+- Added `docs/curriculum/PacoGO_C9_Vertical_Learning_Chain_Validation_Protocol_v0.2.md`.
+  - Commit: `9f0804a1e1abf387cc8e34a5ca8f178561077878`.
+- Both are versioned design proposals, owner review required, NOT approved for implementation. The v0.1 documents remain historical.
+
+### C8 v0.2 reconciliation
+- Canonical temporal histories require the complete six-part branch identity: learner key, registry-version ID, claim ID, development ID, scope ID and time-window ID.
+- Every history item references an immutable decision snapshot, exact C6 evaluation and exact C7 decision.
+- Snapshot event-time boundaries and assessment-availability cutoff remain separate; late coding can enter only a later snapshot and cannot rewrite prior history.
+- Single-branch summaries preserve the exact latest C6 mastery state and C7 action without recomputation.
+- A separate, explicitly typed higher-level projection may compare successive branches/windows descriptively, but must retain every source identity and may not pool evidence or create new mastery/next-action decisions.
+- Legacy v0.1 histories remain legacy/unscoped where registry/window/snapshot provenance is missing; no fields are inferred or fabricated.
+
+### C9 v0.2 reconciliation
+- C9 validates every branch independently against the complete six-part identity.
+- The required graph now includes raw observation, target-specific assessment/coder provenance, immutable scope/window definitions, frozen snapshot, C6 evaluation, exact C7 handoff and C8 single-branch history.
+- One raw observation may be referenced by multiple target assessments/branches without duplication or inflated observation counts.
+- C9 checks event-time eligibility separately from assessment-availability cutoff, exact record/version membership, and shared-observation lineage.
+- Multi-branch requests return per-branch structural results only; no pooled mastery or next-action output is permitted.
+- Historical v0.1 chains may be checked under their historical contract but cannot be labelled canonical v0.2 branches.
+
+### Boundaries and open decisions
+- Both documents are design-only. No code, tests, catalogue, registry, learner state, SQL, schema, RPC, RLS, Supabase or learner data changed.
+- Scope/window owner decisions remain open under `PacoGO_Scope_and_Time_Window_Lifecycle_Contract_v0.1.md`.
+- C3 codebook v0.2 and target-assessment/coder-provenance decisions remain unapproved.
+- Canonical branch-ID serialization, physical branch-state persistence/read model, legacy projection API and integrated C3/C6–C9 contract v0.2 remain open.
+- B1-L06 remains designed only and unimplemented.
+- Branch remains `refactor/professional-v1`; LIVE `main` remains untouched.
+
+### Next concrete step
+Update the integrated multi-target decision contract to v0.2 so it incorporates the staged lifecycle, immutable snapshots, exact six-part C8/C9 contracts and unresolved implementation gates. Then reconcile its open decisions and request explicit owner decisions for scope/window and C3 codebook v0.2. Do not begin runtime or persistence implementation until those decisions and compatibility contracts are approved.
+
+### Verification
+- This handoff update follows C8 v0.2 commit `3fe9410f4bf106a43e56646c11f61efa39d3f2ae` and C9 v0.2 commit `9f0804a1e1abf387cc8e34a5ca8f178561077878`.
+- Full Regression for the combined C8/C9/handoff document state is pending; no GREEN status is claimed until a run completes on the exact resulting handoff commit.
+- Latest verified Full Regression before these three documentation commits: #3035 GREEN on `a98c46458d1d14ee55ae73b8dd977abe5ad86953`.

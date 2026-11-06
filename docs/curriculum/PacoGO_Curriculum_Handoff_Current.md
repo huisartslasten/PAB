@@ -1228,3 +1228,33 @@ The scan covered the legacy table names, old service names and constructors, old
 - Audited base commit: `9657fed4c65177fc8f607f90732588c87f74fa9f`.
 - Full Regression #3018 was reported GREEN by the user, but a new run on the post-handoff commit is still required. No new regression is claimed here.
 - LIVE `main` remains untouched.
+
+
+## 40. B1 three-group quantity-composition practice — 2026-11-06
+
+### Implemented
+- Added operational learner task `B1-L05`: three visible quantity groups, `2 + 3 + 4 = 9`.
+- The task remains mapped to the existing `B1.D1 → B1.C1 → B1.TM1 → B1.ET1` contract. No registry, evidence-target, mastery, development-order or task-model change was made.
+- The existing quantity-groups interface already renders one group per addend. No new interaction or persistence contract was required.
+- Updated the learner catalogue and B1 task-coverage specification.
+- Added interface-model, controller, catalogue-contract and browser coverage. The browser test verifies three groups, nine dots, completion, and persistence of the fifth learning cycle.
+- Corrected the browser test sequence to explicitly advance from B1-L04 to B1-L05 after the fourth task completes.
+
+### Regression and failure isolation
+- Pre-build baseline: Full Regression #3019 / run ID `42131597064`, GREEN on `c19ca4eded641fc2585f8de5dd3f0798a9a67a82`.
+- Initial implementation commit: `22693a1f299e7416e57f4ddb33b3eb27eb681ce6`.
+- Full Regression #3020 / run ID `42207387133`: FAILED. 57 tests passed; one browser test failed because the test attempted to assert B1-L05 before clicking the existing “Volgende oefening” control after B1-L04. All preceding engine, architecture, Node and Vitest steps passed.
+- Root cause was isolated to the browser-test sequence; no application defect was found from that failure.
+- Test correction commit: `1a19e53ff8266acd665226693bd429ef54f5619f`.
+- Full Regression #3021 / run ID `42207597254`: completed GREEN on exact commit `1a19e53ff8266acd665226693bd429ef54f5619f`.
+
+### Boundaries
+- Branch remains `refactor/professional-v1`; LIVE `main` untouched.
+- No Supabase schema, migration, data or RLS change.
+- ET7 remains unresolved in the B1 task-model mapping. This task does not claim independence evidence.
+- The practice / interim-assessment / final-assessment mode contract and help-request termination rule remain a separate central design decision; no assessment runtime was implemented here.
+
+### Current status and next step
+- Current verified feature commit: `1a19e53ff8266acd665226693bd429ef54f5619f`.
+- Full Regression: #3021 GREEN on that exact commit.
+- Next: continue the B1 learner-facing task design from supported quantity composition, while keeping ET7 and assessment-mode semantics explicit blockers for any independence or assessment implementation.

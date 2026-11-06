@@ -105,7 +105,7 @@ A context task may involve reading data, money notation or measurement units. Th
 ## 6. Candidate catalogue shape — not yet implemented
 
 A future B1 catalogue revision should:
-- retain B1-L01–L04 and their existing task identities/contracts unless a verified defect requires change;
+- retain B1-L01–L05 and their existing task identities/contracts unless a verified defect requires change;
 - add tasks that explicitly cover D3 and D4;
 - add D2 variation beyond the two existing two-digit symbolic tasks;
 - explicitly cover ET2, ET4, ET5, ET6, ET7 and ET8 across the catalogue;

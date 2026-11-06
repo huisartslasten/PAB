@@ -1683,3 +1683,46 @@ Continue the planned PacoGO build without creating a separate assessment engine 
   - This handoff decision: `3dca3031f619319be031ac14ac77bf493615d252`.
 - Full Regression #3045 / run ID `42247081822`: GREEN on exact handoff commit `3dca3031f619319be031ac14ac77bf493615d252`; all 16 workflow steps succeeded.
 - This verification statement is itself a handoff update. Full Regression must run again on the exact resulting commit; no GREEN status is claimed for that new commit until it completes.
+
+
+## 52. Legacy Skills dependency audit — current-branch reconciliation — 2026-11-06
+
+### Exact starting verification
+- Branch: `refactor/professional-v1`; exact HEAD before this handoff update: `676ed8f276a3759b04060335e3e877e258ef7af3`.
+- Full Regression #3046 / run ID `42252273430`: completed GREEN on that exact commit.
+- LIVE `main` was not changed.
+
+### Reconciliation of the prior audit counts
+- Re-inspected the recursive Git tree at the exact current branch HEAD and compared all changes since the Stage A dependency-proof base `9657fed4c65177fc8f607f90732588c87f74fa9`.
+- The prior production/source count of 351 is consistent when the 14 existing test-oriented runtime modules (for example `test-engine.js`, `test-runtime.js` and `practice-test-runtime.js`) are not classified as production curriculum/application source.
+- The repository contains 64 HTML pages and 57 SQL migrations, matching the prior inventory.
+- The prior count of 193 test files covers the `test/`, `tests/` and `vitest/` test directories. A further 113 `.test/.spec` files are located under `src/` and `pacogo-engine/`; these were not represented in that 193 count.
+- All 113 additional test files were inspected on exact HEAD `676ed8f` for legacy Skill table/service/runtime identifiers and old math-session references.
+
+### Additional test-file findings
+- `src/features/skills/math/math-domain.test.js` imports `math-domain.js` and exercises `createMathSession`. This is the isolated test contract for the retained legacy math-domain module.
+- `src/services/game-result-service.test.js` contains the string `math-skill-addition` as a fixture for the generic game-result service. It is not an import or runtime dependency on the retired Skills module.
+- No other legacy Skill table, service, page, runtime or math-session references were found in the 113 additional test files.
+- The previously identified dedicated tests `test/skill-definition-service.test.js` and `test/skill-configuration-service.test.js` remain the only test consumers of the two retained legacy persistence services.
+
+### Current-branch change check
+- Compared `9657fed` through `676ed8f`: 19 changed paths, consisting of curriculum documentation/handoff files and four test files.
+- No production JavaScript/MJS/TypeScript source, HTML route/page, SQL migration or Supabase file changed in that interval. The four changed tests were inspected; their changes concern the B1 three-group quantity task and introduce no legacy Skills dependency.
+- Re-inspected current `src/app/bootstrap.js`, `src/app/routes.js` and `src/features/skills/runtime.js`: none constructs or imports the legacy definition/configuration services or old math-session module.
+- The old definition/configuration service files remain in the repository but are not constructed by the active app bootstrap. Their dedicated tests remain isolated.
+- The legacy math-domain module remains isolated to its dedicated test. The central curriculum Skills route remains the active Skills entry point.
+
+### Audit disposition and boundaries
+- Stage A read-only dependency inventory is now reconciled for the current branch, including the 113 embedded test files omitted from the earlier 193-file test-directory count.
+- The old learner-facing editor pages and management runtimes remain retired as recorded in Section 36.
+- The two legacy persistence services, their isolated tests, the math-domain module and its isolated test remain present pending a separate Stage B retirement decision.
+- Existing legacy TEST data remains dormant and unchanged under the disposition plan: no automatic mapping to SLO skills, no deletion or rewrite. The earlier read-only inventory of 13 definitions, 37 assignments and three unresolved `math-mixed` orphan assignments remains the recorded database baseline; no new Supabase inspection or database operation was performed in this audit.
+- No production conclusion is made from this repository audit. No code, tests, schema, migration, data, RLS, Supabase or LIVE `main` changes were made.
+
+### Next concrete step
+Prepare the Stage B owner decision: whether to retire the now-isolated legacy persistence services and old math-domain code/tests while keeping all legacy database rows and tables untouched. Do not delete code or data until that decision and its exact compatibility/test consequences are documented.
+
+### Verification
+- Exact audit baseline: `676ed8f276a3759b04060335e3e877e258ef7af3`.
+- Full Regression #3046 / run ID `42252273430`: GREEN on that exact baseline.
+- This handoff update requires its own Full Regression on the resulting commit. No post-update GREEN status is claimed until that exact-commit run completes.

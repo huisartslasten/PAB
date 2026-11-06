@@ -1767,3 +1767,44 @@ Perform a read-only, exact-scope audit of legacy Skills database dependencies an
 - This handoff update is documentation-only and must be followed by Full Regression on its exact resulting commit.
 - No GREEN status is claimed for the handoff update until that exact-commit run completes.
 - No source code, tests, SQL migrations, Supabase data/schema, or LIVE `main` changes are included in this decision record.
+
+
+## 54. Owner-confirmed scope correction — new SLO Skills build phase — 2026-11-06
+
+### Superseding decision
+This section records the owner's latest explicit direction and supersedes the legacy Skills retirement decision in Section 53 wherever they conflict.
+
+- Existing/legacy Skills remain in the repository and are preserved for now.
+- No legacy Skills deletion, migration, retirement, re-investigation or cleanup is in scope for the current build phase.
+- Legacy Skills cleanup is deferred to a separate future phase.
+- Games remain outside this development.
+- Existing lessons, learner profiles, assessment history and unrelated Supabase components remain untouched.
+- No new Supabase project will be created.
+- C1–C9 contracts are not to be changed to accommodate legacy systems.
+- Build the new SLO-based Skills on the existing curriculum engine, beginning with the existing B1 addition developmental line.
+- Work only on `refactor/professional-v1`; LIVE `main` remains untouched.
+
+Section 53's owner decision to retire legacy Skills is superseded by this newer scope decision. Its historical audit observations remain historical records only; they do not authorise deletion, migration or further legacy investigation during this phase.
+
+### Verified starting baseline
+- Branch: `refactor/professional-v1`.
+- Exact HEAD: `5f7223cd5f09e105e51e8acf903fcc27d2afef83`.
+- Full Regression #3048 / run ID `42256163216`: completed successfully on that exact SHA.
+- All 19 workflow steps completed successfully, including curriculum-engine, architecture, maintained Node, maintained Vitest, browser regression and clean-working-tree verification.
+- LIVE `main` was not changed.
+
+### B1 starting point and constraints
+- B1 remains the existing SLO-mapped skill `Optellen` with its current four developments, four claims, eight evidence targets, six task models and existing mastery/decision rules.
+- The current learner catalogue v0.1 contains five tasks (B1-L01–L05) and declares registry 0.4.0-candidate, while the current registry candidate is 0.6.0-candidate. The B1 skill object is unchanged between registry 0.4 and 0.6, but the route/version integration must still be handled deliberately.
+- Existing catalogue coverage analysis identifies missing operational tasks for D3 and D4 and missing explicit coverage for ET2, ET4, ET5, ET6, ET7 and ET8.
+- B1.ET7 is not mapped by any of the six existing task models. Do not silently attach ET7 to a task model, remove it, or invent a replacement mapping.
+- Existing C3/codebook and observation-schema reconciliation proposals remain candidate design artifacts, not approved canonical contracts. Do not derive target-specific independence codes or change persistence/schema by guessing.
+- The owner-confirmed product interaction policy remains: supported practice permits help; tussentoets and toets are independent assessment formats; a content-help request during either ends that attempt as incomplete and returns the learner to a separate supported-practice attempt. This does not itself approve a runtime/event/schema implementation.
+- Preserve raw responses, ordered interaction events and the separation between observation, evidence assessment, inference, mastery and next action.
+- Do not change B1 curriculum meanings, C1–C9, mastery thresholds, learner history, Supabase or unrelated modules merely to make the first interface slice easier.
+
+### Next concrete step
+Continue the B1 build from the verified baseline. First identify the smallest complete, contract-valid learner-practice vertical slice that can be implemented without unresolved evidence/schema assumptions. Then extend task coverage along the existing B1 developmental line. Independent tussentoets/toets support must not be represented as implemented until its event and observation contract is sufficiently resolved and tested.
+
+### Verification of this handoff update
+This documentation update is a repository change. Full Regression must run on the exact commit created by this update. Do not claim post-update GREEN until that exact-commit workflow completes.

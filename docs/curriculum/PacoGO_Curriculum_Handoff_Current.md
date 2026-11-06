@@ -1288,3 +1288,36 @@ The scan covered the legacy table names, old service names and constructors, old
 
 ### Next concrete step
 Inspect the existing B1 controller → observation → browser vertical-slice → persistence path for lossless preservation of the two response dimensions. If the current contract supports it, implement the reusable interface extension and B1-L06 with unit, controller, catalogue, browser and Full Regression coverage. If it does not, stop and design the underlying contract before changing code or persistence.
+
+
+## 42. Multi-target task evidence contract — 2026-11-06
+
+### Exact baseline
+- Branch: `refactor/professional-v1`.
+- Full Regression #3024 / run ID `42216716227`: completed GREEN on exact commit `a97c299b3b7c441aefaefe8c35570defbc71aaeb`.
+- Handoff-only commit `48799d803f1ddaa6b6efce68b5c0bb87480e0b86` follows that verified design commit. The branch head was re-inspected before writing; no force update was used.
+
+### Inspection result — implementation gate not met
+- Inspected B1 representation-mapping design, `interaction-contract.js`, `curriculum-registry.js`, `prototype.js`, `addition-controller.js`, `learner-curriculum-service.js`, registry v0.4 and the evidence persistence migration.
+- The persistence service passes the full observation object into JSONB, so nested raw responses can be preserved without lossy field selection.
+- The inference contract is single-target: task instances have one primary claim/development, observations expose only the first `evidence_target_id`, evidence assessment computes one quality, and inference attributes that one evidence item to one development.
+- B1.TM2 maps to ET1 + ET2; ET1 belongs to C1/D1 and ET2 belongs to C2/D2. The current B1 catalogue test also assumes all task targets belong to one task claim. This cannot correctly represent the designed B1-L06.
+- A combined correctness boolean or assigning both targets to the primary C2/D2 would misattribute evidence. Do not implement this task on the current contract.
+
+### Design decision
+- New design artifact: `docs/curriculum/PacoGO_Multi_Target_Task_Evidence_Contract_v0.1.md`.
+- Separate one task attempt (raw learner interaction episode) from multiple target-specific evidence units.
+- Resolve each target's claim and development through the registry.
+- Assess ET1 and ET2 independently; preserve mixed responses.
+- Ensure multiple target units from one attempt do not count as multiple independent attempts.
+- Candidate persistence uses the existing JSONB observation/evidence-assessment fields with one row per task attempt, subject to explicit compatibility decisions for the scalar target column and legacy history. No Supabase change is made or authorized yet.
+
+### Boundaries and next step
+- B1-L06 remains designed but not implemented.
+- No runtime, test, catalogue, registry, database, Supabase or learner data changed in this design step.
+- ET7 and central assessment/help semantics remain separate unresolved contracts.
+- Next: reconcile target-level evidence and task-attempt counting with C1-C9, validation data design, mastery and next-action semantics; settle persistence compatibility before coding.
+
+### Verification
+- This design and handoff update must be verified by Full Regression on the resulting commit.
+- LIVE `main` remains untouched.

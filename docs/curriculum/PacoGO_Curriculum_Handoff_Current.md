@@ -1355,3 +1355,35 @@ Prepare a focused versioned contract decision for observation-to-target-assessme
 - Design starting commit: `e0a4309f6ff92568df8051d8c4d00b050ba96bd7`.
 - The design artifact and this handoff update require Full Regression on their resulting commit.
 - Branch remains `refactor/professional-v1`; LIVE `main` and Supabase remain untouched.
+
+
+## 44. Observation cardinality and legacy compatibility decision — 2026-11-06
+
+### Exact baseline and inspection
+- Full Regression #3027 / run ID `42219020009`: completed GREEN on exact commit `1ab93d17c0afbc782b10641c36e38824ac201578`.
+- Inspected C2, empirical observation schema v0.1, Pilot_DataSchema v0.2, C3 reconciliation/codebook proposals, validation data specification, current interaction/registry/prototype engine, learner curriculum service, evidence/state/trace migrations and current persistence RPC.
+- New design artifact: `docs/curriculum/PacoGO_Observation_Cardinality_Legacy_Compatibility_Decision_v0.1.md`.
+
+### Proposed logical decision
+- One separately administered task attempt = one immutable raw observation.
+- One raw observation may have zero or more separately justified, versioned target-specific assessments.
+- Target assessment resolves its own claim/development through the registry; task routing context does not overwrite target ownership.
+- Rejected duplicating one source observation row per target because it would conflict with source-event uniqueness and inflate observation/independence counts.
+- Historical single-target rows remain immutable and are exposed through a virtual legacy target-assessment read view without recoding old values or inventing provenance.
+- A JSONB target-assessment array in one source row is the leading product compatibility candidate; a normalized child relation may still be preferable for scientific coder/round/adjudication records. Final canonical research storage remains undecided.
+- Proposed scalar compatibility: populate scalar target/claim/development only for an unambiguous single-target record; use null for zero/multiple target assessments. This still requires complete consumer validation before implementation.
+
+### Current blockers confirmed
+- Current interaction/observation/registry/prototype/history adapter supports only one scalar target assessment.
+- Current runtime produces one development/mastery/next-action result; state and persistence are skill-scoped, while C6–C8 require coherent claim/development/scope branches.
+- JSONB raw-response preservation does not itself implement correct target fan-out or C6 independence semantics.
+- C3 codebook v0.2 and observation schema remain unapproved candidates.
+- No code, tests, catalogue, registry, Supabase, database schema, learner state or data changed.
+
+### Next concrete step
+Complete the scalar-field and learner-state consumer inventory, then specify the C6–C9 branch-state representation and read/write compatibility tests. Keep the JSONB-vs-normalized research-store decision open until coder/adjudication requirements are resolved. B1-L06 remains unimplemented.
+
+### Verification
+- Design starting commit: `1ab93d17c0afbc782b10641c36e38824ac201578`.
+- New design artifact and this handoff update require Full Regression on their resulting commit.
+- Branch remains `refactor/professional-v1`; LIVE `main` and Supabase remain untouched.

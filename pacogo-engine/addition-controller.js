@@ -62,11 +62,7 @@ function createAdditionController({
   const supportController = createTaskSupportController({
     taskInstanceId: taskInstance.task_instance_id,
     record,
-    isSubmitted: () => submitted,
-    requestHelp: supportController.requestHelp,
-    deliverSupport: supportController.deliverSupport,
-    dismissHelp: supportController.dismissHelp,
-    hasPendingHelp: supportController.hasPendingHelp
+    isSubmitted: () => submitted
   });
 
   record('task_presented', {
@@ -201,7 +197,11 @@ function createAdditionController({
     submit,
     getSelectedStrategy: () => selectedStrategy,
     getSubmittedAnswer: () => submittedAnswer,
-    isSubmitted: () => submitted
+    isSubmitted: () => submitted,
+    requestHelp: supportController.requestHelp,
+    deliverSupport: supportController.deliverSupport,
+    dismissHelp: supportController.dismissHelp,
+    hasPendingHelp: supportController.hasPendingHelp
   });
 }
 

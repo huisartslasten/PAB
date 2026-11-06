@@ -1255,6 +1255,8 @@ The scan covered the legacy table names, old service names and constructors, old
 - The practice / interim-assessment / final-assessment mode contract and help-request termination rule remain a separate central design decision; no assessment runtime was implemented here.
 
 ### Current status and next step
-- Current verified feature commit: `1a19e53ff8266acd665226693bd429ef54f5619f`.
-- Full Regression: #3021 GREEN on that exact commit.
+- Current branch HEAD before this handoff metadata update: `70baad52350f38a20a2556c37619373aea469d52`.
+- Full Regression #3022 / run ID `42207815956`: completed GREEN on exact commit `70baad52350f38a20a2556c37619373aea469d52`.
+- Feature implementation commit: `22693a1f299e7416e57f4ddb33b3eb27eb681ce6`; browser-test sequence correction: `1a19e53ff8266acd665226693bd429ef54f5619f`.
+- This handoff metadata update must itself be verified by Full Regression on its resulting commit.
 - Next: continue the B1 learner-facing task design from supported quantity composition, while keeping ET7 and assessment-mode semantics explicit blockers for any independence or assessment implementation.

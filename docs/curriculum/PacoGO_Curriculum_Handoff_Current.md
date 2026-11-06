@@ -1861,3 +1861,32 @@ Continue the B1 operational module by extending meaningful task coverage along t
 
 ### Verification of this handoff update
 This handoff update is a repository change and requires Full Regression on its exact resulting commit. No post-update GREEN status is claimed until that exact-commit run completes.
+
+
+## 56. B1 D2 task coverage extension — operational catalogue v0.2 — 2026-11-06
+
+### Implemented
+Created `docs/curriculum/PacoGO_B1_Learner_Task_Catalogue_v0.2.json` and moved the B1 learner route to this catalogue version.
+
+- B1-L01–L05 are retained unchanged.
+- B1-L06 adds a two-digit whole-number symbolic addition without regrouping: 34 + 25 = 59.
+- B1-L07 adds a three-digit whole-number symbolic addition with regrouping: 126 + 37 = 163.
+- Both new tasks remain within B1.D2 / B1.C2 / B1.TM3 / B1.ET3.
+- Both use the existing symbolic-expression renderer, integer response contract and supported-practice help layer.
+- No strategy, checking, independence, transfer or mastery claim is inferred from these tasks.
+
+The operational catalogue now contains seven tasks. The existing registry pointer remains `0.4.0-candidate`; no registry version or Supabase registration change was made.
+
+### Verification
+- Implementation commit: `aa42075a9a1938c9d043f6bb0861126dbf3309ef`.
+- Full Regression #3053 / run ID `42268307961`: GREEN on that exact commit.
+- All 19 workflow steps passed, including maintained Node, Vitest, 58 browser tests and clean-working-tree verification.
+- The catalogue contract test verifies exact B1.D2/C2/TM3/ET3 mapping and unique task/variation IDs.
+- The browser regression completed and persisted all seven learning cycles through the existing learner-curriculum path.
+- LIVE `main` was not changed.
+
+### Next concrete step
+Continue B1 by implementing an observable representation-mapping task within the existing B1.TM2 / ET1+ET2 contract. The learner must actively construct or select a representation of the same addition relation; merely displaying an equation and collecting a numeric answer is not ET2 evidence. Reuse the existing pedagogical interface architecture where appropriate. Do not create new claims, task models, mastery rules or Supabase schema to bypass the current interaction/evidence requirements.
+
+### Verification of this handoff update
+This handoff update is a repository change and requires Full Regression on its exact resulting commit. No post-update GREEN status is claimed until that exact-commit run completes.

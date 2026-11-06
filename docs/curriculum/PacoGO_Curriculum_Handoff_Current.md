@@ -1631,3 +1631,52 @@ Conduct a focused owner-decision review against the open items in Sections 18–
 - Integrated contract v0.2 commit: `7b0684bdae55f0a384841379e42628ed78458c7f`.
 - Full Regression for the integrated contract plus this handoff update is pending; no GREEN status is claimed until a run completes on the exact resulting handoff commit.
 - Latest verified Full Regression: #3040 GREEN on `5c4dd08a4b1788dabcff38a9d6f1a1fb9f75915d`.
+
+
+## 51. Owner-confirmed learner assessment modes: oefenen, tussentoets and toets — 2026-11-06
+
+### Verified documentation review
+
+The current handoff and the two task-support documents were checked on `refactor/professional-v1`.
+
+- Section 17 already distinguished assessment from teaching support, but did not define the three learner-facing assessment modes.
+- `PacoGO_Task_Support_Conditions_and_Independence_Contract_v0.1.md` already defined supported practice and independent performance. It explicitly left open whether a help request during independent performance pauses or ends the attempt.
+- `PacoGO_Task_Support_Condition_C3_Addendum_v0.1.md` contained the same unresolved product choice.
+- The following owner decision therefore closes that product-interaction question; it was not previously fully recorded.
+
+### Confirmed product policy
+
+1. **Oefenen:** Zyon may ask PacoGO for help, such as an explanation, hint or example. Help-seeking is normal learning behaviour and is not a failure.
+2. **Tussentoets:** PacoGO administers an independent assessment of a smaller, explicitly defined part of an existing curriculum objective.
+3. **Toets:** PacoGO administers an independent assessment of a broader part of the existing curriculum objective.
+4. Before either assessment, PacoGO clearly tells the learner that it is independent and that content help is not available during the attempt.
+5. If the learner requests content help during a tussentoets or toets, the independent attempt ends immediately. PacoGO records the request and marks that assessment attempt as ended/incomplete, not as a failed test or an incorrect learner response. The learner returns to oefenen, where help is available.
+6. Any subsequent supported work is a separate practice attempt; it must not be merged with or overwrite the ended independent assessment attempt.
+7. A help request and support actually delivered remain separate recorded events. The request ends the assessment by product policy, but does not prove that help was delivered.
+8. Neutral interface clarification (for example, how to enter an answer) remains distinct from content help and must not supply target reasoning.
+
+### Assessment and mastery boundaries
+
+- **PacoGO is the single operational assessor** in the learner product. No second human assessor or parallel rating workflow is introduced into normal learner use.
+- PacoGO evaluates the evidence against the existing curriculum contracts and mastery decision process.
+- Oefenen, tussentoets and toets are learner-facing **afnamevormen**, not new skills, developments, claims, evidence targets or mastery rules.
+- Tussentoets and toets differ in the scope of the existing objective being assessed; they do not create a new mastery threshold.
+- Existing C6 seven-gate mastery protocol, target-specific evidence requirements, scope/time boundaries and no-automatic-promotion rule remain unchanged. A single assessment or one correct response does not automatically establish mastery.
+- The future scientific validation of PacoGO's decisions is separate from the operational learner experience. It does not require multiple assessors in the normal product flow.
+
+### Documentation changes in this update
+
+- Updated `PacoGO_Task_Support_Conditions_and_Independence_Contract_v0.1.md` to select the help-request interaction and distinguish the assessment formats.
+- Updated `PacoGO_Task_Support_Condition_C3_Addendum_v0.1.md` to close the previously open pause/end product choice.
+- No curriculum registry, skill, task catalogue, mastery rule, runtime, event schema, SQL, RLS, Supabase or learner data was changed or approved by this decision.
+
+### Next concrete step
+
+Continue the planned PacoGO build without creating a separate assessment engine or second assessor. When the learner-facing assessment flow is implemented, design it against this policy and the existing curriculum/C3/C6 contracts. Any required event/schema changes must be specified first and must pass the regression-first workflow.
+
+### Verification
+
+- Branch: `refactor/professional-v1`.
+- Exact pre-documentation baseline: `a05731d1366b7d47501bb4506547646bbf3fdaf0`.
+- Full Regression #3042 / run ID `42244656143`: GREEN on that exact baseline; all 16 workflow steps succeeded.
+- Full Regression for the documentation commit created by this update must run on that exact resulting commit. No post-update GREEN status is claimed until that run completes.

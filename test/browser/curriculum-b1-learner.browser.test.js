@@ -168,6 +168,7 @@ test('B1 learner practice provisions an owned profile and persists each atomic l
   await page.locator('input[aria-label="Wat is de som?"]').fill('15');
   await page.getByRole('button', { name: 'Controleren' }).click();
   await expect(page.locator('#feedback')).toContainText('antwoord is opgeslagen');
+  await page.getByRole('button', { name: 'Volgende oefening' }).click();
   await expect(page.locator('#progress')).toContainText('Oefening 5 van 5');
   await expect(page.locator('.quantity-group')).toHaveCount(3);
   await expect(page.locator('.quantity-dot')).toHaveCount(9);

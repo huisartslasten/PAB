@@ -1726,3 +1726,44 @@ Prepare the Stage B owner decision: whether to retire the now-isolated legacy pe
 - Exact audit baseline: `676ed8f276a3759b04060335e3e877e258ef7af3`.
 - Full Regression #3046 / run ID `42252273430`: GREEN on that exact baseline.
 - This handoff update requires its own Full Regression on the resulting commit. No post-update GREEN status is claimed until that exact-commit run completes.
+
+## 53. Owner decision: replace legacy Skills persistence within the existing Supabase project — 2026-11-06
+
+### Exact starting verification
+- Branch: `refactor/professional-v1`.
+- Exact starting HEAD: `5729daeab08c2e5e9f777037f2f93fd09ddb0aeb`.
+- Full Regression #3047 / run ID `42253821751`: completed successfully on that exact SHA. All 19 workflow steps completed successfully, including curriculum-engine, architecture, maintained Node, maintained Vitest, browser regression and clean-working-tree verification.
+- LIVE `main` was not changed.
+
+### Owner-confirmed decision
+The owner authorizes retirement of the old Skills implementation and its old Skills persistence data model. The replacement is to be built **inside the existing Supabase project**. A separate Supabase project is explicitly rejected because the rest of PacoGO must continue using the current project.
+
+The intended disposition is:
+- Retire the isolated legacy Skills definition/configuration services, their obsolete tests, and the old math question/session generator and its tests, after final consumer/dependency verification.
+- Replace the legacy Skills tables and their associated rows with a curriculum-aligned Skills persistence structure in the existing Supabase project, but only after the new contract and migration sequence are designed, reviewed and tested.
+- Legacy Skills rows/IDs do not need to be mapped into the new SLO curriculum identifiers. Do not silently translate old keys such as `addition-100` or `math-mixed`.
+- Preserve the current Supabase project, authentication, parent accounts, learner profiles, lessons and lesson data, shared student data, curriculum registry/evidence/state contracts, and all unrelated modules.
+- Preserve the active curriculum Skills route (`src/features/skills/runtime.js`) and the current curriculum registry. These are not the retired legacy Skills system.
+- Preserve shared game infrastructure/data such as `game_results`, `game_access_state`, and shared `games` rows unless a precise dependency audit proves that a narrowly identified seed row belongs exclusively to legacy Skills. No broad deletion from shared tables is authorized.
+- Do not rewrite historical migration files. Any eventual schema replacement must use new forward migrations.
+- Do not change C1–C9 contracts, evidence semantics, mastery rules, assessment policy or learner-state contracts merely to fit a new table design. Reuse existing curriculum persistence where it already satisfies the approved contracts.
+- No Supabase DDL/DML, old table deletion, source deletion or migration creation is authorized by this decision alone. The destructive operation remains gated by a complete dependency audit, a defined backup/export and recovery plan, a tested replacement contract and a verified cutover sequence.
+
+### Reconciliation of Section 52
+This owner decision supersedes the previous Section 52 default disposition of dormant preservation for the legacy Skills tables and rows. The read-only inventory in Section 52 remains historical evidence only; it is not a current live database assertion. The retirement scope is now approved in principle, while the exact table/data deletion set remains subject to dependency verification.
+
+### Current B1 learner-route finding
+The existing curriculum B1 learner route is a real starting point, not the old Skills module:
+- `curriculum-b1-learner.html` uses the current curriculum engine, the B1 learner task catalogue and the existing learner-curriculum persistence services.
+- The current operational catalogue contains five fixed practice tasks. Its coverage specification identifies the absence of operational tasks for B1.D3 and B1.D4 and gaps in ET2, ET4, ET5, ET6, ET7 and ET8.
+- The B1 page currently submits an answer and persists the resulting learning cycle, but does not yet provide the approved learner help-request/support-delivery interaction.
+- The task-support contract identifies unresolved C3 codebook/event-schema mismatches and the unresolved B1.ET7 relationship. These are design gates; do not implement help/independence coding by guessing or by hardcoding independence.
+- The B1 route currently references curriculum registry 0.4 while the current Skills runtime/catalogue and registry candidate are at 0.6. Its version/history/persistence implications must be reconciled before changing that pointer.
+
+### Next concrete step
+Perform a read-only, exact-scope audit of legacy Skills database dependencies and reconcile the B1/C3 implementation gates. Produce the replacement persistence contract and safe migration/cutover plan before creating migrations or deleting anything. In parallel, specify the B1 practice-route improvements against the approved SLO/B1 task coverage and support contracts. Keep the existing Supabase project and shared learner/lesson data intact.
+
+### Verification
+- This handoff update is documentation-only and must be followed by Full Regression on its exact resulting commit.
+- No GREEN status is claimed for the handoff update until that exact-commit run completes.
+- No source code, tests, SQL migrations, Supabase data/schema, or LIVE `main` changes are included in this decision record.

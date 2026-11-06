@@ -1676,7 +1676,10 @@ Continue the planned PacoGO build without creating a separate assessment engine 
 
 ### Verification
 
-- Branch: `refactor/professional-v1`.
-- Exact pre-documentation baseline: `a05731d1366b7d47501bb4506547646bbf3fdaf0`.
-- Full Regression #3042 / run ID `42244656143`: GREEN on that exact baseline; all 16 workflow steps succeeded.
-- Full Regression for the documentation commit created by this update must run on that exact resulting commit. No post-update GREEN status is claimed until that run completes.
+- Branch: `refactor/professional-v1`; LIVE `main` was not changed.
+- Documentation commits:
+  - Task Support Conditions contract: `f8f242e56d98b75d0b2e888046e8e05e1c4dd31c`.
+  - C3 addendum: `c7f564062c9696707d29e0d6aa96b06db89654db`.
+  - This handoff decision: `3dca3031f619319be031ac14ac77bf493615d252`.
+- Full Regression #3045 / run ID `42247081822`: GREEN on exact handoff commit `3dca3031f619319be031ac14ac77bf493615d252`; all 16 workflow steps succeeded.
+- This verification statement is itself a handoff update. Full Regression must run again on the exact resulting commit; no GREEN status is claimed for that new commit until it completes.

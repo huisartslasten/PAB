@@ -16,6 +16,23 @@ This planned condition is not an assistance event and is not an independence jud
 
 This addendum complements v0.2. It does not replace its coding model or approve a canonical schema.
 
+## Owner-confirmed product decision — practice, mid-test and test
+
+This interaction policy is now explicitly selected for the PacoGO learner experience:
+
+- **Oefenen (supported practice):** the learner may ask PacoGO for help, including explanation, hints or examples. Asking for help is a normal learning action and is not a failure.
+- **Tussentoets:** an independent assessment of a smaller, explicitly defined part of an existing skill/development/claim. The learner is told before starting that this is an independent attempt and that content help is not available during it.
+- **Toets:** an independent assessment over a broader part of the existing learning objective/scope. The same no-content-help condition is communicated before starting.
+- **Help request during a tussentoets or toets:** the independent attempt ends immediately. PacoGO records the attempt and the help request, marks the assessment as ended/incomplete (not as a failed learner or an incorrect answer), and returns the learner to supported practice. Any subsequent supported work is a separate practice attempt and must not be merged into the ended assessment attempt.
+- A request is recorded separately from support actually delivered. A help request alone is not evidence that help was received. The assessment nevertheless ends on the request, because that is the selected product interaction policy.
+- Neutral interface clarification (for example, how to enter an answer) remains distinct from content help and is handled under the approved operational distinction; it must not silently supply target reasoning.
+
+**Assessment ownership:** PacoGO is the single operational assessor in the learner product. It evaluates the recorded evidence using the existing curriculum contracts and mastery decision process. No second human assessor or parallel rating workflow is introduced into ordinary learner use.
+
+A tussentoets or toets is an **afnamevorm**, not a new skill, development, evidence target or mastery rule. The smaller/broader scope is selected from existing curriculum definitions. Existing C6 mastery gates, evidence requirements and scope boundaries remain authoritative; one completed assessment or one correct response does not automatically award mastery.
+
+This is an owner-confirmed product interaction decision. It does not by itself approve runtime implementation, event/schema changes, registry changes, new thresholds or Supabase persistence. Those require their own contract review and the normal regression-first workflow.
+
 ## 2. Four-layer model
 
 Keep four separate layers:
@@ -51,7 +68,7 @@ This mode must be declared and communicated before the learner begins.
 - The learner may end the independent attempt and continue in supported practice. That continuation is a distinct attempt/response episode and must not overwrite or merge with the independent attempt.
 - Neutral interface clarification (for example, how to enter an answer) is distinguished from assistance that supplies target-relevant mathematical reasoning.
 
-The product interaction for a help request during independent performance remains a design choice: either the request pauses/ends the independent attempt before offering support, or the learner explicitly abandons that attempt and starts a supported one. In either design, the help request and delivered support are separate events.
+**Product interaction decision (owner-confirmed):** a content-help request during a tussentoets or toets immediately ends the independent attempt. PacoGO records the attempt as ended/incomplete, records the request separately from any support actually delivered, and returns the learner to supported practice in a distinct attempt. This is not a failed test result or a negative judgement about the learner. A tussentoets covers a smaller defined part of an existing learning objective; a toets covers a broader part. These are assessment formats, not new curriculum objects or mastery rules. PacoGO remains the single operational assessor.
 
 ## 4. Relationship to C3 v0.2
 

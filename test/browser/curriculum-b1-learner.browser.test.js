@@ -140,6 +140,9 @@ test('B1 learner practice provisions an owned profile and persists each atomic l
   await expect(page.locator('.quantity-group')).toHaveCount(2);
   await expect(page.locator('textarea')).toHaveCount(0);
 
+  await page.getByRole('button', { name: 'Ik wil hulp' }).click();
+  await page.getByRole('button', { name: 'Hint' }).click();
+  await expect(page.locator('[data-addition-support-message]')).toContainText('Bekijk alle groepen');
   await page.locator('input[aria-label="Wat is de som?"]').fill('11');
   await page.getByRole('button', { name: 'Controleren' }).click();
   await expect(page.locator('#feedback')).toContainText('nog niet opgeslagen');
@@ -190,5 +193,12 @@ test('B1 learner practice provisions an owned profile and persists each atomic l
   expect(persisted.traces).toHaveLength(5);
   expect(persisted.evidence.every(row => row.student_key === learnerKey)).toBe(true);
   expect(persisted.evidence.every(row => row.student_key !== 'Leerling A')).toBe(true);
+  const firstObservation = persisted.evidence[0].observation;
+  const supportEvents = firstObservation.interaction_events;
+  expect(supportEvents.map(event => event.event_type)).toContain('help_requested');
+  expect(supportEvents.map(event => event.event_type)).toContain('support_delivered');
+  expect(supportEvents.find(event => event.event_type === 'support_delivered').payload.support_type).toBe('hint');
+  expect(firstObservation.performance.hints).toBe(1);
+  expect(firstObservation.independence_status).toBe('UNKNOWN');
   expect(pageErrors).toEqual([]);
 });

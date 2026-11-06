@@ -1,4 +1,5 @@
 import { createInteractionEvent, createObservation, createTaskInstance } from './interaction-contract.js';
+import { createTaskSupportController } from './task-support-controller.js';
 
 function assertFiniteNumber(value, label) {
   if (!Number.isFinite(value)) throw new TypeError(`${label} must be a finite number`);
@@ -58,6 +59,16 @@ function createAdditionController({
     }));
   };
 
+  const supportController = createTaskSupportController({
+    taskInstanceId: taskInstance.task_instance_id,
+    record,
+    isSubmitted: () => submitted,
+    requestHelp: supportController.requestHelp,
+    deliverSupport: supportController.deliverSupport,
+    dismissHelp: supportController.dismissHelp,
+    hasPendingHelp: supportController.hasPendingHelp
+  });
+
   record('task_presented', {
     addends: [...addends],
     representation,
@@ -115,6 +126,7 @@ function createAdditionController({
     assertFiniteNumber(Number(answer), 'answer');
     submittedAnswer = Number(answer);
     const correct = submittedAnswer === expectedAnswer;
+    supportController.finalize();
     record('addition_submitted', {
       addends: [...addends],
       submitted_answer: submittedAnswer,
@@ -144,7 +156,7 @@ function createAdditionController({
         observed_at: observedAt,
         response_time_ms: Math.max(0, Date.parse(observedAt) - Date.parse(startedAt)),
         attempts: 1,
-        hints: 0,
+        hints: events.filter(event => event.event_type === 'support_delivered' && event.payload.support_type === 'hint').length,
         strategy: selectedStrategy,
         representation,
         prompted_example: promptedExampleRecorded
@@ -152,7 +164,7 @@ function createAdditionController({
       context: {
         language: 'nl',
         setting: 'browser_vertical_slice',
-        prompt_level: 'none',
+        prompt_level: events.some(event => event.event_type === 'support_delivered') ? null : 'none',
         task_variant: task.variation_key,
         variation_key: task.variation_key
       },

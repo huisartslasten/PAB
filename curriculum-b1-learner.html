@@ -60,6 +60,7 @@
   import { createPacoGOApp } from './src/app/bootstrap.js';
   import { createAdditionController } from './pacogo-engine/addition-controller.js';
   import { createAdditionLearningInterfaceModel } from './pacogo-engine/addition-learning-interface-contract.js';
+  import { createAdditionSupportOptions } from './pacogo-engine/addition-support-content.js';
   import { renderAdditionLearningInterface } from './pacogo-engine/addition-learning-interface.js';
   import { createBrowserVerticalSliceRuntime } from './pacogo-engine/browser-vertical-slice.js';
   import { createCurriculumRegistry } from './pacogo-engine/curriculum-registry.js';
@@ -220,6 +221,7 @@
   function showTask() {
     const task = catalogue.tasks[taskIndex];
     const model = createAdditionLearningInterfaceModel({ task });
+    const supportOptions = createAdditionSupportOptions({ task });
     const controller = createAdditionController({
       task,
       studentKey: selectedLearner.learner_key,
@@ -237,6 +239,10 @@
     renderAdditionLearningInterface({
       root: exerciseHost,
       model,
+      supportOptions,
+      onHelpRequest: () => controller.requestHelp(),
+      onSupportDelivered: support => controller.deliverSupport(support),
+      onHelpDismissed: () => controller.dismissHelp(),
       onSubmit: answer => {
         try {
           const { evaluation, observation } = controller.submit(answer);
@@ -251,6 +257,7 @@
           });
           pendingCycle = { evaluation, observation, cycle };
           exerciseHost.querySelector('form button').disabled = true;
+          exerciseHost.querySelector('[data-addition-help]')?.setAttribute('disabled', '');
           persistPendingCycle();
         } catch (error) {
           feedback.className = 'status error';

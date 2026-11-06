@@ -187,3 +187,58 @@ assert.deepEqual(threeGroupResult.observation.response.addends, [2, 3, 4]);
 assert.equal(threeGroupResult.observation.response.submitted_answer, 9);
 assert.equal(threeGroupResult.observation.evidence_target_id, 'B1.ET1');
 assert.equal(threeGroupResult.observation.task_model_id, 'B1.TM1');
+
+
+const supportedHelpController = createAdditionController({
+  task: {
+    ...learnerTask,
+    task_id: 'B1-L06',
+    variation_key: 'learner_supported_help'
+  },
+  studentKey: 'learner-session',
+  renderer: {},
+  addends: [7, 5],
+  expectedAnswer: 12,
+  strategyOptions: [],
+  provenance: { test: true, mode: 'operational_learner_practice' }
+});
+const helpRequestId = supportedHelpController.requestHelp();
+assert.equal(supportedHelpController.hasPendingHelp(), true);
+supportedHelpController.deliverSupport({
+  support_type: 'hint',
+  content_id: 'b1-addition-hint-quantity-v1',
+  content_version: '0.1',
+  content: 'Bekijk alle groepen. Hoeveel zijn het samen?'
+});
+assert.equal(supportedHelpController.hasPendingHelp(), false);
+const supportedHelpResult = supportedHelpController.submit(12);
+const supportEventTypes = supportedHelpResult.observation.interaction_events.map(event => event.event_type);
+assert.ok(supportEventTypes.indexOf('help_requested') < supportEventTypes.indexOf('support_delivered'));
+assert.ok(supportEventTypes.indexOf('support_delivered') < supportEventTypes.indexOf('addition_submitted'));
+assert.equal(
+  supportedHelpResult.observation.interaction_events.find(event => event.event_type === 'help_requested').payload.help_request_id,
+  helpRequestId
+);
+assert.equal(supportedHelpResult.observation.performance.hints, 1);
+assert.equal(supportedHelpResult.observation.context.prompt_level, null);
+assert.equal(supportedHelpResult.observation.independent, false);
+assert.equal(supportedHelpResult.observation.independence_status, 'UNKNOWN');
+
+const unresolvedHelpController = createAdditionController({
+  task: {
+    ...learnerTask,
+    task_id: 'B1-L07',
+    variation_key: 'learner_help_requested_not_delivered'
+  },
+  studentKey: 'learner-session',
+  renderer: {},
+  addends: [4, 3],
+  expectedAnswer: 7,
+  strategyOptions: []
+});
+unresolvedHelpController.requestHelp();
+const unresolvedHelpResult = unresolvedHelpController.submit(7);
+assert.ok(unresolvedHelpResult.observation.interaction_events.some(
+  event => event.event_type === 'help_request_unresolved'
+));
+assert.equal(unresolvedHelpResult.observation.performance.hints, 0);

@@ -1,7 +1,16 @@
-function renderAdditionLearningInterface({ root, model, onSubmit }) {
+function renderAdditionLearningInterface({
+  root,
+  model,
+  onSubmit,
+  supportOptions = [],
+  onHelpRequest = () => {},
+  onSupportDelivered = () => {},
+  onHelpDismissed = () => {}
+}) {
   if (!root || !model || typeof onSubmit !== 'function') {
     throw new TypeError('root, model and onSubmit are required');
   }
+  if (!Array.isArray(supportOptions)) throw new TypeError('supportOptions must be an array');
   root.replaceChildren();
 
   const title = document.createElement('h2');
@@ -22,7 +31,7 @@ function renderAdditionLearningInterface({ root, model, onSubmit }) {
       }
       const group = document.createElement('div');
       group.className = 'quantity-group';
-      group.setAttribute('aria-label', `Hoeveelheid ${count}`);
+      group.setAttribute('aria-label', 'Hoeveelheid ' + count);
       for (let dotIndex = 0; dotIndex < count; dotIndex += 1) {
         const dot = document.createElement('span');
         dot.className = 'quantity-dot';
@@ -65,7 +74,73 @@ function renderAdditionLearningInterface({ root, model, onSubmit }) {
   });
 
   root.append(title, instruction, visual, form);
-  return Object.freeze({ input, submit });
+
+  let helpOpen = false;
+  let supportMessage = null;
+  let supportChoices = null;
+  let helpButton = null;
+
+  if (supportOptions.length > 0) {
+    const supportRegion = document.createElement('section');
+    supportRegion.className = 'addition-support';
+    supportRegion.setAttribute('aria-label', 'Hulp bij optellen');
+
+    helpButton = document.createElement('button');
+    helpButton.type = 'button';
+    helpButton.dataset.additionHelp = 'true';
+    helpButton.textContent = 'Ik wil hulp';
+
+    supportChoices = document.createElement('div');
+    supportChoices.className = 'addition-support-options';
+    supportChoices.hidden = true;
+
+    supportMessage = document.createElement('div');
+    supportMessage.className = 'addition-support-message';
+    supportMessage.dataset.additionSupportMessage = 'true';
+    supportMessage.setAttribute('role', 'status');
+    supportMessage.setAttribute('aria-live', 'polite');
+    supportMessage.hidden = true;
+
+    helpButton.addEventListener('click', () => {
+      if (helpOpen) {
+        onHelpDismissed();
+        supportChoices.hidden = true;
+        supportMessage.hidden = true;
+        helpButton.textContent = 'Ik wil hulp';
+        helpOpen = false;
+        return;
+      }
+
+      onHelpRequest();
+      supportChoices.replaceChildren();
+      supportOptions.forEach(option => {
+        const optionButton = document.createElement('button');
+        optionButton.type = 'button';
+        optionButton.textContent = option.label;
+        optionButton.addEventListener('click', () => {
+          onSupportDelivered(option);
+          supportMessage.replaceChildren();
+          const heading = document.createElement('strong');
+          heading.textContent = option.title;
+          const content = document.createElement('p');
+          content.textContent = option.content;
+          supportMessage.append(heading, content);
+          supportMessage.hidden = false;
+          supportChoices.hidden = true;
+        });
+        supportChoices.appendChild(optionButton);
+      });
+      supportChoices.hidden = false;
+      supportMessage.hidden = true;
+      helpButton.textContent = 'Hulp sluiten';
+      helpOpen = true;
+    });
+
+    supportRegion.append(helpButton, supportChoices, supportMessage);
+    root.appendChild(supportRegion);
+  }
+
+  return Object.freeze({ input, submit, helpButton, supportChoices, supportMessage });
 }
 
 export { renderAdditionLearningInterface };

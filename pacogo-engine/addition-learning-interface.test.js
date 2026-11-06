@@ -39,3 +39,21 @@ test('addition learning model supports symbolic prompts and rejects invalid repr
     /at least two finite numbers/
   );
 });
+
+
+test('addition learning model preserves three quantity groups as separate addends', () => {
+  const model = createAdditionLearningInterfaceModel({
+    task: {
+      task_id: 'B1-L05',
+      title: 'Tel drie hoeveelheden bij elkaar',
+      instruction: 'Bekijk de drie groepen. Hoeveel zijn het samen?',
+      representation: 'quantity_groups',
+      addends: [2, 3, 4],
+      response_process_required: false
+    }
+  });
+
+  assert.equal(model.taskId, 'B1-L05');
+  assert.deepEqual(model.addends, [2, 3, 4]);
+  assert.equal(model.problemLabel, '2 + 3 + 4 = ?');
+});

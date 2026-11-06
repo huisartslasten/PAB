@@ -165,3 +165,25 @@ assert.throws(
   }),
   /strategyOptions must contain at least one strategy/
 );
+
+
+const threeGroupTask = {
+  ...learnerTask,
+  task_id: 'B1-L05',
+  variation_key: 'learner_quantity_groups_three_groups'
+};
+const threeGroupController = createAdditionController({
+  task: threeGroupTask,
+  studentKey: 'learner-session',
+  renderer: {},
+  addends: [2, 3, 4],
+  expectedAnswer: 9,
+  strategyOptions: [],
+  provenance: { test: true, mode: 'operational_learner_practice' }
+});
+const threeGroupResult = threeGroupController.submit(9);
+assert.equal(threeGroupResult.evaluation.correct, true);
+assert.deepEqual(threeGroupResult.observation.response.addends, [2, 3, 4]);
+assert.equal(threeGroupResult.observation.response.submitted_answer, 9);
+assert.equal(threeGroupResult.observation.evidence_target_id, 'B1.ET1');
+assert.equal(threeGroupResult.observation.task_model_id, 'B1.TM1');

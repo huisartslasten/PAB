@@ -42,17 +42,19 @@ Existing development order and mastery rules are candidate model parameters. Thi
 
 ## 3. Current operational catalogue coverage
 
-B1 Learner Task Catalogue v0.1 contains three tasks:
-- B1-L01: combine two small quantity groups; D1/C1/TM1/ET1.
+B1 Learner Task Catalogue v0.1 contains five tasks:
+- B1-L01: combine two small quantity groups (7 + 5); D1/C1/TM1/ET1.
 - B1-L02: symbolic addition 28 + 17; D2/C2/TM3/ET3.
 - B1-L03: symbolic addition 46 + 28; D2/C2/TM3/ET3.
+- B1-L04: combine two medium quantity groups (9 + 6); D1/C1/TM1/ET1.
+- B1-L05: combine three visible quantity groups (2 + 3 + 4); D1/C1/TM1/ET1.
 
 Observed catalogue gaps:
-- D1 has one task and one small-quantity variation.
+- D1 has three tasks: two two-group compositions at different sizes and one three-group composition. This broadens the visible part-whole composition demand, but does not by itself establish mastery or a new development.
 - D2 has two symbolic two-digit tasks, but no explicit task variation across written/contextual/decimal forms in this catalogue.
 - D3 has no operational learner task.
 - D4 has no operational learner task.
-- ET2 (representation of the addition relation), ET4 (strategy), ET5 (checking), ET6 (robustness), ET7 (independence) and ET8 (transfer) are not explicitly covered by these three catalogue tasks.
+- ET2 (representation of the addition relation), ET4 (strategy), ET5 (checking), ET6 (robustness), ET7 (independence) and ET8 (transfer) are not explicitly covered by these five catalogue tasks.
 
 This is a catalogue coverage statement, not a claim that the registry model lacks these targets.
 
@@ -103,7 +105,7 @@ A context task may involve reading data, money notation or measurement units. Th
 ## 6. Candidate catalogue shape — not yet implemented
 
 A future B1 catalogue revision should:
-- retain B1-L01–L03 and their existing task identities/contracts unless a verified defect requires change;
+- retain B1-L01–L04 and their existing task identities/contracts unless a verified defect requires change;
 - add tasks that explicitly cover D3 and D4;
 - add D2 variation beyond the two existing two-digit symbolic tasks;
 - explicitly cover ET2, ET4, ET5, ET6, ET7 and ET8 across the catalogue;
@@ -213,3 +215,8 @@ Before implementing new learner tasks, produce a B1 task-level traceability and 
 The first implementation slice should be the smallest complete vertical slice that can genuinely capture its declared evidence. Prefer a supported D1/D2 extension if it closes a real coverage gap without pretending to cover D3/D4. D3/D4 should follow only after the interaction/evidence contracts are implemented and tested.
 
 No runtime code, learner catalogue, route, database or Supabase schema was changed in this audit.
+
+
+## 12. Implemented D1 composition extension — B1-L05
+
+The operational learner catalogue now includes B1-L05, a three-group quantity-composition task (`2 + 3 + 4`). It remains within the unchanged B1.D1 / B1.C1 / B1.TM1 / B1.ET1 contract. The interface already renders one quantity group per addend, so no new representation, response type, controller semantics or persistence contract is introduced. This task adds a meaningful composition variation (three parts rather than two); it does not claim ET7, strategy selection, checking, mastery or a new development. Browser coverage verifies three visible groups and the persisted observation path.

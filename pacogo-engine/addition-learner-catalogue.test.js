@@ -31,3 +31,16 @@ test('operational B1 learner tasks use exact existing registry contracts', () =>
   assert.ok(catalogue.tasks.some(task => task.development_id === 'B1.D1' && task.task_model_id === 'B1.TM1'));
   assert.ok(catalogue.tasks.some(task => task.development_id === 'B1.D2' && task.task_model_id === 'B1.TM3'));
 });
+
+
+test('three-group quantity composition stays within the existing TM1/ET1 contract', () => {
+  const task = catalogue.tasks.find(item => item.task_id === 'B1-L05');
+  assert.ok(task);
+  assert.deepEqual(task.addends, [2, 3, 4]);
+  assert.equal(task.expected_answer, 9);
+  assert.equal(task.development_id, 'B1.D1');
+  assert.equal(task.claim_id, 'B1.C1');
+  assert.equal(task.task_model_id, 'B1.TM1');
+  assert.deepEqual(task.evidence_target_ids, ['B1.ET1']);
+  assert.equal(task.response_process_required, false);
+});

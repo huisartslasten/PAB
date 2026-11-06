@@ -1260,3 +1260,31 @@ The scan covered the legacy table names, old service names and constructors, old
 - Feature implementation commit: `22693a1f299e7416e57f4ddb33b3eb27eb681ce6`; browser-test sequence correction: `1a19e53ff8266acd665226693bd429ef54f5619f`.
 - This handoff metadata update must itself be verified by Full Regression on its resulting commit.
 - Next: continue the B1 learner-facing task design from supported quantity composition, while keeping ET7 and assessment-mode semantics explicit blockers for any independence or assessment implementation.
+
+
+## 41. B1 representation-mapping task design — 2026-11-06
+
+### Design completed
+- New design artifact: `docs/curriculum/PacoGO_B1_Representation_Mapping_Task_Design_v0.1.md`.
+- Provisional learner task B1-L06 is designed for the existing B1.D2 → B1.C2 → B1.TM2 contract.
+- TM2's exact evidence target set is preserved: ET1 + ET2.
+- The learner sees quantity groups, selects the symbolic equation that represents those groups, and separately enters the total. Mapping and total remain distinct raw response facts and distinct target-specific correctness values.
+- Mixed responses (correct total / incorrect mapping, or the reverse) must remain distinguishable.
+- The task is practice-only. It does not claim ET7, strategy, checking, independence, assessment validity or mastery.
+- This is a design artifact, not an operational catalogue task. B1-L06 is provisional and has not been added to the learner catalogue or runtime.
+
+### Architectural and persistence gates
+- Extend the reusable Addition Learning Interface in separate pedagogical/function, interaction/state/evidence and rendering layers; do not create a B1-only widget.
+- Before implementation, inspect the existing observation and persistence path to prove that the target-specific raw response can be preserved losslessly.
+- Preserve the existing registry version/history scope (catalogue points to 0.4.0-candidate; TEST does not register 0.6.0-candidate).
+- No Supabase schema, RPC, RLS, registry mapping, mastery or learner-state change is authorized by this design.
+- ET7 and the central practice/interim-assessment/final-assessment support contract remain unresolved blockers for any independence or assessment implementation.
+
+### Verification
+- Branch: `refactor/professional-v1`.
+- Design commit: `a97c299b3b7c441aefaefe8c35570defbc71aaeb`.
+- Full Regression #3024 / run ID `42216716227`: completed GREEN on exact commit `a97c299b3b7c441aefaefe8c35570defbc71aaeb`.
+- LIVE `main` and Supabase remain untouched.
+
+### Next concrete step
+Inspect the existing B1 controller → observation → browser vertical-slice → persistence path for lossless preservation of the two response dimensions. If the current contract supports it, implement the reusable interface extension and B1-L06 with unit, controller, catalogue, browser and Full Regression coverage. If it does not, stop and design the underlying contract before changing code or persistence.

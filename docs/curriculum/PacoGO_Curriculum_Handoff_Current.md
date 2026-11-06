@@ -1497,3 +1497,48 @@ Author the Scope and Time-Window Lifecycle Contract and reconcile C8's time-wind
 - The review is documentation-only and must be verified by Full Regression on the resulting combined commit after this handoff update.
 - Latest verified Full Regression at the time of this handoff update: #3031 GREEN on `ac01f16538639537d0a91940c936c224fc4965b1`.
 - No GREEN status is claimed for the new review/handoff commit until its own exact-commit run completes.
+
+
+## 48. Scope and time-window lifecycle contract drafted — 2026-11-06
+
+### Exact starting verification
+- Full Regression #3033 / run ID `42241864483` completed GREEN on exact commit `663d434804ba113cb0f3a4e46d2d96ba4da3d365`.
+- The review and lifecycle-contract documents were created after that verified baseline.
+
+### New design artifact
+- `docs/curriculum/PacoGO_Scope_and_Time_Window_Lifecycle_Contract_v0.1.md`.
+- Commit: `ad5b6808210c18f17bd94c20025a5b26f76e3353`.
+- Status: design proposal; owner review required; not approved for implementation.
+
+### Core lifecycle direction
+- Scope is a versioned specification of the evidence universe and decision question; it is not a task, session, UI or hidden threshold.
+- Time window is a versioned temporal eligibility boundary; it is not implicitly the last N days, school term, browser session or task count.
+- Both definitions are immutable once referenced by a decision evaluation. A changed definition creates a new identity/branch.
+- Raw observation ingestion, later target assessment/coding and C6–C9 decision evaluation are separate lifecycle stages.
+- Each decision snapshot freezes eligible observation IDs, target-assessment/coding versions, event-time interval, assessment-availability cut-off, registry and protocol versions.
+- Late coding may enter a later snapshot without rewriting the earlier decision. Late observations after closure remain disallowed by default pending explicit policy.
+- Overlapping windows are discouraged unless justified; they cannot count as independent replications.
+- Successive windows remain separate six-part branches. C8 may compare them descriptively but cannot pool their evidence into a new mastery result.
+
+### C6–C9 consequences
+- C6 continues to use its existing seven gates and decision order; it receives explicit scope/window definitions and cannot create or infer them.
+- C7 preserves the exact C6 branch and snapshot identity.
+- C8 v0.1 is incomplete for the six-part branch identity. A new version must add registry-version and time-window identity and distinguish one-branch history from higher-level descriptive comparisons across windows.
+- C9 must validate all six identity components for each branch independently.
+- Operational decision windows are not automatically scientific longitudinal measurement waves.
+
+### Owner decisions still required
+The contract lists nine decisions, including scope/window authority, fixed versus rolling/event-defined windows, authoritative event timestamp/time zone, late-arrival rules, coding cut-off/finalization, overlap policy, mandatory scope dimensions, C8 presentation and retention/deletion.
+
+### Boundaries
+- No code, tests, registry, catalogue, curriculum mapping, SQL, schema, RPC, RLS, Supabase or learner data changed.
+- No C3 codebook or C6 mastery thresholds were approved or changed.
+- B1-L06 remains unimplemented.
+- Branch remains `refactor/professional-v1`; LIVE `main` untouched.
+
+### Next concrete step
+Reconcile C8 and C9 into explicit versioned proposals using the full six-part identity and staged snapshot lifecycle. In parallel, obtain owner decisions on the scope/window questions and C3 v0.2 Section 13. Then update the integrated multi-target contract to v0.2.
+
+### Verification
+- Latest verified Full Regression before this design change: #3033 GREEN on `663d434804ba113cb0f3a4e46d2d96ba4da3d365`.
+- Scope contract commit and this handoff update require Full Regression on the resulting combined commit. No GREEN status is claimed until that exact-commit run completes.

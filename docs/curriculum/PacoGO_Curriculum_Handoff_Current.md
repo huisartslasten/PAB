@@ -1972,3 +1972,45 @@ Do not implement the B1 multi-target learner task, inference fan-out, read-model
 
 ### Verification of this handoff update
 This handoff update is a repository change and requires Full Regression on its exact resulting commit. No post-update GREEN status is claimed until that exact-commit run completes.
+
+
+## 59. Owner-directed multi-target architecture decisions — 2026-11-06
+
+### Decision record
+Created:
+- `docs/curriculum/PacoGO_Multi_Target_Owner_Architecture_Decisions_v0.1.md`
+
+The owner instructed us to proceed with the reviewed recommendations. This record establishes the logical architecture baseline for O1–O4 and O7–O8 while explicitly leaving O5, O6 and O9 open. It does not authorize runtime or persistence implementation.
+
+### Logical decisions recorded
+- O1: normalized logical target-assessment records linked to one immutable raw observation, with separate append-only coder/round/adjudication provenance. Physical schema is deferred until C3 and persistence/security design are approved.
+- O2: branch-specific state and append-only decision history are authoritative; skill-level state is a derived projection only. Physical read-model/table design remains open.
+- O3: the six explicit branch fields remain authoritative. No derived branch hash/serialization is approved; a separate canonical serialization contract would be required.
+- O4: historical scalar records remain unchanged/readable; a read-only legacy adapter is the forward direction. Exact API/mapping waits for consumer inventory.
+- O7: observation, assessment/coding and decision evaluation have separate idempotency boundaries. Lifecycle is staged; each write stage is atomic internally and supports durable retry/recovery. Exact status/retry/concurrency design remains a pre-implementation gate.
+- O8: C6 consumes one frozen snapshot per exact six-part branch; C7 consumes the exact C6 branch/snapshot/evaluation and does not recompute mastery.
+
+### Explicitly open
+- O5: scope/time-window owner, event clock/timezone, closure, grace/late-arrival, overlap, C8 presentation and retention policy.
+- O6: canonical C3 vocabulary, quality scale, evidence-status/missingness rules, independence anchors, contradiction, coder/adjudication and reliability design, schema versioning.
+- O9: exact learner-facing cross-branch presentation and wording. Descriptive summaries must preserve branch lineage and cannot pool evidence or recompute mastery/actions.
+
+### Invariants and scope
+- One separately administered task-instance response episode = one immutable raw observation.
+- One observation may have zero or more target-specific assessments; assessment/coder/adjudication cardinality never inflates raw observation counts.
+- A shared observation may be referenced by multiple branch snapshots but is never duplicated.
+- Existing SLO meanings, skills, developments, claims, targets, task models, C1–C9 meanings and mastery criteria remain unchanged.
+- Legacy Skills, lessons, learner profiles, assessment history, games and unrelated Supabase components remain untouched.
+- No runtime, tests, registry, catalogue, SQL/RPC/RLS, Supabase or learner-data changes are authorized by this decision record.
+- B1-L08 multi-target task remains blocked until the contracts and implementation-readiness gates are closed.
+
+### Next concrete step
+Produce a consolidated implementation-readiness matrix identifying each remaining gate, owner, required artifact/evidence, dependencies and implementation authorization point. Then close O5/O6/O9 and the remaining C6–C9, consumer, identity, persistence, security and atomicity gates before considering a pure contract implementation slice.
+
+### Verification
+- Starting branch: `refactor/professional-v1`.
+- Starting exact commit: `8ec132ed609ec9563ec2f1ea663982a4a708279c`.
+- Full Regression #3057 / run ID `42272691896`: GREEN on that exact commit (all 19 workflow steps).
+- Decision record commit: `655bd8c80771733f76e0cd787c2d2bf14b6f3d36`.
+- This handoff update is a documentation change and requires Full Regression on the exact resulting commit. No post-update GREEN is claimed until that run completes.
+- LIVE `main` was not changed.

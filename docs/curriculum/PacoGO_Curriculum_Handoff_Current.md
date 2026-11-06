@@ -1890,3 +1890,34 @@ Continue B1 by implementing an observable representation-mapping task within the
 
 ### Verification of this handoff update
 This handoff update is a repository change and requires Full Regression on its exact resulting commit. No post-update GREEN status is claimed until that exact-commit run completes.
+
+
+
+## 57. B1 TM2 multi-target evidence contract blocker — 2026-11-06
+
+### Verified finding
+The next planned operational task is a representation-mapping task under the existing B1.TM2 contract, whose registry definition declares both B1.ET1 and B1.ET2.
+
+The current observation/persistence path does not preserve both targets:
+- `createTaskInstance` retains the complete `evidence_target_ids` array.
+- `createObservation` reduces that array to the singular `evidence_target_id` by selecting index 0.
+- `createLearnerCurriculumService.persistLearningCycle` sends only that singular target to the persistence RPC.
+- `student_evidence` stores a singular `evidence_target_id`; its unique idempotency index is on `(student_key, source_event_id)`.
+
+Therefore a TM2 task using the current path would persist ET1 while silently losing ET2. Merely adding a representation-selection UI or event would not fix the missing target-level evidence persistence. Do not implement the TM2 learner task until this contract is resolved.
+
+### Scope boundaries
+- This is an evidence/observation/persistence contract issue, not a curriculum-definition issue.
+- B1 meanings, TM2, ET1/ET2, C1–C9, mastery rules and the registry remain unchanged.
+- No Supabase migration or runtime persistence change has been made.
+- Do not duplicate evidence rows with the same source event or fabricate target-specific observations without a defined assessment and idempotency contract.
+- Old Skills, games, lessons, learner profiles, test history and unrelated Supabase areas remain untouched.
+
+### Next concrete step
+Design and test a canonical multi-target evidence contract: how one learner interaction produces separately assessable evidence for each declared target; how target-specific assessments, observation identity, event provenance and idempotent persistence work; and how inference consumes those records without double-counting one performance as multiple independent observations. Determine from that design whether a genuine persistence contract change is required. Only then implement the smallest complete vertical slice.
+
+### Verification context
+- Branch: `refactor/professional-v1`.
+- Starting commit for this finding: `e7c6bdf553b99a1a03b6bcc770921ec200fe7c49`.
+- Full Regression #3054 / run ID `42268591207`: GREEN on that exact starting commit; all 19 workflow steps completed successfully, including browser regression and clean-tree verification.
+- This handoff update itself requires Full Regression on its resulting exact commit. No post-update GREEN status is claimed until that run completes.

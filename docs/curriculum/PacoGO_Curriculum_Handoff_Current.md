@@ -1423,9 +1423,39 @@ Complete the scalar-field and learner-state consumer inventory, then specify the
 - B1-L06 remains unimplemented.
 
 ### Next concrete step
-Complete the remaining exact-branch consumer inventory, including all scalar-field reads/writes, SQL constraints and RPC callers, then review this v0.1 contract and resolve O1–O7. Do not begin implementation until the logical contract and required C3 boundaries are approved.
+Review this v0.1 contract and resolve O1–O7. The current browser/controller, engine, adapter, learner-service, SQL/RPC and regression-test consumer inventory has been completed to the scope recorded in sections 2.1–2.8. Do not begin implementation until the logical contract and required C3 boundaries are approved.
 
 ### Verification
 - The design artifact was created on `refactor/professional-v1`.
 - This handoff update and design artifact require Full Regression on the resulting commit. No regression result is claimed until the run completes on that exact commit.
 - LIVE `main` and Supabase remain untouched.
+
+
+## 46. Multi-target consumer inventory completed — 2026-11-06
+
+### Exact baseline
+- Branch head before this design-only inventory update: `e808938316c07440cb41f86d61ad827d5f4f4916`.
+- Full Regression #3029 / run ID `42230086941`: completed GREEN on exact commit `4ee28ee8aa24261adaa04ac2ab6418cfecf1e867`.
+- The handoff-only commit `e808938316c07440cb41f86d61ad827d5f4f4916` followed the tested design commit; this next commit is intended to trigger verification of the combined document state.
+
+### Additional verified consumers
+- Browser runtime `browser-vertical-slice.js` checks only task skill against observation skill before calling `runSkillCycle`; it does not validate the complete task/target/claim/development/registry relationship.
+- Addition controller creates a task instance with one claim/development and a target array, then receives the current first-target scalar projection from `createObservation`.
+- The controller adds provisional scalar evidence fields. They are not an approved C3 target-assessment set.
+- Existing C3, registry/prototype, C6, C7, C8/C9 and vertical-slice tests validate the current single-target/single-branch contract only.
+- Learner ownership and write-context migrations enforce guardian-scoped access, deny direct client writes and protect the atomic RPC boundary. These protections must remain unchanged in any future multi-branch persistence design.
+- SQL integration tests currently prove one-row/one-state/one-trace persistence, guardian isolation, idempotent replay and rollback; they do not prove multi-branch persistence or conflicting replay rejection.
+
+### Design update
+- Contract v0.1 now records the browser/controller validation gap, existing test boundary and persistence security requirements.
+- No runtime, tests, catalogue, registry, SQL, RLS, Supabase or learner data changed.
+- JSONB versus normalized target-assessment storage and the physical branch-state model remain open.
+- No implementation is authorized.
+
+### Next concrete step
+Review the integrated contract and resolve its open decisions O1–O7, starting with the C3 assessment/coder-round requirements and the exact branch-state/read-model contract. Only then define the implementation sequence.
+
+### Verification
+- Full Regression #3029 was GREEN on `4ee28ee8aa24261adaa04ac2ab6418cfecf1e867`.
+- The new combined documentation commit requires its own Full Regression result; no result is claimed until that run completes on its exact commit.
+- Branch remains `refactor/professional-v1`; LIVE `main` and Supabase remain untouched.

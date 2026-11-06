@@ -85,6 +85,48 @@ Current persistence schema/RPC:
 
 Therefore JSONB preservation alone does not make the current inference, state or persistence path multi-target capable.
 
+### 2.6 Browser and controller path
+
+`pacogo-engine/browser-vertical-slice.js` is the actual browser bridge:
+
+- `runTaskObservation()` resolves the task by task ID and checks only that observation.skill_id equals task.skill_id.
+- It does not currently validate observation task-instance identity, task-model identity, target-opportunity set, claim/development ownership or registry-version context against the resolved task.
+- It then delegates to `registry.runSkillCycle()`, which executes the skill-level prototype path.
+
+`pacogo-engine/addition-controller.js`:
+
+- builds its task instance with one task.development_id and one task.claim_id plus an evidence-target array;
+- emits a raw observation through `createObservation()`;
+- the interaction contract currently projects only the first target ID;
+- the returned learner observation adds provisional scalar coding fields (`quality`, `relevant`, `contradiction`, `independent`, `independence_status`). Those provisional fields must not be mistaken for an approved target-specific C3 assessment or C6 mastery result.
+
+The browser boundary therefore needs a future task-instance/registry validation contract, not merely an array-valued observation field.
+
+### 2.7 Existing test coverage boundary
+
+The current tests establish single-target and single-branch behavior:
+
+- `interaction-contract.test.js` explicitly asserts the scalar first target;
+- `curriculum-registry.test.js` exercises scalar evidence targets and skill-level state;
+- `prototype.test.js` exercises one observation assessment and skill-level mastery;
+- C6 tests exercise one branch per claim;
+- C7 adapter tests select a C6 result by claim;
+- the real C6→C7→C8→C9 vertical-slice test exercises one branch.
+
+These tests are valid for the existing contract. They do not prove multi-target fan-out, branch isolation or shared-observation cardinality. They must be supplemented by the scenarios in section 13; they must not be weakened to accommodate an implementation.
+
+### 2.8 Persistence security boundary
+
+The learner-ownership migration and subsequent write-context migration add guardian checks and a transaction-local write capability around the existing learning-cycle RPC. Any future multi-branch persistence design must preserve those controls:
+
+- authenticated guardian membership remains checked for the learner;
+- direct client table writes remain denied;
+- write capability remains transaction-local and is cleared after success or failure;
+- atomic rollback remains required;
+- the multi-branch extension must not broaden RLS or grant new direct write privileges.
+
+The existing SQL integration test covers guardian isolation, replay idempotency, direct-write denial and atomic rollback for the current one-row/one-state/one-trace transaction. It does not yet cover multi-branch writes or conflicting replay payloads.
+
 ## 3. Canonical logical entities and cardinality
 
 The following is the proposed logical model. It intentionally separates immutable learner data from revisable scientific coding and derived decisions.

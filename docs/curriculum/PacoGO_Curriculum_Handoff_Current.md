@@ -1321,3 +1321,37 @@ Inspect the existing B1 controller → observation → browser vertical-slice �
 ### Verification
 - This design and handoff update must be verified by Full Regression on the resulting commit.
 - LIVE `main` remains untouched.
+
+
+## 43. Multi-target evidence architecture reconciliation — 2026-11-06
+
+### C1–C9 reconciliation completed — design only
+- Full Regression #3026 / run ID `42218253663` completed GREEN on exact commit `e0a4309f6ff92568df8051d8c4d00b050ba96bd7`.
+- Reviewed the multi-target proposal against C2 Student Data Model, C3 consolidated observation/event reconciliation and C3 codebook proposal v0.2, C6 Mastery Decision Protocol, C7 Next-Action Decision Protocol v0.2, C8 Student Model protocol, C9 Vertical Chain Validation protocol and the Scientific Validation Data Specification.
+- New design artifact: `docs/curriculum/PacoGO_Multi_Target_Evidence_Architecture_Reconciliation_v0.1.md`.
+
+### Reconciled architecture direction
+- One administered task attempt remains one immutable raw observation.
+- Multiple target-specific assessments may reference that observation; each target resolves its own claim/development through the registry.
+- C6 mastery remains separate per claim/development/scope/time context. Evidence from ET1 (C1/D1) and ET2 (C2/D2) must not be pooled into one cross-claim mastery result.
+- Target expansion never creates extra independent observations. Distinct attempt IDs alone do not prove independence; target-specific support/assistance provenance and an approved C3 judgement are required.
+- Coverage, stability, variation and contradiction remain target-/scope-specific and must not be inflated by expansion.
+- C7 next actions remain tied to their own C6 context and explicit ordering state.
+- C8 temporal records retain one consistent learner/claim/development/scope identity. A shared raw observation can feed separate development histories through separate target assessments.
+- C9 validates each claim/development branch while retaining the shared source-observation link; it must not collapse target ownership into the task's primary claim.
+
+### Implementation gates remain closed
+- C3 canonical codebook v0.2 remains a proposal, not approved. Quality scale, evidence vocabulary, assistance/independence boundaries, contradiction states and coder cardinality remain unresolved.
+- Singular-versus-array observation schema conflict remains unresolved.
+- The scalar database target column and all consumers require inspection before choosing persistence representation.
+- Existing runtime inference/mastery semantics must be mapped to the claim/development-scoped fan-out without changing thresholds by assumption.
+- No runtime, test, task catalogue, registry, Supabase, schema, learner-state or mastery changes are authorized by this reconciliation.
+- B1-L06 remains designed only and is not implemented.
+
+### Next concrete step
+Prepare a focused versioned contract decision for observation-to-target-assessment cardinality and C6–C9 fan-out, including a compatibility decision for legacy single-target observations and scalar target columns. Only after that and explicit C3 codebook approval should implementation be reconsidered.
+
+### Verification
+- Design starting commit: `e0a4309f6ff92568df8051d8c4d00b050ba96bd7`.
+- The design artifact and this handoff update require Full Regression on their resulting commit.
+- Branch remains `refactor/professional-v1`; LIVE `main` and Supabase remain untouched.

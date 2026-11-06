@@ -1588,3 +1588,46 @@ Update the integrated multi-target decision contract to v0.2 so it incorporates 
 - This handoff update follows C8 v0.2 commit `3fe9410f4bf106a43e56646c11f61efa39d3f2ae` and C9 v0.2 commit `9f0804a1e1abf387cc8e34a5ca8f178561077878`.
 - Full Regression for the combined C8/C9/handoff document state is pending; no GREEN status is claimed until a run completes on the exact resulting handoff commit.
 - Latest verified Full Regression before these three documentation commits: #3035 GREEN on `a98c46458d1d14ee55ae73b8dd977abe5ad86953`.
+
+
+
+## 50. Integrated multi-target decision contract v0.2 — 2026-11-06
+
+### Exact starting verification
+- Full Regression #3040 / run ID `42243391852` completed GREEN on exact commit `5c4dd08a4b1788dabcff38a9d6f1a1fb9f75915d`.
+- All workflow steps succeeded: dependency/security checks, canonical ownership boundaries, curriculum-engine regression, architecture boundary tests, Double or Nothing runtime regression, maintained Node regression, maintained Vitest regression, Chromium setup, fixture server, browser regression and clean-working-tree verification.
+
+### New integrated contract
+- Added `docs/curriculum/PacoGO_Integrated_Multi_Target_Decision_Contract_v0.2.md`.
+- Commit: `7b0684bdae55f0a384841379e42628ed78458c7f`.
+- This is an integrated logical architecture proposal / owner review required / NOT approved for implementation. v0.1 remains historical; its implementation observations are explicitly tied to its old verified baseline, not represented as a fresh current-branch audit.
+
+### Integrated decisions now reconciled
+- Three distinct lifecycle stages: immutable raw-observation ingestion; append-only target-specific C3 assessment/coding; frozen branch-specific decision snapshot and evaluation.
+- One administered task-instance response episode produces one raw observation. One observation may link to multiple target assessments and branches without duplicating source observations or inflating independence counts.
+- Target assessment, coder round and adjudication are not new learner observations. Late coding/correction is append-only and can only enter a later eligible snapshot.
+- Every canonical C6–C9 branch retains the full six-part identity: learner, registry version, claim, development, scope and time window.
+- Scope/window definitions are immutable and versioned once referenced. Event-time eligibility and assessment-availability cutoff are separate. A frozen snapshot lists exact observation IDs, target-assessment IDs/versions, codebook/protocol versions and exclusions.
+- C6 retains its seven gates/order but requires branch-keyed results rather than claim-only output. C7 consumes the exact C6 branch, snapshot and evaluation. C8 preserves exact branch histories and only permits descriptive cross-branch projections. C9 validates each branch independently while retaining shared observation identity.
+- Observation ingestion, assessment/coding ingestion and decision evaluation have separate idempotency boundaries. Conflicting same-identity payloads reject.
+- Recommended but unapproved directions: normalized target-assessment/coder-provenance relations; branch-keyed state projection plus append-only decision history; read-only legacy adapter; versioned canonical tuple serialization with SHA-256 surrogate while retaining all six fields.
+
+### Owner decisions still open
+- C3 codebook vocabulary, target-assessment lifecycle, coder rounds/adjudication and physical storage.
+- Scope/window ownership, timestamp authority/timezone, late arrivals, closure/finalization, overlap and retention.
+- Canonical branch-ID serialization and compatibility.
+- Physical branch-state/read-model, atomicity, idempotency and legacy consumer projections.
+- Exact C6/C7 snapshot envelope reconciliation and product-facing cross-branch projection rules.
+
+### Boundaries
+- No code, tests, task catalogue, registry, learner state/data, SQL, schema, RPC, RLS, Supabase or LIVE `main` changes were made.
+- B1-L06 remains designed only and unimplemented.
+- Branch remains `refactor/professional-v1`.
+
+### Next concrete step
+Conduct a focused owner-decision review against the open items in Sections 18–19 of the integrated v0.2 contract, starting with C3 codebook/assessment provenance and scope/window authority/lifecycle. Then reconcile C6/C7 snapshot envelope and canonical branch-ID serialization. Do not start runtime or persistence implementation until the relevant contracts are explicitly approved.
+
+### Verification
+- Integrated contract v0.2 commit: `7b0684bdae55f0a384841379e42628ed78458c7f`.
+- Full Regression for the integrated contract plus this handoff update is pending; no GREEN status is claimed until a run completes on the exact resulting handoff commit.
+- Latest verified Full Regression: #3040 GREEN on `5c4dd08a4b1788dabcff38a9d6f1a1fb9f75915d`.

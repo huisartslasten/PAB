@@ -3253,3 +3253,47 @@ Verify the exact handoff commit with Full Regression. Then reconcile the G3 cand
 
 - Full Regression #3144 / run ID `42422960987`: **GREEN** on exact commit `27789c9fd4758ac40b18e73c43493c86cd22856d`; all workflow steps passed, including curriculum engine, architecture boundaries, Node/Vitest, browser regression and clean-working-tree verification. This verifies the handoff update and the preceding O6 v0.3/matrix changes.
 - This final handoff status update must itself be verified on its resulting commit before the block is considered closed.
+
+
+## 89. G3 ↔ O6 v0.3 traceability review — 2026-11-07
+
+### Baseline and verification status
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Full Regression #3145 / run ID `42423068970`: **GREEN** on exact prior handoff commit `7a666f22ddf7d6219c1e17417043dc8d6e7b3c05`; all workflow steps passed, including curriculum engine, architecture boundaries, Node/Vitest, browser regression and clean-working-tree checks.
+- The traceability review below is documentation-only and requires a new Full Regression on its final handoff commit.
+
+### Work completed
+
+Created `docs/curriculum/PacoGO_G3_O6_v0.3_Traceability_and_Gap_Review_v0.1.md`.
+
+The review maps all 40 G3 candidate vectors and A1/B1/FR2 domain anchors to O6 v0.3. It classifies direct mappings and explicitly identifies dependencies that must not be guessed:
+- exact task/target elicitation and required process streams;
+- target-specific PROMPTED/DEPENDENT anchors;
+- partial-alignment component definitions;
+- G6/G9 assessment identity, replay/conflict and reassessment semantics;
+- O5 snapshot/availability cutoff;
+- G5 C6 M1/M2 mapping;
+- any future separately approved quality construct.
+
+It also proposes the executable G3 suite structure and negative assertions. No executable tests or runtime code were added.
+
+Updated readiness matrix Section 8.18.
+
+### Gate status
+
+- G2/O6 remains OPEN pending owner acceptance of exact `PacoGO_Operational_Assessment_Contract_v0.3.md`. Earlier "i guess" authorizes continuing from the decision brief as a working baseline, not silently final approval of every category.
+- G3 vectors are now reconciled to O6 v0.3 at design level. G3 remains OPEN until G2 is frozen and executable contract tests are implemented and verified.
+- G5, G6/G9 and O5 dependencies remain separate.
+- No runtime, executable tests, registry, task catalogue, learner state, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Commits
+
+- O6 v0.3 contract: `e4132f2d7d56af1920ce7b26f0d1750c53185475`.
+- G3 traceability review: `66b5dcba8d6b81b1246d1dbc39d62adfc7db1988`.
+- Readiness matrix Section 8.18: `ba6716f24d5c3bd8f7b04e11c9c2a69b4754bda0`.
+- This handoff update must receive its own Full Regression on the resulting exact commit.
+
+### Next concrete step
+
+After verifying this documentation block, obtain the owner's acceptance of exact O6 v0.3. Then freeze G2 and convert the reconciled G3 vectors into executable contract tests. Do not implement runtime or persistence before all applicable gates and explicit G12 authorization.

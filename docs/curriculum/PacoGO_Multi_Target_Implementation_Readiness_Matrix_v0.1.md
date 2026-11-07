@@ -864,3 +864,24 @@ The complete workflow also passed curriculum-engine regression, architecture-bou
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN; this suite is still a test-only normalized logical-record harness, not a production assessor. G3-037–039 remain dependent on G6/G9; G3-040 remains dependent on O5. G5 and G12 remain separate gates. No runtime or persistence authorization is implied.
 
 **Next step:** Continue strengthening genuine vector-level positive and negative assertions against the frozen O6 v0.3 contract. Do not invent unresolved G5/G6/G9/O5 semantics and do not start production implementation before applicable gates and explicit authorization.
+
+
+
+## 8.22 G3-008 — partial alignment must reference a pre-defined target component
+
+**Contract basis:** O6 v0.3 §5.1 permits `PARTIALLY_ALIGNED` only when the target contract explicitly defines separable components and the assessment names the component actually elicited. G3 traceability requires a named pre-defined component; full-target alignment must not be inferred.
+
+**Test change:** `pacogo-engine/operational-assessment-contract.test.js` now represents the target contract's `separable_component_ids` explicitly. The conformance assertion rejects partial alignment unless the instance's named `component_id` is present in that pre-defined list. The G3-008 test now exercises:
+- accepted partial alignment for a component declared by the target contract;
+- rejection when the instance names a component absent from the target contract;
+- rejection when the instance does not name the elicited component.
+
+The negative cases call the shared `assertAssessment` conformance assertion; they no longer simulate rejection with a test-local conditional.
+
+**Scope:** Test-only normalized logical-record harness. No production assessor, learner runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Implementation commit `1f6b41e4c1126ed18eceff623a453424e49f6c99`. Full Regression #3165 / run ID `42425645992`: **GREEN** on that exact commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks all passed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with the next directly specified vector and strengthen its positive and negative cases through the shared conformance assertion. Do not infer semantics owned by G5, G6/G9 or O5.

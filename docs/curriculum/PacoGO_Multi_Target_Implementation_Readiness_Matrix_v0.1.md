@@ -100,7 +100,7 @@ Open blockers:
 - G5: C6–C9 reconciliation and versioned handoff.
 - G6–G11: identity, consumer, persistence, security, recovery and test design.
 
-**Next concrete action:** complete the repository-wide consumer/import inventory for the local mastery service and remaining learner routes, then define the legacy/scalar compatibility disposition and cross-stage positive/negative/missing/mismatch examples. O6 still blocks final C3 assessment-input semantics; O9 is needed before learner-facing cross-branch projection is designed or shipped.
+**Next concrete action:** complete the direct/indirect consumer inventory and assign each consumer a read/write/derived/legacy disposition. Then reconcile the examples in Section 7.12 with the C6–C9 protocol owners. O6 still blocks final C3 assessment-input semantics; O9 is needed before learner-facing cross-branch projection is designed or shipped.
 
 B1-L08 remains blocked until the approved contract supports its target-specific evidence end to end. Existing B1-L01–L07 remain unchanged.
 
@@ -304,6 +304,75 @@ Still required before G5 can close:
 - confirm all negative permissions and references consistently across the four stages.
 
 O9 remains necessary only for learner-facing cross-branch presentation, not for this internal single-branch lineage. No C8 cross-branch projection is approved by this crosswalk.
+
+
+### 7.12 Cross-stage G5 contract examples — illustrative, not implementation fixtures
+
+These examples use symbolic IDs only. They demonstrate the agreed lineage and existing C6/C7 distinctions; they do not define a JSON payload, database schema, C3 assessment vocabulary or new decision policy.
+
+Let one branch be:
+
+`B = (learner=L1, registry=R1, claim=C1, development=D1, scope=S1, window=W1)`
+
+#### Positive example P1 — one coherent branch
+
+1. Snapshot `SN1` declares exactly branch `B`, the approved scope/window definition versions, event-time interval, availability cutoff, eligible raw-observation IDs, eligible target-assessment record/version references and explicit exclusions.
+2. C6 evaluation `E1` references exactly `SN1` and `B`, records the existing seven-gate trace and returns one existing C6 outcome.
+3. C7 decision `D7-1` references exactly `E1`, `SN1` and `B`; carries `prerequisite_ordering_state` and `next_development_ordering_state` separately; and chooses only from the explicit candidate set under the named C7 action-policy version.
+4. Example permitted route: when C6 is `MASTERED`, prerequisite ordering is `SUPPORTED`, next-development ordering is `SUPPORTED`, and the explicit policy/candidate set permit it, C7 may select `ASSESS_NEXT_DEVELOPMENT` or `PRACTICE_NEXT_DEVELOPMENT`. The selected action is the policy result, not a universal default.
+5. C8 item `H1` references exactly `SN1`, `E1`, `D7-1` and `B`, preserving the exact outcomes, timestamp and provenance. It appends; it does not rewrite older history.
+6. C9 validates the same chain and returns one structural result for `B`.
+
+Expected disposition: **valid single-branch lineage**, assuming all referenced records resolve and all existing gates pass.
+
+#### Positive example P2 — prerequisite uncertainty is isolated
+
+For the same branch, C6 is `MASTERED`; `prerequisite_ordering_state=NOT_ASSESSED`; `next_development_ordering_state=UNCERTAIN`. If `ASSESS_PREREQUISITE_DEVELOPMENT` is explicitly available and permitted by the applicable C7 policy, that candidate may be selected. The uncertainty about next-development ordering is not substituted for prerequisite ordering and does not by itself invalidate the prerequisite candidate.
+
+Expected disposition: **candidate-specific C7 evaluation**, not a generic merged ordering state.
+
+#### Negative examples
+
+| ID | Deliberate defect | Required result |
+|---|---|---|
+| N1 | Snapshot is `B`, but C6 evaluation changes only `time_window_id` to `W2` | Reject branch lineage; do not repair or select by claim ID |
+| N2 | Two C6 results share `claim_id=C1` but belong to different scopes/windows; C7 receives only the claim key | Reject as ambiguous; no “latest” or first-match selection |
+| N3 | C7 references `E1` but supplies another snapshot or branch identity | Reject C7 handoff |
+| N4 | C6 returns `INSUFFICIENT EVIDENCE`, while C7 proposes a next-development action | Do not advance; apply the existing C7 HOLD boundary |
+| N5 | C7 ordering fields are collapsed into one `ordering_state` | Reject the input contract; the two domains must remain separate |
+| N6 | C8 item references `SN1/E1` but a different C7 decision ID | Reject history lineage; do not create a corrected synthetic item |
+| N7 | C9 receives a four-field legacy record and current registry/window values are available | Keep it legacy/unscoped; do not infer missing canonical identity |
+| N8 | Assessment becomes available after `SN1` cutoff | Exclude it from `SN1/E1`; a later snapshot/evaluation is required to include it |
+| N9 | Same raw observation is copied into two raw-observation IDs to represent two targets | Reject duplicate raw cardinality; preserve one source observation with separate target-assessment references |
+| N10 | C8 collection contains an item from another six-part branch | Reject the mixed single-branch history; do not pool states |
+
+#### Missing-input examples
+
+- Missing any one of the six branch fields: canonical branch is incomplete; reject canonical evaluation.
+- Missing snapshot ID or its immutable eligibility/cutoff envelope: C6 cannot be treated as an evaluation of a canonical frozen snapshot.
+- Missing or ambiguous C6 evaluation ID: C7 cannot choose a C6 result.
+- Missing C6 gate trace/protocol provenance: reject the incomplete handoff.
+- Missing either C7 ordering domain: apply the existing C7 uncertainty/hold boundary; do not infer it from the other field.
+- Missing explicit candidate set or action-policy version: C7 cannot emit a candidate action.
+- Missing exact C6/C7 references in C8: no canonical history item.
+- Missing source/provenance references in C9: return structural failure with stage attribution; do not repair.
+
+O6-specific target-assessment states and version fields remain intentionally symbolic. These examples do not close O6 or authorize test/runtime changes.
+
+### 7.13 Legacy/scalar compatibility disposition — proposed boundary
+
+The source contracts and current runtime inventory support a strict separation between historical/legacy state and canonical six-part branches:
+
+1. Existing claim-keyed C6 maps, four-field C8/C9 records, skill-scoped evidence/state and lesson/item local mastery remain readable only under their original contract and ownership boundaries.
+2. A legacy record may expose only fields actually present. Missing registry, scope/window, snapshot, evaluation or decision provenance remains explicitly unknown/legacy.
+3. No field is inferred from the current registry, current scope/window policy, current task metadata, timestamps, learner session or a matching claim.
+4. Legacy values cannot overwrite canonical C6/C7/C8 state, satisfy canonical branch validation, or be pooled with canonical evidence.
+5. A future compatibility adapter, if approved, must be explicit, versioned, traceable and non-destructive. It may preserve/read legacy history but cannot promote it to a canonical branch without separately traceable source provenance and a new approved snapshot/evaluation.
+6. Existing persisted B1–B5 skill-scoped flows and the current Supabase RPC remain unchanged until a separate migration/compatibility design is approved.
+7. The local lesson/item `mastery-service` remains a separate progress mechanism; it is not an alias for C6 mastery.
+
+This is a proposed compatibility boundary, not selection of a canonical adapter, migration, backfill, persistence schema or implementation plan. G7 remains OPEN until every direct and indirect consumer has been enumerated and assigned an owner/read/write/derived/legacy disposition.
+
 
 ### 7.6 G5 exit criteria
 

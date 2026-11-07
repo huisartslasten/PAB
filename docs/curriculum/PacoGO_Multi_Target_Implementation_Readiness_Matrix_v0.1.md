@@ -804,3 +804,6 @@ It makes the following distinctions explicit and normative within the proposal: 
 It preserves existing A1/B1/FR2 target meanings, B1 ET7 unresolved mapping, C6 mastery gates and C7 authority. It does not authorize runtime or persistence work.
 
 **Gate disposition:** G2/O6 remains OPEN until the owner accepts this exact v0.3 as the approved versioned contract and required governance review is complete. G3 remains OPEN pending G2 freeze and executable contract tests. G5 and G6 remain separate dependent gates. No runtime, tests, registry, task catalogue, learner state, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+
+Full Regression #3142 / run ID `42422816647`: **GREEN** on exact contract/matrix/handoff commit `cecc708bcae805eb3a28bb80bb6c7d3f680f77d4`; all workflow steps passed, including curriculum engine, architecture boundaries, Node/Vitest, browser regression and clean-working-tree verification. This verifies O6 contract v0.3, matrix Section 8.17 and handoff Section 88 as committed in that SHA.

@@ -3519,7 +3519,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 99. G3-013 mixed-performance component provenance — verification pending
+## 99. G3-013 mixed-performance component provenance — verified
 
 ### Work implemented
 - Inspected G3-013 in the verification specification and O6 v0.3 §5.3.
@@ -3530,7 +3530,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 ### Verification status
 - Implementation commit: `6107e6b2eb146e8a857714b7d57b59feda6272a2`.
 - Pre-build Full Regression #3180 / run ID `42426674545`: GREEN on exact baseline commit `64d47cf4316101b0e3d2968eaa168e5e44c12ce5`.
-- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+- Full Regression #3184 / run ID `42426831166`: **GREEN** on correction commit `3684aa7d5a00b0ed937f9d107a2d82bf6e1e71c9`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.
@@ -3552,4 +3552,4 @@ After verifying this documentation update with Full Regression, continue G3 test
 - Updated only the assertion's diagnostic message to state `MIXED result must retain at least 2 separable component results`, aligning the message with the already-existing condition `component_results.length >= 2`.
 - No assertion condition was weakened or removed; no expected result was changed.
 - Correction commit: `3684aa7d5a00b0ed937f9d107a2d82bf6e1e71c9`.
-- Full Regression on the correction commit is pending. Do not continue to another build vector until the exact correction commit passes Full Regression.
+- Full Regression #3184 / run ID `42426831166`: **GREEN** on exact correction commit `3684aa7d5a00b0ed937f9d107a2d82bf6e1e71c9`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.

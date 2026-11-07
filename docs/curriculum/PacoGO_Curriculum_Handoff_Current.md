@@ -2472,3 +2472,43 @@ C8 ordering uses validated evaluation time and a stable identity tie-breaker, no
 ### Next concrete step
 
 Complete cross-stage positive, negative, missing and mismatch examples plus the legacy/scalar compatibility disposition. Then finish the G6/G7 read-only identity and consumer inventories. Keep O6-specific assessment fields unresolved until O6 is approved. No runtime or persistence work before G5–G11 and explicit G12 authorization are complete.
+
+## 71. Initial G6/G7 runtime source inventory — 2026-11-07
+
+### Verified source findings
+
+An initial read-only inspection of the current branch recorded these findings in readiness matrix Section 8:
+
+1. **Task/attempt identity:** `interaction-contract.js` reuses the stable task ID as `task_instance_id`. Task definition and administered instance are conflated.
+2. **Observation identity/cardinality:** observation ID derives from task-instance ID plus timestamp; `task_id` receives the instance ID; only the first evidence target is projected into the scalar observation field.
+3. **Browser route:** `browser-vertical-slice.js` checks task-to-skill identity, then delegates to the skill-level `registry.runSkillCycle`. It does not validate the full task/target/claim/development/registry/branch relationship.
+4. **C6:** `c6-mastery-decision.js` implements the existing seven gates and five outcomes, but returns `mastery_state_by_claim`; it has no full six-field branch identity, snapshot ID or evaluation ID.
+5. **C6→C7:** both `c6-c7-adapter.js` and `c7-from-c6.js` exist as separate claim-keyed adapters. They validate some safety and development fields and pass the two ordering inputs separately, but neither preserves full branch/snapshot/evaluation lineage. Their validation details differ. No canonical adapter is selected.
+6. **C7:** the decision result contains candidate action, reason, gate, claim/development and supporting evidence references, but not the exact C6 evaluation, snapshot or six-field branch.
+7. **C8:** `c8-c9-adapter.js` normalizes a claim-keyed result and builds a simplified timestamp-based history observation. `c8-student-model.js` uses only learner/claim/development/scope identity and observed-time ordering. It does not preserve the full snapshot/C6/C7 lineage.
+8. **C9:** `c9-vertical-validation.js` checks the current four-field identity and a simplified vertical slice. It does not validate registry-version/time-window identity, frozen snapshot eligibility or exact C6→C7→C8 references.
+9. **Separate older progress paths:** `prototype.js` and `curriculum-registry.js` execute a skill-centric cycle; `student-evidence-store.js` stores learner/registry/skill entries; `src/services/mastery-service.js` stores lesson/item local streak mastery. These are not equivalent to canonical six-part C6 mastery.
+
+### Test inventory
+
+Existing tests cover C6 gate classification and safety flags; claim-keyed C6→C7 selection and ordering separation; C7 candidate gates; simplified C8 state preservation; and C9 consistency under the four-field prototype identity.
+
+They do not yet cover six-field branch isolation, registry/window mismatch, exact snapshot/evaluation lineage, task/attempt separation, multi-target raw-observation cardinality or cross-consumer compatibility. These are upstream contract gaps; this is not authorization to add tests around an unapproved design.
+
+### G6/G7 status
+
+- G6 remains OPEN: task-definition, attempt, event, observation, retry/replay and provenance identity are not yet reconciled.
+- G7 remains OPEN: the duplicate C6→C7 adapters, C8/C9 adapter, skill-centric browser route, evidence store and separate local mastery service need a complete consumer ownership/compatibility disposition.
+- This is an initial source inventory, not a claim that every application consumer has been enumerated.
+- No runtime, tests, registry/catalogue, database, learner data or Supabase changed. No canonical adapter, migration, backfill or scalar compatibility adapter was selected.
+
+### Verification
+
+- Branch: `refactor/professional-v1`; LIVE `main` was not a target of these changes.
+- Full Regression #3100 / run ID `42378236663`: **GREEN** on exact baseline commit `ab7bd9a5b70f123dcfb5fe09c42b982eef8f6eba`; all workflow steps passed, including browser regression and clean-working-tree verification.
+- Readiness-matrix inventory commit: `876eb1d4a2b0071915799fdbd1674f7f955c6a03`.
+- This handoff update is another repository change and requires Full Regression on its exact resulting commit. No post-update GREEN is claimed yet.
+
+### Next concrete step
+
+Continue G7 by enumerating the actual application/page/service consumers of the identified adapters and legacy state paths, then assign each a read/write/derived/legacy disposition. In parallel, complete the cross-stage G5 mismatch examples. Do not select a canonical adapter or change runtime until the upstream contracts, G5–G11 and explicit G12 authorization permit it.

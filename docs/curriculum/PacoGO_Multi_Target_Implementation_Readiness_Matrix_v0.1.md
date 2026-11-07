@@ -486,3 +486,34 @@ Read-only inspection was extended to the repository's root-level HTML entrypoint
 **Scan boundary:** this establishes the observed repository call paths described above. It does not prove the absence of external consumers, runtime-generated imports, deployment-side scripts or integrations not represented in the inspected repository tree.
 
 **G7 disposition:** the known in-repository direct consumers now have explicit ownership classifications. G7 remains OPEN until the remaining adapter/history/report/export consumers and any external/dynamic callback wiring have an explicit disposition, and until the G5/G6 contracts they depend on are reconciled. No adapter, migration or canonical write path is approved by this inventory.
+
+## 8.6 Adapter, history, report and export consumer disposition — 2026-11-07
+
+A focused read-only inspection of the adapter modules, their direct test imports, the pilot analysis/export modules, and the existing test-history service establishes the following distinctions:
+
+| Path | Verified consumer/use | Ownership and compatibility disposition |
+|---|---|---|
+| `c6-c7-adapter.js` | Directly imported by `c6-c7-adapter.test.js`; no learner-page or application-runtime import was identified in the inspected paths. | Contract/test path only in the inspected surface. It is not an active learner write path. Do not designate it canonical by presence alone. |
+| `c7-from-c6.js` | Imported by `c7-from-c6.test.js`, `c6-c7-vertical-slice.test.js` and `c8-c9-real-vertical-slice.test.js`. | Test-driven prototype adapter path. Its duplicate relationship to `c6-c7-adapter.js` remains unresolved under G5/G6; neither adapter is selected as canonical. |
+| `c8-c9-adapter.js` | Imported by its adapter/vertical-slice tests; it normalizes C6/C7-shaped inputs into the simplified C8 history and C9 validation path. | Prototype validation/history bridge, not an identified persisted learner-history route. Its four-field identity and timestamp-derived observation remain insufficient for canonical branch history. |
+| `curriculum-registry.js`, `prototype.js`, `longitudinal-state.js` | The registry calls the skill-centric prototype cycle and derives a longitudinal state/decision trace. The previously inventoried A1/B1/FR2 and B-family demonstrations expose this separate cycle result. | Legacy/prototype skill-centric route. Keep distinct from local lesson/item mastery, Supabase learner curriculum history and canonical C6–C9 decisions. No automatic promotion or migration. |
+| `student-evidence-store.js` | In-memory append/list helper keyed by learner, registry version and skill; no persistent write or canonical branch identity. No active learner-page consumer was identified in the inspected paths. | Isolated in-memory prototype store. Not a substitute for Supabase learner history or canonical append-only branch history. |
+| `pilot-analysis-report.js` and `empirical-pilot-analysis-pipeline.js` | The analysis pipeline calls the report builder to create a descriptive-only report. The pipeline's identified direct invocation is its Node test; no learner-facing route was identified in the inspected application paths. | Research/analysis output, not an operational learner progress or mastery consumer. Its explicit no-mastery/no-promotion boundaries remain in force. |
+| `empirical-pilot-execution.js` and `pilot-execution-package.js` | Build validated pilot execution snapshots/packages/exports; their identified direct invocations are tests. | Research execution/export utilities, separate from learner runtime persistence. Exported data must retain its synthetic/empirical provenance and must not be treated as learner-state writes. |
+| `src/services/test-history-service.js` and `src/features/test-history/*` | The test-history route reads `test_attempts` and associated answers for display. | Separate assessment-attempt history. It is not curriculum evidence, longitudinal C8 history or C6 mastery. Its existing contract remains unchanged. |
+| External or dynamically supplied consumers | Repository inspection cannot establish whether deployment-side scripts, browser extensions, external integrations or runtime-generated callback wiring exist outside the checked-out source. The Wordtrainer `recordResult` destination remains unverified. | Explicitly UNKNOWN / not approved. Do not infer a destination or migrate/write through it. Any such integration must be disclosed and separately mapped before G7 can close. |
+
+### G7 disposition after focused inspection
+
+The inspected in-repository surfaces now distinguish:
+- active local lesson/item mastery writes through the practice runtime;
+- active Supabase skill-scoped learner curriculum reads/writes on B1–B5 learner pages;
+- skill-centric browser prototype cycle results;
+- in-memory evidence storage;
+- C6–C9 adapter/validation test paths;
+- research-only analysis and execution/export utilities;
+- separate test-attempt history reads.
+
+This narrows the remaining G7 gap, but does **not** close it. The external/dynamic callback boundary is still unknown, and the adapter/history/report/export inventory has not been proven against every possible deployment-side or runtime-generated consumer. G7 remains OPEN. G5 and G6 remain OPEN; no canonical adapter, migration, persistence change or runtime write path is authorized.
+
+No runtime code, tests, curriculum registry/catalogue, database schema, SQL/RPC/RLS, Supabase or learner data changed.

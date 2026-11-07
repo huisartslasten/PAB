@@ -3598,7 +3598,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 103. G3-016 per-stream process availability — verification pending
+## 103. G3-016 per-stream process availability — verified
 
 ### Work implemented
 - Inspected G3-016 in the verification specification and O6 v0.3 §5.4.
@@ -3610,7 +3610,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 ### Verification status
 - Implementation commit: `f387b72ea179b1d583fd79bab94708df631e115f`.
 - Pre-build Full Regression #3195 / run ID `42427406449`: GREEN on exact baseline commit `33ca66ebd95a3148af86b90da34c5a6b614feca1`.
-- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+- Full Regression #3196 / run ID `42427522460`: **GREEN** on exact implementation commit `f387b72ea179b1d583fd79bab94708df631e115f`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

@@ -56,6 +56,10 @@ function assertAssessment(record) {
   const alignment = record.dimensions.alignment?.result;
   const relation = record.dimensions.relation?.result;
   const performance = record.dimensions.performance?.result;
+
+  if (record.relation_basis_sufficient === false) {
+    assert.equal(relation, 'INDETERMINATE', 'insufficient relation basis must not be guessed as DIRECT, PARTIAL, INDIRECT or NONE');
+  }
   const evidence = record.dimensions.evidence?.result;
   const independence = record.dimensions.independence?.result;
   const contradiction = record.dimensions.contradiction?.result;
@@ -157,7 +161,8 @@ function base(overrides = {}) {
     criterion: { met: true },
     support: { request: false, delivered: false, target_relevant: false },
     process: { required_streams_complete: true },
-    target_contract: { separable_component_ids: [] }
+    target_contract: { separable_component_ids: [] },
+    relation_basis_sufficient: true
   };
   return {
     ...defaults,
@@ -167,7 +172,8 @@ function base(overrides = {}) {
     criterion: { ...defaults.criterion, ...overrides.criterion },
     support: { ...defaults.support, ...overrides.support },
     process: { ...defaults.process, ...overrides.process },
-    target_contract: { ...defaults.target_contract, ...overrides.target_contract }
+    target_contract: { ...defaults.target_contract, ...overrides.target_contract },
+    relation_basis_sufficient: overrides.relation_basis_sufficient ?? defaults.relation_basis_sufficient
   };
 }
 
@@ -258,7 +264,20 @@ test('G3-009: NONE requires an existing inspectable response', () => {
 });
 
 test('G3-010: uncertain response relation remains INDETERMINATE', () => {
-  assertAssessment(base({ dimensions: { relation: dimension('INDETERMINATE') } }));
+  const uncertain = base({
+    relation_basis_sufficient: false,
+    dimensions: { relation: dimension('INDETERMINATE'), evidence: dimension('INDETERMINATE') }
+  });
+  assertAssessment(uncertain);
+  assert.equal(uncertain.dimensions.relation.result, 'INDETERMINATE');
+
+  for (const guessed of ['DIRECT', 'PARTIAL', 'INDIRECT', 'NONE']) {
+    const invalid = base({
+      relation_basis_sufficient: false,
+      dimensions: { relation: dimension(guessed), evidence: dimension('INDETERMINATE') }
+    });
+    assert.throws(() => assertAssessment(invalid), /insufficient relation basis must not be guessed/);
+  }
 });
 
 test('G3-011: CORRECT does not automatically imply target evidence', () => {

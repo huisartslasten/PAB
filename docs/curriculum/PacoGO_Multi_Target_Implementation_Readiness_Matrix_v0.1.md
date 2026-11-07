@@ -977,3 +977,19 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-014, preserving `NO_RESPONSE` as `NOT_OBSERVED` and target evidence as `INDETERMINATE` by default. Do not infer semantics owned by G5, G6/G9 or O5.
+
+
+
+## 8.28 G3-014 — no-response outcomes remain non-negative and indeterminate
+
+**Contract basis:** O6 v0.3 §§5.2–5.5 preserve `NO_RESPONSE` as a raw response/administration event. The default performance is `NOT_OBSERVED`, relation is `INDETERMINATE`, and target evidence is `INDETERMINATE`.
+
+**Test change:** `pacogo-engine/operational-assessment-contract.test.js` now verifies the complete valid result combination and rejects three prohibited outcomes through the shared `assertAssessment` assertion: performance `INCORRECT`, relation `NONE`, and target evidence `ABSENT`.
+
+**Scope:** Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Implementation commit `c87f8e93e7ce6bad94ff1f6b87ca02805937ca78`. Full Regression #3188 / run ID `42427054170`: **GREEN** on that exact commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with G3-015, distinguishing an existing but unscorable response from no response and incorrect performance. Do not infer semantics owned by G5, G6/G9 or O5.

@@ -3158,3 +3158,40 @@ The brief is a recommendation package. It does not silently approve any proposal
 ### Next concrete step
 
 Obtain the owner's O6 decision on the compact package. Once approved, freeze the versioned logical C3/O6 contract and proceed to G3, then reconcile G5/G6. If the owner requests revisions, change only the identified decision items and retain all already-settled architecture boundaries. No runtime or persistence work before the applicable gates and explicit G12 authorization.
+
+
+## 87. G3 candidate operational assessment verification specification — 2026-11-07
+
+### Baseline and owner direction
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Full Regression #3136 / run ID `42418979978`: **GREEN** on exact baseline commit `67ebfdb37b90c4d136b28d22c3d7d1e36bd2cc97`; workflow completed successfully. This is the verified pre-build baseline, not verification of the G3 documents created afterward.
+- The owner authorized continued work using O6 Decision Brief v0.1 as the working baseline. Treat this as authorization to develop the G3 candidate specification, not as an irreversible or final freeze of every O6 category/anchor. Do not claim G2 closed.
+
+### Work completed
+
+Created `docs/curriculum/PacoGO_G3_Operational_Assessment_Rule_Verification_Specification_v0.1.md`.
+
+The specification contains 40 deterministic logical vectors covering applicability/execution, alignment/relation, performance and missingness, strict ABSENT conditions, support/independence, Tussentoets/Toets help-request lifecycle, contradiction, multi-target cardinality, provenance/idempotency/reassessment/O5 cutoff, and A1/B1/FR2 anchors. It preserves existing curriculum meanings and explicitly prohibits O6 outputs from deciding mastery or next action.
+
+The specification is design-only. It does not create executable tests or authorize runtime, registry, task catalogue, learner-state, database, SQL/RPC/RLS, Supabase or learner-data changes.
+
+Updated readiness matrix Section 8.16 to record the candidate specification and its gate disposition.
+
+### Gate status
+
+- G2/O6 remains OPEN until the exact versioned operational contract is frozen.
+- G3 remains OPEN until G2 is frozen, the vectors are converted into executable contract tests, and Full Regression is GREEN on the exact implementation commit.
+- G5 and G6 remain separate dependent gates; no shortcut or automatic closure.
+- The specification intentionally leaves unresolved target-specific prompt anchors, required process streams, quality anchors (if retained), final identity/payload semantics, O5 snapshot details and C3-to-C6 M1/M2 mapping to their proper gates.
+- No runtime or persistence implementation was performed.
+
+### Repository commits and verification
+
+- G3 specification commit: `321799bb03ce665d6430e241afc667cca7147a29`.
+- Readiness matrix Section 8.16 commit: `a90cbc288b72754670bf84d577f9ffe7df86e50d`.
+- This handoff update is being committed next. Full Regression must run on the exact resulting handoff commit; #3136 does not cover these subsequent documentation changes.
+
+### Next concrete step
+
+First verify the final handoff commit with Full Regression. Then freeze the exact O6 contract from the owner's working-baseline direction, resolving only the still-open O6 anchors and semantics. After that, convert the G3 vectors into executable contract tests. Do not implement runtime or persistence before the applicable gates and explicit G12 authorization.

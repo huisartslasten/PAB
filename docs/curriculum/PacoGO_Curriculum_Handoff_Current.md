@@ -24,7 +24,7 @@ Core chain:
 
 - C1: claim-centred validation design; feasibility, discriminating and longitudinal phases separated.
 - C2: learner/context → task instance → interaction/observation → evidence assessment → inference → decision.
-- C3: evidence coding includes target match, performance, process, quality, contradiction, prompting/independence, alternatives and reliability.
+- C3: PacoGO is the single operational assessor. The C3 contract specifies versioned target-specific assessment of learner evidence; human coder rounds, adjudication and inter-rater reliability are not learner-runtime components. Assessment dimensions and rules remain subject to scientific/technical specification.
 - C4: discriminating tasks and readiness gates; 19 tasks over 10 developments, model families M0–M4.
 - C5: developmental ordering distinguished from sequence, temporal precedence, prediction, prerequisite and causality; alternatives, invariance, longitudinal design and model comparison explicit.
 - C6: mastery is claim/development/scope/time bounded; seven gates; no automatic promotion.
@@ -207,6 +207,8 @@ Keep the five pages as synthetic technical demonstrations only. Do not use their
 **Next concrete step:** review/approve or revise the v0.1 specification. Do not change registry mappings, task pages, runtime, coding rules or Supabase until the contract is approved.
 
 ## 9B. FR2 Task–Evidence Alignment Specification
+
+> **Historical candidate section — coder-specific details are superseded by sections 63–64.** Preserve raw observation/target-assessment distinctions only where consistent with PacoGO as the single operational assessor.
 
 Specification: `docs/curriculum/PacoGO_FR2_Task_Evidence_Alignment_Specification_v0.1.md`.
 
@@ -2118,7 +2120,9 @@ The audit is based on the exact branch source, learner HTML entry points, engine
 Close G1/O5 and G2/O6 with explicit owner/scientific decisions, and obtain G4/O9 product approval. Reconcile C6–C9 contracts (G5) against the verified code findings. Then use this audit to author the canonical task/attempt/observation identity contract and consumer-by-consumer legacy compatibility plan. Keep G8–G11 closed until those upstream contracts are approved. Do not implement B1-L08, runtime fan-out or persistence changes before G12 explicitly authorizes a bounded slice.
 
 
-## 62. C3 scientific measurement and coding review — 2026-11-06
+## 62. [WITHDRAWN] C3 scientific measurement and coding review — 2026-11-06
+
+> This section records an invalid human-coder premise and is superseded in full by sections 63–64. Do not use its coder rounds, adjudication, double-coding or inter-rater reliability requirements as PacoGO learner-runtime architecture.
 
 ### Artifact created
 - `docs/curriculum/PacoGO_C3_Scientific_Measurement_and_Coding_Review_v0.1.md`

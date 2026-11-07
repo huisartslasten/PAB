@@ -125,7 +125,7 @@ function assertAssessment(record) {
 
 function assertMixedComponentMapping(record) {
   assert.equal(record.dimensions.performance?.result, 'MIXED', 'this G3-013 fixture uses the MIXED scoring outcome');
-  assert.ok(Array.isArray(record.component_results) && record.component_results.length >= 2, 'MIXED result must retain separable component results');
+  assert.ok(Array.isArray(record.component_results) && record.component_results.length >= 2, 'MIXED result must retain at least 2 separable component results');
   const ids = record.component_results.map(item => item.component_id);
   assert.ok(ids.every(id => typeof id === 'string' && id.trim()), 'each mixed component requires its own identifier');
   assert.equal(new Set(ids).size, ids.length, 'mixed component identifiers must be unique');

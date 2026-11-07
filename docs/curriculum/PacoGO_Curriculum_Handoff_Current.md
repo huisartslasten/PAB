@@ -2426,7 +2426,8 @@ A rejected handoff is an integrity/input-availability problem, not a learner fai
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
 - Before this work, Full Regression #3095 / run ID `42377842782` was verified **GREEN** on exact commit `ca2f7259f35839f7e02bc1c87cbb9f0f405cbf6c`; all 16 job steps completed successfully, including browser regression and clean-working-tree verification.
 - Matrix update commit: `c098238e8f6385e7d55fd84908805172de79e85e`.
-- This handoff update is a separate repository change and requires Full Regression on its exact resulting commit. No post-update GREEN is claimed until that run completes.
+- Full Regression #3107 / run ID 42380216412: **GREEN** on exact commit f288fd95ae7a3fdb6ebcaaf63ebb6842b71cec21; all workflow steps passed, including browser regression and clean-working-tree verification.
+- This verification-status reconciliation is itself a repository change and has its own Full Regression run on the resulting exact commit.
 - No runtime or persistence implementation was performed.
 
 ### Next concrete step

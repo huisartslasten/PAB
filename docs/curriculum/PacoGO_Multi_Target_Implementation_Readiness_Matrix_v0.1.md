@@ -749,3 +749,22 @@ The cross-domain examples make the following boundaries concrete:
 Full Regression #3133 / run ID `42403744862`: **GREEN** on exact commit `ff07b3e9eb477ebcff44dec16b052c50c0d9d73f`; workflow completed successfully, including curriculum engine, architecture boundaries, Node/Vitest, browser regression and clean-working-tree verification.
 
 No runtime, tests, registry, catalogue, learner state, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+
+## 8.15 O6 decision brief v0.1 — 2026-11-07
+
+**Decision brief:** `docs/curriculum/PacoGO_O6_Decision_Brief_v0.1.md`.
+
+The brief consolidates O6 v0.2, reconciliation review R1–R13 and the A1/B1/FR2 domain-anchor examples into one approval-ready recommendation. It explicitly separates settled logical architecture from recommended O6 rules and the remaining owner approvals.
+
+Key recommendations:
+- separate applicability (`APPLICABLE` / `NOT_APPLICABLE`), rule execution (`NOT_RUN` / `COMPLETED` / `BLOCKED` / `ERROR`) and dimension result;
+- keep alignment, response relation, objective performance, per-stream capture availability, target evidence, target-specific independence and contradiction as distinct dimensions;
+- use `NOT_OBSERVED` for no response and `NOT_SCORABLE` for an existing unscorable response; default no-response evidence to `INDETERMINATE`;
+- restrict `ABSENT` to validly elicited, sufficiently captured and inspectable target material;
+- classify `PROMPTED` versus `DEPENDENT` by what delivered support did to the specific target operation;
+- keep C3 contradiction observation-local and separate from C6 M7;
+- use a structured, non-scored M2 adequacy profile and reconcile M1/M2 boundaries in G5;
+- pre-specify/minimise context capture and preserve O5 event-time/availability and immutable reassessment provenance.
+
+**Gate status:** this is a recommendation package, not approval. G2/O6 remains OPEN. G3, G5 and G6 remain separate follow-on gates. No implementation is authorized.

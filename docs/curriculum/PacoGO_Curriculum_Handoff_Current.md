@@ -3115,3 +3115,46 @@ The examples explicitly preserve the unresolved B1 ET7 mapping and do not author
 ### Next concrete step
 
 Produce one compact O6 decision brief that separates (a) what is already determined by accepted architecture/product decisions, (b) the specific recommendations supported by the A1/B1/FR2 examples, and (c) the remaining explicit owner approvals. Do not reopen settled observation cardinality, raw-versus-assessment separation or C3/C6 boundaries. Once the O6 decisions are approved, finalize the canonical versioned C3 contract, then proceed to G3 and reconcile G5/G6. No runtime or persistence work before the applicable readiness gates and explicit G12 authorization.
+
+
+## 86. O6 decision brief — 2026-11-07
+
+### Verification baseline
+
+Full Regression #3134 / run ID `42404191375`: **GREEN** on exact handoff commit `be3fad09f427dbbf6af6df4c0c54bac317717543`; all workflow steps passed, including curriculum engine, architecture boundaries, dependency audit, Node/Vitest, browser regression and clean-working-tree verification.
+
+### Work completed
+
+Created `docs/curriculum/PacoGO_O6_Decision_Brief_v0.1.md` after reading O6 contract v0.2, reconciliation review R1–R13 and the A1/B1/FR2 domain-anchor examples.
+
+The brief separates:
+- already determined architecture/product facts (one immutable raw observation per response episode; zero or more target-specific assessments; exact observation/target reference per assessment; no evidence-count inflation; raw facts, assessment and inference remain separate);
+- recommended O6 dimension model and operational vocabularies;
+- strict no-response and ABSENT boundaries;
+- target-specific support/independence anchors;
+- observation-local C3 contradiction versus evidence-set C6 M7;
+- structured, non-scored M2 adequacy profile;
+- minimal, pre-specified context capture and immutable assessment provenance;
+- the exact owner approvals needed to close G2/O6.
+
+The brief is a recommendation package. It does not silently approve any proposal, alter curriculum meanings or authorize implementation.
+
+### Gate status and limits
+
+- G2/O6 remains OPEN pending explicit owner approval of the decision package or specific revisions.
+- G3 follows O6 approval and must define deterministic operational-rule cases.
+- G5 must reconcile the exact C3 output and provenance with C6–C9.
+- G6 must reconcile task/attempt/observation lifecycle with the approved O6 contract.
+- G7 remains OPEN because the external/dynamic callback boundary remains unknown. G8–G12 remain open; no implementation authorization exists.
+- Scientific Validation remains separate; no empirical validity claim is made.
+- No runtime, tests, registry, catalogue, learner state, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Repository and verification
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Decision brief, readiness matrix Section 8.15 and this handoff Section 86 are committed together.
+- Full Regression must run on the exact resulting commit. The #3134 GREEN result above is for the parent commit and does not cover this new handoff commit.
+
+### Next concrete step
+
+Obtain the owner's O6 decision on the compact package. Once approved, freeze the versioned logical C3/O6 contract and proceed to G3, then reconcile G5/G6. If the owner requests revisions, change only the identified decision items and retain all already-settled architecture boundaries. No runtime or persistence work before the applicable gates and explicit G12 authorization.

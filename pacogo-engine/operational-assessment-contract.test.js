@@ -234,13 +234,27 @@ test('G3-008: partial alignment names a component defined by the target contract
   assert.throws(() => assertAssessment(unnamedComponent), /named separable component/);
 });
 
-test('G3-009: NONE requires an inspectable response', () => {
-  const record = base({ raw_response_status: 'RESPONSE_PRESENT', task_instance: { ...base().task_instance, actual_response_inspectable: true }, dimensions: { relation: dimension('NONE') } });
+test('G3-009: NONE requires an existing inspectable response', () => {
+  const record = base({
+    raw_response_status: 'RESPONSE_PRESENT',
+    task_instance: { ...base().task_instance, actual_response_inspectable: true },
+    dimensions: { relation: dimension('NONE'), evidence: dimension('INDETERMINATE') }
+  });
   assertAssessment(record);
-  const noResponse = base({ task_instance: { ...base().task_instance, actual_response_inspectable: false }, dimensions: { relation: dimension('NONE') } });
-  assert.throws(() => {
-    if (!noResponse.task_instance.actual_response_inspectable && noResponse.dimensions.relation.result === 'NONE') throw new Error('No response cannot be NONE');
-  }, /cannot be NONE/);
+
+  const noResponse = base({
+    raw_response_status: 'NO_RESPONSE',
+    task_instance: { ...base().task_instance, actual_response_inspectable: false },
+    dimensions: { relation: dimension('NONE'), performance: dimension('NOT_OBSERVED'), evidence: dimension('INDETERMINATE') }
+  });
+  assert.throws(() => assertAssessment(noResponse), /NONE requires an existing response/);
+
+  const uninspectableResponse = base({
+    raw_response_status: 'RESPONSE_PRESENT',
+    task_instance: { ...base().task_instance, actual_response_inspectable: false },
+    dimensions: { relation: dimension('NONE'), evidence: dimension('INDETERMINATE') }
+  });
+  assert.throws(() => assertAssessment(uninspectableResponse), /NONE requires an inspectable response/);
 });
 
 test('G3-010: uncertain response relation remains INDETERMINATE', () => {

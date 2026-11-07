@@ -922,3 +922,24 @@ The accepted example keeps target evidence `INDETERMINATE`; the test does not in
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with the next directly specified vector and strengthen its positive and negative cases through the shared conformance assertion. Do not infer semantics owned by G5, G6/G9 or O5.
+
+
+
+## 8.25 G3-011 — objective performance and target evidence remain independent
+
+**Contract basis:** O6 v0.3 §§5.3 and 5.5 distinguish objective task performance under the task scoring rule from target-specific evidence under the target criterion. G3-011 requires `CORRECT` performance when the objective scoring rule is met, while target evidence is assessed independently and must not be auto-set to `PRESENT`.
+
+**Test change:** `pacogo-engine/operational-assessment-contract.test.js` adds a test-only `objective_scoring_result` fixture value and a shared assertion that the performance result preserves it. G3-011 verifies:
+- objective `CORRECT` with target evidence `INDETERMINATE` is accepted when the target criterion cannot be concluded;
+- `PRESENT` is rejected when the target criterion is not met;
+- a performance result that disagrees with the fixture's objective scoring result is rejected.
+
+The fixture value is test-only; it does not define a production API or persisted field.
+
+**Scope:** Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Implementation commit `ff375c40e7859575d7e3e9307224fba981344b22`. Full Regression #3174 / run ID `42426297601`: **GREEN** on that exact commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with G3-012, preserving objective performance, target evidence and contradiction as distinct outputs. Do not infer semantics owned by G5, G6/G9 or O5.

@@ -100,7 +100,7 @@ Open blockers:
 - G5: C6–C9 reconciliation and versioned handoff.
 - G6–G11: identity, consumer, persistence, security, recovery and test design.
 
-**Next concrete action:** reconcile the C6→C7 minimum envelope and rejection rules in Sections 7.7–7.9 against C8/C9 lineage requirements, then continue the G6/G7 read-only identity and consumer inventories. O6 still blocks final C3 assessment-input semantics; O9 is needed before learner-facing cross-branch projection is designed or shipped.
+**Next concrete action:** complete cross-stage positive/negative/missing/mismatch examples and the legacy/scalar compatibility disposition, then finish the G6/G7 read-only identity and consumer inventories. O6 still blocks final C3 assessment-input semantics; O9 is needed before learner-facing cross-branch projection is designed or shipped.
 
 B1-L08 remains blocked until the approved contract supports its target-specific evidence end to end. Existing B1-L01–L07 remain unchanged.
 

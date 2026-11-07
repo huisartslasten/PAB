@@ -1,3 +1,5 @@
+> **WITHDRAWN — NOT A VALID BASIS FOR PACOGO LEARNER-RUNTIME OR C3 ARCHITECTURE DECISIONS.** This review incorrectly treated human observational coders, independent coder rounds, adjudication and inter-rater reliability as if they belonged in PacoGO's learner evidence pipeline. That conflicts with the owner-confirmed product contract: PacoGO is the single operational assessor; the learner modes are OEFENEN, TUSSENTOETSEN and TOETSEN; no second human assessor or parallel rating workflow is introduced. Retain this file only as an audit trail of the incorrect premise. Its coder workflow, reliability gates, recommendations and O6 framing are superseded and must not be used for implementation or owner decisions. Scientific Validation may separately define independent external measures for validating PacoGO, but that does not create human assessors in the learner runtime.
+
 # PacoGO C3 — Scientific Measurement and Coding Review v0.1
 
 Status: literature-informed design review / candidate recommendations / NOT an approved codebook  

@@ -3408,3 +3408,25 @@ After verifying this documentation update with Full Regression, continue G3 test
 - Branch: `refactor/professional-v1`; LIVE `main` was not changed.
 - Full Regression #3162 / run ID `42425104869` completed GREEN on parent commit `565d9d62528e5624fba8492f323eba7bd4dfb35e`, not on cleanup commit `f76b2b4d149ac10ea86ff3e276e4883dc4842115`.
 - Therefore the cleanup commit itself is not yet regression-verified. Run Full Regression on the exact resulting branch HEAD before any further build step.
+
+
+
+## 94. G3-008 partial-alignment conformance strengthening — 2026-11-07
+
+### Work completed
+- Reviewed O6 v0.3 §5.1 and the G3↔O6 traceability requirement for G3-008.
+- Strengthened `pacogo-engine/operational-assessment-contract.test.js`: `PARTIALLY_ALIGNED` now requires the elicited `component_id` to be included in the target contract's pre-defined `separable_component_ids`.
+- The test covers a valid declared component, an undeclared component and a missing component identifier. Negative cases exercise the shared `assertAssessment` conformance assertion rather than test-local simulated failures.
+- This remains a test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification
+- Pre-build Full Regression #3164 / run ID `42425497446`: GREEN on exact baseline commit `79d0521ba5fb8dce27e7f0af8747e58a66356a84`.
+- Test implementation commit: `1f6b41e4c1126ed18eceff623a453424e49f6c99`.
+- Full Regression #3165 / run ID `42425645992`: **GREEN** on that exact implementation commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+### Gate status and next step
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN; continue vector by vector with meaningful positive and negative assertions.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
+- Next: inspect and strengthen the next directly specified G3 vector through the shared conformance assertion. Do not invent unresolved G5/G6/G9/O5 semantics and do not begin production runtime or persistence work without applicable gates and explicit G12 authorization.

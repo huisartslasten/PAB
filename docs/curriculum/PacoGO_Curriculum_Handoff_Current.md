@@ -2755,3 +2755,43 @@ G5 and G6 remain OPEN. No runtime implementation is authorized.
 ### Next concrete step
 
 Continue G5 with a bounded contract crosswalk: map each field and reference in the proposed six-part snapshot/C6/C7/C8/C9 envelope to the current protocol and executable shape, classify each mismatch as missing, differently named, or semantically unresolved, and keep O6 explicitly unresolved. Do not implement or change tests to bless the candidate envelope. Then reconcile G6 task-definition/task-instance/attempt/observation identity. No runtime or persistence work before G5–G11 and explicit G12 authorization are complete.
+
+## 78. G5 executable six-part envelope crosswalk — 2026-11-07
+
+### Work completed
+
+A read-only crosswalk now compares the current C6–C9 executable modules with the proposed C7 v0.2, C8 v0.2 and C9 v0.2 contracts. The full field-by-field matrix is in readiness matrix Section 8.7.
+
+Confirmed mismatches:
+- `learner_key` and registry-version identity are missing from current C6/C7; current C8/C9 use `learner_id` and omit registry-version identity.
+- `claim_id` is present throughout but C6's claim-keyed result map is not a unique branch identity.
+- `development_id` exists with differing C7 naming (`current_development_id`); `scope_id` is omitted at the C7 handoff; `time_window_id` is carried by C6 but not propagated through C7/C8/C9.
+- Current executable C6/C7/C8/C9 has no immutable decision snapshot ID, stable C6 evaluation ID or stable C7 decision ID.
+- Current C8 history uses a four-field parent and derives an observation ID from the timestamp; it does not reference the exact snapshot, C6 evaluation and C7 decision required by C8 v0.2.
+- Current C8 derives evidence state from whether C6 evidence_count is greater than zero. This is not an approved C3/O6 evidence-sufficiency rule.
+- Current C9 validates the narrower four-field prototype identity and basic vertical links; it does not validate the proposed six-field branch, snapshot eligibility or exact C6→C7→C8 lineage.
+
+The positive C7 ordering separation is internally consistent: prerequisite assessment depends on prerequisite ordering; next-development actions depend on next-development ordering. The existing P2 example matches the executable logic when the explicit policy authorizes prerequisite assessment.
+
+### Interpretation and gates
+
+- C6 v0.1 remains a candidate protocol; the executable output does not yet implement the O8 snapshot envelope.
+- C7 v0.2 remains a candidate protocol; the current adapters do not preserve the proposed six-field branch/snapshot/evaluation lineage.
+- C8/C9 v0.2 remain owner-review proposals and are not implementation authorization.
+- O6 remains open. Target-assessment states, coding semantics and version provenance cannot be finalized from the current count-based shortcut.
+- G5 remains OPEN; G6 remains OPEN because task/attempt/observation identity still needs a reconciled lifecycle contract; G7 remains OPEN for the external/dynamic consumer boundary.
+
+No runtime, tests, registry, database schema, SQL/RPC/RLS, Supabase or learner data changed. No implementation was started.
+
+### Verification and repository state
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Full Regression #3115 / run ID `42400366410`: **GREEN** on exact commit `f26ae161866eacb7bb928cf24a305b2933915ec7`.
+- Final bounded G7 handoff commit: `f0537cc36eb30fee05404feea1302a7a6bd74351`; Full Regression #3116 / run ID `42400511399`: **GREEN** on that exact commit.
+- G5 crosswalk readiness-matrix commit: `e6cbf8cf4b82f2a4d42cfd213e304165ad58c92b`.
+- Full Regression #3117 / run ID `42400596188` is running on exact commit `e6cbf8cf4b82f2a4d42cfd213e304165ad58c92b`; no GREEN is claimed yet.
+- This handoff update is another documentation-only change and requires Full Regression on its exact resulting commit.
+
+### Next concrete step
+
+After the current documentation regression is green, continue G5 by reconciling the C6 output contract with the O8 six-part snapshot envelope and the still-open O6 target-assessment semantics. Keep candidate protocol fields distinct from approved fields. Then reconcile G6 identity/lifecycle for task definition, task instance, attempt, event and raw observation. No runtime or persistence work before G5–G11 and explicit G12 authorization are complete.

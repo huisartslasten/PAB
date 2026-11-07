@@ -2212,3 +2212,52 @@ The owner-confirmed task-support contract is the source for the three learner mo
 - Full Regression #3066 / run ID `42317429411`: GREEN on exact commit `1ef4ac5ea08598e05078e4a186ee92e4290de6a2`; all 19 workflow steps passed.
 - These documentation corrections are not yet verified. Full Regression must run on the exact resulting commit before this correction is considered complete.
 - Next: reconcile the impacted candidate contracts against this owner-confirmed product policy. Do not implement code or persistence while those contracts remain inconsistent.
+
+
+## 64. C3 / multi-target document quarantine and correction status — 2026-11-06
+
+Following section 63, the following candidate artifacts have now been explicitly marked as superseded, withdrawn, archived or requiring recasting because they embed a human-coder / adjudication workflow in the learner evidence pipeline:
+
+- `PacoGO_Integrated_Multi_Target_Decision_Contract_v0.2.md`;
+- `PacoGO_Scope_and_Time_Window_Lifecycle_Contract_v0.1.md`;
+- `PacoGO_C3_Canonical_Codebook_Reconciliation_Proposal_v0.2.md`;
+- `PacoGO_C3_Consolidated_Observation_Event_Coding_Contract_Reconciliation_v0.1.md`;
+- `PacoGO_C3_Descriptive_Coding_Reliability_Layer_v0.1.md`;
+- `PacoGO_C3_Evidence_Coding_Specification_v0.1.md`;
+- `PacoGO_Evidence_Coding_Manual_v0.1.md`;
+- `PacoGO_C3_Blinded_Synthetic_Coder_Packet_v0.1.md`;
+- `PacoGO_C3_Synthetic_Coder_Adjudication_Key_v0.1.md`.
+
+The owner decision record now describes PacoGO as the single operational assessor and replaces the human-coder stage with PacoGO target-assessment evaluation/recording. The readiness matrix replaces double-coding/reliability gates with operational assessment-rule verification. The C3 scientific review is explicitly withdrawn as an architecture basis.
+
+### What remains valid versus what is quarantined
+
+Retain as candidate measurement distinctions, subject to explicit C3 review:
+- raw observation versus assessment;
+- task-instance alignment versus learner performance;
+- objective performance versus target-specific evidence;
+- process availability versus process interpretation;
+- planned support condition versus help request versus support actually delivered;
+- target-specific independence and contradiction semantics;
+- unknown/insufficient/not-assessed states;
+- one raw observation may support multiple separately justified target assessments without duplicating the learner episode.
+
+Do not carry forward as learner-runtime architecture:
+- human coder identity/provenance;
+- independent double-coding;
+- coder rounds or adjudication;
+- human assessment of learner observations;
+- inter-rater reliability as a production readiness gate.
+
+### Current repository state
+
+- Branch: `refactor/professional-v1`.
+- Latest documentation commit before this handoff update: `db9cb2f76d23ae4bb20d4dd3f2a8d85a1af99c6c`.
+- LIVE `main` remains untouched.
+- No runtime, curriculum registry, tests, database schema, SQL/RPC/RLS, Supabase or learner data was changed.
+- Full Regression #3066 was GREEN on its exact earlier commit `1ef4ac5ea08598e05078e4a186ee92e4290de6a2`; it does not verify the later correction commits.
+- The final corrected document set and this handoff update require Full Regression on the exact resulting commit. No GREEN status is claimed for the latest tree until that run completes.
+
+### Next concrete step
+
+Perform a source-by-source reconciliation of the quarantined candidate artifacts into one coherent PacoGO assessment contract. Resolve the exact C3 dimensions and machine-operational rules without importing human assessors. Preserve the owner-confirmed three learner modes. Only after the contract is internally consistent should G2/G3 be reconsidered. No runtime or persistence implementation is authorized.

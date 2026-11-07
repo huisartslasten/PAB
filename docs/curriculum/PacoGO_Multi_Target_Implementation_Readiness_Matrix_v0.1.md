@@ -831,3 +831,16 @@ All 40 candidate G3 vectors and the A1/B1/FR2 domain anchors are mapped to O6 v0
 **Next build:** G3 contract-test implementation only. Test cases must distinguish directly specified O6 behavior from dependency-bound cases. Where an expected result depends on an unresolved G5/G6/G9/O5 contract, assert the approved boundary or blocked/unknown behavior; do not invent missing semantics.
 
 No learner data or runtime behavior changed in this decision record.
+
+
+## 8.20 First executable G3 contract-conformance suite — 2026-11-07
+
+**Test file:** `pacogo-engine/operational-assessment-contract.test.js`.
+
+Added a test-only normalized logical record representation and conformance assertions for O6 v0.3. The suite covers G3-001–036, A1/B1/FR2 preservation examples and the structured non-scored M2 profile. G3-037–039 remain blocked on G6/G9 identity/payload semantics; G3-040 remains blocked on O5 snapshot-cutoff semantics.
+
+**Scope limitation:** this is not a production assessor and does not infer judgments from learner responses. The normalized fixture shape is test-only, not a persisted schema or API. No runtime, learner state, registry, task catalogue, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Full Regression #3154 / run ID `42424440906`: **GREEN** on exact test commit `4ae2420753e9a10bcfc094b695d3b42d20792264`. Curriculum-engine regression, architecture boundaries, Node/Vitest, browser regression and clean-working-tree verification passed.
+
+**Gate status:** G2/O6 CLOSED. G3 OPEN pending deeper executable coverage and subsequent implementation-specific verification. G5, G6/G9, O5 and G12 remain separate gates.

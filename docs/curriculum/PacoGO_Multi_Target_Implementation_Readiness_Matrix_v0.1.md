@@ -959,3 +959,21 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-013, checking component-level scoring and provenance without flattening mixed performance. Do not infer semantics owned by G5, G6/G9 or O5.
+
+
+
+## 8.27 G3-013 — mixed performance retains component-level provenance
+
+**Contract basis:** O6 v0.3 §5.3 permits `MIXED` where the response contains separable correct and incorrect components and prohibits flattening target-relevant distinctions into a boolean or generic percentage.
+
+**Test change:** `pacogo-engine/operational-assessment-contract.test.js` adds a test-only G3-013 component-mapping assertion. The positive fixture preserves distinct component identifiers and their `CORRECT`/`INCORRECT` outcomes under objective `MIXED`. Negative cases reject a flattened single component, duplicate component identifiers and loss of the incorrect component. The fixture exercises the `MIXED` path without redefining all task-specific scoring schemes.
+
+**Regression investigation:** Full Regression #3182 / run ID `42426785582` was RED on implementation commit `6107e6b2eb146e8a857714b7d57b59feda6272a2`. The only failing test was G3-013: the minimum-component assertion correctly failed for the flattened negative fixture, but its diagnostic message did not match the expected `/at least 2/` pattern. The assertion condition was already correct. The message was clarified without weakening or changing the condition.
+
+**Verified result:** Correction commit `3684aa7d5a00b0ed937f9d107a2d82bf6e1e71c9`. Full Regression #3184 / run ID `42426831166`: **GREEN** on that exact correction commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+
+**Scope:** Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with G3-014, preserving `NO_RESPONSE` as `NOT_OBSERVED` and target evidence as `INDETERMINATE` by default. Do not infer semantics owned by G5, G6/G9 or O5.

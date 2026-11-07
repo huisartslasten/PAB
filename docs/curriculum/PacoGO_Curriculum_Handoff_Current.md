@@ -3247,3 +3247,9 @@ Verify the exact handoff commit with Full Regression. Then reconcile the G3 cand
 - Full Regression #3142 / run ID `42422816647`: **GREEN** on exact commit `cecc708bcae805eb3a28bb80bb6c7d3f680f77d4`; all workflow steps passed, including curriculum engine, architecture boundaries, Node/Vitest, browser regression and clean-working-tree verification. This verified O6 v0.3, readiness matrix Section 8.17 and handoff Section 88 at that commit.
 - Readiness matrix regression record added in commit `f10894ce507be339433d85bb7fcd88da89af8f57`.
 - This handoff verification update is the next commit; its exact resulting SHA must receive its own Full Regression before the work block is closed.
+
+
+### Final verification for this documentation block — 2026-11-07
+
+- Full Regression #3144 / run ID `42422960987`: **GREEN** on exact commit `27789c9fd4758ac40b18e73c43493c86cd22856d`; all workflow steps passed, including curriculum engine, architecture boundaries, Node/Vitest, browser regression and clean-working-tree verification. This verifies the handoff update and the preceding O6 v0.3/matrix changes.
+- This final handoff status update must itself be verified on its resulting commit before the block is considered closed.

@@ -613,3 +613,50 @@ The C2, C3 and multi-target task/evidence documents support the following **cand
 D9 support-condition and attempt-boundary decisions remain open in the C3 reconciliation. No retry, support, timeout or resume behavior is selected here.
 
 **Disposition:** this is a candidate identity hierarchy for owner/protocol reconciliation only. G6 remains OPEN. No runtime, tests, schema, SQL/RPC/RLS, Supabase or learner data changed; no implementation is authorized.
+
+## 8.10 G6 lifecycle reconciliation against explicit product decisions — 2026-11-07
+
+This section refines Section 8.9 using the owner-confirmed task-support policy, C3 v0.2 observation unit, multi-target task/evidence contract and approved logical decisions O1/O7. It separates what is already determined from what remains a genuine contract/product decision. It does not approve a runtime schema.
+
+### A. Determined by existing contracts and product decisions
+
+| Question | Reconciled interpretation | Source basis |
+|---|---|---|
+| What is a task definition? | A reusable, versioned definition of intended content, task model, target opportunities and planned support condition. It is not a learner administration. | C3 v0.2 §3.1; task-support addendum §5. |
+| What is a task instance? | One concrete administration/presentation. It must preserve what was actually presented and any departure from the versioned definition. It is distinct from the reusable task definition. | C3 v0.2 §3.1. |
+| What does `task_attempt_id` identify? | Align it with the complete learner response episode, not with an individual click/edit/retry. The multi-target contract explicitly defines one task attempt as one learner interaction episode; C3 v0.2 defines the raw observation around that episode and its ordered attempts/events. | Multi-target task/evidence contract §3; C3 v0.2 §3.1. |
+| Does a retry automatically create a new observation? | No. A click, edit or retry remains within the current response episode unless a defined lifecycle transition starts a separately administered episode. Internal attempt/retry detail remains ordered within the episode. | C3 v0.2 §3.1. |
+| What happens when content help is requested during a tussentoets or toets? | The independent attempt ends immediately and is recorded as ended/incomplete, not as learner failure or an incorrect answer. The help request is a separate event from any support actually delivered. The learner returns to supported practice in a distinct attempt; that practice must not be merged with the ended assessment. | Owner-confirmed product decision in Task Support Condition Addendum §1 and Task Support Conditions Contract §12. |
+| What is one raw observation? | One separately administered response episode produces one immutable raw observation. One observation may have zero, one or multiple target-specific assessments. | Approved O1; C3 v0.2 §3; owner architecture decisions O1. |
+| How are multiple target assessments represented logically? | Each assessment refers to exactly one raw observation and one evidence target, with claim/development resolved from the registry. One raw observation is not duplicated and multiple target assessments do not inflate independent-observation counts. | Approved O1; multi-target task/evidence contract §§3, 6. |
+| What is the idempotency principle? | Raw-observation ingestion, target-assessment evaluation/recording and decision evaluation are separate idempotency boundaries. Same identity plus same canonical immutable payload is a replay; same identity plus a different payload is an integrity conflict. | Approved O7. |
+
+### B. Decisions that remain open
+
+| Open point | Why it remains open | Required resolution |
+|---|---|---|
+| Does the supported-practice continuation reuse the independent task instance ID? | The product decision requires a distinct attempt/observation, while C3 distinguishes separately administered task instances. The documents do not explicitly settle whether the changed support condition always creates a new task instance. | Confirm that a new supported-practice presentation is a new task instance, or define the precise permitted reuse case. Recommended default for review: create a new task instance when the administered support condition changes. |
+| Ordinary-practice restart after completion/abandonment | C3 says separately administered task instances receive separate observations, but the product lifecycle does not fully define when an interrupted or abandoned practice session is resumed versus restarted. | Define explicit end/restart/resume transitions; do not infer them from elapsed time alone. |
+| Timeout, interruption and resume | Test help-request termination is explicit; generic timeout/interruption/resume behavior is not. | Define whether a resume continues the same response episode or begins a new one, including the evidence cutoff. |
+| Event identity and ordering | C3 requires ordered events and O7 establishes idempotency behavior, but no canonical event ID, monotonic sequence/order field or source-event key format is approved. Timestamp alone is not the complete ordering contract. | Specify stable event identity, per-episode ordering, event-time semantics and source-event idempotency identity. |
+| Observation and attempt ID generation | The logical cardinality is determined, but the canonical ID format, generation boundary and collision handling are not. | Define stable opaque IDs and replay behavior in the versioned logical contract before implementation. |
+| Target-assessment identity/version | O1 determines the logical relation; O6 remains open on assessment states, rules and version provenance. | Complete O6 before specifying the final assessment record and its versioned identity. |
+| Neutral interface clarification versus content help | The product distinction is required, but the operational classification boundary is not fully anchored. | Specify examples/rules for interface-only clarification versus target-relevant assistance. |
+| PROMPTED versus DEPENDENT and other C3 states | O6 is explicitly open; no final operational codebook or evidence-status vocabulary is approved. | Resolve in O6. Do not infer codes from correctness or a help-request event alone. |
+
+### C. Consolidated candidate hierarchy
+
+The best-supported logical hierarchy is now:
+
+`versioned task definition → task model/target opportunities → administered task instance → response episode (task_attempt_id) → ordered interaction events and internal retries → immutable raw observation → zero or more target-specific PacoGO assessments → branch-specific C6/C7 inference and decisions`
+
+A new independent-to-supported transition creates a distinct response episode and raw observation. Whether it also always creates a new task-instance identity is the remaining narrow product decision noted above. The event stream records both the help request and any actual support delivery separately.
+
+### G6 disposition
+
+The earlier six questions in Section 8.9 are now narrowed:
+- Response-episode identity, retry-as-event, raw-observation cardinality and multi-target assessment cardinality are determined by the existing candidate/approved logical contracts.
+- Support-condition transition semantics are partly determined by the owner-confirmed product decision.
+- New task-instance identity on that transition, generic interruption/resume, stable event/ID serialization and final target-assessment semantics remain open.
+
+G6 remains OPEN pending these remaining decisions and their versioned contract reconciliation. This section does not authorize runtime implementation, test changes, registry changes, schema/SQL/RPC/RLS changes, Supabase work or learner-data changes.

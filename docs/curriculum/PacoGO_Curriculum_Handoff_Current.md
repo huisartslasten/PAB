@@ -2547,3 +2547,44 @@ The readiness matrix Section 8.3 now records the following inspected paths:
 ### Next concrete step
 
 Finish the repository-wide import/call-site inventory for the local mastery service and remaining learner routes. Then define the legacy/scalar compatibility disposition and complete cross-stage G5 positive/negative/missing/mismatch examples. Do not select or implement a canonical adapter before G5–G11 and explicit G12 authorization.
+
+## 73. G5 cross-stage examples and legacy boundary — 2026-11-07
+
+### Work completed
+
+Readiness matrix Sections 7.12–7.13 now contain symbolic cross-stage examples and a proposed compatibility boundary.
+
+**Cross-stage examples**
+- P1 records a complete coherent six-part branch through one frozen snapshot, exact C6 evaluation, exact C7 decision, one C8 history item and one C9 per-branch validation result.
+- P2 demonstrates that prerequisite ordering and next-development ordering remain independent; a prerequisite-assessment candidate may remain available when only the next-development ordering is uncertain, if the explicit C7 policy permits it.
+- N1–N10 cover branch mismatch, ambiguous claim-keyed results, C6/C7 snapshot mismatch, forbidden advancement from insufficient evidence, merged ordering fields, C8 reference mismatch, legacy identity inference, late-arriving assessments, duplicated raw observations and foreign items in a single-branch history.
+- Missing-input cases cover each branch field, snapshot, C6 evaluation/trace, both C7 ordering domains, candidate set/policy version and exact C8/C9 references.
+
+These are symbolic design examples, not executable fixtures. O6-specific assessment vocabulary/version fields remain unresolved.
+
+**Legacy/scalar compatibility boundary**
+- Existing claim-keyed, four-field, skill-scoped and lesson/item state remains under its original contract.
+- Missing canonical identity/provenance remains explicitly legacy/unknown; it is never inferred from current registry, policy, task metadata, timestamps or claim equality.
+- Legacy state cannot overwrite or satisfy canonical branch state.
+- Any future adapter must be separately approved, versioned, traceable and non-destructive; no adapter has been selected.
+- Existing B1–B5 persistence and the current Supabase RPC remain unchanged.
+- The local lesson/item mastery service remains distinct from C6 mastery.
+
+### Remaining limits
+
+- G5 remains OPEN: these examples still require protocol-owner reconciliation, O6 assessment-input decisions, and coherent C6/C7/C8/C9 contract approval.
+- G7 remains OPEN: the complete direct/indirect consumer inventory and per-consumer ownership/read/write/derived/legacy disposition are not yet complete.
+- The local mastery service is imported and constructed by app bootstrap and exposed on the app object. A scan of all root HTML pages found no direct app.mastery/record/get/save references. Selected lesson runtime modules also showed no references. This is not yet a complete indirect JavaScript import/call graph, so no claim is made that the service is globally unused.
+- The existing browser demonstrations and B1–B5 persisted pages remain as inventoried in Section 8.3.
+- No runtime, tests, curriculum registry/catalogue, schema, RPC, Supabase or learner data changed.
+
+### Verification
+
+- Branch: refactor/professional-v1; LIVE main untouched.
+- Before this work, Full Regression #3105 / run ID 42379189921 was GREEN on exact commit 9c59056c6a3528d15e328617a19a3a1602a8a1d2; all workflow steps passed, including browser regression and clean-working-tree verification.
+- Readiness-matrix examples/compatibility commit: b97f5ab118d34e21d52710b667ed6baf09ed6040.
+- This handoff update is a separate repository change and requires Full Regression on its exact resulting commit. No post-update GREEN is claimed until that run completes.
+
+### Next concrete step
+
+Complete the direct and indirect JavaScript import/call graph for the app-exposed mastery service and all learner curriculum routes. Assign each confirmed consumer an explicit read/write/derived/legacy disposition. Then present the G5 symbolic examples for protocol-owner reconciliation. Do not implement an adapter, migration, runtime branch identity or persistence change before G5–G11 and explicit G12 authorization.

@@ -16,19 +16,19 @@ The existing curriculum meanings, SLO mappings, skills, developments, claims, ev
 
 ## 2. Approved logical architecture decisions
 
-### O1 — Target-assessment and coder storage
+### O1 — Target-assessment storage and PacoGO assessment ownership
 
-**Decision:** the canonical logical model is a normalized target-assessment relation linked to one immutable raw observation, with separate append-only coder/round and adjudication provenance.
+**Decision:** the canonical logical model is a normalized target-specific assessment relation linked to one immutable raw learner observation. PacoGO is the single operational assessor in the learner product and evaluates recorded evidence under the approved, versioned curriculum/C3 contracts. No second human assessor, human coder rounds, adjudication workflow or parallel rating process is part of the learner runtime.
 
 Invariants:
-- One separately administered response episode produces one raw observation.
+- One separately administered response episode produces one immutable raw observation.
 - One raw observation may have zero, one or multiple target-specific assessments.
 - Each target assessment refers to exactly one observation and one evidence target, with registry-resolved claim/development ownership.
-- Coder rounds and adjudication records are not additional learner observations.
-- Corrections and recoding append linked records; raw observation and prior coding are not overwritten.
-- Task target opportunities are not themselves assessments.
+- A target opportunity in a task definition is not itself an assessment.
+- Assessment logic/version and its result provenance must remain distinguishable from the raw learner response.
+- A later correction or reassessment must not overwrite the raw observation or silently rewrite prior decision history; the exact versioned correction lifecycle remains to be specified.
 
-**Not approved here:** physical table names, columns, foreign keys, indexes, retention, RLS, RPCs, migration strategy and the final C3 vocabulary. These require the approved C3 codebook, data/security inventory and persistence design. No Supabase change is authorized.
+**Not approved here:** physical table names, columns, foreign keys, indexes, retention, RLS, RPCs, migration strategy, final C3 vocabulary or the implementation of assessment logic. These require the approved C3 assessment contract, data/security inventory and persistence design. No Supabase change is authorized.
 
 ### O2 — Branch state and decision history
 
@@ -52,7 +52,7 @@ A derived branch ID/hash is deferred. It may be introduced only after a separate
 
 ### O4 — Legacy compatibility
 
-**Decision:** historical scalar records remain unchanged and readable under their original contract. The forward architecture may provide a read-only legacy adapter. Missing registry, scope, window, target, coder or snapshot provenance remains explicitly legacy/unknown; it must never be reconstructed from current registry, task, skill, timestamp or session.
+**Decision:** historical scalar records remain unchanged and readable under their original contract. The forward architecture may provide a read-only legacy adapter. Missing registry, scope, window, target, assessment-version or snapshot provenance remains explicitly legacy/unknown; it must never be reconstructed from current registry, task, skill, timestamp or session.
 
 A scalar projection is allowed only when exactly one target/branch is unambiguous and the consumer contract permits it. Ambiguous multi-target or multi-branch input must not be collapsed into a scalar.
 
@@ -60,15 +60,15 @@ A scalar projection is allowed only when exactly one target/branch is unambiguou
 
 ### O7 — Idempotency and staged atomicity
 
-**Decision:** observation ingestion, target-assessment/coding ingestion and decision evaluation are separate idempotency boundaries.
+**Decision:** raw-observation ingestion, PacoGO target-assessment evaluation/recording and decision evaluation are separate idempotency boundaries.
 
 For each boundary:
 - same identity + same canonical immutable payload is an idempotent replay;
 - same identity + different payload is an integrity conflict and must be rejected;
-- a correction or new coding round has a new linked identity;
+- a correction or reassessment receives a new linked/versioned identity and does not overwrite the raw observation or prior decision history;
 - a changed eligible evidence set or protocol creates a new snapshot/evaluation, not an overwrite.
 
-The lifecycle is staged rather than one transaction spanning the entire learner-observation-to-decision timeline. Each stage must commit atomically within its own write unit and expose a durable, inspectable state for retry/recovery. Later stages may occur later in time (for example, human coding after raw observation capture). A failure must not leave partial writes inside the affected stage. The exact stage status model, outbox/retry mechanism, transaction boundaries, locking and failure recovery must be specified and tested before persistence implementation. No assumption is made that observation, later coding, C6 and C7 all occur in one database transaction.
+The lifecycle is staged rather than one transaction spanning the entire learner-observation-to-decision timeline. Each stage must commit atomically within its own write unit and expose a durable, inspectable state for retry/recovery. Assessment evaluation and C6/C7 may occur at distinct times, but there is no human coding stage in the learner evidence pipeline. A failure must not leave partial writes inside the affected stage. The exact stage status model, outbox/retry mechanism, transaction boundaries, locking and failure recovery must be specified and tested before persistence implementation.
 
 Existing guardian ownership, RLS, direct-write denial, transaction-local capability cleanup and rollback/security guarantees must remain intact.
 
@@ -86,15 +86,15 @@ C8 remains a descriptive projection of exact C6/C7 history. C9 remains a structu
 
 **OPEN — no owner approval recorded.**
 
-The proposal's recommended defaults remain candidates, not approved operational policy: immutable versioned definitions, event-time membership, separate assessment-availability cutoff, no inferred rolling windows, default rejection of late observations after closure, late coding only in a later snapshot until finalization, and discouragement of overlapping windows.
+The proposal's recommended defaults remain candidates, not approved operational policy: immutable versioned definitions, event-time membership, separate assessment-availability cutoff, no inferred rolling windows, default rejection of late observations after closure, late-arriving PacoGO assessments only in a later snapshot until finalization, and discouragement of overlapping windows.
 
-Still requires explicit decisions on authority/ownership, window purpose and construction, authoritative event clock and timezone normalization, closure/grace periods, late coding/finalization, overlap, required scope dimensions, C8 presentation constraints and child-data retention/deletion. Operational windows must not be treated as scientific measurement waves.
+Still requires explicit decisions on authority/ownership, window purpose and construction, authoritative event clock and timezone normalization, closure/grace periods, late assessment availability/finalization, overlap, required scope dimensions, C8 presentation constraints and child-data retention/deletion. Operational windows must not be treated as scientific measurement waves.
 
 ### O6 — Canonical C3 codebook and measurement decisions
 
 **OPEN — no codebook approval recorded.**
 
-The C3 v0.2 proposal remains a candidate. The following remain unresolved: final task-alignment and response-relation labels/anchors; raw collection/missingness and NO_RESPONSE treatment; evidence-status boundaries; quality construct and scale; PROMPTED versus DEPENDENT anchors; contradiction states/rationale; coder/adjudication workflow; reliability design; and canonical observation/assessment schema versioning.
+The C3 v0.2 proposal remains a candidate. The following remain unresolved: final task-alignment and response-relation labels/anchors; raw collection/missingness and NO_RESPONSE treatment; evidence-status boundaries; quality construct and scale; PROMPTED versus DEPENDENT anchors; contradiction states/rationale; deterministic/operational C3 assessment rules, including unknown and insufficient-data behavior; assessment-version provenance; and canonical observation/assessment schema versioning. PacoGO remains the single operational assessor; human coder/adjudication workflows are not learner-runtime requirements. Any future research comparison of PacoGO outputs with independent measures belongs to the separate Scientific Validation stream, not to production learner assessment.
 
 No quality scale is selected. In particular, the proposed five-level and three-level numeric scales must not be silently reconciled. Synthetic examples are not independent coder reliability evidence. No C3 category may be inferred by the runtime from correctness or assistance events without an approved coding rule.
 
@@ -134,7 +134,7 @@ C8 descriptive branch history
 C9 structural validation per branch
 ```
 
-A single observation may be referenced by more than one branch, but it is never duplicated to manufacture independent observations. Multiple target assessments, coder rounds or adjudications do not increase the count of raw learner episodes.
+A single observation may be referenced by more than one branch, but it is never duplicated to manufacture independent observations. Multiple target assessments do not increase the count of raw learner episodes.
 
 ## 5. Implementation gates that remain closed
 

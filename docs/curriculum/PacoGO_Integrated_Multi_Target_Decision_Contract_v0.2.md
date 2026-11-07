@@ -1,3 +1,5 @@
+> **SUPERSEDED FOR LEARNER-RUNTIME ARCHITECTURE — HUMAN CODER MODEL WITHDRAWN.** The owner-confirmed product contract states that PacoGO is the single operational assessor and that no second human assessor, coder rounds or adjudication workflow exists in learner use. This v0.2 proposal's coder/adjudication lifecycle and coder provenance are not valid learner-runtime requirements. Preserve only the raw-observation/target-assessment separation and branch/snapshot invariants where they remain consistent. Reconcile all assessment stages to PacoGO's versioned operational assessment contract before using this proposal further.
+
 # PacoGO — Integrated Multi-Target Decision Contract v0.2
 
 Status: integrated architecture proposal / candidate / owner review required / NOT approved for implementation  

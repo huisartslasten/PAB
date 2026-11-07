@@ -40,7 +40,7 @@ function createAdditionController({
     developmentId: task.development_id,
     claimId: task.claim_id,
     evidenceTargetIds: task.evidence_target_ids,
-    taskDefinitionVersion: '0.1'
+    taskDefinitionVersion: task.task_definition_version || '0.1'
   });
 
   const events = [];
@@ -55,6 +55,7 @@ function createAdditionController({
       taskInstanceId: taskInstance.task_instance_id,
       eventType,
       at: new Date().toISOString(),
+      eventSequence: events.length + 1,
       payload
     }));
   };
@@ -66,6 +67,8 @@ function createAdditionController({
   });
 
   record('task_presented', {
+    task_definition_id: taskInstance.task_definition_id,
+    task_instance_id: taskInstance.task_instance_id,
     addends: [...addends],
     representation,
     strategy_option_count: strategyOptions.length,
@@ -167,7 +170,7 @@ function createAdditionController({
       provenance: {
         source: 'browser_interaction',
         source_event_id: events.at(-1)?.event_id,
-        task_definition_version: '0.1',
+        task_definition_version: taskInstance.task_definition_version,
         collector_version: '0.1',
         ...provenance
       }

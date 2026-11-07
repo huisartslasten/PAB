@@ -1,3 +1,5 @@
+> **WITHDRAWN AS A PACOGO PRODUCTION REQUIREMENT.** This artifact models human coder reliability and must not be used as a learner-runtime component, implementation gate or reason to add human assessors. PacoGO is the single operational assessor. Future Scientific Validation may assess PacoGO's outputs against independent measures; that is separate from production coding/reliability workflows.
+
 # PacoGO — C3 Descriptive Coding Reliability Layer v0.1
 
 Status: Candidate / design-only / [O]

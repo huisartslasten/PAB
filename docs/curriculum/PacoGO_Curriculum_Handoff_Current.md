@@ -3355,3 +3355,46 @@ The owner approved the exact logical contents of `docs/curriculum/PacoGO_Operati
 - G3: **OPEN** — first conformance suite exists; continue by strengthening vector-level assertions and negative cases. Keep G6/G9 and O5-dependent vectors blocked rather than inventing identity or cutoff semantics.
 - G5, G6/G9, O5 and G12 remain separate. No production assessor/runtime/persistence implementation is authorized by this test-only suite.
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+
+## 92. G3 conformance-suite strengthening and final Full Regression #3159 — 2026-11-07
+
+### Work completed
+
+- Strengthened `pacogo-engine/operational-assessment-contract.test.js` with cross-dimension O6 invariants, independent-attempt policy checks and structured non-scored M2 adequacy-profile checks.
+- Added negative cases to reject prohibited shortcuts and incomplete/aggregate M2 profiles.
+- Full Regression #3158 / run ID `42424698111` was RED on exact commit `337369086e9e7f189251dcfadae4cf3f480160c5`. Three tests exposed a test fixture factory defect: partial overrides shallow-replaced nested defaults, unintentionally dropping default dimensions.
+- Corrected the fixture factory to merge nested `task_instance`, `dimensions`, `criterion`, `support` and `process` defaults. This was a test-fixture construction defect, not a production engine defect. No tests were disabled or weakened.
+- Correction commit: `0b1c2ad17daa1ed432cd2c191d570b407b2c6e2f`.
+
+### Full Regression and browser verification
+
+- Full Regression #3159 / run ID `42424761647`: **GREEN** on exact commit `0b1c2ad17daa1ed432cd2c191d570b407b2c6e2f`.
+- Browser regression completed successfully in the `agenda-cutover-and-regression` job:
+  - Playwright: **59 tests passed**, 0 failed, one worker.
+  - Startup diagnostics: `no browser errors observed`.
+  - The clean-working-tree check after browser tests passed.
+- The same workflow also passed curriculum-engine regression, architecture-boundary tests, Double or Nothing runtime regression, maintained Node regression and maintained Vitest regression.
+- This is the latest verified Full Regression at the time of this handoff update. The documentation changes in this section and the accompanying readiness-matrix update must receive their own Full Regression on the exact resulting commit.
+
+### Scope and gate status
+
+- Changes remain limited to the test-only normalized logical-record conformance harness and its fixture construction.
+- This harness is not a production assessor; it does not infer judgments from raw learner responses and its fixture representation is not a persisted schema/API.
+- No learner-facing runtime, registry, task catalogue, learner state, database, SQL/RPC/RLS, Supabase or learner data changed.
+- G2/O6: **CLOSED** — logical contract v0.3 approved and frozen.
+- G3: **OPEN** — continue genuine vector-level positive and negative assertions.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 and G12 remain separate dependencies/gates.
+- No production assessor, runtime or persistence implementation is authorized by this test-only work.
+
+### Repository state
+
+- Branch: `refactor/professional-v1`.
+- LIVE `main`: untouched.
+- Last verified code commit: `0b1c2ad17daa1ed432cd2c191d570b407b2c6e2f`.
+- Latest Full Regression: #3159 / `42424761647`, GREEN on that exact code commit.
+- The documentation update now being committed must itself be regression-verified before the next build step.
+
+### Next concrete step
+
+After verifying this documentation update with Full Regression, continue G3 test coverage vector by vector using the frozen O6 v0.3 contract and the G3 traceability review. For each vector, assert meaningful accepted and rejected/indeterminate cases. Preserve explicit blocks for G5/G6/G9/O5 dependencies. Do not begin production runtime or persistence work without all applicable gates and explicit G12 authorization.

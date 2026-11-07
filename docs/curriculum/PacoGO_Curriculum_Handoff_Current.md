@@ -3240,3 +3240,10 @@ Updated readiness matrix Section 8.17 to record v0.3 and its gate disposition.
 ### Next concrete step
 
 Verify the exact handoff commit with Full Regression. Then reconcile the G3 candidate vectors against O6 v0.3 and prepare the G2 owner acceptance checkpoint without reopening settled product policy or curriculum mappings. Do not implement runtime or persistence before the applicable gates and explicit G12 authorization.
+
+
+### Verification update — 2026-11-07
+
+- Full Regression #3142 / run ID `42422816647`: **GREEN** on exact commit `cecc708bcae805eb3a28bb80bb6c7d3f680f77d4`; all workflow steps passed, including curriculum engine, architecture boundaries, Node/Vitest, browser regression and clean-working-tree verification. This verified O6 v0.3, readiness matrix Section 8.17 and handoff Section 88 at that commit.
+- Readiness matrix regression record added in commit `f10894ce507be339433d85bb7fcd88da89af8f57`.
+- This handoff verification update is the next commit; its exact resulting SHA must receive its own Full Regression before the work block is closed.

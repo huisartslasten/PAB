@@ -3475,3 +3475,24 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN; continue vector by vector with meaningful positive and negative assertions.
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
 - Next: inspect and strengthen G3-011 against its exact input condition and prohibited shortcut. Do not invent unresolved G5/G6/G9/O5 semantics and do not begin production runtime or persistence work without applicable gates and explicit G12 authorization.
+
+
+
+## 97. G3-011 objective performance/evidence separation — verification pending
+
+### Work implemented
+- Inspected G3-011 in the verification specification and O6 v0.3 §§5.3 and 5.5.
+- Strengthened `pacogo-engine/operational-assessment-contract.test.js` with a test-only `objective_scoring_result` fixture value. The shared assertion checks that the performance result preserves that objective scoring-rule result.
+- G3-011 now accepts objective `CORRECT` with target evidence `INDETERMINATE` where target evidence cannot be concluded, rejects auto-setting evidence `PRESENT` when the target criterion is not met, and rejects a performance result that disagrees with the fixture's objective scoring result.
+- This is a test-only fixture, not a production scoring API, persisted field or learner assessor. No production runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification status
+- Implementation commit: `ff375c40e7859575d7e3e9307224fba981344b22`.
+- No Full Regression run has yet been observed for that exact implementation commit. The latest verified Full Regression remains #3172 / run ID `42426198774` on baseline commit `c7f8381b1a34c8a8e1584d660f6ee35d6a9a1bc0`.
+- The current handoff update is being used to trigger and verify Full Regression on the resulting branch HEAD. Do not continue to another build vector until the exact resulting HEAD is GREEN.
+
+### Gate status
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.

@@ -2062,3 +2062,57 @@ The matrix translates the accepted logical architecture decisions into explicit 
 
 ### Next concrete step
 Resolve the owner/scientific decisions in G1 (O5) and G2 (O6), and obtain the product decision in G4 (O9). In parallel, complete only the read-only G6 task/attempt identity audit and G7 consumer inventory. Do not implement B1-L08 or persistence/runtime fan-out until G0–G11 are closed and G12 explicitly authorizes a bounded slice.
+
+
+## 61. G6/G7 read-only identity and consumer audit — 2026-11-06
+
+### Artifact created
+- `docs/curriculum/PacoGO_G6_G7_Read_Only_Identity_and_Consumer_Audit_v0.1.md`
+- Audit commit: `c01af851c2b133b7f028cebf0060b2784b27b752`
+
+The audit is based on the exact branch source, learner HTML entry points, engine modules/tests, service code and committed SQL migrations. It is read-only. No code, tests, registry, catalogue, task models, SQL/RPC/RLS, Supabase or learner data were changed. Migration files were inspected as repository artifacts only; deployed Supabase state is not asserted.
+
+### G6 — verified identity findings
+- `createTaskInstance` sets `task_instance_id` equal to the supplied stable catalogue `task_id`; task definition and administered attempt are conflated.
+- The shared contract does not define a unique administration/attempt identity or a complete immutable task-definition snapshot.
+- `createObservation` derives observation identity from task-instance ID plus timestamp, stores the task-instance ID in `task_id`, and retains only `evidence_target_ids[0]` as scalar `evidence_target_id`.
+- Scalar claim/development ownership is copied from the task instance. A future multi-target task cannot yet produce separately owned target assessments through this path.
+- Interaction event IDs are composed from task-instance ID, event type and timestamp. Controllers use the last event as `source_event_id`; there is no separate canonical administration identity.
+- Controllers hard-code task-definition version values (mostly `0.1`; B5 `0.3`). Some pages also store catalogue version in provenance, but no single canonical immutable task-definition/interface configuration identity is carried through the whole chain.
+- The runtime observation is only shallowly frozen; nested cloned payloads are not recursively frozen.
+- The current B1 learner catalogue v0.2 contains B1-L01–L07 and each currently declares one evidence target. The first-target loss is therefore a latent multi-target contract defect, not a failure exercised by those seven current entries. B1-L06/L07 remain TM3/ET3. B1-L08 remains blocked.
+- The addition controller is data-driven over catalogue tasks; it is not a separate implementation per arithmetic sum.
+
+**G6 disposition: OPEN.** Define versioned task definition, task model/interface identity, administered task instance/attempt, event/retry semantics, immutable observation identity, timestamps/provenance and canonical payload/replay semantics before changing controllers.
+
+### G7 — verified runtime and consumer findings
+- The browser learner cycle is `browser-vertical-slice → curriculum-registry → prototype`. It assesses one scalar target, infers development/mastery and chooses a next task in a skill-centric cycle.
+- The separate C6–C9 modules are not wired into the reviewed browser learner cycle. C6/C7 and C8/C9 are exercised through separate constructed vertical-slice tests.
+- C6 currently returns a claim-keyed `mastery_state_by_claim` map. Same-claim results across distinct development/scope/window contexts can overwrite. Current C6/C7 adapters select by claim ID and do not preserve the full six-part branch plus exact snapshot/evaluation envelope.
+- Current C8/C9 code validates a four-part learner/claim/development/scope identity, not the six-part identity in the v0.2 design proposals.
+- B1–B5 persisted learner pages use the skill-centric browser cycle and `learner-curriculum-service` for history and persistence.
+- A1 number-line, FR2 fraction and B1 experimental/variant pages call the browser cycle but the reviewed pages do not call learner-curriculum persistence.
+- Clock interface/controller demo pages use their own interface/controller path and do not call the learner curriculum persistence service.
+- `mastery-service` is a separate local-storage streak service, not C6. Test-history and practice-result services are separate product histories, not C8 branch history.
+
+### G7 — verified persistence findings
+- `student_evidence` stores scalar target/claim/development/task fields and one JSONB observation/assessment per row; unique key is learner + source event.
+- `student_longitudinal_state` is unique by learner + registry version + skill, not by six-part branch identity.
+- `curriculum_decision_trace` is constrained to one trace per learner + source event.
+- `persist_curriculum_learning_cycle` inserts one evidence row, upserts one skill-level state and inserts one trace in one RPC.
+- The duplicate path checks that related rows exist but does not compare the existing immutable payload to a canonical replay payload; same-key conflicting payloads are not currently distinguished as integrity conflicts.
+- Guardian ownership, RLS, the later SECURITY INVOKER write path and transaction-local capability cleanup are existing security boundaries to preserve. No deployed database state is inferred from migrations.
+
+**G7 disposition:** runtime and persistence inventory baseline recorded. Consumer-by-consumer compatibility/rollout, physical persistence redesign and C6–C9 integration remain gated; no implementation authorized.
+
+### Verification
+- Branch: `refactor/professional-v1`.
+- Starting exact commit: `6ec1b879d80d8635902508e891b35f24f33c4b23`.
+- Full Regression #3062 / run ID `42316250165`: GREEN on that exact starting commit; all 19 steps passed.
+- Audit commit: `c01af851c2b133b7f028cebf0060b2784b27b752`.
+- Full Regression #3063 / run ID `42316716344`: GREEN on that exact audit commit; all 19 workflow steps passed, including Node, Vitest, browser regression and clean-working-tree verification.
+- This handoff update is itself a repository change and requires Full Regression on its exact resulting commit. No post-update GREEN is claimed until that run completes.
+- LIVE `main` was not changed.
+
+### Next concrete step
+Close G1/O5 and G2/O6 with explicit owner/scientific decisions, and obtain G4/O9 product approval. Reconcile C6–C9 contracts (G5) against the verified code findings. Then use this audit to author the canonical task/attempt/observation identity contract and consumer-by-consumer legacy compatibility plan. Keep G8–G11 closed until those upstream contracts are approved. Do not implement B1-L08, runtime fan-out or persistence changes before G12 explicitly authorizes a bounded slice.

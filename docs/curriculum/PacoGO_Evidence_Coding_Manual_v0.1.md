@@ -1,3 +1,5 @@
+> **NOT AN APPROVED HUMAN-ASSESSOR MANUAL.** The owner-confirmed learner architecture has no human assessors or parallel rating workflow. PacoGO is the single operational assessor. Treat any useful category descriptions here only as candidate semantic definitions to be translated into explicit PacoGO assessment rules; do not instantiate human coder identities, coder rounds or adjudication.
+
 # PacoGO Evidence Coding Manual v0.1
 
 Date: 2026-11-02  

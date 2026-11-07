@@ -2663,3 +2663,46 @@ No runtime code, tests, curriculum registry/catalogue, database schema, SQL/RPC/
 ### Next concrete step
 
 Complete the remaining explicit consumer disposition for the adapter/history/report/export paths and unresolved external/dynamic callback boundary. Keep runtime and persistence unchanged. G5–G7 remain open; no implementation is authorized.
+
+## 76. G7 adapter, history, report and export disposition — 2026-11-07
+
+### Work completed
+
+A focused read-only inspection extended the G7 map across the C6/C7/C8/C9 adapters, prototype registry/history, evidence store, pilot analysis/export utilities and the ordinary test-history route. The readiness matrix Section 8.6 records the consumer-by-consumer findings.
+
+- `c6-c7-adapter.js` is directly imported by its test. `c7-from-c6.js` is imported by its own test and the C6–C7/C8–C9 vertical-slice tests. Neither was identified as a learner-page/application-runtime import in the inspected paths. Their duplicate/canonical ownership remains unresolved.
+- `c8-c9-adapter.js` is used by its adapter and vertical-slice tests to build a simplified C8 history observation and C9 structural validation input. It is not the identified persisted learner-history route and does not carry full branch/snapshot/evaluation lineage.
+- `curriculum-registry.js` calls the skill-centric `prototype.js` cycle and `longitudinal-state.js`. The A1/B1/FR2 and B-family demonstration pages use this separate prototype result; it is not the local lesson/item service or canonical C6–C9 history.
+- `student-evidence-store.js` is an in-memory learner/registry-version/skill store. No active learner-page consumer was identified in the inspected paths.
+- `pilot-analysis-report.js` is called by `empirical-pilot-analysis-pipeline.js` to produce a descriptive-only research report. The identified direct pipeline invocation is its test; no learner-facing route was identified in the inspected application paths.
+- `empirical-pilot-execution.js` and `pilot-execution-package.js` create validated research execution snapshots/packages/exports. Their identified direct invocations are tests; they are not learner-runtime persistence paths.
+- `src/services/test-history-service.js` and `src/features/test-history/*` read and display ordinary `test_attempts` and answers. This is separate from curriculum evidence, C8 longitudinal history and C6 mastery.
+- External/deployment-side and runtime-generated consumers cannot be ruled out by repository inspection. The Wordtrainer `recordResult` callback destination remains unknown; no destination is inferred or approved.
+
+### Current disposition
+
+The known in-repository routes are now separated into:
+1. local lesson/item mastery writes through the practice runtime;
+2. Supabase skill-scoped learner curriculum reads/writes on B1–B5 pages;
+3. skill-centric prototype cycle/history;
+4. in-memory evidence storage;
+5. C6–C9 adapter/validation test paths;
+6. research-only report and execution/export utilities;
+7. separate ordinary test-attempt history reads.
+
+G7 remains OPEN because external/dynamic callback wiring is still unknown and the repository scan cannot prove absence of consumers outside the inspected source/deployment boundary. G5 and G6 remain OPEN. No canonical adapter, migration, schema change, Supabase work or runtime write path is authorized.
+
+### Deliberately unchanged
+
+No runtime code, tests, curriculum registry/catalogue, database schema, SQL/RPC/RLS, Supabase, learner data or local mastery state changed.
+
+### Verification and repository state
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Before these documentation updates, Full Regression #3113 / run ID `42398239637`: **GREEN** on exact commit `6408380ee065296b6ed30026753e694a519d5de2`; all 16 workflow steps completed successfully, including browser regression and clean-working-tree verification.
+- Readiness matrix update commit: `8b245160ae29c352d913e39775a82e19c495cf21`.
+- This handoff update is another documentation-only repository change and requires Full Regression on its exact resulting commit. No post-update GREEN is claimed until that run completes.
+
+### Next concrete step
+
+Perform a final bounded check of the remaining application import/callback boundary and deployment configuration for externally supplied or dynamically loaded consumers. If that boundary cannot be evidenced from the repository, retain it explicitly as UNKNOWN and keep G7 open rather than infer absence. Then reconcile the G5 cross-stage examples and G6 identity contracts; do not implement adapters or persistence changes before G5–G11 and explicit G12 authorization are complete.

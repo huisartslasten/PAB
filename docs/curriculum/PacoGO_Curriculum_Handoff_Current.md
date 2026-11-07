@@ -2014,3 +2014,51 @@ Produce a consolidated implementation-readiness matrix identifying each remainin
 - Decision record commit: `655bd8c80771733f76e0cd787c2d2bf14b6f3d36`.
 - This handoff update is a documentation change and requires Full Regression on the exact resulting commit. No post-update GREEN is claimed until that run completes.
 - LIVE `main` was not changed.
+
+
+## 60. Multi-target implementation-readiness matrix — 2026-11-06
+
+### Artifact created
+- `docs/curriculum/PacoGO_Multi_Target_Implementation_Readiness_Matrix_v0.1.md`
+- Commit: `8b70571666ee218c0623908e59d454416142eb04`
+
+The matrix translates the accepted logical architecture decisions into explicit gates, accountable roles, required evidence/artifacts, dependencies and authorization checkpoints. It distinguishes owner/scientific/product decisions from engineering and data/security design. It explicitly records that completing individual gates does not authorize implementation; G12 is the explicit implementation authorization checkpoint.
+
+### Gate structure
+- G0: exact-branch baseline and Full Regression.
+- G1: O5 scope/time-window lifecycle approval.
+- G2: O6 canonical C3 codebook and measurement approval.
+- G3: C3 coding reliability readiness.
+- G4: O9 learner-facing cross-branch product policy.
+- G5: C6–C9 contract reconciliation.
+- G6: task-definition / task-instance / observation identity.
+- G7: legacy and runtime consumer inventory.
+- G8: physical persistence and read-model design.
+- G9: staged writes, idempotency, concurrency and recovery.
+- G10: security, privacy and child-data governance.
+- G11: contract and migration verification suite.
+- G12: explicit narrow implementation authorization.
+- G13: separate empirical validation and product-claim authorization.
+
+### Current disposition
+- O1–O4 and O7–O8 remain accepted at logical level only.
+- O5, O6 and O9 remain open.
+- C3 v0.2 and Scope/Time-Window v0.1 remain proposals.
+- C6 v0.1, C7 v0.2, C8 v0.2 and C9 v0.2 still require cross-contract reconciliation; the matrix does not silently approve them.
+- G6 and G7 read-only audit work can proceed in parallel with owner decisions; no runtime behavior change is authorized.
+- G8–G11 remain dependent on approved contracts and complete consumer/security inventories.
+- B1-L08 remains blocked. B1-L01–L07 and existing curriculum meanings remain unchanged.
+- No runtime, tests, registry, catalogue, task models, SQL/RPC/RLS, Supabase or learner data were changed.
+- Scientific Validation remains distinct from engineering regression and structural chain validation.
+
+### Verification
+- Branch: `refactor/professional-v1`.
+- Before matrix work, Full Regression #3059 / run ID `42315420685` completed GREEN on exact handoff commit `8d840d220d0c2feed7100f53756385c409f1c5ad`; all 19 workflow steps passed.
+- The current branch verification-only commit `043a649f903c5bf04da65c2035451eb27a069a79` has the exact same tree as `8d840d2`.
+- Matrix commit: `8b70571666ee218c0623908e59d454416142eb04`.
+- Full Regression #3061 / run ID `42315810808`: GREEN on that exact matrix commit; all 19 workflow steps passed, including maintained Node/Vitest regression, browser regression and clean-working-tree verification.
+- This handoff update is itself a repository change and requires Full Regression on its exact resulting commit. No post-update GREEN is claimed until that run completes.
+- LIVE `main` was not changed.
+
+### Next concrete step
+Resolve the owner/scientific decisions in G1 (O5) and G2 (O6), and obtain the product decision in G4 (O9). In parallel, complete only the read-only G6 task/attempt identity audit and G7 consumer inventory. Do not implement B1-L08 or persistence/runtime fan-out until G0–G11 are closed and G12 explicitly authorizes a bounded slice.

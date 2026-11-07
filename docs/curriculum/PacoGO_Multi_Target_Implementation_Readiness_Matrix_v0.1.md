@@ -791,3 +791,16 @@ The G3 specification translates the O6 candidate rules into 40 deterministic log
 - the structured non-scored C6 M2 adequacy profile without changing C6 gate meanings.
 
 **Gate disposition:** G2/O6 remains OPEN until the exact versioned contract is frozen. G3 remains OPEN until G2 is frozen, the vectors are converted into executable contract tests, and the exact implementation commit passes Full Regression. G5/G6 remain separate dependent gates. No runtime, tests, registry, task catalogue, learner state, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+
+## 8.17 O6 consolidated operational assessment contract v0.3 — 2026-11-07
+
+**Contract:** `docs/curriculum/PacoGO_Operational_Assessment_Contract_v0.3.md`.
+
+This version consolidates the O6 v0.2 proposal, decision brief, reconciliation review, A1/B1/FR2 domain anchors, owner-confirmed support-condition policy and G3 candidate vectors into one logical working contract.
+
+It makes the following distinctions explicit and normative within the proposal: applicability versus execution versus result; task-instance alignment versus response relation; objective performance versus target evidence; per-stream process availability; strict preconditions for ABSENT; NO_RESPONSE → NOT_OBSERVED + INDETERMINATE by default; planned support versus help request versus delivered support versus target-specific independence; immediate incomplete termination of Tussentoets/Toets on content-help request with separate supported continuation; observation-local contradiction; non-scored C6 M2 adequacy profile; immutable observation/assessment history and O5 availability-cutoff lineage.
+
+It preserves existing A1/B1/FR2 target meanings, B1 ET7 unresolved mapping, C6 mastery gates and C7 authority. It does not authorize runtime or persistence work.
+
+**Gate disposition:** G2/O6 remains OPEN until the owner accepts this exact v0.3 as the approved versioned contract and required governance review is complete. G3 remains OPEN pending G2 freeze and executable contract tests. G5 and G6 remain separate dependent gates. No runtime, tests, registry, task catalogue, learner state, database, SQL/RPC/RLS, Supabase or learner data changed.

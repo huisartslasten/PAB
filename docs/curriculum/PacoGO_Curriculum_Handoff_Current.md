@@ -2355,3 +2355,38 @@ This closes the **core logical portion** of O5 only. Detailed permissions/owners
 
 ### Next concrete step
 Apply this minimum policy to the C6–C9 branch/snapshot contract crosswalk (G5) without inventing C3 assessment semantics or physical persistence. Keep O6 and O9 open, and do not implement runtime or Supabase changes before the remaining gates and G12 authorization are satisfied.
+
+## 68. Full Regression #3094 verified; G5 preliminary crosswalk completed — 2026-11-07
+
+### Verification baseline
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- O5 decision commit: `9fb5c40b07c49ffffcd7b4851fbe772c0134684e`.
+- Full Regression #3094 / run ID `42356418882`: **GREEN** on that exact commit; all workflow steps completed successfully, including browser regression and clean-working-tree verification.
+
+### G5 source reconciliation performed
+Compared:
+- C6 Mastery Decision Protocol v0.1;
+- C7 Next-Action Decision Protocol v0.2;
+- C8 Student Model / Learning Status Protocol v0.2;
+- C9 Vertical Learning Chain Validation Protocol v0.2;
+- Operational Assessment Contract v0.1;
+- Multi-Target Implementation Readiness Matrix v0.1;
+- current C6/C7 runtime findings already recorded in the handoff.
+
+Confirmed:
+- C8/C9 proposals explicitly require the six-part branch identity.
+- C6/C7 candidate protocols do not yet define a complete shared six-field branch/snapshot envelope.
+- Current C6 result storage and C7 adapter remain claim-keyed, so they cannot safely distinguish separate branches sharing a claim.
+- The required lineage is one immutable branch snapshot → exact C6 evaluation → exact C7 decision → C8 history item → C9 validation of that same chain.
+- C9 validates structural integrity only; it does not validate scientific truth or learning outcomes.
+- O5's approved minimum policy can be carried through this envelope without selecting a universal duration or automatic rolling windows.
+
+The readiness matrix now contains a preliminary G5 crosswalk, updated O5 gate status and corrected G5 dependencies. **G5 remains OPEN** because O6 assessment-input semantics and the remaining contract/compatibility details are not resolved. O9 remains open for learner-facing cross-branch presentation.
+
+### Repository change and regression
+- Documentation changes: readiness matrix and this handoff only.
+- No runtime code, tests, curriculum registry/catalogue, C1–C9 decision meanings, database schema, SQL/RPC/RLS, Supabase or learner data changed.
+- The documentation change is based on the verified O5 baseline above. Its own Full Regression must run on the exact resulting commit; no post-change GREEN is claimed yet.
+
+### Next concrete step
+Continue G5 by defining the exact C6→C7 branch/snapshot envelope and rejection cases, while keeping C3 target-assessment fields explicitly unresolved under O6. In parallel, continue the read-only G6/G7 identity and consumer inventory. Do not change runtime code until G5–G11 and explicit G12 authorization permit a bounded implementation slice.

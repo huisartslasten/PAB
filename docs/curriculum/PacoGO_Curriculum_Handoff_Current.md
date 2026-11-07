@@ -3026,3 +3026,50 @@ Synthetic cases are included as future rule-test vectors only; they are not lear
 ### Next concrete step
 
 Review the O6 proposal against the current curriculum and task contracts, then resolve any category/anchor conflicts before creating the versioned canonical C3 contract. In particular, verify that `PROMPTED` versus `DEPENDENT` is target-specific and behaviorally distinguishable; that `ABSENT` requires an adequate aligned opportunity and sufficient capture; and that the structured M2 profile preserves C6's existing gate meaning. Do not implement or change C6–C9 until the O6 contract is approved and G5 is reconciled. No runtime or persistence work before G0–G11 and explicit G12 authorization.
+
+
+## 84. O6 operational assessment reconciliation review — 2026-11-07
+
+### Verification baseline
+
+Full Regression #3130 / run ID `42403229733`: **GREEN** on exact prior commit `492c965a4230ab9c11f2d6b9625d3c886a7cf6b4`; all 19 workflow steps passed, including curriculum engine, architecture boundaries, Node/Vitest, browser regression and clean-working-tree verification.
+
+### Work completed
+
+Created `docs/curriculum/PacoGO_O6_Operational_Assessment_Reconciliation_Review_v0.1.md` to critically reconcile O6 proposal v0.2 against O1–O4/O7–O8, C1–C6, owner-confirmed task-support policy, O5 and the G5/G6 boundaries.
+
+The review confirms the overall separation of measurement dimensions but identifies ambiguities that must be resolved before O6 approval:
+- applicability, assessment execution and assessment result are currently conflated by `NOT_ASSESSED`;
+- `PARTIALLY_ALIGNED` needs explicit target-component semantics;
+- response relation `NONE` must not be used for no response;
+- `NOT_OBSERVED` versus `NOT_SCORABLE` must distinguish no submitted response from an existing unscorable response;
+- `ABSENT` requires an aligned opportunity and sufficient target-relevant capture;
+- C3 assistance independence and C6 M5 evidence-set independence are separate constructs;
+- `PROMPTED` versus `DEPENDENT` needs a target-specific behavioral rule;
+- C3 contradiction is observation-local; C6 M7 is evidence-set-level;
+- M2's structured adequacy profile must not duplicate M1 or redefine either existing C6 gate;
+- contextual data capture must be pre-specified/minimised and aligned with G10;
+- event time and assessment-availability provenance remain aligned with O5.
+
+The readiness matrix now records the review in Section 8.13. All recommendations remain proposals. No owner approval is implied.
+
+### Gate status
+
+- G2/O6: OPEN; category/anchor and logical output approval still required.
+- G3: OPEN; deterministic rules/test vectors follow O6 approval.
+- G5: OPEN; C3 output and six-part branch/snapshot/C6–C9 handoff not yet finalized.
+- G6: OPEN; lifecycle proposal must be reconciled after O6 approval.
+- G7: OPEN; external/dynamic consumer boundary remains unknown.
+- G8–G12: OPEN; no physical schema, persistence or runtime authorization.
+- Scientific Validation remains separate; no empirical validity claim is made.
+
+### Repository and verification
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- O6 reconciliation review commit: `d4068f41dc52ab3a3da64a70403fe8c0246bdb68`.
+- This matrix + handoff update is being committed as one coherent documentation commit based on that review.
+- Full Regression must run on the exact resulting commit. The #3130 GREEN result above is for the parent commit only and is not a claim about the new handoff commit.
+
+### Next concrete step
+
+Continue with a bounded O6 decision-ready contract: resolve the R1–R13 recommendations against actual A1/B1/FR2 target requirements and existing C6 semantics. Produce concrete domain examples for support boundaries and partial target elicitation, without changing curriculum meanings. Then present the exact remaining owner decisions, rather than reopening settled architecture. No runtime or persistence work before G2/G3/G5–G11 and explicit G12 authorization.

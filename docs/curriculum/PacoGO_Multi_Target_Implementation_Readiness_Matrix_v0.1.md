@@ -702,3 +702,25 @@ This version recasts O6 as PacoGO's operational, target-specific assessment cont
 The prior C3 candidate documents that assumed a human coding workflow remain historical inputs only; this proposal does not introduce a parallel learner-runtime assessment path.
 
 No runtime, tests, registry, catalogue, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+
+## 8.13 O6 operational assessment reconciliation review — 2026-11-07
+
+**Review:** `docs/curriculum/PacoGO_O6_Operational_Assessment_Reconciliation_Review_v0.1.md`.
+
+The review identifies and proposes resolutions for the remaining logical ambiguities in O6 v0.2:
+
+1. Separate applicability, assessment execution state and dimension result; an absent rule or technical failure is not a learner evidence state.
+2. Restrict `PARTIALLY_ALIGNED` to explicitly decomposed target components; a misaligned task cannot produce target-level `ABSENT`.
+3. Keep response relation distinct from evidence status; no response is not relation `NONE`.
+4. Distinguish no response (`NOT_OBSERVED`) from an existing but unscorable response (`NOT_SCORABLE`), while preserving the raw `NO_RESPONSE` event.
+5. Apply strict preconditions to `ABSENT`; incomplete capture, no response or misalignment default to uncertainty/not-assessed as appropriate.
+6. Explicitly distinguish C3 target-specific assistance/independence from C6 M5 independence across an eligible evidence set.
+7. Give `PROMPTED` versus `DEPENDENT` a target-specific behavioral decision sequence.
+8. Keep C3 contradiction observation-local and C6 M7 evidence-set-level.
+9. Reconcile the M2 adequacy profile with C6 M1/M2 without duplication, scoring or changing existing gate meaning.
+10. Pre-specify and minimise captured context variables; preserve O5 event-time/availability-cutoff provenance.
+
+**Gate status:** these are recommendations, not owner approvals. G2/O6 remains OPEN. G3 must turn approved rules into deterministic contract tests. G5 must define the exact C3-to-C6–C9 handoff. G6 must be reconciled after O6 approval. No runtime or persistence implementation is authorized.
+
+No runtime, tests, registry, catalogue, learner state, database, SQL/RPC/RLS, Supabase or learner data changed.

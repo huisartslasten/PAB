@@ -547,3 +547,32 @@ This is a read-only field/lineage comparison of the current C6–C9 executable m
 5. O6 remains open. The exact target-assessment states, coding semantics and version provenance required by a frozen snapshot cannot be finalized from the current executable shortcut.
 
 **Disposition:** G5 remains OPEN. G6 remains OPEN because task-definition, task-instance, attempt, event and observation identities still require a reconciled lifecycle contract. G7 remains OPEN for the external/dynamic consumer boundary recorded in Section 8.6. No runtime, tests, registry, schema, SQL/RPC/RLS, Supabase or learner data changed. No implementation is authorized.
+
+## 8.8 G6 task, attempt, event and observation identity crosswalk — 2026-11-07
+
+This is a read-only comparison of the current browser interaction path, the existing persistence boundary and the C2/C3/multi-target candidate contracts. It records mismatches without choosing a new identity hierarchy.
+
+| Identity layer | Current executable/persistence behavior | Candidate contract expectation | Classification |
+|---|---|---|---|
+| Task definition | Controllers receive a registry task with `task_id`, `task_model_id` and other task fields. `task_definition_version` is hardcoded to `0.1`; no distinct task-definition ID is carried by the interaction contract. | C3 distinguishes versioned task definition ID/version from the administered instance and its actual presented content. | Definition identity/version is incomplete and partly hardcoded. |
+| Task instance | `createTaskInstance` sets `task_instance_id = taskId`. The stable task ID is reused as the instance ID. | C2/C3 require an identifiable administered task instance, with actual presentation/provenance. | Definition and administration are conflated. |
+| Task/instance linkage | `createObservation` writes `task_id = taskInstance.task_instance_id`; the original task-definition ID is not separately retained in that field. | The multi-target contract keeps `task_id`, task model and parent attempt identity distinct. | Identity field is overloaded. |
+| Attempt / response episode | Controllers set `performance.attempts = 1` and prevent a second submission. No separate `task_attempt_id` is generated. | The multi-target contract proposes one stable task-attempt identity for one learner interaction episode. C3 describes ordered attempts/events within an episode and a separately started supported episode as distinct. | Missing attempt identity; relationship between task instance and attempt episode still needs one reconciled definition. |
+| Interaction event | Event ID is composed from task-instance ID, event type and timestamp. | C3 expects ordered events with timestamp/order, actor/source, event type and idempotent provenance. | Timestamp-composed identity; stable event/idempotency semantics and ordering contract are not fully specified. |
+| Raw observation | Observation ID is composed from task-instance ID and observed timestamp. No attempt ID is included. | C2/C3 require one immutable raw response episode with stable observation identity and provenance. | Timestamp-derived identity; cannot distinguish separate attempts under the current conflated instance identity. |
+| Target cardinality | Task instance retains `evidence_target_ids[]`, but `createObservation` writes only the first target to scalar `evidence_target_id`. | Multi-target contract requires one raw attempt/observation linked to multiple target-specific evidence assessments. | Multi-target relationship is lost at the observation boundary. |
+| Browser validation | `runTaskObservation` verifies only that observation `skill_id` matches the task's skill. | Task/attempt/observation lineage must validate task definition, instance, target set and curriculum ownership, not skill alone. | Partial identity validation. |
+| Pilot execution path | `empirical-pilot-execution.js` separately carries `task_id` and `task_instance_id`, plus learner/study/session/wave/registry and administration time. Its raw observation requires both IDs but has no explicit `task_attempt_id`. | Must reconcile with the learner-runtime task/attempt/observation hierarchy rather than assume the research export shape is the runtime contract. | More explicit but separate research path; not the canonical runtime solution. |
+| Supabase persistence boundary | `student_evidence` has scalar `task_instance_id`, `task_model_id`, `evidence_target_id` and `source_event_id`; the service maps `observation.task_id` into the `task_instance_id` column. The full observation is also stored as JSONB. | Candidate model distinguishes definition, administered instance, attempt, raw observation and target-specific assessments. | Existing scalar compatibility boundary; G8 must inspect constraints/consumers before any persistence design. No schema change is authorized. |
+
+### G6 conclusions and unresolved decisions
+
+1. Do not treat a stable catalogue `task_id` as a unique administered task-instance ID.
+2. Reconcile the C2 `task_instance_id`, C3 response-episode unit and multi-target `task_attempt_id` into one explicit hierarchy. Do not infer whether a retry or support transition is a new attempt or a new observation; the C3 lifecycle rules must decide this.
+3. Define stable, ordered event identity and source-event/idempotency identity separately from timestamps.
+4. Define one immutable raw-observation identity per approved response-episode unit.
+5. Preserve the exact declared target set on the raw task attempt and link each target assessment to the same source observation; do not collapse to the first scalar target.
+6. Align the separate pilot execution model with the approved logical hierarchy without treating its current fields as an approved learner-runtime API.
+7. Keep existing Supabase rows and RPC unchanged until the logical contract is approved and G8 has completed the physical compatibility review.
+
+**Disposition:** G6 remains OPEN. The current code has an identifiable task/instance conflation, no explicit attempt identity and a scalar target projection. These are contract findings, not authorization to patch the interaction contract or alter tests. No runtime, tests, schema, SQL/RPC/RLS, Supabase or learner data changed.

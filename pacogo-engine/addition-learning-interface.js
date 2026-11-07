@@ -1,7 +1,29 @@
+function appendQuantityGroups(visual, addends) {
+  addends.forEach((count, index) => {
+    if (index > 0) {
+      const plus = document.createElement('span');
+      plus.className = 'addition-plus';
+      plus.textContent = '+';
+      visual.appendChild(plus);
+    }
+    const group = document.createElement('div');
+    group.className = 'quantity-group';
+    group.setAttribute('aria-label', 'Hoeveelheid ' + count);
+    for (let dotIndex = 0; dotIndex < count; dotIndex += 1) {
+      const dot = document.createElement('span');
+      dot.className = 'quantity-dot';
+      dot.setAttribute('aria-hidden', 'true');
+      group.appendChild(dot);
+    }
+    visual.appendChild(group);
+  });
+}
+
 function renderAdditionLearningInterface({
   root,
   model,
   onSubmit,
+  onRepresentationOptionSelected = () => {},
   supportOptions = [],
   onHelpRequest = () => {},
   onSupportDelivered = () => {},
@@ -11,6 +33,9 @@ function renderAdditionLearningInterface({
     throw new TypeError('root, model and onSubmit are required');
   }
   if (!Array.isArray(supportOptions)) throw new TypeError('supportOptions must be an array');
+  if (typeof onRepresentationOptionSelected !== 'function') {
+    throw new TypeError('onRepresentationOptionSelected must be a function');
+  }
   root.replaceChildren();
 
   const title = document.createElement('h2');
@@ -22,24 +47,7 @@ function renderAdditionLearningInterface({
   visual.className = 'addition-visual';
 
   if (model.representation === 'quantity_groups') {
-    model.addends.forEach((count, index) => {
-      if (index > 0) {
-        const plus = document.createElement('span');
-        plus.className = 'addition-plus';
-        plus.textContent = '+';
-        visual.appendChild(plus);
-      }
-      const group = document.createElement('div');
-      group.className = 'quantity-group';
-      group.setAttribute('aria-label', 'Hoeveelheid ' + count);
-      for (let dotIndex = 0; dotIndex < count; dotIndex += 1) {
-        const dot = document.createElement('span');
-        dot.className = 'quantity-dot';
-        dot.setAttribute('aria-hidden', 'true');
-        group.appendChild(dot);
-      }
-      visual.appendChild(group);
-    });
+    appendQuantityGroups(visual, model.addends);
   } else {
     const equation = document.createElement('div');
     equation.className = 'addition-equation';
@@ -47,6 +55,9 @@ function renderAdditionLearningInterface({
     visual.appendChild(equation);
   }
 
+  let mappingStatus = null;
+  let mappingOptions = null;
+  let selectedOptionId = null;
   const form = document.createElement('form');
   form.className = 'addition-answer-form';
   const label = document.createElement('label');
@@ -62,18 +73,68 @@ function renderAdditionLearningInterface({
   submit.textContent = 'Controleren';
   label.appendChild(input);
   form.append(label, submit);
+
+  if (model.interactionType === 'representation_mapping') {
+    const fieldset = document.createElement('fieldset');
+    fieldset.className = 'addition-mapping-options';
+    fieldset.setAttribute('aria-label', model.mappingQuestion);
+    const legend = document.createElement('legend');
+    legend.textContent = model.mappingQuestion;
+    fieldset.appendChild(legend);
+    mappingOptions = model.mappingOptions.map(option => {
+      const optionButton = document.createElement('button');
+      optionButton.type = 'button';
+      optionButton.textContent = option.label;
+      optionButton.dataset.mappingOption = option.id;
+      optionButton.setAttribute('aria-pressed', 'false');
+      optionButton.addEventListener('click', () => {
+        selectedOptionId = option.id;
+        mappingOptions.forEach(({ button }) => {
+          const selected = button.dataset.mappingOption === selectedOptionId;
+          button.setAttribute('aria-pressed', String(selected));
+          button.classList.toggle('is-selected', selected);
+        });
+        mappingStatus.textContent = '';
+        onRepresentationOptionSelected(option.id);
+      });
+      fieldset.appendChild(optionButton);
+      return { id: option.id, button: optionButton };
+    });
+    mappingStatus = document.createElement('p');
+    mappingStatus.className = 'addition-mapping-status';
+    mappingStatus.setAttribute('role', 'alert');
+    mappingStatus.setAttribute('aria-live', 'polite');
+    root.append(title, instruction, visual, fieldset, form, mappingStatus);
+  } else {
+    root.append(title, instruction, visual, form);
+  }
+
   form.addEventListener('submit', event => {
     event.preventDefault();
+    if (model.interactionType === 'representation_mapping' && !selectedOptionId) {
+      mappingStatus.textContent = 'Kies eerst de som die bij de groepen past.';
+      mappingOptions[0]?.button.focus();
+      return;
+    }
     if (input.value.trim() === '') {
       input.setCustomValidity('Vul eerst je antwoord in.');
       input.reportValidity();
       return;
     }
     input.setCustomValidity('');
-    onSubmit(Number(input.value));
+    if (model.interactionType === 'representation_mapping') {
+      onSubmit({
+        selectedOptionId,
+        submittedTotalRaw: input.value
+      });
+    } else {
+      onSubmit(Number(input.value));
+    }
   });
 
-  root.append(title, instruction, visual, form);
+  if (model.interactionType !== 'representation_mapping') {
+    // The form is appended above for the existing total-only interaction.
+  }
 
   let helpOpen = false;
   let supportMessage = null;
@@ -140,7 +201,15 @@ function renderAdditionLearningInterface({
     root.appendChild(supportRegion);
   }
 
-  return Object.freeze({ input, submit, helpButton, supportChoices, supportMessage });
+  return Object.freeze({
+    input,
+    submit,
+    helpButton,
+    supportChoices,
+    supportMessage,
+    mappingOptions: mappingOptions?.map(option => option.button) || [],
+    getSelectedOptionId: () => selectedOptionId
+  });
 }
 
 export { renderAdditionLearningInterface };

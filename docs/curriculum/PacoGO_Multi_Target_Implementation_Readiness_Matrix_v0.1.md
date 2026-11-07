@@ -100,7 +100,7 @@ Open blockers:
 - G5: C6–C9 reconciliation and versioned handoff.
 - G6–G11: identity, consumer, persistence, security, recovery and test design.
 
-**Next concrete action:** continue the G5 crosswalk from the six-part identity and immutable snapshot envelope. The preliminary crosswalk in Section 7 is not a gate closure: O6 still blocks final assessment-input semantics. Continue G6/G7 read-only inventories in parallel. O9 is needed before any learner-facing cross-branch projection is designed or shipped.
+**Next concrete action:** reconcile the C6→C7 minimum envelope and rejection rules in Sections 7.7–7.9 against C8/C9 lineage requirements, then continue the G6/G7 read-only identity and consumer inventories. O6 still blocks final C3 assessment-input semantics; O9 is needed before learner-facing cross-branch projection is designed or shipped.
 
 B1-L08 remains blocked until the approved contract supports its target-specific evidence end to end. Existing B1-L01–L07 remain unchanged.
 
@@ -194,6 +194,64 @@ The exact scope/window definition references and snapshot cutoff must be identic
 - G6/G7 identity and consumer compatibility work remains necessary before any runtime adapter transition.
 - No canonical branch hash/serialization is selected. The six inspectable fields remain authoritative.
 - No physical schema, persistence API, Supabase change, runtime fan-out or test modification is authorized.
+
+
+### 7.7 C6 → C7 minimum handoff envelope
+
+**Status: logical contract crosswalk; canonical serialization and runtime implementation remain unapproved.**
+
+The C6 result and C7 input must be bound to one exact evaluation of one immutable snapshot. The minimum logical envelope is:
+
+| Element | C6 evaluation must provide | C7 must do |
+|---|---|---|
+| Branch identity | All six canonical fields: `learner_key`, `curriculum_registry_version_id`, `claim_id`, `development_id`, `scope_id`, `time_window_id` | Preserve all six values unchanged in its input trace and decision output |
+| Snapshot reference | Exact `decision_snapshot_id` evaluated by C6 | Reference that same snapshot; never select a replacement or newer snapshot |
+| Evaluation reference | Unique `c6_evaluation_id` | Reference that exact evaluation as the sole source of mastery state |
+| Mastery result | Exactly one of the five C6 outcomes: `MASTERED`, `NOT YET MASTERED`, `INSUFFICIENT EVIDENCE`, `CONTRADICTORY`, `NOT ASSESSED` | Consume unchanged; never reconstruct it from scores, gates or observations |
+| Gate trace | Results and explicit reasons for the seven existing C6 gates, with C6 protocol provenance | Preserve the evaluation reference and trace provenance; do not reinterpret or rerun C6 |
+| Snapshot provenance | Scope/window definition references and versions, event-time bounds, availability cutoff, eligible source references and exclusions from the frozen snapshot | Retain the same snapshot lineage; do not widen eligibility or add late-arriving material |
+| Protocol provenance | C6 protocol version and applicable registry provenance | Record the C6 version used and the C7 protocol/action-policy versions used for its own decision |
+
+The six identity fields and snapshot/evaluation references are required logical fields, not a decision to use a particular JSON shape, database key, branch hash or physical schema. The exact C3 target-assessment vocabulary and assessment-version fields remain governed by O6 and are deliberately not specified here.
+
+C7 also requires its own explicit inputs, separate from the C6 result:
+- `prerequisite_ordering_state`;
+- `next_development_ordering_state`;
+- the explicitly available candidate-action set;
+- the applicable C7 action-policy version.
+
+These ordering states are passed as separate information. C6 does not derive them, and neither state may be silently substituted for the other.
+
+### 7.8 C6 → C7 rejection rules
+
+The handoff is rejected as invalid or unavailable for decision when any of the following applies:
+
+| Condition | Required disposition |
+|---|---|
+| Any of the six branch identity fields is absent | Reject; do not infer it from claim, task, learner session or another record |
+| Any branch identity field differs between snapshot, C6 evaluation and C7 request | Reject the handoff; do not merge or repair identities |
+| Snapshot ID differs between the C6 evaluation and C7 request | Reject; C7 must not consume an evaluation from another snapshot |
+| Scope/window definition reference, version, event-time boundary or availability cutoff does not match the referenced frozen snapshot | Reject the lineage as inconsistent |
+| C6 evaluation reference is missing, ambiguous or does not resolve to exactly one evaluation | Reject; do not choose the latest or first matching result |
+| C6 evaluation is not linked to the exact referenced snapshot and six-part branch | Reject; claim equality is not sufficient |
+| C6 mastery outcome is absent or outside the five defined C6 outcomes | Reject as an invalid C6 result; C7 must not reconstruct a replacement |
+| Required C6 gate trace or protocol provenance is absent | Reject as an incomplete handoff; do not infer gate results |
+| A claim-keyed lookup returns more than one possible branch result, or cannot prove the full six-field identity and snapshot | Reject; claim-only selection is not a valid branch resolver |
+| A newer or late-arriving assessment exists after the snapshot cutoff | Exclude it from this evaluation; it may be considered only through a new immutable snapshot and new C6 evaluation |
+| C7 ordering state or candidate-action set is missing/ambiguous | Apply the existing C7 uncertainty/hold boundary; do not invent ordering or candidate actions |
+| A proposed C7 action is not in the explicitly supplied candidate set or violates an existing C7 gate | Do not emit that action; use only a permitted candidate or the existing hold outcome |
+
+A rejected handoff is not a learner failure and does not change mastery. It is a decision-chain integrity failure or an unavailable decision input. It must remain inspectable and must not be silently converted to `NOT YET MASTERED`, `CONTRADICTORY` or another learner-state outcome.
+
+### 7.9 C6/C7 decision trace boundary
+
+For each accepted C7 decision, the trace must make it possible to follow:
+
+`six-part branch → decision_snapshot_id → c6_evaluation_id → decision_id`
+
+The C7 decision must retain the exact C6 evaluation reference, the unchanged branch identity, the snapshot reference, the C6 mastery outcome, the two separate ordering inputs, the candidate set, the selected candidate/hold outcome, the applicable C7 gates and the protocol/policy versions. This is a logical trace requirement, not a physical field-name or schema approval.
+
+C7 remains a candidate-action selector only. It does not mutate learner state, write mastery, promote the registry, or authorize automatic progression.
 
 ### 7.6 G5 exit criteria
 

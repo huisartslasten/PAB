@@ -2538,9 +2538,11 @@ The readiness matrix Section 8.3 now records the following inspected paths:
 ### Verification
 
 - Branch: `refactor/professional-v1`; LIVE `main` was not a target of these changes.
-- Full Regression #3102 / run ID `42378520783`: **GREEN** on exact baseline commit `b278a54198bd2f6a5c7eaa78f5e72d8c548acd14`; all workflow steps passed, including browser regression and clean-working-tree verification.
+- Full Regression #3102 / run ID `42378520783`: **GREEN** on exact baseline commit `b278a54198bd2f6a5c7eaa78f5e72d8c548acd14`.
 - Readiness-matrix consumer-map commit: `c278e880c068c6e410a611b70c9d718045817af0`.
-- This handoff update is another repository change and requires Full Regression on its exact resulting commit. No post-update GREEN is claimed yet.
+- Handoff consumer-map commit: `3ae2368c7bff9523a422eee5f4edcc3fd777700a`.
+- Full Regression #3104 / run ID `42378856627`: **GREEN** on exact commit `3ae2368c7bff9523a422eee5f4edcc3fd777700a`; all workflow steps passed, including browser regression and clean-working-tree verification.
+- This status reconciliation is itself a repository change and requires Full Regression on its exact resulting commit. No post-reconciliation GREEN is claimed until that run completes.
 
 ### Next concrete step
 

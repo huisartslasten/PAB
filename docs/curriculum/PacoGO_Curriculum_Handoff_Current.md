@@ -3498,7 +3498,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 98. G3-012 incorrect-performance/contradiction separation — verification pending
+## 98. G3-012 incorrect-performance/contradiction separation — verified
 
 ### Work implemented
 - Inspected G3-012 in the verification specification and O6 v0.3 §§5.3 and 5.7.
@@ -3509,7 +3509,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 ### Verification status
 - Implementation commit: `3d2d1baa55f82707935cd384f02adfdbff7099c3`.
 - Pre-build Full Regression #3177 / run ID `42426432508`: GREEN on exact baseline commit `16c134c91674eba76b75674af9c89e88df867a3b`.
-- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+- Full Regression #3178 / run ID `42426573789`: **GREEN** on exact implementation commit `3d2d1baa55f82707935cd384f02adfdbff7099c3`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

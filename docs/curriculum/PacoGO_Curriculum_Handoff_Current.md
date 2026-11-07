@@ -3478,7 +3478,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 97. G3-011 objective performance/evidence separation — verification pending
+## 97. G3-011 objective performance/evidence separation — verified
 
 ### Work implemented
 - Inspected G3-011 in the verification specification and O6 v0.3 §§5.3 and 5.5.
@@ -3488,8 +3488,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 ### Verification status
 - Implementation commit: `ff375c40e7859575d7e3e9307224fba981344b22`.
-- No Full Regression run has yet been observed for that exact implementation commit. The latest verified Full Regression remains #3172 / run ID `42426198774` on baseline commit `c7f8381b1a34c8a8e1584d660f6ee35d6a9a1bc0`.
-- The current handoff update is being used to trigger and verify Full Regression on the resulting branch HEAD. Do not continue to another build vector until the exact resulting HEAD is GREEN.
+- Full Regression #3174 / run ID `42426297601`: **GREEN** on exact implementation commit `ff375c40e7859575d7e3e9307224fba981344b22`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

@@ -3398,3 +3398,13 @@ The owner approved the exact logical contents of `docs/curriculum/PacoGO_Operati
 ### Next concrete step
 
 After verifying this documentation update with Full Regression, continue G3 test coverage vector by vector using the frozen O6 v0.3 contract and the G3 traceability review. For each vector, assert meaningful accepted and rejected/indeterminate cases. Preserve explicit blocks for G5/G6/G9/O5 dependencies. Do not begin production runtime or persistence work without all applicable gates and explicit G12 authorization.
+
+
+
+## 93. Duplicate chat handoff cleanup — 2026-11-07
+
+- Removed the redundant file `docs/curriculum/PacoGO_Chat_Handoff_2026-11-07.txt`; the authoritative cross-chat handoff remains this `PacoGO_Curriculum_Handoff_Current.md`.
+- Cleanup commit: `f76b2b4d149ac10ea86ff3e276e4883dc4842115`.
+- Branch: `refactor/professional-v1`; LIVE `main` was not changed.
+- Full Regression #3162 / run ID `42425104869` completed GREEN on parent commit `565d9d62528e5624fba8492f323eba7bd4dfb35e`, not on cleanup commit `f76b2b4d149ac10ea86ff3e276e4883dc4842115`.
+- Therefore the cleanup commit itself is not yet regression-verified. Run Full Regression on the exact resulting branch HEAD before any further build step.

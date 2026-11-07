@@ -63,6 +63,11 @@ function assertAssessment(record) {
   if (alignment === 'PARTIALLY_ALIGNED') {
     assert.equal(typeof record.task_instance.component_id, 'string', 'partial alignment requires a named separable component');
     assert.ok(record.task_instance.component_id.trim());
+    assert.ok(
+      Array.isArray(record.target_contract?.separable_component_ids) &&
+      record.target_contract.separable_component_ids.includes(record.task_instance.component_id),
+      'partial alignment component must be pre-defined by the target contract'
+    );
   }
   if (relation === 'NONE') {
     assert.equal(record.raw_response_status, 'RESPONSE_PRESENT', 'NONE requires an existing response');
@@ -151,7 +156,8 @@ function base(overrides = {}) {
     },
     criterion: { met: true },
     support: { request: false, delivered: false, target_relevant: false },
-    process: { required_streams_complete: true }
+    process: { required_streams_complete: true },
+    target_contract: { separable_component_ids: [] }
   };
   return {
     ...defaults,
@@ -160,7 +166,8 @@ function base(overrides = {}) {
     dimensions: { ...defaults.dimensions, ...overrides.dimensions },
     criterion: { ...defaults.criterion, ...overrides.criterion },
     support: { ...defaults.support, ...overrides.support },
-    process: { ...defaults.process, ...overrides.process }
+    process: { ...defaults.process, ...overrides.process },
+    target_contract: { ...defaults.target_contract, ...overrides.target_contract }
   };
 }
 
@@ -203,17 +210,28 @@ test('G3-007: co-display without a mapping action cannot be asserted as aligned 
   assert.equal(record.dimensions.evidence.result, 'INDETERMINATE');
 });
 
-test('G3-008: partial alignment names a pre-defined separable component', () => {
+test('G3-008: partial alignment names a component defined by the target contract', () => {
   const record = base({
+    target_contract: { separable_component_ids: ['component-a', 'component-b'] },
     task_instance: { ...base().task_instance, component_id: 'component-a' },
     dimensions: { alignment: dimension('PARTIALLY_ALIGNED') }
   });
   assertAssessment(record);
-  assert.ok(record.task_instance.component_id);
-  const invalid = base({ task_instance: { ...base().task_instance, component_id: null }, dimensions: { alignment: dimension('PARTIALLY_ALIGNED') } });
-  assert.throws(() => {
-    if (!invalid.task_instance.component_id) throw new Error('Partial alignment requires a named pre-defined component');
-  }, /pre-defined component/);
+  assert.ok(record.target_contract.separable_component_ids.includes(record.task_instance.component_id));
+
+  const undefinedComponent = base({
+    target_contract: { separable_component_ids: ['component-b'] },
+    task_instance: { ...base().task_instance, component_id: 'component-a' },
+    dimensions: { alignment: dimension('PARTIALLY_ALIGNED') }
+  });
+  assert.throws(() => assertAssessment(undefinedComponent), /pre-defined by the target contract/);
+
+  const unnamedComponent = base({
+    target_contract: { separable_component_ids: ['component-a'] },
+    task_instance: { ...base().task_instance, component_id: null },
+    dimensions: { alignment: dimension('PARTIALLY_ALIGNED') }
+  });
+  assert.throws(() => assertAssessment(unnamedComponent), /named separable component/);
 });
 
 test('G3-009: NONE requires an inspectable response', () => {

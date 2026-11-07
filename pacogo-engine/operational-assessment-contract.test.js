@@ -311,10 +311,29 @@ test('G3-011: objective correctness is preserved without auto-setting target evi
   assert.throws(() => assertAssessment(scoreMismatch), /performance must preserve the objective scoring-rule result/);
 });
 
-test('G3-012: INCORRECT does not automatically imply contradiction', () => {
-  const record = base({ dimensions: { performance: dimension('INCORRECT'), contradiction: dimension('ABSENT') } });
+test('G3-012: objective INCORRECT does not automatically imply contradiction PRESENT', () => {
+  const record = base({
+    objective_scoring_result: 'INCORRECT',
+    criterion: { met: null },
+    dimensions: {
+      performance: dimension('INCORRECT'),
+      evidence: dimension('INDETERMINATE'),
+      contradiction: dimension('INDETERMINATE')
+    }
+  });
   assertAssessment(record);
-  assert.equal(record.dimensions.contradiction.result, 'ABSENT');
+  assert.equal(record.dimensions.performance.result, 'INCORRECT');
+  assert.equal(record.dimensions.evidence.result, 'INDETERMINATE');
+  assert.equal(record.dimensions.contradiction.result, 'INDETERMINATE');
+
+  const autoContradiction = base({
+    objective_scoring_result: 'INCORRECT',
+    dimensions: {
+      performance: dimension('INCORRECT'),
+      contradiction: dimension('PRESENT')
+    }
+  });
+  assert.throws(() => assertAssessment(autoContradiction), /contradiction must cite source material/);
 });
 
 test('G3-013: mixed performance preserves component-level provenance', () => {

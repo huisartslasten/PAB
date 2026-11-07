@@ -3453,3 +3453,25 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN; continue vector by vector with meaningful positive and negative assertions.
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
 - Next: inspect and strengthen the next directly specified G3 vector through the shared conformance assertion. Do not invent unresolved G5/G6/G9/O5 semantics and do not begin production runtime or persistence work without applicable gates and explicit G12 authorization.
+
+
+
+## 96. G3-010 uncertain-response-relation conformance strengthening — 2026-11-07
+
+### Work completed
+- Reviewed the exact G3-010 input condition and expected/prohibited outcomes in the G3 verification specification, and O6 v0.3 §5.2.
+- Added a test-only fixture condition `relation_basis_sufficient: false`. The shared `assertAssessment` now requires relation `INDETERMINATE` when the fixture states that the relation basis is insufficient.
+- G3-010 accepts the indeterminate relation and rejects guessed `DIRECT`, `PARTIAL`, `INDIRECT` and `NONE` results through the shared conformance assertion.
+- This fixture condition is not a persisted field, API or new production contract. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification
+- Pre-build Full Regression #3170 / run ID `42425981837`: GREEN on exact baseline commit `db2d1abf39e42f2f80869f01f647b299b9a52049`.
+- Test implementation commit: `fd0eb7c78b175967a6546c5ad3ef1f87b8aa0fbd`.
+- Full Regression #3171 / run ID `42426099815`: **GREEN** on that exact implementation commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+### Gate status and next step
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN; continue vector by vector with meaningful positive and negative assertions.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
+- Next: inspect and strengthen G3-011 against its exact input condition and prohibited shortcut. Do not invent unresolved G5/G6/G9/O5 semantics and do not begin production runtime or persistence work without applicable gates and explicit G12 authorization.

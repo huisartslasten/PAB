@@ -2432,3 +2432,43 @@ A rejected handoff is an integrity/input-availability problem, not a learner fai
 ### Next concrete step
 
 Reconcile the C6→C7 handoff against the exact C8/C9 snapshot, history and validation references, then complete the G6/G7 read-only identity and consumer inventory. Keep O6-specific assessment fields unresolved until O6 is approved. Do not implement runtime or persistence before G5–G11 and explicit G12 authorization are complete.
+
+## 70. C8/C9 lineage reconciled against C6→C7 handoff — 2026-11-07
+
+### Work completed
+
+The readiness matrix now adds Sections 7.10–7.11, aligning the C8 history item and C9 structural result with the exact C6→C7 handoff.
+
+**C8 history item** must preserve:
+- one exact six-part branch identity;
+- the immutable snapshot ID;
+- the exact C6 evaluation ID and C7 decision ID;
+- validated evaluation time and snapshot event-time/availability boundaries;
+- unique source-observation references and the target-assessment record/version references admitted by that snapshot;
+- the unchanged C6 mastery outcome and C7 action/hold outcome;
+- applicable registry, assessment, C6, C7 and C8 version provenance;
+- explicit exclusion/correction/supersession references where relevant.
+
+C8 ordering uses validated evaluation time and a stable identity tie-breaker, not caller array order. A new snapshot/evaluation creates a new history item; it does not rewrite an earlier item. One canonical branch history contains one six-part identity. Empty history remains distinguishable from evidence of absence.
+
+**C9 structural validation** is per branch. It verifies identity and registry relationships, snapshot eligibility/cutoff, exact C6→C7 references, C8 history lineage, shared-observation identity, legacy boundaries and negative permissions. Results are traceable by the full six-field identity and report explicit checks and stage-attributed errors. A multi-branch request may report independent per-branch results and shared source references, but cannot pool mastery or next actions.
+
+### Remaining boundaries
+
+- O6 still owns the exact C3 assessment-state vocabulary and assessment-version semantics; these remain unspecified here.
+- O9 still blocks any learner-facing cross-branch projection.
+- C8/C9 remain design proposals requiring owner review; this reconciliation does not approve their implementation.
+- G5 remains OPEN until protocol versions are approved as one coherent set, cross-stage positive/negative/missing/mismatch examples are agreed, and legacy/scalar compatibility is resolved with G6/G7.
+- No runtime, tests, registry/catalogue, C1–C9 meanings, learner data, physical schema or Supabase changed.
+- No implementation authorization is implied; G12 remains required.
+
+### Verification and repository state
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Full Regression #3097 / run ID `42378110545`: **GREEN** on exact commit `1cc2800e5cda710710174acd6eabdc7f640e219e`; all 19 workflow steps completed successfully, including browser regression and clean-working-tree verification.
+- Subsequent readiness-matrix commits: `2c305b135d2be38dd9acdc5aa211dc8b7a3a0a69` and `e3c3034866ddb5d46e57597655ff2400c8d234b9`.
+- This handoff update is another repository change. Full Regression must run on its exact resulting commit before this documentation block is considered verified. No post-update GREEN is claimed yet.
+
+### Next concrete step
+
+Complete cross-stage positive, negative, missing and mismatch examples plus the legacy/scalar compatibility disposition. Then finish the G6/G7 read-only identity and consumer inventories. Keep O6-specific assessment fields unresolved until O6 is approved. No runtime or persistence work before G5–G11 and explicit G12 authorization are complete.

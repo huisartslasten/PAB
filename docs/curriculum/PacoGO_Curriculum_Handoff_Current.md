@@ -3574,3 +3574,24 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN.
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+
+
+## 102. G3-015 existing but unscorable response — verification pending
+
+### Work implemented
+- Inspected G3-015 in the verification specification and O6 v0.3 §§5.3 and 5.5.
+- Strengthened `pacogo-engine/operational-assessment-contract.test.js` with a test-only `scoring_rule_interpretable` fixture condition. When an existing response is present and the approved scoring rule cannot interpret it, the shared `assertAssessment` requires performance `NOT_SCORABLE`.
+- The positive case retains target evidence as `INDETERMINATE`; the negative case rejects conversion to `INCORRECT`.
+- The fixture condition is test-only, not a persisted field or production scoring API. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification status
+- Implementation commit: `669be29b0bc31854664fdf1e68b4dff3538199d9`.
+- Pre-build Full Regression #3190 / run ID `42427198962`: GREEN on exact baseline commit `9ca59b6e8fb563f3909ee7d4d78801dd1240b1bd`.
+- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+
+### Gate status
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.

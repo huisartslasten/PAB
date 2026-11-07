@@ -660,3 +660,22 @@ The earlier six questions in Section 8.9 are now narrowed:
 - New task-instance identity on that transition, generic interruption/resume, stable event/ID serialization and final target-assessment semantics remain open.
 
 G6 remains OPEN pending these remaining decisions and their versioned contract reconciliation. This section does not authorize runtime implementation, test changes, registry changes, schema/SQL/RPC/RLS changes, Supabase work or learner-data changes.
+
+
+## 8.11 G6 task / attempt / observation lifecycle proposal — 2026-11-07
+
+**Proposal:** `docs/curriculum/PacoGO_Task_Observation_Identity_Lifecycle_Proposal_v0.1.md`.
+
+The proposal now gives a concrete, reviewable candidate contract for:
+- distinct versioned task definition, task model, administered task instance, response episode (`task_attempt_id`), interaction event and immutable observation identities;
+- one task instance → one response episode → one raw observation under the proposed minimum lifecycle;
+- retries as ordered events within the same episode;
+- new task instance + episode + observation when support condition changes (recommended default, awaiting explicit owner approval);
+- same-state interruption/resume as the same episode; changed/reissued presentation as a new administration;
+- explicit timeout policy only; no implicit timeout inferred from elapsed time;
+- stable event identity, per-episode monotonic sequence, separate event/ingestion times, and O7 replay/conflict behavior;
+- preservation of incomplete/no-response episodes without selecting an O6 assessment label.
+
+**Gate disposition:** this materially narrows G6, but G6 remains OPEN. The final identity/lifecycle contract must be reconciled with the approved C3/O6 model because G6 explicitly depends on G2. The proposal does not resolve O6 target-assessment vocabulary, status labels or assessment-version provenance. It does not close G2, G5 or G7–G12 and does not authorize implementation.
+
+No runtime, tests, registry, catalogue, database, SQL/RPC/RLS, Supabase or learner data changed.

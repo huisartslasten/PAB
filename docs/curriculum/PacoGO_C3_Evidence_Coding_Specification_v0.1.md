@@ -1,3 +1,5 @@
+> **REQUIRES RECASTING — NOT AN APPROVED HUMAN-CODER SPECIFICATION.** The learner product has one operational assessor: PacoGO. Any assessment dimensions retained from this candidate must be expressed as PacoGO's versioned assessment rules and observable inputs/outputs, not as human coder judgements, coder rounds or adjudication. This file is not implementation authority.
+
 # PacoGO C3 — Evidence Coding Specification v0.1
 
 Status: Candidate / design-only / [O]

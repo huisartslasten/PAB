@@ -2265,3 +2265,38 @@ Do not carry forward as learner-runtime architecture:
 ### Next concrete step
 
 Perform a source-by-source reconciliation of the quarantined candidate artifacts into one coherent PacoGO assessment contract. Resolve the exact C3 dimensions and machine-operational rules without importing human assessors. Preserve the owner-confirmed three learner modes. Only after the contract is internally consistent should G2/G3 be reconsidered. No runtime or persistence implementation is authorized.
+
+
+## 65. Operational assessment contract consolidated — 2026-11-06
+
+### Contract artifact
+- Added `docs/curriculum/PacoGO_Operational_Assessment_Contract_v0.1.md`.
+- Commit: `618336f47e5e5035896bbadb397ce37fcd15e504`.
+- The contract consolidates the owner-confirmed learner modes, raw observation/target-assessment separation, accepted multi-target logical invariants, branch/snapshot boundaries and the remaining assessment/persistence gates.
+- It records the source-by-source disposition of the superseded candidate documents so they are not treated as parallel operational contracts.
+- It distinguishes task definition, administered attempt, immutable raw observation, PacoGO target-specific assessment and downstream C6–C9 decisions.
+- It records the owner-confirmed OEFENEN / TUSSENTOETS / TOETS interaction policy.
+- It preserves the six-part branch identity and the rule that one observation is never duplicated or counted as multiple independent attempts.
+- It does not select unresolved C3 vocabulary, an evidence-quality scale, physical schema, persistence model, scope/window policy or learner-facing cross-branch presentation.
+
+### Current-runtime findings consolidated
+The source review confirmed:
+- task-definition ID and administered attempt ID are currently conflated in `createTaskInstance`;
+- `createObservation` retains only the first evidence target in its scalar projection;
+- the browser vertical-slice validates skill binding but not the full task/target/claim/development/registry relationship;
+- the current browser cycle remains single-target and skill-scoped;
+- the Addition controller derives its provisional `quality` value from correctness and supplies fixed relevance/contradiction values, while the prototype converts those fields into evidence;
+- the support controller records supported-practice help events, but does not implement the independent-assessment attempt-ending lifecycle;
+- current persistence does not implement target fan-out or the full six-part branch model.
+
+These are contract gaps, not permission to patch individual fields or alter C1–C9 meanings. No runtime, tests, registry, catalogue, database, SQL/RPC/RLS, Supabase or learner data changed in this step.
+
+### Verification
+- Starting exact HEAD: `123127a3dd034d760d3d90876fde81a0ff8c3c70`.
+- Starting Full Regression #3081 / run ID `42318137979`: GREEN on that exact commit.
+- Contract commit: `618336f47e5e5035896bbadb397ce37fcd15e504`.
+- Full Regression #3082 / run ID `42319143630`: GREEN on that exact contract commit; all workflow jobs and checks completed successfully, including curriculum-engine, architecture, maintained Node, maintained Vitest, browser regression and clean-working-tree verification.
+- LIVE `main` remains untouched.
+
+### Next concrete step
+Use this consolidated contract as the single operational assessment design basis. Reconcile only the remaining unresolved O5/O6/O9 and G5–G11 decisions that materially affect the first bounded implementation slice. Then select a slice that can be implemented without unsupported target fan-out, guessed assessment semantics or unapproved persistence changes. Keep B1-L08 and multi-target runtime/persistence fan-out blocked until their contracts and explicit authorization are complete.

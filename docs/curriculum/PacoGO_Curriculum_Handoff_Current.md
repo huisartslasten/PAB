@@ -2589,3 +2589,41 @@ These are symbolic design examples, not executable fixtures. O6-specific assessm
 ### Next concrete step
 
 Complete the direct and indirect JavaScript import/call graph for the app-exposed mastery service and all learner curriculum routes. Assign each confirmed consumer an explicit read/write/derived/legacy disposition. Then present the G5 symbolic examples for protocol-owner reconciliation. Do not implement an adapter, migration, runtime branch identity or persistence change before G5–G11 and explicit G12 authorization.
+
+
+## 74. G7 local mastery and learner-route call graph — 2026-11-07
+
+### Work completed
+
+A read-only static scan covered all 351 JavaScript files under `src/` on baseline commit `06f591ab8c227bdbe2ff1a0d7eb7fb5e0d903fe8`. The direct and indirect local mastery path is now traced:
+
+- `src/app/bootstrap.js` imports `createMasteryService`, constructs one service using the app's localStorage dependency, and exposes it as `app.mastery`.
+- The active consumer is `src/features/practice/lesson-practice-runtime.js`. It passes `app.mastery` to `createPracticePresentation`.
+- `src/features/lessons/practice-presentation.js` forwards that service to `createPracticeRuntimeEntry`.
+- `src/features/lessons/practice-runtime-entry.js` uses the injected service and calls `record(student, lesson.id, item.id, correct)` for a learner response when the session mode is `mastery`.
+- `src/services/mastery-service.js` stores a streak and local `mastered` flag in localStorage under learner + lesson + item. Three consecutive correct responses set the local flag. This remains separate from C6 mastery and has no canonical registry/development/claim/scope/window/snapshot/evaluation identity.
+- The runtime entry also imports `createMasteryService` and creates a fallback when no service is injected. The Toets and Oefentoets routes share the presentation/runtime entry but set `practiceMode: 'assessment'`, which selects `single-pass`; the mastery-write condition is therefore not entered on those routes.
+- The B1–B5 learner pages are direct consumers of `app.learnerCurriculum`: learner listing/profile creation, registry-version lookup, history loading and learning-cycle persistence. The service reads/writes the existing learner/evidence/state tables and uses the existing RPC. Its current identity remains learner + registry version + skill.
+- `src/features/wordtrainer/index.js` accepts a generic `recordResult` callback but does not import or call the local mastery service. Its callback wiring is not established by the `src/` scan.
+- The `mastery` value returned by the skill-centric browser curriculum cycle is a separate prototype result; it is not the localStorage service and is not canonical six-part C6 mastery.
+
+The readiness matrix Section 8.3–8.4 now records these routes, reads/writes and compatibility boundaries.
+
+### Deliberately unchanged
+
+- No runtime code, tests, curriculum registry/catalogue, learner route, database schema, SQL/RPC/RLS, Supabase or learner data changed.
+- No local mastery state was migrated, deleted, renamed or reinterpreted.
+- Existing B1–B5 skill-scoped persistence remains unchanged.
+- G7 remains OPEN: non-`src/` entrypoints and any external/dynamic callback consumers still need final disposition. This scan does not claim proof about consumers outside the inspected repository paths.
+
+### Verification and repository state
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Baseline Full Regression #3108 / run ID `42380365733`: **GREEN** on exact commit `06f591ab8c227bdbe2ff1a0d7eb7fb5e0d903fe8`; all 16 workflow steps passed, including browser regression and clean-working-tree verification.
+- Readiness matrix update commit: `d821dcc5a38c19c60435bb8a51dd458c51d17279`.
+- This handoff update is a repository change and requires Full Regression on its exact resulting commit. No post-update GREEN is claimed here.
+- No runtime or persistence implementation was performed.
+
+### Next concrete step
+
+Complete the remaining non-`src/` import/call-site and callback-wiring disposition for the local mastery service and learner curriculum routes. Then close the remaining G7 inventory gaps without changing legacy runtime or persistence. G5 remains OPEN and no implementation authorization is implied.

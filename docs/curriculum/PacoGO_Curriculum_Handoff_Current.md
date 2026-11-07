@@ -3329,3 +3329,29 @@ The owner approved the exact logical contents of `docs/curriculum/PacoGO_Operati
 - Pre-build Full Regression #3150 / run ID `42423466418`: GREEN on exact baseline commit `9639f8c60b1be39368fd957bcd3a91e4c81c7100`.
 - This approval/matrix/handoff documentation change requires Full Regression on its exact final commit before the G3 build begins.
 - Next build is limited to deterministic G3 contract tests against frozen O6 v0.3. No learner-facing runtime or persistence changes.
+
+
+## 91. First executable G3 contract-conformance suite — 2026-11-07
+
+### Work completed
+
+- G2/O6 v0.3 is approved and frozen as the logical assessment contract.
+- Added `pacogo-engine/operational-assessment-contract.test.js`, a test-only normalized logical record conformance harness.
+- It exercises the direct O6 boundaries represented by G3-001–036, A1/B1/FR2 preservation anchors and the structured non-scored M2 profile.
+- G3-037–039 remain blocked on G6/G9 identity and canonical payload semantics. G3-040 remains blocked on O5 snapshot/availability cutoff semantics.
+- This test file is not a production assessor: it does not derive judgments from raw learner responses and its fixture representation is not a persisted schema/API.
+- No runtime, registry, learner state, task catalogue, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification
+
+- Pre-build Full Regression #3153 / run ID `42424128734`: **GREEN** on exact baseline commit `f243b6273345ea9d53df5d772ed6adadb0a4a8ef`.
+- G3 test commit: `4ae2420753e9a10bcfc094b695d3b42d20792264`.
+- Full Regression #3154 / run ID `42424440906`: **GREEN** on that exact test commit. Curriculum-engine regression, architecture boundaries, Node/Vitest, browser regression and clean-working-tree checks passed.
+- This handoff/matrix/traceability documentation update requires its own Full Regression on the exact resulting commit.
+
+### Gate status and next step
+
+- G2/O6: **CLOSED** — exact logical contract v0.3 approved and frozen.
+- G3: **OPEN** — first conformance suite exists; continue by strengthening vector-level assertions and negative cases. Keep G6/G9 and O5-dependent vectors blocked rather than inventing identity or cutoff semantics.
+- G5, G6/G9, O5 and G12 remain separate. No production assessor/runtime/persistence implementation is authorized by this test-only suite.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.

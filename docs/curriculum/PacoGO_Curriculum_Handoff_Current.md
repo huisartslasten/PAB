@@ -2116,3 +2116,37 @@ The audit is based on the exact branch source, learner HTML entry points, engine
 
 ### Next concrete step
 Close G1/O5 and G2/O6 with explicit owner/scientific decisions, and obtain G4/O9 product approval. Reconcile C6–C9 contracts (G5) against the verified code findings. Then use this audit to author the canonical task/attempt/observation identity contract and consumer-by-consumer legacy compatibility plan. Keep G8–G11 closed until those upstream contracts are approved. Do not implement B1-L08, runtime fan-out or persistence changes before G12 explicitly authorizes a bounded slice.
+
+
+## 62. C3 scientific measurement and coding review — 2026-11-06
+
+### Artifact created
+- `docs/curriculum/PacoGO_C3_Scientific_Measurement_and_Coding_Review_v0.1.md`
+- Review commit: `2f34e93896a7d6961fcdcad2d604265ce654cf4f`
+
+The review compares the current C3 v0.2 candidate, coding specification/manual, blinded synthetic packet, descriptive reliability layer and the two conflicting observation schemas against methodological literature on assessment validity, observational coding, ordinal agreement and generalizability theory.
+
+### Main findings
+- Keep task-instance alignment, response-to-target relation, objective performance, raw process availability, target-specific evidence status, assistance exposure, independence and contradiction as separate coding dimensions. They answer different questions and must not be collapsed into one score.
+- Correctness must not automatically determine evidence status, evidence quality, independence, contradiction or mastery.
+- The three-level quality scale in the coding manual and five-level scale in the C3 specification remain incompatible. Neither is approved. The synthetic coder packet does not include a quality dimension, so it cannot test quality anchors.
+- Evidence quality has no sufficiently operationalised construct/anchor set yet. A numeric scale must not be selected for convenience or treated as interval data without justification.
+- The exact PROMPTED/DEPENDENT boundary remains unresolved and needs observable assistance-event anchors.
+- Reliability statistics must follow the actual measurement level, coding unit, coder assignment (crossed/nested), number of coders, missing-rating structure and category prevalence. No coefficient or threshold is selected.
+- The current descriptive reliability layer's exactly-two-coder pairing is a reporting limitation, not a scientific requirement. Unpaired and multi-coder records must remain visible.
+- Synthetic examples can test instruction clarity and category boundaries; they cannot establish empirical inter-rater reliability, population prevalence, construct validity or mastery validity.
+- A further lifecycle distinction is required: no target-assessment record exists yet is not necessarily the same as an existing assessment record whose field remains NOT_CODED.
+- The singular target/coding fields in Pilot_DataSchema v0.2 and array/separate coding boundary in Empirical_Observation_Schema v0.1 remain unresolved. No schema selection or migration is authorized.
+
+### O6 disposition
+**O6 remains OPEN.** This review is evidence for owner/scientific review, not approval of a canonical codebook. Required decisions remain the final labels/anchors, missingness and NO_RESPONSE rules, evidence-status boundaries, quality construct/scale, assistance/independence anchors, contradiction rationale, coder/adjudication lifecycle, reliability design and canonical schema/version compatibility.
+
+### Verification
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Full Regression #3064 / run ID `42316871653`: GREEN on exact preceding handoff commit `4b29000ed67d6ff7e7b64db21c2873f115cc5c93`, all 19 workflow steps.
+- C3 review commit: `2f34e93896a7d6961fcdcad2d604265ce654cf4f`.
+- Full Regression #3065 / run ID `42317293805`: IN PROGRESS on the exact C3 review commit at the time of this handoff update. Do not claim GREEN until completion.
+- This handoff update requires its own Full Regression on the exact resulting commit.
+
+### Next concrete step
+Prepare the explicit O6 owner/scientific decision record using the C3 v0.2 proposal and this review. Do not select categories, quality scale, reliability statistic or threshold on the owner's behalf. In parallel, O5's existing Scope/Time-Window Lifecycle Contract remains the candidate for owner review, and O9 still requires a product decision. Only after O5/O6/O9 and G5–G11 are resolved may G12 implementation authorization be considered. B1-L08, runtime fan-out, schema changes and Supabase work remain blocked.

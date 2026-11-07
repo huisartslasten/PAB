@@ -993,3 +993,19 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-015, distinguishing an existing but unscorable response from no response and incorrect performance. Do not infer semantics owned by G5, G6/G9 or O5.
+
+
+
+## 8.29 G3-015 — existing unscorable response is not incorrect
+
+**Contract basis:** O6 v0.3 §5.3 distinguishes `NOT_SCORABLE` from `INCORRECT`. An existing response that the approved scoring rule cannot interpret is `NOT_SCORABLE`; target evidence remains `INDETERMINATE` unless another inspectable target-specific component supports a result.
+
+**Test change:** `pacogo-engine/operational-assessment-contract.test.js` adds the test-only fixture condition `scoring_rule_interpretable: false`. The shared `assertAssessment` requires `NOT_SCORABLE` when a response exists but the scoring rule cannot interpret it. G3-015 accepts `NOT_SCORABLE` with evidence `INDETERMINATE` and rejects conversion to `INCORRECT`.
+
+**Scope:** Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Implementation commit `669be29b0bc31854664fdf1e68b4dff3538199d9`. Full Regression #3192 / run ID `42427295240`: **GREEN** on that exact commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with G3-016, keeping per-stream collection availability distinct and preventing missing required streams from supporting `ABSENT`. Do not infer semantics owned by G5, G6/G9 or O5.

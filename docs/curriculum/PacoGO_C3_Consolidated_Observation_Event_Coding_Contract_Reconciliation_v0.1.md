@@ -1,3 +1,5 @@
+> **SUPERSEDED FOR LEARNER-RUNTIME ARCHITECTURE — HUMAN CODER MODEL WITHDRAWN.** The reconciliation below assumes coder records, multiple independent coders and adjudication. Those are not learner-runtime components. PacoGO is the single operational assessor. Reconcile the model to one raw learner observation plus zero or more PacoGO target-specific assessments, with explicit assessment-rule/version provenance. Do not infer a need for human reviewers from the current schema mismatch.
+
 # PacoGO C3 — Consolidated Observation, Event and Coding Contract Reconciliation v0.1
 
 Status: Design reconciliation / candidate / not approved for implementation  

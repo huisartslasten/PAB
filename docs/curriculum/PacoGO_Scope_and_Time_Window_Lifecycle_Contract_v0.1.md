@@ -1,3 +1,5 @@
+> **CORRECTION REQUIRED — DO NOT IMPLEMENT CODER PROVENANCE OR LATE HUMAN CODING.** This lifecycle candidate incorrectly includes coder IDs, coding rounds and adjudication as if they were part of learner evidence processing. PacoGO is the single operational assessor; no human coder stage exists in learner runtime. Replace these references with PacoGO assessment-version provenance and assessment-availability timing. Event time and assessment-availability cutoff may remain distinct concepts, but late human coding is not a learner-pipeline lifecycle event.
+
 # PacoGO — Scope and Time-Window Lifecycle Contract v0.1
 
 Status: design proposal / owner review required / NOT approved for implementation  

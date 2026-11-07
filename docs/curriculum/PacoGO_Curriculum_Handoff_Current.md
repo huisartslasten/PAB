@@ -3595,3 +3595,25 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN.
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+
+
+## 103. G3-016 per-stream process availability — verification pending
+
+### Work implemented
+- Inspected G3-016 in the verification specification and O6 v0.3 §5.4.
+- Strengthened `pacogo-engine/operational-assessment-contract.test.js` with a test-only `process_streams` fixture collection and `assertRequiredProcessStreams` assertion. Each required stream has its own identifier and O6 availability value.
+- The positive case retains one `AVAILABLE` stream and a separate `NOT_COLLECTED` required stream while target evidence remains `INDETERMINATE`.
+- Negative cases reject an aggregate-only capture flag with no per-stream records and reject evidence `ABSENT` while a required stream remains uncollected.
+- These are test-only fixture structures, not a persisted schema or production API. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification status
+- Implementation commit: `f387b72ea179b1d583fd79bab94708df631e115f`.
+- Pre-build Full Regression #3195 / run ID `42427406449`: GREEN on exact baseline commit `33ca66ebd95a3148af86b90da34c5a6b614feca1`.
+- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+
+### Gate status
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.

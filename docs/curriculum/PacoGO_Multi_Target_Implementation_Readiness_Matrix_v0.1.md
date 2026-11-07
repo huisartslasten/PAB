@@ -679,3 +679,26 @@ The proposal now gives a concrete, reviewable candidate contract for:
 **Gate disposition:** this materially narrows G6, but G6 remains OPEN. The final identity/lifecycle contract must be reconciled with the approved C3/O6 model because G6 explicitly depends on G2. The proposal does not resolve O6 target-assessment vocabulary, status labels or assessment-version provenance. It does not close G2, G5 or G7–G12 and does not authorize implementation.
 
 No runtime, tests, registry, catalogue, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+
+## 8.12 G2/O6 operational assessment contract v0.2 — 2026-11-07
+
+**Proposal:** `docs/curriculum/PacoGO_Operational_Assessment_Contract_v0.2.md`.
+
+This version recasts O6 as PacoGO's operational, target-specific assessment contract. It explicitly keeps raw observations, assessment results and downstream curriculum inference separate. It proposes:
+
+- separate task-instance alignment and response-to-target relation;
+- objective task performance separate from target evidence status;
+- per-stream process/capture availability separate from interpretation;
+- target evidence states `PRESENT`, `ABSENT`, `INDETERMINATE`, `NOT_ASSESSED`, `NOT_APPLICABLE`, with strict non-negative treatment of missingness/no-response;
+- target-specific independence states `INDEPENDENT`, `PROMPTED`, `DEPENDENT`, `UNKNOWN`, `NOT_REQUIRED`, based on actual delivered support and target requirements;
+- target-specific contradiction with evidence reference and rationale;
+- no generic numeric quality score; a structured capture/scoring/interpretability profile is proposed to support the existing C6 M2 quality gate without changing its meaning;
+- exact assessment-rule/engine/registry provenance and linked reassessment;
+- synthetic boundary cases for positive, negative, mixed, missing, no-response, misaligned and assisted observations.
+
+**Important boundary:** this is a review proposal, not an approved codebook. G2/O6 remains OPEN until the categories, operational anchors, M2 profile and target-specific rules are explicitly approved. G3 must then define and verify the operational rule behavior. G5 must reconcile the C3 output profile with C6–C9. G6's identity/lifecycle proposal must be reconciled with the approved O6 contract. No implementation is authorized.
+
+The prior C3 candidate documents that assumed a human coding workflow remain historical inputs only; this proposal does not introduce a parallel learner-runtime assessment path.
+
+No runtime, tests, registry, catalogue, database, SQL/RPC/RLS, Supabase or learner data changed.

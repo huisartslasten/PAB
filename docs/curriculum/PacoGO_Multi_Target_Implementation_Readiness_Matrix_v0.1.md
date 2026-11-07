@@ -844,3 +844,23 @@ Added a test-only normalized logical record representation and conformance asser
 **Verification:** Full Regression #3154 / run ID `42424440906`: **GREEN** on exact test commit `4ae2420753e9a10bcfc094b695d3b42d20792264`. Curriculum-engine regression, architecture boundaries, Node/Vitest, browser regression and clean-working-tree verification passed.
 
 **Gate status:** G2/O6 CLOSED. G3 OPEN pending deeper executable coverage and subsequent implementation-specific verification. G5, G6/G9, O5 and G12 remain separate gates.
+
+
+## 8.21 G3 conformance-suite strengthening and Full Regression #3159 — 2026-11-07
+
+**Test changes:** Strengthened `pacogo-engine/operational-assessment-contract.test.js` with cross-dimension O6 invariants, independent-attempt policy assertions and structured M2 adequacy-profile checks. Added negative cases to reject prohibited shortcuts and incomplete/aggregate M2 profiles.
+
+**Regression investigation:** Full Regression #3158 / run ID `42424698111` was RED on `337369086e9e7f189251dcfadae4cf3f480160c5`. Three tests exposed a defect in the test fixture factory: partial overrides shallow-replaced nested defaults, removing unrelated default dimensions. The fixture factory was corrected to merge the nested `task_instance`, `dimensions`, `criterion`, `support` and `process` defaults. This was a test-fixture construction defect, not a production engine defect; no tests were disabled or weakened.
+
+**Verified result:** Full Regression #3159 / run ID `42424761647`: **GREEN** on exact commit `0b1c2ad17daa1ed432cd2c191d570b407b2c6e2f`. The browser job completed successfully:
+- Playwright ran 59 browser tests using one worker.
+- **59 passed**; no browser test failures.
+- Startup diagnostics: `no browser errors observed`.
+- The subsequent clean-working-tree check passed.
+The complete workflow also passed curriculum-engine regression, architecture-boundary tests, Double or Nothing runtime regression, maintained Node regression and maintained Vitest regression.
+
+**Scope:** Test-only conformance harness and fixture correction. No production assessor, learner-facing runtime, registry, task catalogue, learner state, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN; this suite is still a test-only normalized logical-record harness, not a production assessor. G3-037–039 remain dependent on G6/G9; G3-040 remains dependent on O5. G5 and G12 remain separate gates. No runtime or persistence authorization is implied.
+
+**Next step:** Continue strengthening genuine vector-level positive and negative assertions against the frozen O6 v0.3 contract. Do not invent unresolved G5/G6/G9/O5 semantics and do not start production implementation before applicable gates and explicit authorization.

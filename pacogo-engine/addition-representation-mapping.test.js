@@ -23,6 +23,7 @@ test('representation-mapping model validates three unique, unambiguous equations
   assert.equal(model.interactionType, 'representation_mapping');
   assert.deepEqual(model.addends, [7, 5]);
   assert.equal(model.mappingOptions.length, 3);
+  assert.equal(model.mappingOptions[2].label, '7 + 5 = 13');
   assert.equal(model.correctMappingOptionId, 'same-groups');
   assert.deepEqual(model.mappingOptions.map(option => option.label), [
     '7 + 5 = 12',
@@ -40,9 +41,10 @@ test('representation-mapping model rejects ambiguous or malformed option sets', 
     task: {
       ...task,
       mapping_options: [
-        ...task.mapping_options,
-        { id: 'same-reversed', addends: [5, 7], total: 12 }
-      ].slice(0, 3)
+        task.mapping_options[0],
+        { id: 'same-reversed', addends: [5, 7], total: 12 },
+        task.mapping_options[1]
+      ]
     }
   }), /exactly one equation/);
 
@@ -59,10 +61,10 @@ test('representation-mapping model rejects ambiguous or malformed option sets', 
     task: {
       ...task,
       mapping_options: task.mapping_options.map((option, index) =>
-        index === 1 ? { ...option, total: 12 } : option
+        index === 1 ? { ...option, total: Number.NaN } : option
       )
     }
-  }), /mathematically valid equation/);
+  }), /total must be a whole number/);
 });
 
 test('mapping response preserves separate raw facts and separate correctness results', () => {

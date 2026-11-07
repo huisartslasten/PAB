@@ -7,6 +7,13 @@ function assertAddends(addends, label) {
   }
 }
 
+function assertWholeNumberAddends(addends, label) {
+  assertAddends(addends, label);
+  if (addends.some(value => !Number.isInteger(value) || value < 0)) {
+    throw new TypeError(`${label} must contain non-negative whole numbers`);
+  }
+}
+
 function sameAdditionTerms(left, right) {
   if (left.length !== right.length) return false;
   const a = [...left].sort((x, y) => x - y);
@@ -28,7 +35,8 @@ function createAdditionLearningInterfaceModel({ task }) {
     if (task.representation !== 'quantity_groups') {
       throw new TypeError('representation mapping requires quantity_groups as its source representation');
     }
-    if (!Number.isFinite(task.expected_answer) || task.expected_answer !== task.addends.reduce((sum, value) => sum + value, 0)) {
+    assertWholeNumberAddends(task.addends, 'task.addends');
+    if (!Number.isInteger(task.expected_answer) || task.expected_answer !== task.addends.reduce((sum, value) => sum + value, 0)) {
       throw new TypeError('mapping task expected_answer must equal the sum of its presented addends');
     }
     if (!Array.isArray(task.mapping_options) || task.mapping_options.length !== 3) {
@@ -42,12 +50,9 @@ function createAdditionLearningInterfaceModel({ task }) {
       }
       if (optionIds.has(option.id)) throw new TypeError('mapping option IDs must be unique');
       optionIds.add(option.id);
-      assertAddends(option.addends, `mapping_options[${index}].addends`);
-      if (!Number.isFinite(option.total)) {
-        throw new TypeError(`mapping_options[${index}].total must be a finite number`);
-      }
-      if (option.total !== option.addends.reduce((sum, value) => sum + value, 0)) {
-        throw new TypeError(`mapping_options[${index}] must show a mathematically valid equation`);
+      assertWholeNumberAddends(option.addends, `mapping_options[${index}].addends`);
+      if (!Number.isInteger(option.total)) {
+        throw new TypeError(`mapping_options[${index}].total must be a whole number`);
       }
       return Object.freeze({
         id: option.id,

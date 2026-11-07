@@ -943,3 +943,19 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-012, preserving objective performance, target evidence and contradiction as distinct outputs. Do not infer semantics owned by G5, G6/G9 or O5.
+
+
+
+## 8.26 G3-012 — incorrect performance does not imply contradiction
+
+**Contract basis:** O6 v0.3 §§5.3 and 5.7 separate objective performance from observation-local contradiction. G3-012 requires `INCORRECT` when the objective scoring rule is not met, while explicitly prohibiting automatic contradiction `PRESENT`.
+
+**Test change:** `pacogo-engine/operational-assessment-contract.test.js` ties the fixture's objective scoring result to performance. The positive case accepts `INCORRECT` with target evidence and contradiction both `INDETERMINATE` when neither is independently established. The negative case rejects contradiction `PRESENT` when no specific contradiction source material is supplied.
+
+**Scope:** Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Implementation commit `3d2d1baa55f82707935cd384f02adfdbff7099c3`. Full Regression #3178 / run ID `42426573789`: **GREEN** on that exact commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with G3-013, checking component-level scoring and provenance without flattening mixed performance. Do not infer semantics owned by G5, G6/G9 or O5.

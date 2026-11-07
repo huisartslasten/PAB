@@ -807,3 +807,12 @@ It preserves existing A1/B1/FR2 target meanings, B1 ET7 unresolved mapping, C6 m
 
 
 Full Regression #3142 / run ID `42422816647`: **GREEN** on exact contract/matrix/handoff commit `cecc708bcae805eb3a28bb80bb6c7d3f680f77d4`; all workflow steps passed, including curriculum engine, architecture boundaries, Node/Vitest, browser regression and clean-working-tree verification. This verifies O6 contract v0.3, matrix Section 8.17 and handoff Section 88 as committed in that SHA.
+
+
+## 8.18 G3 ↔ O6 v0.3 traceability and gap review — 2026-11-07
+
+**Review:** `docs/curriculum/PacoGO_G3_O6_v0.3_Traceability_and_Gap_Review_v0.1.md`.
+
+All 40 candidate G3 vectors and the A1/B1/FR2 domain anchors are mapped to O6 v0.3. Directly specified cases are distinguished from cases dependent on task/target anchors, G6/G9 identity semantics, O5 snapshot cutoffs or G5 C6 M1/M2 mapping. The review explicitly blocks guesses where those contracts are not frozen.
+
+**Gate disposition:** G2/O6 remains OPEN pending acceptance of exact v0.3. G3 remains OPEN pending G2 freeze and executable contract tests. G5/G6/G9 and O5 dependencies remain separate. No runtime, executable tests, registry, task catalogue, learner state, database, SQL/RPC/RLS, Supabase or learner data changed.

@@ -3516,3 +3516,24 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN.
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+
+
+## 99. G3-013 mixed-performance component provenance — verification pending
+
+### Work implemented
+- Inspected G3-013 in the verification specification and O6 v0.3 §5.3.
+- Strengthened `pacogo-engine/operational-assessment-contract.test.js` with a test-only `assertMixedComponentMapping` assertion for the G3-013 fixture. The fixture uses objective `MIXED` and retains separate component identifiers and results for one `CORRECT` and one `INCORRECT` component.
+- Negative cases reject a flattened single-component result, duplicate component identifiers and loss of the incorrect component. The assertion is scoped to this G3-013 fixture and does not redefine every task's mixed-scoring scheme.
+- This remains a test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification status
+- Implementation commit: `6107e6b2eb146e8a857714b7d57b59feda6272a2`.
+- Pre-build Full Regression #3180 / run ID `42426674545`: GREEN on exact baseline commit `64d47cf4316101b0e3d2968eaa168e5e44c12ce5`.
+- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+
+### Gate status
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.

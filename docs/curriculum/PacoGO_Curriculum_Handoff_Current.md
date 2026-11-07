@@ -2512,3 +2512,36 @@ They do not yet cover six-field branch isolation, registry/window mismatch, exac
 ### Next concrete step
 
 Continue G7 by enumerating the actual application/page/service consumers of the identified adapters and legacy state paths, then assign each a read/write/derived/legacy disposition. In parallel, complete the cross-stage G5 mismatch examples. Do not select a canonical adapter or change runtime until the upstream contracts, G5–G11 and explicit G12 authorization permit it.
+
+## 72. Focused G7 application consumer map — 2026-11-07
+
+### Consumer findings
+
+The readiness matrix Section 8.3 now records the following inspected paths:
+
+- A1 Number Line, B1 Addition and the five FR2 browser pages call the shared browser vertical-slice runtime, which delegates into the skill-centric curriculum registry. They do not call the C6→C7 or C8→C9 adapters.
+- Additional B1/B-family demonstration pages (countertask, prompted-independent, strategy-variation and symbolic-addition) use the same skill-centric browser runtime.
+- B1, B2, B3, B4 and B5 learner pages call `app.learnerCurriculum.loadLearningHistory` and `persistLearningCycle`.
+- `src/services/learner-curriculum-service.js` reads/writes `student_evidence` and `student_longitudinal_state` and calls `persist_curriculum_learning_cycle`. Its current persistence boundary is learner + registry version + skill, with development/claim/target/task and observation/assessment details; it does not carry the six-part snapshot/evaluation lineage.
+- `src/app/bootstrap.js` constructs and exposes `learnerCurriculum` and a separate local `mastery` service.
+- Clock demonstrations remain separate interface/controller prototypes.
+
+### Current disposition
+
+- The browser demonstrations are skill-centric prototype consumers, not canonical C6–C9 consumers.
+- The B1–B5 learner pages are existing persisted skill-scoped consumers and must retain their behavior until a separately approved compatibility/migration plan exists.
+- The existing Supabase RPC is a compatibility boundary. No schema/RPC change is authorized or presumed.
+- The local `mastery` service is exposed through bootstrap, but its complete direct call-site inventory remains open.
+- This is a focused named-page/service inventory, not yet a complete repository-wide import graph. G7 remains OPEN.
+- No existing learner route, old skill or persistence path was deleted, redirected or reinterpreted.
+
+### Verification
+
+- Branch: `refactor/professional-v1`; LIVE `main` was not a target of these changes.
+- Full Regression #3102 / run ID `42378520783`: **GREEN** on exact baseline commit `b278a54198bd2f6a5c7eaa78f5e72d8c548acd14`; all workflow steps passed, including browser regression and clean-working-tree verification.
+- Readiness-matrix consumer-map commit: `c278e880c068c6e410a611b70c9d718045817af0`.
+- This handoff update is another repository change and requires Full Regression on its exact resulting commit. No post-update GREEN is claimed yet.
+
+### Next concrete step
+
+Finish the repository-wide import/call-site inventory for the local mastery service and remaining learner routes. Then define the legacy/scalar compatibility disposition and complete cross-stage G5 positive/negative/missing/mismatch examples. Do not select or implement a canonical adapter before G5–G11 and explicit G12 authorization.

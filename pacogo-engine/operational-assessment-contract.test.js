@@ -64,6 +64,9 @@ function assertAssessment(record) {
   const independence = record.dimensions.independence?.result;
   const contradiction = record.dimensions.contradiction?.result;
 
+  if (record.raw_response_status === 'RESPONSE_PRESENT' && record.scoring_rule_interpretable === false) {
+    assert.equal(performance, 'NOT_SCORABLE', 'an existing response the scoring rule cannot interpret must be NOT_SCORABLE');
+  }
   if (record.objective_scoring_result !== undefined) {
     assert.equal(performance, record.objective_scoring_result, 'performance must preserve the objective scoring-rule result');
   }
@@ -179,7 +182,8 @@ function base(overrides = {}) {
     process: { required_streams_complete: true },
     target_contract: { separable_component_ids: [] },
     relation_basis_sufficient: true,
-    objective_scoring_result: undefined
+    objective_scoring_result: undefined,
+    scoring_rule_interpretable: true
   };
   return {
     ...defaults,
@@ -191,7 +195,8 @@ function base(overrides = {}) {
     process: { ...defaults.process, ...overrides.process },
     target_contract: { ...defaults.target_contract, ...overrides.target_contract },
     relation_basis_sufficient: overrides.relation_basis_sufficient ?? defaults.relation_basis_sufficient,
-    objective_scoring_result: overrides.objective_scoring_result ?? defaults.objective_scoring_result
+    objective_scoring_result: overrides.objective_scoring_result ?? defaults.objective_scoring_result,
+    scoring_rule_interpretable: overrides.scoring_rule_interpretable ?? defaults.scoring_rule_interpretable
   };
 }
 
@@ -429,10 +434,23 @@ test('G3-014: NO_RESPONSE maps to NOT_OBSERVED and INDETERMINATE by default', ()
   assert.throws(() => assertAssessment(asAbsent), /NO_RESPONSE evidence is INDETERMINATE by default/);
 });
 
-test('G3-015: existing unscorable response is NOT_SCORABLE, not INCORRECT', () => {
-  const record = base({ raw_response_status: 'RESPONSE_PRESENT', scoring_interpretable: false, dimensions: { performance: dimension('NOT_SCORABLE'), evidence: dimension('INDETERMINATE') } });
+test('G3-015: existing response the approved scoring rule cannot interpret is NOT_SCORABLE', () => {
+  const record = base({
+    raw_response_status: 'RESPONSE_PRESENT',
+    scoring_rule_interpretable: false,
+    objective_scoring_result: 'NOT_SCORABLE',
+    dimensions: { performance: dimension('NOT_SCORABLE'), evidence: dimension('INDETERMINATE') }
+  });
   assertAssessment(record);
-  assert.notEqual(record.dimensions.performance.result, 'INCORRECT');
+  assert.equal(record.dimensions.performance.result, 'NOT_SCORABLE');
+  assert.equal(record.dimensions.evidence.result, 'INDETERMINATE');
+
+  const incorrectlyScored = base({
+    raw_response_status: 'RESPONSE_PRESENT',
+    scoring_rule_interpretable: false,
+    dimensions: { performance: dimension('INCORRECT'), evidence: dimension('INDETERMINATE') }
+  });
+  assert.throws(() => assertAssessment(incorrectlyScored), /must be NOT_SCORABLE/);
 });
 
 test('G3-016: uncollected required stream cannot support ABSENT', () => {

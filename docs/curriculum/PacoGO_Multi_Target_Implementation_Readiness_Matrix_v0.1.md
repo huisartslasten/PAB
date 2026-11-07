@@ -906,3 +906,19 @@ The accepted example keeps target evidence `INDETERMINATE`; the test does not in
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with the next directly specified vector and strengthen its positive and negative cases through the shared conformance assertion. Do not infer semantics owned by G5, G6/G9 or O5.
+
+
+
+## 8.24 G3-010 — uncertain response relation must not be guessed
+
+**Contract basis:** O6 v0.3 §5.2 defines `INDETERMINATE` when available information does not support a defensible response-to-target relation. G3-010 requires an uncertain captured response to remain `INDETERMINATE`, not guessed as `DIRECT` or `NONE`.
+
+**Test change:** `pacogo-engine/operational-assessment-contract.test.js` now includes an explicit test-fixture condition `relation_basis_sufficient: false`. The shared `assertAssessment` conformance assertion requires relation `INDETERMINATE` under that condition. G3-010 verifies the valid indeterminate case and rejects all four overclaims: `DIRECT`, `PARTIAL`, `INDIRECT` and `NONE`. This fixture condition is test-only and does not establish a persisted field or API.
+
+**Scope:** Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Implementation commit `fd0eb7c78b175967a6546c5ad3ef1f87b8aa0fbd`. Full Regression #3171 / run ID `42426099815`: **GREEN** on that exact commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with the next directly specified vector and strengthen its positive and negative cases through the shared conformance assertion. Do not infer semantics owned by G5, G6/G9 or O5.

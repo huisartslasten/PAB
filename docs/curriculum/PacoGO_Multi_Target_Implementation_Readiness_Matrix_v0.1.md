@@ -100,7 +100,7 @@ Open blockers:
 - G5: C6–C9 reconciliation and versioned handoff.
 - G6–G11: identity, consumer, persistence, security, recovery and test design.
 
-**Next concrete action:** use the initial G6/G7 inventory in Section 8 to complete the consumer-by-consumer compatibility disposition and cross-stage positive/negative/missing/mismatch examples. O6 still blocks final C3 assessment-input semantics; O9 is needed before learner-facing cross-branch projection is designed or shipped.
+**Next concrete action:** complete the repository-wide consumer/import inventory for the local mastery service and remaining learner routes, then define the legacy/scalar compatibility disposition and cross-stage positive/negative/missing/mismatch examples. O6 still blocks final C3 assessment-input semantics; O9 is needed before learner-facing cross-branch projection is designed or shipped.
 
 B1-L08 remains blocked until the approved contract supports its target-specific evidence end to end. Existing B1-L01–L07 remain unchanged.
 
@@ -336,6 +336,31 @@ The following files were inspected on the current branch. This inventory records
 | Skill-centric legacy engine | `pacogo-engine/prototype.js`, `curriculum-registry.js`, `longitudinal-state.js` | Browser execution delegates to a skill-level cycle using configured relevance/quality/contradiction rules, a mastery rule and skill-level next-task selection. | This is a separate older execution path, not the C6–C9 branch engine. Do not silently treat its skill-level state as canonical branch mastery or next action. |
 | Evidence store | `pacogo-engine/student-evidence-store.js` | In-memory append/list records are keyed by learner, curriculum registry version and skill. | No six-part branch partition, snapshot, target-assessment record or immutable decision history is represented. |
 | Separate local mastery service | `src/services/mastery-service.js`, `test/mastery-service.test.js` | Local-storage streak state is keyed by learner, lesson and item; three consecutive correct answers set its local `mastered` flag. | This is a separate lesson/item progress mechanism, not C6 mastery. Its consumers and coexistence/compatibility boundary must be inventoried before any learner-state migration. |
+
+
+### 8.3 Application consumer map — focused page/service inspection
+
+The following application paths were inspected in addition to the engine modules:
+
+| Consumer | Observed path | Current ownership classification | Compatibility consequence |
+|---|---|---|---|
+| A1 Number Line and B1 Addition browser demonstrations | `curriculum-a1-numberline.html`, `curriculum-b1-addition.html` | Browser page → shared browser vertical-slice guard → skill-centric curriculum registry cycle | These pages do not call the C6–C9 modules. Their current execution is a prototype/skill cycle, not canonical six-part branch execution. |
+| FR2 Fraction browser demonstrations | `curriculum-fr2-fraction-equivalence.html`, `curriculum-fr2-fractions.html`, `curriculum-fr2-representation-transfer.html`, `curriculum-fr2-surface-countertask.html`, `curriculum-fr2-language-reduced-transfer.html` | Same browser vertical-slice → skill-centric registry path | These are technical interface/evidence demonstrations. They do not call the C6–C9 modules or establish a canonical branch history. |
+| Additional B1/B-family demonstrations | `curriculum-b1-memorization-countertask.html`, `curriculum-b1-prompted-independent.html`, `curriculum-b1-strategy-variation.html`, `curriculum-b1-symbolic-addition.html` | Browser vertical-slice → skill-centric registry path | Preserve as existing demonstrations; no silent migration to the new branch contract. |
+| Persisted learner curriculum pages | `curriculum-b1-learner.html`, `curriculum-b2-learner.html`, `curriculum-b3-learner.html`, `curriculum-b4-learner.html`, `curriculum-b5-learner.html` | Load and persist through `app.learnerCurriculum` using learner + registry-version + skill scope | These are active skill-scoped persistence consumers. Any future compatibility plan must preserve their existing read/write behavior until an explicit migration is approved. |
+| Learner curriculum service | `src/services/learner-curriculum-service.js` | Supabase read/write service for `student_evidence` and `student_longitudinal_state`; persistence RPC is `persist_curriculum_learning_cycle` | Existing persistence is keyed by learner, registry version and skill. Its payload contains development/claim/target/task and observation/assessment data but not the six-part snapshot/evaluation lineage. Do not change its schema or RPC as part of this inventory. |
+| App bootstrap | `src/app/bootstrap.js` | Constructs and exposes both `learnerCurriculum` and a separate local `mastery` service | Service exposure is confirmed. Direct call sites for the local `mastery` service have not yet been exhaustively enumerated. |
+| Clock demonstrations | `curriculum-clock-controller-interface.html`, `curriculum-clock-interface.html` | Separate reusable interface/controller demonstrations | They are not connected to the registered C6–C9 branch chain and remain interface prototypes. |
+
+### 8.4 Consumer disposition and limits of this inspection
+
+- The inspected A1/B1/FR2 browser pages use the skill-centric runtime and do not import the C6→C7 or C8→C9 adapters.
+- The inspected persisted B1/B2/B3/B4/B5 learner pages read and write through the skill-scoped learner curriculum service. They are not yet six-part branch consumers.
+- The current Supabase persistence service is an existing compatibility boundary, not permission to add a migration or replace its RPC.
+- The separate local `mastery` service is constructed by app bootstrap; its complete call-site inventory remains open.
+- This is a focused inventory of the named curriculum pages and service paths, not a complete repository-wide import graph. Other routes, dynamic imports and indirect consumers still need checking before G7 can close.
+- Do not delete legacy skills or learner routes, silently redirect them, or reinterpret their skill-level state as canonical C6 mastery.
+
 
 ### 8.1 Test coverage observed
 

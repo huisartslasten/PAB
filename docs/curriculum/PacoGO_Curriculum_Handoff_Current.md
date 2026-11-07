@@ -2706,3 +2706,52 @@ No runtime code, tests, curriculum registry/catalogue, database schema, SQL/RPC/
 ### Next concrete step
 
 Perform a final bounded check of the remaining application import/callback boundary and deployment configuration for externally supplied or dynamically loaded consumers. If that boundary cannot be evidenced from the repository, retain it explicitly as UNKNOWN and keep G7 open rather than infer absence. Then reconcile the G5 cross-stage examples and G6 identity contracts; do not implement adapters or persistence changes before G5–G11 and explicit G12 authorization are complete.
+
+## 77. Final bounded G7 application-route check and verified status — 2026-11-07
+
+### Final application-route check
+
+A final read-only check of `src/app/routes.js`, `src/app/bootstrap.js`, `src/app/runtime.js`, `src/features/wordtrainer/index.js` and the application package scripts confirms:
+
+- The application route registry statically imports and registers its known feature runtimes; no Wordtrainer route is registered there.
+- Wordtrainer accepts an optional `recordResult` callback and invokes it only when supplied. The checked bootstrap/route/runtime path does not supply or wire that callback to `app.mastery` or `app.learnerCurriculum`.
+- The callback destination therefore remains UNKNOWN. This does not prove absence of external scripts, deployment-side injection or integrations outside the checked source.
+- No new runtime route, import, callback, persistence or external integration was added.
+
+### G7 status
+
+The in-repository consumer map is now substantially complete for the inspected source surfaces and is recorded in readiness matrix Sections 8.3–8.6. The distinct ownership paths are:
+- local lesson/item mastery writes via the practice runtime;
+- Supabase skill-scoped learner curriculum reads/writes via B1–B5 learner pages;
+- skill-centric browser prototype cycle/history;
+- in-memory evidence store;
+- C6/C7/C8/C9 adapter and vertical-slice test paths;
+- research-only analysis/report and execution/export utilities;
+- separate ordinary test-attempt history reads.
+
+G7 remains OPEN because the external/dynamic callback boundary cannot be established from the repository. Do not infer absence, select a callback destination or migrate any of these paths.
+
+### G5 contract cross-check — current verified interpretation
+
+The existing C7 v0.2 decision protocol and executable C7 logic agree on the key ordering separation: prerequisite assessment is gated by prerequisite ordering only; next-development actions are gated by next-development ordering only. The existing P2 example is consistent with that behavior when the explicit action policy authorizes prerequisite assessment.
+
+The remaining G5 gaps are not resolved:
+- C6 v0.1 remains a candidate protocol and the executable result remains claim-keyed; it does not yet carry the approved six-part branch, immutable snapshot ID or evaluation ID.
+- C7 v0.2 remains a candidate protocol. The executable adapter passes a claim-selected mastery result and ordering fields, but not the complete six-part identity or exact snapshot/evaluation lineage.
+- C8/C9 v0.2 define the proposed six-part branch and exact snapshot/C6/C7 history references, while the current executable C8/C9 path still uses the narrower four-field identity and simplified timestamp/evidence-count projection.
+- O6 remains open; target-assessment input semantics and version provenance are not approved. C8/C9 v0.2 also remain owner-review proposals, not implementation authorization.
+
+G5 and G6 remain OPEN. No runtime implementation is authorized.
+
+### Verification and repository state
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Full Regression #3113 / run ID `42398239637`: **GREEN** on `6408380ee065296b6ed30026753e694a519d5de2`.
+- Readiness matrix consumer disposition commit: `8b245160ae29c352d913e39775a82e19c495cf21`.
+- G7 handoff update commit: `f26ae161866eacb7bb928cf24a305b2933915ec7`.
+- Full Regression #3115 / run ID `42400366410`: **GREEN** on exact commit `f26ae161866eacb7bb928cf24a305b2933915ec7`; all 16 workflow steps passed, including curriculum engine, architecture boundaries, Node/Vitest, browser regression and clean-working-tree verification.
+- This handoff update is another documentation-only repository change and requires Full Regression on its exact resulting commit. No post-update GREEN is claimed until that run completes.
+
+### Next concrete step
+
+Continue G5 with a bounded contract crosswalk: map each field and reference in the proposed six-part snapshot/C6/C7/C8/C9 envelope to the current protocol and executable shape, classify each mismatch as missing, differently named, or semantically unresolved, and keep O6 explicitly unresolved. Do not implement or change tests to bless the candidate envelope. Then reconcile G6 task-definition/task-instance/attempt/observation identity. No runtime or persistence work before G5–G11 and explicit G12 authorization are complete.

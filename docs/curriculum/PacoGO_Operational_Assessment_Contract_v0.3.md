@@ -1,6 +1,6 @@
 # PacoGO — Operational Assessment Contract v0.3
 
-Status: **consolidated O6 working contract; design-only; final G2/O6 closure and implementation authorization remain separate**  
+Status: **OWNER-APPROVED VERSIONED LOGICAL CONTRACT — G2/O6 FROZEN; design-only; no runtime or persistence authorization**  
 Date: 2026-11-07  
 Branch: `refactor/professional-v1`  
 Supersedes for current O6 review: `PacoGO_Operational_Assessment_Contract_v0.2.md`  
@@ -314,7 +314,7 @@ Every implementation and G3 test must enforce:
 
 ## 10. G2/G3/G5/G6 gate disposition
 
-- **G2/O6:** this v0.3 is the consolidated working contract. G2 remains OPEN until the owner accepts this exact version as the approved, versioned O6 contract and any required governance review is complete.
+- **G2/O6:** the owner accepted this exact v0.3 as the approved, versioned logical O6 contract on 2026-11-07. G2 is CLOSED at the logical-contract level. This does not authorize runtime or persistence implementation; applicable downstream gates and explicit G12 authorization remain required.
 - **G3:** the 40 logical vectors in `PacoGO_G3_Operational_Assessment_Rule_Verification_Specification_v0.1.md` must be reconciled against this v0.3 and converted into executable contract tests only after G2 is frozen. G3 remains OPEN.
 - **G5:** reconcile exact C3 outputs and the non-scored adequacy profile with C6–C9; preserve existing M1/M2 and downstream authority.
 - **G6:** reconcile task definition/instance/attempt/observation identity and support-condition transitions with this contract.

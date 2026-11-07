@@ -100,7 +100,7 @@ Open blockers:
 - G5: C6–C9 reconciliation and versioned handoff.
 - G6–G11: identity, consumer, persistence, security, recovery and test design.
 
-**Next concrete action:** complete cross-stage positive/negative/missing/mismatch examples and the legacy/scalar compatibility disposition, then finish the G6/G7 read-only identity and consumer inventories. O6 still blocks final C3 assessment-input semantics; O9 is needed before learner-facing cross-branch projection is designed or shipped.
+**Next concrete action:** use the initial G6/G7 inventory in Section 8 to complete the consumer-by-consumer compatibility disposition and cross-stage positive/negative/missing/mismatch examples. O6 still blocks final C3 assessment-input semantics; O9 is needed before learner-facing cross-branch projection is designed or shipped.
 
 B1-L08 remains blocked until the approved contract supports its target-specific evidence end to end. Existing B1-L01–L07 remain unchanged.
 
@@ -316,3 +316,54 @@ G5 can close only after:
 6. all cross-stage contract examples and test vectors are agreed.
 
 A preliminary crosswalk is not implementation authorization and does not close G5.
+
+## 8. G6/G7 read-only runtime inventory — 2026-11-07
+
+**Status: initial source inventory; G6 and G7 remain OPEN. No runtime change is authorized.**
+
+The following files were inspected on the current branch. This inventory records observed behavior, not a target design or permission to patch individual modules.
+
+| Area | Current source | Verified current behavior | Contract gap / disposition |
+|---|---|---|---|
+| Task definition and attempt identity | `pacogo-engine/interaction-contract.js` | `createTaskInstance` sets `task_instance_id` equal to `taskId`; the stable catalogue task ID is therefore reused as the instance ID. | G6 remains open: task definition/version and each administered attempt need distinct identities and an explicit lifecycle. Do not change the ID format until replay/retry and consumer compatibility are reconciled. |
+| Raw observation identity/cardinality | `pacogo-engine/interaction-contract.js` | Observation ID is derived from task-instance ID plus observed timestamp; `task_id` is populated from the task-instance ID; only `evidence_target_ids[0]` is projected into scalar `evidence_target_id`. | G6/G8 gap: one raw episode and target-specific assessments are not yet represented by the complete canonical contract. Preserve the raw episode once; do not fan out by duplicating observations or silently selecting a primary target. |
+| Browser task binding | `pacogo-engine/browser-vertical-slice.js`, `browser-vertical-slice.test.js` | The runtime resolves a task and checks that observation `skill_id` matches the task's `skill_id`, then delegates to `registry.runSkillCycle`. | This is a useful task-to-skill guard, not full task/attempt/target/claim/development/registry/branch validation. |
+| C6 result model | `pacogo-engine/c6-mastery-decision.js`, `c6-mastery-decision.test.js` | C6 validates seven gates and returns five mastery outcomes, but stores results in `mastery_state_by_claim`. The result includes claim, development, scope and time-window fields, gate states, coverage and evidence count. | G5/G7 gap: no learner key, registry-version identity, snapshot ID or evaluation ID; claim is the result-map key. The existing seven gates and five outcomes remain unchanged. |
+| C6→C7 adapter paths | `pacogo-engine/c6-c7-adapter.js`, `pacogo-engine/c7-from-c6.js` and their tests | Two separate adapter implementations select C6 results by `claim_id`, check safety flags and pass the mastery result plus separate prerequisite/next ordering inputs. Their validation details differ; neither carries the full six-field branch or exact snapshot/evaluation lineage. | G5/G7 gap: duplicate adapter paths have no approved canonical ownership/disposition. Do not patch one path in isolation or change tests to bless a new envelope before G5/G6/G7 contracts are complete. |
+| C7 decision output | `pacogo-engine/c7-next-action-decision.js` and tests | C7 emits candidate action, reason, gate, claim/development and supporting evidence IDs with negative permission flags. | Output does not carry the exact C6 evaluation ID, snapshot ID or six-field identity. C7 remains a candidate-action selector; no runtime state mutation is authorized. |
+| C8 adapter/history | `pacogo-engine/c8-c9-adapter.js`, `c8-student-model.js` and tests | Adapter can normalize a claim-keyed C6 result, checks claim/development alignment with C7, creates an observation ID from a timestamp, and derives a simplified evidence state from evidence count. C8 parent/history identity is learner, claim, development and scope; temporal order uses observed time. | G5/G7 gap: no registry version, time-window identity, immutable snapshot, exact C6 evaluation or exact C7 decision reference. The evidence-state shortcut is not an approved O6 assessment rule. C8 is not yet the canonical six-part append-only decision history. |
+| C9 validator | `pacogo-engine/c9-vertical-validation.js`, `c8-c9-adapter.js` and tests | Validator checks a structural vertical slice using learner, claim, development and scope; it checks basic task/evidence links and C6/C7/C8 state agreement. | G5/G7 gap: it does not validate registry-version/time-window identity, snapshot eligibility/cutoff or exact C6→C7→C8 references. Its current passing tests establish only the narrower four-field prototype contract. |
+| Skill-centric legacy engine | `pacogo-engine/prototype.js`, `curriculum-registry.js`, `longitudinal-state.js` | Browser execution delegates to a skill-level cycle using configured relevance/quality/contradiction rules, a mastery rule and skill-level next-task selection. | This is a separate older execution path, not the C6–C9 branch engine. Do not silently treat its skill-level state as canonical branch mastery or next action. |
+| Evidence store | `pacogo-engine/student-evidence-store.js` | In-memory append/list records are keyed by learner, curriculum registry version and skill. | No six-part branch partition, snapshot, target-assessment record or immutable decision history is represented. |
+| Separate local mastery service | `src/services/mastery-service.js`, `test/mastery-service.test.js` | Local-storage streak state is keyed by learner, lesson and item; three consecutive correct answers set its local `mastered` flag. | This is a separate lesson/item progress mechanism, not C6 mastery. Its consumers and coexistence/compatibility boundary must be inventoried before any learner-state migration. |
+
+### 8.1 Test coverage observed
+
+The inspected tests currently verify:
+- C6's seven-gate classification and five outcome states;
+- C6 safety flags;
+- claim-keyed C6→C7 selection, development alignment and separate ordering inputs;
+- C7 candidate-action gates and negative permissions;
+- C8 preservation of simplified mastery/action values;
+- C9 consistency across the current four identity fields.
+
+They do **not** yet verify:
+- six-field branch isolation;
+- registry-version and time-window mismatch rejection;
+- exact immutable snapshot/evaluation linkage;
+- C7 reference to the exact C6 evaluation;
+- C8 history reference to exact snapshot/C6/C7 IDs;
+- delayed assessment availability and frozen-snapshot immutability;
+- task-definition versus administered-attempt identity;
+- target fan-out without duplicating the raw observation;
+- compatibility across all consumers of the two C6→C7 adapter paths.
+
+These are inventory gaps, not instructions to add tests before the upstream contracts are approved.
+
+### 8.2 G6/G7 disposition
+
+- G6 remains OPEN: exact task-definition, administered-attempt, event, raw-observation, retry/replay and provenance contracts are not yet complete.
+- G7 remains OPEN: the two C6→C7 adapters, C8/C9 adapter, skill-centric browser/runtime path, evidence store and separate local mastery service need a consumer-by-consumer ownership and compatibility disposition.
+- No adapter is designated canonical yet.
+- No scalar compatibility adapter, backfill, registry mapping change, schema change, learner-state migration or Supabase work is authorized.
+- This is an initial inventory of the inspected sources, not a claim that every application consumer has been enumerated.

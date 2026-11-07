@@ -3309,3 +3309,23 @@ After verifying this documentation block, obtain the owner's acceptance of exact
 
 - Full Regression #3149 / run ID `42423357578`: **GREEN** on exact commit `65f735dd938132ab56c94d13d48c9acdf49402ae`; all workflow steps passed, including curriculum engine, architecture boundaries, Node/Vitest, browser regression and clean-working-tree verification. This verified the G3/O6 traceability review, readiness matrix Section 8.18 and handoff Section 89.
 - This handoff now records #3149 as the latest verified regression for the completed traceability block. Its present update must receive the next Full Regression on the resulting exact commit.
+
+
+## 90. G2/O6 v0.3 approved and frozen — 2026-11-07
+
+### Owner decision
+
+The owner approved the exact logical contents of `docs/curriculum/PacoGO_Operational_Assessment_Contract_v0.3.md` by directing continuation after the explicit approval checkpoint. The approval is recorded as acceptance of the versioned logical assessment contract, not authorization to implement runtime or persistence.
+
+- G2/O6: **CLOSED — logical contract v0.3 approved and frozen**.
+- G3: OPEN; next step is executable contract-test implementation for the 40 candidate vectors.
+- G5, G6/G9 and O5 remain separate dependencies. G3 must not invent missing identity, lineage, snapshot or C6 mapping semantics.
+- G12 and all applicable downstream gates remain prerequisites for runtime/persistence work.
+- No runtime, learner state, registry, task catalogue, database, SQL/RPC/RLS, Supabase or learner data changed as part of this approval.
+
+### Baseline and next step
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Pre-build Full Regression #3150 / run ID `42423466418`: GREEN on exact baseline commit `9639f8c60b1be39368fd957bcd3a91e4c81c7100`.
+- This approval/matrix/handoff documentation change requires Full Regression on its exact final commit before the G3 build begins.
+- Next build is limited to deterministic G3 contract tests against frozen O6 v0.3. No learner-facing runtime or persistence changes.

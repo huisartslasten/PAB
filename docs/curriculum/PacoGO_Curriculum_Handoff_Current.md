@@ -3537,3 +3537,19 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN.
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+
+
+## 100. G3-013 Full Regression #3182 failure isolation and diagnostic correction — 2026-11-07
+
+### Exact failure
+- Full Regression #3182 / run ID `42426785582` failed in the `Run curriculum engine regression` step on implementation commit `6107e6b2eb146e8a857714b7d57b59feda6272a2`.
+- The complete curriculum-engine test run reported 282 tests: 281 passed, 1 failed.
+- The sole failing test was G3-013. Its negative fixture correctly triggered the intended minimum-component assertion, but `assert.throws` expected the diagnostic text to match `/at least 2/` while the assertion's actual message did not contain that phrase.
+- This is an assertion-diagnostic mismatch in the test harness, not a production-engine defect and not evidence that the positive mixed-component case failed. The positive case and other negative cases ran before the failing assertion.
+
+### Correction
+- Updated only the assertion's diagnostic message to state `MIXED result must retain at least 2 separable component results`, aligning the message with the already-existing condition `component_results.length >= 2`.
+- No assertion condition was weakened or removed; no expected result was changed.
+- Correction commit: `3684aa7d5a00b0ed937f9d107a2d82bf6e1e71c9`.
+- Full Regression on the correction commit is pending. Do not continue to another build vector until the exact correction commit passes Full Regression.

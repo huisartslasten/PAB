@@ -576,3 +576,40 @@ This is a read-only comparison of the current browser interaction path, the exis
 7. Keep existing Supabase rows and RPC unchanged until the logical contract is approved and G8 has completed the physical compatibility review.
 
 **Disposition:** G6 remains OPEN. The current code has an identifiable task/instance conflation, no explicit attempt identity and a scalar target projection. These are contract findings, not authorization to patch the interaction contract or alter tests. No runtime, tests, schema, SQL/RPC/RLS, Supabase or learner data changed.
+
+## 8.9 G6 candidate identity hierarchy and unresolved lifecycle — 2026-11-07
+
+The C2, C3 and multi-target task/evidence documents support the following **candidate logical layers**. This table is a reconciliation aid, not an approved runtime contract. It deliberately leaves episode/attempt cardinality unresolved where the candidate documents use different terminology.
+
+| Layer | Candidate responsibility | Required distinction | Remaining decision |
+|---|---|---|---|
+| Task definition | Stable task identity and immutable definition version: intended content, task model, target opportunities and planned conditions. | A definition is reusable; it is not a learner administration. | Canonical naming between `task_id` and `task_definition_id`; exact definition/version ownership. |
+| Task model | Curriculum-level model of the task and its intended evidence opportunities. | `task_model_id` is not a task definition, task instance or attempt ID. | Exact binding/version relationship between model, definition and registry. |
+| Task instance | One concrete administration/presentation, including what was actually shown and deviations from the planned definition. | Must not reuse the stable task-definition ID as its unique instance ID. | Whether a changed support/presentation phase remains the same instance or creates a new administration. |
+| Response episode / task attempt | A learner interaction episode associated with an administration; carries the response and its ordered interaction history. | Must be distinguishable from both the reusable definition and the administration. | C3 describes ordered attempts within one response episode; the multi-target contract uses `task_attempt_id` for one episode. The canonical term and cardinality must be explicitly approved. |
+| Interaction event | One event within an episode: presentation, response/edit, help request/offer/delivery/dismissal, retry, completion or abandonment as applicable. | An event is not automatically a new observation. Event order and event time are distinct. | Stable event ID, sequence/order, actor/source and idempotency key semantics. |
+| Raw observation | Immutable record of the response episode and its source provenance. | It is not a target assessment, inference or decision. | Confirm the one-to-one or other explicit cardinality with the approved response-episode identity. |
+| Target-specific assessment | A separate assessment of one observation against one evidence target. | One observation may link to multiple target assessments; this must not duplicate the raw observation or inflate independent-attempt counts. | O6 must approve assessment semantics, status vocabulary and version provenance. |
+| Inference / decision | Derived interpretation and C6/C7 result with exact source references. | Never overwrite the raw response or target assessment; retain exact version and lineage. | Reconcile with G5 six-part branch, snapshot, evaluation and decision identities. |
+
+### Lifecycle constraints supported by the candidate documents
+
+- A click, edit, retry or help request is an event within the response episode unless the approved lifecycle explicitly starts a new episode.
+- C3's candidate reconciliation distinguishes help requested, support offered, support delivered, support declined/dismissed, an independent attempt ending/being abandoned and a separate supported attempt starting.
+- C3 states that an independent episode followed by supported practice must be preserved separately; the supported episode must not overwrite or merge with the independent one.
+- The multi-target contract requires one parent attempt/observation to be persisted once, even when it produces multiple target-specific evidence assessments.
+- Each target assessment must resolve its own evidence target to the correct claim/development under the registry. It must not inherit a task's primary claim by default.
+- Raw observation identity, source-event/idempotency identity and target-assessment identity are different identities and must not be substituted for one another.
+
+### Unresolved lifecycle decisions
+
+1. Does `task_attempt_id` name the complete response episode (as in the multi-target contract), or an individual attempt nested inside the C3 response episode?
+2. When a learner retries without a support-condition change, is this another ordered attempt inside the same episode or a new episode?
+3. When independent work ends and supported practice starts, does the new episode reuse the same task instance or create a new task instance because the actual presented condition changes?
+4. What exact event marks episode completion, abandonment, timeout or interruption, and how is a resumed episode distinguished from a replay?
+5. Is each raw observation exactly one response episode, and what stable source-event key makes persistence replay idempotent?
+6. How are multiple target assessments attached to one raw observation while preserving target-specific claim/development ownership and independent-observation counts?
+
+D9 support-condition and attempt-boundary decisions remain open in the C3 reconciliation. No retry, support, timeout or resume behavior is selected here.
+
+**Disposition:** this is a candidate identity hierarchy for owner/protocol reconciliation only. G6 remains OPEN. No runtime, tests, schema, SQL/RPC/RLS, Supabase or learner data changed; no implementation is authorized.

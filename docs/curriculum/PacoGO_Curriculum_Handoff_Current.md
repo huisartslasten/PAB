@@ -3195,3 +3195,48 @@ Updated readiness matrix Section 8.16 to record the candidate specification and 
 ### Next concrete step
 
 First verify the final handoff commit with Full Regression. Then freeze the exact O6 contract from the owner's working-baseline direction, resolving only the still-open O6 anchors and semantics. After that, convert the G3 vectors into executable contract tests. Do not implement runtime or persistence before the applicable gates and explicit G12 authorization.
+
+
+## 88. O6 consolidated operational assessment contract v0.3 — 2026-11-07
+
+### Baseline and workflow
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Before this documentation block, Full Regression #3139 / run ID `42420412667` was **GREEN** on exact baseline commit `dd76caeabf25de44417f62d8e29643f951a75b88`, including curriculum engine, architecture boundaries, Node/Vitest, browser regression and clean-working-tree checks.
+- The O6 v0.3 work below is documentation-only. A new Full Regression is required on the final handoff commit; #3139 does not verify these subsequent changes.
+
+### Work completed
+
+Created `docs/curriculum/PacoGO_Operational_Assessment_Contract_v0.3.md` as the consolidated O6 working contract. It integrates O6 v0.2, Decision Brief v0.1, reconciliation review, A1/B1/FR2 domain anchors, the owner-confirmed support-condition policy and the G3 candidate vectors.
+
+The v0.3 contract specifies:
+- one immutable raw observation per response episode; zero or more target-specific assessments per observation;
+- strict separation of raw facts, target assessment and downstream inference;
+- applicability, rule execution and dimension result as separate layers;
+- distinct task alignment, response relation, objective performance, process availability and target evidence dimensions;
+- strict preconditions for `ABSENT`; `NO_RESPONSE` → `NOT_OBSERVED` + `INDETERMINATE` by default;
+- planned support condition, help request, delivered support and target-specific independence as separate facts;
+- Tussentoets/Toets content-help request immediately ends the independent attempt as incomplete; any supported continuation is a separate episode/observation;
+- observation-local contradiction and a structured, non-scored M2 adequacy profile;
+- immutable assessment history, version provenance and O5 availability-cutoff lineage;
+- preservation of existing A1/B1/FR2 target meanings and unresolved B1 ET7 mapping.
+
+Updated readiness matrix Section 8.17 to record v0.3 and its gate disposition.
+
+### Gate status
+
+- G2/O6 remains OPEN until the owner accepts this exact v0.3 as the approved versioned contract and any required governance review is complete. The earlier "i guess" is treated as permission to continue using the decision brief as a working baseline, not silently converted into final approval of every category.
+- G3 remains OPEN until G2 is frozen and the 40 candidate vectors are reconciled to v0.3 and converted into executable contract tests.
+- G5 and G6 remain separate dependent gates.
+- No runtime, executable tests, registry, task catalogue, learner state, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Commits and verification
+
+- G3 candidate specification: `321799bb03ce665d6430e241afc667cca7147a29`.
+- O6 v0.3 contract: `e4132f2d7d56af1920ce7b26f0d1750c53185475`.
+- Readiness matrix Section 8.17: `bc0b58ed16bf635d8e1a2cdb3d67f1190f4824e4`.
+- This handoff update is the final documentation commit in this block. Full Regression must verify the exact resulting commit before any further build step.
+
+### Next concrete step
+
+Verify the exact handoff commit with Full Regression. Then reconcile the G3 candidate vectors against O6 v0.3 and prepare the G2 owner acceptance checkpoint without reopening settled product policy or curriculum mappings. Do not implement runtime or persistence before the applicable gates and explicit G12 authorization.

@@ -816,3 +816,18 @@ Full Regression #3142 / run ID `42422816647`: **GREEN** on exact contract/matrix
 All 40 candidate G3 vectors and the A1/B1/FR2 domain anchors are mapped to O6 v0.3. Directly specified cases are distinguished from cases dependent on task/target anchors, G6/G9 identity semantics, O5 snapshot cutoffs or G5 C6 M1/M2 mapping. The review explicitly blocks guesses where those contracts are not frozen.
 
 **Gate disposition:** G2/O6 remains OPEN pending acceptance of exact v0.3. G3 remains OPEN pending G2 freeze and executable contract tests. G5/G6/G9 and O5 dependencies remain separate. No runtime, executable tests, registry, task catalogue, learner state, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+
+## 8.19 G2/O6 owner approval and logical contract freeze — 2026-11-07
+
+**Decision:** The project owner approved the exact contents of `PacoGO_Operational_Assessment_Contract_v0.3.md` by directing continuation after the explicit approval checkpoint. The approval is limited to the logical O6 assessment contract.
+
+**Gate status:**
+- G2/O6: **CLOSED — logical contract v0.3 approved and frozen**.
+- G3: OPEN — implement executable deterministic contract tests for the 40 candidate vectors against the frozen O6 v0.3 contract.
+- G5, G6/G9 and O5 dependencies remain separate; their semantics must not be guessed or silently absorbed into G3.
+- This approval does not authorize runtime, learner-state, registry, task-catalogue, database, SQL/RPC/RLS, Supabase or persistence changes. Explicit G12 authorization and applicable downstream gates remain required.
+
+**Next build:** G3 contract-test implementation only. Test cases must distinguish directly specified O6 behavior from dependency-bound cases. Where an expected result depends on an unresolved G5/G6/G9/O5 contract, assert the approved boundary or blocked/unknown behavior; do not invent missing semantics.
+
+No learner data or runtime behavior changed in this decision record.

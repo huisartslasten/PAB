@@ -84,11 +84,22 @@ C8 remains a descriptive projection of exact C6/C7 history. C9 remains a structu
 
 ### O5 — Scope and time-window ownership/lifecycle
 
-**OPEN — no owner approval recorded.**
+**CORE POLICY APPROVED — configurable and reversible; secondary lifecycle/privacy details remain open.**
 
-The proposal's recommended defaults remain candidates, not approved operational policy: immutable versioned definitions, event-time membership, separate assessment-availability cutoff, no inferred rolling windows, default rejection of late observations after closure, late-arriving PacoGO assessments only in a later snapshot until finalization, and discouragement of overlapping windows.
+Owner direction: use the simplest workable policy now, while ensuring it can be changed later without rewriting historical learner data or changing curriculum meaning.
 
-Still requires explicit decisions on authority/ownership, window purpose and construction, authoritative event clock and timezone normalization, closure/grace periods, late assessment availability/finalization, overlap, required scope dimensions, C8 presentation constraints and child-data retention/deletion. Operational windows must not be treated as scientific measurement waves.
+Approved minimum policy:
+- Scope is selected explicitly from existing curriculum definitions. PacoGO does not invent a scope or derive one from a practice session.
+- A time window is an explicitly configured start/end interval. No automatic rolling window, session-derived window or hidden default duration is introduced.
+- Window definitions are versioned. A policy change creates a new definition/version; it does not rewrite prior definitions or frozen snapshots.
+- Membership is determined by the task/observation event time, using a half-open interval: start inclusive, end exclusive.
+- Event time and assessment-availability time remain separate. Each evaluation snapshot records its own availability cutoff.
+- A snapshot is immutable. New or late-arriving eligible information may be included only in a newly created snapshot/evaluation; prior results remain inspectable and unchanged.
+- No arbitrary grace period, finalization state machine, overlap prohibition or universal window duration is introduced in this minimum policy. These can be added through a later versioned decision if actual product needs require them.
+- Canonical timestamps are stored as UTC instants; any learner-facing timezone is presentation configuration and does not change event ordering or window membership.
+- Operational windows are not scientific measurement waves.
+
+Still open: detailed authority/permissions for creating scope/window definitions, overlap presentation, retention/deletion and any later finalization or grace-period policy. These details do not block a pure contract implementation of the approved minimum policy, but they remain required before affected persistence/privacy behavior is implemented.
 
 ### O6 — Canonical C3 codebook and measurement decisions
 

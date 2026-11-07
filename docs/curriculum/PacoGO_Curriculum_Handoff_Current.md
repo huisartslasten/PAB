@@ -2330,3 +2330,28 @@ The operational assessment contract explicitly leaves exact ID format and retry/
 
 ### Next concrete step
 Return to the approved gate sequence in Section 65: reconcile the remaining O5/O6/O9 and G5–G11 decisions that materially affect the first bounded implementation slice. In particular, close G6/G7 with a versioned identity/lifecycle contract and consumer compatibility plan before changing controllers or updating browser expectations. Do not expand B1 coverage, introduce target fan-out or change persistence until the required upstream gates and bounded-slice authorization are complete.
+
+## 67. O5 minimum scope/window policy approved — 2026-11-07
+
+The owner directed PacoGO to use the simplest workable policy now, with the explicit requirement that it remain changeable later. The following **minimum, reversible logical policy** is approved:
+
+- Select scope explicitly from existing curriculum definitions; never infer it from a practice session.
+- Configure each time window with an explicit start and end. Do not invent a universal duration or create automatic rolling/session windows.
+- Version window definitions. A later policy change creates a new version and never rewrites prior definitions or frozen snapshots.
+- Determine membership from event time using a half-open interval: start inclusive, end exclusive.
+- Keep event time separate from assessment-availability time. Record the availability cutoff on each evaluation snapshot.
+- Keep each snapshot immutable. Newly available or late-arriving information can enter only a new snapshot/evaluation; prior results remain unchanged and inspectable.
+- Store canonical timestamps as UTC instants. Learner-facing timezone is presentation configuration only.
+- Do not add grace periods, finalization machinery or a universal overlap rule in this minimum policy. Those remain future versioned decisions if needed.
+- Operational windows are not scientific measurement waves.
+
+This closes the **core logical portion** of O5 only. Detailed permissions/ownership, overlap presentation and retention/deletion remain open; G1 is not fully closed. This is an architecture decision, not runtime implementation authorization. Existing curriculum definitions, C1–C9 meanings, learner data and Supabase remain unchanged.
+
+### Verification at decision baseline
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Baseline commit: `241943c1dd0846bcabf26b8a16d15347d73f1fc4`.
+- Full Regression #3093 / run ID `42321850470`: GREEN on that exact baseline commit.
+- The O5 decision and this handoff update are new repository changes and require Full Regression on their exact resulting commit. No post-change GREEN is claimed here.
+
+### Next concrete step
+Apply this minimum policy to the C6–C9 branch/snapshot contract crosswalk (G5) without inventing C3 assessment semantics or physical persistence. Keep O6 and O9 open, and do not implement runtime or Supabase changes before the remaining gates and G12 authorization are satisfied.

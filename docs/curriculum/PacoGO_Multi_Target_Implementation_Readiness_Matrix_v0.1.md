@@ -517,3 +517,33 @@ The inspected in-repository surfaces now distinguish:
 This narrows the remaining G7 gap, but does **not** close it. The external/dynamic callback boundary is still unknown, and the adapter/history/report/export inventory has not been proven against every possible deployment-side or runtime-generated consumer. G7 remains OPEN. G5 and G6 remain OPEN; no canonical adapter, migration, persistence change or runtime write path is authorized.
 
 No runtime code, tests, curriculum registry/catalogue, database schema, SQL/RPC/RLS, Supabase or learner data changed.
+
+## 8.7 G5 proposed-envelope to executable-contract crosswalk — 2026-11-07
+
+This is a read-only field/lineage comparison of the current C6–C9 executable modules against the proposed six-part snapshot/history contracts in C7 v0.2, C8 v0.2 and C9 v0.2. It identifies mismatches; it does not select a new payload or authorize implementation.
+
+| Contract element | Current executable shape | Proposed forward contract | Classification |
+|---|---|---|---|
+| Learner identity | C6/C7 carry no learner identity. C8/C9 use `learner_id`. | Canonical branch uses `learner_key`. | Missing upstream; naming/identity mismatch downstream. |
+| Registry identity | No registry-version identity in current C6/C7/C8/C9 decision envelope. | `curriculum_registry_version_id` is a required branch field and exact registry reference. | Missing. |
+| Claim | C6 returns `mastery_state_by_claim`; C7 selects by `claim_id`; C8/C9 carry `claim_id`. | Claim is one of six explicit branch fields, never a unique branch key by itself. | Present but unsafe shape: claim-keyed selection is ambiguous across scopes/windows/registries. |
+| Development | C6 returns `development_id`; C7 uses `current_development_id`; C8/C9 use `development_id`. | One explicit `development_id` in the six-part branch, identical at every stage. | Concept present; naming and propagation differ. |
+| Scope | C6 returns `scope_id`; C7 input/output omits it; C8/C9 use it. | Required six-part branch field preserved through C6, C7, C8 and C9. | Missing at C7 handoff. |
+| Time window | C6 accepts/returns `time_window_id`; C7/C8/C9 executable envelopes omit it. | Required six-part branch field with immutable versioned definition. | Present only at C6; not propagated. |
+| Snapshot | Current C6–C9 executable path has no immutable decision-snapshot identity or eligibility/cutoff envelope. | Exact `decision_snapshot_id`, eligible observation/assessment references, event-time interval and assessment-availability cutoff. | Missing. |
+| C6 evaluation | C6 returns a claim-keyed result map with gate states, coverage and evidence count; no stable evaluation ID or exact snapshot reference. | C6 evaluation has stable identity, exact branch/snapshot, protocol/version provenance and gate trace. | Missing lineage and identity. |
+| C7 decision | C7 returns claim/development, action, reason, gate and evidence references; no stable decision ID or exact C6 evaluation/snapshot reference. | C7 preserves the exact six-part branch, snapshot and C6 evaluation identity. | Missing lineage and identity. |
+| C8 history item | Adapter builds `observation_id = OBS-${observed_at}`; C8 history uses four-field parent identity and timestamp ordering. | Stable `c8_item_id`, exact branch, snapshot, C6 evaluation and C7 decision references; deterministic evaluation-time ordering. | Shape and semantic mismatch. |
+| Source evidence lineage | C6 receives evidence IDs/count; current C8/C9 prototype does not preserve exact raw-observation plus target-assessment record/version sets in a frozen snapshot. | Separate immutable raw-observation IDs and versioned target-assessment/coding references, without duplicating shared observations. | Missing snapshot-level provenance; O6 semantics still unresolved. |
+| Evidence state | C8 adapter derives `SUFFICIENT` when C6 evidence count is greater than zero, otherwise `NOT_ASSESSED`. | Evidence/assessment status must be explicit and traceable to the approved C3/O6 contract and snapshot. | Semantically unresolved shortcut; do not treat count>0 as approved sufficiency. |
+| C9 validation | Current validator checks learner/claim/development/scope identity and basic task/evidence/C6/C7/C8 consistency. | C9 v0.2 requires exact six-field identity, registry resolution, assessment provenance, snapshot eligibility and C6→C7→C8 lineage. | Material contract gap. |
+
+### Crosswalk conclusions
+
+1. The current C7 logic and C7 v0.2 protocol agree that prerequisite ordering and next-development ordering are separate, action-specific gates. The existing P2 example is consistent with the executable decision path when prerequisite assessment is explicitly authorized.
+2. C6 v0.1 remains a candidate protocol. The executable C6 output is claim-keyed and does not yet implement the approved O8 snapshot envelope.
+3. C7 v0.2 is a candidate protocol; the executable adapters do not preserve the proposed branch/snapshot/evaluation lineage.
+4. C8/C9 v0.2 are owner-review proposals. Their six-part identity and immutable lineage are not present in the current four-field executable prototype.
+5. O6 remains open. The exact target-assessment states, coding semantics and version provenance required by a frozen snapshot cannot be finalized from the current executable shortcut.
+
+**Disposition:** G5 remains OPEN. G6 remains OPEN because task-definition, task-instance, attempt, event and observation identities still require a reconciled lifecycle contract. G7 remains OPEN for the external/dynamic consumer boundary recorded in Section 8.6. No runtime, tests, registry, schema, SQL/RPC/RLS, Supabase or learner data changed. No implementation is authorized.

@@ -724,3 +724,28 @@ The review identifies and proposes resolutions for the remaining logical ambigui
 **Gate status:** these are recommendations, not owner approvals. G2/O6 remains OPEN. G3 must turn approved rules into deterministic contract tests. G5 must define the exact C3-to-C6–C9 handoff. G6 must be reconciled after O6 approval. No runtime or persistence implementation is authorized.
 
 No runtime, tests, registry, catalogue, learner state, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+
+## 8.14 O6 domain anchor examples for A1, B1 and FR2 — 2026-11-07
+
+**Examples:** `docs/curriculum/PacoGO_O6_Domain_Anchor_Examples_v0.1.md`.
+
+The examples apply the proposed O6 distinctions to existing curriculum/task meanings without changing any skill, development, claim, evidence-target or task-model mapping. They are hypothetical rule-test vectors, not learner data, approved codebook anchors or empirical validation.
+
+The cross-domain examples make the following boundaries concrete:
+
+- Separate raw response/event facts, target applicability, assessment execution, C3 target result and downstream inference.
+- Do not infer a target merely because a task displays a representation or lists a target opportunity.
+- Assess multi-target responses separately while retaining one raw observation and avoiding inflated independent-observation counts.
+- Separate objective performance from evidence status; preserve mixed responses, unscorable responses and no-response distinctly.
+- Require genuine task opportunities for strategy, checking, transfer, robustness and representation-change targets.
+- Treat explanations as evidence only when their mathematical content meets the target criterion; the presence or length of text is not evidence.
+- Evaluate support against the specific target operation supplied; a help request alone is not delivered support, and the same cue may affect different targets differently.
+- Keep C3 target-specific assistance/independence separate from C6 M5 evidence-set independence, and C3 observation-local contradiction separate from C6 M7 evidence-set contradiction.
+- Preserve unresolved B1 ET7 mapping; no task-model or registry change is implied.
+
+**Gate disposition:** the examples sharpen the review but do not approve O6. G2/O6 remains OPEN pending explicit approval of the operational vocabulary, applicability/execution/result model, target-specific anchors, strict ABSENT conditions, support/independence rules, M2 adequacy profile and provenance. G3 follows approval; G5 and G6 remain dependent on the finalized O6 output contract. No implementation is authorized.
+
+Full Regression #3133 / run ID `42403744862`: **GREEN** on exact commit `ff07b3e9eb477ebcff44dec16b052c50c0d9d73f`; workflow completed successfully, including curriculum engine, architecture boundaries, Node/Vitest, browser regression and clean-working-tree verification.
+
+No runtime, tests, registry, catalogue, learner state, database, SQL/RPC/RLS, Supabase or learner data changed.

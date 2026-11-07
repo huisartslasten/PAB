@@ -3073,3 +3073,45 @@ The readiness matrix now records the review in Section 8.13. All recommendations
 ### Next concrete step
 
 Continue with a bounded O6 decision-ready contract: resolve the R1–R13 recommendations against actual A1/B1/FR2 target requirements and existing C6 semantics. Produce concrete domain examples for support boundaries and partial target elicitation, without changing curriculum meanings. Then present the exact remaining owner decisions, rather than reopening settled architecture. No runtime or persistence work before G2/G3/G5–G11 and explicit G12 authorization.
+
+
+## 85. O6 domain anchor examples and verified regression — 2026-11-07
+
+### Work completed
+
+Created `docs/curriculum/PacoGO_O6_Domain_Anchor_Examples_v0.1.md` after reviewing the existing A1 reference slice, B1 task/evidence contracts and FR2 task/evidence alignment specification against O6 v0.2 and the O6 reconciliation review.
+
+The examples use only existing curriculum meanings. They do not add, rename or remap skills, developments, claims, evidence targets or task models. They are hypothetical rule-test vectors, not learner data, approved codebook anchors or empirical validation.
+
+The examples cover:
+
+- A1 representational meaning, mapping/invariant value and coordination;
+- B1 part-whole relation, representation, execution, strategy, checking, robustness and transfer;
+- FR2 recognition, superficial-cue discrimination, same-value reasoning, representation change, functional use and contradiction/counterevidence;
+- partial target elicitation, mixed responses, unscorable responses, no-response, missing process capture and strict preconditions for ABSENT;
+- neutral interface clarification, target cues, supplied operations/reasoning, answer delivery and help requests without delivered support;
+- one raw observation with multiple target-specific assessments, without counting those assessments as independent observations;
+- the boundaries between C3 target-specific assistance/independence and C6 M5, and between observation-local C3 contradiction and evidence-set-level C6 M7.
+
+The examples explicitly preserve the unresolved B1 ET7 mapping and do not authorize curriculum/task changes.
+
+### Gate status and limits
+
+- G2/O6 remains OPEN. The examples do not constitute approval of categories, labels, anchors, M2 profile, ABSENT rules, support rules or assessment provenance.
+- G3 remains OPEN; deterministic operational rules and tests follow O6 approval.
+- G5 remains OPEN; the exact C3 output and C6–C9 branch/snapshot lineage still require reconciliation.
+- G6 remains OPEN pending final reconciliation of its task/attempt/observation lifecycle with approved O6.
+- G7 remains OPEN because the external/dynamic callback boundary remains unknown. G8–G12 remain OPEN; no implementation authorization exists.
+- Scientific Validation remains distinct; no empirical validity claim is made.
+- No runtime, tests, registry, catalogue, learner state, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Repository and verification
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Domain-anchor examples commit: `ff07b3e9eb477ebcff44dec16b052c50c0d9d73f`.
+- Full Regression #3133 / run ID `42403744862`: **GREEN** on that exact commit. The workflow completed successfully; curriculum engine, architecture boundaries, dependency audit, Node/Vitest, browser regression and clean-working-tree checks passed.
+- The readiness matrix and this handoff update are one documentation-only commit. Full Regression must run on that exact resulting commit; the #3133 GREEN result above does not cover the subsequent handoff commit.
+
+### Next concrete step
+
+Produce one compact O6 decision brief that separates (a) what is already determined by accepted architecture/product decisions, (b) the specific recommendations supported by the A1/B1/FR2 examples, and (c) the remaining explicit owner approvals. Do not reopen settled observation cardinality, raw-versus-assessment separation or C3/C6 boundaries. Once the O6 decisions are approved, finalize the canonical versioned C3 contract, then proceed to G3 and reconcile G5/G6. No runtime or persistence work before the applicable readiness gates and explicit G12 authorization.

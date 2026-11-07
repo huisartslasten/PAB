@@ -1009,3 +1009,19 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-016, keeping per-stream collection availability distinct and preventing missing required streams from supporting `ABSENT`. Do not infer semantics owned by G5, G6/G9 or O5.
+
+
+
+## 8.30 G3-016 — required process-stream availability is recorded per stream
+
+**Contract basis:** O6 v0.3 §5.4 requires availability to be recorded separately for every required stream and prohibits collapsing distinct streams into one overall flag. G3-016 requires a missing stream to remain `NOT_COLLECTED` and affected target evidence to remain `INDETERMINATE`, not `ABSENT`.
+
+**Test change:** `pacogo-engine/operational-assessment-contract.test.js` adds a test-only per-stream fixture collection and assertion. The positive case preserves one `AVAILABLE` stream and a separate `NOT_COLLECTED` required stream. Negative cases reject aggregate-only availability without per-stream records and reject target evidence `ABSENT` while a required stream is uncollected.
+
+**Scope:** Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Implementation commit `f387b72ea179b1d583fd79bab94708df631e115f`. Full Regression #3196 / run ID `42427522460`: **GREEN** on that exact commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with G3-017, keeping technical capture failure distinct from `NOT_COLLECTED` and preventing it from supporting `ABSENT` or `INCORRECT`. Do not infer semantics owned by G5, G6/G9 or O5.

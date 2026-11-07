@@ -123,6 +123,18 @@ function assertAssessment(record) {
   return true;
 }
 
+function assertMixedComponentMapping(record) {
+  assert.equal(record.dimensions.performance?.result, 'MIXED', 'this G3-013 fixture uses the MIXED scoring outcome');
+  assert.ok(Array.isArray(record.component_results) && record.component_results.length >= 2, 'MIXED result must retain separable component results');
+  const ids = record.component_results.map(item => item.component_id);
+  assert.ok(ids.every(id => typeof id === 'string' && id.trim()), 'each mixed component requires its own identifier');
+  assert.equal(new Set(ids).size, ids.length, 'mixed component identifiers must be unique');
+  const results = new Set(record.component_results.map(item => item.result));
+  assert.ok(results.has('CORRECT'), 'mixed component mapping must preserve a correct component');
+  assert.ok(results.has('INCORRECT'), 'mixed component mapping must preserve an incorrect component');
+  return true;
+}
+
 function assertIndependentAttempt(attempt) {
   assert.ok(['Tussentoets', 'Toets'].includes(attempt.mode));
   if (attempt.help_request === 'content_help') {
@@ -336,10 +348,48 @@ test('G3-012: objective INCORRECT does not automatically imply contradiction PRE
   assert.throws(() => assertAssessment(autoContradiction), /contradiction must cite source material/);
 });
 
-test('G3-013: mixed performance preserves component-level provenance', () => {
-  const record = base({ dimensions: { performance: dimension('MIXED') }, component_results: [{ component_id: 'a', result: 'CORRECT' }, { component_id: 'b', result: 'INCORRECT' }] });
+test('G3-013: mixed performance preserves distinct correct and incorrect component provenance', () => {
+  const record = base({
+    objective_scoring_result: 'MIXED',
+    dimensions: { performance: dimension('MIXED'), evidence: dimension('INDETERMINATE') },
+    component_results: [
+      { component_id: 'component-a', result: 'CORRECT' },
+      { component_id: 'component-b', result: 'INCORRECT' }
+    ]
+  });
   assertAssessment(record);
-  assert.deepEqual(record.component_results.map(item => item.result), ['CORRECT', 'INCORRECT']);
+  assertMixedComponentMapping(record);
+  assert.deepEqual(record.component_results, [
+    { component_id: 'component-a', result: 'CORRECT' },
+    { component_id: 'component-b', result: 'INCORRECT' }
+  ]);
+
+  const flattened = base({
+    objective_scoring_result: 'MIXED',
+    dimensions: { performance: dimension('MIXED') },
+    component_results: [{ component_id: 'component-a', result: 'MIXED' }]
+  });
+  assert.throws(() => assertMixedComponentMapping(flattened), /at least 2/);
+
+  const duplicateIds = base({
+    objective_scoring_result: 'MIXED',
+    dimensions: { performance: dimension('MIXED') },
+    component_results: [
+      { component_id: 'component-a', result: 'CORRECT' },
+      { component_id: 'component-a', result: 'INCORRECT' }
+    ]
+  });
+  assert.throws(() => assertMixedComponentMapping(duplicateIds), /identifiers must be unique/);
+
+  const lostIncorrectComponent = base({
+    objective_scoring_result: 'MIXED',
+    dimensions: { performance: dimension('MIXED') },
+    component_results: [
+      { component_id: 'component-a', result: 'CORRECT' },
+      { component_id: 'component-b', result: 'CORRECT' }
+    ]
+  });
+  assert.throws(() => assertMixedComponentMapping(lostIncorrectComponent), /preserve an incorrect component/);
 });
 
 test('G3-014: NO_RESPONSE maps to NOT_OBSERVED and INDETERMINATE by default', () => {

@@ -1,3 +1,5 @@
+> **SUPERSEDED FOR LEARNER-RUNTIME ARCHITECTURE — HUMAN CODER MODEL WITHDRAWN.** This proposal's human coder rounds, independent double-coding, adjudication and inter-rater reliability assumptions do not belong in PacoGO's learner evidence pipeline. The owner-confirmed contract is: OEFENEN allows help; TUSSENTOETSEN and TOETSEN do not; a content-help request ends the independent attempt; PacoGO is the single operational assessor. Preserve only measurement distinctions that can be implemented as PacoGO's versioned assessment rules. Human coding/reliability is not a production gate. Rework this candidate before treating it as an O6 basis.
+
 # PacoGO C3 — Canonical Codebook Reconciliation Proposal v0.2
 
 Status: Revised design proposal / candidate / not approved for implementation  

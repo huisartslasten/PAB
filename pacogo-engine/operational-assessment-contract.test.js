@@ -396,11 +396,37 @@ test('G3-014: NO_RESPONSE maps to NOT_OBSERVED and INDETERMINATE by default', ()
   const record = base({
     raw_response_status: 'NO_RESPONSE',
     task_instance: { ...base().task_instance, actual_response_inspectable: false },
-    dimensions: { performance: dimension('NOT_OBSERVED'), relation: dimension('INDETERMINATE'), evidence: dimension('INDETERMINATE') }
+    dimensions: {
+      performance: dimension('NOT_OBSERVED'),
+      relation: dimension('INDETERMINATE'),
+      evidence: dimension('INDETERMINATE')
+    }
   });
   assertAssessment(record);
   assert.equal(record.dimensions.performance.result, 'NOT_OBSERVED');
+  assert.equal(record.dimensions.relation.result, 'INDETERMINATE');
   assert.equal(record.dimensions.evidence.result, 'INDETERMINATE');
+
+  const asIncorrect = base({
+    raw_response_status: 'NO_RESPONSE',
+    task_instance: { ...base().task_instance, actual_response_inspectable: false },
+    dimensions: { performance: dimension('INCORRECT'), relation: dimension('INDETERMINATE'), evidence: dimension('INDETERMINATE') }
+  });
+  assert.throws(() => assertAssessment(asIncorrect), /NO_RESPONSE must be NOT_OBSERVED/);
+
+  const asUnrelated = base({
+    raw_response_status: 'NO_RESPONSE',
+    task_instance: { ...base().task_instance, actual_response_inspectable: false },
+    dimensions: { performance: dimension('NOT_OBSERVED'), relation: dimension('NONE'), evidence: dimension('INDETERMINATE') }
+  });
+  assert.throws(() => assertAssessment(asUnrelated), /NONE requires an existing response/);
+
+  const asAbsent = base({
+    raw_response_status: 'NO_RESPONSE',
+    task_instance: { ...base().task_instance, actual_response_inspectable: false },
+    dimensions: { performance: dimension('NOT_OBSERVED'), relation: dimension('INDETERMINATE'), evidence: dimension('ABSENT') }
+  });
+  assert.throws(() => assertAssessment(asAbsent), /NO_RESPONSE evidence is INDETERMINATE by default/);
 });
 
 test('G3-015: existing unscorable response is NOT_SCORABLE, not INCORRECT', () => {

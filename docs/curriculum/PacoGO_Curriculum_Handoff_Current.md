@@ -2300,3 +2300,31 @@ These are contract gaps, not permission to patch individual fields or alter C1�
 
 ### Next concrete step
 Use this consolidated contract as the single operational assessment design basis. Reconcile only the remaining unresolved O5/O6/O9 and G5–G11 decisions that materially affect the first bounded implementation slice. Then select a slice that can be implemented without unsupported target fan-out, guessed assessment semantics or unapproved persistence changes. Keep B1-L08 and multi-target runtime/persistence fan-out blocked until their contracts and explicit authorization are complete.
+
+
+## 66. G6 implementation attempt rejected and rolled back — 2026-11-06
+
+### What happened
+- Commit `6bc486ef432b450b266594d4a237938ecba32414` attempted to separate the stable task-definition ID from a newly generated administered-attempt ID.
+- It also changed the observation ID format to `obs:attempt:<uuid>` and changed the Addition controller's event/version handling.
+- Full Regression #3091 / run ID `42321042513` FAILED on that exact commit.
+- Curriculum engine, architecture, maintained Node and maintained Vitest checks passed. Browser regression failed 5 of 59 tests: A1-T01 and FR2-T02 through FR2-T05. Each failure was an assertion that the decision trace observation ID still contained the stable task ID; the implementation instead returned an attempt-derived ID. Working-tree verification was skipped after the browser failure.
+
+### Root-cause classification
+The failed assertion is not permission to change the browser tests to accept an unapproved ID format. G6 was still explicitly OPEN:
+- exact task/attempt/observation identity contract;
+- event and retry/replay semantics;
+- immutable task-definition snapshot and interface identity;
+- timestamps and provenance;
+- canonical payload/replay semantics.
+
+The operational assessment contract explicitly leaves exact ID format and retry/replay identity unresolved. The implementation selected an ID format and modified controllers before those upstream contracts and the G6/G7 consumer compatibility plan were closed. The browser failure exposed that incomplete contract transition; it is not to be fixed by changing assertions alone.
+
+### Disposition
+- The incomplete implementation is rolled back as a whole. The code tree is restored to the pre-attempt baseline `2b59128f0c5464e8c62bfd8b98eb1649c6989b7f`; no browser or unit test is weakened or rewritten.
+- No curriculum registry, task catalogue, C1–C9 rule, persistence schema, SQL/RPC/RLS, Supabase or learner data is changed by this rollback.
+- The rollback and this handoff correction are committed together. Full Regression on the resulting exact commit is required; no GREEN status is claimed until that run completes.
+- LIVE `main` remains untouched.
+
+### Next concrete step
+Return to the approved gate sequence in Section 65: reconcile the remaining O5/O6/O9 and G5–G11 decisions that materially affect the first bounded implementation slice. In particular, close G6/G7 with a versioned identity/lifecycle contract and consumer compatibility plan before changing controllers or updating browser expectations. Do not expand B1 coverage, introduce target fan-out or change persistence until the required upstream gates and bounded-slice authorization are complete.

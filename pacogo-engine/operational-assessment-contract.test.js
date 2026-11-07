@@ -126,6 +126,19 @@ function assertAssessment(record) {
   return true;
 }
 
+function assertRequiredProcessStreams(record) {
+  assert.ok(Array.isArray(record.process_streams) && record.process_streams.length > 0, 'required process streams must be represented separately');
+  const ids = record.process_streams.map(stream => stream.stream_id);
+  assert.ok(ids.every(id => typeof id === 'string' && id.trim()), 'each process stream requires its own identifier');
+  assert.equal(new Set(ids).size, ids.length, 'process stream identifiers must be unique');
+  const required = record.process_streams.filter(stream => stream.required === true);
+  assert.ok(required.length > 0, 'at least one required process stream must be identified');
+  for (const stream of required) {
+    assert.ok(RESULT.availability.has(stream.availability), 'required process stream availability must use the O6 vocabulary');
+  }
+  return true;
+}
+
 function assertMixedComponentMapping(record) {
   assert.equal(record.dimensions.performance?.result, 'MIXED', 'this G3-013 fixture uses the MIXED scoring outcome');
   assert.ok(Array.isArray(record.component_results) && record.component_results.length >= 2, 'MIXED result must retain at least 2 separable component results');
@@ -183,7 +196,8 @@ function base(overrides = {}) {
     target_contract: { separable_component_ids: [] },
     relation_basis_sufficient: true,
     objective_scoring_result: undefined,
-    scoring_rule_interpretable: true
+    scoring_rule_interpretable: true,
+    process_streams: []
   };
   return {
     ...defaults,
@@ -196,7 +210,8 @@ function base(overrides = {}) {
     target_contract: { ...defaults.target_contract, ...overrides.target_contract },
     relation_basis_sufficient: overrides.relation_basis_sufficient ?? defaults.relation_basis_sufficient,
     objective_scoring_result: overrides.objective_scoring_result ?? defaults.objective_scoring_result,
-    scoring_rule_interpretable: overrides.scoring_rule_interpretable ?? defaults.scoring_rule_interpretable
+    scoring_rule_interpretable: overrides.scoring_rule_interpretable ?? defaults.scoring_rule_interpretable,
+    process_streams: overrides.process_streams ?? defaults.process_streams
   };
 }
 
@@ -453,13 +468,36 @@ test('G3-015: existing response the approved scoring rule cannot interpret is NO
   assert.throws(() => assertAssessment(incorrectlyScored), /must be NOT_SCORABLE/);
 });
 
-test('G3-016: uncollected required stream cannot support ABSENT', () => {
+test('G3-016: an uncollected required stream remains distinct and cannot support ABSENT', () => {
   const record = base({
     process: { required_streams_complete: false },
+    process_streams: [
+      { stream_id: 'response-stream', required: true, availability: 'AVAILABLE' },
+      { stream_id: 'strategy-process-stream', required: true, availability: 'NOT_COLLECTED' }
+    ],
     dimensions: { availability: dimension('NOT_COLLECTED'), evidence: dimension('INDETERMINATE') }
   });
   assertAssessment(record);
+  assertRequiredProcessStreams(record);
+  assert.deepEqual(record.process_streams.map(stream => stream.availability), ['AVAILABLE', 'NOT_COLLECTED']);
   assert.equal(record.dimensions.evidence.result, 'INDETERMINATE');
+
+  const aggregateOnly = base({
+    process: { required_streams_complete: false },
+    dimensions: { availability: dimension('NOT_COLLECTED'), evidence: dimension('INDETERMINATE') }
+  });
+  assert.throws(() => assertRequiredProcessStreams(aggregateOnly), /represented separately/);
+
+  const absentDespiteMissingStream = base({
+    process: { required_streams_complete: false },
+    process_streams: [
+      { stream_id: 'strategy-process-stream', required: true, availability: 'NOT_COLLECTED' }
+    ],
+    criterion: { met: false },
+    dimensions: { alignment: dimension('ALIGNED'), evidence: dimension('ABSENT') }
+  });
+  assertRequiredProcessStreams(absentDespiteMissingStream);
+  assert.throws(() => assertAssessment(absentDespiteMissingStream), /ABSENT requires complete required streams/);
 });
 
 test('G3-017: technical capture failure cannot support ABSENT', () => {

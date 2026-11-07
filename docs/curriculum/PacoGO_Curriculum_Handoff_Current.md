@@ -3153,7 +3153,7 @@ The brief is a recommendation package. It does not silently approve any proposal
 
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
 - Decision brief, readiness matrix Section 8.15 and this handoff Section 86 are committed together.
-- Full Regression must run on the exact resulting commit. The #3134 GREEN result above is for the parent commit and does not cover this new handoff commit.
+- Full Regression #3135 / run ID `42418832606`: **GREEN** on exact decision-brief commit `84ecb723ed38654417c76850eebe5446adbfbdd3`; all workflow steps passed, including curriculum engine, architecture boundaries, dependency audit, Node/Vitest, browser regression and clean-working-tree verification. This verifies the decision brief, matrix Section 8.15 and handoff Section 86 as committed in that SHA.
 
 ### Next concrete step
 

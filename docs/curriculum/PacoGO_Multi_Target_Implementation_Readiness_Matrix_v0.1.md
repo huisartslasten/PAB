@@ -767,4 +767,6 @@ Key recommendations:
 - use a structured, non-scored M2 adequacy profile and reconcile M1/M2 boundaries in G5;
 - pre-specify/minimise context capture and preserve O5 event-time/availability and immutable reassessment provenance.
 
+**Verification:** Full Regression #3135 / run ID `42418832606`: **GREEN** on exact decision-brief commit `84ecb723ed38654417c76850eebe5446adbfbdd3`; all workflow steps passed, including browser regression and clean-working-tree verification.
+
 **Gate status:** this is a recommendation package, not approval. G2/O6 remains OPEN. G3, G5 and G6 remain separate follow-on gates. No implementation is authorized.

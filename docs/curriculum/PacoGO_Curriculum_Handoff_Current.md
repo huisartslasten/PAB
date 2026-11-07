@@ -2390,3 +2390,45 @@ The readiness matrix now contains a preliminary G5 crosswalk, updated O5 gate st
 
 ### Next concrete step
 Continue G5 by defining the exact C6→C7 branch/snapshot envelope and rejection cases, while keeping C3 target-assessment fields explicitly unresolved under O6. In parallel, continue the read-only G6/G7 identity and consumer inventory. Do not change runtime code until G5–G11 and explicit G12 authorization permit a bounded implementation slice.
+
+## 69. G5 C6→C7 handoff and rejection rules specified — 2026-11-07
+
+### Work completed
+
+The G5 readiness matrix now defines the minimum logical C6→C7 handoff and its rejection behavior in Sections 7.7–7.9.
+
+The handoff requires:
+- unchanged six-part branch identity across snapshot, C6 evaluation and C7 decision;
+- one exact immutable `decision_snapshot_id`;
+- one unique `c6_evaluation_id` linked to that snapshot and branch;
+- one of the five existing C6 mastery outcomes, consumed unchanged by C7;
+- the seven-gate C6 trace and protocol provenance;
+- snapshot scope/window versions, event-time bounds, assessment-availability cutoff, eligible source references and exclusions;
+- separate C7 inputs for prerequisite ordering, next-development ordering, explicit candidate actions and action-policy version;
+- a C7 decision trace retaining the exact C6 evaluation and snapshot references.
+
+The rejection rules now explicitly cover missing or mismatched branch fields, snapshot/definition/cutoff mismatch, missing or ambiguous evaluation references, invalid C6 outcomes, incomplete gate/protocol provenance, claim-only result selection, late-arriving material outside the frozen cutoff, and missing/invalid C7 ordering or candidate inputs.
+
+A rejected handoff is an integrity/input-availability problem, not a learner failure and not a new mastery outcome. C7 may not reconstruct mastery, select a different/latest C6 result, infer missing identity or ordering, or emit an action outside its explicit candidate set.
+
+### Deliberately unresolved
+
+- O6 still determines the exact C3 target-assessment vocabulary and assessment-version fields. No substitute vocabulary or physical payload schema was invented.
+- O9 still governs any learner-facing cross-branch presentation.
+- No branch hash, JSON serialization, physical schema, database key or persistence API was selected.
+- No runtime, tests, curriculum registry/catalogue, C1–C9 meanings, learner data or Supabase changed.
+- G5 remains OPEN: C8/C9 cross-reference reconciliation, full contract examples/test vectors and O6-dependent assessment-input semantics remain to be completed.
+- G6/G7 read-only identity and consumer inventories remain open.
+- No implementation authorization is implied; G12 remains required.
+
+### Verification and repository state
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Before this work, Full Regression #3095 / run ID `42377842782` was verified **GREEN** on exact commit `ca2f7259f35839f7e02bc1c87cbb9f0f405cbf6c`; all 16 job steps completed successfully, including browser regression and clean-working-tree verification.
+- Matrix update commit: `c098238e8f6385e7d55fd84908805172de79e85e`.
+- This handoff update is a separate repository change and requires Full Regression on its exact resulting commit. No post-update GREEN is claimed until that run completes.
+- No runtime or persistence implementation was performed.
+
+### Next concrete step
+
+Reconcile the C6→C7 handoff against the exact C8/C9 snapshot, history and validation references, then complete the G6/G7 read-only identity and consumer inventory. Keep O6-specific assessment fields unresolved until O6 is approved. Do not implement runtime or persistence before G5–G11 and explicit G12 authorization are complete.

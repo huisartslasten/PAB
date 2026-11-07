@@ -64,6 +64,10 @@ function assertAssessment(record) {
   const independence = record.dimensions.independence?.result;
   const contradiction = record.dimensions.contradiction?.result;
 
+  if (record.objective_scoring_result !== undefined) {
+    assert.equal(performance, record.objective_scoring_result, 'performance must preserve the objective scoring-rule result');
+  }
+
   if (alignment === 'PARTIALLY_ALIGNED') {
     assert.equal(typeof record.task_instance.component_id, 'string', 'partial alignment requires a named separable component');
     assert.ok(record.task_instance.component_id.trim());
@@ -162,7 +166,8 @@ function base(overrides = {}) {
     support: { request: false, delivered: false, target_relevant: false },
     process: { required_streams_complete: true },
     target_contract: { separable_component_ids: [] },
-    relation_basis_sufficient: true
+    relation_basis_sufficient: true,
+    objective_scoring_result: undefined
   };
   return {
     ...defaults,
@@ -173,7 +178,8 @@ function base(overrides = {}) {
     support: { ...defaults.support, ...overrides.support },
     process: { ...defaults.process, ...overrides.process },
     target_contract: { ...defaults.target_contract, ...overrides.target_contract },
-    relation_basis_sufficient: overrides.relation_basis_sufficient ?? defaults.relation_basis_sufficient
+    relation_basis_sufficient: overrides.relation_basis_sufficient ?? defaults.relation_basis_sufficient,
+    objective_scoring_result: overrides.objective_scoring_result ?? defaults.objective_scoring_result
   };
 }
 
@@ -280,10 +286,29 @@ test('G3-010: uncertain response relation remains INDETERMINATE', () => {
   }
 });
 
-test('G3-011: CORRECT does not automatically imply target evidence', () => {
-  const record = base({ dimensions: { performance: dimension('CORRECT'), evidence: dimension('INDETERMINATE') } });
+test('G3-011: objective correctness is preserved without auto-setting target evidence PRESENT', () => {
+  const record = base({
+    objective_scoring_result: 'CORRECT',
+    criterion: { met: null },
+    process: { required_streams_complete: false },
+    dimensions: { performance: dimension('CORRECT'), evidence: dimension('INDETERMINATE') }
+  });
   assertAssessment(record);
+  assert.equal(record.dimensions.performance.result, 'CORRECT');
   assert.equal(record.dimensions.evidence.result, 'INDETERMINATE');
+
+  const autoPresent = base({
+    objective_scoring_result: 'CORRECT',
+    criterion: { met: false },
+    dimensions: { performance: dimension('CORRECT'), evidence: dimension('PRESENT') }
+  });
+  assert.throws(() => assertAssessment(autoPresent), /PRESENT requires the pre-specified criterion to be met/);
+
+  const scoreMismatch = base({
+    objective_scoring_result: 'CORRECT',
+    dimensions: { performance: dimension('INCORRECT'), evidence: dimension('INDETERMINATE') }
+  });
+  assert.throws(() => assertAssessment(scoreMismatch), /performance must preserve the objective scoring-rule result/);
 });
 
 test('G3-012: INCORRECT does not automatically imply contradiction', () => {

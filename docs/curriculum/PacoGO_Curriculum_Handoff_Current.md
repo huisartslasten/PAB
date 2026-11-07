@@ -3577,7 +3577,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 102. G3-015 existing but unscorable response — verification pending
+## 102. G3-015 existing but unscorable response — verified
 
 ### Work implemented
 - Inspected G3-015 in the verification specification and O6 v0.3 §§5.3 and 5.5.
@@ -3588,7 +3588,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 ### Verification status
 - Implementation commit: `669be29b0bc31854664fdf1e68b4dff3538199d9`.
 - Pre-build Full Regression #3190 / run ID `42427198962`: GREEN on exact baseline commit `9ca59b6e8fb563f3909ee7d4d78801dd1240b1bd`.
-- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+- Full Regression #3192 / run ID `42427295240`: **GREEN** on exact implementation commit `669be29b0bc31854664fdf1e68b4dff3538199d9`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

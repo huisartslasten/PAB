@@ -1,3 +1,5 @@
+> **ARCHIVED SYNTHETIC CODER EXERCISE — NOT PART OF LEARNER RUNTIME.** This packet was created under the withdrawn human-coder premise. It must not be used to justify human assessment of learner responses, double-coding or adjudication in PacoGO. It may be retained only as historical design material pending a decision on whether any examples are useful for testing PacoGO's own assessment rules.
+
 # PacoGO C3 — Blinded Synthetic Coder Packet v0.1
 
 Status: Synthetic coding exercise / candidate anchors / not an approved canonical codebook

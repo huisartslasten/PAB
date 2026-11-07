@@ -2836,3 +2836,47 @@ These documents do not yet establish one approved, unambiguous hierarchy between
 ### Next concrete step
 
 Reconcile the candidate C2/C3/multi-target definitions into an explicit identity/lifecycle decision table: what creates a task instance, what creates a new response attempt/episode, which events belong to it, when a new immutable observation is created, and how independent-to-supported transitions are represented. Preserve the unresolved product/protocol decisions rather than inventing retry rules. Then map the resulting logical contract to existing C6/C7/C8/C9 provenance and only later to G8 persistence. No implementation before G5–G11 and explicit G12 authorization are complete.
+
+## 80. G6 candidate identity hierarchy and lifecycle questions — 2026-11-07
+
+### Work completed
+
+Readiness matrix Section 8.9 now consolidates the candidate identity layers from C2, C3 and the multi-target task/evidence contract:
+
+`task definition/version → task model → administered task instance → response episode/task attempt → ordered interaction events → immutable raw observation → zero or more target-specific assessments → inference/decision`
+
+This is a candidate reconciliation structure only. It is not an approved runtime contract.
+
+The main unresolved semantic conflict is explicit:
+- C3 describes one task-instance response episode containing ordered attempts/events and requires a separate supported episode after an independent episode.
+- The multi-target contract uses `task_attempt_id` for one learner interaction episode.
+- C2 identifies a task instance but does not settle the task-attempt identity/cardinality.
+
+The identity/lifecycle decision table therefore leaves these questions open:
+1. whether `task_attempt_id` identifies the whole response episode or an individual attempt inside it;
+2. whether an ordinary retry remains an event/attempt inside the same episode or starts a new episode;
+3. whether an independent-to-supported transition reuses the task instance or creates a new one;
+4. what marks completion, abandonment, timeout, interruption and resume;
+5. whether one raw observation is exactly one response episode and which stable source-event key makes replay idempotent;
+6. how multiple target assessments link to one observation without duplicating raw evidence or inflating independent-observation counts.
+
+No retry, support, timeout or resume behavior has been selected. D9 support-condition/attempt-boundary decisions remain open.
+
+### Current gate status
+
+- G5 OPEN: six-part branch/snapshot/evaluation lineage is absent from the current executable C6–C9 envelope; O6 remains open.
+- G6 OPEN: task definition, task instance, attempt/episode, event and raw-observation identities and lifecycle are not yet reconciled.
+- G7 OPEN: known repository consumers are classified; external/dynamic callback destination remains UNKNOWN.
+- No runtime, tests, registry, Supabase, schema, SQL/RPC/RLS or learner data changed.
+
+### Verification and repository state
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Full Regression #3120 / run ID `42401075527`: **GREEN** on exact commit `a133548ec618f222aeef4e868d2422a936434767`; all 16 workflow steps passed, including curriculum engine, architecture boundaries, Node/Vitest, browser regression and clean-working-tree verification.
+- G6 identity crosswalk commit: `c5af70a6afe9880e5e240c4206d53f988931ed70`.
+- G6 candidate identity hierarchy commit: `ac4b262cfde37e22353c32e7cbedbf1dd36442f0`.
+- This handoff update is another documentation-only change and requires Full Regression on its exact resulting commit. No post-update GREEN is claimed until that run completes.
+
+### Next concrete step
+
+Reconcile the six lifecycle questions above against the C3 D9 decision and the multi-target task/evidence contract, without inventing retry or support semantics. Record which points are already determined by the source contracts and which require an explicit owner decision. In parallel, keep O6 unresolved until the target-assessment contract is approved. No runtime or persistence work before G5–G11 and explicit G12 authorization are complete.

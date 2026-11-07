@@ -2927,3 +2927,47 @@ No retry, timeout or resume behavior was invented. No runtime, tests, registry, 
 ### Next concrete step
 
 Resolve the narrow remaining G6 lifecycle points against the owner-confirmed product policy: task-instance identity when support condition changes; generic interruption/resume/restart boundaries; event ordering and idempotency identity. Keep recommended defaults separate from approved decisions. In parallel, O6 must be completed before final target-assessment semantics or implementation. No runtime or persistence work before G5–G11 and explicit G12 authorization are complete.
+
+
+## 82. G6 task / attempt / observation lifecycle proposal — 2026-11-07
+
+### Verification before this documentation block
+
+The previously pending Full Regression runs have completed:
+- Full Regression #3123 / run ID `42401897036`: **GREEN** on exact commit `6a9ce01ebd18e8eeeed44a9db2afbac01ab828a6`; all 16 workflow steps passed.
+- Full Regression #3124 / run ID `42401913249`: **GREEN** on exact commit `79b1e952a5062c3abd2d8c88c1325a135037a10d`; all 16 workflow steps passed, including browser regression and clean-working-tree verification.
+
+### Work completed
+
+Created `docs/curriculum/PacoGO_Task_Observation_Identity_Lifecycle_Proposal_v0.1.md` and recorded its disposition in readiness matrix Section 8.11.
+
+The proposal makes the candidate identity chain explicit:
+
+`versioned task definition → task model → administered task instance → response episode (task_attempt_id) → ordered events/internal retries → one immutable raw observation → zero or more target-specific assessments`
+
+It gives concrete proposed lifecycle rules:
+- Ordinary clicks, edits and retries remain events inside the same response episode.
+- A change in support condition should create a new task instance, response episode and observation. This is the recommended default because the actual administration/presentation changes; explicit owner approval is still required.
+- A temporary interruption may resume the same episode only when the exact task presentation and support condition can be restored. A reissued or materially changed presentation starts a new administration.
+- A timeout is terminal only if an explicit, versioned task/session policy says so; no universal timeout is inferred from elapsed time.
+- Explicit restart after completion/abandonment creates a new task instance and episode.
+- Event order uses a per-episode monotonic sequence; timestamps are separate. O7 same-identity/same-payload replay and same-identity/different-payload conflict rules apply.
+- Incomplete/no-response episodes are preserved without inventing an O6 assessment label.
+
+### Gate status and limits
+
+- G6 is materially narrowed but remains OPEN. Its final contract must be reconciled with the approved C3/O6 model because the readiness matrix explicitly makes G6 dependent on G2.
+- O6 target-assessment vocabulary, operational status labels, assessment rules and assessment-version provenance remain open under G2.
+- G5 and G7 remain OPEN; G8–G12 remain unclosed. No implementation is authorized.
+- No runtime, tests, registry, catalogue, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Repository and verification
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Lifecycle proposal commit: `bca0e1cd29776f621cc3b96b44c06135558ba3f5`.
+- Readiness matrix update commit: `8eb3adafd374d7ab27e4c0093509cddb4d94acef`.
+- This handoff update is a further documentation-only repository change. Full Regression must run on the exact resulting handoff commit; no post-update GREEN is claimed until that run completes.
+
+### Next concrete step
+
+Do not reopen the already reconciled identity questions. Continue with the next readiness blocker: complete the G2/O6 operational C3 assessment contract, preserving PacoGO as the single operational assessor and keeping target-assessment semantics separate from raw observations. Once O6 is approved, reconcile the G6 lifecycle proposal against it and close G6 only if its acceptance criteria are met. No runtime or persistence work before G0–G11 and explicit G12 authorization.

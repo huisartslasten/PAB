@@ -2628,3 +2628,38 @@ The readiness matrix Section 8.3–8.4 now records these routes, reads/writes an
 ### Next concrete step
 
 Complete the remaining non-`src/` import/call-site and callback-wiring disposition for the local mastery service and learner curriculum routes. Then close the remaining G7 inventory gaps without changing legacy runtime or persistence. G5 remains OPEN and no implementation authorization is implied.
+
+
+## 75. G7 non-`src/` consumer and legacy-callback disposition — 2026-11-07
+
+### Work completed
+
+A read-only scan extended the earlier 351-file `src/` inventory to the root-level HTML entrypoints and the relevant `pacogo-engine` modules.
+
+- A1, B1, FR2 and the additional B1 demonstration pages expose `cycle.mastery` from the older skill-centric prototype cycle. This is not the bootstrap-exposed `app.mastery` service and is not canonical C6 mastery.
+- B1–B5 learner pages directly use `app.learnerCurriculum` for learner-profile creation/listing, history reads, registry-version lookup and learning-cycle persistence. Their existing identity remains learner + registry version + skill.
+- No additional direct local mastery-service or learner-curriculum-service calls were found in the scanned root HTML entrypoints.
+- `prototype.js`, `curriculum-registry.js` and `longitudinal-state.js` form a distinct skill-centric mastery/longitudinal route. `student-evidence-store.js` is a separate in-memory evidence store. None is an alias for the local lesson/item service or the canonical C6–C9 branch history.
+- The inspected C6/C7 and C8/C9 adapter modules do not import or call the local `mastery-service`. Their canonical ownership and full downstream consumer disposition remain open under G5/G7.
+- `src/features/wordtrainer/index.js` accepts and conditionally invokes a generic `recordResult` callback. No in-repository caller wiring that callback to `app.mastery` or `learnerCurriculum` was found in the `src/` and root HTML scans. Its destination remains UNKNOWN; external or dynamic wiring is not proven absent.
+
+### Compatibility disposition
+
+- Local lesson/item mastery, skill-centric prototype mastery, Supabase learner curriculum history, in-memory student evidence and C6–C9 decision/history remain separate systems.
+- No direct non-`src/` local mastery-service consumer was identified in the scanned HTML entrypoints.
+- No legacy callback destination is inferred.
+- G7 remains OPEN: remaining adapter/history/report/export consumers and external/dynamic callback wiring still require explicit disposition. G5 and G6 remain open; no implementation authorization follows from this inventory.
+
+### Deliberately unchanged
+
+No runtime code, tests, curriculum registry/catalogue, database schema, SQL/RPC/RLS, Supabase, learner data or local mastery state was changed.
+
+### Verification and repository state
+
+- Branch: `refactor/professional-v1`; HEAD before documentation update: `38114915242a450e858e8f8973b4c577c49cd242`; LIVE `main` untouched.
+- Full Regression #3111 / run ID `42393751796`: **GREEN** on exact commit `38114915242a450e858e8f8973b4c577c49cd242`. All 16 workflow steps completed successfully, including curriculum engine regression, architecture boundary tests, Node/Vitest regressions, browser regression and clean-working-tree verification.
+- This inventory update is documentation-only and requires its own Full Regression on the exact resulting commit. No post-update GREEN is claimed until that run completes.
+
+### Next concrete step
+
+Complete the remaining explicit consumer disposition for the adapter/history/report/export paths and unresolved external/dynamic callback boundary. Keep runtime and persistence unchanged. G5–G7 remain open; no implementation is authorized.

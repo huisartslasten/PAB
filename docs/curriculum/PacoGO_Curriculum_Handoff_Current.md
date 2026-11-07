@@ -2880,3 +2880,50 @@ No retry, support, timeout or resume behavior has been selected. D9 support-cond
 ### Next concrete step
 
 Reconcile the six lifecycle questions above against the C3 D9 decision and the multi-target task/evidence contract, without inventing retry or support semantics. Record which points are already determined by the source contracts and which require an explicit owner decision. In parallel, keep O6 unresolved until the target-assessment contract is approved. No runtime or persistence work before G5–G11 and explicit G12 authorization are complete.
+
+## 81. G6 lifecycle reconciliation — 2026-11-07
+
+### Work completed
+
+Readiness matrix Section 8.10 now reconciles the candidate identity hierarchy against:
+- C3 v0.2 raw observation and response-episode definitions;
+- the multi-target task/evidence contract;
+- the owner-confirmed Oefenen / Tussentoets / Toets support policy;
+- approved logical decisions O1 (one immutable raw observation with zero or more target-specific assessments) and O7 (separate idempotency boundaries).
+
+### Determined contract meaning
+
+- A task definition is reusable and versioned; a task instance is one concrete administration/presentation and records what was actually presented.
+- `task_attempt_id` should identify the complete response episode, not an individual click/edit/retry. This aligns the multi-target contract's explicit definition with C3's response-episode observation unit.
+- A retry is not automatically a new observation. Clicks, edits and retries remain ordered within the response episode unless a defined lifecycle transition starts a separately administered episode.
+- A content-help request during Tussentoets/Toets ends the independent attempt immediately. It is recorded as ended/incomplete, not learner failure or incorrect performance. The request and any delivered support are distinct events.
+- The subsequent supported-practice continuation is a separate attempt/response episode and raw observation; it must not be merged with the ended independent attempt.
+- One separately administered response episode produces one immutable raw observation. That observation may have zero, one or multiple target-specific assessments. Each target assessment links to exactly one observation and one target, with claim/development resolved from the registry.
+- O7 establishes the idempotency rule: same identity + same canonical immutable payload is a replay; same identity + different payload is an integrity conflict. Raw observation, assessment and decision are separate idempotency boundaries.
+
+### Remaining explicit decisions
+
+- Whether the independent-to-supported transition always creates a new task-instance ID. Recommended default for review: yes, because the administered support condition/presentation changes; the source decision requires a separate attempt/observation but does not explicitly settle task-instance reuse.
+- Generic practice abandonment, interruption, timeout, resume and restart boundaries.
+- Canonical event ID, event sequence/order, source-event idempotency key and opaque ID generation/collision semantics.
+- Neutral interface clarification versus target-relevant content help operational anchors.
+- Final target-assessment vocabulary, rules and version provenance under O6.
+
+No retry, timeout or resume behavior was invented. No runtime, tests, registry, schema, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Gate status
+
+- G5 OPEN: six-part branch/snapshot/evaluation lineage and O6 dependencies remain unresolved.
+- G6 OPEN: core response-episode and observation cardinality are reconciled; the remaining lifecycle/identity decisions above still require contract resolution.
+- G7 OPEN: in-repository consumer inventory is classified; external/dynamic callback destination remains UNKNOWN.
+
+### Verification and repository state
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Full Regression #3122 / run ID `42401383327`: **GREEN** on exact commit `a1e8e78e809be5ec7988064f9c4e85a36b6a3520`; all workflow steps passed, including browser regression and clean-working-tree verification.
+- G6 lifecycle readiness-matrix commit: `6a9ce01ebd18e8eeeed44a9db2afbac01ab828a6`.
+- This handoff update is another documentation-only repository change and requires Full Regression on its exact resulting commit. No post-update GREEN is claimed until that run completes.
+
+### Next concrete step
+
+Resolve the narrow remaining G6 lifecycle points against the owner-confirmed product policy: task-instance identity when support condition changes; generic interruption/resume/restart boundaries; event ordering and idempotency identity. Keep recommended defaults separate from approved decisions. In parallel, O6 must be completed before final target-assessment semantics or implementation. No runtime or persistence work before G5–G11 and explicit G12 authorization are complete.

@@ -770,3 +770,24 @@ Key recommendations:
 **Verification:** Full Regression #3135 / run ID `42418832606`: **GREEN** on exact decision-brief commit `84ecb723ed38654417c76850eebe5446adbfbdd3`; all workflow steps passed, including browser regression and clean-working-tree verification.
 
 **Gate status:** this is a recommendation package, not approval. G2/O6 remains OPEN. G3, G5 and G6 remain separate follow-on gates. No implementation is authorized.
+
+
+## 8.16 G3 candidate operational assessment verification specification — 2026-11-07
+
+**Specification:** `docs/curriculum/PacoGO_G3_Operational_Assessment_Rule_Verification_Specification_v0.1.md`.
+
+The project owner authorized continued work using O6 Decision Brief v0.1 as the working baseline. This is permission to develop the deterministic verification specification; it is not a final freeze of the versioned O6 contract and does not authorize runtime or persistence implementation.
+
+The G3 specification translates the O6 candidate rules into 40 deterministic logical vectors covering:
+- applicability, rule execution and result separation;
+- task-instance alignment versus response relation;
+- objective performance, process capture, no-response and strict ABSENT preconditions;
+- support requests versus delivered support and target-specific independence;
+- Tussentoets/Toets content-help termination, incomplete status and separate supported continuation;
+- observation-local contradiction;
+- one observation with multiple target assessments;
+- provenance, replay/conflict, reassessment and O5 availability cutoff;
+- A1, B1 and FR2 domain anchors, including preservation of unresolved B1 ET7 mapping;
+- the structured non-scored C6 M2 adequacy profile without changing C6 gate meanings.
+
+**Gate disposition:** G2/O6 remains OPEN until the exact versioned contract is frozen. G3 remains OPEN until G2 is frozen, the vectors are converted into executable contract tests, and the exact implementation commit passes Full Regression. G5/G6 remain separate dependent gates. No runtime, tests, registry, task catalogue, learner state, database, SQL/RPC/RLS, Supabase or learner data changed.

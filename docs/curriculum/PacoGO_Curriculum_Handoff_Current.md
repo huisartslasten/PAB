@@ -3556,7 +3556,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 101. G3-014 no-response default and prohibited outcomes — verification pending
+## 101. G3-014 no-response default and prohibited outcomes — verified
 
 ### Work implemented
 - Inspected G3-014 in the verification specification and O6 v0.3 §§5.2–5.5.
@@ -3567,7 +3567,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 ### Verification status
 - Implementation commit: `c87f8e93e7ce6bad94ff1f6b87ca02805937ca78`.
 - Pre-build Full Regression #3186 / run ID `42426951926`: GREEN on exact baseline commit `9f4ba92e4f8dfadccbeaa6e0e09f78b2b051ee25`.
-- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+- Full Regression #3188 / run ID `42427054170`: **GREEN** on exact implementation commit `c87f8e93e7ce6bad94ff1f6b87ca02805937ca78`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

@@ -2795,3 +2795,44 @@ No runtime, tests, registry, database schema, SQL/RPC/RLS, Supabase or learner d
 ### Next concrete step
 
 After the current documentation regression is green, continue G5 by reconciling the C6 output contract with the O8 six-part snapshot envelope and the still-open O6 target-assessment semantics. Keep candidate protocol fields distinct from approved fields. Then reconcile G6 identity/lifecycle for task definition, task instance, attempt, event and raw observation. No runtime or persistence work before G5–G11 and explicit G12 authorization are complete.
+
+## 79. G6 task/attempt/observation identity crosswalk — 2026-11-07
+
+### Work completed
+
+A read-only crosswalk of `interaction-contract.js`, browser runtime/controllers, the pilot execution path, the learner-curriculum persistence service, the existing evidence migration and the C2/C3/multi-target candidate contracts is recorded in readiness matrix Section 8.8.
+
+Confirmed current gaps:
+- `createTaskInstance` assigns the stable task ID directly to `task_instance_id`; task definition and administered instance are conflated.
+- `createObservation` then stores that instance ID in `task_id`, so the original definition ID is not preserved as a distinct field there.
+- The task-definition version is hardcoded as `0.1` in the current controllers.
+- No separate `task_attempt_id` is generated. Controllers record `attempts: 1` and prevent repeat submission.
+- Event IDs and observation IDs are timestamp-composed; no complete stable event/idempotency/attempt hierarchy is established.
+- The task instance carries an evidence-target array, but the observation projects only its first target into scalar `evidence_target_id`.
+- The browser vertical-slice runtime validates skill equality only, not full task/instance/target/registry lineage.
+- The pilot execution path distinguishes `task_id` and `task_instance_id`, but has no explicit `task_attempt_id`; it is a separate research execution model, not an approved runtime contract.
+- The current Supabase evidence row has scalar task-instance and target fields. The service maps `observation.task_id` into `task_instance_id`; the complete observation is also preserved in JSONB. This is a persistence compatibility boundary for later G8 review, not authorization for a schema change.
+
+### Contract interpretation
+
+C2 defines task-instance, interaction/observation, evidence assessment, inference and decision as separate layers. C3's candidate reconciliation defines a raw response episode containing ordered attempts/events and treats a separately started supported episode as distinct. The multi-target task/evidence proposal uses `task_attempt_id` for one learner interaction episode and links multiple target evidence items to that same attempt.
+
+These documents do not yet establish one approved, unambiguous hierarchy between task definition, administered task instance, task attempt/response episode, interaction event and raw observation. That relationship must be explicitly reconciled; no identity format or retry/support lifecycle is selected here.
+
+### Current gate status
+
+- G5 OPEN: current C6–C9 executable lineage does not match the proposed six-part snapshot envelope; O6 remains open.
+- G6 OPEN: task definition, instance, attempt, event and observation identities/lifecycle are not reconciled.
+- G7 OPEN: known in-repository consumers are classified; external/dynamic callback boundary remains UNKNOWN.
+- No runtime, tests, registry, Supabase, schema, SQL/RPC/RLS or learner data changed.
+
+### Verification and repository state
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Full Regression #3118 / run ID `42400675363`: **GREEN** on exact commit `8984ecac04351ee32e8fac8e3eedad46ffb7eef4`; all 16 workflow steps passed, including browser regression and clean-working-tree verification.
+- G6 readiness-matrix update commit: `c5af70a6afe9880e5e240c4206d53f988931ed70`.
+- This handoff update is another documentation-only change and requires Full Regression on its exact resulting commit. No post-update GREEN is claimed until that run completes.
+
+### Next concrete step
+
+Reconcile the candidate C2/C3/multi-target definitions into an explicit identity/lifecycle decision table: what creates a task instance, what creates a new response attempt/episode, which events belong to it, when a new immutable observation is created, and how independent-to-supported transitions are represented. Preserve the unresolved product/protocol decisions rather than inventing retry rules. Then map the resulting logical contract to existing C6/C7/C8/C9 provenance and only later to G8 persistence. No implementation before G5–G11 and explicit G12 authorization are complete.

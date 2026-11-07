@@ -2971,3 +2971,58 @@ It gives concrete proposed lifecycle rules:
 ### Next concrete step
 
 Do not reopen the already reconciled identity questions. Continue with the next readiness blocker: complete the G2/O6 operational C3 assessment contract, preserving PacoGO as the single operational assessor and keeping target-assessment semantics separate from raw observations. Once O6 is approved, reconcile the G6 lifecycle proposal against it and close G6 only if its acceptance criteria are met. No runtime or persistence work before G0–G11 and explicit G12 authorization.
+
+
+## 83. O6 operational assessment contract proposal — 2026-11-07
+
+### Verification of the preceding G6 documentation phase
+
+Full Regression #3127 / run ID `42402964108`: **GREEN** on exact handoff commit `ab5c3d734a8ee827bdaffcdd7fb484947bb66528`; all 19 workflow steps passed, including curriculum engine, architecture boundaries, Node/Vitest, browser regression and clean-working-tree verification. The preceding proposal and matrix commits also passed #3125 and #3126.
+
+### Source review and work completed
+
+Reviewed the current operational assessment contract, C3 v0.2 proposal, historical C3 specification/manual, observation/event reconciliation, task-support addendum, owner architecture decisions and both candidate observation schemas.
+
+Created `docs/curriculum/PacoGO_Operational_Assessment_Contract_v0.2.md` and recorded it in readiness matrix Section 8.12.
+
+The proposal recasts O6 around PacoGO's single operational assessment path. It does not carry forward historical human-coding workflow assumptions. It separates:
+- actual task-instance alignment;
+- response-to-target relation;
+- objective task performance;
+- per-stream process/capture availability;
+- target-specific evidence status;
+- planned support, help request, delivered support and target-specific independence;
+- target-specific contradiction with evidence reference/rationale;
+- a structured quality profile for C6 M2 instead of an unsupported generic numeric quality score;
+- alternative contextual facts from later claim-specific explanation;
+- assessment rule/engine/registry provenance from immutable raw observations.
+
+The proposal supplies candidate categories and explicit operational definitions, including:
+- `PRESENT` / `ABSENT` / `INDETERMINATE` / `NOT_ASSESSED` / `NOT_APPLICABLE` evidence states;
+- no-response is preserved as an observed event and defaults to INDETERMINATE, not ABSENT;
+- independence is target-specific and based on actual delivered support; a request alone is not delivery;
+- missing/incomplete event capture cannot produce INDEPENDENT;
+- contradiction is not an incorrect answer, missingness, task mismatch or help request;
+- no generic quality score or averaging; structured capture/scoring/interpretability inputs are proposed for the existing M2 gate without changing its meaning.
+
+Synthetic cases are included as future rule-test vectors only; they are not learner evidence or scientific validation.
+
+### Gate status and limits
+
+- G2/O6 remains OPEN pending explicit approval of categories, anchors, the M2 profile, no-response exceptions and target-specific rules.
+- G3 remains OPEN; operational rules and test vectors follow approved O6.
+- G5 remains OPEN; the C3 output-to-C6/C7/C8/C9 handoff still requires reconciliation.
+- G6 remains OPEN pending reconciliation of the lifecycle proposal with the approved O6 contract.
+- G7 remains OPEN; G8–G12 remain unclosed. No implementation is authorized.
+- No runtime, tests, registry, catalogue, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Repository and verification
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- O6 contract proposal commit: `3eefe762dd193152711cb2bb8f975e91da0cdefa`.
+- Readiness matrix update commit: `9f865e96036532bea50f7a9a714aaba353bc4c47`.
+- This handoff update is a further documentation-only repository change and requires Full Regression on its exact resulting commit. No post-update GREEN is claimed until that run completes.
+
+### Next concrete step
+
+Review the O6 proposal against the current curriculum and task contracts, then resolve any category/anchor conflicts before creating the versioned canonical C3 contract. In particular, verify that `PROMPTED` versus `DEPENDENT` is target-specific and behaviorally distinguishable; that `ABSENT` requires an adequate aligned opportunity and sufficient capture; and that the structured M2 profile preserves C6's existing gate meaning. Do not implement or change C6–C9 until the O6 contract is approved and G5 is reconciled. No runtime or persistence work before G0–G11 and explicit G12 authorization.

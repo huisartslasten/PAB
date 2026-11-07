@@ -253,6 +253,58 @@ The C7 decision must retain the exact C6 evaluation reference, the unchanged bra
 
 C7 remains a candidate-action selector only. It does not mutate learner state, write mastery, promote the registry, or authorize automatic progression.
 
+
+### 7.10 C8 history and C9 validation crosswalk
+
+**Status: source reconciliation; C8/C9 remain proposals requiring owner review.**
+
+C8 consumes committed decisions. It does not create or repair them. A canonical C8 history item must preserve, without reinterpretation:
+
+- a unique history-item identity;
+- the exact six-part branch identity;
+- the immutable `decision_snapshot_id`;
+- the exact `c6_evaluation_id` and `c7_decision_id`;
+- the validated evaluation timestamp;
+- the snapshot event-time boundaries and assessment-availability cutoff;
+- the unique source-observation references and exact target-assessment record/version references admitted by that snapshot;
+- the exact C6 mastery outcome and exact C7 action/hold outcome;
+- the applicable registry, assessment, C6, C7 and C8 contract/version provenance;
+- explicit status/reason references for exclusions, corrections or supersession where applicable.
+
+C8 ordering is based on validated evaluation time, with a stable identity tie-breaker; caller array order is not authoritative. A new snapshot/evaluation creates a new history item. It never rewrites an earlier item. A canonical branch history contains one exact six-part identity only. Empty history may be represented as `NOT ASSESSED` without implying evidence of absence.
+
+The exact C3 assessment-state vocabulary and assessment-version fields remain unresolved under O6. C8 may preserve those source references and versions but must not invent or normalize their categories. C8's optional cross-branch projection is a separate descriptive product and remains blocked by O9; it cannot pool evidence or create a combined mastery/action result.
+
+C9 validates each supplied branch independently. Its minimum structural checks must cover:
+
+1. all six identity fields are present, resolvable and identical across snapshot, C6, C7 and C8;
+2. the registry version resolves the claim/development/target relationship;
+3. each included target-assessment record points to the exact source observation and is eligible under the snapshot's scope, event-time interval and availability cutoff;
+4. the frozen snapshot lists exact eligible observations and target-assessment records/versions, with explicit exclusions;
+5. C6 references the exact snapshot and branch;
+6. C7 references the exact C6 evaluation and preserves its branch;
+7. C8 references that same snapshot/C6/C7 chain and contains no foreign branch item;
+8. shared observations retain one source identity and are not duplicated to satisfy target cardinality;
+9. legacy/unscoped records remain outside canonical branch validation unless a separately approved adapter supplies traceable provenance;
+10. no stage silently repairs missing or conflicting lineage.
+
+C9 output must be traceable per full six-field branch, with explicit checks, source references and stage-attributed errors. A multi-branch request returns independent per-branch validation results and may report shared observation references; it must never return pooled mastery or next-action state. C9 validates structure and permissions only, not scientific validity or educational outcomes.
+
+### 7.11 Cross-stage disposition and remaining G5 closure
+
+The combined C6→C7→C8→C9 lineage is now logically aligned around:
+
+`six-part branch → immutable snapshot → exact C6 evaluation → exact C7 decision → one-branch C8 history item → per-branch C9 structural result`
+
+Still required before G5 can close:
+- reconcile and approve the C6/C7/C8/C9 candidate protocol versions as one consistent contract set;
+- resolve O6 target-assessment inputs and version/provenance semantics;
+- agree cross-stage positive, negative, missing and mismatch examples/test vectors;
+- finish the legacy/scalar compatibility disposition with G6/G7;
+- confirm all negative permissions and references consistently across the four stages.
+
+O9 remains necessary only for learner-facing cross-branch presentation, not for this internal single-branch lineage. No C8 cross-branch projection is approved by this crosswalk.
+
 ### 7.6 G5 exit criteria
 
 G5 can close only after:

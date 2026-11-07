@@ -3495,3 +3495,24 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN.
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+
+
+## 98. G3-012 incorrect-performance/contradiction separation — verification pending
+
+### Work implemented
+- Inspected G3-012 in the verification specification and O6 v0.3 §§5.3 and 5.7.
+- Strengthened `pacogo-engine/operational-assessment-contract.test.js`: objective performance `INCORRECT` is tied to the test-only objective scoring-rule result, while target evidence and contradiction remain separate.
+- The positive fixture accepts `INCORRECT` with evidence and contradiction both `INDETERMINATE` where those conclusions are not independently established. A negative fixture rejects contradiction `PRESENT` when no specific contradiction source material is supplied.
+- This is a test-only normalized logical-record fixture, not a production assessor, persisted field or API. No production runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification status
+- Implementation commit: `3d2d1baa55f82707935cd384f02adfdbff7099c3`.
+- Pre-build Full Regression #3177 / run ID `42426432508`: GREEN on exact baseline commit `16c134c91674eba76b75674af9c89e88df867a3b`.
+- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+
+### Gate status
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.

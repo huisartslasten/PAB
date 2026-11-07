@@ -466,3 +466,23 @@ These are inventory gaps, not instructions to add tests before the upstream cont
 - No adapter is designated canonical yet.
 - No scalar compatibility adapter, backfill, registry mapping change, schema change, learner-state migration or Supabase work is authorized.
 - This is an initial inventory of the inspected sources, not a claim that every application consumer has been enumerated.
+
+
+### 8.5 Non-`src/` consumer scan and callback disposition — 2026-11-07
+
+Read-only inspection was extended to the repository's root-level HTML entrypoints and the relevant `pacogo-engine` modules. This supplements, but does not replace, the 351-file `src/` scan in Section 8.3.
+
+| Consumer / seam | Verified source behavior | Disposition |
+|---|---|---|
+| A1, B1 and FR2 browser demonstrations | The root pages expose `cycle.mastery` from the skill-centric `curriculum-registry.js` / `prototype.js` cycle. | Separate prototype/skill-cycle result. It is not `app.mastery`, not localStorage lesson/item mastery, and not the canonical C6 mastery decision. |
+| Additional B1 demonstration pages | The memorization-countertask, prompted-independent, strategy-variation and symbolic-addition pages also expose `cycle.mastery`. | Same skill-centric prototype boundary; no local mastery-service call was found. |
+| B1–B5 learner pages | The five root learner pages call `app.learnerCurriculum` for learner profiles, history reads, registry-version lookup and learning-cycle persistence. | Existing learner + registry-version + skill persistence route. No six-part branch identity is implied; preserve the existing Supabase/RPC contract. |
+| Other root-level HTML entrypoints | The repository's root HTML entrypoints were scanned for `mastery`, `learnerCurriculum`, `recordResult`, `studentEvidence` and related curriculum-runtime references. No additional direct call to the local mastery service or learner-curriculum service was found. | No additional direct non-`src/` consumer identified in the scanned HTML entrypoints. This does not establish absence of dynamically loaded or external consumers. |
+| Skill-centric engine modules | `prototype.js` defines skill-cycle mastery inference; `curriculum-registry.js` invokes `runSkillCycle` and returns `cycle.mastery`; `longitudinal-state.js` consumes that skill-cycle result. | A distinct legacy/prototype engine path. Do not alias its result to C6–C9 or to the local lesson/item service. |
+| In-memory evidence store | `student-evidence-store.js` maintains its own in-memory evidence records. | Separate evidence-store mechanism; no equivalence with localStorage mastery or Supabase learner history is established. |
+| C6/C7 and C8/C9 adapter modules | The inspected adapters consume C6/C7-shaped inputs and emit downstream decision/history structures; they do not import or call the local `mastery-service`. | Keep as separate engine contract paths. Their canonical ownership and complete consumer disposition remain open under G5/G7; do not select or patch an adapter by inference. |
+| Wordtrainer `recordResult` callback | `src/features/wordtrainer/index.js` accepts an optional callback and invokes it after evaluation when supplied. No in-repository caller wiring it to `app.mastery` or `learnerCurriculum` was found in the `src/` scan or root HTML scan. | Destination remains UNKNOWN / unresolved legacy seam. Do not assume it writes local mastery, curriculum evidence or learner history. External/dynamic wiring is not proven absent. |
+
+**Scan boundary:** this establishes the observed repository call paths described above. It does not prove the absence of external consumers, runtime-generated imports, deployment-side scripts or integrations not represented in the inspected repository tree.
+
+**G7 disposition:** the known in-repository direct consumers now have explicit ownership classifications. G7 remains OPEN until the remaining adapter/history/report/export consumers and any external/dynamic callback wiring have an explicit disposition, and until the G5/G6 contracts they depend on are reconciled. No adapter, migration or canonical write path is approved by this inventory.

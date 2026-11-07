@@ -47,10 +47,85 @@ function assertAssessment(record) {
   assert.ok(record.observation_id.trim());
   assert.equal(typeof record.evidence_target_id, 'string');
   assert.ok(record.evidence_target_id.trim());
+  assert.ok(record.task_instance && record.dimensions, 'task instance and dimensions are required');
+
   for (const [name, vocabulary] of Object.entries(RESULT)) {
     if (record.dimensions[name]) assertDimension(record.dimensions[name], vocabulary, name);
   }
+
+  const alignment = record.dimensions.alignment?.result;
+  const relation = record.dimensions.relation?.result;
+  const performance = record.dimensions.performance?.result;
+  const evidence = record.dimensions.evidence?.result;
+  const independence = record.dimensions.independence?.result;
+  const contradiction = record.dimensions.contradiction?.result;
+
+  if (alignment === 'PARTIALLY_ALIGNED') {
+    assert.equal(typeof record.task_instance.component_id, 'string', 'partial alignment requires a named separable component');
+    assert.ok(record.task_instance.component_id.trim());
+  }
+  if (relation === 'NONE') {
+    assert.equal(record.raw_response_status, 'RESPONSE_PRESENT', 'NONE requires an existing response');
+    assert.equal(record.task_instance.actual_response_inspectable, true, 'NONE requires an inspectable response');
+  }
+  if (record.raw_response_status === 'NO_RESPONSE') {
+    assert.equal(performance, 'NOT_OBSERVED', 'NO_RESPONSE must be NOT_OBSERVED');
+    assert.equal(relation, 'INDETERMINATE', 'NO_RESPONSE must not be NONE');
+    assert.equal(evidence, 'INDETERMINATE', 'NO_RESPONSE evidence is INDETERMINATE by default');
+  }
+  if (evidence === 'ABSENT') {
+    assert.equal(alignment === 'ALIGNED' || alignment === 'PARTIALLY_ALIGNED', true, 'ABSENT requires valid task alignment');
+    assert.equal(record.task_instance.criterion_defined, true, 'ABSENT requires a pre-defined criterion');
+    assert.equal(record.task_instance.required_material_defined, true, 'ABSENT requires pre-defined required material');
+    assert.equal(record.task_instance.required_material_captured, true, 'ABSENT requires complete capture');
+    assert.equal(record.task_instance.required_material_inspectable, true, 'ABSENT requires inspectable material');
+    assert.equal(record.process?.required_streams_complete, true, 'ABSENT requires complete required streams');
+    assert.equal(record.criterion?.met, false, 'ABSENT requires the criterion not to be met');
+  }
+  if (evidence === 'PRESENT') {
+    assert.equal(alignment === 'ALIGNED' || alignment === 'PARTIALLY_ALIGNED', true, 'PRESENT requires valid elicitation');
+    assert.equal(record.criterion?.met, true, 'PRESENT requires the pre-specified criterion to be met');
+    assert.equal(record.task_instance.required_material_inspectable, true, 'PRESENT requires inspectable material');
+  }
+  if (independence === 'INDEPENDENT') {
+    assert.equal(record.process?.required_streams_complete, true, 'INDEPENDENT requires sufficiently complete event capture');
+    assert.notEqual(record.support?.target_relevant, true, 'INDEPENDENT forbids delivered target-relevant assistance');
+  }
+  if (independence === 'PROMPTED') {
+    assert.equal(record.support?.delivered, true, 'PROMPTED requires delivered support');
+    assert.equal(record.support?.target_relevant, true, 'PROMPTED requires target-relevant support');
+    assert.equal(record.support?.supplied_required_operation, false, 'PROMPTED leaves the required operation to the learner');
+  }
+  if (independence === 'DEPENDENT') {
+    assert.equal(record.support?.delivered, true, 'DEPENDENT requires delivered support');
+    assert.equal(record.support?.target_relevant, true, 'DEPENDENT requires target-relevant support');
+    assert.equal(record.support?.supplied_required_operation, true, 'DEPENDENT support supplies a required operation');
+  }
+  if (contradiction === 'PRESENT') {
+    assert.equal(typeof record.contradiction_source?.event_id, 'string', 'contradiction must cite source material');
+    assert.ok(record.contradiction_source.event_id.trim());
+    assert.equal(typeof record.contradiction_source?.conflicts_with, 'string', 'contradiction must identify the conflicting interpretation');
+    assert.ok(record.contradiction_source.conflicts_with.trim());
+  }
   return true;
+}
+
+function assertIndependentAttempt(attempt) {
+  assert.ok(['Tussentoets', 'Toets'].includes(attempt.mode));
+  if (attempt.help_request === 'content_help') {
+    assert.equal(attempt.ended, true, 'content-help request ends the independent attempt');
+    assert.equal(attempt.status, 'INCOMPLETE', 'ended independent attempt is incomplete, not failed');
+  }
+  if (attempt.help_request === 'interface_clarification' && attempt.supplies_target_reasoning === false) {
+    assert.equal(attempt.ended, false, 'neutral interface clarification does not end the attempt');
+  }
+}
+
+function assertAdequacyProfile(profile) {
+  const required = ['capture_integrity', 'response_interpretability', 'scoring_validity', 'administration_fidelity', 'source_provenance_integrity'];
+  for (const key of required) assert.ok(Object.hasOwn(profile, key), 'missing M2 profile component: ' + key);
+  assert.equal(Object.hasOwn(profile, 'score'), false, 'M2 profile must not be scored');
+  assert.equal(Object.hasOwn(profile, 'quality_total'), false, 'M2 profile must not have a composite total');
 }
 
 function base(overrides = {}) {
@@ -134,7 +209,7 @@ test('G3-008: partial alignment names a pre-defined separable component', () => 
 });
 
 test('G3-009: NONE requires an inspectable response', () => {
-  const record = base({ task_instance: { ...base().task_instance, actual_response_inspectable: true }, dimensions: { relation: dimension('NONE') } });
+  const record = base({ raw_response_status: 'RESPONSE_PRESENT', task_instance: { ...base().task_instance, actual_response_inspectable: true }, dimensions: { relation: dimension('NONE') } });
   assertAssessment(record);
   const noResponse = base({ task_instance: { ...base().task_instance, actual_response_inspectable: false }, dimensions: { relation: dimension('NONE') } });
   assert.throws(() => {
@@ -276,6 +351,7 @@ test('G3-026: independence is assessed separately for each target', () => {
 
 test('G3-027: content-help request ends independent assessment incomplete even without delivery', () => {
   const attempt = { mode: 'Tussentoets', help_request: 'content_help', support_delivered: false, ended: true, status: 'INCOMPLETE' };
+  assertIndependentAttempt(attempt);
   assert.equal(attempt.ended, true);
   assert.equal(attempt.status, 'INCOMPLETE');
   assert.equal(attempt.support_delivered, false);
@@ -283,6 +359,7 @@ test('G3-027: content-help request ends independent assessment incomplete even w
 
 test('G3-028: neutral answer-entry clarification does not end independent assessment', () => {
   const attempt = { mode: 'Toets', help_request: 'interface_clarification', supplies_target_reasoning: false, ended: false };
+  assertIndependentAttempt(attempt);
   assert.equal(attempt.ended, false);
 });
 
@@ -415,7 +492,50 @@ test('C6 M2 adequacy remains a structured non-scored profile', () => {
     administration_fidelity: 'NO_DEVIATION_RECORDED',
     source_provenance_integrity: 'TRACEABLE'
   };
-  assert.equal(Object.hasOwn(profile, 'score'), false);
-  assert.equal(Object.hasOwn(profile, 'quality_total'), false);
+  assertAdequacyProfile(profile);
   assert.equal(Object.keys(profile).length, 5);
+});
+
+
+test('negative contract cases reject prohibited shortcuts', () => {
+  const noResponseAsIncorrect = base({
+    raw_response_status: 'NO_RESPONSE',
+    task_instance: { ...base().task_instance, actual_response_inspectable: false },
+    dimensions: { performance: dimension('INCORRECT'), relation: dimension('INDETERMINATE'), evidence: dimension('INDETERMINATE') }
+  });
+  assert.throws(() => assertAssessment(noResponseAsIncorrect), /NO_RESPONSE must be NOT_OBSERVED/);
+
+  const absentWithMissingCapture = base({
+    criterion: { met: false },
+    task_instance: { ...base().task_instance, required_material_captured: false },
+    dimensions: { alignment: dimension('ALIGNED'), evidence: dimension('ABSENT') }
+  });
+  assert.throws(() => assertAssessment(absentWithMissingCapture), /ABSENT requires complete capture/);
+
+  const independentDespiteDeliveredTargetHelp = base({
+    support: { delivered: true, target_relevant: true },
+    dimensions: { independence: dimension('INDEPENDENT') }
+  });
+  assert.throws(() => assertAssessment(independentDespiteDeliveredTargetHelp), /INDEPENDENT forbids/);
+
+  const dependentWithoutDeliveredHelp = base({
+    support: { delivered: false, target_relevant: false, supplied_required_operation: false },
+    dimensions: { independence: dimension('DEPENDENT') }
+  });
+  assert.throws(() => assertAssessment(dependentWithoutDeliveredHelp), /DEPENDENT requires delivered support/);
+
+  const contradictionWithoutSource = base({ dimensions: { contradiction: dimension('PRESENT') } });
+  assert.throws(() => assertAssessment(contradictionWithoutSource), /contradiction must cite source material/);
+});
+
+test('M2 profile rejects missing components and aggregate scores', () => {
+  assert.throws(() => assertAdequacyProfile({ capture_integrity: 'AVAILABLE' }), /missing M2 profile component/);
+  assert.throws(() => assertAdequacyProfile({
+    capture_integrity: 'AVAILABLE',
+    response_interpretability: 'INTERPRETABLE',
+    scoring_validity: 'APPLICABLE',
+    administration_fidelity: 'NO_DEVIATION_RECORDED',
+    source_provenance_integrity: 'TRACEABLE',
+    quality_total: 4
+  }), /M2 profile must not have a composite total/);
 });

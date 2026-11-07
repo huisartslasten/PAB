@@ -2323,7 +2323,9 @@ The operational assessment contract explicitly leaves exact ID format and retry/
 ### Disposition
 - The incomplete implementation is rolled back as a whole. The code tree is restored to the pre-attempt baseline `2b59128f0c5464e8c62bfd8b98eb1649c6989b7f`; no browser or unit test is weakened or rewritten.
 - No curriculum registry, task catalogue, C1–C9 rule, persistence schema, SQL/RPC/RLS, Supabase or learner data is changed by this rollback.
-- The rollback and this handoff correction are committed together. Full Regression on the resulting exact commit is required; no GREEN status is claimed until that run completes.
+- The rollback and this handoff correction were committed together as `beec853681cd3892e60bde1731b36c2d7f4809c4`.
+- Full Regression #3092 / run ID `42321723716`: **GREEN** on that exact commit; all 19 workflow steps passed, including curriculum engine, architecture, maintained Node, maintained Vitest, browser regression and clean-working-tree verification.
+- This subsequent handoff status update is itself a repository change and requires Full Regression on its exact resulting commit.
 - LIVE `main` remains untouched.
 
 ### Next concrete step

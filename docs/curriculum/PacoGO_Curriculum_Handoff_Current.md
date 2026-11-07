@@ -2150,3 +2150,65 @@ The review compares the current C3 v0.2 candidate, coding specification/manual, 
 
 ### Next concrete step
 Prepare the explicit O6 owner/scientific decision record using the C3 v0.2 proposal and this review. Do not select categories, quality scale, reliability statistic or threshold on the owner's behalf. In parallel, O5's existing Scope/Time-Window Lifecycle Contract remains the candidate for owner review, and O9 still requires a product decision. Only after O5/O6/O9 and G5–G11 are resolved may G12 implementation authorization be considered. B1-L08, runtime fan-out, schema changes and Supabase work remain blocked.
+
+
+## 63. Correction — learner assessment ownership and C3 coder premise — 2026-11-06
+
+### Owner-confirmed learner interaction contract
+
+Source: `PacoGO_Task_Support_Conditions_and_Independence_Contract_v0.1.md`.
+
+- **OEFENEN:** the learner may ask PacoGO for help, including explanation, hints or examples. Help-seeking is a normal learning action, not failure.
+- **TUSSENTOETSEN:** independent assessment of a smaller, explicitly defined part of an existing learning objective/scope; no content help.
+- **TOETSEN:** independent assessment over a broader part of the existing learning objective/scope; no content help.
+- A content-help request during TUSSENTOETSEN or TOETSEN immediately ends that attempt. PacoGO records the attempt as ended/incomplete and the request; it is not a failed learner result or incorrect answer. The learner returns to OEFENEN in a separate attempt.
+- A help request is distinct from assistance actually delivered.
+- TUSSENTOETSEN and TOETSEN are **afnamevormen**, not new skills, developments, evidence targets or mastery rules.
+- **PacoGO is the single operational assessor. No second human assessor, coder rounds, adjudication workflow or parallel rating process is part of learner runtime.**
+
+### Corrected learner evidence pipeline
+
+`task definition → administered attempt → immutable raw observation → PacoGO target-specific assessment under a versioned C3 contract → C6 inference/mastery → C7 next action → learner state/history`
+
+The human-coder premise in recent multi-target/C3 documents was incorrectly imported into the learner evidence pipeline. It is withdrawn.
+
+The following distinctions remain valid:
+- raw learner response/process is not the same as its assessment;
+- one raw observation may relate to multiple separately justified target assessments;
+- task target opportunities are not automatically evidence;
+- objective correctness alone does not establish mastery, independence or reasoning;
+- planned support condition, learner help request and support actually delivered are distinct;
+- assessment status and provenance must be versioned and inspectable;
+- one learner episode must never be duplicated to inflate evidence counts.
+
+The following are **not** part of the PacoGO learner-runtime architecture or prerequisites:
+- human coder IDs or coder rounds;
+- independent double-coding;
+- coder adjudication;
+- inter-rater reliability as a production gate;
+- human assessment of each learner observation.
+
+PacoGO's operational C3 assessment rules still require scientific/technical specification: target alignment, response relation, performance, process availability, evidence status, assistance/independence, contradiction, quality (if retained), unknown/insufficient-data behavior and schema/version provenance. This is an assessment-contract question, not a human-coder workflow.
+
+Future Scientific Validation must independently evaluate PacoGO's claims and decisions against suitable independent measures. That research stream is separate from learner assessment and must not silently reintroduce human coders into runtime.
+
+### Impacted artifacts requiring reconciliation
+
+- `PacoGO_Multi_Target_Owner_Architecture_Decisions_v0.1.md` — O1/O4/O7 and O6;
+- `PacoGO_Multi_Target_Implementation_Readiness_Matrix_v0.1.md` — G2/G3/G8/G9/G11;
+- `PacoGO_Integrated_Multi_Target_Decision_Contract_v0.2.md`;
+- `PacoGO_Scope_and_Time_Window_Lifecycle_Contract_v0.1.md`;
+- `PacoGO_C3_Canonical_Codebook_Reconciliation_Proposal_v0.2.md`;
+- `PacoGO_C3_Consolidated_Observation_Event_Coding_Contract_Reconciliation_v0.1.md`;
+- `PacoGO_C3_Descriptive_Coding_Reliability_Layer_v0.1.md`;
+- `PacoGO_C3_Scientific_Measurement_and_Coding_Review_v0.1.md` — WITHDRAWN as an architecture basis;
+- `PacoGO_Evidence_Coding_Manual_v0.1.md` and related synthetic coder packet/key.
+
+The owner-confirmed task-support contract is the source for the three learner modes and single-assessor policy. No runtime, registry, schema, database, Supabase or learner-data changes are authorized by this correction. Existing legacy skills remain untouched; B1-L08 remains blocked.
+
+### Verification and next step
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Full Regression #3066 / run ID `42317429411`: GREEN on exact commit `1ef4ac5ea08598e05078e4a186ee92e4290de6a2`; all 19 workflow steps passed.
+- These documentation corrections are not yet verified. Full Regression must run on the exact resulting commit before this correction is considered complete.
+- Next: reconcile the impacted candidate contracts against this owner-confirmed product policy. Do not implement code or persistence while those contracts remain inconsistent.

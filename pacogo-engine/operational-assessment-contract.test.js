@@ -129,7 +129,7 @@ function assertAdequacyProfile(profile) {
 }
 
 function base(overrides = {}) {
-  return {
+  const defaults = {
     observation_id: 'obs-1',
     evidence_target_id: 'target-1',
     task_instance: {
@@ -151,8 +151,16 @@ function base(overrides = {}) {
     },
     criterion: { met: true },
     support: { request: false, delivered: false, target_relevant: false },
-    process: { required_streams_complete: true },
-    ...overrides
+    process: { required_streams_complete: true }
+  };
+  return {
+    ...defaults,
+    ...overrides,
+    task_instance: { ...defaults.task_instance, ...overrides.task_instance },
+    dimensions: { ...defaults.dimensions, ...overrides.dimensions },
+    criterion: { ...defaults.criterion, ...overrides.criterion },
+    support: { ...defaults.support, ...overrides.support },
+    process: { ...defaults.process, ...overrides.process }
   };
 }
 

@@ -1,6 +1,6 @@
 # PacoGO — G3 to O6 v0.3 Traceability and Gap Review v0.1
 
-Status: **design reconciliation; no executable tests or implementation authorization**  
+Status: **G2/O6 frozen; first G3 test-only contract-conformance suite implemented; G3 remains open**  
 Date: 2026-11-07  
 Branch: `refactor/professional-v1`  
 O6 baseline: `PacoGO_Operational_Assessment_Contract_v0.3.md`  
@@ -74,18 +74,29 @@ Every test must assert both the expected result and prohibited shortcuts. Exampl
 - content-help request during independent assessment ends the attempt incomplete even when no support is delivered;
 - neutral answer-entry clarification does not itself end the independent attempt.
 
-## 5. G2 acceptance boundary
+## 5. G2 approval boundary
 
-O6 v0.3 is now the consolidated working contract. This review shows the G3 candidate vectors can be traced to it without changing curriculum meanings. It does not convert the earlier working-baseline direction into final approval of every O6 category.
-
-Before G2 closes, the owner must accept this exact v0.3 contract as the versioned operational assessment contract, or request specific revisions. This is the only remaining owner decision at this stage; it is not a request to reopen the already-confirmed Oefenen/Tussentoets/Toets product policy.
+The owner approved the exact logical contents of O6 v0.3 on 2026-11-07. G2 is CLOSED at the logical-contract level. The approved contract is frozen as the source for G3 conformance tests. This approval does not authorize runtime, learner-state, registry, task-catalogue, persistence or Supabase implementation.
 
 ## 6. Gate disposition
 
-- G2/O6: OPEN pending acceptance of exact v0.3.
-- G3: candidate vectors reconciled; OPEN pending G2 freeze and executable contract tests.
+- G2/O6: **CLOSED** — exact logical contract v0.3 approved and frozen.
+- G3: **OPEN** — first test-only contract-conformance suite exists and passes Full Regression; it validates normalized logical output fixtures, not a production assessor. Further tests must cover remaining vectors and must not invent dependency-bound semantics.
 - G5: OPEN; exact C3-to-C6–C9 mapping, including M1/M2, remains separate.
 - G6/G9: OPEN; identity and idempotency details remain separate.
 - O5: remains authoritative for snapshot and availability cutoff.
 - No runtime, executable tests, registry, task catalogue, learner state, database, SQL/RPC/RLS, Supabase or learner data changed.
 - LIVE `main` untouched.
+
+
+## 7. First executable G3 contract-conformance suite — 2026-11-07
+
+Added `pacogo-engine/operational-assessment-contract.test.js`.
+
+The suite provides a test-only normalized logical record representation and conformance assertions for O6 v0.3. It covers the direct rule boundaries in G3-001–036, A1/B1/FR2 preservation examples and the non-scored M2 profile. It explicitly marks G3-037–039 as blocked on G6/G9 identity/payload semantics and G3-040 as blocked on O5 cutoff semantics.
+
+**Important scope:** this is a test-only conformance harness over synthetic logical records. It is not a production assessor, does not derive learner judgments from raw responses, does not establish a persisted schema or ID format, and does not change runtime behavior. Its value is to make the frozen contract's required distinctions and prohibited shortcuts executable before a production assessment implementation is designed.
+
+**Verification:** Full Regression #3154 / run ID `42424440906`: **GREEN** on exact test commit `4ae2420753e9a10bcfc094b695d3b42d20792264`. Curriculum-engine regression, architecture boundaries, Node, Vitest, browser regression and clean-working-tree verification all passed.
+
+**Gate status:** G3 remains OPEN. Next work is to strengthen the suite so each vector is backed by reusable contract assertions and explicit negative cases, then separately design the actual operational assessor only after the applicable gates and implementation authorization. No runtime or persistence changes were made.

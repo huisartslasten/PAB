@@ -1,3 +1,5 @@
+> **ARCHIVED SYNTHETIC ADJUDICATION KEY — NOT PART OF LEARNER RUNTIME.** The human-coder/adjudication workflow that this key assumes has been withdrawn. Do not use it as an operational learner-assessment artifact or implementation requirement.
+
 # PacoGO C3 — Synthetic Coder Adjudication Key v0.1
 
 Status: Restricted companion to the blinded synthetic coder packet / candidate adjudication guidance / not an approved canonical codebook

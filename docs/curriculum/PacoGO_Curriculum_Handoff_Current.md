@@ -4005,7 +4005,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 ### Verification status
 - Pre-build Full Regression #3277 / run ID `42463050793`: GREEN on exact baseline commit `ee977cc2e64eae712cb58b7c85ed50c4ebe6c3b5`.
 - Implementation commit: `263dfcf14aa946f2aa43053c541058609ddf6533`.
-- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+- Full Regression #3278 / run ID `42463163132`: **GREEN** on exact implementation commit `263dfcf14aa946f2aa43053c541058609ddf6533`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed. The pending handoff/matrix status update must also pass Full Regression before the next build vector.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

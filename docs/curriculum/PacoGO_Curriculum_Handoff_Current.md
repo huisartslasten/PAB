@@ -4145,3 +4145,32 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3 remains OPEN because G3-037–039 still depend on G6/G9 identity and canonical-payload semantics.
 - G2/O6 remains CLOSED. G5, G6/G9 and G12 remain separate gates. No production implementation authorization is implied.
 - Next: reconcile the existing G6 task/attempt/observation lifecycle proposal with approved O6 v0.3, clearly separating determined contract requirements from owner decisions still needed. Do not infer G6/G9 identity or canonical-payload behavior and do not begin runtime/persistence work.
+
+
+## 128. G6 support-condition identity boundary — owner-approved logical decision
+
+### Decision
+- On 2026-11-08 the owner approved the explicit logical identity consequence for a material change in support condition.
+- A material support-condition change creates a new task instance, a new response episode and a new immutable raw observation.
+- In the confirmed Tussentoets/Toets flow, a content-help request ends the independent episode as incomplete. The supported-practice continuation is a separate administration and must not be merged into the independent episode.
+- All pre-request events and the incomplete independent episode remain preserved.
+- A neutral interface clarification that supplies no target reasoning does not itself change the support condition and does not create a new administration identity.
+- Ordinary answer revisions/retries within the same administration remain events in the same response episode.
+
+### Implementation and verification
+- Added test-fixture-only G6 checks for three distinct identities across a material support-condition transition and for identity continuity during neutral interface clarification.
+- The tests use logical fixture identifiers only; they do not define physical ID formats, storage keys, schema, API or runtime behavior.
+- Test commit: `e14fd5fced63d3db4c1e94d9fbf397201256843e`; Full Regression #3317 / run ID `42498366233`: **GREEN** on that exact commit.
+- G6 proposal update: `612599a46a8f807fbdc3b28cac9f43376b980251`; Full Regression #3318 / run ID `42498549925`: **GREEN** on that exact commit.
+- Owner architecture decision record update: `abad589e70ca2f504b4eb02acaa8162a640ecfbd`; Full Regression #3319 / run ID `42498553242`: **GREEN** on that exact commit.
+- All three runs passed curriculum-engine regression, architecture boundaries, maintained Node/Vitest, browser regression and clean-working-tree verification.
+
+### Remaining G6/G9 work
+- G6 remains OPEN. Explicit decisions/reconciliation are still required for completion, abandonment, interruption/resume, restart, timeout, event lifecycle and full alignment with the final C3/O6 model.
+- G9 remains OPEN for canonical immutable payload representation, stage status, retries, concurrency and durable recovery. O7's logical same-identity/same-payload replay versus same-identity/different-payload conflict rule does not define a physical canonical serializer.
+- G3-037–039 therefore remain BLOCKED until the relevant G6 and G9 semantics are fully approved and testable.
+- No runtime, database, SQL/RPC/RLS, Supabase, curriculum registry, learner data or production assessment behavior changed.
+- Branch remains `refactor/professional-v1`; LIVE `main` untouched.
+
+### Next concrete step
+- Reconcile the remaining G6 lifecycle transitions against C3 v0.2 and frozen O6 v0.3. Keep logical decisions separate from G9 payload serialization and G8/G10 persistence/security design. Do not implement runtime or persistence.

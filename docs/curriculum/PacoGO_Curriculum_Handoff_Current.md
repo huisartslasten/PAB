@@ -3661,3 +3661,24 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN.
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+
+
+## 106. G3-019 positive target-evidence preconditions — verification pending
+
+### Work implemented
+- Inspected G3-019 in the G3 verification specification and O6 v0.3 §§1, 5.5 and 9.
+- Strengthened the shared `assertAssessment` so target evidence `PRESENT` requires valid target elicitation, a pre-defined criterion, pre-defined required material, the criterion being met, and inspectable material. The evidence dimension must also pass the existing completed-rule/result validation.
+- Expanded G3-019 with one valid positive case and six negative cases: misalignment, criterion not pre-defined, required material not pre-defined, criterion not met, required material not inspectable, and target rule not completed.
+- This is test-only conformance work against frozen O6 v0.3. It does not infer mastery, transfer or next action from `PRESENT`; those remain outside O6. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification status
+- Pre-build Full Regression #3206 / run ID `42428186877`: GREEN on exact baseline commit `5945d521d4dbf8c774cfc705e080965c7f6da156`.
+- Final test implementation commit: `67c77d2b824b9ec0b3304db0e80c499ab63c8330`.
+- Full Regression on the exact final implementation commit is pending. Do not continue to another build vector until it is GREEN.
+
+### Gate status
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.

@@ -3745,3 +3745,24 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN.
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+
+
+## 110. G3-023 target cue versus supplied operation — verification pending
+
+### Work implemented
+- Inspected G3-023 in the G3 verification specification and O6 v0.3 §5.6.
+- Expanded `pacogo-engine/operational-assessment-contract.test.js` so `PROMPTED` requires support actually delivered, classified as target-relevant, while leaving the required target operation/reasoning to the learner.
+- Added negative cases through the shared `assertAssessment` assertion for support not delivered, support not target-relevant, and support that supplies the required operation. The latter must not be classified as `PROMPTED`.
+- This remains test-only normalized logical-record conformance work. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification status
+- Pre-build Full Regression #3223 / run ID `42429090347`: GREEN on exact baseline commit `c847b6b412a4ed0e749be07d20c605a3bfb3716e`.
+- Implementation commit: `9bb43290e834ff8b19b27eb16e21f41ee17576aa`.
+- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+
+### Gate status
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.

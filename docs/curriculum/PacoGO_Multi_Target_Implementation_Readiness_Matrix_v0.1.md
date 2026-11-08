@@ -1532,3 +1532,16 @@ Full Regression #3292 / run ID `42463863331`, handoff-only #3293 / run ID `42463
 **Gate status:** G3-039 logical lineage is verified; full G3-039 persistence/idempotency remains dependent on G6/G9. G3-037/038 remain BLOCKED. G6 and G9 remain OPEN. No runtime, physical schema, persistence, SQL/RPC/RLS, Supabase or learner data changed; O6 v0.3 remains frozen.
 
 **Next step:** finish the remaining logical G6 event identity/order boundary, explicitly excluding G9 payload serialization and durable write/retry mechanics. Then reassess G3-037/038.
+
+
+## 8.65 G6 logical event identity and ordering boundary fixture-tested
+
+**Logical requirements:** each interaction event belongs to exactly one response episode; event identity is stable and unique within that parent episode; the raw observation preserves source/episode event order; timestamps do not silently reorder the stream; event time and assessment-availability time remain separate O5/O6 facts. A numeric event-sequence field is not mandated by the logical contract; ordered identity is required, physical representation is open.
+
+**G9 boundary:** O7 defines same identity + same canonical immutable payload as replay and same identity + different payload as integrity conflict. Canonical payload fields/serialization/equality, idempotency-key mechanics, stage status, durable retry, concurrency and recovery remain G9 work.
+
+**Test change:** G6-006 fixture test checks event identity uniqueness within an episode, exactly one parent episode and preservation of source event order even when timestamps are not chronological. Test commit `0033986c909ce5b37a8448174ebcc01966591466`; Full Regression #3333 / run ID `42501201552`: **GREEN** on exact commit. G6 proposal update commit `27ccd9b570b0668c2ad9a6bacb0cf6de8fd99c74`; Full Regression #3334 / run ID `42501204468`: **GREEN** on exact commit. Both runs passed the exact-checkout guard and all full-regression steps.
+
+**Gate status:** G6 remains OPEN for interruption/resume, timeout, exact assessment-identity semantics and full C3/O6 lifecycle reconciliation. G9 remains OPEN for canonical payload/replay/conflict and durable write/recovery mechanics. G3-039 logical lineage is tested; G3-037/038 remain BLOCKED on exact G6 assessment identity and G9 payload semantics. No runtime, physical event schema, persistence, SQL/RPC/RLS, Supabase or learner data changed; O6 v0.3 remains frozen.
+
+**Next step:** isolate the exact logical assessment-identity boundary for G3-037/038 separately from G9 canonical-payload equality/conflict mechanics. Do not invent physical keys or serializers.

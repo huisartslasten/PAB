@@ -3993,7 +3993,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 121. G3-034 one observation, multiple target-specific assessments — verification pending
+## 121. G3-034 one observation, multiple target-specific assessments — verified
 
 ### Work implemented
 - Inspected G3-034 in the G3 verification specification and O6 v0.3 §2.
@@ -4005,7 +4005,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 ### Verification status
 - Pre-build Full Regression #3277 / run ID `42463050793`: GREEN on exact baseline commit `ee977cc2e64eae712cb58b7c85ed50c4ebe6c3b5`.
 - Implementation commit: `263dfcf14aa946f2aa43053c541058609ddf6533`.
-- Full Regression #3278 / run ID `42463163132`: **GREEN** on exact implementation commit `263dfcf14aa946f2aa43053c541058609ddf6533`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed. The pending handoff/matrix status update must also pass Full Regression before the next build vector.
+- Full Regression #3278 / run ID `42463163132`: **GREEN** on exact implementation commit `263dfcf14aa946f2aa43053c541058609ddf6533`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed. Handoff/matrix documentation commits `d85490f64d2f505c0a649c60e16caadd49f0ff0f` and `a08092226f2d56792ad5892d8ccb585b79297da5` also passed Full Regression #3281 / run ID `42463286584` and #3282 / run ID `42463289970`.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.
@@ -4015,7 +4015,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 122. G3-035 declared opportunity versus actual elicitation — verification pending
+## 122. G3-035 declared opportunity versus actual elicitation — verified
 
 ### Work implemented
 - Inspected G3-035 in the G3 verification specification and O6 v0.3 §2.
@@ -4036,7 +4036,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 123. G3-036 logical assessment provenance completeness — verification pending
+## 123. G3-036 logical assessment provenance completeness — verified
 
 ### Work implemented
 - Inspected G3-036 in the G3 verification specification and O6 v0.3 §7.
@@ -4059,7 +4059,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 124. G3-036 regression failure isolation and correction — verification pending
+## 124. G3-036 regression failure isolation and correction — verified
 
 ### Exact failure
 - Full Regression #3292 / run ID `42463863331` failed on implementation commit `1ba0ecc5236a4bbb5167461f7d48562864770f1e`; the handoff-only commit `f991b89df2a6aef524d48810325ed8a88a2abbcb` failed in #3293 / run ID `42463881545`; and the matrix-only commit `bae6c2a37363cf7ca87d730c5b8bf2529a824f68` failed in #3294 / run ID `42463884328`.

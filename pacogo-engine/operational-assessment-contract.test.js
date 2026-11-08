@@ -361,9 +361,9 @@ function assertSupportConditionChangeStartsNewAdministration(previous, next) {
  * fixtures, not a persisted status vocabulary or physical identifier format.
  */
 function assertSameEpisodeRetry(previous, retried) {
-  assert.equal(retried.task_instance_id, previous.task_instance_id);
-  assert.equal(retried.task_attempt_id, previous.task_attempt_id);
-  assert.equal(retried.observation_id, previous.observation_id);
+  assert.equal(retried.task_instance_id, previous.task_instance_id, 'retry must retain task_instance_id');
+  assert.equal(retried.task_attempt_id, previous.task_attempt_id, 'retry must retain task_attempt_id');
+  assert.equal(retried.observation_id, previous.observation_id, 'retry must retain observation_id');
   assert.ok(retried.events.length > previous.events.length, 'retry appends events within the same episode');
   assert.deepEqual(retried.events.slice(0, previous.events.length), previous.events, 'retry preserves prior ordered events');
 }

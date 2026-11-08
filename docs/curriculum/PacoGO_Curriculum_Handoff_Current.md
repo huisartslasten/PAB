@@ -3748,7 +3748,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 110. G3-023 target cue versus supplied operation — verification pending
+## 110. G3-023 target cue versus supplied operation — verified
 
 ### Work implemented
 - Inspected G3-023 in the G3 verification specification and O6 v0.3 §5.6.
@@ -3759,7 +3759,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 ### Verification status
 - Pre-build Full Regression #3223 / run ID `42429090347`: GREEN on exact baseline commit `c847b6b412a4ed0e749be07d20c605a3bfb3716e`.
 - Implementation commit: `9bb43290e834ff8b19b27eb16e21f41ee17576aa`.
-- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+- Full Regression #3224 / run ID `42429183898`: **GREEN** on exact implementation commit `9bb43290e834ff8b19b27eb16e21f41ee17576aa`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

@@ -435,6 +435,31 @@ function assertLogicalEventStream(episode, observation) {
   return true;
 }
 
+/**
+ * G6 logical target-assessment identity binding. This validates logical
+ * one-assessment/one-observation/one-target relationships only; it does not
+ * define key generation, canonical payloads or persistence.
+ */
+function assertLogicalAssessmentIdentityBindings(assessments) {
+  assert.ok(Array.isArray(assessments) && assessments.length > 0);
+  const identities = new Set();
+  for (const assessment of assessments) {
+    for (const field of ['assessment_id', 'observation_id', 'evidence_target_id']) {
+      assert.ok(
+        typeof assessment[field] === 'string' && assessment[field].trim(),
+        field + ' must be a non-empty logical identity'
+      );
+    }
+    assert.equal(
+      identities.has(assessment.assessment_id),
+      false,
+      'one assessment identity cannot identify multiple assessment records'
+    );
+    identities.add(assessment.assessment_id);
+  }
+  return true;
+}
+
 const M2_PROFILE_COMPONENTS = [
   'capture_integrity',
   'response_interpretability',
@@ -1336,6 +1361,49 @@ test('G3-029: prior raw events are preserved and supported continuation is a sep
 
   const notReturnedToPractice = { ...practice, mode: 'Toets' };
   assert.throws(() => assertSeparateSupportedContinuation(independent, notReturnedToPractice), /returns to supported practice/);
+});
+
+test('G6-007: each target assessment has one stable identity bound to exactly one observation and one target', () => {
+  const assessments = [
+    {
+      assessment_id: 'fixture-assessment-observation-1-target-a',
+      observation_id: 'fixture-observation-1',
+      evidence_target_id: 'fixture-target-a'
+    },
+    {
+      assessment_id: 'fixture-assessment-observation-1-target-b',
+      observation_id: 'fixture-observation-1',
+      evidence_target_id: 'fixture-target-b'
+    },
+    {
+      assessment_id: 'fixture-assessment-observation-2-target-a',
+      observation_id: 'fixture-observation-2',
+      evidence_target_id: 'fixture-target-a'
+    }
+  ];
+
+  assertLogicalAssessmentIdentityBindings(assessments);
+
+  const duplicateIdentityAcrossTargets = [
+    assessments[0],
+    { ...assessments[1], assessment_id: assessments[0].assessment_id }
+  ];
+  assert.throws(
+    () => assertLogicalAssessmentIdentityBindings(duplicateIdentityAcrossTargets),
+    /cannot identify multiple assessment records/
+  );
+
+  const missingObservation = [{ ...assessments[0], observation_id: '  ' }];
+  assert.throws(
+    () => assertLogicalAssessmentIdentityBindings(missingObservation),
+    /observation_id must be a non-empty logical identity/
+  );
+
+  const missingTarget = [{ ...assessments[0], evidence_target_id: undefined }];
+  assert.throws(
+    () => assertLogicalAssessmentIdentityBindings(missingTarget),
+    /evidence_target_id must be a non-empty logical identity/
+  );
 });
 
 test('G6-006: event identity is episode-scoped and raw event order is preserved independently of timestamps', () => {

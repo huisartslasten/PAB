@@ -3769,7 +3769,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 111. G3-024 delivered support supplies a required operation — verification pending
+## 111. G3-024 delivered support supplies a required operation — verified
 
 ### Work implemented
 - Inspected G3-024 in the G3 verification specification and O6 v0.3 §5.6.
@@ -3781,7 +3781,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 ### Verification status
 - Pre-build Full Regression #3227 / run ID `42429291175`: GREEN on exact baseline commit `51c3632ca3ec99b66e43a6f4c4bbd53865a28015`.
 - Implementation commit: `73148881908de05538de42f62d791daccd350b00`.
-- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+- Full Regression #3228 / run ID `42429410466`: **GREEN** on exact implementation commit `73148881908de05538de42f62d791daccd350b00`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

@@ -134,7 +134,7 @@ G9 must specify:
 
 No silent last-write-wins behavior is compatible with O7's integrity-conflict requirement.
 
-## 4. Current implementation finding — audit only
+## 5. Current implementation finding — audit only
 
 The G6/G7 read-only audit records that the current `persist_curriculum_learning_cycle` RPC performs one atomic operation that:
 1. inserts one student-evidence row;
@@ -147,7 +147,7 @@ Therefore the audited current behavior does not distinguish same-key/same-payloa
 
 This is a recorded architecture gap, not an instruction to patch the RPC. The audit describes committed repository migrations and source; it does not assert the live state of a deployed Supabase environment.
 
-## 5. Security and persistence constraints
+## 6. Security and persistence constraints
 
 The existing Learner Ownership and Persistence Contract records guardian-to-learner ownership, RLS-scoped reads, append-only evidence/decision history for normal clients, a narrowly scoped authenticated write path, `SECURITY INVOKER` RPC behavior, transaction-local capability cleanup and atomic rollback guarantees.
 
@@ -158,7 +158,7 @@ Any later G8/G10 physical design must preserve these controls. This G9 requireme
 - migrations or learner-data rewrites;
 - Supabase environment changes.
 
-## 6. G9 acceptance questions
+## 7. G9 acceptance questions
 
 G9 cannot close until the following are explicitly specified and testable:
 
@@ -179,7 +179,7 @@ G9 cannot close until the following are explicitly specified and testable:
 
 A G9 design must not use tests to choose undocumented canonicalization behavior. Any unresolved case remains blocked/unknown rather than silently accepted.
 
-## 7. Gate disposition
+## 8. Gate disposition
 
 - **G6:** logical event identity/order and target-assessment identity boundaries now have fixture coverage; interruption/resume, timeout and final lifecycle approval remain open.
 - **G9:** requirements are extracted here; detailed canonical payload, stage state, retry/concurrency and recovery contract remains OPEN.

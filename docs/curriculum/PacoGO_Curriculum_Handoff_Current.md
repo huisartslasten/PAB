@@ -4055,3 +4055,19 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN.
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+
+
+## 124. G3-036 regression failure isolation and correction — verification pending
+
+### Exact failure
+- Full Regression #3292 / run ID `42463863331` failed on implementation commit `1ba0ecc5236a4bbb5167461f7d48562864770f1e`; the handoff-only commit `f991b89df2a6aef524d48810325ed8a88a2abbcb` also failed in Full Regression #3293 / run ID `42463881545`.
+- Curriculum-engine regression: 282 tests, 281 passed, 1 failed. The sole failure was G3-036's negative case for an empty `source_event_ids` array.
+- Root cause: `Array.prototype.every()` returns true for an empty array. The helper checked that every supplied event reference was non-empty but did not require at least one event reference, so the negative fixture did not throw.
+- This was an incomplete test assertion, not a production engine failure. No tests outside the new G3-036 case failed.
+
+### Correction
+- Correction commit: `3e9a7a66640a422a3ce3780e37f7723c166636e9`.
+- The provenance helper now requires a non-empty source-event-reference list before validating each identifier. The negative fixture expects that specific diagnostic.
+- No assertion was weakened; the missing required provenance condition is now explicitly enforced.
+- Full Regression on the exact correction commit is pending. Do not continue to another build vector until it is GREEN.

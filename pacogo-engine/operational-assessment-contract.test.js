@@ -1045,9 +1045,31 @@ test('G3-029: prior raw events are preserved and supported continuation is a sep
   assert.throws(() => assertSeparateSupportedContinuation(independent, notReturnedToPractice), /returns to supported practice/);
 });
 
-test('G3-030: incorrect response alone is not contradiction', () => {
-  const record = base({ dimensions: { performance: dimension('INCORRECT'), contradiction: dimension('ABSENT') } });
+test('G3-030: an incorrect response without conflicting material yields no contradiction', () => {
+  const record = base({
+    objective_scoring_result: 'INCORRECT',
+    criterion: { met: null },
+    dimensions: {
+      performance: dimension('INCORRECT'),
+      evidence: dimension('INDETERMINATE'),
+      contradiction: dimension('ABSENT')
+    }
+  });
   assertAssessment(record);
+  assert.equal(record.dimensions.performance.result, 'INCORRECT');
+  assert.equal(record.dimensions.evidence.result, 'INDETERMINATE');
+  assert.equal(record.dimensions.contradiction.result, 'ABSENT');
+
+  const unsupportedContradiction = base({
+    objective_scoring_result: 'INCORRECT',
+    criterion: { met: null },
+    dimensions: {
+      performance: dimension('INCORRECT'),
+      evidence: dimension('INDETERMINATE'),
+      contradiction: dimension('PRESENT')
+    }
+  });
+  assert.throws(() => assertAssessment(unsupportedContradiction), /contradiction must cite source material/);
 });
 
 test('G3-031: contradiction is target-specific and cites conflicting material', () => {

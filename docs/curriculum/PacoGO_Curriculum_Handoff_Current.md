@@ -4330,3 +4330,19 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 ### Next concrete step
 - Review the G9 requirements artifact against O7 and the current audit for any missing invariant; then formulate only the unresolved owner decisions required to freeze the logical G9 contract. Do not select physical serialization/storage mechanisms or modify the RPC.
+
+
+## 135. G9 review refined with stage-specific payload source boundaries
+
+- Refined `PacoGO_G9_Staged_Idempotency_Requirements_Review_v0.1.md` to map the logical content protected by each O7 stage:
+  - raw-observation ingestion: C2 interaction/observation layer, immutable raw events/response/missingness/provenance, with G6 identity and ordering;
+  - target-assessment evaluation/recording: O6 v0.3 §7 exact one-observation/one-target references, dimension applicability/execution/results, source/rationale/support references, rule/contract/engine versions, event/availability times and correction lineage;
+  - decision evaluation: O8 complete six-part branch identity, snapshot/evaluation IDs, protocol/version provenance, gate trace and exact observation/assessment references; C7 must preserve the validated C6 identity rather than recompute it.
+- Explicitly left the precise boundary between C6 evaluation and C7 decision records to the approved C6/C7/O8 contracts. G9 must not merge stage identities because the learner-facing flow is continuous.
+- This is a source-derived logical payload boundary, not a canonical serialization or physical schema.
+- Stage-boundary refinement commit `5b8391d6afaf7ee719a34e5297b0711df600fa53`: Full Regression #3348 / run ID `42503487582`: **GREEN** on exact commit.
+- Section-number correction commit `b818be5818f8a20d7d1a7ccea0f32f8d5c9386cd`: Full Regression #3349 / run ID `42503548664`: **GREEN** on exact commit.
+- Both runs passed exact-checkout guard and all full-regression steps, including browser regression and clean-working-tree verification.
+
+### Next concrete step
+- Prepare a G9 candidate logical contract that maps each stage to its existing source identity (observation ID, target-assessment ID, snapshot/evaluation identity) and proposes content-equality rules only where the source contracts support them. Explicitly mark unresolved canonicalization, null/absence, collection ordering, status, retry and concurrency decisions as proposals requiring review. Do not implement or modify persistence/RPC/Supabase.

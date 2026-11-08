@@ -4072,3 +4072,25 @@ After verifying this documentation update with Full Regression, continue G3 test
 - The provenance helper now requires a non-empty source-event-reference list before validating each identifier. The negative fixture expects that specific diagnostic.
 - No assertion was weakened; the missing required provenance condition is now explicitly enforced.
 - Full Regression #3295 / run ID `42463916536`: **GREEN** on exact correction commit `3e9a7a66640a422a3ce3780e37f7723c166636e9`. Handoff-only commit `bc096bd2ff2394733a2fddb44ab9dd441746e1a9` also passed Full Regression #3296 / run ID `42463932797`.
+
+
+
+## 125. A1/B1/FR2 domain-anchor conformance strengthening — verification pending
+
+### Work implemented
+- Re-read the G3↔O6 traceability review and O6 Domain Anchor Examples v0.1, then verified target identifiers against curriculum registry v0.6.
+- Strengthened the A1 anchor to use canonical `A1.ET2`: co-display without an actual mapping action remains `MISALIGNED/INDETERMINATE`; a genuinely elicited mapping can be `ALIGNED/PRESENT`; an auto-assessed positive result for the non-elicited target is rejected.
+- Strengthened B1 anchors to use canonical `B1.ET3`, `B1.ET4` and `B1.ET5`. One raw response observation now has separate target assessments: execution is `PRESENT`, while strategy and checking remain `INDETERMINATE` because the actual administration did not elicit them. B1.ET7 remains explicitly unmapped, using its canonical registry ID.
+- Strengthened FR2 anchors to use canonical `FR2.ET1` and `FR2.ET3` from one observation. Recognition `PRESENT` does not imply same-value reasoning; text presence alone cannot produce reasoning evidence; wrong selection alone cannot produce contradiction.
+- All new flags/patterns are test-fixture-only. No curriculum target, task-model mapping, registry, production runtime, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification status
+- Pre-build Full Regression #3304 / run ID `42464335034`: GREEN on exact baseline commit `a1eb8ba3008733d9bfc52e59047b3bdc2b38ed23`.
+- Implementation commit: `253afb6b59052ad6b35d3fd544359b18ab3101b9`.
+- Full Regression on the exact implementation commit is pending. Do not continue to another build step until it is GREEN.
+
+### Gate status
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN for directly specified domain-anchor strengthening; G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics; G3-040 remains blocked on O5 snapshot/availability-cutoff semantics.
+- G5, G6/G9, O5 and G12 remain separate dependencies/gates.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.

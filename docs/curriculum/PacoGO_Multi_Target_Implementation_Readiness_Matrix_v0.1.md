@@ -1105,3 +1105,19 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-022, requiring actual completed event capture and absence of delivered target-relevant support before classifying independence as `INDEPENDENT`. Do not infer independence from the planned task condition alone.
+
+
+
+## 8.36 G3-022 — actual independence requires complete capture and no delivered target support
+
+**Contract basis:** O6 v0.3 §5.6 defines `INDEPENDENT` by actual episode evidence: no target-relevant assistance was delivered and event capture is sufficiently complete to support that conclusion. A planned independent condition alone is insufficient.
+
+**Test change:** G3-022 now has an explicit positive case with complete required event capture and no delivered support. Negative cases pass incomplete capture and delivered target-relevant assistance through the shared `assertAssessment` assertion and reject `INDEPENDENT`.
+
+**Scope:** Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Pre-build Full Regression #3219 / run ID `42428855949`: GREEN on exact baseline commit `f96379871016013fa17e68b121ad6a3df3d059e7`. Implementation commit `c134cc15fff565095e9f7db137d14bb7b93a9ec8`. Full Regression #3220 / run ID `42428971731`: **GREEN** on that exact implementation commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with G3-023, distinguishing a target-relevant cue that leaves the required operation to the learner (`PROMPTED`) from assistance that supplies the operation (`DEPENDENT`).

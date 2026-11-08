@@ -1237,3 +1237,19 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-030, ensuring an incorrect response alone does not create contradiction evidence.
+
+
+
+## 8.44 G3-030 — incorrect performance does not imply contradiction
+
+**Contract basis:** O6 v0.3 §5.7 distinguishes objective performance from contradiction. An incorrect answer alone is not contradictory evidence; contradiction requires specific inspectable source material that conflicts with an interpretation.
+
+**Test change:** `pacogo-engine/operational-assessment-contract.test.js` verifies objective performance `INCORRECT`, target evidence `INDETERMINATE`, and contradiction `ABSENT` when the completed contradiction rule finds no conflicting material. A negative case rejects contradiction `PRESENT` without specific conflicting source material.
+
+**Scope:** Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Implementation commit `242e5ac6d8e187a8d576fce750fd45c80b38bc32`. Full Regression #3259 / run ID `42431013705`: **GREEN** on that exact commit. The subsequent handoff-only commit `218d5157ff19a299ea3a22c9b169c6194ac0ec6b` also passed Full Regression #3260 / run ID `42431025892`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with G3-031, allowing contradiction to be target-specific when a correct response's required explanation explicitly conflicts with the target interpretation. Do not propagate contradiction to unrelated targets.

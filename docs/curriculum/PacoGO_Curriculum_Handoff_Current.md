@@ -4394,3 +4394,36 @@ After verifying this documentation update with Full Regression, continue G3 test
 4. Keep G6/G9 and G8/G10 dependencies explicit. No implementation until the required gates and explicit G12 authorization are complete.
 
 Working branch remains `refactor/professional-v1`; `main` / LIVE untouched.
+
+
+## 138. G9 stage payload field inventory and Stage C identity clarified
+
+### Completed
+- Full Regression #3355 / run ID `42504801468`: **GREEN** on exact handoff commit `a5b5b60939d68ff0fbef77bc21fa517deb3461b5`.
+- Full Regression #3354 / run ID `42504798016`: **GREEN** on exact matrix commit `fbf841554ec6260c654ec851b9caca8c4826db4c`.
+- Every required step passed on both runs: exact triggering-commit/ref guard, dependency audit, Agenda/practice ownership boundaries, curriculum engine, architecture tests, maintained Node/Vitest, browser regression and clean working tree.
+- Updated G9 candidate Stage C to distinguish the immutable snapshot, C6 evaluation identity and separate C7 decision identity. C7's logical decision record references the exact C6 evaluation. The C8/C9 crosswalk uses `c6_evaluation_id` and `c7_decision_id`; O8 calls the C6 identifier `evaluation_id`. Final naming/approval remains under G5.
+- Created `docs/curriculum/PacoGO_G9_Logical_Payload_Field_Inventory_v0.1.md`: field-by-field Stage A/B/C inventory with required, conditional, not-part-by-default and unresolved classifications.
+- The inventory preserves source distinctions: raw observation versus target assessment versus inference; observation identity versus assessment identity; event time versus assessment availability; snapshot versus C6 evaluation versus C7 decision.
+
+### Commits
+- Stage C candidate clarification: `c90fd7532191dd7c56ca1896eeb863e01c48b18a`.
+- Field inventory: `4d9907f237bd8f00f6237187e7919188e3c46b61`.
+- Readiness matrix and this handoff are now being updated. Their final commit must pass Full Regression before this block is closed.
+
+### Current gate status
+- G2/O6 v0.3 remains CLOSED at logical-contract level and frozen.
+- G5 remains OPEN for final C6/C7/C8/C9 identity and lineage approval.
+- G6 remains OPEN for identity namespaces and complete task/episode lifecycle reconciliation.
+- G9 remains OPEN for canonical equality, stage-state vocabulary, uncertain-commit recovery, retry and concurrency.
+- G3-037/038 remain BLOCKED; G3-039 logical lineage remains fixture-tested but durable recording is open.
+- G8/G10 physical persistence/security and G12 authorization remain separate.
+- No runtime, tests, registry, learner state, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Next concrete step
+1. Review the field inventory against G6 and G5 source decisions.
+2. Draft the logical G9 equality/state/recovery contract only where sources determine behavior.
+3. Keep absent/null, scalar normalization, non-event collection ordering, timestamp precision, retry/concurrency mechanics and status transitions open until explicitly decided.
+4. Do not implement persistence or modify the existing RPC.
+
+Branch remains `refactor/professional-v1`; LIVE `main` untouched.

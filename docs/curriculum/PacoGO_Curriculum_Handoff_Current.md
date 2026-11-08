@@ -4427,3 +4427,35 @@ Working branch remains `refactor/professional-v1`; `main` / LIVE untouched.
 4. Do not implement persistence or modify the existing RPC.
 
 Branch remains `refactor/professional-v1`; LIVE `main` untouched.
+
+
+## 139. G9 source-determined logical stage contract baseline recorded
+
+### Completed
+- Re-read this handoff and confirmed the working branch is `refactor/professional-v1`; LIVE `main` remains untouched.
+- Confirmed prior Full Regression #3359 / run ID `42505641953` GREEN on exact commit `cd0b62db48fe9079b1643db394d2cafb83d696f7` before beginning the next build step.
+- Created `docs/curriculum/PacoGO_G9_Logical_Stage_Contract_Source_Determined_v0.1.md`. It consolidates only source-determined logical requirements from O5/O6 v0.3/O7/O8, C2, G6 and the C8/C9 crosswalk.
+- Updated `PacoGO_Multi_Target_Implementation_Readiness_Matrix_v0.1.md` section 8.70.
+- The contract separates determined invariants from unresolved decisions: O7's three idempotency boundaries and replay/conflict outcomes; immutable observation and target-assessment identities; source event ordering; immutable snapshot, distinct C6 evaluation and C7 decision lineage; stage-local atomicity/durable inspectable state; O5 UTC/half-open event-time and availability-cutoff semantics.
+- It explicitly leaves G5 Stage C identity/atomic write-unit approval, G6 identity namespaces/lifecycle, canonical equality choices, stage-state vocabulary, uncertain-commit recovery, retry/concurrency and operation-timeout mechanics open. G8/G10 physical persistence/security and G12 authorization remain downstream prerequisites.
+
+### Commits and Full Regression
+- Source-determined G9 contract: commit `1271403de09bbe055b2ba6d3c0542bb444982dd6`; Full Regression #3360 / run ID `42506349687`: **GREEN** on exact commit.
+- Readiness matrix section 8.70: commit `fffa4e8f305c379e4a4a6c35516b8d05e5badd52`; Full Regression #3361 / run ID `42506367094`: **GREEN** on exact commit.
+- Both runs passed exact branch/triggering-SHA guard, dependency audit, Agenda/practice ownership boundaries, curriculum engine regression, architecture tests, Double or Nothing runtime regression, maintained Node/Vitest, browser regression and clean-working-tree verification.
+- This handoff update is a project change; its own Full Regression must be run and verified before the block is closed.
+
+### Gate status
+- G5 remains OPEN for final C6/C7 identity and lineage approval and Stage C write-unit boundary.
+- G6 remains OPEN for final observation/assessment identity namespaces and remaining administration lifecycle decisions.
+- G9 remains OPEN for canonical equality details and durable stage-state/retry/concurrency/recovery contract.
+- G3-037/038 remain BLOCKED; G3-039 logical lineage remains fixture-tested but durable recording is open.
+- G8/G10 physical persistence/security and G12 implementation authorization remain separate prerequisites.
+- No runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data changed. O6 v0.3 remains frozen.
+
+### Next concrete step
+1. Inspect the exact open G5 and G6 decisions in their current source documents and owner decision records.
+2. Produce a dependency/decision map showing which G9 choices are blocked by G5, which by G6, and which remain genuine G9 owner decisions after those dependencies.
+3. Do not silently decide cross-gate identity, canonicalization, timeout, retry, concurrency or persistence behavior. Do not implement or modify the RPC.
+
+Branch: `refactor/professional-v1`; LIVE `main` untouched.

@@ -1478,3 +1478,18 @@ Full Regression #3292 / run ID `42463863331`, handoff-only #3293 / run ID `42463
 **Gate status:** O5 core logical cutoff policy is approved; detailed governance items remain open under G1. G3-040 is verified and no longer blocked on the minimum O5 cutoff semantics. G3 remains OPEN because G3-037–039 depend on G6/G9 identity and canonical-payload semantics. G2/O6 remains CLOSED; G5, G6/G9 and G12 remain separate gates. No production implementation authorization is implied.
 
 **Next step:** Reconcile the existing G6 task/attempt/observation lifecycle proposal with approved O6 v0.3, distinguishing determined requirements from owner decisions still needed. Do not infer G6/G9 identity or canonical-payload behavior.
+
+
+## 8.62 G6 — material support-condition identity boundary owner-approved
+
+**Owner decision (2026-11-08):** a material change in the actual support condition creates a new task instance, response episode and immutable raw observation. In the confirmed Tussentoets/Toets flow, a content-help request ends the independent attempt as incomplete; subsequent supported practice is a separate administration and is not merged with the independent episode. The prior episode and all captured pre-request events remain preserved.
+
+**Boundary distinction:** neutral interface clarification that supplies no target reasoning does not itself change the support condition and does not create a new administration identity. Ordinary answer revisions/retries within the same administration remain events in the same response episode.
+
+**Verification:** test-fixture-only G6 conformance checks were added in `e14fd5fced63d3db4c1e94d9fbf397201256843e`; Full Regression #3317 / run ID `42498366233`: **GREEN**. The G6 proposal was updated in `612599a46a8f807fbdc3b28cac9f43376b980251`; Full Regression #3318 / run ID `42498549925`: **GREEN**. The owner architecture decision record was updated in `abad589e70ca2f504b4eb02acaa8162a640ecfbd`; Full Regression #3319 / run ID `42498553242`: **GREEN**. The handoff was updated in `83bc432c338a13939b39a65f678d562b166f75e4`; Full Regression #3320 / run ID `42498796138`: **GREEN**. All runs passed browser regression and clean-working-tree verification.
+
+**Scope:** logical identity rule and test fixtures only. No physical ID format, storage key, schema/API, production runtime, learner data, persistence, SQL/RPC/RLS or Supabase change. O6 v0.3 remains frozen.
+
+**Gate status:** this closes one explicit G6 identity boundary, not G6 as a whole. G6 remains OPEN pending lifecycle decisions for completion, abandonment, interruption/resume, restart, timeout, event lifecycle and complete C3/O6 reconciliation. G9 remains OPEN for exact canonical immutable payload representation, stage status, retry, concurrency and durable recovery. G3-037–039 remain BLOCKED pending the relevant complete G6/G9 semantics. No implementation authorization is implied.
+
+**Next step:** reconcile the remaining G6 lifecycle transitions against C3 v0.2 and O6 v0.3, without inventing O6 labels or G9 serialization/persistence behavior.

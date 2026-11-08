@@ -68,23 +68,32 @@ C2 requires raw interaction and observation records to preserve what happened wi
 
 ### Stage C — decision evaluation
 
-**Logical object:** one C6 evaluation for one frozen snapshot and one complete six-part branch, followed by a C7 decision that consumes that exact validated C6 result.
+**Logical flow:** one immutable snapshot for one complete six-part branch → one C6 evaluation → one C7 decision consuming that exact C6 evaluation.
 
-**Approved identity envelope:** O8 requires the C6 result to carry the complete six-part branch identity, `snapshot_id`, `evaluation_id`, protocol/version provenance, gate trace and exact observation/assessment references. C7 must preserve the exact branch, snapshot and evaluation identity.
+**Snapshot identity and content:** the snapshot is a distinct immutable input to C6, not a substitute for the C6 evaluation identity. It preserves the six-part branch, versioned scope/window definitions, event-time interval, assessment-availability cutoff, exact eligible raw-observation IDs, exact eligible target-assessment record/version references, explicit exclusions and relevant protocol/registry provenance (O5/O7/O8; readiness matrix §7.2).
 
-**Candidate payload content:**
-- complete six-part branch identity;
-- snapshot identity and frozen snapshot provenance/cutoff;
-- evaluation identity;
-- exact eligible observation and target-assessment references;
-- C6 protocol and relevant rule/engine versions;
-- all required gate outcomes and their reasons/trace;
-- C7 action-policy version and decision trace when recording the C7 result;
-- exact C6 input/result reference consumed by C7.
+**C6 evaluation record:**
+- O8 logical identity: C6 `evaluation_id` (the C8/C9 crosswalk calls this `c6_evaluation_id`; final field naming is subject to G5).
+- exact immutable snapshot reference (the C8/C9 crosswalk uses `decision_snapshot_id`);
+- complete six-part branch identity, with all six source fields retained and compared explicitly;
+- exact eligible observation and target-assessment references consumed from the snapshot;
+- C6 protocol/version provenance;
+- seven existing C6 gate outcomes and their reasons/trace;
+- exact existing C6 mastery outcome.
 
-**Critical unresolved identity decision:** O8 identifies the C6 evaluation with `evaluation_id`, but does not explicitly define whether C7 decision evaluation has its own separate idempotency identity or is recorded under the same evaluation identity with a distinct stage discriminator. G9 must not silently choose. Owner/architecture decision is required before the Stage C idempotency key can be frozen.
+**C7 decision record:**
+- separate logical C7 decision identity (the C8/C9 crosswalk uses `c7_decision_id`; final field naming and approval remain under G5);
+- exact reference to the one C6 evaluation consumed;
+- unchanged six-part branch identity and exact snapshot reference;
+- exact C6 mastery outcome consumed, not recomputed;
+- separate `prerequisite_ordering_state` and `next_development_ordering_state`;
+- explicit candidate action set, selected candidate or HOLD outcome, applicable C7 gates and reason/decision trace;
+- C7 action-policy/protocol version provenance and negative permission boundary.
 
-**Replay/conflict:** same approved Stage C identity and same canonical payload → replay; same identity and different payload → integrity conflict; preserve the original decision history. A changed eligible evidence set or protocol produces a new snapshot/evaluation identity, not an overwrite.
+**Identity reconciliation:** O8 explicitly defines the C6 evaluation identity and requires C7 to preserve the exact branch, snapshot and evaluation identity. C8 v0.2 and C9 v0.2, together with the preliminary readiness-matrix crosswalk (§§7.2 and 7.9), represent the C7 decision as a distinct `c7_decision_id` referencing the exact `c6_evaluation_id`. The source-aligned G9 candidate therefore keeps the C6 evaluation and C7 decision as distinct logical records/identities; it does not reuse the C6 evaluation identity as the C7 decision identity. **G5 remains OPEN**, so final cross-stage naming and approval must be completed there before G9 is frozen.
+
+**Replay/conflict:** same approved identity for the relevant Stage C record and same complete canonical immutable payload → replay; same identity and different payload → integrity conflict; preserve original history. A changed eligible evidence set or applicable protocol creates a new snapshot and C6 evaluation. A C7 decision must reference the exact C6 evaluation it consumed. The final Stage C idempotency envelope must be approved under G5/G9 before conformance tests or persistence implementation.
+
 
 ## 4. Canonical equality candidate
 

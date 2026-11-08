@@ -3968,3 +3968,25 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN.
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+
+
+## 120. G3-033 help request alone is not contradiction — verification pending
+
+### Work implemented
+- Inspected G3-033 in the G3 verification specification and O6 v0.3 §5.7.
+- Strengthened the shared `assertAssessment` assertion so a contradiction cannot cite the same event as a help request when no support was delivered.
+- Replaced the minimal fixture with three cases: a help request alone with contradiction `ABSENT`; a negative case rejecting `PRESENT` when its only cited source is the help request; and a control case preserving `PRESENT` when a separate response event independently contains target-conflicting material.
+- This prevents help-seeking itself from being treated as contradictory evidence without overblocking a genuinely separate contradiction within the same observation.
+- Test-only normalized logical-record fixtures; no production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification status
+- Pre-build Full Regression #3272 / run ID `42462810181`: GREEN on exact baseline commit `5e24b2b3efd118a27a23bc7c881a6e0186efbf68`.
+- Implementation commit: `54e118375de73e880b0f13cc77fe241f9ae787a8`.
+- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+
+### Gate status
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.

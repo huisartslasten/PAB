@@ -3791,25 +3791,23 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 112. G3-025 incomplete support provenance — correction pending verification
+## 112. G3-025 incomplete support provenance — correction verification pending
 
-### Initial implementation and regression failure
+### Initial implementation and regression investigation
 - Inspected G3-025 in the G3 verification specification and O6 v0.3 §5.6.
-- Initial implementation commit `dcbc8bc9f38ce179b4a0fce775f0b08f3cbbaf53` made incomplete support provenance/event capture require independence `UNKNOWN` without checking whether the target contract required an independence judgement.
-- Full Regression #3232 / run ID `42429627050` was **RED** on that exact commit. Six curriculum-engine tests failed because records whose target contract did not require an independence judgement correctly had `NOT_REQUIRED`, but the new unconditional assertion incorrectly forced `UNKNOWN`. Affected existing vectors included G3-011, G3-016, G3-017, G3-022 and G3-032, plus the aggregate negative-contract test.
+- Initial implementation commit `dcbc8bc9f38ce179b4a0fce775f0b08f3cbbaf53` failed Full Regression #3232 / run ID `42429627050`. The new rule forced `UNKNOWN` even when the target contract did not require an independence judgement. Six curriculum-engine tests failed, including G3-011, G3-016, G3-017, G3-022 and G3-032, plus the aggregate negative-contract test.
 - Root cause: the harness did not distinguish a required independence judgement from a target contract where independence is `NOT_REQUIRED`. O6 v0.3 §5.6 explicitly defines `NOT_REQUIRED` when the target contract does not require an independence judgement.
+- The corrected fixture added test-only `target_contract.independence_required`: required targets cannot use `NOT_REQUIRED`; non-required targets must use it; incomplete support provenance/event capture requires `UNKNOWN` only when the target requires an independence judgement.
 
-### Corrected underlying contract fixture
-- Added test-only `target_contract.independence_required` to make the target's requirement explicit in the normalized fixture.
-- The shared `assertAssessment` now requires `NOT_REQUIRED` when independence is not required, and prohibits `NOT_REQUIRED` when the target contract requires an independence judgement.
-- Incomplete support provenance, unclassifiable delivered target-relevant content or incomplete event capture now requires `UNKNOWN` only when the target contract requires an independence judgement.
-- G3-022–026 explicitly identify that independence is required. A separate positive G3-025 case verifies that incomplete support provenance remains `NOT_REQUIRED` when the target contract does not require an independence judgement.
-- This is test-only normalized logical-record conformance work against frozen O6 v0.3; no production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
-- Corrected implementation commit: `8a32b85e9033be4c1b417e2171923da4505e23eb`.
+### Follow-up regression and fixture correction
+- Full Regression #3234 / run ID `42429805676` and #3235 / run ID `42429837840` both failed only in G3-020.
+- Exact cause: the G3-020 negative fixtures attempted `PROMPTED`/`DEPENDENT` without declaring that the target contract required an independence judgement. The new contract gate correctly rejected those fixtures earlier as `NOT_REQUIRED`.
+- Updated the G3-020 negative fixtures to set `target_contract.independence_required: true`, so they now test the intended prohibition: a request without delivered support cannot be `PROMPTED` or `DEPENDENT`.
+- Corrected implementation commit: `d7b06192a47954ee21f10b405772e7fc77b40169`.
 
 ### Verification status
 - Pre-build Full Regression #3231 / run ID `42429517399`: GREEN on exact baseline commit `f19934a0caf5b662961b49c70cf6d600cacce390`.
-- Full Regression on corrected implementation commit `8a32b85e9033be4c1b417e2171923da4505e23eb` is pending. Do not continue to another build vector until the exact commit is GREEN.
+- Full Regression on corrected implementation commit `d7b06192a47954ee21f10b405772e7fc77b40169` is pending. Do not continue to another build vector until the exact commit is GREEN.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

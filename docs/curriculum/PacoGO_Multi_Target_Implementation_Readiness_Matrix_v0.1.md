@@ -1041,3 +1041,19 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-018, validating every strict precondition before allowing target evidence `ABSENT`. Do not infer semantics owned by G5, G6/G9 or O5.
+
+
+
+## 8.32 G3-018 — every strict precondition is required before ABSENT
+
+**Contract basis:** O6 v0.3 §5.5 permits target evidence `ABSENT` only when the task is validly aligned, the criterion and required material were defined in advance, all required material was captured and is inspectable, the applicable target rule completed, and the criterion was not met.
+
+**Test change:** `pacogo-engine/operational-assessment-contract.test.js` routes the valid `ABSENT` case and eight negative cases through the shared `assertAssessment` conformance assertion. The negative cases separately remove valid alignment, pre-defined criterion, pre-defined material, complete capture, inspectability, complete required streams, unmet criterion, or completed rule execution.
+
+**Scope:** Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Pre-build Full Regression #3202 / run ID `42427882277`: GREEN on exact baseline commit `073e353c549f7330e9865a592f23b223ac59ea45`. Implementation commit `f91513784da49a48212f426f190724ca3fcc282c`. Full Regression #3203 / run ID `42428008931`: **GREEN** on that exact implementation commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with G3-019, requiring `PRESENT` to satisfy its positive target criterion and all applicable capture/inspectability preconditions. Do not infer mastery or transfer from `PRESENT` alone.

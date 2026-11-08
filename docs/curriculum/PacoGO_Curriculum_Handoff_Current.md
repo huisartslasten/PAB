@@ -4260,3 +4260,15 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 ### Next concrete step
 - Isolate the exact logical assessment-identity boundary needed by G3-037/038 from G9's canonical-payload equality/conflict mechanics. Keep the G6 identity decision logical and inspectable; do not invent physical keys or serializers.
+
+
+## 132. G6 logical target-assessment identity boundary — fixture-tested
+
+- Added G6-007 test-fixture coverage: one immutable observation can have separate target assessments; each target assessment has one non-empty stable logical assessment identity, one observation reference and one existing target reference; one assessment identity cannot identify multiple assessment records.
+- The test deliberately does not select ID generation, physical uniqueness constraints, canonical payload serialization, equality or persistence.
+- Test commit `4ec0bad47f4f76b880c55e26c5d48dbf92ec6f9e`; Full Regression #3339 / run ID `42501694960`: **GREEN** on exact commit. Exact checkout guard, curriculum engine, architecture boundaries, Node/Vitest, browser regression (59 passed) and clean-working-tree verification all passed.
+- G6 proposal records the fixture coverage but keeps final owner approval and full C3/O6 reconciliation open.
+- G3-037/038 remain BLOCKED pending approved exact G6 assessment identity plus G9 canonical payload equality/conflict and durable idempotent stage-write behavior. G3-039 logical lineage remains tested; durable persistence remains open.
+- G6 remains OPEN for interruption/resume, timeout, final owner approval of logical lifecycle/assessment identity and complete C3/O6 reconciliation. G9 remains OPEN for payload representation/equality, idempotency mechanics, stage status, retry, concurrency and recovery.
+- No production evaluator/runtime, physical schema, database, SQL/RPC/RLS, Supabase or learner data changed. O6 v0.3 remains frozen. Branch `refactor/professional-v1`; LIVE `main` untouched.
+- Next: reconcile this logical assessment identity candidate against C3/O6 and the owner architecture decision record; then determine which G3-037/038 assertions can be safely authored without specifying G9 mechanics.

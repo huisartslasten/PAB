@@ -105,6 +105,12 @@ function assertAssessment(record) {
     assert.equal(record.criterion?.met, true, 'PRESENT requires the pre-specified criterion to be met');
     assert.equal(record.task_instance.required_material_inspectable, true, 'PRESENT requires inspectable material');
   }
+  if (record.support?.support_kind === 'interface_clarification') {
+    assert.equal(record.support.delivered, true, 'interface clarification is recorded only when actually delivered');
+    assert.equal(record.support.target_relevant, false, 'neutral interface clarification must not be target-relevant support');
+    assert.equal(record.support.supplied_required_operation, false, 'neutral interface clarification must not supply target reasoning');
+  }
+
   if (independence === 'INDEPENDENT') {
     assert.equal(record.process?.required_streams_complete, true, 'INDEPENDENT requires sufficiently complete event capture');
     assert.notEqual(record.support?.target_relevant, true, 'INDEPENDENT forbids delivered target-relevant assistance');
@@ -687,10 +693,45 @@ test('G3-020: a help request without delivered support cannot be PROMPTED or DEP
   }
 });
 
-test('G3-021: neutral interface clarification is not target-relevant support', () => {
-  const record = base({ support: { request: true, delivered: true, target_relevant: false, support_kind: 'interface_clarification' }, dimensions: { independence: dimension('NOT_REQUIRED') } });
+test('G3-021: delivered interface clarification is neutral and does not supply target reasoning', () => {
+  const record = base({
+    support: {
+      request: true,
+      delivered: true,
+      target_relevant: false,
+      support_kind: 'interface_clarification',
+      supplied_required_operation: false
+    },
+    dimensions: { independence: dimension('NOT_REQUIRED') }
+  });
   assertAssessment(record);
+  assert.equal(record.support.delivered, true);
   assert.equal(record.support.target_relevant, false);
+  assert.equal(record.support.supplied_required_operation, false);
+
+  const targetRelevant = base({
+    support: {
+      request: true,
+      delivered: true,
+      target_relevant: true,
+      support_kind: 'interface_clarification',
+      supplied_required_operation: false
+    },
+    dimensions: { independence: dimension('NOT_REQUIRED') }
+  });
+  assert.throws(() => assertAssessment(targetRelevant), /must not be target-relevant support/);
+
+  const suppliedReasoning = base({
+    support: {
+      request: true,
+      delivered: true,
+      target_relevant: false,
+      support_kind: 'interface_clarification',
+      supplied_required_operation: true
+    },
+    dimensions: { independence: dimension('NOT_REQUIRED') }
+  });
+  assert.throws(() => assertAssessment(suppliedReasoning), /must not supply target reasoning/);
 });
 
 test('G3-022: INDEPENDENT requires complete event capture and no target-relevant delivery', () => {

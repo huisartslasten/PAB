@@ -216,6 +216,37 @@ function assertLogicalAssessmentProvenance(record) {
   return true;
 }
 
+/**
+ * Test-fixture-only O5 snapshot eligibility check. These logical fixture
+ * properties are not a persisted schema, physical snapshot ID or API.
+ */
+function getSnapshotAssessmentEligibility(snapshot, assessment) {
+  const windowStart = Date.parse(snapshot.windowStart);
+  const windowEnd = Date.parse(snapshot.windowEnd);
+  const availabilityCutoff = Date.parse(snapshot.availabilityCutoff);
+  const eventTime = Date.parse(assessment.provenance.event_time);
+  const assessmentAvailableAt = Date.parse(assessment.provenance.assessment_available_at);
+
+  for (const [label, value] of Object.entries({
+    windowStart,
+    windowEnd,
+    availabilityCutoff,
+    eventTime,
+    assessmentAvailableAt
+  })) {
+    assert.equal(Number.isFinite(value), true, label + ' must be a valid timestamp');
+  }
+  assert.ok(windowStart < windowEnd, 'O5 event window must have a positive duration');
+
+  const withinEventWindow = eventTime >= windowStart && eventTime < windowEnd;
+  const availableByCutoff = assessmentAvailableAt <= availabilityCutoff;
+  return {
+    within_event_window: withinEventWindow,
+    available_by_cutoff: availableByCutoff,
+    eligible: withinEventWindow && availableByCutoff
+  };
+}
+
 function assertOneObservationManyTargetAssessments(rawObservations, assessments) {
   assert.ok(Array.isArray(rawObservations) && rawObservations.length === 1, 'one response episode must produce exactly one raw observation');
   const observationId = rawObservations[0]?.observation_id;
@@ -1554,9 +1585,88 @@ test('G3-037–039 remain blocked pending approved G6/G9 identity and payload se
   assert.deepEqual(dependency.cases, ['G3-037', 'G3-038', 'G3-039']);
 });
 
-test('G3-040 remains blocked pending approved O5 snapshot-cutoff semantics', () => {
-  const dependency = { cases: ['G3-040'], gate: 'O5', status: 'BLOCKED' };
-  assert.equal(dependency.status, 'BLOCKED');
+test('G3-040 excludes late-available assessments from an immutable O5 snapshot', () => {
+  const snapshot = Object.freeze({
+    windowStart: '2026-11-08T10:00:00Z',
+    windowEnd: '2026-11-08T12:00:00Z',
+    availabilityCutoff: '2026-11-08T11:00:00Z'
+  });
+  const originalSnapshot = { ...snapshot };
+  const assessment = {
+    provenance: {
+      event_time: '2026-11-08T10:30:00Z',
+      assessment_available_at: '2026-11-08T11:00:01Z'
+    }
+  };
+
+  const originalEvaluation = getSnapshotAssessmentEligibility(snapshot, assessment);
+  assert.deepEqual(originalEvaluation, {
+    within_event_window: true,
+    available_by_cutoff: false,
+    eligible: false
+  });
+
+  const laterSnapshot = Object.freeze({
+    ...snapshot,
+    availabilityCutoff: '2026-11-08T11:00:02Z'
+  });
+  const laterEvaluation = getSnapshotAssessmentEligibility(laterSnapshot, assessment);
+  assert.deepEqual(laterEvaluation, {
+    within_event_window: true,
+    available_by_cutoff: true,
+    eligible: true
+  });
+
+  assert.deepEqual(snapshot, originalSnapshot, 'a later evaluation must not mutate the original snapshot');
+  assert.equal(
+    getSnapshotAssessmentEligibility(snapshot, assessment).eligible,
+    false,
+    'a late assessment must remain excluded from the original snapshot'
+  );
+});
+
+test('O5 event-window membership and assessment availability cutoff remain separate', () => {
+  const snapshot = Object.freeze({
+    windowStart: '2026-11-08T10:00:00Z',
+    windowEnd: '2026-11-08T12:00:00Z',
+    availabilityCutoff: '2026-11-08T11:00:00Z'
+  });
+
+  const atWindowStartAndCutoff = {
+    provenance: {
+      event_time: '2026-11-08T10:00:00Z',
+      assessment_available_at: '2026-11-08T11:00:00Z'
+    }
+  };
+  assert.deepEqual(getSnapshotAssessmentEligibility(snapshot, atWindowStartAndCutoff), {
+    within_event_window: true,
+    available_by_cutoff: true,
+    eligible: true
+  });
+
+  const atExclusiveWindowEnd = {
+    provenance: {
+      event_time: '2026-11-08T12:00:00Z',
+      assessment_available_at: '2026-11-08T10:30:00Z'
+    }
+  };
+  assert.deepEqual(getSnapshotAssessmentEligibility(snapshot, atExclusiveWindowEnd), {
+    within_event_window: false,
+    available_by_cutoff: true,
+    eligible: false
+  });
+
+  const afterAvailabilityCutoff = {
+    provenance: {
+      event_time: '2026-11-08T10:30:00Z',
+      assessment_available_at: '2026-11-08T11:00:01Z'
+    }
+  };
+  assert.deepEqual(getSnapshotAssessmentEligibility(snapshot, afterAvailabilityCutoff), {
+    within_event_window: true,
+    available_by_cutoff: false,
+    eligible: false
+  });
 });
 
 test('A1 ET2 mapping evidence requires actual mapping elicitation, not co-display', () => {

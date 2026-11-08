@@ -551,28 +551,63 @@ test('G3-017: technical capture failure blocks the affected rule and cannot supp
   assert.throws(() => assertAssessment(absentDespiteFailure), /ABSENT requires complete required streams/);
 });
 
-test('G3-018: ABSENT requires every strict O6 precondition', () => {
-  const record = base({
+test('G3-018: ABSENT requires every strict O6 precondition through the shared assertion', () => {
+  const valid = base({
     criterion: { met: false },
     dimensions: { alignment: dimension('ALIGNED'), evidence: dimension('ABSENT') }
   });
-  assertAssessment(record);
-  const preconditions = record.task_instance.aligned &&
-    record.task_instance.criterion_defined &&
-    record.task_instance.required_material_defined &&
-    record.task_instance.required_material_captured &&
-    record.task_instance.required_material_inspectable &&
-    record.process.required_streams_complete &&
-    record.criterion.met === false;
-  assert.equal(preconditions, true);
-  const invalid = { ...record, task_instance: { ...record.task_instance, required_material_captured: false } };
-  assert.throws(() => {
-    const valid = invalid.task_instance.aligned && invalid.task_instance.criterion_defined &&
-      invalid.task_instance.required_material_defined && invalid.task_instance.required_material_captured &&
-      invalid.task_instance.required_material_inspectable && invalid.process.required_streams_complete &&
-      invalid.criterion.met === false;
-    if (!valid && invalid.dimensions.evidence.result === 'ABSENT') throw new Error('ABSENT preconditions not satisfied');
-  }, /ABSENT preconditions/);
+  assertAssessment(valid);
+  assert.equal(valid.dimensions.evidence.result, 'ABSENT');
+
+  const invalidCases = [
+    {
+      label: 'misaligned task',
+      record: base({ criterion: { met: false }, dimensions: { alignment: dimension('MISALIGNED'), evidence: dimension('ABSENT') } }),
+      expected: /ABSENT requires valid task alignment/
+    },
+    {
+      label: 'criterion not defined before assessment',
+      record: base({ task_instance: { criterion_defined: false }, criterion: { met: false }, dimensions: { evidence: dimension('ABSENT') } }),
+      expected: /ABSENT requires a pre-defined criterion/
+    },
+    {
+      label: 'required material not defined before assessment',
+      record: base({ task_instance: { required_material_defined: false }, criterion: { met: false }, dimensions: { evidence: dimension('ABSENT') } }),
+      expected: /ABSENT requires pre-defined required material/
+    },
+    {
+      label: 'required material not fully captured',
+      record: base({ task_instance: { required_material_captured: false }, criterion: { met: false }, dimensions: { evidence: dimension('ABSENT') } }),
+      expected: /ABSENT requires complete capture/
+    },
+    {
+      label: 'required material not inspectable',
+      record: base({ task_instance: { required_material_inspectable: false }, criterion: { met: false }, dimensions: { evidence: dimension('ABSENT') } }),
+      expected: /ABSENT requires inspectable material/
+    },
+    {
+      label: 'required process stream incomplete',
+      record: base({ process: { required_streams_complete: false }, criterion: { met: false }, dimensions: { evidence: dimension('ABSENT') } }),
+      expected: /ABSENT requires complete required streams/
+    },
+    {
+      label: 'target criterion met rather than not met',
+      record: base({ criterion: { met: true }, dimensions: { evidence: dimension('ABSENT') } }),
+      expected: /ABSENT requires the criterion not to be met/
+    },
+    {
+      label: 'target rule did not complete',
+      record: base({
+        criterion: { met: false },
+        dimensions: { evidence: dimension('ABSENT', { execution: 'BLOCKED', reason: 'Required assessment input unavailable' }) }
+      }),
+      expected: /evidence must not emit a learner result/
+    }
+  ];
+
+  for (const { label, record, expected } of invalidCases) {
+    assert.throws(() => assertAssessment(record), expected, label);
+  }
 });
 
 test('G3-019: PRESENT requires the pre-specified target criterion to be met', () => {

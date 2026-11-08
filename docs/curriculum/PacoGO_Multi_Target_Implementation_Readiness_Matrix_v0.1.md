@@ -1253,3 +1253,19 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-031, allowing contradiction to be target-specific when a correct response's required explanation explicitly conflicts with the target interpretation. Do not propagate contradiction to unrelated targets.
+
+
+
+## 8.45 G3-031 — contradiction remains local to the explanation-dependent target
+
+**Contract basis:** O6 v0.3 §5.7 requires an observation-local contradiction to cite exact response/event material and identify the target-specific interpretation it conflicts with. A contradiction for one target must not be propagated indiscriminately to another target.
+
+**Test change:** Replaced the minimal single-record G3-031 fixture in `pacogo-engine/operational-assessment-contract.test.js` with two distinct target assessments sharing one observation. The explanation-dependent target retains objective performance `CORRECT` while contradiction is `PRESENT`, with exact source material and target-specific conflict. A separate recognition target retains evidence `PRESENT` and contradiction `ABSENT`. A negative case rejects propagation of the contradiction to the recognition target.
+
+**Scope:** Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Implementation commit `2702f36e6ec95dc95d23e8b5e8fcc2062515d147`. Pre-build Full Regression #3262 / run ID `42462282079`: **GREEN** on exact baseline commit `f99edffce9887d8d6fb2c011c4622418994e12bf`. Full Regression on the implementation commit is pending.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** After the exact implementation commit passes Full Regression, continue with G3-032. Do not infer contradiction from missing process or task mismatch.

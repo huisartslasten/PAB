@@ -4174,3 +4174,30 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 ### Next concrete step
 - Reconcile the remaining G6 lifecycle transitions against C3 v0.2 and frozen O6 v0.3. Keep logical decisions separate from G9 payload serialization and G8/G10 persistence/security design. Do not implement runtime or persistence.
+
+
+## 129. G6 lifecycle reconciliation — retry/restart/abandonment anchors tested
+
+### Source reconciliation
+- Reconciled the G6 proposal against C2 Student Data Model v0.1, retained C3 v0.2 observation-unit requirements, Multi-Target Task Evidence Contract v0.1 and owner-approved O6 v0.3.
+- Determined: one administered task-instance response episode maps to one immutable raw observation; ordinary click/edit/answer retry remains an ordered event within the same episode; a separately administered restart is a new task instance/episode/observation.
+- Determined: completion and abandonment are raw lifecycle events. A started abandoned episode preserves its captured events and immutable observation. O6's NO_RESPONSE handling remains an assessment rule (NOT_OBSERVED performance and INDETERMINATE target evidence), not a lifecycle status shortcut.
+- Previously approved: a material support-condition change creates a new task instance, response episode and observation. A neutral interface clarification that supplies no target reasoning does not itself change administration identity.
+- Still a candidate/product decision: whether an interruption can resume the same episode depends on exact restoration of the same administration state; timeout is not terminal merely because time elapsed and requires an explicit versioned task/session policy.
+
+### Test and document work
+- Added test-fixture-only G6 checks for ordinary retries retaining all three identities, explicit restart creating new identities while preserving the completed episode, and a started abandoned episode preserving one immutable observation and its captured events.
+- The first test run exposed a test-diagnostic issue only: the negative assertion expected observation_id in Node's default assertion message. The identity check itself correctly failed. The assertion was given an explicit diagnostic message; no production or contract behavior was weakened.
+- Test commit `661d7250ff15dce23c689cf5fbbc081061a45526`: Full Regression #3322 / run ID `42499243432`: **RED**, 289 passed / 1 failed. Exact failure: G6-003's negative test expected the field name in the default Node assertion message.
+- Test diagnostic correction commit `61cd6917df18af3120e9a6a87f92675be17ab78a`: Full Regression #3323 / run ID `42499293139`: **GREEN** on exact commit.
+- G6 lifecycle reconciliation proposal commit `bc95ab0f8c6d3fd0134d5bceac5e677be514fbc6`: Full Regression #3324 / run ID `42499416128`: **GREEN** on exact commit. All full-regression steps passed, including browser regression and clean-working-tree verification.
+
+### Gate status
+- G6 remains OPEN: exact interruption/resume restoration policy, timeout duration/consequence, learner-facing lifecycle wording, complete event ordering/identity semantics and final C3/O6 reconciliation remain.
+- G9 remains OPEN for canonical immutable payload representation, stage status, retries, concurrency and durable recovery.
+- G3-037–039 remain BLOCKED pending complete G6/G9 semantics.
+- No runtime, production evaluator, registry, learner data, persistence, SQL/RPC/RLS or Supabase changes. O6 v0.3 remains frozen.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+### Next concrete step
+- Complete the G6 logical event/lifecycle table without inventing timeout policy or exact resume/recovery behavior. Then isolate which remaining G3-037–039 requirements depend on G6 versus G9. Keep canonical payload serialization and physical persistence/security outside this G6 logical step.

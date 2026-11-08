@@ -3664,7 +3664,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 106. G3-019 positive target-evidence preconditions — verification pending
+## 106. G3-019 positive target-evidence preconditions — verified
 
 ### Work implemented
 - Inspected G3-019 in the G3 verification specification and O6 v0.3 §§1, 5.5 and 9.
@@ -3675,7 +3675,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 ### Verification status
 - Pre-build Full Regression #3206 / run ID `42428186877`: GREEN on exact baseline commit `5945d521d4dbf8c774cfc705e080965c7f6da156`.
 - Final test implementation commit: `67c77d2b824b9ec0b3304db0e80c499ab63c8330`.
-- Full Regression on the exact final implementation commit is pending. Do not continue to another build vector until it is GREEN.
+- Full Regression #3208 / run ID `42428302970`: **GREEN** on exact final implementation commit `67c77d2b824b9ec0b3304db0e80c499ab63c8330`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

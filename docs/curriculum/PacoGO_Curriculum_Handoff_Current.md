@@ -4522,3 +4522,17 @@ Branch: `refactor/professional-v1`; LIVE `main` untouched.
 - Product priority remains to get Zyon effective mathematics practice quickly, especially fractions. The existing FR2 work is too narrow to represent a complete fractions recovery path. The next product-planning step is to define that learning progression from the existing curriculum/SLO basis and identify a bounded implementation slice; implementation starts only after the applicable gates and explicit G12 authorization are satisfied.
 - The next engineering step is to reconcile the audit findings with G5/G6/G9 and the current owner-approved contracts, then prepare the exact gate package for a bounded implementation slice. Do not create another general architecture document; update this handoff or an existing contract only when a concrete decision requires it.
 
+
+
+## 141. Fractions curriculum scope cross-check for Zyon
+
+- Re-read `PacoGO_Curriculum_Rekenen_SLO_10-18_Mapping.md` against the current executable registry.
+- The SLO mapping assigns KD10B (breuken) to FR1–FR2 plus relationships with A/B. Its scope includes the fraction as number/ratio/division, relationships with decimals/ratios/percentages, comparing/ordering/simplifying and calculating with fractions.
+- Current executable registry v0.6 contains FR2 but not FR1. No FR1-specific implementation or curriculum artifact is present in the current repository tree.
+- Current FR2 is specifically “Breukequivalentie herkennen en gebruiken”. Its interface supports symbolic fractions and area models. It does not cover the full KD10B scope and its browser pages are not connected to persisted learner-curriculum history.
+- This is a source-based scope gap, not a decision to add curriculum content or a new skill. Do not expand FR2 informally to stand in for FR1 or the whole KD10B domain.
+- Product-planning priority: define a coherent FR1–FR2 progression and its links to existing A/B skills from the SLO mapping; then select a small first practice slice based on an explicit learner starting-point check. Keep visual fraction representations central.
+- No registry, curriculum, task catalogue, interface, test, runtime or persistence changes were made. G5/G6/G9 and G12 gates remain as recorded in section 140.
+- Verification immediately before this handoff amendment: Full Regression #3364 / run ID `42510652470`, GREEN on exact commit `301cf6ca946d079622e7577e8b28b2888bfa470f`. This amendment itself requires a new Full Regression before it is considered verified.
+
+Branch: `refactor/professional-v1`; LIVE `main` untouched.

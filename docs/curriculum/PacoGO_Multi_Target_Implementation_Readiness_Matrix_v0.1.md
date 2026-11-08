@@ -1628,3 +1628,23 @@ This is the source-aligned candidate direction. G5 remains OPEN and must approve
 **Gate status:** G9 remains OPEN. G3-037/038 remain BLOCKED. G3-039 logical lineage is fixture-tested; durable recording remains open. No runtime, tests, registry, learner-state, database, SQL/RPC/RLS, Supabase or learner data changed.
 
 **Next concrete step:** review the field inventory against G6 and G5 dependencies, then write the logical G9 equality/state/recovery contract only for source-determined behavior. Keep unresolved behavior explicitly open; no physical implementation.
+
+
+## 8.70 G9 source-determined logical stage contract baseline
+
+**Artifact:** `PacoGO_G9_Logical_Stage_Contract_Source_Determined_v0.1.md`  
+**Status:** source-derived baseline for owner review; not frozen G9 approval and not implementation authorization.
+
+The artifact consolidates only requirements already supported by O5/O6 v0.3/O7/O8, C2, G6 and the C8/C9 crosswalk:
+- three distinct O7 idempotency boundaries and replay-versus-integrity-conflict outcomes;
+- immutable raw observation per administered response episode, with source event order and lifecycle/missingness preserved;
+- one immutable target assessment per assessment identity, referencing exactly one observation and one existing target; linked correction/reassessment preserves prior history;
+- immutable snapshot, separate C6 evaluation identity and source-aligned distinct C7 decision identity; C7 consumes the exact C6 result;
+- stage-local atomicity and durable inspectable state, without treating the complete observation-to-decision chain as one transaction;
+- O5 UTC/half-open event-time and separate availability-cutoff semantics.
+
+The artifact explicitly leaves unresolved: G5 Stage C identity and atomic write-unit approval; G6 identity namespaces and remaining lifecycle; null/absence, normalization, collection ordering and timestamp precision; stage-state vocabulary, uncertain-commit recovery, retry/concurrency and persistence timeout mechanics. G8/G10 physical persistence/security and G12 implementation authorization remain downstream prerequisites.
+
+**No implementation:** no runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data changed. G9 remains OPEN; G3-037/038 remain BLOCKED; G3-039 logical lineage is fixture-tested but durable recording remains open.
+
+**Next:** resolve G5/G6 owner decisions and then complete G9 canonical equality and durable recovery decisions. Do not implement or author tests for unresolved semantics.

@@ -4075,7 +4075,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 125. A1/B1/FR2 domain-anchor conformance strengthening — verification pending
+## 125. A1/B1/FR2 domain-anchor conformance strengthening — verified
 
 ### Work implemented
 - Re-read the G3↔O6 traceability review and O6 Domain Anchor Examples v0.1, then verified target identifiers against curriculum registry v0.6.
@@ -4087,7 +4087,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 ### Verification status
 - Pre-build Full Regression #3304 / run ID `42464335034`: GREEN on exact baseline commit `a1eb8ba3008733d9bfc52e59047b3bdc2b38ed23`.
 - Implementation commit: `253afb6b59052ad6b35d3fd544359b18ab3101b9`.
-- Full Regression on the exact implementation commit is pending. Do not continue to another build step until it is GREEN.
+- Full Regression #3305 / run ID `42464593360`: **GREEN** on exact implementation commit `253afb6b59052ad6b35d3fd544359b18ab3101b9`. Handoff/matrix documentation commit `160186d4357f2f6bb5b1af73566f8c251ba6b4c5` also passed Full Regression #3306 / run ID `42464612413`. All required steps passed, including browser regression and clean-working-tree verification.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

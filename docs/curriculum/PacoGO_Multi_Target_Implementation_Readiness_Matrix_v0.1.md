@@ -1025,3 +1025,19 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-017, keeping technical capture failure distinct from `NOT_COLLECTED` and preventing it from supporting `ABSENT` or `INCORRECT`. Do not infer semantics owned by G5, G6/G9 or O5.
+
+
+
+## 8.31 G3-017 — technical capture failure blocks affected assessment
+
+**Contract basis:** G3-017 and O6 v0.3 §§5.3–5.5 distinguish a technical capture failure from learner performance. A required stream with `TECHNICAL_FAILURE` blocks the affected assessment rule; it cannot support `ABSENT` or `INCORRECT`, and affected target evidence remains `INDETERMINATE`.
+
+**Test change:** `pacogo-engine/operational-assessment-contract.test.js` strengthens the G3-017 fixture with an explicitly identified required stream marked `TECHNICAL_FAILURE`. The test requires the affected performance rule to be `BLOCKED` with no learner performance result, while target evidence remains `INDETERMINATE`. Negative cases reject an `INCORRECT` result and target evidence `ABSENT` for the same failed capture condition.
+
+**Scope:** Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Pre-build Full Regression #3199 / run ID `42427646099`: GREEN on exact baseline commit `ef7da3458c865067646cb739f69139705907c667`. Implementation commit `eefa0c9e5dfe0f954f78c9760665fb32e14ea65b`. Full Regression #3200 / run ID `42427783561`: **GREEN** on that exact implementation commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with G3-018, validating every strict precondition before allowing target evidence `ABSENT`. Do not infer semantics owned by G5, G6/G9 or O5.

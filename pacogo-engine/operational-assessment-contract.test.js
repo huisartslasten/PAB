@@ -217,6 +217,23 @@ function assertLogicalAssessmentProvenance(record) {
 }
 
 /**
+ * Logical G3-039 lineage assertion. Fixture IDs are opaque test values only;
+ * this does not prescribe physical keys, canonical serialization or storage.
+ */
+function assertLogicalReassessmentLineage(previous, reassessment) {
+  assert.ok(typeof previous.assessment_id === 'string' && previous.assessment_id.trim());
+  assert.ok(typeof reassessment.assessment_id === 'string' && reassessment.assessment_id.trim());
+  assert.notEqual(reassessment.assessment_id, previous.assessment_id, 'reassessment requires a new assessment identity');
+  assert.equal(reassessment.observation_id, previous.observation_id, 'reassessment remains linked to the same immutable raw observation');
+  assert.equal(reassessment.evidence_target_id, previous.evidence_target_id, 'reassessment remains about the same evidence target');
+  assert.equal(reassessment.provenance.prior_assessment_id, previous.assessment_id, 'reassessment must link its prior assessment');
+  assert.ok(typeof reassessment.correction_reason === 'string' && reassessment.correction_reason.trim(), 'reassessment requires a reason');
+  assert.notEqual(reassessment.provenance.rule_version, previous.provenance.rule_version, 'reassessment under a new rule/version must preserve that version change');
+  assert.deepEqual(previous, previous._originalSnapshot, 'the prior assessment must remain unchanged');
+  return true;
+}
+
+/**
  * Test-fixture-only O5 snapshot eligibility check. These logical fixture
  * properties are not a persisted schema, physical snapshot ID or API.
  */
@@ -1763,10 +1780,43 @@ test('G3-036: assessment preserves required logical provenance without prescribi
   );
 });
 
-test('G3-037–039 remain blocked pending approved G6/G9 identity and payload semantics', () => {
-  const dependency = { cases: ['G3-037', 'G3-038', 'G3-039'], gate: 'G6/G9', status: 'BLOCKED' };
-  assert.equal(dependency.status, 'BLOCKED');
-  assert.deepEqual(dependency.cases, ['G3-037', 'G3-038', 'G3-039']);
+test('G3-037/038 remain blocked pending exact G6 assessment identity and G9 canonical payload semantics', () => {
+  const dependencies = [
+    { case: 'G3-037', required: ['G6 assessment identity', 'G9 canonical immutable payload equality', 'G9 idempotent stage write'] },
+    { case: 'G3-038', required: ['G6 assessment identity', 'G9 canonical immutable payload conflict detection', 'G9 preserve-original behavior'] }
+  ];
+  assert.deepEqual(dependencies.map(item => item.case), ['G3-037', 'G3-038']);
+  for (const item of dependencies) assert.ok(item.required.length >= 3);
+});
+
+test('G3-039: logical reassessment lineage creates a new linked version and preserves the prior assessment', () => {
+  const previous = {
+    assessment_id: 'fixture-assessment-v1',
+    observation_id: 'fixture-observation-1',
+    evidence_target_id: 'fixture-target-1',
+    provenance: { rule_version: 'target-rule-v1' }
+  };
+  previous._originalSnapshot = structuredClone(previous);
+  const reassessment = {
+    assessment_id: 'fixture-assessment-v2',
+    observation_id: 'fixture-observation-1',
+    evidence_target_id: 'fixture-target-1',
+    provenance: {
+      prior_assessment_id: 'fixture-assessment-v1',
+      rule_version: 'target-rule-v2'
+    },
+    correction_reason: 'A versioned target rule corrected the prior assessment interpretation'
+  };
+
+  assertLogicalReassessmentLineage(previous, reassessment);
+  const missingPriorLink = { ...reassessment, provenance: { ...reassessment.provenance, prior_assessment_id: undefined } };
+  assert.throws(() => assertLogicalReassessmentLineage(previous, missingPriorLink), /prior assessment/);
+  const overwrittenIdentity = { ...reassessment, assessment_id: previous.assessment_id };
+  assert.throws(() => assertLogicalReassessmentLineage(previous, overwrittenIdentity), /new assessment identity/);
+  const missingReason = { ...reassessment, correction_reason: '   ' };
+  assert.throws(() => assertLogicalReassessmentLineage(previous, missingReason), /requires a reason/);
+  const unchangedRule = { ...reassessment, provenance: { ...reassessment.provenance, rule_version: previous.provenance.rule_version } };
+  assert.throws(() => assertLogicalReassessmentLineage(previous, unchangedRule), /version change/);
 });
 
 test('G3-040 excludes late-available assessments from an immutable O5 snapshot', () => {

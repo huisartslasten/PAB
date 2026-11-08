@@ -3946,3 +3946,25 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN.
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+
+
+## 119. G3-032 missing process / task misalignment cannot establish contradiction — verification pending
+
+### Work implemented
+- Inspected G3-032 in the G3 verification specification and O6 v0.3 §5.7.
+- Strengthened the shared `assertAssessment` conformance assertion: when target alignment is `MISALIGNED` or required process streams are incomplete, contradiction cannot be `PRESENT`.
+- Replaced the prior weak G3-032 fixture (which did not actually set the alignment result to `MISALIGNED`) with explicit cases for: misalignment plus incomplete process yielding `INDETERMINATE`; misalignment where the contradiction rule is `NOT_APPLICABLE/NOT_RUN`; and missing process yielding `INDETERMINATE`.
+- Added negative cases with otherwise source-cited contradiction `PRESENT` to verify that neither task misalignment nor incomplete process can support it.
+- Test-only normalized logical-record conformance harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification status
+- Pre-build Full Regression #3267 / run ID `42462527928`: GREEN on exact baseline commit `b283a9da8756bb1d4fd428bb927f67f5f7c40399`.
+- Implementation commit: `c0b500230486d076f783a573c2681a82c0c6b34d`.
+- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+
+### Gate status
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.

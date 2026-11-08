@@ -1363,3 +1363,19 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-035. A declared target opportunity must not be treated as actual elicitation when the administration did not elicit that target.
+
+
+
+## 8.54 G3-035 — declared target opportunity does not prove actual elicitation
+
+**Contract basis:** G3-035 and O6 v0.3 §2 state that a task definition's list of potential target opportunities does not prove that the actual task instance elicited every target.
+
+**Test change:** The shared `assertAssessment` assertion rejects evidence `PRESENT` when the task model declares a target but the test fixture states the actual task instance did not elicit it. The positive case retains alignment `MISALIGNED` and evidence `INDETERMINATE`; a negative case rejects auto-assessment as `PRESENT`; a control case confirms that an actually elicited target can be assessed normally.
+
+**Scope:** Test-only normalized logical-record harness. The `actual_target_elicited` value is fixture-only, not a production field/API. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Implementation commit `0d9daa89c78199796c69f2bd81daa6450755cb14`. Pre-build Full Regression #3284 / run ID `42463423482`: GREEN on exact baseline commit `f2b0dce8f0c715c3c674ceb09a200eb9b3fb7c94`. Full Regression on the implementation commit is pending.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** After the exact implementation commit passes Full Regression, continue with G3-036. Preserve the required logical provenance without prescribing physical storage keys.

@@ -972,10 +972,29 @@ test('G3-027: content-help request immediately ends the independent attempt inco
   assert.throws(() => assertIndependentAttempt(incorrectlyIncorrect), /INCOMPLETE/);
 });
 
-test('G3-028: neutral answer-entry clarification does not end independent assessment', () => {
-  const attempt = { mode: 'Toets', help_request: 'interface_clarification', supplies_target_reasoning: false, ended: false };
+test('G3-028: delivered neutral answer-entry clarification does not end independent assessment', () => {
+  const attempt = {
+    mode: 'Toets',
+    help_request: 'interface_clarification',
+    support_delivered: true,
+    support_kind: 'interface_clarification',
+    supplies_target_reasoning: false,
+    ended: false
+  };
   assertIndependentAttempt(attempt);
+  assert.equal(attempt.support_delivered, true);
+  assert.equal(attempt.supplies_target_reasoning, false);
   assert.equal(attempt.ended, false);
+
+  const incorrectlyEnded = {
+    mode: 'Tussentoets',
+    help_request: 'interface_clarification',
+    support_delivered: true,
+    support_kind: 'interface_clarification',
+    supplies_target_reasoning: false,
+    ended: true
+  };
+  assert.throws(() => assertIndependentAttempt(incorrectlyEnded), /neutral interface clarification does not end the attempt/);
 });
 
 test('G3-029: supported continuation is a separate response episode', () => {

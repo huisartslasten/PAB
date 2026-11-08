@@ -169,6 +169,26 @@ function assertAssessment(record) {
   return true;
 }
 
+function assertOneObservationManyTargetAssessments(rawObservations, assessments) {
+  assert.ok(Array.isArray(rawObservations) && rawObservations.length === 1, 'one response episode must produce exactly one raw observation');
+  const observationId = rawObservations[0]?.observation_id;
+  assert.equal(typeof observationId, 'string', 'the raw observation requires its own identifier');
+  assert.ok(observationId.trim());
+  assert.ok(Array.isArray(assessments) && assessments.length >= 2, 'one observation may support multiple target assessments');
+  assert.ok(
+    assessments.every(assessment => assessment.observation_id === observationId),
+    'each target assessment must reference the one shared raw observation'
+  );
+  const targetIds = assessments.map(assessment => assessment.evidence_target_id);
+  assert.ok(targetIds.every(id => typeof id === 'string' && id.trim()), 'each assessment requires exactly one target identifier');
+  assert.equal(new Set(targetIds).size, targetIds.length, 'each target assessment must address a distinct evidence target');
+  for (const assessment of assessments) {
+    assert.equal(Object.hasOwn(assessment, 'raw_observation'), false, 'target assessments must reference, not duplicate, the raw observation');
+    assertAssessment(assessment);
+  }
+  return true;
+}
+
 function assertTargetScopedContradiction(records) {
   assert.equal(records.length, 2, 'the G3-031 fixture must contain two target assessments');
   assert.equal(records[0].observation_id, records[1].observation_id, 'target assessments must refer to the same observation');
@@ -1272,14 +1292,48 @@ test('G3-033: a help request without delivered support is not itself contradicto
   assertAssessment(independentContradictoryMaterial);
 });
 
-test('G3-034: multiple target assessments share one observation without duplicating it', () => {
-  const records = [
-    base({ evidence_target_id: 'target-a' }),
-    base({ evidence_target_id: 'target-b', dimensions: { evidence: dimension('INDETERMINATE') } })
+test('G3-034: one raw response observation supports separate target-specific assessments', () => {
+  const rawObservation = { observation_id: 'obs-shared-response-episode' };
+  const assessments = [
+    base({
+      observation_id: rawObservation.observation_id,
+      evidence_target_id: 'target-a',
+      dimensions: { evidence: dimension('PRESENT') }
+    }),
+    base({
+      observation_id: rawObservation.observation_id,
+      evidence_target_id: 'target-b',
+      dimensions: { evidence: dimension('INDETERMINATE') }
+    })
   ];
-  records.forEach(assertAssessment);
-  assert.equal(new Set(records.map(item => item.observation_id)).size, 1);
-  assert.equal(new Set(records.map(item => item.evidence_target_id)).size, 2);
+
+  assertOneObservationManyTargetAssessments([rawObservation], assessments);
+  assert.equal(assessments[0].observation_id, assessments[1].observation_id);
+  assert.notEqual(assessments[0].evidence_target_id, assessments[1].evidence_target_id);
+  assert.notEqual(assessments[0].dimensions.evidence.result, assessments[1].dimensions.evidence.result);
+
+  assert.throws(
+    () => assertOneObservationManyTargetAssessments([rawObservation, { ...rawObservation }], assessments),
+    /exactly one raw observation/
+  );
+
+  const detachedAssessment = [
+    assessments[0],
+    base({ observation_id: 'different-observation', evidence_target_id: 'target-b' })
+  ];
+  assert.throws(
+    () => assertOneObservationManyTargetAssessments([rawObservation], detachedAssessment),
+    /each target assessment must reference the one shared raw observation/
+  );
+
+  const duplicateTargetAssessment = [
+    assessments[0],
+    base({ observation_id: rawObservation.observation_id, evidence_target_id: 'target-a' })
+  ];
+  assert.throws(
+    () => assertOneObservationManyTargetAssessments([rawObservation], duplicateTargetAssessment),
+    /distinct evidence target/
+  );
 });
 
 test('G3-035: declared target opportunity alone does not prove actual elicitation', () => {

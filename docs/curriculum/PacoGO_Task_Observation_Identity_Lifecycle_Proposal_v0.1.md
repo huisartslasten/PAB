@@ -90,6 +90,13 @@ Recommended logical contract, without prescribing a physical schema or transport
 
 **Fixture verification:** G6-007 verifies that one immutable observation may have separate assessment identities for distinct targets; each assessment record must carry exactly one non-empty assessment identity, observation identity and target identity; and one assessment identity cannot be reused for multiple assessment records. This is logical contract coverage only. It does not define a key format, canonical payload, storage uniqueness constraint or replay implementation. The boundary remains subject to final G6 owner approval and C3/O6 reconciliation.
 
+**Source reconciliation for this boundary:**
+- Multi-Target Task Evidence Contract v0.1 §§3–4 separates one task-attempt/raw observation from one target-specific evidence unit per justified target; target expansion does not create additional independent observations. It does not define a canonical assessment ID.
+- The retained C3 reconciliation artifact describes one immutable raw observation with zero or more separately justified target assessments, but explicitly labels itself superseded for learner-runtime architecture and not an approved schema. It is historical context, not the source of a new ID/schema decision.
+- O6 v0.3 §7 is the controlling logical assessment record: each target-specific assessment references exactly one immutable observation and exactly one existing evidence target, and preserves a stable assessment identity under G6/G9. O6 also requires linked prior-assessment identity and reason for correction/reassessment.
+- Owner decision O7 separates raw-observation ingestion, target-assessment evaluation/recording and decision evaluation into distinct idempotency boundaries. Same identity/same canonical immutable payload is replay; same identity/different payload is conflict. O7 does not define canonical serialization or physical write/recovery mechanics.
+- Therefore G6's logical responsibility is one distinct stable identity per target-specific assessment instance, bound to one observation and one target, with linked new identities for correction/reassessment. G9 remains responsible for canonical payload equality/conflict and durable idempotent recording.
+
 ### 4.3 G9 replay and payload boundary
 
 O7 determines the logical outcome:

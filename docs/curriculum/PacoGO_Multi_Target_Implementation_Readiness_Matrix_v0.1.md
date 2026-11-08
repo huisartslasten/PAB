@@ -1073,3 +1073,19 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-020, distinguishing a help request from support actually delivered and not classifying the learner as PROMPTED or DEPENDENT when no support was delivered.
+
+
+
+## 8.34 G3-020 — help request is not delivered support
+
+**Contract basis:** O6 v0.3 §1 records a help request separately from support actually delivered. A request without delivery is not a basis for classifying independence as `PROMPTED` or `DEPENDENT`.
+
+**Test change:** `pacogo-engine/operational-assessment-contract.test.js` accepts a request event with `delivered: false` and independence `NOT_REQUIRED` in the fixture. Negative cases pass `PROMPTED` and `DEPENDENT` through the shared `assertAssessment` assertion and verify both are rejected without delivered support.
+
+**Scope:** Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Pre-build Full Regression #3211 / run ID `42428410315`: GREEN on exact baseline commit `1b8c43e93ee21aa3ed428e1259fa862260080ead`. Implementation commit `2fa2689a401d30135375845d57dd9cfe0d1aa336`. Full Regression #3212 / run ID `42428510380`: **GREEN** on that exact implementation commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with G3-021, distinguishing neutral interface clarification from target-relevant mathematical/content support.

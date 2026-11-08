@@ -3838,7 +3838,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 114. G3-027 content-help request ends independent attempt incomplete — verification pending
+## 114. G3-027 content-help request ends independent attempt incomplete — verified
 
 ### Work implemented
 - Inspected G3-027 in the G3 verification specification and O6 v0.3 §5.6.
@@ -3854,7 +3854,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 ### Verification status
 - Pre-build Full Regression #3244 / run ID `42430232236`: GREEN on exact baseline commit `b012c1640c7a9de80faaaccc39f59a49379343a1`.
-- Full Regression on correction commit `2afba1afa9358a06b69ae25d8c7d3b2b463d29da` is pending. Do not continue to another build vector until the exact commit is GREEN.
+- Full Regression #3247 / run ID `42430379823`: **GREEN** on exact correction commit `2afba1afa9358a06b69ae25d8c7d3b2b463d29da`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

@@ -1545,3 +1545,16 @@ Full Regression #3292 / run ID `42463863331`, handoff-only #3293 / run ID `42463
 **Gate status:** G6 remains OPEN for interruption/resume, timeout, exact assessment-identity semantics and full C3/O6 lifecycle reconciliation. G9 remains OPEN for canonical payload/replay/conflict and durable write/recovery mechanics. G3-039 logical lineage is tested; G3-037/038 remain BLOCKED on exact G6 assessment identity and G9 payload semantics. No runtime, physical event schema, persistence, SQL/RPC/RLS, Supabase or learner data changed; O6 v0.3 remains frozen.
 
 **Next step:** isolate the exact logical assessment-identity boundary for G3-037/038 separately from G9 canonical-payload equality/conflict mechanics. Do not invent physical keys or serializers.
+
+
+## 8.66 G6 logical target-assessment identity boundary — fixture-tested
+
+**Logical candidate:** every target-specific assessment has its own stable logical identity and refers to exactly one immutable observation and one existing evidence target. Multiple target assessments may refer to the same observation. Multiple historical assessments for the same observation/target are separately identified and linked as correction/reassessment versions; prior assessments remain immutable. No physical ID format or storage key is selected.
+
+**Test:** G6-007 verifies distinct assessment identities for multiple targets on one observation, required non-empty assessment/observation/target identities, and rejection of one assessment identity reused for multiple records. Test commit `4ec0bad47f4f76b880c55e26c5d48dbf92ec6f9e`; Full Regression #3339 / run ID `42501694960`: **GREEN** on exact commit, including exact-checkout guard, browser regression (59 passed) and clean-working-tree verification.
+
+**Boundary:** this is logical fixture coverage, not final owner approval, physical uniqueness enforcement, canonical payload serialization, payload equality or persistence. Final G6 approval and C3/O6 reconciliation remain open.
+
+**Gate status:** G3-037/038 remain BLOCKED pending approved exact G6 assessment identity plus G9 canonical payload equality/conflict and durable idempotent stage-write semantics. G3-039 logical lineage remains tested; durable persistence remains open. G6 remains OPEN for interruption/resume, timeout and complete lifecycle reconciliation. G9 remains OPEN. No runtime, schema, database, SQL/RPC/RLS, Supabase or learner data changed; O6 v0.3 remains frozen.
+
+**Next:** reconcile the logical assessment-identity candidate against C3/O6 and the owner architecture decision record; then determine which G3-037/038 assertions can be authored without specifying G9 mechanics.

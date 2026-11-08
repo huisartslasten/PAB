@@ -1462,3 +1462,19 @@ Full Regression #3292 / run ID `42463863331`, handoff-only #3293 / run ID `42463
 **Gate status:** G2/O6 remains CLOSED; G3 remains OPEN. G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics; G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate. No production implementation authorization is implied.
 
 **Next step:** Inspect remaining directly specified G3↔O6 anchors for an eligible, unblocked conformance gap. Do not infer G6/G9 or O5 semantics.
+
+
+
+## 8.61 G3-040 — O5 snapshot availability-cutoff conformance verified
+
+**Contract basis:** G3-040 / G3 verification specification §4.6 requires an assessment that becomes available after an O5 snapshot's availability cutoff to be excluded from that immutable snapshot and considered only by a new snapshot/evaluation. O5's approved minimum logical policy (handoff Section 67) specifies event-time membership in a half-open window, a separate assessment-availability cutoff per snapshot, immutable snapshots and late-arrival handling.
+
+**Test change:** Replaced the G3-040 blocked placeholder with test-fixture-only logical eligibility checks. The suite verifies that an in-window event with assessment availability after the cutoff is excluded from the original snapshot; a later snapshot/evaluation with a later cutoff may include it; and the original snapshot remains unchanged. Boundary cases cover inclusive window start, exclusive window end, availability exactly at cutoff and availability after cutoff. Event-time membership and assessment availability are tested separately.
+
+**Scope:** Test-only logical fixtures. No physical snapshot ID, storage key, schema/API, production evaluator/runtime, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Implementation commit `d5d7c8095405c4ab6d9401c89784396db05dc956`. Full Regression #3314 / run ID `42466872610`: **GREEN** on that exact commit; all required steps passed, including browser regression and clean-working-tree verification.
+
+**Gate status:** O5 core logical cutoff policy is approved; detailed governance items remain open under G1. G3-040 is verified and no longer blocked on the minimum O5 cutoff semantics. G3 remains OPEN because G3-037–039 depend on G6/G9 identity and canonical-payload semantics. G2/O6 remains CLOSED; G5, G6/G9 and G12 remain separate gates. No production implementation authorization is implied.
+
+**Next step:** Reconcile the existing G6 task/attempt/observation lifecycle proposal with approved O6 v0.3, distinguishing determined requirements from owner decisions still needed. Do not infer G6/G9 identity or canonical-payload behavior.

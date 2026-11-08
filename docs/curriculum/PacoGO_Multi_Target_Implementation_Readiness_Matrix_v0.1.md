@@ -1221,3 +1221,19 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-029, preserving pre-request raw work/events and keeping any later supported continuation in a separate attempt/response episode.
+
+
+
+## 8.43 G3-029 — preserve pre-request work and separate supported continuation
+
+**Contract basis:** O6 v0.3 §5.6 requires a content-help request during Tussentoets/Toets to close the independent attempt as `INCOMPLETE`, preserve all prior work/events, and keep later supported work in a distinct practice attempt/response episode.
+
+**Test change:** Added test-only `assertSeparateSupportedContinuation`. G3-029 now verifies preservation of two pre-request raw events, an incomplete independent attempt, and a separate `Oefenen` observation for later supported work. Negative cases reject erased prior work, reusing the same observation for continuation, and continuation in an independent assessment mode.
+
+**Scope:** Test-only normalized attempt/observation fixtures. No production attempt runtime, assessor, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Pre-build Full Regression #3252 / run ID `42430621661`: GREEN on exact baseline commit `805e68e8db39ed283b9466509b3283298173e12a`. Implementation commit `d62f29e00275223ebe6978c430628405853239d2`. Full Regression #3255 / run ID `42430758236`: **GREEN** on that exact implementation commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with G3-030, ensuring an incorrect response alone does not create contradiction evidence.

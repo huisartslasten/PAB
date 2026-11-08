@@ -3640,3 +3640,24 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN; continue vector by vector with meaningful positive and negative assertions.
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
 - Next: inspect and strengthen G3-018 against its strict preconditions for target evidence `ABSENT`. Do not invent unresolved G5/G6/G9/O5 semantics and do not begin production runtime or persistence work without applicable gates and explicit G12 authorization.
+
+
+
+## 105. G3-018 strict ABSENT preconditions — verification pending
+
+### Work implemented
+- Inspected G3-018 in the G3 verification specification and O6 v0.3 §5.5.
+- Reworked `pacogo-engine/operational-assessment-contract.test.js` so the valid `ABSENT` case passes through the shared `assertAssessment` conformance assertion.
+- Added eight negative cases, also through the shared assertion: misaligned task, criterion not pre-defined, required material not pre-defined, required material not fully captured, required material not inspectable, incomplete required streams, criterion actually met, and target rule not completed.
+- This strengthens the existing frozen O6 contract; it does not change the contract or production semantics. Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification status
+- Pre-build Full Regression #3202 / run ID `42427882277`: GREEN on exact baseline commit `073e353c549f7330e9865a592f23b223ac59ea45`.
+- Implementation commit: `f91513784da49a48212f426f190724ca3fcc282c`.
+- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+
+### Gate status
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.

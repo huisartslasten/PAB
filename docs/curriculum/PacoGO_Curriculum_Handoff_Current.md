@@ -4459,3 +4459,66 @@ Branch remains `refactor/professional-v1`; LIVE `main` untouched.
 3. Do not silently decide cross-gate identity, canonicalization, timeout, retry, concurrency or persistence behavior. Do not implement or modify the RPC.
 
 Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+
+## 140. Implementation Alignment & Build Phase 1 — repository audit baseline
+
+### Audit baseline and method
+- Branch: `refactor/professional-v1`.
+- Exact HEAD at audit start: `62584ba81947e4516f03898f5c1e2c6758c88854`.
+- Latest branch Full Regression at audit start: #3363 / run ID `42507549459`, conclusion `success`, exact same HEAD SHA. Browser regression and clean-working-tree verification were included in the workflow.
+- The branch API independently confirmed that `refactor/professional-v1` points to this exact SHA. LIVE `main` was not changed.
+- Read-only repository inventory: 135 files under `pacogo-engine`; 18 curriculum browser pages; 132 files under `docs/curriculum`; 320 test files, including 64 engine test files and 34 browser test files; 1,082 total Git-tree files.
+- Rechecked the existing `PacoGO_G6_G7_Read_Only_Identity_and_Consumer_Audit_v0.1.md` against current source. Its main runtime, identity and persistence findings remain applicable. The comparison from its audited baseline showed the intervening implementation changes concentrated in the Addition Learning Interface and its representation-mapping path; the reviewed runtime/identity/persistence core files remain unchanged.
+- No source code, tests, curriculum data, SQL/RPC/RLS, Supabase or learner data were changed during this audit.
+
+### C1–C5 — research and measurement infrastructure
+- C1–C3: empirical-pilot data validation, task-instance/observation/coding-input preparation, dataset snapshots and descriptive analysis helpers exist. `operational-assessment-contract.test.js` explicitly identifies itself as a fixture-only conformance harness, not a production assessor. No operational O6/C3 assessment runtime module was found in `pacogo-engine`.
+- C4: candidate development-comparison and measurement-readiness modules exist, with tests. They validate supplied comparison/readiness results; they do not establish empirical developmental validity by themselves.
+- C5: W0/W1/W2 feasibility, protocol and analysis validators exist. W0 requires a synthetic feasibility fixture; W1/W2 are explicitly design-only. W2 establishes repeated-measurement readiness/temporal-analysis readiness and explicitly blocks developmental-ordering, prerequisite, causal and mastery conclusions.
+- These are useful research/pilot infrastructure, not evidence that the curriculum claims have been empirically validated.
+
+### C6–C9 — modules exist, but the learner runtime does not consume them
+- C6 mastery and C7 next-action modules exist with dedicated tests and an isolated C6→C7 test path.
+- C8 student-model and C9 structural vertical-validation modules exist with adapters and tests.
+- The active browser route remains `browser-vertical-slice.js → curriculum-registry.js → prototype.js`. The registry calls the generic `runCycle()` in `prototype.js`; it does not call the separate C6/C7 modules or the C8/C9 adapters.
+- The current C6 result is keyed by `claim_id` only, so multiple results for the same claim in different branch contexts are not represented as distinct map entries.
+- Current C8 validates learner/claim/development/scope identity, not the complete six-part branch identity. Its adapter derives an observation ID from `observed_at`.
+- Current C9 validates a structural vertical slice with the same four-part identity and does not validate the proposed full snapshot/evaluation lineage. Its result explicitly does not prove developmental validity or empirical curriculum validity.
+- Therefore C6–C9 are partially implemented candidate modules, not an integrated branch-specific learner decision runtime.
+
+### Browser pages and Learning Interfaces
+- 16 of the 18 curriculum pages call the shared browser vertical-slice runtime. The two clock demo pages use a separate clock interface/controller path.
+- Five learner pages — B1 through B5 — use the learner-curriculum service to load history and persist the skill-cycle result. A1, B1 experimental/variant pages and FR2 pages use the runtime but do not use that persistence service.
+- Existing reusable interface families include Number Line, Addition, Fraction, Clock, Quantity Representation and Division Representation. Their current separation varies: Number Line and Quantity/Division have distinct model/rendering modules; Addition and Fraction have contracts/controllers/renderers; the Clock interface combines DOM rendering and interaction handling inside its interface module.
+- No Measurement or Ratio Learning Interface implementation was found in the current engine tree.
+- Quantity Representation is currently used as a display representation in the inspected B3 learner path.
+- FR2 is specifically the candidate skill “Breukequivalentie herkennen en gebruiken”. Its interface supports symbolic fractions and area models, but FR2 is not a complete fractions recovery curriculum. The five FR2 browser pages are not connected to the persisted learner-curriculum service.
+
+### Persistence and learner-state boundaries
+- The persisted B1–B5 path uses `src/services/learner-curriculum-service.js` and the committed `persist_curriculum_learning_cycle` RPC.
+- The current RPC is one atomic write unit for one evidence row, one skill-level longitudinal-state upsert and one decision-trace row. The current database shape is scalar/skill-level, not the proposed staged observation → target-assessment → branch-decision model.
+- Current duplicate handling checks whether the related evidence/state/trace rows exist for learner + source event. It does not compare the complete canonical immutable payload and therefore does not implement the G9 same-identity/same-payload replay versus different-payload integrity-conflict contract.
+- The committed security migrations include guardian ownership checks, RLS-scoped writes, SECURITY INVOKER execution and transaction-local capability cleanup on success and error. This is source-code/migration evidence only; no deployed Supabase environment was inspected or certified.
+- `student-evidence-store.js` is a simple in-memory helper exercised by engine tests; it is not the persistent store used by the B1–B5 learner pages.
+
+### Implementation/contract crosswalk
+| Area | Status | Exact finding |
+|---|---|---|
+| Existing skill-centric browser runtime | GEBOUWD | Used by 16 curriculum pages; routes through registry and `prototype.js`. |
+| B1–B5 learner persistence | GEBOUWD | Loads/persists scalar skill evidence/state/decision through the existing service and RPC. |
+| C1–C3 operational assessment | GEDEELTELIJK | Pilot/data-validation helpers and fixture conformance tests exist; production O6/C3 assessor runtime is absent. |
+| C4–C5 research pipeline | GEDEELTELIJK | Candidate comparison, feasibility and design-only protocol/analysis validators exist; no empirical developmental conclusion is established. |
+| C6–C9 branch decision chain | GEDEELTELIJK | Separate candidate modules/tests exist, but they are not integrated into the active browser runtime and do not yet satisfy the complete six-part snapshot/evaluation lineage. |
+| Learning Interfaces | GEDEELTELIJK | Several reusable families exist; integration, state/evidence contracts and rendering separation are not uniform; Measurement/Ratio are absent. |
+| FR2 fractions practice | GEDEELTELIJK | Fraction-equivalence interface and demos exist; no full fractions progression and no learner-curriculum persistence path. |
+| Multi-stage persistence/idempotency | ONTWERP / GEDEELTELIJK | Logical O7/G9 direction exists; current scalar RPC does not implement staged canonical replay/conflict semantics. |
+| Deployed Supabase state | ONDUIDELIJK | Committed migrations were inspected; deployed database state was not inspected. |
+
+### Gates and next work
+- The audit does not close G5, G6, G8, G9, G10 or G11. G5 branch-lineage approval, G6 complete identity/lifecycle approval and G9 canonical equality/stage recovery decisions remain open in the current source documents.
+- G12 remains NOT AUTHORIZED. The readiness matrix requires G0–G11 before a narrow implementation authorization; runtime and persistence work require their own completed design/security gates. The uploaded Implementation Alignment handoff's Phase 4 must not be interpreted as permission to bypass these current gates.
+- No implementation, test adjustment, registry change or Supabase change is authorized by this audit.
+- Product priority remains to get Zyon effective mathematics practice quickly, especially fractions. The existing FR2 work is too narrow to represent a complete fractions recovery path. The next product-planning step is to define that learning progression from the existing curriculum/SLO basis and identify a bounded implementation slice; implementation starts only after the applicable gates and explicit G12 authorization are satisfied.
+- The next engineering step is to reconcile the audit findings with G5/G6/G9 and the current owner-approved contracts, then prepare the exact gate package for a bounded implementation slice. Do not create another general architecture document; update this handoff or an existing contract only when a concrete decision requires it.
+

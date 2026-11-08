@@ -4094,3 +4094,26 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN for directly specified domain-anchor strengthening; G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics; G3-040 remains blocked on O5 snapshot/availability-cutoff semantics.
 - G5, G6/G9, O5 and G12 remain separate dependencies/gates.
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+
+
+## 126. C6 M2 descriptive-profile conformance — verified
+
+### Work implemented
+- Reviewed the direct C6 M2 descriptive-profile anchor against G3 verification specification §7 and the frozen O6 v0.3 non-scored profile requirement.
+- Verified that the five required components remain separately inspectable: `capture_integrity`, `response_interpretability`, `scoring_validity`, `administration_fidelity` and `source_provenance_integrity`.
+- The test harness rejects missing components, non-record values and prohibited score/ordinal/weighted/composite aggregates at any nesting depth. It also rejects compound and camelCase aggregate field names, while permitting descriptive nested detail.
+- The profile remains descriptive and non-scored. No numeric/ordinal total is introduced; this does not decide G5's downstream M1/M2 relationship or redefine C6 gates.
+- Scope is test-only. No production assessor/runtime, curriculum mapping, registry, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification status
+- Full Regression #3310 / run ID `42466388550`: **GREEN** on exact commit `5a11956729812febf919e1e7fc7919e9d89a5592`.
+- Additional compound-field coverage commit: `dd65d1026151d3d91e7bb6b7be2de0adaf1f4117`.
+- Full Regression #3311 / run ID `42466547557`: **GREEN** on that exact commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks all passed.
+
+### Gate status and next step
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN; this closes the reviewed direct C6 M2 descriptive-profile conformance gap, not G3 as a whole.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains a separate dependency; no M1/M2 mapping is decided here.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Next: inspect the remaining directly specified G3↔O6 anchors for an eligible, unblocked gap. Do not infer G6/G9 or O5 semantics.

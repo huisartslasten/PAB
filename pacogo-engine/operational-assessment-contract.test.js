@@ -310,11 +310,64 @@ function assertSeparateSupportedContinuation(independent, practice) {
   return true;
 }
 
+const M2_PROFILE_COMPONENTS = [
+  'capture_integrity',
+  'response_interpretability',
+  'scoring_validity',
+  'administration_fidelity',
+  'source_provenance_integrity'
+];
+
+function isM2AggregateField(key) {
+  const normalized = String(key).toLowerCase().replace(/[^a-z0-9]/g, '');
+  const forbidden = new Set([
+    'score', 'qualityscore', 'adequacyscore', 'm2score',
+    'qualitytotal', 'adequacytotal', 'm2total', 'totalquality', 'totaladequacy',
+    'average', 'qualityaverage', 'adequacyaverage', 'm2average', 'mean',
+    'weight', 'weights', 'qualityweight', 'adequacyweight', 'm2weight',
+    'weightedscore', 'qualityweightedscore', 'adequacyweightedscore',
+    'rank', 'qualityrank', 'adequacyrank', 'm2rank',
+    'composite', 'qualitycomposite', 'adequacycomposite', 'm2composite',
+    'aggregate', 'qualityaggregate', 'adequacyaggregate', 'm2aggregate',
+    'qualityindex', 'adequacyindex', 'm2index',
+    'qualitylevel', 'adequacylevel', 'm2level',
+    'qualityrating', 'adequacyrating', 'm2rating',
+    'overallquality', 'overalladequacy', 'overallm2'
+  ]);
+  return forbidden.has(normalized);
+}
+
+function assertNoM2AggregateFields(value, location = 'profile', visited = new WeakSet()) {
+  if (value === null || typeof value !== 'object' || visited.has(value)) return;
+  visited.add(value);
+
+  for (const [key, nested] of Object.entries(value)) {
+    assert.equal(
+      isM2AggregateField(key),
+      false,
+      'M2 profile must not contain a score, ordinal, weighted or composite aggregate: ' + location + '.' + key
+    );
+    assertNoM2AggregateFields(nested, location + '.' + key, visited);
+  }
+}
+
 function assertAdequacyProfile(profile) {
-  const required = ['capture_integrity', 'response_interpretability', 'scoring_validity', 'administration_fidelity', 'source_provenance_integrity'];
-  for (const key of required) assert.ok(Object.hasOwn(profile, key), 'missing M2 profile component: ' + key);
-  assert.equal(Object.hasOwn(profile, 'score'), false, 'M2 profile must not be scored');
-  assert.equal(Object.hasOwn(profile, 'quality_total'), false, 'M2 profile must not have a composite total');
+  assert.ok(
+    profile !== null && typeof profile === 'object' && !Array.isArray(profile),
+    'M2 profile must be a structured record'
+  );
+
+  for (const key of M2_PROFILE_COMPONENTS) {
+    assert.ok(Object.hasOwn(profile, key), 'missing M2 profile component: ' + key);
+    assert.equal(
+      Object.prototype.propertyIsEnumerable.call(profile, key),
+      true,
+      'M2 profile component must be independently inspectable: ' + key
+    );
+  }
+
+  assertNoM2AggregateFields(profile);
+  return true;
 }
 
 function base(overrides = {}) {
@@ -1689,7 +1742,7 @@ test('FR2 wrong selection alone is not contradiction', () => {
   );
 });
 
-test('C6 M2 adequacy remains a structured non-scored profile', () => {
+test('C6 M2 adequacy exposes all five descriptive components independently', () => {
   const profile = {
     capture_integrity: 'AVAILABLE',
     response_interpretability: 'INTERPRETABLE',
@@ -1697,8 +1750,13 @@ test('C6 M2 adequacy remains a structured non-scored profile', () => {
     administration_fidelity: 'NO_DEVIATION_RECORDED',
     source_provenance_integrity: 'TRACEABLE'
   };
-  assertAdequacyProfile(profile);
-  assert.equal(Object.keys(profile).length, 5);
+
+  assert.equal(assertAdequacyProfile(profile), true);
+  assert.deepEqual(Object.keys(profile), M2_PROFILE_COMPONENTS);
+  for (const component of M2_PROFILE_COMPONENTS) {
+    assert.equal(Object.prototype.propertyIsEnumerable.call(profile, component), true);
+    assert.notEqual(profile[component], undefined);
+  }
 });
 
 
@@ -1735,14 +1793,73 @@ test('negative contract cases reject prohibited shortcuts', () => {
   assert.throws(() => assertAssessment(contradictionWithoutSource), /contradiction must cite source material/);
 });
 
-test('M2 profile rejects missing components and aggregate scores', () => {
-  assert.throws(() => assertAdequacyProfile({ capture_integrity: 'AVAILABLE' }), /missing M2 profile component/);
-  assert.throws(() => assertAdequacyProfile({
+test('M2 profile rejects missing components and non-record values', () => {
+  const complete = {
     capture_integrity: 'AVAILABLE',
     response_interpretability: 'INTERPRETABLE',
     scoring_validity: 'APPLICABLE',
     administration_fidelity: 'NO_DEVIATION_RECORDED',
-    source_provenance_integrity: 'TRACEABLE',
-    quality_total: 4
-  }), /M2 profile must not have a composite total/);
+    source_provenance_integrity: 'TRACEABLE'
+  };
+
+  for (const component of M2_PROFILE_COMPONENTS) {
+    const incomplete = { ...complete };
+    delete incomplete[component];
+    assert.throws(
+      () => assertAdequacyProfile(incomplete),
+      new RegExp('missing M2 profile component: ' + component)
+    );
+  }
+
+  for (const invalid of [null, undefined, [], 'profile', 5]) {
+    assert.throws(() => assertAdequacyProfile(invalid), /M2 profile must be a structured record/);
+  }
+});
+
+test('M2 profile rejects score, ordinal, weighted and composite aggregates at every depth', () => {
+  const complete = {
+    capture_integrity: 'AVAILABLE',
+    response_interpretability: 'INTERPRETABLE',
+    scoring_validity: 'APPLICABLE',
+    administration_fidelity: 'NO_DEVIATION_RECORDED',
+    source_provenance_integrity: 'TRACEABLE'
+  };
+  const prohibitedFields = [
+    'score', 'quality_score', 'adequacyScore', 'm2_score',
+    'quality_total', 'total_quality', 'adequacy_total',
+    'average', 'quality_average', 'mean',
+    'weight', 'quality_weight', 'weighted_score',
+    'rank', 'quality_rank',
+    'composite', 'quality_composite',
+    'aggregate', 'quality_aggregate',
+    'quality_index', 'adequacy_level', 'm2_rating',
+    'overall_quality'
+  ];
+
+  for (const field of prohibitedFields) {
+    assert.throws(
+      () => assertAdequacyProfile({ ...complete, [field]: 1 }),
+      /M2 profile must not contain a score, ordinal, weighted or composite aggregate/
+    );
+
+    assert.throws(
+      () => assertAdequacyProfile({
+        ...complete,
+        capture_integrity: { status: 'AVAILABLE', [field]: 'HIGH' }
+      }),
+      /M2 profile must not contain a score, ordinal, weighted or composite aggregate/
+    );
+  }
+});
+
+test('M2 profile permits descriptive detail without introducing an aggregate', () => {
+  const profile = {
+    capture_integrity: { response_stream: 'AVAILABLE', event_stream: 'PARTIAL' },
+    response_interpretability: { status: 'INTERPRETABLE', rationale_reference: 'reason-1' },
+    scoring_validity: { status: 'APPLICABLE', rule_reference: 'rule-1' },
+    administration_fidelity: { status: 'DEVIATION_RECORDED', deviation_reference: 'deviation-1' },
+    source_provenance_integrity: { status: 'TRACEABLE', source_reference: 'source-1' }
+  };
+
+  assert.equal(assertAdequacyProfile(profile), true);
 });

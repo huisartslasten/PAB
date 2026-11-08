@@ -3906,7 +3906,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 117. G3-030 incorrect performance does not imply contradiction — verification pending
+## 117. G3-030 incorrect performance does not imply contradiction — verified
 
 ### Work implemented
 - Inspected G3-030 in the G3 verification specification and O6 v0.3 §5.7.
@@ -3917,7 +3917,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 ### Verification status
 - Pre-build Full Regression #3258 / run ID `42430890658`: GREEN on exact baseline commit `3a60437b1e0dbd7577b8069159ed469d2e87d6a8`.
 - Implementation commit: `242e5ac6d8e187a8d576fce750fd45c80b38bc32`.
-- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+- Full Regression #3259 / run ID `42431013705`: **GREEN** on exact implementation commit `242e5ac6d8e187a8d576fce750fd45c80b38bc32`. The subsequent handoff-only commit `218d5157ff19a299ea3a22c9b169c6194ac0ec6b` also passed Full Regression #3260 / run ID `42431025892`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

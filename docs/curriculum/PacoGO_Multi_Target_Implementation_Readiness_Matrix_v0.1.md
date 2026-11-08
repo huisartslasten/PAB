@@ -1353,3 +1353,13 @@ The fixture value is test-only; it does not define a production API or persisted
 ## 8.52 G3-034 — one observation, multiple target assessments verified
 
 **Verification:** Implementation commit `263dfcf14aa946f2aa43053c541058609ddf6533`. Full Regression #3278 / run ID `42463163132`: **GREEN** on that exact commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed. The pending handoff/matrix status update must also pass Full Regression before the next build vector.
+
+
+
+## 8.53 G3-034 — one observation, multiple target assessments verified
+
+**Verification:** Implementation commit `263dfcf14aa946f2aa43053c541058609ddf6533`. Full Regression #3278 / run ID `42463163132`: **GREEN** on that exact commit. Documentation commits `d85490f64d2f505c0a649c60e16caadd49f0ff0f` and `a08092226f2d56792ad5892d8ccb585b79297da5` passed Full Regression #3281 / run ID `42463286584` and #3282 / run ID `42463289970`, respectively. All required regression steps passed, including browser regression and clean-working-tree verification.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with G3-035. A declared target opportunity must not be treated as actual elicitation when the administration did not elicit that target.

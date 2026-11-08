@@ -64,6 +64,17 @@ function assertAssessment(record) {
   const independence = record.dimensions.independence?.result;
   const contradiction = record.dimensions.contradiction?.result;
 
+  if (
+    record.task_model_declares_target === true &&
+    record.task_instance.actual_target_elicited === false
+  ) {
+    assert.notEqual(
+      evidence,
+      'PRESENT',
+      'a declared target not elicited by the actual task instance cannot receive PRESENT evidence'
+    );
+  }
+
   if (alignment === 'MISALIGNED' || record.process?.required_streams_complete === false) {
     assert.notEqual(
       contradiction,
@@ -1336,15 +1347,54 @@ test('G3-034: one raw response observation supports separate target-specific ass
   );
 });
 
-test('G3-035: declared target opportunity alone does not prove actual elicitation', () => {
-  const record = base({
+test('G3-035: a declared target opportunity is not evidence unless the actual instance elicited it', () => {
+  const notElicited = base({
     task_model_declares_target: true,
-    task_instance: { ...base().task_instance, aligned: false },
-    dimensions: { alignment: dimension('MISALIGNED'), evidence: dimension('INDETERMINATE') }
+    task_instance: {
+      ...base().task_instance,
+      aligned: false,
+      actual_target_elicited: false
+    },
+    dimensions: {
+      alignment: dimension('MISALIGNED'),
+      evidence: dimension('INDETERMINATE')
+    }
   });
-  assertAssessment(record);
-  assert.equal(record.task_model_declares_target, true);
-  assert.equal(record.dimensions.evidence.result, 'INDETERMINATE');
+  assertAssessment(notElicited);
+  assert.equal(notElicited.task_model_declares_target, true);
+  assert.equal(notElicited.task_instance.actual_target_elicited, false);
+  assert.equal(notElicited.dimensions.alignment.result, 'MISALIGNED');
+  assert.equal(notElicited.dimensions.evidence.result, 'INDETERMINATE');
+
+  const autoAssessed = base({
+    task_model_declares_target: true,
+    task_instance: {
+      ...base().task_instance,
+      aligned: false,
+      actual_target_elicited: false
+    },
+    dimensions: {
+      alignment: dimension('MISALIGNED'),
+      evidence: dimension('PRESENT')
+    }
+  });
+  assert.throws(
+    () => assertAssessment(autoAssessed),
+    /a declared target not elicited by the actual task instance cannot receive PRESENT evidence/
+  );
+
+  const actuallyElicited = base({
+    task_model_declares_target: true,
+    task_instance: {
+      ...base().task_instance,
+      actual_target_elicited: true
+    },
+    dimensions: {
+      alignment: dimension('ALIGNED'),
+      evidence: dimension('PRESENT')
+    }
+  });
+  assertAssessment(actuallyElicited);
 });
 
 test('G3-036: assessment preserves logical provenance without prescribing physical keys', () => {

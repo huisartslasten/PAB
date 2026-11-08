@@ -4233,3 +4233,30 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 ### Next concrete step
 - Define only the remaining logical G6 event identity/order boundary, keeping canonical payload serialization and durable write/retry mechanics in G9. Then re-evaluate whether G3-037/038 have sufficient approved logical inputs for executable contract tests.
+
+
+## 131. G6 logical event identity and ordering boundary — fixture-tested
+
+### Logical boundary
+- Each interaction event belongs to exactly one response episode.
+- Event identity is stable and unique within its parent response episode.
+- The raw observation preserves the event stream in source/episode order. Event timestamps are provenance; they do not silently reorder events.
+- Event time and assessment-availability time remain separate O5/O6 facts.
+- A numeric event-sequence field is not mandated by the logical contract; preserving ordered event identity is required, while the physical representation remains open.
+- O7's replay/conflict outcome applies to event identity plus canonical immutable payload. Exact payload fields, serialization/equality, idempotency-key mechanics and durable retry/concurrency/recovery remain G9 work.
+- A corrected event must not rewrite the original raw event; a linked/versioned correction remains the logical direction, with physical lineage implementation deferred.
+
+### Test and document work
+- Added G6-006 test-fixture coverage for event identity uniqueness within an episode, exactly one parent episode and preservation of source event order even when timestamps are not chronological.
+- Test commit `0033986c909ce5b37a8448174ebcc01966591466`: Full Regression #3333 / run ID `42501201552`: **GREEN** on exact commit. The exact-checkout guard, curriculum-engine, architecture, Node/Vitest, browser and clean-working-tree checks passed.
+- G6 proposal event-boundary update commit `27ccd9b570b0668c2ad9a6bacb0cf6de8fd99c74`: Full Regression #3334 / run ID `42501204468`: **GREEN** on exact commit.
+
+### Gate status
+- G6 logical event parentage/identity/order boundary: specified and fixture-tested; G6 remains OPEN for interruption/resume, timeout, exact assessment-identity semantics and complete C3/O6 lifecycle reconciliation.
+- G9 remains OPEN for canonical payload representation/equality, idempotency mechanics, stage status, retry, concurrency and durable recovery.
+- G3-039 logical lineage remains tested; G3-037/038 remain BLOCKED on exact G6 assessment identity and G9 canonical payload semantics.
+- No production runtime, physical event schema, persistence, SQL/RPC/RLS, Supabase or learner data changed. O6 v0.3 remains frozen.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+### Next concrete step
+- Isolate the exact logical assessment-identity boundary needed by G3-037/038 from G9's canonical-payload equality/conflict mechanics. Keep the G6 identity decision logical and inspectable; do not invent physical keys or serializers.

@@ -1379,3 +1379,9 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** After the exact implementation commit passes Full Regression, continue with G3-036. Preserve the required logical provenance without prescribing physical storage keys.
+
+
+
+## 8.55 G3-035 — actual elicitation verified independently of declared opportunity
+
+**Verification:** Implementation commit `0d9daa89c78199796c69f2bd81daa6450755cb14`. Full Regression #3285 / run ID `42463541450`: **GREEN** on that exact commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed. The pending handoff/matrix update must also pass Full Regression before the next build vector.

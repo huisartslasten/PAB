@@ -3835,3 +3835,24 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN.
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+
+
+## 114. G3-027 content-help request ends independent attempt incomplete — verification pending
+
+### Work implemented
+- Inspected G3-027 in the G3 verification specification and O6 v0.3 §5.6.
+- Expanded `pacogo-engine/operational-assessment-contract.test.js` to verify that a content-help request during Tussentoets/Toets immediately ends the attempt as `INCOMPLETE`, even when no support is subsequently delivered.
+- Negative cases reject an attempt that remains open and attempts marked `FAILED` or `INCORRECT`.
+- This remains test-only attempt-lifecycle conformance work. No production attempt runtime, assessor, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification status
+- Pre-build Full Regression #3244 / run ID `42430232236`: GREEN on exact baseline commit `b012c1640c7a9de80faaaccc39f59a49379343a1`.
+- Implementation commit: `b311a88804f82f1ac51fcd081e541b102638a8b2`.
+- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+
+### Gate status
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.

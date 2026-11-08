@@ -149,6 +149,17 @@ function assertAssessment(record) {
     assert.equal(record.support?.target_relevant, true, 'DEPENDENT requires target-relevant support');
     assert.equal(record.support?.supplied_required_operation, true, 'DEPENDENT support supplies a required operation');
   }
+  if (
+    contradiction === 'PRESENT' &&
+    record.support?.request === true &&
+    record.support?.delivered === false
+  ) {
+    assert.notEqual(
+      record.contradiction_source?.event_id,
+      record.support.request_event_id,
+      'a help request without delivered support cannot itself establish contradiction'
+    );
+  }
   if (contradiction === 'PRESENT') {
     assert.equal(typeof record.contradiction_source?.event_id, 'string', 'contradiction must cite source material');
     assert.ok(record.contradiction_source.event_id.trim());
@@ -1212,9 +1223,53 @@ test('G3-032: missing process or task misalignment leaves contradiction indeterm
   assert.throws(() => assertAssessment(missingProcessContradiction), /missing process or task misalignment cannot establish contradiction PRESENT/);
 });
 
-test('G3-033: help request alone is not contradiction', () => {
-  const record = base({ support: { request: true, delivered: false }, dimensions: { contradiction: dimension('ABSENT') } });
-  assertAssessment(record);
+test('G3-033: a help request without delivered support is not itself contradictory evidence', () => {
+  const requestOnly = base({
+    support: {
+      request: true,
+      delivered: false,
+      target_relevant: false,
+      request_event_id: 'help-request-1'
+    },
+    dimensions: { contradiction: dimension('ABSENT') }
+  });
+  assertAssessment(requestOnly);
+  assert.equal(requestOnly.dimensions.contradiction.result, 'ABSENT');
+
+  const requestMisclassified = base({
+    support: {
+      request: true,
+      delivered: false,
+      target_relevant: false,
+      request_event_id: 'help-request-2'
+    },
+    dimensions: { contradiction: dimension('PRESENT') },
+    contradiction_source: {
+      event_id: 'help-request-2',
+      source_material: 'The learner requested help.',
+      conflicts_with: 'a target-specific interpretation'
+    }
+  });
+  assert.throws(
+    () => assertAssessment(requestMisclassified),
+    /a help request without delivered support cannot itself establish contradiction/
+  );
+
+  const independentContradictoryMaterial = base({
+    support: {
+      request: true,
+      delivered: false,
+      target_relevant: false,
+      request_event_id: 'help-request-3'
+    },
+    dimensions: { contradiction: dimension('PRESENT') },
+    contradiction_source: {
+      event_id: 'response-event-3',
+      source_material: 'The captured explanation conflicts with the target interpretation.',
+      conflicts_with: 'the target-specific interpretation'
+    }
+  });
+  assertAssessment(independentContradictoryMaterial);
 });
 
 test('G3-034: multiple target assessments share one observation without duplicating it', () => {

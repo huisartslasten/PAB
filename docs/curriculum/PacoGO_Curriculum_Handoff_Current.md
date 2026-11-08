@@ -4201,3 +4201,35 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 ### Next concrete step
 - Complete the G6 logical event/lifecycle table without inventing timeout policy or exact resume/recovery behavior. Then isolate which remaining G3-037–039 requirements depend on G6 versus G9. Keep canonical payload serialization and physical persistence/security outside this G6 logical step.
+
+
+## 130. G3-037–039 dependency split, G3-039 logical lineage test and exact-commit CI verification
+
+### G3 dependency split
+- G3-037 (same assessment identity + same canonical immutable content): requires G6's exact logical assessment-identity boundary and G9's canonical-payload equality/idempotent stage-write semantics. Remains BLOCKED.
+- G3-038 (same assessment identity + different canonical content): requires the same G6 identity boundary plus G9's canonical-payload conflict detection and preserve-original behavior. Remains BLOCKED.
+- G3-039 (correction/reassessment under a new rule/version): O6 v0.3 §7 already specifies logical provenance, stable assessment identity, prior-assessment linkage and correction reason. A test-fixture-only logical lineage check now verifies a new assessment identity, same source observation and target, prior-assessment link, non-empty correction reason, changed rule version and preservation of the prior assessment.
+- G3-039's logical lineage requirement is verified; durable append-only/idempotent recording and exact identity realization remain dependent on G6/G9. Do not mark the complete persistence/replay case closed.
+
+### G6/O6 identity reconciliation
+- Corrected the G6 proposal's target-assessment identity row: O6 v0.3 governs logical provenance and correction lineage; exact identity semantics, canonical immutable payload and replay/conflict behavior are G6/G9 responsibilities.
+- This avoids assigning exact identity semantics to O6 when O6 §7 explicitly defers them to G6/G9.
+
+### Test and CI verification
+- G3-039 logical lineage test commit: `43b2bf519d249da0ccde1e1bcd50d5dd5fab9011`; this run's trigger SHA did not match the SHA actually checked out because the workflow checked out the moving branch name. Its result is not accepted as exact-commit evidence.
+- Corrected fixture snapshot and updated G6 identity reconciliation commit: `8e2837d04c36bcc7a14d27d81e361b7cc2fc24ab`.
+- CI root cause: `.github/workflows/full-regression-refactor-v1.yml` checked out literal branch `refactor/professional-v1`. When pushes arrived before runner checkout, multiple runs could test the same later branch HEAD while reporting different triggering SHAs.
+- Historical audit: #3318 was triggered by `612599a46a8f807fbdc3b28cac9f43376b980251` but checked out `abad589e70ca2f504b4eb02acaa8162a640ecfbd`; #3327 and #3328 both checked out `43b2bf519d249da0ccde1e1bcd50d5dd5fab9011` despite different trigger SHAs; #3329 checked out `b35d98e45598e66cfc79e11c4bb0925df7769d3d` rather than its triggering SHA. Their run conclusions are not exact-commit verification for their metadata SHAs.
+- Fixed workflow commit: `b35d98e45598e66cfc79e11c4bb0925df7769d3d`. It checks out `github.sha`, asserts `GITHUB_REF` is exactly `refs/heads/refactor/professional-v1`, and asserts `git rev-parse HEAD = GITHUB_SHA`.
+- Full Regression #3330 / run ID `42500399488`: **GREEN** on exact commit `b35d98e45598e66cfc79e11c4bb0925df7769d3d`; the exact-checkout guard, all curriculum/architecture/Node/Vitest checks, browser regression and clean-working-tree check passed.
+
+### Current gate status
+- G3-039 logical lineage test: verified; persistence/idempotency portion remains dependent on G9.
+- G3-037 and G3-038: BLOCKED on G6/G9.
+- G6 remains OPEN for interruption/resume policy, timeout policy, full event identity/order and final C3/O6 reconciliation.
+- G9 remains OPEN for canonical payload serialization/equality, staged write states, retry, concurrency and durable recovery.
+- No production runtime, physical schema, database, SQL/RPC/RLS, Supabase or learner data changed. O6 v0.3 remains frozen.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+### Next concrete step
+- Define only the remaining logical G6 event identity/order boundary, keeping canonical payload serialization and durable write/retry mechanics in G9. Then re-evaluate whether G3-037/038 have sufficient approved logical inputs for executable contract tests.

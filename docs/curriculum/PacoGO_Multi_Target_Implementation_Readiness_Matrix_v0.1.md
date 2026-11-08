@@ -1205,3 +1205,19 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-028, ensuring neutral answer-entry clarification does not end an independent attempt when it supplies no mathematical/content reasoning.
+
+
+
+## 8.42 G3-028 — neutral answer-entry clarification does not end independent assessment
+
+**Contract basis:** O6 v0.3 §5.6 states that neutral answer-entry/navigation clarification supplying no content reasoning does not end a Tussentoets/Toets attempt.
+
+**Test change:** G3-028 records delivered neutral interface clarification with `supplies_target_reasoning: false` and confirms the independent attempt remains open. A negative case rejects ending the attempt solely because of that neutral clarification.
+
+**Scope:** Test-only attempt-lifecycle conformance work. No production attempt runtime, assessor, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Pre-build Full Regression #3250 / run ID `42430506962`: GREEN on exact baseline commit `7d4e0c2c051c35038f640cdc6423fc15a26a2011`. Implementation commit `a442ab120fa2cefa14bb01c136b0d382251a8688`. Full Regression #3251 / run ID `42430611392`: **GREEN** on that exact implementation commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with G3-029, preserving pre-request raw work/events and keeping any later supported continuation in a separate attempt/response episode.

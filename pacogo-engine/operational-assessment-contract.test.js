@@ -734,11 +734,31 @@ test('G3-021: delivered interface clarification is neutral and does not supply t
   assert.throws(() => assertAssessment(suppliedReasoning), /must not supply target reasoning/);
 });
 
-test('G3-022: INDEPENDENT requires complete event capture and no target-relevant delivery', () => {
-  const record = base({ support: { request: false, delivered: false, target_relevant: false }, process: { required_streams_complete: true }, dimensions: { independence: dimension('INDEPENDENT') } });
+test('G3-022: INDEPENDENT requires complete actual event capture and no delivered target-relevant support', () => {
+  const record = base({
+    support: { request: false, delivered: false, target_relevant: false },
+    process: { required_streams_complete: true },
+    dimensions: { independence: dimension('INDEPENDENT') }
+  });
   assertAssessment(record);
   assert.equal(record.process.required_streams_complete, true);
+  assert.equal(record.support.delivered, false);
   assert.equal(record.support.target_relevant, false);
+  assert.equal(record.dimensions.independence.result, 'INDEPENDENT');
+
+  const incompleteCapture = base({
+    support: { request: false, delivered: false, target_relevant: false },
+    process: { required_streams_complete: false },
+    dimensions: { independence: dimension('INDEPENDENT') }
+  });
+  assert.throws(() => assertAssessment(incompleteCapture), /INDEPENDENT requires sufficiently complete event capture/);
+
+  const deliveredTargetHelp = base({
+    support: { request: false, delivered: true, target_relevant: true },
+    process: { required_streams_complete: true },
+    dimensions: { independence: dimension('INDEPENDENT') }
+  });
+  assert.throws(() => assertAssessment(deliveredTargetHelp), /INDEPENDENT forbids delivered target-relevant assistance/);
 });
 
 test('G3-023: PROMPTED means target cue leaves required operation to learner', () => {

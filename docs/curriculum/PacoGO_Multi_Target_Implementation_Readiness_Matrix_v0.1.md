@@ -1137,3 +1137,19 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-024, requiring delivered target-relevant support to supply, select, perform, materially narrow or complete a required target operation before classifying the affected target as `DEPENDENT`.
+
+
+
+## 8.38 G3-024 — DEPENDENT requires delivered operation-supplying support
+
+**Contract basis:** O6 v0.3 §5.6 defines `DEPENDENT` only when delivered target-relevant support discloses, selects, performs, materially narrows or completes a required target operation/reasoning/strategy.
+
+**Test change:** G3-024 now verifies the positive delivered/target-relevant/operation-supplying combination. It preserves objective performance `CORRECT` while independence is `DEPENDENT`. Negative cases reject support not delivered, support not target-relevant, and support that does not supply the required operation.
+
+**Scope:** Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Pre-build Full Regression #3227 / run ID `42429291175`: GREEN on exact baseline commit `51c3632ca3ec99b66e43a6f4c4bbd53865a28015`. Implementation commit `73148881908de05538de42f62d791daccd350b00`. Full Regression #3228 / run ID `42429410466`: **GREEN** on that exact implementation commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with G3-025, preserving `UNKNOWN` when support delivery/content or event provenance is incomplete; do not default to `INDEPENDENT`.

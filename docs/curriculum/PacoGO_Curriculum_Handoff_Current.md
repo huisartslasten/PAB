@@ -3846,10 +3846,15 @@ After verifying this documentation update with Full Regression, continue G3 test
 - Negative cases reject an attempt that remains open and attempts marked `FAILED` or `INCORRECT`.
 - This remains test-only attempt-lifecycle conformance work. No production attempt runtime, assessor, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
 
+### Regression investigation and correction
+- Full Regression #3245 / run ID `42430334151` was **RED** on implementation commit `b311a88804f82f1ac51fcd081e541b102638a8b2`.
+- The only failing case was the negative fixture for an attempt that remains open. The shared assertion correctly rejected it with diagnostic `content-help request ends the independent attempt`; the test incorrectly expected the different text `/ended true/`.
+- Corrected only the expected diagnostic pattern. No assertion condition or expected behavior was changed.
+- Correction commit: `2afba1afa9358a06b69ae25d8c7d3b2b463d29da`.
+
 ### Verification status
 - Pre-build Full Regression #3244 / run ID `42430232236`: GREEN on exact baseline commit `b012c1640c7a9de80faaaccc39f59a49379343a1`.
-- Implementation commit: `b311a88804f82f1ac51fcd081e541b102638a8b2`.
-- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+- Full Regression on correction commit `2afba1afa9358a06b69ae25d8c7d3b2b463d29da` is pending. Do not continue to another build vector until the exact commit is GREEN.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

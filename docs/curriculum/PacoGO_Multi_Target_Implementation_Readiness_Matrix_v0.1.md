@@ -1316,7 +1316,7 @@ The fixture value is test-only; it does not define a production API or persisted
 
 **Scope:** Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
 
-**Verification:** Implementation commit `54e118375de73e880b0f13cc77fe241f9ae787a8`. Pre-build Full Regression #3272 / run ID `42462810181`: GREEN on exact baseline commit `5e24b2b3efd118a27a23bc7c881a6e0186efbf68`. Full Regression on the implementation commit is pending.
+**Verification:** Implementation commit `54e118375de73e880b0f13cc77fe241f9ae787a8`. Pre-build Full Regression #3272 / run ID `42462810181`: GREEN on exact baseline commit `5e24b2b3efd118a27a23bc7c881a6e0186efbf68`. Full Regression #3278 / run ID `42463163132`: **GREEN** on the exact implementation commit. Documentation commits `d85490f64d2f505c0a649c60e16caadd49f0ff0f` and `a08092226f2d56792ad5892d8ccb585b79297da5` passed #3281 / run ID `42463286584` and #3282 / run ID `42463289970`.
 
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
@@ -1342,7 +1342,7 @@ The fixture value is test-only; it does not define a production API or persisted
 
 **Scope:** Test-only normalized logical-record harness. No production observation store, assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
 
-**Verification:** Implementation commit `263dfcf14aa946f2aa43053c541058609ddf6533`. Pre-build Full Regression #3277 / run ID `42463050793`: GREEN on exact baseline commit `ee977cc2e64eae712cb58b7c85ed50c4ebe6c3b5`. Full Regression on the implementation commit is pending.
+**Verification:** Implementation commit `263dfcf14aa946f2aa43053c541058609ddf6533`. Pre-build Full Regression #3277 / run ID `42463050793`: GREEN on exact baseline commit `ee977cc2e64eae712cb58b7c85ed50c4ebe6c3b5`. Full Regression #3285 / run ID `42463541450`: **GREEN** on the exact implementation commit. Documentation commits `6351e19dd22581e60710d9cc683e10774f64bb3a` and `3bcf6d75994cb50a50154be49781cbafa67112bb` passed #3288 / run ID `42463665274` and #3289 / run ID `42463668637`.
 
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
@@ -1352,7 +1352,7 @@ The fixture value is test-only; it does not define a production API or persisted
 
 ## 8.52 G3-034 — one observation, multiple target assessments verified
 
-**Verification:** Implementation commit `263dfcf14aa946f2aa43053c541058609ddf6533`. Full Regression #3278 / run ID `42463163132`: **GREEN** on that exact commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed. The pending handoff/matrix status update must also pass Full Regression before the next build vector.
+**Verification:** Implementation commit `263dfcf14aa946f2aa43053c541058609ddf6533`. Full Regression #3278 / run ID `42463163132`: **GREEN** on that exact commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed. Handoff/matrix documentation commits `d85490f64d2f505c0a649c60e16caadd49f0ff0f` and `a08092226f2d56792ad5892d8ccb585b79297da5` also passed Full Regression #3281 / run ID `42463286584` and #3282 / run ID `42463289970`.
 
 
 
@@ -1384,7 +1384,7 @@ The fixture value is test-only; it does not define a production API or persisted
 
 ## 8.55 G3-035 — actual elicitation verified independently of declared opportunity
 
-**Verification:** Implementation commit `0d9daa89c78199796c69f2bd81daa6450755cb14`. Full Regression #3285 / run ID `42463541450`: **GREEN** on that exact commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed. The pending handoff/matrix update must also pass Full Regression before the next build vector.
+**Verification:** Implementation commit `0d9daa89c78199796c69f2bd81daa6450755cb14`. Full Regression #3285 / run ID `42463541450`: **GREEN** on that exact commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed. Handoff/matrix documentation commits `6351e19dd22581e60710d9cc683e10774f64bb3a` and `3bcf6d75994cb50a50154be49781cbafa67112bb` also passed Full Regression #3288 / run ID `42463665274` and #3289 / run ID `42463668637`.
 
 
 

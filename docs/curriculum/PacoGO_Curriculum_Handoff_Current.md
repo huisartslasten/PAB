@@ -3882,3 +3882,24 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN.
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+
+
+## 116. G3-029 preserve prior work and separate supported continuation — verification pending
+
+### Work implemented
+- Inspected G3-029 in the G3 verification specification and O6 v0.3 §5.6.
+- Added test-only `assertSeparateSupportedContinuation` to verify that a content-help request closes the independent attempt as `INCOMPLETE`, all pre-request raw events are retained, and later supported work uses a distinct observation in `Oefenen`.
+- The G3-029 positive case preserves two pre-request events and creates a separate practice observation. Negative cases reject erased prior work, reusing the same observation for continuation, and continuation in an independent assessment mode.
+- Test-only normalized attempt/observation fixtures. No production attempt runtime, assessor, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification status
+- Pre-build Full Regression #3252 / run ID `42430621661`: GREEN on exact baseline commit `805e68e8db39ed283b9466509b3283298173e12a`.
+- Implementation commit: `d62f29e00275223ebe6978c430628405853239d2`.
+- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+
+### Gate status
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.

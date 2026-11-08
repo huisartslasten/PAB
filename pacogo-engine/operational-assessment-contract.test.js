@@ -341,6 +341,21 @@ function assertSeparateSupportedContinuation(independent, practice) {
   return true;
 }
 
+/**
+ * G6 logical identity assertion. The identifiers below are fixture values,
+ * not a physical ID format, storage schema or runtime API.
+ */
+function assertSupportConditionChangeStartsNewAdministration(previous, next) {
+  assert.notEqual(previous.support_condition, next.support_condition, 'a material support-condition change must be explicit');
+  assert.notEqual(previous.task_instance_id, next.task_instance_id, 'a changed support condition requires a new task instance');
+  assert.notEqual(previous.task_attempt_id, next.task_attempt_id, 'a changed support condition requires a new response episode');
+  assert.notEqual(previous.observation_id, next.observation_id, 'a changed support condition requires a new immutable observation');
+  assert.equal(previous.status, 'INCOMPLETE', 'the ended independent episode remains incomplete');
+  assert.deepEqual(previous.retained_events, previous.events, 'the earlier episode retains all captured events');
+  assert.equal(next.support_condition, 'supported_practice');
+  return true;
+}
+
 const M2_PROFILE_COMPONENTS = [
   'capture_integrity',
   'response_interpretability',
@@ -1242,6 +1257,76 @@ test('G3-029: prior raw events are preserved and supported continuation is a sep
 
   const notReturnedToPractice = { ...practice, mode: 'Toets' };
   assert.throws(() => assertSeparateSupportedContinuation(independent, notReturnedToPractice), /returns to supported practice/);
+});
+
+test('G6-001: a material support-condition change starts a new task instance, episode and observation', () => {
+  const independent = {
+    task_instance_id: 'fixture-task-instance-independent',
+    task_attempt_id: 'fixture-attempt-independent',
+    observation_id: 'fixture-observation-independent',
+    support_condition: 'independent_performance',
+    status: 'INCOMPLETE',
+    events: [
+      { event_id: 'fixture-event-1', kind: 'response_recorded' },
+      { event_id: 'fixture-event-2', kind: 'content_help_requested' }
+    ],
+    retained_events: [
+      { event_id: 'fixture-event-1', kind: 'response_recorded' },
+      { event_id: 'fixture-event-2', kind: 'content_help_requested' }
+    ]
+  };
+  const supportedPractice = {
+    task_instance_id: 'fixture-task-instance-supported',
+    task_attempt_id: 'fixture-attempt-supported',
+    observation_id: 'fixture-observation-supported',
+    support_condition: 'supported_practice',
+    status: 'ACTIVE'
+  };
+
+  assertSupportConditionChangeStartsNewAdministration(independent, supportedPractice);
+
+  const reusedTaskInstance = { ...supportedPractice, task_instance_id: independent.task_instance_id };
+  assert.throws(
+    () => assertSupportConditionChangeStartsNewAdministration(independent, reusedTaskInstance),
+    /new task instance/
+  );
+  const reusedAttempt = { ...supportedPractice, task_attempt_id: independent.task_attempt_id };
+  assert.throws(
+    () => assertSupportConditionChangeStartsNewAdministration(independent, reusedAttempt),
+    /new response episode/
+  );
+  const reusedObservation = { ...supportedPractice, observation_id: independent.observation_id };
+  assert.throws(
+    () => assertSupportConditionChangeStartsNewAdministration(independent, reusedObservation),
+    /new immutable observation/
+  );
+});
+
+test('G6-002: neutral interface clarification does not itself change the support condition or administration identity', () => {
+  const attemptBefore = {
+    task_instance_id: 'fixture-task-instance-independent',
+    task_attempt_id: 'fixture-attempt-independent',
+    observation_id: 'fixture-observation-independent',
+    support_condition: 'independent_performance',
+    help_request: null
+  };
+  const attemptAfter = {
+    ...attemptBefore,
+    help_request: 'interface_clarification',
+    supplies_target_reasoning: false
+  };
+
+  assertIndependentAttempt({
+    mode: 'Toets',
+    help_request: attemptAfter.help_request,
+    support_delivered: true,
+    supplies_target_reasoning: false,
+    ended: false
+  });
+  assert.equal(attemptAfter.support_condition, attemptBefore.support_condition);
+  assert.equal(attemptAfter.task_instance_id, attemptBefore.task_instance_id);
+  assert.equal(attemptAfter.task_attempt_id, attemptBefore.task_attempt_id);
+  assert.equal(attemptAfter.observation_id, attemptBefore.observation_id);
 });
 
 test('G3-030: an incorrect response without conflicting material yields no contradiction', () => {

@@ -3685,7 +3685,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 107. G3-020 help request versus delivered support — verification pending
+## 107. G3-020 help request versus delivered support — verified
 
 ### Work implemented
 - Inspected G3-020 in the G3 verification specification and O6 v0.3 §1.
@@ -3696,7 +3696,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 ### Verification status
 - Pre-build Full Regression #3211 / run ID `42428410315`: GREEN on exact baseline commit `1b8c43e93ee21aa3ed428e1259fa862260080ead`.
 - Implementation commit: `2fa2689a401d30135375845d57dd9cfe0d1aa336`.
-- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+- Full Regression #3212 / run ID `42428510380`: **GREEN** on exact implementation commit `2fa2689a401d30135375845d57dd9cfe0d1aa336`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

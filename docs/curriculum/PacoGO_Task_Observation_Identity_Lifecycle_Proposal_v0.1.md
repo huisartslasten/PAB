@@ -88,6 +88,8 @@ Recommended logical contract, without prescribing a physical schema or transport
 - A new rule/contract/engine assessment is not an in-place mutation of the prior assessment. It receives a new assessment identity and preserves the prior link.
 - The identity remains opaque at the logical level. No UUID format, database key, composite hash or deterministic serializer is selected here.
 
+**Fixture verification:** G6-007 verifies that one immutable observation may have separate assessment identities for distinct targets; each assessment record must carry exactly one non-empty assessment identity, observation identity and target identity; and one assessment identity cannot be reused for multiple assessment records. This is logical contract coverage only. It does not define a key format, canonical payload, storage uniqueness constraint or replay implementation. The boundary remains subject to final G6 owner approval and C3/O6 reconciliation.
+
 ### 4.3 G9 replay and payload boundary
 
 O7 determines the logical outcome:

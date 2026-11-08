@@ -33,7 +33,7 @@ Identity meanings:
 | `event_id` | One immutable interaction event | Unique event identity; event belongs to exactly one response episode |
 | `event_sequence` | Order of events within one response episode | Monotonically increasing; authoritative order is not inferred from timestamps |
 | `observation_id` | One immutable raw observation for the response episode | Exactly one observation per separately administered response episode; one-to-one with `task_attempt_id` |
-| target-assessment identity | PacoGO's stable, versioned assessment of one existing target against one immutable observation | O6 v0.3 defines logical provenance and correction lineage; exact identity semantics, canonical immutable payload and replay/conflict behavior are governed jointly by G6/G9; no physical key or serialization is defined here |
+| target-assessment identity | One stable logical identity for one PacoGO assessment instance of exactly one existing target against exactly one immutable observation | Assessment identity is distinct in meaning from observation and target identity; the same observation/target may have multiple historical assessments only as separately identified, linked versions. O6 v0.3 defines provenance/lineage; G9 defines canonical payload and replay/conflict mechanics. No physical key or ID format is prescribed |
 
 The task instance captures what was actually administered, not merely what the task definition intended. Any material difference from the definition is recorded as an administration deviation rather than silently rewritten into the definition.
 
@@ -80,6 +80,14 @@ Recommended logical contract, without prescribing a physical schema or transport
 - The ordered event stream is authoritative. A numeric sequence field is one possible representation, not a required logical field; no causal order is inferred from wall-clock timestamps.
 - A corrected event is represented as a new linked/versioned event; the original event remains inspectable.
 
+### 4.3 G6 target-assessment identity boundary
+
+- Every target-specific assessment has its own stable logical identity; it is not identified solely by the observation/target pair.
+- Each assessment identity refers to exactly one immutable observation and exactly one existing evidence target, consistent with O6 v0.3.
+- Multiple historical assessments for the same observation/target are permitted only as separately identified, linked correction/reassessment versions with reason and provenance.
+- A new rule/contract/engine assessment is not an in-place mutation of the prior assessment. It receives a new assessment identity and preserves the prior link.
+- The identity remains opaque at the logical level. No UUID format, database key, composite hash or deterministic serializer is selected here.
+
 ### 4.3 G9 replay and payload boundary
 
 O7 determines the logical outcome:
@@ -104,7 +112,7 @@ G9 must still define canonical payload fields/serialization/equality, event idem
 The following remain outside this proposal:
 
 1. Final target-alignment, response-relation, evidence-status, quality, assistance/independence and contradiction vocabularies and deterministic assessment rules — G2/O6.
-2. Logical target-assessment provenance and correction lineage — defined by O6 v0.3 §7. Exact identity semantics, canonical immutable payload and replay/conflict behavior remain G6/G9.
+2. O6 v0.3 §7 defines logical target-assessment provenance and correction lineage. G6 defines one stable logical identity per assessment instance, bound to exactly one observation and one target. G9 defines canonical immutable payload and replay/conflict mechanics.
 3. Operational examples distinguishing neutral UI clarification from target-relevant content help — G2/O6 plus product review.
 4. Physical tables, columns, constraints, RLS, RPCs, migrations, transaction/outbox design and retention — G8–G10.
 5. Learner-facing status wording and timeout durations — product decision; no hidden universal timeout is introduced.

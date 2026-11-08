@@ -198,7 +198,10 @@ function assertLogicalAssessmentProvenance(record) {
     assert.equal(typeof record.provenance[field], 'string', 'provenance.' + field + ' must be a non-empty string');
     assert.ok(record.provenance[field].trim(), 'provenance.' + field + ' must be a non-empty string');
   }
-  assert.ok(Array.isArray(record.source_event_ids), 'source event references must be preserved');
+  assert.ok(
+    Array.isArray(record.source_event_ids) && record.source_event_ids.length > 0,
+    'at least one source event reference must be preserved for this response assessment'
+  );
   assert.ok(
     record.source_event_ids.every(id => typeof id === 'string' && id.trim()),
     'each source event reference must be a non-empty identifier'
@@ -1471,7 +1474,7 @@ test('G3-036: assessment preserves required logical provenance without prescribi
   const missingEventReference = { ...record, source_event_ids: [] };
   assert.throws(
     () => assertLogicalAssessmentProvenance(missingEventReference),
-    /each source event reference must be a non-empty identifier/
+    /at least one source event reference must be preserved/
   );
 });
 

@@ -4298,3 +4298,35 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 ### Next concrete step
 - Move to a read-only G9 requirements reconciliation from O7 and the existing persistence/consumer audit. Separate canonical payload semantics and stage idempotency/recovery from the physical database/RLS design (G8/G10). Do not modify the RPC or Supabase.
+
+
+## 134. G9 staged idempotency requirements review — source-derived, no implementation
+
+### O7 logical requirements extracted
+- Three separate idempotency boundaries: raw-observation ingestion; PacoGO target-assessment evaluation/recording; decision evaluation.
+- For each boundary: same identity + same canonical immutable payload is replay; same identity + different payload is an integrity conflict and must be rejected; correction/reassessment uses a new linked/versioned identity and never overwrites prior history.
+- A changed eligible evidence set or protocol creates a new snapshot/evaluation.
+- Each stage commits atomically within its own write unit and exposes durable, inspectable state for retry/recovery. The entire observation-to-decision timeline is not one transaction.
+- O7 does not prescribe canonical payload fields/serialization, status vocabulary, retry/outbox mechanism, concurrency/locking or failure-recovery implementation.
+
+### Current implementation finding from the existing read-only audit
+- Current `persist_curriculum_learning_cycle` is one atomic operation inserting evidence, upserting skill-level state and inserting a decision trace.
+- Its current learner + source-event duplicate path checks that records exist and returns `duplicate: true`; it does not compare the existing payload to a canonical immutable payload. It therefore does not distinguish same-identity/same-payload replay from same-identity/different-payload conflict.
+- This is a documented architecture gap, not a reason to patch the RPC. The audit describes repository source/migrations and does not claim deployed Supabase state.
+
+### G9 review artifact
+- Created `docs/curriculum/PacoGO_G9_Staged_Idempotency_Requirements_Review_v0.1.md`.
+- It separates canonical payload contract, identity/idempotency scope, durable stage state, atomicity/failure behavior, retry/concurrency/conflict handling and security/persistence boundaries.
+- It leaves unresolved status names, canonicalization details, key scope, transaction/outbox/locking design and physical storage. G8/G10 remain responsible for persistence/security design.
+- Review artifact commit `0f4051612662d8a77e4dbaeded4bf2d1a9a5ff19`: Full Regression #3345 / run ID `42502755601`: **GREEN** on exact commit.
+- Preceding handoff commit `3f2db0bb91ffe984fa1f736278aeecf5ba0fa26d`: Full Regression #3344 / run ID `42502692074`: **GREEN** on exact commit. Both runs passed exact-checkout verification and all full-regression steps, including browser regression and clean-working-tree verification.
+
+### Gate status
+- G6: logical event identity/order and target-assessment identity candidate are fixture-tested; final owner approval, interruption/resume, timeout and full lifecycle closure remain open.
+- G9: requirements review completed; detailed canonical payload, stage state, idempotency, retry, concurrency and recovery contract remains OPEN.
+- G3-037/038 remain BLOCKED until G9 semantics are defined and tested in addition to G6 identity. G3-039 logical lineage is tested; durable recording remains open.
+- G8/G10 physical persistence/security and G12 implementation authorization remain separate.
+- No runtime, production assessor, database, SQL/RPC/RLS, Supabase or learner data changed. O6 v0.3 remains frozen. Branch `refactor/professional-v1`; LIVE `main` untouched.
+
+### Next concrete step
+- Review the G9 requirements artifact against O7 and the current audit for any missing invariant; then formulate only the unresolved owner decisions required to freeze the logical G9 contract. Do not select physical serialization/storage mechanisms or modify the RPC.

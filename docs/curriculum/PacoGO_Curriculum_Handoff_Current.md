@@ -3949,7 +3949,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 119. G3-032 missing process / task misalignment cannot establish contradiction — verification pending
+## 119. G3-032 missing process / task misalignment cannot establish contradiction — verified
 
 ### Work implemented
 - Inspected G3-032 in the G3 verification specification and O6 v0.3 §5.7.
@@ -3961,7 +3961,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 ### Verification status
 - Pre-build Full Regression #3267 / run ID `42462527928`: GREEN on exact baseline commit `b283a9da8756bb1d4fd428bb927f67f5f7c40399`.
 - Implementation commit: `c0b500230486d076f783a573c2681a82c0c6b34d`.
-- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+- Full Regression #3268 / run ID `42462685732`: **GREEN** on exact implementation commit `c0b500230486d076f783a573c2681a82c0c6b34d`. Handoff/matrix documentation commit `8a45b79f760172a9657fd9c2b16aa3ad025d90ef` also passed Full Regression #3269 / run ID `42462698260`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

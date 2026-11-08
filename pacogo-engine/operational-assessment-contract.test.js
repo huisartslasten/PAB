@@ -319,7 +319,13 @@ const M2_PROFILE_COMPONENTS = [
 ];
 
 function isM2AggregateField(key) {
-  const normalized = String(key).toLowerCase().replace(/[^a-z0-9]/g, '');
+  const raw = String(key);
+  const normalized = raw.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const tokens = raw
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
   const forbidden = new Set([
     'score', 'qualityscore', 'adequacyscore', 'm2score',
     'qualitytotal', 'adequacytotal', 'm2total', 'totalquality', 'totaladequacy',
@@ -334,7 +340,11 @@ function isM2AggregateField(key) {
     'qualityrating', 'adequacyrating', 'm2rating',
     'overallquality', 'overalladequacy', 'overallm2'
   ]);
-  return forbidden.has(normalized);
+  const forbiddenTokens = new Set([
+    'score', 'total', 'average', 'mean', 'weight', 'weighted',
+    'rank', 'composite', 'aggregate', 'index', 'level', 'rating'
+  ]);
+  return forbidden.has(normalized) || tokens.some(token => forbiddenTokens.has(token));
 }
 
 function assertNoM2AggregateFields(value, location = 'profile', visited = new WeakSet()) {
@@ -1833,7 +1843,9 @@ test('M2 profile rejects score, ordinal, weighted and composite aggregates at ev
     'composite', 'quality_composite',
     'aggregate', 'quality_aggregate',
     'quality_index', 'adequacy_level', 'm2_rating',
-    'overall_quality'
+    'overall_quality',
+    'overall_quality_score', 'weighted_average',
+    'm2_quality_index', 'qualityLevel'
   ];
 
   for (const field of prohibitedFields) {

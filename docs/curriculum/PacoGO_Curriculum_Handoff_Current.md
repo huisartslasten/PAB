@@ -3791,18 +3791,25 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 112. G3-025 incomplete support provenance — verification pending
+## 112. G3-025 incomplete support provenance — correction pending verification
 
-### Work implemented
+### Initial implementation and regression failure
 - Inspected G3-025 in the G3 verification specification and O6 v0.3 §5.6.
-- Strengthened the shared `assertAssessment` so incomplete support-delivery provenance, unclassifiable delivered target-relevant content, or incomplete required event capture requires independence `UNKNOWN`.
-- Expanded G3-025 with valid UNKNOWN cases for unknown delivery, unclassifiable delivered content and incomplete event capture. Negative cases reject `INDEPENDENT` when delivery provenance or required event capture is incomplete.
-- This is test-only normalized logical-record conformance work against frozen O6 v0.3. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+- Initial implementation commit `dcbc8bc9f38ce179b4a0fce775f0b08f3cbbaf53` made incomplete support provenance/event capture require independence `UNKNOWN` without checking whether the target contract required an independence judgement.
+- Full Regression #3232 / run ID `42429627050` was **RED** on that exact commit. Six curriculum-engine tests failed because records whose target contract did not require an independence judgement correctly had `NOT_REQUIRED`, but the new unconditional assertion incorrectly forced `UNKNOWN`. Affected existing vectors included G3-011, G3-016, G3-017, G3-022 and G3-032, plus the aggregate negative-contract test.
+- Root cause: the harness did not distinguish a required independence judgement from a target contract where independence is `NOT_REQUIRED`. O6 v0.3 §5.6 explicitly defines `NOT_REQUIRED` when the target contract does not require an independence judgement.
+
+### Corrected underlying contract fixture
+- Added test-only `target_contract.independence_required` to make the target's requirement explicit in the normalized fixture.
+- The shared `assertAssessment` now requires `NOT_REQUIRED` when independence is not required, and prohibits `NOT_REQUIRED` when the target contract requires an independence judgement.
+- Incomplete support provenance, unclassifiable delivered target-relevant content or incomplete event capture now requires `UNKNOWN` only when the target contract requires an independence judgement.
+- G3-022–026 explicitly identify that independence is required. A separate positive G3-025 case verifies that incomplete support provenance remains `NOT_REQUIRED` when the target contract does not require an independence judgement.
+- This is test-only normalized logical-record conformance work against frozen O6 v0.3; no production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+- Corrected implementation commit: `8a32b85e9033be4c1b417e2171923da4505e23eb`.
 
 ### Verification status
 - Pre-build Full Regression #3231 / run ID `42429517399`: GREEN on exact baseline commit `f19934a0caf5b662961b49c70cf6d600cacce390`.
-- Implementation commit: `dcbc8bc9f38ce179b4a0fce775f0b08f3cbbaf53`.
-- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+- Full Regression on corrected implementation commit `8a32b85e9033be4c1b417e2171923da4505e23eb` is pending. Do not continue to another build vector until the exact commit is GREEN.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

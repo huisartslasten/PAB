@@ -1269,3 +1269,13 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** After the exact implementation commit passes Full Regression, continue with G3-032. Do not infer contradiction from missing process or task mismatch.
+
+
+
+## 8.46 G3-031 — target-specific contradiction verified
+
+**Verification:** Implementation commit `2702f36e6ec95dc95d23e8b5e8fcc2062515d147`. Full Regression #3263 / run ID `42462402832`: **GREEN** on that exact commit. Handoff/matrix documentation commit `1a49fb03b1dbde942a4fa3da9254151fdc8110da` also passed Full Regression #3264 / run ID `42462414663`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks all passed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with G3-032. Missing process or task misalignment must leave contradiction `INDETERMINATE` or the rule blocked/not applicable as specified; never infer contradiction from missingness or mismatch.

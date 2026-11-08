@@ -702,6 +702,7 @@ test('G3-020: a help request without delivered support cannot be PROMPTED or DEP
 
   for (const classification of ['PROMPTED', 'DEPENDENT']) {
     const invalid = base({
+      target_contract: { independence_required: true },
       support: { request: true, delivered: false, target_relevant: false },
       dimensions: { independence: dimension(classification) }
     });

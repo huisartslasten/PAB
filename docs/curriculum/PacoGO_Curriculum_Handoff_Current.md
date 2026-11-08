@@ -3727,7 +3727,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 109. G3-022 actual independence conditions — verification pending
+## 109. G3-022 actual independence conditions — verified
 
 ### Work implemented
 - Inspected G3-022 in the G3 verification specification and O6 v0.3 §5.6.
@@ -3738,7 +3738,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 ### Verification status
 - Pre-build Full Regression #3219 / run ID `42428855949`: GREEN on exact baseline commit `f96379871016013fa17e68b121ad6a3df3d059e7`.
 - Implementation commit: `c134cc15fff565095e9f7db137d14bb7b93a9ec8`.
-- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+- Full Regression #3220 / run ID `42428971731`: **GREEN** on exact implementation commit `c134cc15fff565095e9f7db137d14bb7b93a9ec8`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

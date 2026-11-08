@@ -909,22 +909,26 @@ test('G3-025: incomplete support delivery, content or event provenance requires 
   assert.throws(() => assertAssessment(incorrectlyIndependentWithIncompleteCapture), /incomplete support provenance or event capture requires UNKNOWN/);
 });
 
-test('G3-026: independence is assessed separately for each target', () => {
+test('G3-026: the same delivered support event receives target-specific independence assessments', () => {
   const first = base({
     evidence_target_id: 'target-a',
     target_contract: { independence_required: true },
-    support: { delivered: true, target_relevant: true, supplied_required_operation: false },
+    support: { event_id: 'support-event-1', delivered: true, target_relevant: true, supplied_required_operation: false },
     dimensions: { independence: dimension('PROMPTED') }
   });
   const second = base({
     evidence_target_id: 'target-b',
     target_contract: { independence_required: true },
-    support: { delivered: true, target_relevant: true, supplied_required_operation: true },
+    support: { event_id: 'support-event-1', delivered: true, target_relevant: true, supplied_required_operation: true },
     dimensions: { independence: dimension('DEPENDENT') }
   });
   assertAssessment(first);
   assertAssessment(second);
+  assert.equal(first.support.event_id, second.support.event_id);
+  assert.notEqual(first.evidence_target_id, second.evidence_target_id);
   assert.notEqual(first.dimensions.independence.result, second.dimensions.independence.result);
+  assert.equal(first.dimensions.independence.result, 'PROMPTED');
+  assert.equal(second.dimensions.independence.result, 'DEPENDENT');
 });
 
 test('G3-027: content-help request ends independent assessment incomplete even without delivery', () => {

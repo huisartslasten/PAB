@@ -80,6 +80,20 @@ C7 consumes exactly one validated C6 branch result and preserves the exact branc
 
 C8 remains a descriptive projection of exact C6/C7 history. C9 remains a structural chain validator, not a scientific-validity validator. The existing C6 seven gates and C7 action policy are not changed by this record.
 
+### G6-S1 — Material support-condition change creates a new administration identity
+
+**Owner decision (2026-11-08):** a material change in the actual support condition creates a new task instance, a new learner response episode and a new immutable raw observation.
+
+This makes the identity boundary explicit:
+- The independent Tussentoets/Toets episode ends as incomplete when the learner requests content help, as already required by the owner-confirmed support policy.
+- The supported-practice continuation is a separate task instance, response episode and observation.
+- The independent episode and all captured pre-request events remain preserved and are not merged with the supported continuation.
+- A neutral interface clarification that supplies no target reasoning does not itself change the support condition and does not create a new administration identity.
+- Ordinary retries/revisions within the same actual administration remain events in the same response episode; they do not create new observations merely because an answer was edited or retried.
+
+**Boundary:** this is a logical identity decision only. It does not define physical ID formats, storage keys, database schema, runtime APIs, transaction boundaries, event transport or persistence. It does not settle all G6 lifecycle transitions (completion, restart, abandonment, interruption/resume and timeout), which remain explicit reconciliation work. G6 remains OPEN until the full owner-approved logical lifecycle is reconciled with O6/C3.
+
+
 ## 3. Explicitly open decisions
 
 ### O5 — Scope and time-window ownership/lifecycle

@@ -1,6 +1,6 @@
 # PacoGO — Task / Attempt / Observation Identity and Lifecycle Proposal v0.1
 
-Status: **candidate logical contract; owner/protocol approval required; implementation NOT authorized**  
+Status: **candidate logical contract; support-condition identity boundary owner-approved; remaining lifecycle decisions open; implementation NOT authorized**  
 Date: 2026-11-07  
 Branch: `refactor/professional-v1`
 
@@ -49,14 +49,14 @@ The task instance captures what was actually administered, not merely what the t
 | Temporary interruption with exact same presentation and support condition | Keep the same task instance and episode resumable; append interruption/resume events; preserve event order | Recommended default, not yet approved |
 | Resume cannot restore the same administration state, or content/representation/response mode/support condition changes | Do not splice the new presentation into the old episode; create a new task instance and episode | Recommended default |
 | Timeout | Do not infer a terminal timeout from elapsed time alone. A timeout may end an episode only when an explicit, versioned task/session policy defines the duration and consequence. Record the timeout event and preserve the resulting incomplete observation. | Product/protocol decision required before implementation |
-| Content-help request during Tussentoets/Toets | End the independent episode immediately as ended/incomplete; record the request separately from any support delivered; create a new task instance and supported-practice episode for the continuation | Required by owner-confirmed support policy; new task-instance ID is the recommended identity consequence |
+| Content-help request during Tussentoets/Toets | End the independent episode immediately as ended/incomplete; record the request separately from any support delivered; create a new task instance, response episode and observation for the supported-practice continuation | Owner-approved logical identity boundary (2026-11-08); no physical ID/schema defined |
 | Neutral interface clarification | Does not automatically end the independent episode, provided it does not supply target reasoning | Product distinction is required; operational anchors remain open under O6 |
 
 ### Why a support-condition change gets a new task instance
 
-A task instance is the concrete administration, including the actual support condition and presentation. Independent performance and supported practice are materially different administration conditions. Reusing one task-instance ID would make one identity refer to two different administrations and weaken provenance. Therefore the recommended rule is: **a change in support condition creates a new task instance and a new response episode/observation**. The independent episode remains immutable and incomplete; supported practice is separately recorded.
+A task instance is the concrete administration, including the actual support condition and presentation. Independent performance and supported practice are materially different administration conditions. Reusing one task-instance ID would make one identity refer to two different administrations and weaken provenance. Therefore the approved logical rule is: **a material change in support condition creates a new task instance, a new response episode and a new immutable observation**. The independent episode remains immutable and incomplete; supported practice is separately recorded. This was explicitly approved by the owner on 2026-11-08 (instruction: “ga door”) after review of the proposed boundary.
 
-This recommendation follows the meaning of task instance and the owner-confirmed separate-attempt rule, but the explicit task-instance-ID decision still requires owner approval.
+A neutral interface clarification that supplies no target reasoning does not itself change the support condition and does not create a new administration identity. The rule distinguishes a material change in the actual support condition from a navigation/answer-entry clarification.
 
 ## 4. Event identity, ordering and replay
 
@@ -100,13 +100,13 @@ G6 can close only when the owner-approved, versioned logical contract explicitly
 - one task instance has one response episode under the selected minimum lifecycle;
 - one separately administered response episode maps to exactly one immutable raw observation;
 - retries remain within an episode unless a specified transition creates a new administration;
-- support-condition changes create a new task instance and response episode, or an explicitly bounded exception is documented;
+- a material support-condition change creates a new task instance, response episode and immutable observation; neutral interface clarification that supplies no target reasoning does not itself change that condition;
 - completion, abandonment, interruption, resume, restart and timeout transitions are explicit;
 - event identity, within-episode order, event time and replay/conflict semantics are explicit;
 - incomplete/no-response episodes are preserved without guessing an O6 assessment label;
 - the contract is reconciled with the finally approved C3/O6 model.
 
-Until then G6 remains OPEN. Even after G6 closes, this does not close G2/O6, G5 or G7–G12 and does not authorize implementation.
+Until then G6 remains OPEN: completion/restart/abandonment, resumability, timeout policy, full event lifecycle and the complete O6/C3 reconciliation still require explicit decisions. O7's exact canonical-payload representation, stage status/retry/concurrency/recovery design and physical identity realization remain separate G9/G8/G10 work. This partial G6 decision does not close G2/O6, G5 or G7–G12 and does not authorize implementation.
 
 ## 8. Source basis
 

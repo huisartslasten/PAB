@@ -761,10 +761,33 @@ test('G3-022: INDEPENDENT requires complete actual event capture and no delivere
   assert.throws(() => assertAssessment(deliveredTargetHelp), /INDEPENDENT forbids delivered target-relevant assistance/);
 });
 
-test('G3-023: PROMPTED means target cue leaves required operation to learner', () => {
-  const record = base({ support: { delivered: true, target_relevant: true, supplied_required_operation: false }, dimensions: { independence: dimension('PROMPTED') } });
+test('G3-023: PROMPTED requires a delivered target cue that leaves the required operation to the learner', () => {
+  const record = base({
+    support: { delivered: true, target_relevant: true, supplied_required_operation: false },
+    dimensions: { independence: dimension('PROMPTED') }
+  });
   assertAssessment(record);
+  assert.equal(record.support.delivered, true);
+  assert.equal(record.support.target_relevant, true);
   assert.equal(record.support.supplied_required_operation, false);
+
+  const notDelivered = base({
+    support: { delivered: false, target_relevant: true, supplied_required_operation: false },
+    dimensions: { independence: dimension('PROMPTED') }
+  });
+  assert.throws(() => assertAssessment(notDelivered), /PROMPTED requires delivered support/);
+
+  const notTargetRelevant = base({
+    support: { delivered: true, target_relevant: false, supplied_required_operation: false },
+    dimensions: { independence: dimension('PROMPTED') }
+  });
+  assert.throws(() => assertAssessment(notTargetRelevant), /PROMPTED requires target-relevant support/);
+
+  const suppliedOperation = base({
+    support: { delivered: true, target_relevant: true, supplied_required_operation: true },
+    dimensions: { independence: dimension('PROMPTED') }
+  });
+  assert.throws(() => assertAssessment(suppliedOperation), /PROMPTED leaves the required operation to the learner/);
 });
 
 test('G3-024: DEPENDENT means delivered support supplies a required operation', () => {

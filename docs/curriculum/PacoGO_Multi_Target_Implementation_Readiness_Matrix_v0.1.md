@@ -1438,3 +1438,11 @@ Full Regression #3292 / run ID `42463863331`, handoff-only #3293 / run ID `42463
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN for direct anchors. G3-037–039 remain blocked on G6/G9; G3-040 remains blocked on O5. No production implementation authorization is implied.
 
 **Next step:** After this exact implementation passes Full Regression, continue reviewing any remaining directly specified anchor gaps. Do not infer G6/G9 identity or O5 cutoff semantics.
+
+
+
+## 8.59 A1/B1/FR2 domain-anchor strengthening verified
+
+**Verification:** Implementation commit `253afb6b59052ad6b35d3fd544359b18ab3101b9`. Full Regression #3305 / run ID `42464593360`: **GREEN** on that exact commit. Handoff/matrix documentation commit `160186d4357f2f6bb5b1af73566f8c251ba6b4c5` passed Full Regression #3306 / run ID `42464612413`. All required steps passed, including curriculum-engine regression, architecture boundaries, maintained Node/Vitest, browser regression and clean-working-tree verification.
+
+**Next step:** Review the remaining direct C6 M2 descriptive-profile anchor without deciding G5's downstream M1/M2 mapping. Keep G3-037–039 blocked on G6/G9 and G3-040 blocked on O5.

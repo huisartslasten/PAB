@@ -3903,3 +3903,24 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN.
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+
+
+## 117. G3-030 incorrect performance does not imply contradiction — verification pending
+
+### Work implemented
+- Inspected G3-030 in the G3 verification specification and O6 v0.3 §5.7.
+- Expanded `pacogo-engine/operational-assessment-contract.test.js` with objective performance `INCORRECT`, target evidence `INDETERMINATE`, and contradiction `ABSENT` when the completed contradiction rule finds no conflicting material.
+- Added a negative case rejecting contradiction `PRESENT` when no specific conflicting source material is supplied.
+- This remains test-only normalized logical-record conformance work. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification status
+- Pre-build Full Regression #3258 / run ID `42430890658`: GREEN on exact baseline commit `3a60437b1e0dbd7577b8069159ed469d2e87d6a8`.
+- Implementation commit: `242e5ac6d8e187a8d576fce750fd45c80b38bc32`.
+- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+
+### Gate status
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.

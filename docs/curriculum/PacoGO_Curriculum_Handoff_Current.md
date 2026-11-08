@@ -3990,3 +3990,25 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN.
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+
+
+## 121. G3-034 one observation, multiple target-specific assessments — verification pending
+
+### Work implemented
+- Inspected G3-034 in the G3 verification specification and O6 v0.3 §2.
+- Replaced the weak two-record test with one explicit raw-observation fixture and two target-specific assessment fixtures referencing that same observation.
+- Added `assertOneObservationManyTargetAssessments` to verify exactly one raw observation, shared observation reference, distinct target identifiers, and no embedded duplicate raw observation in an assessment.
+- The positive case preserves different target-specific evidence results (`PRESENT` and `INDETERMINATE`) from the same response episode. Negative cases reject duplicated raw observations, a detached assessment reference, and duplicate target assessments.
+- Test-only normalized logical-record fixtures; no production observation store, assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification status
+- Pre-build Full Regression #3277 / run ID `42463050793`: GREEN on exact baseline commit `ee977cc2e64eae712cb58b7c85ed50c4ebe6c3b5`.
+- Implementation commit: `263dfcf14aa946f2aa43053c541058609ddf6533`.
+- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+
+### Gate status
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.

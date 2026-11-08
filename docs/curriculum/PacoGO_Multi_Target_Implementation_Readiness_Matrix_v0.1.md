@@ -1121,3 +1121,19 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-023, distinguishing a target-relevant cue that leaves the required operation to the learner (`PROMPTED`) from assistance that supplies the operation (`DEPENDENT`).
+
+
+
+## 8.37 G3-023 — PROMPTED leaves the required operation to the learner
+
+**Contract basis:** O6 v0.3 §5.6 defines `PROMPTED` as delivered target-relevant support that influences the response while leaving the required target operation/reasoning/strategy to the learner.
+
+**Test change:** G3-023 now covers the valid delivered target-relevant cue with `supplied_required_operation: false`. Negative cases pass support not delivered, support not target-relevant, and support that supplies the required operation through the shared `assertAssessment` assertion; all are rejected as `PROMPTED`.
+
+**Scope:** Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Pre-build Full Regression #3223 / run ID `42429090347`: GREEN on exact baseline commit `c847b6b412a4ed0e749be07d20c605a3bfb3716e`. Implementation commit `9bb43290e834ff8b19b27eb16e21f41ee17576aa`. Full Regression #3224 / run ID `42429183898`: **GREEN** on that exact implementation commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with G3-024, requiring delivered target-relevant support to supply, select, perform, materially narrow or complete a required target operation before classifying the affected target as `DEPENDENT`.

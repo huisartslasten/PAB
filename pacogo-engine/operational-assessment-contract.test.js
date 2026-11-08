@@ -402,6 +402,24 @@ function assertStartedAbandonedEpisodeIsPreserved(episode) {
   assert.deepEqual(episode.observation.events, episode.events, 'all captured events remain in the observation');
 }
 
+/**
+ * G6 logical event-stream assertion. The array is a test fixture for source
+ * order, not a prescribed event transport or persisted schema.
+ */
+function assertLogicalEventStream(episode, observation) {
+  assert.ok(typeof episode.task_attempt_id === 'string' && episode.task_attempt_id.trim());
+  assert.ok(Array.isArray(episode.events), 'the response episode must preserve its ordered event stream');
+  const ids = episode.events.map(event => event.event_id);
+  assert.ok(ids.every(id => typeof id === 'string' && id.trim()), 'each event requires a stable logical identity');
+  assert.equal(new Set(ids).size, ids.length, 'event identity must be unique within its response episode');
+  for (const event of episode.events) {
+    assert.equal(event.task_attempt_id, episode.task_attempt_id, 'each event must belong to exactly one response episode');
+  }
+  assert.equal(observation.task_attempt_id, episode.task_attempt_id);
+  assert.deepEqual(observation.events, episode.events, 'the raw observation must preserve source event order without timestamp sorting');
+  return true;
+}
+
 const M2_PROFILE_COMPONENTS = [
   'capture_integrity',
   'response_interpretability',
@@ -1303,6 +1321,49 @@ test('G3-029: prior raw events are preserved and supported continuation is a sep
 
   const notReturnedToPractice = { ...practice, mode: 'Toets' };
   assert.throws(() => assertSeparateSupportedContinuation(independent, notReturnedToPractice), /returns to supported practice/);
+});
+
+test('G6-006: event identity is episode-scoped and raw event order is preserved independently of timestamps', () => {
+  const episode = {
+    task_attempt_id: 'fixture-attempt-event-stream',
+    events: [
+      { event_id: 'fixture-event-later-time', task_attempt_id: 'fixture-attempt-event-stream', event_time: '2026-11-08T11:00:00Z', kind: 'answer_revised' },
+      { event_id: 'fixture-event-earlier-time', task_attempt_id: 'fixture-attempt-event-stream', event_time: '2026-11-08T10:00:00Z', kind: 'response_submitted' }
+    ]
+  };
+  const observation = {
+    task_attempt_id: 'fixture-attempt-event-stream',
+    events: structuredClone(episode.events)
+  };
+
+  assertLogicalEventStream(episode, observation);
+
+  const duplicateIdentity = {
+    ...episode,
+    events: [episode.events[0], { ...episode.events[1], event_id: episode.events[0].event_id }]
+  };
+  assert.throws(
+    () => assertLogicalEventStream(duplicateIdentity, { ...observation, events: duplicateIdentity.events }),
+    /unique within its response episode/
+  );
+
+  const wrongParent = {
+    ...episode,
+    events: [{ ...episode.events[0], task_attempt_id: 'fixture-different-attempt' }]
+  };
+  assert.throws(
+    () => assertLogicalEventStream(wrongParent, { ...observation, events: wrongParent.events }),
+    /exactly one response episode/
+  );
+
+  const reorderedObservation = {
+    ...observation,
+    events: [...observation.events].reverse()
+  };
+  assert.throws(
+    () => assertLogicalEventStream(episode, reorderedObservation),
+    /preserve source event order/
+  );
 });
 
 test('G6-003: ordinary retries and answer revisions remain events in the same response episode', () => {

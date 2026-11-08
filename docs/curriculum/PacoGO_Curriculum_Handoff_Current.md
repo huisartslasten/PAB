@@ -4012,3 +4012,24 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN.
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+
+
+## 122. G3-035 declared opportunity versus actual elicitation — verification pending
+
+### Work implemented
+- Inspected G3-035 in the G3 verification specification and O6 v0.3 §2.
+- Strengthened the shared `assertAssessment` assertion: a task model's declared target opportunity cannot produce evidence `PRESENT` when a test-only fixture explicitly records that the actual task instance did not elicit that target.
+- Replaced the prior weak fixture with: a declared-but-not-elicited target assessed as alignment `MISALIGNED` and evidence `INDETERMINATE`; a negative case rejecting auto-assessment as `PRESENT`; and a control case where the actual task instance did elicit the target and the assessment is valid.
+- The `actual_target_elicited` value is test-fixture-only; it does not define a production persisted field or API. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification status
+- Pre-build Full Regression #3284 / run ID `42463423482`: GREEN on exact baseline commit `f2b0dce8f0c715c3c674ceb09a200eb9b3fb7c94`.
+- Implementation commit: `0d9daa89c78199796c69f2bd81daa6450755cb14`.
+- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+
+### Gate status
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.

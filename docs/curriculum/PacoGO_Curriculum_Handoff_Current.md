@@ -3643,7 +3643,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 105. G3-018 strict ABSENT preconditions — verification pending
+## 105. G3-018 strict ABSENT preconditions — verified
 
 ### Work implemented
 - Inspected G3-018 in the G3 verification specification and O6 v0.3 §5.5.
@@ -3654,7 +3654,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 ### Verification status
 - Pre-build Full Regression #3202 / run ID `42427882277`: GREEN on exact baseline commit `073e353c549f7330e9865a592f23b223ac59ea45`.
 - Implementation commit: `f91513784da49a48212f426f190724ca3fcc282c`.
-- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+- Full Regression #3203 / run ID `42428008931`: **GREEN** on exact implementation commit `f91513784da49a48212f426f190724ca3fcc282c`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

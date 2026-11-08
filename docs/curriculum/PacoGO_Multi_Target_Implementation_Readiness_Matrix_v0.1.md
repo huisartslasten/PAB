@@ -1605,3 +1605,26 @@ G3-037/038 remain blocked. G3-039 logical lineage remains fixture-tested; durabl
 ### Next concrete step
 
 Reconcile the Stage C candidate to distinguish the C6 `evaluation_id` from the C7 `decision_id` that references it, then draft field-by-field logical payload inventories for Stages A/B/C. Do not decide serialization/normalization or implement persistence.
+
+
+## 8.69 G9 stage payload field inventory and C6/C7 identity reconciliation
+
+**Artifacts:**
+- `PacoGO_G9_Logical_Payload_Field_Inventory_v0.1.md`
+- Updated `PacoGO_G9_Logical_Idempotency_Contract_Candidate_v0.1.md`
+- `PacoGO_G9_Source_Reconciliation_v0.1.md`
+
+**Field inventory completed:** Stage A raw observation, Stage B target-specific assessment, and Stage C frozen snapshot/C6 evaluation/C7 decision are mapped field-by-field as required, conditional, not part by default, or unresolved. The inventory follows C2, O5, O6 v0.3, G6, O7/O8 and the preliminary C8/C9 crosswalk. It distinguishes logical facts from serialization and physical schema.
+
+**Stage C clarification:** the candidate now separates:
+- immutable decision snapshot identity;
+- C6 evaluation identity (`evaluation_id` in O8; `c6_evaluation_id` in the C8/C9 crosswalk);
+- C7 decision identity (`c7_decision_id` in the C8/C9 crosswalk), referencing the exact C6 evaluation.
+
+This is the source-aligned candidate direction. G5 remains OPEN and must approve final naming and cross-stage envelope. No claim that G5 has closed.
+
+**Still unresolved:** G6 observation/assessment identity namespaces and complete lifecycle; canonical absent/null, scalar/string, collection and timestamp equality; G9 durable stage states, uncertain-commit recovery, retries and concurrency; G8/G10 physical persistence/security.
+
+**Gate status:** G9 remains OPEN. G3-037/038 remain BLOCKED. G3-039 logical lineage is fixture-tested; durable recording remains open. No runtime, tests, registry, learner-state, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Next concrete step:** review the field inventory against G6 and G5 dependencies, then write the logical G9 equality/state/recovery contract only for source-determined behavior. Keep unresolved behavior explicitly open; no physical implementation.

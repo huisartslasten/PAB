@@ -3617,3 +3617,26 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN.
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+
+
+## 104. G3-017 technical capture failure — verified
+
+### Work implemented
+- Inspected G3-017 in the verification specification and O6 v0.3 §§5.3–5.5.
+- Strengthened `pacogo-engine/operational-assessment-contract.test.js` so a required process stream marked `TECHNICAL_FAILURE` explicitly blocks the affected performance rule.
+- The valid case requires performance execution `BLOCKED` with no learner performance result and target evidence `INDETERMINATE`.
+- Negative cases reject `INCORRECT` and target evidence `ABSENT` for the same technical capture failure.
+- This remains a test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification
+- Pre-build Full Regression #3199 / run ID `42427646099`: GREEN on exact baseline commit `ef7da3458c865067646cb739f69139705907c667`.
+- Implementation commit: `eefa0c9e5dfe0f954f78c9760665fb32e14ea65b`.
+- Full Regression #3200 / run ID `42427783561`: **GREEN** on that exact implementation commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+### Gate status and next step
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN; continue vector by vector with meaningful positive and negative assertions.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
+- Next: inspect and strengthen G3-018 against its strict preconditions for target evidence `ABSENT`. Do not invent unresolved G5/G6/G9/O5 semantics and do not begin production runtime or persistence work without applicable gates and explicit G12 authorization.

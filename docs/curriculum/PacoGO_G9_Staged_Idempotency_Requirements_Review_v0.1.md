@@ -40,9 +40,44 @@ Each stage must:
 
 The complete learner-observation-to-decision timeline is not one transaction. Assessment evaluation and C6/C7 may occur at distinct times.
 
-## 3. G9 logical responsibilities
+## 3. Stage payload content boundaries from existing contracts
 
-### 3.1 Canonical immutable payload contract
+These are logical content sources for each stage, not serialized payload examples or physical record shapes.
+
+### 3.1 Raw-observation ingestion
+
+C2 Student Data Model v0.1 Layers 3–4 and §4 require the raw interaction/observation layer to preserve what happened without developmental interpretation, including interaction events and response/output, objective correctness where defined, and missingness/provenance as applicable. Raw interaction and observation records are immutable; later interpretation/correction creates a linked derived record and does not overwrite source facts.
+
+G6 supplies the logical administration/episode/event/observation identity and source event ordering. The exact complete field set for the canonical ingestion payload still needs to be reconciled against the final approved G6 record contract; this review does not invent one.
+
+### 3.2 Target-assessment evaluation and recording
+
+O6 v0.3 §7 requires each target-specific assessment to preserve:
+- exactly one immutable observation reference and exactly one existing evidence-target reference;
+- applicable task-instance, task-definition, task-model and curriculum-registry versions;
+- applicability and execution state for each evaluated dimension, including reasons where no result is emitted;
+- completed dimension results and source/rationale references;
+- relevant support-event references and target-specific independence rationale;
+- scoring-rule version where performance is scored;
+- O6/C3 contract version, target-rule version and assessment-engine version;
+- event time and assessment-availability time;
+- source observation/event references;
+- stable assessment identity under G6/G9;
+- prior-assessment link and correction/reassessment reason when applicable.
+
+O6 v0.3 §9 further requires raw facts, target assessment and downstream inference to remain separate and historical corrections to preserve immutable history. G6 defines the logical assessment identity binding; G9 defines canonical payload equality/conflict and durable recording.
+
+### 3.3 Decision evaluation
+
+Owner decision O8 requires a C6 result to carry the complete six-part branch identity, snapshot ID, evaluation ID, protocol/version provenance, gate trace and exact observation/assessment references. C7 consumes one validated C6 branch result and preserves the exact branch, snapshot and evaluation identity; it does not recompute mastery or infer missing identity. C8 is a descriptive projection of exact C6/C7 history; C9 structurally validates the linked chain.
+
+A changed eligible evidence set or protocol creates a new snapshot/evaluation under O7. The exact boundary between a C6 evaluation record and a C7 decision record must follow the approved C6/C7/O8 contracts; G9 must not collapse their identities merely because they are part of one learner-facing decision flow.
+
+These stage-specific source boundaries define which logical content must be protected by idempotency. They do not settle canonical serialization, physical field names, storage layout or transaction implementation.
+
+## 4. G9 logical responsibilities
+
+### 4.1 Canonical immutable payload contract
 
 G9 must define, separately for each idempotency boundary:
 - the exact logical fields included in the immutable payload;

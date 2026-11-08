@@ -53,24 +53,27 @@ O9/G4 learner-facing cross-branch presentation remains separate. It is required 
 
 - Task definition/version, task model/version, administered task instance, response episode, interaction event and raw observation are distinct logical concepts.
 - One separately administered response episode maps to exactly one immutable raw observation.
-- Ordinary edits/revisions/retries remain events within the same response episode.
-- Explicit restart after completion is a new administration with a new task instance, response episode and observation; the prior episode remains preserved.
-- A started abandoned episode preserves its abandonment event and captured history; no score/evidence result is invented from abandonment alone.
-- A material support-condition change creates a new task instance, response episode and immutable observation. For the confirmed Tussentoets/Toets flow, content-help ends the independent attempt as incomplete; supported practice is a separate administration.
-- Neutral interface clarification supplying no target reasoning does not itself change the support condition.
-- Each interaction event belongs to exactly one parent episode, has stable identity within that episode, and the source event order is preserved independently of timestamps.
+- **Ordinary answer edits, revisions and retries remain events in the same response episode**; they do not create a new attempt or observation.
+- **Explicit restart after completion is a new administration** with a new task instance, response episode and observation; the completed episode and its history remain preserved.
+- **A started abandoned episode preserves its captured event/history and immutable raw observation; abandonment alone never fabricates a score or evidence result.**
+- **A temporary interruption may resume the same task instance and response episode only if the exact same administration state is restored.** For this logical contract, that means the same task content/version, presentation/representation, response mode, support condition and recorded progress/event history. If exact restoration is unavailable, the old episode must not be resumed as though unchanged.
+- **A material change to task content, presentation/representation, response mode or support condition is a new administration** with a new task instance, response episode and observation. For the confirmed Tussentoets/Toets flow, content-help ends the independent episode as incomplete; supported practice is a separate administration. Neutral interface clarification that supplies no target reasoning is not itself a material support-condition change.
+- **Elapsed time alone never terminates an episode.** Timeout termination is permitted only under an explicit, versioned task/session policy that defines the timeout and its consequence. Without such a policy, there is no automatic timeout termination.
+- Each interaction event belongs to exactly one parent episode; the source event order is preserved independently of timestamps.
 - Each target-specific assessment has its own logical identity and refers to exactly one immutable observation and one existing evidence target. Multiple target assessments can reference the same observation; corrections/reassessments are separately identified linked history.
+
+The lifecycle rules above were explicitly approved by the owner on 2026-11-08. They are logical contract decisions only: they do not select physical ID formats, storage keys, snapshot/hash formats, timeout durations or implementation mechanics.
 
 ### G6 decisions still required
 
-1. **Interruption/resume:** approve the exact restoration condition under which the same response episode may resume. The current proposal's “resume only if the exact same administration state is restored” is explicitly a candidate, not final approval.
-2. **Timeout:** approve whether/when an explicit versioned task/session policy can terminate an episode and its consequence. Elapsed time alone is not a terminal event.
-3. **Completion and lifecycle state model:** reconcile completion, abandonment, interruption, resume, restart and timeout transitions with C3/O6, including learner-facing lifecycle wording where needed.
-4. **Final identity namespace/uniqueness scope:** approve the observation and target-assessment identity scope. No physical ID format, database key or deterministic serializer is implied.
-5. **Final C3/O6 reconciliation:** confirm the complete administration and target-assessment provenance envelope against the frozen O6 v0.3 logical requirements. Do not invent assessment labels for missing/no-response/incomplete episodes.
-6. **Task-instance/episode relationship:** explicitly approve the minimum lifecycle cardinality and transition rules in the G6 acceptance criteria.
+1. **Policy-specific timeout configuration:** before any task/session uses a timeout, its versioned policy must define duration and consequence. No universal duration or implicit default is approved.
+2. **Completion and learner-facing lifecycle vocabulary:** reconcile completion, abandonment, interruption, resume, restart and policy-triggered timeout labels/transitions with C3/O6; do not introduce assessment labels or learner-facing claims that O6 does not support.
+3. **Final identity namespace/uniqueness scope:** approve observation, event and target-assessment identity scopes. No physical ID format, database key or deterministic serializer is implied.
+4. **Final C3/O6 reconciliation:** confirm the complete administration and target-assessment provenance envelope against frozen O6 v0.3. Do not invent assessment labels for missing/no-response/incomplete episodes.
+5. **Task-instance/episode cardinality:** finalize the proposed minimum cardinality and transition rules against the complete G6 acceptance criteria; do not infer a physical relationship from the logical proposal.
+6. **Operational interruption verification:** specify how the runtime can establish that the exact administration state was restored, without prematurely choosing a physical snapshot or hash mechanism.
 
-G6 event-order and target-assessment fixture tests are useful evidence, but do not by themselves close the owner approval or persistence behavior.
+G6 event-order and target-assessment fixture tests are useful evidence, but do not by themselves close the remaining owner approval or persistence behavior.
 
 ## 5. G9 — decisions owned by G9 after G5/G6 inputs are approved
 

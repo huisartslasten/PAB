@@ -4362,3 +4362,35 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 ### Next concrete step
 - Review the ten explicit G9 open decisions against the source contracts and separate those already determined by O7/O8/O6/G6 from those requiring an owner choice. Do not begin G9 implementation until that distinction and the Stage C identity decision are resolved.
+
+
+## 137. G9 source reconciliation — owner decisions separated from specification gaps
+
+### Completed
+- Read the current handoff and checked Full Regression before continuing.
+- Full Regression #3352 / run ID `42504176404` completed **GREEN** on exact commit `41a305716d91046528934e84f991fc04b59616c3`. Exact branch/commit guard, curriculum, architecture, Node, Vitest, browser regression and clean-working-tree checks all passed.
+- Read the G9 logical candidate against O7/O8, O6 v0.3, G6 identity lifecycle, C6/C7 and the C8/C9 preliminary crosswalk.
+- Created `docs/curriculum/PacoGO_G9_Source_Reconciliation_v0.1.md`.
+- Updated the implementation-readiness matrix with the source reconciliation.
+
+### Findings
+- O7 already approves three separate idempotency boundaries, replay/conflict outcomes, linked correction/reassessment, new snapshot/evaluation after changed eligible evidence/protocol, stage-local atomicity and durable inspectable retry/recovery state.
+- G6/O1/O6 already determine observation/assessment cardinality and provenance boundaries, including one stable target-assessment identity bound to exactly one observation and one target. Actual reassessment under a changed rule/contract/engine gets a new linked identity.
+- O5 already determines UTC instants, half-open event-time membership, separate assessment-availability cutoff and immutable snapshots.
+- C6 `evaluation_id` and C7's consumed C6 identity must remain distinct from the C7 decision record. C8/C9 v0.2 and the preliminary G5 crosswalk identify a separate C7 decision identity referencing the exact C6 evaluation. This is a source-aligned candidate pending final G5 approval, not a claim that G5 is closed.
+- Still open: Stage A/B identity namespace/uniqueness scope; final Stage A field envelope pending G6; null/absence, scalar/string normalization, collection ordering, timestamp precision and contract-version equality rules; stage-state vocabulary/transitions; uncertain-commit recovery; retry/concurrency/in-progress behavior; operation timeout semantics.
+- Learner administration timeout (G6) and persistence operation timeout (G9) are separate concerns.
+- G8/G10 physical persistence/security design remains downstream. No RPC/Supabase patch.
+
+### Verification state
+- Source reconciliation artifact commit: `8d6a9865511fdbc3f2fdebf4c1735fbbf6af9fbe`.
+- Matrix and handoff documentation updates are being completed as one documentation-only block; their final commit must pass Full Regression before this phase is closed.
+- No runtime, tests, registry, learner state, schema, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Next concrete step
+1. Reconcile Stage C in the G9 candidate: separate the C6 evaluation identity from the C7 decision identity that references it, subject to G5 approval.
+2. Draft field-by-field logical payload inventories for Stages A, B and C, marking required/conditional/optional fields from source contracts.
+3. Keep canonicalization decisions open where sources do not decide them. Do not add tests for unresolved semantics.
+4. Keep G6/G9 and G8/G10 dependencies explicit. No implementation until the required gates and explicit G12 authorization are complete.
+
+Working branch remains `refactor/professional-v1`; `main` / LIVE untouched.

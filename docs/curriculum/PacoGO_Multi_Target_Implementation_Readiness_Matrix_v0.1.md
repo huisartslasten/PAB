@@ -1558,3 +1558,18 @@ Full Regression #3292 / run ID `42463863331`, handoff-only #3293 / run ID `42463
 **Gate status:** G3-037/038 remain BLOCKED pending approved exact G6 assessment identity plus G9 canonical payload equality/conflict and durable idempotent stage-write semantics. G3-039 logical lineage remains tested; durable persistence remains open. G6 remains OPEN for interruption/resume, timeout and complete lifecycle reconciliation. G9 remains OPEN. No runtime, schema, database, SQL/RPC/RLS, Supabase or learner data changed; O6 v0.3 remains frozen.
 
 **Next:** reconcile the logical assessment-identity candidate against C3/O6 and the owner architecture decision record; then determine which G3-037/038 assertions can be authored without specifying G9 mechanics.
+
+
+## 8.67 G9 staged idempotency requirements review — O7 mapped, design remains open
+
+**Owner-approved O7 requirements:** three separate idempotency boundaries (raw-observation ingestion, target-assessment evaluation/recording, decision evaluation); same identity + same canonical immutable payload is replay; same identity + different payload is rejected as integrity conflict; correction/reassessment uses a new linked identity; changed eligible evidence set/protocol creates a new snapshot/evaluation; each stage commits atomically and exposes durable inspectable state for retry/recovery. The whole observation-to-decision timeline is not one transaction.
+
+**Current audit finding:** the current `persist_curriculum_learning_cycle` is one atomic write of evidence, skill-level state and decision trace. Duplicate learner + source-event handling checks row existence and returns `duplicate: true`, without canonical immutable payload comparison. It therefore does not implement O7's distinct staged idempotency/conflict semantics. This is an audit finding, not an RPC patch instruction, and does not assert deployed database state.
+
+**Review artifact:** `PacoGO_G9_Staged_Idempotency_Requirements_Review_v0.1.md` maps the logical requirements for canonical payload fields/equality, stage identity scope, durable stage state, atomicity/failure behavior, retries, concurrency and conflict handling. It deliberately leaves status vocabulary, canonicalization details, idempotency key scope, locking/outbox/recovery technology and physical storage unresolved. G8/G10 remain separate for physical persistence/security.
+
+**Verification:** review commit `0f4051612662d8a77e4dbaeded4bf2d1a9a5ff19`; Full Regression #3345 / run ID `42502755601`: **GREEN** on exact commit. Handoff commit `3f2db0bb91ffe984fa1f736278aeecf5ba0fa26d`; Full Regression #3344 / run ID `42502692074`: **GREEN** on exact commit. Exact-checkout guard and all full-regression steps passed, including browser regression and clean-working-tree verification.
+
+**Gate status:** G9 requirements review is complete; detailed contract remains OPEN. G6 remains OPEN for final lifecycle approval, interruption/resume and timeout. G3-037/038 remain BLOCKED pending G9 canonical payload and durable idempotency semantics plus G6 identity. G3-039 logical lineage is tested; durable recording remains open. No runtime, RPC, database, SQL/RLS, Supabase or learner data changed; O6 v0.3 remains frozen.
+
+**Next:** identify only the unresolved owner decisions needed to freeze logical G9. Do not choose a physical serializer, storage model or modify the existing RPC.

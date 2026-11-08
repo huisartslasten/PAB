@@ -10,11 +10,17 @@ jobs:
   agenda-cutover-and-regression:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout refactor branch
+      - name: Checkout triggering commit
         uses: actions/checkout@v4
         with:
-          ref: refactor/professional-v1
+          ref: ${{ github.sha }}
           fetch-depth: 0
+      - name: Verify exact refactor branch and triggering commit
+        run: |
+          test "$GITHUB_REF" = "refs/heads/refactor/professional-v1"
+          actual=$(git rev-parse HEAD)
+          printf 'Workflow trigger SHA: %s\\nChecked out SHA: %s\\n' "$GITHUB_SHA" "$actual"
+          test "$actual" = "$GITHUB_SHA"
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:

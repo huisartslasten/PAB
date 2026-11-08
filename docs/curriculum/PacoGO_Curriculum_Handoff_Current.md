@@ -4047,8 +4047,9 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 ### Verification status
 - Pre-build Full Regression #3290 / run ID `42463781726`: GREEN on exact baseline commit `bdb6cebfbc5312414b07e333b84c7ed35f212f1f`.
-- Implementation commit: `1ba0ecc5236a4bbb5167461f7d48562864770f1e`.
-- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+- Initial implementation commit: `1ba0ecc5236a4bbb5167461f7d48562864770f1e` (RED as documented below).
+- Corrected implementation commit: `3e9a7a66640a422a3ce3780e37f7723c166636e9`.
+- Full Regression #3295 / run ID `42463916536`: **GREEN** on the exact correction commit. The subsequent handoff-only commit `bc096bd2ff2394733a2fddb44ab9dd441746e1a9` also passed Full Regression #3296 / run ID `42463932797`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.
@@ -4061,7 +4062,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 ## 124. G3-036 regression failure isolation and correction — verification pending
 
 ### Exact failure
-- Full Regression #3292 / run ID `42463863331` failed on implementation commit `1ba0ecc5236a4bbb5167461f7d48562864770f1e`; the handoff-only commit `f991b89df2a6aef524d48810325ed8a88a2abbcb` also failed in Full Regression #3293 / run ID `42463881545`.
+- Full Regression #3292 / run ID `42463863331` failed on implementation commit `1ba0ecc5236a4bbb5167461f7d48562864770f1e`; the handoff-only commit `f991b89df2a6aef524d48810325ed8a88a2abbcb` failed in #3293 / run ID `42463881545`; and the matrix-only commit `bae6c2a37363cf7ca87d730c5b8bf2529a824f68` failed in #3294 / run ID `42463884328`.
 - Curriculum-engine regression: 282 tests, 281 passed, 1 failed. The sole failure was G3-036's negative case for an empty `source_event_ids` array.
 - Root cause: `Array.prototype.every()` returns true for an empty array. The helper checked that every supplied event reference was non-empty but did not require at least one event reference, so the negative fixture did not throw.
 - This was an incomplete test assertion, not a production engine failure. No tests outside the new G3-036 case failed.
@@ -4070,4 +4071,4 @@ After verifying this documentation update with Full Regression, continue G3 test
 - Correction commit: `3e9a7a66640a422a3ce3780e37f7723c166636e9`.
 - The provenance helper now requires a non-empty source-event-reference list before validating each identifier. The negative fixture expects that specific diagnostic.
 - No assertion was weakened; the missing required provenance condition is now explicitly enforced.
-- Full Regression on the exact correction commit is pending. Do not continue to another build vector until it is GREEN.
+- Full Regression #3295 / run ID `42463916536`: **GREEN** on exact correction commit `3e9a7a66640a422a3ce3780e37f7723c166636e9`. Handoff-only commit `bc096bd2ff2394733a2fddb44ab9dd441746e1a9` also passed Full Regression #3296 / run ID `42463932797`.

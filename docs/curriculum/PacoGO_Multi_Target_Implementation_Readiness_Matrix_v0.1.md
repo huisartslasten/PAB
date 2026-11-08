@@ -1419,3 +1419,22 @@ The fixture value is test-only; it does not define a production API or persisted
 ### G3-036 regression correction note
 
 Full Regression #3292 / run ID `42463863331`, handoff-only #3293 / run ID `42463881545`, and matrix-only #3294 / run ID `42463884328` were RED because the new helper used `Array.prototype.every()` without requiring a non-empty array; an empty source-event list therefore passed. The run contained 282 tests: 281 passed, and the sole failure was G3-036's negative empty-list case. Correction commit `3e9a7a66640a422a3ce3780e37f7723c166636e9` now requires at least one source event reference before validating each identifier. The correction commit passed Full Regression #3295 / run ID `42463916536`, and the subsequent handoff-only commit passed #3296 / run ID `42463932797`.
+
+
+
+## 8.58 A1/B1/FR2 domain-anchor conformance strengthening
+
+**Contract basis:** G3 traceability identifies A1-1–A1-3, B1-1–B1-4 and FR2-1–FR2-4 as direct, target-specific O6 preservation anchors. The O6 Domain Anchor Examples v0.1 and registry v0.6 supply the existing target distinctions; no target mapping is changed.
+
+**Test change:**
+- A1 uses canonical `A1.ET2` to distinguish co-display from an actual mapping action; only actual elicitation may support `PRESENT`.
+- B1 uses canonical `B1.ET3/ET4/ET5` to preserve execution, strategy and checking as separate target assessments. One observation can support all three, while only execution is elicited and positive. Canonical `B1.ET7` remains unmapped.
+- FR2 uses canonical `FR2.ET1/ET3` to keep recognition distinct from same-value reasoning within one observation. Text presence alone does not establish reasoning, and wrong selection alone does not establish contradiction.
+
+**Scope:** Test-only normalized logical-record fixtures. No registry, curriculum target, task-model mapping, production assessor/runtime, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Implementation commit `253afb6b59052ad6b35d3fd544359b18ab3101b9`. Pre-build Full Regression #3304 / run ID `42464335034`: GREEN on exact baseline commit `a1eb8ba3008733d9bfc52e59047b3bdc2b38ed23`. Full Regression on the exact implementation commit is pending.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN for direct anchors. G3-037–039 remain blocked on G6/G9; G3-040 remains blocked on O5. No production implementation authorization is implied.
+
+**Next step:** After this exact implementation passes Full Regression, continue reviewing any remaining directly specified anchor gaps. Do not infer G6/G9 identity or O5 cutoff semantics.

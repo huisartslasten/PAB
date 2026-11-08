@@ -1057,3 +1057,19 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-019, requiring `PRESENT` to satisfy its positive target criterion and all applicable capture/inspectability preconditions. Do not infer mastery or transfer from `PRESENT` alone.
+
+
+
+## 8.33 G3-019 — PRESENT requires pre-specified positive target evidence
+
+**Contract basis:** O6 v0.3 §§1, 5.5 and 9 separate target-specific evidence assessment from downstream inference. `PRESENT` requires valid target elicitation, a pre-defined criterion and required material, the criterion being met, and inspectable material. It does not establish mastery, transfer or next action.
+
+**Test change:** The shared `assertAssessment` now enforces the pre-defined criterion/material conditions for `PRESENT`. G3-019 covers one valid positive case and six negative cases: misalignment, criterion not pre-defined, required material not pre-defined, criterion not met, required material not inspectable, and target rule not completed.
+
+**Scope:** Test-only conformance work against frozen O6 v0.3. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Pre-build Full Regression #3206 / run ID `42428186877`: GREEN on exact baseline commit `5945d521d4dbf8c774cfc705e080965c7f6da156`. Final test implementation commit `67c77d2b824b9ec0b3304db0e80c499ab63c8330`. Full Regression #3208 / run ID `42428302970`: **GREEN** on that exact implementation commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with G3-020, distinguishing a help request from support actually delivered and not classifying the learner as PROMPTED or DEPENDENT when no support was delivered.

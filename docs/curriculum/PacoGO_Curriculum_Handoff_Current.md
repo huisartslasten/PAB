@@ -3724,3 +3724,24 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN.
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+
+
+## 109. G3-022 actual independence conditions — verification pending
+
+### Work implemented
+- Inspected G3-022 in the G3 verification specification and O6 v0.3 §5.6.
+- Expanded `pacogo-engine/operational-assessment-contract.test.js` to verify that `INDEPENDENT` is accepted only when actual required event capture is sufficiently complete and no target-relevant support was delivered.
+- Added negative cases through the shared `assertAssessment` assertion for incomplete event capture and delivered target-relevant assistance. The positive case explicitly records no delivered support and complete event capture.
+- This remains test-only normalized logical-record conformance work. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification status
+- Pre-build Full Regression #3219 / run ID `42428855949`: GREEN on exact baseline commit `f96379871016013fa17e68b121ad6a3df3d059e7`.
+- Implementation commit: `c134cc15fff565095e9f7db137d14bb7b93a9ec8`.
+- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+
+### Gate status
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.

@@ -150,6 +150,25 @@ function assertAssessment(record) {
   return true;
 }
 
+function assertTargetScopedContradiction(records) {
+  assert.equal(records.length, 2, 'the G3-031 fixture must contain two target assessments');
+  assert.equal(records[0].observation_id, records[1].observation_id, 'target assessments must refer to the same observation');
+  assert.notEqual(records[0].evidence_target_id, records[1].evidence_target_id, 'target assessments must remain distinct');
+  const contradictory = records.filter(record => record.dimensions.contradiction?.result === 'PRESENT');
+  assert.equal(contradictory.length, 1, 'contradiction must remain local to the explanation-dependent target');
+  const source = contradictory[0].contradiction_source;
+  assert.equal(typeof source?.event_id, 'string', 'target contradiction must cite the exact response event');
+  assert.ok(source.event_id.trim());
+  assert.equal(typeof source?.source_material, 'string', 'target contradiction must preserve the exact conflicting material');
+  assert.ok(source.source_material.trim());
+  assert.equal(typeof source?.conflicts_with, 'string', 'target contradiction must identify the target-specific interpretation');
+  assert.ok(source.conflicts_with.trim());
+  const recognition = records.find(record => record !== contradictory[0]);
+  assert.equal(recognition.dimensions.evidence?.result, 'PRESENT', 'recognition target may retain PRESENT evidence');
+  assert.equal(recognition.dimensions.contradiction?.result, 'ABSENT', 'explanation contradiction must not propagate to recognition target');
+  return true;
+}
+
 function assertTechnicalFailureBlocksAffectedPerformance(record) {
   const failed = record.process_streams?.filter(stream => stream.required === true && stream.availability === 'TECHNICAL_FAILURE') ?? [];
   assert.ok(failed.length > 0, 'a required process stream must record TECHNICAL_FAILURE');
@@ -1072,14 +1091,50 @@ test('G3-030: an incorrect response without conflicting material yields no contr
   assert.throws(() => assertAssessment(unsupportedContradiction), /contradiction must cite source material/);
 });
 
-test('G3-031: contradiction is target-specific and cites conflicting material', () => {
-  const record = base({
-    dimensions: { contradiction: dimension('PRESENT') },
-    contradiction_source: { event_id: 'event-explanation-1', conflicts_with: 'target-specific interpretation' }
+test('G3-031: correct response can contradict an explanation target without contaminating recognition evidence', () => {
+  const explanationTarget = base({
+    evidence_target_id: 'target-explanation',
+    objective_scoring_result: 'CORRECT',
+    dimensions: {
+      performance: dimension('CORRECT'),
+      evidence: dimension('INDETERMINATE'),
+      contradiction: dimension('PRESENT')
+    },
+    contradiction_source: {
+      event_id: 'event-explanation-1',
+      source_material: 'The learner states that the larger numerator always makes the fraction smaller.',
+      conflicts_with: 'The target interpretation requires understanding that fraction magnitude depends on the numerator and denominator together.'
+    }
   });
-  assertAssessment(record);
-  assert.ok(record.contradiction_source.event_id);
-  assert.ok(record.contradiction_source.conflicts_with);
+  const recognitionTarget = base({
+    evidence_target_id: 'target-recognition',
+    objective_scoring_result: 'CORRECT',
+    dimensions: {
+      performance: dimension('CORRECT'),
+      evidence: dimension('PRESENT'),
+      contradiction: dimension('ABSENT')
+    }
+  });
+
+  const assessments = [explanationTarget, recognitionTarget];
+  assessments.forEach(assertAssessment);
+  assertTargetScopedContradiction(assessments);
+
+  const propagated = [
+    explanationTarget,
+    base({
+      evidence_target_id: 'target-recognition',
+      objective_scoring_result: 'CORRECT',
+      dimensions: {
+        performance: dimension('CORRECT'),
+        evidence: dimension('PRESENT'),
+        contradiction: dimension('PRESENT')
+      },
+      contradiction_source: explanationTarget.contradiction_source
+    })
+  ];
+  propagated.forEach(assertAssessment);
+  assert.throws(() => assertTargetScopedContradiction(propagated), /contradiction must remain local/);
 });
 
 test('G3-032: missing process or misalignment cannot be contradiction PRESENT by default', () => {

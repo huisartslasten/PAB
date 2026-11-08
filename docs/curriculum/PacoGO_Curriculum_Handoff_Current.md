@@ -3864,7 +3864,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 115. G3-028 neutral answer-entry clarification does not end independent attempt — verification pending
+## 115. G3-028 neutral answer-entry clarification does not end independent attempt — verified
 
 ### Work implemented
 - Inspected G3-028 in the G3 verification specification and O6 v0.3 §5.6.
@@ -3875,7 +3875,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 ### Verification status
 - Pre-build Full Regression #3250 / run ID `42430506962`: GREEN on exact baseline commit `7d4e0c2c051c35038f640cdc6423fc15a26a2011`.
 - Implementation commit: `a442ab120fa2cefa14bb01c136b0d382251a8688`.
-- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+- Full Regression #3251 / run ID `42430611392`: **GREEN** on exact implementation commit `a442ab120fa2cefa14bb01c136b0d382251a8688`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

@@ -4536,3 +4536,42 @@ Branch: `refactor/professional-v1`; LIVE `main` untouched.
 - Verification immediately before this handoff amendment: Full Regression #3364 / run ID `42510652470`, GREEN on exact commit `301cf6ca946d079622e7577e8b28b2888bfa470f`. This amendment itself requires a new Full Regression before it is considered verified.
 
 Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+## 142. G6 owner-approved lifecycle rules and regression verification
+
+### Owner decision — 2026-11-08
+
+The owner explicitly approved the following logical administration/attempt lifecycle rules:
+
+- Ordinary answer edits, revisions and retries remain within the same response episode; they do not create a new attempt/observation.
+- An explicit restart after completion is a new administration with a new task instance, response episode and immutable observation. The completed episode and its history remain preserved.
+- Abandonment preserves the started episode's captured events/history and immutable raw observation. Abandonment alone must not fabricate a score or evidence result.
+- A temporary interruption may resume the same task instance/response episode only if the exact same administration state is restored: same task content/version, presentation/representation, response mode, support condition and recorded progress/event history. If exact restoration is unavailable, do not resume the old episode as if unchanged.
+- A material change to task content, presentation/representation, response mode or support condition is a new administration with a new task instance, response episode and observation. Neutral interface clarification that supplies no target reasoning is not itself a material support-condition change. The previously approved Tussentoets/Toets content-help boundary remains: the independent episode ends incomplete and supported practice is separately administered.
+- Elapsed time alone never terminates an episode. Timeout termination is permitted only under an explicit, versioned task/session policy defining the timeout and its consequence. Without such a policy, there is no automatic timeout termination.
+
+These are logical contract decisions only. They do not define physical IDs/keys, a snapshot/hash format, a universal timeout duration, persistence mechanics or runtime implementation.
+
+### Contract updates
+
+- Updated `PacoGO_Task_Observation_Identity_Lifecycle_Proposal_v0.1.md` to record the approved rules and distinguish them from the remaining open G6 work.
+- Updated `PacoGO_G5_G6_G9_Dependency_Decision_Map_v0.1.md` so the G6 owner-approved rules are no longer described as candidate decisions.
+- G6 remains OPEN. Remaining work includes policy-specific timeout definition before use, final lifecycle vocabulary/C3–O6 reconciliation, identity namespace/uniqueness scope, task-instance/episode cardinality finalization and operational verification of exact-state restoration.
+- G5, G9, G8/G10 and G12 remain open/downstream as previously recorded. G12 implementation authorization has not been granted.
+- No runtime, tests, curriculum registry/data, learner state, SQL/RPC/RLS, database or Supabase changes were made. No tests were changed.
+
+### Regression and commit trail
+
+- Previous matrix-status reconciliation commit: `20f4ee7970018c356ddc00ba1885c3a98d132c31`.
+- Full Regression #3367, run ID `42511074361`, attempt 1 failed only at browser regression: the lesson-view canonical-shell test did not find the expected `.paco-template-version-badge` / `V7.0`; 58 browser tests passed. The other workflow stages passed.
+- The failed browser job was rerun without code/test changes. Full Regression #3367, attempt 2, completed **GREEN** on the exact same commit `20f4ee7970018c356ddc00ba1885c3a98d132c31`. Browser regression and clean-working-tree verification both passed. The first failure was not reproduced; no root cause was established, so no code/test correction was made.
+- G6 lifecycle proposal update: commit `edc8df09d4a96b2822a6761cb5db002cee01179c`.
+- G5/G6/G9 dependency map update: commit `a559f1d3b906f3f88314fe94a1477f1d53e00e82`.
+- This handoff update is itself a project change and requires its own Full Regression before this work block is considered verified.
+
+### Next concrete step
+
+Continue G5/G6/G9 contract work from the now owner-approved lifecycle baseline. Do not reopen the approved G6 lifecycle rules without a specific contradiction. Finish the remaining G6 identity/cardinality/C3–O6 reconciliation and G5 Stage C lineage/write-unit decisions, then address the genuine G9 canonical equality and durable recovery decisions. Do not implement runtime or persistence work until all required gates and explicit G12 authorization are satisfied.
+
+Branch: `refactor/professional-v1`; LIVE `main` untouched.
+

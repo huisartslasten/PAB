@@ -60,17 +60,35 @@ A neutral interface clarification that supplies no target reasoning does not its
 
 ## 4. Event identity, ordering and replay
 
-Recommended minimum logical event contract:
+### 4.1 Source-derived logical requirements
 
-- Each event receives an opaque, stable `event_id` at event creation.
-- Each event carries a per-episode monotonically increasing `event_sequence`; sequence, not wall-clock time, determines causal order within the episode.
-- Event time is stored separately as an event-time instant. Arrival/ingestion time is also separate where needed; neither replaces sequence.
-- A source-generated idempotency key remains stable when the same event is resent. Scope it to the response episode unless the source system guarantees global uniqueness.
-- Same event identity/key plus the same canonical immutable payload is a replay. The same identity/key with a different payload is an integrity conflict and is rejected, consistent with O7.
-- Missing sequence, duplicate sequence with different events, or an event whose parent episode does not match is an integrity error; do not sort by timestamp to repair it.
-- An event correction is a new linked/versioned record; the original event and observation are not overwritten.
+The following are determined by the existing C2/C3/O6/O7 boundaries:
 
-Opaque IDs should be generated once at the logical creation boundary and persisted unchanged across retries. UUID-style random identifiers are a candidate implementation, not a required public format. Collision handling is uniqueness enforcement plus explicit conflict; never silently reuse an existing ID.
+- Each interaction event belongs to exactly one response episode; the episode's raw observation preserves the ordered event stream.
+- Clicks, edits, answer revisions and ordinary retries remain events in the same episode unless a separately administered task instance is created.
+- Event order is preserved as source/episode order. Event timestamps are provenance; they must not be used to silently reorder the event stream.
+- Event time and assessment-availability time are separate logical facts under O5/O6.
+- Raw events and observations are immutable. A later correction must not rewrite the original response/event history.
+
+### 4.2 G6 logical identity boundary
+
+Recommended logical contract, without prescribing a physical schema or transport:
+
+- Each event has a stable logical identity within its parent response episode.
+- An event identity cannot refer to two different events in the same episode.
+- Each event is linked to exactly one parent response episode.
+- The ordered event stream is authoritative. A numeric sequence field is one possible representation, not a required logical field; no causal order is inferred from wall-clock timestamps.
+- A corrected event is represented as a new linked/versioned event; the original event remains inspectable.
+
+### 4.3 G9 replay and payload boundary
+
+O7 determines the logical outcome:
+- same identity + same canonical immutable payload is an idempotent replay;
+- same identity + different payload is an integrity conflict and must be rejected.
+
+G9 must still define canonical payload fields/serialization/equality, event idempotency-key scope and durable retry/concurrency/recovery behavior. UUID format, database key, wire encoding, numeric sequence storage, transaction/outbox implementation and physical persistence are not defined by G6.
+
+
 
 ## 5. Observation creation and immutability
 

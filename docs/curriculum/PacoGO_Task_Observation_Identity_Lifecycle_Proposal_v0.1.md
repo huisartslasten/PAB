@@ -33,7 +33,7 @@ Identity meanings:
 | `event_id` | One immutable interaction event | Unique event identity; event belongs to exactly one response episode |
 | `event_sequence` | Order of events within one response episode | Monotonically increasing; authoritative order is not inferred from timestamps |
 | `observation_id` | One immutable raw observation for the response episode | Exactly one observation per separately administered response episode; one-to-one with `task_attempt_id` |
-| target-assessment identity | PacoGO's versioned assessment of one target against one observation | Zero or more per observation; exact identity/version is governed by G2/O6, not this proposal |
+| target-assessment identity | PacoGO's stable, versioned assessment of one existing target against one immutable observation | O6 v0.3 defines logical provenance and correction lineage; exact identity semantics, canonical immutable payload and replay/conflict behavior are governed jointly by G6/G9; no physical key or serialization is defined here |
 
 The task instance captures what was actually administered, not merely what the task definition intended. Any material difference from the definition is recorded as an administration deviation rather than silently rewritten into the definition.
 
@@ -86,7 +86,7 @@ Opaque IDs should be generated once at the logical creation boundary and persist
 The following remain outside this proposal:
 
 1. Final target-alignment, response-relation, evidence-status, quality, assistance/independence and contradiction vocabularies and deterministic assessment rules — G2/O6.
-2. Exact target-assessment identity and assessment-version provenance — G2/O6.
+2. Logical target-assessment provenance and correction lineage — defined by O6 v0.3 §7. Exact identity semantics, canonical immutable payload and replay/conflict behavior remain G6/G9.
 3. Operational examples distinguishing neutral UI clarification from target-relevant content help — G2/O6 plus product review.
 4. Physical tables, columns, constraints, RLS, RPCs, migrations, transaction/outbox design and retention — G8–G10.
 5. Learner-facing status wording and timeout durations — product decision; no hidden universal timeout is introduced.
@@ -106,7 +106,7 @@ G6 can close only when the owner-approved, versioned logical contract explicitly
 - incomplete/no-response episodes are preserved without guessing an O6 assessment label;
 - the contract is reconciled with the finally approved C3/O6 model.
 
-G6 remains OPEN. C2/O6 now determine preservation of completion/abandonment events and immutable raw observations; G6-003–005 fixture tests cover same-episode retries, a new administration after explicit restart, and preservation of a started abandoned episode. The owner-approved material support-condition boundary is covered by G6-001/002. Still open: exact interruption/resume restoration policy, timeout duration/consequence, learner-facing lifecycle wording, complete event ordering/identity semantics and final C3/O6 reconciliation. O7's exact canonical-payload representation, stage status/retry/concurrency/recovery design and physical identity realization remain separate G9/G8/G10 work. This partial G6 progress does not close G2/O6, G5 or G7–G12 and does not authorize implementation.
+G6 remains OPEN. C2/O6 now determine preservation of completion/abandonment events and immutable raw observations; G6-003–005 fixture tests cover same-episode retries, a new administration after explicit restart, and preservation of a started abandoned episode. The owner-approved material support-condition boundary is covered by G6-001/002. Still open: exact interruption/resume restoration policy, timeout duration/consequence, learner-facing lifecycle wording, complete event ordering/identity semantics and final C3/O6 reconciliation. O6 v0.3 §7 is authoritative for logical assessment provenance and linked correction/reassessment requirements; G6/G9 must still define the exact assessment identity and replay/conflict envelope. O7's exact canonical-payload representation, stage status/retry/concurrency/recovery design and physical identity realization remain separate G9/G8/G10 work. This partial G6 progress does not close G2/O6, G5 or G7–G12 and does not authorize implementation.
 
 ## 8. Source basis
 

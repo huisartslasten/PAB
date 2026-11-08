@@ -1264,7 +1264,7 @@ The fixture value is test-only; it does not define a production API or persisted
 
 **Scope:** Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
 
-**Verification:** Implementation commit `2702f36e6ec95dc95d23e8b5e8fcc2062515d147`. Pre-build Full Regression #3262 / run ID `42462282079`: **GREEN** on exact baseline commit `f99edffce9887d8d6fb2c011c4622418994e12bf`. Full Regression on the implementation commit is pending.
+**Verification:** Implementation commit `2702f36e6ec95dc95d23e8b5e8fcc2062515d147`. Pre-build Full Regression #3262 / run ID `42462282079`: **GREEN** on exact baseline commit `f99edffce9887d8d6fb2c011c4622418994e12bf`. Full Regression #3278 / run ID `42463163132`: **GREEN** on the exact implementation commit. Documentation commits `d85490f64d2f505c0a649c60e16caadd49f0ff0f` and `a08092226f2d56792ad5892d8ccb585b79297da5` passed #3281 / run ID `42463286584` and #3282 / run ID `42463289970`.
 
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
@@ -1290,7 +1290,7 @@ The fixture value is test-only; it does not define a production API or persisted
 
 **Scope:** Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
 
-**Verification:** Implementation commit `c0b500230486d076f783a573c2681a82c0c6b34d`. Pre-build Full Regression #3267 / run ID `42462527928`: GREEN on exact baseline commit `b283a9da8756bb1d4fd428bb927f67f5f7c40399`. Full Regression on the implementation commit is pending.
+**Verification:** Implementation commit `c0b500230486d076f783a573c2681a82c0c6b34d`. Pre-build Full Regression #3267 / run ID `42462527928`: GREEN on exact baseline commit `b283a9da8756bb1d4fd428bb927f67f5f7c40399`. Full Regression #3285 / run ID `42463541450`: **GREEN** on the exact implementation commit. Documentation commits `6351e19dd22581e60710d9cc683e10774f64bb3a` and `3bcf6d75994cb50a50154be49781cbafa67112bb` passed #3288 / run ID `42463665274` and #3289 / run ID `42463668637`.
 
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
@@ -1410,10 +1410,12 @@ The fixture value is test-only; it does not define a production API or persisted
 
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
-**Next step:** After the exact implementation commit passes Full Regression, G3-037–039 remain blocked until G6/G9 defines identity and canonical-payload semantics. Do not implement those cases by inference.
+**Verification:** Corrected implementation commit `3e9a7a66640a422a3ce3780e37f7723c166636e9` passed Full Regression #3295 / run ID `42463916536`. Handoff-only commit `bc096bd2ff2394733a2fddb44ab9dd441746e1a9` passed #3296 / run ID `42463932797`. All required regression steps passed, including browser regression and clean-working-tree verification.
+
+**Next step:** G3-037–039 remain blocked until G6/G9 defines identity and canonical-payload semantics. Do not implement those cases by inference.
 
 
 
 ### G3-036 regression correction note
 
-Full Regression #3292 / run ID `42463863331`, handoff-only #3293 / run ID `42463881545`, and matrix-only #3294 / run ID `42463884328` were RED because the new helper used `Array.prototype.every()` without requiring a non-empty array; an empty source-event list therefore passed. The run contained 282 tests: 281 passed, and the sole failure was G3-036's negative empty-list case. Correction commit `3e9a7a66640a422a3ce3780e37f7723c166636e9` now requires at least one source event reference before validating each identifier. Full Regression on the correction commit is pending.
+Full Regression #3292 / run ID `42463863331`, handoff-only #3293 / run ID `42463881545`, and matrix-only #3294 / run ID `42463884328` were RED because the new helper used `Array.prototype.every()` without requiring a non-empty array; an empty source-event list therefore passed. The run contained 282 tests: 281 passed, and the sole failure was G3-036's negative empty-list case. Correction commit `3e9a7a66640a422a3ce3780e37f7723c166636e9` now requires at least one source event reference before validating each identifier. The correction commit passed Full Regression #3295 / run ID `42463916536`, and the subsequent handoff-only commit passed #3296 / run ID `42463932797`.

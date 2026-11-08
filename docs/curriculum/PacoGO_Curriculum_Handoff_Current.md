@@ -3706,7 +3706,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 108. G3-021 neutral interface clarification — verification pending
+## 108. G3-021 neutral interface clarification — verified
 
 ### Work implemented
 - Inspected G3-021 in the G3 verification specification and O6 v0.3 §1.
@@ -3717,7 +3717,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 ### Verification status
 - Pre-build Full Regression #3215 / run ID `42428623106`: GREEN on exact baseline commit `4deef55ebc67cb67412a25f36f6b5ca02a515a0e`.
 - Implementation commit: `11f2881f92f885ae4110e7551a0bdaae710aa058`.
-- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+- Full Regression #3216 / run ID `42428731369`: **GREEN** on exact implementation commit `11f2881f92f885ae4110e7551a0bdaae710aa058`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

@@ -3817,7 +3817,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 113. G3-026 same support event, target-specific independence — verification pending
+## 113. G3-026 same support event, target-specific independence — verified
 
 ### Work implemented
 - Inspected G3-026 in the G3 verification specification and O6 v0.3 §5.6.
@@ -3828,7 +3828,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 ### Verification status
 - Pre-build Full Regression #3240 / run ID `42429996862`: GREEN on exact baseline commit `c4227192bd69dd2736c04622ec956a5139813f67`.
 - Implementation commit: `732f3db91e93aab918f9ec2146ea91dc1b603219`.
-- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+- Full Regression #3241 / run ID `42430112666`: **GREEN** on exact implementation commit `732f3db91e93aab918f9ec2146ea91dc1b603219`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

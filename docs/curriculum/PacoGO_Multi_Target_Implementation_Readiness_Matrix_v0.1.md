@@ -1395,3 +1395,19 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-036, preserving the logical provenance fields required by O6 without prescribing physical storage keys.
+
+
+
+## 8.57 G3-036 — preserve logical assessment provenance without physical-key decisions
+
+**Contract basis:** G3-036 and O6 v0.3 §7 require every target-specific assessment to preserve its observation and target references; applicable task-instance, task-definition, task-model and curriculum-registry versions; task scoring-rule version where performance is scored; O6/C3 contract and target-rule versions; assessment-engine version; event time; assessment-availability time; and source observation/event references.
+
+**Test change:** Replaced the truthiness-only fixture check with `assertLogicalAssessmentProvenance`, which requires each listed logical version/time field to be a non-empty value and source event references to be preserved. Negative cases remove each required provenance field individually and omit source event references. The existing assessment assertion verifies the observation and evidence-target references.
+
+**Scope:** Test-only logical-record harness. No physical storage keys, assessment identity format, canonical payload semantics or persistence schema is prescribed. G6/G9 identity work remains blocked. No production assessor/runtime, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Implementation commit `1ba0ecc5236a4bbb5167461f7d48562864770f1e`. Pre-build Full Regression #3290 / run ID `42463781726`: GREEN on exact baseline commit `bdb6cebfbc5312414b07e333b84c7ed35f212f1f`. Full Regression on the implementation commit is pending.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** After the exact implementation commit passes Full Regression, G3-037–039 remain blocked until G6/G9 defines identity and canonical-payload semantics. Do not implement those cases by inference.

@@ -196,6 +196,15 @@ function assertIndependentAttempt(attempt) {
   }
 }
 
+function assertSeparateSupportedContinuation(independent, practice) {
+  assertIndependentAttempt(independent);
+  assert.ok(Array.isArray(independent.pre_request_events), 'pre-request raw events must be represented');
+  assert.deepEqual(independent.retained_pre_request_events, independent.pre_request_events, 'all pre-request raw events must be preserved');
+  assert.notEqual(independent.observation_id, practice.observation_id, 'supported continuation must be a separate response episode/observation');
+  assert.equal(practice.mode, 'Oefenen', 'supported continuation returns to supported practice');
+  return true;
+}
+
 function assertAdequacyProfile(profile) {
   const required = ['capture_integrity', 'response_interpretability', 'scoring_validity', 'administration_fidelity', 'source_provenance_integrity'];
   for (const key of required) assert.ok(Object.hasOwn(profile, key), 'missing M2 profile component: ' + key);
@@ -997,10 +1006,43 @@ test('G3-028: delivered neutral answer-entry clarification does not end independ
   assert.throws(() => assertIndependentAttempt(incorrectlyEnded), /neutral interface clarification does not end the attempt/);
 });
 
-test('G3-029: supported continuation is a separate response episode', () => {
-  const independent = { observation_id: 'obs-independent', status: 'INCOMPLETE' };
-  const practice = { observation_id: 'obs-practice', mode: 'Oefenen' };
-  assert.notEqual(independent.observation_id, practice.observation_id);
+test('G3-029: prior raw events are preserved and supported continuation is a separate practice episode', () => {
+  const preRequestEvents = [
+    { event_id: 'event-1', kind: 'response_submitted', value: 'learner response' },
+    { event_id: 'event-2', kind: 'work_recorded', value: 'learner working' }
+  ];
+  const independent = {
+    observation_id: 'obs-independent',
+    mode: 'Toets',
+    help_request: 'content_help',
+    support_delivered: false,
+    ended: true,
+    status: 'INCOMPLETE',
+    pre_request_events: preRequestEvents,
+    retained_pre_request_events: [
+      { event_id: 'event-1', kind: 'response_submitted', value: 'learner response' },
+      { event_id: 'event-2', kind: 'work_recorded', value: 'learner working' }
+    ]
+  };
+  const practice = {
+    observation_id: 'obs-practice',
+    mode: 'Oefenen',
+    response_events: [{ event_id: 'event-3', kind: 'supported_practice_response' }]
+  };
+  assertSeparateSupportedContinuation(independent, practice);
+  assert.equal(independent.status, 'INCOMPLETE');
+
+  const erasedPriorWork = {
+    ...independent,
+    retained_pre_request_events: [{ event_id: 'event-2', kind: 'work_recorded', value: 'learner working' }]
+  };
+  assert.throws(() => assertSeparateSupportedContinuation(erasedPriorWork, practice), /all pre-request raw events must be preserved/);
+
+  const mergedContinuation = { ...practice, observation_id: independent.observation_id };
+  assert.throws(() => assertSeparateSupportedContinuation(independent, mergedContinuation), /separate response episode\/observation/);
+
+  const notReturnedToPractice = { ...practice, mode: 'Toets' };
+  assert.throws(() => assertSeparateSupportedContinuation(independent, notReturnedToPractice), /returns to supported practice/);
 });
 
 test('G3-030: incorrect response alone is not contradiction', () => {

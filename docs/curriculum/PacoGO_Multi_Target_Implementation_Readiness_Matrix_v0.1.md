@@ -1331,3 +1331,19 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-034, preserving one shared observation with separate target-specific assessments and provenance.
+
+
+
+## 8.51 G3-034 — one raw observation, multiple target-specific assessments
+
+**Contract basis:** G3-034 and O6 v0.3 §2 require one immutable raw observation for one response episode, with zero, one or multiple separate target-specific assessments. Each assessment refers to exactly one raw observation and one existing evidence target. Multiple target assessments do not create multiple observations or independent evidence episodes.
+
+**Test change:** Added `assertOneObservationManyTargetAssessments` and replaced the weak prior fixture with one explicit raw-observation fixture referenced by two distinct target assessments. The assessments retain different evidence results (`PRESENT` and `INDETERMINATE`). Negative cases reject duplicated raw observations, a detached observation reference, and duplicate target assessments.
+
+**Scope:** Test-only normalized logical-record harness. No production observation store, assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Implementation commit `263dfcf14aa946f2aa43053c541058609ddf6533`. Pre-build Full Regression #3277 / run ID `42463050793`: GREEN on exact baseline commit `ee977cc2e64eae712cb58b7c85ed50c4ebe6c3b5`. Full Regression on the implementation commit is pending.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** After the exact implementation commit passes Full Regression, continue with G3-035. A declared target opportunity must not be treated as actual elicitation when the administration did not elicit that target.

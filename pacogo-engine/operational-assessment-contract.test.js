@@ -111,12 +111,19 @@ function assertAssessment(record) {
     assert.equal(record.support.supplied_required_operation, false, 'neutral interface clarification must not supply target reasoning');
   }
 
+  const independenceRequired = record.target_contract?.independence_required === true;
+  if (independenceRequired) {
+    assert.notEqual(independence, 'NOT_REQUIRED', 'target contract requires an independence judgement');
+  } else {
+    assert.equal(independence, 'NOT_REQUIRED', 'target contract does not require an independence judgement');
+  }
+
   const supportProvenanceIncomplete =
     record.process?.required_streams_complete === false ||
     record.support?.delivered == null ||
     (record.support?.delivered === true && record.support.target_relevant == null) ||
     (record.support?.delivered === true && record.support.target_relevant === true && record.support.supplied_required_operation == null);
-  if (supportProvenanceIncomplete) {
+  if (independenceRequired && supportProvenanceIncomplete) {
     assert.equal(independence, 'UNKNOWN', 'incomplete support provenance or event capture requires UNKNOWN independence');
   }
 
@@ -220,7 +227,7 @@ function base(overrides = {}) {
     criterion: { met: true },
     support: { request: false, delivered: false, target_relevant: false },
     process: { required_streams_complete: true },
-    target_contract: { separable_component_ids: [] },
+    target_contract: { separable_component_ids: [], independence_required: false },
     relation_basis_sufficient: true,
     objective_scoring_result: undefined,
     scoring_rule_interpretable: true,
@@ -745,6 +752,7 @@ test('G3-021: delivered interface clarification is neutral and does not supply t
 
 test('G3-022: INDEPENDENT requires complete actual event capture and no delivered target-relevant support', () => {
   const record = base({
+    target_contract: { independence_required: true },
     support: { request: false, delivered: false, target_relevant: false },
     process: { required_streams_complete: true },
     dimensions: { independence: dimension('INDEPENDENT') }
@@ -756,14 +764,16 @@ test('G3-022: INDEPENDENT requires complete actual event capture and no delivere
   assert.equal(record.dimensions.independence.result, 'INDEPENDENT');
 
   const incompleteCapture = base({
+    target_contract: { independence_required: true },
     support: { request: false, delivered: false, target_relevant: false },
     process: { required_streams_complete: false },
     dimensions: { independence: dimension('INDEPENDENT') }
   });
-  assert.throws(() => assertAssessment(incompleteCapture), /INDEPENDENT requires sufficiently complete event capture/);
+  assert.throws(() => assertAssessment(incompleteCapture), /incomplete support provenance or event capture requires UNKNOWN/);
 
   const deliveredTargetHelp = base({
-    support: { request: false, delivered: true, target_relevant: true },
+    target_contract: { independence_required: true },
+    support: { request: false, delivered: true, target_relevant: true, supplied_required_operation: false },
     process: { required_streams_complete: true },
     dimensions: { independence: dimension('INDEPENDENT') }
   });
@@ -772,6 +782,7 @@ test('G3-022: INDEPENDENT requires complete actual event capture and no delivere
 
 test('G3-023: PROMPTED requires a delivered target cue that leaves the required operation to the learner', () => {
   const record = base({
+    target_contract: { independence_required: true },
     support: { delivered: true, target_relevant: true, supplied_required_operation: false },
     dimensions: { independence: dimension('PROMPTED') }
   });
@@ -781,18 +792,21 @@ test('G3-023: PROMPTED requires a delivered target cue that leaves the required 
   assert.equal(record.support.supplied_required_operation, false);
 
   const notDelivered = base({
+    target_contract: { independence_required: true },
     support: { delivered: false, target_relevant: true, supplied_required_operation: false },
     dimensions: { independence: dimension('PROMPTED') }
   });
   assert.throws(() => assertAssessment(notDelivered), /PROMPTED requires delivered support/);
 
   const notTargetRelevant = base({
+    target_contract: { independence_required: true },
     support: { delivered: true, target_relevant: false, supplied_required_operation: false },
     dimensions: { independence: dimension('PROMPTED') }
   });
   assert.throws(() => assertAssessment(notTargetRelevant), /PROMPTED requires target-relevant support/);
 
   const suppliedOperation = base({
+    target_contract: { independence_required: true },
     support: { delivered: true, target_relevant: true, supplied_required_operation: true },
     dimensions: { independence: dimension('PROMPTED') }
   });
@@ -801,6 +815,7 @@ test('G3-023: PROMPTED requires a delivered target cue that leaves the required 
 
 test('G3-024: DEPENDENT requires delivered target-relevant support that supplies a required operation', () => {
   const record = base({
+    target_contract: { independence_required: true },
     objective_scoring_result: 'CORRECT',
     support: { delivered: true, target_relevant: true, supplied_required_operation: true },
     dimensions: {
@@ -815,26 +830,30 @@ test('G3-024: DEPENDENT requires delivered target-relevant support that supplies
   assert.equal(record.dimensions.performance.result, 'CORRECT');
 
   const notDelivered = base({
+    target_contract: { independence_required: true },
     support: { delivered: false, target_relevant: true, supplied_required_operation: true },
     dimensions: { independence: dimension('DEPENDENT') }
   });
   assert.throws(() => assertAssessment(notDelivered), /DEPENDENT requires delivered support/);
 
   const notTargetRelevant = base({
+    target_contract: { independence_required: true },
     support: { delivered: true, target_relevant: false, supplied_required_operation: true },
     dimensions: { independence: dimension('DEPENDENT') }
   });
   assert.throws(() => assertAssessment(notTargetRelevant), /DEPENDENT requires target-relevant support/);
 
   const didNotSupplyOperation = base({
+    target_contract: { independence_required: true },
     support: { delivered: true, target_relevant: true, supplied_required_operation: false },
     dimensions: { independence: dimension('DEPENDENT') }
   });
   assert.throws(() => assertAssessment(didNotSupplyOperation), /DEPENDENT support supplies a required operation/);
 });
 
-test('G3-025: incomplete support delivery, content or event provenance requires UNKNOWN', () => {
+test('G3-025: incomplete support delivery, content or event provenance requires UNKNOWN when independence is required', () => {
   const unknownDelivery = base({
+    target_contract: { independence_required: true },
     support: { delivered: null, target_relevant: null },
     dimensions: { independence: dimension('UNKNOWN') }
   });
@@ -842,6 +861,7 @@ test('G3-025: incomplete support delivery, content or event provenance requires 
   assert.equal(unknownDelivery.dimensions.independence.result, 'UNKNOWN');
 
   const unclassifiableDeliveredContent = base({
+    target_contract: { independence_required: true },
     support: { delivered: true, target_relevant: true, supplied_required_operation: null },
     dimensions: { independence: dimension('UNKNOWN') }
   });
@@ -849,6 +869,7 @@ test('G3-025: incomplete support delivery, content or event provenance requires 
   assert.equal(unclassifiableDeliveredContent.dimensions.independence.result, 'UNKNOWN');
 
   const incompleteEventCapture = base({
+    target_contract: { independence_required: true },
     support: { delivered: false, target_relevant: false },
     process: { required_streams_complete: false },
     dimensions: { independence: dimension('UNKNOWN') }
@@ -856,13 +877,23 @@ test('G3-025: incomplete support delivery, content or event provenance requires 
   assertAssessment(incompleteEventCapture);
   assert.equal(incompleteEventCapture.dimensions.independence.result, 'UNKNOWN');
 
+  const notRequiredWhenContractDoesNotRequireIt = base({
+    target_contract: { independence_required: false },
+    support: { delivered: null, target_relevant: null },
+    dimensions: { independence: dimension('NOT_REQUIRED') }
+  });
+  assertAssessment(notRequiredWhenContractDoesNotRequireIt);
+  assert.equal(notRequiredWhenContractDoesNotRequireIt.dimensions.independence.result, 'NOT_REQUIRED');
+
   const incorrectlyIndependent = base({
+    target_contract: { independence_required: true },
     support: { delivered: null, target_relevant: null },
     dimensions: { independence: dimension('INDEPENDENT') }
   });
   assert.throws(() => assertAssessment(incorrectlyIndependent), /incomplete support provenance or event capture requires UNKNOWN/);
 
   const incorrectlyIndependentWithIncompleteCapture = base({
+    target_contract: { independence_required: true },
     support: { delivered: false, target_relevant: false },
     process: { required_streams_complete: false },
     dimensions: { independence: dimension('INDEPENDENT') }
@@ -871,8 +902,18 @@ test('G3-025: incomplete support delivery, content or event provenance requires 
 });
 
 test('G3-026: independence is assessed separately for each target', () => {
-  const first = base({ evidence_target_id: 'target-a', support: { delivered: true, target_relevant: true, supplied_required_operation: false }, dimensions: { independence: dimension('PROMPTED') } });
-  const second = base({ evidence_target_id: 'target-b', support: { delivered: true, target_relevant: true, supplied_required_operation: true }, dimensions: { independence: dimension('DEPENDENT') } });
+  const first = base({
+    evidence_target_id: 'target-a',
+    target_contract: { independence_required: true },
+    support: { delivered: true, target_relevant: true, supplied_required_operation: false },
+    dimensions: { independence: dimension('PROMPTED') }
+  });
+  const second = base({
+    evidence_target_id: 'target-b',
+    target_contract: { independence_required: true },
+    support: { delivered: true, target_relevant: true, supplied_required_operation: true },
+    dimensions: { independence: dimension('DEPENDENT') }
+  });
   assertAssessment(first);
   assertAssessment(second);
   assert.notEqual(first.dimensions.independence.result, second.dimensions.independence.result);
@@ -1042,12 +1083,14 @@ test('negative contract cases reject prohibited shortcuts', () => {
   assert.throws(() => assertAssessment(absentWithMissingCapture), /ABSENT requires complete capture/);
 
   const independentDespiteDeliveredTargetHelp = base({
-    support: { delivered: true, target_relevant: true },
+    target_contract: { independence_required: true },
+    support: { delivered: true, target_relevant: true, supplied_required_operation: false },
     dimensions: { independence: dimension('INDEPENDENT') }
   });
   assert.throws(() => assertAssessment(independentDespiteDeliveredTargetHelp), /INDEPENDENT forbids/);
 
   const dependentWithoutDeliveredHelp = base({
+    target_contract: { independence_required: true },
     support: { delivered: false, target_relevant: false, supplied_required_operation: false },
     dimensions: { independence: dimension('DEPENDENT') }
   });

@@ -931,12 +931,45 @@ test('G3-026: the same delivered support event receives target-specific independ
   assert.equal(second.dimensions.independence.result, 'DEPENDENT');
 });
 
-test('G3-027: content-help request ends independent assessment incomplete even without delivery', () => {
-  const attempt = { mode: 'Tussentoets', help_request: 'content_help', support_delivered: false, ended: true, status: 'INCOMPLETE' };
+test('G3-027: content-help request immediately ends the independent attempt incomplete without requiring delivery', () => {
+  const attempt = {
+    mode: 'Tussentoets',
+    help_request: 'content_help',
+    support_delivered: false,
+    ended: true,
+    status: 'INCOMPLETE'
+  };
   assertIndependentAttempt(attempt);
   assert.equal(attempt.ended, true);
   assert.equal(attempt.status, 'INCOMPLETE');
   assert.equal(attempt.support_delivered, false);
+
+  const notEnded = {
+    mode: 'Toets',
+    help_request: 'content_help',
+    support_delivered: false,
+    ended: false,
+    status: 'INCOMPLETE'
+  };
+  assert.throws(() => assertIndependentAttempt(notEnded), /ended true/);
+
+  const incorrectlyFailed = {
+    mode: 'Tussentoets',
+    help_request: 'content_help',
+    support_delivered: false,
+    ended: true,
+    status: 'FAILED'
+  };
+  assert.throws(() => assertIndependentAttempt(incorrectlyFailed), /INCOMPLETE/);
+
+  const incorrectlyIncorrect = {
+    mode: 'Toets',
+    help_request: 'content_help',
+    support_delivered: false,
+    ended: true,
+    status: 'INCORRECT'
+  };
+  assert.throws(() => assertIndependentAttempt(incorrectlyIncorrect), /INCOMPLETE/);
 });
 
 test('G3-028: neutral answer-entry clarification does not end independent assessment', () => {

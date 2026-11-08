@@ -180,6 +180,32 @@ function assertAssessment(record) {
   return true;
 }
 
+function assertLogicalAssessmentProvenance(record) {
+  const requiredFields = [
+    'task_instance_version',
+    'task_definition_version',
+    'task_model_version',
+    'curriculum_registry_version',
+    'task_scoring_rule_version',
+    'contract_version',
+    'rule_version',
+    'engine_version',
+    'event_time',
+    'assessment_available_at'
+  ];
+  assert.ok(record.provenance && typeof record.provenance === 'object', 'logical assessment provenance is required');
+  for (const field of requiredFields) {
+    assert.equal(typeof record.provenance[field], 'string', 'provenance.' + field + ' must be a non-empty string');
+    assert.ok(record.provenance[field].trim(), 'provenance.' + field + ' must be a non-empty string');
+  }
+  assert.ok(Array.isArray(record.source_event_ids), 'source event references must be preserved');
+  assert.ok(
+    record.source_event_ids.every(id => typeof id === 'string' && id.trim()),
+    'each source event reference must be a non-empty identifier'
+  );
+  return true;
+}
+
 function assertOneObservationManyTargetAssessments(rawObservations, assessments) {
   assert.ok(Array.isArray(rawObservations) && rawObservations.length === 1, 'one response episode must produce exactly one raw observation');
   const observationId = rawObservations[0]?.observation_id;
@@ -1397,22 +1423,56 @@ test('G3-035: a declared target opportunity is not evidence unless the actual in
   assertAssessment(actuallyElicited);
 });
 
-test('G3-036: assessment preserves logical provenance without prescribing physical keys', () => {
+test('G3-036: assessment preserves required logical provenance without prescribing physical keys', () => {
   const record = base({
     provenance: {
       task_instance_version: 'task-instance-v1',
       task_definition_version: 'task-definition-v1',
       task_model_version: 'task-model-v1',
       curriculum_registry_version: 'registry-v1',
+      task_scoring_rule_version: 'task-scoring-rule-v1',
       contract_version: 'O6-v0.3',
       rule_version: 'target-rule-v1',
       engine_version: 'assessment-engine-v1',
       event_time: '2026-11-07T10:00:00Z',
       assessment_available_at: '2026-11-07T10:00:01Z'
-    }
+    },
+    source_event_ids: ['response-event-1']
   });
   assertAssessment(record);
-  for (const value of Object.values(record.provenance)) assert.ok(value);
+  assertLogicalAssessmentProvenance(record);
+  assert.equal(typeof record.observation_id, 'string');
+  assert.equal(typeof record.evidence_target_id, 'string');
+
+  const requiredFields = [
+    'task_instance_version',
+    'task_definition_version',
+    'task_model_version',
+    'curriculum_registry_version',
+    'task_scoring_rule_version',
+    'contract_version',
+    'rule_version',
+    'engine_version',
+    'event_time',
+    'assessment_available_at'
+  ];
+  for (const field of requiredFields) {
+    const missing = {
+      ...record,
+      provenance: { ...record.provenance }
+    };
+    delete missing.provenance[field];
+    assert.throws(
+      () => assertLogicalAssessmentProvenance(missing),
+      new RegExp('provenance\\.' + field + ' must be a non-empty string')
+    );
+  }
+
+  const missingEventReference = { ...record, source_event_ids: [] };
+  assert.throws(
+    () => assertLogicalAssessmentProvenance(missingEventReference),
+    /each source event reference must be a non-empty identifier/
+  );
 });
 
 test('G3-037–039 remain blocked pending approved G6/G9 identity and payload semantics', () => {

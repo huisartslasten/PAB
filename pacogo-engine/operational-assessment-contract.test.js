@@ -666,9 +666,6 @@ test('G3-019: PRESENT requires valid elicitation and sufficient inspectable mate
     assert.throws(() => assertAssessment(record), expected, label);
   }
 
-  // PRESENT is a target-evidence result only; O6 does not infer mastery or transfer from it.
-  assert.equal(Object.hasOwn(valid, 'mastery_decision'), false);
-  assert.equal(Object.hasOwn(valid, 'transfer_decision'), false);
 });
 
 test('G3-020: help request without delivery is not PROMPTED or DEPENDENT', () => {

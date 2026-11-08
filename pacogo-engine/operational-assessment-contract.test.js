@@ -790,10 +790,38 @@ test('G3-023: PROMPTED requires a delivered target cue that leaves the required 
   assert.throws(() => assertAssessment(suppliedOperation), /PROMPTED leaves the required operation to the learner/);
 });
 
-test('G3-024: DEPENDENT means delivered support supplies a required operation', () => {
-  const record = base({ support: { delivered: true, target_relevant: true, supplied_required_operation: true }, dimensions: { independence: dimension('DEPENDENT') } });
+test('G3-024: DEPENDENT requires delivered target-relevant support that supplies a required operation', () => {
+  const record = base({
+    objective_scoring_result: 'CORRECT',
+    support: { delivered: true, target_relevant: true, supplied_required_operation: true },
+    dimensions: {
+      performance: dimension('CORRECT'),
+      independence: dimension('DEPENDENT')
+    }
+  });
   assertAssessment(record);
+  assert.equal(record.support.delivered, true);
+  assert.equal(record.support.target_relevant, true);
   assert.equal(record.support.supplied_required_operation, true);
+  assert.equal(record.dimensions.performance.result, 'CORRECT');
+
+  const notDelivered = base({
+    support: { delivered: false, target_relevant: true, supplied_required_operation: true },
+    dimensions: { independence: dimension('DEPENDENT') }
+  });
+  assert.throws(() => assertAssessment(notDelivered), /DEPENDENT requires delivered support/);
+
+  const notTargetRelevant = base({
+    support: { delivered: true, target_relevant: false, supplied_required_operation: true },
+    dimensions: { independence: dimension('DEPENDENT') }
+  });
+  assert.throws(() => assertAssessment(notTargetRelevant), /DEPENDENT requires target-relevant support/);
+
+  const didNotSupplyOperation = base({
+    support: { delivered: true, target_relevant: true, supplied_required_operation: false },
+    dimensions: { independence: dimension('DEPENDENT') }
+  });
+  assert.throws(() => assertAssessment(didNotSupplyOperation), /DEPENDENT support supplies a required operation/);
 });
 
 test('G3-025: incomplete support provenance requires UNKNOWN', () => {

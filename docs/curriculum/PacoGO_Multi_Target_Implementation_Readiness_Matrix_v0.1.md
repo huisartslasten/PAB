@@ -1493,3 +1493,23 @@ Full Regression #3292 / run ID `42463863331`, handoff-only #3293 / run ID `42463
 **Gate status:** this closes one explicit G6 identity boundary, not G6 as a whole. G6 remains OPEN pending lifecycle decisions for completion, abandonment, interruption/resume, restart, timeout, event lifecycle and complete C3/O6 reconciliation. G9 remains OPEN for exact canonical immutable payload representation, stage status, retry, concurrency and durable recovery. G3-037–039 remain BLOCKED pending the relevant complete G6/G9 semantics. No implementation authorization is implied.
 
 **Next step:** reconcile the remaining G6 lifecycle transitions against C3 v0.2 and O6 v0.3, without inventing O6 labels or G9 serialization/persistence behavior.
+
+
+## 8.63 G6 lifecycle reconciliation — source-derived anchors and remaining decisions
+
+**Source reconciliation:** C2 v0.1 records interaction events, completion/abandonment and missingness separately. Retained C3 v0.2 §3.1 defines one administered task-instance response episode, with clicks/edits/retries as events and separately administered task instances as separate observations. O6 v0.3 requires explicit completion/attempt-end/interruption/help events, preserves NO_RESPONSE as raw administration status, and keeps performance/evidence results separate from lifecycle status.
+
+**Determined logical anchors:**
+- One administered response episode maps to one immutable raw observation.
+- Ordinary click/edit/answer retry remains an ordered event within the same task instance, response episode and observation.
+- Explicit restart after completion is a new administration and therefore receives a new task instance, response episode and observation; the completed episode remains preserved.
+- A started abandoned episode preserves its abandonment event, all captured events and one immutable raw observation. O6 assessment outputs are not guessed from lifecycle status.
+- The owner-approved material support-condition transition creates a new task instance, response episode and observation. Neutral interface clarification supplying no target reasoning does not itself change administration identity.
+
+**Still open:** interruption/resume may reuse the same episode only if the exact administration state is restored; this remains a candidate product/protocol decision. Timeout duration and terminal consequence require an explicit versioned task/session policy; elapsed time alone does not terminate an episode. Learner-facing lifecycle wording, full event ordering/identity semantics and final C3/O6 reconciliation remain open.
+
+**Verification:** G6 fixture tests commit `661d7250ff15dce23c689cf5fbbc081061a45526`; Full Regression #3322 / run ID `42499243432`: **RED** (289 passed, one test assertion diagnostic mismatch in G6-003). Corrected diagnostic commit `61cd6917df18af3120e9a6a87f92675be17ab78a`; Full Regression #3323 / run ID `42499293139`: **GREEN**. Reconciled G6 proposal commit `bc95ab0f8c6d3fd0134d5bceac5e677be514fbc6`; Full Regression #3324 / run ID `42499416128`: **GREEN**. Handoff update commit `c744396ca6b5c8cb9a9358ad601a125dec223426`; Full Regression #3325 / run ID `42499557900`: **GREEN**. All green runs passed browser regression and clean-working-tree verification.
+
+**Gate status:** G6 remains OPEN for the unresolved interruption/resume and timeout decisions, full event ordering/identity and final C3/O6 reconciliation. G9 remains OPEN for canonical immutable payload representation, staged write statuses, retry, concurrency and durable recovery. G3-037–039 remain BLOCKED pending complete G6/G9 semantics. No runtime, physical schema, persistence, SQL/RPC/RLS, Supabase or learner data changed; O6 v0.3 remains frozen.
+
+**Next step:** map the exact preconditions of G3-037, G3-038 and G3-039 separately to the G6 logical identity/lifecycle requirements and G9 replay/payload requirements. Do not close or implement a case merely because one dependency is now clearer.

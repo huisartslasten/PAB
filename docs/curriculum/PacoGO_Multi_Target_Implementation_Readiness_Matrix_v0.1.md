@@ -1305,3 +1305,19 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-033. A help request alone, without delivered target-relevant support, must not create contradiction.
+
+
+
+## 8.49 G3-033 — a help request alone is not contradictory evidence
+
+**Contract basis:** G3-033 and O6 v0.3 §5.7 prohibit treating a help request as observation-local contradiction. Contradiction must be grounded in separate, specific response/process material that conflicts with the target interpretation.
+
+**Test change:** The shared `assertAssessment` assertion rejects contradiction `PRESENT` when its cited event is the same help-request event and no support was delivered. The positive case retains `ABSENT` for a request alone; a negative case rejects `PRESENT` sourced only from the request; a control case confirms separate target-conflicting response material can still support `PRESENT`.
+
+**Scope:** Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Implementation commit `54e118375de73e880b0f13cc77fe241f9ae787a8`. Pre-build Full Regression #3272 / run ID `42462810181`: GREEN on exact baseline commit `5e24b2b3efd118a27a23bc7c881a6e0186efbf68`. Full Regression on the implementation commit is pending.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** After the exact implementation commit passes Full Regression, continue with G3-034, preserving one shared observation with separate target-specific assessments and provenance.

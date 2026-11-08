@@ -1153,3 +1153,21 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-025, preserving `UNKNOWN` when support delivery/content or event provenance is incomplete; do not default to `INDEPENDENT`.
+
+
+
+## 8.39 G3-025 — incomplete support provenance requires UNKNOWN only when independence is required
+
+**Contract basis:** O6 v0.3 §5.6 defines `UNKNOWN` when support provenance/capture is incomplete, while `NOT_REQUIRED` applies when the target contract does not require an independence judgement. These are distinct contract states.
+
+**Test change:** The normalized test fixture now carries test-only `target_contract.independence_required`. The shared `assertAssessment` requires `NOT_REQUIRED` when false and prohibits it when true. Incomplete delivery provenance, unclassifiable delivered target-relevant content, or incomplete event capture requires `UNKNOWN` only when the target requires an independence judgement. G3-025 covers unknown delivery, unclassifiable content, incomplete capture, an invalid `INDEPENDENT` result, and the valid `NOT_REQUIRED` case for a target that does not require independence.
+
+**Regression investigation:** Initial implementation commit `dcbc8bc9f38ce179b4a0fce775f0b08f3cbbaf53` failed Full Regression #3232 because the new UNKNOWN condition was applied to targets whose independence result was correctly `NOT_REQUIRED`. Follow-up runs #3234 and #3235 exposed missing test-fixture declarations in G3-020 negative cases; those fixtures now explicitly declare that independence is required. No production contract was changed.
+
+**Scope:** Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Corrected implementation commit `d7b06192a47954ee21f10b405772e7fc77b40169`. Full Regression #3237 / run ID `42429883320`: **GREEN** on that exact commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with G3-026, preserving target-specific independence judgements rather than copying one global independence label across multiple targets.

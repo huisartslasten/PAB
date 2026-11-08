@@ -668,10 +668,23 @@ test('G3-019: PRESENT requires valid elicitation and sufficient inspectable mate
 
 });
 
-test('G3-020: help request without delivery is not PROMPTED or DEPENDENT', () => {
-  const record = base({ support: { request: true, delivered: false, target_relevant: false }, dimensions: { independence: dimension('NOT_REQUIRED') } });
+test('G3-020: a help request without delivered support cannot be PROMPTED or DEPENDENT', () => {
+  const record = base({
+    support: { request: true, delivered: false, target_relevant: false },
+    dimensions: { independence: dimension('NOT_REQUIRED') }
+  });
   assertAssessment(record);
+  assert.equal(record.support.request, true);
   assert.equal(record.support.delivered, false);
+  assert.equal(record.dimensions.independence.result, 'NOT_REQUIRED');
+
+  for (const classification of ['PROMPTED', 'DEPENDENT']) {
+    const invalid = base({
+      support: { request: true, delivered: false, target_relevant: false },
+      dimensions: { independence: dimension(classification) }
+    });
+    assert.throws(() => assertAssessment(invalid), /requires delivered support/, classification);
+  }
 });
 
 test('G3-021: neutral interface clarification is not target-relevant support', () => {

@@ -1513,3 +1513,22 @@ Full Regression #3292 / run ID `42463863331`, handoff-only #3293 / run ID `42463
 **Gate status:** G6 remains OPEN for the unresolved interruption/resume and timeout decisions, full event ordering/identity and final C3/O6 reconciliation. G9 remains OPEN for canonical immutable payload representation, staged write statuses, retry, concurrency and durable recovery. G3-037–039 remain BLOCKED pending complete G6/G9 semantics. No runtime, physical schema, persistence, SQL/RPC/RLS, Supabase or learner data changed; O6 v0.3 remains frozen.
 
 **Next step:** map the exact preconditions of G3-037, G3-038 and G3-039 separately to the G6 logical identity/lifecycle requirements and G9 replay/payload requirements. Do not close or implement a case merely because one dependency is now clearer.
+
+
+## 8.64 G3-039 logical lineage separated from G3-037/038 replay semantics; exact-commit CI guard
+
+**G3-037:** same assessment identity plus identical canonical immutable content is an idempotent replay. It requires the G6 assessment-identity boundary and G9 canonical-payload equality/idempotent stage-write semantics. **BLOCKED.**
+
+**G3-038:** same assessment identity plus different canonical content is an integrity conflict. It requires the same G6 identity boundary and G9 canonical-payload conflict detection/preserve-original behavior. **BLOCKED.**
+
+**G3-039:** O6 v0.3 §7 already specifies logical provenance, stable assessment identity, prior-assessment linkage and correction reason. A test-fixture-only logical lineage check now verifies: a new assessment identity; same immutable source observation and evidence target; link to the prior assessment; non-empty correction reason; changed rule version; and preservation of the prior assessment. This verifies the logical lineage portion only. Durable append-only/idempotent recording and exact identity realization remain G6/G9 work.
+
+**G6/O6 reconciliation:** the G6 identity proposal now states that O6 v0.3 defines logical assessment provenance and correction lineage, while exact assessment identity semantics, canonical immutable payload and replay/conflict behavior are jointly governed by G6/G9. No physical key or serialization is prescribed.
+
+**CI root cause and correction:** the full-regression workflow previously checked out the moving branch name, so concurrent runs could test a later branch HEAD while displaying the original triggering SHA. Audit found mismatches in #3318, #3327, #3328 and #3329. Workflow commit `b35d98e45598e66cfc79e11c4bb0925df7769d3d` now checks out `github.sha`, asserts the ref is exactly `refs/heads/refactor/professional-v1`, and verifies `git rev-parse HEAD = GITHUB_SHA`.
+
+**Verification:** exact workflow commit `b35d98e45598e66cfc79e11c4bb0925df7769d3d` passed Full Regression #3330 / run ID `42500399488`: **GREEN**. Handoff correction commit `3dfb790d2d7fca4ad46d8eafa09fc06270f56cbc` passed Full Regression #3331 / run ID `42500751850`: **GREEN** on exact commit, including the new checkout guard, browser regression and clean-working-tree check.
+
+**Gate status:** G3-039 logical lineage is verified; full G3-039 persistence/idempotency remains dependent on G6/G9. G3-037/038 remain BLOCKED. G6 and G9 remain OPEN. No runtime, physical schema, persistence, SQL/RPC/RLS, Supabase or learner data changed; O6 v0.3 remains frozen.
+
+**Next step:** finish the remaining logical G6 event identity/order boundary, explicitly excluding G9 payload serialization and durable write/retry mechanics. Then reassess G3-037/038.

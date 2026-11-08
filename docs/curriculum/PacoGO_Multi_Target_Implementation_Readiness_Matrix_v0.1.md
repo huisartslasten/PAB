@@ -1187,3 +1187,21 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-027, preserving the independent assessment attempt as `INCOMPLETE` when content help is requested during Tussentoets/Toets, even if support is not subsequently delivered.
+
+
+
+## 8.41 G3-027 — content-help request ends independent assessment as incomplete
+
+**Contract basis:** O6 v0.3 §5.6 requires a content-help request during Tussentoets/Toets to end the independent attempt immediately, even if no support is subsequently delivered. The attempt is `INCOMPLETE`, not failed or incorrect.
+
+**Test change:** G3-027 verifies immediate closure with `support_delivered: false`. Negative cases reject an attempt left open and statuses `FAILED` or `INCORRECT`.
+
+**Regression investigation:** Full Regression #3245 / run ID `42430334151` was RED because the negative test expected the diagnostic `/ended true/`, while the existing shared assertion correctly emitted `content-help request ends the independent attempt`. Only the expected diagnostic was corrected; no assertion condition or behavior changed.
+
+**Scope:** Test-only attempt-lifecycle conformance work. No production attempt runtime, assessor, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Pre-build Full Regression #3244 / run ID `42430232236`: GREEN on exact baseline commit `b012c1640c7a9de80faaaccc39f59a49379343a1`. Correction commit `2afba1afa9358a06b69ae25d8c7d3b2b463d29da`. Full Regression #3247 / run ID `42430379823`: **GREEN** on that exact correction commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with G3-028, ensuring neutral answer-entry clarification does not end an independent attempt when it supplies no mathematical/content reasoning.

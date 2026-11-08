@@ -3791,7 +3791,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 112. G3-025 incomplete support provenance — correction verification pending
+## 112. G3-025 incomplete support provenance — verified after regression correction
 
 ### Initial implementation and regression investigation
 - Inspected G3-025 in the G3 verification specification and O6 v0.3 §5.6.
@@ -3807,7 +3807,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 ### Verification status
 - Pre-build Full Regression #3231 / run ID `42429517399`: GREEN on exact baseline commit `f19934a0caf5b662961b49c70cf6d600cacce390`.
-- Full Regression on corrected implementation commit `d7b06192a47954ee21f10b405772e7fc77b40169` is pending. Do not continue to another build vector until the exact commit is GREEN.
+- Full Regression #3237 / run ID `42429883320`: **GREEN** on exact corrected implementation commit `d7b06192a47954ee21f10b405772e7fc77b40169`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

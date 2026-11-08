@@ -1279,3 +1279,19 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-032. Missing process or task misalignment must leave contradiction `INDETERMINATE` or the rule blocked/not applicable as specified; never infer contradiction from missingness or mismatch.
+
+
+
+## 8.47 G3-032 — missing process and task misalignment cannot establish contradiction
+
+**Contract basis:** G3-032 and O6 v0.3 §5.7 prohibit inferring observation-local contradiction from missing process or task mismatch. The contradiction result must remain `INDETERMINATE` or the rule must be `NOT_APPLICABLE`/`BLOCKED` as specified.
+
+**Test change:** The shared `assertAssessment` now rejects contradiction `PRESENT` whenever target alignment is `MISALIGNED` or required process streams are incomplete. The G3-032 fixtures now explicitly represent misalignment (the prior fixture only changed a task-instance flag, not the alignment result), incomplete process, `INDETERMINATE`, and a `NOT_APPLICABLE/NOT_RUN` rule. Negative cases include otherwise source-cited `PRESENT` contradictions for both misalignment and incomplete process.
+
+**Scope:** Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Implementation commit `c0b500230486d076f783a573c2681a82c0c6b34d`. Pre-build Full Regression #3267 / run ID `42462527928`: GREEN on exact baseline commit `b283a9da8756bb1d4fd428bb927f67f5f7c40399`. Full Regression on the implementation commit is pending.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** After the exact implementation commit passes Full Regression, continue with G3-033. A help request without delivered target-relevant support must not create contradiction.

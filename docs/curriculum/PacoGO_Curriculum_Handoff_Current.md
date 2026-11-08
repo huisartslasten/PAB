@@ -4117,3 +4117,31 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains a separate dependency; no M1/M2 mapping is decided here.
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
 - Next: inspect the remaining directly specified G3↔O6 anchors for an eligible, unblocked gap. Do not infer G6/G9 or O5 semantics.
+
+
+
+## 127. G3-040 — O5 snapshot availability-cutoff conformance verified
+
+### Contract review
+- Rechecked G3-040 against the approved minimum O5 logical policy in Section 67, O6 v0.3 §7 and G3 verification specification §4.6.
+- O5 now explicitly separates event-time window membership from assessment-availability time, records an availability cutoff per evaluation snapshot, keeps snapshots immutable, and permits late-arriving information only in a new snapshot/evaluation.
+- This is sufficient for a logical test-fixture assertion. It does not require a physical snapshot ID, storage key, table or persistence contract.
+
+### Test change
+- Replaced the former G3-040 blocked placeholder with a test-fixture-only snapshot-eligibility check.
+- The tests verify that an assessment whose event falls inside the O5 window but whose assessment-availability time is after the snapshot cutoff is excluded from that immutable snapshot.
+- A later snapshot/evaluation with a later cutoff may include the assessment; the original snapshot remains unchanged and continues to exclude it.
+- Boundary cases verify inclusive window start, exclusive window end, availability exactly at cutoff, and availability after cutoff.
+- Event-time membership and assessment availability remain separate logical checks.
+
+### Scope and verification
+- Test-only normalized logical fixture. No physical snapshot identity, schema/API, production evaluator/runtime, curriculum mapping, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+- Implementation commit: `d5d7c8095405c4ab6d9401c89784396db05dc956`.
+- Full Regression #3314 / run ID `42466872610`: **GREEN** on that exact commit. All required steps passed, including curriculum-engine regression, architecture boundaries, maintained Node/Vitest, browser regression and clean-working-tree verification.
+
+### Gate status and next step
+- O5 core logical scope/window and availability-cutoff policy: approved; detailed governance items remain open under G1.
+- G3-040: verified; no longer blocked on the minimum O5 cutoff semantics.
+- G3 remains OPEN because G3-037–039 still depend on G6/G9 identity and canonical-payload semantics.
+- G2/O6 remains CLOSED. G5, G6/G9 and G12 remain separate gates. No production implementation authorization is implied.
+- Next: reconcile the existing G6 task/attempt/observation lifecycle proposal with approved O6 v0.3, clearly separating determined contract requirements from owner decisions still needed. Do not infer G6/G9 identity or canonical-payload behavior and do not begin runtime/persistence work.

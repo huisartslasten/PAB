@@ -126,6 +126,16 @@ function assertAssessment(record) {
   return true;
 }
 
+function assertTechnicalFailureBlocksAffectedPerformance(record) {
+  const failed = record.process_streams?.filter(stream => stream.required === true && stream.availability === 'TECHNICAL_FAILURE') ?? [];
+  assert.ok(failed.length > 0, 'a required process stream must record TECHNICAL_FAILURE');
+  const performance = record.dimensions.performance;
+  assert.equal(performance?.execution, 'BLOCKED', 'the affected performance rule must remain blocked');
+  assert.equal(performance?.result, undefined, 'a blocked performance rule must not emit INCORRECT or another learner result');
+  assert.equal(record.dimensions.evidence?.result, 'INDETERMINATE', 'technical capture failure leaves affected target evidence INDETERMINATE');
+  return true;
+}
+
 function assertRequiredProcessStreams(record) {
   assert.ok(Array.isArray(record.process_streams) && record.process_streams.length > 0, 'required process streams must be represented separately');
   const ids = record.process_streams.map(stream => stream.stream_id);
@@ -500,13 +510,45 @@ test('G3-016: an uncollected required stream remains distinct and cannot support
   assert.throws(() => assertAssessment(absentDespiteMissingStream), /ABSENT requires complete required streams/);
 });
 
-test('G3-017: technical capture failure cannot support ABSENT', () => {
+test('G3-017: technical capture failure blocks the affected rule and cannot support ABSENT or INCORRECT', () => {
   const record = base({
     process: { required_streams_complete: false },
-    dimensions: { availability: dimension('TECHNICAL_FAILURE'), evidence: dimension('INDETERMINATE') }
+    process_streams: [
+      { stream_id: 'strategy-process-stream', required: true, availability: 'TECHNICAL_FAILURE' }
+    ],
+    dimensions: {
+      availability: dimension('TECHNICAL_FAILURE'),
+      performance: dimension(undefined, { execution: 'BLOCKED', reason: 'Required strategy process stream failed technically' }),
+      evidence: dimension('INDETERMINATE')
+    }
   });
   assertAssessment(record);
-  assert.equal(record.dimensions.evidence.result, 'INDETERMINATE');
+  assertRequiredProcessStreams(record);
+  assertTechnicalFailureBlocksAffectedPerformance(record);
+
+  const incorrectlyScored = base({
+    process: { required_streams_complete: false },
+    process_streams: [
+      { stream_id: 'strategy-process-stream', required: true, availability: 'TECHNICAL_FAILURE' }
+    ],
+    dimensions: {
+      availability: dimension('TECHNICAL_FAILURE'),
+      performance: dimension('INCORRECT'),
+      evidence: dimension('INDETERMINATE')
+    }
+  });
+  assert.throws(() => assertTechnicalFailureBlocksAffectedPerformance(incorrectlyScored), /affected performance rule must remain blocked/);
+
+  const absentDespiteFailure = base({
+    process: { required_streams_complete: false },
+    process_streams: [
+      { stream_id: 'strategy-process-stream', required: true, availability: 'TECHNICAL_FAILURE' }
+    ],
+    criterion: { met: false },
+    dimensions: { alignment: dimension('ALIGNED'), evidence: dimension('ABSENT') }
+  });
+  assertRequiredProcessStreams(absentDespiteFailure);
+  assert.throws(() => assertAssessment(absentDespiteFailure), /ABSENT requires complete required streams/);
 });
 
 test('G3-018: ABSENT requires every strict O6 precondition', () => {

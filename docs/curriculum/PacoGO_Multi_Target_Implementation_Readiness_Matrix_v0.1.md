@@ -1374,11 +1374,11 @@ The fixture value is test-only; it does not define a production API or persisted
 
 **Scope:** Test-only normalized logical-record harness. The `actual_target_elicited` value is fixture-only, not a production field/API. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
 
-**Verification:** Implementation commit `0d9daa89c78199796c69f2bd81daa6450755cb14`. Pre-build Full Regression #3284 / run ID `42463423482`: GREEN on exact baseline commit `f2b0dce8f0c715c3c674ceb09a200eb9b3fb7c94`. Full Regression on the implementation commit is pending.
+**Verification:** Implementation commit `0d9daa89c78199796c69f2bd81daa6450755cb14`. Pre-build Full Regression #3284 / run ID `42463423482`: GREEN on exact baseline commit `f2b0dce8f0c715c3c674ceb09a200eb9b3fb7c94`. Full Regression #3285 / run ID `42463541450`: **GREEN** on the exact implementation commit. Documentation commits `6351e19dd22581e60710d9cc683e10774f64bb3a` and `3bcf6d75994cb50a50154be49781cbafa67112bb` passed #3288 / run ID `42463665274` and #3289 / run ID `42463668637`.
 
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
-**Next step:** After the exact implementation commit passes Full Regression, continue with G3-036. Preserve the required logical provenance without prescribing physical storage keys.
+**Next step:** G3-036 logical provenance is verified. G3-037–039 remain blocked until G6/G9 defines identity and canonical-payload semantics; do not implement those cases by inference.
 
 
 

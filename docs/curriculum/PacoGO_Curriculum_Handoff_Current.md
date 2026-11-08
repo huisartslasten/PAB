@@ -4528,7 +4528,7 @@ Branch: `refactor/professional-v1`; LIVE `main` untouched.
 
 - Re-read `PacoGO_Curriculum_Rekenen_SLO_10-18_Mapping.md` against the current executable registry.
 - The SLO mapping assigns KD10B (breuken) to FR1–FR2 plus relationships with A/B. Its scope includes the fraction as number/ratio/division, relationships with decimals/ratios/percentages, comparing/ordering/simplifying and calculating with fractions.
-- Current executable registry v0.6 contains FR2 but not FR1. No FR1-specific implementation or curriculum artifact is present in the current repository tree.
+- Current executable registry v0.6 contains FR2 but not FR1. No FR1-named implementation or curriculum artifact path was found in the repository tree; this audit did not perform an exhaustive full-text search of every document for FR1 mentions.
 - Current FR2 is specifically “Breukequivalentie herkennen en gebruiken”. Its interface supports symbolic fractions and area models. It does not cover the full KD10B scope and its browser pages are not connected to persisted learner-curriculum history.
 - This is a source-based scope gap, not a decision to add curriculum content or a new skill. Do not expand FR2 informally to stand in for FR1 or the whole KD10B domain.
 - Product-planning priority: define a coherent FR1–FR2 progression and its links to existing A/B skills from the SLO mapping; then select a small first practice slice based on an explicit learner starting-point check. Keep visual fraction representations central.

@@ -951,7 +951,7 @@ test('G3-027: content-help request immediately ends the independent attempt inco
     ended: false,
     status: 'INCOMPLETE'
   };
-  assert.throws(() => assertIndependentAttempt(notEnded), /ended true/);
+  assert.throws(() => assertIndependentAttempt(notEnded), /content-help request ends the independent attempt/);
 
   const incorrectlyFailed = {
     mode: 'Tussentoets',

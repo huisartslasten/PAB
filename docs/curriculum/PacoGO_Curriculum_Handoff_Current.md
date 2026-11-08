@@ -3885,7 +3885,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 
 
-## 116. G3-029 preserve prior work and separate supported continuation — verification pending
+## 116. G3-029 preserve prior work and separate supported continuation — verified
 
 ### Work implemented
 - Inspected G3-029 in the G3 verification specification and O6 v0.3 §5.6.
@@ -3896,7 +3896,7 @@ After verifying this documentation update with Full Regression, continue G3 test
 ### Verification status
 - Pre-build Full Regression #3252 / run ID `42430621661`: GREEN on exact baseline commit `805e68e8db39ed283b9466509b3283298173e12a`.
 - Implementation commit: `d62f29e00275223ebe6978c430628405853239d2`.
-- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+- Full Regression #3255 / run ID `42430758236`: **GREEN** on exact implementation commit `d62f29e00275223ebe6978c430628405853239d2`. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
 
 ### Gate status
 - G2/O6: CLOSED; logical contract v0.3 remains frozen.

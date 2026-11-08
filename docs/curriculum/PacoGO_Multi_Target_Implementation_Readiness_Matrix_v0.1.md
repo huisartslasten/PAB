@@ -1573,3 +1573,35 @@ Full Regression #3292 / run ID `42463863331`, handoff-only #3293 / run ID `42463
 **Gate status:** G9 requirements review is complete; detailed contract remains OPEN. G6 remains OPEN for final lifecycle approval, interruption/resume and timeout. G3-037/038 remain BLOCKED pending G9 canonical payload and durable idempotency semantics plus G6 identity. G3-039 logical lineage is tested; durable recording remains open. No runtime, RPC, database, SQL/RLS, Supabase or learner data changed; O6 v0.3 remains frozen.
 
 **Next:** identify only the unresolved owner decisions needed to freeze logical G9. Do not choose a physical serializer, storage model or modify the existing RPC.
+
+
+## 8.68 G9 source reconciliation — determined requirements versus open design
+
+**Artifact:** `PacoGO_G9_Source_Reconciliation_v0.1.md`  
+**Status:** source-reconciliation review; G9 remains OPEN; no implementation authorization.
+
+The eleven items in the G9 logical candidate were checked against O7/O8, O6 v0.3, the G6 lifecycle proposal, C6/C7 and the preliminary C8/C9 crosswalk.
+
+### Determined by existing logical contracts
+
+- O7 already determines the three separate idempotency boundaries, replay versus integrity-conflict outcomes, linked correction/reassessment, new snapshot/evaluation after changed eligible evidence or protocol, stage-local atomicity and durable inspectable retry/recovery state.
+- G6/O1/O6 determine one immutable observation per separately administered response episode; stable observation identity; source event ordering; one stable target-assessment identity per assessment; exactly one observation and one target per assessment; and new linked identity for an actual reassessment under changed rule/contract/engine.
+- O5 determines UTC instants, half-open event-time membership, separate assessment-availability cutoff and immutable snapshots.
+- O8 determines the C6 evaluation identity and requires C7 to preserve the exact branch, snapshot and C6 evaluation identity.
+- C8/C9 v0.2 plus the preliminary G5 crosswalk specify a distinct C7 decision identity referencing the exact C6 evaluation. This is the source-aligned candidate, but G5 remains OPEN and must approve the final cross-stage envelope.
+
+### Still open or dependent
+
+- Stage A/B identity namespace and uniqueness scope.
+- Final exact Stage A canonical raw-observation field envelope, pending G6 lifecycle reconciliation.
+- Canonical equality details: absent/null, scalar/string normalization, collection ordering by field, timestamp precision, contract-version compatibility and transport metadata exclusions. Source event order and UTC instant semantics are already fixed and must be preserved.
+- Final Stage C C6/C7 identity envelope approval under G5.
+- Stage-state vocabulary/transitions; uncertain-commit resolution; retry policy; concurrency/in-progress response behavior; operation-timeout recovery.
+- Learner administration timeout remains a separate G6 policy; elapsed time must not silently terminate an episode.
+- Physical keys, transactions, locking/recovery implementation and security integration remain G8/G10 work.
+
+G3-037/038 remain blocked. G3-039 logical lineage remains fixture-tested; durable recording remains open. No runtime, tests, registry, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Next concrete step
+
+Reconcile the Stage C candidate to distinguish the C6 `evaluation_id` from the C7 `decision_id` that references it, then draft field-by-field logical payload inventories for Stages A/B/C. Do not decide serialization/normalization or implement persistence.

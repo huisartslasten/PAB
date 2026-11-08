@@ -64,6 +64,14 @@ function assertAssessment(record) {
   const independence = record.dimensions.independence?.result;
   const contradiction = record.dimensions.contradiction?.result;
 
+  if (alignment === 'MISALIGNED' || record.process?.required_streams_complete === false) {
+    assert.notEqual(
+      contradiction,
+      'PRESENT',
+      'missing process or task misalignment cannot establish contradiction PRESENT'
+    );
+  }
+
   if (record.raw_response_status === 'RESPONSE_PRESENT' && record.scoring_rule_interpretable === false) {
     assert.equal(performance, 'NOT_SCORABLE', 'an existing response the scoring rule cannot interpret must be NOT_SCORABLE');
   }
@@ -1137,9 +1145,71 @@ test('G3-031: correct response can contradict an explanation target without cont
   assert.throws(() => assertTargetScopedContradiction(propagated), /contradiction must remain local/);
 });
 
-test('G3-032: missing process or misalignment cannot be contradiction PRESENT by default', () => {
-  const record = base({ task_instance: { ...base().task_instance, aligned: false }, process: { required_streams_complete: false }, dimensions: { contradiction: dimension('INDETERMINATE') } });
-  assertAssessment(record);
+test('G3-032: missing process or task misalignment leaves contradiction indeterminate or unassessed', () => {
+  const misaligned = base({
+    task_instance: { ...base().task_instance, aligned: false },
+    process: { required_streams_complete: false },
+    dimensions: {
+      alignment: dimension('MISALIGNED'),
+      evidence: dimension('INDETERMINATE'),
+      contradiction: dimension('INDETERMINATE')
+    }
+  });
+  assertAssessment(misaligned);
+  assert.equal(misaligned.dimensions.contradiction.result, 'INDETERMINATE');
+
+  const notApplicable = base({
+    task_instance: { ...base().task_instance, aligned: false },
+    dimensions: {
+      alignment: dimension('MISALIGNED'),
+      evidence: dimension('INDETERMINATE'),
+      contradiction: dimension(undefined, {
+        applicability: 'NOT_APPLICABLE',
+        execution: 'NOT_RUN',
+        reason: 'No valid target elicitation exists for this task instance'
+      })
+    }
+  });
+  assertAssessment(notApplicable);
+  assert.equal(notApplicable.dimensions.contradiction.result, undefined);
+
+  const missingProcess = base({
+    process: { required_streams_complete: false },
+    dimensions: {
+      evidence: dimension('INDETERMINATE'),
+      contradiction: dimension('INDETERMINATE')
+    }
+  });
+  assertAssessment(missingProcess);
+
+  const misalignedContradiction = base({
+    task_instance: { ...base().task_instance, aligned: false },
+    dimensions: {
+      alignment: dimension('MISALIGNED'),
+      evidence: dimension('INDETERMINATE'),
+      contradiction: dimension('PRESENT')
+    },
+    contradiction_source: {
+      event_id: 'event-1',
+      source_material: 'Captured response material',
+      conflicts_with: 'target-specific interpretation'
+    }
+  });
+  assert.throws(() => assertAssessment(misalignedContradiction), /missing process or task misalignment cannot establish contradiction PRESENT/);
+
+  const missingProcessContradiction = base({
+    process: { required_streams_complete: false },
+    dimensions: {
+      evidence: dimension('INDETERMINATE'),
+      contradiction: dimension('PRESENT')
+    },
+    contradiction_source: {
+      event_id: 'event-2',
+      source_material: 'Captured response material',
+      conflicts_with: 'target-specific interpretation'
+    }
+  });
+  assert.throws(() => assertAssessment(missingProcessContradiction), /missing process or task misalignment cannot establish contradiction PRESENT/);
 });
 
 test('G3-033: help request alone is not contradiction', () => {

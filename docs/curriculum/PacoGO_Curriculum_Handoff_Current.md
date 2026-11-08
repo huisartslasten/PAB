@@ -4272,3 +4272,29 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G6 remains OPEN for interruption/resume, timeout, final owner approval of logical lifecycle/assessment identity and complete C3/O6 reconciliation. G9 remains OPEN for payload representation/equality, idempotency mechanics, stage status, retry, concurrency and recovery.
 - No production evaluator/runtime, physical schema, database, SQL/RPC/RLS, Supabase or learner data changed. O6 v0.3 remains frozen. Branch `refactor/professional-v1`; LIVE `main` untouched.
 - Next: reconcile this logical assessment identity candidate against C3/O6 and the owner architecture decision record; then determine which G3-037/038 assertions can be safely authored without specifying G9 mechanics.
+
+
+## 133. G6 target-assessment identity source reconciliation
+
+### Source-derived boundary
+- Multi-Target Task Evidence Contract v0.1 §§3–4: one task attempt/raw observation remains singular; each separately justified target receives its own target-specific evidence unit. Target expansion does not create additional independent observations. The contract does not define a canonical assessment ID.
+- Retained C3 Consolidated Observation/Event Coding Contract Reconciliation v0.1 explicitly marks itself superseded for learner-runtime architecture and not an approved schema. It is historical context only; it is not used to introduce a new schema or identity format.
+- O6 v0.3 §7 is the controlling logical assessment record: each target-specific assessment references exactly one immutable observation and exactly one existing evidence target, preserves a stable assessment identity under G6/G9, and carries prior-assessment linkage/reason for correction or reassessment.
+- Owner decision O7 separates raw-observation ingestion, target-assessment evaluation/recording and decision evaluation into distinct idempotency boundaries. Same identity/same canonical immutable payload is replay; same identity/different payload is an integrity conflict. O7 does not specify canonical serialization or physical write/recovery mechanics.
+- G6 logical responsibility: one distinct stable identity per target-specific assessment instance, bound to exactly one observation and one target; correction/reassessment uses a new linked identity and does not mutate prior history. G9 owns canonical payload equality/conflict and durable idempotent recording.
+
+### Verification
+- G6-007 fixture test commit `4ec0bad47f4f76b880c55e26c5d48dbf92ec6f9e`: Full Regression #3339 / run ID `42501694960`: **GREEN** on exact commit.
+- Proposal fixture note commit `1336151d074f48158a82367948f2e193238962e5`: Full Regression #3340 / run ID `42502143871`: **GREEN**.
+- Handoff and readiness matrix updates: handoff commit `ef5c72ba7ecb9731fd5b185323493b77233646ab`, Full Regression #3341 / run ID `42502148198`: **GREEN**; matrix commit `4b5c388b1b5ba04d58481207634d9dc471771042`, Full Regression #3342 / run ID `42502254738`: **GREEN**.
+- Proposal source reconciliation commit `76cf44f84c615921754518a0c27194c550003af9`: Full Regression #3343 / run ID `42502527256`: **GREEN** on exact commit. All runs passed the exact-checkout guard, curriculum engine, architecture, Node/Vitest, browser regression and clean-working-tree verification.
+
+### Gate status
+- G6 assessment identity: source-reconciled and fixture-tested as a logical candidate; final owner approval and full lifecycle closure remain open.
+- G6 interruption/resume and timeout decisions remain open. No default timeout or automatic terminal transition is introduced.
+- G9 remains OPEN for canonical payload definition/serialization/equality, stage status, idempotency mechanics, retry, concurrency and durable recovery.
+- G3-037/038 remain BLOCKED on G9 even though the logical G6 assessment identity boundary is now specified and tested. G3-039 logical lineage is tested; its durable persistence/idempotency remains open.
+- No production assessor/runtime, physical schema, database, SQL/RPC/RLS, Supabase or learner data changed. O6 v0.3 remains frozen. Branch `refactor/professional-v1`; LIVE `main` untouched.
+
+### Next concrete step
+- Move to a read-only G9 requirements reconciliation from O7 and the existing persistence/consumer audit. Separate canonical payload semantics and stage idempotency/recovery from the physical database/RLS design (G8/G10). Do not modify the RPC or Supabase.

@@ -1411,3 +1411,9 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** After the exact implementation commit passes Full Regression, G3-037–039 remain blocked until G6/G9 defines identity and canonical-payload semantics. Do not implement those cases by inference.
+
+
+
+### G3-036 regression correction note
+
+Full Regression #3292 / run ID `42463863331` and the subsequent handoff-only #3293 / run ID `42463881545` were RED because the new helper used `Array.prototype.every()` without requiring a non-empty array; an empty source-event list therefore passed. The run contained 282 tests: 281 passed, and the sole failure was G3-036's negative empty-list case. Correction commit `3e9a7a66640a422a3ce3780e37f7723c166636e9` now requires at least one source event reference before validating each identifier. Full Regression on the correction commit is pending.

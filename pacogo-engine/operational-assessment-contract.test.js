@@ -885,6 +885,13 @@ test('G3-025: incomplete support delivery, content or event provenance requires 
   assertAssessment(notRequiredWhenContractDoesNotRequireIt);
   assert.equal(notRequiredWhenContractDoesNotRequireIt.dimensions.independence.result, 'NOT_REQUIRED');
 
+  const requiredButNotJudged = base({
+    target_contract: { independence_required: true },
+    support: { delivered: false, target_relevant: false },
+    dimensions: { independence: dimension('NOT_REQUIRED') }
+  });
+  assert.throws(() => assertAssessment(requiredButNotJudged), /target contract requires an independence judgement/);
+
   const incorrectlyIndependent = base({
     target_contract: { independence_required: true },
     support: { delivered: null, target_relevant: null },

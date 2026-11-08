@@ -100,6 +100,8 @@ function assertAssessment(record) {
   }
   if (evidence === 'PRESENT') {
     assert.equal(alignment === 'ALIGNED' || alignment === 'PARTIALLY_ALIGNED', true, 'PRESENT requires valid elicitation');
+    assert.equal(record.task_instance.criterion_defined, true, 'PRESENT requires a pre-defined target criterion');
+    assert.equal(record.task_instance.required_material_defined, true, 'PRESENT requires pre-defined required material');
     assert.equal(record.criterion?.met, true, 'PRESENT requires the pre-specified criterion to be met');
     assert.equal(record.task_instance.required_material_inspectable, true, 'PRESENT requires inspectable material');
   }
@@ -610,10 +612,63 @@ test('G3-018: ABSENT requires every strict O6 precondition through the shared as
   }
 });
 
-test('G3-019: PRESENT requires the pre-specified target criterion to be met', () => {
-  const record = base({ criterion: { met: true }, dimensions: { evidence: dimension('PRESENT') } });
-  assertAssessment(record);
-  assert.equal(record.criterion.met, true);
+test('G3-019: PRESENT requires valid elicitation and sufficient inspectable material under the pre-specified rule', () => {
+  const valid = base({
+    task_instance: {
+      aligned: true,
+      criterion_defined: true,
+      required_material_defined: true,
+      required_material_inspectable: true
+    },
+    criterion: { met: true },
+    dimensions: { alignment: dimension('ALIGNED'), evidence: dimension('PRESENT') }
+  });
+  assertAssessment(valid);
+  assert.equal(valid.dimensions.evidence.result, 'PRESENT');
+
+  const invalidCases = [
+    {
+      label: 'task not aligned to target',
+      record: base({ criterion: { met: true }, dimensions: { alignment: dimension('MISALIGNED'), evidence: dimension('PRESENT') } }),
+      expected: /PRESENT requires valid elicitation/
+    },
+    {
+      label: 'criterion not pre-defined',
+      record: base({ task_instance: { criterion_defined: false }, criterion: { met: true }, dimensions: { evidence: dimension('PRESENT') } }),
+      expected: /PRESENT requires a pre-defined target criterion/
+    },
+    {
+      label: 'required material not pre-defined',
+      record: base({ task_instance: { required_material_defined: false }, criterion: { met: true }, dimensions: { evidence: dimension('PRESENT') } }),
+      expected: /PRESENT requires pre-defined required material/
+    },
+    {
+      label: 'criterion not met',
+      record: base({ criterion: { met: false }, dimensions: { evidence: dimension('PRESENT') } }),
+      expected: /PRESENT requires the pre-specified criterion to be met/
+    },
+    {
+      label: 'required material not inspectable',
+      record: base({ task_instance: { required_material_inspectable: false }, criterion: { met: true }, dimensions: { evidence: dimension('PRESENT') } }),
+      expected: /PRESENT requires inspectable material/
+    },
+    {
+      label: 'target rule did not complete',
+      record: base({
+        criterion: { met: true },
+        dimensions: { evidence: dimension('PRESENT', { execution: 'BLOCKED', reason: 'Target rule could not inspect required material' }) }
+      }),
+      expected: /evidence must not emit a learner result/
+    }
+  ];
+
+  for (const { label, record, expected } of invalidCases) {
+    assert.throws(() => assertAssessment(record), expected, label);
+  }
+
+  // PRESENT is a target-evidence result only; O6 does not infer mastery or transfer from it.
+  assert.equal(Object.hasOwn(valid, 'mastery_decision'), false);
+  assert.equal(Object.hasOwn(valid, 'transfer_decision'), false);
 });
 
 test('G3-020: help request without delivery is not PROMPTED or DEPENDENT', () => {

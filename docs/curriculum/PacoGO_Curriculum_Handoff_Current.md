@@ -4033,3 +4033,25 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN.
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+
+
+## 123. G3-036 logical assessment provenance completeness — verification pending
+
+### Work implemented
+- Inspected G3-036 in the G3 verification specification and O6 v0.3 §7.
+- Replaced the prior truthiness-only provenance check with `assertLogicalAssessmentProvenance`, requiring non-empty logical references/versions for task instance, task definition, task model, curriculum registry, task scoring rule, O6/C3 contract, target rule and assessment engine, plus event time and assessment-availability time.
+- The fixture also preserves source event references. Existing `assertAssessment` checks the observation and evidence-target references.
+- Added negative cases removing each required provenance field individually and a case omitting source event references.
+- This is logical test-fixture conformance only. It does not prescribe physical storage keys, an assessment identity format, canonical payload semantics or a persistence schema. G6/G9 identity semantics remain blocked and untouched. No production assessor/runtime, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification status
+- Pre-build Full Regression #3290 / run ID `42463781726`: GREEN on exact baseline commit `bdb6cebfbc5312414b07e333b84c7ed35f212f1f`.
+- Implementation commit: `1ba0ecc5236a4bbb5167461f7d48562864770f1e`.
+- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+
+### Gate status
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.

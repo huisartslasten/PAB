@@ -4346,3 +4346,19 @@ After verifying this documentation update with Full Regression, continue G3 test
 
 ### Next concrete step
 - Prepare a G9 candidate logical contract that maps each stage to its existing source identity (observation ID, target-assessment ID, snapshot/evaluation identity) and proposes content-equality rules only where the source contracts support them. Explicitly mark unresolved canonicalization, null/absence, collection ordering, status, retry and concurrency decisions as proposals requiring review. Do not implement or modify persistence/RPC/Supabase.
+
+
+## 136. G9 logical idempotency contract candidate drafted
+
+- Created `docs/curriculum/PacoGO_G9_Logical_Idempotency_Contract_Candidate_v0.1.md`.
+- The candidate maps O7's three separate idempotency boundaries to the current logical identities:
+  - Stage A raw observation: G6 `observation_id` candidate; exact namespace/uniqueness scope remains open.
+  - Stage B target assessment: G6 `assessment_id`, exactly one observation and one existing target; correction/reassessment is new linked history.
+  - Stage C decision evaluation: O8's six-part branch identity, `snapshot_id`, `evaluation_id`, protocol provenance, gate trace and exact observation/assessment references. Whether C7 requires a separate stage identity or a shared evaluation identity plus stage discriminator remains unresolved.
+- It defines source-derived logical payload content for each stage, proposes a complete versioned semantic equality envelope, and lists explicit unresolved decisions for null/absence, normalization, collection order, timestamp handling, stage status, uncertain-commit recovery, retries, concurrency and timeout.
+- It includes 16 conformance-test scenarios, but deliberately does not add tests for unresolved semantics or implement storage behavior.
+- Candidate commit `06f1c6acf8a280db5e7c53541a56b1b290933fe8`: Full Regression #3351 / run ID `42504038523`: **GREEN** on exact commit. Exact-checkout guard, all curriculum/architecture/Node/Vitest checks, browser regression and clean-working-tree verification passed.
+- This is a candidate for owner review, not a final G9 approval. O7/O8 and O6 v0.3 were not changed. G3-037/038 remain BLOCKED; G3-039 logical lineage is tested but durable recording remains open. No runtime, schema, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Next concrete step
+- Review the ten explicit G9 open decisions against the source contracts and separate those already determined by O7/O8/O6/G6 from those requiring an owner choice. Do not begin G9 implementation until that distinction and the Stage C identity decision are resolved.

@@ -171,6 +171,13 @@ function assertAssessment(record) {
       'a help request without delivered support cannot itself establish contradiction'
     );
   }
+  if (record.fixture_response_pattern === 'FR2_WRONG_SELECTION_ONLY') {
+    assert.notEqual(
+      contradiction,
+      'PRESENT',
+      'a wrong selection alone cannot establish FR2 contradiction'
+    );
+  }
   if (contradiction === 'PRESENT') {
     assert.equal(typeof record.contradiction_source?.event_id, 'string', 'contradiction must cite source material');
     assert.ok(record.contradiction_source.event_id.trim());
@@ -1489,44 +1496,197 @@ test('G3-040 remains blocked pending approved O5 snapshot-cutoff semantics', () 
   assert.equal(dependency.status, 'BLOCKED');
 });
 
-test('A1 anchors preserve mapping as distinct from co-display and answer correctness', () => {
-  const coDisplayOnly = base({ task_instance: { ...base().task_instance, aligned: false }, dimensions: { alignment: dimension('MISALIGNED'), evidence: dimension('INDETERMINATE') } });
-  const mapped = base({ task_instance: { ...base().task_instance, aligned: true }, dimensions: { alignment: dimension('ALIGNED'), evidence: dimension('PRESENT') } });
+test('A1 ET2 mapping evidence requires actual mapping elicitation, not co-display', () => {
+  const coDisplayOnly = base({
+    observation_id: 'A1-observation-co-display',
+    evidence_target_id: 'A1.ET2',
+    task_model_declares_target: true,
+    task_instance: {
+      ...base().task_instance,
+      aligned: false,
+      actual_target_elicited: false
+    },
+    dimensions: {
+      alignment: dimension('MISALIGNED'),
+      evidence: dimension('INDETERMINATE')
+    }
+  });
+  const mapped = base({
+    observation_id: 'A1-observation-mapping',
+    evidence_target_id: 'A1.ET2',
+    task_model_declares_target: true,
+    task_instance: {
+      ...base().task_instance,
+      aligned: true,
+      actual_target_elicited: true
+    },
+    dimensions: {
+      alignment: dimension('ALIGNED'),
+      evidence: dimension('PRESENT')
+    }
+  });
   assertAssessment(coDisplayOnly);
   assertAssessment(mapped);
+  assert.equal(coDisplayOnly.evidence_target_id, 'A1.ET2');
   assert.equal(coDisplayOnly.dimensions.evidence.result, 'INDETERMINATE');
+  assert.equal(mapped.dimensions.evidence.result, 'PRESENT');
+
+  const autoMapped = base({
+    evidence_target_id: 'A1.ET2',
+    task_model_declares_target: true,
+    task_instance: {
+      ...base().task_instance,
+      aligned: false,
+      actual_target_elicited: false
+    },
+    dimensions: {
+      alignment: dimension('MISALIGNED'),
+      evidence: dimension('PRESENT')
+    }
+  });
+  assert.throws(
+    () => assertAssessment(autoMapped),
+    /a declared target not elicited by the actual task instance cannot receive PRESENT evidence/
+  );
 });
 
-test('B1 anchors preserve execution, strategy and checking as separate targets', () => {
-  const execution = base({ evidence_target_id: 'B1-ET3', dimensions: { performance: dimension('CORRECT'), evidence: dimension('PRESENT') } });
-  const strategyNotElicited = base({ evidence_target_id: 'B1-ET4', dimensions: { alignment: dimension('MISALIGNED'), evidence: dimension('INDETERMINATE') } });
-  assertAssessment(execution);
-  assertAssessment(strategyNotElicited);
+test('B1 ET3 execution, ET4 strategy and ET5 checking remain separate target assessments', () => {
+  const observationId = 'B1-observation-one-response-episode';
+  const assessments = [
+    base({
+      observation_id: observationId,
+      evidence_target_id: 'B1.ET3',
+      task_model_declares_target: true,
+      task_instance: { ...base().task_instance, actual_target_elicited: true },
+      dimensions: {
+        alignment: dimension('ALIGNED'),
+        performance: dimension('CORRECT'),
+        evidence: dimension('PRESENT')
+      }
+    }),
+    base({
+      observation_id: observationId,
+      evidence_target_id: 'B1.ET4',
+      task_model_declares_target: true,
+      task_instance: { ...base().task_instance, aligned: false, actual_target_elicited: false },
+      dimensions: {
+        alignment: dimension('MISALIGNED'),
+        evidence: dimension('INDETERMINATE')
+      }
+    }),
+    base({
+      observation_id: observationId,
+      evidence_target_id: 'B1.ET5',
+      task_model_declares_target: true,
+      task_instance: { ...base().task_instance, aligned: false, actual_target_elicited: false },
+      dimensions: {
+        alignment: dimension('MISALIGNED'),
+        evidence: dimension('INDETERMINATE')
+      }
+    })
+  ];
+  assertOneObservationManyTargetAssessments([{ observation_id: observationId }], assessments);
+  assert.deepEqual(
+    assessments.map(item => item.evidence_target_id),
+    ['B1.ET3', 'B1.ET4', 'B1.ET5']
+  );
+  assert.deepEqual(
+    assessments.map(item => item.dimensions.evidence.result),
+    ['PRESENT', 'INDETERMINATE', 'INDETERMINATE']
+  );
 });
 
-test('B1 ET7 remains unmapped; this suite does not create a task-model link', () => {
-  const mapping = { evidence_target_id: 'B1-ET7', task_model_id: null, mapping_status: 'UNMAPPED' };
+test('B1.ET7 remains unmapped; this suite does not create a task-model link', () => {
+  const mapping = { evidence_target_id: 'B1.ET7', task_model_id: null, mapping_status: 'UNMAPPED' };
+  assert.equal(mapping.evidence_target_id, 'B1.ET7');
   assert.equal(mapping.task_model_id, null);
   assert.equal(mapping.mapping_status, 'UNMAPPED');
 });
 
-test('FR2 recognition does not imply same-value reasoning', () => {
-  const recognition = base({ evidence_target_id: 'FR2-recognition', dimensions: { evidence: dimension('PRESENT') } });
-  const reasoning = base({ evidence_target_id: 'FR2-same-value-reasoning', dimensions: { evidence: dimension('INDETERMINATE') } });
-  assertAssessment(recognition);
-  assertAssessment(reasoning);
-  assert.notEqual(recognition.evidence_target_id, reasoning.evidence_target_id);
+test('FR2 ET1 recognition does not imply ET3 same-value reasoning', () => {
+  const observationId = 'FR2-observation-one-response-episode';
+  const assessments = [
+    base({
+      observation_id: observationId,
+      evidence_target_id: 'FR2.ET1',
+      task_model_declares_target: true,
+      task_instance: { ...base().task_instance, actual_target_elicited: true },
+      dimensions: { alignment: dimension('ALIGNED'), evidence: dimension('PRESENT') }
+    }),
+    base({
+      observation_id: observationId,
+      evidence_target_id: 'FR2.ET3',
+      task_model_declares_target: true,
+      task_instance: { ...base().task_instance, actual_target_elicited: true },
+      criterion: { met: null },
+      dimensions: { alignment: dimension('ALIGNED'), evidence: dimension('INDETERMINATE') }
+    })
+  ];
+  assertOneObservationManyTargetAssessments([{ observation_id: observationId }], assessments);
+  assert.deepEqual(
+    assessments.map(item => item.evidence_target_id),
+    ['FR2.ET1', 'FR2.ET3']
+  );
+  assert.deepEqual(
+    assessments.map(item => item.dimensions.evidence.result),
+    ['PRESENT', 'INDETERMINATE']
+  );
 });
 
-test('FR2 text presence alone is not reasoning evidence', () => {
-  const record = base({ raw_explanation: 'text exists', explanation_meets_target_criterion: false, dimensions: { evidence: dimension('INDETERMINATE') } });
+test('FR2 ET3 text presence alone is not same-value reasoning evidence', () => {
+  const record = base({
+    evidence_target_id: 'FR2.ET3',
+    raw_explanation: 'text exists',
+    explanation_meets_target_criterion: false,
+    criterion: { met: null },
+    dimensions: { evidence: dimension('INDETERMINATE') }
+  });
   assertAssessment(record);
   assert.equal(record.explanation_meets_target_criterion, false);
+
+  const textAutoAssessed = base({
+    evidence_target_id: 'FR2.ET3',
+    raw_explanation: 'text exists',
+    explanation_meets_target_criterion: false,
+    criterion: { met: false },
+    dimensions: { alignment: dimension('ALIGNED'), evidence: dimension('PRESENT') }
+  });
+  assert.throws(
+    () => assertAssessment(textAutoAssessed),
+    /PRESENT requires the pre-specified criterion to be met/
+  );
 });
 
 test('FR2 wrong selection alone is not contradiction', () => {
-  const record = base({ dimensions: { performance: dimension('INCORRECT'), contradiction: dimension('ABSENT') } });
+  const record = base({
+    evidence_target_id: 'FR2.ET1',
+    objective_scoring_result: 'INCORRECT',
+    fixture_response_pattern: 'FR2_WRONG_SELECTION_ONLY',
+    dimensions: {
+      performance: dimension('INCORRECT'),
+      contradiction: dimension('ABSENT')
+    }
+  });
   assertAssessment(record);
+
+  const wrongSelectionAsContradiction = base({
+    evidence_target_id: 'FR2.ET1',
+    objective_scoring_result: 'INCORRECT',
+    fixture_response_pattern: 'FR2_WRONG_SELECTION_ONLY',
+    dimensions: {
+      performance: dimension('INCORRECT'),
+      contradiction: dimension('PRESENT')
+    },
+    contradiction_source: {
+      event_id: 'fr2-wrong-selection-event',
+      source_material: 'The learner selected a non-equivalent pair as equivalent.',
+      conflicts_with: 'same-value interpretation for FR2.ET1'
+    }
+  });
+  assert.throws(
+    () => assertAssessment(wrongSelectionAsContradiction),
+    /a wrong selection alone cannot establish FR2 contradiction/
+  );
 });
 
 test('C6 M2 adequacy remains a structured non-scored profile', () => {

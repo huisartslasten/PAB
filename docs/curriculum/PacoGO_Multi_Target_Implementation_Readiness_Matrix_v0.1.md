@@ -1406,7 +1406,7 @@ The fixture value is test-only; it does not define a production API or persisted
 
 **Scope:** Test-only logical-record harness. No physical storage keys, assessment identity format, canonical payload semantics or persistence schema is prescribed. G6/G9 identity work remains blocked. No production assessor/runtime, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
 
-**Verification:** Implementation commit `1ba0ecc5236a4bbb5167461f7d48562864770f1e`. Pre-build Full Regression #3290 / run ID `42463781726`: GREEN on exact baseline commit `bdb6cebfbc5312414b07e333b84c7ed35f212f1f`. Full Regression on the implementation commit is pending.
+**Verification:** Initial implementation commit `1ba0ecc5236a4bbb5167461f7d48562864770f1e` exposed the empty-array assertion gap described in the correction note below. Corrected implementation commit `3e9a7a66640a422a3ce3780e37f7723c166636e9` passed Full Regression #3295 / run ID `42463916536`. Handoff-only commit `bc096bd2ff2394733a2fddb44ab9dd441746e1a9` passed Full Regression #3296 / run ID `42463932797`.
 
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
@@ -1416,4 +1416,4 @@ The fixture value is test-only; it does not define a production API or persisted
 
 ### G3-036 regression correction note
 
-Full Regression #3292 / run ID `42463863331` and the subsequent handoff-only #3293 / run ID `42463881545` were RED because the new helper used `Array.prototype.every()` without requiring a non-empty array; an empty source-event list therefore passed. The run contained 282 tests: 281 passed, and the sole failure was G3-036's negative empty-list case. Correction commit `3e9a7a66640a422a3ce3780e37f7723c166636e9` now requires at least one source event reference before validating each identifier. Full Regression on the correction commit is pending.
+Full Regression #3292 / run ID `42463863331`, handoff-only #3293 / run ID `42463881545`, and matrix-only #3294 / run ID `42463884328` were RED because the new helper used `Array.prototype.every()` without requiring a non-empty array; an empty source-event list therefore passed. The run contained 282 tests: 281 passed, and the sole failure was G3-036's negative empty-list case. Correction commit `3e9a7a66640a422a3ce3780e37f7723c166636e9` now requires at least one source event reference before validating each identifier. Full Regression on the correction commit is pending.

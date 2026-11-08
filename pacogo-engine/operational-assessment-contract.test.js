@@ -111,6 +111,15 @@ function assertAssessment(record) {
     assert.equal(record.support.supplied_required_operation, false, 'neutral interface clarification must not supply target reasoning');
   }
 
+  const supportProvenanceIncomplete =
+    record.process?.required_streams_complete === false ||
+    record.support?.delivered == null ||
+    (record.support?.delivered === true && record.support.target_relevant == null) ||
+    (record.support?.delivered === true && record.support.target_relevant === true && record.support.supplied_required_operation == null);
+  if (supportProvenanceIncomplete) {
+    assert.equal(independence, 'UNKNOWN', 'incomplete support provenance or event capture requires UNKNOWN independence');
+  }
+
   if (independence === 'INDEPENDENT') {
     assert.equal(record.process?.required_streams_complete, true, 'INDEPENDENT requires sufficiently complete event capture');
     assert.notEqual(record.support?.target_relevant, true, 'INDEPENDENT forbids delivered target-relevant assistance');
@@ -824,10 +833,41 @@ test('G3-024: DEPENDENT requires delivered target-relevant support that supplies
   assert.throws(() => assertAssessment(didNotSupplyOperation), /DEPENDENT support supplies a required operation/);
 });
 
-test('G3-025: incomplete support provenance requires UNKNOWN', () => {
-  const record = base({ support: { delivered: null, target_relevant: null }, dimensions: { independence: dimension('UNKNOWN') } });
-  assertAssessment(record);
-  assert.equal(record.dimensions.independence.result, 'UNKNOWN');
+test('G3-025: incomplete support delivery, content or event provenance requires UNKNOWN', () => {
+  const unknownDelivery = base({
+    support: { delivered: null, target_relevant: null },
+    dimensions: { independence: dimension('UNKNOWN') }
+  });
+  assertAssessment(unknownDelivery);
+  assert.equal(unknownDelivery.dimensions.independence.result, 'UNKNOWN');
+
+  const unclassifiableDeliveredContent = base({
+    support: { delivered: true, target_relevant: true, supplied_required_operation: null },
+    dimensions: { independence: dimension('UNKNOWN') }
+  });
+  assertAssessment(unclassifiableDeliveredContent);
+  assert.equal(unclassifiableDeliveredContent.dimensions.independence.result, 'UNKNOWN');
+
+  const incompleteEventCapture = base({
+    support: { delivered: false, target_relevant: false },
+    process: { required_streams_complete: false },
+    dimensions: { independence: dimension('UNKNOWN') }
+  });
+  assertAssessment(incompleteEventCapture);
+  assert.equal(incompleteEventCapture.dimensions.independence.result, 'UNKNOWN');
+
+  const incorrectlyIndependent = base({
+    support: { delivered: null, target_relevant: null },
+    dimensions: { independence: dimension('INDEPENDENT') }
+  });
+  assert.throws(() => assertAssessment(incorrectlyIndependent), /incomplete support provenance or event capture requires UNKNOWN/);
+
+  const incorrectlyIndependentWithIncompleteCapture = base({
+    support: { delivered: false, target_relevant: false },
+    process: { required_streams_complete: false },
+    dimensions: { independence: dimension('INDEPENDENT') }
+  });
+  assert.throws(() => assertAssessment(incorrectlyIndependentWithIncompleteCapture), /incomplete support provenance or event capture requires UNKNOWN/);
 });
 
 test('G3-026: independence is assessed separately for each target', () => {

@@ -3703,3 +3703,24 @@ After verifying this documentation update with Full Regression, continue G3 test
 - G3: OPEN.
 - G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
+
+
+
+## 108. G3-021 neutral interface clarification — verification pending
+
+### Work implemented
+- Inspected G3-021 in the G3 verification specification and O6 v0.3 §1.
+- Strengthened the shared `assertAssessment` for the test fixture's `interface_clarification` support kind: it must be actually delivered, not target-relevant, and must not supply the required target operation/reasoning.
+- The positive case records a delivered neutral clarification with independence `NOT_REQUIRED`. Negative cases reject a clarification marked target-relevant or one that supplies the required operation.
+- This remains test-only normalized logical-record conformance work. No production support delivery, assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification status
+- Pre-build Full Regression #3215 / run ID `42428623106`: GREEN on exact baseline commit `4deef55ebc67cb67412a25f36f6b5ca02a515a0e`.
+- Implementation commit: `11f2881f92f885ae4110e7551a0bdaae710aa058`.
+- Full Regression on the exact implementation commit is pending. Do not continue to another build vector until it is GREEN.
+
+### Gate status
+- G2/O6: CLOSED; logical contract v0.3 remains frozen.
+- G3: OPEN.
+- G3-037–039 remain blocked on G6/G9 identity/canonical-payload semantics. G3-040 remains blocked on O5 snapshot/availability-cutoff semantics. G5 remains separate.
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.

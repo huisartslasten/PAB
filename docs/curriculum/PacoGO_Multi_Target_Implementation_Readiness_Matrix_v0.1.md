@@ -1089,3 +1089,19 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-021, distinguishing neutral interface clarification from target-relevant mathematical/content support.
+
+
+
+## 8.35 G3-021 — neutral interface clarification is not target-relevant support
+
+**Contract basis:** O6 v0.3 §1 distinguishes neutral interface clarification (answer entry/submission only) from mathematical/content support. Neutral clarification must not supply target reasoning or be treated as target-relevant assistance.
+
+**Test change:** The shared `assertAssessment` requires the test fixture's `interface_clarification` support kind to be actually delivered, not target-relevant, and not to supply the required operation/reasoning. The positive case records delivered neutral clarification with independence `NOT_REQUIRED`; negative cases reject target-relevant classification and supplied target reasoning.
+
+**Scope:** Test-only normalized logical-record harness. No production support delivery, assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Pre-build Full Regression #3215 / run ID `42428623106`: GREEN on exact baseline commit `4deef55ebc67cb67412a25f36f6b5ca02a515a0e`. Implementation commit `11f2881f92f885ae4110e7551a0bdaae710aa058`. Full Regression #3216 / run ID `42428731369`: **GREEN** on that exact implementation commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with G3-022, requiring actual completed event capture and absence of delivered target-relevant support before classifying independence as `INDEPENDENT`. Do not infer independence from the planned task condition alone.

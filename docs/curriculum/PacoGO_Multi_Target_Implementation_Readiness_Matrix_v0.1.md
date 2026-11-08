@@ -1,7 +1,8 @@
 # PacoGO — Multi-Target Implementation Readiness Matrix v0.1
 
 Status: architecture-readiness planning artifact / implementation NOT authorized
-Date: 2026-11-06
+Original date: 2026-11-06
+Current gate-status reconciliation: 2026-11-08 (see §§8.19–8.70 and current handoff)
 Branch: `refactor/professional-v1`
 Basis:
 - `PacoGO_Multi_Target_Owner_Architecture_Decisions_v0.1.md`
@@ -29,11 +30,11 @@ O1–O4 and O7–O8 are accepted only at the logical level:
 - raw observation, PacoGO target assessment and decision evaluation have separate idempotency boundaries;
 - C6 evaluates a frozen snapshot for one exact branch; C7 consumes that exact result.
 
-### Still open owner decisions
+### Current owner-decision status (reconciled 2026-11-08)
 
 - **O5 — Scope/time-window lifecycle:** minimum reversible logical policy approved; detailed ownership/permissions, overlap presentation and retention/deletion remain open.
-- **O6 — Canonical C3 assessment and measurement vocabulary:** not approved.
-- **O9 — Learner-facing cross-branch projection:** not finalized.
+- **O6 — Canonical C3 assessment and measurement vocabulary:** exact Operational Assessment Contract v0.3 was owner-approved on 2026-11-07; G2 is CLOSED at the logical-contract level. This does not close G3 or authorize runtime/persistence implementation.
+- **O9 — Learner-facing cross-branch projection:** not finalized; remains separate from the internal single-branch C6→C9 contract.
 
 ### Not authorized
 
@@ -92,15 +93,17 @@ The slice must not change curriculum mappings, task catalogue entries, mastery t
 
 ## 5. Current blockers and next concrete action
 
-Open blockers:
+Current blockers (reconciled 2026-11-08):
 
-- G1 / O5: minimum logical policy approved; detailed governance/privacy details remain open.
-- G2 / O6: C3 assessment and measurement approval.
-- G4 / O9: learner-facing cross-branch product policy.
-- G5: C6–C9 reconciliation and versioned handoff.
-- G6–G11: identity, consumer, persistence, security, recovery and test design.
+- G1 / O5: minimum logical scope/window policy approved; remaining ownership, permissions, overlap presentation and retention/deletion decisions remain open for affected product/persistence work.
+- G2 / O6: CLOSED at the logical-contract level on exact owner-approved Operational Assessment Contract v0.3. G3 operational rule verification remains OPEN.
+- G4 / O9: learner-facing cross-branch product policy remains OPEN; it is not a prerequisite for internal single-branch C6→C9 lineage.
+- G5: C6–C9 contract reconciliation, exact Stage C identity/write-unit boundary, cross-stage examples and negative permissions remain OPEN.
+- G6: administration lifecycle, interruption/resume, timeout, identity namespace and final event semantics remain OPEN.
+- G7–G11: consumer compatibility, physical persistence, security/privacy and complete conformance/failure-recovery verification remain gated downstream.
+- G12: explicit narrow implementation authorization has NOT been granted.
 
-**Next concrete action:** complete the direct/indirect consumer inventory and assign each consumer a read/write/derived/legacy disposition. Then reconcile the examples in Section 7.12 with the C6–C9 protocol owners. O6 still blocks final C3 assessment-input semantics; O9 is needed before learner-facing cross-branch projection is designed or shipped.
+**Next concrete action:** finish the G5 Stage C lineage/atomicity decision package and G6 lifecycle/identity decision package using the frozen O6 v0.3 contract. Then resolve G9 equality and durable recovery semantics. Do not reopen O6 v0.3 or design learner-facing cross-branch projection as a prerequisite for the internal lineage.
 
 B1-L08 remains blocked until the approved contract supports its target-specific evidence end to end. Existing B1-L01–L07 remain unchanged.
 

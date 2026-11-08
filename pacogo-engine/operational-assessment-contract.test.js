@@ -356,6 +356,35 @@ function assertSupportConditionChangeStartsNewAdministration(previous, next) {
   return true;
 }
 
+/**
+ * Logical lifecycle assertions only. Status labels and IDs here are test
+ * fixtures, not a persisted status vocabulary or physical identifier format.
+ */
+function assertSameEpisodeRetry(previous, retried) {
+  assert.equal(retried.task_instance_id, previous.task_instance_id);
+  assert.equal(retried.task_attempt_id, previous.task_attempt_id);
+  assert.equal(retried.observation_id, previous.observation_id);
+  assert.ok(retried.events.length > previous.events.length, 'retry appends events within the same episode');
+  assert.deepEqual(retried.events.slice(0, previous.events.length), previous.events, 'retry preserves prior ordered events');
+}
+
+function assertRestartCreatesNewAdministration(completed, restarted) {
+  assert.equal(completed.lifecycle_state, 'COMPLETED');
+  assert.notEqual(restarted.task_instance_id, completed.task_instance_id, 'explicit restart is a new task instance');
+  assert.notEqual(restarted.task_attempt_id, completed.task_attempt_id, 'explicit restart is a new response episode');
+  assert.notEqual(restarted.observation_id, completed.observation_id, 'explicit restart is a new observation');
+  assert.deepEqual(completed.retained_events, completed.events, 'completed episode remains preserved');
+}
+
+function assertStartedAbandonedEpisodeIsPreserved(episode) {
+  assert.equal(episode.started, true, 'only a started administration has an abandoned response episode');
+  assert.equal(episode.lifecycle_state, 'ABANDONED');
+  assert.ok(episode.observation && episode.observation.immutable === true, 'abandoned started episode retains one immutable raw observation');
+  assert.equal(episode.observation.observation_id, episode.observation_id);
+  assert.equal(episode.observation.task_attempt_id, episode.task_attempt_id);
+  assert.deepEqual(episode.observation.events, episode.events, 'all captured events remain in the observation');
+}
+
 const M2_PROFILE_COMPONENTS = [
   'capture_integrity',
   'response_interpretability',
@@ -1257,6 +1286,76 @@ test('G3-029: prior raw events are preserved and supported continuation is a sep
 
   const notReturnedToPractice = { ...practice, mode: 'Toets' };
   assert.throws(() => assertSeparateSupportedContinuation(independent, notReturnedToPractice), /returns to supported practice/);
+});
+
+test('G6-003: ordinary retries and answer revisions remain events in the same response episode', () => {
+  const first = {
+    task_instance_id: 'fixture-task-instance-1',
+    task_attempt_id: 'fixture-attempt-1',
+    observation_id: 'fixture-observation-1',
+    events: [{ event_id: 'fixture-event-1', sequence: 1, kind: 'response_submitted' }]
+  };
+  const retried = {
+    ...first,
+    events: [
+      ...first.events,
+      { event_id: 'fixture-event-2', sequence: 2, kind: 'answer_revised' },
+      { event_id: 'fixture-event-3', sequence: 3, kind: 'response_resubmitted' }
+    ]
+  };
+  assertSameEpisodeRetry(first, retried);
+  assert.throws(
+    () => assertSameEpisodeRetry(first, { ...retried, observation_id: 'fixture-observation-2' }),
+    /observation_id/
+  );
+});
+
+test('G6-004: explicit restart after completion creates a new administration and preserves the completed episode', () => {
+  const completed = {
+    task_instance_id: 'fixture-task-instance-1',
+    task_attempt_id: 'fixture-attempt-1',
+    observation_id: 'fixture-observation-1',
+    lifecycle_state: 'COMPLETED',
+    events: [{ event_id: 'fixture-event-1', sequence: 1, kind: 'response_submitted' }],
+    retained_events: [{ event_id: 'fixture-event-1', sequence: 1, kind: 'response_submitted' }]
+  };
+  const restarted = {
+    task_instance_id: 'fixture-task-instance-2',
+    task_attempt_id: 'fixture-attempt-2',
+    observation_id: 'fixture-observation-2'
+  };
+  assertRestartCreatesNewAdministration(completed, restarted);
+  assert.throws(
+    () => assertRestartCreatesNewAdministration(completed, { ...restarted, task_instance_id: completed.task_instance_id }),
+    /new task instance/
+  );
+});
+
+test('G6-005: abandoning a started episode preserves one immutable observation and its captured events', () => {
+  const abandoned = {
+    task_instance_id: 'fixture-task-instance-abandoned',
+    task_attempt_id: 'fixture-attempt-abandoned',
+    observation_id: 'fixture-observation-abandoned',
+    started: true,
+    lifecycle_state: 'ABANDONED',
+    events: [
+      { event_id: 'fixture-event-1', sequence: 1, kind: 'task_started' },
+      { event_id: 'fixture-event-2', sequence: 2, kind: 'learner_abandoned' }
+    ],
+    observation: {
+      observation_id: 'fixture-observation-abandoned',
+      task_attempt_id: 'fixture-attempt-abandoned',
+      immutable: true,
+      events: [
+        { event_id: 'fixture-event-1', sequence: 1, kind: 'task_started' },
+        { event_id: 'fixture-event-2', sequence: 2, kind: 'learner_abandoned' }
+      ]
+    }
+  };
+  assertStartedAbandonedEpisodeIsPreserved(abandoned);
+
+  const lostObservation = { ...abandoned, observation: null };
+  assert.throws(() => assertStartedAbandonedEpisodeIsPreserved(lostObservation), /one immutable raw observation/);
 });
 
 test('G6-001: a material support-condition change starts a new task instance, episode and observation', () => {

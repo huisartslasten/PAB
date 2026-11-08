@@ -1171,3 +1171,19 @@ The fixture value is test-only; it does not define a production API or persisted
 **Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
 
 **Next step:** Continue with G3-026, preserving target-specific independence judgements rather than copying one global independence label across multiple targets.
+
+
+
+## 8.40 G3-026 — the same support event is assessed separately for each target
+
+**Contract basis:** O6 v0.3 §5.6 requires target-specific independence assessment. The same delivered support event can be `PROMPTED` for one target and `DEPENDENT` for another because each target has a different required learner operation.
+
+**Test change:** G3-026 now uses one shared support event reference in two distinct target assessments. The same event is classified `PROMPTED` for target A, where the required operation remains with the learner, and `DEPENDENT` for target B, where the same event supplies the required operation. The test asserts the shared event reference and distinct target-specific results.
+
+**Scope:** Test-only normalized logical-record harness. No production assessor/runtime, curriculum mapping, registry, catalogue, learner state, persistence, SQL/RPC/RLS, Supabase or learner data changed.
+
+**Verification:** Pre-build Full Regression #3240 / run ID `42429996862`: GREEN on exact baseline commit `c4227192bd69dd2736c04622ec956a5139813f67`. Implementation commit `732f3db91e93aab918f9ec2146ea91dc1b603219`. Full Regression #3241 / run ID `42430112666`: **GREEN** on that exact implementation commit. Curriculum-engine regression, architecture boundaries, Double or Nothing runtime regression, maintained Node, Vitest, browser regression and clean-working-tree checks passed.
+
+**Gate status:** G2/O6 remains CLOSED. G3 remains OPEN. G5, G6/G9 and O5 dependencies remain unchanged; G3-037–039 and G3-040 remain blocked as specified. No implementation authorization is implied.
+
+**Next step:** Continue with G3-027, preserving the independent assessment attempt as `INCOMPLETE` when content help is requested during Tussentoets/Toets, even if support is not subsequently delivered.

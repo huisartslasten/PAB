@@ -217,6 +217,21 @@ function assertLogicalAssessmentProvenance(record) {
 }
 
 /**
+ * Logical assessment identity is distinct from the source observation and
+ * target references. This does not prescribe an ID format or physical key.
+ */
+function assertLogicalAssessmentIdentity(record) {
+  assert.ok(
+    typeof record.assessment_id === 'string' && record.assessment_id.trim(),
+    'a stable logical assessment identity is required'
+  );
+  assert.ok(typeof record.observation_id === 'string' && record.observation_id.trim());
+  assert.ok(typeof record.evidence_target_id === 'string' && record.evidence_target_id.trim());
+  assertLogicalAssessmentProvenance(record);
+  return true;
+}
+
+/**
  * Logical G3-039 lineage assertion. Fixture IDs are opaque test values only;
  * this does not prescribe physical keys, canonical serialization or storage.
  */
@@ -1789,8 +1804,9 @@ test('G3-035: a declared target opportunity is not evidence unless the actual in
   assertAssessment(actuallyElicited);
 });
 
-test('G3-036: assessment preserves required logical provenance without prescribing physical keys', () => {
+test('G3-036: assessment preserves stable logical identity and required provenance without prescribing physical keys', () => {
   const record = base({
+    assessment_id: 'fixture-assessment-1',
     provenance: {
       task_instance_version: 'task-instance-v1',
       task_definition_version: 'task-definition-v1',
@@ -1806,7 +1822,7 @@ test('G3-036: assessment preserves required logical provenance without prescribi
     source_event_ids: ['response-event-1']
   });
   assertAssessment(record);
-  assertLogicalAssessmentProvenance(record);
+  assertLogicalAssessmentIdentity(record);
   assert.equal(typeof record.observation_id, 'string');
   assert.equal(typeof record.evidence_target_id, 'string');
 
@@ -1839,15 +1855,22 @@ test('G3-036: assessment preserves required logical provenance without prescribi
     () => assertLogicalAssessmentProvenance(missingEventReference),
     /at least one source event reference must be preserved/
   );
+
+  const missingAssessmentIdentity = { ...record };
+  delete missingAssessmentIdentity.assessment_id;
+  assert.throws(
+    () => assertLogicalAssessmentIdentity(missingAssessmentIdentity),
+    /stable logical assessment identity is required/
+  );
 });
 
-test('G3-037/038 remain blocked pending exact G6 assessment identity and G9 canonical payload semantics', () => {
+test('G3-037/038 remain blocked pending G9 canonical payload equality and conflict semantics', () => {
   const dependencies = [
-    { case: 'G3-037', required: ['G6 assessment identity', 'G9 canonical immutable payload equality', 'G9 idempotent stage write'] },
-    { case: 'G3-038', required: ['G6 assessment identity', 'G9 canonical immutable payload conflict detection', 'G9 preserve-original behavior'] }
+    { case: 'G3-037', required: ['G9 canonical immutable payload equality', 'G9 idempotent stage write'] },
+    { case: 'G3-038', required: ['G9 canonical immutable payload conflict detection', 'G9 preserve-original behavior'] }
   ];
   assert.deepEqual(dependencies.map(item => item.case), ['G3-037', 'G3-038']);
-  for (const item of dependencies) assert.ok(item.required.length >= 3);
+  for (const item of dependencies) assert.equal(item.required.length, 2);
 });
 
 test('G3-039: logical reassessment lineage creates a new linked version and preserves the prior assessment', () => {

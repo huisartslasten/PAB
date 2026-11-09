@@ -4855,3 +4855,14 @@ The C8 history-boundary recommendation remains **NOT APPROVED**. The brief recom
 Next concrete step: present the three alternatives and the Option A recommendation for explicit owner disposition. Until the owner explicitly chooses, do not update the logical C8 contract, choose persistence semantics, alter runtime/tests/schema, or treat any option as approved.
 
 This handoff update records verification only. It changes no runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data.
+
+
+## 149. G5 C8 history boundary — owner decision approved
+
+The owner approved **Option A: C8 is a derived, descriptive, non-authoritative read projection over committed C6/C7 records** and explicitly chose to **remove `c8_item_id` as an authoritative domain identity**. Logical source lineage is the exact six-part branch identity plus `decision_snapshot_id`, `c6_evaluation_id` and `c7_decision_id`. C8 has no independent authoritative history record, write unit, idempotency key or replay/conflict lifecycle. Append-only history is inherited from immutable C6/C7 source records. Reprojection must not duplicate, mutate or reinterpret those source decisions. No fourth O7 top-level boundary is introduced.
+
+Option B remains a possible future G8 physical optimization only if needed; any materialized read model must be rebuildable and non-authoritative. A technical row handle is projection-local, not a domain identity. Physical storage, refresh, query optimization, canonical equality/serialization and security remain open under G8/G9.
+
+**Dependencies:** G5's C8 logical boundary is RESOLVED; G5 remains OPEN for protocol-version/rejection crosswalk, C3/O6 provenance, examples and legacy compatibility. G9 must not define C8-specific authoritative identity/write/idempotency semantics; it retains actual O7-stage equality/recovery/retry/concurrency and C9 validation/disposition alignment. G8 may later assess rebuildable materialization. G6 remains unchanged and OPEN. G12 remains NOT AUTHORIZED. Documentation only; no runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data changes.
+
+Prior baseline: commit `c6c1e299dd0c4e099224bd39f0ca63197619296e`, Full Regression #3393 / run ID `42558193355` GREEN on that exact commit. This decision documentation update requires its own Full Regression. Next step after verification: finish G5's remaining protocol/rejection, provenance, examples and legacy compatibility reconciliation. No runtime implementation.

@@ -98,6 +98,15 @@ O7 is authoritative for the staged idempotency outcomes:
 
 **G5 owner decision — APPROVED 2026-11-08:** the immutable snapshot, C6 evaluation and C7 decision are distinct logical records with distinct identities. C6 is committed atomically as its own record; C7 may be committed only after the exact C6 evaluation it consumes is committed. C6 and C7 are separate ordered atomic writes within O7's existing decision-evaluation boundary, not additional top-level O7 boundaries and not one shared indivisible write. If C7 fails, the committed C6 evaluation remains unchanged and C7 may be retried against that exact C6 record. Logical field names are approved by G5-S3 as `decision_snapshot_id`, `c6_evaluation_id` and `c7_decision_id`; O8's `evaluation_id` is the generic name for the C6 identity. Physical identity namespaces/uniqueness, canonical payload equality, keys/tables, transaction technology, retry/concurrency mechanics and persistence implementation remain OPEN under G6/G9/G8/G10. Do not write tests for unresolved equality or recovery mechanics.
 
+
+### 5.1 C8 history projection — G5 owner decision (2026-11-09)
+
+**APPROVED logical boundary:** C8 is a derived, descriptive, non-authoritative read projection over committed C6/C7 records. It does not create an independent authoritative history record or write unit. The C8 v0.2 `c8_item_id` is removed as an authoritative domain identity and must not serve as a C8 idempotency key or replay/conflict identity.
+
+The logical source lineage is the exact six-part branch identity plus `decision_snapshot_id`, `c6_evaluation_id` and `c7_decision_id`. Historical/append-only meaning is inherited from immutable source records. Reprojection must not duplicate, mutate or reinterpret C6/C7 decisions. C9 validates the projection against exact source lineage; it does not repair it.
+
+No fourth O7 top-level boundary is introduced. Option B may be considered later as a G8 physical optimization only if needed; any materialized read model must be rebuildable and non-authoritative. A future technical row handle is projection-local, not a domain identity. Physical storage, refresh, query design, canonical serialization/equality and security remain open under G8/G9. G12 remains NOT AUTHORIZED.
+
 ## 6. Atomicity and recovery: what is and is not determined
 
 **Determined by O7:**
@@ -162,7 +171,7 @@ The list does **not** authorize tests that assume null/absence behavior, normali
 
 | Gate | Required contribution | Current status |
 |---|---|---|
-| G5 | Final C6/C7 identity and lineage approval for Stage C | OPEN |
+| G5 | Final Stage C protocol/lineage reconciliation, including C8/C9 rejection/version crosswalk, provenance, examples and legacy compatibility | OPEN; C8 history read/write boundary RESOLVED |
 | G6 | Final observation/assessment identity namespace and lifecycle envelope | OPEN |
 | G9 | Canonical equality details, durable stage states, retry/concurrency/recovery contract | OPEN |
 | G8/G10 | Physical persistence and security design after logical contract | OPEN / downstream |
@@ -174,4 +183,4 @@ G3-037/038 remain BLOCKED on approved G6 identity and G9 replay/conflict semanti
 
 No runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data are changed by this artifact. O6 v0.3 remains frozen. This artifact does not assert anything about deployed Supabase state. It does not close G5/G6/G9 or authorize implementation.
 
-**Next concrete step:** resolve the G5 Stage C identity/atomicity envelope and the remaining G6 identity/lifecycle decisions, then decide the G9 canonical-equality and durable-recovery semantics from those approved contracts. Only after those decisions should conformance tests for the newly decided behavior be authored.
+**Next concrete step:** finish the remaining G5 Stage C protocol/version/rejection crosswalk, O6 provenance alignment, examples and legacy compatibility; resolve remaining G6 identity/lifecycle decisions; then decide G9 canonical equality and durable recovery semantics. The approved C8 projection boundary must be reflected in the final cross-stage contract, but no C8 write/idempotency behavior is to be invented.

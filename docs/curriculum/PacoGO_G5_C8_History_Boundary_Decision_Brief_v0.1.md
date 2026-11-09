@@ -1,6 +1,6 @@
 # PacoGO G5 — C8 History Boundary Decision Brief v0.1
 
-**Status:** owner decision requested; recommendation only; NOT approved  
+**Status:** OWNER-APPROVED logical decision (2026-11-09); documentation only; no implementation authorization  
 **Date:** 2026-11-09  
 **Branch:** `refactor/professional-v1`  
 **Scope:** logical boundary of C8 history items relative to immutable C6/C7 decision records and O7's existing decision-evaluation boundary.  
@@ -16,7 +16,7 @@ The owner must decide which logical meaning applies:
 2. C8 is a **materialized but rebuildable read model** whose contents are derived from immutable C6/C7 history.
 3. C8 creates a **separately persisted authoritative history record** with its own identity and write/replay/conflict lifecycle.
 
-No choice is currently approved. The existing O7 top-level boundaries remain three; this brief does not propose or authorize a fourth top-level boundary.
+**Owner decision (2026-11-09): Option A approved.** C8 is a derived, descriptive, non-authoritative read projection over committed C6/C7 records. `c8_item_id` is removed as an authoritative domain identity. The existing O7 top-level boundaries remain three; no fourth top-level boundary is created.
 
 ## 2. Source-derived constraints
 
@@ -47,7 +47,7 @@ C9 validates the exact branch and snapshot → C6 → C7 → C8 lineage. It is a
 
 ## 3. Options and consequences
 
-### Option A — Derived read projection (recommended)
+### Option A — Derived read projection (OWNER-APPROVED)
 
 **Logical meaning**
 - C8 is a read-only projection calculated from committed C6/C7 records and their immutable source references.
@@ -128,29 +128,27 @@ C9 validates the exact branch and snapshot → C6 → C7 → C8 lineage. It is a
 
 ## 4. Recommendation
 
-**Recommend Option A as the logical contract.** Treat C8 as a descriptive, non-authoritative read projection over committed C6/C7 records. Permit Option B later as a physical optimization only if G8 demonstrates a need; a materialized view/cache must remain rebuildable and non-authoritative.
+**Owner decision — APPROVED 2026-11-09: Option A.** Treat C8 as a descriptive, non-authoritative read projection over committed C6/C7 records. Option B may be considered later only as a G8 physical optimization if a demonstrated need exists; any materialized view/cache must remain rebuildable and non-authoritative. Option C is not selected.
 
 Under this recommendation:
 - C8 does not own an independent durable history-item identity.
-- The C8 v0.2 `c8_item_id` must be removed from the authoritative logical record contract or explicitly qualified as a projection-local read handle, not a domain identity.
-- The exact source tuple and any projection-local handle must not be encoded until G9's canonical equality/serialization rules are approved.
+- The C8 v0.2 `c8_item_id` is removed from the authoritative logical contract. It is not a domain identity, independent idempotency key or C8 write key. A future technical row handle, if required for materialization, must be projection-local and non-authoritative.
+- Logical source lineage is the exact six-part branch identity plus `decision_snapshot_id`, `c6_evaluation_id` and `c7_decision_id`. This does not define canonical serialization, a hash, physical key or namespace; those remain G9/G8 concerns.
 - C8 replay/conflict behavior is inherited from C6/C7; C8 does not create a new idempotency/write boundary.
 - C8 history remains one-branch and descriptive. It does not create mastery, next action, learner-state mutation or automatic advancement.
 - C9 validates that the C8 projection faithfully represents the exact committed source lineage.
 
-This recommendation is an architectural inference from the current source contracts, not a source-derived owner decision.
+This is an explicit owner decision on the logical C8 boundary, grounded in the current source contracts. It does not settle physical materialization, canonical equality/serialization, storage, query implementation or security.
 
-## 5. Explicit questions for owner disposition
+## 5. Decision effect and remaining questions
 
-1. Approve Option A, Option B, or Option C?
-2. If A/B is approved, should `c8_item_id` be removed from the authoritative contract or retained only as a non-authoritative projection-local handle?
-3. If C is approved, explicitly authorize G5 to define its Stage C ordering/write/replay boundary before G9/G8 design proceeds.
+The owner has approved Option A and removal of `c8_item_id` as an authoritative domain identity. No further owner choice is required for the logical C8 read/write boundary.
 
-A partial answer is acceptable; unresolved details remain OPEN.
+Remaining technical work: G5 must reconcile C8/C9 protocol wording and examples; G9 must align stage-attributed rejection/legacy disposition without inventing a C8 write/idempotency contract; G8 may later assess whether a rebuildable non-authoritative materialized read model is warranted. Physical storage, projection refresh, query optimization, canonical serialization and security remain open in their assigned gates.
 
 ## 6. Gate and permission status
 
-- G5: OPEN pending this decision and remaining protocol reconciliation.
+- G5: OPEN for remaining protocol-version/rejection crosswalk, provenance alignment, examples and legacy compatibility. The C8 history read/write boundary is RESOLVED.
 - G6: OPEN.
 - G9: OPEN; canonical equality, physical identity namespace, durable state/recovery and concurrency remain separate decisions.
 - G8/G10: downstream physical persistence/read-model/security design.

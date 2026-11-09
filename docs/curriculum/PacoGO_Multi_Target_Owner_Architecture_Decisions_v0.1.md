@@ -80,6 +80,23 @@ C7 consumes exactly one validated C6 branch result and preserves the exact branc
 
 C8 remains a descriptive projection of exact C6/C7 history. C9 remains a structural chain validator, not a scientific-validity validator. The existing C6 seven gates and C7 action policy are not changed by this record.
 
+### G5-S2 — Stage C C6/C7 record and atomic-write boundary
+
+**Owner decision (2026-11-08):** preserve O7's three top-level idempotency boundaries unchanged:
+1. raw-observation ingestion;
+2. PacoGO target-assessment evaluation/recording;
+3. decision evaluation.
+
+Within O7's existing decision-evaluation boundary, the immutable decision snapshot, C6 evaluation and C7 decision are distinct logical records with distinct identities. C6 and C7 are committed as separate ordered atomic writes:
+
+- The C6 evaluation record is immutable and must be durably committed before a C7 decision consuming it can be committed.
+- The C7 decision record has its own identity and references the exact committed C6 evaluation, including the same six-part branch and snapshot lineage.
+- C7 does not recompute mastery, replace the C6 result or infer/reconstruct missing identity.
+- If C7 fails or is unavailable, the committed C6 evaluation remains unchanged. C7 may later be retried against that exact C6 evaluation without rewriting or rerunning C6.
+- These are two record-level atomic writes inside the existing O7 decision-evaluation boundary. They do not create additional top-level O7 idempotency boundaries, and they are not one shared indivisible C6/C7 write unit.
+
+**Not approved:** physical identity formats/namespaces, field naming, keys/tables, serialization or hashing, transaction technology/layout, retry/backoff, concurrency/locking, outbox/workers, persistence APIs or schema. These remain subject to G6/G9 and downstream G8/G10 design and approval.
+
 ### G6-S1 — Material support-condition change creates a new administration identity
 
 **Owner decision (2026-11-08):** a material change in the actual support condition creates a new task instance, a new learner response episode and a new immutable raw observation.

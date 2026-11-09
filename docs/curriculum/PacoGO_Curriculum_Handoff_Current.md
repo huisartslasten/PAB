@@ -5137,3 +5137,58 @@ Zyon's fraction learning is the product priority. Do not keep producing document
 - Latest verified content commit: `12256e42187071d18aa26a853a7d9c88bbb5ac2a`.
 - Latest verified Full Regression: #3413 / run `42667682449`, **GREEN** on that exact commit.
 - This handoff update is a repository change and requires its own Full Regression on the resulting exact commit before it is considered verified.
+
+
+---
+
+## Current handoff update — 2026-11-09 (G6 field-level repository matrix)
+
+**Branch:** `refactor/professional-v1`; LIVE `main` untouched.
+
+### Verified work in this continuation
+
+- Full Regression #3414 / run `42668139721`: **GREEN** on exact commit `35337d40b66f3d0592ed4b562167af556053cd56`.
+- Created the G6 field-level contract-to-code matrix:
+  `docs/curriculum/PacoGO_G6_Field_Level_Contract_to_Code_Matrix_v0.1.md`.
+- Full Regression #3415 / run `42669734906`: **GREEN** on exact commit `8da41097b620624eef289d5cfe5bf78d91644e92`.
+- Regression #3415 completed all 17 workflow steps, including exact branch/commit verification, dependency and vulnerability checks, curriculum engine regression, architecture tests, maintained Node/Vitest regression, Chromium browser regression and clean-working-tree verification.
+- No runtime code, tests, registry, learner state, schema, persistence, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+### What the field-level matrix establishes
+
+The matrix follows the current shared interaction contract through all eight direct controller consumers. Important current-code findings:
+
+- `task_instance_id` currently receives the supplied catalogue `taskId`; the inspected path does not create a distinct concrete administration identity.
+- The task-definition version is supplied as a literal `0.1` by the inspected controllers.
+- There is no separately named response-episode identity in the current shared contract.
+- Event identity is currently derived from task-instance ID, event type and timestamp.
+- Observation identity is currently derived from task-instance ID and observation timestamp.
+- The observation's `task_id` is populated from `task_instance_id`; the current output carries only the first evidence target ID.
+- The Fraction controller constructs its task instance at controller construction, records presentation and interaction events, and creates one observation on submission.
+- The browser vertical slice validates task lookup and skill binding, but the inspected path does not validate a separate administration/episode identity, complete target membership, or full Learning Interface configuration and renderer provenance.
+- Existing tests establish important within-instance behavior, including submission locking, but do not establish uniqueness across repeated administrations or all the proposed G6 identity/provenance guarantees.
+
+These are traceability findings, not a blanket assertion that every observed absence is an execution defect. The shared contract has eight direct controller consumers, so a future shared-contract change must assess compatibility across them. The first practical implementation can still be deliberately scoped to FR2 if a backward-compatible contract or adapter is justified.
+
+### Current gate status
+
+- G5 bounded logical crosswalk: RESOLVED for its recorded scope; not every G5 deliverable is thereby closed.
+- G6: OPEN. G6-A cardinality, G6-B identity namespace/uniqueness and Learning Interface/presentation provenance remain candidate recommendations awaiting explicit owner disposition. The field-level matrix is a repository traceability audit, not approval of those candidates.
+- G9: OPEN; canonical equality, replay/conflict and durable recovery remain downstream of approved logical inputs.
+- G12: **NOT AUTHORIZED**. “Ga door” is not approval of candidate contracts and is not implementation authorization.
+- No Supabase change is indicated by this documentation/traceability work.
+
+### Next concrete step — keep the path short and product-focused
+
+1. Reconcile only the G6 logical decisions that genuinely block a safe FR2 learner-facing implementation. Keep physical ID formats, persistence, concurrency and recovery details in their owning gates unless the minimal FR2 slice actually depends on them.
+2. Present the owner with a small, explicit set of material G6 decisions; do not treat candidate recommendations or successful regressions as approval.
+3. Prepare the smallest backward-compatible FR2/Fraction implementation slice using the existing reusable interface and five existing technical demonstrations. Preserve curriculum and evidence boundaries; synthetic demonstrations are not learner evidence.
+4. Once the necessary logical contracts are explicitly dispositioned, request separate, bounded G12 authorization before making runtime changes.
+5. Keep Zyon's fraction learning as the practical priority. Avoid further documentation-only expansion that does not resolve a real implementation blocker.
+
+### Branch, latest verified commit and regression
+
+- Working branch: `refactor/professional-v1`.
+- Latest verified content commit before this handoff update: `8da41097b620624eef289d5cfe5bf78d91644e92`.
+- Latest verified Full Regression before this handoff update: #3415 / run `42669734906`, **GREEN** on that exact commit.
+- This handoff update is a new repository change and requires its own Full Regression on the resulting exact commit. Do not mark the handoff update verified until that run is GREEN.

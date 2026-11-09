@@ -5241,3 +5241,12 @@ Prepare the narrow FR2 implementation authorization package against the existing
 - Latest verified commit before this handoff update: `d34b511f143fcf21d741718e18aec7dd6f93c209`.
 - Latest verified Full Regression: #3416 / run `42670018033`, **GREEN** on that exact commit.
 - This handoff update is part of the new G6 disposition commit and requires Full Regression on that exact resulting commit before it is considered verified.
+
+
+### Verification closure — G6 logical disposition handoff update
+
+- Full Regression #3417 / run `42670649008`: **GREEN** on exact commit `a75e2266b1025585b01e70aa04a81392b5a525fb`.
+- All 17 workflow steps passed, including 59 browser tests and clean-working-tree verification.
+- The G6 logical disposition, the three review addenda, the field-matrix status clarification, dependency-map update and handoff update are therefore verified on that exact commit.
+- Latest verified Full Regression before this verification-only handoff update: #3417 / run `42670649008`, GREEN on `a75e2266b1025585b01e70aa04a81392b5a525fb`.
+- This verification-only handoff update itself requires its own Full Regression on the resulting exact commit.

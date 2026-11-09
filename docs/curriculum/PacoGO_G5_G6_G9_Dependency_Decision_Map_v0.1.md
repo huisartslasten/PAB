@@ -236,9 +236,11 @@ The source-by-source review confirms:
 - C8 v0.2's rejection/quarantine and duplicate/replay wording must be read subject to the owner-approved derived projection boundary. C8 cannot create durable quarantine, a C8 conflict lifecycle or independent identity.
 - C9 v0.2 is a structural validator that reports per-branch, stage-attributed errors; it does not repair or mutate records.
 - C3 v0.2 and the earlier C3 reconciliation retain withdrawn human-coder assumptions and are not approved operational codebooks. New learner-runtime assessment provenance must align to O6's O6/C3 contract version, target-rule version and assessment-engine version; human coder/adjudication references are historical/external only where genuinely present.
-- C6 M1/M2 use of O6 alignment/relation and the non-scored adequacy profile remains an explicit G5 open item. No O6 profile score or automatic M1/M2 mapping is introduced.
+**Historical status note (pre-disposition):** The following source-audit summary originally listed the bounded crosswalk questions as awaiting owner review. That status was accurate before the delegated owner disposition recorded in audit §9; it is superseded for those specific questions by the resolution below. It must not be read as the current status.
 
-G5 remains OPEN for owner review of stage-attributed rejection/C8 diagnostics, operational provenance terminology, C6 M1/M2 consumption, examples and legacy/scalar compatibility. G6/G9 remain OPEN; G12 remains NOT AUTHORIZED. Audit is documentation only and does not change frozen O6 v0.3, runtime, tests, schema, persistence or Supabase.
+- The initial source audit identified C6 M1/M2 use of O6 alignment/relation and the non-scored adequacy profile as requiring an explicit disposition. The subsequent disposition resolves the interpretation without introducing an O6 profile score or automatic M1/M2 mapping.
+
+At the time of the initial audit, G5 was OPEN for owner review of stage-attributed rejection/C8 diagnostics, operational provenance terminology, C6 M1/M2 consumption, examples and legacy/scalar compatibility. **Those bounded logical crosswalk questions are now RESOLVED** by the owner-authorized disposition recorded in audit §9 and summarized in the follow-up section below. This does not close every G5 deliverable or authorize runtime work. G6/G9 remain OPEN; G12 remains NOT AUTHORIZED. The disposition is documentation-only and does not change frozen O6 v0.3, runtime, tests, schema, persistence or Supabase.
 
 ## G5 follow-up — owner-approved logical crosswalk disposition (2026-11-09)
 

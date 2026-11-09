@@ -4866,3 +4866,23 @@ Option B remains a possible future G8 physical optimization only if needed; any 
 **Dependencies:** G5's C8 logical boundary is RESOLVED; G5 remains OPEN for protocol-version/rejection crosswalk, C3/O6 provenance, examples and legacy compatibility. G9 must not define C8-specific authoritative identity/write/idempotency semantics; it retains actual O7-stage equality/recovery/retry/concurrency and C9 validation/disposition alignment. G8 may later assess rebuildable materialization. G6 remains unchanged and OPEN. G12 remains NOT AUTHORIZED. Documentation only; no runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data changes.
 
 Prior baseline: commit `c6c1e299dd0c4e099224bd39f0ca63197619296e`, Full Regression #3393 / run ID `42558193355` GREEN on that exact commit. This decision documentation update requires its own Full Regression. Next step after verification: finish G5's remaining protocol/rejection, provenance, examples and legacy compatibility reconciliation. No runtime implementation.
+
+
+## 150. G5 C8 owner decision — Full Regression verification
+
+### Decision-documentation commit verified
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Owner-decision documentation commit: `8cd8ef014084397b130dbe5604f0e637e237ac1a`.
+- Full Regression #3394 / run ID `42558789377`: **GREEN** on that exact commit.
+- Verified branch and triggering SHA; dependency installation and zero-known-vulnerability check; Agenda/practice ownership boundaries; curriculum engine regression; architecture boundary tests; Double or Nothing runtime regression; maintained Node and Vitest regressions; Chromium installation; fixture server; browser regression; and clean working tree.
+
+### Documentation consistency review
+
+The C8 decision brief, G5/G6/G9 dependency map, G9 logical payload inventory and G9 source-determined stage contract were read back from the branch after commit. They consistently record Option A, remove `c8_item_id` as an authoritative domain identity, preserve the exact six-part branch plus snapshot/C6/C7 lineage, and keep C8 non-authoritative with no independent write/idempotency boundary. The G5 C8 logical boundary is RESOLVED; remaining G5 protocol/rejection, O6 provenance, examples and legacy compatibility work remains OPEN. G6/G9 remain OPEN; G12 remains NOT AUTHORIZED.
+
+### Scope and next step
+
+This was documentation-only. No runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data changed. No implementation authorization was granted. Next: continue G5 source-by-source reconciliation of the remaining protocol-version/rejection crosswalk, C3/O6 provenance alignment, positive/negative/missing/mismatch examples and legacy compatibility. Do not implement.
+
+This handoff verification update itself requires a separate Full Regression on its exact commit.

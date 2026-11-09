@@ -51,7 +51,7 @@ The role labels below identify accountable functions, not named individuals. The
 | G2 | O6 C3 assessment and measurement model | Scientific owner/reviewer | Approved, versioned PacoGO assessment contract: target alignment, response relation, raw process/missingness/NO_RESPONSE, evidence status, objective performance versus quality, quality construct/anchors, assistance and independence rules, contradiction, unknown/insufficient-data behavior, assessment provenance and schema versioning | C3 v0.2 proposal (to be reconciled); consolidated observation/event reconciliation; owner-confirmed support-condition contract; O1 cardinality | PacoGO's single-assessor role is explicit; operational rules, labels and anchors are versioned; unresolved categories/scales and schema conflicts are resolved. No human coder or second-assessor workflow is required or introduced. |
 | G3 | C3 operational assessment-rule verification | Scientific/protocol owner + engineering owner | Versioned rule/decision specification with positive, negative, boundary, missing-data and unknown cases; deterministic test vectors where applicable; explicit provenance and no-inference constraints | G2; task support-condition contract; C3 dimensions and measurement rules fixed | PacoGO's assessment behavior is testable against approved rules; unsupported cases remain unknown/insufficient rather than guessed. This is software/measurement-rule verification, not human inter-rater reliability. Empirical validity remains under G13. |
 | G4 | O9 learner-facing cross-branch product policy | Product owner + project owner | Product decision record and reviewed learner/parent presentation prototypes covering audience, permissions, wording, visual hierarchy, contradictory/insufficient/not-assessed/legacy states and lineage visibility | O2/O3 branch semantics; C8 v0.2 proposal; G1/G2; privacy review | Product explicitly accepts descriptive-only projection constraints. No pooled evidence, cross-branch mastery/action recomputation, unsupported transfer/retention claims or automatic advancement. |
-| G5 | C6–C9 contract reconciliation | Scientific/protocol owner + architecture owner | One reconciled, versioned contract set and crosswalk: C6 seven-gate inputs/outputs and branch identity; C7 exact C6 handoff; C8 branch history and descriptive projection; C9 structural validation; snapshot/version lineage and negative permissions | Approved minimum O5 policy; G2/O6 for target-assessment inputs; accepted O1–O4/O7–O8. O9 is required for learner-facing cross-branch presentation, not for the internal single-branch lineage contract. | Every stage agrees on six-part identity, immutable snapshot/evaluation references, cardinality, eligibility, legacy boundary and error/rejection behavior. No protocol silently expands another's authority. |
+| G5 | C6–C9 contract reconciliation | Scientific/protocol owner + architecture owner | One reconciled, versioned contract set and crosswalk: C6 seven-gate inputs/outputs and branch identity; C7 exact C6 handoff; C8 branch history and descriptive projection; C9 structural validation; snapshot/version lineage; the owner-approved distinct C6/C7 record identities and ordered atomic-write boundary within O7; and consistent negative permissions | Approved minimum O5 policy; G2/O6 for target-assessment inputs; accepted O1–O4/O7–O8. O9 is required for learner-facing cross-branch presentation, not for the internal single-branch lineage contract. | Every stage agrees on six-part identity, immutable snapshot/evaluation references, cardinality, eligibility, legacy boundary and error/rejection behavior. No protocol silently expands another's authority. |
 | G6 | Task definition / attempt / observation identity | Curriculum + interaction architecture owner | Canonical identity and provenance contract distinguishing versioned task definition, task/interface model, administered task instance/attempt, immutable raw observation and within-attempt interaction events | O1/O4/O7; G2; existing interaction-contract and task-model audit | A stable task definition ID is never reused as an attempt ID; one separately administered response episode maps to one immutable observation; retries/events are classified by an explicit administration lifecycle. |
 | G7 | Runtime consumer and legacy compatibility inventory | Engineering owner | Audited inventory of browser pages, controllers, registry/prototype, services, learner-state/history, reports, exports and external consumers; each classified as canonical read/write, legacy read, derived projection or prohibited write | O2/O4; G5/G6; current scalar-path findings | Every scalar consumer and write path has an explicit migration/adapter disposition. Ambiguous multi-target or multi-branch records cannot be collapsed. Historical provenance is not fabricated. |
 | G8 | Persistence and read-model design | Data/architecture owner | Physical logical-to-relational mapping for observation, target assessment, assessment-version provenance, snapshot, branch identity, evaluation, branch history and derived projections; keys, constraints, indexes, versioning, query/read paths and retention | G1, G2, G5, G6, G7 | Design demonstrates one raw observation with multiple assessments without duplicated observations; exact six-field branch uniqueness; append-only history; queryable lineage; no skill-level row substituting for branch authority. |
@@ -98,12 +98,12 @@ Current blockers (reconciled 2026-11-08):
 - G1 / O5: minimum logical scope/window policy approved; remaining ownership, permissions, overlap presentation and retention/deletion decisions remain open for affected product/persistence work.
 - G2 / O6: CLOSED at the logical-contract level on exact owner-approved Operational Assessment Contract v0.3. G3 operational rule verification remains OPEN.
 - G4 / O9: learner-facing cross-branch product policy remains OPEN; it is not a prerequisite for internal single-branch C6→C9 lineage.
-- G5: C6–C9 contract reconciliation, exact Stage C identity/write-unit boundary, cross-stage examples and negative permissions remain OPEN.
-- G6: administration lifecycle, interruption/resume, timeout, identity namespace and final event semantics remain OPEN.
+- G5: the Stage C C6/C7 distinct-record and ordered atomic-write boundary is owner-approved (2026-11-08). G5 remains OPEN for protocol-version reconciliation, O6 input/provenance alignment, cross-stage examples/test vectors, negative permissions and legacy/scalar disposition.
+- G6: the owner-approved logical lifecycle rules (answer edits/retries, explicit restart, abandonment, exact-state interruption/resume, material changes and timeout principle) are recorded. G6 remains OPEN for identity namespace/uniqueness, task-instance/episode cardinality, final C3/O6 reconciliation, policy-specific timeout configuration, lifecycle vocabulary and operational exact-state restoration verification.
 - G7–G11: consumer compatibility, physical persistence, security/privacy and complete conformance/failure-recovery verification remain gated downstream.
 - G12: explicit narrow implementation authorization has NOT been granted.
 
-**Next concrete action:** finish the G5 Stage C lineage/atomicity decision package and G6 lifecycle/identity decision package using the frozen O6 v0.3 contract. Then resolve G9 equality and durable recovery semantics. Do not reopen O6 v0.3 or design learner-facing cross-branch projection as a prerequisite for the internal lineage.
+**Next concrete action:** complete G5's remaining C6–C9 protocol reconciliation, O6 input/provenance alignment, cross-stage examples and negative-permission review; complete G6's remaining identity/cardinality/C3–O6 reconciliation; then resolve G9 canonical equality and durable recovery semantics. The Stage C logical record/write boundary is already owner-approved and must not be reopened without a specific contradiction. Do not reopen frozen O6 v0.3 or make learner-facing cross-branch projection a prerequisite for internal single-branch lineage.
 
 B1-L08 remains blocked until the approved contract supports its target-specific evidence end to end. Existing B1-L01–L07 remain unchanged.
 
@@ -295,9 +295,11 @@ C9 output must be traceable per full six-field branch, with explicit checks, sou
 
 ### 7.11 Cross-stage disposition and remaining G5 closure
 
-The combined C6→C7→C8→C9 lineage is now logically aligned around:
+The combined C6→C7→C8→C9 lineage is organized around:
 
 `six-part branch → immutable snapshot → exact C6 evaluation → exact C7 decision → one-branch C8 history item → per-branch C9 structural result`
+
+**Owner-approved Stage C boundary (2026-11-08):** O7's three top-level idempotency boundaries remain unchanged. Within the existing decision-evaluation boundary, the snapshot, C6 evaluation and C7 decision are distinct immutable logical records with distinct identities. C6 and C7 are separate ordered atomic writes: C7 may commit only after the exact C6 evaluation it consumes has committed. If C7 fails, C6 remains committed and C7 can be retried against that exact C6 record without rerunning or rewriting C6. This is not a fourth O7 boundary and is not one shared indivisible C6/C7 write unit. Physical ID formats, field naming, database keys and transaction mechanics remain open.
 
 Still required before G5 can close:
 - reconcile and approve the C6/C7/C8/C9 candidate protocol versions as one consistent contract set;
@@ -349,6 +351,16 @@ Expected disposition: **candidate-specific C7 evaluation**, not a generic merged
 | N9 | Same raw observation is copied into two raw-observation IDs to represent two targets | Reject duplicate raw cardinality; preserve one source observation with separate target-assessment references |
 | N10 | C8 collection contains an item from another six-part branch | Reject the mixed single-branch history; do not pool states |
 
+#### Stage C partial-failure example — approved logical behavior
+
+1. Snapshot `SN1` is frozen for branch `B`.
+2. C6 evaluation `E1` is committed as an immutable record referencing `SN1` and `B`.
+3. The C7 decision write for `D7-1`, which consumes exactly `E1`, fails before commit.
+4. The committed `E1` remains intact and inspectable. No C7 decision is represented as committed.
+5. A later C7 retry uses the same committed `E1`; it does not rerun C6, create a replacement C6 evaluation or rewrite `E1`.
+
+Expected disposition: **C6 remains committed; C7 remains separately retryable against the exact C6 result.** This is an illustrative logical contract example, not an implementation fixture or a selection of physical recovery mechanics.
+
 #### Missing-input examples
 
 - Missing any one of the six branch fields: canonical branch is incomplete; reject canonical evaluation.
@@ -381,7 +393,8 @@ This is a proposed compatibility boundary, not selection of a canonical adapter,
 
 G5 can close only after:
 1. C6 and C7 contracts explicitly carry the six-part branch identity and exact snapshot/evaluation lineage;
-2. C8/C9 fields and references are reconciled to the same canonical envelope;
+2. the owner-approved distinct C6/C7 identities and separate ordered atomic writes are consistently represented across the contract set, including the rule that C7 consumes the exact committed C6 result and cannot trigger a C6 rewrite/recalculation on retry;
+3. C8/C9 fields and references are reconciled to the same canonical envelope;
 3. O6 supplies the approved target-assessment input/version semantics;
 4. legacy and mismatch/rejection behavior is consistent across all four stages;
 5. negative permissions are explicit and consistent;
@@ -1642,11 +1655,12 @@ The artifact consolidates only requirements already supported by O5/O6 v0.3/O7/O
 - three distinct O7 idempotency boundaries and replay-versus-integrity-conflict outcomes;
 - immutable raw observation per administered response episode, with source event order and lifecycle/missingness preserved;
 - one immutable target assessment per assessment identity, referencing exactly one observation and one existing target; linked correction/reassessment preserves prior history;
-- immutable snapshot, separate C6 evaluation identity and source-aligned distinct C7 decision identity; C7 consumes the exact C6 result;
+- immutable snapshot, separate C6 evaluation identity and distinct C7 decision identity; C7 consumes the exact committed C6 result;
+- owner-approved Stage C boundary: C6 and C7 are separate ordered atomic record writes within O7's existing decision-evaluation boundary; a failed C7 write leaves C6 committed and retryable C7 must reuse that exact C6 record;
 - stage-local atomicity and durable inspectable state, without treating the complete observation-to-decision chain as one transaction;
 - O5 UTC/half-open event-time and separate availability-cutoff semantics.
 
-The artifact explicitly leaves unresolved: G5 Stage C identity and atomic write-unit approval; G6 identity namespaces and remaining lifecycle; null/absence, normalization, collection ordering and timestamp precision; stage-state vocabulary, uncertain-commit recovery, retry/concurrency and persistence timeout mechanics. G8/G10 physical persistence/security and G12 implementation authorization remain downstream prerequisites.
+The artifact no longer treats the G5 Stage C identity distinction or logical atomic-write boundary as unresolved: those are owner-approved on 2026-11-08. It still leaves unresolved G5's final cross-protocol field/provenance reconciliation and test vectors; G6 identity namespaces and remaining lifecycle/cardinality reconciliation; G9 null/absence, normalization, collection ordering, timestamp precision, stage-state vocabulary, uncertain-commit recovery, retry/concurrency and persistence timeout mechanics. G8/G10 physical persistence/security and G12 implementation authorization remain downstream prerequisites.
 
 **No implementation:** no runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data changed. G9 remains OPEN; G3-037/038 remain BLOCKED; G3-039 logical lineage is fixture-tested but durable recording remains open.
 

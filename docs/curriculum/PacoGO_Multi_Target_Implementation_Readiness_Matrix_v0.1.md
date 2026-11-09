@@ -395,10 +395,10 @@ G5 can close only after:
 1. C6 and C7 contracts explicitly carry the six-part branch identity and exact snapshot/evaluation lineage;
 2. the owner-approved distinct C6/C7 identities and separate ordered atomic writes are consistently represented across the contract set, including the rule that C7 consumes the exact committed C6 result and cannot trigger a C6 rewrite/recalculation on retry;
 3. C8/C9 fields and references are reconciled to the same canonical envelope;
-3. O6 supplies the approved target-assessment input/version semantics;
-4. legacy and mismatch/rejection behavior is consistent across all four stages;
-5. negative permissions are explicit and consistent;
-6. all cross-stage contract examples and test vectors are agreed.
+4. O6 supplies the approved target-assessment input/version semantics;
+5. legacy and mismatch/rejection behavior is consistent across all four stages;
+6. negative permissions are explicit and consistent;
+7. all cross-stage contract examples and test vectors are agreed.
 
 A preliminary crosswalk is not implementation authorization and does not close G5.
 
@@ -1604,14 +1604,14 @@ The eleven items in the G9 logical candidate were checked against O7/O8, O6 v0.3
 - G6/O1/O6 determine one immutable observation per separately administered response episode; stable observation identity; source event ordering; one stable target-assessment identity per assessment; exactly one observation and one target per assessment; and new linked identity for an actual reassessment under changed rule/contract/engine.
 - O5 determines UTC instants, half-open event-time membership, separate assessment-availability cutoff and immutable snapshots.
 - O8 determines the C6 evaluation identity and requires C7 to preserve the exact branch, snapshot and C6 evaluation identity.
-- C8/C9 v0.2 plus the preliminary G5 crosswalk specify a distinct C7 decision identity referencing the exact C6 evaluation. This is the source-aligned candidate, but G5 remains OPEN and must approve the final cross-stage envelope.
+- C8/C9 v0.2 plus the G5 crosswalk specify a distinct C7 decision identity referencing the exact C6 evaluation. The owner has now approved the distinct C6/C7 logical identities and separate ordered atomic writes within O7's existing decision-evaluation boundary. Final field names and exact cross-stage references/provenance remain G5 reconciliation work.
 
 ### Still open or dependent
 
 - Stage A/B identity namespace and uniqueness scope.
 - Final exact Stage A canonical raw-observation field envelope, pending G6 lifecycle reconciliation.
 - Canonical equality details: absent/null, scalar/string normalization, collection ordering by field, timestamp precision, contract-version compatibility and transport metadata exclusions. Source event order and UTC instant semantics are already fixed and must be preserved.
-- Final Stage C C6/C7 identity envelope approval under G5.
+- Final Stage C field naming and exact cross-stage references/provenance under G5; the logical identity distinction and ordered atomic-write boundary are owner-approved.
 - Stage-state vocabulary/transitions; uncertain-commit resolution; retry policy; concurrency/in-progress response behavior; operation-timeout recovery.
 - Learner administration timeout remains a separate G6 policy; elapsed time must not silently terminate an episode.
 - Physical keys, transactions, locking/recovery implementation and security integration remain G8/G10 work.
@@ -1620,7 +1620,7 @@ G3-037/038 remain blocked. G3-039 logical lineage remains fixture-tested; durabl
 
 ### Next concrete step
 
-Reconcile the Stage C candidate to distinguish the C6 `evaluation_id` from the C7 `decision_id` that references it, then draft field-by-field logical payload inventories for Stages A/B/C. Do not decide serialization/normalization or implement persistence.
+Align the G9 candidate with the owner-approved distinct C6 evaluation and C7 decision records and their ordered atomic-write boundary. Finalize only the source-grounded field names/references that can be reconciled across O8 and C6/C7/C8/C9; keep physical namespaces, canonicalization and persistence mechanics open. Do not implement persistence.
 
 
 ## 8.69 G9 stage payload field inventory and C6/C7 identity reconciliation
@@ -1637,7 +1637,7 @@ Reconcile the Stage C candidate to distinguish the C6 `evaluation_id` from the C
 - C6 evaluation identity (`evaluation_id` in O8; `c6_evaluation_id` in the C8/C9 crosswalk);
 - C7 decision identity (`c7_decision_id` in the C8/C9 crosswalk), referencing the exact C6 evaluation.
 
-This is the source-aligned candidate direction. G5 remains OPEN and must approve final naming and cross-stage envelope. No claim that G5 has closed.
+The distinct C6 evaluation and C7 decision identities, and their separate ordered atomic-write boundary within O7's existing decision-evaluation domain, are owner-approved. G5 remains OPEN for final field naming, exact cross-stage references/provenance and protocol reconciliation. No claim that G5 has closed.
 
 **Still unresolved:** G6 observation/assessment identity namespaces and complete lifecycle; canonical absent/null, scalar/string, collection and timestamp equality; G9 durable stage states, uncertain-commit recovery, retries and concurrency; G8/G10 physical persistence/security.
 

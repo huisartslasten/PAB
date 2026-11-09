@@ -4886,3 +4886,22 @@ The C8 decision brief, G5/G6/G9 dependency map, G9 logical payload inventory and
 This was documentation-only. No runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data changed. No implementation authorization was granted. Next: continue G5 source-by-source reconciliation of the remaining protocol-version/rejection crosswalk, C3/O6 provenance alignment, positive/negative/missing/mismatch examples and legacy compatibility. Do not implement.
 
 This handoff verification update itself requires a separate Full Regression on its exact commit.
+
+
+## 151. G5 C8 decision — handoff verification regression
+
+### Verification
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Handoff commit `3d1c0b5f04bafaeacc747feddb263d643f5120b3`: Full Regression #3395 / run ID `42560647963`: **GREEN** on that exact commit.
+- All workflow steps passed: exact branch/SHA guard, dependency installation, zero-known-vulnerability check, Agenda/practice ownership boundaries, curriculum engine regression, architecture boundary tests, Double or Nothing runtime regression, maintained Node and Vitest regressions, Chromium installation, fixture server, browser regression and clean-working-tree verification.
+
+### Current project position
+
+The approved C8 logical boundary remains RESOLVED: derived, descriptive, non-authoritative projection over committed C6/C7 records; no authoritative `c8_item_id`, independent C8 write/idempotency boundary or fourth O7 top-level boundary. The decision and dependency updates are recorded in the branch documentation and verified by Full Regression #3394; this handoff verification is verified by #3395.
+
+Remaining work is G5 source-by-source reconciliation: protocol-version and stage-attributed rejection crosswalk; C3/O6 provenance alignment; positive, negative, missing and mismatch examples; and legacy/scalar compatibility. G6 and G9 remain OPEN. G12 remains NOT AUTHORIZED. No runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data changes are authorized by these decisions.
+
+### Next concrete step
+
+Resume G5 with a source-by-source protocol/rejection crosswalk across C6 v0.1, C7 v0.2, C8 v0.2, C9 v0.2 and frozen O6 v0.3. Separate direct source statements from unresolved or conflicting wording; attribute every rejection to its owning stage and do not invent shared behavior. Then reconcile provenance, examples and legacy compatibility. No implementation.

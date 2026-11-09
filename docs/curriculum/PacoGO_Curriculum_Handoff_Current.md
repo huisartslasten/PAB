@@ -4781,7 +4781,7 @@ Branch: `refactor/professional-v1`; LIVE `main` untouched. Latest verified commi
 - Prior verified baseline: commit `efc860bf678927022c2d8d9a3bff931d49239f6f`, Full Regression #3388 / run ID `42556057022`: **GREEN**.
 - Documentation reconciliation commit: `4d6c8f37e83fb382f70032e4e2d98ab6dfc6e932`.
 - Full Regression #3389 / run ID `42556670623`: **GREEN** on that exact commit. Branch/SHA guard, dependency/vulnerability checks, ownership boundaries, curriculum engine, architecture, Double or Nothing, Node, Vitest, Chromium, fixture server, browser regression and clean working-tree verification all passed.
-- The handoff verification update below is a documentation-only follow-up and requires its own Full Regression.
+- Full Regression #3390 / run ID `42557051176`: **GREEN** on exact handoff commit `6a2f4b6e5b72e8bd5edc0f79ca09554e88b87fd6`, including all required checks through browser regression and clean working tree.
 
 ### Read-only reconciliation findings
 
@@ -4809,3 +4809,31 @@ The G9 source-determined contract previously said G5 had not decided whether C6/
 This was a documentation/source-reconciliation change only. No runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data changed. G5/G6/G9 remain OPEN; G12 remains NOT AUTHORIZED.
 
 Next concrete step: prepare the owner decision brief for the C8 history boundary, grounded in the exact C8 v0.2 text and O7's three existing boundaries. Present the derived-read-model and separately persisted-record alternatives, consequences for `c8_item_id` and replay/conflict semantics, and a recommendation without recording it as approved. Do not implement.
+
+
+## 147. G5 C8 history boundary — owner decision brief prepared
+
+### Source reconciliation baseline
+
+- C6 v0.1 §8 and C7 v0.2 §8 define distinct immutable C6/C7 records and separate ordered atomic writes within O7's existing decision-evaluation boundary.
+- C8 v0.2 §§1–2 and §10 describe C8 as descriptive: it consumes committed C6/C7 outputs and does not create mastery, select actions or mutate learner state.
+- C8 v0.2 §§5.2, 6 and 9 nevertheless define a stable `c8_item_id`, append-only history items, and replay/conflict behavior.
+- C9 v0.2 §§5.5–6 and §10 validates the exact snapshot → C6 → C7 → C8 lineage and returns structural validation results; it does not repair records or create decisions.
+- G5 map §3 and §5 retain the C8 history read/write boundary as an owner decision. No fourth top-level O7 boundary is approved.
+
+### Decision brief
+
+Created `PacoGO_G5_C8_History_Boundary_Decision_Brief_v0.1.md` with three logical alternatives: derived read projection, rebuildable/materialized read model, or separately persisted authoritative C8 history record. It explains the consequences for `c8_item_id`, append-only history, replay/conflict handling, failure/recovery, C9 validation and O7 boundaries.
+
+**Recommendation only — NOT an owner decision:** define C8 as a descriptive, non-authoritative read projection of committed C6/C7 records. Any later materialization should be a rebuildable G8 read-model/cache choice, not an independent authoritative C8 write unit. C8 replay/conflict should inherit the immutable C6/C7 source-record semantics. Do not assign `c8_item_id` an independent durable identity or idempotency role; if a read model needs a row handle, its projection-local nature and derivation must be explicitly specified without inventing the still-open canonical serializer.
+
+The owner has not yet approved this recommendation. G5 remains OPEN; G6/G9 remain OPEN; G12 remains NOT AUTHORIZED. No runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Verification
+
+- Prior handoff commit `6a2f4b6e5b72e8bd5edc0f79ca09554e88b87fd6`: Full Regression #3390 / run ID `42557051176` **GREEN** on exact commit.
+- The decision-brief and handoff documentation commit requires its own Full Regression.
+
+### Next step
+
+Present the recommendation and alternatives for explicit owner disposition. Until approved, retain the C8 boundary as OPEN and do not change C8/C9 protocols or implement any persistence/read-model behavior.

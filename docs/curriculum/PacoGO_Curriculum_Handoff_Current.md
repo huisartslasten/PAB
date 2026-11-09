@@ -4832,7 +4832,7 @@ The owner has not yet approved this recommendation. G5 remains OPEN; G6/G9 remai
 ### Verification
 
 - Prior handoff commit `6a2f4b6e5b72e8bd5edc0f79ca09554e88b87fd6`: Full Regression #3390 / run ID `42557051176` **GREEN** on exact commit.
-- The decision-brief and handoff documentation commit requires its own Full Regression.
+- Full Regression #3391 / run ID `42557216641`: **GREEN** on exact decision-brief commit `58703ef599e5d2bcec8a9172b27576c3d9b0f4cc`. Branch/SHA guard, dependency/vulnerability checks, ownership boundaries, curriculum engine, architecture, Double or Nothing, Node, Vitest, Chromium, fixture server, browser regression and clean-working-tree verification all passed.
 
 ### Next step
 

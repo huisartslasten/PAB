@@ -4631,3 +4631,56 @@ The verified runs passed the required curriculum-engine, architecture-boundary, 
 **Next concrete step:** continue the G5 cross-protocol reconciliation from the owner-approved C6/C7 boundary. Compare C6, C7, C8 and C9 field-by-field for exact inputs, outputs, branch/snapshot/evaluation/decision references, protocol provenance and rejection behavior. Record only source-supported agreements; keep unresolved names and mechanics open. Then finish G6 identity/cardinality reconciliation before freezing G9. Do not implement runtime or persistence and do not modify Supabase.
 
 Branch: `refactor/professional-v1`; LIVE `main` untouched. The latest verified pre-handoff commit is `53a32f2cd02623afd5241f93a7bbd0a16a298457`, Full Regression #3378 GREEN. This handoff amendment itself requires Full Regression on its resulting commit.
+
+## 144. G5 cross-protocol reconciliation audit after Stage C approval
+
+### Read-only comparison completed
+
+Compared the current C6 v0.1, C7 v0.2, C8 v0.2, C9 v0.2 and G9 candidate against the owner-approved G5 Stage C boundary and O7/O8.
+
+Confirmed common logical requirements:
+- C6 owns the seven-gate mastery evaluation and five existing outcomes; its immutable evaluation record carries one complete six-part branch, exact snapshot, consumed observation/target-assessment references, protocol provenance and gate trace.
+- C7 consumes the exact committed C6 result, preserves branch/snapshot/evaluation lineage, keeps prerequisite and next-development ordering separate, and owns a distinct decision identity and decision trace.
+- C8 consumes committed C6/C7 outputs descriptively. Its proposal names `decision_snapshot_id`, `c6_evaluation_id`, `c7_decision_id` and `c8_item_id`.
+- C9 validates the exact six-part branch and snapshot → C6 → C7 → C8 lineage and rejects missing/mismatched references rather than repairing them.
+
+Recorded in the existing `PacoGO_G5_G6_G9_Dependency_Decision_Map_v0.1.md` as unresolved G5 reconciliation items:
+1. C6/O8 uses generic `evaluation_id`; C8/C9/G9 use `c6_evaluation_id`. C7's own protocol describes its identity generically while C8/C9 use `c7_decision_id`. Final logical field naming/uniqueness scope is not yet owner-approved.
+2. C7's candidate-action list uses `HOLD_FOR_MORE_EVIDENCE`, while some decision-flow prose uses `HOLD`; C8 stores the exact C7 `next_action`. Do not silently normalize.
+3. C7's first vertical-slice example still uses claim-keyed `mastery_state_by_claim`. This is explicitly qualified as a non-canonical prototype; it cannot satisfy the six-part branch/snapshot/evaluation envelope or be used as the canonical adapter implementation spec. G5/G7 must resolve adapter ownership and compatibility.
+4. C8 is described as a descriptive projection of committed C6/C7 history, but its proposal also defines stable `c8_item_id`, append-only history items and replay/conflict behavior. Whether this is a derived read projection or a separately persisted record/write unit remains open. Do not infer a fourth O7 boundary.
+5. C8/C9 mention coder/round/adjudication provenance where relevant. O1/O6 keep PacoGO as the single operational assessor and exclude human coder/adjudication workflows from learner runtime. G5 must scope such provenance to genuine historical/external records if applicable; no second-assessor learner workflow is introduced.
+6. C6/C7/C8/C9 protocol versions and missing/mismatch/legacy rejection behavior still need one consistent approved crosswalk.
+
+These are source-reconciliation findings, not additional owner decisions. C6 mastery gates, C7 action policy, C8 descriptive-only authority, C9 structural-only authority and frozen O6 v0.3 remain unchanged.
+
+### Additional contract clarifications
+
+- Corrected C6 protocol section numbering after adding its approved Stage C record boundary.
+- Added an explicit C7 warning that its claim-keyed first vertical slice is a prototype, not a canonical branch-safe adapter contract.
+- No C8/C9 protocol edit was necessary for the already explicit snapshot/C6/C7 references; their remaining status is proposal/owner-review, not implementation approval.
+
+### Commits and Full Regression
+
+- C6 section-number correction: commit `dbeecf98e90bdab165b2059f9c41ae4a599be7f3`; Full Regression #3380: **GREEN** on exact commit.
+- C7 prototype-slice qualification: commit `92f2fec37254f0b2b7ce68f43dcaf76a86f7077e`; Full Regression #3381: **GREEN** on exact commit.
+- G5 cross-protocol audit findings: commit `35051446fd7cb426b0df98066c0554ff33065bff`; Full Regression #3382: **GREEN** on exact commit.
+
+All required regression steps passed, including browser regression and clean-working-tree verification. These changes were documentation-only. No runtime, tests, registry, learner state, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Next owner decision proposed — not yet approved
+
+The C8/C9 crosswalk already uses these explicit logical names:
+- `decision_snapshot_id`;
+- `c6_evaluation_id`;
+- `c7_decision_id`.
+
+**Recommendation:** standardize the C6–C9 logical field names on those three names, and treat O8's `evaluation_id` as the generic description of the C6 evaluation identity rather than a second competing field name. This is only logical field naming; it does not choose physical IDs, keys, serializers or storage.
+
+Do not record this recommendation as an owner decision until explicitly approved. The C8 derived-versus-persisted history boundary and other audit findings remain separate open decisions.
+
+### Current gate status and next step
+
+G5 remains OPEN for the six reconciliation items above. G6 remains OPEN for identity namespace/uniqueness, task-instance/episode cardinality, C3/O6 reconciliation, policy-specific timeout configuration, lifecycle vocabulary and operational exact-state restoration. G9 remains OPEN for canonical equality, payload envelopes, stage-state vocabulary, uncertain-commit recovery, retry and concurrency. G8/G10 and G12 remain downstream; G12 implementation authorization is not granted.
+
+Branch: `refactor/professional-v1`; LIVE `main` untouched. Latest verified pre-handoff commit: `35051446fd7cb426b0df98066c0554ff33065bff`, Full Regression #3382 GREEN. This handoff amendment itself requires Full Regression on its resulting commit.

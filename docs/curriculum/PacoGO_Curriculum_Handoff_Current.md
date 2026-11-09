@@ -4778,9 +4778,10 @@ Branch: `refactor/professional-v1`; LIVE `main` untouched. Latest verified commi
 ### Verification baseline
 
 - Branch: `refactor/professional-v1`; LIVE `main` untouched.
-- Latest verified pre-audit commit: `efc860bf678927022c2d8d9a3bff931d49239f6f`.
-- Full Regression #3388 / run ID `42556057022`: **GREEN** on that exact commit, including branch/SHA guard, dependency/vulnerability checks, ownership boundaries, curriculum engine, architecture, Double or Nothing, Node, Vitest, Chromium, fixture server, browser regression and clean working tree.
-- This documentation reconciliation commit requires its own Full Regression.
+- Prior verified baseline: commit `efc860bf678927022c2d8d9a3bff931d49239f6f`, Full Regression #3388 / run ID `42556057022`: **GREEN**.
+- Documentation reconciliation commit: `4d6c8f37e83fb382f70032e4e2d98ab6dfc6e932`.
+- Full Regression #3389 / run ID `42556670623`: **GREEN** on that exact commit. Branch/SHA guard, dependency/vulnerability checks, ownership boundaries, curriculum engine, architecture, Double or Nothing, Node, Vitest, Chromium, fixture server, browser regression and clean working-tree verification all passed.
+- The handoff verification update below is a documentation-only follow-up and requires its own Full Regression.
 
 ### Read-only reconciliation findings
 

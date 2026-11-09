@@ -131,7 +131,7 @@ This is a logical record/ordering decision within O7's existing decision-evaluat
 
 **Still open:** final field names and physical identity namespace/uniqueness, canonical payload equality details, physical keys/tables, transaction technology, retry/concurrency mechanics and persistence implementation. These are not defined by this protocol amendment.
 
-## 8. Technische contractgrens
+## 9. Technische contractgrens
 
 De C6-engine mag een deterministische kandidaatuitkomst berekenen uit expliciet aangeleverde assessmentgegevens.
 

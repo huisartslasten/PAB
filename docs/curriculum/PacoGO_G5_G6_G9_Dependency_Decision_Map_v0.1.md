@@ -239,3 +239,20 @@ The source-by-source review confirms:
 - C6 M1/M2 use of O6 alignment/relation and the non-scored adequacy profile remains an explicit G5 open item. No O6 profile score or automatic M1/M2 mapping is introduced.
 
 G5 remains OPEN for owner review of stage-attributed rejection/C8 diagnostics, operational provenance terminology, C6 M1/M2 consumption, examples and legacy/scalar compatibility. G6/G9 remain OPEN; G12 remains NOT AUTHORIZED. Audit is documentation only and does not change frozen O6 v0.3, runtime, tests, schema, persistence or Supabase.
+
+## G5 follow-up — owner-approved logical crosswalk disposition (2026-11-09)
+
+Source decision: §9 of `PacoGO_G5_C6_C7_C8_C9_Protocol_Rejection_Crosswalk_Audit_v0.1.md`. Full Regression #3401 / run ID `42612779144` is GREEN on exact audit-decision commit `a207ed82b49d1ee456590bfd7b8d11dc8e77148e`.
+
+The owner delegated the bounded logical decisions to the project assistant. The resulting conservative disposition is:
+
+- **Stage ownership:** each producer validates its own record; C6 owns mastery inference, C7 owns pedagogical candidate action, C8 is a non-authoritative projection containing only structurally eligible source chains, and C9 reports cross-stage structural diagnostics with stage/record attribution. Structural failures are never converted into mastery outcomes or C7 hold actions. C8 has no durable quarantine, rejection ledger, independent identity or idempotency lifecycle.
+- **Operational provenance:** new target assessments retain the O6/C3 assessment-contract version, target-rule version and assessment-engine version, plus exact O6-required task, registry, scoring and source provenance. Human coder/adjudication metadata is historical/external only when actually present and relevant. C3 proposal v0.2 is not silently promoted to canonical operational codebook.
+- **C6 M1/M2:** M1 is an explicit claim-specific relevance judgement informed by target mapping, task alignment, response relation and completed target rule; no single label automatically passes it. M2 inspects O6's non-scored adequacy dimensions contextually; no composite score or universal threshold is introduced. Unavailable necessary inputs remain unassessable under C6's existing outcome order. The seven gates are unchanged.
+- **Examples:** positive, negative, missing, task-misalignment, structural-lineage mismatch and late/legacy examples in audit §6 are approved as logical illustrations, not executable fixtures.
+- **Legacy/scalar:** historical payloads and scalar/array shapes remain unchanged and are interpreted only under their original version. No inferred/backfilled provenance, coercion, automatic array conversion or mixed legacy/canonical validation. Any future adapter needs a separate explicit design and approval.
+
+**G5 status:** LOGICAL CROSSWALK RESOLVED for this bounded scope. This does not mean runtime-ready protocol revisions or executable acceptance tests are approved. The versioned C6/C7/C8/C9 proposals are not silently rewritten by this decision.
+
+**Dependencies remain:** G6 and G9 OPEN for identity, lifecycle, canonical equality, serialization, retry/concurrency and recovery. O6 v0.3 remains frozen. C8 Option A remains controlling. G12 remains NOT AUTHORIZED. No runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data changed. No implementation authorization is implied.
+

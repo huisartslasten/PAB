@@ -55,6 +55,26 @@ The owner approved the following logical boundary:
 
 This decision settles the logical Stage C record/write-unit boundary. It does **not** select physical IDs, field names, database keys/tables, transaction technology, serialization/hash formats, retry mechanics, locking, or persistence implementation. Those remain assigned to the relevant G5/G9/G8/G10 decisions.
 
+### G5 cross-protocol reconciliation findings — read-only audit (2026-11-08)
+
+The current C6/C7/C8/C9 documents share the following source-supported requirements:
+
+- **C6:** seven existing mastery gates and five existing outcomes; the immutable evaluation record carries the complete six-part branch, exact snapshot, exact consumed observation/target-assessment references, C6 version provenance and gate trace.
+- **C7:** consumes the exact committed C6 result; preserves the same six-part branch and snapshot/evaluation lineage; keeps prerequisite and next-development ordering separate; records its own decision identity, candidate set, decision trace and action-policy provenance.
+- **C8:** consumes committed C6/C7 outputs descriptively. Its history item carries the exact six-part branch, `decision_snapshot_id`, `c6_evaluation_id`, `c7_decision_id`, exact C6/C7 outputs and version/provenance references.
+- **C9:** validates the same six-part branch and exact snapshot → C6 → C7 → C8 lineage, rejects mismatches and does not repair missing identity.
+
+The following are **genuine G5 reconciliation items**, not owner-approved decisions. Preserve them as open until the source contracts are reconciled:
+
+1. **Identity field naming:** O8/C6 uses `evaluation_id`; C8/C9 and the G9 crosswalk use `c6_evaluation_id`. C8/C9 use `c7_decision_id`, while the C7 protocol currently describes its own identity generically. Final logical field names and uniqueness scopes must be consistent; physical ID formats remain downstream.
+2. **C7 HOLD vocabulary:** the candidate-action list defines `HOLD_FOR_MORE_EVIDENCE`, while parts of the C7 decision flow use the shorter `HOLD`. C8 stores the exact C7 `next_action`. Determine whether `HOLD` is explanatory shorthand or an actual distinct result; do not silently normalize it.
+3. **C7 adapter envelope and ownership:** the first vertical-slice example still shows `mastery_state_by_claim`. The C7 protocol now explicitly qualifies this as a non-canonical claim-keyed prototype, because it lacks the complete six-part branch/snapshot/evaluation identity. G5/G7 must reconcile the canonical adapter contract and existing duplicate adapter paths without selecting a runtime path by inference.
+4. **C8 history write/read boundary:** C8 is defined as a descriptive projection of committed C6/C7 history, but its proposal also defines a stable `c8_item_id`, append-only history items and replay/conflict behavior. Clarify whether C8 is a derived read projection of Stage C or a separately persisted history record/write unit. Do not assume a fourth top-level O7 idempotency boundary or choose physical storage by convenience.
+5. **C3 provenance scope:** C8/C9 mention coder, coding-round or adjudication provenance “where relevant”. The owner-approved O1/O6 direction keeps PacoGO as the single operational assessor and excludes human coder/adjudication workflows from the learner runtime. Reconcile those fields as historical/external provenance where genuinely applicable, or otherwise remove the ambiguity; do not introduce a second-assessor learner workflow.
+6. **Version and rejection crosswalk:** approve the C6/C7/C8/C9 protocol versions as one set and ensure missing, mismatched, legacy and invalid-state outcomes are consistent. C8/C9 v0.2 remain proposals, not implementation approval.
+
+These findings do not change C6 mastery gates, C7 action policy, C8 descriptive-only authority, C9 structural-only authority or O6 v0.3. They do not authorize runtime, tests, schema, SQL/RPC/RLS or Supabase changes.
+
 ### G5 items not blocking internal single-branch lineage
 
 O9/G4 learner-facing cross-branch presentation remains separate. It is required before that optional product presentation is designed/shipped, but the matrix explicitly says it is not required to approve the internal single-branch C6→C9 lineage.
@@ -100,6 +120,7 @@ G6 event-order and target-assessment fixture tests are useful evidence, but do n
 | Stage B assessment identity scope | G6 | Blocked on G6 namespace approval |
 | Stage B assessment payload/provenance envelope | O6 v0.3 + G5/G6 | Preserve O6 v0.3; reconcile exact field/version envelope |
 | Stage C final C6/C7 field names, identity uniqueness scopes and complete immutable payload envelopes | G5/G6/G9 | Logical distinction and ordered atomic-write boundary are owner-approved; final naming/namespace and payload details remain open |
+| C8 history-item identity and derived-read-model versus separately persisted-record boundary | G5/G8/G9 | Logical descriptive-only role is defined; record/write-unit and persistence relationship to Stage C remain unresolved |
 | Absent vs explicit null | G9 | Genuine G9 contract decision; not specified by current sources |
 | Scalar/number/string normalization | G9 | Genuine G9 contract decision; not specified by current sources |
 | Collection ordering/set semantics by field | G9, respecting G6 event order | Genuine G9 contract decision; event source order itself is already fixed |

@@ -5089,3 +5089,51 @@ G6-B is a **candidate recommendation only**, not an owner-approved decision. G6-
 - Latest verified content commit before this handoff update: `1965ef105fb6f83207fc4a81be2c0e2593121067`.
 - Latest verified Full Regression: #3410 / run ID `42650206429`, GREEN on that exact commit.
 - This handoff update is itself a repository change. Its resulting commit requires a fresh Full Regression; do not claim the handoff update verified until that run is GREEN on its exact commit.
+
+
+---
+
+## Current handoff update — 2026-11-09 (G6 provenance and repository traceability)
+
+**Branch:** `refactor/professional-v1`; LIVE `main` untouched.
+
+### Verified work in this continuation
+
+- G6 Learning Interface / presentation provenance review:
+  `docs/curriculum/PacoGO_G6_Learning_Interface_Presentation_Provenance_Review_v0.1.md`
+  - Full Regression #3412 / run `42653450846`: **GREEN** on exact commit `bc5c7db00955465495dbaed50b7a4d364aa79c54`.
+- First concrete G6 contract-to-existing-repository traceability review:
+  `docs/curriculum/PacoGO_G6_Contract_to_Repository_Traceability_Review_v0.1.md`
+  - Full Regression #3413 / run `42667682449`: **GREEN** on exact commit `12256e42187071d18aa26a853a7d9c88bbb5ac2a`.
+  - All 17 workflow steps passed, including Chromium, local fixture server, browser regression and clean-working-tree verification.
+
+### What the repository traceability establishes
+
+This is not a parallel documentation project: the G6 contracts have now been mapped to the existing Fraction implementation and shared runtime. The review traces the generic Learning Interface contract, Fraction configuration and renderers, controller bridge, FR2 controller and browser vertical-slice runtime.
+
+It identifies concrete questions to resolve before any safe runtime change: explicit administration-start lifecycle, separately named response-episode identity, task-instance identity creation, effective interface configuration provenance, and renderer/presentation provenance. These are findings for contract reconciliation, not automatically confirmed code defects.
+
+### Current gate and implementation boundary
+
+- G6-A task-instance/response-episode cardinality: candidate recommendation; owner disposition still pending.
+- G6-B identity namespace/uniqueness: candidate recommendation; owner disposition still pending.
+- Learning Interface / presentation provenance: candidate recommendation and open questions; owner disposition still pending.
+- G6 remains OPEN; G9 remains OPEN; G12 remains **NOT AUTHORIZED**.
+- No runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data changed in this continuation.
+
+### Practical priority and next work
+
+Zyon's fraction learning is the product priority. Do not keep producing documents without moving toward PacoGO implementation. Continue with the shortest safe path:
+
+1. Read-only audit `pacogo-engine/interaction-contract.js` and all relevant consumers to establish exactly how task-instance identity, events and observations are currently created and used.
+2. Build a concise field-level contract-to-code matrix for the approved/current logical fields across Fraction, Clock, Addition and the A1/B1/FR2 browser slices.
+3. Separate genuinely blocking contract gaps from details that can safely remain deferred. Keep the implementation scope minimal and centered on the existing FR2/Fraction path.
+4. Present only bounded owner decisions that materially block implementation. “Ga door” means continue the investigation; it does not approve candidate contracts or grant G12.
+5. Once the necessary logical contracts are reconciled, request explicit G12 authorization for a minimal FR2/Fraction implementation slice. Do not wait for unrelated theoretical closure, and do not change Supabase unless a real persistence/runtime contract requires it.
+6. Preserve the five existing FR2 technical demonstrations. They are synthetic integration demonstrations, not learner evidence and not proof of learning.
+
+### Verification baseline before this handoff update
+
+- Latest verified content commit: `12256e42187071d18aa26a853a7d9c88bbb5ac2a`.
+- Latest verified Full Regression: #3413 / run `42667682449`, **GREEN** on that exact commit.
+- This handoff update is a repository change and requires its own Full Regression on the resulting exact commit before it is considered verified.

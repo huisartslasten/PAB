@@ -4932,3 +4932,23 @@ Principal findings:
 The audit is a documentation-only draft, not a frozen cross-stage contract or owner decision. G5 remains OPEN for owner review of stage-attributed rejection/C8 diagnostics, operational provenance terminology, C6 M1/M2 consumption, examples and legacy/scalar compatibility. G6/G9 remain OPEN; G12 remains NOT AUTHORIZED. No runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data changed.
 
 Next: obtain owner disposition on the bounded logical choices identified in audit §8. Do not alter frozen O6 v0.3, invent a C3 codebook version, implement runtime or add persistence.
+
+
+## 153. G5 protocol/rejection crosswalk — regression verification
+
+### Verification
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Audit commit `37866c6ff90d7ce8d5ff44605075f34719516633`: Full Regression #3397 / run ID `42563323724`: **GREEN** on that exact commit.
+- Integrated audit + dependency-map + handoff commit `621c24452eb4991f1fab3c9f79e3fd3fc7e9a956`: Full Regression #3398 / run ID `42563358426`: **GREEN** on that exact commit.
+- Both runs passed exact branch/SHA guard, dependency and vulnerability checks, Agenda/practice ownership boundaries, curriculum engine, architecture, Double or Nothing, Node, Vitest, Chromium, fixture server, browser regression and clean-working-tree verification.
+
+### Verified audit state
+
+The audit `PacoGO_G5_C6_C7_C8_C9_Protocol_Rejection_Crosswalk_Audit_v0.1.md` and its dependency-map/handoff references are committed and regression-verified. It remains a source-derived draft for owner review, not a frozen protocol set. It preserves the approved C8 projection boundary and frozen O6 v0.3.
+
+G5 remains OPEN for owner disposition on stage-attributed rejection/C8 projection diagnostics, operational assessment provenance terminology, C6 M1/M2 consumption of O6, and the draft examples/legacy compatibility. G6/G9 remain OPEN; G12 remains NOT AUTHORIZED. No runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Next concrete step
+
+Obtain owner disposition on the bounded choices in audit §8. Only after that should the approved cross-stage wording be incorporated into the protocol documents. Do not infer owner approval from the audit or regression results; do not implement.

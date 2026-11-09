@@ -4952,3 +4952,28 @@ G5 remains OPEN for owner disposition on stage-attributed rejection/C8 projectio
 ### Next concrete step
 
 Obtain owner disposition on the bounded choices in audit §8. Only after that should the approved cross-stage wording be incorporated into the protocol documents. Do not infer owner approval from the audit or regression results; do not implement.
+
+## 154. G5 protocol/rejection crosswalk — handoff verification
+
+### Verification
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Handoff/audit verification commit `1266614c314daa265f80bd799363aa8f39eb35b9`: Full Regression #3399 / run ID `42563484630`: **GREEN** on that exact commit.
+- Verified exact branch and triggering SHA; dependency installation and zero-known-vulnerability check; Agenda/practice ownership boundaries; curriculum engine regression; architecture boundary tests; Double or Nothing; maintained Node and Vitest regressions; Chromium installation; fixture server; browser regression; and clean working tree. All workflow steps completed successfully.
+
+### Current position
+
+The source-derived G5 audit and dependency-map references are committed and verified. The audit remains a draft for owner review, not an approved/frozen cross-stage contract. The C8 Option A decision remains approved and unchanged. Frozen O6 v0.3 remains unchanged.
+
+G5 remains OPEN pending owner disposition on:
+1. stage-attributed rejection and ownership of C8 projection-local diagnostics;
+2. operational assessment provenance terminology versus historical/external coder provenance;
+3. how C6 M1/M2 consume O6's alignment/relation dimensions and non-scored adequacy profile;
+4. the positive, negative, missing and mismatch examples, followed by legacy/scalar compatibility.
+
+G6 and G9 remain OPEN. G12 remains NOT AUTHORIZED. No runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Next concrete step
+
+Obtain explicit owner disposition on the bounded logical choices in audit §8. Once decided, incorporate only approved wording into the relevant protocol and dependency documents, preserve source/version provenance, update this handoff, and run Full Regression on each resulting commit. Do not implement runtime or persistence.
+

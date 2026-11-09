@@ -198,3 +198,85 @@ These are logical examples to expose boundaries, not executable fixtures or appr
 | G9 equality/retry/concurrency/recovery | OPEN | Continue only after G5/G6 logical contracts; no C8-specific idempotency |
 
 **Next concrete step:** owner review the bounded G5 choices in this table, starting with (1) stage-attributed rejection and C8 projection diagnostics, (2) O6 operational provenance versus historical coder provenance, and (3) C6 M1/M2 consumption of the O6 profile. After those are settled, complete the positive/negative/missing/mismatch examples and legacy/scalar compatibility disposition. Do not change the frozen O6 v0.3, curriculum mappings, C6 gates, C7 action policy, runtime, tests, schemas, database or Supabase. G12 remains NOT AUTHORIZED.
+
+## 9. Owner disposition — G5 logical crosswalk decisions (2026-11-09)
+
+**Status: owner-authorized design decisions.** The owner delegated the three bounded choices and the follow-on examples/legacy disposition to the project assistant, with instruction to choose the best course. The following conservative decisions are therefore recorded as the project disposition for G5. They do not approve runtime implementation, persistence, schema changes or changes to frozen source contracts.
+
+### 9.1 Stage-attributed rejection and diagnostics
+
+Adopt a strict separation between source-stage validation, pedagogical decisions, descriptive projection and cross-stage structural validation:
+
+1. **Each producing stage owns validation of its own record.** A stage must not emit a record that violates its own required identity, shape or version contract. A failure at that boundary remains attributed to that stage and is not converted into a learner outcome or pedagogical action.
+2. **C6 owns mastery inference only.** Structural input/lineage failures are not C6 mastery outcomes. C6's five outcomes remain unchanged.
+3. **C7 owns candidate next-action selection only.** HOLD_FOR_MORE_EVIDENCE remains a pedagogical candidate action for insufficient/unusable decision-policy inputs. It is not a structural rejection code and must not conceal a broken identity or lineage reference.
+4. **C8 is a pure descriptive projection over committed C6/C7 source records.** It includes only structurally eligible source chains. Invalid or unresolved chains are omitted from the valid canonical projection; C8 does not create a durable quarantine, rejection ledger, conflict lifecycle, independent item identity or write/idempotency behavior. The projection must not repair, rewrite or reinterpret source records.
+5. **C9 is the cross-stage diagnostic authority.** It reports structural failures with the exact owning stage, record/reference relationship, and available source identifiers. It does not repair, mutate, quarantine or create learner decisions. C9 diagnostics are validation output, not a new persistent decision record.
+
+No generic REJECTED or HOLD state is introduced across these domains. The existing C8 Option A decision remains controlling; no fourth O7 boundary is created.
+
+### 9.2 Operational assessment provenance
+
+For new PacoGO learner-runtime target assessments, require explicit operational provenance using this version tuple:
+
+- O6/C3 assessment-contract version;
+- target-rule version;
+- assessment-engine version.
+
+Retain the exact registry, task definition/task model, scoring-rule version where applicable, source observation/event references, and relevant event/assessment-availability timestamps required by O6 v0.3.
+
+The phrase C3 codebook/schema version in C8/C9 proposal text is not silently equated with C3 proposal v0.2 and is not accepted as a substitute for the explicit operational tuple. A canonical operational C3 artifact/version must be separately identified and approved before that label is used normatively. C3 v0.2 remains candidate/historical proposal material, not the canonical operational codebook by implication.
+
+New operational learner assessments do not require human coder_id, coding rounds, independent human coder records or adjudication. Preserve those fields only when they genuinely exist in historical/external source records and are necessary to interpret that provenance. Correction/reassessment is represented as a new linked assessment with prior-assessment reference and reason where O6 requires it; do not relabel it as adjudication.
+
+### 9.3 C6 M1/M2 consumption of O6
+
+Keep the existing seven C6 gates and their meanings unchanged. O6 fields are evidence inputs to C6's gate judgements, not new gates or automatic pass/fail switches.
+
+**M1 — relevance to the claim**
+- Consider the exact registry target-to-claim/development mapping, task-instance alignment, response relation, and completed target-specific O6 rule together.
+- ALIGNED and DIRECT are relevant supporting facts, not sufficient conditions by themselves for M1 to pass.
+- MISALIGNED, UNCLEAR, non-direct response relation, missing target mapping or an incomplete/unavailable target rule cannot be silently treated as positive target-relevant evidence. Preserve the actual assessment state and rationale.
+- M1 remains an explicit claim-specific relevance judgement; no single O6 label is an automatic M1 verdict.
+
+**M2 — technical and content reliability/quality**
+- Inspect O6's non-scored adequacy profile in its component dimensions: capture integrity, response interpretability, scoring validity, administration fidelity, and source/provenance integrity.
+- Interpret applicable dimensions in the context of the target, task and intended inference. No numeric/ordinal composite, universal threshold or automatic pass/fail mapping is introduced.
+- A demonstrated defect that undermines the trustworthiness or interpretability of the evidence can cause M2 to fail, with an explicit rationale. If a necessary adequacy dimension is unavailable, unassessed or unresolved, M2 is not reliably assessable; C6 follows its existing decision order and returns the applicable insufficient/not-assessed outcome rather than inventing a pass.
+- No single profile field automatically passes or fails M2. O6's profile remains non-scored and O6 v0.3 remains frozen.
+
+This interpretation preserves the C6 decision order: unassessed, unresolved contradiction, insufficient/unassessable necessary input, explicit gate failure, then all seven gates plus supporting inference. No mastery threshold or automatic promotion is added.
+
+### 9.4 Logical examples approved; no executable fixtures
+
+Examples P, N, M, X1 and X2, and L in §6 are approved as logical contract illustrations subject to the rules above. They are not test fixtures, scoring algorithms, or learner-runtime acceptance tests. In particular:
+- positive target evidence requires a completed applicable target rule and the pre-specified criterion; correctness alone is not enough;
+- ABSENT requires a valid, aligned opportunity, completed rule and sufficient required material; missing capture is not negative learner evidence;
+- task misalignment is an assessment finding, while cross-stage identity mismatch is a structural validation failure;
+- late assessments cannot be inserted into an earlier immutable snapshot;
+- a positive example never bypasses the seven C6 gates.
+
+### 9.5 Legacy and scalar compatibility disposition
+
+Adopt non-destructive, read-only historical compatibility only:
+
+- Preserve each legacy record's original payload, scalar/array shape, schema/contract/codebook version and provenance exactly as recorded.
+- Interpret a scalar target/coding field only under the historical schema version that defined it. Do not silently promote it to an array, duplicate it across targets, infer missing targets, or treat it as canonical multi-target evidence.
+- Do not backfill missing branch, registry, task, target, assessment, support-event or timestamp provenance from current policy, current registry, task names or approximate dates.
+- Historical C8/C9 records may be read/validated under their own historical protocol versions and must be labelled as historical. They are not canonical six-part v0.2 records.
+- A mixed legacy/canonical chain is not eligible for canonical validation unless a separately approved, explicit, traceable adapter is designed. No such adapter is selected or authorized by this decision.
+- The Pilot_DataSchema v0.2 versus Empirical_Observation_Schema v0.1 cardinality/wire-format conflict remains a G6/G9 schema-contract issue. This disposition authorizes no schema version, migration, coercion, database, SQL/RPC/RLS or Supabase change.
+
+### 9.6 G5 status and boundaries
+
+The bounded logical decisions above close G5's current crosswalk questions for stage attribution, operational provenance vocabulary, M1/M2 interpretation, logical examples and historical/scalar read compatibility. G5 may be marked LOGICAL CROSSWALK RESOLVED for this scope, while any implementation-ready protocol revision and executable contract tests remain separate work requiring their own design and authorization.
+
+G6 and G9 remain OPEN for their respective identity, lifecycle, canonical equality, serialization, retry/concurrency and recovery contracts. C8 remains a non-authoritative projection under Option A. O6 v0.3 remains frozen. G12 remains NOT AUTHORIZED. No runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data is changed or authorized by this decision.
+
+### 9.7 Next sequence
+
+1. Update the G5/G6/G9 dependency map and current handoff with this disposition.
+2. Run Full Regression on the audit decision commit and on each subsequent documentation commit.
+3. After verification, perform a consistency-only read-back of C6/C7/C8/C9/O6 references. Do not rewrite the versioned protocol proposals in this step.
+4. Treat any later conversion of these logical decisions into normative versioned protocol revisions as a separately scoped documentation phase; implementation remains blocked pending G12.
+

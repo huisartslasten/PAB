@@ -4575,3 +4575,59 @@ Continue G5/G6/G9 contract work from the now owner-approved lifecycle baseline. 
 
 Branch: `refactor/professional-v1`; LIVE `main` untouched.
 
+## 143. G5 owner-approved Stage C C6/C7 record boundary
+
+### Owner decision — 2026-11-08
+
+The owner approved the G5 Stage C logical boundary:
+
+- O7's three top-level idempotency boundaries remain unchanged: raw-observation ingestion, target-assessment evaluation/recording and decision evaluation.
+- The immutable decision snapshot, C6 evaluation and C7 decision are distinct immutable logical records with distinct identities.
+- C6 and C7 are separate ordered atomic writes within O7's existing decision-evaluation boundary. C7 may be committed only after the exact C6 evaluation it consumes has been committed.
+- C7 preserves the exact six-part branch identity and snapshot/evaluation lineage; it does not recompute mastery or infer missing identity.
+- If C7 fails, the committed C6 evaluation remains intact. A later C7 retry consumes that exact C6 evaluation without rerunning, rewriting or replacing C6.
+- This is not a fourth O7 top-level idempotency boundary and not one shared indivisible C6/C7 write unit.
+
+The decision is logical only. It does not select physical ID formats/namespaces, final field names, database keys/tables, canonical serialization/hash, transaction technology/layout, retry/backoff, concurrency/locking or persistence implementation.
+
+### Repository documents updated
+
+The decision is recorded in existing repository artifacts; no parallel architecture document was created:
+
+- `PacoGO_G5_G6_G9_Dependency_Decision_Map_v0.1.md`: G5 Stage C boundary marked owner-approved; G9 dependency table and sequencing now leave only field names, uniqueness scopes and complete payload details open.
+- `PacoGO_Multi_Target_Owner_Architecture_Decisions_v0.1.md`: added owner decision G5-S2 under the existing O7/O8 architecture baseline.
+- `PacoGO_C6_Mastery_Decision_Protocol_v0.1.md`: records C6 as a separate immutable evaluation record with exact branch/snapshot/evidence lineage and its own atomic commit.
+- `PacoGO_C7_Next_Action_Decision_Protocol_v0.2.md`: records the distinct C7 decision identity, exact committed C6 dependency, retry behavior and unchanged O7 boundary.
+- `PacoGO_G9_Logical_Idempotency_Contract_Candidate_v0.1.md`: Stage C now applies replay/conflict per immutable C6/C7 record; a failed C7 write leaves C6 committed.
+- `PacoGO_Multi_Target_Implementation_Readiness_Matrix_v0.1.md`: updated G5 closure status, approved partial-failure example, G9 dependencies and historical reconciliation notes.
+
+C8 v0.2 and C9 v0.2 already carried separate C6 evaluation and C7 decision references; they were reviewed and not changed in this block. Their full cross-protocol reconciliation remains a G5 deliverable.
+
+### Commits and Full Regression
+
+All changes were documentation-only and made on `refactor/professional-v1`. Each commit below was tested by Full Regression on that exact commit:
+
+| Run | Commit | Result |
+|---|---|---|
+| #3371 | `7ec61cc08c43b49e846ab0d97a8c016fff10dc29` | GREEN |
+| #3372 | `4e039de5626adbe4cde29c87dd396e00bd0a1ad6` | GREEN |
+| #3373 | `d62e64bb460f5a451bf600aa8e7b2b6abe5c884c` | GREEN |
+| #3374 | `09adcb8a0a21c14d978d00d8ac251fd04f027681` | GREEN |
+| #3375 | `57ee0ba01d590d2db32028e8db8ca7026699f764` | GREEN |
+| #3376 | `2e365f0b27750d723cb6d8d52cb36e32a4e45db5` | GREEN |
+| #3377 | `2a1ae64ad80ea21e8d0892bd16599bb98d856d39` | GREEN |
+| #3378 | `53a32f2cd02623afd5241f93a7bbd0a16a298457` | GREEN |
+
+The verified runs passed the required curriculum-engine, architecture-boundary, Double or Nothing, maintained Node/Vitest, browser regression and clean-working-tree steps. No runtime, tests, registry, learner state, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+### Gate status and next step
+
+- **G5 remains OPEN** for final C6/C7/C8/C9 protocol-version reconciliation, final field names and exact cross-stage references/provenance, O6 input/version alignment, positive/negative/missing/mismatch test vectors, negative permissions and legacy/scalar disposition.
+- **G6 remains OPEN** for identity namespace/uniqueness, task-instance/episode cardinality, final C3/O6 reconciliation, policy-specific timeout configuration, lifecycle vocabulary and operational exact-state restoration verification. The owner-approved lifecycle rules in section 142 remain settled.
+- **G9 remains OPEN** for canonical equality, payload envelopes, durable stage-state vocabulary, uncertain-commit recovery, retry and concurrency semantics.
+- G8/G10 physical persistence/security and G12 narrow implementation authorization remain downstream. **G12 implementation authorization has not been granted.**
+- No runtime or persistence implementation is authorized by this decision.
+
+**Next concrete step:** continue the G5 cross-protocol reconciliation from the owner-approved C6/C7 boundary. Compare C6, C7, C8 and C9 field-by-field for exact inputs, outputs, branch/snapshot/evaluation/decision references, protocol provenance and rejection behavior. Record only source-supported agreements; keep unresolved names and mechanics open. Then finish G6 identity/cardinality reconciliation before freezing G9. Do not implement runtime or persistence and do not modify Supabase.
+
+Branch: `refactor/professional-v1`; LIVE `main` untouched. The latest verified pre-handoff commit is `53a32f2cd02623afd5241f93a7bbd0a16a298457`, Full Regression #3378 GREEN. This handoff amendment itself requires Full Regression on its resulting commit.

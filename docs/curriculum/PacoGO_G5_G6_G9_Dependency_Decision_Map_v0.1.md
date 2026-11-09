@@ -169,3 +169,22 @@ O8's `evaluation_id` is the generic historical/source term for the C6 evaluation
 This approval standardizes **logical field names only**. It does not decide physical ID formats, generation, namespaces or uniqueness scopes, database columns/keys/tables, serialization, hashing, storage, transactions, retry/concurrency mechanics or persistence APIs. Those remain assigned to their existing G6/G9/G8/G10 gates.
 
 This decision resolves only G5's logical field-naming item. It does not close G5, G6 or G9; does not alter the approved Stage C record/write boundary; and does not authorize runtime, tests, schema, SQL/RPC/RLS, database or Supabase changes. G12 remains NOT AUTHORIZED.
+
+## G5-S4 — C7 HOLD vocabulary: source-reconciled clarification
+
+**Finding: source-derived; no separate owner policy decision is required for the current C7 v0.2 contract.**
+
+The active C7 v0.2 candidate-action list (§3) defines exactly six candidate actions. Its only hold action is `HOLD_FOR_MORE_EVIDENCE`. The unqualified word `HOLD` appears in §6's explanatory decision-flow sketches; it is not defined there as a separate candidate action, decision-result enum, or persisted status.
+
+This interpretation is corroborated by the existing C7 v0.2 validation matrix and maintained engine contract:
+- `PacoGO_C7_Decision_Test_Matrix_v0.1.json` (matrix version 0.2) expresses each hold scenario as `expected.candidate_action = HOLD_FOR_MORE_EVIDENCE`;
+- `pacogo-engine/c7-contracts.js` defines `HOLD_FOR_MORE_EVIDENCE` as the only hold candidate;
+- `pacogo-engine/c7-next-action-decision.js` emits that candidate for insufficient evidence, unusable/unassessed mastery, unsupported/uncertain ordering and unauthorized next actions;
+- maintained C7 tests assert the exact candidate value; they do not define or accept a separate `HOLD` candidate;
+- C8 v0.2 stores the exact C7 output in `next_action`, without reinterpretation.
+
+**Reconciled meaning:** in C7 v0.2 explanatory flow prose, `HOLD` is shorthand for selecting the explicit candidate action `HOLD_FOR_MORE_EVIDENCE`. It is not a seventh action, separate terminal status, or alternative serialized value. The decision reason and gate continue to explain why that candidate was selected. When a C7 output is recorded or passed downstream, the exact candidate value `HOLD_FOR_MORE_EVIDENCE` is preserved.
+
+This clarification does not change the action policy, candidate set, gate behavior, decision reasons, C6 mastery outcomes, C8 descriptive authority or C9 validation authority. It does not authorize runtime/test changes, schema, SQL/RPC/RLS, persistence or Supabase work. Existing engine and test artifacts were inspected read-only; no code or tests were changed.
+
+**G5 effect:** the HOLD vocabulary ambiguity is resolved at the logical contract level by the active protocol, validation matrix and maintained engine/test evidence. G5 remains OPEN for its other reconciliation deliverables. G6/G9 remain OPEN; G12 remains NOT AUTHORIZED.

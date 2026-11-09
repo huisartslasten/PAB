@@ -4720,7 +4720,7 @@ This clarification does not change the action policy, candidate set, gate behavi
 
 ## G5-S5 — C6→C7 adapter ownership and prototype-path audit
 
-**Status: read-only source audit; canonical adapter ownership remains OPEN.**
+**Status: owner decision approved 2026-11-08; existing paths remain non-canonical prototypes.**
 
 ### Existing source paths inspected
 
@@ -4742,8 +4742,32 @@ Therefore neither existing C6→C7 adapter can be designated the canonical Stage
 - **G7 owns** consumer compatibility, inventory of existing call paths, and any explicit deprecation/transition plan. G7 must not choose a logical contract by implementation convenience.
 - **G12 remains the only narrow implementation-authorization gate.**
 
-**Recommendation for owner disposition:** retain both existing C6→C7 adapters and the C8/C9 bridge as non-canonical prototype/test paths; do not designate either as the canonical adapter. Define the canonical adapter only from the approved full Stage C lineage envelope after G5/G7 reconciliation. Do not delete, merge, refactor or route runtime traffic in this audit.
+**Owner decision approved 2026-11-08:** retain both existing C6→C7 adapters and the downstream C8/C9 bridge explicitly as non-canonical prototype/test paths. No existing path is designated as the canonical Stage C adapter. The canonical adapter must be defined from the reconciled full Stage C lineage envelope after G5/G7 reconciliation. Do not delete, merge, refactor or route runtime traffic based on this decision. No code or tests were changed; no runtime, curriculum, registry, learner state, schema, database, SQL/RPC/RLS or Supabase was changed. The existing adapters were inspected read-only.
 
-This is a recommendation, not an owner decision. No code or tests were changed; no runtime, curriculum, registry, learner state, schema, database, SQL/RPC/RLS or Supabase was changed. The existing adapters were inspected read-only.
+**Decision effect:** adapter ownership is resolved only to the extent that all three existing paths remain non-canonical. G5 still owns the logical adapter envelope; G7 still owns consumer compatibility and migration/deprecation planning. This decision does not select a canonical adapter, change runtime routing, or authorize implementation.
 
-**Next owner decision required:** confirm whether both existing C6→C7 adapters and the downstream C8/C9 bridge are to remain explicitly non-canonical prototype/test paths, with no path designated canonical at this stage.
+## 145. G5 owner decision — existing C6/C7/C8/C9 adapters remain non-canonical
+
+### Decision and rationale
+The owner approved retaining both existing C6→C7 adapter paths and the downstream C8/C9 bridge as non-canonical prototype/test paths. No existing adapter is designated the canonical Stage C adapter.
+
+The source audit established that the two C6→C7 adapters have overlapping responsibility but different input/function contracts, and that their maintained test usage does not establish production ownership. The downstream C8/C9 bridge also lacks the complete six-part branch/snapshot/C6/C7 lineage envelope. None can therefore be promoted to canonical status by inference or implementation convenience.
+
+The canonical adapter contract must be derived from the reconciled full Stage C lineage envelope under G5. G7 owns consumer compatibility, existing call-path inventory and any later deprecation/transition plan.
+
+### Scope and permissions
+- Retain all three existing code paths unchanged as non-canonical prototype/test paths.
+- Do not delete, merge, refactor, select, or route runtime traffic to any of them on the basis of this decision.
+- No runtime, test, registry, learner-state, schema, database, SQL/RPC/RLS, Supabase or learner-data changes.
+- G5 remains OPEN for the remaining protocol/lineage reconciliation items; G6 and G9 remain OPEN.
+- G12 remains NOT AUTHORIZED. This decision is not implementation authorization.
+
+### Verification
+- Source audit and owner decision documentation commit: to be recorded after commit creation.
+- Full Regression #3386 / run ID `42555632006`: **GREEN** on exact prior audit commit `bc2dcfcebccd38b154b9f7a27347dbcb218e6c72`. Exact branch/commit guard, dependency checks, ownership boundaries, curriculum engine, architecture, Double or Nothing, maintained Node, maintained Vitest, browser regression and clean-working-tree verification all passed.
+- This decision/handoff documentation commit requires its own Full Regression before closure.
+
+### Next concrete step
+Continue G5 with a source-by-source C6/C7/C8/C9 protocol reconciliation: compare required inputs, outputs, exact branch/snapshot/evaluation/decision references, version provenance, and rejection behavior. Record only source-supported alignment and isolate unresolved differences. Do not implement runtime or persistence. G12 remains the implementation gate.
+
+Branch: `refactor/professional-v1`; LIVE `main` untouched. Latest verified commit before this decision update: `bc2dcfcebccd38b154b9f7a27347dbcb218e6c72`, Full Regression #3386 GREEN.

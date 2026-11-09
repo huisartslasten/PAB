@@ -4684,3 +4684,17 @@ Do not record this recommendation as an owner decision until explicitly approved
 G5 remains OPEN for the six reconciliation items above. G6 remains OPEN for identity namespace/uniqueness, task-instance/episode cardinality, C3/O6 reconciliation, policy-specific timeout configuration, lifecycle vocabulary and operational exact-state restoration. G9 remains OPEN for canonical equality, payload envelopes, stage-state vocabulary, uncertain-commit recovery, retry and concurrency. G8/G10 and G12 remain downstream; G12 implementation authorization is not granted.
 
 Branch: `refactor/professional-v1`; LIVE `main` untouched. Latest verified pre-handoff commit: `35051446fd7cb426b0df98066c0554ff33065bff`, Full Regression #3382 GREEN. This handoff amendment itself requires Full Regression on its resulting commit.
+
+## G5-S3 — Official logical Stage C identity field names
+
+**Owner decision: approved 2026-11-08.** The official logical field names are:
+
+- `decision_snapshot_id` — identity/reference for the immutable decision snapshot;
+- `c6_evaluation_id` — identity/reference for the immutable C6 mastery evaluation;
+- `c7_decision_id` — identity/reference for the immutable C7 next-action decision.
+
+O8's `evaluation_id` is the generic historical/source term for the C6 evaluation identity; it is not a second identity and must be interpreted as `c6_evaluation_id` in the reconciled cross-stage logical contract. C7's own decision identity is distinct and is named `c7_decision_id`.
+
+This approval standardizes **logical field names only**. It does not decide physical ID formats, generation, namespaces or uniqueness scopes, database columns/keys/tables, serialization, hashing, storage, transactions, retry/concurrency mechanics or persistence APIs. Those remain assigned to their existing G6/G9/G8/G10 gates.
+
+This decision resolves only G5's logical field-naming item. It does not close G5, G6 or G9; does not alter the approved Stage C record/write boundary; and does not authorize runtime, tests, schema, SQL/RPC/RLS, database or Supabase changes. G12 remains NOT AUTHORIZED.

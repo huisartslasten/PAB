@@ -202,3 +202,17 @@ Create one consolidated implementation-readiness matrix from this record and the
 ## 7. Verification
 
 This decision record is documentation-only. It does not claim implementation or post-change Full Regression success. The resulting handoff update and this record must be verified by Full Regression on the exact resulting commit.
+
+## G5-S3 — Official logical Stage C identity field names
+
+**Owner decision: approved 2026-11-08.** The official logical field names are:
+
+- `decision_snapshot_id` — identity/reference for the immutable decision snapshot;
+- `c6_evaluation_id` — identity/reference for the immutable C6 mastery evaluation;
+- `c7_decision_id` — identity/reference for the immutable C7 next-action decision.
+
+O8's `evaluation_id` is the generic historical/source term for the C6 evaluation identity; it is not a second identity and must be interpreted as `c6_evaluation_id` in the reconciled cross-stage logical contract. C7's own decision identity is distinct and is named `c7_decision_id`.
+
+This approval standardizes **logical field names only**. It does not decide physical ID formats, generation, namespaces or uniqueness scopes, database columns/keys/tables, serialization, hashing, storage, transactions, retry/concurrency mechanics or persistence APIs. Those remain assigned to their existing G6/G9/G8/G10 gates.
+
+This decision resolves only G5's logical field-naming item. It does not close G5, G6 or G9; does not alter the approved Stage C record/write boundary; and does not authorize runtime, tests, schema, SQL/RPC/RLS, database or Supabase changes. G12 remains NOT AUTHORIZED.

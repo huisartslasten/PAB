@@ -4763,11 +4763,11 @@ The canonical adapter contract must be derived from the reconciled full Stage C 
 - G12 remains NOT AUTHORIZED. This decision is not implementation authorization.
 
 ### Verification
-- Source audit and owner decision documentation commit: to be recorded after commit creation.
-- Full Regression #3386 / run ID `42555632006`: **GREEN** on exact prior audit commit `bc2dcfcebccd38b154b9f7a27347dbcb218e6c72`. Exact branch/commit guard, dependency checks, ownership boundaries, curriculum engine, architecture, Double or Nothing, maintained Node, maintained Vitest, browser regression and clean-working-tree verification all passed.
-- This decision/handoff documentation commit requires its own Full Regression before closure.
+- Owner decision documentation commit: `87d8ca4d7963c1fae633d115ab04fb92881fedcd`.
+- Full Regression #3387 / run ID `42555852084`: **GREEN** on that exact commit. Exact branch/triggering-commit guard, dependency installation and vulnerability check, Agenda/practice ownership boundaries, curriculum engine, architecture boundary tests, Double or Nothing, maintained Node, maintained Vitest, Chromium installation, fixture server, browser regression and clean-working-tree verification all passed.
+- Full Regression #3386 / run ID `42555632006`: **GREEN** on the preceding audit commit `bc2dcfcebccd38b154b9f7a27347dbcb218e6c72`.
 
 ### Next concrete step
 Continue G5 with a source-by-source C6/C7/C8/C9 protocol reconciliation: compare required inputs, outputs, exact branch/snapshot/evaluation/decision references, version provenance, and rejection behavior. Record only source-supported alignment and isolate unresolved differences. Do not implement runtime or persistence. G12 remains the implementation gate.
 
-Branch: `refactor/professional-v1`; LIVE `main` untouched. Latest verified commit before this decision update: `bc2dcfcebccd38b154b9f7a27347dbcb218e6c72`, Full Regression #3386 GREEN.
+Branch: `refactor/professional-v1`; LIVE `main` untouched. Latest verified commit: `87d8ca4d7963c1fae633d115ab04fb92881fedcd`, Full Regression #3387 GREEN. This handoff verification update requires its own Full Regression.

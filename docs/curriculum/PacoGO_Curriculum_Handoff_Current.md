@@ -4961,19 +4961,35 @@ Obtain owner disposition on the bounded choices in audit §8. Only after that sh
 - Handoff/audit verification commit `1266614c314daa265f80bd799363aa8f39eb35b9`: Full Regression #3399 / run ID `42563484630`: **GREEN** on that exact commit.
 - Verified exact branch and triggering SHA; dependency installation and zero-known-vulnerability check; Agenda/practice ownership boundaries; curriculum engine regression; architecture boundary tests; Double or Nothing; maintained Node and Vitest regressions; Chromium installation; fixture server; browser regression; and clean working tree. All workflow steps completed successfully.
 
-### Current position
+### Current position — G5 logical crosswalk disposition recorded (2026-11-09)
 
-The source-derived G5 audit and dependency-map references are committed and verified. The audit remains a draft for owner review, not an approved/frozen cross-stage contract. The C8 Option A decision remains approved and unchanged. Frozen O6 v0.3 remains unchanged.
+The source-by-source G5 audit is in `PacoGO_G5_C6_C7_C8_C9_Protocol_Rejection_Crosswalk_Audit_v0.1.md`. Its §9 records the delegated, conservative owner disposition. The dependency decision map records the same decisions and marks **G5 LOGICAL CROSSWALK RESOLVED** for this bounded scope.
 
-G5 remains OPEN pending owner disposition on:
-1. stage-attributed rejection and ownership of C8 projection-local diagnostics;
-2. operational assessment provenance terminology versus historical/external coder provenance;
-3. how C6 M1/M2 consume O6's alignment/relation dimensions and non-scored adequacy profile;
-4. the positive, negative, missing and mismatch examples, followed by legacy/scalar compatibility.
+**Decision/verification chain**
+- Audit disposition commit: `a207ed82b49d1ee456590bfd7b8d11dc8e77148e`; Full Regression #3401, run ID `42612779144`, GREEN on that exact commit.
+- Dependency-map disposition commit: `5a1c459cffdd260abbe9ea4169bf89ead3343e31`; Full Regression #3402, run ID `42613034938`, GREEN on that exact commit.
+- #3401 and #3402 both completed all required steps, including browser regression and clean-working-tree verification.
 
-G6 and G9 remain OPEN. G12 remains NOT AUTHORIZED. No runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data changed.
+**Approved logical boundaries**
+1. Stage-attributed structural validation belongs to the producing stage; C9 reports cross-stage diagnostics without repair or mutation. Structural failures are not learner mastery outcomes or pedagogical hold actions.
+2. C8 remains a non-authoritative descriptive projection over eligible C6/C7 lineage. No durable C8 quarantine/rejection ledger, independent identity, conflict lifecycle or idempotency authority.
+3. New operational assessment provenance uses O6/C3 assessment-contract version, target-rule version and assessment-engine version, plus applicable exact task/registry/scoring/source provenance. C3 proposal v0.2 is not silently treated as an approved operational codebook; human coder/adjudication fields are historical/external only when genuinely present and relevant.
+4. C6 M1/M2 retain their existing meanings and seven-gate structure. M1 is claim-specific and considers mapping, alignment, response relation and completed target rule together. M2 contextually assesses O6's non-scored adequacy dimensions; no composite score, universal threshold or automatic field-to-gate mapping.
+5. Examples are logical illustrations, not executable fixtures. Legacy/scalar records remain read-only under their original schema/version; no coercion, inferred provenance, backfill or automatic canonicalization.
+
+**Unchanged constraints**
+- C8 Option A remains controlling; O6 v0.3 remains frozen.
+- G6 and G9 remain OPEN for identity, lifecycle, canonical equality, serialization, retry/concurrency and recovery.
+- G12 remains NOT AUTHORIZED. No runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data changed. No implementation authorization is implied.
+- The versioned C6/C7/C8/C9 proposals have not been silently rewritten or promoted to normative runtime contracts.
 
 ### Next concrete step
 
-Obtain explicit owner disposition on the bounded logical choices in audit §8. Once decided, incorporate only approved wording into the relevant protocol and dependency documents, preserve source/version provenance, update this handoff, and run Full Regression on each resulting commit. Do not implement runtime or persistence.
+Complete a read-only consistency check of the G5 audit, dependency map and referenced C6/C7/C8/C9/O6 source documents. Record any actual contradiction or unresolved dependency without patching protocols. Then define the separate G6/G9 work boundary. Runtime implementation remains blocked unless a distinct G12 authorization is explicitly granted.
 
+### Branch, commit and regression
+
+- Branch: `refactor/professional-v1` (exclusive working branch; `main` untouched).
+- Latest verified commit before this handoff update: `5a1c459cffdd260abbe9ea4169bf89ead3343e31`.
+- Latest verified Full Regression: #3402 / run ID `42613034938`, GREEN on that exact commit.
+- This handoff update is a new documentation commit and requires its own Full Regression before it is considered verified.

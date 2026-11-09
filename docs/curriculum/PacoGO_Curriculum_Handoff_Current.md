@@ -4837,3 +4837,21 @@ The owner has not yet approved this recommendation. G5 remains OPEN; G6/G9 remai
 ### Next step
 
 Present the recommendation and alternatives for explicit owner disposition. Until approved, retain the C8 boundary as OPEN and do not change C8/C9 protocols or implement any persistence/read-model behavior.
+
+
+## 148. G5 C8 history boundary — decision brief verification
+
+### Verification of the decision-brief commit
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Decision-brief commit: `58703ef599e5d2bcec8a9172b27576c3d9b0f4cc`; Full Regression #3391 / run ID `42557216641`: **GREEN** on that exact commit.
+- Handoff verification commit: `8caa0e43b6e91a63fc7d9e4c16954b18747d1622`.
+- Full Regression #3392 / run ID `42557882155`: **GREEN** on exact commit `8caa0e43b6e91a63fc7d9e4c16954b18747d1622`. The branch/triggering-commit guard, dependency installation, zero-known-vulnerability check, Agenda/practice ownership boundaries, curriculum engine regression, architecture boundary tests, Double or Nothing runtime regression, maintained Node and Vitest regressions, Chromium installation, fixture server, browser regression and clean-working-tree verification all completed successfully.
+
+### Current status and next owner action
+
+The C8 history-boundary recommendation remains **NOT APPROVED**. The brief recommends Option A (derived, non-authoritative read projection), but the owner's prior instruction to continue is not approval of that decision. G5 remains OPEN; G6/G9 remain OPEN; G12 remains NOT AUTHORIZED.
+
+Next concrete step: present the three alternatives and the Option A recommendation for explicit owner disposition. Until the owner explicitly chooses, do not update the logical C8 contract, choose persistence semantics, alter runtime/tests/schema, or treat any option as approved.
+
+This handoff update records verification only. It changes no runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data.

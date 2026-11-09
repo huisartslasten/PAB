@@ -116,6 +116,23 @@ The lifecycle rules above were explicitly approved by the owner on 2026-11-08. T
 
 G6 event-order and target-assessment fixture tests are useful evidence, but do not by themselves close the remaining owner approval or persistence behavior.
 
+### G6-A — task-instance / response-episode cardinality review (2026-11-09)
+
+Created `PacoGO_G6_Task_Instance_Response_Episode_Cardinality_Review_v0.1.md` after Full Regression #3406 verified the review-document commit `c6cf99a7e3b275e5ccc4125a1958755637e5de02` GREEN.
+
+The review recommends, but does not approve, the following minimum logical cardinality:
+
+- A task instance represents a **started** concrete administration; a preview/unopened task creates no task instance, response episode or observation.
+- One started task instance corresponds to exactly one response episode (1:1), with both identities created together at administration start.
+- One response episode maps to exactly one immutable raw observation.
+- One observation may have zero or more separately identified target assessments; each assessment refers to exactly one observation and one existing evidence target.
+- A response episode may have zero or more events; event source order remains authoritative.
+- Reusable task definition/version and task model/version remain distinct references; no parent relationship or physical foreign-key structure is selected.
+
+**Disposition:** G6-A is a source-derived recommendation awaiting explicit owner disposition. It does not close the task-instance/episode cardinality item, approve a physical relationship, select identity namespaces, or authorize runtime/schema/test changes. G6 remains OPEN; G9 remains OPEN; G12 remains NOT AUTHORIZED. The review deliberately leaves identity namespace/uniqueness, canonical serialization/equality, durable state/recovery, physical persistence and learner-facing vocabulary to their owning decisions.
+
+Next G6 work after owner disposition: G6-B identity namespace and uniqueness-scope review, followed by the remaining C3/O6 provenance and interruption-restoration reconciliation. Do not treat the recommendation as approved merely because the review or its regression passed.
+
 ## 5. G9 — decisions owned by G9 after G5/G6 inputs are approved
 
 **Current status: OPEN.**

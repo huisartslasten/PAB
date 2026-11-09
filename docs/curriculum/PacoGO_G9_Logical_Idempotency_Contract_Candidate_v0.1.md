@@ -90,9 +90,9 @@ C2 requires raw interaction and observation records to preserve what happened wi
 - explicit candidate action set, selected candidate or HOLD outcome, applicable C7 gates and reason/decision trace;
 - C7 action-policy/protocol version provenance and negative permission boundary.
 
-**Identity reconciliation:** O8 explicitly defines the C6 evaluation identity and requires C7 to preserve the exact branch, snapshot and evaluation identity. C8 v0.2 and C9 v0.2, together with the preliminary readiness-matrix crosswalk (§§7.2 and 7.9), represent the C7 decision as a distinct `c7_decision_id` referencing the exact `c6_evaluation_id`. The source-aligned G9 candidate therefore keeps the C6 evaluation and C7 decision as distinct logical records/identities; it does not reuse the C6 evaluation identity as the C7 decision identity. **G5 remains OPEN**, so final cross-stage naming and approval must be completed there before G9 is frozen.
+**Identity and write-boundary reconciliation — owner-approved 2026-11-08:** O8, C8 v0.2 and C9 v0.2 are aligned on distinct C6 evaluation and C7 decision records, with C7 referencing the exact C6 evaluation and preserving the six-part branch/snapshot lineage. The owner has approved separate identities and separate ordered atomic commits for those records within O7's existing decision-evaluation boundary. The C6 identity is named `evaluation_id` in O8 and `c6_evaluation_id` in the C8/C9 crosswalk; `decision_snapshot_id` and `c7_decision_id` are the current crosswalk names. Final field naming and physical identity/uniqueness namespaces remain open for G5/G6/G9 reconciliation. G5 remains OPEN for its other cross-protocol and test-vector deliverables.
 
-**Replay/conflict:** same approved identity for the relevant Stage C record and same complete canonical immutable payload → replay; same identity and different payload → integrity conflict; preserve original history. A changed eligible evidence set or applicable protocol creates a new snapshot and C6 evaluation. A C7 decision must reference the exact C6 evaluation it consumed. The final Stage C idempotency envelope must be approved under G5/G9 before conformance tests or persistence implementation.
+**Replay/conflict:** apply the O7 same-identity/same-payload replay and same-identity/different-payload conflict rule independently to each immutable Stage C record (C6 evaluation and C7 decision), using the final approved record identity and complete canonical payload. Preserve the original record/history on conflict. C7's immutable payload must reference the exact already-committed C6 evaluation and preserve its branch/snapshot lineage. A changed eligible evidence set requires a new snapshot/C6 evaluation; a C7 retry after failure reuses the exact committed C6 record and does not rerun or rewrite C6. The exact payload fields and physical identity namespace remain open under G9/G8/G10.
 
 
 ## 4. Canonical equality candidate
@@ -127,7 +127,7 @@ The logical contract must make it possible to determine whether a stage committe
 
 - Stage A commits the raw observation as one logical atomic unit.
 - Stage B commits one target assessment as one logical atomic unit. Multiple target assessments from one observation remain separate records and separate Stage B identities.
-- Stage C commits one C6 evaluation/decision-stage unit according to the still-open Stage C identity decision.
+- Stage C is O7's existing decision-evaluation idempotency boundary, but it contains two distinct ordered atomic record writes: first the immutable C6 evaluation, then the immutable C7 decision that consumes that exact C6 result. The C6 commit remains durable if the C7 write fails; C7 can be retried against the same C6 record without rewriting C6. This does not create additional top-level O7 idempotency boundaries.
 - The three stages are not one transaction. A committed Stage A may exist while Stage B has not yet run; committed assessments may exist before a C6/C7 decision.
 - A downstream stage may consume only complete, valid, committed upstream records with exact identity/provenance links.
 - Failure in a later stage does not roll back or mutate a previously committed upstream stage.
@@ -144,14 +144,17 @@ The logical contract must make it possible to determine whether a stage committe
 | Same observation, two distinct targets and assessment identities | Two assessments; one observation |
 | Same Stage B identity reused for a different target | Conflict |
 | Correction with new assessment identity and prior link | New immutable assessment; prior preserved |
-| Same Stage C identity and same frozen branch/snapshot/protocol/trace payload | Replay |
-| Same Stage C identity with changed eligible evidence or protocol | Conflict; new snapshot/evaluation required |
+| Same C6 evaluation identity and same complete snapshot/branch/protocol/gate-trace payload | Replay of the existing C6 record |
+| Same C6 evaluation identity with a different immutable payload | Integrity conflict; preserve the original C6 record |
+| Same C7 decision identity and same complete C6-reference/branch/snapshot/action-policy payload | Replay of the existing C7 record |
+| Same C7 decision identity with a different immutable payload | Integrity conflict; preserve the original C7 record |
+| Changed eligible evidence set for a new decision evaluation | New snapshot and new C6 evaluation; prior lineage remains unchanged |
 | Same snapshot with a later-arriving eligible assessment | New evaluation/snapshot; prior evaluation unchanged |
 | Failure before a stage commit | No partial result within that stage |
 | Response lost after commit, then retry | Resolve committed result; no duplicate |
 | Two concurrent same-identity/same-payload requests | One logical commit; other resolves as replay |
 | Two concurrent same-identity/different-payload requests | One immutable original; other resolves as conflict |
-| Stage B committed, Stage C unavailable/fails | Stage B remains committed; Stage C safely retryable |
+| Stage B committed, C6 committed, C7 unavailable/fails | Stage B and C6 remain committed; retry C7 against the exact C6 record without rewriting C6 |
 | C7 receives missing/mismatched C6 branch/snapshot/evaluation identity | Reject; do not infer or reconstruct identity |
 
 Tests for null/absence, ordering, normalization, status transitions, timeouts and retry races must wait for explicit decisions; the expected behavior must not be guessed in tests.
@@ -162,7 +165,7 @@ Tests for null/absence, ordering, normalization, status transitions, timeouts an
 2. Approve the exact canonical logical field set for Stage A, including task/interface configuration and timing provenance.
 3. Approve absent/null, scalar normalization, collection-order and timestamp equality rules.
 4. Confirm Stage B's exact G6 assessment identity namespace and whether assessment-rule/engine version changes always require a new assessment identity (the current candidate assumes a new linked assessment when the assessment itself is rerun under changed rules).
-5. Decide whether Stage C has one identity per C6 evaluation and a distinct C7 decision-stage identity, or a shared evaluation identity plus an explicit stage discriminator.
+5. Finalize C6/C7 identity field names and uniqueness scopes consistently across O8 and C6/C7/C8/C9. The logical distinction and separate ordered atomic writes are owner-approved; physical ID formats, database keys and namespace mechanics are not.
 6. Define the canonical payload envelope for the frozen C6 snapshot and its gate trace, and what constitutes a new snapshot versus a replay.
 7. Approve durable stage-state vocabulary and valid transitions.
 8. Define uncertain-commit recovery and retry behavior.
@@ -173,7 +176,7 @@ Tests for null/absence, ordering, normalization, status transitions, timeouts an
 ## 9. Gate status and exclusions
 
 - G6 logical event and target-assessment identity fixture coverage exists, but full lifecycle approval remains open.
-- G9 is not closed by this candidate. The open decisions above remain open until explicitly decided and tested.
+- G9 is not closed by this candidate. The owner-approved Stage C logical boundary is recorded, but the remaining equality, field-envelope, stage-state, recovery, retry and concurrency decisions remain open until explicitly decided and tested.
 - G3-037/038 remain blocked until canonical payload equality/conflict and durable stage semantics are approved and testable.
 - G3-039 logical lineage remains tested; durable append-only recording remains open.
 - No production runtime/evaluator, schema, database, SQL/RPC/RLS, Supabase or learner data changed.

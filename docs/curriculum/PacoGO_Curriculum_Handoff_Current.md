@@ -5037,3 +5037,55 @@ This is a **candidate recommendation only**, not an owner-approved decision. Do 
 5. Preserve the practical priority: Zyon should catch up in mathematics, especially fractions. Reuse the existing FR2 Fraction Learning Interface and its five technical demonstrations; do not wait for theoretical G6/G9 closure to plan appropriate learning support, but do not treat synthetic demo observations as learner evidence.
 
 **Regression discipline:** the handoff update itself is a repository change and must receive a fresh Full Regression. Do not claim the handoff update is verified until that run completes GREEN on its exact resulting commit.
+
+
+---
+
+## Current handoff update — 2026-11-09 (G6-B identity namespace review)
+
+**Verified branch:** `refactor/professional-v1`  
+**Latest verified content commit before this handoff update:** `1965ef105fb6f83207fc4a81be2c0e2593121067`  
+**Full Regression:** #3410, run `42650206429`, GREEN on that exact commit.  
+**Run:** https://github.com/huisartslasten/PAB/actions/runs/42650206429
+
+### Completed in this continuation
+
+- Confirmed Full Regression #3409 GREEN on the G6-B review document commit `43b79e95cc511f7eb89a8e7af4714d779b05261b`.
+- Created `PacoGO_G6_Identity_Namespace_Uniqueness_Scope_Review_v0.1.md`.
+- Updated `PacoGO_G5_G6_G9_Dependency_Decision_Map_v0.1.md` with the G6-B source-derived candidate review and its ownership boundaries.
+- Full Regression #3410 verified the dependency-map update commit `1965ef105fb6f83207fc4a81be2c0e2593121067` GREEN, including browser regression and clean-working-tree verification.
+- No runtime code, tests, schema, persistence, database, SQL/RPC/RLS, Supabase or learner data were changed. `main` remains untouched.
+
+### G6-B status — owner disposition still pending
+
+The review distinguishes logical identities for reusable task definition/version, reusable task model/version, concrete task instance, response episode, interaction event, immutable raw observation and target assessment. It proposes candidate uniqueness scopes, including episode-qualified event identity and distinct observation/assessment identities.
+
+It also identifies Learning Interface identity/version/configuration provenance as a separate unresolved gap. It does **not** equate a Learning Interface with a task model or invent a new identity contract.
+
+Physical ID format/generation, deterministic hashes, canonical serialization, physical keys/constraints, idempotency-key encoding, persistence and recovery are explicitly deferred to their owning gates.
+
+G6-B is a **candidate recommendation only**, not an owner-approved decision. G6-A cardinality is also still awaiting owner disposition. Neither recommendation is approved merely because its document or regression passed.
+
+### Current gate status
+
+- G5 bounded logical crosswalk: RESOLVED for its recorded scope; this does not close every G5 deliverable.
+- G6: OPEN. G6-A cardinality and G6-B identity namespace/uniqueness recommendations await owner disposition. Remaining lifecycle vocabulary, C3/O6 provenance reconciliation, Learning Interface provenance and exact interruption-restoration verification remain open.
+- G9: OPEN; canonical equality, replay/conflict and durable recovery work depends on approved G5/G6 logical inputs.
+- G8/G10/G11: downstream/separately gated.
+- G12: NOT AUTHORIZED. No implementation authorization is implied.
+
+### Next concrete steps
+
+1. Obtain/record explicit owner disposition for G6-A and G6-B. Do not infer approval from “ga door”, a successful regression or the existence of a recommendation.
+2. Reconcile the resulting approved identity/lifecycle/provenance contract against C2, frozen O6 v0.3 and the applicable operational C3 contract. Do not silently promote C3 proposal v0.2 to an approved operational codebook.
+3. Resolve Learning Interface identity/version/configuration provenance without assuming it is identical to task-model identity.
+4. Specify how exact interruption-state restoration can be verified, while leaving physical snapshot/hash mechanics to the owning gate.
+5. Only after G6 inputs are approved, proceed to G9 canonical equality, replay/conflict and durable stage recovery.
+6. Preserve the practical priority: Zyon should catch up in mathematics, especially fractions. Reuse the existing FR2 Fraction Learning Interface and its five technical demonstrations. Learning support planning need not wait for G6/G9 closure, but synthetic demo observations are not learner evidence.
+
+### Branch, commit and regression discipline
+
+- Branch: `refactor/professional-v1`; `main` untouched.
+- Latest verified content commit before this handoff update: `1965ef105fb6f83207fc4a81be2c0e2593121067`.
+- Latest verified Full Regression: #3410 / run ID `42650206429`, GREEN on that exact commit.
+- This handoff update is itself a repository change. Its resulting commit requires a fresh Full Regression; do not claim the handoff update verified until that run is GREEN on its exact commit.

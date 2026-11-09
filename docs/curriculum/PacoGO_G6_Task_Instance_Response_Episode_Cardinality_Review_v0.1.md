@@ -147,3 +147,12 @@ If this recommendation is accepted, G6 can treat task-instance/episode cardinali
 - G12: **NOT AUTHORIZED**.
 
 This is a design-only document. It changes no runtime, tests, curriculum registry, task catalogue, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data. It does not authorize implementation.
+
+
+## Owner-delegated disposition — 2026-11-09
+
+The candidate recommendation in this review has since received a bounded logical disposition under the owner's instruction to proceed using best judgement. See `PacoGO_G6_Logical_Boundary_Disposition_v0.1.md`, which is the controlling decision record.
+
+- G6-A cardinality is **APPROVED**: one started task instance ↔ one response episode ↔ one immutable raw observation (1:1:1). Preview/unopened tasks create no administration identities. One observation may have zero or more separately identified target assessments.
+- This approval concerns logical cardinality only. It does not decide physical relationships, ID formats, serialization, persistence or runtime implementation.
+- G6 overall remains OPEN for the items listed in the controlling disposition. G9 remains OPEN; G12 remains NOT AUTHORIZED.

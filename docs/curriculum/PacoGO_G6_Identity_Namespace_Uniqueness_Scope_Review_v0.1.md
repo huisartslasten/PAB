@@ -163,3 +163,18 @@ This is a recommendation for owner disposition, not an approved contract. G6 rem
 ## 12. Verification boundary
 
 This document is documentation-only. It changes no runtime, tests, curriculum registry, task catalogue, learner state, data schema, database, SQL/RPC/RLS, Supabase or learner data. It does not authorize implementation or empirical learner-data collection.
+
+
+## Owner-delegated disposition — 2026-11-09
+
+The candidate logical identity recommendations in this review have received a bounded disposition under the owner's instruction to proceed using best judgement. See `PacoGO_G6_Logical_Boundary_Disposition_v0.1.md`, the controlling decision record.
+
+Approved logical boundaries:
+- Task definition/version, task model/version, task instance, response episode, event, raw observation and target assessment are distinct typed identities.
+- Definition/model immutable revisions are identified by their respective ID+version pair.
+- Task-instance, response-episode, raw-observation and target-assessment identities have separate uniqueness scopes in their respective PacoGO operational identity domains.
+- Event identity is episode-local; its logical reference is qualified by the parent response-episode identity. No wider/global event-ID uniqueness is required by the current source/consumer review.
+- Correction/reassessment has a new linked assessment identity; it never overwrites the prior assessment or raw observation.
+- C2 learner/study/session/wave identities remain context, not substitutes for G6 object identities.
+
+Physical formats, ID generation, serialization/hashing, database keys/constraints, idempotency and persistence remain deferred. G6 remains OPEN for lifecycle, timeout, interruption-restoration and final O6/C3 envelope reconciliation. G9 remains OPEN; G12 remains NOT AUTHORIZED.

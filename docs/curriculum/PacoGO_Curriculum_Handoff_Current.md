@@ -5192,3 +5192,52 @@ These are traceability findings, not a blanket assertion that every observed abs
 - Latest verified content commit before this handoff update: `8da41097b620624eef289d5cfe5bf78d91644e92`.
 - Latest verified Full Regression before this handoff update: #3415 / run `42669734906`, **GREEN** on that exact commit.
 - This handoff update is a new repository change and requires its own Full Regression on the resulting exact commit. Do not mark the handoff update verified until that run is GREEN.
+
+
+---
+
+## Current handoff update — 2026-11-09 (delegated G6 logical disposition)
+
+**Branch:** `refactor/professional-v1`; LIVE `main` untouched.
+
+### Verified baseline before this decision record
+
+- Full Regression #3416 / run `42670018033`: **GREEN** on exact commit `d34b511f143fcf21d741718e18aec7dd6f93c209`.
+- All 17 workflow steps passed, including curriculum engine, architecture, maintained Node/Vitest, Chromium browser regression (59 tests) and clean-working-tree verification.
+
+### Owner-delegated logical disposition
+
+The owner asked the project to proceed using its best judgement. The bounded recommendations in G6-A, G6-B and the Learning Interface provenance review are therefore dispositioned as **APPROVED logical boundaries** in:
+
+`docs/curriculum/PacoGO_G6_Logical_Boundary_Disposition_v0.1.md`.
+
+Approved scope:
+
+- A task instance represents one started concrete administration; one started task instance maps 1:1 to one response episode; one episode maps 1:1 to one immutable raw observation. A preview/unopened task creates none of these administration identities.
+- Task definition/version, task model/version, task instance, response episode, event, raw observation and target assessment are distinct logical identities. Reusable definition/model versions are identified by their respective ID+version pair. Administration, episode, observation and assessment identities have distinct uniqueness scopes in their respective PacoGO operational identity domains. Event references are episode-qualified; no global event-ID uniqueness is required by the current contract.
+- One observation may have zero or more separately identified target assessments; each assessment points to exactly one observation and one existing evidence target. Reassessment/correction is a new linked assessment, never an overwrite.
+- A reusable Learning Interface has its own ID/version, distinct from task definition/model. The effective task-specific configuration, renderer ID/version where versioned, and materially relevant rendered presentation settings are captured as administration provenance anchored to the started task instance, with a stable path from the raw observation.
+- Learning Interface and task-model identities remain distinct. Interaction state/events remain in the response episode; they are not part of reusable interface identity/configuration.
+
+This disposition is logical only. It does not select UUID/ULID, ID generation, canonical serialization/hashing, physical keys/constraints, database/schema, persistence, idempotency encoding, retry/concurrency/recovery mechanics, or assessment/mastery semantics. Frozen O6 v0.3 is not changed.
+
+### Remaining G6 work — still OPEN
+
+- Versioned timeout policy duration and consequence before any timeout is used; no universal default is approved.
+- Final lifecycle vocabulary/transitions for completion, incomplete, abandonment, interruption/resume and policy-triggered timeout, reconciled to frozen O6 v0.3 without inventing assessment labels.
+- Operational method for verifying exact interruption-state restoration; physical snapshot/hash/storage mechanics remain deferred.
+- Final field-level reconciliation of the administration/assessment provenance envelope against O6 v0.3 and the current operational C3 contract.
+- Current logical provenance permits multiple Learning Interfaces where a composed task genuinely uses them; exact interface/configuration cardinality and renderer-versioning thresholds are not globally fixed. The FR2 first slice uses its existing Fraction interface.
+
+G6 is **not closed**. G9 remains OPEN and depends on the complete approved G5/G6 inputs. G12 remains **NOT AUTHORIZED**. No runtime, tests, registry, learner state, schema, persistence, database, SQL/RPC/RLS, Supabase or learner data changed in this decision.
+
+### Next concrete step
+
+Prepare the narrow FR2 implementation authorization package against the existing Fraction interface and five existing technical demonstrations. It must state the exact runtime files/contract changes, compatibility strategy for the other seven shared-contract consumers, tests, exclusions and rollback boundary. Request separate explicit G12 authorization before any runtime change. Preserve the practical priority: Zyon catching up in fractions; do not let unrelated G9/physical-persistence questions delay a safe, bounded learner-facing FR2 slice.
+
+### Latest verified branch/commit/regression before this handoff update
+
+- Branch: `refactor/professional-v1`.
+- Latest verified commit before this handoff update: `d34b511f143fcf21d741718e18aec7dd6f93c209`.
+- Latest verified Full Regression: #3416 / run `42670018033`, **GREEN** on that exact commit.
+- This handoff update is part of the new G6 disposition commit and requires Full Regression on that exact resulting commit before it is considered verified.

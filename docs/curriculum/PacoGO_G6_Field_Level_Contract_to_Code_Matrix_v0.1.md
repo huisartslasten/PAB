@@ -144,3 +144,10 @@ Prepare a short, bounded G6 reconciliation note that puts only the implementatio
 This document is documentation-only. It does not change runtime code, tests, curriculum registry, learner state, schemas, persistence, SQL/RPC/RLS, Supabase or learner data.
 
 The commit containing this document must pass Full Regression on its exact SHA. No implementation authorization is implied by this review.
+
+
+## Subsequent logical disposition — 2026-11-09
+
+This read-only matrix remains the source audit of current code. Its original statement that G6 candidate recommendations were awaiting owner disposition is superseded by the later controlling record `PacoGO_G6_Logical_Boundary_Disposition_v0.1.md`.
+
+The matrix's implementation findings remain unchanged. The approved logical requirements are now explicit, but the code still does not implement distinct concrete task-instance/response-episode identities or the full interface/presentation provenance envelope. This does not itself authorize a patch. The first implementation target remains FR2, with a backwards-compatible extension or deliberate adapter chosen only after review of all eight shared-contract consumers. G12 remains NOT AUTHORIZED.

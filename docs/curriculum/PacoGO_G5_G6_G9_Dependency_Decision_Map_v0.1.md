@@ -86,74 +86,54 @@ The following items remain **open G5 reconciliation work**. Earlier findings in 
 
 O9/G4 learner-facing cross-branch presentation remains separate. It is required before that optional product presentation is designed/shipped, but the matrix explicitly says it is not required to approve the internal single-branch C6→C9 lineage.
 
-## 4. G6 — exact remaining work
+## 4. G6 — approved logical boundaries and remaining work
 
-**Current status: OPEN.** Logical identity anchors and fixture coverage exist, but the lifecycle proposal's own §7 acceptance criteria are not all closed.
+**Current status: OPEN.** The bounded logical administration, identity and Learning Interface provenance decisions below are approved by delegated disposition on 2026-11-09. This resolves those logical questions; it does not close the complete G6 gate or authorize implementation.
 
-### Determined or owner-approved anchors
+### 4.1 Approved task-instance / response-episode cardinality (G6-A)
 
-- Task definition/version, task model/version, administered task instance, response episode, interaction event and raw observation are distinct logical concepts.
-- One separately administered response episode maps to exactly one immutable raw observation.
-- **Ordinary answer edits, revisions and retries remain events in the same response episode**; they do not create a new attempt or observation.
-- **Explicit restart after completion is a new administration** with a new task instance, response episode and observation; the completed episode and its history remain preserved.
-- **A started abandoned episode preserves its captured event/history and immutable raw observation; abandonment alone never fabricates a score or evidence result.**
-- **A temporary interruption may resume the same task instance and response episode only if the exact same administration state is restored.** For this logical contract, that means the same task content/version, presentation/representation, response mode, support condition and recorded progress/event history. If exact restoration is unavailable, the old episode must not be resumed as though unchanged.
-- **A material change to task content, presentation/representation, response mode or support condition is a new administration** with a new task instance, response episode and observation. For the confirmed Tussentoets/Toets flow, content-help ends the independent episode as incomplete; supported practice is a separate administration. Neutral interface clarification that supplies no target reasoning is not itself a material support-condition change.
-- **Elapsed time alone never terminates an episode.** Timeout termination is permitted only under an explicit, versioned task/session policy that defines the timeout and its consequence. Without such a policy, there is no automatic timeout termination.
-- Each interaction event belongs to exactly one parent episode; the source event order is preserved independently of timestamps.
-- Each target-specific assessment has its own logical identity and refers to exactly one immutable observation and one existing evidence target. Multiple target assessments can reference the same observation; corrections/reassessments are separately identified linked history.
+- A task instance represents one **started** concrete administration. A preview/unopened task creates no task-instance, response-episode or observation identity.
+- At administration start, exactly one task-instance identity and exactly one response-episode identity are created together. Their logical relationship is 1:1.
+- One response episode maps to exactly one immutable raw observation (1:1).
+- A started abandoned/incomplete episode remains represented by its one raw observation; abandonment does not fabricate an answer, score or evidence result.
+- Ordinary edits, answer revisions and retries remain events in the same episode. Explicit restart is a new administration and receives a new task instance, episode and observation.
+- A response episode has zero or more ordered interaction events. Source order is authoritative; timestamps do not reorder the event stream.
+- One raw observation may have zero or more target-specific assessments. Each assessment has its own identity and refers to exactly one observation and one existing evidence target. Reassessment/correction creates a new linked assessment; it never overwrites the previous assessment or raw observation.
 
-The lifecycle rules above were explicitly approved by the owner on 2026-11-08. They are logical contract decisions only: they do not select physical ID formats, storage keys, snapshot/hash formats, timeout durations or implementation mechanics.
+### 4.2 Approved logical identity namespaces and uniqueness boundaries (G6-B)
 
-### G6 decisions still required
+- Task definition/version and task model/version are separate reusable identities. Each immutable reusable revision is identified by its respective (ID, version) pair; no parent relationship between task definition and task model is implied.
+- Task instance, response episode, raw observation and target assessment are distinct identities, each unique within its respective PacoGO operational identity domain. These are logical domains, not decisions about tenants, environments, UUIDs or physical indexes.
+- Event identity is unique within its parent response episode. The qualified logical event reference is (response_episode_id, event_id). The current source/consumer contract does not require globally unique standalone event IDs.
+- Target-assessment identity is separate from both observation and evidence-target identity. A correction/reassessment receives a new linked assessment identity.
+- C2 learner/study/session/wave identifiers remain contextual and are not substitutes for G6 administration/evidence identities.
+- Domain identity is not derived from timestamps, answer content, event type, learner identity or array position.
 
-1. **Policy-specific timeout configuration:** before any task/session uses a timeout, its versioned policy must define duration and consequence. No universal duration or implicit default is approved.
-2. **Completion and learner-facing lifecycle vocabulary:** reconcile completion, abandonment, interruption, resume, restart and policy-triggered timeout labels/transitions with C3/O6; do not introduce assessment labels or learner-facing claims that O6 does not support.
-3. **Final identity namespace/uniqueness scope:** approve observation, event and target-assessment identity scopes. No physical ID format, database key or deterministic serializer is implied.
-4. **Final C3/O6 reconciliation:** confirm the complete administration and target-assessment provenance envelope against frozen O6 v0.3. Do not invent assessment labels for missing/no-response/incomplete episodes.
-5. **Task-instance/episode cardinality:** finalize the proposed minimum cardinality and transition rules against the complete G6 acceptance criteria; do not infer a physical relationship from the logical proposal.
-6. **Operational interruption verification:** specify how the runtime can establish that the exact administration state was restored, without prematurely choosing a physical snapshot or hash mechanism.
+### 4.3 Approved Learning Interface / presentation provenance boundary
 
-G6 event-order and target-assessment fixture tests are useful evidence, but do not by themselves close the remaining owner approval or persistence behavior.
+- A reusable Learning Interface has its own ID and immutable version, distinct from task-definition and task-model identities.
+- The effective task-specific interface configuration is retained as actual administration provenance. A separate globally unique configuration ID is not required absent a demonstrated consumer need.
+- Renderer identity/version, where versioned, is distinct from Learning Interface identity/version.
+- Materially relevant rendered representation/layout, accessibility/language presentation settings and material presentation deviations are retained as administration provenance anchored to the started task instance.
+- The raw observation must retain a stable path to the actual administration provenance. Learner interaction state/events remain in the response-episode layer, not in reusable interface identity/configuration.
+- The logical model permits multiple interface provenance entries when a composed task genuinely uses multiple interfaces; it does not force every task to use an interface or impose a universal one-interface-per-task cardinality.
+- Ephemeral CSS/DOM details are not required unless they materially affect the learner's experience, response interpretation or evidence.
 
-### G6-A — task-instance / response-episode cardinality review (2026-11-09)
+### 4.4 Remaining G6 work — not resolved by this disposition
 
-Created `PacoGO_G6_Task_Instance_Response_Episode_Cardinality_Review_v0.1.md` after Full Regression #3406 verified the review-document commit `c6cf99a7e3b275e5ccc4125a1958755637e5de02` GREEN.
+1. **Timeout policy:** before any task/session uses a timeout, a versioned policy must specify duration and consequence. No universal duration or implicit default is approved.
+2. **Lifecycle vocabulary/transitions:** reconcile completion, incomplete, abandonment, interruption/resume, restart and policy-triggered timeout with frozen O6 v0.3. Do not invent assessment labels for no-response/incomplete episodes.
+3. **Exact interruption restoration:** define the operational evidence needed to establish that the same task content/version, presentation/representation, response mode, support condition and progress/event history were restored. Physical snapshot/hash/storage mechanics remain deferred.
+4. **Final O6/C3 envelope reconciliation:** confirm exact administration and target-assessment provenance fields against frozen O6 v0.3 and the current operational C3 contract. Do not reopen O6 or silently promote a draft C3 codebook.
+5. **Interface/presentation details:** exact renderer-versioning thresholds and the boundary between material presentation facts and transient rendering noise remain to be finalized against real interface/evidence needs.
 
-The review recommends, but does not approve, the following minimum logical cardinality:
+### 4.5 Effect on G9 and implementation
 
-- A task instance represents a **started** concrete administration; a preview/unopened task creates no task instance, response episode or observation.
-- One started task instance corresponds to exactly one response episode (1:1), with both identities created together at administration start.
-- One response episode maps to exactly one immutable raw observation.
-- One observation may have zero or more separately identified target assessments; each assessment refers to exactly one observation and one existing evidence target.
-- A response episode may have zero or more events; event source order remains authoritative.
-- Reusable task definition/version and task model/version remain distinct references; no parent relationship or physical foreign-key structure is selected.
+G9 may now use the approved G6 logical identity/cardinality/provenance boundaries as inputs, but G9 remains OPEN for canonical payload equality/serialization, replay/conflict, durable stage-state, retry/concurrency and recovery. Physical persistence/security remain with G8/G10; conformance testing remains with G11.
 
-**Disposition:** G6-A is a source-derived recommendation awaiting explicit owner disposition. It does not close the task-instance/episode cardinality item, approve a physical relationship, select identity namespaces, or authorize runtime/schema/test changes. G6 remains OPEN; G9 remains OPEN; G12 remains NOT AUTHORIZED. The review deliberately leaves identity namespace/uniqueness, canonical serialization/equality, durable state/recovery, physical persistence and learner-facing vocabulary to their owning decisions.
+The first practical implementation target remains the existing FR2/Fraction path. The current shared interaction contract has eight direct controller consumers, so any shared-contract extension must be backwards-compatible or deliberately isolated behind an adapter after consumer/test review. Preserve the five existing FR2 demonstrations; they remain synthetic technical fixtures, not learner evidence.
 
-Next G6 work after owner disposition: G6-B identity namespace and uniqueness-scope review, followed by the remaining C3/O6 provenance and interruption-restoration reconciliation. Do not treat the recommendation as approved merely because the review or its regression passed.
-
-
-### G6-B — identity namespace and uniqueness-scope review (2026-11-09)
-
-Created `PacoGO_G6_Identity_Namespace_Uniqueness_Scope_Review_v0.1.md` after Full Regression #3409 verified review commit `43b79e95cc511f7eb89a8e7af4714d779b05261b` GREEN.
-
-The source-derived review recommends the following logical distinctions and candidate uniqueness scopes; it does **not** select physical keys or formats:
-
-- Task definition and immutable version are a reusable definition/version pair; task model and immutable version are a separate reusable model/version pair. No parent relationship between task definition and task model is inferred.
-- Task instance identifies one concrete started administration; response episode identifies its response history; raw observation is a separate immutable evidence record.
-- An event belongs to exactly one response episode. The candidate logical reference is episode-qualified (episode identity + event identity); global event-ID uniqueness remains unresolved unless a consumer requires it.
-- A target assessment has its own record identity and points to exactly one raw observation and one existing evidence target. Correction/reassessment creates a separately identified linked assessment; it does not overwrite the observation or prior assessment.
-- Reusable definition/model identities and their version identities are scoped to their respective entity/version namespaces. Administration, episode, observation and assessment identities are candidates for uniqueness across their respective PacoGO operational identity domains.
-- C2 learner, study, session and wave identifiers remain contextual identities outside G6 ownership. They are not substitutes for task-instance, episode or evidence-record identities.
-
-The review also records a provenance gap for Learning Interface identity/version/configuration. It does not equate a Learning Interface with a task model or invent an ID contract; this requires a separate, source-led decision.
-
-**Explicitly deferred:** UUID/ULID or other ID format; random or deterministic generation; timestamp/content-hash derivation; canonical serialization; physical primary/foreign keys; database constraints; idempotency-key encoding; persistence and recovery mechanics. These belong to their owning gates, especially G9 and G8/G10, and cannot be selected by G6 namespace wording.
-
-**Disposition:** G6-B is a candidate recommendation awaiting explicit owner disposition. It does not close identity scope, G6, G9 or any persistence gate. G6-A cardinality remains separately pending owner disposition. G6 remains OPEN; G9 remains OPEN; G12 remains NOT AUTHORIZED. No runtime/schema/test change or implementation authorization follows from this review.
-
-Next G6 work: obtain owner disposition for G6-A and G6-B; then reconcile approved logical identities and provenance with C2, frozen O6 v0.3 and the applicable C3 operational contract, including Learning Interface provenance and interruption-restoration verification. Do not begin G9 canonical equality/replay/recovery design until its G5/G6 inputs are approved.
+G6 is not closed. G9 is not closed. G12 remains **NOT AUTHORIZED**. This disposition changes no runtime, tests, registry, learner state, schema, persistence, SQL/RPC/RLS, Supabase or learner data.
 
 ## 5. G9 — decisions owned by G9 after G5/G6 inputs are approved
 

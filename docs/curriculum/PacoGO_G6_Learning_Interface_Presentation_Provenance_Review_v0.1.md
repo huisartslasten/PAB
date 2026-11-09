@@ -173,3 +173,18 @@ This is a candidate recommendation, not an approved contract. G6 remains OPEN; G
 ## 9. Verification boundary
 
 This document is documentation-only. It changes no runtime, tests, curriculum registry, task catalogue, learner state, data schema, database, SQL/RPC/RLS, Supabase or learner data. It does not authorize implementation, empirical learner-data collection or a new Learning Interface runtime.
+
+
+## Owner-delegated disposition — 2026-11-09
+
+The bounded Learning Interface provenance recommendation has received a logical disposition under the owner's instruction to proceed using best judgement. See `PacoGO_G6_Logical_Boundary_Disposition_v0.1.md`, the controlling decision record.
+
+Approved logical boundaries:
+- A reusable Learning Interface is identified by its own ID and immutable version, distinct from task definition and task model identities.
+- The effective task-specific interface configuration is captured as actual administration provenance; a separate globally unique configuration ID is not required unless a real consumer later demonstrates that need.
+- Renderer identity/version, where versioned, is distinct from Learning Interface identity/version.
+- Materially relevant rendered representation/layout, accessibility/language presentation settings and material presentation deviations are captured with the started task instance.
+- The raw observation retains a stable path to the actual administration provenance. Interaction state/events remain in the response-episode layer.
+- The model permits multiple interface provenance entries where a composed task genuinely uses more than one interface; this does not force every task to use an interface or establish a universal one-interface-per-task rule.
+
+Exact renderer versioning thresholds and the boundary between material presentation facts and transient rendering noise remain subject to the actual interface/evidence requirements. G6 remains OPEN for lifecycle, timeout, interruption restoration and final O6/C3 envelope reconciliation. G9 remains OPEN; G12 remains NOT AUTHORIZED.

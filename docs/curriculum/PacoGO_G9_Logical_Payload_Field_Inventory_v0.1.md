@@ -76,7 +76,7 @@ Stage C must preserve the source lineage as distinct logical records. Do not tre
 | Field group | Classification | Source-derived content and boundary |
 |---|---|---|
 | Branch identity | Required | All six inspectable fields: `learner_key`, `curriculum_registry_version_id`, `claim_id`, `development_id`, `scope_id`, `time_window_id`. Equality compares all six; no claim-only key or locally invented hash. |
-| Snapshot identity | Required | Stable immutable decision-snapshot identity. C8/C9 crosswalk names it `decision_snapshot_id`; final naming follows G5. |
+| Snapshot identity | Required | Stable immutable decision-snapshot identity, officially named `decision_snapshot_id` by owner decision G5-S3. |
 | Scope/window provenance | Required | Exact scope and time-window definition IDs/versions. |
 | Event-time interval | Required | Configured start-inclusive/end-exclusive interval, represented as UTC instants. |
 | Assessment-availability cutoff | Required | Snapshot-specific cutoff distinct from event time. |
@@ -89,7 +89,7 @@ Stage C must preserve the source lineage as distinct logical records. Do not tre
 
 | Field group | Classification | Source-derived content and boundary |
 |---|---|---|
-| C6 evaluation identity | Required | O8 calls this `evaluation_id`; C8/C9 crosswalk calls it `c6_evaluation_id`. Final canonical field name is a G5 reconciliation item. |
+| C6 evaluation identity | Required | Official logical name `c6_evaluation_id` (G5-S3). O8's generic `evaluation_id` denotes this same C6 identity, not a second identity. Physical format/namespace/uniqueness remain open. |
 | Snapshot reference | Required | Exact immutable snapshot identity consumed; never substitute a newer snapshot. |
 | Branch identity | Required | Same complete six-part identity as snapshot; all six values preserved unchanged. |
 | Source evidence references | Required | Exact observation and target-assessment references consumed from the snapshot. |
@@ -101,18 +101,18 @@ Stage C must preserve the source lineage as distinct logical records. Do not tre
 
 | Field group | Classification | Source-derived content and boundary |
 |---|---|---|
-| C7 decision identity | Required candidate | C8/C9 v0.2 and preliminary readiness-matrix crosswalk use `c7_decision_id`, distinct from the C6 evaluation identity. Final approval and naming remain under G5. |
+| C7 decision identity | Required | Official logical name `c7_decision_id` (G5-S3), distinct from `c6_evaluation_id`. Physical format/namespace/uniqueness remain open. |
 | Exact C6 reference | Required | One exact `c6_evaluation_id` / O8 `evaluation_id` consumed by C7. |
 | Snapshot and branch | Required | Exact snapshot reference and unchanged six-part branch identity inherited from the consumed C6 result. |
 | C6 mastery outcome | Required | Exact outcome consumed unchanged; C7 must not recompute mastery. |
 | Ordering inputs | Required | `prerequisite_ordering_state` and `next_development_ordering_state` remain separate; do not merge them into a generic ordering state. |
 | Candidate action set | Required | Explicit candidates available in this curriculum context. |
-| Decision result | Required | Selected candidate action or explicit HOLD outcome, with applicable C7 gates and reasons/trace. |
+| Decision result | Required | Selected candidate action or the exact hold candidate `HOLD_FOR_MORE_EVIDENCE`, with applicable C7 gates and reasons/trace. Unqualified `HOLD` is explanatory shorthand only (G5-S4). |
 | C7 policy provenance | Required | Exact C7 action-policy/protocol version used. |
 | Negative permissions | Required | C7 remains a candidate-action selector; it must not mutate mastery, learner state, curriculum registry or runtime instructions. |
 | Cross-branch projection | Excluded from canonical branch decision | Any descriptive cross-branch projection is a separately typed downstream C8 concern under G4/O9; it is not folded into a single-branch C7 decision. |
 
-**Stage C source reconciliation:** O8 determines the C6 evaluation identity and exact C7 consumption. C8/C9 v0.2 and the preliminary G5 crosswalk specify a separate C7 decision identity referencing the exact C6 evaluation. This is the current source-aligned logical candidate. G5 remains OPEN and must approve the final C6/C7 envelope before G9 is frozen.
+**Stage C source reconciliation:** G5-S3 has approved the logical names `decision_snapshot_id`, `c6_evaluation_id` and `c7_decision_id`; O8's `evaluation_id` is the same C6 evaluation identity. The owner-approved G5 Stage C boundary also requires distinct immutable C6/C7 records and separate ordered atomic writes within O7's existing decision-evaluation boundary. C7 consumes the exact committed C6 record. G5 remains OPEN for C8 history read/write disposition, O6 input/provenance alignment, protocol-version/rejection crosswalk, examples and legacy compatibility. Physical identity namespaces/uniqueness and G9 equality/recovery semantics remain open.
 
 ## 5. Cross-stage canonical equality boundaries
 

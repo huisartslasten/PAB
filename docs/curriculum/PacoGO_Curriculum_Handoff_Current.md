@@ -4771,3 +4771,40 @@ The canonical adapter contract must be derived from the reconciled full Stage C 
 Continue G5 with a source-by-source C6/C7/C8/C9 protocol reconciliation: compare required inputs, outputs, exact branch/snapshot/evaluation/decision references, version provenance, and rejection behavior. Record only source-supported alignment and isolate unresolved differences. Do not implement runtime or persistence. G12 remains the implementation gate.
 
 Branch: `refactor/professional-v1`; LIVE `main` untouched. Latest verified commit: `87d8ca4d7963c1fae633d115ab04fb92881fedcd`, Full Regression #3387 GREEN. This handoff verification update requires its own Full Regression.
+
+
+## 146. G5 source-by-source reconciliation — C6/C7/C8/C9 follow-up
+
+### Verification baseline
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Latest verified pre-audit commit: `efc860bf678927022c2d8d9a3bff931d49239f6f`.
+- Full Regression #3388 / run ID `42556057022`: **GREEN** on that exact commit, including branch/SHA guard, dependency/vulnerability checks, ownership boundaries, curriculum engine, architecture, Double or Nothing, Node, Vitest, Chromium, fixture server, browser regression and clean working tree.
+- This documentation reconciliation commit requires its own Full Regression.
+
+### Read-only reconciliation findings
+
+The active protocol set was compared directly: C6 v0.1, C7 v0.2, C8 v0.2, C9 v0.2, G5 dependency map, G9 payload inventory/source-determined contract, C3 v0.2 proposal and the maintained readiness matrix.
+
+**Resolved and aligned with recorded decisions/source authority:**
+- G5-S3 official logical identity names: `decision_snapshot_id`, `c6_evaluation_id`, `c7_decision_id`. O8's `evaluation_id` is the generic C6 identity term.
+- C6/C7 are separate immutable records and separate ordered atomic writes inside O7's existing decision-evaluation boundary. C7 consumes the exact committed C6 record; failure of C7 does not rewrite or rerun C6.
+- G5-S4: C7's only hold candidate is `HOLD_FOR_MORE_EVIDENCE`; prose `HOLD` is shorthand.
+- G5-S5: both C6→C7 adapter modules and the C8/C9 bridge remain non-canonical prototype/test paths. No canonical adapter/runtime route is selected.
+- Operational assessment is performed by PacoGO as the single operational assessor. The former C3 human-coder/independent-coding/adjudication model is withdrawn for learner-runtime architecture. C8/C9 references to coder/round/adjudication can only preserve genuinely applicable historical/external provenance, not introduce a human second-assessor workflow.
+
+**Remaining open items:**
+1. C8 v0.2 defines a descriptive projection/history over committed C6/C7 records, but also specifies `c8_item_id`, append-only items and replay/conflict behavior. Owner disposition is required on derived read projection versus a separately persisted record/write unit. Do not assume a fourth O7 top-level boundary or physical storage.
+2. C8/C9 assessment provenance fields must be aligned to frozen O6 v0.3. Operational provenance must identify PacoGO's applicable assessment engine/rule versions; optional human coder/adjudication references are historical/external only. Historical compatibility details remain to be reconciled with G6/G7.
+3. Reconcile protocol versions as one proposed set: C6 v0.1, C7 v0.2, C8 v0.2 and C9 v0.2. C8's reject/quarantine-from-canonical-summary wording and C9's canonical-chain rejection/legacy historical validation need an explicit shared stage-attributed disposition.
+4. Approve cross-stage positive, negative, missing and mismatch examples and complete legacy/scalar compatibility disposition. O6 v0.3 remains frozen; do not invent assessment labels or reopen it.
+
+### G9 source-document correction
+
+The G9 source-determined contract previously said G5 had not decided whether C6/C7 were one or separate atomic writes. That sentence was stale. It now reflects the 2026-11-08 owner-approved separate ordered atomic-write boundary and approved logical identity names. G9 equality, namespace, retry/concurrency and recovery decisions remain open.
+
+### Scope and next step
+
+This was a documentation/source-reconciliation change only. No runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data changed. G5/G6/G9 remain OPEN; G12 remains NOT AUTHORIZED.
+
+Next concrete step: prepare the owner decision brief for the C8 history boundary, grounded in the exact C8 v0.2 text and O7's three existing boundaries. Present the derived-read-model and separately persisted-record alternatives, consequences for `c8_item_id` and replay/conflict semantics, and a recommendation without recording it as approved. Do not implement.

@@ -96,7 +96,7 @@ O7 is authoritative for the staged idempotency outcomes:
 
 **Replay/conflict baseline:** O7's same-identity/same-payload replay and same-identity/different-payload conflict outcomes apply to decision evaluation. A changed eligible evidence set or applicable protocol requires a new snapshot/evaluation; prior history remains unchanged.
 
-**G5 dependency — OPEN:** G5 must approve the final C6/C7 cross-stage identity and lineage envelope, including final naming and the exact Stage C idempotency unit boundaries. This document does not decide whether C6 evaluation and C7 decision are persisted as one or separate atomic write units. Do not write conformance tests for that unresolved atomicity detail.
+**G5 owner decision — APPROVED 2026-11-08:** the immutable snapshot, C6 evaluation and C7 decision are distinct logical records with distinct identities. C6 is committed atomically as its own record; C7 may be committed only after the exact C6 evaluation it consumes is committed. C6 and C7 are separate ordered atomic writes within O7's existing decision-evaluation boundary, not additional top-level O7 boundaries and not one shared indivisible write. If C7 fails, the committed C6 evaluation remains unchanged and C7 may be retried against that exact C6 record. Logical field names are approved by G5-S3 as `decision_snapshot_id`, `c6_evaluation_id` and `c7_decision_id`; O8's `evaluation_id` is the generic name for the C6 identity. Physical identity namespaces/uniqueness, canonical payload equality, keys/tables, transaction technology, retry/concurrency mechanics and persistence implementation remain OPEN under G6/G9/G8/G10. Do not write tests for unresolved equality or recovery mechanics.
 
 ## 6. Atomicity and recovery: what is and is not determined
 

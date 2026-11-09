@@ -113,6 +113,24 @@ C6 bepaalt nog niet:
 
 Deze vragen behoren tot empirische validatie en modelvergelijking.
 
+## 8. Owner-approved Stage C record boundary
+
+**Owner decision, 2026-11-08:** the C6 evaluation is a distinct immutable logical record with its own identity. It is separate from the immutable decision snapshot it evaluates and from the distinct C7 decision record that may later consume it.
+
+The C6 evaluation record must preserve:
+- the complete six-part branch identity;
+- the exact immutable decision snapshot reference;
+- the exact eligible observation and target-assessment references consumed;
+- C6 protocol/version provenance;
+- all seven existing gate outcomes and their explicit reasons/trace;
+- the resulting existing C6 mastery outcome.
+
+The C6 evaluation is committed atomically as its own record. C7 may consume only this exact committed C6 result; it may not recompute mastery or reconstruct missing branch, snapshot or evaluation identity. If a later C7 write fails, the committed C6 evaluation remains unchanged and available for a C7 retry.
+
+This is a logical record/ordering decision within O7's existing decision-evaluation idempotency boundary. It does not create another top-level O7 boundary and does not combine C6 and C7 into one indivisible write.
+
+**Still open:** final field names and physical identity namespace/uniqueness, canonical payload equality details, physical keys/tables, transaction technology, retry/concurrency mechanics and persistence implementation. These are not defined by this protocol amendment.
+
 ## 8. Technische contractgrens
 
 De C6-engine mag een deterministische kandidaatuitkomst berekenen uit expliciet aangeleverde assessmentgegevens.

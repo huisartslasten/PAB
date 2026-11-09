@@ -99,7 +99,7 @@ G6 event-order and target-assessment fixture tests are useful evidence, but do n
 | Stage A complete immutable field envelope | G6 + O6 v0.3 | Use field inventory as candidate; finalize after lifecycle/provenance approval |
 | Stage B assessment identity scope | G6 | Blocked on G6 namespace approval |
 | Stage B assessment payload/provenance envelope | O6 v0.3 + G5/G6 | Preserve O6 v0.3; reconcile exact field/version envelope |
-| Stage C snapshot/C6/C7 identities and write-unit boundary | G5 | Blocked on G5 approval |
+| Stage C final C6/C7 field names, identity uniqueness scopes and complete immutable payload envelopes | G5/G6/G9 | Logical distinction and ordered atomic-write boundary are owner-approved; final naming/namespace and payload details remain open |
 | Absent vs explicit null | G9 | Genuine G9 contract decision; not specified by current sources |
 | Scalar/number/string normalization | G9 | Genuine G9 contract decision; not specified by current sources |
 | Collection ordering/set semantics by field | G9, respecting G6 event order | Genuine G9 contract decision; event source order itself is already fixed |
@@ -113,7 +113,7 @@ G6 event-order and target-assessment fixture tests are useful evidence, but do n
 
 ## 6. Correct sequencing
 
-1. **G5:** complete the C6–C9 crosswalk, settle the Stage C logical identity and atomic write-unit boundary, and approve the cross-stage examples.
+1. **G5:** complete the C6–C9 crosswalk around the owner-approved Stage C boundary; finalize field names and exact references/provenance, reconcile protocol versions and approve the cross-stage examples/negative permissions.
 2. **G6:** approve the remaining administration lifecycle and identity namespace, reconciled with O6 v0.3.
 3. **G9:** freeze the complete stage payload envelopes; then decide the unresolved canonical equality rules and durable stage-state/recovery semantics.
 4. **G8/G10:** design physical persistence and security/privacy around the approved logical contracts.

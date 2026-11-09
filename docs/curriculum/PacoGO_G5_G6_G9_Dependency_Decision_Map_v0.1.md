@@ -133,6 +133,28 @@ The review recommends, but does not approve, the following minimum logical cardi
 
 Next G6 work after owner disposition: G6-B identity namespace and uniqueness-scope review, followed by the remaining C3/O6 provenance and interruption-restoration reconciliation. Do not treat the recommendation as approved merely because the review or its regression passed.
 
+
+### G6-B — identity namespace and uniqueness-scope review (2026-11-09)
+
+Created `PacoGO_G6_Identity_Namespace_Uniqueness_Scope_Review_v0.1.md` after Full Regression #3409 verified review commit `43b79e95cc511f7eb89a8e7af4714d779b05261b` GREEN.
+
+The source-derived review recommends the following logical distinctions and candidate uniqueness scopes; it does **not** select physical keys or formats:
+
+- Task definition and immutable version are a reusable definition/version pair; task model and immutable version are a separate reusable model/version pair. No parent relationship between task definition and task model is inferred.
+- Task instance identifies one concrete started administration; response episode identifies its response history; raw observation is a separate immutable evidence record.
+- An event belongs to exactly one response episode. The candidate logical reference is episode-qualified (episode identity + event identity); global event-ID uniqueness remains unresolved unless a consumer requires it.
+- A target assessment has its own record identity and points to exactly one raw observation and one existing evidence target. Correction/reassessment creates a separately identified linked assessment; it does not overwrite the observation or prior assessment.
+- Reusable definition/model identities and their version identities are scoped to their respective entity/version namespaces. Administration, episode, observation and assessment identities are candidates for uniqueness across their respective PacoGO operational identity domains.
+- C2 learner, study, session and wave identifiers remain contextual identities outside G6 ownership. They are not substitutes for task-instance, episode or evidence-record identities.
+
+The review also records a provenance gap for Learning Interface identity/version/configuration. It does not equate a Learning Interface with a task model or invent an ID contract; this requires a separate, source-led decision.
+
+**Explicitly deferred:** UUID/ULID or other ID format; random or deterministic generation; timestamp/content-hash derivation; canonical serialization; physical primary/foreign keys; database constraints; idempotency-key encoding; persistence and recovery mechanics. These belong to their owning gates, especially G9 and G8/G10, and cannot be selected by G6 namespace wording.
+
+**Disposition:** G6-B is a candidate recommendation awaiting explicit owner disposition. It does not close identity scope, G6, G9 or any persistence gate. G6-A cardinality remains separately pending owner disposition. G6 remains OPEN; G9 remains OPEN; G12 remains NOT AUTHORIZED. No runtime/schema/test change or implementation authorization follows from this review.
+
+Next G6 work: obtain owner disposition for G6-A and G6-B; then reconcile approved logical identities and provenance with C2, frozen O6 v0.3 and the applicable C3 operational contract, including Learning Interface provenance and interruption-restoration verification. Do not begin G9 canonical equality/replay/recovery design until its G5/G6 inputs are approved.
+
 ## 5. G9 — decisions owned by G9 after G5/G6 inputs are approved
 
 **Current status: OPEN.**

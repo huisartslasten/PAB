@@ -5000,3 +5000,40 @@ Define the separate G6/G9 work boundary from the outstanding identity, lifecycle
 - Latest verified commit before this handoff update: `a6ea678a13077197c137dfd2bf68e3856acebeb0`.
 - Latest verified Full Regression: #3404 / run ID `42626524495`, GREEN on that exact commit.
 - This handoff update is a new documentation commit and requires its own Full Regression before it is considered verified.
+
+
+---
+
+## Current handoff update — 2026-11-09 (G6-A review)
+
+**Verified branch:** `refactor/professional-v1`  
+**Latest verified content commit before this handoff update:** `95664a4fc2b8a4178e2baa2ad1773d265374c7e2`  
+**Full Regression:** #3407, run `42639332288`, GREEN on that exact commit.  
+**Run:** https://github.com/huisartslasten/PAB/actions/runs/42639332288
+
+### Completed in this continuation
+- Confirmed Full Regression #3406 GREEN on G6 review commit `c6cf99a7e3b275e5ccc4125a1958755637e5de02`.
+- Added the G6-A task-instance/response-episode cardinality review: `PacoGO_G6_Task_Instance_Response_Episode_Cardinality_Review_v0.1.md`.
+- Added the G6-A candidate summary to `PacoGO_G5_G6_G9_Dependency_Decision_Map_v0.1.md`.
+- Full Regression #3407 verified the dependency-map update commit `95664a4fc2b8a4178e2baa2ad1773d265374c7e2` GREEN.
+
+### G6-A status — owner disposition still pending
+The review recommends one started task instance ↔ one response episode (1:1), created together when a concrete administration starts; one episode ↔ one immutable raw observation; one observation may have zero or more separately identified target assessments. A preview that never starts creates no administration identities. Task definition/version and task model/version remain separate reusable references.
+
+This is a **candidate recommendation only**, not an owner-approved decision. Do not mark cardinality closed or use it to authorize implementation until owner disposition is explicit.
+
+### Current gate status
+- G5 bounded logical crosswalk: RESOLVED.
+- G6: OPEN; G6-A recommendation awaits owner disposition. Identity namespace/uniqueness, complete C3/O6 reconciliation, interruption restoration details and remaining lifecycle vocabulary are open.
+- G9: OPEN; depends on approved G5/G6 logical inputs.
+- G8/G10/G11: downstream/separately gated.
+- G12: NOT AUTHORIZED. No runtime, test, registry, learner-state, database, SQL/RPC/RLS, Supabase or learner-data changes were made in this work.
+
+### Next concrete steps
+1. Obtain/record owner disposition for G6-A. Do not infer approval from a successful regression or from the instruction to continue.
+2. Proceed with G6-B: source-led review of logical identity namespaces and uniqueness scopes for task definition/version, task model/version, task instance, response episode, event, raw observation and target assessment. Keep logical identity distinct from physical primary keys, UUID formats, composite hashes, serialization and storage constraints.
+3. Reconcile the resulting identity contract against C2, C3 v0.2 and O6 v0.3, including correction/reassessment lineage and the existing G6 fixture coverage.
+4. Only after G6 inputs are approved, move to G9 canonical payload equality, replay/conflict and durable stage recovery design.
+5. Preserve the practical priority: Zyon should catch up in mathematics, especially fractions. Reuse the existing FR2 Fraction Learning Interface and its five technical demonstrations; do not wait for theoretical G6/G9 closure to plan appropriate learning support, but do not treat synthetic demo observations as learner evidence.
+
+**Regression discipline:** the handoff update itself is a repository change and must receive a fresh Full Regression. Do not claim the handoff update is verified until that run completes GREEN on its exact resulting commit.

@@ -197,6 +197,8 @@ Minimaal moet worden aangetoond dat:
 4. niet-mastered C6-uitkomsten geen next-development advancement opleveren;
 5. C7 geen runtime-state muteert.
 
+**Belangrijke contractkwalificatie bij deze eerste slice:** de illustratieve lookup `mastery_state_by_claim` is claim-keyed en draagt op zichzelf niet de volledige zesdelige branch-identiteit, snapshotreferentie en C6-evaluatie-identiteit. Deze slice is daarom geen canonieke C6→C7-adapter-specificatie en mag niet rechtstreeks als implementatiecontract worden gebruikt. G5/G7 moeten de canonieke adapter en de relatie tot de bestaande claim-keyed prototypepaden expliciet reconciliëren. De owner-approved recordgrens in §8 en de exacte lineage-eisen blijven leidend; er wordt hier geen runtimepad gekozen.
+
 ## 10. Belangrijke grens
 
 C7 is geen aanbevelingsalgoritme dat zelfstandig nieuwe onderwijsstappen bedenkt.

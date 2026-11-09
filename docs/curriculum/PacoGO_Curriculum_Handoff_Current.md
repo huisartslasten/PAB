@@ -4905,3 +4905,30 @@ Remaining work is G5 source-by-source reconciliation: protocol-version and stage
 ### Next concrete step
 
 Resume G5 with a source-by-source protocol/rejection crosswalk across C6 v0.1, C7 v0.2, C8 v0.2, C9 v0.2 and frozen O6 v0.3. Separate direct source statements from unresolved or conflicting wording; attribute every rejection to its owning stage and do not invent shared behavior. Then reconcile provenance, examples and legacy compatibility. No implementation.
+
+
+## 152. G5 Stage C protocol/rejection crosswalk audit prepared
+
+### Verification baseline
+
+- Branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Handoff verification commit `848b50ef41ea05936532b0fdead78e6f543cc538`: Full Regression #3396 / run ID `42563135457`: **GREEN** on that exact commit. All required steps passed, including Chromium, fixture server, browser regression and clean-working-tree verification.
+
+### Source-by-source audit
+
+Created `PacoGO_G5_C6_C7_C8_C9_Protocol_Rejection_Crosswalk_Audit_v0.1.md` as a source-derived draft for owner review. It compares C6 v0.1, C7 v0.2, C8 v0.2, C9 v0.2, frozen O6 v0.3 and the superseded C3 v0.2 candidate material. The dependency map now points to this audit.
+
+Principal findings:
+- C6 inference outcomes, O6 assessment/execution states, C7 candidate actions, C8 projection eligibility and C9 structural validation failures are different domains; they must not be collapsed into a generic reject/hold status.
+- C7 `HOLD_FOR_MORE_EVIDENCE` is a pedagogical candidate action, not a structural error code.
+- Under the approved C8 derived-projection decision, C8 cannot durably quarantine or maintain an independent conflict/replay lifecycle. The precise ownership of projection-local diagnostics remains open.
+- C9 reports exact stage/record mismatches; it does not repair or write.
+- O6 v0.3 requires O6/C3 contract, target-rule and assessment-engine provenance. C3 v0.2 human-coder workflow assumptions are explicitly withdrawn for learner runtime and are not an approved canonical operational codebook.
+- C6 M1/M2 consumption of O6's separate alignment/relation dimensions and non-scored adequacy profile remains unresolved.
+- Positive, negative, missing, structural mismatch, late-arriving and legacy examples are drafted as logical examples only, not approved executable fixtures.
+
+### Current status and next step
+
+The audit is a documentation-only draft, not a frozen cross-stage contract or owner decision. G5 remains OPEN for owner review of stage-attributed rejection/C8 diagnostics, operational provenance terminology, C6 M1/M2 consumption, examples and legacy/scalar compatibility. G6/G9 remain OPEN; G12 remains NOT AUTHORIZED. No runtime, tests, registry, learner state, schema, database, SQL/RPC/RLS, Supabase or learner data changed.
+
+Next: obtain owner disposition on the bounded logical choices identified in audit §8. Do not alter frozen O6 v0.3, invent a C3 codebook version, implement runtime or add persistence.

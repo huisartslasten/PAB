@@ -223,3 +223,19 @@ Therefore neither existing C6→C7 adapter can be designated the canonical Stage
 **Owner decision approved 2026-11-08:** retain both existing C6→C7 adapters and the downstream C8/C9 bridge explicitly as non-canonical prototype/test paths. No existing path is designated as the canonical Stage C adapter. The canonical adapter must be defined from the reconciled full Stage C lineage envelope after G5/G7 reconciliation. Do not delete, merge, refactor or route runtime traffic based on this decision. No code or tests were changed; no runtime, curriculum, registry, learner state, schema, database, SQL/RPC/RLS or Supabase was changed. The existing adapters were inspected read-only.
 
 **Decision effect:** adapter ownership is resolved only to the extent that all three existing paths remain non-canonical. G5 still owns the logical adapter envelope; G7 still owns consumer compatibility and migration/deprecation planning. This decision does not select a canonical adapter, change runtime routing, or authorize implementation.
+
+
+## G5 follow-up — protocol/rejection and O6 provenance crosswalk audit (2026-11-09)
+
+Audit: `PacoGO_G5_C6_C7_C8_C9_Protocol_Rejection_Crosswalk_Audit_v0.1.md`.
+
+The source-by-source review confirms:
+- O6 v0.3 is the frozen, owner-approved operational assessment contract; its applicability, execution and result layers must remain distinct.
+- C6 v0.1 has five mastery outcomes; missing/unassessable evidence is not the same as structural lineage rejection.
+- C7 v0.2 has six candidate actions; `HOLD_FOR_MORE_EVIDENCE` is the sole hold candidate. Structural identity failure must not be converted into that pedagogical action.
+- C8 v0.2's rejection/quarantine and duplicate/replay wording must be read subject to the owner-approved derived projection boundary. C8 cannot create durable quarantine, a C8 conflict lifecycle or independent identity.
+- C9 v0.2 is a structural validator that reports per-branch, stage-attributed errors; it does not repair or mutate records.
+- C3 v0.2 and the earlier C3 reconciliation retain withdrawn human-coder assumptions and are not approved operational codebooks. New learner-runtime assessment provenance must align to O6's O6/C3 contract version, target-rule version and assessment-engine version; human coder/adjudication references are historical/external only where genuinely present.
+- C6 M1/M2 use of O6 alignment/relation and the non-scored adequacy profile remains an explicit G5 open item. No O6 profile score or automatic M1/M2 mapping is introduced.
+
+G5 remains OPEN for owner review of stage-attributed rejection/C8 diagnostics, operational provenance terminology, C6 M1/M2 consumption, examples and legacy/scalar compatibility. G6/G9 remain OPEN; G12 remains NOT AUTHORIZED. Audit is documentation only and does not change frozen O6 v0.3, runtime, tests, schema, persistence or Supabase.

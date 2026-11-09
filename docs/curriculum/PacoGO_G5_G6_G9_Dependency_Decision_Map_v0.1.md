@@ -34,12 +34,26 @@ This is a reconciliation of the repository sources, not a new owner decision. Wh
 ### G5 deliverables still required
 
 1. **Reconcile and approve protocol versions as one contract set.** C6 v0.1 and C7 v0.2 are candidate protocols; C8/C9 v0.2 carry more explicit branch/snapshot lineage. The four documents must agree on required inputs, outputs, references, error/rejection behavior and version provenance.
-2. **Approve the complete Stage C lineage envelope.** Distinguish immutable snapshot identity, C6 `evaluation_id`, and the separate C7 decision identity that references the exact C6 evaluation. Resolve final names and exact references consistently through C6/C7/C8/C9.
-3. **Decide Stage C idempotency/atomicity unit boundaries.** O7 establishes separate idempotency boundaries for raw observation, target assessment and decision evaluation, and requires stage-local atomicity. It does not specify whether C6 and C7 are one or separate atomic write units. G5 must settle the logical C6/C7 boundary before G9 can define Stage C replay/recovery.
+2. **Approve and reconcile the complete Stage C lineage envelope.** The owner has approved distinct immutable snapshot, C6 evaluation and C7 decision records/identities, with C7 referencing the exact committed C6 evaluation. Reconcile the final field names and exact references consistently through C6/C7/C8/C9; field naming and physical identity namespaces remain open.
+3. **Stage C idempotency/atomicity boundary — OWNER-APPROVED 2026-11-08.** O7's three top-level idempotency boundaries remain unchanged: raw-observation ingestion, target-assessment evaluation/recording and decision evaluation. Within O7's existing decision-evaluation boundary, C6 and C7 are distinct, ordered, immutable logical records with separate identities and separate atomic commits. C6 must be durably committed before C7 may be committed. C7 references the exact committed C6 result and the same branch/snapshot lineage. If C7 fails, the C6 record remains committed; C7 may be retried against that exact C6 result without rewriting or recomputing C6. This does not create a fourth O7 boundary or combine the C6 and C7 writes into one indivisible transaction.
 4. **Reconcile target-assessment input and version provenance with O6 v0.3.** O6 v0.3 remains the frozen logical basis. Do not silently reopen or rewrite it; record any genuine cross-protocol mismatch as a specific gap requiring owner disposition.
 5. **Approve cross-stage positive, negative, missing and mismatch examples/test vectors.** Existing examples in matrix §7.12 are illustrative, not implementation fixtures.
 6. **Confirm consistent negative permissions and legacy boundaries.** C6/C7/C8/C9 must not infer missing identity, repair mismatched lineage, pool branches or expand one another's authority.
 7. **Confirm legacy/scalar disposition with G6/G7.** Missing historical provenance remains legacy/unknown; no reconstruction from current registry, task, timestamp or session.
+
+### G5 owner decision — Stage C C6/C7 boundary (2026-11-08)
+
+The owner approved the following logical boundary:
+
+- Keep O7's three top-level idempotency boundaries unchanged.
+- Treat the immutable decision snapshot, C6 evaluation and C7 decision as distinct logical records with distinct identities.
+- C6's evaluation record is immutable and is committed atomically as its own write.
+- C7's decision record is immutable and has its own identity. It may be committed only after the exact C6 evaluation it consumes has been committed.
+- C7 must preserve the exact six-part branch identity and snapshot/evaluation lineage from C6; it may not recompute mastery or reconstruct missing identity.
+- If C7 fails or is unavailable, the committed C6 evaluation remains intact. A later C7 retry consumes that exact C6 evaluation and does not rewrite or rerun C6.
+- C6 and C7 are separate ordered atomic writes **within O7's existing decision-evaluation boundary**. They are not two additional top-level O7 idempotency boundaries, and they are not one shared indivisible write unit.
+
+This decision settles the logical Stage C record/write-unit boundary. It does **not** select physical IDs, field names, database keys/tables, transaction technology, serialization/hash formats, retry mechanics, locking, or persistence implementation. Those remain assigned to the relevant G5/G9/G8/G10 decisions.
 
 ### G5 items not blocking internal single-branch lineage
 

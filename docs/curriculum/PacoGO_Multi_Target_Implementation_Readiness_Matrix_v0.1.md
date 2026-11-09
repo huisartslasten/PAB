@@ -1698,3 +1698,33 @@ This interpretation is corroborated by the existing C7 v0.2 validation matrix an
 This clarification does not change the action policy, candidate set, gate behavior, decision reasons, C6 mastery outcomes, C8 descriptive authority or C9 validation authority. It does not authorize runtime/test changes, schema, SQL/RPC/RLS, persistence or Supabase work. Existing engine and test artifacts were inspected read-only; no code or tests were changed.
 
 **G5 effect:** the HOLD vocabulary ambiguity is resolved at the logical contract level by the active protocol, validation matrix and maintained engine/test evidence. G5 remains OPEN for its other reconciliation deliverables. G6/G9 remain OPEN; G12 remains NOT AUTHORIZED.
+
+## G5-S5 — C6→C7 adapter ownership and prototype-path audit
+
+**Status: read-only source audit; canonical adapter ownership remains OPEN.**
+
+### Existing source paths inspected
+
+1. `pacogo-engine/c6-c7-adapter.js` exports `validateC6SafetyBoundary` and `createC7InputFromC6`. It selects `c6Result.mastery_state_by_claim[options.claim_id]`, requires caller-supplied C7 context, and checks the supplied current development against the selected C6 result.
+2. `pacogo-engine/c7-from-c6.js` exports `validateC6ResultForC7` and `buildC7InputFromC6`. It also selects `c6_result.mastery_state_by_claim[claim_id]`, but derives current development from the selected C6 result. It separately validates ordering/alternative states before building the C7 input.
+3. Both paths enforce the existing C6 safety flags and construct the same general claim/development-keyed C7 input shape. They are distinct modules with overlapping adapter responsibility and different function/input contracts.
+4. The maintained tests for each adapter exercise the corresponding path. `c6-c7-vertical-slice.test.js` and `c8-c9-real-vertical-slice.test.js` exercise `buildC7InputFromC6` from `c7-from-c6.js`. This proves test-fixture usage, not production runtime ownership.
+5. `pacogo-engine/c8-c9-adapter.js` is a separate downstream bridge. It accepts either a claim-keyed C6 result plus claim ID or an already normalized claim result, then checks claim/development alignment and maps the C7 `candidate_action` to C8's `next_action`. It does not establish canonical six-part branch/snapshot/C6/C7 identity lineage.
+
+### Contract gap established
+
+The current C6 engine result exposes `mastery_state_by_claim` and safety flags, but no immutable `decision_snapshot_id`, `c6_evaluation_id` or complete six-part branch envelope. The current C7 engine output similarly contains claim/development, candidate action, reason, gate, supporting evidence and safety flags, but no `c7_decision_id` or exact upstream lineage references.
+
+Therefore neither existing C6→C7 adapter can be designated the canonical Stage C adapter merely because its tests pass. Both are claim-keyed prototype paths, consistent with the explicit non-canonical warning in C7 v0.2 §9. The downstream C8/C9 adapter is also a prototype bridge, not a canonical lineage adapter.
+
+### Ownership boundary and recommendation
+
+- **G5 owns** the logical C6→C7 input/output envelope and exact lineage requirements, under the already approved Stage C record boundary and official names `decision_snapshot_id`, `c6_evaluation_id`, `c7_decision_id`.
+- **G7 owns** consumer compatibility, inventory of existing call paths, and any explicit deprecation/transition plan. G7 must not choose a logical contract by implementation convenience.
+- **G12 remains the only narrow implementation-authorization gate.**
+
+**Recommendation for owner disposition:** retain both existing C6→C7 adapters and the C8/C9 bridge as non-canonical prototype/test paths; do not designate either as the canonical adapter. Define the canonical adapter only from the approved full Stage C lineage envelope after G5/G7 reconciliation. Do not delete, merge, refactor or route runtime traffic in this audit.
+
+This is a recommendation, not an owner decision. No code or tests were changed; no runtime, curriculum, registry, learner state, schema, database, SQL/RPC/RLS or Supabase was changed. The existing adapters were inspected read-only.
+
+**Next owner decision required:** confirm whether both existing C6→C7 adapters and the downstream C8/C9 bridge are to remain explicitly non-canonical prototype/test paths, with no path designated canonical at this stage.

@@ -149,7 +149,25 @@ De adapter geeft orderinginformatie expliciet en gescheiden door als:
 
 De adapter leidt deze waarden niet af uit C6.
 
-## 8. Eerste verticale C6 → C7 slice
+## 8. Owner-approved Stage C decision-record boundary
+
+**Owner decision, 2026-11-08:** a C7 next-action decision is a distinct immutable logical record with its own identity. It is not the C6 evaluation record and must reference the exact committed C6 evaluation it consumes.
+
+The C7 decision record preserves:
+- its own C7 decision identity;
+- the exact C6 evaluation identity/reference;
+- the unchanged complete six-part branch identity;
+- the exact immutable decision snapshot reference carried by C6;
+- the exact C6 mastery outcome consumed, without recomputation;
+- C7's explicit candidate set, decision result/trace and applicable action-policy/protocol provenance.
+
+C7 may be committed only after the exact C6 evaluation it consumes has been durably committed. If the C7 write fails, the C6 evaluation remains committed and unchanged. A later C7 retry must consume that same C6 evaluation; it must not rerun C6, replace its result or rewrite its history.
+
+C6 and C7 are separate ordered atomic record writes within O7's existing decision-evaluation idempotency boundary. They do not create additional top-level O7 boundaries and are not one shared indivisible C6/C7 write unit. O7's same-identity/same-payload replay and same-identity/different-payload integrity-conflict rule applies independently to each immutable record.
+
+**Still open:** final field names and physical identity namespaces/uniqueness, canonical payload equality details, physical keys/tables, transaction technology, retry/concurrency mechanics and persistence implementation. This section does not select them.
+
+## 9. Eerste verticale C6 → C7 slice
 
 ```text
 C6 mastery assessment
@@ -179,7 +197,7 @@ Minimaal moet worden aangetoond dat:
 4. niet-mastered C6-uitkomsten geen next-development advancement opleveren;
 5. C7 geen runtime-state muteert.
 
-## 9. Belangrijke grens
+## 10. Belangrijke grens
 
 C7 is geen aanbevelingsalgoritme dat zelfstandig nieuwe onderwijsstappen bedenkt.
 
@@ -201,7 +219,7 @@ C7 mag niet:
 - automatisch een leerling laten doorgaan;
 - runtime-state muteren.
 
-## 10. Empirische vragen
+## 11. Empirische vragen
 
 C7 moet later empirisch worden getoetst op onder meer:
 

@@ -1,6 +1,6 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
-import { createFractionDiagnosticSession, FRACTION_DIAGNOSTIC_STEPS } from '../../../../pacogo-engine/fraction-diagnostic-session.js';
+import { createFractionDiagnosticSession, FRACTION_DIAGNOSTIC_STEPS } from '../../../pacogo-engine/fraction-diagnostic-session.js';
 
 export function createFractionDiagnosticRuntime({ app, templateMount, context, documentRef = document, navigate } = {}) {
   if (!app || !templateMount || typeof navigate !== 'function') throw new TypeError('Fraction diagnostic runtime requires app, template mount and navigation.');
@@ -12,7 +12,8 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
   let learner = null;
 
   const setup = documentRef.createElement('section');
-  setup.className = 'paco-template-card fraction-diagnostic-card';
+  setup.id = 'fraction-diagnostic-setup';
+  setup.className = 'card fraction-diagnostic-card';
   const setupTitle = documentRef.createElement('h2');
   setupTitle.textContent = 'Wie gaat de breukendiagnose maken?';
   const setupCopy = documentRef.createElement('p');
@@ -28,7 +29,8 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
   setup.append(setupTitle, setupCopy, setupStatus, learnerList);
 
   const diagnostic = documentRef.createElement('section');
-  diagnostic.className = 'paco-template-card fraction-diagnostic-card';
+  diagnostic.id = 'fraction-diagnostic-card';
+  diagnostic.className = 'card fraction-diagnostic-card';
   diagnostic.hidden = true;
   const learnerLabel = documentRef.createElement('p');
   learnerLabel.className = 'fraction-diagnostic-muted';
@@ -56,7 +58,8 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
   diagnostic.append(learnerLabel, stepTitle, prompt, progress, expression, form, diagnosticNotice, diagnosticStatus);
 
   const result = documentRef.createElement('section');
-  result.className = 'paco-template-card fraction-diagnostic-card';
+  result.id = 'fraction-diagnostic-result';
+  result.className = 'card fraction-diagnostic-card';
   result.hidden = true;
   const resultTitle = documentRef.createElement('h2');
   const resultCopy = documentRef.createElement('p');
@@ -85,12 +88,7 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
   restart.textContent = 'Diagnose opnieuw doen';
   result.append(resultTitle, resultCopy, explanation, practiceTitle, practicePrompt, practiceExpression, practiceForm, practiceStatus, restart);
 
-  const practiceLink = documentRef.createElement('button');
-  practiceLink.type = 'button';
-  practiceLink.className = 'secondary';
-  practiceLink.textContent = 'Naar de gewone breukenoefeningen';
-  practiceLink.addEventListener('click', () => navigate('curriculum-fr2-practice-learner.html'));
-  content.append(setup, diagnostic, result, practiceLink);
+  content.append(setup, diagnostic, result);
 
   function renderFields(host, definitions) {
     host.replaceChildren();
@@ -165,7 +163,6 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
     learner = selectedLearner;
     session = createFractionDiagnosticSession({ learnerKey: learner.learner_key, storage: documentRef.defaultView?.localStorage || globalThis.localStorage });
     setup.hidden = true;
-    result.hidden = false;
     result.hidden = true;
     diagnostic.hidden = false;
     learnerLabel.textContent = 'PacoGO • ' + learner.display_name + ' • Rekenen • Breuken';

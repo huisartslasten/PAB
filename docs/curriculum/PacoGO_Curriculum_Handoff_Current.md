@@ -5388,3 +5388,50 @@ Obtain a recent school workbook page, test or teacher/parent confirmation showin
 - Latest verified content commit before this handoff update: `fa5a91af98516dd3219b45a7b5533105d43bba07`.
 - Latest verified Full Regression before this handoff update: #3425 / run `42835157181`, **GREEN** on that exact commit.
 - This diagnostic-design and handoff update is a repository change and requires Full Regression on its exact resulting commit.
+
+
+---
+
+## Current handoff update — 2026-11-10 (School workbook review and fraction catch-up priority update)
+
+**Branch:** `refactor/professional-v1`; LIVE `main` untouched.
+
+### Full Regression #3426 closure
+
+- Full Regression #3426 / run `42836910292`: **GREEN** on exact commit `a33043a2dfbd5614491a125c59f6bd1c6017a857`.
+- All workflow steps passed, including dependency checks, curriculum engine, architecture boundaries, maintained Node/Vitest, Chromium browser regression and clean-working-tree verification.
+- Run URL: https://github.com/huisartslasten/PAB/actions/runs/42836910292
+
+### Parent-supplied school workbook reviewed
+
+A photograph supplied on 2026-11-10 shows school exercises for:
+- generating equivalent fractions (e.g. chains based on 2/3, 3/4, 2/5, 5/6 and 7/8);
+- adding fractions with unlike denominators;
+- subtracting fractions with unlike denominators;
+- a partially visible fractional comparison/difference task;
+- a separate multiplication word problem (53 × 42), which is outside the fraction curriculum slice.
+
+This establishes that these task types appear on the supplied page. It does not establish complete syllabus coverage, the school's exact written algorithm, or Zyon's mastery/gaps. The handwritten responses are not used as a formal score because the image is partial and some entries are hard to read.
+
+### Diagnostic design updated
+
+The candidate design document `docs/curriculum/PacoGO_Zyon_Fraction_Diagnostic_Design_v0.1.md` now records the workbook evidence and reprioritises the diagnostic around:
+1. equivalent-fraction meaning/generation;
+2. common denominators;
+3. addition with unlike denominators;
+4. subtraction with unlike denominators;
+5. fraction comparison/difference where confirmed by the full workbook section.
+
+Equal partitioning and part–whole meaning remain short prerequisite checks only when responses indicate they are needed. A provisional teaching path is recorded as a hypothesis, not a universal developmental claim: equivalent fractions → common denominators → addition → subtraction → comparison/mixed application. The school-specific written method remains unconfirmed; obtain a worked example or teacher/parent confirmation before claiming alignment with it.
+
+The multiplication problem is explicitly kept separate from FR2 and the fraction diagnostic. No curriculum registry, formal evidence/mastery, learner-state or Supabase contract was changed.
+
+### Next concrete step
+
+Use the actual workbook method if a worked example is available, then finalise a short formative diagnostic that directly tests equivalent fractions, common denominators, unlike-denominator addition and subtraction. Start targeted teaching from the first concept that is genuinely uncertain; do not spend time reteaching prerequisites that Zyon already demonstrates. Keep the diagnostic formative and separate from formal engine evidence.
+
+### Branch, commit and regression
+
+- Latest verified content commit before this documentation update: `a33043a2dfbd5614491a125c59f6bd1c6017a857`.
+- Latest verified Full Regression before this update: #3426 / run `42836910292`, **GREEN** on that exact commit.
+- This workbook-informed diagnostic and handoff update requires Full Regression on its exact resulting commit.

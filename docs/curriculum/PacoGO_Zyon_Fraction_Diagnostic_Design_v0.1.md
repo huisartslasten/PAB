@@ -97,3 +97,40 @@ The current FR2 candidate model distinguishes recognition, explanation and funct
 - No assumptions about Zyon's current gaps or the school's method.
 - No new Supabase tables, migrations, RPC, RLS or persistence contract.
 - No expansion of the existing G12 authorization beyond its stated FR2 learner-practice scope without explicit authorization.
+
+
+## 10. School-workbook evidence supplied 2026-11-10
+
+A parent-supplied photograph of a current/recent school workbook page titled **“Oefen met breuken”** was reviewed. The visible page supports the following taught-scope observations:
+
+### Directly visible fraction content
+
+1. **Equivalent fractions:** chains beginning with examples such as 2/3, 3/4, 2/5, 5/6 and 7/8, with denominators/numerators scaled to create equivalent fractions.
+2. **Fraction addition with unlike denominators:** examples include 1/4 + 3/8, 2/5 + 3/10, 1/6 + 5/12, 2/3 + 1/5 and 1/3 + 5/8.
+3. **Fraction subtraction with unlike denominators:** examples include 7/8 − 3/4, 5/6 − 1/3, 9/10 − 3/5, 3/4 − 2/3 and 4/5 − 1/2.
+4. **Fraction comparison/difference:** the right-hand part of the photograph shows a task about the difference between fractional amounts, but the full task and all examples are not visible in the crop.
+5. **Multiplication:** a separate word problem shows 53 oven batches with 42 bread rolls per tray, asking for the total (53 × 42). This is broader arithmetic, not itself a fraction probe.
+
+This is direct evidence that these kinds of exercises appear on the supplied school page. It does not establish the complete class syllabus, whether every topic has already been taught independently, the school's preferred written procedure, or whether Zyon has mastered any of the topics. The handwriting/photo is not treated as a reliable diagnostic score; some responses are difficult to read and the full page is not shown.
+
+### Updated diagnostic priority
+
+The diagnostic should now prioritise the actual visible fraction work rather than spend most of its time on generic fraction prerequisites:
+
+1. Equivalent-fraction meaning and generation: explain/show why numerator and denominator are scaled together without changing the value.
+2. Finding a common denominator for two fractions, including whether the learner understands the relationship between the denominators and the chosen common unit.
+3. Addition with unlike denominators: represent the quantities in a common unit, combine numerators, and interpret the result.
+4. Subtraction with unlike denominators: represent both quantities in a common unit, subtract, and interpret the difference.
+5. Fraction comparison/difference in a visual or contextual task, if the full workbook section confirms that scope.
+
+A short prerequisite check of equal partitioning and part–whole meaning remains available only if the learner's responses suggest it is needed. It should not be a lengthy default gate before addressing the classwork.
+
+### Instructional sequence hypothesis — to be checked, not assumed
+
+The provisional teaching path is:
+
+**equivalent fractions → common denominators → addition with unlike denominators → subtraction with unlike denominators → comparison and mixed application.**
+
+This is a practical instructional hypothesis inferred from the visible task family, not a claim about a validated universal developmental order or the school's exact teaching sequence. Before reproducing a school-specific written algorithm, obtain a page showing the teacher's worked example or confirm the method with the parent/teacher. PacoGO may use a clear visual explanation of the common-unit idea without claiming it is the school's written procedure.
+
+The 53 × 42 word problem should be tracked as a separate multiplication learning need if the parent wants a broader arithmetic catch-up plan; it must not be folded into FR2 or the fraction diagnostic.

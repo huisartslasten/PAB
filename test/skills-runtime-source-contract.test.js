@@ -11,7 +11,7 @@ test('central Skills entry is driven by the curriculum registry and routes only 
   assert.match(runtime, /FR2: Object\.freeze/);
   assert.match(runtime, /curriculum-a1-numberline\.html/);
   assert.match(runtime, /curriculum-b1-learner\.html/);
-  assert.match(runtime, /curriculum-fr2-fractions\.html/);
+  assert.match(runtime, /curriculum-fraction-diagnostic-learner\.html/);
 });
 
 test('central Skills entry does not depend on retired timed practice or legacy Skill persistence', () => {

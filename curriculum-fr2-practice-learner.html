@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — Breuken oefenen</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <link rel="stylesheet" href="./pacogo-engine/fraction-learning-interface.css">
+  <style>
+    :root{font-family:Nunito,system-ui,sans-serif;color:#102b57;background:#f5f9fd}
+    body{margin:0;padding:24px;min-height:100vh;box-sizing:border-box}
+    main{max-width:900px;margin:0 auto;display:grid;gap:18px}
+    .card{background:#fff;border:1px solid #d8e7f4;border-radius:22px;padding:24px;box-shadow:0 8px 24px rgba(16,43,87,.07)}
+    h1,h2{margin:0 0 10px}h1{font-size:30px}h2{font-size:21px}
+    p{line-height:1.55}.muted{color:#647894;line-height:1.5}
+    button{border:0;border-radius:14px;padding:12px 18px;background:#1787f2;color:#fff;font:800 15px Nunito,system-ui,sans-serif;cursor:pointer;margin:4px}
+    button:disabled{opacity:.55;cursor:not-allowed}
+    button:focus-visible{outline:3px solid #102b57;outline-offset:3px}
+    #learnerList{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+    #setupStatus,#feedback{padding:12px 14px;border-radius:14px;background:#eef8ff;color:#126fc9;font-weight:700}
+    #feedback.error{background:#fff0f0;color:#b42318}
+    #progress{font-size:14px;color:#647894;font-weight:800;margin:14px 0}
+    .concept{padding:16px;border-radius:16px;background:#f1f7fc;border:1px solid #d8e7f4}
+    .concept strong{display:block;margin-bottom:5px}
+    #comparison{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;margin:16px 0;padding:16px;background:#f5f9fd;border-radius:14px}
+    .comparison-item{display:grid;justify-items:center;gap:8px;min-width:130px}
+    .comparison-item span:last-child{font-weight:800}
+    #exerciseCard[hidden],#learnerSetup[hidden],#resultCard[hidden]{display:none}
+    @media(max-width:600px){body{padding:14px}.card{padding:18px}h1{font-size:25px}}
+  </style>
+</head>
+<body>
+<main>
+  <section class="card" id="learnerSetup">
+    <div class="muted">PacoGO • Rekenen • Breuken</div>
+    <h1>Wie gaat breuken oefenen?</h1>
+    <p class="muted">Kies het leerlingprofiel. Deze oefenvoortgang wordt alleen op dit apparaat bewaard.</p>
+    <div id="setupStatus" role="status" aria-live="polite">Ouderaccount controleren…</div>
+    <div id="learnerList"></div>
+  </section>
+
+  <section class="card" id="exerciseCard" hidden>
+    <div class="muted" id="selectedLearnerLabel">PacoGO • Breuken</div>
+    <h1>Breuken die evenveel betekenen</h1>
+    <div class="concept">
+      <strong>Wat betekent een breuk?</strong>
+      Een breuk laat een deel van één geheel zien. Twee breuken kunnen anders verdeeld zijn en toch evenveel van dat geheel laten zien. Vergelijk steeds de blauwe hoeveelheid.
+    </div>
+    <div id="progress">Voortgang laden…</div>
+    <div id="prompt" class="muted"></div>
+    <div id="fractionInterface"></div>
+    <div id="feedback" role="status" aria-live="polite">Kijk rustig naar de modellen.</div>
+    <div id="comparison" hidden></div>
+    <div id="nextAction"></div>
+    <p class="muted">Dit is een oefenronde. De antwoorden worden niet gebruikt voor een toets, beoordeling of mastery-beslissing.</p>
+  </section>
+
+  <section class="card" id="resultCard" hidden>
+    <h1>Oefenronde afgerond</h1>
+    <p id="resultText" class="muted"></p>
+    <button type="button" id="restartPractice">Oefenronde opnieuw beginnen</button>
+  </section>
+</main>
+<script type="module">
+  import { createPacoGOApp } from "./src/app/bootstrap.js";
+  import { createFractionLearningInterface } from "./pacogo-engine/fraction-learning-interface.js";
+  import { renderFractionRepresentation } from "./pacogo-engine/fraction-learning-interface-renderers.js";
+  import { FRACTION_PRACTICE_TASKS, createFractionPracticeSession } from "./pacogo-engine/fraction-practice-session.js";
+
+  const app = createPacoGOApp({ supabaseLib: window.supabase, storage: window.localStorage });
+  const setup = document.querySelector("#learnerSetup");
+  const setupStatus = document.querySelector("#setupStatus");
+  const learnerList = document.querySelector("#learnerList");
+  const exerciseCard = document.querySelector("#exerciseCard");
+  const resultCard = document.querySelector("#resultCard");
+  const interfaceHost = document.querySelector("#fractionInterface");
+  const feedback = document.querySelector("#feedback");
+  const comparison = document.querySelector("#comparison");
+  const nextAction = document.querySelector("#nextAction");
+  const progressLabel = document.querySelector("#progress");
+  let selectedLearner = null;
+  let practiceSession = null;
+  let currentTask = null;
+  let interfaceInstance = null;
+
+  function setSetupError(error) {
+    setupStatus.textContent = error?.message || "De leerlingprofielen konden niet worden geladen.";
+    setupStatus.style.background = "#fff0f0";
+    setupStatus.style.color = "#b42318";
+  }
+
+  function addLearnerButton(learner) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = "Oefenen met " + learner.display_name;
+    button.setAttribute("aria-label", "Leerling kiezen: " + learner.display_name);
+    button.addEventListener("click", () => startPractice(learner));
+    learnerList.append(button);
+  }
+
+  async function loadLearners() {
+    const session = await app.initializeSession();
+    if (!session || !app.auth.isParent) {
+      window.location.replace("auth.html?returnTo=curriculum-fr2-practice-learner.html");
+      return;
+    }
+    const learners = await app.learnerCurriculum.listLearners();
+    learnerList.replaceChildren();
+    if (!learners.length) {
+      setupStatus.textContent = "Er is nog geen leerlingprofiel beschikbaar. Maak eerst een profiel aan via Beheer.";
+      return;
+    }
+    setupStatus.textContent = "Kies het profiel van de leerling die gaat oefenen.";
+    learners.forEach(addLearnerButton);
+  }
+
+  function updateProgress() {
+    const progress = practiceSession.getProgress();
+    progressLabel.textContent = "Oefening " + Math.min(progress.completedCount + 1, progress.totalCount) +
+      " van " + progress.totalCount + " • " + progress.completedCount + " afgerond";
+  }
+
+  function showComparison(task) {
+    comparison.replaceChildren();
+    const correct = task.options.find(option =>
+      task.targetFraction.numerator * option.fraction.denominator ===
+      option.fraction.numerator * task.targetFraction.denominator
+    );
+    const items = [
+      { label: "Doel", fraction: task.targetFraction, representation: "area_model" },
+      { label: "Evenveel", fraction: correct.fraction, representation: "area_model" }
+    ];
+    items.forEach(item => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "comparison-item";
+      const label = document.createElement("span");
+      label.textContent = item.label;
+      wrapper.append(label, renderFractionRepresentation(item.fraction, item.representation, item.label));
+      const fractionLabel = document.createElement("span");
+      fractionLabel.textContent = item.fraction.numerator + "/" + item.fraction.denominator;
+      wrapper.append(fractionLabel);
+      comparison.append(wrapper);
+    });
+    comparison.hidden = false;
+  }
+
+  function showCompleted() {
+    exerciseCard.hidden = true;
+    resultCard.hidden = false;
+    const progress = practiceSession.getProgress();
+    document.querySelector("#resultText").textContent =
+      "Je hebt alle " + progress.totalCount + " opdrachten afgerond. Je hebt " +
+      progress.correctAnswers + " juiste antwoorden gegeven. Je voortgang staat alleen op dit apparaat.";
+  }
+
+  function renderTask() {
+    const nextTaskId = practiceSession.getNextTaskId();
+    if (!nextTaskId) {
+      showCompleted();
+      return;
+    }
+    currentTask = FRACTION_PRACTICE_TASKS.find(task => task.id === nextTaskId);
+    interfaceHost.replaceChildren();
+    comparison.hidden = true;
+    comparison.replaceChildren();
+    nextAction.replaceChildren();
+    feedback.className = "";
+    feedback.textContent = "Kijk naar de blauwe delen. Welke optie laat evenveel zien?";
+    document.querySelector("#prompt").textContent = "Vergelijk de hoeveelheid blauw in het doelmodel met de antwoordopties.";
+    updateProgress();
+
+    interfaceInstance = createFractionLearningInterface({
+      mount: interfaceHost,
+      config: {
+        targetFraction: currentTask.targetFraction,
+        options: currentTask.options,
+        targetRepresentation: "area_model",
+        optionRepresentation: currentTask.optionRepresentation,
+        labels: {
+          title: "Welke breuk laat evenveel zien?",
+          target: "Doel",
+          options: "Kies de breuk met dezelfde waarde",
+          submit: "Controleren"
+        }
+      },
+      onSubmit: () => handleAnswer(interfaceInstance.getSelectedOptionId())
+    });
+  }
+
+  function handleAnswer(selectedOptionId) {
+    if (!currentTask || !selectedOptionId) return;
+    const selected = currentTask.options.find(option => option.id === selectedOptionId);
+    const correct = currentTask.targetFraction.numerator * selected.fraction.denominator ===
+      selected.fraction.numerator * currentTask.targetFraction.denominator;
+    const progress = practiceSession.recordAnswer({ taskId: currentTask.id, correct });
+    interfaceInstance.lock();
+    showComparison(currentTask);
+    if (correct) {
+      feedback.className = "";
+      feedback.textContent = "Goed gezien. De blauwe hoeveelheid is even groot. De verdeling is anders, maar het deel van het geheel blijft gelijk.";
+      const next = document.createElement("button");
+      next.type = "button";
+      next.textContent = progress.isComplete ? "Bekijk resultaat" : "Volgende oefening";
+      next.addEventListener("click", () => {
+        if (practiceSession.getProgress().isComplete) showCompleted();
+        else renderTask();
+      });
+      nextAction.replaceChildren(next);
+    } else {
+      feedback.className = "error";
+      feedback.textContent = "Deze optie laat niet evenveel blauw zien. Vergelijk de twee modellen: de juiste verdeling heeft dezelfde hoeveelheid blauw als het doel.";
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.textContent = "Nog een keer proberen";
+      retry.addEventListener("click", renderTask);
+      nextAction.replaceChildren(retry);
+    }
+  }
+
+  function startPractice(learner) {
+    selectedLearner = learner;
+    practiceSession = createFractionPracticeSession({ learnerKey: learner.learner_key });
+    setup.hidden = true;
+    resultCard.hidden = true;
+    exerciseCard.hidden = false;
+    document.querySelector("#selectedLearnerLabel").textContent =
+      "PacoGO • " + learner.display_name + " • Rekenen • Breuken";
+    renderTask();
+  }
+
+  document.querySelector("#restartPractice").addEventListener("click", () => {
+    practiceSession.reset();
+    resultCard.hidden = true;
+    exerciseCard.hidden = false;
+    renderTask();
+  });
+
+  try {
+    await loadLearners();
+  } catch (error) {
+    setSetupError(error);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+.fraction-diagnostic{display:grid;gap:18px;color:var(--paco-text)}
+.fraction-diagnostic-card{padding:24px}
+.fraction-diagnostic-card h2{margin:0 0 10px;font:900 26px/1.15 "Baloo 2",Nunito,sans-serif;color:var(--paco-text)}
+.fraction-diagnostic-card h3{margin:18px 0 8px;font:900 21px/1.2 "Baloo 2",Nunito,sans-serif;color:var(--paco-text)}
+.fraction-diagnostic-muted{color:var(--paco-muted);line-height:1.5}
+.fraction-diagnostic-status,.fraction-diagnostic-explanation{padding:14px 16px;border-radius:15px;background:#eef8ff;color:#126fc9;font-weight:800;line-height:1.45}
+.fraction-diagnostic-status.is-error{background:#fff0f0;color:#b42318}
+.fraction-diagnostic-learners{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+.fraction-diagnostic-progress{margin:12px 0;color:var(--paco-blue-dark);font-weight:900}
+.fraction-diagnostic-expression{margin:16px 0;padding:22px;border-radius:18px;background:#edf8ff;color:var(--paco-text);font-size:clamp(23px,3vw,32px);font-weight:900;text-align:center;letter-spacing:.2px}
+.fraction-diagnostic-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:16px 0}
+.fraction-diagnostic-field{display:grid;gap:7px;color:var(--paco-text);font-weight:800}
+.fraction-diagnostic-field input{min-height:48px}
+.fraction-diagnostic button{margin:4px 6px 4px 0}
+.fraction-diagnostic button:focus-visible{outline:3px solid rgba(23,135,242,.4);outline-offset:3px}
+.fraction-diagnostic [hidden]{display:none!important}
+@media(max-width:600px){.fraction-diagnostic-card{padding:18px}.fraction-diagnostic-expression{padding:18px;font-size:22px}}

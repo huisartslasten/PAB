@@ -1,6 +1,6 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoManagementNavigation } from '../../components/page-navigation.js';
-import { listStudents } from '../../core/student-registry.js';
+import { getStudentLearningProfile, listStudents } from '../../core/student-registry.js';
 import { buildViewUrl } from '../../core/view-context.js';
 
 const FILTER_LABELS = Object.freeze({
@@ -98,6 +98,98 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     });
   }
 
+  function renderLearnerProfileSection() {
+    if (!selectedStudent) return;
+    const studentProfile = getStudentLearningProfile(selectedStudent);
+    if (!studentProfile?.curriculumKey) return;
+    const section = documentRef.createElement('section');
+    section.className = 'management-dashboard-section';
+    const heading = documentRef.createElement('h2');
+    heading.textContent = 'Curriculum-leerlingprofiel';
+    const card = documentRef.createElement('article');
+    card.className = 'management-dashboard-card management-learner-link-card';
+    const title = documentRef.createElement('h3');
+    title.textContent = selectedStudent;
+    const description = documentRef.createElement('p');
+    description.textContent = 'Koppel de bestaande PacoGO-leerling aan één curriculumprofiel. De koppeling gebruikt een vaste leerlingcode, niet de naam.';
+    const status = documentRef.createElement('p');
+    status.className = 'management-learner-link-status';
+    status.setAttribute('role', 'status');
+    status.textContent = 'Curriculumprofiel controleren…';
+    const controls = documentRef.createElement('div');
+    controls.className = 'management-dashboard-card-actions';
+    const existing = documentRef.createElement('select');
+    existing.className = 'management-learner-link-select';
+    existing.setAttribute('aria-label', 'Bestaand curriculumprofiel');
+    const placeholder = documentRef.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = 'Kies bestaand profiel…';
+    existing.appendChild(placeholder);
+    const linkButton = documentRef.createElement('button');
+    linkButton.type = 'button';
+    linkButton.className = 'management-dashboard-card-secondary';
+    linkButton.textContent = 'Koppel bestaand profiel';
+    linkButton.disabled = true;
+    existing.addEventListener('change', () => { linkButton.disabled = !existing.value; });
+    const createButton = documentRef.createElement('button');
+    createButton.type = 'button';
+    createButton.className = 'management-dashboard-card-primary';
+    createButton.textContent = 'Maak profiel voor ' + selectedStudent;
+    controls.append(existing, linkButton, createButton);
+    card.append(title, description, status, controls);
+    section.append(heading, card);
+    content.appendChild(section);
+
+    const setBusy = busy => {
+      existing.disabled = busy;
+      linkButton.disabled = busy || !existing.value;
+      createButton.disabled = busy;
+    };
+    const refresh = async () => {
+      const linked = await app.learnerCurriculum.getAppLearnerProfile(studentProfile.curriculumKey);
+      if (linked) {
+        status.textContent = 'Gekoppeld aan curriculumprofiel: ' + linked.display_name;
+        controls.hidden = true;
+        return;
+      }
+      status.textContent = 'Nog niet gekoppeld. Koppel een bestaand profiel of maak er één aan.';
+      const profiles = await app.learnerCurriculum.listLearners();
+      profiles.forEach(profile => {
+        const option = documentRef.createElement('option');
+        option.value = profile.learner_key;
+        option.textContent = profile.display_name;
+        existing.appendChild(option);
+      });
+      if (!profiles.length) linkButton.hidden = true;
+    };
+    linkButton.addEventListener('click', async () => {
+      if (!existing.value) return;
+      setBusy(true);
+      try {
+        await app.learnerCurriculum.linkAppLearnerProfile(studentProfile.curriculumKey, existing.value);
+        render();
+      } catch (error) {
+        status.textContent = error?.message || 'Het bestaande profiel kon niet worden gekoppeld.';
+        setBusy(false);
+      }
+    });
+    createButton.addEventListener('click', async () => {
+      setBusy(true);
+      try {
+        await app.learnerCurriculum.createAppLearnerProfile(studentProfile.curriculumKey, selectedStudent);
+        render();
+      } catch (error) {
+        status.textContent = error?.message || 'Het curriculumprofiel kon niet worden aangemaakt.';
+        setBusy(false);
+      }
+    });
+    void refresh().catch(error => {
+      status.textContent = error?.message || 'De curriculumprofielen konden niet worden geladen.';
+      status.classList.add('is-error');
+      setBusy(false);
+    });
+  }
+
   function render() {
     content.replaceChildren();
     const allCapabilities = app.managementCapabilities.getAvailableForPage({ page: 'management', student: selectedStudent });
@@ -128,6 +220,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     if (show('extra', 'challenges')) extraCards.push(createCard(documentRef, { title: 'Challenges', description: 'Open de centrale Challenge-instellingen.', actionLabel: 'Challenges openen', onClick: () => go('challenge-settings.html') }));
     if (show('extra', 'games')) extraCards.push(createCard(documentRef, { title: 'Spelletjes', description: 'Beheer de spelvrijgave van de actieve leerling.', actionLabel: 'Spelletjes openen', disabled: !hasStudent, onClick: () => go('game-access.html') }));
     renderSection('Extra', extraCards);
+    if (show('beheer') && hasStudent) renderLearnerProfileSection();
 
     const beheerCards = [];
     if (show('beheer', 'archive')) beheerCards.push(createCard(documentRef, { title: 'Archief', description: 'Bekijk items die uit de actieve omgeving zijn gearchiveerd.', actionLabel: 'Archief openen', onClick: () => go('archive.html', { recovery: 'archive' }) }));

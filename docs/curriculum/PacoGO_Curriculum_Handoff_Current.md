@@ -5311,3 +5311,43 @@ This is a first practice slice for FR2 equivalent fractions, not a complete frac
 - Latest verified content commit before this handoff update: `143571546488d26033e2ed2876724a91520fa19a`.
 - Latest verified Full Regression before this handoff update: #3422 / run `42821129258`, **GREEN** on that exact commit.
 - This handoff update requires a fresh Full Regression on its exact resulting commit.
+
+
+---
+
+## Current handoff update — 2026-11-10 (FR2 symbolic-option visual models and Full Regression #3424)
+
+**Branch:** `refactor/professional-v1`; LIVE `main` untouched.
+
+### Verified change
+
+The learner-facing FR2 practice page now shows an area-model visual alongside each symbolic fraction answer option. This corrects a didactic mismatch in FR2 practice tasks 2 and 3: the learner was instructed to compare the blue quantity while the answer choices showed only symbolic fractions.
+
+Files changed in implementation commit:
+- `curriculum-fr2-practice-learner.html`
+- `pacogo-engine/fraction-learning-interface.css`
+- `test/browser/curriculum-fr2-practice-learner.browser.test.js`
+
+The change is scoped to the FR2 practice presentation. It does not change the shared Fraction interface contract or renderer, curriculum definitions, evidence assessment, inference, mastery, learner state, or Supabase. The browser regression explicitly verifies that both symbolic options have their own area-model visual.
+
+### Regression verification
+
+- Full Regression #3424 / run `42834029451`: **GREEN** on exact commit `d668344dfb49d74320189078dc930252b5aa51e0`.
+- All 20 workflow steps completed successfully, including exact branch/commit verification, dependency and vulnerability checks, curriculum engine regression, architecture boundaries, maintained Node and Vitest regression, Chromium installation, local fixture server, browser regression and clean-working-tree verification.
+- Run URL: https://github.com/huisartslasten/PAB/actions/runs/42834029451
+- Branch head was verified as `d668344dfb49d74320189078dc930252b5aa51e0` on `refactor/professional-v1` before this handoff update.
+
+### Next concrete steps
+
+1. Run Full Regression on the exact commit containing this handoff update; do not mark the handoff update verified until that run is GREEN.
+2. Review the learner-facing FR2 practice flow as a whole for clarity, accessibility and conceptual coherence. Keep symbolic fractions paired with meaningful visual representations where the task prompt asks the learner to compare quantities.
+3. The current three practice tasks are only a first equivalent-fractions slice. They do not diagnose or establish Zyon's actual fraction knowledge or gaps. Next learning design should begin with a short, low-pressure diagnostic covering prerequisite fraction concepts and equivalent fractions, then sequence practice from the observed responses.
+4. Where available, establish the method/representations used by Zyon's school before introducing method-specific steps. Do not claim alignment with an unknown school method.
+5. Keep this formative practice and its browser-local progress separate from formal evidence, mastery and learner-state decisions. No Supabase change is indicated by the current practice-only slice.
+
+### Branch, commit and regression
+
+- Working branch: `refactor/professional-v1`.
+- Latest implementation commit verified before this handoff update: `d668344dfb49d74320189078dc930252b5aa51e0`.
+- Latest verified Full Regression before this handoff update: #3424 / run `42834029451`, **GREEN** on that exact commit.
+- This handoff update is a new repository change and requires Full Regression on its exact resulting commit.

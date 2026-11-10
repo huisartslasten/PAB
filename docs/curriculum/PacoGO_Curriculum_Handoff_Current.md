@@ -5435,3 +5435,49 @@ Use the actual workbook method if a worked example is available, then finalise a
 - Latest verified content commit before this documentation update: `a33043a2dfbd5614491a125c59f6bd1c6017a857`.
 - Latest verified Full Regression before this update: #3426 / run `42836910292`, **GREEN** on that exact commit.
 - This workbook-informed diagnostic and handoff update requires Full Regression on its exact resulting commit.
+
+
+---
+
+## Current handoff update — 2026-11-10 (Classroom fraction method identified from board photographs)
+
+**Branch:** `refactor/professional-v1`; LIVE `main` untouched.
+
+### Full Regression #3427 closure
+
+- Full Regression #3427 / run `42851409567`: **GREEN** on exact commit `c51c0d6434a977fd0910c36b6e1ef1ee158b589c`.
+- All 20 workflow steps passed, including curriculum engine, architecture boundaries, Node/Vitest, Chromium browser regression and clean-working-tree verification.
+- Run URL: https://github.com/huisartslasten/PAB/actions/runs/42851409567
+
+### Classroom board photographs reviewed
+
+Two chalkboard photographs from the previous week show the teacher demonstrating:
+
+- Product-denominator conversion to equivalent fractions for unlike-denominator addition/subtraction: e.g. `1/3 + 1/2 = 2/6 + 3/6 = 5/6`, `1/3 + 1/4 = 4/12 + 3/12 = 7/12`, `1/2 - 2/5 = 5/10 - 4/10 = 1/10`, and `3/4 - 2/5 = 15/20 - 8/20 = 7/20`.
+- Mixed-number conversion before operating: e.g. `1 1/3 = 4/3`, `2 5/6 = 17/6`, and `5 - 1/2 = 10/2 - 1/2 = 9/2 = 4 1/2`.
+- Conversion back to a mixed number for an improper result, e.g. `13/12 = 1 1/12`.
+
+This is direct evidence that the teacher demonstrated this procedure in the photographed lesson. It does not prove it is the only school-approved method or that Zyon independently understands or masters it. The earlier workbook photo shows the corresponding task types: equivalent fractions, unlike-denominator addition/subtraction and mixed-number work.
+
+### Diagnostic design refined
+
+Updated `docs/curriculum/PacoGO_Zyon_Fraction_Diagnostic_Design_v0.1.md` to include the classroom worked examples and their limits. Diagnostic/teaching sequence should distinguish:
+1. making equivalent fractions using the product of the denominators;
+2. accurately multiplying numerator and denominator by the same factor;
+3. adding/subtracting numerators once denominators match;
+4. converting mixed numbers to improper fractions (whole × denominator + numerator);
+5. converting an improper result back to a mixed number.
+
+PacoGO may use fraction bars/area models to explain why the procedure works, but those visuals supplement rather than silently replace the demonstrated written method. The diagnostic must identify the step causing difficulty rather than infer it from a wrong final answer.
+
+No curriculum registry, formal evidence/mastery, learner-state, runtime or Supabase contract changed. This is documentation-only curriculum/learning design work.
+
+### Next concrete step
+
+Prepare a short formative check using the classroom's demonstrated notation and procedure, with one small item per step above. Use the result to select the first targeted teaching activity. Keep visual explanation paired with the school's written sequence and avoid claiming mastery from a single response.
+
+### Branch, commit and regression
+
+- Latest verified content commit before this update: `c51c0d6434a977fd0910c36b6e1ef1ee158b589c`.
+- Latest verified Full Regression before this update: #3427 / run `42851409567`, **GREEN** on that exact commit.
+- This design and handoff update requires Full Regression on its exact resulting commit.

@@ -134,3 +134,45 @@ The provisional teaching path is:
 This is a practical instructional hypothesis inferred from the visible task family, not a claim about a validated universal developmental order or the school's exact teaching sequence. Before reproducing a school-specific written algorithm, obtain a page showing the teacher's worked example or confirm the method with the parent/teacher. PacoGO may use a clear visual explanation of the common-unit idea without claiming it is the school's written procedure.
 
 The 53 × 42 word problem should be tracked as a separate multiplication learning need if the parent wants a broader arithmetic catch-up plan; it must not be folded into FR2 or the fraction diagnostic.
+
+
+## 11. Classroom worked examples supplied 2026-11-10 — observed procedure
+
+Two photographs of the classroom chalkboard from the previous week were supplied. They provide stronger evidence of the teacher's demonstrated procedure than the earlier workbook page, while still not proving that this is the only method the school uses or that Zyon can independently execute it.
+
+### A. Common-denominator procedure shown on the board
+
+The worked examples show a product denominator: multiply the two denominators, and multiply each numerator by the other fraction's denominator. Examples visible include:
+
+- Addition: \(1/3 + 1/2 = 2/6 + 3/6 = 5/6\).
+- Addition: \(1/3 + 1/4 = 4/12 + 3/12 = 7/12\).
+- Addition: \(1/3 + 3/4 = 4/12 + 9/12 = 13/12 = 1\ 1/12\).
+- Subtraction: \(1/2 - 2/5 = 5/10 - 4/10 = 1/10\).
+- Subtraction: \(3/4 - 2/5 = 15/20 - 8/20 = 7/20\).
+
+This is commonly described as cross-multiplying to create a common denominator. In the examples, it is not the shortcut for comparing fractions by cross-products; it is the construction of equivalent fractions with the same denominator, followed by adding/subtracting the numerators.
+
+### B. Mixed numbers
+
+The board explicitly converts mixed numbers into improper fractions before operating:
+
+- \(1\ 1/3 = 4/3\), then \(4/3 - 2/5 = 20/15 - 6/15 = 14/15\).
+- \(2\ 5/6 = 17/6\), then \(17/6 - 2/5 = 85/30 - 12/30 = 73/30 = 2\ 13/30\).
+- \(5 - 1/2 = 10/2 - 1/2 = 9/2 = 4\ 1/2\).
+
+The board also shows the conversion rule visually/algebraically: multiply the whole number by the denominator, add the numerator, and keep the denominator.
+
+### C. Instructional implication
+
+The next diagnostic and teaching examples should use the classroom's demonstrated sequence and notation:
+
+1. Make equivalent fractions using the product of the denominators, showing the multiplication applied to both numerator and denominator.
+2. Add or subtract the resulting numerators while retaining the common denominator.
+3. For mixed numbers, first convert each mixed number to an improper fraction using whole × denominator + numerator.
+4. Apply the same common-denominator procedure, perform the operation, then convert an improper result back to a mixed number when appropriate.
+
+PacoGO may additionally explain why this works using fraction bars/area models, but should label that as a conceptual visual explanation rather than replacing the classroom's demonstrated written steps. The diagnostic should distinguish (a) understanding equivalence, (b) carrying out the conversion accurately, (c) operating with common denominators, and (d) converting mixed/improper forms. A wrong final answer alone does not identify which step failed.
+
+### D. Limits of the source
+
+These are teacher-written worked examples from one classroom board on one occasion. They support that this procedure was demonstrated. They do not establish that the school always requires the product denominator rather than a least common denominator, nor that Zyon has learned or mastered each step. Confirm with a full worked exercise or teacher/parent if the distinction matters for a specific task.

@@ -23,3 +23,7 @@
 .pacogo-fraction-cell:last-child{border-right:0}
 .pacogo-fraction-cell.is-shaded{background:#b8dcfa}
 @media(max-width:600px){.pacogo-fraction-interface__options{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.practice-option-model{display:grid;justify-items:center;gap:5px;width:100%}
+.practice-option-model-label{font-size:12px;font-weight:800;color:#647894}
+.practice-option-model .pacogo-fraction-representation--area{width:min(100%,180px)}

@@ -60,6 +60,8 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
 
   await expect(page.locator("#progress")).toContainText("1 afgerond");
   await expect(page.locator(".pacogo-fraction-interface__option .pacogo-fraction-representation--symbolic")).toHaveCount(2);
+  await expect(page.locator(".practice-option-model")).toHaveCount(2);
+  await expect(page.locator(".practice-option-model .pacogo-fraction-representation--area")).toHaveCount(2);
   await page.locator(".pacogo-fraction-interface__option").nth(1).click();
   await page.getByRole("button", { name: "Controleren" }).click();
   await expect(page.locator("#feedback")).toContainText("Deze optie laat niet evenveel blauw zien");

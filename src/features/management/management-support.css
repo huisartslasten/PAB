@@ -94,3 +94,9 @@
 .management-dashboard-card-primary[disabled],.management-dashboard-card-secondary[disabled]{opacity:.5;cursor:not-allowed}
 @media(max-width:1050px){.management-dashboard-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.management-dashboard-grid{grid-template-columns:1fr}}
+
+.management-learner-link-card{min-height:0}
+.management-learner-link-status{font-weight:800}
+.management-learner-link-status.is-error{color:#b42318}
+.management-learner-link-select{min-height:40px;max-width:100%;border:1px solid var(--paco-border);border-radius:11px;padding:8px 12px;background:#fff;color:var(--paco-text);font:700 14px/1.2 "Baloo 2",Nunito,sans-serif}
+.management-learner-link-card .management-dashboard-card-actions{align-items:center}

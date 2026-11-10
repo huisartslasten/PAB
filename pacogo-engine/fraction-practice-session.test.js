@@ -32,8 +32,11 @@ assert.equal(learnerA.getProgress().isComplete, true);
 assert.equal(learnerA.getProgress().correctAnswers, 3);
 assert.equal(learnerA.getNextTaskId(), null);
 
-const persistedValues = storage.entries().map(([, value]) => value);
-assert.equal(persistedValues.length, 2);
+const persistedEntries = storage.entries();
+assert.equal(persistedEntries.length, 1);
+assert.match(persistedEntries[0][0], /learner-a/);
+assert.doesNotMatch(persistedEntries[0][0], /learner-b/);
+const persistedValues = persistedEntries.map(([, value]) => value);
 assert.equal(persistedValues.some(value => value.includes("explanation") || value.includes("response")), false);
 assert.equal(persistedValues.some(value => value.includes("learner-a")), false);
 assert.equal(learnerB.getProgress().isComplete, false);

@@ -5351,3 +5351,40 @@ The change is scoped to the FR2 practice presentation. It does not change the sh
 - Latest implementation commit verified before this handoff update: `d668344dfb49d74320189078dc930252b5aa51e0`.
 - Latest verified Full Regression before this handoff update: #3424 / run `42834029451`, **GREEN** on that exact commit.
 - This handoff update is a new repository change and requires Full Regression on its exact resulting commit.
+
+
+---
+
+## Current handoff update — 2026-11-10 (Full Regression #3425 closure and Zyon fraction diagnostic design)
+
+**Branch:** `refactor/professional-v1`; LIVE `main` untouched.
+
+### Verification closure
+
+- Full Regression #3425 / run `42835157181`: **GREEN** on exact commit `fa5a91af98516dd3219b45a7b5533105d43bba07`.
+- All 20 workflow steps completed successfully, including exact branch/commit verification, dependency/vulnerability checks, curriculum engine regression, architecture boundaries, maintained Node/Vitest regression, Chromium browser regression and clean-working-tree verification.
+- Run URL: https://github.com/huisartslasten/PAB/actions/runs/42835157181
+
+### Read-only FR2 learner-flow review
+
+The learner-facing FR2 page was reviewed with its practice session/controller and Fraction Learning Interface styling. The page presents a short concept explanation, three equivalent-fraction tasks, visual feedback, retry/next controls and device-local progress. The two symbolic-choice tasks now show an area model beside each option, matching the prompt's instruction to compare the blue quantity.
+
+Review boundary: this is a code/design review, not a live learner usability study. It does not establish how Zyon understands the prompts or whether the interface matches his school's taught method. The practice session records completion/attempt counters and correct-answer totals, not a diagnostic record of the learner's mathematical reasoning.
+
+### New design-only deliverable
+
+Created `docs/curriculum/PacoGO_Zyon_Fraction_Diagnostic_Design_v0.1.md` as a candidate, formative, school-neutral diagnostic design.
+
+It proposes a brief 8–12 minute check with up to six core probes covering equal partitioning, part–whole meaning, representation mapping, fraction comparison, number-line meaning where taught, and FR2 equivalence recognition/explanation. Optional fraction-of-quantity and like-denominator operation probes are gated on confirmation that school has already taught them.
+
+The document explicitly avoids treating untaught material as a deficit, one response as mastery, or an unknown school method as known. It keeps diagnostic observations separate from formal evidence/mastery and does not change registry, C3, learner-state or Supabase contracts.
+
+### Next concrete step
+
+Obtain a recent school workbook page, test or teacher/parent confirmation showing the fraction topics and representations currently taught to Zyon. Use that source to finalise the diagnostic prompts and choose the next instructional sequence. Do not implement a new diagnostic route or expand the prior narrow G12 authorization until the learner flow and minimal formative data boundary are defined.
+
+### Branch, commit and regression
+
+- Latest verified content commit before this handoff update: `fa5a91af98516dd3219b45a7b5533105d43bba07`.
+- Latest verified Full Regression before this handoff update: #3425 / run `42835157181`, **GREEN** on that exact commit.
+- This diagnostic-design and handoff update is a repository change and requires Full Regression on its exact resulting commit.

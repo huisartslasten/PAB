@@ -47,6 +47,7 @@
       Een breuk laat een deel van één geheel zien. Twee breuken kunnen anders verdeeld zijn en toch evenveel van dat geheel laten zien. Vergelijk steeds de blauwe hoeveelheid.
     </div>
     <div id="progress">Voortgang laden…</div>
+    <button type="button" id="openFractionDiagnostic">Start breukendiagnose</button>
     <div id="prompt" class="muted"></div>
     <div id="fractionInterface"></div>
     <div id="feedback" role="status" aria-live="polite">Kijk rustig naar de modellen.</div>
@@ -249,6 +250,9 @@
     exerciseCard.hidden = false;
     document.querySelector("#selectedLearnerLabel").textContent =
       "PacoGO • " + learner.display_name + " • Rekenen • Breuken";
+    document.querySelector("#openFractionDiagnostic").onclick = () => {
+      window.location.href = "curriculum-fraction-diagnostic-learner.html";
+    };
     renderTask();
   }
 

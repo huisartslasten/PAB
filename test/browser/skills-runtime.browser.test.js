@@ -44,4 +44,12 @@ test('central Skills route renders A1, B1 and FR2 and preserves learner context'
   expect(result.navigatedTo).toContain('curriculum-a1-numberline.html');
   expect(result.navigatedTo).toContain('viewStudent=Zyon');
   expect(result.navigatedTo).toContain('mode=management');
+
+  const fractionTile = [...document.querySelectorAll('.paco-tile')].find(tile =>
+    tile.querySelector('.paco-tile-title')?.textContent.includes('Breukequivalentie')
+  );
+  fractionTile.querySelector('.paco-tile-action').click();
+  expect(navigatedTo).toContain('curriculum-fraction-diagnostic-learner.html');
+  expect(navigatedTo).toContain('viewStudent=Zyon');
+  expect(navigatedTo).toContain('mode=management');
 });

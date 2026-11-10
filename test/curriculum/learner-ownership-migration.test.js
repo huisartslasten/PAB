@@ -10,6 +10,10 @@ const writeBoundaryMigration = readFileSync(
   new URL('../../supabase/migrations/20261105030000_switch_learning_cycle_to_invoker.sql', import.meta.url),
   'utf8'
 );
+const appLearnerLinkMigration = readFileSync(
+  new URL('../../supabase/migrations/20261110193000_link_app_students_to_curriculum_learners.sql', import.meta.url),
+  'utf8'
+);
 const databaseTest = readFileSync(
   new URL('../../supabase/tests/learner_ownership_rls.test.sql', import.meta.url),
   'utf8'
@@ -91,4 +95,18 @@ test('database integration test covers two isolated parents, direct-write denial
   assert.match(databaseTest, /Direct evidence insert unexpectedly succeeded/);
   assert.match(databaseTest, /Learning-cycle write capability leaked after RPC return/);
   assert.match(databaseTest, /rollback;/i);
+});
+
+test('PacoGO roster-to-curriculum identity mapping is explicit, owner-scoped and idempotent', () => {
+  assert.match(appLearnerLinkMigration, /create table public\\.learner_profile_links/);
+  assert.match(appLearnerLinkMigration, /primary key \\(owner_user_id, app_student_key\\)/);
+  assert.match(appLearnerLinkMigration, /unique \\(learner_key\\)/);
+  assert.match(appLearnerLinkMigration, /learner_profile_links_select_owner/);
+  assert.match(appLearnerLinkMigration, /learner_profile_links_insert_owner/);
+  assert.match(appLearnerLinkMigration, /p\\.owner_user_id = \\(select auth\\.uid\\(\\)\\)/);
+  assert.match(appLearnerLinkMigration, /create or replace function public\\.link_app_learner_profile[\\s\\S]*?security invoker/);
+  assert.match(appLearnerLinkMigration, /create or replace function public\\.create_app_learner_profile[\\s\\S]*?security invoker/);
+  assert.match(appLearnerLinkMigration, /pg_advisory_xact_lock/);
+  assert.match(appLearnerLinkMigration, /public\\.create_learner_profile\\(btrim\\(p_display_name\\)\\)/);
+  assert.doesNotMatch(appLearnerLinkMigration, /display_name\\s*=\\s*p_display_name/i);
 });

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-const url = 'http://127.0.0.1:4173/curriculum-fraction-diagnostic-learner.html';
+const url = 'http://127.0.0.1:4173/curriculum-fraction-diagnostic-learner.html?viewStudent=Zyon';
 const parent = '5d0e1e5c-1dbe-4909-bd3a-81a1e7b26d09';
 const learner = '123e4567-e89b-42d3-a456-426614174000';
 
@@ -8,7 +8,7 @@ test('FR2 diagnostic renders in the canonical PacoGO shell and gives targeted fo
   page.on('pageerror', error => errors.push(error.message));
   await page.addInitScript(({ parent, learner }) => {
     const calls = [];
-    const profiles = [{ learner_key: learner, display_name: 'Leerling A' }];
+    const link = { app_student_key: 'zyon', learner_key: learner, learner_profiles: { display_name: 'Zyon' } };
     const db = {
       functions: { invoke: async () => ({ data: null, error: null }) },
       auth: {
@@ -18,10 +18,15 @@ test('FR2 diagnostic renders in the canonical PacoGO shell and gives targeted fo
       },
       from(table) {
         const query = {
-          select() { calls.push(['select', table]); return query; },
+          select(columns) { calls.push(['select', table, columns]); return query; },
+          eq(column, value) { calls.push(['eq', table, column, value]); return query; },
+          maybeSingle() {
+            calls.push(['maybeSingle', table]);
+            return Promise.resolve({ data: table === 'learner_profile_links' ? link : null, error: null });
+          },
           order() { return query; },
           then(resolve, reject) {
-            return Promise.resolve({ data: table === 'learner_profiles' ? profiles : [], error: null }).then(resolve, reject);
+            return Promise.resolve({ data: table === 'learner_profiles' ? [link.learner_profiles] : [], error: null }).then(resolve, reject);
           }
         };
         return query;
@@ -38,7 +43,8 @@ test('FR2 diagnostic renders in the canonical PacoGO shell and gives targeted fo
   await expect(page.locator('.paco-page-template')).toBeVisible();
   await expect(page.locator('.paco-template-page-heading h1')).toHaveText('Breuken');
   await expect(page.locator('.paco-template-navigation')).toBeVisible();
-  await page.getByRole('button', { name: 'Start diagnose voor Leerling A' }).click();
+  await expect(page.locator('#fraction-diagnostic-card')).toBeVisible();
+  await expect(page.locator('#fraction-diagnostic-card')).toContainText('Zyon');
 
   const answers = [[3,6,9],[6,2,3],[12,4,3,7,12],[10,5,4,1,10],[12,17,6],[4,3,15,20,6,14,15],[2,13,30]];
   for (const values of answers) {
@@ -59,7 +65,9 @@ test('FR2 diagnostic renders in the canonical PacoGO shell and gives targeted fo
     stored: Object.entries(localStorage).filter(([key]) => key.startsWith('pacogo:fraction-diagnostic:'))
   }));
   expect(state.calls.filter(call => call[0] === 'rpc')).toEqual([]);
-  expect(state.calls).toEqual([['select', 'learner_profiles']]);
+  expect(state.calls).toContainEqual(['select', 'learner_profile_links', 'app_student_key,learner_key,learner_profiles(display_name)']);
+  expect(state.calls).toContainEqual(['eq', 'learner_profile_links', 'app_student_key', 'zyon']);
+  expect(state.calls).toContainEqual(['maybeSingle', 'learner_profile_links']);
   expect(state.stored).toHaveLength(1);
   expect(state.stored[0][0]).toContain(learner);
   expect(state.stored[0][1]).not.toContain('display_name');

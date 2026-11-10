@@ -58,3 +58,4 @@ test('dashboard Breuken card opens the formative diagnostic and preserves learne
   expect(result.navigatedTo).toContain('curriculum-fraction-diagnostic-learner.html');
   expect(result.navigatedTo).toContain('viewStudent=Zyon');
   expect(result.navigatedTo).toContain('mode=student');
+});

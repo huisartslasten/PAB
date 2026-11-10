@@ -5589,3 +5589,49 @@ Next:
 - Latest implementation commit verified: `493247023d9c3a9d5b72f1ee80a1439f61847734`.
 - Latest verified Full Regression: #3442 / run `42877049189`, **GREEN** on that exact commit.
 - This handoff update itself requires Full Regression on its resulting commit; do not claim the handoff update verified until that exact-commit run completes.
+
+---
+
+## Current handoff update — 2026-11-10 (FR2 diagnostic navigation cutover)
+
+**Branch:** `refactor/professional-v1`; LIVE `main` untouched.
+
+### What changed
+
+The learner-facing PacoGO entry points now lead to the dedicated formative fraction diagnostic instead of the older FR2-T02 symbolic-equivalence demo page:
+
+- Skills → FR2 now routes to `curriculum-fraction-diagnostic-learner.html`.
+- Dashboard → Breuken now routes to the same dedicated diagnostic and preserves the current learner/mode context through the central router.
+- The dashboard tile copy now accurately describes a formative diagnostic, not a saved-progress practice activity.
+- If the parent session is missing, the diagnostic authentication return target now points back to the diagnostic page itself, not the old FR2-T02 page.
+- The original `curriculum-fr2-fractions.html` FR2-T02 vertical slice remains intact and separately addressable for its curriculum/browser contract.
+
+### Tests and regression
+
+- Added browser navigation assertions for both Dashboard and Skills, including preservation of student and mode context.
+- Updated the Skills source-contract test to reflect the intentional FR2 destination change.
+- During verification, Full Regression #3448 exposed the stale source-contract assertion expecting the old FR2-T02 destination. That assertion was updated because the route contract intentionally changed.
+- Full Regression #3450 then exposed a test-harness scope error in the new Skills browser assertion (a Node-side reference to the browser `document`). The assertion was moved inside the page evaluation; application code was not changed to accommodate the test.
+- Browser proof #666 / run `42887721974`: **GREEN** on `c92e32d0ea2512ce282e1e7110cd2412f71ec1e9`.
+- Full Regression #3451 / run `42887722335`: **GREEN** on exact implementation commit `c92e32d0ea2512ce282e1e7110cd2412f71ec1e9`.
+- Full Regression run: https://github.com/huisartslasten/PAB/actions/runs/42887722335
+
+### Boundaries retained
+
+No curriculum registry, formal evidence, inference, mastery, learner-state, Supabase schema/RPC/RLS, or learner data was changed. The diagnostic remains formative and local-storage based. The old FR2-T02 page remains available as a distinct technical curriculum slice.
+
+### Next concrete step
+
+Verify the actual navigation in the local PacoGO TEST environment with a parent session:
+1. Dashboard → Breuken → Start diagnose.
+2. Skills → Breukequivalentie → Openen.
+3. Confirm both routes show the modern PacoGO shell, the learner-profile selector and the seven-step diagnostic.
+4. Confirm unauthenticated entry returns to the diagnostic after login.
+
+Then run the diagnostic with Zyon and use his actual intermediate steps to choose the first targeted teaching activity. Do not treat this formative result as formal mastery.
+
+### Branch, commit and regression
+
+- Implementation commit: `c92e32d0ea2512ce282e1e7110cd2412f71ec1e9`.
+- Latest verified Full Regression before this handoff update: #3451 / run `42887722335`, **GREEN** on that exact implementation commit.
+- This handoff update is itself a repository change and requires Full Regression on its exact resulting commit.

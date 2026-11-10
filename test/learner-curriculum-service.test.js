@@ -46,7 +46,7 @@ function makeHarness(tableData = {}) {
     from: createQueryHarness(tableData, calls),
     rpc: async (name, payload) => {
       rpcCalls.push([name, payload]);
-      if (name === 'create_learner_profile') return { data: learnerKey, error: null };
+      if (['create_learner_profile', 'create_app_learner_profile', 'link_app_learner_profile'].includes(name)) return { data: learnerKey, error: null };
       return { data: { evidence_id: 'evidence-id', state_id: 'state-id', decision_trace_id: 'trace-id', duplicate: false }, error: null };
     }
   };
@@ -75,6 +75,43 @@ test('learner profile provisioning uses the authenticated SECURITY INVOKER RPC c
   });
   assert.deepEqual(harness.rpcCalls, [
     ['create_learner_profile', { p_display_name: 'Learner A' }]
+  ]);
+});
+
+
+test('PacoGO roster identity resolves only through the explicit owner-scoped link', async () => {
+  const harness = makeHarness({
+    learner_profile_links: [{
+      app_student_key: 'zyon',
+      learner_key: learnerKey,
+      learner_profiles: { display_name: 'Zyon' }
+    }]
+  });
+  const service = createLearnerCurriculumService(harness.db);
+  assert.deepEqual(await service.getAppLearnerProfile('zyon'), {
+    app_student_key: 'zyon',
+    learner_key: learnerKey,
+    display_name: 'Zyon'
+  });
+  assert.ok(harness.calls.some(call => call[0] === 'select' && call[1] === 'learner_profile_links'));
+  await assert.rejects(() => service.getAppLearnerProfile('Zyon display name'), /stable PacoGO student key/);
+});
+
+test('PacoGO learner profile creation and existing-profile linking use explicit atomic RPC contracts', async () => {
+  const harness = makeHarness();
+  const service = createLearnerCurriculumService(harness.db);
+  assert.deepEqual(await service.createAppLearnerProfile('zyon', 'Zyon'), {
+    app_student_key: 'zyon',
+    learner_key: learnerKey,
+    display_name: 'Zyon'
+  });
+  assert.deepEqual(await service.linkAppLearnerProfile('zenith', learnerKey), {
+    app_student_key: 'zenith',
+    learner_key: learnerKey
+  });
+  assert.deepEqual(harness.rpcCalls.slice(0, 2), [
+    ['create_app_learner_profile', { p_app_student_key: 'zyon', p_display_name: 'Zyon' }],
+    ['link_app_learner_profile', { p_app_student_key: 'zenith', p_learner_key: learnerKey }]
   ]);
 });
 

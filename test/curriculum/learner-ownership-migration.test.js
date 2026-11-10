@@ -11,7 +11,7 @@ const writeBoundaryMigration = readFileSync(
   'utf8'
 );
 const appLearnerLinkMigration = readFileSync(
-  new URL('../../supabase/migrations/20261110193000_link_app_students_to_curriculum_learners.sql', import.meta.url),
+  new URL('../../supabase/migrations/20261110232751_link_app_students_to_curriculum_learners.sql', import.meta.url),
   'utf8'
 );
 const databaseTest = readFileSync(

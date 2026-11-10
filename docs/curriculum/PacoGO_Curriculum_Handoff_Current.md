@@ -5538,3 +5538,54 @@ Under the owner's explicit authorization, the repository now contains a separate
 - Latest implementation commit: `94157254c2b2af819c9ee8d4a9530eb8ef638b19`.
 - Latest verified Full Regression: #3431 / run `42867640273`, **GREEN** on that exact commit.
 - This handoff update is itself a repository change and requires Full Regression on its exact resulting commit.
+
+
+---
+
+## Current handoff update — 2026-11-10 (FR2 route separation and diagnostic shell integration)
+
+**Branch:** `refactor/professional-v1`; LIVE `main` untouched.
+
+### Root cause isolated
+
+Full Regression #3438 failed on the existing browser test for FR2-T02:
+- The test expected the original symbolic-equivalence task title, but the page rendered the PacoGO login screen.
+- The integration had repurposed `curriculum-fr2-fractions.html` as the formative diagnostic route.
+- That HTML replacement removed the existing FR2-T02 vertical-slice page implementation (including its Fraction Learning Interface, controller/bridge and browser vertical-slice runtime wiring).
+- This was an application route/page ownership regression, not a missing login fixture and not a reason to weaken the existing FR2 test.
+
+### Structural correction implemented
+
+- Restored `curriculum-fr2-fractions.html` to the original FR2-T02 symbolic-equivalence browser vertical slice.
+- Kept the formative diagnostic on its own existing dedicated URL: `curriculum-fraction-diagnostic-learner.html`.
+- Replaced that diagnostic page's standalone bespoke markup with the central PacoGO application shell entry point.
+- Registered `curriculum-fraction-diagnostic-learner.html` in `src/app/routes.js`, using the canonical `createFractionDiagnosticRuntime` and its feature stylesheet.
+- Updated the diagnostic browser test to navigate to its dedicated URL.
+- Preserved the original FR2-T02 browser test unchanged.
+- No curriculum registry, evidence assessment, inference, mastery, learner-state, Supabase schema, RPC, RLS or learner-data changes.
+
+### Regression verification
+
+- Restoration commit: `8a074c5f7c9f58b742df02a893bed684001645de`.
+- Diagnostic shell page commit: `e9967bc9b798e517cb4df2157efa67dcaab408a2`.
+- Dedicated route commit: `5c9ff36050206f2157bea9348770c7c36ae0b060`.
+- Diagnostic browser URL update / implementation HEAD: `493247023d9c3a9d5b72f1ee80a1439f61847734`.
+- Full Regression #3442 / run `42877049189`: **GREEN** on exact HEAD `493247023d9c3a9d5b72f1ee80a1439f61847734`.
+- All 20 workflow steps completed successfully, including the full browser regression and clean-working-tree verification.
+- Run URL: https://github.com/huisartslasten/PAB/actions/runs/42877049189
+
+### Current status and next concrete step
+
+The original FR2-T02 exercise and the separate seven-probe formative diagnostic now coexist on separate URLs. The diagnostic is integrated into the canonical PacoGO shell and retains its parent-authenticated learner selection, local formative progress and no-formal-evidence boundary.
+
+Next:
+1. Verify the dedicated diagnostic route in the actual PacoGO TEST environment with a real parent login and a test learner profile; do not use LIVE.
+2. Review the prompts and targeted explanation with Zyon's actual responses. Synthetic browser tests do not establish learner usability or instructional effectiveness.
+3. Keep this formative diagnostic separate from formal FR2 registry evidence/mastery unless a separately reviewed curriculum/evidence contract authorises a change.
+
+### Branch and verification state
+
+- Working branch: `refactor/professional-v1`.
+- Latest implementation commit verified: `493247023d9c3a9d5b72f1ee80a1439f61847734`.
+- Latest verified Full Regression: #3442 / run `42877049189`, **GREEN** on that exact commit.
+- This handoff update itself requires Full Regression on its resulting commit; do not claim the handoff update verified until that exact-commit run completes.

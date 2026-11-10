@@ -217,7 +217,7 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
     try {
       const auth = await app.initializeSession();
       if (!auth || !app.auth.isParent) {
-        documentRef.defaultView.location.replace('auth.html?returnTo=curriculum-fr2-fractions.html');
+        documentRef.defaultView.location.replace('auth.html?returnTo=curriculum-fraction-diagnostic-learner.html');
         return;
       }
       const learners = await app.learnerCurriculum.listLearners();

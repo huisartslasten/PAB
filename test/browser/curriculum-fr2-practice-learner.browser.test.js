@@ -12,6 +12,7 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
     const calls = [];
     const profiles = [{ learner_key: learnerKey, display_name: "Leerling A" }];
     const db = {
+      functions: { invoke: async () => ({ data: null, error: null }) },
       auth: {
         getSession: async () => ({ data: { session: { user: { id: parentUserId } } }, error: null }),
         onAuthStateChange: () => ({ data: { subscription: { unsubscribe() {} } } }),

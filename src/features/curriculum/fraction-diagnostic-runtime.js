@@ -1,10 +1,13 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
+import { getStudentLearningProfile } from '../../core/student-registry.js';
+import { buildViewUrl } from '../../core/view-context.js';
 import { createFractionDiagnosticSession, FRACTION_DIAGNOSTIC_STEPS } from '../../../pacogo-engine/fraction-diagnostic-session.js';
 
 export function createFractionDiagnosticRuntime({ app, templateMount, context, documentRef = document, navigate } = {}) {
   if (!app || !templateMount || typeof navigate !== 'function') throw new TypeError('Fraction diagnostic runtime requires app, template mount and navigation.');
   const student = context?.student || '';
+  const studentProfile = getStudentLearningProfile(student);
   const content = documentRef.createElement('div');
   content.className = 'fraction-diagnostic';
   let session = null;
@@ -220,20 +223,27 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
         documentRef.defaultView.location.replace('auth.html?returnTo=curriculum-fraction-diagnostic-learner.html');
         return;
       }
-      const learners = await app.learnerCurriculum.listLearners();
-      if (!learners.length) {
-        setupStatus.textContent = 'Er is nog geen leerlingprofiel beschikbaar. Maak eerst een profiel aan via Beheer.';
+      if (!student || !studentProfile?.curriculumKey) {
+        setupStatus.textContent = 'Selecteer eerst een leerling via de balk bovenaan en open daarna opnieuw de breukendiagnose.';
         return;
       }
-      setupStatus.textContent = 'Kies het leerlingprofiel.';
-      learners.forEach(item => {
-        const button = documentRef.createElement('button');
-        button.type = 'button';
-        button.className = 'secondary';
-        button.textContent = 'Start diagnose voor ' + item.display_name;
-        button.addEventListener('click', () => start(item));
-        learnerList.appendChild(button);
-      });
+      const linkedLearner = await app.learnerCurriculum.getAppLearnerProfile(studentProfile.curriculumKey);
+      if (!linkedLearner) {
+        setupStatus.textContent = 'Voor ' + student + ' is nog geen curriculumprofiel gekoppeld. Open Beheer om een bestaand profiel te koppelen of een profiel aan te maken.';
+        const manage = documentRef.createElement('button');
+        manage.type = 'button';
+        manage.className = 'secondary';
+        manage.textContent = 'Open leerlingbeheer';
+        manage.addEventListener('click', () => navigate(buildViewUrl('management.html', {
+          student,
+          mode: 'management',
+          managementFilter: 'beheer'
+        })));
+        learnerList.appendChild(manage);
+        return;
+      }
+      setupStatus.textContent = 'Leerlingprofiel voor ' + student + ' gevonden. De diagnose wordt geopend.';
+      start(linkedLearner);
     } catch (error) {
       setupStatus.textContent = error?.message || 'De leerlingprofielen konden niet worden geladen.';
       setupStatus.classList.add('is-error');

@@ -3,15 +3,94 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PacoGO — Breuken</title>
-  <link rel="stylesheet" href="src/components/page-template.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <title>PacoGO — FR2 Breukequivalentie</title>
+  <link rel="stylesheet" href="./pacogo-engine/fraction-learning-interface.css">
+  <style>
+    :root{font-family:Nunito,system-ui,sans-serif;color:#102b57;background:#f5f9fd}
+    body{margin:0;padding:32px;min-height:100vh;box-sizing:border-box}
+    main{max-width:980px;margin:0 auto;display:grid;gap:18px}
+    .card{background:#fff;border:1px solid #d8e7f4;border-radius:22px;padding:24px;box-shadow:0 8px 24px rgba(16,43,87,.07)}
+    h1,h2{margin:0} h1{font-size:30px} h2{font-size:21px}
+    .muted{color:#647894;line-height:1.5}
+    pre{margin:10px 0 0;white-space:pre-wrap;background:#f5f9fd;border-radius:14px;padding:14px;font:700 13px/1.5 ui-monospace,monospace}
+    @media(max-width:700px){body{padding:16px}.card{padding:18px}}
+  </style>
 </head>
 <body>
-  <div id="paco-template-mount"></div>
-  <script type="module">
-    import { startPacoRuntime } from './src/app/runtime.js';
-    await startPacoRuntime({ templateMount: document.querySelector('#paco-template-mount') });
-  </script>
+<main>
+  <section class="card">
+    <div class="muted">PacoGO • FR2 • Breukequivalentie herkennen en gebruiken</div>
+    <h1>Welke breuk heeft dezelfde waarde?</h1>
+    <p class="muted">Vergelijk de teller en noemer, maar let vooral op de waarde van de hele breuk.</p>
+    <div id="fraction-interface"></div>
+  </section>
+  <section class="card">
+    <h2>Wat PacoGO heeft waargenomen</h2>
+    <div id="status" class="muted">Nog geen observatie.</div>
+    <pre id="trace">Nog geen observatie.</pre>
+  </section>
+</main>
+<script type="module">
+  import { createFractionEquivalenceController } from "./pacogo-engine/fraction-equivalence-controller.js";
+  import { createBrowserVerticalSliceRuntime } from "./pacogo-engine/browser-vertical-slice.js";
+  import { createCurriculumRegistry } from "./pacogo-engine/curriculum-registry.js";
+  import { createFractionLearningInterface } from "./pacogo-engine/fraction-learning-interface.js";
+  import { createFractionInterfaceControllerBridge } from "./pacogo-engine/fraction-interface-controller-bridge.js";
+
+  const registryConfig = await fetch("./docs/curriculum/PacoGO_Curriculum_Registry_v0.2.json").then(response => response.json());
+  const taskSet = await fetch("./docs/curriculum/PacoGO_Pilot_TaskSet_v0.1.json").then(response => response.json());
+  const registry = createCurriculumRegistry(registryConfig);
+  const runtime = createBrowserVerticalSliceRuntime({ registry, taskSet });
+  const taskId = "FR2-T02";
+  const task = runtime.getTask(taskId);
+  const responseProcessRequired = task.response_process_required === true;
+  const config = {
+    targetFraction: { numerator: 1, denominator: 2 },
+    options: [
+      { id: "opt-a", fraction: { numerator: 3, denominator: 5 } },
+      { id: "opt-b", fraction: { numerator: 4, denominator: 8 } },
+      { id: "opt-c", fraction: { numerator: 2, denominator: 3 } }
+    ],
+    representation: "symbolic_fraction",
+    responseProcessRequired,
+    labels: { title: "Vergelijk de breuken", explanation: "Leg uit waarom deze breuk dezelfde waarde heeft." }
+  };
+  const controller = createFractionEquivalenceController({
+    task, studentKey: "browser-synthetic-fr2", renderer: {},
+    targetFraction: config.targetFraction, options: config.options,
+    representation: config.representation,
+    provenance: { page: "curriculum-fr2-fractions.html" }
+  });
+  let bridge;
+  const interfaceInstance = createFractionLearningInterface({
+    mount: document.querySelector("#fraction-interface"),
+    config,
+    onInteraction: event => {
+      bridge.handleInteraction(event);
+      if (event.type === "option_selected") document.querySelector("#status").textContent = "Antwoord geselecteerd. Geef nu je uitleg.";
+    },
+    onSubmit: () => {
+      const result = bridge.submit();
+      const cycle = runtime.runTaskObservation({ taskId, observation: result.observation });
+      document.querySelector("#status").textContent = result.evaluation.correct
+        ? "Goed gekozen. De observatie is doorgegeven aan de leerengine."
+        : "Deze keuze is vastgelegd en doorgegeven aan de leerengine.";
+      document.querySelector("#trace").textContent = JSON.stringify({
+        observation_id: result.observation.observation_id,
+        registry_version: registry.registry_version,
+        evidence_count: cycle.evidence.length,
+        development: cycle.development,
+        mastery: cycle.mastery,
+        next: cycle.next,
+        decision: cycle.decision_trace.decision,
+        explanation: result.observation.response.explanation,
+        interaction_event_count: result.observation.interaction_events.length
+      }, null, 2);
+    }
+  });
+  bridge = createFractionInterfaceControllerBridge({
+    interfaceInstance, controller, responseProcessRequired
+  });
+</script>
 </body>
 </html>

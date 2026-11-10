@@ -32,6 +32,52 @@ select set_config(
   true
 );
 
+-- Each existing PacoGO learner can be linked explicitly to its own curriculum profile.
+-- Provisioning the same stable app key twice must return the same opaque profile key.
+select set_config(
+  'test.learner_b_app_key',
+  public.link_app_learner_profile('zenith', current_setting('test.learner_b')),
+  true
+);
+select set_config(
+  'test.learner_b_app_key_repeat',
+  public.create_app_learner_profile('zenith', 'Different display name is not identity'),
+  true
+);
+
+select set_config('request.jwt.claim.sub', 'a1000000-0000-4000-8000-000000000001', true);
+select set_config('request.jwt.claims',
+  '{"sub":"a1000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
+select set_config(
+  'test.learner_a_app_key',
+  public.link_app_learner_profile('zyon', current_setting('test.learner_a')),
+  true
+);
+select set_config(
+  'test.learner_a_app_key_repeat',
+  public.create_app_learner_profile('zyon', 'Different display name is not identity'),
+  true
+);
+
+select set_config('request.jwt.claim.sub', 'b2000000-0000-4000-8000-000000000002', true);
+select set_config('request.jwt.claims',
+  '{"sub":"b2000000-0000-4000-8000-000000000002","role":"authenticated"}', true);
+
+do $test$
+begin
+  if current_setting('test.learner_b_app_key') <> current_setting('test.learner_b')
+     or current_setting('test.learner_b_app_key_repeat') <> current_setting('test.learner_b') then
+    raise exception 'Parent B app learner profile link was not idempotent';
+  end if;
+  if exists (
+    select 1 from public.learner_profile_links
+    where app_student_key = 'zyon'
+  ) then
+    raise exception 'Parent B can read Parent A PacoGO learner mapping';
+  end if;
+end;
+$test$;
+
 select set_config(
   'test.registry_id',
   (
@@ -128,6 +174,21 @@ begin
     raise exception 'Parent A cannot read its own learner profile';
   end if;
 
+  if not exists (
+    select 1 from public.learner_profile_links
+    where app_student_key = 'zyon'
+      and learner_key = current_setting('test.learner_a')
+  ) then
+    raise exception 'Parent A cannot read its own PacoGO learner mapping';
+  end if;
+
+  if exists (
+    select 1 from public.learner_profile_links
+    where app_student_key = 'zenith'
+  ) then
+    raise exception 'Parent A can read Parent B PacoGO learner mapping';
+  end if;
+
   if exists (
     select 1 from public.learner_profiles
     where learner_key = current_setting('test.learner_b')
@@ -164,6 +225,13 @@ $test$;
 -- Parent A cannot add itself to Parent B's learner or persist for Parent B.
 do $test$
 begin
+  begin
+    perform public.link_app_learner_profile('zephon', current_setting('test.learner_b'));
+    raise exception 'Cross-guardian learner-profile linking unexpectedly succeeded';
+  exception
+    when insufficient_privilege then null;
+  end;
+
   begin
     insert into public.learner_guardians (
       learner_key, guardian_user_id, membership_role
@@ -311,7 +379,8 @@ begin
   if has_table_privilege('anon', 'public.student_evidence', 'SELECT')
      or has_table_privilege('anon', 'public.student_longitudinal_state', 'SELECT')
      or has_table_privilege('anon', 'public.curriculum_decision_trace', 'SELECT')
-     or has_table_privilege('anon', 'public.learner_profiles', 'SELECT') then
+     or has_table_privilege('anon', 'public.learner_profiles', 'SELECT')
+     or has_table_privilege('anon', 'public.learner_profile_links', 'SELECT') then
     raise exception 'Anonymous role retains learner-data table privileges';
   end if;
 end;

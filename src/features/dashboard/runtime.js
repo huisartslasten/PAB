@@ -138,18 +138,18 @@ export function createDashboardRuntime({ app, templateMount, chooserMount, conte
     curriculumPracticeHeading.textContent = 'Rekenen oefenen';
     const curriculumPracticeGrid = createPacoTileGrid({ documentRef });
     curriculumPracticeGrid.style.marginTop = '15px';
-    const fractionPreviewTarget = buildViewUrl('curriculum-fr2-fractions.html', {
+    const fractionPreviewTarget = buildViewUrl('curriculum-fraction-diagnostic-learner.html', {
       student: selectedStudent,
       mode: context.mode
     });
     curriculumPracticeGrid.appendChild(createPacoTile({
       documentRef,
       title: 'Breuken',
-      description: 'Bekijk een eerste interactieve oefening over gelijkwaardige breuken.',
+      description: 'Ontdek welke tussenstappen bij breuken al lukken en wat je volgende leerstap is.',
       icon: '½',
-      meta: 'Voorbeeld · voortgang nog niet opgeslagen',
-      actionLabel: 'Bekijk voorbeeld →',
-      onActivate: () => documentRef.defaultView.location.assign(fractionPreviewTarget.toString())
+      meta: 'Formatieve diagnose · geen mastery-beslissing',
+      actionLabel: 'Start diagnose →',
+      onActivate: () => navigate(fractionPreviewTarget)
     }));
     curriculumPracticeCard.append(curriculumPracticeHeading, curriculumPracticeGrid);
 

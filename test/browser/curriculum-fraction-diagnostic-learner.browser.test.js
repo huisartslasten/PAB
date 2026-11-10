@@ -73,3 +73,37 @@ test('FR2 diagnostic renders in the canonical PacoGO shell and gives targeted fo
   expect(state.stored[0][1]).not.toContain('display_name');
   expect(errors).toEqual([]);
 });
+
+
+test('FR2 diagnostic directs an unlinked selected learner to explicit profile linking', async ({ page }) => {
+  await page.addInitScript(({ parent }) => {
+    const db = {
+      functions: { invoke: async () => ({ data: null, error: null }) },
+      auth: {
+        getSession: async () => ({ data: { session: { user: { id: parent } } }, error: null }),
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe() {} } } }),
+        signOut: async () => ({ error: null })
+      },
+      from() {
+        const query = {
+          select() { return query; },
+          eq() { return query; },
+          maybeSingle() { return Promise.resolve({ data: null, error: null }); },
+          order() { return query; },
+          then(resolve, reject) { return Promise.resolve({ data: [], error: null }).then(resolve, reject); }
+        };
+        return query;
+      },
+      rpc: async () => ({ data: null, error: new Error('Unexpected RPC') })
+    };
+    window.__pacoSupabaseStub = { createClient: () => db };
+  }, { parent: '5d0e1e5c-1dbe-4909-bd3a-81a1e7b26d09' });
+  await page.route('https://cdn.jsdelivr.net/**', route => route.fulfill({
+    status: 200, contentType: 'application/javascript', body: 'window.supabase = window.__pacoSupabaseStub;'
+  }));
+  await page.goto(url);
+  await expect(page.locator('#fraction-diagnostic-setup')).toBeVisible();
+  await expect(page.locator('#fraction-diagnostic-setup')).toContainText('Voor Zyon is nog geen curriculumprofiel gekoppeld');
+  await page.getByRole('button', { name: 'Open leerlingbeheer' }).click();
+  await expect(page).toHaveURL(/management\.html\?.*viewStudent=Zyon.*mode=management.*managementFilter=beheer/);
+});

@@ -5250,3 +5250,64 @@ Prepare the narrow FR2 implementation authorization package against the existing
 - The G6 logical disposition, the three review addenda, the field-matrix status clarification, dependency-map update and handoff update are therefore verified on that exact commit.
 - Latest verified Full Regression before this verification-only handoff update: #3417 / run `42670649008`, GREEN on `a75e2266b1025585b01e70aa04a81392b5a525fb`.
 - This verification-only handoff update itself requires its own Full Regression on the resulting exact commit.
+
+
+---
+
+## Current handoff update — 2026-11-10 (G12 FR2 learner practice implementation and regression closure)
+
+**Branch:** `refactor/professional-v1`; LIVE `main` untouched.
+
+### What was built
+
+Under the owner's explicit, narrow G12 authorization, the first learner-facing FR2 practice slice was implemented using the existing Fraction Learning Interface:
+
+- `pacogo-engine/fraction-practice-session.js`
+  - Practice-only session/controller with three equivalent-fraction tasks.
+  - Minimal progress counters and completed-task IDs stored locally per selected learner UUID.
+  - Retry and reset support; no raw free-text learner explanation is stored.
+- `curriculum-fr2-practice-learner.html`
+  - Parent-authenticated learner selection using the existing PacoGO app pattern.
+  - Visual explanation and guided practice using the existing Fraction Learning Interface/rendering.
+  - Immediate formative feedback and learner-local progress display.
+- `pacogo-engine/fraction-practice-session.test.js`
+  - Unit coverage for progress, learner isolation, retry and validation.
+- `test/browser/curriculum-fr2-practice-learner.browser.test.js`
+  - Browser coverage for the learner page, practice flow, local storage isolation and absence of formal evidence/RPC writes.
+
+This is a first practice slice for FR2 equivalent fractions, not a complete fraction catch-up curriculum and not proof of mastery. The three sample tasks do not establish Zyon's actual gaps. Further learning progression must be based on observed learner work and aligned with the school's taught method.
+
+### Boundaries preserved
+
+- No curriculum registry, task/evidence alignment, C3 assessment, inference, mastery, next-action or learner-state contract was changed.
+- The practice controller is separate from the formal evidence/controller path; no synthetic demo observation is submitted as learner evidence.
+- Practice progress is browser-local and learner-keyed; it is not synced across devices.
+- No Supabase schema, migration, SQL, RPC, RLS, database or persistence contract was changed.
+- The five existing synthetic Fraction technical demonstrations were not rebuilt or repurposed as learner evidence.
+- G6 remains OPEN for its listed lifecycle/timeout/O6-C3/provenance/restoration questions; G9 remains OPEN. The narrow FR2 practice implementation does not close those gates.
+
+### Regression investigation and correction
+
+- Full Regression #3420 on implementation commit `9f611545176ed316eb6431e079ef28ac2610b495` was RED because a browser-test assertion expected two stored learner entries when only learner A had generated progress. The test expectation was corrected to assert one entry and verify that it belongs to learner A.
+- Full Regression #3421 on commit `3f6005eba862d8ddfbebd0d4c0ab7273eea34c48` remained RED. Investigation isolated the FR2 browser fixture: its Supabase stub omitted `functions.invoke`, required during existing app initialization by the answer-grading and lesson-audio services. The existing B1 fixture already supplied this member.
+- The correction changed only the FR2 browser test stub to include `functions.invoke`; no production code or test strength was changed.
+- Corrective commit: `143571546488d26033e2ed2876724a91520fa19a`, message: `Complete Supabase browser test stub contract`.
+- Full Regression #3422 / run `42821129258`: **GREEN** on that exact commit.
+- Run URL: https://github.com/huisartslasten/PAB/actions/runs/42821129258
+- All workflow job steps completed successfully, including exact branch/commit verification, dependency/vulnerability checks, curriculum engine regression, architecture boundaries, maintained Node and Vitest regression, Chromium browser regression and clean-working-tree verification.
+- The branch head was verified as `143571546488d26033e2ed2876724a91520fa19a` on `refactor/professional-v1`.
+
+### Current verified state and next concrete steps
+
+1. Treat `143571546488d26033e2ed2876724a91520fa19a` as the latest verified implementation commit; Full Regression #3422 is GREEN on it.
+2. This handoff update is a new repository change. Run Full Regression on its exact resulting commit before considering the handoff verified.
+3. After that verification, inspect the actual learner-facing FR2 experience against the intended school-neutral visual pedagogy and accessibility requirements. Do not infer Zyon's mastery from the sample task data.
+4. Plan the next fraction learning slice from a short diagnostic of Zyon's current understanding, using the school's taught representation/method where known. Prioritize catching up in fractions, but do not claim the three FR2 equivalence tasks cover the whole fraction domain.
+5. Keep practice-only progress separate from formal evidence and mastery until the evidence-assessment contracts and validation requirements support that use.
+
+### Branch, commit and regression
+
+- Working branch: `refactor/professional-v1`.
+- Latest verified content commit before this handoff update: `143571546488d26033e2ed2876724a91520fa19a`.
+- Latest verified Full Regression before this handoff update: #3422 / run `42821129258`, **GREEN** on that exact commit.
+- This handoff update requires a fresh Full Regression on its exact resulting commit.

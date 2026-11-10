@@ -5481,3 +5481,60 @@ Prepare a short formative check using the classroom's demonstrated notation and 
 - Latest verified content commit before this update: `c51c0d6434a977fd0910c36b6e1ef1ee158b589c`.
 - Latest verified Full Regression before this update: #3427 / run `42851409567`, **GREEN** on that exact commit.
 - This design and handoff update requires Full Regression on its exact resulting commit.
+
+
+---
+
+## Current handoff update — 2026-11-10 (Zyon formative fraction diagnostic implementation)
+
+**Branch:** `refactor/professional-v1`; LIVE `main` untouched.
+
+### What was built
+
+Under the owner's explicit authorization, the repository now contains a separate learner-facing formative fraction diagnostic:
+
+- `pacogo-engine/fraction-diagnostic-session.js`
+  - Seven ordered probes covering equivalent-fraction generation, product common denominator, unlike-denominator addition and subtraction, mixed-to-improper conversion, a mixed-number subtraction combining those steps, and improper-to-mixed conversion.
+  - Captures each requested numeric intermediate value separately, evaluates each field independently and preserves the complete step response.
+  - After all probes, selects the earliest probe with an incorrect/incomplete field and returns a matched, structurally similar practice task with an explanation.
+  - If all probes are answered correctly, recommends a broader application task rather than claiming mastery.
+  - Progress is stored locally under a learner-keyed browser storage key. No learner name or raw free-text explanation is stored.
+- `curriculum-fraction-diagnostic-learner.html`
+  - Parent-authenticated learner selection using the existing PacoGO application/bootstrap and learner-profile service.
+  - Presents one probe at a time without correctness feedback during the diagnostic.
+  - Presents the selected instructional explanation and one new targeted practice task after the diagnostic.
+- `pacogo-engine/fraction-diagnostic-session.test.js`
+  - Covers seven-step progression, intermediate field validation, learner isolation, duplicate submission prevention, recommendation selection, practice validation and reset.
+- `test/browser/curriculum-fraction-diagnostic-learner.browser.test.js`
+  - Covers parent/learner flow, all seven probes, targeted practice and the absence of formal evidence/RPC writes.
+- Added a visible entry button from `curriculum-fr2-practice-learner.html` to the diagnostic page.
+
+### Curriculum and epistemic boundaries
+
+- The sequence reflects the workbook task families and the teacher's photographed board procedure, including product denominators and mixed-number conversion.
+- The diagnostic is **formative only**. Its local responses are not submitted to the formal curriculum registry, C3 evidence assessment, inference, mastery, decision trace or learner-state pipeline.
+- FR2 registry v0.6 and its candidate claims/developments/evidence/task models were not changed. The diagnostic is a separate instructional probe set; its addition/subtraction and mixed-number probes must not be misrepresented as newly registered FR2 task models or as formal evidence.
+- The broader 32-skill SLO mapping is not yet fully operationalised in the runtime. This implementation closes a practical fraction-learning gap, not the complete Grade 8 curriculum route.
+- No Supabase schema, migration, RPC, RLS, persistence contract or real learner data was changed.
+
+### Regression investigation and correction
+
+- Full Regression #3429 on implementation commit `798d748fbee72ec916f5ae641c924e97019236af` was **RED**. The new page omitted the Supabase UMD loader required by `createPacoGOApp`, so the existing learner-profile bootstrap could not load the learner list.
+- Corrected in commit `589cee126a701a64b3b86f1d9f56081007bf87e8`: added the same Supabase UMD loader used by the existing learner route and added the entry button from the existing FR2 practice page. Full Regression #3430 then exposed a browser assertion/content mismatch: the UI title was “Gelijkwaardige breuken” while the intended diagnostic label/test expected “Gelijkwaardige breuken maken”.
+- Corrected the learner-facing step title, not the test, in commit `94157254c2b2af819c9ee8d4a9530eb8ef638b19`.
+- Full Regression #3431 / run `42867640273`: **GREEN** on exact commit `94157254c2b2af819c9ee8d4a9530eb8ef638b19`. All workflow steps passed, including the 61-test Chromium browser suite and clean-working-tree verification.
+- Run URL: https://github.com/huisartslasten/PAB/actions/runs/42867640273
+
+### Next concrete step
+
+1. Verify the new route in the actual PacoGO TEST environment with a real parent login and a test learner profile; do not use LIVE.
+2. Review the seven probe prompts and the targeted practice explanations with Zyon's actual responses; the current browser regression uses synthetic learners and does not prove learner usability or instructional effectiveness.
+3. Add visual fraction representations/step scaffolds where they materially improve comprehension, without revealing answers during diagnosis.
+4. In a separate bounded step, define the exact relationship between these formative probes and the candidate FR2 registry (especially FR2.D1–D3) without submitting them as formal evidence or changing mastery rules.
+5. Continue operationalising the wider SLO-to-runtime path after the fraction slice has been exercised. Do not claim all 32 skills or the Grade 8 endpoint are already runtime-complete.
+
+### Branch, commit and regression
+
+- Latest implementation commit: `94157254c2b2af819c9ee8d4a9530eb8ef638b19`.
+- Latest verified Full Regression: #3431 / run `42867640273`, **GREEN** on that exact commit.
+- This handoff update is itself a repository change and requires Full Regression on its exact resulting commit.

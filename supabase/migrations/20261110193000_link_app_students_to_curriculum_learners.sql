@@ -35,7 +35,7 @@ create policy learner_profile_links_insert_owner
     and exists (
       select 1
       from public.learner_profiles p
-      where p.learner_key = learner_key
+      where p.learner_key = learner_profile_links.learner_key
         and p.owner_user_id = (select auth.uid())
     )
   );

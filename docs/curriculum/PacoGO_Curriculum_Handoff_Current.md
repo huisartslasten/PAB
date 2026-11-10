@@ -5635,3 +5635,75 @@ Then run the diagnostic with Zyon and use his actual intermediate steps to choos
 - Implementation commit: `c92e32d0ea2512ce282e1e7110cd2412f71ec1e9`.
 - Latest verified Full Regression before this handoff update: #3451 / run `42887722335`, **GREEN** on that exact implementation commit.
 - This handoff update is itself a repository change and requires Full Regression on its exact resulting commit.
+
+---
+
+## Current handoff update — 2026-11-10 (PacoGO roster ↔ curriculum learner identity)
+
+**Branch:** `refactor/professional-v1`. LIVE Git branch `main` and Supabase project `PAB` were not changed.
+
+### Problem and root cause
+
+The modern FR2 diagnostic rendered the PacoGO shell greeting for the selected learner (e.g. Zyon), but then displayed that no curriculum learner profile existed. The two systems used separate identity sources:
+
+- PacoGO's fixed roster in `src/core/student-registry.js` uses the application learner names.
+- The curriculum engine uses opaque UUID keys from `public.learner_profiles`.
+
+There was no explicit, owner-scoped mapping between these identities. Looking up profiles by display name would be unsafe and could silently map the wrong learner.
+
+### Architecture decision
+
+Add an explicit mapping from a stable application key to one opaque curriculum profile:
+
+- Stable application keys: `zyon`, `zenith`, `zephon`.
+- New table: `public.learner_profile_links`.
+- Mapping is owner-scoped by `owner_user_id`; one application key per parent and one PacoGO roster identity per curriculum profile.
+- No mapping is inferred from names.
+- Authenticated SECURITY INVOKER RPCs:
+  - `link_app_learner_profile` links an existing profile after checking ownership.
+  - `create_app_learner_profile` atomically creates and links a profile, idempotently, protected by a transaction advisory lock.
+- RLS is enabled. Only the authenticated owner can read or insert their own mappings. Anonymous execution of the new RPCs is denied.
+- Existing profile selection is offered in Beheer to avoid creating a duplicate when a suitable profile already exists.
+
+### Implemented
+
+- Added stable `curriculumKey` values to the PacoGO student registry.
+- Extended `learner-curriculum-service.js` with profile lookup, explicit linking and idempotent provisioning methods.
+- Added a Curriculum-leerlingprofiel section to Beheer for the selected student. A parent can link an existing profile or create the profile for that roster identity.
+- Changed the FR2 diagnostic to resolve the selected PacoGO learner through the explicit mapping. If missing, it gives a specific route to Beheer; it no longer offers a global, unassociated profile picker.
+- Added service, registry, migration-contract and browser tests. Browser coverage verifies that selecting Zyon resolves Zyon's linked UUID and starts the diagnostic, and that an unlinked Zyon is directed to Beheer.
+- Extended `supabase/tests/learner_ownership_rls.test.sql` to verify idempotence, owner isolation and denial of cross-guardian linking.
+- The migration filename was aligned to the version actually recorded by Supabase TEST: `20261110232751_link_app_students_to_curriculum_learners.sql`.
+
+### Supabase TEST deployment and verification
+
+- Applied migration `20261110232751_link_app_students_to_curriculum_learners` to Supabase project **PacoGO TEST** (`btnhhvtpmuvrpbnkyjnm`) only.
+- Confirmed the new table exists with RLS enabled, owner-scoped policies, and the expected foreign keys.
+- Confirmed both new RPCs are SECURITY INVOKER, executable by `authenticated`, and not executable by `anon`.
+- Executed the full learner-ownership SQL integration test against PacoGO TEST. It returned the explicit verification result: `learner ownership + app identity link integration passed`.
+- Confirmed the test transaction rolled back its synthetic users and mappings; `learner_profile_links` remains empty. No real learner profile was created by this work.
+- Supabase security advisors returned existing warnings about unrelated game-access SECURITY DEFINER functions and leaked-password protection. No warning identified either new RPC as SECURITY DEFINER.
+- Supabase production project `PAB` was not modified.
+
+### Regression verification
+
+- Browser regression #668 / run `42923368198`: **GREEN** on application implementation commit `a9eeb7c40c5459e0ea3d5a20b3048bf892d5d948`.
+- Full Regression #3465 / run `42923651330`: **GREEN** on `70a7d5dc13ee9a263ee76c5fada351a187646435`.
+- Full Regression #3468 / run `42923870416`: **GREEN** on exact branch HEAD `7e0fca32a9addf507a57e6c2861ce126d6870c9c`. All workflow steps passed, including browser regression and clean working tree.
+- Run URL: https://github.com/huisartslasten/PAB/actions/runs/42923870416
+
+### Next concrete step — local PacoGO TEST UI
+
+1. Use the local PacoGO TEST app with the parent account.
+2. Select Zyon in the top navigation and open Beheer.
+3. In **Curriculum-leerlingprofiel**, use **Maak profiel voor Zyon** (the TEST database currently has no curriculum learner profiles), or select an existing profile if one is present by the time this is tested.
+4. Return to Dashboard → Breuken or Skills → Breukequivalentie. The diagnostic should resolve Zyon automatically and start without the former “no learner profile” message.
+5. Verify that the created mapping persists after refresh. Then run the formative diagnosis with Zyon. It remains formative only: no formal evidence, inference, mastery or learner-state writes are made by this diagnostic.
+
+If the UI cannot read the new table/RPC, inspect the exact Data API/RLS error; do not create profiles manually or weaken the ownership policy.
+
+### Current branch / verification boundary
+
+- Latest implementation branch commit verified: `7e0fca32a9addf507a57e6c2861ce126d6870c9c`.
+- Latest verified Full Regression: #3468 / run `42923870416`, **GREEN** on that exact commit.
+- This handoff update is itself a repository change and requires Full Regression on its exact resulting commit before the phase can be closed.

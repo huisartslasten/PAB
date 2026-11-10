@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-const url = 'http://127.0.0.1:4173/curriculum-fr2-fractions.html';
+const url = 'http://127.0.0.1:4173/curriculum-fraction-diagnostic-learner.html';
 const parent = '5d0e1e5c-1dbe-4909-bd3a-81a1e7b26d09';
 const learner = '123e4567-e89b-42d3-a456-426614174000';
 

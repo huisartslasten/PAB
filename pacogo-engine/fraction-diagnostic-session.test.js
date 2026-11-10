@@ -1,0 +1,10 @@
+import assert from "node:assert/strict";
+import{FRACTION_DIAGNOSTIC_STEPS as steps,createFractionDiagnosticSession}from"./fraction-diagnostic-session.js";
+function storage(){const m=new Map();return{getItem:k=>m.get(k)||null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k),entries:()=>[...m.entries()]};}
+const db=storage(),a=createFractionDiagnosticSession({learnerKey:"a",storage:db}),b=createFractionDiagnosticSession({learnerKey:"b",storage:db});
+assert.equal(steps.length,7);assert.equal(a.getProgress().totalCount,7);assert.equal(a.getCurrentStep().id,"equivalence");assert.throws(()=>a.getRecommendation(),/Complete/);
+const first=steps[0];assert.equal(a.submitStep({stepId:first.id,values:{factor:3,numerator:6,denominator:9}}).correct,false);assert.equal(a.getCurrentStep().id,"common-denominator");assert.throws(()=>a.submitStep({stepId:first.id,values:first.expected}),/already/);
+for(const s of steps.slice(1))a.submitStep({stepId:s.id,values:s.expected});
+assert.equal(a.getProgress().isComplete,true);assert.equal(a.getRecommendation().stepId,"equivalence");assert.equal(a.evaluatePractice({stepId:"equivalence",values:first.practice.expected}).correct,true);assert.throws(()=>a.evaluatePractice({stepId:"common-denominator",values:{}}),/recommended/);assert.equal(b.getProgress().completedCount,0);
+assert.throws(()=>b.submitStep({stepId:"equivalence",values:{factor:-1,numerator:4,denominator:6}}),/non-negative/);assert.throws(()=>b.submitStep({stepId:"equivalence",values:{factor:2,numerator:4}}),/fields/);assert.throws(()=>createFractionDiagnosticSession({learnerKey:" ",storage:db}),/learner key/);
+assert.equal(db.entries().length,1);assert.doesNotMatch(db.entries()[0][1],/"a"/);a.reset();assert.equal(a.getProgress().completedCount,0);console.log("PacoGO fraction diagnostic session tests passed.");

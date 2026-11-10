@@ -40,6 +40,48 @@ export function createLearnerCurriculumService(db) {
     }));
   }
 
+  async function getAppLearnerProfile(appStudentKey) {
+    const key = String(appStudentKey || '').trim();
+    if (!/^[a-z][a-z0-9-]{1,63}$/.test(key)) throw new TypeError('A stable PacoGO student key is required.');
+    const result = await db
+      .from('learner_profile_links')
+      .select('app_student_key,learner_key,learner_profiles(display_name)')
+      .eq('app_student_key', key)
+      .maybeSingle();
+    const row = unwrap(result, 'PacoGO learner link query');
+    if (!row) return null;
+    return {
+      app_student_key: row.app_student_key,
+      learner_key: requireUuid(row.learner_key, 'learner_key'),
+      display_name: String(row.learner_profiles?.display_name || '')
+    };
+  }
+
+  async function linkAppLearnerProfile(appStudentKey, learnerKey) {
+    const key = String(appStudentKey || '').trim();
+    if (!/^[a-z][a-z0-9-]{1,63}$/.test(key)) throw new TypeError('A stable PacoGO student key is required.');
+    const normalizedLearnerKey = requireUuid(learnerKey, 'learner_key');
+    const result = await db.rpc('link_app_learner_profile', {
+      p_app_student_key: key,
+      p_learner_key: normalizedLearnerKey
+    });
+    const linkedKey = requireUuid(unwrap(result, 'PacoGO learner profile linking'), 'learner_key');
+    return { app_student_key: key, learner_key: linkedKey };
+  }
+
+  async function createAppLearnerProfile(appStudentKey, displayName) {
+    const key = String(appStudentKey || '').trim();
+    if (!/^[a-z][a-z0-9-]{1,63}$/.test(key)) throw new TypeError('A stable PacoGO student key is required.');
+    const normalizedName = String(displayName || '').trim();
+    if (!normalizedName) throw new TypeError('A learner display name is required.');
+    const result = await db.rpc('create_app_learner_profile', {
+      p_app_student_key: key,
+      p_display_name: normalizedName
+    });
+    const learnerKey = requireUuid(unwrap(result, 'PacoGO learner profile creation'), 'learner_key');
+    return { app_student_key: key, learner_key: learnerKey, display_name: normalizedName };
+  }
+
   async function createLearnerProfile(displayName) {
     const normalizedName = String(displayName || '').trim();
     if (!normalizedName) throw new TypeError('A learner display name is required.');
@@ -176,6 +218,9 @@ export function createLearnerCurriculumService(db) {
 
   return Object.freeze({
     listLearners,
+    getAppLearnerProfile,
+    linkAppLearnerProfile,
+    createAppLearnerProfile,
     createLearnerProfile,
     getRegistryVersionId,
     loadLearningHistory,

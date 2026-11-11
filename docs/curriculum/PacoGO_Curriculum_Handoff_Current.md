@@ -5756,3 +5756,50 @@ Verify the actual diagnostic in PacoGO TEST with Zyon: confirm the stacked notat
 - Latest verified implementation commit: `aaaaa86c20743662f72d94b17d989723f76b3369`.
 - Latest verified Full Regression: #3479 / run `43017375870`, **GREEN** on that exact commit.
 - This handoff update is itself a repository change and requires Full Regression on its exact resulting commit before the handoff can be considered verified.
+
+
+---
+
+## Current handoff update — 2026-11-11 (fraction diagnostic regression correction and assessment contract)
+
+**Branch:** `refactor/professional-v1`. LIVE `main` untouched.
+
+### Regression correction
+
+Full Regression #3486 was RED because the diagnostic browser scenario filled every probe with correct values but asserted that the engine should recommend targeted practice. The engine correctly recommends broader application when all probes are correct.
+
+Corrected the browser scenario so its first probe is intentionally incorrect, while the remaining six are correct. This exercises the targeted-practice branch the test name describes. The diagnostic engine was not altered to satisfy the stale assertion.
+
+- Browser test file: `test/browser/curriculum-fraction-diagnostic-learner.browser.test.js`.
+- Correction commit: `67b48c8c5a7aa392f07c83fcd4c07b8308228ef3`.
+- Browser proof #673 / run `43073957373`: **GREEN** on exact commit above.
+- Full Regression #3487 / run `43073957189`: **GREEN** on exact commit above.
+- Full Regression URL: https://github.com/huisartslasten/PAB/actions/runs/43073957189
+
+### Assessment contract documented
+
+Created `docs/curriculum/PacoGO_Zyon_Fraction_Diagnostic_Assessment_Contract_v0.1.md` as a candidate design contract. It separates:
+- mathematical validity from alignment with the classroom's demonstrated procedure;
+- equivalent-fraction and common-denominator relationships from fixed expected-number comparisons;
+- arithmetic errors from invalid conversions;
+- downstream responses dependent on an earlier error from independent difficulties;
+- formative diagnostic classifications from formal evidence/mastery.
+
+The contract includes formulas for common denominators, addition/subtraction, mixed-number conversion and improper-to-mixed conversion, plus required test cases and implementation sequence.
+
+This is a candidate design, not an approved or implemented runtime contract. The current seven probes still require a task-set review for overlap and learner burden, especially common-denominator versus addition, and mixed-to-improper versus mixed-subtraction.
+
+### Boundaries
+
+No diagnostic engine implementation, curriculum registry, FR2 evidence mapping, C1–C9, formal evidence, inference, mastery, learner state, Supabase schema/RPC/RLS or learner data changed in this phase. The diagnostic remains formative and local-storage based.
+
+### Next concrete step
+
+Review and reduce the current seven-probe set to the smallest set that distinguishes the learning decisions actually needed for Zyon's current schoolwork. Then implement pure mathematical evaluators with unit tests before integrating them into the session/runtime. Do not begin implementation until the task-set and response classifications are sufficiently specified.
+
+### Verification state
+
+- Last verified implementation/test commit: `67b48c8c5a7aa392f07c83fcd4c07b8308228ef3`.
+- Latest verified Full Regression: #3487 / run `43073957189`, **GREEN** on that exact commit.
+- Assessment contract documentation commit: `85598975cf3ab59843a32fd6b8b2301e334bd89b`.
+- This handoff update is a repository change and requires Full Regression on its exact resulting commit before the handoff can be considered verified.

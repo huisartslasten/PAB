@@ -47,22 +47,25 @@ test('FR2 diagnostic renders in the canonical PacoGO shell and gives targeted fo
   await expect(page.locator('#fraction-diagnostic-card')).toContainText('Zyon');
 
   await expect(page.locator('#fraction-diagnostic-card .fraction-diagnostic-fraction')).toHaveCount(2);
+  await expect(page.locator('#fraction-diagnostic-card .fraction-diagnostic-expression')).toContainText('2');
   await expect(page.locator('#fraction-diagnostic-card .fraction-diagnostic-inline-input[name="numerator"]')).toBeVisible();
   const answerNames = [
-    ['factor','numerator','denominator'],
-    ['commonDenominator','firstNumerator','secondNumerator'],
-    ['commonDenominator','firstNumerator','secondNumerator','resultNumerator','resultDenominator'],
-    ['commonDenominator','firstNumerator','secondNumerator','resultNumerator','resultDenominator'],
-    ['wholeProduct','numerator','denominator'],
+    ['factor','numerator'],
+    ['firstNumerator','firstDenominator','secondNumerator','secondDenominator'],
+    ['firstNumerator','firstDenominator','secondNumerator','secondDenominator','resultNumerator','resultDenominator'],
+    ['firstNumerator','firstDenominator','secondNumerator','secondDenominator','resultNumerator','resultDenominator'],
+    ['wholeProduct','numerator'],
     ['improperNumerator','improperDenominator','commonDenominator','firstNumerator','secondNumerator','resultNumerator','resultDenominator'],
-    ['whole','remainder','denominator']
+    ['whole','remainder']
   ];
-  const answers = [[3,6,9],[6,2,3],[12,4,3,7,12],[10,5,4,1,10],[12,17,6],[4,3,15,20,6,14,15],[2,13,30]];
+  const answers = [[2,4],[2,6,3,6],[4,12,3,12,7,12],[5,10,4,10,1,10],[12,17],[4,3,15,20,6,14,15],[2,13]];
   for (let step = 0; step < answers.length; step++) {
     if (step === 1) {
       await expect(page.locator('#fraction-diagnostic-card .fraction-diagnostic-fraction')).toHaveCount(4);
       await expect(page.locator('#fraction-diagnostic-card .fraction-diagnostic-inline-input[name="firstNumerator"]')).toBeVisible();
+      await expect(page.locator('#fraction-diagnostic-card .fraction-diagnostic-inline-input[name="firstDenominator"]')).toBeVisible();
       await expect(page.locator('#fraction-diagnostic-card .fraction-diagnostic-inline-input[name="secondNumerator"]')).toBeVisible();
+      await expect(page.locator('#fraction-diagnostic-card .fraction-diagnostic-inline-input[name="secondDenominator"]')).toBeVisible();
     }
     for (let i = 0; i < answers[step].length; i++) {
       await page.locator('#fraction-diagnostic-card:visible form input[name="' + answerNames[step][i] + '"]').fill(String(answers[step][i]));

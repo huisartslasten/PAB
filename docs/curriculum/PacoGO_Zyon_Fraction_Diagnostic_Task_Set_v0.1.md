@@ -55,7 +55,7 @@ Purpose: check whether the learner can transfer the common-denominator procedure
 
 Prompt: calculate 1 1/3 − 2/5.
 
-Administer only if F1 and the conversion portions of F2/F3 show enough prerequisite access to make this application interpretable. Reveal in this order:
+Administer only when F3 demonstrates the prerequisites needed to interpret this combined application: the learner's common denominator is valid, both converted fractions preserve their source values, and subtraction of the learner's converted numerators is arithmetically valid. F1 remains a separate equivalent-fraction observation; it is not an additional gate because F3 already samples equivalent-fraction scaling in the subtraction context. Reveal in this order:
 1. convert 1 1/3 to an improper fraction (capture the new numerator; denominator 3 is unchanged and is not re-entered);
 2. choose a common denominator;
 3. determine the equivalent numerator for the converted mixed fraction;
@@ -95,18 +95,70 @@ The stopping threshold and exact branching rules must be explicit in the evaluat
 ## 6. Open checks before implementation
 
 1. Confirm from the current workbook/teacher whether improper-to-mixed conversion is an immediate requirement; otherwise keep it outside the core diagnostic.
-2. Confirm whether F4 should be administered after successful F1–F3 only, or whether partial prerequisite success is sufficient. The branch rule must be based on observable response classifications, not an opaque total score.
-3. Review the Dutch prompts for learner comprehension without adding hints that reveal the next mathematical step.
-4. Define exact response data shape and versioned local-storage compatibility before changing the existing v1 session.
-5. Ensure the UI reveals one action at a time and never presents a solved intermediate expression.
+2. Review the Dutch prompts for learner comprehension without adding hints that reveal the next mathematical step.
+3. Ensure the UI reveals one action at a time and never presents a solved intermediate expression.
 
 ## 7. Implementation order
 
 1. Review/approve this task set and the branch/stop rules.
 2. Specify pure mathematical evaluators and response classifications; add unit tests first.
-3. Specify a versioned formative session schema and safe handling of existing v1 local progress.
+3. Use the v2 formative session schema below; preserve existing v1 storage untouched and do not reinterpret or migrate it.
 4. Implement staged interaction so each submitted action reveals only the next action.
-5. Add browser tests proving that future fields/answers are not present, alternate common denominators are accepted, arithmetic and conversion errors are distinguished, dependent-consistent work is not double-counted, and no formal learner state is written.
+5. Add browser tests proving that future fields/answers are not present, alternate common denominators are accepted, arithmetic and conversion errors are distinguished, dependent-consistent work is not double-counted, F4 follows the explicit gate, and no formal learner state is written.
 6. Run Full Regression after each bounded change and verify the exact commit in PacoGO TEST before using the diagnostic with Zyon.
 
 No runtime implementation is authorised by this candidate document alone.
+
+
+## 8. Explicit branch and stopping contract (v0.1)
+
+- F1, F2 and F3 are the core route. A single incorrect response is not a reason to stop.
+- Complete the independent actions in each core episode where the learner is able to respond. A later action that follows an invalid earlier value is retained and classified as dependent; it is not counted as a second independent difficulty.
+- The learner may stop at any time. An episode that cannot be completed is recorded as incomplete, with unsubmitted actions classified as missing; do not manufacture a score.
+- F4 is administered only if all four prerequisite components in F3 are valid: common denominator, first equivalent numerator, second equivalent numerator, and subtraction arithmetic. Otherwise F4 is not_administered with reason prerequisite_not_demonstrated.
+- F1 is not a second F4 gate: F3 already observes equivalent-fraction scaling in the relevant subtraction context.
+- Improper-to-mixed remains outside the core until confirmed by current workbook/teacher material.
+
+## 9. Versioned formative session data contract (v2)
+
+The v2 session is separate from the legacy v1 session. Use a distinct local-storage namespace/key ending in :v2:; do not overwrite, migrate, reinterpret or delete v1 data. A new v2 session begins independently. No timestamp is required for this short formative workflow; action order is the sequence in the stored array.
+
+Top-level shape (illustrative):
+
+    {
+      schemaVersion: 2,
+      taskSetVersion: "0.1",
+      assessmentContractVersion: "0.1",
+      learnerKey: "<existing learner key>",
+      status: "in_progress" | "completed" | "stopped",
+      tasks: {
+        F1: { status: "completed" | "incomplete", actions: [] },
+        F2: { status: "completed" | "incomplete", actions: [] },
+        F3: { status: "completed" | "incomplete", actions: [] },
+        F4: {
+          status: "completed" | "not_administered" | "incomplete",
+          reason: null | "prerequisite_not_demonstrated",
+          actions: []
+        }
+      }
+    }
+
+Each submitted action is appended in presentation order:
+
+    {
+      actionId: "common_denominator",
+      rawValue: 12,
+      classification: "valid" | "invalid_relation" | "arithmetic_error" |
+        "dependent_consistent" | "missing" | "invalid_input" | "ambiguous",
+      dependencyActionIds: []
+    }
+
+- rawValue preserves the learner's original integer response; it is never replaced by a corrected or normalised value. Unsubmitted actions have no fabricated response record; task completion metadata and expected action sequence identify omissions.
+- dependencyActionIds explicitly links a dependent classification to the earlier submitted action(s) on which it relies.
+- Evaluator diagnostics/reason codes may be stored as separate machine-readable metadata, but must not replace or mutate rawValue.
+- Store only formative diagnostic state. No formal evidence, inference, mastery, next-action, learner-state, registry or Supabase writes.
+- Session validation must reject unknown schema versions and malformed action sequences without silently coercing legacy data.
+
+## 10. Implementation authorisation boundary
+
+This closes the task-set branch/stop and storage-schema design questions. It authorises implementation of the pure mathematical evaluators and their unit tests only after a fresh Full Regression is green on the exact current branch HEAD. It does not authorise changing the learner-facing runtime until evaluator contracts and tests are verified.

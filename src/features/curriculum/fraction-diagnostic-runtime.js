@@ -189,6 +189,7 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
     renderExpression(expression, step.expression, step.fields, step.id);
     progress.textContent = 'Stap ' + (state.completedCount + 1) + ' van ' + state.totalCount;
     const inlineIds = new Set(embeddedFields[step.id] || []);
+    renderFields(fields, step.fields.filter(([id]) => !inlineIds.has(id)));
     diagnosticStatus.textContent = '';
   }
 

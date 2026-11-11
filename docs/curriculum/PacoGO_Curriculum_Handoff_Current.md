@@ -5841,3 +5841,31 @@ Review the candidate task set and close the three design checks: whether imprope
 - Task-set specification commit: `5111a7823a9df850e5839b9cd8ffa2527d559b69`.
 - Handoff update commit: pending Full Regression.
 - Full Regression must run on the exact resulting handoff commit before this documentation phase is considered verified.
+
+
+---
+
+## Current handoff update — 2026-11-11 (fraction diagnostic branch and session contract closed)
+
+**Branch:** refactor/professional-v1. LIVE main untouched.
+
+### Design decisions completed
+
+The fraction diagnostic task-set specification now defines:
+- F1–F3 as the core route; one incorrect answer alone does not stop the diagnostic.
+- F4 is administered only when the F3 common denominator, both equivalent-fraction conversions and subtraction arithmetic are all valid. Otherwise F4 is not administered because prerequisites were not demonstrated; this is not evidence that mixed-number conversion is deficient.
+- Improper-to-mixed conversion remains outside the core until confirmed as an immediate workbook/teacher requirement.
+- A versioned v2 local session schema with ordered per-action raw responses and classifications.
+- v2 uses a separate local-storage namespace; legacy v1 data is preserved untouched and is not migrated or reinterpreted.
+- No formal evidence, inference, mastery, next-action, learner-state, registry or Supabase writes.
+
+### Next concrete step
+
+Before any evaluator implementation, run Full Regression on the exact current branch HEAD. If green, implement pure mathematical evaluators and unit tests as a bounded first code phase. Do not yet change the learner-facing runtime. If red, stop and isolate the exact cause.
+
+### Verification boundary
+
+- Prior verified baseline: Full Regression #3491 / run 43074854767, GREEN on 39fda06747d3e59e6506626a2ba42a5436e69a85.
+- Task-set contract update commit: 0456bd12402ad3f57e3d31b2c737e446706333e9.
+- Handoff update commit: pending.
+- The final handoff commit must receive its own Full Regression before this design phase is closed.

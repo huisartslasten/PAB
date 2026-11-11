@@ -11,8 +11,11 @@ assert.equal(evaluateEquivalentFraction({ numerator: 2, denominator: 3, targetDe
 assert.equal(evaluateEquivalentFraction({ numerator: 2, denominator: 3, targetDenominator: 6, factor: 3, newNumerator: 6 }).classification, C.INVALID_RELATION);
 assert.equal(evaluateEquivalentFraction({ numerator: 2, denominator: 3, targetDenominator: 5, factor: 0, newNumerator: 0 }).classification, C.INVALID_INPUT);
 
-for (const commonDenominator of [12, 6, 24]) {
+for (const commonDenominator of [12, 24, 36]) {
   assert.equal(evaluateCommonDenominator({ firstDenominator: 3, secondDenominator: 4, commonDenominator }).classification, C.VALID);
+}
+for (const commonDenominator of [6, 12, 18]) {
+  assert.equal(evaluateCommonDenominator({ firstDenominator: 3, secondDenominator: 2, commonDenominator }).classification, C.VALID);
 }
 assert.equal(evaluateCommonDenominator({ firstDenominator: 3, secondDenominator: 4, commonDenominator: 8 }).classification, C.INVALID_RELATION);
 assert.equal(evaluateCommonDenominator({ firstDenominator: 3, secondDenominator: 4, commonDenominator: 0 }).classification, C.INVALID_INPUT);

@@ -46,17 +46,30 @@ test('FR2 diagnostic renders in the canonical PacoGO shell and gives targeted fo
   await expect(page.locator('#fraction-diagnostic-card')).toBeVisible();
   await expect(page.locator('#fraction-diagnostic-card')).toContainText('Zyon');
 
+  await expect(page.locator('#fraction-diagnostic-card .fraction-diagnostic-fraction')).toHaveCount(3);
+  await expect(page.locator('#fraction-diagnostic-card .fraction-diagnostic-inline-input[name="firstNumerator"]')).toBeVisible();
+  const answerNames = [
+    ['factor','numerator','denominator'],
+    ['commonDenominator','firstNumerator','secondNumerator'],
+    ['commonDenominator','firstNumerator','secondNumerator','resultNumerator','resultDenominator'],
+    ['commonDenominator','firstNumerator','secondNumerator','resultNumerator','resultDenominator'],
+    ['wholeProduct','numerator','denominator'],
+    ['improperNumerator','improperDenominator','commonDenominator','firstNumerator','secondNumerator','resultNumerator','resultDenominator'],
+    ['whole','remainder','denominator']
+  ];
   const answers = [[3,6,9],[6,2,3],[12,4,3,7,12],[10,5,4,1,10],[12,17,6],[4,3,15,20,6,14,15],[2,13,30]];
-  for (const values of answers) {
-    const visibleInputs = page.locator('#fraction-diagnostic-card:visible form input');
-    for (let i = 0; i < values.length; i++) await visibleInputs.nth(i).fill(String(values[i]));
+  for (let step = 0; step < answers.length; step++) {
+    for (let i = 0; i < answers[step].length; i++) {
+      await page.locator('#fraction-diagnostic-card:visible form input[name="' + answerNames[step][i] + '"]').fill(String(answers[step][i]));
+    }
     await page.getByRole('button', { name: 'Antwoord vastleggen' }).click();
   }
   await expect(page.locator('#fraction-diagnostic-result h2')).toContainText('Volgende stap: Gelijkwaardige breuken maken');
   await expect(page.locator('#fraction-diagnostic-result form')).toBeVisible();
   const practice = [2,6,8];
-  const visibleInputs = page.locator('#fraction-diagnostic-result form input');
-  for (let i = 0; i < practice.length; i++) await visibleInputs.nth(i).fill(String(practice[i]));
+  for (const [name, value] of [['factor',2],['numerator',6],['denominator',8]]) {
+    await page.locator('#fraction-diagnostic-result form input[name="' + name + '"]').fill(String(value));
+  }
   await page.getByRole('button', { name: 'Oefening controleren' }).click();
   await expect(page.locator('#fraction-diagnostic-result .fraction-diagnostic-status')).toContainText('Goed uitgevoerd');
 

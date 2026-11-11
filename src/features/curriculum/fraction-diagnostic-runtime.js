@@ -93,24 +93,79 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
 
   content.append(setup, diagnostic, result);
 
+  const embeddedFields = Object.freeze({
+    equivalence: ['numerator'],
+    'common-denominator': ['firstNumerator', 'secondNumerator'],
+    addition: ['resultNumerator'],
+    subtraction: ['resultNumerator'],
+    'mixed-to-improper': ['numerator'],
+    'mixed-subtraction': ['resultNumerator'],
+    'improper-to-mixed': ['whole', 'remainder']
+  });
+
+  function createInput(id, labelText, inline = false) {
+    const label = documentRef.createElement('label');
+    label.className = inline ? 'fraction-diagnostic-inline-field' : 'fraction-diagnostic-field';
+    const caption = documentRef.createElement('span');
+    caption.className = inline ? 'fraction-diagnostic-visually-hidden' : '';
+    caption.textContent = labelText;
+    const input = documentRef.createElement('input');
+    input.type = 'number';
+    input.inputMode = 'numeric';
+    input.min = '0';
+    input.step = '1';
+    input.required = true;
+    input.name = id;
+    input.className = inline ? 'fraction-diagnostic-inline-input' : 'paco-form-control';
+    input.setAttribute('aria-label', labelText);
+    label.append(caption, input);
+    return label;
+  }
+
   function renderFields(host, definitions) {
     host.replaceChildren();
-    definitions.forEach(([id, labelText]) => {
-      const label = documentRef.createElement('label');
-      label.className = 'fraction-diagnostic-field';
-      const caption = documentRef.createElement('span');
-      caption.textContent = labelText;
-      const input = documentRef.createElement('input');
-      input.type = 'number';
-      input.inputMode = 'numeric';
-      input.min = '0';
-      input.step = '1';
-      input.required = true;
-      input.name = id;
-      input.className = 'paco-form-control';
-      label.append(caption, input);
-      host.appendChild(label);
-    });
+    definitions.forEach(([id, labelText]) => host.appendChild(createInput(id, labelText)));
+  }
+
+  function renderExpression(host, expressionText, definitions, stepId) {
+    host.replaceChildren();
+    const inlineIds = embeddedFields[stepId] || [];
+    const labels = new Map(definitions);
+    let inlineIndex = 0;
+    const tokens = /(\\d+|\\?)\\/(\\d+|\\?)|\\?/g;
+    let cursor = 0;
+    for (const match of expressionText.matchAll(tokens)) {
+      const index = match.index;
+      if (index > cursor) host.append(documentRef.createTextNode(expressionText.slice(cursor, index)));
+      const numerator = match[1] ?? match[0];
+      const denominator = match[2];
+      if (denominator !== undefined) {
+        const fraction = documentRef.createElement('span');
+        fraction.className = 'fraction-diagnostic-fraction';
+        const top = documentRef.createElement('span');
+        top.className = 'fraction-diagnostic-numerator';
+        const bottom = documentRef.createElement('span');
+        bottom.className = 'fraction-diagnostic-denominator';
+        if (numerator === '?') {
+          const id = inlineIds[inlineIndex++];
+          if (id) top.appendChild(createInput(id, labels.get(id) || id, true));
+          else top.textContent = '?';
+        } else top.textContent = numerator;
+        if (denominator === '?') {
+          const id = inlineIds[inlineIndex++];
+          if (id) bottom.appendChild(createInput(id, labels.get(id) || id, true));
+          else bottom.textContent = '?';
+        } else bottom.textContent = denominator;
+        fraction.append(top, bottom);
+        host.appendChild(fraction);
+      } else {
+        const id = inlineIds[inlineIndex++];
+        if (id) host.appendChild(createInput(id, labels.get(id) || id, true));
+        else host.append(documentRef.createTextNode('?'));
+      }
+      cursor = index + match[0].length;
+    }
+    if (cursor < expressionText.length) host.append(documentRef.createTextNode(expressionText.slice(cursor)));
   }
 
   function readValues(host) {
@@ -131,9 +186,9 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
     const state = session.getProgress();
     stepTitle.textContent = step.title;
     prompt.textContent = step.prompt;
-    expression.textContent = step.expression;
+    renderExpression(expression, step.expression, step.fields, step.id);
     progress.textContent = 'Stap ' + (state.completedCount + 1) + ' van ' + state.totalCount;
-    renderFields(fields, step.fields);
+    const inlineIds = new Set(embeddedFields[step.id] || []);\n    renderFields(fields, step.fields.filter(([id]) => !inlineIds.has(id)));
     diagnosticStatus.textContent = '';
   }
 

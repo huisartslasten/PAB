@@ -95,11 +95,11 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
 
   const embeddedFields = Object.freeze({
     equivalence: ['numerator'],
-    'common-denominator': ['firstNumerator', 'secondNumerator'],
-    addition: ['resultNumerator'],
-    subtraction: ['resultNumerator'],
+    'common-denominator': ['firstNumerator', 'firstDenominator', 'secondNumerator', 'secondDenominator'],
+    addition: ['firstNumerator', 'firstDenominator', 'secondNumerator', 'secondDenominator', 'resultNumerator', 'resultDenominator'],
+    subtraction: ['firstNumerator', 'firstDenominator', 'secondNumerator', 'secondDenominator', 'resultNumerator', 'resultDenominator'],
     'mixed-to-improper': ['numerator'],
-    'mixed-subtraction': ['resultNumerator'],
+    'mixed-subtraction': [],
     'improper-to-mixed': ['whole', 'remainder']
   });
 

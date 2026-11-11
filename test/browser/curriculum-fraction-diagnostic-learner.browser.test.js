@@ -58,7 +58,8 @@ test('FR2 diagnostic renders in the canonical PacoGO shell and gives targeted fo
     ['improperNumerator','improperDenominator','commonDenominator','firstNumerator','secondNumerator','resultNumerator','resultDenominator'],
     ['whole','remainder']
   ];
-  const answers = [[2,4],[2,6,3,6],[4,12,3,12,7,12],[5,10,4,10,1,10],[12,17],[4,3,15,20,6,14,15],[2,13]];
+  // The first probe is intentionally incorrect so this browser scenario exercises targeted practice.
+  const answers = [[3,6],[2,6,3,6],[4,12,3,12,7,12],[5,10,4,10,1,10],[12,17],[4,3,15,20,6,14,15],[2,13]];
   for (let step = 0; step < answers.length; step++) {
     if (step === 1) {
       await expect(page.locator('#fraction-diagnostic-card .fraction-diagnostic-fraction')).toHaveCount(4);

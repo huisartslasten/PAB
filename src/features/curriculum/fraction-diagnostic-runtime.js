@@ -132,7 +132,7 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
     const inlineIds = embeddedFields[stepId] || [];
     const labels = new Map(definitions);
     let inlineIndex = 0;
-    const tokens = /(\\d+|\\?)\\/(\\d+|\\?)|\\?/g;
+    const tokens = /(\d+|\?)\/(\d+|\?)|\?/g;
     let cursor = 0;
     for (const match of expressionText.matchAll(tokens)) {
       const index = match.index;
@@ -188,7 +188,7 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
     prompt.textContent = step.prompt;
     renderExpression(expression, step.expression, step.fields, step.id);
     progress.textContent = 'Stap ' + (state.completedCount + 1) + ' van ' + state.totalCount;
-    const inlineIds = new Set(embeddedFields[step.id] || []);\n    renderFields(fields, step.fields.filter(([id]) => !inlineIds.has(id)));
+    const inlineIds = new Set(embeddedFields[step.id] || []);
     diagnosticStatus.textContent = '';
   }
 

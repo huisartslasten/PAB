@@ -81,7 +81,7 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
   practiceSubmit.type = 'submit';
   practiceSubmit.className = 'success';
   practiceSubmit.textContent = 'Oefening controleren';
-  practiceForm.append(practiceFields, practiceSubmit);
+  practiceForm.append(practiceExpression, practiceFields, practiceSubmit);
   const practiceStatus = documentRef.createElement('p');
   practiceStatus.className = 'fraction-diagnostic-status';
   practiceStatus.setAttribute('role', 'status');
@@ -89,7 +89,7 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
   restart.type = 'button';
   restart.className = 'secondary';
   restart.textContent = 'Diagnose opnieuw doen';
-  result.append(resultTitle, resultCopy, explanation, practiceTitle, practicePrompt, practiceExpression, practiceForm, practiceStatus, restart);
+  result.append(resultTitle, resultCopy, explanation, practiceTitle, practicePrompt, practiceForm, practiceStatus, restart);
 
   content.append(setup, diagnostic, result);
 

@@ -5707,3 +5707,52 @@ If the UI cannot read the new table/RPC, inspect the exact Data API/RLS error; d
 - Latest implementation branch commit verified: `7e0fca32a9addf507a57e6c2861ce126d6870c9c`.
 - Latest verified Full Regression: #3468 / run `42923870416`, **GREEN** on that exact commit.
 - This handoff update is itself a repository change and requires Full Regression on its exact resulting commit before the phase can be closed.
+
+
+---
+
+## Current handoff update — 2026-11-11 (stacked fraction notation and embedded answer fields)
+
+**Branch:** `refactor/professional-v1`. LIVE `main` untouched.
+
+### What changed
+
+The formative fraction diagnostic now renders fraction expressions in conventional vertical notation:
+
+- numerator above a horizontal fraction bar;
+- denominator below the bar;
+- missing numerator/denominator values are entered in-place, at the corresponding position in the fraction;
+- embedded inputs are part of the actual diagnostic form and are included in submitted values;
+- the same structural rule is applied to the targeted follow-up practice form.
+
+The renderer maps the relevant missing-value fields into the expression for each diagnostic probe. Remaining supporting fields continue to be rendered in the normal field area. This is a presentation and form-structure change only.
+
+### Regression investigation and final verification
+
+Several Full Regression runs correctly exposed successive issues during implementation. These were investigated rather than bypassed:
+
+- malformed parser/newline source caused an earlier runtime failure;
+- the main diagnostic expression initially sat outside its form, so its embedded input was not submitted;
+- after correcting that, the targeted practice expression was found to sit outside its own form, causing the practice input not to be found/submitted;
+- the final correction moved the targeted practice expression inside the practice form and kept the expression, supporting fields and submit control together.
+
+Final implementation commit: `aaaaa86c20743662f72d94b17d989723f76b3369`.
+
+- Full Regression #3479 / run `43017375870`: **GREEN** on the exact implementation commit above.
+- Workflow job `agenda-cutover-and-regression`: completed successfully.
+- Run URL: https://github.com/huisartslasten/PAB/actions/runs/43017375870
+
+### Scope boundaries retained
+
+No curriculum skill/development/claim/task mapping, formal evidence, evidence assessment, inference, mastery rule, learner state, Supabase schema/RPC/RLS or learner data was changed. The diagnostic remains formative. No changes were made to LIVE `main`.
+
+### Next concrete step
+
+Verify the actual diagnostic in PacoGO TEST with Zyon: confirm the stacked notation is readable, each missing value appears inside the correct numerator/denominator position, and the targeted practice form accepts and evaluates the embedded response. Then use Zyon's actual diagnostic responses to select the first targeted fraction explanation/practice. Do not interpret the formative diagnostic as formal mastery.
+
+### Branch and verification state
+
+- Working branch: `refactor/professional-v1`.
+- Latest verified implementation commit: `aaaaa86c20743662f72d94b17d989723f76b3369`.
+- Latest verified Full Regression: #3479 / run `43017375870`, **GREEN** on that exact commit.
+- This handoff update is itself a repository change and requires Full Regression on its exact resulting commit before the handoff can be considered verified.

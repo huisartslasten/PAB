@@ -51,14 +51,14 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
   submit.type = 'submit';
   submit.className = 'success';
   submit.textContent = 'Antwoord vastleggen';
-  form.append(fields, submit);
+  form.append(expression, fields, submit);
   const diagnosticNotice = documentRef.createElement('p');
   diagnosticNotice.className = 'fraction-diagnostic-muted';
   diagnosticNotice.textContent = 'Tijdens de diagnose geeft PacoGO nog geen goed/fout-feedback. Zo worden eerst je eigen tussenstappen zichtbaar.';
   const diagnosticStatus = documentRef.createElement('p');
   diagnosticStatus.className = 'fraction-diagnostic-status';
   diagnosticStatus.setAttribute('role', 'status');
-  diagnostic.append(learnerLabel, stepTitle, prompt, progress, expression, form, diagnosticNotice, diagnosticStatus);
+  diagnostic.append(learnerLabel, stepTitle, prompt, progress, form, diagnosticNotice, diagnosticStatus);
 
   const result = documentRef.createElement('section');
   result.id = 'fraction-diagnostic-result';
@@ -211,8 +211,9 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
       const step = FRACTION_DIAGNOSTIC_STEPS.find(item => item.id === recommendation.stepId);
       practiceTitle.textContent = 'Probeer een vergelijkbare opgave';
       practicePrompt.textContent = recommendation.practice.prompt;
-      practiceExpression.textContent = recommendation.practice.expression;
-      renderFields(practiceFields, step.fields);
+      renderExpression(practiceExpression, recommendation.practice.expression, step.fields, step.id);
+      const inlineIds = new Set(embeddedFields[step.id] || []);
+      renderFields(practiceFields, step.fields.filter(([id]) => !inlineIds.has(id)));
     } else {
       practiceStatus.textContent = '';
     }
@@ -233,7 +234,7 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
     event.preventDefault();
     try {
       const step = session.getCurrentStep();
-      session.submitStep({ stepId: step.id, values: readValues(fields) });
+      session.submitStep({ stepId: step.id, values: readValues(form) });
       if (session.getCurrentStep()) renderStep();
       else showRecommendation();
     } catch (error) {
@@ -244,7 +245,7 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
   practiceForm.addEventListener('submit', event => {
     event.preventDefault();
     try {
-      const outcome = session.evaluatePractice({ stepId: recommendation.stepId, values: readValues(practiceFields) });
+      const outcome = session.evaluatePractice({ stepId: recommendation.stepId, values: readValues(practiceForm) });
       practiceStatus.textContent = outcome.correct
         ? 'Goed uitgevoerd. Je hebt deze aanpak in een nieuwe opgave toegepast. Probeer later nog een andere opgave.'
         : 'Deze oefening is nog niet helemaal goed. Vergelijk iedere tussenstap opnieuw met de uitleg.';

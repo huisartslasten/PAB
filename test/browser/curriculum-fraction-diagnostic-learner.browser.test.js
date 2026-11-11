@@ -74,8 +74,7 @@ test('FR2 diagnostic renders in the canonical PacoGO shell and gives targeted fo
   }
   await expect(page.locator('#fraction-diagnostic-result h2')).toContainText('Volgende stap: Gelijkwaardige breuken maken');
   await expect(page.locator('#fraction-diagnostic-result form')).toBeVisible();
-  const practice = [2,6,8];
-  for (const [name, value] of [['factor',2],['numerator',6],['denominator',8]]) {
+  for (const [name, value] of [['factor',2],['numerator',6]]) {
     await page.locator('#fraction-diagnostic-result form input[name="' + name + '"]').fill(String(value));
   }
   await page.getByRole('button', { name: 'Oefening controleren' }).click();

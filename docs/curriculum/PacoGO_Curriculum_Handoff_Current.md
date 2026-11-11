@@ -5803,3 +5803,41 @@ Review and reduce the current seven-probe set to the smallest set that distingui
 - Latest verified Full Regression: #3487 / run `43073957189`, **GREEN** on that exact commit.
 - Assessment contract documentation commit: `85598975cf3ab59843a32fd6b8b2301e334bd89b`.
 - This handoff update is a repository change and requires Full Regression on its exact resulting commit before the handoff can be considered verified.
+
+
+---
+
+## Current handoff update — 2026-11-11 (reduced fraction diagnostic task-set design)
+
+**Branch:** `refactor/professional-v1`. LIVE `main` untouched.
+
+### Verification before this design step
+
+- Full Regression #3489 / run `43074410195`: **GREEN** on exact handoff commit `f2f84d201dc6b8c3198dd99e680409a1ec20ae8c`.
+- This is the verified baseline before the task-set design commit below.
+
+### Task-set design created
+
+Added `docs/curriculum/PacoGO_Zyon_Fraction_Diagnostic_Task_Set_v0.1.md` as a candidate design specification.
+
+The proposed minimum route is:
+- F1: equivalent fractions;
+- F2: addition with unlike denominators, eliciting common-denominator construction, both numerator conversions and addition one action at a time;
+- F3: subtraction with unlike denominators, eliciting the same component actions in a distinct operation;
+- F4: conditional mixed-number subtraction, integrating mixed-number conversion with the already sampled subtraction procedure.
+
+The design removes standalone common-denominator and mixed-to-improper probes as redundant. Improper-to-mixed is excluded from the core until confirmed as an immediate workbook/teacher requirement. F4 is conditional; dependent downstream responses must not be counted as independent errors.
+
+Most importantly, the learner sees only one action at a time. PacoGO must not pre-fill intermediate work, show later fields early, or solve the setup for the learner. The diagnostic remains formative, with no correctness feedback until completion and no formal evidence/mastery/learner-state/Supabase writes.
+
+This is a candidate design, not runtime implementation. Exact branch/stop rules, workbook scope and local-storage compatibility remain to be resolved before code changes.
+
+### Next concrete step
+
+Review the candidate task set and close the three design checks: whether improper-to-mixed is in the immediate school scope; the observable prerequisite rule for administering F4; and the exact staged response/session schema. Only then implement pure mathematical evaluators and tests, followed by the staged learner interface.
+
+### Verification boundary
+
+- Task-set specification commit: `5111a7823a9df850e5839b9cd8ffa2527d559b69`.
+- Handoff update commit: pending Full Regression.
+- Full Regression must run on the exact resulting handoff commit before this documentation phase is considered verified.

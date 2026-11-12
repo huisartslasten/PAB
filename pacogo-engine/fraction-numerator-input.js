@@ -1,6 +1,6 @@
-function createFractionNumeratorInput({
+function createFractionIntegerInput({
   mount,
-  label = "Vul de teller in",
+  label = "Vul het getal in",
   submitLabel = "Controleren",
   onInteraction = () => {},
   onSubmit = () => {}
@@ -10,12 +10,12 @@ function createFractionNumeratorInput({
     throw new TypeError("onInteraction and onSubmit must be functions");
   }
   const root = document.createElement("div");
-  root.className = "pacogo-fraction-numerator-input";
+  root.className = "pacogo-fraction-integer-input";
   const fieldLabel = document.createElement("label");
-  fieldLabel.className = "pacogo-fraction-numerator-input__label";
+  fieldLabel.className = "pacogo-fraction-integer-input__label";
   fieldLabel.textContent = label;
   const field = document.createElement("input");
-  field.className = "pacogo-fraction-numerator-input__field";
+  field.className = "pacogo-fraction-integer-input__field";
   field.type = "text";
   field.inputMode = "numeric";
   field.autocomplete = "off";
@@ -23,7 +23,7 @@ function createFractionNumeratorInput({
   field.setAttribute("aria-label", label);
   const submit = document.createElement("button");
   submit.type = "button";
-  submit.className = "pacogo-fraction-numerator-input__submit";
+  submit.className = "pacogo-fraction-integer-input__submit";
   submit.textContent = submitLabel;
   field.addEventListener("input", () => {
     onInteraction({ type: "numerator_changed", rawValue: field.value, source: "learner_input" });
@@ -43,4 +43,8 @@ function createFractionNumeratorInput({
     setValue: value => { if (!field.disabled) field.value = String(value ?? ""); }
   });
 }
-export { createFractionNumeratorInput };
+function createFractionNumeratorInput(options = {}) {
+  return createFractionIntegerInput({ label: "Vul de teller in", ...options });
+}
+
+export { createFractionIntegerInput, createFractionNumeratorInput };

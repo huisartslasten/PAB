@@ -5919,3 +5919,60 @@ Before changing the learner-facing UI, inspect the current diagnostic page and i
 - Latest implementation commit verified before this handoff update: `f691be34069c30b2d8eb19f8d3ea304f71f28d51`.
 - Latest verified Full Regression: #3511 / run `43134106967`, **GREEN** on that exact commit.
 - This handoff update is itself a repository change and requires Full Regression on its exact resulting commit before the handoff is considered verified.
+
+---
+
+## Current handoff update — 2026-11-12 (staged v2 fraction diagnostic learner UI)
+
+**Branch:** `refactor/professional-v1`. LIVE `main` untouched.
+
+### What changed
+
+Connected the staged v2 session engine to the existing learner-facing diagnostic route:
+
+- `src/features/curriculum/fraction-diagnostic-runtime.js` now uses `createFractionDiagnosticSessionV2`; it no longer uses the legacy seven-probe v1 session.
+- `src/features/curriculum/fraction-diagnostic.css` adds clear styling for the ordered answer history and single response field.
+- `test/browser/curriculum-fraction-diagnostic-learner.browser.test.js` now covers the staged learner flow.
+
+The learner interface renders exactly one numeric response field per action. The current expression is contextualized using the learner's already submitted values (for example, after selecting a common denominator, the next numerator conversion shows that denominator). Earlier raw responses remain visible as a history, without correctness classifications or prefilled future answers.
+
+The interface gives no correctness feedback during the diagnostic. At completion it shows a neutral completion summary; it does not yet make targeted-practice recommendations from v2 classifications. A learner can stop; only already submitted responses are retained. Reloading an in-progress session resumes from the next unsubmitted action through the v2 local storage namespace.
+
+F4 is shown only when every F3 action is classified valid. Otherwise the learner sees a neutral explanation that the mixed-number extension was skipped because the required subtraction steps were not all demonstrated.
+
+The learner-facing route does not write formal evidence, assessment records, inference, mastery, next action, learner state, registry data or Supabase records. Legacy v1 storage is not read, migrated, reset or overwritten.
+
+### Browser and regression verification
+
+The browser suite verifies:
+- exactly one visible input per learner action;
+- the learner performs F1, F2, F3 and conditional F4 actions sequentially;
+- prior responses are displayed as learner-entered history;
+- no future action fields are exposed;
+- F4 appears after valid F3 and is skipped after an invalid F3 prerequisite;
+- stopping retains only already submitted responses;
+- local storage uses the v2 namespace/schema;
+- no Supabase RPC/formal learner-state writes occur;
+- unlinked learner handling remains intact.
+
+Full Regression #3521 / run `43136054099`: **GREEN** on exact commit `79963a203b9cb13994db54b5364bc80ed1506455`. Browser regression and clean-working-tree verification succeeded.
+
+Run URL: https://github.com/huisartslasten/PAB/actions/runs/43136054099
+
+### Current boundary and next step
+
+The v2 session engine and learner-facing staged interface are integrated and regression-verified, but this is not yet a learner-tested or scientifically validated diagnostic. Do not infer Zyon's actual skill status from synthetic browser fixtures.
+
+Next:
+1. Verify the exact branch head and Full Regression after this handoff update.
+2. Review the final UI and task wording against Zyon's current workbook/classroom material before live use. Do not add extra probes unless the material demonstrates they are needed.
+3. Run a controlled first session in PacoGO TEST, not LIVE. Confirm the learner sees one action at a time and can enter each step himself. Avoid resetting any prior v1 data.
+4. After the controlled TEST session, inspect the v2 raw response sequence and classifications for mathematical correctness before drawing any learning conclusions.
+5. Only then design the interpretation/next-practice layer; it must not convert a formative diagnostic into formal mastery without a separate validated contract.
+
+### Branch and verification state
+
+- Working branch: `refactor/professional-v1`.
+- Latest implementation commit verified before this handoff update: `79963a203b9cb13994db54b5364bc80ed1506455`.
+- Latest verified Full Regression: #3521 / run `43136054099`, **GREEN** on that exact commit.
+- This handoff update is itself a repository change and requires Full Regression on its exact resulting commit before the handoff is considered verified.

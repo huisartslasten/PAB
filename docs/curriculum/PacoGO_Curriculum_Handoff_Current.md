@@ -6064,44 +6064,47 @@ The test expectation was updated to the approved inline-denominator presentation
 
 ---
 
-## Current handoff update — 2026-11-12 (Adaptive Instruction and SLO fraction scope research)
+## Current handoff update — 2026-11-12 (Adaptive Instruction architecture; existing SLO curriculum retained)
 
 **Branch:** `refactor/professional-v1`. LIVE `main` untouched.
 
 ### Completed in this phase
 
 1. Added `docs/curriculum/PacoGO_Adaptive_Instruction_Layer_Architecture_Specification_v0.1.md` (commit `9928ae8c4ef7ee9baea5e8a939253de8e3663e4f`). It defines the separation between curriculum objective, sourced instructional method profile, episode-specific instruction configuration and reusable Learning Interface.
-2. Added `docs/curriculum/PacoGO_Instructional_Method_Profile_Selection_Contract_v0.1.md` (commit `597688f744f1383162e5fe93c86ee353d1872474`). It defines profile/provenance fields, deterministic selection outcomes, conflict handling, fraction topic scope and selector test requirements.
-3. Added `docs/curriculum/PacoGO_SLO_Fraction_Scope_and_Curriculum_Boundary_Review_v0.1.md` (commit `e2ff9c865ad5eb9e19c61a75d82f01dec3586883`). It distinguishes the 2025 SLO kerndoel 10B from the 2017 interim-goal elaboration toward 1S and older TULE kerndoel 26. It identifies candidate strands without creating registry entries.
+2. Added `docs/curriculum/PacoGO_Instructional_Method_Profile_Selection_Contract_v0.1.md` (commit `597688f744f1383162e5fe93c86ee353d1872474`). It defines profile/provenance fields, deterministic selection outcomes and conflict handling. This is an instructional-method contract; it does not define or replace SLO curriculum goals.
+3. The separately created `PacoGO_SLO_Fraction_Scope_and_Curriculum_Boundary_Review_v0.1.md` was removed in commit `4a2a08d457a61c675587944ddf56a357b2226c9f`. It was redundant and must not be treated as a PacoGO curriculum source.
 
-### SLO findings and curriculum boundary
+### Existing SLO curriculum remains authoritative
 
-- Current SLO kerndoel 10B describes reasoning/calculating with fractions as number, ratio and division, including unit/proper/mixed/improper fractions, links to decimals/ratios/percentages, ordering/simplification/comparison and contextual calculation supported by models or number relations.
-- The SLO 2017 interim-goal publication is a non-mandatory example elaboration toward 1S. Its end-of-primary 1S concretisation includes addition/subtraction of unlike fractions, extracting wholes and simplifying, including the standard procedure of making denominators alike, with explanation of the approach. Its appendix also addresses written fraction operations and simplifying/complicating/mixed-number representation.
-- Older TULE kerndoel 26 for groups 7–8 includes addition/subtraction of simple like- and unlike-denominator fractions in meaningful contexts.
-- These sources support a broader fraction curriculum than FR2. They do not authorise expanding FR2, which remains the candidate skill `Breukequivalentie herkennen en gebruiken`.
-- Current F1–F4 remains a short formative sample, not a complete assessment of end-group-8 or 1S. It does not cover the full fraction domain, contexts, reasoning, fraction/decimal/ratio links, comparison/ordering, multiplication/division or transfer.
-- Candidate strands are research outputs only; no skill/development/claim/task/evidence mapping has been approved or added.
+The existing source documents were inspected and remain the basis. Do not recreate or reinterpret their content:
 
-### Immediate product direction
+- `PacoGO_Curriculum_Rekenen_SLO_10-18_Mapping.md` is the existing candidate mapping of SLO kerndoelen 10–18 to the PacoGO skill architecture. It maps KD10B (breuken) to **FR1–FR2 plus relations with A/B**. It explicitly says SLO goals do not automatically become skills and that the 32 existing candidate content skills remain the top-level architecture for now.
+- `PacoGO_Curriculum_B10_Complete_Model.md` integrates the existing B1–B9 work into the complete curriculum model. B10 is an integration layer, not a new curriculum research exercise.
+- `PacoGO_Curriculum_Registry_v0.6.json` is the executable candidate registry. FR2 is specifically `Breukequivalentie herkennen en gebruiken`, with its existing developments, claims, evidence targets and task models. Do not expand FR2 to cover all fraction operations.
+- `PacoGO_Curriculum_MachineReadable_v0.1.json` is the earlier machine-readable reference model; do not mistake it for the complete current registry.
+- `PacoGO_Fraction_Learning_Interface_Design_v0.1.md` defines the reusable Fraction interface and its FR2 task coverage.
+- `PacoGO_Zyon_Fraction_Diagnostic_Design_v0.1.md`, `PacoGO_Zyon_Fraction_Diagnostic_Task_Set_v0.1.md` and the assessment contract define the separate formative diagnostic. F1–F4 are not new FR2 registry tasks and do not create formal evidence or mastery.
 
-Do not hold all useful practice hostage to a complete curriculum rebuild. After the parent reviews the staged diagnostic in PacoGO TEST and inspects the raw F1–F4 responses, PacoGO may offer a clearly labelled provisional, non-formal practice episode for the immediate need. It must not claim grade-8 mastery or formal curriculum coverage. Learner performs each mathematical step; hints may explain but not fill answers. Practice remains separate from formal evidence, inference, mastery, next-action and learner-state writes. School-method alignment remains conditional on sourced confirmation.
+The SLO mapping is a **candidate mapping** and the registry's skill models are **candidate constructs**, not empirically validated constructs. Preserve those epistemic labels. The current short F1–F4 diagnostic is not a complete assessment of all fraction goals or end-group-8 / 1S attainment.
+
+### Immediate learner and implementation boundary
+
+The immediate objective remains to let Zyon begin targeted fraction practice promptly, using the already documented SLO curriculum, existing FR2 boundaries, the formative diagnostic and the supplied school-work examples. Do not invent a new fraction skill sequence from the diagnostic or from general SLO knowledge. Do not claim that FR2 alone represents the complete fraction domain.
+
+The next work is an **inventory of existing SLO skills and their implementation status**, as already specified in this handoff: identify which existing mapped skills are complete, partial or not yet implemented; which existing Learning Interfaces and tasks support them; and what remains before learners can use them. This is an inventory, not curriculum redesign. Prioritise Zyon's current learning needs only within the existing curriculum and approved contracts.
+
+Adaptive instruction remains a cross-interface architecture requirement. It may adapt explanations and representations to a sourced school method while preserving existing curriculum objectives and evidence boundaries. It does not authorise changing the SLO mapping, skills, developments, claims, evidence targets or mastery criteria.
 
 ### Verification
 
 - Full Regression #3531 / run `43145347192`: GREEN on exact commit `9928ae8c4ef7ee9baea5e8a939253de8e3663e4f`.
 - Full Regression #3532 / run `43145663498`: GREEN on exact commit `597688f744f1383162e5fe93c86ee353d1872474`.
-- SLO review commit `e2ff9c865ad5eb9e19c61a75d82f01dec3586883` has been created after #3532; it is not yet verified by Full Regression.
-- Current branch HEAD before this handoff update: `e2ff9c865ad5eb9e19c61a75d82f01dec3586883`.
-- No code/runtime change, registry change, C1–C9 change, formal evidence change, learner-state change or Supabase change was made.
+- Full Regression #3533 / run `43145958687`: GREEN on exact commit `e2ff9c865ad5eb9e19c61a75d82f01dec3586883`; this run tested the then-current tree including the now-deleted SLO review document.
+- Full Regression #3535 / run `43146457949`: GREEN on exact deletion commit `4a2a08d457a61c675587944ddf56a357b2226c9f`.
+- No curriculum registry, skill, development, claim, evidence target, mastery criterion, learner state, runtime or Supabase contract was changed in this phase.
 
-### Open decisions / next concrete step
+### Next concrete step
 
-1. Review the diagnostic flow visually in PacoGO TEST before learner use; no real Zyon session has yet been observed.
-2. Confirm current school procedure and scope topic-by-topic; board photographs show demonstrated procedures but do not establish exclusivity or full coverage.
-3. Continue the SLO goal-to-candidate-strand matrix and reconcile it with the current registry and C1–C9 contracts before formal curriculum additions.
-4. Decide the first bounded provisional practice episode based on actual diagnostic responses and the current school unit.
-5. Resolve profile authority/override decisions before implementing the method-profile validator/selector.
-6. Run Full Regression on the exact SLO-review commit and this handoff-update commit; do not report either as green until completed.
+Complete the read-only inventory against the existing SLO mapping, B10 model, current registry and existing skill/task/interface implementation. Report exact existing coverage and gaps before selecting the next bounded implementation task. Do not create replacement SLO goals or a new curriculum mapping.
 
-**Latest verified Full Regression:** #3532 / run `43145663498`, GREEN on `597688f744f1383162e5fe93c86ee353d1872474`. **Current documentation HEAD is newer and unverified.**
+**Latest verified Full Regression:** #3535 / run `43146457949`, GREEN on exact commit `4a2a08d457a61c675587944ddf56a357b2226c9f`. Any subsequent handoff change requires its own Full Regression.

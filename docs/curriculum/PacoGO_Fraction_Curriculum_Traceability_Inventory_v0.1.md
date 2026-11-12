@@ -361,3 +361,13 @@ The existing three-item recognition practice remains unchanged. After completing
 
 Full Regression #3550 was RED on intermediate feature commit `4908257e7e428e1cea47a0167b0fa44ac3e3b1f3` because the numeric parser pattern was over-escaped. The parser defect was corrected in `216e5b4c08b0e20c9ff59271d0a773d8d567982c`. This documentation commit is the next Full Regression target; its actual outcome must be read from the run for the exact resulting commit. Do not mark the feature green before that verification.
 
+
+
+
+### Regression closure — 2026-11-12
+
+- Full Regression #3550 was RED because the new raw-numerator parser's digit pattern was over-escaped; implementation fixed in `216e5b4c08b0e20c9ff59271d0a773d8d567982c`.
+- Full Regression #3551 and #3552 were RED because the browser test asserted that construction-practice storage existed without first executing the construction-practice flow.
+- The browser test now runs the complete construction episode, including incorrect response/retry, correct responses, progression, completion and learner-local raw-response storage.
+- Full Regression #3553 / run `43219737675`: **GREEN** on exact commit `aa2e79a53aab4f624bf13732b445d0a8b681f9db`, all 20 workflow steps passed.
+- The current documentation closure is a follow-up project change and must be verified by Full Regression on its exact resulting commit.

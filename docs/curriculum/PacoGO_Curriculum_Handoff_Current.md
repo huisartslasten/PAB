@@ -6337,3 +6337,16 @@ The existing three-item recognition practice remains unchanged. After completing
 Review the learner-facing presentation in PacoGO TEST before using it with Zyon. Then continue the fraction route with the next source-supported practice capability. Before adding common-denominator operations or mixed-number teaching, resolve the appropriate SLO/FR1 curriculum scope and the instructional-method provenance/unknown-method boundary. Do not expand FR2 to absorb those operations, infer Zyon's school method from his answers, or implement the unapproved Adaptive Instruction Layer proposal as if it were approved.
 
 The complete executable fraction learning route remains open.
+
+
+
+### Regression closure — 2026-11-12
+
+- Full Regression #3550 / run `43219389375`: RED on feature commit `4908257e7e428e1cea47a0167b0fa44ac3e3b1f3`. Root cause: the raw-numerator parser used an over-escaped digit pattern, so numeric strings were classified as invalid. Fixed in `216e5b4c08b0e20c9ff59271d0a773d8d567982c`; the test expectation was preserved.
+- Full Regression #3551 / run `43219469622`: RED on parser-fix commit `216e5b4c08b0e20c9ff59271d0a773d8d567982c`. Root cause: the browser test expected the new construction-practice storage key before it had actually launched and completed that episode.
+- Full Regression #3552 / run `43219620208`: RED on documentation commit `1a476ba08f9269b75e7714d2e0bf67a877751930` for the same browser-test coverage gap.
+- The browser test was corrected to execute the entire learner flow before inspecting local storage. No assertion was removed or weakened.
+- Full Regression #3553 / run `43219737675`: **GREEN** on exact commit `aa2e79a53aab4f624bf13732b445d0a8b681f9db`. All 20 workflow steps passed, including curriculum engine regression, architecture checks, Node/Vitest tests, browser regression and clean-working-tree verification.
+- Browser proof #684 / run `43219737492` was also triggered on the same exact commit; its outcome should be read from the workflow record if needed.
+
+The handoff and fraction inventory updates are included in this verified code/test tree. The follow-up documentation commit that records this closure must itself pass Full Regression before this phase is closed.

@@ -109,6 +109,8 @@ The learner pages do not all consume the same registry version:
 
 This is an observed version split, not an authorization to mass-update pages or reinterpret stored learner data. Any version consolidation requires its own compatibility and data review.
 
+The B1–B5 learner routes that call the learner-curriculum service still execute the skill-centric browser vertical-slice / `curriculum-registry.js` / `prototype.js` cycle. The current B1–B5 persistence path stores the existing scalar skill-level evidence/state/decision shape. It does **not** mean the active learner pages consume the separate C6/C7 modules or the C8/C9 adapters as an integrated six-part branch-specific learner decision runtime. The earlier read-only implementation audit found those C6–C9 modules/adapters are not consumed by the active browser route. Do not conflate a persisted learner cycle with completion of the canonical C1–C9 runtime chain.
+
 ## 6. Fraction-specific findings for the next learning work
 
 ### 6.1 Existing curriculum boundary

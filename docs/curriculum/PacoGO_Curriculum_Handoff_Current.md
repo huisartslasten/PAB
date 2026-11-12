@@ -5976,3 +5976,46 @@ Next:
 - Latest implementation commit verified before this handoff update: `79963a203b9cb13994db54b5364bc80ed1506455`.
 - Latest verified Full Regression: #3521 / run `43136054099`, **GREEN** on that exact commit.
 - This handoff update is itself a repository change and requires Full Regression on its exact resulting commit before the handoff is considered verified.
+
+---
+
+## Current handoff update — 2026-11-12 (F1 sequential classification refinement and contract status)
+
+**Branch:** `refactor/professional-v1`. LIVE `main` untouched.
+
+### Additional evaluator refinement
+
+A final review of the sequential F1 actions identified an important distinction: when a learner gives an incorrect multiplier but independently supplies the mathematically correct numerator for the fixed target denominator, the numerator itself is valid. If the numerator instead follows the learner's incorrect multiplier, it is `dependent_consistent`; if neither relation is supported, it remains `ambiguous`.
+
+The v2 session evaluator now distinguishes these cases. Unit tests cover:
+- incorrect multiplier + correct target numerator → `invalid_relation`, then `valid`;
+- incorrect multiplier + numerator following that multiplier → `invalid_relation`, then `dependent_consistent`;
+- incorrect multiplier + numerator following neither relation → `invalid_relation`, then `ambiguous`.
+
+Full Regression #3524 / run `43136408114`: **GREEN** on exact implementation commit `6b8a4cd259b11a9c0bbadaa033cb125193d37fc1`.
+
+### Documentation alignment
+
+The task-set specification and assessment contract were updated to stop describing runtime implementation as still unauthorised/pending. Their current status is now: formative v2 implementation baseline exists; controlled learner use and empirical validation remain pending. No formal curriculum, FR2, C1–C9, evidence, mastery, learner-state or Supabase contracts were changed.
+
+### Current verified implementation state
+
+- Staged v2 session engine and learner UI are integrated.
+- Browser regression confirms one visible learner action at a time, ordered learner-entered history, F4 positive/negative gate, stop behavior, v2-only local storage, and no formal learner-state writes.
+- F1 sequential evaluation distinguishes independently correct numerator work from dependent work after an incorrect multiplier.
+- Legacy v1 session code/data remain untouched.
+- No live deployment or PacoGO TEST learner session has been performed by this work.
+
+### Next concrete step
+
+1. Run Full Regression on the exact latest documentation commit and verify clean working tree.
+2. Review the implemented Dutch prompts and the current school workbook/classroom scope. Do not expand the probe set without source evidence.
+3. Have the parent run the staged flow in PacoGO TEST, not LIVE. Confirm the learner can complete each step independently and that no later fields/answers are shown.
+4. Inspect the resulting v2 raw responses and classifications before drawing any conclusions or designing targeted practice. The diagnostic remains formative and is not empirically validated.
+
+### Branch and verification state
+
+- Working branch: `refactor/professional-v1`.
+- Latest implementation commit with Full Regression verified: `6b8a4cd259b11a9c0bbadaa033cb125193d37fc1`.
+- Latest verified Full Regression: #3524 / run `43136408114`, **GREEN** on that exact implementation commit.
+- Latest task-set, assessment-contract and handoff documentation changes are pending their own Full Regression on the final documentation commit.

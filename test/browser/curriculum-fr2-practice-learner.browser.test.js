@@ -139,14 +139,38 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await page.getByRole("button", { name: "Controleren" }).last().click();
   await page.getByRole("button", { name: "Bekijk uitkomst" }).click();
   await expect(page.locator("#additionExpression")).toHaveText("Jouw uitkomst: 7/12");
+  await page.getByRole("button", { name: "Oefen gemengd getal 15/10" }).click();
+  await expect(page.locator("#resultFormCard")).toBeVisible();
+  await expect(page.locator("#resultFormExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "15/10 = ? ?/?");
+  await expect(page.locator("#resultFormExpression input")).toHaveCount(3);
+  await page.getByRole("textbox", { name: "Heel getal" }).fill("1");
+  await page.getByRole("textbox", { name: "Teller van het breukdeel" }).fill("4");
+  await page.getByRole("textbox", { name: "Noemer van het breukdeel" }).fill("10");
+  await page.getByRole("button", { name: "Controleren" }).last().click();
+  await expect(page.locator("#resultFormFeedback")).toContainText("Controleer het hele getal");
+  await page.getByRole("textbox", { name: "Teller van het breukdeel" }).fill("5");
+  await page.getByRole("button", { name: "Controleren" }).last().click();
+  await expect(page.locator("#resultFormFeedback")).toContainText("Kies nu zelf voor vereenvoudigen");
+  await page.getByRole("button", { name: "Vereenvoudigen" }).click();
+  await expect(page.locator("#resultFormExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "1 5/10 = 1 ?/?");
+  await expect(page.locator("#resultFormExpression input")).toHaveCount(2);
+  await page.getByRole("textbox", { name: "Vereenvoudigde teller" }).fill("2");
+  await page.getByRole("textbox", { name: "Vereenvoudigde noemer" }).fill("4");
+  await page.getByRole("button", { name: "Controleren" }).last().click();
+  await expect(page.locator("#resultFormFeedback")).toContainText("nog niet volledig vereenvoudigd");
+  await page.getByRole("textbox", { name: "Vereenvoudigde teller" }).fill("1");
+  await page.getByRole("textbox", { name: "Vereenvoudigde noemer" }).fill("2");
+  await page.getByRole("button", { name: "Controleren" }).last().click();
+  await expect(page.locator("#resultFormExpression")).toHaveText("1 5/10 = 1 1/2");
+  await expect(page.locator("#resultFormFeedback")).toContainText("eerst het gemengde getal gemaakt");
 
   const state = await page.evaluate(() => ({
     calls: window.__pacoPracticeTest.calls,
-    local: Object.entries(localStorage).filter(([key]) => key.startsWith("pacogo:fraction-practice:") || key.startsWith("pacogo:fraction-construction-practice:") || key.startsWith("pacogo:fraction-addition-practice:"))
+    local: Object.entries(localStorage).filter(([key]) => key.startsWith("pacogo:fraction-practice:") || key.startsWith("pacogo:fraction-construction-practice:") || key.startsWith("pacogo:fraction-addition-practice:") || key.startsWith("pacogo:fraction-result-form-practice:"))
   }));
   expect(state.calls.filter(call => call[0] === "rpc")).toEqual([]);
   expect(state.calls).toEqual([["select", "learner_profiles"]]);
-  expect(state.local).toHaveLength(3);
+  expect(state.local).toHaveLength(4);
   expect(state.local[0][0]).toContain(learnerKey);
   expect(state.local[0][1]).not.toContain("explanation");
   expect(state.local.find(([key]) => key.startsWith("pacogo:fraction-practice:"))[1]).not.toContain("response");
@@ -163,5 +187,12 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   expect(additionState[1]).toContain('"rawValue":"8"');
   expect(additionState[1]).toContain('"rawValue":"7"');
   expect(additionState[1]).not.toContain(learnerKey);
+  const resultFormState = state.local.find(([key]) => key.startsWith("pacogo:fraction-result-form-practice:"));
+  expect(resultFormState[0]).toContain(learnerKey);
+  expect(resultFormState[1]).toContain('"rawValues":["1","4","10"]');
+  expect(resultFormState[1]).toContain('"rawValues":["1","5","10"]');
+  expect(resultFormState[1]).toContain('"rawValues":["2","4"]');
+  expect(resultFormState[1]).toContain('"rawValues":["1","2"]');
+  expect(resultFormState[1]).not.toContain(learnerKey);
   expect(pageErrors).toEqual([]);
 });

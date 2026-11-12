@@ -437,3 +437,12 @@ The F2 practice input now appears inside the equation through the new reusable a
 Regression history: #3560 RED due to a stale old-location browser assertion; #3561 RED due to a stale focus reference in an invalid-response path; both were corrected without weakening coverage. Full Regression #3562 / run 43226779723: **GREEN** on exact commit `774bfeae618c301cd33c2d83c4b24d4ed3a57b82`; all 20 steps passed, including browser regression and clean working tree. This documentation closure requires its own exact-commit Full Regression.
 
 Next: build the optional learner-controlled mixed-number and simplification result stages; then reuse the inline equation input for F3 subtraction practice. No formal curriculum, diagnostic, mastery or Supabase changes.
+
+
+## 19. Update 2026-11-12 — learner-entered mixed-number and simplification practice
+
+An optional non-formal result-form practice episode is now added after the existing F2 addition practice, using the user-provided example 15/10. Stage 1 presents `15/10 = ? ?/?` with three learner-entered inline fields for whole number, numerator and denominator. After validation, the learner explicitly chooses **Vereenvoudigen**. Stage 2 presents `1 5/10 = 1 ?/?` with two learner-entered inline fields. PacoGO validates equivalence and requires lowest terms; it does not prefill or calculate the learner's values.
+
+The activity has its own learner-keyed versioned local-only store, preserving raw inputs and classifications, including incorrect attempts. Unit and browser coverage test invalid decomposition, retry, non-simplest equivalent fraction, successful 1/2, learner isolation and no formal evidence writes. This is a non-formal practice example, not a new formal skill/task/evidence mapping. It does not change the diagnostic F1–F4 task set, the F2 1/3 + 1/4 practice task, C1–C9, mastery, next-action, learner-state or Supabase contracts.
+
+Next: exact-commit Full Regression; then build the separate F3 subtraction practice using the shared inline equation entry.

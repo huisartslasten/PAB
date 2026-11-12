@@ -6476,3 +6476,16 @@ The F2 arithmetic practice has been refactored so its active numeric response is
 ### Next concrete step
 
 Implement the optional learner-controlled mixed-number conversion and simplification stages on the non-formal arithmetic practice result flow. Use a proper/improper fraction-capable equation renderer and preserve raw whole-number/numerator/denominator entries. Only after that shared result flow is verified, reuse the same inline equation input for the separate F3 subtraction practice (1/2 − 2/5). Do not modify the diagnostic F1–F4 contract or FR1/FR2 formal curriculum mappings.
+
+
+### Implementation update — learner-entered mixed-number and simplification practice
+
+Added a separate optional, non-formal practice episode using the user-provided example 15/10. It is offered after the existing F2 addition practice; it does not alter the F2 task (1/3 + 1/4), the diagnostic task set, FR1/FR2 curriculum scope or any formal evidence contract.
+
+Stage 1 shows the inline equation `15/10 = ? ?/?`; the learner enters whole number, numerator and denominator. PacoGO validates the learner's decomposition and does not prefill the fields. Only after a valid response does the learner choose **Vereenvoudigen**.
+
+Stage 2 shows `1 5/10 = 1 ?/?`; the learner enters a numerator and denominator. PacoGO validates equivalence and requires the entered fraction to be in lowest terms. It does not calculate or fill the answer. Raw values and classifications for valid and invalid attempts are stored in a separate learner-keyed, versioned local-only store. No formal evidence, mastery, next action, learner state or Supabase writes are made.
+
+The shared inline renderer is reused with multiple input slots. Unit and browser regression cover incorrect decomposition, retry, a mathematically equivalent but unsimplified answer (2/4), successful 1/2 entry, learner isolation and the local-only boundary. This example is a non-formal practice activity based on the user's requested example, not a new formal curriculum task or empirical validation.
+
+Next: verify this implementation through Full Regression on its exact commit. After green, proceed to the separate F3 subtraction practice (1/2 − 2/5) using the same inline entry capability.

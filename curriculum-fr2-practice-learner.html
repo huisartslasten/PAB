@@ -39,7 +39,7 @@
     #comparison{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;margin:16px 0;padding:16px;background:#f5f9fd;border-radius:14px}
     .comparison-item{display:grid;justify-items:center;gap:8px;min-width:130px}
     .comparison-item span:last-child{font-weight:800}
-    #exerciseCard[hidden],#learnerSetup[hidden],#resultCard[hidden]{display:none}
+    #exerciseCard[hidden],#learnerSetup[hidden],#resultCard[hidden],#resultFormCard[hidden]{display:none}
     @media(max-width:600px){body{padding:14px}.card{padding:18px}h1{font-size:25px}}
   </style>
 </head>
@@ -103,6 +103,17 @@
     <div id="additionNext"></div>
     <p class="muted">Dit is een niet-formele oefening op basis van de bestaande F2-stappenbeschrijving. Antwoorden worden alleen lokaal bewaard; er wordt geen toets-, bewijs- of masteryresultaat gemaakt.</p>
   </section>
+  <section class="card" id="resultFormCard" hidden>
+    <div class="muted" id="resultFormLearnerLabel">PacoGO • Breuken oefenen</div>
+    <h1>Van 15/10 naar een gemengd getal</h1>
+    <p class="muted" id="resultFormPrompt"></p>
+    <div class="construction-equation" id="resultFormExpression"></div>
+    <div id="resultFormInput"></div>
+    <p id="resultFormFeedback" role="status" aria-live="polite">Vul de ontbrekende getallen zelf in.</p>
+    <p id="resultFormProgress"></p>
+    <div id="resultFormNext"></div>
+    <p class="muted">Dit is extra, niet-formele oefening met het voorbeeld 15/10. Je antwoorden worden alleen op dit apparaat bewaard. Ze tellen niet mee voor een toets, formele beoordeling of mastery-beslissing.</p>
+  </section>
 </main>
 <script type="module">
   import { createPacoGOApp } from "./src/app/bootstrap.js";
@@ -113,6 +124,7 @@
   import { createFractionNumeratorInput, createFractionIntegerInput } from "./pacogo-engine/fraction-numerator-input.js";
   import { renderFractionPracticeExpression } from "./pacogo-engine/fraction-practice-equation.js";
   import { createFractionAdditionPracticeSession } from "./pacogo-engine/fraction-addition-practice-session.js";
+  import { createFractionResultFormPracticeSession } from "./pacogo-engine/fraction-result-form-practice-session.js";
   import { FRACTION_CONSTRUCTION_PRACTICE_TASKS, createFractionConstructionPracticeSession } from "./pacogo-engine/fraction-construction-practice-session.js";
 
   const app = createPacoGOApp({ supabaseLib: window.supabase, storage: window.localStorage });
@@ -141,6 +153,13 @@
   const additionFeedback = document.querySelector("#additionFeedback");
   const additionProgress = document.querySelector("#additionProgress");
   const additionNext = document.querySelector("#additionNext");
+  const resultFormCard = document.querySelector("#resultFormCard");
+  const resultFormPrompt = document.querySelector("#resultFormPrompt");
+  const resultFormExpression = document.querySelector("#resultFormExpression");
+  const resultFormInputHost = document.querySelector("#resultFormInput");
+  const resultFormFeedback = document.querySelector("#resultFormFeedback");
+  const resultFormProgress = document.querySelector("#resultFormProgress");
+  const resultFormNext = document.querySelector("#resultFormNext");
   let selectedLearner = null;
   let practiceSession = null;
   let currentTask = null;
@@ -150,6 +169,8 @@
   let constructionInputInstance = null;
   let additionSession = null;
   let additionEquationInstance = null;
+  let resultFormSession = null;
+  let resultFormEquationInstance = null;
   const selectedStudent = new URLSearchParams(window.location.search).get("viewStudent") || "";
 
   function setSetupError(error) {
@@ -414,6 +435,10 @@
       additionSession.reset();
       renderAdditionStep();
     });
+    const resultForm = document.createElement("button");
+    resultForm.type = "button";
+    resultForm.textContent = "Oefen gemengd getal 15/10";
+    resultForm.addEventListener("click", startResultFormPractice);
     const back = document.createElement("button");
     back.type = "button";
     back.textContent = "Terug naar breuken oefenen";
@@ -421,7 +446,95 @@
       additionCard.hidden = true;
       constructionCard.hidden = false;
     });
-    additionNext.append(restart, back);
+    additionNext.append(restart, resultForm, back);
+  }
+
+  function updateResultFormProgress() {
+    const progress = resultFormSession.getProgress();
+    resultFormProgress.textContent = "Stap " + Math.min(progress.completedStageCount + 1, progress.totalStageCount) +
+      " van " + progress.totalStageCount + " • " + progress.completedStageCount + " afgerond";
+  }
+
+  function showResultFormCompleted() {
+    const completion = resultFormSession.getCompletion();
+    resultFormPrompt.textContent = "Je hebt beide stappen zelf ingevuld.";
+    resultFormExpression.textContent = completion.mixedNumber.whole + " " +
+      completion.mixedNumber.numerator + "/" + completion.mixedNumber.denominator + " = " +
+      completion.mixedNumber.whole + " " + completion.simplifiedFraction.numerator + "/" +
+      completion.simplifiedFraction.denominator;
+    resultFormInputHost.replaceChildren();
+    resultFormFeedback.textContent = "Goed. Je hebt eerst het gemengde getal gemaakt en daarna zelf vereenvoudigd.";
+    updateResultFormProgress();
+    resultFormNext.replaceChildren();
+    const restart = document.createElement("button");
+    restart.type = "button";
+    restart.textContent = "Deze oefening opnieuw doen";
+    restart.addEventListener("click", () => { resultFormSession.reset(); renderResultFormStage(); });
+    const back = document.createElement("button");
+    back.type = "button";
+    back.textContent = "Terug naar optellen";
+    back.addEventListener("click", () => { resultFormCard.hidden = true; additionCard.hidden = false; });
+    resultFormNext.append(restart, back);
+  }
+
+  function handleResultFormAnswer(rawValues) {
+    const result = resultFormSession.recordResponse({ rawValues });
+    updateResultFormProgress();
+    if (result.classification === "valid") {
+      resultFormEquationInstance?.lock();
+      const submit = resultFormInputHost.querySelector("button");
+      if (submit) submit.disabled = true;
+      resultFormNext.replaceChildren();
+      if (result.progress.isComplete) { showResultFormCompleted(); return; }
+      resultFormFeedback.textContent = "Goed. Je hebt 15/10 als 1 5/10 geschreven. Kies nu zelf voor vereenvoudigen.";
+      const next = document.createElement("button");
+      next.type = "button";
+      next.textContent = "Vereenvoudigen";
+      next.addEventListener("click", renderResultFormStage);
+      resultFormNext.append(next);
+      return;
+    }
+    resultFormFeedback.textContent = result.classification === "invalid_input"
+      ? "Vul alle vakjes met niet-negatieve hele getallen in."
+      : result.classification === "not_simplified"
+        ? "Deze breuk betekent misschien evenveel, maar is nog niet volledig vereenvoudigd. Probeer opnieuw."
+        : "Controleer het hele getal, de teller en de noemer. Schrijf eerst 15/10 als een gemengd getal.";
+    resultFormEquationInstance?.focus();
+  }
+
+  function renderResultFormStage() {
+    const current = resultFormSession.getCurrentStage();
+    if (!current) { showResultFormCompleted(); return; }
+    resultFormPrompt.textContent = current.prompt;
+    resultFormFeedback.textContent = "Vul de ontbrekende getallen zelf in.";
+    resultFormNext.replaceChildren();
+    resultFormEquationInstance = renderFractionPracticeExpression({
+      mount: resultFormExpression,
+      expression: current.expression,
+      inputLabels: current.inputLabels,
+      onInteraction: event => {
+        resultFormFeedback.textContent = event.rawValue
+          ? "Je kunt je antwoorden controleren."
+          : "Vul de ontbrekende getallen zelf in.";
+      }
+    });
+    resultFormInputHost.replaceChildren();
+    const submit = document.createElement("button");
+    submit.type = "button";
+    submit.textContent = "Controleren";
+    submit.addEventListener("click", () => handleResultFormAnswer(resultFormEquationInstance.getValues()));
+    resultFormInputHost.append(submit);
+    updateResultFormProgress();
+    resultFormEquationInstance.focus();
+  }
+
+  function startResultFormPractice() {
+    resultFormSession = createFractionResultFormPracticeSession({ learnerKey: selectedLearner.learner_key });
+    additionCard.hidden = true;
+    resultFormCard.hidden = false;
+    document.querySelector("#resultFormLearnerLabel").textContent =
+      "PacoGO • " + selectedLearner.display_name + " • Extra breukenoefening";
+    renderResultFormStage();
   }
 
   function handleAdditionAnswer(rawValue) {
@@ -488,6 +601,7 @@
 
   function startAdditionPractice() {
     additionCard.hidden = false;
+    resultFormCard.hidden = true;
     constructionCard.hidden = true;
     resultCard.hidden = true;
     exerciseCard.hidden = true;
@@ -590,6 +704,7 @@
     practiceSession = createFractionPracticeSession({ learnerKey: learner.learner_key });
     constructionSession = createFractionConstructionPracticeSession({ learnerKey: learner.learner_key });
     additionSession = createFractionAdditionPracticeSession({ learnerKey: learner.learner_key });
+    resultFormSession = createFractionResultFormPracticeSession({ learnerKey: learner.learner_key });
     setup.hidden = true;
     resultCard.hidden = true;
     exerciseCard.hidden = false;

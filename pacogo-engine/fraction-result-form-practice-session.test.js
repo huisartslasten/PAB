@@ -1,0 +1,20 @@
+import assert from "node:assert/strict";
+import {createFractionResultFormPracticeSession} from "./fraction-result-form-practice-session.js";
+function memory(){const m=new Map();return{getItem:k=>m.has(k)?m.get(k):null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k),entries:()=>[...m.entries()]};}
+const storage=memory(),a=createFractionResultFormPracticeSession({learnerKey:"learner-a",storage}),b=createFractionResultFormPracticeSession({learnerKey:"learner-b",storage});
+assert.equal(a.getCurrentStage().expression,"15/10 = ? ?/?");
+assert.equal(a.recordResponse({rawValues:["1","4","10"]}).classification,"incorrect_mixed_number");
+assert.equal(a.recordResponse({rawValues:["1","5","10"]}).classification,"valid");
+assert.equal(a.getCurrentStage().expression,"1 5/10 = 1 ?/?");
+assert.equal(a.recordResponse({rawValues:["2","4"]}).classification,"not_simplified");
+const done=a.recordResponse({rawValues:["1","2"]});
+assert.equal(done.classification,"valid");assert.equal(done.progress.isComplete,true);
+assert.deepEqual(done.completion,{mixedNumber:{whole:1,numerator:5,denominator:10},simplifiedFraction:{numerator:1,denominator:2}});
+assert.equal(a.getCurrentStage(),null);assert.equal(b.getProgress().completedStageCount,0);
+const [key,value]=storage.entries()[0];assert.match(key,/pacogo:fraction-result-form-practice:v1:learner-a/);
+for(const raw of ['"rawValues":["1","4","10"]','"rawValues":["1","5","10"]','"rawValues":["2","4"]','"rawValues":["1","2"]'])assert.ok(value.includes(raw));
+assert.equal(value.includes("learner-a"),false);
+assert.throws(()=>createFractionResultFormPracticeSession({learnerKey:" ",storage}),/learner key/);
+assert.throws(()=>createFractionResultFormPracticeSession({learnerKey:"learner-a"}),/local storage/);
+a.reset();assert.equal(a.getProgress().completedStageCount,0);assert.equal(b.getProgress().completedStageCount,0);
+console.log("PacoGO fraction result-form practice session tests passed.");

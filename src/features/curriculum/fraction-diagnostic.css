@@ -25,3 +25,13 @@
 .fraction-diagnostic-inline-input:focus{outline:3px solid rgba(23,135,242,.25);border-color:var(--paco-blue)}
 .fraction-diagnostic-visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media(max-width:600px){.fraction-diagnostic-inline-input{width:2.1em;min-width:2.1em}.fraction-diagnostic-expression{gap:.22em}}
+
+.fraction-diagnostic-history-title{margin:18px 0 8px;font:800 18px/1.25 "Baloo 2",Nunito,sans-serif;color:var(--paco-text)}
+.fraction-diagnostic-history,.fraction-diagnostic-result-history{display:grid;gap:12px;margin:0;padding:0}
+.fraction-diagnostic-history-group{padding:12px 14px;border:1px solid var(--paco-border,#dbe5ef);border-radius:12px;background:var(--paco-surface,#fff)}
+.fraction-diagnostic-history-group h4,.fraction-diagnostic-history h4{margin:0 0 6px;font-weight:900;color:var(--paco-text)}
+.fraction-diagnostic-history-group ul,.fraction-diagnostic-history-list{display:grid;gap:4px;margin:0;padding-left:20px;color:var(--paco-muted);line-height:1.45}
+.fraction-diagnostic-history-list{padding:12px 14px 12px 34px;border:1px solid var(--paco-border,#dbe5ef);border-radius:12px}
+.fraction-diagnostic-result-history{margin-top:8px}
+.fraction-diagnostic-result-history .fraction-diagnostic-history-group{margin:0}
+.fraction-diagnostic #fraction-diagnostic-answer{max-width:280px;font-size:20px;font-weight:800}

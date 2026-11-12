@@ -6157,3 +6157,48 @@ Do not begin a broad all-domain inventory. Do not expand FR2, invent FR1 identif
 - Previous verified commit: `8d328dcfd2e67a93709696091974c2e84a9a42da`.
 - Full Regression #3539 / run `43215088121`: GREEN on that exact commit.
 - The current fraction-specific inventory + handoff update is a project documentation change and requires Full Regression on its exact resulting commit before closure.
+
+
+---
+
+## Current handoff update — 2026-11-12 (FR1 source recovery from prior curriculum handoffs)
+
+**Branch:** `refactor/professional-v1`; LIVE `main` untouched.
+
+### Prior source artifacts recovered
+
+A Library search and targeted reads recovered the earlier curriculum handoffs:
+- `PacoGO_Curriculum_Overdracht_01-11-2026(1).txt`;
+- `PacoGO_CURRICULUM_OVERDRACHT_01-11-2026-2(1).txt`;
+- `PacoGO_Curriculum_Overdracht_B10(1).txt`;
+- `PacoGO_Curriculum_Overdracht_Skillmodel_v0.1(1).txt`;
+- `PacoGO_Curriculum_Overdracht_Volgende_Chat(1).txt`.
+
+These sources establish FR1 as an existing skill, not a blank concept:
+- FR1 — **Breuken representeren en interpreteren**;
+- core: fractions as meaningful quantities/relationships, including quantity, part–whole, ratio and position; not primarily fraction calculations;
+- FR2 remains the separate skill **Breukequivalentie herkennen en gebruiken**;
+- the fraction skill family was recorded as two skills; no separate FR3 or separate skill for comparing, ordering, positioning, simplification or common denominator.
+
+The prior network/prerequisite matrix records A1 → FR1 (S), A2/A6 → FR1 (O), FR1 → FR2 (E/S), FR1 → VR1 (S), and FR2 → VR1/VR2 (O/S). These remain candidate/supporting relationships, not automatically hard runtime gates.
+
+### Exact FR1 gap after source recovery
+
+The recovered handoffs confirm FR1's skill-level definition, prior status and cross-skill relationships. However, the inspected sources do not supply a source-verifiable formal FR1 development list, FR1 claims, evidence targets, task models or executable task catalogue. A prior summary described a possible development outline, but no matching source artifact was recovered; it is not promoted to a formal FR1 contract. No `FR1.D*`, `FR1.C*`, `FR1.ET*` or `FR1.TM*` IDs were invented.
+
+The fraction-specific inventory was corrected accordingly at `docs/curriculum/PacoGO_Fraction_Curriculum_Traceability_Inventory_v0.1.md`. It now distinguishes the existing FR1 skill definition from the missing formal development/evidence/task contract.
+
+### Next concrete step
+
+Continue the three-level fractions inventory, not a broad all-domain inventory:
+1. Curriculum: complete the source-supported FR1/FR2 structure and A/B relationships; recover the original FR1 Skill Development Pass / Development Evidence File if it exists. If it cannot be found, state the exact missing formal fields and obtain only the smallest necessary owner disposition. Do not recreate FR1 from general didactics.
+2. Technical: map each existing FR1/FR2 curriculum element to actual task definitions, controllers, Fraction interface, learner pages, raw-response handling, task-skill binding, evidence path and tests.
+3. Learner route: trace diagnostic completion → formative interpretation → first suitable practice → explanation/visual support → learner-entered steps → retained responses/progress → next step.
+
+Then consolidate the three levels into one traceable fraction overview and move directly toward executable route C. Keep FR2 narrow; do not add FR3; do not invent FR1 IDs, claims, evidence, tasks or mastery rules. No runtime, registry, C1–C9, Supabase or learner data change is authorized by this source-recovery update.
+
+### Verification before this handoff update
+
+- Previous verified commit: `38b30031e9d81095eeead07366b4281db463f089`.
+- Full Regression #3540 / run `43215478297`: GREEN on that exact commit.
+- This source-recovery inventory + handoff update requires Full Regression on its exact resulting commit.

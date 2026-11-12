@@ -50,22 +50,66 @@ The mapping explicitly treats SLO as a curriculum framework, not a one-to-one sk
 
 The current executable candidate registry v0.6 contains FR2 but no FR1 entry. The absence of an FR1 registry entry must not be “fixed” by expanding FR2.
 
-## 4. Existing FR1 working design — recovered, not yet reconciled into the repository
+## 4. Existing FR1 skill definition and source status
 
-Earlier PacoGO project conversations already established the following FR1 working definition:
+FR1 is an existing skill in the prior curriculum work. It is **not** a blank concept to invent.
 
+### 4.1 Source-supported skill definition
+
+The earlier curriculum handoff records the fraction domain as two skills, marked “voorlopig gevalideerd / domein gesloten”:
 - **FR1 — Breuken representeren en interpreteren.**
-- Core: understand fractions as meaningful quantities and relationships; interpret, represent and connect fraction meanings across representations and situations.
-- Meanings discussed: part–whole, quantity, position on a number line, ratio and division result.
-- Previously discussed development outline: part of a whole → fraction as a quantity → represent through images/partitions/number line/notation → interpret numerator and denominator → connect meanings and representations (e.g. 1/2, “half”, a number-line position, 0.5 and 50%).
-- Previously discussed complexity dimensions: representation variation and distance, abstraction, coordination of numerator/denominator/whole, and distance between given and requested information.
-- Earlier discussions retained FR1 and FR2 and excluded a separate FR3.
+- **FR2 — Breukequivalentie herkennen en gebruiken.**
 
-**Status distinction:** this is recovered prior project design, not a newly invented skill. The exact FR1 source/decision artifact and a complete formal FR1 development/claim/evidence/task contract were not found in the current repository sources inspected for this inventory. Therefore this recovered outline is not silently promoted to a registry entry or implementation-ready contract.
+FR1's core is recorded as interpreting fractions as meaningful quantities/relationships and representing/connecting those meanings. A second prior curriculum summary specifies the meaning as quantity, part–whole, ratio and position, and explicitly says FR1 is not primarily a skill for fraction calculations.
 
-No \`FR1.D*\`, \`FR1.C*\`, \`FR1.ET*\` or \`FR1.TM*\` identifiers are created here. Recover the original source/decision record and preserve its exact identifiers if they exist. If a formal field is genuinely absent, record that exact gap for owner disposition rather than filling it from general didactics.
+The prior Skillmodel handoff calls FR1 a **voorlopige skill**. Another curriculum handoff says FR1 and FR2 were worked out at the skill/domain level. These are curriculum-skill decisions; they do not by themselves prove that a complete FR1 developmental/evidence contract exists.
 
-Earlier conversations discussed relationships including FR1 supporting FR2 and connecting onward to VR1/VR2, and links with A1/A2/A6/B4, A2/A3/A6 for comparison/ordering/positioning, and B1–B4 for operations. These are retained as traceability leads, not converted here into rigid prerequisite edges. The wider curriculum was described as a network, not one universal linear order. The exact source contract for each cross-skill relation must be recovered before runtime uses it.
+### 4.2 Source-supported cross-skill relationships
+
+The prior 32-skill curriculum network and prerequisite matrix record:
+- `A1 → FR1 = S` (strong supporting/prerequisite relationship);
+- `A2/A6 → FR1 = O` (supporting);
+- `FR1 → FR2 = E/S` (essential/strong candidate relationship);
+- `FR1 → VR1 = S`;
+- `FR2 → VR1/VR2 = O/S`.
+
+The same sources state that prerequisites are supporting hypotheses until empirically shown to be necessary. Preserve the source labels, but do not turn them into hard runtime gates. The curriculum is a network; curriculum, instructional, task and empirical developmental order are not automatically identical.
+
+### 4.3 Explicit skill-boundary decisions
+
+The prior skill/domain handoff explicitly says:
+- no separate skill for fraction comparison;
+- no separate skill for fraction ordering;
+- no separate skill for fraction positioning;
+- no separate skill for simplification;
+- no separate skill for common denominator;
+- no broad “fraction operations” skill.
+
+These are handled through FR1/FR2 together with relevant general skills such as A2/A3/A6 and B1–B4, depending on the primary learning objective. Do not create FR3 or split these items into new skills.
+
+### 4.4 What the existing sources do not specify
+
+The source files inspected contain the FR1 skill name, core meaning, status and cross-skill relationships. They do **not** provide a source-verifiable formal FR1 set of:
+- named `FR1.D*` developments;
+- `FR1.C*` developmental claims;
+- `FR1.ET*` evidence targets;
+- `FR1.TM*` task models;
+- FR1-specific task catalogue and executable registry binding.
+
+The phrase “FR1 and FR2 worked out” in a prior handoff is not enough to infer these missing formal fields. The B10 source inspected lists FR1 and the wider skill network, but its detailed development/claim/evidence/task sections do not add a formal FR1 contract. Registry v0.6 likewise has no FR1 entry.
+
+A prior conversation summary described a more detailed possible FR1 development outline, but no matching source artifact was recovered in the existing handoffs searched. Do not promote that summary into formal developments or create IDs from it. Recover the original FR1 Skill Development Pass / Development Evidence File if it exists; otherwise record the exact missing contract fields for owner disposition.
+
+### 4.5 Source provenance
+
+The FR1 facts above are supported by these prior project artifacts:
+- `PacoGO_Curriculum_Overdracht_01-11-2026(1).txt`, §6.C (FR1/FR2 skill definitions, domain status and explicit skill-boundary decisions).
+- `PacoGO_CURRICULUM_OVERDRACHT_01-11-2026-2(1).txt`, §6 (FR1 core) and §§7–8 (network and prerequisite matrix).
+- `PacoGO_Curriculum_Overdracht_Skillmodel_v0.1(1).txt`, §11 (FR1 provisional status; FR2 as framework test; no separate comparison/ordering/positioning or broad operations skill).
+- `PacoGO_Curriculum_Overdracht_Volgende_Chat(1).txt`, §6 (FR1 and FR2 recorded as the completed fraction skill family at the skill level).
+- `PacoGO_Curriculum_Overdracht_B10(1).txt`, §4 (FR1/FR2 included in the 32-skill model).
+
+The current repository SLO mapping and B10 model remain the branch source of truth for technical integration. The older handoffs above recover prior curriculum decisions; they do not authorize a new registry or runtime change by themselves.
 
 ## 5. Existing FR2 curriculum contract
 

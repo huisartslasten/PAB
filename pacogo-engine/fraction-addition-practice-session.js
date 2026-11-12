@@ -106,9 +106,9 @@ function createFractionAdditionPracticeSession({ learnerKey, storage = globalThi
     if (stepId === "addition_result") {
       return Object.freeze({
         taskId: task.id, stepId, stepNumber: 4, totalSteps: 4,
-        prompt: "Tel de twee tellers op die je zelf hebt ingevuld.",
-        inputLabel: "Som van de tellers",
-        expression: leftNumerator + " + " + rightNumerator + " = ?"
+        prompt: "Tel de tellers op. De noemer blijft hetzelfde, want beide breuken zijn nu in twaalfden.",
+        inputLabel: "Teller van de som",
+        expression: leftNumerator + "/" + denominator + " + " + rightNumerator + "/" + denominator + " = ?/" + denominator
       });
     }
     return null;

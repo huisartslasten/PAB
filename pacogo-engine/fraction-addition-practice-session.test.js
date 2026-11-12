@@ -26,7 +26,7 @@ assert.equal(learnerA.getCurrentStep().stepId, "left_equivalent_numerator");
 assert.equal(learnerA.recordResponse({ rawValue: "4" }).classification, "valid");
 assert.equal(learnerA.getCurrentStep().expression, "1/4 = ?/12");
 assert.equal(learnerA.recordResponse({ rawValue: "3" }).classification, "valid");
-assert.equal(learnerA.getCurrentStep().expression, "4 + 3 = ?");
+assert.equal(learnerA.getCurrentStep().expression, "4/12 + 3/12 = ?/12");
 assert.equal(learnerA.recordResponse({ rawValue: "8" }).classification, "arithmetic_error");
 assert.equal(learnerA.getCurrentStep().stepId, "addition_result");
 const done = learnerA.recordResponse({ rawValue: "7" });

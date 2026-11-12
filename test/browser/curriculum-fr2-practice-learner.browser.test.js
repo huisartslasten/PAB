@@ -135,11 +135,13 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await page.getByRole("button", { name: "Controleren" }).last().click();
   await page.getByRole("button", { name: "Volgende stap" }).click();
 
-  await expect(page.locator("#additionExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "4 + 3 = ?");
-  await page.getByRole("textbox", { name: "Som van de tellers" }).fill("8");
+  await expect(page.locator("#additionExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "4/12 + 3/12 = ?/12");
+  await expect(page.locator("#additionExpression .fraction-practice-fraction")).toHaveCount(3);
+  await expect(page.locator("#additionExpression input")).toHaveCount(1);
+  await page.getByRole("textbox", { name: "Teller van de som" }).fill("8");
   await page.getByRole("button", { name: "Controleren" }).last().click();
   await expect(page.locator("#additionFeedback")).toContainText("Controleer de optelling");
-  await page.getByRole("textbox", { name: "Som van de tellers" }).fill("7");
+  await page.getByRole("textbox", { name: "Teller van de som" }).fill("7");
   await page.getByRole("button", { name: "Controleren" }).last().click();
   await page.getByRole("button", { name: "Bekijk uitkomst" }).click();
   await expect(page.locator("#additionExpression")).toHaveText("Jouw uitkomst: 7/12");

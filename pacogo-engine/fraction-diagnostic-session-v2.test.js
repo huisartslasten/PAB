@@ -47,7 +47,7 @@ test("dependent responses are retained without double-counting an earlier invali
 
 test("F4 is administered only after every F3 action is valid", () => {
   const session = createFractionDiagnosticSessionV2({ learnerKey: "zyon", storage: memoryStorage() });
-  [2, 4, 12, 4, 3, 7, 10, 5, 4, 1].forEach(value => answer(session, value));
+  [2, 4, 12, 4, 3, 7, 8, 4, 3, 1].forEach(value => answer(session, value));
   assert.equal(session.getCurrentAction().taskId, "F4");
   assert.equal(session.getCurrentAction().action.actionId, "mixed_numerator");
   [4, 15, 20, 6, 14].forEach(value => answer(session, value));

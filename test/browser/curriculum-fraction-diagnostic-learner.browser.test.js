@@ -64,12 +64,12 @@ test('staged diagnostic asks one learner action at a time and completes F1-F4 wi
 
   await expect(card.locator('input')).toHaveCount(1);
   await expect(card.locator('h2')).toHaveText('Gelijkwaardige breuken');
-  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('noemer 6');
+  await expect(card.locator('.fraction-diagnostic-expression')).toHaveAttribute('data-expression', '2/3  →  noemer 6');
   await answerOne(page, 2, 'Met welke factor');
 
   await expect(card.locator('h2')).toHaveText('Gelijkwaardige breuken');
-  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('2/3');
-  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('6');
+  await expect(card.locator('.fraction-diagnostic-expression')).toHaveAttribute('data-expression', '2/3 = ?/6');
+  await expect(card.locator('.fraction-diagnostic-expression')).toHaveAttribute('data-expression', '2/3 = ?/6');
   await answerOne(page, 4, 'Welke teller');
 
   await expect(card.locator('h2')).toHaveText('Breuken optellen');

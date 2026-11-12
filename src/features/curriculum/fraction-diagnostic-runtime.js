@@ -94,7 +94,7 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
   const historyTitle = documentRef.createElement('h3');
   historyTitle.className = 'fraction-diagnostic-history-title';
   historyTitle.textContent = 'Jouw eerdere antwoorden';
-  const history = documentRef.createElement('ol');
+  const history = documentRef.createElement('div');
   history.className = 'fraction-diagnostic-history';
   const diagnosticNotice = documentRef.createElement('p');
   diagnosticNotice.className = 'fraction-diagnostic-muted';

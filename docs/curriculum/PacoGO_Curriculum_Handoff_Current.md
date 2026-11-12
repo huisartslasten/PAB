@@ -6202,3 +6202,42 @@ Then consolidate the three levels into one traceable fraction overview and move 
 - Previous verified commit: `38b30031e9d81095eeead07366b4281db463f089`.
 - Full Regression #3540 / run `43215478297`: GREEN on that exact commit.
 - This source-recovery inventory + handoff update requires Full Regression on its exact resulting commit.
+
+
+---
+
+## Current handoff update — 2026-11-12 (fraction task, interface and learner-route traceability)
+
+**Branch:** `refactor/professional-v1`; LIVE `main` untouched.
+
+### Read-only implementation trace completed
+
+Inspected the exact current Fraction diagnostic/practice runtime, assessment functions, task set, Fraction Learning Interface contract/renderers, relevant unit/browser tests, route registry and current branch tree.
+
+Key findings added to `docs/curriculum/PacoGO_Fraction_Curriculum_Traceability_Inventory_v0.1.md`:
+
+- The pilot task set defines five candidate FR2 tasks T01–T05, but the current branch tree contains only two FR2 demo HTML pages: T01 and T02. T03 appears in a controller unit-test fixture; T04/T05 remain task-set definitions/audit items without current learner-facing pages or browser tests. Historical readiness-matrix entries listing five separate pages are stale relative to the current branch tree.
+- Pilot task set v0.1 is `candidate` / `design_only`; tasks are test fixtures, not validated curriculum measures.
+- FR2 alignment remains open: T01/T02 explanations do not themselves establish ET3; T03/T05 name ET3 while TM2 requires ET3+ET4; T04 is a countertask but mapped to TM1/ET1 rather than TM5/ET2+ET6; TM4/ET5 functional-use task T06 is absent.
+- The two technical demo pages use registry v0.2 seed, pilot task set v0.1 and synthetic learner context. Their generated quality/relevance/independence/contradiction shortcuts are not approved C3 assessments.
+- The Fraction Learning Interface supports proper fractions, symbolic/area models, multiple-choice selection and optional explanation text. It does not provide staged numeric inputs or mixed/improper fraction rendering. The diagnostic's one-at-a-time numeric field is custom to its runtime, not a reusable Fraction component.
+- The three-item practice page stores only completed IDs, attempt counts and total correct answers. It does not preserve raw selected options or explanations and is not adaptively routed.
+- Diagnostic v2 stores raw numeric answers/classifications/dependencies locally and presents one action at a time, but the completion view only shows a neutral summary/history. It does not interpret results into a next practice task and has no direct practice navigation.
+- The practice page links to the diagnostic, but does not pass the selected learner context; the diagnostic does not link back to practice. The practice page is standalone, while the diagnostic is centrally registered in `src/app/routes.js`.
+- The task-set design says to stop when the learner is struggling substantially in F1/common-denominator actions, but the v2 engine has no defined threshold or early-stop branch; only the F4 gate and manual stop are implemented.
+- F1's fixed v2 classifier is hard-coded for its single item even though a general equivalent-fraction evaluator exists and is unit-tested. Keep this visible before generalizing task variants.
+- Unit tests cover alternate common denominators; the current browser flow demonstrates only 12 and 10. Browser-level alternate-denominator integration is not demonstrated.
+
+### Current learner-flow boundary
+
+The current state is not yet the requested executable learning route C. It consists of a diagnostic route and a separate fixed three-item practice route. There is no result interpretation → targeted teaching → practice → next step chain. The two routes do not preserve learner context across navigation. No runtime changes were made during this inspection.
+
+### Next concrete step
+
+Finish the fractions-only three-level inventory by reconciling each FR1/FR2 curriculum element against its task contract, interface capability, learner route, raw-response storage, assessment boundary and test proof. Then select the smallest safe route-C implementation slice. The first slice must connect a completed formative diagnostic to an appropriate learner-controlled practice episode without creating formal mastery or filling intermediate answers. Do not start that implementation until the existing curriculum scope and route contract are explicit; use a separate narrow authorization if the work exceeds the existing FR2 practice/diagnostic scope.
+
+### Verification before this handoff update
+
+- Previous verified commit: `e43e249c6817ab986b389c6f775fb57367c8f36e`.
+- Full Regression #3541 / run `43215897080`: GREEN on that exact commit; all 20 workflow steps passed, including browser regression and clean-working-tree verification.
+- This inventory/handoff update is documentation-only and requires Full Regression on its exact resulting commit.

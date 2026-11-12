@@ -145,14 +145,21 @@ The registry's FR2 developments, claims, evidence targets, task models and proto
 
 ## 6. Existing FR2 task/evidence implementation findings
 
-Five FR2 browser task pages exist as technical demonstrations. The FR2 task/evidence audit identifies these unresolved alignments:
+The candidate pilot task set contains **five FR2 task definitions (T01–T05)**, but the current branch tree contains only **two dedicated FR2 HTML demo pages**:
+- `curriculum-fr2-fraction-equivalence.html` implements FR2-T01.
+- `curriculum-fr2-fractions.html` implements FR2-T02.
+- FR2-T03 appears in a controller unit-test fixture, not as a current learner-facing HTML route.
+- FR2-T04 and FR2-T05 exist in the candidate task set and alignment documents, but no corresponding current HTML pages or browser tests were found in the branch tree.
 
+The readiness matrix and earlier historical handoffs list five separate FR2 HTML pages. That historical inventory does not match the current branch tree; use the exact current tree above and do not assume T03–T05 pages still exist.
+
+The FR2 task/evidence audit identifies these unresolved alignments:
 - **T01/T02:** mapped to recognition ET1. The explanation field/task wording does not itself establish that ET3 reasoning was elicited or assessed.
 - **T03/T05:** task instances currently identify ET3, while registry TM2 covers ET3 + ET4. The changed-representation contrast required for ET4 is not established merely by rendering different forms.
 - **T04:** currently mapped as TM1/ET1 despite being described as a surface-familiarity countertask. The intended TM5 / ET2 + ET6 opportunity is not implemented by a changed visual surface alone.
-- **ET5 / TM4:** the T01–T05 set does not establish functional use of equivalence for another purpose without an explicit cue.
+- **ET5 / TM4:** no T06 or later functional-use task exists in the current task set; T01–T05 do not establish functional use of equivalence for another purpose without an explicit cue.
 
-The five pages are synthetic technical demonstrations. They are not pilot-ready coded evidence and are not empirical validation. Do not silently change the registry or task mappings to make the pages appear aligned.
+The pilot task set is explicitly `candidate` / `design_only`, and its tasks are test fixtures, not validated curriculum measures. T01/T02 are synthetic technical demonstrations. T03 is a unit-test fixture. T04/T05 remain design/task-set definitions without current learner-facing pages. None is pilot-ready coded evidence or empirical validation. Do not silently change the registry or task mappings to make the pages appear aligned.
 
 ## 7. Existing Learning Interface and learner-facing fraction work
 
@@ -185,6 +192,29 @@ F1–F4 are diagnostic probes, not new FR2 task models or registered skills. Add
 
 Simplification is not part of F1–F4. It remains a separate learner-controlled practice step where the existing curriculum/task scope requires it; PacoGO must not simplify or fill an answer automatically.
 
+### 7.4 Exact current interaction and routing gaps
+
+- The diagnostic result view shows completion/stopped status and the learner's submitted action history only. It does not interpret classifications into an instructional recommendation and has no direct “start practice” route.
+- The practice page links **to** the diagnostic, but the diagnostic does not link back to practice. The practice page is a standalone HTML page and is not registered in the central `src/app/routes.js`; the central route registry registers the diagnostic page only.
+- The practice page's link to the diagnostic does not pass the selected learner context. The diagnostic expects the selected PacoGO roster learner in its view context and resolves that learner through the explicit profile link. The two routes therefore do not yet form one continuous learner flow.
+- Practice stores only completed task IDs, attempt counts and a total correct-answer count. It does not store the selected option, explanation or raw interaction sequence, so it cannot yet support response-level adaptive interpretation.
+- The diagnostic stores raw numeric actions, classifications and dependency action IDs locally. It is not formal evidence.
+- The diagnostic task-set specification says to stop and move to targeted teaching if the learner is struggling substantially in F1 or the common-denominator actions. The v2 engine implements the conditional F4 gate and an explicit manual stop, but no defined early-struggle threshold or automatic early-stop branch. The threshold is not specified; do not invent one.
+- The generic pure `evaluateEquivalentFraction` exists and has unit tests, but the current v2 session's fixed F1 classifier uses hard-coded values for its single `2/3 → ?/6` item rather than calling that evaluator. Keep this limitation visible before generalising F1 to task variants.
+- The pure assessment tests include alternate common denominators (e.g. 24 and 36); the browser flow currently demonstrates 12 for F2 and 10 for F3. Browser-level alternate-denominator integration is not established by that browser test.
+
+### 7.5 Fraction input and representation capability
+
+The reusable Fraction Learning Interface currently supports:
+- a proper-fraction target and answer options;
+- symbolic-fraction or area-model rendering (bar/grid);
+- multiple-choice option selection;
+- an optional free-text explanation field.
+
+Its contract rejects fractions whose numerator exceeds the denominator. It does not currently provide mixed-number/improper-fraction rendering, a number-line mode, or a small numeric answer field for staged arithmetic. The F1–F4 diagnostic builds its own inline numeric input in the diagnostic runtime; that input is not a reusable Fraction interface component. The repository search found a separate clock analog input, but no reusable fraction numeric-step input component.
+
+Consequently, the current Fraction interface is useful for FR2 equivalence but is not yet a complete interface for the full FR1–FR2 fraction meaning/operation space. Mixed-number work in F4 is rendered by the diagnostic's custom expression renderer, not by the reusable Fraction interface.
+
 ## 8. Adaptive instruction and school-method provenance
 
 The Adaptive Instruction Layer architecture specification exists as a design artifact. The Instructional Method Profile Selection Contract remains a proposal, not an approved runtime implementation.
@@ -200,16 +230,34 @@ No method selector or complete adaptive instruction runtime is established by th
 
 ## 9. Runtime, persistence and engine boundary
 
-- FR2 technical demo pages use the earlier registry/pilot-task vertical-slice path and synthetic learner context; they are not the persisted B1–B5 learner-curriculum route.
-- The three-item practice route uses browser-local learner-keyed progress only.
-- Diagnostic v2 uses its separate browser-local formative session store only.
-- The FR2 demos, practice route and diagnostic are not a complete integrated C1–C9 learner decision runtime.
-- The current active learner route does not make the separate C6/C7 modules or C8/C9 adapters a canonical integrated branch-specific runtime.
+- The two current FR2 demo HTML pages load registry `0.2.0-seed` and pilot task set v0.1, and use the synthetic learner key `browser-synthetic-fr2`. They are not connected to the persisted B1–B5 learner-curriculum service.
+- The demo controller emits synthetic shortcuts such as quality/relevance/independence/contradiction fields. The FR2 Task–Evidence specification explicitly says these are not approved C3 evidence assessments and must not be used as empirical evidence.
+- The three-item practice route uses browser-local learner-keyed progress only; it does not preserve raw selected options or explanation text.
+- Diagnostic v2 uses its separate browser-local formative session store only; it preserves raw numeric answers, classifications and dependency references.
+- The diagnostic is centrally registered in `src/app/routes.js`; the three-item practice page is a standalone HTML page outside that route registry.
+- The FR2 demos, practice route and diagnostic are not a complete integrated C1–C9 learner decision runtime. The active learner route does not consume the separate C6/C7 modules or C8/C9 adapters as a canonical branch-specific runtime.
 - No Supabase schema, RPC, RLS or learner-data change is indicated by this inventory.
 
 Keep formal engine stages inactive where the current task/evidence contracts do not support them. Do not bypass the engine or force formal evidence/mastery into the formative practice slice.
 
-## 10. What the complete vertical fraction overview must still consolidate
+
+
+## 10. Three-level fraction traceability matrix
+
+| Curriculum element | Task / technical implementation | Learner-facing route and current gap |
+|---|---|---|
+| FR1 — represent and interpret fractions | Skill-level definition and network links exist in prior curriculum handoffs; no formal FR1.D/C/ET/TM contract or registry entry was found. | No FR1 learner task or route. The Fraction interface exists but is not bound to FR1. |
+| FR2.D1 — recognise equivalence | Registry D1/C1/ET1/TM1. Candidate tasks T01/T02; only T01 and T02 have current HTML demo pages. | Demo only, synthetic learner; separate three-item practice page is not connected to the formal registry and is local-only. |
+| FR2.D2 — explain equivalence | Registry D2/C2; TM2 requires ET3 + ET4. T03/T05 definitions exist, but current task instances name ET3 only; T03 appears in a unit fixture, T05 has no current page. | No complete learner-facing cross-representation/transfer route. |
+| FR2.D2 — counterevidence / surface discrimination | TM5 requires ET2 + ET6. T04 is described as a countertask but is mapped to TM1/ET1. | No current T04 page or browser test; task/evidence contract unresolved. |
+| FR2.D3 — functional use | TM4 requires ET5. No T06 or later task in the current pilot task set. | No functional-use practice route beyond the fixed equivalence recognition items. |
+| Zyon diagnostic F1 | One fixed equivalent-fraction item; formative probe, not a registered task model. | One inline numeric input per action; local-only; no FR1 meaning/number-line diagnosis. |
+| Zyon diagnostic F2/F3 | Unlike-denominator addition/subtraction probes; not FR2 task models. | One learner-entered numeric action at a time; local-only; no instructional recommendation after completion. |
+| Zyon diagnostic F4 | Conditional mixed-number subtraction probe; not a registered FR1/FR2 task model. | Uses a custom expression/input renderer; not the reusable Fraction interface. |
+| Fraction practice 01–03 | Three fixed equivalent-fraction multiple-choice tasks; no raw option/explanation record. | Learner-keyed local progress; no adaptive route, no staged arithmetic inputs, and no direct path from diagnostic result. |
+| Fraction Learning Interface | Proper fractions; symbolic and area-model; option selection; optional explanation text. | Does not yet cover improper/mixed numbers or reusable numeric step entry. |
+
+## 11. What the complete vertical fraction overview must still consolidate
 
 The next consolidation must bring the existing sources together, not create replacements:
 
@@ -223,7 +271,7 @@ The next consolidation must bring the existing sources together, not create repl
 
 Do not continue broad inventory work across A/B/VR/MG/GK/PA/MGK. Their wider architecture remains context only; fractions are the active product.
 
-## 11. Next concrete work toward executable route C
+## 12. Next concrete work toward executable route C
 
 After the source consolidation in §10:
 
@@ -237,7 +285,7 @@ After the source consolidation in §10:
 8. Verify the full learner flow in PacoGO TEST with a real parent session and test learner before use with Zyon. Browser fixtures are not learner validation.
 9. Run Full Regression on the exact implementation commit and update/verify the repository handoff.
 
-## 12. Verification baseline
+## 13. Verification baseline
 
 - Branch: \`refactor/professional-v1\`.
 - Pre-change HEAD: \`8d328dcfd2e67a93709696091974c2e84a9a42da\`.

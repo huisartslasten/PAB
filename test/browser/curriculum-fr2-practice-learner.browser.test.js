@@ -76,6 +76,33 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await page.getByRole("button", { name: "Bekijk resultaat" }).click();
   await expect(page.locator("#resultCard h1")).toHaveText("Oefenronde afgerond");
 
+  await page.getByRole("button", { name: "Zelf een gelijkwaardige breuk maken" }).click();
+  await expect(page.locator("#constructionCard")).toBeVisible();
+  await expect(page.locator("#constructionTarget .pacogo-fraction-representation--area")).toHaveCount(1);
+  await expect(page.locator("#constructionEquation")).toContainText("1/2=?/4");
+  await expect(page.getByRole("textbox", { name: "Vul de teller in" })).toHaveValue("");
+  await expect(page.locator("#constructionPrompt")).toContainText("noemer 4");
+
+  await page.getByRole("textbox", { name: "Vul de teller in" }).fill("1");
+  await page.getByRole("button", { name: "Controleren" }).last().click();
+  await expect(page.locator("#constructionFeedback")).toContainText("Vergelijk de hoeveelheid blauw");
+  await expect(page.locator("#constructionProgress")).toContainText("0 van 3");
+  await page.getByRole("textbox", { name: "Vul de teller in" }).fill("2");
+  await page.getByRole("button", { name: "Controleren" }).last().click();
+  await expect(page.locator("#constructionFeedback")).toContainText("betekent evenveel");
+  await page.getByRole("button", { name: "Volgende oefening" }).click();
+
+  await expect(page.locator("#constructionEquation")).toContainText("1/3=?/6");
+  await page.getByRole("textbox", { name: "Vul de teller in" }).fill("2");
+  await page.getByRole("button", { name: "Controleren" }).last().click();
+  await page.getByRole("button", { name: "Volgende oefening" }).click();
+
+  await expect(page.locator("#constructionEquation")).toContainText("2/3=?/6");
+  await page.getByRole("textbox", { name: "Vul de teller in" }).fill("4");
+  await page.getByRole("button", { name: "Controleren" }).last().click();
+  await page.getByRole("button", { name: "Bekijk afronding" }).click();
+  await expect(page.locator("#constructionFeedback")).toContainText("geen formele beoordeling");
+
   const state = await page.evaluate(() => ({
     calls: window.__pacoPracticeTest.calls,
     local: Object.entries(localStorage).filter(([key]) => key.startsWith("pacogo:fraction-practice:") || key.startsWith("pacogo:fraction-construction-practice:"))

@@ -142,7 +142,9 @@ function classify(taskId, action, session) {
         ? (action.actionId === "first_numerator" ? [1, 2] : [2, 5])
         : (action.actionId === "first_numerator" ? [prior("mixed_numerator"), 3] : [2, 5]);
     const denominator = prior("common_denominator");
-    const prerequisite = taskId === "F4" && action.actionId === "first_numerator" && priorClass("mixed_numerator") !== C.VALID\n      ? priorClass("mixed_numerator")\n      : priorClass("common_denominator");
+    const prerequisite = taskId === "F4" && action.actionId === "first_numerator" && priorClass("mixed_numerator") !== C.VALID
+      ? priorClass("mixed_numerator")
+      : priorClass("common_denominator");
     const result = evaluateConvertedNumerator({
       sourceNumerator: source[0], sourceDenominator: source[1],
       commonDenominator: denominator, submittedNumerator: action.rawValue,

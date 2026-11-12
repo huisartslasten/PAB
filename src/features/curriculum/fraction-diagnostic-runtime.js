@@ -266,7 +266,7 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
       practice.type = 'button';
       practice.id = 'fraction-diagnostic-open-practice';
       practice.className = 'success';
-      practice.textContent = 'Start breuken oefenen';
+      practice.textContent = 'Verder naar gelijkwaardige breuken oefenen';
       practice.addEventListener('click', () => {
         documentRef.defaultView.location.href = buildViewUrl('curriculum-fr2-practice-learner.html', {
           student,

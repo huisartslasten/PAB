@@ -264,4 +264,4 @@ function createFractionDiagnosticSessionV2({ learnerKey, storage = globalThis.lo
   return Object.freeze({ getCurrentAction, getProgress, getSessionSnapshot, submitCurrentAction, stop });
 }
 
-export { createFractionDiagnosticSessionV2, FRACTION_DIAGNOSTIC_TASKS_V2: TASKS };
+export { createFractionDiagnosticSessionV2, TASKS as FRACTION_DIAGNOSTIC_TASKS_V2 };

@@ -2,7 +2,45 @@ import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
 import { getStudentLearningProfile } from '../../core/student-registry.js';
 import { buildViewUrl } from '../../core/view-context.js';
-import { createFractionDiagnosticSession, FRACTION_DIAGNOSTIC_STEPS } from '../../../pacogo-engine/fraction-diagnostic-session.js';
+import { createFractionDiagnosticSessionV2, FRACTION_DIAGNOSTIC_TASKS_V2 } from '../../../pacogo-engine/fraction-diagnostic-session-v2.js';
+
+const TASK_ORDER = Object.freeze(['F1', 'F2', 'F3', 'F4']);
+const ACTION_LABELS = Object.freeze({
+  factor: 'Vermenigvuldigingsfactor',
+  new_numerator: 'Nieuwe teller',
+  common_denominator: 'Gemeenschappelijke noemer',
+  first_numerator: 'Eerste nieuwe teller',
+  second_numerator: 'Tweede nieuwe teller',
+  result_numerator: 'Uitkomst van de tellers',
+  mixed_numerator: 'Teller na omzetten'
+});
+
+function expressionFor(action, taskId, snapshot) {
+  const task = snapshot.tasks[taskId];
+  const value = id => task.actions.find(item => item.actionId === id)?.rawValue;
+  const common = value('common_denominator');
+  const mixed = value('mixed_numerator');
+  const first = value('first_numerator');
+  const second = value('second_numerator');
+  switch (taskId + '.' + action.actionId) {
+    case 'F1.factor': return '2/3  →  noemer 6';
+    case 'F1.new_numerator': return '2/3 = ?/6';
+    case 'F2.common_denominator': return '1/3 + 1/4';
+    case 'F2.first_numerator': return '1/3 = ?/' + common;
+    case 'F2.second_numerator': return '1/4 = ?/' + common;
+    case 'F2.result_numerator': return first + ' + ' + second + ' = ?';
+    case 'F3.common_denominator': return '1/2 − 2/5';
+    case 'F3.first_numerator': return '1/2 = ?/' + common;
+    case 'F3.second_numerator': return '2/5 = ?/' + common;
+    case 'F3.result_numerator': return first + ' − ' + second + ' = ?';
+    case 'F4.mixed_numerator': return '1 1/3 = ?/3';
+    case 'F4.common_denominator': return mixed + '/3 − 2/5';
+    case 'F4.first_numerator': return mixed + '/3 = ?/' + common;
+    case 'F4.second_numerator': return '2/5 = ?/' + common;
+    case 'F4.result_numerator': return first + ' − ' + second + ' = ?';
+    default: return action.expression;
+  }
+}
 
 export function createFractionDiagnosticRuntime({ app, templateMount, context, documentRef = document, navigate } = {}) {
   if (!app || !templateMount || typeof navigate !== 'function') throw new TypeError('Fraction diagnostic runtime requires app, template mount and navigation.');
@@ -11,7 +49,6 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
   const content = documentRef.createElement('div');
   content.className = 'fraction-diagnostic';
   let session = null;
-  let recommendation = null;
   let learner = null;
 
   const setup = documentRef.createElement('section');
@@ -21,7 +58,7 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
   setupTitle.textContent = 'Wie gaat de breukendiagnose maken?';
   const setupCopy = documentRef.createElement('p');
   setupCopy.className = 'fraction-diagnostic-muted';
-  setupCopy.textContent = 'PacoGO onderzoekt de tussenstappen bij breuken. Dit is een formatieve check, geen toets of mastery-beslissing.';
+  setupCopy.textContent = 'PacoGO onderzoekt jouw tussenstappen. Jij voert iedere rekenstap zelf uit. Dit is een formatieve diagnose, geen toets of mastery-beslissing.';
   const setupStatus = documentRef.createElement('p');
   setupStatus.className = 'fraction-diagnostic-status';
   setupStatus.setAttribute('role', 'status');
@@ -37,28 +74,40 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
   diagnostic.hidden = true;
   const learnerLabel = documentRef.createElement('p');
   learnerLabel.className = 'fraction-diagnostic-muted';
-  const stepTitle = documentRef.createElement('h2');
-  const prompt = documentRef.createElement('p');
-  prompt.className = 'fraction-diagnostic-muted';
+  const taskTitle = documentRef.createElement('h2');
+  const actionPrompt = documentRef.createElement('p');
+  actionPrompt.className = 'fraction-diagnostic-muted';
   const progress = documentRef.createElement('p');
   progress.className = 'fraction-diagnostic-progress';
   const expression = documentRef.createElement('div');
   expression.className = 'fraction-diagnostic-expression';
+  expression.setAttribute('aria-label', 'Rekenopgave');
   const form = documentRef.createElement('form');
+  form.id = 'fraction-diagnostic-action-form';
   const fields = documentRef.createElement('div');
   fields.className = 'fraction-diagnostic-fields';
   const submit = documentRef.createElement('button');
   submit.type = 'submit';
   submit.className = 'success';
-  submit.textContent = 'Antwoord vastleggen';
-  form.append(expression, fields, submit);
+  submit.textContent = 'Volgende stap';
+  form.append(fields, submit);
+  const historyTitle = documentRef.createElement('h3');
+  historyTitle.className = 'fraction-diagnostic-history-title';
+  historyTitle.textContent = 'Jouw eerdere antwoorden';
+  const history = documentRef.createElement('ol');
+  history.className = 'fraction-diagnostic-history';
   const diagnosticNotice = documentRef.createElement('p');
   diagnosticNotice.className = 'fraction-diagnostic-muted';
-  diagnosticNotice.textContent = 'Tijdens de diagnose geeft PacoGO nog geen goed/fout-feedback. Zo worden eerst je eigen tussenstappen zichtbaar.';
+  diagnosticNotice.textContent = 'Je krijgt tijdens deze diagnose nog geen goed/fout-feedback. PacoGO bekijkt de samenhang tussen jouw tussenstappen nadat je klaar bent.';
   const diagnosticStatus = documentRef.createElement('p');
   diagnosticStatus.className = 'fraction-diagnostic-status';
   diagnosticStatus.setAttribute('role', 'status');
-  diagnostic.append(learnerLabel, stepTitle, prompt, progress, form, diagnosticNotice, diagnosticStatus);
+  const stop = documentRef.createElement('button');
+  stop.type = 'button';
+  stop.className = 'secondary';
+  stop.id = 'fraction-diagnostic-stop';
+  stop.textContent = 'Diagnose stoppen';
+  diagnostic.append(learnerLabel, taskTitle, actionPrompt, progress, expression, form, historyTitle, history, diagnosticNotice, diagnosticStatus, stop);
 
   const result = documentRef.createElement('section');
   result.id = 'fraction-diagnostic-result';
@@ -67,202 +116,172 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
   const resultTitle = documentRef.createElement('h2');
   const resultCopy = documentRef.createElement('p');
   resultCopy.className = 'fraction-diagnostic-muted';
-  const explanation = documentRef.createElement('div');
-  explanation.className = 'fraction-diagnostic-explanation';
-  const practiceTitle = documentRef.createElement('h3');
-  const practicePrompt = documentRef.createElement('p');
-  practicePrompt.className = 'fraction-diagnostic-muted';
-  const practiceExpression = documentRef.createElement('div');
-  practiceExpression.className = 'fraction-diagnostic-expression';
-  const practiceForm = documentRef.createElement('form');
-  const practiceFields = documentRef.createElement('div');
-  practiceFields.className = 'fraction-diagnostic-fields';
-  const practiceSubmit = documentRef.createElement('button');
-  practiceSubmit.type = 'submit';
-  practiceSubmit.className = 'success';
-  practiceSubmit.textContent = 'Oefening controleren';
-  practiceForm.append(practiceExpression, practiceFields, practiceSubmit);
-  const practiceStatus = documentRef.createElement('p');
-  practiceStatus.className = 'fraction-diagnostic-status';
-  practiceStatus.setAttribute('role', 'status');
-  const restart = documentRef.createElement('button');
-  restart.type = 'button';
-  restart.className = 'secondary';
-  restart.textContent = 'Diagnose opnieuw doen';
-  result.append(resultTitle, resultCopy, explanation, practiceTitle, practicePrompt, practiceForm, practiceStatus, restart);
-
+  const resultHistoryTitle = documentRef.createElement('h3');
+  resultHistoryTitle.textContent = 'Ingevulde tussenstappen';
+  const resultHistory = documentRef.createElement('div');
+  resultHistory.className = 'fraction-diagnostic-result-history';
+  result.append(resultTitle, resultCopy, resultHistoryTitle, resultHistory);
   content.append(setup, diagnostic, result);
 
-  const embeddedFields = Object.freeze({
-    equivalence: ['numerator'],
-    'common-denominator': ['firstNumerator', 'firstDenominator', 'secondNumerator', 'secondDenominator'],
-    addition: ['firstNumerator', 'firstDenominator', 'secondNumerator', 'secondDenominator', 'resultNumerator', 'resultDenominator'],
-    subtraction: ['firstNumerator', 'firstDenominator', 'secondNumerator', 'secondDenominator', 'resultNumerator', 'resultDenominator'],
-    'mixed-to-improper': ['numerator'],
-    'mixed-subtraction': [],
-    'improper-to-mixed': ['whole', 'remainder']
-  });
-
-  function createInput(id, labelText, inline = false) {
+  function createInput() {
     const label = documentRef.createElement('label');
-    label.className = inline ? 'fraction-diagnostic-inline-field' : 'fraction-diagnostic-field';
+    label.className = 'fraction-diagnostic-field';
     const caption = documentRef.createElement('span');
-    caption.className = inline ? 'fraction-diagnostic-visually-hidden' : '';
-    caption.textContent = labelText;
+    caption.textContent = ACTION_LABELS[session.getCurrentAction().action.actionId] || 'Jouw antwoord';
     const input = documentRef.createElement('input');
     input.type = 'number';
     input.inputMode = 'numeric';
     input.min = '0';
     input.step = '1';
     input.required = true;
-    input.name = id;
-    input.className = inline ? 'fraction-diagnostic-inline-input' : 'paco-form-control';
-    input.setAttribute('aria-label', labelText);
+    input.name = 'answer';
+    input.id = 'fraction-diagnostic-answer';
+    input.className = 'paco-form-control';
+    input.setAttribute('aria-label', caption.textContent);
     label.append(caption, input);
     return label;
   }
 
-  function renderFields(host, definitions) {
+  function renderMathExpression(host, text) {
     host.replaceChildren();
-    definitions.forEach(([id, labelText]) => host.appendChild(createInput(id, labelText)));
-  }
-
-  function renderExpression(host, expressionText, definitions, stepId) {
-    host.replaceChildren();
-    const inlineIds = embeddedFields[stepId] || [];
-    const labels = new Map(definitions);
-    let inlineIndex = 0;
-    const tokens = /(\d+|\?)\/(\d+|\?)|\?/g;
+    const tokenPattern = /(\d+\s+)?(\d+|\?)\/(\d+|\?)|(\?)/g;
     let cursor = 0;
-    for (const match of expressionText.matchAll(tokens)) {
-      const index = match.index;
-      if (index > cursor) host.append(documentRef.createTextNode(expressionText.slice(cursor, index)));
-      const numerator = match[1] ?? match[0];
-      const denominator = match[2];
-      if (denominator !== undefined) {
+    for (const match of text.matchAll(tokenPattern)) {
+      if (match.index > cursor) host.append(documentRef.createTextNode(text.slice(cursor, match.index)));
+      if (match[4]) {
+        host.append(documentRef.createTextNode('?'));
+      } else {
+        if (match[1]) {
+          const whole = documentRef.createElement('span');
+          whole.textContent = match[1].trim();
+          host.append(whole);
+        }
         const fraction = documentRef.createElement('span');
         fraction.className = 'fraction-diagnostic-fraction';
-        const top = documentRef.createElement('span');
-        top.className = 'fraction-diagnostic-numerator';
-        const bottom = documentRef.createElement('span');
-        bottom.className = 'fraction-diagnostic-denominator';
-        if (numerator === '?') {
-          const id = inlineIds[inlineIndex++];
-          if (id) top.appendChild(createInput(id, labels.get(id) || id, true));
-          else top.textContent = '?';
-        } else top.textContent = numerator;
-        if (denominator === '?') {
-          const id = inlineIds[inlineIndex++];
-          if (id) bottom.appendChild(createInput(id, labels.get(id) || id, true));
-          else bottom.textContent = '?';
-        } else bottom.textContent = denominator;
-        fraction.append(top, bottom);
-        host.appendChild(fraction);
-      } else {
-        const id = inlineIds[inlineIndex++];
-        if (id) host.appendChild(createInput(id, labels.get(id) || id, true));
-        else host.append(documentRef.createTextNode('?'));
+        const numerator = documentRef.createElement('span');
+        numerator.className = 'fraction-diagnostic-numerator';
+        numerator.textContent = match[2];
+        const denominator = documentRef.createElement('span');
+        denominator.className = 'fraction-diagnostic-denominator';
+        denominator.textContent = match[3];
+        fraction.append(numerator, denominator);
+        host.append(fraction);
       }
-      cursor = index + match[0].length;
+      cursor = match.index + match[0].length;
     }
-    if (cursor < expressionText.length) host.append(documentRef.createTextNode(expressionText.slice(cursor)));
+    if (cursor < text.length) host.append(documentRef.createTextNode(text.slice(cursor)));
   }
 
-  function readValues(host) {
-    const values = {};
-    for (const input of host.querySelectorAll('input')) {
-      if (!input.value.trim() || !Number.isSafeInteger(Number(input.value)) || Number(input.value) < 0) {
-        input.focus();
-        throw new Error('Vul bij iedere stap een niet-negatief heel getal in.');
+  function renderHistory(host, snapshot, activeTaskId = null) {
+    host.replaceChildren();
+    const list = documentRef.createElement('ol');
+    list.className = 'fraction-diagnostic-history-list';
+    let count = 0;
+    for (const taskId of TASK_ORDER) {
+      const task = snapshot.tasks[taskId];
+      if (task.actions.length === 0 || (activeTaskId && taskId === activeTaskId)) continue;
+      const group = documentRef.createElement('section');
+      group.className = 'fraction-diagnostic-history-group';
+      const heading = documentRef.createElement('h4');
+      heading.textContent = FRACTION_DIAGNOSTIC_TASKS_V2[taskId].title;
+      group.appendChild(heading);
+      const items = documentRef.createElement('ul');
+      for (const entry of task.actions) {
+        const item = documentRef.createElement('li');
+        item.textContent = (ACTION_LABELS[entry.actionId] || entry.actionId) + ': ' + entry.rawValue;
+        items.appendChild(item);
+        count++;
       }
-      values[input.name] = Number(input.value);
+      group.appendChild(items);
+      host.appendChild(group);
     }
-    return values;
+    if (activeTaskId) {
+      const active = snapshot.tasks[activeTaskId];
+      for (const entry of active.actions) {
+        const item = documentRef.createElement('li');
+        item.textContent = (ACTION_LABELS[entry.actionId] || entry.actionId) + ': ' + entry.rawValue;
+        list.appendChild(item);
+        count++;
+      }
+    }
+    if (activeTaskId && list.childElementCount) {
+      const heading = documentRef.createElement('h4');
+      heading.textContent = FRACTION_DIAGNOSTIC_TASKS_V2[activeTaskId].title;
+      host.append(heading, list);
+    }
+    if (count === 0) {
+      const empty = documentRef.createElement('p');
+      empty.className = 'fraction-diagnostic-muted';
+      empty.textContent = 'Je antwoorden verschijnen hier nadat je een stap hebt vastgelegd.';
+      host.appendChild(empty);
+    }
   }
 
-  function renderStep() {
-    const step = session.getCurrentStep();
-    if (!step) return showRecommendation();
+  function renderCurrentAction() {
+    const current = session.getCurrentAction();
+    if (!current) return showResult();
+    const snapshot = session.getSessionSnapshot();
     const state = session.getProgress();
-    stepTitle.textContent = step.title;
-    prompt.textContent = step.prompt;
-    renderExpression(expression, step.expression, step.fields, step.id);
-    progress.textContent = 'Stap ' + (state.completedCount + 1) + ' van ' + state.totalCount;
-    const inlineIds = new Set(embeddedFields[step.id] || []);
-    renderFields(fields, step.fields.filter(([id]) => !inlineIds.has(id)));
+    taskTitle.textContent = current.taskTitle;
+    actionPrompt.textContent = current.action.prompt;
+    progress.textContent = 'Handeling ' + (state.submittedActions + 1) + ' van maximaal 15';
+    renderMathExpression(expression, expressionFor(current.action, current.taskId, snapshot));
+    fields.replaceChildren(createInput());
+    history.replaceChildren();
+    renderHistory(history, snapshot, current.taskId);
     diagnosticStatus.textContent = '';
+    diagnostic.hidden = false;
+    result.hidden = true;
+    fields.querySelector('input')?.focus();
   }
 
-  function showRecommendation() {
+  function showResult() {
+    const snapshot = session.getSessionSnapshot();
+    const state = session.getProgress();
     diagnostic.hidden = true;
     result.hidden = false;
-    recommendation = session.getRecommendation();
-    resultTitle.textContent = recommendation.kind === 'targeted-practice' ? 'Volgende stap: ' + recommendation.title : 'Breder toepassen';
-    resultCopy.textContent = recommendation.kind === 'targeted-practice'
-      ? 'PacoGO begint bij de eerste tussenstap die nog niet helemaal goed is ingevuld.'
-      : 'Alle onderzochte tussenstappen zijn goed ingevuld. Dit is geen mastery-beslissing; een bredere toepassingssituatie is de volgende controle.';
-    explanation.textContent = recommendation.explanation;
-    const targeted = recommendation.kind === 'targeted-practice';
-    practiceTitle.hidden = !targeted;
-    practicePrompt.hidden = !targeted;
-    practiceExpression.hidden = !targeted;
-    practiceForm.hidden = !targeted;
-    if (targeted) {
-      const step = FRACTION_DIAGNOSTIC_STEPS.find(item => item.id === recommendation.stepId);
-      practiceTitle.textContent = 'Probeer een vergelijkbare opgave';
-      practicePrompt.textContent = recommendation.practice.prompt;
-      renderExpression(practiceExpression, recommendation.practice.expression, step.fields, step.id);
-      const inlineIds = new Set(embeddedFields[step.id] || []);
-      renderFields(practiceFields, step.fields.filter(([id]) => !inlineIds.has(id)));
-    } else {
-      practiceStatus.textContent = '';
-    }
+    resultTitle.textContent = state.isStopped ? 'Diagnose gestopt' : 'Diagnose afgerond';
+    resultCopy.textContent = state.isStopped
+      ? 'Je ingevulde antwoorden zijn bewaard. Er is nog geen beoordeling of mastery-beslissing vastgelegd.'
+      : snapshot.tasks.F4.status === 'not_administered'
+        ? 'De basisstappen zijn vastgelegd. De extra opdracht met een gemengde breuk is overgeslagen omdat de vereiste tussenstappen bij het aftrekken nog niet allemaal zijn aangetoond.'
+        : 'Alle aangeboden tussenstappen zijn vastgelegd. PacoGO heeft tijdens het maken geen goed/fout-antwoorden getoond.';
+    resultHistory.replaceChildren();
+    renderHistory(resultHistory, snapshot);
+    resultHistoryTitle.hidden = resultHistory.childElementCount === 0;
   }
 
   function start(selectedLearner) {
     learner = selectedLearner;
-    session = createFractionDiagnosticSession({ learnerKey: learner.learner_key, storage: documentRef.defaultView?.localStorage || globalThis.localStorage });
+    session = createFractionDiagnosticSessionV2({
+      learnerKey: learner.learner_key,
+      storage: documentRef.defaultView?.localStorage || globalThis.localStorage
+    });
     setup.hidden = true;
-    result.hidden = true;
-    diagnostic.hidden = false;
     learnerLabel.textContent = 'PacoGO • ' + learner.display_name + ' • Rekenen • Breuken';
-    if (session.getProgress().isComplete) showRecommendation();
-    else renderStep();
+    if (session.getProgress().isComplete || session.getProgress().isStopped) showResult();
+    else renderCurrentAction();
   }
 
   form.addEventListener('submit', event => {
     event.preventDefault();
     try {
-      const step = session.getCurrentStep();
-      session.submitStep({ stepId: step.id, values: readValues(form) });
-      if (session.getCurrentStep()) renderStep();
-      else showRecommendation();
+      const input = fields.querySelector('input');
+      if (!input?.value.trim() || !Number.isSafeInteger(Number(input.value)) || Number(input.value) < 0) {
+        input?.focus();
+        throw new Error('Vul een niet-negatief heel getal in.');
+      }
+      session.submitCurrentAction(Number(input.value));
+      renderCurrentAction();
     } catch (error) {
       diagnosticStatus.textContent = error.message;
     }
   });
 
-  practiceForm.addEventListener('submit', event => {
-    event.preventDefault();
-    try {
-      const outcome = session.evaluatePractice({ stepId: recommendation.stepId, values: readValues(practiceForm) });
-      practiceStatus.textContent = outcome.correct
-        ? 'Goed uitgevoerd. Je hebt deze aanpak in een nieuwe opgave toegepast. Probeer later nog een andere opgave.'
-        : 'Deze oefening is nog niet helemaal goed. Vergelijk iedere tussenstap opnieuw met de uitleg.';
-      practiceStatus.classList.toggle('is-error', !outcome.correct);
-    } catch (error) {
-      practiceStatus.textContent = error.message;
-      practiceStatus.classList.add('is-error');
-    }
+  stop.addEventListener('click', () => {
+    session.stop();
+    showResult();
   });
-
-  function reset() {
-    session.reset();
-    result.hidden = true;
-    diagnostic.hidden = false;
-    renderStep();
-  }
-  restart.addEventListener('click', reset);
 
   async function mount() {
     mountPacoPageTemplate({
@@ -270,7 +289,7 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
       greeting: student ? 'Hoi ' + student + '! 🐶' : 'Welkom bij PacoGO! 🐶',
       title: 'Breuken',
       icon: '📘',
-      subtitle: 'Ontdek welke tussenstap je al beheerst en wat je volgende leerstap is.',
+      subtitle: 'Jij voert de rekenstappen uit. PacoGO kijkt naar de samenhang tussen jouw antwoorden.',
       navigation: createPacoNavigation({ app, active: 'skills', student, viewMode: context?.mode, includeManagement: true, navigate }),
       content
     });

@@ -1,62 +1,46 @@
-const FRACTION_RESULT_FORM_TASK = Object.freeze({id:"fraction-result-form-15-10",numerator:15,denominator:10});
-const STAGES = Object.freeze(["mixed_number","simplification"]);
-const CLASSIFICATIONS = Object.freeze(["valid","invalid_input","incorrect_mixed_number","equivalent_wrong_form","not_simplified"]);
-function createFractionResultFormPracticeSession({learnerKey,storage=globalThis.localStorage}={}) {
- const learner=String(learnerKey||"").trim();
- if(!learner) throw new TypeError("A learner key is required.");
- if(!storage||typeof storage.getItem!=="function"||typeof storage.setItem!=="function"||typeof storage.removeItem!=="function") throw new TypeError("A compatible local storage object is required.");
- const storageKey="pacogo:fraction-result-form-practice:v1:"+encodeURIComponent(learner);
- const empty=()=>({schemaVersion:1,completedStageIds:[],responses:[]});
- function read() {
-  const raw=storage.getItem(storageKey); if(!raw) return empty();
-  let parsed; try{parsed=JSON.parse(raw)}catch{throw new Error("Saved fraction result-form practice is unreadable.")}
-  if(!parsed||parsed.schemaVersion!==1||!Array.isArray(parsed.completedStageIds)||!Array.isArray(parsed.responses)||parsed.completedStageIds.some((id,index)=>STAGES[index]!==id)||parsed.completedStageIds.length>STAGES.length) throw new Error("Saved fraction result-form practice has an unsupported format.");
-  for(const response of parsed.responses) if(!response||!STAGES.includes(response.stageId)||!Array.isArray(response.rawValues)||response.rawValues.some(v=>typeof v!=="string")||!CLASSIFICATIONS.includes(response.classification)) throw new Error("Saved fraction result-form practice contains an invalid response.");
-  return {schemaVersion:1,completedStageIds:[...parsed.completedStageIds],responses:parsed.responses.map(r=>({stageId:r.stageId,rawValues:[...r.rawValues],classification:r.classification}))};
- }
- function getCurrentStage() {
-  const p=read();
-  if(!p.completedStageIds.includes("mixed_number")) return Object.freeze({taskId:FRACTION_RESULT_FORM_TASK.id,stageId:"mixed_number",stageNumber:1,totalStages:2,prompt:"Schrijf 15/10 eerst als 1 5/10. Laat de noemer 10 staan; vereenvoudigen doe je in de volgende stap.",expression:"15/10 = ? ?/?",inputLabels:["Heel getal","Teller van het breukdeel","Noemer van het breukdeel"]});
-  if(!p.completedStageIds.includes("simplification")) return Object.freeze({taskId:FRACTION_RESULT_FORM_TASK.id,stageId:"simplification",stageNumber:2,totalStages:2,prompt:"Vereenvoudig nu zelf het breukdeel. Vul de nieuwe teller en noemer in.",expression:"1 5/10 = 1 ?/?",inputLabels:["Vereenvoudigde teller","Vereenvoudigde noemer"]});
-  return null;
- }
- function getProgress(){const p=read();return Object.freeze({completedStageCount:p.completedStageIds.length,totalStageCount:STAGES.length,attemptCount:p.responses.length,isComplete:p.completedStageIds.length===STAGES.length});}
- function getCompletion(){
-  const p=read(); if(p.completedStageIds.length!==STAGES.length)return null;
-  const m=[...p.responses].reverse().find(r=>r.stageId==="mixed_number"&&r.classification==="valid");
-  const s=[...p.responses].reverse().find(r=>r.stageId==="simplification"&&r.classification==="valid");
-  return Object.freeze({mixedNumber:Object.freeze({whole:Number(m.rawValues[0]),numerator:Number(m.rawValues[1]),denominator:Number(m.rawValues[2])}),simplifiedFraction:Object.freeze({numerator:Number(s.rawValues[0]),denominator:Number(s.rawValues[1])})});
- }
- function recordResponse({rawValues}={}) {
-  const current=getCurrentStage(); if(!current)throw new Error("The fraction result-form practice is already complete.");
-  const values=Array.isArray(rawValues)?rawValues.map(v=>String(v??"")):[];
-  const parsed=values.map(v=>/^[0-9]+$/.test(v)?Number(v):NaN);
-  const safe=parsed.every(v=>Number.isSafeInteger(v)&&v>=0);
-  let classification="invalid_input";
-  if(safe&&values.length===current.inputLabels.length){
-   if(current.stageId==="mixed_number"){
-    const [whole,numerator,denominator]=parsed;
-    if(denominator>0&&numerator<denominator){
-     const sameValue=(whole*denominator+numerator)*FRACTION_RESULT_FORM_TASK.denominator===FRACTION_RESULT_FORM_TASK.numerator*denominator;
-     classification=sameValue
-      ? denominator===FRACTION_RESULT_FORM_TASK.denominator?"valid":"equivalent_wrong_form"
-      : "incorrect_mixed_number";
-    } else classification="incorrect_mixed_number";
-   } else {
-    const [numerator,denominator]=parsed;
-    if(denominator>0&&numerator>0){
-     const equivalent=numerator*10===denominator*5;
-     const gcd=(a,b)=>b===0?a:gcd(b,a%b);
-     classification=equivalent&&gcd(numerator,denominator)===1?"valid":"not_simplified";
-    } else classification="not_simplified";
-   }
+const FRACTION_RESULT_FORM_TASK = Object.freeze({ id: "fraction-result-form-15-10", numerator: 15, denominator: 10 });
+const CLASSIFICATIONS = Object.freeze(["valid", "invalid_input", "incorrect_answer", "not_simplified"]);
+function createFractionResultFormPracticeSession({ learnerKey, storage = globalThis.localStorage } = {}) {
+  const learner = String(learnerKey || "").trim();
+  if (!learner) throw new TypeError("A learner key is required.");
+  if (!storage || typeof storage.getItem !== "function" || typeof storage.setItem !== "function" || typeof storage.removeItem !== "function") throw new TypeError("A compatible local storage object is required.");
+  const key = "pacogo:fraction-result-form-practice:v2:" + encodeURIComponent(learner);
+  const empty = () => ({ schemaVersion: 2, completed: false, responses: [] });
+  function read() {
+    const raw = storage.getItem(key); if (!raw) return empty();
+    let data; try { data = JSON.parse(raw); } catch { throw new Error("Saved fraction result-form practice is unreadable."); }
+    if (!data || data.schemaVersion !== 2 || typeof data.completed !== "boolean" || !Array.isArray(data.responses)) throw new Error("Saved fraction result-form practice has an unsupported format.");
+    if (data.responses.some(item => !item || !CLASSIFICATIONS.includes(item.classification) || !item.values || typeof item.values !== "object")) throw new Error("Saved fraction result-form practice contains an invalid response.");
+    return { schemaVersion: 2, completed: data.completed, responses: data.responses.map(item => ({ classification: item.classification, values: { ...item.values } })) };
   }
-  const p=read();p.responses.push({stageId:current.stageId,rawValues:values,classification});
-  if(classification==="valid")p.completedStageIds.push(current.stageId);
-  storage.setItem(storageKey,JSON.stringify(p));
-  return Object.freeze({classification,progress:getProgress(),completion:getCompletion()});
- }
- function reset(){storage.removeItem(storageKey);}
- return Object.freeze({getCurrentStage,getProgress,getCompletion,recordResponse,reset});
+  const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+  function getCurrentStage() { return read().completed ? null : Object.freeze({ taskId: FRACTION_RESULT_FORM_TASK.id, stageId: "answer", stageNumber: 1, totalStages: 1, prompt: "Schrijf 15/10 op jouw manier. Je kunt een heel getal toevoegen en zelf kiezen of je vereenvoudigt.", expression: "15/10 =" }); }
+  function getProgress() { const state = read(); return Object.freeze({ completedStageCount: state.completed ? 1 : 0, totalStageCount: 1, attemptCount: state.responses.length, isComplete: state.completed }); }
+  function getCompletion() { const state = read(); if (!state.completed) return null; const item = [...state.responses].reverse().find(response => response.classification === "valid"); return item ? Object.freeze({ ...item.values }) : null; }
+  function recordResponse({ values } = {}) {
+    if (read().completed) throw new Error("The fraction result-form practice is already complete.");
+    const value = values && typeof values === "object" ? { wholeNumberEnabled: values.wholeNumberEnabled === true, wholeNumber: String(values.wholeNumber ?? ""), numerator: String(values.numerator ?? ""), denominator: String(values.denominator ?? ""), simplified: values.simplified === true, simplifiedNumerator: String(values.simplifiedNumerator ?? ""), simplifiedDenominator: String(values.simplifiedDenominator ?? "") } : null;
+    const fields = value ? [value.numerator, value.denominator, ...(value.wholeNumberEnabled ? [value.wholeNumber] : []), ...(value.simplified ? [value.simplifiedNumerator, value.simplifiedDenominator] : [])] : null;
+    const numbers = fields && fields.map(field => /^[0-9]+$/.test(field) ? Number(field) : NaN);
+    let classification = "invalid_input";
+    if (numbers && numbers.every(number => Number.isSafeInteger(number) && number >= 0)) {
+      let index = 0; const numerator = numbers[index++], denominator = numbers[index++], whole = value.wholeNumberEnabled ? numbers[index++] : 0;
+      if (denominator > 0 && (!value.wholeNumberEnabled || numerator < denominator)) {
+        const sameValue = (whole * denominator + numerator) * 10 === 15 * denominator;
+        classification = sameValue ? "valid" : "incorrect_answer";
+        if (sameValue && value.simplified) {
+          const reducedNumerator = numbers[index++], reducedDenominator = numbers[index++];
+          const targetNumerator = value.wholeNumberEnabled ? 5 : 15, targetDenominator = 10;
+          const equivalent = reducedDenominator > 0 && reducedNumerator * targetDenominator === targetNumerator * reducedDenominator;
+          const reduced = reducedNumerator > 0 && reducedDenominator > 0 && gcd(reducedNumerator, reducedDenominator) === 1;
+          classification = equivalent && reduced ? "valid" : "not_simplified";
+        }
+      } else classification = "incorrect_answer";
+    }
+    const state = read(); state.responses.push({ classification, values: value || {} }); if (classification === "valid") state.completed = true;
+    storage.setItem(key, JSON.stringify(state)); return Object.freeze({ classification, progress: getProgress(), completion: getCompletion() });
+  }
+  function reset() { storage.removeItem(key); }
+  return Object.freeze({ getCurrentStage, getProgress, getCompletion, recordResponse, reset });
 }
-export {FRACTION_RESULT_FORM_TASK,createFractionResultFormPracticeSession};
+export { FRACTION_RESULT_FORM_TASK, createFractionResultFormPracticeSession };

@@ -117,3 +117,7 @@ The shared interface is used by all five FR2 pilot browser tasks:
 - FR2-T05: area-model target and symbolic options for language-reduced visual transfer.
 
 Each task obtains the explanation requirement from its task-set record. Browser tests verify mixed-representation rendering, required explanation, raw explanation preservation, task-bound observation submission and absence of automatic mastery promotion. These are synthetic browser integration fixtures, not empirical validation.
+
+## 9. Shared fraction answer input — architecture extension
+
+The reusable answer-entry control is `pacogo-engine/fraction-answer-input.js`. It owns only presentation and learner interaction state: an optional whole-number field (unchecked/hidden by default), a primary numerator/denominator pair, and an always-visible **Vereenvoudigen** action that reveals a second fraction pair adjacent to the answer only after learner activation. Fields use compact solid-border styling without dotted placeholders. The component exposes raw values and locking; it does not calculate correctness, infer curriculum progression, or create evidence/mastery. The non-formal 15/10 practice is its first consumer; task-specific validation remains in the practice session. This preserves separate pedagogical configuration, interaction state, and rendering, and is suitable for future reuse by other fraction tasks. No C1–C9, FR1/FR2 formal mappings, evidence, mastery, next-action, learner-state, or Supabase contracts are changed.

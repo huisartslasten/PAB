@@ -34,6 +34,21 @@
     .fraction-practice-divider{height:2px;background:currentColor;width:100%}
     .fraction-practice-inline-input{width:54px;min-height:42px;box-sizing:border-box;border:2px dashed #8aa6c2;border-radius:9px;text-align:center;font:800 22px Nunito,system-ui,sans-serif;color:#102b57;background:#fff;padding:4px}
     .fraction-practice-inline-input:focus{outline:3px solid #9bcfff;outline-offset:2px}
+    .pacogo-fraction-answer{display:grid;justify-items:center;gap:8px;width:100%;font-size:16px}
+    .pacogo-fraction-answer__line{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+    .pacogo-fraction-answer__fraction{display:inline-grid;grid-template-rows:auto 2px auto;align-items:center;justify-items:stretch;min-width:64px}
+    .pacogo-fraction-answer__field{display:grid;justify-items:center;gap:2px;font-size:10px;font-weight:700;color:#647894}
+    .pacogo-fraction-answer__field[hidden]{display:none}
+    .pacogo-fraction-answer__input{width:62px;height:36px;box-sizing:border-box;border:1.5px solid #9bb7d0;border-radius:8px;background:#fff;color:#102b57;text-align:center;font:800 20px Nunito,system-ui,sans-serif;padding:3px}
+    .pacogo-fraction-answer__input:focus{outline:3px solid #9bcfff;outline-offset:1px;border-color:#1787f2}
+    .pacogo-fraction-answer__divider{height:2px;background:#102b57;width:100%}
+    .pacogo-fraction-answer__equals{font-size:24px;font-weight:900}
+    .pacogo-fraction-answer__toggle{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:800}
+    .pacogo-fraction-answer__toggle input{width:17px;height:17px;accent-color:#1787f2}
+    .pacogo-fraction-answer__simplified{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+    .pacogo-fraction-answer__simplified[hidden]{display:none}
+    .pacogo-fraction-answer__simplify{padding:8px 14px;font-size:14px}
+    #resultFormCard{padding:18px} #resultFormCard h1{font-size:25px} #resultFormCard .construction-equation{margin:10px 0;padding:12px}
     .concept{padding:16px;border-radius:16px;background:#f1f7fc;border:1px solid #d8e7f4}
     .concept strong{display:block;margin-bottom:5px}
     #comparison{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;margin:16px 0;padding:16px;background:#f5f9fd;border-radius:14px}
@@ -135,6 +150,7 @@
   import { FRACTION_PRACTICE_TASKS, createFractionPracticeSession } from "./pacogo-engine/fraction-practice-session.js";
   import { getStudentLearningProfile } from "./src/core/student-registry.js";
   import { renderFractionPracticeExpression } from "./pacogo-engine/fraction-practice-equation.js";
+  import { renderFractionAnswerInput } from "./pacogo-engine/fraction-answer-input.js";
   import { createFractionAdditionPracticeSession } from "./pacogo-engine/fraction-addition-practice-session.js";
   import { createFractionResultFormPracticeSession } from "./pacogo-engine/fraction-result-form-practice-session.js";
   import { createFractionSubtractionPracticeSession } from "./pacogo-engine/fraction-subtraction-practice-session.js";
@@ -476,89 +492,31 @@
   }
 
   function showResultFormCompleted() {
-    const completion = resultFormSession.getCompletion();
-    resultFormPrompt.textContent = "Je hebt beide stappen zelf ingevuld.";
-    resultFormExpression.textContent = completion.mixedNumber.whole + " " +
-      completion.mixedNumber.numerator + "/" + completion.mixedNumber.denominator + " = " +
-      completion.mixedNumber.whole + " " + completion.simplifiedFraction.numerator + "/" +
-      completion.simplifiedFraction.denominator;
-    resultFormInputHost.replaceChildren();
-    resultFormFeedback.textContent = "Goed. Je hebt eerst het gemengde getal gemaakt en daarna zelf vereenvoudigd.";
-    updateResultFormProgress();
-    resultFormNext.replaceChildren();
-    const restart = document.createElement("button");
-    restart.type = "button";
-    restart.textContent = "Deze oefening opnieuw doen";
-    restart.addEventListener("click", () => { resultFormSession.reset(); renderResultFormStage(); });
-    const back = document.createElement("button");
-    back.type = "button";
-    back.textContent = "Terug naar optellen";
-    back.addEventListener("click", () => { resultFormCard.hidden = true; additionCard.hidden = false; });
-    resultFormNext.append(restart, back);
+    const value = resultFormSession.getCompletion();
+    const whole = value.wholeNumberEnabled ? value.wholeNumber + " " : "";
+    const answer = whole + value.numerator + "/" + value.denominator;
+    const simplified = value.simplified ? " = " + whole + value.simplifiedNumerator + "/" + value.simplifiedDenominator : "";
+    resultFormPrompt.textContent = "Je antwoord is gecontroleerd."; resultFormExpression.textContent = "15/10 = " + answer + simplified;
+    resultFormInputHost.replaceChildren(); resultFormFeedback.textContent = "Goed. Je hebt zelf gekozen hoe je de breuk noteert."; updateResultFormProgress(); resultFormNext.replaceChildren();
+    const restart = document.createElement("button"); restart.type = "button"; restart.textContent = "Deze oefening opnieuw doen"; restart.addEventListener("click", () => { resultFormSession.reset(); renderResultFormStage(); });
+    const back = document.createElement("button"); back.type = "button"; back.textContent = "Terug naar optellen"; back.addEventListener("click", () => { resultFormCard.hidden = true; additionCard.hidden = false; }); resultFormNext.append(restart, back);
   }
-
-  function handleResultFormAnswer(rawValues) {
-    const result = resultFormSession.recordResponse({ rawValues });
-    updateResultFormProgress();
-    if (result.classification === "valid") {
-      resultFormEquationInstance?.lock();
-      const submit = resultFormInputHost.querySelector("button");
-      if (submit) submit.disabled = true;
-      resultFormNext.replaceChildren();
-      if (result.progress.isComplete) { showResultFormCompleted(); return; }
-      resultFormFeedback.textContent = "Goed. Je hebt 15/10 als 1 5/10 geschreven. Kies nu zelf voor vereenvoudigen.";
-      const next = document.createElement("button");
-      next.type = "button";
-      next.textContent = "Vereenvoudigen";
-      next.addEventListener("click", renderResultFormStage);
-      resultFormNext.append(next);
-      return;
-    }
-    resultFormFeedback.textContent = result.classification === "invalid_input"
-      ? "Vul alle vakjes met niet-negatieve hele getallen in."
-      : result.classification === "equivalent_wrong_form"
-        ? "Dit is dezelfde hoeveelheid, maar laat voor deze tussenstap de noemer 10 staan: vul 1 5/10 in. Vereenvoudigen komt hierna."
-      : result.classification === "not_simplified"
-        ? "Deze breuk betekent misschien evenveel, maar is nog niet volledig vereenvoudigd. Probeer opnieuw."
-        : "Controleer het hele getal, de teller en de noemer. Schrijf eerst 15/10 als een gemengd getal.";
+  function handleResultFormAnswer(values) {
+    const result = resultFormSession.recordResponse({ values }); updateResultFormProgress();
+    if (result.classification === "valid") { resultFormEquationInstance?.lock(); const submit = resultFormInputHost.querySelector("button"); if (submit) submit.disabled = true; showResultFormCompleted(); return; }
+    resultFormFeedback.textContent = result.classification === "invalid_input" ? "Vul de getoonde velden met hele getallen in." : result.classification === "not_simplified" ? "Deze breuk is nog niet volledig vereenvoudigd. Controleer de extra breuk naast je antwoord." : "Dit antwoord heeft nog niet dezelfde waarde als 15/10. Controleer teller, noemer en eventueel het hele getal.";
     resultFormEquationInstance?.focus();
   }
-
   function renderResultFormStage() {
-    const current = resultFormSession.getCurrentStage();
-    if (!current) { showResultFormCompleted(); return; }
-    resultFormPrompt.textContent = current.prompt;
-    resultFormFeedback.textContent = "Vul de ontbrekende getallen zelf in.";
-    resultFormNext.replaceChildren();
-    resultFormEquationInstance = renderFractionPracticeExpression({
-      mount: resultFormExpression,
-      expression: current.expression,
-      inputLabels: current.inputLabels,
-      onInteraction: event => {
-        resultFormFeedback.textContent = event.rawValue
-          ? "Je kunt je antwoorden controleren."
-          : "Vul de ontbrekende getallen zelf in.";
-      }
-    });
-    resultFormInputHost.replaceChildren();
-    const submit = document.createElement("button");
-    submit.type = "button";
-    submit.textContent = "Controleren";
-    submit.addEventListener("click", () => handleResultFormAnswer(resultFormEquationInstance.getValues()));
-    resultFormInputHost.append(submit);
-    updateResultFormProgress();
-    resultFormEquationInstance.focus();
+    const current = resultFormSession.getCurrentStage(); if (!current) { showResultFormCompleted(); return; }
+    resultFormPrompt.textContent = current.prompt; resultFormFeedback.textContent = "Vul je antwoord in. Je kiest zelf of je een heel getal toevoegt of vereenvoudigt."; resultFormNext.replaceChildren();
+    resultFormEquationInstance = renderFractionAnswerInput({ mount: resultFormExpression, labels: { wholeToggle: "Heel getal toevoegen", whole: "Heel getal", numerator: "Teller", denominator: "Noemer", simplify: "Vereenvoudigen", simplifiedNumerator: "Teller", simplifiedDenominator: "Noemer" }, onChange: () => { resultFormFeedback.textContent = "Je kunt je antwoord controleren."; } });
+    resultFormInputHost.replaceChildren(); const submit = document.createElement("button"); submit.type = "button"; submit.textContent = "Controleren"; submit.addEventListener("click", () => handleResultFormAnswer(resultFormEquationInstance.getValues())); resultFormInputHost.append(submit); updateResultFormProgress(); resultFormEquationInstance.focus();
   }
-
   function startResultFormPractice() {
-    resultFormSession = createFractionResultFormPracticeSession({ learnerKey: selectedLearner.learner_key });
-    additionCard.hidden = true;
-    resultFormCard.hidden = false;
-    document.querySelector("#resultFormLearnerLabel").textContent =
-      "PacoGO • " + selectedLearner.display_name + " • Extra breukenoefening";
-    renderResultFormStage();
+    resultFormSession = createFractionResultFormPracticeSession({ learnerKey: selectedLearner.learner_key }); additionCard.hidden = true; resultFormCard.hidden = false;
+    document.querySelector("#resultFormLearnerLabel").textContent = "PacoGO • " + selectedLearner.display_name + " • Extra breukenoefening"; renderResultFormStage();
   }
-
   function renderSubtractionVisual() {
     subtractionVisual.replaceChildren();
     const items = [

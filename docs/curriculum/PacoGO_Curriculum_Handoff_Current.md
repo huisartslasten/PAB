@@ -6350,3 +6350,8 @@ The complete executable fraction learning route remains open.
 - Browser proof #684 / run `43219737492` was also triggered on the same exact commit; its outcome should be read from the workflow record if needed.
 
 The handoff and fraction inventory updates are included in this verified code/test tree. The follow-up documentation commit that records this closure must itself pass Full Regression before this phase is closed.
+
+
+### Verification target for the 2026-11-12 handoff closure
+
+The learner-entered equivalent-fraction practice and its browser coverage passed Full Regression #3553 on `aa2e79a53aab4f624bf13732b445d0a8b681f9db`. This follow-up commit records the regression history in the handoff and traceability inventory; Full Regression must also pass on this exact follow-up commit before the documentation phase is closed.

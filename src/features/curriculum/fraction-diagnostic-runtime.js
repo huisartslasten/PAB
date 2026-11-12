@@ -144,6 +144,8 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
 
   function renderMathExpression(host, text) {
     host.replaceChildren();
+    host.setAttribute('data-expression', text);
+    host.setAttribute('aria-label', text);
     const tokenPattern = /(\d+\s+)?(\d+|\?)\/(\d+|\?)|(\?)/g;
     let cursor = 0;
     for (const match of text.matchAll(tokenPattern)) {

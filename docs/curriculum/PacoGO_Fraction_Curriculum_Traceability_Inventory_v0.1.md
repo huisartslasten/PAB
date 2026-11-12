@@ -323,3 +323,41 @@ This section supersedes the earlier statement that the diagnostic and practice r
 - Full Regression #3547 / run `43217736298`: **GREEN** on that exact commit.
 - Full Regression #3546 was RED on an intermediate UI-label-only commit because the browser assertion still expected the previous label; the assertion was corrected to the intentional, more precise label and #3547 passed.
 - This inventory update and the repository handoff update are documentation changes and must be verified by Full Regression on their resulting exact commit.
+
+
+
+---
+
+## 15. Update 2026-11-12 — learner-entered equivalent-fraction construction practice
+
+### Implemented as optional formative practice
+
+The existing three-item recognition practice remains unchanged. After completing it, the learner can choose a separate construction episode:
+- three examples reuse existing practice values: 1/2 → denominator 4, 1/3 → denominator 6, and 2/3 → denominator 6;
+- the learner sees the target area model and a symbolic expression with the denominator supplied and numerator blank;
+- the learner enters the numerator; PacoGO does not fill it in;
+- a generic mathematical equivalence check compares the two fraction values;
+- incorrect responses can be retried; progression occurs only after a correct response;
+- raw entered numerators and classifications are kept in a separate versioned learner-keyed local store.
+
+### Boundaries
+
+- These are local formative practice identifiers, not FR2 registry task IDs and not formal evidence tasks.
+- They do not change the FR2 task set, registry, C1–C9, mastery, next-action, learner state or formal evidence.
+- They are not adaptively routed from diagnostic results.
+- The explanation is method-neutral and does not claim school-method alignment. The Adaptive Instruction Layer remains a proposal, not runtime.
+- This slice asks for one numerator action with a supplied denominator. It does not yet cover learner-selected common denominators, multi-step addition/subtraction, mixed numbers or the full fraction curriculum.
+- No Supabase or database change was made. The existing recognition progress store is unchanged.
+
+### Files and tests
+
+- `pacogo-engine/fraction-numerator-input.js`
+- `pacogo-engine/fraction-construction-practice-session.js`
+- `pacogo-engine/fraction-construction-practice-session.test.js`
+- updated `curriculum-fr2-practice-learner.html`
+- updated `test/browser/curriculum-fr2-practice-learner.browser.test.js`
+
+### Verification status
+
+Full Regression #3550 was RED on intermediate feature commit `4908257e7e428e1cea47a0167b0fa44ac3e3b1f3` because the numeric parser pattern was over-escaped. The parser defect was corrected in `216e5b4c08b0e20c9ff59271d0a773d8d567982c`. This documentation commit is the next Full Regression target; its actual outcome must be read from the run for the exact resulting commit. Do not mark the feature green before that verification.
+

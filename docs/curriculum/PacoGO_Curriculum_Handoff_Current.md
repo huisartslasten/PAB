@@ -6288,3 +6288,52 @@ The route connection is an initial integration step, not completion of the user'
 ### Verification trigger for the 2026-11-12 route handoff update
 
 The route implementation was verified by Full Regression #3547 (GREEN) on `d246a4c3eaebd8174e0c3940d8552475be262939`. The route handoff and fraction traceability inventory were then committed together in `c305953150c43134148157bf158f269bf0d07e6c`. This follow-up handoff commit includes that documentation update and is the exact commit submitted for Full Regression before this phase is closed.
+
+
+
+---
+
+## Current handoff update — 2026-11-12 (learner-entered equivalent-fraction construction practice)
+
+**Branch:** `refactor/professional-v1`; LIVE `main` untouched.
+
+### Built
+
+The existing three-item recognition practice remains unchanged. After completing it, the learner may choose a separate, extra practice episode: **Maak zelf een gelijkwaardige breuk**.
+
+- The learner sees the target fraction as an area model and a symbolic expression with the target denominator supplied and the numerator left blank.
+- The learner enters the numerator in a small, reusable numeric-input control; PacoGO does not prefill or calculate it.
+- Three examples reuse fraction values already present in the existing practice set: 1/2 with denominator 4, 1/3 with denominator 6, and 2/3 with denominator 6.
+- The response is checked for equivalent value by the mathematical equality of the two fractions. The feedback is deliberately conceptual and does not prescribe a school-specific procedure.
+- The learner can retry an incorrect answer. Only after a correct response does the next item become available.
+- Raw entered numerators and response classifications are stored locally under a separate learner-keyed, versioned storage key. The previous recognition-practice storage is not changed or migrated.
+
+### Formal and instructional boundaries
+
+- These three new local task identifiers are **formative practice identifiers only**, not FR2 registry task IDs, not FR2-T01–T05, and not formal evidence tasks.
+- No FR2 development/claim/evidence mapping, assessment rule, mastery rule, learner-state decision or curriculum registry entry was changed.
+- The activity is optional and is not automatically selected from the diagnostic. It does not turn a diagnostic classification into a learner trait or next-action decision.
+- The prompt uses a method-neutral visual/conceptual explanation. It does not claim to match Zyon's school method and does not implement the unapproved Adaptive Instruction Layer proposal.
+- The denominator is supplied; this first slice captures one learner-entered numerator action. It does **not** yet provide multi-step common-denominator addition/subtraction, mixed-number work, or the complete fraction route.
+- No Supabase, database, RPC, RLS or formal learner-data changes were made.
+
+### Implementation files
+
+- `pacogo-engine/fraction-numerator-input.js` — reusable small numerator input control.
+- `pacogo-engine/fraction-construction-practice-session.js` — separate learner-isolated formative session and raw response store.
+- `pacogo-engine/fraction-construction-practice-session.test.js` — session, equivalence evaluator and learner-isolation tests.
+- `curriculum-fr2-practice-learner.html` — optional construction practice entry and learner flow.
+- `test/browser/curriculum-fr2-practice-learner.browser.test.js` — browser flow and local-storage boundary coverage.
+
+### Regression history
+
+- Feature commit `4908257e7e428e1cea47a0167b0fa44ac3e3b1f3`: Full Regression #3550 was RED in the new session unit test. The exact cause was an over-escaped digit pattern in the raw-numerator parser, which classified digit strings as invalid input. The failure was in implementation code, not the test.
+- Corrected parser commit: `216e5b4c08b0e20c9ff59271d0a773d8d567982c`. The test was not weakened or changed to hide the defect.
+- Browser proof #683 / run `43219389468` was GREEN on the feature commit, but it does not supersede the failed Full Regression.
+- This handoff/inventory update is submitted as a separate documentation commit. Full Regression on its exact resulting commit is the verification gate for this phase; do not report the phase green until that run is actually complete and successful.
+
+### Next concrete step
+
+Review the learner-facing presentation in PacoGO TEST before using it with Zyon. Then continue the fraction route with the next source-supported practice capability. Before adding common-denominator operations or mixed-number teaching, resolve the appropriate SLO/FR1 curriculum scope and the instructional-method provenance/unknown-method boundary. Do not expand FR2 to absorb those operations, infer Zyon's school method from his answers, or implement the unapproved Adaptive Instruction Layer proposal as if it were approved.
+
+The complete executable fraction learning route remains open.

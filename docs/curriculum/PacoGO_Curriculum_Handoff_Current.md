@@ -6403,3 +6403,8 @@ The two original fractions are shown as area models. Only the active step and it
 Build the analogous optional F3 subtraction practice from the existing task-set sequence: 1/2 − 2/5, learner-selected common denominator, both learner-entered equivalent numerators, and learner-entered subtraction result. Continue accepting any mathematically valid common denominator and keep the activity non-formal. Do not add mixed-number teaching or formal FR1/FR2 task bindings until the relevant curriculum scope and method provenance are resolved.
 
 The complete executable fraction learning route remains open.
+
+
+### Verification target for the 2026-11-12 addition-practice handoff
+
+The staged F2 addition practice was verified by Full Regression #3556 (GREEN) on `287d327daa81928c1bbc9500ad0c5231b60ada51`. This follow-up handoff/inventory documentation commit must also pass Full Regression on its exact resulting commit before the phase is closed.

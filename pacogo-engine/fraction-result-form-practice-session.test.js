@@ -3,6 +3,8 @@ import {createFractionResultFormPracticeSession} from "./fraction-result-form-pr
 function memory(){const m=new Map();return{getItem:k=>m.has(k)?m.get(k):null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k),entries:()=>[...m.entries()]};}
 const storage=memory(),a=createFractionResultFormPracticeSession({learnerKey:"learner-a",storage}),b=createFractionResultFormPracticeSession({learnerKey:"learner-b",storage});
 assert.equal(a.getCurrentStage().expression,"15/10 = ? ?/?");
+assert.equal(a.recordResponse({rawValues:["1","1","2"]}).classification,"equivalent_wrong_form");
+assert.equal(a.getCurrentStage().prompt,"Schrijf 15/10 eerst als 1 5/10. Laat de noemer 10 staan; vereenvoudigen doe je in de volgende stap.");
 assert.equal(a.recordResponse({rawValues:["1","4","10"]}).classification,"incorrect_mixed_number");
 assert.equal(a.recordResponse({rawValues:["1","5","10"]}).classification,"valid");
 assert.equal(a.getCurrentStage().expression,"1 5/10 = 1 ?/?");

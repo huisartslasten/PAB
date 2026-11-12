@@ -516,6 +516,8 @@
     }
     resultFormFeedback.textContent = result.classification === "invalid_input"
       ? "Vul alle vakjes met niet-negatieve hele getallen in."
+      : result.classification === "equivalent_wrong_form"
+        ? "Dit is dezelfde hoeveelheid, maar laat voor deze tussenstap de noemer 10 staan: vul 1 5/10 in. Vereenvoudigen komt hierna."
       : result.classification === "not_simplified"
         ? "Deze breuk betekent misschien evenveel, maar is nog niet volledig vereenvoudigd. Probeer opnieuw."
         : "Controleer het hele getal, de teller en de noemer. Schrijf eerst 15/10 als een gemengd getal.";

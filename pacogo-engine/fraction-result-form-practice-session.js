@@ -1,6 +1,6 @@
 const FRACTION_RESULT_FORM_TASK = Object.freeze({id:"fraction-result-form-15-10",numerator:15,denominator:10});
 const STAGES = Object.freeze(["mixed_number","simplification"]);
-const CLASSIFICATIONS = Object.freeze(["valid","invalid_input","incorrect_mixed_number","not_simplified"]);
+const CLASSIFICATIONS = Object.freeze(["valid","invalid_input","incorrect_mixed_number","equivalent_wrong_form","not_simplified"]);
 function createFractionResultFormPracticeSession({learnerKey,storage=globalThis.localStorage}={}) {
  const learner=String(learnerKey||"").trim();
  if(!learner) throw new TypeError("A learner key is required.");
@@ -16,7 +16,7 @@ function createFractionResultFormPracticeSession({learnerKey,storage=globalThis.
  }
  function getCurrentStage() {
   const p=read();
-  if(!p.completedStageIds.includes("mixed_number")) return Object.freeze({taskId:FRACTION_RESULT_FORM_TASK.id,stageId:"mixed_number",stageNumber:1,totalStages:2,prompt:"Schrijf 15/10 als een gemengd getal. Vul zelf het hele getal, de teller en de noemer in.",expression:"15/10 = ? ?/?",inputLabels:["Heel getal","Teller van het breukdeel","Noemer van het breukdeel"]});
+  if(!p.completedStageIds.includes("mixed_number")) return Object.freeze({taskId:FRACTION_RESULT_FORM_TASK.id,stageId:"mixed_number",stageNumber:1,totalStages:2,prompt:"Schrijf 15/10 eerst als 1 5/10. Laat de noemer 10 staan; vereenvoudigen doe je in de volgende stap.",expression:"15/10 = ? ?/?",inputLabels:["Heel getal","Teller van het breukdeel","Noemer van het breukdeel"]});
   if(!p.completedStageIds.includes("simplification")) return Object.freeze({taskId:FRACTION_RESULT_FORM_TASK.id,stageId:"simplification",stageNumber:2,totalStages:2,prompt:"Vereenvoudig nu zelf het breukdeel. Vul de nieuwe teller en noemer in.",expression:"1 5/10 = 1 ?/?",inputLabels:["Vereenvoudigde teller","Vereenvoudigde noemer"]});
   return null;
  }
@@ -37,8 +37,10 @@ function createFractionResultFormPracticeSession({learnerKey,storage=globalThis.
    if(current.stageId==="mixed_number"){
     const [whole,numerator,denominator]=parsed;
     if(denominator>0&&numerator<denominator){
-     const sameValue=whole*denominator+numerator===FRACTION_RESULT_FORM_TASK.numerator*denominator/FRACTION_RESULT_FORM_TASK.denominator;
-     classification=sameValue&&denominator===FRACTION_RESULT_FORM_TASK.denominator?"valid":"incorrect_mixed_number";
+     const sameValue=(whole*denominator+numerator)*FRACTION_RESULT_FORM_TASK.denominator===FRACTION_RESULT_FORM_TASK.numerator*denominator;
+     classification=sameValue
+      ? denominator===FRACTION_RESULT_FORM_TASK.denominator?"valid":"equivalent_wrong_form"
+      : "incorrect_mixed_number";
     } else classification="incorrect_mixed_number";
    } else {
     const [numerator,denominator]=parsed;

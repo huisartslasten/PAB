@@ -149,6 +149,7 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await expect(page.locator("#resultFormCard")).toBeVisible();
   await expect(page.locator("#resultFormExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "15/10 = ? ?/?");
   await expect(page.locator("#resultFormExpression input")).toHaveCount(3);
+  await expect(page.locator("#resultFormPrompt")).toContainText("Laat de noemer 10 staan");
   await page.getByRole("textbox", { name: "Heel getal" }).fill("1");
   await page.getByRole("textbox", { name: "Teller van het breukdeel" }).fill("4");
   await page.getByRole("textbox", { name: "Noemer van het breukdeel" }).fill("10");

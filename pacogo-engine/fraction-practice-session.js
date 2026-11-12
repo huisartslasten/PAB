@@ -89,10 +89,8 @@ function createFractionPracticeSession({ learnerKey, storage = globalThis.localS
     if (typeof correct !== "boolean") throw new TypeError("correct must be a boolean.");
     const progress = readProgress();
     progress.attemptsByTask[taskId] = (progress.attemptsByTask[taskId] || 0) + 1;
-    if (correct) {
-      progress.correctAnswers += 1;
-      if (!progress.completedTaskIds.includes(taskId)) progress.completedTaskIds.push(taskId);
-    }
+    if (correct) progress.correctAnswers += 1;
+    if (!progress.completedTaskIds.includes(taskId)) progress.completedTaskIds.push(taskId);
     writeProgress(progress);
     return getProgress();
   }

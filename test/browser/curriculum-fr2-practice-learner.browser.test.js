@@ -65,9 +65,7 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await page.locator(".pacogo-fraction-interface__option").nth(1).click();
   await page.getByRole("button", { name: "Controleren" }).click();
   await expect(page.locator("#feedback")).toContainText("Deze optie laat niet evenveel blauw zien");
-  await page.getByRole("button", { name: "Nog een keer proberen" }).click();
-  await page.locator(".pacogo-fraction-interface__option").nth(0).click();
-  await page.getByRole("button", { name: "Controleren" }).click();
+  await expect(page.getByRole("button", { name: "Volgende oefening" })).toBeVisible();
   await page.getByRole("button", { name: "Volgende oefening" }).click();
 
   await expect(page.locator("#progress")).toContainText("2 afgerond");

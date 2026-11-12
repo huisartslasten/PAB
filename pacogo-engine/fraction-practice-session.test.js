@@ -18,10 +18,9 @@ const learnerB = createFractionPracticeSession({ learnerKey: "learner-b", storag
 assert.equal(FRACTION_PRACTICE_TASKS.length, 3);
 assert.equal(learnerA.getProgress().completedCount, 0);
 assert.equal(learnerA.getNextTaskId(), "FR2-PRACTICE-01");
-assert.equal(learnerA.recordAnswer({ taskId: "FR2-PRACTICE-01", correct: false }).completedCount, 0);
+assert.equal(learnerA.recordAnswer({ taskId: "FR2-PRACTICE-01", correct: false }).completedCount, 1);
+assert.equal(learnerA.getProgress().correctAnswers, 0);
 assert.equal(learnerA.getProgress().attemptsByTask["FR2-PRACTICE-01"], 1);
-assert.equal(learnerA.getNextTaskId(), "FR2-PRACTICE-01");
-assert.equal(learnerA.recordAnswer({ taskId: "FR2-PRACTICE-01", correct: true }).completedCount, 1);
 assert.equal(learnerA.getNextTaskId(), "FR2-PRACTICE-02");
 assert.equal(learnerB.getProgress().completedCount, 0);
 assert.equal(learnerB.getProgress().correctAnswers, 0);
@@ -29,7 +28,7 @@ assert.equal(learnerB.getProgress().correctAnswers, 0);
 learnerA.recordAnswer({ taskId: "FR2-PRACTICE-02", correct: true });
 learnerA.recordAnswer({ taskId: "FR2-PRACTICE-03", correct: true });
 assert.equal(learnerA.getProgress().isComplete, true);
-assert.equal(learnerA.getProgress().correctAnswers, 3);
+assert.equal(learnerA.getProgress().correctAnswers, 2);
 assert.equal(learnerA.getNextTaskId(), null);
 
 const persistedEntries = storage.entries();

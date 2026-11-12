@@ -799,11 +799,14 @@
     } else {
       feedback.className = "error";
       feedback.textContent = "Deze optie laat niet evenveel blauw zien. Vergelijk de twee modellen: de juiste verdeling heeft dezelfde hoeveelheid blauw als het doel.";
-      const retry = document.createElement("button");
-      retry.type = "button";
-      retry.textContent = "Nog een keer proberen";
-      retry.addEventListener("click", renderTask);
-      nextAction.replaceChildren(retry);
+      const next = document.createElement("button");
+      next.type = "button";
+      next.textContent = progress.completedCount === progress.totalCount ? "Bekijk resultaat" : "Volgende oefening";
+      next.addEventListener("click", () => {
+        if (practiceSession.getProgress().isComplete) showCompleted();
+        else renderTask();
+      });
+      nextAction.replaceChildren(next);
     }
   }
 

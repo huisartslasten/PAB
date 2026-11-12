@@ -15,17 +15,17 @@ function renderFractionAnswerInput({ mount, onChange = () => {}, labels = {} } =
   const reduced = createFraction(text.simplifiedNumerator, text.simplifiedDenominator, "simplified");
   reducedLine.append(reducedEquals, reduced.root); line.append(whole.wrapper, primary.root, simplify); root.append(line, toggleLabel, reducedLine); mount.replaceChildren(root);
   let simplified = false;
-  function createField(label, key) {
+  function createField(label, key, accessibleLabel = label) {
     const wrapper = document.createElement("label"); wrapper.className = "pacogo-fraction-answer__field";
     const caption = document.createElement("span"); caption.textContent = label;
-    const input = document.createElement("input"); input.type = "text"; input.inputMode = "numeric"; input.autocomplete = "off"; input.maxLength = 6; input.className = "pacogo-fraction-answer__input"; input.setAttribute("aria-label", label); input.dataset.answerPart = key;
+    const input = document.createElement("input"); input.type = "text"; input.inputMode = "numeric"; input.autocomplete = "off"; input.maxLength = 6; input.className = "pacogo-fraction-answer__input"; input.setAttribute("aria-label", accessibleLabel); input.dataset.answerPart = key;
     wrapper.append(caption, input); return { wrapper, input };
   }
   function createFraction(numeratorLabel, denominatorLabel, prefix) {
     const root = document.createElement("span"); root.className = "pacogo-fraction-answer__fraction";
-    const numerator = createField(numeratorLabel, prefix + "Numerator");
+    const numerator = createField(numeratorLabel, prefix + "Numerator", prefix === "simplified" ? "Vereenvoudigde teller" : numeratorLabel);
     const divider = document.createElement("span"); divider.className = "pacogo-fraction-answer__divider";
-    const denominator = createField(denominatorLabel, prefix + "Denominator");
+    const denominator = createField(denominatorLabel, prefix + "Denominator", prefix === "simplified" ? "Vereenvoudigde noemer" : denominatorLabel);
     root.append(numerator.wrapper, divider, denominator.wrapper); return { root, numerator: numerator.input, denominator: denominator.input };
   }
   function getValues() { return Object.freeze({ wholeNumberEnabled: toggle.checked, wholeNumber: whole.input.value, numerator: primary.numerator.value, denominator: primary.denominator.value, simplified, simplifiedNumerator: reduced.numerator.value, simplifiedDenominator: reduced.denominator.value }); }

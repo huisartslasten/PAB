@@ -6463,3 +6463,16 @@ The F2 arithmetic practice has been refactored so its active numeric response is
 - Full Regression #3561 / run 43226477223: RED on exact commit 921efb10cd078cb0fda5047e9d5f9016b33a9f73. Curriculum engine, architecture, Node and Vitest checks passed. Browser regression reached the complete F2 route but detected two page errors during incorrect-answer retries: a stale call still referenced the removed addition input instance when restoring focus.
 - Root cause: one occurrence remained because the first code transformation replaced only the first matching focus call. This is an implementation defect, not a browser-test defect.
 - The stale declaration and reference are removed; both invalid-response focus paths now target the active inline expression input. The browser test continues to exercise incorrect common denominator and incorrect arithmetic result, and continues to require zero page errors. Full Regression on the exact correction commit is the next gate.
+
+
+### Regression closure — F2 inline expression input — 2026-11-12
+
+- Implementation commit: `2da5177fe445a5197b94cab1981211f15ab07449` introduced the reusable `pacogo-engine/fraction-practice-equation.js` renderer and moved F2 practice inputs into the mathematical expression. The F2 session remains four learner-entered actions; raw storage and classification are unchanged.
+- Full Regression #3560 / run 43226149457: RED because a second browser assertion still expected the input in the former separate host. The assertion was corrected to verify the inline location and no input in the old host.
+- Full Regression #3561 / run 43226477223: RED because one invalid-response path still referenced the removed input instance for focus. That implementation reference and its stale declaration were removed; the browser retry coverage remains.
+- Full Regression #3562 / run 43226779723: **GREEN** on exact commit `774bfeae618c301cd33c2d83c4b24d4ed3a57b82`. All 20 workflow steps passed, including curriculum engine, architecture boundaries, Node, Vitest, browser regression and clean working tree.
+- This closure documentation update must itself pass Full Regression on its exact resulting commit before the phase is closed.
+
+### Next concrete step
+
+Implement the optional learner-controlled mixed-number conversion and simplification stages on the non-formal arithmetic practice result flow. Use a proper/improper fraction-capable equation renderer and preserve raw whole-number/numerator/denominator entries. Only after that shared result flow is verified, reuse the same inline equation input for the separate F3 subtraction practice (1/2 − 2/5). Do not modify the diagnostic F1–F4 contract or FR1/FR2 formal curriculum mappings.

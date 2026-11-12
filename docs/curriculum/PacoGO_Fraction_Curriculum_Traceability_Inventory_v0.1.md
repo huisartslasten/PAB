@@ -428,3 +428,12 @@ Full Regression #3560 / run 43226149457 was RED on commit 2da5177fe445a5197b94ca
 ### Regression note — stale focus reference in inline F2 entry
 
 Full Regression #3561 / run 43226477223 was RED on 921efb10cd078cb0fda5047e9d5f9016b33a9f73. Browser regression found a real implementation defect: a remaining error-retry path attempted to focus the removed separate input instance. The stale reference/declaration is removed and focus is directed to the inline equation field. Existing incorrect-answer retry coverage and zero-browser-error assertion remain intact. Await exact-commit Full Regression.
+
+
+### Regression closure — F2 inline expression input — 2026-11-12
+
+The F2 practice input now appears inside the equation through the new reusable arithmetic-expression renderer. The previous separate answer host contains only the submit action. Raw F2 session responses, step ordering, mathematical checks, local-only storage and learner isolation remain unchanged.
+
+Regression history: #3560 RED due to a stale old-location browser assertion; #3561 RED due to a stale focus reference in an invalid-response path; both were corrected without weakening coverage. Full Regression #3562 / run 43226779723: **GREEN** on exact commit `774bfeae618c301cd33c2d83c4b24d4ed3a57b82`; all 20 steps passed, including browser regression and clean working tree. This documentation closure requires its own exact-commit Full Regression.
+
+Next: build the optional learner-controlled mixed-number and simplification result stages; then reuse the inline equation input for F3 subtraction practice. No formal curriculum, diagnostic, mastery or Supabase changes.

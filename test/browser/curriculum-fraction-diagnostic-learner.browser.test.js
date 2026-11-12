@@ -85,7 +85,7 @@ test('staged diagnostic asks one learner action at a time and completes F1-F4 wi
   await answerOne(page, 7, 'Welke teller krijg je als uitkomst?');
 
   await expect(card.locator('h2')).toHaveText('Breuken aftrekken');
-  await expect(card.locator('.fraction-diagnostic-expression')).toHaveAttribute('data-expression', '1/2 − 2/5');
+  await expect(card.locator('.fraction-diagnostic-expression')).toHaveAttribute('data-expression', '1/2 − 2/5 → noemer ?');
   await answerOne(page, 10, 'Welke noemer gebruik je voor beide breuken?');
   await answerOne(page, 5, 'Vul de ontbrekende teller in.');
   await answerOne(page, 4, 'Vul de ontbrekende teller in.');

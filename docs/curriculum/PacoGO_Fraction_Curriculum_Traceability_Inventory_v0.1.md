@@ -462,3 +462,8 @@ Added optional non-formal practice based on the existing diagnostic F3 episode `
 Any positive common multiple of 2 and 5 is accepted. Browser coverage uses 20 to prove that the learner is not restricted to the least common denominator, then checks the 10 − 8 = 2 subtraction. The final result is shown as 2/20 and is not automatically simplified. Invalid responses remain retryable and raw attempts/classifications are stored in a separate learner-keyed local-only store. This does not modify diagnostic F3, formal curriculum/evidence contracts, mastery, learner state or Supabase.
 
 Next: exact-commit Full Regression; then review the complete fraction practice route in PacoGO TEST before Zyon uses it.
+
+
+### Regression investigation — F3 browser scenario ordering — 2026-11-12
+
+Full Regression #3566 / run 43231374670: RED on `a2d66787f702f89dca8eb0b98d93f504fcc49317`. All non-browser checks passed. Browser test failure was caused by asserting five local storage records before executing the new F3 route. The F3 browser scenario is moved before the local-storage snapshot; no assertion is removed or weakened. The failed run did not exercise the F3 browser route, so re-run exact-commit Full Regression is required before judging the runtime.

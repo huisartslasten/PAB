@@ -164,6 +164,39 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await expect(page.locator("#resultFormExpression")).toHaveText("1 5/10 = 1 1/2");
   await expect(page.locator("#resultFormFeedback")).toContainText("eerst het gemengde getal gemaakt");
 
+  await page.getByRole("button", { name: "Terug naar optellen" }).click();
+  await page.getByRole("button", { name: "Oefenen met breuken aftrekken" }).click();
+  await expect(page.locator("#subtractionPracticeCard")).toBeVisible();
+  await expect(page.locator("#subtractionVisual .pacogo-fraction-representation--area")).toHaveCount(2);
+  await expect(page.locator("#subtractionExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "1/2 − 2/5 → noemer ?");
+  await page.getByRole("textbox", { name: "Gemeenschappelijke noemer" }).fill("4");
+  await page.getByRole("button", { name: "Controleren" }).last().click();
+  await expect(page.locator("#subtractionFeedback")).toContainText("deelbaar zijn door 2 én door 5");
+  await page.getByRole("textbox", { name: "Gemeenschappelijke noemer" }).fill("20");
+  await page.getByRole("button", { name: "Controleren" }).last().click();
+  await page.getByRole("button", { name: "Volgende stap" }).click();
+  await expect(page.locator("#subtractionExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "1/2 = ?/20");
+  await page.getByRole("textbox", { name: "Nieuwe teller voor 1/2" }).fill("9");
+  await page.getByRole("button", { name: "Controleren" }).last().click();
+  await expect(page.locator("#subtractionFeedback")).toContainText("hoeveelheid gelijk");
+  await page.getByRole("textbox", { name: "Nieuwe teller voor 1/2" }).fill("10");
+  await page.getByRole("button", { name: "Controleren" }).last().click();
+  await page.getByRole("button", { name: "Volgende stap" }).click();
+  await expect(page.locator("#subtractionExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "2/5 = ?/20");
+  await page.getByRole("textbox", { name: "Nieuwe teller voor 2/5" }).fill("7");
+  await page.getByRole("button", { name: "Controleren" }).last().click();
+  await page.getByRole("textbox", { name: "Nieuwe teller voor 2/5" }).fill("8");
+  await page.getByRole("button", { name: "Controleren" }).last().click();
+  await page.getByRole("button", { name: "Volgende stap" }).click();
+  await expect(page.locator("#subtractionExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "10 − 8 = ?");
+  await page.getByRole("textbox", { name: "Verschil van de tellers" }).fill("3");
+  await page.getByRole("button", { name: "Controleren" }).last().click();
+  await expect(page.locator("#subtractionFeedback")).toContainText("Controleer de aftrekking");
+  await page.getByRole("textbox", { name: "Verschil van de tellers" }).fill("2");
+  await page.getByRole("button", { name: "Controleren" }).last().click();
+  await page.getByRole("button", { name: "Bekijk uitkomst" }).click();
+  await expect(page.locator("#subtractionExpression")).toHaveText("Jouw uitkomst: 2/20");
+
   const state = await page.evaluate(() => ({
     calls: window.__pacoPracticeTest.calls,
     local: Object.entries(localStorage).filter(([key]) => key.startsWith("pacogo:fraction-practice:") || key.startsWith("pacogo:fraction-construction-practice:") || key.startsWith("pacogo:fraction-addition-practice:") || key.startsWith("pacogo:fraction-result-form-practice:") || key.startsWith("pacogo:fraction-subtraction-practice:"))
@@ -198,37 +231,6 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   expect(subtractionState[0]).toContain(learnerKey);
   for (const raw of ['"rawValue":"4"','"rawValue":"20"','"rawValue":"9"','"rawValue":"10"','"rawValue":"7"','"rawValue":"8"','"rawValue":"3"','"rawValue":"2"']) expect(subtractionState[1]).toContain(raw);
   expect(subtractionState[1]).not.toContain(learnerKey);
-  await page.getByRole("button", { name: "Terug naar optellen" }).click();
-  await page.getByRole("button", { name: "Oefenen met breuken aftrekken" }).click();
-  await expect(page.locator("#subtractionPracticeCard")).toBeVisible();
-  await expect(page.locator("#subtractionVisual .pacogo-fraction-representation--area")).toHaveCount(2);
-  await expect(page.locator("#subtractionExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "1/2 − 2/5 → noemer ?");
-  await page.getByRole("textbox", { name: "Gemeenschappelijke noemer" }).fill("4");
-  await page.getByRole("button", { name: "Controleren" }).last().click();
-  await expect(page.locator("#subtractionFeedback")).toContainText("deelbaar zijn door 2 én door 5");
-  await page.getByRole("textbox", { name: "Gemeenschappelijke noemer" }).fill("20");
-  await page.getByRole("button", { name: "Controleren" }).last().click();
-  await page.getByRole("button", { name: "Volgende stap" }).click();
-  await expect(page.locator("#subtractionExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "1/2 = ?/20");
-  await page.getByRole("textbox", { name: "Nieuwe teller voor 1/2" }).fill("9");
-  await page.getByRole("button", { name: "Controleren" }).last().click();
-  await expect(page.locator("#subtractionFeedback")).toContainText("hoeveelheid gelijk");
-  await page.getByRole("textbox", { name: "Nieuwe teller voor 1/2" }).fill("10");
-  await page.getByRole("button", { name: "Controleren" }).last().click();
-  await page.getByRole("button", { name: "Volgende stap" }).click();
-  await expect(page.locator("#subtractionExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "2/5 = ?/20");
-  await page.getByRole("textbox", { name: "Nieuwe teller voor 2/5" }).fill("7");
-  await page.getByRole("button", { name: "Controleren" }).last().click();
-  await page.getByRole("textbox", { name: "Nieuwe teller voor 2/5" }).fill("8");
-  await page.getByRole("button", { name: "Controleren" }).last().click();
-  await page.getByRole("button", { name: "Volgende stap" }).click();
-  await expect(page.locator("#subtractionExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "10 − 8 = ?");
-  await page.getByRole("textbox", { name: "Verschil van de tellers" }).fill("3");
-  await page.getByRole("button", { name: "Controleren" }).last().click();
-  await expect(page.locator("#subtractionFeedback")).toContainText("Controleer de aftrekking");
-  await page.getByRole("textbox", { name: "Verschil van de tellers" }).fill("2");
-  await page.getByRole("button", { name: "Controleren" }).last().click();
-  await page.getByRole("button", { name: "Bekijk uitkomst" }).click();
-  await expect(page.locator("#subtractionExpression")).toHaveText("Jouw uitkomst: 2/20");
+
   expect(pageErrors).toEqual([]);
 });

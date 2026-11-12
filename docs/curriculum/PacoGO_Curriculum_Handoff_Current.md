@@ -6510,3 +6510,10 @@ Added a separate optional non-formal practice episode based on the existing diag
 The practice accepts any positive common multiple of 2 and 5, not only 10. The browser regression exercises 20 as an alternate denominator and verifies 10 − 8 = 2, displaying the learner's result as 2/20 without automatically simplifying it. Invalid denominator, conversion and subtraction responses can be retried. Raw attempts and classifications are saved in a separate learner-keyed versioned local-only store. No diagnostic F3 session is started or modified; no formal evidence, mastery, next action, learner state or Supabase writes occur.
 
 This is non-formal practice derived from the existing diagnostic action sequence, not a formal FR1/FR2 task/evidence mapping. Full Regression on the exact implementation commit is required before closure.
+
+
+### Regression investigation — F3 browser scenario ordering — 2026-11-12
+
+- Full Regression #3566 / run 43231374670: RED on exact implementation commit `a2d66787f702f89dca8eb0b98d93f504fcc49317`. Curriculum engine, architecture, Node and Vitest passed. Browser regression failed because the test asserted five local stores before executing the new F3 route; the snapshot therefore correctly contained only the four stores created by earlier episodes.
+- This is a browser-test ordering defect: the F3 interaction scenario was appended after the local-storage snapshot/assertions. The F3 runtime had not yet been exercised by that run, so no conclusion about its browser behavior can be drawn from #3566.
+- The complete F3 route is moved before the storage snapshot. No assertion is removed or weakened; the five-store assertion now checks after the F3 episode has actually run. Re-run Full Regression on the exact correction commit before proceeding.

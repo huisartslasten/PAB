@@ -67,6 +67,7 @@
   import { createFractionLearningInterface } from "./pacogo-engine/fraction-learning-interface.js";
   import { renderFractionRepresentation } from "./pacogo-engine/fraction-learning-interface-renderers.js";
   import { FRACTION_PRACTICE_TASKS, createFractionPracticeSession } from "./pacogo-engine/fraction-practice-session.js";
+  import { getStudentLearningProfile } from "./src/core/student-registry.js";
 
   const app = createPacoGOApp({ supabaseLib: window.supabase, storage: window.localStorage });
   const setup = document.querySelector("#learnerSetup");
@@ -83,6 +84,7 @@
   let practiceSession = null;
   let currentTask = null;
   let interfaceInstance = null;
+  const selectedStudent = new URLSearchParams(window.location.search).get("viewStudent") || "";
 
   function setSetupError(error) {
     setupStatus.textContent = error?.message || "De leerlingprofielen konden niet worden geladen.";
@@ -103,6 +105,20 @@
     const session = await app.initializeSession();
     if (!session || !app.auth.isParent) {
       window.location.replace("auth.html?returnTo=curriculum-fr2-practice-learner.html");
+      return;
+    }
+    if (selectedStudent) {
+      const studentProfile = getStudentLearningProfile(selectedStudent);
+      if (!studentProfile) {
+        setupStatus.textContent = "De geselecteerde leerling is niet bekend in PacoGO. Open de oefenroute opnieuw vanuit de leerlingomgeving.";
+        return;
+      }
+      const linkedLearner = await app.learnerCurriculum.getAppLearnerProfile(studentProfile.curriculumKey);
+      if (!linkedLearner) {
+        setupStatus.textContent = "Voor " + selectedStudent + " is geen gekoppeld curriculumprofiel gevonden. Open Beheer om het profiel te koppelen.";
+        return;
+      }
+      startPractice(linkedLearner);
       return;
     }
     const learners = await app.learnerCurriculum.listLearners();
@@ -251,7 +267,9 @@
     document.querySelector("#selectedLearnerLabel").textContent =
       "PacoGO • " + learner.display_name + " • Rekenen • Breuken";
     document.querySelector("#openFractionDiagnostic").onclick = () => {
-      window.location.href = "curriculum-fraction-diagnostic-learner.html";
+      const diagnosticUrl = new URL("curriculum-fraction-diagnostic-learner.html", window.location.href);
+      if (selectedStudent) diagnosticUrl.searchParams.set("viewStudent", selectedStudent);
+      window.location.href = diagnosticUrl.toString();
     };
     renderTask();
   }

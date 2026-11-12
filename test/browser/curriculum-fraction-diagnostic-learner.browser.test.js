@@ -123,6 +123,16 @@ test('staged diagnostic asks one learner action at a time and completes F1-F4 wi
   expect(state.stored[0][1]).toContain('"schemaVersion":2');
   expect(state.stored[0][1]).toContain('"rawValue":14');
   expect(errors).toEqual([]);
+
+  await page.getByRole('button', { name: 'Start breuken oefenen' }).click();
+  await expect(page).toHaveURL(/curriculum-fr2-practice-learner\.html\?viewStudent=Zyon/);
+  await expect(page.locator('#exerciseCard')).toBeVisible();
+  await expect(page.locator('#selectedLearnerLabel')).toContainText('Zyon');
+
+  await page.getByRole('button', { name: 'Start breukendiagnose' }).click();
+  await expect(page).toHaveURL(/curriculum-fraction-diagnostic-learner\.html\?viewStudent=Zyon/);
+  await expect(page.locator('#fraction-diagnostic-result')).toBeVisible();
+  await expect(page.locator('#fraction-diagnostic-result h2')).toHaveText('Diagnose afgerond');
 });
 
 test('F4 is skipped in the learner interface when F3 prerequisites are not all demonstrated', async ({ page }) => {

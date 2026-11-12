@@ -5869,3 +5869,53 @@ Before any evaluator implementation, run Full Regression on the exact current br
 - Task-set contract update commit: 0456bd12402ad3f57e3d31b2c737e446706333e9.
 - Handoff update commit: pending.
 - The final handoff commit must receive its own Full Regression before this design phase is closed.
+
+---
+
+## Current handoff update — 2026-11-11/12 (staged fraction diagnostic v2 session engine)
+
+**Branch:** `refactor/professional-v1`. LIVE `main` untouched.
+
+### What was built
+
+Added a separate formative v2 session engine:
+
+- `pacogo-engine/fraction-diagnostic-session-v2.js`
+- `pacogo-engine/fraction-diagnostic-session-v2.test.js`
+
+The v2 engine exposes exactly one current learner action at a time and accepts one non-negative whole-number response per submission. It advances in the fixed F1 → F2 → F3 order, and exposes F4 only when every F3 action is classified `valid`.
+
+The engine stores the raw submitted value, action ID, classification and explicit dependency action IDs in presentation order. It preserves incomplete work when the learner stops. F4 is recorded as `not_administered` with `prerequisite_not_demonstrated` when the F3 gate is not met.
+
+F1–F4 use the previously implemented pure mathematical evaluators. The F4 first-numerator evaluation also preserves dependency on an incorrect mixed-number conversion, so work that correctly follows the learner's submitted conversion is not counted as a second independent error.
+
+Storage uses the separate namespace `pacogo:fraction-diagnostic:v2:<learnerKey>`. The legacy v1 session module and its stored data are unchanged. No formal evidence, inference, mastery, next-action, learner-state, registry or Supabase writes were added.
+
+### Regression investigation and verification
+
+The first Full Regression attempts exposed source-formatting and test-fixture errors. They were inspected at the exact failing lines:
+- an invalid named-export syntax was corrected;
+- dependent-consistency expectations were aligned with the mathematical relation;
+- the F4 positive and negative gate fixtures were separated so the positive case actually has four valid F3 actions and the negative case has an invalid common denominator;
+- literal escaped newline sequences introduced while updating source files were replaced with real line breaks.
+
+No tests were removed or skipped, and no production behavior was changed merely to satisfy an incorrect test expectation.
+
+- Full Regression #3511 / run `43134106967`: **GREEN** on exact commit `f691be34069c30b2d8eb19f8d3ea304f71f28d51`.
+- The run completed the maintained Node regression, Vitest regression, browser regression and clean-working-tree verification.
+- Run URL: https://github.com/huisartslasten/PAB/actions/runs/43134106967
+
+### Current boundary
+
+The v2 session engine is implemented and unit-tested, but it is not yet connected to the learner-facing diagnostic UI. The seven-step v1 UI/session remains the current learner-facing runtime until the staged v2 interface is separately designed, implemented and browser-verified. Do not run v2 with Zyon yet.
+
+### Next concrete step
+
+Before changing the learner-facing UI, inspect the current diagnostic page and its rendering/submission flow. Design a v2 presentation adapter that renders only the current action, retains the learner's prior submitted work as context without revealing future fields or answers, and gives no correctness feedback until the diagnostic is complete. Add browser tests proving one visible input at a time, no prefilled intermediate work, the F4 gate, and no formal learner-state writes. Run Full Regression before and after that bounded UI integration.
+
+### Branch and verification state
+
+- Working branch: `refactor/professional-v1`.
+- Latest implementation commit verified before this handoff update: `f691be34069c30b2d8eb19f8d3ea304f71f28d51`.
+- Latest verified Full Regression: #3511 / run `43134106967`, **GREEN** on that exact commit.
+- This handoff update is itself a repository change and requires Full Regression on its exact resulting commit before the handoff is considered verified.

@@ -178,7 +178,7 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await expect(page.locator("#subtractionExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "1/2 = ?/20");
   await page.getByRole("textbox", { name: "Nieuwe teller voor 1/2" }).fill("9");
   await page.getByRole("button", { name: "Controleren" }).last().click();
-  await expect(page.locator("#subtractionFeedback")).toContainText("hoeveelheid gelijk");
+  await expect(page.locator("#subtractionFeedback")).toContainText("De hoeveelheid moet gelijk blijven");
   await page.getByRole("textbox", { name: "Nieuwe teller voor 1/2" }).fill("10");
   await page.getByRole("button", { name: "Controleren" }).last().click();
   await page.getByRole("button", { name: "Volgende stap" }).click();

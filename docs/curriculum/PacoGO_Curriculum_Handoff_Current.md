@@ -6517,3 +6517,9 @@ This is non-formal practice derived from the existing diagnostic action sequence
 - Full Regression #3566 / run 43231374670: RED on exact implementation commit `a2d66787f702f89dca8eb0b98d93f504fcc49317`. Curriculum engine, architecture, Node and Vitest passed. Browser regression failed because the test asserted five local stores before executing the new F3 route; the snapshot therefore correctly contained only the four stores created by earlier episodes.
 - This is a browser-test ordering defect: the F3 interaction scenario was appended after the local-storage snapshot/assertions. The F3 runtime had not yet been exercised by that run, so no conclusion about its browser behavior can be drawn from #3566.
 - The complete F3 route is moved before the storage snapshot. No assertion is removed or weakened; the five-store assertion now checks after the F3 episode has actually run. Re-run Full Regression on the exact correction commit before proceeding.
+
+
+### Regression investigation — F3 feedback assertion wording — 2026-11-12
+
+- Full Regression #3567 / run 43231737163: RED on exact commit `62bfcb135a4e77c37b4b25e89bb727e882e0f521`. Curriculum engine, architecture, Node and Vitest passed. The browser route now reached F3 and successfully passed the earlier denominator retry and alternate common-denominator (20) steps. It stopped at the first equivalent-numerator retry because the test expected the substring `hoeveelheid gelijk`, while the learner-facing message says `De hoeveelheid moet gelijk blijven`.
+- This is a wording mismatch in the assertion, not a calculation or UI runtime defect. The assertion is aligned to the exact existing learner-facing feedback text. No scenario or coverage is removed. Full Regression on the exact correction commit is required.

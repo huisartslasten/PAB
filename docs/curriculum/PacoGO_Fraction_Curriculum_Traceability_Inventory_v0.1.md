@@ -467,3 +467,8 @@ Next: exact-commit Full Regression; then review the complete fraction practice r
 ### Regression investigation — F3 browser scenario ordering — 2026-11-12
 
 Full Regression #3566 / run 43231374670: RED on `a2d66787f702f89dca8eb0b98d93f504fcc49317`. All non-browser checks passed. Browser test failure was caused by asserting five local storage records before executing the new F3 route. The F3 browser scenario is moved before the local-storage snapshot; no assertion is removed or weakened. The failed run did not exercise the F3 browser route, so re-run exact-commit Full Regression is required before judging the runtime.
+
+
+### Regression investigation — F3 feedback assertion wording — 2026-11-12
+
+Full Regression #3567 / run 43231737163 was RED on `62bfcb135a4e77c37b4b25e89bb727e882e0f521`. The F3 browser route was exercised through denominator retry and accepted alternate denominator 20. It stopped at an assertion expecting `hoeveelheid gelijk`, whereas the actual feedback says `De hoeveelheid moet gelijk blijven`. The test assertion is aligned to the exact UI wording; no coverage is removed. Await exact-commit Full Regression.

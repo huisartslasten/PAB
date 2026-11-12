@@ -1,6 +1,6 @@
 # PacoGO — Zyon Fraction Diagnostic Task Set v0.1
 
-Status: candidate task-set specification; review required before runtime implementation
+Status: implementation baseline v0.1; staged v2 runtime implemented, controlled learner use pending
 Date: 2026-11-11
 Branch: `refactor/professional-v1`
 Scope: short formative diagnostic for Zyon's current fraction work; no formal curriculum/evidence/mastery/learner-state effects
@@ -159,6 +159,8 @@ Each submitted action is appended in presentation order:
 - Store only formative diagnostic state. No formal evidence, inference, mastery, next-action, learner-state, registry or Supabase writes.
 - Session validation must reject unknown schema versions and malformed action sequences without silently coercing legacy data.
 
-## 10. Implementation authorisation boundary
+## 10. Implementation status and operational boundary
 
-This closes the task-set branch/stop and storage-schema design questions. It authorises implementation of the pure mathematical evaluators and their unit tests only after a fresh Full Regression is green on the exact current branch HEAD. It does not authorise changing the learner-facing runtime until evaluator contracts and tests are verified.
+The branch/stop and v2 storage contract above have been implemented in the formative v2 session engine and the staged learner-facing diagnostic runtime. The learner interface displays one action at a time, retains raw submitted responses, and does not write formal evidence, mastery or learner state. The legacy v1 session and storage remain untouched.
+
+This implementation status is not a claim of scientific validation or learner effectiveness. Before using the diagnostic with Zyon, review the final wording and task scope against current school material, then perform a controlled session in PacoGO TEST. Inspect the raw response sequence and classifications before making any teaching recommendation. Do not add improper-to-mixed or other probes unless current workbook/teacher material confirms they are required.

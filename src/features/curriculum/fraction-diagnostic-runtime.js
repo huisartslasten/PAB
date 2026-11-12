@@ -129,7 +129,9 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
   resultHistoryTitle.textContent = 'Ingevulde tussenstappen';
   const resultHistory = documentRef.createElement('div');
   resultHistory.className = 'fraction-diagnostic-result-history';
-  result.append(resultTitle, resultCopy, resultHistoryTitle, resultHistory);
+  const resultAction = documentRef.createElement('div');
+  resultAction.className = 'fraction-diagnostic-result-actions';
+  result.append(resultTitle, resultCopy, resultHistoryTitle, resultHistory, resultAction);
   content.append(setup, diagnostic, result);
 
   function renderMathExpression(host, text, inputLabel) {
@@ -256,8 +258,23 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
         ? 'De basisstappen zijn vastgelegd. De extra opdracht met een gemengde breuk is overgeslagen omdat de vereiste tussenstappen bij het aftrekken nog niet allemaal zijn aangetoond.'
         : 'Alle aangeboden tussenstappen zijn vastgelegd. PacoGO heeft tijdens het maken geen goed/fout-antwoorden getoond.';
     resultHistory.replaceChildren();
+    resultAction.replaceChildren();
     renderHistory(resultHistory, snapshot);
     resultHistoryTitle.hidden = resultHistory.childElementCount === 0;
+    if (state.isComplete && !state.isStopped) {
+      const practice = documentRef.createElement('button');
+      practice.type = 'button';
+      practice.id = 'fraction-diagnostic-open-practice';
+      practice.className = 'success';
+      practice.textContent = 'Start breuken oefenen';
+      practice.addEventListener('click', () => {
+        documentRef.defaultView.location.href = buildViewUrl('curriculum-fr2-practice-learner.html', {
+          student,
+          mode: context?.mode || 'student'
+        }).toString();
+      });
+      resultAction.appendChild(practice);
+    }
   }
 
   function start(selectedLearner) {

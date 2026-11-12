@@ -6355,3 +6355,51 @@ The handoff and fraction inventory updates are included in this verified code/te
 ### Verification target for the 2026-11-12 handoff closure
 
 The learner-entered equivalent-fraction practice and its browser coverage passed Full Regression #3553 on `aa2e79a53aab4f624bf13732b445d0a8b681f9db`. This follow-up commit records the regression history in the handoff and traceability inventory; Full Regression must also pass on this exact follow-up commit before the documentation phase is closed.
+
+
+
+---
+
+## Current handoff update — 2026-11-12 (staged formative fraction addition practice)
+
+**Branch:** `refactor/professional-v1`; LIVE `main` untouched.
+
+### Built
+
+A separate optional practice episode now follows the learner-entered equivalent-fraction construction practice: **1/3 + 1/4**.
+
+The learner completes four actions, one at a time:
+1. choose a common denominator for 3 and 4;
+2. enter the equivalent numerator for 1/3;
+3. enter the equivalent numerator for 1/4;
+4. add the two numerators.
+
+The two original fractions are shown as area models. Only the active step and its small integer input are shown; future steps are not displayed or prefilled. The learner can retry a step before proceeding. Any valid common denominator is accepted, not just 12. The final fraction is shown using the denominator and numerators the learner supplied; PacoGO does not silently simplify it.
+
+### Boundaries
+
+- The sequence is based on the existing F2 episode in `PacoGO_Zyon_Fraction_Diagnostic_Task_Set_v0.1.md`, but this is a **separate non-formal practice activity**, not a diagnostic replay, formal FR task, registry task ID or evidence measure.
+- It does not expand FR2 to include fraction addition and does not invent FR1 claims/evidence/task models.
+- The feedback is method-neutral: it accepts any valid common denominator and does not claim alignment with Zyon's school procedure.
+- Each step's raw input and practice classification are stored locally under a separate learner-keyed, versioned storage key. Diagnostic state and the other practice stores remain separate.
+- No formal evidence, inference, mastery, next-action, learner-state or Supabase/database writes occur.
+
+### Implementation files
+
+- `pacogo-engine/fraction-addition-practice-session.js` — four-step practice state, any-valid-common-denominator check, response history and local progress.
+- `pacogo-engine/fraction-addition-practice-session.test.js` — step order, valid/invalid denominator, equivalent numerator, arithmetic result, retry, raw response and learner isolation.
+- `pacogo-engine/fraction-numerator-input.js` — generalized reusable integer-input primitive; numerator-specific wrapper remains for the previous practice.
+- `curriculum-fr2-practice-learner.html` — visual F2 practice episode.
+- `test/browser/curriculum-fr2-practice-learner.browser.test.js` — end-to-end step visibility, retry, progression, final result and local-only persistence.
+
+### Verification
+
+- Full Regression #3556 / run `43220904553`: **GREEN** on exact commit `287d327daa81928c1bbc9500ad0c5231b60ada51`. All 20 workflow steps passed, including browser regression and clean-working-tree verification.
+- Browser proof #685 / run `43220904486`: GREEN on the same exact commit.
+- This handoff and traceability-inventory update is a separate documentation change and must be included in a Full Regression run on its exact resulting commit before closure.
+
+### Next concrete step
+
+Build the analogous optional F3 subtraction practice from the existing task-set sequence: 1/2 − 2/5, learner-selected common denominator, both learner-entered equivalent numerators, and learner-entered subtraction result. Continue accepting any mathematically valid common denominator and keep the activity non-formal. Do not add mixed-number teaching or formal FR1/FR2 task bindings until the relevant curriculum scope and method provenance are resolved.
+
+The complete executable fraction learning route remains open.

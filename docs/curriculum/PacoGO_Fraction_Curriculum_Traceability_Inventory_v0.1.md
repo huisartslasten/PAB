@@ -371,3 +371,21 @@ Full Regression #3550 was RED on intermediate feature commit `4908257e7e428e1cea
 - The browser test now runs the complete construction episode, including incorrect response/retry, correct responses, progression, completion and learner-local raw-response storage.
 - Full Regression #3553 / run `43219737675`: **GREEN** on exact commit `aa2e79a53aab4f624bf13732b445d0a8b681f9db`, all 20 workflow steps passed.
 - The current documentation closure is a follow-up project change and must be verified by Full Regression on its exact resulting commit.
+
+
+
+---
+
+## 16. Update 2026-11-12 — staged formative fraction addition practice
+
+A separate optional practice episode now implements the existing F2 step sequence for 1/3 + 1/4 as non-formal practice:
+1. learner selects a common denominator;
+2. learner enters the equivalent numerator for 1/3;
+3. learner enters the equivalent numerator for 1/4;
+4. learner enters the sum of those numerators.
+
+Two original area models remain visible. Only the active action is shown; no future input or intermediate answer is prefilled. Any valid common denominator is accepted. Incorrect responses can be retried without advancing. The final fraction uses the learner's chosen denominator and is not automatically simplified.
+
+The episode stores raw step responses and classifications in a separate learner-keyed local store. It is not a diagnostic replay or formal task/evidence measure. It does not alter FR2 scope, FR1 contracts, C1–C9, mastery, learner state or Supabase. Method alignment is not claimed.
+
+Full Regression #3556 / run `43220904553`: **GREEN** on exact code/test commit `287d327daa81928c1bbc9500ad0c5231b60ada51`; all 20 steps passed. The documentation closure requires its own Full Regression on the exact resulting commit.

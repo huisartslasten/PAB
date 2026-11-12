@@ -6108,3 +6108,52 @@ Adaptive instruction remains a cross-interface architecture requirement. It may 
 Complete the read-only inventory against the existing SLO mapping, B10 model, current registry and existing skill/task/interface implementation. Report exact existing coverage and gaps before selecting the next bounded implementation task. Do not create replacement SLO goals or a new curriculum mapping.
 
 **Latest verified Full Regression:** #3535 / run `43146457949`, GREEN on exact commit `4a2a08d457a61c675587944ddf56a357b2226c9f`. Any subsequent handoff change requires its own Full Regression.
+
+
+---
+
+## Current handoff update — 2026-11-12 (fraction-only scope correction and traceability inventory)
+
+**Branch:** `refactor/professional-v1`; LIVE `main` untouched.
+
+### Governing task scope confirmed
+
+Read the complete user-provided `PacoGO_Overdracht_Complete_Breukenleerlijn_en_Uitvoerbare_Leerroute_2026-11-12(1).txt` (607 lines). Its B → C order is controlling for the immediate product:
+- B: consolidate the already existing vertical fractions curriculum.
+- C: connect it to an executable learner route.
+- Only after the fractions line and route are completed should the same approach expand to other mathematics domains.
+
+The user-provided handoff explicitly says not to begin a broad inventory of all mathematics domains and not to invent FR1/FR2 content, skills, developments, claims, evidence targets, task models, prerequisites or mastery rules.
+
+### Scope correction
+
+A broad 32-skill implementation inventory was briefly committed in `PacoGO_SLO_Skill_Implementation_Status_Inventory_v0.1.md` (commit `727a3f675508adc1a524e60d4f9c2f334702fe28`, Full Regression #3537 GREEN) and later clarified for the C6–C9 runtime boundary (commit `fcbe76bbae6116549c43313c96b15bcb61a1d883`, Full Regression #3538 GREEN). That broad artifact is removed in the current correction because it does not match the fractions-only scope of the user-provided handoff. Do not resume the all-domain inventory.
+
+### Fraction-specific traceability findings
+
+Created `docs/curriculum/PacoGO_Fraction_Curriculum_Traceability_Inventory_v0.1.md`. It consolidates only existing fraction sources and implementation:
+- Existing SLO mapping: KD10B → FR1–FR2 plus documented A/B relationships.
+- FR2 remains the registered candidate skill `Breukequivalentie herkennen en gebruiken`, with D1–D3, C1–C3, ET1–ET6 and TM1–TM5.
+- The current registry v0.6 has FR2 but no FR1 entry. Earlier project conversations contain an FR1 working definition (“Breuken representeren en interpreteren”) and a previously discussed outline; this is recorded with provenance and is not silently promoted to a current registry contract.
+- No FR1 formal claim/evidence/task IDs are invented. The original FR1 source/decision and any existing formal fields must be recovered before registry or task binding.
+- FR2 T01–T05 remain synthetic technical demonstrations with the task/evidence alignment gaps already recorded in the FR2 audit.
+- The three-item FR2 practice route remains a narrow equivalent-fraction slice with browser-local progress.
+- Diagnostic v2 remains a staged formative F1–F4 route with local-only raw responses; it does not create formal evidence, mastery or learner state.
+- Adaptive Instruction and method-profile selection remain design proposals; classroom photographs establish demonstrated procedures, not an exclusive universal school method.
+- The current learner-facing fraction route is not an integrated canonical C1–C9 branch-specific runtime. No Supabase change is indicated.
+
+### Next concrete step
+
+Complete the **fractions-only source consolidation**:
+1. Recover the original FR1 source/decision and exact already-defined formal structure, if it exists.
+2. Bring FR1 and FR2, their source-supported developments/claims/evidence/task models and documented A/B/VR relationships into one traceable vertical fraction overview.
+3. Mark only genuine missing source definitions or contract gaps as open; do not fill them with general didactic assumptions.
+4. Use that overview immediately to design the smallest safe executable fraction practice route C, preserving the formal/formative boundary and requiring Zyon to perform the steps himself.
+
+Do not begin a broad all-domain inventory. Do not expand FR2, invent FR1 identifiers or create FR3. Do not modify runtime, registry, C1–C9, Supabase or learner data without the applicable gate and explicit authorization.
+
+### Verification before this handoff update
+
+- Previous verified commit: `8d328dcfd2e67a93709696091974c2e84a9a42da`.
+- Full Regression #3539 / run `43215088121`: GREEN on that exact commit.
+- The current fraction-specific inventory + handoff update is a project documentation change and requires Full Regression on its exact resulting commit before closure.

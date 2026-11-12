@@ -6489,3 +6489,15 @@ Stage 2 shows `1 5/10 = 1 ?/?`; the learner enters a numerator and denominator. 
 The shared inline renderer is reused with multiple input slots. Unit and browser regression cover incorrect decomposition, retry, a mathematically equivalent but unsimplified answer (2/4), successful 1/2 entry, learner isolation and the local-only boundary. This example is a non-formal practice activity based on the user's requested example, not a new formal curriculum task or empirical validation.
 
 Next: verify this implementation through Full Regression on its exact commit. After green, proceed to the separate F3 subtraction practice (1/2 − 2/5) using the same inline entry capability.
+
+
+### Regression closure — mixed-number and simplification practice — 2026-11-12
+
+- Implementation commit: `892d7176fcbe17f9d66ca3d4af4dae6766f99ece` added the learner-entered non-formal 15/10 result-form episode, its own local-only learner-keyed store, unit tests, browser coverage and the shared inline renderer integration.
+- Full Regression #3564 / run 43230489974: **GREEN** on exact commit `892d7176fcbe17f9d66ca3d4af4dae6766f99ece`. All 20 workflow steps passed, including curriculum engine, architecture, Node, Vitest, browser regression and clean working tree.
+- The implementation is an optional practice example, not a new formal FR1/FR2 task or diagnostic task. It does not modify the F2 1/3 + 1/4 episode, diagnostic F1–F4, C1–C9, mastery, next action, learner state or Supabase contracts.
+- This handoff closure update must itself pass Full Regression on its exact documentation commit.
+
+### Next concrete step
+
+Build the separate non-formal F3 subtraction practice based on the existing diagnostic F3 episode `1/2 − 2/5`, using the shared inline expression renderer. Keep the learner-entered sequence explicit: choose a valid common denominator, enter the equivalent numerator for each original fraction, and enter the subtraction result. Preserve raw attempts in a separate learner-keyed local-only store. Do not change the diagnostic F3 contract or formal FR1/FR2 mappings. After implementation, inspect the learner-facing page in browser regression and verify exact-commit Full Regression. Before Zyon uses it, review the actual PacoGO TEST presentation; automated regression is not pedagogical validation.

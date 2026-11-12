@@ -446,3 +446,10 @@ An optional non-formal result-form practice episode is now added after the exist
 The activity has its own learner-keyed versioned local-only store, preserving raw inputs and classifications, including incorrect attempts. Unit and browser coverage test invalid decomposition, retry, non-simplest equivalent fraction, successful 1/2, learner isolation and no formal evidence writes. This is a non-formal practice example, not a new formal skill/task/evidence mapping. It does not change the diagnostic F1–F4 task set, the F2 1/3 + 1/4 practice task, C1–C9, mastery, next-action, learner-state or Supabase contracts.
 
 Next: exact-commit Full Regression; then build the separate F3 subtraction practice using the shared inline equation entry.
+
+
+### Regression closure — mixed-number and simplification practice — 2026-11-12
+
+Implementation commit `892d7176fcbe17f9d66ca3d4af4dae6766f99ece` added the optional non-formal 15/10 episode with learner-entered mixed-number conversion and explicit simplification. Full Regression #3564 / run 43230489974: **GREEN** on that exact commit; all 20 workflow steps passed, including browser regression and clean working tree. This example is not a formal task/evidence mapping and does not alter diagnostic F1–F4, F2 addition, curriculum contracts or persistence boundaries. This documentation closure requires exact-commit regression.
+
+Next: build separate F3 subtraction practice from the existing 1/2 − 2/5 diagnostic episode using the shared inline renderer, raw learner entries and local-only learner-keyed storage. Keep formal diagnostic and curriculum contracts unchanged.

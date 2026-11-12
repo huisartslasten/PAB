@@ -495,3 +495,8 @@ Next: learner-facing review in PacoGO TEST. F4 remains conditional and is not bu
 The Netlify project `pacogo-test` exists at `https://test.pacogo.org`, but its latest ready deploy `6ad057585d4a377dd54bb132` was published 2026-10-15 from commit `67a39b26a42520fa2e04734798b897563b01c624` on `refactor/professional-v1`. This predates the current fraction practice implementation and must not be treated as the new route's review environment. The current branch HEAD at inspection is `68e6740c6072c1bb18ec426f5b24799825443f55`, Full Regression #3570 GREEN. Connected Netlify actions in this session provide read-only deploy inspection only; no deploy was triggered.
 
 Required before learner review: deploy the current refactor branch through the authorized TEST deployment process, verify exact deployed commit SHA, then inspect the full fraction practice flow. No learner/pedagogical validation has yet occurred.
+
+
+### Verification closure — TEST deployment readiness note — 2026-11-12
+
+The TEST deployment readiness note is included in commit `bd770c68e58223337cd937adacc7d6341e53a181`; Full Regression #3571 / run 43233460099: **GREEN** on that exact commit. The Netlify TEST alias still points to an older deployment from commit `67a39b26a42520fa2e04734798b897563b01c624` (published 2026-10-15). Current learner route has not been reviewed in TEST. Next: authorized deploy of the current refactor branch, exact-SHA verification, then learner-facing review.

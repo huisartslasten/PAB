@@ -6556,3 +6556,16 @@ Review the complete learner-facing fraction route in PacoGO TEST before Zyon use
 All newly added construction/addition/result-form/subtraction episodes are non-formal practice, separately learner-keyed and local-only. No formal FR1/FR2 registry/task/evidence changes, diagnostic F1–F4 changes, C1–C9 changes, mastery/next-action/learner-state writes or Supabase changes were made. Technical regression is not empirical or pedagogical validation.
 
 Next: review the entire learner-facing route in PacoGO TEST with Zyon before use. Record where instructions, models, expression inputs, feedback or transitions are unclear. Do not build F4 yet; it is conditional on all four F3 diagnostic prerequisites and its method provenance needs review. The FR1 formal development/claim/evidence/task contract remains an explicit gap; do not invent IDs.
+
+
+### PacoGO TEST deployment readiness check — 2026-11-12
+
+- Netlify project `pacogo-test` was located. Its public alias is `https://test.pacogo.org`.
+- The latest ready deploy exposed by the project is deploy `6ad057585d4a377dd54bb132`, branch `refactor/professional-v1`, but it was published 2026-10-15 from commit `67a39b26a42520fa2e04734798b897563b01c624`.
+- This is not the current curriculum branch HEAD and predates the new fraction practice route. Therefore the current TEST alias cannot yet be used as proof of the new learner route, and no learner-facing review has been completed.
+- A branch-version URL is listed by Netlify, but the deploy metadata does not show a branch-specific deploy link for the current HEAD. The connected Netlify actions available in this session are read-only for deploys; no deploy-creation action is available. No deployment was started or claimed.
+- Current code/documentation branch at this check: `refactor/professional-v1`, commit `68e6740c6072c1bb18ec426f5b24799825443f55`; Full Regression #3570 / run 43232842346: GREEN on that exact commit. This readiness note itself requires exact-commit Full Regression.
+
+### Next required action
+
+Publish the current `refactor/professional-v1` commit to the existing `pacogo-test` Netlify site using the project's authorized deployment process, without touching LIVE `main`. Verify the resulting deploy's branch and exact commit SHA before opening the learner route. Then review the complete fraction practice flow in TEST. Until that happens, do not state that the new fraction route has been reviewed with Zyon or is ready for learner use.

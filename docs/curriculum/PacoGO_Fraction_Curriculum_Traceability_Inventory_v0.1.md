@@ -488,3 +488,10 @@ Full Regression #3568 / run 43232097780 was GREEN on F3 implementation/test comm
 The complete non-formal learner route now includes visual recognition, learner-created equivalent fractions, staged F2 addition, the learner-entered 15/10 mixed-number/simplification example, and staged F3 subtraction. All additional practice stores are separate, learner-keyed and local-only. No formal FR1/FR2 curriculum/evidence, diagnostic, C1–C9, mastery, next-action, learner-state or Supabase contracts were changed.
 
 Next: learner-facing review in PacoGO TEST. F4 remains conditional and is not built. FR1 formal contract gap remains open.
+
+
+### PacoGO TEST deployment readiness — 2026-11-12
+
+The Netlify project `pacogo-test` exists at `https://test.pacogo.org`, but its latest ready deploy `6ad057585d4a377dd54bb132` was published 2026-10-15 from commit `67a39b26a42520fa2e04734798b897563b01c624` on `refactor/professional-v1`. This predates the current fraction practice implementation and must not be treated as the new route's review environment. The current branch HEAD at inspection is `68e6740c6072c1bb18ec426f5b24799825443f55`, Full Regression #3570 GREEN. Connected Netlify actions in this session provide read-only deploy inspection only; no deploy was triggered.
+
+Required before learner review: deploy the current refactor branch through the authorized TEST deployment process, verify exact deployed commit SHA, then inspect the full fraction practice flow. No learner/pedagogical validation has yet occurred.

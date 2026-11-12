@@ -75,10 +75,10 @@ test('staged diagnostic asks one learner action at a time and completes F1-F4 wi
   await expect(card.locator('h2')).toHaveText('Breuken optellen');
   await expect(card.locator('.fraction-diagnostic-expression')).toHaveAttribute('data-expression', '1/3 + 1/4');
   await answerOne(page, 12, 'Welke noemer');
-  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('12');
+  await expect(card.locator('.fraction-diagnostic-expression')).toHaveAttribute('data-expression', '1/3 = ?/12');
   await expect(card.locator('.fraction-diagnostic-history')).toContainText('Gemeenschappelijke noemer: 12');
   await answerOne(page, 4, 'eerste gelijkwaardige breuk');
-  await expect(card.locator('.fraction-diagnostic-expression')).toHaveAttribute('data-expression', '1/3 = ?/12');
+  await expect(card.locator('.fraction-diagnostic-expression')).toHaveAttribute('data-expression', '1/4 = ?/12');
   await answerOne(page, 3, 'tweede gelijkwaardige breuk');
   await expect(card.locator('.fraction-diagnostic-expression')).toHaveAttribute('data-expression', '4 + 3 = ?');
   await answerOne(page, 7, 'Tel de twee tellers');

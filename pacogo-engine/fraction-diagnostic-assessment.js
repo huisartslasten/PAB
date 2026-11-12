@@ -29,11 +29,12 @@ function validatePositiveInteger(value) {
 }
 
 function evaluateEquivalentFraction({ numerator, denominator, targetDenominator, factor, newNumerator } = {}) {
-  for (const [name, value] of Object.entries({ numerator, denominator, targetDenominator })) {
-    const invalid = validatePositiveInteger(name === "numerator" ? value + 1 : value);
-    if (invalid) return result(invalid, { action: name });
+  const numeratorIssue = validateNonNegativeInteger(numerator);
+  if (numeratorIssue) return result(numeratorIssue, { action: "numerator" });
+  for (const [name, value] of Object.entries({ denominator, targetDenominator })) {
+    const issue = validatePositiveInteger(value);
+    if (issue) return result(issue, { action: name });
   }
-  if (!integer(numerator) || numerator < 0) return result(CLASSIFICATIONS.INVALID_INPUT, { action: "numerator" });
   const factorIssue = validatePositiveInteger(factor);
   if (factorIssue) return result(factorIssue, { action: "factor" });
   const newNumeratorIssue = validateNonNegativeInteger(newNumerator);
@@ -41,10 +42,11 @@ function evaluateEquivalentFraction({ numerator, denominator, targetDenominator,
   if (targetDenominator % denominator !== 0 || factor !== targetDenominator / denominator) {
     return result(CLASSIFICATIONS.INVALID_RELATION, { action: "factor" });
   }
-  if (newNumerator !== numerator * factor) {
-    return result(CLASSIFICATIONS.INVALID_RELATION, { action: "newNumerator" });
-  }
-  return result(CLASSIFICATIONS.VALID);
+  const expectedNumerator = numerator * factor;
+  if (!integer(expectedNumerator)) return result(CLASSIFICATIONS.INVALID_INPUT, { action: "newNumerator" });
+  return newNumerator === expectedNumerator
+    ? result(CLASSIFICATIONS.VALID)
+    : result(CLASSIFICATIONS.INVALID_RELATION, { action: "newNumerator" });
 }
 
 function evaluateCommonDenominator({ firstDenominator, secondDenominator, commonDenominator } = {}) {
@@ -59,21 +61,50 @@ function evaluateCommonDenominator({ firstDenominator, secondDenominator, common
 }
 
 function evaluateConvertedNumerator({ sourceNumerator, sourceDenominator, commonDenominator, submittedNumerator, prerequisiteClassification = CLASSIFICATIONS.VALID } = {}) {
-  const issue = validateNonNegativeInteger(sourceNumerator);
-  if (issue) return result(issue, { action: "sourceNumerator" });
+  const numeratorIssue = validateNonNegativeInteger(sourceNumerator);
+  if (numeratorIssue) return result(numeratorIssue, { action: "sourceNumerator" });
   for (const [name, value] of Object.entries({ sourceDenominator, commonDenominator })) {
-    const invalid = validatePositiveInteger(value);
-    if (invalid) return result(invalid, { action: name });
+    const issue = validatePositiveInteger(value);
+    if (issue) return result(issue, { action: name });
   }
   const submittedIssue = validateNonNegativeInteger(submittedNumerator);
   if (submittedIssue) return result(submittedIssue, { action: "submittedNumerator" });
-  if (prerequisiteClassification !== CLASSIFICATIONS.VALID) {
-    return result(CLASSIFICATIONS.DEPENDENT_CONSISTENT, { dependency: "commonDenominator" });
+  if (prerequisiteClassification === CLASSIFICATIONS.MISSING ||
+      prerequisiteClassification === CLASSIFICATIONS.INVALID_INPUT ||
+      prerequisiteClassification === CLASSIFICATIONS.AMBIGUOUS) {
+    return result(prerequisiteClassification, { dependency: "commonDenominator" });
   }
   if (commonDenominator % sourceDenominator !== 0) {
-    return result(CLASSIFICATIONS.INVALID_RELATION, { action: "commonDenominator" });
+    return result(prerequisiteClassification === CLASSIFICATIONS.INVALID_RELATION
+      ? CLASSIFICATIONS.AMBIGUOUS
+      : CLASSIFICATIONS.INVALID_RELATION, { action: "commonDenominator" });
   }
   const expected = sourceNumerator * (commonDenominator / sourceDenominator);
+  if (!integer(expected)) return result(CLASSIFICATIONS.INVALID_INPUT, { action: "submittedNumerator" });
+  if (prerequisiteClassification !== CLASSIFICATIONS.VALID) {
+    return submittedNumerator === expected
+      ? result(CLASSIFICATIONS.DEPENDENT_CONSISTENT, { dependency: "commonDenominator" })
+      : result(CLASSIFICATIONS.AMBIGUOUS, { dependency: "commonDenominator" });
+  }
+  return submittedNumerator === expected
+    ? result(CLASSIFICATIONS.VALID)
+    : result(CLASSIFICATIONS.INVALID_RELATION, { action: "submittedNumerator" });
+}
+
+function evaluateMixedNumberConversion({ whole, numerator, denominator, submittedNumerator } = {}) {
+  for (const [name, value] of Object.entries({ whole, numerator })) {
+    const issue = validateNonNegativeInteger(value);
+    if (issue) return result(issue, { action: name });
+  }
+  const denominatorIssue = validatePositiveInteger(denominator);
+  if (denominatorIssue) return result(denominatorIssue, { action: "denominator" });
+  const submittedIssue = validateNonNegativeInteger(submittedNumerator);
+  if (submittedIssue) return result(submittedIssue, { action: "submittedNumerator" });
+  if (numerator >= denominator) {
+    return result(CLASSIFICATIONS.INVALID_INPUT, { action: "mixedNumber" });
+  }
+  const expected = whole * denominator + numerator;
+  if (!integer(expected)) return result(CLASSIFICATIONS.INVALID_INPUT, { action: "submittedNumerator" });
   return submittedNumerator === expected
     ? result(CLASSIFICATIONS.VALID)
     : result(CLASSIFICATIONS.INVALID_RELATION, { action: "submittedNumerator" });
@@ -85,14 +116,18 @@ function evaluateOperation({ operation, firstNumerator, secondNumerator, submitt
     const issue = validateNonNegativeInteger(value);
     if (issue) return result(issue, { action: name });
   }
+  const expected = operation === "add" ? firstNumerator + secondNumerator : firstNumerator - secondNumerator;
+  if (!integer(expected)) return result(CLASSIFICATIONS.INVALID_INPUT, { action: "operation" });
+  if (expected < 0) return result(CLASSIFICATIONS.INVALID_RELATION, { action: "operationDomain" });
+  if (prerequisiteClassifications.some(value => value === CLASSIFICATIONS.MISSING ||
+      value === CLASSIFICATIONS.INVALID_INPUT || value === CLASSIFICATIONS.AMBIGUOUS)) {
+    return result(CLASSIFICATIONS.AMBIGUOUS, { dependency: "convertedNumerators" });
+  }
   if (prerequisiteClassifications.some(value => value !== CLASSIFICATIONS.VALID)) {
-    const expectedFromLearnerValues = operation === "add" ? firstNumerator + secondNumerator : firstNumerator - secondNumerator;
-    return submittedResult === expectedFromLearnerValues
+    return submittedResult === expected
       ? result(CLASSIFICATIONS.DEPENDENT_CONSISTENT, { dependency: "convertedNumerators" })
       : result(CLASSIFICATIONS.AMBIGUOUS, { dependency: "convertedNumerators" });
   }
-  const expected = operation === "add" ? firstNumerator + secondNumerator : firstNumerator - secondNumerator;
-  if (expected < 0) return result(CLASSIFICATIONS.INVALID_RELATION, { action: "operationDomain" });
   return submittedResult === expected
     ? result(CLASSIFICATIONS.VALID)
     : result(CLASSIFICATIONS.ARITHMETIC_ERROR, { action: "operation" });
@@ -103,5 +138,6 @@ export {
   evaluateEquivalentFraction,
   evaluateCommonDenominator,
   evaluateConvertedNumerator,
+  evaluateMixedNumberConversion,
   evaluateOperation
 };

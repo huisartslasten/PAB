@@ -73,33 +73,33 @@ test('staged diagnostic asks one learner action at a time and completes F1-F4 wi
   await answerOne(page, 4, 'Welke teller');
 
   await expect(card.locator('h2')).toHaveText('Breuken optellen');
-  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('1/3 + 1/4');
+  await expect(card.locator('.fraction-diagnostic-expression')).toHaveAttribute('data-expression', '1/3 + 1/4');
   await answerOne(page, 12, 'Welke noemer');
   await expect(card.locator('.fraction-diagnostic-expression')).toContainText('12');
   await expect(card.locator('.fraction-diagnostic-history')).toContainText('Gemeenschappelijke noemer: 12');
   await answerOne(page, 4, 'eerste gelijkwaardige breuk');
-  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('1/3 = ?/12');
+  await expect(card.locator('.fraction-diagnostic-expression')).toHaveAttribute('data-expression', '1/3 = ?/12');
   await answerOne(page, 3, 'tweede gelijkwaardige breuk');
-  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('4 + 3 = ?');
+  await expect(card.locator('.fraction-diagnostic-expression')).toHaveAttribute('data-expression', '4 + 3 = ?');
   await answerOne(page, 7, 'Tel de twee tellers');
 
   await expect(card.locator('h2')).toHaveText('Breuken aftrekken');
-  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('1/2 − 2/5');
+  await expect(card.locator('.fraction-diagnostic-expression')).toHaveAttribute('data-expression', '1/2 − 2/5');
   await answerOne(page, 10, 'Welke noemer');
   await answerOne(page, 5, 'eerste gelijkwaardige breuk');
   await answerOne(page, 4, 'tweede gelijkwaardige breuk');
-  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('5 − 4 = ?');
+  await expect(card.locator('.fraction-diagnostic-expression')).toHaveAttribute('data-expression', '5 − 4 = ?');
   await answerOne(page, 1, 'Trek de tweede teller');
 
   await expect(card.locator('h2')).toHaveText('Gemengde breuk aftrekken');
-  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('1 1/3');
+  await expect(card.locator('.fraction-diagnostic-expression')).toHaveAttribute('data-expression', '1 1/3');
   await answerOne(page, 4, 'gemengde getal omzet');
-  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('4/3 − 2/5');
+  await expect(card.locator('.fraction-diagnostic-expression')).toHaveAttribute('data-expression', '4/3 − 2/5');
   await answerOne(page, 15, 'Welke noemer');
-  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('4/3 = ?/15');
+  await expect(card.locator('.fraction-diagnostic-expression')).toHaveAttribute('data-expression', '4/3 = ?/15');
   await answerOne(page, 20, 'eerste gelijkwaardige breuk');
   await answerOne(page, 6, 'tweede gelijkwaardige breuk');
-  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('20 − 6 = ?');
+  await expect(card.locator('.fraction-diagnostic-expression')).toHaveAttribute('data-expression', '20 − 6 = ?');
   await answerOne(page, 14, 'Trek de tweede teller');
 
   const result = page.locator('#fraction-diagnostic-result');

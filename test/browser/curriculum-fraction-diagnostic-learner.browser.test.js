@@ -92,7 +92,7 @@ test('staged diagnostic asks one learner action at a time and completes F1-F4 wi
   await answerOne(page, 1, 'Trek de tweede teller');
 
   await expect(card.locator('h2')).toHaveText('Gemengde breuk aftrekken');
-  await expect(card.locator('.fraction-diagnostic-expression')).toHaveAttribute('data-expression', '1 1/3');
+  await expect(card.locator('.fraction-diagnostic-expression')).toHaveAttribute('data-expression', '1 1/3 = ?/3');
   await answerOne(page, 4, 'gemengde getal omzet');
   await expect(card.locator('.fraction-diagnostic-expression')).toHaveAttribute('data-expression', '4/3 − 2/5');
   await answerOne(page, 15, 'Welke noemer');

@@ -292,3 +292,34 @@ After the source consolidation in §10:
 - Full Regression #3539 / run \`43215088121\`: GREEN on that exact commit.
 - This fraction-specific inventory and its handoff update are documentation changes. Their resulting commit requires a new Full Regression before being considered verified.
 - No runtime, tests, curriculum registry, C1–C9 contract, learner state, database, SQL/RPC/RLS, Supabase or learner data changed in this inventory.
+
+
+---
+
+## 14. Update 2026-11-12 — diagnostic-to-practice navigation slice
+
+This section supersedes the earlier statement that the diagnostic and practice routes have no direct navigation between them.
+
+### Implemented and browser-verified
+
+- Completed formative diagnostic → neutral continuation action → existing FR2 equivalent-fraction practice page.
+- The continuation action is shown only after a completed (not manually stopped) diagnostic.
+- The destination is labelled **“Verder naar gelijkwaardige breuken oefenen”** so it does not imply that the narrow FR2 episode covers the entire fraction domain.
+- The selected roster learner is preserved using `viewStudent`; the practice page resolves the linked curriculum profile via the existing student registry and learner-curriculum service.
+- Practice → diagnostic navigation preserves the same roster learner.
+- Browser coverage verifies the complete round trip and confirms that the same learner is selected when the diagnostic is reopened.
+
+### Scope and limitations
+
+- This is a navigation connection only. It does not interpret diagnostic patterns, select an adaptive next task, or claim the practice is targeted to the diagnostic result.
+- The existing three-item FR2 practice content, local progress format, diagnostic response storage and formal/formative boundaries remain unchanged.
+- No new curriculum/task/evidence/mastery contract, learner-state persistence, Supabase or database change was made.
+- FR1's formal development/claim/evidence/task structure remains unresolved in the source inventory.
+- The complete fraction route C is **not complete**. Zyon still needs a learner-facing practice flow that presents suitable visual explanations and requires him to enter the necessary intermediate fraction steps himself, within source-supported and explicitly formative boundaries.
+
+### Verification
+
+- Route implementation commit: `d246a4c3eaebd8174e0c3940d8552475be262939`.
+- Full Regression #3547 / run `43217736298`: **GREEN** on that exact commit.
+- Full Regression #3546 was RED on an intermediate UI-label-only commit because the browser assertion still expected the previous label; the assertion was corrected to the intentional, more precise label and #3547 passed.
+- This inventory update and the repository handoff update are documentation changes and must be verified by Full Regression on their resulting exact commit.

@@ -6241,3 +6241,45 @@ Finish the fractions-only three-level inventory by reconciling each FR1/FR2 curr
 - Previous verified commit: `e43e249c6817ab986b389c6f775fb57367c8f36e`.
 - Full Regression #3541 / run `43215897080`: GREEN on that exact commit; all 20 workflow steps passed, including browser regression and clean-working-tree verification.
 - This inventory/handoff update is documentation-only and requires Full Regression on its exact resulting commit.
+
+
+---
+
+## Current handoff update — 2026-11-12 (first diagnostic-to-practice learner-route connection)
+
+**Branch:** `refactor/professional-v1`. LIVE `main` untouched.
+
+### Built
+
+A deliberately narrow route-C navigation slice now connects the existing formative fraction diagnostic with the existing FR2 practice page:
+
+- A learner who completes the diagnostic sees a neutral continuation action: **“Verder naar gelijkwaardige breuken oefenen”**.
+- The action opens the existing three-item FR2 equivalent-fraction practice route.
+- The selected PacoGO roster learner is carried as `viewStudent`.
+- The practice page resolves that roster identity through the existing student registry and `getAppLearnerProfile`; it does not silently select a different learner.
+- Returning from practice to the diagnostic preserves the same `viewStudent` context.
+- A manually stopped/incomplete diagnostic does not show the completion continuation action.
+- The browser regression exercises the full diagnostic → practice → diagnostic round trip and checks that Zyon remains selected.
+
+The practice page remains a standalone HTML route; it is not falsely registered as a central router route. The transition uses a full page navigation because the destination is not in `src/app/routes.js`.
+
+### Boundaries preserved
+
+- This is navigation to the existing FR2 practice episode, **not** a diagnosis-based recommendation or adaptive instructional decision.
+- The diagnostic answers are not interpreted into mastery, a permanent learner trait, or a targeted learning prescription.
+- No new task, skill, development, claim, evidence target, task model, prerequisite or mastery rule was created.
+- Existing diagnostic and practice task content and local-storage semantics were not changed.
+- No curriculum registry, C1–C9, learner-state, Supabase, SQL/RPC/RLS or learner data changes were made.
+- FR2 remains the narrow equivalent-fraction skill; this slice does not complete the full fraction learning route or the FR1 source gap.
+
+### Regression history and root cause
+
+- Full Regression #3545 / run `43217488740`: GREEN on `81f495ad4fb1a377d8a353c9931d879214ae71d9`; the route round-trip implementation and browser test passed.
+- An intentional wording refinement changed the destination button label to identify the actual FR2 practice content. The intermediate commit `29efb3926bedd21c29a2803bbc5f38ee5456e099` had a stale browser assertion for the previous label; Full Regression #3546 was RED only at the browser step, with the test waiting for the old label. The runtime navigation itself was not the failure.
+- The browser assertion was updated to the new precise label. Full Regression #3547 / run `43217736298`: GREEN on exact commit `d246a4c3eaebd8174e0c3940d8552475be262939`, including all 20 workflow steps and clean working tree.
+
+### Next concrete step
+
+Continue route C, not broad curriculum redesign: determine the smallest supported learner-facing practice episode that lets Zyon perform the required fraction steps himself, with visual explanation and small numeric input where the existing source/task contracts support it. Keep any activity without a formal FR1/FR2 task/evidence mapping explicitly formative/non-formal. Do not infer a targeted lesson from the diagnostic automatically, and do not fill the FR1 development/claim/evidence/task gap with invented curriculum. Reconcile the exact school method only from confirmed source material; do not impose an unverified method.
+
+The route connection is an initial integration step, not completion of the user's goal. The complete executable fraction learning route remains open.

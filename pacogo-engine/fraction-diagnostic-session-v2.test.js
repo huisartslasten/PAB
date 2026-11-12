@@ -41,7 +41,7 @@ test("dependent responses are retained without double-counting an earlier invali
   const actions = session.getSessionSnapshot().tasks.F2.actions;
   assert.equal(actions[0].classification, "invalid_relation");
   assert.equal(actions[1].classification, "ambiguous");
-  assert.equal(actions[2].classification, "ambiguous");
+  assert.equal(actions[2].classification, "dependent_consistent");
   assert.equal(actions[3].classification, "ambiguous");
 });
 
@@ -55,7 +55,7 @@ test("F4 is administered only after every F3 action is valid", () => {
   assert.equal(session.getSessionSnapshot().tasks.F4.status, "completed");
 });
 
-test("F4 is explicitly not administered when an F3 prerequisite is not valid", () => {
+test("F4 preserves dependent work after an incorrect mixed-number conversion", () => {\n  const session = createFractionDiagnosticSessionV2({ learnerKey: "zyon", storage: memoryStorage() });\n  [2, 4, 12, 4, 3, 7, 10, 5, 4, 1, 5, 15, 25, 6, 19].forEach(value => answer(session, value));\n  const f4 = session.getSessionSnapshot().tasks.F4.actions;\n  assert.equal(f4[0].classification, "invalid_relation");\n  assert.equal(f4[2].classification, "dependent_consistent");\n  assert.equal(f4[4].classification, "dependent_consistent");\n});\n\ntest("F4 is explicitly not administered when an F3 prerequisite is not valid", () => {
   const session = createFractionDiagnosticSessionV2({ learnerKey: "zyon", storage: memoryStorage() });
   [2, 4, 10, 5, 4, 1].forEach(value => answer(session, value));
   assert.equal(session.getCurrentAction(), null);

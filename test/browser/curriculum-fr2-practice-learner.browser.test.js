@@ -106,9 +106,10 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await page.getByRole("button", { name: "Oefenen met breuken optellen" }).click();
   await expect(page.locator("#additionPracticeCard")).toBeVisible();
   await expect(page.locator("#additionVisual .pacogo-fraction-representation--area")).toHaveCount(2);
-  await expect(page.locator("#additionExpression")).toHaveText("1/3 + 1/4");
+  await expect(page.locator("#additionExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "1/3 + 1/4 → noemer ?");
   await expect(page.locator("#additionProgress")).toContainText("Stap 1 van 4");
-  await expect(page.locator("#additionInput input")).toHaveCount(1);
+  await expect(page.locator("#additionExpression input")).toHaveCount(1);
+  await expect(page.locator("#additionInput input")).toHaveCount(0);
 
   await page.getByRole("textbox", { name: "Gemeenschappelijke noemer" }).fill("6");
   await page.getByRole("button", { name: "Controleren" }).last().click();
@@ -118,18 +119,18 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await page.getByRole("button", { name: "Controleren" }).last().click();
   await page.getByRole("button", { name: "Volgende stap" }).click();
 
-  await expect(page.locator("#additionExpression")).toHaveText("1/3 = ?/12");
+  await expect(page.locator("#additionExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "1/3 = ?/12");
   await expect(page.locator("#additionInput input")).toHaveCount(1);
   await page.getByRole("textbox", { name: "Nieuwe teller voor 1/3" }).fill("4");
   await page.getByRole("button", { name: "Controleren" }).last().click();
   await page.getByRole("button", { name: "Volgende stap" }).click();
 
-  await expect(page.locator("#additionExpression")).toHaveText("1/4 = ?/12");
+  await expect(page.locator("#additionExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "1/4 = ?/12");
   await page.getByRole("textbox", { name: "Nieuwe teller voor 1/4" }).fill("3");
   await page.getByRole("button", { name: "Controleren" }).last().click();
   await page.getByRole("button", { name: "Volgende stap" }).click();
 
-  await expect(page.locator("#additionExpression")).toHaveText("4 + 3 = ?");
+  await expect(page.locator("#additionExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "4 + 3 = ?");
   await page.getByRole("textbox", { name: "Som van de tellers" }).fill("8");
   await page.getByRole("button", { name: "Controleren" }).last().click();
   await expect(page.locator("#additionFeedback")).toContainText("Controleer de optelling");

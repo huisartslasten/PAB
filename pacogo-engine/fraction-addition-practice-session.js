@@ -84,7 +84,7 @@ function createFractionAdditionPracticeSession({ learnerKey, storage = globalThi
         taskId: task.id, stepId, stepNumber: 1, totalSteps: 4,
         prompt: "Kies een gemeenschappelijke noemer voor 1/3 en 1/4.",
         inputLabel: "Gemeenschappelijke noemer",
-        expression: "1/3 + 1/4"
+        expression: "1/3 + 1/4 → noemer ?"
       });
     }
     if (stepId === "left_equivalent_numerator") {

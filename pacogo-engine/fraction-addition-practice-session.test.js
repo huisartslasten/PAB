@@ -16,6 +16,7 @@ const learnerA = createFractionAdditionPracticeSession({ learnerKey: "learner-a"
 const learnerB = createFractionAdditionPracticeSession({ learnerKey: "learner-b", storage });
 assert.equal(learnerA.getCurrentStep().stepId, "common_denominator");
 assert.equal(learnerA.getCurrentStep().stepNumber, 1);
+assert.equal(learnerA.getCurrentStep().expression, "1/3 + 1/4 → noemer ?");
 assert.equal(learnerA.recordResponse({ rawValue: "6" }).classification, "not_common_denominator");
 assert.equal(learnerA.getCurrentStep().stepId, "common_denominator");
 assert.equal(learnerA.recordResponse({ rawValue: "12" }).classification, "valid");

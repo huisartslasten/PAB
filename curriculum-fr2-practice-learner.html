@@ -28,6 +28,12 @@
     .pacogo-fraction-integer-input__label{display:grid;gap:6px;font-weight:800}
     .pacogo-fraction-integer-input__field{width:90px;box-sizing:border-box;padding:12px;border:2px solid #9bb7d0;border-radius:12px;font:800 24px Nunito,system-ui,sans-serif;text-align:center;color:#102b57}
     .pacogo-fraction-integer-input__field:focus{outline:3px solid #9bcfff;outline-offset:2px}
+    .fraction-practice-equation{display:inline-flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap;line-height:1.5}
+    .fraction-practice-fraction{display:inline-grid;grid-template-rows:auto 2px auto;align-items:center;justify-items:stretch;vertical-align:middle;min-width:42px;margin:0 2px}
+    .fraction-practice-numerator,.fraction-practice-denominator{display:flex;justify-content:center;min-width:28px;padding:0 3px}
+    .fraction-practice-divider{height:2px;background:currentColor;width:100%}
+    .fraction-practice-inline-input{width:54px;min-height:42px;box-sizing:border-box;border:2px dashed #8aa6c2;border-radius:9px;text-align:center;font:800 22px Nunito,system-ui,sans-serif;color:#102b57;background:#fff;padding:4px}
+    .fraction-practice-inline-input:focus{outline:3px solid #9bcfff;outline-offset:2px}
     .concept{padding:16px;border-radius:16px;background:#f1f7fc;border:1px solid #d8e7f4}
     .concept strong{display:block;margin-bottom:5px}
     #comparison{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;margin:16px 0;padding:16px;background:#f5f9fd;border-radius:14px}
@@ -105,6 +111,7 @@
   import { FRACTION_PRACTICE_TASKS, createFractionPracticeSession } from "./pacogo-engine/fraction-practice-session.js";
   import { getStudentLearningProfile } from "./src/core/student-registry.js";
   import { createFractionNumeratorInput, createFractionIntegerInput } from "./pacogo-engine/fraction-numerator-input.js";
+  import { renderFractionPracticeExpression } from "./pacogo-engine/fraction-practice-equation.js";
   import { createFractionAdditionPracticeSession } from "./pacogo-engine/fraction-addition-practice-session.js";
   import { FRACTION_CONSTRUCTION_PRACTICE_TASKS, createFractionConstructionPracticeSession } from "./pacogo-engine/fraction-construction-practice-session.js";
 
@@ -143,6 +150,7 @@
   let constructionInputInstance = null;
   let additionSession = null;
   let additionInputInstance = null;
+  let additionEquationInstance = null;
   const selectedStudent = new URLSearchParams(window.location.search).get("viewStudent") || "";
 
   function setSetupError(error) {
@@ -420,14 +428,16 @@
   function handleAdditionAnswer(rawValue) {
     if (rawValue.trim() === "") {
       additionFeedback.textContent = "Vul eerst een getal in.";
-      additionInputInstance.focus();
+      additionEquationInstance?.focus();
       return;
     }
     const result = additionSession.recordResponse({ rawValue });
     updateAdditionProgress();
     if (result.classification === "valid") {
       additionFeedback.textContent = "Goed. Deze stap klopt. De volgende stap verschijnt pas als je verdergaat.";
-      additionInputInstance.lock();
+      additionEquationInstance?.lock();
+      const additionSubmit = additionInputHost.querySelector("button");
+      if (additionSubmit) additionSubmit.disabled = true;
       additionNext.replaceChildren();
       const next = document.createElement("button");
       next.type = "button";
@@ -454,22 +464,27 @@
       showAdditionCompleted();
       return;
     }
-    additionExpression.textContent = current.expression;
     additionPrompt.textContent = current.prompt;
     additionFeedback.textContent = "Vul deze stap in. De volgende stap is nog niet zichtbaar.";
     additionNext.replaceChildren();
-    additionInputInstance = createFractionIntegerInput({
-      mount: additionInputHost,
-      label: current.inputLabel,
-      submitLabel: "Controleren",
+    additionEquationInstance = renderFractionPracticeExpression({
+      mount: additionExpression,
+      expression: current.expression,
+      inputLabels: [current.inputLabel],
       onInteraction: event => {
         additionFeedback.textContent = event.rawValue
           ? "Je kunt deze stap controleren."
           : "Vul deze stap in. De volgende stap is nog niet zichtbaar.";
-      },
-      onSubmit: handleAdditionAnswer
+      }
     });
+    additionInputHost.replaceChildren();
+    const submit = document.createElement("button");
+    submit.type = "button";
+    submit.textContent = "Controleren";
+    submit.addEventListener("click", () => handleAdditionAnswer(additionEquationInstance.getValues()[0] || ""));
+    additionInputHost.append(submit);
     updateAdditionProgress();
+    additionEquationInstance.focus();
   }
 
   function startAdditionPractice() {

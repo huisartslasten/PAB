@@ -411,3 +411,10 @@ Read-only implementation findings:
 Revised order: (1) reusable inline arithmetic-expression input for non-formal practice; (2) refactor F2 practice to use it; (3) add optional learner-controlled mixed-number and simplification stages; (4) reuse the same capability in the F3 subtraction practice based on the existing 1/2 − 2/5 task-set episode. No diagnostic, formal curriculum, C1–C9, mastery, learner-state or Supabase contract changes are authorized by this UI requirement.
 
 Baseline Full Regression #3558 / run 43221213403 was GREEN on e771796b1929c787b99b79d87a1db6e08c97dfe9. This documentation update must pass Full Regression on its exact resulting commit.
+
+
+## 18. Update 2026-11-12 — F2 practice inline expression input
+
+The non-formal F2 addition practice now renders its active numeric input directly inside the mathematical expression, reusing the same interaction principle already present in the diagnostic runtime. The separate input host now contains only the submit action. The common-denominator step explicitly shows an inline missing-value slot after the original operation; equivalent-numerator and result steps retain their missing slot inside fraction notation or the arithmetic expression. The reusable renderer supports multiple input slots, accessible labels, keyboard focus and locking.
+
+The F2 step order, valid-denominator logic, raw-response storage, learner isolation and local-only boundary are unchanged. Browser regression now checks that the input is a descendant of the expression itself. Mixed-number and simplification controls are not yet built; they remain the next increment. This is still non-formal practice and does not alter FR1/FR2 curriculum scope or formal evidence.

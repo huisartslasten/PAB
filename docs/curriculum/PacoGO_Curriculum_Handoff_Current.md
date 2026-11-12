@@ -6444,3 +6444,8 @@ Preserve all existing formal/non-formal boundaries: no FR1/FR2 registry expansio
 ### Verification target
 
 This is a documentation-only clarification following Full Regression #3558 (GREEN) on baseline commit e771796b1929c787b99b79d87a1db6e08c97dfe9. Full Regression must run on the exact resulting documentation commit before this update is closed or the next implementation slice begins.
+
+
+### Implementation update — reusable inline expression entry (F2 practice)
+
+The F2 arithmetic practice has been refactored so its active numeric response is rendered directly inside the mathematical expression. The common-denominator step now appears as part of the original operation, and subsequent equivalent-numerator and result fields occupy the corresponding numerator/result positions. The separate input host contains only the action button. The new renderer supports multiple missing positions, accessible input labels, keyboard focus and locking; it is intended for reuse by subsequent non-formal arithmetic practice. Raw response storage and the F2 session contract are unchanged. The new browser coverage asserts that the field is inside the expression and that the learner still completes the same four steps. Mixed-number and simplification stages are not yet implemented; they remain the next interface increment.

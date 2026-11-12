@@ -1,6 +1,6 @@
 # PacoGO — Zyon Fraction Diagnostic Assessment Contract v0.1
 
-Status: candidate design contract; review required before implementation
+Status: implemented formative assessment baseline v0.1; operational review and empirical validation pending
 Date: 2026-11-11
 Branch: `refactor/professional-v1`
 Scope: formative fraction diagnostic only; no formal evidence, mastery or learner-state effects
@@ -152,14 +152,17 @@ The evaluator must be tested for at least:
 
 Tests must assert both mathematical validity and the distinct diagnostic classification. Do not weaken tests to fit the implementation.
 
-## 8. Implementation sequence
+## 8. Implementation status and next verification
 
-1. Review and approve the task-set reduction and exact prompts.
-2. Implement pure mathematical evaluators with unit tests, separate from session orchestration.
-3. Integrate evaluator results into the formative session while preserving raw responses and backward-safe local storage handling.
-4. Update browser tests to cover a valid alternative denominator, an arithmetic error, a dependent-consistent response and targeted practice.
-5. Run Full Regression before and after each bounded implementation phase. Stop on RED and isolate the exact cause.
-6. Verify in PacoGO TEST with the parent account and learner profile before using the diagnostic with Zyon.
+Implemented on `refactor/professional-v1`:
+
+1. Pure mathematical evaluators with unit tests, separate from session orchestration.
+2. A versioned v2 formative session that preserves raw responses and ordered dependencies in a separate local-storage namespace; legacy v1 data is untouched.
+3. A staged learner interface that renders one action at a time, shows prior learner-entered responses without correctness feedback, and supports conditional F4 and stopping.
+4. Browser coverage for alternative common denominators, sequential actions, dependent responses, the F4 gate, stopping, local-only persistence and absence of formal learner-state writes.
+5. Full Regression #3524 / run `43136408114`: GREEN on exact commit `6b8a4cd259b11a9c0bbadaa033cb125193d37fc1`.
+
+Next, review wording and task scope against current school material, then verify the flow in PacoGO TEST with the parent account and learner profile before using it with Zyon. Inspect raw responses and classifications before making any teaching recommendation. This formative implementation is not empirically validated and must not be used as a formal mastery decision.
 
 ## 9. Explicit non-decisions
 

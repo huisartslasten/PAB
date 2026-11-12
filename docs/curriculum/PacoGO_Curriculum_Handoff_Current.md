@@ -6523,3 +6523,16 @@ This is non-formal practice derived from the existing diagnostic action sequence
 
 - Full Regression #3567 / run 43231737163: RED on exact commit `62bfcb135a4e77c37b4b25e89bb727e882e0f521`. Curriculum engine, architecture, Node and Vitest passed. The browser route now reached F3 and successfully passed the earlier denominator retry and alternate common-denominator (20) steps. It stopped at the first equivalent-numerator retry because the test expected the substring `hoeveelheid gelijk`, while the learner-facing message says `De hoeveelheid moet gelijk blijven`.
 - This is a wording mismatch in the assertion, not a calculation or UI runtime defect. The assertion is aligned to the exact existing learner-facing feedback text. No scenario or coverage is removed. Full Regression on the exact correction commit is required.
+
+
+### Regression closure — F3 subtraction practice — 2026-11-12
+
+- Implementation commit: `a2d66787f702f89dca8eb0b98d93f504fcc49317` added the separate non-formal F3 subtraction session, learner-facing four-step route, local-only store, unit tests and browser scenario.
+- Full Regression #3566 / run 43231374670: RED because the browser test checked five local stores before running the F3 scenario. The scenario was moved before the storage snapshot without removing assertions.
+- Full Regression #3567 / run 43231737163: RED because the browser test expected `hoeveelheid gelijk`, while the actual F3 feedback says `De hoeveelheid moet gelijk blijven`. The assertion was corrected to the exact learner-facing wording.
+- Full Regression #3568 / run 43232097780: **GREEN** on exact commit `40eb0fe0ab45dcf82298bc106587ea89793fbdf4`. All 20 workflow steps passed, including curriculum engine, architecture, Node, Vitest, browser regression and clean working tree. The browser flow exercised F3's incorrect denominator retry, alternate denominator 20, numerator retries, subtraction retry and final result 2/20.
+- This documentation closure must itself pass Full Regression on its exact resulting commit.
+
+### Next concrete step
+
+Review the complete learner-facing fraction route in PacoGO TEST before Zyon uses it: recognition practice, learner-created equivalent fractions, staged addition, the 15/10 mixed-number/simplification example, and staged subtraction. Check whether the prompts, visual models, field placement, feedback and navigation make pedagogical sense to the learner. Automated browser regression proves technical flow only, not learning effectiveness. Record observations before changing the instructional design. Keep F4 conditional and do not build it until the F3 prerequisites and source-backed method provenance are reviewed. The FR1 formal development/claim/evidence/task contract gap remains open; do not invent IDs to close it.

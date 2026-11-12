@@ -472,3 +472,10 @@ Full Regression #3566 / run 43231374670: RED on `a2d66787f702f89dca8eb0b98d93f50
 ### Regression investigation — F3 feedback assertion wording — 2026-11-12
 
 Full Regression #3567 / run 43231737163 was RED on `62bfcb135a4e77c37b4b25e89bb727e882e0f521`. The F3 browser route was exercised through denominator retry and accepted alternate denominator 20. It stopped at an assertion expecting `hoeveelheid gelijk`, whereas the actual feedback says `De hoeveelheid moet gelijk blijven`. The test assertion is aligned to the exact UI wording; no coverage is removed. Await exact-commit Full Regression.
+
+
+### Regression closure — F3 subtraction practice — 2026-11-12
+
+Implementation commit `a2d66787f702f89dca8eb0b98d93f504fcc49317` added optional non-formal F3 practice. Full Regression #3566 was RED due to test scenario ordering; #3567 was RED due to a mismatch between asserted and actual feedback wording. Both were corrected without removing coverage. Full Regression #3568 / run 43232097780: **GREEN** on exact commit `40eb0fe0ab45dcf82298bc106587ea89793fbdf4`; all 20 steps passed, including the complete browser F3 route and clean working tree.
+
+Next: review the complete fraction practice route in PacoGO TEST with the learner before use. Technical regression is not pedagogical validation. Keep F4 conditional; verify its prerequisites and method provenance before implementation. FR1 formal contract gap remains open and must not be filled with invented registry IDs.

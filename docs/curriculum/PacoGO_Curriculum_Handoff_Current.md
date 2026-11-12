@@ -6536,3 +6536,23 @@ This is non-formal practice derived from the existing diagnostic action sequence
 ### Next concrete step
 
 Review the complete learner-facing fraction route in PacoGO TEST before Zyon uses it: recognition practice, learner-created equivalent fractions, staged addition, the 15/10 mixed-number/simplification example, and staged subtraction. Check whether the prompts, visual models, field placement, feedback and navigation make pedagogical sense to the learner. Automated browser regression proves technical flow only, not learning effectiveness. Record observations before changing the instructional design. Keep F4 conditional and do not build it until the F3 prerequisites and source-backed method provenance are reviewed. The FR1 formal development/claim/evidence/task contract gap remains open; do not invent IDs to close it.
+
+
+### Regression closure — F3 browser route and handoff — 2026-11-12
+
+- Full Regression #3568 / run 43232097780 was GREEN on exact F3 implementation/test commit `40eb0fe0ab45dcf82298bc106587ea89793fbdf4`.
+- Handoff/inventory closure commit: `cc2ea4093d548f00a5ef73dbb7c6c7fcd352610e`.
+- Full Regression #3569 / run 43232481482: **GREEN** on exact closure commit `cc2ea4093d548f00a5ef73dbb7c6c7fcd352610e`. All 20 steps passed, including browser regression and clean working tree.
+- Current verified branch HEAD is the closure commit above; LIVE `main` remains untouched.
+
+### Fraction practice route now implemented
+
+1. Existing visual recognition practice (three FR2-aligned demo practice items; non-formal local progress).
+2. Learner-created equivalent-fraction practice (three items; raw learner numerator entries local-only).
+3. Staged addition practice F2: `1/3 + 1/4`, four learner-entered steps, inline expression fields, accepts any valid common denominator.
+4. Optional mixed-number/simplification practice using the user-provided example `15/10`: learner enters `1 5/10`, explicitly chooses **Vereenvoudigen**, then enters `1/2`.
+5. Staged subtraction practice F3: `1/2 − 2/5`, four learner-entered steps, inline expression fields, accepts any valid common denominator. The test uses 20 and displays the result as `2/20`; no automatic simplification.
+
+All newly added construction/addition/result-form/subtraction episodes are non-formal practice, separately learner-keyed and local-only. No formal FR1/FR2 registry/task/evidence changes, diagnostic F1–F4 changes, C1–C9 changes, mastery/next-action/learner-state writes or Supabase changes were made. Technical regression is not empirical or pedagogical validation.
+
+Next: review the entire learner-facing route in PacoGO TEST with Zyon before use. Record where instructions, models, expression inputs, feedback or transitions are unclear. Do not build F4 yet; it is conditional on all four F3 diagnostic prerequisites and its method provenance needs review. The FR1 formal development/claim/evidence/task contract remains an explicit gap; do not invent IDs.

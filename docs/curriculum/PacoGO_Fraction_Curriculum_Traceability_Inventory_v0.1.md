@@ -479,3 +479,12 @@ Full Regression #3567 / run 43231737163 was RED on `62bfcb135a4e77c37b4b25e89bb7
 Implementation commit `a2d66787f702f89dca8eb0b98d93f504fcc49317` added optional non-formal F3 practice. Full Regression #3566 was RED due to test scenario ordering; #3567 was RED due to a mismatch between asserted and actual feedback wording. Both were corrected without removing coverage. Full Regression #3568 / run 43232097780: **GREEN** on exact commit `40eb0fe0ab45dcf82298bc106587ea89793fbdf4`; all 20 steps passed, including the complete browser F3 route and clean working tree.
 
 Next: review the complete fraction practice route in PacoGO TEST with the learner before use. Technical regression is not pedagogical validation. Keep F4 conditional; verify its prerequisites and method provenance before implementation. FR1 formal contract gap remains open and must not be filled with invented registry IDs.
+
+
+### Final regression closure — F3 and documentation — 2026-11-12
+
+Full Regression #3568 / run 43232097780 was GREEN on F3 implementation/test commit `40eb0fe0ab45dcf82298bc106587ea89793fbdf4`. Handoff/inventory closure commit `cc2ea4093d548f00a5ef73dbb7c6c7fcd352610e` then passed Full Regression #3569 / run 43232481482: **GREEN** on that exact commit, all 20 steps passed. Current branch HEAD at this closure is `cc2ea4093d548f00a5ef73dbb7c6c7fcd352610e`.
+
+The complete non-formal learner route now includes visual recognition, learner-created equivalent fractions, staged F2 addition, the learner-entered 15/10 mixed-number/simplification example, and staged F3 subtraction. All additional practice stores are separate, learner-keyed and local-only. No formal FR1/FR2 curriculum/evidence, diagnostic, C1–C9, mastery, next-action, learner-state or Supabase contracts were changed.
+
+Next: learner-facing review in PacoGO TEST. F4 remains conditional and is not built. FR1 formal contract gap remains open.

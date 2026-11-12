@@ -6019,3 +6019,44 @@ The task-set specification and assessment contract were updated to stop describi
 - Latest implementation commit with Full Regression verified: `6b8a4cd259b11a9c0bbadaa033cb125193d37fc1`.
 - Latest verified Full Regression: #3524 / run `43136408114`, **GREEN** on that exact implementation commit.
 - Latest task-set, assessment-contract and handoff documentation changes are pending their own Full Regression on the final documentation commit.
+
+
+---
+
+## Current handoff update — 2026-11-12 (fraction diagnostic inline answer presentation verified)
+
+**Branch:** `refactor/professional-v1`. LIVE `main` untouched.
+
+### What was built
+
+The fraction diagnostic now renders the single active answer field directly in the mathematical expression rather than in a separate wide answer panel.
+
+- F1 multiplier and numerator responses use compact inline fields.
+- F2/F3 common-denominator responses appear inline alongside the original operation.
+- F2/F3 arithmetic expressions retain the common denominator visibly, so the learner supplies the missing result numerator in a complete fraction expression.
+- F4 retains the mixed-number and denominator context during conversion and subtraction.
+- Prompts and answer-history labels are shorter and less technical.
+- The answer input is inside the form and inside the expression; browser tests assert this.
+- The v2 session contract remains one non-negative whole-number response per ordered action. Existing v1/v2 stored sessions are not migrated, reset, overwritten or reinterpreted.
+
+### Root cause found during verification
+
+Full Regression #3528 was RED on implementation commit `aadfd629769b413671be2bef2658736893f1d229`. The exact browser failure was a stale expected expression in the F3 subtraction test: it expected `1/2 − 2/5` while the intentional new interface correctly displayed `1/2 − 2/5 → noemer ?`. The other 64 browser tests passed; the maintained Node, Vitest and curriculum-engine checks had passed.
+
+The test expectation was updated to the approved inline-denominator presentation in commit `cf8dd28cffb5928a1d6bcf282e3852b288b05e43`. No production behavior was changed to satisfy an incorrect mathematical test.
+
+### Verification
+
+- Implementation commit: `aadfd629769b413671be2bef2658736893f1d229`.
+- Browser contract correction: `cf8dd28cffb5928a1d6bcf282e3852b288b05e43`.
+- Full Regression #3529 / run `43144462130`: **GREEN** on exact commit `cf8dd28cffb5928a1d6bcf282e3852b288b05e43`.
+- The run completed curriculum-engine, architecture, maintained Node, maintained Vitest, all browser tests and clean-working-tree verification.
+- Run URL: https://github.com/huisartslasten/PAB/actions/runs/43144462130
+
+### Boundaries and next step
+
+- No curriculum registry, FR2/C1–C9, formal evidence, inference, mastery, next-action, learner-state or Supabase contract changed.
+- Simplification is not part of diagnostic F1–F4. It remains a separate learner-controlled step to design in the Fraction practice interface.
+- No real learner session or PacoGO TEST visual review has been performed. Browser fixtures are technical verification, not learner validation.
+
+**Next concrete step:** review the inline learner flow in PacoGO TEST, confirm it preserves the intended step-by-step experience and raw answers, then build the Fraction practice route that starts targeted teaching promptly. The practice route must preserve the same curriculum and evidence boundaries while allowing the learner to request simplification where the task requires it.

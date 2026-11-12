@@ -80,7 +80,7 @@ function createFractionConstructionPracticeSession({ learnerKey, storage = globa
     const task = FRACTION_CONSTRUCTION_PRACTICE_TASKS.find(item => item.id === taskId);
     if (!task) throw new TypeError("Unknown fraction construction practice task.");
     const raw = String(rawNumerator ?? "");
-    const parsed = /^\\d+$/.test(raw) ? Number(raw) : NaN;
+    const parsed = /^\d+$/.test(raw) ? Number(raw) : NaN;
     const classification = evaluateEquivalentNumerator({
       targetFraction: task.targetFraction,
       numerator: Number.isSafeInteger(parsed) ? parsed : NaN,

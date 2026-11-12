@@ -418,3 +418,8 @@ Baseline Full Regression #3558 / run 43221213403 was GREEN on e771796b1929c787b9
 The non-formal F2 addition practice now renders its active numeric input directly inside the mathematical expression, reusing the same interaction principle already present in the diagnostic runtime. The separate input host now contains only the submit action. The common-denominator step explicitly shows an inline missing-value slot after the original operation; equivalent-numerator and result steps retain their missing slot inside fraction notation or the arithmetic expression. The reusable renderer supports multiple input slots, accessible labels, keyboard focus and locking.
 
 The F2 step order, valid-denominator logic, raw-response storage, learner isolation and local-only boundary are unchanged. Browser regression now checks that the input is a descendant of the expression itself. Mixed-number and simplification controls are not yet built; they remain the next increment. This is still non-formal practice and does not alter FR1/FR2 curriculum scope or formal evidence.
+
+
+### Regression note — F2 inline expression input
+
+Full Regression #3560 / run 43226149457 was RED on commit 2da5177fe445a5197b94cab1981211f15ab07449. All non-browser checks passed. The browser failure was a stale second-step assertion that still expected the integer input inside #additionInput. The new UI intentionally places it inside #additionExpression. The assertion is corrected to verify the new location and the absence of an input in the old host; no assertion coverage is removed. Await Full Regression on the exact correction commit.

@@ -6449,3 +6449,10 @@ This is a documentation-only clarification following Full Regression #3558 (GREE
 ### Implementation update — reusable inline expression entry (F2 practice)
 
 The F2 arithmetic practice has been refactored so its active numeric response is rendered directly inside the mathematical expression. The common-denominator step now appears as part of the original operation, and subsequent equivalent-numerator and result fields occupy the corresponding numerator/result positions. The separate input host contains only the action button. The new renderer supports multiple missing positions, accessible input labels, keyboard focus and locking; it is intended for reuse by subsequent non-formal arithmetic practice. Raw response storage and the F2 session contract are unchanged. The new browser coverage asserts that the field is inside the expression and that the learner still completes the same four steps. Mixed-number and simplification stages are not yet implemented; they remain the next interface increment.
+
+
+### Regression investigation — inline F2 practice renderer
+
+- Full Regression #3560 / run 43226149457: RED on exact commit 2da5177fe445a5197b94cab1981211f15ab07449. Curriculum engine, architecture, maintained Node and Vitest steps passed; browser regression failed at a stale assertion expecting the F2 numeric input under #additionInput.
+- The new renderer correctly places that input inside #additionExpression; the browser test still contained a second old-location assertion at the second step. This is a test expectation that no longer matches the intentionally changed UI contract, not a runtime failure.
+- The browser test is corrected to assert the input remains inside #additionExpression and that #additionInput contains no input. No coverage is removed or weakened. Full Regression on the exact follow-up commit is required before proceeding.

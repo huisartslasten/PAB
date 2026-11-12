@@ -120,7 +120,8 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await page.getByRole("button", { name: "Volgende stap" }).click();
 
   await expect(page.locator("#additionExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "1/3 = ?/12");
-  await expect(page.locator("#additionInput input")).toHaveCount(1);
+  await expect(page.locator("#additionExpression input")).toHaveCount(1);
+  await expect(page.locator("#additionInput input")).toHaveCount(0);
   await page.getByRole("textbox", { name: "Nieuwe teller voor 1/3" }).fill("4");
   await page.getByRole("button", { name: "Controleren" }).last().click();
   await page.getByRole("button", { name: "Volgende stap" }).click();

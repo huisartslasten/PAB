@@ -6569,3 +6569,17 @@ Next: review the entire learner-facing route in the local PacoGO TEST environmen
 ### Volgende concrete stap
 
 Gebruik de lokale PacoGO TEST-omgeving om de volledige breukenroute te openen en te beoordelen: herkenning, zelf breuken maken, optellen, het voorbeeld 15/10 met gemengde breuk en vereenvoudigen, en aftrekken. Controleer de begrijpelijkheid van instructies, visuele modellen, invulvelden, feedback en overgangen. Leg bevindingen vast voordat de instructie wordt aangepast. Bouw F4 nog niet; eerst moeten de F3-diagnostische voorwaarden en de herkomst van de gebruikte methode worden gecontroleerd.
+
+### Inline invoer constructie gelijkwaardige breuken — 2026-11-12
+
+- Op de leerlingpagina gebruikte de oefening **Maak zelf een gelijkwaardige breuk** nog de oude losse tellerinvoer onder de vergelijking. De gebruiker constateerde dit in de lokale TEST-weergave.
+- De oorzaak was dat deze constructie-oefening nog `createFractionNumeratorInput` gebruikte, terwijl F2-optellen, F3-aftrekken en het gemengde-getalvoorbeeld al de gedeelde inline renderer `renderFractionPracticeExpression` gebruikten.
+- Implementatiecommit: `7912f28afac19bbd540b42f1cd66423d5e6eb398`. De constructie-oefening rendert nu `1/2 = ?/4` met het daadwerkelijke invoerveld op de tellerpositie in de vergelijking. De losse invoer onder de vergelijking is verwijderd; **Controleren** blijft een aparte actieknop. Onjuiste antwoorden kunnen opnieuw worden geprobeerd. Berekening, drie bestaande taken, local-only learner-keyed opslag en formele grenzen zijn ongewijzigd.
+- De browserregressie controleert nu expliciet dat de vergelijking de inline textbox bevat en dat `#constructionInput` geen textbox meer bevat, voor de drie constructie-opgaven.
+- Full Regression #3575 / run 43318414936: **GREEN** op exact commit `7912f28afac19bbd540b42f1cd66423d5e6eb398`. Alle 20 stappen geslaagd, inclusief curriculum engine, architectuurgrenzen, Node, Vitest, browserregressie en clean working tree.
+- De branch is uitsluitend `refactor/professional-v1`; LIVE `main), curriculumdefinities, C1–C9, FR1/FR2-formele mappings, mastery/next-action/learner-state en Supabase zijn niet gewijzigd.
+
+### Volgende concrete stap
+
+Herhaal de lokale PacoGO TEST-controle van de volledige breukenroute. Controleer nu expliciet dat de tellerinvoer in **Maak zelf een gelijkwaardige breuk** daadwerkelijk in de vergelijking staat, en beoordeel daarnaast de herkenning, optelroute, het voorbeeld 15/10 met gemengd getal en vereenvoudigen, en de aftrekroute. De geautomatiseerde browserregressie bevestigt de DOM-/interactiecontracten, maar vervangt de visuele controle in de echte lokale ouder-/leerlingomgeving niet. Noteer eventuele resterende verschillen met screenshots voordat nieuwe code wordt gewijzigd. Bouw F4 nog niet; de FR1 formele contractgap en de F4-methodeherkomst blijven open.
+

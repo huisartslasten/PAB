@@ -6,13 +6,22 @@ import { createFractionDiagnosticSessionV2, FRACTION_DIAGNOSTIC_TASKS_V2 } from 
 
 const TASK_ORDER = Object.freeze(['F1', 'F2', 'F3', 'F4']);
 const ACTION_LABELS = Object.freeze({
-  factor: 'Vermenigvuldigingsfactor',
-  new_numerator: 'Nieuwe teller',
-  common_denominator: 'Gemeenschappelijke noemer',
-  first_numerator: 'Eerste nieuwe teller',
-  second_numerator: 'Tweede nieuwe teller',
-  result_numerator: 'Uitkomst van de tellers',
+  factor: 'Factor',
+  new_numerator: 'Teller',
+  common_denominator: 'Noemer',
+  first_numerator: 'Eerste teller',
+  second_numerator: 'Tweede teller',
+  result_numerator: 'Uitkomst',
   mixed_numerator: 'Teller na omzetten'
+});
+const ACTION_PROMPTS = Object.freeze({
+  factor: 'Vul het ontbrekende getal in.',
+  new_numerator: 'Vul de ontbrekende teller in.',
+  common_denominator: 'Welke noemer gebruik je voor beide breuken?',
+  first_numerator: 'Vul de ontbrekende teller in.',
+  second_numerator: 'Vul de ontbrekende teller in.',
+  result_numerator: 'Welke teller krijg je als uitkomst?',
+  mixed_numerator: 'Vul de ontbrekende teller in.'
 });
 
 function expressionFor(action, taskId, snapshot) {
@@ -23,21 +32,21 @@ function expressionFor(action, taskId, snapshot) {
   const first = value('first_numerator');
   const second = value('second_numerator');
   switch (taskId + '.' + action.actionId) {
-    case 'F1.factor': return '2/3  →  noemer 6';
+    case 'F1.factor': return '2/3 → 3 × ? = 6';
     case 'F1.new_numerator': return '2/3 = ?/6';
-    case 'F2.common_denominator': return '1/3 + 1/4';
+    case 'F2.common_denominator': return '1/3 + 1/4 → noemer ?';
     case 'F2.first_numerator': return '1/3 = ?/' + common;
     case 'F2.second_numerator': return '1/4 = ?/' + common;
-    case 'F2.result_numerator': return first + ' + ' + second + ' = ?';
-    case 'F3.common_denominator': return '1/2 − 2/5';
+    case 'F2.result_numerator': return first + '/' + common + ' + ' + second + '/' + common + ' = ?/' + common;
+    case 'F3.common_denominator': return '1/2 − 2/5 → noemer ?';
     case 'F3.first_numerator': return '1/2 = ?/' + common;
     case 'F3.second_numerator': return '2/5 = ?/' + common;
-    case 'F3.result_numerator': return first + ' − ' + second + ' = ?';
+    case 'F3.result_numerator': return first + '/' + common + ' − ' + second + '/' + common + ' = ?/' + common;
     case 'F4.mixed_numerator': return '1 1/3 = ?/3';
-    case 'F4.common_denominator': return mixed + '/3 − 2/5';
+    case 'F4.common_denominator': return mixed + '/3 − 2/5 → noemer ?';
     case 'F4.first_numerator': return mixed + '/3 = ?/' + common;
     case 'F4.second_numerator': return '2/5 = ?/' + common;
-    case 'F4.result_numerator': return first + ' − ' + second + ' = ?';
+    case 'F4.result_numerator': return first + '/' + common + ' − ' + second + '/' + common + ' = ?/' + common;
     default: return action.expression;
   }
 }
@@ -90,7 +99,7 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
   submit.type = 'submit';
   submit.className = 'success';
   submit.textContent = 'Volgende stap';
-  form.append(fields, submit);
+  form.append(expression, fields, submit);
   const historyTitle = documentRef.createElement('h3');
   historyTitle.className = 'fraction-diagnostic-history-title';
   historyTitle.textContent = 'Jouw eerdere antwoorden';
@@ -107,7 +116,7 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
   stop.className = 'secondary';
   stop.id = 'fraction-diagnostic-stop';
   stop.textContent = 'Diagnose stoppen';
-  diagnostic.append(learnerLabel, taskTitle, actionPrompt, progress, expression, form, historyTitle, history, diagnosticNotice, diagnosticStatus, stop);
+  diagnostic.append(learnerLabel, taskTitle, actionPrompt, progress, form, historyTitle, history, diagnosticNotice, diagnosticStatus, stop);
 
   const result = documentRef.createElement('section');
   result.id = 'fraction-diagnostic-result';
@@ -123,35 +132,38 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
   result.append(resultTitle, resultCopy, resultHistoryTitle, resultHistory);
   content.append(setup, diagnostic, result);
 
-  function createInput() {
-    const label = documentRef.createElement('label');
-    label.className = 'fraction-diagnostic-field';
-    const caption = documentRef.createElement('span');
-    caption.textContent = ACTION_LABELS[session.getCurrentAction().action.actionId] || 'Jouw antwoord';
-    const input = documentRef.createElement('input');
-    input.type = 'number';
-    input.inputMode = 'numeric';
-    input.min = '0';
-    input.step = '1';
-    input.required = true;
-    input.name = 'answer';
-    input.id = 'fraction-diagnostic-answer';
-    input.className = 'paco-form-control';
-    input.setAttribute('aria-label', caption.textContent);
-    label.append(caption, input);
-    return label;
-  }
-
-  function renderMathExpression(host, text) {
+  function renderMathExpression(host, text, inputLabel) {
     host.replaceChildren();
     host.setAttribute('data-expression', text);
     host.setAttribute('aria-label', text);
+    let inputCreated = false;
+    const appendValue = (parent, value, slotClass) => {
+      const slot = documentRef.createElement('span');
+      slot.className = slotClass;
+      if (value === '?' && !inputCreated) {
+        const input = documentRef.createElement('input');
+        input.type = 'number';
+        input.inputMode = 'numeric';
+        input.min = '0';
+        input.step = '1';
+        input.required = true;
+        input.name = 'answer';
+        input.className = 'fraction-diagnostic-inline-input';
+        input.setAttribute('aria-label', inputLabel || 'Jouw antwoord');
+        slot.classList.add('fraction-diagnostic-inline-field');
+        slot.appendChild(input);
+        inputCreated = true;
+      } else {
+        slot.textContent = value === '?' ? 'zelfde' : value;
+      }
+      parent.appendChild(slot);
+    };
     const tokenPattern = /(\d+\s+)?(\d+|\?)\/(\d+|\?)|(\?)/g;
     let cursor = 0;
     for (const match of text.matchAll(tokenPattern)) {
       if (match.index > cursor) host.append(documentRef.createTextNode(text.slice(cursor, match.index)));
       if (match[4]) {
-        host.append(documentRef.createTextNode('?'));
+        appendValue(host, '?', 'fraction-diagnostic-inline-field');
       } else {
         if (match[1]) {
           const whole = documentRef.createElement('span');
@@ -160,13 +172,8 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
         }
         const fraction = documentRef.createElement('span');
         fraction.className = 'fraction-diagnostic-fraction';
-        const numerator = documentRef.createElement('span');
-        numerator.className = 'fraction-diagnostic-numerator';
-        numerator.textContent = match[2];
-        const denominator = documentRef.createElement('span');
-        denominator.className = 'fraction-diagnostic-denominator';
-        denominator.textContent = match[3];
-        fraction.append(numerator, denominator);
+        appendValue(fraction, match[2], 'fraction-diagnostic-numerator');
+        appendValue(fraction, match[3], 'fraction-diagnostic-denominator');
         host.append(fraction);
       }
       cursor = match.index + match[0].length;
@@ -225,16 +232,16 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
     const snapshot = session.getSessionSnapshot();
     const state = session.getProgress();
     taskTitle.textContent = current.taskTitle;
-    actionPrompt.textContent = current.action.prompt;
-    progress.textContent = 'Handeling ' + (state.submittedActions + 1) + ' van maximaal 15';
-    renderMathExpression(expression, expressionFor(current.action, current.taskId, snapshot));
-    fields.replaceChildren(createInput());
+    actionPrompt.textContent = ACTION_PROMPTS[current.action.actionId] || current.action.prompt;
+    progress.textContent = 'Stap ' + (state.submittedActions + 1) + ' van maximaal 15';
+    renderMathExpression(expression, expressionFor(current.action, current.taskId, snapshot), ACTION_LABELS[current.action.actionId]);
+    fields.replaceChildren();
     history.replaceChildren();
     renderHistory(history, snapshot, current.taskId);
     diagnosticStatus.textContent = '';
     diagnostic.hidden = false;
     result.hidden = true;
-    fields.querySelector('input')?.focus();
+    expression.querySelector('input')?.focus();
   }
 
   function showResult() {
@@ -268,7 +275,7 @@ export function createFractionDiagnosticRuntime({ app, templateMount, context, d
   form.addEventListener('submit', event => {
     event.preventDefault();
     try {
-      const input = fields.querySelector('input');
+      const input = expression.querySelector('input');
       if (!input?.value.trim() || !Number.isSafeInteger(Number(input.value)) || Number(input.value) < 0) {
         input?.focus();
         throw new Error('Vul een niet-negatief heel getal in.');

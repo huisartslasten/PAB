@@ -164,3 +164,18 @@ Each submitted action is appended in presentation order:
 The branch/stop and v2 storage contract above have been implemented in the formative v2 session engine and the staged learner-facing diagnostic runtime. The learner interface displays one action at a time, retains raw submitted responses, and does not write formal evidence, mastery or learner state. The legacy v1 session and storage remain untouched.
 
 This implementation status is not a claim of scientific validation or learner effectiveness. Before using the diagnostic with Zyon, review the final wording and task scope against current school material, then perform a controlled session in PacoGO TEST. Inspect the raw response sequence and classifications before making any teaching recommendation. Do not add improper-to-mixed or other probes unless current workbook/teacher material confirms they are required.
+
+
+## 11. Learner-facing expression layout — implementation update 2026-11-12
+
+The staged learner interface now places the single active answer field directly inside the mathematical expression rather than in a separate wide answer panel.
+
+- Equivalent-fraction numerator and conversion answers appear in the numerator position of a displayed fraction.
+- The common-denominator response appears as a compact inline field alongside the original operation; the selected denominator is then shown in each subsequent equivalent-fraction expression.
+- Addition and subtraction results retain the common denominator visibly (for example, the learner completes the numerator in a full fraction expression).
+- Mixed-number conversion keeps the original mixed number and the unchanged denominator visible while the learner supplies the converted numerator.
+- Only one editable field is rendered at a time. It is part of the form and remains keyboard accessible.
+- Short learner-facing prompts and concise history labels replace the previous technical field labels. The learner's earlier raw responses remain visible.
+- The v2 session schema and one-integer-per-action contract are unchanged. No existing v2 or legacy v1 session data is migrated, overwritten or reinterpreted.
+
+**Scope boundary:** simplification is not added to this diagnostic. It is not part of the current F1–F4 action contract and must be designed as a separate learner-controlled step in the subsequent Fraction practice interface. PacoGO must not simplify an answer automatically or display a solved value before the learner supplies it.

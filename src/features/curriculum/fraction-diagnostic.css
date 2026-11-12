@@ -35,3 +35,12 @@
 .fraction-diagnostic-result-history{margin-top:8px}
 .fraction-diagnostic-result-history .fraction-diagnostic-history-group{margin:0}
 .fraction-diagnostic #fraction-diagnostic-answer{max-width:280px;font-size:20px;font-weight:800}
+
+/* Fraction answers are entered directly in the mathematical expression. */
+.fraction-diagnostic-fields{display:none}
+.fraction-diagnostic-inline-field{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle}
+.fraction-diagnostic-inline-input{box-sizing:border-box;width:2.25em;min-width:2.25em;height:1.55em;padding:0 .12em;border:2px solid #8fc6f5;border-radius:8px;background:#fff;color:var(--paco-text);font:800 .78em/1 Nunito,sans-serif;text-align:center}
+.fraction-diagnostic-inline-input:focus{outline:3px solid rgba(23,135,242,.25);border-color:var(--paco-blue)}
+.fraction-diagnostic-inline-input::-webkit-inner-spin-button,.fraction-diagnostic-inline-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.fraction-diagnostic-inline-input{-moz-appearance:textfield}
+@media(max-width:600px){.fraction-diagnostic-inline-input{width:2em;min-width:2em}}

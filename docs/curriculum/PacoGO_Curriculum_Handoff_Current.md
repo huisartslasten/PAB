@@ -6408,3 +6408,39 @@ The complete executable fraction learning route remains open.
 ### Verification target for the 2026-11-12 addition-practice handoff
 
 The staged F2 addition practice was verified by Full Regression #3556 (GREEN) on `287d327daa81928c1bbc9500ad0c5231b60ada51`. This follow-up handoff/inventory documentation commit must also pass Full Regression on its exact resulting commit before the phase is closed.
+
+
+---
+
+## Current handoff update — 2026-11-12 (learner-authored inline fraction results)
+
+### User-approved Learning Interface requirement
+
+The learner-facing arithmetic practice must keep the mathematical expression as the primary work surface. Numeric response fields belong directly in the expression at the missing mathematical position; they must not be presented only as a separate answer panel below the sum.
+
+For an improper result such as 15/10, the learner may explicitly select a mixed-number representation. That action reveals the whole-number, numerator and denominator input positions in the equation, allowing the learner to enter 1 5/10. PacoGO must not calculate or prefill these values.
+
+A separate learner-triggered **Vereenvoudigen** action then reveals a second equation for the fractional part (for example, 1 5/10 = 1 [numerator]/[denominator]). The learner enters both values, such as 1 and 2. PacoGO validates mathematical equivalence and the intended simplified form; it must not silently reduce the fraction or replace the learner's raw response.
+
+This is a user-approved product/interface requirement for non-formal fraction practice, not a new curriculum skill, formal task, evidence target, diagnostic action or mastery rule. The diagnostic F1–F4 contract remains unchanged.
+
+### Source and implementation check
+
+- The diagnostic runtime already has an inline mathematical-expression renderer (renderMathExpression) that places its single active numeric input inside the expression.
+- The separate F2 practice page currently renders its arithmetic expression as text and mounts the numeric input in a separate panel (#additionInput). It does not yet meet the inline-expression requirement.
+- The reusable Fraction Learning Interface remains a proper-fraction recognition/equivalence instrument. Its current contract rejects improper fractions and it has no arithmetic numeric-entry or mixed-number/simplification workflow. Do not overload its FR2 recognition contract with arithmetic behavior.
+- The F2 practice result is 7/12, so it does not exercise mixed-number conversion or simplification. The sample 15/10 is an interaction example, not an authorization to change the source diagnostic task set.
+
+### Revised next implementation sequence
+
+1. Create a reusable learner-facing arithmetic-expression input/rendering capability for non-formal practice, preserving one active learner-entered value at a time and keyboard accessibility.
+2. Refactor the existing F2 practice so its missing values appear inside the equation rather than in a separate answer panel.
+3. Add the optional learner-controlled mixed-number and simplification stages, preserving raw responses and validating equivalence without automatic completion.
+4. Reuse the same capability for the separate F3 subtraction practice (1/2 − 2/5), based on the existing diagnostic task-set sequence. F3 remains optional, formative and local-only.
+5. Review the result in PacoGO TEST before Zyon uses it. Technical regression does not establish pedagogical validation.
+
+Preserve all existing formal/non-formal boundaries: no FR1/FR2 registry expansion, no invented developments/claims/evidence/task models, no C1–C9 changes, no mastery/next-action/learner-state writes, and no Supabase change absent a real persistence contract need.
+
+### Verification target
+
+This is a documentation-only clarification following Full Regression #3558 (GREEN) on baseline commit e771796b1929c787b99b79d87a1db6e08c97dfe9. Full Regression must run on the exact resulting documentation commit before this update is closed or the next implementation slice begins.

@@ -389,3 +389,25 @@ Two original area models remain visible. Only the active action is shown; no fut
 The episode stores raw step responses and classifications in a separate learner-keyed local store. It is not a diagnostic replay or formal task/evidence measure. It does not alter FR2 scope, FR1 contracts, C1–C9, mastery, learner state or Supabase. Method alignment is not claimed.
 
 Full Regression #3556 / run `43220904553`: **GREEN** on exact code/test commit `287d327daa81928c1bbc9500ad0c5231b60ada51`; all 20 steps passed. The documentation closure requires its own Full Regression on the exact resulting commit.
+
+
+---
+
+## 17. Update 2026-11-12 — inline arithmetic expression and learner-controlled result forms
+
+A user-approved interface requirement now clarifies the next fraction-practice design:
+
+- The equation itself is the work surface. Missing numeric values must be entered directly inside the mathematical expression, not solely in a separate answer panel.
+- For an improper result such as 15/10, the learner may select a mixed-number option. The UI then reveals learner-editable whole-number, numerator and denominator positions (example: 1 5/10).
+- A separate learner-triggered **Vereenvoudigen** action reveals another equation for the fractional part (example: 1 5/10 = 1 [numerator]/[denominator]). The learner enters the simplified fraction (example: 1/2). PacoGO validates the learner's entry but does not prefill, calculate or silently simplify it.
+- Preserve raw responses and keep each stage explicit. This is non-formal practice behavior, not a new skill, task/evidence mapping or mastery rule.
+
+Read-only implementation findings:
+- The formative diagnostic runtime already implements an inline expression renderer with one active input embedded at the missing position. This behavior belongs to the diagnostic route and does not itself satisfy the practice-page requirement.
+- The current F2 practice page still places its input in a separate host below the expression.
+- The reusable FR2 Fraction Learning Interface only accepts proper fractions and supports recognition/representation tasks, not arithmetic entry or mixed/improper fraction rendering. Keep those contracts separate.
+- Existing F2 practice result 7/12 does not trigger mixed-number or simplification paths. 15/10 is the user's example for the desired generic interaction, not a change to the diagnostic task set.
+
+Revised order: (1) reusable inline arithmetic-expression input for non-formal practice; (2) refactor F2 practice to use it; (3) add optional learner-controlled mixed-number and simplification stages; (4) reuse the same capability in the F3 subtraction practice based on the existing 1/2 − 2/5 task-set episode. No diagnostic, formal curriculum, C1–C9, mastery, learner-state or Supabase contract changes are authorized by this UI requirement.
+
+Baseline Full Regression #3558 / run 43221213403 was GREEN on e771796b1929c787b99b79d87a1db6e08c97dfe9. This documentation update must pass Full Regression on its exact resulting commit.

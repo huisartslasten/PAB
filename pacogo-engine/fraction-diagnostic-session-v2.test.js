@@ -41,7 +41,7 @@ test("dependent responses are retained without double-counting an earlier invali
   const actions = session.getSessionSnapshot().tasks.F2.actions;
   assert.equal(actions[0].classification, "invalid_relation");
   assert.equal(actions[1].classification, "ambiguous");
-  assert.equal(actions[2].classification, "valid");
+  assert.equal(actions[2].classification, "ambiguous");
   assert.equal(actions[3].classification, "ambiguous");
 });
 

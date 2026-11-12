@@ -6501,3 +6501,12 @@ Next: verify this implementation through Full Regression on its exact commit. Af
 ### Next concrete step
 
 Build the separate non-formal F3 subtraction practice based on the existing diagnostic F3 episode `1/2 − 2/5`, using the shared inline expression renderer. Keep the learner-entered sequence explicit: choose a valid common denominator, enter the equivalent numerator for each original fraction, and enter the subtraction result. Preserve raw attempts in a separate learner-keyed local-only store. Do not change the diagnostic F3 contract or formal FR1/FR2 mappings. After implementation, inspect the learner-facing page in browser regression and verify exact-commit Full Regression. Before Zyon uses it, review the actual PacoGO TEST presentation; automated regression is not pedagogical validation.
+
+
+### Implementation update — separate F3 subtraction practice
+
+Added a separate optional non-formal practice episode based on the existing diagnostic F3 task `1/2 − 2/5`. The four learner-entered stages follow the source sequence exactly: (1) choose any valid common denominator; (2) enter the equivalent numerator for 1/2; (3) enter the equivalent numerator for 2/5; (4) subtract the learner's converted numerators. The expression and one active inline input are visible at each stage; future actions are not shown or prefilled.
+
+The practice accepts any positive common multiple of 2 and 5, not only 10. The browser regression exercises 20 as an alternate denominator and verifies 10 − 8 = 2, displaying the learner's result as 2/20 without automatically simplifying it. Invalid denominator, conversion and subtraction responses can be retried. Raw attempts and classifications are saved in a separate learner-keyed versioned local-only store. No diagnostic F3 session is started or modified; no formal evidence, mastery, next action, learner state or Supabase writes occur.
+
+This is non-formal practice derived from the existing diagnostic action sequence, not a formal FR1/FR2 task/evidence mapping. Full Regression on the exact implementation commit is required before closure.

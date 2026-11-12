@@ -453,3 +453,12 @@ Next: exact-commit Full Regression; then build the separate F3 subtraction pract
 Implementation commit `892d7176fcbe17f9d66ca3d4af4dae6766f99ece` added the optional non-formal 15/10 episode with learner-entered mixed-number conversion and explicit simplification. Full Regression #3564 / run 43230489974: **GREEN** on that exact commit; all 20 workflow steps passed, including browser regression and clean working tree. This example is not a formal task/evidence mapping and does not alter diagnostic F1–F4, F2 addition, curriculum contracts or persistence boundaries. This documentation closure requires exact-commit regression.
 
 Next: build separate F3 subtraction practice from the existing 1/2 − 2/5 diagnostic episode using the shared inline renderer, raw learner entries and local-only learner-keyed storage. Keep formal diagnostic and curriculum contracts unchanged.
+
+
+## 20. Update 2026-11-12 — separate F3 subtraction practice
+
+Added optional non-formal practice based on the existing diagnostic F3 episode `1/2 − 2/5`. It follows the source-defined four actions one at a time: choose a common denominator, enter the equivalent numerator for 1/2, enter the equivalent numerator for 2/5, then subtract the learner-entered numerators. Each active response appears inline in the mathematical expression; later actions are not prefilled or shown.
+
+Any positive common multiple of 2 and 5 is accepted. Browser coverage uses 20 to prove that the learner is not restricted to the least common denominator, then checks the 10 − 8 = 2 subtraction. The final result is shown as 2/20 and is not automatically simplified. Invalid responses remain retryable and raw attempts/classifications are stored in a separate learner-keyed local-only store. This does not modify diagnostic F3, formal curriculum/evidence contracts, mastery, learner state or Supabase.
+
+Next: exact-commit Full Regression; then review the complete fraction practice route in PacoGO TEST before Zyon uses it.

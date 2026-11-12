@@ -1,0 +1,26 @@
+import assert from "node:assert/strict";
+import {createFractionSubtractionPracticeSession} from "./fraction-subtraction-practice-session.js";
+function memory(){const m=new Map();return{getItem:k=>m.has(k)?m.get(k):null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k),entries:()=>[...m.entries()]};}
+const storage=memory(),a=createFractionSubtractionPracticeSession({learnerKey:"learner-a",storage}),b=createFractionSubtractionPracticeSession({learnerKey:"learner-b",storage});
+assert.equal(a.getCurrentStep().expression,"1/2 − 2/5 → noemer ?");
+assert.equal(a.recordResponse({rawValue:"4"}).classification,"not_common_denominator");
+assert.equal(a.recordResponse({rawValue:"20"}).classification,"valid");
+assert.equal(a.getCurrentStep().expression,"1/2 = ?/20");
+assert.equal(a.recordResponse({rawValue:"9"}).classification,"not_equivalent");
+assert.equal(a.recordResponse({rawValue:"10"}).classification,"valid");
+assert.equal(a.getCurrentStep().expression,"2/5 = ?/20");
+assert.equal(a.recordResponse({rawValue:"7"}).classification,"not_equivalent");
+assert.equal(a.recordResponse({rawValue:"8"}).classification,"valid");
+assert.equal(a.getCurrentStep().expression,"10 − 8 = ?");
+assert.equal(a.recordResponse({rawValue:"3"}).classification,"arithmetic_error");
+const done=a.recordResponse({rawValue:"2"});
+assert.equal(done.classification,"valid");assert.equal(done.progress.isComplete,true);
+assert.deepEqual(done.completion,{leftNumerator:10,rightNumerator:8,resultNumerator:2,denominator:20});
+assert.equal(a.getCurrentStep(),null);assert.equal(b.getProgress().completedStepCount,0);
+const [key,value]=storage.entries()[0];assert.match(key,/pacogo:fraction-subtraction-practice:v1:learner-a/);
+for(const raw of ['"rawValue":"4"','"rawValue":"20"','"rawValue":"9"','"rawValue":"10"','"rawValue":"7"','"rawValue":"8"','"rawValue":"3"','"rawValue":"2"'])assert.ok(value.includes(raw));
+assert.equal(value.includes("learner-a"),false);
+assert.throws(()=>createFractionSubtractionPracticeSession({learnerKey:" ",storage}),/learner key/);
+assert.throws(()=>createFractionSubtractionPracticeSession({learnerKey:"learner-a"}),/local storage/);
+a.reset();assert.equal(a.getProgress().completedStepCount,0);assert.equal(b.getProgress().completedStepCount,0);
+console.log("PacoGO fraction subtraction practice session tests passed.");

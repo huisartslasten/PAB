@@ -77,7 +77,9 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await page.getByRole("button", { name: "Zelf een gelijkwaardige breuk maken" }).click();
   await expect(page.locator("#constructionCard")).toBeVisible();
   await expect(page.locator("#constructionTarget .pacogo-fraction-representation--area")).toHaveCount(1);
-  await expect(page.locator("#constructionEquation")).toContainText("1/2=?/4");
+  await expect(page.locator("#constructionEquation .fraction-practice-equation")).toHaveAttribute("data-expression", "1/2 = ?/4");
+  await expect(page.locator("#constructionEquation input")).toHaveCount(1);
+  await expect(page.locator("#constructionInput input")).toHaveCount(0);
   await expect(page.getByRole("textbox", { name: "Vul de teller in" })).toHaveValue("");
   await expect(page.locator("#constructionPrompt")).toContainText("noemer 4");
 
@@ -90,12 +92,16 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await expect(page.locator("#constructionFeedback")).toContainText("betekent evenveel");
   await page.getByRole("button", { name: "Volgende oefening" }).click();
 
-  await expect(page.locator("#constructionEquation")).toContainText("1/3=?/6");
+  await expect(page.locator("#constructionEquation .fraction-practice-equation")).toHaveAttribute("data-expression", "1/3 = ?/6");
+  await expect(page.locator("#constructionEquation input")).toHaveCount(1);
+  await expect(page.locator("#constructionInput input")).toHaveCount(0);
   await page.getByRole("textbox", { name: "Vul de teller in" }).fill("2");
   await page.getByRole("button", { name: "Controleren" }).last().click();
   await page.getByRole("button", { name: "Volgende oefening" }).click();
 
-  await expect(page.locator("#constructionEquation")).toContainText("2/3=?/6");
+  await expect(page.locator("#constructionEquation .fraction-practice-equation")).toHaveAttribute("data-expression", "2/3 = ?/6");
+  await expect(page.locator("#constructionEquation input")).toHaveCount(1);
+  await expect(page.locator("#constructionInput input")).toHaveCount(0);
   await page.getByRole("textbox", { name: "Vul de teller in" }).fill("4");
   await page.getByRole("button", { name: "Controleren" }).last().click();
   await page.getByRole("button", { name: "Bekijk afronding" }).click();

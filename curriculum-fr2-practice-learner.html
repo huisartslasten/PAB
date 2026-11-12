@@ -134,7 +134,6 @@
   import { renderFractionRepresentation } from "./pacogo-engine/fraction-learning-interface-renderers.js";
   import { FRACTION_PRACTICE_TASKS, createFractionPracticeSession } from "./pacogo-engine/fraction-practice-session.js";
   import { getStudentLearningProfile } from "./src/core/student-registry.js";
-  import { createFractionNumeratorInput, createFractionIntegerInput } from "./pacogo-engine/fraction-numerator-input.js";
   import { renderFractionPracticeExpression } from "./pacogo-engine/fraction-practice-equation.js";
   import { createFractionAdditionPracticeSession } from "./pacogo-engine/fraction-addition-practice-session.js";
   import { createFractionResultFormPracticeSession } from "./pacogo-engine/fraction-result-form-practice-session.js";
@@ -287,21 +286,18 @@
       " opdrachten afgerond";
   }
 
-  function renderConstructionEquation(task, enteredNumerator = "?") {
-    constructionEquation.replaceChildren();
-    const target = document.createElement("span");
-    target.textContent = task.targetFraction.numerator + "/" + task.targetFraction.denominator;
-    const equals = document.createElement("span");
-    equals.textContent = "=";
-    const numerator = document.createElement("span");
-    numerator.className = "construction-equation__unknown";
-    numerator.id = "constructionEnteredNumerator";
-    numerator.textContent = enteredNumerator;
-    const slash = document.createElement("span");
-    slash.textContent = "/";
-    const denominator = document.createElement("span");
-    denominator.textContent = String(task.answerDenominator);
-    constructionEquation.append(target, equals, numerator, slash, denominator);
+  function renderConstructionEquation(task) {
+    constructionInputInstance = renderFractionPracticeExpression({
+      mount: constructionEquation,
+      expression: task.targetFraction.numerator + "/" + task.targetFraction.denominator +
+        " = ?/" + task.answerDenominator,
+      inputLabels: ["Vul de teller in"],
+      onInteraction: event => {
+        constructionFeedback.textContent = event.rawValue
+          ? "Je kunt je antwoord controleren."
+          : "Kijk naar de blauwe hoeveelheid en vul de teller in.";
+      }
+    });
   }
 
   function showConstructionCompleted() {
@@ -349,8 +345,6 @@
     updateConstructionProgress();
     if (result.classification === "correct") {
       constructionFeedback.textContent = "Goed. Deze breuk betekent evenveel als de doelbreuk.";
-      const entered = constructionEquation.querySelector("#constructionEnteredNumerator");
-      if (entered) entered.textContent = rawNumerator;
       constructionInputInstance.lock();
       constructionNext.replaceChildren();
       const next = document.createElement("button");
@@ -385,17 +379,15 @@
     renderConstructionEquation(currentConstructionTask);
     constructionFeedback.textContent = "Kijk naar de blauwe hoeveelheid en vul de teller in.";
     constructionNext.replaceChildren();
-    constructionInputInstance = createFractionNumeratorInput({
-      mount: constructionInputHost,
-      label: "Vul de teller in",
-      submitLabel: "Controleren",
-      onInteraction: event => {
-        constructionFeedback.textContent = event.rawValue
-          ? "Je kunt je antwoord controleren."
-          : "Kijk naar de blauwe hoeveelheid en vul de teller in.";
-      },
-      onSubmit: handleConstructionAnswer
-    });
+    constructionInputHost.replaceChildren();
+    const submit = document.createElement("button");
+    submit.type = "button";
+    submit.textContent = "Controleren";
+    submit.addEventListener("click", () =>
+      handleConstructionAnswer(constructionInputInstance.getValues()[0] || "")
+    );
+    constructionInputHost.append(submit);
+    constructionInputInstance.focus();
     updateConstructionProgress();
   }
 

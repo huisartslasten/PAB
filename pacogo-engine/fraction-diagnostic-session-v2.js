@@ -119,7 +119,9 @@ function classify(taskId, action, session) {
     const followsFactor = action.rawValue === 2 * prior("factor");
     const classification = priorClass("factor") === C.VALID
       ? (action.rawValue === 4 ? C.VALID : C.INVALID_RELATION)
-      : (followsFactor ? C.DEPENDENT_CONSISTENT : C.AMBIGUOUS);
+      : action.rawValue === 4
+        ? C.VALID
+        : followsFactor ? C.DEPENDENT_CONSISTENT : C.AMBIGUOUS;
     return { classification, dependencyActionIds: [ref("F1", "factor")] };
   }
   if (action.actionId === "common_denominator") {

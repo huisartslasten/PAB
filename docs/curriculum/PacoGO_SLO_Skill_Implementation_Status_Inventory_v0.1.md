@@ -119,6 +119,29 @@ The existing SLO mapping assigns KD10B (fractions) to **FR1–FR2 plus relations
 
 The inventory found no FR1 registry entry or FR1-specific learner implementation in the current branch tree. That is the clearest curriculum-runtime coverage gap for the complete fraction route. This inventory does not invent what FR1 should contain.
 
+### 6.1.1 Prior FR1 design recovered from earlier project conversations
+
+A targeted retrieval of earlier PacoGO project conversations found a pre-existing FR1 working design. This is important continuity context: FR1 is **not** a blank concept to invent now. However, the design was not found as a current FR1 source document or registry entry in this branch, so this note preserves its provenance and does not silently promote it to an implementation-ready contract.
+
+Recovered FR1 definition:
+- **Name:** “Breuken representeren en interpreteren”.
+- **Core meaning:** understand fractions as meaningful quantities and relationships; interpret, represent and connect their meanings across representations and situations.
+- **Meanings explicitly discussed:** part–whole, quantity, position on a number line, ratio and division result.
+- **Previously discussed development outline:** part of a whole → fraction as a quantity → represent through images/partitions/number line/notation → interpret numerator and denominator → connect the different meanings and representations (for example, 1/2, “half”, a number-line position, 0.5 and 50%).
+- **Previously discussed complexity considerations:** representation variation and distance, abstraction, coordination of numerator/denominator/whole, and distance between given and requested information.
+- **Previously discussed supporting links:** A1/A2/A6 and B4 support relevant parts of FR1; fraction comparison/ordering/positioning connects FR1/FR2 with A2/A3/A6; fraction operations connect FR1/FR2 with B1–B4; fraction-as-division links FR1 and B4; ratio and decimal/percentage relations connect the FR and VR families.
+- **Previously discussed cross-skill relationship:** FR1 supports FR2 and links onward to VR1/VR2. The wider curriculum was explicitly described as a network, not one universal linear sequence; these links must not be turned into rigid prerequisites without the original approved decision.
+- Earlier conversation context also records retaining FR1 and FR2 and not adding FR3. Preserve that exclusion; do not create FR3.
+
+The retrieved context did **not** establish a complete, source-verifiable FR1 development/claim/evidence-target/task-model contract or provide the exact owner decision record. Therefore:
+- do not invent FR1.C*, FR1.ET* or FR1.TM* identifiers;
+- do not infer formal assessment or mastery rules from the outline;
+- do not reinterpret FR2 to absorb FR1 or fraction operations;
+- recover and reconcile the original FR1 decision/source artifact before making registry or task bindings.
+
+This is a recovered prior working design, not a new curriculum proposal and not an empirical validation result. The existing SLO mapping still governs the current 32-skill candidate structure.
+
+
 ### 6.2 What already exists for Zyon
 
 - The reusable Fraction Learning Interface exists, with separate pedagogical/configuration, interaction/controller and rendering concerns.
@@ -141,7 +164,7 @@ The inventory found no FR1 registry entry or FR1-specific learner implementation
 1. Do not redesign the 32-skill architecture. The existing SLO mapping and B10 remain the sources of the candidate structure.
 2. Do not equate “present in registry” with “fully implemented,” and do not equate “learner page exists” with “empirically validated.”
 3. Do not expand FR2 to cover all fractions. The missing FR1 portion must be traced to existing approved/source artifacts before any content is authored or runtime is bound.
-4. The next curriculum task is a **source-traceability closeout for FR1 within the existing SLO mapping/B10/decision records**, not a new SLO research exercise. Establish whether an existing FR1 definition or decision already exists outside the current registry. If none exists, report that as an owner-level curriculum gap; do not invent FR1.
+4. The next curriculum task is a **source-traceability closeout for the recovered FR1 working design** within the existing SLO mapping/B10/decision records. Reconcile the prior FR1 name, definition, development outline and cross-skill links against the original source/decision record. The current repository still lacks the FR1 registry entry and its formal development/claim/evidence/task contract. Restore only what is source-supported; leave missing formal fields open for owner disposition. Do not invent FR1 identifiers or create FR3.
 5. In parallel, the next product task can prepare a bounded, clearly labelled non-formal fraction practice episode only where its learning objective is already supported by the existing curriculum and sourced school material. It must keep learner work visible, never fill intermediate answers, keep simplification learner-controlled, and remain separate from formal evidence/mastery until the correct curriculum contracts exist.
 6. No runtime, registry, task/evidence mapping, C1–C9, learner state, Supabase or learner data change is authorized by this inventory.
 

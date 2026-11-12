@@ -6583,3 +6583,11 @@ Gebruik de lokale PacoGO TEST-omgeving om de volledige breukenroute te openen en
 
 Herhaal de lokale PacoGO TEST-controle van de volledige breukenroute. Controleer nu expliciet dat de tellerinvoer in **Maak zelf een gelijkwaardige breuk** daadwerkelijk in de vergelijking staat, en beoordeel daarnaast de herkenning, optelroute, het voorbeeld 15/10 met gemengd getal en vereenvoudigen, en de aftrekroute. De geautomatiseerde browserregressie bevestigt de DOM-/interactiecontracten, maar vervangt de visuele controle in de echte lokale ouder-/leerlingomgeving niet. Noteer eventuele resterende verschillen met screenshots voordat nieuwe code wordt gewijzigd. Bouw F4 nog niet; de FR1 formele contractgap en de F4-methodeherkomst blijven open.
 
+### Lokale TEST-controle — inline tellerinvoer bevestigd — 2026-11-12
+
+- De gebruiker heeft de constructie-oefening opnieuw in de lokale PacoGO TEST-omgeving gecontroleerd en bevestigd: **de tellerinvoer staat nu correct inline in de breukvergelijking**. De eerdere zichtbare fout (los invulveld onder de vergelijking) is hiermee voor deze UI-stap opgelost.
+- Dit is een handmatige visuele controle van de betreffende constructie-invoer. Het betekent nog niet dat de volledige breukenroute pedagogisch is beoordeeld of empirisch gevalideerd.
+- De implementatiecommit `7912f28afac19bbd540b42f1cd66423d5e6eb398` is geverifieerd door Full Regression #3575 (GREEN, alle 20 stappen).
+- De vorige handoff-update commit `5cec2f4b835d90d6bdd9b84b705c7f3fabb4a6a3` is geverifieerd door Full Regression #3576 (GREEN).
+- Volgende stap: ga door met de lokale review van de resterende volledige breukenroute (herkenning, optellen, gemengd getal/vereenvoudigen en aftrekken). Noteer alleen concrete onduidelijkheden die de gebruiker in de TEST-weergave aantreft. Geen F4-bouw totdat de F3-voorwaarden en methodeherkomst zijn gecontroleerd.
+

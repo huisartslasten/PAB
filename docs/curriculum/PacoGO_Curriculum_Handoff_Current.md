@@ -6283,3 +6283,8 @@ The practice page remains a standalone HTML route; it is not falsely registered 
 Continue route C, not broad curriculum redesign: determine the smallest supported learner-facing practice episode that lets Zyon perform the required fraction steps himself, with visual explanation and small numeric input where the existing source/task contracts support it. Keep any activity without a formal FR1/FR2 task/evidence mapping explicitly formative/non-formal. Do not infer a targeted lesson from the diagnostic automatically, and do not fill the FR1 development/claim/evidence/task gap with invented curriculum. Reconcile the exact school method only from confirmed source material; do not impose an unverified method.
 
 The route connection is an initial integration step, not completion of the user's goal. The complete executable fraction learning route remains open.
+
+
+### Verification trigger for the 2026-11-12 route handoff update
+
+The route implementation was verified by Full Regression #3547 (GREEN) on `d246a4c3eaebd8174e0c3940d8552475be262939`. The route handoff and fraction traceability inventory were then committed together in `c305953150c43134148157bf158f269bf0d07e6c`. This follow-up handoff commit includes that documentation update and is the exact commit submitted for Full Regression before this phase is closed.

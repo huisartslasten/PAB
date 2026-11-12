@@ -124,7 +124,7 @@ test('staged diagnostic asks one learner action at a time and completes F1-F4 wi
   expect(state.stored[0][1]).toContain('"rawValue":14');
   expect(errors).toEqual([]);
 
-  await page.getByRole('button', { name: 'Start breuken oefenen' }).click();
+  await page.getByRole('button', { name: 'Verder naar gelijkwaardige breuken oefenen' }).click();
   await expect(page).toHaveURL(/curriculum-fr2-practice-learner\.html\?viewStudent=Zyon/);
   await expect(page.locator('#exerciseCard')).toBeVisible();
   await expect(page.locator('#selectedLearnerLabel')).toContainText('Zyon');

@@ -6535,7 +6535,7 @@ This is non-formal practice derived from the existing diagnostic action sequence
 
 ### Next concrete step
 
-Review the complete learner-facing fraction route in PacoGO TEST before Zyon uses it: recognition practice, learner-created equivalent fractions, staged addition, the 15/10 mixed-number/simplification example, and staged subtraction. Check whether the prompts, visual models, field placement, feedback and navigation make pedagogical sense to the learner. Automated browser regression proves technical flow only, not learning effectiveness. Record observations before changing the instructional design. Keep F4 conditional and do not build it until the F3 prerequisites and source-backed method provenance are reviewed. The FR1 formal development/claim/evidence/task contract gap remains open; do not invent IDs to close it.
+Review the complete learner-facing fraction route in the local PacoGO TEST environment before Zyon uses it: recognition practice, learner-created equivalent fractions, staged addition, the 15/10 mixed-number/simplification example, and staged subtraction. Use the local parent session and test learner profile; do not use LIVE. Check whether the prompts, visual models, field placement, feedback and navigation make pedagogical sense to the learner. Automated browser regression proves technical flow only, not learning effectiveness. Record observations before changing the instructional design. Keep F4 conditional and do not build it until the F3 prerequisites and source-backed method provenance are reviewed. The FR1 formal development/claim/evidence/task contract gap remains open; do not invent IDs to close it.
 
 
 ### Regression closure — F3 browser route and handoff — 2026-11-12
@@ -6555,25 +6555,17 @@ Review the complete learner-facing fraction route in PacoGO TEST before Zyon use
 
 All newly added construction/addition/result-form/subtraction episodes are non-formal practice, separately learner-keyed and local-only. No formal FR1/FR2 registry/task/evidence changes, diagnostic F1–F4 changes, C1–C9 changes, mastery/next-action/learner-state writes or Supabase changes were made. Technical regression is not empirical or pedagogical validation.
 
-Next: review the entire learner-facing route in PacoGO TEST with Zyon before use. Record where instructions, models, expression inputs, feedback or transitions are unclear. Do not build F4 yet; it is conditional on all four F3 diagnostic prerequisites and its method provenance needs review. The FR1 formal development/claim/evidence/task contract remains an explicit gap; do not invent IDs.
+Next: review the entire learner-facing route in the local PacoGO TEST environment with Zyon before use. Use the local parent session and test learner profile; do not use LIVE or Netlify. Record where instructions, models, expression inputs, feedback or transitions are unclear. Do not build F4 yet; it is conditional on all four F3 diagnostic prerequisites and its method provenance needs review. The FR1 formal development/claim/evidence/task contract remains an explicit gap; do not invent IDs.
 
 
-### PacoGO TEST deployment readiness check — 2026-11-12
+### TEST- en uitvoerwerkwijze — bijgewerkt 2026-11-12
 
-- Netlify project `pacogo-test` was located. Its public alias is `https://test.pacogo.org`.
-- The latest ready deploy exposed by the project is deploy `6ad057585d4a377dd54bb132`, branch `refactor/professional-v1`, but it was published 2026-10-15 from commit `67a39b26a42520fa2e04734798b897563b01c624`.
-- This is not the current curriculum branch HEAD and predates the new fraction practice route. Therefore the current TEST alias cannot yet be used as proof of the new learner route, and no learner-facing review has been completed.
-- A branch-version URL is listed by Netlify, but the deploy metadata does not show a branch-specific deploy link for the current HEAD. The connected Netlify actions available in this session are read-only for deploys; no deploy-creation action is available. No deployment was started or claimed.
-- Current code/documentation branch at this check: `refactor/professional-v1`, commit `68e6740c6072c1bb18ec426f5b24799825443f55`; Full Regression #3570 / run 43232842346: GREEN on that exact commit. This readiness note itself requires exact-commit Full Regression.
+- De gebruiker gebruikt **Netlify niet** voor PacoGO-ontwikkeling of tests. Reden: na iedere wijziging worden Netlify-credits verbruikt.
+- Start of publiceer daarom geen Netlify-deploys en stuur de gebruiker niet opnieuw naar Netlify als voorwaarde voor voortgang. De oude Netlify-deployinformatie en de eerdere instructie om `pacogo-test` via Netlify te publiceren zijn vervallen.
+- Gebruik voor de learner-facing controle de **lokale PacoGO TEST-omgeving**, met een lokale ouderlogin en testleerlingprofiel. LIVE/`main` blijft buiten scope.
+- De lokale testwerkwijze sluit aan op de bestaande handoff-instructie voor de lokale PacoGO TEST UI. Verifieer bij de volgende teststap de exacte lokale start-/testprocedure in de repository of bij de gebruiker; neem geen nieuwe hostingdienst of betaalde publicatiestap aan.
+- De fraction practice route is technisch aanwezig op de ontwikkelbranch, maar de learner-facing review met Zyon is nog niet uitgevoerd. Browserregressie is geen pedagogische validatie.
 
-### Next required action
+### Volgende concrete stap
 
-Publish the current `refactor/professional-v1` commit to the existing `pacogo-test` Netlify site using the project's authorized deployment process, without touching LIVE `main`. Verify the resulting deploy's branch and exact commit SHA before opening the learner route. Then review the complete fraction practice flow in TEST. Until that happens, do not state that the new fraction route has been reviewed with Zyon or is ready for learner use.
-
-
-### Verification closure — TEST deployment readiness note — 2026-11-12
-
-- TEST readiness documentation commit: `bd770c68e58223337cd937adacc7d6341e53a181`.
-- Full Regression #3571 / run 43233460099: **GREEN** on exact commit `bd770c68e58223337cd937adacc7d6341e53a181`. All 20 workflow steps passed, including browser regression and clean working tree.
-- The published Netlify TEST deploy remains old (commit `67a39b26a42520fa2e04734798b897563b01c624`, published 2026-10-15). No current-code TEST deployment has been created. The available Netlify integration exposes deploy inspection but no deploy-creation action in this session.
-- The next work item is not further fraction code: publish current branch through the authorized TEST deployment process, verify the exact deployed commit, then perform learner-facing review. Do not claim the new route has been reviewed with Zyon.
+Gebruik de lokale PacoGO TEST-omgeving om de volledige breukenroute te openen en te beoordelen: herkenning, zelf breuken maken, optellen, het voorbeeld 15/10 met gemengde breuk en vereenvoudigen, en aftrekken. Controleer de begrijpelijkheid van instructies, visuele modellen, invulvelden, feedback en overgangen. Leg bevindingen vast voordat de instructie wordt aangepast. Bouw F4 nog niet; eerst moeten de F3-diagnostische voorwaarden en de herkomst van de gebruikte methode worden gecontroleerd.

@@ -20,6 +20,14 @@
     #setupStatus,#feedback{padding:12px 14px;border-radius:14px;background:#eef8ff;color:#126fc9;font-weight:700}
     #feedback.error{background:#fff0f0;color:#b42318}
     #progress{font-size:14px;color:#647894;font-weight:800;margin:14px 0}
+    .construction-equation{display:flex;align-items:center;justify-content:center;gap:8px;margin:18px 0;padding:16px;border-radius:14px;background:#f5f9fd;font-size:28px;font-weight:900}
+    .construction-equation__unknown{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;border:2px dashed #8aa6c2;border-radius:10px;color:#126fc9}
+    #constructionTarget{display:flex;justify-content:center;padding:14px}
+    #constructionProgress{font-size:14px;color:#647894;font-weight:800;margin:14px 0}
+    .pacogo-fraction-numerator-input{display:flex;align-items:end;justify-content:center;gap:10px;flex-wrap:wrap;margin:16px 0}
+    .pacogo-fraction-numerator-input__label{display:grid;gap:6px;font-weight:800}
+    .pacogo-fraction-numerator-input__field{width:90px;box-sizing:border-box;padding:12px;border:2px solid #9bb7d0;border-radius:12px;font:800 24px Nunito,system-ui,sans-serif;text-align:center;color:#102b57}
+    .pacogo-fraction-numerator-input__field:focus{outline:3px solid #9bcfff;outline-offset:2px}
     .concept{padding:16px;border-radius:16px;background:#f1f7fc;border:1px solid #d8e7f4}
     .concept strong{display:block;margin-bottom:5px}
     #comparison{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;margin:16px 0;padding:16px;background:#f5f9fd;border-radius:14px}
@@ -60,6 +68,20 @@
     <h1>Oefenronde afgerond</h1>
     <p id="resultText" class="muted"></p>
     <button type="button" id="restartPractice">Oefenronde opnieuw beginnen</button>
+    <button type="button" id="startConstructionPractice">Zelf een gelijkwaardige breuk maken</button>
+  </section>
+
+  <section class="card" id="constructionCard" hidden>
+    <div class="muted" id="constructionLearnerLabel">PacoGO • Breuken oefenen</div>
+    <h1>Maak zelf een gelijkwaardige breuk</h1>
+    <p class="muted" id="constructionPrompt"></p>
+    <div id="constructionTarget"></div>
+    <div class="construction-equation" id="constructionEquation" aria-label="Vul de ontbrekende teller in"></div>
+    <div id="constructionInput"></div>
+    <p id="constructionFeedback" role="status" aria-live="polite">Kijk naar de blauwe hoeveelheid en vul de teller in.</p>
+    <p id="constructionProgress"></p>
+    <div id="constructionNext"></div>
+    <p class="muted">Dit is extra oefening. Je antwoorden en pogingen worden alleen op dit apparaat bewaard. Ze tellen niet mee voor een toets, formele beoordeling of mastery-beslissing.</p>
   </section>
 </main>
 <script type="module">
@@ -68,6 +90,8 @@
   import { renderFractionRepresentation } from "./pacogo-engine/fraction-learning-interface-renderers.js";
   import { FRACTION_PRACTICE_TASKS, createFractionPracticeSession } from "./pacogo-engine/fraction-practice-session.js";
   import { getStudentLearningProfile } from "./src/core/student-registry.js";
+  import { createFractionNumeratorInput } from "./pacogo-engine/fraction-numerator-input.js";
+  import { FRACTION_CONSTRUCTION_PRACTICE_TASKS, createFractionConstructionPracticeSession } from "./pacogo-engine/fraction-construction-practice-session.js";
 
   const app = createPacoGOApp({ supabaseLib: window.supabase, storage: window.localStorage });
   const setup = document.querySelector("#learnerSetup");
@@ -80,10 +104,20 @@
   const comparison = document.querySelector("#comparison");
   const nextAction = document.querySelector("#nextAction");
   const progressLabel = document.querySelector("#progress");
+  const constructionCard = document.querySelector("#constructionCard");
+  const constructionTarget = document.querySelector("#constructionTarget");
+  const constructionEquation = document.querySelector("#constructionEquation");
+  const constructionInputHost = document.querySelector("#constructionInput");
+  const constructionFeedback = document.querySelector("#constructionFeedback");
+  const constructionProgress = document.querySelector("#constructionProgress");
+  const constructionNext = document.querySelector("#constructionNext");
   let selectedLearner = null;
   let practiceSession = null;
   let currentTask = null;
   let interfaceInstance = null;
+  let constructionSession = null;
+  let currentConstructionTask = null;
+  let constructionInputInstance = null;
   const selectedStudent = new URLSearchParams(window.location.search).get("viewStudent") || "";
 
   function setSetupError(error) {
@@ -168,6 +202,129 @@
     document.querySelector("#resultText").textContent =
       "Je hebt alle " + progress.totalCount + " opdrachten afgerond. Je hebt " +
       progress.correctAnswers + " juiste antwoorden gegeven. Je voortgang staat alleen op dit apparaat.";
+  }
+
+  function updateConstructionProgress() {
+    const progress = constructionSession.getProgress();
+    constructionProgress.textContent = progress.completedCount + " van " + progress.totalCount +
+      " opdrachten afgerond";
+  }
+
+  function renderConstructionEquation(task, enteredNumerator = "?") {
+    constructionEquation.replaceChildren();
+    const target = document.createElement("span");
+    target.textContent = task.targetFraction.numerator + "/" + task.targetFraction.denominator;
+    const equals = document.createElement("span");
+    equals.textContent = "=";
+    const numerator = document.createElement("span");
+    numerator.className = "construction-equation__unknown";
+    numerator.id = "constructionEnteredNumerator";
+    numerator.textContent = enteredNumerator;
+    const slash = document.createElement("span");
+    slash.textContent = "/";
+    const denominator = document.createElement("span");
+    denominator.textContent = String(task.answerDenominator);
+    constructionEquation.append(target, equals, numerator, slash, denominator);
+  }
+
+  function showConstructionCompleted() {
+    currentConstructionTask = null;
+    constructionTarget.replaceChildren();
+    constructionInputHost.replaceChildren();
+    constructionEquation.replaceChildren();
+    document.querySelector("#constructionPrompt").textContent =
+      "Je hebt alle drie opdrachten afgerond. Je hebt zelf de teller ingevuld en PacoGO heeft gecontroleerd of de hoeveelheid gelijk bleef.";
+    constructionFeedback.textContent = "Oefenronde afgerond. Dit is oefenvoortgang, geen formele beoordeling.";
+    updateConstructionProgress();
+    constructionNext.replaceChildren();
+    const restart = document.createElement("button");
+    restart.type = "button";
+    restart.textContent = "Deze oefenronde opnieuw doen";
+    restart.addEventListener("click", () => {
+      constructionSession.reset();
+      renderConstructionTask();
+    });
+    const back = document.createElement("button");
+    back.type = "button";
+    back.textContent = "Terug naar breuken oefenen";
+    back.addEventListener("click", () => {
+      constructionCard.hidden = true;
+      resultCard.hidden = false;
+    });
+    constructionNext.append(restart, back);
+  }
+
+  function handleConstructionAnswer(rawNumerator) {
+    if (!currentConstructionTask) return;
+    if (rawNumerator.trim() === "") {
+      constructionFeedback.textContent = "Vul eerst de teller in.";
+      constructionInputInstance.focus();
+      return;
+    }
+    const result = constructionSession.recordResponse({
+      taskId: currentConstructionTask.id,
+      rawNumerator
+    });
+    updateConstructionProgress();
+    if (result.classification === "correct") {
+      constructionFeedback.textContent = "Goed. Deze breuk betekent evenveel als de doelbreuk.";
+      const entered = constructionEquation.querySelector("#constructionEnteredNumerator");
+      if (entered) entered.textContent = rawNumerator;
+      constructionInputInstance.lock();
+      constructionNext.replaceChildren();
+      const next = document.createElement("button");
+      next.type = "button";
+      next.textContent = result.progress.isComplete ? "Bekijk afronding" : "Volgende oefening";
+      next.addEventListener("click", renderConstructionTask);
+      constructionNext.append(next);
+      return;
+    }
+    constructionFeedback.textContent = result.classification === "invalid_input"
+      ? "Vul een positief heel getal in."
+      : "Nog niet. Vergelijk de hoeveelheid blauw en probeer een andere teller.";
+    constructionInputInstance.focus();
+  }
+
+  function renderConstructionTask() {
+    const nextTaskId = constructionSession.getNextTaskId();
+    if (!nextTaskId) {
+      showConstructionCompleted();
+      return;
+    }
+    currentConstructionTask = FRACTION_CONSTRUCTION_PRACTICE_TASKS.find(task => task.id === nextTaskId);
+    constructionTarget.replaceChildren(renderFractionRepresentation(
+      currentConstructionTask.targetFraction,
+      "area_model",
+      "Blauwe hoeveelheid van " + currentConstructionTask.targetFraction.numerator + "/" +
+        currentConstructionTask.targetFraction.denominator
+    ));
+    document.querySelector("#constructionPrompt").textContent =
+      "Maak een breuk met noemer " + currentConstructionTask.answerDenominator +
+      " die evenveel betekent als het blauwe deel. Vul alleen de teller in; de noemer staat al vast.";
+    renderConstructionEquation(currentConstructionTask);
+    constructionFeedback.textContent = "Kijk naar de blauwe hoeveelheid en vul de teller in.";
+    constructionNext.replaceChildren();
+    constructionInputInstance = createFractionNumeratorInput({
+      mount: constructionInputHost,
+      label: "Vul de teller in",
+      submitLabel: "Controleren",
+      onInteraction: event => {
+        constructionFeedback.textContent = event.rawValue
+          ? "Je kunt je antwoord controleren."
+          : "Kijk naar de blauwe hoeveelheid en vul de teller in.";
+      },
+      onSubmit: handleConstructionAnswer
+    });
+    updateConstructionProgress();
+  }
+
+  function startConstructionPractice() {
+    constructionCard.hidden = false;
+    resultCard.hidden = true;
+    exerciseCard.hidden = true;
+    document.querySelector("#constructionLearnerLabel").textContent =
+      "PacoGO • " + selectedLearner.display_name + " • Extra breukenoefening";
+    renderConstructionTask();
   }
 
   function renderTask() {
@@ -261,6 +418,7 @@
   function startPractice(learner) {
     selectedLearner = learner;
     practiceSession = createFractionPracticeSession({ learnerKey: learner.learner_key });
+    constructionSession = createFractionConstructionPracticeSession({ learnerKey: learner.learner_key });
     setup.hidden = true;
     resultCard.hidden = true;
     exerciseCard.hidden = false;
@@ -273,6 +431,8 @@
     };
     renderTask();
   }
+
+  document.querySelector("#startConstructionPractice").addEventListener("click", startConstructionPractice);
 
   document.querySelector("#restartPractice").addEventListener("click", () => {
     practiceSession.reset();

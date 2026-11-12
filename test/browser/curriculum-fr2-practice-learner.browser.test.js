@@ -78,13 +78,19 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
 
   const state = await page.evaluate(() => ({
     calls: window.__pacoPracticeTest.calls,
-    local: Object.entries(localStorage).filter(([key]) => key.startsWith("pacogo:fraction-practice:"))
+    local: Object.entries(localStorage).filter(([key]) => key.startsWith("pacogo:fraction-practice:") || key.startsWith("pacogo:fraction-construction-practice:"))
   }));
   expect(state.calls.filter(call => call[0] === "rpc")).toEqual([]);
   expect(state.calls).toEqual([["select", "learner_profiles"]]);
-  expect(state.local).toHaveLength(1);
+  expect(state.local).toHaveLength(2);
   expect(state.local[0][0]).toContain(learnerKey);
   expect(state.local[0][1]).not.toContain("explanation");
-  expect(state.local[0][1]).not.toContain("response");
+  expect(state.local.find(([key]) => key.startsWith("pacogo:fraction-practice:"))[1]).not.toContain("response");
+  const constructionState = state.local.find(([key]) => key.startsWith("pacogo:fraction-construction-practice:"));
+  expect(constructionState[0]).toContain(learnerKey);
+  expect(constructionState[1]).toContain('"rawNumerator":"1"');
+  expect(constructionState[1]).toContain('"rawNumerator":"2"');
+  expect(constructionState[1]).toContain('"rawNumerator":"4"');
+  expect(constructionState[1]).not.toContain(learnerKey);
   expect(pageErrors).toEqual([]);
 });

@@ -66,7 +66,7 @@ test("F4 preserves dependent work after an incorrect mixed-number conversion", (
 
 test("F4 is explicitly not administered when an F3 prerequisite is not valid", () => {
   const session = createFractionDiagnosticSessionV2({ learnerKey: "zyon", storage: memoryStorage() });
-  [2, 4, 10, 5, 4, 1].forEach(value => answer(session, value));
+  [2, 4, 12, 4, 3, 7, 8, 4, 3, 1].forEach(value => answer(session, value));
   assert.equal(session.getCurrentAction(), null);
   const saved = session.getSessionSnapshot();
   assert.equal(saved.status, "completed");

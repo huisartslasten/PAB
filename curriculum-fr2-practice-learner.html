@@ -149,7 +149,6 @@
   let currentConstructionTask = null;
   let constructionInputInstance = null;
   let additionSession = null;
-  let additionInputInstance = null;
   let additionEquationInstance = null;
   const selectedStudent = new URLSearchParams(window.location.search).get("viewStudent") || "";
 
@@ -455,7 +454,7 @@
     } else {
       additionFeedback.textContent = "Vul een positief heel getal in.";
     }
-    additionInputInstance.focus();
+    additionEquationInstance?.focus();
   }
 
   function renderAdditionStep() {

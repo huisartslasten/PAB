@@ -6456,3 +6456,10 @@ The F2 arithmetic practice has been refactored so its active numeric response is
 - Full Regression #3560 / run 43226149457: RED on exact commit 2da5177fe445a5197b94cab1981211f15ab07449. Curriculum engine, architecture, maintained Node and Vitest steps passed; browser regression failed at a stale assertion expecting the F2 numeric input under #additionInput.
 - The new renderer correctly places that input inside #additionExpression; the browser test still contained a second old-location assertion at the second step. This is a test expectation that no longer matches the intentionally changed UI contract, not a runtime failure.
 - The browser test is corrected to assert the input remains inside #additionExpression and that #additionInput contains no input. No coverage is removed or weakened. Full Regression on the exact follow-up commit is required before proceeding.
+
+
+### Regression investigation — stale focus reference
+
+- Full Regression #3561 / run 43226477223: RED on exact commit 921efb10cd078cb0fda5047e9d5f9016b33a9f73. Curriculum engine, architecture, Node and Vitest checks passed. Browser regression reached the complete F2 route but detected two page errors during incorrect-answer retries: a stale call still referenced the removed addition input instance when restoring focus.
+- Root cause: one occurrence remained because the first code transformation replaced only the first matching focus call. This is an implementation defect, not a browser-test defect.
+- The stale declaration and reference are removed; both invalid-response focus paths now target the active inline expression input. The browser test continues to exercise incorrect common denominator and incorrect arithmetic result, and continues to require zero page errors. Full Regression on the exact correction commit is the next gate.

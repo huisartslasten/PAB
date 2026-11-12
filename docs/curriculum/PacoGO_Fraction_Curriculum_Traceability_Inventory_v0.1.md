@@ -423,3 +423,8 @@ The F2 step order, valid-denominator logic, raw-response storage, learner isolat
 ### Regression note — F2 inline expression input
 
 Full Regression #3560 / run 43226149457 was RED on commit 2da5177fe445a5197b94cab1981211f15ab07449. All non-browser checks passed. The browser failure was a stale second-step assertion that still expected the integer input inside #additionInput. The new UI intentionally places it inside #additionExpression. The assertion is corrected to verify the new location and the absence of an input in the old host; no assertion coverage is removed. Await Full Regression on the exact correction commit.
+
+
+### Regression note — stale focus reference in inline F2 entry
+
+Full Regression #3561 / run 43226477223 was RED on 921efb10cd078cb0fda5047e9d5f9016b33a9f73. Browser regression found a real implementation defect: a remaining error-retry path attempted to focus the removed separate input instance. The stale reference/declaration is removed and focus is directed to the inline equation field. Existing incorrect-answer retry coverage and zero-browser-error assertion remain intact. Await exact-commit Full Regression.

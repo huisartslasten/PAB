@@ -27,6 +27,26 @@ test("v2 exposes exactly one ordered action and stores raw answers", () => {
   assert.equal(storage.getItemByPrefix("pacogo:fraction-diagnostic:v1:").length, 0);
 });
 
+test("F1 separates a correct numerator from a numerator that follows an incorrect factor", () => {
+  const correctNumerator = createFractionDiagnosticSessionV2({ learnerKey: "f1-correct", storage: memoryStorage() });
+  answer(correctNumerator, 3);
+  answer(correctNumerator, 4);
+  const correctActions = correctNumerator.getSessionSnapshot().tasks.F1.actions;
+  assert.deepEqual(correctActions.map(action => action.classification), ["invalid_relation", "valid"]);
+
+  const dependentNumerator = createFractionDiagnosticSessionV2({ learnerKey: "f1-dependent", storage: memoryStorage() });
+  answer(dependentNumerator, 3);
+  answer(dependentNumerator, 6);
+  const dependentActions = dependentNumerator.getSessionSnapshot().tasks.F1.actions;
+  assert.deepEqual(dependentActions.map(action => action.classification), ["invalid_relation", "dependent_consistent"]);
+
+  const ambiguousNumerator = createFractionDiagnosticSessionV2({ learnerKey: "f1-ambiguous", storage: memoryStorage() });
+  answer(ambiguousNumerator, 3);
+  answer(ambiguousNumerator, 5);
+  const ambiguousActions = ambiguousNumerator.getSessionSnapshot().tasks.F1.actions;
+  assert.deepEqual(ambiguousActions.map(action => action.classification), ["invalid_relation", "ambiguous"]);
+});
+
 test("F2 accepts any common multiple and assesses each learner action in sequence", () => {
   const session = createFractionDiagnosticSessionV2({ learnerKey: "zyon", storage: memoryStorage() });
   [2, 4, 12, 4, 3, 7].forEach(value => answer(session, value));

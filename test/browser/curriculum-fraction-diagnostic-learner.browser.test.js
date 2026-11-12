@@ -1,18 +1,17 @@
 import { test, expect } from '@playwright/test';
+
 const url = 'http://127.0.0.1:4173/curriculum-fraction-diagnostic-learner.html?viewStudent=Zyon';
 const parent = '5d0e1e5c-1dbe-4909-bd3a-81a1e7b26d09';
 const learner = '123e4567-e89b-42d3-a456-426614174000';
 
-test('FR2 diagnostic renders in the canonical PacoGO shell and gives targeted formative practice', async ({ page }) => {
-  const errors = [];
-  page.on('pageerror', error => errors.push(error.message));
-  await page.addInitScript(({ parent, learner }) => {
+async function installParentFixture(page, { linked = true } = {}) {
+  await page.addInitScript(({ parentId, learnerId, linkedLearner }) => {
     const calls = [];
-    const link = { app_student_key: 'zyon', learner_key: learner, learner_profiles: { display_name: 'Zyon' } };
+    const link = { app_student_key: 'zyon', learner_key: learnerId, learner_profiles: { display_name: 'Zyon' } };
     const db = {
       functions: { invoke: async () => ({ data: null, error: null }) },
       auth: {
-        getSession: async () => ({ data: { session: { user: { id: parent } } }, error: null }),
+        getSession: async () => ({ data: { session: { user: { id: parentId } } }, error: null }),
         onAuthStateChange: () => ({ data: { subscription: { unsubscribe() {} } } }),
         signOut: async () => ({ error: null })
       },
@@ -22,11 +21,11 @@ test('FR2 diagnostic renders in the canonical PacoGO shell and gives targeted fo
           eq(column, value) { calls.push(['eq', table, column, value]); return query; },
           maybeSingle() {
             calls.push(['maybeSingle', table]);
-            return Promise.resolve({ data: table === 'learner_profile_links' ? link : null, error: null });
+            return Promise.resolve({ data: linkedLearner && table === 'learner_profile_links' ? link : null, error: null });
           },
           order() { return query; },
           then(resolve, reject) {
-            return Promise.resolve({ data: table === 'learner_profiles' ? [link.learner_profiles] : [], error: null }).then(resolve, reject);
+            return Promise.resolve({ data: linkedLearner && table === 'learner_profiles' ? [link.learner_profiles] : [], error: null }).then(resolve, reject);
           }
         };
         return query;
@@ -35,52 +34,79 @@ test('FR2 diagnostic renders in the canonical PacoGO shell and gives targeted fo
     };
     window.__diag = { calls };
     window.__pacoSupabaseStub = { createClient: () => db };
-  }, { parent, learner });
+  }, { parentId: parent, learnerId: learner, linkedLearner: linked });
   await page.route('https://cdn.jsdelivr.net/**', route => route.fulfill({
     status: 200, contentType: 'application/javascript', body: 'window.supabase = window.__pacoSupabaseStub;'
   }));
+}
+
+async function answerOne(page, value, expectedPrompt) {
+  const card = page.locator('#fraction-diagnostic-card');
+  await expect(card).toBeVisible();
+  await expect(card.locator('input')).toHaveCount(1);
+  await expect(card.locator('input')).toBeVisible();
+  if (expectedPrompt) await expect(card.locator('p').filter({ hasText: expectedPrompt }).first()).toBeVisible();
+  await card.locator('input').fill(String(value));
+  await page.getByRole('button', { name: 'Volgende stap' }).click();
+}
+
+test('staged diagnostic asks one learner action at a time and completes F1-F4 without feedback or formal writes', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await installParentFixture(page);
   await page.goto(url);
   await expect(page.locator('.paco-page-template')).toBeVisible();
   await expect(page.locator('.paco-template-page-heading h1')).toHaveText('Breuken');
   await expect(page.locator('.paco-template-navigation')).toBeVisible();
-  await expect(page.locator('#fraction-diagnostic-card')).toBeVisible();
-  await expect(page.locator('#fraction-diagnostic-card')).toContainText('Zyon');
+  const card = page.locator('#fraction-diagnostic-card');
+  await expect(card).toBeVisible();
+  await expect(card).toContainText('Zyon');
 
-  await expect(page.locator('#fraction-diagnostic-card .fraction-diagnostic-fraction')).toHaveCount(2);
-  await expect(page.locator('#fraction-diagnostic-card .fraction-diagnostic-expression')).toContainText('2');
-  await expect(page.locator('#fraction-diagnostic-card .fraction-diagnostic-inline-input[name="numerator"]')).toBeVisible();
-  const answerNames = [
-    ['factor','numerator'],
-    ['firstNumerator','firstDenominator','secondNumerator','secondDenominator'],
-    ['firstNumerator','firstDenominator','secondNumerator','secondDenominator','resultNumerator','resultDenominator'],
-    ['firstNumerator','firstDenominator','secondNumerator','secondDenominator','resultNumerator','resultDenominator'],
-    ['wholeProduct','numerator'],
-    ['improperNumerator','improperDenominator','commonDenominator','firstNumerator','secondNumerator','resultNumerator','resultDenominator'],
-    ['whole','remainder']
-  ];
-  // The first probe is intentionally incorrect so this browser scenario exercises targeted practice.
-  const answers = [[3,6],[2,6,3,6],[4,12,3,12,7,12],[5,10,4,10,1,10],[12,17],[4,3,15,20,6,14,15],[2,13]];
-  for (let step = 0; step < answers.length; step++) {
-    if (step === 1) {
-      await expect(page.locator('#fraction-diagnostic-card .fraction-diagnostic-fraction')).toHaveCount(4);
-      await expect(page.locator('#fraction-diagnostic-card .fraction-diagnostic-inline-input[name="firstNumerator"]')).toBeVisible();
-      await expect(page.locator('#fraction-diagnostic-card .fraction-diagnostic-inline-input[name="firstDenominator"]')).toBeVisible();
-      await expect(page.locator('#fraction-diagnostic-card .fraction-diagnostic-inline-input[name="secondNumerator"]')).toBeVisible();
-      await expect(page.locator('#fraction-diagnostic-card .fraction-diagnostic-inline-input[name="secondDenominator"]')).toBeVisible();
-    }
-    for (let i = 0; i < answers[step].length; i++) {
-      await page.locator('#fraction-diagnostic-card:visible form input[name="' + answerNames[step][i] + '"]').fill(String(answers[step][i]));
-    }
-    await page.getByRole('button', { name: 'Antwoord vastleggen' }).click();
-  }
-  await expect(page.locator('#fraction-diagnostic-result h2')).toContainText('Volgende stap: Gelijkwaardige breuken maken');
-  await expect(page.locator('#fraction-diagnostic-result form')).toBeVisible();
-  for (const [name, value] of [['factor',2],['numerator',6]]) {
-    await page.locator('#fraction-diagnostic-result form input[name="' + name + '"]').fill(String(value));
-  }
-  await page.getByRole('button', { name: 'Oefening controleren' }).click();
-  await expect(page.locator('#fraction-diagnostic-result .fraction-diagnostic-status')).toContainText('Goed uitgevoerd');
+  await expect(card.locator('input')).toHaveCount(1);
+  await expect(card.locator('h2')).toHaveText('Gelijkwaardige breuken');
+  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('noemer 6');
+  await answerOne(page, 2, 'Met welke factor');
 
+  await expect(card.locator('h2')).toHaveText('Gelijkwaardige breuken');
+  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('2/3');
+  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('6');
+  await answerOne(page, 4, 'Welke teller');
+
+  await expect(card.locator('h2')).toHaveText('Breuken optellen');
+  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('1/3 + 1/4');
+  await answerOne(page, 12, 'Welke noemer');
+  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('12');
+  await expect(card.locator('.fraction-diagnostic-history')).toContainText('Gemeenschappelijke noemer: 12');
+  await answerOne(page, 4, 'eerste gelijkwaardige breuk');
+  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('1/3 = ?/12');
+  await answerOne(page, 3, 'tweede gelijkwaardige breuk');
+  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('4 + 3 = ?');
+  await answerOne(page, 7, 'Tel de twee tellers');
+
+  await expect(card.locator('h2')).toHaveText('Breuken aftrekken');
+  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('1/2 − 2/5');
+  await answerOne(page, 10, 'Welke noemer');
+  await answerOne(page, 5, 'eerste gelijkwaardige breuk');
+  await answerOne(page, 4, 'tweede gelijkwaardige breuk');
+  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('5 − 4 = ?');
+  await answerOne(page, 1, 'Trek de tweede teller');
+
+  await expect(card.locator('h2')).toHaveText('Gemengde breuk aftrekken');
+  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('1 1/3');
+  await answerOne(page, 4, 'gemengde getal omzet');
+  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('4/3 − 2/5');
+  await answerOne(page, 15, 'Welke noemer');
+  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('4/3 = ?/15');
+  await answerOne(page, 20, 'eerste gelijkwaardige breuk');
+  await answerOne(page, 6, 'tweede gelijkwaardige breuk');
+  await expect(card.locator('.fraction-diagnostic-expression')).toContainText('20 − 6 = ?');
+  await answerOne(page, 14, 'Trek de tweede teller');
+
+  const result = page.locator('#fraction-diagnostic-result');
+  await expect(result).toBeVisible();
+  await expect(result.locator('h2')).toHaveText('Diagnose afgerond');
+  await expect(result).toContainText('Alle aangeboden tussenstappen zijn vastgelegd');
+  await expect(result).toContainText('Teller na omzetten: 4');
   const state = await page.evaluate(() => ({
     calls: window.__diag.calls,
     stored: Object.entries(localStorage).filter(([key]) => key.startsWith('pacogo:fraction-diagnostic:'))
@@ -90,38 +116,48 @@ test('FR2 diagnostic renders in the canonical PacoGO shell and gives targeted fo
   expect(state.calls).toContainEqual(['eq', 'learner_profile_links', 'app_student_key', 'zyon']);
   expect(state.calls).toContainEqual(['maybeSingle', 'learner_profile_links']);
   expect(state.stored).toHaveLength(1);
+  expect(state.stored[0][0]).toContain('v2');
   expect(state.stored[0][0]).toContain(learner);
   expect(state.stored[0][1]).not.toContain('display_name');
+  expect(state.stored[0][1]).toContain('"schemaVersion":2');
+  expect(state.stored[0][1]).toContain('"rawValue":14');
   expect(errors).toEqual([]);
 });
 
+test('F4 is skipped in the learner interface when F3 prerequisites are not all demonstrated', async ({ page }) => {
+  await installParentFixture(page);
+  await page.goto(url);
+  await expect(page.locator('#fraction-diagnostic-card')).toBeVisible();
+  const card = page.locator('#fraction-diagnostic-card');
+  for (const [value, prompt] of [
+    [2, 'Met welke factor'], [4, 'Welke teller'],
+    [12, 'Welke noemer'], [4, 'eerste gelijkwaardige breuk'],
+    [3, 'tweede gelijkwaardige breuk'], [7, 'Tel de twee tellers'],
+    [8, 'Welke noemer'], [4, 'eerste gelijkwaardige breuk'],
+    [3, 'tweede gelijkwaardige breuk'], [1, 'Trek de tweede teller']
+  ]) await answerOne(page, value, prompt);
+  await expect(page.locator('#fraction-diagnostic-result')).toBeVisible();
+  await expect(page.locator('#fraction-diagnostic-result')).toContainText('gemengde breuk is overgeslagen');
+  await expect(page.locator('#fraction-diagnostic-card')).toBeHidden();
+});
 
-test('FR2 diagnostic directs an unlinked selected learner to explicit profile linking', async ({ page }) => {
-  await page.addInitScript(({ parent }) => {
-    const db = {
-      functions: { invoke: async () => ({ data: null, error: null }) },
-      auth: {
-        getSession: async () => ({ data: { session: { user: { id: parent } } }, error: null }),
-        onAuthStateChange: () => ({ data: { subscription: { unsubscribe() {} } } }),
-        signOut: async () => ({ error: null })
-      },
-      from() {
-        const query = {
-          select() { return query; },
-          eq() { return query; },
-          maybeSingle() { return Promise.resolve({ data: null, error: null }); },
-          order() { return query; },
-          then(resolve, reject) { return Promise.resolve({ data: [], error: null }).then(resolve, reject); }
-        };
-        return query;
-      },
-      rpc: async () => ({ data: null, error: new Error('Unexpected RPC') })
-    };
-    window.__pacoSupabaseStub = { createClient: () => db };
-  }, { parent: '5d0e1e5c-1dbe-4909-bd3a-81a1e7b26d09' });
-  await page.route('https://cdn.jsdelivr.net/**', route => route.fulfill({
-    status: 200, contentType: 'application/javascript', body: 'window.supabase = window.__pacoSupabaseStub;'
-  }));
+test('diagnostic can be stopped and keeps only the learner responses already submitted', async ({ page }) => {
+  await installParentFixture(page);
+  await page.goto(url);
+  await answerOne(page, 2, 'Met welke factor');
+  await expect(page.locator('#fraction-diagnostic-card input')).toHaveCount(1);
+  await page.getByRole('button', { name: 'Diagnose stoppen' }).click();
+  await expect(page.locator('#fraction-diagnostic-result')).toBeVisible();
+  await expect(page.locator('#fraction-diagnostic-result')).toContainText('Diagnose gestopt');
+  await expect(page.locator('#fraction-diagnostic-result')).toContainText('Vermenigvuldigingsfactor: 2');
+  const stored = await page.evaluate(() => Object.entries(localStorage).filter(([key]) => key.startsWith('pacogo:fraction-diagnostic:v2:')));
+  expect(stored).toHaveLength(1);
+  expect(stored[0][1]).toContain('"rawValue":2');
+  expect(stored[0][1]).not.toContain('"rawValue":4');
+});
+
+test('diagnostic directs an unlinked selected learner to explicit profile linking', async ({ page }) => {
+  await installParentFixture(page, { linked: false });
   await page.goto(url);
   await expect(page.locator('#fraction-diagnostic-setup')).toBeVisible();
   await expect(page.locator('#fraction-diagnostic-setup')).toContainText('Voor Zyon is nog geen curriculumprofiel gekoppeld');

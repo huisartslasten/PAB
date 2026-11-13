@@ -6672,3 +6672,18 @@ Perform the pending visual/learner-facing review in the local PacoGO TEST enviro
 ### Volgende concrete stap
 
 Open de gewijzigde pagina in de lokale PacoGO TEST-omgeving en controleer dat de doelbreuk, de visuele voorstelling en de twee antwoordopties daadwerkelijk direct zichtbaar zijn op één scherm. De browserasserties bewijzen de DOM-/zichtbaarheidscontracten, maar vervangen de visuele controle niet.
+
+
+### FR2 practice / diagnostic entry-point regression resolution — 2026-11-12
+
+- Full Regression #3617 was RED on `382bf42b5cf9181b8af3face72d745287d18adf1`. All non-browser checks passed; one browser assertion failed because `curriculum-fr2-practice-learner.browser.test.js` incorrectly expected `#openFractionDiagnostic` to be absent.
+- Root cause: the assertion added in commit `a4b18bc5164a06c13eb6ceb0c8651e20564dd7da` contradicted the pre-existing diagnostic learner browser contract, which requires the learner to return to practice and reopen the diagnostic while preserving `viewStudent`.
+- The correct product contract is that the diagnostic entry point remains available as a compact secondary action in the learner-context row, outside the mathematical work area. The exercise prompt, target model and answer options remain the primary visible content.
+- Corrected only the FR2 practice browser test: it now asserts that the context row and diagnostic entry point are visible and that the button is contained in that row. The staged diagnostic browser test and its navigation/context-preservation assertions remain unchanged.
+- Resolution commit: `009bf2867a98d68e4fd584278c8ff35615b4c389` (`Align FR2 practice test with diagnostic navigation contract`).
+- Full Regression #3618 / run `43356534131` completed **GREEN** on exact commit `009bf2867a98d68e4fd584278c8ff35615b4c389`. All checks passed, including the full browser regression and clean-working-tree verification.
+- Branch: `refactor/professional-v1`. LIVE `main` untouched. No Supabase change and no Netlify deployment.
+
+### Next concrete step
+
+Perform the still-pending visual review in the local PacoGO TEST environment: verify that the active task, target model, two answer options and compact diagnostic action fit the intended PacoGO page layout without displacing the mathematical work. Do not infer visual acceptance from the green browser regression.

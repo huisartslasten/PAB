@@ -27,3 +27,8 @@
 .practice-option-model{display:grid;justify-items:center;gap:5px;width:100%}
 .practice-option-model-label{font-size:12px;font-weight:800;color:#647894}
 .practice-option-model .pacogo-fraction-representation--area{width:min(100%,180px)}
+
+.pacogo-fraction-pie{display:block;width:min(100%,180px);height:auto;overflow:visible}
+.pacogo-fraction-pie__sector{fill:#fff;stroke:#102b57;stroke-width:1.5;stroke-linejoin:round}
+.pacogo-fraction-pie__sector.is-shaded{fill:#b8dcfa}
+.pacogo-fraction-representation[data-layout="pie"]{width:min(100%,180px)}

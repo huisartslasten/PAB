@@ -6,7 +6,8 @@ const FRACTION_PRACTICE_TASKS = Object.freeze([
       Object.freeze({ id: "two-fourths", fraction: Object.freeze({ numerator: 2, denominator: 4 }) }),
       Object.freeze({ id: "three-fourths", fraction: Object.freeze({ numerator: 3, denominator: 4 }) })
     ]),
-    optionRepresentation: "area_model"
+    optionRepresentation: "area_model",
+    targetLayout: "bar"
   }),
   Object.freeze({
     id: "FR2-PRACTICE-02",
@@ -15,7 +16,8 @@ const FRACTION_PRACTICE_TASKS = Object.freeze([
       Object.freeze({ id: "two-sixths", fraction: Object.freeze({ numerator: 2, denominator: 6 }) }),
       Object.freeze({ id: "two-thirds", fraction: Object.freeze({ numerator: 2, denominator: 3 }) })
     ]),
-    optionRepresentation: "symbolic_fraction"
+    optionRepresentation: "area_model",
+    targetLayout: "pie"
   }),
   Object.freeze({
     id: "FR2-PRACTICE-03",
@@ -24,7 +26,8 @@ const FRACTION_PRACTICE_TASKS = Object.freeze([
       Object.freeze({ id: "four-sixths", fraction: Object.freeze({ numerator: 4, denominator: 6 }) }),
       Object.freeze({ id: "three-sixths", fraction: Object.freeze({ numerator: 3, denominator: 6 }) })
     ]),
-    optionRepresentation: "symbolic_fraction"
+    optionRepresentation: "area_model",
+    targetLayout: "bar"
   })
 ]);
 

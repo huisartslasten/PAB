@@ -6591,3 +6591,17 @@ Herhaal de lokale PacoGO TEST-controle van de volledige breukenroute. Controleer
 - De vorige handoff-update commit `5cec2f4b835d90d6bdd9b84b705c7f3fabb4a6a3` is geverifieerd door Full Regression #3576 (GREEN).
 - Volgende stap: ga door met de lokale review van de resterende volledige breukenroute (herkenning, optellen, gemengd getal/vereenvoudigen en aftrekken). Noteer alleen concrete onduidelijkheden die de gebruiker in de TEST-weergave aantreft. Geen F4-bouw totdat de F3-voorwaarden en methodeherkomst zijn gecontroleerd.
 
+### Fraction result-form inline input — regression closure — 2026-11-12
+
+- Shared answer-input implementation commit: `9c96e7263c62ebafca51ce07937ec0a49aef10f2`. It adds the reusable fraction answer input with an optional whole-number field and learner-controlled **Vereenvoudigen** action that reveals a second fraction pair. The learner enters both forms; PacoGO does not auto-simplify.
+- Accessibility correction commit: `1252a5691482975d8bf1b937a2a5bb9089cb94e6`.
+- Browser selector precision commit: `976260f961de3854e74ca296fe0016ba65c9a111`.
+- The v2 result-form session stores each explicitly submitted answer as named values in a learner-keyed local-only store. The browser test was updated to assert this v2 contract rather than the retired v1 two-stage `rawValues` contract. This is not keystroke logging; a response is recorded when the learner submits **Controleren**.
+- Test-contract update commit: `0e94155514b6d459ccad76783c7b486702e5fcd6`.
+- Full Regression #3583 / run 43328831727: **GREEN** on exact commit `0e94155514b6d459ccad76783c7b486702e5fcd6`. All 20 workflow steps passed, including curriculum engine, architecture boundaries, Node, Vitest, browser regression and clean working tree.
+- Branch HEAD before this handoff update: `0e94155514b6d459ccad76783c7b486702e5fcd6`. Working branch remains `refactor/professional-v1`; LIVE `main` was not touched. No Supabase or Netlify changes.
+- This handoff update must itself pass Full Regression on its exact resulting commit before closure.
+
+### Next concrete step
+
+Continue the local PacoGO TEST review of the full learner-facing fraction route. Include the newly unified result form: check the optional whole-number toggle, inline numerator/denominator fields, the **Vereenvoudigen** reveal, and the independent reduced-fraction inputs (for example, entering `1 5/10` and then `1/2` for `15/10`). Also review recognition, learner-created equivalent fractions, addition and subtraction. Do not use LIVE or Netlify. Record concrete UI/pedagogical findings before changing code. Do not build F4 until its prerequisites and method provenance are verified; do not invent formal FR1/FR2 curriculum or evidence identifiers.

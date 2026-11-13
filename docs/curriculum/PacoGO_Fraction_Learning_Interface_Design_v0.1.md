@@ -121,3 +121,13 @@ Each task obtains the explanation requirement from its task-set record. Browser 
 ## 9. Shared fraction answer input — architecture extension
 
 The reusable answer-entry control is `pacogo-engine/fraction-answer-input.js`. It owns only presentation and learner interaction state: an optional whole-number field (unchecked/hidden by default), a primary numerator/denominator pair, and an always-visible **Vereenvoudigen** action that reveals a second fraction pair adjacent to the answer only after learner activation. Fields use compact solid-border styling without dotted placeholders. The component exposes raw values and locking; it does not calculate correctness, infer curriculum progression, or create evidence/mastery. The non-formal 15/10 practice is its first consumer; task-specific validation remains in the practice session. This preserves separate pedagogical configuration, interaction state, and rendering, and is suitable for future reuse by other fraction tasks. No C1–C9, FR1/FR2 formal mappings, evidence, mastery, next-action, learner-state, or Supabase contracts are changed.
+
+## 10. Mandatory central Fraction Practice Design System
+
+The binding learner-facing visual and interaction rules for **all** fraction exercises are maintained in:
+
+`docs/curriculum/PacoGO_Fraction_Practice_Interface_Design_System_v0.1.md`
+
+That document is the single source of truth for fraction notation, answer-input sizing, complete numerator/denominator entry, equation layout, separation of mathematical work and controls, mixed-number/simplification behavior, compact responsive PacoGO layout, feedback, reusable components and acceptance criteria.
+
+All existing and future fraction exercises MUST follow it. This design document remains the pedagogical/interface architecture baseline; the central Design System is the normative visual/interaction contract. Neither document changes curriculum mappings or formal evidence/mastery contracts.

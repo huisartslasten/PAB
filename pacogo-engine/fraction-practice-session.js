@@ -16,7 +16,7 @@ const FRACTION_PRACTICE_TASKS = Object.freeze([
       Object.freeze({ id: "two-sixths", fraction: Object.freeze({ numerator: 2, denominator: 6 }) }),
       Object.freeze({ id: "two-thirds", fraction: Object.freeze({ numerator: 2, denominator: 3 }) })
     ]),
-    optionRepresentation: "area_model",
+    optionRepresentation: "symbolic_fraction",
     targetLayout: "pie"
   }),
   Object.freeze({

@@ -175,7 +175,8 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await expect(page.locator("#resultFormCard .pacogo-fraction-practice-template__work #resultFormExpression")).toHaveCount(1);
   await expect(page.locator("#resultFormCard .pacogo-fraction-practice-template__controls #resultFormInput")).toHaveCount(1);
   await expect(page.locator("#resultFormExpression .pacogo-fraction-representation--symbolic")).toHaveCount(1);
-  await expect(page.locator("#resultFormExpression .pacogo-fraction-answer__fraction")).toHaveCount(1);
+  await expect(page.locator("#resultFormExpression .pacogo-fraction-answer__fraction")).toHaveCount(2);
+  await expect(page.locator("#resultFormExpression .pacogo-fraction-answer__simplified")).toBeHidden();
   await expect(page.locator("#resultFormInput .pacogo-fraction-answer__controls")).toBeVisible();
   expect(await page.locator("#resultFormCard").innerText()).not.toMatch(/\d+\s*\/\s*\d+/);
   await expect(page.locator("#resultFormExpression .pacogo-fraction-answer")).toBeVisible();

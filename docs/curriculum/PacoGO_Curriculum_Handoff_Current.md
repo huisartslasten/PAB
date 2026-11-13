@@ -6629,3 +6629,14 @@ Read the central Fraction Practice Design System before touching any fraction UI
 - This is a central UI/renderer requirement, not a curriculum change. No task, claim, evidence, mastery, next-action, learner-state or Supabase contract is altered.
 - Regression baseline before this design decision: Full Regression #3588 / run `43351270003`, **GREEN** on exact commit `2ad9944c32159d623baa1fa13046408f89ca9a4a`. All workflow steps completed successfully.
 - This documentation update must itself pass Full Regression on its exact resulting commit.
+
+
+### Fraction representation consistency — clarified — 2026-11-12
+
+- User clarification: **one fraction exercise must use either pie models or horizontal fraction bars, never a mixture of both.**
+- All fraction models displayed together in a single exercise must use the same selected representation. Do not show (for example) one fraction as a pie and another as a bar in the same comparison or operation.
+- Do not switch representation within an exercise. A different representation may be selected for a separate exercise.
+- This supersedes the earlier wording in section 13 of the central Fraction Practice Design System that allowed a deliberate bar/pie comparison or transition within one task.
+- The normative rule is now in section 13C of `docs/curriculum/PacoGO_Fraction_Practice_Interface_Design_System_v0.1.md`.
+- Documentation only; no curriculum, task, evidence, controller, mastery, learner-state or Supabase contract changes.
+- Full Regression #3590 / run `43351459378` completed **GREEN** on exact commit `e78029f3f10218c3b0504a86e4520d8314e79ddb`. The subsequent documentation clarification commits must be checked by Full Regression on their exact final commit.

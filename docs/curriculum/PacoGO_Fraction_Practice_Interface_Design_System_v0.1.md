@@ -187,15 +187,17 @@ Use a circle divided into equal angular sectors, with the numerator's sectors cl
 - connecting familiar part-whole situations (for example, halves, quarters and thirds) to fraction notation;
 - interpreting a fraction as a share of one complete object.
 
-### C. Exclusive representation rule — one model per exercise
+### C. One visual model per exercise — without blocking notation transfer
 
-- The task adapter or pedagogical configuration selects **one** representation for the complete exercise: either `bar` or `pie`.
-- **Never mix pie models and bar models within one exercise.** For example, do not show one fraction as a pie and another fraction as a bar in the same comparison or operation.
-- All fraction models shown together in one exercise must use the same selected representation. This applies to source models, comparison models, working models and result-related models.
-- Do not switch from a bar to a pie (or vice versa) partway through one exercise. A representation transition may occur only between separate exercises, where the next exercise consistently uses its own selected model.
-- Do not use pie models merely for decoration or force them into every task. Do not use bars exclusively. Both renderers are first-class shared components, selected exclusively per exercise according to its pedagogical purpose.
-- When comparing different fractions, preserve equal-whole meaning and make partitions mathematically accurate. A pie model must use equal sectors; a bar model must use equal-sized partitions.
-- Keep labels, shading, contrast, accessibility text and visual sizing consistent across both representations.
+- The task adapter selects one **area-model layout** for the complete exercise: `bar`, `grid` or `pie`.
+- **Never mix pie, bar and grid area models within one exercise.** All area-model renderings shown together must use the same selected layout.
+- Do not switch between area-model layouts partway through one exercise. A visual-model transition may occur only between separate exercises.
+- Symbolic stacked-fraction notation is mathematical notation, not a second area model. It MAY be used as answer options when the authoritative task is designed to assess transfer from a visual model to symbolic notation (or vice versa).
+- A visual target with symbolic fraction options is therefore valid and intentional for representational-transfer tasks such as FR2-T03, FR2-T04 and FR2-T05. The visual-model exclusivity rule does not prohibit this.
+- When both target and options are area models, they MUST use the same selected layout. When options are symbolic fractions, render them with the shared stacked-fraction renderer.
+- Do not use pie models merely for decoration or force them into every task. Do not use bars exclusively. Select the area-model layout according to the task's pedagogical purpose.
+- When comparing different fractions, preserve equal-whole meaning and make partitions mathematically accurate. A pie model must use equal sectors; a bar model must use equal-sized partitions; a grid must preserve equal-sized cells.
+- Keep labels, shading, contrast, accessibility text and visual sizing consistent across all layouts.
 - Renderer choice changes presentation only; it must not change fraction value, task identity, answer validation, evidence, mastery or curriculum inference.
 
-The shared renderer contract therefore includes `bar` and `pie` as supported representation types, with a strict one-model-per-exercise selection. Additional representations may be added only through this central design system and shared component contract.
+The shared renderer contract includes `bar`, `grid` and `pie` area-model layouts, plus symbolic stacked-fraction notation. The task contract may select distinct target and option renderers only when this distinction is pedagogically required; it must never accidentally mix different area-model layouts.

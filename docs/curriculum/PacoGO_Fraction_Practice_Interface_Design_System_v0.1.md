@@ -169,3 +169,32 @@ A technically passing test suite does not replace the user's visual/pedagogical 
 This document is the central source of truth. Future chats and contributors must read it before building or changing a fraction exercise. A page-specific exception is not permitted by default. Any proposed exception must be explicitly justified by the authoritative task specification and documented here before implementation.
 
 Changes to these visual/interaction rules must update this central document and the current curriculum handoff. Do not silently override the rules in page CSS, task adapters or local markup.
+
+## 13. Visual representation choice — bars and pie models
+
+The shared Fraction Practice Interface MUST support at least two reusable visual representations:
+
+### A. Fraction bar model
+Use a bar partitioned into equal-sized parts. This is especially useful when the learner needs to:
+- compare fraction sizes on a common linear scale;
+- see equivalent fractions and common denominators;
+- reason about addition/subtraction and the relationship between parts and a shared whole;
+- align or compare multiple fractions side by side.
+
+### B. Fraction circle / pie model
+Use a circle divided into equal angular sectors, with the numerator's sectors clearly shaded. This is especially useful when the learning purpose is:
+- recognising a fraction as part(s) of one whole;
+- connecting familiar part-whole situations (for example, halves, quarters and thirds) to fraction notation;
+- interpreting a fraction as a share of one complete object.
+
+### C. Pedagogical selection rule
+
+- The task adapter or pedagogical configuration selects the representation that best serves the learning purpose; individual pages must not invent their own model.
+- Do not use pie models merely for decoration or force them into every task.
+- Do not use bars exclusively. Both renderers are first-class shared components.
+- A task may show a bar, a pie model, or a deliberate comparison/transition between the two when that supports the intended learning.
+- When comparing different fractions, preserve equal-whole meaning and make partitions mathematically accurate. A pie model must use equal sectors; a bar model must use equal-sized partitions.
+- Keep labels, shading, contrast, accessibility text and visual sizing consistent across both representations.
+- Renderer choice changes presentation only; it must not change fraction value, task identity, answer validation, evidence, mastery or curriculum inference.
+
+The shared renderer contract therefore includes `bar` and `pie` as supported representation types. Additional representations may be added only through this central design system and shared component contract.

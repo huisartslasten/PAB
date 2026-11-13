@@ -6605,3 +6605,18 @@ Herhaal de lokale PacoGO TEST-controle van de volledige breukenroute. Controleer
 ### Next concrete step
 
 Continue the local PacoGO TEST review of the full learner-facing fraction route. Include the newly unified result form: check the optional whole-number toggle, inline numerator/denominator fields, the **Vereenvoudigen** reveal, and the independent reduced-fraction inputs (for example, entering `1 5/10` and then `1/2` for `15/10`). Also review recognition, learner-created equivalent fractions, addition and subtraction. Do not use LIVE or Netlify. Record concrete UI/pedagogical findings before changing code. Do not build F4 until its prerequisites and method provenance are verified; do not invent formal FR1/FR2 curriculum or evidence identifiers.
+
+### Central Fraction Practice Design System — mandatory — 2026-11-12
+
+- Created `docs/curriculum/PacoGO_Fraction_Practice_Interface_Design_System_v0.1.md` as the single normative source of truth for the visual and interaction contract of **all existing and future fraction exercises**.
+- The rules are mandatory for every fraction practice page and every future chat/contributor. No exercise may invent its own fraction notation, answer inputs, controls, layout or styling.
+- Requirements include: central PacoGO page template; compact responsive screen layout; stacked numerator / horizontal bar / denominator notation everywhere (no visible slash fractions, including feedback/results); compact inputs with typed digits matching displayed numeral size; both numerator and denominator fields for full fraction construction unless the authoritative task contract explicitly constrains the response; horizontal operation layout and side-by-side source models on desktop where space permits; separate mathematical work area and control area; **Vereenvoudigen** and **Heel getal toevoegen** only in the control area; simplified result horizontally to the right of the original result on desktop; concise instructions/feedback; original and simplified learner-entered forms remain visible.
+- The existing `PacoGO_Fraction_Learning_Interface_Design_v0.1.md` now points to this central contract. The central contract is a UI/interaction specification only: no curriculum, SLO, FR1/FR2 formal mapping, task/evidence, diagnostic, C1–C9, mastery, next-action, learner-state, storage or Supabase contract is changed.
+- This is a documentation/design baseline, **not yet an implementation claim**. The current screenshot findings still need to be implemented through shared reusable Fraction Practice components and verified in the local PacoGO TEST environment.
+- Current branch: `refactor/professional-v1`; LIVE `main` untouched.
+- Baseline before this documentation work: commit `e62f420af847040e96cf3973a478161cfc7314a0`; Full Regression #3585 / run `43348836937` was GREEN on that exact commit (all 20 steps completed successfully).
+- The documentation commits must themselves pass Full Regression on the exact final resulting commit before this work is closed.
+
+### Next concrete step
+
+Read the central Fraction Practice Design System before touching any fraction UI. Then inspect the existing shared fraction renderers, answer-input component, addition/subtraction expression renderer, mixed-number result form and all fraction practice routes. Design the shared component changes against the central contract first; do not patch individual pages separately and do not change curriculum/task/evidence contracts. Implement only after the architecture is clear, add regression coverage for every applicable acceptance criterion, and run Full Regression on the exact resulting commit. Afterward, ask the user to review the local TEST screens before considering the fraction UI accepted.

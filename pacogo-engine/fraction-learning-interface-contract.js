@@ -23,14 +23,11 @@ function createFractionLearningInterfaceConfig({
   if (![representation, targetRepresentation, optionRepresentation].every(value => supportedRepresentations.includes(value))) {
     throw new TypeError("representation, targetRepresentation and optionRepresentation must be area_model or symbolic_fraction");
   }
-  if (targetRepresentation !== optionRepresentation) {
-    throw new TypeError("target and option representations must match within one exercise");
-  }
   if (!["bar", "grid", "pie"].includes(targetLayout)) {
     throw new TypeError("targetLayout must be bar, grid or pie");
   }
   if (targetLayout !== "bar" && targetRepresentation !== "area_model") {
-    throw new TypeError("grid and pie layouts require an area_model representation");
+    throw new TypeError("grid and pie target layouts require an area_model target representation");
   }
   if (typeof responseProcessRequired !== "boolean") {
     throw new TypeError("responseProcessRequired must be a boolean");
@@ -50,7 +47,7 @@ function createFractionLearningInterfaceConfig({
   });
   return Object.freeze({
     interfaceId: "fraction",
-    version: "0.2",
+    version: "0.3",
     targetFraction: Object.freeze({ numerator: targetFraction.numerator, denominator: targetFraction.denominator }),
     options: Object.freeze(safeOptions),
     representation,

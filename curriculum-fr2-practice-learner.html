@@ -743,7 +743,7 @@
         targetFraction: currentTask.targetFraction,
         options: currentTask.options,
         targetRepresentation: "area_model",
-        optionRepresentation: "area_model",
+        optionRepresentation: currentTask.optionRepresentation || "symbolic_fraction",
         targetLayout: currentTask.targetLayout || "bar",
         labels: {
           title: "Welke breuk laat evenveel zien?",

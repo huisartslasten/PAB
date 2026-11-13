@@ -32,7 +32,7 @@ const pieConfig = createFractionLearningInterfaceConfig({
 assert.equal(pieConfig.targetRepresentation, "area_model");
 assert.equal(pieConfig.optionRepresentation, "area_model");
 assert.equal(pieConfig.targetLayout, "pie");
-assert.throws(() => createFractionLearningInterfaceConfig({
+const transferConfig = createFractionLearningInterfaceConfig({
   targetFraction: { numerator: 2, denominator: 3 },
   options: [
     { id: "eq", fraction: { numerator: 4, denominator: 6 } },
@@ -41,7 +41,10 @@ assert.throws(() => createFractionLearningInterfaceConfig({
   targetRepresentation: "area_model",
   optionRepresentation: "symbolic_fraction",
   targetLayout: "grid"
-}), /must match within one exercise/);
+});
+assert.equal(transferConfig.targetRepresentation, "area_model");
+assert.equal(transferConfig.optionRepresentation, "symbolic_fraction");
+assert.equal(transferConfig.targetLayout, "grid");
 assert.throws(() => createFractionLearningInterfaceConfig({
   targetFraction: { numerator: 1, denominator: 2 },
   options: [{ id: "a", fraction: { numerator: 1, denominator: 2 } }, { id: "b", fraction: { numerator: 2, denominator: 4 } }],

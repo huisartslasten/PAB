@@ -52,7 +52,7 @@ assert.throws(() => createFractionLearningInterfaceConfig({
   options: [{ id: "a", fraction: { numerator: 1, denominator: 2 } }, { id: "b", fraction: { numerator: 2, denominator: 4 } }],
   targetRepresentation: "symbolic_fraction",
   targetLayout: "grid"
-}), /requires an area_model/);
+}), /require an area_model/);
 assert.throws(() => createFractionLearningInterfaceConfig({
   targetFraction: { numerator: 1, denominator: 2 },
   options: [{ id: "same", fraction: { numerator: 1, denominator: 2 } }, { id: "same", fraction: { numerator: 2, denominator: 4 } }]

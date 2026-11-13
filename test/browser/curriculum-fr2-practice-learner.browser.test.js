@@ -48,9 +48,17 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await expect(page.locator("#learnerSetup h1")).toHaveText("Wie gaat breuken oefenen?");
   await page.getByRole("button", { name: "Leerling kiezen: Leerling A" }).click();
   await expect(page.locator("#exerciseCard h1")).toHaveText("Breuken die evenveel betekenen");
+  await expect(page.locator("#exerciseCard .concept")).toHaveCount(0);
+  await expect(page.locator("#openFractionDiagnostic")).toHaveCount(0);
+  await expect(page.locator("#prompt")).toHaveText("Kies de breuk die evenveel blauw laat zien.");
+  await expect(page.locator("#fractionInterface .pacogo-fraction-interface__target")).toBeVisible();
+  await expect(page.locator("#fractionInterface .pacogo-fraction-interface__target .pacogo-fraction-representation--area")).toBeVisible();
+  await expect(page.locator("#fractionInterface .pacogo-fraction-interface__option")).toHaveCount(2);
+  await expect(page.locator("#fractionInterface .pacogo-fraction-interface__option").first()).toBeVisible();
   await expect(page.locator(".pacogo-fraction-interface__target .pacogo-fraction-representation--area")).toHaveCount(1);
   await expect(page.locator(".pacogo-fraction-interface__option")).toHaveCount(2);
   await expect(page.locator("#progress")).toContainText("0 afgerond");
+  await expect(page.locator("#feedback")).toBeHidden();
 
   await page.locator(".pacogo-fraction-interface__option").nth(0).click();
   await page.getByRole("button", { name: "Controleren" }).click();

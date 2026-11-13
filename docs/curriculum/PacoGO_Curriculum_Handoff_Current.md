@@ -6656,3 +6656,19 @@ Read the central Fraction Practice Design System before touching any fraction UI
 ### Next concrete step
 
 Perform the pending visual/learner-facing review in the local PacoGO TEST environment (never LIVE/Netlify). Check the ordinary recognition tasks with symbolic options and matching visual models, including the pie-model task, then review the full fraction route. Record concrete visual or pedagogical findings before changing code. Full Regression GREEN establishes technical regression status only; it does not establish visual acceptance or learning effectiveness.
+
+
+### Fraction practice — zichtbare opgave en compacte leerlingpagina — 2026-11-12
+
+- De lokale TEST-screenshot liet zien dat de actieve breukoefening werd verdrongen door herhaalde uitleg, een extra knop voor de breukendiagnose en een lange technische disclaimer. De leerling zag daardoor niet direct de eigenlijke opgave.
+- De leerlingpagina is teruggebracht tot één korte instructie, voortgang en de actieve gedeelde Fraction Learning Interface. De algemene uitlegkaart, de knop **Start breukendiagnose** en de technische disclaimer zijn uit deze oefenpagina verwijderd; de aparte diagnostische route en curriculumdefinities zijn niet gewijzigd.
+- De gedeelde interface heeft compactere tussenruimtes en antwoordkaarten, met een expliciet zichtbare doelmodelzone. De taak blijft dezelfde: visueel vergelijken en een gelijkwaardige breuk kiezen. Antwoordopties, visuele modellen, sessiegedrag en lokale voortgang blijven behouden.
+- De browserregressie controleert expliciet dat de overbodige uitleg en diagnoseknop ontbreken, de korte instructie zichtbaar is, het doelmodel en antwoordopties zichtbaar zijn en de lege feedbackzone geen ruimte inneemt.
+- Dit is een learner-facing UI-correctie; er zijn geen wijzigingen aan SLO-curriculum, formele taken/evidence, mastery, next-action, learner state, opslagcontract of Supabase.
+- Baseline vóór deze bouwstap: Full Regression #3615 / run `43353541564` was **GREEN** op exact commit `b447f59cd7b1e1e704e30882a62305c35d39e2d4`.
+- Implementatie en bijbehorende browserasserties zijn samengebracht in één commit; de volledige regressie moet op die exacte commit slagen voordat de wijziging als geverifieerd geldt.
+- Branch: `refactor/professional-v1`; LIVE `main` blijft onaangeraakt. Geen Netlify-deploy.
+
+### Volgende concrete stap
+
+Open de gewijzigde pagina in de lokale PacoGO TEST-omgeving en controleer dat de doelbreuk, de visuele voorstelling en de twee antwoordopties daadwerkelijk direct zichtbaar zijn op één scherm. De browserasserties bewijzen de DOM-/zichtbaarheidscontracten, maar vervangen de visuele controle niet.

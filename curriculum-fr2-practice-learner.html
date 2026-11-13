@@ -72,7 +72,11 @@
     .paco-template-page-content button { padding:9px 14px; margin:2px; }
     .paco-template-page-content #comparison { margin:8px 0; padding:10px; gap:12px; }
     .paco-template-page-content .comparison-item { gap:4px; }
+    .paco-template-page-content .concept { display:none; }
     .paco-template-page-content #fractionInterface { min-width:0; }
+    .paco-template-page-content #prompt { margin:0 0 5px; font-size:15px; font-weight:800; color:#126fc9; }
+    .paco-template-page-content #feedback:empty { display:none; }
+    .paco-template-page-content #progress { margin:2px 0 5px; }
     .paco-template-page-content #feedback { padding:9px 12px; margin:7px 0; }
     .paco-template-page-content #nextAction { margin-top:5px; }
     .paco-template-page-content #exerciseCard { gap:7px; }
@@ -105,18 +109,12 @@
   <section class="card" id="exerciseCard" hidden>
     <div class="muted" id="selectedLearnerLabel">PacoGO • Breuken</div>
     <h1>Breuken die evenveel betekenen</h1>
-    <div class="concept">
-      <strong>Wat betekent een breuk?</strong>
-      Een breuk laat een deel van één geheel zien. Twee breuken kunnen anders verdeeld zijn en toch evenveel van dat geheel laten zien. Vergelijk steeds de blauwe hoeveelheid.
-    </div>
     <div id="progress">Voortgang laden…</div>
-    <button type="button" id="openFractionDiagnostic">Start breukendiagnose</button>
-    <div id="prompt" class="muted"></div>
+    <div id="prompt" class="muted">Kies de breuk die evenveel blauw laat zien.</div>
     <div id="fractionInterface"></div>
-    <div id="feedback" role="status" aria-live="polite">Kijk rustig naar de modellen.</div>
+    <div id="feedback" role="status" aria-live="polite"></div>
     <div id="comparison" hidden></div>
     <div id="nextAction"></div>
-    <p class="muted">Dit is een oefenronde. De antwoorden worden niet gebruikt voor een toets, beoordeling of mastery-beslissing.</p>
   </section>
 
   <section class="card" id="resultCard" hidden>
@@ -733,8 +731,8 @@
     comparison.replaceChildren();
     nextAction.replaceChildren();
     feedback.className = "";
-    feedback.textContent = "Kijk naar de blauwe delen. Welke optie laat evenveel zien?";
-    document.querySelector("#prompt").textContent = "Vergelijk de hoeveelheid blauw in het doelmodel met de antwoordopties.";
+    feedback.textContent = "";
+    document.querySelector("#prompt").textContent = "Kies de breuk die evenveel blauw laat zien."
     updateProgress();
 
     interfaceInstance = createFractionLearningInterface({
@@ -821,11 +819,6 @@
     exerciseCard.hidden = false;
     document.querySelector("#selectedLearnerLabel").textContent =
       "PacoGO • " + learner.display_name + " • Rekenen • Breuken";
-    document.querySelector("#openFractionDiagnostic").onclick = () => {
-      const diagnosticUrl = new URL("curriculum-fraction-diagnostic-learner.html", window.location.href);
-      if (selectedStudent) diagnosticUrl.searchParams.set("viewStudent", selectedStudent);
-      window.location.href = diagnosticUrl.toString();
-    };
     renderTask();
   }
 

@@ -1,4 +1,12 @@
-.pacogo-fraction-interface{display:grid;gap:16px;color:#102b57}
+.pacogo-fraction-interface{display:grid;gap:10px;color:#102b57}
+.pacogo-fraction-interface__target{min-height:138px;align-content:center}
+.pacogo-fraction-interface__title{font-size:20px;line-height:1.15;margin:0}
+.pacogo-fraction-interface__options-label{font-size:15px;line-height:1.2}
+.pacogo-fraction-interface__options{gap:10px}
+.pacogo-fraction-interface__option{min-height:100px;padding:10px}
+.pacogo-fraction-interface__submit{margin-top:2px}
+.pacogo-fraction-interface__status{margin:0}
+
 .pacogo-fraction-interface__title{margin:0;font-size:24px}
 .pacogo-fraction-interface__target{display:grid;justify-items:center;gap:12px;padding:18px;border-radius:16px;background:#eef7ff}
 .pacogo-fraction-interface__label,.pacogo-fraction-interface__options-label{font-weight:800}

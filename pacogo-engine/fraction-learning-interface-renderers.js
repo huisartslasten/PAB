@@ -72,4 +72,34 @@ function renderFractionRepresentation(fraction, representation, label = "Breuk",
   return wrapper;
 }
 
-export { renderFractionRepresentation };
+function renderMixedNumber({ wholeNumber = 0, numerator, denominator } = {}, label = "Gemengd getal") {
+  if (!Number.isSafeInteger(wholeNumber) || wholeNumber < 0 ||
+      !Number.isSafeInteger(numerator) || numerator < 0 ||
+      !Number.isSafeInteger(denominator) || denominator <= 0) {
+    throw new TypeError("mixed-number values must be non-negative integers with a positive denominator");
+  }
+  const wrapper = document.createElement("span");
+  wrapper.className = "pacogo-fraction-mixed-number";
+  const parts = [];
+  if (wholeNumber > 0) {
+    const whole = document.createElement("span");
+    whole.className = "pacogo-fraction-mixed-number__whole";
+    whole.textContent = String(wholeNumber);
+    wrapper.append(whole);
+    parts.push(String(wholeNumber) + " hele");
+  }
+  const fraction = renderFractionRepresentation(
+    { numerator, denominator },
+    "symbolic_fraction",
+    label
+  );
+  fraction.removeAttribute("role");
+  fraction.removeAttribute("aria-label");
+  wrapper.append(fraction);
+  parts.push(numerator + " gedeeld door " + denominator);
+  wrapper.setAttribute("role", "img");
+  wrapper.setAttribute("aria-label", label + ": " + parts.join(" en "));
+  return wrapper;
+}
+
+export { renderFractionRepresentation, renderMixedNumber };

@@ -14,7 +14,7 @@ function createFractionResultFormPracticeSession({ learnerKey, storage = globalT
     return { schemaVersion: 2, completed: data.completed, responses: data.responses.map(item => ({ classification: item.classification, values: { ...item.values } })) };
   }
   const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
-  function getCurrentStage() { return read().completed ? null : Object.freeze({ taskId: FRACTION_RESULT_FORM_TASK.id, stageId: "answer", stageNumber: 1, totalStages: 1, prompt: "Schrijf 15/10 op jouw manier. Je kunt een heel getal toevoegen en zelf kiezen of je vereenvoudigt.", expression: "15/10 =" }); }
+  function getCurrentStage() { return read().completed ? null : Object.freeze({ taskId: FRACTION_RESULT_FORM_TASK.id, stageId: "answer", stageNumber: 1, totalStages: 1, prompt: "Noteer vijftien tienden op jouw manier. Je kunt een heel getal toevoegen en zelf kiezen of je vereenvoudigt.", expression: "vijftien tienden =" }); }
   function getProgress() { const state = read(); return Object.freeze({ completedStageCount: state.completed ? 1 : 0, totalStageCount: 1, attemptCount: state.responses.length, isComplete: state.completed }); }
   function getCompletion() { const state = read(); if (!state.completed) return null; const item = [...state.responses].reverse().find(response => response.classification === "valid"); return item ? Object.freeze({ ...item.values }) : null; }
   function recordResponse({ values } = {}) {

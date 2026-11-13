@@ -1,42 +1,615 @@
-.pacogo-fraction-interface{display:grid;gap:10px;color:#102b57}
-.pacogo-fraction-interface__target{min-height:138px;align-content:center}
-.pacogo-fraction-interface__title{font-size:20px;line-height:1.15;margin:0}
-.pacogo-fraction-interface__options-label{font-size:15px;line-height:1.2}
-.pacogo-fraction-interface__options{gap:10px}
-.pacogo-fraction-interface__option{min-height:100px;padding:10px}
-.pacogo-fraction-interface__submit{margin-top:2px}
-.pacogo-fraction-interface__status{margin:0}
+.pacogo-fraction-practice-template {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  color: #102b57;
+}
+.pacogo-fraction-practice-template__header {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+.pacogo-fraction-practice-template__context:empty,
+.pacogo-fraction-practice-template__title-area:empty,
+.pacogo-fraction-practice-template__instruction:empty,
+.pacogo-fraction-practice-template__progress:empty,
+.pacogo-fraction-practice-template__prompt:empty,
+.pacogo-fraction-practice-template__work:empty,
+.pacogo-fraction-practice-template__controls:empty,
+.pacogo-fraction-practice-template__feedback:empty,
+.pacogo-fraction-practice-template__actions:empty,
+.pacogo-fraction-practice-template__footnote:empty {
+  display: none;
+}
+.pacogo-fraction-practice-template__context,
+.exercise-context-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.pacogo-fraction-practice-template__title-area h1,
+.pacogo-fraction-practice-template__title-area h2 {
+  margin: 0;
+  font-size: clamp(21px, 2vw, 28px);
+  line-height: 1.12;
+}
+.pacogo-fraction-practice-template__instruction,
+.pacogo-fraction-practice-template__prompt {
+  margin: 0;
+  line-height: 1.3;
+}
+.pacogo-fraction-practice-template__instruction {
+  color: #647894;
+  font-size: 13px;
+}
+.pacogo-fraction-practice-template__prompt {
+  color: #126fc9;
+  font-size: 15px;
+  font-weight: 800;
+}
+.pacogo-fraction-practice-template__progress {
+  color: #647894;
+  font-size: 13px;
+  font-weight: 800;
+}
+.pacogo-fraction-practice-template__work {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.pacogo-fraction-practice-template__controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+  padding-top: 7px;
+  border-top: 1px solid #e1ebf4;
+}
+.pacogo-fraction-practice-template__feedback {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+.pacogo-fraction-practice-template__feedback > [role="status"] {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 11px;
+  background: #eef8ff;
+  color: #126fc9;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.pacogo-fraction-practice-template__feedback > [role="status"]:empty {
+  display: none;
+}
+.pacogo-fraction-practice-template__feedback > #feedback.error {
+  background: #fff0f0;
+  color: #b42318;
+}
+.pacogo-fraction-practice-template__actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.pacogo-fraction-practice-template__actions:empty {
+  display: none;
+}
+.pacogo-fraction-practice-template__footnote {
+  color: #647894;
+  font-size: 12px;
+  line-height: 1.3;
+}
+.pacogo-fraction-practice-template__footnote p {
+  margin: 0;
+}
 
-.pacogo-fraction-interface__title{margin:0;font-size:24px}
-.pacogo-fraction-interface__target{display:grid;justify-items:center;gap:12px;padding:18px;border-radius:16px;background:#eef7ff}
-.pacogo-fraction-interface__label,.pacogo-fraction-interface__options-label{font-weight:800}
-.pacogo-fraction-interface__options-label{margin:0}
-.pacogo-fraction-interface__options{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
-.pacogo-fraction-interface__option{min-height:110px;display:grid;place-items:center;padding:14px;border:2px solid #d8e7f4;border-radius:16px;background:#fbfdff;color:#102b57;cursor:pointer;font:inherit}
-.pacogo-fraction-interface__option.is-selected{border-color:#1787f2;background:#eef7ff;box-shadow:0 0 0 3px rgba(23,135,242,.12)}
-.pacogo-fraction-interface__option:focus-visible,.pacogo-fraction-interface__submit:focus-visible,.pacogo-fraction-interface__explanation:focus-visible{outline:3px solid #1787f2;outline-offset:3px}
-.pacogo-fraction-interface__response{display:grid;gap:8px}
-.pacogo-fraction-interface__explanation-label{display:grid;gap:8px;font-weight:700}
-.pacogo-fraction-interface__explanation{width:100%;box-sizing:border-box;border:1px solid #b8cbe0;border-radius:12px;padding:12px;font:inherit;resize:vertical}
-.pacogo-fraction-interface__submit{justify-self:start;border:0;border-radius:14px;padding:12px 20px;background:#1787f2;color:#fff;font:inherit;font-weight:800;cursor:pointer}
-.pacogo-fraction-interface__submit:disabled,.pacogo-fraction-interface__option:disabled{opacity:.55;cursor:not-allowed}
-.pacogo-fraction-interface__status{margin:0;padding:10px 12px;border-radius:12px;background:#eef8ff;color:#126fc9;font-weight:700}
-.pacogo-fraction-interface__status.is-error{background:#fff0f0;color:#b42318}
-.pacogo-fraction-representation{display:inline-grid;justify-items:center;align-items:center}
-.pacogo-fraction-representation--symbolic{grid-template-rows:auto 2px auto;min-width:52px;font-size:26px;font-weight:900;line-height:1.1}
-.pacogo-fraction-divider{width:100%;height:2px;background:currentColor}
-.pacogo-fraction-representation--area{width:min(100%,320px)}
-.pacogo-fraction-cells{display:grid;width:100%;min-height:54px;border:2px solid #102b57;border-radius:8px;overflow:hidden;background:#fff}
-.pacogo-fraction-cell{border-right:1px solid #102b57;background:#fff}
-.pacogo-fraction-cell:last-child{border-right:0}
-.pacogo-fraction-cell.is-shaded{background:#b8dcfa}
-@media(max-width:600px){.pacogo-fraction-interface__options{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.pacogo-fraction-interface {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  color: #102b57;
+}
+.pacogo-fraction-interface__title {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.15;
+}
+.pacogo-fraction-interface__target {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 7px;
+  min-height: 0;
+  padding: 10px;
+  border-radius: 13px;
+  background: #eef7ff;
+}
+.pacogo-fraction-interface__label,
+.pacogo-fraction-interface__options-label {
+  font-size: 14px;
+  font-weight: 800;
+}
+.pacogo-fraction-interface__options-label {
+  margin: 0;
+  line-height: 1.2;
+}
+.pacogo-fraction-interface__options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+.pacogo-fraction-interface__option {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 78px;
+  padding: 8px;
+  border: 2px solid #d8e7f4;
+  border-radius: 13px;
+  background: #fbfdff;
+  color: #102b57;
+  cursor: pointer;
+  font: inherit;
+}
+.pacogo-fraction-interface__option.is-selected {
+  border-color: #1787f2;
+  background: #eef7ff;
+  box-shadow: 0 0 0 3px rgba(23, 135, 242, .12);
+}
+.pacogo-fraction-interface__option:focus-visible,
+.pacogo-fraction-interface__submit:focus-visible,
+.pacogo-fraction-interface__explanation:focus-visible,
+.pacogo-fraction-practice-template button:focus-visible,
+.pacogo-fraction-answer__input:focus-visible,
+.fraction-practice-inline-input:focus-visible {
+  outline: 3px solid #1787f2;
+  outline-offset: 2px;
+}
+.pacogo-fraction-interface__response {
+  display: grid;
+  gap: 6px;
+}
+.pacogo-fraction-interface__explanation-label {
+  display: grid;
+  gap: 6px;
+  font-weight: 700;
+}
+.pacogo-fraction-interface__explanation {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #b8cbe0;
+  border-radius: 10px;
+  padding: 9px;
+  font: inherit;
+  resize: vertical;
+}
+.pacogo-fraction-interface__submit {
+  justify-self: start;
+  min-height: 38px;
+  margin: 0;
+  border: 0;
+  border-radius: 12px;
+  padding: 8px 15px;
+  background: #1787f2;
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+.pacogo-fraction-interface__submit:disabled,
+.pacogo-fraction-interface__option:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+.pacogo-fraction-interface__status {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 11px;
+  background: #eef8ff;
+  color: #126fc9;
+  font-size: 13px;
+  font-weight: 700;
+}
+.pacogo-fraction-interface__status:empty {
+  display: none;
+}
+.pacogo-fraction-interface__status.is-error {
+  background: #fff0f0;
+  color: #b42318;
+}
 
-.practice-option-model{display:grid;justify-items:center;gap:5px;width:100%}
-.practice-option-model-label{font-size:12px;font-weight:800;color:#647894}
-.practice-option-model .pacogo-fraction-representation--area{width:min(100%,180px)}
+.pacogo-fraction-representation {
+  display: inline-grid;
+  justify-items: center;
+  align-items: center;
+}
+.pacogo-fraction-representation--symbolic {
+  grid-template-rows: auto 2px auto;
+  min-width: 44px;
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1.05;
+}
+.pacogo-fraction-numerator,
+.pacogo-fraction-denominator {
+  display: flex;
+  justify-content: center;
+  min-width: 26px;
+  padding: 0 3px;
+}
+.pacogo-fraction-divider {
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+}
+.pacogo-fraction-representation--area {
+  width: min(100%, 260px);
+}
+.pacogo-fraction-cells {
+  display: grid;
+  width: 100%;
+  min-height: 42px;
+  border: 2px solid #102b57;
+  border-radius: 7px;
+  overflow: hidden;
+  background: #fff;
+}
+.pacogo-fraction-cell {
+  border-right: 1px solid #102b57;
+  background: #fff;
+}
+.pacogo-fraction-cell:last-child {
+  border-right: 0;
+}
+.pacogo-fraction-cell.is-shaded {
+  background: #b8dcfa;
+}
+.pacogo-fraction-pie {
+  display: block;
+  width: min(100%, 160px);
+  height: auto;
+  overflow: visible;
+}
+.pacogo-fraction-pie__sector {
+  fill: #fff;
+  stroke: #102b57;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+.pacogo-fraction-pie__sector.is-shaded {
+  fill: #b8dcfa;
+}
+.pacogo-fraction-representation[data-layout="pie"] {
+  width: min(100%, 160px);
+}
+.practice-option-model {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  width: 100%;
+}
+.practice-option-model-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #647894;
+}
+.practice-option-model .pacogo-fraction-representation--area {
+  width: min(100%, 150px);
+}
 
-.pacogo-fraction-pie{display:block;width:min(100%,180px);height:auto;overflow:visible}
-.pacogo-fraction-pie__sector{fill:#fff;stroke:#102b57;stroke-width:1.5;stroke-linejoin:round}
-.pacogo-fraction-pie__sector.is-shaded{fill:#b8dcfa}
-.pacogo-fraction-representation[data-layout="pie"]{width:min(100%,180px)}
+#comparison,
+.comparison {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-width: 0;
+  margin: 0;
+  padding: 9px;
+  border-radius: 12px;
+  background: #f5f9fd;
+}
+.comparison-item {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  min-width: 80px;
+}
+.comparison-item > span:last-child {
+  font-weight: 800;
+}
+#constructionTarget {
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+  padding: 5px;
+}
+.construction-equation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+  margin: 0;
+  padding: 9px;
+  border-radius: 12px;
+  background: #f5f9fd;
+  font-size: 24px;
+  font-weight: 900;
+}
+.fraction-practice-equation {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  line-height: 1.25;
+  min-width: 0;
+}
+.fraction-practice-fraction {
+  display: inline-grid;
+  grid-template-rows: auto 2px auto;
+  align-items: center;
+  justify-items: stretch;
+  vertical-align: middle;
+  min-width: 38px;
+  margin: 0 2px;
+}
+.fraction-practice-numerator,
+.fraction-practice-denominator {
+  display: flex;
+  justify-content: center;
+  min-width: 26px;
+  padding: 0 3px;
+}
+.fraction-practice-divider {
+  height: 2px;
+  width: 100%;
+  background: currentColor;
+}
+.fraction-practice-whole {
+  align-self: center;
+}
+.fraction-practice-inline-field {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.fraction-practice-inline-input {
+  width: 46px;
+  min-height: 36px;
+  box-sizing: border-box;
+  border: 2px dashed #8aa6c2;
+  border-radius: 8px;
+  text-align: center;
+  font: 900 21px Nunito, system-ui, sans-serif;
+  color: #102b57;
+  background: #fff;
+  padding: 3px;
+}
+.fraction-practice-inline-input:focus-visible {
+  outline: 3px solid #9bcfff;
+  outline-offset: 2px;
+}
+
+.pacogo-fraction-answer {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  width: 100%;
+  min-width: 0;
+}
+.pacogo-fraction-answer__line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+.pacogo-fraction-answer__fraction {
+  display: inline-grid;
+  grid-template-rows: auto 2px auto;
+  align-items: center;
+  justify-items: stretch;
+  min-width: 52px;
+}
+.pacogo-fraction-answer__field {
+  display: grid;
+  justify-items: center;
+  min-width: 0;
+}
+.pacogo-fraction-answer__visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.pacogo-fraction-answer__field[hidden] {
+  display: none;
+}
+.pacogo-fraction-answer__whole-field {
+  display: flex;
+  align-items: center;
+}
+.pacogo-fraction-answer__input {
+  width: 48px;
+  height: 36px;
+  box-sizing: border-box;
+  border: 1.5px solid #9bb7d0;
+  border-radius: 8px;
+  background: #fff;
+  color: #102b57;
+  text-align: center;
+  font: 900 22px Nunito, system-ui, sans-serif;
+  padding: 2px;
+}
+.pacogo-fraction-answer__divider {
+  height: 2px;
+  width: 100%;
+  background: #102b57;
+}
+.pacogo-fraction-answer__equals {
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 900;
+}
+.pacogo-fraction-answer__controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.pacogo-fraction-answer__toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 800;
+}
+.pacogo-fraction-answer__toggle input {
+  width: 17px;
+  height: 17px;
+  accent-color: #1787f2;
+}
+.pacogo-fraction-answer__simplify {
+  min-height: 34px;
+  margin: 0;
+  padding: 7px 12px;
+  font-size: 13px;
+}
+.pacogo-fraction-answer__simplified {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+.pacogo-fraction-answer__simplified[hidden] {
+  display: none;
+}
+.pacogo-fraction-mixed-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 23px;
+  line-height: 1.05;
+  font-weight: 900;
+}
+.pacogo-fraction-mixed-number__whole {
+  font-size: 23px;
+  font-weight: 900;
+}
+.fraction-result-equation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  min-width: 0;
+  margin: 0;
+  padding: 9px;
+  border-radius: 12px;
+  background: #f5f9fd;
+  font-size: 23px;
+  font-weight: 900;
+}
+#constructionInput,
+#additionInput,
+#resultFormInput,
+#subtractionInput {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+#progress,
+#constructionProgress,
+#additionProgress,
+#resultFormProgress,
+#subtractionProgress {
+  margin: 0;
+  color: #647894;
+  font-size: 13px;
+  font-weight: 800;
+}
+#feedback,
+#constructionFeedback,
+#additionFeedback,
+#resultFormFeedback,
+#subtractionFeedback {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 11px;
+  background: #eef8ff;
+  color: #126fc9;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+#feedback:empty,
+#constructionFeedback:empty,
+#additionFeedback:empty,
+#resultFormFeedback:empty,
+#subtractionFeedback:empty {
+  display: none;
+}
+#feedback.error {
+  background: #fff0f0;
+  color: #b42318;
+}
+.pacogo-fraction-practice__primary-action {
+  min-height: 38px;
+  margin: 0;
+  padding: 8px 15px;
+  border-radius: 12px;
+}
+
+@media (max-width: 600px) {
+  .pacogo-fraction-interface__options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .pacogo-fraction-practice-template__controls {
+    gap: 6px;
+  }
+  .pacogo-fraction-answer__line,
+  .pacogo-fraction-answer__simplified {
+    flex-wrap: wrap;
+  }
+  .comparison-item {
+    min-width: 72px;
+  }
+  .construction-equation,
+  .fraction-result-equation {
+    gap: 6px;
+    padding: 7px;
+    font-size: 21px;
+  }
+}
+
+@media (max-width: 380px) {
+  .pacogo-fraction-answer__input {
+    width: 43px;
+  }
+  .fraction-practice-inline-input {
+    width: 42px;
+  }
+}

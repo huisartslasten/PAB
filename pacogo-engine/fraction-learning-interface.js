@@ -1,9 +1,12 @@
 import { createFractionLearningInterfaceConfig } from "./fraction-learning-interface-contract.js";
 import { renderFractionRepresentation } from "./fraction-learning-interface-renderers.js";
+import { createFractionPracticeTemplate } from "./fraction-practice-template.js";
 
 function createFractionLearningInterface({
   mount,
+  template = null,
   config,
+  showTitle = true,
   onInteraction = () => {},
   onSubmit = () => {}
 }) {
@@ -11,7 +14,15 @@ function createFractionLearningInterface({
   if (typeof onInteraction !== "function" || typeof onSubmit !== "function") {
     throw new TypeError("onInteraction and onSubmit must be functions");
   }
+  if (typeof showTitle !== "boolean") throw new TypeError("showTitle must be a boolean");
+
   const settings = createFractionLearningInterfaceConfig(config);
+  const activeTemplate = template || createFractionPracticeTemplate({ mount });
+  if (!activeTemplate.workArea || !activeTemplate.controlsArea || !activeTemplate.feedbackArea) {
+    throw new TypeError("A compatible Fraction Practice Template is required.");
+  }
+  const workMount = template ? mount : activeTemplate.workArea;
+
   let selectedOptionId = null;
   let explanation = "";
   let locked = false;
@@ -26,7 +37,13 @@ function createFractionLearningInterface({
   const targetLabel = document.createElement("span");
   targetLabel.className = "pacogo-fraction-interface__label";
   targetLabel.textContent = settings.labels.target;
-  target.append(targetLabel, renderFractionRepresentation(settings.targetFraction, settings.targetRepresentation, settings.labels.target, { layout: settings.targetLayout }));
+  target.append(targetLabel, renderFractionRepresentation(
+    settings.targetFraction,
+    settings.targetRepresentation,
+    settings.labels.target,
+    { layout: settings.targetLayout }
+  ));
+
   const optionsLabel = document.createElement("h3");
   optionsLabel.className = "pacogo-fraction-interface__options-label";
   optionsLabel.textContent = settings.labels.options;
@@ -34,8 +51,10 @@ function createFractionLearningInterface({
   options.className = "pacogo-fraction-interface__options";
   options.setAttribute("role", "group");
   options.setAttribute("aria-label", settings.labels.options);
+
   const status = document.createElement("p");
   status.className = "pacogo-fraction-interface__status";
+  status.setAttribute("role", "status");
   status.setAttribute("aria-live", "polite");
   status.textContent = "Kies een antwoord.";
   let explanationInput = null;
@@ -46,7 +65,12 @@ function createFractionLearningInterface({
     button.type = "button";
     button.className = "pacogo-fraction-interface__option";
     button.setAttribute("aria-pressed", "false");
-    button.append(renderFractionRepresentation(option.fraction, settings.optionRepresentation, "Antwoordoptie", { layout: settings.targetLayout }));
+    button.append(renderFractionRepresentation(
+      option.fraction,
+      settings.optionRepresentation,
+      "Antwoordoptie",
+      { layout: settings.targetLayout }
+    ));
     button.addEventListener("click", () => {
       if (locked) return;
       selectedOptionId = option.id;
@@ -55,7 +79,10 @@ function createFractionLearningInterface({
         candidate.classList.toggle("is-selected", selected);
         candidate.setAttribute("aria-pressed", String(selected));
       });
-      status.textContent = "Antwoord geselecteerd. Je kunt je uitleg invullen.";
+      status.textContent = settings.responseProcessRequired
+        ? "Antwoord geselecteerd. Je kunt je uitleg invullen."
+        : "Antwoord geselecteerd.";
+      status.classList.remove("is-error");
       onInteraction({ type: "option_selected", optionId: option.id, source: "learner_input" });
     });
     optionButtons.set(option.id, button);
@@ -98,16 +125,20 @@ function createFractionLearningInterface({
       return;
     }
     try {
-      onSubmit();
-      status.textContent = "Je antwoord en uitleg zijn vastgelegd.";
+      const result = onSubmit();
+      status.textContent = typeof result === "string" ? result : "";
+      status.classList.remove("is-error");
     } catch (error) {
       status.textContent = error.message;
       status.classList.add("is-error");
     }
   });
 
-  root.append(title, target, optionsLabel, options, response, submit, status);
-  mount.replaceChildren(root);
+  if (showTitle && settings.labels.title) root.append(title);
+  root.append(target, optionsLabel, options, response);
+  workMount.replaceChildren(root);
+  activeTemplate.controlsArea.append(submit);
+  activeTemplate.feedbackArea.append(status);
 
   const lock = () => {
     locked = true;
@@ -122,7 +153,8 @@ function createFractionLearningInterface({
     getExplanation: () => explanation,
     isLocked: () => locked,
     lock,
-    getConfig: () => settings
+    getConfig: () => settings,
+    getTemplate: () => activeTemplate
   });
 }
 

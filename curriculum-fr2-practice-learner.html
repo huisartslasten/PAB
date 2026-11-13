@@ -7,94 +7,37 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <link rel="stylesheet" href="./src/components/page-template.css">
   <link rel="stylesheet" href="./pacogo-engine/fraction-learning-interface.css">
-  <style>
+<style>
     :root{font-family:Nunito,system-ui,sans-serif;color:#102b57;background:#f5f9fd}
-    body{margin:0;padding:24px;min-height:100vh;box-sizing:border-box}
-    main{max-width:900px;margin:0 auto;display:grid;gap:18px}
-    .card{background:#fff;border:1px solid #d8e7f4;border-radius:22px;padding:24px;box-shadow:0 8px 24px rgba(16,43,87,.07)}
-    h1,h2{margin:0 0 10px}h1{font-size:30px}h2{font-size:21px}
-    p{line-height:1.55}.muted{color:#647894;line-height:1.5}
-    button{border:0;border-radius:14px;padding:12px 18px;background:#1787f2;color:#fff;font:800 15px Nunito,system-ui,sans-serif;cursor:pointer;margin:4px}
+    body{margin:0;padding:0;min-height:100vh;box-sizing:border-box}
+    main{width:100%;max-width:none;margin:0;padding:0;display:grid;gap:10px}
+    .card{background:#fff;border:1px solid #d8e7f4;border-radius:16px;padding:15px 18px;box-shadow:0 4px 14px rgba(16,43,87,.06)}
+    h1,h2{margin:0 0 7px}
+    h1{font-size:clamp(22px,2vw,28px);line-height:1.12}
+    h2{font-size:19px;line-height:1.15}
+    p{margin:6px 0;line-height:1.35}
+    .muted{color:#647894;font-size:14px;line-height:1.35}
+    button{border:0;border-radius:12px;padding:9px 14px;background:#1787f2;color:#fff;font:800 15px Nunito,system-ui,sans-serif;cursor:pointer;margin:2px}
     button:disabled{opacity:.55;cursor:not-allowed}
     button:focus-visible{outline:3px solid #102b57;outline-offset:3px}
-    #learnerList{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
-    #setupStatus,#feedback{padding:12px 14px;border-radius:14px;background:#eef8ff;color:#126fc9;font-weight:700}
-    #feedback.error{background:#fff0f0;color:#b42318}
-    #progress{font-size:14px;color:#647894;font-weight:800;margin:14px 0}
-    .construction-equation{display:flex;align-items:center;justify-content:center;gap:8px;margin:18px 0;padding:16px;border-radius:14px;background:#f5f9fd;font-size:28px;font-weight:900}
-    .construction-equation__unknown{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;border:2px dashed #8aa6c2;border-radius:10px;color:#126fc9}
-    #constructionTarget{display:flex;justify-content:center;padding:14px}
-    #constructionProgress{font-size:14px;color:#647894;font-weight:800;margin:14px 0}
-    .pacogo-fraction-integer-input{display:flex;align-items:end;justify-content:center;gap:10px;flex-wrap:wrap;margin:16px 0}
-    .pacogo-fraction-integer-input__label{display:grid;gap:6px;font-weight:800}
-    .pacogo-fraction-integer-input__field{width:90px;box-sizing:border-box;padding:12px;border:2px solid #9bb7d0;border-radius:12px;font:800 24px Nunito,system-ui,sans-serif;text-align:center;color:#102b57}
-    .pacogo-fraction-integer-input__field:focus{outline:3px solid #9bcfff;outline-offset:2px}
-    .fraction-practice-equation{display:inline-flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap;line-height:1.5}
-    .fraction-practice-fraction{display:inline-grid;grid-template-rows:auto 2px auto;align-items:center;justify-items:stretch;vertical-align:middle;min-width:42px;margin:0 2px}
-    .fraction-practice-numerator,.fraction-practice-denominator{display:flex;justify-content:center;min-width:28px;padding:0 3px}
-    .fraction-practice-divider{height:2px;background:currentColor;width:100%}
-    .fraction-practice-inline-input{width:54px;min-height:42px;box-sizing:border-box;border:2px dashed #8aa6c2;border-radius:9px;text-align:center;font:800 22px Nunito,system-ui,sans-serif;color:#102b57;background:#fff;padding:4px}
-    .fraction-practice-inline-input:focus{outline:3px solid #9bcfff;outline-offset:2px}
-    .pacogo-fraction-answer{display:grid;justify-items:center;gap:8px;width:100%;font-size:16px}
-    .pacogo-fraction-answer__line{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
-    .pacogo-fraction-answer__fraction{display:inline-grid;grid-template-rows:auto 2px auto;align-items:center;justify-items:stretch;min-width:64px}
-    .pacogo-fraction-answer__field{display:grid;justify-items:center;gap:2px;font-size:10px;font-weight:700;color:#647894}
-    .pacogo-fraction-answer__field[hidden]{display:none}
-    .pacogo-fraction-answer__input{width:62px;height:36px;box-sizing:border-box;border:1.5px solid #9bb7d0;border-radius:8px;background:#fff;color:#102b57;text-align:center;font:800 20px Nunito,system-ui,sans-serif;padding:3px}
-    .pacogo-fraction-answer__input:focus{outline:3px solid #9bcfff;outline-offset:1px;border-color:#1787f2}
-    .pacogo-fraction-answer__divider{height:2px;background:#102b57;width:100%}
-    .pacogo-fraction-answer__equals{font-size:24px;font-weight:900}
-    .pacogo-fraction-answer__toggle{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:800}
-    .pacogo-fraction-answer__toggle input{width:17px;height:17px;accent-color:#1787f2}
-    .pacogo-fraction-answer__simplified{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
-    .pacogo-fraction-answer__simplified[hidden]{display:none}
-    .pacogo-fraction-answer__simplify{padding:8px 14px;font-size:14px}
-    #resultFormCard{padding:18px} #resultFormCard h1{font-size:25px} #resultFormCard .construction-equation{margin:10px 0;padding:12px}
-    .concept{padding:16px;border-radius:16px;background:#f1f7fc;border:1px solid #d8e7f4}
-    .concept strong{display:block;margin-bottom:5px}
-    #comparison{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;margin:16px 0;padding:16px;background:#f5f9fd;border-radius:14px}
-    .comparison-item{display:grid;justify-items:center;gap:8px;min-width:130px}
-    .comparison-item span:last-child{font-weight:800}
-    #exerciseCard[hidden],#learnerSetup[hidden],#resultCard[hidden],#resultFormCard[hidden],#subtractionPracticeCard[hidden]{display:none}
-    @media(max-width:600px){body{padding:14px}.card{padding:18px}h1{font-size:25px}}
-
-    /* Canonical PacoGO template + compact single-screen fraction practice */
-    body { margin:0; padding:0; min-height:100vh; }
-    main { width:100%; max-width:none; margin:0; padding:0; display:grid; gap:10px; }
-    .paco-template-page-content { min-width:0; }
-    .paco-template-page-content .card { padding:15px 18px; border-radius:16px; box-shadow:0 4px 14px rgba(16,43,87,.06); }
-    .paco-template-page-content h1 { font-size:clamp(22px,2vw,28px); line-height:1.12; margin:0 0 7px; }
-    .paco-template-page-content h2 { font-size:19px; line-height:1.15; margin:0 0 6px; }
-    .paco-template-page-content p { margin:6px 0; line-height:1.35; }
-    .paco-template-page-content .muted { font-size:14px; line-height:1.35; }
-    .paco-template-page-content .concept { padding:10px 13px; border-radius:12px; }
-    .paco-template-page-content #progress { margin:5px 0; }
-    .paco-template-page-content button { padding:9px 14px; margin:2px; }
-    .paco-template-page-content #comparison { margin:8px 0; padding:10px; gap:12px; }
-    .paco-template-page-content .comparison-item { gap:4px; }
-    .paco-template-page-content .concept { display:none; }
-    .paco-template-page-content #fractionInterface { min-width:0; }
-    .paco-template-page-content #prompt { margin:0 0 5px; font-size:15px; font-weight:800; color:#126fc9; }
-    .paco-template-page-content #feedback:empty { display:none; }
-    .paco-template-page-content #progress { margin:2px 0 5px; }
-    .paco-template-page-content #feedback { padding:9px 12px; margin:7px 0; }
-    .paco-template-page-content #nextAction { margin-top:5px; }
-    .paco-template-page-content #exerciseCard { gap:7px; }
-    .paco-template-page-content .exercise-context-row { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
-    .paco-template-page-content #selectedLearnerLabel { margin:0; }
-    .paco-template-page-content #openFractionDiagnostic { min-height:32px; padding:5px 10px; margin:0; border-width:1px; border-radius:10px; font-size:13px; box-shadow:none; }
-    @media(max-width:900px) {
-      .paco-template-page-content .card { padding:13px 14px; }
-      .paco-template-page-content .concept { padding:9px 11px; }
-    }
-    @media(max-height:850px) and (min-width:901px) {
-      .paco-template-hero { display:none; }
-      .paco-template-body { padding-top:8px; }
-      .paco-template-page-header { min-height:76px; margin-bottom:10px; padding:12px 18px; }
-      .paco-template-page-icon { font-size:30px; }
-      .paco-template-page-heading h1 { font-size:30px; }
-      .paco-template-sidebar-card { max-height:calc(100vh - 70px); }
-      .paco-template-page-content .card { padding:11px 14px; }
+    #learnerList{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+    #setupStatus{padding:10px 12px;border-radius:12px;background:#eef8ff;color:#126fc9;font-weight:700}
+    #exerciseCard[hidden],#learnerSetup[hidden],#resultCard[hidden],#constructionCard[hidden],#additionPracticeCard[hidden],#resultFormCard[hidden],#subtractionPracticeCard[hidden]{display:none}
+    .paco-template-page-content{min-width:0}
+    .paco-template-page-content .card{padding:13px 16px;border-radius:15px}
+    .paco-template-page-content .concept{display:none}
+    .paco-template-page-content #fractionInterface{min-width:0}
+    .paco-template-page-content #openFractionDiagnostic{min-height:32px;padding:5px 10px;margin:0;border:1px solid #d8e7f4;border-radius:10px;background:#edf8ff;color:#126fc9;font-size:13px;box-shadow:none}
+    @media(max-width:900px){.paco-template-page-content .card{padding:12px 13px}}
+    @media(max-width:600px){.paco-template-page-content .card{padding:11px}}
+    @media(max-height:850px) and (min-width:901px){
+      .paco-template-hero{display:none}
+      .paco-template-body{padding-top:8px}
+      .paco-template-page-header{min-height:76px;margin-bottom:10px;padding:12px 18px}
+      .paco-template-page-icon{font-size:30px}
+      .paco-template-page-heading h1{font-size:30px}
+      .paco-template-sidebar-card{max-height:calc(100vh - 70px)}
+      .paco-template-page-content .card{padding:11px 14px}
     }
   </style>
 </head>
@@ -158,14 +101,14 @@
   </section>
   <section class="card" id="resultFormCard" hidden>
     <div class="muted" id="resultFormLearnerLabel">PacoGO • Breuken oefenen</div>
-    <h1>Van 15/10 naar een gemengd getal</h1>
+    <h1>Van vijftien tienden naar een gemengd getal</h1>
     <p class="muted" id="resultFormPrompt"></p>
-    <div class="construction-equation" id="resultFormExpression"></div>
+    <div class="fraction-result-equation" id="resultFormExpression"></div>
     <div id="resultFormInput"></div>
     <p id="resultFormFeedback" role="status" aria-live="polite">Vul de ontbrekende getallen zelf in.</p>
     <p id="resultFormProgress"></p>
     <div id="resultFormNext"></div>
-    <p class="muted">Dit is extra, niet-formele oefening met het voorbeeld 15/10. Je antwoorden worden alleen op dit apparaat bewaard. Ze tellen niet mee voor een toets, formele beoordeling of mastery-beslissing.</p>
+    <p class="muted">Dit is extra, niet-formele oefening met het voorbeeld van vijftien tienden. Je antwoorden worden alleen op dit apparaat bewaard. Ze tellen niet mee voor een toets, formele beoordeling of mastery-beslissing.</p>
   </section>
   <section class="card" id="subtractionPracticeCard" hidden>
     <div class="muted" id="subtractionLearnerLabel">PacoGO • Breuken oefenen</div>
@@ -186,7 +129,8 @@
   import { mountPacoPageTemplate } from "./src/components/page-template.js";
   import { createPacoNavigation } from "./src/components/page-navigation.js";
   import { createFractionLearningInterface } from "./pacogo-engine/fraction-learning-interface.js";
-  import { renderFractionRepresentation } from "./pacogo-engine/fraction-learning-interface-renderers.js";
+  import { createFractionPracticeTemplate } from "./pacogo-engine/fraction-practice-template.js";
+  import { renderFractionRepresentation, renderMixedNumber } from "./pacogo-engine/fraction-learning-interface-renderers.js";
   import { FRACTION_PRACTICE_TASKS, createFractionPracticeSession } from "./pacogo-engine/fraction-practice-session.js";
   import { getStudentLearningProfile } from "./src/core/student-registry.js";
   import { renderFractionPracticeExpression } from "./pacogo-engine/fraction-practice-equation.js";
@@ -208,6 +152,8 @@
   const nextAction = document.querySelector("#nextAction");
   const progressLabel = document.querySelector("#progress");
   const constructionCard = document.querySelector("#constructionCard");
+  const constructionLearnerLabel = document.querySelector("#constructionLearnerLabel");
+  const constructionPrompt = document.querySelector("#constructionPrompt");
   const constructionTarget = document.querySelector("#constructionTarget");
   const constructionEquation = document.querySelector("#constructionEquation");
   const constructionInputHost = document.querySelector("#constructionInput");
@@ -215,6 +161,7 @@
   const constructionProgress = document.querySelector("#constructionProgress");
   const constructionNext = document.querySelector("#constructionNext");
   const additionCard = document.querySelector("#additionPracticeCard");
+  const additionLearnerLabel = document.querySelector("#additionLearnerLabel");
   const additionVisual = document.querySelector("#additionVisual");
   const additionExpression = document.querySelector("#additionExpression");
   const additionPrompt = document.querySelector("#additionPrompt");
@@ -223,6 +170,7 @@
   const additionProgress = document.querySelector("#additionProgress");
   const additionNext = document.querySelector("#additionNext");
   const resultFormCard = document.querySelector("#resultFormCard");
+  const resultFormLearnerLabel = document.querySelector("#resultFormLearnerLabel");
   const resultFormPrompt = document.querySelector("#resultFormPrompt");
   const resultFormExpression = document.querySelector("#resultFormExpression");
   const resultFormInputHost = document.querySelector("#resultFormInput");
@@ -230,6 +178,7 @@
   const resultFormProgress = document.querySelector("#resultFormProgress");
   const resultFormNext = document.querySelector("#resultFormNext");
   const subtractionCard = document.querySelector("#subtractionPracticeCard");
+  const subtractionLearnerLabel = document.querySelector("#subtractionLearnerLabel");
   const subtractionVisual = document.querySelector("#subtractionVisual");
   const subtractionExpression = document.querySelector("#subtractionExpression");
   const subtractionPrompt = document.querySelector("#subtractionPrompt");
@@ -264,6 +213,75 @@
       includeManagement: true, navigate
     }),
     content: document.querySelector("main")
+  });
+
+  const constructionParagraphs = constructionCard.querySelectorAll("p.muted");
+  const additionParagraphs = additionCard.querySelectorAll("p.muted");
+  const subtractionParagraphs = subtractionCard.querySelectorAll("p.muted");
+  if (constructionParagraphs.length !== 2 || additionParagraphs.length !== 3 ||
+      subtractionParagraphs.length !== 3) {
+    throw new Error("The fraction practice page structure no longer matches its template contract.");
+  }
+
+  const exerciseTemplate = createFractionPracticeTemplate({
+    mount: exerciseCard,
+    context: exerciseCard.querySelector(".exercise-context-row"),
+    title: exerciseCard.querySelector("h1"),
+    progress: progressLabel,
+    prompt: document.querySelector("#prompt"),
+    work: [interfaceHost, comparison],
+    feedback: [feedback],
+    actions: [nextAction]
+  });
+  createFractionPracticeTemplate({
+    mount: constructionCard,
+    context: constructionLearnerLabel,
+    title: constructionCard.querySelector("h1"),
+    prompt: constructionPrompt,
+    progress: constructionProgress,
+    work: [constructionTarget, constructionEquation],
+    controls: [constructionInputHost],
+    feedback: [constructionFeedback],
+    actions: [constructionNext],
+    footnote: constructionParagraphs[1]
+  });
+  createFractionPracticeTemplate({
+    mount: additionCard,
+    context: additionLearnerLabel,
+    title: additionCard.querySelector("h1"),
+    instruction: additionParagraphs[0],
+    prompt: additionPrompt,
+    progress: additionProgress,
+    work: [additionVisual, additionExpression],
+    controls: [additionInputHost],
+    feedback: [additionFeedback],
+    actions: [additionNext],
+    footnote: additionParagraphs[2]
+  });
+  createFractionPracticeTemplate({
+    mount: resultFormCard,
+    context: resultFormLearnerLabel,
+    title: resultFormCard.querySelector("h1"),
+    prompt: resultFormPrompt,
+    progress: resultFormProgress,
+    work: [resultFormExpression],
+    controls: [resultFormInputHost],
+    feedback: [resultFormFeedback],
+    actions: [resultFormNext],
+    footnote: resultFormCard.querySelector("p:last-of-type")
+  });
+  createFractionPracticeTemplate({
+    mount: subtractionCard,
+    context: subtractionLearnerLabel,
+    title: subtractionCard.querySelector("h1"),
+    instruction: subtractionParagraphs[0],
+    prompt: subtractionPrompt,
+    progress: subtractionProgress,
+    work: [subtractionVisual, subtractionExpression],
+    controls: [subtractionInputHost],
+    feedback: [subtractionFeedback],
+    actions: [subtractionNext],
+    footnote: subtractionParagraphs[2]
   });
 
   function setSetupError(error) {
@@ -324,24 +342,27 @@
       option.fraction.numerator * task.targetFraction.denominator
     );
     const items = [
-      { label: "Doel", fraction: task.targetFraction, representation: "area_model" },
-      { label: "Evenveel", fraction: correct.fraction, representation: "area_model" }
+      { label: "Doel", fraction: task.targetFraction },
+      { label: "Evenveel", fraction: correct.fraction }
     ];
     items.forEach(item => {
       const wrapper = document.createElement("div");
       wrapper.className = "comparison-item";
       const label = document.createElement("span");
       label.textContent = item.label;
-      wrapper.append(label, renderFractionRepresentation(item.fraction, item.representation, item.label, { layout: task.targetLayout || "bar" }));
-      const fractionLabel = document.createElement("span");
-      fractionLabel.textContent = item.fraction.numerator + "/" + item.fraction.denominator;
-      wrapper.append(fractionLabel);
+      wrapper.append(
+        label,
+        renderFractionRepresentation(item.fraction, "area_model", item.label, {
+          layout: task.targetLayout || "bar"
+        }),
+        renderFractionRepresentation(item.fraction, "symbolic_fraction", item.label + " als breuk")
+      );
       comparison.append(wrapper);
     });
     comparison.hidden = false;
   }
 
-  function showCompleted() {
+
     exerciseCard.hidden = true;
     resultCard.hidden = false;
     const progress = practiceSession.getProgress();
@@ -440,8 +461,7 @@
     constructionTarget.replaceChildren(renderFractionRepresentation(
       currentConstructionTask.targetFraction,
       "area_model",
-      "Blauwe hoeveelheid van " + currentConstructionTask.targetFraction.numerator + "/" +
-        currentConstructionTask.targetFraction.denominator
+      "Blauwe hoeveelheid"
     ));
     document.querySelector("#constructionPrompt").textContent =
       "Maak een breuk met noemer " + currentConstructionTask.answerDenominator +
@@ -452,6 +472,7 @@
     constructionInputHost.replaceChildren();
     const submit = document.createElement("button");
     submit.type = "button";
+    submit.className = "pacogo-fraction-practice__primary-action";
     submit.textContent = "Controleren";
     submit.addEventListener("click", () =>
       handleConstructionAnswer(constructionInputInstance.getValues()[0] || "")
@@ -481,12 +502,11 @@
       wrapper.className = "comparison-item";
       const label = document.createElement("span");
       label.textContent = item.label;
-      wrapper.append(label, renderFractionRepresentation(
-        item.fraction, "area_model", item.label + " " + item.fraction.numerator + "/" + item.fraction.denominator
-      ));
-      const value = document.createElement("span");
-      value.textContent = item.fraction.numerator + "/" + item.fraction.denominator;
-      wrapper.append(value);
+      wrapper.append(
+        label,
+        renderFractionRepresentation(item.fraction, "area_model", item.label, { layout: "bar" }),
+        renderFractionRepresentation(item.fraction, "symbolic_fraction", item.label + " als breuk")
+      );
       additionVisual.append(wrapper);
       if (index === 0) {
         const plus = document.createElement("strong");
@@ -497,7 +517,7 @@
     });
   }
 
-  function updateAdditionProgress() {
+
     const progress = additionSession.getProgress();
     const current = additionSession.getCurrentStep();
     additionProgress.textContent = current
@@ -509,7 +529,17 @@
   function showAdditionCompleted() {
     const completion = additionSession.getCompletion();
     additionPrompt.textContent = "Je hebt alle vier stappen zelf ingevuld.";
-    additionExpression.textContent = "Jouw uitkomst: " + completion.resultNumerator + "/" + completion.denominator;
+    additionExpression.replaceChildren();
+    const resultLabel = document.createElement("span");
+    resultLabel.textContent = "Jouw uitkomst:";
+    additionExpression.append(
+      resultLabel,
+      renderFractionRepresentation(
+        { numerator: completion.resultNumerator, denominator: completion.denominator },
+        "symbolic_fraction",
+        "Jouw uitkomst"
+      )
+    );
     additionInputHost.replaceChildren();
     additionFeedback.textContent = "Oefenronde afgerond. Je hebt zelf de tussenstappen en de som ingevuld.";
     updateAdditionProgress();
@@ -523,7 +553,7 @@
     });
     const resultForm = document.createElement("button");
     resultForm.type = "button";
-    resultForm.textContent = "Oefen gemengd getal 15/10";
+    resultForm.textContent = "Oefen met vijftien tienden";
     resultForm.addEventListener("click", startResultFormPractice);
     const subtraction = document.createElement("button");
     subtraction.type = "button";
@@ -539,7 +569,7 @@
     additionNext.append(restart, resultForm, subtraction, back);
   }
 
-  function updateResultFormProgress() {
+
     const progress = resultFormSession.getProgress();
     resultFormProgress.textContent = "Stap " + Math.min(progress.completedStageCount + 1, progress.totalStageCount) +
       " van " + progress.totalStageCount + " • " + progress.completedStageCount + " afgerond";
@@ -547,47 +577,152 @@
 
   function showResultFormCompleted() {
     const value = resultFormSession.getCompletion();
-    const whole = value.wholeNumberEnabled ? value.wholeNumber + " " : "";
-    const answer = whole + value.numerator + "/" + value.denominator;
-    const simplified = value.simplified ? " = " + whole + value.simplifiedNumerator + "/" + value.simplifiedDenominator : "";
-    resultFormPrompt.textContent = "Je antwoord is gecontroleerd."; resultFormExpression.textContent = "15/10 = " + answer + simplified;
-    resultFormInputHost.replaceChildren(); resultFormFeedback.textContent = "Goed. Je hebt zelf gekozen hoe je de breuk noteert."; updateResultFormProgress(); resultFormNext.replaceChildren();
-    const restart = document.createElement("button"); restart.type = "button"; restart.textContent = "Deze oefening opnieuw doen"; restart.addEventListener("click", () => { resultFormSession.reset(); renderResultFormStage(); });
-    const back = document.createElement("button"); back.type = "button"; back.textContent = "Terug naar optellen"; back.addEventListener("click", () => { resultFormCard.hidden = true; additionCard.hidden = false; }); resultFormNext.append(restart, back);
+    const wholeNumber = value.wholeNumberEnabled ? Number(value.wholeNumber) : 0;
+    resultFormPrompt.textContent = "Je hebt je antwoord zelf ingevoerd.";
+    resultFormExpression.replaceChildren();
+
+    const sourceFraction = renderFractionRepresentation(
+      { numerator: 15, denominator: 10 },
+      "symbolic_fraction",
+      "Vijftien tienden"
+    );
+    const firstEquals = document.createElement("span");
+    firstEquals.className = "pacogo-fraction-answer__equals";
+    firstEquals.textContent = "=";
+    resultFormExpression.append(
+      sourceFraction,
+      firstEquals,
+      renderMixedNumber({
+        wholeNumber,
+        numerator: Number(value.numerator),
+        denominator: Number(value.denominator)
+      }, "Oorspronkelijke vorm")
+    );
+
+    if (value.simplified) {
+      const secondEquals = document.createElement("span");
+      secondEquals.className = "pacogo-fraction-answer__equals";
+      secondEquals.textContent = "=";
+      resultFormExpression.append(
+        secondEquals,
+        renderMixedNumber({
+          wholeNumber,
+          numerator: Number(value.simplifiedNumerator),
+          denominator: Number(value.simplifiedDenominator)
+        }, "Vereenvoudigde vorm")
+      );
+    }
+
+    resultFormInputHost.replaceChildren();
+    resultFormFeedback.textContent = "Goed. Je hebt zelf gekozen hoe je de breuk noteert.";
+    updateResultFormProgress();
+    resultFormNext.replaceChildren();
+    const restart = document.createElement("button");
+    restart.type = "button";
+    restart.textContent = "Deze oefening opnieuw doen";
+    restart.addEventListener("click", () => {
+      resultFormSession.reset();
+      renderResultFormStage();
+    });
+    const back = document.createElement("button");
+    back.type = "button";
+    back.textContent = "Terug naar optellen";
+    back.addEventListener("click", () => {
+      resultFormCard.hidden = true;
+      additionCard.hidden = false;
+    });
+    resultFormNext.append(restart, back);
   }
-  function handleResultFormAnswer(values) {
+
+
     const result = resultFormSession.recordResponse({ values }); updateResultFormProgress();
-    if (result.classification === "valid") { resultFormEquationInstance?.lock(); const submit = resultFormInputHost.querySelector("button"); if (submit) submit.disabled = true; showResultFormCompleted(); return; }
-    resultFormFeedback.textContent = result.classification === "invalid_input" ? "Vul de getoonde velden met hele getallen in." : result.classification === "not_simplified" ? "Deze breuk is nog niet volledig vereenvoudigd. Controleer de extra breuk naast je antwoord." : "Dit antwoord heeft nog niet dezelfde waarde als 15/10. Controleer teller, noemer en eventueel het hele getal.";
+    if (result.classification === "valid") { resultFormEquationInstance?.lock(); const submit = resultFormInputHost.querySelector(".pacogo-fraction-practice__primary-action"); if (submit) submit.disabled = true; showResultFormCompleted(); return; }
+    resultFormFeedback.textContent = result.classification === "invalid_input" ? "Vul de getoonde velden met hele getallen in." : result.classification === "not_simplified" ? "Deze breuk is nog niet volledig vereenvoudigd. Controleer de extra breuk naast je antwoord." : "Dit antwoord heeft nog niet dezelfde waarde als vijftien tienden. Controleer teller, noemer en eventueel het hele getal.";
     resultFormEquationInstance?.focus();
   }
   function renderResultFormStage() {
-    const current = resultFormSession.getCurrentStage(); if (!current) { showResultFormCompleted(); return; }
-    resultFormPrompt.textContent = current.prompt; resultFormFeedback.textContent = "Vul je antwoord in. Je kiest zelf of je een heel getal toevoegt of vereenvoudigt."; resultFormNext.replaceChildren();
-    resultFormEquationInstance = renderFractionAnswerInput({ mount: resultFormExpression, labels: { wholeToggle: "Heel getal toevoegen", whole: "Heel getal", numerator: "Teller", denominator: "Noemer", simplify: "Vereenvoudigen", simplifiedNumerator: "Teller", simplifiedDenominator: "Noemer" }, onChange: () => { resultFormFeedback.textContent = "Je kunt je antwoord controleren."; } });
-    resultFormInputHost.replaceChildren(); const submit = document.createElement("button"); submit.type = "button"; submit.textContent = "Controleren"; submit.addEventListener("click", () => handleResultFormAnswer(resultFormEquationInstance.getValues())); resultFormInputHost.append(submit); updateResultFormProgress(); resultFormEquationInstance.focus();
+    const current = resultFormSession.getCurrentStage();
+    if (!current) {
+      showResultFormCompleted();
+      return;
+    }
+    resultFormPrompt.textContent = current.prompt;
+    resultFormFeedback.textContent = "Vul je antwoord in. Je kiest zelf of je een heel getal toevoegt of vereenvoudigt.";
+    resultFormNext.replaceChildren();
+    resultFormExpression.replaceChildren();
+    resultFormInputHost.replaceChildren();
+
+    const sourceFraction = renderFractionRepresentation(
+      { numerator: 15, denominator: 10 },
+      "symbolic_fraction",
+      "Vijftien tienden"
+    );
+    const equals = document.createElement("span");
+    equals.className = "pacogo-fraction-answer__equals";
+    equals.textContent = "=";
+    const answerMount = document.createElement("div");
+    answerMount.className = "pacogo-fraction-answer-mount";
+    resultFormExpression.append(sourceFraction, equals, answerMount);
+
+    resultFormEquationInstance = renderFractionAnswerInput({
+      workMount: answerMount,
+      controlsMount: resultFormInputHost,
+      labels: {
+        wholeToggle: "Heel getal toevoegen",
+        whole: "Heel getal",
+        numerator: "Teller",
+        denominator: "Noemer",
+        simplify: "Vereenvoudigen",
+        simplifiedNumerator: "Vereenvoudigde teller",
+        simplifiedDenominator: "Vereenvoudigde noemer"
+      },
+      onChange: () => {
+        resultFormFeedback.textContent = "Je kunt je antwoord controleren.";
+      }
+    });
+    const submit = document.createElement("button");
+    submit.type = "button";
+    submit.className = "pacogo-fraction-practice__primary-action";
+    submit.textContent = "Controleren";
+    submit.addEventListener("click", () =>
+      handleResultFormAnswer(resultFormEquationInstance.getValues())
+    );
+    resultFormInputHost.append(submit);
+    updateResultFormProgress();
+    resultFormEquationInstance.focus();
   }
-  function startResultFormPractice() {
+
+
     resultFormSession = createFractionResultFormPracticeSession({ learnerKey: selectedLearner.learner_key }); additionCard.hidden = true; resultFormCard.hidden = false;
     document.querySelector("#resultFormLearnerLabel").textContent = "PacoGO • " + selectedLearner.display_name + " • Extra breukenoefening"; renderResultFormStage();
   }
   function renderSubtractionVisual() {
     subtractionVisual.replaceChildren();
     const items = [
-      {label:"Eerste breuk",fraction:{numerator:1,denominator:2}},
-      {label:"Tweede breuk",fraction:{numerator:2,denominator:5}}
+      { label: "Eerste breuk", fraction: { numerator: 1, denominator: 2 } },
+      { label: "Tweede breuk", fraction: { numerator: 2, denominator: 5 } }
     ];
-    items.forEach((item,index)=>{
-      const wrapper=document.createElement("div");wrapper.className="comparison-item";
-      const label=document.createElement("span");label.textContent=item.label;
-      wrapper.append(label,renderFractionRepresentation(item.fraction,"area_model",item.label+" "+item.fraction.numerator+"/"+item.fraction.denominator));
-      const value=document.createElement("span");value.textContent=item.fraction.numerator+"/"+item.fraction.denominator;
-      wrapper.append(value);subtractionVisual.append(wrapper);
-      if(index===0){const minus=document.createElement("strong");minus.textContent="−";minus.setAttribute("aria-label","min");subtractionVisual.append(minus);}
+    items.forEach((item, index) => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "comparison-item";
+      const label = document.createElement("span");
+      label.textContent = item.label;
+      wrapper.append(
+        label,
+        renderFractionRepresentation(item.fraction, "area_model", item.label, { layout: "bar" }),
+        renderFractionRepresentation(item.fraction, "symbolic_fraction", item.label + " als breuk")
+      );
+      subtractionVisual.append(wrapper);
+      if (index === 0) {
+        const minus = document.createElement("strong");
+        minus.textContent = "−";
+        minus.setAttribute("aria-label", "min");
+        subtractionVisual.append(minus);
+      }
     });
   }
 
-  function updateSubtractionProgress() {
+
     const progress=subtractionSession.getProgress(),current=subtractionSession.getCurrentStep();
     subtractionProgress.textContent=current
       ?"Stap "+current.stepNumber+" van "+current.totalSteps+" • "+progress.completedStepCount+" van "+progress.totalStepCount+" afgerond"
@@ -595,20 +730,41 @@
   }
 
   function showSubtractionCompleted() {
-    const completion=subtractionSession.getCompletion();
-    subtractionPrompt.textContent="Je hebt alle vier stappen zelf ingevuld.";
-    subtractionExpression.textContent="Jouw uitkomst: "+completion.resultNumerator+"/"+completion.denominator;
+    const completion = subtractionSession.getCompletion();
+    subtractionPrompt.textContent = "Je hebt alle vier stappen zelf ingevuld.";
+    subtractionExpression.replaceChildren();
+    const resultLabel = document.createElement("span");
+    resultLabel.textContent = "Jouw uitkomst:";
+    subtractionExpression.append(
+      resultLabel,
+      renderFractionRepresentation(
+        { numerator: completion.resultNumerator, denominator: completion.denominator },
+        "symbolic_fraction",
+        "Jouw uitkomst"
+      )
+    );
     subtractionInputHost.replaceChildren();
-    subtractionFeedback.textContent="Oefenronde afgerond. Je hebt zelf de tussenstappen en de aftreksom ingevuld. De breuk is hier niet automatisch vereenvoudigd.";
-    updateSubtractionProgress();subtractionNext.replaceChildren();
-    const restart=document.createElement("button");restart.type="button";restart.textContent="Deze aftrekoefening opnieuw doen";
-    restart.addEventListener("click",()=>{subtractionSession.reset();renderSubtractionStep();});
-    const back=document.createElement("button");back.type="button";back.textContent="Terug naar optellen";
-    back.addEventListener("click",()=>{subtractionCard.hidden=true;additionCard.hidden=false;});
-    subtractionNext.append(restart,back);
+    subtractionFeedback.textContent = "Oefenronde afgerond. Je hebt zelf de tussenstappen en de aftreksom ingevuld. De breuk is hier niet automatisch vereenvoudigd.";
+    updateSubtractionProgress();
+    subtractionNext.replaceChildren();
+    const restart = document.createElement("button");
+    restart.type = "button";
+    restart.textContent = "Deze aftrekoefening opnieuw doen";
+    restart.addEventListener("click", () => {
+      subtractionSession.reset();
+      renderSubtractionStep();
+    });
+    const back = document.createElement("button");
+    back.type = "button";
+    back.textContent = "Terug naar optellen";
+    back.addEventListener("click", () => {
+      subtractionCard.hidden = true;
+      additionCard.hidden = false;
+    });
+    subtractionNext.append(restart, back);
   }
 
-  function handleSubtractionAnswer(rawValue) {
+
     if(rawValue.trim()===""){subtractionFeedback.textContent="Vul eerst een getal in.";subtractionEquationInstance?.focus();return;}
     const result=subtractionSession.recordResponse({rawValue});updateSubtractionProgress();
     if(result.classification==="valid"){
@@ -638,7 +794,7 @@
       onInteraction:event=>{subtractionFeedback.textContent=event.rawValue?"Je kunt deze stap controleren.":"Vul deze stap in. De volgende stap is nog niet zichtbaar.";}
     });
     subtractionInputHost.replaceChildren();
-    const submit=document.createElement("button");submit.type="button";submit.textContent="Controleren";
+    const submit=document.createElement("button");submit.type="button";submit.className="pacogo-fraction-practice__primary-action";submit.textContent="Controleren";
     submit.addEventListener("click",()=>handleSubtractionAnswer(subtractionEquationInstance.getValues()[0]||""));
     subtractionInputHost.append(submit);updateSubtractionProgress();subtractionEquationInstance.focus();
   }
@@ -705,6 +861,7 @@
     additionInputHost.replaceChildren();
     const submit = document.createElement("button");
     submit.type = "button";
+    submit.className = "pacogo-fraction-practice__primary-action";
     submit.textContent = "Controleren";
     submit.addEventListener("click", () => handleAdditionAnswer(additionEquationInstance.getValues()[0] || ""));
     additionInputHost.append(submit);
@@ -743,6 +900,8 @@
 
     interfaceInstance = createFractionLearningInterface({
       mount: interfaceHost,
+      template: exerciseTemplate,
+      showTitle: false,
       config: {
         targetFraction: currentTask.targetFraction,
         options: currentTask.options,

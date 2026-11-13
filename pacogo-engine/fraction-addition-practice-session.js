@@ -82,7 +82,7 @@ function createFractionAdditionPracticeSession({ learnerKey, storage = globalThi
     if (stepId === "common_denominator") {
       return Object.freeze({
         taskId: task.id, stepId, stepNumber: 1, totalSteps: 4,
-        prompt: "Kies een gemeenschappelijke noemer voor 1/3 en 1/4.",
+        prompt: "Kies een gemeenschappelijke noemer voor de twee getoonde breuken.",
         inputLabel: "Gemeenschappelijke noemer",
         expression: "1/3 + 1/4 → noemer ?"
       });
@@ -90,7 +90,7 @@ function createFractionAdditionPracticeSession({ learnerKey, storage = globalThi
     if (stepId === "left_equivalent_numerator") {
       return Object.freeze({
         taskId: task.id, stepId, stepNumber: 2, totalSteps: 4,
-        prompt: "Welke teller hoort bij 1/3 als de noemer " + denominator + " wordt?",
+        prompt: "Welke teller hoort bij de eerste breuk als de noemer " + denominator + " wordt?",
         inputLabel: "Nieuwe teller voor 1/3",
         expression: "1/3 = ?/" + denominator
       });
@@ -98,7 +98,7 @@ function createFractionAdditionPracticeSession({ learnerKey, storage = globalThi
     if (stepId === "right_equivalent_numerator") {
       return Object.freeze({
         taskId: task.id, stepId, stepNumber: 3, totalSteps: 4,
-        prompt: "Welke teller hoort bij 1/4 als de noemer " + denominator + " wordt?",
+        prompt: "Welke teller hoort bij de tweede breuk als de noemer " + denominator + " wordt?",
         inputLabel: "Nieuwe teller voor 1/4",
         expression: "1/4 = ?/" + denominator
       });

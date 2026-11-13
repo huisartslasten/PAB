@@ -31,9 +31,9 @@ function createFractionSubtractionPracticeSession({learnerKey,storage=globalThis
   const p=read();if(p.completedTaskIds.includes(task.id))return null;
   const done=p.completedStepIdsByTask[task.id]||[],stepId=STEP_IDS.find(id=>!done.includes(id));
   const denominator=validValue(p,"common_denominator"),left=validValue(p,"left_equivalent_numerator"),right=validValue(p,"right_equivalent_numerator");
-  if(stepId==="common_denominator")return Object.freeze({taskId:task.id,stepId,stepNumber:1,totalSteps:4,prompt:"Kies een gemeenschappelijke noemer voor 1/2 en 2/5.",inputLabel:"Gemeenschappelijke noemer",expression:"1/2 − 2/5 → noemer ?"});
-  if(stepId==="left_equivalent_numerator")return Object.freeze({taskId:task.id,stepId,stepNumber:2,totalSteps:4,prompt:"Welke teller hoort bij 1/2 als de noemer "+denominator+" wordt?",inputLabel:"Nieuwe teller voor 1/2",expression:"1/2 = ?/"+denominator});
-  if(stepId==="right_equivalent_numerator")return Object.freeze({taskId:task.id,stepId,stepNumber:3,totalSteps:4,prompt:"Welke teller hoort bij 2/5 als de noemer "+denominator+" wordt?",inputLabel:"Nieuwe teller voor 2/5",expression:"2/5 = ?/"+denominator});
+  if(stepId==="common_denominator")return Object.freeze({taskId:task.id,stepId,stepNumber:1,totalSteps:4,prompt:"Kies een gemeenschappelijke noemer voor de twee getoonde breuken.",inputLabel:"Gemeenschappelijke noemer",expression:"1/2 − 2/5 → noemer ?"});
+  if(stepId==="left_equivalent_numerator")return Object.freeze({taskId:task.id,stepId,stepNumber:2,totalSteps:4,prompt:"Welke teller hoort bij de eerste breuk als de noemer "+denominator+" wordt?",inputLabel:"Nieuwe teller voor 1/2",expression:"1/2 = ?/"+denominator});
+  if(stepId==="right_equivalent_numerator")return Object.freeze({taskId:task.id,stepId,stepNumber:3,totalSteps:4,prompt:"Welke teller hoort bij de tweede breuk als de noemer "+denominator+" wordt?",inputLabel:"Nieuwe teller voor 2/5",expression:"2/5 = ?/"+denominator});
   if(stepId==="subtraction_result")return Object.freeze({taskId:task.id,stepId,stepNumber:4,totalSteps:4,prompt:"Trek de tweede teller af van de eerste teller.",inputLabel:"Verschil van de tellers",expression:left+" − "+right+" = ?"});
   return null;
  }

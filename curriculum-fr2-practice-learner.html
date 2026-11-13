@@ -363,6 +363,7 @@
   }
 
 
+  function showCompleted() {
     exerciseCard.hidden = true;
     resultCard.hidden = false;
     const progress = practiceSession.getProgress();
@@ -518,6 +519,7 @@
   }
 
 
+  function updateAdditionProgress() {
     const progress = additionSession.getProgress();
     const current = additionSession.getCurrentStep();
     additionProgress.textContent = current
@@ -570,6 +572,7 @@
   }
 
 
+  function updateResultFormProgress() {
     const progress = resultFormSession.getProgress();
     resultFormProgress.textContent = "Stap " + Math.min(progress.completedStageCount + 1, progress.totalStageCount) +
       " van " + progress.totalStageCount + " • " + progress.completedStageCount + " afgerond";
@@ -635,6 +638,7 @@
   }
 
 
+  function handleResultFormAnswer(values) {
     const result = resultFormSession.recordResponse({ values }); updateResultFormProgress();
     if (result.classification === "valid") { resultFormEquationInstance?.lock(); const submit = resultFormInputHost.querySelector(".pacogo-fraction-practice__primary-action"); if (submit) submit.disabled = true; showResultFormCompleted(); return; }
     resultFormFeedback.textContent = result.classification === "invalid_input" ? "Vul de getoonde velden met hele getallen in." : result.classification === "not_simplified" ? "Deze breuk is nog niet volledig vereenvoudigd. Controleer de extra breuk naast je antwoord." : "Dit antwoord heeft nog niet dezelfde waarde als vijftien tienden. Controleer teller, noemer en eventueel het hele getal.";
@@ -693,6 +697,7 @@
   }
 
 
+  function startResultFormPractice() {
     resultFormSession = createFractionResultFormPracticeSession({ learnerKey: selectedLearner.learner_key }); additionCard.hidden = true; resultFormCard.hidden = false;
     document.querySelector("#resultFormLearnerLabel").textContent = "PacoGO • " + selectedLearner.display_name + " • Extra breukenoefening"; renderResultFormStage();
   }
@@ -723,6 +728,7 @@
   }
 
 
+  function updateSubtractionProgress() {
     const progress=subtractionSession.getProgress(),current=subtractionSession.getCurrentStep();
     subtractionProgress.textContent=current
       ?"Stap "+current.stepNumber+" van "+current.totalSteps+" • "+progress.completedStepCount+" van "+progress.totalStepCount+" afgerond"
@@ -765,6 +771,7 @@
   }
 
 
+  function handleSubtractionAnswer(rawValue) {
     if(rawValue.trim()===""){subtractionFeedback.textContent="Vul eerst een getal in.";subtractionEquationInstance?.focus();return;}
     const result=subtractionSession.recordResponse({rawValue});updateSubtractionProgress();
     if(result.classification==="valid"){

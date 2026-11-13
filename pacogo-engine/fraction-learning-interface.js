@@ -137,7 +137,10 @@ function createFractionLearningInterface({
   if (showTitle && settings.labels.title) root.append(title);
   root.append(target, optionsLabel, options, response);
   workMount.replaceChildren(root);
-  activeTemplate.controlsArea.append(submit);
+  activeTemplate.controlsArea.replaceChildren(submit);
+  activeTemplate.feedbackArea
+    .querySelectorAll(".pacogo-fraction-interface__status")
+    .forEach(previousStatus => previousStatus.remove());
   activeTemplate.feedbackArea.append(status);
 
   const lock = () => {

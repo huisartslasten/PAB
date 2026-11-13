@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PacoGO — Breuken oefenen</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <link rel="stylesheet" href="./src/components/page-template.css">
   <link rel="stylesheet" href="./pacogo-engine/fraction-learning-interface.css">
   <style>
     :root{font-family:Nunito,system-ui,sans-serif;color:#102b57;background:#f5f9fd}
@@ -56,9 +57,42 @@
     .comparison-item span:last-child{font-weight:800}
     #exerciseCard[hidden],#learnerSetup[hidden],#resultCard[hidden],#resultFormCard[hidden],#subtractionPracticeCard[hidden]{display:none}
     @media(max-width:600px){body{padding:14px}.card{padding:18px}h1{font-size:25px}}
+
+    /* Canonical PacoGO template + compact single-screen fraction practice */
+    body { margin:0; padding:0; min-height:100vh; }
+    main { width:100%; max-width:none; margin:0; padding:0; display:grid; gap:10px; }
+    .paco-template-page-content { min-width:0; }
+    .paco-template-page-content .card { padding:15px 18px; border-radius:16px; box-shadow:0 4px 14px rgba(16,43,87,.06); }
+    .paco-template-page-content h1 { font-size:clamp(22px,2vw,28px); line-height:1.12; margin:0 0 7px; }
+    .paco-template-page-content h2 { font-size:19px; line-height:1.15; margin:0 0 6px; }
+    .paco-template-page-content p { margin:6px 0; line-height:1.35; }
+    .paco-template-page-content .muted { font-size:14px; line-height:1.35; }
+    .paco-template-page-content .concept { padding:10px 13px; border-radius:12px; }
+    .paco-template-page-content #progress { margin:5px 0; }
+    .paco-template-page-content button { padding:9px 14px; margin:2px; }
+    .paco-template-page-content #comparison { margin:8px 0; padding:10px; gap:12px; }
+    .paco-template-page-content .comparison-item { gap:4px; }
+    .paco-template-page-content #fractionInterface { min-width:0; }
+    .paco-template-page-content #feedback { padding:9px 12px; margin:7px 0; }
+    .paco-template-page-content #nextAction { margin-top:5px; }
+    .paco-template-page-content #exerciseCard { gap:7px; }
+    @media(max-width:900px) {
+      .paco-template-page-content .card { padding:13px 14px; }
+      .paco-template-page-content .concept { padding:9px 11px; }
+    }
+    @media(max-height:850px) and (min-width:901px) {
+      .paco-template-hero { display:none; }
+      .paco-template-body { padding-top:8px; }
+      .paco-template-page-header { min-height:76px; margin-bottom:10px; padding:12px 18px; }
+      .paco-template-page-icon { font-size:30px; }
+      .paco-template-page-heading h1 { font-size:30px; }
+      .paco-template-sidebar-card { max-height:calc(100vh - 70px); }
+      .paco-template-page-content .card { padding:11px 14px; }
+    }
   </style>
 </head>
 <body>
+<div id="paco-template-mount"></div>
 <main>
   <section class="card" id="learnerSetup">
     <div class="muted">PacoGO • Rekenen • Breuken</div>
@@ -145,6 +179,8 @@
 </main>
 <script type="module">
   import { createPacoGOApp } from "./src/app/bootstrap.js";
+  import { mountPacoPageTemplate } from "./src/components/page-template.js";
+  import { createPacoNavigation } from "./src/components/page-navigation.js";
   import { createFractionLearningInterface } from "./pacogo-engine/fraction-learning-interface.js";
   import { renderFractionRepresentation } from "./pacogo-engine/fraction-learning-interface-renderers.js";
   import { FRACTION_PRACTICE_TASKS, createFractionPracticeSession } from "./pacogo-engine/fraction-practice-session.js";
@@ -211,6 +247,20 @@
   let subtractionSession = null;
   let subtractionEquationInstance = null;
   const selectedStudent = new URLSearchParams(window.location.search).get("viewStudent") || "";
+  const templateMount = document.querySelector("#paco-template-mount");
+  const navigate = url => { window.location.href = url.toString(); };
+  mountPacoPageTemplate({
+    mount: templateMount,
+    greeting: selectedStudent ? "Hoi " + selectedStudent + "! 🐶" : "Welkom bij PacoGO! 🐶",
+    title: "Breuken oefenen",
+    icon: "📘",
+    subtitle: "Bekijk, vergelijk en reken zelf met breuken.",
+    navigation: createPacoNavigation({
+      app, active: "skills", student: selectedStudent, viewMode: "student",
+      includeManagement: true, navigate
+    }),
+    content: document.querySelector("main")
+  });
 
   function setSetupError(error) {
     setupStatus.textContent = error?.message || "De leerlingprofielen konden niet worden geladen.";

@@ -6782,3 +6782,11 @@ De centrale breuktemplate en gedeelde componentlaag zijn gebouwd; alle reeds ges
 - This verifies the handoff/build-plan commit only. It does **not** claim that the central Fraction Practice template or complete vertical fraction line has already been implemented.
 - The next implementation step remains: inspect the authoritative SLO/curriculum source documents and the existing fraction components/routes, then design and build the shared template/component layer before migrating all specified exercises.
 - This verification note is itself a handoff update; its commit must be verified by the automatically triggered Full Regression.
+
+### Verificatie repository-handoff — 2026-11-13
+
+- Full Regression #3621 / run `43423425311`: **GREEN / success** on exact commit `af4bf9d0b8313b81f78708041149a0b2c3eb3dda`.
+- Verified workflow: `.github/workflows/full-regression-refactor-v1.yml`; push-trigger on `refactor/professional-v1`.
+- All 20 workflow steps passed, including curriculum engine, architecture boundaries, maintained Node/Vitest suites, Chromium, full Playwright browser regression and clean working tree.
+- This confirms the previous handoff/build-plan commit. It does not claim that the central Fraction Practice Template or complete vertical fraction curriculum has been implemented.
+- Current next phase: complete the shared Fraction Practice component architecture and migrate the existing learner-facing fraction practice route without changing curriculum, diagnostic, evidence, mastery, learner-state or Supabase contracts.

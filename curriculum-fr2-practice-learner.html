@@ -328,7 +328,7 @@
       wrapper.className = "comparison-item";
       const label = document.createElement("span");
       label.textContent = item.label;
-      wrapper.append(label, renderFractionRepresentation(item.fraction, item.representation, item.label));
+      wrapper.append(label, renderFractionRepresentation(item.fraction, item.representation, item.label, { layout: task.targetLayout || "bar" }));
       const fractionLabel = document.createElement("span");
       fractionLabel.textContent = item.fraction.numerator + "/" + item.fraction.denominator;
       wrapper.append(fractionLabel);
@@ -743,7 +743,8 @@
         targetFraction: currentTask.targetFraction,
         options: currentTask.options,
         targetRepresentation: "area_model",
-        optionRepresentation: currentTask.optionRepresentation,
+        optionRepresentation: "area_model",
+        targetLayout: currentTask.targetLayout || "bar",
         labels: {
           title: "Welke breuk laat evenveel zien?",
           target: "Doel",
@@ -754,29 +755,7 @@
       onSubmit: () => handleAnswer(interfaceInstance.getSelectedOptionId())
     });
 
-    // Symbolic options also receive an area model so the learner can compare
-    // the same shaded quantity across the target and every answer choice.
-    if (currentTask.optionRepresentation === "symbolic_fraction") {
-      const optionButtons = interfaceHost.querySelectorAll(".pacogo-fraction-interface__option");
-      currentTask.options.forEach((option, index) => {
-        const button = optionButtons[index];
-        if (!button) return;
-        const model = document.createElement("span");
-        model.className = "practice-option-model";
-        const caption = document.createElement("span");
-        caption.className = "practice-option-model-label";
-        caption.textContent = "Als model";
-        model.append(
-          caption,
-          renderFractionRepresentation(
-            option.fraction,
-            "area_model",
-            "Model van " + option.fraction.numerator + " van " + option.fraction.denominator
-          )
-        );
-        button.append(model);
-      });
-    }
+
   }
 
   function handleAnswer(selectedOptionId) {

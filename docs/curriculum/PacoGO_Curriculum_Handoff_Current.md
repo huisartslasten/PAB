@@ -6772,3 +6772,13 @@ De centrale breuktemplate en gedeelde componentlaag zijn gebouwd; alle reeds ges
 - Full Regression #3619, run `43356682116`: **GREEN / success** op exact commit `e7daee884a583a7ada09d7b12caa238f20862f28` (push-trigger; workflow `full-regression-refactor-v1.yml`).
 - Deze handoff-update vormt de volgende commit en triggert Full Regression automatisch via de push-trigger op `refactor/professional-v1`. De status van die nieuwe commit moet na uitvoering afzonderlijk worden gecontroleerd en hier worden vastgelegd.
 - LIVE `main` blijft onaangeraakt. Geen Netlify-deploy. Geen Supabase-wijziging.
+
+
+### Verificatie handoff-bouwopdracht — 2026-11-13
+
+- Full Regression #3620 / run `43423242956` completed **GREEN / success** on exact commit `2b6005d76e24e6ef52f35ae214c4bf82673a77e2`.
+- Verified workflow: `.github/workflows/full-regression-refactor-v1.yml`, triggered by push to `refactor/professional-v1`.
+- All workflow stages passed, including curriculum engine, architecture boundaries, Double or Nothing runtime, maintained Node tests, maintained Vitest tests, Chromium installation, full Playwright browser regression and clean-working-tree verification.
+- This verifies the handoff/build-plan commit only. It does **not** claim that the central Fraction Practice template or complete vertical fraction line has already been implemented.
+- The next implementation step remains: inspect the authoritative SLO/curriculum source documents and the existing fraction components/routes, then design and build the shared template/component layer before migrating all specified exercises.
+- This verification note is itself a handoff update; its commit must be verified by the automatically triggered Full Regression.

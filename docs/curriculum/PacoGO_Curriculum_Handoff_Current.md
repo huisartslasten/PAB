@@ -6898,3 +6898,8 @@ The simplification and whole-number controls remain in the separate shared contr
 ### Fraction subtraction final-step correction (2026-11-13)
 
 The non-formal subtraction practice sequence retains the common denominator in its final arithmetic step. After the two equivalent numerators have been established, the learner sees `10/20 − 8/20 = ?/20` (for the current example) and enters only the missing result numerator. The denominator is displayed in its fraction position and is not treated as a separate arithmetic operand. The session completion continues to return the result numerator together with the unchanged common denominator. Unit and browser regression coverage assert the full fraction expression and the numerator input slot. This is a practice-interface correction only; it does not alter SLO curriculum tasks, formal evidence, mastery, or Supabase persistence.
+
+
+### Shared fraction answer input sizing (2026-11-13)
+
+The shared fraction input styles now size inline missing-value fields and full-answer numerator/denominator fields by character width rather than a broad fixed pixel width. They inherit the surrounding fraction's font size and retain a bold weight, so entered digits visually match the symbolic fraction. Browser regression now explicitly renders a missing denominator in the denominator slot and checks its computed width and inherited font size. The existing full-answer component already provides the optional whole-number field, the simplify control, and the adjacent reduced-fraction fields; those controls remain relevant to complete fraction answers, not single-value intermediate steps.

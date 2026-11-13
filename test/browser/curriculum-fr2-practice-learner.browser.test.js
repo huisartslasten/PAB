@@ -45,6 +45,23 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   }));
 
   await page.goto(pageUrl);
+  const denominatorSlot = await page.evaluate(async () => {
+    const { renderFractionPracticeExpression } = await import("/pacogo-engine/fraction-practice-equation.js");
+    const mount = document.createElement("div");
+    document.body.append(mount);
+    renderFractionPracticeExpression({ mount, expression: "1/2 = 3/?", inputLabels: ["Ontbrekende noemer"] });
+    const input = mount.querySelector("input");
+    const style = getComputedStyle(input);
+    return {
+      slot: input.parentElement.className,
+      width: parseFloat(style.width),
+      fontSize: style.fontSize,
+      equationFontSize: getComputedStyle(mount.querySelector(".fraction-practice-equation")).fontSize
+    };
+  });
+  expect(denominatorSlot.slot).toBe("fraction-practice-denominator fraction-practice-inline-field");
+  expect(denominatorSlot.width).toBeLessThanOrEqual(48);
+  expect(denominatorSlot.fontSize).toBe(denominatorSlot.equationFontSize);
   await expect(page.locator("#learnerSetup h1")).toHaveText("Wie gaat breuken oefenen?");
   await page.getByRole("button", { name: "Leerling kiezen: Leerling A" }).click();
   await expect(page.locator("#exerciseCard h1")).toHaveText("Breuken die evenveel betekenen");

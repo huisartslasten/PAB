@@ -755,7 +755,25 @@
       onSubmit: () => handleAnswer(interfaceInstance.getSelectedOptionId())
     });
 
-
+    if (currentTask.optionRepresentation === "symbolic_fraction") {
+      const optionButtons = interfaceHost.querySelectorAll(".pacogo-fraction-interface__option");
+      currentTask.options.forEach((option, index) => {
+        const button = optionButtons[index];
+        if (!button) return;
+        const visualModel = document.createElement("span");
+        visualModel.className = "practice-option-model";
+        const visualLabel = document.createElement("span");
+        visualLabel.className = "practice-option-model-label";
+        visualLabel.textContent = "Hoeveelheid";
+        visualModel.append(
+          visualLabel,
+          renderFractionRepresentation(option.fraction, "area_model", "Antwoordoptie " + (index + 1), {
+            layout: currentTask.targetLayout || "bar"
+          })
+        );
+        button.append(visualModel);
+      });
+    }
   }
 
   function handleAnswer(selectedOptionId) {

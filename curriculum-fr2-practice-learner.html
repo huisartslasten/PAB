@@ -80,6 +80,9 @@
     .paco-template-page-content #feedback { padding:9px 12px; margin:7px 0; }
     .paco-template-page-content #nextAction { margin-top:5px; }
     .paco-template-page-content #exerciseCard { gap:7px; }
+    .paco-template-page-content .exercise-context-row { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+    .paco-template-page-content #selectedLearnerLabel { margin:0; }
+    .paco-template-page-content #openFractionDiagnostic { min-height:32px; padding:5px 10px; margin:0; border-width:1px; border-radius:10px; font-size:13px; box-shadow:none; }
     @media(max-width:900px) {
       .paco-template-page-content .card { padding:13px 14px; }
       .paco-template-page-content .concept { padding:9px 11px; }
@@ -107,7 +110,10 @@
   </section>
 
   <section class="card" id="exerciseCard" hidden>
-    <div class="muted" id="selectedLearnerLabel">PacoGO • Breuken</div>
+    <div class="exercise-context-row">
+      <div class="muted" id="selectedLearnerLabel">PacoGO • Breuken</div>
+      <button type="button" class="secondary" id="openFractionDiagnostic">Start breukendiagnose</button>
+    </div>
     <h1>Breuken die evenveel betekenen</h1>
     <div id="progress">Voortgang laden…</div>
     <div id="prompt" class="muted">Kies de breuk die evenveel blauw laat zien.</div>
@@ -821,6 +827,12 @@
       "PacoGO • " + learner.display_name + " • Rekenen • Breuken";
     renderTask();
   }
+
+  document.querySelector("#openFractionDiagnostic").addEventListener("click", () => {
+    const diagnosticUrl = new URL("curriculum-fraction-diagnostic-learner.html", window.location.href);
+    if (selectedStudent) diagnosticUrl.searchParams.set("viewStudent", selectedStudent);
+    window.location.href = diagnosticUrl.toString();
+  });
 
   document.querySelector("#startConstructionPractice").addEventListener("click", startConstructionPractice);
 

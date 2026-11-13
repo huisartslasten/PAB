@@ -6640,3 +6640,19 @@ Read the central Fraction Practice Design System before touching any fraction UI
 - The normative rule is now in section 13C of `docs/curriculum/PacoGO_Fraction_Practice_Interface_Design_System_v0.1.md`.
 - Documentation only; no curriculum, task, evidence, controller, mastery, learner-state or Supabase contract changes.
 - Full Regression #3590 / run `43351459378` completed **GREEN** on exact commit `e78029f3f10218c3b0504a86e4520d8314e79ddb`. The subsequent documentation clarification commits must be checked by Full Regression on their exact final commit.
+
+
+### Fraction visual-model / symbolic-option regression closure — 2026-11-12
+
+- Full Regression #3611 was RED on `0ef421ad3c7ee76f330d624336d4182878404706`: four browser assertions showed that the FR2 representation-transfer tasks had lost their symbolic answer options.
+- Root cause: the interface incorrectly treated symbolic stacked-fraction notation as if it were a second area-model layout. This blocked the intended visual-to-symbolic transfer in FR2-T03–T05.
+- The contract now distinguishes visual area-model layout (`bar`, `grid`, `pie`) from mathematical notation (`symbolic_fraction`). A visual target with symbolic options is valid when required by the authoritative task design. When target and options are both area models, they must use the same selected visual layout.
+- FR2-T03, T04 and T05 retain symbolic answer options. The ordinary FR2 practice route also retains symbolic choices and restores the companion visual model beside each symbolic choice, using the same selected area-model layout as the target. This restores the existing learner-facing/browser contract; it does not change curriculum, SLO, task/evidence, mastery or learner-state rules.
+- Central design-system wording was clarified to state that one exercise may not mix different area-model layouts, while symbolic notation is not a competing area model.
+- Full Regression #3614 / run `43353328121`: **GREEN** on exact commit `ca31b34c1a3b6ff45fe9db1139beec9682ea8de3`, branch `refactor/professional-v1`. Workflow conclusion `success`; job completed successfully, including browser regression and clean-working-tree verification.
+- Current verified implementation commit: `ca31b34c1a3b6ff45fe9db1139beec9682ea8de3`. LIVE `main` untouched. No Supabase or Netlify changes.
+- Handoff closure is a documentation change and must itself pass Full Regression on its exact resulting commit.
+
+### Next concrete step
+
+Perform the pending visual/learner-facing review in the local PacoGO TEST environment (never LIVE/Netlify). Check the ordinary recognition tasks with symbolic options and matching visual models, including the pie-model task, then review the full fraction route. Record concrete visual or pedagogical findings before changing code. Full Regression GREEN establishes technical regression status only; it does not establish visual acceptance or learning effectiveness.

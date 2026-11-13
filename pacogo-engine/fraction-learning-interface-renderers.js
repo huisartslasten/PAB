@@ -1,3 +1,33 @@
+function renderPieModel(fraction, label) {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 100 100");
+  svg.setAttribute("class", "pacogo-fraction-pie");
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", label + ": " + fraction.numerator + " van " + fraction.denominator + " gelijke taartpunten");
+  svg.setAttribute("focusable", "false");
+  const center = 50;
+  const radius = 46;
+  for (let index = 0; index < fraction.denominator; index += 1) {
+    const startAngle = -Math.PI / 2 + (index * Math.PI * 2 / fraction.denominator);
+    const endAngle = -Math.PI / 2 + ((index + 1) * Math.PI * 2 / fraction.denominator);
+    const x1 = center + radius * Math.cos(startAngle);
+    const y1 = center + radius * Math.sin(startAngle);
+    const x2 = center + radius * Math.cos(endAngle);
+    const y2 = center + radius * Math.sin(endAngle);
+    const largeArc = endAngle - startAngle > Math.PI ? 1 : 0;
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    const d = fraction.denominator === 1
+      ? "M 50 50 L 50 4 A 46 46 0 1 1 49.99 4 Z"
+      : "M 50 50 L " + x1.toFixed(4) + " " + y1.toFixed(4) +
+        " A 46 46 0 " + largeArc + " 1 " + x2.toFixed(4) + " " + y2.toFixed(4) + " Z";
+    path.setAttribute("d", d);
+    path.setAttribute("class", index < fraction.numerator ? "pacogo-fraction-pie__sector is-shaded" : "pacogo-fraction-pie__sector");
+    path.setAttribute("aria-hidden", "true");
+    svg.append(path);
+  }
+  return svg;
+}
+
 function renderFractionRepresentation(fraction, representation, label = "Breuk", options = {}) {
   const wrapper = document.createElement("span");
   wrapper.className = "pacogo-fraction-representation";
@@ -20,8 +50,12 @@ function renderFractionRepresentation(fraction, representation, label = "Breuk",
   if (representation !== "area_model") throw new TypeError("unsupported fraction representation");
   wrapper.classList.add("pacogo-fraction-representation--area");
   const layout = options.layout || "bar";
-  if (!["bar", "grid"].includes(layout)) throw new TypeError("unsupported area model layout");
+  if (!["bar", "grid", "pie"].includes(layout)) throw new TypeError("unsupported area model layout");
   wrapper.dataset.layout = layout;
+  if (layout === "pie") {
+    wrapper.append(renderPieModel(fraction, label));
+    return wrapper;
+  }
   wrapper.setAttribute("role", "img");
   wrapper.setAttribute("aria-label", label + ": " + fraction.numerator + " van " + fraction.denominator + " gelijke delen");
   const cells = document.createElement("span");

@@ -187,14 +187,15 @@ Use a circle divided into equal angular sectors, with the numerator's sectors cl
 - connecting familiar part-whole situations (for example, halves, quarters and thirds) to fraction notation;
 - interpreting a fraction as a share of one complete object.
 
-### C. Pedagogical selection rule
+### C. Exclusive representation rule — one model per exercise
 
-- The task adapter or pedagogical configuration selects the representation that best serves the learning purpose; individual pages must not invent their own model.
-- Do not use pie models merely for decoration or force them into every task.
-- Do not use bars exclusively. Both renderers are first-class shared components.
-- A task may show a bar, a pie model, or a deliberate comparison/transition between the two when that supports the intended learning.
+- The task adapter or pedagogical configuration selects **one** representation for the complete exercise: either `bar` or `pie`.
+- **Never mix pie models and bar models within one exercise.** For example, do not show one fraction as a pie and another fraction as a bar in the same comparison or operation.
+- All fraction models shown together in one exercise must use the same selected representation. This applies to source models, comparison models, working models and result-related models.
+- Do not switch from a bar to a pie (or vice versa) partway through one exercise. A representation transition may occur only between separate exercises, where the next exercise consistently uses its own selected model.
+- Do not use pie models merely for decoration or force them into every task. Do not use bars exclusively. Both renderers are first-class shared components, selected exclusively per exercise according to its pedagogical purpose.
 - When comparing different fractions, preserve equal-whole meaning and make partitions mathematically accurate. A pie model must use equal sectors; a bar model must use equal-sized partitions.
 - Keep labels, shading, contrast, accessibility text and visual sizing consistent across both representations.
 - Renderer choice changes presentation only; it must not change fraction value, task identity, answer validation, evidence, mastery or curriculum inference.
 
-The shared renderer contract therefore includes `bar` and `pie` as supported representation types. Additional representations may be added only through this central design system and shared component contract.
+The shared renderer contract therefore includes `bar` and `pie` as supported representation types, with a strict one-model-per-exercise selection. Additional representations may be added only through this central design system and shared component contract.

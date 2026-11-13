@@ -359,7 +359,7 @@
 }
 .fraction-practice-fraction {
   display: inline-grid;
-  grid-template-rows: auto 2px auto;
+  grid-template-rows: 1.45em 2px 1.45em;
   align-items: center;
   justify-items: stretch;
   vertical-align: middle;
@@ -387,22 +387,22 @@
   justify-content: center;
 }
 .fraction-practice-inline-input {
-  width: 2.2ch !important;
-  min-width: 2.2ch !important;
-  max-width: 3.2ch !important;
-  min-height: 1.55em;
-  height: 1.55em;
-  flex: 0 0 auto;
+  width: 40px;
+  min-width: 40px;
+  max-width: 40px;
+  height: 30px;
+  min-height: 30px;
+  flex: 0 0 40px;
   box-sizing: border-box;
-  border: 2px dashed #8aa6c2;
-  border-radius: 8px;
+  border: 2px solid #8aa6c2;
+  border-radius: 6px;
   text-align: center;
   font: inherit;
   font-weight: 900;
   line-height: 1;
   color: #102b57;
   background: #fff;
-  padding: 0 1px;
+  padding: 0 2px;
 }
 .fraction-practice-inline-input:focus-visible {
   outline: 3px solid #9bcfff;
@@ -675,6 +675,9 @@
 .pacogo-fraction-answer__fraction {
   font-size: 24px;
   line-height: 1.05;
+}
+.fraction-practice-fraction {
+  grid-template-rows: 1.45em 2px 1.45em;
 }
 .fraction-practice-inline-input,
 .pacogo-fraction-answer__input {

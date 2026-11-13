@@ -46,7 +46,7 @@ function createFractionLearningInterface({
     button.type = "button";
     button.className = "pacogo-fraction-interface__option";
     button.setAttribute("aria-pressed", "false");
-    button.append(renderFractionRepresentation(option.fraction, settings.optionRepresentation, "Antwoordoptie"));
+    button.append(renderFractionRepresentation(option.fraction, settings.optionRepresentation, "Antwoordoptie", { layout: settings.targetLayout }));
     button.addEventListener("click", () => {
       if (locked) return;
       selectedOptionId = option.id;

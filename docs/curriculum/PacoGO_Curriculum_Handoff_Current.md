@@ -6878,3 +6878,18 @@ Deze handoff-update is een documentatiewijziging op dezelfde branch. De push tri
 
 De aparte FR2 Task–Evidence Alignment Specification uit sectie 9A/9B blijft een zelfstandige open curriculum/evidence-onderzoeksvraag. Deze template-implementatie keurt die specificatie niet goed en wijzigt geen FR2-mappings.
 
+
+
+## Fraction Practice Template — shared presentation extension (2026-11-13)
+
+The existing shared Fraction Practice Template is being extended centrally; this is not a page-by-page restyling effort. The implementation contract remains governed by `docs/curriculum/PacoGO_Fraction_Practice_Interface_Design_System_v0.1.md`.
+
+The current implementation step adds:
+- a stacked symbolic fraction beside the target area model whenever the target is rendered as an area model;
+- a reusable `fraction-practice-operation.js` component for horizontal source-fraction operation rows, used by both addition and subtraction practice rather than duplicated page markup;
+- shared compact sizing tokens for equation digits and answer inputs;
+- explicit browser assertions for target notation and shared horizontal operation rows.
+
+The shared equation renderer already represents missing numerator and denominator values in their mathematical positions when the expression contains `?` in that position (for example, `1/2 = 3/?`). This UI capability does not add or alter curriculum tasks. Existing construction tasks and their numerator-only task contract remain unchanged in this step. Extending formal/session persistence to record a denominator response is a separate task-contract change and is not inferred from the visual renderer.
+
+The simplification and whole-number controls remain in the separate shared controls region of the fraction answer workspace. They are applicable to complete fraction-answer entry, not scalar intermediate steps that ask only for one numerator or denominator. No evidence, mastery, learner-state, SLO or Supabase contract is changed.

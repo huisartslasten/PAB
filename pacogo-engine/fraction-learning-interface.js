@@ -37,12 +37,24 @@ function createFractionLearningInterface({
   const targetLabel = document.createElement("span");
   targetLabel.className = "pacogo-fraction-interface__label";
   targetLabel.textContent = settings.labels.target;
-  target.append(targetLabel, renderFractionRepresentation(
+  const targetRepresentation = document.createElement("div");
+  targetRepresentation.className = "pacogo-fraction-interface__target-representations";
+  targetRepresentation.append(renderFractionRepresentation(
     settings.targetFraction,
     settings.targetRepresentation,
     settings.labels.target,
     { layout: settings.targetLayout }
   ));
+  if (settings.targetRepresentation === "area_model") {
+    const targetNotation = renderFractionRepresentation(
+      settings.targetFraction,
+      "symbolic_fraction",
+      settings.labels.target + " als breuk"
+    );
+    targetNotation.classList.add("pacogo-fraction-interface__target-notation");
+    targetRepresentation.append(targetNotation);
+  }
+  target.append(targetLabel, targetRepresentation);
 
   const optionsLabel = document.createElement("h3");
   optionsLabel.className = "pacogo-fraction-interface__options-label";

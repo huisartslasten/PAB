@@ -59,6 +59,7 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await expect(page.locator("#prompt")).toHaveText("Kies de breuk die evenveel blauw laat zien.");
   await expect(page.locator("#fractionInterface .pacogo-fraction-interface__target")).toBeVisible();
   await expect(page.locator("#fractionInterface .pacogo-fraction-interface__target .pacogo-fraction-representation--area")).toBeVisible();
+  await expect(page.locator("#fractionInterface .pacogo-fraction-interface__target .pacogo-fraction-representation--symbolic")).toHaveCount(1);
   await expect(page.locator("#fractionInterface .pacogo-fraction-interface__option")).toHaveCount(2);
   await expect(page.locator("#fractionInterface .pacogo-fraction-interface__option").first()).toBeVisible();
   await expect(page.locator(".pacogo-fraction-interface__target .pacogo-fraction-representation--area")).toHaveCount(1);
@@ -132,6 +133,8 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await expect(page.locator("#additionPracticeCard .pacogo-fraction-practice-template__controls #additionInput")).toHaveCount(1);
   expect(await page.locator("#additionPracticeCard").innerText()).not.toMatch(/\d+\s*\/\s*\d+/);
   await expect(page.locator("#additionVisual .pacogo-fraction-representation--area")).toHaveCount(2);
+  await expect(page.locator("#additionVisual .pacogo-fraction-operation")).toHaveCount(1);
+  await expect(page.locator("#additionVisual .pacogo-fraction-operation__symbol")).toHaveText("+");
   await expect(page.locator("#additionExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "1/3 + 1/4 → noemer ?");
   await expect(page.locator("#additionProgress")).toContainText("Stap 1 van 4");
   await expect(page.locator("#additionExpression input")).toHaveCount(1);
@@ -224,6 +227,8 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await expect(page.locator("#subtractionPracticeCard .pacogo-fraction-practice-template__controls #subtractionInput")).toHaveCount(1);
   expect(await page.locator("#subtractionPracticeCard").innerText()).not.toMatch(/\d+\s*\/\s*\d+/);
   await expect(page.locator("#subtractionVisual .pacogo-fraction-representation--area")).toHaveCount(2);
+  await expect(page.locator("#subtractionVisual .pacogo-fraction-operation")).toHaveCount(1);
+  await expect(page.locator("#subtractionVisual .pacogo-fraction-operation__symbol")).toHaveText("−");
   await expect(page.locator("#subtractionExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "1/2 − 2/5 → noemer ?");
   await page.getByRole("textbox", { name: "Gemeenschappelijke noemer" }).fill("4");
   await page.getByRole("button", { name: "Controleren" }).last().click();

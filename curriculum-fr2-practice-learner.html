@@ -135,6 +135,7 @@
   import { getStudentLearningProfile } from "./src/core/student-registry.js";
   import { renderFractionPracticeExpression } from "./pacogo-engine/fraction-practice-equation.js";
   import { renderFractionAnswerInput } from "./pacogo-engine/fraction-answer-input.js";
+  import { renderFractionOperation } from "./pacogo-engine/fraction-practice-operation.js";
   import { createFractionAdditionPracticeSession } from "./pacogo-engine/fraction-addition-practice-session.js";
   import { createFractionResultFormPracticeSession } from "./pacogo-engine/fraction-result-form-practice-session.js";
   import { createFractionSubtractionPracticeSession } from "./pacogo-engine/fraction-subtraction-practice-session.js";
@@ -493,31 +494,15 @@
   }
 
   function renderAdditionVisual() {
-    additionVisual.replaceChildren();
-    const items = [
-      { label: "Eerste breuk", fraction: { numerator: 1, denominator: 3 } },
-      { label: "Tweede breuk", fraction: { numerator: 1, denominator: 4 } }
-    ];
-    items.forEach((item, index) => {
-      const wrapper = document.createElement("div");
-      wrapper.className = "comparison-item";
-      const label = document.createElement("span");
-      label.textContent = item.label;
-      wrapper.append(
-        label,
-        renderFractionRepresentation(item.fraction, "area_model", item.label, { layout: "bar" }),
-        renderFractionRepresentation(item.fraction, "symbolic_fraction", item.label + " als breuk")
-      );
-      additionVisual.append(wrapper);
-      if (index === 0) {
-        const plus = document.createElement("strong");
-        plus.textContent = "+";
-        plus.setAttribute("aria-label", "plus");
-        additionVisual.append(plus);
-      }
+    renderFractionOperation({
+      mount: additionVisual,
+      operator: "+",
+      terms: [
+        { label: "Eerste breuk", fraction: { numerator: 1, denominator: 3 } },
+        { label: "Tweede breuk", fraction: { numerator: 1, denominator: 4 } }
+      ]
     });
   }
-
 
   function updateAdditionProgress() {
     const progress = additionSession.getProgress();
@@ -702,31 +687,15 @@
     document.querySelector("#resultFormLearnerLabel").textContent = "PacoGO • " + selectedLearner.display_name + " • Extra breukenoefening"; renderResultFormStage();
   }
   function renderSubtractionVisual() {
-    subtractionVisual.replaceChildren();
-    const items = [
-      { label: "Eerste breuk", fraction: { numerator: 1, denominator: 2 } },
-      { label: "Tweede breuk", fraction: { numerator: 2, denominator: 5 } }
-    ];
-    items.forEach((item, index) => {
-      const wrapper = document.createElement("div");
-      wrapper.className = "comparison-item";
-      const label = document.createElement("span");
-      label.textContent = item.label;
-      wrapper.append(
-        label,
-        renderFractionRepresentation(item.fraction, "area_model", item.label, { layout: "bar" }),
-        renderFractionRepresentation(item.fraction, "symbolic_fraction", item.label + " als breuk")
-      );
-      subtractionVisual.append(wrapper);
-      if (index === 0) {
-        const minus = document.createElement("strong");
-        minus.textContent = "−";
-        minus.setAttribute("aria-label", "min");
-        subtractionVisual.append(minus);
-      }
+    renderFractionOperation({
+      mount: subtractionVisual,
+      operator: "−",
+      terms: [
+        { label: "Eerste breuk", fraction: { numerator: 1, denominator: 2 } },
+        { label: "Tweede breuk", fraction: { numerator: 2, denominator: 5 } }
+      ]
     });
   }
-
 
   function updateSubtractionProgress() {
     const progress=subtractionSession.getProgress(),current=subtractionSession.getCurrentStep();

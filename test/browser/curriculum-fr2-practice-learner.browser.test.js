@@ -60,7 +60,7 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
     };
   });
   expect(denominatorSlot.slot).toBe("fraction-practice-denominator fraction-practice-inline-field");
-  expect(denominatorSlot.width).toBeLessThanOrEqual(48);
+  expect(denominatorSlot.width).toBe(60);
   expect(denominatorSlot.fontSize).toBe(denominatorSlot.fractionFontSize);
   await expect(page.locator("#learnerSetup h1")).toHaveText("Wie gaat breuken oefenen?");
   await page.getByRole("button", { name: "Leerling kiezen: Leerling A" }).click();

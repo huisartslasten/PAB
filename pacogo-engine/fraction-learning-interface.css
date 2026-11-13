@@ -621,8 +621,9 @@
     width: 43px;
   }
   .fraction-practice-inline-input {
-    width: 2.2ch !important;
-    min-width: 2.2ch !important;
+    width: 60px;
+    min-width: 60px;
+    max-width: 60px;
   }
 }
 
@@ -679,7 +680,13 @@
 .fraction-practice-fraction {
   grid-template-rows: 1.45em 2px 1.45em;
 }
-.fraction-practice-inline-input,
+.fraction-practice-inline-input {
+  width: 60px;
+  min-width: 60px;
+  max-width: 60px;
+  flex-basis: 60px;
+  font-size: 24px;
+}
 .pacogo-fraction-answer__input {
   width: 40px;
   font-size: 24px;

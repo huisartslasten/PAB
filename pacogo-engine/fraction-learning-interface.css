@@ -387,16 +387,22 @@
   justify-content: center;
 }
 .fraction-practice-inline-input {
-  width: 46px;
-  min-height: 36px;
+  width: 2.2ch !important;
+  min-width: 2.2ch !important;
+  max-width: 3.2ch !important;
+  min-height: 1.55em;
+  height: 1.55em;
+  flex: 0 0 auto;
   box-sizing: border-box;
   border: 2px dashed #8aa6c2;
   border-radius: 8px;
   text-align: center;
-  font: 900 21px Nunito, system-ui, sans-serif;
+  font: inherit;
+  font-weight: 900;
+  line-height: 1;
   color: #102b57;
   background: #fff;
-  padding: 3px;
+  padding: 0 1px;
 }
 .fraction-practice-inline-input:focus-visible {
   outline: 3px solid #9bcfff;
@@ -449,16 +455,21 @@
   align-items: center;
 }
 .pacogo-fraction-answer__input {
-  width: 48px;
-  height: 36px;
+  width: 2.2ch !important;
+  min-width: 2.2ch !important;
+  max-width: 3.2ch !important;
+  height: 1.55em;
+  flex: 0 0 auto;
   box-sizing: border-box;
   border: 1.5px solid #9bb7d0;
   border-radius: 8px;
   background: #fff;
   color: #102b57;
   text-align: center;
-  font: 900 22px Nunito, system-ui, sans-serif;
-  padding: 2px;
+  font: inherit;
+  font-weight: 900;
+  line-height: 1;
+  padding: 0 1px;
 }
 .pacogo-fraction-answer__divider {
   height: 2px;
@@ -610,7 +621,8 @@
     width: 43px;
   }
   .fraction-practice-inline-input {
-    width: 42px;
+    width: 2.2ch !important;
+    min-width: 2.2ch !important;
   }
 }
 

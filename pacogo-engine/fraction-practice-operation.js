@@ -1,3 +1,5 @@
+import { renderFractionRepresentation } from "./fraction-learning-interface-renderers.js";
+
 function renderFractionOperation({ mount, terms, operator } = {}) {
   if (!(mount instanceof HTMLElement)) throw new TypeError("mount must be an HTMLElement");
   if (!Array.isArray(terms) || terms.length !== 2) throw new TypeError("exactly two fraction terms are required");

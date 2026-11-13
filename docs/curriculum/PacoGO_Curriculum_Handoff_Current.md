@@ -6790,3 +6790,91 @@ De centrale breuktemplate en gedeelde componentlaag zijn gebouwd; alle reeds ges
 - All 20 workflow steps passed, including curriculum engine, architecture boundaries, maintained Node/Vitest suites, Chromium, full Playwright browser regression and clean working tree.
 - This confirms the previous handoff/build-plan commit. It does not claim that the central Fraction Practice Template or complete vertical fraction curriculum has been implemented.
 - Current next phase: complete the shared Fraction Practice component architecture and migrate the existing learner-facing fraction practice route without changing curriculum, diagnostic, evidence, mastery, learner-state or Supabase contracts.
+
+---
+
+## 10A. Centrale Fraction Practice Template — implementatie afgerond — 2026-11-13
+
+> Deze update vervangt de eerdere eerstvolgende bouwstap uit sectie 10. De centrale template- en integratiefase is technisch afgerond. De complete verticale SLO-breukenleerlijn tot eind groep 8 is hiermee **nog niet** afgerond.
+
+### Doel en curriculumgrens
+
+Het hogere doel blijft een complete verticale breukenleerlijn vanaf het relevante instapniveau tot en met eind groep 8, volgens de reeds uitgewerkte SLO-tussendoelen en bestaande PacoGO-curriculumdocumentatie. Het curriculum is niet opnieuw ontworpen. Geen SLO-tussendoelen, Skills, Developments, Claims, Tasks, evidence-targets of masterycriteria zijn toegevoegd of herschreven.
+
+De centrale Fraction Practice Template is nu de gedeelde leerlinggerichte interfacebasis voor de bestaande breukoefenroute. De template is geen zelfstandige curriculum-engine en kent geen formele evidence, mastery of next-action toe.
+
+### Gebouwde componentarchitectuur
+
+Nieuwe gedeelde component:
+- `pacogo-engine/fraction-practice-template.js` — één gedeelde paginastructuur met context, titel, instructie, voortgang, prompt, werkruimte, bedieningszone, feedback, acties en voetnoot.
+
+Aangesloten/gemodificeerde gedeelde componenten:
+- `pacogo-engine/fraction-learning-interface.js` — gebruikt de centrale template; component-owned controls en status worden bij opnieuw renderen vervangen, zodat geen oude knoppen of statusmeldingen opstapelen;
+- `pacogo-engine/fraction-answer-input.js` — gescheiden werk- en bedieningsmounts; teller/noemer, optioneel heel-getalveld en optionele tweede breukinvoer;
+- `pacogo-engine/fraction-practice-equation.js` — gestapelde breukweergave en betekenisvolle toegankelijke expressielabels;
+- `pacogo-engine/fraction-learning-interface-renderers.js` — gedeelde symbolische/area-model-rendering en weergave van een door de leerling ingevoerd gemengd getal;
+- `pacogo-engine/fraction-learning-interface.css` — gedeelde compacte en responsive styling voor de template en breukcomponenten.
+
+De architectuurlagen blijven gescheiden:
+1. bestaande taak-/pedagogische configuratie;
+2. interactie en lokale learner/practice state;
+3. visuele rendering en pagina-indeling.
+
+### Bestaande learner-route aangesloten
+
+`curriculum-fr2-practice-learner.html` gebruikt de centrale template voor alle bestaande onderdelen van de route:
+- breuken herkennen en gelijkwaardige breuken kiezen;
+- zelf een gelijkwaardige breuk construeren;
+- breuken optellen in afzonderlijke stappen;
+- een uitkomst zoals vijftien tienden zelf als breuk of gemengd getal invoeren;
+- optioneel zelf een vereenvoudigde breuk invoeren;
+- breuken aftrekken in afzonderlijke stappen.
+
+De vijf FR2-T01–T05 synthetic browser vertical slices gebruiken eveneens de gedeelde Fraction Learning Interface; die interface mount nu standaard de centrale template. Hun technische observatie-/tracepanelen blijven diagnostische ontwikkelweergaven en zijn geen vervanging voor de gewone learner practice-pagina.
+
+### Vastgelegde leerlinginteracties
+
+- Zichtbare breuken worden als gestapelde breuken getoond: teller, horizontale breukstreep en noemer. Slashnotatie blijft alleen in machine-/taakexpressies waar dat nodig is; zij wordt niet als zichtbare breuknotatie gebruikt in de aangesloten learner-route.
+- Teller en noemer zijn afzonderlijke invoervelden.
+- De leerling kan zelf kiezen om een heel getal toe te voegen; het aparte veld verschijnt dan in de wiskundige werkruimte.
+- De oorspronkelijke breukinvoer blijft staan.
+- De knop **Vereenvoudigen** toont een tweede breukinvoer met een gelijkteken ertussen. De leerling vult zelf de tweede teller en noemer in.
+- Er wordt geen gemengd getal of vereenvoudigde breuk automatisch berekend of ingevuld.
+- Werkruimte en bedieningszone zijn gescheiden. **Heel getal toevoegen**, **Vereenvoudigen** en **Controleren** staan in de bedieningszone.
+- De bestaande diagnostische ingang blijft als secundaire actie in de contextregel behouden.
+- De interface claimt niet dat uitleg of data is opgeslagen wanneer dat niet daadwerkelijk is gebeurd.
+- Bestaande taak-/sessievalidatie en lokale learner-keyed opslag blijven leidend.
+
+### Tests en regressieverloop
+
+De FR2 learner-browserregressie is uitgebreid met controles voor:
+- gebruik van de centrale template op de bestaande route;
+- afwezigheid van zichtbare slashbreuken;
+- scheiding tussen werkruimte en bediening;
+- optioneel heel-getalveld;
+- tweede breukinvoer die vóór de klik verborgen blijft en na **Vereenvoudigen** zichtbaar wordt;
+- behoud van de oorspronkelijke invoer;
+- horizontale uitlijning van oorspronkelijke en vereenvoudigde invoer op desktop;
+- responsive gedrag op een smal scherm;
+- gestapelde uitkomsten en de bestaande volledige oefenroute.
+
+Diagnoses tijdens de bouw:
+- Full Regression #3623 was **RED** door verloren functiegrenzen in de gewijzigde learner-pagina. De oorspronkelijke functiegrenzen zijn hersteld; tests zijn niet verzwakt.
+- Full Regression #3624 was **RED** doordat opnieuw gerenderde interfacecomponenten oude knoppen in de gedeelde template-slot lieten staan. De component-slotlevenscyclus is op componentniveau hersteld.
+- Full Regression #3625 was **RED** door een onjuiste nieuwe testverwachting: de tweede breukinvoer bestaat al verborgen in de DOM voordat zij zichtbaar wordt. De test controleert nu expliciet de verborgen toestand; de interface is niet aangepast om de test te omzeilen.
+
+**Laatste geverifieerde implementatiecommit:** `2a09a4833cb1968d95c8957a4e89831818672701`  
+**Branch:** `refactor/professional-v1`  
+**Full Regression:** #3626 / run `43426630765` — **GREEN / success** op exact deze commit.  
+De volledige workflow slaagde, inclusief curriculum-engine, architectuurgrenzen, Node/Vitest-tests, Chromium, volledige Playwright-browserregressie en clean-working-tree-controle.
+
+Deze handoff-update is een documentatiewijziging op dezelfde branch. De push triggert een afzonderlijke Full Regression op de handoff-commit; die uitslag moet apart worden gecontroleerd. LIVE `main` is onaangeraakt. Er is geen Netlify-deploy en geen Supabase-wijziging uitgevoerd.
+
+### Wat nog openstaat
+
+1. De gebruiker beoordeelt nu één keer de volledige bestaande breukoefenroute in de lokale PacoGO TEST-omgeving, inclusief schermindeling, invoer, modellen, feedback en diagnostische contextactie.
+2. Daarna wordt de volledige reeds uitgewerkte SLO-breukenleerlijn tot eind groep 8 vanuit de bestaande curriculumbronnen en repository geïnventariseerd: welke ontwikkelingen en taakvormen zijn al aanwezig, welke ontbreken nog en welke koppelingen zijn nog niet geïmplementeerd.
+3. De ontbrekende onderdelen worden vervolgens volgens de bestaande SLO-/PacoGO-definities gebouwd. Geen curriculum opnieuw verzinnen en geen formele mappings of mastery-contracten aanpassen om een interface eenvoudiger te maken.
+
+De aparte FR2 Task–Evidence Alignment Specification uit sectie 9A/9B blijft een zelfstandige open curriculum/evidence-onderzoeksvraag. Deze template-implementatie keurt die specificatie niet goed en wijzigt geen FR2-mappings.
+

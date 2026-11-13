@@ -34,7 +34,7 @@ function createFractionSubtractionPracticeSession({learnerKey,storage=globalThis
   if(stepId==="common_denominator")return Object.freeze({taskId:task.id,stepId,stepNumber:1,totalSteps:4,prompt:"Kies een gemeenschappelijke noemer voor de twee getoonde breuken.",inputLabel:"Gemeenschappelijke noemer",expression:"1/2 − 2/5 → noemer ?"});
   if(stepId==="left_equivalent_numerator")return Object.freeze({taskId:task.id,stepId,stepNumber:2,totalSteps:4,prompt:"Welke teller hoort bij de eerste breuk als de noemer "+denominator+" wordt?",inputLabel:"Nieuwe teller voor 1/2",expression:"1/2 = ?/"+denominator});
   if(stepId==="right_equivalent_numerator")return Object.freeze({taskId:task.id,stepId,stepNumber:3,totalSteps:4,prompt:"Welke teller hoort bij de tweede breuk als de noemer "+denominator+" wordt?",inputLabel:"Nieuwe teller voor 2/5",expression:"2/5 = ?/"+denominator});
-  if(stepId==="subtraction_result")return Object.freeze({taskId:task.id,stepId,stepNumber:4,totalSteps:4,prompt:"Trek de tweede teller af van de eerste teller.",inputLabel:"Verschil van de tellers",expression:left+" − "+right+" = ?"});
+  if(stepId==="subtraction_result")return Object.freeze({taskId:task.id,stepId,stepNumber:4,totalSteps:4,prompt:"Trek de tweede teller af van de eerste teller. De gemeenschappelijke noemer blijft gelijk.",inputLabel:"Verschil van de tellers",expression:left+"/"+denominator+" − "+right+"/"+denominator+" = ?/"+denominator});
   return null;
  }
  function getProgress(){const p=read();return Object.freeze({completedStepCount:(p.completedStepIdsByTask[task.id]||[]).length,totalStepCount:STEP_IDS.length,attemptCount:(p.responsesByTask[task.id]||[]).length,isComplete:p.completedTaskIds.includes(task.id)});}

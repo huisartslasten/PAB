@@ -6893,3 +6893,8 @@ The current implementation step adds:
 The shared equation renderer already represents missing numerator and denominator values in their mathematical positions when the expression contains `?` in that position (for example, `1/2 = 3/?`). This UI capability does not add or alter curriculum tasks. Existing construction tasks and their numerator-only task contract remain unchanged in this step. Extending formal/session persistence to record a denominator response is a separate task-contract change and is not inferred from the visual renderer.
 
 The simplification and whole-number controls remain in the separate shared controls region of the fraction answer workspace. They are applicable to complete fraction-answer entry, not scalar intermediate steps that ask only for one numerator or denominator. No evidence, mastery, learner-state, SLO or Supabase contract is changed.
+
+
+### Fraction subtraction final-step correction (2026-11-13)
+
+The non-formal subtraction practice sequence retains the common denominator in its final arithmetic step. After the two equivalent numerators have been established, the learner sees `10/20 − 8/20 = ?/20` (for the current example) and enters only the missing result numerator. The denominator is displayed in its fraction position and is not treated as a separate arithmetic operand. The session completion continues to return the result numerator together with the unchanged common denominator. Unit and browser regression coverage assert the full fraction expression and the numerator input slot. This is a practice-interface correction only; it does not alter SLO curriculum tasks, formal evidence, mastery, or Supabase persistence.

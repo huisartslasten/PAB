@@ -249,7 +249,14 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await page.getByRole("textbox", { name: "Nieuwe teller voor 2/5" }).fill("8");
   await page.getByRole("button", { name: "Controleren" }).last().click();
   await page.getByRole("button", { name: "Volgende stap" }).click();
-  await expect(page.locator("#subtractionExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "10 − 8 = ?");
+  await expect(page.locator("#subtractionExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "10/20 − 8/20 = ?/20");
+  await expect(page.locator("#subtractionExpression .fraction-practice-fraction")).toHaveCount(3);
+  await expect(page.locator("#subtractionExpression .fraction-practice-fraction").nth(0)).toContainText("10");
+  await expect(page.locator("#subtractionExpression .fraction-practice-fraction").nth(0)).toContainText("20");
+  await expect(page.locator("#subtractionExpression .fraction-practice-fraction").nth(1)).toContainText("8");
+  await expect(page.locator("#subtractionExpression .fraction-practice-fraction").nth(1)).toContainText("20");
+  await expect(page.locator("#subtractionExpression .fraction-practice-fraction").nth(2).locator(".fraction-practice-numerator input")).toHaveCount(1);
+  await expect(page.locator("#subtractionExpression .fraction-practice-fraction").nth(2).locator(".fraction-practice-denominator")).toHaveText("20");
   await page.getByRole("textbox", { name: "Verschil van de tellers" }).fill("3");
   await page.getByRole("button", { name: "Controleren" }).last().click();
   await expect(page.locator("#subtractionFeedback")).toContainText("Controleer de aftrekking");

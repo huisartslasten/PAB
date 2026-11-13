@@ -11,7 +11,7 @@ assert.equal(a.recordResponse({rawValue:"10"}).classification,"valid");
 assert.equal(a.getCurrentStep().expression,"2/5 = ?/20");
 assert.equal(a.recordResponse({rawValue:"7"}).classification,"not_equivalent");
 assert.equal(a.recordResponse({rawValue:"8"}).classification,"valid");
-assert.equal(a.getCurrentStep().expression,"10 − 8 = ?");
+assert.equal(a.getCurrentStep().expression,"10/20 − 8/20 = ?/20");
 assert.equal(a.recordResponse({rawValue:"3"}).classification,"arithmetic_error");
 const done=a.recordResponse({rawValue:"2"});
 assert.equal(done.classification,"valid");assert.equal(done.progress.isComplete,true);

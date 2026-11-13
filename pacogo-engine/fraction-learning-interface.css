@@ -387,12 +387,12 @@
   justify-content: center;
 }
 .fraction-practice-inline-input {
-  width: 40px;
-  min-width: 40px;
-  max-width: 40px;
+  width: 60px;
+  min-width: 60px;
+  max-width: 60px;
   height: 30px;
   min-height: 30px;
-  flex: 0 0 40px;
+  flex: 0 0 60px;
   box-sizing: border-box;
   border: 2px solid #8aa6c2;
   border-radius: 6px;

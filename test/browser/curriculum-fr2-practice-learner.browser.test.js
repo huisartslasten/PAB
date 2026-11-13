@@ -120,6 +120,9 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await page.getByRole("textbox", { name: "Vul de teller in" }).click();
   await page.keyboard.type("2");
   await expect(page.getByRole("textbox", { name: "Vul de teller in" })).toHaveValue("2");
+  await page.getByRole("textbox", { name: "Vul de teller in" }).fill("12");
+  await expect(page.getByRole("textbox", { name: "Vul de teller in" })).toHaveValue("12");
+  await expect(page.getByRole("textbox", { name: "Vul de teller in" })).toHaveCSS("width", "60px");
   await page.getByRole("textbox", { name: "Vul de teller in" }).fill("");
   await expect(page.locator("#constructionPrompt")).toContainText("noemer 4");
 

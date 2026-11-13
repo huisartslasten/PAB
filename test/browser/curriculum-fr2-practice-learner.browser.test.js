@@ -49,7 +49,9 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await page.getByRole("button", { name: "Leerling kiezen: Leerling A" }).click();
   await expect(page.locator("#exerciseCard h1")).toHaveText("Breuken die evenveel betekenen");
   await expect(page.locator("#exerciseCard .concept")).toHaveCount(0);
-  await expect(page.locator("#openFractionDiagnostic")).toHaveCount(0);
+  await expect(page.locator("#exerciseCard .exercise-context-row")).toBeVisible();
+  await expect(page.locator("#openFractionDiagnostic")).toBeVisible();
+  await expect(page.locator("#exerciseCard .exercise-context-row #openFractionDiagnostic")).toHaveCount(1);
   await expect(page.locator("#prompt")).toHaveText("Kies de breuk die evenveel blauw laat zien.");
   await expect(page.locator("#fractionInterface .pacogo-fraction-interface__target")).toBeVisible();
   await expect(page.locator("#fractionInterface .pacogo-fraction-interface__target .pacogo-fraction-representation--area")).toBeVisible();

@@ -6687,3 +6687,88 @@ Open de gewijzigde pagina in de lokale PacoGO TEST-omgeving en controleer dat de
 ### Next concrete step
 
 Perform the still-pending visual review in the local PacoGO TEST environment: verify that the active task, target model, two answer options and compact diagnostic action fit the intended PacoGO page layout without displacing the mathematical work. Do not infer visual acceptance from the green browser regression.
+
+
+---
+
+## 10. Centrale breuktemplate en volledige verticale breukenleerlijn — bouwopdracht — 2026-11-13
+
+### Hoger product- en curriculumdoel
+
+Bouw een complete, doorlopende verticale leerlijn voor **breuken vanaf het huidige instapniveau tot en met het einde van groep 8**, gebaseerd op de **reeds uitgewerkte SLO-tussendoelen en bestaande curriculumdocumentatie**.
+
+Het curriculum is al uitgewerkt. De volgende chat/contributor mag geen nieuw SLO-curriculum, nieuwe tussendoelen, nieuwe skill-indeling of alternatieve leerlijn bedenken. Lees de bestaande curriculum- en SLO-documenten en implementeer de bestaande inhoud. Als een noodzakelijke koppeling of inhoudelijke beslissing niet in de bestaande bronnen staat, markeer die als open punt; vul die niet zelf in.
+
+De centrale breuktemplate is de herbruikbare leerlingpagina en componentbasis waarmee alle bestaande en toekomstige breukoefeningen volgens één PacoGO-standaard worden gebouwd. Dit is geen losse cosmetische verbetering van één FR2-pagina.
+
+### Verplichte bronbestanden en ontwerpcontract
+
+Lees vóór implementatie:
+- `docs/curriculum/PacoGO_Fraction_Practice_Interface_Design_System_v0.1.md` — normatief centraal visueel/interactioneel contract voor alle breukoefeningen;
+- `docs/curriculum/PacoGO_Fraction_Learning_Interface_Design_v0.1.md` — bestaande Fraction Learning Interface;
+- de bestaande SLO-/curriculumdocumenten voor de volledige breukenleerlijn en de FR1/FR2-contracten;
+- de relevante bestaande fraction renderers, answer-inputs, practice routes en browser-/unit-tests.
+
+De centrale design system-specificatie is verplicht en geldt voor iedere breukoefening. Geen afzonderlijke pagina mag een eigen breuknotatie, invoerveld, bediening, layout of styling verzinnen.
+
+### Wat gebouwd moet worden
+
+1. **Eén centrale PacoGO-oefenpaginastructuur**
+   - compact en passend op één normaal laptopscherm waar de taak dat toelaat;
+   - duidelijke hiërarchie: korte instructie, opgave/model, werkruimte, feedback en bediening;
+   - geen overbodige herhaalde uitleg of technische disclaimers;
+   - responsive gedrag voor kleinere schermen;
+   - herkenbare PacoGO-opmaak en consistente spacing/typografie.
+
+2. **Eén gedeelde Fraction Practice-componentlaag**
+   - gestapelde breukweergave: teller, horizontale breukstreep, noemer; geen zichtbare slashnotatie;
+   - compacte teller- en noemerinvoer die qua grootte, gewicht en uitlijning overeenkomt met de getoonde cijfers;
+   - horizontale bewerkingen en gelijkwaardige breuken naast elkaar op desktop waar passend;
+   - optionele invoer voor een heel getal;
+   - knop **Vereenvoudigen** die een tweede breukinvoer rechts van de oorspronkelijke invoer toont, met een gelijkteken ertussen;
+   - oorspronkelijke invoer blijft zichtbaar; vereenvoudiging wordt niet automatisch uitgevoerd;
+   - bediening zoals **Heel getal toevoegen**, **Vereenvoudigen** en **Controleren** staat in de aparte bedieningszone, niet midden in het rekenwerk;
+   - duidelijke, compacte feedback en correcte toetsenbord-/focusbediening.
+
+3. **Eenduidige visuele breukmodellen**
+   - gedeelde weergave voor breukbalken en breukcirkels/taartmodellen;
+   - kies het model op grond van het pedagogische doel en de bestaande taakdefinitie;
+   - gebruik binnen één oefening niet door elkaar verschillende area-modelvormen: dus niet tegelijk balk en taart;
+   - gestapelde symbolische breuknotatie is geen tweede area-model en mag wel naast een visueel model staan als de bestaande taak dat vraagt;
+   - gelijke delen moeten wiskundig correct zijn weergegeven.
+
+4. **Alle bestaande breukoefeningen aansluiten**
+   - inventariseer de volledige bestaande FR1-/FR2- en overige breukroutes aan de hand van curriculumregister, SLO-documenten en repository;
+   - laat herkenning, equivalentie, zelf breuken maken, optellen, aftrekken, gemengde getallen, vereenvoudigen en overige reeds gespecificeerde onderdelen dezelfde centrale template/componenten gebruiken;
+   - voeg geen nieuwe formele curriculum-, task-, claim-, evidence- of mastery-identifiers toe zonder bestaande bron/contract;
+   - behoud de bestaande diagnostische ingang als compacte secundaire actie waar de bestaande browser-/navigatiecontracten dat vereisen.
+
+5. **Architectuurgrenzen behouden**
+   - scheid pedagogische/taakconfiguratie, interactie-/state-/evidence-laag en visuele/renderlaag;
+   - de template mag curriculumlogica, SLO-mapping, FR1/FR2-contracten, C1–C9, evidence-assessment, mastery, next-action of learner state niet stilzwijgend wijzigen;
+   - adaptieve instructie blijft afhankelijk van bevestigde methode/provenance; verzin geen schoolmethode;
+   - geen Supabase-wijziging tenzij een echte persistence-/runtime-contractwijziging dat vereist;
+   - PacoGO Deluxe / Upper Tier mag later de renderinglaag vervangen zonder curriculum- of interactielogica te herbouwen.
+
+### Werkwijze en volgorde
+
+- Begin met de actuele Full Regression-status en controleer branch/HEAD.
+- Groen: ontwerp de gedeelde componentarchitectuur op basis van de bestaande centrale design system-specificatie en implementeer als één samenhangende bouwfase.
+- Rood: stop, isoleer de exacte oorzaak en ontwerp de onderliggende oplossing; geen symptoompatches en geen testverzwakking.
+- Bouw niet pagina voor pagina met losse afwijkende oplossingen. Maak de centrale template/componentlaag en migreer daarna alle bestaande breukoefeningen naar die laag.
+- Voeg gerichte tests toe voor de gedeelde contracten en alle gekoppelde routes.
+- Voer Full Regression uit op de exacte implementatiecommit.
+- Pas na de complete bouwfase en groene technische regressie volgt één samenhangende visuele beoordeling in de lokale PacoGO TEST-omgeving. Vraag de gebruiker niet tussentijds om telkens ontbrekende onderdelen te ontdekken die al in dit bouwplan staan.
+- Werk deze handoff na iedere significante fase bij. Iedere handoff-commit moet zelf ook Full Regression doorstaan.
+
+### Definitie van gereed
+
+De centrale breuktemplate en gedeelde componentlaag zijn gebouwd; alle reeds gespecificeerde breukoefeningen gebruiken deze standaard; de bestaande SLO-leerlijn is volledig doorgetrokken tot eind groep 8 zonder curriculum opnieuw te ontwerpen; de relevante regressietests en Full Regression zijn groen op de exacte commit; en de gebruiker kan daarna de volledige learner-facing breukenroute in lokale TEST in één keer beoordelen.
+
+### Actuele status bij vastlegging
+
+- Branch: `refactor/professional-v1`.
+- Laatste geverifieerde implementatie-/handoff-commit vóór deze update: `e7daee884a583a7ada09d7b12caa238f20862f28`.
+- Full Regression #3619, run `43356682116`: **GREEN / success** op exact commit `e7daee884a583a7ada09d7b12caa238f20862f28` (push-trigger; workflow `full-regression-refactor-v1.yml`).
+- Deze handoff-update vormt de volgende commit en triggert Full Regression automatisch via de push-trigger op `refactor/professional-v1`. De status van die nieuwe commit moet na uitvoering afzonderlijk worden gecontroleerd en hier worden vastgelegd.
+- LIVE `main` blijft onaangeraakt. Geen Netlify-deploy. Geen Supabase-wijziging.

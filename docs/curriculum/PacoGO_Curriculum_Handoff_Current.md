@@ -6620,3 +6620,12 @@ Continue the local PacoGO TEST review of the full learner-facing fraction route.
 ### Next concrete step
 
 Read the central Fraction Practice Design System before touching any fraction UI. Then inspect the existing shared fraction renderers, answer-input component, addition/subtraction expression renderer, mixed-number result form and all fraction practice routes. Design the shared component changes against the central contract first; do not patch individual pages separately and do not change curriculum/task/evidence contracts. Implement only after the architecture is clear, add regression coverage for every applicable acceptance criterion, and run Full Regression on the exact resulting commit. Afterward, ask the user to review the local TEST screens before considering the fraction UI accepted.
+
+### Fraction visual models — pie representation added — 2026-11-12
+
+- User decision: fraction practice must not rely exclusively on horizontal bars. The central Fraction Practice Design System now requires both reusable **fraction bar** and **fraction circle/pie** renderers.
+- Choose the representation according to the pedagogical purpose. Bars are particularly useful for linear comparison, equivalent fractions, common denominators and operations; pie models are useful for part-whole meaning and familiar shares of one whole. Do not use pie models decoratively or force one representation into every task.
+- Both models must represent equal parts accurately and preserve the same mathematical value and task/evidence boundaries. A deliberate transition/comparison between bar and pie is allowed where it supports learning.
+- This is a central UI/renderer requirement, not a curriculum change. No task, claim, evidence, mastery, next-action, learner-state or Supabase contract is altered.
+- Regression baseline before this design decision: Full Regression #3588 / run `43351270003`, **GREEN** on exact commit `2ad9944c32159d623baa1fa13046408f89ca9a4a`. All workflow steps completed successfully.
+- This documentation update must itself pass Full Regression on its exact resulting commit.

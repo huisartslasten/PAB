@@ -1,5 +1,5 @@
 const FRACTION_RESULT_FORM_TASK = Object.freeze({ id: "fraction-result-form-15-10", numerator: 15, denominator: 10 });
-const CLASSIFICATIONS = Object.freeze(["valid", "invalid_input", "incorrect_answer", "not_simplified"]);
+const CLASSIFICATIONS = Object.freeze(["valid", "invalid_input", "incorrect_answer", "requires_simplification", "not_simplified"]);
 function createFractionResultFormPracticeSession({ learnerKey, storage = globalThis.localStorage } = {}) {
   const learner = String(learnerKey || "").trim();
   if (!learner) throw new TypeError("A learner key is required.");
@@ -14,7 +14,7 @@ function createFractionResultFormPracticeSession({ learnerKey, storage = globalT
     return { schemaVersion: 2, completed: data.completed, responses: data.responses.map(item => ({ classification: item.classification, values: { ...item.values } })) };
   }
   const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
-  function getCurrentStage() { return read().completed ? null : Object.freeze({ taskId: FRACTION_RESULT_FORM_TASK.id, stageId: "answer", stageNumber: 1, totalStages: 1, prompt: "Noteer vijftien tienden op jouw manier. Je kunt een heel getal toevoegen en zelf kiezen of je vereenvoudigt.", expression: "vijftien tienden =" }); }
+  function getCurrentStage() { return read().completed ? null : Object.freeze({ taskId: FRACTION_RESULT_FORM_TASK.id, stageId: "answer", stageNumber: 1, totalStages: 1, prompt: "Noteer vijftien tienden op jouw manier. Is je breuk nog te vereenvoudigen? Vereenvoudig die dan zelf.", expression: "vijftien tienden =" }); }
   function getProgress() { const state = read(); return Object.freeze({ completedStageCount: state.completed ? 1 : 0, totalStageCount: 1, attemptCount: state.responses.length, isComplete: state.completed }); }
   function getCompletion() { const state = read(); if (!state.completed) return null; const item = [...state.responses].reverse().find(response => response.classification === "valid"); return item ? Object.freeze({ ...item.values }) : null; }
   function recordResponse({ values } = {}) {
@@ -28,12 +28,19 @@ function createFractionResultFormPracticeSession({ learnerKey, storage = globalT
       if (denominator > 0 && (!value.wholeNumberEnabled || numerator < denominator)) {
         const sameValue = (whole * denominator + numerator) * 10 === 15 * denominator;
         classification = sameValue ? "valid" : "incorrect_answer";
-        if (sameValue && value.simplified) {
-          const reducedNumerator = numbers[index++], reducedDenominator = numbers[index++];
-          const targetNumerator = value.wholeNumberEnabled ? 5 : 15, targetDenominator = 10;
-          const equivalent = reducedDenominator > 0 && reducedNumerator * targetDenominator === targetNumerator * reducedDenominator;
-          const reduced = reducedNumerator > 0 && reducedDenominator > 0 && gcd(reducedNumerator, reducedDenominator) === 1;
-          classification = equivalent && reduced ? "valid" : "not_simplified";
+        if (sameValue) {
+          const needsSimplification = gcd(numerator, denominator) > 1;
+          if (needsSimplification && !value.simplified) {
+            classification = "requires_simplification";
+          } else if (value.simplified) {
+            const reducedNumerator = numbers[index++], reducedDenominator = numbers[index++];
+            const equivalent = reducedDenominator > 0 &&
+              reducedNumerator * denominator === numerator * reducedDenominator;
+            const reduced = reducedNumerator > 0 && reducedDenominator > 0 &&
+              gcd(reducedNumerator, reducedDenominator) === 1 &&
+              (!value.wholeNumberEnabled || reducedNumerator < reducedDenominator);
+            classification = equivalent && reduced ? "valid" : "not_simplified";
+          }
         }
       } else classification = "incorrect_answer";
     }

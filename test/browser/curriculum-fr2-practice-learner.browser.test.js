@@ -243,6 +243,10 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await expect(resultDenominator).toHaveValue("10");
   await expect(resultDenominator).toHaveCSS("width", "60px");
   await expect(resultNumerator).toHaveCSS("height", "36px");
+  await expect(resultNumerator).toHaveCSS("min-height", "36px");
+  await expect(resultNumerator).toHaveCSS("border-radius", "7px");
+  await expect(resultNumerator).toHaveCSS("padding-top", "0px");
+  await expect(resultNumerator).toHaveCSS("font-size", "24px");
   await page.getByRole("textbox", { name: "Heel getal" }).fill("1");
   await page.getByRole("textbox", { name: "Vereenvoudigde teller" }).fill("1");
   await page.getByRole("textbox", { name: "Vereenvoudigde noemer" }).fill("2");

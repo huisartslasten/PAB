@@ -692,6 +692,23 @@
   height: 36px;
   font-size: 24px;
 }
+
+/* Fraction fields override generic PacoGO form-control sizing inside the shared learner template. */
+.paco-page-template input:is(.fraction-practice-inline-input, .pacogo-fraction-answer__input) {
+  width: 60px !important;
+  min-width: 60px !important;
+  max-width: 60px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  padding: 0 1px !important;
+  border-radius: 7px !important;
+  font-family: inherit !important;
+  font-size: 24px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  box-sizing: border-box !important;
+}
 @media (max-width: 520px) {
   .pacogo-fraction-operation {
     gap: 6px;

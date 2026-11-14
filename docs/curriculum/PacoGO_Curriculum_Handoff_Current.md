@@ -7026,3 +7026,45 @@ Aangesloten componenten:
 - LIVE `main` blijft onaangeraakt.
 
 **Volgende concrete stap:** laat de gebruiker de bestaande breukbalken en taartpunten visueel beoordelen in PacoGO TEST. Daarna kunnen toekomstige representaties alleen via dit centrale contract, de gedeelde renderer en bijbehorende regressietests worden uitgebreid. Bouw nu geen nieuwe oefenvormen of representaties zonder een afzonderlijke pedagogische reden.
+
+
+## Skills navigation — centrale onderwerpenstructuur (2026-11-14)
+
+### Doel en gebruikersroute
+
+De leerlingroute voor Skills start voortaan met een onderwerpsoverzicht. De oude FR2-detailpagina met drie leerontwikkelingen en de knoppen voor oefenen/diagnose is voorlopig geen startpunt meer.
+
+De afgesproken navigatie is:
+1. **Skills** toont de 18 rekenonderwerpen uit de bestaande gebruikersreferentie: Splitsen, Getallen, Erbijsommen, Erafssommen, Cijferen, Delen, Vermenigvuldigen, Breuken, Maten, Procenten, Klokkijken, Geld, Grafieken, Kommagetallen, Rekenmachine, Ruimtelijk inzicht, Redactiesommen en Divers.
+2. **Breuken** opent binnen dezelfde Skills-route een tweede overzicht met: Algemeen, Optellen, Aftrekken, Vermenigvuldigen, Delen en Getallenlijn.
+3. De verdere inhoud per onderwerp wordt daarna opgebouwd vanuit de bestaande PacoGO-SLO-skills en curriculumbronnen. De navigatielabels zijn geen nieuwe curriculum Skills en creëren geen nieuwe Development-, Claim-, Evidence- of prerequisite-contracten.
+
+### Verplichte pagina-architectuur
+
+- Iedere Skills-pagina en iedere toekomstige onderwerppagina gebruikt de centrale `mountPacoPageTemplate`-shell, gedeelde PacoGO-navigatie en centrale PacoGO-tegelcomponenten.
+- De onderwerpencatalogus staat centraal in `src/features/skills/skills-navigation-catalog.js`; pagina's mogen geen eigen afwijkende lijsten definiëren.
+- De navigatie is compact en responsief en gebruikt de gedeelde PacoGO-tegelcomponent met de Skills-navigatiestijlen.
+- De eerste implementatie opent alleen Breuken. Andere hoofdonderwerpen en de zes breukensubonderwerpen zijn zichtbaar als navigatiestructuur, maar worden niet voorgesteld als reeds gebouwde leerinhoud.
+- De oude `curriculum-fr2-learning-path.html`-route blijft technisch bestaan voor bestaande compatibiliteit, maar wordt niet langer vanuit de centrale Skills-startpagina aangeboden. De bestaande FR2 curriculumdefinitie en andere curriculumcontracten zijn niet gewijzigd.
+- De centrale Fraction Practice Template en Fraction Learning Interface blijven verplicht voor toekomstige breukoefeningen. Deze navigatiestap vervangt of dupliceert die templates niet.
+
+### Implementatie
+
+- `src/features/skills/skills-navigation-catalog.js`: centrale lijst met de 18 hoofdonderwerpen en zes breukensubonderwerpen.
+- `src/features/skills/runtime.js`: centrale Skills-runtime toont afhankelijk van `domain=fractions` het hoofdonderwerpenoverzicht of het Breuken-overzicht.
+- `src/features/skills/skills-navigation.css`: compacte, responsieve presentatie voor de centrale PacoGO-tegels.
+- `src/app/routes.js`: geeft het domein door aan dezelfde Skills-runtime en laadt de navigatiestijlen.
+- `test/browser/skills-runtime.browser.test.js`: browserdekking voor alle 18 hoofdonderwerpen, de Breuken-doornavigatie, de zes subonderwerpen, learner-context en gebruik van de centrale page template.
+- `test/skills-runtime-source-contract.test.js`: broncontracten controleren de nieuwe navigatie en expliciet dat de oude FR2-detail-/oefenknoppen niet langer in de centrale Skills-startflow worden aangeboden.
+
+### Regression en oorzaakisolatie
+
+- Implementatiecommit: `97c5728b921d3d66bfb6e4b8c0b0c5acaf45d879`.
+- Full Regression #3653 / run `43627401148`: **RED**. De twee falende tests waren verouderde broncontracttests die nog eisten dat Skills de oude drie registrykaarten en FR2-detailroute aanbiedt. De implementatie was bewust veranderd naar de afgesproken onderwerpennavigatie; browserregressie was in die run overgeslagen doordat de Node-regressie eerder stopte.
+- De tests zijn vervolgens inhoudelijk herzien om de nieuwe navigatie te verifiëren: de onderwerpencatalogus, de zes breukensubonderwerpen, het centrale template, domeinrouting en het niet aanbieden van de oude FR2-detail-/oefenknoppen. Dit verwijdert geen productcontrole en versoepelt geen curriculumcontract.
+- Definitieve implementatie-/testcommit: `d904fb9c6b156d3f9b68a3271257384869517083`.
+- Full Regression #3654 / run `43627471888`: **GREEN / SUCCESS** op exact `d904fb9c6b156d3f9b68a3271257384869517083`; alle gates geslaagd, inclusief maintained Node, Vitest, volledige browserregressie en clean-working-tree-controle.
+- Browser proof #719 / run `43627471866`: **GREEN / SUCCESS** op dezelfde commit.
+- Branch: `refactor/professional-v1`. LIVE `main` is niet gewijzigd. Geen Supabase-, learner-data-, curriculumregistry-, SLO-, mastery- of persistencewijzigingen.
+
+**Volgende concrete stap:** werk de zes zichtbare Breuken-onderwerpen één voor één uit vanuit de bestaande SLO-/curriculumbronnen en de centrale PacoGO-SLO-skills. Begin met bron- en traceability-controle; houd de formele FR1-contractgap expliciet open en verzin geen FR1.D*/C*/ET*/TM*-IDs. Iedere nieuwe onderwerppagina blijft de centrale PacoGO-pagetemplate gebruiken. Voor breukoefeningen blijft de centrale Fraction Practice Template verplicht.

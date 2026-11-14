@@ -75,3 +75,29 @@ describe('PacoGO form control primitives', () => {
     expect(pageTemplateCss).not.toContain('select');
   });
 });
+
+
+describe('PacoGO bone difficulty indicator', () => {
+  it('renders five original vector bones with the correct filled state and accessible label', async () => {
+    const { createPacoBoneDifficulty } = await import('./design-system.js');
+    const indicator = createPacoBoneDifficulty({ level: 1, maxLevel: 5 });
+    expect(indicator.getAttribute('aria-label')).toBe('Moeilijkheidsgraad: 1 van 5');
+    expect(indicator.querySelectorAll('svg')).toHaveLength(5);
+    expect(indicator.querySelectorAll('svg.is-filled')).toHaveLength(1);
+    expect(indicator.querySelectorAll('svg:not(.is-filled)')).toHaveLength(4);
+    expect(indicator.querySelector('path').getAttribute('d')).toContain('M18 9.5');
+  });
+
+  it('renders all filled bones at level five and rejects invalid levels', async () => {
+    const { createPacoBoneDifficulty } = await import('./design-system.js');
+    expect(createPacoBoneDifficulty({ level: 5 }).querySelectorAll('svg.is-filled')).toHaveLength(5);
+    expect(() => createPacoBoneDifficulty({ level: 0 })).toThrow(RangeError);
+    expect(() => createPacoBoneDifficulty({ level: 6 })).toThrow(RangeError);
+  });
+
+  it('keeps bone illustration styling in the central Design System stylesheet', () => {
+    const css = fs.readFileSync(new URL('./design-system.css', import.meta.url), 'utf8');
+    expect(css).toContain('.paco-bone-difficulty__shape');
+    expect(css).toContain('.paco-bone-difficulty__bone.is-filled');
+  });
+});

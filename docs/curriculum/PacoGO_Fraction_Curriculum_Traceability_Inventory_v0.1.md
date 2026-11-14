@@ -500,3 +500,97 @@ Required before learner review: deploy the current refactor branch through the a
 ### Verification closure — TEST deployment readiness note — 2026-11-12
 
 The TEST deployment readiness note is included in commit `bd770c68e58223337cd937adacc7d6341e53a181`; Full Regression #3571 / run 43233460099: **GREEN** on that exact commit. The Netlify TEST alias still points to an older deployment from commit `67a39b26a42520fa2e04734798b897563b01c624` (published 2026-10-15). Current learner route has not been reviewed in TEST. Next: authorized deploy of the current refactor branch, exact-SHA verification, then learner-facing review.
+
+
+## 12. Current branch verification addendum — BREUKEN 01 (2026-11-13)
+
+This addendum supersedes stale branch-tree and regression snapshots above where they conflict with the verified current branch. Historical findings remain preserved as historical context.
+
+### 12.1 Exact repository and regression snapshot
+
+- Branch: `refactor/professional-v1`.
+- Current HEAD at inspection: `a275be231feddd3d8e81455a76e1b71080179e96`.
+- Full Regression #3647 / run `43550134483`: **COMPLETED / SUCCESS** on that exact HEAD.
+- Workflow: `.github/workflows/full-regression-refactor-v1.yml`.
+- The prior handoff's #3646 / `0c40b6daf129ada9f2a5d18273b1b9c50f59b0be` is the preceding verified commit, not the current HEAD.
+- LIVE `main` was not changed.
+
+### 12.2 Authoritative SLO source checked
+
+The repository mapping `PacoGO_Curriculum_Rekenen_SLO_10-18_Mapping.md` identifies SLO Kerndoelen primair onderwijs, version July 2026, as its source and maps KD10B (fractions) to FR1–FR2 plus relationships with A/B.
+
+The official SLO July 2026 primary-education kerndoelen publication was independently located. KD10B states that the learner reasons and calculates with fractions as number, ratio and division. Its content includes:
+- unit fractions, proper fractions, mixed numbers and improper fractions;
+- relationships between fractions, decimals, ratios and percentages;
+- relationships between fractions and division;
+- reasoned ordering, simplification and comparison;
+- fraction calculations in concrete situations, supported by models or number relations.
+
+The SLO illustrative document adds examples such as placing fractions on a number line, fraction language, making common denominators, making wholes from fractions, writing whole numbers as fractions and calculating with named or unnamed fractions. These illustrations must remain distinguished from the formal KD10B wording.
+
+KD10B itself does not supply PacoGO development IDs or a complete grade-by-grade developmental sequence. SLO's end-of-primary reference level and PacoGO's candidate development structure must not be conflated.
+
+### 12.3 FR1 source finding — formal contract not recovered
+
+The current branch tree contains no FR1-specific curriculum contract artifact and registry v0.6.0-candidate contains no FR1 entry.
+
+The existing traceability sources and prior handoff provenance support the existing FR1 skill-level definition:
+**FR1 — Breuken representeren en interpreteren.**
+
+Its recorded conceptual scope includes fractions as meaningful quantities and relationships: quantity, part–whole, ratio and position. It is not defined as a primary fraction-calculation skill. Prior curriculum handoffs also record cross-skill relationships and explicit decisions not to create separate skills for comparison, ordering, positioning, simplification, common denominators or broad fraction operations.
+
+However, the inspected current repository sources do not provide a recoverable, formal FR1 set of developments, claims, evidence targets, task models, task catalogue or registry binding. No FR1.D*, FR1.C*, FR1.ET* or FR1.TM* identifiers may be inferred from summaries or invented. The original FR1 Skill Development Pass / Development Evidence File remains the exact source-recovery target. If it cannot be recovered, the owner must decide how to handle the missing formal contract before formal FR1 implementation.
+
+### 12.4 FR2 candidate contract confirmed
+
+Registry v0.6.0-candidate contains FR2 — Breukequivalentie herkennen en gebruiken:
+- FR2.D1 Equivalentie herkennen;
+- FR2.D2 Equivalentie verklaren;
+- FR2.D3 Equivalentie functioneel gebruiken;
+- FR2.C1–C3;
+- FR2.ET1–ET6;
+- FR2.TM1–TM5.
+
+The task/evidence audit and candidate alignment specification remain unresolved design artifacts. In particular:
+- T01/T02 recognition ET1 does not make a required explanation proof of ET3 reasoning;
+- TM2 covers ET3 + ET4, but an actual contrast/stability observation is required for ET4;
+- TM5 covers ET2 + ET6; a changed visual surface alone does not establish that the countertask elicits those targets;
+- TM4/ET5 functional use is not covered by the current T01–T05 task set;
+- synthetic controller shortcuts for quality, relevance, independence and contradiction are not approved C3 assessment and are not empirical learner evidence.
+
+Do not change registry mappings, C3 rules, mastery rules or persistence to conceal these gaps.
+
+### 12.5 Corrected current branch implementation inventory
+
+The current recursive Git tree at HEAD `a275be231feddd3d8e81455a76e1b71080179e96` confirms the following learner-facing files:
+- `curriculum-fr2-fraction-equivalence.html` — FR2-T01;
+- `curriculum-fr2-fractions.html` — FR2-T02;
+- `curriculum-fr2-representation-transfer.html` — FR2-T03;
+- `curriculum-fr2-surface-countertask.html` — FR2-T04;
+- `curriculum-fr2-language-reduced-transfer.html` — FR2-T05;
+- `curriculum-fr2-practice-learner.html` — short learner-facing practice route;
+- `curriculum-fraction-diagnostic-learner.html` — formative diagnostic route.
+
+The branch also contains browser tests:
+- `test/browser/curriculum-fr2-fractions.browser.test.js`;
+- `test/browser/curriculum-fr2-generalisation.browser.test.js`;
+- `test/browser/curriculum-fr2-learning-path.browser.test.js`;
+- `test/browser/curriculum-fr2-practice-learner.browser.test.js`;
+- `test/browser/curriculum-fraction-diagnostic-learner.browser.test.js`.
+
+This corrects the earlier section 6 statement that only two FR2 HTML demo pages existed. That was true of the older inspected tree but is no longer true at the verified current HEAD. The five task pages are still synthetic technical demonstrations, not validated assessment instruments or proof of a complete vertical curriculum.
+
+The central Fraction Practice Template and shared interface/input components listed in section 7 and in the current handoff remain present. The diagnostic remains formative and local-only under its separate v2 contract; it is not FR1/FR2 formal task coverage.
+
+### 12.6 Phase-01 conclusion and safe build boundary
+
+The source reconstruction establishes:
+1. KD10B is the authoritative SLO content anchor for fractions.
+2. FR1 exists at skill-definition level in prior curriculum decisions, but its formal development/evidence contract is not recovered in the current repository.
+3. FR2 has a complete candidate registry structure, but its task/evidence alignment remains unresolved.
+4. The central Fraction Practice Template and reusable Fraction Learning Interface exist and are shared; they should be extended, not duplicated.
+5. Five FR2 synthetic task pages, a short practice route and a formative diagnostic route exist; none constitutes the complete vertical fraction learner route to end group 8.
+
+**First concrete action for BREUKEN 02:** construct the source-traceable vertical coverage matrix for KD10B using only recovered FR1/FR2 definitions, their existing cross-skill relations and the exact SLO wording. Mark each KD10B content element as covered, partially covered, cross-skill-dependent or unresolved. Keep the missing FR1 formal contract explicitly blocked; do not manufacture identifiers. Resolve source recovery/owner disposition before formal FR1 task/evidence implementation.
+
+**No curriculum, registry, task, evidence, mastery, runtime, Supabase or learner-data contract was changed in this phase.**

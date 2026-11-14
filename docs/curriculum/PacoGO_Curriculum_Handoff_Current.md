@@ -6924,3 +6924,27 @@ De persistentieregressie controleert alle drie opgeslagen responsclassificaties 
 - De voorafgaande tussencommit `2fa51b87aa332a77b02da39a66c413a3954bf120` was RED omdat de bestaande persistentieregressie nog slechts één respons verwachtte; de assertion is daarna uitgebreid om de drie bedoelde sessieresponsen exact te controleren.
 - Deze handoff-update is een nieuwe projectcommit en moet zelf opnieuw door Full Regression worden geverifieerd.
 - LIVE `main` is onaangeraakt. Geen Netlify-deploy en geen Supabase-wijziging.
+
+
+### FR2 leerlingnamen — leerlinggerichte presentatie gescheiden van curriculumregister (2026-11-14)
+
+De FR2-leerroute toont voor de drie bestaande ontwikkelingen nu kindvriendelijke leerlingnamen en korte uitleg. De officiële ontwikkelingsnamen, definities en identifiers in `PacoGO_Curriculum_Registry_v0.6.json` zijn ongewijzigd gebleven.
+
+Leerlinggerichte presentatie:
+- `FR2.D1`: **Wanneer zijn breuken even groot?** — “Ontdek welke breuken evenveel waard zijn, ook als ze er anders uitzien.”
+- `FR2.D2`: **Hoe weet je dat breuken even groot zijn?** — “Leg uit hoe je kunt zien dat twee breuken even groot zijn.”
+- `FR2.D3`: **Slim rekenen met breuken** — “Gebruik breuken die even groot zijn om slimmer te vergelijken en te rekenen.”
+
+De mapping staat uitsluitend in `src/features/skills/fraction-learning-path-runtime.js` als leerlinggerichte presentatielaag. Onbekende development-ID's vallen terug op de bestaande registry-naam en -definitie. De browserregressie controleert alle drie zichtbare namen, alle drie beschrijvingen en behoud van `FR2.D1`–`FR2.D3`.
+
+- Implementatiecommit: `52ff6058e3d09a5852471a4a3451645bc04049cd`.
+- Testcommit: `0c40b6daf129ada9f2a5d18273b1b9c50f59b0be`.
+- Branch: `refactor/professional-v1`.
+- Full Regression #3646 / run `43549705950`: **GREEN / success** op exact testcommit `0c40b6daf129ada9f2a5d18273b1b9c50f59b0be`; alle workflowstappen geslaagd, inclusief volledige browserregressie en clean-working-tree-controle.
+- Browser proof #716 / run `43549705944`: **GREEN / success** op dezelfde commit.
+- Full Regression #3645 op tussencommit `52ff6058e3d09a5852471a4a3451645bc04049cd` eindigde RED terwijl de opvolgende volledige testcommit #3646 GREEN is. De geldige eindverificatie voor de complete wijziging is #3646 op de uiteindelijke commit; de tussencommit is niet als release-/eindstatus aangemerkt.
+- Geen curriculumregister, SLO-mapping, task/evidence/mastery-contract, learner-state, Supabase of LIVE `main` gewijzigd. Geen Netlify-deploy uitgevoerd.
+
+**Volgende concrete stap:** maak vanuit de bestaande SLO-documenten, curriculumregistry en repository een gerichte dekkinginventaris van de volledige breukenleerlijn tot eind groep 8. Begin met de bestaande FR1/FR2-dekking en de aantoonbare lacunes; herstel eerst de formele FR1-bron/contract-gap voordat nieuwe FR1-ontwikkelingen of taken worden gebouwd. Houd dit als inventarisatie-/broncontrole-stap afgebakend; ontwerp niet opnieuw de hele leerlijn.
+
+Deze handoff-update moet zelf door Full Regression worden geverifieerd. Laatste geverifieerde implementatie-/testcommit vóór deze handoff-update: `0c40b6daf129ada9f2a5d18273b1b9c50f59b0be`, Full Regression #3646 **GREEN**. LIVE `main` blijft onaangeraakt.

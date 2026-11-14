@@ -6903,3 +6903,24 @@ The non-formal subtraction practice sequence retains the common denominator in i
 ### Shared fraction answer input sizing (2026-11-13)
 
 The shared fraction input styles now size inline missing-value fields and full-answer numerator/denominator fields by character width rather than a broad fixed pixel width. They inherit the surrounding fraction's font size and retain a bold weight, so entered digits visually match the symbolic fraction. Browser regression now explicitly renders a missing denominator in the denominator slot and checks its computed width and inherited font size. The existing full-answer component already provides the optional whole-number field, the simplify control, and the adjacent reduced-fraction fields; those controls remain relevant to complete fraction answers, not single-value intermediate steps.
+
+
+### Fraction result-form browser regression — testscenario hersteld (2026-11-14)
+
+De rode Full Regression op commit `3a5b7c0eff6329ae6b55720e4a4e36f1f3f1eba1` is geïsoleerd tot de browser-test voor het invoeren van vijftien tienden als gemengd getal en vereenvoudigde breuk.
+
+De test verwachtte bij onvolledige invoer een onjuiste tekst. De sessie valideerde correct als `invalid_input` en de learner-pagina toonde de bestaande contracttekst: “Vul de getoonde velden met hele getallen in.” Er is geen productcode- of rekenlogica-defect vastgesteld.
+
+Het browser-scenario test nu expliciet drie opeenvolgende situaties:
+1. Onvolledige invoer (vereenvoudigingsvelden leeg) → `invalid_input`.
+2. Volledig ingevuld maar rekenkundig onjuist antwoord (`1 15/10 = 1 1/2`) → `incorrect_answer`.
+3. Correct antwoord na wijziging van de oorspronkelijke teller naar 5 (`1 5/10 = 1 1/2`) → `valid`.
+
+De persistentieregressie controleert alle drie opgeslagen responsclassificaties en waarden. Er is uitsluitend het browser-testbestand aangepast; geen productcode, gedeelde Fraction-component, sessievalidatie, curriculum, evidence/mastery, Supabase of LIVE `main` is gewijzigd. De testverwachtingen zijn niet versoepeld.
+
+- Branch: `refactor/professional-v1`.
+- Implementatie-/testcommit: `abc3d6e74ce67267c397b9369a8a6380e79d180b`.
+- Full Regression #3641 / run `43545311589`: **GREEN / success** op exact deze commit; alle workflowstappen geslaagd, inclusief volledige browserregressie en clean-working-tree-controle.
+- De voorafgaande tussencommit `2fa51b87aa332a77b02da39a66c413a3954bf120` was RED omdat de bestaande persistentieregressie nog slechts één respons verwachtte; de assertion is daarna uitgebreid om de drie bedoelde sessieresponsen exact te controleren.
+- Deze handoff-update is een nieuwe projectcommit en moet zelf opnieuw door Full Regression worden geverifieerd.
+- LIVE `main` is onaangeraakt. Geen Netlify-deploy en geen Supabase-wijziging.

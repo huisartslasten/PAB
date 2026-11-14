@@ -38,6 +38,8 @@ test('FR2 learning path reads the registered developments and opens existing pra
       pageTitle: document.querySelector('.paco-template-main h1')?.textContent,
       skillTitle: document.querySelector('.fraction-learning-path-card h2')?.textContent,
       names,
+      descriptions: [...document.querySelectorAll('.fraction-learning-path-development p')].map(node => node.textContent),
+      developmentIds: [...document.querySelectorAll('.fraction-learning-path-id')].map(node => node.textContent),
       destination,
       boundary: document.querySelector('.fraction-learning-path-boundary')?.textContent || ''
     };
@@ -45,10 +47,16 @@ test('FR2 learning path reads the registered developments and opens existing pra
   expect(result.pageTitle).toBe('Breuken');
   expect(result.skillTitle).toBe('Breukequivalentie herkennen en gebruiken');
   expect(result.names).toEqual([
-    'Equivalentie herkennen',
-    'Equivalentie verklaren',
-    'Equivalentie functioneel gebruiken'
+    'Wanneer zijn breuken even groot?',
+    'Hoe weet je dat breuken even groot zijn?',
+    'Slim rekenen met breuken'
   ]);
+  expect(result.descriptions).toEqual([
+    'Ontdek welke breuken evenveel waard zijn, ook als ze er anders uitzien.',
+    'Leg uit hoe je kunt zien dat twee breuken even groot zijn.',
+    'Gebruik breuken die even groot zijn om slimmer te vergelijken en te rekenen.'
+  ]);
+  expect(result.developmentIds).toEqual(['FR2.D1', 'FR2.D2', 'FR2.D3']);
   expect(result.destination).toContain('curriculum-fr2-practice-learner.html');
   expect(result.destination).toContain('viewStudent=Zyon');
   expect(result.destination).toContain('mode=management');

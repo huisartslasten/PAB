@@ -6948,3 +6948,33 @@ De mapping staat uitsluitend in `src/features/skills/fraction-learning-path-runt
 **Volgende concrete stap:** maak vanuit de bestaande SLO-documenten, curriculumregistry en repository een gerichte dekkinginventaris van de volledige breukenleerlijn tot eind groep 8. Begin met de bestaande FR1/FR2-dekking en de aantoonbare lacunes; herstel eerst de formele FR1-bron/contract-gap voordat nieuwe FR1-ontwikkelingen of taken worden gebouwd. Houd dit als inventarisatie-/broncontrole-stap afgebakend; ontwerp niet opnieuw de hele leerlijn.
 
 Deze handoff-update moet zelf door Full Regression worden geverifieerd. Laatste geverifieerde implementatie-/testcommit vóór deze handoff-update: `0c40b6daf129ada9f2a5d18273b1b9c50f59b0be`, Full Regression #3646 **GREEN**. LIVE `main` blijft onaangeraakt.
+
+
+## BREUKEN 01 — bronnenreconstructie (2026-11-13)
+
+### Uitgevoerde broncontrole
+
+De fase BREUKEN 01 heeft de actuele SLO-/PacoGO-bronnen en de implementatie op `refactor/professional-v1` gereconstrueerd. De bevindingen zijn vastgelegd in:
+`docs/curriculum/PacoGO_Fraction_Curriculum_Traceability_Inventory_v0.1.md`, sectie 12.
+
+Bronconclusies:
+- SLO KD10B (publicatie primair onderwijs, versie juli 2026) is het inhoudelijke anker: breuken als getal, verhouding en deling; typen breuken; relaties met decimalen/verhoudingen/procenten en deling; beredeneerd ordenen, vereenvoudigen en vergelijken; rekenen in concrete situaties met modellen/getalrelaties.
+- De SLO-illustraties geven voorbeelden zoals getallenlijn, gelijknamig maken en hele getallen als breuk. Houd illustraties gescheiden van de formele kerndoeltekst.
+- FR1 — Breuken representeren en interpreteren — is in eerdere curriculumartefacten op skillniveau teruggevonden, inclusief de inhoudelijke kern en afbakeningen. De formele FR1 development/claim/evidence/task-bron is niet teruggevonden in de actuele repository of de doorzochte eerdere handoffs. Geen FR1.D*, FR1.C*, FR1.ET* of FR1.TM* identifiers verzinnen. Herstel de oorspronkelijke FR1 Skill Development Pass / Development Evidence File of leg de ontbrekende contractvelden ter besluitvorming voor.
+- Registry v0.6.0-candidate bevat FR2 met D1–D3, C1–C3, ET1–ET6 en TM1–TM5. FR2 Task–Evidence Audit/Specification bevatten nog open alignmentbesluiten; wijzig mappings, C3, mastery of persistence niet zonder goedgekeurde specificatie.
+- De huidige branch tree bevat vijf FR2 task-demo's (T01–T05), een korte FR2-practice route en een aparte formatieve diagnostische route. Dit zijn technische/synthetische routes, geen complete verticale leerlijn of empirisch gevalideerde assessment.
+- De centrale Fraction Practice Template, Fraction Learning Interface en gedeelde invoercomponenten bestaan en blijven verplicht hergebruikspunt.
+
+### Branch, commits en regressie
+
+- Branch: `refactor/professional-v1`; LIVE `main` niet aangeraakt.
+- Baseline HEAD bij start broncontrole: `a275be231feddd3d8e81455a76e1b71080179e96`.
+- Full Regression #3647 / run `43550134483`: GREEN / success op exact baseline HEAD.
+- Broninventaris bijgewerkt in commit `9e9e62f5cb2a1b3cd916fe7c33e297838ce83a85`.
+- Full Regression #3648 / run `43553034432` op exact die inventariscommit is gestart. Bij deze handoff-update was de run nog IN PROGRESS; Node/Vitest en eerdere gates waren groen, Chromium-installatie liep nog. Claim geen groen resultaat totdat de workflow voltooid is.
+
+### Volgende concrete stap — BREUKEN 02
+
+Maak de brongetrouwe verticale KD10B-dekkingsmatrix met bestaande FR1/FR2-definities, bestaande A/B-relaties en exacte SLO-bronherkomst. Markeer elk KD10B-element als gedekt, gedeeltelijk gedekt, afhankelijk van een bestaande cross-skill-relatie of onopgelost. Houd de formele FR1-contractgap expliciet open. Ga niet zelf nieuwe ontwikkelingen, claims, evidence targets, task models of prerequisites maken.
+
+Geen curriculumregistry, runtime, task/evidence/mastery-contract, Supabase of learner-data wijziging uitgevoerd in BREUKEN 01. De handoff-updatecommit die hieruit voortkomt moet zelf door Full Regression worden geverifieerd.

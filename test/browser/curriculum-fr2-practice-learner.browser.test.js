@@ -337,18 +337,44 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   expect(JSON.parse(resultFormState[1])).toEqual({
     schemaVersion: 2,
     completed: true,
-    responses: [{
-      classification: "valid",
-      values: {
-        wholeNumberEnabled: true,
-        wholeNumber: "1",
-        numerator: "5",
-        denominator: "10",
-        simplified: true,
-        simplifiedNumerator: "1",
-        simplifiedDenominator: "2"
+    responses: [
+      {
+        classification: "invalid_input",
+        values: {
+          wholeNumberEnabled: true,
+          wholeNumber: "1",
+          numerator: "15",
+          denominator: "10",
+          simplified: true,
+          simplifiedNumerator: "",
+          simplifiedDenominator: ""
+        }
+      },
+      {
+        classification: "incorrect_answer",
+        values: {
+          wholeNumberEnabled: true,
+          wholeNumber: "1",
+          numerator: "15",
+          denominator: "10",
+          simplified: true,
+          simplifiedNumerator: "1",
+          simplifiedDenominator: "2"
+        }
+      },
+      {
+        classification: "valid",
+        values: {
+          wholeNumberEnabled: true,
+          wholeNumber: "1",
+          numerator: "5",
+          denominator: "10",
+          simplified: true,
+          simplifiedNumerator: "1",
+          simplifiedDenominator: "2"
+        }
       }
-    }]
+    ]
   });
   expect(resultFormState[1]).not.toContain(learnerKey);
   const subtractionState = state.local.find(([key]) => key.startsWith("pacogo:fraction-subtraction-practice:"));

@@ -48,7 +48,8 @@ test('Skills overview shows the mathematics subjects and opens the fraction topi
     'Grafieken', 'Kommagetallen', 'Rekenmachine', 'Ruimtelijk inzicht',
     'Redactiesommen', 'Divers'
   ]);
-  expect(result.navigation).toContain('skills.html?domain=fractions');
+  expect(result.navigation).toContain('skills.html');
+  expect(result.navigation).toContain('domain=fractions');
   expect(result.navigation).toContain('viewStudent=Zyon');
   expect(result.navigation).toContain('mode=management');
 });

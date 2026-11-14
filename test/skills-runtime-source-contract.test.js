@@ -3,28 +3,40 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const runtime = readFileSync(new URL('../src/features/skills/runtime.js', import.meta.url), 'utf8');
+const catalog = readFileSync(new URL('../src/features/skills/skills-navigation-catalog.js', import.meta.url), 'utf8');
 const routes = readFileSync(new URL('../src/app/routes.js', import.meta.url), 'utf8');
 
-test('central Skills entry is driven by the curriculum registry and opens the FR2 learning path', () => {
-  assert.match(runtime, /PacoGO_Curriculum_Registry_v0\.6\.json/);
-  assert.match(runtime, /A1: Object\.freeze/);
-  assert.match(runtime, /B1: Object\.freeze/);
-  assert.match(runtime, /FR2: Object\.freeze/);
-  assert.match(runtime, /curriculum-a1-numberline\.html/);
-  assert.match(runtime, /curriculum-b1-learner\.html/);
-  assert.match(runtime, /curriculum-fr2-learning-path\.html/);
-  assert.match(routes, /routes\['curriculum-fr2-learning-path\.html'\]/);
-  assert.match(routes, /routes\['curriculum-fraction-diagnostic-learner\.html'\]/);
+test('central Skills entry renders subject navigation and opens the fraction overview', () => {
+  assert.match(runtime, /MATH_SKILL_SUBJECTS/);
+  assert.match(runtime, /FRACTION_NAVIGATION_TOPICS/);
+  assert.match(runtime, /const FRACTION_DOMAIN = 'fractions'/);
+  assert.match(runtime, /navigate\(buildViewUrl\('skills\.html'/);
+  assert.match(runtime, /extra: \{ domain: FRACTION_DOMAIN \}/);
+  assert.match(routes, /domain: url\.searchParams\.get\('domain'\)/);
+  assert.match(routes, /skills-navigation\.css/);
+});
+
+test('Skills navigation catalog contains the agreed mathematics and fraction topic hierarchy', () => {
+  for (const subject of [
+    'Splitsen', 'Getallen', 'Erbijsommen', 'Erafssommen', 'Cijferen', 'Delen',
+    'Vermenigvuldigen', 'Breuken', 'Maten', 'Procenten', 'Klokkijken', 'Geld',
+    'Grafieken', 'Kommagetallen', 'Rekenmachine', 'Ruimtelijk inzicht',
+    'Redactiesommen', 'Divers'
+  ]) assert.ok(catalog.includes(`label: '${subject}'`), `Missing mathematics subject: ${subject}`);
+
+  for (const topic of ['Algemeen', 'Optellen', 'Aftrekken', 'Vermenigvuldigen', 'Delen', 'Getallenlijn']) {
+    assert.ok(catalog.includes(`label: '${topic}'`), `Missing fraction topic: ${topic}`);
+  }
+});
+
+test('central Skills entry does not expose the legacy FR2 detail page or practice shortcuts', () => {
+  assert.doesNotMatch(runtime, /curriculum-fr2-learning-path\.html/);
+  assert.doesNotMatch(runtime, /Start met breuken oefenen|Start breukendiagnose/);
+  assert.doesNotMatch(runtime, /fraction-learning-path-developments/);
 });
 
 test('central Skills entry does not depend on retired timed practice or legacy Skill persistence', () => {
   assert.doesNotMatch(runtime, /createMathSession|DEFAULT_SKILL_DURATION_SECONDS|SKILL_DURATIONS_SECONDS/);
   assert.doesNotMatch(runtime, /skillDefinitions|skillConfiguration|math-skill-/);
   assert.doesNotMatch(runtime, /score|highScore|setInterval/);
-});
-
-test('central Skills entry distinguishes persisted B1 practice from A1 and FR2 prototypes', () => {
-  assert.match(runtime, /B1:[\s\S]*?voortgang wordt opgeslagen/);
-  assert.match(runtime, /A1:[\s\S]*?voortgang nog niet gekoppeld/);
-  assert.match(runtime, /FR2:[\s\S]*?voortgang nog niet gekoppeld/);
 });

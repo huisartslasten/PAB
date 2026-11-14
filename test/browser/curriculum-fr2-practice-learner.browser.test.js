@@ -248,6 +248,9 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await expect(resultNumerator).toHaveCSS("padding-top", "0px");
   await expect(resultNumerator).toHaveCSS("font-size", "24px");
   await page.getByRole("textbox", { name: "Heel getal" }).fill("1");
+  await page.getByRole("button", { name: "Controleren" }).last().click();
+  await expect(page.locator("#resultFormFeedback")).toContainText("Controleer teller, noemer en eventueel het hele getal");
+  await resultNumerator.fill("5");
   await page.getByRole("textbox", { name: "Vereenvoudigde teller" }).fill("1");
   await page.getByRole("textbox", { name: "Vereenvoudigde noemer" }).fill("2");
   await page.getByRole("button", { name: "Controleren" }).last().click();

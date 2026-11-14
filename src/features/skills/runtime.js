@@ -14,8 +14,8 @@ const SKILL_DESTINATIONS = Object.freeze({
     status: 'Oefenen met leerlingprofiel; voortgang wordt opgeslagen.'
   }),
   FR2: Object.freeze({
-    page: 'curriculum-fraction-diagnostic-learner.html',
-    status: 'Prototype — voortgang nog niet gekoppeld.'
+    page: 'curriculum-fr2-learning-path.html',
+    status: 'Bekijk de leerontwikkelingen en start met oefenen.'
   })
 });
 

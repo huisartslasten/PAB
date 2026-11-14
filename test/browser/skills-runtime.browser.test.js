@@ -49,7 +49,7 @@ test('central Skills route renders A1, B1 and FR2 and preserves learner context'
   expect(result.firstNavigation).toContain('curriculum-a1-numberline.html');
   expect(result.firstNavigation).toContain('viewStudent=Zyon');
   expect(result.firstNavigation).toContain('mode=management');
-  expect(result.fractionNavigation).toContain('curriculum-fraction-diagnostic-learner.html');
+  expect(result.fractionNavigation).toContain('curriculum-fr2-learning-path.html');
   expect(result.fractionNavigation).toContain('viewStudent=Zyon');
   expect(result.fractionNavigation).toContain('mode=management');
 });

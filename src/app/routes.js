@@ -26,6 +26,7 @@ import { createFlashPageRuntime } from '../features/practice/flash/page-runtime.
 import { createFlashcardsPageRuntime } from '../features/practice/flashcards/page-runtime.js';
 import { createRockPaperScissorsPageRuntime } from '../features/practice/rock-paper-scissors/page-runtime.js';
 import { createSkillsRuntime } from '../features/skills/runtime.js';
+import { createFractionLearningPathRuntime } from '../features/skills/fraction-learning-path-runtime.js';
 import { createFractionDiagnosticRuntime } from '../features/curriculum/fraction-diagnostic-runtime.js';
 import { createAgendaPageRuntime } from '../features/agenda/page-runtime.js';
 import { createMonthCalendarRuntime } from '../features/agenda/month-calendar-runtime.js';
@@ -66,6 +67,7 @@ export function createPacoRouteRegistry({ app, mounts, documentRef = document } 
   routes['oefentoets.html'] = defineRoute(({ url, navigate }) => createPracticeTestRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', contentKind: url.searchParams.get('content_kind') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css']);
   routes['games.html'] = defineRoute(({ url, navigate }) => createGamesRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), lessonId: url.searchParams.get('lesson_id') || '', documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/practice/games.css']);
   routes['skills.html'] = defineRoute(({ url, navigate }) => createSkillsRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/components/paco-tile.css']);
+  routes['curriculum-fr2-learning-path.html'] = defineRoute(({ url, navigate }) => createFractionLearningPathRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/skills/fraction-learning-path.css']);
   routes['curriculum-fraction-diagnostic-learner.html'] = defineRoute(({ url, navigate }) => createFractionDiagnosticRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/curriculum/fraction-diagnostic.css']);
   routes['double-or-nothing.html'] = game('double-or-nothing', ({ context, lessonId, navigate }) => createDoubleOrNothingPageRuntime({ app, templateMount: mounts.templateMount, context, lessonId, documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/double-or-nothing.css']);
   routes['millionaire.html'] = defineRoute(({ url, navigate }) => createMillionairePageRuntime({ app, templateMount: mounts.templateMount, context: readViewContext(url.searchParams), documentRef, navigate }), ['src/features/lessons/lesson-context-view.css', 'src/features/lessons/practice-page.css', 'src/features/practice/millionaire/millionaire.css']);

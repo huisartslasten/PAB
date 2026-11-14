@@ -1,0 +1,17 @@
+.fraction-learning-path-card{margin:0 0 14px;padding:18px 20px}
+.fraction-learning-path-eyebrow{margin:0 0 6px;color:#47749d;font-size:12px;font-weight:900;letter-spacing:.08em}
+.fraction-learning-path-card h2{margin:0 0 8px;font:900 25px/1.15 "Baloo 2",Nunito,sans-serif;color:#102b57}
+.fraction-learning-path-definition{max-width:850px;margin:0 0 16px;color:#425b79;font-size:16px;line-height:1.5}
+.fraction-learning-path-actions{display:flex;flex-wrap:wrap;gap:10px}
+.fraction-learning-path-actions button{margin:0}
+.fraction-learning-path-primary,.fraction-learning-path-secondary{min-height:44px}
+.fraction-learning-path-developments{display:grid;gap:12px;margin:14px 0 0;padding:0;list-style:none}
+.fraction-learning-path-development{display:flex;align-items:flex-start;gap:13px;padding:13px;border:1px solid #dce9f4;border-radius:15px;background:#fbfdff}
+.fraction-learning-path-number{display:grid;place-items:center;flex:0 0 34px;height:34px;border-radius:11px;background:#e5f2ff;color:#145b9c;font-weight:900}
+.fraction-learning-path-development-details{min-width:0}
+.fraction-learning-path-development h3{margin:0 0 4px;font:800 18px/1.2 "Baloo 2",Nunito,sans-serif;color:#102b57}
+.fraction-learning-path-development p{margin:0 0 5px;color:#526985;line-height:1.4}
+.fraction-learning-path-id{color:#7890a8;font-size:11px;font-weight:800;letter-spacing:.04em}
+.fraction-learning-path-muted{margin:0;color:#647894;line-height:1.4}
+.fraction-learning-path-boundary{padding:12px 15px;border-left:4px solid #e5b94f;border-radius:8px;background:#fff8e6;color:#725b25;font-size:13px;line-height:1.45}
+@media(max-width:600px){.fraction-learning-path-card{padding:14px}.fraction-learning-path-actions{display:grid}.fraction-learning-path-actions button{width:100%}.fraction-learning-path-development{gap:10px;padding:11px}}

@@ -7125,3 +7125,29 @@ Deze volgorde is een formatieve oefen-/interface-eis. Verwar dit niet met formel
 - Neem de hierboven vastgelegde vereenvoudigingsvolgorde mee in de gedeelde antwoord-/sessieflow; controleer eerst wat de bestaande component al ondersteunt voordat er iets wordt gewijzigd.
 - Gebruik de door de gebruiker aangeleverde Junior Einstein-screenshots uitsluitend als inhoudelijke referentie voor de opgavevorm. Bouw eigen PacoGO-opgaven, uitleg, feedback en presentatie.
 - LIVE `main` blijft onaangeraakt. Geen Supabase-wijziging of deployment zonder afzonderlijke noodzaak en opdracht.
+
+
+### Gedeelde vereenvoudigingsstap — implementatie 14 november 2026
+
+De bestaande formatieve breukantwoord-/sessieflow is aangepast zodat een correct maar nog vereenvoudigbaar antwoord niet direct wordt afgerond.
+
+- `pacogo-engine/fraction-result-form-practice-session.js`: nieuwe tussenclassificatie `requires_simplification`. De sessie blijft open wanneer de oorspronkelijke breuk nog een gemeenschappelijke deler heeft. Een expliciet ingevoerde, equivalente en volledig vereenvoudigde vorm rondt de oefening af.
+- `pacogo-engine/fraction-result-form-practice-session.test.js`: regressiedekking toegevoegd voor de verplichte tussenstap, het openblijven van de sessie en afronding na correcte vereenvoudiging.
+- `curriculum-fr2-practice-learner.html`: feedback maakt het onderscheid tussen rekenkundig correct maar nog te vereenvoudigen, onjuiste vereenvoudiging en een onjuist antwoord zichtbaar.
+- De gedeelde antwoordinvoercomponent en bestaande Fraction Practice Template zijn hergebruikt; geen parallelle invoercomponent of template toegevoegd.
+- Dit is een technische wijziging in de bestaande formatieve result-form-oefening. De eerste nieuwe opteloefening is nog niet gebouwd of geïntegreerd.
+- De huidige result-form-sessie blijft een specifieke oefening voor vijftien tienden; deze implementatie is nog geen generiek configureerbaar contract voor alle toekomstige breukoefeningen. Dat moet bij de volgende bouwstap expliciet worden ontworpen vanuit de daadwerkelijke oefenbehoefte, zonder dit bestaande voorbeeld als universeel model te veronderstellen.
+
+Commits:
+- `67d0758684e2a452e02c68e1f67ddb1eb5b30aaf` — sessielogica;
+- `79b09ac3a872e051e119c7613c1db2b7cd2b8e9e` — tests;
+- `424e1b3412182aaf5e234d50b46b695631f5ff3f` — pagina-feedback.
+
+Full Regression:
+- #3662 / run `43651211917`: SUCCESS op exact `67d0758684e2a452e02c68e1f67ddb1eb5b30aaf`;
+- #3663 / run `43651215131`: SUCCESS op exact `79b09ac3a872e051e119c7613c1db2b7cd2b8e9e`;
+- #3664 / run `43651218875`: **SUCCESS** op exact eindcommit `424e1b3412182aaf5e234d50b46b695631f5ff3f`; alle stappen geslaagd, inclusief curriculum-engine-regressie, architectuurgrenzen, Node, Vitest, browserregressie en clean-working-tree-controle.
+
+Geen SLO-, curriculumregistry-, evidence-, mastery-, learner-state-, Supabase- of LIVE `main`-wijziging. Geen deployment.
+
+**Volgende concrete stap:** ontwerp vanuit de daadwerkelijke eerste opteloefening het herbruikbare oefen-/sessiecontract dat meerdere opgaven en verschillende antwoordvormen kan ondersteunen. Controleer eerst de exacte bronopgave en de gewenste getalnotatie; leid die niet af uit de bestaande vijftien-tienden-demonstratie. Gebruik de centrale PacoGO-paginatemplate en de bestaande Fraction Practice Template/interface. Houd de botjesindicator buiten de oefenpagina totdat de gebruiker de zichtbare vorm heeft beoordeeld.

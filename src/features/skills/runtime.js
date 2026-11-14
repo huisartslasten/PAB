@@ -2,27 +2,15 @@ import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
 import { createPacoTile, createPacoTileGrid } from '../../components/paco-tile.js';
 import { buildViewUrl } from '../../core/view-context.js';
+import { MATH_SKILL_SUBJECTS, FRACTION_NAVIGATION_TOPICS } from './skills-navigation-catalog.js';
 
-const CURRICULUM_REGISTRY_URL = './docs/curriculum/PacoGO_Curriculum_Registry_v0.6.json';
-const SKILL_DESTINATIONS = Object.freeze({
-  A1: Object.freeze({
-    page: 'curriculum-a1-numberline.html',
-    status: 'Prototype — voortgang nog niet gekoppeld.'
-  }),
-  B1: Object.freeze({
-    page: 'curriculum-b1-learner.html',
-    status: 'Oefenen met leerlingprofiel; voortgang wordt opgeslagen.'
-  }),
-  FR2: Object.freeze({
-    page: 'curriculum-fr2-learning-path.html',
-    status: 'Leerlijn beschikbaar; voortgang nog niet gekoppeld.'
-  })
-});
+const FRACTION_DOMAIN = 'fractions';
 
 export function createSkillsRuntime({
   app,
   templateMount,
   context,
+  domain = '',
   documentRef = document,
   navigate
 } = {}) {
@@ -32,70 +20,80 @@ export function createSkillsRuntime({
 
   const student = context?.student || '';
   const content = documentRef.createElement('div');
-  const fetchRegistry = documentRef.defaultView?.fetch?.bind(documentRef.defaultView)
-    || globalThis.fetch;
 
-  function renderMessage(message, isError = false) {
-    content.replaceChildren();
-    const card = documentRef.createElement('section');
-    card.className = 'paco-template-card';
-    const text = documentRef.createElement('p');
-    text.textContent = message;
-    if (isError) text.setAttribute('role', 'alert');
-    card.appendChild(text);
-    content.appendChild(card);
+  function openFractions() {
+    navigate(buildViewUrl('skills.html', {
+      student,
+      mode: context?.mode,
+      extra: { domain: FRACTION_DOMAIN }
+    }));
   }
 
-  function openSkill(skillId) {
-    const destination = SKILL_DESTINATIONS[skillId];
-    if (!destination) return;
-    navigate(buildViewUrl(destination.page, { student, mode: context?.mode }));
-  }
-
-  async function renderSkills() {
+  function renderSubjectOverview() {
     content.replaceChildren();
-    const response = await fetchRegistry(CURRICULUM_REGISTRY_URL);
-    if (!response?.ok) throw new Error('De curriculumcatalogus kon niet worden geladen.');
-    const registry = await response.json();
-    const skills = (Array.isArray(registry?.skills) ? registry.skills : [])
-      .filter(skill => SKILL_DESTINATIONS[skill.id]);
-
     const card = documentRef.createElement('section');
-    card.className = 'paco-template-card';
+    card.className = 'paco-template-card skills-navigation-card';
     const heading = documentRef.createElement('h2');
     heading.textContent = 'Rekenen';
     const introduction = documentRef.createElement('p');
-    introduction.textContent = 'Kies een skill om te zien en te oefenen wat je leert.';
-    const grid = createPacoTileGrid({ documentRef, className: 'skills-tile-grid' });
+    introduction.className = 'skills-navigation-introduction';
+    introduction.textContent = 'Kies een rekenonderwerp.';
+    const grid = createPacoTileGrid({ documentRef, className: 'skills-navigation-grid' });
 
-    skills.forEach(skill => {
-      const destination = SKILL_DESTINATIONS[skill.id];
+    MATH_SKILL_SUBJECTS.forEach(subject => {
+      const isFractions = subject.id === FRACTION_DOMAIN;
       grid.appendChild(createPacoTile({
         documentRef,
-        title: skill.name,
-        description: `${skill.definition} ${destination.status}`,
-        icon: '📘',
-        actionLabel: 'Openen →',
-        onActivate: () => openSkill(skill.id)
+        title: subject.label,
+        icon: subject.icon,
+        className: 'skills-navigation-tile',
+        ...(isFractions ? {
+          description: 'Bekijk de onderwerpen binnen breuken.',
+          actionLabel: 'Openen →',
+          onActivate: openFractions
+        } : {})
       }));
     });
 
-    if (!skills.length) {
-      introduction.textContent = 'Er zijn nog geen Skills beschikbaar in de curriculumcatalogus.';
-      card.append(heading, introduction);
-    } else {
-      card.append(heading, introduction, grid);
-    }
+    card.append(heading, introduction, grid);
+    content.appendChild(card);
+  }
+
+  function renderFractionOverview() {
+    content.replaceChildren();
+    const card = documentRef.createElement('section');
+    card.className = 'paco-template-card skills-navigation-card';
+    const heading = documentRef.createElement('h2');
+    heading.textContent = 'Breuken';
+    const introduction = documentRef.createElement('p');
+    introduction.className = 'skills-navigation-introduction';
+    introduction.textContent = 'Kies een onderwerp binnen de breukenleerlijn.';
+    const grid = createPacoTileGrid({ documentRef, className: 'skills-navigation-grid skills-navigation-grid--fractions' });
+
+    FRACTION_NAVIGATION_TOPICS.forEach(topic => {
+      grid.appendChild(createPacoTile({
+        documentRef,
+        title: topic.label,
+        icon: topic.icon,
+        meta: 'Onderdeel van de breukenleerlijn',
+        className: 'skills-navigation-tile skills-navigation-tile--topic'
+      }));
+    });
+
+    card.append(heading, introduction, grid);
     content.appendChild(card);
   }
 
   async function mount() {
+    const showingFractions = domain === FRACTION_DOMAIN;
     mountPacoPageTemplate({
       mount: templateMount,
       greeting: student ? `Hoi ${student}! 🐶` : 'Welkom bij PacoGO!',
-      title: 'Skills',
-      icon: '📘',
-      subtitle: 'Wat leer je, waarom is het belangrijk en wat is je volgende stap?',
+      title: showingFractions ? 'Breuken' : 'Skills',
+      icon: showingFractions ? '½' : '📘',
+      subtitle: showingFractions
+        ? 'Onderwerpen binnen de breukenleerlijn.'
+        : 'Wat leer je, waarom is het belangrijk en wat is je volgende stap?',
       navigation: createPacoNavigation({
         app,
         active: 'skills',
@@ -107,15 +105,8 @@ export function createSkillsRuntime({
       content
     });
 
-    try {
-      if (typeof fetchRegistry !== 'function') {
-        throw new Error('De curriculumcatalogus kan in deze omgeving niet worden geladen.');
-      }
-      await renderSkills();
-    } catch (error) {
-      console.error('Skills curriculum load error:', error);
-      renderMessage(error?.message || 'De Skills konden niet worden geladen.', true);
-    }
+    if (showingFractions) renderFractionOverview();
+    else renderSubjectOverview();
   }
 
   return Object.freeze({ mount, destroy() {}, content });

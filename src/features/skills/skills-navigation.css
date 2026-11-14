@@ -1,0 +1,15 @@
+.skills-navigation-card{margin:0;padding:18px 20px}
+.skills-navigation-card h2{margin:0 0 6px;color:#102b57;font:900 24px/1.15 "Baloo 2",Nunito,sans-serif}
+.skills-navigation-introduction{margin:0 0 14px;color:#526985;font-size:15px;line-height:1.4}
+.skills-navigation-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.skills-navigation-tile{width:100%;min-width:0;max-width:none;height:112px;min-height:112px;padding:12px 14px;border-radius:16px}
+.skills-navigation-tile .paco-tile-body{flex-direction:row;align-items:center;gap:12px}
+.skills-navigation-tile .paco-tile-icon{width:42px;height:42px;min-width:42px;margin:0;font-size:23px}
+.skills-navigation-tile .paco-tile-title{white-space:normal;font-size:18px;line-height:1.12}
+.skills-navigation-tile .paco-tile-description{margin-top:5px;font-size:12px}
+.skills-navigation-tile .paco-tile-action{margin-top:7px;padding:5px 8px;font-size:12px}
+.skills-navigation-tile--topic{height:94px;min-height:94px}
+.skills-navigation-tile--topic .paco-tile-body{flex-direction:row;align-items:center}
+.skills-navigation-tile--topic .paco-tile-meta{font-size:10px;line-height:1.2}
+@media(max-width:900px){.skills-navigation-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.skills-navigation-card{padding:14px}.skills-navigation-grid{grid-template-columns:minmax(0,1fr);gap:9px}.skills-navigation-tile,.skills-navigation-tile--topic{height:auto;min-height:76px;padding:10px 12px}}

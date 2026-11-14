@@ -9,7 +9,11 @@ assert.equal(a.recordResponse({ values: { numerator: "1", denominator: "2" } }).
 assert.equal(a.recordResponse({ values: { wholeNumberEnabled: true, wholeNumber: "1", numerator: "1", denominator: "2" } }).classification, "valid");
 assert.equal(a.getProgress().isComplete, true); assert.equal(a.getCompletion().wholeNumberEnabled, true);
 a.reset();
+assert.equal(a.recordResponse({ values: { wholeNumberEnabled: true, wholeNumber: "1", numerator: "5", denominator: "10" } }).classification, "requires_simplification");
+assert.equal(a.getProgress().isComplete, false);
 assert.equal(a.recordResponse({ values: { wholeNumberEnabled: true, wholeNumber: "1", numerator: "5", denominator: "10", simplified: true, simplifiedNumerator: "1", simplifiedDenominator: "2" } }).classification, "valid");
+a.reset();
+assert.equal(a.recordResponse({ values: { numerator: "15", denominator: "10" } }).classification, "requires_simplification");
 a.reset();
 assert.equal(a.recordResponse({ values: { numerator: "15", denominator: "10", simplified: true, simplifiedNumerator: "3", simplifiedDenominator: "2" } }).classification, "valid");
 a.reset();

@@ -7,6 +7,22 @@ const FRACTION_SKILL_ID = 'FR2';
 const PRACTICE_PAGE = 'curriculum-fr2-practice-learner.html';
 const DIAGNOSTIC_PAGE = 'curriculum-fraction-diagnostic-learner.html';
 
+// Learner-facing wording is deliberately separate from the authoritative curriculum registry.
+const LEARNER_DEVELOPMENT_PRESENTATION = Object.freeze({
+  'FR2.D1': Object.freeze({
+    name: 'Wanneer zijn breuken even groot?',
+    definition: 'Ontdek welke breuken evenveel waard zijn, ook als ze er anders uitzien.'
+  }),
+  'FR2.D2': Object.freeze({
+    name: 'Hoe weet je dat breuken even groot zijn?',
+    definition: 'Leg uit hoe je kunt zien dat twee breuken even groot zijn.'
+  }),
+  'FR2.D3': Object.freeze({
+    name: 'Slim rekenen met breuken',
+    definition: 'Gebruik breuken die even groot zijn om slimmer te vergelijken en te rekenen.'
+  })
+});
+
 export function createFractionLearningPathRuntime({
   app,
   templateMount,
@@ -85,10 +101,11 @@ export function createFractionLearningPathRuntime({
         number.textContent = String(index + 1);
         const details = documentRef.createElement('div');
         details.className = 'fraction-learning-path-development-details';
+        const learnerPresentation = LEARNER_DEVELOPMENT_PRESENTATION[development.id];
         const name = documentRef.createElement('h3');
-        name.textContent = development.name;
+        name.textContent = learnerPresentation?.name || development.name;
         const description = documentRef.createElement('p');
-        description.textContent = development.definition;
+        description.textContent = learnerPresentation?.definition || development.definition;
         const identifier = documentRef.createElement('span');
         identifier.className = 'fraction-learning-path-id';
         identifier.textContent = development.id;

@@ -6971,10 +6971,58 @@ Bronconclusies:
 - Baseline HEAD bij start broncontrole: `a275be231feddd3d8e81455a76e1b71080179e96`.
 - Full Regression #3647 / run `43550134483`: GREEN / success op exact baseline HEAD.
 - Broninventaris bijgewerkt in commit `9e9e62f5cb2a1b3cd916fe7c33e297838ce83a85`.
-- Full Regression #3648 / run `43553034432` op exact die inventariscommit is gestart. Bij deze handoff-update was de run nog IN PROGRESS; Node/Vitest en eerdere gates waren groen, Chromium-installatie liep nog. Claim geen groen resultaat totdat de workflow voltooid is.
+- Full Regression #3648 / run `43553034432`: **COMPLETED / SUCCESS** op exact inventariscommit `9e9e62f5cb2a1b3cd916fe7c33e297838ce83a85`; alle workflowstappen geslaagd, inclusief browserregressie en clean-working-tree-controle.
 
 ### Volgende concrete stap — BREUKEN 02
 
 Maak de brongetrouwe verticale KD10B-dekkingsmatrix met bestaande FR1/FR2-definities, bestaande A/B-relaties en exacte SLO-bronherkomst. Markeer elk KD10B-element als gedekt, gedeeltelijk gedekt, afhankelijk van een bestaande cross-skill-relatie of onopgelost. Houd de formele FR1-contractgap expliciet open. Ga niet zelf nieuwe ontwikkelingen, claims, evidence targets, task models of prerequisites maken.
 
 Geen curriculumregistry, runtime, task/evidence/mastery-contract, Supabase of learner-data wijziging uitgevoerd in BREUKEN 01. De handoff-updatecommit die hieruit voortkomt moet zelf door Full Regression worden geverifieerd.
+
+
+## Fraction visual-representation architecture — central extension (2026-11-14)
+
+### Doel en scope
+
+De bestaande Fraction Practice Template, Fraction Learning Interface en visuele breukmodellen blijven het uitgangspunt. Er is geen nieuwe breukentemplate gebouwd en er zijn geen nieuwe pizza-/taartoefeningen of nieuwe oefenpagina's toegevoegd.
+
+Deze stap maakt de bestaande visuele representatiekeuze centraal configureerbaar en voorkomt dat samengestelde componenten hun eigen modelkeuze hardcoderen. De bestaande representaties blijven behouden:
+- `bar` — horizontale breukenbalk;
+- `grid` — gelijk verdeelde cellen;
+- `pie` — cirkel met gelijke taartpunten.
+
+### Implementatie
+
+Nieuw centraal contract:
+- `pacogo-engine/fraction-representation-contract.js` — enige bron voor toegestane area-model layouts, standaardkeuze en normalisatie/configuratie.
+
+Aangesloten componenten:
+- `fraction-learning-interface-contract.js` gebruikt de centrale layoutvalidatie en standaardwaarde.
+- `fraction-learning-interface-renderers.js` gebruikt dezelfde centrale layoutvalidatie in plaats van een eigen lijst/default.
+- `fraction-practice-operation.js` accepteert nu `areaModelLayout` en geeft dezelfde keuze door aan alle breukmodellen in de optel-/aftrekrij. De eerdere vaste `bar`-keuze is verwijderd.
+- `curriculum-fr2-practice-learner.html` gebruikt één gedeelde representatieconfiguratie voor de bestaande optel- en aftrekvisuals. De huidige default blijft `bar`; bestaande oefeninhoud en pedagogische keuzes zijn niet gewijzigd.
+
+### Regressiedekking
+
+- `pacogo-engine/fraction-representation-contract.test.js` controleert toegestane layouts, default en ongeldige waarden.
+- `test/browser/curriculum-fr2-practice-learner.browser.test.js` controleert dat de gedeelde operation-component alle drie layouts consequent op beide breuken toepast, dat de default `bar` blijft en dat ongeldige layouts worden afgewezen.
+- Het centrale Fraction Practice Design System is aangevuld met sectie 14: alle gedeelde renderers/composite components moeten het centrale representatiecontract gebruiken; geen eigen layoutlijst of hardcoded afwijkende keuze.
+
+### Grenzen
+
+- Geen SLO, Skill, Development, Claim, Task, evidence, mastery, next-action, learner-state of curriculumregistry gewijzigd.
+- Geen diagnostische of formele task/evidence-contracten gewijzigd.
+- Geen Supabase, opslagformaat of learner-data gewijzigd.
+- Geen LIVE `main`-wijziging en geen deployment.
+- Geen empirische of pedagogische validatieclaim; dit is een technische architectuuruitbreiding.
+
+### Branch, commits en verificatie
+
+- Branch: `refactor/professional-v1`.
+- Implementatiecommit: `f4290e6d0e05f0c1c85624b52b15842d69f60181`.
+- Full Regression #3651 / run `43613245067`: **GREEN / SUCCESS** op exact deze implementatiecommit; alle gates geslaagd, inclusief volledige browserregressie en clean-working-tree-controle.
+- Browser proof #717 / run `43613245167`: **GREEN / SUCCESS** op dezelfde implementatiecommit.
+- Baseline Full Regression #3650 / run `43613021246`: **GREEN / SUCCESS** op exacte pre-implementatiecommit `912d75bff11bc1197035c5bb3123dd73e30e66f6`.
+- LIVE `main` blijft onaangeraakt.
+
+**Volgende concrete stap:** laat de gebruiker de bestaande breukbalken en taartpunten visueel beoordelen in PacoGO TEST. Daarna kunnen toekomstige representaties alleen via dit centrale contract, de gedeelde renderer en bijbehorende regressietests worden uitgebreid. Bouw nu geen nieuwe oefenvormen of representaties zonder een afzonderlijke pedagogische reden.

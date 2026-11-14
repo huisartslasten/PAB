@@ -1,9 +1,11 @@
 import { renderFractionRepresentation } from "./fraction-learning-interface-renderers.js";
+import { DEFAULT_FRACTION_AREA_MODEL_LAYOUT, normalizeFractionAreaModelLayout } from "./fraction-representation-contract.js";
 
-function renderFractionOperation({ mount, terms, operator } = {}) {
+function renderFractionOperation({ mount, terms, operator, areaModelLayout = DEFAULT_FRACTION_AREA_MODEL_LAYOUT } = {}) {
   if (!(mount instanceof HTMLElement)) throw new TypeError("mount must be an HTMLElement");
   if (!Array.isArray(terms) || terms.length !== 2) throw new TypeError("exactly two fraction terms are required");
   if (!["+", "−"].includes(operator)) throw new TypeError("operator must be plus or minus");
+  const selectedLayout = normalizeFractionAreaModelLayout(areaModelLayout);
   terms.forEach(term => {
     if (!term || typeof term.label !== "string" || !term.label.trim() ||
         !term.fraction || !Number.isSafeInteger(term.fraction.numerator) ||
@@ -35,7 +37,7 @@ function renderFractionOperation({ mount, terms, operator } = {}) {
     label.textContent = term.label;
     item.append(
       label,
-      renderFractionRepresentation(term.fraction, "area_model", term.label, { layout: "bar" }),
+      renderFractionRepresentation(term.fraction, "area_model", term.label, { layout: selectedLayout }),
       renderFractionRepresentation(term.fraction, "symbolic_fraction", term.label + " als breuk")
     );
     root.append(item);

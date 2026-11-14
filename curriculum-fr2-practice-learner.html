@@ -136,10 +136,13 @@
   import { renderFractionPracticeExpression } from "./pacogo-engine/fraction-practice-equation.js";
   import { renderFractionAnswerInput } from "./pacogo-engine/fraction-answer-input.js";
   import { renderFractionOperation } from "./pacogo-engine/fraction-practice-operation.js";
+  import { createFractionRepresentationConfig } from "./pacogo-engine/fraction-representation-contract.js";
   import { createFractionAdditionPracticeSession } from "./pacogo-engine/fraction-addition-practice-session.js";
   import { createFractionResultFormPracticeSession } from "./pacogo-engine/fraction-result-form-practice-session.js";
   import { createFractionSubtractionPracticeSession } from "./pacogo-engine/fraction-subtraction-practice-session.js";
   import { FRACTION_CONSTRUCTION_PRACTICE_TASKS, createFractionConstructionPracticeSession } from "./pacogo-engine/fraction-construction-practice-session.js";
+
+  const FRACTION_OPERATION_PRESENTATION = createFractionRepresentationConfig();
 
   const app = createPacoGOApp({ supabaseLib: window.supabase, storage: window.localStorage });
   const setup = document.querySelector("#learnerSetup");
@@ -497,6 +500,7 @@
     renderFractionOperation({
       mount: additionVisual,
       operator: "+",
+      areaModelLayout: FRACTION_OPERATION_PRESENTATION.areaModelLayout,
       terms: [
         { label: "Eerste breuk", fraction: { numerator: 1, denominator: 3 } },
         { label: "Tweede breuk", fraction: { numerator: 1, denominator: 4 } }
@@ -690,6 +694,7 @@
     renderFractionOperation({
       mount: subtractionVisual,
       operator: "−",
+      areaModelLayout: FRACTION_OPERATION_PRESENTATION.areaModelLayout,
       terms: [
         { label: "Eerste breuk", fraction: { numerator: 1, denominator: 2 } },
         { label: "Tweede breuk", fraction: { numerator: 2, denominator: 5 } }

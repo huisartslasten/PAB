@@ -62,6 +62,40 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   expect(denominatorSlot.slot).toBe("fraction-practice-denominator fraction-practice-inline-field");
   expect(denominatorSlot.width).toBe(60);
   expect(denominatorSlot.fontSize).toBe(denominatorSlot.fractionFontSize);
+  const operationLayouts = await page.evaluate(async () => {
+    const { renderFractionOperation } = await import("/pacogo-engine/fraction-practice-operation.js");
+    const terms = [
+      { label: "Eerste breuk", fraction: { numerator: 1, denominator: 2 } },
+      { label: "Tweede breuk", fraction: { numerator: 1, denominator: 3 } }
+    ];
+    const layouts = {};
+    for (const areaModelLayout of ["bar", "grid", "pie"]) {
+      const mount = document.createElement("div");
+      renderFractionOperation({ mount, terms, operator: "+", areaModelLayout });
+      layouts[areaModelLayout] = [...mount.querySelectorAll(".pacogo-fraction-representation--area")]
+        .map(model => model.dataset.layout);
+    }
+    const defaultMount = document.createElement("div");
+    renderFractionOperation({ mount: defaultMount, terms, operator: "+" });
+    let invalidLayoutRejected = false;
+    try {
+      renderFractionOperation({ mount: document.createElement("div"), terms, operator: "+", areaModelLayout: "unknown" });
+    } catch (error) {
+      invalidLayoutRejected = error instanceof TypeError;
+    }
+    return {
+      layouts,
+      defaultLayout: [...defaultMount.querySelectorAll(".pacogo-fraction-representation--area")]
+        .map(model => model.dataset.layout),
+      invalidLayoutRejected
+    };
+  });
+  expect(operationLayouts.layouts.bar).toEqual(["bar", "bar"]);
+  expect(operationLayouts.layouts.grid).toEqual(["grid", "grid"]);
+  expect(operationLayouts.layouts.pie).toEqual(["pie", "pie"]);
+  expect(operationLayouts.defaultLayout).toEqual(["bar", "bar"]);
+  expect(operationLayouts.invalidLayoutRejected).toBe(true);
+
   await expect(page.locator("#learnerSetup h1")).toHaveText("Wie gaat breuken oefenen?");
   await page.getByRole("button", { name: "Leerling kiezen: Leerling A" }).click();
   await expect(page.locator("#exerciseCard h1")).toHaveText("Breuken die evenveel betekenen");

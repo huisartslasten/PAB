@@ -1,3 +1,5 @@
+import { DEFAULT_FRACTION_AREA_MODEL_LAYOUT, normalizeFractionAreaModelLayout } from "./fraction-representation-contract.js";
+
 function assertFraction(fraction, label) {
   if (!fraction || !Number.isInteger(fraction.numerator) || !Number.isInteger(fraction.denominator) ||
       fraction.denominator <= 0 || fraction.numerator < 0 || fraction.numerator > fraction.denominator) {
@@ -11,7 +13,7 @@ function createFractionLearningInterfaceConfig({
   representation = "symbolic_fraction",
   targetRepresentation = representation,
   optionRepresentation = representation,
-  targetLayout = "bar",
+  targetLayout = DEFAULT_FRACTION_AREA_MODEL_LAYOUT,
   responseProcessRequired = false,
   labels = {}
 }) {
@@ -23,10 +25,8 @@ function createFractionLearningInterfaceConfig({
   if (![representation, targetRepresentation, optionRepresentation].every(value => supportedRepresentations.includes(value))) {
     throw new TypeError("representation, targetRepresentation and optionRepresentation must be area_model or symbolic_fraction");
   }
-  if (!["bar", "grid", "pie"].includes(targetLayout)) {
-    throw new TypeError("targetLayout must be bar, grid or pie");
-  }
-  if (targetLayout !== "bar" && targetRepresentation !== "area_model") {
+  const areaModelLayout = normalizeFractionAreaModelLayout(targetLayout);
+  if (areaModelLayout !== DEFAULT_FRACTION_AREA_MODEL_LAYOUT && targetRepresentation !== "area_model") {
     throw new TypeError("grid and pie target layouts require an area_model target representation");
   }
   if (typeof responseProcessRequired !== "boolean") {
@@ -53,7 +53,7 @@ function createFractionLearningInterfaceConfig({
     representation,
     targetRepresentation,
     optionRepresentation,
-    targetLayout,
+    targetLayout: areaModelLayout,
     responseProcessRequired,
     labels: Object.freeze({
       title: labels.title || "Welke breuk heeft dezelfde waarde?",

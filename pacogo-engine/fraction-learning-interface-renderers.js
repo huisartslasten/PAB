@@ -1,3 +1,5 @@
+import { normalizeFractionAreaModelLayout } from "./fraction-representation-contract.js";
+
 function renderPieModel(fraction, label) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", "0 0 100 100");
@@ -49,8 +51,7 @@ function renderFractionRepresentation(fraction, representation, label = "Breuk",
   }
   if (representation !== "area_model") throw new TypeError("unsupported fraction representation");
   wrapper.classList.add("pacogo-fraction-representation--area");
-  const layout = options.layout || "bar";
-  if (!["bar", "grid", "pie"].includes(layout)) throw new TypeError("unsupported area model layout");
+  const layout = normalizeFractionAreaModelLayout(options.layout);
   wrapper.dataset.layout = layout;
   if (layout === "pie") {
     wrapper.append(renderPieModel(fraction, label));

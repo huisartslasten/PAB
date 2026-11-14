@@ -201,3 +201,30 @@ Use a circle divided into equal angular sectors, with the numerator's sectors cl
 - Renderer choice changes presentation only; it must not change fraction value, task identity, answer validation, evidence, mastery or curriculum inference.
 
 The shared renderer contract includes `bar`, `grid` and `pie` area-model layouts, plus symbolic stacked-fraction notation. The task contract may select distinct target and option renderers only when this distinction is pedagogically required; it must never accidentally mix different area-model layouts.
+
+## 14. Central visual-representation contract
+
+The supported area-model layouts and the default layout are defined once in
+`pacogo-engine/fraction-representation-contract.js`. Shared renderers and
+composite components MUST consume this contract; they must not maintain their
+own lists of supported layouts or silently hardcode a different layout.
+
+The shared contract currently exposes:
+- `bar` — horizontal fraction bar;
+- `grid` — equal-sized cell/grid model;
+- `pie` — circle divided into equal sectors;
+- `bar` as the current default when an exercise does not explicitly select a layout.
+
+A task or practice adapter may provide an explicit `areaModelLayout` through
+the shared representation configuration. Composite components such as the
+addition/subtraction operation row must pass that same selected layout to every
+area model they render. All area models within one exercise use that one
+selection. Symbolic stacked-fraction notation remains independent of the area
+model selection.
+
+Adding a future representation requires extending the central contract,
+renderer, relevant visual styles and regression coverage. Existing components
+must receive the new selection through configuration; no page-specific renderer
+or duplicated layout switch is permitted. Representation selection remains a
+presentation concern and cannot change mathematical values, validation,
+learner responses, task identity, evidence, mastery or curriculum progression.

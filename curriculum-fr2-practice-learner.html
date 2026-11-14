@@ -630,7 +630,13 @@
   function handleResultFormAnswer(values) {
     const result = resultFormSession.recordResponse({ values }); updateResultFormProgress();
     if (result.classification === "valid") { resultFormEquationInstance?.lock(); const submit = resultFormInputHost.querySelector(".pacogo-fraction-practice__primary-action"); if (submit) submit.disabled = true; showResultFormCompleted(); return; }
-    resultFormFeedback.textContent = result.classification === "invalid_input" ? "Vul de getoonde velden met hele getallen in." : result.classification === "not_simplified" ? "Deze breuk is nog niet volledig vereenvoudigd. Controleer de extra breuk naast je antwoord." : "Dit antwoord heeft nog niet dezelfde waarde als vijftien tienden. Controleer teller, noemer en eventueel het hele getal.";
+    resultFormFeedback.textContent = result.classification === "invalid_input"
+      ? "Vul de getoonde velden met hele getallen in."
+      : result.classification === "requires_simplification"
+        ? "Je berekening klopt. Je kunt de breuk nog vereenvoudigen. Kies Vereenvoudigen en maak de breuk zo eenvoudig mogelijk."
+        : result.classification === "not_simplified"
+          ? "Deze vereenvoudigde breuk klopt nog niet. Controleer de teller en noemer."
+          : "Dit antwoord heeft nog niet dezelfde waarde als vijftien tienden. Controleer teller, noemer en eventueel het hele getal.";
     resultFormEquationInstance?.focus();
   }
   function renderResultFormStage() {

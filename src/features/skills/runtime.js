@@ -15,7 +15,7 @@ const SKILL_DESTINATIONS = Object.freeze({
   }),
   FR2: Object.freeze({
     page: 'curriculum-fr2-learning-path.html',
-    status: 'Bekijk de leerontwikkelingen en start met oefenen.'
+    status: 'Leerlijn beschikbaar; voortgang nog niet gekoppeld.'
   })
 });
 

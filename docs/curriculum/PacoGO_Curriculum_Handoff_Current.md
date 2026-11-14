@@ -7076,3 +7076,52 @@ De afgesproken navigatie is:
 **Eerste bouwstap:** inspecteer en hergebruik de bestaande opteloefening en de bestaande sessie-/weergavecomponenten. Breid de reeks uit van eenvoudig naar moeilijk, met pedagogisch verantwoorde variatie in getallen, denkstappen en representatie. Leg per oefening doel, leerlinghandeling, voorkennis, representatie, antwoordvorm en opbouwpositie vast, zonder nieuwe formele curriculum-identifiers te creëren.
 
 **Engineeringstatus bij deze overdracht:** branch `refactor/professional-v1`; HEAD `1317f5fa0be6d91fe778fbe930aa75322df6de99`; Full Regression #3655 / run `43627628568` is GREEN op exact die commit. Dit is de geverifieerde baseline vóór de handoff-update; de handoff-updatecommit moet zelf Full Regression doorlopen voordat de oefenbouw begint. LIVE `main` blijft onaangeraakt. Geen Supabase-wijziging of deployment zonder afzonderlijke noodzaak/opdracht.
+
+## PacoGO difficulty indicator and fraction-answer assessment sequence (2026-11-14)
+
+### Centrale PacoGO-botjesindicator
+
+De centrale design-systemcomponent voor de moeilijkheidsindicator is toegevoegd:
+- `createPacoBoneDifficulty({ level, maxLevel, label, documentRef })` in `design-system.js`;
+- oorspronkelijke PacoGO-botvorm als SVG, met gevulde en niet-gevulde toestanden;
+- centrale CSS in `design-system.css`;
+- unitdekking in `design-system.test.js`.
+
+Commits:
+- `886a26d65c4f90aaa2a813b93215cd4dce82e2ba` — component;
+- `07935db760a5488be5148cdf995cd89675695b75` — originele vectorvorm en styling;
+- `a3b0e21991ba004c1e6d0c31ea9b3453b43a5766` — testdekking.
+
+Full Regression #3659 / run `43634239921`: GREEN op `07935db760a5488be5148cdf995cd89675695b75`.
+Full Regression #3660 / run `43634243450`: GREEN op exacte HEAD `a3b0e21991ba004c1e6d0c31ea9b3453b43a5766`; alle workflowstappen geslaagd, inclusief curriculum engine regression, architecture boundaries, Node, Vitest, browser regression en clean-working-tree-controle.
+
+**Visuele status:** de botjescomponent bestaat centraal in code, maar is nog niet op een zichtbare pagina of demonstratie geplaatst en is dus nog niet visueel door de gebruiker beoordeeld of goedgekeurd. Integreer de indicator niet als definitief goedgekeurde vorm voordat de gebruiker de zichtbare weergave heeft kunnen beoordelen. Dit blokkeert de inhoudelijke oefenbouw niet; het visuele gebruik blijft apart ter beoordeling.
+
+### Beoordelingsvolgorde bij vereenvoudigen in formatieve breukoefeningen
+
+Expliciete product-/didactische eis van de gebruiker (2026-11-14):
+
+Een rekenkundig correct breukantwoord dat nog vereenvoudigd kan worden, mag **niet onmiddellijk als fout** worden beoordeeld. PacoGO houdt de opgave open en vraagt de leerling eerst de breuk zelf te vereenvoudigen.
+
+Gewenste volgorde:
+1. Leerling voert het rekenkundige resultaat in, eventueel als gemengd getal.
+2. PacoGO controleert de rekenkundige juistheid en stelt vast dat de breuk nog vereenvoudigd kan worden.
+3. De opgave blijft onafgerond; PacoGO geeft gerichte feedback, bijvoorbeeld: **"Je berekening klopt. Je kunt de breuk nog vereenvoudigen. Maak de breuk zo eenvoudig mogelijk."**
+4. Leerling voert zelf de vereenvoudigde breuk in. PacoGO berekent of vult niets automatisch in en bewaart de oorspronkelijke invoer.
+5. Een correcte vereenvoudigde vorm leidt tot een correcte eindbeoordeling van de opgave.
+6. Een onjuiste vereenvoudiging leidt tot een onjuiste beoordeling en passende feedback volgens de oefenregels.
+
+Voorbeeld: bij `8 + 6 14/20` kan `14 14/20` rekenkundig juist zijn, maar is de opgave nog niet voltooid. De leerling moet zelf `14 7/10` invoeren. Pas daarna wordt de volledige opgave goed gerekend.
+
+Deze volgorde is een formatieve oefen-/interface-eis. Verwar dit niet met formele curriculum-assessment, evidence, mastery of diagnostische contracten. Hergebruik de bestaande gedeelde breukantwoordcomponent en centrale templates; ontwerp geen oefeningspecifieke variant. Geen automatische vereenvoudiging en geen onmiddellijke foutclassificatie uitsluitend omdat een correct antwoord nog niet vereenvoudigd is.
+
+### Huidige engineeringstatus en eerstvolgende stap
+
+- Branch: `refactor/professional-v1`.
+- Laatste geverifieerde code-HEAD vóór deze handoff-update: `a3b0e21991ba004c1e6d0c31ea9b3453b43a5766`.
+- Laatste geverifieerde Full Regression: #3660 / run `43634243450`, GREEN op exact die commit.
+- Deze handoff-update is een nieuwe projectwijziging en moet zelf door Full Regression worden geverifieerd voordat oefenbouw begint.
+- Daarna: inspecteer de bestaande opteloefening, de centrale Fraction Practice Template, de bestaande Fraction Practice answer/session components en de bestaande oefencontent. Bouw de eerste formatieve oefening uitsluitend door centrale onderdelen te hergebruiken.
+- Neem de hierboven vastgelegde vereenvoudigingsvolgorde mee in de gedeelde antwoord-/sessieflow; controleer eerst wat de bestaande component al ondersteunt voordat er iets wordt gewijzigd.
+- Gebruik de door de gebruiker aangeleverde Junior Einstein-screenshots uitsluitend als inhoudelijke referentie voor de opgavevorm. Bouw eigen PacoGO-opgaven, uitleg, feedback en presentatie.
+- LIVE `main` blijft onaangeraakt. Geen Supabase-wijziging of deployment zonder afzonderlijke noodzaak en opdracht.

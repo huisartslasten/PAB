@@ -527,7 +527,7 @@
     const completion = additionSession.getCompletion();
     renderAdditionVisual(completion);
     additionPrompt.textContent = "Opgave " + completion.taskNumber + " van " +
-      completion.totalTasks + " afgerond. Je hebt alle vier stappen zelf ingevuld.";
+      completion.totalTasks + " afgerond. Je hebt alle stappen zelf ingevuld.";
     additionExpression.replaceChildren();
     const resultLabel = document.createElement("span");
     resultLabel.textContent = "Jouw uitkomst:";
@@ -823,7 +823,12 @@
       return;
     }
     if (result.classification === "not_common_denominator") {
-      additionFeedback.textContent = "Deze noemer werkt nog niet voor beide breuken. Hij moet deelbaar zijn door 3 én door 4. Een andere geldige gemeenschappelijke noemer mag ook.";
+      const current = additionSession.getCurrentStep();
+      const leftDenominator = current.leftFraction.denominator;
+      const rightDenominator = current.rightFraction.denominator;
+      additionFeedback.textContent = "Deze noemer werkt nog niet voor beide breuken. Hij moet deelbaar zijn door " +
+        leftDenominator + " én door " + rightDenominator +
+        ". Een andere geldige gemeenschappelijke noemer mag ook.";
     } else if (result.classification === "not_equivalent") {
       additionFeedback.textContent = "De hoeveelheid moet gelijk blijven. Vergelijk de oorspronkelijke breuk met de nieuwe noemer en probeer opnieuw.";
     } else if (result.classification === "arithmetic_error") {

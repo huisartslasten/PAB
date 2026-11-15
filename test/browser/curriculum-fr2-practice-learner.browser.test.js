@@ -267,7 +267,7 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await expect(page.locator("#resultFormInput .pacogo-fraction-answer__controls")).toBeVisible();
   expect(await page.locator("#resultFormCard").innerText()).not.toMatch(/\d+\s*\/\s*\d+/);
   await expect(page.locator("#resultFormExpression .pacogo-fraction-answer")).toBeVisible();
-  await expect(page.getByRole("checkbox", { name: "Heel getal toevoegen" })).not.toBeChecked();
+  await expect(page.getByRole("button", { name: "Heel getal toevoegen" })).toHaveAttribute("aria-pressed", "false");
   await expect(page.getByRole("textbox", { name: "Heel getal" })).toBeHidden();
   await expect(page.getByRole("button", { name: "Vereenvoudigen" })).toBeVisible();
   await expect(page.locator("#resultFormInput .pacogo-fraction-answer__controls")).toContainText("Heel getal toevoegen");

@@ -73,6 +73,28 @@ assert.equal(session.recordAnswer({ values: answer({
 }) }).classification, "valid");
 
 assert.equal(session.getProgress().completedCount, 5);
+
+// The learner may enter an already simplified mixed number directly in the primary fields.
+const directSimplifiedSession = createFractionSameDenominatorAdditionSession({
+  learnerKey: "direct-simplified", storage: memoryStorage()
+});
+assert.equal(directSimplifiedSession.recordAnswer({ values: answer({
+  numerator: "2", denominator: "5"
+}) }).classification, "valid");
+assert.equal(directSimplifiedSession.recordAnswer({ values: answer({
+  numerator: "9", denominator: "10"
+}) }).classification, "valid");
+assert.equal(directSimplifiedSession.recordAnswer({ values: answer({
+  wholeNumberEnabled: true, wholeNumber: "1", numerator: "1", denominator: "10"
+}) }).classification, "valid");
+assert.equal(directSimplifiedSession.recordAnswer({ values: answer({
+  wholeNumberEnabled: true, wholeNumber: "1", numerator: "4", denominator: "7"
+}) }).classification, "valid");
+assert.equal(directSimplifiedSession.recordAnswer({ values: answer({
+  wholeNumberEnabled: true, wholeNumber: "1", numerator: "4", denominator: "5"
+}) }).classification, "valid");
+assert.equal(directSimplifiedSession.getProgress().completedCount, 5);
+
 const wrongWholeSession = createFractionSameDenominatorAdditionSession({ learnerKey: "other", storage: memoryStorage() });
 for (const values of [
   answer({ numerator: "4", denominator: "10", simplified: true, simplifiedNumerator: "2", simplifiedDenominator: "5" }),

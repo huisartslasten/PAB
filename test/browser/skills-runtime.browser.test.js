@@ -191,6 +191,7 @@ test('first whole-number plus mixed-fraction practice uses the central page and 
       fractionTemplate: Boolean(document.querySelector('[data-component="fraction-practice-template"]')),
       progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
       expression: document.querySelector('.fraction-whole-mixed-expression')?.innerText || '',
+      mixedWhole: document.querySelector('.fraction-whole-mixed-expression .pacogo-fraction-mixed-number__whole')?.textContent || '',
       stackedFraction: document.querySelectorAll('.pacogo-fraction-representation--symbolic').length,
       slashNotation: document.querySelector('.fraction-whole-mixed-expression')?.textContent.includes('/') || false,
       controlsSeparate: Boolean(document.querySelector('.pacogo-fraction-practice-template__controls .pacogo-fraction-answer__controls')),
@@ -215,6 +216,7 @@ test('first whole-number plus mixed-fraction practice uses the central page and 
   expect(result.initial.fractionTemplate).toBe(true);
   expect(result.initial.progress).toContain('Som 1 van 15');
   expect(result.initial.expression).toContain('2');
+  expect(result.initial.mixedWhole).toBe('1');
   expect(result.initial.stackedFraction).toBeGreaterThan(0);
   expect(result.initial.slashNotation).toBe(false);
   expect(result.initial.controlsSeparate).toBe(true);

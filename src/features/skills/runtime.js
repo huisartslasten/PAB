@@ -13,6 +13,13 @@ import { MATH_SKILL_SUBJECTS, FRACTION_NAVIGATION_TOPICS } from './skills-naviga
 
 const FRACTION_DOMAIN = 'fractions';
 
+function formatFractionPracticeProgress(progress, exercise) {
+  const level = ' · Niveau ' + exercise.difficultyLevel + ' van ' + exercise.maxDifficultyLevel;
+  return progress.isComplete
+    ? progress.completedCount + ' van ' + progress.totalCount + ' afgerond' + level
+    : 'Som ' + (progress.completedCount + 1) + ' van ' + progress.totalCount + level;
+}
+
 export function createSkillsRuntime({
   app,
   templateMount,
@@ -171,7 +178,7 @@ export function createSkillsRuntime({
       instruction.textContent = 'Tel het hele getal en het gemengde getal bij elkaar op. Geef je antwoord als gemengd getal.';
       const progressLabel = documentRef.createElement('p');
       progressLabel.className = 'fraction-practice-progress';
-      progressLabel.textContent = 'Som ' + (progress.completedCount + 1) + ' van ' + progress.totalCount + ' · Niveau ' + exercise.difficultyLevel + ' van ' + exercise.maxDifficultyLevel;
+      progressLabel.textContent = formatFractionPracticeProgress(progress, exercise);
       template.titleArea.append(title);
       template.instructionArea.append(instruction);
       template.progressArea.append(progressLabel);
@@ -243,7 +250,7 @@ export function createSkillsRuntime({
           next.textContent = result.progress.isComplete ? 'Bekijk resultaat' : 'Volgende som';
           next.addEventListener('click', () => renderCurrentTask());
           template.actionsArea.replaceChildren(next);
-          progressLabel.textContent = 'Som ' + result.progress.completedCount + ' van ' + result.progress.totalCount + ' · Niveau ' + exercise.difficultyLevel + ' van ' + exercise.maxDifficultyLevel;
+          progressLabel.textContent = formatFractionPracticeProgress(result.progress, exercise);
           return;
         }
         const messages = {
@@ -285,7 +292,7 @@ export function createSkillsRuntime({
       instruction.textContent = 'Tel de tellers bij elkaar op. De noemer blijft hetzelfde. Is je antwoord groter dan 1? Schrijf het dan als gemengd getal.';
       const progressLabel = documentRef.createElement('p');
       progressLabel.className = 'fraction-practice-progress';
-      progressLabel.textContent = 'Som ' + (progress.completedCount + 1) + ' van ' + progress.totalCount + ' · Niveau ' + exercise.difficultyLevel + ' van ' + exercise.maxDifficultyLevel;
+      progressLabel.textContent = formatFractionPracticeProgress(progress, exercise);
       template.titleArea.append(title);
       template.instructionArea.append(instruction);
       template.progressArea.append(progressLabel);
@@ -343,7 +350,7 @@ export function createSkillsRuntime({
           next.textContent = result.progress.isComplete ? 'Bekijk resultaat' : 'Volgende som';
           next.addEventListener('click', renderCurrentTask);
           template.actionsArea.replaceChildren(next);
-          progressLabel.textContent = 'Som ' + result.progress.completedCount + ' van ' + result.progress.totalCount + ' · Niveau ' + exercise.difficultyLevel + ' van ' + exercise.maxDifficultyLevel;
+          progressLabel.textContent = formatFractionPracticeProgress(result.progress, exercise);
           return;
         }
         const messages = {
@@ -383,7 +390,7 @@ export function createSkillsRuntime({
       instruction.textContent = 'Tel de hele getallen bij elkaar op. Tel de breukdelen bij elkaar op en schrijf je uitkomst als gemengd getal.';
       const progressLabel = documentRef.createElement('p');
       progressLabel.className = 'fraction-practice-progress';
-      progressLabel.textContent = 'Som ' + (progress.completedCount + 1) + ' van ' + progress.totalCount + ' · Niveau ' + exercise.difficultyLevel + ' van ' + exercise.maxDifficultyLevel;
+      progressLabel.textContent = formatFractionPracticeProgress(progress, exercise);
       template.titleArea.append(title);
       template.instructionArea.append(instruction);
       template.progressArea.append(progressLabel);
@@ -441,7 +448,7 @@ export function createSkillsRuntime({
           next.textContent = result.progress.isComplete ? 'Bekijk resultaat' : 'Volgende som';
           next.addEventListener('click', renderCurrentTask);
           template.actionsArea.replaceChildren(next);
-          progressLabel.textContent = 'Som ' + result.progress.completedCount + ' van ' + result.progress.totalCount + ' · Niveau ' + exercise.difficultyLevel + ' van ' + exercise.maxDifficultyLevel;
+          progressLabel.textContent = formatFractionPracticeProgress(result.progress, exercise);
           return;
         }
         const messages = {

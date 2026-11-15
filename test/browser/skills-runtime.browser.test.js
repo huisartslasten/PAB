@@ -407,3 +407,87 @@ test('same-denominator addition presents 15 tasks and checks proper, mixed and s
   expect(result.fourthFeedback).toContain('Goed gedaan');
   expect(result.fifthFeedback).toContain('Goed gedaan');
 });
+
+
+test('mixed same-denominator addition presents 15 original mixed-number tasks and checks regrouping and simplification', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=optellen', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    localStorage.removeItem('pacogo:fraction-mixed-same-denominator-addition:v1:Zyon');
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {},
+      managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    const runtime = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'optellen', exercise: 'mixed-same-denominator-addition',
+      documentRef: document, navigate: () => {}
+    });
+    await runtime.mount();
+
+    const snapshot = () => ({
+      title: document.querySelector('.pacogo-fraction-practice-template__title-area h2')?.textContent || '',
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      mixedNumbers: document.querySelectorAll('.fraction-mixed-same-denominator-addition-card .pacogo-fraction-mixed-number').length,
+      fractionBars: document.querySelectorAll('.fraction-mixed-same-denominator-addition-card .pacogo-fraction-representation--symbolic').length,
+      wholeFieldVisible: !document.querySelector('[data-answer-part="whole"]').closest('label').hidden,
+      wholeToggleHidden: document.querySelector('.pacogo-fraction-answer__toggle').hidden,
+      centralPage: Boolean(document.querySelector('.paco-page-template')),
+      fractionTemplate: Boolean(document.querySelector('.pacogo-fraction-practice-template'))
+    });
+    const initial = snapshot();
+    const set = (part, value) => { document.querySelector('[data-answer-part="' + part + '"]').value = value; };
+    const click = selector => document.querySelector(selector).click();
+    const action = '.fraction-mixed-same-denominator-addition-card .pacogo-fraction-practice-template__actions .paco-btn';
+
+    // First task: 2 3/8 + 1 6/8 = 4 1/8. Test the learner-led simplification path.
+    set('whole', '4');
+    set('primaryNumerator', '2');
+    set('primaryDenominator', '16');
+    click(action);
+    const simplifyFeedback = document.querySelector('.fraction-practice-feedback')?.textContent || '';
+    click('.pacogo-fraction-answer__simplify');
+    set('simplifiedNumerator', '1');
+    set('simplifiedDenominator', '8');
+    click(action);
+    const firstCorrect = document.querySelector('.fraction-practice-feedback')?.textContent || '';
+
+    const answers = [
+      ['7','1','12'], ['9','3','7'], ['8','1','9'], ['6','1','2'],
+      ['10','1','5'], ['8','1','2'], ['8','2','11'], ['8','1','3'],
+      ['10','2','13'], ['8','1','6'], ['9','2','7'], ['12','1','2'],
+      ['9','1','5'], ['12','1','4']
+    ];
+    const completed = [];
+    for (const [whole, numerator, denominator] of answers) {
+      click(action);
+      set('whole', whole);
+      set('primaryNumerator', numerator);
+      set('primaryDenominator', denominator);
+      click(action);
+      completed.push(document.querySelector('.fraction-practice-feedback')?.textContent || '');
+    }
+    const finalProgress = document.querySelector('.fraction-practice-progress')?.textContent || '';
+    const completion = document.querySelector('.fraction-practice-complete')?.textContent || '';
+    return { initial, simplifyFeedback, firstCorrect, completed, finalProgress, completion };
+  });
+
+  expect(result.initial.title).toBe('Gelijknamige breuken groter dan 1 bij elkaar optellen');
+  expect(result.initial.progress).toContain('Som 1 van 15');
+  expect(result.initial.mixedNumbers).toBe(2);
+  expect(result.initial.fractionBars).toBe(2);
+  expect(result.initial.wholeFieldVisible).toBe(true);
+  expect(result.initial.wholeToggleHidden).toBe(true);
+  expect(result.initial.centralPage).toBe(true);
+  expect(result.initial.fractionTemplate).toBe(true);
+  expect(result.simplifyFeedback).toContain('Je berekening klopt');
+  expect(result.firstCorrect).toContain('Goed gedaan');
+  expect(result.completed).toHaveLength(14);
+  expect(result.completed.every(message => message.includes('Goed gedaan'))).toBe(true);
+  expect(result.finalProgress).toContain('15 van 15');
+  expect(result.completion).toContain('alle 15 sommen');
+});

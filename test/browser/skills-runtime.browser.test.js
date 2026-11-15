@@ -274,3 +274,40 @@ test('optional whole-number and simplification controls are blue, reversible, an
   expect(result.values.wholeNumberEnabled).toBe(false);
   expect(result.values.simplified).toBe(false);
 });
+
+test('simplified mixed-number answer keeps the whole-number part unchanged', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    const { renderFractionAnswerInput } = await import('/pacogo-engine/fraction-answer-input.js');
+    const work = document.createElement('div');
+    const controls = document.createElement('div');
+    document.body.replaceChildren(work, controls);
+    const answer = renderFractionAnswerInput({
+      workMount: work,
+      controlsMount: controls,
+      wholeNumberMode: 'required'
+    });
+    const whole = work.querySelector('[data-answer-part="whole"]');
+    whole.value = '6';
+    whole.dispatchEvent(new Event('input', { bubbles: true }));
+    controls.querySelector('.pacogo-fraction-answer__simplify').click();
+    const preservedWhole = work.querySelector('.pacogo-fraction-answer__simplified-whole');
+    return {
+      primaryWhole: whole.value,
+      preservedWhole: preservedWhole.textContent,
+      preservedWholeVisible: !preservedWhole.hidden,
+      simplifiedGroupVisible: !work.querySelector('.pacogo-fraction-answer__simplified').hidden,
+      reducedFields: [...work.querySelectorAll('[data-answer-part^="simplified"]')].length,
+      wholeInputs: work.querySelectorAll('[data-answer-part="whole"]').length,
+      values: answer.getValues()
+    };
+  });
+  expect(result.primaryWhole).toBe('6');
+  expect(result.preservedWhole).toBe('6');
+  expect(result.preservedWholeVisible).toBe(true);
+  expect(result.simplifiedGroupVisible).toBe(true);
+  expect(result.reducedFields).toBe(2);
+  expect(result.wholeInputs).toBe(1);
+  expect(result.values.wholeNumber).toBe('6');
+  expect(result.values.simplified).toBe(true);
+});

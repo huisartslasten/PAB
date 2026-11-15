@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import assert from "node:assert/strict";
 import {
   FRACTION_SAME_DENOMINATOR_ADDITION_EXERCISE,
   createFractionSameDenominatorAdditionSession,
@@ -23,73 +23,69 @@ function answer(values) {
   };
 }
 
-describe("same-denominator fraction addition exercise", () => {
+{
   it("contains 15 unique level-one tasks, including all five screenshot examples", () => {
     const exercise = FRACTION_SAME_DENOMINATOR_ADDITION_EXERCISE;
-    expect(exercise.questionCount).toBe(15);
-    expect(exercise.tasks).toHaveLength(15);
-    expect(new Set(exercise.tasks.map(task => task.id)).size).toBe(15);
-    expect(exercise.difficultyLevel).toBe(1);
-    expect(exercise.tasks.slice(0, 5).map(task => [
+    assert.equal(exercise.questionCount, 15);
+    assert.equal(exercise.tasks.length, 15);
+    assert.equal(new Set(exercise.tasks.map(task => task.id)).size, 15);
+    assert.equal(exercise.difficultyLevel, 1);
+    assert.deepEqual(exercise.tasks.slice(0, 5).map(task => [
       task.left.numerator, task.left.denominator, task.right.numerator, task.right.denominator
-    ])).toEqual([
+    ]), [
       [3, 10, 1, 10], [5, 10, 4, 10], [9, 10, 2, 10],
       [6, 7, 5, 7], [9, 10, 9, 10]
     ]);
-    expect(exercise.tasks.slice(0, 5).every(task => task.source === "user-screenshot")).toBe(true);
-    expect(exercise.tasks.slice(5).every(task => task.source === "authored-variation")).toBe(true);
+    assert.equal(exercise.tasks.slice(0, 5).every(task => task.source === "user-screenshot"), true);
+    assert.equal(exercise.tasks.slice(5).every(task => task.source === "authored-variation"), true);
     for (const task of exercise.tasks) {
-      expect(task.left.denominator).toBe(task.right.denominator);
-      expect(task.left.numerator).toBeGreaterThan(0);
-      expect(task.left.numerator).toBeLessThan(task.left.denominator);
-      expect(task.right.numerator).toBeGreaterThan(0);
-      expect(task.right.numerator).toBeLessThan(task.right.denominator);
+      assert.equal(task.left.denominator, task.right.denominator);
+      assert.ok(task.left.numerator > 0 && task.left.numerator < task.left.denominator);
+      assert.ok(task.right.numerator > 0 && task.right.numerator < task.right.denominator);
     }
-  });
 
+}
   it("requires learner-led simplification when the result is reducible", () => {
     const session = createFractionSameDenominatorAdditionSession({ learnerKey: "Zyon", storage: memoryStorage() });
-    expect(expectedFor(FRACTION_SAME_DENOMINATOR_ADDITION_EXERCISE.tasks[0])).toMatchObject({
+    assert.deepEqual(expectedFor(FRACTION_SAME_DENOMINATOR_ADDITION_EXERCISE.tasks[0]), {
       whole: 0, numerator: 4, denominator: 10, reducedNumerator: 2, reducedDenominator: 5,
       requiresSimplification: true
-    });
-    expect(session.recordAnswer({ values: answer({ numerator: "4", denominator: "10" }) }).classification)
-      .toBe("requires_simplification");
-    expect(session.getProgress().completedCount).toBe(0);
-    expect(session.recordAnswer({ values: answer({
+
+}
+    assert.equal(session.recordAnswer({ values: answer({ numerator: "4", denominator: "10" }) }).classification, "requires_simplification");
+    assert.equal(session.getProgress().completedCount, 0);
+    assert.equal(session.recordAnswer({ values: answer({
       numerator: "4", denominator: "10", simplified: true,
       simplifiedNumerator: "2", simplifiedDenominator: "5"
-    }) }).classification).toBe("valid");
+    }) }).classification, "valid");
     expect(session.getProgress().completedCount).toBe(1);
-  });
 
+}
   it("accepts an unsimplified sum below one when it is already in simplest form", () => {
     const session = createFractionSameDenominatorAdditionSession({ learnerKey: "Zyon", storage: memoryStorage() });
-    expect(session.recordAnswer({ values: answer({ numerator: "4", denominator: "10" }) }).classification)
-      .toBe("requires_simplification");
-    expect(session.recordAnswer({ values: answer({
+    assert.equal(session.recordAnswer({ values: answer({ numerator: "4", denominator: "10" }) }).classification, "requires_simplification");
+    assert.equal(session.recordAnswer({ values: answer({
       numerator: "4", denominator: "10", simplified: true,
       simplifiedNumerator: "2", simplifiedDenominator: "5"
-    }) }).classification).toBe("valid");
+    }) }).classification, "valid");
     expect(session.recordAnswer({ values: answer({ numerator: "9", denominator: "10" }) }).classification)
       .toBe("valid");
-    expect(session.getProgress().completedCount).toBe(2);
-    expect(session.getCurrentTask().id).toBe("FSD1-03");
-  });
+    assert.equal(session.getProgress().completedCount, 2);
+    assert.equal(session.getCurrentTask().id, "FSD1-03");
 
+}
   it("requires a whole-number field when the sum is greater than one", () => {
     const session = createFractionSameDenominatorAdditionSession({ learnerKey: "Zyon", storage: memoryStorage() });
     for (let i = 0; i < 2; i++) session.recordAnswer({ values: answer({
       numerator: i === 0 ? "4" : "9", denominator: "10",
       simplified: i === 0, simplifiedNumerator: "2", simplifiedDenominator: "5"
     }) });
-    expect(session.recordAnswer({ values: answer({ numerator: "1", denominator: "10" }) }).classification)
-      .toBe("requires_mixed_number");
+    assert.equal(session.recordAnswer({ values: answer({ numerator: "1", denominator: "10" }) }).classification, "requires_mixed_number");
     expect(session.recordAnswer({ values: answer({
       wholeNumberEnabled: true, wholeNumber: "1", numerator: "1", denominator: "10"
-    }) }).classification).toBe("valid");
-  });
+    }) }).classification, "valid");
 
+}
   it("keeps the whole-number part and requires a reduced fraction for 9/10 + 9/10", () => {
     const session = createFractionSameDenominatorAdditionSession({ learnerKey: "Zyon", storage: memoryStorage() });
     for (let i = 0; i < 4; i++) {
@@ -103,18 +99,18 @@ describe("same-denominator fraction addition exercise", () => {
         values.simplifiedNumerator = String(expected.reducedNumerator);
         values.simplifiedDenominator = String(expected.reducedDenominator);
       }
-      expect(session.recordAnswer({ values }).classification).toBe("valid");
-      expect(task).toBeTruthy();
+      assert.equal(session.recordAnswer({ values }).classification, "valid", task.id);
+      assert.ok(task);
     }
     expect(session.recordAnswer({ values: answer({
       wholeNumberEnabled: true, wholeNumber: "1", numerator: "8", denominator: "10"
-    }) }).classification).toBe("requires_simplification");
+    }) }).classification, "requires_simplification");
     expect(session.recordAnswer({ values: answer({
       wholeNumberEnabled: true, wholeNumber: "1", numerator: "8", denominator: "10",
       simplified: true, simplifiedNumerator: "4", simplifiedDenominator: "5"
-    }) }).classification).toBe("valid");
-  });
+    }) }).classification, "valid");
 
+}
   it("rejects wrong whole-number and wrong reduced fraction values", () => {
     const session = createFractionSameDenominatorAdditionSession({ learnerKey: "Zyon", storage: memoryStorage() });
     for (let i = 0; i < 4; i++) {
@@ -125,11 +121,15 @@ describe("same-denominator fraction addition exercise", () => {
       if (expected.requiresSimplification) Object.assign(values, {
         simplified: true, simplifiedNumerator: String(expected.reducedNumerator),
         simplifiedDenominator: String(expected.reducedDenominator)
-      });
+
+}
       session.recordAnswer({ values });
     }
     expect(session.recordAnswer({ values: answer({
       wholeNumberEnabled: true, wholeNumber: "2", numerator: "8", denominator: "10"
-    }) }).classification).toBe("incorrect_answer");
-  });
-});
+    }) }).classification, "incorrect_answer");
+
+}
+
+}
+console.log("PacoGO same-denominator fraction addition session tests passed.");

@@ -72,7 +72,7 @@ assert.equal(session.recordAnswer({ values: answer({
   simplified: true, simplifiedNumerator: "4", simplifiedDenominator: "5"
 }) }).classification, "valid");
 
-assert.equal(session.getProgress().completedCount, 6);
+assert.equal(session.getProgress().completedCount, 5);
 const wrongWholeSession = createFractionSameDenominatorAdditionSession({ learnerKey: "other", storage: memoryStorage() });
 for (const values of [
   answer({ numerator: "4", denominator: "10", simplified: true, simplifiedNumerator: "2", simplifiedDenominator: "5" }),

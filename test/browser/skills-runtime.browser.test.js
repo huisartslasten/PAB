@@ -403,7 +403,7 @@ test('same-denominator addition presents 15 tasks and checks proper, mixed and s
   expect(result.simplifiedFeedback).toContain('Goed gedaan');
   expect(result.secondFeedback).toContain('Goed gedaan');
   expect(result.thirdFeedback).toContain('Goed gedaan');
-  expect(result.thirdProgress).toContain('3 van 15');
+  expect(result.thirdProgress).toContain('Som 4 van 15');
   expect(result.fourthFeedback).toContain('Goed gedaan');
   expect(result.fifthFeedback).toContain('Goed gedaan');
 });

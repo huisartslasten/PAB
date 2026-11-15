@@ -85,7 +85,8 @@ describe('PacoGO bone difficulty indicator', () => {
     expect(indicator.querySelectorAll('svg')).toHaveLength(5);
     expect(indicator.querySelectorAll('svg.is-filled')).toHaveLength(1);
     expect(indicator.querySelectorAll('svg:not(.is-filled)')).toHaveLength(4);
-    expect(indicator.querySelector('path').getAttribute('d')).toContain('M11 5.5');\n    expect(indicator.querySelector('path').getAttribute('d')).toContain('H14.5');
+    expect(indicator.querySelector('path').getAttribute('d')).toContain('M11 5.5');
+    expect(indicator.querySelector('path').getAttribute('d')).toContain('H14.5');
   });
 
   it('renders all filled bones at level five and rejects invalid levels', async () => {

@@ -75,8 +75,11 @@ function renderFractionAnswerInput({
   const equals = document.createElement("span");
   equals.className = "pacogo-fraction-answer__equals";
   equals.textContent = "=";
+  const simplifiedWhole = document.createElement("span");
+  simplifiedWhole.className = "pacogo-fraction-answer__simplified-whole";
+  simplifiedWhole.hidden = true;
   const reduced = createFraction(text.simplifiedNumerator, text.simplifiedDenominator, "simplified");
-  simplifiedGroup.append(equals, reduced.root);
+  simplifiedGroup.append(simplifiedWhole, equals, reduced.root);
   line.append(whole.wrapper, primary.root, simplifiedGroup);
   root.append(line);
 
@@ -108,7 +111,12 @@ function renderFractionAnswerInput({
       simplifiedDenominator: reduced.denominator.value
     });
   }
-  function emit() { onChange(getValues()); }
+  function syncSimplifiedWhole() {
+    const showWhole = wholeEnabled && whole.input.value.trim() !== "";
+    simplifiedWhole.hidden = !showWhole;
+    simplifiedWhole.textContent = showWhole ? whole.input.value : "";
+  }
+  function emit() { syncSimplifiedWhole(); onChange(getValues()); }
 
   [whole.input, primary.numerator, primary.denominator, reduced.numerator, reduced.denominator]
     .forEach(input => input.addEventListener("input", emit));
@@ -119,6 +127,7 @@ function renderFractionAnswerInput({
     wholeToggle.textContent = wholeEnabled ? "Heel getal verwijderen" : text.wholeToggle;
     wholeToggle.setAttribute("aria-pressed", String(wholeEnabled));
     if (!wholeEnabled) whole.input.value = "";
+    syncSimplifiedWhole();
     emit();
     if (wholeEnabled) whole.input.focus();
   });

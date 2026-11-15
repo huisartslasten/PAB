@@ -732,3 +732,40 @@
 .fraction-practice-feedback.is-error{background:#fff4e8;color:#8a4c12}
 .fraction-practice-complete{margin:0;padding:18px 12px;text-align:center;font:800 22px/1.25 "Baloo 2",Nunito,sans-serif;color:var(--paco-text)}
 @media(max-width:600px){.fraction-whole-mixed-expression{gap:9px;min-height:70px;font-size:24px}.fraction-whole-mixed-expression__operator{font-size:24px}}
+
+/* Keep the full arithmetic expression and its answer together on one line. */
+.fraction-whole-mixed-equation {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 18px;
+  width: 100%;
+  min-width: 0;
+  flex-wrap: nowrap;
+}
+.fraction-whole-mixed-equation .fraction-whole-mixed-expression {
+  flex: 0 0 auto;
+  min-height: 0;
+}
+.fraction-whole-mixed-equation .fraction-whole-mixed-expression__operator {
+  flex: 0 0 auto;
+}
+.fraction-whole-mixed-equation .fraction-whole-mixed-answer {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+.fraction-whole-mixed-equation .pacogo-fraction-answer {
+  width: auto;
+}
+@media (max-width: 600px) {
+  .fraction-whole-mixed-equation {
+    gap: 8px;
+  }
+  .fraction-whole-mixed-equation .fraction-whole-mixed-expression {
+    gap: 7px;
+    font-size: 22px;
+  }
+  .fraction-whole-mixed-equation .fraction-whole-mixed-expression__operator {
+    font-size: 22px;
+  }
+}

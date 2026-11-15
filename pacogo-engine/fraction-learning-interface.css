@@ -769,3 +769,18 @@
     font-size: 22px;
   }
 }
+
+/* Preserve the entered whole-number part when showing an equivalent reduced mixed number. */
+.pacogo-fraction-answer__simplified-whole {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1ch;
+  color: #102b57;
+  font-size: 23px;
+  font-weight: 900;
+  line-height: 1.05;
+}
+.pacogo-fraction-answer__simplified-whole[hidden] {
+  display: none;
+}

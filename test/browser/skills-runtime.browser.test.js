@@ -98,3 +98,55 @@ test('fraction subject overview uses the canonical PacoGO page template and show
   expect(result.topicCount).toBe(6);
   expect(result.legacyDetailVisible).toBe(false);
 });
+
+
+test('Optellen in the fraction overview opens the six-row addition overview with the supplied difficulty levels', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    let navigatedTo = '';
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {},
+      managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    const runtime = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', documentRef: document,
+      navigate: target => { navigatedTo = String(target); }
+    });
+    await runtime.mount();
+    const additionTile = [...document.querySelectorAll('.paco-tile')].find(tile =>
+      tile.querySelector('.paco-tile-title')?.textContent === 'Optellen'
+    );
+    additionTile.querySelector('.paco-tile-action').click();
+    const additionRuntime = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'optellen', documentRef: document, navigate: () => {}
+    });
+    await additionRuntime.mount();
+    return {
+      navigation: navigatedTo,
+      pageTitle: document.querySelector('.paco-template-main h1')?.textContent || '',
+      labels: [...document.querySelectorAll('.skills-addition-overview-label')].map(node => node.textContent),
+      levels: [...document.querySelectorAll('.skills-addition-overview-row')].map(row => row.querySelectorAll('.skills-addition-overview-dot.is-filled').length),
+      templatePresent: Boolean(document.querySelector('.paco-page-template'))
+    };
+  });
+  expect(result.navigation).toContain('topic=optellen');
+  expect(result.navigation).toContain('domain=fractions');
+  expect(result.pageTitle).toBe('Optellen');
+  expect(result.templatePresent).toBe(true);
+  expect(result.labels).toEqual([
+    'Heel getal optellen bij een breukgetal groter dan 1',
+    'Gelijknamige breuken kleiner dan 1 bij elkaar optellen',
+    'Breuken gelijknamig maken',
+    'Gelijknamige breuken groter dan 1 bij elkaar optellen',
+    'Ongelijknamige breuken kleiner dan 1 bij elkaar optellen',
+    'Ongelijknamige breuken groter dan 1 bij elkaar optellen'
+  ]);
+  expect(result.levels).toEqual([1, 1, 2, 2, 4, 5]);
+});

@@ -297,6 +297,10 @@ test('simplified mixed-number answer keeps the whole-number part unchanged', asy
       preservedWhole: preservedWhole.textContent,
       preservedWholeVisible: !preservedWhole.hidden,
       simplifiedGroupVisible: !work.querySelector('.pacogo-fraction-answer__simplified').hidden,
+      simplifiedSequence: [...work.querySelector('.pacogo-fraction-answer__simplified').children].map(node =>
+        node.classList.contains('pacogo-fraction-answer__equals') ? 'equals' :
+        node.classList.contains('pacogo-fraction-answer__simplified-whole') ? 'whole' : 'fraction'
+      ),
       reducedFields: [...work.querySelectorAll('[data-answer-part^="simplified"]')].length,
       wholeInputs: work.querySelectorAll('[data-answer-part="whole"]').length,
       values: answer.getValues()
@@ -306,6 +310,7 @@ test('simplified mixed-number answer keeps the whole-number part unchanged', asy
   expect(result.preservedWhole).toBe('6');
   expect(result.preservedWholeVisible).toBe(true);
   expect(result.simplifiedGroupVisible).toBe(true);
+  expect(result.simplifiedSequence).toEqual(['equals', 'whole', 'fraction']);
   expect(result.reducedFields).toBe(2);
   expect(result.wholeInputs).toBe(1);
   expect(result.values.wholeNumber).toBe('6');

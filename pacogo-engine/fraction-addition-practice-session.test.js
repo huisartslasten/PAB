@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { createFractionAdditionPracticeSession } from "./fraction-addition-practice-session.js";
+import { FRACTION_ADDITION_PRACTICE_TASKS } from "./fraction-addition-practice-task-bank.js";
 
 function createMemoryStorage() {
   const values = new Map();
@@ -14,6 +15,18 @@ function createMemoryStorage() {
 function completeCurrentTask(session, answers) {
   for (const answer of answers) assert.equal(session.recordResponse({ rawValue: String(answer) }).classification, "valid");
 }
+
+assert.equal(FRACTION_ADDITION_PRACTICE_TASKS.length, 6);
+assert.deepEqual(FRACTION_ADDITION_PRACTICE_TASKS.map(task => [
+  task.leftFraction.numerator, task.leftFraction.denominator,
+  task.rightFraction.numerator, task.rightFraction.denominator
+]), [
+  [1, 3, 1, 4], [1, 4, 3, 8], [2, 5, 3, 10],
+  [1, 6, 5, 12], [2, 3, 1, 5], [1, 3, 5, 8]
+]);
+assert.equal(new Set(FRACTION_ADDITION_PRACTICE_TASKS.map(task => task.id)).size, 6);
+assert.equal(FRACTION_ADDITION_PRACTICE_TASKS.every(task => task.source), true);
+assert.throws(() => { FRACTION_ADDITION_PRACTICE_TASKS[0].leftFraction.numerator = 99; }, TypeError);
 
 const storage = createMemoryStorage();
 const learnerA = createFractionAdditionPracticeSession({ learnerKey: "learner-a", storage });

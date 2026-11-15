@@ -258,7 +258,6 @@ export function createSkillsRuntime({
     const showingFractions = domain === FRACTION_DOMAIN;
     const showingAddition = showingFractions && topic === 'optellen';
     const showingPractice = showingAddition && exercise === 'whole-number-mixed-addition';
-    const showingPractice = showingAddition && exercise === 'whole-number-mixed-addition';
     mountPacoPageTemplate({
       mount: templateMount,
       greeting: student ? `Hoi ${student}! 🐶` : 'Welkom bij PacoGO!',

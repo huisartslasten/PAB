@@ -7151,3 +7151,59 @@ Full Regression:
 Geen SLO-, curriculumregistry-, evidence-, mastery-, learner-state-, Supabase- of LIVE `main`-wijziging. Geen deployment.
 
 **Volgende concrete stap:** ontwerp vanuit de daadwerkelijke eerste opteloefening het herbruikbare oefen-/sessiecontract dat meerdere opgaven en verschillende antwoordvormen kan ondersteunen. Controleer eerst de exacte bronopgave en de gewenste getalnotatie; leid die niet af uit de bestaande vijftien-tienden-demonstratie. Gebruik de centrale PacoGO-paginatemplate en de bestaande Fraction Practice Template/interface. Houd de botjesindicator buiten de oefenpagina totdat de gebruiker de zichtbare vorm heeft beoordeeld.
+## Formatieve breukenopteloefeningen — eerste twee oefenreeksen (2026-11-15)
+
+### Uitgevoerde bouwstap
+
+De leerlingroute **Skills → Breuken → Optellen** is uitgebreid met formatieve oefenroutes. Alle oefenpagina's gebruiken de centrale mountPacoPageTemplate-paginaopbouw en de bestaande Fraction Practice Template, gedeelde breukweergave en gedeelde antwoordinvoer. Er is geen nieuwe pagina- of breuktemplate naast de centrale templates gemaakt.
+
+#### Reeks 1 — gelijknamige breuken kleiner dan 1
+
+- Oefening: **Gelijknamige breuken kleiner dan 1 bij elkaar optellen**.
+- Niveau-indicatie: 1 van 5; 15 opgaven, sequentieel aangeboden.
+- De eerste vijf opgaven zijn letterlijk overgenomen uit de door de gebruiker aangeleverde screenshots: 3/10 + 1/10, 5/10 + 4/10, 9/10 + 2/10, 6/7 + 5/7 en 9/10 + 9/10.
+- De overige tien opgaven zijn eigen variaties, niet broncitaten.
+- Voortgang en responsen worden per leerling in localStorage bijgehouden; geen Supabase- of formele learner-state-integratie.
+- Bij uitkomsten groter dan 1 moet de leerling het veld voor het hele getal zelf inschakelen en invullen.
+- Een correct maar vereenvoudigbaar antwoord wordt niet fout gerekend of afgerond: de leerling krijgt de vereenvoudigingsstap. Een al direct in vereenvoudigde vorm ingevoerd antwoord wordt geaccepteerd.
+- Na een correct antwoord gaat de oefening door naar de volgende opgave; na alle 15 volgt de afrondingsweergave.
+
+Implementatie:
+- pacogo-engine/fraction-same-denominator-addition-session.js
+- src/features/skills/runtime.js
+- regressies in test/browser/skills-runtime.browser.test.js en de bijbehorende session tests.
+
+#### Reeks 2 — gelijknamige breuken groter dan 1
+
+- Oefening: **Gelijknamige breuken groter dan 1 bij elkaar optellen**.
+- Niveau-indicatie: 2 van 5; 15 opgaven met gemengde getallen als beide termen.
+- De leerling voert het antwoord als gemengd getal in; het hele-getalveld is in deze oefenvorm verplicht.
+- Vereenvoudiging volgt dezelfde learner-led regel: geen automatische vereenvoudiging en geen onmiddellijke foutclassificatie bij een rekenkundig juist maar nog vereenvoudigbaar antwoord.
+- De 15 opgaven zijn geprogrammeerde oefenvariaties; ze zijn niet als letterlijke bronopgaven uit de screenshots aangemerkt.
+
+Implementatie:
+- pacogo-engine/fraction-mixed-same-denominator-addition-session.js
+- route en renderer in src/features/skills/runtime.js
+- session- en browserregressies in de bestaande testbestanden.
+
+### Belangrijke grenzen
+
+- Dit zijn formatieve oefenreeksen, geen formele FR1/FR2 curriculumtaken, diagnostische probes, evidence-mappings of masterybeslissingen.
+- De niveau-indicaties 1/5 en 2/5 zijn oefenopbouwlabels. Ze zijn geen gevalideerde moeilijkheidsschaal en bewijzen geen volledige verticale dekking.
+- De twee reeksen vormen nog geen complete optelleerlijn, geen volledige breukenleerlijn tot eind groep 8 en geen volledige 15-opgavenbank voor elk van de vijf niveaus.
+- Er is geen SLO-, curriculumregistry-, claim-, task-, evidence-, mastery-, next-action-, learner-state-, Supabase- of LIVE main-wijziging gedaan.
+- De centrale PacoGO-paginatemplate en Fraction Practice Template blijven verplicht voor elke volgende uitbreiding. Ontwerp nieuwe gedeelde functionaliteit centraal; kopieer geen paginashells of breukcomponenten.
+
+### Regressie, exacte commit en branch
+
+- Branch: refactor/professional-v1.
+- De browserregressie verwacht na de derde voltooide opgave terecht **Som 4 van 15**. De productlogica was correct; de oude testassertion liep één opgave achter.
+- Laatste codecommit: 0d853abf7c1702ec005e564602fcb7e1c1188645.
+- Full Regression #3747 / run 43759233144: **GREEN / SUCCESS** op exact deze commit.
+- Browser proof #741 / run 43759233181: **GREEN / SUCCESS** op exact dezelfde commit.
+- Beide workflows zijn daadwerkelijk afgerond met conclusie success.
+- LIVE main is onaangeroerd.
+
+### Volgende concrete stap
+
+Werk na deze oefenbouw de inhoudelijke inventaris bij: leg per bestaande en nieuwe opteloefening vast wat het leerdoel, de leerlinghandeling, voorkennis, representatie, antwoordvorm en opbouwpositie is. Vergelijk dit vervolgens met de bestaande SLO-/curriculumdocumenten en PacoGO Skills, zonder nieuwe formele identifiers te verzinnen. Breng eerst de inhoudelijke dekking en hiaten van **Breuken → Optellen** in kaart voordat meer oefenvarianten of andere rekenbewerkingen worden gebouwd. Het uiteindelijke projectdoel blijft een volledige, brongetrouwe verticale leerlijn voor alle leerjaren.

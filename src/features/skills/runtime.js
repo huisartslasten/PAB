@@ -4,8 +4,9 @@ import { createPacoTile, createPacoTileGrid } from '../../components/paco-tile.j
 import { createPacoBoneDifficulty } from '../../components/design-system.js';
 import { createFractionPracticeTemplate } from '../../../pacogo-engine/fraction-practice-template.js';
 import { renderFractionAnswerInput } from '../../../pacogo-engine/fraction-answer-input.js';
-import { renderMixedNumber } from '../../../pacogo-engine/fraction-learning-interface-renderers.js';
+import { renderFractionRepresentation, renderMixedNumber } from '../../../pacogo-engine/fraction-learning-interface-renderers.js';
 import { FRACTION_WHOLE_MIXED_ADDITION_EXERCISE, createFractionWholeMixedAdditionSession } from '../../../pacogo-engine/fraction-whole-mixed-addition-session.js';
+import { FRACTION_SAME_DENOMINATOR_ADDITION_EXERCISE, createFractionSameDenominatorAdditionSession } from '../../../pacogo-engine/fraction-same-denominator-addition-session.js';
 import { buildViewUrl } from '../../core/view-context.js';
 import { MATH_SKILL_SUBJECTS, FRACTION_NAVIGATION_TOPICS } from './skills-navigation-catalog.js';
 
@@ -130,13 +131,16 @@ export function createSkillsRuntime({
       const label = documentRef.createElement('span');
       label.className = 'skills-addition-overview-label';
       label.textContent = item.label;
-      if (index === 0) {
+      if (index === 0 || index === 1) {
         const open = documentRef.createElement('button');
         open.type = 'button';
         open.className = 'paco-btn paco-btn--primary paco-btn--small skills-addition-overview-open';
+        if (index === 0) open.classList.add('skills-addition-overview-open-whole-mixed');
+        else open.classList.add('skills-addition-overview-open-same-denominator');
         open.textContent = 'Oefenen';
+        const exerciseId = index === 0 ? 'whole-number-mixed-addition' : 'same-denominator-addition';
         open.addEventListener('click', () => navigate(buildViewUrl('skills.html', {
-          student, mode: context?.mode, extra: { domain: FRACTION_DOMAIN, topic: 'optellen', exercise: 'whole-number-mixed-addition' }
+          student, mode: context?.mode, extra: { domain: FRACTION_DOMAIN, topic: 'optellen', exercise: exerciseId }
         })));
         row.append(difficulty, label, open);
       } else row.append(difficulty, label);
@@ -261,17 +265,119 @@ export function createSkillsRuntime({
     renderCurrentTask();
   }
 
+  function renderSameDenominatorAdditionPractice() {
+    const learnerKey = student || context?.learnerId || 'local-learner';
+    const session = createFractionSameDenominatorAdditionSession({ learnerKey });
+    const exercise = FRACTION_SAME_DENOMINATOR_ADDITION_EXERCISE;
+
+    function renderCurrentTask() {
+      const task = session.getCurrentTask();
+      const progress = session.getProgress();
+      content.replaceChildren();
+      const card = documentRef.createElement('section');
+      card.className = 'card fraction-whole-mixed-addition-card fraction-same-denominator-addition-card';
+      const template = createFractionPracticeTemplate({ mount: card });
+      const title = documentRef.createElement('h2');
+      title.textContent = exercise.title;
+      const instruction = documentRef.createElement('p');
+      instruction.className = 'fraction-practice-instruction';
+      instruction.textContent = 'Tel de tellers bij elkaar op. De noemer blijft hetzelfde. Is je antwoord groter dan 1? Schrijf het dan als gemengd getal.';
+      const progressLabel = documentRef.createElement('p');
+      progressLabel.className = 'fraction-practice-progress';
+      progressLabel.textContent = 'Som ' + (progress.completedCount + 1) + ' van ' + progress.totalCount + ' · Niveau ' + exercise.difficultyLevel + ' van ' + exercise.maxDifficultyLevel;
+      template.titleArea.append(title);
+      template.instructionArea.append(instruction);
+      template.progressArea.append(progressLabel);
+
+      if (!task) {
+        const done = documentRef.createElement('p');
+        done.className = 'fraction-practice-complete';
+        done.textContent = 'Je hebt alle 15 sommen afgerond. Goed gewerkt!';
+        template.workArea.append(done);
+        content.append(card);
+        return;
+      }
+
+      const equation = documentRef.createElement('div');
+      equation.className = 'fraction-whole-mixed-equation';
+      const expression = documentRef.createElement('div');
+      expression.className = 'fraction-whole-mixed-expression';
+      expression.append(
+        renderFractionRepresentation(task.left, 'symbolic_fraction', 'Eerste breuk'),
+        Object.assign(documentRef.createElement('span'), { className: 'fraction-whole-mixed-expression__operator', textContent: '+' }),
+        renderFractionRepresentation(task.right, 'symbolic_fraction', 'Tweede breuk')
+      );
+      const equals = documentRef.createElement('span');
+      equals.className = 'fraction-whole-mixed-expression__operator';
+      equals.textContent = '=';
+      const answerMount = documentRef.createElement('div');
+      answerMount.className = 'fraction-whole-mixed-answer';
+      equation.append(expression, equals, answerMount);
+      template.workArea.append(equation);
+
+      const answer = renderFractionAnswerInput({
+        workMount: answerMount,
+        controlsMount: template.controlsArea,
+        wholeNumberMode: 'optional'
+      });
+      const check = documentRef.createElement('button');
+      check.type = 'button';
+      check.className = 'paco-btn paco-btn--primary';
+      check.textContent = 'Controleren';
+      template.actionsArea.append(check);
+
+      check.addEventListener('click', () => {
+        const result = session.recordAnswer({ values: answer.getValues() });
+        if (result.classification === 'valid') {
+          answer.lock();
+          check.disabled = true;
+          const feedback = documentRef.createElement('p');
+          feedback.className = 'fraction-practice-feedback is-correct';
+          feedback.setAttribute('role', 'status');
+          feedback.textContent = 'Goed gedaan! Je antwoord klopt.';
+          template.feedbackArea.replaceChildren(feedback);
+          const next = documentRef.createElement('button');
+          next.type = 'button';
+          next.className = 'paco-btn paco-btn--primary';
+          next.textContent = result.progress.isComplete ? 'Bekijk resultaat' : 'Volgende som';
+          next.addEventListener('click', renderCurrentTask);
+          template.actionsArea.replaceChildren(next);
+          progressLabel.textContent = 'Som ' + result.progress.completedCount + ' van ' + result.progress.totalCount + ' · Niveau ' + exercise.difficultyLevel + ' van ' + exercise.maxDifficultyLevel;
+          return;
+        }
+        const messages = {
+          invalid_input: 'Vul de teller en noemer in. De noemer moet groter zijn dan nul.',
+          incorrect_answer: 'Dat antwoord klopt nog niet. Tel de tellers op en houd de noemer gelijk.',
+          requires_mixed_number: 'De uitkomst is groter dan 1. Voeg het hele getal toe en schrijf de uitkomst als gemengd getal.',
+          requires_simplification: 'Je berekening klopt. Je kunt de breuk nog vereenvoudigen. Maak de breuk zo eenvoudig mogelijk.',
+          not_simplified: 'De vereenvoudigde breuk klopt nog niet. Probeer het nog eens.'
+        };
+        const feedback = documentRef.createElement('p');
+        feedback.className = 'fraction-practice-feedback is-error';
+        feedback.setAttribute('role', 'alert');
+        feedback.textContent = messages[result.classification] || 'Controleer je antwoord en probeer het opnieuw.';
+        template.feedbackArea.replaceChildren(feedback);
+      });
+      content.append(card);
+    }
+    renderCurrentTask();
+  }
+
   async function mount() {
     const showingFractions = domain === FRACTION_DOMAIN;
     const showingAddition = showingFractions && topic === 'optellen';
-    const showingPractice = showingAddition && exercise === 'whole-number-mixed-addition';
+    const showingWholeMixedPractice = showingAddition && exercise === 'whole-number-mixed-addition';
+    const showingSameDenominatorPractice = showingAddition && exercise === 'same-denominator-addition';
+    const showingPractice = showingWholeMixedPractice || showingSameDenominatorPractice;
     mountPacoPageTemplate({
       mount: templateMount,
       greeting: student ? `Hoi ${student}! 🐶` : 'Welkom bij PacoGO!',
       title: showingPractice ? 'Oefenen' : showingAddition ? 'Optellen' : showingFractions ? 'Breuken' : 'Skills',
       icon: showingAddition ? '➕' : showingFractions ? '½' : '📘',
-      subtitle: showingPractice
+      subtitle: showingWholeMixedPractice
         ? 'Breuken → Optellen → Heel getal optellen bij een breukgetal groter dan 1.'
+        : showingSameDenominatorPractice
+        ? 'Breuken → Optellen → Gelijknamige breuken kleiner dan 1 bij elkaar optellen.'
         : showingAddition
         ? 'Breuken → Optellen.'
         : showingFractions
@@ -288,7 +394,8 @@ export function createSkillsRuntime({
       content
     });
 
-    if (showingPractice) renderWholeNumberMixedAdditionPractice();
+    if (showingWholeMixedPractice) renderWholeNumberMixedAdditionPractice();
+    else if (showingSameDenominatorPractice) renderSameDenominatorAdditionPractice();
     else if (showingAddition) renderFractionAdditionOverview();
     else if (showingFractions) renderFractionOverview();
     else renderSubjectOverview();

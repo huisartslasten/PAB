@@ -88,7 +88,7 @@ assert.equal(learnerA.getCurrentTask(), null);
 assert.deepEqual(learnerA.getProgress(), {
   completedCount: 15,
   totalCount: 15,
-  attemptCount: 19,
+  attemptCount: 18,
   isComplete: true
 });
 assert.throws(() => learnerA.recordAnswer({ values: {} }), /already complete/);

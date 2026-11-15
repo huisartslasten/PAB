@@ -127,23 +127,29 @@ function createFractionSameDenominatorAdditionSession({ learnerKey, storage = gl
     let classification = "invalid_input";
 
     if (v) {
-      const base = [v.numerator, v.denominator];
-      const extra = v.simplified ? [v.simplifiedNumerator, v.simplifiedDenominator] : [];
-      const rawNumbers = [...base, ...extra].map(x => /^[0-9]+$/.test(x) ? Number(x) : NaN);
-      const [num, den, reducedNum, reducedDen] = rawNumbers;
+      const [num, den] = [v.numerator, v.denominator].map(x =>
+        /^[0-9]+$/.test(x) ? Number(x) : NaN
+      );
       const wholeValue = v.wholeNumberEnabled && /^[0-9]+$/.test(v.wholeNumber) ? Number(v.wholeNumber) : NaN;
       const wholeShapeValid = expected.whole === 0
         ? !v.wholeNumberEnabled
         : v.wholeNumberEnabled && Number.isSafeInteger(wholeValue);
-      if (rawNumbers.every(Number.isSafeInteger) && den > 0 && num > 0 && num < den &&
+      if (Number.isSafeInteger(num) && Number.isSafeInteger(den) && den > 0 && num > 0 && num < den &&
           wholeShapeValid && (!v.wholeNumberEnabled || Number.isSafeInteger(wholeValue))) {
         const enteredWhole = v.wholeNumberEnabled ? wholeValue : 0;
         const equivalent = (enteredWhole * den + num) * expected.denominator ===
           (expected.whole * expected.denominator + expected.numerator) * den;
         classification = equivalent ? "valid" : "incorrect_answer";
         if (equivalent && expected.requiresSimplification) {
-          if (!v.simplified) classification = "requires_simplification";
-          else {
+          const primaryIsReduced = gcd(num, den) === 1;
+          if (primaryIsReduced) {
+            // A learner may enter the final simplified answer directly in the primary fields.
+            classification = "valid";
+          } else if (!v.simplified) {
+            classification = "requires_simplification";
+          } else {
+            const reducedNum = /^[0-9]+$/.test(v.simplifiedNumerator) ? Number(v.simplifiedNumerator) : NaN;
+            const reducedDen = /^[0-9]+$/.test(v.simplifiedDenominator) ? Number(v.simplifiedDenominator) : NaN;
             const validReduced = Number.isSafeInteger(reducedNum) && Number.isSafeInteger(reducedDen) &&
               reducedNum > 0 && reducedDen > 0 && reducedNum < reducedDen &&
               gcd(reducedNum, reducedDen) === 1 &&
@@ -153,6 +159,8 @@ function createFractionSameDenominatorAdditionSession({ learnerKey, storage = gl
             classification = validReduced ? "valid" : "not_simplified";
           }
         } else if (equivalent && v.simplified) {
+          const reducedNum = /^[0-9]+$/.test(v.simplifiedNumerator) ? Number(v.simplifiedNumerator) : NaN;
+          const reducedDen = /^[0-9]+$/.test(v.simplifiedDenominator) ? Number(v.simplifiedDenominator) : NaN;
           const validReduced = Number.isSafeInteger(reducedNum) && Number.isSafeInteger(reducedDen) &&
             reducedNum > 0 && reducedDen > 0 && reducedNum < reducedDen &&
             gcd(reducedNum, reducedDen) === 1 &&

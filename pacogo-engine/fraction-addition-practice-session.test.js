@@ -21,6 +21,11 @@ const learnerB = createFractionAdditionPracticeSession({ learnerKey: "learner-b"
 assert.equal(learnerA.getCurrentStep().stepId, "common_denominator");
 assert.equal(learnerA.getCurrentStep().stepNumber, 1);
 assert.equal(learnerA.getCurrentStep().expression, "1/3 + 1/4 → noemer ?");
+assert.deepEqual(learnerA.getCurrentStep().leftFraction, { numerator: 1, denominator: 3 });
+assert.deepEqual(learnerA.getCurrentStep().rightFraction, { numerator: 1, denominator: 4 });
+assert.equal(learnerA.getCurrentStep().operationSymbol, "+");
+assert.equal(learnerA.getCurrentStep().taskNumber, 1);
+assert.equal(learnerA.getCurrentStep().totalTasks, 1);
 assert.equal(learnerA.recordResponse({ rawValue: "6" }).classification, "not_common_denominator");
 assert.equal(learnerA.getCurrentStep().stepId, "common_denominator");
 assert.equal(learnerA.recordResponse({ rawValue: "12" }).classification, "valid");
@@ -38,6 +43,10 @@ assert.equal(done.classification, "valid");
 assert.equal(done.progress.isComplete, true);
 assert.deepEqual(done.completion, {
   taskId: "fraction-addition-practice-01",
+  taskNumber: 1, totalTasks: 1,
+  leftFraction: { numerator: 1, denominator: 3 },
+  rightFraction: { numerator: 1, denominator: 4 },
+  operationSymbol: "+",
   leftNumerator: 4, rightNumerator: 3, resultNumerator: 7, denominator: 12
 });
 assert.equal(learnerA.getCurrentStep(), null);
@@ -90,11 +99,16 @@ assert.deepEqual(configured.getProgress(), {
 });
 assert.deepEqual(configured.getCompletion("addition-b"), {
   taskId: "addition-b",
+  taskNumber: 2, totalTasks: 2,
+  leftFraction: { numerator: 2, denominator: 5 },
+  rightFraction: { numerator: 1, denominator: 10 },
+  operationSymbol: "+",
   leftNumerator: 4,
   rightNumerator: 1,
   resultNumerator: 5,
   denominator: 10
 });
+assert.deepEqual(configured.getCompletion(), configured.getCompletion("addition-b"));
 const resumed = createFractionAdditionPracticeSession({
   learnerKey: "learner-configured", storage, tasks: configuredTasks
 });

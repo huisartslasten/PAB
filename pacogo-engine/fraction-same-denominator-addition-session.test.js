@@ -65,10 +65,14 @@ describe("same-denominator fraction addition exercise", () => {
 
   it("accepts an unsimplified sum below one when it is already in simplest form", () => {
     const session = createFractionSameDenominatorAdditionSession({ learnerKey: "Zyon", storage: memoryStorage() });
-    session.recordAnswer({ values: answer({ numerator: "4", denominator: "10" }) });
-    session.recordAnswer({ values: answer({
-      numerator: "9", denominator: "10"
-    }) });
+    expect(session.recordAnswer({ values: answer({ numerator: "4", denominator: "10" }) }).classification)
+      .toBe("requires_simplification");
+    expect(session.recordAnswer({ values: answer({
+      numerator: "4", denominator: "10", simplified: true,
+      simplifiedNumerator: "2", simplifiedDenominator: "5"
+    }) }).classification).toBe("valid");
+    expect(session.recordAnswer({ values: answer({ numerator: "9", denominator: "10" }) }).classification)
+      .toBe("valid");
     expect(session.getProgress().completedCount).toBe(2);
     expect(session.getCurrentTask().id).toBe("FSD1-03");
   });

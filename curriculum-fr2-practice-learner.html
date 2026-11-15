@@ -496,14 +496,18 @@
     renderConstructionTask();
   }
 
-  function renderAdditionVisual() {
+  function renderAdditionVisual(task) {
+    if (!task?.leftFraction || !task?.rightFraction) {
+      additionVisual.replaceChildren();
+      return;
+    }
     renderFractionOperation({
       mount: additionVisual,
-      operator: "+",
+      operator: task.operationSymbol || "+",
       areaModelLayout: FRACTION_OPERATION_PRESENTATION.areaModelLayout,
       terms: [
-        { label: "Eerste breuk", fraction: { numerator: 1, denominator: 3 } },
-        { label: "Tweede breuk", fraction: { numerator: 1, denominator: 4 } }
+        { label: "Eerste breuk", fraction: task.leftFraction },
+        { label: "Tweede breuk", fraction: task.rightFraction }
       ]
     });
   }
@@ -512,14 +516,18 @@
     const progress = additionSession.getProgress();
     const current = additionSession.getCurrentStep();
     additionProgress.textContent = current
-      ? "Stap " + current.stepNumber + " van " + current.totalSteps + " • " +
-        progress.completedStepCount + " van " + progress.totalStepCount + " afgerond"
-      : progress.totalStepCount + " van " + progress.totalStepCount + " stappen afgerond";
+      ? "Opgave " + current.taskNumber + " van " + current.totalTasks +
+        " • Stap " + current.stepNumber + " van " + current.totalSteps +
+        " • " + progress.completedStepCount + " van " + progress.totalStepCount + " stappen afgerond"
+      : progress.completedTaskCount + " van " + progress.totalTaskCount +
+        " opgaven • " + progress.totalStepCount + " van " + progress.totalStepCount + " stappen afgerond";
   }
 
   function showAdditionCompleted() {
     const completion = additionSession.getCompletion();
-    additionPrompt.textContent = "Je hebt alle vier stappen zelf ingevuld.";
+    renderAdditionVisual(completion);
+    additionPrompt.textContent = "Opgave " + completion.taskNumber + " van " +
+      completion.totalTasks + " afgerond. Je hebt alle vier stappen zelf ingevuld.";
     additionExpression.replaceChildren();
     const resultLabel = document.createElement("span");
     resultLabel.textContent = "Jouw uitkomst:";
@@ -832,6 +840,7 @@
       showAdditionCompleted();
       return;
     }
+    renderAdditionVisual(current);
     additionPrompt.textContent = current.prompt;
     additionFeedback.textContent = "Vul deze stap in. De volgende stap is nog niet zichtbaar.";
     additionNext.replaceChildren();
@@ -865,7 +874,6 @@
     exerciseCard.hidden = true;
     document.querySelector("#additionLearnerLabel").textContent =
       "PacoGO • " + selectedLearner.display_name + " • Extra breukenoefening";
-    renderAdditionVisual();
     renderAdditionStep();
   }
 

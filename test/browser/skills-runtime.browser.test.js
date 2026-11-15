@@ -375,7 +375,7 @@ test('same-denominator addition presents 15 tasks and checks proper, mixed and s
 
     // Fourth task: 11/7 = 1 4/7, then fifth task: 18/10 = 1 4/5.
     // The fifth answer is already simplified in the primary fields; no extra simplify step is needed.
-    click('.fraction-same-denominator-addition-card .fraction-whole-mixed-addition-actions .paco-btn');
+    click('.fraction-same-denominator-addition-card .pacogo-fraction-practice-template__actions .paco-btn');
     click('.pacogo-fraction-answer__toggle');
     set('whole', '1');
     set('primaryNumerator', '4');

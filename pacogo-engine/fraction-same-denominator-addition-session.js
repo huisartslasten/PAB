@@ -134,7 +134,7 @@ function createFractionSameDenominatorAdditionSession({ learnerKey, storage = gl
       const wholeValue = v.wholeNumberEnabled && /^[0-9]+$/.test(v.wholeNumber) ? Number(v.wholeNumber) : NaN;
       const wholeShapeValid = expected.whole === 0
         ? !v.wholeNumberEnabled
-        : v.wholeNumberEnabled && wholeValue === expected.whole;
+        : v.wholeNumberEnabled && Number.isSafeInteger(wholeValue);
       if (rawNumbers.every(Number.isSafeInteger) && den > 0 && num > 0 && num < den &&
           wholeShapeValid && (!v.wholeNumberEnabled || Number.isSafeInteger(wholeValue))) {
         const enteredWhole = v.wholeNumberEnabled ? wholeValue : 0;

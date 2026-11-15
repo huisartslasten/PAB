@@ -86,6 +86,9 @@ completeCurrentTask(configured, [12, 4, 3, 7]);
 assert.equal(configured.getCurrentStep().taskId, "addition-b");
 assert.equal(configured.getCurrentStep().taskNumber, 2);
 assert.equal(configured.getCurrentStep().expression, "2/5 + 1/10 → noemer ?");
+assert.deepEqual(configured.getCurrentStep().leftFraction, { numerator: 2, denominator: 5 });
+assert.deepEqual(configured.getCurrentStep().rightFraction, { numerator: 1, denominator: 10 });
+assert.equal(configured.recordResponse({ rawValue: "6" }).classification, "not_common_denominator");
 completeCurrentTask(configured, [10, 4, 1, 5]);
 assert.equal(configured.getCurrentStep(), null);
 assert.deepEqual(configured.getProgress(), {

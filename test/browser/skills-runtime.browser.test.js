@@ -350,11 +350,13 @@ test('same-denominator addition presents 15 tasks and checks proper, mixed and s
 
     set('primaryNumerator', '4');
     set('primaryDenominator', '10');
+    click('.fraction-same-denominator-addition-card .pacogo-fraction-practice-template__actions .paco-btn');
+    const firstFeedback = document.querySelector('.fraction-practice-feedback')?.textContent || '';
     click('.pacogo-fraction-answer__simplify');
     set('simplifiedNumerator', '2');
     set('simplifiedDenominator', '5');
     click('.fraction-same-denominator-addition-card .pacogo-fraction-practice-template__actions .paco-btn');
-    const firstFeedback = document.querySelector('.fraction-practice-feedback')?.textContent || '';
+    const simplifiedFeedback = document.querySelector('.fraction-practice-feedback')?.textContent || '';
     click('.fraction-same-denominator-addition-card .pacogo-fraction-practice-template__actions .paco-btn');
 
     set('primaryNumerator', '9');
@@ -369,7 +371,7 @@ test('same-denominator addition presents 15 tasks and checks proper, mixed and s
     set('primaryDenominator', '10');
     click('.fraction-same-denominator-addition-card .pacogo-fraction-practice-template__actions .paco-btn');
     const thirdFeedback = document.querySelector('.fraction-practice-feedback')?.textContent || '';
-    return { initial, firstFeedback, secondFeedback, thirdFeedback, thirdProgress: document.querySelector('.fraction-practice-progress')?.textContent || '' };
+    return { initial, firstFeedback, simplifiedFeedback, secondFeedback, thirdFeedback, thirdProgress: document.querySelector('.fraction-practice-progress')?.textContent || '' };
   });
   expect(result.initial.title).toContain('Gelijknamige breuken kleiner dan 1');
   expect(result.initial.progress).toContain('Som 1 van 15');
@@ -378,6 +380,7 @@ test('same-denominator addition presents 15 tasks and checks proper, mixed and s
   expect(result.initial.wholeToggleVisible).toBe(true);
   expect(result.initial.wholeFieldHidden).toBe(true);
   expect(result.firstFeedback).toContain('Je berekening klopt');
+  expect(result.simplifiedFeedback).toContain('Goed gedaan');
   expect(result.secondFeedback).toContain('Goed gedaan');
   expect(result.thirdFeedback).toContain('Goed gedaan');
   expect(result.thirdProgress).toContain('3 van 15');

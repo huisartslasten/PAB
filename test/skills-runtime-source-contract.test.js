@@ -32,6 +32,12 @@ test('Skills navigation catalog contains the agreed mathematics and fraction top
   }
 });
 
+test('fraction addition overview reuses central PacoGO difficulty bones and card styling', () => {
+  assert.match(runtime, /createPacoBoneDifficulty\\(\\{/);
+  assert.match(runtime, /overview\\.className = 'card skills-addition-overview'/);
+  assert.doesNotMatch(runtime, /skills-addition-overview-dot/);
+});
+
 test('central Skills entry does not expose the legacy FR2 detail page or practice shortcuts', () => {
   assert.doesNotMatch(runtime, /curriculum-fr2-learning-path\.html/);
   assert.doesNotMatch(runtime, /Start met breuken oefenen|Start breukendiagnose/);

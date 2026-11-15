@@ -14,15 +14,53 @@ const STEP_IDS = Object.freeze([
   "right_equivalent_numerator",
   "addition_result"
 ]);
+const RESPONSE_CLASSIFICATIONS = Object.freeze([
+  "valid", "not_common_denominator", "not_equivalent", "arithmetic_error", "invalid_input"
+]);
 
-function createFractionAdditionPracticeSession({ learnerKey, storage = globalThis.localStorage } = {}) {
+function normalizeTasks(tasks) {
+  if (!Array.isArray(tasks) || tasks.length === 0) {
+    throw new TypeError("At least one fraction addition task is required.");
+  }
+  const ids = new Set();
+  return Object.freeze(tasks.map((task, index) => {
+    const id = String(task?.id || "").trim();
+    const left = task?.leftFraction;
+    const right = task?.rightFraction;
+    const validFraction = fraction => fraction &&
+      Number.isSafeInteger(fraction.numerator) && fraction.numerator > 0 &&
+      Number.isSafeInteger(fraction.denominator) && fraction.denominator > 0;
+    if (!id || ids.has(id)) throw new TypeError("Fraction addition task IDs must be non-empty and unique.");
+    if (!validFraction(left) || !validFraction(right)) {
+      throw new TypeError("Each fraction addition task requires positive integer fractions.");
+    }
+    if (task.operation != null && task.operation !== "addition") {
+      throw new TypeError("Only addition tasks are supported by this session.");
+    }
+    ids.add(id);
+    return Object.freeze({
+      id,
+      leftFraction: Object.freeze({ numerator: left.numerator, denominator: left.denominator }),
+      rightFraction: Object.freeze({ numerator: right.numerator, denominator: right.denominator }),
+      operation: "addition",
+      operationSymbol: "+"
+    });
+  }));
+}
+
+function createFractionAdditionPracticeSession({
+  learnerKey,
+  storage = globalThis.localStorage,
+  tasks = FRACTION_ADDITION_PRACTICE_TASKS
+} = {}) {
   const learner = String(learnerKey || "").trim();
   if (!learner) throw new TypeError("A learner key is required.");
   if (!storage || typeof storage.getItem !== "function" ||
       typeof storage.setItem !== "function" || typeof storage.removeItem !== "function") {
     throw new TypeError("A compatible local storage object is required.");
   }
-  const task = FRACTION_ADDITION_PRACTICE_TASKS[0];
+  const configuredTasks = normalizeTasks(tasks);
+  const taskById = new Map(configuredTasks.map(task => [task.id, task]));
   const storageKey = "pacogo:fraction-addition-practice:v1:" + encodeURIComponent(learner);
   const emptyProgress = () => ({
     schemaVersion: 1, completedTaskIds: [], completedStepIdsByTask: {}, responsesByTask: {}
@@ -39,113 +77,147 @@ function createFractionAdditionPracticeSession({ learnerKey, storage = globalThi
         !parsed.responsesByTask || typeof parsed.responsesByTask !== "object") {
       throw new Error("Saved fraction addition practice has an unsupported format.");
     }
-    const completedStepIds = parsed.completedStepIdsByTask[task.id] || [];
-    const responses = parsed.responsesByTask[task.id] || [];
-    if (!Array.isArray(completedStepIds) || !Array.isArray(responses) ||
-        completedStepIds.some((id, index) => STEP_IDS[index] !== id) ||
-        completedStepIds.length > STEP_IDS.length) {
-      throw new Error("Saved fraction addition practice contains an invalid step sequence.");
-    }
-    for (const response of responses) {
-      if (!response || !STEP_IDS.includes(response.stepId) ||
-          typeof response.rawValue !== "string" ||
-          !["valid", "not_common_denominator", "not_equivalent", "arithmetic_error", "invalid_input"].includes(response.classification)) {
-        throw new Error("Saved fraction addition practice contains an invalid response.");
+    const completedStepIdsByTask = {};
+    const responsesByTask = {};
+    for (const task of configuredTasks) {
+      const completedStepIds = parsed.completedStepIdsByTask[task.id] || [];
+      const responses = parsed.responsesByTask[task.id] || [];
+      if (!Array.isArray(completedStepIds) || !Array.isArray(responses) ||
+          completedStepIds.some((id, index) => STEP_IDS[index] !== id) ||
+          completedStepIds.length > STEP_IDS.length) {
+        throw new Error("Saved fraction addition practice contains an invalid step sequence.");
       }
+      for (const response of responses) {
+        if (!response || !STEP_IDS.includes(response.stepId) ||
+            typeof response.rawValue !== "string" ||
+            !RESPONSE_CLASSIFICATIONS.includes(response.classification)) {
+          throw new Error("Saved fraction addition practice contains an invalid response.");
+        }
+      }
+      completedStepIdsByTask[task.id] = [...completedStepIds];
+      responsesByTask[task.id] = responses.map(response => ({
+        stepId: response.stepId, rawValue: response.rawValue, classification: response.classification
+      }));
     }
     return {
       schemaVersion: 1,
-      completedTaskIds: parsed.completedTaskIds.filter(id => id === task.id),
-      completedStepIdsByTask: { [task.id]: [...completedStepIds] },
-      responsesByTask: { [task.id]: responses.map(response => ({
-        stepId: response.stepId, rawValue: response.rawValue, classification: response.classification
-      })) }
+      completedTaskIds: parsed.completedTaskIds.filter(id => taskById.has(id)),
+      completedStepIdsByTask,
+      responsesByTask
     };
   }
 
-  function getValidValue(progress, stepId) {
-    const responses = progress.responsesByTask[task.id] || [];
+  function getValidValue(progress, taskId, stepId) {
+    const responses = progress.responsesByTask[taskId] || [];
     const response = [...responses].reverse().find(item =>
       item.stepId === stepId && item.classification === "valid"
     );
     return response ? Number(response.rawValue) : null;
   }
 
+  function getActiveTask(progress) {
+    return configuredTasks.find(task => !progress.completedTaskIds.includes(task.id)) || null;
+  }
+
   function getCurrentStep() {
     const progress = readProgress();
-    if (progress.completedTaskIds.includes(task.id)) return null;
+    const task = getActiveTask(progress);
+    if (!task) return null;
     const completed = progress.completedStepIdsByTask[task.id] || [];
     const stepId = STEP_IDS.find(id => !completed.includes(id));
-    const denominator = getValidValue(progress, "common_denominator");
-    const leftNumerator = getValidValue(progress, "left_equivalent_numerator");
-    const rightNumerator = getValidValue(progress, "right_equivalent_numerator");
+    const denominator = getValidValue(progress, task.id, "common_denominator");
+    const leftNumerator = getValidValue(progress, task.id, "left_equivalent_numerator");
+    const rightNumerator = getValidValue(progress, task.id, "right_equivalent_numerator");
+    const left = task.leftFraction;
+    const right = task.rightFraction;
     if (stepId === "common_denominator") {
       return Object.freeze({
-        taskId: task.id, stepId, stepNumber: 1, totalSteps: 4,
+        taskId: task.id, taskNumber: configuredTasks.indexOf(task) + 1,
+        totalTasks: configuredTasks.length, stepId, stepNumber: 1, totalSteps: STEP_IDS.length,
         prompt: "Kies een gemeenschappelijke noemer voor de twee getoonde breuken.",
         inputLabel: "Gemeenschappelijke noemer",
-        expression: "1/3 + 1/4 → noemer ?"
+        expression: left.numerator + "/" + left.denominator + " + " +
+          right.numerator + "/" + right.denominator + " → noemer ?"
       });
     }
     if (stepId === "left_equivalent_numerator") {
       return Object.freeze({
-        taskId: task.id, stepId, stepNumber: 2, totalSteps: 4,
+        taskId: task.id, taskNumber: configuredTasks.indexOf(task) + 1,
+        totalTasks: configuredTasks.length, stepId, stepNumber: 2, totalSteps: STEP_IDS.length,
         prompt: "Welke teller hoort bij de eerste breuk als de noemer " + denominator + " wordt?",
-        inputLabel: "Nieuwe teller voor 1/3",
-        expression: "1/3 = ?/" + denominator
+        inputLabel: "Nieuwe teller voor " + left.numerator + "/" + left.denominator,
+        expression: left.numerator + "/" + left.denominator + " = ?/" + denominator
       });
     }
     if (stepId === "right_equivalent_numerator") {
       return Object.freeze({
-        taskId: task.id, stepId, stepNumber: 3, totalSteps: 4,
+        taskId: task.id, taskNumber: configuredTasks.indexOf(task) + 1,
+        totalTasks: configuredTasks.length, stepId, stepNumber: 3, totalSteps: STEP_IDS.length,
         prompt: "Welke teller hoort bij de tweede breuk als de noemer " + denominator + " wordt?",
-        inputLabel: "Nieuwe teller voor 1/4",
-        expression: "1/4 = ?/" + denominator
+        inputLabel: "Nieuwe teller voor " + right.numerator + "/" + right.denominator,
+        expression: right.numerator + "/" + right.denominator + " = ?/" + denominator
       });
     }
     if (stepId === "addition_result") {
       return Object.freeze({
-        taskId: task.id, stepId, stepNumber: 4, totalSteps: 4,
-        prompt: "Tel de tellers op. De noemer blijft hetzelfde, want beide breuken zijn nu in twaalfden.",
+        taskId: task.id, taskNumber: configuredTasks.indexOf(task) + 1,
+        totalTasks: configuredTasks.length, stepId, stepNumber: 4, totalSteps: STEP_IDS.length,
+        prompt: "Tel de tellers op. De noemer blijft hetzelfde.",
         inputLabel: "Teller van de som",
-        expression: leftNumerator + "/" + denominator + " + " + rightNumerator + "/" + denominator + " = ?/" + denominator
+        expression: leftNumerator + "/" + denominator + " + " +
+          rightNumerator + "/" + denominator + " = ?/" + denominator
       });
     }
     return null;
   }
 
-  function getCompletion() {
+  function getCompletion(taskId) {
     const progress = readProgress();
-    if (!progress.completedTaskIds.includes(task.id)) return null;
+    const task = taskId == null
+      ? (configuredTasks.length === 1 ? configuredTasks[0] : configuredTasks.find(item => progress.completedTaskIds.includes(item.id)))
+      : taskById.get(taskId);
+    if (!task || !progress.completedTaskIds.includes(task.id)) return null;
     return Object.freeze({
-      leftNumerator: getValidValue(progress, "left_equivalent_numerator"),
-      rightNumerator: getValidValue(progress, "right_equivalent_numerator"),
-      resultNumerator: getValidValue(progress, "addition_result"),
-      denominator: getValidValue(progress, "common_denominator")
+      taskId: task.id,
+      leftNumerator: getValidValue(progress, task.id, "left_equivalent_numerator"),
+      rightNumerator: getValidValue(progress, task.id, "right_equivalent_numerator"),
+      resultNumerator: getValidValue(progress, task.id, "addition_result"),
+      denominator: getValidValue(progress, task.id, "common_denominator")
     });
   }
 
   function getProgress() {
     const progress = readProgress();
+    const completedStepCount = configuredTasks.reduce((total, task) =>
+      total + (progress.completedStepIdsByTask[task.id] || []).length, 0);
+    const attemptCount = configuredTasks.reduce((total, task) =>
+      total + (progress.responsesByTask[task.id] || []).length, 0);
+    const completedTaskCount = configuredTasks.filter(task =>
+      progress.completedTaskIds.includes(task.id)).length;
+    const activeTask = getActiveTask(progress);
     return Object.freeze({
-      completedStepCount: (progress.completedStepIdsByTask[task.id] || []).length,
-      totalStepCount: STEP_IDS.length,
-      attemptCount: (progress.responsesByTask[task.id] || []).length,
-      isComplete: progress.completedTaskIds.includes(task.id)
+      completedStepCount,
+      totalStepCount: configuredTasks.length * STEP_IDS.length,
+      attemptCount,
+      completedTaskCount,
+      totalTaskCount: configuredTasks.length,
+      currentTaskId: activeTask?.id || null,
+      isComplete: completedTaskCount === configuredTasks.length
     });
   }
 
   function recordResponse({ rawValue } = {}) {
     const current = getCurrentStep();
-    if (!current) throw new Error("The fraction addition practice task is already complete.");
+    if (!current) throw new Error("The fraction addition practice session is already complete.");
+    const task = taskById.get(current.taskId);
     const raw = String(rawValue ?? "");
     const parsed = /^[0-9]+$/.test(raw) ? Number(raw) : NaN;
     const value = Number.isSafeInteger(parsed) ? parsed : NaN;
     let classification = "invalid_input";
     const progress = readProgress();
-    const denominator = getValidValue(progress, "common_denominator");
-    const leftNumerator = getValidValue(progress, "left_equivalent_numerator");
-    const rightNumerator = getValidValue(progress, "right_equivalent_numerator");
+    const denominator = getValidValue(progress, task.id, "common_denominator");
+    const leftNumerator = getValidValue(progress, task.id, "left_equivalent_numerator");
+    const rightNumerator = getValidValue(progress, task.id, "right_equivalent_numerator");
 
     if (Number.isSafeInteger(value) && value > 0) {
       if (current.stepId === "common_denominator") {
@@ -175,7 +247,7 @@ function createFractionAdditionPracticeSession({ learnerKey, storage = globalThi
     }
     storage.setItem(storageKey, JSON.stringify(progress));
     return Object.freeze({
-      classification, progress: getProgress(), completion: getCompletion()
+      classification, progress: getProgress(), completion: getCompletion(task.id)
     });
   }
 

@@ -316,3 +316,69 @@ test('simplified mixed-number answer keeps the whole-number part unchanged', asy
   expect(result.values.wholeNumber).toBe('6');
   expect(result.values.simplified).toBe(true);
 });
+
+test('same-denominator addition presents 15 tasks and checks proper, mixed and simplified results', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=optellen', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    localStorage.removeItem('pacogo:fraction-same-denominator-addition:v1:Zyon');
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {},
+      managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    const runtime = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'optellen', exercise: 'same-denominator-addition',
+      documentRef: document, navigate: () => {}
+    });
+    await runtime.mount();
+    const snapshot = () => ({
+      title: document.querySelector('.pacogo-fraction-practice-template__title-area h2')?.textContent || '',
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      operands: document.querySelectorAll('.fraction-same-denominator-addition-card .pacogo-fraction-representation--symbolic').length,
+      plus: document.querySelector('.fraction-whole-mixed-expression .fraction-whole-mixed-expression__operator')?.textContent || '',
+      wholeToggleVisible: !document.querySelector('.pacogo-fraction-answer__toggle').hidden,
+      wholeFieldHidden: document.querySelector('[data-answer-part="whole"]').closest('label').hidden
+    });
+    const initial = snapshot();
+    const set = (part, value) => { document.querySelector('[data-answer-part="' + part + '"]').value = value; };
+    const click = selector => document.querySelector(selector).click();
+
+    set('primaryNumerator', '4');
+    set('primaryDenominator', '10');
+    click('.pacogo-fraction-answer__simplify');
+    set('simplifiedNumerator', '2');
+    set('simplifiedDenominator', '5');
+    click('.fraction-same-denominator-addition-card .pacogo-fraction-practice-template__actions .paco-btn');
+    const firstFeedback = document.querySelector('.fraction-practice-feedback')?.textContent || '';
+    click('.fraction-same-denominator-addition-card .pacogo-fraction-practice-template__actions .paco-btn');
+
+    set('primaryNumerator', '9');
+    set('primaryDenominator', '10');
+    click('.fraction-same-denominator-addition-card .pacogo-fraction-practice-template__actions .paco-btn');
+    const secondFeedback = document.querySelector('.fraction-practice-feedback')?.textContent || '';
+    click('.fraction-same-denominator-addition-card .pacogo-fraction-practice-template__actions .paco-btn');
+
+    click('.pacogo-fraction-answer__toggle');
+    set('whole', '1');
+    set('primaryNumerator', '1');
+    set('primaryDenominator', '10');
+    click('.fraction-same-denominator-addition-card .pacogo-fraction-practice-template__actions .paco-btn');
+    const thirdFeedback = document.querySelector('.fraction-practice-feedback')?.textContent || '';
+    return { initial, firstFeedback, secondFeedback, thirdFeedback, thirdProgress: document.querySelector('.fraction-practice-progress')?.textContent || '' };
+  });
+  expect(result.initial.title).toContain('Gelijknamige breuken kleiner dan 1');
+  expect(result.initial.progress).toContain('Som 1 van 15');
+  expect(result.initial.operands).toBe(2);
+  expect(result.initial.plus).toBe('+');
+  expect(result.initial.wholeToggleVisible).toBe(true);
+  expect(result.initial.wholeFieldHidden).toBe(true);
+  expect(result.firstFeedback).toContain('Je berekening klopt');
+  expect(result.secondFeedback).toContain('Goed gedaan');
+  expect(result.thirdFeedback).toContain('Goed gedaan');
+  expect(result.thirdProgress).toContain('3 van 15');
+});

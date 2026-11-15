@@ -94,7 +94,7 @@ assert.equal(configured.getCurrentStep(), null);
 assert.deepEqual(configured.getProgress(), {
   completedStepCount: 8,
   totalStepCount: 8,
-  attemptCount: 8,
+  attemptCount: 9,
   completedTaskCount: 2,
   totalTaskCount: 2,
   currentTaskId: null,

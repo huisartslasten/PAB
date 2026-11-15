@@ -198,10 +198,10 @@ test('first whole-number plus mixed-fraction practice uses the central page and 
       stackedFraction: document.querySelectorAll('.pacogo-fraction-representation--symbolic').length,
       slashNotation: document.querySelector('.fraction-whole-mixed-expression')?.textContent.includes('/') || false,
       controlsSeparate: Boolean(document.querySelector('.pacogo-fraction-practice-template__controls .pacogo-fraction-answer__controls')),
+      wholeNumberVisible: !document.querySelector('[data-answer-part="whole"]').closest('label').hidden,
+      wholeNumberToggleVisible: !document.querySelector('.pacogo-fraction-answer__toggle').hidden,
       questionCount: 15
     };
-    const wholeToggle = document.querySelector('.pacogo-fraction-answer__toggle input');
-    wholeToggle.click();
     document.querySelector('[data-answer-part="whole"]').value = '3';
     document.querySelector('[data-answer-part="primaryNumerator"]').value = '1';
     document.querySelector('[data-answer-part="primaryDenominator"]').value = '2';
@@ -226,5 +226,7 @@ test('first whole-number plus mixed-fraction practice uses the central page and 
   expect(result.initial.stackedFraction).toBeGreaterThan(0);
   expect(result.initial.slashNotation).toBe(false);
   expect(result.initial.controlsSeparate).toBe(true);
+  expect(result.initial.wholeNumberVisible).toBe(true);
+  expect(result.initial.wholeNumberToggleVisible).toBe(false);
   expect(result.feedback).toContain('Goed gedaan');
 });

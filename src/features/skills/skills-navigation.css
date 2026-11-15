@@ -11,5 +11,13 @@
 .skills-navigation-tile--topic{height:94px;min-height:94px}
 .skills-navigation-tile--topic .paco-tile-body{flex-direction:row;align-items:center}
 .skills-navigation-tile--topic .paco-tile-meta{font-size:10px;line-height:1.2}
+.skills-addition-overview{padding:8px 0 0}
+.skills-addition-overview-list{display:grid;border-top:1px solid #c9e1ed}
+.skills-addition-overview-row{display:grid;grid-template-columns:116px minmax(0,1fr);align-items:center;gap:16px;min-height:82px;padding:13px 18px;border-bottom:1px solid #c9e1ed;background:#fff}
+.skills-addition-overview-dots{display:flex;align-items:center;gap:5px}
+.skills-addition-overview-dot{width:16px;height:16px;border:2px solid #79c96b;border-radius:50%;background:#fff}
+.skills-addition-overview-dot.is-filled{border-color:#4caf35;background:#4caf35}
+.skills-addition-overview-label{color:#101820;font-size:clamp(17px,2vw,25px);line-height:1.25}
+@media(max-width:600px){.skills-addition-overview-row{grid-template-columns:88px minmax(0,1fr);gap:10px;min-height:72px;padding:11px 12px}.skills-addition-overview-dot{width:13px;height:13px}.skills-addition-overview-dots{gap:4px}.skills-addition-overview-label{font-size:16px}}
 @media(max-width:900px){.skills-navigation-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.skills-navigation-card{padding:14px}.skills-navigation-grid{grid-template-columns:minmax(0,1fr);gap:9px}.skills-navigation-tile,.skills-navigation-tile--topic{height:auto;min-height:76px;padding:10px 12px}}

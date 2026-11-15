@@ -133,7 +133,10 @@ function createFractionAdditionPracticeSession({
     if (stepId === "common_denominator") {
       return Object.freeze({
         taskId: task.id, taskNumber: configuredTasks.indexOf(task) + 1,
-        totalTasks: configuredTasks.length, stepId, stepNumber: 1, totalSteps: STEP_IDS.length,
+        totalTasks: configuredTasks.length,
+        leftFraction: task.leftFraction, rightFraction: task.rightFraction,
+        operationSymbol: task.operationSymbol,
+        stepId, stepNumber: 1, totalSteps: STEP_IDS.length,
         prompt: "Kies een gemeenschappelijke noemer voor de twee getoonde breuken.",
         inputLabel: "Gemeenschappelijke noemer",
         expression: left.numerator + "/" + left.denominator + " + " +
@@ -143,7 +146,10 @@ function createFractionAdditionPracticeSession({
     if (stepId === "left_equivalent_numerator") {
       return Object.freeze({
         taskId: task.id, taskNumber: configuredTasks.indexOf(task) + 1,
-        totalTasks: configuredTasks.length, stepId, stepNumber: 2, totalSteps: STEP_IDS.length,
+        totalTasks: configuredTasks.length,
+        leftFraction: task.leftFraction, rightFraction: task.rightFraction,
+        operationSymbol: task.operationSymbol,
+        stepId, stepNumber: 2, totalSteps: STEP_IDS.length,
         prompt: "Welke teller hoort bij de eerste breuk als de noemer " + denominator + " wordt?",
         inputLabel: "Nieuwe teller voor " + left.numerator + "/" + left.denominator,
         expression: left.numerator + "/" + left.denominator + " = ?/" + denominator
@@ -152,7 +158,10 @@ function createFractionAdditionPracticeSession({
     if (stepId === "right_equivalent_numerator") {
       return Object.freeze({
         taskId: task.id, taskNumber: configuredTasks.indexOf(task) + 1,
-        totalTasks: configuredTasks.length, stepId, stepNumber: 3, totalSteps: STEP_IDS.length,
+        totalTasks: configuredTasks.length,
+        leftFraction: task.leftFraction, rightFraction: task.rightFraction,
+        operationSymbol: task.operationSymbol,
+        stepId, stepNumber: 3, totalSteps: STEP_IDS.length,
         prompt: "Welke teller hoort bij de tweede breuk als de noemer " + denominator + " wordt?",
         inputLabel: "Nieuwe teller voor " + right.numerator + "/" + right.denominator,
         expression: right.numerator + "/" + right.denominator + " = ?/" + denominator
@@ -161,7 +170,10 @@ function createFractionAdditionPracticeSession({
     if (stepId === "addition_result") {
       return Object.freeze({
         taskId: task.id, taskNumber: configuredTasks.indexOf(task) + 1,
-        totalTasks: configuredTasks.length, stepId, stepNumber: 4, totalSteps: STEP_IDS.length,
+        totalTasks: configuredTasks.length,
+        leftFraction: task.leftFraction, rightFraction: task.rightFraction,
+        operationSymbol: task.operationSymbol,
+        stepId, stepNumber: 4, totalSteps: STEP_IDS.length,
         prompt: "Tel de tellers op. De noemer blijft hetzelfde.",
         inputLabel: "Teller van de som",
         expression: leftNumerator + "/" + denominator + " + " +
@@ -174,11 +186,16 @@ function createFractionAdditionPracticeSession({
   function getCompletion(taskId) {
     const progress = readProgress();
     const task = taskId == null
-      ? (configuredTasks.length === 1 ? configuredTasks[0] : configuredTasks.find(item => progress.completedTaskIds.includes(item.id)))
+      ? [...configuredTasks].reverse().find(item => progress.completedTaskIds.includes(item.id))
       : taskById.get(taskId);
     if (!task || !progress.completedTaskIds.includes(task.id)) return null;
     return Object.freeze({
       taskId: task.id,
+      taskNumber: configuredTasks.indexOf(task) + 1,
+      totalTasks: configuredTasks.length,
+      leftFraction: task.leftFraction,
+      rightFraction: task.rightFraction,
+      operationSymbol: task.operationSymbol,
       leftNumerator: getValidValue(progress, task.id, "left_equivalent_numerator"),
       rightNumerator: getValidValue(progress, task.id, "right_equivalent_numerator"),
       resultNumerator: getValidValue(progress, task.id, "addition_result"),

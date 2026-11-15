@@ -1,6 +1,7 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoNavigation } from '../../components/page-navigation.js';
 import { createPacoTile, createPacoTileGrid } from '../../components/paco-tile.js';
+import { createPacoBoneDifficulty } from '../../components/design-system.js';
 import { buildViewUrl } from '../../core/view-context.js';
 import { MATH_SKILL_SUBJECTS, FRACTION_NAVIGATION_TOPICS } from './skills-navigation-catalog.js';
 
@@ -103,40 +104,33 @@ export function createSkillsRuntime({
       { label: 'Ongelijknamige breuken kleiner dan 1 bij elkaar optellen', level: 4 },
       { label: 'Ongelijknamige breuken groter dan 1 bij elkaar optellen', level: 5 }
     ];
+
     content.replaceChildren();
-    const card = documentRef.createElement('section');
-    card.className = 'paco-template-card skills-navigation-card skills-addition-overview';
-    const heading = documentRef.createElement('h2');
-    heading.textContent = 'Optellen';
-    const introduction = documentRef.createElement('p');
-    introduction.className = 'skills-navigation-introduction';
-    introduction.textContent = 'Onderwerpen binnen Breuken → Optellen.';
+    const overview = documentRef.createElement('section');
+    overview.className = 'card skills-addition-overview';
+    overview.setAttribute('aria-label', 'Onderwerpen breuken optellen');
     const list = documentRef.createElement('div');
     list.className = 'skills-addition-overview-list';
-    list.setAttribute('aria-label', 'Onderwerpen breuken optellen');
 
-    items.forEach((item, index) => {
+    items.forEach(item => {
       const row = documentRef.createElement('div');
       row.className = 'skills-addition-overview-row';
-      row.setAttribute('role', 'group');
-      row.setAttribute('aria-label', item.label + ', moeilijkheidsniveau ' + item.level + ' van 5');
-      const dots = documentRef.createElement('span');
-      dots.className = 'skills-addition-overview-dots';
-      dots.setAttribute('aria-hidden', 'true');
-      for (let level = 1; level <= 5; level += 1) {
-        const dot = documentRef.createElement('span');
-        dot.className = 'skills-addition-overview-dot' + (level <= item.level ? ' is-filled' : '');
-        dots.appendChild(dot);
-      }
+      const difficulty = createPacoBoneDifficulty({
+        level: item.level,
+        maxLevel: 5,
+        label: 'Moeilijkheidsgraad',
+        documentRef
+      });
+      difficulty.classList.add('skills-addition-overview-difficulty');
       const label = documentRef.createElement('span');
       label.className = 'skills-addition-overview-label';
       label.textContent = item.label;
-      row.append(dots, label);
+      row.append(difficulty, label);
       list.appendChild(row);
     });
 
-    card.append(heading, introduction, list);
-    content.appendChild(card);
+    overview.appendChild(list);
+    content.appendChild(overview);
   }
 
   async function mount() {

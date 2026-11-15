@@ -180,6 +180,8 @@ export function createSkillsRuntime({
         return;
       }
 
+      const equation = documentRef.createElement('div');
+      equation.className = 'fraction-whole-mixed-equation';
       const expression = documentRef.createElement('div');
       expression.className = 'fraction-whole-mixed-expression';
       const whole = documentRef.createElement('span');
@@ -198,7 +200,8 @@ export function createSkillsRuntime({
       equals.textContent = '=';
       const answerMount = documentRef.createElement('div');
       answerMount.className = 'fraction-whole-mixed-answer';
-      template.workArea.append(expression, equals, answerMount);
+      equation.append(expression, equals, answerMount);
+      template.workArea.append(equation);
 
       const answer = renderFractionAnswerInput({
         workMount: answerMount,

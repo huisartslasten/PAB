@@ -11,6 +11,10 @@ function createMemoryStorage() {
   };
 }
 
+function completeCurrentTask(session, answers) {
+  for (const answer of answers) assert.equal(session.recordResponse({ rawValue: String(answer) }).classification, "valid");
+}
+
 const storage = createMemoryStorage();
 const learnerA = createFractionAdditionPracticeSession({ learnerKey: "learner-a", storage });
 const learnerB = createFractionAdditionPracticeSession({ learnerKey: "learner-b", storage });
@@ -32,7 +36,10 @@ assert.equal(learnerA.getCurrentStep().stepId, "addition_result");
 const done = learnerA.recordResponse({ rawValue: "7" });
 assert.equal(done.classification, "valid");
 assert.equal(done.progress.isComplete, true);
-assert.deepEqual(done.completion, { leftNumerator: 4, rightNumerator: 3, resultNumerator: 7, denominator: 12 });
+assert.deepEqual(done.completion, {
+  taskId: "fraction-addition-practice-01",
+  leftNumerator: 4, rightNumerator: 3, resultNumerator: 7, denominator: 12
+});
 assert.equal(learnerA.getCurrentStep(), null);
 assert.equal(learnerB.getProgress().completedStepCount, 0);
 const [key, value] = storage.entries()[0];
@@ -46,4 +53,62 @@ assert.throws(() => createFractionAdditionPracticeSession({ learnerKey: "learner
 learnerA.reset();
 assert.equal(learnerA.getProgress().completedStepCount, 0);
 assert.equal(learnerB.getProgress().completedStepCount, 0);
+
+// A configured session advances through multiple independently defined tasks.
+const configuredTasks = [
+  {
+    id: "addition-a",
+    leftFraction: { numerator: 1, denominator: 3 },
+    rightFraction: { numerator: 1, denominator: 4 }
+  },
+  {
+    id: "addition-b",
+    leftFraction: { numerator: 2, denominator: 5 },
+    rightFraction: { numerator: 1, denominator: 10 }
+  }
+];
+const configured = createFractionAdditionPracticeSession({
+  learnerKey: "learner-configured", storage, tasks: configuredTasks
+});
+assert.equal(configured.getProgress().totalTaskCount, 2);
+assert.equal(configured.getProgress().totalStepCount, 8);
+assert.equal(configured.getCurrentStep().taskId, "addition-a");
+completeCurrentTask(configured, [12, 4, 3, 7]);
+assert.equal(configured.getCurrentStep().taskId, "addition-b");
+assert.equal(configured.getCurrentStep().taskNumber, 2);
+assert.equal(configured.getCurrentStep().expression, "2/5 + 1/10 → noemer ?");
+completeCurrentTask(configured, [10, 4, 1, 5]);
+assert.equal(configured.getCurrentStep(), null);
+assert.deepEqual(configured.getProgress(), {
+  completedStepCount: 8,
+  totalStepCount: 8,
+  attemptCount: 8,
+  completedTaskCount: 2,
+  totalTaskCount: 2,
+  currentTaskId: null,
+  isComplete: true
+});
+assert.deepEqual(configured.getCompletion("addition-b"), {
+  taskId: "addition-b",
+  leftNumerator: 4,
+  rightNumerator: 1,
+  resultNumerator: 5,
+  denominator: 10
+});
+const resumed = createFractionAdditionPracticeSession({
+  learnerKey: "learner-configured", storage, tasks: configuredTasks
+});
+assert.equal(resumed.getProgress().isComplete, true);
+assert.throws(() => createFractionAdditionPracticeSession({
+  learnerKey: "bad-tasks", storage, tasks: []
+}), /at least one/i);
+assert.throws(() => createFractionAdditionPracticeSession({
+  learnerKey: "bad-tasks", storage, tasks: [configuredTasks[0], configuredTasks[0]]
+}), /unique/i);
+assert.throws(() => createFractionAdditionPracticeSession({
+  learnerKey: "bad-tasks", storage, tasks: [{
+    id: "invalid", leftFraction: { numerator: 0, denominator: 3 },
+    rightFraction: { numerator: 1, denominator: 4 }
+  }]
+}), /positive integer fractions/i);
 console.log("PacoGO fraction addition practice session tests passed.");

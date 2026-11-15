@@ -138,6 +138,7 @@
   import { renderFractionOperation } from "./pacogo-engine/fraction-practice-operation.js";
   import { createFractionRepresentationConfig } from "./pacogo-engine/fraction-representation-contract.js";
   import { createFractionAdditionPracticeSession } from "./pacogo-engine/fraction-addition-practice-session.js";
+  import { FRACTION_ADDITION_PRACTICE_TASKS } from "./pacogo-engine/fraction-addition-practice-task-bank.js";
   import { createFractionResultFormPracticeSession } from "./pacogo-engine/fraction-result-form-practice-session.js";
   import { createFractionSubtractionPracticeSession } from "./pacogo-engine/fraction-subtraction-practice-session.js";
   import { FRACTION_CONSTRUCTION_PRACTICE_TASKS, createFractionConstructionPracticeSession } from "./pacogo-engine/fraction-construction-practice-session.js";
@@ -976,7 +977,9 @@
     selectedLearner = learner;
     practiceSession = createFractionPracticeSession({ learnerKey: learner.learner_key });
     constructionSession = createFractionConstructionPracticeSession({ learnerKey: learner.learner_key });
-    additionSession = createFractionAdditionPracticeSession({ learnerKey: learner.learner_key });
+    additionSession = createFractionAdditionPracticeSession({
+      learnerKey: learner.learner_key, tasks: FRACTION_ADDITION_PRACTICE_TASKS
+    });
     resultFormSession = createFractionResultFormPracticeSession({ learnerKey: learner.learner_key });
     subtractionSession = createFractionSubtractionPracticeSession({ learnerKey: learner.learner_key });
     setup.hidden = true;

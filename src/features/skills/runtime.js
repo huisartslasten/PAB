@@ -188,7 +188,11 @@ export function createSkillsRuntime({
       const plus = documentRef.createElement('span');
       plus.className = 'fraction-whole-mixed-expression__operator';
       plus.textContent = '+';
-      expression.append(whole, plus, renderMixedNumber(task.mixed, 'Gemengd getal'));
+      expression.append(whole, plus, renderMixedNumber({
+        wholeNumber: task.mixed.whole,
+        numerator: task.mixed.numerator,
+        denominator: task.mixed.denominator
+      }, 'Gemengd getal'));
       const equals = documentRef.createElement('span');
       equals.className = 'fraction-whole-mixed-expression__operator';
       equals.textContent = '=';

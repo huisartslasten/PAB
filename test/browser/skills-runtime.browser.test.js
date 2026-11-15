@@ -156,3 +156,67 @@ test('Optellen in the fraction overview opens the six-row addition overview with
   expect(result.centralCard).toBe(true);
   expect(result.customDots).toBe(0);
 });
+
+
+test('first whole-number plus mixed-fraction practice uses the central page and fraction templates for 15 tasks', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=optellen', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    localStorage.removeItem('pacogo:fraction-whole-mixed-addition:v1:Zyon');
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {},
+      managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    let navigation = '';
+    const runtime = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'optellen', documentRef: document,
+      navigate: target => { navigation = String(target); }
+    });
+    await runtime.mount();
+    document.querySelector('.skills-addition-overview-open').click();
+    const practice = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'optellen', exercise: 'whole-number-mixed-addition',
+      documentRef: document, navigate: () => {}
+    });
+    await practice.mount();
+    const initial = {
+      title: document.querySelector('.paco-template-main h1')?.textContent || '',
+      canonicalPage: Boolean(document.querySelector('.paco-page-template')),
+      fractionTemplate: Boolean(document.querySelector('[data-component="fraction-practice-template"]')),
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      expression: document.querySelector('.fraction-whole-mixed-expression')?.innerText || '',
+      stackedFraction: document.querySelectorAll('.pacogo-fraction-representation--symbolic').length,
+      slashNotation: document.querySelector('.fraction-whole-mixed-expression')?.textContent.includes('/') || false,
+      controlsSeparate: Boolean(document.querySelector('.pacogo-fraction-practice-template__controls .pacogo-fraction-answer__controls')),
+      questionCount: 15
+    };
+    const wholeToggle = document.querySelector('.pacogo-fraction-answer__toggle input');
+    wholeToggle.click();
+    document.querySelector('[data-answer-part="whole"]').value = '3';
+    document.querySelector('[data-answer-part="primaryNumerator"]').value = '1';
+    document.querySelector('[data-answer-part="primaryDenominator"]').value = '2';
+    document.querySelector('[data-answer-part="whole"]').dispatchEvent(new Event('input', { bubbles: true }));
+    document.querySelector('[data-answer-part="primaryNumerator"]').dispatchEvent(new Event('input', { bubbles: true }));
+    document.querySelector('[data-answer-part="primaryDenominator"]').dispatchEvent(new Event('input', { bubbles: true }));
+    document.querySelector('.fraction-whole-mixed-addition-card .paco-btn').click();
+    const feedback = document.querySelector('.fraction-practice-feedback')?.textContent || '';
+    document.querySelector('.fraction-whole-mixed-addition-card .fraction-practice-template__actions .paco-btn')?.click();
+    return { navigation, initial, feedback };
+  });
+  expect(result.navigation).toContain('exercise=whole-number-mixed-addition');
+  expect(result.initial.title).toBe('Oefenen');
+  expect(result.initial.canonicalPage).toBe(true);
+  expect(result.initial.fractionTemplate).toBe(true);
+  expect(result.initial.progress).toContain('Som 1 van 15');
+  expect(result.initial.expression).toContain('2');
+  expect(result.initial.stackedFraction).toBeGreaterThan(0);
+  expect(result.initial.slashNotation).toBe(false);
+  expect(result.initial.controlsSeparate).toBe(true);
+  expect(result.feedback).toContain('Goed gedaan');
+});

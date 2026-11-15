@@ -5,9 +5,11 @@ function renderFractionAnswerInput({
   workMount,
   controlsMount,
   onChange = () => {},
-  labels = {}
+  labels = {},
+  wholeNumberMode = "optional"
 } = {}) {
   if (typeof onChange !== "function") throw new TypeError("onChange must be a function");
+  if (!["optional", "required"].includes(wholeNumberMode)) throw new TypeError("wholeNumberMode must be optional or required");
 
   const template = (!workMount || !controlsMount)
     ? createFractionPracticeTemplate({ mount })
@@ -65,7 +67,7 @@ function renderFractionAnswerInput({
 
   const whole = createField(text.whole, "whole");
   whole.wrapper.classList.add("pacogo-fraction-answer__whole-field");
-  whole.wrapper.hidden = true;
+  whole.wrapper.hidden = wholeNumberMode !== "required";
   const primary = createFraction(text.numerator, text.denominator, "primary");
   const simplifiedGroup = document.createElement("span");
   simplifiedGroup.className = "pacogo-fraction-answer__simplified";
@@ -80,22 +82,24 @@ function renderFractionAnswerInput({
 
   const controls = document.createElement("div");
   controls.className = "pacogo-fraction-answer__controls";
-  const toggleLabel = document.createElement("label");
-  toggleLabel.className = "pacogo-fraction-answer__toggle";
-  const toggle = document.createElement("input");
-  toggle.type = "checkbox";
-  toggle.checked = false;
-  toggleLabel.append(toggle, document.createTextNode(text.wholeToggle));
+  const wholeToggle = document.createElement("button");
+  wholeToggle.type = "button";
+  wholeToggle.className = "paco-btn paco-btn--primary paco-btn--small pacogo-fraction-answer__toggle";
+  wholeToggle.setAttribute("aria-pressed", String(wholeNumberMode === "required"));
+  wholeToggle.textContent = text.wholeToggle;
+  wholeToggle.hidden = wholeNumberMode === "required";
   const simplify = document.createElement("button");
   simplify.type = "button";
-  simplify.className = "pacogo-fraction-answer__simplify";
+  simplify.className = "paco-btn paco-btn--primary paco-btn--small pacogo-fraction-answer__simplify";
   simplify.textContent = text.simplify;
-  controls.append(toggleLabel, simplify);
+  simplify.setAttribute("aria-pressed", "false");
+  controls.append(wholeToggle, simplify);
 
+  let wholeEnabled = wholeNumberMode === "required";
   let simplified = false;
   function getValues() {
     return Object.freeze({
-      wholeNumberEnabled: toggle.checked,
+      wholeNumberEnabled: wholeEnabled,
       wholeNumber: whole.input.value,
       numerator: primary.numerator.value,
       denominator: primary.denominator.value,
@@ -108,16 +112,26 @@ function renderFractionAnswerInput({
 
   [whole.input, primary.numerator, primary.denominator, reduced.numerator, reduced.denominator]
     .forEach(input => input.addEventListener("input", emit));
-  toggle.addEventListener("change", () => {
-    whole.wrapper.hidden = !toggle.checked;
+  wholeToggle.addEventListener("click", () => {
+    if (wholeNumberMode === "required") return;
+    wholeEnabled = !wholeEnabled;
+    whole.wrapper.hidden = !wholeEnabled;
+    wholeToggle.textContent = wholeEnabled ? "Heel getal verwijderen" : text.wholeToggle;
+    wholeToggle.setAttribute("aria-pressed", String(wholeEnabled));
+    if (!wholeEnabled) whole.input.value = "";
     emit();
-    if (toggle.checked) whole.input.focus();
+    if (wholeEnabled) whole.input.focus();
   });
   simplify.addEventListener("click", () => {
-    simplified = true;
-    simplifiedGroup.hidden = false;
+    simplified = !simplified;
+    simplifiedGroup.hidden = !simplified;
+    simplify.textContent = simplified ? "Vereenvoudiging verwijderen" : text.simplify;
+    simplify.setAttribute("aria-pressed", String(simplified));
+    if (!simplified) {
+      reduced.numerator.value = "";
+      reduced.denominator.value = "";
+    } else reduced.numerator.focus();
     emit();
-    reduced.numerator.focus();
   });
 
   workHost.replaceChildren(root);
@@ -125,14 +139,14 @@ function renderFractionAnswerInput({
 
   return Object.freeze({
     getValues,
-    focus: () => (toggle.checked ? whole.input : primary.numerator).focus(),
+    focus: () => (wholeEnabled ? whole.input : primary.numerator).focus(),
     lock: () => {
       root.querySelectorAll("input,button").forEach(control => { control.disabled = true; });
       controls.querySelectorAll("input,button").forEach(control => { control.disabled = true; });
       root.dataset.locked = "true";
     },
     isSimplificationVisible: () => simplified,
-    isWholeNumberVisible: () => toggle.checked
+    isWholeNumberVisible: () => wholeEnabled
   });
 }
 

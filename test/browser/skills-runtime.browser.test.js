@@ -208,7 +208,7 @@ test('first whole-number plus mixed-fraction practice uses the central page and 
     document.querySelector('[data-answer-part="whole"]').dispatchEvent(new Event('input', { bubbles: true }));
     document.querySelector('[data-answer-part="primaryNumerator"]').dispatchEvent(new Event('input', { bubbles: true }));
     document.querySelector('[data-answer-part="primaryDenominator"]').dispatchEvent(new Event('input', { bubbles: true }));
-    document.querySelector('.fraction-whole-mixed-addition-card .paco-btn').click();
+    document.querySelector('.fraction-whole-mixed-addition-card .pacogo-fraction-practice-template__actions .paco-btn').click();
     const feedback = document.querySelector('.fraction-practice-feedback')?.textContent || '';
     document.querySelector('.fraction-whole-mixed-addition-card .fraction-practice-template__actions .paco-btn')?.click();
     return { navigation, initial, feedback };

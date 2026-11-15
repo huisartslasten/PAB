@@ -109,7 +109,7 @@ export function createPacoDropdown({
 }
 
 
-const PACO_BONE_SILHOUETTE = "M18 9.5c-3.2-3.2-7.2-3.5-9.3-1.4-1.6 1.6-1.6 4.1-.1 6.1-1.5 2-1.5 4.5.1 6.1 2.1 2.1 6.1 1.8 9.3-1.4l12-12c3.2 3.2 7.2 3.5 9.3 1.4 1.6-1.6 1.6-4.1.1-6.1 1.5-2 1.5-4.5-.1-6.1-2.1-2.1-6.1-1.8-9.3 1.4z";
+const PACO_BONE_SILHOUETTE = "M11 5.5C8.2 2.2 3.5 2.7 2.1 6.2c-1.3 3.1.4 6.1 4.2 7.8-3.8 1.7-5.5 4.7-4.2 7.8 1.4 3.5 6.1 4 8.9.7l3.5-4h19l3.5 4c2.8 3.3 7.5 2.8 8.9-.7 1.3-3.1-.4-6.1-4.2-7.8 3.8-1.7 5.5-4.7 4.2-7.8-1.4-3.5-6.1-4-8.9-.7l-3.5 4H14.5z";
 
 function createPacoBoneDifficulty({ level, maxLevel = 5, label = "Moeilijkheidsgraad", documentRef = document } = {}) {
   const maximum = Number(maxLevel);

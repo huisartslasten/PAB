@@ -230,3 +230,47 @@ test('first whole-number plus mixed-fraction practice uses the central page and 
   expect(result.initial.wholeNumberToggleVisible).toBe(false);
   expect(result.feedback).toContain('Goed gedaan');
 });
+
+test('optional whole-number and simplification controls are blue, reversible, and clear removed values', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    const { renderFractionAnswerInput } = await import('/pacogo-engine/fraction-answer-input.js');
+    const work = document.createElement('div');
+    const controls = document.createElement('div');
+    document.body.replaceChildren(work, controls);
+    const answer = renderFractionAnswerInput({ workMount: work, controlsMount: controls });
+    const wholeButton = controls.querySelector('.pacogo-fraction-answer__toggle');
+    const simplifyButton = controls.querySelector('.pacogo-fraction-answer__simplify');
+    const wholeField = work.querySelector('[data-answer-part="whole"]');
+    const reducedNumerator = work.querySelector('[data-answer-part="simplifiedNumerator"]');
+    const reducedDenominator = work.querySelector('[data-answer-part="simplifiedDenominator"]');
+    const buttonClasses = [wholeButton.classList.contains('paco-btn'), wholeButton.classList.contains('paco-btn--primary'),
+      simplifyButton.classList.contains('paco-btn'), simplifyButton.classList.contains('paco-btn--primary')];
+    wholeButton.click();
+    wholeField.value = '3';
+    wholeButton.click();
+    simplifyButton.click();
+    reducedNumerator.value = '2';
+    reducedDenominator.value = '4';
+    simplifyButton.click();
+    return {
+      buttonClasses,
+      wholeHiddenAgain: wholeField.closest('label').hidden,
+      wholeValueCleared: wholeField.value === '',
+      simplifyHiddenAgain: work.querySelector('.pacogo-fraction-answer__simplified').hidden,
+      reducedValuesCleared: reducedNumerator.value === '' && reducedDenominator.value === '',
+      wholeToggleLabelRestored: wholeButton.textContent === 'Heel getal toevoegen',
+      simplifyLabelRestored: simplifyButton.textContent === 'Vereenvoudigen',
+      values: answer.getValues()
+    };
+  });
+  expect(result.buttonClasses).toEqual([true, true, true, true]);
+  expect(result.wholeHiddenAgain).toBe(true);
+  expect(result.wholeValueCleared).toBe(true);
+  expect(result.simplifyHiddenAgain).toBe(true);
+  expect(result.reducedValuesCleared).toBe(true);
+  expect(result.wholeToggleLabelRestored).toBe(true);
+  expect(result.simplifyLabelRestored).toBe(true);
+  expect(result.values.wholeNumberEnabled).toBe(false);
+  expect(result.values.simplified).toBe(false);
+});

@@ -471,6 +471,7 @@ test('mixed same-denominator addition presents 15 original mixed-number tasks an
       click(action);
       completed.push(document.querySelector('.fraction-practice-feedback')?.textContent || '');
     }
+    click(action);
     const finalProgress = document.querySelector('.fraction-practice-progress')?.textContent || '';
     const completion = document.querySelector('.fraction-practice-complete')?.textContent || '';
     return { initial, simplifyFeedback, firstCorrect, completed, finalProgress, completion };

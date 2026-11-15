@@ -117,7 +117,7 @@ export function createSkillsRuntime({
     const list = documentRef.createElement('div');
     list.className = 'skills-addition-overview-list';
 
-    items.forEach(item => {
+    items.forEach((item, index) => {
       const row = documentRef.createElement('div');
       row.className = 'skills-addition-overview-row';
       const difficulty = createPacoBoneDifficulty({
@@ -130,7 +130,16 @@ export function createSkillsRuntime({
       const label = documentRef.createElement('span');
       label.className = 'skills-addition-overview-label';
       label.textContent = item.label;
-      row.append(difficulty, label);
+      if (index === 0) {
+        const open = documentRef.createElement('button');
+        open.type = 'button';
+        open.className = 'paco-btn paco-btn--primary paco-btn--small skills-addition-overview-open';
+        open.textContent = 'Oefenen';
+        open.addEventListener('click', () => navigate(buildViewUrl('skills.html', {
+          student, mode: context?.mode, extra: { domain: FRACTION_DOMAIN, topic: 'optellen', exercise: 'whole-number-mixed-addition' }
+        })));
+        row.append(difficulty, label, open);
+      } else row.append(difficulty, label);
       list.appendChild(row);
     });
 
@@ -247,13 +256,17 @@ export function createSkillsRuntime({
 
   async function mount() {
     const showingFractions = domain === FRACTION_DOMAIN;
-    const showingAddition = showingFractions && topic === 'optellen';\n    const showingPractice = showingAddition && exercise === 'whole-number-mixed-addition';
+    const showingAddition = showingFractions && topic === 'optellen';
+    const showingPractice = showingAddition && exercise === 'whole-number-mixed-addition';
+    const showingPractice = showingAddition && exercise === 'whole-number-mixed-addition';
     mountPacoPageTemplate({
       mount: templateMount,
       greeting: student ? `Hoi ${student}! 🐶` : 'Welkom bij PacoGO!',
       title: showingPractice ? 'Oefenen' : showingAddition ? 'Optellen' : showingFractions ? 'Breuken' : 'Skills',
       icon: showingAddition ? '➕' : showingFractions ? '½' : '📘',
-      subtitle: showingAddition
+      subtitle: showingPractice
+        ? 'Breuken → Optellen → Heel getal optellen bij een breukgetal groter dan 1.'
+        : showingAddition
         ? 'Breuken → Optellen.'
         : showingFractions
         ? 'Onderwerpen binnen de breukenleerlijn.'
@@ -269,7 +282,8 @@ export function createSkillsRuntime({
       content
     });
 
-    if (showingPractice) renderWholeNumberMixedAdditionPractice();\n    else if (showingAddition) renderFractionAdditionOverview();
+    if (showingPractice) renderWholeNumberMixedAdditionPractice();
+    else if (showingAddition) renderFractionAdditionOverview();
     else if (showingFractions) renderFractionOverview();
     else renderSubjectOverview();
   }

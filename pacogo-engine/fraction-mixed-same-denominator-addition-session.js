@@ -139,10 +139,8 @@ function createFractionMixedSameDenominatorAdditionSession({ learnerKey, storage
         const equivalent = (whole * den + num) * expected.denominator ===
           (expected.whole * expected.denominator + expected.numerator) * den;
         classification = equivalent ? "valid" : "incorrect_answer";
-        if (equivalent && expected.requiresSimplification) {
-          if (gcd(num, den) === 1) {
-            classification = "valid";
-          } else if (!v.simplified) {
+        if (equivalent && gcd(num, den) > 1) {
+          if (!v.simplified) {
             classification = "requires_simplification";
           } else {
             const reducedNum = /^[0-9]+$/.test(v.simplifiedNumerator) ? Number(v.simplifiedNumerator) : NaN;
@@ -161,7 +159,9 @@ function createFractionMixedSameDenominatorAdditionSession({ learnerKey, storage
           const validReduced = Number.isSafeInteger(reducedNum) && Number.isSafeInteger(reducedDen) &&
             reducedNum > 0 && reducedDen > 0 && reducedNum < reducedDen &&
             gcd(reducedNum, reducedDen) === 1 &&
-            reducedNum * den === num * reducedDen;
+            reducedNum * den === num * reducedDen &&
+            reducedNum === expected.reducedNumerator &&
+            reducedDen === expected.reducedDenominator;
           classification = validReduced ? "valid" : "not_simplified";
         }
       }

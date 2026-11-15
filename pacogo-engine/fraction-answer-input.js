@@ -79,7 +79,7 @@ function renderFractionAnswerInput({
   simplifiedWhole.className = "pacogo-fraction-answer__simplified-whole";
   simplifiedWhole.hidden = true;
   const reduced = createFraction(text.simplifiedNumerator, text.simplifiedDenominator, "simplified");
-  simplifiedGroup.append(simplifiedWhole, equals, reduced.root);
+  simplifiedGroup.append(equals, simplifiedWhole, reduced.root);
   line.append(whole.wrapper, primary.root, simplifiedGroup);
   root.append(line);
 

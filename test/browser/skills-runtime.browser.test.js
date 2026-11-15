@@ -132,7 +132,7 @@ test('Optellen in the fraction overview opens the six-row addition overview with
       navigation: navigatedTo,
       pageTitle: document.querySelector('.paco-template-main h1')?.textContent || '',
       labels: [...document.querySelectorAll('.skills-addition-overview-label')].map(node => node.textContent),
-      levels: [...document.querySelectorAll('.skills-addition-overview-row')].map(row => row.querySelectorAll('.skills-addition-overview-dot.is-filled').length),
+      levels: [...document.querySelectorAll('.skills-addition-overview-row')].map(row => row.querySelectorAll('.paco-bone-difficulty__bone.is-filled').length),\n      boneCounts: [...document.querySelectorAll('.skills-addition-overview-row')].map(row => row.querySelectorAll('.paco-bone-difficulty__bone').length),\n      centralCard: Boolean(document.querySelector('.skills-addition-overview.card')),\n      customDots: document.querySelectorAll('.skills-addition-overview-dot').length,
       templatePresent: Boolean(document.querySelector('.paco-page-template'))
     };
   });
@@ -148,5 +148,5 @@ test('Optellen in the fraction overview opens the six-row addition overview with
     'Ongelijknamige breuken kleiner dan 1 bij elkaar optellen',
     'Ongelijknamige breuken groter dan 1 bij elkaar optellen'
   ]);
-  expect(result.levels).toEqual([1, 1, 2, 2, 4, 5]);
+  expect(result.levels).toEqual([1, 1, 2, 2, 4, 5]);\n  expect(result.boneCounts).toEqual([5, 5, 5, 5, 5, 5]);\n  expect(result.centralCard).toBe(true);\n  expect(result.customDots).toBe(0);
 });

@@ -206,7 +206,7 @@ export function createSkillsRuntime({
       const answer = renderFractionAnswerInput({
         workMount: answerMount,
         controlsMount: template.controlsArea,
-        labels: { wholeToggle: 'Heel getal toevoegen' }
+        wholeNumberMode: 'required'
       });
       const check = documentRef.createElement('button');
       check.type = 'button';

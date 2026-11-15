@@ -371,7 +371,27 @@ test('same-denominator addition presents 15 tasks and checks proper, mixed and s
     set('primaryDenominator', '10');
     click('.fraction-same-denominator-addition-card .pacogo-fraction-practice-template__actions .paco-btn');
     const thirdFeedback = document.querySelector('.fraction-practice-feedback')?.textContent || '';
-    return { initial, firstFeedback, simplifiedFeedback, secondFeedback, thirdFeedback, thirdProgress: document.querySelector('.fraction-practice-progress')?.textContent || '' };
+    const thirdProgress = document.querySelector('.fraction-practice-progress')?.textContent || '';
+
+    // Fourth task: 11/7 = 1 4/7, then fifth task: 18/10 = 1 4/5.
+    // The fifth answer is already simplified in the primary fields; no extra simplify step is needed.
+    click('.fraction-same-denominator-addition-card .fraction-whole-mixed-addition-actions .paco-btn');
+    click('.pacogo-fraction-answer__toggle');
+    set('whole', '1');
+    set('primaryNumerator', '4');
+    set('primaryDenominator', '7');
+    click('.fraction-same-denominator-addition-card .pacogo-fraction-practice-template__actions .paco-btn');
+    const fourthFeedback = document.querySelector('.fraction-practice-feedback')?.textContent || '';
+
+    click('.fraction-same-denominator-addition-card .pacogo-fraction-practice-template__actions .paco-btn');
+    click('.pacogo-fraction-answer__toggle');
+    set('whole', '1');
+    set('primaryNumerator', '4');
+    set('primaryDenominator', '5');
+    click('.fraction-same-denominator-addition-card .pacogo-fraction-practice-template__actions .paco-btn');
+    const fifthFeedback = document.querySelector('.fraction-practice-feedback')?.textContent || '';
+
+    return { initial, firstFeedback, simplifiedFeedback, secondFeedback, thirdFeedback, thirdProgress, fourthFeedback, fifthFeedback };
   });
   expect(result.initial.title).toContain('Gelijknamige breuken kleiner dan 1');
   expect(result.initial.progress).toContain('Som 1 van 15');
@@ -384,4 +404,6 @@ test('same-denominator addition presents 15 tasks and checks proper, mixed and s
   expect(result.secondFeedback).toContain('Goed gedaan');
   expect(result.thirdFeedback).toContain('Goed gedaan');
   expect(result.thirdProgress).toContain('3 van 15');
+  expect(result.fourthFeedback).toContain('Goed gedaan');
+  expect(result.fifthFeedback).toContain('Goed gedaan');
 });

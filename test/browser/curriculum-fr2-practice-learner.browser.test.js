@@ -290,7 +290,8 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await page.setViewportSize({ width: 1280, height: 720 });
   await expect(page.getByRole("textbox", { name: "Vereenvoudigde teller" })).toBeVisible();
   await expect(page.getByRole("textbox", { name: "Vereenvoudigde noemer" })).toBeVisible();
-  await page.getByRole("checkbox", { name: "Heel getal toevoegen" }).check();
+  await page.getByRole("button", { name: "Heel getal toevoegen" }).click();
+  await expect(page.getByRole("button", { name: "Heel getal verwijderen" })).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByRole("textbox", { name: "Heel getal" })).toBeVisible();
   const resultNumerator = page.getByRole("textbox", { name: "Teller", exact: true });
   const resultDenominator = page.getByRole("textbox", { name: "Noemer", exact: true });

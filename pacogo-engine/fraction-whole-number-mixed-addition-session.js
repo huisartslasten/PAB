@@ -104,7 +104,8 @@ function createWholeNumberMixedFractionAdditionSession({ learnerKey, task, stora
             classification = equivalent && reduced ? "valid" : "not_simplified";
           }
         }
-      } else classification = "incorrect_answer";
+      } else if (denominator === 0) classification = "invalid_input";
+      else classification = "incorrect_answer";
     }
 
     const state = read();

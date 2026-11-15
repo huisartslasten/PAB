@@ -194,6 +194,7 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await expect(page.locator("#additionVisual .pacogo-fraction-operation")).toHaveCount(1);
   await expect(page.locator("#additionVisual .pacogo-fraction-operation__symbol")).toHaveText("+");
   await expect(page.locator("#additionExpression .fraction-practice-equation")).toHaveAttribute("data-expression", "1/3 + 1/4 → noemer ?");
+  await expect(page.locator("#additionProgress")).toContainText("Opgave 1 van 6");
   await expect(page.locator("#additionProgress")).toContainText("Stap 1 van 4");
   await expect(page.locator("#additionExpression input")).toHaveCount(1);
   await expect(page.locator("#additionInput input")).toHaveCount(0);
@@ -226,6 +227,31 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await expect(page.locator("#additionFeedback")).toContainText("Controleer de optelling");
   await page.getByRole("textbox", { name: "Teller van de som" }).fill("7");
   await page.getByRole("button", { name: "Controleren" }).last().click();
+  const remainingAdditionTasks = [
+    { denominator: "8", left: "2", right: "3", result: "5", expression: "1/4 + 3/8 → noemer ?" },
+    { denominator: "10", left: "4", right: "3", result: "7", expression: "2/5 + 3/10 → noemer ?" },
+    { denominator: "12", left: "2", right: "5", result: "7", expression: "1/6 + 5/12 → noemer ?" },
+    { denominator: "15", left: "10", right: "3", result: "13", expression: "2/3 + 1/5 → noemer ?" },
+    { denominator: "24", left: "8", right: "15", result: "23", expression: "1/3 + 5/8 → noemer ?" }
+  ];
+  for (let index = 0; index < remainingAdditionTasks.length; index++) {
+    const task = remainingAdditionTasks[index];
+    await page.getByRole("button", { name: "Volgende stap" }).click();
+    await expect(page.locator("#additionProgress")).toContainText("Opgave " + (index + 2) + " van 6");
+    await expect(page.locator("#additionExpression .fraction-practice-equation")).toHaveAttribute("data-expression", task.expression);
+    await page.getByRole("textbox", { name: "Gemeenschappelijke noemer" }).fill(task.denominator);
+    await page.getByRole("button", { name: "Controleren" }).last().click();
+    await page.getByRole("button", { name: "Volgende stap" }).click();
+    await page.getByRole("textbox", { name: /Nieuwe teller voor/ }).first().fill(task.left);
+    await page.getByRole("button", { name: "Controleren" }).last().click();
+    await page.getByRole("button", { name: "Volgende stap" }).click();
+    await page.getByRole("textbox", { name: /Nieuwe teller voor/ }).last().fill(task.right);
+    await page.getByRole("button", { name: "Controleren" }).last().click();
+    await page.getByRole("button", { name: "Volgende stap" }).click();
+    await page.getByRole("textbox", { name: "Teller van de som" }).fill(task.result);
+    await page.getByRole("button", { name: "Controleren" }).last().click();
+  }
+  await expect(page.locator("#additionProgress")).toContainText("6 van 6 opgaven");
   await page.getByRole("button", { name: "Bekijk uitkomst" }).click();
   await expect(page.locator("#additionExpression")).toContainText("Jouw uitkomst:");
   await expect(page.locator("#additionExpression .pacogo-fraction-representation--symbolic")).toHaveCount(1);

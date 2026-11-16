@@ -626,8 +626,8 @@ export function createSkillsRuntime({
     const guided=createFractionAdditionLevel5GuidedSession({learnerKey});
     const independent=createFractionAdditionLevel5IndependentSession({learnerKey});
     const stepIds=['common_denominator','left_equivalent_numerator','right_equivalent_numerator','whole_number_conversion','fraction_parts_addition','mixed_number_answer'];
-    const labels=['Gemeenschappelijke noemer kiezen','Eerste breukdeel gelijkwaardig maken','Tweede breukdeel gelijkwaardig maken','Hele getallen omzetten naar breuken','Breukdelen bij elkaar optellen','Antwoord als gemengd getal'];
-    const prompts=['Kies een noemer die bij beide breukdelen past.','Maak het eerste breukdeel gelijkwaardig.','Maak het tweede breukdeel gelijkwaardig.','Schrijf ieder heel getal als een breuk met de gemeenschappelijke noemer.','Tel de vier tellers bij elkaar op. De noemer blijft gelijk.','Vul het antwoord als gemengd getal in. Vereenvoudig als dat nodig is.'];
+    const labels=['Gemeenschappelijke noemer kiezen','Eerste breukdeel gelijkwaardig maken','Tweede breukdeel gelijkwaardig maken','Hele getallen omzetten naar breuken','Tellers optellen','Antwoord als gemengd getal'];
+    const prompts=['Kies een noemer die bij beide breukdelen past.','Maak het eerste breukdeel gelijkwaardig.','Maak het tweede breukdeel gelijkwaardig.','Zet ieder heel getal om in een breuk met dezelfde noemer.','Tel de tellers van de twee breuken bij elkaar op. De noemer blijft hetzelfde.','Vul het antwoord als gemengd getal in. Vereenvoudig als dat nodig is.'];
     const op=v=>Object.assign(documentRef.createElement('span'),{className:'fraction-guided-operator',textContent:v});
     const renderMixed=(value,label)=>renderMixedNumber({wholeNumber:value.wholeNumber,numerator:value.numerator,denominator:value.denominator},label);
     const renderFraction=(numerator,denominator,label)=>renderFractionRepresentation({numerator,denominator},'symbolic_fraction',label);
@@ -689,17 +689,14 @@ export function createSkillsRuntime({
       if(!hasLeft&&!hasRight&&!hasWhole&&!hasTotal&&!hasAnswer)return null;
       const solution=documentRef.createElement('div');solution.className='fraction-guided-solution';solution.setAttribute('aria-label','Stapsgewijs opgebouwde breukuitwerking');
       solution.append(op('='));
+      solution.append(renderMixed({wholeNumber:task.leftMixedNumber.wholeNumber,numerator:hasLeft?task.leftNumerator:task.leftMixedNumber.numerator,denominator:hasLeft?task.denominator:task.leftMixedNumber.denominator},'Eerste getal na gelijknamig maken'),
+        op('+'),
+        renderMixed({wholeNumber:task.rightMixedNumber.wholeNumber,numerator:hasRight?task.rightNumerator:task.rightMixedNumber.numerator,denominator:hasRight?task.denominator:task.rightMixedNumber.denominator},'Tweede getal na gelijknamig maken'));
       if(hasWhole){
-        solution.append(renderFraction(task.leftWholeNumerator,task.denominator,'Eerste hele getal als breuk'),op('+'),
-          renderFraction(task.rightWholeNumerator,task.denominator,'Tweede hele getal als breuk'),op('+'),
-          renderFraction(task.leftNumerator,task.denominator,'Eerste gelijkwaardige breukdeel'),op('+'),
-          renderFraction(task.rightNumerator,task.denominator,'Tweede gelijkwaardige breukdeel'));
-      }else{
-        solution.append(renderMixed({wholeNumber:task.leftMixedNumber.wholeNumber,numerator:hasLeft?task.leftNumerator:task.leftMixedNumber.numerator,denominator:hasLeft?task.denominator:task.leftMixedNumber.denominator},'Eerste getal na gelijknamig maken'),
-          op('+'),
-          renderMixed({wholeNumber:task.rightMixedNumber.wholeNumber,numerator:hasRight?task.rightNumerator:task.rightMixedNumber.numerator,denominator:hasRight?task.denominator:task.rightMixedNumber.denominator},'Tweede getal na gelijknamig maken'));
+        solution.append(op('='),renderFraction(task.leftWholeNumerator+task.leftNumerator,task.denominator,'Eerste gemengde getal als onechte breuk'),
+          op('+'),renderFraction(task.rightWholeNumerator+task.rightNumerator,task.denominator,'Tweede gemengde getal als onechte breuk'));
       }
-      if(hasTotal)solution.append(op('='),renderFraction(task.improperNumerator,task.denominator,'Totale onechte breuk'));
+      if(hasTotal)solution.append(op('='),renderFraction(task.improperNumerator,task.denominator,'Som als onechte breuk'));
       if(hasAnswer)solution.append(op('='),renderMixed({wholeNumber:task.whole,numerator:task.numerator,denominator:task.reducedDenominator},'Gemengd eindantwoord'));
       return solution;
     }
@@ -708,7 +705,7 @@ export function createSkillsRuntime({
       mode='guided';
       const task=guided.getCurrentTask(),progress=guided.getProgress();
       content.replaceChildren();
-      const view=createCard('Ongelijknamige gemengde getallen bij elkaar optellen','Werk de zes stappen één voor één af. Eerst maak je de breukdelen gelijknamig. Daarna zet je de hele getallen om en tel je alle breukdelen op.','Begeleid — som '+(task?.taskNumber||progress.completedCount+1)+' van '+progress.totalCount);
+      const view=createCard('Ongelijknamige gemengde getallen bij elkaar optellen','Werk de zes stappen één voor één af. De som wordt na iedere stap verder opgebouwd.','Begeleid — som '+(task?.taskNumber||progress.completedCount+1)+' van '+progress.totalCount);
       const {card,template}=view;
       if(!task){
         const done=documentRef.createElement('p');done.className='fraction-practice-complete';done.textContent='Je hebt alle 10 begeleide sommen afgerond. Goed gewerkt!';
@@ -737,7 +734,7 @@ export function createSkillsRuntime({
           if(id==='common_denominator')answer.textContent='Noemer: '+den;
           else if(id==='left_equivalent_numerator')answer.append(renderMixed({wholeNumber:task.leftMixedNumber.wholeNumber,numerator:task.leftNumerator,denominator:den},'Eerste gelijkwaardige gemengde getal'));
           else if(id==='right_equivalent_numerator')answer.append(renderMixed({wholeNumber:task.rightMixedNumber.wholeNumber,numerator:task.rightNumerator,denominator:den},'Tweede gelijkwaardige gemengde getal'));
-          else if(id==='whole_number_conversion')answer.append(renderFraction(task.leftWholeNumerator,den,'Eerste hele getal als breuk'),op('+'),renderFraction(task.rightWholeNumerator,den,'Tweede hele getal als breuk'));
+          else if(id==='whole_number_conversion')answer.append(renderFraction(task.leftWholeNumerator+task.leftNumerator,den,'Eerste gemengde getal als onechte breuk'),op('+'),renderFraction(task.rightWholeNumerator+task.rightNumerator,den,'Tweede gemengde getal als onechte breuk'));
           else if(id==='fraction_parts_addition')answer.append(renderFraction(task.improperNumerator,den,'Som als onechte breuk'));
           else answer.append(renderMixed({wholeNumber:task.whole,numerator:task.numerator,denominator:task.reducedDenominator},'Gemengd eindantwoord'));
           item.append(answer);
@@ -759,11 +756,9 @@ export function createSkillsRuntime({
             expression.append(documentRef.createTextNode(String(task.leftMixedNumber.wholeNumber)),op('='),left,op('+'),documentRef.createTextNode(String(task.rightMixedNumber.wholeNumber)),op('='),right);
             activeInputs=[...expression.querySelectorAll('[data-fraction-step-answer="true"]')];
           }else if(id==='fraction_parts_addition'){
-            expression.append(renderFraction(task.leftWholeNumerator,den,'Eerste omgezette hele getal'),op('+'),
-              renderFraction(task.rightWholeNumerator,den,'Tweede omgezette hele getal'),op('+'),
-              renderFraction(task.leftNumerator,den,'Eerste breukdeel'),op('+'),
-              renderFraction(task.rightNumerator,den,'Tweede breukdeel'),op('='),
-              renderFractionInputRepresentation({denominator:den,inputPart:'numerator',inputLabel:'Totaal van de vier tellers',documentRef}));
+            expression.append(renderFraction(task.leftWholeNumerator+task.leftNumerator,den,'Eerste onechte breuk'),op('+'),
+              renderFraction(task.rightWholeNumerator+task.rightNumerator,den,'Tweede onechte breuk'),op('='),
+              renderFractionInputRepresentation({denominator:den,inputPart:'numerator',inputLabel:'Teller van de som',documentRef}));
             activeInputs=[expression.querySelector('[data-fraction-step-answer="true"]')];
           }else{
             const mount=documentRef.createElement('div');mount.className='fraction-guided-mixed-answer';expression.append(mount);

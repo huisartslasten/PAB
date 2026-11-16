@@ -748,10 +748,16 @@ test('level 5 guided practice uses six progressive steps and waits for an explic
     const fill=(selector,value)=>{const field=document.querySelector(selector);field.value=String(value);field.dispatchEvent(new Event('input',{bubbles:true}));};
     fill('.fraction-guided-step-card[data-step-id="common_denominator"] .fraction-guided-scalar-input',12);clickCheck();
     fill('.fraction-guided-step-card[data-step-id="left_equivalent_numerator"] [data-fraction-step-answer="true"]',4);clickCheck();
+    const afterLeft=document.querySelector('.fraction-guided-solution')?.textContent||'';
     fill('.fraction-guided-step-card[data-step-id="right_equivalent_numerator"] [data-fraction-step-answer="true"]',3);clickCheck();
+    const afterRight=document.querySelector('.fraction-guided-solution')?.textContent||'';
     const wholeFields=[...document.querySelectorAll('.fraction-guided-step-card[data-step-id="whole_number_conversion"] [data-fraction-step-answer="true"]')];
     wholeFields[0].value='24';wholeFields[1].value='12';wholeFields.forEach(x=>x.dispatchEvent(new Event('input',{bubbles:true})));clickCheck();
+    const afterWhole=document.querySelector('.fraction-guided-solution')?.textContent||'';
+    const wholeAnswer=document.querySelector('.fraction-guided-step-card[data-step-id="whole_number_conversion"] .fraction-guided-step-completed-answer')?.textContent||'';
+    const stepFiveExpression=document.querySelector('.fraction-guided-step-card[data-step-id="fraction_parts_addition"] .fraction-guided-step-expression')?.textContent||'';
     fill('.fraction-guided-step-card[data-step-id="fraction_parts_addition"] [data-fraction-step-answer="true"]',43);clickCheck();
+    const afterTotal=document.querySelector('.fraction-guided-solution')?.textContent||'';
     fill('[data-answer-part="whole"]',3);fill('[data-answer-part="primaryNumerator"]',7);fill('[data-answer-part="primaryDenominator"]',12);
     document.querySelector('.fraction-guided-step-card[data-step-id="mixed_number_answer"] button').click();
     const afterCorrect={
@@ -764,7 +770,7 @@ test('level 5 guided practice uses six progressive steps and waits for an explic
     };
     document.querySelector('.pacogo-fraction-practice-template__actions button').click();
     const afterNext={active:document.querySelectorAll('.fraction-guided-step-card[data-state="active"]').length,progress:document.querySelector('.fraction-practice-progress')?.textContent||'',firstStep:document.querySelector('.fraction-guided-step-grid')?.dataset.activeStep||''};
-    return {initial,afterCorrect,afterNext};
+    return {initial,afterLeft,afterRight,afterWhole,wholeAnswer,stepFiveExpression,afterTotal,afterCorrect,afterNext};
   });
   expect(result.initial.cards).toBe(6);
   expect(result.initial.active).toBe(1);
@@ -772,6 +778,16 @@ test('level 5 guided practice uses six progressive steps and waits for an explic
   expect(result.initial.locked).toBe(5);
   expect(result.initial.inputWidth).toBeLessThanOrEqual(56);
   expect(result.initial.progression).toBe(false);
+  expect(result.afterLeft).toContain('4');
+  expect(result.afterRight).toContain('3');
+  expect(result.afterWhole).toContain('28');
+  expect(result.afterWhole).toContain('15');
+  expect(result.wholeAnswer).toContain('28');
+  expect(result.wholeAnswer).toContain('15');
+  expect(result.stepFiveExpression).toContain('28');
+  expect(result.stepFiveExpression).toContain('15');
+  expect(result.stepFiveExpression).not.toContain('24');
+  expect(result.afterTotal).toContain('43');
   expect(result.afterCorrect.cards).toBe(6);
   expect(result.afterCorrect.active).toBe(0);
   expect(result.afterCorrect.completed).toBe(6);

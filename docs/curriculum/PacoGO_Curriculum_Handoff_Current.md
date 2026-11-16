@@ -7207,3 +7207,28 @@ Implementatie:
 ### Volgende concrete stap
 
 Werk na deze oefenbouw de inhoudelijke inventaris bij: leg per bestaande en nieuwe opteloefening vast wat het leerdoel, de leerlinghandeling, voorkennis, representatie, antwoordvorm en opbouwpositie is. Vergelijk dit vervolgens met de bestaande SLO-/curriculumdocumenten en PacoGO Skills, zonder nieuwe formele identifiers te verzinnen. Breng eerst de inhoudelijke dekking en hiaten van **Breuken → Optellen** in kaart voordat meer oefenvarianten of andere rekenbewerkingen worden gebouwd. Het uiteindelijke projectdoel blijft een volledige, brongetrouwe verticale leerlijn voor alle leerjaren.
+
+## Oefenen breuken optellen — niveau 3 en 4 (2026-11-16)
+
+### Vastgelegde oefenafspraak
+
+De volgende bouwstap is het afmaken van de formatieve oefeningen voor **ongelijknamige breuken optellen**. De afgesproken oefenopzet blijft ongewijzigd; alleen het aantal opgaven wordt **10 in plaats van 15**.
+
+- **Niveau 3 — begeleid:** de oorspronkelijke som staat bovenaan. De vier denkstappen worden als horizontale kaarten naast elkaar op één pagina opgebouwd. Eerst is stap 1 zichtbaar. Stap 2 komt pas beschikbaar nadat stap 1 correct is afgerond; stap 3 pas na stap 2; stap 4 pas na stap 3. Afgeronde stappen blijven zichtbaar. PacoGO geeft duidelijk aan welke stap op dat moment aan de beurt is. Er komt geen aparte pagina of navigatie per stap.
+- De vier stappen zijn: (1) een gemeenschappelijke noemer kiezen, (2) de eerste breuk gelijkwaardig maken, (3) de tweede breuk gelijkwaardig maken, en (4) de tellers optellen bij dezelfde noemer.
+- **Niveau 4 — zelfstandig:** dezelfde rekenvaardigheid en centrale oefenopbouw, maar zonder aangeboden of begeleide tussenstappen. De leerling lost de som zelfstandig op.
+- De voorbeeldsom uit de afspraak is 2/3 + 1/4. De oefenbank bevat 10 opgaven; de inhoudelijke opbouw en leerdoelen worden niet veranderd door de vermindering van 15 naar 10.
+- Niveau 3 en 4 blijven formatieve oefeningen. Geen wijziging aan SLO-mapping, formele curriculum-identifiers, evidence, mastery of learner-state.
+
+### Centrale implementatieregels
+
+- Iedere pagina gebruikt de centrale PacoGO-paginatemplate via de bestaande Skills-runtime.
+- Iedere breuk, breukinvoer, vergelijking, stapkaart en bediening gebruikt bestaande centrale Fraction Practice / Fraction Learning Interface-componenten waar die passend zijn. Nieuwe herbruikbare presentatiefunctionaliteit wordt centraal uitgebreid en getest; geen lokale kopieën.
+- De som en stapkaarten blijven op desktop horizontaal naast elkaar op één pagina. Alleen op smalle schermen mag de centrale responsieve opmaak ze herschikken om leesbaarheid te behouden.
+- De pedagogische volgorde, sessiestatus en validatie blijven gescheiden van de weergave.
+- Na iedere implementatiestap Full Regression uitvoeren en exact de geteste commit rapporteren.
+
+### Eerstvolgende bouwstap
+
+Controleer en hergebruik de bestaande vierstappensessie en de brongetrouwe opgavenbank. Breid de bank uit tot de afgesproken 10 opgaven zonder de leerdoelen of stapvolgorde te veranderen; integreer daarna niveau 3 en de zelfstandige niveau-4-oefening via de centrale templates. Werk pas daarna de browserregressie uit voor stapvrijgave, behoud van afgeronde stappen, horizontale layout en de zelfstandige antwoordroute.
+

@@ -741,6 +741,7 @@ test('level 5 guided practice uses six progressive steps and waits for an explic
       completed:document.querySelectorAll('.fraction-guided-step-card[data-state="completed"]').length,
       locked:document.querySelectorAll('.fraction-guided-step-card[data-state="locked"]').length,
       inputWidth:document.querySelector('.fraction-guided-step-grid--progressive .fraction-guided-scalar-input')?.getBoundingClientRect().width||0,
+      rowTopAligned:[...document.querySelectorAll('.fraction-guided-step-card')].every(card=>Math.abs(card.getBoundingClientRect().top-document.querySelector('.fraction-guided-step-card').getBoundingClientRect().top)<2),
       progression:Boolean(document.querySelector('.fraction-guided-solution'))
     });
     const initial=snapshot();
@@ -777,6 +778,7 @@ test('level 5 guided practice uses six progressive steps and waits for an explic
   expect(result.initial.completed).toBe(0);
   expect(result.initial.locked).toBe(5);
   expect(result.initial.inputWidth).toBeLessThanOrEqual(56);
+  expect(result.initial.rowTopAligned).toBe(true);
   expect(result.initial.progression).toBe(false);
   expect(result.afterLeft).toContain('4');
   expect(result.afterRight).toContain('3');

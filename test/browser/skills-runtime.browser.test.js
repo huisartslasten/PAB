@@ -656,3 +656,31 @@ test('independent unequal-denominator addition level 4 uses the central fraction
   expect(result.simplify).toContain('Je berekening klopt');expect(result.needsWhole).toContain('Voeg het hele getal toe');
   expect(result.nextProgress).toContain('Som 9 van 15');
 });
+
+
+test('guided fraction addition accepts Enter and compacts completed step one on short screens', async ({ page }) => {
+  await page.setViewportSize({width:1280,height:700});
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=optellen', {waitUntil:'domcontentloaded'});
+  const result=await page.evaluate(async()=>{
+    localStorage.removeItem('pacogo:fraction-addition-practice:v1:EnterUser:level-3b');
+    const {createSkillsRuntime}=await import('/src/features/skills/runtime.js');
+    const templateMount=document.createElement('div');templateMount.id='paco-template-mount';document.body.replaceChildren(templateMount);
+    const app={auth:{isParent:false,isLoggedIn:false,session:null,subscribe:()=>({unsubscribe(){}})},authSession:{},managementCapabilities:{getAvailableForPage:()=>[]}};
+    const runtime=createSkillsRuntime({app,templateMount,context:{student:'EnterUser',mode:'student'},domain:'fractions',topic:'optellen',exercise:'unequal-denominator-guided-mixed-addition',documentRef:document,navigate:()=>{}});
+    await runtime.mount();
+    const answer=(value)=>{
+      const input=document.querySelector('.fraction-guided-step-card[data-state="active"] input');
+      input.value=String(value);
+      input.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true,cancelable:true}));
+    };
+    answer(12);answer(10);answer(9);answer(19);
+    const grid=document.querySelector('.fraction-guided-step-grid');
+    const first=document.querySelector('.fraction-guided-step-card[data-step-id="common_denominator"]');
+    return {active:grid.dataset.activeStep,firstState:first.dataset.state,firstHeight:getComputedStyle(first).minHeight,firstAnswer:first.querySelector('.fraction-guided-step-completed-answer')?.textContent||'',step5Active:document.querySelector('.fraction-guided-step-card[data-step-id="mixed_number_conversion"]')?.dataset.state};
+  });
+  expect(result.active).toBe('mixed_number_conversion');
+  expect(result.firstState).toBe('completed');
+  expect(result.firstAnswer).toContain('Noemer: 12');
+  expect(result.step5Active).toBe('active');
+  expect(result.firstHeight).toBe('0px');
+});

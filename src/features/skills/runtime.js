@@ -9,7 +9,7 @@ import { FRACTION_ADDITION_LEVEL_3_TASKS } from '../../../pacogo-engine/fraction
 import { FRACTION_ADDITION_LEVEL_4_EXERCISE, createFractionUnequalIndependentAdditionSession } from '../../../pacogo-engine/fraction-unequal-independent-addition-session.js';
 import { FRACTION_ADDITION_LEVEL_3B_TASKS } from '../../../pacogo-engine/fraction-addition-level-3b-task-bank.js';
 import { createFractionAdditionPracticeSession } from '../../../pacogo-engine/fraction-addition-practice-session.js';
-import { FRACTION_SUBTRACTION_EXERCISE, createFractionSubtractionPracticeSession } from '../../../pacogo-engine/fraction-subtraction-practice-session.js';
+import { FRACTION_SUBTRACTION_EXERCISE, createFractionSubtractionPracticeSession } from '../../../pacogo-engine/fraction-whole-minus-mixed-subtraction-session.js';
 import { FRACTION_ADDITION_LEVEL_5_GUIDED_TASKS, FRACTION_ADDITION_LEVEL_5_INDEPENDENT_TASKS } from '../../../pacogo-engine/fraction-addition-level-5-task-bank.js';
 import { createFractionAdditionLevel5GuidedSession, createFractionAdditionLevel5IndependentSession } from '../../../pacogo-engine/fraction-addition-level-5-session.js';
 import { FRACTION_WHOLE_MIXED_ADDITION_EXERCISE, createFractionWholeMixedAdditionSession } from '../../../pacogo-engine/fraction-whole-mixed-addition-session.js';

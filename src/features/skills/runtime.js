@@ -522,7 +522,7 @@ export function createSkillsRuntime({
         }else{const status=documentRef.createElement('p');status.className='fraction-guided-step-status';status.textContent='Komt hierna';item.append(status);}
         grid.append(item);
       });
-      template.workArea.append(grid);if(feedbackMessage){const feedback=documentRef.createElement('p');feedback.className='fraction-practice-feedback is-correct';feedback.setAttribute('role','status');feedback.textContent=feedbackMessage;template.feedbackArea.append(feedback);}if(completedTask){const next=documentRef.createElement('button');next.type='button';next.className='paco-btn paco-btn--primary paco-btn--small';next.textContent=progress.isComplete?'AFRONDEN':'VOLGENDE';next.addEventListener('click',()=>renderCurrentTask());template.actionsArea.replaceChildren(next);}content.append(card);activeInput?.focus();
+      template.workArea.append(grid);if(feedbackMessage){const feedback=documentRef.createElement('p');feedback.className='fraction-practice-feedback is-correct';feedback.setAttribute('role','status');feedback.textContent=feedbackMessage;template.feedbackArea.append(feedback);}if(completedTask){const next=documentRef.createElement('button');next.type='button';next.className='paco-btn paco-btn--primary paco-btn--small';next.textContent=progress.isComplete?'Afronden':'Volgende';next.addEventListener('click',()=>renderCurrentTask());template.actionsArea.replaceChildren(next);}content.append(card);activeInput?.focus();
     }
     renderCurrentTask();
   }

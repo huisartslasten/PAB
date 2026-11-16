@@ -519,7 +519,7 @@ test('guided unequal-denominator addition uses central templates, ten tasks and 
   expect(result.initial.canonicalPage).toBe(true); expect(result.initial.fractionTemplate).toBe(true);
   expect(result.initial.progress).toContain('Som 1 van 10'); expect(result.initial.stepCards).toBe(4);
   expect(result.initial.states).toEqual(['active','locked','locked','locked']); expect(result.initial.fractions).toBe(2); expect(result.initial.fractionInputWidth).toBe('48px');
-  expect(result.afterFirst.states).toEqual(['completed','active','locked','locked']);
+  expect(result.afterFirst.states).toEqual(['completed','active','locked','locked']); expect(result.afterFirst.fractionInputWidth).toBe('48px');
   expect(result.afterSecond.states).toEqual(['completed','completed','active','locked']);
   expect(result.afterThird.states).toEqual(['completed','completed','completed','active']);
   expect(result.afterFourth.states).toEqual(['completed','completed','completed','completed']);

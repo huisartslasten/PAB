@@ -525,7 +525,7 @@ test('guided unequal-denominator addition uses central templates, ten tasks and 
   expect(result.afterFourth.states).toEqual(['completed','completed','completed','completed']);
   expect(result.afterFourth.progress).toContain('Som 1 van 10');
   expect(result.afterFourth.feedback).toContain('Goed gedaan! Deze som is afgerond.');
-  expect(result.afterFourth.nextButton).toBe('VOLGENDE'); expect(result.afterFourth.nextButtonClass).toContain('paco-btn--small');
+  expect(result.afterFourth.nextButton).toBe('Volgende'); expect(result.afterFourth.nextButtonClass).toContain('paco-btn--small');
   expect(result.afterFourth.hasLevelLabel).toBe(false);
   expect(result.afterNext.states).toEqual(['active','locked','locked','locked']);
   expect(result.afterNext.progress).toContain('Som 2 van 10');

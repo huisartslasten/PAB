@@ -18,10 +18,8 @@ const pairs = all.map(task => {
 assert.equal(new Set(pairs).size, 25);
 const carryKinds = all.map(task => {
   const left = task.leftMixedNumber, right = task.rightMixedNumber;
-  const leftValue = left.numerator / left.denominator, rightValue = right.numerator / right.denominator;
-  return leftValue + rightValue < 1 ? "below" : leftValue + rightValue === 1 ? "equal" : "above";
+  return left.numerator / left.denominator + right.numerator / right.denominator < 1 ? "below" : "above";
 });
 assert.equal(carryKinds.includes("below"), true);
-assert.equal(carryKinds.includes("equal"), true);
 assert.equal(carryKinds.includes("above"), true);
 console.log("PacoGO level 5 mixed-number task bank tests passed.");

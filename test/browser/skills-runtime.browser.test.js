@@ -100,7 +100,7 @@ test('fraction subject overview uses the canonical PacoGO page template and show
 });
 
 
-test('Optellen in the fraction overview opens the seven-row addition overview with the supplied difficulty levels', async ({ page }) => {
+test('Optellen in the fraction overview opens the eight-row addition overview with the supplied difficulty levels', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions', { waitUntil: 'domcontentloaded' });
   const result = await page.evaluate(async () => {
     const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
@@ -150,10 +150,11 @@ test('Optellen in the fraction overview opens the seven-row addition overview wi
     'Gelijknamige breuken groter dan 1 bij elkaar optellen',
     'Ongelijknamige breuken kleiner dan 1 bij elkaar optellen',
     'Ongelijknamige breuken met een uitkomst groter dan 1 optellen',
+    'Ongelijknamige breuken zelfstandig optellen',
     'Ongelijknamige breuken groter dan 1 bij elkaar optellen'
   ]);
-  expect(result.levels).toEqual([1, 1, 2, 2, 3, 3, 5]);
-  expect(result.boneCounts).toEqual([5, 5, 5, 5, 5, 5, 5]);
+  expect(result.levels).toEqual([1, 1, 2, 2, 3, 3, 4, 5]);
+  expect(result.boneCounts).toEqual([5, 5, 5, 5, 5, 5, 5, 5]);
   expect(result.centralCard).toBe(true);
   expect(result.customDots).toBe(0);
 });
@@ -608,7 +609,7 @@ test('guided unequal-denominator addition converts sums above one to mixed numbe
     const afterMixed = snapshot();
     return { overviewResult, initial, afterDenominator, afterLeft, afterRight, afterSum, mixedFields, afterMixed };
   });
-  expect(result.overviewResult.rows).toBe(7);
+  expect(result.overviewResult.rows).toBe(8);
   expect(result.overviewResult.hasExerciseButton).toBe(true);
   expect(result.initial.page).toBe(true); expect(result.initial.equationLayout).toEqual({display:'flex',promptAndSolutionShareRow:true,solutionWrap:'nowrap'});
   expect(result.initial.fractionTemplate).toBe(true);

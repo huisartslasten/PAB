@@ -14,9 +14,59 @@ const STEP_IDS = Object.freeze([
   "right_equivalent_numerator",
   "addition_result"
 ]);
+const MIXED_NUMBER_STEP_ID = "mixed_number_conversion";
 const RESPONSE_CLASSIFICATIONS = Object.freeze([
-  "valid", "not_common_denominator", "not_equivalent", "arithmetic_error", "invalid_input"
+  "valid", "not_common_denominator", "not_equivalent", "arithmetic_error", "invalid_input",
+  "incorrect_mixed_number", "requires_mixed_number", "requires_simplification", "not_simplified"
 ]);
+function greatestCommonDivisor(a, b) {
+  while (b !== 0) [a, b] = [b, a % b];
+  return a;
+}
+function taskStepIds(task) {
+  return task.requiresMixedNumber ? [...STEP_IDS, MIXED_NUMBER_STEP_ID] : STEP_IDS;
+}
+function parseWholeNumberAnswer(values) {
+  if (!values || typeof values !== "object") return null;
+  const fields = ["wholeNumber", "numerator", "denominator"];
+  const parsed = Object.fromEntries(fields.map(key => [key,
+    /^[0-9]+$/.test(String(values[key] ?? "")) ? Number(values[key]) : NaN
+  ]));
+  if (values.wholeNumberEnabled !== true || fields.some(key => !Number.isSafeInteger(parsed[key]))) return null;
+  return { ...parsed, simplified: values.simplified === true,
+    simplifiedNumerator: /^[0-9]+$/.test(String(values.simplifiedNumerator ?? "")) ? Number(values.simplifiedNumerator) : NaN,
+    simplifiedDenominator: /^[0-9]+$/.test(String(values.simplifiedDenominator ?? "")) ? Number(values.simplifiedDenominator) : NaN };
+}
+function classifyMixedNumberAnswer(values, improperNumerator, denominator) {
+  if (!values || typeof values !== "object") return "invalid_input";
+  const numeratorRaw = String(values.numerator ?? "");
+  const denominatorRaw = String(values.denominator ?? "");
+  const numerator = /^[0-9]+$/.test(numeratorRaw) ? Number(numeratorRaw) : NaN;
+  const enteredDenominator = /^[0-9]+$/.test(denominatorRaw) ? Number(denominatorRaw) : NaN;
+  if (!Number.isSafeInteger(numerator) || !Number.isSafeInteger(enteredDenominator) || enteredDenominator <= 0) return "invalid_input";
+  if (values.wholeNumberEnabled !== true) {
+    if (numerator >= enteredDenominator &&
+        numerator * denominator === improperNumerator * enteredDenominator) return "requires_mixed_number";
+    return "incorrect_mixed_number";
+  }
+  const parsed = parseWholeNumberAnswer(values);
+  if (!parsed || parsed.denominator <= 0 || parsed.numerator >= parsed.denominator) return "invalid_input";
+  const equivalent = (parsed.wholeNumber * parsed.denominator + parsed.numerator) * denominator === improperNumerator * parsed.denominator;
+  if (!equivalent) return "incorrect_mixed_number";
+  const reduced = greatestCommonDivisor(parsed.numerator, parsed.denominator) === 1;
+  if (!reduced && !parsed.simplified) return "requires_simplification";
+  if (parsed.simplified) {
+    const validSimplified = Number.isSafeInteger(parsed.simplifiedNumerator) &&
+      Number.isSafeInteger(parsed.simplifiedDenominator) && parsed.simplifiedNumerator > 0 &&
+      parsed.simplifiedDenominator > 0 && parsed.simplifiedNumerator < parsed.simplifiedDenominator &&
+      greatestCommonDivisor(parsed.simplifiedNumerator, parsed.simplifiedDenominator) === 1 &&
+      parsed.simplifiedNumerator * parsed.denominator === parsed.numerator * parsed.simplifiedDenominator &&
+      (parsed.wholeNumber * parsed.simplifiedDenominator + parsed.simplifiedNumerator) * denominator ===
+        improperNumerator * parsed.simplifiedDenominator;
+    return validSimplified ? "valid" : "not_simplified";
+  }
+  return "valid";
+}
 
 function normalizeTasks(tasks) {
   if (!Array.isArray(tasks) || tasks.length === 0) {
@@ -51,7 +101,8 @@ function normalizeTasks(tasks) {
 function createFractionAdditionPracticeSession({
   learnerKey,
   storage = globalThis.localStorage,
-  tasks = FRACTION_ADDITION_PRACTICE_TASKS
+  tasks = FRACTION_ADDITION_PRACTICE_TASKS,
+  sessionId = ""
 } = {}) {
   const learner = String(learnerKey || "").trim();
   if (!learner) throw new TypeError("A learner key is required.");
@@ -61,7 +112,9 @@ function createFractionAdditionPracticeSession({
   }
   const configuredTasks = normalizeTasks(tasks);
   const taskById = new Map(configuredTasks.map(task => [task.id, task]));
-  const storageKey = "pacogo:fraction-addition-practice:v1:" + encodeURIComponent(learner);
+  const suffix = String(sessionId || "").trim();
+  const storageKey = "pacogo:fraction-addition-practice:v1:" + encodeURIComponent(learner) +
+    (suffix ? ":" + encodeURIComponent(suffix) : "");
   const emptyProgress = () => ({
     schemaVersion: 1, completedTaskIds: [], completedStepIdsByTask: {}, responsesByTask: {}
   });
@@ -82,21 +135,24 @@ function createFractionAdditionPracticeSession({
     for (const task of configuredTasks) {
       const completedStepIds = parsed.completedStepIdsByTask[task.id] || [];
       const responses = parsed.responsesByTask[task.id] || [];
+      const allowedSteps = taskStepIds(task);
       if (!Array.isArray(completedStepIds) || !Array.isArray(responses) ||
-          completedStepIds.some((id, index) => STEP_IDS[index] !== id) ||
-          completedStepIds.length > STEP_IDS.length) {
+          completedStepIds.some((id, index) => allowedSteps[index] !== id) ||
+          completedStepIds.length > allowedSteps.length) {
         throw new Error("Saved fraction addition practice contains an invalid step sequence.");
       }
       for (const response of responses) {
-        if (!response || !STEP_IDS.includes(response.stepId) ||
+        if (!response || !allowedSteps.includes(response.stepId) ||
             typeof response.rawValue !== "string" ||
+            (response.values != null && (typeof response.values !== "object" || Array.isArray(response.values))) ||
             !RESPONSE_CLASSIFICATIONS.includes(response.classification)) {
           throw new Error("Saved fraction addition practice contains an invalid response.");
         }
       }
       completedStepIdsByTask[task.id] = [...completedStepIds];
       responsesByTask[task.id] = responses.map(response => ({
-        stepId: response.stepId, rawValue: response.rawValue, classification: response.classification
+        stepId: response.stepId, rawValue: response.rawValue, classification: response.classification,
+        ...(response.values ? { values: { ...response.values } } : {})
       }));
     }
     return {
@@ -124,7 +180,8 @@ function createFractionAdditionPracticeSession({
     const task = getActiveTask(progress);
     if (!task) return null;
     const completed = progress.completedStepIdsByTask[task.id] || [];
-    const stepId = STEP_IDS.find(id => !completed.includes(id));
+    const currentStepIds = taskStepIds(task);
+    const stepId = currentStepIds.find(id => !completed.includes(id));
     const denominator = getValidValue(progress, task.id, "common_denominator");
     const leftNumerator = getValidValue(progress, task.id, "left_equivalent_numerator");
     const rightNumerator = getValidValue(progress, task.id, "right_equivalent_numerator");
@@ -140,7 +197,7 @@ function createFractionAdditionPracticeSession({
         rightEquivalentNumerator: rightNumerator,
         leftFraction: task.leftFraction, rightFraction: task.rightFraction,
         operationSymbol: task.operationSymbol,
-        stepId, stepNumber: 1, totalSteps: STEP_IDS.length,
+        stepId, stepNumber: 1, totalSteps: currentStepIds.length,
         prompt: "Kies een gemeenschappelijke noemer voor de twee getoonde breuken.",
         inputLabel: "Gemeenschappelijke noemer",
         expression: left.numerator + "/" + left.denominator + " + " +
@@ -157,7 +214,7 @@ function createFractionAdditionPracticeSession({
         rightEquivalentNumerator: rightNumerator,
         leftFraction: task.leftFraction, rightFraction: task.rightFraction,
         operationSymbol: task.operationSymbol,
-        stepId, stepNumber: 2, totalSteps: STEP_IDS.length,
+        stepId, stepNumber: 2, totalSteps: currentStepIds.length,
         prompt: "Welke teller hoort bij de eerste breuk als de noemer " + denominator + " wordt?",
         inputLabel: "Nieuwe teller voor " + left.numerator + "/" + left.denominator,
         expression: left.numerator + "/" + left.denominator + " = ?/" + denominator
@@ -173,7 +230,7 @@ function createFractionAdditionPracticeSession({
         rightEquivalentNumerator: rightNumerator,
         leftFraction: task.leftFraction, rightFraction: task.rightFraction,
         operationSymbol: task.operationSymbol,
-        stepId, stepNumber: 3, totalSteps: STEP_IDS.length,
+        stepId, stepNumber: 3, totalSteps: currentStepIds.length,
         prompt: "Welke teller hoort bij de tweede breuk als de noemer " + denominator + " wordt?",
         inputLabel: "Nieuwe teller voor " + right.numerator + "/" + right.denominator,
         expression: right.numerator + "/" + right.denominator + " = ?/" + denominator
@@ -189,11 +246,32 @@ function createFractionAdditionPracticeSession({
         rightEquivalentNumerator: rightNumerator,
         leftFraction: task.leftFraction, rightFraction: task.rightFraction,
         operationSymbol: task.operationSymbol,
-        stepId, stepNumber: 4, totalSteps: STEP_IDS.length,
+        stepId, stepNumber: 4, totalSteps: currentStepIds.length,
         prompt: "Tel de tellers op. De noemer blijft hetzelfde.",
         inputLabel: "Teller van de som",
         expression: leftNumerator + "/" + denominator + " + " +
           rightNumerator + "/" + denominator + " = ?/" + denominator
+      });
+    }
+    if (stepId === MIXED_NUMBER_STEP_ID) {
+      const resultNumerator = leftNumerator + rightNumerator;
+      return Object.freeze({
+        taskId: task.id, taskNumber: configuredTasks.indexOf(task) + 1,
+        totalTasks: configuredTasks.length,
+        completedStepIds: Object.freeze([...completed]),
+        commonDenominator: denominator,
+        leftEquivalentNumerator: leftNumerator,
+        rightEquivalentNumerator: rightNumerator,
+        resultNumerator,
+        resultWholeNumber: Math.floor(resultNumerator / denominator),
+        resultRemainderNumerator: resultNumerator % denominator,
+        leftFraction: task.leftFraction, rightFraction: task.rightFraction,
+        operationSymbol: task.operationSymbol,
+        requiresMixedNumber: true,
+        stepId, stepNumber: 5, totalSteps: currentStepIds.length,
+        prompt: "Zet de onechte breuk om in een gemengd getal. Gebruik ‘Heel getal toevoegen’.",
+        inputLabel: "Gemengd getal als antwoord",
+        expression: resultNumerator + "/" + denominator + " omzetten naar een gemengd getal"
       });
     }
     return null;
@@ -215,7 +293,19 @@ function createFractionAdditionPracticeSession({
       leftNumerator: getValidValue(progress, task.id, "left_equivalent_numerator"),
       rightNumerator: getValidValue(progress, task.id, "right_equivalent_numerator"),
       resultNumerator: getValidValue(progress, task.id, "addition_result"),
-      denominator: getValidValue(progress, task.id, "common_denominator")
+      denominator: getValidValue(progress, task.id, "common_denominator"),
+      requiresMixedNumber: task.requiresMixedNumber,
+      ...(task.requiresMixedNumber ? {
+        resultWholeNumber: Math.floor(
+          (getValidValue(progress, task.id, "left_equivalent_numerator") +
+           getValidValue(progress, task.id, "right_equivalent_numerator")) /
+          getValidValue(progress, task.id, "common_denominator")
+        ),
+        resultRemainderNumerator:
+          (getValidValue(progress, task.id, "left_equivalent_numerator") +
+           getValidValue(progress, task.id, "right_equivalent_numerator")) %
+          getValidValue(progress, task.id, "common_denominator")
+      } : {})
     });
   }
 
@@ -230,7 +320,7 @@ function createFractionAdditionPracticeSession({
     const activeTask = getActiveTask(progress);
     return Object.freeze({
       completedStepCount,
-      totalStepCount: configuredTasks.length * STEP_IDS.length,
+      totalStepCount: configuredTasks.reduce((total, task) => total + taskStepIds(task).length, 0),
       attemptCount,
       completedTaskCount,
       totalTaskCount: configuredTasks.length,
@@ -239,7 +329,7 @@ function createFractionAdditionPracticeSession({
     });
   }
 
-  function recordResponse({ rawValue } = {}) {
+  function recordResponse({ rawValue, values } = {}) {
     const current = getCurrentStep();
     if (!current) throw new Error("The fraction addition practice session is already complete.");
     const task = taskById.get(current.taskId);
@@ -266,15 +356,23 @@ function createFractionAdditionPracticeSession({
         classification = value === leftNumerator + rightNumerator ? "valid" : "arithmetic_error";
       }
     }
+    if (current.stepId === MIXED_NUMBER_STEP_ID) {
+      classification = classifyMixedNumberAnswer(values, leftNumerator + rightNumerator, denominator);
+    }
 
     const responses = progress.responsesByTask[task.id] || [];
-    responses.push({ stepId: current.stepId, rawValue: raw, classification });
+    responses.push({
+      stepId: current.stepId,
+      rawValue: raw,
+      classification,
+      ...(current.stepId === MIXED_NUMBER_STEP_ID ? { values: values && typeof values === "object" ? { ...values } : {} } : {})
+    });
     progress.responsesByTask[task.id] = responses;
     if (classification === "valid") {
       const completed = progress.completedStepIdsByTask[task.id] || [];
       completed.push(current.stepId);
       progress.completedStepIdsByTask[task.id] = completed;
-      if (completed.length === STEP_IDS.length && !progress.completedTaskIds.includes(task.id)) {
+      if (completed.length === taskStepIds(task).length && !progress.completedTaskIds.includes(task.id)) {
         progress.completedTaskIds.push(task.id);
       }
     }

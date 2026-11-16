@@ -491,13 +491,15 @@ export function createSkillsRuntime({
       else mount.append(renderFractionRepresentation({numerator:step.leftEquivalentNumerator,denominator:step.commonDenominator},'symbolic_fraction','Eerste gelijkwaardige breuk'),op('+'),renderFractionRepresentation({numerator:step.rightEquivalentNumerator,denominator:step.commonDenominator},'symbolic_fraction','Tweede gelijkwaardige breuk'),op('='),renderFractionInputRepresentation({denominator:step.commonDenominator,inputPart:'numerator',inputLabel:'Teller van de som',documentRef}));
       return mount.querySelector('[data-fraction-step-answer="true"]');
     }
-    function renderCurrentTask(feedbackMessage='') {
-      const step=session.getCurrentStep(),progress=session.getProgress();content.replaceChildren();
+    function renderCurrentTask(feedbackMessage='',completedTask=null) {
+      const currentStep=session.getCurrentStep(),progress=session.getProgress();
+      const step=completedTask?{...completedTask,completedStepIds:stepIds,stepId:null}:currentStep;
+      content.replaceChildren();
       const card=documentRef.createElement('section');card.className='card fraction-whole-mixed-addition-card fraction-addition-guided-card';
       const template=createFractionPracticeTemplate({mount:card});
       const title=documentRef.createElement('h2');title.textContent='Ongelijknamige breuken kleiner dan 1 bij elkaar optellen';
       const instruction=documentRef.createElement('p');instruction.className='fraction-practice-instruction';instruction.textContent='Werk de vier stappen één voor één af. Een volgende stap komt vrij zodra je de huidige stap goed hebt gedaan.';
-      const progressLabel=documentRef.createElement('p');progressLabel.className='fraction-practice-progress';progressLabel.textContent=formatFractionPracticeProgress({completedCount:progress.completedTaskCount,totalCount:progress.totalTaskCount,isComplete:progress.isComplete},{difficultyLevel:3,maxDifficultyLevel:5});
+      const progressLabel=documentRef.createElement('p');progressLabel.className='fraction-practice-progress';progressLabel.textContent='Som '+(completedTask?completedTask.taskNumber:progress.completedTaskCount+1)+' van '+progress.totalTaskCount;
       template.titleArea.append(title);template.instructionArea.append(instruction);template.progressArea.append(progressLabel);
       if(!step){const done=documentRef.createElement('p');done.className='fraction-practice-complete';done.textContent='Je hebt alle 10 sommen afgerond. Goed gewerkt!';template.workArea.append(done);content.append(card);return;}
       const taskLabel=documentRef.createElement('p');taskLabel.className='fraction-guided-task-label';taskLabel.textContent='Som '+step.taskNumber+' van '+step.totalTasks;
@@ -513,14 +515,14 @@ export function createSkillsRuntime({
           const help=documentRef.createElement('p');help.className='fraction-guided-step-prompt';help.textContent=step.prompt;
           const expression=documentRef.createElement('div');expression.className='fraction-guided-step-expression';activeInput=renderExpression(step,expression);
           const check=documentRef.createElement('button');check.type='button';check.className='paco-btn paco-btn--primary paco-btn--small';check.textContent='Controleren';
-          check.addEventListener('click',()=>{const result=session.recordResponse({rawValue:activeInput?.value||''});if(result.classification==='valid'){renderCurrentTask('Goed gedaan! Deze stap is afgerond.');return;}
+          check.addEventListener('click',()=>{const result=session.recordResponse({rawValue:activeInput?.value||''});if(result.classification==='valid'){if(step.stepId==='addition_result'){renderCurrentTask('Goed gedaan! Deze som is afgerond.',result.completion);return;}renderCurrentTask('Goed gedaan! Deze stap is afgerond.');return;}
             const messages={invalid_input:'Vul een positief heel getal in.',not_common_denominator:'Deze noemer past niet bij beide breuken. Kies een noemer die door beide noemers gedeeld kan worden.',not_equivalent:'Deze teller maakt de breuk nog niet gelijkwaardig. Controleer met welke factor de noemer is vermenigvuldigd.',arithmetic_error:'Tel de twee tellers bij elkaar op. De noemer blijft hetzelfde.'};
             const feedback=documentRef.createElement('p');feedback.className='fraction-practice-feedback is-error';feedback.setAttribute('role','alert');feedback.textContent=messages[result.classification]||'Controleer je antwoord en probeer het opnieuw.';template.feedbackArea.replaceChildren(feedback);activeInput?.focus();});
           item.append(help,expression,check);
         }else{const status=documentRef.createElement('p');status.className='fraction-guided-step-status';status.textContent='Komt hierna';item.append(status);}
         grid.append(item);
       });
-      template.workArea.append(grid);if(feedbackMessage){const feedback=documentRef.createElement('p');feedback.className='fraction-practice-feedback is-correct';feedback.setAttribute('role','status');feedback.textContent=feedbackMessage;template.feedbackArea.append(feedback);}content.append(card);activeInput?.focus();
+      template.workArea.append(grid);if(feedbackMessage){const feedback=documentRef.createElement('p');feedback.className='fraction-practice-feedback is-correct';feedback.setAttribute('role','status');feedback.textContent=feedbackMessage;template.feedbackArea.append(feedback);}if(completedTask){const next=documentRef.createElement('button');next.type='button';next.className='paco-btn paco-btn--primary';next.textContent=progress.isComplete?'AFRONDEN':'VOLGENDE';next.addEventListener('click',()=>renderCurrentTask());template.actionsArea.replaceChildren(next);}content.append(card);activeInput?.focus();
     }
     renderCurrentTask();
   }

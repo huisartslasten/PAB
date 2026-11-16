@@ -574,7 +574,7 @@ test('guided unequal-denominator addition converts sums above one to mixed numbe
       fractionBars: document.querySelectorAll('.fraction-guided-task-prompt .pacogo-fraction-representation--symbolic').length,
       feedback: document.querySelector('.fraction-practice-feedback')?.textContent || '',
       activeFractionFields: document.querySelectorAll('.fraction-guided-step-card[data-state="active"] [data-answer-part]').length,
-      controls: [...document.querySelectorAll('.pacogo-fraction-practice-template__controls button')].map(button => button.textContent),summaryFractions:document.querySelectorAll('.fraction-guided-solution .fraction-guided-summary-fraction').length,completedAnswers:[...document.querySelectorAll('.fraction-guided-step-card[data-state="completed"] .fraction-guided-step-completed-answer')].map(node=>node.textContent.trim())
+      controls: [...document.querySelectorAll('.pacogo-fraction-practice-template__controls button')].map(button => button.textContent),summaryFractions:document.querySelectorAll('.fraction-guided-solution .fraction-guided-summary-fraction').length,mixedNumbers:document.querySelectorAll('.fraction-guided-solution .pacogo-fraction-mixed-number').length,completedAnswers:[...document.querySelectorAll('.fraction-guided-step-card[data-state="completed"] .fraction-guided-step-completed-answer')].map(node=>node.textContent.trim())
     });
     const initial = snapshot();
     const answerStep = value => {

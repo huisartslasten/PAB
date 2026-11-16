@@ -74,3 +74,30 @@
     grid-column:2;grid-row:1 / span 2;min-height:0;margin:0;font-size:13px;
   }
 }
+
+/* Progressive six-step cards: one active working area, compact history and upcoming steps. */
+.fraction-guided-step-grid--progressive{grid-template-columns:repeat(3,minmax(0,1fr));align-items:start}
+.fraction-guided-step-grid--progressive .fraction-guided-step-card{min-height:0;gap:6px;padding:8px 10px}
+.fraction-guided-step-grid--progressive .fraction-guided-step-card[data-state="active"]{grid-column:1/-1;min-height:0;padding:12px}
+.fraction-guided-step-grid--progressive .fraction-guided-step-card[data-state="completed"],
+.fraction-guided-step-grid--progressive .fraction-guided-step-card[data-state="locked"]{display:flex;flex-direction:row;align-items:center;flex-wrap:wrap;gap:7px}
+.fraction-guided-step-grid--progressive .fraction-guided-step-card[data-state="completed"] h3,
+.fraction-guided-step-grid--progressive .fraction-guided-step-card[data-state="locked"] h3{flex:0 0 auto}
+.fraction-guided-step-grid--progressive .fraction-guided-step-card[data-state="completed"] .fraction-guided-step-title,
+.fraction-guided-step-grid--progressive .fraction-guided-step-card[data-state="locked"] .fraction-guided-step-title{flex:1 1 130px}
+.fraction-guided-step-grid--progressive .fraction-guided-step-card[data-state="completed"] .fraction-guided-step-status,
+.fraction-guided-step-grid--progressive .fraction-guided-step-card[data-state="locked"] .fraction-guided-step-status{margin:0 0 0 auto}
+.fraction-guided-step-grid--progressive .fraction-guided-step-card[data-state="completed"] .fraction-guided-step-completed-answer{min-height:0;margin:0 0 0 auto}
+.fraction-guided-step-grid--progressive .fraction-guided-step-card[data-state="active"] .fraction-guided-step-expression{justify-content:flex-start;flex-wrap:wrap;gap:8px}
+.fraction-guided-step-grid--progressive .fraction-guided-scalar-input{width:52px;min-width:52px;max-width:52px;height:38px;font-size:20px}
+.fraction-guided-step-grid--progressive .fraction-guided-step-card[data-step-id="whole_number_conversion"] .pacogo-fraction-representation--symbolic,
+.fraction-guided-step-grid--progressive .fraction-guided-step-card[data-step-id="fraction_parts_addition"] .pacogo-fraction-representation--symbolic{font-size:19px}
+@media(max-width:850px){.fraction-guided-step-grid--progressive{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){
+ .fraction-guided-step-grid--progressive{grid-template-columns:minmax(0,1fr)}
+ .fraction-guided-step-grid--progressive .fraction-guided-step-card[data-state="active"]{grid-column:1}
+ .fraction-guided-step-grid--progressive .fraction-guided-step-card[data-state="completed"],
+ .fraction-guided-step-grid--progressive .fraction-guided-step-card[data-state="locked"]{padding:7px 9px}
+ .fraction-guided-step-grid--progressive .fraction-guided-step-card[data-state="completed"] .fraction-guided-step-completed-answer{margin-left:0}
+ .fraction-guided-step-grid--progressive .fraction-guided-step-card[data-state="active"] .fraction-guided-step-expression{gap:6px}
+}

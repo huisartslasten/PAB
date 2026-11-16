@@ -724,3 +724,60 @@ test('level 5 offers 15 independent mixed-number tasks after guided completion',
   expect(result.nextButton).toBe('Volgende som');
   expect(result.nextProgress).toContain('2 van 15');
 });
+
+
+test('level 5 guided practice uses six progressive steps and waits for an explicit next-sum click', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=optellen', {waitUntil:'domcontentloaded'});
+  const result=await page.evaluate(async()=>{
+    localStorage.removeItem('pacogo:fraction-addition-level-5:guided:v1:Zyon:guided');
+    const {createSkillsRuntime}=await import('/src/features/skills/runtime.js');
+    const templateMount=document.createElement('div');templateMount.id='paco-template-mount';document.body.replaceChildren(templateMount);
+    const app={auth:{isParent:false,isLoggedIn:false,session:null,subscribe:()=>({unsubscribe(){}})},authSession:{},managementCapabilities:{getAvailableForPage:()=>[]}};
+    const runtime=createSkillsRuntime({app,templateMount,context:{student:'Zyon',mode:'student'},domain:'fractions',topic:'optellen',exercise:'unequal-mixed-addition',documentRef:document,navigate:()=>{}});
+    await runtime.mount();
+    const snapshot=()=>({
+      cards:document.querySelectorAll('.fraction-guided-step-card').length,
+      active:document.querySelectorAll('.fraction-guided-step-card[data-state="active"]').length,
+      completed:document.querySelectorAll('.fraction-guided-step-card[data-state="completed"]').length,
+      locked:document.querySelectorAll('.fraction-guided-step-card[data-state="locked"]').length,
+      inputWidth:document.querySelector('.fraction-guided-step-grid--progressive .fraction-guided-scalar-input')?.getBoundingClientRect().width||0,
+      progression:Boolean(document.querySelector('.fraction-guided-solution'))
+    });
+    const initial=snapshot();
+    const clickCheck=()=>document.querySelector('.fraction-guided-step-card[data-state="active"] button').click();
+    const fill=(selector,value)=>{const field=document.querySelector(selector);field.value=String(value);field.dispatchEvent(new Event('input',{bubbles:true}));};
+    fill('.fraction-guided-step-card[data-step-id="common_denominator"] .fraction-guided-scalar-input',12);clickCheck();
+    fill('.fraction-guided-step-card[data-step-id="left_equivalent_numerator"] [data-fraction-step-answer="true"]',4);clickCheck();
+    fill('.fraction-guided-step-card[data-step-id="right_equivalent_numerator"] [data-fraction-step-answer="true"]',3);clickCheck();
+    const wholeFields=[...document.querySelectorAll('.fraction-guided-step-card[data-step-id="whole_number_conversion"] [data-fraction-step-answer="true"]')];
+    wholeFields[0].value='24';wholeFields[1].value='12';wholeFields.forEach(x=>x.dispatchEvent(new Event('input',{bubbles:true})));clickCheck();
+    fill('.fraction-guided-step-card[data-step-id="fraction_parts_addition"] [data-fraction-step-answer="true"]',43);clickCheck();
+    fill('[data-answer-part="whole"]',3);fill('[data-answer-part="primaryNumerator"]',7);fill('[data-answer-part="primaryDenominator"]',12);
+    document.querySelector('.fraction-guided-step-card[data-step-id="mixed_number_answer"] button').click();
+    const afterCorrect={
+      cards:document.querySelectorAll('.fraction-guided-step-card').length,
+      active:document.querySelectorAll('.fraction-guided-step-card[data-state="active"]').length,
+      completed:document.querySelectorAll('.fraction-guided-step-card[data-state="completed"]').length,
+      next:document.querySelector('.pacogo-fraction-practice-template__actions button')?.textContent||'',
+      progress:document.querySelector('.fraction-practice-progress')?.textContent||'',
+      currentTask:JSON.parse(localStorage.getItem('pacogo:fraction-addition-level-5:guided:v1:Zyon:guided')||'{}').pendingTaskId||''
+    };
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    const afterNext={active:document.querySelectorAll('.fraction-guided-step-card[data-state="active"]').length,progress:document.querySelector('.fraction-practice-progress')?.textContent||'',firstStep:document.querySelector('.fraction-guided-step-grid')?.dataset.activeStep||''};
+    return {initial,afterCorrect,afterNext};
+  });
+  expect(result.initial.cards).toBe(6);
+  expect(result.initial.active).toBe(1);
+  expect(result.initial.completed).toBe(0);
+  expect(result.initial.locked).toBe(5);
+  expect(result.initial.inputWidth).toBeLessThanOrEqual(56);
+  expect(result.initial.progression).toBe(false);
+  expect(result.afterCorrect.cards).toBe(6);
+  expect(result.afterCorrect.active).toBe(0);
+  expect(result.afterCorrect.completed).toBe(6);
+  expect(result.afterCorrect.next).toBe('Volgende som');
+  expect(result.afterCorrect.currentTask).toBe('fraction-addition-5-guided-01');
+  expect(result.afterNext.active).toBe(1);
+  expect(result.afterNext.firstStep).toBe('common_denominator');
+  expect(result.afterNext.progress).toContain('som 2 van 10');
+});

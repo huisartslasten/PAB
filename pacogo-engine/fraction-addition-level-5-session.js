@@ -1,6 +1,6 @@
 import {FRACTION_ADDITION_LEVEL_5_GUIDED_TASKS,FRACTION_ADDITION_LEVEL_5_INDEPENDENT_TASKS} from "./fraction-addition-level-5-task-bank.js";
 
-const STEPS=Object.freeze(["common_denominator","left_equivalent_numerator","right_equivalent_numerator","combined_total","mixed_number_answer"]);
+const STEPS=Object.freeze(["common_denominator","left_equivalent_numerator","right_equivalent_numerator","whole_number_conversion","fraction_parts_addition","mixed_number_answer"]);
 const CLASSIFICATIONS=Object.freeze(["valid","invalid_input","not_common_denominator","not_equivalent","arithmetic_error","incorrect_answer","requires_mixed_number","requires_simplification","not_simplified"]);
 function gcd(a,b){while(b!==0)[a,b]=[b,a%b];return a;}
 function lcm(a,b){return a/gcd(a,b)*b;}
@@ -11,9 +11,12 @@ function safeValues(values){
 function expectedFor(task){
  const left=task.leftMixedNumber,right=task.rightMixedNumber,denominator=lcm(left.denominator,right.denominator);
  const leftNumerator=left.numerator*(denominator/left.denominator),rightNumerator=right.numerator*(denominator/right.denominator);
- const improperNumerator=(left.wholeNumber+right.wholeNumber)*denominator+leftNumerator+rightNumerator;
+ const leftWholeNumerator=left.wholeNumber*denominator,rightWholeNumerator=right.wholeNumber*denominator;
+ const wholeNumerator=leftWholeNumerator+rightWholeNumerator;
+ const fractionPartsNumerator=leftNumerator+rightNumerator;
+ const improperNumerator=wholeNumerator+fractionPartsNumerator;
  const whole=Math.floor(improperNumerator/denominator),numerator=improperNumerator%denominator,divisor=gcd(numerator,denominator);
- return Object.freeze({denominator,leftNumerator,rightNumerator,improperNumerator,whole,numerator,reducedNumerator:numerator/divisor,reducedDenominator:denominator/divisor,requiresSimplification:numerator>0&&divisor>1});
+ return Object.freeze({denominator,leftNumerator,rightNumerator,leftWholeNumerator,rightWholeNumerator,wholeNumerator,fractionPartsNumerator,improperNumerator,whole,numerator,reducedNumerator:numerator/divisor,reducedDenominator:denominator/divisor,requiresSimplification:numerator>0&&divisor>1});
 }
 function classifyFinal(values,expected){
  const v=safeValues(values);if(!v)return "invalid_input";
@@ -36,43 +39,55 @@ function createSession({learnerKey,storage=globalThis.localStorage,tasks,session
  if(!Array.isArray(tasks)||!tasks.length)throw new TypeError("Level 5 tasks are required.");
  const byId=new Map(tasks.map(t=>[t.id,t]));
  const key="pacogo:fraction-addition-level-5:"+mode+":v1:"+encodeURIComponent(learner)+(sessionId?":"+encodeURIComponent(sessionId):"");
- const empty=()=>({schemaVersion:1,completedTaskIds:[],responsesByTask:{}});
+ const empty=()=>({schemaVersion:1,completedTaskIds:[],responsesByTask:{},pendingTaskId:null});
  function read(){
   const raw=storage.getItem(key);if(!raw)return empty();let p;try{p=JSON.parse(raw);}catch{throw new Error("Saved level-5 fraction addition progress is unreadable.");}
   if(!p||p.schemaVersion!==1||!Array.isArray(p.completedTaskIds)||!p.responsesByTask||typeof p.responsesByTask!=="object")throw new Error("Saved level-5 fraction addition progress has an unsupported format.");
   const completedTaskIds=p.completedTaskIds.filter(id=>byId.has(id)),responsesByTask={};
   for(const [id,list] of Object.entries(p.responsesByTask)){if(!byId.has(id)||!Array.isArray(list))throw new Error("Saved level-5 fraction addition progress contains an invalid task.");if(list.some(x=>!x||!CLASSIFICATIONS.includes(x.classification)))throw new Error("Saved level-5 fraction addition progress contains an invalid response.");responsesByTask[id]=list.map(x=>({stepId:x.stepId||"answer",classification:x.classification,rawValue:String(x.rawValue??""),values:x.values?{...x.values}:null}));}
-  return {schemaVersion:1,completedTaskIds,responsesByTask};
+  const pendingTaskId=byId.has(p.pendingTaskId)?p.pendingTaskId:null;
+  return {schemaVersion:1,completedTaskIds,responsesByTask,pendingTaskId};
  }
- function active(p){return tasks.find(t=>!p.completedTaskIds.includes(t.id))||null;}
+ function active(p){if(p.pendingTaskId)return byId.get(p.pendingTaskId)||null;return tasks.find(t=>!p.completedTaskIds.includes(t.id))||null;}
  function responses(p,t){return p.responsesByTask[t.id]||[];}
  function validValue(p,t,id){const r=[...responses(p,t)].reverse().find(x=>x.stepId===id&&x.classification==="valid");return r?Number(r.rawValue):null;}
  function getProgress(){const p=read(),count=p.completedTaskIds.length;return Object.freeze({completedCount:count,totalCount:tasks.length,attemptCount:Object.values(p.responsesByTask).reduce((n,a)=>n+a.length,0),isComplete:count===tasks.length});}
  function getCurrentTask(){
-  const p=read(),t=active(p);if(!t)return null;const i=tasks.indexOf(t);
+  const p=read(),t=active(p);if(!t)return null;const i=tasks.indexOf(t),e=expectedFor(t),rs=responses(p,t);
   if(mode==="independent")return Object.freeze({id:t.id,index:i+1,total:tasks.length,leftMixedNumber:t.leftMixedNumber,rightMixedNumber:t.rightMixedNumber});
-  const rs=responses(p,t),completed=STEPS.filter(id=>rs.some(x=>x.stepId===id&&x.classification==="valid"));
-  const stepId=STEPS.find(id=>!completed.includes(id)),e=expectedFor(t);
-  return Object.freeze({id:t.id,taskNumber:i+1,totalTasks:tasks.length,stepId,stepNumber:STEPS.indexOf(stepId)+1,totalSteps:STEPS.length,completedStepIds:Object.freeze(completed),leftMixedNumber:t.leftMixedNumber,rightMixedNumber:t.rightMixedNumber,...e});
+  const completed=STEPS.filter(id=>rs.some(x=>x.stepId===id&&x.classification==="valid"));
+  if(p.pendingTaskId===t.id)return Object.freeze({id:t.id,taskNumber:i+1,totalTasks:tasks.length,stepId:null,stepNumber:STEPS.length,totalSteps:STEPS.length,completedStepIds:Object.freeze(completed),isAwaitingNext:true,leftMixedNumber:t.leftMixedNumber,rightMixedNumber:t.rightMixedNumber,...e});
+  const stepId=STEPS.find(id=>!completed.includes(id));
+  return Object.freeze({id:t.id,taskNumber:i+1,totalTasks:tasks.length,stepId,stepNumber:STEPS.indexOf(stepId)+1,totalSteps:STEPS.length,completedStepIds:Object.freeze(completed),isAwaitingNext:false,leftMixedNumber:t.leftMixedNumber,rightMixedNumber:t.rightMixedNumber,...e});
  }
  function recordGuided({stepId,rawValue,values}={}){
   if(mode!=="guided")throw new Error("This is not a guided session.");
   const current=getCurrentTask();if(!current)throw new Error("The guided level-5 session is complete.");
-  if(stepId!==current.stepId)throw new Error("Only the active guided step can be answered.");
+  if(current.isAwaitingNext||stepId!==current.stepId)throw new Error("Only the active guided step can be answered.");
   const task=byId.get(current.id),e=expectedFor(task),raw=String(rawValue??"");let classification="invalid_input";
   if(stepId==="mixed_number_answer")classification=classifyFinal(values,e);
-  else{
+  else if(stepId==="whole_number_conversion"){
+   const left=/^[0-9]+$/.test(String(values?.leftWholeNumerator??""))?Number(values.leftWholeNumerator):NaN;
+   const right=/^[0-9]+$/.test(String(values?.rightWholeNumerator??""))?Number(values.rightWholeNumerator):NaN;
+   if(Number.isSafeInteger(left)&&Number.isSafeInteger(right))classification=left===e.leftWholeNumerator&&right===e.rightWholeNumerator?"valid":"not_equivalent";
+  }else{
    const n=/^[0-9]+$/.test(raw)?Number(raw):NaN;
    if(Number.isSafeInteger(n)&&n>0){
     if(stepId==="common_denominator")classification=n%e.denominator===0?"valid":"not_common_denominator";
     else if(stepId==="left_equivalent_numerator")classification=n===e.leftNumerator?"valid":"not_equivalent";
     else if(stepId==="right_equivalent_numerator")classification=n===e.rightNumerator?"valid":"not_equivalent";
-    else if(stepId==="combined_total")classification=n===e.improperNumerator?"valid":"arithmetic_error";
+    else if(stepId==="fraction_parts_addition")classification=n===e.improperNumerator?"valid":"arithmetic_error";
    }
   }
-  const p=read(),list=responses(p,task);list.push({stepId,rawValue:raw,classification,values:safeValues(values)});p.responsesByTask[task.id]=list;
-  let completion=null;if(classification==="valid"&&stepId==="mixed_number_answer"){p.completedTaskIds.push(task.id);completion=Object.freeze({taskId:task.id,taskNumber:current.taskNumber,totalTasks:tasks.length,...e});}
+  const p=read(),list=responses(p,task);list.push({stepId,rawValue:raw,classification,values:values&&typeof values==="object"?{...values}:safeValues(values)});p.responsesByTask[task.id]=list;
+  let completion=null;
+  if(classification==="valid"&&stepId==="mixed_number_answer"){if(!p.completedTaskIds.includes(task.id))p.completedTaskIds.push(task.id);p.pendingTaskId=task.id;completion=Object.freeze({taskId:task.id,taskNumber:current.taskNumber,totalTasks:tasks.length,...e});}
   storage.setItem(key,JSON.stringify(p));return Object.freeze({classification,progress:getProgress(),currentTask:getCurrentTask(),completion});
+ }
+ function advanceGuidedTask(){
+  if(mode!=="guided")throw new Error("This is not a guided session.");
+  const p=read();if(!p.pendingTaskId)throw new Error("There is no completed guided task waiting to advance.");
+  p.pendingTaskId=null;storage.setItem(key,JSON.stringify(p));return Object.freeze({progress:getProgress(),currentTask:getCurrentTask()});
  }
  function recordAnswer({values}={}){
   if(mode!=="independent")throw new Error("This is not an independent session.");
@@ -84,7 +99,7 @@ function createSession({learnerKey,storage=globalThis.localStorage,tasks,session
  }
  function getCurrentResponses(){const p=read(),t=active(p);return Object.freeze(t?responses(p,t).map(x=>Object.freeze({...x,values:x.values?Object.freeze({...x.values}):null})):[]);}
  function reset(){storage.removeItem(key);}
- return Object.freeze({getCurrentTask,getProgress,getCurrentResponses,recordGuided,recordAnswer,reset});
+ return Object.freeze({getCurrentTask,getProgress,getCurrentResponses,recordGuided,advanceGuidedTask,recordAnswer,reset});
 }
 function createFractionAdditionLevel5GuidedSession(options={}){return createSession({...options,tasks:options.tasks||FRACTION_ADDITION_LEVEL_5_GUIDED_TASKS,sessionId:"guided",mode:"guided"});}
 function createFractionAdditionLevel5IndependentSession(options={}){return createSession({...options,tasks:options.tasks||FRACTION_ADDITION_LEVEL_5_INDEPENDENT_TASKS,sessionId:"independent",mode:"independent"});}

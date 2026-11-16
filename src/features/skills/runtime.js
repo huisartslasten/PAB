@@ -542,7 +542,7 @@ export function createSkillsRuntime({
         solution.append(op('='));
         solution.append(renderMixedNumber({wholeNumber:whole,numerator:remainder,denominator},'Gemengd getal als uitkomst'));
       }
-      template.promptArea.append(prompt,solution);
+      const equation=documentRef.createElement('div');equation.className='fraction-guided-equation';equation.setAttribute('aria-label','Som en uitwerking naast elkaar');equation.append(prompt,solution);template.promptArea.append(equation);
       const grid=documentRef.createElement('div');grid.className='fraction-guided-step-grid'+(mixedNumberResult?' fraction-guided-step-grid--five':'');grid.setAttribute('aria-label',mixedNumberResult?'Vijf denkstappen':'Vier denkstappen');let activeInput=null;let activeFractionAnswer=null;
       stepIds.forEach((stepId,index)=>{
         const completed=step.completedStepIds.includes(stepId),active=step.stepId===stepId;

@@ -566,6 +566,8 @@ test('guided unequal-denominator addition converts sums above one to mixed numbe
     });
     await runtime.mount();
     const snapshot = () => ({
+      equationLayout: (() => { const row=document.querySelector('.fraction-guided-equation'); return row ? { display:getComputedStyle(row).display, promptAndSolutionShareRow: row.children.length===2 && row.children[0].parentElement===row && row.children[1].parentElement===row, solutionWrap:getComputedStyle(row.children[1]).flexWrap } : null; })(),
+      equationLayout: (() => { const row=document.querySelector('.fraction-guided-equation'); return row ? { display:getComputedStyle(row).display, promptAndSolutionShareRow: row.children.length===2 && row.children[0].parentElement===row && row.children[1].parentElement===row, solutionWrap:getComputedStyle(row.children[1]).flexWrap } : null; })(),
       page: Boolean(document.querySelector('.paco-page-template')),
       fractionTemplate: Boolean(document.querySelector('[data-component="fraction-practice-template"]')),
       stepCount: document.querySelectorAll('.fraction-guided-step-card').length,
@@ -608,9 +610,9 @@ test('guided unequal-denominator addition converts sums above one to mixed numbe
   });
   expect(result.overviewResult.rows).toBe(7);
   expect(result.overviewResult.hasExerciseButton).toBe(true);
-  expect(result.initial.page).toBe(true);
+  expect(result.initial.page).toBe(true); expect(result.initial.equationLayout).toEqual({display:'flex',promptAndSolutionShareRow:true,solutionWrap:'nowrap'});
   expect(result.initial.fractionTemplate).toBe(true);
-  expect(result.initial.stepCount).toBe(5);
+  expect(result.initial.stepCount).toBe(5); expect(result.initial.equationLayout).toEqual({display:'flex',promptAndSolutionShareRow:true,solutionWrap:'nowrap'});
   expect(result.initial.states).toEqual(['active', 'locked', 'locked', 'locked', 'locked']);
   expect(result.initial.progress).toContain('Som 1 van 10');
   expect(result.afterDenominator.states).toEqual(['completed', 'active', 'locked', 'locked', 'locked']); expect(result.afterDenominator.summaryFractions).toBe(2); expect(result.afterDenominator.completedAnswers).toContain('Noemer: 12');

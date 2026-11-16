@@ -10,6 +10,9 @@ assert.equal(s.recordAnswer({values:answer({numerator:"11",denominator:"14"})}).
 assert.equal(s.recordAnswer({values:answer({numerator:"17",denominator:"20"})}).classification,"valid");
 assert.equal(s.recordAnswer({values:answer({numerator:"9",denominator:"12"})}).classification,"requires_simplification");
 assert.equal(s.recordAnswer({values:answer({numerator:"9",denominator:"12",simplified:true,simplifiedNumerator:"3",simplifiedDenominator:"4"})}).classification,"valid");
+assert.equal(s.recordAnswer({values:answer({numerator:"13",denominator:"14"})}).classification,"valid");
+assert.equal(s.recordAnswer({values:answer({numerator:"7",denominator:"9"})}).classification,"valid");
+assert.equal(s.recordAnswer({values:answer({numerator:"33",denominator:"40"})}).classification,"valid");
 assert.equal(s.recordAnswer({values:answer({numerator:"1",denominator:"24"})}).classification,"requires_mixed_number");
 assert.equal(s.recordAnswer({values:answer({wholeNumberEnabled:true,wholeNumber:"1",numerator:"1",denominator:"24"})}).classification,"valid");
 assert.equal(s.getProgress().completedCount,5);

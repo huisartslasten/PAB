@@ -530,3 +530,93 @@ test('guided unequal-denominator addition uses central templates, ten tasks and 
   expect(result.afterNext.states).toEqual(['active','locked','locked','locked']);
   expect(result.afterNext.progress).toContain('Som 2 van 10');
 });
+
+
+test('guided unequal-denominator addition converts sums above one to mixed numbers through the central fraction answer interface', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=optellen', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {},
+      managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    const overview = createSkillsRuntime({
+      app, templateMount, context: { student: 'Level3B', mode: 'student' },
+      domain: 'fractions', topic: 'optellen', documentRef: document, navigate: () => {}
+    });
+    await overview.mount();
+    const rows = [...document.querySelectorAll('.skills-addition-overview-row')];
+    const row = rows.find(item => item.querySelector('.skills-addition-overview-label')?.textContent.includes('uitkomst groter dan 1'));
+    const difficulty = row.querySelector('.skills-addition-overview-difficulty');
+    const overviewResult = {
+      rows: rows.length,
+      levelIndicator: difficulty?.textContent || '',
+      hasExerciseButton: Boolean(row.querySelector('button'))
+    };
+    const runtime = createSkillsRuntime({
+      app, templateMount, context: { student: 'Level3B', mode: 'student' },
+      domain: 'fractions', topic: 'optellen',
+      exercise: 'unequal-denominator-guided-mixed-addition',
+      documentRef: document, navigate: () => {}
+    });
+    await runtime.mount();
+    const snapshot = () => ({
+      page: Boolean(document.querySelector('.paco-page-template')),
+      fractionTemplate: Boolean(document.querySelector('[data-component="fraction-practice-template"]')),
+      stepCount: document.querySelectorAll('.fraction-guided-step-card').length,
+      states: [...document.querySelectorAll('.fraction-guided-step-card')].map(node => node.dataset.state),
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      fractionBars: document.querySelectorAll('.fraction-guided-task-prompt .pacogo-fraction-representation--symbolic').length,
+      feedback: document.querySelector('.fraction-practice-feedback')?.textContent || '',
+      activeFractionFields: document.querySelectorAll('.fraction-guided-step-card[data-state="active"] [data-answer-part]').length,
+      controls: [...document.querySelectorAll('.pacogo-fraction-practice-template__controls button')].map(button => button.textContent)
+    });
+    const answerStep = value => {
+      const input = document.querySelector('.fraction-guided-step-card[data-state="active"] [data-fraction-guided-answer], .fraction-guided-step-card[data-state="active"] [data-fraction-step-answer]');
+      input.value = String(value);
+      document.querySelector('.fraction-guided-step-card[data-state="active"] button').click();
+    };
+    answerStep(12);
+    const afterDenominator = snapshot();
+    answerStep(10);
+    const afterLeft = snapshot();
+    answerStep(9);
+    const afterRight = snapshot();
+    answerStep(19);
+    const afterSum = snapshot();
+    const mixedFields = {
+      wholeToggle: document.querySelector('.fraction-guided-step-card[data-state="active"] .pacogo-fraction-answer__toggle')?.textContent || '',
+      initialWholeVisible: !document.querySelector('.fraction-guided-step-card[data-state="active"] [data-answer-part="whole"]')?.closest('label')?.hidden,
+      shownImproperFraction: document.querySelector('.fraction-guided-step-card[data-state="active"] .pacogo-fraction-representation--symbolic')?.textContent || ''
+    };
+    const setPart = (part, value) => {
+      const input = document.querySelector('.fraction-guided-step-card[data-state="active"] [data-answer-part="' + part + '"]');
+      input.value = String(value);
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    document.querySelector('.fraction-guided-step-card[data-state="active"] .pacogo-fraction-answer__toggle').click();
+    setPart('whole', 1); setPart('primaryNumerator', 7); setPart('primaryDenominator', 12);
+    document.querySelector('.fraction-guided-step-card[data-state="active"] button').click();
+    const afterMixed = snapshot();
+    return { overviewResult, initial: snapshot(), afterDenominator, afterLeft, afterRight, afterSum, mixedFields, afterMixed };
+  });
+  expect(result.overviewResult.rows).toBe(7);
+  expect(result.overviewResult.hasExerciseButton).toBe(true);
+  expect(result.initial.page).toBe(true);
+  expect(result.initial.fractionTemplate).toBe(true);
+  expect(result.initial.stepCount).toBe(5);
+  expect(result.initial.states).toEqual(['active', 'locked', 'locked', 'locked', 'locked']);
+  expect(result.initial.progress).toContain('Som 1 van 10');
+  expect(result.afterDenominator.states).toEqual(['completed', 'active', 'locked', 'locked', 'locked']);
+  expect(result.afterLeft.states).toEqual(['completed', 'completed', 'active', 'locked', 'locked']);
+  expect(result.afterRight.states).toEqual(['completed', 'completed', 'completed', 'active', 'locked']);
+  expect(result.afterSum.states).toEqual(['completed', 'completed', 'completed', 'completed', 'active']);
+  expect(result.mixedFields.wholeToggle).toContain('Heel getal toevoegen');
+  expect(result.mixedFields.initialWholeVisible).toBe(false);
+  expect(result.afterMixed.states).toEqual(['completed', 'completed', 'completed', 'completed', 'completed']);
+  expect(result.afterMixed.feedback).toContain('Goed gedaan! Deze som is afgerond.');
+});

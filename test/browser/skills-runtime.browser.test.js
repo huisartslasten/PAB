@@ -804,3 +804,48 @@ test('level 5 guided practice uses six progressive steps and waits for an explic
   expect(result.afterNext.firstStep).toBe('common_denominator');
   expect(result.afterNext.progress).toContain('som 2 van 10');
 });
+
+
+test('fraction subtraction overview uses the central PacoGO page and five ordered difficulty rows', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=aftrekken', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {},
+      managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    const runtime = createSkillsRuntime({
+      app,
+      templateMount,
+      context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions',
+      topic: 'aftrekken',
+      documentRef: document,
+      navigate: () => {}
+    });
+    await runtime.mount();
+    return {
+      title: document.querySelector('.paco-page-template')?.textContent.includes('Aftrekken') || false,
+      centralPage: Boolean(document.querySelector('.paco-page-template')),
+      rows: [...document.querySelectorAll('.skills-addition-overview-row')].map(row => ({
+        label: row.querySelector('.skills-addition-overview-label')?.textContent || '',
+        filled: row.querySelectorAll('.paco-bone-difficulty__bone.is-filled, .paco-bone-difficulty__bone--filled').length
+      })),
+      heading: document.querySelector('[aria-label="Onderwerpen breuken aftrekken"]')?.getAttribute('aria-label') || ''
+    };
+  });
+  expect(result.centralPage).toBe(true);
+  expect(result.title).toBe(true);
+  expect(result.heading).toBe('Onderwerpen breuken aftrekken');
+  expect(result.rows.map(row => row.label)).toEqual([
+    'Breukgetal groter dan 1 aftrekken van een heel getal',
+    'Gelijknamige breuken kleiner dan 1 van elkaar aftrekken',
+    'Gelijknamige breuken groter dan 1 van elkaar aftrekken',
+    'Ongelijknamige breuken kleiner dan 1 van elkaar aftrekken',
+    'Ongelijknamige breuken groter dan 1 van elkaar aftrekken'
+  ]);
+});

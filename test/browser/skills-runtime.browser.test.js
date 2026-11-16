@@ -100,7 +100,7 @@ test('fraction subject overview uses the canonical PacoGO page template and show
 });
 
 
-test('Optellen in the fraction overview opens the six-row addition overview with the supplied difficulty levels', async ({ page }) => {
+test('Optellen in the fraction overview opens the seven-row addition overview with the supplied difficulty levels', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions', { waitUntil: 'domcontentloaded' });
   const result = await page.evaluate(async () => {
     const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
@@ -149,10 +149,11 @@ test('Optellen in the fraction overview opens the six-row addition overview with
     'Breuken gelijknamig maken',
     'Gelijknamige breuken groter dan 1 bij elkaar optellen',
     'Ongelijknamige breuken kleiner dan 1 bij elkaar optellen',
+    'Ongelijknamige breuken met een uitkomst groter dan 1 optellen',
     'Ongelijknamige breuken groter dan 1 bij elkaar optellen'
   ]);
-  expect(result.levels).toEqual([1, 1, 2, 2, 3, 5]);
-  expect(result.boneCounts).toEqual([5, 5, 5, 5, 5, 5]);
+  expect(result.levels).toEqual([1, 1, 2, 2, 3, 3, 5]);
+  expect(result.boneCounts).toEqual([5, 5, 5, 5, 5, 5, 5]);
   expect(result.centralCard).toBe(true);
   expect(result.customDots).toBe(0);
 });
@@ -589,7 +590,7 @@ test('guided unequal-denominator addition converts sums above one to mixed numbe
     answerStep(19);
     const afterSum = snapshot();
     const mixedFields = {
-      wholeToggle: document.querySelector('.fraction-guided-step-card[data-state="active"] .pacogo-fraction-answer__toggle')?.textContent || '',
+      wholeToggle: document.querySelector('.pacogo-fraction-answer__toggle')?.textContent || '',
       initialWholeVisible: !document.querySelector('.fraction-guided-step-card[data-state="active"] [data-answer-part="whole"]')?.closest('label')?.hidden,
       shownImproperFraction: document.querySelector('.fraction-guided-step-card[data-state="active"] .pacogo-fraction-representation--symbolic')?.textContent || ''
     };
@@ -598,7 +599,7 @@ test('guided unequal-denominator addition converts sums above one to mixed numbe
       input.value = String(value);
       input.dispatchEvent(new Event('input', { bubbles: true }));
     };
-    document.querySelector('.fraction-guided-step-card[data-state="active"] .pacogo-fraction-answer__toggle').click();
+    document.querySelector('.pacogo-fraction-answer__toggle').click();
     setPart('whole', 1); setPart('primaryNumerator', 7); setPart('primaryDenominator', 12);
     document.querySelector('.fraction-guided-step-card[data-state="active"] button').click();
     const afterMixed = snapshot();

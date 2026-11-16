@@ -5,7 +5,7 @@ import { createPacoBoneDifficulty } from '../../components/design-system.js';
 import { createFractionPracticeTemplate } from '../../../pacogo-engine/fraction-practice-template.js';
 import { renderFractionAnswerInput } from '../../../pacogo-engine/fraction-answer-input.js';
 import { renderFractionRepresentation, renderMixedNumber, renderFractionInputRepresentation } from '../../../pacogo-engine/fraction-learning-interface-renderers.js';
-import { FRACTION_ADDITION_PRACTICE_TASKS } from '../../../pacogo-engine/fraction-addition-practice-task-bank.js';
+import { FRACTION_ADDITION_LEVEL_3_TASKS } from '../../../pacogo-engine/fraction-addition-level-3-task-bank.js';
 import { createFractionAdditionPracticeSession } from '../../../pacogo-engine/fraction-addition-practice-session.js';
 import { FRACTION_WHOLE_MIXED_ADDITION_EXERCISE, createFractionWholeMixedAdditionSession } from '../../../pacogo-engine/fraction-whole-mixed-addition-session.js';
 import { FRACTION_SAME_DENOMINATOR_ADDITION_EXERCISE, createFractionSameDenominatorAdditionSession } from '../../../pacogo-engine/fraction-same-denominator-addition-session.js';
@@ -476,7 +476,7 @@ export function createSkillsRuntime({
 
   function renderUnequalDenominatorGuidedAdditionPractice() {
     const learnerKey=student||context?.learnerId||'local-learner';
-    const session=createFractionAdditionPracticeSession({learnerKey,tasks:FRACTION_ADDITION_PRACTICE_TASKS});
+    const session=createFractionAdditionPracticeSession({learnerKey,tasks:FRACTION_ADDITION_LEVEL_3_TASKS});
     const stepIds=['common_denominator','left_equivalent_numerator','right_equivalent_numerator','addition_result'];
     const stepLabels=['Gemeenschappelijke noemer kiezen','Eerste breuk gelijkwaardig maken','Tweede breuk gelijkwaardig maken','Tellers optellen'];
     function renderExpression(step,mount) {

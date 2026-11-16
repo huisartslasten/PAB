@@ -502,9 +502,8 @@ export function createSkillsRuntime({
       const progressLabel=documentRef.createElement('p');progressLabel.className='fraction-practice-progress';progressLabel.textContent='Som '+(completedTask?completedTask.taskNumber:progress.completedTaskCount+1)+' van '+progress.totalTaskCount;
       template.titleArea.append(title);template.instructionArea.append(instruction);template.progressArea.append(progressLabel);
       if(!step){const done=documentRef.createElement('p');done.className='fraction-practice-complete';done.textContent='Je hebt alle 10 sommen afgerond. Goed gewerkt!';template.workArea.append(done);content.append(card);return;}
-      const taskLabel=documentRef.createElement('p');taskLabel.className='fraction-guided-task-label';taskLabel.textContent='Som '+step.taskNumber+' van '+step.totalTasks;
       const prompt=documentRef.createElement('div');prompt.className='fraction-guided-task-prompt';const op=value=>Object.assign(documentRef.createElement('span'),{className:'fraction-guided-operator',textContent:value});
-      prompt.append(renderFractionRepresentation(step.leftFraction,'symbolic_fraction','Eerste breuk'),op('+'),renderFractionRepresentation(step.rightFraction,'symbolic_fraction','Tweede breuk'));template.promptArea.append(taskLabel,prompt);
+      prompt.append(renderFractionRepresentation(step.leftFraction,'symbolic_fraction','Eerste breuk'),op('+'),renderFractionRepresentation(step.rightFraction,'symbolic_fraction','Tweede breuk'));template.promptArea.append(prompt);
       const grid=documentRef.createElement('div');grid.className='fraction-guided-step-grid';grid.setAttribute('aria-label','Vier denkstappen');let activeInput=null;
       stepIds.forEach((stepId,index)=>{
         const completed=step.completedStepIds.includes(stepId),active=step.stepId===stepId;

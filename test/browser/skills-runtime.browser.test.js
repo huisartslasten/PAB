@@ -508,7 +508,7 @@ test('guided unequal-denominator addition uses central templates, ten tasks and 
     row.querySelector('button').click();
     const runtime=createSkillsRuntime({app,templateMount,context:{student:'Zyon',mode:'student'},domain:'fractions',topic:'optellen',exercise:'unequal-denominator-guided-addition',documentRef:document,navigate:()=>{}});
     await runtime.mount();
-    const snapshot=()=>({canonicalPage:Boolean(document.querySelector('.paco-page-template')),fractionTemplate:Boolean(document.querySelector('[data-component="fraction-practice-template"]')),progress:document.querySelector('.fraction-practice-progress')?.textContent||'',progressCount:document.querySelectorAll('.fraction-practice-progress').length,duplicateTaskLabelCount:document.querySelectorAll('.fraction-guided-task-label').length,stepCards:document.querySelectorAll('.fraction-guided-step-card').length,states:[...document.querySelectorAll('.fraction-guided-step-card')].map(node=>node.dataset.state),fractions:document.querySelectorAll('.fraction-guided-task-prompt .pacogo-fraction-representation--symbolic').length,feedback:document.querySelector('.fraction-practice-feedback')?.textContent||'',nextButton:document.querySelector('.pacogo-fraction-practice-template__actions button')?.textContent||'',nextButtonClass:document.querySelector('.pacogo-fraction-practice-template__actions button')?.className||'',hasLevelLabel:/Niveau/i.test(document.querySelector('.fraction-practice-progress')?.textContent||''),fractionInputWidth:document.querySelector('.fraction-guided-step-card[data-state="active"] .pacogo-fraction-step-input')?getComputedStyle(document.querySelector('.fraction-guided-step-card[data-state="active"] .pacogo-fraction-step-input')).width:null});
+    const snapshot=()=>({canonicalPage:Boolean(document.querySelector('.paco-page-template')),fractionTemplate:Boolean(document.querySelector('[data-component="fraction-practice-template"]')),progress:document.querySelector('.fraction-practice-progress')?.textContent||'',progressCount:document.querySelectorAll('.fraction-practice-progress').length,duplicateTaskLabelCount:document.querySelectorAll('.fraction-guided-task-label').length,stepCards:document.querySelectorAll('.fraction-guided-step-card').length,states:[...document.querySelectorAll('.fraction-guided-step-card')].map(node=>node.dataset.state),fractions:document.querySelectorAll('.fraction-guided-task-prompt .pacogo-fraction-representation--symbolic').length,feedback:document.querySelector('.fraction-practice-feedback')?.textContent||'',nextButton:document.querySelector('.pacogo-fraction-practice-template__actions button')?.textContent||'',nextButtonClass:document.querySelector('.pacogo-fraction-practice-template__actions button')?.className||'',hasLevelLabel:/Niveau/i.test(document.querySelector('.fraction-practice-progress')?.textContent||''),fractionInputWidth:document.querySelector('.fraction-guided-step-card[data-state="active"] .pacogo-fraction-step-input')?getComputedStyle(document.querySelector('.fraction-guided-step-card[data-state="active"] .pacogo-fraction-step-input')).width:null,scalarInputWidth:document.querySelector('.fraction-guided-scalar-input')?getComputedStyle(document.querySelector('.fraction-guided-scalar-input')).width:null,summaryFractions:document.querySelectorAll('.fraction-guided-solution .fraction-guided-summary-fraction').length,completedAnswers:[...document.querySelectorAll('.fraction-guided-step-card[data-state="completed"] .fraction-guided-step-completed-answer')].map(node=>node.textContent.trim())});
     const initial=snapshot();
     const answer=value=>{const input=document.querySelector('[data-fraction-guided-answer],[data-fraction-step-answer]');input.value=String(value);document.querySelector('.fraction-guided-step-card[data-state="active"] button').click()};
     answer(12);const afterFirst=snapshot();answer(4);const afterSecond=snapshot();answer(3);const afterThird=snapshot();answer(7);const afterFourth=snapshot();
@@ -520,10 +520,10 @@ test('guided unequal-denominator addition uses central templates, ten tasks and 
   expect(result.initial.canonicalPage).toBe(true); expect(result.initial.fractionTemplate).toBe(true);
   expect(result.initial.progress).toContain('Som 1 van 10'); expect(result.initial.progressCount).toBe(1); expect(result.initial.duplicateTaskLabelCount).toBe(0); expect(result.initial.stepCards).toBe(4);
   expect(result.initial.states).toEqual(['active','locked','locked','locked']); expect(result.initial.fractions).toBe(2);
-  expect(result.afterFirst.states).toEqual(['completed','active','locked','locked']); expect(result.afterFirst.fractionInputWidth).toBe('48px');
-  expect(result.afterSecond.states).toEqual(['completed','completed','active','locked']);
-  expect(result.afterThird.states).toEqual(['completed','completed','completed','active']);
-  expect(result.afterFourth.states).toEqual(['completed','completed','completed','completed']);
+  expect(result.afterFirst.states).toEqual(['completed','active','locked','locked']); expect(result.afterFirst.fractionInputWidth).toBe('48px'); expect(result.initial.scalarInputWidth).toBe('76px'); expect(result.afterFirst.summaryFractions).toBe(2); expect(result.afterFirst.completedAnswers).toContain('Noemer: 12');
+  expect(result.afterSecond.states).toEqual(['completed','completed','active','locked']); expect(result.afterSecond.completedAnswers).toHaveLength(2);
+  expect(result.afterThird.states).toEqual(['completed','completed','completed','active']); expect(result.afterThird.completedAnswers).toHaveLength(3);
+  expect(result.afterFourth.states).toEqual(['completed','completed','completed','completed']); expect(result.afterFourth.completedAnswers).toHaveLength(4); expect(result.afterFourth.summaryFractions).toBe(3);
   expect(result.afterFourth.progress).toContain('Som 1 van 10');
   expect(result.afterFourth.feedback).toContain('Goed gedaan! Deze som is afgerond.');
   expect(result.afterFourth.nextButton).toBe('Volgende'); expect(result.afterFourth.nextButtonClass).toContain('paco-btn--small');
@@ -574,7 +574,7 @@ test('guided unequal-denominator addition converts sums above one to mixed numbe
       fractionBars: document.querySelectorAll('.fraction-guided-task-prompt .pacogo-fraction-representation--symbolic').length,
       feedback: document.querySelector('.fraction-practice-feedback')?.textContent || '',
       activeFractionFields: document.querySelectorAll('.fraction-guided-step-card[data-state="active"] [data-answer-part]').length,
-      controls: [...document.querySelectorAll('.pacogo-fraction-practice-template__controls button')].map(button => button.textContent)
+      controls: [...document.querySelectorAll('.pacogo-fraction-practice-template__controls button')].map(button => button.textContent),summaryFractions:document.querySelectorAll('.fraction-guided-solution .fraction-guided-summary-fraction').length,completedAnswers:[...document.querySelectorAll('.fraction-guided-step-card[data-state="completed"] .fraction-guided-step-completed-answer')].map(node=>node.textContent.trim())
     });
     const initial = snapshot();
     const answerStep = value => {
@@ -613,12 +613,12 @@ test('guided unequal-denominator addition converts sums above one to mixed numbe
   expect(result.initial.stepCount).toBe(5);
   expect(result.initial.states).toEqual(['active', 'locked', 'locked', 'locked', 'locked']);
   expect(result.initial.progress).toContain('Som 1 van 10');
-  expect(result.afterDenominator.states).toEqual(['completed', 'active', 'locked', 'locked', 'locked']);
-  expect(result.afterLeft.states).toEqual(['completed', 'completed', 'active', 'locked', 'locked']);
-  expect(result.afterRight.states).toEqual(['completed', 'completed', 'completed', 'active', 'locked']);
-  expect(result.afterSum.states).toEqual(['completed', 'completed', 'completed', 'completed', 'active']);
+  expect(result.afterDenominator.states).toEqual(['completed', 'active', 'locked', 'locked', 'locked']); expect(result.afterDenominator.summaryFractions).toBe(2); expect(result.afterDenominator.completedAnswers).toContain('Noemer: 12');
+  expect(result.afterLeft.states).toEqual(['completed', 'completed', 'active', 'locked', 'locked']); expect(result.afterLeft.completedAnswers).toHaveLength(2);
+  expect(result.afterRight.states).toEqual(['completed', 'completed', 'completed', 'active', 'locked']); expect(result.afterRight.completedAnswers).toHaveLength(3);
+  expect(result.afterSum.states).toEqual(['completed', 'completed', 'completed', 'completed', 'active']); expect(result.afterSum.summaryFractions).toBe(3); expect(result.afterSum.completedAnswers).toHaveLength(4);
   expect(result.mixedFields.wholeToggle).toContain('Heel getal toevoegen');
   expect(result.mixedFields.initialWholeVisible).toBe(false);
-  expect(result.afterMixed.states).toEqual(['completed', 'completed', 'completed', 'completed', 'completed']);
+  expect(result.afterMixed.states).toEqual(['completed', 'completed', 'completed', 'completed', 'completed']); expect(result.afterMixed.completedAnswers).toHaveLength(5); expect(result.afterMixed.summaryFractions).toBe(4);
   expect(result.afterMixed.feedback).toContain('Goed gedaan! Deze som is afgerond.');
 });

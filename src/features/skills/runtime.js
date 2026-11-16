@@ -507,13 +507,57 @@ export function createSkillsRuntime({
       template.titleArea.append(title);template.instructionArea.append(instruction);template.progressArea.append(progressLabel);
       if(!step){const done=documentRef.createElement('p');done.className='fraction-practice-complete';done.textContent='Je hebt alle 10 sommen afgerond. Goed gewerkt!';template.workArea.append(done);content.append(card);return;}
       const prompt=documentRef.createElement('div');prompt.className='fraction-guided-task-prompt';const op=value=>Object.assign(documentRef.createElement('span'),{className:'fraction-guided-operator',textContent:value});
-      prompt.append(renderFractionRepresentation(step.leftFraction,'symbolic_fraction','Eerste breuk'),op('+'),renderFractionRepresentation(step.rightFraction,'symbolic_fraction','Tweede breuk'));template.promptArea.append(prompt);
+      prompt.append(renderFractionRepresentation(step.leftFraction,'symbolic_fraction','Eerste breuk'),op('+'),renderFractionRepresentation(step.rightFraction,'symbolic_fraction','Tweede breuk'));
+      const completedIds=step.completedStepIds||[];
+      const denominator=completedTask?.denominator??step.commonDenominator;
+      const leftNumerator=completedTask?.leftNumerator??step.leftEquivalentNumerator;
+      const rightNumerator=completedTask?.rightNumerator??step.rightEquivalentNumerator;
+      const resultNumerator=completedTask?.resultNumerator??step.resultNumerator??(Number.isSafeInteger(leftNumerator)&&Number.isSafeInteger(rightNumerator)?leftNumerator+rightNumerator:null);
+      const hasDenominator=completedIds.includes('common_denominator')||completedTask!==null;
+      const hasLeft=completedIds.includes('left_equivalent_numerator')||completedTask!==null;
+      const hasRight=completedIds.includes('right_equivalent_numerator')||completedTask!==null;
+      const hasResult=completedIds.includes('addition_result')||completedTask!==null;
+      const solution=documentRef.createElement('div');solution.className='fraction-guided-solution';solution.setAttribute('aria-label','Uitwerking van de som');
+      const appendSummaryFraction=(numerator,denom,label)=>{
+        const fraction=documentRef.createElement('span');fraction.className='fraction-guided-summary-fraction';fraction.setAttribute('aria-label',label);
+        const top=documentRef.createElement('span');top.className='fraction-guided-summary-numerator';top.textContent=Number.isSafeInteger(numerator)?String(numerator):'?';
+        const bar=documentRef.createElement('span');bar.className='fraction-guided-summary-divider';
+        const bottom=documentRef.createElement('span');bottom.className='fraction-guided-summary-denominator';bottom.textContent=String(denom);
+        fraction.append(top,bar,bottom);solution.append(fraction);
+      };
+      if(hasDenominator&&Number.isSafeInteger(denominator)){
+        solution.append(op('='));
+        appendSummaryFraction(hasLeft?leftNumerator:null,denominator,'Eerste gelijkwaardige breuk');
+        solution.append(op('+'));
+        appendSummaryFraction(hasRight?rightNumerator:null,denominator,'Tweede gelijkwaardige breuk');
+      }
+      if(hasResult&&Number.isSafeInteger(resultNumerator)&&Number.isSafeInteger(denominator)){
+        solution.append(op('='));
+        appendSummaryFraction(resultNumerator,denominator,'Som als onechte breuk');
+      }
+      const isMixedStepCompleted=completedIds.includes('mixed_number_conversion')||completedTask?.requiresMixedNumber===true;
+      if(mixedNumberResult&&isMixedStepCompleted){
+        const whole=completedTask?.resultWholeNumber??step.resultWholeNumber;
+        const remainder=completedTask?.resultRemainderNumerator??step.resultRemainderNumerator;
+        solution.append(op('='));
+        solution.append(renderMixedNumber({wholeNumber:whole,numerator:remainder,denominator},'Gemengd getal als uitkomst'));
+      }
+      template.promptArea.append(prompt,solution);
       const grid=documentRef.createElement('div');grid.className='fraction-guided-step-grid'+(mixedNumberResult?' fraction-guided-step-grid--five':'');grid.setAttribute('aria-label',mixedNumberResult?'Vijf denkstappen':'Vier denkstappen');let activeInput=null;let activeFractionAnswer=null;
       stepIds.forEach((stepId,index)=>{
         const completed=step.completedStepIds.includes(stepId),active=step.stepId===stepId;
         const item=documentRef.createElement('section');item.className='fraction-guided-step-card';item.dataset.stepId=stepId;item.dataset.state=completed?'completed':active?'active':'locked';item.setAttribute('aria-label','Stap '+(index+1)+': '+stepLabels[index]);
         const heading=documentRef.createElement('h3');heading.textContent='Stap '+(index+1);const label=documentRef.createElement('p');label.className='fraction-guided-step-title';label.textContent=stepLabels[index];item.append(heading,label);
-        if(completed){const status=documentRef.createElement('p');status.className='fraction-guided-step-status';status.textContent='Afgerond';item.append(status);}
+        if(completed){
+          const status=documentRef.createElement('p');status.className='fraction-guided-step-status';status.textContent='Afgerond';item.append(status);
+          const answer=documentRef.createElement('div');answer.className='fraction-guided-step-completed-answer';
+          if(stepId==='common_denominator')answer.textContent='Noemer: '+denominator;
+          else if(stepId==='left_equivalent_numerator')answer.append(renderFractionRepresentation({numerator:leftNumerator,denominator},'symbolic_fraction','Eerste gelijkwaardige breuk'));
+          else if(stepId==='right_equivalent_numerator')answer.append(renderFractionRepresentation({numerator:rightNumerator,denominator},'symbolic_fraction','Tweede gelijkwaardige breuk'));
+          else if(stepId==='addition_result')answer.append(renderFractionRepresentation({numerator:resultNumerator,denominator},'symbolic_fraction','Som als onechte breuk'));
+          else if(stepId==='mixed_number_conversion')answer.append(renderMixedNumber({wholeNumber:completedTask?.resultWholeNumber??step.resultWholeNumber,numerator:completedTask?.resultRemainderNumerator??step.resultRemainderNumerator,denominator},'Gemengd getal als uitkomst'));
+          item.append(answer);
+        }
         else if(active){
           const help=documentRef.createElement('p');help.className='fraction-guided-step-prompt';help.textContent=step.prompt;
           const expression=documentRef.createElement('div');expression.className='fraction-guided-step-expression';

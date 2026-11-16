@@ -251,6 +251,18 @@
   height: 2px;
   background: currentColor;
 }
+
+/* Compact numeric fields inside the shared stacked-fraction renderer. */
+.pacogo-fraction-representation--symbolic .pacogo-fraction-step-input {
+  width: 48px !important;
+  min-width: 48px !important;
+  max-width: 48px !important;
+  height: 30px;
+  box-sizing: border-box;
+  flex: 0 0 48px;
+  padding: 0 2px;
+  text-align: center;
+}
 .pacogo-fraction-representation--area {
   width: min(100%, 260px);
 }

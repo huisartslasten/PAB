@@ -93,7 +93,8 @@ function normalizeTasks(tasks) {
       leftFraction: Object.freeze({ numerator: left.numerator, denominator: left.denominator }),
       rightFraction: Object.freeze({ numerator: right.numerator, denominator: right.denominator }),
       operation: "addition",
-      operationSymbol: "+"
+      operationSymbol: "+",
+      requiresMixedNumber: task.requiresMixedNumber === true
     });
   }));
 }

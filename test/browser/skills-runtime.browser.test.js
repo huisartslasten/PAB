@@ -507,11 +507,13 @@ test('guided unequal-denominator addition uses central templates, ten tasks and 
     row.querySelector('button').click();
     const runtime=createSkillsRuntime({app,templateMount,context:{student:'Zyon',mode:'student'},domain:'fractions',topic:'optellen',exercise:'unequal-denominator-guided-addition',documentRef:document,navigate:()=>{}});
     await runtime.mount();
-    const snapshot=()=>({canonicalPage:Boolean(document.querySelector('.paco-page-template')),fractionTemplate:Boolean(document.querySelector('[data-component="fraction-practice-template"]')),progress:document.querySelector('.fraction-practice-progress')?.textContent||'',stepCards:document.querySelectorAll('.fraction-guided-step-card').length,states:[...document.querySelectorAll('.fraction-guided-step-card')].map(node=>node.dataset.state),fractions:document.querySelectorAll('.fraction-guided-task-prompt .pacogo-fraction-representation--symbolic').length});
+    const snapshot=()=>({canonicalPage:Boolean(document.querySelector('.paco-page-template')),fractionTemplate:Boolean(document.querySelector('[data-component="fraction-practice-template"]')),progress:document.querySelector('.fraction-practice-progress')?.textContent||'',stepCards:document.querySelectorAll('.fraction-guided-step-card').length,states:[...document.querySelectorAll('.fraction-guided-step-card')].map(node=>node.dataset.state),fractions:document.querySelectorAll('.fraction-guided-task-prompt .pacogo-fraction-representation--symbolic').length,feedback:document.querySelector('.fraction-practice-feedback')?.textContent||'',nextButton:document.querySelector('.fraction-practice-template-actions button')?.textContent||'',hasLevelLabel:/Niveau/i.test(document.querySelector('.fraction-practice-progress')?.textContent||'')});
     const initial=snapshot();
     const answer=value=>{const input=document.querySelector('[data-fraction-guided-answer],[data-fraction-step-answer]');input.value=String(value);document.querySelector('.fraction-guided-step-card[data-state="active"] button').click()};
     answer(12);const afterFirst=snapshot();answer(4);const afterSecond=snapshot();answer(3);const afterThird=snapshot();answer(7);const afterFourth=snapshot();
-    return {navigation,initial,afterFirst,afterSecond,afterThird,afterFourth};
+    document.querySelector('.fraction-practice-template-actions button')?.click();
+    const afterNext=snapshot();
+    return {navigation,initial,afterFirst,afterSecond,afterThird,afterFourth,afterNext};
   });
   expect(result.navigation).toContain('exercise=unequal-denominator-guided-addition');
   expect(result.initial.canonicalPage).toBe(true); expect(result.initial.fractionTemplate).toBe(true);
@@ -520,5 +522,11 @@ test('guided unequal-denominator addition uses central templates, ten tasks and 
   expect(result.afterFirst.states).toEqual(['completed','active','locked','locked']);
   expect(result.afterSecond.states).toEqual(['completed','completed','active','locked']);
   expect(result.afterThird.states).toEqual(['completed','completed','completed','active']);
-  expect(result.afterFourth.states).toEqual(['active','locked','locked','locked']); expect(result.afterFourth.progress).toContain('Som 2 van 10');
+  expect(result.afterFourth.states).toEqual(['completed','completed','completed','completed']);
+  expect(result.afterFourth.progress).toContain('Som 1 van 10');
+  expect(result.afterFourth.feedback).toContain('Goed gedaan! Deze som is afgerond.');
+  expect(result.afterFourth.nextButton).toBe('VOLGENDE');
+  expect(result.afterFourth.hasLevelLabel).toBe(false);
+  expect(result.afterNext.states).toEqual(['active','locked','locked','locked']);
+  expect(result.afterNext.progress).toContain('Som 2 van 10');
 });

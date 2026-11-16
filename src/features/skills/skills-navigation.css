@@ -40,3 +40,12 @@
 .pacogo-fraction-step-input{width:38px;min-width:30px;height:28px;padding:0;border:0;border-radius:4px;text-align:center;font:700 18px inherit;color:var(--paco-text);background:var(--paco-card)}
 @media(max-width:850px){.fraction-guided-step-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.fraction-guided-step-grid{grid-template-columns:minmax(0,1fr)}.fraction-guided-step-card{min-height:0}.fraction-guided-task-prompt{gap:9px}}
+
+.fraction-guided-step-grid--five{grid-template-columns:repeat(5,minmax(0,1fr))}
+.fraction-guided-mixed-answer{display:flex;align-items:center;justify-content:center;min-width:0}
+.fraction-guided-step-card[data-step-id="mixed_number_conversion"] .pacogo-fraction-answer__line{gap:5px}
+.fraction-guided-step-card[data-step-id="mixed_number_conversion"] .pacogo-fraction-answer__input{width:34px;min-width:28px;height:30px}
+.fraction-guided-step-card[data-step-id="mixed_number_conversion"] .pacogo-fraction-answer__controls{display:flex;flex-wrap:wrap;gap:6px}
+@media(max-width:1050px){.fraction-guided-step-grid--five{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:850px){.fraction-guided-step-grid--five{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.fraction-guided-step-grid--five{grid-template-columns:minmax(0,1fr)}}

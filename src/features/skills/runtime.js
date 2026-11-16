@@ -518,7 +518,9 @@ export function createSkillsRuntime({
           const help=documentRef.createElement('p');help.className='fraction-guided-step-prompt';help.textContent=step.prompt;
           const expression=documentRef.createElement('div');expression.className='fraction-guided-step-expression';
           if(step.stepId==='mixed_number_conversion'){
-            activeFractionAnswer=renderFractionAnswerInput({workMount:expression,controlsMount:template.controlsArea,wholeNumberMode:'optional'});
+            expression.append(renderFractionRepresentation({numerator:step.resultNumerator,denominator:step.commonDenominator},'symbolic_fraction','Onechte breuk'));
+            const answerMount=documentRef.createElement('div');answerMount.className='fraction-guided-mixed-answer';expression.append(answerMount);
+            activeFractionAnswer=renderFractionAnswerInput({workMount:answerMount,controlsMount:template.controlsArea,wholeNumberMode:'optional'});
           }else activeInput=renderExpression(step,expression);
           const check=documentRef.createElement('button');check.type='button';check.className='paco-btn paco-btn--primary paco-btn--small';check.textContent='Controleren';
           check.addEventListener('click',()=>{const result=session.recordResponse(step.stepId==='mixed_number_conversion'?{values:activeFractionAnswer?.getValues()}:{rawValue:activeInput?.value||''});if(result.classification==='valid'){if(step.stepId==='addition_result'&&!mixedNumberResult){renderCurrentTask('Goed gedaan! Deze som is afgerond.',result.completion);return;}if(step.stepId==='mixed_number_conversion'){activeFractionAnswer?.lock();renderCurrentTask('Goed gedaan! Deze som is afgerond.',result.completion);return;}renderCurrentTask('Goed gedaan! Deze stap is afgerond.');return;}

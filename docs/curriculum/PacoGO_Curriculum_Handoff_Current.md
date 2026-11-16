@@ -7263,3 +7263,41 @@ Werk na deze oefenbouw de inhoudelijke inventaris bij: leg per bestaande en nieu
 4. Controleer dat alle drie de pagina's op desktop compact blijven en op smallere schermen leesbaar herschikken.
 5. Bij iedere rode regressie eerst de exacte oorzaak isoleren; niet symptoom-patchen.
 6. Na visuele afronding van deze opteloefeningen verder met de resterende bewerkingen binnen breuken, voordat de verticale SLO-leerlijn wordt uitgewerkt.
+
+
+## Breuken optellen — niveau 5 (2026-11-16)
+
+### Uitgevoerde uitbreiding
+
+Niveau 5 voor **ongelijknamige gemengde getallen optellen** is geïntegreerd in de bestaande Skills-runtime.
+
+- De begeleide reeks bevat 10 originele PacoGO-opgaven en gebruikt vijf centrale stappen: gemeenschappelijke noemer, equivalente teller links, equivalente teller rechts, optellen van de hele en fractionele delen (inclusief eventuele overdracht) en invoer van het gemengde eindantwoord.
+- Na afronding van de 10 begeleide sommen verschijnt de overgangsknop **Start 15 zelfstandige sommen**.
+- De zelfstandige reeks bevat 15 originele PacoGO-opgaven. Deze gebruikt geen stapkaarten of hints.
+- Begeleide en zelfstandige voortgang worden afzonderlijk opgeslagen.
+- Beide routes gebruiken de centrale Fraction Practice Template, centrale Fraction Learning Interface-renderers en centrale antwoordinvoer. Voor het zelfstandige eindantwoord is het hele-getalveld verplicht.
+- De browserregressie controleert de overgang na de 10 begeleide taken, de centrale weergave van de zelfstandige som, het ontbreken van stapkaarten, het gemengde antwoordveld en de voortgang na een correct antwoord.
+
+### Grenzen
+
+Dit blijft formatief oefenen. Er zijn geen wijzigingen aangebracht aan SLO-mapping, curriculumregistry, formele claims/tasks/evidence, mastery, next-action, learner-state of Supabase. De centrale pagina- en breuktemplates blijven verplicht; er is geen niveau-5-specifieke paginashell of parallelle breukcomponent gemaakt.
+
+### Verificatie
+
+- Branch: `refactor/professional-v1`.
+- Implementatiecommit: `5a0d3f79a4a26120a714336c715f6456d055b920`.
+- Browserregressietestcommit: `38e59167aada1eb21583d514555561eb3f1c5c93`.
+- Full Regression #3798 / run `43880448734`: **GREEN / SUCCESS** op exact `38e59167aada1eb21583d514555561eb3f1c5c93`.
+- Browser proof #762 / run `43880448825`: **GREEN / SUCCESS** op exact dezelfde commit.
+- LIVE `main` is onaangeraakt. Geen Supabase-wijziging of deployment.
+
+### Eerstvolgende concrete stappen
+
+1. Voer de afgesproken visuele controle in localhost uit voor niveau 3A, 3B, 4 én 5: compacte desktopweergave, leesbare herschikking op smalle schermen, horizontale breuknotatie, centrale template en correcte zichtbaarheid van stapkaarten/antwoordvelden.
+2. Los eventuele visuele bevindingen pas op nadat ze reproduceerbaar zijn vastgesteld; vóór iedere codebouw eerst Full Regression controleren.
+3. Rond daarna de resterende bewerkingen binnen **Breuken** af (onder meer aftrekken en vermenigvuldigen) met hergebruik van centrale templates en componenten.
+4. Pas nadat de breukoefeningen inhoudelijk zijn opgebouwd, inventariseer en vergelijk de dekking met de bestaande SLO-/curriculumdocumenten. Werk daarna de verticale leerlijn uit; verzin geen nieuwe formele curriculumcontracten om oefenbouw te vereenvoudigen.
+
+### Handoff-verificatie
+
+Deze handoff-aanvulling is geschreven na de groene verificatie van de niveau-5-implementatie. De handoff-wijziging is zelf een projectwijziging en moet op haar eigen commit door Full Regression worden geverifieerd voordat de volgende bouwstap begint.

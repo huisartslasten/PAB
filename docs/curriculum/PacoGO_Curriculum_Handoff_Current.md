@@ -7383,3 +7383,25 @@ Voer in de lokale PacoGO TEST-omgeving de visuele controle uit voordat er opnieu
 7. bruikbaarheid op desktop en smallere schermen.
 
 De groene regressies bewijzen technische regressiestatus, maar vervangen deze visuele en didactische acceptatie niet. Bij concrete afwijkingen eerst de exacte oorzaak vaststellen. Vóór iedere codewijziging opnieuw Full Regression controleren.
+
+### Niveau 5 — horizontale stapkaarten met dynamische breedte (16 november 2026)
+
+De stapindeling is aangepast aan de expliciete visuele eis: alle zes stappen blijven in één horizontale rij en de breedte volgt de status van de stap.
+
+- De actieve stap krijgt veruit de meeste breedte en toont de volledige opdracht, uitleg en invoervelden.
+- Toekomstige/vergrendelde stappen zijn smalle kaarten die uitsluitend het stapnummer tonen.
+- Een afgeronde stap wordt weer smaller; de lange titel en status verdwijnen, maar het belangrijkste bereikte antwoord blijft zichtbaar.
+- Wanneer de leerling naar de volgende stap gaat, verhuist de brede werkruimte naar die stap.
+- De rij breekt niet af naar een tweede rij. De breedteverdeling gebruikt flexverhoudingen in plaats van gelijke gridkolommen.
+- De wijziging zit in de bestaande centrale Skills-weergave/CSS en blijft de centrale Fraction Practice Template en Fraction Learning Interface-renderers gebruiken. Er is geen aparte niveau-5-pagina of parallelle breuktemplate toegevoegd.
+
+### Verificatie
+- Branch: `refactor/professional-v1`.
+- CSS-indeling: commit `c94ade000f3c4fd2f066e35bdd2d3ac5b4b2a89b`.
+- Browsercontrole en overlapcontrole: commit `332b8cd135b992935398c70121000ff7081ad082`.
+- Full Regression #3807 / run `43925631745`: **GREEN / SUCCESS** op exact `332b8cd135b992935398c70121000ff7081ad082`.
+- Browser proof #767 / run `43925632384`: **GREEN / SUCCESS** op exact dezelfde commit.
+- LIVE `main` is onaangeraakt. Geen Supabase-wijziging en geen deployment.
+
+### Eerstvolgende stap
+Voer de visuele acceptatie uit in localhost op de nieuwste branchversie. Controleer bij stap 1, een tussenstap en de laatste stap dat de actieve kaart breed is, toekomstige kaarten alleen hun nummer tonen, afgeronde kaarten hun antwoord behouden en alle zes kaarten op één horizontale rij blijven. Controleer ook dat de actieve invoervelden volledig bruikbaar blijven. Technisch groene regressies vervangen deze visuele acceptatie niet. Bij afwijkingen eerst de lokale versie/branch en reproduceerbare oorzaak vaststellen voordat code wordt aangepast.

@@ -1,0 +1,44 @@
+.rock-paper-scissors-game-template .practice-game-area {
+  overflow: hidden;
+}
+
+.rps-progress-wrap { margin: 0 0 18px; }
+.rps-progress-label { display: flex; justify-content: space-between; gap: 16px; font-size: .9rem; font-weight: 700; margin-bottom: 7px; }
+.rps-progress { height: 8px; border-radius: 999px; background: rgba(0,0,0,.08); overflow: hidden; }
+.rps-progress > span { display: block; height: 100%; border-radius: inherit; background: currentColor; transition: width .25s ease; }
+.rps-content { display: grid; gap: 18px; }
+.rps-question-label { font-size: .78rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; opacity: .68; }
+.rps-question { padding: 22px; border-radius: 20px; background: rgba(255,255,255,.8); border: 1px solid rgba(0,0,0,.08); font-size: clamp(1.2rem, 3vw, 1.8rem); font-weight: 750; line-height: 1.35; text-align: center; }
+.rps-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+.rps-options button { min-height: 72px; }
+.rps-choice-intro, .rps-reveal-hint { text-align: center; font-weight: 650; opacity: .78; }
+.rps-choice-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.rps-choice-card { border: 0; background: transparent; padding: 0; cursor: pointer; display: grid; gap: 9px; font: inherit; font-weight: 850; text-transform: uppercase; }
+.rps-choice-card img, .rps-card img { display: block; width: 100%; height: auto; border-radius: 18px; box-shadow: 0 10px 24px rgba(0,0,0,.12); }
+.rps-choice-card span, .rps-card span { display: block; text-align: center; }
+.rps-choice-card:hover img { transform: translateY(-3px); box-shadow: 0 14px 28px rgba(0,0,0,.16); }
+.rps-reveal-stage { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 20px; max-width: 760px; margin: 0 auto; width: 100%; }
+.rps-card { display: grid; gap: 9px; border: 0; background: transparent; padding: 0; font: inherit; font-weight: 850; text-transform: uppercase; }
+button.rps-card { cursor: pointer; }
+.rps-versus { font-size: 1.3rem; font-weight: 900; }
+.rps-result { display: grid; gap: 12px; text-align: center; }
+.rps-answer-result, .rps-duel-result { padding: 18px; border-radius: 18px; display: grid; gap: 5px; border: 1px solid rgba(0,0,0,.08); background: rgba(255,255,255,.8); }
+.rps-answer-result strong, .rps-duel-result strong { font-size: 1.25rem; }
+.rps-answer-result.is-correct { border-width: 2px; }
+.rps-answer-result.is-wrong { border-width: 2px; }
+.rps-score-line { font-size: 1.15rem; font-weight: 750; }
+.rps-finished { display: grid; gap: 16px; text-align: center; }
+.rps-finished-title { font-size: 2rem; font-weight: 900; }
+.rps-final-score { font-size: clamp(2.8rem, 8vw, 5rem); font-weight: 950; line-height: 1; }
+.rps-finished-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.rps-finished-stats > div { padding: 14px; border-radius: 16px; background: rgba(255,255,255,.75); border: 1px solid rgba(0,0,0,.08); display: grid; gap: 4px; }
+.rps-finished-stats span { font-size: .8rem; opacity: .68; }
+.rps-finished-stats strong { font-size: 1.25rem; }
+.rps-finished-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+
+@media (max-width: 700px) {
+  .rps-choice-grid { grid-template-columns: 1fr; max-width: 280px; margin: 0 auto; width: 100%; }
+  .rps-reveal-stage { grid-template-columns: 1fr; max-width: 280px; }
+  .rps-versus { text-align: center; }
+  .rps-finished-stats { grid-template-columns: 1fr; }
+}

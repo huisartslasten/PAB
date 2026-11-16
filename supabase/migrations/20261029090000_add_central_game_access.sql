@@ -1,0 +1,4 @@
+-- Supabase applied this migration as 20261029123902_add_central_game_access.
+-- This timestamped placeholder is intentionally a no-op so local migration history
+-- does not execute the same DDL twice. The canonical SQL lives in the matching
+-- TEST-applied migration file 20261029123902_add_central_game_access.sql.

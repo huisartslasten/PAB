@@ -1,0 +1,46 @@
+.fraction-diagnostic{display:grid;gap:18px;color:var(--paco-text)}
+.fraction-diagnostic-card{padding:24px}
+.fraction-diagnostic-card h2{margin:0 0 10px;font:900 26px/1.15 "Baloo 2",Nunito,sans-serif;color:var(--paco-text)}
+.fraction-diagnostic-card h3{margin:18px 0 8px;font:900 21px/1.2 "Baloo 2",Nunito,sans-serif;color:var(--paco-text)}
+.fraction-diagnostic-muted{color:var(--paco-muted);line-height:1.5}
+.fraction-diagnostic-status,.fraction-diagnostic-explanation{padding:14px 16px;border-radius:15px;background:#eef8ff;color:#126fc9;font-weight:800;line-height:1.45}
+.fraction-diagnostic-status.is-error{background:#fff0f0;color:#b42318}
+.fraction-diagnostic-learners{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+.fraction-diagnostic-progress{margin:12px 0;color:var(--paco-blue-dark);font-weight:900}
+.fraction-diagnostic-expression{margin:16px 0;padding:22px;border-radius:18px;background:#edf8ff;color:var(--paco-text);font-size:clamp(23px,3vw,32px);font-weight:900;text-align:center;letter-spacing:.2px}
+.fraction-diagnostic-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:16px 0}
+.fraction-diagnostic-field{display:grid;gap:7px;color:var(--paco-text);font-weight:800}
+.fraction-diagnostic-field input{min-height:48px}
+.fraction-diagnostic button{margin:4px 6px 4px 0}
+.fraction-diagnostic button:focus-visible{outline:3px solid rgba(23,135,242,.4);outline-offset:3px}
+.fraction-diagnostic [hidden]{display:none!important}
+@media(max-width:600px){.fraction-diagnostic-card{padding:18px}.fraction-diagnostic-expression{padding:18px;font-size:22px}}
+
+.fraction-diagnostic-expression{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:.32em;line-height:1.5}
+.fraction-diagnostic-fraction{display:inline-grid;grid-template-rows:auto 2px auto;justify-items:stretch;align-items:center;vertical-align:middle;min-width:1.45em;margin:0 .08em;line-height:1.05}
+.fraction-diagnostic-numerator{grid-row:1}.fraction-diagnostic-denominator{grid-row:3}.fraction-diagnostic-numerator,.fraction-diagnostic-denominator{display:flex;align-items:center;justify-content:center;min-height:1.05em;padding:0 .16em}
+.fraction-diagnostic-fraction::after{content:"";grid-column:1;grid-row:2;height:2px;background:currentColor;border-radius:2px}
+.fraction-diagnostic-inline-field{display:inline-flex;align-items:center;justify-content:center;min-width:0}
+.fraction-diagnostic-inline-input{box-sizing:border-box;width:2.35em;min-width:2.35em;height:1.55em;padding:0 .12em;border:2px solid #8fc6f5;border-radius:8px;background:#fff;color:var(--paco-text);font:800 .78em/1 Nunito,sans-serif;text-align:center}
+.fraction-diagnostic-inline-input:focus{outline:3px solid rgba(23,135,242,.25);border-color:var(--paco-blue)}
+.fraction-diagnostic-visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:600px){.fraction-diagnostic-inline-input{width:2.1em;min-width:2.1em}.fraction-diagnostic-expression{gap:.22em}}
+
+.fraction-diagnostic-history-title{margin:18px 0 8px;font:800 18px/1.25 "Baloo 2",Nunito,sans-serif;color:var(--paco-text)}
+.fraction-diagnostic-history,.fraction-diagnostic-result-history{display:grid;gap:12px;margin:0;padding:0}
+.fraction-diagnostic-history-group{padding:12px 14px;border:1px solid var(--paco-border,#dbe5ef);border-radius:12px;background:var(--paco-surface,#fff)}
+.fraction-diagnostic-history-group h4,.fraction-diagnostic-history h4{margin:0 0 6px;font-weight:900;color:var(--paco-text)}
+.fraction-diagnostic-history-group ul,.fraction-diagnostic-history-list{display:grid;gap:4px;margin:0;padding-left:20px;color:var(--paco-muted);line-height:1.45}
+.fraction-diagnostic-history-list{padding:12px 14px 12px 34px;border:1px solid var(--paco-border,#dbe5ef);border-radius:12px}
+.fraction-diagnostic-result-history{margin-top:8px}
+.fraction-diagnostic-result-history .fraction-diagnostic-history-group{margin:0}
+.fraction-diagnostic #fraction-diagnostic-answer{max-width:280px;font-size:20px;font-weight:800}
+
+/* Fraction answers are entered directly in the mathematical expression. */
+.fraction-diagnostic-fields{display:none}
+.fraction-diagnostic-inline-field{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle}
+.fraction-diagnostic-inline-input{box-sizing:border-box;width:2.25em;min-width:2.25em;height:1.55em;padding:0 .12em;border:2px solid #8fc6f5;border-radius:8px;background:#fff;color:var(--paco-text);font:800 .78em/1 Nunito,sans-serif;text-align:center}
+.fraction-diagnostic-inline-input:focus{outline:3px solid rgba(23,135,242,.25);border-color:var(--paco-blue)}
+.fraction-diagnostic-inline-input::-webkit-inner-spin-button,.fraction-diagnostic-inline-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.fraction-diagnostic-inline-input{-moz-appearance:textfield}
+@media(max-width:600px){.fraction-diagnostic-inline-input{width:2em;min-width:2em}}

@@ -1,0 +1,1 @@
+Millionaire uses a fixed 40/40/20 difficulty progression: the first 40% of questions are hard, the next 40% are harder, and the final 20% are expert. This policy is owned by the Challenge domain and is not configured in the lesson editor or exposed as parent-facing controls.

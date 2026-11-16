@@ -1,0 +1,25 @@
+import assert from "node:assert/strict";
+import { createFractionResultFormPracticeSession } from "./fraction-result-form-practice-session.js";
+function memory() { const map = new Map(); return { getItem: key => map.has(key) ? map.get(key) : null, setItem: (key, value) => map.set(key, String(value)), removeItem: key => map.delete(key), entries: () => [...map.entries()] }; }
+const storage = memory();
+const a = createFractionResultFormPracticeSession({ learnerKey: "learner-a", storage });
+const b = createFractionResultFormPracticeSession({ learnerKey: "learner-b", storage });
+assert.equal(a.getCurrentStage().stageNumber, 1); assert.equal(a.getCurrentStage().totalStages, 1);
+assert.equal(a.recordResponse({ values: { numerator: "1", denominator: "2" } }).classification, "incorrect_answer");
+assert.equal(a.recordResponse({ values: { wholeNumberEnabled: true, wholeNumber: "1", numerator: "1", denominator: "2" } }).classification, "valid");
+assert.equal(a.getProgress().isComplete, true); assert.equal(a.getCompletion().wholeNumberEnabled, true);
+a.reset();
+assert.equal(a.recordResponse({ values: { wholeNumberEnabled: true, wholeNumber: "1", numerator: "5", denominator: "10" } }).classification, "requires_simplification");
+assert.equal(a.getProgress().isComplete, false);
+assert.equal(a.recordResponse({ values: { wholeNumberEnabled: true, wholeNumber: "1", numerator: "5", denominator: "10", simplified: true, simplifiedNumerator: "1", simplifiedDenominator: "2" } }).classification, "valid");
+a.reset();
+assert.equal(a.recordResponse({ values: { numerator: "15", denominator: "10" } }).classification, "requires_simplification");
+a.reset();
+assert.equal(a.recordResponse({ values: { numerator: "15", denominator: "10", simplified: true, simplifiedNumerator: "3", simplifiedDenominator: "2" } }).classification, "valid");
+a.reset();
+assert.equal(a.recordResponse({ values: { wholeNumberEnabled: true, wholeNumber: "1", numerator: "5", denominator: "10", simplified: true, simplifiedNumerator: "2", simplifiedDenominator: "4" } }).classification, "not_simplified");
+assert.equal(b.getProgress().attemptCount, 0);
+const [key, raw] = storage.entries()[0]; assert.match(key, /pacogo:fraction-result-form-practice:v2:learner-a/); assert.ok(raw.includes('"simplifiedNumerator":"2"')); assert.equal(raw.includes("learner-a"), false);
+assert.throws(() => createFractionResultFormPracticeSession({ learnerKey: " ", storage }), /learner key/);
+assert.throws(() => createFractionResultFormPracticeSession({ learnerKey: "learner-a" }), /local storage/);
+console.log("PacoGO fraction result-form practice session tests passed.");

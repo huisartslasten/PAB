@@ -1,0 +1,167 @@
+import { isPracticeModeActive } from '../practice-domain.js';
+import { createLessonContextField } from '../../lessons/lesson-context-view.js';
+import { filterLessonItemsByContentKind } from '../../lessons/lesson-content-model.js';
+import {
+  createFlashcardSession,
+  getCurrentFlashcard,
+  getFlashcardCards,
+  nextFlashcard,
+  revealFlashcard,
+  revealFlashcardHint
+} from './flashcard-domain.js';
+
+export async function mountFlashcardPractice({
+  mount,
+  app,
+  lessonId,
+  student = 'Zyon',
+  contentKind = ''
+} = {}) {
+  if (!(mount instanceof HTMLElement)) throw new TypeError('A flashcard mount is required.');
+  if (!app?.loadLessons || !app?.mapLessons) throw new TypeError('A PacoGO application context is required.');
+
+  const content = document.createElement('div');
+  content.className = 'flashcard-practice-content';
+  mount.replaceChildren(content);
+
+  const loading = document.createElement('div');
+  loading.className = 'flashcard-state';
+  loading.textContent = 'Flashcards laden…';
+  content.appendChild(loading);
+
+  if (!isPracticeModeActive('flashcards')) {
+    loading.textContent = 'Flashcards zijn momenteel niet beschikbaar.';
+    return;
+  }
+
+  let lesson = null;
+  try {
+    const records = await app.loadLessons();
+    const record = app.mapLessons(records).find(candidate => String(candidate.id) === String(lessonId));
+    lesson = record || null;
+  } catch (error) {
+    loading.textContent = 'De flashcards konden niet worden geladen.';
+    console.error(error);
+    return;
+  }
+
+  if (!lesson) {
+    loading.textContent = 'Deze les kon niet worden gevonden.';
+    return;
+  }
+
+  const filteredItems = filterLessonItemsByContentKind(lesson, contentKind);
+  const cards = getFlashcardCards(filteredItems);
+  if (!cards.length) {
+    loading.textContent = 'Dit onderdeel bevat nog geen vraag-en-antwoordkaarten.';
+    return;
+  }
+
+  mount.replaceChildren(createLessonContextField(lesson), content);
+
+  let reverse = false;
+  let session = createFlashcardSession(cards);
+
+  const controls = document.createElement('div');
+  controls.className = 'flashcard-controls';
+
+  const reverseButton = document.createElement('button');
+  reverseButton.type = 'button';
+  reverseButton.className = 'flashcard-reverse-button';
+  reverseButton.textContent = '↔ Omgekeerd oefenen';
+  controls.appendChild(reverseButton);
+
+  const progress = document.createElement('div');
+  progress.className = 'flashcard-progress';
+  controls.appendChild(progress);
+
+  const card = document.createElement('article');
+  card.className = 'flashcard-card';
+  card.tabIndex = 0;
+  card.setAttribute('role', 'button');
+  card.setAttribute('aria-label', 'Flashcard. Druk op Enter om verder te gaan.');
+  content.replaceChildren(controls, card);
+
+  const prompt = document.createElement('div');
+  prompt.className = 'flashcard-prompt';
+  card.appendChild(prompt);
+
+  const answer = document.createElement('div');
+  answer.className = 'flashcard-answer';
+  card.appendChild(answer);
+
+  const hintButton = document.createElement('button');
+  hintButton.type = 'button';
+  hintButton.className = 'flashcard-hint-button';
+  hintButton.hidden = true;
+  hintButton.textContent = '💡 Hint';
+  card.appendChild(hintButton);
+
+  const hint = document.createElement('div');
+  hint.className = 'flashcard-hint';
+  hint.hidden = true;
+  card.appendChild(hint);
+
+  function render() {
+    const current = getCurrentFlashcard(session);
+    prompt.textContent = current.prompt;
+    answer.textContent = current.revealed ? current.answer : '';
+    answer.hidden = !current.revealed;
+    hintButton.hidden = !current.hint || current.hintRevealed;
+    hintButton.setAttribute('aria-expanded', String(current.hintRevealed));
+    hint.textContent = current.hintRevealed ? current.hint : '';
+    hint.hidden = !current.hintRevealed;
+    progress.textContent = `${current.index + 1} / ${current.total}`;
+    reverseButton.setAttribute('aria-pressed', String(reverse));
+    reverseButton.textContent = reverse ? '↔ Normaal oefenen' : '↔ Omgekeerd oefenen';
+  }
+
+  function handleAdvance() {
+    if (!session.revealed) {
+      session = revealFlashcard(session);
+      render();
+      return;
+    }
+
+    const next = nextFlashcard(session);
+    if (next === session) {
+      hint.textContent = 'Klaar! Druk op terug om de les te verlaten.';
+      hint.hidden = false;
+      hintButton.hidden = true;
+      return;
+    }
+
+    session = next;
+    render();
+  }
+
+  hintButton.addEventListener('click', event => {
+    event.stopPropagation();
+    session = revealFlashcardHint(session);
+    render();
+    hint.focus();
+  });
+
+  reverseButton.addEventListener('click', () => {
+    reverse = !reverse;
+    session = createFlashcardSession(cards, { reverse });
+    render();
+    card.focus();
+  });
+
+  card.addEventListener('click', event => {
+    if (event.target.closest('.flashcard-hint-button')) return;
+    handleAdvance();
+  });
+  card.addEventListener('keydown', event => {
+    if (event.target.closest('.flashcard-hint-button')) return;
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    handleAdvance();
+  });
+
+  render();
+  card.focus();
+
+  return { lesson, cards, student, contentKind };
+}

@@ -1,0 +1,2 @@
+export function createPhotoLessonSession() { let selectedFile = null; let analysis = null; return { get selectedFile(){return selectedFile;}, get analysis(){return analysis;}, setFile(file){selectedFile=file||null;}, setAnalysis(value){analysis=value??null;}, clear(){selectedFile=null;analysis=null;} }; }
+export function photoFileIsSupported(file) { return Boolean(file && /^image\/(jpeg|png|webp)$/i.test(file.type || '')); }

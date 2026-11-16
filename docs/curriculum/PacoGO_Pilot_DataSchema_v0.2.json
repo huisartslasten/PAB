@@ -1,0 +1,86 @@
+{
+  "schema_version": "0.2",
+  "status": "candidate",
+  "supersedes": "PacoGO_Pilot_DataSchema_v0.1",
+  "unit": "Student × Time × Task × Response × Evidence",
+  "purpose": "C2 student data provenance and versioned evidence coding for empirical curriculum validation",
+  "required_fields": {
+    "observation_id": "string",
+    "student_key": "string",
+    "session_id": "string",
+    "observed_at": "timestamp",
+    "curriculum_registry_version": "string",
+    "skill_id": "string",
+    "development_id": "string|null",
+    "claim_id": "string|null",
+    "evidence_target_id": "string|null",
+    "task_model_id": "string|null",
+    "task_instance_id": "string",
+    "performance": "object",
+    "context": "object",
+    "provenance": "object",
+    "coding_record": "object|null"
+  },
+  "performance": {
+    "response": "object|null",
+    "correctness": "number|null",
+    "response_time_ms": "number|null",
+    "attempts": "number|null",
+    "hints": "array",
+    "strategy": "object|null",
+    "explanation": "object|null",
+    "representation": "object|null"
+  },
+  "context": {
+    "language": "string|null",
+    "setting": "string|null",
+    "prompt_level": "string|null",
+    "task_variant": "string|null",
+    "variation_key": "string|null",
+    "notes": "string|null"
+  },
+  "provenance": {
+    "source": "string",
+    "source_event_id": "string|null",
+    "task_definition_version": "string",
+    "collector_version": "string",
+    "observation_version": "string"
+  },
+  "coding_record": {
+    "coding_record_id": "string",
+    "coding_version": "string",
+    "coder_id": "string|null",
+    "codebook_version": "string",
+    "supersedes_coding_record_id": "string|null",
+    "coding_status": "PRESENT|ABSENT|INDETERMINATE|NOT_CODED",
+    "evidence_target_match": "MATCH|MISMATCH|UNCLEAR|NOT_CODED",
+    "quality": "number|null",
+    "independence": "INDEPENDENT|PROMPTED|DEPENDENT|UNKNOWN",
+    "contradiction": "boolean|null",
+    "alternative_explanations": "array",
+    "coder_note": "string|null",
+    "adjudication": "object|null"
+  },
+  "adjudication": {
+    "status": "NONE|RESOLVED|NOT_RESOLVED",
+    "resolved_by": "string|null",
+    "resolved_at": "timestamp|null",
+    "reason": "string|null"
+  },
+  "privacy": {
+    "student_key_must_be_pseudonymous": true,
+    "direct_identifiers_outside_this_schema": true,
+    "minimum_necessary_data": true
+  },
+  "integrity_rules": [
+    "Every observation has exactly one curriculum registry version.",
+    "Every task instance resolves to a task model and task definition version.",
+    "Observed performance is immutable.",
+    "Each coding revision creates a new coding record and points to the record it supersedes.",
+    "Original independent coder records are never overwritten by adjudication.",
+    "Missingness is represented explicitly and is never silently converted to failure.",
+    "Development inference is not stored as raw performance.",
+    "A correct response does not by itself establish developmental support.",
+    "One observation may support multiple targets only when separately justified; it is not counted as multiple independent observations."
+  ]
+}

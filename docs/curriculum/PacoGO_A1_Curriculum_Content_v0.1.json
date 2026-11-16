@@ -1,0 +1,82 @@
+{
+  "schema_version": "0.1",
+  "status": "candidate",
+  "epistemic_status": "[S]/[O]",
+  "skill_id": "A1",
+  "name": "Getallen representeren en verbinden",
+  "purpose": "Reference curriculum slice for turning the scientific A1 registry definition into reusable learning interactions without hard-coding a lesson-specific interface.",
+  "developments": [
+    {
+      "id": "A1.D1",
+      "focus": "Representational meaning",
+      "required_interaction_forms": ["identify", "place", "match", "explain"],
+      "primary_interfaces": ["quantity-representation", "number-line"],
+      "evidence_targets": ["A1.ET1"],
+      "content_principles": [
+        "Use multiple representations of the same numerical value.",
+        "Require the learner to connect representation with quantity or position.",
+        "Capture the learner action, not only the final answer.",
+        "Avoid treating a correct answer alone as proof of conceptual understanding."
+      ]
+    },
+    {
+      "id": "A1.D2",
+      "focus": "Mapping",
+      "required_interaction_forms": ["match", "transform", "compare", "explain"],
+      "primary_interfaces": ["quantity-representation", "number-line"],
+      "evidence_targets": ["A1.ET2", "A1.ET4"],
+      "content_principles": [
+        "Move between representations while preserving the underlying value.",
+        "Vary surface form so familiarity cannot substitute for the target relation.",
+        "Capture whether the learner preserves the invariant numerical value."
+      ]
+    },
+    {
+      "id": "A1.D3",
+      "focus": "Coordination",
+      "required_interaction_forms": ["select", "combine", "translate", "justify"],
+      "primary_interfaces": ["quantity-representation", "number-line"],
+      "evidence_targets": ["A1.ET3", "A1.ET5"],
+      "content_principles": [
+        "Require coordination of more than two representations where appropriate.",
+        "Allow the learner to choose or combine representations.",
+        "Distinguish independent coordination from prompted completion."
+      ]
+    }
+  ],
+  "reference_task_sequence": [
+    {
+      "task_id": "A1-T01",
+      "claim_id": "A1.C1",
+      "development_id": "A1.D1",
+      "interface": "number-line",
+      "interaction": "place",
+      "evidence_capture": ["position", "interaction_events", "independence"]
+    },
+    {
+      "task_id": "A1-T02",
+      "claim_id": "A1.C1",
+      "development_id": "A1.D1",
+      "interface": "quantity-representation",
+      "interaction": "match",
+      "evidence_capture": ["selected_representation", "justification", "independence"]
+    },
+    {
+      "task_id": "A1-T03",
+      "claim_id": "A1.C2",
+      "development_id": "A1.D2",
+      "interface": "quantity-representation",
+      "interaction": "transform",
+      "evidence_capture": ["source_value", "target_representation", "invariant_value"]
+    }
+  ],
+  "interface_contract": {
+    "must_be_reusable": true,
+    "must_capture_evidence": true,
+    "must_separate_pedagogy_from_rendering": true,
+    "must_support_future_deluxe_rendering": true,
+    "must_not_encode_mastery_rules": true,
+    "must_not_select_next_development": true,
+    "must_not_assume_one_fixed_lesson": true
+  }
+}

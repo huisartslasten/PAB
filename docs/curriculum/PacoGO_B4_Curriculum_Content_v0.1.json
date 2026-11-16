@@ -1,0 +1,290 @@
+{
+  "schema_version": "0.1",
+  "status": "candidate",
+  "epistemic_status": "[S]/[O]",
+  "skill_id": "B4",
+  "name": "Delen",
+  "definition": "Een hoeveelheid of waarde verdelen of groeperen en de delingsrelatie begrijpen, representeren en gebruiken om quotiënten en ontbrekende factoren te bepalen.",
+  "purpose": "Kandidaatmodel voor delen waarin verdelen in gelijke delen en bepalen hoeveel groepen in een hoeveelheid passen als onderscheiden betekenissen binnen één skill worden behandeld. De delingsrelatie staat centraal; tafels en procedures zijn geen aparte skills.",
+  "curriculum_scope": "SLO KD10A: gehele en decimale getallen. Breukbewerkingen blijven binnen de FR-skillfamilie.",
+  "concept_links": [
+    {
+      "concept": "Delen",
+      "relation": "primary"
+    },
+    {
+      "concept": "Verdelen in gelijke delen",
+      "relation": "primary"
+    },
+    {
+      "concept": "Groeperen/meetdeling",
+      "relation": "primary"
+    },
+    {
+      "concept": "Delingsrelatie",
+      "relation": "primary"
+    },
+    {
+      "skill_id": "B3",
+      "relation": "strong_inverse_operation",
+      "status": "candidate"
+    },
+    {
+      "skill_id": "B5",
+      "relation": "separate_integrative_skill",
+      "status": "candidate"
+    },
+    {
+      "skill_id": "A1",
+      "relation": "supporting_number_representation",
+      "status": "candidate"
+    },
+    {
+      "skill_id": "A4",
+      "relation": "supporting_place_value",
+      "status": "candidate"
+    },
+    {
+      "skill_id": "A5",
+      "relation": "supporting_flexible_number_relations",
+      "status": "candidate"
+    }
+  ],
+  "developments": [
+    {
+      "id": "B4.D1",
+      "focus": "Gelijke hoeveelheden eerlijk verdelen",
+      "candidate_order": 1,
+      "interaction_forms": [
+        "share_equally",
+        "partition_quantity",
+        "identify_amount_per_share"
+      ],
+      "primary_interfaces": [
+        "quantity-representation"
+      ],
+      "evidence_targets": [
+        "B4.ET1",
+        "B4.ET2"
+      ],
+      "content_principles": [
+        "Maak het geheel en het aantal gelijke delen zichtbaar.",
+        "Laat de hoeveelheid per deel bepalen zonder de betekenis te reduceren tot een procedure.",
+        "Varieer de totale hoeveelheid en het aantal delen."
+      ]
+    },
+    {
+      "id": "B4.D2",
+      "focus": "Groeperen en het aantal groepen bepalen",
+      "candidate_order": 2,
+      "interaction_forms": [
+        "form_equal_groups",
+        "count_groups",
+        "compare_group_size"
+      ],
+      "primary_interfaces": [
+        "quantity-representation"
+      ],
+      "evidence_targets": [
+        "B4.ET3",
+        "B4.ET4"
+      ],
+      "content_principles": [
+        "Maak zichtbaar hoeveel groepen van een vaste grootte in het geheel passen.",
+        "Onderscheid het aantal groepen van de hoeveelheid per groep.",
+        "Behoud de betekenis van de situatie bij wisselende formulering."
+      ]
+    },
+    {
+      "id": "B4.D3",
+      "focus": "Deling representeren en interpreteren",
+      "candidate_order": 3,
+      "interaction_forms": [
+        "model_division",
+        "map_context_to_expression",
+        "interpret_division_symbols"
+      ],
+      "primary_interfaces": [
+        "quantity-representation",
+        "number-line"
+      ],
+      "evidence_targets": [
+        "B4.ET5",
+        "B4.ET6"
+      ],
+      "content_principles": [
+        "Verbind context, hoeveelheid, model en symbolische notatie.",
+        "Maak deeltal, deler en quotiënt betekenisvol.",
+        "Eén visueel model mag niet worden verward met de volledige betekenis van delen."
+      ]
+    },
+    {
+      "id": "B4.D4",
+      "focus": "Deling verbinden met vermenigvuldiging",
+      "candidate_order": 4,
+      "interaction_forms": [
+        "find_missing_factor",
+        "inverse_relation",
+        "match_multiplication_division"
+      ],
+      "primary_interfaces": [
+        "quantity-representation"
+      ],
+      "evidence_targets": [
+        "B4.ET7",
+        "B4.ET8"
+      ],
+      "content_principles": [
+        "Gebruik vermenigvuldiging als inverse relatie om deling te begrijpen en controleren.",
+        "Behandel ontbrekende-factorvragen als een betekenisvolle verbinding.",
+        "B3 en B4 zijn onderscheiden skills; geen starre prerequisite."
+      ]
+    },
+    {
+      "id": "B4.D5",
+      "focus": "Quotiënt en rest betekenisvol bepalen",
+      "candidate_order": 5,
+      "interaction_forms": [
+        "calculate_quotient_remainder",
+        "interpret_remainder",
+        "choose_contextual_remainder"
+      ],
+      "primary_interfaces": [
+        "quantity-representation"
+      ],
+      "evidence_targets": [
+        "B4.ET9",
+        "B4.ET10"
+      ],
+      "content_principles": [
+        "Maak onderscheid tussen exact delen en delen met rest.",
+        "De betekenis van de rest hangt af van de context: behouden, afronden naar boven of niet relevant.",
+        "Laat de leerling in eenvoudige taken direct antwoorden; vraag interpretatie alleen waar die wordt onderzocht."
+      ]
+    },
+    {
+      "id": "B4.D6",
+      "focus": "Delen met grotere en decimale getallen",
+      "candidate_order": 6,
+      "interaction_forms": [
+        "divide_larger_whole_numbers",
+        "divide_decimals",
+        "interpret_quotient_scale"
+      ],
+      "primary_interfaces": [
+        "quantity-representation",
+        "number-line"
+      ],
+      "evidence_targets": [
+        "B4.ET11",
+        "B4.ET12"
+      ],
+      "content_principles": [
+        "Behoud plaatswaarde en de waarde van deeltal, deler en quotiënt.",
+        "Maak schaalverandering zichtbaar bij decimale delingen.",
+        "Getalgrootte alleen bepaalt niet de conceptuele complexiteit."
+      ]
+    },
+    {
+      "id": "B4.D7",
+      "focus": "Flexibel en gecontroleerd delen",
+      "candidate_order": 7,
+      "interaction_forms": [
+        "choose_division_strategy",
+        "calculate",
+        "check_with_multiplication",
+        "estimate_and_transfer"
+      ],
+      "primary_interfaces": [
+        "quantity-representation",
+        "number-line"
+      ],
+      "evidence_targets": [
+        "B4.ET13",
+        "B4.ET14"
+      ],
+      "content_principles": [
+        "Kies een passende aanpak op basis van getalstructuur en context.",
+        "Controleer met vermenigvuldiging, schatting of betekenis van de situatie.",
+        "Strategieën en standaardalgoritmen zijn aanpakken binnen B4, geen aparte skills."
+      ]
+    }
+  ],
+  "reference_task_sequence": [
+    {
+      "task_id": "B4-L01",
+      "development_id": "B4.D1",
+      "task_model_id": "B4.TM1",
+      "interface": "quantity-representation",
+      "interaction": "share-equally"
+    },
+    {
+      "task_id": "B4-L03",
+      "development_id": "B4.D2",
+      "task_model_id": "B4.TM2",
+      "interface": "quantity-representation",
+      "interaction": "form-equal-groups"
+    },
+    {
+      "task_id": "B4-L05",
+      "development_id": "B4.D3",
+      "task_model_id": "B4.TM3",
+      "interface": "quantity-representation",
+      "interaction": "represent-division"
+    },
+    {
+      "task_id": "B4-L07",
+      "development_id": "B4.D4",
+      "task_model_id": "B4.TM4",
+      "interface": "quantity-representation",
+      "interaction": "inverse-multiplication"
+    },
+    {
+      "task_id": "B4-L09",
+      "development_id": "B4.D5",
+      "task_model_id": "B4.TM5",
+      "interface": "quantity-representation",
+      "interaction": "quotient-remainder"
+    },
+    {
+      "task_id": "B4-L11",
+      "development_id": "B4.D6",
+      "task_model_id": "B4.TM6",
+      "interface": "quantity-representation",
+      "interaction": "decimal-division"
+    },
+    {
+      "task_id": "B4-L13",
+      "development_id": "B4.D7",
+      "task_model_id": "B4.TM7",
+      "interface": "quantity-representation",
+      "interaction": "choose-and-check"
+    }
+  ],
+  "complexity_model": {
+    "core_rule": "Een taak wordt complexer wanneer de delingsrelatie minder direct zichtbaar is en de leerling meer relaties tussen geheel, aantal delen/groepen, deler, quotiënt, rest en context moet coördineren.",
+    "dimensions": [
+      "meaning_structure",
+      "distance_given_to_asked",
+      "representation_distance",
+      "abstraction",
+      "missing_information",
+      "number_of_elements",
+      "dependencies",
+      "strategy_choice",
+      "contextual_load",
+      "number_range_and_type",
+      "remainder_interpretation",
+      "cross_skill_integration"
+    ],
+    "boundary": "Getalgrootte alleen bepaalt niet de complexiteit. Tafels, hoofdrekenen, staartdeling, splitsen en compenseren zijn kennis of aanpakken binnen B4, geen afzonderlijke skills."
+  },
+  "developmental_order_status": "candidate_hypothesis_not_proven_linear",
+  "cross_skill_boundary": {
+    "B3": "Sterke inverse relatie. B3 en B4 zijn onderscheiden skills en kunnen relationeel/parallel worden ontwikkeld; volledige beheersing van B3 is geen starre voorwaarde voor B4.",
+    "B5": "B5 blijft de afzonderlijke integratieve skill voor combineren en structureren van bewerkingen; geen eindniveau van B4.",
+    "fractions": "Breukbewerkingen vallen buiten B4 en blijven binnen de FR-skillfamilie.",
+    "strategies": "Tafels, standaardalgoritmen, herhaald aftrekken, splitsen en schatten zijn kennis of aanpakken, geen afzonderlijke skills."
+  },
+  "mastery_boundary": "De mastery-parameters in de registry zijn prototype-only kandidaatparameters en geen gevalideerde beslisgrenzen."
+}

@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — B1 Prompted naar zelfstandig</title>
+  <style>
+    :root{font-family:Nunito,system-ui,sans-serif;color:#102b57;background:#f5f9fd}
+    body{margin:0;padding:32px;min-height:100vh;box-sizing:border-box}
+    main{max-width:980px;margin:0 auto;display:grid;gap:18px}
+    .card{background:#fff;border:1px solid #d8e7f4;border-radius:22px;padding:24px;box-shadow:0 8px 24px rgba(16,43,87,.07)}
+    h1,h2{margin:0} h1{font-size:30px} h2{font-size:21px}
+    .muted{color:#647894;line-height:1.5}
+    .problem{text-align:center;font-size:32px;font-weight:900;padding:16px;border-radius:16px;background:#eef7ff}
+    .example{background:#f8fbff;border:1px solid #d8e7f4;border-radius:16px;padding:16px;margin:18px 0}
+    .example strong{display:block;margin-bottom:8px}
+    .strategies{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px}
+    .strategy{padding:14px;border:2px solid #d8e7f4;border-radius:16px;background:#fbfdff;color:#102b57;cursor:pointer;font:900 16px Nunito,system-ui,sans-serif}
+    .strategy.selected{border-color:#1787f2;background:#eef7ff}
+    .answer{display:grid;gap:10px;margin-top:16px}
+    input,textarea{padding:12px;border:2px solid #d8e7f4;border-radius:14px;font:700 16px Nunito,system-ui,sans-serif}
+    input{width:120px;text-align:center;font-size:20px}
+    textarea{min-height:80px;resize:vertical}
+    button.submit{border:0;border-radius:14px;padding:12px 20px;font:900 15px Nunito,system-ui,sans-serif;cursor:pointer;background:#1787f2;color:#fff}
+    button:disabled{opacity:.5;cursor:not-allowed}
+    .status{font-weight:900;padding:12px 14px;border-radius:14px;background:#eef8ff;color:#126fc9}
+    .status.error{background:#fff0f0;color:#b42318}
+    pre{margin:10px 0 0;white-space:pre-wrap;background:#f5f9fd;border-radius:14px;padding:14px;font:700 13px/1.5 ui-monospace,monospace}
+  </style>
+</head>
+<body>
+<main>
+  <section class="card">
+    <div class="muted">PacoGO • B1 • Prompted → zelfstandig</div>
+    <h1>Eerst met hulp, daarna zelf</h1>
+    <p class="muted">Je ziet eerst een vergelijkbaar voorbeeld met een kleine aanwijzing. Daarna los je een passend probleem zelfstandig op.</p>
+
+    <div class="example">
+      <strong>Voorbeeld met aanwijzing</strong>
+      <div class="problem">8 + 7 = 15</div>
+      <p class="muted">Aanwijzing: tel vanaf 8 verder: 9, 10, 11, 12, 13, 14, 15.</p>
+      <button id="recordExample" type="button">Voorbeeld begrepen</button>
+    </div>
+
+    <div>
+      <div class="muted">Zelfstandig probleem</div>
+      <div class="problem">23 + 19 = ?</div>
+      <div class="strategies" id="strategies"></div>
+      <div class="answer">
+        <input id="answer" inputmode="numeric" aria-label="Antwoord">
+        <textarea id="explanation" aria-label="Uitleg" placeholder="Leg kort uit hoe je hebt gerekend."></textarea>
+        <button class="submit" id="submit" type="button">Zelfstandig controleren</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Wat PacoGO heeft waargenomen</h2>
+    <div id="status" class="status">Rond eerst het voorbeeld af.</div>
+    <pre id="trace">Nog geen observatie.</pre>
+  </section>
+</main>
+<script type="module">
+  import { createAdditionController } from './pacogo-engine/addition-controller.js';
+  import { createBrowserVerticalSliceRuntime } from './pacogo-engine/browser-vertical-slice.js';
+  import { createCurriculumRegistry } from './pacogo-engine/curriculum-registry.js';
+
+  const registryConfig = await fetch('./docs/curriculum/PacoGO_Curriculum_Registry_v0.2.json').then(response => response.json());
+  const taskSet = await fetch('./docs/curriculum/PacoGO_Pilot_TaskSet_v0.1.json').then(response => response.json());
+  const registry = createCurriculumRegistry(registryConfig);
+  const runtime = createBrowserVerticalSliceRuntime({ registry, taskSet });
+  const taskId = 'B1-T05';
+  const task = runtime.getTask(taskId);
+  const strategyOptions = [
+    { id: 'count-on', label: 'Verder tellen' },
+    { id: 'make-ten', label: 'Eerst naar tien' }
+  ];
+  const controller = createAdditionController({
+    task,
+    studentKey: 'browser-synthetic-b1',
+    renderer: {},
+    addends: [23, 19],
+    expectedAnswer: 42,
+    strategyOptions,
+    representation: 'prompted_to_independent_surface',
+    responseType: 'prompted_independent_addition',
+    provenance: { page: 'curriculum-b1-prompted-independent.html' }
+  });
+
+  const status = document.querySelector('#status');
+  const trace = document.querySelector('#trace');
+  const exampleButton = document.querySelector('#recordExample');
+  const submitButton = document.querySelector('#submit');
+  const strategyHost = document.querySelector('#strategies');
+
+  strategyOptions.forEach(strategy => {
+    const button = document.createElement('button');
+    button.className = 'strategy';
+    button.type = 'button';
+    button.textContent = strategy.label;
+    button.disabled = true;
+    button.addEventListener('click', () => {
+      try {
+        controller.selectStrategy(strategy.id, 'browser');
+        strategyHost.querySelectorAll('.strategy').forEach(item => item.classList.toggle('selected', item === button));
+        status.className = 'status';
+        status.textContent = `Strategie gekozen: ${strategy.label}. Los nu het probleem zelfstandig op.`;
+      } catch (error) {
+        status.className = 'status error';
+        status.textContent = error.message;
+      }
+    });
+    strategyHost.appendChild(button);
+  });
+
+  exampleButton.addEventListener('click', () => {
+    try {
+      controller.recordPromptedExample({
+        addends: [8, 7],
+        answer: 15,
+        strategyId: 'count-on',
+        prompt: 'Tel vanaf 8 zeven stappen verder.',
+        explanation: 'Ik tel vanaf 8 verder tot 15.'
+      });
+      exampleButton.disabled = true;
+      strategyHost.querySelectorAll('.strategy').forEach(button => { button.disabled = false; });
+      status.className = 'status';
+      status.textContent = 'Voorbeeld geregistreerd. Kies nu zelfstandig een strategie en los 23 + 19 op.';
+    } catch (error) {
+      status.className = 'status error';
+      status.textContent = error.message;
+    }
+  });
+
+  submitButton.addEventListener('click', () => {
+    try {
+      const { evaluation, observation } = controller.submit(
+        document.querySelector('#answer').value,
+        document.querySelector('#explanation').value || null
+      );
+      const cycle = runtime.runTaskObservation({ taskId, observation });
+      status.className = 'status';
+      status.textContent = evaluation.correct
+        ? `Goed. De zelfstandige transfer is vastgelegd. Volgende stap: ${cycle.next?.action || 'bepalen'}.`
+        : 'De zelfstandige poging is vastgelegd als informatie voor de leerengine.';
+      trace.textContent = JSON.stringify({
+        observation_id: observation.observation_id,
+        task_id: taskId,
+        variation_key: observation.variation_key,
+        prompted_example: observation.performance.prompted_example,
+        independent: observation.independent,
+        interaction_event_types: observation.interaction_events.map(event => event.event_type),
+        evidence_count: cycle.evidence.length,
+        development: cycle.development,
+        mastery: cycle.mastery,
+        next: cycle.next,
+        decision: cycle.decision_trace.decision
+      }, null, 2);
+      submitButton.disabled = true;
+      strategyHost.querySelectorAll('.strategy').forEach(button => { button.disabled = true; });
+    } catch (error) {
+      status.className = 'status error';
+      status.textContent = error.message;
+    }
+  });
+</script>
+</body>
+</html>

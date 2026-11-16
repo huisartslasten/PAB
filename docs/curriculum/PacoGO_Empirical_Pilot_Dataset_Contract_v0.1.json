@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1",
+  "status": "candidate",
+  "epistemic_status": "[O]",
+  "synthetic_or_empirical": "design_only",
+  "purpose": "Define the auditable dataset boundary between administered task instances, immutable raw observations, C3 coding records and reproducible pilot analysis.",
+  "inputs": ["task_instances", "raw_observations", "coding_records"],
+  "required_identity_links": ["task_instance_id", "task_id", "learner_id", "study_id", "session_id", "wave_id", "registry_version"],
+  "rules": [
+    "Every observation must reference exactly one administered task instance.",
+    "The observation task_id must equal the referenced task instance task_id.",
+    "Learner, study, session, wave and registry version must agree between observation and task instance.",
+    "Observation IDs, task-instance IDs and coding IDs must be unique within the dataset snapshot.",
+    "A coding record may reference only an existing observation.",
+    "The same coder may not create two records for the same observation and coding round.",
+    "Independent coder records remain separate; adjudication is a separate record and never replaces the originals.",
+    "No dataset validator may infer mastery, developmental position, prerequisite status, causal inference, curriculum promotion or next action.",
+    "The dataset is a research/test boundary and is not a runtime mastery store."
+  ],
+  "snapshot": {
+    "ordering": "Deterministic ordering by learner_id, observed_at, observation_id for observations; coding_id for coding records; task_instance_id for task instances.",
+    "purpose": "Reproducible exports and analysis inputs without changing source observations."
+  },
+  "supabase": {
+    "required_for_this_contract": false,
+    "reason": "This layer validates pure dataset structure and referential integrity; it does not change persistence schema or write learner data."
+  },
+  "scientific_boundary": "A structurally valid dataset is not evidence that a developmental claim is true. C4/C5 inference remains gated by the pre-specified protocols."
+}

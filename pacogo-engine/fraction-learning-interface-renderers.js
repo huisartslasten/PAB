@@ -1,0 +1,122 @@
+import { normalizeFractionAreaModelLayout } from "./fraction-representation-contract.js";
+
+function renderPieModel(fraction, label) {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 100 100");
+  svg.setAttribute("class", "pacogo-fraction-pie");
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", label + ": " + fraction.numerator + " van " + fraction.denominator + " gelijke taartpunten");
+  svg.setAttribute("focusable", "false");
+  const center = 50;
+  const radius = 46;
+  for (let index = 0; index < fraction.denominator; index += 1) {
+    const startAngle = -Math.PI / 2 + (index * Math.PI * 2 / fraction.denominator);
+    const endAngle = -Math.PI / 2 + ((index + 1) * Math.PI * 2 / fraction.denominator);
+    const x1 = center + radius * Math.cos(startAngle);
+    const y1 = center + radius * Math.sin(startAngle);
+    const x2 = center + radius * Math.cos(endAngle);
+    const y2 = center + radius * Math.sin(endAngle);
+    const largeArc = endAngle - startAngle > Math.PI ? 1 : 0;
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    const d = fraction.denominator === 1
+      ? "M 50 50 L 50 4 A 46 46 0 1 1 49.99 4 Z"
+      : "M 50 50 L " + x1.toFixed(4) + " " + y1.toFixed(4) +
+        " A 46 46 0 " + largeArc + " 1 " + x2.toFixed(4) + " " + y2.toFixed(4) + " Z";
+    path.setAttribute("d", d);
+    path.setAttribute("class", index < fraction.numerator ? "pacogo-fraction-pie__sector is-shaded" : "pacogo-fraction-pie__sector");
+    path.setAttribute("aria-hidden", "true");
+    svg.append(path);
+  }
+  return svg;
+}
+
+function renderFractionRepresentation(fraction, representation, label = "Breuk", options = {}) {
+  const wrapper = document.createElement("span");
+  wrapper.className = "pacogo-fraction-representation";
+  if (representation === "symbolic_fraction") {
+    wrapper.classList.add("pacogo-fraction-representation--symbolic");
+    wrapper.setAttribute("role", "img");
+    wrapper.setAttribute("aria-label", label + ": " + fraction.numerator + " gedeeld door " + fraction.denominator);
+    const numerator = document.createElement("span");
+    numerator.className = "pacogo-fraction-numerator";
+    numerator.textContent = String(fraction.numerator);
+    const divider = document.createElement("span");
+    divider.className = "pacogo-fraction-divider";
+    divider.setAttribute("aria-hidden", "true");
+    const denominator = document.createElement("span");
+    denominator.className = "pacogo-fraction-denominator";
+    denominator.textContent = String(fraction.denominator);
+    wrapper.append(numerator, divider, denominator);
+    return wrapper;
+  }
+  if (representation !== "area_model") throw new TypeError("unsupported fraction representation");
+  wrapper.classList.add("pacogo-fraction-representation--area");
+  const layout = normalizeFractionAreaModelLayout(options.layout);
+  wrapper.dataset.layout = layout;
+  if (layout === "pie") {
+    wrapper.append(renderPieModel(fraction, label));
+    return wrapper;
+  }
+  wrapper.setAttribute("role", "img");
+  wrapper.setAttribute("aria-label", label + ": " + fraction.numerator + " van " + fraction.denominator + " gelijke delen");
+  const cells = document.createElement("span");
+  cells.className = "pacogo-fraction-cells";
+  const columns = layout === "grid" ? Math.min(fraction.denominator, Math.ceil(Math.sqrt(fraction.denominator))) : fraction.denominator;
+  cells.style.gridTemplateColumns = "repeat(" + columns + ", minmax(0, 1fr))";
+  for (let index = 0; index < fraction.denominator; index += 1) {
+    const cell = document.createElement("span");
+    cell.className = index < fraction.numerator ? "pacogo-fraction-cell is-shaded" : "pacogo-fraction-cell";
+    cell.setAttribute("aria-hidden", "true");
+    cells.append(cell);
+  }
+  wrapper.append(cells);
+  return wrapper;
+}
+
+function renderMixedNumber({ wholeNumber = 0, numerator, denominator } = {}, label = "Gemengd getal") {
+  if (!Number.isSafeInteger(wholeNumber) || wholeNumber < 0 ||
+      !Number.isSafeInteger(numerator) || numerator < 0 ||
+      !Number.isSafeInteger(denominator) || denominator <= 0) {
+    throw new TypeError("mixed-number values must be non-negative integers with a positive denominator");
+  }
+  const wrapper = document.createElement("span");
+  wrapper.className = "pacogo-fraction-mixed-number";
+  const parts = [];
+  if (wholeNumber > 0) {
+    const whole = document.createElement("span");
+    whole.className = "pacogo-fraction-mixed-number__whole";
+    whole.textContent = String(wholeNumber);
+    wrapper.append(whole);
+    parts.push(String(wholeNumber) + " hele");
+  }
+  const fraction = renderFractionRepresentation(
+    { numerator, denominator },
+    "symbolic_fraction",
+    label
+  );
+  fraction.removeAttribute("role");
+  fraction.removeAttribute("aria-label");
+  wrapper.append(fraction);
+  parts.push(numerator + " gedeeld door " + denominator);
+  wrapper.setAttribute("role", "img");
+  wrapper.setAttribute("aria-label", label + ": " + parts.join(" en "));
+  return wrapper;
+}
+
+
+function renderFractionInputRepresentation({ numerator = null, denominator = null, inputPart = "numerator", inputLabel = "Breukgetal", documentRef = document } = {}) {
+  if (!["numerator", "denominator"].includes(inputPart)) throw new TypeError("inputPart must be numerator or denominator");
+  const wrapper = documentRef.createElement("span");
+  wrapper.className = "pacogo-fraction-representation pacogo-fraction-representation--symbolic";
+  wrapper.setAttribute("role", "group"); wrapper.setAttribute("aria-label", inputLabel);
+  const part = (value, name, editable) => {
+    if (!editable) { const node=documentRef.createElement("span"); node.className=name==="teller"?"pacogo-fraction-numerator":"pacogo-fraction-denominator"; node.textContent=String(value); return node; }
+    const input=documentRef.createElement("input"); input.type="text"; input.inputMode="numeric"; input.autocomplete="off"; input.maxLength=6;
+    input.className=(name==="teller"?"pacogo-fraction-numerator":"pacogo-fraction-denominator")+" pacogo-fraction-step-input";
+    input.setAttribute("aria-label",inputLabel); input.dataset.fractionStepAnswer="true"; return input;
+  };
+  const top=part(numerator,"teller",inputPart==="numerator"), divider=documentRef.createElement("span");
+  divider.className="pacogo-fraction-divider"; divider.setAttribute("aria-hidden","true");
+  const bottom=part(denominator,"noemer",inputPart==="denominator"); wrapper.append(top,divider,bottom); return wrapper;
+}
+export { renderFractionRepresentation, renderMixedNumber, renderFractionInputRepresentation };

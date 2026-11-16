@@ -1,0 +1,51 @@
+PacoGO Curriculum — Stap 13 Status
+Datum: 2026-11-02
+Branch: refactor/professional-v1
+MAIN/LIVE: niet aangeraakt
+
+STATUS: TECHNISCH AFGEROND — CANDIDATE
+
+## Doel
+De bestaande registry + evidence-contracten uitbreiden naar een uitlegbare longitudinale cyclus:
+
+EVIDENCE → INFERENCE → MASTERY → DECISION → NEXT ACTION
+
+## Afgerond
+
+1. Longitudinal state engine toegevoegd in `pacogo-engine/longitudinal-state.js`.
+2. Registry runtime uitgebreid zodat iedere cycle ook:
+   - longitudinale state;
+   - decision explanation;
+   - decision trace
+   kan opleveren.
+3. Decision trace is expliciet gekoppeld aan de exacte curriculum registry version.
+4. Supabase uitgebreid met:
+   - `student_longitudinal_state`;
+   - `curriculum_decision_trace`.
+5. Beide tabellen hebben RLS; decision traces zijn append-only op databasecontractniveau, longitudinale state is updatebaar als actuele afgeleide toestand.
+6. A1, B1 en FR2 blijven dezelfde generieke runtime gebruiken; geen skill-specifieke engine-logica toegevoegd.
+7. DEV CI uitgebreid met een expliciete curriculum-engine regression step.
+8. Engine specification v0.3 toegevoegd.
+
+## Wetenschappelijke status
+
+Alle curriculumclaims, ontwikkelingsordes, mastery-regels en decision-prioriteiten blijven Candidate.
+
+Een runtime-status `MASTERED` betekent uitsluitend dat de huidige Candidate-regel met de beschikbare evidence is voldaan. Het is geen empirisch gevalideerde masteryclaim.
+
+De nieuwe state/trace-laag is infrastructuur voor reproduceerbaarheid en inspecteerbaarheid; zij vormt geen empirische validatie.
+
+## Supabase
+
+Nieuwe tabellen zijn toegepast op het huidige TEST-project.
+
+Bestaande security-advisories zijn opnieuw gecontroleerd. De bekende waarschuwingen rond bestaande SECURITY DEFINER-functies en leaked-password protection zijn niet veroorzaakt door deze curriculum-migratie en zijn bewust niet gewijzigd in deze stap.
+
+## Volgende grote blok
+
+Niet opnieuw A1/B1/FR2 bouwen. Volgende noodzakelijke uitbreiding:
+
+1. expliciete alternative-explanation / contradiction model;
+2. betere onzekerheidsrepresentatie zonder schijnprecisie;
+3. validation hooks voor C1-C10;
+4. daarna empirische validatie-workflow waarin Candidate → Supported → Validated alleen onder expliciete criteria kan plaatsvinden.

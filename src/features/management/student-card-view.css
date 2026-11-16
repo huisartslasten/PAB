@@ -1,0 +1,195 @@
+.management-student-card {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--paco-border);
+  border-radius: 18px;
+  background: #f7fbff;
+  box-shadow: 0 6px 16px rgba(16, 43, 87, .07);
+}
+
+.management-student-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.management-student-name,
+.management-student-open,
+.management-student-action,
+.management-student-agenda-link {
+  border: 0;
+  cursor: pointer;
+  font-family: "Baloo 2", Nunito, sans-serif;
+  font-weight: 800;
+}
+
+.management-student-name {
+  min-width: 0;
+  padding: 7px 10px;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--paco-text);
+  font-size: 19px;
+  text-align: left;
+}
+
+.management-student-name:hover {
+  background: #dff0ff;
+  color: var(--paco-blue-dark);
+}
+
+.management-student-open,
+.management-student-action {
+  padding: 7px 10px;
+  border: 1px solid var(--paco-border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--paco-blue-dark);
+  font-size: 14px;
+  line-height: 1.1;
+  box-shadow: 0 3px 8px rgba(16, 43, 87, .05);
+}
+
+.management-student-open:hover,
+.management-student-action:hover {
+  background: #eaf4ff;
+  border-color: #a9d1f3;
+}
+
+.management-student-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 13px;
+}
+
+.management-student-section {
+  width: 100%;
+  padding: 11px 0 0;
+  border: 0;
+  border-top: 1px solid #dce9f6;
+  background: transparent;
+  text-align: left;
+}
+
+.management-student-section + .management-student-section {
+  margin-top: 11px;
+}
+
+.management-student-section-link {
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+
+.management-student-section-link:hover {
+  color: var(--paco-blue-dark);
+}
+
+.management-student-section-link:focus-visible,
+.management-student-agenda-link:focus-visible,
+.management-student-calendar-action:focus-visible {
+  outline: 3px solid #1787f2;
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+.management-student-section-label {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--paco-text);
+  font-family: "Baloo 2", Nunito, sans-serif;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: .2px;
+}
+
+.management-subject-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.management-subject-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 4px 9px;
+  border: 1px solid #cfe3f3;
+  border-radius: 999px;
+  background: #eaf4ff;
+  color: var(--paco-blue-dark);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.management-student-muted {
+  display: block;
+  color: var(--paco-muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.management-student-agenda-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.management-student-agenda-link {
+  min-width: 0;
+  flex: 1;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.management-student-agenda-link:hover .management-student-section-label {
+  color: var(--paco-blue-dark);
+}
+
+.management-student-calendar-action {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.management-agenda-preview {
+  display: grid;
+  gap: 6px;
+}
+
+.management-agenda-preview-item {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr);
+  gap: 8px;
+  align-items: baseline;
+  font-size: 14px;
+}
+
+.management-agenda-date {
+  color: var(--paco-blue-dark);
+  font-weight: 900;
+}
+
+.management-agenda-title {
+  min-width: 0;
+  color: var(--paco-text);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 700px) {
+  .management-student-card-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .management-student-agenda-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

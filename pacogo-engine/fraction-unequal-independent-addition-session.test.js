@@ -1,0 +1,18 @@
+import assert from "node:assert/strict";
+import {FRACTION_ADDITION_LEVEL_4_EXERCISE,createFractionUnequalIndependentAdditionSession,expectedFor} from "./fraction-unequal-independent-addition-session.js";
+function memoryStorage(){const m=new Map();return {getItem:k=>m.has(k)?m.get(k):null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k)};}
+const answer=v=>({wholeNumberEnabled:false,wholeNumber:"",numerator:"",denominator:"",simplified:false,simplifiedNumerator:"",simplifiedDenominator:"",...v});
+assert.equal(FRACTION_ADDITION_LEVEL_4_EXERCISE.questionCount,15);
+assert.deepEqual(expectedFor(FRACTION_ADDITION_LEVEL_4_EXERCISE.tasks[0]),{whole:0,numerator:5,denominator:6,reducedNumerator:5,reducedDenominator:6,requiresSimplification:false});
+const storage=memoryStorage(),s=createFractionUnequalIndependentAdditionSession({learnerKey:"Zyon",storage});
+assert.equal(s.recordAnswer({values:answer({numerator:"5",denominator:"6"})}).classification,"valid");
+assert.equal(s.recordAnswer({values:answer({numerator:"11",denominator:"14"})}).classification,"valid");
+assert.equal(s.recordAnswer({values:answer({numerator:"17",denominator:"20"})}).classification,"valid");
+assert.equal(s.recordAnswer({values:answer({numerator:"9",denominator:"12"})}).classification,"requires_simplification");
+assert.equal(s.recordAnswer({values:answer({numerator:"9",denominator:"12",simplified:true,simplifiedNumerator:"3",simplifiedDenominator:"4"})}).classification,"valid");
+assert.equal(s.recordAnswer({values:answer({numerator:"1",denominator:"24"})}).classification,"requires_mixed_number");
+assert.equal(s.recordAnswer({values:answer({wholeNumberEnabled:true,wholeNumber:"1",numerator:"1",denominator:"24"})}).classification,"valid");
+assert.equal(s.getProgress().completedCount,5);
+assert.equal(s.getProgress().totalCount,15);
+assert.equal(createFractionUnequalIndependentAdditionSession({learnerKey:"Zyon",storage}).getCurrentTask().index,6);
+console.log("PacoGO level 4 session tests passed.");

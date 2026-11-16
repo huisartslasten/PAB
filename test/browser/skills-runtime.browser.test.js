@@ -624,3 +624,31 @@ test('guided unequal-denominator addition converts sums above one to mixed numbe
   expect(result.afterMixed.states).toEqual(['completed', 'completed', 'completed', 'completed', 'completed']); expect(result.afterMixed.completedAnswers).toHaveLength(5); expect(result.afterMixed.summaryFractions).toBe(3); expect(result.afterMixed.mixedNumbers).toBe(1);
   expect(result.afterMixed.feedback).toContain('Goed gedaan! Deze som is afgerond.');
 });
+
+test('independent unequal-denominator addition level 4 uses the central fraction template and 15 new tasks', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=optellen', {waitUntil:'domcontentloaded'});
+  const result=await page.evaluate(async()=>{
+    localStorage.removeItem('pacogo:fraction-unequal-independent-addition:v1:Zyon');
+    const {createSkillsRuntime}=await import('/src/features/skills/runtime.js');
+    const templateMount=document.createElement('div');templateMount.id='paco-template-mount';document.body.replaceChildren(templateMount);
+    const app={auth:{isParent:false,isLoggedIn:false,session:null,subscribe:()=>({unsubscribe(){}})},authSession:{},managementCapabilities:{getAvailableForPage:()=>[]}};
+    const runtime=createSkillsRuntime({app,templateMount,context:{student:'Zyon',mode:'student'},domain:'fractions',topic:'optellen',exercise:'unequal-independent-addition',documentRef:document,navigate:()=>{}});
+    await runtime.mount();
+    const snapshot=()=>({title:document.querySelector('.pacogo-fraction-practice-template__title-area h2')?.textContent||'',progress:document.querySelector('.fraction-practice-progress')?.textContent||'',centralPage:Boolean(document.querySelector('.paco-page-template')),fractionTemplate:Boolean(document.querySelector('[data-component="fraction-practice-template"]')),operands:document.querySelectorAll('.fraction-unequal-independent-addition-card .pacogo-fraction-representation--symbolic').length,wholeToggleVisible:!document.querySelector('.pacogo-fraction-answer__toggle').hidden,wholeFieldHidden:document.querySelector('[data-answer-part="whole"]').closest('label').hidden,stepCards:document.querySelectorAll('.fraction-guided-step-card').length});
+    const initial=snapshot(),set=(part,value)=>{document.querySelector('[data-answer-part="'+part+'"]').value=value;},click=selector=>document.querySelector(selector).click(),action='.fraction-unequal-independent-addition-card .pacogo-fraction-practice-template__actions .paco-btn';
+    set('primaryNumerator','5');set('primaryDenominator','6');click(action);const first=document.querySelector('.fraction-practice-feedback')?.textContent||'';click(action);
+    set('primaryNumerator','11');set('primaryDenominator','14');click(action);const second=document.querySelector('.fraction-practice-feedback')?.textContent||'';click(action);
+    set('primaryNumerator','17');set('primaryDenominator','20');click(action);const third=document.querySelector('.fraction-practice-feedback')?.textContent||'';click(action);
+    set('primaryNumerator','9');set('primaryDenominator','12');click(action);const simplify=document.querySelector('.fraction-practice-feedback')?.textContent||'';click('.pacogo-fraction-answer__simplify');set('simplifiedNumerator','3');set('simplifiedDenominator','4');click(action);const simplified=document.querySelector('.fraction-practice-feedback')?.textContent||'';click(action);
+    set('primaryNumerator','1');set('primaryDenominator','24');click(action);const needsWhole=document.querySelector('.fraction-practice-feedback')?.textContent||'';click('.pacogo-fraction-answer__toggle');set('whole','1');set('primaryNumerator','1');set('primaryDenominator','24');click(action);const mixed=document.querySelector('.fraction-practice-feedback')?.textContent||'';
+    return {initial,first,second,third,simplify,simplified,needsWhole,mixed,nextProgress:document.querySelector('.fraction-practice-progress')?.textContent||''};
+  });
+  expect(result.initial.title).toContain('Ongelijknamige breuken zelfstandig');
+  expect(result.initial.progress).toContain('Som 1 van 15');
+  expect(result.initial.centralPage).toBe(true);expect(result.initial.fractionTemplate).toBe(true);
+  expect(result.initial.operands).toBe(2);expect(result.initial.wholeToggleVisible).toBe(true);
+  expect(result.initial.wholeFieldHidden).toBe(true);expect(result.initial.stepCards).toBe(0);
+  for(const key of ['first','second','third','simplified','mixed'])expect(result[key]).toContain('Goed gedaan');
+  expect(result.simplify).toContain('Je berekening klopt');expect(result.needsWhole).toContain('Voeg het hele getal toe');
+  expect(result.nextProgress).toContain('Som 6 van 15');
+});

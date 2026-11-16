@@ -7208,71 +7208,27 @@ Implementatie:
 
 Werk na deze oefenbouw de inhoudelijke inventaris bij: leg per bestaande en nieuwe opteloefening vast wat het leerdoel, de leerlinghandeling, voorkennis, representatie, antwoordvorm en opbouwpositie is. Vergelijk dit vervolgens met de bestaande SLO-/curriculumdocumenten en PacoGO Skills, zonder nieuwe formele identifiers te verzinnen. Breng eerst de inhoudelijke dekking en hiaten van **Breuken → Optellen** in kaart voordat meer oefenvarianten of andere rekenbewerkingen worden gebouwd. Het uiteindelijke projectdoel blijft een volledige, brongetrouwe verticale leerlijn voor alle leerjaren.
 
-## Oefenen breuken optellen — niveau 3A en 3B (2026-11-16)
+## Oefenen breuken optellen — niveau 3 en 4 (2026-11-16)
 
-### Huidige scope en volgorde
+### Vastgelegde oefenafspraak
 
-Niveau 4 staat voorlopig op pauze. Eerst worden niveau 3A en 3B gecontroleerd en afgerond. Pas daarna wordt niveau 4 gebouwd.
+De volgende bouwstap is het afmaken van de formatieve oefeningen voor **ongelijknamige breuken optellen**. De afgesproken oefenopzet blijft ongewijzigd; alleen het aantal opgaven wordt **10 in plaats van 15**.
 
-- **3A:** ongelijknamige breuken kleiner dan 1 optellen, begeleid met vier stappen.
-- **3B:** ongelijknamige breuken kleiner dan 1 optellen met een uitkomst groter dan 1, begeleid met vijf stappen; de laatste stap zet de onechte breuk om in een gemengd getal.
-- Beide niveaus hebben 10 opgaven en blijven formatieve oefeningen.
-- Geen wijziging aan SLO-mapping, formele curriculum-identifiers, evidence, mastery of learner-state.
-
-### Vastgelegde UI-beslissingen voor 3A en 3B
-
-De screenshotreview heeft de volgende aanpassingen opgeleverd:
-
-1. Het invulveld voor de gemeenschappelijke noemer in stap 1 moet breder zijn, zodat een volledig cijfer goed leesbaar blijft.
-2. Afgeronde stapkaarten blijven zichtbaar en tonen het daadwerkelijk ingevulde/berekende resultaat. Een afgeronde stap mag niet leeg/wit worden.
-3. De oorspronkelijke voorbeeldsom wordt links uitgelijnd.
-4. Boven de stapkaarten wordt de uitwerking horizontaal en stapsgewijs opgebouwd. Voorbeeld:
-   - start: 7/8 + 2/3
-   - na de gemeenschappelijke noemer: 7/8 + 2/3 = ?/24 + ?/24
-   - na het gelijkwaardig maken: 7/8 + 2/3 = 21/24 + 16/24
-   - na het optellen: ... = 37/24
-   - bij 3B na de laatste stap: ... = 1 13/24
-5. De stapkaarten blijven onder de uitwerking naast elkaar staan op brede schermen. Op smalle schermen mag de centrale responsieve layout herschikken.
+- **Niveau 3 — begeleid:** de oorspronkelijke som staat bovenaan. De vier denkstappen worden als horizontale kaarten naast elkaar op één pagina opgebouwd. Eerst is stap 1 zichtbaar. Stap 2 komt pas beschikbaar nadat stap 1 correct is afgerond; stap 3 pas na stap 2; stap 4 pas na stap 3. Afgeronde stappen blijven zichtbaar. PacoGO geeft duidelijk aan welke stap op dat moment aan de beurt is. Er komt geen aparte pagina of navigatie per stap.
+- De vier stappen zijn: (1) een gemeenschappelijke noemer kiezen, (2) de eerste breuk gelijkwaardig maken, (3) de tweede breuk gelijkwaardig maken, en (4) de tellers optellen bij dezelfde noemer.
+- **Niveau 4 — zelfstandig:** dezelfde rekenvaardigheid en centrale oefenopbouw, maar zonder aangeboden of begeleide tussenstappen. De leerling lost de som zelfstandig op.
+- De voorbeeldsom uit de afspraak is 2/3 + 1/4. De oefenbank bevat 10 opgaven; de inhoudelijke opbouw en leerdoelen worden niet veranderd door de vermindering van 15 naar 10.
+- Niveau 3 en 4 blijven formatieve oefeningen. Geen wijziging aan SLO-mapping, formele curriculum-identifiers, evidence, mastery of learner-state.
 
 ### Centrale implementatieregels
 
 - Iedere pagina gebruikt de centrale PacoGO-paginatemplate via de bestaande Skills-runtime.
-- Breuken en gemengde getallen blijven de centrale Fraction Learning Interface-renderers gebruiken.
-- De centrale Fraction Practice-template en centrale antwoordinvoer blijven behouden; geen nieuwe lokale breukentemplate.
-- De uitwerking wordt opgebouwd vanuit de bestaande sessiestatus en gevalideerde stapresultaten. De pedagogische volgorde, sessiestatus en validatie blijven gescheiden van de weergave.
-- De ingevulde waarden van afgeronde stappen blijven zichtbaar in de kaarten.
-- De oefening blijft één pagina; geen aparte pagina of navigatie per stap.
+- Iedere breuk, breukinvoer, vergelijking, stapkaart en bediening gebruikt bestaande centrale Fraction Practice / Fraction Learning Interface-componenten waar die passend zijn. Nieuwe herbruikbare presentatiefunctionaliteit wordt centraal uitgebreid en getest; geen lokale kopieën.
+- De som en stapkaarten blijven op desktop horizontaal naast elkaar op één pagina. Alleen op smalle schermen mag de centrale responsieve opmaak ze herschikken om leesbaarheid te behouden.
+- De pedagogische volgorde, sessiestatus en validatie blijven gescheiden van de weergave.
+- Na iedere implementatiestap Full Regression uitvoeren en exact de geteste commit rapporteren.
 
-### Uitgevoerde wijziging
+### Eerstvolgende bouwstap
 
-- De voorbeeldsom staat nu links en krijgt een doorlopende uitwerking die na iedere stap groeit.
-- Afgeronde kaarten tonen hun resultaat.
-- Het invulveld voor de gemeenschappelijke noemer is verbreed.
-- De browserregressie is uitgebreid voor 3A en 3B: stapvrijgave, behoud van antwoorden, groeiende uitwerking en gemengd getal.
-- Centrale renderers en templates zijn hergebruikt; er is geen aparte breukentemplate geïntroduceerd.
+Controleer en hergebruik de bestaande vierstappensessie en de brongetrouwe opgavenbank. Breid de bank uit tot de afgesproken 10 opgaven zonder de leerdoelen of stapvolgorde te veranderen; integreer daarna niveau 3 en de zelfstandige niveau-4-oefening via de centrale templates. Werk pas daarna de browserregressie uit voor stapvrijgave, behoud van afgeronde stappen, horizontale layout en de zelfstandige antwoordroute.
 
-### Verificatie
-
-- Branch: refactor/professional-v1.
-- Laatste geverifieerde codecommit vóór deze handoff-update: 5385fe55d0fe1cc2924afaedf8a127de65ae1172.
-- Full Regression #3780 / run 43797524803: GREEN / SUCCESS op die codecommit.
-- Browser proof #756 / run 43797524800: GREEN / SUCCESS op die codecommit.
-- Een eerdere browserpoging had een onjuiste testassertie over de telling van breukweergaven versus gemengde getallen; dit is inhoudelijk gecorrigeerd en de daaropvolgende workflows zijn geslaagd.
-- LIVE main is onaangeroerd.
-
-### Eerstvolgende concrete stappen
-
-1. Controleer 3A visueel in de browser: breedte stap-1-invoer, linkse uitlijning, uitbreiding van de som na iedere stap en zichtbaarheid van afgeronde antwoorden.
-2. Controleer 3B visueel op dezelfde punten, inclusief de laatste omzetting naar een gemengd getal.
-3. Controleer dat de lange uitwerking op desktop de beschikbare horizontale ruimte benut en op smallere schermen leesbaar blijft.
-4. Los alleen aantoonbare problemen op; bij een rode regressie eerst de exacte oorzaak isoleren.
-5. Rond 3A en 3B volledig af voordat niveau 4 wordt gestart.
-
-### Niveau 4 — uitgesteld besluit
-
-Wanneer 3A en 3B zijn afgerond:
-- 15 zelfstandige sommen.
-- Geen tussenstappen of begeleide stapkaarten.
-- Dezelfde centrale Fraction Practice-template en antwoordinvoer als bij de eerste opteloefeningen.
-- Geen nieuwe lokale template; bestaande centrale onderdelen hergebruiken.
-- De inhoud van de 15 opgaven wordt pas vastgesteld wanneer niveau 4 daadwerkelijk aan de beurt is.

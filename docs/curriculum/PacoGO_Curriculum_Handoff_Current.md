@@ -7301,3 +7301,51 @@ Dit blijft formatief oefenen. Er zijn geen wijzigingen aangebracht aan SLO-mappi
 ### Handoff-verificatie
 
 Deze handoff-aanvulling is geschreven na de groene verificatie van de niveau-5-implementatie. De handoff-wijziging is zelf een projectwijziging en moet op haar eigen commit door Full Regression worden geverifieerd voordat de volgende bouwstap begint.
+
+
+### Niveau 5 — zesstaps begeleide uitwerking en expliciete taakovergang (16 november 2026)
+
+De begeleide oefening **ongelijknamige gemengde getallen optellen** is aangescherpt op basis van de vastgestelde openstaande punten.
+
+- De begeleide sessie gebruikt nu zes afzonderlijk gevalideerde stappen:
+  1. gemeenschappelijke noemer kiezen;
+  2. eerste breukdeel gelijkwaardig maken;
+  3. tweede breukdeel gelijkwaardig maken;
+  4. beide hele getallen afzonderlijk omzetten naar breuken met de gemeenschappelijke noemer;
+  5. de vier tellers optellen;
+  6. het eindantwoord als gemengd getal invoeren.
+- De omzetting van de hele getallen is dus een eigen didactische stap en wordt afzonderlijk gecontroleerd; deze is niet samengevoegd met het optellen van de breukdelen.
+- De actieve stap krijgt de volledige werkruimte. Afgeronde stappen blijven compact zichtbaar met hun resultaat; toekomstige stappen blijven compact en vergrendeld.
+- De horizontale breukuitwerking bouwt voort op de bestaande Fraction Learning Interface-renderers. De invoer voor de gemeenschappelijke noemer is compact gemaakt.
+- Na een correct eindantwoord blijft de afgeronde som staan. De sessie gaat pas verder na een expliciete klik op **Volgende som**.
+- De bestaande zelfstandige reeks van 15 sommen blijft inhoudelijk en functioneel ongewijzigd.
+- De centrale PacoGO-paginatemplate, Fraction Practice Template, breukrenderers en gedeelde antwoordcomponent blijven leidend. Er is geen niveau-5-specifieke paginashell of parallelle breuktemplate toegevoegd.
+- Dit blijft formatieve oefenlogica. Geen SLO-, curriculumregistry-, claim-, task-, evidence-, mastery-, next-action-, learner-state-, Supabase- of LIVE-main-wijziging.
+
+Implementatie en regressiedekking:
+- `pacogo-engine/fraction-addition-level-5-session.js` — zesstaps sessiecontract, afzonderlijke validatie en expliciete taakovergang.
+- `pacogo-engine/fraction-addition-level-5-session.test.js` — unit/regressietests voor de zes stappen, omzetting van hele getallen, gemengde antwoorden, vereenvoudiging en learner-isolatie.
+- `src/features/skills/runtime.js` — begeleide en zelfstandige niveau-5-weergave en interactie.
+- `src/features/skills/skills-navigation.css` — compacte voortgangsweergave en responsieve indeling.
+- `test/browser/skills-runtime.browser.test.js` — browserregressie voor de zes stappen, voortgang, compacte invoer en wachten op expliciete taakovergang.
+
+### Verificatie en actuele engineeringstatus
+
+- Branch: `refactor/professional-v1`.
+- Implementatiecommit: `34aca81e32d0ff96f9e78b0b2c2bc664e63740cd`.
+- Full Regression #3800 / run `43893847098`: **GREEN / SUCCESS** op exact deze commit. Alle workflowstappen zijn geslaagd, inclusief curriculum-engine-regressie, architectuurgrenzen, maintained Node-regressie, Vitest, browserregressie en clean-working-tree-controle.
+- Browser proof #764 / run `43893846977`: **GREEN / SUCCESS** op exact dezelfde commit.
+- LIVE `main` is onaangeraakt. Geen Supabase-wijziging en geen deployment.
+
+### Eerstvolgende concrete stap
+
+Voer in de lokale PacoGO TEST-omgeving de visuele controle uit van niveau 5, naast de eerder geplande controle van 3A, 3B en niveau 4. Controleer specifiek:
+1. de zes stappen en de didactische juistheid van de twee aparte omzettingen van hele getallen;
+2. de actieve stap als enige volledige werkruimte en de compacte afgeronde/toekomstige stappen;
+3. de horizontale uitbreiding van de doelbreuk naarmate de leerling verder komt;
+4. de breedte en leesbaarheid van het invoerveld voor de gemeenschappelijke noemer;
+5. de weergave van het gemengde eindantwoord en de vereenvoudigingsstap;
+6. dat na een correct antwoord de leerling expliciet op **Volgende som** moet klikken;
+7. desktopcompactheid en herschikking op smallere schermen.
+
+Full Regression bewijst technische regressiestatus, niet de visuele of pedagogische acceptatie. Leg concrete reproduceerbare bevindingen vast voordat er code wordt aangepast. Vóór iedere daaropvolgende bouwstap eerst Full Regression controleren. Deze handoff-update is zelf een projectwijziging en moet op haar eigen commit door Full Regression worden geverifieerd voordat de volgende bouwstap begint.

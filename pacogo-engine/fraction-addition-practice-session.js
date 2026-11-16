@@ -295,8 +295,8 @@ function createFractionAdditionPracticeSession({
       rightNumerator: getValidValue(progress, task.id, "right_equivalent_numerator"),
       resultNumerator: getValidValue(progress, task.id, "addition_result"),
       denominator: getValidValue(progress, task.id, "common_denominator"),
-      requiresMixedNumber: task.requiresMixedNumber,
       ...(task.requiresMixedNumber ? {
+        requiresMixedNumber: true,
         resultWholeNumber: Math.floor(
           (getValidValue(progress, task.id, "left_equivalent_numerator") +
            getValidValue(progress, task.id, "right_equivalent_numerator")) /

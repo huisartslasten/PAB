@@ -684,3 +684,43 @@ test('guided fraction addition accepts Enter and compacts completed step one on 
   expect(result.step5Active).toBe('active');
   expect(result.firstHeight).toBe('0px');
 });
+
+
+test('level 5 offers 15 independent mixed-number tasks after guided completion', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=optellen', {waitUntil:'domcontentloaded'});
+  const result=await page.evaluate(async()=>{
+    const guidedKey='pacogo:fraction-addition-level-5:guided:v1:Zyon:guided';
+    const independentKey='pacogo:fraction-addition-level-5:independent:v1:Zyon:independent';
+    localStorage.setItem(guidedKey,JSON.stringify({schemaVersion:1,completedTaskIds:Array.from({length:10},(_,i)=>'fraction-addition-5-guided-'+String(i+1).padStart(2,'0')),responsesByTask:{}}));
+    localStorage.removeItem(independentKey);
+    const {createSkillsRuntime}=await import('/src/features/skills/runtime.js');
+    const templateMount=document.createElement('div');templateMount.id='paco-template-mount';document.body.replaceChildren(templateMount);
+    const app={auth:{isParent:false,isLoggedIn:false,session:null,subscribe:()=>({unsubscribe(){}})},authSession:{},managementCapabilities:{getAvailableForPage:()=>[]}};
+    const runtime=createSkillsRuntime({app,templateMount,context:{student:'Zyon',mode:'student'},domain:'fractions',topic:'optellen',exercise:'unequal-mixed-addition',documentRef:document,navigate:()=>{}});
+    await runtime.mount();
+    const transition={template:Boolean(document.querySelector('[data-component="fraction-practice-template"]')),message:document.querySelector('.fraction-practice-complete')?.textContent||'',button:document.querySelector('.pacogo-fraction-practice-template__actions button')?.textContent||''};
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    const initial={title:document.querySelector('.pacogo-fraction-practice-template__title-area h2')?.textContent||'',progress:document.querySelector('.fraction-practice-progress')?.textContent||'',template:Boolean(document.querySelector('[data-component="fraction-practice-template"]')),operands:document.querySelectorAll('.fraction-guided-task-prompt .pacogo-fraction-mixed-number').length,stepCards:document.querySelectorAll('.fraction-guided-step-card').length,wholeRequired:!document.querySelector('[data-answer-part="whole"]').closest('label').hidden};
+    const set=(part,value)=>{const field=document.querySelector('[data-answer-part="'+part+'"]');field.value=String(value);field.dispatchEvent(new Event('input',{bubbles:true}));};
+    set('whole',3);set('primaryNumerator',9);set('primaryDenominator',20);
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    const feedback=document.querySelector('.fraction-practice-feedback')?.textContent||'';
+    const stored=JSON.parse(localStorage.getItem(independentKey)||'{}');
+    const nextButton=document.querySelector('.pacogo-fraction-practice-template__actions button')?.textContent||'';
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    return {transition,initial,feedback,completedIndependent:stored.completedTaskIds?.length||0,nextButton,nextProgress:document.querySelector('.fraction-practice-progress')?.textContent||''};
+  });
+  expect(result.transition.template).toBe(true);
+  expect(result.transition.message).toContain('alle 10 begeleide sommen');
+  expect(result.transition.button).toBe('Start 15 zelfstandige sommen');
+  expect(result.initial.title).toContain('Zelfstandig oefenen');
+  expect(result.initial.progress).toContain('1 van 15');
+  expect(result.initial.template).toBe(true);
+  expect(result.initial.operands).toBe(2);
+  expect(result.initial.stepCards).toBe(0);
+  expect(result.initial.wholeRequired).toBe(true);
+  expect(result.feedback).toContain('Goed gedaan');
+  expect(result.completedIndependent).toBe(1);
+  expect(result.nextButton).toBe('Volgende som');
+  expect(result.nextProgress).toContain('2 van 15');
+});

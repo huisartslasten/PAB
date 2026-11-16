@@ -6,6 +6,7 @@ import { createFractionPracticeTemplate } from '../../../pacogo-engine/fraction-
 import { renderFractionAnswerInput } from '../../../pacogo-engine/fraction-answer-input.js';
 import { renderFractionRepresentation, renderMixedNumber, renderFractionInputRepresentation } from '../../../pacogo-engine/fraction-learning-interface-renderers.js';
 import { FRACTION_ADDITION_LEVEL_3_TASKS } from '../../../pacogo-engine/fraction-addition-level-3-task-bank.js';
+import { FRACTION_ADDITION_LEVEL_3B_TASKS } from '../../../pacogo-engine/fraction-addition-level-3b-task-bank.js';
 import { createFractionAdditionPracticeSession } from '../../../pacogo-engine/fraction-addition-practice-session.js';
 import { FRACTION_WHOLE_MIXED_ADDITION_EXERCISE, createFractionWholeMixedAdditionSession } from '../../../pacogo-engine/fraction-whole-mixed-addition-session.js';
 import { FRACTION_SAME_DENOMINATOR_ADDITION_EXERCISE, createFractionSameDenominatorAdditionSession } from '../../../pacogo-engine/fraction-same-denominator-addition-session.js';
@@ -117,7 +118,8 @@ export function createSkillsRuntime({
       { label: 'Gelijknamige breuken kleiner dan 1 bij elkaar optellen', level: 1 },
       { label: 'Breuken gelijknamig maken', level: 2 },
       { label: 'Gelijknamige breuken groter dan 1 bij elkaar optellen', level: 2 },
-      { label: 'Ongelijknamige breuken kleiner dan 1 bij elkaar optellen', level: 3 },
+      { label: 'Ongelijknamige breuken kleiner dan 1 bij elkaar optellen', level: 3, exercise: 'unequal-denominator-guided-addition' },
+      { label: 'Ongelijknamige breuken met een uitkomst groter dan 1 optellen', level: 3, exercise: 'unequal-denominator-guided-mixed-addition' },
       { label: 'Ongelijknamige breuken groter dan 1 bij elkaar optellen', level: 5 }
     ];
 
@@ -141,16 +143,17 @@ export function createSkillsRuntime({
       const label = documentRef.createElement('span');
       label.className = 'skills-addition-overview-label';
       label.textContent = item.label;
-      if (index === 0 || index === 1 || index === 3 || index === 4) {
+      if (index === 0 || index === 1 || index === 3 || index === 4 || index === 5) {
         const open = documentRef.createElement('button');
         open.type = 'button';
         open.className = 'paco-btn paco-btn--primary paco-btn--small skills-addition-overview-open';
         if (index === 0) open.classList.add('skills-addition-overview-open-whole-mixed');
         else if (index === 1) open.classList.add('skills-addition-overview-open-same-denominator');
         else if (index === 4) open.classList.add('skills-addition-overview-open-unequal-denominator-guided');
+        else if (index === 5) open.classList.add('skills-addition-overview-open-unequal-denominator-guided-mixed');
         else open.classList.add('skills-addition-overview-open-same-denominator-mixed');
         open.textContent = 'Oefenen';
-        const exerciseId = index === 0 ? 'whole-number-mixed-addition' : index === 1 ? 'same-denominator-addition' : index === 3 ? 'mixed-same-denominator-addition' : 'unequal-denominator-guided-addition';
+        const exerciseId = item.exercise || (index === 0 ? 'whole-number-mixed-addition' : index === 1 ? 'same-denominator-addition' : index === 3 ? 'mixed-same-denominator-addition' : 'unequal-denominator-guided-addition');
         open.addEventListener('click', () => navigate(buildViewUrl('skills.html', {
           student, mode: context?.mode, extra: { domain: FRACTION_DOMAIN, topic: 'optellen', exercise: exerciseId }
         })));
@@ -474,11 +477,12 @@ export function createSkillsRuntime({
   }
 
 
-  function renderUnequalDenominatorGuidedAdditionPractice() {
+  function renderUnequalDenominatorGuidedAdditionPractice({ mixedNumberResult = false } = {}) {
     const learnerKey=student||context?.learnerId||'local-learner';
-    const session=createFractionAdditionPracticeSession({learnerKey,tasks:FRACTION_ADDITION_LEVEL_3_TASKS});
-    const stepIds=['common_denominator','left_equivalent_numerator','right_equivalent_numerator','addition_result'];
-    const stepLabels=['Gemeenschappelijke noemer kiezen','Eerste breuk gelijkwaardig maken','Tweede breuk gelijkwaardig maken','Tellers optellen'];
+    const tasks=mixedNumberResult?FRACTION_ADDITION_LEVEL_3B_TASKS:FRACTION_ADDITION_LEVEL_3_TASKS;
+    const session=createFractionAdditionPracticeSession({learnerKey,tasks,sessionId:mixedNumberResult?'level-3b':'level-3a'});
+    const stepIds=['common_denominator','left_equivalent_numerator','right_equivalent_numerator','addition_result',...(mixedNumberResult?['mixed_number_conversion']:[])];
+    const stepLabels=['Gemeenschappelijke noemer kiezen','Eerste breuk gelijkwaardig maken','Tweede breuk gelijkwaardig maken','Tellers optellen',...(mixedNumberResult?['Omzetten naar een gemengd getal']:[])];
     function renderExpression(step,mount) {
       const left=step.leftFraction,right=step.rightFraction;
       const op=value=>Object.assign(documentRef.createElement('span'),{className:'fraction-guided-operator',textContent:value});
@@ -498,13 +502,13 @@ export function createSkillsRuntime({
       const card=documentRef.createElement('section');card.className='card fraction-whole-mixed-addition-card fraction-addition-guided-card';
       const template=createFractionPracticeTemplate({mount:card});
       const title=documentRef.createElement('h2');title.textContent='Ongelijknamige breuken kleiner dan 1 bij elkaar optellen';
-      const instruction=documentRef.createElement('p');instruction.className='fraction-practice-instruction';instruction.textContent='Werk de vier stappen één voor één af. Een volgende stap komt vrij zodra je de huidige stap goed hebt gedaan.';
+      const instruction=documentRef.createElement('p');instruction.className='fraction-practice-instruction';instruction.textContent=mixedNumberResult?'Werk de vijf stappen één voor één af. Bij de laatste stap zet je de onechte breuk om in een gemengd getal.':'Werk de vier stappen één voor één af. Een volgende stap komt vrij zodra je de huidige stap goed hebt gedaan.';
       const progressLabel=documentRef.createElement('p');progressLabel.className='fraction-practice-progress';progressLabel.textContent='Som '+(completedTask?completedTask.taskNumber:progress.completedTaskCount+1)+' van '+progress.totalTaskCount;
       template.titleArea.append(title);template.instructionArea.append(instruction);template.progressArea.append(progressLabel);
       if(!step){const done=documentRef.createElement('p');done.className='fraction-practice-complete';done.textContent='Je hebt alle 10 sommen afgerond. Goed gewerkt!';template.workArea.append(done);content.append(card);return;}
       const prompt=documentRef.createElement('div');prompt.className='fraction-guided-task-prompt';const op=value=>Object.assign(documentRef.createElement('span'),{className:'fraction-guided-operator',textContent:value});
       prompt.append(renderFractionRepresentation(step.leftFraction,'symbolic_fraction','Eerste breuk'),op('+'),renderFractionRepresentation(step.rightFraction,'symbolic_fraction','Tweede breuk'));template.promptArea.append(prompt);
-      const grid=documentRef.createElement('div');grid.className='fraction-guided-step-grid';grid.setAttribute('aria-label','Vier denkstappen');let activeInput=null;
+      const grid=documentRef.createElement('div');grid.className='fraction-guided-step-grid'+(mixedNumberResult?' fraction-guided-step-grid--five':'');grid.setAttribute('aria-label',mixedNumberResult?'Vijf denkstappen':'Vier denkstappen');let activeInput=null;let activeFractionAnswer=null;
       stepIds.forEach((stepId,index)=>{
         const completed=step.completedStepIds.includes(stepId),active=step.stepId===stepId;
         const item=documentRef.createElement('section');item.className='fraction-guided-step-card';item.dataset.stepId=stepId;item.dataset.state=completed?'completed':active?'active':'locked';item.setAttribute('aria-label','Stap '+(index+1)+': '+stepLabels[index]);
@@ -512,10 +516,13 @@ export function createSkillsRuntime({
         if(completed){const status=documentRef.createElement('p');status.className='fraction-guided-step-status';status.textContent='Afgerond';item.append(status);}
         else if(active){
           const help=documentRef.createElement('p');help.className='fraction-guided-step-prompt';help.textContent=step.prompt;
-          const expression=documentRef.createElement('div');expression.className='fraction-guided-step-expression';activeInput=renderExpression(step,expression);
+          const expression=documentRef.createElement('div');expression.className='fraction-guided-step-expression';
+          if(step.stepId==='mixed_number_conversion'){
+            activeFractionAnswer=renderFractionAnswerInput({workMount:expression,controlsMount:template.controlsArea,wholeNumberMode:'optional'});
+          }else activeInput=renderExpression(step,expression);
           const check=documentRef.createElement('button');check.type='button';check.className='paco-btn paco-btn--primary paco-btn--small';check.textContent='Controleren';
-          check.addEventListener('click',()=>{const result=session.recordResponse({rawValue:activeInput?.value||''});if(result.classification==='valid'){if(step.stepId==='addition_result'){renderCurrentTask('Goed gedaan! Deze som is afgerond.',result.completion);return;}renderCurrentTask('Goed gedaan! Deze stap is afgerond.');return;}
-            const messages={invalid_input:'Vul een positief heel getal in.',not_common_denominator:'Deze noemer past niet bij beide breuken. Kies een noemer die door beide noemers gedeeld kan worden.',not_equivalent:'Deze teller maakt de breuk nog niet gelijkwaardig. Controleer met welke factor de noemer is vermenigvuldigd.',arithmetic_error:'Tel de twee tellers bij elkaar op. De noemer blijft hetzelfde.'};
+          check.addEventListener('click',()=>{const result=session.recordResponse(step.stepId==='mixed_number_conversion'?{values:activeFractionAnswer?.getValues()}:{rawValue:activeInput?.value||''});if(result.classification==='valid'){if(step.stepId==='addition_result'&&!mixedNumberResult){renderCurrentTask('Goed gedaan! Deze som is afgerond.',result.completion);return;}if(step.stepId==='mixed_number_conversion'){activeFractionAnswer?.lock();renderCurrentTask('Goed gedaan! Deze som is afgerond.',result.completion);return;}renderCurrentTask('Goed gedaan! Deze stap is afgerond.');return;}
+            const messages={invalid_input:'Vul alle benodigde getallen in. Controleer ook de noemer.',not_common_denominator:'Deze noemer past niet bij beide breuken. Kies een noemer die door beide noemers gedeeld kan worden.',not_equivalent:'Deze teller maakt de breuk nog niet gelijkwaardig. Controleer met welke factor de noemer is vermenigvuldigd.',arithmetic_error:'Tel de twee tellers bij elkaar op. De noemer blijft hetzelfde.',incorrect_mixed_number:'Dit gemengde getal is nog niet gelijk aan de uitkomst. Controleer het hele getal en de breuk.',requires_mixed_number:'De uitkomst is groter dan 1. Schakel ‘Heel getal toevoegen’ in en vul het gemengde getal in.',requires_simplification:'Je gemengde getal klopt. Vereenvoudig de breuk nog voordat je verdergaat.',not_simplified:'De vereenvoudigde breuk klopt nog niet. Probeer het opnieuw.'};
             const feedback=documentRef.createElement('p');feedback.className='fraction-practice-feedback is-error';feedback.setAttribute('role','alert');feedback.textContent=messages[result.classification]||'Controleer je antwoord en probeer het opnieuw.';template.feedbackArea.replaceChildren(feedback);activeInput?.focus();});
           item.append(help,expression,check);
         }else{const status=documentRef.createElement('p');status.className='fraction-guided-step-status';status.textContent='Komt hierna';item.append(status);}
@@ -533,7 +540,8 @@ export function createSkillsRuntime({
     const showingSameDenominatorPractice = showingAddition && exercise === 'same-denominator-addition';
     const showingMixedSameDenominatorPractice = showingAddition && exercise === 'mixed-same-denominator-addition';
     const showingUnequalDenominatorGuidedPractice = showingAddition && exercise === 'unequal-denominator-guided-addition';
-    const showingPractice = showingWholeMixedPractice || showingSameDenominatorPractice || showingMixedSameDenominatorPractice || showingUnequalDenominatorGuidedPractice;
+    const showingUnequalDenominatorGuidedMixedPractice = showingAddition && exercise === 'unequal-denominator-guided-mixed-addition';
+    const showingPractice = showingWholeMixedPractice || showingSameDenominatorPractice || showingMixedSameDenominatorPractice || showingUnequalDenominatorGuidedPractice || showingUnequalDenominatorGuidedMixedPractice;
     mountPacoPageTemplate({
       mount: templateMount,
       greeting: student ? `Hoi ${student}! 🐶` : 'Welkom bij PacoGO!',
@@ -545,6 +553,8 @@ export function createSkillsRuntime({
         ? 'Breuken → Optellen → Gelijknamige breuken groter dan 1 bij elkaar optellen.'
         : showingSameDenominatorPractice
         ? 'Breuken → Optellen → Gelijknamige breuken kleiner dan 1 bij elkaar optellen.'
+        : showingUnequalDenominatorGuidedMixedPractice
+        ? 'Breuken → Optellen → Ongelijknamige breuken met een uitkomst groter dan 1 optellen.'
         : showingUnequalDenominatorGuidedPractice
         ? 'Breuken → Optellen → Ongelijknamige breuken kleiner dan 1 bij elkaar optellen.'
         : showingAddition
@@ -566,6 +576,7 @@ export function createSkillsRuntime({
     if (showingWholeMixedPractice) renderWholeNumberMixedAdditionPractice();
     else if (showingSameDenominatorPractice) renderSameDenominatorAdditionPractice();
     else if (showingMixedSameDenominatorPractice) renderMixedSameDenominatorAdditionPractice();
+    else if (showingUnequalDenominatorGuidedMixedPractice) renderUnequalDenominatorGuidedAdditionPractice({ mixedNumberResult: true });
     else if (showingUnequalDenominatorGuidedPractice) renderUnequalDenominatorGuidedAdditionPractice();
     else if (showingAddition) renderFractionAdditionOverview();
     else if (showingFractions) renderFractionOverview();

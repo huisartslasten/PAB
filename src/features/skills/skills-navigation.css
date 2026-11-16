@@ -60,17 +60,17 @@
 /* In de vijfde stap blijft stap 1 als compacte, leesbare samenvatting aanwezig
    wanneer de beschikbare schermhoogte beperkt is. */
 @media(max-height:760px) and (min-width:521px){
-  .fraction-guided-step-grid--five[data-active-step="mixed_number_answer"] .fraction-guided-step-card[data-step-id="common_denominator"]{
+  .fraction-guided-step-grid--five:is([data-active-step="mixed_number_conversion"],[data-active-step="mixed_number_answer"]) .fraction-guided-step-card[data-step-id="common_denominator"]{
     display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;align-items:center;
     column-gap:8px;row-gap:2px;min-height:0;padding:7px 10px;
   }
-  .fraction-guided-step-grid--five[data-active-step="mixed_number_answer"] .fraction-guided-step-card[data-step-id="common_denominator"] h3,
-  .fraction-guided-step-grid--five[data-active-step="mixed_number_answer"] .fraction-guided-step-card[data-step-id="common_denominator"] .fraction-guided-step-title,
-  .fraction-guided-step-grid--five[data-active-step="mixed_number_answer"] .fraction-guided-step-card[data-step-id="common_denominator"] .fraction-guided-step-status{display:none}
-  .fraction-guided-step-grid--five[data-active-step="mixed_number_answer"] .fraction-guided-step-card[data-step-id="common_denominator"]::before{
+  .fraction-guided-step-grid--five:is([data-active-step="mixed_number_conversion"],[data-active-step="mixed_number_answer"]) .fraction-guided-step-card[data-step-id="common_denominator"] h3,
+  .fraction-guided-step-grid--five:is([data-active-step="mixed_number_conversion"],[data-active-step="mixed_number_answer"]) .fraction-guided-step-card[data-step-id="common_denominator"] .fraction-guided-step-title,
+  .fraction-guided-step-grid--five:is([data-active-step="mixed_number_conversion"],[data-active-step="mixed_number_answer"]) .fraction-guided-step-card[data-step-id="common_denominator"] .fraction-guided-step-status{display:none}
+  .fraction-guided-step-grid--five:is([data-active-step="mixed_number_conversion"],[data-active-step="mixed_number_answer"]) .fraction-guided-step-card[data-step-id="common_denominator"]::before{
     content:"Stap 1 afgerond";grid-column:1;grid-row:1 / span 2;color:var(--paco-muted);font-size:11px;font-weight:800;
   }
-  .fraction-guided-step-grid--five[data-active-step="mixed_number_answer"] .fraction-guided-step-card[data-step-id="common_denominator"] .fraction-guided-step-completed-answer{
+  .fraction-guided-step-grid--five:is([data-active-step="mixed_number_conversion"],[data-active-step="mixed_number_answer"]) .fraction-guided-step-card[data-step-id="common_denominator"] .fraction-guided-step-completed-answer{
     grid-column:2;grid-row:1 / span 2;min-height:0;margin:0;font-size:13px;
   }
 }

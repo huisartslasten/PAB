@@ -151,7 +151,7 @@ test('Optellen in the fraction overview opens the eight-row addition overview wi
     'Ongelijknamige breuken kleiner dan 1 bij elkaar optellen',
     'Ongelijknamige breuken met een uitkomst groter dan 1 optellen',
     'Ongelijknamige breuken zelfstandig optellen',
-    'Ongelijknamige breuken groter dan 1 bij elkaar optellen'
+    'Ongelijknamige gemengde getallen bij elkaar optellen'
   ]);
   expect(result.levels).toEqual([1, 1, 2, 2, 3, 3, 4, 5]);
   expect(result.boneCounts).toEqual([5, 5, 5, 5, 5, 5, 5, 5]);

@@ -576,6 +576,7 @@ test('guided unequal-denominator addition converts sums above one to mixed numbe
       activeFractionFields: document.querySelectorAll('.fraction-guided-step-card[data-state="active"] [data-answer-part]').length,
       controls: [...document.querySelectorAll('.pacogo-fraction-practice-template__controls button')].map(button => button.textContent)
     });
+    const initial = snapshot();
     const answerStep = value => {
       const input = document.querySelector('.fraction-guided-step-card[data-state="active"] [data-fraction-guided-answer], .fraction-guided-step-card[data-state="active"] [data-fraction-step-answer]');
       input.value = String(value);
@@ -603,7 +604,7 @@ test('guided unequal-denominator addition converts sums above one to mixed numbe
     setPart('whole', 1); setPart('primaryNumerator', 7); setPart('primaryDenominator', 12);
     document.querySelector('.fraction-guided-step-card[data-state="active"] button').click();
     const afterMixed = snapshot();
-    return { overviewResult, initial: snapshot(), afterDenominator, afterLeft, afterRight, afterSum, mixedFields, afterMixed };
+    return { overviewResult, initial, afterDenominator, afterLeft, afterRight, afterSum, mixedFields, afterMixed };
   });
   expect(result.overviewResult.rows).toBe(7);
   expect(result.overviewResult.hasExerciseButton).toBe(true);

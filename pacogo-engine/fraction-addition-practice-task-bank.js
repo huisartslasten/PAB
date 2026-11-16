@@ -46,7 +46,11 @@ const FRACTION_ADDITION_PRACTICE_TASKS = Object.freeze([
     source: "user-provided-school-workbook",
     leftFraction: { numerator: 1, denominator: 3 },
     rightFraction: { numerator: 5, denominator: 8 }
-  })
+  }),
+  freezeTask({ id:"fraction-addition-original-07", source:"pacogo-original-variation", leftFraction:{numerator:2,denominator:3}, rightFraction:{numerator:1,denominator:4} }),
+  freezeTask({ id:"fraction-addition-original-08", source:"pacogo-original-variation", leftFraction:{numerator:3,denominator:4}, rightFraction:{numerator:1,denominator:6} }),
+  freezeTask({ id:"fraction-addition-original-09", source:"pacogo-original-variation", leftFraction:{numerator:2,denominator:5}, rightFraction:{numerator:1,denominator:3} }),
+  freezeTask({ id:"fraction-addition-original-10", source:"pacogo-original-variation", leftFraction:{numerator:3,denominator:8}, rightFraction:{numerator:1,denominator:6} })
 ]);
 
 export { FRACTION_ADDITION_PRACTICE_TASKS };

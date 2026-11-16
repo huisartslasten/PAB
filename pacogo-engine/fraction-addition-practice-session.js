@@ -134,6 +134,10 @@ function createFractionAdditionPracticeSession({
       return Object.freeze({
         taskId: task.id, taskNumber: configuredTasks.indexOf(task) + 1,
         totalTasks: configuredTasks.length,
+        completedStepIds: Object.freeze([...completed]),
+        commonDenominator: denominator,
+        leftEquivalentNumerator: leftNumerator,
+        rightEquivalentNumerator: rightNumerator,
         leftFraction: task.leftFraction, rightFraction: task.rightFraction,
         operationSymbol: task.operationSymbol,
         stepId, stepNumber: 1, totalSteps: STEP_IDS.length,
@@ -147,6 +151,10 @@ function createFractionAdditionPracticeSession({
       return Object.freeze({
         taskId: task.id, taskNumber: configuredTasks.indexOf(task) + 1,
         totalTasks: configuredTasks.length,
+        completedStepIds: Object.freeze([...completed]),
+        commonDenominator: denominator,
+        leftEquivalentNumerator: leftNumerator,
+        rightEquivalentNumerator: rightNumerator,
         leftFraction: task.leftFraction, rightFraction: task.rightFraction,
         operationSymbol: task.operationSymbol,
         stepId, stepNumber: 2, totalSteps: STEP_IDS.length,
@@ -159,6 +167,10 @@ function createFractionAdditionPracticeSession({
       return Object.freeze({
         taskId: task.id, taskNumber: configuredTasks.indexOf(task) + 1,
         totalTasks: configuredTasks.length,
+        completedStepIds: Object.freeze([...completed]),
+        commonDenominator: denominator,
+        leftEquivalentNumerator: leftNumerator,
+        rightEquivalentNumerator: rightNumerator,
         leftFraction: task.leftFraction, rightFraction: task.rightFraction,
         operationSymbol: task.operationSymbol,
         stepId, stepNumber: 3, totalSteps: STEP_IDS.length,
@@ -171,6 +183,10 @@ function createFractionAdditionPracticeSession({
       return Object.freeze({
         taskId: task.id, taskNumber: configuredTasks.indexOf(task) + 1,
         totalTasks: configuredTasks.length,
+        completedStepIds: Object.freeze([...completed]),
+        commonDenominator: denominator,
+        leftEquivalentNumerator: leftNumerator,
+        rightEquivalentNumerator: rightNumerator,
         leftFraction: task.leftFraction, rightFraction: task.rightFraction,
         operationSymbol: task.operationSymbol,
         stepId, stepNumber: 4, totalSteps: STEP_IDS.length,

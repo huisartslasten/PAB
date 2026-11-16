@@ -103,4 +103,20 @@ function renderMixedNumber({ wholeNumber = 0, numerator, denominator } = {}, lab
   return wrapper;
 }
 
-export { renderFractionRepresentation, renderMixedNumber };
+
+function renderFractionInputRepresentation({ numerator = null, denominator = null, inputPart = "numerator", inputLabel = "Breukgetal", documentRef = document } = {}) {
+  if (!["numerator", "denominator"].includes(inputPart)) throw new TypeError("inputPart must be numerator or denominator");
+  const wrapper = documentRef.createElement("span");
+  wrapper.className = "pacogo-fraction-representation pacogo-fraction-representation--symbolic";
+  wrapper.setAttribute("role", "group"); wrapper.setAttribute("aria-label", inputLabel);
+  const part = (value, name, editable) => {
+    if (!editable) { const node=documentRef.createElement("span"); node.className=name==="teller"?"pacogo-fraction-numerator":"pacogo-fraction-denominator"; node.textContent=String(value); return node; }
+    const input=documentRef.createElement("input"); input.type="text"; input.inputMode="numeric"; input.autocomplete="off"; input.maxLength=6;
+    input.className=(name==="teller"?"pacogo-fraction-numerator":"pacogo-fraction-denominator")+" pacogo-fraction-step-input";
+    input.setAttribute("aria-label",inputLabel); input.dataset.fractionStepAnswer="true"; return input;
+  };
+  const top=part(numerator,"teller",inputPart==="numerator"), divider=documentRef.createElement("span");
+  divider.className="pacogo-fraction-divider"; divider.setAttribute("aria-hidden","true");
+  const bottom=part(denominator,"noemer",inputPart==="denominator"); wrapper.append(top,divider,bottom); return wrapper;
+}
+export { renderFractionRepresentation, renderMixedNumber, renderFractionInputRepresentation };

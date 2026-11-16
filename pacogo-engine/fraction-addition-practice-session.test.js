@@ -16,15 +16,16 @@ function completeCurrentTask(session, answers) {
   for (const answer of answers) assert.equal(session.recordResponse({ rawValue: String(answer) }).classification, "valid");
 }
 
-assert.equal(FRACTION_ADDITION_PRACTICE_TASKS.length, 6);
+assert.equal(FRACTION_ADDITION_PRACTICE_TASKS.length, 10);
 assert.deepEqual(FRACTION_ADDITION_PRACTICE_TASKS.map(task => [
   task.leftFraction.numerator, task.leftFraction.denominator,
   task.rightFraction.numerator, task.rightFraction.denominator
 ]), [
   [1, 3, 1, 4], [1, 4, 3, 8], [2, 5, 3, 10],
-  [1, 6, 5, 12], [2, 3, 1, 5], [1, 3, 5, 8]
+  [1, 6, 5, 12], [2, 3, 1, 5], [1, 3, 5, 8],
+  [2, 3, 1, 4], [3, 4, 1, 6], [2, 5, 1, 3], [3, 8, 1, 6]
 ]);
-assert.equal(new Set(FRACTION_ADDITION_PRACTICE_TASKS.map(task => task.id)).size, 6);
+assert.equal(new Set(FRACTION_ADDITION_PRACTICE_TASKS.map(task => task.id)).size, 10);
 assert.equal(FRACTION_ADDITION_PRACTICE_TASKS.every(task => task.source), true);
 assert.throws(() => { FRACTION_ADDITION_PRACTICE_TASKS[0].leftFraction.numerator = 99; }, TypeError);
 

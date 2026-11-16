@@ -151,7 +151,7 @@ test('Optellen in the fraction overview opens the six-row addition overview with
     'Ongelijknamige breuken kleiner dan 1 bij elkaar optellen',
     'Ongelijknamige breuken groter dan 1 bij elkaar optellen'
   ]);
-  expect(result.levels).toEqual([1, 1, 2, 2, 4, 5]);
+  expect(result.levels).toEqual([1, 1, 2, 2, 3, 5]);
   expect(result.boneCounts).toEqual([5, 5, 5, 5, 5, 5]);
   expect(result.centralCard).toBe(true);
   expect(result.customDots).toBe(0);
@@ -491,4 +491,34 @@ test('mixed same-denominator addition presents 15 original mixed-number tasks an
   expect(result.completed.every(message => message.includes('Goed gedaan'))).toBe(true);
   expect(result.finalProgress).toContain('15 van 15');
   expect(result.completion).toContain('alle 15 sommen');
+});
+
+test('guided unequal-denominator addition uses central templates, ten tasks and sequential four-step cards', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=optellen', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    localStorage.removeItem('pacogo:fraction-addition-practice:v1:Zyon');
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const templateMount = document.createElement('div'); templateMount.id = 'paco-template-mount'; document.body.replaceChildren(templateMount);
+    const app = { auth:{isParent:false,isLoggedIn:false,session:null,subscribe:()=>({unsubscribe(){}})}, authSession:{}, managementCapabilities:{getAvailableForPage:()=>[]} };
+    let navigation='';
+    const overview=createSkillsRuntime({app,templateMount,context:{student:'Zyon',mode:'student'},domain:'fractions',topic:'optellen',documentRef:document,navigate:target=>{navigation=String(target)}});
+    await overview.mount();
+    const row=[...document.querySelectorAll('.skills-addition-overview-row')].find(item=>item.querySelector('.skills-addition-overview-label')?.textContent.includes('Ongelijknamige breuken kleiner'));
+    row.querySelector('button').click();
+    const runtime=createSkillsRuntime({app,templateMount,context:{student:'Zyon',mode:'student'},domain:'fractions',topic:'optellen',exercise:'unequal-denominator-guided-addition',documentRef:document,navigate:()=>{}});
+    await runtime.mount();
+    const snapshot=()=>({canonicalPage:Boolean(document.querySelector('.paco-page-template')),fractionTemplate:Boolean(document.querySelector('[data-component="fraction-practice-template"]')),progress:document.querySelector('.fraction-practice-progress')?.textContent||'',stepCards:document.querySelectorAll('.fraction-guided-step-card').length,states:[...document.querySelectorAll('.fraction-guided-step-card')].map(node=>node.dataset.state),fractions:document.querySelectorAll('.fraction-guided-task-prompt .pacogo-fraction-representation--symbolic').length});
+    const initial=snapshot();
+    const answer=value=>{const input=document.querySelector('[data-fraction-guided-answer],[data-fraction-step-answer]');input.value=String(value);document.querySelector('.fraction-guided-step-card[data-state="active"] button').click()};
+    answer(12);const afterFirst=snapshot();answer(4);const afterSecond=snapshot();answer(3);const afterThird=snapshot();answer(7);const afterFourth=snapshot();
+    return {navigation,initial,afterFirst,afterSecond,afterThird,afterFourth};
+  });
+  expect(result.navigation).toContain('exercise=unequal-denominator-guided-addition');
+  expect(result.initial.canonicalPage).toBe(true); expect(result.initial.fractionTemplate).toBe(true);
+  expect(result.initial.progress).toContain('Som 1 van 10'); expect(result.initial.stepCards).toBe(4);
+  expect(result.initial.states).toEqual(['active','locked','locked','locked']); expect(result.initial.fractions).toBe(2);
+  expect(result.afterFirst.states).toEqual(['completed','active','locked','locked']);
+  expect(result.afterSecond.states).toEqual(['completed','completed','active','locked']);
+  expect(result.afterThird.states).toEqual(['completed','completed','completed','active']);
+  expect(result.afterFourth.states).toEqual(['active','locked','locked','locked']); expect(result.afterFourth.progress).toContain('Som 2 van 10');
 });

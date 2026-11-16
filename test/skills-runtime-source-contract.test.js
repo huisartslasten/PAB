@@ -35,6 +35,8 @@ test('Skills navigation catalog contains the agreed mathematics and fraction top
 test('fraction addition overview reuses central PacoGO difficulty bones and card styling', () => {
   assert.ok(runtime.includes('createPacoBoneDifficulty({'));
   assert.ok(runtime.includes("overview.className = 'card skills-addition-overview'"));
+  assert.ok(runtime.includes('renderUnequalDenominatorGuidedAdditionPractice'));
+  assert.ok(runtime.includes("exercise === 'unequal-denominator-guided-addition'"));
   assert.doesNotMatch(runtime, /skills-addition-overview-dot/);
 });
 

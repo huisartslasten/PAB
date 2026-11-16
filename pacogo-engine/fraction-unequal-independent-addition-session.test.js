@@ -15,7 +15,7 @@ assert.equal(s.recordAnswer({values:answer({numerator:"7",denominator:"9"})}).cl
 assert.equal(s.recordAnswer({values:answer({numerator:"33",denominator:"40"})}).classification,"valid");
 assert.equal(s.recordAnswer({values:answer({numerator:"1",denominator:"24"})}).classification,"requires_mixed_number");
 assert.equal(s.recordAnswer({values:answer({wholeNumberEnabled:true,wholeNumber:"1",numerator:"1",denominator:"24"})}).classification,"valid");
-assert.equal(s.getProgress().completedCount,5);
+assert.equal(s.getProgress().completedCount,8);
 assert.equal(s.getProgress().totalCount,15);
-assert.equal(createFractionUnequalIndependentAdditionSession({learnerKey:"Zyon",storage}).getCurrentTask().index,6);
+assert.equal(createFractionUnequalIndependentAdditionSession({learnerKey:"Zyon",storage}).getCurrentTask().index,9);
 console.log("PacoGO level 4 session tests passed.");

@@ -7349,3 +7349,37 @@ Voer in de lokale PacoGO TEST-omgeving de visuele controle uit van niveau 5, naa
 7. desktopcompactheid en herschikking op smallere schermen.
 
 Full Regression bewijst technische regressiestatus, niet de visuele of pedagogische acceptatie. Leg concrete reproduceerbare bevindingen vast voordat er code wordt aangepast. Vóór iedere daaropvolgende bouwstap eerst Full Regression controleren. Deze handoff-update is zelf een projectwijziging en moet op haar eigen commit door Full Regression worden geverifieerd voordat de volgende bouwstap begint.
+
+
+### Niveau 5 — verdere horizontale opbouw van de berekening (16 november 2026)
+
+De begeleide niveau-5-uitwerking is verder vereenvoudigd zodat de leerling de berekening horizontaal ziet groeien en bij het optellen niet vier losse termen hoeft te combineren.
+
+- De voortgangsregel toont eerst de twee gemengde getallen; na het gelijknamig maken worden de equivalente breukdelen zichtbaar.
+- Na de stap voor het omzetten van de hele getallen toont de opgebouwde berekening de twee bijbehorende onechte breuken naast elkaar.
+- De volgende stap vraagt de leerling de tellers van deze twee breuken op te tellen; de noemer blijft gelijk.
+- De begeleide reeks blijft zes stappen tellen, met afzonderlijke controle per stap en expliciete knop **Volgende som** na een correct eindantwoord.
+- De bestaande centrale Fraction Practice Template en centrale Fraction Learning Interface-renderers blijven gebruikt. Er is geen aparte niveau-5-pagina of parallelle breuktemplate gemaakt.
+- De zelfstandige reeks en de curriculum-/SLO-contracten zijn niet gewijzigd.
+
+### Verificatie van deze uitbreiding
+
+- Branch: `refactor/professional-v1`.
+- Implementatiecommit: `c48efaa5f3f2aca0160bc3c0227fc16260de9c07`.
+- Full Regression #3802 / run `43922856406`: **GREEN / SUCCESS** op exact deze commit. Alle stappen geslaagd, inclusief curriculum-engine-regressie, architectuurgrenzen, Node, Vitest, browserregressie en clean-working-tree-controle.
+- Browser proof #765 / run `43922856335`: **GREEN / SUCCESS** op exact dezelfde commit.
+- De voorafgaande handoff-commit `d75df9f64c9eb035cab6828987c3ea559dcdf55e` was eveneens geverifieerd door Full Regression #3801 / run `43907671698`: **GREEN / SUCCESS**.
+- LIVE `main` is onaangeraakt. Geen Supabase-wijziging en geen deployment.
+
+### Volgende stap — visuele acceptatie, geen nieuwe bouwstap
+
+Voer in de lokale PacoGO TEST-omgeving de visuele controle uit voordat er opnieuw code wordt gebouwd. Controleer niveau 5 op:
+1. horizontale groei van de berekening na iedere stap;
+2. correcte omzetting naar de twee onechte breuken vóór stap 5;
+3. duidelijke optelling van die twee breuken in stap 5;
+4. leesbare breuknotatie en compacte invoervelden;
+5. actieve, afgeronde en vergrendelde stapkaarten;
+6. het gemengde eindantwoord en de expliciete knop **Volgende som**;
+7. bruikbaarheid op desktop en smallere schermen.
+
+De groene regressies bewijzen technische regressiestatus, maar vervangen deze visuele en didactische acceptatie niet. Bij concrete afwijkingen eerst de exacte oorzaak vaststellen. Vóór iedere codewijziging opnieuw Full Regression controleren.

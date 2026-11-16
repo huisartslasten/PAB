@@ -7208,71 +7208,58 @@ Implementatie:
 
 Werk na deze oefenbouw de inhoudelijke inventaris bij: leg per bestaande en nieuwe opteloefening vast wat het leerdoel, de leerlinghandeling, voorkennis, representatie, antwoordvorm en opbouwpositie is. Vergelijk dit vervolgens met de bestaande SLO-/curriculumdocumenten en PacoGO Skills, zonder nieuwe formele identifiers te verzinnen. Breng eerst de inhoudelijke dekking en hiaten van **Breuken → Optellen** in kaart voordat meer oefenvarianten of andere rekenbewerkingen worden gebouwd. Het uiteindelijke projectdoel blijft een volledige, brongetrouwe verticale leerlijn voor alle leerjaren.
 
-## Oefenen breuken optellen — niveau 3A en 3B (2026-11-16)
+## Breuken optellen — niveau 3A, 3B en niveau 4 (2026-11-16)
 
-### Huidige scope en volgorde
-
-Niveau 4 staat voorlopig op pauze. Eerst worden niveau 3A en 3B gecontroleerd en afgerond. Pas daarna wordt niveau 4 gebouwd.
+### Actuele status en scope
 
 - **3A:** ongelijknamige breuken kleiner dan 1 optellen, begeleid met vier stappen.
-- **3B:** ongelijknamige breuken kleiner dan 1 optellen met een uitkomst groter dan 1, begeleid met vijf stappen; de laatste stap zet de onechte breuk om in een gemengd getal.
-- Beide niveaus hebben 10 opgaven en blijven formatieve oefeningen.
-- Geen wijziging aan SLO-mapping, formele curriculum-identifiers, evidence, mastery of learner-state.
+- **3B:** ongelijknamige breuken optellen met een uitkomst groter dan 1, begeleid met vijf stappen; de laatste stap zet de onechte breuk om in een gemengd getal.
+- **Niveau 4:** 15 volledig nieuwe sommen voor zelfstandig optellen van ongelijknamige breuken. Geen begeleide tussenstappen, hints of stapkaarten.
+- Alle drie blijven formatieve oefeningen. Geen wijziging aan SLO-mapping, formele curriculum-identifiers, evidence, mastery of learner-state.
+- De 15 niveau-4-opgaven zijn PacoGO-original variations; ze zijn niet gekopieerd uit de 3A- of 3B-opgavenbank. Beide optelbreuken zijn echte breuken kleiner dan 1. De set bevat zowel uitkomsten kleiner dan 1 als uitkomsten groter dan 1.
 
 ### Vastgelegde UI-beslissingen voor 3A en 3B
 
-De screenshotreview heeft de volgende aanpassingen opgeleverd:
-
-1. Het invulveld voor de gemeenschappelijke noemer in stap 1 moet breder zijn, zodat een volledig cijfer goed leesbaar blijft.
-2. Afgeronde stapkaarten blijven zichtbaar en tonen het daadwerkelijk ingevulde/berekende resultaat. Een afgeronde stap mag niet leeg/wit worden.
-3. De oorspronkelijke voorbeeldsom wordt links uitgelijnd.
-4. Boven de stapkaarten wordt de uitwerking horizontaal en stapsgewijs opgebouwd. Voorbeeld:
-   - start: 7/8 + 2/3
-   - na de gemeenschappelijke noemer: 7/8 + 2/3 = ?/24 + ?/24
-   - na het gelijkwaardig maken: 7/8 + 2/3 = 21/24 + 16/24
-   - na het optellen: ... = 37/24
-   - bij 3B na de laatste stap: ... = 1 13/24
-5. De stapkaarten blijven onder de uitwerking naast elkaar staan op brede schermen. Op smalle schermen mag de centrale responsieve layout herschikken.
+1. Het invulveld voor de gemeenschappelijke noemer in stap 1 moet breed genoeg zijn om het volledige cijfer goed leesbaar te tonen.
+2. Afgeronde stapkaarten blijven zichtbaar en tonen het daadwerkelijk ingevulde/berekende resultaat.
+3. De oorspronkelijke voorbeeldsom staat links uitgelijnd.
+4. Boven de stapkaarten wordt de uitwerking horizontaal en stapsgewijs opgebouwd.
+5. De stapkaarten staan op brede schermen naast elkaar; op smalle schermen mag de centrale responsieve layout herschikken.
 
 ### Centrale implementatieregels
 
 - Iedere pagina gebruikt de centrale PacoGO-paginatemplate via de bestaande Skills-runtime.
-- Breuken en gemengde getallen blijven de centrale Fraction Learning Interface-renderers gebruiken.
-- De centrale Fraction Practice-template en centrale antwoordinvoer blijven behouden; geen nieuwe lokale breukentemplate.
-- De uitwerking wordt opgebouwd vanuit de bestaande sessiestatus en gevalideerde stapresultaten. De pedagogische volgorde, sessiestatus en validatie blijven gescheiden van de weergave.
-- De ingevulde waarden van afgeronde stappen blijven zichtbaar in de kaarten.
-- De oefening blijft één pagina; geen aparte pagina of navigatie per stap.
+- Breuken en gemengde getallen gebruiken de centrale Fraction Learning Interface-renderers.
+- Niveau 4 gebruikt dezelfde centrale Fraction Practice-template en centrale antwoordinvoer als de eerste opteloefeningen.
+- Geen lokale of afzonderlijke breukentemplate voor niveau 4.
+- De antwoordvelden voor teller en noemer, het optionele hele getal en de vereenvoudigingsbediening komen uit de centrale antwoordinvoer.
+- Bij niveau 4 verschijnen geen tussenstappen of begeleide stapkaarten.
+- Pedagogische volgorde, sessiestatus, validatie en weergave blijven gescheiden.
 
-### Uitgevoerde wijziging
+### Uitgevoerde wijzigingen
 
-- De voorbeeldsom staat nu links en krijgt een doorlopende uitwerking die na iedere stap groeit.
-- Afgeronde kaarten tonen hun resultaat.
-- Het invulveld voor de gemeenschappelijke noemer is verbreed.
-- De browserregressie is uitgebreid voor 3A en 3B: stapvrijgave, behoud van antwoorden, groeiende uitwerking en gemengd getal.
-- Centrale renderers en templates zijn hergebruikt; er is geen aparte breukentemplate geïntroduceerd.
+- 3A/3B: doorlopende horizontale uitwerking, zichtbare resultaten van afgeronde kaarten en verbreed invoerveld voor de gemeenschappelijke noemer.
+- Niveau 4: eigen task bank met 15 nieuwe sommen, eigen onafhankelijke sessie/validatie en een zelfstandige Skills-runtime-route.
+- Niveau 4 gebruikt de centrale breukentemplate en de centrale antwoordbediening.
+- Het breuken-opteloverzicht toont nu acht onderwerpen; niveau 4 staat op moeilijkheidsgraad 4.
+- Browserregressie controleert de centrale pagina/template, twee breukoperandweergaven, afwezigheid van stapkaarten, vereenvoudigen, gemengde getallen en de voortgang door niveau 4.
+- De bestaande 3A/3B-opgaven en begeleide sessielogica zijn niet vervangen.
 
 ### Verificatie
 
 - Branch: refactor/professional-v1.
-- Laatste geverifieerde codecommit vóór deze handoff-update: 5385fe55d0fe1cc2924afaedf8a127de65ae1172.
-- Full Regression #3780 / run 43797524803: GREEN / SUCCESS op die codecommit.
-- Browser proof #756 / run 43797524800: GREEN / SUCCESS op die codecommit.
-- Een eerdere browserpoging had een onjuiste testassertie over de telling van breukweergaven versus gemengde getallen; dit is inhoudelijk gecorrigeerd en de daaropvolgende workflows zijn geslaagd.
+- Codecommit waarop de niveau-4-implementatie en regressies groen zijn: 139ab455584b46a1db79d16610b0d61becbe4422.
+- Full Regression #3787 / run 43858400253: GREEN / SUCCESS op die codecommit.
+- Browser proof #760 / run 43858400168: GREEN / SUCCESS op die codecommit.
+- Full Regression #3786 was rood doordat twee bestaande browserasserties het oude zeven-onderwerpen-overzicht verwachtten. De actuele implementatie heeft terecht acht onderwerpen. De assertions zijn bijgewerkt om het nieuwe niveau-4-onderwerp en moeilijkheidsgraad 4 expliciet te controleren; de daaropvolgende volledige regressie is groen.
 - LIVE main is onaangeroerd.
+- Handoff-update zelf moet na commit opnieuw worden geverifieerd.
 
 ### Eerstvolgende concrete stappen
 
-1. Controleer 3A visueel in de browser: breedte stap-1-invoer, linkse uitlijning, uitbreiding van de som na iedere stap en zichtbaarheid van afgeronde antwoorden.
-2. Controleer 3B visueel op dezelfde punten, inclusief de laatste omzetting naar een gemengd getal.
-3. Controleer dat de lange uitwerking op desktop de beschikbare horizontale ruimte benut en op smallere schermen leesbaar blijft.
-4. Los alleen aantoonbare problemen op; bij een rode regressie eerst de exacte oorzaak isoleren.
-5. Rond 3A en 3B volledig af voordat niveau 4 wordt gestart.
-
-### Niveau 4 — uitgesteld besluit
-
-Wanneer 3A en 3B zijn afgerond:
-- 15 zelfstandige sommen.
-- Geen tussenstappen of begeleide stapkaarten.
-- Dezelfde centrale Fraction Practice-template en antwoordinvoer als bij de eerste opteloefeningen.
-- Geen nieuwe lokale template; bestaande centrale onderdelen hergebruiken.
-- De inhoud van de 15 opgaven wordt pas vastgesteld wanneer niveau 4 daadwerkelijk aan de beurt is.
+1. Controleer 3A visueel in localhost: breedte stap-1-invoer, linkse uitlijning, uitbreiding van de som en zichtbaarheid van afgeronde antwoorden.
+2. Controleer 3B visueel op dezelfde punten, inclusief omzetting naar een gemengd getal.
+3. Controleer niveau 4 visueel in localhost: dezelfde centrale template als de eerste opteloefeningen, horizontale som, teller/noemer-invoer, vereenvoudigingsbediening en optioneel heel getal; geen tussenstappen.
+4. Controleer dat alle drie de pagina's op desktop compact blijven en op smallere schermen leesbaar herschikken.
+5. Bij iedere rode regressie eerst de exacte oorzaak isoleren; niet symptoom-patchen.
+6. Na visuele afronding van deze opteloefeningen verder met de resterende bewerkingen binnen breuken, voordat de verticale SLO-leerlijn wordt uitgewerkt.

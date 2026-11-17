@@ -7766,3 +7766,35 @@ De gerichte integratiecontrole op de echte Skills-route is toegevoegd en uitgevo
 
 **Volgende concrete stap**
 Voer de visuele QA van de echte oefening uit op desktop en mobiel: beoordeel of de volledige symbolische én visuele som, de instructie/annotaties en het interactieve werkveld compact en begrijpelijk op één scherm passen. De huidige browserdekking bewijst dat er geen horizontale overflow is; zij bewijst nog niet dat verticale scrolling niet nodig is. Pas na concrete waarneming eventueel de centrale Fraction Practice Template of gedeelde Fraction Learning Interface aan, niet een los route-specifiek scherm. Voor iedere bouwstap eerst opnieuw Full Regression controleren. Iedere handoff-wijziging moet zelf opnieuw door Full Regression.
+
+
+### Interactieve aftrekinterface — herstelbare verdeling (17 november 2026)
+
+**Gebruikersprobleem**
+- De leerling moet na een verkeerde keuze (bijvoorbeeld 4 delen in plaats van 2) een andere verdeling kunnen kiezen.
+- Dit moet ook mogelijk blijven nadat al één of meer delen zijn weggeklikt.
+- Een herstelactie die alleen bij de algemene geselecteerde bediening verschijnt, is onvoldoende duidelijk en te afhankelijk van selectie.
+
+**Besluit en implementatie**
+- De centrale Fraction Learning Interface toont bij iedere verdeelde eenheid een eigen knop: **“Andere verdeling kiezen”**.
+- De actie zet de betreffende balk/taart terug naar één volledig geheel. Eerder verwijderde delen van die eenheid worden daarbij hersteld; daarna kan opnieuw in 2, 3 of 4 delen worden verdeeld.
+- De resetmogelijkheid is dus niet beperkt tot een volledig gevulde verdeelde eenheid.
+- De modelactie `restoreFractionQuantityUnit` en controlleractie `restoreUnit` ondersteunen dit herstel.
+- Browserdekking test zowel het veranderen van 4 naar 2 delen als het opnieuw kiezen nadat al een segment is verwijderd.
+- De herstelactie is centraal gebouwd in `fraction-learning-interface-renderers.js` en `fraction-quantity-model.js`, niet als route-specifieke uitzondering.
+
+**Testcorrectie tijdens implementatie**
+- Een controllerregressie faalde eerst omdat de test na resetten en opnieuw verdelen niet opnieuw een segment verwijderde, terwijl latere assertions nog de toestand na segmentverwijdering verwachtten.
+- De testsequentie is gecorrigeerd om de bedoelde gebruikershandeling expliciet uit te voeren. De productlogica is niet aangepast om een onjuiste verwachting groen te maken.
+
+**Verificatie**
+- Browser proof #781 / run `44133865290`: **GREEN / SUCCESS** op commit `ac74d8caeecb61e73d7505042da6c8b8e3edf825`.
+- Full Regression #3887 / run `44133946044`: **GREEN / SUCCESS** op exact commit `3d11c215318490f64b50cbf21ca43fd85991afe1`.
+- Branch: `refactor/professional-v1`.
+- LIVE `main` is niet gewijzigd. Geen Supabase-wijziging en geen deployment.
+
+**Nog open**
+- De gebruiker wees erop dat het interactieve werkveld (knop en balk/taart) nog te smal is ten opzichte van één hele balk in de visuele doelsom. De maatvoering moet centraal gelijkgetrokken worden.
+- De instructietekst en didactische interactie moeten nog worden herzien conform de gewenste taak: toon twee hele beginbalken; instrueer bijvoorbeeld “Trek nu 1 hele en een half af”; laat de leerling precies die hoeveelheid wegklikken en zichtbaar een half overhouden. De huidige bediening/instructie is nog niet volledig volgens dit ontwerp.
+- De gebruiker verduidelijkte dat breedte prioriteit heeft boven de schermhoogte. Geen verdere hoogte-optimalisatie uitvoeren voordat de breedte en interactieve taak correct zijn.
+- Volgende stap: vóór verdere codewijziging Full Regression controleren; daarna eerst de centrale maatvoering van interactieve balk/knop en de visuele doelsom onderzoeken en met gerichte browsermetingen verifiëren. De taak moet daarna de aftrekhandeling als aftrekhandeling tonen en testen, niet alleen de resthoeveelheid.

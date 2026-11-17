@@ -76,6 +76,15 @@ function divideFractionQuantityUnit(state, unitId, denominator) {
   });
 }
 
+function restoreFractionQuantityUnit(state, unitId) {
+  return updateUnit(state, unitId, unit => {
+    if (!unit.segments.every(Boolean)) {
+      throw new Error("A unit with removed parts must be restored before resetting its division");
+    }
+    return { ...unit, denominator: 1, segments: [true] };
+  });
+}
+
 function setFractionQuantityUnitFilled(state, unitId, filled) {
   if (typeof filled !== "boolean") throw new TypeError("filled must be a boolean");
   return updateUnit(state, unitId, unit => ({ ...unit, segments: Array(unit.denominator).fill(filled) }));
@@ -151,6 +160,6 @@ function areFractionQuantitiesEqual(left, right) {
 
 export {
   FRACTION_QUANTITY_DIVISIONS, assertFractionQuantityState, createFractionQuantityState, divideFractionQuantityUnit,
-  setFractionQuantityUnitFilled, setFractionQuantitySegmentFilled, getFractionQuantityAmount,
+  setFractionQuantityUnitFilled, setFractionQuantitySegmentFilled, restoreFractionQuantityUnit, getFractionQuantityAmount,
   getFractionQuantityRemovedAmount, getFractionQuantityUnitAnnotation, areFractionQuantitiesEqual
 };

@@ -7682,3 +7682,64 @@ De visuele aftreksessie voor het aftrekken van een breukgetal groter dan 1 van e
 ### Volgende concrete stap
 
 Voer een gerichte integratiecontrole uit op de echte Skills-route: controleer dat de overzichtsknop naar de nieuwe oefening leidt, de tien taakbankitems in de juiste volgorde verschijnen, de centrale pagina-/breuktemplate behouden blijft en de oude niveau-1-oefening bereikbaar en functioneel blijft. Voeg alleen gerichte browserdekking toe waar de bestaande regressie deze routegrens nog niet rechtstreeks controleert. Controleer daarbij desktop- en mobiele compactheid en voorkom dat de oefening onnodig scrollen vereist. Eerst opnieuw Full Regression uitvoeren voordat deze volgende bouwstap begint.
+
+
+### Interactieve visuele aftreksessie — Fase E4: volledige somweergave en afwisselende modellen (17 november 2026)
+
+De implementatie is uitgebreid op basis van de expliciet door de gebruiker goedgekeurde vormgeving.
+
+**Oude en nieuwe oefening afzonderlijk**
+- De oorspronkelijke overzichtsregel is hersteld als eerste item met de oorspronkelijke route `whole-minus-mixed-subtraction`.
+- De nieuwe oefening staat als afzonderlijk tweede item: “Breukgetal groter dan 1 aftrekken van een heel getal — visueel oefenen”, met route `whole-minus-greater-than-one-subtraction`.
+- De oude oefening is niet hernoemd of vervangen; beide hebben een eigen zichtbare knop en route.
+- Historische reconstructie: op commit `8e499aea47bc1710f0115d6814f1505dc846c964` verwees het oorspronkelijke eerste overzichtsitem naar `whole-minus-mixed-subtraction`. De huidige nieuwe route was daar nog niet aanwezig.
+
+**Volledige somweergave**
+- De symbolische som blijft zichtbaar met de bestaande gestapelde breuknotatie.
+- Daaronder toont een centrale visuele compositie de beginhoeveelheid als afzonderlijke hele modellen, daarna het minteken, de af te trekken hele eenheden plus het breukdeel, vervolgens het gelijkteken en vraagteken.
+- Voor de eerste som betekent dit: twee hele balken, min één hele balk en één halfgevulde balk, is gelijk aan vraagteken.
+- Iedere hele eenheid heeft de annotatie 1; ieder breukmodel heeft een gestapelde teller/noemer-annotatie die overeenkomt met de gevulde delen.
+- De volledige somweergave blijft zichtbaar terwijl de leerling de aftrekking uitvoert.
+
+**Interactieve uitvoering**
+- In een afzonderlijk werkveld verschijnen opnieuw alle oorspronkelijke hele balken of taartmodellen.
+- De leerling kan het hele model direct aanklikken om het te selecteren; de bestaande selectiebesturing blijft eveneens beschikbaar.
+- Na selectie kiest de leerling een verdeling in 2, 3 of 4 gelijke delen.
+- Daarna kan de leerling de afzonderlijke delen aanklikken om ze leeg te maken.
+- De annotatie blijft gekoppeld aan de actuele gevulde delen. De noemer blijft alle oorspronkelijke gelijke delen tellen.
+- De renderer toont zowel de afgetrokken als de overgebleven hoeveelheid.
+- De sessie controleert nu expliciet de exacte verwijderde hoeveelheid tegen de gevraagde aftrekhoeveelheid; de resterende hoeveelheid wordt daarnaast getoond.
+
+**Afwisselende representaties**
+- De tien taken in de centrale taakbank wisselen per afzonderlijke som af: bar, pie, bar, pie, enzovoort.
+- Binnen één som gebruikt zowel de bronweergave als de interactieve weergave exact dezelfde representatie.
+- Balken en taartpunten worden nooit in één som gecombineerd.
+- De taakbank blijft de bron van de representatiekeuze; de gedeelde renderer gebruikt de centrale representatiecontracten.
+- De centrale Fraction Practice Design System v0.1 is aangevuld met sectie 15 voor deze som- en interactieregels.
+
+**Gewijzigde onderdelen**
+- `pacogo-engine/fraction-learning-interface-renderers.js`
+- `pacogo-engine/fraction-quantity-subtraction-practice.js`
+- `pacogo-engine/fraction-quantity-subtraction-session.js`
+- `pacogo-engine/fraction-quantity-whole-minus-greater-than-one-task-bank.js`
+- bijbehorende taakbank- en sessietests
+- `pacogo-engine/fraction-learning-interface-contract.js`
+- `pacogo-engine/fraction-learning-interface.css` is niet gewijzigd; bestaande centrale stijlen worden hergebruikt.
+- `src/features/skills/runtime.js`
+- `docs/curriculum/PacoGO_Fraction_Practice_Interface_Design_System_v0.1.md`
+
+**Branch en verificatie**
+- Branch: `refactor/professional-v1`.
+- Laatste codecommit op dit moment: `2298987c6b2c8d07709ef63d13940a332c1097e6`.
+- De voorafgaande Full Regression #3852 / run `44100295707` was GREEN op de toenmalige commit `19cfe3240636ee0856a73c005b3c5d81f9d7d5be`.
+- **Full Regression is nog NIET uitgevoerd of geverifieerd op de nieuwe implementatiecommits.** De gecombineerde statuscontrole en beschikbare commit-workflow-opvraag leverden geen nieuwe regressierun of checks op. Er mag dus niet worden gemeld dat de nieuwe implementatie groen is.
+- Ook de gerichte browserregressie voor de twee afzonderlijke overzichtsitems, de volledige visuele som, directe modelselectie, verdelen, leegmaken en de wisseling tussen bar/pie moet nog worden uitgevoerd.
+- LIVE `main` is niet gewijzigd. Geen Supabase-wijziging en geen deployment.
+
+**Volgende concrete stap**
+1. Voer Full Regression uit op de actuele branch-head en controleer de exacte commit.
+2. Bij rood: stoppen en de exacte oorzaak isoleren; niet patchen op symptoomniveau.
+3. Voeg/controleer gerichte browserdekking voor de oude en nieuwe route, de bron-somweergave, de interactiestappen, annotaties en afwisselende representaties.
+4. Controleer de echte Skills-route in PacoGO TEST op desktop en mobiel.
+5. Laat de gebruiker de visuele uitvoering beoordelen.
+6. Werk deze handoff opnieuw bij met de geverifieerde commit en werkelijke regressiestatus. De handoff-update zelf moet ook worden geverifieerd.

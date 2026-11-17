@@ -36,7 +36,7 @@ for (const representation of ["pie", "bar"]) {
     await expect(page.locator(".fraction-quantity-subtraction-prompt")).toContainText("Trek nu 1 hele en een half af.");
     await expect(page.locator(".fraction-quantity-subtraction-prompt")).toContainText("Verdeel een eenheid in gelijke delen");
     await expect(page.locator(".fraction-quantity-subtraction-expression--visual .pacogo-fraction-quantity__annotation")).toHaveCount(4);
-    await expect(page.locator(".pacogo-fraction-quantity__annotated-unit")).toHaveCount(2);
+    await expect(page.locator(".fraction-quantity-subtraction-model .pacogo-fraction-quantity__annotated-unit")).toHaveCount(2);
     await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Over: 2");
     await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Afgetrokken: 0");
 

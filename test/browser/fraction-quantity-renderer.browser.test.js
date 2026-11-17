@@ -65,7 +65,7 @@ for (const representation of ['pie', 'bar']) {
     await expect(firstSegment).toHaveAttribute('aria-label', 'Vul: deel 1');
     await firstSegment.focus();
     await firstSegment.press('Enter');
-    await expect(annotation).toHaveAttribute('aria-label', '1 van 3 delen gevuld');
+    await expect(annotation).toHaveAttribute('aria-label', '3 van 3 delen gevuld');
     await expect(firstSegment).toHaveAttribute('aria-label', 'Maak leeg: deel 1');
     await firstSegment.click();
     await expect(annotation).toHaveAttribute('aria-label', '2 van 3 delen gevuld');

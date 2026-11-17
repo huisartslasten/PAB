@@ -818,7 +818,7 @@
   justify-items: center;
   align-content: start;
   gap: 5px;
-  min-width: 62px;
+  min-width: 116px;
 }
 .pacogo-fraction-quantity__select {
   min-height: 28px;
@@ -966,7 +966,7 @@
     gap: 7px;
   }
   .pacogo-fraction-quantity__annotated-unit {
-    min-width: 52px;
+    min-width: 88px;
   }
   .pacogo-fraction-quantity[data-representation="pie"] .pacogo-fraction-quantity__model {
     width: 88px;

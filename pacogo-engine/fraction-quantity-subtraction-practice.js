@@ -105,7 +105,9 @@ function createFractionQuantitySubtractionPractice({
     template.workArea.append(createElement(
       "p",
       "fraction-quantity-subtraction-prompt",
-      "Voer dezelfde aftrekking hieronder uit. Klik op een hele balk of taart om deze te verdelen. Klik daarna op de delen die je wilt aftrekken. De breukannotatie blijft bij ieder model zichtbaar."
+      "Trek nu " + task.subtraction.whole + (task.subtraction.whole === 1 ? " hele" : " hele") +
+        (task.subtraction.numerator > 0 ? " en " + task.subtraction.numerator + "/" + task.subtraction.denominator : "") +
+        " af. Klik op de hele balk die je wilt weghalen. Voor een half of ander deel verdeel je eerst een balk."
     ));
 
     const rendererMount = createElement("div", "fraction-quantity-subtraction-model");
@@ -116,8 +118,8 @@ function createFractionQuantitySubtractionPractice({
       representation: taskRepresentation,
       labels: {
         unit: "Eenheid",
-        quantity: "Overgebleven hoeveelheid",
-        divide: "Verdeel de geselecteerde eenheid"
+        quantity: "Over",
+        divide: "Kies hoe je de balk verdeelt"
       }
     });
 
@@ -147,7 +149,7 @@ function createFractionQuantitySubtractionPractice({
       hasCheck = true;
       if (result.correct) {
         checkButton.disabled = true;
-        const feedback = createElement("p", "fraction-practice-feedback is-correct", "Goed gedaan! De overgebleven hoeveelheid klopt.");
+        const feedback = createElement("p", "fraction-practice-feedback is-correct", "Goed gedaan! Je hebt precies de gevraagde hoeveelheid afgetrokken.");
         feedback.setAttribute("role", "status");
         template.feedbackArea.replaceChildren(feedback);
         const next = createElement(
@@ -164,7 +166,7 @@ function createFractionQuantitySubtractionPractice({
         });
         template.actionsArea.replaceChildren(next);
       } else {
-        const feedback = createElement("p", "fraction-practice-feedback is-error", "Nog niet. Kijk welke eenheden en delen je hebt weggehaald en probeer opnieuw.");
+        const feedback = createElement("p", "fraction-practice-feedback is-error", "Nog niet. Je hebt nog niet precies de gevraagde hoeveelheid weggehaald. Probeer opnieuw.");
         feedback.setAttribute("role", "alert");
         template.feedbackArea.replaceChildren(feedback);
       }

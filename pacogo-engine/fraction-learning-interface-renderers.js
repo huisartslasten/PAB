@@ -348,7 +348,7 @@ function renderFractionQuantityLearningInterface({
         (snapshot.selectedUnitId === unit.id ? " is-selected" : "");
       select.setAttribute("aria-pressed", String(snapshot.selectedUnitId === unit.id));
       select.setAttribute("aria-label", "Selecteer eenheid " + (snapshot.state.units.indexOf(unit) + 1));
-      select.textContent = "Selecteer";
+      select.textContent = "Verdelen";
       select.addEventListener("click", () => {
         controller.selectUnit(unit.id);
         instructions.textContent = "Gekozen. Kies hoe je deze balk wilt verdelen.";

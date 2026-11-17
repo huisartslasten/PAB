@@ -187,7 +187,7 @@ test("real Skills route mounts the central fraction template and the approved te
   expect(result.layoutMode).toBe("practice");
   expect(result.practiceBodyClass).toBe(true);
   expect(result.heroDisplay).toBe("none");
-  expect(result.sidebarCardDisplay).toBe("none");
+  expect(result.sidebarCardDisplay).toBe("flex");
   expect(result.backButtonVisible).toBe(true);
   expect(result.pageHeaderHeight).toBeLessThanOrEqual(60);
   expect(result.scrollY).toBe(0);
@@ -226,7 +226,7 @@ test("real visual subtraction route fits the mobile viewport in central practice
   expect(result.centralPage).toBe(true);
   expect(result.layoutMode).toBe("practice");
   expect(result.heroDisplay).toBe("none");
-  expect(result.sidebarCardDisplay).toBe("none");
+  expect(result.sidebarCardDisplay).toBe("flex");
   expect(result.backButtonVisible).toBe(true);
   expect(result.pageHeaderHeight).toBeLessThanOrEqual(52);
   expect(result.scrollY).toBe(0);

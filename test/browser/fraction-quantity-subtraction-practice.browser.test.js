@@ -30,7 +30,7 @@ for (const representation of ["pie", "bar"]) {
     await expect(page.getByText("Som 1 van 10 · 0 afgerond")).toBeVisible();
     await expect(page.getByLabel("Aftreksom", { exact: true })).toBeVisible();
     await expect(page.locator(".fraction-quantity-subtraction-expression--visual")).toBeVisible();
-    await expect(page.locator(".fraction-quantity-subtraction-expression--visual .pacogo-fraction-quantity__annotation")).toHaveCount(3);
+    await expect(page.locator(".fraction-quantity-subtraction-expression--visual .pacogo-fraction-quantity__annotation")).toHaveCount(4);
     await expect(page.locator(".pacogo-fraction-quantity")).toHaveAttribute("data-representation", representation);
     await expect(page.locator(".pacogo-fraction-quantity .pacogo-fraction-quantity__annotation")).toHaveCount(2);
 

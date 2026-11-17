@@ -7612,3 +7612,36 @@ Stel eerst de inhoudelijke taakconfiguratie van de tien sommen vast vanuit de be
 
 Vóór de volgende bouwstap opnieuw Full Regression controleren. De laatste geverifieerde codecommit is `1aa5d413a99407a2666287e46e6ec60d7dea4f56`, Full Regression #3843 groen. Deze handoff-update moet op haar eigen commit eveneens Full Regression groen doorlopen.
 
+### Interactieve visuele aftreksessie — Fase E2b: domein-neutrale sessiekern (17 november 2026)
+
+De gedeelde voortgangs-/sessiekern is losgemaakt van de aftrek- en breukterminologie, zodat deze later door meerdere oefendomeinen kan worden gebruikt.
+
+- Nieuw `pacogo-engine/practice-session-core.js`: domein-neutrale kern voor geordende taken, pogingen, voortgang, automatische of expliciete voltooiing, ongedaan maken van een nog niet afgeronde expliciete controle, toestandssnapshot en reset.
+- De kern interpreteert de inhoud van taakobjecten niet. De oefenadapter blijft verantwoordelijk voor taakvalidatie, rekenregels, antwoordclassificatie, feedback en eventuele opslag.
+- De kern bevat geen curriculum-, skill-, evidence-, mastery-, learner-state- of Supabase-logica.
+- `fraction-quantity-subtraction-session.js` gebruikt nu de generieke kern voor de tien visuele aftreksommen.
+- De bestaande niveau-1-oefening `fraction-whole-minus-mixed-subtraction-session.js` gebruikt eveneens de generieke kern; haar taakbank, antwoordregels en bestaande opslagcontract zijn behouden.
+- De oude module `fraction-subtraction-session-core.js` blijft als tijdelijke compatibiliteitslaag bestaan en exporteert de generieke kern onder de oude naam. Bestaande imports worden niet abrupt gebroken.
+- Nieuwe `practice-session-core.test.js` test de kern met taakobjecten uit verschillende domeinen (onder meer optellen en kloklezen), expliciete/automatische voltooiing, pogingregistratie, voortgang, herstel, reset en ongeldige invoer.
+- De bestaande aftreksessie-tests zijn aangepast aan de expliciete foutmelding van het generieke contract; er is geen productieregel versoepeld om tests groen te maken.
+
+### Verificatie Fase E2b
+
+- Branch: `refactor/professional-v1`.
+- Generieke kern en adapters: commit `77258448b66be964a2ce8ae9e454c7e4014d6cb1`; Full Regression #3848 / run `44092161119`: **RED** door twee verouderde foutmelding-asserties in bestaande tests.
+- De testverwachtingen zijn afgestemd op de nieuwe generieke contractmelding. Definitieve code-/testcommit: `8e499aea47bc1710f0115d6814f1505dc846c964`.
+- Full Regression #3849 / run `44092384490`: **GREEN / SUCCESS** op exact commit `8e499aea47bc1710f0115d6814f1505dc846c964`. De volledige workflow is geslaagd: curriculum-engine-regressie, architectuurgrenzen, Double or Nothing, maintained Node, Vitest, Chromium/browserregressie en clean-working-tree-controle.
+- `main` is onaangeraakt. Geen Supabase-wijziging en geen deployment.
+
+### Volgende stap — Fase E3: inhoudelijke taakbank en Skills-integratie
+
+De visuele sessiepresentatie bestaat en is browsergetest, maar is nog niet aan een leerlingroute gekoppeld. De taakbank met tien productieopgaven is evenmin vastgesteld.
+
+- De huidige quantity-model ondersteunt 1–12 hele eenheden en verdelingen in 2, 3 of 4 gelijke delen. Een productie-taakbank moet binnen deze contractgrenzen passen, tenzij een centrale modeluitbreiding inhoudelijk en technisch wordt onderbouwd en getest.
+- De diagnostische F3-opgave `1/2 − 2/5` is geen goedgekeurde taakbank voor deze visuele sessie en gebruikt bovendien noemer 5, die niet door de huidige quantity-modelconfiguratie wordt ondersteund. Hergebruik deze opgave dus niet stilzwijgend.
+- Er is in de repository geen goedgekeurde bron gevonden met de definitieve tien waarden voor deze specifieke visuele aftreksessie. Verzin daarom geen productie-taakbank.
+- De eerstvolgende inhoudelijke stap is het vaststellen/goedkeuren van de tien sommen en de didactische volgorde op basis van de bedoelde bron of expliciete inhoudelijke beslissing.
+- Daarna wordt één centrale, versieerbare taakbank toegevoegd en vanuit de bestaande Skills-runtime gekoppeld via de bestaande breuken-/aftrekoverzichtsroute. De centrale PacoGO-paginatemplate, Fraction Practice Template, quantity-renderer en generieke sessiekern blijven leidend.
+- Voeg route- en browserregressie toe voor de echte taakbank, inclusief desktop-/mobiele compactheid. Controleer expliciet dat de bestaande niveau-1-aftrekoefening, de afzonderlijke vierstaps-oefening en FR2 backward compatible blijven.
+
+Voor iedere volgende bouwstap eerst de meest recente Full Regression controleren. Laatste geverifieerde codecommit: `8e499aea47bc1710f0115d6814f1505dc846c964`; Full Regression #3849 groen. Deze handoff-update moet op haar eigen commit eveneens Full Regression groen doorlopen.

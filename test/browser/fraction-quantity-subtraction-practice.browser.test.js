@@ -40,7 +40,7 @@ for (const representation of ["pie", "bar"]) {
 
     await page.getByRole("button", { name: "Selecteer eenheid 1" }).click();
     await page.getByRole("button", { name: "2 gelijke delen" }).click();
-    const firstUnit = page.locator(".pacogo-fraction-quantity__annotated-unit").first();
+    const firstUnit = page.locator(".pacogo-fraction-quantity .pacogo-fraction-quantity__annotated-unit").first();
     const segment = representation === "pie"
       ? firstUnit.locator('.pacogo-fraction-quantity__sector[data-segment-index="0"]')
       : firstUnit.locator('.pacogo-fraction-quantity__segment[data-segment-index="0"]');
@@ -61,7 +61,7 @@ for (const representation of ["pie", "bar"]) {
     await next.press("Enter");
     await expect(page.getByText("Som 2 van 10 · 1 afgerond")).toBeVisible();
     await expect(page.locator(".pacogo-fraction-quantity")).toHaveAttribute("data-representation", representation);
-    await expect(page.locator(".pacogo-fraction-quantity__annotation")).toHaveCount(2);
+    await expect(page.locator(".pacogo-fraction-quantity .pacogo-fraction-quantity__annotation")).toHaveCount(2);
     await expect(page.locator('[data-component="fraction-practice-template"]')).toHaveCount(1);
   });
 }

@@ -3,12 +3,23 @@ const FRACTION_SUBTRACTION_EXERCISE = Object.freeze({
   title: "Breukgetal groter dan 1 aftrekken van een heel getal",
   difficultyLevel: 1,
   maxDifficultyLevel: 5,
-  questionCount: 4,
+  questionCount: 15,
   tasks: Object.freeze([
-    { id: "FWS1-01", whole: 8, mixed: { whole: 2, numerator: 5, denominator: 7 }, answer: { whole: 5, numerator: 2, denominator: 7 }, source: "user-screenshot" },
-    { id: "FWS1-02", whole: 6, mixed: { whole: 5, numerator: 4, denominator: 9 }, answer: { whole: 0, numerator: 5, denominator: 9 }, source: "user-screenshot" },
-    { id: "FWS1-03", whole: 6, mixed: { whole: 3, numerator: 3, denominator: 7 }, answer: { whole: 2, numerator: 4, denominator: 7 }, source: "user-screenshot" },
-    { id: "FWS1-04", whole: 9, mixed: { whole: 8, numerator: 6, denominator: 7 }, answer: { whole: 0, numerator: 1, denominator: 7 }, source: "user-screenshot" }
+    { id: "FWS1-01", whole: 7, mixed: { whole: 2, numerator: 3, denominator: 5 }, answer: { whole: 4, numerator: 2, denominator: 5 } },
+    { id: "FWS1-02", whole: 9, mixed: { whole: 4, numerator: 2, denominator: 7 }, answer: { whole: 4, numerator: 5, denominator: 7 } },
+    { id: "FWS1-03", whole: 6, mixed: { whole: 3, numerator: 1, denominator: 4 }, answer: { whole: 2, numerator: 3, denominator: 4 } },
+    { id: "FWS1-04", whole: 8, mixed: { whole: 5, numerator: 3, denominator: 8 }, answer: { whole: 2, numerator: 5, denominator: 8 } },
+    { id: "FWS1-05", whole: 10, mixed: { whole: 6, numerator: 4, denominator: 9 }, answer: { whole: 3, numerator: 5, denominator: 9 } },
+    { id: "FWS1-06", whole: 5, mixed: { whole: 2, numerator: 5, denominator: 6 }, answer: { whole: 2, numerator: 1, denominator: 6 } },
+    { id: "FWS1-07", whole: 12, mixed: { whole: 7, numerator: 3, denominator: 10 }, answer: { whole: 4, numerator: 7, denominator: 10 } },
+    { id: "FWS1-08", whole: 9, mixed: { whole: 3, numerator: 5, denominator: 8 }, answer: { whole: 5, numerator: 3, denominator: 8 } },
+    { id: "FWS1-09", whole: 7, mixed: { whole: 5, numerator: 2, denominator: 3 }, answer: { whole: 1, numerator: 1, denominator: 3 } },
+    { id: "FWS1-10", whole: 11, mixed: { whole: 6, numerator: 5, denominator: 12 }, answer: { whole: 4, numerator: 7, denominator: 12 } },
+    { id: "FWS1-11", whole: 8, mixed: { whole: 4, numerator: 7, denominator: 10 }, answer: { whole: 3, numerator: 3, denominator: 10 } },
+    { id: "FWS1-12", whole: 13, mixed: { whole: 9, numerator: 4, denominator: 11 }, answer: { whole: 3, numerator: 7, denominator: 11 } },
+    { id: "FWS1-13", whole: 6, mixed: { whole: 4, numerator: 5, denominator: 9 }, answer: { whole: 1, numerator: 4, denominator: 9 } },
+    { id: "FWS1-14", whole: 10, mixed: { whole: 8, numerator: 7, denominator: 12 }, answer: { whole: 1, numerator: 5, denominator: 12 } },
+    { id: "FWS1-15", whole: 14, mixed: { whole: 9, numerator: 5, denominator: 8 }, answer: { whole: 4, numerator: 3, denominator: 8 } }
   ].map(task => Object.freeze({
     ...task,
     mixed: Object.freeze({ ...task.mixed }),

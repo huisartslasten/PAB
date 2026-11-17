@@ -7,6 +7,7 @@ test("central bank contains ten tasks of only whole number minus a fraction grea
   assert.equal(bank.tasks.length, 10);
   assert.equal(bank.defaultRepresentation, "bar");
   assert.deepEqual(bank.allowedDivisions, [2, 3, 4]);
+  assert.deepEqual(bank.tasks.map(task => task.representation), ["bar", "pie", "bar", "pie", "bar", "pie", "bar", "pie", "bar", "pie"]);
   const ids = new Set();
   for (const task of bank.tasks) {
     assert.equal(ids.has(task.id), false);

@@ -3,7 +3,7 @@ import { createFractionQuantityLearningInterfaceConfig } from "./fraction-learni
 import { createFractionQuantitySubtractionSession } from "./fraction-quantity-subtraction-session.js";
 import {
   renderMixedNumber,
-   renderFractionQuantityLearningInterface
+  renderFractionQuantityLearningInterface
 } from "./fraction-learning-interface-renderers.js";
 
 function renderSubtractionAmount(amount, documentRef) {
@@ -26,7 +26,7 @@ function createFractionQuantitySubtractionPractice({
   representation = "pie",
   allowedDivisions = [2, 3, 4],
   title = "Visueel aftrekken",
-  instruction = "Trek de aangegeven hoeveelheid af door de juiste eenheden of delen leeg te maken.",
+  instruction = null,
   documentRef = document
 } = {}) {
   if (!mount || typeof mount.replaceChildren !== "function") {
@@ -54,7 +54,7 @@ function createFractionQuantitySubtractionPractice({
     const card = createElement("section", "card fraction-quantity-subtraction-card");
     const template = createFractionPracticeTemplate({ mount: card });
     template.titleArea.append(createElement("h2", "", title));
-    template.instructionArea.append(createElement("p", "fraction-practice-instruction", instruction));
+    if (instruction) template.instructionArea.append(createElement("p", "fraction-practice-instruction", instruction));
     template.progressArea.append(createElement("p", "fraction-practice-progress", "10 van 10 sommen afgerond"));
     template.workArea.append(createElement("p", "fraction-practice-complete", "Je hebt alle 10 sommen afgerond. Goed gewerkt!"));
     currentCard = card;

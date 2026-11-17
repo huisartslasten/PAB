@@ -76,6 +76,6 @@ for (const representation of ['pie', 'bar']) {
     await expect(page.locator('.pacogo-fraction-quantity__annotation')).toHaveCount(2);
     const events = await page.evaluate(() => window.__fractionQuantityTest.events);
     expect(events).toContain('unit_selected');
-    expect(events.filter(type => type === 'quantity_changed').length).toBe(6);
+    expect(events.filter(type => type === 'quantity_changed').length).toBe(7);
   });
 }

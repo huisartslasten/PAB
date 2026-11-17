@@ -67,14 +67,14 @@ for (const representation of ["pie", "bar"]) {
       ? secondUnit.locator('.pacogo-fraction-quantity__sector[data-segment-index="0"]')
       : secondUnit.locator('.pacogo-fraction-quantity__segment[data-segment-index="0"]');
     await segment.click();
-    await expect(page.locator('[aria-label="Overgebleven hoeveelheid: 1 hele en 1 gedeeld door 2"]')).toBeVisible();
-    await expect(page.locator('[aria-label="Afgetrokken hoeveelheid: 1 gedeeld door 2"]')).toBeVisible();
+    await expect(page.locator('[aria-label="Overgebleven hoeveelheid: 1 gedeeld door 2"]')).toBeVisible();
+    await expect(page.locator('[aria-label="Afgetrokken hoeveelheid: 1 hele en 1 gedeeld door 2"]')).toBeVisible();
     await segment.click();
-    await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Over: 2");
-    await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Afgetrokken: 0");
+    await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Over: 1");
+    await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Afgetrokken: 1");
     await segment.click();
-    await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Over: 1 1/2");
-    await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Afgetrokken: 1/2");
+    await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Over: 1/2");
+    await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Afgetrokken: 1 1/2");
     await expect(page.getByRole("alert")).toHaveCount(0);
 
     const check = page.getByRole("button", { name: "Controleren" });

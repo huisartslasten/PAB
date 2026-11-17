@@ -178,7 +178,8 @@ export function createSkillsRuntime({
 
   function renderFractionSubtractionOverview() {
     const items = [
-      { label: 'Breukgetal groter dan 1 aftrekken van een heel getal', level: 1 },
+      { label: 'Breukgetal groter dan 1 aftrekken van een heel getal', level: 1, exercise: 'whole-minus-mixed-subtraction' },
+      { label: 'Breukgetal groter dan 1 aftrekken van een heel getal — visueel oefenen', level: 1, exercise: 'whole-minus-greater-than-one-subtraction' },
       { label: 'Gelijknamige breuken kleiner dan 1 van elkaar aftrekken', level: 1 },
       { label: 'Gelijknamige breuken groter dan 1 van elkaar aftrekken', level: 2 },
       { label: 'Ongelijknamige breuken kleiner dan 1 van elkaar aftrekken', level: 3 },
@@ -206,14 +207,14 @@ export function createSkillsRuntime({
       label.className = 'skills-addition-overview-label';
       label.textContent = item.label;
       row.append(difficulty, label);
-      if (index === 0) {
+      if (item.exercise) {
         const open = documentRef.createElement('button');
         open.type = 'button';
         open.className = 'paco-btn paco-btn--primary paco-btn--small skills-addition-overview-open';
         open.textContent = 'Oefenen';
         open.addEventListener('click', () => navigate(buildViewUrl('skills.html', {
           student, mode: context?.mode,
-          extra: { domain: FRACTION_DOMAIN, topic: 'aftrekken', exercise: 'whole-minus-greater-than-one-subtraction' }
+          extra: { domain: FRACTION_DOMAIN, topic: 'aftrekken', exercise: item.exercise }
         })));
         row.append(open);
       }

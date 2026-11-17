@@ -8020,3 +8020,30 @@ Laatste browserdiagnostiek op commit `16cd0061a6f62d632a362907d97b15b38506b6c1`:
 1. Verifieer deze handoff-update met Full Regression op de exacte nieuwe commit.
 2. Daarna de gebruiker de 15-sommen-oefening visueel laten controleren in PacoGO TEST.
 3. Geen extra inhoudelijke sommen of layoutwijzigingen toevoegen zonder de volgende expliciete opdracht.
+
+### Skills-route koppeling — gelijknamige breuken kleiner dan 1 aftrekken (17 november 2026)
+
+**Oorzaak**
+- De 15-sommen-taakbank en oefenpagina waren aanwezig, maar de centrale Skills-aftrekcatalogus kende aan deze rij nog geen oefenroute toe.
+- De overzichtspagina maakte daardoor geen knop **Oefenen**. De bestaande browsertest controleerde alleen de twee oudere knoppen en miste deze nieuwe rij.
+
+**Oplossing**
+- De centrale Skills-catalogus koppelt de rij nu aan de route-ID like-denominator-subtraction.
+- De centrale Skills-runtime opent de oefening als practice-route, gebruikt de bestaande createFractionLikeDenominatorSubtractionSession, renderFractionOperation, renderFractionPracticeExpression en de centrale Fraction Practice Template.
+- De bestaande Skills-pagina, centrale PacoGO Page Template, terugnavigatie en leerlingcontext blijven behouden. Er is geen aparte paginatemplate toegevoegd.
+- De 15 sommen blijven in de bestaande centrale taakbank en de voortgang blijft per leerling lokaal opgeslagen.
+- Browserdekking controleert nu de derde Oefenen-knop, de route, de centrale practice-template, de eerste som, een correct antwoord en de overgang naar som 2 van 15.
+
+**Verificatie**
+- Branch: refactor/professional-v1.
+- Code-/testcommit: 2f5f05dde836eb1b62f6e62105f2e357e4d97410.
+- Full Regression #3932 / run 44199114431: **GREEN / SUCCESS** op exact deze commit; alle stappen geslaagd, inclusief volledige browserregressie en clean-working-tree-controle.
+- LIVE main is niet gewijzigd. Geen deployment en geen Supabase-wijziging.
+
+**Volgende concrete stap**
+- Laat de gebruiker de lokale ontwikkelbranch bijwerken naar de actuele branch-HEAD en de Skills-pagina opnieuw laden.
+- Controleer dat de derde rij nu de knop **Oefenen** toont en dat deze naar Som 1 van 15 leidt.
+- Geen nieuwe curriculum- of taakbankwijziging uitvoeren voordat deze route visueel is gecontroleerd.
+
+**Handoff-verificatie**
+- Deze handoff-update vereist Full Regression op de exacte resulterende commit; rapporteer de uitkomst pas nadat die run is afgerond.

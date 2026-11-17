@@ -21,6 +21,28 @@ async function mountPractice(page, representation, subtraction = { whole: 1, num
   }, { representationValue: representation, subtractionValue: subtraction });
 }
 
+test("a whole pie is rendered as one continuous circle without a radial divider", async ({ page }) => {
+  await page.goto("http://127.0.0.1:4173/skills.html", { waitUntil: "domcontentloaded" });
+  const result = await page.evaluate(async () => {
+    const { renderFractionRepresentation } =
+      await import("/pacogo-engine/fraction-learning-interface-renderers.js");
+    const whole = renderFractionRepresentation(
+      { numerator: 1, denominator: 1 },
+      "area_model",
+      "Eén heel",
+      { layout: "pie", documentRef: document }
+    );
+    const path = whole.querySelector(".pacogo-fraction-pie__sector");
+    return {
+      pathCount: whole.querySelectorAll(".pacogo-fraction-pie__sector").length,
+      path: path?.getAttribute("d") || ""
+    };
+  });
+  expect(result.pathCount).toBe(1);
+  expect(result.path).toBe("M 50 4 A 46 46 0 1 1 50 96 A 46 46 0 1 1 50 4 Z");
+  expect(result.path).not.toContain("L 50 50");
+});
+
 for (const representation of ["pie", "bar"]) {
   test("central visual subtraction practice " + representation + " uses the shared fraction template and explicit task progression", async ({ page }) => {
     await mountPractice(page, representation);
@@ -33,6 +55,12 @@ for (const representation of ["pie", "bar"]) {
     await expect(page.locator(".fraction-quantity-subtraction-model .pacogo-fraction-quantity__annotated-unit")).toHaveCount(2);
     await expect(page.locator(".fraction-quantity-subtraction-model .pacogo-fraction-quantity")).toHaveAttribute("data-representation", representation);
     await expect(page.locator(".fraction-quantity-subtraction-model .pacogo-fraction-quantity__annotation")).toHaveCount(2);
+    if (representation === "pie") {
+      const wholePiePaths = page.locator(".fraction-quantity-subtraction-model .pacogo-fraction-quantity__sector");
+      await expect(wholePiePaths).toHaveCount(2);
+      await expect(wholePiePaths.first()).toHaveAttribute("d", "M 50 4 A 46 46 0 1 1 50 96 A 46 46 0 1 1 50 4 Z");
+      await expect(wholePiePaths.nth(1)).toHaveAttribute("d", "M 50 4 A 46 46 0 1 1 50 96 A 46 46 0 1 1 50 4 Z");
+    }
     await expect(page.locator(".fraction-quantity-subtraction-prompt")).toContainText("Trek nu 1 hele en een half af.");
     await expect(page.locator(".fraction-quantity-subtraction-prompt")).toContainText("Verdeel een eenheid in gelijke delen");
     await expect(page.locator(".fraction-quantity-subtraction-model .pacogo-fraction-quantity__annotated-unit")).toHaveCount(2);

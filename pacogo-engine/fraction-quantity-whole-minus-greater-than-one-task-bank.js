@@ -8,8 +8,8 @@
 const FRACTION_QUANTITY_WHOLE_MINUS_GREATER_THAN_ONE_TASK_BANK = Object.freeze({
   version: "0.1.0",
   exerciseId: "whole-minus-greater-than-one-subtraction",
-  title: "Breukgetal groter dan 1 aftrekken van een heel getal",
-  instruction: "Verwijder het breukgetal uit het hele getal. Verdeel de gehelen in gelijke delen en maak de gevraagde delen leeg.",
+  title: "Trek een breuk af",
+  instruction: "Haal het getal dat je ziet weg. Klik hele balken weg. Verdeel een balk als je een stukje moet aftrekken.",
   defaultRepresentation: "bar",
   allowedDivisions: Object.freeze([2, 3, 4]),
   tasks: Object.freeze([

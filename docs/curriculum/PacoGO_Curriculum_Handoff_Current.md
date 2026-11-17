@@ -7902,3 +7902,52 @@ Laatste browserdiagnostiek op commit `16cd0061a6f62d632a362907d97b15b38506b6c1`:
 - Verander de layout niet opnieuw zonder een concreet geconstateerd probleem. Als er een wijziging nodig is, onderzoek en wijzig de centrale PacoGO Page Template / Fraction Practice Template, niet een losse route.
 - Daarna pas de volgende inhoudelijke oefen-/taakstap uitvoeren. Voor iedere bouwstap eerst de actuele Full Regression controleren.
 - Deze handoff-update is zelf een repositorywijziging. Start Full Regression op de exacte handoff-updatecommit en rapporteer de uitkomst pas nadat de run volledig is afgerond.
+
+### Correctie aftreksessie — één somnotatie en één interactief visueel werkveld (17 november 2026)
+
+**Gebruikerscorrectie / leidend ontwerpbesluit**
+- De huidige implementatie toont ten onrechte twee visuele weergaven van dezelfde aftreksom: een statische visuele operatie boven de opdracht én daaronder een tweede interactief werkveld. De gebruiker heeft expliciet aangegeven dat dit niet de bedoeling is.
+- De eerdere handoff-tekst die de volledige statische visuele aftreksom naast een afzonderlijk interactief werkveld voorschreef, was onjuist en wordt door deze sectie vervangen.
+- De juiste presentatie bestaat uit precies één symbolische somnotatie en precies één visuele weergave: het interactieve werkveld waarin de leerling de aftrekking zelf uitvoert.
+
+**Exacte gewenste uitvoering**
+- Toon één symbolische som, bijvoorbeeld 2 − 1 ⅓ = ?, met de breuk gestapeld als teller / horizontale breukstreep / noemer.
+- Toon daaronder uitsluitend de oorspronkelijke beginhoeveelheid als precies twee volledige breukenbalken (of twee volledige taartmodellen als de taak de pie-representatie gebruikt).
+- Toon GEEN tweede statische visuele somrij met twee beginbalken, minteken, aftrekhoeveelheid en uitkomstteken. De af te trekken hoeveelheid wordt niet vooraf visueel afgebeeld.
+- De leerling maakt zelf de eerste hele balk wit/leeg.
+- De leerling verdeelt zelf de tweede hele balk in drie gelijke delen.
+- De leerling maakt zelf precies één derde wit/leeg.
+- Het interactieve model toont zo één heel en één derde afgetrokken en twee derde over. Het model, de annotaties en de hoeveelheidsstatus veranderen mee met de handelingen.
+- Er is één visuele representatie per taak: balk OF taart. Tussen afzonderlijke taken mag de taakbank wisselen; binnen één taak nooit mengen.
+
+**Annotaties**
+- De gemengde breuk in de symbolische som heeft één gestapelde breuknotatie.
+- In het ene interactieve werkveld blijven de hoeveelheidannotaties zichtbaar en synchroon met de actuele toestand. Een hele eenheid toont de hele hoeveelheid; na verdeling toont de annotatie de actuele teller en de oorspronkelijke noemer.
+- Er wordt geen tweede reeks statische breukannotaties voor een dubbele bronweergave getoond.
+
+**Exacte technische oorzaak in de huidige code**
+- In pacogo-engine/fraction-quantity-subtraction-practice.js rendert renderCurrentTask() de symbolische vergelijking en roept daarna renderFractionQuantityOperation() aan. Dit voegt de dubbele statische visuele operatie toe aan template.promptArea.
+- Vervolgens rendert dezelfde functie via renderFractionQuantityLearningInterface() nogmaals de oorspronkelijke hele eenheden als interactief werkveld in template.workArea.
+- De dubbele weergave is dus geen CSS-probleem: beide modellen worden bewust afzonderlijk door de practice-adapter gemonteerd. De inhoudelijke oplossing is om de statische visuele operatie te verwijderen uit deze taakpresentatie en het interactieve model als enige visuele werkruimte te behouden. De gedeelde quantity renderer en task/session-contracten moeten de juiste beginhoeveelheid en interacties blijven leveren.
+- Geen implementatie van deze inhoudelijke correctie is nog uitgevoerd. De ontwerpregel is eerst vastgelegd in het centrale Fraction Practice Design System v0.1, sectie 16, en deze handoff.
+
+**Layoutcorrectie LB — afzonderlijk van bovenstaande didactische correctie**
+- De centrale PacoGO Page Template practice-modus behoudt nu de LB, terugknop en navigatie. Op mobiel is de LB compacter gemaakt zonder deze te verbergen.
+- Full Regression #3914 / run 44179497700: GREEN / SUCCESS op exact commit 561f85e874d82b1eb4f07833b047c3d6959a91ad. Alle workflowstappen zijn geslaagd.
+- De eerder geconstateerde fout in #3913 was de mobiele grens voor pageMainTop (<100 px, gemeten 152 px nadat de LB was teruggezet). De centrale mobiele LB is daarna compacter gemaakt; #3914 bevestigt dat de volledige regressie nu groen is.
+
+**Huidige repositorystatus bij deze handoff-correctie**
+- Branch: refactor/professional-v1. LIVE main blijft onaangeraakt.
+- Laatst geverifieerde codecommit: 561f85e874d82b1eb4f07833b047c3d6959a91ad.
+- Laatste geverifieerde Full Regression: #3914 / run 44179497700 — GREEN op die codecommit.
+- Het centrale ontwerpdocument is bijgewerkt in commit 892d033c929d27a50ca449f5859828f812105481. Deze documentcommit moet nog door Full Regression worden geverifieerd samen met de hierop volgende handoff-update.
+- Geen Supabase-wijziging en geen deployment.
+
+**Volgende concrete stappen — verplichte volgorde**
+1. Verifieer de document- en handoff-update met Full Regression op de exacte uiteindelijke commit.
+2. Voor de inhoudelijke bouwstap: controleer eerst opnieuw Full Regression. Bij rood stoppen en de exacte oorzaak onderzoeken.
+3. Pas de centrale Fraction Practice Template / Fraction Learning Interface-adapter aan zodat één symbolische som plus één interactief visueel werkveld wordt getoond. Verwijder de dubbele statische visuele operatie uit deze oefenpresentatie; bouw geen route-specifieke tweede component.
+4. Voeg gerichte browserdekking toe die expliciet bewijst: één symbolische som; één interactief visueel model; geen statische visuele duplicaatrij; exact twee oorspronkelijke eenheden voor 2 − 1 ⅓; eerste eenheid leegmaken; tweede eenheid in drieën verdelen; exact één derde leegmaken; twee derde over; annotaties blijven correct zichtbaar.
+5. Behoud de bestaande oude oefenroute en de centrale taakbank-/representatiecontracten. Verander geen curriculum-, evidence-, mastery- of Supabase-contracten.
+6. Test op desktop en mobiel. Vraag daarna de gebruiker om visuele QA van de echte Skills-route.
+7. Werk na de significante implementatie de handoff bij en verifieer die handoff-commit opnieuw met Full Regression.

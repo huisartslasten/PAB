@@ -38,9 +38,10 @@ for (const representation of ["pie", "bar"]) {
 
     await page.getByRole("button", { name: "Selecteer eenheid 1" }).click();
     await page.getByRole("button", { name: "2 gelijke delen" }).click();
+    const firstUnit = page.locator(".pacogo-fraction-quantity__annotated-unit").first();
     const segment = representation === "pie"
-      ? page.locator('.pacogo-fraction-quantity__sector[data-segment-index="0"]')
-      : page.locator('.pacogo-fraction-quantity__segment[data-segment-index="0"]');
+      ? firstUnit.locator('.pacogo-fraction-quantity__sector[data-segment-index="0"]')
+      : firstUnit.locator('.pacogo-fraction-quantity__segment[data-segment-index="0"]');
     await segment.focus();
     await segment.press("Enter");
     await expect(page.locator(".pacogo-fraction-quantity__annotation").first()).toHaveAttribute("aria-label", "1 van 2 delen gevuld");

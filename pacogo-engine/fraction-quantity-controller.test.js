@@ -39,6 +39,7 @@ assert.equal(controller.getState().state.units[1].denominator, 1);
 assert.equal(controller.getState().amount.whole, 4);
 controller.selectUnit("unit-2");
 controller.divideSelectedUnit(3);
+controller.toggleSegment("unit-2", 0);
 assert.equal(controller.getState().state.units[1].denominator, 3);
 assert.equal(controller.getState().amount.whole, 3);
 assert.equal(controller.getState().amount.numerator, 2);

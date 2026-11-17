@@ -30,7 +30,7 @@ test("checks the exact remaining quantity and requires an explicit advance after
   const session = createFractionQuantitySubtractionSession({ tasks: createTasks() });
   const controller = session.getController();
   assert.equal(session.check().correct, false);
-  assert.throws(() => session.advance(), /correct check is required/);
+  assert.throws(() => session.advance(), /correct current-task check is required/);
 
   controller.selectUnit("unit-1");
   controller.divideSelectedUnit(2);

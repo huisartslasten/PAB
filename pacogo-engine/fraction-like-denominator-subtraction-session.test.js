@@ -14,7 +14,8 @@ function memoryStorage() {
   };
 }
 
-assert.equal(FRACTION_LIKE_DENOMINATOR_SUBTRACTION_TASKS.length, 10);
+assert.equal(FRACTION_LIKE_DENOMINATOR_SUBTRACTION_TASKS.length, 15);
+assert.equal(new Set(FRACTION_LIKE_DENOMINATOR_SUBTRACTION_TASKS.map(task => task.id)).size, 15);
 assert.deepEqual(FRACTION_LIKE_DENOMINATOR_SUBTRACTION_TASKS.slice(0, 4).map(task => [
   task.leftFraction.numerator, task.leftFraction.denominator,
   task.rightFraction.numerator, task.rightFraction.denominator
@@ -37,6 +38,22 @@ assert.equal(a.getCurrentTask().id, "fraction-like-denominator-subtraction-02");
 assert.equal(a.getProgress().completedCount, 1);
 assert.equal(b.getProgress().completedCount, 0);
 assert.equal(a.getProgress().attemptCount, 3);
+
+const completeAll = createFractionLikeDenominatorSubtractionSession({ learnerKey: "learner-complete-all", storage });
+for (let index = 0; index < 15; index += 1) {
+  const current = completeAll.getCurrentTask();
+  assert.equal(current.taskNumber, index + 1);
+  assert.equal(current.totalTasks, 15);
+  const result = completeAll.recordAnswer({
+    numerator: current.result.numerator,
+    denominator: current.result.denominator
+  });
+  assert.equal(result.classification, "valid");
+}
+assert.equal(completeAll.getCurrentTask(), null);
+assert.deepEqual(completeAll.getProgress(), {
+  completedCount: 15, totalCount: 15, attemptCount: 15, isComplete: true
+});
 const [key, raw] = storage.entries()[0];
 assert.match(key, /learner-a/);
 assert.doesNotMatch(raw, /learner-a/);

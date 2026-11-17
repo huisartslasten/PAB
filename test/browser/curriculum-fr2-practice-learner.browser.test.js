@@ -370,13 +370,31 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await expect(page.locator("#subtractionExpression .pacogo-fraction-representation--symbolic")).toHaveCount(1);
   expect(await page.locator("#subtractionExpression").innerText()).not.toMatch(/\d+\s*\/\s*\d+/);
 
+  await page.getByRole("button", { name: "Oefenen met gelijknamige breuken" }).click();
+  await expect(page.locator("#likeDenominatorSubtractionCard")).toBeVisible();
+  await expect(page.locator("#likeDenominatorSubtractionCard > .pacogo-fraction-practice-template")).toHaveCount(1);
+  await expect(page.locator("#likeDenominatorProgress")).toHaveText("Som 1 van 15 • 0 afgerond");
+  await expect(page.locator("#likeDenominatorVisual .pacogo-fraction-operation")).toHaveCount(1);
+  await expect(page.locator("#likeDenominatorVisual .pacogo-fraction-representation--area")).toHaveCount(2);
+  await expect(page.locator("#likeDenominatorExpression .fraction-practice-equation")).toHaveAttribute(
+    "data-expression", "6/7 − 1/7 = ?/?"
+  );
+  await page.getByRole("textbox", { name: "Uitkomstteller" }).fill("5");
+  await page.getByRole("textbox", { name: "Uitkomstnoemer" }).fill("7");
+  await page.getByRole("button", { name: "Controleren" }).last().click();
+  await expect(page.locator("#likeDenominatorProgress")).toHaveText("Som 2 van 15 • 1 afgerond");
+  await page.getByRole("button", { name: "Volgende som" }).click();
+  await expect(page.locator("#likeDenominatorExpression .fraction-practice-equation")).toHaveAttribute(
+    "data-expression", "7/8 − 1/8 = ?/?"
+  );
+
   const state = await page.evaluate(() => ({
     calls: window.__pacoPracticeTest.calls,
-    local: Object.entries(localStorage).filter(([key]) => key.startsWith("pacogo:fraction-practice:") || key.startsWith("pacogo:fraction-construction-practice:") || key.startsWith("pacogo:fraction-addition-practice:") || key.startsWith("pacogo:fraction-result-form-practice:") || key.startsWith("pacogo:fraction-subtraction-practice:"))
+    local: Object.entries(localStorage).filter(([key]) => key.startsWith("pacogo:fraction-practice:") || key.startsWith("pacogo:fraction-construction-practice:") || key.startsWith("pacogo:fraction-addition-practice:") || key.startsWith("pacogo:fraction-result-form-practice:") || key.startsWith("pacogo:fraction-subtraction-practice:") || key.startsWith("pacogo:fraction-like-denominator-subtraction:"))
   }));
   expect(state.calls.filter(call => call[0] === "rpc")).toEqual([]);
   expect(state.calls).toEqual([["select", "learner_profiles"]]);
-  expect(state.local).toHaveLength(5);
+  expect(state.local).toHaveLength(6);
   expect(state.local[0][0]).toContain(learnerKey);
   expect(state.local[0][1]).not.toContain("explanation");
   expect(state.local.find(([key]) => key.startsWith("pacogo:fraction-practice:"))[1]).not.toContain("response");
@@ -442,6 +460,10 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   expect(subtractionState[0]).toContain(learnerKey);
   for (const raw of ['"rawValue":"4"','"rawValue":"20"','"rawValue":"9"','"rawValue":"10"','"rawValue":"7"','"rawValue":"8"','"rawValue":"3"','"rawValue":"2"']) expect(subtractionState[1]).toContain(raw);
   expect(subtractionState[1]).not.toContain(learnerKey);
+  const likeDenominatorState = state.local.find(([key]) => key.startsWith("pacogo:fraction-like-denominator-subtraction:"));
+  expect(likeDenominatorState[0]).toContain(learnerKey);
+  expect(likeDenominatorState[1]).toContain('"fraction-like-denominator-subtraction-01"');
+  expect(likeDenominatorState[1]).not.toContain(learnerKey);
 
   expect(pageErrors).toEqual([]);
 });

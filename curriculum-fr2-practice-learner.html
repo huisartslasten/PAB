@@ -851,7 +851,7 @@
     if (!task) {
       likeDenominatorVisual.replaceChildren();
       likeDenominatorExpression.replaceChildren();
-      likeDenominatorFeedback.textContent = "Je hebt alle tien sommen afgerond. Goed gewerkt!";
+      likeDenominatorFeedback.textContent = "Je hebt alle " + likeDenominatorSession.getProgress().totalCount + " sommen afgerond. Goed gewerkt!";
       updateLikeDenominatorProgress();
       const restart = document.createElement("button");
       restart.type = "button";

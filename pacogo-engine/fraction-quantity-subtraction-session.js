@@ -4,7 +4,7 @@ import {
   areFractionQuantitiesEqual
 } from "./fraction-quantity-model.js";
 import { createFractionQuantityController } from "./fraction-quantity-controller.js";
-import { createFractionSubtractionSessionCore } from "./fraction-subtraction-session-core.js";
+import { createPracticeSessionCore } from "./practice-session-core.js";
 
 const DEFAULT_ALLOWED_DIVISIONS = Object.freeze([2, 3, 4]);
 const REQUIRED_TASK_COUNT = 10;
@@ -95,7 +95,7 @@ function createFractionQuantitySubtractionSession({
 
   const divisions = Object.freeze([...allowedDivisions]);
   const normalizedTasks = normalizeTasks(tasks, divisions);
-  const core = createFractionSubtractionSessionCore({
+  const core = createPracticeSessionCore({
     tasks: normalizedTasks,
     completionMode: "explicit"
   });

@@ -1,4 +1,4 @@
-import { createFractionSubtractionSessionCore } from "./fraction-subtraction-session-core.js";
+import { createPracticeSessionCore } from "./practice-session-core.js";
 
 const FRACTION_SUBTRACTION_EXERCISE = Object.freeze({
   id: "fraction-whole-minus-mixed-level-1",
@@ -78,7 +78,7 @@ function createFractionSubtractionPracticeSession({ learnerKey, storage = global
     return { schemaVersion: 2, completedTaskIds, responsesByTask };
   }
 
-  const core = createFractionSubtractionSessionCore({
+  const core = createPracticeSessionCore({
     tasks: exercise.tasks,
     initialState: readState(),
     completionMode: "automatic",

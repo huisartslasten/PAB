@@ -1,12 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createFractionSubtractionSessionCore } from "./fraction-subtraction-session-core.js";
+import { createPracticeSessionCore } from "./practice-session-core.js";
 
 const tasks = [{ id: "task-1", value: 4 }, { id: "task-2", value: 7 }];
 
 test("shares task ordering, progress and attempt recording", () => {
   const writes = [];
-  const core = createFractionSubtractionSessionCore({ tasks, onStateChange: state => writes.push(state) });
+  const core = createPracticeSessionCore({ tasks, onStateChange: state => writes.push(state) });
   assert.equal(core.getCurrentTask().id, "task-1");
   assert.deepEqual(core.getProgress(), {
     completedCount: 0, totalCount: 2, attemptCount: 0, currentTaskId: "task-1", isComplete: false
@@ -23,7 +23,7 @@ test("shares task ordering, progress and attempt recording", () => {
 });
 
 test("explicit completion requires a correct check and can be invalidated after a model change", () => {
-  const core = createFractionSubtractionSessionCore({ tasks, completionMode: "explicit" });
+  const core = createPracticeSessionCore({ tasks, completionMode: "explicit" });
   core.recordAttempt({ taskId: "task-1", classification: "valid" });
   assert.equal(core.getProgress().completedCount, 0);
   core.invalidatePendingCompletion();
@@ -35,7 +35,7 @@ test("explicit completion requires a correct check and can be invalidated after 
 });
 
 test("restores known progress and ignores task IDs outside the configured task bank", () => {
-  const core = createFractionSubtractionSessionCore({
+  const core = createPracticeSessionCore({
     tasks,
     initialState: {
       completedTaskIds: ["task-1", "unknown", "task-1"],
@@ -51,17 +51,17 @@ test("restores known progress and ignores task IDs outside the configured task b
 });
 
 test("resets shared progress without changing task configuration", () => {
-  const core = createFractionSubtractionSessionCore({ tasks });
+  const core = createPracticeSessionCore({ tasks });
   core.recordAttempt({ taskId: "task-1", classification: "valid" });
   assert.equal(core.reset().completedCount, 0);
   assert.equal(core.getCurrentTask().id, "task-1");
 });
 
 test("rejects invalid tasks, completion modes, and attempts for non-current tasks", () => {
-  assert.throws(() => createFractionSubtractionSessionCore({ tasks: [] }), /At least one/);
-  assert.throws(() => createFractionSubtractionSessionCore({ tasks: [{ id: "same" }, { id: "same" }] }), /unique/);
-  assert.throws(() => createFractionSubtractionSessionCore({ tasks, completionMode: "automatic-next" }), /completionMode/);
-  const core = createFractionSubtractionSessionCore({ tasks });
-  assert.throws(() => core.recordAttempt({ taskId: "task-2", classification: "valid" }), /current subtraction task/);
+  assert.throws(() => createPracticeSessionCore({ tasks: [] }), /At least one/);
+  assert.throws(() => createPracticeSessionCore({ tasks: [{ id: "same" }, { id: "same" }] }), /unique/);
+  assert.throws(() => createPracticeSessionCore({ tasks, completionMode: "automatic-next" }), /completionMode/);
+  const core = createPracticeSessionCore({ tasks });
+  assert.throws(() => core.recordAttempt({ taskId: "task-2", classification: "valid" }), /current practice task/);
   assert.throws(() => core.recordAttempt({ taskId: "task-1", classification: "" }), /classification/);
 });

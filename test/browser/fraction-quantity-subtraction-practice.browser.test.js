@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-async function mountPractice(page, representation) {
+async function mountPractice(page, representation, subtraction = { whole: 1, numerator: 1, denominator: 2 }) {
   await page.goto("http://127.0.0.1:4173/skills.html", { waitUntil: "domcontentloaded" });
   await page.evaluate(async representationValue => {
     const { createFractionQuantitySubtractionPractice } =
@@ -13,7 +13,7 @@ async function mountPractice(page, representation) {
       tasks: Array.from({ length: 10 }, (_, index) => ({
         id: "quantity-subtraction-" + (index + 1),
         wholeUnits: 2,
-        subtraction: { whole: 1, numerator: 1, denominator: 2 }
+        subtraction
       })),
       representation: representationValue
     });
@@ -29,13 +29,12 @@ for (const representation of ["pie", "bar"]) {
     await expect(page.getByRole("heading", { name: "Visueel aftrekken" })).toBeVisible();
     await expect(page.getByText("Som 1 van 10 · 0 afgerond")).toBeVisible();
     await expect(page.getByLabel("Aftreksom", { exact: true })).toBeVisible();
-    await expect(page.locator(".fraction-quantity-subtraction-expression--visual")).toHaveCount(1);
-    await expect(page.locator(".fraction-quantity-subtraction-expression--visual")).toBeVisible();
+    await expect(page.locator(".fraction-quantity-subtraction-expression--visual")).toHaveCount(0);
+    await expect(page.locator(".fraction-quantity-subtraction-model .pacogo-fraction-quantity__annotated-unit")).toHaveCount(2);
     await expect(page.locator(".fraction-quantity-subtraction-model .pacogo-fraction-quantity")).toHaveAttribute("data-representation", representation);
     await expect(page.locator(".fraction-quantity-subtraction-model .pacogo-fraction-quantity__annotation")).toHaveCount(2);
     await expect(page.locator(".fraction-quantity-subtraction-prompt")).toContainText("Trek nu 1 hele en een half af.");
     await expect(page.locator(".fraction-quantity-subtraction-prompt")).toContainText("Verdeel een eenheid in gelijke delen");
-    await expect(page.locator(".fraction-quantity-subtraction-expression--visual .pacogo-fraction-quantity__annotation")).toHaveCount(4);
     await expect(page.locator(".fraction-quantity-subtraction-model .pacogo-fraction-quantity__annotated-unit")).toHaveCount(2);
     await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Over: 2");
     await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Afgetrokken: 0");
@@ -131,7 +130,6 @@ async function mountSkillsRoute(page, { exercise = "whole-minus-greater-than-one
     const sidebarCard = document.querySelector(".paco-template-sidebar-card");
     const backButton = document.querySelector(".paco-template-back");
     const pageHeader = document.querySelector(".paco-template-page-header");
-    const visualExpression = document.querySelector(".fraction-quantity-subtraction-expression--visual");
     const interactiveModel = document.querySelector(".fraction-quantity-subtraction-model .pacogo-fraction-quantity");
     return {
       title: document.querySelector(".paco-template-main h1")?.textContent || "",
@@ -150,12 +148,6 @@ async function mountSkillsRoute(page, { exercise = "whole-minus-greater-than-one
       taskRepresentations: bank.tasks.map(task => task.representation),
       firstTaskProgress: document.querySelector(".fraction-practice-progress")?.textContent || "",
       symbolicExpression: document.querySelector('.fraction-quantity-subtraction-expression[aria-label="Aftreksom"]')?.textContent || "",
-      visualExpression: Boolean(visualExpression),
-      visualRepresentation: visualExpression?.dataset.representation || "",
-      visualUnitCount: visualExpression?.querySelectorAll(".fraction-quantity-subtraction-expression__term .pacogo-fraction-quantity__annotated-unit").length || 0,
-      visualAnnotationCount: visualExpression?.querySelectorAll(".pacogo-fraction-quantity__annotation").length || 0,
-      visualUnitWidth: visualExpression?.querySelector(".pacogo-fraction-quantity__annotated-unit")?.getBoundingClientRect().width || 0,
-      visualModelWidth: visualExpression?.querySelector(".pacogo-fraction-quantity__model")?.getBoundingClientRect().width || 0,
       interactiveRepresentation: interactiveModel?.dataset.representation || "",
       annotationCount: interactiveModel?.querySelectorAll(".pacogo-fraction-quantity__annotation").length || 0,
       interactiveUnitCount: interactiveModel?.querySelectorAll(".pacogo-fraction-quantity__annotated-unit").length || 0,
@@ -202,19 +194,12 @@ test("real Skills route mounts the central fraction template and the approved te
   expect(result.taskRepresentations).toEqual(["bar", "pie", "bar", "pie", "bar", "pie", "bar", "pie", "bar", "pie"]);
   expect(result.firstTaskProgress).toContain("Som 1 van 10");
   expect(result.symbolicExpression).toContain("2");
-  expect(result.visualExpression).toBe(true);
-  expect(result.visualUnitCount).toBe(4);
-  expect(result.visualRepresentation).toBe("bar");
-  expect(result.visualAnnotationCount).toBe(4);
-  expect(result.visualUnitWidth).toBe(116);
-  expect(result.visualModelWidth).toBe(116);
+  expect(result.duplicateVisualExpression).toBe(null);
   expect(result.interactiveRepresentation).toBe("bar");
   expect(result.annotationCount).toBe(2);
   expect(result.interactiveUnitCount).toBe(2);
   expect(result.interactiveUnitWidth).toBe(116);
   expect(result.interactiveBarWidth).toBe(116);
-  expect(result.visualUnitWidth).toBe(result.interactiveUnitWidth);
-  expect(result.visualModelWidth).toBe(result.interactiveBarWidth);
   expect(result.documentWidth).toBeLessThanOrEqual(result.viewportWidth);
 });
 
@@ -235,20 +220,13 @@ test("real visual subtraction route fits the mobile viewport in central practice
   expect(result.cardBottom).toBeLessThanOrEqual(result.viewportHeight);
   expect(result.documentHeight).toBeLessThanOrEqual(result.viewportHeight + 2);
   expect(result.fractionTemplateCount).toBe(1);
-  expect(result.visualExpression).toBe(true);
-  expect(result.visualRepresentation).toBe("bar");
-  expect(result.visualUnitCount).toBe(4);
-  expect(result.visualAnnotationCount).toBe(4);
-  expect(result.visualUnitWidth).toBe(116);
-  expect(result.visualModelWidth).toBe(116);
+  expect(result.duplicateVisualExpression).toBe(null);
   expect(result.interactiveRepresentation).toBe("bar");
   expect(result.annotationCount).toBe(2);
   expect(result.interactiveUnitCount).toBe(2);
   expect(result.documentWidth).toBeLessThanOrEqual(result.viewportWidth);
   expect(result.interactiveUnitWidth).toBe(116);
   expect(result.interactiveBarWidth).toBe(116);
-  expect(result.visualUnitWidth).toBe(result.interactiveUnitWidth);
-  expect(result.visualModelWidth).toBe(result.interactiveBarWidth);
   expect(result.cardWidth).toBeGreaterThan(0);
   expect(result.cardWidth).toBeLessThanOrEqual(result.viewportWidth);
 });
@@ -262,4 +240,38 @@ test("Skills overview keeps the standard page-template layout", async ({ page })
   expect(result.heroDisplay).not.toBe("none");
   expect(result.sidebarCardDisplay).not.toBe("none");
   expect(result.backButtonVisible).toBe(true);
+});
+
+
+test("learner constructs 1 1/3 subtraction in the single interactive visual workspace", async ({ page }) => {
+  await mountPractice(page, "bar", { whole: 1, numerator: 1, denominator: 3 });
+  const equation = page.getByLabel("Aftreksom", { exact: true });
+  const workspace = page.locator(".fraction-quantity-subtraction-model .pacogo-fraction-quantity");
+  const units = workspace.locator(".pacogo-fraction-quantity__annotated-unit");
+
+  await expect(equation).toBeVisible();
+  await expect(equation).toContainText("2");
+  await expect(page.locator(".fraction-quantity-subtraction-expression--visual")).toHaveCount(0);
+  await expect(workspace).toHaveAttribute("data-representation", "bar");
+  await expect(units).toHaveCount(2);
+  await expect(workspace.locator(".pacogo-fraction-quantity__annotation")).toHaveCount(2);
+  await expect(workspace.locator(".pacogo-fraction-quantity__amount")).toContainText("Over: 2");
+  await expect(workspace.locator(".pacogo-fraction-quantity__amount")).toContainText("Afgetrokken: 0");
+
+  const firstBar = units.nth(0).locator(".pacogo-fraction-quantity__segment");
+  await firstBar.click();
+  await expect(workspace.locator(".pacogo-fraction-quantity__amount")).toContainText("Over: 1");
+  await expect(workspace.locator(".pacogo-fraction-quantity__amount")).toContainText("Afgetrokken: 1");
+  await expect(units.nth(0).locator(".pacogo-fraction-quantity__annotation")).toHaveAttribute("aria-label", "0 hele eenheden");
+
+  await units.nth(1).getByRole("button", { name: "Verdelen van eenheid 2" }).click();
+  await page.getByRole("button", { name: "3 delen" }).click();
+  await expect(units.nth(1).locator(".pacogo-fraction-quantity__annotation")).toHaveAttribute("aria-label", "3 van 3 delen gevuld");
+  await expect(units).toHaveCount(2);
+
+  await units.nth(1).locator('.pacogo-fraction-quantity__segment[data-segment-index="0"]').click();
+  await expect(units.nth(1).locator(".pacogo-fraction-quantity__annotation")).toHaveAttribute("aria-label", "2 van 3 delen gevuld");
+  await expect(workspace.locator(".pacogo-fraction-quantity__amount")).toContainText("Over:");
+  await expect(workspace.locator('[aria-label="Overgebleven hoeveelheid: 2 gedeeld door 3"]')).toBeVisible();
+  await expect(workspace.locator('[aria-label="Afgetrokken hoeveelheid: 1 hele en 1 gedeeld door 3"]')).toBeVisible();
 });

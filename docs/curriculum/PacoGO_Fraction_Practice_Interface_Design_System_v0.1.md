@@ -228,3 +228,35 @@ must receive the new selection through configuration; no page-specific renderer
 or duplicated layout switch is permitted. Representation selection remains a
 presentation concern and cannot change mathematical values, validation,
 learner responses, task identity, evidence, mastery or curriculum progression.
+
+
+## 15. Whole-number minus a fraction greater than one — visual subtraction contract
+
+The reusable quantity-subtraction interface MUST present the complete subtraction as one coherent visual equation before the learner starts interacting.
+
+### Source equation
+
+- Show the complete symbolic equation using the shared stacked-fraction notation.
+- Directly with that equation, show the starting whole quantity as individual complete fraction bars or complete pie models.
+- After the subtraction sign, show the subtracted quantity as its whole units plus its fractional part, using the same selected model.
+- Show the equals sign and unknown result.
+- Every complete unit and fractional part has a visible annotation rendered by the shared stacked-fraction/quantity annotation renderer. The annotation must describe the exact quantity represented by its filled model.
+- The source equation remains visible while the learner performs the subtraction.
+
+### Learner interaction field
+
+- Repeat the original starting whole quantity in a separate interaction field.
+- The learner selects a complete, undivided bar or pie model directly, then chooses an allowed equal partition (currently 2, 3 or 4).
+- After division, each individual segment/sector is directly interactive. Emptying a segment changes the filled numerator while the denominator continues to count all original equal parts.
+- An undivided whole unit can be emptied as one complete unit.
+- Keep the stacked annotation beside/below every unit visible and synchronised with its visual state throughout selection, division, clearing, undo/redo and checking.
+- Show both the amount removed and the amount remaining with the shared stacked-fraction renderer.
+- A correct check compares the exact removed quantity with the requested subtraction quantity; it must not accept merely a guessed final answer.
+
+### Representation selection
+
+- Each task selects exactly one area-model layout for both its source equation and its interactive field.
+- Bar and pie models may alternate between separate tasks in the same task bank/session.
+- Never combine bars and pie models in one sum, never switch representation within a task, and never use a different representation between the source equation and its interaction field.
+- Task-level representation is presentation configuration only; it cannot change the mathematical values, validation contract, task identity, evidence, mastery or curriculum decisions.
+- Both source and interactive models must consume the central representation contract and shared renderers. No exercise-local model implementation is permitted.

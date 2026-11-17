@@ -3,8 +3,7 @@ import { createFractionQuantityLearningInterfaceConfig } from "./fraction-learni
 import { createFractionQuantitySubtractionSession } from "./fraction-quantity-subtraction-session.js";
 import {
   renderMixedNumber,
-  renderFractionQuantityOperation,
-  renderFractionQuantityLearningInterface
+   renderFractionQuantityLearningInterface
 } from "./fraction-learning-interface-renderers.js";
 
 function renderSubtractionAmount(amount, documentRef) {
@@ -96,19 +95,10 @@ function createFractionQuantitySubtractionPractice({
     equation.append(renderSubtractionAmount(task.subtraction, documentRef));
     equation.append(createElement("span", "fraction-quantity-subtraction-expression__operator", "="));
     equation.append(createElement("span", "fraction-quantity-subtraction-expression__unknown", "?"));
-    template.promptArea.append(equation, renderFractionQuantityOperation({
-      wholeUnits: task.wholeUnits,
-      subtraction: task.subtraction,
-      representation: taskRepresentation,
-      documentRef
-    }));
-    template.workArea.append(createElement(
-      "p",
-      "fraction-quantity-subtraction-prompt",
-      "Trek nu " + task.subtraction.whole + (task.subtraction.whole === 1 ? " hele" : " hele") +
-        (task.subtraction.numerator > 0 ? " en " + task.subtraction.numerator + "/" + task.subtraction.denominator : "") +
-        " af. Klik op de hele balk die je wilt weghalen. Voor een half of ander deel verdeel je eerst een balk."
-    ));
+    const taskPrompt = createElement("p", "fraction-quantity-subtraction-prompt", "Haal ");
+    taskPrompt.append(renderSubtractionAmount(task.subtraction, documentRef));
+    taskPrompt.append(documentRef.createTextNode(" weg."));
+    template.promptArea.append(equation, taskPrompt);
 
     const rendererMount = createElement("div", "fraction-quantity-subtraction-model");
     template.workArea.append(rendererMount);

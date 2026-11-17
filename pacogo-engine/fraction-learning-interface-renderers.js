@@ -315,7 +315,7 @@ function renderFractionQuantityLearningInterface({
   if (!controller || typeof controller.getState !== "function" ||
       typeof controller.subscribe !== "function" || typeof controller.selectUnit !== "function" ||
       typeof controller.divideUnit !== "function" || typeof controller.setUnitFilled !== "function" ||
-      typeof controller.toggleSegment !== "function" || typeof controller.undo !== "function" ||
+      typeof controller.toggleSegment !== "function" || typeof controller.restoreUnit !== "function" || typeof controller.undo !== "function" ||
       typeof controller.redo !== "function") {
     throw new TypeError("A compatible Fraction quantity controller is required");
   }
@@ -351,7 +351,7 @@ function renderFractionQuantityLearningInterface({
       select.textContent = "Selecteer";
       select.addEventListener("click", () => {
         controller.selectUnit(unit.id);
-        instructions.textContent = "Gekozen. Kies nu hoe je deze eenheid wilt verdelen.";
+        instructions.textContent = "Gekozen. Kies hoe je deze balk wilt verdelen.";
       });
       const item = renderFractionQuantityUnit(unit, config.representation, documentRef,
         (unitId, segmentIndex) => controller.toggleSegment(unitId, segmentIndex),
@@ -369,6 +369,14 @@ function renderFractionQuantityLearningInterface({
       divideLabel.className = "pacogo-fraction-quantity__control-label";
       divideLabel.textContent = config.labels.divide;
       controls.append(divideLabel);
+      if (selected.denominator > 1 && selected.segments.every(Boolean)) {
+        const restore = documentRef.createElement("button");
+        restore.type = "button";
+        restore.className = "paco-btn paco-btn--secondary paco-btn--small";
+        restore.textContent = "Maak weer één hele balk";
+        restore.addEventListener("click", () => controller.restoreUnit(selected.id));
+        controls.append(restore);
+      }
       if (selected.denominator === 1 && selected.segments[0]) {
         config.allowedDivisions.forEach(denominator => {
           const divide = documentRef.createElement("button");
@@ -377,7 +385,7 @@ function renderFractionQuantityLearningInterface({
           divide.textContent = denominator + " gelijke delen";
           divide.addEventListener("click", () => {
             controller.divideUnit(selected.id, denominator);
-            instructions.textContent = "De eenheid is verdeeld. Maak nu de af te trekken delen leeg.";
+            instructions.textContent = "De balk is verdeeld. Klik op de stukken die je wilt aftrekken.";
           });
           controls.append(divide);
         });
@@ -392,7 +400,7 @@ function renderFractionQuantityLearningInterface({
       });
       controls.append(empty);
     } else {
-      controls.append(documentRef.createTextNode("Selecteer een taart of balk."));
+      controls.append(documentRef.createTextNode("Kies een hele balk om te verdelen."));
     }
     const appendAmount = (labelText, value, accessibleLabel) => {
       const row = documentRef.createElement("span");

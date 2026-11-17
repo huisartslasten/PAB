@@ -1,3 +1,4 @@
+import test from "node:test";
 import assert from "node:assert/strict";
 import { createFractionSubtractionSessionCore } from "./fraction-subtraction-session-core.js";
 

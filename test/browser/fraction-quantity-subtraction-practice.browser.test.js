@@ -133,6 +133,10 @@ async function mountSkillsRoute(page) {
       visualUnitCount: visualExpression?.querySelectorAll(".fraction-quantity-subtraction-expression__term .pacogo-fraction-quantity__annotated-unit").length || 0,
       interactiveRepresentation: interactiveModel?.dataset.representation || "",
       annotationCount: interactiveModel?.querySelectorAll(".pacogo-fraction-quantity__annotation").length || 0,
+      interactiveUnitWidth: interactiveModel?.querySelector(".pacogo-fraction-quantity__annotated-unit")?.getBoundingClientRect().width || 0,
+      interactiveSelectWidth: interactiveModel?.querySelector(".pacogo-fraction-quantity__select")?.getBoundingClientRect().width || 0,
+      interactiveBarWidth: interactiveModel?.querySelector(".pacogo-fraction-quantity__model")?.getBoundingClientRect().width || 0,
+      targetBarWidth: visualExpression?.querySelector(".pacogo-fraction-quantity__annotated-unit .pacogo-fraction-quantity__model")?.getBoundingClientRect().width || 0,
       cardWidth: card?.getBoundingClientRect().width || 0,
       cardHeight: card?.getBoundingClientRect().height || 0,
       cardTop: card?.getBoundingClientRect().top || 0,
@@ -166,6 +170,10 @@ test("real Skills route mounts the central fraction template and the approved te
   expect(result.visualUnitCount).toBe(4);
   expect(result.interactiveRepresentation).toBe("bar");
   expect(result.annotationCount).toBe(2);
+  expect(result.targetBarWidth).toBe(116);
+  expect(result.interactiveUnitWidth).toBe(result.targetBarWidth);
+  expect(result.interactiveSelectWidth).toBe(result.targetBarWidth);
+  expect(result.interactiveBarWidth).toBe(result.targetBarWidth);
   expect(result.documentWidth).toBeLessThanOrEqual(result.viewportWidth);
 });
 
@@ -179,6 +187,10 @@ test("real visual subtraction route has no horizontal overflow on a mobile scree
   expect(result.visualRepresentation).toBe("bar");
   expect(result.interactiveRepresentation).toBe("bar");
   expect(result.documentWidth).toBeLessThanOrEqual(result.viewportWidth);
+  expect(result.targetBarWidth).toBe(116);
+  expect(result.interactiveUnitWidth).toBe(result.targetBarWidth);
+  expect(result.interactiveSelectWidth).toBe(result.targetBarWidth);
+  expect(result.interactiveBarWidth).toBe(result.targetBarWidth);
   expect(result.cardWidth).toBeGreaterThan(0);
   expect(result.cardWidth).toBeLessThanOrEqual(result.viewportWidth);
 });

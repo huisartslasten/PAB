@@ -248,7 +248,7 @@ export function createSkillsRuntime({
       if (!task) {
         const done = documentRef.createElement('p');
         done.className = 'fraction-practice-complete';
-        done.textContent = 'Je hebt alle 4 voorbeeldsommen afgerond. Goed gewerkt!';
+        done.textContent = 'Je hebt alle 15 sommen afgerond. Goed gewerkt!';
         template.workArea.append(done);
         content.append(card);
         return;

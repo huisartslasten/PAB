@@ -36,7 +36,9 @@ test("checks the exact remaining quantity and requires an explicit advance after
   controller.divideSelectedUnit(2);
   controller.toggleSegment("unit-1", 0);
   assert.equal(session.getLastCheck(), null, "a changed model invalidates the previous check");
-  assert.equal(session.check().correct, true);
+  const checked = session.check();
+  assert.equal(checked.correct, true);
+  assert.deepEqual(checked.removed, { whole: 0, numerator: 1, denominator: 2, improperNumerator: 1, improperDenominator: 2 });
   const next = session.advance();
   assert.equal(next.currentTask.taskNumber, 2);
   assert.equal(next.progress.completedTaskCount, 1);

@@ -135,7 +135,7 @@ test("real Skills route mounts the central fraction template and the approved te
   expect(result.symbolicExpression).toContain("2");
   expect(result.visualExpression).toBe(true);
   expect(result.visualRepresentation).toBe("bar");
-  expect(result.visualUnitCount).toBe(3);
+  expect(result.visualUnitCount).toBe(4);
   expect(result.interactiveRepresentation).toBe("bar");
   expect(result.annotationCount).toBe(2);
   expect(result.documentWidth).toBeLessThanOrEqual(result.viewportWidth);

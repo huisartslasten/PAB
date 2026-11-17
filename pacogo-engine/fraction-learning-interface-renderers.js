@@ -356,8 +356,11 @@ function renderFractionQuantityLearningInterface({
       const item = renderFractionQuantityUnit(unit, config.representation, documentRef,
         (unitId, segmentIndex) => controller.toggleSegment(unitId, segmentIndex),
         unitId => {
-          controller.selectUnit(unitId);
-          instructions.textContent = "Gekozen. Kies nu hoe je deze eenheid wilt verdelen.";
+          const selectedUnit = snapshot.state.units.find(item => item.id === unitId);
+          if (selectedUnit && selectedUnit.denominator === 1 && selectedUnit.segments[0]) {
+            controller.setUnitFilled(unitId, false);
+            instructions.textContent = "Deze hele balk is afgetrokken.";
+          }
         });
       annotated.append(select, item, renderFractionQuantityAnnotation(annotationByUnit.get(unit.id), documentRef));
       units.append(annotated);

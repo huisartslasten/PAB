@@ -27,7 +27,7 @@ test("explicit completion requires a correct check and can be invalidated after 
   core.recordAttempt({ taskId: "task-1", classification: "valid" });
   assert.equal(core.getProgress().completedCount, 0);
   core.invalidatePendingCompletion();
-  assert.throws(() => core.advance(), /correct current-task check/);
+  assert.throws(() => core.advance(), /successful current-task check/);
   core.recordAttempt({ taskId: "task-1", classification: "valid" });
   core.advance();
   assert.equal(core.getCurrentTask().id, "task-2");

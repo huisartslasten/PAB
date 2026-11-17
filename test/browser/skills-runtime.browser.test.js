@@ -860,3 +860,57 @@ test('fraction subtraction overview keeps the original exercise and adds the sep
   expect(result.navigations[0]).toContain('exercise=whole-minus-mixed-subtraction');
   expect(result.navigations[1]).toContain('exercise=whole-minus-greater-than-one-subtraction');
 });
+
+
+test('fraction practice retains the canonical left sidebar on desktop and mobile', async ({ page }) => {
+  const layouts = [];
+  for (const viewport of [{ width: 1280, height: 800 }, { width: 390, height: 844 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=aftrekken&exercise=whole-minus-greater-than-one-subtraction', { waitUntil: 'domcontentloaded' });
+    const layout = await page.evaluate(async () => {
+      const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+      const templateMount = document.createElement('div');
+      templateMount.id = 'paco-template-mount';
+      document.body.replaceChildren(templateMount);
+      const app = {
+        auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+        authSession: {},
+        managementCapabilities: { getAvailableForPage: () => [] }
+      };
+      const runtime = createSkillsRuntime({
+        app,
+        templateMount,
+        context: { student: 'Zyon', mode: 'student' },
+        domain: 'fractions',
+        topic: 'aftrekken',
+        exercise: 'whole-minus-greater-than-one-subtraction',
+        documentRef: document,
+        navigate: () => {}
+      });
+      await runtime.mount();
+      const sidebarCard = document.querySelector('.paco-template-sidebar-card');
+      const navigation = document.querySelector('.paco-template-navigation');
+      const main = document.querySelector('.paco-template-main');
+      return {
+        layoutMode: document.querySelector('.paco-page-template')?.dataset.layoutMode || '',
+        sidebarVisible: Boolean(sidebarCard && getComputedStyle(sidebarCard).display !== 'none' && sidebarCard.getBoundingClientRect().height > 0),
+        greeting: document.querySelector('.paco-template-greeting')?.textContent || '',
+        navigationItemCount: navigation?.querySelectorAll('.paco-template-nav-item, .paco-template-nav-subitem').length || 0,
+        backButtonVisible: Boolean(document.querySelector('.paco-template-back')?.getBoundingClientRect().height),
+        mainVisible: Boolean(main && main.getBoundingClientRect().width > 0),
+        sidebarCardHeight: sidebarCard?.getBoundingClientRect().height || 0,
+        viewportWidth: innerWidth
+      };
+    });
+    layouts.push({ viewport, ...layout });
+  }
+
+  for (const layout of layouts) {
+    expect(layout.layoutMode).toBe('practice');
+    expect(layout.sidebarVisible).toBe(true);
+    expect(layout.greeting).toContain('Zyon');
+    expect(layout.navigationItemCount).toBeGreaterThan(0);
+    expect(layout.backButtonVisible).toBe(true);
+    expect(layout.mainVisible).toBe(true);
+  }
+});

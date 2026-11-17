@@ -14,6 +14,12 @@ assert.throws(() => controller.divideSelectedUnit(3), /Select a whole unit/);
 controller.selectUnit("unit-2");
 controller.divideSelectedUnit(3);
 assert.equal(controller.getState().state.units[1].denominator, 3);
+controller.restoreUnit("unit-2");
+assert.equal(controller.getState().state.units[1].denominator, 1);
+assert.equal(controller.getState().amount.whole, 4);
+controller.selectUnit("unit-2");
+controller.divideSelectedUnit(3);
+assert.equal(controller.getState().state.units[1].denominator, 3);
 assert.deepEqual(controller.getState().annotations[1], {
   unitId: "unit-2", kind: "fraction", numerator: 3, denominator: 3
 });

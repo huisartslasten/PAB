@@ -3,6 +3,7 @@ import { createFractionQuantityLearningInterfaceConfig } from "./fraction-learni
 import { createFractionQuantitySubtractionSession } from "./fraction-quantity-subtraction-session.js";
 import {
   renderMixedNumber,
+  renderFractionQuantityOperation,
   renderFractionQuantityLearningInterface
 } from "./fraction-learning-interface-renderers.js";
 
@@ -72,6 +73,8 @@ function createFractionQuantitySubtractionPractice({
     renderer = null;
 
     const progress = session.getProgress();
+    const taskConfiguration = tasks.find(item => item.id === task.id) || task;
+    const taskRepresentation = taskConfiguration.representation || representation;
     const card = createElement("section", "card fraction-quantity-subtraction-card");
     const template = createFractionPracticeTemplate({ mount: card });
     template.titleArea.append(createElement("h2", "", title));
@@ -93,19 +96,24 @@ function createFractionQuantitySubtractionPractice({
     equation.append(renderSubtractionAmount(task.subtraction, documentRef));
     equation.append(createElement("span", "fraction-quantity-subtraction-expression__operator", "="));
     equation.append(createElement("span", "fraction-quantity-subtraction-expression__unknown", "?"));
-    template.promptArea.append(createElement(
+    template.promptArea.append(equation, renderFractionQuantityOperation({
+      wholeUnits: task.wholeUnits,
+      subtraction: task.subtraction,
+      representation: taskRepresentation,
+      documentRef
+    }));
+    template.workArea.append(createElement(
       "p",
       "fraction-quantity-subtraction-prompt",
-      "Maak de af te trekken hoeveelheid leeg. De teller toont de gevulde delen; de noemer blijft alle oorspronkelijke gelijke delen tellen."
+      "Voer dezelfde aftrekking hieronder uit. Klik op een hele balk of taart om deze te verdelen. Klik daarna op de delen die je wilt aftrekken. De breukannotatie blijft bij ieder model zichtbaar."
     ));
-    template.workArea.append(equation);
 
     const rendererMount = createElement("div", "fraction-quantity-subtraction-model");
     template.workArea.append(rendererMount);
     const config = createFractionQuantityLearningInterfaceConfig({
       wholeUnits: task.wholeUnits,
       allowedDivisions,
-      representation,
+      representation: taskRepresentation,
       labels: {
         unit: "Eenheid",
         quantity: "Overgebleven hoeveelheid",

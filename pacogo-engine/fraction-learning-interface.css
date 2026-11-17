@@ -851,7 +851,9 @@
 .pacogo-fraction-quantity__model {
   display: flex;
   align-items: stretch;
-  width: min(100%, 116px);
+  width: 116px;
+  min-width: 116px;
+  flex: 0 0 116px;
   min-height: 36px;
 }
 .pacogo-fraction-quantity[data-representation="pie"] .pacogo-fraction-quantity__model {
@@ -971,7 +973,9 @@
     min-height: 88px;
   }
   .pacogo-fraction-quantity__model {
-    width: min(100%, 88px);
+    width: 88px;
+    min-width: 88px;
+    flex: 0 0 88px;
   }
   .pacogo-fraction-quantity__bar {
     min-height: 30px;

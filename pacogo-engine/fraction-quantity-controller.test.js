@@ -46,7 +46,7 @@ assert.equal(controller.getState().annotations[1].numerator, 0);
 assert.equal(controller.getState().annotations[1].denominator, 3);
 assert.equal(controller.getState().state.units[1].segments.length, 3);
 assert.throws(() => controller.selectUnit("missing"), /Unknown/);
-assert.throws(() => controller.divideUnit("unit-1", 3), /full, undivided/);
+assert.throws(() => controller.divideUnit("unit-2", 3), /full, undivided/);
 assert.throws(() => controller.setSegmentFilled("unit-1", 0, false), /no individual/);
 assert.throws(() => controller.setSegmentFilled("unit-2", 3, false), /outside/);
 assert.ok(events.some(item => item.event.type === "unit_selected"));

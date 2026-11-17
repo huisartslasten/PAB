@@ -363,6 +363,19 @@ function renderFractionQuantityLearningInterface({
           }
         });
       annotated.append(select, item, renderFractionQuantityAnnotation(annotationByUnit.get(unit.id), documentRef));
+      if (unit.denominator > 1) {
+        const resetDivision = documentRef.createElement("button");
+        resetDivision.type = "button";
+        resetDivision.className = "paco-btn paco-btn--secondary paco-btn--small pacogo-fraction-quantity__reset-division";
+        resetDivision.textContent = "Andere verdeling kiezen";
+        resetDivision.setAttribute("aria-label", "Verdeling van eenheid " +
+          (snapshot.state.units.indexOf(unit) + 1) + " opnieuw kiezen");
+        resetDivision.addEventListener("click", () => {
+          controller.restoreUnit(unit.id);
+          instructions.textContent = "De balk is weer heel. Kies nu 2, 3 of 4 gelijke delen.";
+        });
+        annotated.append(resetDivision);
+      }
       units.append(annotated);
     });
     controls.replaceChildren();
@@ -372,14 +385,6 @@ function renderFractionQuantityLearningInterface({
       divideLabel.className = "pacogo-fraction-quantity__control-label";
       divideLabel.textContent = config.labels.divide;
       controls.append(divideLabel);
-      if (selected.denominator > 1 && selected.segments.every(Boolean)) {
-        const restore = documentRef.createElement("button");
-        restore.type = "button";
-        restore.className = "paco-btn paco-btn--secondary paco-btn--small";
-        restore.textContent = "Maak weer één hele balk";
-        restore.addEventListener("click", () => controller.restoreUnit(selected.id));
-        controls.append(restore);
-      }
       if (selected.denominator === 1 && selected.segments[0]) {
         config.allowedDivisions.forEach(denominator => {
           const divide = documentRef.createElement("button");

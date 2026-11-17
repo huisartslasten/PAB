@@ -7501,3 +7501,26 @@ De bestaande FR2-statische weergaven en de bestaande niveau-1-aftrekoefening moe
 ### Volgende concrete stap
 
 Werk eerst de handoff bij en verifieer die wijziging met Full Regression. Daarna: voeg gerichte DOM-/browserinteractietests toe voor beide weergaven, waaronder annotaties per eenheid, behouden noemers bij lege segmenten, segmentinteractie, Enter/spatie-bediening, selectie en undo/redo. Pas wanneer die centrale renderercontracten aantoonbaar werken, volgt koppeling aan de aftreksessie en bestaande centrale Skills/Fraction Practice Template. Geen aparte pagina bouwen; hergebruik de centrale breuktemplate en interface.
+
+
+### Interactieve visuele aftrekuitleg — Fase D: browserinteractie geverifieerd (17 november 2026)
+
+De centrale quantity-renderer is nu ook op browserniveau getest voor beide representaties.
+
+- Nieuw testbestand: `test/browser/fraction-quantity-renderer.browser.test.js`.
+- De tests mounten de centrale renderer met dezelfde quantity-controller en controleren zowel `pie` als `bar`.
+- Getest zijn: blijvende annotaties per oorspronkelijke eenheid; behoud van alle segmenten en de oorspronkelijke noemer wanneer delen leeg worden gemaakt; muisbediening; Enter- en spatiebediening; undo/redo; en de bijbehorende interactiegebeurtenissen.
+- De tests controleren dat een andere eenheid haar eigen toestand en annotatie behoudt wanneer de eerste eenheid wordt aangepast.
+- Dit blijft renderer-/interfaceverificatie. Er is nog geen koppeling aan een aftreksessie of Skills-runtime gebouwd.
+
+### Verificatie en actuele status
+
+- Branch: `refactor/professional-v1`.
+- Laatste code-/testcommit: `a94f5c3bd4746654dc7ed1e413a995da446ac897`.
+- Full Regression #3836 / run `44003307291`: **GREEN / SUCCESS** op exact deze commit. Alle workflowstappen zijn geslaagd, inclusief Chromium-installatie, browserregressie en clean-working-tree-controle.
+- Laatste geverifieerde Full Regression vóór deze handoff-aanvulling: #3836, run `44003307291`, commit `a94f5c3bd4746654dc7ed1e413a995da446ac897`.
+- `main` is onaangeraakt. Geen Supabase-wijziging en geen deployment.
+
+### Volgende concrete stap
+
+Werk na deze handoff-aanvulling de handoff zelf met Full Regression op haar eigen commit af. Pas daarna: inspecteer de bestaande centrale Fraction Practice Template, de huidige aftreksessiecontracten en de Skills-runtime-aanroepketen. Ontwerp vervolgens de integratie van de quantity-renderer met een begeleide aftreksessie via de bestaande centrale breuktemplate. De renderer mag geen eigen curriculum-, task-, evidence-, mastery- of learner-state-logica introduceren. Geen nieuwe paginashell of parallelle breuktemplate. Behoud de bestaande niveau-1-aftrekoefening en FR2-statische interface backward compatible.

@@ -97,11 +97,12 @@ for (const representation of ["pie", "bar"]) {
 }
 
 
-async function mountSkillsRoute(page) {
+async function mountSkillsRoute(page, { exercise = "whole-minus-greater-than-one-subtraction", seedStandardScroll = true } = {}) {
   await page.goto("http://127.0.0.1:4173/skills.html?domain=fractions&topic=aftrekken&exercise=whole-minus-greater-than-one-subtraction", {
     waitUntil: "domcontentloaded"
   });
-  return page.evaluate(async () => {
+  return page.evaluate(async ({ exerciseValue, seedStandardScrollValue }) => {
+    if (seedStandardScrollValue) window.sessionStorage.setItem("pacoGO:template-scroll", "480");
     const { createSkillsRuntime } = await import("/src/features/skills/runtime.js");
     const { FRACTION_QUANTITY_WHOLE_MINUS_GREATER_THAN_ONE_TASK_BANK: bank } =
       await import("/pacogo-engine/fraction-quantity-whole-minus-greater-than-one-task-bank.js");
@@ -119,17 +120,29 @@ async function mountSkillsRoute(page) {
       context: { student: "Zyon", mode: "student" },
       domain: "fractions",
       topic: "aftrekken",
-      exercise: "whole-minus-greater-than-one-subtraction",
+      exercise: exerciseValue,
       documentRef: document,
       navigate: () => {}
     });
     await runtime.mount();
     const card = document.querySelector(".fraction-quantity-subtraction-card");
+    const pageTemplate = document.querySelector(".paco-page-template");
+    const hero = document.querySelector(".paco-template-hero");
+    const sidebarCard = document.querySelector(".paco-template-sidebar-card");
+    const backButton = document.querySelector(".paco-template-back");
+    const pageHeader = document.querySelector(".paco-template-page-header");
     const visualExpression = document.querySelector(".fraction-quantity-subtraction-expression--visual");
     const interactiveModel = document.querySelector(".fraction-quantity-subtraction-model .pacogo-fraction-quantity");
     return {
       title: document.querySelector(".paco-template-main h1")?.textContent || "",
-      centralPage: Boolean(document.querySelector(".paco-page-template")),
+      centralPage: Boolean(pageTemplate),
+      layoutMode: pageTemplate?.dataset.layoutMode || "",
+      heroDisplay: hero ? getComputedStyle(hero).display : "missing",
+      sidebarCardDisplay: sidebarCard ? getComputedStyle(sidebarCard).display : "missing",
+      backButtonVisible: Boolean(backButton && getComputedStyle(backButton).display !== "none" && backButton.getBoundingClientRect().width > 0 && backButton.getBoundingClientRect().height > 0),
+      pageHeaderHeight: pageHeader?.getBoundingClientRect().height || 0,
+      scrollY: window.scrollY,
+      standardScrollSaved: window.sessionStorage.getItem("pacoGO:template-scroll"),
       fractionTemplateCount: document.querySelectorAll('[data-component="fraction-practice-template"]').length,
       taskCount: bank.tasks.length,
       taskIds: bank.tasks.map(task => task.id),
@@ -161,7 +174,7 @@ async function mountSkillsRoute(page) {
       documentWidth: document.documentElement.scrollWidth,
       documentHeight: document.documentElement.scrollHeight
     };
-  });
+  }, { exerciseValue: exercise, seedStandardScrollValue: seedStandardScroll });
 }
 
 test("real Skills route mounts the central fraction template and the approved ten-task bank", async ({ page }) => {
@@ -170,6 +183,16 @@ test("real Skills route mounts the central fraction template and the approved te
   console.log("FRACTION_SUBTRACTION_DESKTOP_LAYOUT", JSON.stringify(result));
   expect(result.title).toBe("Oefenen");
   expect(result.centralPage).toBe(true);
+  expect(result.layoutMode).toBe("practice");
+  expect(result.heroDisplay).toBe("none");
+  expect(result.sidebarCardDisplay).toBe("none");
+  expect(result.backButtonVisible).toBe(true);
+  expect(result.pageHeaderHeight).toBeLessThanOrEqual(60);
+  expect(result.scrollY).toBe(0);
+  expect(result.standardScrollSaved).toBe("480");
+  expect(result.pageMainTop).toBeLessThan(100);
+  expect(result.cardBottom).toBeLessThanOrEqual(result.viewportHeight);
+  expect(result.documentHeight).toBeLessThanOrEqual(result.viewportHeight + 2);
   expect(result.fractionTemplateCount).toBe(1);
   expect(result.taskCount).toBe(10);
   expect(result.taskIds).toHaveLength(10);
@@ -193,12 +216,22 @@ test("real Skills route mounts the central fraction template and the approved te
   expect(result.documentWidth).toBeLessThanOrEqual(result.viewportWidth);
 });
 
-test("real visual subtraction route has no horizontal overflow on a mobile screen", async ({ page }) => {
+test("real visual subtraction route fits the mobile viewport in central practice mode", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   const result = await mountSkillsRoute(page);
   console.log("FRACTION_SUBTRACTION_MOBILE_LAYOUT", JSON.stringify(result));
   expect(result.title).toBe("Oefenen");
   expect(result.centralPage).toBe(true);
+  expect(result.layoutMode).toBe("practice");
+  expect(result.heroDisplay).toBe("none");
+  expect(result.sidebarCardDisplay).toBe("none");
+  expect(result.backButtonVisible).toBe(true);
+  expect(result.pageHeaderHeight).toBeLessThanOrEqual(52);
+  expect(result.scrollY).toBe(0);
+  expect(result.standardScrollSaved).toBe("480");
+  expect(result.pageMainTop).toBeLessThan(100);
+  expect(result.cardBottom).toBeLessThanOrEqual(result.viewportHeight);
+  expect(result.documentHeight).toBeLessThanOrEqual(result.viewportHeight + 2);
   expect(result.fractionTemplateCount).toBe(1);
   expect(result.visualExpression).toBe(true);
   expect(result.visualRepresentation).toBe("bar");
@@ -216,4 +249,14 @@ test("real visual subtraction route has no horizontal overflow on a mobile scree
   expect(result.visualModelWidth).toBe(result.interactiveBarWidth);
   expect(result.cardWidth).toBeGreaterThan(0);
   expect(result.cardWidth).toBeLessThanOrEqual(result.viewportWidth);
+});
+
+
+test("Skills overview keeps the standard page-template layout", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  const result = await mountSkillsRoute(page, { exercise: null, seedStandardScroll: false });
+  expect(result.layoutMode).toBe("standard");
+  expect(result.heroDisplay).not.toBe("none");
+  expect(result.sidebarCardDisplay).not.toBe("none");
+  expect(result.backButtonVisible).toBe(true);
 });

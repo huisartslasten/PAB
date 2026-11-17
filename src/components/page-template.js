@@ -13,6 +13,16 @@ const TEMPLATE_SCROLL_KEY = 'pacoGO:template-scroll';
 const TEMPLATE_SCROLL_CLEANUP_PROPERTY = '__pacoGOTemplateScrollCleanup';
 const TEMPLATE_SIDEBAR_SCROLL_CLEANUP_PROPERTY = '__pacoGOTemplateSidebarScrollCleanup';
 const MANAGEMENT_TOPBAR_STYLE_ID = 'pacogo-management-topbar-styles';
+const PACO_PAGE_LAYOUT_MODES = new Set(['standard', 'practice']);
+
+function normalizePageLayoutMode(value = 'standard') {
+  if (!PACO_PAGE_LAYOUT_MODES.has(value)) throw new TypeError('Unsupported PacoGO page layout mode: ' + value);
+  return value;
+}
+
+function getTemplateScrollStorageKey(layoutMode) {
+  return layoutMode === 'practice' ? TEMPLATE_SCROLL_KEY + ':practice' : TEMPLATE_SCROLL_KEY;
+}
 export const PACOGO_TEST_VERSION = 'V7.0';
 
 function installManualScrollRestoration(windowRef) {
@@ -53,18 +63,18 @@ export function installPacoTemplateSidebarScrollChaining({ navigationElement, wi
   return cleanup;
 }
 
-export function installPacoTemplateScrollMemory({ windowRef = window, documentRef = document } = {}) {
+export function installPacoTemplateScrollMemory({ windowRef = window, documentRef = document, storageKey = TEMPLATE_SCROLL_KEY } = {}) {
   const previousCleanup = windowRef[TEMPLATE_SCROLL_CLEANUP_PROPERTY];
   if (typeof previousCleanup === 'function') previousCleanup();
   const restoreHistoryScroll = installManualScrollRestoration(windowRef);
   const save = () => {
-    try { windowRef.sessionStorage.setItem(TEMPLATE_SCROLL_KEY, String(windowRef.scrollY || 0)); }
+    try { windowRef.sessionStorage.setItem(storageKey, String(windowRef.scrollY || 0)); }
     catch (error) { console.warn('Could not save PacoGO template scroll position:', error); }
   };
   const restore = () => {
     let savedPosition = null;
     try {
-      const raw = windowRef.sessionStorage.getItem(TEMPLATE_SCROLL_KEY);
+      const raw = windowRef.sessionStorage.getItem(storageKey);
       if (raw !== null) savedPosition = Number(raw);
     } catch (error) { console.warn('Could not read PacoGO template scroll position:', error); }
     if (!Number.isFinite(savedPosition) || savedPosition <= 0) return;
@@ -78,7 +88,7 @@ export function installPacoTemplateScrollMemory({ windowRef = window, documentRe
       const contentReady = maxScroll >= savedPosition;
       const timedOut = Date.now() - startedAt >= 2000;
       if (contentReady || timedOut || attempts >= 60) {
-        try { windowRef.sessionStorage.removeItem(TEMPLATE_SCROLL_KEY); }
+        try { windowRef.sessionStorage.removeItem(storageKey); }
         catch (error) { console.warn('Could not clear PacoGO template scroll position:', error); }
         return;
       }
@@ -178,8 +188,9 @@ function nodeFrom(value) {
   return null;
 }
 
-export function createPacoPageTemplate({ greeting = '', navigation = [], title = '', icon = '', subtitle = '', content = null, className = '', topbar = null, testVersion = PACOGO_TEST_VERSION } = {}) {
+export function createPacoPageTemplate({ greeting = '', navigation = [], title = '', icon = '', subtitle = '', content = null, className = '', topbar = null, testVersion = PACOGO_TEST_VERSION, layoutMode = 'standard' } = {}) {
   const root = document.createElement('div'); root.className = `paco-page-template ${className}`.trim();
+  root.dataset.layoutMode = normalizePageLayoutMode(layoutMode);
   const managementTopbar = createPacoManagementTopbar({ topbar, documentRef: document }); if (managementTopbar) root.appendChild(managementTopbar);
   const hero = document.createElement('header'); hero.className = 'paco-template-hero';
   const heroImage = document.createElement('img'); heroImage.src = 'pacogo-aruba-hero.png'; heroImage.alt = 'PacoGO Aruba'; heroImage.className = 'paco-template-hero-image'; hero.appendChild(heroImage); root.appendChild(hero);
@@ -201,8 +212,11 @@ export function createPacoPageTemplate({ greeting = '', navigation = [], title =
   return root;
 }
 
-function updatePacoPageTemplate(template, { greeting = '', navigation = [], title = '', icon = '', subtitle = '', content = null, topbar = null } = {}) {
+function updatePacoPageTemplate(template, options = {}) {
   if (!template) throw new Error('updatePacoPageTemplate requires a template');
+  const { greeting = '', navigation = [], title = '', icon = '', subtitle = '', content = null, topbar = null } = options;
+  const layoutMode = normalizePageLayoutMode(options.layoutMode ?? template.dataset.layoutMode ?? 'standard');
+  template.dataset.layoutMode = layoutMode;
   const backButton = template.querySelector('.paco-template-back'); const greetingElement = template.querySelector('.paco-template-greeting'); const navigationElement = template.querySelector('.paco-template-navigation'); const iconElement = template.querySelector('.paco-template-page-icon'); const titleElement = template.querySelector('.paco-template-page-heading h1'); const subtitleElement = template.querySelector('.paco-template-page-heading p'); const contentElement = template.querySelector('.paco-template-page-content');
   if (!backButton || !greetingElement || !navigationElement || !iconElement || !titleElement || !subtitleElement || !contentElement) throw new Error('PacoGO page template is missing its canonical shell elements.');
 
@@ -223,6 +237,18 @@ function updatePacoPageTemplate(template, { greeting = '', navigation = [], titl
 export function mountPacoPageTemplate({ mount, ...options } = {}) {
   if (!mount) throw new Error('mountPacoPageTemplate requires a mount element');
   const existingTemplate = mount.firstElementChild?.classList.contains('paco-page-template') ? mount.firstElementChild : null;
-  if (existingTemplate) return updatePacoPageTemplate(existingTemplate, options);
-  const template = createPacoPageTemplate(options); mount.replaceChildren(template); installPacoTemplateScrollMemory(); installPacoTemplateSidebarScrollChaining({ navigationElement: template.querySelector('.paco-template-navigation') }); return template;
+  if (existingTemplate) {
+    const previousLayoutMode = existingTemplate.dataset.layoutMode || 'standard';
+    const updatedTemplate = updatePacoPageTemplate(existingTemplate, options);
+    if (previousLayoutMode !== updatedTemplate.dataset.layoutMode) {
+      installPacoTemplateScrollMemory({ storageKey: getTemplateScrollStorageKey(updatedTemplate.dataset.layoutMode) });
+      installPacoTemplateSidebarScrollChaining({ navigationElement: updatedTemplate.querySelector('.paco-template-navigation') });
+    }
+    return updatedTemplate;
+  }
+  const template = createPacoPageTemplate(options);
+  mount.replaceChildren(template);
+  installPacoTemplateScrollMemory({ storageKey: getTemplateScrollStorageKey(template.dataset.layoutMode) });
+  installPacoTemplateSidebarScrollChaining({ navigationElement: template.querySelector('.paco-template-navigation') });
+  return template;
 }

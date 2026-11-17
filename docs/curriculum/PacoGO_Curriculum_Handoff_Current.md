@@ -7431,7 +7431,7 @@ Voer de visuele acceptatie uit in localhost op de nieuwste branchversie. Control
 
 - Implementatiecommit: `6caf1cffbb6972ad195cb02ee983c1e953bd4dea`.
 - Deze codecommit is via Git-data-ref bijgewerkt; de Full Regression-workflow startte daardoor niet automatisch. Een daaropvolgende inhoudscommit via de repository Contents API wordt gebruikt om de verplichte push-triggered Full Regression op de code plus deze handoff-update uit te voeren.
-- Full Regression op de handoff-updatecommit: pending; rapporteer geen groen totdat de exacte commit en alle workflowstappen zijn gecontroleerd.
+- Handoff-updatecommit: `be0520a841bf3e0ce1637ba7e97f159f2da74b22`; Full Regression #3822 / run `44000076786`: **GREEN / SUCCESS** op exact deze commit. Alle stappen geslaagd, inclusief curriculum-engine-regressie, architectuurgrenzen, maintained Node-regressie, Vitest, Chromium-installatie, browserregressie en clean-working-tree-controle.
 - Er is nog geen interactiecontroller, rendereruitbreiding, uitlegsessie, taakbank of Skills-runtime-integratie gebouwd. Dat zijn afzonderlijke volgende fasen en mogen pas na een groene regressie beginnen.
 - `main` is niet gewijzigd. Geen Supabase-wijziging en geen deployment.
 

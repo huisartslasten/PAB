@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { createFractionLearningInterfaceConfig } from "./fraction-learning-interface-contract.js";
+import { createFractionLearningInterfaceConfig, createFractionQuantityLearningInterfaceConfig } from "./fraction-learning-interface-contract.js";
 import { createFractionInterfaceControllerBridge } from "./fraction-interface-controller-bridge.js";
 
 const areaConfig = createFractionLearningInterfaceConfig({
@@ -119,5 +119,27 @@ const guardedBridge = createFractionInterfaceControllerBridge({
 });
 assert.throws(() => guardedBridge.submit(), /explanation is required/);
 assert.equal(submitCalls, 1);
+
+
+const quantityPieConfig = createFractionQuantityLearningInterfaceConfig({
+  wholeUnits: 4, allowedDivisions: [2, 3, 4], representation: "pie"
+});
+assert.equal(quantityPieConfig.interfaceId, "fraction");
+assert.equal(quantityPieConfig.mode, "interactive_quantity");
+assert.equal(quantityPieConfig.version, "0.4");
+assert.equal(quantityPieConfig.wholeUnits, 4);
+assert.deepEqual(quantityPieConfig.allowedDivisions, [2, 3, 4]);
+assert.equal(quantityPieConfig.representation, "pie");
+const quantityBarConfig = createFractionQuantityLearningInterfaceConfig({
+  wholeUnits: 3, allowedDivisions: [3], representation: "bar",
+  labels: { unit: "Balk", quantity: "Resterend", divide: "Kies de verdeling" }
+});
+assert.equal(quantityBarConfig.representation, "bar");
+assert.equal(quantityBarConfig.labels.unit, "Balk");
+assert.throws(() => createFractionQuantityLearningInterfaceConfig({ wholeUnits: 0 }), /wholeUnits/);
+assert.throws(() => createFractionQuantityLearningInterfaceConfig({ wholeUnits: 13 }), /wholeUnits/);
+assert.throws(() => createFractionQuantityLearningInterfaceConfig({ wholeUnits: 2, allowedDivisions: [2, 2] }), /unique/);
+assert.throws(() => createFractionQuantityLearningInterfaceConfig({ wholeUnits: 2, allowedDivisions: [5] }), /allowedDivisions/);
+assert.throws(() => createFractionQuantityLearningInterfaceConfig({ wholeUnits: 2, representation: "grid" }), /pie or bar/);
 
 console.log("PacoGO Fraction Learning Interface contract and bridge passed.");

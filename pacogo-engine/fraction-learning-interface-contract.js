@@ -7,6 +7,41 @@ function assertFraction(fraction, label) {
   }
 }
 
+
+const FRACTION_QUANTITY_REPRESENTATIONS = Object.freeze(["pie", "bar"]);
+
+function createFractionQuantityLearningInterfaceConfig({
+  wholeUnits,
+  allowedDivisions = [2, 3, 4],
+  representation = "pie",
+  labels = {}
+} = {}) {
+  if (!Number.isSafeInteger(wholeUnits) || wholeUnits < 1 || wholeUnits > 12) {
+    throw new TypeError("wholeUnits must be an integer between 1 and 12");
+  }
+  if (!Array.isArray(allowedDivisions) || allowedDivisions.length === 0 ||
+      allowedDivisions.some(value => ![2, 3, 4].includes(value)) ||
+      new Set(allowedDivisions).size !== allowedDivisions.length) {
+    throw new TypeError("allowedDivisions must contain unique values from 2, 3 and 4");
+  }
+  if (!FRACTION_QUANTITY_REPRESENTATIONS.includes(representation)) {
+    throw new TypeError("representation must be pie or bar");
+  }
+  return Object.freeze({
+    interfaceId: "fraction",
+    mode: "interactive_quantity",
+    version: "0.4",
+    wholeUnits,
+    allowedDivisions: Object.freeze([...allowedDivisions]),
+    representation,
+    labels: Object.freeze({
+      unit: typeof labels.unit === "string" && labels.unit.trim() ? labels.unit : "Eenheid",
+      quantity: typeof labels.quantity === "string" && labels.quantity.trim() ? labels.quantity : "Overgebleven hoeveelheid",
+      divide: typeof labels.divide === "string" && labels.divide.trim() ? labels.divide : "Verdelen in gelijke delen"
+    })
+  });
+}
+
 function createFractionLearningInterfaceConfig({
   targetFraction,
   options,
@@ -65,4 +100,8 @@ function createFractionLearningInterfaceConfig({
   });
 }
 
-export { createFractionLearningInterfaceConfig };
+export {
+  FRACTION_QUANTITY_REPRESENTATIONS,
+  createFractionQuantityLearningInterfaceConfig,
+  createFractionLearningInterfaceConfig
+};

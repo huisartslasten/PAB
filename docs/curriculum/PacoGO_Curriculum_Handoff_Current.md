@@ -7984,3 +7984,39 @@ Laatste browserdiagnostiek op commit `16cd0061a6f62d632a362907d97b15b38506b6c1`:
 2. Verifieer daarna de Full Regression die door deze handoff-update wordt gestart op de exacte nieuwe handoffcommit.
 3. Als beide runs groen zijn, vraag de gebruiker om de echte Skills-route visueel te controleren: één gestapelde symbolische som en exact één interactief werkveld; de leerling verwijdert zelf het hele deel en het derde deel.
 4. Voer geen verdere layout- of modelwijziging uit zonder concrete gebruikersfeedback. Houd de LB en centrale template intact.
+
+
+### Gelijknamige breuken aftrekken — taakbank uitgebreid naar 15 sommen (17 november 2026)
+
+**Gebruikerscorrectie**
+- De oefenreeks moet 15 sommen bevatten, niet 10. De eerste tien sommen blijven ongewijzigd; vijf sommen zijn toegevoegd.
+- Het aantal wordt centraal bepaald door `FRACTION_LIKE_DENOMINATOR_SUBTRACTION_TASKS`. De voortgang en afrondingsmelding lezen het werkelijke aantal uit de sessie; er staat geen hardcoded "tien" meer in de afrondingstekst.
+
+**Wat is gewijzigd**
+- De taakbank in `pacogo-engine/fraction-like-denominator-subtraction-session.js` bevat nu 15 gelijknamige breukenaftreksommen.
+- De vijf nieuwe sommen zijn toegevoegd aan het einde van de bestaande reeks; de volgorde en inhoud van de eerste tien zijn behouden.
+- De centrale sessie geeft het totaal dynamisch door aan de voortgangsweergave.
+- De afrondingsmelding toont het werkelijke totaal.
+- De unit test controleert 15 unieke taak-ID's en doorloopt alle 15 sommen tot de sessie correct als voltooid wordt gemarkeerd.
+- De browserregressie controleert dat de leerling "Som 1 van 15" ziet, de eerste som correct kan beantwoorden en vervolgens som 2 ziet.
+- De bestaande centrale PacoGO Page Template en Fraction Practice Template blijven in gebruik. Geen nieuwe losse pagina-template.
+- De eerdere aftrekoefening blijft behouden; deze uitbreiding voegt de volgende oefenroute toe.
+- Geen curriculum-, evidence-, mastery-, Supabase- of LIVE-main-wijziging.
+
+**Commit en verificatie**
+- Code-, taakbank-, unit-test- en browser-testcommit: `575bf74821b02a9f920b993abdc70061f251961a`.
+- Branch: `refactor/professional-v1`.
+- Full Regression #3930 / run `44197871506`: **GREEN / SUCCESS** op exact commit `575bf74821b02a9f920b993abdc70061f251961a`.
+- Alle workflowstappen zijn geslaagd, inclusief curriculum-engine, architectuurgrenzen, maintained en migrated Node-regressies, Chromium, volledige browserregressie en clean-working-tree-controle.
+- Full Regression #3929 / run `44197459311`: GREEN op de voorgaande UI-implementatiecommit `e488b46b5e596abce1e92def6d84b5685de68cfd`.
+
+**Actuele status**
+- Laatste geverifieerde code/test-commit: `575bf74821b02a9f920b993abdc70061f251961a`.
+- Laatste geverifieerde Full Regression: #3930 — GREEN op die exacte commit.
+- Deze handoff-update is zelf een repositorywijziging en moet nog met Full Regression op de nieuwe handoff-commit worden geverifieerd.
+- LIVE `main` is niet gewijzigd. Geen deployment.
+
+**Volgende concrete stap**
+1. Verifieer deze handoff-update met Full Regression op de exacte nieuwe commit.
+2. Daarna de gebruiker de 15-sommen-oefening visueel laten controleren in PacoGO TEST.
+3. Geen extra inhoudelijke sommen of layoutwijzigingen toevoegen zonder de volgende expliciete opdracht.

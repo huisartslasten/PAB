@@ -113,10 +113,15 @@ async function mountSkillsRoute(page) {
       annotationCount: interactiveModel?.querySelectorAll(".pacogo-fraction-quantity__annotation").length || 0,
       cardWidth: card?.getBoundingClientRect().width || 0,
       cardHeight: card?.getBoundingClientRect().height || 0,
+      cardTop: card?.getBoundingClientRect().top || 0,
       cardBottom: card?.getBoundingClientRect().bottom || 0,
+      pageMainTop: document.querySelector(".paco-template-main")?.getBoundingClientRect().top || 0,
+      pageMainBottom: document.querySelector(".paco-template-main")?.getBoundingClientRect().bottom || 0,
+      pageTemplateBottom: document.querySelector(".paco-page-template")?.getBoundingClientRect().bottom || 0,
       viewportWidth: window.innerWidth,
       viewportHeight: window.innerHeight,
-      documentWidth: document.documentElement.scrollWidth
+      documentWidth: document.documentElement.scrollWidth,
+      documentHeight: document.documentElement.scrollHeight
     };
   });
 }
@@ -124,6 +129,7 @@ async function mountSkillsRoute(page) {
 test("real Skills route mounts the central fraction template and the approved ten-task bank", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   const result = await mountSkillsRoute(page);
+  console.log("FRACTION_SUBTRACTION_DESKTOP_LAYOUT", JSON.stringify(result));
   expect(result.title).toBe("Oefenen");
   expect(result.centralPage).toBe(true);
   expect(result.fractionTemplateCount).toBe(1);
@@ -144,6 +150,7 @@ test("real Skills route mounts the central fraction template and the approved te
 test("real visual subtraction route has no horizontal overflow on a mobile screen", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   const result = await mountSkillsRoute(page);
+  console.log("FRACTION_SUBTRACTION_MOBILE_LAYOUT", JSON.stringify(result));
   expect(result.title).toBe("Oefenen");
   expect(result.centralPage).toBe(true);
   expect(result.fractionTemplateCount).toBe(1);

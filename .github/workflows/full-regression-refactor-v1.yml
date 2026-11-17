@@ -73,14 +73,14 @@ jobs:
             ! -name 'lesson-edit-model.test.js' ! -name 'lesson-editor-model.test.js' \
             ! -name 'lesson-editor.test.js' ! -name 'lesson-item-collector-types.test.js' \
             ! -name 'lesson-part-model.test.js' ! -name 'lesson-save-controller.test.js' \
-            ! -name 'lesson-save-flow.test.js' ! -name 'lesson-save-persistence.test.js' \
+            ! -name 'lesson-save-flow.test.js' \
             ! -name 'lesson-test-date-model.test.js' ! -name 'parity-contracts.test.js' \
             ! -name 'practice-evaluation-runtime-source-contract.test.js' \
             ! -name 'refactor-pure-modules.test.js' ! -name 'word-row-model.test.js' \
             ! -name 'skill-definition-service.test.js' ! -name 'skill-configuration-service.test.js' | sort)
           node --test $files
-      - name: Run maintained Vitest regression
-        run: npx vitest run test/lesson-item-collector-types.test.js test/lesson-part-model.test.js test/lesson-save-flow.test.js test/lesson-save-persistence.test.js src/services/learning-content-service.test.js test/skill-definition-service.test.js test/skill-configuration-service.test.js
+      - name: Run migrated native Node regression
+        run: node --test test/lesson-item-collector-types.test.js test/lesson-part-model.test.js test/lesson-save-flow.test.js src/services/learning-content-service.test.js test/skill-definition-service.test.js test/skill-configuration-service.test.js vitest/*.test.js
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Start local fixture server

@@ -1,16 +1,17 @@
-import { describe, expect, it } from 'vitest';
+import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
 import { buildAnswerPartModel, buildQuestionPartModel } from '../src/features/lessons/lesson-part-model.js';
 
 describe('lesson-part-model', () => {
   it('preserves the V4.78 question value and placeholder', () => {
-    expect(buildQuestionPartModel('Wat is fotosynthese?')).toEqual({
+    assert.deepStrictEqual(buildQuestionPartModel('Wat is fotosynthese?'), {
       text: 'Wat is fotosynthese?',
       placeholder: 'Vul hier de vraag in'
     });
   });
 
   it('uses answer role by default', () => {
-    expect(buildAnswerPartModel({ text: '42' })).toEqual({
+    assert.deepStrictEqual(buildAnswerPartModel({ text: '42' }), {
       text: '42',
       role: 'answer',
       placeholder: 'Vul hier het antwoord in',
@@ -19,11 +20,11 @@ describe('lesson-part-model', () => {
   });
 
   it('preserves the extra role and label', () => {
-    expect(buildAnswerPartModel({
+    assert.deepStrictEqual(buildAnswerPartModel({
       text: 'Extra uitleg',
       role: 'extra',
       placeholder: 'Schrijf hier het antwoord of de uitleg.'
-    })).toEqual({
+    }), {
       text: 'Extra uitleg',
       role: 'extra',
       placeholder: 'Schrijf hier het antwoord of de uitleg.',
@@ -32,6 +33,6 @@ describe('lesson-part-model', () => {
   });
 
   it('falls back to answer for unknown roles', () => {
-    expect(buildAnswerPartModel({ text: 'x', role: 'unknown' }).role).toBe('answer');
+    assert.equal(buildAnswerPartModel({ text: 'x', role: 'unknown' }).role, 'answer');
   });
 });

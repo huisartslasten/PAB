@@ -22,7 +22,7 @@
     button:focus-visible{outline:3px solid #102b57;outline-offset:3px}
     #learnerList{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
     #setupStatus{padding:10px 12px;border-radius:12px;background:#eef8ff;color:#126fc9;font-weight:700}
-    #exerciseCard[hidden],#learnerSetup[hidden],#resultCard[hidden],#constructionCard[hidden],#additionPracticeCard[hidden],#resultFormCard[hidden],#subtractionPracticeCard[hidden]{display:none}
+    #exerciseCard[hidden],#learnerSetup[hidden],#resultCard[hidden],#constructionCard[hidden],#additionPracticeCard[hidden],#resultFormCard[hidden],#subtractionPracticeCard[hidden],#likeDenominatorSubtractionCard[hidden]{display:none}
     .paco-template-page-content{min-width:0}
     .paco-template-page-content .card{padding:13px 16px;border-radius:15px}
     .paco-template-page-content .concept{display:none}
@@ -123,6 +123,19 @@
     <div id="subtractionNext"></div>
     <p class="muted">Dit is een niet-formele oefening op basis van de bestaande F3-stappenbeschrijving. Antwoorden worden alleen lokaal bewaard; er wordt geen toets-, bewijs- of masteryresultaat gemaakt.</p>
   </section>
+  <section class="card" id="likeDenominatorSubtractionCard" hidden>
+    <div class="muted" id="likeDenominatorLearnerLabel">PacoGO • Breuken oefenen</div>
+    <h1>Gelijknamige breuken kleiner dan 1 van elkaar aftrekken</h1>
+    <p class="muted">Trek de tellers van elkaar af. De noemer blijft gelijk.</p>
+    <div id="likeDenominatorVisual" class="comparison"></div>
+    <div class="construction-equation" id="likeDenominatorExpression"></div>
+    <p class="muted" id="likeDenominatorPrompt">Vul de teller en noemer van het antwoord in.</p>
+    <div id="likeDenominatorInput"></div>
+    <p id="likeDenominatorFeedback" role="status" aria-live="polite">Bekijk de twee breuken en reken uit.</p>
+    <p id="likeDenominatorProgress"></p>
+    <div id="likeDenominatorNext"></div>
+    <p class="muted">Extra, niet-formele oefening. Antwoorden worden alleen lokaal bewaard en tellen niet mee voor een toets of mastery-beslissing.</p>
+  </section>
 </main>
 <script type="module">
   import { createPacoGOApp } from "./src/app/bootstrap.js";
@@ -139,6 +152,7 @@
   import { createFractionRepresentationConfig } from "./pacogo-engine/fraction-representation-contract.js";
   import { createFractionAdditionPracticeSession } from "./pacogo-engine/fraction-addition-practice-session.js";
   import { FRACTION_ADDITION_PRACTICE_TASKS } from "./pacogo-engine/fraction-addition-practice-task-bank.js";
+  import { createFractionLikeDenominatorSubtractionSession } from "./pacogo-engine/fraction-like-denominator-subtraction-session.js";
   import { createFractionResultFormPracticeSession } from "./pacogo-engine/fraction-result-form-practice-session.js";
   import { createFractionSubtractionPracticeSession } from "./pacogo-engine/fraction-subtraction-practice-session.js";
   import { FRACTION_CONSTRUCTION_PRACTICE_TASKS, createFractionConstructionPracticeSession } from "./pacogo-engine/fraction-construction-practice-session.js";
@@ -191,6 +205,14 @@
   const subtractionFeedback = document.querySelector("#subtractionFeedback");
   const subtractionProgress = document.querySelector("#subtractionProgress");
   const subtractionNext = document.querySelector("#subtractionNext");
+  const likeDenominatorCard = document.querySelector("#likeDenominatorSubtractionCard");
+  const likeDenominatorLearnerLabel = document.querySelector("#likeDenominatorLearnerLabel");
+  const likeDenominatorVisual = document.querySelector("#likeDenominatorVisual");
+  const likeDenominatorExpression = document.querySelector("#likeDenominatorExpression");
+  const likeDenominatorInput = document.querySelector("#likeDenominatorInput");
+  const likeDenominatorFeedback = document.querySelector("#likeDenominatorFeedback");
+  const likeDenominatorProgress = document.querySelector("#likeDenominatorProgress");
+  const likeDenominatorNext = document.querySelector("#likeDenominatorNext");
   let selectedLearner = null;
   let practiceSession = null;
   let currentTask = null;
@@ -204,6 +226,8 @@
   let resultFormEquationInstance = null;
   let subtractionSession = null;
   let subtractionEquationInstance = null;
+  let likeDenominatorSession = null;
+  let likeDenominatorEquationInstance = null;
   const selectedStudent = new URLSearchParams(window.location.search).get("viewStudent") || "";
   const templateMount = document.querySelector("#paco-template-mount");
   const navigate = url => { window.location.href = url.toString(); };
@@ -274,6 +298,19 @@
     feedback: [resultFormFeedback],
     actions: [resultFormNext],
     footnote: resultFormCard.querySelector("p:last-of-type")
+  });
+  createFractionPracticeTemplate({
+    mount: likeDenominatorCard,
+    context: likeDenominatorLearnerLabel,
+    title: likeDenominatorCard.querySelector("h1"),
+    instruction: likeDenominatorCard.querySelector("p.muted"),
+    progress: likeDenominatorProgress,
+    prompt: document.querySelector("#likeDenominatorPrompt"),
+    work: [likeDenominatorVisual, likeDenominatorExpression],
+    controls: [likeDenominatorInput],
+    feedback: [likeDenominatorFeedback],
+    actions: [likeDenominatorNext],
+    footnote: likeDenominatorCard.querySelector("p:last-of-type")
   });
   createFractionPracticeTemplate({
     mount: subtractionCard,
@@ -756,7 +793,11 @@
       subtractionCard.hidden = true;
       additionCard.hidden = false;
     });
-    subtractionNext.append(restart, back);
+    const nextLikeDenominator = document.createElement("button");
+    nextLikeDenominator.type = "button";
+    nextLikeDenominator.textContent = "Oefenen met gelijknamige breuken";
+    nextLikeDenominator.addEventListener("click", startLikeDenominatorSubtractionPractice);
+    subtractionNext.append(restart, back, nextLikeDenominator);
   }
 
 
@@ -793,6 +834,103 @@
     const submit=document.createElement("button");submit.type="button";submit.className="pacogo-fraction-practice__primary-action";submit.textContent="Controleren";
     submit.addEventListener("click",()=>handleSubtractionAnswer(subtractionEquationInstance.getValues()[0]||""));
     subtractionInputHost.append(submit);updateSubtractionProgress();subtractionEquationInstance.focus();
+  }
+
+  function updateLikeDenominatorProgress() {
+    const progress = likeDenominatorSession.getProgress();
+    const current = likeDenominatorSession.getCurrentTask();
+    likeDenominatorProgress.textContent = current
+      ? "Som " + current.taskNumber + " van " + current.totalTasks + " • " + progress.completedCount + " afgerond"
+      : progress.completedCount + " van " + progress.totalCount + " sommen afgerond";
+  }
+
+  function renderLikeDenominatorTask() {
+    const task = likeDenominatorSession.getCurrentTask();
+    likeDenominatorNext.replaceChildren();
+    likeDenominatorInput.replaceChildren();
+    if (!task) {
+      likeDenominatorVisual.replaceChildren();
+      likeDenominatorExpression.replaceChildren();
+      likeDenominatorFeedback.textContent = "Je hebt alle tien sommen afgerond. Goed gewerkt!";
+      updateLikeDenominatorProgress();
+      const restart = document.createElement("button");
+      restart.type = "button";
+      restart.textContent = "Deze oefenronde opnieuw doen";
+      restart.addEventListener("click", () => { likeDenominatorSession.reset(); renderLikeDenominatorTask(); });
+      const back = document.createElement("button");
+      back.type = "button";
+      back.textContent = "Terug naar breuken aftrekken";
+      back.addEventListener("click", () => { likeDenominatorCard.hidden = true; subtractionCard.hidden = false; });
+      likeDenominatorNext.append(restart, back);
+      return;
+    }
+    renderFractionOperation({
+      mount: likeDenominatorVisual,
+      operator: "−",
+      areaModelLayout: FRACTION_OPERATION_PRESENTATION.areaModelLayout,
+      terms: [
+        { label: "Eerste breuk", fraction: task.leftFraction },
+        { label: "Tweede breuk", fraction: task.rightFraction }
+      ]
+    });
+    likeDenominatorEquationInstance = renderFractionPracticeExpression({
+      mount: likeDenominatorExpression,
+      expression: task.leftFraction.numerator + "/" + task.leftFraction.denominator +
+        " − " + task.rightFraction.numerator + "/" + task.rightFraction.denominator + " = ?/?",
+      inputLabels: ["Uitkomstteller", "Uitkomstnoemer"],
+      onInteraction: event => {
+        likeDenominatorFeedback.textContent = event.rawValue
+          ? "Je kunt je antwoord controleren."
+          : "Vul de teller en noemer van het antwoord in.";
+      }
+    });
+    likeDenominatorFeedback.textContent = "Trek de tellers van elkaar af. De noemer blijft gelijk.";
+    const submit = document.createElement("button");
+    submit.type = "button";
+    submit.className = "pacogo-fraction-practice__primary-action";
+    submit.textContent = "Controleren";
+    submit.addEventListener("click", () => {
+      const values = likeDenominatorEquationInstance.getValues();
+      const result = likeDenominatorSession.recordAnswer({
+        numerator: values[0] || "",
+        denominator: values[1] || ""
+      });
+      updateLikeDenominatorProgress();
+      if (result.classification === "valid") {
+        likeDenominatorEquationInstance.lock();
+        submit.disabled = true;
+        likeDenominatorFeedback.textContent = "Goed gedaan! Je hebt de tellers afgetrokken en de noemer gelijk gehouden.";
+        const next = document.createElement("button");
+        next.type = "button";
+        next.textContent = result.progress.isComplete ? "Oefenronde afronden" : "Volgende som";
+        next.addEventListener("click", renderLikeDenominatorTask);
+        likeDenominatorNext.replaceChildren(next);
+      } else {
+        likeDenominatorFeedback.textContent = result.classification === "invalid_input"
+          ? "Vul bij de uitkomst zowel een teller als een noemer in."
+          : "Nog niet. Trek de tellers van elkaar af en neem dezelfde noemer over.";
+        likeDenominatorEquationInstance.focus();
+      }
+    });
+    likeDenominatorInput.append(submit);
+    updateLikeDenominatorProgress();
+    likeDenominatorEquationInstance.focus();
+  }
+
+  function startLikeDenominatorSubtractionPractice() {
+    likeDenominatorSession = createFractionLikeDenominatorSubtractionSession({
+      learnerKey: selectedLearner.learner_key
+    });
+    subtractionCard.hidden = true;
+    likeDenominatorCard.hidden = false;
+    additionCard.hidden = true;
+    resultFormCard.hidden = true;
+    constructionCard.hidden = true;
+    resultCard.hidden = true;
+    exerciseCard.hidden = true;
+    likeDenominatorLearnerLabel.textContent =
+      "PacoGO • " + selectedLearner.display_name + " • Extra breukenoefening";
+    renderLikeDenominatorTask();
   }
 
   function startSubtractionPractice() {

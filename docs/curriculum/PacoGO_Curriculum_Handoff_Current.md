@@ -7438,3 +7438,34 @@ Voer de visuele acceptatie uit in localhost op de nieuwste branchversie. Control
 ### Volgende concrete stap
 
 Na een groene Full Regression op de handoff-updatecommit: bouw de gedeelde interactiecontroller (selecteren, verdelen, leeg/vullen, undo/redo en events) boven op het quantity-model. Daarna pas de centrale taart-/breukenbalkrenderers en de uitlegsessie.
+
+
+### Interactieve visuele aftrekuitleg — Fase C: centrale interactiecontroller (17 november 2026)
+
+Fase C is gebouwd boven op het renderer-onafhankelijke hoeveelheidsmodel.
+
+- `pacogo-engine/fraction-quantity-model.js` exporteert nu ook `assertFractionQuantityState`, zodat de controller dezelfde centrale toestandvalidatie gebruikt.
+- Nieuw `pacogo-engine/fraction-quantity-controller.js`: één renderer-onafhankelijke controller voor selectie van een eenheid, verdelen in een toegestane noemer, hele eenheden vullen/leegmaken, afzonderlijke segmenten vullen/leegmaken, segmenten omwisselen, undo/redo en abonnementen op interactiegebeurtenissen.
+- De controller levert immutable snapshots met de actuele hoeveelheid, verwijderde hoeveelheid, selectie, undo/redo-status en een annotatie per oorspronkelijke eenheid.
+- De controller kent geen taart- of balkgeometrie en geen DOM. Taart en breukenbalk moeten later dezelfde controller en hoeveelheidsstaat gebruiken.
+- De bestaande Fraction Learning Interface, renderers en FR2-controllerbridge zijn nog niet aangepast of geïntegreerd. De volgende fase moet de bestaande centrale architectuur uitbreiden; geen parallelle breukinterface of lokale template bouwen.
+- De model- en controllercontracten zijn getest. De eerste regressie van de controllerfase (#3826) was rood door een foutieve testassertie die een nog volle, onverdeelde eenheid als ongeldig doel aanwees. De test wees daardoor ten onrechte de verkeerde eenheid aan. Alleen die aantoonbaar onjuiste testverwijzing is gecorrigeerd; productiecode is niet gewijzigd om de test groen te maken.
+
+### Verificatie en actuele status
+
+- Branch: `refactor/professional-v1`.
+- Laatste code-/testcommit: `b3f43ffc4c30d4946a22a6cb3b9c341e7c440844`.
+- Full Regression #3827 / run `44001312767`: **GREEN / SUCCESS** op exact deze commit. Alle workflowstappen zijn voltooid, waaronder curriculum-engine-regressie, architectuurgrenzen, Node/Vitest, browserregressie en clean-working-tree-controle.
+- Laatste geverifieerde Full Regression: #3827, run `44001312767`, commit `b3f43ffc4c30d4946a22a6cb3b9c341e7c440844`.
+- `main` is onaangeroerd. Geen Supabase-wijziging en geen deployment.
+
+### Volgende concrete stap — Fase D
+
+Breid de bestaande centrale Fraction Learning Interface uit met een interactieve hoeveelheidweergave, met behoud van het bestaande FR2-contract en de huidige statische breukweergaven. Inspecteer vóór implementatie de bestaande renderer-CSS en de volledige aanroepketen. Ontwerp vervolgens één gedeelde renderergrens voor:
+1. taartmodel: identieke cirkels en exact gelijke sectoren;
+2. breukenbalk: identieke rechthoekige balken en exact gelijke segmenten;
+3. per oorspronkelijke eenheid permanent zichtbare annotatie, waarbij teller het aantal gevulde delen is en noemer alle oorspronkelijke delen blijft tellen;
+4. lege eenheden en segmenten die zichtbaar blijven en niet verschuiven;
+5. toetsenbord-/muis-/touchbediening die gebeurtenissen naar dezelfde quantity-controller stuurt.
+
+De gekozen weergave komt uit de configuratie per opgave; de twee representaties delen alle hoeveelheids- en interactielogica. Geen cijferlabels ín de taart of balk. Voordat Fase D code wordt gebouwd, moet de handoff-update op haar eigen commit Full Regression groen doorlopen.

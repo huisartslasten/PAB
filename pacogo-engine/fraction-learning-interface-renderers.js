@@ -165,7 +165,8 @@ function renderFractionQuantityPieUnit(unit, documentRef, onToggle) {
   const svg = documentRef.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", "0 0 100 100");
   svg.setAttribute("class", "pacogo-fraction-quantity__pie");
-  svg.setAttribute("aria-hidden", "true");
+  svg.setAttribute("role", "group");
+  svg.setAttribute("aria-label", "Taart met " + unit.denominator + " gelijke delen");
   unit.segments.forEach((filled, index) => {
     const path = documentRef.createElementNS("http://www.w3.org/2000/svg", "path");
     path.setAttribute("d", unit.denominator === 1
@@ -263,7 +264,9 @@ function renderFractionQuantityLearningInterface({
       });
       const item = renderFractionQuantityUnit(unit, config.representation, documentRef,
         (unitId, segmentIndex) => {
-          controller.toggleSegment(unitId, segmentIndex);
+          const currentUnit = controller.getState().state.units.find(item => item.id === unitId);
+          if (currentUnit.denominator === 1) controller.setUnitFilled(unitId, !currentUnit.segments[0]);
+          else controller.toggleSegment(unitId, segmentIndex);
         });
       annotated.append(select, item, renderFractionQuantityAnnotation(annotationByUnit.get(unit.id), documentRef));
       units.append(annotated);

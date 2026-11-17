@@ -15,6 +15,8 @@ import { createFractionAdditionLevel5GuidedSession, createFractionAdditionLevel5
 import { FRACTION_WHOLE_MIXED_ADDITION_EXERCISE, createFractionWholeMixedAdditionSession } from '../../../pacogo-engine/fraction-whole-mixed-addition-session.js';
 import { FRACTION_SAME_DENOMINATOR_ADDITION_EXERCISE, createFractionSameDenominatorAdditionSession } from '../../../pacogo-engine/fraction-same-denominator-addition-session.js';
 import { FRACTION_MIXED_SAME_DENOMINATOR_ADDITION_EXERCISE, createFractionMixedSameDenominatorAdditionSession } from '../../../pacogo-engine/fraction-mixed-same-denominator-addition-session.js';
+import { FRACTION_QUANTITY_WHOLE_MINUS_GREATER_THAN_ONE_TASK_BANK } from '../../../pacogo-engine/fraction-quantity-whole-minus-greater-than-one-task-bank.js';
+import { createFractionQuantitySubtractionPractice } from '../../../pacogo-engine/fraction-quantity-subtraction-practice.js';
 import { buildViewUrl } from '../../core/view-context.js';
 import { MATH_SKILL_SUBJECTS, FRACTION_NAVIGATION_TOPICS } from './skills-navigation-catalog.js';
 
@@ -43,6 +45,7 @@ export function createSkillsRuntime({
 
   const student = context?.student || '';
   const content = documentRef.createElement('div');
+  let quantitySubtractionPractice = null;
 
   function openFractions() {
     navigate(buildViewUrl('skills.html', {
@@ -210,7 +213,7 @@ export function createSkillsRuntime({
         open.textContent = 'Oefenen';
         open.addEventListener('click', () => navigate(buildViewUrl('skills.html', {
           student, mode: context?.mode,
-          extra: { domain: FRACTION_DOMAIN, topic: 'aftrekken', exercise: 'whole-minus-mixed-subtraction' }
+          extra: { domain: FRACTION_DOMAIN, topic: 'aftrekken', exercise: 'whole-minus-greater-than-one-subtraction' }
         })));
         row.append(open);
       }
@@ -219,6 +222,19 @@ export function createSkillsRuntime({
 
     overview.appendChild(list);
     content.appendChild(overview);
+  }
+
+  function renderWholeMinusGreaterThanOneSubtractionPractice() {
+    const bank = FRACTION_QUANTITY_WHOLE_MINUS_GREATER_THAN_ONE_TASK_BANK;
+    quantitySubtractionPractice = createFractionQuantitySubtractionPractice({
+      mount: content,
+      tasks: bank.tasks,
+      representation: bank.defaultRepresentation,
+      allowedDivisions: bank.allowedDivisions,
+      title: bank.title,
+      instruction: bank.instruction,
+      documentRef
+    });
   }
 
   function renderWholeMinusMixedSubtractionPractice() {
@@ -960,6 +976,7 @@ export function createSkillsRuntime({
     const showingAddition = showingFractions && topic === 'optellen';
     const showingSubtraction = showingFractions && topic === 'aftrekken';
     const showingWholeMinusMixedSubtraction = showingSubtraction && exercise === 'whole-minus-mixed-subtraction';
+    const showingWholeMinusGreaterThanOneSubtraction = showingSubtraction && exercise === 'whole-minus-greater-than-one-subtraction';
     const showingWholeMixedPractice = showingAddition && exercise === 'whole-number-mixed-addition';
     const showingSameDenominatorPractice = showingAddition && exercise === 'same-denominator-addition';
     const showingMixedSameDenominatorPractice = showingAddition && exercise === 'mixed-same-denominator-addition';
@@ -971,7 +988,7 @@ export function createSkillsRuntime({
     mountPacoPageTemplate({
       mount: templateMount,
       greeting: student ? `Hoi ${student}! 🐶` : 'Welkom bij PacoGO!',
-      title: showingPractice || showingWholeMinusMixedSubtraction ? 'Oefenen' : showingAddition ? 'Optellen' : showingSubtraction ? 'Aftrekken' : showingFractions ? 'Breuken' : 'Skills',
+      title: showingPractice || showingWholeMinusMixedSubtraction || showingWholeMinusGreaterThanOneSubtraction ? 'Oefenen' : showingAddition ? 'Optellen' : showingSubtraction ? 'Aftrekken' : showingFractions ? 'Breuken' : 'Skills',
       icon: showingAddition ? '➕' : showingSubtraction ? '➖' : showingFractions ? '½' : '📘',
       subtitle: showingWholeMixedPractice
         ? 'Breuken → Optellen → Heel getal optellen bij een breukgetal groter dan 1.'
@@ -987,6 +1004,8 @@ export function createSkillsRuntime({
         ? 'Breuken → Optellen → Ongelijknamige breuken kleiner dan 1 bij elkaar optellen.'
         : showingAddition
         ? 'Breuken → Optellen.'
+        : showingWholeMinusGreaterThanOneSubtraction
+        ? 'Breuken → Aftrekken → ' + FRACTION_QUANTITY_WHOLE_MINUS_GREATER_THAN_ONE_TASK_BANK.title + '.'
         : showingWholeMinusMixedSubtraction
         ? 'Breuken → Aftrekken → ' + FRACTION_SUBTRACTION_EXERCISE.title + '.'
         : showingSubtraction
@@ -1013,11 +1032,19 @@ export function createSkillsRuntime({
     else if (showingUnequalDenominatorGuidedMixedPractice) renderUnequalDenominatorGuidedAdditionPractice({ mixedNumberResult: true });
     else if (showingUnequalDenominatorGuidedPractice) renderUnequalDenominatorGuidedAdditionPractice();
     else if (showingAddition) renderFractionAdditionOverview();
+    else if (showingWholeMinusGreaterThanOneSubtraction) renderWholeMinusGreaterThanOneSubtractionPractice();
     else if (showingWholeMinusMixedSubtraction) renderWholeMinusMixedSubtractionPractice();
     else if (showingSubtraction) renderFractionSubtractionOverview();
     else if (showingFractions) renderFractionOverview();
     else renderSubjectOverview();
   }
 
-  return Object.freeze({ mount, destroy() {}, content });
+  return Object.freeze({
+    mount,
+    destroy() {
+      if (quantitySubtractionPractice) quantitySubtractionPractice.destroy();
+      quantitySubtractionPractice = null;
+    },
+    content
+  });
 }

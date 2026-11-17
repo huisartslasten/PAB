@@ -1,6 +1,6 @@
 const FRACTION_QUANTITY_DIVISIONS = Object.freeze([2, 3, 4]);
 
-function assertState(state) {
+function assertFractionQuantityState(state) {
   if (!state || state.schemaVersion !== 1 || !Number.isSafeInteger(state.originalWholeUnits) ||
       state.originalWholeUnits < 1 || !Array.isArray(state.allowedDivisions) ||
       !Array.isArray(state.units) || state.units.length !== state.originalWholeUnits) {
@@ -48,7 +48,7 @@ function createFractionQuantityState({ wholeUnits, allowedDivisions = FRACTION_Q
 }
 
 function updateUnit(state, unitId, transform) {
-  assertState(state);
+  assertFractionQuantityState(state);
   if (typeof unitId !== "string" || typeof transform !== "function") {
     throw new TypeError("unitId and a unit transformation are required");
   }
@@ -66,7 +66,7 @@ function updateUnit(state, unitId, transform) {
 }
 
 function divideFractionQuantityUnit(state, unitId, denominator) {
-  assertState(state);
+  assertFractionQuantityState(state);
   if (!state.allowedDivisions.includes(denominator)) throw new RangeError("The requested division is not allowed");
   return updateUnit(state, unitId, unit => {
     if (unit.denominator !== 1 || unit.segments[0] !== true) {
@@ -115,7 +115,7 @@ function mixedAmount(numerator, denominator) {
 }
 
 function getFractionQuantityAmount(state) {
-  assertState(state);
+  assertFractionQuantityState(state);
   const denominator = state.units.reduce((value, unit) => lcm(value, unit.denominator), 1);
   const numerator = state.units.reduce((value, unit) =>
     value + unit.segments.filter(Boolean).length * (denominator / unit.denominator), 0);
@@ -150,7 +150,7 @@ function areFractionQuantitiesEqual(left, right) {
 }
 
 export {
-  FRACTION_QUANTITY_DIVISIONS, createFractionQuantityState, divideFractionQuantityUnit,
+  FRACTION_QUANTITY_DIVISIONS, assertFractionQuantityState, createFractionQuantityState, divideFractionQuantityUnit,
   setFractionQuantityUnitFilled, setFractionQuantitySegmentFilled, getFractionQuantityAmount,
   getFractionQuantityRemovedAmount, getFractionQuantityUnitAnnotation, areFractionQuantitiesEqual
 };

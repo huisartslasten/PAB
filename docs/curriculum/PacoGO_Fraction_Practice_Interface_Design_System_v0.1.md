@@ -260,3 +260,44 @@ The reusable quantity-subtraction interface MUST present the complete subtractio
 - Never combine bars and pie models in one sum, never switch representation within a task, and never use a different representation between the source equation and its interaction field.
 - Task-level representation is presentation configuration only; it cannot change the mathematical values, validation contract, task identity, evidence, mastery or curriculum decisions.
 - Both source and interactive models must consume the central representation contract and shared renderers. No exercise-local model implementation is permitted.
+
+## 16. Authoritative correction — one symbolic equation and one interactive visual workspace
+
+**This section supersedes any conflicting wording in section 15 or earlier notes that asks for a separate static visual subtraction equation in addition to the interactive model.**
+
+The learner must solve the subtraction directly in one visual workspace. PacoGO must not show the same subtraction twice as two separate visual models.
+
+### Required presentation
+
+1. Show exactly one symbolic equation, for example 2 − 1 ⅓ = ?. The fraction in the mixed number uses the shared stacked numerator / horizontal fraction bar / denominator notation.
+2. Show exactly one visual representation for the task: the interactive starting quantity. For 2 − 1 ⅓, this is **exactly two complete fraction bars** (or exactly two complete pie units when that task selects pie).
+3. Do not render a second, static visual operation row that depicts the starting quantity, minus sign, and removed quantity. In particular, do not show a second set of bars/pies that already depicts the quantity being subtracted.
+4. The interactive starting units are the only visual model in which the learner performs the subtraction. The learner must construct the subtraction by interacting with those units.
+
+### Required learner action for 2 − 1 ⅓
+
+- Initially show two complete, filled bars, each representing one whole.
+- The learner clicks the first complete bar to make that whole unit empty/white.
+- The learner chooses to divide the second complete bar into three equal parts.
+- The learner clicks exactly one of those thirds to make it empty/white.
+- The resulting model visibly represents one whole and one third removed, with two thirds remaining.
+- The learner's actions, not a pre-rendered subtraction illustration, create the visual result.
+
+The same interaction principle applies to other tasks: show only the original starting whole units; the learner removes the requested whole units and then partitions/removes the requested fractional amount.
+
+### Annotation and representation rules
+
+- The symbolic equation is the one mathematical fraction-notation presentation of the requested mixed number. Use stacked notation; never inline slash notation.
+- The single interactive visual workspace keeps its quantity annotations visible and synchronised with the current filled/empty parts. Whole units are annotated as wholes; after partitioning, the annotation reflects the current numerator and the original denominator.
+- Do not add a second static set of quantity annotations for a duplicate source model.
+- Each task uses exactly one area-model representation: bar OR pie. Tasks may alternate representation between separate sums, but no single sum may mix them.
+- The visual workspace starts with the full original quantity, not a pre-subtracted depiction.
+
+### Central implementation and acceptance criteria
+
+- Implement this in the shared Fraction Practice Template / Fraction Learning Interface and shared quantity renderer. Do not add route-specific markup or CSS.
+- The task/session model remains the source of mathematical values and correctness; the renderer must expose the starting units for learner interaction rather than render a second solved/source operation.
+- Browser tests must assert exactly one symbolic equation, exactly one interactive visual workspace, no duplicate static visual operation row, and exactly wholeUnits starting interactive units.
+- For 2 − 1 ⅓, browser interaction must verify: two filled units initially; first whole cleared; second unit partitioned into thirds; exactly one third cleared; resulting removed amount 1 ⅓ and remaining amount ⅔.
+- Verify annotations remain visible and mathematically consistent after each action, keyboard and pointer interaction, checking, and moving to the next task.
+- The complete visual interaction must use the task's single selected representation and preserve the central model dimensions.

@@ -7405,3 +7405,36 @@ De stapindeling is aangepast aan de expliciete visuele eis: alle zes stappen bli
 
 ### Eerstvolgende stap
 Voer de visuele acceptatie uit in localhost op de nieuwste branchversie. Controleer bij stap 1, een tussenstap en de laatste stap dat de actieve kaart breed is, toekomstige kaarten alleen hun nummer tonen, afgeronde kaarten hun antwoord behouden en alle zes kaarten op één horizontale rij blijven. Controleer ook dat de actieve invoervelden volledig bruikbaar blijven. Technisch groene regressies vervangen deze visuele acceptatie niet. Bij afwijkingen eerst de lokale versie/branch en reproduceerbare oorzaak vaststellen voordat code wordt aangepast.
+
+
+## Interactieve visuele aftrekuitleg — Fase B — 16 november 2026
+
+### Baseline en scope
+
+- Branch: `refactor/professional-v1`.
+- Startcommit: `59f09b942d8f5535e0f767c5f7f733d190202aaa`.
+- Full Regression #3820 / run `43995930244`: alle jobstappen voltooid met `success`, inclusief Chromium-installatie, browserregressie en clean-working-tree-controle.
+- De nieuwe module is een formatieve uitlegtoepassing. Zij maakt geen formele curriculumclaims, task/evidence-identifiers, mastery-beslissingen of Supabase-wijzigingen.
+- De bestaande niveau-1-aftrekoefening en FR2-T01 t/m FR2-T05 blijven buiten de functionele wijzigingsscope.
+
+### Architectuurbesluit — renderer-onafhankelijk hoeveelheidsmodel
+
+- De bestaande `Fraction Learning Interface` ondersteunt momenteel statische breukrepresentaties en antwoordopties; zij bevat nog geen generieke interactieve hoeveelheidstoestand.
+- Het centrale interface-contract is compatibel uitgebreid met `createFractionQuantityLearningInterfaceConfig` (interface mode `interactive_quantity`, versie `0.4`). Het bestaande FR2-configuratiepad blijft ongewijzigd.
+- Nieuw `pacogo-engine/fraction-quantity-model.js`: zuiver, DOM-/renderer-onafhankelijk toestandsmodel voor identieke hele eenheden, verdeling in toegestane gelijke delen (2/3/4), segmenten gevuld/leeg, eenheden in één handeling leeg/vullen en exacte hoeveelheidsberekening.
+- De noemer blijft gebaseerd op het oorspronkelijke aantal gelijke delen, ook wanneer segmenten leeg zijn. Een volledig lege verdeelde eenheid blijft met haar oorspronkelijke segmentgeometrie bestaan.
+- De hoeveelheid wordt met gehele getallen en exacte rationale bewerkingen berekend; de modeltoestand is immutable.
+- Nieuwe modeltests dekken initialisatie, exact verdelen, lege segmenten/noemers, hele eenheden leegmaken/herstellen, verschillende noemers, annotatiewaarden, immutability en ongeldige acties.
+- De centrale Fraction-interface-contracttests dekken de nieuwe quantity-configuratie en bewaken het bestaande FR2-contract.
+
+### Implementatiecommit en verificatie
+
+- Implementatiecommit: `6caf1cffbb6972ad195cb02ee983c1e953bd4dea`.
+- Deze codecommit is via Git-data-ref bijgewerkt; de Full Regression-workflow startte daardoor niet automatisch. Een daaropvolgende inhoudscommit via de repository Contents API wordt gebruikt om de verplichte push-triggered Full Regression op de code plus deze handoff-update uit te voeren.
+- Full Regression op de handoff-updatecommit: pending; rapporteer geen groen totdat de exacte commit en alle workflowstappen zijn gecontroleerd.
+- Er is nog geen interactiecontroller, rendereruitbreiding, uitlegsessie, taakbank of Skills-runtime-integratie gebouwd. Dat zijn afzonderlijke volgende fasen en mogen pas na een groene regressie beginnen.
+- `main` is niet gewijzigd. Geen Supabase-wijziging en geen deployment.
+
+### Volgende concrete stap
+
+Na een groene Full Regression op de handoff-updatecommit: bouw de gedeelde interactiecontroller (selecteren, verdelen, leeg/vullen, undo/redo en events) boven op het quantity-model. Daarna pas de centrale taart-/breukenbalkrenderers en de uitlegsessie.

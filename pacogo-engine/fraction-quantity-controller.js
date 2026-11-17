@@ -3,6 +3,7 @@ import {
   divideFractionQuantityUnit,
   setFractionQuantityUnitFilled,
   setFractionQuantitySegmentFilled,
+  restoreFractionQuantityUnit,
   getFractionQuantityAmount,
   getFractionQuantityRemovedAmount,
   getFractionQuantityUnitAnnotation
@@ -82,6 +83,10 @@ function createFractionQuantityController({ initialState, onChange = null } = {}
     if (selectedUnitId === null) throw new Error("Select a whole unit before dividing it");
     return divideUnit(selectedUnitId, denominator);
   };
+  const restoreUnit = unitId => {
+    requireUnit(unitId);
+    return commit(restoreFractionQuantityUnit(state, unitId), "restore_unit", { unitId });
+  };
   const setUnitFilled = (unitId, filled) => {
     requireUnit(unitId);
     return commit(setFractionQuantityUnitFilled(state, unitId, filled),
@@ -131,7 +136,7 @@ function createFractionQuantityController({ initialState, onChange = null } = {}
   };
   return Object.freeze({
     getState: snapshot, selectUnit, clearSelection, divideUnit, divideSelectedUnit,
-    setUnitFilled, setSegmentFilled, toggleSegment, undo, redo, subscribe,
+    setUnitFilled, setSegmentFilled, toggleSegment, restoreUnit, undo, redo, subscribe,
     canUndo: () => undoStack.length > 0,
     canRedo: () => redoStack.length > 0,
     getSelectedUnitId: () => selectedUnitId

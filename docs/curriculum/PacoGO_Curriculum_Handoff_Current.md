@@ -7570,3 +7570,45 @@ Ontwerp en bouw de centrale presentatie-/integratielaag voor de sessie, met de v
 8. Integreer via de bestaande Skills-runtime zonder de niveau-1-aftrekoefening, de afzonderlijke vierstaps-oefening of FR2 te wijzigen.
 
 Voer vóór de volgende bouwstap opnieuw de verplichte Full Regression-controle uit. De huidige laatste geverifieerde regressie is #3839 op commit `7e56ea0f3c368b0df7fbe018f074be868e6af1a7`.
+
+### Interactieve visuele aftreksessie — Fase E2: centrale leerlingpresentatie (17 november 2026)
+
+De configureerbare sessie heeft nu een herbruikbare leerlingpresentatie die de bestaande centrale breukcomponenten samenstelt.
+
+- Nieuw `pacogo-engine/fraction-quantity-subtraction-practice.js`: compositiecomponent voor de visuele aftreksessie.
+- De presentatie gebruikt verplicht de bestaande `createFractionPracticeTemplate`, `createFractionQuantityLearningInterfaceConfig`, `renderFractionQuantityLearningInterface` en `renderMixedNumber`. Er is geen tweede breuktemplate of eigen breukrenderer gemaakt.
+- De aftreksom wordt als horizontale berekening getoond. Gemengde breuken gebruiken de bestaande gestapelde breuknotatie; zichtbare slashnotatie wordt niet gebruikt.
+- De hoeveelheidweergave kiest per sessie één representatie (`pie` of `bar`) en gebruikt de bestaande quantity-controller.
+- De uitleg houdt de teller-/noemerbetekenis zichtbaar: teller = gevulde delen; noemer = alle oorspronkelijke gelijke delen. De bestaande renderer blijft per oorspronkelijke eenheid annoteren.
+- De leerling krijgt voortgang, **Controleren**, terugkoppeling en pas na een correcte controle de expliciete knop **Volgende som**. Na de tiende som verschijnt een afrondscherm.
+- Als de leerling na een controle de hoeveelheid wijzigt, wordt de oude controle ongeldig, verdwijnt de oude terugkoppeling en wordt **Controleren** opnieuw beschikbaar.
+- Enter op een gefocust segment bedient alleen dat segment. Enter op **Controleren** controleert de huidige hoeveelheid. Enter op **Volgende som** gaat alleen na een correcte controle naar de volgende som. Er is geen globale Enter-snelkoppeling die taken kan overslaan.
+- De centrale CSS-uitbreiding staat in `pacogo-engine/fraction-learning-interface.css`; er is geen nieuwe pagina- of oefening-specifieke stylesheet toegevoegd.
+- Nieuw `test/browser/fraction-quantity-subtraction-practice.browser.test.js`: browserdekking voor taart en breukenbalk als afzonderlijke sessievarianten, gebruik van de centrale template, blijvende annotaties, onjuiste controle, Enter-bediening, correcte controle en expliciete taakovergang.
+
+### Regressieonderzoek tijdens Fase E2
+
+- Full Regression #3841 was rood door een testlocator die segmentindex 0 globaal zocht en daardoor het segment in twee eenheden tegelijk vond. Alleen de locator is gescopeerd naar de eerste eenheid.
+- Full Regression #3842 was rood door een testassertie die `getByRole("status")` gebruikte terwijl zowel de bestaande rendererinstructie als de oefenfeedback bewust `role="status"` gebruiken. Alleen de testassertie is gescopeerd naar `.fraction-practice-feedback.is-correct`; het bestaande toegankelijkheidscontract van de renderer is ongewijzigd gebleven.
+- Beide oorzaken waren testselectieproblemen; er is geen productiecode aangepast om deze regressies te omzeilen.
+
+### Verificatie en resterende integratiegrens
+
+- Branch: `refactor/professional-v1`.
+- Presentatie-/browser-testcommit na de eerste implementatie en testlocatorcorrectie: `1aa5d413a99407a2666287e46e6ec60d7dea4f56`.
+- Full Regression #3843 / run `44087839194`: **GREEN / SUCCESS** op exact commit `1aa5d413a99407a2666287e46e6ec60d7dea4f56`. Alle stappen zijn voltooid, waaronder curriculum-engine-regressie, architectuurgrenzen, maintained Node- en Vitest-regressie, Chromium/browserregressie en clean-working-tree-controle.
+- De presentatie is als herbruikbare compositiecomponent getest met expliciete testopgaven. Zij is nog niet aan een productieroute in de Skills-runtime gekoppeld.
+- Er is nog geen goedgekeurde bron voor de concrete tien productieopgaven. Daarom is geen taakbank verzonnen en is nog geen routeknop toegevoegd die onvolledige of fictieve taakinhoud zou starten.
+- De bestaande niveau-1-aftrekoefening, de afzonderlijke vierstaps-aftrekoefening en FR2 blijven ongewijzigd. Geen Supabase-wijziging, geen deployment en geen wijziging aan `main`.
+
+### Volgende concrete stap — Fase E3
+
+Stel eerst de inhoudelijke taakconfiguratie van de tien sommen vast vanuit de bedoelde bron of expliciete goedkeuring. Daarna:
+1. voeg de tien opgaven toe aan één centrale, versieerbare taakbank;
+2. koppel de compositiecomponent vanuit de bestaande Skills-runtime en de bestaande breuken-/aftrekoverzichtsroute;
+3. behoud de centrale PacoGO-paginatemplate en Fraction Practice Template;
+4. voeg browserregressie toe voor de echte route en taakbank, inclusief visuele compactheid op desktop en mobiel;
+5. controleer dat de bestaande niveau-1-aftrekoefening, de vierstaps-oefening en FR2 ongewijzigd blijven.
+
+Vóór de volgende bouwstap opnieuw Full Regression controleren. De laatste geverifieerde codecommit is `1aa5d413a99407a2666287e46e6ec60d7dea4f56`, Full Regression #3843 groen. Deze handoff-update moet op haar eigen commit eveneens Full Regression groen doorlopen.
+

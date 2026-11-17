@@ -77,12 +77,11 @@ function divideFractionQuantityUnit(state, unitId, denominator) {
 }
 
 function restoreFractionQuantityUnit(state, unitId) {
-  return updateUnit(state, unitId, unit => {
-    if (!unit.segments.every(Boolean)) {
-      throw new Error("A unit with removed parts must be restored before resetting its division");
-    }
-    return { ...unit, denominator: 1, segments: [true] };
-  });
+  return updateUnit(state, unitId, unit => ({
+    ...unit,
+    denominator: 1,
+    segments: [true]
+  }));
 }
 
 function setFractionQuantityUnitFilled(state, unitId, filled) {

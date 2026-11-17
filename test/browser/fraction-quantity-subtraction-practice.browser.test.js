@@ -32,15 +32,41 @@ test("a whole pie is rendered as one continuous circle without a radial divider"
       "Eén heel",
       { layout: "pie", documentRef: document }
     );
-    const path = whole.querySelector(".pacogo-fraction-pie__sector");
+    const circle = whole.querySelector(".pacogo-fraction-pie__sector");
     return {
-      pathCount: whole.querySelectorAll(".pacogo-fraction-pie__sector").length,
-      path: path?.getAttribute("d") || ""
+      circleCount: whole.querySelectorAll("circle.pacogo-fraction-pie__sector").length,
+      pathCount: whole.querySelectorAll("path.pacogo-fraction-pie__sector").length,
+      circleRadius: circle?.getAttribute("r") || ""
     };
   });
-  expect(result.pathCount).toBe(1);
-  expect(result.path).toBe("M 50 4 A 46 46 0 1 1 50 96 A 46 46 0 1 1 50 4 Z");
-  expect(result.path).not.toContain("L 50 50");
+  expect(result.circleCount).toBe(1);
+  expect(result.pathCount).toBe(0);
+  expect(result.circleRadius).toBe("46");
+});
+
+
+
+test("whole interactive pies use circles and only gain radial lines after partitioning", async ({ page }) => {
+  await mountPractice(page, "pie", { whole: 1, numerator: 1, denominator: 4 });
+  const units = page.locator(".fraction-quantity-subtraction-model .pacogo-fraction-quantity__unit");
+  const firstWhole = units.nth(0).locator("circle.pacogo-fraction-quantity__sector");
+  const secondWhole = units.nth(1).locator("circle.pacogo-fraction-quantity__sector");
+
+  await expect(firstWhole).toHaveCount(1);
+  await expect(secondWhole).toHaveCount(1);
+  await expect(units.locator("path.pacogo-fraction-quantity__sector")).toHaveCount(0);
+
+  await firstWhole.click();
+  await units.nth(1).getByRole("button", { name: "Verdelen van eenheid 2" }).click();
+  await page.getByRole("button", { name: "4 delen" }).click();
+
+  await expect(units.nth(0).locator("circle.pacogo-fraction-quantity__sector")).toHaveCount(1);
+  await expect(units.nth(1).locator("circle.pacogo-fraction-quantity__sector")).toHaveCount(0);
+  const quarters = units.nth(1).locator("path.pacogo-fraction-quantity__sector");
+  await expect(quarters).toHaveCount(4);
+  for (let index = 0; index < 4; index += 1) {
+    await expect(quarters.nth(index)).toHaveAttribute("d", /^M 50 50 L /);
+  }
 });
 
 for (const representation of ["pie", "bar"]) {
@@ -58,8 +84,11 @@ for (const representation of ["pie", "bar"]) {
     if (representation === "pie") {
       const wholePiePaths = page.locator(".fraction-quantity-subtraction-model .pacogo-fraction-quantity__sector");
       await expect(wholePiePaths).toHaveCount(2);
-      await expect(wholePiePaths.first()).toHaveAttribute("d", "M 50 4 A 46 46 0 1 1 50 96 A 46 46 0 1 1 50 4 Z");
-      await expect(wholePiePaths.nth(1)).toHaveAttribute("d", "M 50 4 A 46 46 0 1 1 50 96 A 46 46 0 1 1 50 4 Z");
+      await expect(wholePiePaths).toHaveJSProperty("length", 2);
+      await expect(wholePiePaths.first()).toHaveJSProperty("tagName", "circle");
+      await expect(wholePiePaths.nth(1)).toHaveJSProperty("tagName", "circle");
+      await expect(wholePiePaths.first()).toHaveAttribute("r", "46");
+      await expect(wholePiePaths.nth(1)).toHaveAttribute("r", "46");
     }
     await expect(page.locator(".fraction-quantity-subtraction-prompt")).toContainText("Trek nu 1 hele en een half af.");
     await expect(page.locator(".fraction-quantity-subtraction-prompt")).toContainText("Verdeel een eenheid in gelijke delen");

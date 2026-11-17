@@ -7469,3 +7469,35 @@ Breid de bestaande centrale Fraction Learning Interface uit met een interactieve
 5. toetsenbord-/muis-/touchbediening die gebeurtenissen naar dezelfde quantity-controller stuurt.
 
 De gekozen weergave komt uit de configuratie per opgave; de twee representaties delen alle hoeveelheids- en interactielogica. Geen cijferlabels ín de taart of balk. Voordat Fase D code wordt gebouwd, moet de handoff-update op haar eigen commit Full Regression groen doorlopen.
+
+
+### Interactieve visuele aftrekuitleg — Fase D: eerste centrale rendererlaag (17 november 2026)
+
+De eerste rendererlaag voor de interactieve hoeveelheidweergave is gebouwd binnen de bestaande Fraction Learning Interface. Er is geen aparte pagina- of breuktemplate toegevoegd.
+
+- `pacogo-engine/fraction-learning-interface-renderers.js` bevat nu de gedeelde quantity-renderer voor taart- en breukenbalkweergave.
+- Beide weergaven gebruiken dezelfde centrale quantity-controller en dezelfde hoeveelheidsstatus.
+- De taartweergave gebruikt geometrisch gelijke sectoren; de breukenbalk gebruikt gelijke segmenten.
+- De annotatie per oorspronkelijke eenheid blijft zichtbaar. Een lege eenheid of een leeg segment blijft meetellen in de oorspronkelijke noemer en blijft op zijn plaats.
+- Hele eenheden kunnen als geheel worden gevuld/leeggemaakt; verdeelde eenheden kunnen per segment worden aangepast.
+- De taartsectoren zijn toetsenbordbedienbaar met Enter en spatie. De balksegmenten gebruiken native knoppen.
+- Ongedaan maken en opnieuw uitvoeren zijn aangesloten op dezelfde controller.
+- Centrale CSS staat in `pacogo-engine/fraction-learning-interface.css`.
+- De geometrie van taartsectoren (noemers 2, 3 en 4) heeft gerichte unit-tests.
+
+### Grenzen en resterend verificatiewerk
+
+Dit is de eerste centrale rendererlaag, nog geen geïntegreerde leerlingoefening. De renderer is nog niet gekoppeld aan een aftreksessie of Skills-runtime. De huidige nieuwe test controleert de geometrie van taartsectoren; zij bewijst nog niet de volledige DOM-interactie, het vullen/leegmaken via de gebruikersinterface, de toetsenbordbediening in de gerenderde omgeving of de blijvende zichtbaarheid van alle annotaties. Die interactietests moeten vóór runtime-integratie worden toegevoegd.
+
+De bestaande FR2-statische weergaven en de bestaande niveau-1-aftrekoefening moeten backward compatible blijven. Geen curriculum-/SLO-contracten, formele evidence, mastery, learner-state, Supabase of LIVE-main zijn gewijzigd.
+
+### Verificatie
+
+- Branch: `refactor/professional-v1`.
+- Laatste renderer-/testcommit: `1642797b45a97b2ac5e2dbb926661748f16ef331`.
+- Full Regression #3834 / run `44002609863`: **GREEN / SUCCESS** op exact deze commit. Alle workflowstappen zijn voltooid, inclusief curriculum-engine-regressie, architectuurgrenzen, maintained Node-regressie, Vitest, Chromium-installatie, browserregressie en clean-working-tree-controle.
+- `main` is onaangeraakt. Geen Supabase-wijziging en geen deployment.
+
+### Volgende concrete stap
+
+Werk eerst de handoff bij en verifieer die wijziging met Full Regression. Daarna: voeg gerichte DOM-/browserinteractietests toe voor beide weergaven, waaronder annotaties per eenheid, behouden noemers bij lege segmenten, segmentinteractie, Enter/spatie-bediening, selectie en undo/redo. Pas wanneer die centrale renderercontracten aantoonbaar werken, volgt koppeling aan de aftreksessie en bestaande centrale Skills/Fraction Practice Template. Geen aparte pagina bouwen; hergebruik de centrale breuktemplate en interface.

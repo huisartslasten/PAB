@@ -237,7 +237,7 @@ export function createSkillsRuntime({
       title.textContent = exercise.title;
       const instruction = documentRef.createElement('p');
       instruction.className = 'fraction-practice-instruction';
-      instruction.textContent = 'Trek het gemengde getal af van het hele getal. Geef je antwoord als breuk of gemengd getal.';
+      instruction.textContent = 'Trek het gemengde getal af van het hele getal. Geef je antwoord als gemengd getal.';
       const progressLabel = documentRef.createElement('p');
       progressLabel.className = 'fraction-practice-progress';
       progressLabel.textContent = formatFractionPracticeProgress(progress, exercise);
@@ -280,7 +280,7 @@ export function createSkillsRuntime({
       const answer = renderFractionAnswerInput({
         workMount: answerMount,
         controlsMount: template.controlsArea,
-        wholeNumberMode: 'optional'
+        wholeNumberMode: 'required'
       });
       const check = documentRef.createElement('button');
       check.type = 'button';

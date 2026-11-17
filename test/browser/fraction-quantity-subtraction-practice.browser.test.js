@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 async function mountPractice(page, representation, subtraction = { whole: 1, numerator: 1, denominator: 2 }) {
   await page.goto("http://127.0.0.1:4173/skills.html", { waitUntil: "domcontentloaded" });
-  await page.evaluate(async representationValue => {
+  await page.evaluate(async ({ representationValue, subtractionValue }) => {
     const { createFractionQuantitySubtractionPractice } =
       await import("/pacogo-engine/fraction-quantity-subtraction-practice.js");
     const mount = document.createElement("main");
@@ -13,12 +13,12 @@ async function mountPractice(page, representation, subtraction = { whole: 1, num
       tasks: Array.from({ length: 10 }, (_, index) => ({
         id: "quantity-subtraction-" + (index + 1),
         wholeUnits: 2,
-        subtraction
+        subtraction: subtractionValue
       })),
       representation: representationValue
     });
     window.__fractionQuantitySubtractionPractice = practice;
-  }, representation);
+  }, { representationValue: representation, subtractionValue: subtraction });
 }
 
 for (const representation of ["pie", "bar"]) {

@@ -260,12 +260,10 @@ function renderFractionQuantityLearningInterface({
       select.addEventListener("click", () => {
         controller.selectUnit(unit.id);
         instructions.textContent = "Gekozen. Kies nu hoe je deze eenheid wilt verdelen.";
-        onInteraction({ type: "unit_selected", unitId: unit.id });
       });
       const item = renderFractionQuantityUnit(unit, config.representation, documentRef,
         (unitId, segmentIndex) => {
           controller.toggleSegment(unitId, segmentIndex);
-          onInteraction({ type: "segment_toggled", unitId, segmentIndex });
         });
       annotated.append(select, item, renderFractionQuantityAnnotation(annotationByUnit.get(unit.id), documentRef));
       units.append(annotated);
@@ -286,7 +284,6 @@ function renderFractionQuantityLearningInterface({
           divide.addEventListener("click", () => {
             controller.divideUnit(selected.id, denominator);
             instructions.textContent = "De eenheid is verdeeld. Maak nu de af te trekken delen leeg.";
-            onInteraction({ type: "unit_divided", unitId: selected.id, denominator });
           });
           controls.append(divide);
         });
@@ -298,7 +295,6 @@ function renderFractionQuantityLearningInterface({
       empty.disabled = !selected.segments.some(Boolean);
       empty.addEventListener("click", () => {
         controller.setUnitFilled(selected.id, false);
-        onInteraction({ type: "unit_emptied", unitId: selected.id });
       });
       controls.append(empty);
     } else {

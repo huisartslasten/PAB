@@ -172,8 +172,16 @@ body.paco-template-practice-body { margin: 0; }
     font-size: 14px;
   }
   .paco-page-template[data-layout-mode="practice"] .paco-template-sidebar-card {
-    max-height: 136px;
-    padding: 7px 8px;
+    max-height: 80px;
+    padding: 5px 8px;
+  }
+  .paco-page-template[data-layout-mode="practice"] .paco-template-greeting {
+    margin: 0 6px 4px;
+    font-size: 16px;
+  }
+  .paco-page-template[data-layout-mode="practice"] .paco-template-navigation {
+    min-height: 0;
+    overflow-y: auto;
   }
   .paco-page-template[data-layout-mode="practice"] .paco-template-page-header {
     min-height: 46px;

@@ -119,4 +119,236 @@ function renderFractionInputRepresentation({ numerator = null, denominator = nul
   divider.className="pacogo-fraction-divider"; divider.setAttribute("aria-hidden","true");
   const bottom=part(denominator,"noemer",inputPart==="denominator"); wrapper.append(top,divider,bottom); return wrapper;
 }
-export { renderFractionRepresentation, renderMixedNumber, renderFractionInputRepresentation };
+
+function createFractionQuantityPieSectorPath(index, denominator) {
+  if (!Number.isSafeInteger(denominator) || denominator < 2 || denominator > 4 ||
+      !Number.isSafeInteger(index) || index < 0 || index >= denominator) {
+    throw new RangeError("A valid pie sector index and denominator from 2 to 4 are required");
+  }
+  const center = 50, radius = 46;
+  const startAngle = -Math.PI / 2 + index * Math.PI * 2 / denominator;
+  const endAngle = -Math.PI / 2 + (index + 1) * Math.PI * 2 / denominator;
+  const x1 = center + radius * Math.cos(startAngle);
+  const y1 = center + radius * Math.sin(startAngle);
+  const x2 = center + radius * Math.cos(endAngle);
+  const y2 = center + radius * Math.sin(endAngle);
+  const largeArc = endAngle - startAngle > Math.PI ? 1 : 0;
+  return "M 50 50 L " + x1.toFixed(4) + " " + y1.toFixed(4) +
+    " A 46 46 0 " + largeArc + " 1 " + x2.toFixed(4) + " " + y2.toFixed(4) + " Z";
+}
+
+function renderFractionQuantityAnnotation(annotation, documentRef) {
+  const wrapper = documentRef.createElement("span");
+  wrapper.className = "pacogo-fraction-quantity__annotation";
+  if (annotation.kind === "whole") {
+    wrapper.textContent = String(annotation.value);
+    wrapper.setAttribute("aria-label", annotation.value + " hele eenheden");
+    return wrapper;
+  }
+  wrapper.classList.add("pacogo-fraction-representation", "pacogo-fraction-representation--symbolic");
+  wrapper.setAttribute("role", "img");
+  wrapper.setAttribute("aria-label", annotation.numerator + " van " + annotation.denominator + " delen gevuld");
+  const numerator = documentRef.createElement("span");
+  numerator.className = "pacogo-fraction-numerator";
+  numerator.textContent = String(annotation.numerator);
+  const divider = documentRef.createElement("span");
+  divider.className = "pacogo-fraction-divider";
+  divider.setAttribute("aria-hidden", "true");
+  const denominator = documentRef.createElement("span");
+  denominator.className = "pacogo-fraction-denominator";
+  denominator.textContent = String(annotation.denominator);
+  wrapper.append(numerator, divider, denominator);
+  return wrapper;
+}
+
+function renderFractionQuantityPieUnit(unit, documentRef, onToggle) {
+  const svg = documentRef.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 100 100");
+  svg.setAttribute("class", "pacogo-fraction-quantity__pie");
+  svg.setAttribute("aria-hidden", "true");
+  unit.segments.forEach((filled, index) => {
+    const path = documentRef.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", unit.denominator === 1
+      ? "M 50 50 L 50 4 A 46 46 0 1 1 49.99 4 Z"
+      : createFractionQuantityPieSectorPath(index, unit.denominator));
+    path.setAttribute("class", "pacogo-fraction-quantity__sector" + (filled ? " is-filled" : ""));
+    path.dataset.segmentIndex = String(index);
+    svg.append(path);
+  });
+  return svg;
+}
+
+function renderFractionQuantityUnit(unit, representation, documentRef, onToggle) {
+  const group = documentRef.createElement("div");
+  group.className = "pacogo-fraction-quantity__unit";
+  group.dataset.unitId = unit.id;
+  const model = documentRef.createElement("div");
+  model.className = "pacogo-fraction-quantity__model";
+  if (representation === "pie") {
+    model.append(renderFractionQuantityPieUnit(unit, documentRef, onToggle));
+    model.setAttribute("aria-label", "Taartmodel");
+  } else {
+    model.classList.add("pacogo-fraction-quantity__bar");
+    unit.segments.forEach((filled, index) => {
+      const segment = documentRef.createElement("button");
+      segment.type = "button";
+      segment.className = "pacogo-fraction-quantity__segment" + (filled ? " is-filled" : "");
+      segment.dataset.segmentIndex = String(index);
+      segment.setAttribute("aria-label", (filled ? "Maak deel leeg" : "Vul deel") + " " + (index + 1));
+      segment.addEventListener("click", () => onToggle(unit.id, index));
+      model.append(segment);
+    });
+  }
+  if (representation === "pie") {
+    const hitArea = documentRef.createElement("div");
+    hitArea.className = "pacogo-fraction-quantity__pie-hit-area";
+    unit.segments.forEach((filled, index) => {
+      const segment = documentRef.createElement("button");
+      segment.type = "button";
+      segment.className = "pacogo-fraction-quantity__pie-control";
+      segment.dataset.segmentIndex = String(index);
+      segment.setAttribute("aria-label", (filled ? "Maak deel leeg" : "Vul deel") + " " + (index + 1));
+      segment.addEventListener("click", () => onToggle(unit.id, index));
+      hitArea.append(segment);
+    });
+    model.append(hitArea);
+  }
+  group.append(model);
+  return group;
+}
+
+function renderFractionQuantityLearningInterface({
+  mount,
+  config,
+  controller,
+  documentRef = document,
+  onInteraction = () => {}
+} = {}) {
+  if (!mount || typeof mount.replaceChildren !== "function") throw new TypeError("mount must be a DOM element");
+  if (!config || config.interfaceId !== "fraction" || config.mode !== "interactive_quantity" ||
+      !["pie", "bar"].includes(config.representation)) {
+    throw new TypeError("A valid interactive Fraction quantity config is required");
+  }
+  if (!controller || typeof controller.getState !== "function" ||
+      typeof controller.subscribe !== "function" || typeof controller.selectUnit !== "function" ||
+      typeof controller.divideUnit !== "function" || typeof controller.setUnitFilled !== "function" ||
+      typeof controller.toggleSegment !== "function" || typeof controller.undo !== "function" ||
+      typeof controller.redo !== "function") {
+    throw new TypeError("A compatible Fraction quantity controller is required");
+  }
+  if (typeof onInteraction !== "function") throw new TypeError("onInteraction must be a function");
+
+  const root = documentRef.createElement("section");
+  root.className = "pacogo-fraction-quantity";
+  root.dataset.representation = config.representation;
+  const units = documentRef.createElement("div");
+  units.className = "pacogo-fraction-quantity__units";
+  const controls = documentRef.createElement("div");
+  controls.className = "pacogo-fraction-quantity__controls";
+  const instructions = documentRef.createElement("p");
+  instructions.className = "pacogo-fraction-quantity__instructions";
+  instructions.setAttribute("role", "status");
+  const amount = documentRef.createElement("div");
+  amount.className = "pacogo-fraction-quantity__amount";
+  amount.setAttribute("aria-live", "polite");
+  root.append(units, controls, amount, instructions);
+
+  const render = snapshot => {
+    units.replaceChildren();
+    const annotationByUnit = new Map(snapshot.annotations.map(item => [item.unitId, item]));
+    snapshot.state.units.forEach(unit => {
+      const item = renderFractionQuantityUnit(unit, config.representation, documentRef,
+        (unitId, segmentIndex) => {
+          controller.toggleSegment(unitId, segmentIndex);
+          onInteraction({ type: "segment_toggled", unitId, segmentIndex });
+        });
+      const select = documentRef.createElement("button");
+      select.type = "button";
+      select.className = "pacogo-fraction-quantity__select" +
+        (snapshot.selectedUnitId === unit.id ? " is-selected" : "");
+      select.setAttribute("aria-pressed", String(snapshot.selectedUnitId === unit.id));
+      select.setAttribute("aria-label", "Selecteer eenheid " + (snapshot.state.units.indexOf(unit) + 1));
+      select.append(item);
+      select.addEventListener("click", event => {
+        if (event.target.closest(".pacogo-fraction-quantity__segment, .pacogo-fraction-quantity__pie-control")) return;
+        controller.selectUnit(unit.id);
+        instructions.textContent = "Gekozen. Kies nu hoe je deze eenheid wilt verdelen.";
+        onInteraction({ type: "unit_selected", unitId: unit.id });
+      });
+      const annotated = documentRef.createElement("div");
+      annotated.className = "pacogo-fraction-quantity__annotated-unit";
+      annotated.append(select, renderFractionQuantityAnnotation(annotationByUnit.get(unit.id), documentRef));
+      units.append(annotated);
+    });
+    controls.replaceChildren();
+    const selected = snapshot.state.units.find(unit => unit.id === snapshot.selectedUnitId);
+    if (selected) {
+      const divideLabel = documentRef.createElement("span");
+      divideLabel.className = "pacogo-fraction-quantity__control-label";
+      divideLabel.textContent = config.labels.divide;
+      controls.append(divideLabel);
+      if (selected.denominator === 1 && selected.segments[0]) {
+        config.allowedDivisions.forEach(denominator => {
+          const divide = documentRef.createElement("button");
+          divide.type = "button";
+          divide.className = "paco-btn paco-btn--secondary paco-btn--small";
+          divide.textContent = denominator + " gelijke delen";
+          divide.addEventListener("click", () => {
+            controller.divideUnit(selected.id, denominator);
+            instructions.textContent = "De eenheid is verdeeld. Maak nu de af te trekken delen leeg.";
+            onInteraction({ type: "unit_divided", unitId: selected.id, denominator });
+          });
+          controls.append(divide);
+        });
+      }
+      const empty = documentRef.createElement("button");
+      empty.type = "button";
+      empty.className = "paco-btn paco-btn--secondary paco-btn--small";
+      empty.textContent = "Hele eenheid leegmaken";
+      empty.disabled = !selected.segments.some(Boolean);
+      empty.addEventListener("click", () => {
+        controller.setUnitFilled(selected.id, false);
+        onInteraction({ type: "unit_emptied", unitId: selected.id });
+      });
+      controls.append(empty);
+    } else {
+      controls.append(documentRef.createTextNode("Selecteer een taart of balk."));
+    }
+    const value = snapshot.amount;
+    amount.replaceChildren();
+    const label = documentRef.createElement("span");
+    label.textContent = config.labels.quantity + ": ";
+    amount.append(label, renderFractionQuantityAnnotation({
+      kind: value.numerator === 0 && value.denominator === 1 || value.numerator === value.denominator
+        ? "whole" : "fraction",
+      value: value.whole,
+      numerator: value.numerator,
+      denominator: value.denominator
+    }, documentRef));
+    const history = documentRef.createElement("div");
+    history.className = "pacogo-fraction-quantity__history";
+    const undo = documentRef.createElement("button");
+    undo.type = "button"; undo.className = "paco-btn paco-btn--secondary paco-btn--small";
+    undo.textContent = "Ongedaan maken"; undo.disabled = !snapshot.canUndo;
+    undo.addEventListener("click", () => controller.undo());
+    const redo = documentRef.createElement("button");
+    redo.type = "button"; redo.className = "paco-btn paco-btn--secondary paco-btn--small";
+    redo.textContent = "Opnieuw uitvoeren"; redo.disabled = !snapshot.canRedo;
+    redo.addEventListener("click", () => controller.redo());
+    history.append(undo, redo);
+    controls.append(history);
+  };
+  const unsubscribe = controller.subscribe((event, snapshot) => {
+    render(snapshot);
+    onInteraction(event);
+  });
+  render(controller.getState());
+  mount.replaceChildren(root);
+  return Object.freeze({
+    getElement: () => root,
+    getState: () => controller.getState(),
+    destroy: () => unsubscribe()
+  });
+}
+
+export { renderFractionRepresentation, renderMixedNumber, renderFractionInputRepresentation, createFractionQuantityPieSectorPath, renderFractionQuantityAnnotation, renderFractionQuantityLearningInterface };

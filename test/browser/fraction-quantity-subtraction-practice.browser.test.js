@@ -29,10 +29,13 @@ for (const representation of ["pie", "bar"]) {
     await expect(page.getByRole("heading", { name: "Visueel aftrekken" })).toBeVisible();
     await expect(page.getByText("Som 1 van 10 · 0 afgerond")).toBeVisible();
     await expect(page.getByLabel("Aftreksom", { exact: true })).toBeVisible();
-    await expect(page.locator(".fraction-quantity-subtraction-expression--visual")).toBeVisible();
-    await expect(page.locator(".fraction-quantity-subtraction-expression--visual .pacogo-fraction-quantity__annotation")).toHaveCount(4);
+    await expect(page.locator(".fraction-quantity-subtraction-expression--visual")).toHaveCount(0);
+    await expect(page.locator(".fraction-quantity-subtraction-expression")).toBeVisible();
     await expect(page.locator(".pacogo-fraction-quantity")).toHaveAttribute("data-representation", representation);
-    await expect(page.locator(".pacogo-fraction-quantity .pacogo-fraction-quantity__annotation")).toHaveCount(2);
+    await expect(page.locator(".pacogo-fraction-quantity__annotation")).toHaveCount(0);
+    await expect(page.locator(".pacogo-fraction-quantity__annotated-unit")).toHaveCount(2);
+    await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Over: 2");
+    await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Afgetrokken: 0");
 
     await page.getByRole("button", { name: "Controleren" }).click();
     await expect(page.getByRole("alert")).toContainText("Nog niet");
@@ -43,38 +46,40 @@ for (const representation of ["pie", "bar"]) {
       ? firstUnit.locator(".pacogo-fraction-quantity__sector")
       : firstUnit.locator(".pacogo-fraction-quantity__segment");
     await wholeBar.click();
-    await expect(page.locator(".pacogo-fraction-quantity .pacogo-fraction-quantity__annotation").first()).toHaveAttribute("aria-label", "0 hele eenheden");
+    await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Over: 1");
+    await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Afgetrokken: 1");
+    await wholeBar.click();
+    await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Over: 2");
+    await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Afgetrokken: 0");
+    await wholeBar.click();
 
     const secondUnit = page.locator(".pacogo-fraction-quantity .pacogo-fraction-quantity__annotated-unit").nth(1);
-    await secondUnit.getByRole("button", { name: "Selecteer eenheid 2" }).click();
-    await page.getByRole("button", { name: "4 gelijke delen" }).click();
-    await expect(secondUnit.getByRole("button", { name: "Verdeling van eenheid 2 opnieuw kiezen" })).toBeVisible();
-    await secondUnit.getByRole("button", { name: "Verdeling van eenheid 2 opnieuw kiezen" }).click();
-    await expect(page.locator(".pacogo-fraction-quantity .pacogo-fraction-quantity__annotation").nth(1)).toHaveAttribute("aria-label", "1 hele eenheden");
-    await secondUnit.getByRole("button", { name: "Selecteer eenheid 2" }).click();
-    await page.getByRole("button", { name: "2 gelijke delen" }).click();
+    await secondUnit.getByRole("button", { name: "Verdelen van balk 2" }).click();
+    await page.getByRole("button", { name: "4 delen" }).click();
+    await expect(page.locator(".pacogo-fraction-quantity__controls")).toContainText("Andere verdeling");
+    await page.getByRole("button", { name: "Andere verdeling" }).click();
+    await secondUnit.getByRole("button", { name: "Verdelen van balk 2" }).click();
+    await page.getByRole("button", { name: "2 delen" }).click();
     const segment = representation === "pie"
       ? secondUnit.locator('.pacogo-fraction-quantity__sector[data-segment-index="0"]')
       : secondUnit.locator('.pacogo-fraction-quantity__segment[data-segment-index="0"]');
-    await segment.focus();
-    await segment.press("Enter");
-    await expect(page.locator(".pacogo-fraction-quantity .pacogo-fraction-quantity__annotation").nth(1)).toHaveAttribute("aria-label", "1 van 2 delen gevuld");
-    await secondUnit.getByRole("button", { name: "Verdeling van eenheid 2 opnieuw kiezen" }).click();
-    await expect(page.locator(".pacogo-fraction-quantity .pacogo-fraction-quantity__annotation").nth(1)).toHaveAttribute("aria-label", "1 hele eenheden");
-    await secondUnit.getByRole("button", { name: "Selecteer eenheid 2" }).click();
-    await page.getByRole("button", { name: "2 gelijke delen" }).click();
-    const resetSegment = representation === "pie"
-      ? secondUnit.locator('.pacogo-fraction-quantity__sector[data-segment-index="0"]')
-      : secondUnit.locator('.pacogo-fraction-quantity__segment[data-segment-index="0"]');
-    await resetSegment.focus();
-    await resetSegment.press("Enter");
-    await expect(page.locator(".pacogo-fraction-quantity .pacogo-fraction-quantity__annotation").nth(1)).toHaveAttribute("aria-label", "1 van 2 delen gevuld");
+    await segment.click();
+    await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Over: 1 1/2");
+    await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Afgetrokken: 1/2");
+    await segment.click();
+    await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Over: 2");
+    await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Afgetrokken: 0");
+    await segment.click();
+    await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Over: 1 1/2");
+    await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Afgetrokken: 1/2");
     await expect(page.getByRole("alert")).toHaveCount(0);
 
     const check = page.getByRole("button", { name: "Controleren" });
     await check.focus();
     await check.press("Enter");
     await expect(page.locator(".fraction-practice-feedback.is-correct")).toContainText("precies de gevraagde hoeveelheid afgetrokken");
+    await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Over: 1/2");
+    await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Afgetrokken: 1 1/2");
     await expect(page.getByRole("button", { name: "Volgende som" })).toBeVisible();
     await expect(page.getByText("Som 1 van 10 · 0 afgerond")).toBeVisible();
 
@@ -133,10 +138,11 @@ async function mountSkillsRoute(page) {
       visualUnitCount: visualExpression?.querySelectorAll(".fraction-quantity-subtraction-expression__term .pacogo-fraction-quantity__annotated-unit").length || 0,
       interactiveRepresentation: interactiveModel?.dataset.representation || "",
       annotationCount: interactiveModel?.querySelectorAll(".pacogo-fraction-quantity__annotation").length || 0,
+      interactiveUnitCount: interactiveModel?.querySelectorAll(".pacogo-fraction-quantity__annotated-unit").length || 0,
       interactiveUnitWidth: interactiveModel?.querySelector(".pacogo-fraction-quantity__annotated-unit")?.getBoundingClientRect().width || 0,
       interactiveSelectWidth: interactiveModel?.querySelector(".pacogo-fraction-quantity__select")?.getBoundingClientRect().width || 0,
       interactiveBarWidth: interactiveModel?.querySelector(".pacogo-fraction-quantity__model")?.getBoundingClientRect().width || 0,
-      targetBarWidth: visualExpression?.querySelector(".pacogo-fraction-quantity__annotated-unit .pacogo-fraction-quantity__model")?.getBoundingClientRect().width || 0,
+      targetBarWidth: 116,
       cardWidth: card?.getBoundingClientRect().width || 0,
       cardHeight: card?.getBoundingClientRect().height || 0,
       cardTop: card?.getBoundingClientRect().top || 0,
@@ -165,15 +171,13 @@ test("real Skills route mounts the central fraction template and the approved te
   expect(result.taskRepresentations).toEqual(["bar", "pie", "bar", "pie", "bar", "pie", "bar", "pie", "bar", "pie"]);
   expect(result.firstTaskProgress).toContain("Som 1 van 10");
   expect(result.symbolicExpression).toContain("2");
-  expect(result.visualExpression).toBe(true);
-  expect(result.visualRepresentation).toBe("bar");
-  expect(result.visualUnitCount).toBe(4);
+  expect(result.visualExpression).toBe(false);
+  expect(result.visualUnitCount).toBe(0);
   expect(result.interactiveRepresentation).toBe("bar");
-  expect(result.annotationCount).toBe(2);
-  expect(result.targetBarWidth).toBe(116);
-  expect(result.interactiveUnitWidth).toBe(result.targetBarWidth);
-  expect(result.interactiveSelectWidth).toBe(result.targetBarWidth);
-  expect(result.interactiveBarWidth).toBe(result.targetBarWidth);
+  expect(result.annotationCount).toBe(0);
+  expect(result.interactiveUnitCount).toBe(2);
+  expect(result.interactiveUnitWidth).toBe(116);
+  expect(result.interactiveBarWidth).toBe(116);
   expect(result.documentWidth).toBeLessThanOrEqual(result.viewportWidth);
 });
 
@@ -184,13 +188,12 @@ test("real visual subtraction route has no horizontal overflow on a mobile scree
   expect(result.title).toBe("Oefenen");
   expect(result.centralPage).toBe(true);
   expect(result.fractionTemplateCount).toBe(1);
-  expect(result.visualRepresentation).toBe("bar");
+  expect(result.visualExpression).toBe(false);
   expect(result.interactiveRepresentation).toBe("bar");
+  expect(result.interactiveUnitCount).toBe(2);
   expect(result.documentWidth).toBeLessThanOrEqual(result.viewportWidth);
-  expect(result.targetBarWidth).toBe(116);
-  expect(result.interactiveUnitWidth).toBe(result.targetBarWidth);
-  expect(result.interactiveSelectWidth).toBe(result.targetBarWidth);
-  expect(result.interactiveBarWidth).toBe(result.targetBarWidth);
+  expect(result.interactiveUnitWidth).toBe(116);
+  expect(result.interactiveBarWidth).toBe(116);
   expect(result.cardWidth).toBeGreaterThan(0);
   expect(result.cardWidth).toBeLessThanOrEqual(result.viewportWidth);
 });

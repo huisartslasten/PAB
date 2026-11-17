@@ -15,23 +15,22 @@ function createMemoryStorage() {
 }
 
 const exercise = FRACTION_SUBTRACTION_EXERCISE;
-assert.equal(exercise.questionCount, 4);
-assert.equal(exercise.tasks.length, 4);
+assert.equal(exercise.questionCount, 15);
+assert.equal(exercise.tasks.length, 15);
 assert.equal(exercise.difficultyLevel, 1);
 assert.equal(exercise.maxDifficultyLevel, 5);
-assert.deepEqual(exercise.tasks.map(task => [task.whole, task.mixed.whole, task.mixed.numerator, task.mixed.denominator]), [
-  [8, 2, 5, 7],
-  [6, 5, 4, 9],
-  [6, 3, 3, 7],
-  [9, 8, 6, 7]
-]);
-assert.deepEqual(exercise.tasks.map(task => task.answer), [
-  { whole: 5, numerator: 2, denominator: 7 },
-  { whole: 0, numerator: 5, denominator: 9 },
-  { whole: 2, numerator: 4, denominator: 7 },
-  { whole: 0, numerator: 1, denominator: 7 }
-]);
-assert.equal(new Set(exercise.tasks.map(task => task.id)).size, 4);
+assert.equal(new Set(exercise.tasks.map(task => task.id)).size, 15);
+assert.ok(exercise.tasks.every(task =>
+  task.whole > task.mixed.whole &&
+  task.mixed.numerator > 0 &&
+  task.mixed.numerator < task.mixed.denominator &&
+  task.answer.whole === task.whole - task.mixed.whole - 1 &&
+  task.answer.numerator === task.mixed.denominator - task.mixed.numerator &&
+  task.answer.denominator === task.mixed.denominator
+));
+assert.equal(new Set(exercise.tasks.map(task =>
+  [task.whole, task.mixed.whole, task.mixed.numerator, task.mixed.denominator].join("|")
+)).size, 15);
 
 const storage = createMemoryStorage();
 const learnerA = createFractionSubtractionPracticeSession({ learnerKey: "learner-a", storage });
@@ -40,54 +39,44 @@ assert.deepEqual(
   Object.fromEntries(["id", "index", "total", "difficultyLevel", "maxDifficultyLevel"].map(key =>
     [key, learnerA.getCurrentTask()[key]]
   )),
-  { id: "FWS1-01", index: 1, total: 4, difficultyLevel: 1, maxDifficultyLevel: 5 }
+  { id: "FWS1-01", index: 1, total: 15, difficultyLevel: 1, maxDifficultyLevel: 5 }
 );
 assert.equal(learnerA.getProgress().completedCount, 0);
 
-// The first result is a mixed number: 5 2/7.
+// First task: verify mixed-number input and progress.
+const first = exercise.tasks[0];
 const firstCorrect = learnerA.recordAnswer({
-  values: { wholeNumberEnabled: true, wholeNumber: "5", numerator: "2", denominator: "7" }
+  values: { wholeNumberEnabled: true, wholeNumber: String(first.answer.whole),
+    numerator: String(first.answer.numerator), denominator: String(first.answer.denominator) }
 });
 assert.equal(firstCorrect.classification, "valid");
 assert.equal(firstCorrect.progress.completedCount, 1);
 assert.equal(firstCorrect.currentTask.id, "FWS1-02");
 
-// The second result is a proper fraction: the whole-number field must stay disabled.
-const unnecessaryWhole = learnerA.recordAnswer({
-  values: { wholeNumberEnabled: true, wholeNumber: "0", numerator: "5", denominator: "9" }
+// Wrong answers are retained without advancing; then all remaining authored tasks are completed.
+const wrongSecond = learnerA.recordAnswer({
+  values: { wholeNumberEnabled: true, wholeNumber: "99", numerator: "1", denominator: "2" }
 });
-assert.equal(unnecessaryWhole.classification, "invalid_input");
-assert.equal(unnecessaryWhole.progress.completedCount, 1);
+assert.equal(wrongSecond.classification, "incorrect_answer");
+assert.equal(wrongSecond.progress.completedCount, 1);
+assert.equal(wrongSecond.currentTask.id, "FWS1-02");
 
-const secondCorrect = learnerA.recordAnswer({
-  values: { wholeNumberEnabled: false, numerator: "5", denominator: "9" }
-});
-assert.equal(secondCorrect.classification, "valid");
-assert.equal(secondCorrect.currentTask.id, "FWS1-03");
-
-// Wrong answers are recorded but do not advance the learner.
-const wrongThird = learnerA.recordAnswer({
-  values: { wholeNumberEnabled: true, wholeNumber: "2", numerator: "3", denominator: "7" }
-});
-assert.equal(wrongThird.classification, "incorrect_answer");
-assert.equal(wrongThird.progress.completedCount, 2);
-assert.equal(wrongThird.currentTask.id, "FWS1-03");
-
-const thirdCorrect = learnerA.recordAnswer({
-  values: { wholeNumberEnabled: true, wholeNumber: "2", numerator: "4", denominator: "7" }
-});
-assert.equal(thirdCorrect.classification, "valid");
-assert.equal(thirdCorrect.currentTask.id, "FWS1-04");
-
-const fourthCorrect = learnerA.recordAnswer({
-  values: { wholeNumberEnabled: false, numerator: "1", denominator: "7" }
-});
-assert.equal(fourthCorrect.classification, "valid");
-assert.equal(fourthCorrect.currentTask, null);
+for (const task of exercise.tasks.slice(1)) {
+  const answer = learnerA.recordAnswer({
+    values: {
+      wholeNumberEnabled: task.answer.whole > 0,
+      wholeNumber: task.answer.whole > 0 ? String(task.answer.whole) : "",
+      numerator: String(task.answer.numerator),
+      denominator: String(task.answer.denominator)
+    }
+  });
+  assert.equal(answer.classification, "valid", task.id);
+}
+assert.equal(learnerA.getCurrentTask(), null);
 assert.deepEqual(learnerA.getProgress(), {
-  completedCount: 4,
-  totalCount: 4,
-  attemptCount: 6,
+  completedCount: 15,
+  totalCount: 15,
+  attemptCount: 16,
   isComplete: true
 });
 assert.equal(learnerB.getProgress().completedCount, 0);

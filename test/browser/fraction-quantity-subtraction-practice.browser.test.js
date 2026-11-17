@@ -28,9 +28,11 @@ for (const representation of ["pie", "bar"]) {
     await expect(page.locator('[data-component="fraction-practice-template"]')).toHaveCount(1);
     await expect(page.getByRole("heading", { name: "Visueel aftrekken" })).toBeVisible();
     await expect(page.getByText("Som 1 van 10 · 0 afgerond")).toBeVisible();
-    await expect(page.locator(".fraction-quantity-subtraction-expression")).toBeVisible();
+    await expect(page.getByLabel("Aftreksom", { exact: true })).toBeVisible();
+    await expect(page.locator(".fraction-quantity-subtraction-expression--visual")).toBeVisible();
+    await expect(page.locator(".fraction-quantity-subtraction-expression--visual .pacogo-fraction-quantity__annotation")).toHaveCount(3);
     await expect(page.locator(".pacogo-fraction-quantity")).toHaveAttribute("data-representation", representation);
-    await expect(page.locator(".pacogo-fraction-quantity__annotation")).toHaveCount(2);
+    await expect(page.locator(".pacogo-fraction-quantity .pacogo-fraction-quantity__annotation")).toHaveCount(2);
 
     await page.getByRole("button", { name: "Controleren" }).click();
     await expect(page.getByRole("alert")).toContainText("Nog niet");
@@ -44,7 +46,7 @@ for (const representation of ["pie", "bar"]) {
       : firstUnit.locator('.pacogo-fraction-quantity__segment[data-segment-index="0"]');
     await segment.focus();
     await segment.press("Enter");
-    await expect(page.locator(".pacogo-fraction-quantity__annotation").first()).toHaveAttribute("aria-label", "1 van 2 delen gevuld");
+    await expect(page.locator(".pacogo-fraction-quantity .pacogo-fraction-quantity__annotation").first()).toHaveAttribute("aria-label", "1 van 2 delen gevuld");
     await expect(page.getByRole("alert")).toHaveCount(0);
 
     const check = page.getByRole("button", { name: "Controleren" });

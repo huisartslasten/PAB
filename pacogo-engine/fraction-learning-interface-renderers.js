@@ -316,7 +316,8 @@ function renderFractionQuantityLearningInterface({
   }
   if (!controller || typeof controller.getState !== "function" ||
       typeof controller.subscribe !== "function" || typeof controller.selectUnit !== "function" ||
-      typeof controller.divideUnit !== "function" || typeof controller.toggleSegment !== "function" ||
+      typeof controller.divideUnit !== "function" || typeof controller.setUnitFilled !== "function" ||
+      typeof controller.toggleSegment !== "function" ||
       typeof controller.restoreUnit !== "function") {
     throw new TypeError("A compatible Fraction quantity controller is required");
   }
@@ -336,22 +337,28 @@ function renderFractionQuantityLearningInterface({
 
   const render = snapshot => {
     units.replaceChildren();
+    const annotationByUnit = new Map(snapshot.annotations.map(item => [item.unitId, item]));
     snapshot.state.units.forEach((unit, index) => {
       const annotated = documentRef.createElement("div");
       annotated.className = "pacogo-fraction-quantity__annotated-unit";
       const item = renderFractionQuantityUnit(unit, config.representation, documentRef,
         (unitId, segmentIndex) => {
           const current = controller.getState().state.units.find(candidate => candidate.id === unitId);
+          if (!current) return;
+          if (current.denominator === 1) {
+            controller.setUnitFilled(unitId, !current.segments[0]);
+            return;
+          }
           controller.toggleSegment(unitId, segmentIndex);
         });
       const divideTrigger = documentRef.createElement("button");
       divideTrigger.type = "button";
       divideTrigger.className = "pacogo-fraction-quantity__divide-trigger";
       divideTrigger.textContent = "⋯";
-      divideTrigger.setAttribute("aria-label", "Verdelen van balk " + (index + 1));
+      divideTrigger.setAttribute("aria-label", "Verdelen van " + String(config.labels.unit || "eenheid").toLowerCase() + " " + (index + 1));
       divideTrigger.setAttribute("aria-expanded", String(snapshot.selectedUnitId === unit.id));
       divideTrigger.addEventListener("click", () => controller.selectUnit(unit.id));
-      annotated.append(item, divideTrigger);
+      annotated.append(item, renderFractionQuantityAnnotation(annotationByUnit.get(unit.id), documentRef), divideTrigger);
       if (snapshot.selectedUnitId === unit.id) annotated.classList.add("is-selected");
       units.append(annotated);
     });

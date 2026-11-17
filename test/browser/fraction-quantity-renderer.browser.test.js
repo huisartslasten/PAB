@@ -32,7 +32,7 @@ for (const representation of ['pie', 'bar']) {
 
     const units = page.locator('.pacogo-fraction-quantity__annotated-unit');
     await expect(units).toHaveCount(2);
-    await expect(page.locator('.pacogo-fraction-quantity__annotation')).toHaveCount(0);
+    await expect(page.locator('.pacogo-fraction-quantity__annotation')).toHaveCount(2);
     await expect(page.getByRole('button', { name: 'Ongedaan maken' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Opnieuw uitvoeren' })).toHaveCount(0);
 
@@ -40,34 +40,42 @@ for (const representation of ['pie', 'bar']) {
     const whole = representation === 'pie'
       ? firstUnit.locator('.pacogo-fraction-quantity__sector')
       : firstUnit.locator('.pacogo-fraction-quantity__segment');
+    const annotation = firstUnit.locator('.pacogo-fraction-quantity__annotation');
+    await expect(annotation).toHaveAttribute('aria-label', '1 hele eenheden');
     await whole.click();
+    await expect(annotation).toHaveAttribute('aria-label', '0 hele eenheden');
     await expect(page.locator('.pacogo-fraction-quantity__amount')).toContainText('Over: 1');
     await expect(page.locator('.pacogo-fraction-quantity__amount')).toContainText('Afgetrokken: 1');
     await whole.click();
+    await expect(annotation).toHaveAttribute('aria-label', '1 hele eenheden');
     await expect(page.locator('.pacogo-fraction-quantity__amount')).toContainText('Over: 2');
     await expect(page.locator('.pacogo-fraction-quantity__amount')).toContainText('Afgetrokken: 0');
 
-    await units.nth(0).getByRole('button', { name: 'Verdelen van balk 1' }).click();
+    await units.nth(0).getByRole('button', { name: 'Verdelen van eenheid 1' }).click();
     await page.getByRole('button', { name: '3 delen' }).click();
     const segments = representation === 'pie'
       ? firstUnit.locator('.pacogo-fraction-quantity__sector')
       : firstUnit.locator('.pacogo-fraction-quantity__segment');
     await expect(segments).toHaveCount(3);
+    await expect(annotation).toHaveAttribute('aria-label', '3 van 3 delen gevuld');
 
     const firstSegment = firstUnit.locator('[data-segment-index="0"]');
     await firstSegment.click();
+    await expect(annotation).toHaveAttribute('aria-label', '2 van 3 delen gevuld');
     await expect(firstSegment).toHaveAttribute('aria-label', 'Vul: deel 1');
     await firstSegment.focus();
     await firstSegment.press('Enter');
+    await expect(annotation).toHaveAttribute('aria-label', '1 van 3 delen gevuld');
     await expect(firstSegment).toHaveAttribute('aria-label', 'Maak leeg: deel 1');
     await firstSegment.click();
+    await expect(annotation).toHaveAttribute('aria-label', '2 van 3 delen gevuld');
     await expect(firstSegment).toHaveAttribute('aria-label', 'Vul: deel 1');
 
     await page.getByRole('button', { name: 'Andere verdeling' }).click();
     await expect(segments).toHaveCount(1);
-    await expect(page.locator('.pacogo-fraction-quantity__annotation')).toHaveCount(0);
+    await expect(page.locator('.pacogo-fraction-quantity__annotation')).toHaveCount(2);
     const events = await page.evaluate(() => window.__fractionQuantityTest.events);
     expect(events).toContain('unit_selected');
-    expect(events.filter(type => type === 'quantity_changed').length).toBe(5);
+    expect(events.filter(type => type === 'quantity_changed').length).toBe(6);
   });
 }

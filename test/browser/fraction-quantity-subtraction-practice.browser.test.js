@@ -29,10 +29,13 @@ for (const representation of ["pie", "bar"]) {
     await expect(page.getByRole("heading", { name: "Visueel aftrekken" })).toBeVisible();
     await expect(page.getByText("Som 1 van 10 · 0 afgerond")).toBeVisible();
     await expect(page.getByLabel("Aftreksom", { exact: true })).toBeVisible();
-    await expect(page.locator(".fraction-quantity-subtraction-expression--visual")).toHaveCount(0);
-    await expect(page.locator(".fraction-quantity-subtraction-expression")).toBeVisible();
-    await expect(page.locator(".pacogo-fraction-quantity")).toHaveAttribute("data-representation", representation);
-    await expect(page.locator(".pacogo-fraction-quantity__annotation")).toHaveCount(0);
+    await expect(page.locator(".fraction-quantity-subtraction-expression--visual")).toHaveCount(1);
+    await expect(page.locator(".fraction-quantity-subtraction-expression--visual")).toBeVisible();
+    await expect(page.locator(".fraction-quantity-subtraction-model .pacogo-fraction-quantity")).toHaveAttribute("data-representation", representation);
+    await expect(page.locator(".fraction-quantity-subtraction-model .pacogo-fraction-quantity__annotation")).toHaveCount(2);
+    await expect(page.locator(".fraction-quantity-subtraction-prompt")).toContainText("Trek nu 1 hele en een half af.");
+    await expect(page.locator(".fraction-quantity-subtraction-prompt")).toContainText("Verdeel een eenheid in gelijke delen");
+    await expect(page.locator(".fraction-quantity-subtraction-expression--visual .pacogo-fraction-quantity__annotation")).toHaveCount(4);
     await expect(page.locator(".pacogo-fraction-quantity__annotated-unit")).toHaveCount(2);
     await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Over: 2");
     await expect(page.locator(".pacogo-fraction-quantity__amount")).toContainText("Afgetrokken: 0");
@@ -54,11 +57,11 @@ for (const representation of ["pie", "bar"]) {
     await wholeBar.click();
 
     const secondUnit = page.locator(".pacogo-fraction-quantity .pacogo-fraction-quantity__annotated-unit").nth(1);
-    await secondUnit.getByRole("button", { name: "Verdelen van balk 2" }).click();
+    await secondUnit.getByRole("button", { name: "Verdelen van eenheid 2" }).click();
     await page.getByRole("button", { name: "4 delen" }).click();
     await expect(page.locator(".pacogo-fraction-quantity__controls")).toContainText("Andere verdeling");
     await page.getByRole("button", { name: "Andere verdeling" }).click();
-    await secondUnit.getByRole("button", { name: "Verdelen van balk 2" }).click();
+    await secondUnit.getByRole("button", { name: "Verdelen van eenheid 2" }).click();
     await page.getByRole("button", { name: "2 delen" }).click();
     const segment = representation === "pie"
       ? secondUnit.locator('.pacogo-fraction-quantity__sector[data-segment-index="0"]')
@@ -87,7 +90,7 @@ for (const representation of ["pie", "bar"]) {
     await next.focus();
     await next.press("Enter");
     await expect(page.getByText("Som 2 van 10 · 1 afgerond")).toBeVisible();
-    await expect(page.locator(".pacogo-fraction-quantity")).toHaveAttribute("data-representation", representation);
+    await expect(page.locator(".fraction-quantity-subtraction-model .pacogo-fraction-quantity")).toHaveAttribute("data-representation", representation);
     await expect(page.locator(".pacogo-fraction-quantity .pacogo-fraction-quantity__annotation")).toHaveCount(2);
     await expect(page.locator('[data-component="fraction-practice-template"]')).toHaveCount(1);
   });
@@ -136,6 +139,9 @@ async function mountSkillsRoute(page) {
       visualExpression: Boolean(visualExpression),
       visualRepresentation: visualExpression?.dataset.representation || "",
       visualUnitCount: visualExpression?.querySelectorAll(".fraction-quantity-subtraction-expression__term .pacogo-fraction-quantity__annotated-unit").length || 0,
+      visualAnnotationCount: visualExpression?.querySelectorAll(".pacogo-fraction-quantity__annotation").length || 0,
+      visualUnitWidth: visualExpression?.querySelector(".pacogo-fraction-quantity__annotated-unit")?.getBoundingClientRect().width || 0,
+      visualModelWidth: visualExpression?.querySelector(".pacogo-fraction-quantity__model")?.getBoundingClientRect().width || 0,
       interactiveRepresentation: interactiveModel?.dataset.representation || "",
       annotationCount: interactiveModel?.querySelectorAll(".pacogo-fraction-quantity__annotation").length || 0,
       interactiveUnitCount: interactiveModel?.querySelectorAll(".pacogo-fraction-quantity__annotated-unit").length || 0,
@@ -171,13 +177,19 @@ test("real Skills route mounts the central fraction template and the approved te
   expect(result.taskRepresentations).toEqual(["bar", "pie", "bar", "pie", "bar", "pie", "bar", "pie", "bar", "pie"]);
   expect(result.firstTaskProgress).toContain("Som 1 van 10");
   expect(result.symbolicExpression).toContain("2");
-  expect(result.visualExpression).toBe(false);
-  expect(result.visualUnitCount).toBe(0);
+  expect(result.visualExpression).toBe(true);
+  expect(result.visualUnitCount).toBe(4);
+  expect(result.visualRepresentation).toBe("bar");
+  expect(result.visualAnnotationCount).toBe(4);
+  expect(result.visualUnitWidth).toBe(116);
+  expect(result.visualModelWidth).toBe(116);
   expect(result.interactiveRepresentation).toBe("bar");
-  expect(result.annotationCount).toBe(0);
+  expect(result.annotationCount).toBe(2);
   expect(result.interactiveUnitCount).toBe(2);
   expect(result.interactiveUnitWidth).toBe(116);
   expect(result.interactiveBarWidth).toBe(116);
+  expect(result.visualUnitWidth).toBe(result.interactiveUnitWidth);
+  expect(result.visualModelWidth).toBe(result.interactiveBarWidth);
   expect(result.documentWidth).toBeLessThanOrEqual(result.viewportWidth);
 });
 
@@ -188,12 +200,20 @@ test("real visual subtraction route has no horizontal overflow on a mobile scree
   expect(result.title).toBe("Oefenen");
   expect(result.centralPage).toBe(true);
   expect(result.fractionTemplateCount).toBe(1);
-  expect(result.visualExpression).toBe(false);
+  expect(result.visualExpression).toBe(true);
+  expect(result.visualRepresentation).toBe("bar");
+  expect(result.visualUnitCount).toBe(4);
+  expect(result.visualAnnotationCount).toBe(4);
+  expect(result.visualUnitWidth).toBe(116);
+  expect(result.visualModelWidth).toBe(116);
   expect(result.interactiveRepresentation).toBe("bar");
+  expect(result.annotationCount).toBe(2);
   expect(result.interactiveUnitCount).toBe(2);
   expect(result.documentWidth).toBeLessThanOrEqual(result.viewportWidth);
   expect(result.interactiveUnitWidth).toBe(116);
   expect(result.interactiveBarWidth).toBe(116);
+  expect(result.visualUnitWidth).toBe(result.interactiveUnitWidth);
+  expect(result.visualModelWidth).toBe(result.interactiveBarWidth);
   expect(result.cardWidth).toBeGreaterThan(0);
   expect(result.cardWidth).toBeLessThanOrEqual(result.viewportWidth);
 });

@@ -3,6 +3,7 @@ import { createFractionQuantityLearningInterfaceConfig } from "./fraction-learni
 import { createFractionQuantitySubtractionSession } from "./fraction-quantity-subtraction-session.js";
 import {
   renderMixedNumber,
+  renderFractionQuantityOperation,
   renderFractionQuantityLearningInterface
 } from "./fraction-learning-interface-renderers.js";
 
@@ -18,6 +19,26 @@ function renderSubtractionAmount(amount, documentRef) {
     numerator: amount.numerator,
     denominator: amount.denominator
   }, "Hoeveelheid die wordt afgetrokken");
+}
+
+const FRACTION_NUMERATOR_WORDS = Object.freeze(["", "een", "twee", "drie", "vier", "vijf"]);
+const FRACTION_DENOMINATOR_WORDS = Object.freeze({ 2: "half", 3: "derde", 4: "kwart" });
+
+function describeFractionAmount(amount) {
+  const numerator = FRACTION_NUMERATOR_WORDS[amount.numerator] || String(amount.numerator);
+  const denominator = FRACTION_DENOMINATOR_WORDS[amount.denominator];
+  return denominator ? numerator + " " + denominator : amount.numerator + " van de " + amount.denominator + " delen";
+}
+
+function renderSubtractionInstruction(amount, documentRef) {
+  const parts = [];
+  if (amount.whole > 0) parts.push(amount.whole + " hele");
+  if (amount.numerator > 0) parts.push(describeFractionAmount(amount));
+  const prompt = documentRef.createElement("p");
+  prompt.className = "fraction-quantity-subtraction-prompt";
+  prompt.textContent = "Trek nu " + parts.join(" en ") +
+    " af. Klik op een hele eenheid om die af te trekken. Verdeel een eenheid in gelijke delen om het breukdeel af te trekken.";
+  return prompt;
 }
 
 function createFractionQuantitySubtractionPractice({
@@ -95,10 +116,14 @@ function createFractionQuantitySubtractionPractice({
     equation.append(renderSubtractionAmount(task.subtraction, documentRef));
     equation.append(createElement("span", "fraction-quantity-subtraction-expression__operator", "="));
     equation.append(createElement("span", "fraction-quantity-subtraction-expression__unknown", "?"));
-    const taskPrompt = createElement("p", "fraction-quantity-subtraction-prompt", "Haal ");
-    taskPrompt.append(renderSubtractionAmount(task.subtraction, documentRef));
-    taskPrompt.append(documentRef.createTextNode(" weg."));
-    template.promptArea.append(equation, taskPrompt);
+    const visualExpression = renderFractionQuantityOperation({
+      wholeUnits: task.wholeUnits,
+      subtraction: task.subtraction,
+      representation: taskRepresentation,
+      documentRef
+    });
+    template.promptArea.append(equation, visualExpression);
+    template.workArea.append(renderSubtractionInstruction(task.subtraction, documentRef));
 
     const rendererMount = createElement("div", "fraction-quantity-subtraction-model");
     template.workArea.append(rendererMount);

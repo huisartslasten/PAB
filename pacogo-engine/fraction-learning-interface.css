@@ -818,9 +818,14 @@
   justify-items: center;
   align-content: start;
   gap: 5px;
+  width: 116px;
   min-width: 116px;
+  flex: 0 0 116px;
 }
 .pacogo-fraction-quantity__select {
+  box-sizing: border-box;
+  width: 116px;
+  min-width: 116px;
   min-height: 28px;
   padding: 3px 9px;
   border: 1px solid #b8cbe0;
@@ -846,6 +851,7 @@
 .pacogo-fraction-quantity__unit {
   display: grid;
   justify-items: center;
+  width: 100%;
   min-width: 0;
 }
 .pacogo-fraction-quantity__model {
@@ -966,16 +972,22 @@
     gap: 7px;
   }
   .pacogo-fraction-quantity__annotated-unit {
-    min-width: 88px;
+    width: 116px;
+    min-width: 116px;
+    flex-basis: 116px;
+  }
+  .pacogo-fraction-quantity__select {
+    width: 116px;
+    min-width: 116px;
   }
   .pacogo-fraction-quantity[data-representation="pie"] .pacogo-fraction-quantity__model {
-    width: 88px;
-    min-height: 88px;
+    width: 116px;
+    min-height: 116px;
   }
   .pacogo-fraction-quantity__model {
-    width: 88px;
-    min-width: 88px;
-    flex: 0 0 88px;
+    width: 116px;
+    min-width: 116px;
+    flex: 0 0 116px;
   }
   .pacogo-fraction-quantity__bar {
     min-height: 30px;

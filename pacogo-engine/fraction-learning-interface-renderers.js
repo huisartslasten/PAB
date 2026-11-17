@@ -12,6 +12,16 @@ function renderPieModel(fraction, label, documentRef = document) {
   svg.setAttribute("focusable", "false");
   const center = 50;
   const radius = 46;
+  if (fraction.denominator === 1) {
+    const whole = documentRef.createElementNS("http://www.w3.org/2000/svg", "circle");
+    whole.setAttribute("cx", "50");
+    whole.setAttribute("cy", "50");
+    whole.setAttribute("r", "46");
+    whole.setAttribute("class", "pacogo-fraction-pie__sector is-shaded");
+    whole.setAttribute("aria-hidden", "true");
+    svg.append(whole);
+    return svg;
+  }
   for (let index = 0; index < fraction.denominator; index += 1) {
     const startAngle = -Math.PI / 2 + (index * Math.PI * 2 / fraction.denominator);
     const endAngle = -Math.PI / 2 + ((index + 1) * Math.PI * 2 / fraction.denominator);
@@ -257,6 +267,25 @@ function renderFractionQuantityPieUnit(unit, documentRef, onToggle) {
   svg.setAttribute("class", "pacogo-fraction-quantity__pie");
   svg.setAttribute("role", "group");
   svg.setAttribute("aria-label", "Taart met " + unit.denominator + " gelijke delen");
+  if (unit.denominator === 1) {
+    const whole = documentRef.createElementNS("http://www.w3.org/2000/svg", "circle");
+    whole.setAttribute("cx", "50");
+    whole.setAttribute("cy", "50");
+    whole.setAttribute("r", "46");
+    whole.setAttribute("class", "pacogo-fraction-quantity__sector" +
+      (unit.segments[0] ? " is-filled" : ""));
+    whole.setAttribute("role", "button");
+    whole.setAttribute("tabindex", "0");
+    whole.setAttribute("aria-label", (unit.segments[0] ? "Maak leeg: " : "Vul: ") + "hele taart");
+    whole.dataset.segmentIndex = "0";
+    const activateWhole = () => onToggle(unit.id, 0);
+    whole.addEventListener("click", activateWhole);
+    whole.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") { event.preventDefault(); activateWhole(); }
+    });
+    svg.append(whole);
+    return svg;
+  }
   unit.segments.forEach((filled, index) => {
     const path = documentRef.createElementNS("http://www.w3.org/2000/svg", "path");
     path.setAttribute("d", unit.denominator === 1

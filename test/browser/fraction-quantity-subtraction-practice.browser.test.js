@@ -148,6 +148,7 @@ async function mountSkillsRoute(page, { exercise = "whole-minus-greater-than-one
       taskRepresentations: bank.tasks.map(task => task.representation),
       firstTaskProgress: document.querySelector(".fraction-practice-progress")?.textContent || "",
       symbolicExpression: document.querySelector('.fraction-quantity-subtraction-expression[aria-label="Aftreksom"]')?.textContent || "",
+      duplicateVisualExpression: Boolean(document.querySelector(".fraction-quantity-subtraction-expression--visual")),
       interactiveRepresentation: interactiveModel?.dataset.representation || "",
       annotationCount: interactiveModel?.querySelectorAll(".pacogo-fraction-quantity__annotation").length || 0,
       interactiveUnitCount: interactiveModel?.querySelectorAll(".pacogo-fraction-quantity__annotated-unit").length || 0,
@@ -194,7 +195,7 @@ test("real Skills route mounts the central fraction template and the approved te
   expect(result.taskRepresentations).toEqual(["bar", "pie", "bar", "pie", "bar", "pie", "bar", "pie", "bar", "pie"]);
   expect(result.firstTaskProgress).toContain("Som 1 van 10");
   expect(result.symbolicExpression).toContain("2");
-  expect(result.duplicateVisualExpression).toBe(null);
+  expect(result.duplicateVisualExpression).toBe(false);
   expect(result.interactiveRepresentation).toBe("bar");
   expect(result.annotationCount).toBe(2);
   expect(result.interactiveUnitCount).toBe(2);
@@ -220,7 +221,7 @@ test("real visual subtraction route fits the mobile viewport in central practice
   expect(result.cardBottom).toBeLessThanOrEqual(result.viewportHeight);
   expect(result.documentHeight).toBeLessThanOrEqual(result.viewportHeight + 2);
   expect(result.fractionTemplateCount).toBe(1);
-  expect(result.duplicateVisualExpression).toBe(null);
+  expect(result.duplicateVisualExpression).toBe(false);
   expect(result.interactiveRepresentation).toBe("bar");
   expect(result.annotationCount).toBe(2);
   expect(result.interactiveUnitCount).toBe(2);

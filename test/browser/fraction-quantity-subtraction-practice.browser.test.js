@@ -13,7 +13,7 @@ async function mountPractice(page, representation) {
       tasks: Array.from({ length: 10 }, (_, index) => ({
         id: "quantity-subtraction-" + (index + 1),
         wholeUnits: 2,
-        subtraction: { whole: 0, numerator: 1, denominator: 2 }
+        subtraction: { whole: 1, numerator: 1, denominator: 2 }
       })),
       representation: representationValue
     });
@@ -38,21 +38,32 @@ for (const representation of ["pie", "bar"]) {
     await expect(page.getByRole("alert")).toContainText("Nog niet");
     await expect(page.getByRole("button", { name: "Volgende som" })).toHaveCount(0);
 
-    await page.getByRole("button", { name: "Selecteer eenheid 1" }).click();
-    await page.getByRole("button", { name: "2 gelijke delen" }).click();
     const firstUnit = page.locator(".pacogo-fraction-quantity .pacogo-fraction-quantity__annotated-unit").first();
+    const wholeBar = representation === "pie"
+      ? firstUnit.locator(".pacogo-fraction-quantity__sector")
+      : firstUnit.locator(".pacogo-fraction-quantity__segment");
+    await wholeBar.click();
+    await expect(page.locator(".pacogo-fraction-quantity .pacogo-fraction-quantity__annotation").first()).toHaveAttribute("aria-label", "0 hele eenheden");
+
+    const secondUnit = page.locator(".pacogo-fraction-quantity .pacogo-fraction-quantity__annotated-unit").nth(1);
+    await secondUnit.getByRole("button", { name: "Selecteer eenheid 2" }).click();
+    await page.getByRole("button", { name: "2 gelijke delen" }).click();
+    await page.getByRole("button", { name: "Maak weer één hele balk" }).click();
+    await expect(page.locator(".pacogo-fraction-quantity .pacogo-fraction-quantity__annotation").nth(1)).toHaveAttribute("aria-label", "1 hele eenheden");
+    await secondUnit.getByRole("button", { name: "Selecteer eenheid 2" }).click();
+    await page.getByRole("button", { name: "2 gelijke delen" }).click();
     const segment = representation === "pie"
-      ? firstUnit.locator('.pacogo-fraction-quantity__sector[data-segment-index="0"]')
-      : firstUnit.locator('.pacogo-fraction-quantity__segment[data-segment-index="0"]');
+      ? secondUnit.locator('.pacogo-fraction-quantity__sector[data-segment-index="0"]')
+      : secondUnit.locator('.pacogo-fraction-quantity__segment[data-segment-index="0"]');
     await segment.focus();
     await segment.press("Enter");
-    await expect(page.locator(".pacogo-fraction-quantity .pacogo-fraction-quantity__annotation").first()).toHaveAttribute("aria-label", "1 van 2 delen gevuld");
+    await expect(page.locator(".pacogo-fraction-quantity .pacogo-fraction-quantity__annotation").nth(1)).toHaveAttribute("aria-label", "1 van 2 delen gevuld");
     await expect(page.getByRole("alert")).toHaveCount(0);
 
     const check = page.getByRole("button", { name: "Controleren" });
     await check.focus();
     await check.press("Enter");
-    await expect(page.locator(".fraction-practice-feedback.is-correct")).toContainText("De overgebleven hoeveelheid klopt");
+    await expect(page.locator(".fraction-practice-feedback.is-correct")).toContainText("precies de gevraagde hoeveelheid afgetrokken");
     await expect(page.getByRole("button", { name: "Volgende som" })).toBeVisible();
     await expect(page.getByText("Som 1 van 10 · 0 afgerond")).toBeVisible();
 

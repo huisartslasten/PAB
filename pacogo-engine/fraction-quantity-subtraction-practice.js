@@ -3,7 +3,6 @@ import { createFractionQuantityLearningInterfaceConfig } from "./fraction-learni
 import { createFractionQuantitySubtractionSession } from "./fraction-quantity-subtraction-session.js";
 import {
   renderMixedNumber,
-  renderFractionQuantityOperation,
   renderFractionQuantityLearningInterface
 } from "./fraction-learning-interface-renderers.js";
 
@@ -116,13 +115,7 @@ function createFractionQuantitySubtractionPractice({
     equation.append(renderSubtractionAmount(task.subtraction, documentRef));
     equation.append(createElement("span", "fraction-quantity-subtraction-expression__operator", "="));
     equation.append(createElement("span", "fraction-quantity-subtraction-expression__unknown", "?"));
-    const visualExpression = renderFractionQuantityOperation({
-      wholeUnits: task.wholeUnits,
-      subtraction: task.subtraction,
-      representation: taskRepresentation,
-      documentRef
-    });
-    template.promptArea.append(equation, visualExpression);
+    template.promptArea.append(equation);
     template.workArea.append(renderSubtractionInstruction(task.subtraction, documentRef));
 
     const rendererMount = createElement("div", "fraction-quantity-subtraction-model");

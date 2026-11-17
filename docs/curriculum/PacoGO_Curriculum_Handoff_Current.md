@@ -7864,3 +7864,41 @@ Laatste browserdiagnostiek op commit `16cd0061a6f62d632a362907d97b15b38506b6c1`:
 - Full Regression #3905 / run `44161057646`: **GREEN / SUCCESS** op exact deze commit; alle workflowstappen zijn voltooid, inclusief browserregressie en clean-working-tree-controle.
 - Laatste geverifieerde branch HEAD: `b9808501fdd61cab38e4957a2b7b030f75066d43`.
 - Laatste geverifieerde Full Regression: #3905 / `44161057646` — GREEN.
+
+
+### Interactieve visuele aftreksessie — centrale practice-layout en verificatie (17 november 2026)
+
+**Centrale layout**
+- De echte Skills-oefenroute gebruikt de centrale PacoGO Page Template in `practice`-modus; er is geen route-specifieke paginatemplate geïntroduceerd.
+- In practice-modus worden de grote hero en de zijbalkkaart verborgen, terwijl de noodzakelijke terugknop behouden blijft.
+- De bestaande overzichtspagina en de standaard paginalayout blijven behouden; de oefenroute krijgt alleen de centrale practice-layoutmodus.
+- De volledige oefening past nu binnen één viewport op de geteste desktop- en mobiele afmetingen. De documenthoogte is gelijk aan de viewporthoogte; er is geen horizontale of verticale documentoverflow.
+- De volledige symbolische som, volledige visuele som, breukannotaties en interactieve werkruimte blijven aanwezig. De eenheidsbreedte van de statische en interactieve modellen blijft 116 px.
+
+**Browsermetingen op commit `6a60d1d3ae43aa11bcc3e4a8f927b9ecb951d531`**
+- Desktop 1280×800: centrale oefenkaart top 130 px, hoogte 439.4 px, bottom 569.4 px; documenthoogte 800 px.
+- Mobiel 390×844: centrale oefenkaart top 106 px, hoogte 557.6 px, bottom 663.6 px; documenthoogte 844 px.
+- In beide gevallen: `layoutMode=practice`, hero verborgen, zijbalkkaart verborgen, terugknop zichtbaar, één centrale Fraction Practice Template en tien taakbankitems.
+- De tien taken wisselen af tussen `bar` en `pie`; binnen één som worden de representaties niet gemengd.
+- De volledige browserregressie rapporteert 87 geslaagde tests en geen waargenomen browserfouten.
+
+**Laatste CSS-correctie**
+- De progressieve zesstaps-invoer had na een algemene 76 px-regel onbedoeld ook 76 px breedte. De oorzaak was CSS-specificiteit: de selector voor de centrale step-card won van de bestaande progressieve 52 px-regel.
+- Een centrale, op progressieve step-grid gerichte selector herstelt 52 px inclusief min/max-breedte en flex-basis. De gewone scalar-invoer blijft 76 px.
+- Alleen CSS aangepast; geen tests, curriculumlogica, evidence-contracten of Supabase gewijzigd.
+
+**Verificatie**
+- Branch: `refactor/professional-v1`.
+- Geteste codecommit: `6a60d1d3ae43aa11bcc3e4a8f927b9ecb951d531`.
+- Full Regression #3909 / run `44176909761`: **GREEN / SUCCESS** op exact deze commit.
+- Alle 17 workflowstappen geslaagd: dependency-installatie en audit, curriculum-engine, architectuurgrenzen, maintained en gemigreerde Node-regressie, Chromium-installatie, browserregressie en clean-working-tree-controle.
+- Browserregressie: **87 passed**.
+- Branch HEAD gecontroleerd op `6a60d1d3ae43aa11bcc3e4a8f927b9ecb951d531`.
+- LIVE `main` gecontroleerd op `9ddb18aaafec265f2239bb68b05723468c5607f9` en niet gewijzigd.
+- Geen Supabase-wijziging en geen deployment.
+
+**Volgende concrete stap**
+- Laat de gebruiker de actuele oefenroute visueel beoordelen op desktop en mobiel, met nadruk op leesbaarheid en didactische begrijpelijkheid nu alles binnen één viewport past.
+- Verander de layout niet opnieuw zonder een concreet geconstateerd probleem. Als er een wijziging nodig is, onderzoek en wijzig de centrale PacoGO Page Template / Fraction Practice Template, niet een losse route.
+- Daarna pas de volgende inhoudelijke oefen-/taakstap uitvoeren. Voor iedere bouwstap eerst de actuele Full Regression controleren.
+- Deze handoff-update is zelf een repositorywijziging. Start Full Regression op de exacte handoff-updatecommit en rapporteer de uitkomst pas nadat de run volledig is afgerond.

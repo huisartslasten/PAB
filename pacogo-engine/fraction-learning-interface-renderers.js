@@ -249,7 +249,7 @@ function renderFractionQuantityOperation({ wholeUnits, subtraction, representati
   return root;
 }
 
-function renderFractionQuantityPieUnit(unit, documentRef, onToggle, onSelect) {
+function renderFractionQuantityPieUnit(unit, documentRef, onToggle) {
   const svg = documentRef.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", "0 0 100 100");
   svg.setAttribute("class", "pacogo-fraction-quantity__pie");
@@ -263,25 +263,27 @@ function renderFractionQuantityPieUnit(unit, documentRef, onToggle, onSelect) {
     path.setAttribute("class", "pacogo-fraction-quantity__sector" + (filled ? " is-filled" : ""));
     path.setAttribute("role", "button");
     path.setAttribute("tabindex", "0");
-    const isWhole = unit.denominator === 1;
-    path.setAttribute("aria-label", isWhole ? "Selecteer hele eenheid" : (filled ? "Maak deel leeg " : "Vul deel ") + (index + 1));
+    path.setAttribute("aria-label", (filled ? "Maak leeg: " : "Vul: ") +
+      (unit.denominator === 1 ? "hele taart" : "deel " + (index + 1)));
     path.dataset.segmentIndex = String(index);
-    const activate = () => isWhole ? onSelect(unit.id) : onToggle(unit.id, index);
+    const activate = () => onToggle(unit.id, index);
     path.addEventListener("click", activate);
-    path.addEventListener("keydown", event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); activate(); } });
+    path.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") { event.preventDefault(); activate(); }
+    });
     svg.append(path);
   });
   return svg;
 }
 
-function renderFractionQuantityUnit(unit, representation, documentRef, onToggle, onSelect) {
+function renderFractionQuantityUnit(unit, representation, documentRef, onToggle) {
   const group = documentRef.createElement("div");
   group.className = "pacogo-fraction-quantity__unit";
   group.dataset.unitId = unit.id;
   const model = documentRef.createElement("div");
   model.className = "pacogo-fraction-quantity__model";
   if (representation === "pie") {
-    model.append(renderFractionQuantityPieUnit(unit, documentRef, onToggle, onSelect));
+    model.append(renderFractionQuantityPieUnit(unit, documentRef, onToggle));
     model.setAttribute("aria-label", "Taartmodel");
   } else {
     model.classList.add("pacogo-fraction-quantity__bar");
@@ -290,9 +292,9 @@ function renderFractionQuantityUnit(unit, representation, documentRef, onToggle,
       segment.type = "button";
       segment.className = "pacogo-fraction-quantity__segment" + (filled ? " is-filled" : "");
       segment.dataset.segmentIndex = String(index);
-      const isWhole = unit.denominator === 1;
-      segment.setAttribute("aria-label", isWhole ? "Selecteer hele eenheid" : (filled ? "Maak deel leeg" : "Vul deel") + " " + (index + 1));
-      segment.addEventListener("click", () => isWhole ? onSelect(unit.id) : onToggle(unit.id, index));
+      segment.setAttribute("aria-label", (filled ? "Maak leeg: " : "Vul: ") +
+        (unit.denominator === 1 ? "hele balk" : "deel " + (index + 1)));
+      segment.addEventListener("click", () => onToggle(unit.id, index));
       model.append(segment);
     });
   }
@@ -314,9 +316,8 @@ function renderFractionQuantityLearningInterface({
   }
   if (!controller || typeof controller.getState !== "function" ||
       typeof controller.subscribe !== "function" || typeof controller.selectUnit !== "function" ||
-      typeof controller.divideUnit !== "function" || typeof controller.setUnitFilled !== "function" ||
-      typeof controller.toggleSegment !== "function" || typeof controller.restoreUnit !== "function" || typeof controller.undo !== "function" ||
-      typeof controller.redo !== "function") {
+      typeof controller.divideUnit !== "function" || typeof controller.toggleSegment !== "function" ||
+      typeof controller.restoreUnit !== "function") {
     throw new TypeError("A compatible Fraction quantity controller is required");
   }
   if (typeof onInteraction !== "function") throw new TypeError("onInteraction must be a function");
@@ -328,88 +329,57 @@ function renderFractionQuantityLearningInterface({
   units.className = "pacogo-fraction-quantity__units";
   const controls = documentRef.createElement("div");
   controls.className = "pacogo-fraction-quantity__controls";
-  const instructions = documentRef.createElement("p");
-  instructions.className = "pacogo-fraction-quantity__instructions";
-  instructions.setAttribute("role", "status");
   const amount = documentRef.createElement("div");
   amount.className = "pacogo-fraction-quantity__amount";
   amount.setAttribute("aria-live", "polite");
-  root.append(units, controls, amount, instructions);
+  root.append(units, controls, amount);
 
   const render = snapshot => {
     units.replaceChildren();
-    const annotationByUnit = new Map(snapshot.annotations.map(item => [item.unitId, item]));
-    snapshot.state.units.forEach(unit => {
+    snapshot.state.units.forEach((unit, index) => {
       const annotated = documentRef.createElement("div");
       annotated.className = "pacogo-fraction-quantity__annotated-unit";
-      const select = documentRef.createElement("button");
-      select.type = "button";
-      select.className = "pacogo-fraction-quantity__select" +
-        (snapshot.selectedUnitId === unit.id ? " is-selected" : "");
-      select.setAttribute("aria-pressed", String(snapshot.selectedUnitId === unit.id));
-      select.setAttribute("aria-label", "Selecteer eenheid " + (snapshot.state.units.indexOf(unit) + 1));
-      select.textContent = "Verdelen";
-      select.addEventListener("click", () => {
-        controller.selectUnit(unit.id);
-        instructions.textContent = "Gekozen. Kies hoe je deze balk wilt verdelen.";
-      });
       const item = renderFractionQuantityUnit(unit, config.representation, documentRef,
-        (unitId, segmentIndex) => controller.toggleSegment(unitId, segmentIndex),
-        unitId => {
-          const selectedUnit = snapshot.state.units.find(item => item.id === unitId);
-          if (selectedUnit && selectedUnit.denominator === 1 && selectedUnit.segments[0]) {
-            controller.setUnitFilled(unitId, false);
-            instructions.textContent = "Deze hele balk is afgetrokken.";
-          }
+        (unitId, segmentIndex) => {
+          const current = controller.getState().state.units.find(candidate => candidate.id === unitId);
+          controller.toggleSegment(unitId, segmentIndex);
         });
-      annotated.append(select, item, renderFractionQuantityAnnotation(annotationByUnit.get(unit.id), documentRef));
-      if (unit.denominator > 1) {
-        const resetDivision = documentRef.createElement("button");
-        resetDivision.type = "button";
-        resetDivision.className = "paco-btn paco-btn--secondary paco-btn--small pacogo-fraction-quantity__reset-division";
-        resetDivision.textContent = "Andere verdeling kiezen";
-        resetDivision.setAttribute("aria-label", "Verdeling van eenheid " +
-          (snapshot.state.units.indexOf(unit) + 1) + " opnieuw kiezen");
-        resetDivision.addEventListener("click", () => {
-          controller.restoreUnit(unit.id);
-          instructions.textContent = "De balk is weer heel. Kies nu 2, 3 of 4 gelijke delen.";
-        });
-        annotated.append(resetDivision);
-      }
+      const divideTrigger = documentRef.createElement("button");
+      divideTrigger.type = "button";
+      divideTrigger.className = "pacogo-fraction-quantity__divide-trigger";
+      divideTrigger.textContent = "⋯";
+      divideTrigger.setAttribute("aria-label", "Verdelen van balk " + (index + 1));
+      divideTrigger.setAttribute("aria-expanded", String(snapshot.selectedUnitId === unit.id));
+      divideTrigger.addEventListener("click", () => controller.selectUnit(unit.id));
+      annotated.append(item, divideTrigger);
+      if (snapshot.selectedUnitId === unit.id) annotated.classList.add("is-selected");
       units.append(annotated);
     });
+
     controls.replaceChildren();
     const selected = snapshot.state.units.find(unit => unit.id === snapshot.selectedUnitId);
     if (selected) {
-      const divideLabel = documentRef.createElement("span");
-      divideLabel.className = "pacogo-fraction-quantity__control-label";
-      divideLabel.textContent = config.labels.divide;
-      controls.append(divideLabel);
-      if (selected.denominator === 1 && selected.segments[0]) {
-        config.allowedDivisions.forEach(denominator => {
-          const divide = documentRef.createElement("button");
-          divide.type = "button";
-          divide.className = "paco-btn paco-btn--secondary paco-btn--small";
-          divide.textContent = denominator + " gelijke delen";
-          divide.addEventListener("click", () => {
-            controller.divideUnit(selected.id, denominator);
-            instructions.textContent = "De balk is verdeeld. Klik op de stukken die je wilt aftrekken.";
+      if (selected.denominator === 1) {
+        if (selected.segments[0]) {
+          config.allowedDivisions.forEach(denominator => {
+            const divide = documentRef.createElement("button");
+            divide.type = "button";
+            divide.className = "paco-btn paco-btn--secondary paco-btn--small";
+            divide.textContent = denominator + " delen";
+            divide.addEventListener("click", () => controller.divideUnit(selected.id, denominator));
+            controls.append(divide);
           });
-          controls.append(divide);
-        });
+        }
+      } else {
+        const restore = documentRef.createElement("button");
+        restore.type = "button";
+        restore.className = "paco-btn paco-btn--secondary paco-btn--small";
+        restore.textContent = "Andere verdeling";
+        restore.addEventListener("click", () => controller.restoreUnit(selected.id));
+        controls.append(restore);
       }
-      const empty = documentRef.createElement("button");
-      empty.type = "button";
-      empty.className = "paco-btn paco-btn--secondary paco-btn--small";
-      empty.textContent = "Hele eenheid leegmaken";
-      empty.disabled = !selected.segments.some(Boolean);
-      empty.addEventListener("click", () => {
-        controller.setUnitFilled(selected.id, false);
-      });
-      controls.append(empty);
-    } else {
-      controls.append(documentRef.createTextNode("Kies een hele balk om te verdelen."));
     }
+
     const appendAmount = (labelText, value, accessibleLabel) => {
       const row = documentRef.createElement("span");
       row.className = "pacogo-fraction-quantity__amount-row";
@@ -418,25 +388,15 @@ function renderFractionQuantityLearningInterface({
       const total = documentRef.createElement("span");
       total.className = "pacogo-fraction-quantity__total";
       if (value.numerator === 0) total.textContent = String(value.whole);
-      else total.append(renderMixedNumber({ wholeNumber: value.whole, numerator: value.numerator, denominator: value.denominator }, accessibleLabel));
+      else total.append(renderMixedNumber({
+        wholeNumber: value.whole, numerator: value.numerator, denominator: value.denominator
+      }, accessibleLabel));
       row.append(label, total);
       amount.append(row);
     };
     amount.replaceChildren();
-    appendAmount(config.labels.quantity, snapshot.amount, "Overgebleven hoeveelheid");
+    appendAmount("Over", snapshot.amount, "Overgebleven hoeveelheid");
     appendAmount("Afgetrokken", snapshot.removedAmount, "Afgetrokken hoeveelheid");
-    const history = documentRef.createElement("div");
-    history.className = "pacogo-fraction-quantity__history";
-    const undo = documentRef.createElement("button");
-    undo.type = "button"; undo.className = "paco-btn paco-btn--secondary paco-btn--small";
-    undo.textContent = "Ongedaan maken"; undo.disabled = !snapshot.canUndo;
-    undo.addEventListener("click", () => controller.undo());
-    const redo = documentRef.createElement("button");
-    redo.type = "button"; redo.className = "paco-btn paco-btn--secondary paco-btn--small";
-    redo.textContent = "Opnieuw uitvoeren"; redo.disabled = !snapshot.canRedo;
-    redo.addEventListener("click", () => controller.redo());
-    history.append(undo, redo);
-    controls.append(history);
   };
   const unsubscribe = controller.subscribe((event, snapshot) => {
     render(snapshot);

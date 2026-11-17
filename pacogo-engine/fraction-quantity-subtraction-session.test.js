@@ -19,6 +19,7 @@ test("creates a ten-task session with one fixed representation and a fresh share
   assert.equal(session.representation, "bar");
   assert.equal(session.getCurrentTask().taskNumber, 1);
   assert.equal(session.getCurrentTask().totalTasks, 10);
+  assert.equal("expectedRemaining" in session.getCurrentTask(), false, "the learner-facing task contract must not expose the answer");
   assert.equal(session.getController().getState().amount.whole, 2);
   assert.deepEqual(session.getProgress(), {
     completedTaskCount: 0, totalTaskCount: 10, currentTaskNumber: 1, attemptCount: 0, isComplete: false

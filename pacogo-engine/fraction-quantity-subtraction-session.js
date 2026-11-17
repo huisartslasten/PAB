@@ -133,8 +133,7 @@ function createFractionQuantitySubtractionSession({
       taskNumber: currentIndex + 1,
       totalTasks: normalizedTasks.length,
       wholeUnits: task.wholeUnits,
-      subtraction: task.subtraction,
-      expectedRemaining: task.expectedRemaining
+      subtraction: task.subtraction
     });
   }
 
@@ -160,7 +159,6 @@ function createFractionQuantitySubtractionSession({
       correct,
       attemptCount: taskResults[currentIndex].attemptCount,
       actual,
-      expected: task.expectedRemaining
     });
   }
 
@@ -188,7 +186,7 @@ function createFractionQuantitySubtractionSession({
     getCurrentTask,
     getController: () => currentController,
     getProgress,
-    getLastCheck: () => lastCheck,
+    getLastCheck: () => lastCheck ? Object.freeze({ correct: lastCheck.correct }) : null,
     check,
     advance,
     getResults: () => Object.freeze(taskResults.map(result => Object.freeze({ ...result })))

@@ -1,4 +1,4 @@
-import { DEFAULT_FRACTION_AREA_MODEL_LAYOUT, normalizeFractionAreaModelLayout } from "./fraction-representation-contract.js";
+import { FRACTION_AREA_MODEL_LAYOUTS, DEFAULT_FRACTION_AREA_MODEL_LAYOUT, normalizeFractionAreaModelLayout } from "./fraction-representation-contract.js";
 
 function assertFraction(fraction, label) {
   if (!fraction || !Number.isInteger(fraction.numerator) || !Number.isInteger(fraction.denominator) ||
@@ -8,7 +8,7 @@ function assertFraction(fraction, label) {
 }
 
 
-const FRACTION_QUANTITY_REPRESENTATIONS = Object.freeze(["pie", "bar"]);
+const FRACTION_QUANTITY_REPRESENTATIONS = Object.freeze(FRACTION_AREA_MODEL_LAYOUTS.filter(layout => layout === "bar" || layout === "pie"));
 
 function createFractionQuantityLearningInterfaceConfig({
   wholeUnits,

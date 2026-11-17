@@ -4,6 +4,7 @@ import {
   areFractionQuantitiesEqual
 } from "./fraction-quantity-model.js";
 import { createFractionQuantityController } from "./fraction-quantity-controller.js";
+import { createFractionSubtractionSessionCore } from "./fraction-subtraction-session-core.js";
 
 const DEFAULT_ALLOWED_DIVISIONS = Object.freeze([2, 3, 4]);
 const REQUIRED_TASK_COUNT = 10;
@@ -77,10 +78,7 @@ function normalizeTasks(tasks, allowedDivisions) {
   }));
 }
 
-/**
- * Formatieve sessie-adapter voor tien configureerbare visuele aftreksommen.
- * Curriculum-, evidence-, mastery- en persistentielogica vallen bewust buiten dit contract.
- */
+/** Quantity-answer adapter over the shared subtraction task/progression core. */
 function createFractionQuantitySubtractionSession({
   tasks,
   representation = "pie",
@@ -97,9 +95,10 @@ function createFractionQuantitySubtractionSession({
 
   const divisions = Object.freeze([...allowedDivisions]);
   const normalizedTasks = normalizeTasks(tasks, divisions);
-  const completedTaskIds = [];
-  const taskResults = normalizedTasks.map(task => ({ taskId: task.id, attemptCount: 0, completed: false }));
-  let currentIndex = 0;
+  const core = createFractionSubtractionSessionCore({
+    tasks: normalizedTasks,
+    completionMode: "explicit"
+  });
   let currentController = null;
   let lastCheck = null;
   let unsubscribe = null;
@@ -107,12 +106,12 @@ function createFractionQuantitySubtractionSession({
   function activateCurrentTask() {
     if (unsubscribe) unsubscribe();
     lastCheck = null;
-    if (currentIndex >= normalizedTasks.length) {
+    const task = core.getCurrentTask();
+    if (!task) {
       currentController = null;
       unsubscribe = null;
       return;
     }
-    const task = normalizedTasks[currentIndex];
     currentController = createFractionQuantityController({
       initialState: createFractionQuantityState({
         wholeUnits: task.wholeUnits,
@@ -120,17 +119,17 @@ function createFractionQuantitySubtractionSession({
       })
     });
     unsubscribe = currentController.subscribe(() => {
-      // Elke nieuwe handeling maakt een eerdere controle verouderd.
+      core.invalidatePendingCompletion();
       lastCheck = null;
     });
   }
 
   function getCurrentTask() {
-    if (currentIndex >= normalizedTasks.length) return null;
-    const task = normalizedTasks[currentIndex];
+    const task = core.getCurrentTask();
+    if (!task) return null;
     return Object.freeze({
       id: task.id,
-      taskNumber: currentIndex + 1,
+      taskNumber: normalizedTasks.findIndex(item => item.id === task.id) + 1,
       totalTasks: normalizedTasks.length,
       wholeUnits: task.wholeUnits,
       subtraction: task.subtraction
@@ -138,39 +137,37 @@ function createFractionQuantitySubtractionSession({
   }
 
   function getProgress() {
-    const currentResult = taskResults[currentIndex];
+    const progress = core.getProgress();
     return Object.freeze({
-      completedTaskCount: completedTaskIds.length,
-      totalTaskCount: normalizedTasks.length,
-      currentTaskNumber: currentIndex < normalizedTasks.length ? currentIndex + 1 : null,
-      attemptCount: currentResult ? currentResult.attemptCount : 0,
-      isComplete: currentIndex >= normalizedTasks.length
+      completedTaskCount: progress.completedCount,
+      totalTaskCount: progress.totalCount,
+      currentTaskNumber: progress.currentTaskId == null
+        ? null : normalizedTasks.findIndex(task => task.id === progress.currentTaskId) + 1,
+      attemptCount: progress.attemptCount,
+      isComplete: progress.isComplete
     });
   }
 
   function check() {
-    const task = normalizedTasks[currentIndex];
+    const task = core.getCurrentTask();
     if (!task || !currentController) throw new Error("The subtraction session is complete");
     const actual = getFractionQuantityAmount(currentController.getState().state);
     const correct = areFractionQuantitiesEqual(actual, task.expectedRemaining);
-    taskResults[currentIndex].attemptCount += 1;
-    lastCheck = Object.freeze({ correct, actual, expected: task.expectedRemaining });
+    const recorded = core.recordAttempt({
+      taskId: task.id,
+      classification: correct ? "valid" : "incorrect_answer",
+      response: { actual }
+    });
+    lastCheck = Object.freeze({ correct, actual });
     return Object.freeze({
       correct,
-      attemptCount: taskResults[currentIndex].attemptCount,
-      actual,
+      attemptCount: recorded.progress.attemptCount,
+      actual
     });
   }
 
   function advance() {
-    const task = normalizedTasks[currentIndex];
-    if (!task) throw new Error("The subtraction session is complete");
-    if (!lastCheck || !lastCheck.correct) {
-      throw new Error("A correct check is required before advancing to the next sum");
-    }
-    taskResults[currentIndex].completed = true;
-    completedTaskIds.push(task.id);
-    currentIndex += 1;
+    const result = core.advance();
     activateCurrentTask();
     return Object.freeze({
       currentTask: getCurrentTask(),
@@ -189,7 +186,17 @@ function createFractionQuantitySubtractionSession({
     getLastCheck: () => lastCheck ? Object.freeze({ correct: lastCheck.correct }) : null,
     check,
     advance,
-    getResults: () => Object.freeze(taskResults.map(result => Object.freeze({ ...result })))
+    getResults: () => {
+      const state = core.getState();
+      return Object.freeze(normalizedTasks.map(task => {
+        const attempts = state.responsesByTask[task.id] || [];
+        return Object.freeze({
+          taskId: task.id,
+          attemptCount: attempts.length,
+          completed: state.completedTaskIds.includes(task.id)
+        });
+      }));
+    }
   });
 }
 

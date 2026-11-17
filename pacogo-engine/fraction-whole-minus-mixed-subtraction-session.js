@@ -1,3 +1,5 @@
+import { createFractionSubtractionSessionCore } from "./fraction-subtraction-session-core.js";
+
 const FRACTION_SUBTRACTION_EXERCISE = Object.freeze({
   id: "fraction-whole-minus-mixed-level-1",
   title: "Breukgetal groter dan 1 aftrekken van een heel getal",
@@ -76,32 +78,42 @@ function createFractionSubtractionPracticeSession({ learnerKey, storage = global
     return { schemaVersion: 2, completedTaskIds, responsesByTask };
   }
 
+  const core = createFractionSubtractionSessionCore({
+    tasks: exercise.tasks,
+    initialState: readState(),
+    completionMode: "automatic",
+    onStateChange: state => storage.setItem(storageKey, JSON.stringify({ schemaVersion: 2, ...state }))
+  });
+
+
   function getCurrentTask() {
-    const state = readState();
-    const index = exercise.tasks.findIndex(task => !state.completedTaskIds.includes(task.id));
-    if (index < 0) return null;
-    const task = exercise.tasks[index];
+    const task = core.getCurrentTask();
+    if (!task) return null;
     return Object.freeze({
-      id: task.id, index: index + 1, total: exercise.questionCount,
-      difficultyLevel: exercise.difficultyLevel, maxDifficultyLevel: exercise.maxDifficultyLevel,
-      whole: task.whole, mixed: task.mixed
+      id: task.id,
+      index: exercise.tasks.findIndex(item => item.id === task.id) + 1,
+      total: exercise.questionCount,
+      difficultyLevel: exercise.difficultyLevel,
+      maxDifficultyLevel: exercise.maxDifficultyLevel,
+      whole: task.whole,
+      mixed: task.mixed
     });
   }
 
   function getProgress() {
-    const state = readState();
+    const progress = core.getProgress();
     return Object.freeze({
-      completedCount: state.completedTaskIds.length,
+      completedCount: progress.completedCount,
       totalCount: exercise.questionCount,
-      attemptCount: Object.values(state.responsesByTask).reduce((sum, items) => sum + items.length, 0),
-      isComplete: state.completedTaskIds.length === exercise.questionCount
+      attemptCount: progress.attemptCount,
+      isComplete: progress.isComplete
     });
   }
 
   function recordAnswer({ values } = {}) {
     const current = getCurrentTask();
     if (!current) throw new Error("The fraction subtraction exercise is already complete.");
-    const task = taskById.get(current.id);
+    const task = exercise.tasks.find(item => item.id === current.id);
     const v = values && typeof values === "object" ? {
       wholeNumberEnabled: values.wholeNumberEnabled === true,
       wholeNumber: String(values.wholeNumber ?? ""),
@@ -151,18 +163,15 @@ function createFractionSubtractionPracticeSession({ learnerKey, storage = global
         classification = "requires_mixed_number";
       }
     }
-    const state = readState();
-    const responses = state.responsesByTask[current.id] || [];
-    responses.push({ classification, values: v || {} });
-    state.responsesByTask[current.id] = responses;
-    if (classification === "valid" && !state.completedTaskIds.includes(current.id)) {
-      state.completedTaskIds.push(current.id);
-    }
-    storage.setItem(storageKey, JSON.stringify(state));
+    core.recordAttempt({
+      taskId: current.id,
+      classification,
+      response: { values: v || {} }
+    });
     return Object.freeze({ classification, progress: getProgress(), currentTask: getCurrentTask() });
   }
 
-  function reset() { storage.removeItem(storageKey); }
+  function reset() { core.reset(); storage.removeItem(storageKey); }
   return Object.freeze({ getCurrentTask, getProgress, recordAnswer, reset });
 }
 

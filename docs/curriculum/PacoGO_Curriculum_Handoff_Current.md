@@ -7798,3 +7798,62 @@ Voer de visuele QA van de echte oefening uit op desktop en mobiel: beoordeel of 
 - De instructietekst en didactische interactie moeten nog worden herzien conform de gewenste taak: toon twee hele beginbalken; instrueer bijvoorbeeld “Trek nu 1 hele en een half af”; laat de leerling precies die hoeveelheid wegklikken en zichtbaar een half overhouden. De huidige bediening/instructie is nog niet volledig volgens dit ontwerp.
 - De gebruiker verduidelijkte dat breedte prioriteit heeft boven de schermhoogte. Geen verdere hoogte-optimalisatie uitvoeren voordat de breedte en interactieve taak correct zijn.
 - Volgende stap: vóór verdere codewijziging Full Regression controleren; daarna eerst de centrale maatvoering van interactieve balk/knop en de visuele doelsom onderzoeken en met gerichte browsermetingen verifiëren. De taak moet daarna de aftrekhandeling als aftrekhandeling tonen en testen, niet alleen de resthoeveelheid.
+
+
+## Interactieve visuele aftreksessie — herstel, centrale interface en Full Regression-herstel (17 november 2026)
+
+### Security-/testinfrastructuurblokkade structureel opgelost
+
+- Startpunt van dit onderzoek: commit `cbc0a9505f0acd1deb1b6c9f8e582c25b44190a4`, Full Regression #3897 / run `44147653136`: rood bij `npm audit --audit-level=low` door de kwetsbare dependencyketen Vitest → Vite → tinyglobby → fdir → picomatch.
+- De oplossing is de bestaande onderhouden Vitest-testset te migreren naar de ingebouwde Node 22 `node:test`-runner. De audit is niet uitgeschakeld of verlaagd; er zijn geen overrides, geforceerde upgrades of onuitgebrachte forks gebruikt.
+- `package.json` gebruikt nu `node --test` voor de onderhouden testset. Vitest is uit `devDependencies` verwijderd.
+- De lockfile bevat geen `vitest`, `vite`, `tinyglobby`, `fdir` of `picomatch` meer. De verplichte auditstap slaagt.
+- De oorspronkelijke Full Regression verwees naar zeven Vitest-bestanden. `test/lesson-save-persistence.test.js` was eerder bewust verwijderd bij het verwijderen van de dubbele persistence-implementatie (commit `46efd33d`); het is dus geen ontbrekend bestand dat opnieuw moet worden aangemaakt. De onderhouden regressie voert de zes nog bestaande bestanden uit via Node.
+- De twee aanvullende bestanden onder `vitest/` blijven buiten de oorspronkelijke Full Regression-scope en zijn apart beschikbaar via `test:additional`. Ze zijn niet stilzwijgend aan de verplichte Full Regression toegevoegd.
+
+### Exacte regressieoorzaken die tijdens de migratie zijn geïsoleerd
+
+- De eerste migratie gebruikte Node-mockimplementaties niet als een FIFO-reeks en veranderde de betekenis van enkele `toHaveBeenCalledWith`-asserties. De migratie is gecorrigeerd zodat opeenvolgende database-aanroepen en “deze aanroep kwam ergens voor”-semantiek behouden blijven.
+- De oorspronkelijke onderhouden testscope is behouden; aanvullende tests uit `vitest/` zijn niet aan Full Regression toegevoegd.
+- Full Regression #3899 legde vervolgens een bestaande fout in de centrale quantity-renderer bloot: een onverdeeld geheel (`denominator === 1`) werd ten onrechte via `toggleSegment` afgehandeld, terwijl het hoeveelheidsmodel daarvoor bewust `setUnitFilled` aanbiedt. Het modelcontract is niet versoepeld; de centrale renderer routeert hele eenheden nu via `setUnitFilled` en verdeelde eenheden via `toggleSegment`.
+- Tijdens browserverificatie zijn foutieve testverwachtingen gecorrigeerd op basis van de feitelijke interactiesequentie: Enter vult hetzelfde segment weer; herstel van een verdeling registreert ook een quantity-change; en een aftrek van 1 hele en een half uit 2 hele eenheden laat een half over. Gestapelde breuken worden via hun toegankelijke teller/noemer-annotatie gecontroleerd, niet via een slashnotatie in `textContent`.
+- Full Regression #3903 legde een stylesheet-integratieprobleem bloot: de centrale Skills-pagina laadde de bestaande Skills- en Fraction Learning Interface-stylesheets niet. De centrale stylesheets zijn aan `skills.html` gekoppeld; er is geen losse oefening-specifieke CSS-workaround toegevoegd.
+
+### Fraction Learning Interface — inhoudelijk herstel
+
+- De centrale renderer gebruikt opnieuw de bestaande `renderFractionQuantityOperation` voor de volledige statische visuele aftreksom. De symbolische som, volledige visuele som en afzonderlijke interactieve werkweergave blijven gelijktijdig zichtbaar.
+- De bestaande centrale `Fraction Practice Template` en `Fraction Learning Interface` blijven de enige presentatie-/interactiebasis. De bestaande niveau-1-oefening, de afzonderlijke vierstaps-oefening en FR2 zijn niet vervangen of verwijderd.
+- Per oorspronkelijke eenheid blijft de breukannotatie zichtbaar in zowel de statische visuele som als het interactieve werkveld. De teller geeft de gevulde delen weer; de noemer blijft alle oorspronkelijke gelijke delen tellen.
+- De opdrachtinstructie is verduidelijkt en dynamisch opgebouwd, bijvoorbeeld: “Trek nu 1 hele en een half af.” De leerling krijgt daarnaast instructie om een hele eenheid aan te klikken en een eenheid in gelijke delen te verdelen voor het breukdeel.
+- Hele eenheden worden centraal via `setUnitFilled` aangepast; afzonderlijke delen via `toggleSegment`. Het quantity-model en de controllercontracten zijn niet aangepast om een rendererfout te maskeren.
+- De statische visuele som en het interactieve model gebruiken voor iedere taak dezelfde representatiekeuze. Een taak gebruikt óf een breukenbalk óf een taart; deze worden niet binnen één som gemengd.
+- De maatvoering van de statische en interactieve eenheden is in de browser gecontroleerd: beide 116 px. De invoervelden van de bestaande fraction-guided interface gebruiken na het laden van de centrale stylesheets de bedoelde compacte breedte van 48 px.
+
+### Verificatie
+
+- Branch: `refactor/professional-v1`.
+- Definitieve code-/test-/stylesheetcommit: `16cd0061a6f62d632a362907d97b15b38506b6c1`.
+- Full Regression #3904 / run `44160487734`: **GREEN / SUCCESS** op exact deze commit.
+- Alle workflowstappen zijn geslaagd, waaronder dependency-installatie, `npm audit --audit-level=low`, curriculum-engine-regressie, architectuurgrenzen, Double or Nothing, maintained Node-regressie, gemigreerde Node-regressie, Chromium-installatie, browserregressie en clean-working-tree-controle.
+- De volledige browserregressie bevatte 86 tests; alle 86 zijn geslaagd.
+- Browserdiagnostiek bevestigt dat de volledige visuele som en het interactieve model gelijktijdig zichtbaar zijn, de annotaties aanwezig blijven, de representatie overeenkomt en de eenheids-/modelbreedtes gelijk zijn.
+- `main` is niet gewijzigd. Geen Supabase-wijziging en geen deployment.
+
+### Openstaand — verticale compactheid van de centrale oefenpagina
+
+De breedte en interactieve taak zijn nu volgens de afgesproken richting hersteld. De oefening past echter nog niet volledig in één viewport; dit is expliciet nog niet opgelost.
+
+Laatste browserdiagnostiek op commit `16cd0061a6f62d632a362907d97b15b38506b6c1`:
+
+- Desktop 1280×800: `pageMainTop=496`, oefenkaart `top=628.3`, `height=457.6`, `bottom=1086.0`; documenthoogte 1134 px.
+- Mobiel 390×844: `pageMainTop=711.9`, oefenkaart `top=839.4`, `height=557.6`, `bottom=1397.0`; documenthoogte 1445 px.
+- Er is geen horizontale overflow. De visuele en interactieve eenheidsbreedtes blijven 116 px.
+
+### Volgende concrete stap
+
+- Inspecteer de centrale `PacoGO Page Template` en de Skills-runtime om exact vast te stellen waarom de hero-/bovenruimte en op mobiel gestapelde navigatie de oefening zo ver naar beneden duwen.
+- Ontwerp een herbruikbare centrale practice-layoutmodus voor oefenroutes, niet een route-specifieke CSS-patch. Behoud noodzakelijke terugnavigatie en de bestaande overzichtspagina.
+- Verminder ongebruikte verticale ruimte en stapel navigatie op mobiel compacter, zonder de afgesproken breedte van de visuele modellen te verkleinen of de volledige visuele som/annotaties te verwijderen.
+- Verifieer desktop én mobiel opnieuw met echte viewportmetingen en browserregressie. Het doel is dat de complete instructie, symbolische som, visuele som en interactieve taak zonder onnodig scrollen zichtbaar zijn.
+- Voor iedere volgende bouwstap eerst de meest recente Full Regression controleren. De laatste geverifieerde baseline is #3904 op commit `16cd0061a6f62d632a362907d97b15b38506b6c1`.
+- Deze handoff-update is zelf een repositorywijziging en vereist Full Regression op haar exacte resulterende commit. Claim geen post-update GREEN voordat die run is voltooid.

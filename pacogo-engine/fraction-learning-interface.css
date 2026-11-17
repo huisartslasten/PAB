@@ -814,33 +814,49 @@
   min-width: 0;
 }
 .pacogo-fraction-quantity__annotated-unit {
+  position: relative;
   display: grid;
   justify-items: center;
   align-content: start;
-  gap: 5px;
   width: 116px;
   min-width: 116px;
   flex: 0 0 116px;
 }
-.pacogo-fraction-quantity__select {
-  box-sizing: border-box;
-  width: 116px;
-  min-width: 116px;
-  min-height: 28px;
-  padding: 3px 9px;
+.pacogo-fraction-quantity__divide-trigger {
+  position: absolute;
+  z-index: 1;
+  top: -7px;
+  right: -7px;
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  padding: 0;
   border: 1px solid #b8cbe0;
-  border-radius: 8px;
-  background: #f7fbff;
+  border-radius: 50%;
+  background: #fff;
   color: #315474;
   font: inherit;
-  font-size: 11px;
-  font-weight: 800;
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 1;
   cursor: pointer;
+  opacity: 0;
+  transition: opacity .12s ease;
 }
-.pacogo-fraction-quantity__select.is-selected {
-  border: 2px solid #1787f2;
-  background: #eef7ff;
-  color: #126fc9;
+.pacogo-fraction-quantity__annotated-unit:hover .pacogo-fraction-quantity__divide-trigger,
+.pacogo-fraction-quantity__annotated-unit:focus-within .pacogo-fraction-quantity__divide-trigger,
+.pacogo-fraction-quantity__annotated-unit.is-selected .pacogo-fraction-quantity__divide-trigger {
+  opacity: 1;
+}
+@media (pointer: coarse) {
+  .pacogo-fraction-quantity__divide-trigger { opacity: 1; }
+}
+.pacogo-fraction-quantity__divide-trigger:focus-visible,
+.pacogo-fraction-quantity__segment:focus-visible,
+.pacogo-fraction-quantity__sector:focus-visible {
+  outline: 3px solid #1787f2;
+  outline-offset: 3px;
 }
 .pacogo-fraction-quantity__select:focus-visible,
 .pacogo-fraction-quantity__segment:focus-visible,
@@ -930,6 +946,9 @@
   flex-wrap: wrap;
   min-width: 0;
 }
+.pacogo-fraction-quantity__controls:empty {
+  display: none;
+}
 .pacogo-fraction-quantity__control-label {
   width: 100%;
   text-align: center;
@@ -975,10 +994,6 @@
     width: 116px;
     min-width: 116px;
     flex-basis: 116px;
-  }
-  .pacogo-fraction-quantity__select {
-    width: 116px;
-    min-width: 116px;
   }
   .pacogo-fraction-quantity[data-representation="pie"] .pacogo-fraction-quantity__model {
     width: 116px;

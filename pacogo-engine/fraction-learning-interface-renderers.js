@@ -1,6 +1,8 @@
 import { normalizeFractionAreaModelLayout } from "./fraction-representation-contract.js";
 import { FRACTION_QUANTITY_REPRESENTATIONS } from "./fraction-learning-interface-contract.js";
 
+const WHOLE_FRACTION_PIE_PATH = "M 50 4 A 46 46 0 1 1 50 96 A 46 46 0 1 1 50 4 Z";
+
 function renderPieModel(fraction, label, documentRef = document) {
   const svg = documentRef.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", "0 0 100 100");
@@ -20,7 +22,7 @@ function renderPieModel(fraction, label, documentRef = document) {
     const largeArc = endAngle - startAngle > Math.PI ? 1 : 0;
     const path = documentRef.createElementNS("http://www.w3.org/2000/svg", "path");
     const d = fraction.denominator === 1
-      ? "M 50 50 L 50 4 A 46 46 0 1 1 49.99 4 Z"
+      ? WHOLE_FRACTION_PIE_PATH
       : "M 50 50 L " + x1.toFixed(4) + " " + y1.toFixed(4) +
         " A 46 46 0 " + largeArc + " 1 " + x2.toFixed(4) + " " + y2.toFixed(4) + " Z";
     path.setAttribute("d", d);
@@ -258,7 +260,7 @@ function renderFractionQuantityPieUnit(unit, documentRef, onToggle) {
   unit.segments.forEach((filled, index) => {
     const path = documentRef.createElementNS("http://www.w3.org/2000/svg", "path");
     path.setAttribute("d", unit.denominator === 1
-      ? "M 50 50 L 50 4 A 46 46 0 1 1 49.99 4 Z"
+      ? WHOLE_FRACTION_PIE_PATH
       : createFractionQuantityPieSectorPath(index, unit.denominator));
     path.setAttribute("class", "pacogo-fraction-quantity__sector" + (filled ? " is-filled" : ""));
     path.setAttribute("role", "button");

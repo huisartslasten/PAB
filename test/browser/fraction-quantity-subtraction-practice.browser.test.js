@@ -137,6 +137,7 @@ async function mountSkillsRoute(page, { exercise = "whole-minus-greater-than-one
       title: document.querySelector(".paco-template-main h1")?.textContent || "",
       centralPage: Boolean(pageTemplate),
       layoutMode: pageTemplate?.dataset.layoutMode || "",
+      practiceBodyClass: document.body.classList.contains("paco-template-practice-body"),
       heroDisplay: hero ? getComputedStyle(hero).display : "missing",
       sidebarCardDisplay: sidebarCard ? getComputedStyle(sidebarCard).display : "missing",
       backButtonVisible: Boolean(backButton && getComputedStyle(backButton).display !== "none" && backButton.getBoundingClientRect().width > 0 && backButton.getBoundingClientRect().height > 0),
@@ -184,6 +185,7 @@ test("real Skills route mounts the central fraction template and the approved te
   expect(result.title).toBe("Oefenen");
   expect(result.centralPage).toBe(true);
   expect(result.layoutMode).toBe("practice");
+  expect(result.practiceBodyClass).toBe(true);
   expect(result.heroDisplay).toBe("none");
   expect(result.sidebarCardDisplay).toBe("none");
   expect(result.backButtonVisible).toBe(true);
@@ -256,6 +258,7 @@ test("Skills overview keeps the standard page-template layout", async ({ page })
   await page.setViewportSize({ width: 1280, height: 800 });
   const result = await mountSkillsRoute(page, { exercise: null, seedStandardScroll: false });
   expect(result.layoutMode).toBe("standard");
+  expect(result.practiceBodyClass).toBe(false);
   expect(result.heroDisplay).not.toBe("none");
   expect(result.sidebarCardDisplay).not.toBe("none");
   expect(result.backButtonVisible).toBe(true);

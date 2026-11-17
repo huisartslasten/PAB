@@ -57,6 +57,7 @@ body:has(#paco-template-mount:empty):not(:has(#paco-chooser-mount:not(:empty))) 
 @media(max-width:560px){.paco-template-body{width:calc(100% - 18px);padding-top:9px}.paco-template-page-header{padding:16px 17px}.paco-template-page-icon{font-size:32px}.paco-template-page-heading h1{font-size:30px}.paco-template-page-heading p{font-size:15px}.paco-template-version-badge{right:10px;bottom:10px;font-size:18px;padding:8px 12px}}
 
 /* Compact, reusable shell for learner practice routes. */
+body.paco-template-practice-body { margin: 0; }
 .paco-page-template[data-layout-mode="practice"] .paco-template-hero,
 .paco-page-template[data-layout-mode="practice"] .paco-template-sidebar-card,
 .paco-page-template[data-layout-mode="practice"] .paco-template-version-badge {

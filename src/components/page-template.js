@@ -23,6 +23,12 @@ function normalizePageLayoutMode(value = 'standard') {
 function getTemplateScrollStorageKey(layoutMode) {
   return layoutMode === 'practice' ? TEMPLATE_SCROLL_KEY + ':practice' : TEMPLATE_SCROLL_KEY;
 }
+
+function syncPacoTemplateBodyMode(documentRef, layoutMode) {
+  const body = documentRef?.body;
+  if (!body) return;
+  body.classList.toggle('paco-template-practice-body', layoutMode === 'practice');
+}
 export const PACOGO_TEST_VERSION = 'V7.0';
 
 function installManualScrollRestoration(windowRef) {
@@ -240,6 +246,7 @@ export function mountPacoPageTemplate({ mount, ...options } = {}) {
   if (existingTemplate) {
     const previousLayoutMode = existingTemplate.dataset.layoutMode || 'standard';
     const updatedTemplate = updatePacoPageTemplate(existingTemplate, options);
+    syncPacoTemplateBodyMode(mount.ownerDocument || document, updatedTemplate.dataset.layoutMode);
     if (previousLayoutMode !== updatedTemplate.dataset.layoutMode) {
       installPacoTemplateScrollMemory({ storageKey: getTemplateScrollStorageKey(updatedTemplate.dataset.layoutMode) });
       installPacoTemplateSidebarScrollChaining({ navigationElement: updatedTemplate.querySelector('.paco-template-navigation') });
@@ -248,6 +255,7 @@ export function mountPacoPageTemplate({ mount, ...options } = {}) {
   }
   const template = createPacoPageTemplate(options);
   mount.replaceChildren(template);
+  syncPacoTemplateBodyMode(mount.ownerDocument || document, template.dataset.layoutMode);
   installPacoTemplateScrollMemory({ storageKey: getTemplateScrollStorageKey(template.dataset.layoutMode) });
   installPacoTemplateSidebarScrollChaining({ navigationElement: template.querySelector('.paco-template-navigation') });
   return template;

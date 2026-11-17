@@ -44,6 +44,7 @@
 .fraction-guided-step-card .pacogo-fraction-representation--symbolic{font-size:20px}
 .fraction-guided-step-card .fraction-guided-operator{font-size:18px}
 .fraction-guided-scalar-input{width:76px;min-width:76px;height:42px;border:1px solid var(--paco-border);border-radius:8px;text-align:center;font:700 22px inherit;color:var(--paco-text);background:var(--paco-card)}
+.paco-page-template .fraction-guided-step-card .fraction-guided-scalar-input{width:76px;min-width:76px;max-width:76px;flex:0 0 76px;box-sizing:border-box}
 .pacogo-fraction-step-input{width:48px;min-width:42px;height:34px;padding:0;border:0;border-radius:4px;text-align:center;font:700 20px inherit;color:var(--paco-text);background:var(--paco-card)}
 @media(max-width:850px){.fraction-guided-step-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.fraction-guided-step-grid{grid-template-columns:minmax(0,1fr)}.fraction-guided-step-card{min-height:0}.fraction-guided-task-prompt{gap:9px}.fraction-guided-equation{gap:12px}.fraction-guided-solution{gap:8px}.fraction-guided-summary-fraction{font-size:20px}.fraction-guided-operator{font-size:20px}}

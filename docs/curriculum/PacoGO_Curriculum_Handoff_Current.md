@@ -7951,3 +7951,36 @@ Laatste browserdiagnostiek op commit `16cd0061a6f62d632a362907d97b15b38506b6c1`:
 5. Behoud de bestaande oude oefenroute en de centrale taakbank-/representatiecontracten. Verander geen curriculum-, evidence-, mastery- of Supabase-contracten.
 6. Test op desktop en mobiel. Vraag daarna de gebruiker om visuele QA van de echte Skills-route.
 7. Werk na de significante implementatie de handoff bij en verifieer die handoff-commit opnieuw met Full Regression.
+
+### Implementatie — dubbele visuele aftreksom verwijderd (17 november 2026)
+
+**Wat is gewijzigd**
+- In `pacogo-engine/fraction-quantity-subtraction-practice.js` is de aparte statische visuele operatie verwijderd uit `template.promptArea`.
+- De oefenpresentatie toont nu één symbolische aftreksom en één interactief visueel werkveld. Het interactieve werkveld toont uitsluitend de oorspronkelijke hele eenheden; de leerling maakt de gevraagde aftrekking zelf zichtbaar.
+- De dubbele renderer `renderFractionQuantityOperation()` wordt niet langer door deze oefenadapter aangeroepen. De gedeelde renderer blijft beschikbaar voor andere relevante toepassingen; het quantity-model, de sessie, taakbank en validatie zijn niet gewijzigd.
+- De centrale Fraction Practice Template, Fraction Learning Interface, annotaties, modelbreedte van 116 px, bar/pie-keuze per taak, taakvolgorde en aparte bestaande oefenroutes blijven behouden.
+- Browsertests zijn aangepast om afwezigheid van de dubbele statische visuele operatie te controleren. Er is een expliciete browserflow toegevoegd voor `2 − 1 ⅓`: twee volle balken, eerste hele leegmaken, tweede balk in drieën verdelen, één derde leegmaken, resterend ⅔ en afgetrokken 1⅓ controleren.
+
+**Implementatiecommits**
+- Productcode: `e4e770c14ff892865c09f7c3cb91cb9dfbbd6c8d`.
+- Gerichte browserdekking en testfixture: `39258f53eed4b7454b1e5fb94dfcedf359b7b792` en `bbd6e0bdf51fcbeb5824a6d2c5440334a8b27dfe`.
+- Browserassertie voor het ontbreken van de duplicaatrij: `277b6fd481b55e2cbbf3e7e1adb18534d1e82075`.
+
+**Regressieonderzoek**
+- Full Regression #3918 / run `44180884312` was RED op `39258f53...`: de nieuwe browserfixture verwees naar een niet-geserialiseerde variabele en twee route-layouttests controleerden een niet-teruggegeven meetwaarde. Dit waren fouten in de nieuwe testfixture/asserties, niet in de productcode.
+- De fixture is expliciet gemaakt door `subtractionValue` mee te geven aan `page.evaluate`; de routehelper geeft nu een boolean terug voor het bestaan van de dubbele visuele rij.
+- Full Regression #3919 / run `44180919737` was RED op `bbd6e0...`: de twee resterende fouten betroffen uitsluitend de ontbrekende returnwaarde in die routehelper. De nieuwe 1⅓-interactiecontrole en de overige 87 browsercontroles slaagden.
+- De routehelper is daarna gecorrigeerd in `277b6fd...`. Full Regression #3920 / run `44181212942` is gestart op exact die commit; de browserregressie moet nog afronden. Er wordt nog geen GREEN geclaimd.
+
+**Actuele status**
+- Branch: `refactor/professional-v1`; LIVE `main` is niet gewijzigd.
+- Laatste volledig geverifieerde Full Regression vóór de codewijziging: #3916 / run `44180364475`, GREEN op handoffcommit `6b692d9d93bf22750fb13bfb49cb798bcb8d910f`.
+- Code/test-HEAD vóór deze handoff-update: `277b6fd481b55e2cbbf3e7e1adb18534d1e82075`; #3920 is nog in uitvoering.
+- De handoff-update zelf moet door Full Regression worden geverifieerd op de exacte resulterende commit.
+- Geen curriculum-, evidence-, mastery-, Supabase- of deploymentwijziging.
+
+**Volgende concrete stap**
+1. Laat Full Regression #3920 afronden op `277b6fd...`; bij rood eerst de browserlogs analyseren en de exacte oorzaak isoleren.
+2. Verifieer daarna de Full Regression die door deze handoff-update wordt gestart op de exacte nieuwe handoffcommit.
+3. Als beide runs groen zijn, vraag de gebruiker om de echte Skills-route visueel te controleren: één gestapelde symbolische som en exact één interactief werkveld; de leerling verwijdert zelf het hele deel en het derde deel.
+4. Voer geen verdere layout- of modelwijziging uit zonder concrete gebruikersfeedback. Houd de LB en centrale template intact.

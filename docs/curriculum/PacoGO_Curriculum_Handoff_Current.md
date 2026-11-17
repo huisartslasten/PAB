@@ -7743,3 +7743,26 @@ De implementatie is uitgebreid op basis van de expliciet door de gebruiker goedg
 4. Controleer de echte Skills-route in PacoGO TEST op desktop en mobiel.
 5. Laat de gebruiker de visuele uitvoering beoordelen.
 6. Werk deze handoff opnieuw bij met de geverifieerde commit en werkelijke regressiestatus. De handoff-update zelf moet ook worden geverifieerd.
+
+
+### Interactieve visuele aftreksessie — Fase E4 verificatie en testcorrectie (17 november 2026)
+
+De gerichte integratiecontrole op de echte Skills-route is toegevoegd en uitgevoerd.
+
+- De test controleert dat de echte Skills-runtime de centrale PacoGO-paginatemplate en precies één centrale Fraction Practice Template monteert.
+- De centrale taakbank bevat tien unieke taken in de vastgelegde volgorde; de representaties wisselen af tussen balk en taart.
+- De symbolische aftreksom en de volledige visuele som worden gelijktijdig getoond. De visuele som gebruikt dezelfde representatie als de interactieve hoeveelheidweergave.
+- De test controleert blijvende teller/noemer-annotaties en de afwezigheid van horizontale overflow op desktop (1280×800) en mobiel (390×844).
+- De bestaande oefening `whole-minus-mixed-subtraction` en de nieuwe visuele oefening `whole-minus-greater-than-one-subtraction` blijven afzonderlijke overzichtsitems en routes.
+
+**Regressieonderzoek**
+- Full Regression #3866 was GREEN op commit `6228353025abea204b093d877698a66992f00cd1`.
+- De daaropvolgende uitgebreide browsercontrole op commit `55acd375ded79bc83f1ce7d1178c902f2aa37b71` was rood: de nieuwe test verwachtte drie visuele eenheden terwijl de taakweergave terecht vier eenheden bevatte (twee begingehelen, één weg te nemen geheel en één breukdeel). De productcode en taakbank waren op dit punt correct; alleen de nieuwe testverwachting was onjuist.
+- De testassertie is gecorrigeerd van 3 naar 4. Er is geen productcode aangepast voor deze fout.
+- Definitieve commit: `3e6f2531ab11f8967f288f0add6bb2c3fcd2ad4c`.
+- Full Regression #3867 / run `44122045286`: **GREEN / SUCCESS** op exact deze commit. Alle stappen zijn geslaagd, waaronder curriculum-engine-regressie, architectuurgrenzen, maintained Node- en Vitest-regressie, Chromium/browserregressie en clean-working-tree-controle.
+- Afzonderlijke browsercontrole / run `44122045952`: **GREEN / SUCCESS** op dezelfde commit.
+- Branch: `refactor/professional-v1`. LIVE `main` is onaangeraakt. Geen Supabase-wijziging en geen deployment.
+
+**Volgende concrete stap**
+Voer de visuele QA van de echte oefening uit op desktop en mobiel: beoordeel of de volledige symbolische én visuele som, de instructie/annotaties en het interactieve werkveld compact en begrijpelijk op één scherm passen. De huidige browserdekking bewijst dat er geen horizontale overflow is; zij bewijst nog niet dat verticale scrolling niet nodig is. Pas na concrete waarneming eventueel de centrale Fraction Practice Template of gedeelde Fraction Learning Interface aan, niet een los route-specifiek scherm. Voor iedere bouwstap eerst opnieuw Full Regression controleren. Iedere handoff-wijziging moet zelf opnieuw door Full Regression.

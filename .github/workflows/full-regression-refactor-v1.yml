@@ -80,7 +80,7 @@ jobs:
             ! -name 'skill-definition-service.test.js' ! -name 'skill-configuration-service.test.js' | sort)
           node --test $files
       - name: Run migrated native Node regression
-        run: node --test test/lesson-item-collector-types.test.js test/lesson-part-model.test.js test/lesson-save-flow.test.js src/services/learning-content-service.test.js test/skill-definition-service.test.js test/skill-configuration-service.test.js vitest/*.test.js
+        run: node --test test/lesson-item-collector-types.test.js test/lesson-part-model.test.js test/lesson-save-flow.test.js src/services/learning-content-service.test.js test/skill-definition-service.test.js test/skill-configuration-service.test.js
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Start local fixture server

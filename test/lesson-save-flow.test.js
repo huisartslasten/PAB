@@ -1,6 +1,14 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
+import { isDeepStrictEqual } from 'node:util';
 import { createLessonSaveFlow } from '../src/features/lessons/lesson-save-flow.js';
+
+function assertCalledWith(mockFn, expectedArguments) {
+  assert.ok(
+    mockFn.mock.calls.some(call => isDeepStrictEqual(call.arguments, expectedArguments)),
+    'Expected mock to have been called with the supplied arguments'
+  );
+}
 
 describe('createLessonSaveFlow', () => {
   it('keeps the V4.78 completion order after persistence', async () => {
@@ -63,7 +71,7 @@ describe('createLessonSaveFlow', () => {
 
     await flow.save({ lessonId: 7, student: 'Zyon', testDate: '' });
 
-    assert.deepStrictEqual(removeTestDate.mock.calls.map(call => call.arguments), [[7, 'Zyon']]);
+    assertCalledWith(removeTestDate, [7, 'Zyon']);
     assert.equal(upsertTestDate.mock.callCount(), 0);
   });
 

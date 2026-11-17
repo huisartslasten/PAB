@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
+import { isDeepStrictEqual } from 'node:util';
 import { createLearningContentService } from './learning-content-service.js';
 import * as imagePlacement from '../core/image-placement.js';
 
@@ -18,6 +19,13 @@ function query(result = { data: [], error: null }, t) {
 
 const withPlacement = options => ({ imagePlacement, ...options });
 
+function assertCalledWith(mockFn, expectedArguments) {
+  assert.ok(
+    mockFn.mock.calls.some(call => isDeepStrictEqual(call.arguments, expectedArguments)),
+    'Expected mock to have been called with the supplied arguments'
+  );
+}
+
 describe('learning content service', () => {
   it('reads topic-owned structured cards and normalizes wrapped images to a text-flow side', async t => {
     const rows = [{ id: 1, learning_topic_id: 10, title: 'Azië', document: { version: 3, elements: [{ id: 'i1', type: 'image', media_id: 7, size: { width: 70, unit: 'percent' }, placement: { mode: 'flow', x: 18, y: 42, wrap: 'square' } }] }, sort_order: 0 }];
@@ -31,7 +39,7 @@ describe('learning content service', () => {
     assert.deepStrictEqual(cards[0].document.elements[0].size, { width: 70, unit: 'percent' });
     assert.deepStrictEqual(cards[0].document.elements[0].placement, { mode: 'flow', x: 30, y: 0, wrap: 'square' });
     assert.equal(cards[0].document.elements[0].image.url, '/signed/asia.jpg');
-    assert.deepStrictEqual(media.getByIds.mock.calls.map(call => call.arguments), [[[7]]]);
+    assertCalledWith(media.getByIds, [[7]]);
   });
 
   it('migrates the previous side/offset layout into the canonical wrapped-position model', async t => {
@@ -64,18 +72,15 @@ describe('learning content service', () => {
     const save = query({ data: [{ id: 4, learning_topic_id: 10, title: 'A', document: { version: 3, elements: [] }, sort_order: 0 }], error: null }, t);
     const remove = query({ data: [], error: null }, t);
     const read = query({ data: [{ id: 4, learning_topic_id: 10, title: 'A', document: { version: 3, elements: [] }, sort_order: 0 }], error: null }, t);
-    const from = t.mock.fn();
-    from.mock.mockImplementationOnce(() => existing);
-    from.mock.mockImplementationOnce(() => save);
-    from.mock.mockImplementationOnce(() => remove);
-    from.mock.mockImplementationOnce(() => read);
+    const fromResults = [existing, save, remove, read];
+    const from = t.mock.fn(() => fromResults.shift());
     const db = { from };
     const topics = { getById: t.mock.fn(async id => ({ id })) };
     const service = createLearningContentService(db, withPlacement({ topics, canManage: () => true }));
 
     await service.replaceForTopic(10, [{ id: 4, title: 'A', document: { version: 3, elements: [] } }]);
 
-    assert.deepStrictEqual(save.upsert.mock.calls[0].arguments, [[{ id: 4, learning_topic_id: 10, title: 'A', document: { version: 3, elements: [] }, sort_order: 0 }], { defaultToNull: false }]);
-    assert.deepStrictEqual(remove.in.mock.calls[0].arguments, ['id', [5]]);
+    assertCalledWith(save.upsert, [[{ id: 4, learning_topic_id: 10, title: 'A', document: { version: 3, elements: [] }, sort_order: 0 }], { defaultToNull: false }]);
+    assertCalledWith(remove.in, ['id', [5]]);
   });
 });

@@ -5,6 +5,9 @@ import { createPacoBoneDifficulty } from '../../components/design-system.js';
 import { createFractionPracticeTemplate } from '../../../pacogo-engine/fraction-practice-template.js';
 import { renderFractionAnswerInput } from '../../../pacogo-engine/fraction-answer-input.js';
 import { renderFractionRepresentation, renderMixedNumber, renderFractionInputRepresentation } from '../../../pacogo-engine/fraction-learning-interface-renderers.js';
+import { renderFractionOperation } from '../../../pacogo-engine/fraction-practice-operation.js';
+import { renderFractionPracticeExpression } from '../../../pacogo-engine/fraction-practice-equation.js';
+import { createFractionLikeDenominatorSubtractionSession } from '../../../pacogo-engine/fraction-like-denominator-subtraction-session.js';
 import { FRACTION_ADDITION_LEVEL_3_TASKS } from '../../../pacogo-engine/fraction-addition-level-3-task-bank.js';
 import { FRACTION_ADDITION_LEVEL_4_EXERCISE, createFractionUnequalIndependentAdditionSession } from '../../../pacogo-engine/fraction-unequal-independent-addition-session.js';
 import { FRACTION_ADDITION_LEVEL_3B_TASKS } from '../../../pacogo-engine/fraction-addition-level-3b-task-bank.js';
@@ -180,7 +183,7 @@ export function createSkillsRuntime({
     const items = [
       { label: 'Breukgetal groter dan 1 aftrekken van een heel getal', level: 1, exercise: 'whole-minus-mixed-subtraction' },
       { label: 'Breukgetal groter dan 1 aftrekken van een heel getal — visueel oefenen', level: 1, exercise: 'whole-minus-greater-than-one-subtraction' },
-      { label: 'Gelijknamige breuken kleiner dan 1 van elkaar aftrekken', level: 1 },
+      { label: 'Gelijknamige breuken kleiner dan 1 van elkaar aftrekken', level: 1, exercise: 'like-denominator-subtraction' },
       { label: 'Gelijknamige breuken groter dan 1 van elkaar aftrekken', level: 2 },
       { label: 'Ongelijknamige breuken kleiner dan 1 van elkaar aftrekken', level: 3 },
       { label: 'Ongelijknamige breuken groter dan 1 van elkaar aftrekken', level: 4 }
@@ -236,6 +239,116 @@ export function createSkillsRuntime({
       instruction: bank.instruction,
       documentRef
     });
+  }
+
+  function renderLikeDenominatorSubtractionPractice() {
+    const learnerKey = student || context?.learnerId || 'local-learner';
+    const session = createFractionLikeDenominatorSubtractionSession({ learnerKey });
+
+    function renderCurrentTask() {
+      const task = session.getCurrentTask();
+      const progress = session.getProgress();
+      content.replaceChildren();
+      const card = documentRef.createElement('section');
+      card.className = 'card fraction-whole-mixed-addition-card';
+      const template = createFractionPracticeTemplate({ mount: card });
+      const title = documentRef.createElement('h2');
+      title.textContent = 'Gelijknamige breuken kleiner dan 1 van elkaar aftrekken';
+      const instruction = documentRef.createElement('p');
+      instruction.className = 'fraction-practice-instruction';
+      instruction.textContent = 'Trek de tellers van elkaar af. De noemer blijft gelijk.';
+      const progressLabel = documentRef.createElement('p');
+      progressLabel.className = 'fraction-practice-progress';
+      progressLabel.textContent = task
+        ? 'Som ' + task.taskNumber + ' van ' + task.totalTasks + ' • ' + progress.completedCount + ' afgerond'
+        : progress.completedCount + ' van ' + progress.totalCount + ' sommen afgerond';
+      template.titleArea.append(title);
+      template.instructionArea.append(instruction);
+      template.progressArea.append(progressLabel);
+
+      if (!task) {
+        const done = documentRef.createElement('p');
+        done.className = 'fraction-practice-complete';
+        done.textContent = 'Je hebt alle ' + progress.totalCount + ' sommen afgerond. Goed gewerkt!';
+        template.workArea.append(done);
+        const restart = documentRef.createElement('button');
+        restart.type = 'button';
+        restart.className = 'paco-btn paco-btn--primary';
+        restart.textContent = 'Oefenronde opnieuw doen';
+        restart.addEventListener('click', () => {
+          session.reset();
+          renderCurrentTask();
+        });
+        template.actionsArea.append(restart);
+        content.append(card);
+        return;
+      }
+
+      const visual = documentRef.createElement('div');
+      visual.className = 'comparison';
+      renderFractionOperation({
+        mount: visual,
+        operator: '−',
+        terms: [
+          { label: 'Eerste breuk', fraction: task.leftFraction },
+          { label: 'Tweede breuk', fraction: task.rightFraction }
+        ]
+      });
+      const equation = documentRef.createElement('div');
+      equation.className = 'construction-equation';
+      const expression = renderFractionPracticeExpression({
+        mount: equation,
+        expression: task.leftFraction.numerator + '/' + task.leftFraction.denominator +
+          ' − ' + task.rightFraction.numerator + '/' + task.rightFraction.denominator + ' = ?/?',
+        inputLabels: ['Uitkomstteller', 'Uitkomstnoemer']
+      });
+      template.workArea.append(visual, equation);
+
+      const prompt = documentRef.createElement('p');
+      prompt.textContent = 'Vul de teller en noemer van het antwoord in.';
+      template.promptArea.append(prompt);
+
+      const feedback = documentRef.createElement('p');
+      feedback.setAttribute('role', 'status');
+      feedback.textContent = 'Trek de tellers van elkaar af. De noemer blijft gelijk.';
+      template.feedbackArea.append(feedback);
+
+      const submit = documentRef.createElement('button');
+      submit.type = 'button';
+      submit.className = 'paco-btn paco-btn--primary';
+      submit.textContent = 'Controleren';
+      submit.addEventListener('click', () => {
+        const values = expression.getValues();
+        const result = session.recordAnswer({
+          numerator: values[0] || '',
+          denominator: values[1] || ''
+        });
+        const latestProgress = session.getProgress();
+        progressLabel.textContent = 'Som ' + (result.progress.completedCount + (result.progress.isComplete ? 0 : 1)) +
+          ' van ' + result.progress.totalCount + ' • ' + result.progress.completedCount + ' afgerond';
+        if (result.classification === 'valid') {
+          expression.lock();
+          submit.disabled = true;
+          feedback.textContent = 'Goed gedaan! Je hebt de tellers afgetrokken en de noemer gelijk gehouden.';
+          const next = documentRef.createElement('button');
+          next.type = 'button';
+          next.className = 'paco-btn paco-btn--primary';
+          next.textContent = result.progress.isComplete ? 'Oefenronde afronden' : 'Volgende som';
+          next.addEventListener('click', renderCurrentTask);
+          template.actionsArea.replaceChildren(next);
+        } else {
+          feedback.textContent = result.classification === 'invalid_input'
+            ? 'Vul bij de uitkomst zowel een teller als een noemer in.'
+            : 'Nog niet. Trek de tellers van elkaar af en neem dezelfde noemer over.';
+          expression.focus();
+        }
+      });
+      template.controlsArea.append(submit);
+      content.append(card);
+      expression.focus();
+    }
+
+    renderCurrentTask();
   }
 
   function renderWholeMinusMixedSubtractionPractice() {
@@ -977,6 +1090,7 @@ export function createSkillsRuntime({
     const showingAddition = showingFractions && topic === 'optellen';
     const showingSubtraction = showingFractions && topic === 'aftrekken';
     const showingWholeMinusMixedSubtraction = showingSubtraction && exercise === 'whole-minus-mixed-subtraction';
+    const showingLikeDenominatorSubtractionPractice = showingSubtraction && exercise === 'like-denominator-subtraction';
     const showingWholeMinusGreaterThanOneSubtraction = showingSubtraction && exercise === 'whole-minus-greater-than-one-subtraction';
     const showingWholeMixedPractice = showingAddition && exercise === 'whole-number-mixed-addition';
     const showingSameDenominatorPractice = showingAddition && exercise === 'same-denominator-addition';
@@ -986,7 +1100,7 @@ export function createSkillsRuntime({
     const showingUnequalDenominatorGuidedMixedPractice = showingAddition && exercise === 'unequal-denominator-guided-mixed-addition';
     const showingUnequalMixedAdditionPractice = showingAddition && exercise === 'unequal-mixed-addition';
     const showingPractice = showingWholeMixedPractice || showingSameDenominatorPractice || showingMixedSameDenominatorPractice || showingUnequalDenominatorGuidedPractice || showingUnequalDenominatorGuidedMixedPractice || showingUnequalIndependentPractice || showingUnequalMixedAdditionPractice;
-    const showingAnyPractice = showingPractice || showingWholeMinusMixedSubtraction || showingWholeMinusGreaterThanOneSubtraction;
+    const showingAnyPractice = showingPractice || showingWholeMinusMixedSubtraction || showingWholeMinusGreaterThanOneSubtraction || showingLikeDenominatorSubtractionPractice;
     mountPacoPageTemplate({
       mount: templateMount,
       greeting: student ? `Hoi ${student}! 🐶` : 'Welkom bij PacoGO!',
@@ -1007,6 +1121,8 @@ export function createSkillsRuntime({
         ? 'Breuken → Optellen → Ongelijknamige breuken kleiner dan 1 bij elkaar optellen.'
         : showingAddition
         ? 'Breuken → Optellen.'
+        : showingLikeDenominatorSubtractionPractice
+        ? 'Breuken → Aftrekken → Gelijknamige breuken kleiner dan 1 van elkaar aftrekken.'
         : showingWholeMinusGreaterThanOneSubtraction
         ? 'Breuken → Aftrekken → ' + FRACTION_QUANTITY_WHOLE_MINUS_GREATER_THAN_ONE_TASK_BANK.title + '.'
         : showingWholeMinusMixedSubtraction
@@ -1035,6 +1151,7 @@ export function createSkillsRuntime({
     else if (showingUnequalDenominatorGuidedMixedPractice) renderUnequalDenominatorGuidedAdditionPractice({ mixedNumberResult: true });
     else if (showingUnequalDenominatorGuidedPractice) renderUnequalDenominatorGuidedAdditionPractice();
     else if (showingAddition) renderFractionAdditionOverview();
+    else if (showingLikeDenominatorSubtractionPractice) renderLikeDenominatorSubtractionPractice();
     else if (showingWholeMinusGreaterThanOneSubtraction) renderWholeMinusGreaterThanOneSubtractionPractice();
     else if (showingWholeMinusMixedSubtraction) renderWholeMinusMixedSubtractionPractice();
     else if (showingSubtraction) renderFractionSubtractionOverview();

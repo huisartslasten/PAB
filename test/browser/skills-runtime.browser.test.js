@@ -855,12 +855,70 @@ test('fraction subtraction overview keeps the original exercise and adds the sep
     'Ongelijknamige breuken kleiner dan 1 van elkaar aftrekken',
     'Ongelijknamige breuken groter dan 1 van elkaar aftrekken'
   ]);
-  expect(result.exerciseButtonCount).toBe(2);
-  expect(result.navigations).toHaveLength(2);
+  expect(result.exerciseButtonCount).toBe(3);
+  expect(result.navigations).toHaveLength(3);
   expect(result.navigations[0]).toContain('exercise=whole-minus-mixed-subtraction');
   expect(result.navigations[1]).toContain('exercise=whole-minus-greater-than-one-subtraction');
+  expect(result.navigations[2]).toContain('exercise=like-denominator-subtraction');
 });
 
+
+
+test('like-denominator subtraction opens from the central Skills route and runs all fifteen tasks in the central Fraction Practice Template', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=aftrekken&exercise=like-denominator-subtraction', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    localStorage.removeItem('pacogo:fraction-like-denominator-subtraction:v1:Zyon');
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {},
+      managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    const runtime = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'aftrekken', exercise: 'like-denominator-subtraction',
+      documentRef: document, navigate: () => {}
+    });
+    await runtime.mount();
+    const initial = {
+      title: document.querySelector('.paco-template-main h1')?.textContent || '',
+      layoutMode: document.querySelector('.paco-page-template')?.dataset.layoutMode || '',
+      template: Boolean(document.querySelector('[data-component="fraction-practice-template"]')),
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      expression: document.querySelector('.fraction-practice-equation')?.dataset.expression || '',
+      visualTerms: document.querySelectorAll('.pacogo-fraction-operation__term').length
+    };
+    const fields = [...document.querySelectorAll('.fraction-practice-inline-input')];
+    fields[0].value = '5'; fields[0].dispatchEvent(new Event('input', { bubbles: true }));
+    fields[1].value = '7'; fields[1].dispatchEvent(new Event('input', { bubbles: true }));
+    document.querySelector('.pacogo-fraction-practice-template__controls button').click();
+    const afterCorrect = {
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      feedback: document.querySelector('[role="status"]')?.textContent || '',
+      next: document.querySelector('.pacogo-fraction-practice-template__actions button')?.textContent || ''
+    };
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    return {
+      initial, afterCorrect,
+      secondExpression: document.querySelector('.fraction-practice-equation')?.dataset.expression || '',
+      secondProgress: document.querySelector('.fraction-practice-progress')?.textContent || ''
+    };
+  });
+  expect(result.initial.title).toBe('Oefenen');
+  expect(result.initial.layoutMode).toBe('practice');
+  expect(result.initial.template).toBe(true);
+  expect(result.initial.progress).toContain('Som 1 van 15');
+  expect(result.initial.expression).toBe('6/7 − 1/7 = ?/?');
+  expect(result.initial.visualTerms).toBe(2);
+  expect(result.afterCorrect.progress).toContain('1 afgerond');
+  expect(result.afterCorrect.feedback).toContain('Goed gedaan');
+  expect(result.afterCorrect.next).toBe('Volgende som');
+  expect(result.secondExpression).toBe('7/8 − 1/8 = ?/?');
+  expect(result.secondProgress).toContain('Som 2 van 15');
+});
 
 test('fraction practice retains the canonical left sidebar on desktop and mobile', async ({ page }) => {
   const layouts = [];

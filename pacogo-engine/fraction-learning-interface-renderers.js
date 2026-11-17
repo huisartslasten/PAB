@@ -1,7 +1,7 @@
 import { normalizeFractionAreaModelLayout } from "./fraction-representation-contract.js";
 
-function renderPieModel(fraction, label) {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+function renderPieModel(fraction, label, documentRef = document) {
+  const svg = documentRef.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", "0 0 100 100");
   svg.setAttribute("class", "pacogo-fraction-pie");
   svg.setAttribute("role", "img");
@@ -17,7 +17,7 @@ function renderPieModel(fraction, label) {
     const x2 = center + radius * Math.cos(endAngle);
     const y2 = center + radius * Math.sin(endAngle);
     const largeArc = endAngle - startAngle > Math.PI ? 1 : 0;
-    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    const path = documentRef.createElementNS("http://www.w3.org/2000/svg", "path");
     const d = fraction.denominator === 1
       ? "M 50 50 L 50 4 A 46 46 0 1 1 49.99 4 Z"
       : "M 50 50 L " + x1.toFixed(4) + " " + y1.toFixed(4) +
@@ -31,19 +31,20 @@ function renderPieModel(fraction, label) {
 }
 
 function renderFractionRepresentation(fraction, representation, label = "Breuk", options = {}) {
-  const wrapper = document.createElement("span");
+  const documentRef = options.documentRef || document;
+  const wrapper = documentRef.createElement("span");
   wrapper.className = "pacogo-fraction-representation";
   if (representation === "symbolic_fraction") {
     wrapper.classList.add("pacogo-fraction-representation--symbolic");
     wrapper.setAttribute("role", "img");
     wrapper.setAttribute("aria-label", label + ": " + fraction.numerator + " gedeeld door " + fraction.denominator);
-    const numerator = document.createElement("span");
+    const numerator = documentRef.createElement("span");
     numerator.className = "pacogo-fraction-numerator";
     numerator.textContent = String(fraction.numerator);
-    const divider = document.createElement("span");
+    const divider = documentRef.createElement("span");
     divider.className = "pacogo-fraction-divider";
     divider.setAttribute("aria-hidden", "true");
-    const denominator = document.createElement("span");
+    const denominator = documentRef.createElement("span");
     denominator.className = "pacogo-fraction-denominator";
     denominator.textContent = String(fraction.denominator);
     wrapper.append(numerator, divider, denominator);
@@ -54,17 +55,17 @@ function renderFractionRepresentation(fraction, representation, label = "Breuk",
   const layout = normalizeFractionAreaModelLayout(options.layout);
   wrapper.dataset.layout = layout;
   if (layout === "pie") {
-    wrapper.append(renderPieModel(fraction, label));
+    wrapper.append(renderPieModel(fraction, label, documentRef));
     return wrapper;
   }
   wrapper.setAttribute("role", "img");
   wrapper.setAttribute("aria-label", label + ": " + fraction.numerator + " van " + fraction.denominator + " gelijke delen");
-  const cells = document.createElement("span");
+  const cells = documentRef.createElement("span");
   cells.className = "pacogo-fraction-cells";
   const columns = layout === "grid" ? Math.min(fraction.denominator, Math.ceil(Math.sqrt(fraction.denominator))) : fraction.denominator;
   cells.style.gridTemplateColumns = "repeat(" + columns + ", minmax(0, 1fr))";
   for (let index = 0; index < fraction.denominator; index += 1) {
-    const cell = document.createElement("span");
+    const cell = documentRef.createElement("span");
     cell.className = index < fraction.numerator ? "pacogo-fraction-cell is-shaded" : "pacogo-fraction-cell";
     cell.setAttribute("aria-hidden", "true");
     cells.append(cell);
@@ -161,7 +162,93 @@ function renderFractionQuantityAnnotation(annotation, documentRef) {
   return wrapper;
 }
 
-function renderFractionQuantityPieUnit(unit, documentRef, onToggle) {
+
+function renderFractionQuantityStaticUnit({ numerator, denominator, representation, label, documentRef = document } = {}) {
+  if (!Number.isSafeInteger(numerator) || numerator < 0 ||
+      !Number.isSafeInteger(denominator) || denominator < 1 || numerator > denominator ||
+      !["bar", "pie"].includes(representation)) {
+    throw new TypeError("A valid static Fraction quantity unit is required");
+  }
+  const unit = documentRef.createElement("div");
+  unit.className = "pacogo-fraction-quantity__annotated-unit";
+  unit.setAttribute("aria-label", label || "Hoeveelheid");
+  const model = documentRef.createElement("div");
+  model.className = "pacogo-fraction-quantity__model";
+  model.style.width = "116px";
+  if (representation === "pie") model.style.minHeight = "116px";
+  const visual = renderFractionRepresentation(
+    { numerator, denominator },
+    "area_model",
+    label || "Hoeveelheid",
+    { layout: representation, documentRef }
+  );
+  model.append(visual);
+  const annotation = denominator === 1
+    ? renderFractionQuantityAnnotation({ kind: "whole", value: numerator }, documentRef)
+    : renderFractionQuantityAnnotation({ kind: "fraction", numerator, denominator }, documentRef);
+  unit.append(model, annotation);
+  return unit;
+}
+
+function renderFractionQuantityOperation({ wholeUnits, subtraction, representation, documentRef = document } = {}) {
+  if (!Number.isSafeInteger(wholeUnits) || wholeUnits < 1 ||
+      !subtraction || !Number.isSafeInteger(subtraction.whole) || subtraction.whole < 0 ||
+      !Number.isSafeInteger(subtraction.numerator) || subtraction.numerator < 0 ||
+      !Number.isSafeInteger(subtraction.denominator) || subtraction.denominator < 1 ||
+      subtraction.numerator >= subtraction.denominator ||
+      !["bar", "pie"].includes(representation)) {
+    throw new TypeError("A valid Fraction quantity subtraction expression is required");
+  }
+  const root = documentRef.createElement("div");
+  root.className = "fraction-quantity-subtraction-expression fraction-quantity-subtraction-expression--visual";
+  root.dataset.representation = representation;
+  root.setAttribute("aria-label", "Visuele aftreksom met " + wholeUnits + " hele eenheden minus " +
+    subtraction.whole + " hele en " + subtraction.numerator + " van " + subtraction.denominator + " delen");
+  const createTerm = label => {
+    const term = documentRef.createElement("div");
+    term.className = "pacogo-fraction-quantity__units fraction-quantity-subtraction-expression__term";
+    term.setAttribute("role", "group");
+    term.setAttribute("aria-label", label);
+    return term;
+  };
+  const start = createTerm("Beginhoeveelheid: " + wholeUnits + " hele eenheden");
+  for (let index = 0; index < wholeUnits; index += 1) {
+    start.append(renderFractionQuantityStaticUnit({
+      numerator: 1, denominator: 1, representation, label: "Eén heel", documentRef
+    }));
+  }
+  const minus = documentRef.createElement("span");
+  minus.className = "fraction-quantity-subtraction-expression__operator";
+  minus.textContent = "−";
+  minus.setAttribute("aria-hidden", "true");
+  const remove = createTerm("Af te trekken hoeveelheid");
+  for (let index = 0; index < subtraction.whole; index += 1) {
+    remove.append(renderFractionQuantityStaticUnit({
+      numerator: 1, denominator: 1, representation, label: "Eén heel dat wordt afgetrokken", documentRef
+    }));
+  }
+  if (subtraction.numerator > 0) {
+    remove.append(renderFractionQuantityStaticUnit({
+      numerator: subtraction.numerator,
+      denominator: subtraction.denominator,
+      representation,
+      label: "Breukdeel dat wordt afgetrokken",
+      documentRef
+    }));
+  }
+  const equals = documentRef.createElement("span");
+  equals.className = "fraction-quantity-subtraction-expression__operator";
+  equals.textContent = "=";
+  equals.setAttribute("aria-hidden", "true");
+  const unknown = documentRef.createElement("span");
+  unknown.className = "fraction-quantity-subtraction-expression__unknown";
+  unknown.textContent = "?";
+  unknown.setAttribute("aria-label", "Onbekende uitkomst");
+  root.append(start, minus, remove, equals, unknown);
+  return root;
+}
+
+function renderFractionQuantityPieUnit(unit, documentRef, onToggle, onSelect) {
   const svg = documentRef.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", "0 0 100 100");
   svg.setAttribute("class", "pacogo-fraction-quantity__pie");
@@ -175,23 +262,25 @@ function renderFractionQuantityPieUnit(unit, documentRef, onToggle) {
     path.setAttribute("class", "pacogo-fraction-quantity__sector" + (filled ? " is-filled" : ""));
     path.setAttribute("role", "button");
     path.setAttribute("tabindex", "0");
-    path.setAttribute("aria-label", (filled ? "Maak deel leeg " : "Vul deel ") + (index + 1));
+    const isWhole = unit.denominator === 1;
+    path.setAttribute("aria-label", isWhole ? "Selecteer hele eenheid" : (filled ? "Maak deel leeg " : "Vul deel ") + (index + 1));
     path.dataset.segmentIndex = String(index);
-    path.addEventListener("click", () => onToggle(unit.id, index));
-    path.addEventListener("keydown", event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); onToggle(unit.id, index); } });
+    const activate = () => isWhole ? onSelect(unit.id) : onToggle(unit.id, index);
+    path.addEventListener("click", activate);
+    path.addEventListener("keydown", event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); activate(); } });
     svg.append(path);
   });
   return svg;
 }
 
-function renderFractionQuantityUnit(unit, representation, documentRef, onToggle) {
+function renderFractionQuantityUnit(unit, representation, documentRef, onToggle, onSelect) {
   const group = documentRef.createElement("div");
   group.className = "pacogo-fraction-quantity__unit";
   group.dataset.unitId = unit.id;
   const model = documentRef.createElement("div");
   model.className = "pacogo-fraction-quantity__model";
   if (representation === "pie") {
-    model.append(renderFractionQuantityPieUnit(unit, documentRef, onToggle));
+    model.append(renderFractionQuantityPieUnit(unit, documentRef, onToggle, onSelect));
     model.setAttribute("aria-label", "Taartmodel");
   } else {
     model.classList.add("pacogo-fraction-quantity__bar");
@@ -200,8 +289,9 @@ function renderFractionQuantityUnit(unit, representation, documentRef, onToggle)
       segment.type = "button";
       segment.className = "pacogo-fraction-quantity__segment" + (filled ? " is-filled" : "");
       segment.dataset.segmentIndex = String(index);
-      segment.setAttribute("aria-label", (filled ? "Maak deel leeg" : "Vul deel") + " " + (index + 1));
-      segment.addEventListener("click", () => onToggle(unit.id, index));
+      const isWhole = unit.denominator === 1;
+      segment.setAttribute("aria-label", isWhole ? "Selecteer hele eenheid" : (filled ? "Maak deel leeg" : "Vul deel") + " " + (index + 1));
+      segment.addEventListener("click", () => isWhole ? onSelect(unit.id) : onToggle(unit.id, index));
       model.append(segment);
     });
   }
@@ -263,10 +353,10 @@ function renderFractionQuantityLearningInterface({
         instructions.textContent = "Gekozen. Kies nu hoe je deze eenheid wilt verdelen.";
       });
       const item = renderFractionQuantityUnit(unit, config.representation, documentRef,
-        (unitId, segmentIndex) => {
-          const currentUnit = controller.getState().state.units.find(item => item.id === unitId);
-          if (currentUnit.denominator === 1) controller.setUnitFilled(unitId, !currentUnit.segments[0]);
-          else controller.toggleSegment(unitId, segmentIndex);
+        (unitId, segmentIndex) => controller.toggleSegment(unitId, segmentIndex),
+        unitId => {
+          controller.selectUnit(unitId);
+          instructions.textContent = "Gekozen. Kies nu hoe je deze eenheid wilt verdelen.";
         });
       annotated.append(select, item, renderFractionQuantityAnnotation(annotationByUnit.get(unit.id), documentRef));
       units.append(annotated);
@@ -303,15 +393,21 @@ function renderFractionQuantityLearningInterface({
     } else {
       controls.append(documentRef.createTextNode("Selecteer een taart of balk."));
     }
-    const value = snapshot.amount;
+    const appendAmount = (labelText, value, accessibleLabel) => {
+      const row = documentRef.createElement("span");
+      row.className = "pacogo-fraction-quantity__amount-row";
+      const label = documentRef.createElement("span");
+      label.textContent = labelText + ": ";
+      const total = documentRef.createElement("span");
+      total.className = "pacogo-fraction-quantity__total";
+      if (value.numerator === 0) total.textContent = String(value.whole);
+      else total.append(renderMixedNumber({ wholeNumber: value.whole, numerator: value.numerator, denominator: value.denominator }, accessibleLabel));
+      row.append(label, total);
+      amount.append(row);
+    };
     amount.replaceChildren();
-    const label = documentRef.createElement("span");
-    label.textContent = config.labels.quantity + ": ";
-    const total = documentRef.createElement("span");
-    total.className = "pacogo-fraction-quantity__total";
-    if (value.numerator === 0) total.textContent = String(value.whole);
-    else total.append(renderMixedNumber({ wholeNumber: value.whole, numerator: value.numerator, denominator: value.denominator }, "Overgebleven hoeveelheid"));
-    amount.append(label, total);
+    appendAmount(config.labels.quantity, snapshot.amount, "Overgebleven hoeveelheid");
+    appendAmount("Afgetrokken", snapshot.removedAmount, "Afgetrokken hoeveelheid");
     const history = documentRef.createElement("div");
     history.className = "pacogo-fraction-quantity__history";
     const undo = documentRef.createElement("button");
@@ -338,4 +434,4 @@ function renderFractionQuantityLearningInterface({
   });
 }
 
-export { renderFractionRepresentation, renderMixedNumber, renderFractionInputRepresentation, createFractionQuantityPieSectorPath, renderFractionQuantityAnnotation, renderFractionQuantityLearningInterface };
+export { renderFractionRepresentation, renderMixedNumber, renderFractionInputRepresentation, createFractionQuantityPieSectorPath, renderFractionQuantityAnnotation, renderFractionQuantityStaticUnit, renderFractionQuantityOperation, renderFractionQuantityLearningInterface };

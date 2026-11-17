@@ -57,7 +57,8 @@ test("whole interactive pies use circles and only gain radial lines after partit
   await expect(units.locator("path.pacogo-fraction-quantity__sector")).toHaveCount(0);
 
   await firstWhole.click();
-  await units.nth(1).getByRole("button", { name: "Verdelen van eenheid 2" }).click();
+  await page.locator(".fraction-quantity-subtraction-model .pacogo-fraction-quantity__annotated-unit").nth(1)
+    .getByRole("button", { name: "Verdelen van eenheid 2" }).click();
   await page.getByRole("button", { name: "4 delen" }).click();
 
   await expect(units.nth(0).locator("circle.pacogo-fraction-quantity__sector")).toHaveCount(1);
@@ -84,7 +85,6 @@ for (const representation of ["pie", "bar"]) {
     if (representation === "pie") {
       const wholePiePaths = page.locator(".fraction-quantity-subtraction-model .pacogo-fraction-quantity__sector");
       await expect(wholePiePaths).toHaveCount(2);
-      await expect(wholePiePaths).toHaveJSProperty("length", 2);
       await expect(wholePiePaths.first()).toHaveJSProperty("tagName", "circle");
       await expect(wholePiePaths.nth(1)).toHaveJSProperty("tagName", "circle");
       await expect(wholePiePaths.first()).toHaveAttribute("r", "46");

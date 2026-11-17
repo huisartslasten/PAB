@@ -7645,3 +7645,40 @@ De visuele sessiepresentatie bestaat en is browsergetest, maar is nog niet aan e
 - Voeg route- en browserregressie toe voor de echte taakbank, inclusief desktop-/mobiele compactheid. Controleer expliciet dat de bestaande niveau-1-aftrekoefening, de afzonderlijke vierstaps-oefening en FR2 backward compatible blijven.
 
 Voor iedere volgende bouwstap eerst de meest recente Full Regression controleren. Laatste geverifieerde codecommit: `8e499aea47bc1710f0115d6814f1505dc846c964`; Full Regression #3849 groen. Deze handoff-update moet op haar eigen commit eveneens Full Regression groen doorlopen.
+
+
+### Interactieve visuele aftreksessie — Fase E3: taakbank en Skills-route geïntegreerd (17 november 2026)
+
+De visuele aftreksessie voor het aftrekken van een breukgetal groter dan 1 van een heel getal is toegevoegd aan de bestaande Skills-route.
+
+**Centrale taakbank**
+- Nieuw `pacogo-engine/fraction-quantity-whole-minus-greater-than-one-task-bank.js`: één centrale, versieerbare taakbank (versie `0.1.0`) met precies tien unieke opgaven.
+- De reeks loopt op van `2 − 1 1/2`, `2 − 1 1/4`, `2 − 1 3/4`, via aftrekken vanaf 3 en 4 hele eenheden, tot `5 − 3 1/4`.
+- De taakbank gebruikt de bestaande quantity-modelgrenzen: verdelingen in 2, 3 of 4 gelijke delen en maximaal 12 hele eenheden. De sessie gebruikt standaard de breukenbalk.
+- Nieuw `pacogo-engine/fraction-quantity-whole-minus-greater-than-one-task-bank.test.js`: controleert het aantal/unieke IDs, geldigheid en bereik van de sommen, ondersteunde noemers en compatibiliteit met het bestaande sessiecontract.
+- De waarden en volgorde zijn een expliciet goedgekeurde didactische taakvoorstel voor deze oefening. Dit is geen letterlijk overgenomen SLO-taakbank en vormt op zichzelf geen empirische curriculumvalidatie.
+
+**Skills-integratie**
+- `src/features/skills/runtime.js` importeert de centrale taakbank en de bestaande `createFractionQuantitySubtractionPractice`.
+- De nieuwe route-ID is `whole-minus-greater-than-one-subtraction`.
+- De bestaande breuken-/aftrekoverzichtsroute start deze visuele oefening via de nieuwe route.
+- De oefening wordt gemonteerd binnen de bestaande PacoGO Skills-runtime en centrale pagina-template. De leerlingpresentatie blijft gebruikmaken van de bestaande Fraction Practice Template, quantity-controller en centrale pie-/balkrenderer.
+- De eerdere oefening voor een heel getal min een gemengd getal blijft afzonderlijk bereikbaar via `whole-minus-mixed-subtraction`. De nieuwe route vervangt of verwijdert die oefening niet.
+- Er is geen aparte paginashell, tweede breuktemplate of lokale renderer gebouwd.
+
+**Grenzen**
+- De generieke `practice-session-core.js`, de quantity-model/controller en de Fraction Learning Interface blijven de gedeelde technische basis.
+- De taakbank bevat alleen taakconfiguratie. Zij voegt geen curriculumregistratie, SLO-mapping, formele evidence, mastery, learner-state of opslag toe.
+- Geen Supabase-wijziging, geen deployment en geen wijziging aan LIVE `main`.
+
+### Verificatie Fase E3
+
+- Branch: `refactor/professional-v1`.
+- Code-/integratiecommit: `26988e39a839bc996d77a4748128ccc731756f7b`.
+- Full Regression #3851 / run `44095883413`: **GREEN / SUCCESS** op exact deze commit. De volledige workflow is voltooid, inclusief branch-/commitcontrole, security/dependency-controle, curriculum- en architectuurregressie, maintained Node-regressie, Vitest, Chromium-installatie, browserregressie en clean-working-tree-controle.
+- Laatste geverifieerde codecommit: `26988e39a839bc996d77a4748128ccc731756f7b`; Full Regression #3851 groen.
+- LIVE `main` is onaangeraakt.
+
+### Volgende concrete stap
+
+Voer een gerichte integratiecontrole uit op de echte Skills-route: controleer dat de overzichtsknop naar de nieuwe oefening leidt, de tien taakbankitems in de juiste volgorde verschijnen, de centrale pagina-/breuktemplate behouden blijft en de oude niveau-1-oefening bereikbaar en functioneel blijft. Voeg alleen gerichte browserdekking toe waar de bestaande regressie deze routegrens nog niet rechtstreeks controleert. Controleer daarbij desktop- en mobiele compactheid en voorkom dat de oefening onnodig scrollen vereist. Eerst opnieuw Full Regression uitvoeren voordat deze volgende bouwstap begint.

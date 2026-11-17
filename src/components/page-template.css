@@ -56,10 +56,10 @@ body:has(#paco-template-mount:empty):not(:has(#paco-chooser-mount:not(:empty))) 
 @media(max-width:900px){.paco-template-body{width:min(var(--paco-content-max),calc(100% - 28px));grid-template-columns:1fr}.paco-template-sidebar{position:static}.paco-template-sidebar-card{max-height:none}.paco-template-navigation{overflow:visible}.paco-template-nav-submenu{display:flex}.paco-template-page-header{margin-bottom:16px}.paco-template-version-badge{right:16px;bottom:14px;padding:10px 15px;font-size:22px}}
 @media(max-width:560px){.paco-template-body{width:calc(100% - 18px);padding-top:9px}.paco-template-page-header{padding:16px 17px}.paco-template-page-icon{font-size:32px}.paco-template-page-heading h1{font-size:30px}.paco-template-page-heading p{font-size:15px}.paco-template-version-badge{right:10px;bottom:10px;font-size:18px;padding:8px 12px}}
 
-/* Compact, reusable shell for learner practice routes. */
+/* Compact, reusable shell for learner practice routes.
+   The canonical left sidebar remains part of the page structure. */
 body.paco-template-practice-body { margin: 0; }
 .paco-page-template[data-layout-mode="practice"] .paco-template-hero,
-.paco-page-template[data-layout-mode="practice"] .paco-template-sidebar-card,
 .paco-page-template[data-layout-mode="practice"] .paco-template-version-badge {
   display: none;
 }
@@ -67,17 +67,31 @@ body.paco-template-practice-body { margin: 0; }
   width: min(var(--paco-content-max), calc(100% - 48px));
   margin: 0 auto;
   padding: 14px 0 20px;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 10px;
+  grid-template-columns: var(--paco-sidebar-width) minmax(0, 1fr);
+  gap: 20px;
 }
 .paco-page-template[data-layout-mode="practice"] .paco-template-sidebar {
-  position: static;
-  flex-direction: row;
-  align-items: center;
-  gap: 0;
+  position: sticky;
+  top: 14px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+.paco-page-template[data-layout-mode="practice"] .paco-template-sidebar-card {
+  display: flex;
+  max-height: calc(100vh - 110px);
+  padding: 12px 10px;
+}
+.paco-page-template[data-layout-mode="practice"] .paco-template-greeting {
+  margin: 2px 8px 10px;
+  font-size: 21px;
+}
+.paco-page-template[data-layout-mode="practice"] .paco-template-navigation {
+  min-height: 0;
+  overflow-y: auto;
 }
 .paco-page-template[data-layout-mode="practice"] .paco-template-back {
-  width: auto;
+  width: 100%;
   min-height: 40px;
   padding: 8px 14px;
   border-radius: 12px;
@@ -108,10 +122,33 @@ body.paco-template-practice-body { margin: 0; }
   .paco-page-template[data-layout-mode="practice"] .paco-template-body {
     width: calc(100% - 28px);
     padding: 10px 0 18px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+  .paco-page-template[data-layout-mode="practice"] .paco-template-sidebar {
+    position: static;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: stretch;
     gap: 8px;
   }
   .paco-page-template[data-layout-mode="practice"] .paco-template-back {
+    width: auto;
     min-height: 38px;
+    align-self: start;
+  }
+  .paco-page-template[data-layout-mode="practice"] .paco-template-sidebar-card {
+    max-height: 150px;
+    min-width: 0;
+    padding: 8px 10px;
+  }
+  .paco-page-template[data-layout-mode="practice"] .paco-template-greeting {
+    margin: 0 6px 6px;
+    font-size: 18px;
+  }
+  .paco-page-template[data-layout-mode="practice"] .paco-template-navigation {
+    overflow-x: auto;
+    overflow-y: auto;
   }
   .paco-page-template[data-layout-mode="practice"] .paco-template-page-header {
     min-height: 50px;
@@ -125,10 +162,18 @@ body.paco-template-practice-body { margin: 0; }
     padding: 8px 0 14px;
     gap: 8px;
   }
+  .paco-page-template[data-layout-mode="practice"] .paco-template-sidebar {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 6px;
+  }
   .paco-page-template[data-layout-mode="practice"] .paco-template-back {
     min-height: 36px;
-    padding: 6px 12px;
-    font-size: 15px;
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+  .paco-page-template[data-layout-mode="practice"] .paco-template-sidebar-card {
+    max-height: 136px;
+    padding: 7px 8px;
   }
   .paco-page-template[data-layout-mode="practice"] .paco-template-page-header {
     min-height: 46px;
@@ -142,4 +187,3 @@ body.paco-template-practice-body { margin: 0; }
     font-size: 22px;
   }
 }
-

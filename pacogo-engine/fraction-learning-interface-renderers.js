@@ -1,4 +1,5 @@
 import { normalizeFractionAreaModelLayout } from "./fraction-representation-contract.js";
+import { FRACTION_QUANTITY_REPRESENTATIONS } from "./fraction-learning-interface-contract.js";
 
 function renderPieModel(fraction, label, documentRef = document) {
   const svg = documentRef.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -166,7 +167,7 @@ function renderFractionQuantityAnnotation(annotation, documentRef) {
 function renderFractionQuantityStaticUnit({ numerator, denominator, representation, label, documentRef = document } = {}) {
   if (!Number.isSafeInteger(numerator) || numerator < 0 ||
       !Number.isSafeInteger(denominator) || denominator < 1 || numerator > denominator ||
-      !["bar", "pie"].includes(representation)) {
+      !FRACTION_QUANTITY_REPRESENTATIONS.includes(representation)) {
     throw new TypeError("A valid static Fraction quantity unit is required");
   }
   const unit = documentRef.createElement("div");
@@ -196,7 +197,7 @@ function renderFractionQuantityOperation({ wholeUnits, subtraction, representati
       !Number.isSafeInteger(subtraction.numerator) || subtraction.numerator < 0 ||
       !Number.isSafeInteger(subtraction.denominator) || subtraction.denominator < 1 ||
       subtraction.numerator >= subtraction.denominator ||
-      !["bar", "pie"].includes(representation)) {
+      !FRACTION_QUANTITY_REPRESENTATIONS.includes(representation)) {
     throw new TypeError("A valid Fraction quantity subtraction expression is required");
   }
   const root = documentRef.createElement("div");
@@ -308,7 +309,7 @@ function renderFractionQuantityLearningInterface({
 } = {}) {
   if (!mount || typeof mount.replaceChildren !== "function") throw new TypeError("mount must be a DOM element");
   if (!config || config.interfaceId !== "fraction" || config.mode !== "interactive_quantity" ||
-      !["pie", "bar"].includes(config.representation)) {
+      !FRACTION_QUANTITY_REPRESENTATIONS.includes(config.representation)) {
     throw new TypeError("A valid interactive Fraction quantity config is required");
   }
   if (!controller || typeof controller.getState !== "function" ||

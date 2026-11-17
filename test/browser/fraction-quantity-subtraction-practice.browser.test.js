@@ -50,7 +50,7 @@ for (const representation of ["pie", "bar"]) {
     const check = page.getByRole("button", { name: "Controleren" });
     await check.focus();
     await check.press("Enter");
-    await expect(page.getByRole("status")).toContainText("De overgebleven hoeveelheid klopt");
+    await expect(page.locator(".fraction-practice-feedback.is-correct")).toContainText("De overgebleven hoeveelheid klopt");
     await expect(page.getByRole("button", { name: "Volgende som" })).toBeVisible();
     await expect(page.getByText("Som 1 van 10 · 0 afgerond")).toBeVisible();
 

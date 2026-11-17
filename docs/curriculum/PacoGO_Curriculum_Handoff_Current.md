@@ -7524,3 +7524,49 @@ De centrale quantity-renderer is nu ook op browserniveau getest voor beide repre
 ### Volgende concrete stap
 
 Werk na deze handoff-aanvulling de handoff zelf met Full Regression op haar eigen commit af. Pas daarna: inspecteer de bestaande centrale Fraction Practice Template, de huidige aftreksessiecontracten en de Skills-runtime-aanroepketen. Ontwerp vervolgens de integratie van de quantity-renderer met een begeleide aftreksessie via de bestaande centrale breuktemplate. De renderer mag geen eigen curriculum-, task-, evidence-, mastery- of learner-state-logica introduceren. Geen nieuwe paginashell of parallelle breuktemplate. Behoud de bestaande niveau-1-aftrekoefening en FR2-statische interface backward compatible.
+
+### Interactieve visuele aftreksessie — Fase E1: centraal sessiecontract (17 november 2026)
+
+De eerste sessielaag voor de nieuwe reeks van tien visuele aftreksommen is gebouwd als een herbruikbare adapter boven op het bestaande quantity-model en de bestaande quantity-controller.
+
+- Nieuw `pacogo-engine/fraction-quantity-subtraction-session.js`: een configureerbaar sessiecontract dat precies tien unieke taakconfiguraties accepteert.
+- Elke taak specificeert het aantal volle eenheden en de af te trekken hoeveelheid als een gemengd getal. De sessie valideert dat de aftrek positief is en kleiner dan de beginhoeveelheid.
+- De sessie kiest één representatie voor de hele reeks: `pie` of `bar`. De toegestane verdelingen blijven centraal begrensd op 2, 3 en 4.
+- Per opgave wordt een nieuwe toestand aangemaakt met `createFractionQuantityState` en een nieuwe bestaande `createFractionQuantityController`. Er is geen tweede hoeveelheidsmodel of eigen interactielogica geïntroduceerd.
+- De controle vergelijkt de resterende hoeveelheid exact als rationale waarde. De leerling kan pas na een correcte controle expliciet naar de volgende som gaan.
+- Iedere wijziging aan de hoeveelheid maakt een eerder controlemoment ongeldig. Een oude correcte controle kan dus niet worden gebruikt nadat de leerling de hoeveelheid heeft aangepast.
+- Pogingen en voltooide taken worden binnen de sessie bijgehouden. Er is bewust geen opslag, Supabase-contract, curriculum-, evidence-, mastery- of learner-state-logica toegevoegd.
+- Het verwachte antwoord blijft intern in het sessiecontract en wordt niet via het leerlinggerichte taakobject of het controleantwoord beschikbaar gemaakt.
+- Nieuw `pacogo-engine/fraction-quantity-subtraction-session.test.js`: tests voor de tien-takenlimiet, taakvalidatie, één representatie, exacte breukvergelijking, hele en gemengde aftrek, controle/voortgang, expliciete taakovergang en sessievoltooiing.
+
+### Grenzen van Fase E1
+
+Dit is alleen het centrale sessiecontract. De leerlingweergave, de taakbank met de definitieve tien sommen, de koppeling met de centrale Fraction Practice Template en de Skills-runtime zijn nog niet gebouwd.
+
+De taakwaarden zijn bewust niet ingevuld: er is nog geen goedgekeurde bron voor de concrete tien opgaven in deze fase vastgelegd. Gebruik later de bedoelde curriculum-/didactische bron of expliciete taakconfiguratie; verzin geen productie-taakbank.
+
+De bestaande niveau-1-aftrekoefening, de afzonderlijke vierstaps-aftrekoefening en FR2 blijven ongewijzigd. Er is geen aparte pagina, nieuwe breuktemplate, nieuwe paginashell of lokale breukopmaak toegevoegd.
+
+### Verificatie van Fase E1
+
+- Branch: `refactor/professional-v1`.
+- Eerste sessiecontractcommit: `0207f2df0623fc0e0e8d81a03d7df5a821c0abb4`; Full Regression #3838 / run `44084991750`: **GREEN / SUCCESS**.
+- Definitieve API-afscherming van het verwachte antwoord en bijbehorende test: commit `7e56ea0f3c368b0df7fbe018f074be868e6af1a7`.
+- Full Regression #3839 / run `44085450916`: **GREEN / SUCCESS** op exact commit `7e56ea0f3c368b0df7fbe018f074be868e6af1a7`. Alle stappen zijn voltooid, waaronder curriculum-engine-regressie, architectuurgrenzen, maintained Node- en Vitest-regressie, Chromium/browserregressie en clean-working-tree-controle.
+- Laatste geverifieerde commit vóór deze handoff-update: `7e56ea0f3c368b0df7fbe018f074be868e6af1a7`; Full Regression #3839 groen.
+- `main` is onaangeraakt. Geen Supabase-wijziging en geen deployment.
+
+### Volgende concrete stap — Fase E2
+
+Ontwerp en bouw de centrale presentatie-/integratielaag voor de sessie, met de volgende grenzen:
+
+1. Hergebruik de bestaande `createFractionPracticeTemplate`; geen aparte paginashell, eigen breuktemplate of lokale breuknotatie.
+2. Hergebruik `createFractionQuantityLearningInterfaceConfig` en `renderFractionQuantityLearningInterface`; taart en balk blijven dezelfde hoeveelheidstoestand en controller gebruiken.
+3. Toon de aftrekopgave met de bestaande centrale gestapelde breuk-/gemengde-getalrenderers, nooit met zichtbare slashnotatie.
+4. Toon voortgang, controle, begrijpelijke feedback en pas na een correct antwoord de expliciete knop **Volgende som**.
+5. Enter activeert alleen de actuele, gefocuste bediening; Enter mag geen taak overslaan of automatisch naar de volgende som gaan.
+6. Houd pedagogische taakconfiguratie, interactie-/sessiestatus en visuele rendering gescheiden.
+7. Voeg gerichte browserregressie toe voor beide representaties als afzonderlijke sessievarianten, controle/feedback, Enter, undo/redo, blijvende annotaties en het blokkeren van onjuiste taakovergangen.
+8. Integreer via de bestaande Skills-runtime zonder de niveau-1-aftrekoefening, de afzonderlijke vierstaps-oefening of FR2 te wijzigen.
+
+Voer vóór de volgende bouwstap opnieuw de verplichte Full Regression-controle uit. De huidige laatste geverifieerde regressie is #3839 op commit `7e56ea0f3c368b0df7fbe018f074be868e6af1a7`.

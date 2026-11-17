@@ -980,3 +980,20 @@
     min-height: 26px;
   }
 }
+
+
+/* Centrale compositie voor visuele aftreksessies binnen de Fraction Practice Template. */
+.fraction-quantity-subtraction-card{display:grid;gap:12px;padding:16px;min-width:0}
+.fraction-quantity-subtraction-expression{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;min-height:54px;color:#102b57;font-size:clamp(22px,3vw,30px);font-weight:900}
+.fraction-quantity-subtraction-expression__operator{font-size:1.05em}
+.fraction-quantity-subtraction-expression__whole,
+.fraction-quantity-subtraction-expression__unknown{display:inline-flex;align-items:center;justify-content:center;min-width:22px}
+.fraction-quantity-subtraction-expression .pacogo-fraction-mixed-number{font-size:1em}
+.fraction-quantity-subtraction-prompt{margin:0;color:#526985;font-size:13px;line-height:1.4;text-align:center}
+.fraction-quantity-subtraction-model{min-width:0}
+.fraction-quantity-subtraction-model .pacogo-fraction-quantity{gap:9px}
+@media(max-width:520px){
+  .fraction-quantity-subtraction-card{gap:9px;padding:12px}
+  .fraction-quantity-subtraction-expression{gap:8px;min-height:44px}
+  .fraction-quantity-subtraction-prompt{font-size:12px}
+}

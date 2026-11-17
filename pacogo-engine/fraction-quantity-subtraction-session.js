@@ -1,6 +1,7 @@
 import {
   createFractionQuantityState,
   getFractionQuantityAmount,
+  getFractionQuantityRemovedAmount,
   areFractionQuantitiesEqual
 } from "./fraction-quantity-model.js";
 import { createFractionQuantityController } from "./fraction-quantity-controller.js";
@@ -151,18 +152,21 @@ function createFractionQuantitySubtractionSession({
   function check() {
     const task = core.getCurrentTask();
     if (!task || !currentController) throw new Error("The subtraction session is complete");
-    const actual = getFractionQuantityAmount(currentController.getState().state);
-    const correct = areFractionQuantitiesEqual(actual, task.expectedRemaining);
+    const state = currentController.getState().state;
+    const actual = getFractionQuantityAmount(state);
+    const removed = getFractionQuantityRemovedAmount(state);
+    const correct = areFractionQuantitiesEqual(removed, task.subtraction);
     const recorded = core.recordAttempt({
       taskId: task.id,
       classification: correct ? "valid" : "incorrect_answer",
-      response: { actual }
+      response: { actual, removed }
     });
-    lastCheck = Object.freeze({ correct, actual });
+    lastCheck = Object.freeze({ correct, actual, removed });
     return Object.freeze({
       correct,
       attemptCount: recorded.progress.attemptCount,
-      actual
+      actual,
+      removed
     });
   }
 

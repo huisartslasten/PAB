@@ -806,13 +806,14 @@ test('level 5 guided practice uses six progressive steps and waits for an explic
 });
 
 
-test('fraction subtraction overview uses the central PacoGO page and five ordered difficulty rows', async ({ page }) => {
+test('fraction subtraction overview keeps the original exercise and adds the separate visual exercise', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=aftrekken', { waitUntil: 'domcontentloaded' });
   const result = await page.evaluate(async () => {
     const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
     const templateMount = document.createElement('div');
     templateMount.id = 'paco-template-mount';
     document.body.replaceChildren(templateMount);
+    const navigations = [];
     const app = {
       auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
       authSession: {},
@@ -825,16 +826,21 @@ test('fraction subtraction overview uses the central PacoGO page and five ordere
       domain: 'fractions',
       topic: 'aftrekken',
       documentRef: document,
-      navigate: () => {}
+      navigate: target => navigations.push(String(target))
     });
     await runtime.mount();
+    const rows = [...document.querySelectorAll('.skills-addition-overview-row')];
+    const exerciseButtons = [...document.querySelectorAll('.skills-addition-overview-open')];
+    exerciseButtons.forEach(button => button.click());
     return {
       title: document.querySelector('.paco-page-template')?.textContent.includes('Aftrekken') || false,
       centralPage: Boolean(document.querySelector('.paco-page-template')),
-      rows: [...document.querySelectorAll('.skills-addition-overview-row')].map(row => ({
+      rows: rows.map(row => ({
         label: row.querySelector('.skills-addition-overview-label')?.textContent || '',
         filled: row.querySelectorAll('.paco-bone-difficulty__bone.is-filled, .paco-bone-difficulty__bone--filled').length
       })),
+      exerciseButtonCount: exerciseButtons.length,
+      navigations,
       heading: document.querySelector('[aria-label="Onderwerpen breuken aftrekken"]')?.getAttribute('aria-label') || ''
     };
   });
@@ -843,9 +849,14 @@ test('fraction subtraction overview uses the central PacoGO page and five ordere
   expect(result.heading).toBe('Onderwerpen breuken aftrekken');
   expect(result.rows.map(row => row.label)).toEqual([
     'Breukgetal groter dan 1 aftrekken van een heel getal',
+    'Breukgetal groter dan 1 aftrekken van een heel getal — visueel oefenen',
     'Gelijknamige breuken kleiner dan 1 van elkaar aftrekken',
     'Gelijknamige breuken groter dan 1 van elkaar aftrekken',
     'Ongelijknamige breuken kleiner dan 1 van elkaar aftrekken',
     'Ongelijknamige breuken groter dan 1 van elkaar aftrekken'
   ]);
+  expect(result.exerciseButtonCount).toBe(2);
+  expect(result.navigations).toHaveLength(2);
+  expect(result.navigations[0]).toContain('exercise=whole-minus-mixed-subtraction');
+  expect(result.navigations[1]).toContain('exercise=whole-minus-greater-than-one-subtraction');
 });

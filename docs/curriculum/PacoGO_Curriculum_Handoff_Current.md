@@ -8395,3 +8395,56 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 **Volgende concrete stap**
 - Verifieer deze handoff-update met Full Regression op de exacte nieuwe commit.
 - Laat de gebruiker daarna de typografie in PacoGO TEST visueel bevestigen. Geen verdere UI-aanpassingen toevoegen zonder expliciete opdracht.
+## 19. Breuken → Vermenigvuldigen → Heel getal × breukgetal groter dan 1 (18 november 2026)
+
+**Opdracht en brongebruik**
+- De gebruiker leverde vijf screenshots met voorbeelden van een heel getal vermenigvuldigen met een gemengd breukgetal groter dan 1.
+- De screenshots zijn uitsluitend gebruikt als inspiratie voor de taakvorm. Geen van de vijf voorbeeldsommen is letterlijk overgenomen.
+- Exact 15 nieuwe, unieke sommen zijn gemaakt. Iedere vermenigvuldigingsfactor links is een positief heel getal; de factor rechts is een gemengd getal met een heel deel van minimaal 1 en een echte breuk.
+- Alle antwoorden zijn als gemengde getallen uitgerekend en vereenvoudigd. Er zijn geen extra visuele modellen, hints of uitlegonderdelen toegevoegd.
+
+**Nieuwe taakbank — 15 sommen**
+- Bestand: `pacogo-engine/fraction-whole-number-times-mixed-fraction-greater-than-one-task-bank.js`.
+- De 15 sommen:
+  1. 3 × 1 2/5 = 4 1/5
+  2. 4 × 2 1/3 = 9 1/3
+  3. 5 × 1 3/4 = 8 3/4
+  4. 6 × 2 1/7 = 12 6/7
+  5. 7 × 1 2/5 = 9 4/5
+  6. 8 × 2 1/6 = 17 1/3
+  7. 9 × 1 1/8 = 10 1/8
+  8. 5 × 3 2/7 = 16 3/7
+  9. 6 × 1 3/8 = 8 1/4
+  10. 7 × 2 2/9 = 15 5/9
+  11. 8 × 1 2/7 = 10 2/7
+  12. 9 × 2 1/5 = 19 4/5
+  13. 4 × 3 1/6 = 12 2/3
+  14. 5 × 2 3/8 = 11 7/8
+  15. 6 × 1 2/11 = 7 1/11
+- Sessie: `pacogo-engine/fraction-whole-number-times-mixed-fraction-greater-than-one-session.js`; valideert gemengde antwoorden, vereist vereenvoudiging wanneer nodig, bewaart voortgang per leerling en ondersteunt hervatten en resetten.
+
+**Centrale template en aansluiting**
+- De bestaande rij `Heel getal vermenigvuldigen met een breukgetal groter dan 1` in `renderFractionMultiplicationOverview()` heeft nu één knop `Oefenen`.
+- De route gebruikt `domain=fractions&topic=vermenigvuldigen&exercise=whole-number-times-mixed-fraction-greater-than-one`.
+- De oefening gebruikt de bestaande centrale PacoGO Page Template, `createFractionPracticeTemplate`, `fraction-whole-mixed-equation` en `fraction-whole-mixed-expression`, `renderMixedNumber()` voor de opgave en `renderFractionAnswerInput()` voor het antwoord.
+- De antwoordcomponent is bewust dezelfde centrale gemengde-breuk-antwoordcomponent als bij de bestaande oefening Heel getal optellen bij een breukgetal groter dan 1; dus dezelfde velden, afmetingen, font-erfenis en `Vereenvoudigen`-bediening. Geen nieuwe CSS of lokale template toegevoegd.
+- De eerdere oefening `Heel getal × breuk kleiner dan 1` is niet gewijzigd. De andere vijf vermenigvuldigonderdelen blijven zonder oefenroute.
+- Geen curriculum-Skill, Development, Claim, Evidence Target, mastery-contract, Supabase of LIVE `main` gewijzigd.
+
+**Tests en verificatie**
+- Unit-test: `pacogo-engine/fraction-whole-number-times-mixed-fraction-greater-than-one-session.test.js`; controleert 15 unieke opgaven, gemengde factoren groter dan 1, exacte vereenvoudigde uitkomsten, onjuiste antwoorden, vereenvoudigen, voortgang, hervatten en reset.
+- Browserregressie in `test/browser/skills-runtime.browser.test.js`; controleert de overzichtsroute en knop, centrale page- en fraction-template, gemengde breukweergave, dezelfde centrale antwoordcomponent/typografie als de bestaande gemengde opteloefening, correcte invoer en doorgaan naar som 2.
+- Code-/testcommit: `522a4c9ac1314cb7cbc634d811267c62a7cfe596`.
+- Browser Proof #820 / run `44300920596`: **SUCCESS** op exact deze commit.
+- Full Regression #3974 / run `44300920701`: **GREEN / SUCCESS** op exact deze commit; Node, curriculum-engine, browser regression en clean-working-tree-controle geslaagd.
+
+**Actuele status**
+- Branch: `refactor/professional-v1`.
+- Laatste geverifieerde code-/testcommit: `522a4c9ac1314cb7cbc634d811267c62a7cfe596`.
+- Laatste geverifieerde Full Regression: #3974 — **GREEN / SUCCESS** op exact deze commit.
+- Deze handoff-update is zelf een repositorywijziging en moet nog door Full Regression worden geverifieerd op de resulterende handoff-commit.
+- LIVE `main` onaangeroerd; geen deployment en geen Supabase-wijziging.
+
+**Volgende concrete stap**
+- Verifieer deze handoff-update met Full Regression op de exacte nieuwe handoff-commit.
+- Laat de gebruiker de nieuwe oefening visueel testen in PacoGO TEST. Geen volgende oefening of extra UI-elementen toevoegen zonder expliciete opdracht.

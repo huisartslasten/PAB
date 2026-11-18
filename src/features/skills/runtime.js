@@ -1708,6 +1708,521 @@ export function createSkillsRuntime({
     renderCurrentTask();
   }
 
+  function renderSameDenominatorAdditionPractice() {
+    const learnerKey = student || context?.learnerId || 'local-learner';
+    const session = createFractionSameDenominatorAdditionSession({ learnerKey });
+    const exercise = FRACTION_SAME_DENOMINATOR_ADDITION_EXERCISE;
+
+    function renderCurrentTask() {
+      const task = session.getCurrentTask();
+      const progress = session.getProgress();
+      content.replaceChildren();
+      const card = documentRef.createElement('section');
+      card.className = 'card fraction-whole-mixed-addition-card fraction-same-denominator-addition-card';
+      const template = createFractionPracticeTemplate({ mount: card });
+      const title = documentRef.createElement('h2');
+      title.textContent = exercise.title;
+      const instruction = documentRef.createElement('p');
+      instruction.className = 'fraction-practice-instruction';
+      instruction.textContent = 'Tel de tellers bij elkaar op. De noemer blijft hetzelfde. Is je antwoord groter dan 1? Schrijf het dan als gemengd getal.';
+      const progressLabel = documentRef.createElement('p');
+      progressLabel.className = 'fraction-practice-progress';
+      progressLabel.textContent = formatFractionPracticeProgress(progress, exercise);
+      template.titleArea.append(title);
+      template.instructionArea.append(instruction);
+      template.progressArea.append(progressLabel);
+
+      if (!task) {
+        const done = documentRef.createElement('p');
+        done.className = 'fraction-practice-complete';
+        done.textContent = 'Je hebt alle 15 sommen afgerond. Goed gewerkt!';
+        template.workArea.append(done);
+        content.append(card);
+        return;
+      }
+
+      const equation = documentRef.createElement('div');
+      equation.className = 'fraction-whole-mixed-equation';
+      const expression = documentRef.createElement('div');
+      expression.className = 'fraction-whole-mixed-expression';
+      expression.append(
+        renderFractionRepresentation(task.left, 'symbolic_fraction', 'Eerste breuk'),
+        Object.assign(documentRef.createElement('span'), { className: 'fraction-whole-mixed-expression__operator', textContent: '+' }),
+        renderFractionRepresentation(task.right, 'symbolic_fraction', 'Tweede breuk')
+      );
+      const equals = documentRef.createElement('span');
+      equals.className = 'fraction-whole-mixed-expression__operator';
+      equals.textContent = '=';
+      const answerMount = documentRef.createElement('div');
+      answerMount.className = 'fraction-whole-mixed-answer';
+      equation.append(expression, equals, answerMount);
+      template.workArea.append(equation);
+
+      const answer = renderFractionAnswerInput({
+        workMount: answerMount,
+        controlsMount: template.controlsArea,
+        wholeNumberMode: 'optional'
+      });
+      const check = documentRef.createElement('button');
+      check.type = 'button';
+      check.className = 'paco-btn paco-btn--primary';
+      check.textContent = 'Controleren';
+      template.actionsArea.append(check);
+
+      check.addEventListener('click', () => {
+        const result = session.recordAnswer({ values: answer.getValues() });
+        if (result.classification === 'valid') {
+          answer.lock();
+          check.disabled = true;
+          const feedback = documentRef.createElement('p');
+          feedback.className = 'fraction-practice-feedback is-correct';
+          feedback.setAttribute('role', 'status');
+          feedback.textContent = 'Goed gedaan! Je antwoord klopt.';
+          template.feedbackArea.replaceChildren(feedback);
+          const next = documentRef.createElement('button');
+          next.type = 'button';
+          next.className = 'paco-btn paco-btn--primary';
+          next.textContent = result.progress.isComplete ? 'Bekijk resultaat' : 'Volgende som';
+          next.addEventListener('click', renderCurrentTask);
+          template.actionsArea.replaceChildren(next);
+          progressLabel.textContent = formatFractionPracticeProgress(result.progress, exercise);
+          return;
+        }
+        const messages = {
+          invalid_input: 'Vul de teller en noemer in. De noemer moet groter zijn dan nul.',
+          incorrect_answer: 'Dat antwoord klopt nog niet. Tel de tellers op en houd de noemer gelijk.',
+          requires_mixed_number: 'De uitkomst is groter dan 1. Voeg het hele getal toe en schrijf de uitkomst als gemengd getal.',
+          requires_simplification: 'Je berekening klopt. Je kunt de breuk nog vereenvoudigen. Maak de breuk zo eenvoudig mogelijk.',
+          not_simplified: 'De vereenvoudigde breuk klopt nog niet. Probeer het nog eens.'
+        };
+        const feedback = documentRef.createElement('p');
+        feedback.className = 'fraction-practice-feedback is-error';
+        feedback.setAttribute('role', 'alert');
+        feedback.textContent = messages[result.classification] || 'Controleer je antwoord en probeer het opnieuw.';
+        template.feedbackArea.replaceChildren(feedback);
+      });
+      content.append(card);
+    }
+    renderCurrentTask();
+  }
+
+  function renderMixedSameDenominatorAdditionPractice() {
+    const learnerKey = student || context?.learnerId || 'local-learner';
+    const session = createFractionMixedSameDenominatorAdditionSession({ learnerKey });
+    const exercise = FRACTION_MIXED_SAME_DENOMINATOR_ADDITION_EXERCISE;
+
+    function renderCurrentTask() {
+      const task = session.getCurrentTask();
+      const progress = session.getProgress();
+      content.replaceChildren();
+      const card = documentRef.createElement('section');
+      card.className = 'card fraction-whole-mixed-addition-card fraction-mixed-same-denominator-addition-card';
+      const template = createFractionPracticeTemplate({ mount: card });
+      const title = documentRef.createElement('h2');
+      title.textContent = exercise.title;
+      const instruction = documentRef.createElement('p');
+      instruction.className = 'fraction-practice-instruction';
+      instruction.textContent = 'Tel de hele getallen bij elkaar op. Tel de breukdelen bij elkaar op en schrijf je uitkomst als gemengd getal.';
+      const progressLabel = documentRef.createElement('p');
+      progressLabel.className = 'fraction-practice-progress';
+      progressLabel.textContent = formatFractionPracticeProgress(progress, exercise);
+      template.titleArea.append(title);
+      template.instructionArea.append(instruction);
+      template.progressArea.append(progressLabel);
+
+      if (!task) {
+        const done = documentRef.createElement('p');
+        done.className = 'fraction-practice-complete';
+        done.textContent = 'Je hebt alle 15 sommen afgerond. Goed gewerkt!';
+        template.workArea.append(done);
+        content.append(card);
+        return;
+      }
+
+      const equation = documentRef.createElement('div');
+      equation.className = 'fraction-whole-mixed-equation';
+      const expression = documentRef.createElement('div');
+      expression.className = 'fraction-whole-mixed-expression';
+      expression.append(
+        renderMixedNumber(task.left, 'Eerste gemengde getal'),
+        Object.assign(documentRef.createElement('span'), { className: 'fraction-whole-mixed-expression__operator', textContent: '+' }),
+        renderMixedNumber(task.right, 'Tweede gemengde getal')
+      );
+      const equals = documentRef.createElement('span');
+      equals.className = 'fraction-whole-mixed-expression__operator';
+      equals.textContent = '=';
+      const answerMount = documentRef.createElement('div');
+      answerMount.className = 'fraction-whole-mixed-answer';
+      equation.append(expression, equals, answerMount);
+      template.workArea.append(equation);
+
+      const answer = renderFractionAnswerInput({
+        workMount: answerMount,
+        controlsMount: template.controlsArea,
+        wholeNumberMode: 'required'
+      });
+      const check = documentRef.createElement('button');
+      check.type = 'button';
+      check.className = 'paco-btn paco-btn--primary';
+      check.textContent = 'Controleren';
+      template.actionsArea.append(check);
+
+      check.addEventListener('click', () => {
+        const result = session.recordAnswer({ values: answer.getValues() });
+        if (result.classification === 'valid') {
+          answer.lock();
+          check.disabled = true;
+          const feedback = documentRef.createElement('p');
+          feedback.className = 'fraction-practice-feedback is-correct';
+          feedback.setAttribute('role', 'status');
+          feedback.textContent = 'Goed gedaan! Je antwoord klopt.';
+          template.feedbackArea.replaceChildren(feedback);
+          const next = documentRef.createElement('button');
+          next.type = 'button';
+          next.className = 'paco-btn paco-btn--primary';
+          next.textContent = result.progress.isComplete ? 'Bekijk resultaat' : 'Volgende som';
+          next.addEventListener('click', renderCurrentTask);
+          template.actionsArea.replaceChildren(next);
+          progressLabel.textContent = formatFractionPracticeProgress(result.progress, exercise);
+          return;
+        }
+        const messages = {
+          invalid_input: 'Vul het hele getal, de teller en de noemer in. De noemer moet groter zijn dan nul.',
+          incorrect_answer: 'Dat antwoord klopt nog niet. Tel de hele getallen en de breukdelen allebei op.',
+          requires_simplification: 'Je berekening klopt. Je kunt de breuk nog vereenvoudigen. Maak de breuk zo eenvoudig mogelijk.',
+          not_simplified: 'De vereenvoudigde breuk klopt nog niet. Probeer het nog eens.'
+        };
+        const feedback = documentRef.createElement('p');
+        feedback.className = 'fraction-practice-feedback is-error';
+        feedback.setAttribute('role', 'alert');
+        feedback.textContent = messages[result.classification] || 'Controleer je antwoord en probeer het opnieuw.';
+        template.feedbackArea.replaceChildren(feedback);
+      });
+      content.append(card);
+    }
+
+    renderCurrentTask();
+  }
+
+
+  function renderUnequalIndependentAdditionPractice(){
+    const learnerKey=student||context?.learnerId||'local-learner';
+    const session=createFractionUnequalIndependentAdditionSession({learnerKey}),exercise=FRACTION_ADDITION_LEVEL_4_EXERCISE;
+    function renderCurrentTask(){
+      const task=session.getCurrentTask(),progress=session.getProgress();content.replaceChildren();
+      const card=documentRef.createElement('section');card.className='card fraction-whole-mixed-addition-card fraction-unequal-independent-addition-card';
+      const template=createFractionPracticeTemplate({mount:card});
+      const title=documentRef.createElement('h2');title.textContent=exercise.title;
+      const instruction=documentRef.createElement('p');instruction.className='fraction-practice-instruction';instruction.textContent='Tel de ongelijknamige breuken bij elkaar op. Is je uitkomst groter dan 1? Schrijf die dan als gemengd getal. Vereenvoudig als dat nodig is.';
+      const progressLabel=documentRef.createElement('p');progressLabel.className='fraction-practice-progress';progressLabel.textContent=formatFractionPracticeProgress(progress,exercise);
+      template.titleArea.append(title);template.instructionArea.append(instruction);template.progressArea.append(progressLabel);
+      if(!task){const done=documentRef.createElement('p');done.className='fraction-practice-complete';done.textContent='Je hebt alle 15 sommen afgerond. Goed gewerkt!';template.workArea.append(done);content.append(card);return;}
+      const equation=documentRef.createElement('div');equation.className='fraction-whole-mixed-equation';
+      const expression=documentRef.createElement('div');expression.className='fraction-whole-mixed-expression';
+      expression.append(renderFractionRepresentation(task.leftFraction,'symbolic_fraction','Eerste breuk'),
+        Object.assign(documentRef.createElement('span'),{className:'fraction-whole-mixed-expression__operator',textContent:'+'}),
+        renderFractionRepresentation(task.rightFraction,'symbolic_fraction','Tweede breuk'));
+      const equals=documentRef.createElement('span');equals.className='fraction-whole-mixed-expression__operator';equals.textContent='=';
+      const answerMount=documentRef.createElement('div');answerMount.className='fraction-whole-mixed-answer';equation.append(expression,equals,answerMount);template.workArea.append(equation);
+      const answer=renderFractionAnswerInput({workMount:answerMount,controlsMount:template.controlsArea,wholeNumberMode:'optional'});
+      const check=documentRef.createElement('button');check.type='button';check.className='paco-btn paco-btn--primary';check.textContent='Controleren';template.actionsArea.append(check);
+      check.addEventListener('click',()=>{
+        const result=session.recordAnswer({values:answer.getValues()});
+        if(result.classification==='valid'){
+          answer.lock();check.disabled=true;const feedback=documentRef.createElement('p');feedback.className='fraction-practice-feedback is-correct';feedback.setAttribute('role','status');feedback.textContent='Goed gedaan! Je antwoord klopt.';template.feedbackArea.replaceChildren(feedback);
+          const next=documentRef.createElement('button');next.type='button';next.className='paco-btn paco-btn--primary';next.textContent=result.progress.isComplete?'Bekijk resultaat':'Volgende som';next.addEventListener('click',renderCurrentTask);template.actionsArea.replaceChildren(next);progressLabel.textContent=formatFractionPracticeProgress(result.progress,exercise);return;
+        }
+        const messages={invalid_input:'Vul de teller en noemer in. De noemer moet groter zijn dan nul.',incorrect_answer:'Dat antwoord klopt nog niet. Maak de breuken eerst gelijknamig en tel daarna de tellers op.',requires_mixed_number:'De uitkomst is groter dan 1. Voeg het hele getal toe en schrijf de uitkomst als gemengd getal.',requires_simplification:'Je berekening klopt. Je kunt de breuk nog vereenvoudigen. Maak de breuk zo eenvoudig mogelijk.',not_simplified:'De vereenvoudigde breuk klopt nog niet. Probeer het nog eens.'};
+        const feedback=documentRef.createElement('p');feedback.className='fraction-practice-feedback is-error';feedback.setAttribute('role','alert');feedback.textContent=messages[result.classification]||'Controleer je antwoord en probeer het opnieuw.';template.feedbackArea.replaceChildren(feedback);
+      });
+      content.append(card);
+    }
+    renderCurrentTask();
+  }
+
+  function renderUnequalDenominatorGuidedAdditionPractice({ mixedNumberResult = false } = {}) {
+    const learnerKey=student||context?.learnerId||'local-learner';
+    const tasks=mixedNumberResult?FRACTION_ADDITION_LEVEL_3B_TASKS:FRACTION_ADDITION_LEVEL_3_TASKS;
+    const session=createFractionAdditionPracticeSession({learnerKey,tasks,sessionId:mixedNumberResult?'level-3b':'level-3a'});
+    const stepIds=['common_denominator','left_equivalent_numerator','right_equivalent_numerator','addition_result',...(mixedNumberResult?['mixed_number_conversion']:[])];
+    const stepLabels=['Gemeenschappelijke noemer kiezen','Eerste breuk gelijkwaardig maken','Tweede breuk gelijkwaardig maken','Tellers optellen',...(mixedNumberResult?['Omzetten naar een gemengd getal']:[])];
+    function renderExpression(step,mount) {
+      const left=step.leftFraction,right=step.rightFraction;
+      const op=value=>Object.assign(documentRef.createElement('span'),{className:'fraction-guided-operator',textContent:value});
+      if(step.stepId==='common_denominator'){
+        mount.append(renderFractionRepresentation(left,'symbolic_fraction','Eerste breuk'),op('+'),renderFractionRepresentation(right,'symbolic_fraction','Tweede breuk'),op('→'));
+        const input=documentRef.createElement('input');input.type='text';input.inputMode='numeric';input.autocomplete='off';input.maxLength=6;input.className='fraction-guided-scalar-input';input.dataset.fractionGuidedAnswer='true';input.setAttribute('aria-label','Gemeenschappelijke noemer');mount.append(input);return input;
+      }
+      if(step.stepId==='left_equivalent_numerator')mount.append(renderFractionRepresentation(left,'symbolic_fraction','Eerste breuk'),op('='),renderFractionInputRepresentation({denominator:step.commonDenominator,inputPart:'numerator',inputLabel:'Nieuwe teller van de eerste breuk',documentRef}));
+      else if(step.stepId==='right_equivalent_numerator')mount.append(renderFractionRepresentation(right,'symbolic_fraction','Tweede breuk'),op('='),renderFractionInputRepresentation({denominator:step.commonDenominator,inputPart:'numerator',inputLabel:'Nieuwe teller van de tweede breuk',documentRef}));
+      else mount.append(renderFractionRepresentation({numerator:step.leftEquivalentNumerator,denominator:step.commonDenominator},'symbolic_fraction','Eerste gelijkwaardige breuk'),op('+'),renderFractionRepresentation({numerator:step.rightEquivalentNumerator,denominator:step.commonDenominator},'symbolic_fraction','Tweede gelijkwaardige breuk'),op('='),renderFractionInputRepresentation({denominator:step.commonDenominator,inputPart:'numerator',inputLabel:'Teller van de som',documentRef}));
+      return mount.querySelector('[data-fraction-step-answer="true"]');
+    }
+    function renderCurrentTask(feedbackMessage='',completedTask=null) {
+      const currentStep=session.getCurrentStep(),progress=session.getProgress();
+      const step=completedTask?{...completedTask,completedStepIds:stepIds,stepId:null}:currentStep;
+      content.replaceChildren();
+      const card=documentRef.createElement('section');card.className='card fraction-whole-mixed-addition-card fraction-addition-guided-card';
+      const template=createFractionPracticeTemplate({mount:card});
+      const title=documentRef.createElement('h2');title.textContent='Ongelijknamige breuken kleiner dan 1 bij elkaar optellen';
+      const instruction=documentRef.createElement('p');instruction.className='fraction-practice-instruction';instruction.textContent=mixedNumberResult?'Werk de vijf stappen één voor één af. Bij de laatste stap zet je de onechte breuk om in een gemengd getal.':'Werk de vier stappen één voor één af. Een volgende stap komt vrij zodra je de huidige stap goed hebt gedaan.';
+      const progressLabel=documentRef.createElement('p');progressLabel.className='fraction-practice-progress';progressLabel.textContent='Som '+(completedTask?completedTask.taskNumber:progress.completedTaskCount+1)+' van '+progress.totalTaskCount;
+      template.titleArea.append(title);template.instructionArea.append(instruction);template.progressArea.append(progressLabel);
+      if(!step){const done=documentRef.createElement('p');done.className='fraction-practice-complete';done.textContent='Je hebt alle 10 sommen afgerond. Goed gewerkt!';template.workArea.append(done);content.append(card);return;}
+      const prompt=documentRef.createElement('div');prompt.className='fraction-guided-task-prompt';const op=value=>Object.assign(documentRef.createElement('span'),{className:'fraction-guided-operator',textContent:value});
+      prompt.append(renderFractionRepresentation(step.leftFraction,'symbolic_fraction','Eerste breuk'),op('+'),renderFractionRepresentation(step.rightFraction,'symbolic_fraction','Tweede breuk'));
+      const completedIds=step.completedStepIds||[];
+      const denominator=completedTask?.denominator??step.commonDenominator;
+      const leftNumerator=completedTask?.leftNumerator??step.leftEquivalentNumerator;
+      const rightNumerator=completedTask?.rightNumerator??step.rightEquivalentNumerator;
+      const resultNumerator=completedTask?.resultNumerator??step.resultNumerator??(Number.isSafeInteger(leftNumerator)&&Number.isSafeInteger(rightNumerator)?leftNumerator+rightNumerator:null);
+      const hasDenominator=completedIds.includes('common_denominator')||completedTask!==null;
+      const hasLeft=completedIds.includes('left_equivalent_numerator')||completedTask!==null;
+      const hasRight=completedIds.includes('right_equivalent_numerator')||completedTask!==null;
+      const hasResult=completedIds.includes('addition_result')||completedTask!==null;
+      const solution=documentRef.createElement('div');solution.className='fraction-guided-solution';solution.setAttribute('aria-label','Uitwerking van de som');
+      const appendSummaryFraction=(numerator,denom,label)=>{
+        const fraction=documentRef.createElement('span');fraction.className='fraction-guided-summary-fraction';fraction.setAttribute('aria-label',label);
+        const top=documentRef.createElement('span');top.className='fraction-guided-summary-numerator';top.textContent=Number.isSafeInteger(numerator)?String(numerator):'?';
+        const bar=documentRef.createElement('span');bar.className='fraction-guided-summary-divider';
+        const bottom=documentRef.createElement('span');bottom.className='fraction-guided-summary-denominator';bottom.textContent=String(denom);
+        fraction.append(top,bar,bottom);solution.append(fraction);
+      };
+      if(hasDenominator&&Number.isSafeInteger(denominator)){
+        solution.append(op('='));
+        appendSummaryFraction(hasLeft?leftNumerator:null,denominator,'Eerste gelijkwaardige breuk');
+        solution.append(op('+'));
+        appendSummaryFraction(hasRight?rightNumerator:null,denominator,'Tweede gelijkwaardige breuk');
+      }
+      if(hasResult&&Number.isSafeInteger(resultNumerator)&&Number.isSafeInteger(denominator)){
+        solution.append(op('='));
+        appendSummaryFraction(resultNumerator,denominator,'Som als onechte breuk');
+      }
+      const isMixedStepCompleted=completedIds.includes('mixed_number_conversion')||completedTask?.requiresMixedNumber===true;
+      if(mixedNumberResult&&isMixedStepCompleted){
+        const whole=completedTask?.resultWholeNumber??step.resultWholeNumber;
+        const remainder=completedTask?.resultRemainderNumerator??step.resultRemainderNumerator;
+        solution.append(op('='));
+        solution.append(renderMixedNumber({wholeNumber:whole,numerator:remainder,denominator},'Gemengd getal als uitkomst'));
+      }
+      const equation=documentRef.createElement('div');equation.className='fraction-guided-equation';equation.setAttribute('aria-label','Som en uitwerking naast elkaar');equation.append(prompt,solution);template.promptArea.append(equation);
+      const grid=documentRef.createElement('div');grid.className='fraction-guided-step-grid'+(mixedNumberResult?' fraction-guided-step-grid--five':'');grid.setAttribute('aria-label',mixedNumberResult?'Vijf denkstappen':'Vier denkstappen');grid.dataset.activeStep=step.stepId||'';let activeInput=null;let activeFractionAnswer=null;
+      stepIds.forEach((stepId,index)=>{
+        const completed=step.completedStepIds.includes(stepId),active=step.stepId===stepId;
+        const item=documentRef.createElement('section');item.className='fraction-guided-step-card';item.dataset.stepId=stepId;item.dataset.state=completed?'completed':active?'active':'locked';item.setAttribute('aria-label','Stap '+(index+1)+': '+stepLabels[index]);
+        const heading=documentRef.createElement('h3');heading.textContent='Stap '+(index+1);const label=documentRef.createElement('p');label.className='fraction-guided-step-title';label.textContent=stepLabels[index];item.append(heading,label);
+        if(completed){
+          const status=documentRef.createElement('p');status.className='fraction-guided-step-status';status.textContent='Afgerond';item.append(status);
+          const answer=documentRef.createElement('div');answer.className='fraction-guided-step-completed-answer';
+          if(stepId==='common_denominator')answer.textContent='Noemer: '+denominator;
+          else if(stepId==='left_equivalent_numerator')answer.append(renderFractionRepresentation({numerator:leftNumerator,denominator},'symbolic_fraction','Eerste gelijkwaardige breuk'));
+          else if(stepId==='right_equivalent_numerator')answer.append(renderFractionRepresentation({numerator:rightNumerator,denominator},'symbolic_fraction','Tweede gelijkwaardige breuk'));
+          else if(stepId==='addition_result')answer.append(renderFractionRepresentation({numerator:resultNumerator,denominator},'symbolic_fraction','Som als onechte breuk'));
+          else if(stepId==='mixed_number_conversion')answer.append(renderMixedNumber({wholeNumber:completedTask?.resultWholeNumber??step.resultWholeNumber,numerator:completedTask?.resultRemainderNumerator??step.resultRemainderNumerator,denominator},'Gemengd getal als uitkomst'));
+          item.append(answer);
+        }
+        else if(active){
+          const help=documentRef.createElement('p');help.className='fraction-guided-step-prompt';help.textContent=step.prompt;
+          const expression=documentRef.createElement('div');expression.className='fraction-guided-step-expression';
+          if(step.stepId==='mixed_number_conversion'){
+            expression.append(renderFractionRepresentation({numerator:step.resultNumerator,denominator:step.commonDenominator},'symbolic_fraction','Onechte breuk'));
+            const answerMount=documentRef.createElement('div');answerMount.className='fraction-guided-mixed-answer';expression.append(answerMount);
+            activeFractionAnswer=renderFractionAnswerInput({workMount:answerMount,controlsMount:template.controlsArea,wholeNumberMode:'optional'});
+          }else activeInput=renderExpression(step,expression);
+          const check=documentRef.createElement('button');check.type='button';check.className='paco-btn paco-btn--primary paco-btn--small';check.textContent='Controleren';
+          check.addEventListener('click',()=>{const result=session.recordResponse(step.stepId==='mixed_number_conversion'?{values:activeFractionAnswer?.getValues()}:{rawValue:activeInput?.value||''});if(result.classification==='valid'){if(step.stepId==='addition_result'&&!mixedNumberResult){renderCurrentTask('Goed gedaan! Deze som is afgerond.',result.completion);return;}if(step.stepId==='mixed_number_conversion'){activeFractionAnswer?.lock();renderCurrentTask('Goed gedaan! Deze som is afgerond.',result.completion);return;}renderCurrentTask('Goed gedaan! Deze stap is afgerond.');return;}
+            const messages={invalid_input:'Vul alle benodigde getallen in. Controleer ook de noemer.',not_common_denominator:'Deze noemer past niet bij beide breuken. Kies een noemer die door beide noemers gedeeld kan worden.',not_equivalent:'Deze teller maakt de breuk nog niet gelijkwaardig. Controleer met welke factor de noemer is vermenigvuldigd.',arithmetic_error:'Tel de twee tellers bij elkaar op. De noemer blijft hetzelfde.',incorrect_mixed_number:'Dit gemengde getal is nog niet gelijk aan de uitkomst. Controleer het hele getal en de breuk.',requires_mixed_number:'De uitkomst is groter dan 1. Schakel ‘Heel getal toevoegen’ in en vul het gemengde getal in.',requires_simplification:'Je gemengde getal klopt. Vereenvoudig de breuk nog voordat je verdergaat.',not_simplified:'De vereenvoudigde breuk klopt nog niet. Probeer het opnieuw.'};
+            const feedback=documentRef.createElement('p');feedback.className='fraction-practice-feedback is-error';feedback.setAttribute('role','alert');feedback.textContent=messages[result.classification]||'Controleer je antwoord en probeer het opnieuw.';template.feedbackArea.replaceChildren(feedback);activeInput?.focus();});
+          item.addEventListener('keydown',event=>{if(event.key==='Enter'&&event.target instanceof documentRef.defaultView.HTMLInputElement){event.preventDefault();check.click();}});item.append(help,expression,check);
+        }else{const status=documentRef.createElement('p');status.className='fraction-guided-step-status';status.textContent='Komt hierna';item.append(status);}
+        grid.append(item);
+      });
+      template.workArea.append(grid);if(feedbackMessage){const feedback=documentRef.createElement('p');feedback.className='fraction-practice-feedback is-correct';feedback.setAttribute('role','status');feedback.textContent=feedbackMessage;template.feedbackArea.append(feedback);}if(completedTask){const next=documentRef.createElement('button');next.type='button';next.className='paco-btn paco-btn--primary paco-btn--small';next.textContent=progress.isComplete?'Afronden':'Volgende';next.addEventListener('click',()=>renderCurrentTask());template.actionsArea.replaceChildren(next);}content.append(card);activeInput?.focus();
+    }
+    renderCurrentTask();
+  }
+
+
+  function renderUnequalMixedAdditionPractice() {
+    const learnerKey=student||context?.learnerId||'local-learner';
+    const guided=createFractionAdditionLevel5GuidedSession({learnerKey});
+    const independent=createFractionAdditionLevel5IndependentSession({learnerKey});
+    const stepIds=['common_denominator','left_equivalent_numerator','right_equivalent_numerator','whole_number_conversion','fraction_parts_addition','mixed_number_answer'];
+    const labels=['Gemeenschappelijke noemer kiezen','Eerste breukdeel gelijkwaardig maken','Tweede breukdeel gelijkwaardig maken','Hele getallen omzetten naar breuken','Tellers optellen','Antwoord als gemengd getal'];
+    const prompts=['Kies een noemer die bij beide breukdelen past.','Maak het eerste breukdeel gelijkwaardig.','Maak het tweede breukdeel gelijkwaardig.','Zet ieder heel getal om in een breuk met dezelfde noemer.','Tel de tellers van de twee breuken bij elkaar op. De noemer blijft hetzelfde.','Vul het antwoord als gemengd getal in. Vereenvoudig als dat nodig is.'];
+    const op=v=>Object.assign(documentRef.createElement('span'),{className:'fraction-guided-operator',textContent:v});
+    const renderMixed=(value,label)=>renderMixedNumber({wholeNumber:value.wholeNumber,numerator:value.numerator,denominator:value.denominator},label);
+    const renderFraction=(numerator,denominator,label)=>renderFractionRepresentation({numerator,denominator},'symbolic_fraction',label);
+    let mode='guided';
+
+    function createCard(titleText,instructionText,progressText){
+      const card=documentRef.createElement('section');
+      card.className='card fraction-whole-mixed-addition-card fraction-addition-guided-card fraction-addition-level-5-card';
+      const template=createFractionPracticeTemplate({mount:card});
+      const title=documentRef.createElement('h2');title.textContent=titleText;
+      const instruction=documentRef.createElement('p');instruction.className='fraction-practice-instruction';instruction.textContent=instructionText;
+      const progress=documentRef.createElement('p');progress.className='fraction-practice-progress';progress.textContent=progressText;
+      template.titleArea.append(title);template.instructionArea.append(instruction);template.progressArea.append(progress);
+      return {card,template,progress};
+    }
+
+    function renderIndependent(){
+      mode='independent';
+      const task=independent.getCurrentTask(),progress=independent.getProgress();
+      content.replaceChildren();
+      const view=createCard('Zelfstandig oefenen: ongelijknamige gemengde getallen','Tel de gemengde getallen bij elkaar op. Schrijf je antwoord als gemengd getal en vereenvoudig als dat nodig is.','Zelfstandig — som '+(task?.index||progress.completedCount+1)+' van '+progress.totalCount);
+      const {card,template,progress:progressLabel}=view;
+      if(!task){
+        const done=documentRef.createElement('p');done.className='fraction-practice-complete';done.textContent='Je hebt alle 15 zelfstandige sommen afgerond. Goed gewerkt!';
+        template.workArea.append(done);content.append(card);return;
+      }
+      const equation=documentRef.createElement('div');equation.className='fraction-guided-equation';
+      const prompt=documentRef.createElement('div');prompt.className='fraction-guided-task-prompt';
+      prompt.append(renderMixed(task.leftMixedNumber,'Eerste gemengde getal'),op('+'),renderMixed(task.rightMixedNumber,'Tweede gemengde getal'),op('='));
+      const answerMount=documentRef.createElement('div');answerMount.className='fraction-guided-mixed-answer';
+      equation.append(prompt,answerMount);template.promptArea.append(equation);
+      const answer=renderFractionAnswerInput({workMount:answerMount,controlsMount:template.controlsArea,wholeNumberMode:'required'});
+      const check=documentRef.createElement('button');check.type='button';check.className='paco-btn paco-btn--primary';check.textContent='Controleren';template.actionsArea.append(check);
+      check.addEventListener('click',()=>{
+        const result=independent.recordAnswer({values:answer.getValues()});
+        if(result.classification==='valid'){
+          answer.lock();check.disabled=true;
+          const feedback=documentRef.createElement('p');feedback.className='fraction-practice-feedback is-correct';feedback.setAttribute('role','status');feedback.textContent='Goed gedaan! Je antwoord klopt.';
+          template.feedbackArea.replaceChildren(feedback);
+          const next=documentRef.createElement('button');next.type='button';next.className='paco-btn paco-btn--primary';next.textContent=result.progress.isComplete?'Bekijk resultaat':'Volgende som';next.addEventListener('click',renderIndependent);
+          template.actionsArea.replaceChildren(next);
+          progressLabel.textContent='Zelfstandig — '+result.progress.completedCount+' van '+result.progress.totalCount+' afgerond';
+          return;
+        }
+        const messages={invalid_input:'Vul een geldig gemengd getal in. De noemer moet groter zijn dan nul.',incorrect_answer:'Dit antwoord klopt nog niet. Tel de hele getallen en de breukdelen bij elkaar op.',requires_mixed_number:'Vul ook het hele getal in.',requires_simplification:'Je berekening klopt. Vereenvoudig de breuk als dat nodig is.',not_simplified:'De vereenvoudigde breuk klopt nog niet. Probeer het opnieuw.'};
+        const feedback=documentRef.createElement('p');feedback.className='fraction-practice-feedback is-error';feedback.setAttribute('role','alert');feedback.textContent=messages[result.classification]||'Controleer je antwoord en probeer het opnieuw.';
+        template.feedbackArea.replaceChildren(feedback);
+      });
+      content.append(card);
+    }
+
+    function renderProgression(task){
+      const completed=new Set(task.completedStepIds||[]);
+      const hasLeft=completed.has('left_equivalent_numerator');
+      const hasRight=completed.has('right_equivalent_numerator');
+      const hasWhole=completed.has('whole_number_conversion');
+      const hasTotal=completed.has('fraction_parts_addition');
+      const hasAnswer=completed.has('mixed_number_answer');
+      if(!hasLeft&&!hasRight&&!hasWhole&&!hasTotal&&!hasAnswer)return null;
+      const solution=documentRef.createElement('div');solution.className='fraction-guided-solution';solution.setAttribute('aria-label','Stapsgewijs opgebouwde breukuitwerking');
+      solution.append(op('='));
+      solution.append(renderMixed({wholeNumber:task.leftMixedNumber.wholeNumber,numerator:hasLeft?task.leftNumerator:task.leftMixedNumber.numerator,denominator:hasLeft?task.denominator:task.leftMixedNumber.denominator},'Eerste getal na gelijknamig maken'),
+        op('+'),
+        renderMixed({wholeNumber:task.rightMixedNumber.wholeNumber,numerator:hasRight?task.rightNumerator:task.rightMixedNumber.numerator,denominator:hasRight?task.denominator:task.rightMixedNumber.denominator},'Tweede getal na gelijknamig maken'));
+      if(hasWhole){
+        solution.append(op('='),renderFraction(task.leftWholeNumerator+task.leftNumerator,task.denominator,'Eerste gemengde getal als onechte breuk'),
+          op('+'),renderFraction(task.rightWholeNumerator+task.rightNumerator,task.denominator,'Tweede gemengde getal als onechte breuk'));
+      }
+      if(hasTotal)solution.append(op('='),renderFraction(task.improperNumerator,task.denominator,'Som als onechte breuk'));
+      if(hasAnswer)solution.append(op('='),renderMixed({wholeNumber:task.whole,numerator:task.numerator,denominator:task.reducedDenominator},'Gemengd eindantwoord'));
+      return solution;
+    }
+
+    function renderGuided(message=''){
+      mode='guided';
+      const task=guided.getCurrentTask(),progress=guided.getProgress();
+      content.replaceChildren();
+      const view=createCard('Ongelijknamige gemengde getallen bij elkaar optellen','Werk de zes stappen één voor één af. De som wordt na iedere stap verder opgebouwd.','Begeleid — som '+(task?.taskNumber||progress.completedCount+1)+' van '+progress.totalCount);
+      const {card,template}=view;
+      if(!task){
+        const done=documentRef.createElement('p');done.className='fraction-practice-complete';done.textContent='Je hebt alle 10 begeleide sommen afgerond. Goed gewerkt!';
+        template.workArea.append(done);
+        const next=documentRef.createElement('button');next.type='button';next.className='paco-btn paco-btn--primary';next.textContent='Start 15 zelfstandige sommen';next.addEventListener('click',renderIndependent);
+        template.actionsArea.append(next);content.append(card);return;
+      }
+      const equation=documentRef.createElement('div');equation.className='fraction-guided-equation';
+      const prompt=documentRef.createElement('div');prompt.className='fraction-guided-task-prompt';
+      prompt.append(renderMixed(task.leftMixedNumber,'Eerste gemengde getal'),op('+'),renderMixed(task.rightMixedNumber,'Tweede gemengde getal'));
+      equation.append(prompt);
+      const progression=renderProgression(task);if(progression)equation.append(progression);
+      template.promptArea.append(equation);
+      const grid=documentRef.createElement('div');grid.className='fraction-guided-step-grid fraction-guided-step-grid--progressive';grid.setAttribute('aria-label','Zes denkstappen');grid.dataset.activeStep=task.stepId||'awaiting-next';
+      const completed=task.completedStepIds||[],den=task.denominator;
+      let activeInputs=[],activeAnswer=null;
+      stepIds.forEach((id,index)=>{
+        const done=completed.includes(id),active=task.stepId===id,item=documentRef.createElement('section');
+        item.className='fraction-guided-step-card';item.dataset.stepId=id;item.dataset.state=done?'completed':active?'active':'locked';
+        item.setAttribute('aria-label','Stap '+(index+1)+': '+labels[index]);
+        const h=documentRef.createElement('h3');h.textContent='Stap '+(index+1);
+        const label=documentRef.createElement('p');label.className='fraction-guided-step-title';label.textContent=labels[index];item.append(h,label);
+        if(done){
+          const status=documentRef.createElement('p');status.className='fraction-guided-step-status';status.textContent='Afgerond';item.append(status);
+          const answer=documentRef.createElement('div');answer.className='fraction-guided-step-completed-answer';
+          if(id==='common_denominator')answer.textContent='Noemer: '+den;
+          else if(id==='left_equivalent_numerator')answer.append(renderMixed({wholeNumber:task.leftMixedNumber.wholeNumber,numerator:task.leftNumerator,denominator:den},'Eerste gelijkwaardige gemengde getal'));
+          else if(id==='right_equivalent_numerator')answer.append(renderMixed({wholeNumber:task.rightMixedNumber.wholeNumber,numerator:task.rightNumerator,denominator:den},'Tweede gelijkwaardige gemengde getal'));
+          else if(id==='whole_number_conversion')answer.append(renderFraction(task.leftWholeNumerator+task.leftNumerator,den,'Eerste gemengde getal als onechte breuk'),op('+'),renderFraction(task.rightWholeNumerator+task.rightNumerator,den,'Tweede gemengde getal als onechte breuk'));
+          else if(id==='fraction_parts_addition')answer.append(renderFraction(task.improperNumerator,den,'Som als onechte breuk'));
+          else answer.append(renderMixed({wholeNumber:task.whole,numerator:task.numerator,denominator:task.reducedDenominator},'Gemengd eindantwoord'));
+          item.append(answer);
+        }else if(active&&!task.isAwaitingNext){
+          const help=documentRef.createElement('p');help.className='fraction-guided-step-prompt';help.textContent=prompts[index];item.append(help);
+          const expression=documentRef.createElement('div');expression.className='fraction-guided-step-expression';
+          if(id==='common_denominator'){
+            expression.append(renderMixed(task.leftMixedNumber,'Eerste gemengde getal'),op('+'),renderMixed(task.rightMixedNumber,'Tweede gemengde getal'),op('→'));
+            const input=documentRef.createElement('input');input.type='text';input.inputMode='numeric';input.className='fraction-guided-scalar-input';input.setAttribute('aria-label','Gemeenschappelijke noemer');activeInputs=[input];expression.append(input);
+          }else if(id==='left_equivalent_numerator'){
+            expression.append(renderFractionRepresentation({numerator:task.leftMixedNumber.numerator,denominator:task.leftMixedNumber.denominator},'symbolic_fraction','Eerste breukdeel'),op('='),renderFractionInputRepresentation({denominator:den,inputPart:'numerator',inputLabel:'Nieuwe teller eerste breukdeel',documentRef}));
+            activeInputs=[expression.querySelector('[data-fraction-step-answer="true"]')];
+          }else if(id==='right_equivalent_numerator'){
+            expression.append(renderFractionRepresentation({numerator:task.rightMixedNumber.numerator,denominator:task.rightMixedNumber.denominator},'symbolic_fraction','Tweede breukdeel'),op('='),renderFractionInputRepresentation({denominator:den,inputPart:'numerator',inputLabel:'Nieuwe teller tweede breukdeel',documentRef}));
+            activeInputs=[expression.querySelector('[data-fraction-step-answer="true"]')];
+          }else if(id==='whole_number_conversion'){
+            const left=renderFractionInputRepresentation({denominator:den,inputPart:'numerator',inputLabel:'Teller van het eerste hele getal',documentRef});
+            const right=renderFractionInputRepresentation({denominator:den,inputPart:'numerator',inputLabel:'Teller van het tweede hele getal',documentRef});
+            expression.append(documentRef.createTextNode(String(task.leftMixedNumber.wholeNumber)),op('='),left,op('+'),documentRef.createTextNode(String(task.rightMixedNumber.wholeNumber)),op('='),right);
+            activeInputs=[...expression.querySelectorAll('[data-fraction-step-answer="true"]')];
+          }else if(id==='fraction_parts_addition'){
+            expression.append(renderFraction(task.leftWholeNumerator+task.leftNumerator,den,'Eerste onechte breuk'),op('+'),
+              renderFraction(task.rightWholeNumerator+task.rightNumerator,den,'Tweede onechte breuk'),op('='),
+              renderFractionInputRepresentation({denominator:den,inputPart:'numerator',inputLabel:'Teller van de som',documentRef}));
+            activeInputs=[expression.querySelector('[data-fraction-step-answer="true"]')];
+          }else{
+            const mount=documentRef.createElement('div');mount.className='fraction-guided-mixed-answer';expression.append(mount);
+            activeAnswer=renderFractionAnswerInput({workMount:mount,controlsMount:template.controlsArea,wholeNumberMode:'required'});
+          }
+          item.append(expression);
+          const check=documentRef.createElement('button');check.type='button';check.className='paco-btn paco-btn--primary paco-btn--small';check.textContent='Controleren';
+          check.addEventListener('click',()=>{
+            let result;
+            if(id==='mixed_number_answer')result=guided.recordGuided({stepId:id,values:activeAnswer.getValues()});
+            else if(id==='whole_number_conversion')result=guided.recordGuided({stepId:id,values:{leftWholeNumerator:activeInputs[0]?.value||'',rightWholeNumerator:activeInputs[1]?.value||''}});
+            else result=guided.recordGuided({stepId:id,rawValue:activeInputs[0]?.value||''});
+            if(result.classification==='valid'){
+              if(id==='mixed_number_answer')activeAnswer.lock();
+              renderGuided(id==='mixed_number_answer'?'Goed gedaan! Je hebt deze som goed afgerond.':'Goed gedaan! Deze stap is afgerond.');return;
+            }
+            const messages={invalid_input:'Vul alle benodigde getallen in.',not_common_denominator:'Kies een noemer die bij beide breukdelen past.',not_equivalent:'Deze omzetting klopt nog niet. Controleer de vermenigvuldigingsfactor.',arithmetic_error:'Tel de twee omgezette hele getallen en de twee breukdelen bij elkaar op. De noemer blijft gelijk.',incorrect_answer:'Dit gemengde getal klopt nog niet.',requires_simplification:'Je antwoord klopt. Vereenvoudig de breuk als dat nodig is.',not_simplified:'De vereenvoudigde breuk klopt nog niet.'};
+            const feedback=documentRef.createElement('p');feedback.className='fraction-practice-feedback is-error';feedback.setAttribute('role','alert');feedback.textContent=messages[result.classification]||'Controleer je antwoord en probeer het opnieuw.';
+            template.feedbackArea.replaceChildren(feedback);activeInputs[0]?.focus();
+          });
+          item.addEventListener('keydown',event=>{if(event.key==='Enter'&&event.target instanceof documentRef.defaultView.HTMLInputElement){event.preventDefault();check.click();}});
+          item.append(check);
+        }else{
+          const status=documentRef.createElement('p');status.className='fraction-guided-step-status';status.textContent='Komt hierna';item.append(status);
+        }
+        grid.append(item);
+      });
+      template.workArea.append(grid);
+      if(message){const feedback=documentRef.createElement('p');feedback.className='fraction-practice-feedback is-correct';feedback.setAttribute('role','status');feedback.textContent=message;template.feedbackArea.append(feedback);}
+      if(task.isAwaitingNext){
+        const next=documentRef.createElement('button');next.type='button';next.className='paco-btn paco-btn--primary';
+        next.textContent=progress.isComplete?'Bekijk resultaat':'Volgende som';
+        next.addEventListener('click',()=>{guided.advanceGuidedTask();renderGuided();});
+        template.actionsArea.replaceChildren(next);
+      }
+      content.append(card);activeInputs[0]?.focus();
+    }
+
+    renderGuided();
+  }
+
+
   function renderWholeNumberTimesMixedFractionGreaterThanOnePractice() {
     const learnerKey = student || context?.learnerId || 'local-learner';
     const session = createFractionWholeNumberTimesMixedFractionGreaterThanOneSession({

@@ -2069,8 +2069,10 @@ test('whole number divided by a mixed fraction greater than one teaches four sep
   expect(result.afterThird.quotientHelp).toContain('teller');
   expect(result.afterThird.quotientHelp).toContain('noemer');
   expect(result.afterFinal.progress).toContain('Som 2 van 10');
-  expect(result.afterFinal.states).toEqual([]);
-  expect(result.afterFinal.expandedSteps).toEqual([]);
+  expect(result.afterFinal.states).toEqual(['completed', 'completed', 'completed', 'completed']);
+  expect(result.afterFinal.expandedSteps).toEqual([true, true, true, true]);
+  expect(result.afterFinal.solution).toContain('3');
+  expect(result.afterFinal.solution).toContain('15');
   expect(result.afterFinal.nextAction).toBe('Volgende som');
   expect(result.afterFinal.completeMessage).toContain('Deze som is afgerond');
   expect(result.feedback).toContain('Goed gedaan');

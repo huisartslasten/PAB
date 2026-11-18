@@ -8365,3 +8365,33 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Verifieer deze handoff-update met Full Regression op de exacte nieuwe commit.
 - Daarna kan de gebruiker de nieuwe oefening via de knop `Oefenen` in PacoGO TEST testen en de volledige reeks visueel/pedagogisch beoordelen.
 - Voeg geen extra uitleg, visuele modellen, andere oefenroutes of nieuwe bediening toe zonder expliciete opdracht.
+## 18. Typografie-fix — heel getal × breuk kleiner dan 1 (18 november 2026)
+
+**Oorzaak**
+- De eerste implementatie gebruikte `renderFractionPracticeExpression` voor de volledige som. Deze algemene expressieweergave stond niet binnen de centrale typografische compositie `.fraction-whole-mixed-expression`.
+- Daardoor erfden het hele getal, de breuk, operator en antwoord niet de centrale Baloo 2-typografie en de bestaande groottes/uitlijning. De breuk gebruikte bovendien een generieke HTML-weergave in plaats van de gedeelde breukrenderer.
+- De oorzaak was een verkeerde componentkeuze in de oefenrenderer; er was geen reden om globale CSS te wijzigen.
+
+**Correcte implementatie**
+- De som is nu opgebouwd met dezelfde bestaande compositie als de andere breukoefeningen: `.fraction-whole-mixed-equation` en `.fraction-whole-mixed-expression`.
+- Het hele getal en de operator gebruiken de bestaande centrale typografie (Baloo 2, 30px op desktop; bestaande responsive regels blijven gelden).
+- De breuk wordt getoond met `renderFractionRepresentation(..., 'symbolic_fraction', ...)`, de bestaande centrale teller/noemerweergave (24px volgens de bestaande interface).
+- Het antwoord blijft één numeriek veld uit `renderFractionPracticeExpression`, maar staat nu in een `.fraction-whole-mixed-expression`-container en erft daarmee dezelfde centrale font-family; het bestaande antwoordveld behoudt zijn gedeelde 24px-regel.
+- Geen nieuwe CSS, lokale template, eigen breukrenderer of nieuwe bediening toegevoegd. Alle 15 sommen, antwoordvalidatie, voortgang en navigatie blijven ongewijzigd.
+
+**Tests en verificatie**
+- Browserregressie is aangescherpt om de centrale componentstructuur, Baloo 2-font-family, bestaande fontgroottes (30px getal/operator, 24px breuk/antwoord) en de werkende route/antwoord/volgende som te controleren.
+- Correctiecommit: `3603d90829f9a6145eebd83b1b02583913817ad1`.
+- Browser Proof #817 / run `44298111177`: **SUCCESS** op exact deze commit.
+- Full Regression #3967 / run `44298111954`: **GREEN / SUCCESS** op exact deze commit; clean-working-tree-controle geslaagd.
+
+**Actuele status**
+- Branch: `refactor/professional-v1`.
+- Laatste geverifieerde code-/testcommit: `3603d90829f9a6145eebd83b1b02583913817ad1`.
+- Laatste geverifieerde Full Regression: #3967 — **GREEN / SUCCESS** op exact deze commit.
+- Deze handoff-update is zelf een repositorywijziging en moet nog door Full Regression worden geverifieerd op de resulterende handoff-commit.
+- LIVE `main` onaangeroerd; geen Supabase-wijziging.
+
+**Volgende concrete stap**
+- Verifieer deze handoff-update met Full Regression op de exacte nieuwe commit.
+- Laat de gebruiker daarna de typografie in PacoGO TEST visueel bevestigen. Geen verdere UI-aanpassingen toevoegen zonder expliciete opdracht.

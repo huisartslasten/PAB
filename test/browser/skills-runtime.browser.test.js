@@ -908,7 +908,7 @@ test('like-denominator subtraction opens from the central Skills route and runs 
     document.querySelector('.pacogo-fraction-practice-template__actions button').click();
     return {
       initial, afterCorrect,
-      secondSymbolicFractions: [...document.querySelectorAll('.fraction-like-subtraction-equation .pacogo-fraction-representation--symbolic')].map(node => node.textContent.replace(/\\s+/g, ' ').trim()),
+      secondSymbolicFractions: [...document.querySelectorAll('.fraction-like-subtraction-equation .pacogo-fraction-representation--symbolic')].map(node => node.getAttribute('aria-label') || ''),
       secondProgress: document.querySelector('.fraction-practice-progress')?.textContent || ''
     };
   });

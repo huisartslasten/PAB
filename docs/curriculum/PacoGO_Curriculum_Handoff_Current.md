@@ -8047,3 +8047,37 @@ Laatste browserdiagnostiek op commit `16cd0061a6f62d632a362907d97b15b38506b6c1`:
 
 **Handoff-verificatie**
 - Deze handoff-update vereist Full Regression op de exacte resulterende commit; rapporteer de uitkomst pas nadat die run is afgerond.
+## 10. Gelijknamige breuken kleiner dan 1 aftrekken — taakbank inhoudelijk vernieuwd (18 november 2026)
+
+De gebruiker heeft verduidelijkt dat bronopgaven uitsluitend als inspiratie dienen en niet letterlijk of als vrijwel identieke getallenreeks mogen worden overgenomen. De eerste taakbank met vijftien opgaven was te repetitief. Op expliciet verzoek is daarom de volledige reeks vervangen door vijftien eigen opgaven, met behoud van hetzelfde vaardigheidsniveau:
+
+- beide breuken zijn positief en kleiner dan 1;
+- beide breuken hebben dezelfde noemer;
+- de eerste teller is groter dan de tweede teller;
+- de uitkomst blijft positief en kleiner dan 1;
+- de leerling trekt de tellers af en behoudt de noemer;
+- de noemers blijven binnen de bestaande bandbreedte 6–12;
+- geen nieuwe rekenstap, gemengde getallen, ongelijknamigheid of moeilijkere procedure toegevoegd.
+
+Nieuwe reeks (in volgorde):
+1. 8/9 − 3/9
+2. 7/10 − 4/10
+3. 11/12 − 5/12
+4. 5/8 − 2/8
+5. 9/10 − 6/10
+6. 7/9 − 5/9
+7. 10/12 − 3/12
+8. 6/7 − 4/7
+9. 8/10 − 3/10
+10. 11/12 − 8/12
+11. 7/8 − 2/8
+12. 9/10 − 7/10
+13. 10/12 − 4/12
+14. 5/6 − 1/6
+15. 8/12 − 5/12
+
+De sessie-identiteit, vijftien opgaven, antwoordvalidatie, leerlingvoortgang en centrale Fraction Practice Template blijven ongewijzigd. Tests controleren de variatie/unikaliteit en de inhoudelijke grenzen; de browserregressie controleert de eerste twee sommen en voortgang.
+
+Laatste geverifieerde baseline vóór deze wijziging: branch refactor/professional-v1, commit 4d4957aaa26b06c25f0e641bd79b6eedf9d01279, Full Regression #3934 SUCCESS (run 44208043593). Deze baseline bevat ook de meest recente correctie om niet-gevraagde visuele breukmodellen weg te laten.
+
+De taakbankwijziging moet op een nieuwe commit door Full Regression worden geverifieerd. Daarna moet ook de handoff-update zelf opnieuw worden getest. main blijft onaangeraakt.

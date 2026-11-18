@@ -19,21 +19,29 @@ assert.equal(new Set(FRACTION_LIKE_DENOMINATOR_SUBTRACTION_TASKS.map(task => tas
 assert.deepEqual(FRACTION_LIKE_DENOMINATOR_SUBTRACTION_TASKS.slice(0, 4).map(task => [
   task.leftFraction.numerator, task.leftFraction.denominator,
   task.rightFraction.numerator, task.rightFraction.denominator
-]), [[6,7,1,7],[7,8,1,8],[6,8,3,8],[4,10,3,10]]);
+]), [[8,9,3,9],[7,10,4,10],[11,12,5,12],[5,8,2,8]]);
+const taskSignatures = FRACTION_LIKE_DENOMINATOR_SUBTRACTION_TASKS.map(task =>
+  [task.leftFraction.numerator, task.leftFraction.denominator, task.rightFraction.numerator].join("/")
+);
+assert.equal(new Set(taskSignatures).size, 15);
 assert.equal(FRACTION_LIKE_DENOMINATOR_SUBTRACTION_TASKS.every(task =>
   task.leftFraction.denominator === task.rightFraction.denominator &&
   task.result.denominator === task.leftFraction.denominator &&
+  task.leftFraction.numerator < task.leftFraction.denominator &&
+  task.rightFraction.numerator > 0 &&
+  task.leftFraction.numerator > task.rightFraction.numerator &&
+  task.result.numerator > 0 &&
   task.result.numerator === task.leftFraction.numerator - task.rightFraction.numerator
 ), true);
 
 const storage = memoryStorage();
 const a = createFractionLikeDenominatorSubtractionSession({ learnerKey: "learner-a", storage });
 const b = createFractionLikeDenominatorSubtractionSession({ learnerKey: "learner-b", storage });
-assert.deepEqual(a.getCurrentTask().result, { numerator: 5, denominator: 7 });
+assert.deepEqual(a.getCurrentTask().result, { numerator: 5, denominator: 9 });
 assert.equal(a.recordAnswer({ numerator: "", denominator: "" }).classification, "invalid_input");
-assert.equal(a.recordAnswer({ numerator: 4, denominator: 7 }).classification, "incorrect_answer");
+assert.equal(a.recordAnswer({ numerator: 4, denominator: 9 }).classification, "incorrect_answer");
 assert.equal(a.getProgress().completedCount, 0);
-assert.equal(a.recordAnswer({ numerator: 5, denominator: 7 }).classification, "valid");
+assert.equal(a.recordAnswer({ numerator: 5, denominator: 9 }).classification, "valid");
 assert.equal(a.getCurrentTask().id, "fraction-like-denominator-subtraction-02");
 assert.equal(a.getProgress().completedCount, 1);
 assert.equal(b.getProgress().completedCount, 0);

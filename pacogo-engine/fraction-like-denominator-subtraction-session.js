@@ -1,7 +1,7 @@
 const FRACTION_LIKE_DENOMINATOR_SUBTRACTION_TASKS = Object.freeze([
-  [6,7,1,7],[7,8,1,8],[6,8,3,8],[4,10,3,10],[5,6,2,6],
-  [7,9,4,9],[8,10,5,10],[5,8,3,8],[9,10,6,10],[7,12,2,12],
-  [11,12,5,12],[8,9,3,9],[9,10,4,10],[11,12,7,12],[7,8,2,8]
+  [8,9,3,9],[7,10,4,10],[11,12,5,12],[5,8,2,8],[9,10,6,10],
+  [7,9,5,9],[10,12,3,12],[6,7,4,7],[8,10,3,10],[11,12,8,12],
+  [7,8,2,8],[9,10,7,10],[10,12,4,12],[5,6,1,6],[8,12,5,12]
 ].map(([leftNumerator, denominator, rightNumerator], index) => Object.freeze({
   id: "fraction-like-denominator-subtraction-" + String(index + 1).padStart(2, "0"),
   leftFraction: Object.freeze({ numerator: leftNumerator, denominator }),

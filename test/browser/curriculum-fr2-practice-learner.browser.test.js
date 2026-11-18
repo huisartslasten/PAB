@@ -377,15 +377,15 @@ test("FR2 learner practice is visual, learner-isolated and does not write formal
   await expect(page.locator("#likeDenominatorVisual .pacogo-fraction-operation")).toHaveCount(1);
   await expect(page.locator("#likeDenominatorVisual .pacogo-fraction-representation--area")).toHaveCount(2);
   await expect(page.locator("#likeDenominatorExpression .fraction-practice-equation")).toHaveAttribute(
-    "data-expression", "6/7 − 1/7 = ?/?"
+    "data-expression", "8/9 − 3/9 = ?/?"
   );
   await page.getByRole("textbox", { name: "Uitkomstteller" }).fill("5");
-  await page.getByRole("textbox", { name: "Uitkomstnoemer" }).fill("7");
+  await page.getByRole("textbox", { name: "Uitkomstnoemer" }).fill("9");
   await page.getByRole("button", { name: "Controleren" }).last().click();
   await expect(page.locator("#likeDenominatorProgress")).toHaveText("Som 2 van 15 • 1 afgerond");
   await page.getByRole("button", { name: "Volgende som" }).click();
   await expect(page.locator("#likeDenominatorExpression .fraction-practice-equation")).toHaveAttribute(
-    "data-expression", "7/8 − 1/8 = ?/?"
+    "data-expression", "7/10 − 4/10 = ?/?"
   );
 
   const state = await page.evaluate(() => ({

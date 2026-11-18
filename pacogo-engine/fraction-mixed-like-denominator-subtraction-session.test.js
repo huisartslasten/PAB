@@ -16,7 +16,8 @@ assert.equal(session.recordAnswer({numerator:"7",denominator:"8"}).classificatio
 assert.equal(session.getCurrentTask().taskNumber,3);
 assert.equal(session.recordAnswer({wholeNumberEnabled:true,wholeNumber:"5",numerator:"1",denominator:"10"}).classification,"valid");
 assert.equal(session.getProgress().completedCount,3);
-const reduced=createFractionMixedLikeDenominatorSubtractionSession({learnerKey:"reduced",storage});
+const reorderedTasks=[...FRACTION_MIXED_LIKE_DENOMINATOR_SUBTRACTION_TASKS.slice(4),...FRACTION_MIXED_LIKE_DENOMINATOR_SUBTRACTION_TASKS.slice(0,4)];
+const reduced=createFractionMixedLikeDenominatorSubtractionSession({learnerKey:"reduced",storage,tasks:reorderedTasks});
 reduced.recordAnswer({wholeNumberEnabled:true,wholeNumber:"3",numerator:"4",denominator:"10"});
 assert.equal(reduced.getProgress().completedCount,0);
 assert.equal(reduced.recordAnswer({wholeNumberEnabled:true,wholeNumber:"3",numerator:"4",denominator:"10",simplified:true,simplifiedNumerator:"2",simplifiedDenominator:"5"}).classification,"valid");

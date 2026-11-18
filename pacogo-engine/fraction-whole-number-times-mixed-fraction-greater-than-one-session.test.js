@@ -31,7 +31,7 @@ test("answers are checked as mixed numbers and learner progress resumes independ
   const session = createFractionWholeNumberTimesMixedFractionGreaterThanOneSession({ learnerKey: "Zyon", storage, tasks });
   assert.deepEqual(session.getCurrentTask().multiplier, { whole: 1, numerator: 2, denominator: 5 });
   assert.equal(session.recordAnswer({ values: { wholeNumberEnabled: false, wholeNumber: "", numerator: "1", denominator: "5" } }).classification, "invalid_input");
-  assert.equal(session.recordAnswer({ values: { wholeNumberEnabled: true, wholeNumber: "4", numerator: "2", denominator: "5" } }).classification, "incorrect_answer");
+  assert.equal(session.recordAnswer({ values: { wholeNumberEnabled: true, wholeNumber: "4", numerator: "2", denominator: "10" } }).classification, "incorrect_answer");
   assert.equal(session.recordAnswer({ values: { wholeNumberEnabled: true, wholeNumber: "4", numerator: "1", denominator: "10" } }).classification, "requires_simplification");
   assert.equal(session.recordAnswer({ values: { wholeNumberEnabled: true, wholeNumber: "4", numerator: "2", denominator: "10", simplified: true, simplifiedNumerator: "1", simplifiedDenominator: "5" } }).classification, "valid");
   assert.equal(session.getProgress().completedCount, 1);

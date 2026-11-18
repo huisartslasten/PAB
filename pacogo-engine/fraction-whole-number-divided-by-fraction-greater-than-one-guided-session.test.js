@@ -36,6 +36,9 @@ test("guided division exposes four ordered steps and validates each conversion s
   assert.equal(session.getCurrentStep().taskNumber, 2);
   assert.equal(session.getCurrentStep().stepNumber, 1);
   assert.deepEqual(session.getProgress(), { completedCount: 1, totalCount: 15, completedStepCount: 4, totalStepCount: 60, attemptCount: 7, isComplete: false });
+  const secondTaskDivisorNumerator = tasks[1].divisor.whole * tasks[1].divisor.denominator + tasks[1].divisor.numerator;
+  session.recordResponse({ rawValue: String(secondTaskDivisorNumerator) });
+  assert.match(session.getCurrentStep().prompt, /4 onder de breuk verdwijnt/);
 });
 
 test("guided division requires simplified mixed-number answers and resumes per learner", () => {

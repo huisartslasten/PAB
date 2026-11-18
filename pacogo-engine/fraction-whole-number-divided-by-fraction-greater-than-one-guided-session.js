@@ -34,7 +34,7 @@ function classifyFinalAnswer(values, task, divisorNumerator) {
   return gcd(numerator, denominator) === 1 ? "valid" : "requires_simplification";
 }
 function normalizeTasks(tasks) {
-  if (!Array.isArray(tasks) || tasks.length !== 15) throw new TypeError("Exactly 15 division tasks are required.");
+  if (!Array.isArray(tasks) || tasks.length !== 10) throw new TypeError("Exactly 10 division tasks are required.");
   const ids = new Set();
   return Object.freeze(tasks.map((task, index) => {
     const { wholeNumber, divisor, answer } = task || {};

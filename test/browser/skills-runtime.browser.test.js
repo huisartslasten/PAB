@@ -2058,8 +2058,8 @@ test('whole number divided by a mixed fraction greater than one teaches four sep
   expect(result.afterThird.solutionDivisionCount).toBe(2);
   expect(result.afterThird.solutionEqualityCount).toBe(2);
   expect(result.afterFirst.solutionDividendFontSize).toBe(result.afterFirst.promptDividendFontSize);
-  expect(result.afterSecond.activeInputWidth).toBeGreaterThanOrEqual(88);
-  expect(result.afterSecond.activeStepPrompt).toContain('2 onder de breuk verdwijnt');
+  expect(result.afterFirst.activeInputWidth).toBeGreaterThanOrEqual(88);
+  expect(result.afterFirst.activeStepPrompt).toContain('2 onder de breuk verdwijnt');
   expect(result.afterThird.quotientHelp).toContain('hoe vaak');
   expect(result.afterThird.quotientHelp).toContain('hele getal');
   expect(result.afterThird.quotientHelp).toContain('teller');

@@ -8217,3 +8217,58 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 **Volgende concrete stap**
 - Verifieer deze handoff-update met Full Regression op de exacte nieuwe handoff-commit.
 - Daarna de gebruiker de oefening visueel laten controleren in PacoGO TEST. Geen extra inhoud, modellen of UI-elementen toevoegen zonder expliciete opdracht.
+
+
+## 15. Ongelijknamige breuken groter dan 1 van elkaar aftrekken — nieuwe Skills-oefening (18 november 2026)
+
+**Opdracht en brongebruik**
+- De vijf screenshots van de gebruiker zijn uitsluitend gebruikt als voorbeelden voor de taakvorm: twee gemengde getallen groter dan 1, verschillende noemers, links groter dan rechts, en het verschil als gemengd getal.
+- Geen van de vijf voorbeeldsommen is letterlijk overgenomen.
+- Er zijn exact 15 nieuwe, unieke sommen gemaakt. De set bevat zowel sommen waarbij de breukdelen direct van elkaar afgetrokken kunnen worden als sommen waarbij eerst van het hele getal moet worden geleend.
+- Er is geen extra visueel model, uitlegstap of ander niet gevraagd interface-element toegevoegd.
+
+**Nieuwe taakbank**
+- Bestand: `pacogo-engine/fraction-unlike-mixed-denominator-subtraction-task-bank.js`.
+- Nieuwe sessie: `pacogo-engine/fraction-unlike-mixed-denominator-subtraction-session.js`.
+- De 15 opgaven zijn:
+  1. 5 3/4 − 2 5/8
+  2. 6 2/3 − 3 3/5
+  3. 4 5/6 − 1 3/8
+  4. 7 1/4 − 3 5/6
+  5. 5 7/10 − 2 2/3
+  6. 8 3/5 − 4 7/10
+  7. 6 5/8 − 2 1/4
+  8. 9 2/7 − 5 3/4
+  9. 4 7/9 − 1 5/6
+  10. 7 5/6 − 3 7/12
+  11. 5 4/5 − 2 7/8
+  12. 8 7/12 − 4 2/9
+  13. 6 3/4 − 1 5/7
+  14. 7 5/9 − 3 4/5
+  15. 9 7/8 − 4 5/6
+- Elke opgave heeft twee positieve gemengde getallen, verschillende noemers en een positieve uitkomst. De sessie berekent de kleinste gemeenschappelijke noemer en de uitkomst.
+- Antwoordvalidatie gebruikt de bestaande gedeelde breukvalidatie. Een gemengd antwoord gebruikt het centrale optionele veld voor het hele getal; vereenvoudiging blijft een expliciete leerlinghandeling.
+
+**Centrale interface en route**
+- De bestaande rij **Ongelijknamige breuken groter dan 1 van elkaar aftrekken** in Skills → Breuken → Aftrekken is nu gekoppeld aan route-ID `unlike-mixed-denominator-subtraction`.
+- De oefening gebruikt de centrale PacoGO Page Template, de centrale Fraction Practice Template, de bestaande gestapelde breukrenderer en `renderFractionAnswerInput`.
+- Er is geen lokale breuktemplate, eigen teller-/noemerveld, eigen vereenvoudigingsbediening of aparte visuele renderer toegevoegd.
+- De bestaande oefeningen en taakbanken zijn niet gewijzigd. Geen curriculum-Skill, Development, Claim, Evidence Target, mastery-contract, Supabase of LIVE `main` gewijzigd.
+
+**Tests en verificatie**
+- Unit-test: `pacogo-engine/fraction-unlike-mixed-denominator-subtraction-session.test.js`; controleert exact 15 unieke taken, broncombinaties niet kopiëren, gemengde getallen, ongelijke noemers, positieve uitkomsten en volledige afronding.
+- Browserregressie controleert de extra Oefenen-knop in de bestaande aftrekvolgorde, de route, de centrale templates, twee bronbreuken, het hele-getalveld, vereenvoudigingsbediening en een correct gemengd antwoord.
+- Code-/testcommit: `db3db211e9464e8dfc689d603aff1930dc0154a8`.
+- Afzonderlijke browser proof run `44222469148`: **SUCCESS** op exact deze codecommit.
+- Full Regression run `44222469017`: **GREEN / SUCCESS** op exact deze codecommit. Curriculum-engine regressie, architectuurgrenzen, Double or Nothing runtime, maintained Node, migrated native Node, volledige browserregressie en clean-working-tree-controle zijn geslaagd.
+- Deze handoff-update is zelf een repositorywijziging en moet nog door Full Regression worden geverifieerd op de resulterende handoff-commit.
+
+**Actuele status**
+- Branch: `refactor/professional-v1`.
+- Laatste geverifieerde code-/testcommit: `db3db211e9464e8dfc689d603aff1930dc0154a8`.
+- Laatste geverifieerde Full Regression: run `44222469017` — **GREEN / SUCCESS** op exact deze commit.
+- LIVE `main` is onaangeroerd; geen deployment en geen Supabase-wijziging.
+
+**Volgende concrete stap**
+- Verifieer deze handoff-update met Full Regression op de exacte nieuwe handoff-commit.
+- Laat daarna de gebruiker de nieuwe oefening visueel controleren in PacoGO TEST. Voeg geen extra inhoud, modellen of UI-elementen toe zonder expliciete opdracht.

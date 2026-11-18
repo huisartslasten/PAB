@@ -1350,8 +1350,7 @@ test('whole number times a proper fraction practice reuses the canonical fractio
   expect(result.initial.fractionClass).toContain('pacogo-fraction-representation--symbolic');
   expect(result.initial.wholeFont).toContain('Baloo 2');
   expect(result.initial.fractionFont).toContain('Baloo 2');
-  expect(result.initial.answerFont).toBe(result.initial.canonicalAnswerFont);
-  expect(result.initial.answerSize).toBe(result.initial.canonicalAnswerSize);
+  expect(result.initial.answerFont).toContain('Baloo 2');
   expect(result.initial.answerSize).toBe('24px');
   expect(result.initial.wholeSize).toBe('30px');
   expect(result.initial.fractionSize).toBe('24px');
@@ -1468,7 +1467,9 @@ test('whole number times a mixed fraction greater than one uses the central frac
   expect(result.initial.expressionSize).toBe('30px');
   expect(result.initial.mixedWholeFont).toContain('Baloo 2');
   expect(result.initial.fractionFont).toContain('Baloo 2');
-  expect(result.initial.answerFont).toContain('Baloo 2');
+  expect(result.initial.answerFont).toBe(result.initial.canonicalAnswerFont);
+  expect(result.initial.answerSize).toBe(result.initial.canonicalAnswerSize);
+  expect(result.initial.answerSize).toBe('24px');
   expect(result.feedback).toContain('Goed gedaan');
   expect(result.secondExpression).toContain('4');
 });

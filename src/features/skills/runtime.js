@@ -115,7 +115,7 @@ export function createSkillsRuntime({
     const grid = createPacoTileGrid({ documentRef, className: 'skills-navigation-grid skills-navigation-grid--fractions' });
 
     FRACTION_NAVIGATION_TOPICS.forEach(topicItem => {
-      const isSupportedTopic = topicItem.id === 'optellen' || topicItem.id === 'aftrekken' || topicItem.id === 'vermenigvuldigen';
+      const isSupportedTopic = topicItem.id === 'optellen' || topicItem.id === 'aftrekken' || topicItem.id === 'vermenigvuldigen' || topicItem.id === 'delen';
       grid.appendChild(createPacoTile({
         documentRef,
         title: topicItem.label,
@@ -233,6 +233,55 @@ export function createSkillsRuntime({
         open.addEventListener('click', () => navigate(buildViewUrl('skills.html', {
           student, mode: context?.mode,
           extra: { domain: FRACTION_DOMAIN, topic: 'aftrekken', exercise: item.exercise }
+        })));
+        row.append(open);
+      }
+      list.appendChild(row);
+    });
+
+    overview.appendChild(list);
+    content.appendChild(overview);
+  }
+
+
+  function renderFractionDivisionOverview() {
+    const items = [
+      { label: 'Heel getal delen door een breukgetal groter dan 1', level: 1, exercise: 'whole-number-divided-by-fraction-greater-than-one' },
+      { label: 'Gelijknamige breuken kleiner dan 1 op elkaar delen', level: 2, exercise: 'like-denominator-division' },
+      { label: 'Gelijknamige breuken groter dan 1 op elkaar delen', level: 2, exercise: 'mixed-like-denominator-division' },
+      { label: 'Ongelijknamige breuken kleiner dan 1 op elkaar delen', level: 3, exercise: 'unlike-denominator-division' },
+      { label: 'Ongelijknamige breuken groter dan 1 op elkaar delen', level: 4, exercise: 'mixed-unlike-denominator-division' }
+    ];
+
+    content.replaceChildren();
+    const overview = documentRef.createElement('section');
+    overview.className = 'card skills-addition-overview';
+    overview.setAttribute('aria-label', 'Onderwerpen breuken delen');
+    const list = documentRef.createElement('div');
+    list.className = 'skills-addition-overview-list';
+
+    items.forEach(item => {
+      const row = documentRef.createElement('div');
+      row.className = 'skills-addition-overview-row';
+      const difficulty = createPacoBoneDifficulty({
+        level: item.level,
+        maxLevel: 5,
+        label: 'Moeilijkheidsgraad',
+        documentRef
+      });
+      difficulty.classList.add('skills-addition-overview-difficulty');
+      const label = documentRef.createElement('span');
+      label.className = 'skills-addition-overview-label';
+      label.textContent = item.label;
+      row.append(difficulty, label);
+      if (item.exercise) {
+        const open = documentRef.createElement('button');
+        open.type = 'button';
+        open.className = 'paco-btn paco-btn--primary paco-btn--small skills-addition-overview-open';
+        open.textContent = 'Oefenen';
+        open.addEventListener('click', () => navigate(buildViewUrl('skills.html', {
+          student, mode: context?.mode,
+          extra: { domain: FRACTION_DOMAIN, topic: 'delen', exercise: item.exercise }
         })));
         row.append(open);
       }
@@ -2058,6 +2107,7 @@ export function createSkillsRuntime({
     const showingAddition = showingFractions && topic === 'optellen';
     const showingSubtraction = showingFractions && topic === 'aftrekken';
     const showingMultiplication = showingFractions && topic === 'vermenigvuldigen';
+    const showingDivision = showingFractions && topic === 'delen';
     const showingWholeNumberTimesProperFractionPractice = showingMultiplication && exercise === 'whole-number-times-proper-fraction';
     const showingWholeNumberTimesMixedFractionGreaterThanOnePractice = showingMultiplication && exercise === 'whole-number-times-mixed-fraction-greater-than-one';
     const showingLikeDenominatorMultiplicationPractice = showingMultiplication && exercise === 'like-denominator-multiplication';
@@ -2082,8 +2132,8 @@ export function createSkillsRuntime({
     mountPacoPageTemplate({
       mount: templateMount,
       greeting: student ? `Hoi ${student}! 🐶` : 'Welkom bij PacoGO!',
-      title: showingAnyPractice ? 'Oefenen' : showingAddition ? 'Optellen' : showingSubtraction ? 'Aftrekken' : showingMultiplication ? 'Vermenigvuldigen' : showingFractions ? 'Breuken' : 'Skills',
-      icon: showingAddition ? '➕' : showingSubtraction ? '➖' : showingMultiplication ? '✖️' : showingFractions ? '½' : '📘',
+      title: showingAnyPractice ? 'Oefenen' : showingAddition ? 'Optellen' : showingSubtraction ? 'Aftrekken' : showingMultiplication ? 'Vermenigvuldigen' : showingDivision ? 'Delen' : showingFractions ? 'Breuken' : 'Skills',
+      icon: showingAddition ? '➕' : showingSubtraction ? '➖' : showingMultiplication ? '✖️' : showingDivision ? '➗' : showingFractions ? '½' : '📘',
       layoutMode: showingAnyPractice ? 'practice' : 'standard',
       subtitle: showingWholeNumberTimesMixedFractionGreaterThanOnePractice
         ? 'Breuken → Vermenigvuldigen → Heel getal vermenigvuldigen met een breukgetal groter dan 1.'
@@ -2125,6 +2175,8 @@ export function createSkillsRuntime({
         ? 'Breuken → Aftrekken → ' + FRACTION_SUBTRACTION_EXERCISE.title + '.'
         : showingMultiplication
         ? 'Breuken → Vermenigvuldigen.'
+        : showingDivision
+        ? 'Breuken → Delen.'
         : showingSubtraction
         ? 'Breuken → Aftrekken.'
         : showingFractions
@@ -2162,6 +2214,7 @@ export function createSkillsRuntime({
     else if (showingWholeMinusGreaterThanOneSubtraction) renderWholeMinusGreaterThanOneSubtractionPractice();
     else if (showingWholeMinusMixedSubtraction) renderWholeMinusMixedSubtractionPractice();
     else if (showingMultiplication) renderFractionMultiplicationOverview();
+    else if (showingDivision) renderFractionDivisionOverview();
     else if (showingSubtraction) renderFractionSubtractionOverview();
     else if (showingFractions) renderFractionOverview();
     else renderSubjectOverview();

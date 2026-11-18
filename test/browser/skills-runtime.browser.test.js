@@ -1269,7 +1269,7 @@ test('unlike mixed-denominator subtraction uses the central fraction template an
 });
 
 
-test('whole number times a proper fraction practice is connected to its multiplication overview row and uses the central templates for 15 tasks', async ({ page }) => {
+test('whole number times a proper fraction practice reuses the canonical fraction typography and templates', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=vermenigvuldigen', { waitUntil: 'domcontentloaded' });
   const result = await page.evaluate(async () => {
     localStorage.removeItem('pacogo:fraction-whole-number-times-proper-fraction:v1:Zyon');
@@ -1299,25 +1299,39 @@ test('whole number times a proper fraction practice is connected to its multipli
       exercise: 'whole-number-times-proper-fraction', documentRef: document, navigate: () => {}
     });
     await practice.mount();
-    const expression = document.querySelector('.fraction-practice-equation');
-    const input = expression?.querySelector('input');
+    const equation = document.querySelector('.fraction-whole-mixed-equation');
+    const expression = equation?.querySelector('.fraction-whole-mixed-expression');
+    const fraction = expression?.querySelector('.pacogo-fraction-representation--symbolic');
+    const input = equation?.querySelector('.fraction-practice-inline-input');
+    const whole = expression?.querySelector('.fraction-whole-mixed-expression__whole');
+    const operator = expression?.querySelector('.fraction-whole-mixed-expression__operator');
+    const answerExpression = equation?.querySelector('.fraction-whole-mixed-answer .fraction-whole-mixed-expression');
     const initial = {
       title: document.querySelector('.paco-template-main h1')?.textContent || '',
       canonicalPage: Boolean(document.querySelector('.paco-page-template')),
       fractionTemplate: Boolean(document.querySelector('[data-component="fraction-practice-template"]')),
       progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
       expression: expression?.textContent || '',
-      fractionCount: expression?.querySelectorAll('.fraction-practice-fraction').length || 0,
+      fractionCount: expression?.querySelectorAll('.pacogo-fraction-representation--symbolic').length || 0,
       slashNotation: expression?.textContent.includes('/') || false,
       inputLabel: input?.getAttribute('aria-label') || '',
-      inputClass: input?.className || ''
+      inputClass: input?.className || '',
+      fractionClass: fraction?.className || '',
+      wholeFont: whole ? getComputedStyle(whole).fontFamily : '',
+      wholeSize: whole ? getComputedStyle(whole).fontSize : '',
+      fractionFont: fraction ? getComputedStyle(fraction).fontFamily : '',
+      fractionSize: fraction ? getComputedStyle(fraction).fontSize : '',
+      operatorSize: operator ? getComputedStyle(operator).fontSize : '',
+      answerFont: input ? getComputedStyle(input).fontFamily : '',
+      answerSize: input ? getComputedStyle(input).fontSize : '',
+      answerParentFont: answerExpression ? getComputedStyle(answerExpression).fontFamily : ''
     };
     input.value = '24';
     input.dispatchEvent(new Event('input', { bubbles: true }));
     document.querySelector('.pacogo-fraction-practice-template__actions button').click();
     const feedback = document.querySelector('.fraction-practice-feedback')?.textContent || '';
     document.querySelector('.pacogo-fraction-practice-template__actions button')?.click();
-    const secondExpression = document.querySelector('.fraction-practice-equation')?.textContent || '';
+    const secondExpression = document.querySelector('.fraction-whole-mixed-equation .fraction-whole-mixed-expression')?.textContent || '';
     return { navigation, rowButtonCount, initial, feedback, secondExpression };
   });
   expect(result.navigation).toContain('exercise=whole-number-times-proper-fraction');
@@ -1333,6 +1347,15 @@ test('whole number times a proper fraction practice is connected to its multipli
   expect(result.initial.slashNotation).toBe(false);
   expect(result.initial.inputLabel).toBe('Uitkomst');
   expect(result.initial.inputClass).toContain('fraction-practice-inline-input');
+  expect(result.initial.fractionClass).toContain('pacogo-fraction-representation--symbolic');
+  expect(result.initial.wholeFont).toContain('Baloo 2');
+  expect(result.initial.fractionFont).toContain('Baloo 2');
+  expect(result.initial.answerFont).toContain('Baloo 2');
+  expect(result.initial.wholeSize).toBe('30px');
+  expect(result.initial.fractionSize).toBe('24px');
+  expect(result.initial.operatorSize).toBe('30px');
+  expect(result.initial.answerSize).toBe('24px');
+  expect(result.initial.answerParentFont).toContain('Baloo 2');
   expect(result.feedback).toContain('Goed gedaan');
   expect(result.secondExpression).toContain('48');
 });

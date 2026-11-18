@@ -1474,14 +1474,44 @@ export function createSkillsRuntime({
         return;
       }
 
+      // Reuse the exact symbolic-fraction and equation typography used by the
+      // existing fraction exercises. Only the single whole-number answer is
+      // rendered with the shared inline-expression field.
       const equation = documentRef.createElement('div');
       equation.className = 'fraction-whole-mixed-equation';
-      const expression = renderFractionPracticeExpression({
-        mount: equation,
-        expression: task.wholeNumber + ' × ' + task.numerator + '/' + task.denominator + ' = ?',
+      const expression = documentRef.createElement('div');
+      expression.className = 'fraction-whole-mixed-expression';
+      const whole = documentRef.createElement('span');
+      whole.className = 'fraction-whole-mixed-expression__whole';
+      whole.textContent = String(task.wholeNumber);
+      const multiply = documentRef.createElement('span');
+      multiply.className = 'fraction-whole-mixed-expression__operator';
+      multiply.textContent = '×';
+      expression.append(
+        whole,
+        multiply,
+        renderFractionRepresentation(
+          { numerator: task.numerator, denominator: task.denominator },
+          'symbolic_fraction',
+          'Breuk'
+        )
+      );
+      const equals = documentRef.createElement('span');
+      equals.className = 'fraction-whole-mixed-expression__operator';
+      equals.textContent = '=';
+      const answerMount = documentRef.createElement('div');
+      answerMount.className = 'fraction-whole-mixed-answer';
+      const answerExpression = documentRef.createElement('div');
+      answerExpression.className = 'fraction-whole-mixed-expression';
+      answerMount.append(answerExpression);
+      equation.append(expression, equals, answerMount);
+      template.workArea.append(equation);
+
+      const answer = renderFractionPracticeExpression({
+        mount: answerExpression,
+        expression: '?',
         inputLabels: ['Uitkomst']
       });
-      template.workArea.append(equation);
 
       const submit = documentRef.createElement('button');
       submit.type = 'button';
@@ -1490,11 +1520,11 @@ export function createSkillsRuntime({
       template.actionsArea.append(submit);
 
       submit.addEventListener('click', () => {
-        const result = session.recordAnswer({ answer: expression.getValues()[0] });
+        const result = session.recordAnswer({ answer: answer.getValues()[0] });
         progressLabel.textContent = 'Som ' + (result.progress.isComplete ? 15 : result.progress.completedCount + 1) +
           ' van 15 • ' + result.progress.completedCount + ' afgerond';
         if (result.classification === 'valid') {
-          expression.lock();
+          answer.lock();
           submit.disabled = true;
           const feedback = documentRef.createElement('p');
           feedback.className = 'fraction-practice-feedback is-correct';
@@ -1516,16 +1546,15 @@ export function createSkillsRuntime({
           ? 'Vul een heel getal in.'
           : 'Dat antwoord klopt nog niet. Probeer het opnieuw.';
         template.feedbackArea.replaceChildren(feedback);
-        expression.focus();
+        answer.focus();
       });
 
       content.append(card);
-      expression.focus();
+      answer.focus();
     }
 
     renderCurrentTask();
   }
-
 
   async function mount() {
     const showingFractions = domain === FRACTION_DOMAIN;

@@ -1467,9 +1467,12 @@ export function createSkillsRuntime({
     const stepIds = ['convert_mixed_number', 'make_divisor_whole', 'scale_dividend', 'calculate_quotient'];
     const stepLabels = ['Zet het gemengde getal om', 'Vergroot de breuk tot een heel getal', 'Vergroot het hele getal', 'Reken de som uit'];
     let awaitingNextTask = false;
+    let completedTaskStep = null;
 
     function renderCurrentTask(feedbackMessage = '') {
-      const step = session.getCurrentStep();
+      const step = awaitingNextTask && completedTaskStep
+        ? completedTaskStep
+        : session.getCurrentStep();
       const progress = session.getProgress();
       content.replaceChildren();
       const card = documentRef.createElement('section');
@@ -1486,26 +1489,6 @@ export function createSkillsRuntime({
       template.titleArea.append(title);
       template.instructionArea.append(instruction);
       template.progressArea.append(progressLabel);
-
-      if (awaitingNextTask && !progress.isComplete) {
-        const done = documentRef.createElement('p');
-        done.className = 'fraction-practice-complete';
-        done.textContent = 'Deze som is afgerond. Klik op Volgende som als je klaar bent voor de volgende.';
-        template.workArea.append(done);
-        if (feedbackMessage) {
-          const feedback = documentRef.createElement('p');
-          feedback.className = 'fraction-practice-feedback is-correct';
-          feedback.setAttribute('role', 'status');
-          feedback.textContent = feedbackMessage;
-          template.feedbackArea.append(feedback);
-        }
-        content.append(card);
-        template.showNextAction(() => {
-          awaitingNextTask = false;
-          renderCurrentTask();
-        });
-        return;
-      }
 
       if (!step) {
         const done = documentRef.createElement('p');
@@ -1581,7 +1564,7 @@ export function createSkillsRuntime({
       const grid = documentRef.createElement('div');
       grid.className = 'fraction-guided-step-grid fraction-guided-step-grid--progressive';
       grid.setAttribute('aria-label', 'Vier denkstappen');
-      grid.dataset.activeStep = step.stepId;
+      grid.dataset.activeStep = awaitingNextTask ? 'completed' : step.stepId;
       let activeInput = null;
       let activeAnswer = null;
 
@@ -1590,7 +1573,7 @@ export function createSkillsRuntime({
         const active = step.stepId === stepId;
         const item = documentRef.createElement('details');
         item.className = 'fraction-guided-step-card';
-        item.open = active;
+        item.open = awaitingNextTask || active;
         item.dataset.stepId = stepId;
         item.dataset.state = completed ? 'completed' : active ? 'active' : 'locked';
         item.setAttribute('aria-label', 'Stap ' + (index + 1) + ': ' + stepLabels[index]);
@@ -1717,7 +1700,13 @@ export function createSkillsRuntime({
             );
             if (result.classification === 'valid') {
               activeAnswer?.lock();
-              if (stepId === 'calculate_quotient') awaitingNextTask = true;
+              if (stepId === 'calculate_quotient') {
+                completedTaskStep = {
+                  ...step,
+                  completedStepIds: [...step.completedStepIds, stepId]
+                };
+                awaitingNextTask = true;
+              }
               renderCurrentTask(stepId === 'calculate_quotient'
                 ? 'Goed gedaan! Je hebt deze som afgerond.'
                 : 'Goed gedaan! Deze stap is afgerond.');
@@ -1770,7 +1759,36 @@ export function createSkillsRuntime({
         template.feedbackArea.append(feedback);
       }
       content.append(card);
-      activeInput?.focus();
+      if (awaitingNextTask) {
+        const done = documentRef.createElement('p');
+        done.className = 'fraction-practice-complete';
+        done.textContent = progress.isComplete
+          ? 'Deze laatste som is afgerond. Je hebt alle 10 sommen goed gemaakt.'
+          : 'Deze som is afgerond. Klik op Volgende som als je klaar bent voor de volgende.';
+        template.workArea.append(done);
+        template.feedbackArea.replaceChildren();
+        const feedback = documentRef.createElement('p');
+        feedback.className = 'fraction-practice-feedback is-correct';
+        feedback.setAttribute('role', 'status');
+        feedback.textContent = feedbackMessage || 'Goed gedaan! Je hebt deze som afgerond.';
+        template.feedbackArea.append(feedback);
+        if (progress.isComplete) {
+          template.showRestartAction(() => {
+            session.reset();
+            awaitingNextTask = false;
+            completedTaskStep = null;
+            renderCurrentTask();
+          });
+        } else {
+          template.showNextAction(() => {
+            awaitingNextTask = false;
+            completedTaskStep = null;
+            renderCurrentTask();
+          });
+        }
+      } else {
+        activeInput?.focus();
+      }
     }
     renderCurrentTask();
   }

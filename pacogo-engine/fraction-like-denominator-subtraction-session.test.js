@@ -56,7 +56,7 @@ assert.equal(a.recordAnswer({
   simplifiedNumerator: "1", simplifiedDenominator: "2"
 }).classification, "valid");
 assert.equal(a.getProgress().completedCount, 3);
-assert.equal(a.getProgress().completedCount, 1);
+assert.equal(a.getProgress().completedCount, 3);
 assert.equal(b.getProgress().completedCount, 0);
 assert.equal(a.getProgress().attemptCount, 7);
 

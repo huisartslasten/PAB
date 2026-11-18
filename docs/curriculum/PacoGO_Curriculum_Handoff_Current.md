@@ -8121,7 +8121,9 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - De Enter-bediening blijft via de centrale Fraction Practice Template aan de knop **Controleren** gekoppeld.
 
 **Verificatie**
-- Deze implementatie is nog niet gecommit of getest. De Full Regression-baseline #3938 / run `44210326069` was GREEN op commit `c293900069909b97b849345f8ca68ea750f3d1b3`.
+- Implementatiecommit: `b0cac06f2d4511b6707e9429a330f3bf09480a70`.
+- Full Regression #3939 / run `44211395714`: **RED** op deze commit. Curriculum-engine regressie faalde in `fraction-like-denominator-subtraction-session.test.js:59`: na drie correct afgeronde taken verwachtte een overgebleven oude assertion nog `completedCount = 1`, terwijl de nieuwe testflow terecht `3` heeft bereikt. De fout zit uitsluitend in de verouderde testverwachting; er is geen productiecodefout vastgesteld in deze run. De testcorrectie moet opnieuw volledig worden geverifieerd.
+- De voorafgaande Full Regression-baseline #3938 / run `44210326069` was GREEN op commit `c293900069909b97b849345f8ca68ea750f3d1b3`.
 - Branch blijft `refactor/professional-v1`; LIVE `main` onaangeroerd; geen Supabase- of deploymentwijziging.
 
 **Volgende stap**

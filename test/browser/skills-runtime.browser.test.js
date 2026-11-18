@@ -910,7 +910,7 @@ test('fraction subtraction overview keeps the original exercise and adds the sep
     'Ongelijknamige breuken groter dan 1 van elkaar aftrekken'
   ]);
   expect(result.exerciseButtonCount).toBe(6);
-  expect(result.navigations).toHaveLength(7);
+  expect(result.navigations).toHaveLength(6);
   expect(result.navigations[0]).toContain('exercise=whole-minus-mixed-subtraction');
   expect(result.navigations[1]).toContain('exercise=whole-minus-greater-than-one-subtraction');
   expect(result.navigations[2]).toContain('exercise=like-denominator-subtraction');
@@ -1949,7 +1949,7 @@ test('the original whole-number division practice remains available without guid
   expect(result.initial.expression).toContain('12');
   expect(result.feedback).toContain('Goed gedaan');
   expect(result.next).toBe('Volgende som');
-  expect(result.progress).toContain('1 afgerond');
+  expect(result.progress).toContain('Som 2 van 15');
 });
 
 test('whole number divided by a mixed fraction greater than one reuses the central guided-step and fraction templates for fifteen tasks', async ({ page }) => {

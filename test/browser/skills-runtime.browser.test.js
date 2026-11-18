@@ -626,6 +626,8 @@ test('guided unequal-denominator addition converts sums above one to mixed numbe
       page: Boolean(document.querySelector('.paco-page-template')),
       fractionTemplate: Boolean(document.querySelector('[data-component="fraction-practice-template"]')),
       stepCount: document.querySelectorAll('.fraction-guided-step-card').length,
+      stepTags: [...document.querySelectorAll('.fraction-guided-step-card')].map(node => node.tagName.toLowerCase()),
+      expandedSteps: [...document.querySelectorAll('.fraction-guided-step-card')].map(node => node.open),
       states: [...document.querySelectorAll('.fraction-guided-step-card')].map(node => node.dataset.state),
       progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
       fractionBars: document.querySelectorAll('.fraction-guided-task-prompt .pacogo-fraction-representation--symbolic').length,
@@ -2020,6 +2022,8 @@ test('whole number divided by a mixed fraction greater than one teaches four sep
   expect(result.initial.uniqueTasks).toBe(15);
   expect(result.initial.progress).toContain('Som 1 van 15');
   expect(result.initial.stepCount).toBe(4);
+  expect(result.initial.stepTags).toEqual(['details', 'details', 'details', 'details']);
+  expect(result.initial.expandedSteps).toEqual([true, false, false, false]);
   expect(result.initial.states).toEqual(['active', 'locked', 'locked', 'locked']);
   expect(result.initial.stepIds).toEqual(['convert_mixed_number', 'make_divisor_whole', 'scale_dividend', 'calculate_quotient']);
   expect(result.initial.progressive).toBe(true);
@@ -2027,9 +2031,13 @@ test('whole number divided by a mixed fraction greater than one teaches four sep
   expect(result.initial.expression).toContain('8');
   expect(result.initial.expression).toContain('2');
   expect(result.afterFirst.states).toEqual(['completed', 'active', 'locked', 'locked']);
+  expect(result.afterFirst.expandedSteps).toEqual([false, true, false, false]);
   expect(result.afterSecond.states).toEqual(['completed', 'completed', 'active', 'locked']);
+  expect(result.afterSecond.expandedSteps).toEqual([false, false, true, false]);
   expect(result.afterThird.states).toEqual(['completed', 'completed', 'completed', 'active']);
+  expect(result.afterThird.expandedSteps).toEqual([false, false, false, true]);
   expect(result.afterFinal.progress).toContain('Som 2 van 15');
   expect(result.afterFinal.states).toEqual(['active', 'locked', 'locked', 'locked']);
+  expect(result.afterFinal.expandedSteps).toEqual([true, false, false, false]);
   expect(result.feedback).toContain('Goed gedaan');
 });

@@ -1543,23 +1543,30 @@ export function createSkillsRuntime({
       stepIds.forEach((stepId, index) => {
         const completed = step.completedStepIds.includes(stepId);
         const active = step.stepId === stepId;
-        const item = documentRef.createElement('section');
+        const item = documentRef.createElement('details');
         item.className = 'fraction-guided-step-card';
+        item.open = active;
         item.dataset.stepId = stepId;
         item.dataset.state = completed ? 'completed' : active ? 'active' : 'locked';
         item.setAttribute('aria-label', 'Stap ' + (index + 1) + ': ' + stepLabels[index]);
+
+        const summary = documentRef.createElement('summary');
+        summary.className = 'fraction-guided-step-summary';
         const heading = documentRef.createElement('h3');
         heading.textContent = 'Stap ' + (index + 1);
         const label = documentRef.createElement('p');
         label.className = 'fraction-guided-step-title';
         label.textContent = stepLabels[index];
-        item.append(heading, label);
+        summary.append(heading, label);
+        item.append(summary);
 
+        const body = documentRef.createElement('div');
+        body.className = 'fraction-guided-step-content';
         if (completed) {
           const status = documentRef.createElement('p');
           status.className = 'fraction-guided-step-status';
           status.textContent = 'Afgerond';
-          item.append(status);
+          body.append(status);
           const answer = documentRef.createElement('div');
           answer.className = 'fraction-guided-step-completed-answer';
           if (stepId === 'convert_mixed_number') {
@@ -1578,7 +1585,7 @@ export function createSkillsRuntime({
               }, 'Gemengd getal als uitkomst')
             );
           }
-          item.append(answer);
+          body.append(answer);
         } else if (active) {
           const help = documentRef.createElement('p');
           help.className = 'fraction-guided-step-prompt';
@@ -1684,13 +1691,14 @@ export function createSkillsRuntime({
               check.click();
             }
           });
-          item.append(help, expression, check);
+          body.append(help, expression, check);
         } else {
           const status = documentRef.createElement('p');
           status.className = 'fraction-guided-step-status';
           status.textContent = 'Komt hierna';
-          item.append(status);
+          body.append(status);
         }
+        item.append(body);
         grid.append(item);
       });
 
@@ -1707,7 +1715,6 @@ export function createSkillsRuntime({
     }
     renderCurrentTask();
   }
-
   function renderSameDenominatorAdditionPractice() {
     const learnerKey = student || context?.learnerId || 'local-learner';
     const session = createFractionSameDenominatorAdditionSession({ learnerKey });

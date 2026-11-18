@@ -1660,9 +1660,10 @@ export function createSkillsRuntime({
             expression.append(documentRef.createTextNode(step.scaledDividend + ' ÷ ' + step.divisorWholeNumber + '='));
             const quotientHelp = documentRef.createElement('p');
             quotientHelp.className = 'fraction-guided-quotient-help';
-            quotientHelp.textContent = 'Zoek het grootste veelvoud van ' + step.divisorWholeNumber +
-              ' dat niet groter is dan ' + step.scaledDividend + '. Trek dat ervan af. Het getal dat overblijft, wordt de teller. ' +
-              'Het getal waar je door deelt, wordt de noemer.';
+            quotientHelp.textContent = 'Zoek hoe vaak ' + step.divisorWholeNumber + ' in ' + step.scaledDividend +
+              ' past zonder eroverheen te gaan. Dat aantal is het hele getal. Trek het gebruikte getal van ' +
+              step.scaledDividend + ' af. Wat overblijft, is de teller. De deler wordt de noemer.';
+            expression.append(quotientHelp);
             const answerMount = documentRef.createElement('div');
             answerMount.className = 'fraction-guided-mixed-answer';
             expression.append(answerMount);
@@ -1671,7 +1672,6 @@ export function createSkillsRuntime({
               controlsMount: template.controlsArea,
               wholeNumberMode: 'required'
             });
-            expression.append(quotientHelp);
           }
           const check = documentRef.createElement('button');
           check.type = 'button';

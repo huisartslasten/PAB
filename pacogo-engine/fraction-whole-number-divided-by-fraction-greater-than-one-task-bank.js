@@ -13,6 +13,6 @@ const FRACTION_WHOLE_NUMBER_DIVIDED_BY_FRACTION_GREATER_THAN_ONE_TASKS = Object.
   Object.freeze({ id: "fraction-whole-divided-by-mixed-greater-12", wholeNumber: 11, divisor: Object.freeze({ whole: 2, numerator: 5, denominator: 8 }), answer: Object.freeze({ whole: 4, numerator: 4, denominator: 21 }) }),
   Object.freeze({ id: "fraction-whole-divided-by-mixed-greater-13", wholeNumber: 15, divisor: Object.freeze({ whole: 4, numerator: 2, denominator: 9 }), answer: Object.freeze({ whole: 3, numerator: 21, denominator: 38 }) }),
   Object.freeze({ id: "fraction-whole-divided-by-mixed-greater-14", wholeNumber: 19, divisor: Object.freeze({ whole: 5, numerator: 1, denominator: 2 }), answer: Object.freeze({ whole: 3, numerator: 5, denominator: 11 }) }),
-  Object.freeze({ id: "fraction-whole-divided-by-mixed-greater-15", wholeNumber: 14, divisor: Object.freeze({ whole: 3, numerator: 2, denominator: 7 }), answer: Object.freeze({ whole: 3, numerator: 1, denominator: 11 }) })
+  Object.freeze({ id: "fraction-whole-divided-by-mixed-greater-15", wholeNumber: 14, divisor: Object.freeze({ whole: 3, numerator: 2, denominator: 7 }), answer: Object.freeze({ whole: 4, numerator: 6, denominator: 23 }) })
 ]);
 export { FRACTION_WHOLE_NUMBER_DIVIDED_BY_FRACTION_GREATER_THAN_ONE_TASKS };

@@ -1,3 +1,5 @@
+import { areEquivalentFractionValues, greatestCommonDivisor, isFractionInLowestTerms } from "./fraction-answer-validation.js";
+
 const FRACTION_MIXED_SAME_DENOMINATOR_ADDITION_EXERCISE = Object.freeze({
   id: "fraction-mixed-same-denominator-addition-level-2",
   title: "Gelijknamige breuken groter dan 1 bij elkaar optellen",
@@ -31,12 +33,7 @@ const CLASSIFICATIONS = Object.freeze([
   "valid", "invalid_input", "incorrect_answer", "requires_simplification", "not_simplified"
 ]);
 
-function gcd(a, b) {
-  let left = Math.abs(a);
-  let right = Math.abs(b);
-  while (right !== 0) [left, right] = [right, left % right];
-  return left;
-}
+const gcd = greatestCommonDivisor;
 
 function expectedFor(task) {
   const denominator = task.left.denominator;
@@ -136,10 +133,12 @@ function createFractionMixedSameDenominatorAdditionSession({ learnerKey, storage
       const whole = v.wholeNumberEnabled && /^[0-9]+$/.test(v.wholeNumber) ? Number(v.wholeNumber) : NaN;
       if (Number.isSafeInteger(num) && Number.isSafeInteger(den) && den > 0 && num > 0 && num < den &&
           v.wholeNumberEnabled && Number.isSafeInteger(whole) && whole >= 0) {
-        const equivalent = (whole * den + num) * expected.denominator ===
-          (expected.whole * expected.denominator + expected.numerator) * den;
+        const equivalent = areEquivalentFractionValues(
+          { wholeNumber: whole, numerator: num, denominator: den },
+          { wholeNumber: expected.whole, numerator: expected.numerator, denominator: expected.denominator }
+        );
         classification = equivalent ? "valid" : "incorrect_answer";
-        if (equivalent && gcd(num, den) > 1) {
+        if (equivalent && !isFractionInLowestTerms(num, den)) {
           if (!v.simplified) {
             classification = "requires_simplification";
           } else {
@@ -147,7 +146,7 @@ function createFractionMixedSameDenominatorAdditionSession({ learnerKey, storage
             const reducedDen = /^[0-9]+$/.test(v.simplifiedDenominator) ? Number(v.simplifiedDenominator) : NaN;
             const validReduced = Number.isSafeInteger(reducedNum) && Number.isSafeInteger(reducedDen) &&
               reducedNum > 0 && reducedDen > 0 && reducedNum < reducedDen &&
-              gcd(reducedNum, reducedDen) === 1 &&
+              isFractionInLowestTerms(reducedNum, reducedDen) &&
               reducedNum * den === num * reducedDen &&
               reducedNum === expected.reducedNumerator &&
               reducedDen === expected.reducedDenominator;

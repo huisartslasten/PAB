@@ -8583,3 +8583,11 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 **Volgende concrete stap**
 - Voer Full Regression uit op de nieuwe handoff-commit en controleer de exacte browserregressie.
 - Daarna de gebruiker de weergave in PacoGO TEST laten controleren. Geen andere oefeningen of interfaces wijzigen.
+
+
+## 23. Verificatie handoff na reparatie gemengde breuken (18 november 2026)
+
+- Full Regression #3989 / run `44343914199`: **GREEN / SUCCESS** op exact testcommit `3bb7c6b3fde264223afa358b5025fa27266a8947`.
+- Alle workflowstappen zijn succesvol afgerond, inclusief Chromium-installatie, browserregressie en controle dat de working tree schoon bleef.
+- Branch HEAD is daarna de documentatiecommit `2c1586f2ce4766cd5c8f44a9dacba75c413a2f81`, die uitsluitend deze handoff bijwerkt; de geteste code- en testbestanden zijn ongewijzigd.
+- De handoff-commit zelf is nog niet door een afzonderlijke Full Regression-run getest. De eerstvolgende engineeringstap blijft daarom: Full Regression op de actuele branch HEAD verifiëren vóór een nieuwe bouwstap.

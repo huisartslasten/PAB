@@ -8272,3 +8272,40 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 **Volgende concrete stap**
 - Verifieer deze handoff-update met Full Regression op de exacte nieuwe handoff-commit.
 - Laat daarna de gebruiker de nieuwe oefening visueel controleren in PacoGO TEST. Voeg geen extra inhoud, modellen of UI-elementen toe zonder expliciete opdracht.
+
+## 16. Breuken → Vermenigvuldigen — centraal overzicht (18 november 2026)
+
+**Opdracht en afbakening**
+- De gebruiker verduidelijkte dat de tegel Vermenigvuldigen in Breuken moet openen naar het overzicht met zeven onderdelen.
+- De gebruiker leverde een tweede screenshot van Breuken → Optellen als het exacte UI-template voor deze overzichtspagina.
+- Het vermenigvuldigoverzicht gebruikt dezelfde bestaande rijstructuur en styling als Optellen: centrale difficulty-bones, titel, horizontale rij, scheidingslijn en gedeelde overzichts-CSS (skills-addition-overview*).
+- De centrale PacoGO Page Template blijft de paginabasis.
+- Er zijn geen nieuwe oefeningen, oefenroutes of knoppen toegevoegd. De bestaande Optellen-pagina toont Oefenen alleen bij onderdelen waarvoor al een oefenroute bestaat; voor Vermenigvuldigen zijn die routes nog niet gebouwd. Voeg ze niet toe zonder aparte opdracht.
+
+**Overzichtsinhoud**
+1. Een breuk vermenigvuldigen met een heel getal — niveau 1.
+2. Heel getal vermenigvuldigen met een breukgetal kleiner dan 1 — niveau 1.
+3. Heel getal vermenigvuldigen met een breukgetal groter dan 1 — niveau 1.
+4. Gelijknamige breuken kleiner dan 1 met elkaar vermenigvuldigen — niveau 2.
+5. Gelijknamige breuken groter dan 1 met elkaar vermenigvuldigen — niveau 2.
+6. Ongelijknamige breuken kleiner dan 1 met elkaar vermenigvuldigen — niveau 3.
+7. Ongelijknamige breuken groter dan 1 met elkaar vermenigvuldigen — niveau 4.
+
+**Implementatie en tests**
+- Bestand: src/features/skills/runtime.js; route domain=fractions&topic=vermenigvuldigen wordt ondersteund en rendert renderFractionMultiplicationOverview().
+- De bestaande centrale overzichts-CSS in src/features/skills/skills-navigation.css wordt hergebruikt; geen nieuwe CSS-template toegevoegd.
+- Browserregressie test controleert de route, paginatitel, centrale page template, alle zeven labels, difficulty-niveaus en vijf difficulty-bones per rij.
+- Code-/testcommit: 7afb0921af3566d8a8bbbf6127c5e71dfae54b7d.
+- Browser Proof run 44287309900 (#815): SUCCESS op exact deze commit.
+- Full Regression run 44287309943 (#3963): SUCCESS / GREEN op exact deze commit.
+
+**Actuele status bij deze handoff-update**
+- Branch: refactor/professional-v1.
+- Laatste geverifieerde code-/testcommit: 7afb0921af3566d8a8bbbf6127c5e71dfae54b7d.
+- Laatste geverifieerde Full Regression: #3963 — GREEN / SUCCESS op exact deze commit.
+- Deze handoff-update is zelf een repositorywijziging en moet nog door Full Regression worden geverifieerd op de resulterende handoff-commit.
+- LIVE main is onaangeroerd.
+
+**Volgende concrete stap**
+- Verifieer de handoff-update met Full Regression op de exacte nieuwe handoff-commit.
+- Laat de gebruiker daarna het overzicht in PacoGO TEST visueel controleren. Bouw geen vermenigvuldigingsoefeningen of extra UI-functionaliteit zonder expliciete opdracht.

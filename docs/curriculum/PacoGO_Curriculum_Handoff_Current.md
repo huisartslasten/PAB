@@ -8205,7 +8205,7 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Browserregressie: Skills-overzicht controleert de nieuwe Oefenen-knop en route; nieuwe browserflow controleert centrale template, eerste twee sommen, antwoordinvoer en voortgang.
 - Productie-/testimplementatiecommit: `aef0a4569e1a58a1940515caf1e8de73e6c57cef`.
 - Full Regression #3958 / run `44219768328`: **GREEN / SUCCESS** op exact deze commit.
-- Afzonderlijke browser proof #? / run `44219768266`: **SUCCESS**; alle 41 browser-tests geslaagd.
+- Afzonderlijke browser proof #813 / run `44219768266`: **SUCCESS**; alle 41 browser-tests geslaagd.
 - Deze handoff-update is zelf een repositorywijziging en moet nog door Full Regression worden geverifieerd op de resulterende handoff-commit.
 
 **Actuele status**

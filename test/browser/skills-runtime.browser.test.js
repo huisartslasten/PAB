@@ -984,6 +984,128 @@ test('like-denominator subtraction opens from the central Skills route and runs 
 });
 
 
+test('like-denominator multiplication opens from the central Skills route and uses the central Fraction Practice Template for fifteen new tasks', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=vermenigvuldigen', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    localStorage.removeItem('pacogo:fraction-like-denominator-multiplication:v1:Zyon');
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const { FRACTION_LIKE_DENOMINATOR_MULTIPLICATION_TASKS: tasks } = await import('/pacogo-engine/fraction-like-denominator-multiplication-task-bank.js');
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {},
+      managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    let navigation = '';
+    const overview = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'vermenigvuldigen', documentRef: document,
+      navigate: target => { navigation = String(target); }
+    });
+    await overview.mount();
+    const row = [...document.querySelectorAll('.skills-addition-overview-row')].find(item =>
+      item.querySelector('.skills-addition-overview-label')?.textContent === 'Gelijknamige breuken kleiner dan 1 met elkaar vermenigvuldigen'
+    );
+    const rowButtonCount = row.querySelectorAll('button').length;
+    row.querySelector('button')?.click();
+    const practice = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'vermenigvuldigen', exercise: 'like-denominator-multiplication',
+      documentRef: document, navigate: () => {}
+    });
+    await practice.mount();
+    const equation = document.querySelector('.construction-equation');
+    const fractions = [...equation.querySelectorAll('.pacogo-fraction-representation--symbolic')];
+    const initial = {
+      navigation,
+      rowButtonCount,
+      title: document.querySelector('.paco-template-main h1')?.textContent || '',
+      pageTemplate: Boolean(document.querySelector('.paco-page-template')),
+      fractionTemplate: Boolean(document.querySelector('[data-component="fraction-practice-template"]')),
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      sourceFractions: fractions.map(node => node.getAttribute('aria-label') || ''),
+      simplify: document.querySelector('.pacogo-fraction-answer__simplify')?.textContent || '',
+      answerParts: [...document.querySelectorAll('[data-answer-part]')].map(node => node.dataset.answerPart),
+      taskCount: tasks.length,
+      allLikeProper: tasks.every(task =>
+        task.leftFraction.denominator === task.rightFraction.denominator &&
+        task.leftFraction.numerator < task.leftFraction.denominator &&
+        task.rightFraction.numerator < task.rightFraction.denominator
+      ),
+      noSourceCopies: tasks.every(task => ![
+        '6|10|3|10','7|8|4|8','8|10|7|10','5|7|5|7','7|9|1|9'
+      ].includes([
+        task.leftFraction.numerator,task.leftFraction.denominator,
+        task.rightFraction.numerator,task.rightFraction.denominator
+      ].join('|')))
+    };
+    const set = (part, value) => {
+      const field = document.querySelector('[data-answer-part="' + part + '"]');
+      field.value = value;
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    set('primaryNumerator', '2');
+    set('primaryDenominator', '9');
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    const afterFirst = {
+      feedback: document.querySelector('[role="status"]')?.textContent || '',
+      next: document.querySelector('.pacogo-fraction-practice-template__actions button')?.textContent || ''
+    };
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    const second = [...document.querySelectorAll('.construction-equation .pacogo-fraction-representation--symbolic')]
+      .map(node => node.getAttribute('aria-label') || '');
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    const setSecond = (part, value) => {
+      const field = document.querySelector('[data-answer-part="' + part + '"]');
+      field.value = value;
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    setSecond('primaryNumerator', '8');
+    setSecond('primaryDenominator', '49');
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    setSecond('primaryNumerator', '15');
+    setSecond('primaryDenominator', '36');
+    document.querySelector('.pacogo-fraction-answer__simplify').click();
+    setSecond('simplifiedNumerator', '5');
+    setSecond('simplifiedDenominator', '12');
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    return {
+      initial, afterFirst, second,
+      fourth: {
+        feedback: document.querySelector('[role="status"]')?.textContent || '',
+        next: document.querySelector('.pacogo-fraction-practice-template__actions button')?.textContent || ''
+      }
+    };
+  });
+  expect(result.initial.navigation).toContain('exercise=like-denominator-multiplication');
+  expect(result.initial.rowButtonCount).toBe(1);
+  expect(result.initial.title).toBe('Oefenen');
+  expect(result.initial.pageTemplate).toBe(true);
+  expect(result.initial.fractionTemplate).toBe(true);
+  expect(result.initial.progress).toContain('Som 1 van 15');
+  expect(result.initial.sourceFractions).toEqual([
+    'Eerste breuk: 2 gedeeld door 3',
+    'Tweede breuk: 1 gedeeld door 3'
+  ]);
+  expect(result.initial.simplify).toBe('Vereenvoudigen');
+  expect(result.initial.answerParts).toEqual(['primaryNumerator','primaryDenominator','simplifiedNumerator','simplifiedDenominator']);
+  expect(result.initial.taskCount).toBe(15);
+  expect(result.initial.allLikeProper).toBe(true);
+  expect(result.initial.noSourceCopies).toBe(true);
+  expect(result.afterFirst.feedback).toContain('correct');
+  expect(result.afterFirst.next).toBe('Volgende som');
+  expect(result.second).toEqual([
+    'Eerste breuk: 3 gedeeld door 5',
+    'Tweede breuk: 2 gedeeld door 5'
+  ]);
+  expect(result.fourth.feedback).toContain('correct');
+  expect(result.fourth.next).toBe('Volgende som');
+});
+
+
 test('unlike-denominator subtraction opens from its existing Skills tile and uses the central Fraction Practice Template for fifteen original tasks', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=aftrekken&exercise=unlike-denominator-subtraction', { waitUntil: 'domcontentloaded' });
   const result = await page.evaluate(async () => {

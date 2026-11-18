@@ -8818,8 +8818,8 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 
 **Actuele status**
 - Branch: `refactor/professional-v1`.
-- Laatste code-/testcommit vóór deze handoff-update: `8c03a2685e3abc8de1146dbec7f8957bcca7241f`.
-- Laatste volledig geverifieerde Full Regression vóór deze correctie: #4021 — GREEN op uitgangscommit `71a902ac397597ba77ce37865eb3e50ce801fc50`.
+- Laatste geverifieerde code-/testcommit: `2b33122600a1fc883d347ea2e11c83aa0ed07786`.
+- Laatste volledig geverifieerde Full Regression: #4030 — GREEN / SUCCESS op exact die commit.
 - LIVE `main` is niet gewijzigd; geen deployment en geen Supabase-wijziging.
 
 **Volgende concrete stap**

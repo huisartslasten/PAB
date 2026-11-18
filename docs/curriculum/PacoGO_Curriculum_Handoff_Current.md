@@ -8163,3 +8163,57 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Verifieer de handoff-update met Full Regression op de exacte nieuwe commit.
 - Laat daarna de gebruiker in PacoGO TEST de directe invoer van een vereenvoudigde uitkomst controleren.
 - Pas de gedeelde validatie pas verder aan als een concrete andere breukenoefening een afwijkend contract aantoont.
+
+
+## 14. Ongelijknamige breuken kleiner dan 1 van elkaar aftrekken — nieuwe Skills-oefening (18 november 2026)
+
+**Opdracht en brongebruik**
+- De vijf door de gebruiker aangeleverde screenshots zijn uitsluitend gebruikt om de afbakening van de oefening te bepalen: twee positieve breuken kleiner dan 1, verschillende noemers, eerste breuk groter dan tweede breuk, uitkomst als breuk.
+- De getallen en breukcombinaties uit de screenshots zijn niet overgenomen. De nieuwe vijftien taken zijn zelfstandig ontworpen.
+- Er is geen extra visueel model of nieuwe didactische stap toegevoegd; de oefening toont de symbolische aftreksom zoals in de bronvoorbeelden.
+
+**Nieuwe taakbank**
+- Bestand: `pacogo-engine/fraction-unlike-denominator-subtraction-task-bank.js`.
+- Exact 15 unieke sommen:
+  1. 5/6 − 1/4
+  2. 7/8 − 1/3
+  3. 4/5 − 1/6
+  4. 5/6 − 1/3
+  5. 7/9 − 1/5
+  6. 3/4 − 2/9
+  7. 5/8 − 1/6
+  8. 7/10 − 1/5
+  9. 8/11 − 1/3
+  10. 5/6 − 3/8
+  11. 7/12 − 2/5
+  12. 9/14 − 1/3
+  13. 11/15 − 2/7
+  14. 7/8 − 2/5
+  15. 5/9 − 1/7
+- Alle termen zijn positieve echte breuken met verschillende noemers; links is steeds groter dan rechts en alle verschillen zijn positief en kleiner dan 1.
+- De reeks bevat uitkomsten die vereenvoudigd moeten worden (onder meer som 4 en 8) en uitkomsten die al in laagste termen staan.
+
+**Engine en interface**
+- Nieuwe sessie: `pacogo-engine/fraction-unlike-denominator-subtraction-session.js`; berekent de kleinste gemeenschappelijke noemer en het verschil, valideert equivalente antwoorden en gebruikt de gedeelde centrale vereenvoudigingsvalidatie.
+- Antwoorden in volledig vereenvoudigde vorm mogen direct worden ingevoerd. Een nog vereenvoudigbare equivalente breuk wordt niet als voltooid geaccepteerd zonder de vereenvoudigingsstap.
+- De bestaande rij/tegel in Skills → Breuken → Aftrekken is gekoppeld aan route-ID `unlike-denominator-subtraction`.
+- De oefening gebruikt de centrale PacoGO Page Template, de centrale Fraction Practice Template, de bestaande gestapelde breukweergave en `renderFractionAnswerInput` met de bestaande bediening. Geen lokale template, eigen breukvelden of nieuwe visuele renderer.
+- Bestaande oefeningen, curriculumclaims, evidence-/mastery-contracten, Supabase en LIVE `main` zijn niet gewijzigd.
+
+**Tests en verificatie**
+- Unit-test: `pacogo-engine/fraction-unlike-denominator-subtraction-session.test.js`; controleert 15 unieke opgaven, geen exacte herhaling van de vijf broncombinaties, wiskundige grenzen, foutieve invoer, vereenvoudiging en volledige afronding.
+- Browserregressie: Skills-overzicht controleert de nieuwe Oefenen-knop en route; nieuwe browserflow controleert centrale template, eerste twee sommen, antwoordinvoer en voortgang.
+- Productie-/testimplementatiecommit: `aef0a4569e1a58a1940515caf1e8de73e6c57cef`.
+- Full Regression #3958 / run `44219768328`: **GREEN / SUCCESS** op exact deze commit.
+- Afzonderlijke browser proof #? / run `44219768266`: **SUCCESS**; alle 41 browser-tests geslaagd.
+- Deze handoff-update is zelf een repositorywijziging en moet nog door Full Regression worden geverifieerd op de resulterende handoff-commit.
+
+**Actuele status**
+- Branch: `refactor/professional-v1`.
+- Laatste geverifieerde code-/testcommit: `aef0a4569e1a58a1940515caf1e8de73e6c57cef`.
+- Laatste geverifieerde Full Regression: #3958 — GREEN op exact die commit.
+- LIVE `main` is onaangeroerd; geen deployment en geen Supabase-wijziging.
+
+**Volgende concrete stap**
+- Verifieer deze handoff-update met Full Regression op de exacte nieuwe handoff-commit.
+- Daarna de gebruiker de oefening visueel laten controleren in PacoGO TEST. Geen extra inhoud, modellen of UI-elementen toevoegen zonder expliciete opdracht.

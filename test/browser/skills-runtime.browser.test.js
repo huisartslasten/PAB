@@ -1994,7 +1994,9 @@ test('whole number divided by a mixed fraction greater than one teaches four sep
       stepIds: [...document.querySelectorAll('.fraction-guided-step-card')].map(node => node.dataset.stepId),
       progressive: document.querySelector('.fraction-guided-step-grid')?.classList.contains('fraction-guided-step-grid--progressive') || false,
       conversionDenominator: document.querySelector('[data-step-id="convert_mixed_number"] .pacogo-fraction-denominator')?.textContent || '',
-      expression: document.querySelector('.fraction-guided-task-prompt')?.textContent || ''
+      expression: document.querySelector('.fraction-guided-task-prompt')?.textContent || '',
+      solution: document.querySelector('.fraction-guided-solution')?.textContent || '',
+      quotientHelp: document.querySelector('.fraction-guided-quotient-help')?.textContent || ''
     });
     const initial = snapshot();
     const fill = (selector, value) => { const input = document.querySelector(selector); input.value = String(value); };
@@ -2038,6 +2040,17 @@ test('whole number divided by a mixed fraction greater than one teaches four sep
   expect(result.afterSecond.expandedSteps).toEqual([false, false, true, false]);
   expect(result.afterThird.states).toEqual(['completed', 'completed', 'completed', 'active']);
   expect(result.afterThird.expandedSteps).toEqual([false, false, false, true]);
+  expect(result.afterFirst.solution).toContain('8');
+  expect(result.afterFirst.solution).toContain('5');
+  expect(result.afterSecond.solution).toContain('8');
+  expect(result.afterThird.solution).toContain('8');
+  expect(result.afterThird.solution).toContain('16');
+  expect(result.afterThird.solution).toContain('5');
+  expect(result.afterThird.quotientHelp).toContain('grootste veelvoud');
+  expect(result.afterThird.quotientHelp).toContain('teller');
+  expect(result.afterFinal.solution).toContain('16');
+  expect(result.afterFinal.solution).toContain('3');
+  expect(result.afterFinal.solution).toContain('5');
   expect(result.afterFinal.progress).toContain('Som 2 van 15');
   expect(result.afterFinal.states).toEqual(['active', 'locked', 'locked', 'locked']);
   expect(result.afterFinal.expandedSteps).toEqual([true, false, false, false]);

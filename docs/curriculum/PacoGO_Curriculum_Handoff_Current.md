@@ -8448,3 +8448,43 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 **Volgende concrete stap**
 - Verifieer deze handoff-update met Full Regression op de exacte nieuwe handoff-commit.
 - Laat de gebruiker de nieuwe oefening visueel testen in PacoGO TEST. Geen volgende oefening of extra UI-elementen toevoegen zonder expliciete opdracht.
+
+## 20. Breuken → Vermenigvuldigen → Gelijknamige breuken kleiner dan 1 vermenigvuldigen (18 november 2026)
+
+**Opdracht en brongebruik**
+- De gebruiker vroeg exact 15 sommen voor gelijknamige breuken kleiner dan 1 met elkaar vermenigvuldigen.
+- De vijf screenshots zijn uitsluitend inspiratie voor de opgavevorm; geen voorbeeldsom is letterlijk overgenomen.
+- De taakbank bevat exact 15 unieke sommen. Beide factoren zijn positieve echte breuken en hebben per som dezelfde noemer. De producten zijn exact teller × teller en noemer × noemer.
+- Er zijn geen extra uitlegstappen, visuele modellen of bedieningselementen toegevoegd.
+
+**Nieuwe taakbank en sessie**
+- Taakbank: `pacogo-engine/fraction-like-denominator-multiplication-task-bank.js`.
+- Sessie: `pacogo-engine/fraction-like-denominator-multiplication-session.js`.
+- Unit-test: `pacogo-engine/fraction-like-denominator-multiplication-session.test.js`.
+- De sessie valideert dat beide factoren echte breuken met dezelfde noemer zijn, controleert het exacte product, vraagt vereenvoudiging wanneer het product nog te vereenvoudigen is en bewaart voortgang per leerling met hervatten/reset.
+
+**Centrale interface en route**
+- De bestaande rij in Skills → Breuken → Vermenigvuldigen is gekoppeld aan route-ID `like-denominator-multiplication` en heeft één knop `Oefenen`.
+- De oefening hergebruikt de centrale PacoGO Page Template, centrale Fraction Practice Template, bestaande gestapelde breukweergave en `renderFractionAnswerInput()` met de bestaande vereenvoudigingsbediening.
+- Geen lokale breuktemplate, eigen antwoordvelden, eigen breukrenderer of nieuwe CSS toegevoegd.
+- Bestaande oefeningen en curriculum-/mastery-contracten, Supabase en LIVE `main` zijn niet gewijzigd.
+
+**Regressiebevinding en correctie**
+- Full Regression #3976 en #3977 waren rood door browserregressies in de nieuwe testflow; de eerste testopzet sloeg een som over bij het testen van de vereenvoudigingsstap. De sessietest is in commit `faf5415a0e79666fd974d3730d8b547e205c1322` in de juiste taakvolgorde gezet.
+- Full Regression #3978 op commit `c8a8f2531e2fec14fd12a96fec2a08937848b107` bleef rood: 102 browser-tests slaagden en één test faalde. De exacte oorzaak was dat de nieuwe vermenigvuldigingsoefening niet was opgenomen in de centrale `showingAnyPractice`-classificatie. Daardoor koos de centrale page template de standaardtitel/layout `Vermenigvuldigen` in plaats van de bestaande oefenmodus `Oefenen`.
+- De oorzaak is in de runtime gecorrigeerd, niet door de testverwachting te verlagen. De nieuwe oefening is toegevoegd aan de centrale practice-mode classificatie en heeft de bijbehorende centrale breadcrumb-subtitel gekregen.
+- Correctiecommit: `25cefb996a9a6e0dc4282099b10ae32a47193ce7`.
+- De Full Regression op de correctiecommit is nog niet geverifieerd. Noem deze wijziging niet groen voordat een volledige run op de exacte commit slaagt.
+
+**Actuele status**
+- Branch: `refactor/professional-v1`.
+- Laatste codecommit: `25cefb996a9a6e0dc4282099b10ae32a47193ce7`.
+- Laatste uitgevoerde Full Regression: #3978 — RED op de voorafgaande commit `c8a8f2531e2fec14fd12a96fec2a08937848b107`.
+- Laatste geverifieerde groene Full Regression blijft #3974 op `522a4c9ac1314cb7cbc634d811267c62a7cfe596`.
+- Deze handoff-update is zelf een repositorywijziging en moet eveneens worden geverifieerd op de resulterende commit.
+- LIVE `main` is onaangeroerd; geen deployment en geen Supabase-wijziging.
+
+**Volgende concrete stap**
+- Verifieer de runtimecorrectie én deze handoff-update met Full Regression op de exacte nieuwe handoff-commit.
+- Als de regressie rood is: stop, haal de exacte foutlog op en isoleer de oorzaak voordat er iets wordt aangepast.
+- Laat de gebruiker daarna de oefening visueel controleren in PacoGO TEST. Voeg geen volgende oefening of extra interface-elementen toe zonder expliciete opdracht.

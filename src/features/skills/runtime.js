@@ -242,7 +242,7 @@ export function createSkillsRuntime({
       { label: 'Een breuk vermenigvuldigen met een heel getal', level: 1 },
       { label: 'Heel getal vermenigvuldigen met een breukgetal kleiner dan 1', level: 1, exercise: 'whole-number-times-proper-fraction' },
       { label: 'Heel getal vermenigvuldigen met een breukgetal groter dan 1', level: 1, exercise: 'whole-number-times-mixed-fraction-greater-than-one' },
-      { label: 'Gelijknamige breuken kleiner dan 1 met elkaar vermenigvuldigen', level: 2 },
+      { label: 'Gelijknamige breuken kleiner dan 1 met elkaar vermenigvuldigen', level: 2, exercise: 'like-denominator-multiplication' },
       { label: 'Gelijknamige breuken groter dan 1 met elkaar vermenigvuldigen', level: 2 },
       { label: 'Ongelijknamige breuken kleiner dan 1 met elkaar vermenigvuldigen', level: 3 },
       { label: 'Ongelijknamige breuken groter dan 1 met elkaar vermenigvuldigen', level: 4 }

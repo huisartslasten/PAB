@@ -888,7 +888,7 @@ test('like-denominator subtraction opens from the central Skills route and runs 
       layoutMode: document.querySelector('.paco-page-template')?.dataset.layoutMode || '',
       template: Boolean(document.querySelector('[data-component="fraction-practice-template"]')),
       progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
-      symbolicFractions: [...document.querySelectorAll('.fraction-like-subtraction-equation .pacogo-fraction-representation--symbolic')].map(node => node.textContent.replace(/\\s+/g, ' ').trim()),
+      symbolicFractions: [...document.querySelectorAll('.fraction-like-subtraction-equation .pacogo-fraction-representation--symbolic')].map(node => node.getAttribute('aria-label') || ''),
       visualTerms: document.querySelectorAll('.pacogo-fraction-operation__term').length,
       simplifyControl: document.querySelector('.pacogo-fraction-answer__simplify')?.textContent || ''
     };
@@ -916,12 +916,13 @@ test('like-denominator subtraction opens from the central Skills route and runs 
   expect(result.initial.layoutMode).toBe('practice');
   expect(result.initial.template).toBe(true);
   expect(result.initial.progress).toContain('Som 1 van 15');
-  expect(result.initial.expression).toBe('8/9 − 3/9 = ?/?');
+  expect(result.initial.symbolicFractions).toEqual(['Eerste breuk: 8 gedeeld door 9', 'Tweede breuk: 3 gedeeld door 9']);
+  expect(result.initial.simplifyControl).toBe('Vereenvoudigen');
   expect(result.initial.visualTerms).toBe(0);
   expect(result.afterCorrect.progress).toContain('1 afgerond');
   expect(result.afterCorrect.feedback).toContain('Goed gedaan');
   expect(result.afterCorrect.next).toBe('Volgende som');
-  expect(result.secondExpression).toBe('7/10 − 4/10 = ?/?');
+  expect(result.secondSymbolicFractions).toEqual(['Eerste breuk: 7 gedeeld door 10', 'Tweede breuk: 4 gedeeld door 10']);
   expect(result.secondProgress).toContain('Som 2 van 15');
 });
 

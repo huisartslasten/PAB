@@ -8551,3 +8551,35 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 **Volgende concrete stap**
 - Verifieer deze handoff-update met Full Regression op de exacte nieuwe handoff-commit.
 - Daarna de gebruiker de nieuwe oefening visueel laten controleren in PacoGO TEST. Geen volgende oefening, extra UI-elementen of didactische toevoegingen bouwen zonder expliciete opdracht.
+
+## 22. Reparatie gemengde breuken bij vermenigvuldigen (18 november 2026)
+
+**Oorzaak**
+- De taakbank levert gemengde factoren aan als `{ whole, numerator, denominator }`.
+- De centrale renderer `renderMixedNumber()` verwacht expliciet `{ wholeNumber, numerator, denominator }`.
+- De nieuwe vermenigvuldigingsroute gaf de taakbankobjecten rechtstreeks door. Door de afwijkende veldnaam viel `wholeNumber` terug op de standaardwaarde 0, waardoor de hele getallen niet werden weergegeven en alleen de breukdelen zichtbaar bleven.
+- Dit was een contractmismatch aan de aanroepgrens; de centrale renderer en centrale templates zijn niet gewijzigd.
+
+**Reparatie**
+- In `src/features/skills/runtime.js` worden beide factoren nu expliciet naar het contract van `renderMixedNumber()` gemapt.
+- De oefening blijft de bestaande centrale PacoGO Page Template, Fraction Practice Template, `renderMixedNumber()` en `renderFractionAnswerInput()` gebruiken.
+- In `test/browser/skills-runtime.browser.test.js` is de browserregressie aangescherpt: zij controleert nu de zichtbare hele getallen `2` en `1`, aanwezigheid en zichtbaarheid van het verplichte hele-getalantwoordveld en verborgen status van de optionele knop.
+- Geen nieuwe UI, oefenvorm, didactiek, CSS, curriculumcontract, Supabase-wijziging of wijziging aan LIVE `main`.
+
+**Verificatie**
+- Full Regression #3988: GREEN / SUCCESS op exact codecommit `6c5494372d3250a22400c72e7c244b63255297fe`.
+- Gerichte browser proof #825: GREEN / SUCCESS op exact testcommit `3bb7c6b3fde264223afa358b5025fa27266a8947`.
+- Full Regression #3989 op testcommit `3bb7c6b3fde264223afa358b5025fa27266a8947` was bij deze handoff-update nog in uitvoering; niet als groen registreren.
+- De regressie na deze handoff-update moet opnieuw op de exacte handoff-commit worden uitgevoerd.
+
+**Actuele status**
+- Branch: `refactor/professional-v1`.
+- Codecommit: `6c5494372d3250a22400c72e7c244b63255297fe`.
+- Testcommit / branch head vóór deze handoff-update: `3bb7c6b3fde264223afa358b5025fa27266a8947`.
+- Laatste geverifieerde Full Regression: #3988 — GREEN op codecommit `6c5494372d3250a22400c72e7c244b63255297fe`.
+- Laatste gerichte browser proof: #825 — GREEN op testcommit `3bb7c6b3fde264223afa358b5025fa27266a8947`.
+- LIVE `main` onaangeroerd; geen deployment en geen Supabase-wijziging.
+
+**Volgende concrete stap**
+- Voer Full Regression uit op de nieuwe handoff-commit en controleer de exacte browserregressie.
+- Daarna de gebruiker de weergave in PacoGO TEST laten controleren. Geen andere oefeningen of interfaces wijzigen.

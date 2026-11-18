@@ -1931,7 +1931,7 @@ test('whole number divided by a mixed fraction greater than one uses the central
       taskCount: tasks.length,
       uniqueTasks: new Set(tasks.map(task => [task.wholeNumber, task.divisor.whole, task.divisor.numerator, task.divisor.denominator].join('|'))).size,
       wholeNumber: document.querySelector('.fraction-whole-mixed-expression__whole')?.textContent || '',
-      divisorParts: [...document.querySelectorAll('.fraction-whole-mixed-expression .pacogo-fraction-mixed-number__whole, .fraction-whole-mixed-expression .pacogo-fraction-mixed-number__numerator, .fraction-whole-mixed-expression .pacogo-fraction-mixed-number__denominator')].map(node => node.textContent),
+      divisorParts: [...document.querySelectorAll('.fraction-whole-mixed-expression .pacogo-fraction-mixed-number__whole, .fraction-whole-mixed-expression .pacogo-fraction-numerator, .fraction-whole-mixed-expression .pacogo-fraction-denominator')].map(node => node.textContent),
       wholeInputVisible: !document.querySelector('.pacogo-fraction-answer__whole-field')?.hidden,
       wholeToggleHidden: document.querySelector('.pacogo-fraction-answer__toggle')?.hidden,
       progress: document.querySelector('.fraction-practice-progress')?.textContent || '',

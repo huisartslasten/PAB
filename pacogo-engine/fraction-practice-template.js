@@ -50,21 +50,36 @@ function createFractionPracticeTemplate({
   controlsArea.setAttribute("aria-label", "Bediening");
   feedbackArea.setAttribute("aria-live", "polite");
 
-  // Enter in a single-line answer field performs the same explicit check action
-  // as activating the visible Controleren button. Textareas keep native Enter.
+  function showAction(label, onClick) {
+    if (typeof onClick !== "function") throw new TypeError("An action callback is required.");
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "paco-btn paco-btn--primary";
+    button.textContent = label;
+    button.addEventListener("click", onClick);
+    actionsArea.replaceChildren(button);
+    button.focus();
+    return button;
+  }
+
+  // Enter checks an active answer. Once a step is complete, the focused
+  // central next-action button remains keyboard-operable with native Enter.
   root.addEventListener("keydown", event => {
     if (event.key !== "Enter" || event.defaultPrevented) return;
     const target = event.target;
     if (!(target instanceof HTMLInputElement) || target.disabled || target.readOnly) return;
     if (["button", "submit", "reset", "checkbox", "radio", "file", "hidden"].includes(target.type)) return;
 
+    const nextButton = Array.from(actionsArea.querySelectorAll("button"))
+      .find(button => button.textContent.trim().replace(/\\s+/g, " ") === "Volgende som" && !button.disabled);
     const checkButton = [controlsArea, actionsArea]
       .flatMap(area => Array.from(area.querySelectorAll("button")))
       .find(button => button.textContent.trim().replace(/\\s+/g, " ") === "Controleren" && !button.disabled);
-    if (!checkButton) return;
+    const actionButton = nextButton || checkButton;
+    if (!actionButton) return;
 
     event.preventDefault();
-    checkButton.click();
+    actionButton.click();
   });
 
   appendNodes(contextArea, context, "context");
@@ -94,7 +109,9 @@ function createFractionPracticeTemplate({
     controlsArea,
     feedbackArea,
     actionsArea,
-    footnoteArea
+    footnoteArea,
+    showNextAction: onClick => showAction("Volgende som", onClick),
+    showRestartAction: onClick => showAction("Opnieuw oefenen", onClick)
   });
 }
 

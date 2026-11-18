@@ -160,6 +160,60 @@ test('Optellen in the fraction overview opens the eight-row addition overview wi
 });
 
 
+test('Vermenigvuldigen in the fraction overview opens the seven-row multiplication overview', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    let navigatedTo = '';
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {}, managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    const runtime = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', documentRef: document, navigate: target => { navigatedTo = String(target); }
+    });
+    await runtime.mount();
+    const tile = [...document.querySelectorAll('.paco-tile')].find(node =>
+      node.querySelector('.paco-tile-title')?.textContent === 'Vermenigvuldigen'
+    );
+    tile.querySelector('.paco-tile-action').click();
+    const overviewRuntime = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'vermenigvuldigen', documentRef: document, navigate: () => {}
+    });
+    await overviewRuntime.mount();
+    return {
+      navigation: navigatedTo,
+      title: document.querySelector('.paco-template-main h1')?.textContent || '',
+      labels: [...document.querySelectorAll('.skills-addition-overview-label')].map(node => node.textContent),
+      levels: [...document.querySelectorAll('.skills-addition-overview-row')].map(row => row.querySelectorAll('.paco-bone-difficulty__bone.is-filled').length),
+      bones: [...document.querySelectorAll('.skills-addition-overview-row')].map(row => row.querySelectorAll('.paco-bone-difficulty__bone').length),
+      centralCard: Boolean(document.querySelector('.skills-addition-overview.card')),
+      template: Boolean(document.querySelector('.paco-page-template'))
+    };
+  });
+  expect(result.navigation).toContain('topic=vermenigvuldigen');
+  expect(result.navigation).toContain('domain=fractions');
+  expect(result.title).toBe('Vermenigvuldigen');
+  expect(result.template).toBe(true);
+  expect(result.labels).toEqual([
+    'Een breuk vermenigvuldigen met een heel getal',
+    'Heel getal vermenigvuldigen met een breukgetal kleiner dan 1',
+    'Heel getal vermenigvuldigen met een breukgetal groter dan 1',
+    'Gelijknamige breuken kleiner dan 1 met elkaar vermenigvuldigen',
+    'Gelijknamige breuken groter dan 1 met elkaar vermenigvuldigen',
+    'Ongelijknamige breuken kleiner dan 1 met elkaar vermenigvuldigen',
+    'Ongelijknamige breuken groter dan 1 met elkaar vermenigvuldigen'
+  ]);
+  expect(result.levels).toEqual([1, 1, 1, 2, 2, 3, 4]);
+  expect(result.bones).toEqual([5, 5, 5, 5, 5, 5, 5]);
+  expect(result.centralCard).toBe(true);
+});
+
 test('first whole-number plus mixed-fraction practice uses the central page and fraction templates for 15 tasks', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=optellen', { waitUntil: 'domcontentloaded' });
   const result = await page.evaluate(async () => {

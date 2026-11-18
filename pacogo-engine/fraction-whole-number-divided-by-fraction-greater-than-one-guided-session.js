@@ -161,7 +161,7 @@ function createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession({
     const state = read();
     const responses = state.responsesByTask[task.id] || [];
     responses.push({
-      stepId: current.stepId, rawValue, classification,
+      stepId: current.stepId, rawValue: raw, classification,
       ...(current.stepId === "calculate_quotient" ? { values: values && typeof values === "object" ? { ...values } : {} } : {})
     });
     state.responsesByTask[task.id] = responses;

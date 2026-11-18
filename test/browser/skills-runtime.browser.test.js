@@ -1267,3 +1267,72 @@ test('unlike mixed-denominator subtraction uses the central fraction template an
   expect(result.feedback).toContain('correct');
   expect(result.next).toBe('Volgende som');
 });
+
+
+test('whole number times a proper fraction practice is connected to its multiplication overview row and uses the central templates for 15 tasks', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=vermenigvuldigen', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    localStorage.removeItem('pacogo:fraction-whole-number-times-proper-fraction:v1:Zyon');
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {}, managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    let navigation = '';
+    const overview = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'vermenigvuldigen', documentRef: document,
+      navigate: target => { navigation = String(target); }
+    });
+    await overview.mount();
+    const row = [...document.querySelectorAll('.skills-addition-overview-row')].find(item =>
+      item.querySelector('.skills-addition-overview-label')?.textContent === 'Heel getal vermenigvuldigen met een breukgetal kleiner dan 1'
+    );
+    const rowButtonCount = row.querySelectorAll('button').length;
+    row.querySelector('button')?.click();
+    const practice = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'vermenigvuldigen',
+      exercise: 'whole-number-times-proper-fraction', documentRef: document, navigate: () => {}
+    });
+    await practice.mount();
+    const expression = document.querySelector('.fraction-practice-equation');
+    const input = expression?.querySelector('input');
+    const initial = {
+      title: document.querySelector('.paco-template-main h1')?.textContent || '',
+      canonicalPage: Boolean(document.querySelector('.paco-page-template')),
+      fractionTemplate: Boolean(document.querySelector('[data-component="fraction-practice-template"]')),
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      expression: expression?.textContent || '',
+      fractionCount: expression?.querySelectorAll('.fraction-practice-fraction').length || 0,
+      slashNotation: expression?.textContent.includes('/') || false,
+      inputLabel: input?.getAttribute('aria-label') || '',
+      inputClass: input?.className || ''
+    };
+    input.value = '24';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    const feedback = document.querySelector('.fraction-practice-feedback')?.textContent || '';
+    document.querySelector('.pacogo-fraction-practice-template__actions button')?.click();
+    const secondExpression = document.querySelector('.fraction-practice-equation')?.textContent || '';
+    return { navigation, rowButtonCount, initial, feedback, secondExpression };
+  });
+  expect(result.navigation).toContain('exercise=whole-number-times-proper-fraction');
+  expect(result.navigation).toContain('topic=vermenigvuldigen');
+  expect(result.rowButtonCount).toBe(1);
+  expect(result.initial.title).toBe('Oefenen');
+  expect(result.initial.canonicalPage).toBe(true);
+  expect(result.initial.fractionTemplate).toBe(true);
+  expect(result.initial.progress).toContain('Som 1 van 15');
+  expect(result.initial.expression).toContain('36');
+  expect(result.initial.expression).toContain('×');
+  expect(result.initial.fractionCount).toBe(1);
+  expect(result.initial.slashNotation).toBe(false);
+  expect(result.initial.inputLabel).toBe('Uitkomst');
+  expect(result.initial.inputClass).toContain('fraction-practice-inline-input');
+  expect(result.feedback).toContain('Goed gedaan');
+  expect(result.secondExpression).toContain('48');
+});

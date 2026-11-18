@@ -8081,3 +8081,25 @@ De sessie-identiteit, vijftien opgaven, antwoordvalidatie, leerlingvoortgang en 
 Laatste geverifieerde baseline vóór deze wijziging: branch refactor/professional-v1, commit 4d4957aaa26b06c25f0e641bd79b6eedf9d01279, Full Regression #3934 SUCCESS (run 44208043593). Deze baseline bevat ook de meest recente correctie om niet-gevraagde visuele breukmodellen weg te laten.
 
 De taakbankwijziging moet op een nieuwe commit door Full Regression worden geverifieerd. Daarna moet ook de handoff-update zelf opnieuw worden getest. main blijft onaangeraakt.
+
+## 11. Verificatie taakbankvernieuwing en browserregressie (18 november 2026)
+
+**Correctie en verificatie**
+- De vijftien nieuwe gelijknamige breukenaftreksommen zijn geïmplementeerd in commit `eaf0253399e5e0898796e27e122b8dbc1dfdb2f5`.
+- Full Regression #3935 / run `44208897766` was **RED**. De breukbrowserregressie gebruikte nog de oude eerste som (`6/7 − 1/7`) en vulde daardoor het oude antwoord in. De test klikte vervolgens op een volgende-somknop die na een fout antwoord niet aanwezig was.
+- De precieze oorzaak van de afzonderlijke Flashcards-browserfout in #3935 is niet vastgesteld. Flashcards valt buiten deze wijziging en is niet aangepast.
+- Alleen de verouderde breukbrowserverwachtingen zijn gecorrigeerd in `test/browser/skills-runtime.browser.test.js`: eerste som `8/9 − 3/9`, correct antwoord `5/9`, tweede som `7/10 − 4/10`.
+- Correctiecommit: `86fab987853ed6523903706f43f3f3058471bc83`.
+- Full Regression #3936 / run `44209579765`: **GREEN / SUCCESS** op exact correctiecommit `86fab987853ed6523903706f43f3f3058471bc83`. Alle workflowstappen geslaagd, inclusief volledige browserregressie en clean-working-tree-controle.
+- Browser proof #805 is eveneens gestart op deze commit; Full Regression #3936 is de leidende volledige regressieverificatie.
+- Branch: `refactor/professional-v1`. LIVE `main) is niet gewijzigd; geen deployment of Supabase-wijziging.
+
+**Actuele status**
+- Laatste geverifieerde code-/testcommit: `86fab987853ed6523903706f43f3f3058471bc83`.
+- Laatste geverifieerde Full Regression: #3936 / run `44209579765` — **GREEN** op exact die commit.
+- Deze handoff-update is een nieuwe repositorywijziging en moet zelf door Full Regression worden geverifieerd op de resulterende commit.
+
+**Volgende concrete stap**
+- Verifieer deze handoff-update met Full Regression op de exacte nieuwe commit.
+- Daarna de gebruiker de vernieuwde 15-sommen-oefening visueel laten controleren in PacoGO TEST.
+- Geen verdere wijzigingen aan Flashcards, de centrale template of de sommen toevoegen zonder concrete aanleiding en expliciete opdracht.

@@ -1499,11 +1499,11 @@ export function createSkillsRuntime({
           feedback.textContent = feedbackMessage;
           template.feedbackArea.append(feedback);
         }
+        content.append(card);
         template.showNextAction(() => {
           awaitingNextTask = false;
           renderCurrentTask();
         });
-        content.append(card);
         return;
       }
 
@@ -1512,12 +1512,12 @@ export function createSkillsRuntime({
         done.className = 'fraction-practice-complete';
         done.textContent = 'Je hebt alle 10 sommen afgerond. Goed gewerkt!';
         template.workArea.append(done);
+        content.append(card);
         template.showRestartAction(() => {
           session.reset();
           awaitingNextTask = false;
           renderCurrentTask();
         });
-        content.append(card);
         return;
       }
 

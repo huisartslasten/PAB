@@ -1060,12 +1060,15 @@ test('like-denominator multiplication opens from the central Skills route and us
     document.querySelector('.pacogo-fraction-practice-template__actions button').click();
     const second = [...document.querySelectorAll('.construction-equation .pacogo-fraction-representation--symbolic')]
       .map(node => node.getAttribute('aria-label') || '');
-    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
     const setSecond = (part, value) => {
       const field = document.querySelector('[data-answer-part="' + part + '"]');
       field.value = value;
       field.dispatchEvent(new Event('input', { bubbles: true }));
     };
+    setSecond('primaryNumerator', '6');
+    setSecond('primaryDenominator', '25');
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
     setSecond('primaryNumerator', '8');
     setSecond('primaryDenominator', '49');
     document.querySelector('.pacogo-fraction-practice-template__actions button').click();

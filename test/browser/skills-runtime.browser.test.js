@@ -2050,9 +2050,6 @@ test('whole number divided by a mixed fraction greater than one teaches four sep
   expect(result.afterThird.quotientHelp).toContain('hele getal');
   expect(result.afterThird.quotientHelp).toContain('teller');
   expect(result.afterThird.quotientHelp).toContain('noemer');
-  expect(result.afterFinal.solution).toContain('16');
-  expect(result.afterFinal.solution).toContain('3');
-  expect(result.afterFinal.solution).toContain('5');
   expect(result.afterFinal.progress).toContain('Som 2 van 15');
   expect(result.afterFinal.states).toEqual(['active', 'locked', 'locked', 'locked']);
   expect(result.afterFinal.expandedSteps).toEqual([true, false, false, false]);

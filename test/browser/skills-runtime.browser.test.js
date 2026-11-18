@@ -1027,7 +1027,11 @@ test('like-denominator multiplication opens from the central Skills route and us
       progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
       sourceFractions: fractions.map(node => node.getAttribute('aria-label') || ''),
       simplify: document.querySelector('.pacogo-fraction-answer__simplify')?.textContent || '',
-      answerParts: [...document.querySelectorAll('[data-answer-part]')].map(node => node.dataset.answerPart),
+      answerParts: [...document.querySelectorAll('[data-answer-part]')]
+        .filter(node => !node.closest('[hidden]'))
+        .map(node => node.dataset.answerPart),
+      wholeNumberFieldHidden: Boolean(document.querySelector('[data-answer-part="whole"]')?.closest('[hidden]')),
+      wholeNumberToggleVisible: !document.querySelector('.pacogo-fraction-answer__toggle')?.hidden,
       taskCount: tasks.length,
       allLikeProper: tasks.every(task =>
         task.leftFraction.denominator === task.rightFraction.denominator &&
@@ -1091,7 +1095,9 @@ test('like-denominator multiplication opens from the central Skills route and us
     'Tweede breuk: 1 gedeeld door 3'
   ]);
   expect(result.initial.simplify).toBe('Vereenvoudigen');
-  expect(result.initial.answerParts).toEqual(['primaryNumerator','primaryDenominator','simplifiedNumerator','simplifiedDenominator']);
+  expect(result.initial.answerParts).toEqual(['primaryNumerator','primaryDenominator']);
+  expect(result.initial.wholeNumberFieldHidden).toBe(true);
+  expect(result.initial.wholeNumberToggleVisible).toBe(true);
   expect(result.initial.taskCount).toBe(15);
   expect(result.initial.allLikeProper).toBe(true);
   expect(result.initial.noSourceCopies).toBe(true);

@@ -12,16 +12,19 @@ function answerValues(task) {
   return { wholeNumberEnabled: true, wholeNumber: String(task.answer.whole), numerator: String(task.answer.numerator), denominator: String(task.answer.denominator) };
 }
 
-test("guided division exposes three ordered steps and validates the divisor conversion", () => {
+test("guided division exposes four ordered steps and validates each conversion separately", () => {
   const storage = memoryStorage();
   const session = createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession({ learnerKey: "Zyon", storage, tasks });
   const first = session.getCurrentStep();
-  assert.equal(first.stepId, "make_divisor_whole");
+  assert.equal(first.stepId, "convert_mixed_number");
   assert.equal(first.stepNumber, 1);
-  assert.equal(first.totalSteps, 3);
+  assert.equal(first.totalSteps, 4);
   assert.equal(first.divisorNumerator, 5);
   assert.equal(session.recordResponse({ rawValue: "4" }).classification, "incorrect_answer");
+  assert.equal(session.recordResponse({ rawValue: "5" }).classification, "valid");
   assert.equal(session.getCurrentStep().stepId, "make_divisor_whole");
+  assert.equal(session.getCurrentStep().expression, "5/2 × 2 = ?");
+  assert.equal(session.recordResponse({ rawValue: "4" }).classification, "incorrect_answer");
   assert.equal(session.recordResponse({ rawValue: "5" }).classification, "valid");
   assert.equal(session.getCurrentStep().stepId, "scale_dividend");
   assert.equal(session.getCurrentStep().scaledDividend, 16);
@@ -32,12 +35,13 @@ test("guided division exposes three ordered steps and validates the divisor conv
   assert.equal(session.recordResponse({ values: answerValues(tasks[0]) }).classification, "valid");
   assert.equal(session.getCurrentStep().taskNumber, 2);
   assert.equal(session.getCurrentStep().stepNumber, 1);
-  assert.deepEqual(session.getProgress(), { completedCount: 1, totalCount: 15, completedStepCount: 3, totalStepCount: 45, attemptCount: 5, isComplete: false });
+  assert.deepEqual(session.getProgress(), { completedCount: 1, totalCount: 15, completedStepCount: 4, totalStepCount: 60, attemptCount: 7, isComplete: false });
 });
 
 test("guided division requires simplified mixed-number answers and resumes per learner", () => {
   const storage = memoryStorage();
   const session = createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession({ learnerKey: "learner-a", storage, tasks });
+  session.recordResponse({ rawValue: String(tasks[0].divisor.whole * tasks[0].divisor.denominator + tasks[0].divisor.numerator) });
   session.recordResponse({ rawValue: String(tasks[0].divisor.whole * tasks[0].divisor.denominator + tasks[0].divisor.numerator) });
   session.recordResponse({ rawValue: String(tasks[0].wholeNumber * tasks[0].divisor.denominator) });
   assert.equal(session.recordResponse({ values: { ...answerValues(tasks[0]), numerator: "2", denominator: "10" } }).classification, "requires_simplification");
@@ -54,12 +58,13 @@ test("guided division completes exactly fifteen tasks and resets", () => {
   for (const task of tasks) {
     const divisorNumerator = task.divisor.whole * task.divisor.denominator + task.divisor.numerator;
     assert.equal(session.recordResponse({ rawValue: String(divisorNumerator) }).classification, "valid");
+    assert.equal(session.recordResponse({ rawValue: String(divisorNumerator) }).classification, "valid");
     assert.equal(session.recordResponse({ rawValue: String(task.wholeNumber * task.divisor.denominator) }).classification, "valid");
     assert.equal(session.recordResponse({ values: answerValues(task) }).classification, "valid");
   }
   assert.equal(session.getCurrentStep(), null);
   assert.equal(session.getProgress().isComplete, true);
-  assert.equal(session.getProgress().completedStepCount, 45);
+  assert.equal(session.getProgress().completedStepCount, 60);
   session.reset();
   assert.equal(session.getCurrentStep().taskNumber, 1);
 });
@@ -70,7 +75,7 @@ test("guided division rejects invalid task banks and corrupt saved step sequence
   const invalid = tasks.map((task, i) => i ? task : { ...task, answer: { whole: 1, numerator: 1, denominator: 2 } });
   assert.throws(() => createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession({ learnerKey: "x", storage, tasks: invalid }), /incorrect answer/);
   storage.setItem("pacogo:fraction-whole-number-divided-by-fraction-greater-than-one-guided:v1:bad", JSON.stringify({
-    schemaVersion: 1, completedTaskIds: [], completedStepIdsByTask: { [tasks[0].id]: ["scale_dividend"] }, responsesByTask: {}
+    schemaVersion: 2, completedTaskIds: [], completedStepIdsByTask: { [tasks[0].id]: ["make_divisor_whole"] }, responsesByTask: {}
   }));
   const corrupted = createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession({ learnerKey: "bad", storage, tasks });
   assert.throws(() => corrupted.getCurrentStep(), /invalid step sequence/);
@@ -81,4 +86,14 @@ test("guided division uses a separate set of fifteen tasks from the independent 
   assert.equal(tasks.length, 15);
   assert.equal(new Set(tasks.map(task => [task.wholeNumber, task.divisor.whole, task.divisor.numerator, task.divisor.denominator].join("|"))).size, 15);
   assert.equal(tasks.every(task => !independent.has([task.wholeNumber, task.divisor.whole, task.divisor.numerator, task.divisor.denominator].join("|"))), true);
+});
+
+test("guided division keeps legacy three-step progress untouched when the four-step session starts", () => {
+  const storage = memoryStorage();
+  const legacyKey = "pacogo:fraction-whole-number-divided-by-fraction-greater-than-one-guided:v1:Zyon";
+  const legacyValue = JSON.stringify({ schemaVersion: 1, completedTaskIds: ["legacy-task"], completedStepIdsByTask: {}, responsesByTask: {} });
+  storage.setItem(legacyKey, legacyValue);
+  const session = createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession({ learnerKey: "Zyon", storage, tasks });
+  assert.equal(session.getCurrentStep().stepId, "convert_mixed_number");
+  assert.equal(storage.getItem(legacyKey), legacyValue);
 });

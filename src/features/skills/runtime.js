@@ -1672,8 +1672,11 @@ export function createSkillsRuntime({
             activeInput.setAttribute('aria-label', 'Deler als heel getal');
             expression.append(activeInput);
           } else if (stepId === 'scale_dividend') {
+            const dividend = documentRef.createElement('span');
+            dividend.className = 'fraction-guided-step-number';
+            dividend.textContent = String(step.task.wholeNumber);
             expression.append(
-              documentRef.createTextNode(String(step.task.wholeNumber)),
+              dividend,
               op('× ' + step.task.divisor.denominator + '='),
             );
             activeInput = documentRef.createElement('input');

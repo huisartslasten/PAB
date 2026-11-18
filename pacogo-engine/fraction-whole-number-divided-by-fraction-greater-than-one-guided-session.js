@@ -126,7 +126,7 @@ function createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession({
       step.prompt = "Zet het gemengde getal om in een onechte breuk. De noemer blijft hetzelfde.";
       step.expression = "Gemengd getal omzetten naar een onechte breuk";
     } else if (stepId === "make_divisor_whole") {
-      step.prompt = "Vermenigvuldig de onechte breuk met de noemer. Zo maak je de deler een heel getal.";
+      step.prompt = "Vermenigvuldig de breuk met 7. De 7 onder de breuk verdwijnt. Welk getal blijft over?";
       step.expression = divisorNumerator + "/" + task.divisor.denominator + " × " + task.divisor.denominator + " = ?";
     } else if (stepId === "scale_dividend") {
       step.prompt = "Vermenigvuldig het hele getal met dezelfde factor als waarmee je de deler hebt vergroot.";

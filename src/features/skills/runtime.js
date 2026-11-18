@@ -1472,7 +1472,7 @@ export function createSkillsRuntime({
       const progress = session.getProgress();
       content.replaceChildren();
       const card = documentRef.createElement('section');
-      card.className = 'card fraction-whole-mixed-addition-card fraction-addition-guided-card';
+      card.className = 'card fraction-whole-mixed-addition-card fraction-addition-guided-card fraction-whole-number-divided-guided-card';
       const template = createFractionPracticeTemplate({ mount: card });
       const title = documentRef.createElement('h2');
       title.textContent = exercise.title;

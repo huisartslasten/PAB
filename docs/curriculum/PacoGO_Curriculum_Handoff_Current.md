@@ -8616,18 +8616,58 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 **Tests en verificatie**
 - Full Regression #3995 / run `44351342108`: **GREEN / SUCCESS** op runtimecommit `0d790acd4890e13713232169f64f20679b0ebc81`. Node-, curriculum-engine-, architectuur- en browserregressiestappen zijn geslaagd.
 - De browser-testcommit is `56d27cb52c96d860505fecbe662514354ff8433b`.
-- Full Regression #3996 / run `44351350523` op `56d27cb52c96d860505fecbe662514354ff8433b`: op moment van deze handoff-update nog bezig met de browserregressie; niet als groen registreren.
-- Gerichte Browser Proof #826 / run `44351350710` op dezelfde testcommit: nog in uitvoering; niet als groen registreren.
-- Deze handoff-update moet zelf door Full Regression op de resulterende commit worden geverifieerd.
+- Full Regression #3996 / run `44351350523`: **GREEN / SUCCESS** op exact testcommit `56d27cb52c96d860505fecbe662514354ff8433b`.
+- Gerichte Browser Proof #826 / run `44351350710`: **GREEN / SUCCESS** op dezelfde testcommit.
+- Full Regression #3997 / run `44351748619`: **GREEN / SUCCESS** op exact handoffcommit `5380c503e25c573da8b3c1f76347533e6adf44e2`.
 
 **Actuele status**
 - Branch: `refactor/professional-v1`.
 - Runtimecommit: `0d790acd4890e13713232169f64f20679b0ebc81`.
 - Browser-testcommit / branch HEAD vóór deze handoff-update: `56d27cb52c96d860505fecbe662514354ff8433b`.
-- Laatste volledig geverifieerde Full Regression: #3995 — GREEN op runtimecommit `0d790acd4890e13713232169f64f20679b0ebc81`.
-- Full Regression #3996 en Browser Proof #826 zijn nog in uitvoering.
+- Laatste volledig geverifieerde Full Regression: #3997 — GREEN op handoffcommit `5380c503e25c573da8b3c1f76347533e6adf44e2`.
+- De oefening is ook volledig geverifieerd via Full Regression #3996 en Browser Proof #826.
 - LIVE `main` onaangeroerd; geen deployment en geen Supabase-wijziging.
 
 **Volgende concrete stap**
 - Controleer Full Regression op de nieuwe handoff-commit en wacht op de volledige browserregressie voor testcommit `56d27cb52c96d860505fecbe662514354ff8433b`.
+- Laat de gebruiker daarna de oefening visueel controleren in PacoGO TEST. Voeg geen volgende oefening of extra interface-elementen toe zonder expliciete opdracht.
+
+## 25. Breuken → Vermenigvuldigen → Ongelijknamige breuken groter dan 1 vermenigvuldigen (18 november 2026)
+
+**Opdracht en brongebruik**
+- De gebruiker vroeg de volgende oefening met exact 15 sommen.
+- De vijf screenshots tonen gemengde getallen met verschillende noemers. Ze zijn gebruikt als inspiratie voor de opgavevorm; geen van de getoonde sommen is één-op-één overgenomen.
+- De 15 nieuwe opgaven vermenigvuldigen telkens twee gemengde getallen groter dan 1 met ongelijke noemers.
+- De producten zijn exact berekend en als gemengd getal genormaliseerd. De sessie controleert of het breukdeel volledig is vereenvoudigd wanneer dat nodig is.
+
+**Taakbank en sessie**
+- Taakbank: `pacogo-engine/fraction-mixed-unlike-denominator-multiplication-task-bank.js`.
+- Sessie: `pacogo-engine/fraction-mixed-unlike-denominator-multiplication-session.js`.
+- Unit-test: `pacogo-engine/fraction-mixed-unlike-denominator-multiplication-session.test.js`.
+- De sessie valideert dat beide factoren gemengde getallen groter dan 1 zijn, de noemers verschillend zijn, het opgegeven product exact klopt, de antwoordvorm geldig is, vereenvoudiging indien nodig correct wordt ingevoerd en voortgang per leerling wordt opgeslagen/hervat.
+
+**Centrale interface en route**
+- De bestaande overzichtsrij `Ongelijknamige breuken groter dan 1 met elkaar vermenigvuldigen` is gekoppeld aan route-ID `mixed-unlike-denominator-multiplication`.
+- De oefening gebruikt de centrale PacoGO Page Template, `createFractionPracticeTemplate()`, `renderMixedNumber()` en `renderFractionAnswerInput()`.
+- Het hele getal is verplicht zichtbaar als onderdeel van de antwoordvorm; de optionele knop `Heel getal toevoegen` blijft verborgen.
+- De centrale `Vereenvoudigen`-bediening wordt hergebruikt.
+- Geen lokale breuktemplate, eigen antwoordvelden, nieuwe CSS, extra visualisaties, extra bediening, curriculumcontracten, Supabase-wijziging of wijziging aan LIVE `main`.
+
+**Tests en verificatie**
+- Full Regression #4000 / run `44354002760`: **GREEN / SUCCESS** op taakbank-/sessiecommit `7ee4e94c3a6b88fb1fc985d6a66c9079885272ee`.
+- Full Regression #4001 / run `44354068189`: **GREEN / SUCCESS** op runtimecommit `c187265adf6b83f934c3c3926fe34c113cf2d4d7`.
+- Gerichte Browser Proof #827 / run `44354123617`: **GREEN / SUCCESS** op exact testcommit `d499b40ff937dbf7fa4490d28c1872ee59bd813f`.
+- Full Regression #4002 / run `44354123770`: **GREEN / SUCCESS** op exact testcommit `d499b40ff937dbf7fa4490d28c1872ee59bd813f`. De browserregressie rapporteerde 106 geslaagde tests; de working-tree-controle slaagde.
+- De nieuwe handoff-update moet zelf door Full Regression op de resulterende commit worden geverifieerd.
+
+**Actuele status**
+- Branch: `refactor/professional-v1`.
+- Runtimecommit: `c187265adf6b83f934c3c3926fe34c113cf2d4d7`.
+- Testcommit / branch HEAD vóór deze handoff-update: `d499b40ff937dbf7fa4490d28c1872ee59bd813f`.
+- Laatste volledig geverifieerde Full Regression: #4002 — **GREEN / SUCCESS** op exact testcommit `d499b40ff937dbf7fa4490d28c1872ee59bd813f`.
+- Laatste gerichte browser proof: #827 — **GREEN / SUCCESS** op hetzelfde testcommit.
+- LIVE `main` onaangeroerd; geen deployment en geen Supabase-wijziging.
+
+**Volgende concrete stap**
+- Verifieer de nieuwe handoff-commit met Full Regression.
 - Laat de gebruiker daarna de oefening visueel controleren in PacoGO TEST. Voeg geen volgende oefening of extra interface-elementen toe zonder expliciete opdracht.

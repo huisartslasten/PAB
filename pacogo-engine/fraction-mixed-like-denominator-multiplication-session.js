@@ -18,11 +18,12 @@ function createFractionMixedLikeDenominatorMultiplicationSession({learnerKey,sto
  function getProgress(){const state=read(),completedCount=state.completedTaskIds.length;return Object.freeze({completedCount,totalCount:15,attemptCount:Object.values(state.attemptsByTask).reduce((a,b)=>a+b,0),isComplete:completedCount===15});}
  function recordAnswer({wholeNumberEnabled=false,wholeNumber="",numerator,denominator,simplified=false,simplifiedNumerator,simplifiedDenominator}={}){const task=getCurrentTask();if(!task)throw new Error("The multiplication practice is complete.");
   const integer=v=>/^[0-9]+$/.test(String(v??"").trim())?Number(String(v).trim()):NaN,whole=wholeNumberEnabled?integer(wholeNumber):NaN,n=integer(numerator),d=integer(denominator);let classification="incorrect_answer";
+  const expected={wholeNumber:task.result.whole,numerator:task.result.numerator,denominator:task.result.denominator};
   const shape=wholeNumberEnabled&&Number.isSafeInteger(whole)&&whole>=0&&Number.isSafeInteger(n)&&n>=0&&Number.isSafeInteger(d)&&d>n&&d>0;
-  if(!shape)classification="invalid_input";else if(!areEquivalentFractionValues({wholeNumber:whole,numerator:n,denominator:d},task.result))classification="incorrect_answer";
+  if(!shape)classification="invalid_input";else if(!areEquivalentFractionValues({wholeNumber:whole,numerator:n,denominator:d},expected))classification="incorrect_answer";
   else if(!isFractionInLowestTerms(n,d)&&!simplified)classification="simplification_required";
   else if(simplified){const sn=integer(simplifiedNumerator),sd=integer(simplifiedDenominator);if(!Number.isSafeInteger(sn)||!Number.isSafeInteger(sd)||sn<0||sd<=sn||sd<=0)classification="invalid_simplification";
-   else if(!isFractionInLowestTerms(sn,sd)||whole!==task.result.whole||!areEquivalentFractionValues({numerator:sn,denominator:sd},{numerator:n,denominator:d})||!areEquivalentFractionValues({wholeNumber:whole,numerator:sn,denominator:sd},task.result))classification="incorrect_simplification";else classification="valid";}
+   else if(!isFractionInLowestTerms(sn,sd)||whole!==task.result.whole||!areEquivalentFractionValues({numerator:sn,denominator:sd},{numerator:n,denominator:d})||!areEquivalentFractionValues({wholeNumber:whole,numerator:sn,denominator:sd},expected))classification="incorrect_simplification";else classification="valid";}
   else classification="valid";const state=read();state.attemptsByTask[task.id]=(state.attemptsByTask[task.id]||0)+1;if(classification==="valid"&&!state.completedTaskIds.includes(task.id))state.completedTaskIds.push(task.id);storage.setItem(key,JSON.stringify(state));return Object.freeze({classification,correct:classification==="valid",progress:getProgress()});}
  function reset(){storage.removeItem(key);}return Object.freeze({getCurrentTask,getProgress,recordAnswer,reset});
 }

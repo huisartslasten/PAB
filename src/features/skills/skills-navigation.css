@@ -92,6 +92,7 @@
 .fraction-guided-step-grid--progressive .fraction-guided-step-card[data-state="completed"] .pacogo-fraction-representation--symbolic{font-size:17px}
 .fraction-guided-step-grid--progressive .fraction-guided-step-card[data-state="active"] .fraction-guided-step-expression{justify-content:flex-start;flex-wrap:wrap;gap:8px}
 .fraction-guided-step-grid--progressive .fraction-guided-scalar-input{width:52px;min-width:52px;max-width:52px;height:38px;font-size:20px}
+.paco-page-template .fraction-guided-step-grid--progressive .fraction-guided-scalar-input{width:52px;min-width:52px;max-width:52px;flex:0 0 52px;box-sizing:border-box}
 .fraction-whole-number-divided-guided-card .fraction-guided-step-grid--progressive .fraction-guided-scalar-input{width:88px;min-width:88px;max-width:88px;height:38px;font-size:20px}
 .paco-page-template .fraction-whole-number-divided-guided-card .fraction-guided-step-grid--progressive .fraction-guided-scalar-input{width:88px;min-width:88px;max-width:88px;flex:0 0 88px;box-sizing:border-box}
 .fraction-whole-number-divided-guided-card .fraction-guided-solution .fraction-whole-mixed-expression__whole{font:800 30px/1.1 "Baloo 2",Nunito,sans-serif}

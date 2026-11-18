@@ -855,11 +855,12 @@ test('fraction subtraction overview keeps the original exercise and adds the sep
     'Ongelijknamige breuken kleiner dan 1 van elkaar aftrekken',
     'Ongelijknamige breuken groter dan 1 van elkaar aftrekken'
   ]);
-  expect(result.exerciseButtonCount).toBe(3);
-  expect(result.navigations).toHaveLength(3);
+  expect(result.exerciseButtonCount).toBe(4);
+  expect(result.navigations).toHaveLength(4);
   expect(result.navigations[0]).toContain('exercise=whole-minus-mixed-subtraction');
   expect(result.navigations[1]).toContain('exercise=whole-minus-greater-than-one-subtraction');
   expect(result.navigations[2]).toContain('exercise=like-denominator-subtraction');
+  expect(result.navigations[3]).toContain('exercise=mixed-like-denominator-subtraction');
 });
 
 

@@ -1952,10 +1952,10 @@ test('the original whole-number division practice remains available without guid
   expect(result.progress).toContain('Som 2 van 15');
 });
 
-test('whole number divided by a mixed fraction greater than one reuses the central guided-step and fraction templates for fifteen tasks', async ({ page }) => {
+test('whole number divided by a mixed fraction greater than one teaches four separate steps in the central guided-step and fraction templates', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=delen', { waitUntil: 'domcontentloaded' });
   const result = await page.evaluate(async () => {
-    localStorage.removeItem('pacogo:fraction-whole-number-divided-by-fraction-greater-than-one-guided:v1:Zyon');
+    localStorage.removeItem('pacogo:fraction-whole-number-divided-by-fraction-greater-than-one-guided:v2:Zyon');
     const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
     const { FRACTION_WHOLE_NUMBER_DIVIDED_BY_FRACTION_GREATER_THAN_ONE_GUIDED_TASKS: tasks } =
       await import('/pacogo-engine/fraction-whole-number-divided-by-fraction-greater-than-one-guided-task-bank.js');
@@ -1988,22 +1988,27 @@ test('whole number divided by a mixed fraction greater than one reuses the centr
       stepCount: document.querySelectorAll('.fraction-guided-step-card').length,
       states: [...document.querySelectorAll('.fraction-guided-step-card')].map(node => node.dataset.state),
       stepIds: [...document.querySelectorAll('.fraction-guided-step-card')].map(node => node.dataset.stepId),
+      progressive: document.querySelector('.fraction-guided-step-grid')?.classList.contains('fraction-guided-step-grid--progressive') || false,
+      conversionDenominator: document.querySelector('[data-step-id="convert_mixed_number"] .pacogo-fraction-denominator')?.textContent || '',
       expression: document.querySelector('.fraction-guided-task-prompt')?.textContent || ''
     });
     const initial = snapshot();
     const fill = (selector, value) => { const input = document.querySelector(selector); input.value = String(value); };
     const check = () => document.querySelector('.fraction-guided-step-card[data-state="active"] button').click();
-    fill('.fraction-guided-step-card[data-step-id="make_divisor_whole"] .fraction-guided-scalar-input', 5);
+    fill('.fraction-guided-step-card[data-step-id="convert_mixed_number"] [data-fraction-step-answer="true"]', 5);
     check();
     const afterFirst = snapshot();
-    fill('.fraction-guided-step-card[data-step-id="scale_dividend"] .fraction-guided-scalar-input', 16);
+    fill('.fraction-guided-step-card[data-step-id="make_divisor_whole"] .fraction-guided-scalar-input', 5);
     check();
     const afterSecond = snapshot();
+    fill('.fraction-guided-step-card[data-step-id="scale_dividend"] .fraction-guided-scalar-input', 16);
+    check();
+    const afterThird = snapshot();
     fill('.fraction-guided-step-card[data-step-id="calculate_quotient"] [data-answer-part="whole"]', 3);
     fill('.fraction-guided-step-card[data-step-id="calculate_quotient"] [data-answer-part="primaryNumerator"]', 1);
     fill('.fraction-guided-step-card[data-step-id="calculate_quotient"] [data-answer-part="primaryDenominator"]', 5);
     check();
-    return { initial, afterFirst, afterSecond, afterFinal: snapshot(),
+    return { initial, afterFirst, afterSecond, afterThird, afterFinal: snapshot(),
       feedback: document.querySelector('.fraction-practice-feedback')?.textContent || '' };
   });
   expect(result.initial.pageTitle).toBe('Oefenen');
@@ -2014,14 +2019,17 @@ test('whole number divided by a mixed fraction greater than one reuses the centr
   expect(result.initial.differentFromIndependentTasks).toBe(true);
   expect(result.initial.uniqueTasks).toBe(15);
   expect(result.initial.progress).toContain('Som 1 van 15');
-  expect(result.initial.stepCount).toBe(3);
-  expect(result.initial.states).toEqual(['active', 'locked', 'locked']);
-  expect(result.initial.stepIds).toEqual(['make_divisor_whole', 'scale_dividend', 'calculate_quotient']);
+  expect(result.initial.stepCount).toBe(4);
+  expect(result.initial.states).toEqual(['active', 'locked', 'locked', 'locked']);
+  expect(result.initial.stepIds).toEqual(['convert_mixed_number', 'make_divisor_whole', 'scale_dividend', 'calculate_quotient']);
+  expect(result.initial.progressive).toBe(true);
+  expect(result.initial.conversionDenominator).toBe('2');
   expect(result.initial.expression).toContain('8');
   expect(result.initial.expression).toContain('2');
-  expect(result.afterFirst.states).toEqual(['completed', 'active', 'locked']);
-  expect(result.afterSecond.states).toEqual(['completed', 'completed', 'active']);
+  expect(result.afterFirst.states).toEqual(['completed', 'active', 'locked', 'locked']);
+  expect(result.afterSecond.states).toEqual(['completed', 'completed', 'active', 'locked']);
+  expect(result.afterThird.states).toEqual(['completed', 'completed', 'completed', 'active']);
   expect(result.afterFinal.progress).toContain('Som 2 van 15');
-  expect(result.afterFinal.states).toEqual(['active', 'locked', 'locked']);
+  expect(result.afterFinal.states).toEqual(['active', 'locked', 'locked', 'locked']);
   expect(result.feedback).toContain('Goed gedaan');
 });

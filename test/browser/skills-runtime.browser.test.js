@@ -2005,6 +2005,7 @@ test('whole number divided by a mixed fraction greater than one teaches four sep
       activeInputWidth: document.querySelector('.fraction-guided-step-card[data-state="active"] .fraction-guided-scalar-input')
         ? document.querySelector('.fraction-guided-step-card[data-state="active"] .fraction-guided-scalar-input').getBoundingClientRect().width : 0,
       activeStepPrompt: document.querySelector('.fraction-guided-step-card[data-state="active"] .fraction-guided-step-prompt')?.textContent || '',
+      scaleDividendFontWeight: document.querySelector('.fraction-guided-step-card[data-step-id="scale_dividend"] .fraction-guided-step-number') ? getComputedStyle(document.querySelector('.fraction-guided-step-card[data-step-id="scale_dividend"] .fraction-guided-step-number')).fontWeight : '',
       quotientHelp: document.querySelector('.fraction-guided-quotient-help')?.textContent || '',
       nextAction: document.querySelector('.pacogo-fraction-practice-template__actions button')?.textContent || '',
       completeMessage: document.querySelector('.fraction-practice-complete')?.textContent || ''
@@ -2050,6 +2051,7 @@ test('whole number divided by a mixed fraction greater than one teaches four sep
   expect(result.afterSecond.states).toEqual(['completed', 'completed', 'active', 'locked']);
   expect(result.afterSecond.expandedSteps).toEqual([false, false, true, false]);
   expect(result.afterThird.states).toEqual(['completed', 'completed', 'completed', 'active']);
+  expect(result.afterSecond.scaleDividendFontWeight).toBe('800');
   expect(result.afterThird.expandedSteps).toEqual([false, false, false, true]);
   expect(result.afterFirst.solution).toContain('8');
   expect(result.afterFirst.solution).toContain('5');

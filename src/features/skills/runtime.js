@@ -13,6 +13,7 @@ import { FRACTION_WHOLE_NUMBER_TIMES_MIXED_FRACTION_GREATER_THAN_ONE_TASKS } fro
 import { createFractionWholeNumberTimesMixedFractionGreaterThanOneSession } from '../../../pacogo-engine/fraction-whole-number-times-mixed-fraction-greater-than-one-session.js';
 import { FRACTION_WHOLE_NUMBER_DIVIDED_BY_FRACTION_GREATER_THAN_ONE_TASKS } from '../../../pacogo-engine/fraction-whole-number-divided-by-fraction-greater-than-one-task-bank.js';
 import { createFractionWholeNumberDividedByFractionGreaterThanOneSession } from '../../../pacogo-engine/fraction-whole-number-divided-by-fraction-greater-than-one-session.js';
+import { createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession } from '../../../pacogo-engine/fraction-whole-number-divided-by-fraction-greater-than-one-guided-session.js';
 import { createFractionLikeDenominatorSubtractionSession } from '../../../pacogo-engine/fraction-like-denominator-subtraction-session.js';
 import { FRACTION_LIKE_DENOMINATOR_MULTIPLICATION_TASKS } from '../../../pacogo-engine/fraction-like-denominator-multiplication-task-bank.js';
 import { createFractionLikeDenominatorMultiplicationSession } from '../../../pacogo-engine/fraction-like-denominator-multiplication-session.js';
@@ -1344,24 +1345,26 @@ export function createSkillsRuntime({
 
   function renderWholeNumberDividedByFractionGreaterThanOnePractice() {
     const learnerKey = student || context?.learnerId || 'local-learner';
-    const session = createFractionWholeNumberDividedByFractionGreaterThanOneSession({
+    const session = createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession({
       learnerKey,
       tasks: FRACTION_WHOLE_NUMBER_DIVIDED_BY_FRACTION_GREATER_THAN_ONE_TASKS
     });
     const exercise = { title: 'Heel getal delen door een breukgetal groter dan 1', difficultyLevel: 1, maxDifficultyLevel: 5 };
+    const stepIds = ['make_divisor_whole', 'scale_dividend', 'calculate_quotient'];
+    const stepLabels = ['Vergroot de breuk', 'Vergroot het hele getal', 'Reken de som uit'];
 
-    function renderCurrentTask() {
-      const task = session.getCurrentTask();
+    function renderCurrentTask(feedbackMessage = '') {
+      const step = session.getCurrentStep();
       const progress = session.getProgress();
       content.replaceChildren();
       const card = documentRef.createElement('section');
-      card.className = 'card fraction-whole-mixed-addition-card';
+      card.className = 'card fraction-whole-mixed-addition-card fraction-addition-guided-card';
       const template = createFractionPracticeTemplate({ mount: card });
       const title = documentRef.createElement('h2');
       title.textContent = exercise.title;
       const instruction = documentRef.createElement('p');
       instruction.className = 'fraction-practice-instruction';
-      instruction.textContent = 'Deel het hele getal door het gemengde getal. Geef je antwoord als gemengd getal.';
+      instruction.textContent = 'Werk de drie stappen één voor één af. Je gaat pas verder als je de huidige stap goed hebt gedaan.';
       const progressLabel = documentRef.createElement('p');
       progressLabel.className = 'fraction-practice-progress';
       progressLabel.textContent = formatFractionPracticeProgress(progress, exercise);
@@ -1369,7 +1372,7 @@ export function createSkillsRuntime({
       template.instructionArea.append(instruction);
       template.progressArea.append(progressLabel);
 
-      if (!task) {
+      if (!step) {
         const done = documentRef.createElement('p');
         done.className = 'fraction-practice-complete';
         done.textContent = 'Je hebt alle 15 sommen afgerond. Goed gewerkt!';
@@ -1378,79 +1381,206 @@ export function createSkillsRuntime({
         return;
       }
 
-      const equation = documentRef.createElement('div');
-      equation.className = 'fraction-whole-mixed-equation';
-      const expression = documentRef.createElement('div');
-      expression.className = 'fraction-whole-mixed-expression';
+      const op = value => Object.assign(documentRef.createElement('span'), {
+        className: 'fraction-guided-operator', textContent: value
+      });
+      const prompt = documentRef.createElement('div');
+      prompt.className = 'fraction-guided-task-prompt fraction-whole-mixed-expression';
       const whole = documentRef.createElement('span');
       whole.className = 'fraction-whole-mixed-expression__whole';
-      whole.textContent = String(task.wholeNumber);
-      const divide = documentRef.createElement('span');
-      divide.className = 'fraction-whole-mixed-expression__operator';
-      divide.textContent = '÷';
-      expression.append(
-        whole,
-        divide,
+      whole.textContent = String(step.task.wholeNumber);
+      prompt.append(
+        whole, op('÷'),
         renderMixedNumber({
-          wholeNumber: task.divisor.whole,
-          numerator: task.divisor.numerator,
-          denominator: task.divisor.denominator
+          wholeNumber: step.task.divisor.whole,
+          numerator: step.task.divisor.numerator,
+          denominator: step.task.divisor.denominator
         }, 'Gemengd getal')
       );
-      const equals = documentRef.createElement('span');
-      equals.className = 'fraction-whole-mixed-expression__operator';
-      equals.textContent = '=';
-      const answerMount = documentRef.createElement('div');
-      answerMount.className = 'fraction-whole-mixed-answer';
-      equation.append(expression, equals, answerMount);
-      template.workArea.append(equation);
+      const solution = documentRef.createElement('div');
+      solution.className = 'fraction-guided-solution';
+      solution.setAttribute('aria-label', 'Uitwerking van de deling');
+      if (step.completedStepIds.includes('make_divisor_whole')) {
+        solution.append(op('='));
+        solution.append(renderFractionRepresentation({
+          numerator: step.divisorNumerator, denominator: step.task.divisor.denominator
+        }, 'symbolic_fraction', 'Gemengde breuk omgezet naar een onechte breuk'));
+        solution.append(op('× ' + step.task.divisor.denominator + ' = ' + step.divisorNumerator));
+      }
+      if (step.completedStepIds.includes('scale_dividend')) {
+        solution.append(op('→ ' + step.scaledDividend + ' ÷ ' + step.divisorNumerator));
+      }
+      const equation = documentRef.createElement('div');
+      equation.className = 'fraction-guided-equation';
+      equation.setAttribute('aria-label', 'Opgave en tussenstappen');
+      equation.append(prompt, solution);
+      template.promptArea.append(equation);
 
-      const answer = renderFractionAnswerInput({
-        workMount: answerMount,
-        controlsMount: template.controlsArea,
-        wholeNumberMode: 'required'
-      });
-      const check = documentRef.createElement('button');
-      check.type = 'button';
-      check.className = 'paco-btn paco-btn--primary';
-      check.textContent = 'Controleren';
-      template.actionsArea.append(check);
+      const grid = documentRef.createElement('div');
+      grid.className = 'fraction-guided-step-grid';
+      grid.setAttribute('aria-label', 'Drie denkstappen');
+      grid.dataset.activeStep = step.stepId;
+      let activeInput = null;
+      let activeAnswer = null;
 
-      check.addEventListener('click', () => {
-        const result = session.recordAnswer({ values: answer.getValues() });
-        if (result.classification === 'valid') {
-          answer.lock();
-          check.disabled = true;
-          const feedback = documentRef.createElement('p');
-          feedback.className = 'fraction-practice-feedback is-correct';
-          feedback.setAttribute('role', 'status');
-          feedback.textContent = 'Goed gedaan! Je antwoord klopt.';
-          template.feedbackArea.replaceChildren(feedback);
-          const next = documentRef.createElement('button');
-          next.type = 'button';
-          next.className = 'paco-btn paco-btn--primary';
-          next.textContent = result.progress.isComplete ? 'Bekijk resultaat' : 'Volgende som';
-          next.addEventListener('click', renderCurrentTask);
-          template.actionsArea.replaceChildren(next);
-          progressLabel.textContent = formatFractionPracticeProgress(result.progress, exercise);
-          return;
+      stepIds.forEach((stepId, index) => {
+        const completed = step.completedStepIds.includes(stepId);
+        const active = step.stepId === stepId;
+        const item = documentRef.createElement('section');
+        item.className = 'fraction-guided-step-card';
+        item.dataset.stepId = stepId;
+        item.dataset.state = completed ? 'completed' : active ? 'active' : 'locked';
+        item.setAttribute('aria-label', 'Stap ' + (index + 1) + ': ' + stepLabels[index]);
+        const heading = documentRef.createElement('h3');
+        heading.textContent = 'Stap ' + (index + 1);
+        const label = documentRef.createElement('p');
+        label.className = 'fraction-guided-step-title';
+        label.textContent = stepLabels[index];
+        item.append(heading, label);
+
+        if (completed) {
+          const status = documentRef.createElement('p');
+          status.className = 'fraction-guided-step-status';
+          status.textContent = 'Afgerond';
+          item.append(status);
+          const answer = documentRef.createElement('div');
+          answer.className = 'fraction-guided-step-completed-answer';
+          if (stepId === 'make_divisor_whole') {
+            answer.append(
+              renderFractionRepresentation({
+                numerator: step.divisorNumerator, denominator: step.task.divisor.denominator
+              }, 'symbolic_fraction', 'Onechte breuk'),
+              op('× ' + step.task.divisor.denominator + ' = ' + step.divisorNumerator)
+            );
+          } else if (stepId === 'scale_dividend') {
+            answer.textContent = step.task.wholeNumber + ' × ' + step.task.divisor.denominator + ' = ' + step.scaledDividend;
+          } else {
+            answer.append(
+              documentRef.createTextNode(step.scaledDividend + ' ÷ ' + step.divisorNumerator + ' = '),
+              renderMixedNumber({
+                wholeNumber: step.task.answer.whole,
+                numerator: step.task.answer.numerator,
+                denominator: step.task.answer.denominator
+              }, 'Gemengd getal als uitkomst')
+            );
+          }
+          item.append(answer);
+        } else if (active) {
+          const help = documentRef.createElement('p');
+          help.className = 'fraction-guided-step-prompt';
+          help.textContent = step.prompt;
+          const expression = documentRef.createElement('div');
+          expression.className = 'fraction-guided-step-expression';
+          if (stepId === 'make_divisor_whole') {
+            expression.append(
+              renderMixedNumber({
+                wholeNumber: step.task.divisor.whole,
+                numerator: step.task.divisor.numerator,
+                denominator: step.task.divisor.denominator
+              }, 'Gemengd getal'),
+              op('='),
+              renderFractionRepresentation({
+                numerator: step.divisorNumerator, denominator: step.task.divisor.denominator
+              }, 'symbolic_fraction', 'Onechte breuk'),
+              op('× ' + step.task.divisor.denominator + '=')
+            );
+            activeInput = documentRef.createElement('input');
+            activeInput.type = 'text';
+            activeInput.inputMode = 'numeric';
+            activeInput.autocomplete = 'off';
+            activeInput.maxLength = 6;
+            activeInput.className = 'fraction-guided-scalar-input';
+            activeInput.dataset.fractionGuidedAnswer = 'true';
+            activeInput.setAttribute('aria-label', 'Heel getal na het vergroten van de breuk');
+            expression.append(activeInput);
+          } else if (stepId === 'scale_dividend') {
+            expression.append(
+              documentRef.createTextNode(String(step.task.wholeNumber)),
+              op('× ' + step.task.divisor.denominator + '='),
+            );
+            activeInput = documentRef.createElement('input');
+            activeInput.type = 'text';
+            activeInput.inputMode = 'numeric';
+            activeInput.autocomplete = 'off';
+            activeInput.maxLength = 6;
+            activeInput.className = 'fraction-guided-scalar-input';
+            activeInput.dataset.fractionGuidedAnswer = 'true';
+            activeInput.setAttribute('aria-label', 'Vergroot heel getal');
+            expression.append(activeInput);
+          } else {
+            expression.append(documentRef.createTextNode(step.scaledDividend + ' ÷ ' + step.divisorNumerator + '='));
+            const answerMount = documentRef.createElement('div');
+            answerMount.className = 'fraction-guided-mixed-answer';
+            expression.append(answerMount);
+            activeAnswer = renderFractionAnswerInput({
+              workMount: answerMount,
+              controlsMount: template.controlsArea,
+              wholeNumberMode: 'required'
+            });
+          }
+          const check = documentRef.createElement('button');
+          check.type = 'button';
+          check.className = 'paco-btn paco-btn--primary paco-btn--small';
+          check.textContent = 'Controleren';
+          check.addEventListener('click', () => {
+            const result = session.recordResponse(
+              stepId === 'calculate_quotient'
+                ? { values: activeAnswer?.getValues() }
+                : { rawValue: activeInput?.value || '' }
+            );
+            if (result.classification === 'valid') {
+              activeAnswer?.lock();
+              renderCurrentTask(stepId === 'calculate_quotient'
+                ? 'Goed gedaan! Je hebt deze som afgerond.'
+                : 'Goed gedaan! Deze stap is afgerond.');
+              return;
+            }
+            const messages = {
+              invalid_input: stepId === 'calculate_quotient'
+                ? 'Vul het hele getal, de teller en de noemer in.'
+                : 'Vul het getal in.',
+              incorrect_answer: stepId === 'make_divisor_whole'
+                ? 'Reken eerst het gemengde getal om naar een onechte breuk en vermenigvuldig de teller met de noemer.'
+                : stepId === 'scale_dividend'
+                ? 'Vermenigvuldig het hele getal met dezelfde noemer als waarmee je de breuk hebt vergroot.'
+                : 'Dat antwoord klopt nog niet. Controleer de deling.',
+              requires_simplification: 'Je antwoord klopt. Vereenvoudig de breuk zo ver mogelijk.',
+              not_simplified: 'De vereenvoudigde breuk klopt nog niet. Probeer het opnieuw.'
+            };
+            const feedback = documentRef.createElement('p');
+            feedback.className = 'fraction-practice-feedback is-error';
+            feedback.setAttribute('role', 'alert');
+            feedback.textContent = messages[result.classification] || 'Controleer je antwoord en probeer het opnieuw.';
+            template.feedbackArea.replaceChildren(feedback);
+            activeInput?.focus();
+          });
+          item.addEventListener('keydown', event => {
+            if (event.key === 'Enter' && event.target instanceof documentRef.defaultView.HTMLInputElement) {
+              event.preventDefault();
+              check.click();
+            }
+          });
+          item.append(help, expression, check);
+        } else {
+          const status = documentRef.createElement('p');
+          status.className = 'fraction-guided-step-status';
+          status.textContent = 'Komt hierna';
+          item.append(status);
         }
-        const messages = {
-          invalid_input: 'Vul het hele getal, de teller en de noemer in.',
-          incorrect_answer: 'Dat antwoord klopt nog niet. Controleer je deling.',
-          requires_simplification: 'Je antwoord klopt. Vereenvoudig de breuk zo ver mogelijk.',
-          not_simplified: 'De vereenvoudigde breuk klopt nog niet. Probeer het opnieuw.'
-        };
-        const feedback = documentRef.createElement('p');
-        feedback.className = 'fraction-practice-feedback is-error';
-        feedback.setAttribute('role', 'alert');
-        feedback.textContent = messages[result.classification] || 'Controleer je antwoord en probeer het opnieuw.';
-        template.feedbackArea.replaceChildren(feedback);
+        grid.append(item);
       });
 
+      template.workArea.append(grid);
+      if (feedbackMessage) {
+        const feedback = documentRef.createElement('p');
+        feedback.className = 'fraction-practice-feedback is-correct';
+        feedback.setAttribute('role', 'status');
+        feedback.textContent = feedbackMessage;
+        template.feedbackArea.append(feedback);
+      }
       content.append(card);
+      activeInput?.focus();
     }
-
     renderCurrentTask();
   }
 

@@ -8129,3 +8129,37 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 **Volgende stap**
 - Voer de unit- en browserregressies uit, daarna Full Regression op de exacte codecommit.
 - Verifieer vervolgens deze handoff-update met een aparte Full Regression op de handoff-commit.
+
+
+## 13. Centrale fraction answer validation — direct vereenvoudigde antwoorden (18 november 2026)
+
+**Gebruikersregel**
+- Een leerling mag een gelijkwaardige breuk direct in volledig vereenvoudigde vorm invullen; die uitkomst moet als correct worden geaccepteerd.
+- Voorbeeld: bij `5/6 − 1/6` zijn zowel `4/6` gevolgd door de centrale vereenvoudigingsstap naar `2/3`, als direct `2/3` invullen correct.
+- Een equivalente maar nog niet volledig vereenvoudigde breuk, bijvoorbeeld `2/4` als antwoord op `6/12`, wordt niet afgerond voordat de leerling deze vereenvoudigt.
+- De bestaande knop **Vereenvoudigen** en de velden rechts van de oorspronkelijke uitkomst blijven beschikbaar.
+
+**Oorzaak**
+- De sessie voor gelijknamige breuken aftrekken valideerde de primaire invoer tegen exact dezelfde teller en noemer als de taakuitkomst. Daardoor werd een direct ingevoerde equivalente breuk zoals `2/3` afgewezen.
+- De sessie voor gemengde gelijknamige breuken optellen accepteerde directe vereenvoudigde antwoorden al. Die regel was niet gedeeld met de aftreksessie.
+
+**Implementatie**
+- Nieuw gedeeld enginebestand: `pacogo-engine/fraction-answer-validation.js`.
+- Dit bestand centraliseert de berekening van de grootste gemene deler, equivalentie van breukwaarden (inclusief gemengde getallen) en controle op volledig vereenvoudigde vorm.
+- De gelijknamige-aftreksessie gebruikt de gedeelde functies en accepteert nu een direct ingevoerde equivalente breuk als deze in laagste termen staat.
+- De gemengde-gelijknamige-optelsessie gebruikt dezelfde gedeelde rekenfuncties; bestaande acceptatie van directe vereenvoudigde antwoorden blijft behouden.
+- Unit-tests controleren directe acceptatie van `1/2` als equivalent van `6/12`, afwijzing van de nog vereenvoudigbare `2/4`, en de gedeelde breukfuncties.
+- Browserregressie controleert de volledige Skills-route en directe invoer van `1/2` bij de derde som, zonder eerst op **Vereenvoudigen** te klikken.
+- Geen taakbankinhoud, interface-opmaak, centrale template, leerlingvoortgangsschema, Supabase of LIVE `main` gewijzigd.
+
+**Verificatie**
+- Branch: `refactor/professional-v1`.
+- Code-/testcommit: `9dc80602b49f9700132fef1c59bf5965aabf394f`.
+- Full Regression #3949 / run `44214265168`: **GREEN / SUCCESS** op exact deze commit. Curriculum-engine regressie, architectuurgrenzen, maintained Node-regressie, migrated Node-regressie, volledige browserregressie en clean-working-tree-controle zijn geslaagd.
+- Browser proof #811 / run `44214265311`: **SUCCESS** op dezelfde commit.
+- Dit handoff-document moet na deze update opnieuw door Full Regression worden geverifieerd op de resulterende handoff-commit.
+
+**Volgende concrete stap**
+- Verifieer de handoff-update met Full Regression op de exacte nieuwe commit.
+- Laat daarna de gebruiker in PacoGO TEST de directe invoer van een vereenvoudigde uitkomst controleren.
+- Pas de gedeelde validatie pas verder aan als een concrete andere breukenoefening een afwijkend contract aantoont.

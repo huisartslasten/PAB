@@ -1610,3 +1610,105 @@ test('mixed like-denominator multiplication practice uses the central page and f
  const result=await page.evaluate(async()=>{localStorage.removeItem('pacogo:fraction-mixed-like-denominator-multiplication:v1:Zyon');const{createSkillsRuntime}=await import('/src/features/skills/runtime.js');const templateMount=document.createElement('div');templateMount.id='paco-template-mount';document.body.replaceChildren(templateMount);const app={auth:{isParent:false,isLoggedIn:false,session:null,subscribe:()=>({unsubscribe(){}})},authSession:{},managementCapabilities:{getAvailableForPage:()=>[]}};let navigation='';const overview=createSkillsRuntime({app,templateMount,context:{student:'Zyon',mode:'student'},domain:'fractions',topic:'vermenigvuldigen',documentRef:document,navigate:target=>{navigation=String(target);}});await overview.mount();const row=[...document.querySelectorAll('.skills-addition-overview-row')].find(n=>n.querySelector('.skills-addition-overview-label')?.textContent==='Gelijknamige breuken groter dan 1 met elkaar vermenigvuldigen');row?.querySelector('.skills-addition-overview-open')?.click();const practice=createSkillsRuntime({app,templateMount,context:{student:'Zyon',mode:'student'},domain:'fractions',topic:'vermenigvuldigen',exercise:'mixed-like-denominator-multiplication',documentRef:document,navigate:()=>{}});await practice.mount();return{navigation,pageTitle:document.querySelector('.paco-template-main h1')?.textContent||'',canonicalPage:Boolean(document.querySelector('.paco-page-template')),fractionTemplate:Boolean(document.querySelector('[data-component="fraction-practice-template"]')),title:document.querySelector('.fraction-whole-mixed-addition-card h2')?.textContent||'',mixedNumbers:document.querySelectorAll('.fraction-whole-mixed-expression .pacogo-fraction-mixed-number').length,wholeNumbers:[...document.querySelectorAll('.fraction-whole-mixed-expression .pacogo-fraction-mixed-number__whole')].map(n=>n.textContent),wholeInputs:document.querySelectorAll('[data-answer-part="whole"]').length,wholeInputVisible:!document.querySelector('.pacogo-fraction-answer__whole-field')?.hidden,wholeToggleHidden:document.querySelector('.pacogo-fraction-answer__toggle')?.hidden,progress:document.querySelector('.fraction-practice-progress')?.textContent||'',expression:document.querySelector('.fraction-whole-mixed-expression')?.textContent||''};});
  expect(result.navigation).toContain('exercise=mixed-like-denominator-multiplication');expect(result.pageTitle).toBe('Oefenen');expect(result.canonicalPage).toBe(true);expect(result.fractionTemplate).toBe(true);expect(result.title).toBe('Gelijknamige breuken groter dan 1 met elkaar vermenigvuldigen');expect(result.mixedNumbers).toBe(2);expect(result.wholeNumbers).toEqual(['2','1']);expect(result.wholeInputs).toBe(1);expect(result.wholeInputVisible).toBe(true);expect(result.wholeToggleHidden).toBe(true);expect(result.progress).toContain('Som 1 van 15');expect(result.expression).toContain('×');expect(result.expression).not.toContain('/');
 });
+
+
+test('unlike-denominator multiplication opens from the central Skills route and uses the central Fraction Practice Template for fifteen new tasks', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=vermenigvuldigen', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    localStorage.removeItem('pacogo:fraction-unlike-denominator-multiplication:v1:Zyon');
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const { FRACTION_UNLIKE_DENOMINATOR_MULTIPLICATION_TASKS: tasks } = await import('/pacogo-engine/fraction-unlike-denominator-multiplication-task-bank.js');
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {},
+      managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    let navigation = '';
+    const overview = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'vermenigvuldigen', documentRef: document,
+      navigate: target => { navigation = String(target); }
+    });
+    await overview.mount();
+    const row = [...document.querySelectorAll('.skills-addition-overview-row')].find(item =>
+      item.querySelector('.skills-addition-overview-label')?.textContent === 'Ongelijknamige breuken kleiner dan 1 met elkaar vermenigvuldigen'
+    );
+    const rowButtonCount = row.querySelectorAll('button').length;
+    row.querySelector('button')?.click();
+    const practice = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'vermenigvuldigen', exercise: 'unlike-denominator-multiplication',
+      documentRef: document, navigate: () => {}
+    });
+    await practice.mount();
+    const fractions = [...document.querySelectorAll('.construction-equation .pacogo-fraction-representation--symbolic')];
+    const initial = {
+      navigation,
+      rowButtonCount,
+      pageTitle: document.querySelector('.paco-template-main h1')?.textContent || '',
+      pageTemplate: Boolean(document.querySelector('.paco-page-template')),
+      fractionTemplate: Boolean(document.querySelector('[data-component="fraction-practice-template"]')),
+      title: document.querySelector('.fraction-whole-mixed-addition-card h2')?.textContent || '',
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      sourceFractions: fractions.map(node => node.getAttribute('aria-label') || ''),
+      simplify: document.querySelector('.pacogo-fraction-answer__simplify')?.textContent || '',
+      taskCount: tasks.length,
+      allUnlikeProper: tasks.every(task =>
+        task.leftFraction.denominator !== task.rightFraction.denominator &&
+        task.leftFraction.numerator > 0 && task.leftFraction.numerator < task.leftFraction.denominator &&
+        task.rightFraction.numerator > 0 && task.rightFraction.numerator < task.rightFraction.denominator
+      ),
+      answerParts: [...document.querySelectorAll('[data-answer-part]')]
+        .filter(node => !node.closest('[hidden]')).map(node => node.dataset.answerPart)
+    };
+    const set = (part, value) => {
+      const field = document.querySelector('[data-answer-part="' + part + '"]');
+      field.value = value;
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    set('primaryNumerator', '6');
+    set('primaryDenominator', '15');
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    const requiresSimplification = document.querySelector('[role="status"]')?.textContent || '';
+    document.querySelector('.pacogo-fraction-answer__simplify').click();
+    set('simplifiedNumerator', '2');
+    set('simplifiedDenominator', '5');
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    const afterCorrect = {
+      feedback: document.querySelector('[role="status"]')?.textContent || '',
+      next: document.querySelector('.pacogo-fraction-practice-template__actions button')?.textContent || '',
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || ''
+    };
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    const second = [...document.querySelectorAll('.construction-equation .pacogo-fraction-representation--symbolic')]
+      .map(node => node.getAttribute('aria-label') || '');
+    return { initial, requiresSimplification, afterCorrect, second };
+  });
+  expect(result.initial.navigation).toContain('exercise=unlike-denominator-multiplication');
+  expect(result.initial.rowButtonCount).toBe(1);
+  expect(result.initial.pageTitle).toBe('Oefenen');
+  expect(result.initial.pageTemplate).toBe(true);
+  expect(result.initial.fractionTemplate).toBe(true);
+  expect(result.initial.title).toBe('Ongelijknamige breuken kleiner dan 1 met elkaar vermenigvuldigen');
+  expect(result.initial.progress).toContain('Som 1 van 15');
+  expect(result.initial.sourceFractions).toEqual([
+    'Eerste breuk: 2 gedeeld door 3',
+    'Tweede breuk: 3 gedeeld door 5'
+  ]);
+  expect(result.initial.simplify).toBe('Vereenvoudigen');
+  expect(result.initial.taskCount).toBe(15);
+  expect(result.initial.allUnlikeProper).toBe(true);
+  expect(result.initial.answerParts).toEqual(['primaryNumerator','primaryDenominator']);
+  expect(result.requiresSimplification).toContain('vereenvoudigd');
+  expect(result.afterCorrect.feedback).toContain('Goed gedaan');
+  expect(result.afterCorrect.next).toBe('Volgende som');
+  expect(result.afterCorrect.progress).toContain('1 afgerond');
+  expect(result.second).toEqual([
+    'Eerste breuk: 3 gedeeld door 4',
+    'Tweede breuk: 2 gedeeld door 7'
+  ]);
+});
+

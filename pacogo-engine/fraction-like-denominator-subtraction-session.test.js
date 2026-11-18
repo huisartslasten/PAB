@@ -60,6 +60,21 @@ assert.equal(a.getProgress().completedCount, 3);
 assert.equal(b.getProgress().completedCount, 0);
 assert.equal(a.getProgress().attemptCount, 7);
 
+
+// A fully reduced equivalent answer is correct even when entered directly.
+const direct = createFractionLikeDenominatorSubtractionSession({ learnerKey: "learner-direct", storage });
+assert.equal(direct.recordAnswer({ numerator: 5, denominator: 9 }).classification, "valid");
+assert.equal(direct.recordAnswer({ numerator: 3, denominator: 10 }).classification, "valid");
+assert.equal(direct.recordAnswer({ numerator: 1, denominator: 2 }).classification, "valid");
+assert.equal(direct.getProgress().completedCount, 3);
+
+// An equivalent but still reducible answer must use the simplification step.
+const reducible = createFractionLikeDenominatorSubtractionSession({ learnerKey: "learner-reducible", storage });
+assert.equal(reducible.recordAnswer({ numerator: 5, denominator: 9 }).classification, "valid");
+assert.equal(reducible.recordAnswer({ numerator: 3, denominator: 10 }).classification, "valid");
+assert.equal(reducible.recordAnswer({ numerator: 2, denominator: 4 }).classification, "simplification_required");
+assert.equal(reducible.getProgress().completedCount, 2);
+
 const completeAll = createFractionLikeDenominatorSubtractionSession({ learnerKey: "learner-complete-all", storage });
 for (let index = 0; index < 15; index += 1) {
   const current = completeAll.getCurrentTask();

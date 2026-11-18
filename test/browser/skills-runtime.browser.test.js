@@ -2005,7 +2005,9 @@ test('whole number divided by a mixed fraction greater than one teaches four sep
       activeInputWidth: document.querySelector('.fraction-guided-step-card[data-state="active"] .fraction-guided-scalar-input')
         ? document.querySelector('.fraction-guided-step-card[data-state="active"] .fraction-guided-scalar-input').getBoundingClientRect().width : 0,
       activeStepPrompt: document.querySelector('.fraction-guided-step-card[data-state="active"] .fraction-guided-step-prompt')?.textContent || '',
-      quotientHelp: document.querySelector('.fraction-guided-quotient-help')?.textContent || ''
+      quotientHelp: document.querySelector('.fraction-guided-quotient-help')?.textContent || '',
+      nextAction: document.querySelector('.pacogo-fraction-practice-template__actions button')?.textContent || '',
+      completeMessage: document.querySelector('.fraction-practice-complete')?.textContent || ''
     });
     const initial = snapshot();
     const fill = (selector, value) => { const input = document.querySelector(selector); input.value = String(value); };
@@ -2030,10 +2032,10 @@ test('whole number divided by a mixed fraction greater than one teaches four sep
   expect(result.initial.canonicalPage).toBe(true);
   expect(result.initial.fractionTemplate).toBe(true);
   expect(result.initial.title).toBe('Heel getal delen door een breukgetal groter dan 1');
-  expect(result.initial.taskCount).toBe(15);
+  expect(result.initial.taskCount).toBe(10);
   expect(result.initial.differentFromIndependentTasks).toBe(true);
-  expect(result.initial.uniqueTasks).toBe(15);
-  expect(result.initial.progress).toContain('Som 1 van 15');
+  expect(result.initial.uniqueTasks).toBe(10);
+  expect(result.initial.progress).toContain('Som 1 van 10');
   expect(result.initial.stepCount).toBe(4);
   expect(result.initial.stepTags).toEqual(['details', 'details', 'details', 'details']);
   expect(result.initial.expandedSteps).toEqual([true, false, false, false]);
@@ -2064,8 +2066,12 @@ test('whole number divided by a mixed fraction greater than one teaches four sep
   expect(result.afterThird.quotientHelp).toContain('hele getal');
   expect(result.afterThird.quotientHelp).toContain('teller');
   expect(result.afterThird.quotientHelp).toContain('noemer');
-  expect(result.afterFinal.progress).toContain('Som 2 van 15');
-  expect(result.afterFinal.states).toEqual(['active', 'locked', 'locked', 'locked']);
-  expect(result.afterFinal.expandedSteps).toEqual([true, false, false, false]);
+  expect(result.afterFinal.progress).toContain('Som 2 van 10');
+  expect(result.afterFinal.states).toEqual([]);
+  expect(result.afterFinal.expandedSteps).toEqual([]);
+  expect(result.afterFinal.nextAction).toBe('Volgende som');
+  expect(result.afterFinal.completeMessage).toContain('Deze som is afgerond');
   expect(result.feedback).toContain('Goed gedaan');
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.fraction-practice-progress')).toContainText('Som 2 van 10');
 });

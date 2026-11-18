@@ -8466,25 +8466,30 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 **Centrale interface en route**
 - De bestaande rij in Skills → Breuken → Vermenigvuldigen is gekoppeld aan route-ID `like-denominator-multiplication` en heeft één knop `Oefenen`.
 - De oefening hergebruikt de centrale PacoGO Page Template, centrale Fraction Practice Template, bestaande gestapelde breukweergave en `renderFractionAnswerInput()` met de bestaande vereenvoudigingsbediening.
+- Het optionele hele-getalveld blijft verborgen bij deze oefening; de bestaande centrale component maakt het veld aan maar toont het pas na activering. De browser-test controleert de zichtbaarheid in plaats van alleen de aanwezigheid in de DOM.
 - Geen lokale breuktemplate, eigen antwoordvelden, eigen breukrenderer of nieuwe CSS toegevoegd.
 - Bestaande oefeningen en curriculum-/mastery-contracten, Supabase en LIVE `main` zijn niet gewijzigd.
 
-**Regressiebevinding en correctie**
-- Full Regression #3976 en #3977 waren rood door browserregressies in de nieuwe testflow; de eerste testopzet sloeg een som over bij het testen van de vereenvoudigingsstap. De sessietest is in commit `faf5415a0e79666fd974d3730d8b547e205c1322` in de juiste taakvolgorde gezet.
-- Full Regression #3978 op commit `c8a8f2531e2fec14fd12a96fec2a08937848b107` bleef rood: 102 browser-tests slaagden en één test faalde. De exacte oorzaak was dat de nieuwe vermenigvuldigingsoefening niet was opgenomen in de centrale `showingAnyPractice`-classificatie. Daardoor koos de centrale page template de standaardtitel/layout `Vermenigvuldigen` in plaats van de bestaande oefenmodus `Oefenen`.
-- De oorzaak is in de runtime gecorrigeerd, niet door de testverwachting te verlagen. De nieuwe oefening is toegevoegd aan de centrale practice-mode classificatie en heeft de bijbehorende centrale breadcrumb-subtitel gekregen.
-- Correctiecommit: `25cefb996a9a6e0dc4282099b10ae32a47193ce7`.
-- De Full Regression op de correctiecommit is nog niet geverifieerd. Noem deze wijziging niet groen voordat een volledige run op de exacte commit slaagt.
+**Regressiebevindingen en correcties**
+- Full Regression #3976/#3977: de eerste browser-testopzet sloeg een taak over bij het testen van vereenvoudiging. De unit-testvolgorde is gecorrigeerd in commit `faf5415a0e79666fd974d3730d8b547e205c1322`.
+- Full Regression #3978: 102 browser-tests slaagden en één faalde. De nieuwe oefening ontbrak in de centrale `showingAnyPractice`-classificatie. Daardoor koos de centrale page template `Vermenigvuldigen` en de standaardlay-out in plaats van `Oefenen` en de oefenlay-out.
+- Runtimecorrectie: de oefening is opgenomen in de centrale practice-mode classificatie en kreeg de bijbehorende centrale breadcrumb-subtitel. Commit `25cefb996a9a6e0dc4282099b10ae32a47193ce7`.
+- Een volgende browser-test controleerde per ongeluk ook het verborgen optionele hele-getalveld. De test controleert nu zichtbare antwoordvelden en verifieert expliciet dat het hele-getalveld verborgen blijft. Testcorrectiecommit `4a42e09b95c7f37fdd7a536bf56b6097014d134c`.
+- De browser-flow testte daarna taak 3 terwijl taak 2 nog openstond. De testvolgorde is hersteld zodat taken 2 en 3 eerst correct worden afgerond voordat taak 4 op vereenvoudiging wordt getest. Testcorrectiecommit `f08981bf8b017bd3f01620b2d5519c94e66234dc`.
+- Geen productietest is aangepast om een onjuiste runtime-uitkomst te maskeren; alleen de aantoonbaar foutieve testaannames/-volgorde zijn gecorrigeerd.
+
+**Tests en verificatie**
+- Full Regression #3982 / run `44328623277`: **GREEN / SUCCESS** op exact commit `f08981bf8b017bd3f01620b2d5519c94e66234dc`.
+- Op deze run zijn alle stappen geslaagd: dependency/audit, architectuurgrenzen, curriculum-engine, Double or Nothing, maintained en migrated Node-tests, volledige browserregressie en clean-working-tree-controle.
+- De afzonderlijke Browser Proof #823 op dezelfde commit is aanvullend gestart; Full Regression #3982 bevat zelf al de volledige browserregressie.
 
 **Actuele status**
 - Branch: `refactor/professional-v1`.
-- Laatste codecommit: `25cefb996a9a6e0dc4282099b10ae32a47193ce7`.
-- Laatste uitgevoerde Full Regression: #3978 — RED op de voorafgaande commit `c8a8f2531e2fec14fd12a96fec2a08937848b107`.
-- Laatste geverifieerde groene Full Regression blijft #3974 op `522a4c9ac1314cb7cbc634d811267c62a7cfe596`.
-- Deze handoff-update is zelf een repositorywijziging en moet eveneens worden geverifieerd op de resulterende commit.
+- Laatste geverifieerde code-/testcommit: `f08981bf8b017bd3f01620b2d5519c94e66234dc`.
+- Laatste geverifieerde Full Regression: #3982 — **GREEN / SUCCESS** op exact deze commit.
+- Deze handoff-update is zelf een repositorywijziging en moet eveneens door Full Regression worden geverifieerd op de resulterende commit.
 - LIVE `main` is onaangeroerd; geen deployment en geen Supabase-wijziging.
 
 **Volgende concrete stap**
-- Verifieer de runtimecorrectie én deze handoff-update met Full Regression op de exacte nieuwe handoff-commit.
-- Als de regressie rood is: stop, haal de exacte foutlog op en isoleer de oorzaak voordat er iets wordt aangepast.
+- Verifieer deze handoff-update met Full Regression op de exacte nieuwe handoff-commit.
 - Laat de gebruiker daarna de oefening visueel controleren in PacoGO TEST. Voeg geen volgende oefening of extra interface-elementen toe zonder expliciete opdracht.

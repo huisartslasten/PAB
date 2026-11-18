@@ -8671,3 +8671,35 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 **Volgende concrete stap**
 - Verifieer de nieuwe handoff-commit met Full Regression.
 - Laat de gebruiker daarna de oefening visueel controleren in PacoGO TEST. Voeg geen volgende oefening of extra interface-elementen toe zonder expliciete opdracht.
+
+
+## 26. Overzicht Breuken → Delen (18 november 2026)
+
+**Opdracht**
+- De gebruiker vroeg het overzicht voor Breuken → Delen te bouwen op dezelfde manier als de bestaande overzichten Breuken → Optellen en Breuken → Aftrekken.
+- De aangeleverde screenshot van Optellen is de visuele referentie: dezelfde grote overzichtsregels, de centrale vijf-botjes-moeilijkheidsgraad links, onderwerptekst rechts en de Oefenen-knop op dezelfde plek als in de bestaande overzichten.
+- De vijf onderwerpen en moeilijkheidsniveaus zijn overgenomen uit de door de gebruiker aangeleverde Delen-screenshot; de onderwerpen zijn niet inhoudelijk uitgebreid.
+
+**Implementatie**
+- In `src/features/skills/runtime.js` is Delen aangesloten op de bestaande Skills-onderwerpenroute.
+- De overzichtsweergave gebruikt dezelfde bestaande overzichtsmarkup en CSS-klassen als Optellen/Aftrekken: `skills-addition-overview`, `skills-addition-overview-list`, `skills-addition-overview-row`, `skills-addition-overview-difficulty`, `skills-addition-overview-label` en `skills-addition-overview-open`.
+- De bestaande centrale Paco Page Template wordt gebruikt.
+- De vijf rijen volgen de opgegeven onderwerpen en niveaus: 1, 2, 2, 3 en 4 (op een schaal van vijf botjes).
+- Er zijn geen onderliggende deel-oefeningen of taakbanken gebouwd; deze opdracht betrof uitsluitend het overzicht en de routekoppelingen.
+- Geen nieuwe visuele stijl, lokale template, extra functionaliteit, Supabase-wijziging of wijziging aan LIVE `main`.
+
+**Tests en verificatie**
+- Runtimecommit: `8fa042c17f6002f089cd7abc621b6a58b01a704f`.
+- Browser-testcommit: `b16b09ca1432ebdad2b81d93b284b6dca69220ae`.
+- Gerichte Browser Proof #828 / run `44362847445`: **GREEN / SUCCESS** op exact commit `b16b09ca1432ebdad2b81d93b284b6dca69220ae`.
+- Full Regression #4005 / run `44362847489`: **GREEN / SUCCESS** op exact commit `b16b09ca1432ebdad2b81d93b284b6dca69220ae`.
+
+**Actuele status vóór deze handoff-update**
+- Branch: `refactor/professional-v1`.
+- Laatste geverifieerde code-/testcommit: `b16b09ca1432ebdad2b81d93b284b6dca69220ae`.
+- Laatste volledig geverifieerde Full Regression: #4005 — **GREEN / SUCCESS** op exact die commit.
+- LIVE `main` onaangeroerd; geen deployment en geen Supabase-wijziging.
+
+**Volgende concrete stap**
+- Laat de gebruiker het Delen-overzicht visueel vergelijken met Optellen/Aftrekken in PacoGO TEST.
+- Bouw geen onderliggende deel-oefeningen of aanvullende onderdelen zonder expliciete opdracht.

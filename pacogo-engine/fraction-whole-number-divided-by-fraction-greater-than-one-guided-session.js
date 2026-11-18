@@ -1,5 +1,5 @@
-const STORAGE_PREFIX = "pacogo:fraction-whole-number-divided-by-fraction-greater-than-one-guided:v1:";
-const STEP_IDS = Object.freeze(["make_divisor_whole", "scale_dividend", "calculate_quotient"]);
+const STORAGE_PREFIX = "pacogo:fraction-whole-number-divided-by-fraction-greater-than-one-guided:v2:";
+const STEP_IDS = Object.freeze(["convert_mixed_number", "make_divisor_whole", "scale_dividend", "calculate_quotient"]);
 const CLASSIFICATIONS = Object.freeze(["valid", "invalid_input", "incorrect_answer", "requires_simplification", "not_simplified"]);
 
 function gcd(a, b) {
@@ -67,14 +67,14 @@ function createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession({
   }
   const configuredTasks = normalizeTasks(tasks);
   const key = STORAGE_PREFIX + encodeURIComponent(learner);
-  const empty = () => ({ schemaVersion: 1, completedTaskIds: [], completedStepIdsByTask: Object.fromEntries(configuredTasks.map(task => [task.id, []])), responsesByTask: Object.fromEntries(configuredTasks.map(task => [task.id, []])) });
+  const empty = () => ({ schemaVersion: 2, completedTaskIds: [], completedStepIdsByTask: Object.fromEntries(configuredTasks.map(task => [task.id, []])), responsesByTask: Object.fromEntries(configuredTasks.map(task => [task.id, []])) });
 
   function read() {
     const raw = storage.getItem(key);
     if (!raw) return empty();
     let saved;
     try { saved = JSON.parse(raw); } catch { throw new Error("Saved guided division practice is unreadable."); }
-    if (!saved || saved.schemaVersion !== 1 || !Array.isArray(saved.completedTaskIds) ||
+    if (!saved || saved.schemaVersion !== 2 || !Array.isArray(saved.completedTaskIds) ||
         !saved.completedStepIdsByTask || typeof saved.completedStepIdsByTask !== "object" ||
         !saved.responsesByTask || typeof saved.responsesByTask !== "object") {
       throw new Error("Saved guided division practice has an unsupported format.");
@@ -98,7 +98,7 @@ function createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession({
       }));
     }
     return {
-      schemaVersion: 1,
+      schemaVersion: 2,
       completedTaskIds: saved.completedTaskIds.filter(id => configuredTasks.some(task => task.id === id)),
       completedStepIdsByTask, responsesByTask
     };
@@ -118,14 +118,18 @@ function createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession({
     const scaledDividend = task.wholeNumber * task.divisor.denominator;
     const step = {
       taskId: task.id, taskNumber: configuredTasks.indexOf(task) + 1, totalTasks: configuredTasks.length,
-      task, divisorNumerator, scaledDividend, completedStepIds: Object.freeze([...completed]),
+      task, divisorNumerator, divisorWholeNumber: divisorNumerator, scaledDividend,
+      completedStepIds: Object.freeze([...completed]),
       stepId, stepNumber: completed.length + 1, totalSteps: STEP_IDS.length
     };
-    if (stepId === "make_divisor_whole") {
-      step.prompt = "Zet het gemengde getal om in een breuk. Vergroot die breuk daarna tot een heel getal.";
-      step.expression = "Gemengd getal omzetten naar een heel getal";
+    if (stepId === "convert_mixed_number") {
+      step.prompt = "Zet het gemengde getal om in een onechte breuk. De noemer blijft hetzelfde.";
+      step.expression = "Gemengd getal omzetten naar een onechte breuk";
+    } else if (stepId === "make_divisor_whole") {
+      step.prompt = "Vermenigvuldig de onechte breuk met de noemer. Zo maak je de deler een heel getal.";
+      step.expression = divisorNumerator + "/" + task.divisor.denominator + " × " + task.divisor.denominator + " = ?";
     } else if (stepId === "scale_dividend") {
-      step.prompt = "Je hebt de deler met de noemer vermenigvuldigd. Vermenigvuldig het hele getal met dezelfde noemer.";
+      step.prompt = "Vermenigvuldig het hele getal met dezelfde factor als waarmee je de deler hebt vergroot.";
       step.expression = task.wholeNumber + " × " + task.divisor.denominator + " = ?";
     } else if (stepId === "calculate_quotient") {
       step.prompt = "Deel de twee hele getallen. Geef het antwoord als een vereenvoudigd gemengd getal.";
@@ -151,12 +155,14 @@ function createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession({
     const raw = String(rawValue ?? "");
     const value = parseInteger(raw);
     let classification = "invalid_input";
-    if (current.stepId === "make_divisor_whole") {
+    if (current.stepId === "convert_mixed_number") {
       if (Number.isSafeInteger(value) && value > 0) classification = value === current.divisorNumerator ? "valid" : "incorrect_answer";
+    } else if (current.stepId === "make_divisor_whole") {
+      if (Number.isSafeInteger(value) && value > 0) classification = value === current.divisorWholeNumber ? "valid" : "incorrect_answer";
     } else if (current.stepId === "scale_dividend") {
       if (Number.isSafeInteger(value) && value > 0) classification = value === current.scaledDividend ? "valid" : "incorrect_answer";
     } else {
-      classification = classifyFinalAnswer(values, task, current.divisorNumerator);
+      classification = classifyFinalAnswer(values, task, current.divisorWholeNumber);
     }
     const state = read();
     const responses = state.responsesByTask[task.id] || [];

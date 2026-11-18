@@ -1998,6 +1998,13 @@ test('whole number divided by a mixed fraction greater than one teaches four sep
       solution: document.querySelector('.fraction-guided-solution')?.textContent || '',
       solutionDivisionCount: (document.querySelector('.fraction-guided-solution')?.textContent.match(/÷/g) || []).length,
       solutionEqualityCount: (document.querySelector('.fraction-guided-solution')?.textContent.match(/=/g) || []).length,
+      solutionDividendFontSize: document.querySelector('.fraction-guided-solution .fraction-whole-mixed-expression__whole')
+        ? getComputedStyle(document.querySelector('.fraction-guided-solution .fraction-whole-mixed-expression__whole')).fontSize : '',
+      promptDividendFontSize: document.querySelector('.fraction-guided-task-prompt .fraction-whole-mixed-expression__whole')
+        ? getComputedStyle(document.querySelector('.fraction-guided-task-prompt .fraction-whole-mixed-expression__whole')).fontSize : '',
+      activeInputWidth: document.querySelector('.fraction-guided-step-card[data-state="active"] .fraction-guided-scalar-input')
+        ? document.querySelector('.fraction-guided-step-card[data-state="active"] .fraction-guided-scalar-input').getBoundingClientRect().width : 0,
+      activeStepPrompt: document.querySelector('.fraction-guided-step-card[data-state="active"] .fraction-guided-step-prompt')?.textContent || '',
       quotientHelp: document.querySelector('.fraction-guided-quotient-help')?.textContent || ''
     });
     const initial = snapshot();
@@ -2050,6 +2057,9 @@ test('whole number divided by a mixed fraction greater than one teaches four sep
   expect(result.afterThird.solution).toContain('5');
   expect(result.afterThird.solutionDivisionCount).toBe(2);
   expect(result.afterThird.solutionEqualityCount).toBe(2);
+  expect(result.afterFirst.solutionDividendFontSize).toBe(result.afterFirst.promptDividendFontSize);
+  expect(result.afterSecond.activeInputWidth).toBeGreaterThanOrEqual(88);
+  expect(result.afterSecond.activeStepPrompt).toContain('2 onder de breuk verdwijnt');
   expect(result.afterThird.quotientHelp).toContain('hoe vaak');
   expect(result.afterThird.quotientHelp).toContain('hele getal');
   expect(result.afterThird.quotientHelp).toContain('teller');

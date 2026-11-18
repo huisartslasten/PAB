@@ -38,8 +38,8 @@ test("guided division exposes three ordered steps and validates the divisor conv
 test("guided division requires simplified mixed-number answers and resumes per learner", () => {
   const storage = memoryStorage();
   const session = createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession({ learnerKey: "learner-a", storage, tasks });
-  session.recordResponse({ rawValue: "9" });
-  session.recordResponse({ rawValue: "48" });
+  session.recordResponse({ rawValue: String(tasks[0].divisor.whole * tasks[0].divisor.denominator + tasks[0].divisor.numerator) });
+  session.recordResponse({ rawValue: String(tasks[0].wholeNumber * tasks[0].divisor.denominator) });
   assert.equal(session.recordResponse({ values: { ...answerValues(tasks[0]), numerator: "2", denominator: "6" } }).classification, "requires_simplification");
   assert.equal(session.recordResponse({ values: { ...answerValues(tasks[0]), numerator: "2", denominator: "6", simplified: true, simplifiedNumerator: "1", simplifiedDenominator: "3" } }).classification, "valid");
   const resumed = createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession({ learnerKey: "learner-a", storage, tasks });

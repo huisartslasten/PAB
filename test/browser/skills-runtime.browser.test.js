@@ -2112,6 +2112,7 @@ test('guided division completes ten tasks, offers restart, and resets through th
       if (!button) throw new Error('Missing active step check button');
       button.click();
     };
+    let completedWork = null;
     for (let index = 0; index < tasks.length; index += 1) {
       const task = tasks[index];
       const divisorNumerator = task.divisor.whole * task.divisor.denominator + task.divisor.numerator;
@@ -2125,6 +2126,16 @@ test('guided division completes ten tasks, offers restart, and resets through th
       fill('.fraction-guided-step-card[data-step-id="calculate_quotient"] [data-answer-part="primaryNumerator"]', task.answer.numerator);
       fill('.fraction-guided-step-card[data-step-id="calculate_quotient"] [data-answer-part="primaryDenominator"]', task.answer.denominator);
       check();
+      if (index === tasks.length - 1) {
+        completedWork = {
+          stepCount: document.querySelectorAll('.fraction-guided-step-card').length,
+          states: [...document.querySelectorAll('.fraction-guided-step-card')].map(card => card.dataset.state),
+          expanded: [...document.querySelectorAll('.fraction-guided-step-card')].every(card => card.open),
+          prompt: document.querySelector('.fraction-guided-task-prompt')?.textContent || '',
+          solution: document.querySelector('.fraction-guided-solution')?.textContent || '',
+          feedback: document.querySelector('.fraction-practice-feedback')?.textContent || ''
+        };
+      }
       const action = document.querySelector('.pacogo-fraction-practice-template__actions button');
       if (index < tasks.length - 1) {
         if (action?.textContent !== 'Volgende som') throw new Error('Expected Volgende som after task ' + (index + 1));
@@ -2141,6 +2152,7 @@ test('guided division completes ten tasks, offers restart, and resets through th
     document.querySelector('.pacogo-fraction-practice-template__actions button').click();
     return {
       completed,
+      completedWork,
       restartedProgress: document.querySelector('.fraction-practice-progress')?.textContent || '',
       restartedStepCount: document.querySelectorAll('.fraction-guided-step-card').length
     };
@@ -2148,6 +2160,12 @@ test('guided division completes ten tasks, offers restart, and resets through th
   expect(result.completed.progress).toContain('10 van 10');
   expect(result.completed.message).toContain('alle 10 sommen');
   expect(result.completed.action).toBe('Opnieuw oefenen');
+  expect(result.completedWork.stepCount).toBe(4);
+  expect(result.completedWork.states).toEqual(['completed', 'completed', 'completed', 'completed']);
+  expect(result.completedWork.expanded).toBe(true);
+  expect(result.completedWork.prompt).not.toBe('');
+  expect(result.completedWork.solution).toContain('=');
+  expect(result.completedWork.feedback).toContain('Goed gedaan');
   expect(result.restartedProgress).toContain('Som 1 van 10');
   expect(result.restartedStepCount).toBe(4);
 });

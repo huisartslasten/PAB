@@ -8309,3 +8309,59 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 **Volgende concrete stap**
 - Verifieer de handoff-update met Full Regression op de exacte nieuwe handoff-commit.
 - Laat de gebruiker daarna het overzicht in PacoGO TEST visueel controleren. Bouw geen vermenigvuldigingsoefeningen of extra UI-functionaliteit zonder expliciete opdracht.
+## 17. Breuken → Vermenigvuldigen → Heel getal × breuk kleiner dan 1 (18 november 2026)
+
+**Opdracht en brongebruik**
+- De gebruiker leverde vijf screenshots met voorbeelden van een heel getal vermenigvuldigen met een breukgetal kleiner dan 1.
+- De screenshots zijn uitsluitend inspiratie voor de taakvorm en presentatie. Geen voorbeeldsom is letterlijk overgenomen.
+- Er zijn exact 15 nieuwe, unieke sommen gemaakt. Alle breuken zijn positieve echte breuken (teller kleiner dan noemer).
+- Om de taakvorm uit de voorbeelden te behouden, is ieder heel getal deelbaar door de noemer; het antwoord is daardoor een positief heel getal dat de leerling in één numeriek veld invult.
+- Geen extra visueel model, oplossingsstap, hint of uitlegscherm toegevoegd.
+
+**Nieuwe taakbank**
+- Bestand: `pacogo-engine/fraction-whole-number-times-proper-fraction-task-bank.js`.
+- Sessie: `pacogo-engine/fraction-whole-number-times-proper-fraction-session.js`.
+- De 15 sommen:
+  1. 36 × 2/3 = 24
+  2. 48 × 3/4 = 36
+  3. 65 × 3/5 = 39
+  4. 72 × 5/6 = 60
+  5. 84 × 4/7 = 48
+  6. 96 × 5/8 = 60
+  7. 108 × 7/9 = 84
+  8. 120 × 7/10 = 84
+  9. 132 × 5/11 = 60
+  10. 144 × 7/12 = 84
+  11. 55 × 2/5 = 22
+  12. 63 × 4/9 = 28
+  13. 88 × 3/8 = 33
+  14. 105 × 2/7 = 30
+  15. 156 × 7/12 = 91
+- De sessie valideert gehele getallen, houdt pogingen en voortgang per leerling bij, hervat de volgende onvoltooide som en ondersteunt opnieuw starten na voltooiing.
+
+**Centrale interface en koppeling**
+- De rij `Heel getal vermenigvuldigen met een breukgetal kleiner dan 1` in het bestaande vermenigvuldigoverzicht heeft nu één knop `Oefenen`.
+- De knop routeert naar `domain=fractions&topic=vermenigvuldigen&exercise=whole-number-times-proper-fraction`.
+- De oefening gebruikt de centrale PacoGO Page Template, de centrale Fraction Practice Template, `renderFractionPracticeExpression` voor de gestapelde breuk en het ene numerieke antwoordveld, plus de centrale feedback-/actiegebieden.
+- De oefening gebruikt geen lokale fraction-template, geen eigen breukrenderer, geen apart visueel model en geen nieuwe bedieningselementen.
+- De andere zes vermenigvuldigonderdelen en hun oefenstatus blijven onaangeraakt. Er zijn geen andere oefenroutes toegevoegd.
+- Geen curriculum-Skill, Development, Claim, Evidence Target, mastery-contract, Supabase of LIVE `main` gewijzigd.
+
+**Tests en verificatie**
+- Unit-test: `pacogo-engine/fraction-whole-number-times-proper-fraction-session.test.js`; controleert 15 unieke taken, proper fractions, gehele quotiënten, bronvoorbeelden niet kopiëren, invoervalidatie, voortgang, hervatten, volledige afronding en reset.
+- Browserregressie in `test/browser/skills-runtime.browser.test.js`; controleert de Oefenen-knop en route, centrale page- en fraction-template, gestapelde breuknotatie, één numeriek antwoordveld, eerste correct antwoord en doorgaan naar som 2.
+- Code-/testcommit: `c96905a5a261a3b8fd8e04998281d6262289c7be`.
+- Full Regression #3965 / run `44296869549`: **GREEN / SUCCESS** op exact deze commit.
+- Browser Proof #816 / run `44296869513`: **SUCCESS** op exact dezelfde commit.
+
+**Actuele status**
+- Branch: `refactor/professional-v1`.
+- Laatste geverifieerde code-/testcommit: `c96905a5a261a3b8fd8e04998281d6262289c7be`.
+- Laatste geverifieerde Full Regression: #3965 — **GREEN / SUCCESS** op exact deze commit.
+- Deze handoff-update is zelf een repositorywijziging en moet nog door Full Regression worden geverifieerd op de resulterende handoff-commit.
+- LIVE `main` is onaangeroerd; geen deployment en geen Supabase-wijziging.
+
+**Volgende concrete stap**
+- Verifieer deze handoff-update met Full Regression op de exacte nieuwe commit.
+- Daarna kan de gebruiker de nieuwe oefening via de knop `Oefenen` in PacoGO TEST testen en de volledige reeks visueel/pedagogisch beoordelen.
+- Voeg geen extra uitleg, visuele modellen, andere oefenroutes of nieuwe bediening toe zonder expliciete opdracht.

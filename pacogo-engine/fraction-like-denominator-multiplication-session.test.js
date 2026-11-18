@@ -46,6 +46,8 @@ test("the practice validates products, requires reduction only when needed and r
   assert.equal(session.getCurrentTask().taskNumber, 2);
   assert.equal(session.recordAnswer({ numerator: "6", denominator: "25" }).classification, "valid");
   assert.equal(session.getCurrentTask().taskNumber, 3);
+  assert.equal(session.recordAnswer({ numerator: "8", denominator: "49" }).classification, "valid");
+  assert.equal(session.getCurrentTask().taskNumber, 4);
   assert.equal(session.recordAnswer({ numerator: "15", denominator: "36" }).classification, "simplification_required");
   assert.equal(session.recordAnswer({
     numerator: "15", denominator: "36", simplified: true,

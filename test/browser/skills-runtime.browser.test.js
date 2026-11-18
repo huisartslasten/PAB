@@ -1829,3 +1829,69 @@ test('mixed unlike-denominator multiplication opens through the central Skills r
   expect(result.second.wholeNumbers).toEqual(['3', '2']);
   expect(result.second.progress).toContain('Som 2 van 15');
 });
+
+test('Delen in the fraction overview opens the five-row division overview using the central Skills overview pattern', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    const navigations = [];
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {},
+      managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    const overview = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', documentRef: document, navigate: target => navigations.push(String(target))
+    });
+    await overview.mount();
+    const divisionTile = [...document.querySelectorAll('.paco-tile')].find(tile =>
+      tile.querySelector('.paco-tile-title')?.textContent === 'Delen'
+    );
+    divisionTile.querySelector('.paco-tile-action').click();
+    const runtime = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'delen', documentRef: document,
+      navigate: target => navigations.push(String(target))
+    });
+    await runtime.mount();
+    const rows = [...document.querySelectorAll('.skills-addition-overview-row')];
+    const buttons = [...document.querySelectorAll('.skills-addition-overview-open')];
+    buttons.forEach(button => button.click());
+    return {
+      title: document.querySelector('.paco-template-main h1')?.textContent || '',
+      centralPage: Boolean(document.querySelector('.paco-page-template')),
+      centralCard: Boolean(document.querySelector('.skills-addition-overview.card')),
+      heading: document.querySelector('[aria-label="Onderwerpen breuken delen"]')?.getAttribute('aria-label') || '',
+      labels: rows.map(row => row.querySelector('.skills-addition-overview-label')?.textContent || ''),
+      levels: rows.map(row => row.querySelectorAll('.paco-bone-difficulty__bone.is-filled, .paco-bone-difficulty__bone--filled').length),
+      boneCounts: rows.map(row => row.querySelectorAll('.paco-bone-difficulty__bone').length),
+      exerciseButtonCount: buttons.length,
+      navigations
+    };
+  });
+  expect(result.title).toBe('Delen');
+  expect(result.centralPage).toBe(true);
+  expect(result.centralCard).toBe(true);
+  expect(result.heading).toBe('Onderwerpen breuken delen');
+  expect(result.labels).toEqual([
+    'Heel getal delen door een breukgetal groter dan 1',
+    'Gelijknamige breuken kleiner dan 1 op elkaar delen',
+    'Gelijknamige breuken groter dan 1 op elkaar delen',
+    'Ongelijknamige breuken kleiner dan 1 op elkaar delen',
+    'Ongelijknamige breuken groter dan 1 op elkaar delen'
+  ]);
+  expect(result.levels).toEqual([1, 2, 2, 3, 4]);
+  expect(result.boneCounts).toEqual([5, 5, 5, 5, 5]);
+  expect(result.exerciseButtonCount).toBe(5);
+  expect(result.navigations).toHaveLength(6);
+  expect(result.navigations[0]).toContain('topic=delen');
+  expect(result.navigations[1]).toContain('exercise=whole-number-divided-by-fraction-greater-than-one');
+  expect(result.navigations[2]).toContain('exercise=like-denominator-division');
+  expect(result.navigations[3]).toContain('exercise=mixed-like-denominator-division');
+  expect(result.navigations[4]).toContain('exercise=unlike-denominator-division');
+  expect(result.navigations[5]).toContain('exercise=mixed-unlike-denominator-division');
+});

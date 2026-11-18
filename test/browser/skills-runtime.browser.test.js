@@ -1712,3 +1712,120 @@ test('unlike-denominator multiplication opens from the central Skills route and 
   ]);
 });
 
+
+test('mixed unlike-denominator multiplication opens through the central Skills route and reuses the central fraction templates for fifteen tasks', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=vermenigvuldigen', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    localStorage.removeItem('pacogo:fraction-mixed-unlike-denominator-multiplication:v1:Zyon');
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const { FRACTION_MIXED_UNLIKE_DENOMINATOR_MULTIPLICATION_TASKS: tasks } =
+      await import('/pacogo-engine/fraction-mixed-unlike-denominator-multiplication-task-bank.js');
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {},
+      managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    let navigation = '';
+    const overview = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'vermenigvuldigen', documentRef: document,
+      navigate: target => { navigation = String(target); }
+    });
+    await overview.mount();
+    const row = [...document.querySelectorAll('.skills-addition-overview-row')].find(item =>
+      item.querySelector('.skills-addition-overview-label')?.textContent ===
+        'Ongelijknamige breuken groter dan 1 met elkaar vermenigvuldigen'
+    );
+    const rowButtonCount = row.querySelectorAll('button').length;
+    row.querySelector('button')?.click();
+    const practice = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'vermenigvuldigen',
+      exercise: 'mixed-unlike-denominator-multiplication',
+      documentRef: document, navigate: () => {}
+    });
+    await practice.mount();
+    const initial = {
+      navigation,
+      rowButtonCount,
+      pageTitle: document.querySelector('.paco-template-main h1')?.textContent || '',
+      pageTemplate: Boolean(document.querySelector('.paco-page-template')),
+      fractionTemplate: Boolean(document.querySelector('[data-component="fraction-practice-template"]')),
+      title: document.querySelector('.fraction-whole-mixed-addition-card h2')?.textContent || '',
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      mixedNumbers: document.querySelectorAll('.fraction-whole-mixed-expression .pacogo-fraction-mixed-number').length,
+      wholeNumbers: [...document.querySelectorAll('.fraction-whole-mixed-expression .pacogo-fraction-mixed-number__whole')]
+        .map(node => node.textContent),
+      expression: document.querySelector('.fraction-whole-mixed-expression')?.textContent || '',
+      wholeInputVisible: !document.querySelector('.pacogo-fraction-answer__whole-field')?.hidden,
+      wholeToggleHidden: document.querySelector('.pacogo-fraction-answer__toggle')?.hidden,
+      simplify: document.querySelector('.pacogo-fraction-answer__simplify')?.textContent || '',
+      taskCount: tasks.length,
+      allMixedUnlike: tasks.every(task =>
+        task.left.whole > 0 && task.right.whole > 0 &&
+        task.left.denominator !== task.right.denominator &&
+        task.left.numerator > 0 && task.left.numerator < task.left.denominator &&
+        task.right.numerator > 0 && task.right.numerator < task.right.denominator
+      ),
+      reducibleProducts: tasks.filter(task => {
+        const numerator = (task.left.whole * task.left.denominator + task.left.numerator) *
+          (task.right.whole * task.right.denominator + task.right.numerator);
+        const denominator = task.left.denominator * task.right.denominator;
+        const remainder = numerator % denominator;
+        return remainder > 0 && remainder % 2 === 0 && denominator % 2 === 0;
+      }).length
+    };
+    const set = (part, value) => {
+      const field = document.querySelector('[data-answer-part="' + part + '"]');
+      field.value = value;
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    set('whole', '3');
+    set('primaryNumerator', '8');
+    set('primaryDenominator', '30');
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    const requiresSimplification = document.querySelector('[role="status"]')?.textContent || '';
+    document.querySelector('.pacogo-fraction-answer__simplify').click();
+    set('simplifiedNumerator', '4');
+    set('simplifiedDenominator', '15');
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    const afterCorrect = {
+      feedback: document.querySelector('[role="status"]')?.textContent || '',
+      next: document.querySelector('.pacogo-fraction-practice-template__actions button')?.textContent || '',
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || ''
+    };
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    const second = {
+      wholeNumbers: [...document.querySelectorAll('.fraction-whole-mixed-expression .pacogo-fraction-mixed-number__whole')]
+        .map(node => node.textContent),
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || ''
+    };
+    return { initial, requiresSimplification, afterCorrect, second };
+  });
+  expect(result.initial.navigation).toContain('exercise=mixed-unlike-denominator-multiplication');
+  expect(result.initial.rowButtonCount).toBe(1);
+  expect(result.initial.pageTitle).toBe('Oefenen');
+  expect(result.initial.pageTemplate).toBe(true);
+  expect(result.initial.fractionTemplate).toBe(true);
+  expect(result.initial.title).toBe('Ongelijknamige breuken groter dan 1 met elkaar vermenigvuldigen');
+  expect(result.initial.progress).toContain('Som 1 van 15');
+  expect(result.initial.mixedNumbers).toBe(2);
+  expect(result.initial.wholeNumbers).toEqual(['2', '1']);
+  expect(result.initial.expression).toContain('×');
+  expect(result.initial.expression).not.toContain('/');
+  expect(result.initial.wholeInputVisible).toBe(true);
+  expect(result.initial.wholeToggleHidden).toBe(true);
+  expect(result.initial.simplify).toBe('Vereenvoudigen');
+  expect(result.initial.taskCount).toBe(15);
+  expect(result.initial.allMixedUnlike).toBe(true);
+  expect(result.initial.reducibleProducts).toBeGreaterThan(0);
+  expect(result.requiresSimplification).toContain('vereenvoudigd');
+  expect(result.afterCorrect.feedback).toContain('Goed gedaan');
+  expect(result.afterCorrect.next).toBe('Volgende som');
+  expect(result.afterCorrect.progress).toContain('1 afgerond');
+  expect(result.second.wholeNumbers).toEqual(['3', '2']);
+  expect(result.second.progress).toContain('Som 2 van 15');
+});

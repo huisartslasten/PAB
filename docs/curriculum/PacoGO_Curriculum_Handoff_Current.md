@@ -8703,3 +8703,43 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 **Volgende concrete stap**
 - Laat de gebruiker het Delen-overzicht visueel vergelijken met Optellen/Aftrekken in PacoGO TEST.
 - Bouw geen onderliggende deel-oefeningen of aanvullende onderdelen zonder expliciete opdracht.
+
+
+## 27. Breuken → Delen → Heel getal delen door een breukgetal groter dan 1 (18 november 2026)
+
+**Opdracht en brongebruik**
+- De gebruiker vroeg exact 15 nieuwe sommen op basis van drie screenshots.
+- De screenshots tonen de vorm: heel getal ÷ gemengd getal groter dan 1, met een gemengd getal als antwoord.
+- De voorbeeldsommen zijn niet één-op-één overgenomen.
+- Alle 15 nieuwe delingen zijn exact nagerekend; de antwoorden zijn als vereenvoudigde gemengde getallen vastgelegd en zijn groter dan 1.
+
+**Taakbank en sessie**
+- Taakbank: `pacogo-engine/fraction-whole-number-divided-by-fraction-greater-than-one-task-bank.js`.
+- Sessie: `pacogo-engine/fraction-whole-number-divided-by-fraction-greater-than-one-session.js`.
+- Unit-test: `pacogo-engine/fraction-whole-number-divided-by-fraction-greater-than-one-session.test.js`.
+- De sessie controleert de rekenkundige gelijkwaardigheid, vereenvoudiging, 15 unieke opgaven en leerlingvoortgang/herstel.
+
+**Centrale interface en route**
+- Bestaande overzichtsroute-ID `whole-number-divided-by-fraction-greater-than-one` is aangesloten op de oefening.
+- De oefening gebruikt de centrale PacoGO Page Template, `createFractionPracticeTemplate()`, `renderMixedNumber()` en `renderFractionAnswerInput()`.
+- Antwoord wordt als gemengd getal ingevuld; het hele-getalveld is verplicht en de centrale vereenvoudigingsbediening wordt hergebruikt.
+- Geen nieuwe lokale template, extra visualisaties, extra bediening, curriculumwijziging, Supabase-wijziging of wijziging aan LIVE `main`.
+
+**Tests en verificatie**
+- Taskbank-/sessiecommits: `4e6a9e97c0db84c44142570a173789ab3086932b`, `d4e78c0e8d8bdd7944681b91337862559951cfa5`, correctie antwoord laatste opgave `e9d544eb58658d7e5d0b9e7a9f9085f3406c16cf`.
+- Runtimecommit: `b2dbc87233c3cdf74247b9f5861c0dd7d1ef2f51`.
+- Browser-testcommit: `a2d9fedd3018e59b86f038081840ff0b5e58928f`. Browser Proof #829 faalde uitsluitend doordat de test een niet-bestaande CSS-class voor teller/noemer selecteerde; de centrale renderer gebruikt `pacogo-fraction-numerator` en `pacogo-fraction-denominator`. De implementatie was niet de oorzaak.
+- Testselector gecorrigeerd op commit `7e37dff7906fb64569f790fe75d8865fd420efd1`.
+- Gerichte Browser Proof #830 / run `44365023233`: **GREEN / SUCCESS** op exact commit `7e37dff7906fb64569f790fe75d8865fd420efd1`.
+- Full Regression #4013 / run `44365023405`: **IN PROGRESS** op exact commit `7e37dff7906fb64569f790fe75d8865fd420efd1`; nog niet als groen aangemerkt.
+- Full Regression #4007–#4011 op eerdere tussencommits zijn groen; #4012 op de browser-testcommit vóór selectorcorrectie faalde door dezelfde onjuiste testselector.
+
+**Actuele status vóór deze handoff-update**
+- Branch: `refactor/professional-v1`.
+- Laatste code-/testcommit: `7e37dff7906fb64569f790fe75d8865fd420efd1`.
+- Laatste volledig afgeronde Full Regression voor deze oefening: #4011 — **GREEN / SUCCESS** op runtimecommit `b2dbc87233c3cdf74247b9f5861c0dd7d1ef2f51`; #4013 op de definitieve testcommit is nog bezig.
+- LIVE `main` onaangeroerd; geen deployment en geen Supabase-wijziging.
+
+**Volgende concrete stap**
+- Controleer Full Regression #4013 en de regression die door deze handoff-update wordt gestart.
+- Laat de gebruiker de 15 sommen visueel controleren in PacoGO TEST. Voeg geen andere deelonderwerpen of extra functionaliteit toe zonder expliciete opdracht.

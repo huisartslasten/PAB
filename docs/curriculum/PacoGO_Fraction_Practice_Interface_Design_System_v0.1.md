@@ -333,3 +333,26 @@ Aanvullende acceptatiecriteria:
 - [ ] Enter activeert niets wanneer **Controleren** ontbreekt of uitgeschakeld is.
 - [ ] De knop blijft met muis, Enter en Spatie bedienbaar.
 - [ ] Browserregressie bewijst dit gedrag op de centrale template.
+
+
+## 17. Antwoordcontrole en vereenvoudigen — verplicht gedrag
+
+De gedeelde component `renderFractionAnswerInput` is de enige toegestane antwoordbediening voor breukenantwoorden. Elke oefening toont in het centrale controlegebied altijd de knop **Vereenvoudigen**, ook wanneer de uitkomst van een specifieke som al onvereenvoudigbaar is.
+
+- De eerste teller en noemer blijven zichtbaar als het oorspronkelijke antwoord.
+- Na activeren van **Vereenvoudigen** verschijnen rechts van het oorspronkelijke antwoord de twee invoervelden voor de vereenvoudigde teller en noemer, voorafgegaan door een gelijkteken.
+- De oorspronkelijke invoer wordt niet automatisch gewijzigd of overschreven.
+- De oefening mag een antwoord dat nog verder vereenvoudigd kan worden nooit als correct registreren of de voortgang verhogen.
+- Wanneer de oorspronkelijke uitkomst correct is maar een grootste gemene deler groter dan 1 heeft, is de classificatie `simplification_required` totdat de leerling de vereenvoudigde breuk invult.
+- De vereenvoudigde teller en noemer moeten exact de breuk in laagste termen weergeven. Een onvolledige of onjuiste vereenvoudiging wordt niet goedgekeurd.
+- Wanneer de oorspronkelijke uitkomst al in de eenvoudigste vorm staat, is de extra vereenvoudigingsinvoer niet verplicht. De knop blijft wel beschikbaar en de velden verschijnen alleen na expliciete activering.
+- De sessie valideert beide antwoorden; de gedeelde UI-component bepaalt nooit zelf of een antwoord correct is.
+- Dezelfde regels gelden voor alle breukenoefeningen die vereenvoudiging vereisen. Oefeningadapters mogen geen eigen vereenvoudigingsvelden of afwijkende validatie bouwen.
+
+Acceptatiecriteria:
+- [ ] **Vereenvoudigen** is steeds zichtbaar in het centrale controlegebied.
+- [ ] Bij een vereenvoudigbare juiste uitkomst wordt voortgang geblokkeerd totdat de juiste vereenvoudigde breuk is ingevuld.
+- [ ] Een onjuiste vereenvoudigde breuk wordt afgewezen.
+- [ ] De oorspronkelijke en vereenvoudigde antwoorden blijven naast elkaar zichtbaar.
+- [ ] Een onvereenvoudigbare uitkomst kan zonder extra vereenvoudigingsinvoer worden goedgekeurd.
+- [ ] Browsertests controleren zowel de blokkering als het goedkeuren na correcte vereenvoudiging.

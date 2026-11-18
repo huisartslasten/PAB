@@ -972,3 +972,70 @@ test('fraction practice retains the canonical left sidebar on desktop and mobile
     expect(layout.mainVisible).toBe(true);
   }
 });
+
+test('like-denominator subtraction requires simplification before completion and uses the shared fraction answer control', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=aftrekken&exercise=like-denominator-subtraction', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    localStorage.removeItem('pacogo:fraction-like-denominator-subtraction:v1:Zyon');
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {},
+      managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    const runtime = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'aftrekken', exercise: 'like-denominator-subtraction',
+      documentRef: document, navigate: () => {}
+    });
+    await runtime.mount();
+    const answerInputs = () => [...document.querySelectorAll('.pacogo-fraction-answer__input')];
+    const check = () => document.querySelector('.pacogo-fraction-practice-template__actions button');
+    const fillPrimary = (n, d) => {
+      const fields = answerInputs();
+      fields[0].value = String(n); fields[0].dispatchEvent(new Event('input', { bubbles: true }));
+      fields[1].value = String(d); fields[1].dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    const initial = {
+      simplifyVisible: document.querySelector('.pacogo-fraction-answer__simplify')?.textContent || '',
+      stackedEquation: document.querySelectorAll('.pacogo-fraction-representation--symbolic').length,
+      task: document.querySelector('.fraction-practice-progress')?.textContent || ''
+    };
+    fillPrimary(5, 9); check().click();
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    fillPrimary(3, 10); check().click();
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    fillPrimary(6, 12); check().click();
+    const blocked = {
+      task: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      feedback: document.querySelector('[role="status"]')?.textContent || '',
+      nextVisible: Boolean(document.querySelector('.pacogo-fraction-practice-template__actions button')?.textContent.includes('Volgende'))
+    };
+    document.querySelector('.pacogo-fraction-answer__simplify').click();
+    const simplifiedFields = answerInputs();
+    simplifiedFields[2].value = '1'; simplifiedFields[2].dispatchEvent(new Event('input', { bubbles: true }));
+    simplifiedFields[3].value = '2'; simplifiedFields[3].dispatchEvent(new Event('input', { bubbles: true }));
+    check().click();
+    return {
+      initial, blocked,
+      after: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      feedback: document.querySelector('[role="status"]')?.textContent || '',
+      next: document.querySelector('.pacogo-fraction-practice-template__actions button')?.textContent || '',
+      simplifiedVisible: !document.querySelector('.pacogo-fraction-answer__simplified').hidden
+    };
+  });
+  expect(result.initial.simplifyVisible).toBe('Vereenvoudigen');
+  expect(result.initial.stackedEquation).toBe(2);
+  expect(result.initial.task).toContain('Som 1 van 15');
+  expect(result.blocked.task).toContain('Som 3 van 15');
+  expect(result.blocked.feedback).toContain('kan nog vereenvoudigd worden');
+  expect(result.blocked.nextVisible).toBe(false);
+  expect(result.after).toContain('3 afgerond');
+  expect(result.feedback).toContain('vereenvoudigd');
+  expect(result.next).toBe('Volgende som');
+  expect(result.simplifiedVisible).toBe(true);
+});
+

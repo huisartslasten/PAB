@@ -8103,3 +8103,27 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Verifieer deze handoff-update met Full Regression op de exacte nieuwe commit.
 - Daarna de gebruiker de vernieuwde 15-sommen-oefening visueel laten controleren in PacoGO TEST.
 - Geen verdere wijzigingen aan Flashcards, de centrale template of de sommen toevoegen zonder concrete aanleiding en expliciete opdracht.
+
+
+## 12. Centrale vereenvoudigingsbediening voor breukenoefeningen (18 november 2026)
+
+**Gebruikerscorrectie en oorzaak**
+- Visuele controle van de oefening "Gelijknamige breuken kleiner dan 1 van elkaar aftrekken" liet zien dat de zichtbare knop **Vereenvoudigen** ontbrak en dat een nog vereenvoudigbare uitkomst als correct werd goedgekeurd.
+- Oorzaak: de adapter gebruikte `renderFractionPracticeExpression` met eigen teller-/noemervelden en de sessie valideerde alleen de ruwe breuk. De bestaande centrale `renderFractionAnswerInput` was niet aangesloten; de sessie had geen gcd-/vereenvoudigingsvalidatie.
+- Full Regression #3938 was GREEN op de voorafgaande commit `c293900069909b97b849345f8ca68ea750f3d1b3`, maar de bestaande tests bewezen niet de volledige template-acceptatiecriteria.
+
+**Correcte implementatie**
+- Gebruik de gedeelde `renderFractionAnswerInput` voor oorspronkelijke en vereenvoudigde velden; knop **Vereenvoudigen** blijft altijd zichtbaar in het controlegebied.
+- De sessie berekent de grootste gemene deler en accepteert een vereenvoudigbare uitkomst pas als ook de correcte breuk in laagste termen is ingevuld.
+- Een ontbrekende vereenvoudiging krijgt classificatie `simplification_required`; een onjuiste vereenvoudiging wordt afgewezen.
+- De originele invoer blijft staan; de vereenvoudigde invoer verschijnt rechts via de centrale antwoordcomponent.
+- De browserregressie controleert expliciet de derde som (6/12): deze mag niet worden goedgekeurd vóór correcte invoer van (1/2).
+- De Enter-bediening blijft via de centrale Fraction Practice Template aan de knop **Controleren** gekoppeld.
+
+**Verificatie**
+- Deze implementatie is nog niet gecommit of getest. De Full Regression-baseline #3938 / run `44210326069` was GREEN op commit `c293900069909b97b849345f8ca68ea750f3d1b3`.
+- Branch blijft `refactor/professional-v1`; LIVE `main` onaangeroerd; geen Supabase- of deploymentwijziging.
+
+**Volgende stap**
+- Voer de unit- en browserregressies uit, daarna Full Regression op de exacte codecommit.
+- Verifieer vervolgens deze handoff-update met een aparte Full Regression op de handoff-commit.

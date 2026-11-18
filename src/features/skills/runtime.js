@@ -256,7 +256,7 @@ export function createSkillsRuntime({
       title.textContent = 'Gelijknamige breuken kleiner dan 1 van elkaar aftrekken';
       const instruction = documentRef.createElement('p');
       instruction.className = 'fraction-practice-instruction';
-      instruction.textContent = 'Trek de tellers van elkaar af. De noemer blijft gelijk.';
+      instruction.textContent = 'Trek de tellers van elkaar af. De noemer blijft gelijk. Vereenvoudig je antwoord als dat kan.';
       const progressLabel = documentRef.createElement('p');
       progressLabel.className = 'fraction-practice-progress';
       progressLabel.textContent = task
@@ -275,51 +275,59 @@ export function createSkillsRuntime({
         restart.type = 'button';
         restart.className = 'paco-btn paco-btn--primary';
         restart.textContent = 'Oefenronde opnieuw doen';
-        restart.addEventListener('click', () => {
-          session.reset();
-          renderCurrentTask();
-        });
+        restart.addEventListener('click', () => { session.reset(); renderCurrentTask(); });
         template.actionsArea.append(restart);
         content.append(card);
         return;
       }
 
       const equation = documentRef.createElement('div');
-      equation.className = 'construction-equation';
-      const expression = renderFractionPracticeExpression({
-        mount: equation,
-        expression: task.leftFraction.numerator + '/' + task.leftFraction.denominator +
-          ' − ' + task.rightFraction.numerator + '/' + task.rightFraction.denominator + ' = ?/?',
-        inputLabels: ['Uitkomstteller', 'Uitkomstnoemer']
-      });
+      equation.className = 'construction-equation fraction-like-subtraction-equation';
+      equation.append(
+        renderFractionRepresentation(task.leftFraction, 'symbolic_fraction', 'Eerste breuk'),
+        documentRef.createTextNode(' − '),
+        renderFractionRepresentation(task.rightFraction, 'symbolic_fraction', 'Tweede breuk'),
+        documentRef.createTextNode(' = ')
+      );
+      const answerMount = documentRef.createElement('div');
+      answerMount.className = 'fraction-like-subtraction-answer';
+      equation.append(answerMount);
       template.workArea.append(equation);
 
       const prompt = documentRef.createElement('p');
-      prompt.textContent = 'Vul de teller en noemer van het antwoord in.';
+      prompt.textContent = 'Vul de uitkomst in. Gebruik Vereenvoudigen als de breuk nog kleiner kan.';
       template.promptArea.append(prompt);
 
       const feedback = documentRef.createElement('p');
       feedback.setAttribute('role', 'status');
-      feedback.textContent = 'Trek de tellers van elkaar af. De noemer blijft gelijk.';
+      feedback.textContent = 'Je antwoord wordt pas goed gerekend als het volledig is vereenvoudigd wanneer dat mogelijk is.';
       template.feedbackArea.append(feedback);
 
+      const answer = renderFractionAnswerInput({
+        workMount: answerMount,
+        controlsMount: template.controlsArea
+      });
       const submit = documentRef.createElement('button');
       submit.type = 'button';
       submit.className = 'paco-btn paco-btn--primary';
       submit.textContent = 'Controleren';
+      template.actionsArea.append(submit);
+
       submit.addEventListener('click', () => {
-        const values = expression.getValues();
+        const values = answer.getValues();
         const result = session.recordAnswer({
-          numerator: values[0] || '',
-          denominator: values[1] || ''
+          numerator: values.numerator,
+          denominator: values.denominator,
+          simplified: values.simplified,
+          simplifiedNumerator: values.simplifiedNumerator,
+          simplifiedDenominator: values.simplifiedDenominator
         });
-        const latestProgress = session.getProgress();
         progressLabel.textContent = 'Som ' + (result.progress.completedCount + (result.progress.isComplete ? 0 : 1)) +
           ' van ' + result.progress.totalCount + ' • ' + result.progress.completedCount + ' afgerond';
         if (result.classification === 'valid') {
-          expression.lock();
+          answer.lock();
           submit.disabled = true;
-          feedback.textContent = 'Goed gedaan! Je hebt de tellers afgetrokken en de noemer gelijk gehouden.';
+          feedback.textContent = 'Goed gedaan! Je hebt de breuk correct uitgerekend en vereenvoudigd.';
           const next = documentRef.createElement('button');
           next.type = 'button';
           next.className = 'paco-btn paco-btn--primary';
@@ -327,17 +335,20 @@ export function createSkillsRuntime({
           next.addEventListener('click', renderCurrentTask);
           template.actionsArea.replaceChildren(next);
         } else {
-          feedback.textContent = result.classification === 'invalid_input'
-            ? 'Vul bij de uitkomst zowel een teller als een noemer in.'
-            : 'Nog niet. Trek de tellers van elkaar af en neem dezelfde noemer over.';
-          expression.focus();
+          const messages = {
+            invalid_input: 'Vul bij de uitkomst zowel een teller als een noemer in.',
+            incorrect_answer: 'De aftrekking klopt nog niet. Trek de tellers af en behoud de noemer.',
+            simplification_required: 'Je uitkomst klopt, maar kan nog vereenvoudigd worden. Klik op Vereenvoudigen en vul de nieuwe breuk in.',
+            invalid_simplification: 'Vul ook de teller en noemer van de vereenvoudigde breuk in.',
+            incorrect_simplification: 'De vereenvoudigde breuk klopt nog niet. Zoek de grootste gemene deler.'
+          };
+          feedback.textContent = messages[result.classification] || 'Controleer je antwoord en probeer het opnieuw.';
+          answer.focus();
         }
       });
-      template.controlsArea.append(submit);
       content.append(card);
-      expression.focus();
+      answer.focus();
     }
-
     renderCurrentTask();
   }
 

@@ -80,15 +80,41 @@ function createFractionLikeDenominatorSubtractionSession({
       isComplete: completedCount === normalized.length
     });
   }
-  function recordAnswer({ numerator, denominator } = {}) {
+  function greatestCommonDivisor(a, b) {
+    let left = Math.abs(a), right = Math.abs(b);
+    while (right !== 0) [left, right] = [right, left % right];
+    return left || 1;
+  }
+  function recordAnswer({
+    numerator, denominator, simplified = false,
+    simplifiedNumerator, simplifiedDenominator
+  } = {}) {
     const task = getCurrentTask();
     if (!task) throw new Error("The subtraction practice is complete.");
     const n = String(numerator ?? "").trim(), d = String(denominator ?? "").trim();
     const validInteger = value => /^[0-9]+$/.test(value);
-    const classification = !validInteger(n) || !validInteger(d) || Number(d) <= 0
-      ? "invalid_input"
-      : Number(n) === task.result.numerator && Number(d) === task.result.denominator
-        ? "valid" : "incorrect_answer";
+    const primaryValid = validInteger(n) && validInteger(d) && Number(d) > 0 &&
+      Number(n) === task.result.numerator && Number(d) === task.result.denominator;
+    const divisor = greatestCommonDivisor(task.result.numerator, task.result.denominator);
+    const requiresSimplification = divisor > 1;
+    const sn = String(simplifiedNumerator ?? "").trim();
+    const sd = String(simplifiedDenominator ?? "").trim();
+    let classification = "incorrect_answer";
+    if (!validInteger(n) || !validInteger(d) || Number(d) <= 0) {
+      classification = "invalid_input";
+    } else if (!primaryValid) {
+      classification = "incorrect_answer";
+    } else if (requiresSimplification && !simplified) {
+      classification = "simplification_required";
+    } else if (simplified && (!validInteger(sn) || !validInteger(sd) || Number(sd) <= 0)) {
+      classification = "invalid_simplification";
+    } else if (simplified && Number(sn) !== task.result.numerator / divisor) {
+      classification = "incorrect_simplification";
+    } else if (simplified && Number(sd) !== task.result.denominator / divisor) {
+      classification = "incorrect_simplification";
+    } else {
+      classification = "valid";
+    }
     const state = read();
     state.attemptsByTask[task.id] = (state.attemptsByTask[task.id] || 0) + 1;
     if (classification === "valid") state.completedTaskIds.push(task.id);

@@ -43,18 +43,36 @@ assert.equal(a.recordAnswer({ numerator: 4, denominator: 9 }).classification, "i
 assert.equal(a.getProgress().completedCount, 0);
 assert.equal(a.recordAnswer({ numerator: 5, denominator: 9 }).classification, "valid");
 assert.equal(a.getCurrentTask().id, "fraction-like-denominator-subtraction-02");
+assert.equal(a.recordAnswer({ numerator: 3, denominator: 10 }).classification, "valid");
+assert.equal(a.getCurrentTask().id, "fraction-like-denominator-subtraction-03");
+assert.equal(a.recordAnswer({ numerator: 6, denominator: 12 }).classification, "simplification_required");
+assert.equal(a.getProgress().completedCount, 2);
+assert.equal(a.recordAnswer({
+  numerator: 6, denominator: 12, simplified: true,
+  simplifiedNumerator: "3", simplifiedDenominator: "6"
+}).classification, "incorrect_simplification");
+assert.equal(a.recordAnswer({
+  numerator: 6, denominator: 12, simplified: true,
+  simplifiedNumerator: "1", simplifiedDenominator: "2"
+}).classification, "valid");
+assert.equal(a.getProgress().completedCount, 3);
 assert.equal(a.getProgress().completedCount, 1);
 assert.equal(b.getProgress().completedCount, 0);
-assert.equal(a.getProgress().attemptCount, 3);
+assert.equal(a.getProgress().attemptCount, 7);
 
 const completeAll = createFractionLikeDenominatorSubtractionSession({ learnerKey: "learner-complete-all", storage });
 for (let index = 0; index < 15; index += 1) {
   const current = completeAll.getCurrentTask();
   assert.equal(current.taskNumber, index + 1);
   assert.equal(current.totalTasks, 15);
+  const divisor = (x, y) => y ? divisor(y, x % y) : x;
+  const gcd = divisor(current.result.numerator, current.result.denominator);
   const result = completeAll.recordAnswer({
     numerator: current.result.numerator,
-    denominator: current.result.denominator
+    denominator: current.result.denominator,
+    simplified: gcd > 1,
+    simplifiedNumerator: String(current.result.numerator / gcd),
+    simplifiedDenominator: String(current.result.denominator / gcd)
   });
   assert.equal(result.classification, "valid");
 }

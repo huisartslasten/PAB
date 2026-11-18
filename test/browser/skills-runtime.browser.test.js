@@ -926,6 +926,48 @@ test('like-denominator subtraction opens from the central Skills route and runs 
   expect(result.secondProgress).toContain('Som 2 van 15');
 });
 
+
+test('like-denominator subtraction accepts a directly entered reduced equivalent fraction', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=aftrekken&exercise=like-denominator-subtraction', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    localStorage.removeItem('pacogo:fraction-like-denominator-subtraction:v1:Zyon');
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {},
+      managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    const runtime = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'aftrekken', exercise: 'like-denominator-subtraction',
+      documentRef: document, navigate: () => {}
+    });
+    await runtime.mount();
+    const fill = (part, value) => {
+      const field = document.querySelector('[data-answer-part="' + part + '"]');
+      field.value = String(value);
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    const check = () => document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    fill('primaryNumerator', 5); fill('primaryDenominator', 9); check();
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    fill('primaryNumerator', 3); fill('primaryDenominator', 10); check();
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    fill('primaryNumerator', 1); fill('primaryDenominator', 2); check();
+    return {
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      feedback: document.querySelector('[role="status"]')?.textContent || '',
+      next: document.querySelector('.pacogo-fraction-practice-template__actions button')?.textContent || ''
+    };
+  });
+  expect(result.progress).toContain('3 afgerond');
+  expect(result.feedback).toContain('Goed gedaan');
+  expect(result.next).toBe('Volgende som');
+});
+
 test('fraction practice retains the canonical left sidebar on desktop and mobile', async ({ page }) => {
   const layouts = [];
   for (const viewport of [{ width: 1280, height: 800 }, { width: 390, height: 844 }]) {

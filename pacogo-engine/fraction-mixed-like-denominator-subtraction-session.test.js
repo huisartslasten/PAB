@@ -26,7 +26,7 @@ for(let i=0;i<15;i++){
  const t=complete.getCurrentTask(),g=(a,b)=>b?g(b,a%b):a;
  const d=g(t.result.numerator,t.result.denominator);
  const result=complete.recordAnswer({
-  wholeNumberEnabled:t.result.whole>0,wholeNumber:String(t.result.whole),
+  wholeNumberEnabled:t.result.whole>0,wholeNumber:t.result.whole>0?String(t.result.whole):"",
   numerator:String(t.result.numerator/d),denominator:String(t.result.denominator/d),
   simplified:false
  });

@@ -50,6 +50,23 @@ function createFractionPracticeTemplate({
   controlsArea.setAttribute("aria-label", "Bediening");
   feedbackArea.setAttribute("aria-live", "polite");
 
+  // Enter in a single-line answer field performs the same explicit check action
+  // as activating the visible Controleren button. Textareas keep native Enter.
+  root.addEventListener("keydown", event => {
+    if (event.key !== "Enter" || event.defaultPrevented) return;
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement) || target.disabled || target.readOnly) return;
+    if (["button", "submit", "reset", "checkbox", "radio", "file", "hidden"].includes(target.type)) return;
+
+    const checkButton = [controlsArea, actionsArea]
+      .flatMap(area => Array.from(area.querySelectorAll("button")))
+      .find(button => button.textContent.trim().replace(/\\s+/g, " ") === "Controleren" && !button.disabled);
+    if (!checkButton) return;
+
+    event.preventDefault();
+    checkButton.click();
+  });
+
   appendNodes(contextArea, context, "context");
   appendNodes(titleArea, title, "title");
   appendNodes(instructionArea, instruction, "instruction");

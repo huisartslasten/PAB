@@ -301,3 +301,35 @@ The same interaction principle applies to other tasks: show only the original st
 - For 2 − 1 ⅓, browser interaction must verify: two filled units initially; first whole cleared; second unit partitioned into thirds; exactly one third cleared; resulting removed amount 1 ⅓ and remaining amount ⅔.
 - Verify annotations remain visible and mathematically consistent after each action, keyboard and pointer interaction, checking, and moving to the next task.
 - The complete visual interaction must use the task's single selected representation and preserve the central model dimensions.
+
+## 16. Keyboardbediening — Controleren met Enter
+
+De centrale Fraction Practice Template MUST ondersteunen het controleren van een
+breukantwoord met de Enter-toets:
+
+- Wanneer de focus in een actief, enkelregelig antwoordveld staat, voert Enter
+  dezelfde controleactie uit als het activeren van de zichtbare knop
+  **Controleren**.
+- De centrale template zoekt hiervoor uitsluitend naar de actieve knop
+  **Controleren** in de gedeelde control- en actiegebieden. De controle wordt
+  precies één keer uitgevoerd; Enter mag geen volgende stap of andere actie
+  activeren.
+- Wanneer de knop **Controleren** ontbreekt of uitgeschakeld is, voert Enter
+  geen controle uit.
+- Enter in een meerregelig tekstveld (zoals een uitleg-tekstvak) behoudt de
+  normale betekenis en voegt een nieuwe regel toe.
+- Wanneer de knop **Controleren** zelf focus heeft, blijft de native
+  toetsenbordbediening van de knop gelden. Enter en Spatie activeren de knop
+  volgens het normale knopgedrag.
+- De toetsenbordafhandeling hoort bij de centrale template. Oefeningsadapters
+  mogen hiervoor geen eigen Enter-listeners of alternatieve controlelogica
+  toevoegen.
+
+Aanvullende acceptatiecriteria:
+
+- [ ] Enter vanuit een enkelregelig breukantwoordveld activeert de zichtbare
+  knop **Controleren** precies één keer.
+- [ ] Enter in een textarea wordt niet onderschept.
+- [ ] Enter activeert niets wanneer **Controleren** ontbreekt of uitgeschakeld is.
+- [ ] De knop blijft met muis, Enter en Spatie bedienbaar.
+- [ ] Browserregressie bewijst dit gedrag op de centrale template.

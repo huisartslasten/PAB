@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { FRACTION_WHOLE_NUMBER_DIVIDED_BY_FRACTION_GREATER_THAN_ONE_TASKS as tasks } from "./fraction-whole-number-divided-by-fraction-greater-than-one-task-bank.js";
+import { FRACTION_WHOLE_NUMBER_DIVIDED_BY_FRACTION_GREATER_THAN_ONE_GUIDED_TASKS as tasks } from "./fraction-whole-number-divided-by-fraction-greater-than-one-guided-task-bank.js";
+import { FRACTION_WHOLE_NUMBER_DIVIDED_BY_FRACTION_GREATER_THAN_ONE_TASKS as independentTasks } from "./fraction-whole-number-divided-by-fraction-greater-than-one-task-bank.js";
 import { createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession } from "./fraction-whole-number-divided-by-fraction-greater-than-one-guided-session.js";
 
 function memoryStorage() {
@@ -18,16 +19,16 @@ test("guided division exposes three ordered steps and validates the divisor conv
   assert.equal(first.stepId, "make_divisor_whole");
   assert.equal(first.stepNumber, 1);
   assert.equal(first.totalSteps, 3);
-  assert.equal(first.divisorNumerator, 9);
-  assert.equal(session.recordResponse({ rawValue: "8" }).classification, "incorrect_answer");
+  assert.equal(first.divisorNumerator, 5);
+  assert.equal(session.recordResponse({ rawValue: "4" }).classification, "incorrect_answer");
   assert.equal(session.getCurrentStep().stepId, "make_divisor_whole");
-  assert.equal(session.recordResponse({ rawValue: "9" }).classification, "valid");
+  assert.equal(session.recordResponse({ rawValue: "5" }).classification, "valid");
   assert.equal(session.getCurrentStep().stepId, "scale_dividend");
-  assert.equal(session.getCurrentStep().scaledDividend, 48);
-  assert.equal(session.recordResponse({ rawValue: "47" }).classification, "incorrect_answer");
-  assert.equal(session.recordResponse({ rawValue: "48" }).classification, "valid");
+  assert.equal(session.getCurrentStep().scaledDividend, 16);
+  assert.equal(session.recordResponse({ rawValue: "15" }).classification, "incorrect_answer");
+  assert.equal(session.recordResponse({ rawValue: "16" }).classification, "valid");
   assert.equal(session.getCurrentStep().stepId, "calculate_quotient");
-  assert.equal(session.getCurrentStep().expression, "48 : 9");
+  assert.equal(session.getCurrentStep().expression, "16 : 5");
   assert.equal(session.recordResponse({ values: answerValues(tasks[0]) }).classification, "valid");
   assert.equal(session.getCurrentStep().taskNumber, 2);
   assert.equal(session.getCurrentStep().stepNumber, 1);
@@ -73,4 +74,11 @@ test("guided division rejects invalid task banks and corrupt saved step sequence
   }));
   const corrupted = createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession({ learnerKey: "bad", storage, tasks });
   assert.throws(() => corrupted.getCurrentStep(), /invalid step sequence/);
+});
+
+test("guided division uses a separate set of fifteen tasks from the independent exercise", () => {
+  const independent = new Set(independentTasks.map(task => [task.wholeNumber, task.divisor.whole, task.divisor.numerator, task.divisor.denominator].join("|")));
+  assert.equal(tasks.length, 15);
+  assert.equal(new Set(tasks.map(task => [task.wholeNumber, task.divisor.whole, task.divisor.numerator, task.divisor.denominator].join("|"))).size, 15);
+  assert.equal(tasks.every(task => !independent.has([task.wholeNumber, task.divisor.whole, task.divisor.numerator, task.divisor.denominator].join("|"))), true);
 });

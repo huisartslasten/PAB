@@ -1516,16 +1516,32 @@ export function createSkillsRuntime({
       );
       const solution = documentRef.createElement('div');
       solution.className = 'fraction-guided-solution';
-      solution.setAttribute('aria-label', 'Uitwerking van de deling');
+      solution.setAttribute('aria-label', 'Volledige gelijkwaardige deling');
       if (step.completedStepIds.includes('convert_mixed_number')) {
-        solution.append(op('='));
-        solution.append(divisorFraction());
-      }
-      if (step.completedStepIds.includes('make_divisor_whole')) {
-        solution.append(op('× ' + step.task.divisor.denominator + ' = ' + step.divisorWholeNumber));
+        solution.append(
+          op('='),
+          documentRef.createTextNode(String(step.task.wholeNumber)),
+          op('÷'),
+          divisorFraction()
+        );
       }
       if (step.completedStepIds.includes('scale_dividend')) {
-        solution.append(op('→ ' + step.scaledDividend + ' ÷ ' + step.divisorWholeNumber));
+        solution.append(
+          op('='),
+          documentRef.createTextNode(String(step.scaledDividend)),
+          op('÷'),
+          documentRef.createTextNode(String(step.divisorWholeNumber))
+        );
+      }
+      if (step.completedStepIds.includes('calculate_quotient')) {
+        solution.append(
+          op('='),
+          renderMixedNumber({
+            wholeNumber: step.task.answer.whole,
+            numerator: step.task.answer.numerator,
+            denominator: step.task.answer.denominator
+          }, 'Gemengd getal als uitkomst')
+        );
       }
       const equation = documentRef.createElement('div');
       equation.className = 'fraction-guided-equation';
@@ -1570,7 +1586,11 @@ export function createSkillsRuntime({
           const answer = documentRef.createElement('div');
           answer.className = 'fraction-guided-step-completed-answer';
           if (stepId === 'convert_mixed_number') {
-            answer.append(divisorFraction());
+            answer.append(
+              documentRef.createTextNode(String(step.task.wholeNumber)),
+              op('÷'),
+              divisorFraction()
+            );
           } else if (stepId === 'make_divisor_whole') {
             answer.append(divisorFraction(), op('× ' + step.task.divisor.denominator + ' = ' + step.divisorWholeNumber));
           } else if (stepId === 'scale_dividend') {
@@ -1638,6 +1658,11 @@ export function createSkillsRuntime({
             expression.append(activeInput);
           } else {
             expression.append(documentRef.createTextNode(step.scaledDividend + ' ÷ ' + step.divisorWholeNumber + '='));
+            const quotientHelp = documentRef.createElement('p');
+            quotientHelp.className = 'fraction-guided-quotient-help';
+            quotientHelp.textContent = 'Zoek het grootste veelvoud van ' + step.divisorWholeNumber +
+              ' dat niet groter is dan ' + step.scaledDividend + '. Trek dat ervan af. Het getal dat overblijft, wordt de teller. ' +
+              'Het getal waar je door deelt, wordt de noemer.';
             const answerMount = documentRef.createElement('div');
             answerMount.className = 'fraction-guided-mixed-answer';
             expression.append(answerMount);
@@ -1646,6 +1671,7 @@ export function createSkillsRuntime({
               controlsMount: template.controlsArea,
               wholeNumberMode: 'required'
             });
+            expression.append(quotientHelp);
           }
           const check = documentRef.createElement('button');
           check.type = 'button';

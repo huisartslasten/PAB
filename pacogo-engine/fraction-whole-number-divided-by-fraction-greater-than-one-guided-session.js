@@ -67,7 +67,7 @@ function createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession({
   }
   const configuredTasks = normalizeTasks(tasks);
   const key = STORAGE_PREFIX + encodeURIComponent(learner);
-  const empty = () => ({ schemaVersion: 1, completedTaskIds: [], completedStepIdsByTask: {}, responsesByTask: {} });
+  const empty = () => ({ schemaVersion: 1, completedTaskIds: [], completedStepIdsByTask: Object.fromEntries(configuredTasks.map(task => [task.id, []])), responsesByTask: Object.fromEntries(configuredTasks.map(task => [task.id, []])) });
 
   function read() {
     const raw = storage.getItem(key);

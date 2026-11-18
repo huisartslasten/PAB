@@ -1359,3 +1359,102 @@ test('whole number times a proper fraction practice reuses the canonical fractio
   expect(result.feedback).toContain('Goed gedaan');
   expect(result.secondExpression).toContain('48');
 });
+
+
+test('whole number times a mixed fraction greater than one uses the central fraction templates and its fifteen new tasks', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=vermenigvuldigen', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    localStorage.removeItem('pacogo:fraction-whole-number-times-mixed-fraction-greater-than-one:v1:Zyon');
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {}, managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    let navigation = '';
+    const overview = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'vermenigvuldigen', documentRef: document,
+      navigate: target => { navigation = String(target); }
+    });
+    await overview.mount();
+    const row = [...document.querySelectorAll('.skills-addition-overview-row')].find(item =>
+      item.querySelector('.skills-addition-overview-label')?.textContent === 'Heel getal vermenigvuldigen met een breukgetal groter dan 1'
+    );
+    const rowButtonCount = row.querySelectorAll('button').length;
+    row.querySelector('button')?.click();
+    const practice = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'vermenigvuldigen',
+      exercise: 'whole-number-times-mixed-fraction-greater-than-one',
+      documentRef: document, navigate: () => {}
+    });
+    await practice.mount();
+    const equation = document.querySelector('.fraction-whole-mixed-equation');
+    const expression = equation?.querySelector('.fraction-whole-mixed-expression');
+    const mixed = expression?.querySelector('.pacogo-fraction-mixed-number');
+    const fraction = mixed?.querySelector('.pacogo-fraction-representation--symbolic');
+    const wholeAnswer = equation?.querySelector('[data-answer-part="whole"]');
+    const numerator = equation?.querySelector('[data-answer-part="primaryNumerator"]');
+    const denominator = equation?.querySelector('[data-answer-part="primaryDenominator"]');
+    const simplify = document.querySelector('.pacogo-fraction-answer__simplify');
+    const initial = {
+      navigation,
+      rowButtonCount,
+      pageTitle: document.querySelector('.paco-template-main h1')?.textContent || '',
+      pageTemplate: Boolean(document.querySelector('.paco-page-template')),
+      fractionTemplate: Boolean(document.querySelector('[data-component="fraction-practice-template"]')),
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      expressionText: expression?.textContent || '',
+      mixedNumber: Boolean(mixed),
+      fractionCount: expression?.querySelectorAll('.pacogo-fraction-representation--symbolic').length || 0,
+      wholeAnswerVisible: Boolean(wholeAnswer && !wholeAnswer.closest('[hidden]')),
+      numeratorVisible: Boolean(numerator && !numerator.closest('[hidden]')),
+      denominatorVisible: Boolean(denominator && !denominator.closest('[hidden]')),
+      simplifyVisible: Boolean(simplify && !simplify.hidden),
+      inputCount: equation?.querySelectorAll('.pacogo-fraction-answer__input').length || 0,
+      expressionFont: expression ? getComputedStyle(expression).fontFamily : '',
+      expressionSize: expression ? getComputedStyle(expression).fontSize : '',
+      mixedWholeFont: mixed?.querySelector('.pacogo-fraction-mixed-number__whole')
+        ? getComputedStyle(mixed.querySelector('.pacogo-fraction-mixed-number__whole')).fontFamily : '',
+      fractionFont: fraction ? getComputedStyle(fraction).fontFamily : '',
+      answerFont: wholeAnswer ? getComputedStyle(wholeAnswer).fontFamily : ''
+    };
+    wholeAnswer.value = '4';
+    numerator.value = '1';
+    denominator.value = '5';
+    for (const input of [wholeAnswer, numerator, denominator]) input.dispatchEvent(new Event('input', { bubbles: true }));
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    const feedback = document.querySelector('.fraction-practice-feedback')?.textContent || '';
+    document.querySelector('.pacogo-fraction-practice-template__actions button')?.click();
+    const secondExpression = document.querySelector('.fraction-whole-mixed-equation .fraction-whole-mixed-expression')?.textContent || '';
+    return { initial, feedback, secondExpression };
+  });
+  expect(result.initial.navigation).toContain('exercise=whole-number-times-mixed-fraction-greater-than-one');
+  expect(result.initial.navigation).toContain('topic=vermenigvuldigen');
+  expect(result.initial.rowButtonCount).toBe(1);
+  expect(result.initial.pageTitle).toBe('Oefenen');
+  expect(result.initial.pageTemplate).toBe(true);
+  expect(result.initial.fractionTemplate).toBe(true);
+  expect(result.initial.progress).toContain('Som 1 van 15');
+  expect(result.initial.expressionText).toContain('3');
+  expect(result.initial.expressionText).toContain('1');
+  expect(result.initial.expressionText).toContain('2');
+  expect(result.initial.expressionText).toContain('5');
+  expect(result.initial.mixedNumber).toBe(true);
+  expect(result.initial.fractionCount).toBe(1);
+  expect(result.initial.wholeAnswerVisible).toBe(true);
+  expect(result.initial.numeratorVisible).toBe(true);
+  expect(result.initial.denominatorVisible).toBe(true);
+  expect(result.initial.simplifyVisible).toBe(true);
+  expect(result.initial.inputCount).toBe(5);
+  expect(result.initial.expressionFont).toContain('Baloo 2');
+  expect(result.initial.expressionSize).toBe('30px');
+  expect(result.initial.mixedWholeFont).toContain('Baloo 2');
+  expect(result.initial.fractionFont).toContain('Baloo 2');
+  expect(result.initial.answerFont).toContain('Baloo 2');
+  expect(result.feedback).toContain('Goed gedaan');
+  expect(result.secondExpression).toContain('4');
+});

@@ -1,3 +1,5 @@
+import { areEquivalentFractionValues, greatestCommonDivisor, isFractionInLowestTerms } from "./fraction-answer-validation.js";
+
 const FRACTION_LIKE_DENOMINATOR_SUBTRACTION_TASKS = Object.freeze([
   [8,9,3,9],[7,10,4,10],[11,12,5,12],[5,8,2,8],[9,10,6,10],
   [7,9,5,9],[10,12,3,12],[6,7,4,7],[8,10,3,10],[11,12,8,12],
@@ -80,11 +82,6 @@ function createFractionLikeDenominatorSubtractionSession({
       isComplete: completedCount === normalized.length
     });
   }
-  function greatestCommonDivisor(a, b) {
-    let left = Math.abs(a), right = Math.abs(b);
-    while (right !== 0) [left, right] = [right, left % right];
-    return left || 1;
-  }
   function recordAnswer({
     numerator, denominator, simplified = false,
     simplifiedNumerator, simplifiedDenominator
@@ -93,24 +90,34 @@ function createFractionLikeDenominatorSubtractionSession({
     if (!task) throw new Error("The subtraction practice is complete.");
     const n = String(numerator ?? "").trim(), d = String(denominator ?? "").trim();
     const validInteger = value => /^[0-9]+$/.test(value);
-    const primaryValid = validInteger(n) && validInteger(d) && Number(d) > 0 &&
-      Number(n) === task.result.numerator && Number(d) === task.result.denominator;
-    const divisor = greatestCommonDivisor(task.result.numerator, task.result.denominator);
-    const requiresSimplification = divisor > 1;
+    const primaryNumerator = validInteger(n) ? Number(n) : NaN;
+    const primaryDenominator = validInteger(d) ? Number(d) : NaN;
+    const primaryValid = Number.isSafeInteger(primaryNumerator) && primaryNumerator > 0 &&
+      Number.isSafeInteger(primaryDenominator) && primaryDenominator > 0 &&
+      areEquivalentFractionValues(
+        { numerator: primaryNumerator, denominator: primaryDenominator },
+        task.result
+      );
     const sn = String(simplifiedNumerator ?? "").trim();
     const sd = String(simplifiedDenominator ?? "").trim();
+    const simplifiedValue = {
+      numerator: validInteger(sn) ? Number(sn) : NaN,
+      denominator: validInteger(sd) ? Number(sd) : NaN
+    };
     let classification = "incorrect_answer";
-    if (!validInteger(n) || !validInteger(d) || Number(d) <= 0) {
+    if (!validInteger(n) || !validInteger(d) || primaryNumerator <= 0 || primaryDenominator <= 0) {
       classification = "invalid_input";
     } else if (!primaryValid) {
       classification = "incorrect_answer";
-    } else if (requiresSimplification && !simplified) {
+    } else if (!isFractionInLowestTerms(primaryNumerator, primaryDenominator) && !simplified) {
       classification = "simplification_required";
-    } else if (simplified && (!validInteger(sn) || !validInteger(sd) || Number(sd) <= 0)) {
+    } else if (simplified && (!Number.isSafeInteger(simplifiedValue.numerator) ||
+        !Number.isSafeInteger(simplifiedValue.denominator) || simplifiedValue.numerator <= 0 ||
+        simplifiedValue.denominator <= 0)) {
       classification = "invalid_simplification";
-    } else if (simplified && Number(sn) !== task.result.numerator / divisor) {
-      classification = "incorrect_simplification";
-    } else if (simplified && Number(sd) !== task.result.denominator / divisor) {
+    } else if (simplified && (!isFractionInLowestTerms(simplifiedValue.numerator, simplifiedValue.denominator) ||
+        !areEquivalentFractionValues(simplifiedValue, { numerator: primaryNumerator, denominator: primaryDenominator }) ||
+        !areEquivalentFractionValues(simplifiedValue, task.result))) {
       classification = "incorrect_simplification";
     } else {
       classification = "valid";

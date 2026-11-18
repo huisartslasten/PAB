@@ -40,8 +40,8 @@ test("guided division requires simplified mixed-number answers and resumes per l
   const session = createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession({ learnerKey: "learner-a", storage, tasks });
   session.recordResponse({ rawValue: String(tasks[0].divisor.whole * tasks[0].divisor.denominator + tasks[0].divisor.numerator) });
   session.recordResponse({ rawValue: String(tasks[0].wholeNumber * tasks[0].divisor.denominator) });
-  assert.equal(session.recordResponse({ values: { ...answerValues(tasks[0]), numerator: "2", denominator: "6" } }).classification, "requires_simplification");
-  assert.equal(session.recordResponse({ values: { ...answerValues(tasks[0]), numerator: "2", denominator: "6", simplified: true, simplifiedNumerator: "1", simplifiedDenominator: "3" } }).classification, "valid");
+  assert.equal(session.recordResponse({ values: { ...answerValues(tasks[0]), numerator: "2", denominator: "10" } }).classification, "requires_simplification");
+  assert.equal(session.recordResponse({ values: { ...answerValues(tasks[0]), numerator: "2", denominator: "10", simplified: true, simplifiedNumerator: "1", simplifiedDenominator: "5" } }).classification, "valid");
   const resumed = createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession({ learnerKey: "learner-a", storage, tasks });
   assert.equal(resumed.getCurrentStep().taskNumber, 2);
   const other = createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession({ learnerKey: "learner-b", storage, tasks });

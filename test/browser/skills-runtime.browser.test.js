@@ -893,7 +893,7 @@ test('like-denominator subtraction opens from the central Skills route and runs 
     };
     const fields = [...document.querySelectorAll('.fraction-practice-inline-input')];
     fields[0].value = '5'; fields[0].dispatchEvent(new Event('input', { bubbles: true }));
-    fields[1].value = '7'; fields[1].dispatchEvent(new Event('input', { bubbles: true }));
+    fields[1].value = '9'; fields[1].dispatchEvent(new Event('input', { bubbles: true }));
     document.querySelector('.pacogo-fraction-practice-template__controls button').click();
     const afterCorrect = {
       progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
@@ -911,12 +911,12 @@ test('like-denominator subtraction opens from the central Skills route and runs 
   expect(result.initial.layoutMode).toBe('practice');
   expect(result.initial.template).toBe(true);
   expect(result.initial.progress).toContain('Som 1 van 15');
-  expect(result.initial.expression).toBe('6/7 − 1/7 = ?/?');
+  expect(result.initial.expression).toBe('8/9 − 3/9 = ?/?');
   expect(result.initial.visualTerms).toBe(0);
   expect(result.afterCorrect.progress).toContain('1 afgerond');
   expect(result.afterCorrect.feedback).toContain('Goed gedaan');
   expect(result.afterCorrect.next).toBe('Volgende som');
-  expect(result.secondExpression).toBe('7/8 − 1/8 = ?/?');
+  expect(result.secondExpression).toBe('7/10 − 4/10 = ?/?');
   expect(result.secondProgress).toContain('Som 2 van 15');
 });
 

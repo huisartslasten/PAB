@@ -910,7 +910,7 @@ test('fraction subtraction overview keeps the original exercise and adds the sep
     'Ongelijknamige breuken groter dan 1 van elkaar aftrekken'
   ]);
   expect(result.exerciseButtonCount).toBe(6);
-  expect(result.navigations).toHaveLength(6);
+  expect(result.navigations).toHaveLength(7);
   expect(result.navigations[0]).toContain('exercise=whole-minus-mixed-subtraction');
   expect(result.navigations[1]).toContain('exercise=whole-minus-greater-than-one-subtraction');
   expect(result.navigations[2]).toContain('exercise=like-denominator-subtraction');
@@ -1830,7 +1830,7 @@ test('mixed unlike-denominator multiplication opens through the central Skills r
   expect(result.second.progress).toContain('Som 2 van 15');
 });
 
-test('Delen in the fraction overview opens the five-row division overview using the central Skills overview pattern', async ({ page }) => {
+test('Delen in the fraction overview opens both independent and guided division exercises in the central Skills overview', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions', { waitUntil: 'domcontentloaded' });
   const result = await page.evaluate(async () => {
     const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
@@ -1878,22 +1878,78 @@ test('Delen in the fraction overview opens the five-row division overview using 
   expect(result.centralCard).toBe(true);
   expect(result.heading).toBe('Onderwerpen breuken delen');
   expect(result.labels).toEqual([
-    'Heel getal delen door een breukgetal groter dan 1',
+    'Heel getal delen door een breukgetal groter dan 1 — met stappenplan',
+    'Heel getal delen door een breukgetal groter dan 1 — zonder stappenplan',
     'Gelijknamige breuken kleiner dan 1 op elkaar delen',
     'Gelijknamige breuken groter dan 1 op elkaar delen',
     'Ongelijknamige breuken kleiner dan 1 op elkaar delen',
     'Ongelijknamige breuken groter dan 1 op elkaar delen'
   ]);
-  expect(result.levels).toEqual([1, 2, 2, 3, 4]);
-  expect(result.boneCounts).toEqual([5, 5, 5, 5, 5]);
-  expect(result.exerciseButtonCount).toBe(5);
+  expect(result.levels).toEqual([1, 1, 2, 2, 3, 4]);
+  expect(result.boneCounts).toEqual([5, 5, 5, 5, 5, 5]);
+  expect(result.exerciseButtonCount).toBe(6);
   expect(result.navigations).toHaveLength(6);
   expect(result.navigations[0]).toContain('topic=delen');
-  expect(result.navigations[1]).toContain('exercise=whole-number-divided-by-fraction-greater-than-one');
-  expect(result.navigations[2]).toContain('exercise=like-denominator-division');
-  expect(result.navigations[3]).toContain('exercise=mixed-like-denominator-division');
-  expect(result.navigations[4]).toContain('exercise=unlike-denominator-division');
-  expect(result.navigations[5]).toContain('exercise=mixed-unlike-denominator-division');
+  expect(result.navigations[1]).toContain('exercise=whole-number-divided-by-fraction-greater-than-one-guided');
+  expect(result.navigations[2]).toContain('exercise=whole-number-divided-by-fraction-greater-than-one');
+  expect(result.navigations[3]).toContain('exercise=like-denominator-division');
+  expect(result.navigations[4]).toContain('exercise=mixed-like-denominator-division');
+  expect(result.navigations[5]).toContain('exercise=unlike-denominator-division');
+  expect(result.navigations[6]).toContain('exercise=mixed-unlike-denominator-division');
+});
+
+
+test('the original whole-number division practice remains available without guided steps', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=delen&exercise=whole-number-divided-by-fraction-greater-than-one', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    localStorage.removeItem('pacogo:fraction-whole-number-divided-by-fraction-greater-than-one:v1:Zyon');
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {}, managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    const practice = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'delen',
+      exercise: 'whole-number-divided-by-fraction-greater-than-one',
+      documentRef: document, navigate: () => {}
+    });
+    await practice.mount();
+    const initial = {
+      pageTemplate: Boolean(document.querySelector('.paco-page-template')),
+      fractionTemplate: Boolean(document.querySelector('[data-component="fraction-practice-template"]')),
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      guidedSteps: document.querySelectorAll('.fraction-guided-step-card').length,
+      expression: document.querySelector('.fraction-whole-mixed-expression')?.textContent || '',
+      answerWhole: document.querySelector('[data-answer-part="whole"]')?.value ?? null
+    };
+    const set = (part, value) => {
+      const field = document.querySelector('[data-answer-part="' + part + '"]');
+      field.value = String(value);
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    set('whole', '5');
+    set('primaryNumerator', '1');
+    set('primaryDenominator', '3');
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    return {
+      initial,
+      feedback: document.querySelector('[role="status"]')?.textContent || '',
+      next: document.querySelector('.pacogo-fraction-practice-template__actions button')?.textContent || '',
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || ''
+    };
+  });
+  expect(result.initial.pageTemplate).toBe(true);
+  expect(result.initial.fractionTemplate).toBe(true);
+  expect(result.initial.progress).toContain('Som 1 van 15');
+  expect(result.initial.guidedSteps).toBe(0);
+  expect(result.initial.expression).toContain('12');
+  expect(result.feedback).toContain('Goed gedaan');
+  expect(result.next).toBe('Volgende som');
+  expect(result.progress).toContain('1 afgerond');
 });
 
 test('whole number divided by a mixed fraction greater than one reuses the central guided-step and fraction templates for fifteen tasks', async ({ page }) => {
@@ -1901,7 +1957,9 @@ test('whole number divided by a mixed fraction greater than one reuses the centr
   const result = await page.evaluate(async () => {
     localStorage.removeItem('pacogo:fraction-whole-number-divided-by-fraction-greater-than-one-guided:v1:Zyon');
     const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
-    const { FRACTION_WHOLE_NUMBER_DIVIDED_BY_FRACTION_GREATER_THAN_ONE_TASKS: tasks } =
+    const { FRACTION_WHOLE_NUMBER_DIVIDED_BY_FRACTION_GREATER_THAN_ONE_GUIDED_TASKS: tasks } =
+      await import('/pacogo-engine/fraction-whole-number-divided-by-fraction-greater-than-one-guided-task-bank.js');
+    const { FRACTION_WHOLE_NUMBER_DIVIDED_BY_FRACTION_GREATER_THAN_ONE_TASKS: independentTasks } =
       await import('/pacogo-engine/fraction-whole-number-divided-by-fraction-greater-than-one-task-bank.js');
     const templateMount = document.createElement('div');
     templateMount.id = 'paco-template-mount';
@@ -1914,7 +1972,7 @@ test('whole number divided by a mixed fraction greater than one reuses the centr
     const practice = createSkillsRuntime({
       app, templateMount, context: { student: 'Zyon', mode: 'student' },
       domain: 'fractions', topic: 'delen',
-      exercise: 'whole-number-divided-by-fraction-greater-than-one',
+      exercise: 'whole-number-divided-by-fraction-greater-than-one-guided',
       documentRef: document, navigate: () => {}
     });
     await practice.mount();
@@ -1924,6 +1982,7 @@ test('whole number divided by a mixed fraction greater than one reuses the centr
       fractionTemplate: Boolean(document.querySelector('[data-component="fraction-practice-template"]')),
       title: document.querySelector('.fraction-whole-mixed-addition-card h2')?.textContent || '',
       taskCount: tasks.length,
+      differentFromIndependentTasks: tasks.every(task => !independentTasks.some(other => task.wholeNumber === other.wholeNumber && task.divisor.whole === other.divisor.whole && task.divisor.numerator === other.divisor.numerator && task.divisor.denominator === other.divisor.denominator)),
       uniqueTasks: new Set(tasks.map(task => [task.wholeNumber, task.divisor.whole, task.divisor.numerator, task.divisor.denominator].join('|'))).size,
       progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
       stepCount: document.querySelectorAll('.fraction-guided-step-card').length,
@@ -1934,15 +1993,15 @@ test('whole number divided by a mixed fraction greater than one reuses the centr
     const initial = snapshot();
     const fill = (selector, value) => { const input = document.querySelector(selector); input.value = String(value); };
     const check = () => document.querySelector('.fraction-guided-step-card[data-state="active"] button').click();
-    fill('.fraction-guided-step-card[data-step-id="make_divisor_whole"] .fraction-guided-scalar-input', 9);
+    fill('.fraction-guided-step-card[data-step-id="make_divisor_whole"] .fraction-guided-scalar-input', 5);
     check();
     const afterFirst = snapshot();
-    fill('.fraction-guided-step-card[data-step-id="scale_dividend"] .fraction-guided-scalar-input', 48);
+    fill('.fraction-guided-step-card[data-step-id="scale_dividend"] .fraction-guided-scalar-input', 16);
     check();
     const afterSecond = snapshot();
-    fill('.fraction-guided-step-card[data-step-id="calculate_quotient"] [data-answer-part="whole"]', 5);
+    fill('.fraction-guided-step-card[data-step-id="calculate_quotient"] [data-answer-part="whole"]', 3);
     fill('.fraction-guided-step-card[data-step-id="calculate_quotient"] [data-answer-part="primaryNumerator"]', 1);
-    fill('.fraction-guided-step-card[data-step-id="calculate_quotient"] [data-answer-part="primaryDenominator"]', 3);
+    fill('.fraction-guided-step-card[data-step-id="calculate_quotient"] [data-answer-part="primaryDenominator"]', 5);
     check();
     return { initial, afterFirst, afterSecond, afterFinal: snapshot(),
       feedback: document.querySelector('.fraction-practice-feedback')?.textContent || '' };
@@ -1952,12 +2011,13 @@ test('whole number divided by a mixed fraction greater than one reuses the centr
   expect(result.initial.fractionTemplate).toBe(true);
   expect(result.initial.title).toBe('Heel getal delen door een breukgetal groter dan 1');
   expect(result.initial.taskCount).toBe(15);
+  expect(result.initial.differentFromIndependentTasks).toBe(true);
   expect(result.initial.uniqueTasks).toBe(15);
   expect(result.initial.progress).toContain('Som 1 van 15');
   expect(result.initial.stepCount).toBe(3);
   expect(result.initial.states).toEqual(['active', 'locked', 'locked']);
   expect(result.initial.stepIds).toEqual(['make_divisor_whole', 'scale_dividend', 'calculate_quotient']);
-  expect(result.initial.expression).toContain('12');
+  expect(result.initial.expression).toContain('8');
   expect(result.initial.expression).toContain('2');
   expect(result.afterFirst.states).toEqual(['completed', 'active', 'locked']);
   expect(result.afterSecond.states).toEqual(['completed', 'completed', 'active']);

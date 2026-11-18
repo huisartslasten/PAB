@@ -8743,3 +8743,48 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 **Volgende concrete stap**
 - Controleer Full Regression #4013 en de regression die door deze handoff-update wordt gestart.
 - Laat de gebruiker de 15 sommen visueel controleren in PacoGO TEST. Voeg geen andere deelonderwerpen of extra functionaliteit toe zonder expliciete opdracht.
+
+## 28. Breuken → Delen → Heel getal delen door een breukgetal groter dan 1: begeleide stappen (18 november 2026)
+
+**Opdracht en didactische bron**
+- De gebruiker vroeg om een stappen-oefening voor het delen van een heel getal door een gemengd breukgetal groter dan 1.
+- De aangeleverde screenshots van de instructiebron zijn als inhoudelijke referentie gebruikt; voorbeeldsommen zijn niet overgenomen.
+- De gebruiker vroeg expliciet om hergebruik van de bestaande begeleide stappenstructuur van Breuken → Optellen. Er is geen tweede stappeninterface of nieuwe vormgeving gemaakt.
+- De driedelige methode volgt de bron: (1) vergroot de breuk, (2) vergroot het hele getal met dezelfde factor, (3) reken de deling uit.
+- Voor gemengde getallen wordt in stap 1 eerst het gemengde getal naar een onechte breuk omgezet; vervolgens wordt met de oorspronkelijke noemer vermenigvuldigd om de deler een heel getal te maken.
+
+**Implementatie**
+- Nieuwe sessie: pacogo-engine/fraction-whole-number-divided-by-fraction-greater-than-one-guided-session.js.
+- Nieuwe sessietests: pacogo-engine/fraction-whole-number-divided-by-fraction-greater-than-one-guided-session.test.js.
+- Bestaande route whole-number-divided-by-fraction-greater-than-one gebruikt nu de begeleide sessie; de bestaande 15 sommen en taakbank zijn behouden.
+- Runtime gebruikt de bestaande centrale stapstructuur en klassen uit de begeleide breukenopteloefening: fraction-guided-step-grid, fraction-guided-step-card, dezelfde actieve/afgeronde/vergrendelde stapstatussen en dezelfde voortgangsopbouw.
+- De drie delingsstappen zijn: Vergroot de breuk, Vergroot het hele getal, Reken de som uit.
+- De centrale PacoGO Page Template, createFractionPracticeTemplate(), renderMixedNumber(), renderFractionRepresentation() en renderFractionAnswerInput() blijven de rendering verzorgen.
+- De laatste stap vraagt het antwoord als vereenvoudigd gemengd getal via de bestaande centrale antwoordvelden.
+- Geen wijziging aan de 15 oorspronkelijke opgaven, curriculumdefinities, Supabase, LIVE main, of andere breukenoefeningen.
+
+**Opgavevoorbeeld ter uitleg van de stappen**
+- 12 ÷ 2 1/4 → gemengde breuk 9/4, daarna 9/4 × 4 = 9.
+- Vergroot het deeltal met dezelfde factor: 12 × 4 = 48.
+- Reken de deling uit: 48 ÷ 9 = 5 1/3.
+- Dit voorbeeld is uitsluitend een uitleg van de methode; de taakbank blijft de bestaande 15 unieke sommen gebruiken.
+
+**Tests en verificatie**
+- Sessiecommit: dbc23478aeb1d677b02a100446b096b32a49663d.
+- Sessie-opslagcorrecties: 7760d2d52bf498b3f472cb381554ad7cdb41ad78 en e03e7afcda051648afb7e20355fad4c819788e8c.
+- Runtimecommit: 419db7350d94605e2b6257df4ccaddc8a624689b.
+- Browser-testcommit: 2609178109f6dc13aa9d00899f2a95e0331c55fb.
+- Tijdens verificatie zijn twee sessiecontractfouten gevonden en hersteld: alle taakprogressie-arrays moeten bij een lege sessie worden geïnitialiseerd; antwoorden in de responsopslag moeten ook bij het finale antwoord een tekstuele rawValue bevatten.
+- Gerichte Browser Proof #831 op het eerdere testcommit faalde op de eerste opslagfout; dit is niet als geslaagd gerapporteerd.
+- Full Regression #4015–#4019 op tussencommits faalde door deze twee sessiecontractfouten en/of de daaropvolgende browsercontrole; deze runs zijn niet als groen aangemerkt.
+- Full Regression #4020 / run 44369338544: GREEN / SUCCESS op exact commit e03e7afcda051648afb7e20355fad4c819788e8c. Deze volledige run omvatte de curriculum engine regression, architectuurgrenzen, onderhouden Node-tests, gemigreerde Node-tests en browser regression.
+
+**Actuele status vóór deze handoff-update**
+- Branch: refactor/professional-v1.
+- Laatste geverifieerde implementatiecommit: e03e7afcda051648afb7e20355fad4c819788e8c.
+- Laatste volledig geverifieerde Full Regression: #4020 — GREEN / SUCCESS op exact die commit.
+- LIVE main onaangeroerd; geen deployment en geen Supabase-wijziging.
+
+**Volgende concrete stap**
+- Laat de gebruiker de begeleide oefening in PacoGO TEST visueel controleren: stap 1, stap 2, stap 3 en het antwoord als gemengd getal.
+- Voeg geen extra stappen, hulpmiddelen, visualisaties of zelfstandige oefenvariant toe zonder expliciete opdracht.

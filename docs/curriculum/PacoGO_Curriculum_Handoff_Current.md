@@ -8493,3 +8493,61 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 **Volgende concrete stap**
 - Verifieer deze handoff-update met Full Regression op de exacte nieuwe handoff-commit.
 - Laat de gebruiker daarna de oefening visueel controleren in PacoGO TEST. Voeg geen volgende oefening of extra interface-elementen toe zonder expliciete opdracht.
+
+
+## 21. Breuken → Vermenigvuldigen → Gelijknamige gemengde breuken groter dan 1 vermenigvuldigen (18 november 2026)
+
+**Opdracht en brongebruik**
+- De gebruiker gaf aan verder te gaan met breuken vermenigvuldigen en leverde screenshots als inspiratie voor de somvorm.
+- Screenshots zijn uitsluitend als inspiratie gebruikt; de sommen zijn niet één-op-één overgenomen.
+- Exact 15 unieke opgaven: beide factoren zijn gemengde getallen groter dan 1 en hebben binnen iedere som dezelfde noemer.
+- Geen extra didactische stappen, hints, visualisaties of andere UI-elementen toegevoegd buiten wat nodig is voor de gevraagde oefenvorm.
+
+**Taakbank en sessie**
+- Taakbank: `pacogo-engine/fraction-mixed-like-denominator-multiplication-task-bank.js`.
+- Sessie: `pacogo-engine/fraction-mixed-like-denominator-multiplication-session.js`.
+- Unit-test: `pacogo-engine/fraction-mixed-like-denominator-multiplication-session.test.js`.
+- De 15 sommen (met vereenvoudigde gemengde uitkomsten):
+  1. 2 1/3 × 1 2/3 = 3 8/9
+  2. 1 3/4 × 2 1/4 = 3 15/16
+  3. 3 1/5 × 2 2/5 = 7 17/25
+  4. 2 3/7 × 1 5/7 = 4 8/49
+  5. 1 4/9 × 3 2/9 = 4 53/81
+  6. 2 5/8 × 1 3/8 = 3 39/64
+  7. 3 2/11 × 2 7/11 = 8 47/121
+  8. 1 5/6 × 2 1/6 = 3 35/36
+  9. 2 4/5 × 1 3/5 = 4 12/25
+  10. 3 3/10 × 2 7/10 = 8 91/100
+  11. 1 2/7 × 4 3/7 = 5 34/49
+  12. 2 5/9 × 3 1/9 = 7 77/81
+  13. 1 3/8 × 2 5/8 = 3 39/64
+  14. 3 4/11 × 1 6/11 = 5 24/121
+  15. 2 7/12 × 3 5/12 = 8 119/144
+- De sessie controleert de exacte productwaarde, gemengde antwoordstructuur, vereenvoudiging indien nodig en bewaart voortgang per leerling met hervatten/reset.
+
+**Centrale interface en aansluiting**
+- De bestaande overzichtsrij `Gelijknamige breuken groter dan 1 met elkaar vermenigvuldigen` is gekoppeld aan oefenroute `mixed-like-denominator-multiplication`.
+- De oefening gebruikt de centrale PacoGO Page Template, de centrale Fraction Practice Template, de bestaande `renderMixedNumber()` en `renderFractionAnswerInput()`-componenten.
+- Antwoord wordt als gemengd getal ingevoerd; vereenvoudiging gebruikt de bestaande centrale bediening.
+- Geen lokale breuktemplate, eigen antwoordvelden, nieuwe CSS, curriculum-Skill/Development/Claim/Evidence Target, mastery-contract, Supabase-wijziging of wijziging aan LIVE `main`.
+
+**Regressiebevindingen en correcties**
+- Full Regression #3984: rood door een ontbrekend sluithaakje in de nieuwe unit-testfile. Oorzaak geïsoleerd als testsynthax; gecorrigeerd in commit `b09d2b9f9e9bc1a8fef0b5e0b59bbd48c428c2d7`.
+- Full Regression #3985: de syntaxisfout was opgelost, waarna de unit-tests een echte contractfout blootlegden. De sessie gaf het taakresultaat door als `{ whole, numerator, denominator }`, terwijl de gedeelde `areEquivalentFractionValues()`-validator `{ wholeNumber, numerator, denominator }` verwacht.
+- Correctie: de sessie normaliseert het taakresultaat expliciet naar het contract van de gedeelde validator voor zowel het ruwe antwoord als de vereenvoudigde controle. De bestaande tests zijn niet aangepast om de productiefout te maskeren.
+- Correctiecommit: `e6870f921086620e0f1270843d6216486fa43b23`.
+
+**Tests en verificatie**
+- Full Regression #3986 / run `44340834487`: **GREEN / SUCCESS** op exact commit `e6870f921086620e0f1270843d6216486fa43b23`.
+- De curriculum-engine run rapporteerde 374 tests, 374 geslaagd, 0 mislukt. De volledige workflow, inclusief browserregressie en clean-working-tree-controle, is succesvol afgerond.
+- De handoff-update hieronder moet zelf nog door Full Regression worden geverifieerd.
+
+**Actuele status**
+- Branch: `refactor/professional-v1`.
+- Laatste geverifieerde code-/testcommit: `e6870f921086620e0f1270843d6216486fa43b23`.
+- Laatste geverifieerde Full Regression: #3986 — **GREEN / SUCCESS** op exact deze commit.
+- LIVE `main` onaangeroerd; geen deployment en geen Supabase-wijziging.
+
+**Volgende concrete stap**
+- Verifieer deze handoff-update met Full Regression op de exacte nieuwe handoff-commit.
+- Daarna de gebruiker de nieuwe oefening visueel laten controleren in PacoGO TEST. Geen volgende oefening, extra UI-elementen of didactische toevoegingen bouwen zonder expliciete opdracht.

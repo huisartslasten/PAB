@@ -2077,3 +2077,77 @@ test('whole number divided by a mixed fraction greater than one teaches four sep
   await page.keyboard.press('Enter');
   await expect(page.locator('.fraction-practice-progress')).toContainText('Som 2 van 10');
 });
+
+
+test('guided division completes ten tasks, offers restart, and resets through the central fraction template', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=delen', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    localStorage.removeItem('pacogo:fraction-whole-number-divided-by-fraction-greater-than-one-guided:v2:Zyon');
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const { FRACTION_WHOLE_NUMBER_DIVIDED_BY_FRACTION_GREATER_THAN_ONE_GUIDED_TASKS: tasks } =
+      await import('/pacogo-engine/fraction-whole-number-divided-by-fraction-greater-than-one-guided-task-bank.js');
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {},
+      managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    const practice = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'delen',
+      exercise: 'whole-number-divided-by-fraction-greater-than-one-guided',
+      documentRef: document, navigate: () => {}
+    });
+    await practice.mount();
+    const fill = (selector, value) => {
+      const input = document.querySelector(selector);
+      if (!input) throw new Error('Missing guided answer field: ' + selector);
+      input.value = String(value);
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    const check = () => {
+      const button = document.querySelector('.fraction-guided-step-card[data-state="active"] button');
+      if (!button) throw new Error('Missing active step check button');
+      button.click();
+    };
+    for (let index = 0; index < tasks.length; index += 1) {
+      const task = tasks[index];
+      const divisorNumerator = task.divisor.whole * task.divisor.denominator + task.divisor.numerator;
+      fill('.fraction-guided-step-card[data-step-id="convert_mixed_number"] [data-fraction-step-answer="true"]', divisorNumerator);
+      check();
+      fill('.fraction-guided-step-card[data-step-id="make_divisor_whole"] .fraction-guided-scalar-input', divisorNumerator);
+      check();
+      fill('.fraction-guided-step-card[data-step-id="scale_dividend"] .fraction-guided-scalar-input', task.wholeNumber * task.divisor.denominator);
+      check();
+      fill('.fraction-guided-step-card[data-step-id="calculate_quotient"] [data-answer-part="whole"]', task.answer.whole);
+      fill('.fraction-guided-step-card[data-step-id="calculate_quotient"] [data-answer-part="primaryNumerator"]', task.answer.numerator);
+      fill('.fraction-guided-step-card[data-step-id="calculate_quotient"] [data-answer-part="primaryDenominator"]', task.answer.denominator);
+      check();
+      const action = document.querySelector('.pacogo-fraction-practice-template__actions button');
+      if (index < tasks.length - 1) {
+        if (action?.textContent !== 'Volgende som') throw new Error('Expected Volgende som after task ' + (index + 1));
+        action.click();
+      } else if (action?.textContent !== 'Opnieuw oefenen') {
+        throw new Error('Expected Opnieuw oefenen after the tenth task');
+      }
+    }
+    const completed = {
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      message: document.querySelector('.fraction-practice-complete')?.textContent || '',
+      action: document.querySelector('.pacogo-fraction-practice-template__actions button')?.textContent || ''
+    };
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    return {
+      completed,
+      restartedProgress: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      restartedStepCount: document.querySelectorAll('.fraction-guided-step-card').length
+    };
+  });
+  expect(result.completed.progress).toContain('10 van 10');
+  expect(result.completed.message).toContain('alle 10 sommen');
+  expect(result.completed.action).toBe('Opnieuw oefenen');
+  expect(result.restartedProgress).toContain('Som 1 van 10');
+  expect(result.restartedStepCount).toBe(4);
+});

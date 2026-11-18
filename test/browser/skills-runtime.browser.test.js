@@ -1895,3 +1895,70 @@ test('Delen in the fraction overview opens the five-row division overview using 
   expect(result.navigations[4]).toContain('exercise=unlike-denominator-division');
   expect(result.navigations[5]).toContain('exercise=mixed-unlike-denominator-division');
 });
+
+test('whole number divided by a mixed fraction greater than one uses the central templates for fifteen new tasks', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=delen', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    localStorage.removeItem('pacogo:fraction-whole-number-divided-by-fraction-greater-than-one:v1:Zyon');
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const { FRACTION_WHOLE_NUMBER_DIVIDED_BY_FRACTION_GREATER_THAN_ONE_TASKS: tasks } =
+      await import('/pacogo-engine/fraction-whole-number-divided-by-fraction-greater-than-one-task-bank.js');
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {},
+      managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    const overview = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'delen', documentRef: document, navigate: () => {}
+    });
+    await overview.mount();
+    const practice = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'delen',
+      exercise: 'whole-number-divided-by-fraction-greater-than-one',
+      documentRef: document, navigate: () => {}
+    });
+    await practice.mount();
+    const initial = {
+      pageTitle: document.querySelector('.paco-template-main h1')?.textContent || '',
+      canonicalPage: Boolean(document.querySelector('.paco-page-template')),
+      fractionTemplate: Boolean(document.querySelector('[data-component="fraction-practice-template"]')),
+      title: document.querySelector('.fraction-whole-mixed-addition-card h2')?.textContent || '',
+      taskCount: tasks.length,
+      uniqueTasks: new Set(tasks.map(task => [task.wholeNumber, task.divisor.whole, task.divisor.numerator, task.divisor.denominator].join('|'))).size,
+      wholeNumber: document.querySelector('.fraction-whole-mixed-expression__whole')?.textContent || '',
+      divisorParts: [...document.querySelectorAll('.fraction-whole-mixed-expression .pacogo-fraction-mixed-number__whole, .fraction-whole-mixed-expression .pacogo-fraction-mixed-number__numerator, .fraction-whole-mixed-expression .pacogo-fraction-mixed-number__denominator')].map(node => node.textContent),
+      wholeInputVisible: !document.querySelector('.pacogo-fraction-answer__whole-field')?.hidden,
+      wholeToggleHidden: document.querySelector('.pacogo-fraction-answer__toggle')?.hidden,
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      expression: document.querySelector('.fraction-whole-mixed-expression')?.textContent || ''
+    };
+    document.querySelector('[data-answer-part="whole"]').value = '5';
+    document.querySelector('[data-answer-part="primaryNumerator"]').value = '1';
+    document.querySelector('[data-answer-part="primaryDenominator"]').value = '3';
+    document.querySelector('.fraction-practice-template__actions button, .pacogo-fraction-practice-template__actions button')?.click();
+    return {
+      initial,
+      feedback: document.querySelector('.fraction-practice-feedback')?.textContent || '',
+      nextProgress: document.querySelector('.fraction-practice-progress')?.textContent || ''
+    };
+  });
+  expect(result.initial.pageTitle).toBe('Oefenen');
+  expect(result.initial.canonicalPage).toBe(true);
+  expect(result.initial.fractionTemplate).toBe(true);
+  expect(result.initial.title).toBe('Heel getal delen door een breukgetal groter dan 1');
+  expect(result.initial.taskCount).toBe(15);
+  expect(result.initial.uniqueTasks).toBe(15);
+  expect(result.initial.wholeNumber).toBe('12');
+  expect(result.initial.divisorParts).toEqual(['2', '1', '4']);
+  expect(result.initial.wholeInputVisible).toBe(true);
+  expect(result.initial.wholeToggleHidden).toBe(true);
+  expect(result.initial.progress).toContain('Som 1 van 15');
+  expect(result.initial.expression).toContain('÷');
+  expect(result.feedback).toContain('Goed gedaan');
+  expect(result.nextProgress).toContain('Som 2 van 15');
+});

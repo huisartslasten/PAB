@@ -74,7 +74,7 @@ test("guided division rejects invalid task banks and corrupt saved step sequence
   assert.throws(() => createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession({ learnerKey: "x", storage, tasks: tasks.slice(0, 14) }), /Exactly 15/);
   const invalid = tasks.map((task, i) => i ? task : { ...task, answer: { whole: 1, numerator: 1, denominator: 2 } });
   assert.throws(() => createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession({ learnerKey: "x", storage, tasks: invalid }), /incorrect answer/);
-  storage.setItem("pacogo:fraction-whole-number-divided-by-fraction-greater-than-one-guided:v1:bad", JSON.stringify({
+  storage.setItem("pacogo:fraction-whole-number-divided-by-fraction-greater-than-one-guided:v2:bad", JSON.stringify({
     schemaVersion: 2, completedTaskIds: [], completedStepIdsByTask: { [tasks[0].id]: ["make_divisor_whole"] }, responsesByTask: {}
   }));
   const corrupted = createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession({ learnerKey: "bad", storage, tasks });

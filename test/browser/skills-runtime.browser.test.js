@@ -1996,6 +1996,8 @@ test('whole number divided by a mixed fraction greater than one teaches four sep
       conversionDenominator: document.querySelector('[data-step-id="convert_mixed_number"] .pacogo-fraction-denominator')?.textContent || '',
       expression: document.querySelector('.fraction-guided-task-prompt')?.textContent || '',
       solution: document.querySelector('.fraction-guided-solution')?.textContent || '',
+      solutionDivisionCount: (document.querySelector('.fraction-guided-solution')?.textContent.match(/÷/g) || []).length,
+      solutionEqualityCount: (document.querySelector('.fraction-guided-solution')?.textContent.match(/=/g) || []).length,
       quotientHelp: document.querySelector('.fraction-guided-quotient-help')?.textContent || ''
     });
     const initial = snapshot();
@@ -2046,6 +2048,8 @@ test('whole number divided by a mixed fraction greater than one teaches four sep
   expect(result.afterThird.solution).toContain('8');
   expect(result.afterThird.solution).toContain('16');
   expect(result.afterThird.solution).toContain('5');
+  expect(result.afterThird.solutionDivisionCount).toBe(2);
+  expect(result.afterThird.solutionEqualityCount).toBe(2);
   expect(result.afterThird.quotientHelp).toContain('hoe vaak');
   expect(result.afterThird.quotientHelp).toContain('hele getal');
   expect(result.afterThird.quotientHelp).toContain('teller');

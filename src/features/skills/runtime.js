@@ -1466,6 +1466,7 @@ export function createSkillsRuntime({
     const exercise = { title: 'Heel getal delen door een breukgetal groter dan 1', difficultyLevel: 1, maxDifficultyLevel: 5 };
     const stepIds = ['convert_mixed_number', 'make_divisor_whole', 'scale_dividend', 'calculate_quotient'];
     const stepLabels = ['Zet het gemengde getal om', 'Vergroot de breuk tot een heel getal', 'Vergroot het hele getal', 'Reken de som uit'];
+    let awaitingNextTask = false;
 
     function renderCurrentTask(feedbackMessage = '') {
       const step = session.getCurrentStep();
@@ -1486,11 +1487,36 @@ export function createSkillsRuntime({
       template.instructionArea.append(instruction);
       template.progressArea.append(progressLabel);
 
+      if (awaitingNextTask && !progress.isComplete) {
+        const done = documentRef.createElement('p');
+        done.className = 'fraction-practice-complete';
+        done.textContent = 'Deze som is afgerond. Klik op Volgende som als je klaar bent voor de volgende.';
+        template.workArea.append(done);
+        if (feedbackMessage) {
+          const feedback = documentRef.createElement('p');
+          feedback.className = 'fraction-practice-feedback is-correct';
+          feedback.setAttribute('role', 'status');
+          feedback.textContent = feedbackMessage;
+          template.feedbackArea.append(feedback);
+        }
+        template.showNextAction(() => {
+          awaitingNextTask = false;
+          renderCurrentTask();
+        });
+        content.append(card);
+        return;
+      }
+
       if (!step) {
         const done = documentRef.createElement('p');
         done.className = 'fraction-practice-complete';
-        done.textContent = 'Je hebt alle 15 sommen afgerond. Goed gewerkt!';
+        done.textContent = 'Je hebt alle 10 sommen afgerond. Goed gewerkt!';
         template.workArea.append(done);
+        template.showRestartAction(() => {
+          session.reset();
+          awaitingNextTask = false;
+          renderCurrentTask();
+        });
         content.append(card);
         return;
       }
@@ -1688,6 +1714,7 @@ export function createSkillsRuntime({
             );
             if (result.classification === 'valid') {
               activeAnswer?.lock();
+              if (stepId === 'calculate_quotient') awaitingNextTask = true;
               renderCurrentTask(stepId === 'calculate_quotient'
                 ? 'Goed gedaan! Je hebt deze som afgerond.'
                 : 'Goed gedaan! Deze stap is afgerond.');

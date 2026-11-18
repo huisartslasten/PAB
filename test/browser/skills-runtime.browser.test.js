@@ -888,13 +888,18 @@ test('like-denominator subtraction opens from the central Skills route and runs 
       layoutMode: document.querySelector('.paco-page-template')?.dataset.layoutMode || '',
       template: Boolean(document.querySelector('[data-component="fraction-practice-template"]')),
       progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
-      expression: document.querySelector('.fraction-practice-equation')?.dataset.expression || '',
-      visualTerms: document.querySelectorAll('.pacogo-fraction-operation__term').length
+      symbolicFractions: [...document.querySelectorAll('.fraction-like-subtraction-equation .pacogo-fraction-representation--symbolic')].map(node => node.textContent.replace(/\\s+/g, ' ').trim()),
+      visualTerms: document.querySelectorAll('.pacogo-fraction-operation__term').length,
+      simplifyControl: document.querySelector('.pacogo-fraction-answer__simplify')?.textContent || ''
     };
-    const fields = [...document.querySelectorAll('.fraction-practice-inline-input')];
-    fields[0].value = '5'; fields[0].dispatchEvent(new Event('input', { bubbles: true }));
-    fields[1].value = '9'; fields[1].dispatchEvent(new Event('input', { bubbles: true }));
-    document.querySelector('.pacogo-fraction-practice-template__controls button').click();
+    const set = (part, value) => {
+      const field = document.querySelector('[data-answer-part="' + part + '"]');
+      field.value = value;
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    set('primaryNumerator', '5');
+    set('primaryDenominator', '9');
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
     const afterCorrect = {
       progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
       feedback: document.querySelector('[role="status"]')?.textContent || '',
@@ -903,7 +908,7 @@ test('like-denominator subtraction opens from the central Skills route and runs 
     document.querySelector('.pacogo-fraction-practice-template__actions button').click();
     return {
       initial, afterCorrect,
-      secondExpression: document.querySelector('.fraction-practice-equation')?.dataset.expression || '',
+      secondSymbolicFractions: [...document.querySelectorAll('.fraction-like-subtraction-equation .pacogo-fraction-representation--symbolic')].map(node => node.textContent.replace(/\\s+/g, ' ').trim()),
       secondProgress: document.querySelector('.fraction-practice-progress')?.textContent || ''
     };
   });
@@ -992,12 +997,16 @@ test('like-denominator subtraction requires simplification before completion and
       documentRef: document, navigate: () => {}
     });
     await runtime.mount();
-    const answerInputs = () => [...document.querySelectorAll('.pacogo-fraction-answer__input')];
+    const answerField = part => document.querySelector('[data-answer-part="' + part + '"]');
     const check = () => document.querySelector('.pacogo-fraction-practice-template__actions button');
+    const fill = (part, value) => {
+      const field = answerField(part);
+      field.value = String(value);
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+    };
     const fillPrimary = (n, d) => {
-      const fields = answerInputs();
-      fields[0].value = String(n); fields[0].dispatchEvent(new Event('input', { bubbles: true }));
-      fields[1].value = String(d); fields[1].dispatchEvent(new Event('input', { bubbles: true }));
+      fill('primaryNumerator', n);
+      fill('primaryDenominator', d);
     };
     const initial = {
       simplifyVisible: document.querySelector('.pacogo-fraction-answer__simplify')?.textContent || '',
@@ -1015,9 +1024,8 @@ test('like-denominator subtraction requires simplification before completion and
       nextVisible: Boolean(document.querySelector('.pacogo-fraction-practice-template__actions button')?.textContent.includes('Volgende'))
     };
     document.querySelector('.pacogo-fraction-answer__simplify').click();
-    const simplifiedFields = answerInputs();
-    simplifiedFields[2].value = '1'; simplifiedFields[2].dispatchEvent(new Event('input', { bubbles: true }));
-    simplifiedFields[3].value = '2'; simplifiedFields[3].dispatchEvent(new Event('input', { bubbles: true }));
+    fill('simplifiedNumerator', '1');
+    fill('simplifiedDenominator', '2');
     check().click();
     return {
       initial, blocked,

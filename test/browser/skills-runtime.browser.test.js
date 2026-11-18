@@ -1350,7 +1350,9 @@ test('whole number times a proper fraction practice reuses the canonical fractio
   expect(result.initial.fractionClass).toContain('pacogo-fraction-representation--symbolic');
   expect(result.initial.wholeFont).toContain('Baloo 2');
   expect(result.initial.fractionFont).toContain('Baloo 2');
-  expect(result.initial.answerFont).toContain('Baloo 2');
+  expect(result.initial.answerFont).toBe(result.initial.canonicalAnswerFont);
+  expect(result.initial.answerSize).toBe(result.initial.canonicalAnswerSize);
+  expect(result.initial.answerSize).toBe('24px');
   expect(result.initial.wholeSize).toBe('30px');
   expect(result.initial.fractionSize).toBe('24px');
   expect(result.initial.operatorSize).toBe('30px');
@@ -1385,6 +1387,15 @@ test('whole number times a mixed fraction greater than one uses the central frac
     );
     const rowButtonCount = row.querySelectorAll('button').length;
     row.querySelector('button')?.click();
+    const reference = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'optellen', exercise: 'whole-number-mixed-addition',
+      documentRef: document, navigate: () => {}
+    });
+    await reference.mount();
+    const referenceAnswer = document.querySelector('.pacogo-fraction-answer__input');
+    const canonicalAnswerFont = referenceAnswer ? getComputedStyle(referenceAnswer).fontFamily : '';
+    const canonicalAnswerSize = referenceAnswer ? getComputedStyle(referenceAnswer).fontSize : '';
     const practice = createSkillsRuntime({
       app, templateMount, context: { student: 'Zyon', mode: 'student' },
       domain: 'fractions', topic: 'vermenigvuldigen',
@@ -1420,7 +1431,10 @@ test('whole number times a mixed fraction greater than one uses the central frac
       mixedWholeFont: mixed?.querySelector('.pacogo-fraction-mixed-number__whole')
         ? getComputedStyle(mixed.querySelector('.pacogo-fraction-mixed-number__whole')).fontFamily : '',
       fractionFont: fraction ? getComputedStyle(fraction).fontFamily : '',
-      answerFont: wholeAnswer ? getComputedStyle(wholeAnswer).fontFamily : ''
+      answerFont: wholeAnswer ? getComputedStyle(wholeAnswer).fontFamily : '',
+      answerSize: wholeAnswer ? getComputedStyle(wholeAnswer).fontSize : '',
+      canonicalAnswerFont,
+      canonicalAnswerSize
     };
     wholeAnswer.value = '4';
     numerator.value = '1';

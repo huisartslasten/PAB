@@ -8756,7 +8756,7 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 **Implementatie**
 - Nieuwe sessie: pacogo-engine/fraction-whole-number-divided-by-fraction-greater-than-one-guided-session.js.
 - Nieuwe sessietests: pacogo-engine/fraction-whole-number-divided-by-fraction-greater-than-one-guided-session.test.js.
-- Bestaande route whole-number-divided-by-fraction-greater-than-one gebruikt nu de begeleide sessie; de bestaande 15 sommen en taakbank zijn behouden.
+- De eerste implementatie koppelde de bestaande route tijdelijk aan de begeleide sessie. Dit is in sectie 29 gecorrigeerd: de oorspronkelijke route en zelfstandige oefening zijn hersteld; de begeleide oefening heeft een eigen route en taakbank.
 - Runtime gebruikt de bestaande centrale stapstructuur en klassen uit de begeleide breukenopteloefening: fraction-guided-step-grid, fraction-guided-step-card, dezelfde actieve/afgeronde/vergrendelde stapstatussen en dezelfde voortgangsopbouw.
 - De drie delingsstappen zijn: Vergroot de breuk, Vergroot het hele getal, Reken de som uit.
 - De centrale PacoGO Page Template, createFractionPracticeTemplate(), renderMixedNumber(), renderFractionRepresentation() en renderFractionAnswerInput() blijven de rendering verzorgen.
@@ -8788,3 +8788,41 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 **Volgende concrete stap**
 - Laat de gebruiker de begeleide oefening in PacoGO TEST visueel controleren: stap 1, stap 2, stap 3 en het antwoord als gemengd getal.
 - Voeg geen extra stappen, hulpmiddelen, visualisaties of zelfstandige oefenvariant toe zonder expliciete opdracht.
+
+
+## 29. Correctie: zelfstandige én begeleide delingsoefening (18 november 2026)
+
+**Gebruikerscorrectie / exacte opdracht**
+- De eerdere oefening mocht niet worden verwijderd of vervangen.
+- Er moeten twee afzonderlijke oefeningen beschikbaar zijn: één mét stappenplan en één zonder stappenplan.
+- De sommen in beide oefeningen moeten verschillend zijn. De screenshots zijn alleen inhoudelijke inspiratie; voorbeeldsommen niet letterlijk overnemen.
+- Geen extra onderdelen of didactische wijzigingen buiten deze opdracht.
+
+**Behoud van de oorspronkelijke oefening**
+- De bestaande route-ID `whole-number-divided-by-fraction-greater-than-one` is teruggezet naar de oorspronkelijke zelfstandige sessie `createFractionWholeNumberDividedByFractionGreaterThanOneSession()`.
+- De oorspronkelijke taakbank `fraction-whole-number-divided-by-fraction-greater-than-one-task-bank.js` met de oorspronkelijke 15 sommen is behouden.
+- De zelfstandige oefening gebruikt de oorspronkelijke centrale PacoGO Page Template en Fraction Practice Template; er worden geen begeleide stapkaarten getoond.
+
+**Nieuwe afzonderlijke begeleide oefening**
+- Nieuwe route-ID: `whole-number-divided-by-fraction-greater-than-one-guided`.
+- Nieuwe taakbank: `pacogo-engine/fraction-whole-number-divided-by-fraction-greater-than-one-guided-task-bank.js`.
+- De begeleide taakbank bevat 15 unieke sommen die niet voorkomen in de oorspronkelijke zelfstandige taakbank. Alle 15 antwoorden zijn exact rekenkundig gecontroleerd.
+- De begeleide sessie gebruikt de bestaande centrale begeleide-stappenstructuur: (1) Vergroot de breuk, (2) Vergroot het hele getal, (3) Reken de som uit.
+- Beide oefeningen zijn als twee afzonderlijke regels zichtbaar in het bestaande centrale Delen-overzicht: met stappenplan en zonder stappenplan.
+- Er is geen nieuwe pagina-template of Fraction Practice Template gebouwd; beide routes hergebruiken de centrale templates.
+
+**Verificatie**
+- Full Regression #4021 / run 44369705145 was GREEN op de uitgangscommit `71a902ac397597ba77ce37865eb3e50ce801fc50` vóór deze correctie.
+- Nieuwe implementatiecommits: taakbank `124275be130fcf0e755912e5af364354f80a5ca1`; runtime `764d4a5df6ebefbe353b639e6d570d67a388a36b`; sessietest `bb5771a02bab8556b041fac856cabcc20623629a`; browser-test `3c41c4dd6e0b724344495d52ea144bc49d6e0ad1`; testcorrecties `7f2f7d142ef78fd5df77e104d276230ba82f23e6` en `8c03a2685e3abc8de1146dbec7f8957bcca7241f`.
+- De nieuwe volledige regressie voor deze implementatie is nog niet afgerond; status wordt pas als GREEN gerapporteerd na controle van de run op de definitieve branchcommit.
+
+**Actuele status**
+- Branch: `refactor/professional-v1`.
+- Laatste code-/testcommit vóór deze handoff-update: `8c03a2685e3abc8de1146dbec7f8957bcca7241f`.
+- Laatste volledig geverifieerde Full Regression vóór deze correctie: #4021 — GREEN op uitgangscommit `71a902ac397597ba77ce37865eb3e50ce801fc50`.
+- LIVE `main` is niet gewijzigd; geen deployment en geen Supabase-wijziging.
+
+**Volgende concrete stap**
+- Controleer de volledige regression op de nieuwe commit en los alleen bewezen oorzaken op.
+- Laat de gebruiker daarna beide afzonderlijke oefeningen in PacoGO TEST controleren.
+- Verwijder of vervang de oorspronkelijke zelfstandige oefening niet.

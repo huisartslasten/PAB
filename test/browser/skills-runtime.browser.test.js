@@ -855,13 +855,14 @@ test('fraction subtraction overview keeps the original exercise and adds the sep
     'Ongelijknamige breuken kleiner dan 1 van elkaar aftrekken',
     'Ongelijknamige breuken groter dan 1 van elkaar aftrekken'
   ]);
-  expect(result.exerciseButtonCount).toBe(5);
-  expect(result.navigations).toHaveLength(5);
+  expect(result.exerciseButtonCount).toBe(6);
+  expect(result.navigations).toHaveLength(6);
   expect(result.navigations[0]).toContain('exercise=whole-minus-mixed-subtraction');
   expect(result.navigations[1]).toContain('exercise=whole-minus-greater-than-one-subtraction');
   expect(result.navigations[2]).toContain('exercise=like-denominator-subtraction');
   expect(result.navigations[3]).toContain('exercise=mixed-like-denominator-subtraction');
   expect(result.navigations[4]).toContain('exercise=unlike-denominator-subtraction');
+  expect(result.navigations[5]).toContain('exercise=unlike-mixed-denominator-subtraction');
 });
 
 
@@ -1153,3 +1154,62 @@ test('like-denominator subtraction requires simplification before completion and
   expect(result.simplifiedVisible).toBe(true);
 });
 
+
+test('unlike mixed-denominator subtraction uses the central fraction template and accepts mixed-number answers', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=aftrekken&exercise=unlike-mixed-denominator-subtraction', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    localStorage.removeItem('pacogo:fraction-unlike-mixed-denominator-subtraction:v1:Zyon');
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {},
+      managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    const runtime = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'aftrekken', exercise: 'unlike-mixed-denominator-subtraction',
+      documentRef: document, navigate: () => {}
+    });
+    await runtime.mount();
+    const initial = {
+      title: document.querySelector('.paco-template-main h1')?.textContent || '',
+      layoutMode: document.querySelector('.paco-page-template')?.dataset.layoutMode || '',
+      template: Boolean(document.querySelector('[data-component="fraction-practice-template"]')),
+      instruction: document.querySelector('.fraction-practice-instruction')?.textContent || '',
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      mixedTerms: document.querySelectorAll('.fraction-like-subtraction-equation .pacogo-fraction-mixed-number').length,
+      sourceFractions: document.querySelectorAll('.fraction-like-subtraction-equation .pacogo-fraction-representation--symbolic').length,
+      wholeToggle: document.querySelector('.pacogo-fraction-answer__toggle')?.textContent || '',
+      simplify: document.querySelector('.pacogo-fraction-answer__simplify')?.textContent || ''
+    };
+    const set = (part, value) => {
+      const field = document.querySelector('[data-answer-part="' + part + '"]');
+      field.value = value;
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    document.querySelector('.pacogo-fraction-answer__toggle').click();
+    set('whole', '3');
+    set('primaryNumerator', '1');
+    set('primaryDenominator', '8');
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    return {
+      initial,
+      feedback: document.querySelector('[role="status"]')?.textContent || '',
+      next: document.querySelector('.pacogo-fraction-practice-template__actions button')?.textContent || ''
+    };
+  });
+  expect(result.initial.title).toBe('Oefenen');
+  expect(result.initial.layoutMode).toBe('practice');
+  expect(result.initial.template).toBe(true);
+  expect(result.initial.instruction).toContain('gemengde getallen');
+  expect(result.initial.progress).toContain('Som 1 van 15');
+  expect(result.initial.mixedTerms).toBe(2);
+  expect(result.initial.sourceFractions).toBe(2);
+  expect(result.initial.wholeToggle).toBe('Heel getal toevoegen');
+  expect(result.initial.simplify).toBe('Vereenvoudigen');
+  expect(result.feedback).toContain('correct');
+  expect(result.next).toBe('Volgende som');
+});

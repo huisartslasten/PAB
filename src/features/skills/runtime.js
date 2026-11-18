@@ -284,16 +284,6 @@ export function createSkillsRuntime({
         return;
       }
 
-      const visual = documentRef.createElement('div');
-      visual.className = 'comparison';
-      renderFractionOperation({
-        mount: visual,
-        operator: '−',
-        terms: [
-          { label: 'Eerste breuk', fraction: task.leftFraction },
-          { label: 'Tweede breuk', fraction: task.rightFraction }
-        ]
-      });
       const equation = documentRef.createElement('div');
       equation.className = 'construction-equation';
       const expression = renderFractionPracticeExpression({
@@ -302,7 +292,7 @@ export function createSkillsRuntime({
           ' − ' + task.rightFraction.numerator + '/' + task.rightFraction.denominator + ' = ?/?',
         inputLabels: ['Uitkomstteller', 'Uitkomstnoemer']
       });
-      template.workArea.append(visual, equation);
+      template.workArea.append(equation);
 
       const prompt = documentRef.createElement('p');
       prompt.textContent = 'Vul de teller en noemer van het antwoord in.';

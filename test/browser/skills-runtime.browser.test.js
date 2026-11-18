@@ -912,7 +912,7 @@ test('like-denominator subtraction opens from the central Skills route and runs 
   expect(result.initial.template).toBe(true);
   expect(result.initial.progress).toContain('Som 1 van 15');
   expect(result.initial.expression).toBe('6/7 − 1/7 = ?/?');
-  expect(result.initial.visualTerms).toBe(2);
+  expect(result.initial.visualTerms).toBe(0);
   expect(result.afterCorrect.progress).toContain('1 afgerond');
   expect(result.afterCorrect.feedback).toContain('Goed gedaan');
   expect(result.afterCorrect.next).toBe('Volgende som');

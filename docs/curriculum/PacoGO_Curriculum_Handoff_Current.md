@@ -8826,3 +8826,42 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Controleer de volledige regression op de nieuwe commit en los alleen bewezen oorzaken op.
 - Laat de gebruiker daarna beide afzonderlijke oefeningen in PacoGO TEST controleren.
 - Verwijder of vervang de oorspronkelijke zelfstandige oefening niet.
+
+
+## 30. Begeleide deling: centrale vervolgactie, tien opgaven en opnieuw oefenen (18 november 2026)
+
+**Opdracht en scope**
+- De begeleide oefening *Heel getal delen door een breukgetal groter dan 1* krijgt na iedere volledig goed afgeronde som een expliciete vervolgactie.
+- De oefening mag niet automatisch naar de volgende som springen.
+- De knop heet exact **Volgende som** en moet met Enter bedienbaar zijn.
+- Na de tiende som verschijnt **Opnieuw oefenen**. Deze actie start dezelfde oefenreeks opnieuw vanaf som 1.
+- Een stappenplan-oefening bevat exact 10 opgaven.
+- Opnieuw oefenen wordt in deze fase alleen voor deze begeleide delingsoefening gebouwd. Uitbreiding naar andere oefeningen is expliciet uitgesteld.
+- De zelfstandige delingsoefening en haar 15 sommen blijven ongewijzigd.
+
+**Implementatie**
+- De centrale Fraction Practice Template (pacogo-engine/fraction-practice-template.js) heeft herbruikbare showNextAction- en showRestartAction-acties. De centrale Enter-afhandeling blijft verantwoordelijk voor toetsenbordbediening; de gefocuste vervolgknop is ook met native Enter te activeren.
+- De begeleide runtime wacht na stap 4 op **Volgende som**. Na som 10 toont de runtime de afronding en **Opnieuw oefenen**.
+- De herstart wist de sessiestatus voor deze leerling en begint opnieuw met dezelfde tien taken.
+- De begeleide taakbank bevat nu exact de eerste tien gevalideerde, unieke taken uit de bestaande begeleide reeks. De zelfstandige taakbank is niet gewijzigd.
+- De sessie valideert exact tien taken en rapporteert 40 stappen.
+- De 88 px invoervelden zijn uitsluitend op de begeleide delingsoefening van toepassing. De overige begeleide oefeningen behouden hun bestaande 52 px breedte binnen de centrale paginatemplate.
+- Het getal in stap 3 is expliciet vet gemaakt. De typografie van het oorspronkelijke deeltal en het deeltal in de gelijkwaardige uitwerking is gelijkgetrokken.
+- De stap-uitleg over het wegvallen van de noemer en de uitleg bij het omzetten van de uitkomst naar een gemengd getal zijn behouden.
+
+**Verificatie**
+- Full Regression #4067 — **GREEN / SUCCESS** op exact commit fb8ef7fd055628c9959d9987128a2aa0e6de5831.
+- De volledige run omvatte curriculum-engine-regressie, architectuurgrenzen, Double or Nothing-regressie, onderhouden Node-regressie, gemigreerde Node-regressie en browserregressie.
+- De afzonderlijke browser proof #846 — SUCCESS op hetzelfde commit.
+- De browserregressie controleert onder andere de pauze na de eerste som, Enter op **Volgende som**, precies tien taken, de afronding en de centrale herstartactie.
+- Branch: refactor/professional-v1.
+- main is niet gewijzigd; geen deployment en geen Supabase-wijziging.
+
+**Actuele status**
+- Laatste geverifieerde implementatiecommit: fb8ef7fd055628c9959d9987128a2aa0e6de5831.
+- Laatste volledig geverifieerde Full Regression: #4067 — GREEN / SUCCESS op exact die commit.
+- De handoff wordt met deze sectie bijgewerkt; de handoff-wijziging moet zelf nog door Full Regression worden geverifieerd.
+
+**Volgende concrete stap**
+- Laat de gebruiker de begeleide oefening visueel controleren in PacoGO TEST: afronden van een som, **Volgende som** met Enter, afronden van som 10 en **Opnieuw oefenen**.
+- Voeg in deze fase geen herstartknop toe aan andere oefeningen. Dat blijft een afzonderlijke, later uit te voeren opdracht.

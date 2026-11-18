@@ -855,12 +855,13 @@ test('fraction subtraction overview keeps the original exercise and adds the sep
     'Ongelijknamige breuken kleiner dan 1 van elkaar aftrekken',
     'Ongelijknamige breuken groter dan 1 van elkaar aftrekken'
   ]);
-  expect(result.exerciseButtonCount).toBe(4);
-  expect(result.navigations).toHaveLength(4);
+  expect(result.exerciseButtonCount).toBe(5);
+  expect(result.navigations).toHaveLength(5);
   expect(result.navigations[0]).toContain('exercise=whole-minus-mixed-subtraction');
   expect(result.navigations[1]).toContain('exercise=whole-minus-greater-than-one-subtraction');
   expect(result.navigations[2]).toContain('exercise=like-denominator-subtraction');
   expect(result.navigations[3]).toContain('exercise=mixed-like-denominator-subtraction');
+  expect(result.navigations[4]).toContain('exercise=unlike-denominator-subtraction');
 });
 
 
@@ -924,6 +925,67 @@ test('like-denominator subtraction opens from the central Skills route and runs 
   expect(result.afterCorrect.feedback).toContain('Goed gedaan');
   expect(result.afterCorrect.next).toBe('Volgende som');
   expect(result.secondSymbolicFractions).toEqual(['Eerste breuk: 7 gedeeld door 10', 'Tweede breuk: 4 gedeeld door 10']);
+  expect(result.secondProgress).toContain('Som 2 van 15');
+});
+
+
+test('unlike-denominator subtraction opens from its existing Skills tile and uses the central Fraction Practice Template for fifteen original tasks', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=aftrekken&exercise=unlike-denominator-subtraction', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    localStorage.removeItem('pacogo:fraction-unlike-denominator-subtraction:v1:Zyon');
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {},
+      managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    const runtime = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'aftrekken', exercise: 'unlike-denominator-subtraction',
+      documentRef: document, navigate: () => {}
+    });
+    await runtime.mount();
+    const initial = {
+      title: document.querySelector('.paco-template-main h1')?.textContent || '',
+      layoutMode: document.querySelector('.paco-page-template')?.dataset.layoutMode || '',
+      template: Boolean(document.querySelector('[data-component="fraction-practice-template"]')),
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      symbolicFractions: [...document.querySelectorAll('.fraction-like-subtraction-equation .pacogo-fraction-representation--symbolic')].map(node => node.getAttribute('aria-label') || ''),
+      simplifyControl: document.querySelector('.pacogo-fraction-answer__simplify')?.textContent || ''
+    };
+    const fill = (part, value) => {
+      const field = document.querySelector('[data-answer-part="' + part + '"]');
+      field.value = String(value);
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    fill('primaryNumerator', 7);
+    fill('primaryDenominator', 12);
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    const afterCorrect = {
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      feedback: document.querySelector('[role="status"]')?.textContent || '',
+      next: document.querySelector('.pacogo-fraction-practice-template__actions button')?.textContent || ''
+    };
+    document.querySelector('.pacogo-fraction-practice-template__actions button').click();
+    return {
+      initial, afterCorrect,
+      secondSymbolicFractions: [...document.querySelectorAll('.fraction-like-subtraction-equation .pacogo-fraction-representation--symbolic')].map(node => node.getAttribute('aria-label') || ''),
+      secondProgress: document.querySelector('.fraction-practice-progress')?.textContent || ''
+    };
+  });
+  expect(result.initial.title).toBe('Oefenen');
+  expect(result.initial.layoutMode).toBe('practice');
+  expect(result.initial.template).toBe(true);
+  expect(result.initial.progress).toContain('Som 1 van 15');
+  expect(result.initial.symbolicFractions).toEqual(['Eerste breuk: 5 gedeeld door 6', 'Tweede breuk: 1 gedeeld door 4']);
+  expect(result.initial.simplifyControl).toBe('Vereenvoudigen');
+  expect(result.afterCorrect.progress).toContain('1 afgerond');
+  expect(result.afterCorrect.feedback).toContain('Goed gedaan');
+  expect(result.afterCorrect.next).toBe('Volgende som');
+  expect(result.secondSymbolicFractions).toEqual(['Eerste breuk: 7 gedeeld door 8', 'Tweede breuk: 1 gedeeld door 3']);
   expect(result.secondProgress).toContain('Som 2 van 15');
 });
 

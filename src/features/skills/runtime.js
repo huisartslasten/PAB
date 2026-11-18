@@ -421,6 +421,8 @@ export function createSkillsRuntime({
           simplified: values.simplified, simplifiedNumerator: values.simplifiedNumerator,
           simplifiedDenominator: values.simplifiedDenominator
         });
+        progressLabel.textContent = 'Som ' + (result.progress.isComplete ? 15 : result.progress.completedCount + 1) +
+          ' van 15 • ' + result.progress.completedCount + ' afgerond';
         if (result.classification === 'valid') {
           answer.lock();
           submit.disabled = true;

@@ -1984,6 +1984,8 @@ test('whole number divided by a mixed fraction greater than one teaches four sep
       fractionTemplate: Boolean(document.querySelector('[data-component="fraction-practice-template"]')),
       title: document.querySelector('.fraction-whole-mixed-addition-card h2')?.textContent || '',
       taskCount: tasks.length,
+      stepTags: [...document.querySelectorAll('.fraction-guided-step-card')].map(node => node.tagName.toLowerCase()),
+      expandedSteps: [...document.querySelectorAll('.fraction-guided-step-card')].map(node => node.open),
       differentFromIndependentTasks: tasks.every(task => !independentTasks.some(other => task.wholeNumber === other.wholeNumber && task.divisor.whole === other.divisor.whole && task.divisor.numerator === other.divisor.numerator && task.divisor.denominator === other.divisor.denominator)),
       uniqueTasks: new Set(tasks.map(task => [task.wholeNumber, task.divisor.whole, task.divisor.numerator, task.divisor.denominator].join('|'))).size,
       progress: document.querySelector('.fraction-practice-progress')?.textContent || '',

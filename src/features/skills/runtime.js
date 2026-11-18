@@ -1518,9 +1518,12 @@ export function createSkillsRuntime({
       solution.className = 'fraction-guided-solution';
       solution.setAttribute('aria-label', 'Volledige gelijkwaardige deling');
       if (step.completedStepIds.includes('convert_mixed_number')) {
+        const originalDividend = documentRef.createElement('span');
+        originalDividend.className = 'fraction-whole-mixed-expression__whole';
+        originalDividend.textContent = String(step.task.wholeNumber);
         solution.append(
           op('='),
-          documentRef.createTextNode(String(step.task.wholeNumber)),
+          originalDividend,
           op('÷'),
           divisorFraction()
         );
@@ -1697,7 +1700,7 @@ export function createSkillsRuntime({
               incorrect_answer: stepId === 'convert_mixed_number'
                 ? 'Vermenigvuldig het hele getal met de noemer en tel de teller erbij op. De noemer blijft hetzelfde.'
                 : stepId === 'make_divisor_whole'
-                ? 'Vermenigvuldig de onechte breuk met de noemer om een heel getal te krijgen.'
+                ? 'Je hoeft de teller niet nog eens met de noemer te vermenigvuldigen. De noemer en de keerfactor vallen tegen elkaar weg. Wat blijft over?'
                 : stepId === 'scale_dividend'
                 ? 'Vermenigvuldig het hele getal met dezelfde factor als waarmee je de deler hebt vergroot.'
                 : 'Dat antwoord klopt nog niet. Controleer de deling.',

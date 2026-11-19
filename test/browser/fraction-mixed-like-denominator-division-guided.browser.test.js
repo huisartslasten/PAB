@@ -28,6 +28,15 @@ test('guided mixed like-denominator division is a separate overview exercise wit
   await expect(page.locator('.fraction-guided-task-prompt')).toContainText('2');
   await expect(page.locator('.fraction-guided-task-prompt')).toContainText('1');
   await expect(page.locator('.fraction-guided-step-card[data-state="active"]')).toHaveAttribute('data-step-id', 'convert_mixed_numbers');
+  await expect(page.locator('.fraction-guided-step-card[open]')).toHaveCount(1);
+  const pairedRows = page.locator('.fraction-guided-step-expression--paired .fraction-guided-step-subexpression');
+  await expect(pairedRows).toHaveCount(2);
+  const verticalOffsets = await pairedRows.evaluateAll(rows => rows.map(row => {
+    const source = row.children[0].getBoundingClientRect();
+    const answer = row.children[2].getBoundingClientRect();
+    return Math.abs((source.top + source.bottom) / 2 - (answer.top + answer.bottom) / 2);
+  }));
+  expect(verticalOffsets.every(offset => offset <= 4)).toBe(true);
 
   const first = tasks[0];
   const leftImproper = first.left.whole * first.left.denominator + first.left.numerator;
@@ -64,6 +73,7 @@ test('guided mixed like-denominator division is a separate overview exercise wit
   await page.locator('[data-answer-part="primaryDenominator"]').fill(String(first.answer.denominator));
   await page.getByRole('button', { name: 'Controleren' }).click();
   await expect(page.locator('.fraction-guided-solution')).toContainText(String(first.answer.numerator));
+  await expect(page.locator('.fraction-guided-step-card[open]')).toHaveCount(1);
   await expect(page.getByRole('button', { name: 'Volgende som' })).toBeVisible();
   await page.getByRole('button', { name: 'Volgende som' }).click();
   await expect(page.locator('.fraction-practice-progress')).toContainText('Som 2 van 10');

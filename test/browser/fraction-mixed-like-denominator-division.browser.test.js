@@ -26,6 +26,7 @@ test('mixed like-denominator division uses central fraction templates, fifteen n
   await expect(page.locator('[data-component="fraction-practice-template"]')).toBeVisible();
   await expect(page.locator('.fraction-practice-progress')).toContainText('Som 1 van 15');
   await expect(page.locator('.fraction-whole-mixed-expression .pacogo-fraction-mixed-number')).toHaveCount(2);
+  await expect(page.locator('.fraction-whole-mixed-expression .pacogo-fraction-mixed-number__whole')).toHaveText(['2', '1']);
   await expect(page.locator('.fraction-whole-mixed-expression')).toContainText('÷');
 
   for (const [index, task] of FRACTION_MIXED_LIKE_DENOMINATOR_DIVISION_TASKS.entries()) {

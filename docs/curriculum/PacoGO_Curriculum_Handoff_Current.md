@@ -8936,3 +8936,32 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Verifieer deze handoff-update met Full Regression op de nieuwe handoff-commit.
 - Laat de gebruiker daarna de oefening visueel controleren in PacoGO TEST.
 - Voeg geen andere deelonderwerpen, uitlegstappen of extra functionaliteit toe zonder expliciete opdracht.
+
+## 33. Titel begeleide deling expliciet onderscheiden van zelfstandige oefening (19 november 2026)
+
+**Gebruikersopdracht**
+- De gebruiker bevestigde dat voor de nieuwe oefening *Heel getal delen door een breukgetal groter dan 1 — met stappenplan* het bestaande stappenplan zo centraal mogelijk hergebruikt moet worden.
+- Alleen de begeleide oefening krijgt de expliciete aanduiding **— met stappenplan**. De zelfstandige variant blijft afzonderlijk en ongewijzigd.
+
+**Implementatie**
+- Alleen de titel in `renderWholeNumberDividedByFractionGreaterThanOneGuidedPractice()` is aangepast naar `Heel getal delen door een breukgetal groter dan 1 — met stappenplan`.
+- De bestaande vier stappen, tien gevalideerde opgaven, guided session, centrale Fraction Practice Template, antwoordcomponenten, voortgang, expliciete **Volgende som** en **Opnieuw oefenen** zijn hergebruikt.
+- Geen nieuwe template of tweede implementatie gemaakt.
+- De zelfstandige oefening `whole-number-divided-by-fraction-greater-than-one` is niet gewijzigd.
+- Geen curriculum-, Supabase- of LIVE `main`-wijziging.
+
+**Verificatie**
+- Voorafgaande Full Regression #4091 — GREEN / SUCCESS op commit `57e1494912e7099db164ecf38ac110363b0987a3`.
+- Titelwijziging staat op commit `f66e2a11f46e4196293e85f2d475b1f21c564011`.
+- Na deze commit is via de beschikbare GitHub-verbinding nog geen nieuwe workflowrun gestart; Full Regression op `f66e2a11f46e4196293e85f2d475b1f21c564011` is daarom **niet geverifieerd**. De voorafgaande groene run geldt niet als verificatie van deze nieuwe commit.
+
+**Actuele status**
+- Branch: `refactor/professional-v1`.
+- Laatste codecommit: `f66e2a11f46e4196293e85f2d475b1f21c564011`.
+- Laatste geverifieerde Full Regression: #4091 — GREEN op de voorgaande commit `57e1494912e7099db164ecf38ac110363b0987a3`.
+- Handoff-update volgt in de huidige commit; ook deze handoff-commit moet nog door Full Regression worden geverifieerd.
+- LIVE `main` onaangeroerd.
+
+**Volgende concrete stap**
+- Start Full Regression op de actuele branch HEAD en verifieer de titelwijziging en de bestaande guided-division browserflows.
+- Laat de gebruiker daarna de begeleide oefening visueel controleren in PacoGO TEST.

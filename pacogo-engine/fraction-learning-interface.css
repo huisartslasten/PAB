@@ -1103,13 +1103,28 @@
   gap:12px;
   min-width:0;
 }
-.fraction-mixed-like-denominator-division-guided-card .fraction-guided-step-subexpression{
+.fraction-mixed-like-denominator-division-guided-card .fraction-guided-step-expression{
+  flex-wrap:nowrap;
+  justify-content:flex-start;
+  overflow-x:auto;
+  overscroll-behavior-x:contain;
+}
+.fraction-mixed-like-denominator-division-guided-card .fraction-guided-step-expression--paired{
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:flex-start;
+  overflow-x:visible;
+}
+.fraction-mixed-like-denominator-division-guided-card .fraction-guided-step-expression--paired .fraction-guided-step-subexpression{
   display:flex;
   align-items:center;
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
   gap:8px;
-  margin:8px 0;
+  margin:4px 0;
   min-width:0;
+}
+.fraction-mixed-like-denominator-division-guided-card .fraction-guided-step-expression:not(.fraction-guided-step-expression--paired)>*{
+  flex-shrink:0;
 }
 .fraction-mixed-like-denominator-division-guided-card .fraction-guided-whole-entry{
   width:76px!important;

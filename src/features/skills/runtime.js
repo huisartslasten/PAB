@@ -2061,7 +2061,7 @@ export function createSkillsRuntime({
         done.textContent = 'Je hebt alle 15 sommen afgerond. Goed gewerkt!';
         template.workArea.append(done);
         content.append(card);
-        template.showRestartAction(() => { session.reset(); renderCurrentTask(); });
+        template.showRestartAction(() => { session.reset(); renderCurrentTask(); }, 'OPNIEUW MAKEN');
         return;
       }
 

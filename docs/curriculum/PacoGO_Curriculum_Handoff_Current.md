@@ -9100,3 +9100,12 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Verifieer de handoff-update met Full Regression op de nieuwe handoff-commit.
 - Laat de gebruiker de nieuwe begeleide oefening visueel controleren in PacoGO TEST.
 - Voeg niets toe buiten deze opdracht.
+
+
+## 37. Nieuwe begeleide taakbank gebruikt geen voorbeeldsom letterlijk (19 november 2026)
+
+- De eerste som van de nieuwe begeleide oefening is aangepast zodat de uitgewerkte voorbeeldsom uit de bronvideo niet letterlijk wordt overgenomen.
+- Som 1 is nu `2 3/10 ÷ 1 1/10`, met uitkomst `2 1/11`; de overige negen sommen zijn ongewijzigd.
+- De bestaande sessie valideert de sommen dynamisch vanuit de taakbank; de bestaande sessie- en browserregressies blijven van toepassing.
+- Geen wijziging aan de stappen, runtime-renderer, route, bestaande zelfstandige oefening, Supabase of LIVE `main`.
+- Deze taakbank- en handoff-correctie wordt geverifieerd met Full Regression op de resulterende commit.

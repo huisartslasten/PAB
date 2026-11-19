@@ -8865,3 +8865,39 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 **Volgende concrete stap**
 - Laat de gebruiker de begeleide oefening visueel controleren in PacoGO TEST: afronden van een som, **Volgende som** met Enter, afronden van som 10 en **Opnieuw oefenen**.
 - Voeg in deze fase geen herstartknop toe aan andere oefeningen. Dat blijft een afzonderlijke, later uit te voeren opdracht.
+
+
+
+## 31. Begeleide deling: volledige uitwerking zichtbaar na afronding (18 november 2026)
+
+**Gebruikersopdracht**
+- Na het correct afronden van de laatste stap moet het eindbeeld de volledige som blijven tonen.
+- De oorspronkelijke som, alle vier uitwerkstappen en de ingevulde antwoorden blijven zichtbaar.
+- Alle vier stappen blijven open en krijgen de status afgerond.
+- Alleen de feedback verandert: toon dat de som goed is afgerond en de centrale actie **Volgende som**.
+- De volledige uitwerking blijft staan totdat de gebruiker op **Volgende som** drukt.
+- Na de tiende som blijft de laatste uitwerking eveneens zichtbaar, met de bestaande actie **Opnieuw oefenen**.
+- Scope is uitsluitend de bestaande begeleide oefening *Heel getal delen door een breukgetal groter dan 1*. Geen andere oefening, template of functionaliteit wijzigen.
+
+**Implementatie**
+- De bestaande begeleide runtime bewaart de laatst afgeronde stap als voltooid snapshot en rendert die bij het afrondingsbeeld.
+- Alle vier centrale stapkaarten blijven zichtbaar en open; het eindbeeld toont de volledige uitwerking en de ingevulde antwoorden.
+- De bestaande centrale Fraction Practice Template blijft verantwoordelijk voor **Volgende som** en **Opnieuw oefenen**.
+- De volgende som start pas na expliciete gebruikersactie.
+- De zelfstandige delingsoefening, haar 15 opgaven, andere oefeningen, curriculum, Supabase en LIVE `main` zijn niet gewijzigd.
+
+**Verificatie**
+- De eerste implementatie-run #4070 en Browser Proof #847 waren rood door een verouderde bestaande browser-testverwachting: die test verwachtte dat de vier stapkaarten na afronding verdwenen. De log wees niet op een runtimefout; de verwachting was in strijd met de nieuwe gebruikersopdracht.
+- De bestaande browser-test is aangepast om vier zichtbare, afgeronde en open stappen en de behouden uitwerking te controleren.
+- Full Regression #4071 / run 44423000398: **GREEN / SUCCESS** op exact commit `17f6cb1abd37c87533f789aba42a998c5469160a`.
+- Browser Proof #848 / run 44423000405: **SUCCESS** op hetzelfde commit.
+
+**Actuele status vóór handoff-verificatie**
+- Branch: `refactor/professional-v1`.
+- Laatste geverifieerde code-/testcommit: `17f6cb1abd37c87533f789aba42a998c5469160a`.
+- Laatste volledig geverifieerde Full Regression: #4071 — GREEN / SUCCESS op exact die commit.
+- LIVE `main` is niet gewijzigd; geen deployment en geen Supabase-wijziging.
+
+**Volgende concrete stap**
+- Laat de gebruiker de begeleide delingsoefening in PacoGO TEST visueel controleren: na afronding moeten de oorspronkelijke som, vier uitwerkstappen en ingevulde antwoorden zichtbaar blijven tot **Volgende som** wordt gekozen.
+- Voeg niets toe buiten deze opdracht.

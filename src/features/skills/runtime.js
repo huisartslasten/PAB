@@ -1452,7 +1452,7 @@ export function createSkillsRuntime({
       learnerKey,
       tasks: FRACTION_WHOLE_NUMBER_DIVIDED_BY_FRACTION_GREATER_THAN_ONE_TASKS
     });
-    const exercise = { title: 'Heel getal delen door een breukgetal groter dan 1', difficultyLevel: 1, maxDifficultyLevel: 5 };
+    const exercise = { title: 'Heel getal delen door een breukgetal groter dan 1 — met stappenplan', difficultyLevel: 1, maxDifficultyLevel: 5 };
 
     function renderCurrentTask() {
       const task = session.getCurrentTask();

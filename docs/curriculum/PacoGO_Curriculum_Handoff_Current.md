@@ -9050,3 +9050,53 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Verifieer deze handoff-update met Full Regression op de nieuwe handoff-commit.
 - Laat de gebruiker de zichtbare hele getallen in PacoGO TEST bevestigen.
 - Voeg niets toe buiten de opdracht.
+
+
+## 36. Breuken → Delen → Gelijknamige breuken groter dan 1 op elkaar delen — met stappenplan (19 november 2026)
+
+**Gebruikersopdracht**
+- Maak een volledig nieuwe begeleide oefening voor het delen van twee gelijknamige gemengde getallen groter dan 1.
+- De oefening moet als aparte regel in het bestaande Delen-overzicht verschijnen; de bestaande zelfstandige oefening mag niet worden aangepast of vervangen.
+- Gebruik het bestaande begeleide breukenstappenplan en de centrale PacoGO-/breuktemplates zo veel mogelijk.
+- Precies 10 sommen.
+- Doelsom blijft zichtbaar en wordt bij iedere afgeronde stap verder naar rechts uitgebreid; alle eerdere tussenstappen blijven zichtbaar.
+- De vijf stappen zijn vooraf bepaald en door de gebruiker bevestigd:
+  1. Beide gemengde getallen omzetten naar onechte breuken.
+  2. De tweede breuk omkeren.
+  3. Tellers en noemers vermenigvuldigen.
+  4. De onechte breuk omzetten naar een gemengd getal, inclusief rest.
+  5. Het breukdeel vereenvoudigen.
+- De leerling kan pas verder na een correct antwoord. Na iedere som volgt expliciet **Volgende som**; na som 10 verschijnt **Opnieuw oefenen**.
+
+**Implementatie**
+- Nieuwe taakbank: `pacogo-engine/fraction-mixed-like-denominator-division-guided-task-bank.js`, met 10 unieke, wiskundig gecontroleerde delingen van gemengde getallen met dezelfde noemer.
+- Nieuwe sessie: `pacogo-engine/fraction-mixed-like-denominator-division-guided-session.js`, met vijf geordende stappen, validatie per stap, opslag per leerling, voortgang en herstart.
+- Nieuwe sessietests: `pacogo-engine/fraction-mixed-like-denominator-division-guided-session.test.js`; controleren de 10 sommen, vijfstappenvolgorde, onjuiste antwoorden, vereenvoudiging, voortgang en herstart.
+- Nieuwe aparte overzichtsregel: **Gelijknamige breuken groter dan 1 op elkaar delen — met stappenplan**, route-ID `mixed-like-denominator-division-guided`.
+- Nieuwe runtime-renderer hergebruikt de centrale PacoGO Page Template, `createFractionPracticeTemplate()`, `renderMixedNumber()`, `renderFractionRepresentation()`, `renderFractionAnswerInput()` en de bestaande begeleide-stappenkaarten.
+- De doelsom blijft links staan; afgeronde omzettingen, omkering, vermenigvuldiging, gemengde uitkomst en vereenvoudigde uitkomst worden opeenvolgend rechts toegevoegd.
+- De bestaande zelfstandige route `mixed-like-denominator-division` en haar 15 sommen zijn niet gewijzigd.
+- Geen nieuwe lokale paginatemplate, geen Supabase-wijziging, geen curriculumwijziging en geen wijziging aan LIVE `main`.
+
+**Oorzaakanalyse en verificatie**
+- Eerste implementatiecommit `5656652af196632992f93bbfdd2fffe8dc76561d` introduceerde de taakbank, sessie, tests en renderer.
+- De eerste browserregressie was rood doordat de nieuwe overzichtsregel ontbrak in de bestaande exacte overzichtstest; inspectie toonde daarnaast dat de nieuwe guided route nog niet aan de runtime-dispatch was gekoppeld.
+- De overzichtscontracttest is bijgewerkt om de nieuwe, bedoelde regel te controleren; de dispatch is toegevoegd.
+- Een daaropvolgende testcorrectie verplaatste de guided-route assertion naar de juiste Delen-overzichtstest en bewaart de overzichtssnapshot vóór het mounten van de oefenpagina.
+- Definitieve implementatie-/testcommit: `72ab464de67482ff51927c1d099238416ce5d3bb`.
+- Full Regression #4135: **GREEN / SUCCESS** op exact commit `72ab464de67482ff51927c1d099238416ce5d3bb`.
+- Browser Proof #870: **GREEN / SUCCESS** op exact hetzelfde commit.
+- De browserproof voert de browserregressiesuite uit; de gerichte guided-browser-test valideert ook de 10-sommenreeks, vijf stappen, voortgang en herstart.
+
+**Actuele status vóór deze handoff-update**
+- Branch: `refactor/professional-v1`.
+- Laatste geverifieerde implementatiecommit: `72ab464de67482ff51927c1d099238416ce5d3bb`.
+- Laatste Full Regression: #4135 — **GREEN / SUCCESS**.
+- Laatste Browser Proof: #870 — **GREEN / SUCCESS**.
+- Deze handoff-update moet zelf nog door Full Regression worden geverifieerd.
+- LIVE `main` onaangeroerd; geen deployment en geen Supabase-wijziging.
+
+**Volgende concrete stap**
+- Verifieer de handoff-update met Full Regression op de nieuwe handoff-commit.
+- Laat de gebruiker de nieuwe begeleide oefening visueel controleren in PacoGO TEST.
+- Voeg niets toe buiten deze opdracht.

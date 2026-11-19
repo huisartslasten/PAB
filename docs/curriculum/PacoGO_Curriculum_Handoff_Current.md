@@ -9155,3 +9155,31 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Laat de gebruiker de vijfstappenoefening visueel controleren in PacoGO TEST.
 - Voeg niets toe buiten de gemelde visuele correctie.
 
+
+## 39. Ruimte geven aan de actieve stap in begeleide deling (19 november 2026)
+
+**Gebruikersfeedback**
+- De vijf stapkaarten namen ieder een vaste kolombreedte in, ook wanneer vier stappen niet aan de beurt waren. De gebruiker wil dat ongebruikte stappen inklappen zodat de actieve stap de vrijgekomen ruimte krijgt.
+
+**Correctie**
+- De vijfstappenoefening gebruikt nu de bestaande progressieve stapindeling: de actieve stap krijgt het grootste deel van de beschikbare breedte; afgeronde en nog niet gebruikte stappen blijven als smalle, ingeklapte stapkoppen zichtbaar.
+- De vijfstappenweergave is van vijf gelijke gridkolommen naar de bestaande flex-gebaseerde progressieve verdeling omgezet.
+- Alleen `renderMixedLikeDenominatorDivisionGuidedPractice()` gebruikt deze indeling. De drie-stappenbegeleiding en zelfstandige delingsoefeningen zijn niet gewijzigd.
+- De invulbreuken blijven naast het bijbehorende gemengde getal op hun eigen horizontale regel staan.
+- De browserregressie controleert dat de actieve kaart meer dan driemaal zo breed is als een ingeklapte kaart en dat de layout flex-gebaseerd is.
+
+**Verificatie**
+- Correctie-/testcommit: `87f412c12e8f29af426bbee6aed6b58002b13f74`.
+- Full Regression #4149 / run 44581125800: **GREEN / SUCCESS** op exact deze commit; Node-, architectuur- en browserregressies zijn geslaagd.
+- Deze handoff-update moet zelf nog door Full Regression worden geverifieerd.
+
+**Actuele status**
+- Branch: `refactor/professional-v1`.
+- Laatste geverifieerde code-/testcommit: `87f412c12e8f29af426bbee6aed6b58002b13f74`.
+- Laatste volledig geverifieerde Full Regression: #4149 — **GREEN / SUCCESS** op exact die commit.
+- LIVE `main` onaangeroerd; geen deployment en geen Supabase-wijziging.
+
+**Volgende concrete stap**
+- Verifieer deze handoff-update met Full Regression op de nieuwe handoff-commit.
+- Laat de gebruiker controleren of de actieve stap nu voldoende ruimte heeft.
+- Voeg niets toe buiten deze correctie.

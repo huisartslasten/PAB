@@ -9108,4 +9108,9 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Som 1 is nu `2 3/10 ÷ 1 1/10`, met uitkomst `2 1/11`; de overige negen sommen zijn ongewijzigd.
 - De bestaande sessie valideert de sommen dynamisch vanuit de taakbank; de bestaande sessie- en browserregressies blijven van toepassing.
 - Geen wijziging aan de stappen, runtime-renderer, route, bestaande zelfstandige oefening, Supabase of LIVE `main`.
-- Deze taakbank- en handoff-correctie wordt geverifieerd met Full Regression op de resulterende commit.
+- Correctiecommit: `b6d15d680487f46ee2d400dbf50a163d87b94e68`.
+- Full Regression #4137: **GREEN / SUCCESS** op exact commit `b6d15d680487f46ee2d400dbf50a163d87b94e68`.
+- Laatste gerichte Browser Proof #870: **GREEN / SUCCESS** op commit `72ab464de67482ff51927c1d099238416ce5d3bb`; deze bevestigde de afzonderlijke overzichtsregel en guided route. De taakbankcorrectie is daarnaast door de Node-regressies van #4137 gevalideerd.
+- Branch: `refactor/professional-v1`; LIVE `main` onaangeroerd.
+- Volgende stap: laat de gebruiker de oefening visueel controleren in PacoGO TEST.
+- Deze handoff-verificatie wordt uitgevoerd met Full Regression op de nieuwe handoff-commit.

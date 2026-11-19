@@ -1419,7 +1419,7 @@ export function createSkillsRuntime({
       summaries.forEach((item, index) => {
         const isDone = completed.includes(item.id), isActive = step.stepId === item.id;
         const details = documentRef.createElement('details'); details.className = 'fraction-guided-step-card';
-        details.open = isActive; details.dataset.stepId = item.id;
+        details.open = !awaitingNextTask && isActive; details.dataset.stepId = item.id;
         details.dataset.state = isDone ? 'completed' : isActive ? 'active' : 'locked';
         const summary = documentRef.createElement('summary'); summary.className = 'fraction-guided-step-summary';
         const heading = documentRef.createElement('h3'); heading.textContent = 'Stap ' + (index + 1);
@@ -1505,8 +1505,11 @@ export function createSkillsRuntime({
         const done = documentRef.createElement('p'); done.className = 'fraction-practice-complete';
         done.textContent = progress.isComplete ? 'Deze laatste som is afgerond. Je hebt alle 10 sommen goed gemaakt.' : 'Deze som is afgerond. Klik op Volgende som als je klaar bent.';
         template.workArea.append(done);
-        template.showNextAction(() => { awaitingNextTask = false; completedTaskSnapshot = null; renderCurrentTask(); });
-        if (progress.isComplete) template.showRestartAction(() => { session.reset(); awaitingNextTask = false; completedTaskSnapshot = null; renderCurrentTask(); });
+        if (progress.isComplete) {
+          template.showRestartAction(() => { session.reset(); awaitingNextTask = false; completedTaskSnapshot = null; renderCurrentTask(); });
+        } else {
+          template.showNextAction(() => { awaitingNextTask = false; completedTaskSnapshot = null; renderCurrentTask(); });
+        }
       } else if (activeEntry) activeEntry.focus();
     }
     renderCurrentTask();

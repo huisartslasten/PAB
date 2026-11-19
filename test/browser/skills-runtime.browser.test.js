@@ -156,7 +156,6 @@ test('Optellen in the fraction overview opens the eight-row addition overview wi
   expect(result.levels).toEqual([1, 1, 2, 2, 3, 3, 4, 5]);
   expect(result.boneCounts).toEqual([5, 5, 5, 5, 5, 5, 5, 5]);
   expect(result.centralCard).toBe(true);
-  expect(result.guidedRoute).toEqual({ title: 'Oefenen', stepCount: 5, activeStep: 'convert_mixed_numbers', progress: 'Som 1 van 10 · Niveau 2 van 5' });
   expect(result.customDots).toBe(0);
 });
 

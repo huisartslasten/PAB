@@ -1476,7 +1476,7 @@ export function createSkillsRuntime({
               renderFractionRepresentation(step.task.left, 'symbolic_fraction', 'Eerste breuk'), op('×'),
               renderFractionRepresentation(step.inverse, 'symbolic_fraction', 'Omgekeerde tweede breuk'), op('=')
             );
-            activeEntry = renderFractionStepInput({ label: 'Product', maxLength: 5, documentRef }); expression.append(activeEntry.wrap);
+            activeEntry = renderFractionStepInput({ label: 'Product', maxLength: 4, documentRef }); expression.append(activeEntry.wrap);
           } else {
             expression.append(renderFractionRepresentation(step.product, 'symbolic_fraction', 'Onvereenvoudigde uitkomst'), op('='));
             const answerMount = documentRef.createElement('div'); answerMount.className = 'fraction-guided-mixed-answer';
@@ -1657,7 +1657,7 @@ export function createSkillsRuntime({
               renderFractionRepresentation(step.task.left, 'symbolic_fraction', 'Eerste breuk'), op('×'),
               renderFractionRepresentation(step.inverse, 'symbolic_fraction', 'Omgekeerde tweede breuk'), op('=')
             );
-            activeEntry = renderFractionStepInput({ label: 'Product', maxLength: 5, documentRef }); expression.append(activeEntry.wrap);
+            activeEntry = renderFractionStepInput({ label: 'Product', maxLength: 4, documentRef }); expression.append(activeEntry.wrap);
           } else {
             expression.append(renderFractionRepresentation(step.product, 'symbolic_fraction', 'Onvereenvoudigde uitkomst'), op('='));
             const answerMount = documentRef.createElement('div'); answerMount.className = 'fraction-guided-mixed-answer';

@@ -1996,6 +1996,12 @@ test('whole number divided by a mixed fraction greater than one teaches four sep
       conversionDenominator: document.querySelector('[data-step-id="convert_mixed_number"] .pacogo-fraction-denominator')?.textContent || '',
       expression: document.querySelector('.fraction-guided-task-prompt')?.textContent || '',
       solution: document.querySelector('.fraction-guided-solution')?.textContent || '',
+      equationFontSize: document.querySelector('.fraction-guided-equation')
+        ? getComputedStyle(document.querySelector('.fraction-guided-equation')).fontSize : '',
+      completedAnswerFontSizes: [...document.querySelectorAll('.fraction-guided-step-card[data-state="completed"] .fraction-guided-step-completed-answer')]
+        .map(node => getComputedStyle(node).fontSize),
+      completedNestedFontSizes: [...document.querySelectorAll('.fraction-guided-step-card[data-state="completed"] .fraction-guided-step-completed-answer .pacogo-fraction-representation--symbolic, .fraction-guided-step-card[data-state="completed"] .fraction-guided-step-completed-answer .fraction-guided-operator, .fraction-guided-step-card[data-state="completed"] .fraction-guided-step-completed-answer .fraction-whole-mixed-expression__whole')]
+        .map(node => getComputedStyle(node).fontSize),
       solutionDivisionCount: (document.querySelector('.fraction-guided-solution')?.textContent.match(/÷/g) || []).length,
       solutionEqualityCount: (document.querySelector('.fraction-guided-solution')?.textContent.match(/=/g) || []).length,
       solutionDividendFontSize: document.querySelector('.fraction-guided-solution .fraction-whole-mixed-expression__whole')
@@ -2071,6 +2077,9 @@ test('whole number divided by a mixed fraction greater than one teaches four sep
   expect(result.afterFinal.progress).toContain('Som 2 van 10');
   expect(result.afterFinal.states).toEqual(['completed', 'completed', 'completed', 'completed']);
   expect(result.afterFinal.expandedSteps).toEqual([true, true, true, true]);
+  expect(result.afterFinal.equationFontSize).toBe('28px');
+  expect(result.afterFinal.completedAnswerFontSizes).toEqual(['28px', '28px', '28px', '28px']);
+  expect(result.afterFinal.completedNestedFontSizes.every(size => size === '28px')).toBe(true);
   expect(result.afterFinal.solution).toContain('3');
   expect(result.afterFinal.solution).toContain('15');
   expect(result.afterFinal.nextAction).toBe('Volgende som');

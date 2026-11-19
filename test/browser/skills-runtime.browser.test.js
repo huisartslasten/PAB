@@ -1998,8 +1998,14 @@ test('whole number divided by a mixed fraction greater than one teaches four sep
       solution: document.querySelector('.fraction-guided-solution')?.textContent || '',
       equationFontSize: document.querySelector('.fraction-guided-equation')
         ? getComputedStyle(document.querySelector('.fraction-guided-equation')).fontSize : '',
+      equationTextSizes: [...document.querySelectorAll('.fraction-guided-equation .fraction-guided-operator, .fraction-guided-equation .pacogo-fraction-representation--symbolic, .fraction-guided-equation .fraction-whole-mixed-expression__whole')]
+        .map(node => getComputedStyle(node).fontSize),
+      equationTextColors: [...document.querySelectorAll('.fraction-guided-equation .fraction-guided-operator, .fraction-guided-equation .pacogo-fraction-representation--symbolic, .fraction-guided-equation .fraction-whole-mixed-expression__whole')]
+        .map(node => getComputedStyle(node).color),
       completedAnswerFontSizes: [...document.querySelectorAll('.fraction-guided-step-card[data-state="completed"] .fraction-guided-step-completed-answer')]
         .map(node => getComputedStyle(node).fontSize),
+      completedAnswerColors: [...document.querySelectorAll('.fraction-guided-step-card[data-state="completed"] .fraction-guided-step-completed-answer')]
+        .map(node => getComputedStyle(node).color),
       completedNestedFontSizes: [...document.querySelectorAll('.fraction-guided-step-card[data-state="completed"] .fraction-guided-step-completed-answer .pacogo-fraction-representation--symbolic, .fraction-guided-step-card[data-state="completed"] .fraction-guided-step-completed-answer .fraction-guided-operator, .fraction-guided-step-card[data-state="completed"] .fraction-guided-step-completed-answer .fraction-whole-mixed-expression__whole')]
         .map(node => getComputedStyle(node).fontSize),
       solutionDivisionCount: (document.querySelector('.fraction-guided-solution')?.textContent.match(/÷/g) || []).length,
@@ -2078,8 +2084,11 @@ test('whole number divided by a mixed fraction greater than one teaches four sep
   expect(result.afterFinal.states).toEqual(['completed', 'completed', 'completed', 'completed']);
   expect(result.afterFinal.expandedSteps).toEqual([true, true, true, true]);
   expect(result.afterFinal.equationFontSize).toBe('28px');
-  expect(result.afterFinal.completedAnswerFontSizes).toEqual(['28px', '28px', '28px', '28px']);
-  expect(result.afterFinal.completedNestedFontSizes.every(size => size === '28px')).toBe(true);
+  expect(new Set(result.afterFinal.equationTextSizes)).toEqual(new Set(['28px']));
+  expect(new Set(result.afterFinal.equationTextColors).size).toBe(1);
+  expect(result.afterFinal.completedAnswerFontSizes).toEqual(['20px', '20px', '20px', '20px']);
+  expect(new Set(result.afterFinal.completedAnswerColors).size).toBe(1);
+  expect(result.afterFinal.completedNestedFontSizes.every(size => size === '20px')).toBe(true);
   expect(result.afterFinal.solution).toContain('3');
   expect(result.afterFinal.solution).toContain('15');
   expect(result.afterFinal.nextAction).toBe('Volgende som');

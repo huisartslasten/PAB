@@ -29,6 +29,9 @@ test('guided mixed like-denominator division is a separate overview exercise wit
   await expect(page.locator('.fraction-guided-task-prompt')).toContainText('1');
   await expect(page.locator('.fraction-guided-step-card[data-state="active"]')).toHaveAttribute('data-step-id', 'convert_mixed_numbers');
   await expect(page.locator('.fraction-guided-step-card[open]')).toHaveCount(1);
+  const stepWidths = await page.locator('.fraction-guided-step-grid--five .fraction-guided-step-card').evaluateAll(cards => cards.map(card => card.getBoundingClientRect().width));
+  expect(stepWidths[0]).toBeGreaterThan(stepWidths[1] * 3);
+  expect(await page.locator('.fraction-guided-step-grid--five').evaluate(grid => getComputedStyle(grid).display)).toBe('flex');
   const pairedRows = page.locator('.fraction-guided-step-expression--paired .fraction-guided-step-subexpression');
   await expect(pairedRows).toHaveCount(2);
   const verticalOffsets = await pairedRows.evaluateAll(rows => rows.map(row => {

@@ -1098,9 +1098,11 @@
 
 /* Begeleide oefening: gemengde gelijknamige breuken delen — vijf progressieve stappen. */
 .fraction-guided-step-grid--five{
-  display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
+  display:flex;
+  flex-flow:row nowrap;
+  align-items:stretch;
   gap:12px;
+  width:100%;
   min-width:0;
 }
 .fraction-mixed-like-denominator-division-guided-card .fraction-guided-step-expression{

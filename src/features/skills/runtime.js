@@ -1833,7 +1833,7 @@ export function createSkillsRuntime({
       equation.append(prompt, solution);
       template.promptArea.append(equation);
 
-      const grid = documentRef.createElement('div'); grid.className = 'fraction-guided-step-grid fraction-guided-step-grid--five';
+      const grid = documentRef.createElement('div'); grid.className = 'fraction-guided-step-grid fraction-guided-step-grid--five fraction-guided-step-grid--progressive';
       grid.setAttribute('aria-label', 'Vijf denkstappen');
       grid.dataset.activeStep = awaitingNextTask ? 'completed' : step.stepId;
       let activeEntry = null, activeEntries = [], activeAnswer = null;

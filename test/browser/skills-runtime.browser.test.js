@@ -1903,14 +1903,19 @@ test('Delen in the fraction overview opens both independent and guided division 
     const fractionInput = (() => {
       const input = document.querySelector('.fraction-guided-fraction-input');
       const matchedRules = [];
-      if (input) for (const sheet of [...document.styleSheets]) {
-        try {
-          for (const rule of [...sheet.cssRules]) {
-            if (rule.selectorText && input.matches(rule.selectorText) && rule.style?.display) {
-              matchedRules.push({ selector: rule.selectorText, display: rule.style.display });
-            }
+      const collectRules = (rules, href) => {
+        for (const rule of [...rules]) {
+          if (rule.selectorText && input?.matches(rule.selectorText) && rule.style?.display) {
+            matchedRules.push({
+              href, selector: rule.selectorText, display: rule.style.display,
+              important: rule.style.getPropertyPriority('display')
+            });
           }
-        } catch {}
+          if (rule.cssRules) collectRules(rule.cssRules, href);
+        }
+      };
+      for (const sheet of [...document.styleSheets]) {
+        try { collectRules(sheet.cssRules, sheet.href || 'inline'); } catch {}
       }
       console.log('FRACTION_DIVISION_INPUT_DIAGNOSTIC', JSON.stringify({
         className: input?.className || '',
@@ -1925,6 +1930,7 @@ test('Delen in the fraction overview opens both independent and guided division 
         className: input?.className || '',
         closestCard: input?.closest('section')?.className || '',
         matchesDivisionSelector: Boolean(input?.matches('.fraction-division-guided-card .fraction-guided-fraction-input')),
+        matchedRules,
         inlineDisplay: input?.style.display || '',
         display: input ? getComputedStyle(input).display : '',
         rows: input ? getComputedStyle(input).gridTemplateRows.split(' ').length : 0,

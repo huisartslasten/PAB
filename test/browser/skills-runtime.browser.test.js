@@ -1900,21 +1900,27 @@ test('Delen in the fraction overview opens both independent and guided division 
     'Gelijknamige breuken kleiner dan 1 op elkaar delen',
     'Gelijknamige breuken kleiner dan 1 op elkaar delen — met stappenplan',
     'Gelijknamige breuken groter dan 1 op elkaar delen',
+    'Gelijknamige breuken groter dan 1 op elkaar delen — met stappenplan',
     'Ongelijknamige breuken kleiner dan 1 op elkaar delen',
     'Ongelijknamige breuken groter dan 1 op elkaar delen'
   ]);
-  expect(result.levels).toEqual([1, 1, 2, 2, 2, 3, 4]);
-  expect(result.boneCounts).toEqual([5, 5, 5, 5, 5, 5, 5]);
-  expect(result.exerciseButtonCount).toBe(7);
-  expect(result.navigations).toHaveLength(8);
+  expect(result.levels).toEqual([1, 1, 2, 2, 2, 2, 3, 4]);
+  expect(result.boneCounts).toEqual([5, 5, 5, 5, 5, 5, 5, 5]);
+  expect(result.exerciseButtonCount).toBe(8);
+  expect(result.navigations).toHaveLength(9);
   expect(result.navigations[0]).toContain('topic=delen');
   expect(result.navigations[1]).toContain('exercise=whole-number-divided-by-fraction-greater-than-one-guided');
   expect(result.navigations[2]).toContain('exercise=whole-number-divided-by-fraction-greater-than-one');
   expect(result.navigations[3]).toContain('exercise=like-denominator-division');
   expect(result.navigations[4]).toContain('exercise=like-denominator-division-guided');
   expect(result.navigations[5]).toContain('exercise=mixed-like-denominator-division');
-  expect(result.navigations[6]).toContain('exercise=unlike-denominator-division');
-  expect(result.navigations[7]).toContain('exercise=mixed-unlike-denominator-division');
+  expect(result.navigations[6]).toContain('exercise=mixed-like-denominator-division-guided');
+  expect(result.navigations[7]).toContain('exercise=unlike-denominator-division');
+  expect(result.navigations[8]).toContain('exercise=mixed-unlike-denominator-division');
+  expect(result.guidedRoute).toEqual({
+    title: 'Oefenen', stepCount: 5, activeStep: 'convert_mixed_numbers',
+    progress: 'Som 1 van 10 · Niveau 2 van 5'
+  });
 });
 
 

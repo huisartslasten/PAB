@@ -2353,21 +2353,25 @@ test('guided like-denominator division completes ten sums and restarts from the 
       if (!button) throw new Error('Missing active step control');
       button.click();
     };
+    const progressiveEquationLengths = [];
     for (const task of tasks) {
       let fields = [...document.querySelectorAll('.fraction-guided-step-card[data-step-id="invert_divisor"] input')];
       fill(fields[0], task.right.denominator);
       fill(fields[1], task.right.numerator);
       clickCheck();
+      if (task === tasks[0]) progressiveEquationLengths.push(document.querySelector('.fraction-guided-solution')?.children.length || 0);
 
       fields = [...document.querySelectorAll('.fraction-guided-step-card[data-step-id="multiply_fractions"] input')];
       fill(fields[0], task.left.numerator * task.right.denominator);
       fill(fields[1], task.left.denominator * task.right.numerator);
       clickCheck();
+      if (task === tasks[0]) progressiveEquationLengths.push(document.querySelector('.fraction-guided-solution')?.children.length || 0);
 
       fill(document.querySelector('[data-answer-part="whole"]'), task.answer.whole);
       fill(document.querySelector('[data-answer-part="primaryNumerator"]'), task.answer.numerator);
       fill(document.querySelector('[data-answer-part="primaryDenominator"]'), task.answer.denominator);
       clickCheck();
+      if (task === tasks[0]) progressiveEquationLengths.push(document.querySelector('.fraction-guided-solution')?.children.length || 0);
 
       const action = [...document.querySelectorAll('.pacogo-fraction-practice-template__actions button')]
         .find(button => button.textContent.trim() === 'Volgende som' || button.textContent.trim() === 'Opnieuw oefenen');
@@ -2388,11 +2392,13 @@ test('guided like-denominator division completes ten sums and restarts from the 
       .find(button => button.textContent.trim() === 'Opnieuw oefenen')?.click();
     return {
       completed,
+      progressiveEquationLengths,
       restartedProgress: document.querySelector('.fraction-practice-progress')?.textContent || '',
       restartedActiveStep: document.querySelector('.fraction-guided-step-card[data-state="active"]')?.dataset.stepId || '',
       restartedTaskVisible: Boolean(document.querySelector('.fraction-guided-equation'))
     };
   });
+  expect(result.progressiveEquationLengths).toEqual([4, 6, 8]);
   expect(result.completed.progress).toContain('10 van 10 afgerond');
   expect(result.completed.message).toContain('alle 10 sommen goed gemaakt');
   expect(result.completed.action).toContain('Opnieuw oefenen');

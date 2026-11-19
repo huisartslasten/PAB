@@ -31,7 +31,7 @@ function createFractionMixedUnlikeDenominatorDivisionSession({ learnerKey, stora
     return Object.freeze({ id: task.id, left: Object.freeze({ ...left }), right: Object.freeze({ ...right }), answer: Object.freeze({ ...answer }) });
   }));
   if (new Set(normalized.map(task => task.id)).size !== 15 ||
-      new Set(normalized.map(task => [task.left.whole,task.left.numerator,task.left.denominator,task.right.whole,task.right.numerator,task.right.denominator].join("|")).size !== 15) {
+      new Set(normalized.map(task => [task.left.whole,task.left.numerator,task.left.denominator,task.right.whole,task.right.numerator,task.right.denominator].join("|"))).size !== 15) {
     throw new TypeError("Task IDs and division questions must be unique.");
   }
 

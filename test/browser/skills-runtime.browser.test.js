@@ -1890,7 +1890,7 @@ test('Delen in the fraction overview opens both independent and guided division 
   ]);
   expect(result.levels).toEqual([1, 1, 2, 2, 2, 3, 4]);
   expect(result.boneCounts).toEqual([5, 5, 5, 5, 5, 5, 5]);
-  expect(result.exerciseButtonCount).toBe(6);
+  expect(result.exerciseButtonCount).toBe(7);
   expect(result.navigations).toHaveLength(8);
   expect(result.navigations[0]).toContain('topic=delen');
   expect(result.navigations[1]).toContain('exercise=whole-number-divided-by-fraction-greater-than-one-guided');

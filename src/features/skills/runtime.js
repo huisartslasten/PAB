@@ -15,6 +15,8 @@ import { FRACTION_WHOLE_NUMBER_DIVIDED_BY_FRACTION_GREATER_THAN_ONE_TASKS } from
 import { FRACTION_WHOLE_NUMBER_DIVIDED_BY_FRACTION_GREATER_THAN_ONE_GUIDED_TASKS } from '../../../pacogo-engine/fraction-whole-number-divided-by-fraction-greater-than-one-guided-task-bank.js';
 import { createFractionWholeNumberDividedByFractionGreaterThanOneSession } from '../../../pacogo-engine/fraction-whole-number-divided-by-fraction-greater-than-one-session.js';
 import { createFractionWholeNumberDividedByFractionGreaterThanOneGuidedSession } from '../../../pacogo-engine/fraction-whole-number-divided-by-fraction-greater-than-one-guided-session.js';
+import { FRACTION_LIKE_DENOMINATOR_DIVISION_TASKS } from '../../../pacogo-engine/fraction-like-denominator-division-task-bank.js';
+import { createFractionLikeDenominatorDivisionSession } from '../../../pacogo-engine/fraction-like-denominator-division-session.js';
 import { createFractionLikeDenominatorSubtractionSession } from '../../../pacogo-engine/fraction-like-denominator-subtraction-session.js';
 import { FRACTION_LIKE_DENOMINATOR_MULTIPLICATION_TASKS } from '../../../pacogo-engine/fraction-like-denominator-multiplication-task-bank.js';
 import { createFractionLikeDenominatorMultiplicationSession } from '../../../pacogo-engine/fraction-like-denominator-multiplication-session.js';
@@ -1345,6 +1347,105 @@ export function createSkillsRuntime({
     renderCurrentTask();
   }
 
+  function renderLikeDenominatorDivisionPractice() {
+    const learnerKey = student || context?.learnerId || 'local-learner';
+    const session = createFractionLikeDenominatorDivisionSession({
+      learnerKey, tasks: FRACTION_LIKE_DENOMINATOR_DIVISION_TASKS
+    });
+    const exercise = { title: 'Gelijknamige breuken kleiner dan 1 op elkaar delen', difficultyLevel: 2, maxDifficultyLevel: 5 };
+
+    function renderCurrentTask() {
+      const task = session.getCurrentTask();
+      const progress = session.getProgress();
+      content.replaceChildren();
+      const card = documentRef.createElement('section');
+      card.className = 'card fraction-whole-mixed-addition-card';
+      const template = createFractionPracticeTemplate({ mount: card });
+      const title = documentRef.createElement('h2');
+      title.textContent = exercise.title;
+      const instruction = documentRef.createElement('p');
+      instruction.className = 'fraction-practice-instruction';
+      instruction.textContent = 'Deel de tellers door elkaar. De noemers zijn gelijk en vallen tegen elkaar weg. Geef je antwoord als gemengd getal.';
+      const progressLabel = documentRef.createElement('p');
+      progressLabel.className = 'fraction-practice-progress';
+      progressLabel.textContent = formatFractionPracticeProgress(progress, exercise);
+      template.titleArea.append(title);
+      template.instructionArea.append(instruction);
+      template.progressArea.append(progressLabel);
+
+      if (!task) {
+        const done = documentRef.createElement('p');
+        done.className = 'fraction-practice-complete';
+        done.textContent = 'Je hebt alle 15 sommen afgerond. Goed gewerkt!';
+        template.workArea.append(done);
+        content.append(card);
+        template.showRestartAction(() => { session.reset(); renderCurrentTask(); });
+        return;
+      }
+
+      const equation = documentRef.createElement('div');
+      equation.className = 'fraction-whole-mixed-equation';
+      const expression = documentRef.createElement('div');
+      expression.className = 'fraction-whole-mixed-expression';
+      expression.append(
+        renderFractionRepresentation(task.left, 'symbolic_fraction', 'Eerste breuk'),
+        Object.assign(documentRef.createElement('span'), { className: 'fraction-whole-mixed-expression__operator', textContent: '÷' }),
+        renderFractionRepresentation(task.right, 'symbolic_fraction', 'Tweede breuk')
+      );
+      const equals = documentRef.createElement('span');
+      equals.className = 'fraction-whole-mixed-expression__operator';
+      equals.textContent = '=';
+      const answerMount = documentRef.createElement('div');
+      answerMount.className = 'fraction-whole-mixed-answer';
+      equation.append(expression, equals, answerMount);
+      template.workArea.append(equation);
+
+      const answer = renderFractionAnswerInput({
+        workMount: answerMount, controlsMount: template.controlsArea, wholeNumberMode: 'required'
+      });
+      const feedback = documentRef.createElement('p');
+      feedback.className = 'fraction-practice-feedback';
+      feedback.setAttribute('role', 'status');
+      feedback.textContent = 'Vul het antwoord als gemengd getal in en vereenvoudig het breukdeel.';
+      template.feedbackArea.append(feedback);
+      const check = documentRef.createElement('button');
+      check.type = 'button';
+      check.className = 'paco-btn paco-btn--primary';
+      check.textContent = 'Controleren';
+      template.actionsArea.append(check);
+
+      check.addEventListener('click', () => {
+        const result = session.recordAnswer({ values: answer.getValues() });
+        if (result.classification === 'valid') {
+          answer.lock();
+          check.disabled = true;
+          feedback.classList.add('is-correct');
+          feedback.textContent = 'Goed gedaan! Je hebt de deling correct uitgerekend.';
+          const next = documentRef.createElement('button');
+          next.type = 'button';
+          next.className = 'paco-btn paco-btn--primary';
+          next.textContent = 'Volgende som';
+          next.addEventListener('click', renderCurrentTask);
+          template.actionsArea.replaceChildren(next);
+          progressLabel.textContent = formatFractionPracticeProgress(result.progress, exercise);
+          return;
+        }
+        const messages = {
+          invalid_input: 'Vul het hele getal, de teller en de noemer van je antwoord in.',
+          incorrect_answer: 'Dat antwoord klopt nog niet. Deel de teller van de eerste breuk door de teller van de tweede breuk.',
+          requires_simplification: 'Je antwoord klopt, maar het breukdeel moet nog vereenvoudigd worden.',
+          not_simplified: 'De vereenvoudigde breuk klopt nog niet. Probeer het opnieuw.'
+        };
+        feedback.classList.add('is-error');
+        feedback.textContent = messages[result.classification] || 'Controleer je antwoord en probeer het opnieuw.';
+        answer.focus();
+      });
+      content.append(card);
+      answer.focus();
+    }
+    renderCurrentTask();
+  }
+
   function renderWholeNumberDividedByFractionGreaterThanOnePractice() {
     const learnerKey = student || context?.learnerId || 'local-learner';
     const session = createFractionWholeNumberDividedByFractionGreaterThanOneSession({
@@ -2562,6 +2663,7 @@ export function createSkillsRuntime({
     const showingDivision = showingFractions && topic === 'delen';
     const showingWholeNumberDividedByFractionGreaterThanOnePractice = showingDivision && exercise === 'whole-number-divided-by-fraction-greater-than-one';
     const showingWholeNumberDividedByFractionGreaterThanOneGuidedPractice = showingDivision && exercise === 'whole-number-divided-by-fraction-greater-than-one-guided';
+    const showingLikeDenominatorDivisionPractice = showingDivision && exercise === 'like-denominator-division';
     const showingWholeNumberTimesProperFractionPractice = showingMultiplication && exercise === 'whole-number-times-proper-fraction';
     const showingWholeNumberTimesMixedFractionGreaterThanOnePractice = showingMultiplication && exercise === 'whole-number-times-mixed-fraction-greater-than-one';
     const showingLikeDenominatorMultiplicationPractice = showingMultiplication && exercise === 'like-denominator-multiplication';
@@ -2582,14 +2684,16 @@ export function createSkillsRuntime({
     const showingUnequalDenominatorGuidedMixedPractice = showingAddition && exercise === 'unequal-denominator-guided-mixed-addition';
     const showingUnequalMixedAdditionPractice = showingAddition && exercise === 'unequal-mixed-addition';
     const showingPractice = showingWholeMixedPractice || showingSameDenominatorPractice || showingMixedSameDenominatorPractice || showingUnequalDenominatorGuidedPractice || showingUnequalDenominatorGuidedMixedPractice || showingUnequalIndependentPractice || showingUnequalMixedAdditionPractice;
-    const showingAnyPractice = showingPractice || showingWholeNumberDividedByFractionGreaterThanOnePractice || showingWholeNumberDividedByFractionGreaterThanOneGuidedPractice || showingWholeNumberTimesProperFractionPractice || showingWholeNumberTimesMixedFractionGreaterThanOnePractice || showingLikeDenominatorMultiplicationPractice || showingMixedLikeDenominatorMultiplicationPractice || showingUnlikeDenominatorMultiplicationPractice || showingMixedUnlikeDenominatorMultiplicationPractice || showingWholeMinusMixedSubtraction || showingWholeMinusGreaterThanOneSubtraction || showingLikeDenominatorSubtractionPractice || showingMixedLikeDenominatorSubtractionPractice || showingUnlikeDenominatorSubtractionPractice || showingUnlikeMixedDenominatorSubtractionPractice;
+    const showingAnyPractice = showingPractice || showingLikeDenominatorDivisionPractice || showingWholeNumberDividedByFractionGreaterThanOnePractice || showingWholeNumberDividedByFractionGreaterThanOneGuidedPractice || showingWholeNumberTimesProperFractionPractice || showingWholeNumberTimesMixedFractionGreaterThanOnePractice || showingLikeDenominatorMultiplicationPractice || showingMixedLikeDenominatorMultiplicationPractice || showingUnlikeDenominatorMultiplicationPractice || showingMixedUnlikeDenominatorMultiplicationPractice || showingWholeMinusMixedSubtraction || showingWholeMinusGreaterThanOneSubtraction || showingLikeDenominatorSubtractionPractice || showingMixedLikeDenominatorSubtractionPractice || showingUnlikeDenominatorSubtractionPractice || showingUnlikeMixedDenominatorSubtractionPractice;
     mountPacoPageTemplate({
       mount: templateMount,
       greeting: student ? `Hoi ${student}! 🐶` : 'Welkom bij PacoGO!',
       title: showingAnyPractice ? 'Oefenen' : showingAddition ? 'Optellen' : showingSubtraction ? 'Aftrekken' : showingMultiplication ? 'Vermenigvuldigen' : showingDivision ? 'Delen' : showingFractions ? 'Breuken' : 'Skills',
       icon: showingAddition ? '➕' : showingSubtraction ? '➖' : showingMultiplication ? '✖️' : showingDivision ? '➗' : showingFractions ? '½' : '📘',
       layoutMode: showingAnyPractice ? 'practice' : 'standard',
-      subtitle: showingWholeNumberDividedByFractionGreaterThanOneGuidedPractice
+      subtitle: showingLikeDenominatorDivisionPractice
+        ? 'Breuken → Delen → Gelijknamige breuken kleiner dan 1 op elkaar delen.'
+        : showingWholeNumberDividedByFractionGreaterThanOneGuidedPractice
         ? 'Breuken → Delen → Heel getal delen door een breukgetal groter dan 1 — met stappenplan.'
         : showingWholeNumberDividedByFractionGreaterThanOnePractice
         ? 'Breuken → Delen → Heel getal delen door een breukgetal groter dan 1 — zonder stappenplan.'
@@ -2651,7 +2755,8 @@ export function createSkillsRuntime({
       content
     });
 
-    if (showingWholeNumberDividedByFractionGreaterThanOneGuidedPractice) renderWholeNumberDividedByFractionGreaterThanOneGuidedPractice();
+    if (showingLikeDenominatorDivisionPractice) renderLikeDenominatorDivisionPractice();
+    else if (showingWholeNumberDividedByFractionGreaterThanOneGuidedPractice) renderWholeNumberDividedByFractionGreaterThanOneGuidedPractice();
     else if (showingWholeNumberDividedByFractionGreaterThanOnePractice) renderWholeNumberDividedByFractionGreaterThanOnePractice();
     else if (showingWholeNumberTimesMixedFractionGreaterThanOnePractice) renderWholeNumberTimesMixedFractionGreaterThanOnePractice();
     else if (showingWholeNumberTimesProperFractionPractice) renderWholeNumberTimesProperFractionPractice();

@@ -3535,7 +3535,7 @@ export function createSkillsRuntime({
     const showingUnequalDenominatorGuidedMixedPractice = showingAddition && exercise === 'unequal-denominator-guided-mixed-addition';
     const showingUnequalMixedAdditionPractice = showingAddition && exercise === 'unequal-mixed-addition';
     const showingPractice = showingWholeMixedPractice || showingSameDenominatorPractice || showingMixedSameDenominatorPractice || showingUnequalDenominatorGuidedPractice || showingUnequalDenominatorGuidedMixedPractice || showingUnequalIndependentPractice || showingUnequalMixedAdditionPractice;
-    const showingAnyPractice = showingPractice || showingLikeDenominatorDivisionPractice || showingMixedLikeDenominatorDivisionPractice || showingMixedLikeDenominatorDivisionGuidedPractice || showingLikeDenominatorDivisionGuidedPractice || showingUnlikeDenominatorDivisionPractice || showingWholeNumberDividedByFractionGreaterThanOnePractice || showingWholeNumberDividedByFractionGreaterThanOneGuidedPractice || showingWholeNumberTimesProperFractionPractice || showingWholeNumberTimesMixedFractionGreaterThanOnePractice || showingLikeDenominatorMultiplicationPractice || showingMixedLikeDenominatorMultiplicationPractice || showingUnlikeDenominatorMultiplicationPractice || showingMixedUnlikeDenominatorMultiplicationPractice || showingWholeMinusMixedSubtraction || showingWholeMinusGreaterThanOneSubtraction || showingLikeDenominatorSubtractionPractice || showingMixedLikeDenominatorSubtractionPractice || showingUnlikeDenominatorSubtractionPractice || showingUnlikeMixedDenominatorSubtractionPractice;
+    const showingAnyPractice = showingPractice || showingUnlikeDenominatorDivisionGuidedPractice || showingLikeDenominatorDivisionPractice || showingMixedLikeDenominatorDivisionPractice || showingMixedLikeDenominatorDivisionGuidedPractice || showingLikeDenominatorDivisionGuidedPractice || showingUnlikeDenominatorDivisionPractice || showingWholeNumberDividedByFractionGreaterThanOnePractice || showingWholeNumberDividedByFractionGreaterThanOneGuidedPractice || showingWholeNumberTimesProperFractionPractice || showingWholeNumberTimesMixedFractionGreaterThanOnePractice || showingLikeDenominatorMultiplicationPractice || showingMixedLikeDenominatorMultiplicationPractice || showingUnlikeDenominatorMultiplicationPractice || showingMixedUnlikeDenominatorMultiplicationPractice || showingWholeMinusMixedSubtraction || showingWholeMinusGreaterThanOneSubtraction || showingLikeDenominatorSubtractionPractice || showingMixedLikeDenominatorSubtractionPractice || showingUnlikeDenominatorSubtractionPractice || showingUnlikeMixedDenominatorSubtractionPractice;
     mountPacoPageTemplate({
       mount: templateMount,
       greeting: student ? `Hoi ${student}! 🐶` : 'Welkom bij PacoGO!',
@@ -3544,6 +3544,8 @@ export function createSkillsRuntime({
       layoutMode: showingAnyPractice ? 'practice' : 'standard',
       subtitle: showingUnlikeDenominatorDivisionPractice
         ? 'Breuken → Delen → Ongelijknamige breuken kleiner dan 1 op elkaar delen.'
+        : showingUnlikeDenominatorDivisionGuidedPractice
+        ? 'Breuken → Delen → Ongelijknamige breuken kleiner dan 1 op elkaar delen — met stappenplan.'
         : showingMixedLikeDenominatorDivisionGuidedPractice
         ? 'Breuken → Delen → Gelijknamige breuken groter dan 1 op elkaar delen — met stappenplan.'
         : showingMixedLikeDenominatorDivisionPractice

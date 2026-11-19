@@ -1898,22 +1898,22 @@ test('Delen in the fraction overview opens both independent and guided division 
       title: document.querySelector('.paco-template-main h1')?.textContent || '',
       stepCount: document.querySelectorAll('.fraction-guided-step-card').length,
       activeStep: document.querySelector('.fraction-guided-step-card[data-state="active"]')?.dataset.stepId || '',
-      progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
-      fractionInput: (() => {
-        const input = document.querySelector('.fraction-guided-fraction-input');
-        const grid = document.querySelector('.fraction-guided-step-grid--progressive');
-        const locked = document.querySelector('.fraction-guided-step-card[data-state="locked"]');
-        return {
-          display: input ? getComputedStyle(input).display : '',
-          rows: input ? getComputedStyle(input).gridTemplateRows.split(' ').length : 0,
-          inputCount: input?.querySelectorAll('input').length || 0,
-          hasFractionBar: Boolean(input?.querySelector('.pacogo-fraction-divider')),
-          gridAlignItems: grid ? getComputedStyle(grid).alignItems : '',
-          lockedAlignSelf: locked ? getComputedStyle(locked).alignSelf : ''
-        };
-      })()
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || ''
     };
-    return { ...overviewSnapshot, guidedRoute, unlikeGuidedRoute };
+    const fractionInput = (() => {
+      const input = document.querySelector('.fraction-guided-fraction-input');
+      const grid = document.querySelector('.fraction-guided-step-grid--progressive');
+      const locked = document.querySelector('.fraction-guided-step-card[data-state="locked"]');
+      return {
+        display: input ? getComputedStyle(input).display : '',
+        rows: input ? getComputedStyle(input).gridTemplateRows.split(' ').length : 0,
+        inputCount: input?.querySelectorAll('input').length || 0,
+        hasFractionBar: Boolean(input?.querySelector('.pacogo-fraction-divider')),
+        gridAlignItems: grid ? getComputedStyle(grid).alignItems : '',
+        lockedAlignSelf: locked ? getComputedStyle(locked).alignSelf : ''
+      };
+    })();
+    return { ...overviewSnapshot, guidedRoute, unlikeGuidedRoute, fractionInput };
   });
   expect(result.title).toBe('Delen');
   expect(result.centralPage).toBe(true);
@@ -1952,7 +1952,7 @@ test('Delen in the fraction overview opens both independent and guided division 
     title: 'Oefenen', stepCount: 3, activeStep: 'invert_divisor',
     progress: 'Som 1 van 10 · Niveau 3 van 5'
   });
-  expect(result.unlikeGuidedRoute.fractionInput).toEqual({
+  expect(result.fractionInput).toEqual({
     display: 'inline-grid', rows: 3, inputCount: 2, hasFractionBar: true,
     gridAlignItems: 'start', lockedAlignSelf: 'start'
   });

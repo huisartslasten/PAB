@@ -1376,7 +1376,7 @@ export function createSkillsRuntime({
     }
 
     function renderCurrentTask(feedbackMessage = '') {
-      const step = session.getCurrentStep();
+      const step = awaitingNextTask ? completedTaskSnapshot : session.getCurrentStep();
       const progress = session.getProgress();
       content.replaceChildren();
       const card = documentRef.createElement('section');
@@ -1409,7 +1409,7 @@ export function createSkillsRuntime({
       const grid = documentRef.createElement('div'); grid.className = 'fraction-guided-step-grid fraction-guided-step-grid--three';
       grid.setAttribute('aria-label', 'Drie denkstappen');
       grid.dataset.activeStep = step.stepId;
-      let activeEntry = null, activeAnswer = null;
+      let activeEntry = null, activeAnswer = null, awaitingNextTask = false, completedTaskSnapshot = null;
       const completed = step.completedStepIds;
       const summaries = [
         { id: 'invert_divisor', text: 'Keer de tweede breuk om', result: step.inverse },
@@ -1465,6 +1465,10 @@ export function createSkillsRuntime({
               : { numerator: activeEntry?.numerator.value || '', denominator: activeEntry?.denominator.value || '' });
             if (result.classification === 'valid') {
               activeAnswer?.lock();
+              if (item.id === 'simplify_quotient') {
+                completedTaskSnapshot = { ...step, completedStepIds: [...step.completedStepIds, item.id] };
+                awaitingNextTask = true;
+              }
               renderCurrentTask(item.id === 'simplify_quotient' ? 'Goed gedaan! Je hebt deze som afgerond.' : 'Goed gedaan! Deze stap is afgerond.');
               return;
             }
@@ -1497,10 +1501,13 @@ export function createSkillsRuntime({
         feedback.textContent = feedbackMessage; template.feedbackArea.append(feedback);
       }
       content.append(card);
-      if (step.stepId === 'simplify_quotient' && step.completedStepIds.length === 2) {
-        // Final step completion is reflected by the session as the next task or completion state.
-      }
-      if (activeEntry) activeEntry.focus();
+      if (awaitingNextTask) {
+        const done = documentRef.createElement('p'); done.className = 'fraction-practice-complete';
+        done.textContent = progress.isComplete ? 'Deze laatste som is afgerond. Je hebt alle 10 sommen goed gemaakt.' : 'Deze som is afgerond. Klik op Volgende som als je klaar bent.';
+        template.workArea.append(done);
+        template.showNextAction(() => { awaitingNextTask = false; completedTaskSnapshot = null; renderCurrentTask(); });
+        if (progress.isComplete) template.showRestartAction(() => { session.reset(); awaitingNextTask = false; completedTaskSnapshot = null; renderCurrentTask(); });
+      } else if (activeEntry) activeEntry.focus();
     }
     renderCurrentTask();
   }

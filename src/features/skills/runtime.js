@@ -1452,7 +1452,7 @@ export function createSkillsRuntime({
       summaries.forEach((item, index) => {
         const isDone = completed.includes(item.id), isActive = step.stepId === item.id;
         const panel = documentRef.createElement('details'); panel.className = 'fraction-guided-step-card';
-        panel.open = awaitingNextTask || isActive;
+        panel.open = isActive;
         panel.dataset.stepId = item.id;
         panel.dataset.state = isDone ? 'completed' : isActive ? 'active' : 'locked';
         panel.setAttribute('aria-label', 'Stap ' + (index + 1) + ': ' + item.text);

@@ -19,6 +19,7 @@ import { FRACTION_LIKE_DENOMINATOR_DIVISION_TASKS } from '../../../pacogo-engine
 import { createFractionLikeDenominatorDivisionSession } from '../../../pacogo-engine/fraction-like-denominator-division-session.js';
 import { FRACTION_UNLIKE_DENOMINATOR_DIVISION_TASKS } from '../../../pacogo-engine/fraction-unlike-denominator-division-task-bank.js';
 import { createFractionUnlikeDenominatorDivisionSession } from '../../../pacogo-engine/fraction-unlike-denominator-division-session.js';
+import { createFractionUnlikeDenominatorDivisionGuidedSession } from '../../../pacogo-engine/fraction-unlike-denominator-division-guided-session.js';
 import { FRACTION_MIXED_LIKE_DENOMINATOR_DIVISION_TASKS } from '../../../pacogo-engine/fraction-mixed-like-denominator-division-task-bank.js';
 import { createFractionMixedLikeDenominatorDivisionSession } from '../../../pacogo-engine/fraction-mixed-like-denominator-division-session.js';
 import { FRACTION_LIKE_DENOMINATOR_DIVISION_GUIDED_TASKS } from '../../../pacogo-engine/fraction-like-denominator-division-guided-task-bank.js';
@@ -266,6 +267,7 @@ export function createSkillsRuntime({
       { label: 'Gelijknamige breuken kleiner dan 1 op elkaar delen', level: 2, exercise: 'like-denominator-division' },
       { label: 'Gelijknamige breuken groter dan 1 op elkaar delen — met stappenplan', level: 2, exercise: 'mixed-like-denominator-division-guided' },
       { label: 'Gelijknamige breuken groter dan 1 op elkaar delen', level: 2, exercise: 'mixed-like-denominator-division' },
+      { label: 'Ongelijknamige breuken kleiner dan 1 op elkaar delen — met stappenplan', level: 3, exercise: 'unlike-denominator-division-guided' },
       { label: 'Ongelijknamige breuken kleiner dan 1 op elkaar delen', level: 3, exercise: 'unlike-denominator-division' },
       { label: 'Ongelijknamige breuken groter dan 1 op elkaar delen', level: 4, exercise: 'mixed-unlike-denominator-division' }
     ];
@@ -1388,6 +1390,202 @@ export function createSkillsRuntime({
       content.replaceChildren();
       const card = documentRef.createElement('section');
       card.className = 'card fraction-whole-mixed-addition-card fraction-addition-guided-card fraction-like-denominator-division-guided-card';
+      const template = createFractionPracticeTemplate({ mount: card });
+      const title = documentRef.createElement('h2'); title.textContent = exercise.title;
+      const instruction = documentRef.createElement('p');
+      instruction.className = 'fraction-practice-instruction';
+      instruction.textContent = 'Werk de drie stappen één voor één af. Je gaat pas verder als je de huidige stap goed hebt gedaan.';
+      const progressLabel = documentRef.createElement('p');
+      progressLabel.className = 'fraction-practice-progress';
+      progressLabel.textContent = formatFractionPracticeProgress(progress, exercise);
+      template.titleArea.append(title); template.instructionArea.append(instruction); template.progressArea.append(progressLabel);
+      if (!step) {
+        const done = documentRef.createElement('p'); done.className = 'fraction-practice-complete';
+        done.textContent = 'Je hebt alle 10 sommen afgerond. Goed gewerkt!';
+        template.workArea.append(done); content.append(card);
+        template.showRestartAction(() => { session.reset(); awaitingNextTask = false; completedTaskSnapshot = null; renderCurrentTask(); });
+        return;
+      }
+      const op = value => Object.assign(documentRef.createElement('span'), { className: 'fraction-guided-operator', textContent: value });
+      const prompt = documentRef.createElement('div'); prompt.className = 'fraction-guided-task-prompt fraction-whole-mixed-expression';
+      prompt.append(
+        renderFractionRepresentation(step.task.left, 'symbolic_fraction', 'Eerste breuk'),
+        op('÷'),
+        renderFractionRepresentation(step.task.right, 'symbolic_fraction', 'Tweede breuk')
+      );
+      const solution = documentRef.createElement('div'); solution.className = 'fraction-guided-solution';
+      solution.setAttribute('aria-label', 'Uitgewerkte tussenstappen');
+      if (step.completedStepIds.includes('invert_divisor')) {
+        solution.append(
+          op('='),
+          renderFractionRepresentation(step.task.left, 'symbolic_fraction', 'Eerste breuk'),
+          op('×'),
+          renderFractionRepresentation(step.inverse, 'symbolic_fraction', 'Omgekeerde tweede breuk')
+        );
+      }
+      if (step.completedStepIds.includes('multiply_fractions')) {
+        solution.append(
+          op('='),
+          renderFractionRepresentation(step.product, 'symbolic_fraction', 'Product van de breuken')
+        );
+      }
+      if (step.completedStepIds.includes('simplify_quotient')) {
+        solution.append(
+          op('='),
+          renderMixedNumber({
+            wholeNumber: step.task.answer.whole,
+            numerator: step.task.answer.numerator,
+            denominator: step.task.answer.denominator
+          }, 'Vereenvoudigde uitkomst')
+        );
+      }
+      const equation = documentRef.createElement('div'); equation.className = 'fraction-guided-equation';
+      equation.setAttribute('aria-label', 'Doelsom en uitgewerkte tussenstappen');
+      equation.append(prompt, solution);
+      template.promptArea.append(equation);
+      const grid = documentRef.createElement('div'); grid.className = 'fraction-guided-step-grid fraction-guided-step-grid--progressive';
+      grid.setAttribute('aria-label', 'Drie denkstappen');
+      grid.dataset.activeStep = awaitingNextTask ? 'completed' : step.stepId;
+      let activeEntry = null, activeAnswer = null;
+      const completed = step.completedStepIds;
+      const summaries = [
+        { id: 'invert_divisor', text: 'Keer de tweede breuk om', result: step.inverse },
+        { id: 'multiply_fractions', text: 'Vermenigvuldig de tellers en noemers', result: step.product },
+        { id: 'simplify_quotient', text: 'Vereenvoudig de uitkomst', result: step.task.answer }
+      ];
+      summaries.forEach((item, index) => {
+        const isDone = completed.includes(item.id), isActive = step.stepId === item.id;
+        const panel = documentRef.createElement('details'); panel.className = 'fraction-guided-step-card';
+        panel.open = awaitingNextTask || isActive;
+        panel.dataset.stepId = item.id;
+        panel.dataset.state = isDone ? 'completed' : isActive ? 'active' : 'locked';
+        panel.setAttribute('aria-label', 'Stap ' + (index + 1) + ': ' + item.text);
+        const summary = documentRef.createElement('summary'); summary.className = 'fraction-guided-step-summary';
+        const heading = documentRef.createElement('h3'); heading.textContent = 'Stap ' + (index + 1);
+        const label = documentRef.createElement('p'); label.className = 'fraction-guided-step-title'; label.textContent = item.text;
+        summary.append(heading, label); panel.append(summary);
+        const body = documentRef.createElement('div'); body.className = 'fraction-guided-step-content';
+        if (isDone) {
+          const status = documentRef.createElement('p'); status.className = 'fraction-guided-step-status'; status.textContent = 'Afgerond';
+          const answer = documentRef.createElement('div'); answer.className = 'fraction-guided-step-completed-answer';
+          if (item.id === 'simplify_quotient') {
+            answer.append(renderMixedNumber({ wholeNumber: item.result.whole, numerator: item.result.numerator, denominator: item.result.denominator }, 'Vereenvoudigde uitkomst'));
+          } else {
+            answer.append(renderFractionRepresentation(item.result, 'symbolic_fraction', 'Uitkomst van de stap'));
+          }
+          body.append(status, answer);
+        } else if (isActive) {
+          const help = documentRef.createElement('p'); help.className = 'fraction-guided-step-prompt';
+          help.textContent = item.id === 'invert_divisor'
+            ? 'Draai de tweede breuk om: de noemer wordt de teller en de teller wordt de noemer.'
+            : item.id === 'multiply_fractions'
+            ? 'Vermenigvuldig de tellers met elkaar en de noemers met elkaar.'
+            : 'Vul de uitkomst als een volledig vereenvoudigd gemengd getal in.';
+          const expression = documentRef.createElement('div'); expression.className = 'fraction-guided-step-expression';
+          if (item.id === 'invert_divisor') {
+            expression.append(renderFractionRepresentation(step.task.left, 'symbolic_fraction', 'Eerste breuk'), op('×'));
+            activeEntry = fractionEntry('Omgekeerde tweede breuk'); expression.append(activeEntry.wrap);
+          } else if (item.id === 'multiply_fractions') {
+            expression.append(
+              renderFractionRepresentation(step.task.left, 'symbolic_fraction', 'Eerste breuk'), op('×'),
+              renderFractionRepresentation(step.inverse, 'symbolic_fraction', 'Omgekeerde tweede breuk'), op('=')
+            );
+            activeEntry = fractionEntry('Product'); expression.append(activeEntry.wrap);
+          } else {
+            expression.append(renderFractionRepresentation(step.product, 'symbolic_fraction', 'Onvereenvoudigde uitkomst'), op('='));
+            const answerMount = documentRef.createElement('div'); answerMount.className = 'fraction-guided-mixed-answer';
+            expression.append(answerMount);
+            activeAnswer = renderFractionAnswerInput({ workMount: answerMount, controlsMount: template.controlsArea, wholeNumberMode: 'required' });
+          }
+          const check = documentRef.createElement('button'); check.type = 'button';
+          check.className = 'paco-btn paco-btn--primary paco-btn--small'; check.textContent = 'Controleren';
+          check.addEventListener('click', () => {
+            const result = session.recordResponse(item.id === 'simplify_quotient'
+              ? { values: activeAnswer?.getValues() }
+              : { numerator: activeEntry?.numerator.value || '', denominator: activeEntry?.denominator.value || '' });
+            if (result.classification === 'valid') {
+              activeAnswer?.lock();
+              if (item.id === 'simplify_quotient') {
+                completedTaskSnapshot = { ...step, completedStepIds: [...step.completedStepIds, item.id] };
+                awaitingNextTask = true;
+              }
+              renderCurrentTask(item.id === 'simplify_quotient' ? 'Goed gedaan! Je hebt deze som afgerond.' : 'Goed gedaan! Deze stap is afgerond.');
+              return;
+            }
+            const messages = {
+              invalid_input: 'Vul zowel de teller als de noemer in.',
+              incorrect_answer: item.id === 'invert_divisor'
+                ? 'Draai de tweede breuk om: de teller en noemer wisselen van plaats.'
+                : item.id === 'multiply_fractions'
+                ? 'Vermenigvuldig de tellers met elkaar en de noemers met elkaar.'
+                : 'Dat antwoord klopt nog niet. Controleer de vereenvoudiging.',
+              requires_simplification: 'Je antwoord klopt, maar de breuk moet nog verder vereenvoudigd worden.',
+              not_simplified: 'Vul het volledig vereenvoudigde antwoord in.'
+            };
+            const feedback = documentRef.createElement('p'); feedback.className = 'fraction-practice-feedback is-error';
+            feedback.setAttribute('role','alert'); feedback.textContent = messages[result.classification] || 'Controleer je antwoord en probeer het opnieuw.';
+            template.feedbackArea.replaceChildren(feedback); activeEntry?.focus(); activeAnswer?.focus();
+          });
+          panel.addEventListener('keydown', event => {
+            if (event.key === 'Enter' && event.target instanceof documentRef.defaultView.HTMLInputElement) { event.preventDefault(); check.click(); }
+          });
+          body.append(help, expression, check);
+        } else {
+          const status = documentRef.createElement('p'); status.className = 'fraction-guided-step-status';
+          status.textContent = 'Komt hierna'; body.append(status);
+        }
+        panel.append(body); grid.append(panel);
+      });
+      template.workArea.append(grid);
+      if (feedbackMessage) {
+        const feedback = documentRef.createElement('p'); feedback.className = 'fraction-practice-feedback is-correct';
+        feedback.setAttribute('role','status'); feedback.textContent = feedbackMessage; template.feedbackArea.append(feedback);
+      }
+      content.append(card);
+      if (awaitingNextTask) {
+        const done = documentRef.createElement('p'); done.className = 'fraction-practice-complete';
+        done.textContent = progress.isComplete ? 'Deze laatste som is afgerond. Je hebt alle 10 sommen goed gemaakt.' : 'Deze som is afgerond. Klik op Volgende som als je klaar bent.';
+        template.workArea.append(done);
+        if (progress.isComplete) {
+          template.showRestartAction(() => { session.reset(); awaitingNextTask = false; completedTaskSnapshot = null; renderCurrentTask(); });
+        } else {
+          template.showNextAction(() => { awaitingNextTask = false; completedTaskSnapshot = null; renderCurrentTask(); });
+        }
+      } else if (activeEntry) activeEntry.focus();
+    }
+    renderCurrentTask();
+  }
+
+  function renderUnlikeDenominatorDivisionGuidedPractice() {
+    const learnerKey = student || context?.learnerId || 'local-learner';
+    const session = createFractionUnlikeDenominatorDivisionGuidedSession({
+      learnerKey, tasks: FRACTION_UNLIKE_DENOMINATOR_DIVISION_GUIDED_TASKS
+    });
+    const exercise = { title: 'Ongelijknamige breuken kleiner dan 1 op elkaar delen', difficultyLevel: 3, maxDifficultyLevel: 5 };
+    let awaitingNextTask = false, completedTaskSnapshot = null;
+
+    function fractionEntry(label) {
+      const wrap = documentRef.createElement('div');
+      wrap.className = 'fraction-like-division-guided-entry';
+      const numerator = documentRef.createElement('input');
+      numerator.type = 'text'; numerator.inputMode = 'numeric'; numerator.autocomplete = 'off';
+      numerator.className = 'fraction-guided-scalar-input fraction-like-division-guided-number';
+      numerator.maxLength = 4; numerator.setAttribute('aria-label', label + ' teller');
+      const bar = documentRef.createElement('span'); bar.className = 'fraction-like-division-guided-bar';
+      const denominator = documentRef.createElement('input');
+      denominator.type = 'text'; denominator.inputMode = 'numeric'; denominator.autocomplete = 'off';
+      denominator.className = 'fraction-guided-scalar-input fraction-like-division-guided-number';
+      denominator.maxLength = 4; denominator.setAttribute('aria-label', label + ' noemer');
+      wrap.append(numerator, bar, denominator);
+      return { wrap, numerator, denominator, focus: () => numerator.focus() };
+    }
+
+    function renderCurrentTask(feedbackMessage = '') {
+      const step = awaitingNextTask ? completedTaskSnapshot : session.getCurrentStep();
+      const progress = session.getProgress();
+      content.replaceChildren();
+      const card = documentRef.createElement('section');
+      card.className = 'card fraction-whole-mixed-addition-card fraction-addition-guided-card fraction-unlike-denominator-division-guided-card';
       const template = createFractionPracticeTemplate({ mount: card });
       const title = documentRef.createElement('h2'); title.textContent = exercise.title;
       const instruction = documentRef.createElement('p');
@@ -3312,6 +3510,7 @@ export function createSkillsRuntime({
     const showingWholeNumberDividedByFractionGreaterThanOneGuidedPractice = showingDivision && exercise === 'whole-number-divided-by-fraction-greater-than-one-guided';
     const showingLikeDenominatorDivisionPractice = showingDivision && exercise === 'like-denominator-division';
     const showingUnlikeDenominatorDivisionPractice = showingDivision && exercise === 'unlike-denominator-division';
+    const showingUnlikeDenominatorDivisionGuidedPractice = showingDivision && exercise === 'unlike-denominator-division-guided';
     const showingMixedLikeDenominatorDivisionPractice = showingDivision && exercise === 'mixed-like-denominator-division';
     const showingMixedLikeDenominatorDivisionGuidedPractice = showingDivision && exercise === 'mixed-like-denominator-division-guided';
     const showingLikeDenominatorDivisionGuidedPractice = showingDivision && exercise === 'like-denominator-division-guided';
@@ -3414,7 +3613,8 @@ export function createSkillsRuntime({
       content
     });
 
-    if (showingUnlikeDenominatorDivisionPractice) renderUnlikeDenominatorDivisionPractice();
+    if (showingUnlikeDenominatorDivisionGuidedPractice) renderUnlikeDenominatorDivisionGuidedPractice();
+    else if (showingUnlikeDenominatorDivisionPractice) renderUnlikeDenominatorDivisionPractice();
     else if (showingMixedLikeDenominatorDivisionGuidedPractice) renderMixedLikeDenominatorDivisionGuidedPractice();
     else if (showingMixedLikeDenominatorDivisionPractice) renderMixedLikeDenominatorDivisionPractice();
     else if (showingMixedLikeDenominatorDivisionGuidedPractice) renderMixedLikeDenominatorDivisionGuidedPractice();

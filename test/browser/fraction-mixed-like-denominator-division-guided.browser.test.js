@@ -47,6 +47,7 @@ test('guided mixed like-denominator division is a separate overview exercise wit
   await fill('Omgezette tweede breuk teller', rightImproper);
   await fill('Omgezette tweede breuk noemer', first.right.denominator);
   await page.getByRole('button', { name: 'Controleren' }).click();
+  await expect(page.locator('.fraction-guided-step-card[open]')).toHaveCount(1);
   await expect(page.locator('.fraction-guided-solution')).toContainText(String(leftImproper));
   await expect(page.locator('.fraction-guided-solution')).toContainText(String(rightImproper));
   await expect(page.locator('.fraction-guided-step-card[data-state="active"]')).toHaveAttribute('data-step-id', 'invert_divisor');
@@ -54,6 +55,7 @@ test('guided mixed like-denominator division is a separate overview exercise wit
   await fill('Omgekeerde tweede breuk teller', first.right.denominator);
   await fill('Omgekeerde tweede breuk noemer', rightImproper);
   await page.getByRole('button', { name: 'Controleren' }).click();
+  await expect(page.locator('.fraction-guided-step-card[open]')).toHaveCount(1);
   await expect(page.locator('.fraction-guided-step-card[data-state="active"]')).toHaveAttribute('data-step-id', 'multiply_fractions');
 
   const productNumerator = leftImproper * first.right.denominator;
@@ -61,17 +63,20 @@ test('guided mixed like-denominator division is a separate overview exercise wit
   await fill('Product teller', productNumerator);
   await fill('Product noemer', productDenominator);
   await page.getByRole('button', { name: 'Controleren' }).click();
+  await expect(page.locator('.fraction-guided-step-card[open]')).toHaveCount(1);
   await expect(page.locator('.fraction-guided-step-card[data-state="active"]')).toHaveAttribute('data-step-id', 'convert_to_mixed_number');
 
   await fill('Hele getal van het gemengde antwoord', Math.floor(productNumerator / productDenominator));
   await fill('Rest van de onechte breuk teller', productNumerator % productDenominator);
   await page.getByRole('button', { name: 'Controleren' }).click();
+  await expect(page.locator('.fraction-guided-step-card[open]')).toHaveCount(1);
   await expect(page.locator('.fraction-guided-step-card[data-state="active"]')).toHaveAttribute('data-step-id', 'simplify_quotient');
 
   await page.locator('[data-answer-part="whole"]').fill(String(first.answer.whole));
   await page.locator('[data-answer-part="primaryNumerator"]').fill(String(first.answer.numerator));
   await page.locator('[data-answer-part="primaryDenominator"]').fill(String(first.answer.denominator));
   await page.getByRole('button', { name: 'Controleren' }).click();
+  await expect(page.locator('.fraction-guided-step-card[open]')).toHaveCount(1);
   await expect(page.locator('.fraction-guided-solution')).toContainText(String(first.answer.numerator));
   await expect(page.locator('.fraction-guided-step-card[open]')).toHaveCount(1);
   await expect(page.getByRole('button', { name: 'Volgende som' })).toBeVisible();
@@ -87,21 +92,26 @@ test('guided mixed like-denominator division is a separate overview exercise wit
     await fill('Omgezette tweede breuk teller', right);
     await fill('Omgezette tweede breuk noemer', task.right.denominator);
     await page.getByRole('button', { name: 'Controleren' }).click();
+  await expect(page.locator('.fraction-guided-step-card[open]')).toHaveCount(1);
     await fill('Omgekeerde tweede breuk teller', task.right.denominator);
     await fill('Omgekeerde tweede breuk noemer', right);
     await page.getByRole('button', { name: 'Controleren' }).click();
+  await expect(page.locator('.fraction-guided-step-card[open]')).toHaveCount(1);
     const pn = left * task.right.denominator;
     const pd = task.left.denominator * right;
     await fill('Product teller', pn);
     await fill('Product noemer', pd);
     await page.getByRole('button', { name: 'Controleren' }).click();
+  await expect(page.locator('.fraction-guided-step-card[open]')).toHaveCount(1);
     await fill('Hele getal van het gemengde antwoord', Math.floor(pn / pd));
     await fill('Rest van de onechte breuk teller', pn % pd);
     await page.getByRole('button', { name: 'Controleren' }).click();
+  await expect(page.locator('.fraction-guided-step-card[open]')).toHaveCount(1);
     await page.locator('[data-answer-part="whole"]').fill(String(task.answer.whole));
     await page.locator('[data-answer-part="primaryNumerator"]').fill(String(task.answer.numerator));
     await page.locator('[data-answer-part="primaryDenominator"]').fill(String(task.answer.denominator));
     await page.getByRole('button', { name: 'Controleren' }).click();
+  await expect(page.locator('.fraction-guided-step-card[open]')).toHaveCount(1);
     if (task !== tasks[tasks.length - 1]) {
       await expect(page.getByRole('button', { name: 'Volgende som' })).toBeVisible();
       await page.getByRole('button', { name: 'Volgende som' }).click();

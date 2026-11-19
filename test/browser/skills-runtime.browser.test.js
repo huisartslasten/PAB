@@ -1864,6 +1864,17 @@ test('Delen in the fraction overview opens both independent and guided division 
     const rows = [...document.querySelectorAll('.skills-addition-overview-row')];
     const buttons = [...document.querySelectorAll('.skills-addition-overview-open')];
     buttons.forEach(button => button.click());
+    const overviewSnapshot = {
+      title: document.querySelector('.paco-template-main h1')?.textContent || '',
+      centralPage: Boolean(document.querySelector('.paco-page-template')),
+      centralCard: Boolean(document.querySelector('.skills-addition-overview.card')),
+      heading: document.querySelector('[aria-label="Onderwerpen breuken delen"]')?.getAttribute('aria-label') || '',
+      labels: rows.map(row => row.querySelector('.skills-addition-overview-label')?.textContent || ''),
+      levels: rows.map(row => row.querySelectorAll('.paco-bone-difficulty__bone.is-filled, .paco-bone-difficulty__bone--filled').length),
+      boneCounts: rows.map(row => row.querySelectorAll('.paco-bone-difficulty__bone').length),
+      exerciseButtonCount: buttons.length,
+      navigations: [...navigations]
+    };
     localStorage.removeItem('pacogo:fraction-mixed-like-denominator-division-guided:v1:Zyon');
     const guided = createSkillsRuntime({
       app, templateMount, context: { student: 'Zyon', mode: 'student' },
@@ -1877,18 +1888,7 @@ test('Delen in the fraction overview opens both independent and guided division 
       activeStep: document.querySelector('.fraction-guided-step-card[data-state="active"]')?.dataset.stepId || '',
       progress: document.querySelector('.fraction-practice-progress')?.textContent || ''
     };
-    return {
-      guidedRoute,
-      title: document.querySelector('.paco-template-main h1')?.textContent || '',
-      centralPage: Boolean(document.querySelector('.paco-page-template')),
-      centralCard: Boolean(document.querySelector('.skills-addition-overview.card')),
-      heading: document.querySelector('[aria-label="Onderwerpen breuken delen"]')?.getAttribute('aria-label') || '',
-      labels: rows.map(row => row.querySelector('.skills-addition-overview-label')?.textContent || ''),
-      levels: rows.map(row => row.querySelectorAll('.paco-bone-difficulty__bone.is-filled, .paco-bone-difficulty__bone--filled').length),
-      boneCounts: rows.map(row => row.querySelectorAll('.paco-bone-difficulty__bone').length),
-      exerciseButtonCount: buttons.length,
-      navigations
-    };
+    return { ...overviewSnapshot, guidedRoute };
   });
   expect(result.title).toBe('Delen');
   expect(result.centralPage).toBe(true);

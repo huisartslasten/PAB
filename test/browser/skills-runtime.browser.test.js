@@ -2248,7 +2248,7 @@ test('first division overview row opens the guided whole-number divided by mixed
   expect(result.exercise).toBe('whole-number-divided-by-fraction-greater-than-one-guided');
   expect(result.topic).toBe('delen');
   expect(result.pageTitle).toBe('Oefenen');
-  expect(result.exerciseTitle).toBe('Heel getal delen door een breukgetal groter dan 1 — met stappenplan');
+  expect(result.exerciseTitle).toBe('Heel getal delen door een breukgetal groter dan 1');
   expect(result.guidedCard).toBe(true);
   expect(result.stepCount).toBe(4);
   expect(result.progress).toContain('Som 1 van 10');

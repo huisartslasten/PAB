@@ -61,15 +61,30 @@ function createFractionLikeDenominatorDivisionGuidedSession({ learnerKey, storag
     let classification="invalid_input", stored={};
     if(step.stepId==="simplify_quotient"){
       const whole=parse(values?.wholeNumber), n=parse(values?.numerator), d=parse(values?.denominator);
+      const hasSimplification=values?.simplified===true;
+      const simplifiedNumerator=parse(values?.simplifiedNumerator), simplifiedDenominator=parse(values?.simplifiedDenominator);
       if([whole,n,d].every(Number.isSafeInteger)&&whole>=0&&n>=0&&d>0&&(n===0||n<d)){
         const equivalent=(whole*d+n)*step.product.denominator===step.product.numerator*d;
         if(!equivalent)classification="incorrect_answer";
         else if(n===0&&whole*d!==step.product.numerator)classification="incorrect_answer";
-        else if(n>0&&greatestCommonDivisor(n,d)!==1)classification="requires_simplification";
+        else if(hasSimplification){
+          const validReduced=[simplifiedNumerator,simplifiedDenominator].every(Number.isSafeInteger)&&
+            simplifiedNumerator>=0&&simplifiedDenominator>0&&
+            (simplifiedNumerator===0||simplifiedNumerator<simplifiedDenominator);
+          if(!validReduced)classification="invalid_input";
+          else {
+            const reducedEquivalent=(whole*simplifiedDenominator+simplifiedNumerator)*d===
+              (whole*d+n)*simplifiedDenominator;
+            if(!reducedEquivalent)classification="incorrect_answer";
+            else if(simplifiedNumerator>0&&greatestCommonDivisor(simplifiedNumerator,simplifiedDenominator)!==1)classification="requires_simplification";
+            else if(whole!==step.task.answer.whole||simplifiedNumerator!==step.task.answer.numerator||simplifiedDenominator!==step.task.answer.denominator)classification="not_simplified";
+            else classification="valid";
+          }
+        }else if(n>0&&greatestCommonDivisor(n,d)!==1)classification="requires_simplification";
         else if(whole!==step.task.answer.whole||n!==step.task.answer.numerator||d!==step.task.answer.denominator)classification="not_simplified";
         else classification="valid";
       }
-      stored={wholeNumber:String(values?.wholeNumber??""),numerator:String(values?.numerator??""),denominator:String(values?.denominator??"")};
+      stored={wholeNumber:String(values?.wholeNumber??""),numerator:String(values?.numerator??""),denominator:String(values?.denominator??""),simplified:hasSimplification,simplifiedNumerator:String(values?.simplifiedNumerator??""),simplifiedDenominator:String(values?.simplifiedDenominator??"")};
     } else {
       const n=parse(numerator),d=parse(denominator),expected=step.stepId==="invert_divisor"?step.inverse:step.product;
       if(Number.isSafeInteger(n)&&Number.isSafeInteger(d)&&n>0&&d>0) classification=n===expected.numerator&&d===expected.denominator?"valid":"incorrect_answer";

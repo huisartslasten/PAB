@@ -2198,3 +2198,60 @@ test('guided division completes ten tasks, offers restart, and resets through th
   expect(result.restartedProgress).toContain('Som 1 van 10');
   expect(result.restartedStepCount).toBe(4);
 });
+
+test('first division overview row opens the guided whole-number divided by mixed fraction exercise', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=delen', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    localStorage.removeItem('pacogo:fraction-whole-number-divided-by-fraction-greater-than-one-guided:v2:Zyon');
+    const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {},
+      managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    let navigatedTo = '';
+    const overview = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'delen', documentRef: document,
+      navigate: target => { navigatedTo = String(target); }
+    });
+    await overview.mount();
+    const rows = [...document.querySelectorAll('.skills-addition-overview-row')];
+    const firstLabel = rows[0]?.querySelector('.skills-addition-overview-label')?.textContent || '';
+    rows[0]?.querySelector('.skills-addition-overview-open')?.click();
+    const target = new URL(navigatedTo, window.location.href);
+    const exercise = target.searchParams.get('exercise') || '';
+    const routed = createSkillsRuntime({
+      app, templateMount, context: { student: target.searchParams.get('viewStudent') || 'Zyon', mode: target.searchParams.get('mode') || 'student' },
+      domain: target.searchParams.get('domain') || '',
+      topic: target.searchParams.get('topic') || '',
+      exercise, documentRef: document, navigate: () => {}
+    });
+    await routed.mount();
+    return {
+      firstLabel,
+      exercise,
+      topic: target.searchParams.get('topic'),
+      pageTitle: document.querySelector('.paco-template-main h1')?.textContent || '',
+      exerciseTitle: document.querySelector('.fraction-whole-number-divided-guided-card h2')?.textContent || '',
+      guidedCard: Boolean(document.querySelector('.fraction-whole-number-divided-guided-card')),
+      stepCount: document.querySelectorAll('.fraction-guided-step-card').length,
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      firstStep: document.querySelector('.fraction-guided-step-card[data-state="active"]')?.dataset.stepId || '',
+      oldExerciseCard: Boolean(document.querySelector('.fraction-whole-mixed-addition-card:not(.fraction-whole-number-divided-guided-card)'))
+    };
+  });
+  expect(result.firstLabel).toBe('Heel getal delen door een breukgetal groter dan 1 — met stappenplan');
+  expect(result.exercise).toBe('whole-number-divided-by-fraction-greater-than-one-guided');
+  expect(result.topic).toBe('delen');
+  expect(result.pageTitle).toBe('Oefenen');
+  expect(result.exerciseTitle).toBe('Heel getal delen door een breukgetal groter dan 1 — met stappenplan');
+  expect(result.guidedCard).toBe(true);
+  expect(result.stepCount).toBe(4);
+  expect(result.progress).toContain('Som 1 van 10');
+  expect(result.firstStep).toBe('convert_mixed_number');
+  expect(result.oldExerciseCard).toBe(false);
+});

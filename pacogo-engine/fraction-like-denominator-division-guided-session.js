@@ -15,9 +15,7 @@ function normalizeTasks(tasks) {
         left.numerator <= 0 || left.numerator >= left.denominator ||
         right.numerator <= 0 || right.numerator >= right.denominator ||
         left.denominator !== right.denominator || left.numerator <= right.numerator ||
-        answer.whole < 1 || answer.numerator < 0 || answer.denominator < 1 ||
-        (answer.numerator > 0 && (answer.numerator >= answer.denominator || greatestCommonDivisor(answer.numerator,answer.denominator)!==1)) ||
-        (answer.numerator === 0 && (answer.whole * right.numerator !== left.numerator))) {
+        answer.whole < 1 || answer.numerator <= 0 || answer.denominator <= answer.numerator || greatestCommonDivisor(answer.numerator,answer.denominator)!==1) {
       throw new TypeError("Task " + index + " is not a valid like-denominator division task.");
     }
     const n = left.numerator * right.denominator;

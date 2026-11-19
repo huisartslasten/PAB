@@ -19,6 +19,7 @@ import { FRACTION_LIKE_DENOMINATOR_DIVISION_TASKS } from '../../../pacogo-engine
 import { createFractionLikeDenominatorDivisionSession } from '../../../pacogo-engine/fraction-like-denominator-division-session.js';
 import { FRACTION_UNLIKE_DENOMINATOR_DIVISION_TASKS } from '../../../pacogo-engine/fraction-unlike-denominator-division-task-bank.js';
 import { createFractionUnlikeDenominatorDivisionSession } from '../../../pacogo-engine/fraction-unlike-denominator-division-session.js';
+import { FRACTION_UNLIKE_DENOMINATOR_DIVISION_GUIDED_TASKS } from '../../../pacogo-engine/fraction-unlike-denominator-division-guided-task-bank.js';
 import { createFractionUnlikeDenominatorDivisionGuidedSession } from '../../../pacogo-engine/fraction-unlike-denominator-division-guided-session.js';
 import { FRACTION_MIXED_LIKE_DENOMINATOR_DIVISION_TASKS } from '../../../pacogo-engine/fraction-mixed-like-denominator-division-task-bank.js';
 import { createFractionMixedLikeDenominatorDivisionSession } from '../../../pacogo-engine/fraction-mixed-like-denominator-division-session.js';

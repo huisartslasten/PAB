@@ -31,16 +31,17 @@ test('mixed unlike-denominator division uses central templates, 15 sums, Enter n
     await page.locator('[data-answer-part="primaryNumerator"]').fill(String(task.answer.numerator));
     await page.locator('[data-answer-part="primaryDenominator"]').fill(String(task.answer.denominator));
     await page.getByRole('button', { name: 'Controleren' }).click();
-    await expect(page.locator('.fraction-practice-feedback')).toContainText('Goed gedaan!');
     if (index < 14) {
+      await expect(page.locator('.fraction-practice-feedback')).toContainText('Goed gedaan!');
       const next = page.getByRole('button', { name: 'Volgende som' });
       await expect(next).toBeVisible();
       if (index === 0) await next.press('Enter');
       else await next.click();
       await expect(page.locator('.fraction-practice-progress')).toContainText('Som ' + (index + 2) + ' van 15');
+    } else {
+      await expect(page.locator('.fraction-practice-complete')).toContainText('alle 15 sommen afgerond');
     }
   }
-  await expect(page.locator('.fraction-practice-complete')).toContainText('alle 15 sommen afgerond');
   const restart = page.getByRole('button', { name: 'OPNIEUW MAKEN' });
   await expect(restart).toBeVisible();
   await restart.click();

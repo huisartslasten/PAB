@@ -35,8 +35,8 @@ test('like-denominator proper-fraction division uses the central templates, 15 t
     const answerCurrent = task => {
       const values = {
         whole: String(task.answer.whole),
-        numerator: String(task.answer.numerator),
-        denominator: String(task.answer.denominator)
+        primaryNumerator: String(task.answer.numerator),
+        primaryDenominator: String(task.answer.denominator)
       };
       for (const [part, value] of Object.entries(values)) {
         const field = document.querySelector('[data-answer-part="' + part + '"]');

@@ -1902,6 +1902,23 @@ test('Delen in the fraction overview opens both independent and guided division 
     };
     const fractionInput = (() => {
       const input = document.querySelector('.fraction-guided-fraction-input');
+      const matchedRules = [];
+      if (input) for (const sheet of [...document.styleSheets]) {
+        try {
+          for (const rule of [...sheet.cssRules]) {
+            if (rule.selectorText && input.matches(rule.selectorText) && rule.style?.display) {
+              matchedRules.push({ selector: rule.selectorText, display: rule.style.display });
+            }
+          }
+        } catch {}
+      }
+      console.log('FRACTION_DIVISION_INPUT_DIAGNOSTIC', JSON.stringify({
+        className: input?.className || '',
+        inlineDisplay: input?.style.display || '',
+        closestCard: input?.closest('section')?.className || '',
+        matchesDivisionSelector: Boolean(input?.matches('.fraction-division-guided-card .fraction-guided-fraction-input')),
+        matchedRules
+      }));
       const grid = document.querySelector('.fraction-guided-step-grid--progressive');
       const locked = document.querySelector('.fraction-guided-step-card[data-state="locked"]');
       return {

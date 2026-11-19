@@ -1918,7 +1918,7 @@ test('Delen in the fraction overview opens both independent and guided division 
     'Ongelijknamige breuken groter dan 1 op elkaar delen'
   ]);
   expect(result.levels).toEqual([1, 1, 2, 2, 2, 2, 3, 3, 4]);
-  expect(result.boneCounts).toEqual([5, 5, 5, 5, 5, 5, 5, 5]);
+  expect(result.boneCounts).toEqual([5, 5, 5, 5, 5, 5, 5, 5, 5]);
   expect(result.exerciseButtonCount).toBe(9);
   expect(result.navigations).toHaveLength(10);
   expect(result.navigations[0]).toContain('topic=delen');

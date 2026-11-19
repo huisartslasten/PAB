@@ -1358,6 +1358,7 @@ export function createSkillsRuntime({
     });
     const exercise = { title: 'Gelijknamige breuken kleiner dan 1 op elkaar delen', difficultyLevel: 2, maxDifficultyLevel: 5 };
     const labels = ['Keer de tweede breuk om', 'Vermenigvuldig de breuken', 'Vereenvoudig de uitkomst'];
+    let awaitingNextTask = false, completedTaskSnapshot = null;
 
     function fractionEntry(label) {
       const wrap = documentRef.createElement('div');
@@ -1409,7 +1410,7 @@ export function createSkillsRuntime({
       const grid = documentRef.createElement('div'); grid.className = 'fraction-guided-step-grid fraction-guided-step-grid--three';
       grid.setAttribute('aria-label', 'Drie denkstappen');
       grid.dataset.activeStep = step.stepId;
-      let activeEntry = null, activeAnswer = null, awaitingNextTask = false, completedTaskSnapshot = null;
+      let activeEntry = null, activeAnswer = null;
       const completed = step.completedStepIds;
       const summaries = [
         { id: 'invert_divisor', text: 'Keer de tweede breuk om', result: step.inverse },

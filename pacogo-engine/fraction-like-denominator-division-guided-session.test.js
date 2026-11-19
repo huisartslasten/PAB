@@ -93,6 +93,10 @@ test('guided division accepts a correct simplification entered beside the origin
   assert.equal(step.task.id, 'fraction-like-denominator-division-guided-02');
   result = session.recordResponse({ numerator: step.inverse.numerator, denominator: step.inverse.denominator });
   step = result.currentStep;
+  assert.equal(step.stepId, 'multiply_fractions');
+  result = session.recordResponse({ numerator: step.product.numerator, denominator: step.product.denominator });
+  step = result.currentStep;
+  assert.equal(step.stepId, 'simplify_quotient');
   assert.equal(step.product.numerator, 108);
   assert.equal(step.product.denominator, 72);
   result = session.recordResponse({ values: {

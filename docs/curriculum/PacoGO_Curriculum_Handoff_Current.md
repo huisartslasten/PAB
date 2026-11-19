@@ -9015,3 +9015,38 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Verifieer de handoff-update met Full Regression op de nieuwe handoff-commit.
 - Laat de gebruiker daarna de oefening visueel controleren in PacoGO TEST.
 - Voeg niets toe buiten deze opdracht.
+
+
+## 35. Correctie zichtbare hele getallen — gemengde gelijknamige breuken delen (19 november 2026)
+
+**Gebruikersmelding**
+- Bij visuele controle in PacoGO TEST bleken de hele getallen van beide gemengde getallen niet zichtbaar; alleen de breukdelen werden getoond.
+
+**Oorzaak**
+- De taakbank gebruikt voor gemengde getallen het veld `whole`.
+- De centrale `renderMixedNumber()` verwacht het veld `wholeNumber`.
+- De runtime gaf de taakbankobjecten rechtstreeks door, waardoor `wholeNumber` ontbrak en de renderer alleen de breukdelen toonde.
+
+**Correctie**
+- De runtime geeft nu expliciet `wholeNumber`, `numerator` en `denominator` door aan de bestaande centrale `renderMixedNumber()` voor beide getallen.
+- De bestaande centrale renderer en templates zijn ongewijzigd gebleven.
+- De browserregressie controleert expliciet dat de eerste som de hele getallen `2` en `1` toont.
+- Geen wijziging aan taakbank, 15 sommen, sessielogica, Supabase of LIVE `main`.
+
+**Verificatie**
+- Correctiecommit: `49c92c1d1f0dfc53eef804276bc24a3032d02749`.
+- Testcommit: `2d2da8a3da7209107910823004ba1d7ddb86957c`.
+- Full Regression #4129 / run 44559758149: **GREEN / SUCCESS** op exact testcommit `2d2da8a3da7209107910823004ba1d7ddb86957c`.
+- Browser Proof #865 / run 44559758788: **GREEN / SUCCESS** op exact hetzelfde testcommit.
+
+**Actuele status**
+- Branch: `refactor/professional-v1`.
+- Laatste geverifieerde code-/testcommit vóór deze handoff-update: `2d2da8a3da7209107910823004ba1d7ddb86957c`.
+- Laatste Full Regression: #4129 — **GREEN / SUCCESS**.
+- Gerichte browser proof: #865 — **GREEN / SUCCESS**.
+- Deze handoff-update moet zelf nog door Full Regression worden geverifieerd.
+
+**Volgende concrete stap**
+- Verifieer deze handoff-update met Full Regression op de nieuwe handoff-commit.
+- Laat de gebruiker de zichtbare hele getallen in PacoGO TEST bevestigen.
+- Voeg niets toe buiten de opdracht.

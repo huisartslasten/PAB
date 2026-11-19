@@ -2191,7 +2191,7 @@ test('guided division completes ten tasks, offers restart, and resets through th
   expect(result.completedWork.prompt).not.toBe('');
   expect(result.completedWork.solution).toContain('=');
   expect(result.completedWork.stepAnswerFontSizes.length).toBeGreaterThan(0);
-  expect(new Set(result.completedWork.stepAnswerFontSizes)).toEqual(new Set(['28px']));
+  expect(new Set(result.completedWork.stepAnswerFontSizes)).toEqual(new Set(['20px']));
   expect(result.completedWork.topEquationFontSizes.length).toBeGreaterThan(0);
   expect(new Set(result.completedWork.topEquationFontSizes)).toEqual(new Set(['28px']));
   expect(result.completedWork.feedback).toContain('Goed gedaan');

@@ -9114,3 +9114,44 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Branch: `refactor/professional-v1`; LIVE `main` onaangeroerd.
 - Volgende stap: laat de gebruiker de oefening visueel controleren in PacoGO TEST.
 - Deze handoff-verificatie wordt uitgevoerd met Full Regression op de nieuwe handoff-commit.
+
+## 38. Visuele correctie begeleide deling gelijknamige gemengde breuken (19 november 2026)
+
+**Gebruikersfeedback**
+- De niet-actieve stappen moeten ingeklapt blijven.
+- De invulvelden voor teller en noemer moeten naast de bijbehorende breuk staan, niet eronder.
+
+**Oorzaakanalyse**
+- De eerste wijziging raakte per ongeluk de bestaande drie-stappenrenderer voor *Gelijknamige breuken kleiner dan 1 op elkaar delen — met stappenplan* in plaats van de nieuwe vijf-stappenrenderer.
+- De bestaande drie-stappenrenderer is hersteld naar haar oorspronkelijke gedrag.
+- De inklapregel is vervolgens uitsluitend in `renderMixedLikeDenominatorDivisionGuidedPractice()` aangepast.
+- De actieve stap blijft open; niet-actieve stappen blijven dicht. Na afronding van een som klappen alle vijf stappen in.
+
+**Correctie**
+- Stap 1 gebruikt een afzonderlijke horizontale regel per gemengd getal: de invulbreuk staat direct rechts van het gemengde getal.
+- De overige actieve stapuitdrukkingen breken niet meer onder de breuk af; waar de uitdrukking breder is dan de kaart, blijft de regel horizontaal.
+- De bestaande centrale breuknotatie, PacoGO Page Template, Fraction Practice Template en vijfstappenstructuur blijven behouden.
+- Geen wijziging aan de andere drie-stappenoefening, taakbank, sessielogica, zelfstandige oefening, curriculum, Supabase of LIVE `main`.
+
+**Verificatie**
+- Tijdens de oorzaakanalyse waren Full Regression #4143–#4146 rood; deze tussenruns zijn niet als groen beschouwd.
+- De regressieoorzaak was de wijziging aan de verkeerde renderer en een onjuiste testverwachting voor de afgeronde toestand.
+- De gerichte browserregressie controleert nu:
+  - precies één open stap zolang een stap actief is;
+  - geen open stappen nadat de som is afgerond;
+  - teller/noemer-invoervelden op dezelfde horizontale lijn als het bijbehorende gemengde getal;
+  - de volledige reeks van 10 sommen en opnieuw oefenen.
+- Full Regression #4147: **GREEN / SUCCESS** op exact commit `85b40f6d81748c11529627ad877dcda1068ad8dd`.
+- De handoff-update zelf moet nog door Full Regression worden geverifieerd.
+
+**Actuele status**
+- Branch: `refactor/professional-v1`.
+- Laatste geverifieerde code-/testcommit: `85b40f6d81748c11529627ad877dcda1068ad8dd`.
+- Laatste volledig geverifieerde Full Regression: #4147 — **GREEN / SUCCESS** op exact die commit.
+- LIVE `main` onaangeroerd; geen deployment en geen Supabase-wijziging.
+
+**Volgende concrete stap**
+- Verifieer deze handoff-update met Full Regression op de nieuwe handoff-commit.
+- Laat de gebruiker de vijfstappenoefening visueel controleren in PacoGO TEST.
+- Voeg niets toe buiten de gemelde visuele correctie.
+

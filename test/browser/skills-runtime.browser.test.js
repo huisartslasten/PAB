@@ -2259,7 +2259,7 @@ test('first division overview row opens the guided whole-number divided by mixed
 });
 
 
-test('guided like-denominator division opens three steps with inactive steps collapsed and uniform numerals', async ({ page }) => {
+test('guided like-denominator division keeps the target beside all three visible steps with uniform numerals', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=delen', { waitUntil: 'domcontentloaded' });
   const result = await page.evaluate(async () => {
     localStorage.removeItem('pacogo:fraction-like-denominator-division-guided:v1:Zyon');
@@ -2295,13 +2295,19 @@ test('guided like-denominator division opens three steps with inactive steps col
       '.fraction-like-denominator-division-guided-card .fraction-guided-step-expression .pacogo-fraction-representation--symbolic, ' +
       '.fraction-like-denominator-division-guided-card .fraction-guided-step-expression input'
     )];
+    const layout = document.querySelector('.fraction-like-division-guided-layout');
+    const targetEquation = layout?.querySelector('.fraction-like-division-guided-target');
+    const stepGrid = layout?.querySelector('.fraction-guided-step-grid');
     return {
       route: target.searchParams.get('exercise'),
       title: document.querySelector('.fraction-like-denominator-division-guided-card h2')?.textContent || '',
       progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
       stepCount: steps.length,
-      openSteps: steps.filter(item => item.open).length,
+      visibleSteps: steps.filter(item => item.getBoundingClientRect().height > 0).length,
+      stepTags: steps.map(item => item.tagName.toLowerCase()),
       activeStep: steps.find(item => item.dataset.state === 'active')?.dataset.stepId || '',
+      targetVisible: Boolean(targetEquation && targetEquation.getBoundingClientRect().height > 0),
+      targetLeftOfSteps: Boolean(targetEquation && stepGrid && targetEquation.getBoundingClientRect().right <= stepGrid.getBoundingClientRect().left + 1),
       numeralSizes: numeralNodes.map(node => getComputedStyle(node).fontSize)
     };
   });
@@ -2309,8 +2315,90 @@ test('guided like-denominator division opens three steps with inactive steps col
   expect(result.title).toBe('Gelijknamige breuken kleiner dan 1 op elkaar delen');
   expect(result.progress).toContain('Som 1 van 10');
   expect(result.stepCount).toBe(3);
-  expect(result.openSteps).toBe(1);
+  expect(result.visibleSteps).toBe(3);
+  expect(result.stepTags).toEqual(['section', 'section', 'section']);
   expect(result.activeStep).toBe('invert_divisor');
+  expect(result.targetVisible).toBe(true);
+  expect(result.targetLeftOfSteps).toBe(true);
   expect(result.numeralSizes.length).toBeGreaterThan(0);
   expect(new Set(result.numeralSizes)).toEqual(new Set(['24px']));
+});
+
+test('guided like-denominator division completes ten sums and restarts from the central fraction template', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=delen', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    localStorage.removeItem('pacogo:fraction-like-denominator-division-guided:v1:Zyon');
+    const [{ createSkillsRuntime }, { FRACTION_LIKE_DENOMINATOR_DIVISION_GUIDED_TASKS: tasks }] = await Promise.all([
+      import('/src/features/skills/runtime.js'),
+      import('/pacogo-engine/fraction-like-denominator-division-guided-task-bank.js')
+    ]);
+    const templateMount = document.createElement('div');
+    templateMount.id = 'paco-template-mount';
+    document.body.replaceChildren(templateMount);
+    const app = {
+      auth: { isParent: false, isLoggedIn: false, session: null, subscribe: () => ({ unsubscribe() {} }) },
+      authSession: {}, managementCapabilities: { getAvailableForPage: () => [] }
+    };
+    const runtime = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'delen', exercise: 'like-denominator-division-guided',
+      documentRef: document, navigate: () => {}
+    });
+    await runtime.mount();
+    const fill = (input, value) => {
+      if (!input) throw new Error('Missing answer field');
+      input.value = String(value);
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    const clickCheck = () => {
+      const button = document.querySelector('.fraction-like-denominator-division-guided-card .fraction-guided-step-card[data-state="active"] button');
+      if (!button) throw new Error('Missing active step control');
+      button.click();
+    };
+    for (const task of tasks) {
+      let fields = [...document.querySelectorAll('.fraction-guided-step-card[data-step-id="invert_divisor"] input')];
+      fill(fields[0], task.right.denominator);
+      fill(fields[1], task.right.numerator);
+      clickCheck();
+
+      fields = [...document.querySelectorAll('.fraction-guided-step-card[data-step-id="multiply_fractions"] input')];
+      fill(fields[0], task.left.numerator * task.right.denominator);
+      fill(fields[1], task.left.denominator * task.right.numerator);
+      clickCheck();
+
+      fill(document.querySelector('[data-answer-part="whole"]'), task.answer.whole);
+      fill(document.querySelector('[data-answer-part="primaryNumerator"]'), task.answer.numerator);
+      fill(document.querySelector('[data-answer-part="primaryDenominator"]'), task.answer.denominator);
+      clickCheck();
+
+      const action = [...document.querySelectorAll('.pacogo-fraction-practice-template__actions button')]
+        .find(button => button.textContent.trim() === 'Volgende som' || button.textContent.trim() === 'Opnieuw oefenen');
+      if (!action) throw new Error('Missing next/restart action');
+      if (task.id !== tasks[tasks.length - 1].id) {
+        if (action.textContent.trim() !== 'Volgende som') throw new Error('Expected Volgende som before final task');
+        action.click();
+      } else if (action.textContent.trim() !== 'Opnieuw oefenen') {
+        throw new Error('Expected restart action after final task');
+      }
+    }
+    const completed = {
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      message: document.querySelector('.fraction-practice-complete')?.textContent || '',
+      action: [...document.querySelectorAll('.pacogo-fraction-practice-template__actions button')].map(button => button.textContent.trim())
+    };
+    [...document.querySelectorAll('.pacogo-fraction-practice-template__actions button')]
+      .find(button => button.textContent.trim() === 'Opnieuw oefenen')?.click();
+    return {
+      completed,
+      restartedProgress: document.querySelector('.fraction-practice-progress')?.textContent || '',
+      restartedActiveStep: document.querySelector('.fraction-guided-step-card[data-state="active"]')?.dataset.stepId || '',
+      restartedTaskVisible: Boolean(document.querySelector('.fraction-like-division-guided-target'))
+    };
+  });
+  expect(result.completed.progress).toContain('10 van 10 afgerond');
+  expect(result.completed.message).toContain('alle 10 sommen goed gemaakt');
+  expect(result.completed.action).toContain('Opnieuw oefenen');
+  expect(result.restartedProgress).toContain('Som 1 van 10');
+  expect(result.restartedActiveStep).toBe('invert_divisor');
+  expect(result.restartedTaskVisible).toBe(true);
 });

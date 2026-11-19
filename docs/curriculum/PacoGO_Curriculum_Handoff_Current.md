@@ -8978,3 +8978,40 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Verifieer deze handoff-update met Full Regression op de nieuwe handoff-commit.
 - Laat de gebruiker daarna de begeleide oefening visueel controleren in PacoGO TEST.
 - Voeg niets toe buiten de opdracht; wijzig geen centrale template tenzij een concrete visuele of functionele fout is vastgesteld.
+
+
+## 34. Breuken → Delen → Gelijknamige breuken groter dan 1 op elkaar delen (19 november 2026)
+
+**Gebruikersopdracht**
+- Bouw de volgende zelfstandige oefening voor het delen van gelijknamige breuken groter dan 1.
+- Gebruik de aangeleverde voorbeelden als referentie, niet één-op-één.
+- Houd de bestaande centrale PacoGO- en breuktemplates leidend; voeg geen aparte lokale template toe.
+- De oefening bevat 15 sommen. Na iedere goede som moet de leerling expliciet op **Volgende som** drukken; na de laatste som moet **Opnieuw oefenen** beschikbaar zijn.
+- **Volgende som** moet ook met Enter bedienbaar zijn.
+
+**Implementatie**
+- Nieuwe taakbank: `pacogo-engine/fraction-mixed-like-denominator-division-task-bank.js`, met 15 unieke delingen van twee gemengde getallen met dezelfde noemer. De quotiënten zijn groter dan 1 en vastgelegd als vereenvoudigde gemengde getallen.
+- Nieuwe sessie: `pacogo-engine/fraction-mixed-like-denominator-division-session.js`, met taakvalidatie, antwoordclassificatie, voortgang, opslag per leerling en herstart.
+- Nieuwe sessietests: `pacogo-engine/fraction-mixed-like-denominator-division-session.test.js`.
+- De Skills-runtime gebruikt de bestaande `createFractionPracticeTemplate()`, centrale PacoGO Page Template, `renderMixedNumber()` en `renderFractionAnswerInput()`.
+- Nieuwe route-ID: `mixed-like-denominator-division`; toegevoegd aan het bestaande Delen-overzicht.
+- Na een correct antwoord blijft de som staan en verschijnt **Volgende som**. Na de vijftiende som verschijnt **Opnieuw oefenen**, waarmee dezelfde reeks opnieuw begint.
+- Geen nieuwe lokale paginatemplate, geen Supabase-wijziging, geen curriculumwijziging en geen wijziging aan LIVE `main`.
+
+**Verificatie**
+- Implementatiecommit: `109841b8d200d5c790fad6d3c092ef8768be831a`.
+- Full Regression #4126 / run 44558838888: **GREEN / SUCCESS** op exact commit `109841b8d200d5c790fad6d3c092ef8768be831a`.
+- De workflow was de volledige `PacoGO full regression — refactor/professional-v1`, met status `completed` en conclusie `success`.
+- De bijbehorende lesson-save browser proof is geen afzonderlijke visuele proof van deze nieuwe breukenoefening; de gebruiker moet de nieuwe oefening nog visueel controleren in PacoGO TEST.
+
+**Actuele status**
+- Branch: `refactor/professional-v1`.
+- Laatste geverifieerde implementatiecommit: `109841b8d200d5c790fad6d3c092ef8768be831a`.
+- Laatste volledig geverifieerde Full Regression: #4126 — **GREEN / SUCCESS** op exact die commit.
+- LIVE `main` onaangeroerd; geen deployment en geen Supabase-wijziging.
+- Deze handoff-update is een afzonderlijke projectwijziging en moet zelf nog door Full Regression worden geverifieerd.
+
+**Volgende concrete stap**
+- Verifieer de handoff-update met Full Regression op de nieuwe handoff-commit.
+- Laat de gebruiker daarna de oefening visueel controleren in PacoGO TEST.
+- Voeg niets toe buiten deze opdracht.

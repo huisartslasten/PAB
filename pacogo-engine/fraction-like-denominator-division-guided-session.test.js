@@ -75,3 +75,36 @@ test('all ten guided division tasks complete in thirty valid steps', () => {
     attemptCount: 30, isComplete: true
   });
 });
+
+test('guided division accepts a correct simplification entered beside the original mixed fraction', () => {
+  const session = createFractionLikeDenominatorDivisionGuidedSession({ learnerKey: 'simplification-fields-learner', storage: memoryStorage(), tasks });
+  let step = session.getCurrentStep();
+  let result = session.recordResponse({ numerator: step.inverse.numerator, denominator: step.inverse.denominator });
+  step = result.currentStep;
+  result = session.recordResponse({ numerator: step.product.numerator, denominator: step.product.denominator });
+  step = result.currentStep;
+  result = session.recordResponse({ values: {
+    wholeNumber: '1', numerator: '2', denominator: '5',
+    wholeNumberEnabled: true
+  }});
+  assert.equal(result.classification, 'valid');
+
+  step = result.currentStep;
+  assert.equal(step.task.id, 'fraction-like-denominator-division-guided-02');
+  result = session.recordResponse({ numerator: step.inverse.numerator, denominator: step.inverse.denominator });
+  step = result.currentStep;
+  assert.equal(step.product.numerator, 108);
+  assert.equal(step.product.denominator, 72);
+  result = session.recordResponse({ values: {
+    wholeNumberEnabled: true,
+    wholeNumber: '1',
+    numerator: '36',
+    denominator: '72',
+    simplified: true,
+    simplifiedNumerator: '1',
+    simplifiedDenominator: '2'
+  }});
+  assert.equal(result.classification, 'valid');
+  assert.equal(result.progress.completedCount, 2);
+  assert.equal(result.progress.completedStepCount, 6);
+});

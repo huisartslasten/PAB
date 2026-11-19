@@ -8937,31 +8937,44 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Laat de gebruiker daarna de oefening visueel controleren in PacoGO TEST.
 - Voeg geen andere deelonderwerpen, uitlegstappen of extra functionaliteit toe zonder expliciete opdracht.
 
-## 33. Titel begeleide deling expliciet onderscheiden van zelfstandige oefening (19 november 2026)
+## 33. Begeleide oefening heel getal delen door breuk groter dan 1 (19 november 2026)
 
 **Gebruikersopdracht**
-- De gebruiker bevestigde dat voor de nieuwe oefening *Heel getal delen door een breukgetal groter dan 1 — met stappenplan* het bestaande stappenplan zo centraal mogelijk hergebruikt moet worden.
-- Alleen de begeleide oefening krijgt de expliciete aanduiding **— met stappenplan**. De zelfstandige variant blijft afzonderlijk en ongewijzigd.
+- Maak de volgende oefening: **Heel getal delen door een breukgetal groter dan 1 — met stappenplan**.
+- Gebruik de bestaande begeleide oefening en centrale templates zo veel mogelijk; pas alleen het aantal en de inhoud van de stappen voor de nieuwe oefening aan waar nodig.
+- De gebruiker gaf screenshots als inspiratie, niet om sommen één-op-één over te nemen.
+- Houd de zelfstandige oefening gescheiden van de begeleide variant.
 
-**Implementatie**
-- Alleen de titel in `renderWholeNumberDividedByFractionGreaterThanOneGuidedPractice()` is aangepast naar `Heel getal delen door een breukgetal groter dan 1 — met stappenplan`.
-- De bestaande vier stappen, tien gevalideerde opgaven, guided session, centrale Fraction Practice Template, antwoordcomponenten, voortgang, expliciete **Volgende som** en **Opnieuw oefenen** zijn hergebruikt.
-- Geen nieuwe template of tweede implementatie gemaakt.
-- De zelfstandige oefening `whole-number-divided-by-fraction-greater-than-one` is niet gewijzigd.
+**Bestaande bouwstenen en inhoud**
+- De begeleide oefening gebruikt de bestaande vierstappenstructuur en guided-session infrastructuur.
+- De reeks bevat 10 sommen.
+- De centrale PacoGO Page Template, Fraction Practice Template, bestaande breuknotatie en antwoordcomponenten worden hergebruikt; er is geen nieuwe lokale paginatemplate gemaakt.
+- De Skills-overzichtsregel onderscheidt de begeleide variant met de tekst **— met stappenplan** van de zelfstandige variant zonder die toevoeging.
+- De centrale oefenpagina behoudt de canonieke titel zonder toevoeging. De onderscheidende aanduiding hoort bij de Skills-overzichtsregel, niet als afwijkende paginatitel.
+- De gebruiker moet na elke som expliciet verdergaan; na de laatste som is **Opnieuw oefenen** beschikbaar.
 - Geen curriculum-, Supabase- of LIVE `main`-wijziging.
 
-**Verificatie**
-- Voorafgaande Full Regression #4091 — GREEN / SUCCESS op commit `57e1494912e7099db164ecf38ac110363b0987a3`.
-- Titelwijziging staat op commit `f66e2a11f46e4196293e85f2d475b1f21c564011`.
-- Na deze commit is via de beschikbare GitHub-verbinding nog geen nieuwe workflowrun gestart; Full Regression op `f66e2a11f46e4196293e85f2d475b1f21c564011` is daarom **niet geverifieerd**. De voorafgaande groene run geldt niet als verificatie van deze nieuwe commit.
+**Oorzaakanalyse en correctie**
+- Full Regression #4095 en #4096 waren rood door een verkeerde titelplaatsing: de begeleide aanduiding was in de runtime aan de verkeerde renderer gekoppeld.
+- Full Regression #4097 bleef rood omdat de centrale begeleide oefenpagina de canonieke titel zonder toevoeging moet houden.
+- Full Regression #4098 was rood door dezelfde titelcontract-mismatch.
+- De runtime is hersteld zodat de Skills-overzichtsregel de variant aanduidt en de centrale oefenpagina de canonieke titel behoudt.
+- Een gerichte navigatiecontrole is toegevoegd om vast te leggen dat de eerste overzichtsregel de guided route opent, de guided card rendert, vier stappen bevat en start met som 1 van 10.
+- De bestaande testverwachtingen zijn niet aangepast om een regressie te maskeren.
 
-**Actuele status**
+**Verificatie**
+- Full Regression #4099: **GREEN / SUCCESS** op exact commit `44d0954f51cf708cd65d0b95d875a58737da5622`.
+- Full Regression #4098: FAILURE op tussencommit `0fb37b2b4f4d48c5d88664a77ac3721e0e7f9b26`; niet als groen beschouwd.
+- De browserworkflow #857 op commit `44d0954f51cf708cd65d0b95d875a58737da5622` betreft de lesson-save browser proof en is geen afzonderlijke validatie van de fraction-guided navigatie.
+- De handoff-update zelf moet nog door Full Regression worden geverifieerd.
+
+**Actuele status vóór deze handoff-update**
 - Branch: `refactor/professional-v1`.
-- Laatste codecommit: `f66e2a11f46e4196293e85f2d475b1f21c564011`.
-- Laatste geverifieerde Full Regression: #4091 — GREEN op de voorgaande commit `57e1494912e7099db164ecf38ac110363b0987a3`.
-- Handoff-update volgt in de huidige commit; ook deze handoff-commit moet nog door Full Regression worden geverifieerd.
-- LIVE `main` onaangeroerd.
+- Laatste geverifieerde code-/testcommit: `44d0954f51cf708cd65d0b95d875a58737da5622`.
+- Laatste volledig geverifieerde Full Regression: #4099 — **GREEN / SUCCESS** op exact die commit.
+- LIVE `main` onaangeroerd; geen deployment en geen Supabase-wijziging.
 
 **Volgende concrete stap**
-- Start Full Regression op de actuele branch HEAD en verifieer de titelwijziging en de bestaande guided-division browserflows.
+- Verifieer deze handoff-update met Full Regression op de nieuwe handoff-commit.
 - Laat de gebruiker daarna de begeleide oefening visueel controleren in PacoGO TEST.
+- Voeg niets toe buiten de opdracht; wijzig geen centrale template tenzij een concrete visuele of functionele fout is vastgesteld.

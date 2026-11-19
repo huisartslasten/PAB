@@ -142,3 +142,45 @@
   font-size:28px!important;
   font-weight:800;
 }
+
+
+/* Begeleide deling: rustige, uniforme typografie en één tekstkleur voor alle rekenstappen. */
+.fraction-whole-number-divided-guided-card .fraction-guided-equation{
+  color:var(--paco-text);
+  font-family:"Baloo 2",Nunito,sans-serif;
+  font-size:28px;
+  font-weight:800;
+}
+.fraction-whole-number-divided-guided-card .fraction-guided-equation *,
+.fraction-whole-number-divided-guided-card .fraction-guided-equation *::before,
+.fraction-whole-number-divided-guided-card .fraction-guided-equation *::after{
+  color:inherit!important;
+  font-family:inherit!important;
+  font-size:inherit!important;
+  font-weight:inherit!important;
+}
+.fraction-whole-number-divided-guided-card .fraction-guided-step-expression,
+.fraction-whole-number-divided-guided-card .fraction-guided-step-completed-answer{
+  color:var(--paco-text);
+  font-family:"Baloo 2",Nunito,sans-serif;
+  font-size:20px;
+  font-weight:800;
+  line-height:1.2;
+}
+.fraction-whole-number-divided-guided-card .fraction-guided-step-expression *,
+.fraction-whole-number-divided-guided-card .fraction-guided-step-completed-answer *,
+.fraction-whole-number-divided-guided-card .fraction-guided-step-expression *::before,
+.fraction-whole-number-divided-guided-card .fraction-guided-step-completed-answer *::before,
+.fraction-whole-number-divided-guided-card .fraction-guided-step-expression *::after,
+.fraction-whole-number-divided-guided-card .fraction-guided-step-completed-answer *::after{
+  color:inherit!important;
+  font-family:inherit!important;
+  font-size:inherit!important;
+  font-weight:inherit!important;
+}
+.fraction-whole-number-divided-guided-card .fraction-guided-step-expression input,
+.fraction-whole-number-divided-guided-card .fraction-guided-step-completed-answer input{
+  font-family:inherit;
+  font-size:20px;
+  font-weight:800;
+}

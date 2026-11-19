@@ -2006,7 +2006,7 @@ export function createSkillsRuntime({
           feedback.textContent = 'Goed gedaan! Je hebt de deling correct uitgerekend.';
           progressLabel.textContent = formatFractionPracticeProgress(result.progress, exercise);
           if (result.progress.isComplete) {
-            template.showRestartAction(() => { session.reset(); renderCurrentTask(); });
+            renderCurrentTask();
           } else {
             template.showNextAction(renderCurrentTask);
           }

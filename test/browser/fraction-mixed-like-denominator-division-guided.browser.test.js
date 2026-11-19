@@ -76,7 +76,11 @@ test('guided mixed like-denominator division is a separate overview exercise wit
   await page.locator('[data-answer-part="primaryNumerator"]').fill(String(first.answer.numerator));
   await page.locator('[data-answer-part="primaryDenominator"]').fill(String(first.answer.denominator));
   await page.getByRole('button', { name: 'Controleren' }).click();
-  await expect(page.locator('.fraction-guided-step-card[open]')).toHaveCount(1);
+  const finalStepState = await page.locator('.fraction-guided-step-card').evaluateAll(cards => cards.map(card => ({
+    step: card.dataset.stepId, active: card.dataset.activeStepMatch, open: card.open
+  })));
+  console.log('GUIDED_FINAL_STEP_STATE', JSON.stringify(finalStepState));
+  await expect(page.locator('.fraction-guided-step-card[open]')).toHaveCount(0);
   await expect(page.locator('.fraction-guided-solution')).toContainText(String(first.answer.numerator));
   await expect(page.locator('.fraction-guided-step-card[open]')).toHaveCount(1);
   await expect(page.getByRole('button', { name: 'Volgende som' })).toBeVisible();

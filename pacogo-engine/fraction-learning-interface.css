@@ -1094,3 +1094,53 @@
 }
 @media(max-width:850px){.fraction-guided-step-grid--three{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.fraction-guided-step-grid--three{grid-template-columns:minmax(0,1fr)}}
+
+
+/* Gelijknamige breuken delen: doelsom links, alle drie zichtbare tussenstappen ernaast. */
+.fraction-like-denominator-division-guided-card .fraction-like-division-guided-layout{
+  display:grid;
+  grid-template-columns:minmax(190px,.7fr) minmax(0,2fr);
+  align-items:start;
+  gap:16px;
+  min-width:0;
+}
+.fraction-like-denominator-division-guided-card .fraction-like-division-guided-target{
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  min-width:0;
+  padding:18px 12px;
+  border:1px solid var(--paco-border,#d6e3f2);
+  border-radius:14px;
+  background:var(--paco-surface,#fff);
+}
+.fraction-like-denominator-division-guided-card .fraction-guided-step-grid--three{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  align-items:stretch;
+  gap:10px;
+  min-width:0;
+}
+.fraction-like-denominator-division-guided-card .fraction-guided-step-card{
+  min-width:0;
+  padding:12px;
+  border:1px solid var(--paco-border,#d6e3f2);
+  border-radius:14px;
+  background:var(--paco-surface,#fff);
+}
+.fraction-like-denominator-division-guided-card .fraction-guided-step-card[data-state="active"]{
+  border-color:var(--paco-primary,#1683ed);
+}
+.fraction-like-denominator-division-guided-card .fraction-guided-step-card[data-state="locked"]{
+  opacity:.72;
+}
+@media(max-width:1050px){
+  .fraction-like-denominator-division-guided-card .fraction-like-division-guided-layout{
+    grid-template-columns:minmax(0,1fr);
+  }
+}
+@media(max-width:700px){
+  .fraction-like-denominator-division-guided-card .fraction-guided-step-grid--three{
+    grid-template-columns:minmax(0,1fr);
+  }
+}

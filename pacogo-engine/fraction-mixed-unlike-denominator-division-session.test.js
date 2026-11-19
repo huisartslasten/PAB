@@ -15,7 +15,7 @@ function memoryStorage() {
 test("the bank contains fifteen unique divisions of mixed numbers greater than one with unlike denominators and exact simplified answers", () => {
   assert.equal(tasks.length, 15);
   assert.equal(new Set(tasks.map(task => task.id)).size, 15);
-  assert.equal(new Set(tasks.map(task => [task.left.whole,task.left.numerator,task.left.denominator,task.right.whole,task.right.numerator,task.right.denominator].join("|")).size, 15);
+  assert.equal(new Set(tasks.map(task => [task.left.whole,task.left.numerator,task.left.denominator,task.right.whole,task.right.numerator,task.right.denominator].join("|"))).size, 15);
   for (const task of tasks) {
     assert.ok(task.left.whole >= 1 && task.right.whole >= 1);
     assert.notEqual(task.left.denominator, task.right.denominator);

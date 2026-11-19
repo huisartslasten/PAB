@@ -2149,10 +2149,10 @@ export function createSkillsRuntime({
           if (item.id === 'convert_mixed_numbers') {
             const leftWork = documentRef.createElement('div'); leftWork.className = 'fraction-guided-step-subexpression';
             leftWork.append(renderMixedNumber({ wholeNumber: task.left.whole, numerator: task.left.numerator, denominator: task.left.denominator }, 'Eerste gemengde getal'), op('='));
-            const leftEntry = fractionEntry('Omgezette eerste breuk'); activeEntries.push(leftEntry); leftWork.append(leftEntry.wrap);
+            const leftEntry = renderFractionStepInput({ label: 'Omgezette eerste breuk', maxLength: 5, documentRef }); activeEntries.push(leftEntry); leftWork.append(leftEntry.wrap);
             const rightWork = documentRef.createElement('div'); rightWork.className = 'fraction-guided-step-subexpression';
             rightWork.append(renderMixedNumber({ wholeNumber: task.right.whole, numerator: task.right.numerator, denominator: task.right.denominator }, 'Tweede gemengde getal'), op('='));
-            const rightEntry = fractionEntry('Omgezette tweede breuk'); activeEntries.push(rightEntry); rightWork.append(rightEntry.wrap);
+            const rightEntry = renderFractionStepInput({ label: 'Omgezette tweede breuk', maxLength: 5, documentRef }); activeEntries.push(rightEntry); rightWork.append(rightEntry.wrap);
             expression.append(leftWork, rightWork);
           } else if (item.id === 'invert_divisor') {
             expression.append(renderFractionRepresentation({ numerator: task.leftImproper, denominator: task.left.denominator }, 'symbolic_fraction', 'Eerste onechte breuk'), op('×'));
@@ -2163,7 +2163,7 @@ export function createSkillsRuntime({
           } else if (item.id === 'convert_to_mixed_number') {
             expression.append(renderFractionRepresentation(task.product, 'symbolic_fraction', 'Onvereenvoudigde uitkomst'), op('='));
             const whole = scalarEntry('Hele getal van het gemengde antwoord');
-            activeEntry = renderFractionStepInput({ label: 'Rest van de onechte breuk');
+            activeEntry = renderFractionStepInput({ label: 'Rest van de onechte breuk', maxLength: 5, documentRef });
             activeEntries.push(activeEntry);
             activeEntries.push({ numerator: whole, focus: () => whole.focus() });
             activeEntry.denominator.value = String(task.product.denominator);

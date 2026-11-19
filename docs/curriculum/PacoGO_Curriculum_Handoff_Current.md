@@ -9205,3 +9205,30 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 **Volgende concrete stap**
 - Verifieer deze handoff-update met Full Regression op de nieuwe handoff-commit.
 - Voeg niets toe buiten de afgesproken overzichtsvolgorde.
+
+## 41. Browser regression — fraction division input computed display (19 november 2026)
+
+**Oorzaak**
+- Full Regression #4163 op commit `3ed1771a488da0bdb03a2a4686d130bbda823e74` faalde op de browsercontrole voor de begeleide oefening ongelijknamige breuken delen.
+- De test had twee afzonderlijke problemen: de `fractionInput`-snapshot was ten onrechte genest in het route-object, en de test verwachtte `inline-grid` als berekende weergave.
+- De centrale CSS-regel voor `inline-grid` matcht correct. Het breukinvoerveld is een flexonderdeel binnen `.fraction-guided-step-expression`; CSS Display blockificeert de berekende weergave daarom naar `grid`. Dit is browsergedrag, geen runtime- of CSS-fout.
+
+**Correctie**
+- De test-snapshot voor het breukinvoerveld staat los van de routegegevens.
+- De DOM-selectie is beperkt tot `.fraction-unlike-denominator-division-guided-card`.
+- De test verwacht de correcte berekende waarde `grid` en behoudt de controles op drie rijen, twee invoervelden, de breukstreep, `align-items: start` en `align-self: start`.
+- Geen runtime-, centrale template-, CSS-, curriculum-, taakbank- of Supabase-wijziging.
+
+**Verificatie**
+- Code-/testcommit: `a1bbcca31d396046daf9cb0b5af8eafc9e8beabd`.
+- Browser refactor proof #888 / run 44613917654: **GREEN / SUCCESS**.
+- Full Regression #4168 / run 44613917567: **GREEN / SUCCESS** op exact commit `a1bbcca31d396046daf9cb0b5af8eafc9e8beabd`; alle regressionstappen, inclusief browserregressie en clean-working-tree-controle, zijn geslaagd.
+
+**Actuele status**
+- Branch: `refactor/professional-v1`.
+- Laatste volledig geverifieerde code-/testcommit: `a1bbcca31d396046daf9cb0b5af8eafc9e8beabd`.
+- Laatste volledig geverifieerde Full Regression: #4168 — **GREEN / SUCCESS** op exact die commit.
+- LIVE `main` onaangeroerd; geen deployment en geen Supabase-wijziging.
+
+**Volgende concrete stap**
+- Geen verdere wijziging nodig voor deze regressiefout. Ga uitsluitend verder met de volgende expliciet afgesproken PacoGO-stap.

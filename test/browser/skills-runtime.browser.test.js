@@ -1896,10 +1896,10 @@ test('Delen in the fraction overview opens both independent and guided division 
   expect(result.labels).toEqual([
     'Heel getal delen door een breukgetal groter dan 1 — met stappenplan',
     'Heel getal delen door een breukgetal groter dan 1 — zonder stappenplan',
-    'Gelijknamige breuken kleiner dan 1 op elkaar delen',
     'Gelijknamige breuken kleiner dan 1 op elkaar delen — met stappenplan',
-    'Gelijknamige breuken groter dan 1 op elkaar delen',
+    'Gelijknamige breuken kleiner dan 1 op elkaar delen',
     'Gelijknamige breuken groter dan 1 op elkaar delen — met stappenplan',
+    'Gelijknamige breuken groter dan 1 op elkaar delen',
     'Ongelijknamige breuken kleiner dan 1 op elkaar delen',
     'Ongelijknamige breuken groter dan 1 op elkaar delen'
   ]);
@@ -1910,10 +1910,10 @@ test('Delen in the fraction overview opens both independent and guided division 
   expect(result.navigations[0]).toContain('topic=delen');
   expect(result.navigations[1]).toContain('exercise=whole-number-divided-by-fraction-greater-than-one-guided');
   expect(result.navigations[2]).toContain('exercise=whole-number-divided-by-fraction-greater-than-one');
-  expect(result.navigations[3]).toContain('exercise=like-denominator-division');
-  expect(result.navigations[4]).toContain('exercise=like-denominator-division-guided');
-  expect(result.navigations[5]).toContain('exercise=mixed-like-denominator-division');
-  expect(result.navigations[6]).toContain('exercise=mixed-like-denominator-division-guided');
+  expect(result.navigations[3]).toContain('exercise=like-denominator-division-guided');
+  expect(result.navigations[4]).toContain('exercise=like-denominator-division');
+  expect(result.navigations[5]).toContain('exercise=mixed-like-denominator-division-guided');
+  expect(result.navigations[6]).toContain('exercise=mixed-like-denominator-division');
   expect(result.navigations[7]).toContain('exercise=unlike-denominator-division');
   expect(result.navigations[8]).toContain('exercise=mixed-unlike-denominator-division');
   expect(result.guidedRoute).toEqual({

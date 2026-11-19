@@ -260,10 +260,10 @@ export function createSkillsRuntime({
     const items = [
       { label: 'Heel getal delen door een breukgetal groter dan 1 — met stappenplan', level: 1, exercise: 'whole-number-divided-by-fraction-greater-than-one-guided' },
       { label: 'Heel getal delen door een breukgetal groter dan 1 — zonder stappenplan', level: 1, exercise: 'whole-number-divided-by-fraction-greater-than-one' },
-      { label: 'Gelijknamige breuken kleiner dan 1 op elkaar delen', level: 2, exercise: 'like-denominator-division' },
       { label: 'Gelijknamige breuken kleiner dan 1 op elkaar delen — met stappenplan', level: 2, exercise: 'like-denominator-division-guided' },
-      { label: 'Gelijknamige breuken groter dan 1 op elkaar delen', level: 2, exercise: 'mixed-like-denominator-division' },
+      { label: 'Gelijknamige breuken kleiner dan 1 op elkaar delen', level: 2, exercise: 'like-denominator-division' },
       { label: 'Gelijknamige breuken groter dan 1 op elkaar delen — met stappenplan', level: 2, exercise: 'mixed-like-denominator-division-guided' },
+      { label: 'Gelijknamige breuken groter dan 1 op elkaar delen', level: 2, exercise: 'mixed-like-denominator-division' },
       { label: 'Ongelijknamige breuken kleiner dan 1 op elkaar delen', level: 3, exercise: 'unlike-denominator-division' },
       { label: 'Ongelijknamige breuken groter dan 1 op elkaar delen', level: 4, exercise: 'mixed-unlike-denominator-division' }
     ];

@@ -117,33 +117,6 @@
 .fraction-guided-step-grid--progressive .fraction-guided-step-card[open]{overflow:visible}
 
 
-/* Begeleide deling: één vaste tekengrootte voor de volledige som en alle vier uitwerkingen. */
-.fraction-whole-number-divided-guided-card .fraction-guided-equation,
-.fraction-whole-number-divided-guided-card .fraction-guided-step-card[data-state="completed"] .fraction-guided-step-completed-answer{
-  font-size:28px;
-  line-height:1.2;
-}
-.fraction-whole-number-divided-guided-card .fraction-guided-equation .fraction-guided-operator,
-.fraction-whole-number-divided-guided-card .fraction-guided-equation .pacogo-fraction-representation--symbolic,
-.fraction-whole-number-divided-guided-card .fraction-guided-equation .fraction-whole-mixed-expression__whole,
-.fraction-whole-number-divided-guided-card .fraction-guided-step-card[data-state="completed"] .fraction-guided-step-completed-answer .fraction-guided-operator,
-.fraction-whole-number-divided-guided-card .fraction-guided-step-card[data-state="completed"] .fraction-guided-step-completed-answer .pacogo-fraction-representation--symbolic,
-.fraction-whole-number-divided-guided-card .fraction-guided-step-card[data-state="completed"] .fraction-guided-step-completed-answer .fraction-whole-mixed-expression__whole,
-.fraction-whole-number-divided-guided-card .fraction-guided-step-card[data-state="completed"] .fraction-guided-step-completed-answer .fraction-guided-step-number{
-  font-size:inherit!important;
-}
-.fraction-whole-number-divided-guided-card .fraction-guided-equation *,
-.fraction-whole-number-divided-guided-card .fraction-guided-step-card[data-state="completed"] .fraction-guided-step-completed-answer *{
-  font-size:inherit!important;
-}
-.fraction-whole-number-divided-guided-card .fraction-guided-equation .fraction-whole-mixed-expression__whole,
-.fraction-whole-number-divided-guided-card .fraction-guided-solution .fraction-whole-mixed-expression__whole{
-  font-family:"Baloo 2",Nunito,sans-serif;
-  font-size:28px!important;
-  font-weight:800;
-}
-
-
 /* Begeleide deling: rustige, uniforme typografie en één tekstkleur voor alle rekenstappen. */
 .fraction-whole-number-divided-guided-card .fraction-guided-equation{
   color:var(--paco-text);
@@ -160,11 +133,11 @@
   font-weight:inherit!important;
 }
 .fraction-whole-number-divided-guided-card .fraction-guided-step-expression,
-.fraction-whole-number-divided-guided-card .fraction-guided-step-completed-answer{
+.fraction-whole-number-divided-guided-card .fraction-guided-step-card[data-state="completed"] .fraction-guided-step-completed-answer{
   color:var(--paco-text);
   font-family:"Baloo 2",Nunito,sans-serif;
-  font-size:20px;
-  font-weight:800;
+  font-size:20px!important;
+  font-weight:800!important;
   line-height:1.2;
 }
 .fraction-whole-number-divided-guided-card .fraction-guided-step-expression *,
@@ -175,8 +148,8 @@
 .fraction-whole-number-divided-guided-card .fraction-guided-step-completed-answer *::after{
   color:inherit!important;
   font-family:inherit!important;
-  font-size:inherit!important;
-  font-weight:inherit!important;
+  font-size:20px!important;
+  font-weight:800!important;
 }
 .fraction-whole-number-divided-guided-card .fraction-guided-step-expression input,
 .fraction-whole-number-divided-guided-card .fraction-guided-step-completed-answer input{

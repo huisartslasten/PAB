@@ -1357,7 +1357,6 @@ export function createSkillsRuntime({
       learnerKey, tasks: FRACTION_LIKE_DENOMINATOR_DIVISION_GUIDED_TASKS
     });
     const exercise = { title: 'Gelijknamige breuken kleiner dan 1 op elkaar delen', difficultyLevel: 2, maxDifficultyLevel: 5 };
-    const labels = ['Keer de tweede breuk om', 'Vermenigvuldig de breuken', 'Vereenvoudig de uitkomst'];
     let awaitingNextTask = false, completedTaskSnapshot = null;
 
     function fractionEntry(label) {
@@ -2858,7 +2857,9 @@ export function createSkillsRuntime({
       title: showingAnyPractice ? 'Oefenen' : showingAddition ? 'Optellen' : showingSubtraction ? 'Aftrekken' : showingMultiplication ? 'Vermenigvuldigen' : showingDivision ? 'Delen' : showingFractions ? 'Breuken' : 'Skills',
       icon: showingAddition ? '➕' : showingSubtraction ? '➖' : showingMultiplication ? '✖️' : showingDivision ? '➗' : showingFractions ? '½' : '📘',
       layoutMode: showingAnyPractice ? 'practice' : 'standard',
-      subtitle: showingLikeDenominatorDivisionPractice
+      subtitle: showingLikeDenominatorDivisionGuidedPractice
+        ? 'Breuken → Delen → Gelijknamige breuken kleiner dan 1 op elkaar delen — met stappenplan.'
+        : showingLikeDenominatorDivisionPractice
         ? 'Breuken → Delen → Gelijknamige breuken kleiner dan 1 op elkaar delen.'
         : showingWholeNumberDividedByFractionGreaterThanOneGuidedPractice
         ? 'Breuken → Delen → Heel getal delen door een breukgetal groter dan 1 — met stappenplan.'

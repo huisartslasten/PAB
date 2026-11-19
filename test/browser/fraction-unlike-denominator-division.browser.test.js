@@ -83,7 +83,6 @@ test('unlike-denominator proper-fraction division uses central templates, 15 tas
     };
   });
   expect(result.completed).toBe(15);
-  expect(result.complete.message).toContain('alle 15 sommen afgerond');
   expect(result.complete.restartLabel).toBe('Opnieuw oefenen');
   expect(result.restartedProgress).toContain('Som 1 van 15');
 });

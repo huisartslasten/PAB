@@ -3305,6 +3305,7 @@ export function createSkillsRuntime({
 
     if (showingMixedLikeDenominatorDivisionGuidedPractice) renderMixedLikeDenominatorDivisionGuidedPractice();
     else if (showingMixedLikeDenominatorDivisionPractice) renderMixedLikeDenominatorDivisionPractice();
+    else if (showingMixedLikeDenominatorDivisionGuidedPractice) renderMixedLikeDenominatorDivisionGuidedPractice();
     else if (showingLikeDenominatorDivisionGuidedPractice) renderLikeDenominatorDivisionGuidedPractice();
     else if (showingLikeDenominatorDivisionPractice) renderLikeDenominatorDivisionPractice();
     else if (showingWholeNumberDividedByFractionGreaterThanOneGuidedPractice) renderWholeNumberDividedByFractionGreaterThanOneGuidedPractice();

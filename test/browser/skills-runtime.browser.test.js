@@ -156,6 +156,7 @@ test('Optellen in the fraction overview opens the eight-row addition overview wi
   expect(result.levels).toEqual([1, 1, 2, 2, 3, 3, 4, 5]);
   expect(result.boneCounts).toEqual([5, 5, 5, 5, 5, 5, 5, 5]);
   expect(result.centralCard).toBe(true);
+  expect(result.guidedRoute).toEqual({ title: 'Oefenen', stepCount: 5, activeStep: 'convert_mixed_numbers', progress: 'Som 1 van 10 · Niveau 2 van 5' });
   expect(result.customDots).toBe(0);
 });
 
@@ -1863,7 +1864,21 @@ test('Delen in the fraction overview opens both independent and guided division 
     const rows = [...document.querySelectorAll('.skills-addition-overview-row')];
     const buttons = [...document.querySelectorAll('.skills-addition-overview-open')];
     buttons.forEach(button => button.click());
+    localStorage.removeItem('pacogo:fraction-mixed-like-denominator-division-guided:v1:Zyon');
+    const guided = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'delen', exercise: 'mixed-like-denominator-division-guided',
+      documentRef: document, navigate: target => navigations.push(String(target))
+    });
+    await guided.mount();
+    const guidedRoute = {
+      title: document.querySelector('.paco-template-main h1')?.textContent || '',
+      stepCount: document.querySelectorAll('.fraction-guided-step-card').length,
+      activeStep: document.querySelector('.fraction-guided-step-card[data-state="active"]')?.dataset.stepId || '',
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || ''
+    };
     return {
+      guidedRoute,
       title: document.querySelector('.paco-template-main h1')?.textContent || '',
       centralPage: Boolean(document.querySelector('.paco-page-template')),
       centralCard: Boolean(document.querySelector('.skills-addition-overview.card')),

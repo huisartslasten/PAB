@@ -1564,7 +1564,7 @@ export function createSkillsRuntime({
       learnerKey,
       tasks: FRACTION_WHOLE_NUMBER_DIVIDED_BY_FRACTION_GREATER_THAN_ONE_GUIDED_TASKS
     });
-    const exercise = { title: 'Heel getal delen door een breukgetal groter dan 1 — met stappenplan', difficultyLevel: 1, maxDifficultyLevel: 5 };
+    const exercise = { title: 'Heel getal delen door een breukgetal groter dan 1', difficultyLevel: 1, maxDifficultyLevel: 5 };
     const stepIds = ['convert_mixed_number', 'make_divisor_whole', 'scale_dividend', 'calculate_quotient'];
     const stepLabels = ['Zet het gemengde getal om', 'Vergroot de breuk tot een heel getal', 'Vergroot het hele getal', 'Reken de som uit'];
     let awaitingNextTask = false;

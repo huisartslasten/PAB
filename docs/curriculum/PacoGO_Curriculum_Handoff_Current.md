@@ -8901,3 +8901,38 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 **Volgende concrete stap**
 - Laat de gebruiker de begeleide delingsoefening in PacoGO TEST visueel controleren: na afronding moeten de oorspronkelijke som, vier uitwerkstappen en ingevulde antwoorden zichtbaar blijven tot **Volgende som** wordt gekozen.
 - Voeg niets toe buiten deze opdracht.
+
+## 32. Breuken → Delen → Gelijknamige breuken kleiner dan 1 op elkaar delen (18 november 2026)
+
+**Opdracht en brongebruik**
+- De gebruiker leverde screenshots aan als inhoudelijke/visuele referentie voor het delen van twee gelijknamige breuken kleiner dan 1.
+- De voorbeelden zijn niet één-op-één overgenomen.
+- De nieuwe oefenreeks bevat 15 unieke sommen. Beide breuken zijn kleiner dan 1, hebben dezelfde noemer en de teller van de eerste breuk is groter dan die van de tweede. De quotiënten zijn groter dan 1 en de antwoorden zijn vereenvoudigde gemengde getallen.
+
+**Implementatie**
+- Taakbank: `pacogo-engine/fraction-like-denominator-division-task-bank.js`.
+- Sessie: `pacogo-engine/fraction-like-denominator-division-session.js`.
+- De oefening is aangesloten op de bestaande Skills-runtime met route-ID `like-denominator-division`.
+- De bestaande centrale PacoGO Page Template, Fraction Practice Template, `renderFractionRepresentation()` en `renderFractionAnswerInput()` worden hergebruikt.
+- Het antwoord wordt als gemengd getal ingevuld; de centrale antwoordcomponent verzorgt de teller/noemer en vereenvoudigingsbediening.
+- Na een correct antwoord verschijnt expliciet **Volgende som**; er is geen automatische overgang. Na som 15 verschijnt **Opnieuw oefenen**, waarmee dezelfde reeks opnieuw begint.
+- Geen nieuwe lokale pagina-template, geen extra visualisatie of aanvullende functionaliteit, geen curriculum-/Supabase-wijziging en geen wijziging aan LIVE `main`.
+
+**Tests en verificatie**
+- Taakbank-, sessie- en runtime-implementatie zijn opgenomen in commitreeks die eindigt op `b42149b049643709f2b7cda17a58280ca9936de0`.
+- De sessietest gebruikt de bestaande Node-teststandaard (`node:test)); de browser-test gebruikt de veldnamen van de centrale antwoordcomponent.
+- Gerichte Browser Proof #855: **GREEN / SUCCESS** op exact commit `f9b328956bbf1dffdc40c528925fe95455185f98`.
+- Full Regression #4089: **GREEN / SUCCESS** op exact hetzelfde commit. Curriculum-engine-regressie, architectuurgrenzen, onderhouden en gemigreerde Node-tests en browserregressie zijn geslaagd.
+- Eerdere rode runs #4085–#4088 betroffen tussencommits en aantoonbare testcontract-/browserselectorproblemen; deze zijn onderzocht en gecorrigeerd. Ze zijn niet als groen gerapporteerd.
+
+**Actuele status vóór deze handoff-update**
+- Branch: `refactor/professional-v1`.
+- Laatste geverifieerde code-/testcommit: `f9b328956bbf1dffdc40c528925fe95455185f98`.
+- Laatste volledig geverifieerde Full Regression: #4089 — **GREEN / SUCCESS** op exact die commit.
+- Laatste gerichte Browser Proof: #855 — **GREEN / SUCCESS** op exact die commit.
+- LIVE `main` onaangeroerd; geen deployment en geen Supabase-wijziging.
+
+**Volgende concrete stap**
+- Verifieer deze handoff-update met Full Regression op de nieuwe handoff-commit.
+- Laat de gebruiker daarna de oefening visueel controleren in PacoGO TEST.
+- Voeg geen andere deelonderwerpen, uitlegstappen of extra functionaliteit toe zonder expliciete opdracht.

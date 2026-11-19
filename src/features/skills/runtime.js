@@ -1884,6 +1884,7 @@ export function createSkillsRuntime({
             ? 'Kijk hoe vaak de noemer in de teller past. Trek dat aantal keer de noemer van de teller af. Vul het hele getal en de rest in.'
             : 'Vul het antwoord als gemengd getal in en vereenvoudig het breukdeel zo ver mogelijk.';
           const expression = documentRef.createElement('div'); expression.className = 'fraction-guided-step-expression';
+          if (item.id === 'convert_mixed_numbers') expression.classList.add('fraction-guided-step-expression--paired');
           if (item.id === 'convert_mixed_numbers') {
             const leftWork = documentRef.createElement('div'); leftWork.className = 'fraction-guided-step-subexpression';
             leftWork.append(renderMixedNumber({ wholeNumber: task.left.whole, numerator: task.left.numerator, denominator: task.left.denominator }, 'Eerste gemengde getal'), op('='));

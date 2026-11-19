@@ -1901,37 +1901,11 @@ test('Delen in the fraction overview opens both independent and guided division 
       progress: document.querySelector('.fraction-practice-progress')?.textContent || ''
     };
     const fractionInput = (() => {
-      const input = document.querySelector('.fraction-guided-fraction-input');
-      const matchedRules = [];
-      const collectRules = (rules, href) => {
-        for (const rule of [...rules]) {
-          if (rule.selectorText && input?.matches(rule.selectorText) && rule.style?.display) {
-            matchedRules.push({
-              href, selector: rule.selectorText, display: rule.style.display,
-              important: rule.style.getPropertyPriority('display')
-            });
-          }
-          if (rule.cssRules) collectRules(rule.cssRules, href);
-        }
-      };
-      for (const sheet of [...document.styleSheets]) {
-        try { collectRules(sheet.cssRules, sheet.href || 'inline'); } catch {}
-      }
-      console.log('FRACTION_DIVISION_INPUT_DIAGNOSTIC', JSON.stringify({
-        className: input?.className || '',
-        inlineDisplay: input?.style.display || '',
-        closestCard: input?.closest('section')?.className || '',
-        matchesDivisionSelector: Boolean(input?.matches('.fraction-division-guided-card .fraction-guided-fraction-input')),
-        matchedRules
-      }));
-      const grid = document.querySelector('.fraction-guided-step-grid--progressive');
-      const locked = document.querySelector('.fraction-guided-step-card[data-state="locked"]');
+      const card = document.querySelector('.fraction-unlike-denominator-division-guided-card');
+      const input = card?.querySelector('.fraction-guided-fraction-input');
+      const grid = card?.querySelector('.fraction-guided-step-grid--progressive');
+      const locked = card?.querySelector('.fraction-guided-step-card[data-state="locked"]');
       return {
-        className: input?.className || '',
-        closestCard: input?.closest('section')?.className || '',
-        matchesDivisionSelector: Boolean(input?.matches('.fraction-division-guided-card .fraction-guided-fraction-input')),
-        matchedRules,
-        inlineDisplay: input?.style.display || '',
         display: input ? getComputedStyle(input).display : '',
         rows: input ? getComputedStyle(input).gridTemplateRows.split(' ').length : 0,
         inputCount: input?.querySelectorAll('input').length || 0,
@@ -1979,8 +1953,9 @@ test('Delen in the fraction overview opens both independent and guided division 
     title: 'Oefenen', stepCount: 3, activeStep: 'invert_divisor',
     progress: 'Som 1 van 10 · Niveau 3 van 5'
   });
+  // The inline-grid wrapper is a flex item, so its computed display is blockified to grid.
   expect(result.fractionInput).toEqual({
-    display: 'inline-grid', rows: 3, inputCount: 2, hasFractionBar: true,
+    display: 'grid', rows: 3, inputCount: 2, hasFractionBar: true,
     gridAlignItems: 'start', lockedAlignSelf: 'start'
   });
 });

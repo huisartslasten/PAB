@@ -2259,7 +2259,7 @@ test('first division overview row opens the guided whole-number divided by mixed
 });
 
 
-test('guided like-denominator division keeps the target beside all three visible steps with uniform numerals', async ({ page }) => {
+test('guided like-denominator division keeps the target above progressive visible steps', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=delen', { waitUntil: 'domcontentloaded' });
   const result = await page.evaluate(async () => {
     localStorage.removeItem('pacogo:fraction-like-denominator-division-guided:v1:Zyon');
@@ -2295,19 +2295,18 @@ test('guided like-denominator division keeps the target beside all three visible
       '.fraction-like-denominator-division-guided-card .fraction-guided-step-expression .pacogo-fraction-representation--symbolic, ' +
       '.fraction-like-denominator-division-guided-card .fraction-guided-step-expression input'
     )];
-    const layout = document.querySelector('.fraction-like-division-guided-layout');
-    const targetEquation = layout?.querySelector('.fraction-like-division-guided-target');
-    const stepGrid = layout?.querySelector('.fraction-guided-step-grid');
+    const equation = document.querySelector('.fraction-like-denominator-division-guided-card .fraction-guided-equation');
+    const grid = document.querySelector('.fraction-like-denominator-division-guided-card .fraction-guided-step-grid--progressive');
     return {
       route: target.searchParams.get('exercise'),
       title: document.querySelector('.fraction-like-denominator-division-guided-card h2')?.textContent || '',
       progress: document.querySelector('.fraction-practice-progress')?.textContent || '',
       stepCount: steps.length,
       visibleSteps: steps.filter(item => item.getBoundingClientRect().height > 0).length,
+      openSteps: steps.filter(item => item.open).length,
       stepTags: steps.map(item => item.tagName.toLowerCase()),
       activeStep: steps.find(item => item.dataset.state === 'active')?.dataset.stepId || '',
-      targetVisible: Boolean(targetEquation && targetEquation.getBoundingClientRect().height > 0),
-      targetLeftOfSteps: Boolean(targetEquation && stepGrid && targetEquation.getBoundingClientRect().right <= stepGrid.getBoundingClientRect().left + 1),
+      targetAboveSteps: Boolean(equation && grid && equation.getBoundingClientRect().bottom <= grid.getBoundingClientRect().top + 1),
       numeralSizes: numeralNodes.map(node => getComputedStyle(node).fontSize)
     };
   });
@@ -2316,14 +2315,13 @@ test('guided like-denominator division keeps the target beside all three visible
   expect(result.progress).toContain('Som 1 van 10');
   expect(result.stepCount).toBe(3);
   expect(result.visibleSteps).toBe(3);
-  expect(result.stepTags).toEqual(['section', 'section', 'section']);
+  expect(result.openSteps).toBe(1);
+  expect(result.stepTags).toEqual(['details', 'details', 'details']);
   expect(result.activeStep).toBe('invert_divisor');
-  expect(result.targetVisible).toBe(true);
-  expect(result.targetLeftOfSteps).toBe(true);
+  expect(result.targetAboveSteps).toBe(true);
   expect(result.numeralSizes.length).toBeGreaterThan(0);
   expect(new Set(result.numeralSizes)).toEqual(new Set(['24px']));
 });
-
 test('guided like-denominator division completes ten sums and restarts from the central fraction template', async ({ page }) => {
   await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=delen', { waitUntil: 'domcontentloaded' });
   const result = await page.evaluate(async () => {
@@ -2392,7 +2390,7 @@ test('guided like-denominator division completes ten sums and restarts from the 
       completed,
       restartedProgress: document.querySelector('.fraction-practice-progress')?.textContent || '',
       restartedActiveStep: document.querySelector('.fraction-guided-step-card[data-state="active"]')?.dataset.stepId || '',
-      restartedTaskVisible: Boolean(document.querySelector('.fraction-like-division-guided-target'))
+      restartedTaskVisible: Boolean(document.querySelector('.fraction-guided-equation'))
     };
   });
   expect(result.completed.progress).toContain('10 van 10 afgerond');

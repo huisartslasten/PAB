@@ -2135,6 +2135,11 @@ test('guided division completes ten tasks, offers restart, and resets through th
           expanded: [...document.querySelectorAll('.fraction-guided-step-card')].every(card => card.open),
           prompt: document.querySelector('.fraction-guided-task-prompt')?.textContent || '',
           solution: document.querySelector('.fraction-guided-solution')?.textContent || '',
+          stepAnswerFontSizes: [...document.querySelectorAll('.fraction-guided-step-completed-answer')].flatMap(answer => [
+            getComputedStyle(answer).fontSize,
+            ...[...answer.querySelectorAll('.fraction-guided-operator, .pacogo-fraction-representation--symbolic, .fraction-whole-mixed-expression__whole')].map(node => getComputedStyle(node).fontSize)
+          ]),
+          topEquationFontSizes: [...document.querySelectorAll('.fraction-guided-equation .fraction-guided-operator, .fraction-guided-equation .pacogo-fraction-representation--symbolic, .fraction-guided-equation .fraction-whole-mixed-expression__whole')].map(node => getComputedStyle(node).fontSize),
           feedback: document.querySelector('.fraction-practice-feedback')?.textContent || ''
         };
       }
@@ -2167,6 +2172,10 @@ test('guided division completes ten tasks, offers restart, and resets through th
   expect(result.completedWork.expanded).toBe(true);
   expect(result.completedWork.prompt).not.toBe('');
   expect(result.completedWork.solution).toContain('=');
+  expect(result.completedWork.stepAnswerFontSizes.length).toBeGreaterThan(0);
+  expect(new Set(result.completedWork.stepAnswerFontSizes)).toEqual(new Set(['20px']));
+  expect(result.completedWork.topEquationFontSizes.length).toBeGreaterThan(0);
+  expect(new Set(result.completedWork.topEquationFontSizes)).toEqual(new Set(['30px']));
   expect(result.completedWork.feedback).toContain('Goed gedaan');
   expect(result.restartedProgress).toContain('Som 1 van 10');
   expect(result.restartedStepCount).toBe(4);

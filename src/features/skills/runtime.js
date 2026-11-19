@@ -1385,7 +1385,7 @@ export function createSkillsRuntime({
       const title = documentRef.createElement('h2'); title.textContent = exercise.title;
       const instruction = documentRef.createElement('p');
       instruction.className = 'fraction-practice-instruction';
-      instruction.textContent = 'Werk de drie stappen één voor één af. De doelsom en alle tussenstappen blijven zichtbaar.';
+      instruction.textContent = 'Werk de drie stappen één voor één af. Je gaat pas verder als je de huidige stap goed hebt gedaan.';
       const progressLabel = documentRef.createElement('p');
       progressLabel.className = 'fraction-practice-progress';
       progressLabel.textContent = formatFractionPracticeProgress(progress, exercise);
@@ -1404,11 +1404,12 @@ export function createSkillsRuntime({
         op('÷'),
         renderFractionRepresentation(step.task.right, 'symbolic_fraction', 'Tweede breuk')
       );
-      const equation = documentRef.createElement('div'); equation.className = 'fraction-guided-equation fraction-like-division-guided-target';
+      const equation = documentRef.createElement('div'); equation.className = 'fraction-guided-equation';
       equation.setAttribute('aria-label', 'Doelsom'); equation.append(prompt);
-      const grid = documentRef.createElement('div'); grid.className = 'fraction-guided-step-grid fraction-guided-step-grid--three';
+      template.promptArea.append(equation);
+      const grid = documentRef.createElement('div'); grid.className = 'fraction-guided-step-grid fraction-guided-step-grid--progressive';
       grid.setAttribute('aria-label', 'Drie denkstappen');
-      grid.dataset.activeStep = step.stepId;
+      grid.dataset.activeStep = awaitingNextTask ? 'completed' : step.stepId;
       let activeEntry = null, activeAnswer = null;
       const completed = step.completedStepIds;
       const summaries = [
@@ -1418,13 +1419,16 @@ export function createSkillsRuntime({
       ];
       summaries.forEach((item, index) => {
         const isDone = completed.includes(item.id), isActive = step.stepId === item.id;
-        const panel = documentRef.createElement('section'); panel.className = 'fraction-guided-step-card';
+        const panel = documentRef.createElement('details'); panel.className = 'fraction-guided-step-card';
+        panel.open = awaitingNextTask || isActive;
         panel.dataset.stepId = item.id;
         panel.dataset.state = isDone ? 'completed' : isActive ? 'active' : 'locked';
         panel.setAttribute('aria-label', 'Stap ' + (index + 1) + ': ' + item.text);
+        const summary = documentRef.createElement('summary'); summary.className = 'fraction-guided-step-summary';
         const heading = documentRef.createElement('h3'); heading.textContent = 'Stap ' + (index + 1);
         const label = documentRef.createElement('p'); label.className = 'fraction-guided-step-title'; label.textContent = item.text;
-        panel.append(heading, label);
+        summary.append(heading, label); panel.append(summary);
+        const body = documentRef.createElement('div'); body.className = 'fraction-guided-step-content';
         if (isDone) {
           const status = documentRef.createElement('p'); status.className = 'fraction-guided-step-status'; status.textContent = 'Afgerond';
           const answer = documentRef.createElement('div'); answer.className = 'fraction-guided-step-completed-answer';
@@ -1433,7 +1437,7 @@ export function createSkillsRuntime({
           } else {
             answer.append(renderFractionRepresentation(item.result, 'symbolic_fraction', 'Uitkomst van de stap'));
           }
-          panel.append(status, answer);
+          body.append(status, answer);
         } else if (isActive) {
           const help = documentRef.createElement('p'); help.className = 'fraction-guided-step-prompt';
           help.textContent = item.id === 'invert_divisor'
@@ -1489,16 +1493,14 @@ export function createSkillsRuntime({
           panel.addEventListener('keydown', event => {
             if (event.key === 'Enter' && event.target instanceof documentRef.defaultView.HTMLInputElement) { event.preventDefault(); check.click(); }
           });
-          panel.append(help, expression, check);
+          body.append(help, expression, check);
         } else {
           const status = documentRef.createElement('p'); status.className = 'fraction-guided-step-status';
-          status.textContent = 'Komt hierna'; panel.append(status);
+          status.textContent = 'Komt hierna'; body.append(status);
         }
-        grid.append(panel);
+        panel.append(body); grid.append(panel);
       });
-      const layout = documentRef.createElement('div'); layout.className = 'fraction-like-division-guided-layout';
-      layout.append(equation, grid);
-      template.workArea.append(layout);
+      template.workArea.append(grid);
       if (feedbackMessage) {
         const feedback = documentRef.createElement('p'); feedback.className = 'fraction-practice-feedback is-correct';
         feedback.setAttribute('role','status'); feedback.textContent = feedbackMessage; template.feedbackArea.append(feedback);

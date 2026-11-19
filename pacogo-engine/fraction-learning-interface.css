@@ -1032,34 +1032,34 @@
 
 /* Begeleide oefening: gelijknamige breuken delen — drie stappen en uniforme cijfermaat. */
 .fraction-guided-step-grid--three{grid-template-columns:repeat(3,minmax(0,1fr))}
-.fraction-like-denominator-division-guided-card .fraction-guided-task-prompt,
-.fraction-like-denominator-division-guided-card .fraction-guided-step-expression,
-.fraction-like-denominator-division-guided-card .fraction-guided-step-completed-answer{
+.fraction-division-guided-card .fraction-guided-task-prompt,
+.fraction-division-guided-card .fraction-guided-step-expression,
+.fraction-division-guided-card .fraction-guided-step-completed-answer{
   color:var(--paco-text);
   font-family:"Baloo 2",Nunito,sans-serif;
   font-size:24px!important;
   font-weight:800!important;
   line-height:1.2;
 }
-.fraction-like-denominator-division-guided-card .fraction-guided-task-prompt *,
-.fraction-like-denominator-division-guided-card .fraction-guided-step-expression *,
-.fraction-like-denominator-division-guided-card .fraction-guided-step-completed-answer *,
-.fraction-like-denominator-division-guided-card .fraction-guided-task-prompt *::before,
-.fraction-like-denominator-division-guided-card .fraction-guided-step-expression *::before,
-.fraction-like-denominator-division-guided-card .fraction-guided-step-completed-answer *::before,
-.fraction-like-denominator-division-guided-card .fraction-guided-task-prompt *::after,
-.fraction-like-denominator-division-guided-card .fraction-guided-step-expression *::after,
-.fraction-like-denominator-division-guided-card .fraction-guided-step-completed-answer *::after{
+.fraction-division-guided-card .fraction-guided-task-prompt *,
+.fraction-division-guided-card .fraction-guided-step-expression *,
+.fraction-division-guided-card .fraction-guided-step-completed-answer *,
+.fraction-division-guided-card .fraction-guided-task-prompt *::before,
+.fraction-division-guided-card .fraction-guided-step-expression *::before,
+.fraction-division-guided-card .fraction-guided-step-completed-answer *::before,
+.fraction-division-guided-card .fraction-guided-task-prompt *::after,
+.fraction-division-guided-card .fraction-guided-step-expression *::after,
+.fraction-division-guided-card .fraction-guided-step-completed-answer *::after{
   color:inherit!important;
   font-family:inherit!important;
   font-size:24px!important;
   font-weight:800!important;
 }
-.fraction-like-denominator-division-guided-card .fraction-guided-step-card h3{
+.fraction-division-guided-card .fraction-guided-step-card h3{
   font-size:24px!important;
   line-height:1.1;
 }
-.fraction-like-denominator-division-guided-card .fraction-like-division-guided-entry{
+.fraction-division-guided-card .fraction-guided-fraction-input{
   display:inline-grid;
   grid-template-rows:1fr 2px 1fr;
   justify-items:stretch;
@@ -1068,7 +1068,7 @@
   min-width:76px;
   gap:3px;
 }
-.fraction-like-denominator-division-guided-card .fraction-like-division-guided-number{
+.fraction-division-guided-card .fraction-guided-fraction-input__field{
   width:76px!important;
   min-width:76px!important;
   max-width:76px!important;
@@ -1082,16 +1082,18 @@
   font-weight:800!important;
   line-height:1!important;
 }
-.fraction-like-denominator-division-guided-card .fraction-like-division-guided-bar{
+.fraction-division-guided-card .fraction-guided-fraction-input .pacogo-fraction-divider{
   display:block;
   width:100%;
   height:2px;
   background:currentColor;
 }
-.fraction-like-denominator-division-guided-card .pacogo-fraction-answer__input{
+.fraction-division-guided-card .pacogo-fraction-answer__input{
   font-size:24px!important;
   font-family:"Baloo 2",Nunito,sans-serif!important;
 }
+.fraction-division-guided-card .fraction-guided-step-grid--progressive{align-items:start}
+.fraction-division-guided-card .fraction-guided-step-card{align-self:start;height:fit-content;min-height:0}
 @media(max-width:850px){.fraction-guided-step-grid--three{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.fraction-guided-step-grid--three{grid-template-columns:minmax(0,1fr)}}
 

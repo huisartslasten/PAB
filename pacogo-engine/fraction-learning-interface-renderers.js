@@ -134,6 +134,34 @@ function renderFractionInputRepresentation({ numerator = null, denominator = nul
   const bottom=part(denominator,"noemer",inputPart==="denominator"); wrapper.append(top,divider,bottom); return wrapper;
 }
 
+
+function renderFractionStepInput({ label = "Breuk", maxLength = 4, documentRef = document } = {}) {
+  if (!Number.isSafeInteger(maxLength) || maxLength < 1 || maxLength > 6) {
+    throw new RangeError("maxLength must be an integer between 1 and 6");
+  }
+  const wrapper = documentRef.createElement("span");
+  wrapper.className = "pacogo-fraction-representation pacogo-fraction-representation--symbolic fraction-guided-fraction-input";
+  wrapper.setAttribute("role", "group");
+  wrapper.setAttribute("aria-label", label);
+  const createField = part => {
+    const input = documentRef.createElement("input");
+    input.type = "text";
+    input.inputMode = "numeric";
+    input.autocomplete = "off";
+    input.maxLength = maxLength;
+    input.className = "pacogo-fraction-step-input fraction-guided-fraction-input__field";
+    input.setAttribute("aria-label", label + " " + part);
+    return input;
+  };
+  const numerator = createField("teller");
+  const divider = documentRef.createElement("span");
+  divider.className = "pacogo-fraction-divider";
+  divider.setAttribute("aria-hidden", "true");
+  const denominator = createField("noemer");
+  wrapper.append(numerator, divider, denominator);
+  return Object.freeze({ wrap: wrapper, numerator, denominator, focus: () => numerator.focus() });
+}
+
 function createFractionQuantityPieSectorPath(index, denominator) {
   if (!Number.isSafeInteger(denominator) || denominator < 2 || denominator > 4 ||
       !Number.isSafeInteger(index) || index < 0 || index >= denominator) {
@@ -449,4 +477,4 @@ function renderFractionQuantityLearningInterface({
   });
 }
 
-export { renderFractionRepresentation, renderMixedNumber, renderFractionInputRepresentation, createFractionQuantityPieSectorPath, renderFractionQuantityAnnotation, renderFractionQuantityStaticUnit, renderFractionQuantityOperation, renderFractionQuantityLearningInterface };
+export { renderFractionRepresentation, renderMixedNumber, renderFractionInputRepresentation, renderFractionStepInput, createFractionQuantityPieSectorPath, renderFractionQuantityAnnotation, renderFractionQuantityStaticUnit, renderFractionQuantityOperation, renderFractionQuantityLearningInterface };

@@ -9183,3 +9183,25 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Verifieer deze handoff-update met Full Regression op de nieuwe handoff-commit.
 - Laat de gebruiker controleren of de actieve stap nu voldoende ruimte heeft.
 - Voeg niets toe buiten deze correctie.
+
+## 40. Volgorde begeleide en zelfstandige delenoefeningen (19 november 2026)
+
+**Beslissing**
+- In het overzicht Delen staat bij ieder oefenpaar de versie met stappenplan vóór de overeenkomstige zelfstandige versie.
+- De volgorde is: heel getal delen (met stappenplan, zonder stappenplan); gelijknamige breuken kleiner dan 1 (met stappenplan, zonder stappenplan); gelijknamige breuken groter dan 1 (met stappenplan, zonder stappenplan). De twee beschikbare oefeningen zonder begeleide tegenhanger blijven daarna staan.
+- Dit betreft uitsluitend de volgorde van bestaande overzichtsregels en routes. Geen oefeninhoud, route-ID, taakbank of runtime-logica is gewijzigd.
+
+**Verificatie**
+- Code-/testcommit: `b25b1c330fb55a42241af3775e98b29792f290a1`.
+- Full Regression #4151: **GREEN / SUCCESS** op exact deze commit; de centrale Skills-overzichtstest controleert de volledige volgorde en routekoppelingen.
+- Deze handoff-update moet zelf nog door Full Regression worden geverifieerd.
+
+**Actuele status**
+- Branch: `refactor/professional-v1`.
+- Laatste geverifieerde code-/testcommit: `b25b1c330fb55a42241af3775e98b29792f290a1`.
+- Laatste volledig geverifieerde Full Regression: #4151 — **GREEN / SUCCESS** op exact die commit.
+- LIVE `main` onaangeroerd; geen deployment en geen Supabase-wijziging.
+
+**Volgende concrete stap**
+- Verifieer deze handoff-update met Full Regression op de nieuwe handoff-commit.
+- Voeg niets toe buiten de afgesproken overzichtsvolgorde.

@@ -111,7 +111,7 @@ function createFractionPracticeTemplate({
     actionsArea,
     footnoteArea,
     showNextAction: onClick => showAction("Volgende som", onClick),
-    showRestartAction: onClick => showAction("Opnieuw oefenen", onClick)
+    showRestartAction: (onClick, label = "Opnieuw oefenen") => showAction(label, onClick)
   });
 }
 

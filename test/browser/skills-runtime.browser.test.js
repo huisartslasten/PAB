@@ -911,7 +911,7 @@ test('fraction subtraction overview keeps the original exercise and adds the sep
     'Ongelijknamige breuken kleiner dan 1 van elkaar aftrekken',
     'Ongelijknamige breuken groter dan 1 van elkaar aftrekken'
   ]);
-  expect(result.exerciseButtonCount).toBe(7);
+  expect(result.exerciseButtonCount).toBe(6);
   expect(result.navigations).toHaveLength(6);
   expect(result.navigations[0]).toContain('exercise=whole-minus-mixed-subtraction');
   expect(result.navigations[1]).toContain('exercise=whole-minus-greater-than-one-subtraction');

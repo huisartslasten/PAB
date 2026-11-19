@@ -1404,8 +1404,35 @@ export function createSkillsRuntime({
         op('÷'),
         renderFractionRepresentation(step.task.right, 'symbolic_fraction', 'Tweede breuk')
       );
+      const solution = documentRef.createElement('div'); solution.className = 'fraction-guided-solution';
+      solution.setAttribute('aria-label', 'Uitgewerkte tussenstappen');
+      if (step.completedStepIds.includes('invert_divisor')) {
+        solution.append(
+          op('='),
+          renderFractionRepresentation(step.task.left, 'symbolic_fraction', 'Eerste breuk'),
+          op('×'),
+          renderFractionRepresentation(step.inverse, 'symbolic_fraction', 'Omgekeerde tweede breuk')
+        );
+      }
+      if (step.completedStepIds.includes('multiply_fractions')) {
+        solution.append(
+          op('='),
+          renderFractionRepresentation(step.product, 'symbolic_fraction', 'Product van de breuken')
+        );
+      }
+      if (step.completedStepIds.includes('simplify_quotient')) {
+        solution.append(
+          op('='),
+          renderMixedNumber({
+            wholeNumber: step.task.answer.whole,
+            numerator: step.task.answer.numerator,
+            denominator: step.task.answer.denominator
+          }, 'Vereenvoudigde uitkomst')
+        );
+      }
       const equation = documentRef.createElement('div'); equation.className = 'fraction-guided-equation';
-      equation.setAttribute('aria-label', 'Doelsom'); equation.append(prompt);
+      equation.setAttribute('aria-label', 'Doelsom en uitgewerkte tussenstappen');
+      equation.append(prompt, solution);
       template.promptArea.append(equation);
       const grid = documentRef.createElement('div'); grid.className = 'fraction-guided-step-grid fraction-guided-step-grid--progressive';
       grid.setAttribute('aria-label', 'Drie denkstappen');

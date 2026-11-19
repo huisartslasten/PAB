@@ -1690,9 +1690,9 @@ export function createSkillsRuntime({
       const expression = documentRef.createElement('div');
       expression.className = 'fraction-whole-mixed-expression';
       expression.append(
-        renderMixedNumber(task.left, 'Eerste gemengde getal'),
+        renderMixedNumber({ wholeNumber: task.left.whole, numerator: task.left.numerator, denominator: task.left.denominator }, 'Eerste gemengde getal'),
         Object.assign(documentRef.createElement('span'), { className: 'fraction-whole-mixed-expression__operator', textContent: '÷' }),
-        renderMixedNumber(task.right, 'Tweede gemengde getal')
+        renderMixedNumber({ wholeNumber: task.right.whole, numerator: task.right.numerator, denominator: task.right.denominator }, 'Tweede gemengde getal')
       );
       const equals = documentRef.createElement('span');
       equals.className = 'fraction-whole-mixed-expression__operator';

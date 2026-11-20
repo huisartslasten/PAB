@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { FRACTION_MIXED_UNLIKE_DENOMINATOR_DIVISION_GUIDED_TASKS as tasks } from '../../pacogo-engine/fraction-mixed-unlike-denominator-division-guided-task-bank.js';
 
-test('guided mixed like-denominator division is a separate overview exercise with five progressive steps and ten tasks', async ({ page }) => {
-  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=delen&exercise=mixed-like-denominator-division-guided', { waitUntil: 'domcontentloaded' });
+test('guided mixed unlike-denominator division is a separate overview exercise with five progressive steps and ten tasks', async ({ page }) => {
+  await page.goto('http://127.0.0.1:4173/skills.html?domain=fractions&topic=delen&exercise=mixed-unlike-denominator-division-guided', { waitUntil: 'domcontentloaded' });
   await page.evaluate(async () => {
     localStorage.removeItem('pacogo:fraction-mixed-unlike-denominator-division-guided:v1:Zyon');
     const { createSkillsRuntime } = await import('/src/features/skills/runtime.js');
@@ -16,7 +16,7 @@ test('guided mixed like-denominator division is a separate overview exercise wit
     };
     const runtime = createSkillsRuntime({
       app, templateMount, context: { student: 'Zyon', mode: 'student' },
-      domain: 'fractions', topic: 'delen', exercise: 'mixed-like-denominator-division-guided',
+      domain: 'fractions', topic: 'delen', exercise: 'mixed-unlike-denominator-division-guided',
       documentRef: document, navigate: () => {}
     });
     await runtime.mount();

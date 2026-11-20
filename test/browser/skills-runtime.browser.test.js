@@ -1914,7 +1914,20 @@ test('Delen in the fraction overview opens both independent and guided division 
         lockedAlignSelf: locked ? getComputedStyle(locked).alignSelf : ''
       };
     })();
-    return { ...overviewSnapshot, guidedRoute, unlikeGuidedRoute, fractionInput };
+    localStorage.removeItem('pacogo:fraction-mixed-unlike-denominator-division-guided:v1:Zyon');
+    const mixedUnlikeGuided = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'student' },
+      domain: 'fractions', topic: 'delen', exercise: 'mixed-unlike-denominator-division-guided',
+      documentRef: document, navigate: target => navigations.push(String(target))
+    });
+    await mixedUnlikeGuided.mount();
+    const mixedUnlikeGuidedRoute = {
+      title: document.querySelector('.paco-template-main h1')?.textContent || '',
+      stepCount: document.querySelectorAll('.fraction-guided-step-card').length,
+      activeStep: document.querySelector('.fraction-guided-step-card[data-state="active"]')?.dataset.stepId || '',
+      progress: document.querySelector('.fraction-practice-progress')?.textContent || ''
+    };
+    return { ...overviewSnapshot, guidedRoute, unlikeGuidedRoute, mixedUnlikeGuidedRoute, fractionInput };
   });
   expect(result.title).toBe('Delen');
   expect(result.centralPage).toBe(true);
@@ -1929,12 +1942,13 @@ test('Delen in the fraction overview opens both independent and guided division 
     'Gelijknamige breuken groter dan 1 op elkaar delen',
     'Ongelijknamige breuken kleiner dan 1 op elkaar delen — met stappenplan',
     'Ongelijknamige breuken kleiner dan 1 op elkaar delen',
+    'Ongelijknamige breuken groter dan 1 op elkaar delen — met stappenplan',
     'Ongelijknamige breuken groter dan 1 op elkaar delen'
   ]);
-  expect(result.levels).toEqual([1, 1, 2, 2, 2, 2, 3, 3, 4]);
-  expect(result.boneCounts).toEqual([5, 5, 5, 5, 5, 5, 5, 5, 5]);
-  expect(result.exerciseButtonCount).toBe(9);
-  expect(result.navigations).toHaveLength(10);
+  expect(result.levels).toEqual([1, 1, 2, 2, 2, 2, 3, 3, 4, 4]);
+  expect(result.boneCounts).toEqual([5, 5, 5, 5, 5, 5, 5, 5, 5, 5]);
+  expect(result.exerciseButtonCount).toBe(10);
+  expect(result.navigations).toHaveLength(11);
   expect(result.navigations[0]).toContain('topic=delen');
   expect(result.navigations[1]).toContain('exercise=whole-number-divided-by-fraction-greater-than-one-guided');
   expect(result.navigations[2]).toContain('exercise=whole-number-divided-by-fraction-greater-than-one');
@@ -1944,7 +1958,8 @@ test('Delen in the fraction overview opens both independent and guided division 
   expect(result.navigations[6]).toContain('exercise=mixed-like-denominator-division');
   expect(result.navigations[7]).toContain('exercise=unlike-denominator-division-guided');
   expect(result.navigations[8]).toContain('exercise=unlike-denominator-division');
-  expect(result.navigations[9]).toContain('exercise=mixed-unlike-denominator-division');
+  expect(result.navigations[9]).toContain('exercise=mixed-unlike-denominator-division-guided');
+  expect(result.navigations[10]).toContain('exercise=mixed-unlike-denominator-division');
   expect(result.guidedRoute).toEqual({
     title: 'Oefenen', stepCount: 5, activeStep: 'convert_mixed_numbers',
     progress: 'Som 1 van 10 · Niveau 2 van 5'
@@ -1952,6 +1967,10 @@ test('Delen in the fraction overview opens both independent and guided division 
   expect(result.unlikeGuidedRoute).toEqual({
     title: 'Oefenen', stepCount: 3, activeStep: 'invert_divisor',
     progress: 'Som 1 van 10 · Niveau 3 van 5'
+  });
+  expect(result.mixedUnlikeGuidedRoute).toEqual({
+    title: 'Oefenen', stepCount: 5, activeStep: 'convert_mixed_numbers',
+    progress: 'Som 1 van 10 · Niveau 4 van 5'
   });
   // The inline-grid wrapper is a flex item, so its computed display is blockified to grid.
   expect(result.fractionInput).toEqual({

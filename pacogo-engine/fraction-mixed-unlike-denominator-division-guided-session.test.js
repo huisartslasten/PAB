@@ -42,19 +42,19 @@ function solveTask(session, task) {
   return result;
 }
 
-test("the guided task bank contains ten unique, valid mixed-number divisions with like denominators", () => {
+test("the guided task bank contains ten unique, valid mixed-number divisions with unlike denominators", () => {
   assert.equal(tasks.length, 10);
   assert.equal(new Set(tasks.map(task => task.id)).size, 10);
   assert.equal(new Set(tasks.map(task => [task.left.whole,task.left.numerator,task.left.denominator,task.right.whole,task.right.numerator,task.right.denominator].join("|"))).size, 10);
   for (const task of tasks) {
-    assert.equal(task.left.denominator, task.right.denominator);
+    assert.notEqual(task.left.denominator, task.right.denominator);
     assert.ok(task.left.whole > 0 && task.left.numerator > 0 && task.left.numerator < task.left.denominator);
     assert.ok(task.right.whole > 0 && task.right.numerator > 0 && task.right.numerator < task.right.denominator);
     const left = task.left.whole * task.left.denominator + task.left.numerator;
     const right = task.right.whole * task.right.denominator + task.right.numerator;
     const n = left * task.right.denominator;
     const d = task.left.denominator * right;
-    assert.ok(left > right);
+    assert.ok(left * task.right.denominator > right * task.left.denominator);
     assert.equal(Math.floor(n / d), task.answer.whole);
     assert.equal((n % d) * task.answer.denominator, task.answer.numerator * d);
     assert.equal((task.answer.whole * task.answer.denominator + task.answer.numerator) * d, n * task.answer.denominator);

@@ -25,7 +25,7 @@ function normalizeTasks(tasks) {
     const whole = Math.floor(productNumerator / productDenominator);
     const remainder = productNumerator % productDenominator;
     const answerNumerator = answer.whole * answer.denominator + answer.numerator;
-    if (leftImproper <= rightImproper || whole < 1 ||
+    if (leftImproper * right.denominator <= rightImproper * left.denominator || whole < 1 ||
         answer.whole !== whole ||
         remainder * answer.denominator !== answer.numerator * productDenominator ||
         answerNumerator * productDenominator !== productNumerator * answer.denominator) {

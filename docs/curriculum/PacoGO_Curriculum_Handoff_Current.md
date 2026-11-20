@@ -9232,3 +9232,48 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 
 **Volgende concrete stap**
 - Geen verdere wijziging nodig voor deze regressiefout. Ga uitsluitend verder met de volgende expliciet afgesproken PacoGO-stap.
+
+## 42. Begeleide deling ongelijknamige gemengde breuken groter dan 1 (20 november 2026)
+
+**Gebruikersopdracht**
+- Voeg de oefening **Ongelijknamige breuken groter dan 1 op elkaar delen — met stappenplan** toe vóór de bestaande oefening **Ongelijknamige breuken groter dan 1 op elkaar delen**.
+- De begeleide versie bevat 10 sommen.
+- Iedere som doorloopt minimaal vier rekenstappen en daarna het vereenvoudigen.
+- Na afronding van de tiende som staat de knop **Opnieuw oefenen**.
+- **Volgende som** moet ook met Enter bedienbaar zijn.
+
+**Gebouwd**
+- Nieuwe taakbank: `pacogo-engine/fraction-mixed-unlike-denominator-division-guided-task-bank.js` (10 unieke opgaven uit dezelfde inhoudelijke oefenfamilie).
+- Nieuwe sessie en unit tests: `fraction-mixed-unlike-denominator-division-guided-session.js` en `.test.js`.
+- Nieuwe runtime-route: `mixed-unlike-denominator-division-guided`, geregistreerd in `src/features/skills/runtime.js`.
+- De vijf stappen zijn:
+  1. Beide gemengde getallen omzetten naar onechte breuken.
+  2. De tweede breuk omkeren.
+  3. Tellers en noemers vermenigvuldigen.
+  4. De onechte breuk omzetten naar een gemengd getal.
+  5. Het breukdeel volledig vereenvoudigen.
+- De nieuwe overzichtsregel staat direct vóór de bestaande zelfstandige oefening.
+- De oefening gebruikt de centrale Fraction Practice Template en de bestaande vijfstappenpresentatie. De bijbehorende horizontale omzettingslayout is gedeeld via de centrale Fraction Learning Interface CSS, zodat zowel gelijknamige als ongelijknamige gemengde deling dezelfde uitlijning gebruikt.
+- De centrale template houdt de knop **Volgende som** toetsenbordbedienbaar met Enter. De eindtoestand toont **Opnieuw oefenen**.
+- De sessie valideert de verhouding van gemengde getallen via kruisvermenigvuldiging; ruwe tellers worden niet rechtstreeks vergeleken bij ongelijke noemers.
+
+**Oorzaakanalyse tijdens regressie**
+- De eerste unit-regressie vond een onjuiste vergelijking van ruwe tellers in de nieuwe sessie; de correcte vergelijking is hersteld met kruisvermenigvuldiging.
+- De eerste browserregressie vond dat de bestaande vijfstappen-CSS alleen op de gelijknamige variant matchte. De selector is nu gedeeld met de nieuwe ongelijknamige variant.
+- De overzichtstest is bijgewerkt om de expliciet toegevoegde regel, moeilijkheidsgraad en route te controleren. De testasserties zijn niet afgezwakt.
+
+**Verificatie**
+- Browser refactor proof #893 / run 44730038306: **GREEN / SUCCESS** op commit `eb7728b79960815818719bcf2848713f21f794fe`.
+- Full Regression #4192 / run 44730038288: **GREEN / SUCCESS** op exact commit `eb7728b79960815818719bcf2848713f21f794fe`; alle Node-, architectuur-, browser- en clean-working-tree-stappen zijn geslaagd.
+- De handoff-update zelf moet nog door Full Regression worden geverifieerd.
+
+**Actuele status**
+- Branch: `refactor/professional-v1`.
+- Laatste volledig geverifieerde code-/testcommit: `eb7728b79960815818719bcf2848713f21f794fe`.
+- Laatste volledig geverifieerde Full Regression: #4192 — **GREEN / SUCCESS** op exact die commit.
+- LIVE `main` onaangeroerd; geen deployment en geen Supabase-wijziging.
+
+**Volgende concrete stap**
+- Verifieer deze handoff-update met Full Regression op de nieuwe handoff-commit.
+- Laat de gebruiker de nieuwe vijfstappenoefening visueel controleren in PacoGO TEST.
+- De zelfstandige oefening blijft ongewijzigd.

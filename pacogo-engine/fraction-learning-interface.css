@@ -1107,19 +1107,19 @@
   width:100%;
   min-width:0;
 }
-.fraction-mixed-like-denominator-division-guided-card .fraction-guided-step-expression{
+:is(.fraction-mixed-like-denominator-division-guided-card, .fraction-mixed-unlike-denominator-division-guided-card) .fraction-guided-step-expression{
   flex-wrap:nowrap;
   justify-content:flex-start;
   overflow-x:auto;
   overscroll-behavior-x:contain;
 }
-.fraction-mixed-like-denominator-division-guided-card .fraction-guided-step-expression--paired{
+:is(.fraction-mixed-like-denominator-division-guided-card, .fraction-mixed-unlike-denominator-division-guided-card) .fraction-guided-step-expression--paired{
   flex-direction:column;
   align-items:flex-start;
   justify-content:flex-start;
   overflow-x:visible;
 }
-.fraction-mixed-like-denominator-division-guided-card .fraction-guided-step-expression--paired .fraction-guided-step-subexpression{
+:is(.fraction-mixed-like-denominator-division-guided-card, .fraction-mixed-unlike-denominator-division-guided-card) .fraction-guided-step-expression--paired .fraction-guided-step-subexpression{
   display:flex;
   align-items:center;
   flex-wrap:nowrap;
@@ -1127,10 +1127,10 @@
   margin:4px 0;
   min-width:0;
 }
-.fraction-mixed-like-denominator-division-guided-card .fraction-guided-step-expression:not(.fraction-guided-step-expression--paired)>*{
+:is(.fraction-mixed-like-denominator-division-guided-card, .fraction-mixed-unlike-denominator-division-guided-card) .fraction-guided-step-expression:not(.fraction-guided-step-expression--paired)>*{
   flex-shrink:0;
 }
-.fraction-mixed-like-denominator-division-guided-card .fraction-guided-whole-entry{
+:is(.fraction-mixed-like-denominator-division-guided-card, .fraction-mixed-unlike-denominator-division-guided-card) .fraction-guided-whole-entry{
   width:76px!important;
   min-width:76px!important;
   max-width:76px!important;
@@ -1140,7 +1140,7 @@
   font-size:24px!important;
   font-weight:800!important;
 }
-.fraction-mixed-like-denominator-division-guided-card .fraction-guided-step-card{
+:is(.fraction-mixed-like-denominator-division-guided-card, .fraction-mixed-unlike-denominator-division-guided-card) .fraction-guided-step-card{
   min-width:0;
 }
 @media(max-width:1050px){

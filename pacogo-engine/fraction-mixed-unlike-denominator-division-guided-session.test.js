@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { FRACTION_MIXED_LIKE_DENOMINATOR_DIVISION_GUIDED_TASKS as tasks } from "./fraction-mixed-unlike-denominator-division-guided-task-bank.js";
+import { FRACTION_MIXED_UNLIKE_DENOMINATOR_DIVISION_GUIDED_TASKS as tasks } from "./fraction-mixed-unlike-denominator-division-guided-task-bank.js";
 import { createFractionMixedUnlikeDenominatorDivisionGuidedSession } from "./fraction-mixed-unlike-denominator-division-guided-session.js";
 
 function memoryStorage() {

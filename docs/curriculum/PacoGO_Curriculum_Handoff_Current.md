@@ -9265,12 +9265,13 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 **Verificatie**
 - Browser refactor proof #893 / run 44730038306: **GREEN / SUCCESS** op commit `eb7728b79960815818719bcf2848713f21f794fe`.
 - Full Regression #4192 / run 44730038288: **GREEN / SUCCESS** op exact commit `eb7728b79960815818719bcf2848713f21f794fe`; alle Node-, architectuur-, browser- en clean-working-tree-stappen zijn geslaagd.
-- De handoff-update zelf moet nog door Full Regression worden geverifieerd.
+- De handoff-updatecommit `9b96732b91a31cb5408cfd7d9e23c9a1b40f6dcc` is zelf geverifieerd door Full Regression #4193: **GREEN / SUCCESS**.
 
 **Actuele status**
 - Branch: `refactor/professional-v1`.
-- Laatste volledig geverifieerde code-/testcommit: `eb7728b79960815818719bcf2848713f21f794fe`.
-- Laatste volledig geverifieerde Full Regression: #4192 — **GREEN / SUCCESS** op exact die commit.
+- Laatste volledig geverifieerde featurecode-/testcommit: `eb7728b79960815818719bcf2848713f21f794fe`.
+- Laatste volledig geverifieerde Full Regression op de featurecode: #4192 — **GREEN / SUCCESS**.
+- Handoff-commit: `9b96732b91a31cb5408cfd7d9e23c9a1b40f6dcc`; Full Regression #4193 — **GREEN / SUCCESS** op exact die handoff-commit.
 - LIVE `main` onaangeroerd; geen deployment en geen Supabase-wijziging.
 
 **Volgende concrete stap**

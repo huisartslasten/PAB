@@ -26,7 +26,7 @@ describe('vertical learning lines registry', () => {
     expect(registry.getObjective('FR-0002').exercise_ids).toEqual(['fraction-task-01']);
   });
 
-  it('rejects duplicate IDs and incomplete objective metadata', () => {
+  it('loads the complete SLO 2017 fraction inventory and existing curriculum links', () => {\n    expect(verticalLearningLinesRegistry.listObjectives({ domain: 'Breuken' })).toHaveLength(50);\n    expect(verticalLearningLinesRegistry.listObjectives({ domain: 'Breuken', group: 2 })).toHaveLength(2);\n    expect(verticalLearningLinesRegistry.getCoverageSummary({ domain: 'Breuken' }).objectives).toBe(50);\n    expect(verticalLearningLinesRegistry.getObjective('FR-0034').related_skill_ids).toContain('FR2');\n    expect(verticalLearningLinesRegistry.getExercise('fr2-equivalence-practice').route.page).toBe('curriculum-fr2-practice-learner.html');\n    expect(verticalLearningLinesRegistry.listCurriculumSkills().map(skill => skill.id)).toEqual(['FR1', 'FR2']);\n  });\n\n  it('rejects duplicate IDs and incomplete objective metadata', () => {
     const objective = { id: 'FR-0001', domain: 'Breuken', slo_group: 6, slo_source: 'SLO 2017', slo_component: 'Getalbegrip', objective: 'Doel', status: 'active', exercise_ids: [] };
     expect(() => createVerticalLearningLinesRegistry({ objectives: [objective, objective] })).toThrow(/Duplicate/);
     expect(() => createVerticalLearningLinesRegistry({ objectives: [{ ...objective, slo_component: '' }] })).toThrow(/slo_component/);

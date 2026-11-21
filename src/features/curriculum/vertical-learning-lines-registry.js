@@ -321,6 +321,42 @@ const EXERCISES = Object.freeze([
       "exercise": "mixed-unlike-denominator-multiplication"
     },
     "kind": "practice_route"
+  },
+  {
+    "id": "whole-number-mixed-addition",
+    "label": "Heel getal optellen bij een gemengde breuk",
+    "topic": "optellen",
+    "route": {
+      "page": "skills.html",
+      "domain": "fractions",
+      "topic": "optellen",
+      "exercise": "whole-number-mixed-addition"
+    },
+    "kind": "practice_route"
+  },
+  {
+    "id": "same-denominator-addition",
+    "label": "Gelijknamige breuken optellen",
+    "topic": "optellen",
+    "route": {
+      "page": "skills.html",
+      "domain": "fractions",
+      "topic": "optellen",
+      "exercise": "same-denominator-addition"
+    },
+    "kind": "practice_route"
+  },
+  {
+    "id": "mixed-same-denominator-addition",
+    "label": "Gelijknamige breuken groter dan 1 optellen",
+    "topic": "optellen",
+    "route": {
+      "page": "skills.html",
+      "domain": "fractions",
+      "topic": "optellen",
+      "exercise": "mixed-same-denominator-addition"
+    },
+    "kind": "practice_route"
   }
 ]);
 const CURRICULUM_SKILLS = Object.freeze([
@@ -586,6 +622,7 @@ const OBJECTIVES = Object.freeze([
     "source_wording": "samenvatting uit PacoGO traceability-inventaris; geen woordelijk citaat",
     "related_skill_ids": [],
     "exercise_ids": [
+      "same-denominator-addition",
       "like-denominator-subtraction",
       "like-denominator-multiplication"
     ],
@@ -929,7 +966,10 @@ const OBJECTIVES = Object.freeze([
     "source_wording": "samenvatting uit PacoGO traceability-inventaris; geen woordelijk citaat",
     "related_skill_ids": [],
     "exercise_ids": [
-      "like-denominator-subtraction"
+      "same-denominator-addition",
+      "mixed-same-denominator-addition",
+      "like-denominator-subtraction",
+      "mixed-like-denominator-subtraction"
     ],
     "coverage_status": "partial",
     "coverage_note": "Gedeeltelijk. Formele berekening bestaat; contextuele toepassing en formeel SLO-bewijs ontbreken.",
@@ -1034,11 +1074,10 @@ const OBJECTIVES = Object.freeze([
     "source_wording": "samenvatting uit PacoGO traceability-inventaris; geen woordelijk citaat",
     "related_skill_ids": [],
     "exercise_ids": [
-      "unequal-denominator-guided-addition",
-      "unequal-denominator-guided-mixed-addition",
-      "unequal-independent-addition",
-      "unequal-mixed-addition",
-      "unlike-denominator-division"
+      "same-denominator-addition",
+      "mixed-same-denominator-addition",
+      "like-denominator-subtraction",
+      "mixed-like-denominator-subtraction"
     ],
     "coverage_status": "partial",
     "coverage_note": "Gedeeltelijk. De formele procedure en stapbegeleiding zijn aanwezig; contextuele transfer, uitlegkwaliteit en formele evidence-dekking ontbreken.",

@@ -2,6 +2,13 @@ const OBJECTIVE_STATUSES = Object.freeze(['active', 'planned', 'retired']);
 const COVERAGE_STATUSES = Object.freeze(['full', 'partial', 'not_demonstrated', 'unassessed']);
 const EXERCISES = Object.freeze([
   {
+    "id": "fr2-equivalence-practice",
+    "label": "FR2 — breukequivalentie oefenen",
+    "topic": "curriculum",
+    "route": {"page":"curriculum-fr2-practice-learner.html"},
+    "kind": "formative_curriculum_practice"
+  },
+  {
     "id": "unequal-denominator-guided-addition",
     "label": "Ongelijknamige breuken kleiner dan 1 optellen — met stappenplan",
     "topic": "optellen",
@@ -313,6 +320,12 @@ const EXERCISES = Object.freeze([
     },
     "kind": "practice_route"
   }
+]);
+const CURRICULUM_SKILLS = Object.freeze([
+  Object.freeze({id:'FR1',name:'Breuken representeren en interpreteren',status:'definition_only_unregistered',note:'Bestaande skilldefinitie uit eerdere curriculumafspraken; formeel Development/Claim/Evidence/Task-contract niet teruggevonden.'}),
+  Object.freeze({id:'FR2',name:'Breukequivalentie herkennen en gebruiken',status:'candidate_registered',developments:Object.freeze([
+    Object.freeze({id:'FR2.D1',name:'Equivalentie herkennen'}),Object.freeze({id:'FR2.D2',name:'Equivalentie verklaren'}),Object.freeze({id:'FR2.D3',name:'Equivalentie functioneel gebruiken'})
+  ]),claims:Object.freeze(['FR2.C1','FR2.C2','FR2.C3']),evidence_targets:Object.freeze(['FR2.ET1','FR2.ET2','FR2.ET3','FR2.ET4','FR2.ET5','FR2.ET6']),task_models:Object.freeze(['FR2.TM1','FR2.TM2','FR2.TM3','FR2.TM4','FR2.TM5']),note:'Candidate registry; bestaande task/evidence-alignmentvragen blijven open.'})
 ]);
 const OBJECTIVES = Object.freeze([
   {
@@ -1195,6 +1208,7 @@ export function createVerticalLearningLinesRegistry({ objectives = OBJECTIVES, e
     getObjective:id=>byId.get(id)||null,
     listDomains:()=>[...new Set(records.map(o=>o.domain))].sort((a,b)=>a.localeCompare(b,'nl')),
     listExercises:()=>[...exerciseById.values()],
+    listCurriculumSkills:()=>CURRICULUM_SKILLS,
     getExercise:id=>exerciseById.get(id)||null,
     getCoverageSummary:({domain}={})=>{const selected=records.filter(o=>!domain||o.domain===domain);return {objectives:selected.length,linkedObjectives:selected.filter(o=>o.exercise_ids.length).length,unlinkedObjectives:selected.filter(o=>!o.exercise_ids.length).length,partial:selected.filter(o=>o.coverage_status==='partial').length,notDemonstrated:selected.filter(o=>o.coverage_status==='not_demonstrated').length,full:selected.filter(o=>o.coverage_status==='full').length,unassessed:selected.filter(o=>o.coverage_status==='unassessed').length,exerciseLinks:selected.reduce((n,o)=>n+o.exercise_ids.length,0)};}
   });

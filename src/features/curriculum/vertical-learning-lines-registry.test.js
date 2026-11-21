@@ -17,11 +17,11 @@ describe('vertical learning lines registry', () => {
 
   it('loads all 50 inventoried objectives across groups 2 to 8', () => {
     const objectives = verticalLearningLinesRegistry.listObjectives({ domain: 'Breuken' });
-    expect(objectives).toHaveLength(50);
+    expect(objectives).toHaveLength(53);
     expect([2, 3, 4, 5, 6, 7, 8].map(group => verticalLearningLinesRegistry.listObjectives({ domain: 'Breuken', group }).length))
-      .toEqual([2, 1, 5, 4, 17, 12, 9]);
+      .toEqual([2, 1, 4, 4, 19, 12, 11]);
     expect(new Set(objectives.map(item => item.id)).size).toBe(50);
-    expect(verticalLearningLinesRegistry.getCoverageSummary({ domain: 'Breuken' }).objectives).toBe(50);
+    expect(verticalLearningLinesRegistry.getCoverageSummary({ domain: 'Breuken' }).objectives).toBe(53);
   });
 
   it('connects existing FR1 and FR2 curriculum without inventing a formal FR1 contract', () => {
@@ -29,7 +29,7 @@ describe('vertical learning lines registry', () => {
     expect(skills.map(skill => skill.id)).toEqual(['FR1', 'FR2']);
     expect(skills[0].status).toBe('definition_only_unregistered');
     expect(skills[1].developments.map(item => item.id)).toEqual(['FR2.D1', 'FR2.D2', 'FR2.D3']);
-    expect(verticalLearningLinesRegistry.getObjective('FR-0034').related_skill_ids).toContain('FR2');
+    expect(verticalLearningLinesRegistry.getObjective('FR-0034').related_skill_ids).toContain('FR2');\n    expect(verticalLearningLinesRegistry.getObjective('FR-0052').objective).toContain('decimaal getal');\n    expect(verticalLearningLinesRegistry.getObjective('FR-0007').slo_group).toBe(6);
     expect(verticalLearningLinesRegistry.getExercise('fr2-equivalence-practice').route.page).toBe('curriculum-fr2-practice-learner.html');
   });
 

@@ -9370,3 +9370,46 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 2. Controleer de nieuwe beheerweergave visueel via de bestaande lokale TEST-workflow.
 3. Reconstrueer daarna de volledige bestaande SLO-doelenlijst en reeds gebouwde oefeningen uit de broninventaris en repository, voordat verdere Objective IDs of mappings worden toegevoegd.
 4. Breid de tabel pas daarna uit met de geverifieerde SLO-doelen en bestaande PacoGO-oefeningen. Geen curriculumdoelen, codes of dekking verzinnen.
+
+
+## 45. Verticale breukenleerlijn — volledige SLO-kaarten en bestaande oefenroutes (21 november 2026)
+
+**Gebruikersbesluit**
+- Beheer → Verticale leerlijnen → Breuken is het centrale overzicht voor alle relevante SLO 2017-tussendoelen en bestaande PacoGO-oefeningen.
+- SLO-doelen worden als witte kaarten per groep getoond op de bestaande blauwe PacoGO-beheerachtergrond; geen ongestylede zwarte teksttabel.
+- Een doel kan meerdere oefeningen hebben; een oefening kan meerdere doelen ondersteunen. Dit is een expliciete many-to-many-relatie.
+- Iedere gekoppelde oefenroute moet vanuit de doelkaart geopend kunnen worden.
+- Een relatie met een oefening is geen automatisch bewijs van volledige SLO-dekking. De dekking moet inhoudelijk worden onderbouwd.
+
+**Gebouwd**
+- Registry: `src/features/curriculum/vertical-learning-lines-registry.js`.
+- Beheerweergave: `src/features/management/runtime.js`.
+- Styling: `src/features/management/management-support.css`.
+- Registrytests: `src/features/curriculum/vertical-learning-lines-registry.test.js`.
+- De registry bevat 53 SLO-doelrecords voor eind groep 2 t/m 8: groep 2: 2; groep 3: 1; groep 4: 4; groep 5: 4; groep 6: 19; groep 7: 12; groep 8: 11.
+- Het gebruikersvoorbeeld `FR-0001` blijft behouden: Breuken op een getallenlijn plaatsen; groep 6; SLO 2017; Getalbegrip.
+- De ID is de blijvende doelidentiteit; de metadata staat afzonderlijk.
+- De oefeningencatalogus bevat 30 bestaande route-level oefenroutes en 41 doel-oefenroutekoppelingen. Dit zijn route-level links naar bestaande oefeningen; de 405 taakposities in de bestaande taakbanken blijven onderscheiden van het aantal routes.
+- De statusverdeling uit de bestaande traceability-inventaris is 26 gedeeltelijk gedekt, 27 niet aangetoond en 0 volledig aangetoond. De UI maakt expliciet dat een verwante oefenroute geen bewijs van volledige dekking is.
+- De kaart toont groep, ID, SLO-onderdeel, bron/PDF-pagina, gekoppelde bestaande PacoGO-curriculumskill waar teruggevonden, oefenroutes met directe openactie en een uitklapbare dekkingsonderbouwing.
+- FR1 wordt alleen als bestaande skilldefinitie getoond; het formele Development/Claim/Evidence/Task-contract ontbreekt nog in de teruggevonden repositorybronnen en is niet verzonnen.
+- FR2 gebruikt de bestaande kandidaatregistrystructuur D1–D3, C1–C3, ET1–ET6 en TM1–TM5. De bekende FR2 task/evidence-alignmentvragen blijven open.
+- Bestaande centrale Fraction Practice Template, Fraction Answer Input, Fraction Learning Interface en bestaande oefenroutes worden hergebruikt. Geen per-doel-template of nieuwe oefenruntime.
+- Geen Supabase-, learner-state-, formele evidence-, mastery-, C1–C9- of LIVE `main`-wijziging.
+
+**Bron- en dekkingsgrens**
+- SLO 2017 is apart gehouden van de SLO juli 2026/KD10B-mapping.
+- De bestaande traceability-inventaris is gebruikt; de doelkaart markeert bestaande crosswalk-samenvattingen als samenvatting en licht genormaliseerde SLO-bronformuleringen afzonderlijk. De PDF-verwijzing per doel blijft zichtbaar.
+- De koppelingen zijn bestaande inhoudelijk verwante routes. Geen enkele doelkaart claimt volledige dekking.
+- Formatieve FR2-praktijk en synthetische FR2-demo's worden niet als formeel bewijs of mastery gepresenteerd.
+
+**Verificatie**
+- Full Regression #4220 / run 44942098086: **SUCCESS** op exact commit `982f13433bace7dad3d9d3142fa04f9c716fa956`.
+- Presentatie-/CSS-commit `f325b93942c1d434c01e2018b060e0b0233d9ed1`: Full Regression #4222 / run 44942183593 was bij deze handoff-update nog **IN PROGRESS**.
+- Deze handoff-update en de voorafgaande traceability-documentupdate moeten op de resulterende exacte handoff-commit door Full Regression worden geverifieerd.
+
+**Volgende concrete stap**
+1. Wacht op en controleer Full Regression #4222 en de regressie op de handoff-commit; bij rood eerst de exacte oorzaak isoleren.
+2. Laat de gebruiker de witte doelkaarten, alle groepssecties en de directe oefenlinks visueel controleren in de bestaande lokale PacoGO TEST-omgeving.
+3. Controleer de 41 doel-oefenrelaties inhoudelijk tegen de daadwerkelijke opdrachten; verander geen status naar volledig gedekt zonder onderbouwing.
+4. Herstel de oorspronkelijke formele FR1 Skill Development Pass / Development Evidence File indien aanwezig. Geen ontbrekende FR1-IDs afleiden.

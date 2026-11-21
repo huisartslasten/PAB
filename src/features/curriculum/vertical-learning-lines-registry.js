@@ -5,7 +5,9 @@ const EXERCISES = Object.freeze([
     "id": "fr2-equivalence-practice",
     "label": "FR2 — breukequivalentie oefenen",
     "topic": "curriculum",
-    "route": {"page":"curriculum-fr2-practice-learner.html"},
+    "route": {
+      "page": "curriculum-fr2-practice-learner.html"
+    },
     "kind": "formative_curriculum_practice"
   },
   {
@@ -583,7 +585,10 @@ const OBJECTIVES = Object.freeze([
     "source_reference": "SLO 2017, PDF p.107",
     "source_wording": "samenvatting uit PacoGO traceability-inventaris; geen woordelijk citaat",
     "related_skill_ids": [],
-    "exercise_ids": [],
+    "exercise_ids": [
+      "like-denominator-subtraction",
+      "like-denominator-multiplication"
+    ],
     "coverage_status": "partial",
     "coverage_note": "Gedeeltelijk. Bewerkingen zijn aanwezig, maar het expliciete relatiebegrip wordt niet afzonderlijk aangetoond.",
     "status": "active"
@@ -886,8 +891,12 @@ const OBJECTIVES = Object.freeze([
     "source_pdf_page": 115,
     "source_reference": "SLO 2017, PDF p.115",
     "source_wording": "samenvatting uit PacoGO traceability-inventaris; geen woordelijk citaat",
-    "related_skill_ids": [],
-    "exercise_ids": [],
+    "related_skill_ids": [
+      "FR2"
+    ],
+    "exercise_ids": [
+      "fr2-equivalence-practice"
+    ],
     "coverage_status": "partial",
     "coverage_note": "Gedeeltelijk. Een beperkte constructiepraktijk bestaat; generalisatie en formele evidence-dekking zijn niet aangetoond.",
     "status": "active"
@@ -919,7 +928,9 @@ const OBJECTIVES = Object.freeze([
     "source_reference": "SLO 2017, PDF p.117",
     "source_wording": "samenvatting uit PacoGO traceability-inventaris; geen woordelijk citaat",
     "related_skill_ids": [],
-    "exercise_ids": [],
+    "exercise_ids": [
+      "like-denominator-subtraction"
+    ],
     "coverage_status": "partial",
     "coverage_note": "Gedeeltelijk. Formele berekening bestaat; contextuele toepassing en formeel SLO-bewijs ontbreken.",
     "status": "active"
@@ -1159,8 +1170,12 @@ const OBJECTIVES = Object.freeze([
     "source_pdf_page": 129,
     "source_reference": "SLO 2017, PDF p.129",
     "source_wording": "samenvatting uit PacoGO traceability-inventaris; geen woordelijk citaat",
-    "related_skill_ids": [],
-    "exercise_ids": [],
+    "related_skill_ids": [
+      "FR2"
+    ],
+    "exercise_ids": [
+      "fr2-equivalence-practice"
+    ],
     "coverage_status": "partial",
     "coverage_note": "Gedeeltelijk. Equivalentieherkenning bestaat; de verhouding tussen teller en noemer en de formele evidence-koppeling zijn niet volledig aangetoond.",
     "status": "active"

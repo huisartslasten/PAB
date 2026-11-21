@@ -214,6 +214,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     summaryGrid.className = 'vertical-learning-lines-summary';
     const metrics = [
       [String(summary.objectives), 'SLO-tussendoelen'],
+      [String(exercises.length), 'Bestaande oefenroutes'],
       [String(summary.exerciseLinks), 'Oefeningkoppelingen'],
       [String(summary.partial), 'Gedeeltelijk gedekt'],
       [String(summary.notDemonstrated), 'Niet aangetoond']
@@ -349,7 +350,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
         const note = documentRef.createElement('p');
         note.textContent = objective.coverage_note;
         const sourceNote = documentRef.createElement('p');
-        sourceNote.textContent = 'Doelomschrijving is overgenomen uit de bestaande PacoGO-traceability-inventarisatie en is een inhoudelijke samenvatting, geen woordelijk SLO-citaat.';
+        sourceNote.textContent = objective.source_wording.includes('samenvatting') ? 'Doelomschrijving is een inhoudelijke samenvatting uit de PacoGO-traceability-inventarisatie; geen woordelijk SLO-citaat.' : 'Doelomschrijving is gebaseerd op de SLO 2017-bronformulering en licht genormaliseerd; raadpleeg de PDF-verwijzing voor de bronpassage.';
         rationale.append(summaryLabel, note, sourceNote);
         card.appendChild(rationale);
         objectiveGrid.appendChild(card);

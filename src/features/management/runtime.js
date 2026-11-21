@@ -213,7 +213,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     const summaryGrid = documentRef.createElement('div');
     summaryGrid.className = 'vertical-learning-lines-summary';
     const metrics = [
-      ['50', 'SLO-tussendoelen'],
+      [String(summary.objectives), 'SLO-tussendoelen'],
       [String(summary.exerciseLinks), 'Oefeningkoppelingen'],
       [String(summary.partial), 'Gedeeltelijk gedekt'],
       [String(summary.notDemonstrated), 'Niet aangetoond']

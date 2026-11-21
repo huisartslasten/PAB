@@ -652,7 +652,7 @@ const OBJECTIVES = Object.freeze([
     "slo_group": 6,
     "slo_source": "SLO 2017",
     "slo_component": "Getalbegrip",
-    "objective": "Benoemde breuken op een getallenlijn plaatsen en redeneren.",
+    "objective": "Breuken op een getallenlijn plaatsen"
     "source_pdf_page": 107,
     "source_reference": "SLO 2017, PDF p.107",
     "source_wording": "samenvatting uit PacoGO traceability-inventaris; geen woordelijk citaat",

@@ -9328,3 +9328,45 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 3. Bespreek samen welke hiaten als eerste aangepakt moeten worden.
 4. Voeg geen oefeningen, routes, interfaces, skills, FR-codes of curriculumcontracten toe zonder expliciete toestemming van de gebruiker.
 5. Als later een breukpagina of oefening wordt gebouwd, gebruik altijd de centrale PacoGO-paginatemplate, centrale Fraction Practice Template en Fraction Learning Interface; breid de centrale component uit in plaats van een aparte per-skill-template te maken.
+
+
+## 44. Eerste beheerweergave Verticale leerlijnen (21 november 2026)
+
+**Gebruikersbesluit**
+- In Beheer komt een onderdeel **Verticale leerlijnen**.
+- Daaronder komt per rekendomein een leerlijn, gestart met **Breuken**.
+- De centrale tabel toont per SLO-tussendoel het blijvende PacoGO Curriculum Objective ID, SLO-groep, SLO-bron, SLO-onderdeel, volledige doelomschrijving, gekoppelde PacoGO-oefeningen en status.
+- Een Curriculum Objective ID (bijvoorbeeld `FR-0001`) identificeert één leerdoel blijvend. Groep, bron, onderdeel, omschrijving en status zijn metadata van dat doel; zij worden niet in een steeds langere ID-string gecodeerd.
+- De beheerweergave moet zoveel mogelijk bestaande PacoGO-infrastructuur hergebruiken en uitbreidbaar blijven naar andere domeinen.
+
+**Gebouwd op branch `refactor/professional-v1`**
+- Nieuw centraal curriculumdoelenregister: `src/features/curriculum/vertical-learning-lines-registry.js`.
+- Het register valideert ID-vorm, uniciteit, groep, verplichte metadata, status en oefeningreferenties. Het model scheidt curriculumdoelen van skills, developments en taak-/oefenidentiteiten.
+- Eerste record is uitsluitend het expliciet door de gebruiker aangeleverde voorbeeld `FR-0001`: Breuken, groep 6, SLO 2017, Getalbegrip, “Breuken op een getallenlijn plaatsen”, status Actief.
+- Er zijn voor dit record nog geen PacoGO-oefeningen als gedekte oefeningen geregistreerd. De bestaande generieke Number Line-component wordt niet zonder gecontroleerde curriculumkoppeling als gedekte oefening gepresenteerd.
+- Beheer gebruikt de bestaande managementpagina, managementnavigatie, centrale PacoGO-paginatemplate en bestaande CSS-basis. Nieuw navigatie-item: Beheer → Verticale leerlijnen.
+- De tabel is domeingestuurd en toont het doel plus gekoppelde oefening-ID's; op dit moment staat alleen het expliciet bevestigde FR-0001-record erin. De overige SLO-tussendoelen krijgen pas IDs en records na broncontrole en gecontroleerde inventarisatie; geen IDs of oefeningkoppelingen zijn verzonnen.
+- De curriculumweergave is niet afhankelijk van een geselecteerde leerling.
+- Geen Supabase-schema/persistence, learner state, bestaand skill-/claim-/evidence-contract, oefenruntime of LIVE `main` gewijzigd.
+
+**Tests toegevoegd**
+- `src/features/curriculum/vertical-learning-lines-registry.test.js`: metadata, meerdere domeinen/doelen, oefeningreferenties, unieke IDs en validatie van verplichte velden/status/groep.
+
+**Commits van deze bouwstap**
+- `fe0c945789afa572436ded0eb7d280b156138dd0` — centraal register.
+- `a703d41594b1da176daaa4a64449a6e70879fe30` — registertests.
+- `4a2dd742ec0f178b65f8f615444f9482952b8997` — managementweergave.
+- `7cc6442dff5f372b6baae0dafff37c7fd3d3623b` — navigatie.
+- `2b9c85a29767e47c63eb130cf2ff5d6819f7ce34` — tabelstyling.
+- `3024996e0bc48a9c132c4d6cba88279bb4795f37` — beheerweergave onafhankelijk gemaakt van leerlingselectie.
+
+**Verificatie**
+- Voor de bouw was Full Regression #4197 / run 44938509780 **GREEN / SUCCESS** op exacte baseline `f686c3e4ffe67ceffc569d6e109bae455b234c30`.
+- Full Regression #4203 / run 44940223797 op exacte featurecommit `3024996e0bc48a9c132c4d6cba88279bb4795f37` was bij deze handoff-update nog **IN PROGRESS**; curriculum-engine, architectuurgrenzen, Double or Nothing, maintained Node en migrated Node-stappen waren groen; Chromium-installatie/browserregressie nog niet afgerond.
+- Deze handoff-update moet zelf ook door Full Regression op de nieuwe handoff-commit worden geverifieerd.
+
+**Volgende concrete stap**
+1. Wacht op en controleer Full Regression voor de featurecommit en de handoff-commit; bij rood eerst exacte oorzaak isoleren.
+2. Controleer de nieuwe beheerweergave visueel via de bestaande lokale TEST-workflow.
+3. Reconstrueer daarna de volledige bestaande SLO-doelenlijst en reeds gebouwde oefeningen uit de broninventaris en repository, voordat verdere Objective IDs of mappings worden toegevoegd.
+4. Breid de tabel pas daarna uit met de geverifieerde SLO-doelen en bestaande PacoGO-oefeningen. Geen curriculumdoelen, codes of dekking verzinnen.

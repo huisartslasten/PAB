@@ -780,3 +780,54 @@ De telling sluit de FR2-herkennings-/constructietaken en diagnostische probes F1
 - Geen code, tests, curriculumregistry, runtime, Supabase of learner data gewijzigd.
 - Dit addendum is een documentwijziging op basis van de eerder geverifieerde branch HEAD d8894a386de3311237daca2fae70fba346d53bcb en Full Regression #4194.
 - De nieuwe documentcommit en de daaropvolgende handoff-update moeten afzonderlijk op hun exacte commit door Full Regression worden geverifieerd voordat deze documentatie als afgerond wordt beschouwd.
+
+
+## 14. Beheerregister verticale breukenleerlijn — SLO-doelen en oefenroutes (21 november 2026)
+
+**Doel en gebruikersbesluit**
+- Beheer bevat de centrale route **Verticale leerlijnen → Breuken**.
+- De leerlijn presenteert SLO-tussendoelen als afzonderlijke witte doelkaarten, gegroepeerd per eindgroep 2 t/m 8 op de bestaande blauwe PacoGO-beheerachtergrond.
+- Per kaart worden het blijvende Curriculum Objective ID, groep, SLO-onderdeel, bronverwijzing, bestaande PacoGO-curriculumrelatie, verwante oefenroutes en de huidige dekkingsstatus getoond.
+- Een oefenroute kan aan meerdere SLO-doelen gekoppeld zijn en een SLO-doel kan meerdere oefenroutes hebben. De koppeling is dus many-to-many.
+- Vanuit iedere gekoppelde oefenroute kan de bestaande oefening worden geopend. Er worden geen aparte oefenpagina's of oefentemplates per SLO-doel gemaakt.
+
+**SLO-inventaris**
+- De beheerregistry bevat 53 doelrecords, met de relevante voorbereidende verhoudingstaal van eind groep 2 en 3 en de fractionele doelen tot en met eind groep 8.
+- Aantallen per groep: groep 2: 2; groep 3: 1; groep 4: 4; groep 5: 4; groep 6: 19; groep 7: 12; groep 8: 11.
+- Het door de gebruiker aangeleverde voorbeeld-ID **FR-0001** blijft behouden voor “Breuken op een getallenlijn plaatsen”, groep 6, SLO 2017, Getalbegrip.
+- De overige records gebruiken unieke FR-IDs. De ID blijft een stabiele doelidentiteit; groep, bron, onderdeel, omschrijving, status en oefenrelaties zijn afzonderlijke metadata.
+- Per doel is de relevante SLO 2017 PDF-pagina opgenomen. De doelomschrijvingen uit de eerdere traceability-crosswalk zijn als samenvatting gemarkeerd; waar de oorspronkelijke PDF-formulering afzonderlijk is gereconstrueerd, is die als licht genormaliseerde bronformulering gemarkeerd. De kaart toont daarom steeds de bronverwijzing en kwalificeert geen samenvatting als letterlijk citaat.
+
+**Bestaande PacoGO-structuur hergebruikt**
+- FR1 — Breuken representeren en interpreteren: de eerder vastgelegde skilldefinitie is gekoppeld waar relevant. De formele FR1 Development/Claim/Evidence/Task-structuur is nog niet teruggevonden en wordt niet verzonnen of als geregistreerd contract getoond.
+- FR2 — Breukequivalentie herkennen en gebruiken: bestaande kandidaatregistry gebruikt, inclusief D1–D3, C1–C3, ET1–ET6 en TM1–TM5. De bestaande FR2 task/evidence-alignmentvragen blijven open.
+- De centrale Fraction Practice Template, Fraction Answer Input, Fraction Learning Interface en bestaande skillroutes blijven de bestaande uitvoeringslaag. Geen kopieën per SLO-doel.
+- De generieke Number Line-component wordt niet voorgesteld als een reeds geïntegreerde Fraction Number Line-oefening.
+- De oefeningencatalogus bevat 30 bestaande route-level oefenroutes: de gevonden rekenoefenroutes binnen Optellen, Aftrekken, Vermenigvuldigen en Delen plus de bestaande FR2-formatieve oefenroute. De 405 taakposities blijven aantallen opgaven binnen taakbanken, niet 405 afzonderlijke routes of SLO-doelen.
+- Er zijn 41 doel-oefenroutekoppelingen. Dezelfde route kan bij meerdere doelen verschijnen. De links zijn bestaande, inhoudelijk verwante oefenroutes; ze bewijzen niet automatisch volledige dekking van het SLO-doel.
+
+**Dekkingsstatus uit de bestaande crosswalk**
+- 26 doelen: gedeeltelijk gedekt.
+- 27 doelen: niet aangetoond.
+- 0 doelen: volledig aangetoond.
+- Een gekoppelde oefenroute wordt niet als volledige dekking beschouwd alleen omdat de onderwerpnaam overeenkomt. De kaart toont de bestaande inventarisatie-onderbouwing en een expliciete waarschuwing dat context, representatie, redenering of formeel evidence nog kunnen ontbreken.
+- De dekkingsstatus is curriculum-/taakdekking; zij is geen uitspraak over individuele leerlingbeheersing of mastery.
+
+**Implementatie**
+- `src/features/curriculum/vertical-learning-lines-registry.js`: doelrecords, oefenroutecatalogus, FR1/FR2-relaties, metadata-validatie, unieke ID-validatie, many-to-many oefenreferenties en dekkingssamenvatting.
+- `src/features/curriculum/vertical-learning-lines-registry.test.js`: 53 records en groepsaantallen, behoud FR-0001, FR1/FR2-contractgrenzen, many-to-many-koppelingen en validatie van ontbrekende/ongeldige verwijzingen.
+- `src/features/management/runtime.js`: kaartweergave per groep, curriculumstructuur, oefenknoppen naar bestaande routes en uitklapbare onderbouwing.
+- `src/features/management/management-support.css`: witte kaarten, dekkingsstatussen, responsive grid en samenvattingskaarten.
+- De bestaande `management.html`, managementnavigatie, page template en `management-support.css` worden hergebruikt.
+- Geen Supabase, learner state, formele evidence, mastery, C1–C9, bestaande FR2-claim/evidence/task-contracten of LIVE `main` gewijzigd.
+
+**Verificatie**
+- Full Regression #4220 / run 44942098086: **SUCCESS** op exact commit `982f13433bace7dad3d9d3142fa04f9c716fa956`; de curriculum-engine-, architectuur-, Node- en browserregressiestappen zijn geslaagd.
+- De laatste presentatie-/CSS-commit is `f325b93942c1d434c01e2018b060e0b0233d9ed1`; Full Regression #4222 / run 44942183593 is op dat moment nog **IN PROGRESS**.
+- De hierop volgende handoff-update moet zelf ook door Full Regression op de exacte resulterende commit worden geverifieerd.
+
+**Volgende concrete stap**
+1. Controleer Full Regression #4222 op de exacte presentatiecommit en de regressie op de handoff-commit.
+2. Laat de gebruiker de kaartpresentatie en oefenknoppen controleren in de bestaande lokale PacoGO TEST-omgeving.
+3. Controleer de 41 voorgestelde relaties inhoudelijk met de volledige oefeninhoud; pas daarna mogen specifieke relaties worden opgewaardeerd tot volledige of gedeeltelijke SLO-dekking.
+4. Herstel de oorspronkelijke formele FR1 Development/Evidence-bron als die bestaat; vul deze structuur niet af uit aannames.

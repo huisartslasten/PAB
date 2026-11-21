@@ -91,6 +91,7 @@ export function createPacoManagementNavigation({ app, active = '', activeSubmenu
       { key: 'games', label: 'Spelletjes', filter: 'games' }
     ]),
     makeGroup('beheer', 'Beheer', [
+      { key: 'vertical-learning-lines', label: 'Verticale leerlijnen', filter: 'vertical-learning-lines' },
       { key: 'archive', label: 'Archief', filter: 'archive' },
       { key: 'trash', label: 'Prullenbak', filter: 'trash' }
     ])

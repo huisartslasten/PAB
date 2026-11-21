@@ -1239,7 +1239,7 @@ const OBJECTIVES = Object.freeze([
 
 function validateObjective(objective, seenIds, exerciseIds) {
   if (!objective || typeof objective !== 'object') throw new TypeError('Curriculum objective must be an object.');
-  if (!/^FR-\\d{4}$/.test(objective.id || '')) throw new Error('Curriculum objective ID must use the FR-0000 format.');
+  if (!/^FR-\d{4}$/.test(objective.id || '')) throw new Error('Curriculum objective ID must use the FR-0000 format.');
   if (seenIds.has(objective.id)) throw new Error(`Duplicate curriculum objective ID: ${objective.id}`);
   seenIds.add(objective.id);
   for (const field of ['domain', 'slo_source', 'slo_component', 'objective', 'source_reference']) if (!String(objective[field] || '').trim()) throw new Error(`Curriculum objective requires ${field}.`);

@@ -436,7 +436,7 @@ const OBJECTIVES = Object.freeze([
     "slo_group": 4,
     "slo_source": "SLO 2017",
     "slo_component": "Verhoudingen",
-    "objective": "De helft van een geheel begrijpen.",
+    "objective": "De helft van een geheel en van een hoeveelheid begrijpen.",
     "source_pdf_page": 94,
     "source_reference": "SLO 2017, PDF p.94",
     "source_wording": "samenvatting uit PacoGO traceability-inventaris; geen woordelijk citaat",
@@ -444,22 +444,6 @@ const OBJECTIVES = Object.freeze([
     "exercise_ids": [],
     "coverage_status": "partial",
     "coverage_note": "Gedeeltelijk. Een bruikbare representatie bestaat; een doelgerichte taak voor de betekenis van de helft ontbreekt.",
-    "status": "active"
-  },
-  {
-    "id": "FR-0007",
-    "domain": "Breuken",
-    "slo_group": 4,
-    "slo_source": "SLO 2017",
-    "slo_component": "Verhoudingen",
-    "objective": "De helft van een hoeveelheid begrijpen.",
-    "source_pdf_page": 94,
-    "source_reference": "SLO 2017, PDF p.94",
-    "source_wording": "samenvatting uit PacoGO traceability-inventaris; geen woordelijk citaat",
-    "related_skill_ids": [],
-    "exercise_ids": [],
-    "coverage_status": "not_demonstrated",
-    "coverage_note": "Niet aangetoond. De benodigde half-van-een-hoeveelheidstaak ontbreekt.",
     "status": "active"
   },
   {
@@ -516,7 +500,7 @@ const OBJECTIVES = Object.freeze([
     "slo_group": 5,
     "slo_source": "SLO 2017",
     "slo_component": "Verhoudingen",
-    "objective": "Een kwart van één geheel begrijpen.",
+    "objective": "Een kwart van één geheel en van een hoeveelheid begrijpen.",
     "source_pdf_page": 102,
     "source_reference": "SLO 2017, PDF p.102",
     "source_wording": "samenvatting uit PacoGO traceability-inventaris; geen woordelijk citaat",
@@ -524,22 +508,6 @@ const OBJECTIVES = Object.freeze([
     "exercise_ids": [],
     "coverage_status": "partial",
     "coverage_note": "Gedeeltelijk. Renderer aanwezig; taakinhoud ontbreekt.",
-    "status": "active"
-  },
-  {
-    "id": "FR-0012",
-    "domain": "Breuken",
-    "slo_group": 5,
-    "slo_source": "SLO 2017",
-    "slo_component": "Verhoudingen",
-    "objective": "Een kwart van een hoeveelheid begrijpen.",
-    "source_pdf_page": 102,
-    "source_reference": "SLO 2017, PDF p.102",
-    "source_wording": "samenvatting uit PacoGO traceability-inventaris; geen woordelijk citaat",
-    "related_skill_ids": [],
-    "exercise_ids": [],
-    "coverage_status": "not_demonstrated",
-    "coverage_note": "Niet aangetoond.",
     "status": "active"
   },
   {
@@ -752,10 +720,10 @@ const OBJECTIVES = Object.freeze([
     "slo_group": 6,
     "slo_source": "SLO 2017",
     "slo_component": "Verhoudingen",
-    "objective": "Een breuk als deel van een hoeveelheid en als deel van een geheel begrijpen.",
+    "objective": "Begrijpen dat een breuk een deel van een hoeveelheid kan weergeven.",
     "source_pdf_page": 110,
     "source_reference": "SLO 2017, PDF p.110",
-    "source_wording": "samenvatting uit PacoGO traceability-inventaris; geen woordelijk citaat",
+    "source_wording": "SLO 2017 bronformulering (licht genormaliseerd)",
     "related_skill_ids": [
       "FR1"
     ],
@@ -802,14 +770,16 @@ const OBJECTIVES = Object.freeze([
     "slo_group": 6,
     "slo_source": "SLO 2017",
     "slo_component": "Verhoudingen",
-    "objective": "Een deel van een hoeveelheid berekenen en vanuit een gegeven deel het totaal terugvinden.",
+    "objective": "In betekenisvolle verhoudingssituaties een deel van een hoeveelheid berekenen en omgekeerd de totale hoeveelheid berekenen op basis van een gegeven deel.",
     "source_pdf_page": 110,
     "source_reference": "SLO 2017, PDF p.110",
-    "source_wording": "samenvatting uit PacoGO traceability-inventaris; geen woordelijk citaat",
+    "source_wording": "SLO 2017 bronformulering (licht genormaliseerd)",
     "related_skill_ids": [
       "FR1"
     ],
-    "exercise_ids": [],
+    "exercise_ids": [
+      "whole-number-times-proper-fraction"
+    ],
     "coverage_status": "partial",
     "coverage_note": "Gedeeltelijk. De formele operatorberekening is aanwezig; omgekeerd redeneren en context zijn niet aangetoond.",
     "status": "active"
@@ -1225,14 +1195,102 @@ const OBJECTIVES = Object.freeze([
     "slo_group": 8,
     "slo_source": "SLO 2017",
     "slo_component": "Verhoudingen",
-    "objective": "Relaties tussen verhoudingen, breuken, procenten en decimale getallen begrijpen; breukdeling kan een repeterend decimaal opleveren.",
+    "objective": "Weten dat het bij breuken om een deling gaat, dat het bijbehorende decimale getal niet altijd eindigt (bij repeterende breuken) en dat deze breuken in sommige situaties mogen worden afgerond.",
     "source_pdf_page": 129,
     "source_reference": "SLO 2017, PDF p.129",
-    "source_wording": "samenvatting uit PacoGO traceability-inventaris; geen woordelijk citaat",
+    "source_wording": "SLO 2017 bronformulering (licht genormaliseerd)",
     "related_skill_ids": [],
     "exercise_ids": [],
     "coverage_status": "not_demonstrated",
-    "coverage_note": "Niet aangetoond. De conversie, delingsbetekenis en repeterende decimalen ontbreken in de breukleerroute.",
+    "coverage_note": "Er is geen breuk-naar-deling/repeterend-decimaal leerroute aangetroffen.",
+    "status": "active"
+  },
+  {
+    "id": "FR-0051",
+    "domain": "Breuken",
+    "slo_group": 5,
+    "slo_source": "SLO 2017",
+    "slo_component": "Verhoudingen",
+    "objective": "Kritisch denken en redeneren over eenvoudige verhoudingsproblemen.",
+    "source_pdf_page": 102,
+    "source_reference": "SLO 2017, PDF p.102",
+    "source_wording": "SLO 2017 bronformulering (licht genormaliseerd)",
+    "related_skill_ids": [],
+    "exercise_ids": [],
+    "coverage_status": "not_demonstrated",
+    "coverage_note": "Dit tussendoel staat in de oorspronkelijke SLO-bron, maar ontbrak als afzonderlijke regel in de eerdere crosswalk. Er is geen passende taak aangetroffen.",
+    "status": "active"
+  },
+  {
+    "id": "FR-0007",
+    "domain": "Breuken",
+    "slo_group": 6,
+    "slo_source": "SLO 2017",
+    "slo_component": "Verhoudingen",
+    "objective": "Begrijpen dat een breuk een deel van een geheel kan weergeven.",
+    "source_pdf_page": 110,
+    "source_reference": "SLO 2017, PDF p.110",
+    "source_wording": "SLO 2017 bronformulering (licht genormaliseerd)",
+    "related_skill_ids": [
+      "FR1"
+    ],
+    "exercise_ids": [],
+    "coverage_status": "partial",
+    "coverage_note": "De area-modelrenderers tonen deel-geheelrepresentaties; een doelgerichte betekenis-/contexttaak ontbreekt.",
+    "status": "active"
+  },
+  {
+    "id": "FR-0012",
+    "domain": "Breuken",
+    "slo_group": 6,
+    "slo_source": "SLO 2017",
+    "slo_component": "Verhoudingen",
+    "objective": "In betekenisvolle verhoudingssituaties de totale hoeveelheid berekenen op basis van een gegeven deel.",
+    "source_pdf_page": 110,
+    "source_reference": "SLO 2017, PDF p.110",
+    "source_wording": "SLO 2017 bronformulering (licht genormaliseerd)",
+    "related_skill_ids": [
+      "FR1"
+    ],
+    "exercise_ids": [],
+    "coverage_status": "not_demonstrated",
+    "coverage_note": "De omgekeerde contextuele taakvorm is niet als afzonderlijke bestaande oefening aangetroffen.",
+    "status": "active"
+  },
+  {
+    "id": "FR-0052",
+    "domain": "Breuken",
+    "slo_group": 8,
+    "slo_source": "SLO 2017",
+    "slo_component": "Verhoudingen",
+    "objective": "Verhoudingen en breuken, ook met een rekenmachine, noteren als een (afgerond) decimaal getal en decimale getallen relateren aan percentages en andersom.",
+    "source_pdf_page": 129,
+    "source_reference": "SLO 2017, PDF p.129",
+    "source_wording": "SLO 2017 bronformulering (licht genormaliseerd)",
+    "related_skill_ids": [],
+    "exercise_ids": [],
+    "coverage_status": "not_demonstrated",
+    "coverage_note": "Er is geen conversieoefening of geïntegreerde verhouding-breuk-decimaal-percentage-interface aangetroffen.",
+    "status": "active"
+  },
+  {
+    "id": "FR-0053",
+    "domain": "Breuken",
+    "slo_group": 8,
+    "slo_source": "SLO 2017",
+    "slo_component": "Verhoudingen",
+    "objective": "Veel voorkomende relaties tussen verhoudingen, breuken, procenten en decimale getallen uit het hoofd kennen.",
+    "source_pdf_page": 129,
+    "source_reference": "SLO 2017, PDF p.129",
+    "source_wording": "SLO 2017 bronformulering (licht genormaliseerd)",
+    "related_skill_ids": [
+      "FR2"
+    ],
+    "exercise_ids": [
+      "fr2-equivalence-practice"
+    ],
+    "coverage_status": "partial",
+    "coverage_note": "FR2-praktijk ondersteunt breukequivalentie, maar de volledige koppeling met verhoudingen, procenten en decimale getallen ontbreekt.",
     "status": "active"
   }
 ].map(Object.freeze));

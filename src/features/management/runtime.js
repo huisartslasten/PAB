@@ -242,7 +242,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     const showAll = filter === 'dashboard';
     const show = (...filters) => showAll || filters.includes(filter);
 
-    if (!hasStudent) {
+    if (!hasStudent && filter !== 'vertical-learning-lines') {
       const notice = documentRef.createElement('div');
       notice.className = 'management-dashboard-notice';
       notice.textContent = 'Kies bovenaan een leerling om leerlinggebonden beheer te openen.';

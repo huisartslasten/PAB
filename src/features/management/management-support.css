@@ -100,3 +100,14 @@
 .management-learner-link-status.is-error{color:#b42318}
 .management-learner-link-select{min-height:40px;max-width:100%;border:1px solid var(--paco-border);border-radius:11px;padding:8px 12px;background:#fff;color:var(--paco-text);font:700 14px/1.2 "Baloo 2",Nunito,sans-serif}
 .management-learner-link-card .management-dashboard-card-actions{align-items:center}
+
+/* Central curriculum administration: vertical learning lines. */
+.vertical-learning-lines{min-width:0}
+.vertical-learning-lines>h3{margin:4px 0;color:var(--paco-text);font-size:21px;font-weight:900}
+.vertical-learning-lines-table-wrap{width:100%;overflow-x:auto;border:1px solid var(--paco-border);border-radius:16px;background:#fff}
+.vertical-learning-lines-table{width:100%;min-width:980px;border-collapse:collapse;text-align:left}
+.vertical-learning-lines-table th,.vertical-learning-lines-table td{padding:13px 15px;border-bottom:1px solid var(--paco-border);vertical-align:top;line-height:1.35}
+.vertical-learning-lines-table thead th{background:#f7fbff;color:var(--paco-text);font-size:13px;font-weight:900;white-space:nowrap}
+.vertical-learning-lines-table tbody th{color:var(--paco-blue-dark);font-weight:900;white-space:nowrap}
+.vertical-learning-lines-table tbody tr:last-child th,.vertical-learning-lines-table tbody tr:last-child td{border-bottom:0}
+.vertical-learning-lines-note{margin:0;color:var(--paco-muted);font-size:14px;line-height:1.45}

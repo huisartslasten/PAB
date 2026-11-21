@@ -2,6 +2,7 @@ import { mountPacoPageTemplate } from '../../components/page-template.js';
 import { createPacoManagementNavigation } from '../../components/page-navigation.js';
 import { getStudentLearningProfile, listStudents } from '../../core/student-registry.js';
 import { buildViewUrl } from '../../core/view-context.js';
+import { verticalLearningLinesRegistry } from '../curriculum/vertical-learning-lines-registry.js';
 
 const FILTER_LABELS = Object.freeze({
   dashboard: 'Dashboard',
@@ -16,6 +17,7 @@ const FILTER_LABELS = Object.freeze({
   challenges: 'Challenges',
   games: 'Spelletjes',
   beheer: 'Beheer',
+  'vertical-learning-lines': 'Verticale leerlijnen',
   archive: 'Archief',
   trash: 'Prullenbak'
 });
@@ -190,6 +192,48 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     });
   }
 
+  function renderVerticalLearningLines() {
+    const section = documentRef.createElement('section');
+    section.className = 'management-dashboard-section vertical-learning-lines';
+    const heading = documentRef.createElement('h2');
+    heading.textContent = 'Verticale leerlijnen';
+    const intro = documentRef.createElement('p');
+    intro.textContent = 'Beheer de SLO-curriculumdoelen en zie welke PacoGO-oefeningen deze doelen aantoonbaar dekken.';
+    const domainHeading = documentRef.createElement('h3');
+    domainHeading.textContent = 'Breuken';
+    const tableWrap = documentRef.createElement('div');
+    tableWrap.className = 'vertical-learning-lines-table-wrap';
+    const table = documentRef.createElement('table');
+    table.className = 'vertical-learning-lines-table';
+    const head = documentRef.createElement('thead');
+    const headerRow = documentRef.createElement('tr');
+    ['Curriculum Objective ID', 'SLO-groep', 'SLO-bron', 'SLO-onderdeel', 'Tussendoel', 'Gekoppelde PacoGO-oefeningen', 'Status'].forEach(label => {
+      const cell = documentRef.createElement('th');
+      cell.scope = 'col';
+      cell.textContent = label;
+      headerRow.appendChild(cell);
+    });
+    head.appendChild(headerRow);
+    const body = documentRef.createElement('tbody');
+    verticalLearningLinesRegistry.listObjectives({ domain: 'Breuken' }).forEach(objective => {
+      const row = documentRef.createElement('tr');
+      const values = [objective.id, String(objective.slo_group), objective.slo_source, objective.slo_component, objective.objective, objective.exercise_ids.length ? objective.exercise_ids.join(', ') : 'Nog geen oefening gekoppeld', objective.status === 'active' ? 'Actief' : objective.status === 'planned' ? 'Gepland' : 'Vervallen'];
+      values.forEach((value, index) => {
+        const cell = documentRef.createElement(index === 0 ? 'th' : 'td');
+        if (index === 0) cell.scope = 'row';
+        cell.textContent = value;
+        row.appendChild(cell);
+      });
+      body.appendChild(row);
+    });
+    table.append(head, body);
+    tableWrap.appendChild(table);
+    const note = documentRef.createElement('p');
+    note.className = 'vertical-learning-lines-note';
+    note.textContent = 'De lijst bevat nu het expliciet vastgelegde voorbeeld FR-0001. Andere SLO-doelen en oefeningkoppelingen worden pas toegevoegd nadat hun bron en bestaande PacoGO-oefeningen zijn gecontroleerd.';
+    section.append(heading, intro, domainHeading, tableWrap, note);
+    content.appendChild(section);
+  }
   function render() {
     content.replaceChildren();
     const allCapabilities = app.managementCapabilities.getAvailableForPage({ page: 'management', student: selectedStudent });
@@ -221,8 +265,10 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     if (show('extra', 'games')) extraCards.push(createCard(documentRef, { title: 'Spelletjes', description: 'Beheer de spelvrijgave van de actieve leerling.', actionLabel: 'Spelletjes openen', disabled: !hasStudent, onClick: () => go('game-access.html') }));
     renderSection('Extra', extraCards);
     if (show('beheer') && hasStudent) renderLearnerProfileSection();
+    if (filter === 'vertical-learning-lines') renderVerticalLearningLines();
 
     const beheerCards = [];
+    if (show('beheer', 'vertical-learning-lines')) beheerCards.push(createCard(documentRef, { title: 'Verticale leerlijnen', description: 'Bekijk SLO-doelen en de PacoGO-oefeningen die deze doelen dekken.', actionLabel: 'Leerlijnen openen', onClick: () => go('management.html', { managementFilter: 'vertical-learning-lines' }) }));
     if (show('beheer', 'archive')) beheerCards.push(createCard(documentRef, { title: 'Archief', description: 'Bekijk items die uit de actieve omgeving zijn gearchiveerd.', actionLabel: 'Archief openen', onClick: () => go('archive.html', { recovery: 'archive' }) }));
     if (show('beheer', 'trash')) beheerCards.push(createCard(documentRef, { title: 'Prullenbak', description: 'Open de bestaande centrale herstel- en prullenbakfunctie.', actionLabel: 'Prullenbak openen', onClick: () => go('archive.html', { recovery: 'trash' }) }));
     renderSection('Beheer', beheerCards);

@@ -9278,3 +9278,53 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Verifieer deze handoff-update met Full Regression op de nieuwe handoff-commit.
 - Laat de gebruiker de nieuwe vijfstappenoefening visueel controleren in PacoGO TEST.
 - De zelfstandige oefening blijft ongewijzigd.
+
+
+## 43. SLO 2017 tussendoelen breuken — inventarisatie groepen 2 t/m 8 (21 november 2026)
+
+**Doel van deze fase**
+- De bestaande PacoGO-breukeninhoud volledig vergelijken met de relevante SLO 2017-tussendoelen voor eind groep 2 t/m 8.
+- Eerst vaststellen wat al bestaat, wat gedeeltelijk aanwezig is en wat niet aantoonbaar is; geen nieuwe curriculumonderdelen of oefeningen bedenken.
+- De uitkomst moet bruikbaar zijn om later in PacoGO zelf zichtbaar te maken wat aanwezig is en wat nog gebouwd moet worden.
+
+**Bron en repositorycontrole**
+- SLO-bron opnieuw geopend: tussendoelen-rekenen-wiskunde-po-2017_1(5).pdf, 162 pagina's.
+- Relevante PDF-pagina's: groep 2 p.77; groep 3 p.85; groep 4 p.94; groep 5 p.99 en p.102; groep 6 p.107, p.109 en p.110; groep 7 p.115 en p.117; groep 8 p.127 en p.129.
+- De PDF-paginanummers zijn twee hoger dan de gedrukte paginanummers.
+- SLO 2017 is als aparte broninventarisatie behandeld. De bestaande SLO juli 2026/KD10B-mapping is niet overschreven of vermengd.
+- Vooraf geverifieerde branch HEAD: d8894a386de3311237daca2fae70fba346d53bcb.
+- Full Regression #4194 / run 44730622618: SUCCESS op exact die baseline-commit.
+
+**Documentatie uitgevoerd**
+- Aan docs/curriculum/PacoGO_Fraction_Curriculum_Traceability_Inventory_v0.1.md is sectie 13 toegevoegd: SLO 2017 Tussendoelen Breuken — groepen 2 t/m 8.
+- De sectie bevat de SLO-bronafbakening, statusdefinities, inventaris van bestaande PacoGO-componenten, operationele taakbankomvang, crosswalk per groep, dekkingsconclusies en open verificatiepunten.
+- De 405 operationele taakposities zijn uitgesplitst als optellen 105, aftrekken 85, vermenigvuldigen 90 en delen 125. Dit zijn oefenposities, geen SLO-doelen of formele evidence-eenheden.
+- De matrix onderscheidt symbolische oefening, visuele representatie, contextuele taakvormen, begeleide/zelfstandige oefening, lokale formatieve opslag en synthetische FR2-demo's.
+- Geen enkel volledig SLO 2017-doel is op basis van de onderzochte branch als volledig aangetoond gemarkeerd. De sterkste bestaande dekking zit in formele breukbewerkingen; context, maat, getallenlijn, verhoudingstabellen, breuk-decimaalrelaties en kritisch redeneren bevatten belangrijke hiaten.
+
+**Belangrijke technische en curriculumbevindingen**
+- De centrale Fraction Practice Template, Fraction Answer Input en Fraction Learning Interface bestaan en moeten centraal worden hergebruikt; geen aparte pagina-template per skill.
+- De centrale equivalentie-interface ondersteunt symbolische breuken en area models (bar/grid/pie), maar is geen algemene interface voor alle samengestelde en gemengde breuken.
+- De generieke Number Line-component bestaat, maar is niet geïntegreerd als fraction-specifieke Number Line Learning Interface of SLO-breukroute.
+- De vijf FR2-browserpagina's T01–T05, aparte FR2-practice route en F1–F4-diagnostiek bestaan. De vijf browserpagina's zijn synthetische technische demonstraties; de lokale oefen-/diagnostiekopslag is geen formeel SLO-evidence of empirische validatie.
+- Registry v0.6.0-candidate bevat FR2 als enige geregistreerde breukskill. FR1 — Breuken representeren en interpreteren — is inhoudelijk terug te voeren op eerdere afspraken, maar het formele FR1 development/claim/evidence/task-contract is niet teruggevonden. De repositoryboom op de gecontroleerde HEAD bevat geen FR1-specifiek contractbestand. Geen FR1-identifiers verzinnen.
+- De bestaande FR2 task/evidence-alignmentvragen blijven open; de SLO 2017-inventarisatie wijzigt deze mappings niet.
+
+**Wijzigingen en verificatie**
+- Traceability-document eerste addendumcommit: f4d9a14b830a81e9ad136a4839526ea0ee4a8fa3; Full Regression #4195 / run 44938297873: SUCCESS op exact die commit.
+- Definitieve tekstcorrectiecommit van het traceability-document: 23e3db49620ad3c2d2613287ee57737300399ed1.
+- Full Regression #4196 / run 44938312920: SUCCESS op exact commit 23e3db49620ad3c2d2613287ee57737300399ed1.
+- Branch blijft refactor/professional-v1.
+- Alleen documentatie gewijzigd. Geen code, tests, registry, skill-/curriculumcontract, C1–C9, learner state, Supabase of learner data gewijzigd. LIVE main is niet aangeraakt.
+
+**Actuele status vóór deze handoff-update**
+- Laatste geverifieerde traceability-documentcommit: 23e3db49620ad3c2d2613287ee57737300399ed1.
+- Laatste Full Regression: #4196 / run 44938312920: SUCCESS op exact die commit.
+- Deze handoff-update is zelf een documentwijziging en moet door Full Regression op de resulterende exacte commit worden geverifieerd.
+
+**Volgende concrete stap**
+1. Verifieer deze handoff-update met Full Regression op de nieuwe handoff-commit.
+2. Presenteer daarna de uitkomst van de SLO 2017-matrix aan de gebruiker: bestaande dekking, gedeeltelijke dekking en niet-aangetoonde doelen.
+3. Bespreek samen welke hiaten als eerste aangepakt moeten worden.
+4. Voeg geen oefeningen, routes, interfaces, skills, FR-codes of curriculumcontracten toe zonder expliciete toestemming van de gebruiker.
+5. Als later een breukpagina of oefening wordt gebouwd, gebruik altijd de centrale PacoGO-paginatemplate, centrale Fraction Practice Template en Fraction Learning Interface; breid de centrale component uit in plaats van een aparte per-skill-template te maken.

@@ -193,47 +193,175 @@ export function createManagementRuntime({ app, templateMount, context, documentR
   }
 
   function renderVerticalLearningLines() {
+    const objectives = verticalLearningLinesRegistry.listObjectives({ domain: 'Breuken' });
+    const summary = verticalLearningLinesRegistry.getCoverageSummary({ domain: 'Breuken' });
+    const exercises = verticalLearningLinesRegistry.listExercises();
+    const skills = verticalLearningLinesRegistry.listCurriculumSkills();
+    const exerciseById = new Map(exercises.map(item => [item.id, item]));
     const section = documentRef.createElement('section');
     section.className = 'management-dashboard-section vertical-learning-lines';
+
     const heading = documentRef.createElement('h2');
-    heading.textContent = 'Verticale leerlijnen';
+    heading.textContent = 'Verticale leerlijn — Breuken';
     const intro = documentRef.createElement('p');
-    intro.textContent = 'Beheer de SLO-curriculumdoelen en zie welke PacoGO-oefeningen deze doelen aantoonbaar dekken.';
-    const domainHeading = documentRef.createElement('h3');
-    domainHeading.textContent = 'Breuken';
-    const tableWrap = documentRef.createElement('div');
-    tableWrap.className = 'vertical-learning-lines-table-wrap';
-    const table = documentRef.createElement('table');
-    table.className = 'vertical-learning-lines-table';
-    const head = documentRef.createElement('thead');
-    const headerRow = documentRef.createElement('tr');
-    ['Curriculum Objective ID', 'SLO-groep', 'SLO-bron', 'SLO-onderdeel', 'Tussendoel', 'Gekoppelde PacoGO-oefeningen', 'Status'].forEach(label => {
-      const cell = documentRef.createElement('th');
-      cell.scope = 'col';
-      cell.textContent = label;
-      headerRow.appendChild(cell);
+    intro.className = 'vertical-learning-lines-intro';
+    intro.textContent = 'Alle geïnventariseerde SLO-tussendoelen, gekoppeld aan bestaande PacoGO-curriculumonderdelen en oefenroutes.';
+    const source = documentRef.createElement('p');
+    source.className = 'vertical-learning-lines-source';
+    source.textContent = 'Bron: SLO 2017 · eind groep 2 t/m 8 · PDF-paginaverwijzingen per doel';
+
+    const summaryGrid = documentRef.createElement('div');
+    summaryGrid.className = 'vertical-learning-lines-summary';
+    const metrics = [
+      ['50', 'SLO-tussendoelen'],
+      [String(summary.exerciseLinks), 'Oefeningkoppelingen'],
+      [String(summary.partial), 'Gedeeltelijk gedekt'],
+      [String(summary.notDemonstrated), 'Niet aangetoond']
+    ];
+    metrics.forEach(([value, label]) => {
+      const card = documentRef.createElement('article');
+      card.className = 'vertical-learning-lines-metric';
+      const number = documentRef.createElement('strong');
+      number.textContent = value;
+      const caption = documentRef.createElement('span');
+      caption.textContent = label;
+      card.append(number, caption);
+      summaryGrid.appendChild(card);
     });
-    head.appendChild(headerRow);
-    const body = documentRef.createElement('tbody');
-    verticalLearningLinesRegistry.listObjectives({ domain: 'Breuken' }).forEach(objective => {
-      const row = documentRef.createElement('tr');
-      const values = [objective.id, String(objective.slo_group), objective.slo_source, objective.slo_component, objective.objective, objective.exercise_ids.length ? objective.exercise_ids.join(', ') : 'Nog geen oefening gekoppeld', objective.status === 'active' ? 'Actief' : objective.status === 'planned' ? 'Gepland' : 'Vervallen'];
-      values.forEach((value, index) => {
-        const cell = documentRef.createElement(index === 0 ? 'th' : 'td');
-        if (index === 0) cell.scope = 'row';
-        cell.textContent = value;
-        row.appendChild(cell);
+
+    const legend = documentRef.createElement('div');
+    legend.className = 'vertical-learning-lines-legend';
+    legend.textContent = 'Dekkingsstatus komt uit de bestaande PacoGO-inventarisatie. Een verwante oefening is nog geen bewijs dat het volledige SLO-doel wordt gedekt.';
+    const curriculumHeading = documentRef.createElement('h3');
+    curriculumHeading.textContent = 'Bestaande PacoGO-curriculumstructuur';
+    const curriculumGrid = documentRef.createElement('div');
+    curriculumGrid.className = 'vertical-learning-lines-skill-grid';
+    skills.forEach(skill => {
+      const card = documentRef.createElement('article');
+      card.className = 'vertical-learning-skill-card';
+      const title = documentRef.createElement('strong');
+      title.textContent = skill.id + ' — ' + skill.name;
+      const status = documentRef.createElement('span');
+      status.className = 'vertical-learning-skill-status';
+      status.textContent = skill.status === 'candidate_registered' ? 'Kandidaat in registry' : 'Skilldefinitie; formeel contract niet teruggevonden';
+      card.append(title, status);
+      if (skill.developments?.length) {
+        const detail = documentRef.createElement('p');
+        detail.textContent = skill.developments.map(item => item.id + ' ' + item.name).join(' · ');
+        card.appendChild(detail);
+        const contract = documentRef.createElement('p');
+        contract.textContent = 'Claims: ' + skill.claims.join(', ') + ' · Evidence targets: ' + skill.evidence_targets.join(', ') + ' · Task models: ' + skill.task_models.join(', ');
+        card.appendChild(contract);
+      } else {
+        const note = documentRef.createElement('p');
+        note.textContent = skill.note;
+        card.appendChild(note);
+      }
+      curriculumGrid.appendChild(card);
+    });
+
+    const groupContainer = documentRef.createElement('div');
+    groupContainer.className = 'vertical-learning-lines-groups';
+    for (let group = 2; group <= 8; group += 1) {
+      const groupObjectives = objectives.filter(item => item.slo_group === group);
+      if (!groupObjectives.length) continue;
+      const groupCard = documentRef.createElement('section');
+      groupCard.className = 'vertical-learning-group';
+      const groupHeader = documentRef.createElement('div');
+      groupHeader.className = 'vertical-learning-group-header';
+      const groupTitle = documentRef.createElement('h3');
+      groupTitle.textContent = 'Groep ' + group;
+      const groupCount = documentRef.createElement('span');
+      groupCount.textContent = groupObjectives.length + ' tussendoelen';
+      groupHeader.append(groupTitle, groupCount);
+      const objectiveGrid = documentRef.createElement('div');
+      objectiveGrid.className = 'vertical-learning-objective-grid';
+
+      groupObjectives.forEach(objective => {
+        const card = documentRef.createElement('article');
+        card.className = 'vertical-learning-objective-card';
+        const top = documentRef.createElement('div');
+        top.className = 'vertical-learning-objective-top';
+        const id = documentRef.createElement('strong');
+        id.className = 'vertical-learning-objective-id';
+        id.textContent = objective.id;
+        const coverage = documentRef.createElement('span');
+        coverage.className = 'vertical-learning-coverage vertical-learning-coverage--' + objective.coverage_status;
+        coverage.textContent = objective.coverage_status === 'partial' ? 'Gedeeltelijk gedekt' : objective.coverage_status === 'not_demonstrated' ? 'Niet aangetoond' : objective.coverage_status === 'full' ? 'Volledig gedekt' : 'Nog niet beoordeeld';
+        top.append(id, coverage);
+        const title = documentRef.createElement('h4');
+        title.textContent = objective.objective;
+        const meta = documentRef.createElement('p');
+        meta.className = 'vertical-learning-objective-meta';
+        meta.textContent = objective.slo_component + ' · ' + objective.slo_source + ' · ' + objective.source_reference;
+        card.append(top, title, meta);
+
+        if (objective.related_skill_ids.length) {
+          const skillTags = documentRef.createElement('div');
+          skillTags.className = 'vertical-learning-skill-tags';
+          objective.related_skill_ids.forEach(skillId => {
+            const tag = documentRef.createElement('span');
+            tag.textContent = skillId;
+            skillTags.appendChild(tag);
+          });
+          card.appendChild(skillTags);
+        }
+
+        const exerciseHeading = documentRef.createElement('h5');
+        exerciseHeading.className = 'vertical-learning-exercise-heading';
+        exerciseHeading.textContent = 'Bestaande PacoGO-oefeningen';
+        card.appendChild(exerciseHeading);
+        if (objective.exercise_ids.length) {
+          const exerciseList = documentRef.createElement('div');
+          exerciseList.className = 'vertical-learning-exercise-list';
+          objective.exercise_ids.forEach(exerciseId => {
+            const exercise = exerciseById.get(exerciseId);
+            if (!exercise) return;
+            const open = documentRef.createElement('button');
+            open.type = 'button';
+            open.className = 'vertical-learning-exercise-link';
+            open.textContent = exercise.label + '  →';
+            open.addEventListener('click', () => {
+              if (exercise.route.domain === 'fractions') {
+                navigate(buildViewUrl('skills.html', { student: selectedStudent, mode: context?.mode, extra: { domain: exercise.route.domain, topic: exercise.route.topic, exercise: exercise.route.exercise } }));
+              } else {
+                navigate(buildViewUrl(exercise.route.page, { student: selectedStudent, mode: context?.mode }));
+              }
+            });
+            exerciseList.appendChild(open);
+          });
+          card.appendChild(exerciseList);
+          const caution = documentRef.createElement('p');
+          caution.className = 'vertical-learning-exercise-caution';
+          caution.textContent = 'Verwante bestaande oefenroute(s); de volledige dekking van dit doel is hiermee niet automatisch vastgesteld.';
+          card.appendChild(caution);
+        } else {
+          const empty = documentRef.createElement('p');
+          empty.className = 'vertical-learning-no-exercises';
+          empty.textContent = 'Nog geen passende, gecontroleerde oefenroute gekoppeld.';
+          card.appendChild(empty);
+        }
+
+        const rationale = documentRef.createElement('details');
+        rationale.className = 'vertical-learning-objective-rationale';
+        const summaryLabel = documentRef.createElement('summary');
+        summaryLabel.textContent = 'Waarom deze dekkingsstatus?';
+        const note = documentRef.createElement('p');
+        note.textContent = objective.coverage_note;
+        const sourceNote = documentRef.createElement('p');
+        sourceNote.textContent = 'Doelomschrijving is overgenomen uit de bestaande PacoGO-traceability-inventarisatie en is een inhoudelijke samenvatting, geen woordelijk SLO-citaat.';
+        rationale.append(summaryLabel, note, sourceNote);
+        card.appendChild(rationale);
+        objectiveGrid.appendChild(card);
       });
-      body.appendChild(row);
-    });
-    table.append(head, body);
-    tableWrap.appendChild(table);
-    const note = documentRef.createElement('p');
-    note.className = 'vertical-learning-lines-note';
-    note.textContent = 'De lijst bevat nu het expliciet vastgelegde voorbeeld FR-0001. Andere SLO-doelen en oefeningkoppelingen worden pas toegevoegd nadat hun bron en bestaande PacoGO-oefeningen zijn gecontroleerd.';
-    section.append(heading, intro, domainHeading, tableWrap, note);
+      groupCard.append(groupHeader, objectiveGrid);
+      groupContainer.appendChild(groupCard);
+    }
+
+    section.append(heading, intro, source, summaryGrid, legend, curriculumHeading, curriculumGrid, groupContainer);
     content.appendChild(section);
   }
+
   function render() {
     content.replaceChildren();
     const allCapabilities = app.managementCapabilities.getAvailableForPage({ page: 'management', student: selectedStudent });

@@ -594,3 +594,189 @@ The source reconstruction establishes:
 **First concrete action for BREUKEN 02:** construct the source-traceable vertical coverage matrix for KD10B using only recovered FR1/FR2 definitions, their existing cross-skill relations and the exact SLO wording. Mark each KD10B content element as covered, partially covered, cross-skill-dependent or unresolved. Keep the missing FR1 formal contract explicitly blocked; do not manufacture identifiers. Resolve source recovery/owner disposition before formal FR1 task/evidence implementation.
 
 **No curriculum, registry, task, evidence, mastery, runtime, Supabase or learner-data contract was changed in this phase.**
+
+
+---
+
+## 13. SLO 2017 Tussendoelen Breuken — groepen 2 t/m 8
+
+**Status:** afzonderlijke broninventarisatie en implementatie-crosswalk; geen nieuwe curriculumvoorstellen  
+**Datum:** 2026-11-21  
+**Bron:** SLO (2017), Tussendoelen rekenen-wiskunde voor het primair onderwijs, versie 2017, PDF van 162 pagina's  
+**Repositorybasis:** branch refactor/professional-v1, HEAD d8894a386de3311237daca2fae70fba346d53bcb; Full Regression #4194 / run 44730622618 SUCCESS op exact deze commit vóór deze documentwijziging.
+
+### 13.1 Afbakening en brongebruik
+
+Deze sectie is een afzonderlijke SLO 2017-inventarisatie. Zij vervangt of herschrijft niet de bestaande mapping naar SLO Kerndoelen primair onderwijs, juli 2026 (KD10B).
+
+De paginaverwijzingen hieronder zijn PDF-paginanummers. De gedrukte paginanummers in de PDF liggen twee pagina's lager.
+
+Relevante bronpassages:
+- eind groep 2: PDF p.77;
+- eind groep 3: PDF p.85;
+- eind groep 4: PDF p.94;
+- eind groep 5: PDF p.99 en p.102;
+- eind groep 6: PDF p.107, p.109 en p.110;
+- eind groep 7: PDF p.115 en p.117;
+- eind groep 8: PDF p.127 en p.129.
+
+De SLO-bron gebruikt bij de vroege groepen de rubriek **Wiskundetaal bij verhoudingen, breuken en procenten**. De doelen van groep 2 en 3 zijn vooral voorbereidende verhoudingstaal; zij worden niet achteraf als expliciete formele breukdoelen gepresenteerd. Ze blijven opgenomen omdat zij in de relevante SLO-rubriek staan en de verticale aanloop vormen.
+
+De scope omvat doelen waarin breuken expliciet voorkomen en de direct voorafgaande verhoudingstaal die in dezelfde SLO-rubriek staat. Percentage-only en schaal-only doelen zijn niet automatisch breukdoelen. Bij groep 8 worden alleen de expliciete relaties tussen verhoudingen, breuken, procenten en decimale getallen meegenomen; de overige procenten- en schaaldoelen worden niet stilzwijgend aan FR1 of FR2 gekoppeld.
+
+### 13.2 Betekenis van de dekkings- en bewijsstatus
+
+- **Gedeeltelijk:** er bestaat een verwante taak, route of interface, maar niet de volledige SLO-doelinhoud. Ontbrekende context, representaties, zelfstandige redenering, taakvariatie of formele bewijsvoering blijven zichtbaar.
+- **Niet aangetoond:** in de onderzochte branch is geen taak/route/interface gevonden die het specifieke doel aantoonbaar aanbiedt.
+- **Volledig aangetoond:** alleen te gebruiken wanneer de volledige doelinhoud daadwerkelijk door passende taakvormen wordt ondersteund. In deze inventarisatie is geen volledig SLO-doel als volledig aangetoond vastgesteld.
+- **Formatief/lokaal:** oefenresultaten en ruwe antwoorden worden lokaal per leerling opgeslagen; dit is geen formeel curriculum-evidence of mastery.
+- **Synthetische demo:** browserdemonstratie met test-/fixturegegevens; geen echte leerlingmeting en geen empirische validatie.
+
+Een taakbank met veel sommen is geen bewijs van volledige SLO-dekking. De 405 taakposities in §13.4 zijn aantallen oefenposities, niet aantallen SLO-doelen of formele evidence-eenheden.
+
+### 13.3 Bestaande PacoGO-componenten die in de matrix worden gebruikt
+
+**Centrale breukinterface en templates**
+- pacogo-engine/fraction-practice-template.js;
+- pacogo-engine/fraction-answer-input.js;
+- pacogo-engine/fraction-learning-interface-contract.js;
+- pacogo-engine/fraction-learning-interface-renderers.js;
+- pacogo-engine/fraction-learning-interface.js;
+- pacogo-engine/fraction-interface-controller-bridge.js;
+- pacogo-engine/fraction-learning-interface.css;
+- pacogo-engine/fraction-representation-contract.js.
+
+De Fraction Learning Interface ondersteunt symbolische breuknotatie en area models. De centrale area-modelrenderer ondersteunt bar, grid en pie. De formele equivalentie-interface valideert echter alleen breuken met teller kleiner dan of gelijk aan de noemer; zij is geen algemene interface voor alle samengestelde en gemengde breuken.
+
+Er bestaat daarnaast een afzonderlijke interactieve Fraction Quantity-interface/controller voor het verdelen en aanpassen van hoeveelheden. Deze wordt gebruikt door de visuele oefening waarbij een breukgetal groter dan 1 van een heel getal wordt afgetrokken. Dat is geen algemene contextuele breukleerlijn.
+
+**Breukroutes**
+- src/features/skills/runtime.js bevat de onderwerpen Algemeen, Optellen, Aftrekken, Vermenigvuldigen, Delen en Getallenlijn.
+- Alleen Optellen, Aftrekken, Vermenigvuldigen en Delen hebben in deze runtime actieve onderwerpuitwerking.
+- Algemeen en Getallenlijn zijn in de onderzochte branch placeholders; de generieke Number Line-component is geen geïntegreerde Fraction Number Line Learning Interface.
+- De bestaande rekenroutes gebruiken de centrale PacoGO-paginatemplate en centrale breukcomponenten. Er is geen afzonderlijke SLO-pagina per skill gebouwd.
+
+**FR2-curriculum en diagnostiek**
+- docs/curriculum/PacoGO_Curriculum_Registry_v0.6.json bevat FR2 als enige formeel geregistreerde breukskill in deze kandidaatregistry; FR1 ontbreekt.
+- FR2 bevat kandidaatontwikkelingen D1–D3, claims C1–C3, evidence targets ET1–ET6 en task models TM1–TM5.
+- De vijf FR2-browserpagina's zijn curriculum-fr2-fraction-equivalence.html, curriculum-fr2-fractions.html, curriculum-fr2-representation-transfer.html, curriculum-fr2-surface-countertask.html en curriculum-fr2-language-reduced-transfer.html.
+- De aparte learner practice route is curriculum-fr2-practice-learner.html.
+- De formatieve diagnostische route is curriculum-fraction-diagnostic-learner.html, met F1–F4 in fraction-diagnostic-session-v2.js en fraction-diagnostic-assessment.js.
+- FR2-browserpagina's zijn synthetische technische demonstraties. De drie-item herkenningspraktijk, constructiepraktijk en F1–F4-diagnose gebruiken lokale formatieve opslag. Geen daarvan mag zonder de bestaande assessmentcontracten als formeel SLO-bewijs of mastery worden gepresenteerd.
+
+**Formele bewerkingstaakbanken**
+De onderzochte operationele banken omvatten:
+- Optellen: fraction-addition-practice-task-bank.js, fraction-addition-level-3-task-bank.js, fraction-addition-level-3b-task-bank.js, fraction-addition-level-4-task-bank.js en fraction-addition-level-5-task-bank.js.
+- Aftrekken: fraction-quantity-whole-minus-greater-than-one-task-bank.js, fraction-unlike-denominator-subtraction-task-bank.js, fraction-unlike-mixed-denominator-subtraction-task-bank.js en de bijbehorende gelijknamige/gemengde taakbanken en sessies.
+- Vermenigvuldigen: fraction-like-denominator-multiplication-task-bank.js, fraction-unlike-denominator-multiplication-task-bank.js, fraction-mixed-like-denominator-multiplication-task-bank.js, fraction-mixed-unlike-denominator-multiplication-task-bank.js, fraction-whole-number-times-proper-fraction-task-bank.js en fraction-whole-number-times-mixed-fraction-greater-than-one-task-bank.js.
+- Delen: fraction-like-denominator-division-task-bank.js, fraction-like-denominator-division-guided-task-bank.js, fraction-unlike-denominator-division-task-bank.js, fraction-unlike-denominator-division-guided-task-bank.js, fraction-mixed-like-denominator-division-task-bank.js, fraction-mixed-like-denominator-division-guided-task-bank.js, fraction-mixed-unlike-denominator-division-task-bank.js, fraction-mixed-unlike-denominator-division-guided-task-bank.js en fraction-whole-number-divided-by-fraction-greater-than-one-task-bank.js met de begeleide variant.
+
+De formele bewerkingsoefeningen bestaan hoofdzakelijk uit symbolische getalsopgaven. De taakbankobjecten leggen vooral breukwaarden, bewerkingen en antwoorden vast; zij bevatten geen systematisch aanbod van contextuele verhaaltaken voor alle betreffende SLO-doelen. De visuele taakbank voor een heel getal min een breukgetal groter dan 1 is een specifieke uitzondering, geen algemene contextuele dekking.
+
+### 13.4 Omvang van de bestaande operationele bewerkingstaakbanken
+
+| Onderwerp | Taakposities | Opbouw zoals eerder in de bankinventarisatie vastgesteld |
+|---|---:|---|
+| Optellen | 105 | 7 families; onder meer gelijknamig, ongelijknamig, uitkomst groter dan 1 en gemengde getallen; enkele begeleide en zelfstandige varianten |
+| Aftrekken | 85 | 6 families; inclusief één visuele taakbank voor een heel getal min een breukgetal groter dan 1 |
+| Vermenigvuldigen | 90 | 6 families van 15 taken |
+| Delen | 125 | 5 families van 25 taken; per familie 10 begeleid en 15 zelfstandig |
+| **Totaal** | **405** | Taakposities, geen SLO-doelen en geen formele evidence-eenheden |
+
+De telling sluit de FR2-herkennings-/constructietaken en diagnostische probes F1–F4 uit. De aantallen bewijzen niet dat contextuele, meetkundige, getallenlijn- of redeneringsdoelen zijn afgedekt.
+
+### 13.5 SLO 2017 crosswalk — groep 2 t/m 5
+
+| Groep en SLO-bron | SLO-doelinhoud | Bestaand PacoGO-onderdeel en taakvorm | Begeleiding en bewijsstatus | Dekking en aantoonbare gap |
+|---|---|---|---|---|
+| 2, Verhoudingen, p.77 | In betekenisvolle situaties verhoudingsgewijs vergelijken en ordenen. | Geen specifieke verhoudingstaak of breukroute aangetroffen. | Geen passende taak of bewijs. | **Niet aangetoond.** Contextuele verhoudingstaken ontbreken. |
+| 2, Verhoudingen, p.77 | Situaties of afbeeldingen herkennen waarin verhoudingen niet kloppen. | Geen proportie-/wanverhouding-countertask aangetroffen. FR2-T04 is een synthetische breuk-equivalentie-countertask en geen proportiebeeldtaak. | Alleen synthetische FR2-demo voor een ander construct. | **Niet aangetoond.** Er is geen taak die onjuiste verhoudingen in betekenisvolle situaties/afbeeldingen laat herkennen. |
+| 3, Verhoudingen, p.85 | Kwalitatieve verhoudingen in betekenisvolle contexten onder woorden brengen. | Geen contextuele verhoudingstaak of leerlinguitlegtaak voor dit doel aangetroffen. | Geen passende taak of bewijs. | **Niet aangetoond.** Verwoorden van kwalitatieve verhoudingen ontbreekt. |
+| 4, Verhoudingen, p.94 | Eenvoudige verhoudingen in betekenisvolle contexten onder woorden brengen. | Geen afzonderlijke contextuele verhoudingstaak. | Geen passende taak of bewijs. | **Niet aangetoond.** |
+| 4, Verhoudingen, p.94 | De helft van een geheel begrijpen. | De centrale Fraction-renderers kunnen een half visueel en symbolisch tonen; FR2-praktijk bevat onder meer 1/2 als doelbreuk. Dit zijn equivalentie-/representatietaken, geen expliciete half-van-een-geheel-leertaak. | Formatieve FR2-praktijk; lokale voortgang. Geen formeel bewijs voor dit SLO-doel. | **Gedeeltelijk.** Een bruikbare representatie bestaat; een doelgerichte taak voor de betekenis van de helft ontbreekt. |
+| 4, Verhoudingen, p.94 | De helft van een hoeveelheid begrijpen. | De interactieve Fraction Quantity-interface bestaat, maar de aangetroffen toepassing is een specifieke visuele aftrekoefening, niet een taak die de helft van een hoeveelheid laat bepalen. | Visuele oefening; geen formeel evidence. | **Niet aangetoond.** De benodigde half-van-een-hoeveelheidstaak ontbreekt. |
+| 4, Verhoudingen, p.94 | Eenvoudige verhoudingsproblemen met aantallen/prijzen oplossen via verdubbelen, halveren en vermenigvuldigen. | Geen systematische contextuele bank voor aantallen/prijzen of deze strategieën aangetroffen. Symbolische breukbewerkingen zijn geen vervanging voor deze verhoudingstaken. | Geen passende contextuele taak/evidence. | **Niet aangetoond.** Context, strategiegebruik en verwoorden ontbreken. |
+| 4, Verhoudingen, p.94 | Verhoudingstabellen gebruiken. | Geen breuk-/verhoudingstabel-Learning Interface of bijbehorende taakbank aangetroffen. | Geen passende taak of bewijs. | **Niet aangetoond.** |
+| 5, Getalbegrip, p.99 | Betekenis van heel, half, kwart, halveren, verdubbelen, deel en geheel begrijpen. | Fraction area models en quantity-rendering kunnen delen van gehelen weergeven; de bestaande taken toetsen deze begrippen niet systematisch als afzonderlijke betekenissen. | Alleen verwante formatieve representatie-/oefenactiviteiten; geen formeel bewijs. | **Gedeeltelijk.** Visuele bouwstenen bestaan; begrips- en contexttaken voor de volledige begrippenreeks ontbreken. |
+| 5, Verhoudingen, p.102 | Een kwart van één geheel begrijpen. | De centrale area-modelrenderer kan een kwart tonen, maar in de aangetroffen FR2-praktijk is geen doelgerichte kwart-van-een-geheel-leertaak aangetoond. | Geen formeel bewijs voor dit doel. | **Gedeeltelijk.** Renderer aanwezig; taakinhoud ontbreekt. |
+| 5, Verhoudingen, p.102 | Een kwart van een hoeveelheid begrijpen. | Geen specifieke kwart-van-een-hoeveelheidstaak aangetroffen. De quantity-interface is een specifieke visuele aftrektoepassing. | Geen passende taak/evidence. | **Niet aangetoond.** |
+| 5, Verhoudingen, p.102 | Eenvoudige verhoudingsproblemen oplossen met een verhoudingstabel. | Geen verhoudingstabeltaakbank of -interface aangetroffen. | Geen passende taak/evidence. | **Niet aangetoond.** |
+
+### 13.6 SLO 2017 crosswalk — groep 6
+
+| Groep en SLO-bron | SLO-doelinhoud | Bestaand PacoGO-onderdeel en taakvorm | Begeleiding en bewijsstatus | Dekking en aantoonbare gap |
+|---|---|---|---|---|
+| 6, Getalbegrip, p.107 | Breuken lezen, uitspreken en noteren met horizontale en schuine breuknotatie; teller/noemer in context verwoorden. | Centrale stacked-fraction renderer en invoercomponenten tonen teller, breukstreep en noemer. Diagnostiek en taakbanken gebruiken breukwaarden. Een contextuele teller/noemer-uitlegtaak is niet aangetroffen. | Oefen-/diagnostische interactie lokaal; geen formeel FR1-bewijs. | **Gedeeltelijk.** Notatie en invoer bestaan; hardop lezen, uitspreken en betekenis in context zijn niet systematisch getoetst. |
+| 6, Getalbegrip, p.107 | Eenheidsbreuken, niet-stambreuken, hele breuken en samengestelde breuken herkennen. | Taakbanken gebruiken verschillende breukvormen, inclusief gemengde getallen. Er is geen afzonderlijke herkennings-/classificatietaak voor de genoemde categorieën aangetroffen. | Vooral symbolische oefening; geen formeel bewijs voor categorisch begrip. | **Gedeeltelijk.** De vormen komen in opgaven voor; expliciete herkenning en betekenisverklaring ontbreken. |
+| 6, Getalbegrip, p.107 | Breuken als maatverfijning in meetsituaties begrijpen en resultaat als samengestelde breuk uitdrukken. | Geen meetstroken-/meetcontexttaak of meet-Learning Interface voor breuken aangetroffen. | Geen passende taak/evidence. | **Niet aangetoond.** |
+| 6, Getalbegrip, p.107 | Relaties tussen stambreuken, niet-stambreuken en samengestelde breuken met dezelfde noemer begrijpen. | Gelijknamige optel-, aftrek- en vermenigvuldigingstaakbanken gebruiken breuken met dezelfde noemer. FR2 richt zich op equivalentie, niet op de volledige genoemde relaties. | Oefenbanken; waar begeleid, stap-voor-stap; geen formeel SLO-evidence. | **Gedeeltelijk.** Bewerkingen zijn aanwezig, maar het expliciete relatiebegrip wordt niet afzonderlijk aangetoond. |
+| 6, Getalbegrip, p.107 | Veel voorkomende benoemde breuken vergelijken en ordenen en hierover redeneren. | Geen afzonderlijke vergelijkings-/ordeningstaak of route aangetroffen. | Geen passende taak/evidence. | **Niet aangetoond.** |
+| 6, Getalbegrip, p.107 | Benoemde breuken op een getallenlijn plaatsen en redeneren. | Generieke number-line.js, number-line-renderer.js en number-line-controller.js bestaan. Deze vormen geen fraction-specifieke route, tonen geen breuknotatie op de lijn en zijn niet aan FR1/FR2 gekoppeld. | Geen fraction-specifieke learner route of SLO-evidence. | **Niet aangetoond.** Een generieke getallenlijn is geen geïntegreerde Fraction Number Line Learning Interface. |
+| 6, Getalbegrip, p.107 | Kritisch denken en redeneren over breuken als getallen in probleemsituaties. | Geen expliciete redenerings-/probleemtaak voor dit doel aangetroffen. De optionele uitleg bij FR2 is geen automatische beoordeling van redeneerk waliteit. | Synthetische FR2-demo/formatieve praktijk; geen formeel redeneerbewijs. | **Niet aangetoond.** |
+| 6, Bewerkingen, p.109 | Breuken aanvullen tot 1 in contextsituaties en formele sommentaal. | Geen afzonderlijke complement-tot-1-taakbank aangetroffen. De bestaande optelbank is geen bewijs dat dit specifieke doel wordt geoefend. | Geen passende taak/evidence. | **Niet aangetoond.** |
+| 6, Bewerkingen, p.109 | Rekenen met de breuk als operator in informele contextsituaties. | Whole-number-times-proper-fraction en aanverwante vermenigvuldigingstaakbanken bevatten symbolische operatorberekeningen. Geen systematische informele contexttaken aangetroffen. | Vooral zelfstandige symbolische oefening; geen formeel evidence. | **Gedeeltelijk.** De formele rekenvorm bestaat; de informele contextbetekenis ontbreekt. |
+| 6, Verhoudingen, p.110 | Verhoudingstabellen interpreteren en gebruiken om verhoudingen weer te geven en te vergelijken. | Geen verhoudingstabelcomponent of taakbank aangetroffen. | Geen passende taak/evidence. | **Niet aangetoond.** |
+| 6, Verhoudingen, p.110 | Eenvoudige verhoudingen in alledaagse situaties herkennen. | Geen expliciete alledaagse verhoudingstaken aangetroffen. | Geen passende taak/evidence. | **Niet aangetoond.** |
+| 6, Verhoudingen, p.110 | Een breuk als deel van een hoeveelheid en als deel van een geheel begrijpen. | Area-modelrenderers, FR2-praktijk en Fraction Quantity-component bieden verwante representaties. De huidige FR2-praktijk toetst equivalentie; de specifieke deel-van-hoeveelheidstaak is niet aangetroffen. | Formatieve lokale oefening en synthetische demo; geen formeel bewijs voor FR1. | **Gedeeltelijk.** Representatiebouwstenen bestaan; een samenhangende hoeveelheid-/geheel-leerroute ontbreekt. |
+| 6, Verhoudingen, p.110 | Objecten/hoeveelheden in gelijke delen verdelen en het resultaat als breuk benoemen en weergeven. | Fraction Quantity-controller ondersteunt verdelen in gelijke delen; de visuele aftrekoefening gebruikt deze interactie. Er is geen algemene taakroute die het verdelen, benoemen en noteren van een breuk systematisch combineert. | Specifieke visuele oefening; geen formeel evidence. | **Gedeeltelijk.** Interactie bestaat; algemene constructie- en betekenisroute ontbreekt. |
+| 6, Verhoudingen, p.110 | Een deel aanvullen tot een geheel en het complement als breuk benoemen. | Geen afzonderlijke complement-/aanvultaak aangetroffen. | Geen passende taak/evidence. | **Niet aangetoond.** |
+| 6, Verhoudingen, p.110 | Een deel van een hoeveelheid berekenen en vanuit een gegeven deel het totaal terugvinden. | Whole-number-times-fraction-taakbanken ondersteunen een formele berekening van een deel. Een omgekeerde taak waarbij het totaal uit een gegeven deel wordt teruggevonden is niet aangetroffen; contexten ontbreken. | Symbolische oefening; geen formeel evidence. | **Gedeeltelijk.** De formele operatorberekening is aanwezig; omgekeerd redeneren en context zijn niet aangetoond. |
+| 6, Verhoudingen, p.110 | Verhoudingsproblemen met geld, tijd en maten oplossen. | Geen systematische breuk-contextbanken voor geld, tijd en maten aangetroffen. | Geen passende contextuele taak/evidence. | **Niet aangetoond.** |
+| 6, Verhoudingen, p.110 | Kritisch denken en redeneren over breuken als verhoudingsgetal in betekenisvolle probleemsituaties. | Geen expliciete redenerings-/probleemtaak aangetroffen. | Geen passende taak/evidence. | **Niet aangetoond.** |
+
+### 13.7 SLO 2017 crosswalk — groep 7
+
+| Groep en SLO-bron | SLO-doelinhoud | Bestaand PacoGO-onderdeel en taakvorm | Begeleiding en bewijsstatus | Dekking en aantoonbare gap |
+|---|---|---|---|---|
+| 7, Getalbegrip, p.115 | Verschillende verschijningsvormen van breuken begrijpen: deel van geheel, meetresultaat, delingsresultaat, rekengetal en verhouding; voorbeelden kunnen noemen. | Area models en symbolische breuken ondersteunen deel-geheel en rekennotatie; delingsoefeningen gebruiken breuken als bewerkingsgetallen. Een geïntegreerde route die alle betekenissen laat interpreteren en voorbeelden laat geven is niet aangetroffen. | Formatieve oefening/synthetische demo; geen formeel FR1-evidence. | **Gedeeltelijk.** Enkele representaties en bewerkingen bestaan; meetresultaat, delingsresultaat en verhouding zijn niet als samenhangende betekenissen afgedekt. |
+| 7, Getalbegrip, p.115 | Relatie tussen breuken en decimale getallen begrijpen en veel voorkomende breuken/decimalen omzetten. | Geen fraction-decimal conversion task bank of converter-Learning Interface aangetroffen. | Geen passende taak/evidence. | **Niet aangetoond.** |
+| 7, Getalbegrip, p.115 | Samengestelde breuken vergelijken en ordenen en uitleggen waarom de volgorde klopt. | Gemengde breuken komen voor in bewerkingstaakbanken. Er is geen afzonderlijke vergelijkings-/ordeningstaak met uitleg aangetroffen. | Vooral symbolische bewerkingsoefening; geen formeel redeneerbewijs. | **Niet aangetoond.** |
+| 7, Getalbegrip, p.115 | Breuken vereenvoudigen, hele delen eruit halen en bepalen of een breuk maximaal vereenvoudigd is. | Centrale Fraction Answer Input ondersteunt leerlinggestuurde vereenvoudiging en optioneel een heel getal. Resultaatvormpraktijk bevat het voorbeeld 15/10; bewerkingstaakbanken bevatten vereenvoudigings-/gemengde-resultaatvalidatie. | Formatieve lokale oefening; bij sommige bewerkingen begeleid, andere zelfstandig; geen formeel mastery-bewijs. | **Gedeeltelijk.** De reken-/invoerhandeling bestaat; zelfstandige herkenning en redenering over maximale vereenvoudiging zijn niet breed aangetoond. |
+| 7, Getalbegrip, p.115 | Gelijkwaardige breuken bedenken (compliceren). | FR2-construction practice laat drie equivalentieconstructies uitvoeren; FR2 registry en vijf synthetische demo's bestaan. | Formatieve lokale praktijk en synthetische FR2-demo; FR2 task/evidence-alignment blijft kandidaat/open. | **Gedeeltelijk.** Een beperkte constructiepraktijk bestaat; generalisatie en formele evidence-dekking zijn niet aangetoond. |
+| 7, Getalbegrip, p.115 | Kritisch denken en redeneren over breuken als getallen in probleemsituaties. | Geen expliciete probleem-/redeneertaak aangetroffen. | Geen passende taak/evidence. | **Niet aangetoond.** |
+| 7, Bewerkingen, p.117 | Gelijknamige breuken optellen en aftrekken in context en formele rekentaal; indien nodig hele delen eruit halen. | Gelijknamige optel- en aftrekbanken en mixed-number-resultaatcomponenten bestaan. De banken zijn hoofdzakelijk symbolisch; contextuele verhaaltaken zijn niet systematisch aanwezig. | Sommige begeleide stappen en zelfstandige oefening; lokale/formative oefenstatus, geen formeel evidence. | **Gedeeltelijk.** Formele berekening bestaat; contextuele toepassing en formeel SLO-bewijs ontbreken. |
+| 7, Bewerkingen, p.117 | Veel voorkomende ongelijknamige breuken vergelijken en het verschil bepalen. | Ongelijknamige aftrekbanken bestaan. Er is geen afzonderlijke vergelijkings-/ordeningstaak aangetroffen; aftrekken alleen toont niet automatisch vergelijking en uitleg aan. | Vooral symbolische oefening; geen formeel evidence. | **Gedeeltelijk.** Verschilberekening kan worden geoefend; expliciet vergelijken en redeneren zijn niet aangetoond. |
+| 7, Bewerkingen, p.117 | Rekenen met veel voorkomende breuken als operator en begrijpen dat keer en deel nemen van dezelfde uitkomst geven. | Whole-number-times-fraction-banken bevatten formele operatorberekeningen. Er is geen taak aangetroffen die beide interpretaties in context laat vergelijken of verwoorden. | Symbolische oefening; geen formeel evidence. | **Gedeeltelijk.** Formele vermenigvuldiging bestaat; betekenisvergelijking ontbreekt. |
+| 7, Bewerkingen, p.117 | Weten dat een deling als breuk geschreven kan worden, dit uitleggen en toepassen. | Delingstaakbanken voeren breukdelingen uit; geen expliciete taak die een deling omzet naar een breuk en de gelijkwaardigheid uitlegt. | Symbolische bewerkingsoefening; geen passende formele evidence. | **Niet aangetoond.** |
+| 7, Bewerkingen, p.117 | In contexten een heel getal delen door een breuk. | Whole-number-divided-by-fraction-greater-than-one-task-bank.js en begeleide variant bestaan. De huidige opgaven zijn symbolisch; de SLO-contextvorm is niet systematisch aanwezig. | Begeleide en zelfstandige oefening; lokale oefenstatus, geen formeel evidence. | **Gedeeltelijk.** De formele deling bestaat; contextuele interpretatie ontbreekt. |
+| 7, Bewerkingen, p.117 | Kritisch denken en redeneren over breuken in betekenisvolle probleemsituaties. | Geen expliciete kritische redeneer-/probleemtaak aangetroffen. | Geen passende taak/evidence. | **Niet aangetoond.** |
+
+### 13.8 SLO 2017 crosswalk — groep 8
+
+| Groep en SLO-bron | SLO-doelinhoud | Bestaand PacoGO-onderdeel en taakvorm | Begeleiding en bewijsstatus | Dekking en aantoonbare gap |
+|---|---|---|---|---|
+| 8, Bewerkingen, p.127 | Ongelijknamige breuken optellen en aftrekken via de standaardprocedure gelijknamig maken; hele delen eruit halen en vereenvoudigen; aanpak uitleggen. | Ongelijknamige optel-/aftrekbanken, guided sessions, mixed-number answer input en centrale Fraction Practice Template bestaan. De taken zijn overwegend symbolisch; contextuele opdrachten zijn niet systematisch opgenomen. | Zowel begeleide als zelfstandige oefenroutes; formatieve/local practice, geen formeel SLO-evidence. | **Gedeeltelijk.** De formele procedure en stapbegeleiding zijn aanwezig; contextuele transfer, uitlegkwaliteit en formele evidence-dekking ontbreken. |
+| 8, Bewerkingen, p.127 | Een geheel getal vermenigvuldigen met een breuk en een breuk met een geheel getal vermenigvuldigen. | Whole-number-times-proper-fraction- en whole-number-times-mixed-fraction-taskbanks bestaan. | Voornamelijk symbolische zelfstandige oefening; geen formeel evidence. | **Gedeeltelijk.** Rekenfamilies bestaan; contextuele toepassing en de volledige omgekeerde presentatie zijn niet als SLO-dekking aangetoond. |
+| 8, Bewerkingen, p.127 | Een breuk met een breuk vermenigvuldigen in contexten en formele sommentaal. | Gelijknamige en ongelijknamige vermenigvuldigingstaakbanken voor echte en gemengde breuken bestaan. De bankvorm is hoofdzakelijk symbolisch. | Zelfstandige oefenroutes; geen systematische contextuele taakvorm of formeel evidence. | **Gedeeltelijk.** Formele bewerking bestaat; contextuele toepassing ontbreekt. |
+| 8, Bewerkingen, p.127 | Een heel getal delen door een breuk of gemengde breuk, vooral in contexten. | Whole-number-divided-by-fraction-greater-than-one-taskbank en begeleide variant bestaan. De actuele bank bevat symbolische delingen. | Begeleide en zelfstandige oefening; geen formeel evidence. | **Gedeeltelijk.** Formele deling bestaat; contextuele probleeminterpretatie ontbreekt. |
+| 8, Bewerkingen, p.127 | Een breuk delen door een breuk, vooral in contexten. | Gelijknamige, ongelijknamige en gemengde breukdelingsbanken bestaan; meerdere families hebben begeleide en zelfstandige routes. | Per delingsfamilie begeleide en zelfstandige oefenvarianten; lokale oefenstatus, geen formeel evidence. | **Gedeeltelijk.** De symbolische deling en stapbegeleiding bestaan; contextuele taakvormen en formeel bewijs ontbreken. |
+| 8, Bewerkingen, p.127 | Kritisch denken en redeneren over breuken in betekenisvolle probleemsituaties. | Geen expliciete kritische redeneer-/probleemtaak aangetroffen. | Geen passende taak/evidence. | **Niet aangetoond.** |
+| 8, Verhoudingen, p.129 | Een telling verwoorden/noteren als verhouding, breuk en percentage (zoals 6 van 24, 1 op 4, 1/4 en 25%). | FR2 behandelt equivalentie tussen breuken; geen taak die aantallen expliciet in alle drie vormen omzet en verbindt. | FR2 synthetische demo en formatieve oefening; geen formeel evidence voor deze samengestelde SLO-doelinhoud. | **Gedeeltelijk.** Breukequivalentie is aanwezig; telling/verhouding/percentage-integratie ontbreekt. |
+| 8, Verhoudingen, p.129 | Gelijkwaardigheid van breuken begrijpen als gelijkheid van verhoudingen tussen teller en noemer. | FR2.D1–D3 en ET1–ET6 beschrijven equivalentie; de task/evidence-alignment is nog kandidaat en bevat openstaande mismatches. De ratio-interpretatie is niet als afzonderlijke taak aangetoond. | FR2 candidate registry en synthetische demos; geen empirisch gevalideerd bewijs. | **Gedeeltelijk.** Equivalentieherkenning bestaat; de verhouding tussen teller en noemer en de formele evidence-koppeling zijn niet volledig aangetoond. |
+| 8, Verhoudingen, p.129 | Relaties tussen verhoudingen, breuken, procenten en decimale getallen begrijpen; breukdeling kan een repeterend decimaal opleveren. | Geen geïntegreerde ratio-fraction-decimal-percentage Learning Interface of conversie-/repeterende-decimaaltaak aangetroffen. | Geen passende taak/evidence. | **Niet aangetoond.** De conversie, delingsbetekenis en repeterende decimalen ontbreken in de breukleerroute. |
+
+### 13.9 Samenvattende dekkingsconclusies
+
+1. **Geen enkel volledig SLO 2017-doel is op basis van de huidige branch volledig aangetoond.** Dat is geen oordeel dat er geen bruikbare oefeningen bestaan; het betekent dat de volledige doelinhoud, taakvorm en bewijsgrens nog niet samen zijn aangetoond.
+2. De sterkste bestaande dekking zit bij de formele breukbewerkingen in groep 7 en 8: optellen, aftrekken, vermenigvuldigen en delen, met een mix van begeleide en zelfstandige routes.
+3. De grootste hiaten zitten bij betekenisvolle contexten, breuken als maat, de getallenlijn, verhoudingstabellen, breuken als verhouding, omgekeerd redeneren van deel naar geheel, breuk-decimaal-percentage-relaties en expliciet kritisch redeneren.
+4. De huidige 405 bewerkingstaakposities zijn hoofdzakelijk symbolische oefenopgaven. Zij mogen niet worden gepresenteerd als 405 curriculumdoelen of als volledige SLO-dekking.
+5. FR1 — Breuken representeren en interpreteren — blijft inhoudelijk terug te voeren op bestaande eerdere curriculumafspraken, maar een formeel FR1.D/C/ET/TM-contract en registry-entry zijn niet teruggevonden. De repositoryboom op de geverifieerde HEAD bevat geen FR1-specifiek ontwikkelings-/evidencebestand. Er worden geen FR1-identifiers afgeleid of aangemaakt.
+6. FR2 — Breukequivalentie herkennen en gebruiken — is in Registry v0.6.0-candidate opgenomen, maar de kandidaat-task/evidence-alignment is niet volledig gesloten. De vijf browserpagina's blijven synthetische technische demonstraties.
+7. De centrale Fraction Practice Template en Fraction Learning Interface bestaan en moeten worden hergebruikt. Er is geen reden om per SLO-doel of skill een eigen breukpagina-template te maken.
+8. De algemene Number Line-component is niet hetzelfde als een fraction-specifieke Number Line Learning Interface. De actieve Fraction-route heeft hiervoor nog geen geïntegreerde route.
+9. Formatieve lokale oefenresultaten, synthetische browserobservaties en formeel curriculum-evidence blijven drie verschillende statussen. De bestaande oefeningen leveren niet automatisch FR1/FR2 mastery op.
+10. De SLO juli 2026 KD10B-mapping in de eerdere secties blijft ongewijzigd en staat los van deze SLO 2017-groepsinventarisatie.
+
+### 13.10 Open verificatiepunten
+
+- Herstel de oorspronkelijke FR1 Skill Development Pass en/of Development Evidence File als deze nog bestaat. Zo niet, leg de ontbrekende formele contractvelden ter besluitvorming voor; verzin ze niet.
+- De SLO 2017-matrix is een inhoudelijke dekkinginventarisatie op basis van de PDF en de onderzochte branch. Waar een taakvorm niet aantoonbaar in code of taakbank aanwezig is, blijft de dekking niet aangetoond.
+- De FR2 task/evidence-mismatches uit de bestaande audit/specification blijven open en zijn niet door deze matrix opgelost.
+- De matrix verandert geen registry, FR-code, development, claim, evidence target, task model, mastery-regel, runtime, learner state of Supabase-contract.
+
+### 13.11 Verificatiestatus van dit addendum
+
+- Geen code, tests, curriculumregistry, runtime, Supabase of learner data gewijzigd.
+- Dit addendum is een documentwijziging op basis van de eerder geverifieerde branch HEAD d8894a386de3311237daca2fae70fba346d53bcb en Full Regression #4194.
+- De nieuwe documentcommit en de daaropvolgende handoff-update moeten afzonderlijk op hun exacte commit door Full Regression worden geverifieerd voordat deze documentatie als afgerond wordt beschouwd.

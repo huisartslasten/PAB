@@ -9,7 +9,7 @@ describe('vertical learning lines registry', () => {
       slo_group: 6,
       slo_source: 'SLO 2017',
       slo_component: 'Getalbegrip',
-      objective: 'Benoemde breuken op een getallenlijn plaatsen en redeneren',
+      objective: 'Breuken op een getallenlijn plaatsen',
       status: 'active',
       exercise_ids: []
     });

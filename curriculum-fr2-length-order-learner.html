@@ -17,6 +17,7 @@
     import { readViewContext } from './src/core/view-context.js';
     import { createLengthOrderLearningInterface } from './pacogo-engine/length-order-learning-interface.js';
     import { LENGTH_ORDER_TASKS, evaluateLengthOrder } from './pacogo-engine/length-order-task-bank.js';
+    import { createPracticeSessionCore } from './pacogo-engine/practice-session-core.js';
 
     const app = createPacoGOApp({ supabaseLib: window.supabase, storage: window.localStorage });
     const context = readViewContext(new URLSearchParams(window.location.search));
@@ -40,7 +41,7 @@
     speechStatus.setAttribute('aria-live', 'polite');
     content.append(intro, progress, host, controls, speechStatus);
 
-    let taskIndex = 0;
+    const session = createPracticeSessionCore({ tasks: LENGTH_ORDER_TASKS, completionMode: 'automatic' });
     let interfaceInstance = null;
     let completed = false;
     let speechText = '';
@@ -50,59 +51,50 @@
 
     function renderTask() {
       completed = false;
-      const task = LENGTH_ORDER_TASKS[taskIndex];
+      const task = session.getCurrentTask();
+      if (!task) { renderCompleted(); return; }
       speechText = task.prompt + ' Sleep de potloden naar de juiste volgorde. Het kortste potlood komt links.';
-      progress.textContent = 'Oefening ' + (taskIndex + 1) + ' van ' + LENGTH_ORDER_TASKS.length;
+      progress.textContent = 'Oefening ' + (session.getProgress().completedCount + 1) + ' van ' + session.getProgress().totalCount;
       interfaceInstance = createLengthOrderLearningInterface({
         mount: host,
         task,
-        onCheck: order => ({ correct: evaluateLengthOrder(task, order) })
+        onCheck: order => {
+          const correct = evaluateLengthOrder(task, order);
+          session.recordAttempt({ taskId: task.id, classification: correct ? 'valid' : 'incorrect_answer', response: { orderedIndexes: order } });
+          if (correct) queueMicrotask(finishTask);
+          return { correct };
+        }
       });
       speakCurrent();
+    }
+
+    function renderCompleted() {
+      progress.textContent = 'Alle potloden zijn goed geordend. Goed gewerkt!';
+      host.replaceChildren();
+      const done = document.createElement('p');
+      done.className = 'pacogo-length-order__instruction';
+      done.textContent = 'Je hebt alle potloden van klein naar groot gelegd.';
+      const restart = document.createElement('button');
+      restart.type = 'button';
+      restart.className = 'pacogo-length-order__primary';
+      restart.textContent = 'OPNIEUW OEFENEN';
+      restart.addEventListener('click', () => { session.reset(); renderTask(); });
+      host.append(done, restart);
+      restart.focus();
     }
 
     function finishTask() {
       if (completed) return;
       completed = true;
-      taskIndex += 1;
-      if (taskIndex < LENGTH_ORDER_TASKS.length) {
-        const next = document.createElement('button');
-        next.type = 'button';
-        next.className = 'pacogo-length-order__primary';
-        next.textContent = 'Volgende oefening';
-        next.addEventListener('click', renderTask);
-        host.querySelector('.pacogo-length-order__actions')?.appendChild(next);
-        next.focus();
-      } else {
-        progress.textContent = 'Alle potloden zijn goed geordend. Goed gewerkt!';
-        host.replaceChildren();
-        const done = document.createElement('p');
-        done.className = 'pacogo-length-order__instruction';
-        done.textContent = 'Je hebt alle potloden van klein naar groot gelegd.';
-        const restart = document.createElement('button');
-        restart.type = 'button';
-        restart.className = 'pacogo-length-order__primary';
-        restart.textContent = 'OPNIEUW OEFENEN';
-        restart.addEventListener('click', () => { taskIndex = 0; renderTask(); });
-        host.append(done, restart);
-        restart.focus();
-      }
+      if (session.getProgress().isComplete) { renderCompleted(); return; }
+      const next = document.createElement('button');
+      next.type = 'button';
+      next.className = 'pacogo-length-order__primary';
+      next.textContent = 'Volgende oefening';
+      next.addEventListener('click', renderTask);
+      host.querySelector('.pacogo-length-order__actions')?.appendChild(next);
+      next.focus();
     }
-
-    const originalCreate = createLengthOrderLearningInterface;
-    // Completion is triggered from the interface's success callback.
-    function renderCurrentTask() {
-      const task = LENGTH_ORDER_TASKS[taskIndex];
-      speechText = task.prompt + ' Sleep de potloden naar de juiste volgorde. Het kortste potlood komt links.';
-      progress.textContent = 'Oefening ' + (taskIndex + 1) + ' van ' + LENGTH_ORDER_TASKS.length;
-      interfaceInstance = originalCreate({ mount: host, task, onCheck: order => {
-        const correct = evaluateLengthOrder(task, order);
-        if (correct) queueMicrotask(finishTask);
-        return { correct };
-      }});
-      speakCurrent();
-    }
-    renderTask = renderCurrentTask;
 
     mountPacoPageTemplate({
       mount: document.querySelector('#paco-template-mount'),

@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PacoGO — Potloden ordenen</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <link rel="stylesheet" href="./src/components/page-template.css">
   <link rel="stylesheet" href="./pacogo-engine/length-order-learning-interface.css">
 </head>
@@ -108,7 +109,7 @@
       greeting: student ? 'Hoi ' + student + '! 🐶' : 'Welkom bij PacoGO',
       title: 'Potloden van klein naar groot', icon: '✏️',
       subtitle: 'Vergelijk de lengtes en zet de potloden in de juiste volgorde.',
-      navigation: createPacoNavigation({ app, active: 'skills', student, viewMode: context.mode }),
+      navigation: createPacoNavigation({ app, active: 'skills', student, includeAccount: false, navigate: target => window.location.assign(target) }),
       content, layoutMode: 'practice'
     });
     renderTask();

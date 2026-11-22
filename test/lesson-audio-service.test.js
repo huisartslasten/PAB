@@ -47,7 +47,65 @@ test('lesson audio normalizes the function response to playable mp3 audio', asyn
   assert.deepEqual(statuses, ['🔄 AI-stem maken...', 'AI-stem speelt.']);
 });
 
-test('lesson audio reports when the speech function invocation rejects', async () => {
+test('lesson audio falls back to the device voice when the speech function rejects', async () => {
+  const statuses = [];
+  const utterances = [];
+  const speechCalls = [];
+  const db = {
+    functions: {
+      invoke: async () => { throw new Error('Azure unavailable'); }
+    }
+  };
+  const speechSynthesisRef = {
+    speak: utterance => speechCalls.push(utterance),
+    cancel: () => {}
+  };
+  const UtteranceCtor = function SpeechSynthesisUtterance(text) {
+    this.text = text;
+    utterances.push(this);
+  };
+
+  const service = createLessonAudioService(db, { speechSynthesisRef, UtteranceCtor });
+  await service.speak('Zet de potloden van klein naar groot.', {
+    language: 'nl',
+    onStatus: status => statuses.push(status)
+  });
+
+  assert.equal(speechCalls.length, 1);
+  assert.equal(utterances[0].text, 'Zet de potloden van klein naar groot.');
+  assert.equal(utterances[0].lang, 'nl-NL');
+  assert.deepEqual(statuses, [
+    '🔄 AI-stem maken...',
+    'Apparaatstem wordt afgespeeld.'
+  ]);
+});
+
+test('lesson audio falls back to the device voice when the speech function returns an error', async () => {
+  const statuses = [];
+  let spokenText = '';
+  const db = {
+    functions: {
+      invoke: async () => ({ data: null, error: new Error('Azure returned 401') })
+    }
+  };
+  const speechSynthesisRef = {
+    speak: utterance => { spokenText = utterance.text; },
+    cancel: () => {}
+  };
+  const UtteranceCtor = function SpeechSynthesisUtterance(text) {
+    this.text = text;
+  };
+
+  const service = createLessonAudioService(db, { speechSynthesisRef, UtteranceCtor });
+  await service.speak('Vergelijk de lengtes.', {
+    onStatus: status => statuses.push(status)
+  });
+
+  assert.equal(spokenText, 'Vergelijk de lengtes.');
+  assert.equal(statuses.at(-1), 'Apparaatstem wordt afgespeeld.');
+});
+
+test('lesson audio reports when the speech function invocation rejects and no device voice exists', async () => {
   const statuses = [];
   const db = {
     functions: {
@@ -57,7 +115,9 @@ test('lesson audio reports when the speech function invocation rejects', async (
 
   const service = createLessonAudioService(db, {
     AudioCtor: function Audio() {},
-    URLRef: { createObjectURL: () => 'blob:test', revokeObjectURL: () => {} }
+    URLRef: { createObjectURL: () => 'blob:test', revokeObjectURL: () => {} },
+    speechSynthesisRef: null,
+    UtteranceCtor: null
   });
 
   await assert.rejects(
@@ -124,9 +184,6 @@ test('lesson audio reports unexpected browser playback errors', async () => {
   };
 
   const service = createLessonAudioService(db, { AudioCtor, URLRef });
-  await assert.rejects(
-    service.speak('huis', { onStatus: status => statuses.push(status) }),
-    /decode failed/
-  );
+  await service.speak('huis', { onStatus: status => statuses.push(status) });
   assert.equal(statuses.at(-1), '⚠️ AI-stem kon niet worden afgespeeld.');
 });

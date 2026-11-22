@@ -37,7 +37,7 @@ export function createLessonAudioService(db, {
     if (audio && objectUrl && pendingText === normalizedText) {
       try {
         await audio.play();
-        onStatus?.('AI-stem speelt.');
+        onStatus?.('OpenAI-stem speelt.');
         return;
       } catch (error) {
         if (isAutoplayBlocked(error)) {

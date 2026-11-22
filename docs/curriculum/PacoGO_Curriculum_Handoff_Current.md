@@ -9708,3 +9708,39 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 2. Controleer Full Regression op exact die commit.
 3. Bij rood: stoppen en de oorzaak isoleren; niet verder bouwen.
 4. Bij groen: het protocol is formeel vastgelegd en wordt de standaard startprocedure bij iedere nieuwe oefenbouwopdracht.
+
+
+## 54. KD10C — SLO-tussendoelen per groep geïnventariseerd (22 november 2026)
+
+**Nieuwe curriculumdocumentatie**
+- Nieuw document: `docs/curriculum/PacoGO_KD10C_SLO_Tussendoelen_Per_Groep_v0.1.md`.
+- De inventarisatie bevat 56 administratieve doelrecords (KD10C-0001 t/m KD10C-0056) voor de nieuwe bijdragen per eindgroep 2 t/m 8.
+- De bronformuleringen zijn samengevat en gekoppeld aan gedrukte bronpagina's: groep 2 p. 75, groep 3 p. 83, groep 4 p. 92, groep 5 p. 100, groep 6 p. 108, groep 7 p. 117 en groep 8 p. 127.
+- De SLO-doelen zijn cumulatief; de inventarisatie herhaalt geërfde doelen niet bij elke groep.
+- De 56 records zijn administratieve inventarisatie-eenheden, niet de claim dat SLO 56 afzonderlijke, onafhankelijk toetsbare leerdoelen formuleert.
+
+**Bronstatus en afbakening**
+- De officiële SLO-publicatie *Kerndoelen primair onderwijs* (juli 2026), p. 34, bepaalt de actuele KD10C-scope: kwalitatieve/kwantitatieve verhoudingen, procenten, schaal en samengestelde grootheden; relaties tussen verhoudingen, procenten en breuken; herkennen, beredeneerd vergelijken en oplossen van verhoudingsproblemen.
+- De publicatie van 2026 bevat geen groepsgewijze KD10C-doelen. De groepsinventarisatie komt uit SLO 2017, domein Verhoudingen, gedrukte pp. 37–42 en de groepsgewijze uitwerking op pp. 75, 83, 92, 100, 108, 117 en 127. De koppeling aan KD10C is een kandidaat-crosswalk op inhoud, geen officiële 2026-groepsindeling.
+- Breuken als verhouding zijn opgenomen waar de SLO-bron ze onder Verhoudingen beschrijft; breuken als getal en formele breukbewerkingen blijven inhoudelijk onderscheiden onder KD10B.
+- Prijs per eenheid en snelheid overlappen mogelijk met KD11. De primaire leerclaim, niet alleen de context, bepaalt de domeintoewijzing.
+- De relatie met VR1–VR5 is nog niet per doel vastgesteld. De bestaande mapping noemt VR1–VR5 als kandidaatlaag, maar er is nog geen bronverifieerbare formele doel-naar-VR-verdeling vastgesteld.
+
+**Bestaande architectuur — niet gewijzigd**
+- Geen nieuwe PacoGO-skills, developments, claims, evidence targets, task models of masteryregels.
+- Geen doelkoppelingen aan oefeningen of taken; alle records zijn unassessed.
+- Geen wijzigingen aan curriculumregistry/runtime, Learning Interfaces, C1–C9, learner state, Supabase, studentdata of LIVE `main`.
+- De inventarisatie is documentatie; de bestaande centrale Verticale Leerlijn-template blijft de beoogde UI-integratieplek.
+
+**Engineering en verificatie**
+- Branch: `refactor/professional-v1`.
+- Baseline vóór de documentatiestap: Full Regression #4259 / run `45064011189`: **SUCCESS** op exact commit `945b673f6329f5176b27415d1ed0c2e1e11cfbd2`.
+- Inventarisatiedocument aangemaakt in commit `9b6d8c3c41127cfcc4c31d63302d6723e84638a7`.
+- Deze handoff-update is een afzonderlijke repositorywijziging. De uiteindelijke handoff-commit moet zelf door Full Regression worden geverifieerd; deze stap is pas groen bij `completed / success` op de exacte resulterende HEAD.
+
+**Volgende concrete stap**
+1. Voer een granulariteits- en bronpassagecontrole uit op de 56 inventarisatierecords.
+2. Inspecteer de bestaande VR1–VR5-definities en stel vast welke formele development-, claim-, evidence- en task-contracten daadwerkelijk bestaan.
+3. Maak pas daarna de inhoudelijke kandidaat-crosswalk van SLO-doelen naar bestaande VR-skills, met expliciete overlap/afbakening ten opzichte van KD10B en KD11.
+4. Beoordeel vervolgens bestaande dekking via claims, evidence targets en taken.
+5. Integreer pas na inhoudelijke review in de bestaande centrale Verticale Leerlijn-template; geen aparte domeinpagina of renderer.

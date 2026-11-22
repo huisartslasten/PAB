@@ -1,12 +1,9 @@
-// Lesson audio boundary for the professional player.
-// The service owns the Edge Function call and audio lifecycle; pages only request
-// speech for the currently displayed lesson item.
+// Central lesson audio boundary for every learner-facing exercise.
+// Pages request speech; provider selection and playback lifecycle stay here.
 
 export function createLessonAudioService(db, {
   AudioCtor = globalThis.Audio,
-  URLRef = globalThis.URL,
-  speechSynthesisRef = globalThis.speechSynthesis,
-  UtteranceCtor = globalThis.SpeechSynthesisUtterance
+  URLRef = globalThis.URL
 } = {}) {
   if (!db?.functions?.invoke) throw new Error('A Supabase functions client is required.');
 
@@ -25,33 +22,10 @@ export function createLessonAudioService(db, {
       objectUrl = '';
     }
     pendingText = '';
-    try { speechSynthesisRef?.cancel?.(); } catch {}
   }
 
   function isAutoplayBlocked(error) {
     return error?.name === 'NotAllowedError';
-  }
-
-  function speakWithDeviceVoice(text, language, onStatus) {
-    if (typeof UtteranceCtor !== 'function' || typeof speechSynthesisRef?.speak !== 'function') return false;
-
-    try {
-      const utterance = new UtteranceCtor(text);
-      const requestedLanguage = String(language || 'nl');
-      utterance.lang = requestedLanguage === 'nl' ? 'nl-NL' : requestedLanguage;
-      utterance.onerror = () => onStatus?.('⚠️ Apparaatstem kon niet worden afgespeeld.');
-      speechSynthesisRef.speak(utterance);
-      onStatus?.('Apparaatstem wordt afgespeeld.');
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  function useDeviceVoiceOrThrow(text, language, onStatus, error, statusMessage) {
-    if (speakWithDeviceVoice(text, language, onStatus)) return;
-    onStatus?.(statusMessage);
-    throw error;
   }
 
   async function speak(text, { language = 'nl', onStatus = null } = {}) {
@@ -59,9 +33,7 @@ export function createLessonAudioService(db, {
     const normalizedText = String(text);
 
     // Safari may reject the first play() because it happens after the async
-    // speech request. Keep that already-created audio alive so the user action
-    // behind "Nog een keer" can retry the same playback without rebuilding or
-    // revoking the Blob URL underneath WebKit.
+    // speech request. Keep the generated audio alive so a user action can retry.
     if (audio && objectUrl && pendingText === normalizedText) {
       try {
         await audio.play();
@@ -73,16 +45,13 @@ export function createLessonAudioService(db, {
           return;
         }
         stop();
-        useDeviceVoiceOrThrow(
-          normalizedText, language, onStatus, error,
-          '⚠️ AI-stem kon niet worden afgespeeld.'
-        );
-        return;
+        onStatus?.('⚠️ AI-stem kon niet worden afgespeeld.');
+        throw error;
       }
     }
 
     stop();
-    onStatus?.('🔄 AI-stem maken...');
+    onStatus?.('🔄 OpenAI-stem maken...');
 
     let result;
     try {
@@ -90,28 +59,19 @@ export function createLessonAudioService(db, {
         body: { text: normalizedText, language: String(language || 'nl') }
       });
     } catch (error) {
-      useDeviceVoiceOrThrow(
-        normalizedText, language, onStatus, error,
-        '⚠️ AI-stem kon niet worden gemaakt.'
-      );
-      return;
+      onStatus?.('⚠️ OpenAI-stem kon niet worden gemaakt.');
+      throw error;
     }
 
     const { data, error } = result;
     if (error) {
-      useDeviceVoiceOrThrow(
-        normalizedText, language, onStatus, error,
-        '⚠️ AI-stem kon niet worden gemaakt.'
-      );
-      return;
+      onStatus?.('⚠️ OpenAI-stem kon niet worden gemaakt.');
+      throw error;
     }
     if (!data || typeof AudioCtor !== 'function' || !URLRef?.createObjectURL || typeof Blob !== 'function') {
-      const error = new Error('AI-stem leverde geen afspeelbaar audiobestand op.');
-      useDeviceVoiceOrThrow(
-        normalizedText, language, onStatus, error,
-        '⚠️ AI-stem kon niet worden afgespeeld.'
-      );
-      return;
+      const playbackError = new Error('OpenAI-stem leverde geen afspeelbaar audiobestand op.');
+      onStatus?.('⚠️ OpenAI-stem kon niet worden afgespeeld.');
+      throw playbackError;
     }
 
     try {
@@ -131,17 +91,15 @@ export function createLessonAudioService(db, {
       };
 
       await audio.play();
-      onStatus?.('AI-stem speelt.');
+      onStatus?.('OpenAI-stem speelt.');
     } catch (error) {
       if (isAutoplayBlocked(error)) {
         onStatus?.('🔊 Klik op Nog een keer om de stem af te spelen.');
         return;
       }
       stop();
-      useDeviceVoiceOrThrow(
-        normalizedText, language, onStatus, error,
-        '⚠️ AI-stem kon niet worden afgespeeld.'
-      );
+      onStatus?.('⚠️ OpenAI-stem kon niet worden afgespeeld.');
+      throw error;
     }
   }
 

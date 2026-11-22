@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createLessonAudioService } from '../src/services/lesson-audio-service.js';
 
-test('lesson audio normalizes the function response to playable mp3 audio', async () => {
+test('lesson audio sends Dutch text to the central speech function and plays returned mp3 audio', async () => {
   const calls = [];
   const statuses = [];
   const audioInstances = [];
@@ -44,93 +44,54 @@ test('lesson audio normalizes the function response to playable mp3 audio', asyn
   ]]);
   assert.equal(playableBlob.type, 'audio/mpeg');
   assert.equal(audioInstances[0].url, 'blob:test');
-  assert.deepEqual(statuses, ['🔄 AI-stem maken...', 'AI-stem speelt.']);
+  assert.deepEqual(statuses, ['🔄 OpenAI-stem maken...', 'OpenAI-stem speelt.']);
 });
 
-test('lesson audio falls back to the device voice when the speech function rejects', async () => {
+test('lesson audio reports a rejected speech request and never starts a browser voice', async () => {
   const statuses = [];
-  const utterances = [];
-  const speechCalls = [];
+  let browserSpeechStarted = false;
   const db = {
     functions: {
-      invoke: async () => { throw new Error('Azure unavailable'); }
+      invoke: async () => { throw new Error('OpenAI unavailable'); }
     }
   };
-  const speechSynthesisRef = {
-    speak: utterance => speechCalls.push(utterance),
-    cancel: () => {}
-  };
-  const UtteranceCtor = function SpeechSynthesisUtterance(text) {
-    this.text = text;
-    utterances.push(this);
-  };
-
-  const service = createLessonAudioService(db, { speechSynthesisRef, UtteranceCtor });
-  await service.speak('Zet de potloden van klein naar groot.', {
-    language: 'nl',
-    onStatus: status => statuses.push(status)
-  });
-
-  assert.equal(speechCalls.length, 1);
-  assert.equal(utterances[0].text, 'Zet de potloden van klein naar groot.');
-  assert.equal(utterances[0].lang, 'nl-NL');
-  assert.deepEqual(statuses, [
-    '🔄 AI-stem maken...',
-    'Apparaatstem wordt afgespeeld.'
-  ]);
-});
-
-test('lesson audio falls back to the device voice when the speech function returns an error', async () => {
-  const statuses = [];
-  let spokenText = '';
-  const db = {
-    functions: {
-      invoke: async () => ({ data: null, error: new Error('Azure returned 401') })
-    }
-  };
-  const speechSynthesisRef = {
-    speak: utterance => { spokenText = utterance.text; },
-    cancel: () => {}
-  };
-  const UtteranceCtor = function SpeechSynthesisUtterance(text) {
-    this.text = text;
-  };
-
-  const service = createLessonAudioService(db, { speechSynthesisRef, UtteranceCtor });
-  await service.speak('Vergelijk de lengtes.', {
-    onStatus: status => statuses.push(status)
-  });
-
-  assert.equal(spokenText, 'Vergelijk de lengtes.');
-  assert.equal(statuses.at(-1), 'Apparaatstem wordt afgespeeld.');
-});
-
-test('lesson audio reports when the speech function invocation rejects and no device voice exists', async () => {
-  const statuses = [];
-  const db = {
-    functions: {
-      invoke: async () => { throw new TypeError('Type error'); }
-    }
-  };
-
   const service = createLessonAudioService(db, {
-    AudioCtor: function Audio() {},
-    URLRef: { createObjectURL: () => 'blob:test', revokeObjectURL: () => {} },
-    speechSynthesisRef: null,
-    UtteranceCtor: null
+    speechSynthesisRef: { speak: () => { browserSpeechStarted = true; } },
+    UtteranceCtor: function SpeechSynthesisUtterance() { browserSpeechStarted = true; }
   });
 
   await assert.rejects(
-    service.speak('huis', { onStatus: status => statuses.push(status) }),
-    /Type error/
+    service.speak('Zet de potloden van klein naar groot.', {
+      language: 'nl',
+      onStatus: status => statuses.push(status)
+    }),
+    /OpenAI unavailable/
   );
+
+  assert.equal(browserSpeechStarted, false);
   assert.deepEqual(statuses, [
-    '🔄 AI-stem maken...',
-    '⚠️ AI-stem kon niet worden gemaakt.'
+    '🔄 OpenAI-stem maken...',
+    '⚠️ OpenAI-stem kon niet worden gemaakt.'
   ]);
 });
 
-test('lesson audio keeps blocked playback available for a user retry', async () => {
+test('lesson audio reports an OpenAI function error without falling back to device speech', async () => {
+  const statuses = [];
+  const db = {
+    functions: {
+      invoke: async () => ({ data: null, error: new Error('OpenAI returned 401') })
+    }
+  };
+  const service = createLessonAudioService(db);
+
+  await assert.rejects(
+    service.speak('Vergelijk de lengtes.', { onStatus: status => statuses.push(status) }),
+    /OpenAI returned 401/
+  );
+  assert.equal(statuses.at(-1), '⚠️ OpenAI-stem kon niet worden gemaakt.');
+});
+
+test('lesson audio keeps blocked OpenAI playback available for a user retry', async () => {
   const statuses = [];
   let playCount = 0;
   const db = {
@@ -161,13 +122,13 @@ test('lesson audio keeps blocked playback available for a user retry', async () 
 
   assert.equal(playCount, 2);
   assert.deepEqual(statuses, [
-    '🔄 AI-stem maken...',
+    '🔄 OpenAI-stem maken...',
     '🔊 Klik op Nog een keer om de stem af te spelen.',
-    'AI-stem speelt.'
+    'OpenAI-stem speelt.'
   ]);
 });
 
-test('lesson audio reports unexpected browser playback errors', async () => {
+test('lesson audio reports unexpected OpenAI audio playback errors', async () => {
   const statuses = [];
   const db = {
     functions: {
@@ -183,15 +144,10 @@ test('lesson audio reports unexpected browser playback errors', async () => {
     this.pause = () => {};
   };
 
-  const service = createLessonAudioService(db, {
-    AudioCtor,
-    URLRef,
-    speechSynthesisRef: null,
-    UtteranceCtor: null
-  });
+  const service = createLessonAudioService(db, { AudioCtor, URLRef });
   await assert.rejects(
     service.speak('huis', { onStatus: status => statuses.push(status) }),
     /decode failed/
   );
-  assert.equal(statuses.at(-1), '⚠️ AI-stem kon niet worden afgespeeld.');
+  assert.equal(statuses.at(-1), '⚠️ OpenAI-stem kon niet worden afgespeeld.');
 });

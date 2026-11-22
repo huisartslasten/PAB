@@ -37,9 +37,37 @@ export function createLengthOrderLearningInterface({ mount, task, onCheck, docum
       pencil.className = 'pacogo-length-order__pencil';
       pencil.draggable = !locked;
       pencil.dataset.pencilId = String(index);
-      pencil.setAttribute('aria-label', 'Potlood, verplaats met slepen');
+      pencil.setAttribute('aria-label', 'Geel potlood, verplaats met slepen');
       pencil.style.setProperty('--pencil-length', task.lengths[index] + 'px');
-      pencil.innerHTML = '<span class="pacogo-length-order__wood" aria-hidden="true"></span><span class="pacogo-length-order__body" aria-hidden="true"></span><span class="pacogo-length-order__eraser" aria-hidden="true"></span>';
+      pencil.innerHTML = `
+        <svg class="pacogo-length-order__pencil-art" viewBox="0 0 360 64" role="img" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id="pencil-lacquer" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#fff08a"/>
+              <stop offset=".22" stop-color="#ffdc45"/>
+              <stop offset=".72" stop-color="#f3bd25"/>
+              <stop offset="1" stop-color="#d99a12"/>
+            </linearGradient>
+            <linearGradient id="pencil-wood" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#f7d39a"/>
+              <stop offset="1" stop-color="#c98743"/>
+            </linearGradient>
+            <linearGradient id="pencil-eraser" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ffc0ca"/>
+              <stop offset="1" stop-color="#df7188"/>
+            </linearGradient>
+          </defs>
+          <ellipse cx="186" cy="53" rx="160" ry="5" fill="#19345a" opacity=".10"/>
+          <path d="M8 32 L37 12 L37 52 Z" fill="url(#pencil-wood)" stroke="#a96e37" stroke-width="1.4"/>
+          <path d="M8 32 L20 28 L20 36 Z" fill="#302b2a"/>
+          <path d="M37 12 L318 12 L337 20 L337 44 L318 52 L37 52 Z" fill="url(#pencil-lacquer)" stroke="#c58d12" stroke-width="1.5"/>
+          <path d="M38 15 L316 15 L330 21 L48 21 Z" fill="#fff9c8" opacity=".72"/>
+          <path d="M38 45 L318 45 L333 41 L318 52 L37 52 Z" fill="#b77a0d" opacity=".20"/>
+          <path d="M318 12 L329 17 L329 47 L318 52 Z" fill="#c6cbd2" stroke="#929aa5" stroke-width="1.2"/>
+          <path d="M323 15 L323 49 M328 17 L328 47" stroke="#f8fafc" stroke-width="2" opacity=".9"/>
+          <path d="M329 17 Q340 12 350 19 L354 24 L354 40 L350 45 Q340 52 329 47 Z" fill="url(#pencil-eraser)" stroke="#c85d77" stroke-width="1.5"/>
+          <path d="M337 20 Q345 17 350 22" fill="none" stroke="#ffe6eb" stroke-width="2.4" stroke-linecap="round" opacity=".9"/>
+        </svg>`;
       pencil.addEventListener('dragstart', event => {
         if (locked) { event.preventDefault(); return; }
         draggedIndex = index;

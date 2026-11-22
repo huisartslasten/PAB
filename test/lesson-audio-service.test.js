@@ -183,7 +183,15 @@ test('lesson audio reports unexpected browser playback errors', async () => {
     this.pause = () => {};
   };
 
-  const service = createLessonAudioService(db, { AudioCtor, URLRef });
-  await service.speak('huis', { onStatus: status => statuses.push(status) });
+  const service = createLessonAudioService(db, {
+    AudioCtor,
+    URLRef,
+    speechSynthesisRef: null,
+    UtteranceCtor: null
+  });
+  await assert.rejects(
+    service.speak('huis', { onStatus: status => statuses.push(status) }),
+    /decode failed/
+  );
   assert.equal(statuses.at(-1), '⚠️ AI-stem kon niet worden afgespeeld.');
 });

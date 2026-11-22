@@ -9655,3 +9655,26 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 1. Full Regression op de nieuwe commit afronden en controleren.
 2. Daarna KD10A in de lokale TEST-omgeving visueel controleren via Verticale leerlijnen → KD10A.
 3. Vervolgens de broninventarisatie en eventuele actuele SLO-leerlijn aanvullen voordat individuele doelen aan A/B-skills of taken worden gekoppeld.
+
+
+## 52. KD10A — actuele SLO 2026-scope zichtbaar in de centrale leerlijn (22 november 2026)
+
+**Gebouwd**
+- In de centrale KD10A-registry is de actuele kerndoelinhoud uit SLO *Kerndoelen primair onderwijs* (juli 2026), p. 34, als vijf afzonderlijke scope-onderdelen vastgelegd.
+- De bestaande gedeelde domeinrenderer toont deze scope boven de groepsgewijze doelkaarten, uitsluitend wanneer KD10A wordt geopend.
+- De weergave maakt het onderscheid expliciet: de vijf onderdelen vormen de actuele SLO 2026-afbakening; de 170 groepsrecords blijven SLO 2017-inventarisatie en kandidaat-crosswalk, geen officiële groepsdoelen uit 2026.
+- Breuken blijft dezelfde centrale renderer gebruiken en krijgt deze KD10A-scope niet te zien.
+
+**Afbakening**
+- Geen nieuwe pagina of template; centrale registry en gedeelde renderer zijn hergebruikt.
+- Geen wijzigingen aan de 170 groepsrecords, hun unassessed-status, skills, claims, evidence, taken, mastery, C1–C9, Learning Interfaces, Supabase, studentdata of LIVE main.
+
+**Verificatie en commits**
+- Baseline Full Regression #4256 / run `45062584581`: **SUCCESS** op exact commit `9d49c2ef8f3c4d08ec88874760ef50d8c4778e61`.
+- Deze scope-weergave is een nieuwe wijziging en moet zelf nog door Full Regression worden geverifieerd.
+- Branch: `refactor/professional-v1`.
+
+**Volgende concrete stap**
+1. Full Regression op de nieuwe code- en handoff-commit afronden; pas bij `completed / success` is deze stap groen.
+2. Daarna KD10A visueel controleren in de lokale TEST-omgeving via Verticale leerlijnen → KD10A.
+3. Geen verdere KD10A-skill- of oefenkoppelingen toevoegen voordat de broninventarisatie en inhoudelijke crosswalk inhoudelijk zijn beoordeeld.

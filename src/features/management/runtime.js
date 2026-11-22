@@ -193,7 +193,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     });
   }
 
-  function renderDomainVerticalLearningLine({ domain, title: domainTitle, sourceLabel, showCurriculumSkills = false }) {
+  function renderDomainVerticalLearningLine({ domain, title: domainTitle, sourceLabel, showCurriculumSkills = false, scopeComponents = null, scopeSource = '' }) {
     const objectives = verticalLearningLinesRegistry.listObjectives({ domain });
     const summary = verticalLearningLinesRegistry.getCoverageSummary({ domain });
     const exercises = verticalLearningLinesRegistry.listExercises();
@@ -219,6 +219,26 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     const source = documentRef.createElement('p');
     source.className = 'vertical-learning-lines-source';
     source.textContent = sourceLabel;
+
+    let scopeSection = null;
+    if (Array.isArray(scopeComponents) && scopeComponents.length) {
+      scopeSection = documentRef.createElement('section');
+      scopeSection.className = 'vertical-learning-core-scope';
+      const scopeHeading = documentRef.createElement('h3');
+      scopeHeading.textContent = 'Actueel kerndoel KD10A — SLO 2026';
+      const scopeIntro = documentRef.createElement('p');
+      scopeIntro.textContent = 'Dit is de actuele inhoudelijke afbakening van KD10A. De groepsgewijze doelen hieronder komen uit SLO 2017 en zijn een kandidaat-crosswalk; ze zijn geen officiële groepsdoelen uit de publicatie van 2026.';
+      const scopeList = documentRef.createElement('ul');
+      scopeComponents.forEach(component => {
+        const item = documentRef.createElement('li');
+        item.textContent = component;
+        scopeList.appendChild(item);
+      });
+      const scopeCitation = documentRef.createElement('p');
+      scopeCitation.className = 'vertical-learning-lines-source';
+      scopeCitation.textContent = 'Actuele kerndoelbron: ' + scopeSource;
+      scopeSection.append(scopeHeading, scopeIntro, scopeList, scopeCitation);
+    }
 
     const summaryGrid = documentRef.createElement('div');
     summaryGrid.className = 'vertical-learning-lines-summary';
@@ -369,7 +389,9 @@ export function createManagementRuntime({ app, templateMount, context, documentR
       groupContainer.appendChild(groupCard);
     }
 
-    section.append(heading, intro, source, summaryGrid, legend);
+    section.append(heading, intro, source);
+    if (scopeSection) section.appendChild(scopeSection);
+    section.append(summaryGrid, legend);
     if (showCurriculumSkills) section.append(curriculumHeading, curriculumGrid);
     section.appendChild(groupContainer);
     content.appendChild(section);
@@ -382,7 +404,8 @@ export function createManagementRuntime({ app, templateMount, context, documentR
       return;
     }
     if (selectedVerticalLearningCoreGoal === 'KD10A') {
-      renderDomainVerticalLearningLine({ domain: 'Gehele en decimale getallen', title: 'KD10A — Gehele en decimale getallen', sourceLabel: 'Groepsgewijze bron: SLO 2017 · kandidaat-crosswalk naar actueel KD10A (SLO 2026) · bronverwijzing per doel' });
+      const coreGoal = verticalLearningLinesRegistry.listCoreObjectives().find(item => item.id === 'KD10A');
+      renderDomainVerticalLearningLine({ domain: 'Gehele en decimale getallen', title: 'KD10A — Gehele en decimale getallen', sourceLabel: 'Groepsgewijze bron: SLO 2017 · kandidaat-crosswalk naar actueel KD10A (SLO 2026) · bronverwijzing per doel', scopeComponents: coreGoal?.scope_components, scopeSource: coreGoal?.scope_source || '' });
       return;
     }
 

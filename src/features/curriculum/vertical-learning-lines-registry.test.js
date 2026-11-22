@@ -8,6 +8,17 @@ describe('vertical learning lines registry', () => {
       'KD10A', 'KD10B', 'KD10C', 'KD11', 'KD12', 'KD13', 'KD14',
       'KD15', 'KD16', 'KD17', 'KD18'
     ]);
+    expect(coreObjectives.find(item => item.id === 'KD10A')).toMatchObject({
+      detail_domain: 'Gehele en decimale getallen',
+      scope_source: 'SLO, Kerndoelen primair onderwijs, juli 2026, p. 34',
+      scope_components: [
+        "Bewerkingen: vergelijken, ordenen, optellen, aftrekken, vermenigvuldigen en delen.",
+        "Getalrelaties, splitsingen tot 20 en de tafels memoriseren en deze kennis vlot en wendbaar toepassen.",
+        "Beredeneerd kiezen van rekenvorm en rekenwijze en reflecteren op de keuze en uitvoering.",
+        "Rekenvormen: hoofdrekenen, schattend rekenen, schriftelijk rekenen en rekenen met de rekenmachine.",
+        "Rekenwijzen: eigenschappen van getallen en bewerkingen gebruiken en standaardprocedures toepassen."
+      ]
+    });
     expect(coreObjectives.find(item => item.id === 'KD10B')).toMatchObject({
       title: 'Breuken',
       category: 'content',

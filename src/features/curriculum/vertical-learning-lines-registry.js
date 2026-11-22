@@ -2,7 +2,7 @@ const OBJECTIVE_STATUSES = Object.freeze(['active', 'planned', 'retired']);
 const COVERAGE_STATUSES = Object.freeze(['full', 'partial', 'not_demonstrated', 'unassessed']);
 
 const CORE_OBJECTIVES = Object.freeze([
-  { id: 'KD10A', title: 'Gehele en decimale getallen', category: 'content', summary: 'Gehele en decimale getallen', mapped_skills: 'A1–A6 + B1–B5', detail_domain: 'Gehele en decimale getallen' },
+  { id: 'KD10A', title: 'Gehele en decimale getallen', category: 'content', summary: 'Gehele en decimale getallen', mapped_skills: 'A1–A6 + B1–B5', detail_domain: 'Gehele en decimale getallen', scope_source: 'SLO, Kerndoelen primair onderwijs, juli 2026, p. 34', scope_components: ["Bewerkingen: vergelijken, ordenen, optellen, aftrekken, vermenigvuldigen en delen.","Getalrelaties, splitsingen tot 20 en de tafels memoriseren en deze kennis vlot en wendbaar toepassen.","Beredeneerd kiezen van rekenvorm en rekenwijze en reflecteren op de keuze en uitvoering.","Rekenvormen: hoofdrekenen, schattend rekenen, schriftelijk rekenen en rekenen met de rekenmachine.","Rekenwijzen: eigenschappen van getallen en bewerkingen gebruiken en standaardprocedures toepassen."] },
   { id: 'KD10B', title: 'Breuken', category: 'content', summary: 'Breuken', mapped_skills: 'FR1–FR2 + relaties met A/B', detail_domain: 'Breuken' },
   { id: 'KD10C', title: 'Verhoudingen', category: 'content', summary: 'Verhoudingen', mapped_skills: 'VR1–VR5 + relaties met FR/B/MG', detail_domain: null },
   { id: 'KD11', title: 'Grootheden en eenheden', category: 'content', summary: 'Grootheden en eenheden', mapped_skills: 'MG1–MG6', detail_domain: null },

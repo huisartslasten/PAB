@@ -9413,3 +9413,48 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 2. Laat de gebruiker de witte doelkaarten, alle groepssecties en de directe oefenlinks visueel controleren in de bestaande lokale PacoGO TEST-omgeving.
 3. Controleer de 41 doel-oefenrelaties inhoudelijk tegen de daadwerkelijke opdrachten; verander geen status naar volledig gedekt zonder onderbouwing.
 4. Herstel de oorspronkelijke formele FR1 Skill Development Pass / Development Evidence File indien aanwezig. Geen ontbrekende FR1-IDs afleiden.
+
+
+## 46. Centrale spraakterugval voor de potloodoefening (21 november 2026)
+
+**Aanleiding en diagnose**
+- De gebruiker meldde dat de AI-stem in de potloodoefening niet werkte en dat het beschikbare Azure-tegoed op nul stond.
+- De centrale potloodpagina is `curriculum-fr2-length-order-learner.html`. Deze roept `app.audio.speak()` aan bij iedere nieuwe oefening en via de knop “Luister nog een keer”.
+- `src/app/bootstrap.js` maakt de centrale `createLessonAudioService(db)`.
+- `src/services/lesson-audio-service.js` roept de Supabase Edge Function `speak-word-v1` aan.
+- De gedeployde Edge Function gebruikt Azure Speech. Eerder onderzochte Supabase-logs toonden herhaaldelijk Azure HTTP 401. De melding over nul tegoed is afkomstig van de gebruiker; de exacte Azure-accountstatus is niet onafhankelijk vastgesteld.
+- De potloodinterface had dus al een centrale audio-aanroep. Het probleem zat in de externe spraakgeneratie, niet in een ontbrekende knop of een reden om een aparte potloodspraakimplementatie te maken.
+
+**Gebruikersbesluit**
+- De gebruiker heeft toestemming gegeven voor een centrale terugvaloptie: Azure blijft de eerste keuze; wanneer Azure/spraakgeneratie niet beschikbaar is, mag de ingebouwde browser-/apparaatstem de tekst voorlezen.
+- De browserstem wordt niet als AI-stem gepresenteerd. De kwaliteit en beschikbaarheid van een Nederlandse stem hangen af van browser en apparaat.
+
+**Gebouwd**
+- `src/services/lesson-audio-service.js` gebruikt nu de bestaande Azure-audiostroom als eerste keuze.
+- Bij een mislukte Edge Function-aanroep, een geretourneerde functie-fout, ontbrekende/onbruikbare audiogegevens of een onverwachte afspeelfout probeert de centrale dienst `SpeechSynthesisUtterance` / `speechSynthesis` als terugval.
+- De Nederlandse taalcode `nl` wordt voor de apparaatstem omgezet naar `nl-NL`; andere expliciete taalcodes blijven behouden.
+- `stop()` stopt ook eventueel lopende apparaatspraak, zodat opeenvolgende oefenitems elkaar niet overlappen.
+- De bestaande potloodpagina en de centrale `Length Order Learning Interface` hoefden niet te worden aangepast. Geen aparte spraakcode per oefening.
+- `test/lesson-audio-service.test.js` dekt de succesvolle Azure-route, terugval bij een afgewezen Edge Function-aanroep, terugval bij een geretourneerde functie-fout, het ontbreken van apparaatspraak, Safari-autoplay-herhaling en de foutafhandeling bij onbruikbare audio.
+- Geen Supabase-functie, secret, schema, providerconfiguratie of deployment gewijzigd. Azure blijft ongewijzigd de primaire provider; de terugval gebeurt aan de bestaande browserzijde.
+- Geen LIVE `main`-wijziging.
+
+**Commits**
+- `0ce3a5c020f45cd88567757040128c2c87cabd43` — centrale apparaatstem-terugval.
+- `28739b048e0c50de3762268d5a3aa4591bbe1346` — tests voor terugval.
+- `041cf9b2180568615980650f9956896eb3d0e64c` — behoud van foutgedrag wanneer geen apparaatstem beschikbaar is.
+
+**Verificatie**
+- Voor de bouw was Full Regression #4237 / run 44979073304 **SUCCESS** op exact baselinecommit `efc37dbe4ca7253179763eccd5ae072fea1cc805`.
+- De code- en testcommits hierboven zijn nog niet door Full Regression geverifieerd.
+- De handoff-update moet zelf eveneens worden geverifieerd op de resulterende exacte commit.
+- Geen commit wordt als groen beschouwd voordat de bijbehorende Full Regression daadwerkelijk is afgerond.
+
+**Actuele status en volgende concrete stap**
+1. Branch: `refactor/professional-v1`.
+2. Laatste geverifieerde baseline: `efc37dbe4ca7253179763eccd5ae072fea1cc805`, Full Regression #4237 **SUCCESS**.
+3. Nieuwe spraakterugvalimplementatie: commit `041cf9b2180568615980650f9956896eb3d0e64c`; regressie nog open.
+4. Voer Full Regression uit op de handoff-updatecommit. Bij rood: stoppen en de exacte oorzaak isoleren; niet verder bouwen of tests symptoomgericht aanpassen.
+5. Na groene regressie de potloodoefening in de bestaande lokale TEST-omgeving controleren: automatische voorlezing bij een nieuw item, knop “Luister nog een keer”, Nederlands, en geen overlappende spraak.
+6. Pas na expliciete toestemming eventuele wijzigingen aan Supabase of deployment uitvoeren; voor deze terugval zijn die niet nodig.
+

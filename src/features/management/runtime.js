@@ -193,9 +193,9 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     });
   }
 
-  function renderBreukenVerticalLearningLine() {
-    const objectives = verticalLearningLinesRegistry.listObjectives({ domain: 'Breuken' });
-    const summary = verticalLearningLinesRegistry.getCoverageSummary({ domain: 'Breuken' });
+  function renderDomainVerticalLearningLine({ domain, title: domainTitle, sourceLabel, showCurriculumSkills = false }) {
+    const objectives = verticalLearningLinesRegistry.listObjectives({ domain });
+    const summary = verticalLearningLinesRegistry.getCoverageSummary({ domain });
     const exercises = verticalLearningLinesRegistry.listExercises();
     const skills = verticalLearningLinesRegistry.listCurriculumSkills();
     const exerciseById = new Map(exercises.map(item => [item.id, item]));
@@ -212,13 +212,13 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     section.appendChild(backButton);
 
     const heading = documentRef.createElement('h2');
-    heading.textContent = 'Verticale leerlijn — Breuken';
+    heading.textContent = 'Verticale leerlijn — ' + domainTitle;
     const intro = documentRef.createElement('p');
     intro.className = 'vertical-learning-lines-intro';
     intro.textContent = 'Alle geïnventariseerde SLO-tussendoelen, gekoppeld aan bestaande PacoGO-curriculumonderdelen en oefenroutes.';
     const source = documentRef.createElement('p');
     source.className = 'vertical-learning-lines-source';
-    source.textContent = 'Bron: SLO 2017 · eind groep 2 t/m 8 · PDF-paginaverwijzingen per doel';
+    source.textContent = sourceLabel;
 
     const summaryGrid = documentRef.createElement('div');
     summaryGrid.className = 'vertical-learning-lines-summary';
@@ -369,14 +369,20 @@ export function createManagementRuntime({ app, templateMount, context, documentR
       groupContainer.appendChild(groupCard);
     }
 
-    section.append(heading, intro, source, summaryGrid, legend, curriculumHeading, curriculumGrid, groupContainer);
+    section.append(heading, intro, source, summaryGrid, legend);
+    if (showCurriculumSkills) section.append(curriculumHeading, curriculumGrid);
+    section.appendChild(groupContainer);
     content.appendChild(section);
   }
 
 
   function renderVerticalLearningLines() {
     if (selectedVerticalLearningCoreGoal === 'KD10B') {
-      renderBreukenVerticalLearningLine();
+      renderDomainVerticalLearningLine({ domain: 'Breuken', title: 'Breuken', sourceLabel: 'Bron: SLO 2017 · eind groep 2 t/m 8 · PDF-paginaverwijzingen per doel', showCurriculumSkills: true });
+      return;
+    }
+    if (selectedVerticalLearningCoreGoal === 'KD10A') {
+      renderDomainVerticalLearningLine({ domain: 'Gehele en decimale getallen', title: 'KD10A — Gehele en decimale getallen', sourceLabel: 'Groepsgewijze bron: SLO 2017 · kandidaat-crosswalk naar actueel KD10A (SLO 2026) · bronverwijzing per doel' });
       return;
     }
 
@@ -415,11 +421,11 @@ export function createManagementRuntime({ app, templateMount, context, documentR
         description.textContent = objective.summary;
         card.append(top, title, description);
 
-        if (objective.detail_domain === 'Breuken') {
+        if (objective.detail_domain) {
           const open = documentRef.createElement('button');
           open.type = 'button';
           open.className = 'management-dashboard-card-primary';
-          open.textContent = 'Breuken openen';
+          open.textContent = objective.title + ' openen';
           open.addEventListener('click', () => {
             selectedVerticalLearningCoreGoal = objective.id;
             render();

@@ -15,11 +15,17 @@ De bron ordent de doelen onder het oudere wettelijke kerndoel 26 en de domeinen 
 - subdomein Getalbegrip;
 - subdomein Bewerkingen.
 
-De actuele officiële SLO-publicatie is *Kerndoelen primair onderwijs*, juli 2026. Daarin staat op p. 34 het huidige kerndoel 10A: de leerling redeneert en rekent met gehele en decimale getallen. De uitwerking noemt vijf inhoudelijke onderdelen: (1) bewerkingen: vergelijken, ordenen, optellen, aftrekken, vermenigvuldigen en delen; (2) memoriseren van getalrelaties, splitsingen tot 20 en de tafels, en die kennis vlot en wendbaar toepassen; (3) beredeneerd kiezen van rekenvorm en rekenwijze en reflecteren op keuze en uitvoering; (4) rekenvormen: hoofdrekenen, schattend rekenen, schriftelijk rekenen en rekenen met de rekenmachine; (5) rekenwijzen: eigenschappen van getallen en bewerkingen en standaardprocedures. Bron: SLO, *Kerndoelen primair onderwijs* (juli 2026), p. 34, https://www.slo.nl/publish/pages/23619/kerndoelen-primair-onderwijs-slo-2026-printversie-juli-2026.pdf.\n\n**Belangrijk onderscheid:** de publicatie van juli 2026 bevat het actuele kerndoel, maar geen uitwerking van KD10A per eindgroep. SLO beschrijft dat de leerlijnen afzonderlijk worden ontwikkeld en een voorbeeldmatig/inspirerend karakter hebben (pp. 8 en 14–15). De groepsinventarisatie hieronder komt daarom uit de afzonderlijke SLO-publicatie van 2017. De indeling in KD10A is een inhoudelijke PacoGO-crosswalk; presenteer deze groepsdoelen niet als officiële KD10A-groepsdoelen uit 2026.
+De actuele officiële SLO-publicatie is *Kerndoelen primair onderwijs*, juli 2026. Daarin staat op p. 34 het huidige kerndoel 10A: de leerling redeneert en rekent met gehele en decimale getallen. De uitwerking noemt vijf inhoudelijke onderdelen: (1) bewerkingen: vergelijken, ordenen, optellen, aftrekken, vermenigvuldigen en delen; (2) memoriseren van getalrelaties, splitsingen tot 20 en de tafels, en die kennis vlot en wendbaar toepassen; (3) beredeneerd kiezen van rekenvorm en rekenwijze en reflecteren op keuze en uitvoering; (4) rekenvormen: hoofdrekenen, schattend rekenen, schriftelijk rekenen en rekenen met de rekenmachine; (5) rekenwijzen: eigenschappen van getallen en bewerkingen en standaardprocedures. Bron: SLO, *Kerndoelen primair onderwijs* (juli 2026), p. 34, https://www.slo.nl/publish/pages/23619/kerndoelen-primair-onderwijs-slo-2026-printversie-juli-2026.pdf.
+
+**Belangrijk onderscheid:** de publicatie van juli 2026 bevat het actuele kerndoel, maar geen uitwerking van KD10A per eindgroep. SLO beschrijft dat de leerlijnen afzonderlijk worden ontwikkeld en een voorbeeldmatig/inspirerend karakter hebben (pp. 8 en 14–15). De groepsinventarisatie hieronder komt daarom uit de afzonderlijke SLO-publicatie van 2017. De indeling in KD10A is een inhoudelijke PacoGO-crosswalk; presenteer deze groepsdoelen niet als officiële KD10A-groepsdoelen uit 2026.
 
 De SLO-doelen zijn in dit document samengevat en geordend; ze zijn niet woordelijk overgenomen. Raadpleeg de genoemde bronpagina's voor de exacte formulering.
 
-## 2. Actuele KD10A-kaderinhoud uit SLO 2026\n\nDe actuele wettelijke inhoud van KD10A bestaat uit de vijf onderdelen hierboven. De groepsinventarisatie uit 2017 wordt hieronder gebruikt als beschikbare groepsgewijze uitwerking van verwante inhoud, niet als vervanging of letterlijke vertaling van de 2026-kerndoeltekst. De 2026-kerndoeltekst bepaalt de actuele scope; de oudere groepsuitwerking levert voorlopig de groepsgewijze ordening.\n\n## 3. Afbakening
+## 2. Actuele KD10A-kaderinhoud uit SLO 2026
+
+De actuele wettelijke inhoud van KD10A bestaat uit de vijf onderdelen hierboven. De groepsinventarisatie uit 2017 wordt hieronder gebruikt als beschikbare groepsgewijze uitwerking van verwante inhoud, niet als vervanging of letterlijke vertaling van de 2026-kerndoeltekst. De 2026-kerndoeltekst bepaalt de actuele scope; de oudere groepsuitwerking levert voorlopig de groepsgewijze ordening.
+
+## 3. Afbakening
 
 ### Opgenomen in deze KD10A-inventarisatie
 
@@ -339,7 +345,9 @@ De aanwezigheid van A1 in de registry betekent niet dat alle KD10A-doelen al doo
 
 ## 10. Bronverwijzingen
 
-SLO (2026). *Kerndoelen primair onderwijs*, juli 2026, p. 34 (KD10A); pp. 8 en 14–15 (afzonderlijke voorbeeldmatige leerlijnen). https://www.slo.nl/publish/pages/23619/kerndoelen-primair-onderwijs-slo-2026-printversie-juli-2026.pdf.\n\nNoteboom, A., Aartsen, A. & Lit, S. (2017). *Tussendoelen rekenen-wiskunde voor het primair onderwijs: Uitwerking van rekendoelen voor groep 2 tot en met 8 op weg naar streefniveau 1S*. SLO, Enschede, september 2017.
+SLO (2026). *Kerndoelen primair onderwijs*, juli 2026, p. 34 (KD10A); pp. 8 en 14–15 (afzonderlijke voorbeeldmatige leerlijnen). https://www.slo.nl/publish/pages/23619/kerndoelen-primair-onderwijs-slo-2026-printversie-juli-2026.pdf.
+
+Noteboom, A., Aartsen, A. & Lit, S. (2017). *Tussendoelen rekenen-wiskunde voor het primair onderwijs: Uitwerking van rekendoelen voor groep 2 tot en met 8 op weg naar streefniveau 1S*. SLO, Enschede, september 2017.
 
 In de projectbestanden aangetroffen als:
 `tussendoelen-rekenen-wiskunde-po-2017_1(6).pdf`.

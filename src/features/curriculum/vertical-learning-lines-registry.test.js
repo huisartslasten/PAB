@@ -20,6 +20,16 @@ describe('vertical learning lines registry', () => {
   });
 
 
+  it('loads KD10A SLO group objectives as traceable, unassessed records', () => {
+    const objectives = verticalLearningLinesRegistry.listObjectives({ domain: 'Gehele en decimale getallen' });
+    expect(objectives).toHaveLength(170);
+    expect([2, 3, 4, 5, 6, 7, 8].map(group => verticalLearningLinesRegistry.listObjectives({ domain: 'Gehele en decimale getallen', group }).length)).toEqual([12,15,20,29,24,31,39]);
+    expect(new Set(objectives.map(item => item.id)).size).toBe(170);
+    expect(objectives[0]).toMatchObject({ id: 'KD10A-0001', domain: 'Gehele en decimale getallen', slo_group: 2, slo_source: 'SLO 2017 — kandidaat-crosswalk naar KD10A', slo_component: 'Getalbegrip', coverage_status: 'unassessed', related_skill_ids: [], exercise_ids: [] });
+    expect(objectives.every(item => item.source_reference && item.source_wording.includes('geen woordelijk'))).toBe(true);
+    expect(verticalLearningLinesRegistry.getCoverageSummary({ domain: 'Gehele en decimale getallen' }).unassessed).toBe(170);
+  });
+
   it('preserves FR-0001 as the stable SLO objective identity', () => {
     expect(verticalLearningLinesRegistry.getObjective('FR-0001')).toMatchObject({
       id: 'FR-0001',

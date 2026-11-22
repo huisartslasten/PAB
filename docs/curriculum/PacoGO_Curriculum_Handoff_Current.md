@@ -9629,3 +9629,29 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 4. Daarna de exacte SLO-tussendoelen als afzonderlijke traceerbare doelrecords vastleggen, naar hetzelfde niveau van bronpagina, groep, onderdeel en doelidentiteit als bij Breuken.
 5. Pas daarna de inhoudelijke crosswalk naar A1–A6 en B1–B5 uitvoeren; beoordeel dekking op claim/evidence/task-niveau zonder automatisch nieuwe skills te creëren.
 6. Pas na inhoudelijke verificatie en afstemming de bestaande centrale Verticale Leerlijn-template uitbreiden voor KD10A. Geen aparte KD10A-pagina of domeinspecifieke template bouwen.
+
+
+## 51. KD10A — SLO-groepsdoelen geïntegreerd in centrale Verticale Leerlijn (22 november 2026)
+
+**Gebouwd**
+- De bestaande centrale registry bevat nu 170 afzonderlijke KD10A-doelrecords uit de per-groep inventarisatie, verdeeld over eind groep 2 t/m 8: groep 2: 12, groep 3: 15, groep 4: 20, groep 5: 29, groep 6: 24, groep 7: 31, groep 8: 39.
+- Ieder record heeft een stabiele ID (KD10A-0001 e.v.), groep, component (Getalbegrip/Bewerkingen), bron, bronverwijzing, herkomstnotitie en dekkingsstatus.
+- Alle nieuwe KD10A-records starten op `unassessed`. Er zijn geen bestaande taken, oefeningen of skillcontracten aan gekoppeld; er is dus geen dekking geclaimd.
+- De centrale Verticale Leerlijn-weergave opent KD10A vanuit dezelfde kerndoelenbovenlaag en gebruikt dezelfde generieke doelkaart-/groeperingsrenderer als Breuken.
+- De KD10A-detailweergave toont expliciet dat de groepsgewijze bron SLO 2017 is en dat de koppeling naar KD10A een kandidaat-crosswalk is. De actuele SLO 2026-scope is leidend voor de afbakening; de 2026-kerndoelpublicatie bevat geen groepsgewijze doelen.
+- De bestaande Breukenregistratie en weergave blijven behouden; de renderer is gecentraliseerd in één gedeelde domeinfunctie.
+
+**Afbakening**
+- Geen nieuwe skills, developments, claims, evidence targets, task models, masteryregels, oefenroutes of studentdata.
+- Geen wijzigingen aan C1–C9, Learning Interfaces, Supabase of LIVE `main`.
+
+**Verificatie vóór de bouw**
+- Full Regression #4255 / run `45061918454`: **SUCCESS** op exact baselinecommit `c95c3293d98533e5b71b8e61558b1703b8f879d9`.
+
+**Nieuwe commit en verificatie**
+- De implementatiecommit moet zelf door Full Regression worden geverifieerd. Deze stap is pas afgerond wanneer de workflow op de exacte nieuwe commit `completed / success` toont.
+
+**Volgende stap**
+1. Full Regression op de nieuwe commit afronden en controleren.
+2. Daarna KD10A in de lokale TEST-omgeving visueel controleren via Verticale leerlijnen → KD10A.
+3. Vervolgens de broninventarisatie en eventuele actuele SLO-leerlijn aanvullen voordat individuele doelen aan A/B-skills of taken worden gekoppeld.

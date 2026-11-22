@@ -9585,3 +9585,47 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 1. Full Regression uitvoeren en controleren op de nieuwe code- en handoff-commit; bij rood stoppen en de exacte oorzaak isoleren.
 2. Na groene regressie de gebruiker de nieuwe kerndoelenbovenlaag en de doorklik naar Breuken laten controleren in de bestaande lokale TEST-omgeving.
 3. Pas daarna, op basis van de bestaande broninventarisaties en na afstemming, het volgende rekendomein uitwerken. Geen domeindetails vooraf invullen.
+
+
+## 50. KD10A — SLO-tussendoelen per groep geïnventariseerd (22 november 2026)
+
+**Gebruikersopdracht**
+- Werk KD10A — Gehele en decimale getallen uit.
+- Extraheer de tussendoelen en inventariseer ze per eindgroep 2 t/m 8, op dezelfde traceerbare manier als de bestaande Breukeninventarisatie.
+- Neem de tussendoelen en de status daarvan op in deze repository-handoff.
+- Houd het werk brongetrouw en gebruik bestaande centrale curriculumarchitectuur. Maak geen nieuwe skills of doelstructuren zonder inhoudelijke onderbouwing.
+
+**Nieuwe curriculumdocumentatie**
+- Nieuw document: `docs/curriculum/PacoGO_KD10A_SLO_Tussendoelen_Per_Groep_v0.1.md`.
+- Dit document bevat een samengevatte broninventarisatie per groep 2 t/m 8, met onderscheid tussen Getalbegrip (hele en decimale getallen) en Bewerkingen (optellen, aftrekken, vermenigvuldigen, delen, strategieën, schatten en redeneren).
+- Het document bevat ook de bronafbakening, de verticale cumulatieve leeswijzer, een samenvattende groeimatrix, de 1S-concretisering als afzonderlijke laag, de relatie met de bestaande kandidaat-skills en openstaande bron-/crosswalk-vragen.
+- De inventarisatie is een samenvatting van de bron, geen woordelijke transcriptie. De bronpagina's zijn per groep opgenomen zodat de exacte formulering kan worden teruggezocht.
+
+**Bronstatus en belangrijke beperking**
+- In de projectbestanden is de SLO-publicatie gevonden: Noteboom, A., Aartsen, A. & Lit, S. (2017), `Tussendoelen rekenen-wiskunde voor het primair onderwijs`, versie september 2017.
+- Relevante gedrukte pagina's: Getalbegrip pp. 15–20; Bewerkingen pp. 21–36; per groep: groep 2 pp. 73–74, groep 3 pp. 81–82, groep 4 pp. 89–90, groep 5 pp. 97–99, groep 6 pp. 105–107, groep 7 pp. 113–115, groep 8 pp. 123–125.
+- De publicatie uit 2017 gebruikt de toenmalige indeling rond kerndoel 26 en de domeinen Getalbegrip/Bewerkingen. De huidige PacoGO-mapping van 1 november 2026 gebruikt KD10A (gehele en decimale getallen), KD10B (breuken) en KD10C (verhoudingen).
+- Daarom is de koppeling van de 2017-doelen aan KD10A een **kandidaat-crosswalk op inhoud**, niet een letterlijk KD10A-label uit de 2017-publicatie.
+- De officiële SLO-bron die bij de KD10A/KD10B/KD10C-indeling van juli 2026 hoort, is in deze inventarisatiestap nog niet afzonderlijk teruggevonden/gecontroleerd. De 2017-inventarisatie mag dus niet als definitieve actuele 2026-broncrosswalk worden gepresenteerd.
+- Breuken en verhoudingen zijn niet als KD10A-doelen overgenomen. Geld- en meetcontexten zijn alleen contexten waarin getallen worden gebruikt; het zelfstandige meetdomein blijft KD11.
+- De 1S-concretisering is apart gehouden en niet zonder bronbewijs aan één specifieke groep toegewezen.
+
+**Bestaande PacoGO-architectuur — niet gewijzigd**
+- Bestaande kandidaatmapping blijft: Getalbegrip → A1–A6; Bewerkingen → B1–B5.
+- Dit is geen individuele doel-naar-skillmapping en bewijst niet dat alle A1–A6/B1–B5 contracten al volledig zijn uitgewerkt.
+- A1 blijft de bestaande reference/construction case. Geen nieuwe skills, developments, claims, evidence targets, task models of masterycriteria zijn aangemaakt.
+- Geen wijzigingen aan curriculumregistry/runtime, Learning Interfaces, C1–C9, learner state, bestaande oefeningen, studentdata, Supabase of LIVE `main`.
+
+**Commits en verificatie**
+- Branch: `refactor/professional-v1`.
+- Geverifieerde baseline vóór deze documentatiestap: Full Regression #4251 / run `45060002278`, SUCCESS op exact commit `8989fb394afe00b8a2d0ed2231e7c70d72a2cfb4`.
+- KD10A-inventarisatiedocument toegevoegd in commit `3f2e4a23e7b17c46a07487dcaab06bb2752fc588`.
+- Deze handoff-update is een afzonderlijke repositorywijziging en moet eveneens door Full Regression worden geverifieerd. De documentcommits worden niet als regressie-groen beschouwd voordat de workflow op de resulterende exacte HEAD `completed / success` toont.
+
+**Actuele status en volgende concrete stap**
+1. De per-groep inventarisatie uit de SLO-publicatie 2017 is vastgelegd in het nieuwe KD10A-document.
+2. Zoek en verifieer nu de primaire SLO-bron die hoort bij de KD10A/KD10B/KD10C-indeling van juli 2026.
+3. Vergelijk die bron met de 2017-inventarisatie en corrigeer of vul alleen aan waar de primaire bron dat ondersteunt.
+4. Daarna de exacte SLO-tussendoelen als afzonderlijke traceerbare doelrecords vastleggen, naar hetzelfde niveau van bronpagina, groep, onderdeel en doelidentiteit als bij Breuken.
+5. Pas daarna de inhoudelijke crosswalk naar A1–A6 en B1–B5 uitvoeren; beoordeel dekking op claim/evidence/task-niveau zonder automatisch nieuwe skills te creëren.
+6. Pas na inhoudelijke verificatie en afstemming de bestaande centrale Verticale Leerlijn-template uitbreiden voor KD10A. Geen aparte KD10A-pagina of domeinspecifieke template bouwen.

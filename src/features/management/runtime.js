@@ -398,17 +398,20 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     const appendCards = (items, container) => {
       items.forEach(objective => {
         const card = documentRef.createElement('article');
-        card.className = 'vertical-learning-core-card';
+        card.className = 'vertical-learning-objective-card vertical-learning-core-card';
         const top = documentRef.createElement('div');
-        top.className = 'vertical-learning-core-card-top';
+        top.className = 'vertical-learning-objective-top vertical-learning-core-card-top';
         const id = documentRef.createElement('strong');
+        id.className = 'vertical-learning-objective-id';
         id.textContent = objective.id;
         const kind = documentRef.createElement('span');
+        kind.className = 'vertical-learning-coverage vertical-learning-coverage--unassessed';
         kind.textContent = objective.category === 'cross_cutting' ? 'Doorlopende laag' : 'Kerndoel';
         top.append(id, kind);
-        const title = documentRef.createElement('h3');
+        const title = documentRef.createElement('h4');
         title.textContent = objective.title;
         const description = documentRef.createElement('p');
+        description.className = 'vertical-learning-objective-meta';
         description.textContent = objective.summary;
         card.append(top, title, description);
 
@@ -432,24 +435,28 @@ export function createManagementRuntime({ app, templateMount, context, documentR
       });
     };
 
+    const contentGroup = documentRef.createElement('section');
+    contentGroup.className = 'vertical-learning-group vertical-learning-core-group';
     const contentHeading = documentRef.createElement('h3');
-    contentHeading.className = 'vertical-learning-core-section-title';
     contentHeading.textContent = 'Kerndoelen en rekendomeinen';
     const contentGrid = documentRef.createElement('div');
-    contentGrid.className = 'vertical-learning-core-grid';
+    contentGrid.className = 'vertical-learning-objective-grid vertical-learning-core-grid';
     appendCards(contentObjectives, contentGrid);
+    contentGroup.append(contentHeading, contentGrid);
 
+    const crossGroup = documentRef.createElement('section');
+    crossGroup.className = 'vertical-learning-group vertical-learning-core-group';
     const crossHeading = documentRef.createElement('h3');
-    crossHeading.className = 'vertical-learning-core-section-title';
     crossHeading.textContent = 'Doorlopende kerndoelen';
     const crossNote = documentRef.createElement('p');
     crossNote.className = 'vertical-learning-core-note';
     crossNote.textContent = 'KD15–KD18 zijn cross-cutting lagen. Ze vormen geen extra rekendomeinen of afzonderlijke content skills.';
     const crossGrid = documentRef.createElement('div');
-    crossGrid.className = 'vertical-learning-core-grid vertical-learning-core-grid--cross-cutting';
+    crossGrid.className = 'vertical-learning-objective-grid vertical-learning-core-grid vertical-learning-core-grid--cross-cutting';
     appendCards(crossCuttingObjectives, crossGrid);
+    crossGroup.append(crossHeading, crossNote, crossGrid);
 
-    section.append(heading, intro, source, contentHeading, contentGrid, crossHeading, crossNote, crossGrid);
+    section.append(heading, intro, source, contentGroup, crossGroup);
     content.appendChild(section);
   }
 

@@ -9496,3 +9496,59 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 3. Branch-triggercommit: `b6e6f5bc0a2522fd2334cb34268aa128f98ede07`; bevat geen codewijziging.
 4. Openstaande stap: voer Full Regression uit op de commit die deze handoff-update bevat. Bij rood eerst oorzaak isoleren.
 5. Geen verdere audio-aanpassingen nodig tenzij de gebruiker een nieuw concreet probleem meldt.
+
+## 48. Centrale SLO-kerndoelen als bovenlaag voor Verticale leerlijnen — overdracht en eerstvolgende bouwstap (22 november 2026)
+
+**Aanleiding en gebruikersbesluit**
+- De volgende productstap is de centrale bovenlaag van **Beheer → Verticale leerlijnen**.
+- Wanneer de gebruiker op Verticale leerlijnen klikt, moeten eerst de SLO-kerndoelen / hoofdonderdelen zichtbaar zijn.
+- Vanuit deze bovenlaag kan de gebruiker doorklikken naar een domein, bijvoorbeeld **Breuken**.
+- Binnen Breuken moeten de reeds uitgewerkte SLO-tussendoelen zichtbaar blijven, inclusief de bestaande uitwerking en doelkaarten.
+- Breuken is één domein binnen het grotere rekenoverzicht; het mag niet de volledige ingang van Verticale leerlijnen blijven.
+- Bouw zo centraal mogelijk: hergebruik de bestaande beheerpagina, centrale paginatemplate, navigatie, curriculumregistratie en bestaande domein-/Fraction-componenten. Geen aparte pagina- of oefentemplate per skill of SLO-doel.
+- Voeg geen curriculuminhoud, doelen, skills, oefenroutes, mappings of functionaliteit toe zonder broncontrole en expliciete opdracht.
+
+**Bestaande bron- en architectuuronderdelen die al in de repository staan**
+- SLO-kerndoelenmapping: `docs/curriculum/PacoGO_Curriculum_Rekenen_SLO_10-18_Mapping.md`.
+- Geïntegreerd curriculum- en enginecontract: `docs/curriculum/PacoGO_Curriculum_B10_Complete_Model.md`.
+- Centrale beheerweergave: `src/features/management/runtime.js`, functie `renderVerticalLearningLines()`.
+- Centrale beheerregistratie: `src/features/curriculum/vertical-learning-lines-registry.js`.
+- Centrale beheeropmaak: `src/features/management/management-support.css`.
+- Centrale navigatie en paginatemplate bestaan al; de huidige beheerpagina gebruikt `mountPacoPageTemplate`.
+- De view-context ondersteunt al de filter `managementFilter=vertical-learning-lines`.
+- De SLO-mapping beschrijft KD10A (gehele en decimale getallen), KD10B (breuken), KD10C (verhoudingen), KD11 (grootheden en eenheden), KD12 (data), KD13 (patronen en verbanden), KD14 (meetkunde) en KD15–KD18 als cross-cutting lagen.
+- De mapping stelt uitdrukkelijk dat SLO-doelen niet één-op-één nieuwe PacoGO-skills, developments of masterycriteria worden. De bestaande 32 content skills blijven de kandidaat-top-level curriculumarchitectuur; KD15–KD18 zijn geen extra content skills.
+
+**Huidige technische toestand — geverifieerd op branch HEAD**
+- Branch: `refactor/professional-v1`.
+- HEAD vóór deze handoff-update: `12ee86634d1a0aa4685fc474c0206866145a0648`.
+- `renderVerticalLearningLines()` haalt momenteel uitsluitend `domain: 'Breuken'` op en rendert direct de breukenweergave. Er is nog geen bovenliggende selectie-/navigatielaag met kerndoelen en domeinen.
+- Het bestaande register bevat 53 Breuken-doelrecords, verdeeld over groep 2 t/m 8: 2, 1, 4, 4, 19, 12 en 11.
+- De bestaande Breukenkaarten, dekkingsstatussen, onderbouwingen en oefenlinks zijn bestaand werk en moeten behouden blijven. Geen herinventarisatie of herschrijving van de 53 doelen als onderdeel van alleen de navigatie-/bovenlaag.
+- De bestaande mapping naar KD10A–KD18 is een kandidaat curriculum mapping en moet als zodanig worden gepresenteerd; de aanwezigheid van een kerndoel in de bovenlaag is geen bewijs dat het domein of de skill empirisch gevalideerd is.
+- De registry bevat ook een bestaande oefenroute `fr2-pencil-length-ordering` die aan `FR-0002` is gekoppeld. De inhoudelijke classificatie/traceability van deze potlood-lengteactiviteit moet vóór een eventuele verplaatsing of wijziging aan de hand van de oorspronkelijke bron en bestaande route worden gecontroleerd. Niet stilzwijgend wijzigen of verwijderen.
+
+**Bouwgrenzen**
+- Eerst de bovenliggende structuur ontwerpen en implementeren in de bestaande centrale registratie en beheerweergave.
+- Gebruik de bestaande SLO 10–18-mapping als bron voor de hoofdonderdelen; reconstrueer of verzin geen nieuwe kerndoelteksten.
+- Houd de bestaande Breukenweergave als domeindetail intact en bereikbaar vanuit de nieuwe bovenlaag.
+- Maak de structuur uitbreidbaar voor de andere rekendomeinen, maar vul niet alvast domeindetails, doelen of oefenroutes in die nog niet in de bronnen/repository zijn uitgewerkt.
+- KD15–KD18 moeten herkenbaar als cross-cutting worden behandeld, niet als vier extra rekendomeinen of nieuwe skills.
+- Geen nieuwe losse HTML-pagina wanneer de bestaande centrale beheerroute en template de gewenste navigatie kunnen dragen.
+- Geen wijziging aan C1–C9, curriculumcontracten, FR1/FR2, mastery, learner state, bestaande oefeningen, studentdata of Supabase tenzij een aangetoonde contractnoodzaak en expliciete opdracht bestaan.
+- Branch `main` is LIVE en blijft onaangeroerd.
+
+**Verificatie vóór deze handoff-update**
+- Full Regression #4246 / run `45055884889`: **SUCCESS**.
+- Exact geteste commit: `12ee86634d1a0aa4685fc474c0206866145a0648`.
+- Run: https://github.com/huisartslasten/PAB/actions/runs/45055884889
+- Dit is de geverifieerde baseline voor de handoff-wijziging. De nieuwe handoff-commit moet zelf opnieuw door Full Regression worden getest.
+
+**Actuele status en volgende concrete stap**
+1. Deze commit wijzigt uitsluitend dit handoff-document; applicatiecode is niet gewijzigd.
+2. Na commit: controleer de nieuwe branch HEAD en wacht op de door de push getriggerde Full Regression.
+3. Registreer het exacte regressienummer, run-ID, geteste commit en resultaat. Bij rood: stoppen en de oorzaak isoleren; niet bouwen of symptoom-patchen.
+4. Pas na groene regressie: begin met de centrale bovenlaag voor SLO-kerndoelen in de bestaande beheerpagina/registry.
+5. Behoud de bestaande Breukenweergave en alle 53 bestaande doelen; de eerstvolgende gebruikerszichtbare route is: Verticale leerlijnen → SLO-hoofdonderdelen/kerndoelen → Breuken → bestaande uitgewerkte SLO-tussendoelen.
+6. Bouw daarna pas de volgende domeinen, één voor één op basis van de reeds bestaande broninventarisaties en na afstemming met de gebruiker.
+

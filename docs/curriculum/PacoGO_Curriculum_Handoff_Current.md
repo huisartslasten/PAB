@@ -9458,3 +9458,41 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 5. Na groene regressie de potloodoefening in de bestaande lokale TEST-omgeving controleren: automatische voorlezing bij een nieuw item, knop “Luister nog een keer”, Nederlands, en geen overlappende spraak.
 6. Pas na expliciete toestemming eventuele wijzigingen aan Supabase of deployment uitvoeren; voor deze terugval zijn die niet nodig.
 
+## 47. OpenAI-spraak voor potloodoefening — TEST succesvol geverifieerd (22 november 2026)
+
+**Uitkomst**
+- De gebruiker heeft de bestaande OpenAI API-sleutel voor PacoGO TEST aangepast door de beperkingen te verwijderen. Er is geen nieuwe sleutel nodig gebleken.
+- De gebruiker heeft daarna in de lokale PacoGO-potloodoefening bevestigd: **"het werkt"**. Daarmee is de daadwerkelijke OpenAI-spraakgeneratie in de lokale TEST-workflow handmatig bevestigd.
+- De oude browserstem is niet teruggezet. De centrale audi dienst gebruikt de Supabase Edge Function en geeft een fout terug wanneer OpenAI geen audio kan leveren.
+
+**Exacte diagnose**
+- Supabase TEST Edge Function `speak-word-v1`, versie 6, bereikte OpenAI succesvol.
+- De functie-log toonde OpenAI HTTP 401 met `code: missing_scope` en ontbrekende scope `api.model.audio.request`.
+- De gebruikte bestaande sleutel had aanvankelijk alleen `api.responses.write` en `api.responses.read`.
+- Na het verwijderen van de sleutelbeperkingen kon de gebruiker de spraakfunctie succesvol gebruiken.
+- Geen API-sleutel of geheim is in de repository of handoff opgenomen.
+
+**Implementatie en omgeving**
+- Centrale service: `src/services/lesson-audio-service.js`; geen aparte spraakimplementatie voor de potloodpagina.
+- Edge Function-bron: `supabase/functions/speak-word-v1/index.ts`.
+- Provider: OpenAI Audio Speech API, model `gpt-4o-mini-tts`, stem `alloy`.
+- Alleen Supabase TEST-project `btnhhvtpmuvrpbnkyjnm` gebruikt/aangepast. LIVE-project `ncpkqrvxljxwboavxtak` en branch `main` zijn niet gewijzigd.
+- Geen Supabase-schemawijziging.
+
+**Commits en verificatie**
+- Implementatiecommit: `e2d9a8500fc1d8b2967a71e7074d3f2336ffeeb6`.
+- Correctie statusmelding: `1b7fde4e7aa266dbb36f1ad05c588bfd21465fc8`.
+- Triggercommit voor de workflow: `b6e6f5bc0a2522fd2334cb34268aa128f98ede07`.
+- Full Regression #4244 / run `44982304494`: **SUCCESS**, workflow heeft ook Chromium-installatie en browserregressie voltooid. Geteste codecommit is exact `1b7fde4e7aa266dbb36f1ad05c588bfd21465fc8`; de triggercommit bevat geen codewijziging.
+- Handmatige lokale audiotest door gebruiker: **succesvol** na aanpassing van de API-sleutelrechten.
+
+**Correctie op sectie 46**
+- Sectie 46 beschrijft een eerdere, inmiddels verlaten browserstem-terugval en is achterhaald.
+- De uiteindelijke keuze is OpenAI-spraak via de centrale Edge Function, zonder browserstem als automatische terugval. Sectie 47 is leidend voor de actuele audiostatus.
+
+**Actuele status en volgende stap**
+1. Branch: `refactor/professional-v1`.
+2. Laatst volledig geverifieerde codecommit: `1b7fde4e7aa266dbb36f1ad05c588bfd21465fc8`, Full Regression #4244 **SUCCESS**.
+3. Branch-triggercommit: `b6e6f5bc0a2522fd2334cb34268aa128f98ede07`; bevat geen codewijziging.
+4. Openstaande stap: voer Full Regression uit op de commit die deze handoff-update bevat. Bij rood eerst oorzaak isoleren.
+5. Geen verdere audio-aanpassingen nodig tenzij de gebruiker een nieuw concreet probleem meldt.

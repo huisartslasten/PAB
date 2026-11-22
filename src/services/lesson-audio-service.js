@@ -2,7 +2,12 @@
 // The service owns the Edge Function call and audio lifecycle; pages only request
 // speech for the currently displayed lesson item.
 
-export function createLessonAudioService(db, { AudioCtor = globalThis.Audio, URLRef = globalThis.URL } = {}) {
+export function createLessonAudioService(db, {
+  AudioCtor = globalThis.Audio,
+  URLRef = globalThis.URL,
+  speechSynthesisRef = globalThis.speechSynthesis,
+  UtteranceCtor = globalThis.SpeechSynthesisUtterance
+} = {}) {
   if (!db?.functions?.invoke) throw new Error('A Supabase functions client is required.');
 
   let audio = null;
@@ -20,10 +25,33 @@ export function createLessonAudioService(db, { AudioCtor = globalThis.Audio, URL
       objectUrl = '';
     }
     pendingText = '';
+    try { speechSynthesisRef?.cancel?.(); } catch {}
   }
 
   function isAutoplayBlocked(error) {
     return error?.name === 'NotAllowedError';
+  }
+
+  function speakWithDeviceVoice(text, language, onStatus) {
+    if (typeof UtteranceCtor !== 'function' || typeof speechSynthesisRef?.speak !== 'function') return false;
+
+    try {
+      const utterance = new UtteranceCtor(text);
+      const requestedLanguage = String(language || 'nl');
+      utterance.lang = requestedLanguage === 'nl' ? 'nl-NL' : requestedLanguage;
+      utterance.onerror = () => onStatus?.('⚠️ Apparaatstem kon niet worden afgespeeld.');
+      speechSynthesisRef.speak(utterance);
+      onStatus?.('Apparaatstem wordt afgespeeld.');
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function useDeviceVoiceOrThrow(text, language, onStatus, error, statusMessage) {
+    if (speakWithDeviceVoice(text, language, onStatus)) return;
+    onStatus?.(statusMessage);
+    throw error;
   }
 
   async function speak(text, { language = 'nl', onStatus = null } = {}) {
@@ -45,8 +73,11 @@ export function createLessonAudioService(db, { AudioCtor = globalThis.Audio, URL
           return;
         }
         stop();
-        onStatus?.('⚠️ AI-stem kon niet worden afgespeeld.');
-        throw error;
+        useDeviceVoiceOrThrow(
+          normalizedText, language, onStatus, error,
+          '⚠️ AI-stem kon niet worden afgespeeld.'
+        );
+        return;
       }
     }
 
@@ -59,19 +90,28 @@ export function createLessonAudioService(db, { AudioCtor = globalThis.Audio, URL
         body: { text: normalizedText, language: String(language || 'nl') }
       });
     } catch (error) {
-      onStatus?.('⚠️ AI-stem kon niet worden gemaakt.');
-      throw error;
+      useDeviceVoiceOrThrow(
+        normalizedText, language, onStatus, error,
+        '⚠️ AI-stem kon niet worden gemaakt.'
+      );
+      return;
     }
 
     const { data, error } = result;
     if (error) {
-      onStatus?.('⚠️ AI-stem kon niet worden gemaakt.');
-      throw error;
+      useDeviceVoiceOrThrow(
+        normalizedText, language, onStatus, error,
+        '⚠️ AI-stem kon niet worden gemaakt.'
+      );
+      return;
     }
     if (!data || typeof AudioCtor !== 'function' || !URLRef?.createObjectURL || typeof Blob !== 'function') {
       const error = new Error('AI-stem leverde geen afspeelbaar audiobestand op.');
-      onStatus?.('⚠️ AI-stem kon niet worden afgespeeld.');
-      throw error;
+      useDeviceVoiceOrThrow(
+        normalizedText, language, onStatus, error,
+        '⚠️ AI-stem kon niet worden afgespeeld.'
+      );
+      return;
     }
 
     try {
@@ -98,8 +138,10 @@ export function createLessonAudioService(db, { AudioCtor = globalThis.Audio, URL
         return;
       }
       stop();
-      onStatus?.('⚠️ AI-stem kon niet worden afgespeeld.');
-      throw error;
+      useDeviceVoiceOrThrow(
+        normalizedText, language, onStatus, error,
+        '⚠️ AI-stem kon niet worden afgespeeld.'
+      );
     }
   }
 

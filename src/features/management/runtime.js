@@ -326,7 +326,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
               if (exercise.route.domain === 'fractions') {
                 navigate(buildViewUrl('skills.html', { student: selectedStudent, mode: context?.mode, extra: { domain: exercise.route.domain, topic: exercise.route.topic, exercise: exercise.route.exercise } }));
               } else {
-                navigate(buildViewUrl(exercise.route.page, { student: selectedStudent, mode: context?.mode }));
+                window.location.href = buildViewUrl(exercise.route.page, { student: selectedStudent, mode: context?.mode });
               }
             });
             exerciseList.appendChild(open);

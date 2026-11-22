@@ -66,6 +66,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
 
   const selectedStudent = context.student || '';
   const filter = FILTER_LABELS[context.managementFilter] ? context.managementFilter : 'dashboard';
+  let selectedVerticalLearningCoreGoal = '';
   const content = documentRef.createElement('div');
   content.className = 'management-dashboard';
 
@@ -192,7 +193,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     });
   }
 
-  function renderVerticalLearningLines() {
+  function renderBreukenVerticalLearningLine() {
     const objectives = verticalLearningLinesRegistry.listObjectives({ domain: 'Breuken' });
     const summary = verticalLearningLinesRegistry.getCoverageSummary({ domain: 'Breuken' });
     const exercises = verticalLearningLinesRegistry.listExercises();
@@ -200,6 +201,15 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     const exerciseById = new Map(exercises.map(item => [item.id, item]));
     const section = documentRef.createElement('section');
     section.className = 'management-dashboard-section vertical-learning-lines';
+    const backButton = documentRef.createElement('button');
+    backButton.type = 'button';
+    backButton.className = 'vertical-learning-back';
+    backButton.textContent = '← Terug naar SLO-kerndoelen';
+    backButton.addEventListener('click', () => {
+      selectedVerticalLearningCoreGoal = '';
+      render();
+    });
+    section.appendChild(backButton);
 
     const heading = documentRef.createElement('h2');
     heading.textContent = 'Verticale leerlijn — Breuken';
@@ -360,6 +370,86 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     }
 
     section.append(heading, intro, source, summaryGrid, legend, curriculumHeading, curriculumGrid, groupContainer);
+    content.appendChild(section);
+  }
+
+
+  function renderVerticalLearningLines() {
+    if (selectedVerticalLearningCoreGoal === 'KD10B') {
+      renderBreukenVerticalLearningLine();
+      return;
+    }
+
+    const coreObjectives = verticalLearningLinesRegistry.listCoreObjectives();
+    const section = documentRef.createElement('section');
+    section.className = 'management-dashboard-section vertical-learning-lines';
+    const heading = documentRef.createElement('h2');
+    heading.textContent = 'Verticale leerlijnen — SLO-kerndoelen';
+    const intro = documentRef.createElement('p');
+    intro.className = 'vertical-learning-lines-intro';
+    intro.textContent = 'Kies een SLO-kerndoel om de bijbehorende verticale leerlijn te bekijken.';
+    const source = documentRef.createElement('p');
+    source.className = 'vertical-learning-lines-source';
+    source.textContent = 'Bron: SLO Kerndoelen primair onderwijs, juli 2026 · PacoGO-mapping: kandidaat-synthese';
+
+    const contentObjectives = coreObjectives.filter(item => item.category === 'content');
+    const crossCuttingObjectives = coreObjectives.filter(item => item.category === 'cross_cutting');
+
+    const appendCards = (items, container) => {
+      items.forEach(objective => {
+        const card = documentRef.createElement('article');
+        card.className = 'vertical-learning-core-card';
+        const top = documentRef.createElement('div');
+        top.className = 'vertical-learning-core-card-top';
+        const id = documentRef.createElement('strong');
+        id.textContent = objective.id;
+        const kind = documentRef.createElement('span');
+        kind.textContent = objective.category === 'cross_cutting' ? 'Doorlopende laag' : 'Kerndoel';
+        top.append(id, kind);
+        const title = documentRef.createElement('h3');
+        title.textContent = objective.title;
+        const description = documentRef.createElement('p');
+        description.textContent = objective.summary;
+        card.append(top, title, description);
+
+        if (objective.detail_domain === 'Breuken') {
+          const open = documentRef.createElement('button');
+          open.type = 'button';
+          open.className = 'management-dashboard-card-primary';
+          open.textContent = 'Breuken openen';
+          open.addEventListener('click', () => {
+            selectedVerticalLearningCoreGoal = objective.id;
+            render();
+          });
+          card.appendChild(open);
+        } else {
+          const status = documentRef.createElement('span');
+          status.className = 'vertical-learning-core-status';
+          status.textContent = 'Uitwerking nog niet beschikbaar';
+          card.appendChild(status);
+        }
+        container.appendChild(card);
+      });
+    };
+
+    const contentHeading = documentRef.createElement('h3');
+    contentHeading.className = 'vertical-learning-core-section-title';
+    contentHeading.textContent = 'Kerndoelen en rekendomeinen';
+    const contentGrid = documentRef.createElement('div');
+    contentGrid.className = 'vertical-learning-core-grid';
+    appendCards(contentObjectives, contentGrid);
+
+    const crossHeading = documentRef.createElement('h3');
+    crossHeading.className = 'vertical-learning-core-section-title';
+    crossHeading.textContent = 'Doorlopende kerndoelen';
+    const crossNote = documentRef.createElement('p');
+    crossNote.className = 'vertical-learning-core-note';
+    crossNote.textContent = 'KD15–KD18 zijn cross-cutting lagen. Ze vormen geen extra rekendomeinen of afzonderlijke content skills.';
+    const crossGrid = documentRef.createElement('div');
+    crossGrid.className = 'vertical-learning-core-grid vertical-learning-core-grid--cross-cutting';
+    appendCards(crossCuttingObjectives, crossGrid);
+
+    section.append(heading, intro, source, contentHeading, contentGrid, crossHeading, crossNote, crossGrid);
     content.appendChild(section);
   }
 

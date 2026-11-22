@@ -2,6 +2,24 @@ import { describe, expect, it } from 'vitest';
 import { createVerticalLearningLinesRegistry, verticalLearningLinesRegistry } from './vertical-learning-lines-registry.js';
 
 describe('vertical learning lines registry', () => {
+  it('exposes the SLO core objectives from the central mapping', () => {
+    const coreObjectives = verticalLearningLinesRegistry.listCoreObjectives();
+    expect(coreObjectives.map(item => item.id)).toEqual([
+      'KD10A', 'KD10B', 'KD10C', 'KD11', 'KD12', 'KD13', 'KD14',
+      'KD15', 'KD16', 'KD17', 'KD18'
+    ]);
+    expect(coreObjectives.find(item => item.id === 'KD10B')).toMatchObject({
+      title: 'Breuken',
+      category: 'content',
+      detail_domain: 'Breuken'
+    });
+    expect(coreObjectives.filter(item => item.category === 'cross_cutting').map(item => item.id))
+      .toEqual(['KD15', 'KD16', 'KD17', 'KD18']);
+    expect(coreObjectives.find(item => item.id === 'KD15').mapped_skills)
+      .toBe('Cross-cutting: mathematisch denken/werken');
+  });
+
+
   it('preserves FR-0001 as the stable SLO objective identity', () => {
     expect(verticalLearningLinesRegistry.getObjective('FR-0001')).toMatchObject({
       id: 'FR-0001',

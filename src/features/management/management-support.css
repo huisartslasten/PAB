@@ -112,6 +112,24 @@
 .vertical-learning-lines-table tbody tr:last-child th,.vertical-learning-lines-table tbody tr:last-child td{border-bottom:0}
 .vertical-learning-lines-note{margin:0;color:var(--paco-muted);font-size:14px;line-height:1.45}
 
+
+/* SLO core-objective landing layer; reuses the central vertical-learning-lines surface. */
+.vertical-learning-core-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.vertical-learning-core-card{display:grid;align-content:start;gap:10px;min-width:0;padding:18px;border:1px solid #dce7f3;border-radius:17px;background:#fff;box-shadow:0 4px 12px rgba(16,55,100,.08)}
+.vertical-learning-core-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.vertical-learning-core-card-top strong{color:#159447;font-size:15px;font-weight:950}
+.vertical-learning-core-card-top span{color:#6b7f98;font-size:11px;font-weight:850}
+.vertical-learning-core-card h3{margin:0;color:#173f72;font-size:18px;line-height:1.2;font-weight:900}
+.vertical-learning-core-card p{margin:0;color:#526985;font-size:13px;line-height:1.45}
+.vertical-learning-core-card .management-dashboard-card-primary{justify-self:start;margin-top:4px}
+.vertical-learning-core-status{color:#78889b;font-size:12px;font-weight:800}
+.vertical-learning-core-section-title{margin:7px 0 0;color:#14365f;font-size:20px;font-weight:900}
+.vertical-learning-core-note{margin:0;color:#526985;font-size:13px;line-height:1.45}
+.vertical-learning-back{justify-self:start;min-height:38px;padding:7px 11px;border:1px solid #cfe0f4;border-radius:10px;background:#fff;color:#1269bc;font:800 13px/1.1 "Baloo 2",Nunito,sans-serif;cursor:pointer}
+.vertical-learning-back:hover{background:#e5f1ff;border-color:#8db9e8}
+@media(max-width:1000px){.vertical-learning-core-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.vertical-learning-core-grid{grid-template-columns:1fr}}
+
 /* Vertical learning lines: objective cards on the PacoGO blue management canvas. */
 .vertical-learning-lines{display:grid;gap:18px;min-width:0}
 .vertical-learning-lines-intro,.vertical-learning-lines-source{margin:0;color:#17365f;line-height:1.5}

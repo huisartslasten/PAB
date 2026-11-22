@@ -1,5 +1,19 @@
 const OBJECTIVE_STATUSES = Object.freeze(['active', 'planned', 'retired']);
 const COVERAGE_STATUSES = Object.freeze(['full', 'partial', 'not_demonstrated', 'unassessed']);
+
+const CORE_OBJECTIVES = Object.freeze([
+  { id: 'KD10A', title: 'Gehele en decimale getallen', category: 'content', summary: 'Gehele en decimale getallen', mapped_skills: 'A1–A6 + B1–B5', detail_domain: null },
+  { id: 'KD10B', title: 'Breuken', category: 'content', summary: 'Breuken', mapped_skills: 'FR1–FR2 + relaties met A/B', detail_domain: 'Breuken' },
+  { id: 'KD10C', title: 'Verhoudingen', category: 'content', summary: 'Verhoudingen', mapped_skills: 'VR1–VR5 + relaties met FR/B/MG', detail_domain: null },
+  { id: 'KD11', title: 'Grootheden en eenheden', category: 'content', summary: 'Grootheden en eenheden', mapped_skills: 'MG1–MG6', detail_domain: null },
+  { id: 'KD12', title: 'Data', category: 'content', summary: 'Data', mapped_skills: 'GK1–GK2', detail_domain: null },
+  { id: 'KD13', title: 'Patronen en verbanden', category: 'content', summary: 'Patronen en verbanden', mapped_skills: 'PA1–PA3 + GK1–GK2 waar data primair is', detail_domain: null },
+  { id: 'KD14', title: 'Meetkunde', category: 'content', summary: 'Meetkunde', mapped_skills: 'MGK1–MGK3', detail_domain: null },
+  { id: 'KD15', title: 'Wiskundige denk-werkwijzen', category: 'cross_cutting', summary: 'Probleem oplossen, heuristieken, resultaten verwerken, reflectie, modelleren, relevante/irrelevante kenmerken en algoritmes', mapped_skills: 'Cross-cutting: mathematisch denken/werken', detail_domain: null },
+  { id: 'KD16', title: 'Wiskundetaal en gereedschap', category: 'cross_cutting', summary: 'Symbolen/notatie, representaties kiezen/koppelen/beoordelen, instrumentkeuze, nauwkeurigheid, schatten en resultaat interpreteren', mapped_skills: 'Cross-cutting: wiskundetaal/gereedschap', detail_domain: null },
+  { id: 'KD17', title: 'Wiskundige attitude', category: 'cross_cutting', summary: 'Nut/kracht, onderzoekende en kritische houding, reflectie op eigen/andermans handelen', mapped_skills: 'Cross-cutting: attitude/reflectie', detail_domain: null },
+  { id: 'KD18', title: 'Wiskunde in werkelijkheid en andere leergebieden', category: 'cross_cutting', summary: 'Dagelijkse/maatschappelijke situaties, beslissingen, praktische handelingen, media-informatie en andere leergebieden', mapped_skills: 'Cross-cutting: toepassing/transfer', detail_domain: null }
+].map(Object.freeze));
 const EXERCISES = Object.freeze([
   {
     "id": "fr2-pencil-length-ordering",
@@ -1322,7 +1336,8 @@ export function createVerticalLearningLinesRegistry({ objectives = OBJECTIVES, e
   const byId=new Map(records.map(objective=>[objective.id,objective]));
   const exerciseById=new Map(exercises.map(exercise=>[exercise.id,Object.freeze(exercise)]));
   return Object.freeze({
-    schema_version:'1.1.0',
+    schema_version:'1.2.0',
+    listCoreObjectives:()=>CORE_OBJECTIVES.slice(),
     listObjectives:({domain,group}={})=>records.filter(o=>(!domain||o.domain===domain)&&(!group||o.slo_group===group)).slice().sort((a,b)=>a.slo_group-b.slo_group||a.id.localeCompare(b.id,'nl')),
     getObjective:id=>byId.get(id)||null,
     listDomains:()=>[...new Set(records.map(o=>o.domain))].sort((a,b)=>a.localeCompare(b,'nl')),

@@ -9552,3 +9552,36 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 5. Behoud de bestaande Breukenweergave en alle 53 bestaande doelen; de eerstvolgende gebruikerszichtbare route is: Verticale leerlijnen → SLO-hoofdonderdelen/kerndoelen → Breuken → bestaande uitgewerkte SLO-tussendoelen.
 6. Bouw daarna pas de volgende domeinen, één voor één op basis van de reeds bestaande broninventarisaties en na afstemming met de gebruiker.
 
+## 49. Centrale SLO-kerndoelen bovenlaag — eerste implementatie (22 november 2026)
+
+**Gebouwd**
+- De bestaande centrale registry `src/features/curriculum/vertical-learning-lines-registry.js` bevat nu een aparte, centrale lijst met KD10A–KD10C en KD11–KD14 als content-/rekendomeinonderdelen, plus KD15–KD18 als cross-cutting lagen.
+- De registry exposeert deze lijst via `listCoreObjectives()`; de registryversie is verhoogd naar 1.2.0.
+- De bestaande beheerweergave toont nu eerst de SLO-kerndoelen. KD15–KD18 staan afzonderlijk onder Doorlopende kerndoelen en worden niet als extra content skills of rekendomeinen gepresenteerd.
+- KD10B → Breuken opent de bestaande Breuken-detailweergave. Daar zijn alle 53 bestaande doelkaarten, dekkingsstatussen, onderbouwingen, skillverwijzingen en oefenroutes behouden; er is alleen een terugknop naar de kerndoelenbovenlaag toegevoegd.
+- Voor de overige kerndoelen is nog geen domeindetail gebouwd. De kaarten maken dat expliciet; er zijn geen ontbrekende doelrecords, skills, routes of inhoud verzonnen.
+- De bovenlaag gebruikt dezelfde centrale Beheer-route, bestaande managementpagina en bestaande PacoGO-paginatemplate. Geen nieuwe HTML-pagina of per-domeintemplate.
+- Registrytests zijn uitgebreid met controles op alle 11 kerndoelen, KD10B→Breuken en de afzonderlijke cross-cutting categorie.
+
+**Gewijzigde bestanden**
+- `src/features/curriculum/vertical-learning-lines-registry.js`
+- `src/features/curriculum/vertical-learning-lines-registry.test.js`
+- `src/features/management/runtime.js`
+- `src/features/management/management-support.css`
+
+**Afbakening**
+- Bron: `docs/curriculum/PacoGO_Curriculum_Rekenen_SLO_10-18_Mapping.md`; de PacoGO-mapping blijft een kandidaat-synthese.
+- Geen inhoudelijke wijziging aan de 53 Breuken-doelen of hun oefenrelaties.
+- Geen wijziging aan C1–C9, curriculumcontracten, FR1/FR2, mastery, learner state, bestaande oefenruntime, studentdata of Supabase.
+- Branch `main` / LIVE is niet gewijzigd.
+
+**Commit en verificatie**
+- Featurecommit: `5420e246850ca4ebfc24f7dd9f9182d6b6dfdaf7`.
+- Parent/baseline: `9e742a95ae4a55658542db9e6eea38a965cef48a`.
+- Laatste volledig geverifieerde Full Regression vóór deze bouwstap: #4247 / run `45058784783`, SUCCESS op `9e742a95ae4a55658542db9e6eea38a965cef48a`.
+- Full Regression voor de nieuwe featurecommit is nog niet als afgerond geverifieerd. Niet als groen rapporteren totdat de workflow op de commit met deze handoff-update `completed / success` toont.
+
+**Volgende concrete stap**
+1. Full Regression uitvoeren en controleren op de nieuwe code- en handoff-commit; bij rood stoppen en de exacte oorzaak isoleren.
+2. Na groene regressie de gebruiker de nieuwe kerndoelenbovenlaag en de doorklik naar Breuken laten controleren in de bestaande lokale TEST-omgeving.
+3. Pas daarna, op basis van de bestaande broninventarisaties en na afstemming, het volgende rekendomein uitwerken. Geen domeindetails vooraf invullen.

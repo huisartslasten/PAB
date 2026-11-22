@@ -2,6 +2,13 @@ const OBJECTIVE_STATUSES = Object.freeze(['active', 'planned', 'retired']);
 const COVERAGE_STATUSES = Object.freeze(['full', 'partial', 'not_demonstrated', 'unassessed']);
 const EXERCISES = Object.freeze([
   {
+    "id": "fr2-pencil-length-ordering",
+    "label": "FR-0002 — potloden van klein naar groot ordenen",
+    "topic": "vergelijken-en-ordenen",
+    "route": { "page": "curriculum-fr2-length-order-learner.html" },
+    "kind": "non_formal_learning_activity"
+  },
+  {
     "id": "fr2-equivalence-practice",
     "label": "FR2 — breukequivalentie oefenen",
     "topic": "curriculum",
@@ -377,9 +384,9 @@ const OBJECTIVES = Object.freeze([
     "source_reference": "SLO 2017, PDF p.77",
     "source_wording": "samenvatting uit PacoGO traceability-inventaris; geen woordelijk citaat",
     "related_skill_ids": [],
-    "exercise_ids": [],
-    "coverage_status": "not_demonstrated",
-    "coverage_note": "Niet aangetoond. Contextuele verhoudingstaken ontbreken.",
+    "exercise_ids": ["fr2-pencil-length-ordering"],
+    "coverage_status": "partial",
+    "coverage_note": "De activiteit laat lengtes vergelijken en ordenen zien. Dit is slechts een deelaspect; betekenisvolle verhoudingssituaties en de volledige doelstelling zijn hiermee niet afgedekt.",
     "status": "active"
   },
   {

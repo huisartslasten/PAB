@@ -9678,3 +9678,33 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 1. Full Regression op de nieuwe code- en handoff-commit afronden; pas bij `completed / success` is deze stap groen.
 2. Daarna KD10A visueel controleren in de lokale TEST-omgeving via Verticale leerlijnen → KD10A.
 3. Geen verdere KD10A-skill- of oefenkoppelingen toevoegen voordat de broninventarisatie en inhoudelijke crosswalk inhoudelijk zijn beoordeeld.
+
+
+## 53. Centraal PacoGO-bouwprotocol voor oefeningen vastgelegd (22 november 2026)
+
+**Gebruikersbesluit**
+- Wanneer de gebruiker zegt "we gaan een oefening bouwen", moet PacoGO altijd eerst een vast bouwprotocol doorlopen.
+- De vaste volgorde is: curriculuminventarisatie → bestaande dekking onderzoeken → didactisch ontwerp → technisch ontwerp en centrale hergebruikstoets → bouwbesluit/implementatie → verificatie → centrale registratie.
+- Er wordt niet direct gebouwd. Geen fase wordt stilzwijgend overgeslagen.
+- Bouw zo centraal mogelijk: hergebruik de bestaande centrale oefentemplate, Learning Interface, componenten en runtime-contracten. Voor breukenoefeningen wordt de bestaande centrale Fraction Learning Interface hergebruikt wanneer passend; geen nieuwe interface per oefening.
+- Een oefening kan meerdere tussendoelen ondersteunen en een tussendoel kan door meerdere oefeningen worden ondersteund, maar alleen als taak en evidence de koppeling inhoudelijk rechtvaardigen.
+- Beoogde, geïmplementeerde en inhoudelijk/evidence-matig geverifieerde dekking moeten van elkaar onderscheiden blijven.
+- Het protocol introduceert geen nieuwe doelen, skills, claims, evidence targets, masteryregels, schema's of functionaliteit.
+
+**Nieuw document**
+- `docs/curriculum/PacoGO_Exercise_Build_Protocol_v0.1.md`
+- Het document beschrijft de zeven fases, de vaste starttrigger, de centrale hergebruikstoets, de engineering/regression-gates, de evidence- en doelkoppelingen en de afbakening.
+- Het protocol geldt als vaste werkwijze voor nieuwe en wezenlijk herontworpen oefeningen.
+
+**Engineering en verificatie**
+- Branch: `refactor/professional-v1`; LIVE `main` is niet gewijzigd.
+- Baseline vóór deze documentatiestap: Full Regression #4257 / run `45063150172`: **SUCCESS** op exact commit `84bd9b648ad64d09e8f5f3aadf5559a85599525f`.
+- Protocoldocument aangemaakt in commit `059b8b13dc2f0db9bbaaac4a20f693ca959e6a1a`.
+- Deze handoff-update is een afzonderlijke repositorywijziging. De uiteindelijke commit met de handoff-update moet zelf door Full Regression worden geverifieerd; rapporteer die pas als groen wanneer de workflow op de exacte uiteindelijke HEAD `completed / success` toont.
+- Er is geen applicatiecode, curriculumregistry, Learning Interface, runtime, Supabase of studentdata gewijzigd.
+
+**Volgende concrete stap**
+1. Verifieer de nieuwe branch-HEAD na de handoff-commit.
+2. Controleer Full Regression op exact die commit.
+3. Bij rood: stoppen en de oorzaak isoleren; niet verder bouwen.
+4. Bij groen: het protocol is formeel vastgelegd en wordt de standaard startprocedure bij iedere nieuwe oefenbouwopdracht.

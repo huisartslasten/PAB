@@ -1,9 +1,9 @@
-// Reusable, domain-neutral visual interaction for ordering measured objects.
-// Task data supplies object lengths; this layer owns the shared visual and interaction.
+// Shared visual/interaction layer for ordering measured objects.
+// The task supplies lengths; the central interface owns the visual asset and interaction.
 export function createLengthOrderLearningInterface({ mount, task, onCheck, documentRef = document } = {}) {
   if (!mount || !task || !Array.isArray(task.lengths) || !Array.isArray(task.initialOrder) || typeof onCheck !== 'function') throw new TypeError('Length-order interface requires mount, task and onCheck.');
   if (task.lengths.length !== task.initialOrder.length || new Set(task.initialOrder).size !== task.lengths.length || task.initialOrder.some(index => !Number.isInteger(index) || index < 0 || index >= task.lengths.length)) throw new TypeError('Length-order task has an invalid initial order.');
-  if (task.lengths.some(length => !Number.isFinite(length) || length < 76)) throw new TypeError('Pencil lengths must be at least 76 visual units.');
+  if (task.lengths.some(length => !Number.isFinite(length) || length <= 0)) throw new TypeError('Pencil lengths must be positive numbers.');
   let order = [...task.initialOrder];
   let draggedIndex = null;
   let locked = false;
@@ -29,53 +29,16 @@ export function createLengthOrderLearningInterface({ mount, task, onCheck, docum
   status.setAttribute('role', 'status');
   status.setAttribute('aria-live', 'polite');
 
-  function pencilArtwork(length, index) {
-    const bodyEnd = length - 25;
-    const ferruleEnd = length - 17;
-    const gradientId = 'pencil-gold-' + index;
-    const woodId = 'pencil-wood-' + index;
-    const eraserId = 'pencil-eraser-' + index;
-    return `
-      <svg class="pacogo-length-order__pencil-art" viewBox="0 0 ${length} 64" role="img" aria-hidden="true" focusable="false" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="${gradientId}" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#fff5a9"/><stop offset=".18" stop-color="#ffe36a"/>
-            <stop offset=".48" stop-color="#f7c52f"/><stop offset=".82" stop-color="#e9a914"/>
-            <stop offset="1" stop-color="#bd7d0b"/>
-          </linearGradient>
-          <linearGradient id="${woodId}" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#ffe3b1"/><stop offset=".55" stop-color="#d9a064"/><stop offset="1" stop-color="#a96b37"/>
-          </linearGradient>
-          <linearGradient id="${eraserId}" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#ffd1d9"/><stop offset=".45" stop-color="#f39aaa"/><stop offset="1" stop-color="#cf637d"/>
-          </linearGradient>
-        </defs>
-        <ellipse cx="${length / 2}" cy="54" rx="${Math.max(20, length / 2 - 3)}" ry="4.2" fill="#263d5a" opacity=".13"/>
-        <path d="M3 32 L23 19 L23 45 Z" fill="url(#${woodId})" stroke="#a66c3b" stroke-width="1"/>
-        <path d="M3 32 L14 28.8 L14 35.2 Z" fill="#29282a"/>
-        <path d="M7 31 L21 21 M7 33 L21 43" stroke="#f8d5a0" stroke-width="1.1" opacity=".85"/>
-        <path d="M23 19 L${bodyEnd - 5} 19 L${bodyEnd} 23 L${bodyEnd} 41 L${bodyEnd - 5} 45 L23 45 Z" fill="url(#${gradientId})" stroke="#b77d0e" stroke-width="1.1"/>
-        <path d="M24 21 L${bodyEnd - 7} 21 L${bodyEnd - 2} 24 L34 24 Z" fill="#fff9d1" opacity=".88"/>
-        <path d="M25 42 L${bodyEnd - 5} 42 L${bodyEnd - 1} 40 L${bodyEnd - 1} 41 L${bodyEnd - 5} 44 L25 44 Z" fill="#9d680c" opacity=".3"/>
-        <path d="M${bodyEnd - 1} 19 L${ferruleEnd} 21 L${ferruleEnd} 43 L${bodyEnd - 1} 45 Z" fill="#b9c2cb" stroke="#7d8996" stroke-width="1"/>
-        <path d="M${bodyEnd + 2} 21 L${bodyEnd + 2} 43 M${bodyEnd + 6} 21.5 L${bodyEnd + 6} 42.5" stroke="#f9fcff" stroke-width="1.5" opacity=".95"/>
-        <path d="M${ferruleEnd} 21 Q${length - 2} 17 ${length - 2} 25 L${length - 2} 39 Q${length - 2} 47 ${ferruleEnd} 43 Z" fill="url(#${eraserId})" stroke="#c85f78" stroke-width="1.1"/>
-        <path d="M${ferruleEnd + 2} 24 Q${length - 5} 20 ${length - 4} 25" fill="none" stroke="#fff0f2" stroke-width="2" stroke-linecap="round" opacity=".9"/>
-      </svg>`;
-  }
-
   function render() {
     row.replaceChildren();
     order.forEach(index => {
-      const length = task.lengths[index];
       const pencil = documentRef.createElement('button');
       pencil.type = 'button';
       pencil.className = 'pacogo-length-order__pencil';
       pencil.draggable = !locked;
       pencil.dataset.pencilId = String(index);
       pencil.setAttribute('aria-label', 'Geel potlood, verplaats met slepen');
-      pencil.style.setProperty('--pencil-length', length + 'px');
-      pencil.innerHTML = pencilArtwork(length, index);
+      pencil.style.setProperty('--pencil-body-width', Math.max(88, task.lengths[index] * 1.15) + 'px');
       pencil.addEventListener('dragstart', event => {
         if (locked) { event.preventDefault(); return; }
         draggedIndex = index;

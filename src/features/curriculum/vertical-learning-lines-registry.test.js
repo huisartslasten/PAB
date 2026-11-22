@@ -33,6 +33,14 @@ describe('vertical learning lines registry', () => {
     expect(verticalLearningLinesRegistry.getObjective('FR-0052').objective).toContain('decimaal getal');
     expect(verticalLearningLinesRegistry.getObjective('FR-0007').slo_group).toBe(6);
     expect(verticalLearningLinesRegistry.getExercise('fr2-equivalence-practice').route.page).toBe('curriculum-fr2-practice-learner.html');
+    expect(verticalLearningLinesRegistry.getExercise('fr2-pencil-length-ordering')).toMatchObject({
+      kind: 'non_formal_learning_activity',
+      route: { page: 'curriculum-fr2-length-order-learner.html' }
+    });
+    expect(verticalLearningLinesRegistry.getObjective('FR-0002')).toMatchObject({
+      exercise_ids: ['fr2-pencil-length-ordering'],
+      coverage_status: 'partial'
+    });
   });
 
   it('supports many-to-many links between objectives and exercises', () => {

@@ -31,6 +31,43 @@ describe('vertical learning lines registry', () => {
   });
 
 
+  it('exposes the current KD11 scope and central detail domain', () => {
+    expect(verticalLearningLinesRegistry.listCoreObjectives().find(item => item.id === 'KD11')).toMatchObject({
+      title: 'Grootheden en eenheden',
+      detail_domain: 'Grootheden en eenheden',
+      scope_source: 'SLO, Kerndoelen primair onderwijs, juli 2026, p. 35',
+      scope_components: [
+        'Grootheden: lengte, oppervlakte, inhoud, gewicht/massa, snelheid, tijd, geld, temperatuur en geheugenomvang.',
+        'Meten met passende meetinstrumenten.',
+        'Omtrek, oppervlakte en inhoud van rechthoekige figuren bepalen.',
+        'Schatten en controleren met referentiematen en meetreferenties.',
+        'Relaties leggen tussen grootheden en eenheden, tussen grootheden onderling en tussen eenheden onderling.'
+      ]
+    });
+  });
+
+  it('loads all KD11 SLO group objectives as source-traceable, unassessed records', () => {
+    const objectives = verticalLearningLinesRegistry.listObjectives({ domain: 'Grootheden en eenheden' });
+    expect(objectives).toHaveLength(186);
+    expect([2, 3, 4, 5, 6, 7, 8].map(group => verticalLearningLinesRegistry.listObjectives({ domain: 'Grootheden en eenheden', group }).length))
+      .toEqual([19, 25, 30, 28, 36, 26, 22]);
+    expect(new Set(objectives.map(item => item.id)).size).toBe(186);
+    expect(objectives[0]).toMatchObject({
+      id: 'KD11-0001',
+      domain: 'Grootheden en eenheden',
+      slo_group: 2,
+      slo_source: 'SLO 2017 — kandidaat-crosswalk naar KD11',
+      slo_component: 'Lengte en omtrek',
+      coverage_status: 'unassessed',
+      related_skill_ids: [],
+      exercise_ids: []
+    });
+    expect(objectives.at(-1).id).toBe('KD11-0186');
+    expect(objectives.every(item => item.source_reference.includes('gedrukte pp.') && item.source_wording.includes('geen woordelijk SLO-citaat'))).toBe(true);
+    expect(objectives.every(item => item.related_skill_ids.length === 0 && item.exercise_ids.length === 0 && item.coverage_status === 'unassessed')).toBe(true);
+    expect(verticalLearningLinesRegistry.getCoverageSummary({ domain: 'Grootheden en eenheden' }).unassessed).toBe(186);
+  });
+
   it('loads KD10A SLO group objectives as traceable, unassessed records', () => {
     const objectives = verticalLearningLinesRegistry.listObjectives({ domain: 'Gehele en decimale getallen' });
     expect(objectives).toHaveLength(170);

@@ -193,7 +193,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     });
   }
 
-  function renderDomainVerticalLearningLine({ domain, title: domainTitle, sourceLabel, showCurriculumSkills = false, scopeComponents = null, scopeSource = '' }) {
+  function renderDomainVerticalLearningLine({ domain, title: domainTitle, sourceLabel, showCurriculumSkills = false, scopeComponents = null, scopeSource = '', introText = 'Alle geïnventariseerde SLO-tussendoelen, gekoppeld aan bestaande PacoGO-curriculumonderdelen en oefenroutes.', scopeTitle = 'Actueel kerndoel KD10A — SLO 2026', scopeDescription = 'Dit is de actuele inhoudelijke afbakening van KD10A. De groepsgewijze doelen hieronder komen uit SLO 2017 en zijn een kandidaat-crosswalk; ze zijn geen officiële groepsdoelen uit de publicatie van 2026.' }) {
     const objectives = verticalLearningLinesRegistry.listObjectives({ domain });
     const summary = verticalLearningLinesRegistry.getCoverageSummary({ domain });
     const exercises = verticalLearningLinesRegistry.listExercises();
@@ -215,7 +215,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     heading.textContent = 'Verticale leerlijn — ' + domainTitle;
     const intro = documentRef.createElement('p');
     intro.className = 'vertical-learning-lines-intro';
-    intro.textContent = 'Alle geïnventariseerde SLO-tussendoelen, gekoppeld aan bestaande PacoGO-curriculumonderdelen en oefenroutes.';
+    intro.textContent = introText;
     const source = documentRef.createElement('p');
     source.className = 'vertical-learning-lines-source';
     source.textContent = sourceLabel;
@@ -225,9 +225,9 @@ export function createManagementRuntime({ app, templateMount, context, documentR
       scopeSection = documentRef.createElement('section');
       scopeSection.className = 'vertical-learning-core-scope';
       const scopeHeading = documentRef.createElement('h3');
-      scopeHeading.textContent = 'Actueel kerndoel KD10A — SLO 2026';
+      scopeHeading.textContent = scopeTitle;
       const scopeIntro = documentRef.createElement('p');
-      scopeIntro.textContent = 'Dit is de actuele inhoudelijke afbakening van KD10A. De groepsgewijze doelen hieronder komen uit SLO 2017 en zijn een kandidaat-crosswalk; ze zijn geen officiële groepsdoelen uit de publicatie van 2026.';
+      scopeIntro.textContent = scopeDescription;
       const scopeList = documentRef.createElement('ul');
       scopeComponents.forEach(component => {
         const item = documentRef.createElement('li');
@@ -399,6 +399,20 @@ export function createManagementRuntime({ app, templateMount, context, documentR
 
 
   function renderVerticalLearningLines() {
+    if (selectedVerticalLearningCoreGoal === 'KD11') {
+      const coreGoal = verticalLearningLinesRegistry.listCoreObjectives().find(item => item.id === 'KD11');
+      renderDomainVerticalLearningLine({
+        domain: 'Grootheden en eenheden',
+        title: 'KD11 — Grootheden en eenheden',
+        sourceLabel: 'Groepsgewijze bron: SLO 2017 · historische, voorbeeldmatige kandidaat-crosswalk naar actueel KD11 (SLO 2026) · bronverwijzing per doel',
+        scopeComponents: coreGoal?.scope_components,
+        scopeSource: coreGoal?.scope_source || '',
+        introText: 'De onderstaande doelen zijn samengevat uit de voorbeeldmatige SLO 2017-groepsuitwerking. Ze vormen geen officiële groepsindeling van KD11 uit SLO 2026.',
+        scopeTitle: 'Actueel kerndoel KD11 — SLO 2026',
+        scopeDescription: 'Dit is de actuele inhoudelijke afbakening van KD11. De groepsgewijze doelen hieronder komen uit de afzonderlijke SLO 2017-publicatie en zijn een historische, voorbeeldmatige broninventarisatie; ze zijn geen officiële groepsdoelen uit de publicatie van 2026.'
+      });
+      return;
+    }
     if (selectedVerticalLearningCoreGoal === 'KD10B') {
       renderDomainVerticalLearningLine({ domain: 'Breuken', title: 'Breuken', sourceLabel: 'Bron: SLO 2017 · eind groep 2 t/m 8 · PDF-paginaverwijzingen per doel', showCurriculumSkills: true });
       return;

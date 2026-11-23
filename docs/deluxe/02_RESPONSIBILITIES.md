@@ -37,7 +37,7 @@ Bron: [Technical Blueprint v0.1](PacoGO_Deluxe_Blueprint_v0.1.md), repository-au
 
 ## 3. PACOGO CORE — verantwoordelijkheid vastgesteld
 
-<badge>Door gebruiker akkoord</badge>
+**Status: door gebruiker akkoord.**
 
 ### 3.1 Doel
 

@@ -41,7 +41,7 @@ Bron: [Technical Blueprint v0.1](PacoGO_Deluxe_Blueprint_v0.1.md), repository-au
 
 ### 3.1 Doel
 
-PACO­GO CORE vormt de overkoepelende platformbasis waarop de bestaande PacoGO-functionaliteit en de latere Deluxe-systemen kunnen functioneren. Core is geen nieuwe monolithische module die bestaande domeinen overneemt.
+PACOGO CORE vormt de overkoepelende platformbasis waarop de bestaande PacoGO-functionaliteit en de latere Deluxe-systemen kunnen functioneren. Core is geen nieuwe monolithische module die bestaande domeinen overneemt.
 
 De bestaande onderdelen behouden hun eigen eigenaarschap. Deluxe sluit aan op die bestaande basis.
 

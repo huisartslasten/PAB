@@ -9744,3 +9744,46 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 3. Maak pas daarna de inhoudelijke kandidaat-crosswalk van SLO-doelen naar bestaande VR-skills, met expliciete overlap/afbakening ten opzichte van KD10B en KD11.
 4. Beoordeel vervolgens bestaande dekking via claims, evidence targets en taken.
 5. Integreer pas na inhoudelijke review in de bestaande centrale Verticale Leerlijn-template; geen aparte domeinpagina of renderer.
+
+
+
+## 55. Werkvolgorde FR eerst, KD10C parkeren en domeinoverstijgende oefenidentiteit (22 november 2026)
+
+**Gebruikersbesluiten**
+- KD10C blijft in de centrale kerndoeleninventarisatie staan zoals die is. KD10C wordt voorlopig niet verder uitgewerkt.
+- De kandidaatstructuur VR1–VR5 wordt voorlopig niet uitgewerkt. Er worden nu geen nieuwe VR-skills, VR-developments, VR-claims, VR-evidence targets, VR-task models, VR-oefeningen of VR-runtimekoppelingen gemaakt.
+- Eerst wordt het bestaande breukendomein (FR1 en FR2) verder uitgewerkt. Bestaande FR-besluiten en skillgrenzen blijven leidend; er worden geen FR3 of nieuwe skills verzonnen.
+- Daarna worden oefeningen volgens het centrale PacoGO Bouwprotocol voor oefeningen ontworpen en gebouwd. De bestaande centrale Fraction Learning Interface/template wordt gebruikt wanneer die passend is.
+- Na de FR-uitwerking en oefenbouw kan met de daadwerkelijke taken en evidence worden onderzocht welke KD10C-doelen mogelijk geheel of gedeeltelijk door FR-oefeningen worden afgedekt. Pas daarna wordt bepaald welke zelfstandige VR-inhoud nog nodig is.
+
+**Domeinoverstijgende doeldekking per oefening**
+- Iedere oefening wordt niet alleen onderzocht op het primaire kerndoel, maar ook op alle andere relevante SLO-kerndoelen en SLO-tussendoelen die mogelijk door dezelfde oefening worden aangesproken.
+- Een oefening heeft één stabiele, unieke PacoGO-oefen-ID. Deze ID is onafhankelijk van kerndoel, tussendoel, skill, groep, oefentype en Learning Interface. De ID verandert niet wanneer curriculumrelaties later worden toegevoegd of herzien.
+- De oefen-ID is de identiteit van de oefening; de koppelingen naar kerndoelen, tussendoelen, skills, tasks en evidence zijn afzonderlijke relaties.
+- Per doelrelatie wordt vastgelegd: exacte doelidentiteit en bron, primaire of aanvullende rol (secundair, tertiair of verdere relatie waar zinvol), inhoudelijke onderbouwing, beoogd leerlinggedrag, relevante evidence en dekkingsstatus.
+- Rol/prioriteit en dekkingsgraad zijn verschillende dimensies. Een secundair doel kan volledig worden afgedekt; een tertiair doel kan slechts gedeeltelijk worden afgedekt.
+- Mogelijke, gedeeltelijke, volledige en ondersteunende dekking worden per doelrelatie onderscheiden. Alleen taak- en evidence-matig onderbouwde en geverifieerde dekking mag als geverifieerd gelden. Een oefenrelatie betekent nooit automatisch mastery.
+- De stabiele ID's en doelrelaties moeten later een centraal, domeinoverstijgend oefeningennetwerk mogelijk maken. Daarmee moet PacoGO kunnen analyseren welke kerndoelen en vooral welke SLO-tussendoelen volledig, gedeeltelijk, ondersteunend of nog niet door oefeningen worden afgedekt.
+- Het netwerk en een nieuw technisch register worden nu niet gebouwd. Het protocol borgt alleen dat de identiteit en relevante metadata vanaf de eerste oefening voldoende traceerbaar worden vastgelegd. Er wordt geen nieuw databaseschema of tweede curriculum-engine geïntroduceerd.
+
+**Bouwprotocol bijgewerkt**
+- Document: `docs/curriculum/PacoGO_Exercise_Build_Protocol_v0.1.md`.
+- Fase 1 en 2 vereisen nu domeinoverstijgende inventarisatie van mogelijke kerndoel- en tussendoeldekking.
+- Fase 4 vereist een stabiele, domeinoverstijgende PacoGO-oefen-ID.
+- Fase 7 legt vast welke oefenmetadata en afzonderlijke doelrelaties traceerbaar moeten zijn, zonder nu al een nieuw technisch register te bouwen.
+- De protocoltekst maakt expliciet onderscheid tussen doelrelatie, rol/prioriteit, dekkingsstatus en evidence-verificatie.
+- De protocolwijziging verandert geen runtime, curriculumregistry, task/evidence-contract, mastery, learner state, Learning Interface, Supabase of studentdata.
+
+**Directe volgende stap**
+1. Begin de volgende chat met het opnieuw lezen van deze actuele handoff en de relevante FR-brondocumenten.
+2. Ga verder met FR1/FR2; begin niet met KD10C/VR-uitwerking.
+3. Herstel/verifieer eerst de bestaande FR1-besluiten en formele contractgaten; FR1 mag niet op basis van losse samenvattingen worden ingevuld.
+4. Controleer de bestaande FR2-task/evidence-alignmentdocumenten en de openstaande specificatiebeslissingen voordat mappings of taken worden gewijzigd.
+5. Pas wanneer de FR-curriculumbasis voldoende is uitgewerkt, start een concrete oefenopdracht via alle fases van het centrale bouwprotocol.
+6. Voor iedere bouwstap blijft Full Regression verplicht: groen vóór bouwen, daarna opnieuw groen op de exacte nieuwe commit.
+
+**Engineering en verificatie**
+- Werkbranch: `refactor/professional-v1`; `main` / LIVE niet aangeraakt.
+- Baseline vóór documentwijziging: Full Regression #4261, run `45066189606`, exact commit `bc001f058c269665960e189e2a5406e62ed2dbf8`: `completed / success` (GREEN).
+- Protocolwijziging: commit `8b8132753df10b91a26ef0e0c441deaacdfa7535`.
+- Deze handoff-update vormt een volgende repositorywijziging. Full Regression moet na de handoff-update opnieuw op de uiteindelijke commit worden uitgevoerd. Rapporteer de documentatiestap pas als volledig geverifieerd wanneer die run op de exacte eindcommit `completed / success` is.

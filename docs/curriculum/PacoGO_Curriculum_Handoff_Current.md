@@ -9823,7 +9823,7 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 
 ## 57. KD11 — broncontrole 1S-concretisering (23 november 2026)
 
-**Broncontrole afgerond als documentatie; inhoudelijke doelbesluiten nog open**
+**Broncontrole en inhoudelijke classificatie afgerond als documentatie; geen nieuwe doelregistraties besloten**
 - Nieuw document: `docs/curriculum/PacoGO_KD11_1S_Concretisering_Broncontrole_v0.1.md`.
 - De afzonderlijke kolom **Concretisering van Referentieniveau 1S** uit SLO 2017, gedrukte pp. 51–62, is op fragmentniveau vergeleken met de bestaande 186 KD11-objectiefregistraties.
 - De 1S-kolom is een aparte bronlaag naast de groepsgewijze tussendoelen. Zij is niet als extra groepsindeling of automatisch als set nieuwe PacoGO-skills behandeld.
@@ -9846,9 +9846,44 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Broncontroledocument aangemaakt in commit `63e6176cc521e4cde93dbd15cd8f2471beef69dc`.
 - Deze handoff-update is een afzonderlijke repositorywijziging en moet zelf opnieuw door Full Regression worden geverifieerd op de uiteindelijke HEAD.
 
+**Resultaat van de inhoudelijke classificatie**
+1. De 1S-fragmenten over temperatuur in graden/°C en temperatuurreferenties zijn concretiseringen van bestaande temperatuurinhoud.
+2. Referentiematen voor tijd zijn concretiseringen van bestaande doelen rond tijdseenheden, tijdsduren en tijdsbesef.
+3. Geldafronding, budgetten, aanbiedingen, sparen en lenen zijn specifieke 1S-uitwerkingen/toepassingscontexten bij het brede groepsdoel KD11-0135 (redeneren over geld); dit brede doel bewijst niet dat alle contexten volledig worden beheerst.
+4. De geld-'ton' (€100.000) en bedragreferenties zijn aanvullende concretisering/uitbreiding ten opzichte van groepsdoelen die bedragen tot circa €5000 benoemen.
+5. Gemiddelde snelheid is een aanvullende 1S-uitwerking van het snelheidsdomein naast de groepsdoelen over snelheid als afstand per tijdseenheid en rekenen met km/u en m/s.
+6. Meetresultaten noteren/interpreteren, schaalgebruik, referentiematen en samengestelde grootheden blijven gedeeltelijke relaties/concretiseringen; ze zijn geen automatisch bewijs van volledige dekking.
+
+**Besluiten / volgende stap**
+- Geen nieuwe groepsdoelen of PacoGO-skills toevoegen op basis van deze classificatie.
+- De 186 bestaande KD11-registraties blijven ongewijzigd.
+- De 1S-laag blijft afzonderlijk traceerbaar; bij latere oefenbouw worden relevante fragmenten via het centrale Oefeningenbouwprotocol meegenomen.
+- Geen oefening bouwen totdat de gebruiker een concrete oefenopdracht geeft.
+
+
+## 58. KD11 — 1S-fragmenten inhoudelijk geclassificeerd (23 november 2026)
+
+**Afgerond**
+- De 1S-audit is aangevuld met een inhoudelijke classificatie van de eerder gedeeltelijk of niet afzonderlijk traceerbare fragmenten.
+- De classificatie onderscheidt concretiseringen van bestaande groepsdoelen, toepassingscontexten en specifieke 1S-uitwerkingen/uitbreidingen.
+- Geldafronding, budgetten, aanbiedingen, sparen en lenen zijn als specifieke 1S-uitwerkingen bij het brede groepsdoel KD11-0135 geclassificeerd; de brede doelregistratie geldt niet als bewijs van volledige beheersing van elk onderdeel.
+- De €100.000-'ton' en bedragreferenties gaan verder dan de expliciet genoemde groepsbandbreedte tot circa €5000.
+- Gemiddelde snelheid is een aanvullende 1S-uitwerking naast de bestaande groepsdoelen over snelheid als afstand per tijdseenheid en rekenen met km/u en m/s.
+- Temperatuur- en tijdreferenties zijn als concretiseringen beoordeeld. Gedeeltelijke relaties rond meetresultaten, schaal, referentiematen en samengestelde grootheden blijven als zodanig herkenbaar.
+- Geen nieuwe doelen, skills, developments, claims, evidence targets, task models of oefeningen aangemaakt; de 186 bestaande KD11-records zijn niet gewijzigd.
+- Geen code, registry, Learning Interface, runtime, Supabase of studentdata gewijzigd.
+
+**Bronbasis**
+- SLO 2017, *Tussendoelen rekenen-wiskunde voor het primair onderwijs*, subdomein Meten, gedrukte pp. 60–62; in het bijzonder de afzonderlijke kolom Concretisering van Referentieniveau 1S.
+- De actuele KD11-scope blijft gebaseerd op SLO 2026; de SLO 2017-groepsdoelen en 1S-kolom zijn afzonderlijke historische bronlagen en geen officiële groepsindeling uit 2026.
+
+**Engineering en verificatie**
+- Branch: `refactor/professional-v1`; LIVE `main` niet aangeraakt.
+- Baseline Full Regression #4272: groen op exact commit `701f962` (volledige SHA niet uit de aangeleverde screenshot af te leiden).
+- Auditclassificatie gewijzigd in commit `1cf6e4a23f14378b29a52018c386a5f8adc42bf2`.
+- Deze handoff-update is een afzonderlijke wijziging; de resulterende commit moet zelf door Full Regression worden geverifieerd. Er wordt nog geen groene status voor deze laatste commit geclaimd.
+
 **Volgende concrete stap**
-1. Beoordeel de gedeeltelijke en ontbrekende 1S-bronfragmenten inhoudelijk.
-2. Bepaal per fragment of het een zelfstandig doel, concretisering van een bestaand doel of toepassingscontext is.
-3. Beslis pas daarna of aanvullende doelregistraties nodig zijn.
-4. Houd SLO-bronfragment, curriculumdoel, skill/development/claim, task/evidence en oefening als afzonderlijke lagen.
-5. Geen oefening bouwen totdat een concrete oefenopdracht volgens het centrale bouwprotocol wordt gegeven.
+1. Verifieer Full Regression op de exacte commit met deze handoff-update.
+2. Bij `completed / success` is de KD11-broninventarisatie en 1S-bronclassificatie als documentatiefase afgerond.
+3. Daarna alleen verder met KD11 wanneer een concrete vervolgstap wordt gekozen; oefenbouw start uitsluitend via het centrale PacoGO Oefeningenbouwprotocol.

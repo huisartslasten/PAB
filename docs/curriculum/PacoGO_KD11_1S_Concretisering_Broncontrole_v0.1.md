@@ -182,16 +182,34 @@ Aandachtspunt: de bestaande registratie voor grillige figuren noemt globaal bepa
 | Prijs of aantal per tijdeenheid | KD11-0136 | Gedeeltelijk |
 | Kritisch redeneren over samengestelde grootheden | KD11-0138, 0186 | Gedeeltelijk |
 
-## 4. Geconstateerde aandachtspunten
+## 4. Beoordeling van gedeeltelijke en niet afzonderlijk teruggevonden fragmenten
 
-De volgende 1S-elementen zijn in de bestaande 186 registraties niet als zelfstandige inhoud teruggevonden:
+Deze beoordeling bepaalt de aard van de relatie met de bestaande groepsinventarisatie. Zij verandert de 186 groepsregistraties niet en promoveert geen relatie naar formele curriculum- of evidence-dekking.
 
-1. Temperatuur noteren in graden/°C en gebruiken van referentietemperaturen.
-2. Referentiematen voor tijd.
-3. Geldbedragen afronden op 5 eurocent en hele euro's; budgetten; aanbiedingen; sparen; lenen; de betekenis van €100.000 als 'ton'; referentiematen voor bedragen.
-4. Gemiddelde snelheid begrijpen, berekenen en vergelijken.
+| 1S-fragment | Bestaande relatie | Beoordeling |
+|---|---|---|
+| Temperatuur uitdrukken in graden/°C en meetresultaten noteren | KD11-0126, 0159, 0176 behandelen thermometeraflezing en temperaturen boven/onder nul | **Concretisering** van bestaande temperatuurinhoud: een expliciete notatievorm en interpretatiehandeling |
+| Referentiematen voor temperatuur | Bestaande temperatuurdoelen | **Concretisering** van het schatten en betekenisvol interpreteren van temperatuur; niet afzonderlijk als referentiemaat geformuleerd |
+| Referentiematen voor tijd | KD11-0129, 0160–0164, 0177–0180 behandelen tijdseenheden, tijdsduren en tijdrelaties | **Concretisering** van betekenisvol tijdsbesef en het kiezen/interpreteren van tijdseenheden |
+| Geldbedragen afronden op 5 eurocent of hele euro's; afrondingsregels | KD11-0133–0135 behandelen bedragen samenstellen en redeneren over geld | **Aanvullende 1S-uitwerking** binnen geldrekenen; de specifieke afrondingshandeling is niet afzonderlijk in de groepsrecords vastgelegd |
+| Uitgaven relateren aan een budget; aanbiedingen, sparen en lenen | KD11-0135 benoemt breed redeneren over geld | **Toepassingscontexten en concretiseringen** van kritisch redeneren over geld; niet afzonderlijk als groepsdoel geregistreerd |
+| 'Ton' als €100.000 en referentiematen voor bedragen | KD11-0133–0135 behandelen bedragen tot circa €5000 en redeneren over geld | **Aanvullende concretisering/uitbreiding** van geldomvang en bedragsschatting; €100.000 valt buiten de expliciet genoemde bandbreedte van circa €5000 |
+| Gemiddelde snelheid begrijpen, berekenen en vergelijken | KD11-0137 behandelt snelheid als afstand per tijdseenheid; KD11-0185 behandelt rekenen met km/u en m/s | **Aanvullende 1S-uitwerking** van het snelheidsdomein; gemiddelde snelheid is niet afzonderlijk als groepsdoel geformuleerd |
 
-Daarnaast zijn er verschillende gedeeltelijke koppelingen rond meetresultaten noteren/interpreteren, schaalgebruik, referentiematen en samengestelde grootheden. Die vragen om inhoudelijke beoordeling op fragmentniveau.
+### Overige gedeeltelijke koppelingen
+
+- Meetresultaten noteren en interpreteren: concretisering van bestaande meetdoelen; de precieze notatie- en interpretatie-eisen verschillen per grootheid en instrument.
+- Schaalgebruik: toepassingswijze bij meten en afbeelden; niet automatisch een zelfstandig KD11-doel op basis van de huidige koppelingen.
+- Samengestelde grootheden: de groepsregistraties bevatten al onderdelen voor prijs per eenheid, snelheid en bevolkingsdichtheid. De 1S-fragmenten concretiseren en verbreden de soorten samengestelde grootheden en de vereiste interpretatie.
+- Referentiematen: bij verschillende grootheden is sprake van een concretisering van schatten, vergelijken en passende eenheden kiezen; waar een specifieke referentiemaat ontbreekt, blijft dat als afzonderlijk traceerbaarheidspunt zichtbaar.
+
+### Besluit voor deze inventarisatiefase
+
+1. De 1S-fragmenten blijven herkenbaar als afzonderlijke bronlaag.
+2. De hierboven beschreven relaties worden niet omgezet in nieuwe groepsdoelen of PacoGO-skills.
+3. De brede registratie KD11-0135 ('Redeneren over geld') wordt niet opgewaardeerd tot bewijs dat elk genoemd geldprobleem volledig wordt afgedekt.
+4. Gemiddelde snelheid, de specifieke geldafrondingshandelingen en de €100.000-referentie blijven expliciete 1S-uitwerkingen die bij latere curriculum- en oefenbouw inhoudelijk herkenbaar moeten blijven.
+5. De classificatie is een inhoudelijke bronbeoordeling, geen uitspraak over taakdekking, evidence of mastery.
 
 ## 5. Relatie met de actuele SLO 2026-scope
 

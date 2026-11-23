@@ -9820,3 +9820,35 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 4. Maak pas na die inspectie een kandidaat-crosswalk van KD11-tussendoelen naar aantoonbaar bestaande MG-structuur.
 5. Onderzoek afzonderlijk de mogelijke relaties met KD10A/B/C, KD14, KD16B en KD18. Gedeelde context alleen geldt niet als doeldekking.
 6. Integreer de gecontroleerde inventarisatie in de bestaande centrale Verticale Leerlijn-template, zoals bij KD10A/B; geen aparte pagina of renderer.
+
+## 57. KD11 — broncontrole 1S-concretisering (23 november 2026)
+
+**Broncontrole afgerond als documentatie; inhoudelijke doelbesluiten nog open**
+- Nieuw document: `docs/curriculum/PacoGO_KD11_1S_Concretisering_Broncontrole_v0.1.md`.
+- De afzonderlijke kolom **Concretisering van Referentieniveau 1S** uit SLO 2017, gedrukte pp. 51–62, is op fragmentniveau vergeleken met de bestaande 186 KD11-objectiefregistraties.
+- De 1S-kolom is een aparte bronlaag naast de groepsgewijze tussendoelen. Zij is niet als extra groepsindeling of automatisch als set nieuwe PacoGO-skills behandeld.
+- De matrix onderscheidt: gedekt, gedeeltelijk en niet afzonderlijk terug te vinden. Een algemene of verwante registratie telt niet automatisch als volledige dekking.
+- Niet afzonderlijk teruggevonden aandachtspunten omvatten onder meer: temperatuur noteren in graden/°C en referentietemperaturen; referentiematen voor tijd; geld afronden, budgetten, aanbiedingen, sparen, lenen, geld-'ton' (€100.000) en referentiematen voor bedragen; gemiddelde snelheid begrijpen, berekenen en vergelijken.
+- Er zijn ook gedeeltelijke koppelingen rond meetresultaten noteren/interpreteren, schaalgebruik, referentiematen en samengestelde grootheden.
+- Geheugenomvang staat in de actuele SLO 2026-KD11-scope, maar is niet als afzonderlijk onderdeel teruggevonden in de onderzochte SLO 2017-groepsdoelen of 1S-fragmenten. Dit blijft een afzonderlijke bron-/uitwerkingsvraag.
+- De matrix is kandidaat-traceerbaarheid, geen formele doel-, skill-, evidence- of mastery-dekking.
+
+**Besluiten / grenzen**
+- Geen nieuwe KD11-doelen, skills, developments, claims, evidence targets, task models of oefeningen aangemaakt.
+- Geen bestaande 186 registraties gewijzigd.
+- Geen curriculumregistry/runtime, Learning Interfaces, Supabase of studentdata gewijzigd.
+- Voor gedeeltelijke/ontbrekende fragmenten moet eerst worden bepaald of het gaat om een zelfstandig doel, concretisering van een bestaand doel of toepassingscontext. Pas daarna kan over aanvullende registratie worden beslist.
+- Latere oefenbouw blijft onderworpen aan het centrale PacoGO Oefeningenbouwprotocol en de bestaande centrale Learning Interface/template.
+
+**Engineering en verificatie**
+- Branch: `refactor/professional-v1`; `main` / LIVE niet aangeraakt.
+- Baseline vóór deze documentatiestap: Full Regression #4270 / run `45109825205`: `completed / success` op exact commit `fd3b08408b21dfefea3e7125186c40685f163a94`.
+- Broncontroledocument aangemaakt in commit `63e6176cc521e4cde93dbd15cd8f2471beef69dc`.
+- Deze handoff-update is een afzonderlijke repositorywijziging en moet zelf opnieuw door Full Regression worden geverifieerd op de uiteindelijke HEAD.
+
+**Volgende concrete stap**
+1. Beoordeel de gedeeltelijke en ontbrekende 1S-bronfragmenten inhoudelijk.
+2. Bepaal per fragment of het een zelfstandig doel, concretisering van een bestaand doel of toepassingscontext is.
+3. Beslis pas daarna of aanvullende doelregistraties nodig zijn.
+4. Houd SLO-bronfragment, curriculumdoel, skill/development/claim, task/evidence en oefening als afzonderlijke lagen.
+5. Geen oefening bouwen totdat een concrete oefenopdracht volgens het centrale bouwprotocol wordt gegeven.

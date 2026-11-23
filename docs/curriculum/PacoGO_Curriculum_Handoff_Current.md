@@ -9787,3 +9787,36 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Baseline vóór documentwijziging: Full Regression #4261, run `45066189606`, exact commit `bc001f058c269665960e189e2a5406e62ed2dbf8`: `completed / success` (GREEN).
 - Protocolwijziging: commit `8b8132753df10b91a26ef0e0c441deaacdfa7535`.
 - Deze handoff-update vormt een volgende repositorywijziging. Full Regression moet na de handoff-update opnieuw op de uiteindelijke commit worden uitgevoerd. Rapporteer de documentatiestap pas als volledig geverifieerd wanneer die run op de exacte eindcommit `completed / success` is.
+
+
+## 56. KD11 — start broninventarisatie (23 november 2026)
+
+**Gebruikersbesluit / actuele werkvolgorde**
+- KD10A en KD10B zijn uitgewerkt.
+- KD10C blijft bewust open/geparkeerd.
+- De volgende uitwerking is KD11 — Grootheden en eenheden.
+- Deze expliciete, meest recente gebruikersinstructie gaat voor op de eerdere FR-eerst-volgorde in sectie 55. FR blijft behouden; de volgorde wordt voor deze fase aangepast naar KD11.
+- De presentatie volgt dezelfde centrale Verticale Leerlijn-structuur als de bestaande KD10-uitwerkingen. Geen aparte renderer of domeinspecifieke pagina toevoegen.
+
+**KD11-broninventarisatie**
+- Nieuw document: `docs/curriculum/PacoGO_KD11_SLO_Tussendoelen_Per_Groep_v0.1.md`.
+- Het document beschrijft de actuele SLO 2026-scope van KD11/11A en ordent de beschikbare SLO 2017-doelen voor eind groep 2 t/m 8 onder Meten.
+- De bronafbakening is expliciet: SLO 2026 bepaalt de actuele kerndoelscope; de groepsgewijze doelen komen uit de aparte SLO-publicatie 2017 en zijn geen officiële KD11-groepsdoelen uit 2026.
+- De actuele KD11/11A-scope noemt lengte, oppervlakte, inhoud, gewicht/massa, snelheid, tijd, geld, temperatuur en geheugenomvang; geheugenomvang is niet als afzonderlijk onderdeel teruggevonden in de groepsgewijze meetdoelen van SLO 2017.
+- De centrale mapping en B10 noemen MG1–MG6 als kandidaatlaag voor meten. De gecontroleerde curriculumregistry v0.6 bevat geen formele MG1–MG6-skilldefinities of formele development/claim/evidence/task-contracten. Er is daarom nog geen doel-naar-MG-crosswalk vastgesteld.
+- De centrale Clock Learning Interface is een technisch prototype en geen geregistreerde KD11-skill of bewijs van KD11-dekking.
+- Geen skills, developments, claims, evidence targets, task models, oefeningen, Learning Interfaces, runtime, registry, Supabase of studentdata gewijzigd.
+
+**Engineering en verificatie**
+- Branch: `refactor/professional-v1`; `main` / LIVE niet aangeraakt.
+- KD11-inventarisatiedocument aangemaakt in commit `b8b5bbfa17ebf48874359fc89af6597c544cadf1`.
+- Full Regression #4264 / run `45103639618` is gestart op exact commit `b8b5bbfa17ebf48874359fc89af6597c544cadf1`. Op het moment van deze handoff-update is de workflow nog `in_progress`; er wordt dus geen groene status geclaimd.
+- Deze handoff-update is zelf een repositorywijziging en vereist een nieuwe Full Regression op de uiteindelijke handoff-commit.
+
+**Volgende concrete stap**
+1. Verifieer dat Full Regression #4264 eindigt met `completed / success` op commit `b8b5bbfa17ebf48874359fc89af6597c544cadf1`; bij rood stoppen en de exacte oorzaak onderzoeken.
+2. Controleer daarna de bronpassages en granulariteit van de KD11-groepsinventarisatie.
+3. Inspecteer de volledige bestaande MG1–MG6-definities in centrale documentatie en code; verzin geen verdeling of nieuwe skills.
+4. Maak pas na die inspectie een kandidaat-crosswalk van KD11-tussendoelen naar aantoonbaar bestaande MG-structuur.
+5. Onderzoek afzonderlijk de mogelijke relaties met KD10A/B/C, KD14, KD16B en KD18. Gedeelde context alleen geldt niet als doeldekking.
+6. Integreer de gecontroleerde inventarisatie in de bestaande centrale Verticale Leerlijn-template, zoals bij KD10A/B; geen aparte pagina of renderer.

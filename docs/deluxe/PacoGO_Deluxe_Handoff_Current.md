@@ -50,6 +50,7 @@ De SHA uit een vorige handoff is uitsluitend een historische referentie. Control
 - Paco is het eerste personage.
 - Milo is een mogelijke toekomstige hond/vriend; hij is nog niet ontworpen.
 - De gebruiker wil eerst de structuur, daarna verantwoordelijkheden en daarna Paco ontwerpen.
+- De verantwoordelijkheid van PACOGO CORE is op 23 november 2026 expliciet door de gebruiker goedgekeurd en vastgelegd in `02_RESPONSIBILITIES.md`.
 - De bestaande technische Blueprint v0.1 blijft behouden als gedetailleerde audit/baseline.
 
 ## 5. Wat is nog niet besloten of gebouwd?
@@ -67,16 +68,17 @@ De genoemde technologieën Phaser, PixiJS, Construct 3, H5P, Genially, Ink en Tw
 ## 6. Waar staan we?
 
 - De repository-audit en technische Blueprint v0.1 bestonden al op de DEV-branch.
-- Voor deze documentatiestap is de bestaande Deluxe-documentatie uitgebreid met een index, Masterplan, architectuurboom, verantwoordelijkhedenregister, Character System-richting, Design System-scope, technologiebesluitenregister, implementatieplan, changelog en deze handoff.
-- De documentatiewijziging is bedoeld als documentatiebasis; er is geen applicatiecode of database gewijzigd.
-- De laatst vooraf gecontroleerde commit vóór deze documentatie-update was `c3fc7b6b96a6b361aadc151ebaffb6c7b1a77001`. Controleer voor verder werk altijd de nieuwe actuele HEAD.
-- De full-regression workflow op die voorafgaande commit was #4275 en eindigde met `success`. Dit bewijst niet automatisch dat de daaropvolgende documentatiecommit ook groen is; controleer de nieuwe workflowrun.
+- De bestaande Deluxe-documentatie bevat de index, Masterplan, architectuurboom, verantwoordelijkhedenregister, Character System-richting, Design System-scope, technologiebesluitenregister, implementatieplan, changelog en deze handoff.
+- Op 23 november 2026 is PACOGO CORE als eerste verantwoordelijkheid met de gebruiker uitgewerkt en akkoord bevonden. De volledige afbakening staat in `02_RESPONSIBILITIES.md`; de beslissing staat in `07_CHANGELOG.md`.
+- Alleen documentatiebestanden zijn gewijzigd. Er is geen applicatiecode, database, Supabase-schema of LIVE-resource gewijzigd.
+- Voor deze documentatiestap zijn geen tests of regressies uitgevoerd. Er wordt geen groene teststatus geclaimd.
+- De actuele branch-HEAD moet vóór verder technisch werk opnieuw worden gecontroleerd; gebruik geen SHA uit een eerdere handoff als actuele status.
 
 ## 7. Directe volgende stap
 
-**Werk de verantwoordelijkheden uit.**
+**Ga verder met de Engine Layer, te beginnen met de Learning Engine.**
 
-Begin niet met programmeren en begin niet met Paco tekenen. Neem de architectuurboom uit `01_ARCHITECTURE.md` en werk de onderdelen systematisch uit:
+PACOGO CORE is afgerond als eerste goedgekeurde verantwoordelijkheid. Begin niet met programmeren en begin niet met Paco tekenen. Werk de onderdelen uit de architectuurboom systematisch uit:
 - doel;
 - wat het onderdeel wel doet;
 - wat het niet doet;

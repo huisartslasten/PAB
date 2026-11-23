@@ -1,6 +1,6 @@
 # PacoGO Deluxe — Verantwoordelijkheden v0.1
 
-**Status:** eerste afbakening; volledige verantwoordelijkheden moeten nog met de gebruiker worden uitgewerkt.  
+**Status:** PACOGO CORE-verantwoordelijkheid door gebruiker akkoord; overige onderdelen nog uit te werken.  
 **Belangrijk:** dit document vult geen onbesliste grenzen zelf in.
 
 ## 1. Werkwijze
@@ -35,7 +35,85 @@ De technische Blueprint v0.1 heeft de volgende bestaande owners in de repository
 
 Bron: [Technical Blueprint v0.1](PacoGO_Deluxe_Blueprint_v0.1.md), repository-audit en canonical owners.
 
-## 3. Beoogde Deluxe-onderdelen — verantwoordelijkheden nog uit te werken
+## 3. PACOGO CORE — verantwoordelijkheid vastgesteld
+
+<badge>Door gebruiker akkoord</badge>
+
+### 3.1 Doel
+
+PACO­GO CORE vormt de overkoepelende platformbasis waarop de bestaande PacoGO-functionaliteit en de latere Deluxe-systemen kunnen functioneren. Core is geen nieuwe monolithische module die bestaande domeinen overneemt.
+
+De bestaande onderdelen behouden hun eigen eigenaarschap. Deluxe sluit aan op die bestaande basis.
+
+### 3.2 Wat Core doet
+
+- De applicatie starten en beheren.
+- Gebruikersidentiteit en authenticatie beschikbaar maken via de bestaande voorzieningen.
+- Leerlingen en hun bestaande registraties beschikbaar maken.
+- Gedeelde applicatiestatus beheren.
+- Toegang tot bestaande diensten verzorgen.
+- De aansluiting tussen bestaande PacoGO-functionaliteiten en nieuwe Deluxe-onderdelen mogelijk maken.
+
+### 3.3 Wat Core nadrukkelijk niet doet
+
+- Zelf curriculumregels bepalen.
+- Zelf mastery of leerprogress berekenen.
+- Een tweede leerlingregistratie introduceren.
+- Een tweede databaseclient maken.
+- Lesinhoud dupliceren.
+- Story-, Quest- of Game-logica overnemen.
+
+### 3.4 Bestaande owners
+
+| Verantwoordelijkheid | Bestaande owner |
+|---|---|
+| Applicatiestart, routing en gedeelde runtime | `src/core/` |
+| Leerlingregistratie | `src/core/student-registry.js` en bestaande learner-link service |
+| Databaseverbinding en projectselectie | `src/services/supabase-client.js` |
+| Lessen en lesworkflows | `src/features/lessons/` |
+| Curriculum en leerresultaten | `pacogo-engine/` en bestaande services |
+| Algemene paginaopbouw | `src/components/page-template.js` |
+| Gedeelde UI-elementen | `src/components/design-system.js` |
+
+Deze lijst benoemt bestaande owners; ze creëert geen nieuwe fysieke Core-module of nieuw technisch contract.
+
+### 3.5 Inputs en outputs — functionele afbakening
+
+| Inputs | Outputs |
+|---|---|
+| Gebruikerssessie | Beschikbare gebruikersidentiteit |
+| Bestaande leerlingregistratie | Beschikbare leerlinggegevens |
+| Applicatieconfiguratie | Gedeelde applicatiestatus |
+| Navigatieverzoeken | Beschikbare applicatieroutes |
+| Verzoeken aan bestaande diensten | Toegang tot de bestaande services |
+
+Dit is de goedgekeurde functionele afbakening, geen reeds vastgesteld technisch API-contract.
+
+### 3.6 Afhankelijkheden
+
+Core werkt met de bestaande voorzieningen voor:
+- Authentication / Identity;
+- Student Registry;
+- Existing Services;
+- Feature Modules;
+- Curriculum Engine;
+- Shared UI.
+
+De precieze technische interfaces tussen deze onderdelen en toekomstige Deluxe-modules blijven onderwerp van latere uitwerking.
+
+### 3.7 Testbare contracten
+
+De verantwoordelijkheid moet uiteindelijk aantoonbaar maken dat:
+1. Een bestaande gebruiker correct wordt herkend.
+2. De bestaande leerlingregistratie behouden blijft.
+3. Deluxe dezelfde leerlingidentiteit gebruikt.
+4. De bestaande Supabase-client wordt hergebruikt.
+5. De bestaande lessen en curriculumfunctionaliteit blijven werken.
+6. Deluxe geen tweede bron van waarheid introduceert.
+
+Dit zijn acceptatierichtingen voor de latere technische uitwerking; er is in deze documentatiestap geen nieuwe test of implementatie toegevoegd.
+
+## 4. Beoogde overige Deluxe-onderdelen — verantwoordelijkheden nog uit te werken
 
 Onderstaande omschrijvingen zijn voorlopige domeinrichtingen op basis van de goedgekeurde architectuurboom en de technische Blueprint. Ze zijn geen definitieve implementatiecontracten.
 
@@ -56,7 +134,7 @@ Onderstaande omschrijvingen zijn voorlopige domeinrichtingen op basis van de goe
 | PacoGO Design System | Gedeelde visuele taal en UI-bouwstenen | Relatie met bestaande design-system-primitieven |
 | Data & Infrastructure | Opslag en technische aansluiting | Alleen concrete behoeften; geen speculatieve tabellen |
 
-## 4. Vaste scheidingsgrenzen uit de bestaande Blueprint
+## 5. Vaste scheidingsgrenzen uit de bestaande Blueprint
 
 - Learning progress (curriculum evidence, inference, mastery en next action) blijft bij de bestaande curriculum-engine.
 - Experience progress (bijvoorbeeld bezochte scènes, storypositie en queststatus) is een ander domein en mag niet als academische beheersing worden geïnterpreteerd.
@@ -65,6 +143,8 @@ Onderstaande omschrijvingen zijn voorlopige domeinrichtingen op basis van de goe
 - De Experience Engine verandert de presentatie, niet de leerinhoud, antwoordcorrectheid of masteryregels.
 - Een adapter wordt alleen overwogen bij een bewezen contractmismatch, niet uit voorzorg.
 
-## 5. Open uitwerking
+## 6. Volgende uitwerking
 
-De volgende chat werkt de tabel stap voor stap met de gebruiker uit. Begin met de bovenste architectuuronderdelen en leg per onderdeel de verantwoordelijkheid, grenzen, inputs, outputs en relaties vast. Markeer voorstellen als voorstel. Maak niets bindend zonder akkoord.
+PACOGO CORE is als eerste verantwoordelijkheid door de gebruiker akkoord bevonden.
+
+Ga vervolgens door met de onderdelen van de goedgekeurde architectuurboom, te beginnen met de Engine Layer en daarbinnen de Learning Engine. Werk steeds één onderdeel uit met doel, wel/niet-verantwoordelijkheden, bestaande canonieke owner, inputs, outputs, afhankelijkheden en testbare contracten. Markeer voorstellen als voorstel. Maak niets bindend zonder akkoord van de gebruiker.

@@ -73,9 +73,13 @@ test('authenticated management context bar is owned globally, not by an individu
 });
 
 test('Dutch vertical learning lines show all nine SLO core goals and selected PacoGO scope', () => {
-  assert.match(managementRuntime, /listDutchCoreObjectives\(\)/);
-  assert.match(managementRuntime, /grid\.appendChild\(createCard\(documentRef/);
-  assert.doesNotMatch(managementRuntime, /createElement\('details'\)/);
+  const renderStart = managementRuntime.indexOf('function renderDutchVerticalLearningLines()');
+  const renderEnd = managementRuntime.indexOf('function renderDomainVerticalLearningLine(', renderStart);
+  const dutchOverviewRenderer = managementRuntime.slice(renderStart, renderEnd);
+  assert.ok(renderStart >= 0 && renderEnd > renderStart, 'Dutch overview renderer must be present');
+  assert.match(dutchOverviewRenderer, /listDutchCoreObjectives\(\)/);
+  assert.match(dutchOverviewRenderer, /grid\.appendChild\(createCard\(documentRef/);
+  assert.doesNotMatch(dutchOverviewRenderer, /createElement\('details'\)/);
   assert.match(managementRuntime, /Nog niet uitgewerkt/);
   assert.match(managementRuntime, /KD2 openen/);
   assert.match(managementRuntime, /Luister- en kijkopdrachten blijven buiten de PacoGO-scope/);

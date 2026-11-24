@@ -449,6 +449,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
         sourceLabel: 'Actuele kerndoelen: SLO Nederlands 2025 · leesopbouw: SLO Leerstoflijnen lezen beschreven (2010) · historische kandidaat-crosswalk',
         objectiveFilter: objective => !/luister|kijk/i.test((objective.slo_component || '') + ' ' + (objective.objective || '')),
         introText: 'PacoGO werkt binnen KD2 alleen de leescomponenten uit: begrijpend lezen, diep tekstbegrip en bronnen verkennen. Luister- en kijkopdrachten blijven buiten de PacoGO-scope en worden aan school overgelaten. Woordenschat, waaronder themawoorden met definities, ondersteunt het lezen. De groepsopbouw is een historische, voorbeeldmatige kandidaat-crosswalk en geen officiële tussendoelenreeks uit 2025.',
+        scopeComponents: [
           'KD2A — De leerling toont begrip van zakelijke en literaire teksten.',
           'KD2B — De leerling evalueert en reflecteert op zakelijke en literaire teksten.',
           'KD2C — De leerling verkent de betrouwbaarheid van verschillende bronnen.'

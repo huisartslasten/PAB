@@ -59,7 +59,7 @@ describe('vertical learning lines registry', () => {
       selected_components: ['Leescomponent van 2A', '2B — Diep tekstbegrip', '2C — Bronnen verkennen']
     });
     expect(goals.find(item => item.id === 'KD6')).toMatchObject({
-      status_label: 'Geselecteerd — grammatica en spelling',
+      status_label: 'Geselecteerd — taal als systeem',
       selected_components: ['6A — Vorm en betekenis beschouwen', '6B — Spelling, formulering en interpunctie']
     });
     expect(goals.filter(item => item.status === 'not_yet_developed').every(item => item.status_label === 'Nog niet uitgewerkt')).toBe(true);

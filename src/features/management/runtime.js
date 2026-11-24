@@ -526,7 +526,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
         open.className = 'management-dashboard-card-primary';
         open.textContent = coreGoal.id === 'KD2' ? 'Teksten begrijpen openen' : 'Taal als systeem openen';
         open.addEventListener('click', () => {
-          selectedVerticalLearningCoreGoal = 'KD2';
+          selectedVerticalLearningCoreGoal = coreGoal.id;
           render();
         });
         card.appendChild(open);

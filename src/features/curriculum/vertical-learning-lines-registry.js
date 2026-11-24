@@ -6796,6 +6796,183 @@ const KD2_OBJECTIVES = Object.freeze([
     coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. Historische leerstoflijn; geen officieel groepsdoel uit de kerndoelen 2025.',
     status: 'active'
   },
+
+  {
+    id: 'KD2A-0013', domain: 'Teksten begrijpen', slo_group: 2, slo_group_label: 'Groep 1–2',
+    slo_source: 'SLO Leerstoflijnen mondelinge taalvaardigheid beschreven (2015) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — begrijpend luisteren',
+    objective: 'Luisteren naar korte, herkenbare instructies, voorgelezen of vertelde verhalen, gedichten, liedjes, eenvoudige informatie en audiovisuele of digitale teksten.',
+    source_reference: 'SLO 2015, §5.1.2, gedrukte pp. 59–61',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. Voorbeelden en groepsopbouw uit een historische SLO-leerstoflijn; geen officiële tussendoelen bij de kerndoelen 2025.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0014', domain: 'Teksten begrijpen', slo_group: 2, slo_group_label: 'Groep 1–2',
+    slo_source: 'SLO Leerstoflijnen mondelinge taalvaardigheid beschreven (2015) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — begrijpend luisteren',
+    objective: 'Herkennen waar een luistertekst over gaat en welk soort tekst of luistertaak het is; concrete informatie over personen, voorwerpen en gebeurtenissen herkennen en eenvoudige volgordes volgen.',
+    source_reference: 'SLO 2015, §5.1.2, gedrukte pp. 59–61',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. De SLO-beschrijving noemt herkenning van tekstsoorten, specifieke informatie en eenvoudige tekststructuren.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0015', domain: 'Teksten begrijpen', slo_group: 2, slo_group_label: 'Groep 1–2',
+    slo_source: 'SLO Leerstoflijnen mondelinge taalvaardigheid beschreven (2015) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — begrijpend luisteren',
+    objective: 'De inhoud van luisterteksten verbinden aan eigen ervaringen, gevoelens en voorkennis; eenvoudige betekenis afleiden met hulp van afbeeldingen, voorwerpen, gebaren, mimiek, stemgebruik en intonatie.',
+    source_reference: 'SLO 2015, §5.1.2, gedrukte pp. 61–62',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. Interpretatie en contextgebruik worden in deze fase met ondersteuning ontwikkeld.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0016', domain: 'Teksten begrijpen', slo_group: 2, slo_group_label: 'Groep 1–2',
+    slo_source: 'SLO Leerstoflijnen mondelinge taalvaardigheid beschreven (2015) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — begrijpend luisteren',
+    objective: 'Met ondersteuning een luisterdoel herkennen, gericht luisteren naar uitleg of instructies, voorspellingen controleren, reageren op de inhoud en nagaan of het verhaal of de boodschap is begrepen.',
+    source_reference: 'SLO 2015, §5.1.2, gedrukte pp. 61–62',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. De SLO-uitwerking beschrijft luisterstrategieën onder begeleiding en eenvoudige mondelinge verwerking.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0017', domain: 'Teksten begrijpen', slo_group: 4, slo_group_label: 'Groep 3–4',
+    slo_source: 'SLO Leerstoflijnen mondelinge taalvaardigheid beschreven (2015) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — begrijpend luisteren',
+    objective: 'Luisteren naar gedragsaanwijzingen, lesinstructies en uitleg, voorgelezen of vertelde verhalen, presentaties, meningen en passende audiovisuele of digitale teksten.',
+    source_reference: 'SLO 2015, §5.2.2, gedrukte pp. 71–72',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. De groepsopbouw is een historische SLO-voorbeeldlijn en geen officieel tussendoel uit 2025.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0018', domain: 'Teksten begrijpen', slo_group: 4, slo_group_label: 'Groep 3–4',
+    slo_source: 'SLO Leerstoflijnen mondelinge taalvaardigheid beschreven (2015) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — begrijpend luisteren',
+    objective: 'Verschillende verhalende en zakelijke luisterteksten onderscheiden; het onderwerp, de strekking en specifieke informatie herkennen en eenvoudige tekstverbanden volgen, zoals volgorde en oorzaak-gevolg.',
+    source_reference: 'SLO 2015, §5.2.2, gedrukte pp. 72–73',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. De bron beschrijft een groeiend begrip van tekstsoorten, structuurwoorden en relaties tussen tekstdelen.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0019', domain: 'Teksten begrijpen', slo_group: 4, slo_group_label: 'Groep 3–4',
+    slo_source: 'SLO Leerstoflijnen mondelinge taalvaardigheid beschreven (2015) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — begrijpend luisteren',
+    objective: 'Voorkennis en eigen ervaringen verbinden aan een luistertekst; thema, bedoeling en eenvoudige conclusies afleiden en betekenis halen uit context, woordgebruik, stemgebruik en intonatie.',
+    source_reference: 'SLO 2015, §5.2.2, gedrukte pp. 73–74',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. Dit is een kandidaat-crosswalk van de historische SLO-opbouw.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0020', domain: 'Teksten begrijpen', slo_group: 4, slo_group_label: 'Groep 3–4',
+    slo_source: 'SLO Leerstoflijnen mondelinge taalvaardigheid beschreven (2015) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — begrijpend luisteren',
+    objective: 'Met hulp van de leraar het luisterdoel bepalen, precies of globaal luisteren, nagaan of de informatie is begrepen en de belangrijkste inhoud mondeling in eigen woorden navertellen of samenvatten.',
+    source_reference: 'SLO 2015, §5.2.2, gedrukte pp. 73–74',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. De SLO-leerlijn beschrijft begeleiding bij luisterstrategieën en mondeling samenvatten.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0021', domain: 'Teksten begrijpen', slo_group: 6, slo_group_label: 'Groep 5–6',
+    slo_source: 'SLO Leerstoflijnen mondelinge taalvaardigheid beschreven (2015) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — begrijpend luisteren',
+    objective: 'Luisteren naar complexere instructies, leerstofuitleg, verhalen, informatieve presentaties, betogende teksten en audiovisuele of digitale informatie over actuele en minder nabije onderwerpen.',
+    source_reference: 'SLO 2015, §5.3.2, gedrukte pp. 83–84',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. De bron beschrijft verbreding van tekstsoorten, onderwerpen en luistercontexten.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0022', domain: 'Teksten begrijpen', slo_group: 6, slo_group_label: 'Groep 5–6',
+    slo_source: 'SLO Leerstoflijnen mondelinge taalvaardigheid beschreven (2015) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — begrijpend luisteren',
+    objective: 'Thema, strekking en bedoeling van luisterteksten bepalen; hoofd- en bijzaken, tijdsvolgorde, analogieën, oorzaak-gevolg, argumenten, feiten, meningen en conclusies herkennen.',
+    source_reference: 'SLO 2015, §5.3.2, gedrukte pp. 84–85',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. De SLO-beschrijving noemt expliciet het herkennen en verbinden van deze inhoudelijke elementen.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0023', domain: 'Teksten begrijpen', slo_group: 6, slo_group_label: 'Groep 5–6',
+    slo_source: 'SLO Leerstoflijnen mondelinge taalvaardigheid beschreven (2015) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — begrijpend luisteren',
+    objective: 'Informatie uit een luistertekst verbinden aan voorkennis en wereldkennis; tekstsoort, perspectief en bedoeling herkennen en betekenis van onbekende woorden steeds zelfstandiger uit de context afleiden.',
+    source_reference: 'SLO 2015, §5.3.2, gedrukte pp. 85–86',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. De bron beschrijft toenemende zelfstandigheid in interpreteren en woordbetekenissen afleiden.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0024', domain: 'Teksten begrijpen', slo_group: 6, slo_group_label: 'Groep 5–6',
+    slo_source: 'SLO Leerstoflijnen mondelinge taalvaardigheid beschreven (2015) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — begrijpend luisteren',
+    objective: 'Luistermanieren afstemmen op het doel: globaal, precies, selectief of kritisch luisteren; begrip controleren, relevante informatie noteren en de hoofdgedachte in eigen woorden mondeling of schriftelijk samenvatten.',
+    source_reference: 'SLO 2015, §5.3.2, gedrukte pp. 85–86',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. De SLO-beschrijving noemt verschillende luistermanieren, aantekeningen en samenvatten.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0025', domain: 'Teksten begrijpen', slo_group: 8, slo_group_label: 'Groep 7–8',
+    slo_source: 'SLO Leerstoflijnen mondelinge taalvaardigheid beschreven (2015) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — begrijpend luisteren',
+    objective: 'Luisteren naar complexe instructies, langere en informatievere zakelijke teksten, verhalen met meerdere verhaallijnen en vertelperspectieven, betogen met argumentatie en audiovisuele of digitale teksten over maatschappelijke onderwerpen.',
+    source_reference: 'SLO 2015, §5.4.2, gedrukte pp. 95–96',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. De SLO-groepsbeschrijving is een historische voorbeeldmatige opbouw, geen officieel tussendoel uit 2025.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0026', domain: 'Teksten begrijpen', slo_group: 8, slo_group_label: 'Groep 7–8',
+    slo_source: 'SLO Leerstoflijnen mondelinge taalvaardigheid beschreven (2015) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — begrijpend luisteren',
+    objective: 'De strekking, hoofdgedachte, hoofd- en bijzaken en bedoeling van complexe luisterteksten bepalen; verbanden, argumenten, feiten, meningen, conclusies, beeldspraak en betekenis van woorden herkennen.',
+    source_reference: 'SLO 2015, §5.4.2, gedrukte pp. 96–97',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. De bron beschrijft complexere tekststructuren en toenemende informatiedichtheid.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0027', domain: 'Teksten begrijpen', slo_group: 8, slo_group_label: 'Groep 7–8',
+    slo_source: 'SLO Leerstoflijnen mondelinge taalvaardigheid beschreven (2015) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — begrijpend luisteren',
+    objective: 'Informatie uit luisterteksten verbinden aan voorkennis en wereldkennis; perspectief, tekstdoel en bedoeling van de spreker afleiden en impliciete verbanden en conclusies begrijpen.',
+    source_reference: 'SLO 2015, §5.4.2, gedrukte pp. 97–98',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. De groepsplaatsing is een historische SLO-kandidaat-crosswalk.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0028', domain: 'Teksten begrijpen', slo_group: 8, slo_group_label: 'Groep 7–8',
+    slo_source: 'SLO Leerstoflijnen mondelinge taalvaardigheid beschreven (2015) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — begrijpend luisteren',
+    objective: 'Zelfstandig globaal, precies, selectief of kritisch luisteren afhankelijk van het luisterdoel; begrip controleren, relevante informatie selecteren en de hoofdgedachte en betekenis in eigen woorden samenvatten.',
+    source_reference: 'SLO 2015, §5.4.2, gedrukte pp. 97–98',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. Deze registratie betreft begrijpend luisteren; kritische evaluatie van de betrouwbaarheid van bronnen blijft afzonderlijk onder KD2C.',
+    status: 'active'
+  },
   {
     id: 'KD2B-0001', domain: 'Teksten begrijpen', slo_group: 6, slo_group_label: 'Groep 5–6',
     slo_source: 'SLO Leerstoflijnen lezen beschreven (2010) en Referentiekader Taal — kandidaat-crosswalk naar KD2B',

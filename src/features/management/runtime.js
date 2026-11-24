@@ -433,8 +433,8 @@ export function createManagementRuntime({ app, templateMount, context, documentR
       renderDomainVerticalLearningLine({
         domain: 'Teksten begrijpen',
         title: 'KD2 — De leerling begrijpt teksten',
-        sourceLabel: 'Actuele kerndoelen: SLO Nederlands 2025 · historische groepsopbouw: SLO Leerstoflijnen lezen beschreven (2010) · kandidaat-crosswalk',
-        introText: 'Deze eerste verticale uitwerking richt zich op lezen en tekstbegrip. De groepsopbouw is een voorbeeldmatige synthese uit SLO 2010, geen officiële groepsindeling van de kerndoelen 2025. Luisterbegrip en verdere concretisering worden als afzonderlijke bronlaag aangevuld.',
+        sourceLabel: 'Actuele kerndoelen: SLO Nederlands 2025 · leesopbouw: SLO Leerstoflijnen lezen beschreven (2010) · luisteropbouw: SLO Leerstoflijnen mondelinge taalvaardigheid beschreven (2015) · historische kandidaat-crosswalks',
+        introText: 'KD2A is uitgewerkt voor de drie modaliteiten uit het actuele kerndoel: aandachtig luisteren, kijken en aandachtig vloeiend lezen. De luisterdoelen zijn aangevuld vanuit SLO Leerstoflijnen mondelinge taalvaardigheid (2015); de leesdoelen komen uit SLO Leerstoflijnen lezen (2010). Beide groepsopbouwen zijn historische, voorbeeldmatige kandidaat-crosswalks en geen officiële tussendoelen uit 2025. De SLO-leerlijn luisteren betreft niet-interactieve luistersituaties; luisteren tijdens gesprekken valt buiten die specifieke bronafbakening.',
         scopeComponents: [
           'KD2A — De leerling toont begrip van zakelijke en literaire teksten.',
           'KD2B — De leerling evalueert en reflecteert op zakelijke en literaire teksten.',

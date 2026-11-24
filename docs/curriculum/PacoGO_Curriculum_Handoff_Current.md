@@ -9977,3 +9977,47 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 **Volgende concrete stap**
 1. Verifieer Full Regression op de commit met deze handoff-update.
 2. Daarna is de eerste KD2-registratie met luistermodaliteit vastgelegd; verdere bronvalidatie of uitbreiding alleen volgens de volgende concrete opdracht.
+
+
+---
+
+## 62. KD6 — Nederlands: taal als systeem (24 november 2026)
+
+**Status**
+- KD6 is inhoudelijk als eerste brongebaseerde verticale kandidaat-crosswalk uitgewerkt.
+- Beide onderdelen zijn opgenomen: 6A — Vorm en betekenis beschouwen; 6B — Spelling, formulering en interpunctie.
+- Er zijn 21 brongebaseerde doelregistraties toegevoegd: 11 voor KD6A en 10 voor KD6B.
+- Verdeling over de historische/SLO-fasen: groep 1–2: 4; groep 3–4: 6; groep 5–6: 6; groep 7–8: 5.
+- Alle registraties blijven `unassessed`, zonder gekoppelde skills of oefeningen. Er is geen mastery-, evidence- of dekkingsclaim gemaakt.
+- De actuele SLO-kerndoelbeschrijving 2025 is leidend. De fasering uit SLO 2024 en historische concretiseringen uit SLO TULE 2008 en de inhoudslijn schrijven 2020 zijn kandidaat-crosswalks, geen officiële groepsgebonden tussendoelen uit 2025.
+- Groep 1–2 bij 6B is uitsluitend voorbereidende schrift- en taalbewustzijnsontwikkeling, geen spellingbeheersingsdoel.
+- De grens tussen KD6B-formuleren/redigeren en KD3-tekstproductie moet bij toekomstige skill- en taskmodellering bewaakt blijven. KD7 blijft leidend voor taalidentiteit en taalvariatie.
+
+**Bron- en uitwerkingsdocument**
+- `docs/curriculum/PacoGO_KD6_SLO_Tussendoelen_Per_Groep_v0.1.md`
+- Bevat actuele KD6A/KD6B-scope, bronstatus, kandidaat-crosswalk per groepcluster, afbakening, registratiestatus en openstaande punten.
+
+**Code en centrale template**
+- `src/features/curriculum/vertical-learning-lines-registry.js`: 21 KD6A/KD6B-records en actuele KD6-scope.
+- `src/features/management/runtime.js`: KD6 opent via de bestaande centrale `renderDomainVerticalLearningLine()`-template; geen aparte renderer of typografische standaard.
+- `src/features/curriculum/vertical-learning-lines-registry.test.js`: tests voor KD6-selectie en de 21 brontraceerbare, unassessed records.
+- De KD6-kaart gebruikt dezelfde compacte kaartstructuur als de andere Nederlandse doelen en Rekenen.
+
+**Engineering en verificatie**
+- Branch: `refactor/professional-v1`; LIVE `main` niet aangeraakt.
+- Implementatiecommit: `1a08e93b7e7de0af74929d204295a20c222022cb`.
+- Correctie van KD6-kaartnavigatie en testverwachting: `36138d626630609b571689ea01306665a362ccad`.
+- Full Regression #4299 / run `45503947872`: `completed / success` op exact commit `36138d626630609b571689ea01306665a362ccad`.
+- Curriculum-engine, architectuurtests, Node-regressies, browserregressie en working-tree-check: geslaagd.
+- Deze handoff-update en de kleine bronpreciseringen in KD6 moeten nog door Full Regression worden geverifieerd.
+
+**Resterende inhoudelijke aandacht**
+- De groepsindeling blijft een kandidaat-crosswalk; SLO 2025 geeft geen officiële groepsverdeling voor KD6.
+- De precieze grens tussen KD6B-formuleren/redigeren en KD3-tekstproductie blijft een expliciet aandachtspunt.
+- De selectie van grammaticale begrippen mag niet worden geïnterpreteerd als een verplicht traditioneel ontleedprogramma.
+- Geen nieuwe Skills, developments, claims, evidence targets, task models, oefeningen, Learning Interfaces of Supabase-objecten bouwen zonder expliciete opdracht en architectuuronderbouwing.
+
+**Volgende concrete stap**
+1. Voer Full Regression uit op de commit met deze handoff-update.
+2. Bij groen: KD6 eerste brongebaseerde uitwerking is afgerond. Wacht op de volgende expliciete opdracht; voeg geen extra functionaliteit toe.
+3. Bij rood: stop, isoleer de exacte oorzaak en herstel eerst de onderliggende oorzaak voordat verder wordt gebouwd.

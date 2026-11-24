@@ -47,7 +47,7 @@ De officiële SLO-kerndoelbeschrijving bevat geen groepsindeling voor deze onder
 
 - Klankstructuur en schriftklankrelaties onderzoeken, waaronder korte en lange klanken, klankgroepen, klinkers en medeklinkers, uitspraak en rijm.
 - Woordopbouw en eenvoudige woordsoorten verkennen, waaronder lettergreep, verkleinwoord, enkelvoud en meervoud, zelfstandig naamwoord, werkwoord en lidwoord.
-- Zinsdelen en eenvoudige zinsbouw verkennen; de betekenis van zinnen verbinden aan woordvolgorde en zinstype.
+- Zinsdelen en eenvoudige zinsbouw verkennen; woorden en zinsdelen in eenvoudige zinnen herkennen en de functie van zinsdelen bespreken.
 
 ### Groep 5–6 — 6A — Vorm en betekenis beschouwen
 
@@ -69,7 +69,7 @@ De officiële SLO-kerndoelbeschrijving bevat geen groepsindeling voor deze onder
 ### Groep 3–4 — 6B — Spelling, formulering en interpunctie
 
 - Klankzuivere woorden spellen door klanken te analyseren en aan letters te koppelen; veelvoorkomende spellingpatronen, medeklinkerclusters, homofonen en open en gesloten lettergrepen toepassen.
-- Basisconventies van schrift en interpunctie toepassen, waaronder hoofdletters, spaties, punt, komma, vraagteken en uitroepteken; eenvoudige spelling- en interpunctiefouten herkennen en verbeteren.
+- Basisconventies van schrift en eenvoudige interpunctie toepassen, waaronder hoofdletters, spaties, punt, vraagteken en uitroepteken; komma en haakjes als leestekenbegrippen herkennen en bespreken waar passend; eenvoudige spelling- en interpunctiefouten herkennen en verbeteren.
 - Korte, begrijpelijke zinnen formuleren en aandacht ontwikkelen voor zinsbouw, woordkeuze en zinsgrenzen; de historische schrijfopbouw laat in deze fase nog eenvoudige zinnen en fouten toe.
 
 ### Groep 5–6 — 6B — Spelling, formulering en interpunctie

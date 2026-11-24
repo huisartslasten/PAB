@@ -463,11 +463,6 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     const coreObjectives = verticalLearningLinesRegistry.listDutchCoreObjectives();
     const section = documentRef.createElement('section');
     section.className = 'management-dashboard-section vertical-learning-lines';
-    section.style.backgroundColor = '#ffffff';
-    section.style.color = '#17345f';
-    section.style.borderRadius = '20px';
-    section.style.padding = '24px';
-
     const backButton = documentRef.createElement('button');
     backButton.type = 'button';
     backButton.className = 'vertical-learning-back';
@@ -477,30 +472,62 @@ export function createManagementRuntime({ app, templateMount, context, documentR
       selectedVerticalLearningCoreGoal = '';
       render();
     });
-
     const heading = documentRef.createElement('h2');
     heading.textContent = 'Verticale leerlijnen — Nederlands';
     const intro = documentRef.createElement('p');
     intro.className = 'vertical-learning-lines-intro';
-    intro.textContent = 'Alle negen officiële SLO-kerndoelen blijven zichtbaar. De geselecteerde PacoGO-onderdelen zijn begrijpend lezen, woordenschat/themawoorden, grammatica en spelling. Klap een ander kerndoel open voor een korte uitleg.';
+    intro.textContent = 'Kies een SLO-kerndoel om de bijbehorende verticale leerlijn te bekijken.';
     const source = documentRef.createElement('p');
     source.className = 'vertical-learning-lines-source';
     source.textContent = 'Bron: SLO, Kerndoelen primair onderwijs, herziene versie 2025, pp. 16–25. De beschrijvingen hieronder zijn compacte wegwijzers, geen vervanging van de officiële kerndoelteksten.';
 
+    const group = documentRef.createElement('section');
+    group.className = 'vertical-learning-group vertical-learning-core-group';
+    const groupHeading = documentRef.createElement('h3');
+    groupHeading.textContent = 'Kerndoelen Nederlands';
     const grid = documentRef.createElement('div');
     grid.className = 'vertical-learning-objective-grid vertical-learning-core-grid';
     coreObjectives.forEach(coreGoal => {
-      const statusText = coreGoal.status === 'selected' ? 'Geselecteerd voor PacoGO.' : 'Nog niet uitgewerkt.';
-      const description = [coreGoal.description, coreGoal.pacogo_note, statusText].filter(Boolean).join(' ');
-      grid.appendChild(createCard(documentRef, {
-        title: coreGoal.id + ' — ' + coreGoal.title,
-        description,
-        actionLabel: coreGoal.id === 'KD2' ? 'KD2 openen' : '',
-        onClick: coreGoal.id === 'KD2' ? () => { selectedVerticalLearningCoreGoal = 'KD2'; render(); } : null
-      }));
-    });
+      const card = documentRef.createElement('article');
+      card.className = 'vertical-learning-objective-card vertical-learning-core-card';
+      const top = documentRef.createElement('div');
+      top.className = 'vertical-learning-objective-top vertical-learning-core-card-top';
+      const id = documentRef.createElement('strong');
+      id.className = 'vertical-learning-objective-id';
+      id.textContent = coreGoal.id;
+      const kind = documentRef.createElement('span');
+      kind.className = 'vertical-learning-coverage vertical-learning-coverage--unassessed';
+      kind.textContent = 'Kerndoel';
+      top.append(id, kind);
+      const title = documentRef.createElement('h4');
+      title.textContent = coreGoal.title;
+      const description = documentRef.createElement('p');
+      description.className = 'vertical-learning-objective-meta';
+      description.textContent = coreGoal.summary;
+      card.append(top, title, description);
 
-    section.append(backButton, heading, intro, source, grid);
+      if (coreGoal.id === 'KD2') {
+        const open = documentRef.createElement('button');
+        open.type = 'button';
+        open.className = 'management-dashboard-card-primary';
+        open.textContent = 'Teksten begrijpen openen';
+        open.addEventListener('click', () => {
+          selectedVerticalLearningCoreGoal = 'KD2';
+          render();
+        });
+        card.appendChild(open);
+      } else {
+        const status = documentRef.createElement('span');
+        status.className = 'vertical-learning-core-status';
+        status.textContent = coreGoal.status === 'selected'
+          ? coreGoal.status_label
+          : 'Uitwerking nog niet beschikbaar';
+        card.appendChild(status);
+      }
+      grid.appendChild(card);
+    });
+    group.append(groupHeading, grid);
+    section.append(backButton, heading, intro, source, group);
     content.appendChild(section);
   }
 

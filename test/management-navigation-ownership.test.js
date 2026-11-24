@@ -74,7 +74,7 @@ test('authenticated management context bar is owned globally, not by an individu
 
 test('Dutch vertical learning lines show all nine SLO core goals and selected PacoGO scope', () => {
   const renderStart = managementRuntime.indexOf('function renderDutchVerticalLearningLines()');
-  const renderEnd = managementRuntime.indexOf('function renderDomainVerticalLearningLine(', renderStart);
+  const renderEnd = managementRuntime.indexOf('function renderVerticalLearningLines(', renderStart);
   const dutchOverviewRenderer = managementRuntime.slice(renderStart, renderEnd);
   assert.ok(renderStart >= 0 && renderEnd > renderStart, 'Dutch overview renderer must be present');
   assert.match(dutchOverviewRenderer, /listDutchCoreObjectives\(\)/);

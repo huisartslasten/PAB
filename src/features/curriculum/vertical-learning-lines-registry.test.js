@@ -60,9 +60,23 @@ describe('vertical learning lines registry', () => {
     });
     expect(goals.find(item => item.id === 'KD6')).toMatchObject({
       status_label: 'Geselecteerd — grammatica en spelling',
-      selected_components: ['6A — Grammatica en taalbeschouwing', '6B — Spelling, formulering en interpunctie']
+      selected_components: ['6A — Vorm en betekenis beschouwen', '6B — Spelling, formulering en interpunctie']
     });
     expect(goals.filter(item => item.status === 'not_yet_developed').every(item => item.status_label === 'Nog niet uitgewerkt')).toBe(true);
+  });
+
+  it('loads KD6A and KD6B as source-traceable, unassessed candidate crosswalks', () => {
+    const objectives = verticalLearningLinesRegistry.listObjectives({ domain: 'Taal als systeem' });
+    expect(objectives).toHaveLength(21);
+    expect([2, 4, 6, 8].map(group => verticalLearningLinesRegistry.listObjectives({ domain: 'Taal als systeem', group }).length))
+      .toEqual([4, 6, 6, 5]);
+    expect(objectives.filter(item => item.slo_component.startsWith('6A')).length).toBe(11);
+    expect(objectives.filter(item => item.slo_component.startsWith('6B')).length).toBe(10);
+    expect(new Set(objectives.map(item => item.id)).size).toBe(21);
+    expect(objectives.every(item => item.related_skill_ids.length === 0 && item.exercise_ids.length === 0 && item.coverage_status === 'unassessed')).toBe(true);
+    expect(objectives.find(item => item.id === 'KD6B-0001').coverage_note).toContain('geen formeel spelling- of formuleringseindniveau');
+    expect(verticalLearningLinesRegistry.getCoverageSummary({ domain: 'Taal als systeem' }).unassessed).toBe(21);
+    expect(verticalLearningLinesRegistry.getObjective('KD6A-0010').objective).toContain('hoofd- en bijzinnen');
   });
 
   it('loads all KD11 SLO group objectives as source-traceable, unassessed records', () => {

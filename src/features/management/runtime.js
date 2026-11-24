@@ -460,6 +460,20 @@ export function createManagementRuntime({ app, templateMount, context, documentR
       });
       return;
     }
+    if (selectedVerticalLearningCoreGoal === 'KD6') {
+      const coreGoal = verticalLearningLinesRegistry.listDutchCoreObjectives().find(item => item.id === 'KD6');
+      renderDomainVerticalLearningLine({
+        domain: 'Taal als systeem',
+        title: 'KD6 — De leerling toont inzicht in taal als systeem',
+        sourceLabel: 'Actuele kerndoelinhoud: SLO 2025 · fasering: SLO Leerlijn begrippen taalbeschouwing (2024) · historische concretisering: SLO TULE (2008) en inhoudslijn schrijven (2020) · kandidaat-crosswalk',
+        scopeComponents: coreGoal?.scope_components,
+        scopeSource: coreGoal?.scope_source || '',
+        introText: 'De actuele kerndoelinhoud van KD6A en KD6B is leidend. De groepsgewijze opbouw hieronder is een brongebaseerde kandidaat-crosswalk uit SLO-fasen en historische groepsuitwerkingen; deze zijn geen officiële groepsgebonden tussendoelen uit 2025. De registraties zijn nog niet gekoppeld aan PacoGO-skills of oefeningen.',
+        scopeTitle: 'Actueel kerndoel KD6 — SLO 2025',
+        scopeDescription: 'De actuele SLO-beschrijving omvat zowel 6A (vorm en betekenis beschouwen) als 6B (spelling, formulering en interpunctie). De bronbeschrijving geldt voor het primair onderwijs; de groepsindeling hieronder is een afzonderlijke historische/ondersteunende kandidaat-crosswalk.'
+      });
+      return;
+    }
     const coreObjectives = verticalLearningLinesRegistry.listDutchCoreObjectives();
     const section = documentRef.createElement('section');
     section.className = 'management-dashboard-section vertical-learning-lines';
@@ -506,11 +520,11 @@ export function createManagementRuntime({ app, templateMount, context, documentR
       description.textContent = coreGoal.summary;
       card.append(top, title, description);
 
-      if (coreGoal.id === 'KD2') {
+      if (coreGoal.id === 'KD2' || coreGoal.id === 'KD6') {
         const open = documentRef.createElement('button');
         open.type = 'button';
         open.className = 'management-dashboard-card-primary';
-        open.textContent = 'Teksten begrijpen openen';
+        open.textContent = coreGoal.id === 'KD2' ? 'Teksten begrijpen openen' : 'Taal als systeem openen';
         open.addEventListener('click', () => {
           selectedVerticalLearningCoreGoal = 'KD2';
           render();

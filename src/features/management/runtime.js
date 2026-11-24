@@ -490,42 +490,14 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     const grid = documentRef.createElement('div');
     grid.className = 'vertical-learning-objective-grid vertical-learning-core-grid';
     coreObjectives.forEach(coreGoal => {
-      if (coreGoal.status === 'selected') {
-        const card = createCard(documentRef, {
-          title: coreGoal.id + ' — ' + coreGoal.title,
-          description: coreGoal.description,
-          actionLabel: coreGoal.id === 'KD2' ? 'KD2 openen' : '',
-          onClick: coreGoal.id === 'KD2' ? () => { selectedVerticalLearningCoreGoal = 'KD2'; render(); } : null
-        });
-        card.classList.add('vertical-learning-core-selected');
-        grid.appendChild(card);
-        return;
-      }
-
-      const details = documentRef.createElement('details');
-      details.className = 'management-dashboard-card vertical-learning-core-collapsed';
-      details.style.padding = '16px 18px';
-      details.style.border = '1px solid var(--paco-border)';
-      details.style.borderRadius = '16px';
-      details.style.background = '#ffffff';
-      const summaryLine = documentRef.createElement('summary');
-      summaryLine.textContent = coreGoal.id + ' — ' + coreGoal.title + ' · Nog niet uitgewerkt';
-      summaryLine.style.cursor = 'pointer';
-      summaryLine.style.fontWeight = '800';
-      summaryLine.style.lineHeight = '1.3';
-      const description = documentRef.createElement('p');
-      description.textContent = coreGoal.description;
-      description.style.margin = '12px 0 0';
-      description.style.color = '#38577d';
-      details.append(summaryLine, description);
-      if (coreGoal.pacogo_note) {
-        const note = documentRef.createElement('p');
-        note.textContent = coreGoal.pacogo_note;
-        note.style.margin = '8px 0 0';
-        note.style.color = '#38577d';
-        details.appendChild(note);
-      }
-      grid.appendChild(details);
+      const statusText = coreGoal.status === 'selected' ? 'Geselecteerd voor PacoGO.' : 'Nog niet uitgewerkt.';
+      const description = [coreGoal.description, coreGoal.pacogo_note, statusText].filter(Boolean).join(' ');
+      grid.appendChild(createCard(documentRef, {
+        title: coreGoal.id + ' — ' + coreGoal.title,
+        description,
+        actionLabel: coreGoal.id === 'KD2' ? 'KD2 openen' : '',
+        onClick: coreGoal.id === 'KD2' ? () => { selectedVerticalLearningCoreGoal = 'KD2'; render(); } : null
+      }));
     });
 
     section.append(backButton, heading, intro, source, grid);

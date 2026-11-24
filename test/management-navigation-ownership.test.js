@@ -74,7 +74,8 @@ test('authenticated management context bar is owned globally, not by an individu
 
 test('Dutch vertical learning lines show all nine SLO core goals and selected PacoGO scope', () => {
   assert.match(managementRuntime, /listDutchCoreObjectives\(\)/);
-  assert.match(managementRuntime, /createElement\('details'\)/);
+  assert.match(managementRuntime, /grid\.appendChild\(createCard\(documentRef/);
+  assert.doesNotMatch(managementRuntime, /createElement\('details'\)/);
   assert.match(managementRuntime, /Nog niet uitgewerkt/);
   assert.match(managementRuntime, /KD2 openen/);
   assert.match(managementRuntime, /Luister- en kijkopdrachten blijven buiten de PacoGO-scope/);

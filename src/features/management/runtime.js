@@ -440,6 +440,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
           'KD2B — De leerling evalueert en reflecteert op zakelijke en literaire teksten.',
           'KD2C — De leerling verkent de betrouwbaarheid van verschillende bronnen.'
         ],
+        scopeSource: 'SLO Kerndoelen primair onderwijs 2025, KD2A–KD2C',
         scopeTitle: 'Actueel kerndoel KD2 — SLO 2025',
         scopeDescription: 'De drie onderdelen 2A, 2B en 2C zijn de actuele inhoudelijke afbakening. De onderstaande groepsindeling is een voorlopige kandidaat-crosswalk uit oudere SLO-leerstoflijnen; zij is niet door SLO als nieuwe tussendoelenreeks vastgesteld.'
       });

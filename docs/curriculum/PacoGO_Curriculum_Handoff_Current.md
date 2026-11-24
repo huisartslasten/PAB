@@ -9912,3 +9912,35 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - De inhoudelijke SLO-uitwerking voor Nederlands is een afzonderlijke toekomstige opdracht; begin daarmee pas na brononderzoek en expliciete opdracht.
 - Na deze handoff-update moet Full Regression opnieuw worden uitgevoerd op de exacte handoff-commit.
 
+## 60. Nederlands KD2 — eerste verticale leerlijn geregistreerd (24 november 2026)
+
+**Afgerond in deze tranche**
+- De eerste werkversie van de verticale leerlijn Nederlands voor **KD2 — De leerling begrijpt teksten** is opgenomen in de bestaande curriculumregistry.
+- De actuele kerndoelscope KD2A, KD2B en KD2C is zichtbaar gemaakt via de bestaande centrale Verticale Leerlijn-template.
+- Er zijn 17 doelregistraties toegevoegd: KD2A-0001 t/m KD2A-0012, KD2B-0001 t/m KD2B-0003 en KD2C-0001 t/m KD2C-0003.
+- De groepsindeling gebruikt SLO Leerstoflijnen lezen beschreven (2010) als historische, voorbeeldmatige bron voor een voorlopige kandidaat-crosswalk. Deze groepsplaatsingen zijn nadrukkelijk geen officiële nieuwe tussendoelen van de kerndoelen 2025.
+- De doelregistraties staan op `unassessed`; er zijn geen PacoGO-skills, developments, claims, evidence targets, task models of oefeningen aangemaakt en er is geen dekking geclaimd.
+- De eerste uitwerking richt zich op lezen en tekstbegrip. Luisterbegrip en verdere inhoudelijke concretisering vragen nog afzonderlijke broncontrole.
+- Bij controle van de centrale weergave is de ontbrekende bronvermelding onder de actuele KD2-scope hersteld door de bestaande `scopeSource`-invoer correct mee te geven. Er is geen tweede template of renderer gemaakt.
+
+**Wijzigingen**
+- Implementatie KD2: commit `847ccf5ddcb356c8cbfb66c00a58c10d1b579c71`.
+- Correctie bronvermelding in de centrale runtime-template: commit `b5ede9ab6c5f39e65449c464793faf3460823dee`.
+- Gewijzigde codebestanden: `src/features/curriculum/vertical-learning-lines-registry.js` en `src/features/management/runtime.js`.
+- Geen Supabase-, studentdata- of LIVE `main`-wijzigingen.
+
+**Engineering en verificatie**
+- Branch: `refactor/professional-v1`; LIVE `main` niet aangeraakt.
+- Full Regression #4284 / run `45387785178`: `completed / success` op exact commit `847ccf5ddcb356c8cbfb66c00a58c10d1b579c71`.
+- Full Regression #4285 / run `45388421332`: `completed / success` op exact commit `b5ede9ab6c5f39e65449c464793faf3460823dee`.
+- De handoff-update in deze sectie is een afzonderlijke repositorywijziging. De nieuwe handoff-commit moet zelf nog door Full Regression worden geverifieerd; tot die verificatie wordt daarvoor geen groene status geclaimd.
+
+**Openstaande inhoudelijke punten**
+- Valideer de 17 doelregistraties verder op broninhoud en bronpaginaniveau, met bijzondere aandacht voor de kandidaat-crosswalk naar groep 7–8.
+- Onderzoek en werk luisterbegrip binnen KD2A afzonderlijk uit; de huidige tranche mag niet worden gelezen als volledige uitwerking van alle modaliteiten van KD2A.
+- De nieuwe SLO-leerlijn Nederlands (verwacht 2027) moet bij publicatie worden vergeleken met deze voorlopige historische crosswalk.
+- Geen skills of oefeningen bouwen zonder concrete opdracht; bij latere oefenbouw het centrale PacoGO Oefeningenbouwprotocol en de centrale passende Learning Interface/template gebruiken.
+
+**Volgende concrete stap**
+1. Verifieer Full Regression op de commit met deze handoff-update.
+2. Daarna inhoudelijke bronvalidatie van KD2; geen verbreding naar andere kerndoelen of leergebieden zonder nieuwe opdracht.

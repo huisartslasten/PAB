@@ -9944,3 +9944,36 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 **Volgende concrete stap**
 1. Verifieer Full Regression op de commit met deze handoff-update.
 2. Daarna inhoudelijke bronvalidatie van KD2; geen verbreding naar andere kerndoelen of leergebieden zonder nieuwe opdracht.
+
+## 61. Nederlands KD2A — luisteropbouw toegevoegd (24 november 2026)
+
+**Afgerond**
+- De inhoudelijke KD2A-registratie is uitgebreid met de luistermodaliteit. KD2A wordt in de centrale weergave nu expliciet beschreven als aandachtig luisteren, kijken en aandachtig vloeiend lezen.
+- Er zijn 16 aanvullende luisterdoelregistraties toegevoegd: `KD2A-0013` t/m `KD2A-0028`, verdeeld over groep 1–2, 3–4, 5–6 en 7–8 (vier per fase).
+- De luisterdoelen omvatten onder meer tekstsoorten en luisterdoelen, specifieke informatie, tekststructuur en verbanden, hoofdgedachte en strekking, voorkennis en inferenties, woordbetekenis uit context, luisterstrategieën, begrip controleren en samenvatten.
+- Bron voor de historische voorbeeldmatige luisteropbouw: SLO, *Leerstoflijnen mondelinge taalvaardigheid beschreven* (2015), §5.1.2, §5.2.2, §5.3.2 en §5.4.2; gedrukte pp. 59–62, 71–74, 83–86 en 95–98.
+- De SLO 2015-uitwerking betreft niet-interactieve luistersituaties. Luisteren tijdens gesprekken valt buiten deze specifieke bronafbakening; dit staat expliciet vermeld in de centrale KD2-weergave.
+- De luister- en leesgroepsopbouwen zijn historische, voorbeeldmatige kandidaat-crosswalks en geen officiële nieuwe tussendoelen bij de kerndoelen 2025.
+- De 16 nieuwe registraties hebben `coverage_status: 'unassessed'`; er zijn geen PacoGO-skills, developments, claims, evidence targets, task models of oefeningen aangemaakt en er wordt geen dekking geclaimd.
+
+**Wijzigingen**
+- Luisterdoelen in registry: commit `bbf450a55e3eab5b770d9f789e2f05a3a357ffe9`.
+- Scope-/bronbeschrijving in centrale template: commit `866d4c066885010e365a54da5e862bf3dbf71279`.
+- Gewijzigde bestanden: `src/features/curriculum/vertical-learning-lines-registry.js` en `src/features/management/runtime.js`.
+- Branch: `refactor/professional-v1`. LIVE `main` niet aangeraakt. Geen Supabase- of studentdatawijzigingen.
+
+**Engineering en verificatie**
+- Full Regression #4287 / run `45390370251`: `completed / success` op exact commit `bbf450a55e3eab5b770d9f789e2f05a3a357ffe9`.
+- Full Regression #4288 / run `45390377843`: `completed / success` op exact commit `866d4c066885010e365a54da5e862bf3dbf71279`.
+- De handoff-update in deze sectie is een afzonderlijke repositorywijziging en moet zelf nog door Full Regression worden geverifieerd.
+
+**Resterende inhoudelijke punten**
+- De bronvalidatie van alle KD2A-lees- en luisterregistraties op detailniveau en de kandidaat-crosswalk naar groep 7–8 blijven open; de huidige uitbreiding is een zo volledig mogelijke eerste brongebaseerde inventarisatie, geen empirisch gevalideerde leerlijn.
+- De actuele SLO-leerlijn Nederlands moet bij publicatie worden vergeleken met deze historische kandidaat-crosswalk.
+- De KD2B- en KD2C-groepsplaatsingen blijven voorlopige kandidaat-crosswalks.
+- KD2A omvat ook kijken. De visuele/audiovisuele modaliteit is deels opgenomen in de luisterregistraties, maar vraagt nog aparte broncontrole om te bepalen of alle kijkaspecten voldoende zijn afgedekt.
+- Geen skills of oefeningen bouwen zonder concrete opdracht. Bij latere oefenbouw het centrale PacoGO Oefeningenbouwprotocol en de centrale passende Learning Interface/template gebruiken.
+
+**Volgende concrete stap**
+1. Verifieer Full Regression op de commit met deze handoff-update.
+2. Daarna is de eerste KD2-registratie met luistermodaliteit vastgelegd; verdere bronvalidatie of uitbreiding alleen volgens de volgende concrete opdracht.

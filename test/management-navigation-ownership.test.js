@@ -78,10 +78,13 @@ test('Dutch vertical learning lines show all nine SLO core goals and selected Pa
   const dutchOverviewRenderer = managementRuntime.slice(renderStart, renderEnd);
   assert.ok(renderStart >= 0 && renderEnd > renderStart, 'Dutch overview renderer must be present');
   assert.match(dutchOverviewRenderer, /listDutchCoreObjectives\(\)/);
-  assert.match(dutchOverviewRenderer, /grid\.appendChild\(createCard\(documentRef/);
+  assert.match(dutchOverviewRenderer, /vertical-learning-objective-card vertical-learning-core-card/);
+  assert.match(dutchOverviewRenderer, /vertical-learning-objective-top vertical-learning-core-card-top/);
+  assert.match(dutchOverviewRenderer, /vertical-learning-objective-id/);
+  assert.match(dutchOverviewRenderer, /vertical-learning-objective-meta/);
   assert.doesNotMatch(dutchOverviewRenderer, /createElement\('details'\)/);
-  assert.match(managementRuntime, /Nog niet uitgewerkt/);
-  assert.match(managementRuntime, /KD2 openen/);
+  assert.match(dutchOverviewRenderer, /Uitwerking nog niet beschikbaar/);
+  assert.match(dutchOverviewRenderer, /Teksten begrijpen openen/);
   assert.match(managementRuntime, /Luister- en kijkopdrachten blijven buiten de PacoGO-scope/);
   assert.match(managementRuntime, /objectiveFilter: objective => !\/luister\|kijk\/i/);
 });

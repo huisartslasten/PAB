@@ -9887,3 +9887,28 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 1. Verifieer Full Regression op de exacte commit met deze handoff-update.
 2. Bij `completed / success` is de KD11-broninventarisatie en 1S-bronclassificatie als documentatiefase afgerond.
 3. Daarna alleen verder met KD11 wanneer een concrete vervolgstap wordt gekozen; oefenbouw start uitsluitend via het centrale PacoGO Oefeningenbouwprotocol.
+
+## 59. Verticale Leerlijnen — hoofdmenu Rekenen en Nederlands (24 november 2026)
+
+**Gebruikersbesluit en implementatie**
+- Het hoofdmenu **Verticale Leerlijnen** toont voor de huidige scope uitsluitend twee leergebieden: **Rekenen** en **Nederlands**. Andere leergebieden worden niet toegevoegd.
+- De bestaande centrale Verticale Leerlijn-template en managementweergave zijn hergebruikt; er is geen aparte template, renderer of tweede curriculum-engine gemaakt.
+- **Rekenen** opent de bestaande SLO-kerndoelenweergave. Vanuit die weergave kan de gebruiker terug naar het hoofdmenu.
+- **Nederlands** heeft een eigen ingang en terugnavigatie. De pagina vermeldt expliciet dat de SLO-doelen en verticale uitwerking nog niet in deze omgeving zijn opgenomen. Er zijn geen Nederlandse doelen of inhoudelijke uitwerkingen verzonnen.
+- De scopebeslissing betreft alleen de navigatie en presentatie. Er is geen Nederlandse curriculumdata, skill, development, claim, evidence target, task model of oefening aangemaakt.
+
+**Wijzigingsgrenzen**
+- Alleen `src/features/management/runtime.js` gewijzigd.
+- Geen wijziging aan curriculumregistry, SLO-inventarisaties, Learning Interfaces, learner state, Supabase, studentdata of LIVE `main`.
+- Branch: `refactor/professional-v1`.
+
+**Engineering en verificatie**
+- Baseline vóór de wijziging: Full Regression #4281 / run `45234033983`: `completed / success` op exact commit `17b178dcf170e828ed6d8e0582c7239cdf717890`.
+- Implementatiecommit: `1492d0cf22c975c153fba5c909f8179c57c57ba5`.
+- Full Regression #4282 / run `45384185121`: `completed / success` op exact commit `1492d0cf22c975c153fba5c909f8179c57c57ba5`.
+
+**Volgende concrete stap**
+- Geen verdere uitbreiding van het hoofdmenu zonder nieuwe opdracht.
+- De inhoudelijke SLO-uitwerking voor Nederlands is een afzonderlijke toekomstige opdracht; begin daarmee pas na brononderzoek en expliciete opdracht.
+- Na deze handoff-update moet Full Regression opnieuw worden uitgevoerd op de exacte handoff-commit.
+

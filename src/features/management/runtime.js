@@ -294,7 +294,8 @@ export function createManagementRuntime({ app, templateMount, context, documentR
 
     const groupContainer = documentRef.createElement('div');
     groupContainer.className = 'vertical-learning-lines-groups';
-    for (let group = 2; group <= 8; group += 1) {
+    const groupNumbers = [...new Set(objectives.map(item => item.slo_group))].sort((a, b) => a - b);
+    for (const group of groupNumbers) {
       const groupObjectives = objectives.filter(item => item.slo_group === group);
       if (!groupObjectives.length) continue;
       const groupCard = documentRef.createElement('section');
@@ -302,7 +303,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
       const groupHeader = documentRef.createElement('div');
       groupHeader.className = 'vertical-learning-group-header';
       const groupTitle = documentRef.createElement('h3');
-      groupTitle.textContent = 'Groep ' + group;
+      groupTitle.textContent = groupObjectives[0]?.slo_group_label || 'Groep ' + group;
       const groupCount = documentRef.createElement('span');
       groupCount.textContent = groupObjectives.length + ' tussendoelen';
       groupHeader.append(groupTitle, groupCount);
@@ -428,6 +429,22 @@ export function createManagementRuntime({ app, templateMount, context, documentR
   }
 
   function renderDutchVerticalLearningLines() {
+    if (selectedVerticalLearningCoreGoal === 'KD2') {
+      renderDomainVerticalLearningLine({
+        domain: 'Teksten begrijpen',
+        title: 'KD2 — De leerling begrijpt teksten',
+        sourceLabel: 'Actuele kerndoelen: SLO Nederlands 2025 · historische groepsopbouw: SLO Leerstoflijnen lezen beschreven (2010) · kandidaat-crosswalk',
+        introText: 'Deze eerste verticale uitwerking richt zich op lezen en tekstbegrip. De groepsopbouw is een voorbeeldmatige synthese uit SLO 2010, geen officiële groepsindeling van de kerndoelen 2025. Luisterbegrip en verdere concretisering worden als afzonderlijke bronlaag aangevuld.',
+        scopeComponents: [
+          'KD2A — De leerling toont begrip van zakelijke en literaire teksten.',
+          'KD2B — De leerling evalueert en reflecteert op zakelijke en literaire teksten.',
+          'KD2C — De leerling verkent de betrouwbaarheid van verschillende bronnen.'
+        ],
+        scopeTitle: 'Actueel kerndoel KD2 — SLO 2025',
+        scopeDescription: 'De drie onderdelen 2A, 2B en 2C zijn de actuele inhoudelijke afbakening. De onderstaande groepsindeling is een voorlopige kandidaat-crosswalk uit oudere SLO-leerstoflijnen; zij is niet door SLO als nieuwe tussendoelenreeks vastgesteld.'
+      });
+      return;
+    }
     const section = documentRef.createElement('section');
     section.className = 'management-dashboard-section vertical-learning-lines';
     const backButton = documentRef.createElement('button');
@@ -437,10 +454,18 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     backButton.addEventListener('click', () => { selectedVerticalLearningArea = ''; render(); });
     const heading = documentRef.createElement('h2');
     heading.textContent = 'Verticale leerlijn — Nederlands';
-    const note = documentRef.createElement('p');
-    note.className = 'vertical-learning-lines-intro';
-    note.textContent = 'De SLO-doelen en de verticale uitwerking voor Nederlands zijn nog niet opgenomen in deze omgeving.';
-    section.append(backButton, heading, note);
+    const intro = documentRef.createElement('p');
+    intro.className = 'vertical-learning-lines-intro';
+    intro.textContent = 'Kies een kerndoel om de verticale leerlijn te bekijken. De eerste uitwerking is KD2 — Teksten begrijpen.';
+    const grid = documentRef.createElement('div');
+    grid.className = 'vertical-learning-objective-grid vertical-learning-core-grid';
+    grid.appendChild(createCard(documentRef, {
+      title: 'KD2 — De leerling begrijpt teksten',
+      description: 'Tekstbegrip, tekststructuur, interpreteren, evalueren en bronnen beoordelen.',
+      actionLabel: 'KD2 openen',
+      onClick: () => { selectedVerticalLearningCoreGoal = 'KD2'; render(); }
+    }));
+    section.append(backButton, heading, intro, grid);
     content.appendChild(section);
   }
 

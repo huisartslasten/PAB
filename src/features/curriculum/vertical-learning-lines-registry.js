@@ -6662,6 +6662,208 @@ const KD11_OBJECTIVES = Object.freeze([
   }
 ]);
 
+
+const KD2_OBJECTIVES = Object.freeze([
+  {
+    id: 'KD2A-0001', domain: 'Teksten begrijpen', slo_group: 2, slo_group_label: 'Groep 1–2',
+    slo_source: 'SLO Leerstoflijnen lezen beschreven (2010) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — tekstbegrip',
+    objective: 'In betekenisvolle situaties luisteren naar en praten over voorgelezen of bekeken teksten; reageren op herkenbare gebeurtenissen, personages en informatie.',
+    source_reference: 'SLO 2010, Leerstoflijnen lezen beschreven, hoofdstuk 3.1, pp. 121–129',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. Deze historische leerstoflijn beschrijft een mogelijke opbouw van leesonderwijs en is geen officieel groepsdoel uit de kerndoelen 2025.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0002', domain: 'Teksten begrijpen', slo_group: 2, slo_group_label: 'Groep 1–2',
+    slo_source: 'SLO Leerstoflijnen lezen beschreven (2010) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — tekstbegrip',
+    objective: 'Verkennen van verschillende soorten teksten en functies van lezen; met ondersteuning informatie uit een tekst verbinden aan de directe leefwereld en voorkennis.',
+    source_reference: 'SLO 2010, Leerstoflijnen lezen beschreven, hoofdstuk 3.1, pp. 121–129',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. De uitwerking is een historische, voorbeeldmatige opbouw en geen officieel groepsdoel uit de kerndoelen 2025.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0003', domain: 'Teksten begrijpen', slo_group: 4, slo_group_label: 'Groep 3–4',
+    slo_source: 'SLO Leerstoflijnen lezen beschreven (2010) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — tekstbegrip',
+    objective: 'Eenvoudige zakelijke en literaire teksten lezen met een herkenbaar onderwerp, een overzichtelijke opbouw en concrete informatie; tekstsoort en leesdoel beginnen herkennen.',
+    source_reference: 'SLO 2010, Leerstoflijnen lezen beschreven, hoofdstuk 3.2, pp. 130–138',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. Historische leerstoflijn; geen officieel groepsdoel uit de kerndoelen 2025.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0004', domain: 'Teksten begrijpen', slo_group: 4, slo_group_label: 'Groep 3–4',
+    slo_source: 'SLO Leerstoflijnen lezen beschreven (2010) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — tekstbegrip',
+    objective: 'Belangrijke gebeurtenissen en informatie in een tekst navertellen; eenvoudige verbanden herkennen, zoals volgorde, overeenkomst en verschil, en oorzaak en gevolg.',
+    source_reference: 'SLO 2010, Leerstoflijnen lezen beschreven, hoofdstuk 3.2, pp. 130–138',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. Historische leerstoflijn; geen officieel groepsdoel uit de kerndoelen 2025.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0005', domain: 'Teksten begrijpen', slo_group: 6, slo_group_label: 'Groep 5–6',
+    slo_source: 'SLO Leerstoflijnen lezen beschreven (2010) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — tekstbegrip',
+    objective: 'De hoofdgedachte en belangrijke informatie van zakelijke en literaire teksten bepalen; hoofd- en bijzaken onderscheiden en tekstinformatie in eigen woorden weergeven.',
+    source_reference: 'SLO 2010, Leerstoflijnen lezen beschreven, hoofdstuk 3.3, pp. 139–148',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. Historische leerstoflijn; geen officieel groepsdoel uit de kerndoelen 2025.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0006', domain: 'Teksten begrijpen', slo_group: 6, slo_group_label: 'Groep 5–6',
+    slo_source: 'SLO Leerstoflijnen lezen beschreven (2010) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — tekstbegrip',
+    objective: 'Verbanden binnen teksten herkennen, waaronder tijdsvolgorde, oorzaak en gevolg, vergelijking en tegenstelling; feiten en meningen van elkaar onderscheiden.',
+    source_reference: 'SLO 2010, Leerstoflijnen lezen beschreven, hoofdstuk 3.3, pp. 139–148',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. Historische leerstoflijn; geen officieel groepsdoel uit de kerndoelen 2025.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0007', domain: 'Teksten begrijpen', slo_group: 6, slo_group_label: 'Groep 5–6',
+    slo_source: 'SLO Leerstoflijnen lezen beschreven (2010) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — tekstbegrip',
+    objective: 'Leesstrategieën doelgericht inzetten: vooraf oriënteren, leesdoel bepalen, begrip tijdens het lezen controleren en de aanpak aanpassen wanneer de tekst niet wordt begrepen.',
+    source_reference: 'SLO 2010, Leerstoflijnen lezen beschreven, hoofdstuk 3.3, pp. 139–148',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. Historische leerstoflijn; geen officieel groepsdoel uit de kerndoelen 2025.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0008', domain: 'Teksten begrijpen', slo_group: 8, slo_group_label: 'Groep 7–8',
+    slo_source: 'SLO Leerstoflijnen lezen beschreven (2010) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — tekstbegrip',
+    objective: 'Hoofdgedachte, hoofd- en bijzaken, thema en strekking bepalen en de betekenis van een tekst in eigen woorden weergeven, passend bij het leesdoel.',
+    source_reference: 'SLO 2010, Leerstoflijnen lezen beschreven, hoofdstuk 3.4.3, pp. 157–159',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. De SLO-publicatie beschrijft een mogelijke onderwijsopbouw voor groep 7–8; geen officieel groepsdoel uit de kerndoelen 2025.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0009', domain: 'Teksten begrijpen', slo_group: 8, slo_group_label: 'Groep 7–8',
+    slo_source: 'SLO Leerstoflijnen lezen beschreven (2010) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — tekstbegrip',
+    objective: 'Tekststructuren en verbanden op macro-, meso- en microniveau herkennen en benutten; inferenties maken over informatie die niet letterlijk in de tekst staat.',
+    source_reference: 'SLO 2010, Leerstoflijnen lezen beschreven, hoofdstuk 3.4.2–3.4.3, pp. 153–159',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. Historische leerstoflijn; geen officieel groepsdoel uit de kerndoelen 2025.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0010', domain: 'Teksten begrijpen', slo_group: 8, slo_group_label: 'Groep 7–8',
+    slo_source: 'SLO Leerstoflijnen lezen beschreven (2010) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — tekstbegrip',
+    objective: 'Verschillende tekstsoorten, genres, vertelperspectieven en communicatieve doelen herkennen en deze kennis gebruiken om teksten te begrijpen en te interpreteren.',
+    source_reference: 'SLO 2010, Leerstoflijnen lezen beschreven, hoofdstuk 3.4.2–3.4.3, pp. 153–159',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. Historische leerstoflijn; geen officieel groepsdoel uit de kerndoelen 2025.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0011', domain: 'Teksten begrijpen', slo_group: 8, slo_group_label: 'Groep 7–8',
+    slo_source: 'SLO Leerstoflijnen lezen beschreven (2010) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — tekstbegrip',
+    objective: 'Argumenten bij een mening herkennen, perspectieven vergelijken en informatie uit verschillende teksten met voorkennis en eigen inzichten verbinden.',
+    source_reference: 'SLO 2010, Leerstoflijnen lezen beschreven, hoofdstuk 3.4.3, pp. 157–159',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. Historische leerstoflijn; geen officieel groepsdoel uit de kerndoelen 2025.',
+    status: 'active'
+  },
+  {
+    id: 'KD2A-0012', domain: 'Teksten begrijpen', slo_group: 8, slo_group_label: 'Groep 7–8',
+    slo_source: 'SLO Leerstoflijnen lezen beschreven (2010) — historische voorbeeldmatige opbouw; kandidaat-crosswalk naar KD2A',
+    slo_component: 'KD2A — tekstbegrip',
+    objective: 'Leesstrategieën bewust en flexibel toepassen: oriënteren, plannen, monitoren, evalueren en zo nodig de leesaanpak bijstellen.',
+    source_reference: 'SLO 2010, Leerstoflijnen lezen beschreven, hoofdstuk 3.4.3, pp. 157–159',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. Historische leerstoflijn; geen officieel groepsdoel uit de kerndoelen 2025.',
+    status: 'active'
+  },
+  {
+    id: 'KD2B-0001', domain: 'Teksten begrijpen', slo_group: 6, slo_group_label: 'Groep 5–6',
+    slo_source: 'SLO Leerstoflijnen lezen beschreven (2010) en Referentiekader Taal — kandidaat-crosswalk naar KD2B',
+    slo_component: 'KD2B — evalueren en reflecteren',
+    objective: 'Een eerste onderbouwde mening geven over inhoud en bruikbaarheid van een tekst; feiten en meningen onderscheiden en eenvoudige tekstinformatie beoordelen.',
+    source_reference: 'SLO 2010, Leerstoflijnen lezen beschreven, hoofdstuk 2.4.3 en 3.3, pp. 111–112 en 139–148',
+    source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'Kandidaat-crosswalk; de precieze opbouw van KD2B wordt nog getoetst aan de nieuwe kerndoelbeschrijving en de nog te verschijnen SLO-leerlijn.',
+    status: 'active'
+  },
+  {
+    id: 'KD2B-0002', domain: 'Teksten begrijpen', slo_group: 8, slo_group_label: 'Groep 7–8',
+    slo_source: 'SLO Kerndoelen Nederlands (2025) KD2B; SLO Leerstoflijnen lezen beschreven (2010) als historische concretisering',
+    slo_component: 'KD2B — evalueren en reflecteren',
+    objective: 'Inhoudelijke relaties binnen en tussen teksten benoemen; overeenkomsten en verschillen in feiten, meningen, argumenten en perspectieven vergelijken.',
+    source_reference: 'SLO Kerndoelen primair onderwijs 2025, KD2B; SLO 2010, hoofdstuk 3.4.3, pp. 157–159',
+    source_wording: 'PacoGO-samenvatting van de kerndoelbeschrijving en historische leerstoflijn; geen woordelijk citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'De nieuwe kerndoelinhoud is leidend; de groepsplaatsing is een kandidaat-crosswalk en geen officieel groepsdoel uit 2025.',
+    status: 'active'
+  },
+  {
+    id: 'KD2B-0003', domain: 'Teksten begrijpen', slo_group: 8, slo_group_label: 'Groep 7–8',
+    slo_source: 'SLO Kerndoelen Nederlands (2025) KD2B; historische concretisering uit SLO Leerstoflijnen lezen beschreven (2010)',
+    slo_component: 'KD2B — evalueren en reflecteren',
+    objective: 'Bruikbaarheid van teksten beoordelen en reflecteren op waarde, inhoud en vorm; tegenstrijdige en overeenkomstige inhoud tussen teksten herkennen.',
+    source_reference: 'SLO Kerndoelen primair onderwijs 2025, KD2B; SLO 2010, hoofdstuk 3.4.3, pp. 157–159',
+    source_wording: 'PacoGO-samenvatting; geen woordelijk SLO-citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'De groepsplaatsing is een kandidaat-crosswalk. De nieuwe SLO-leerlijn Nederlands wordt bij publicatie in 2027 verwerkt.',
+    status: 'active'
+  },
+  {
+    id: 'KD2C-0001', domain: 'Teksten begrijpen', slo_group: 8, slo_group_label: 'Groep 7–8',
+    slo_source: 'SLO Kerndoelen Nederlands (2025) KD2C',
+    slo_component: 'KD2C — bronnen verkennen',
+    objective: 'Aangereikte bronnen verkennen aan de hand van maker, tekstsoort en verschijningsdatum.',
+    source_reference: 'SLO Kerndoelen primair onderwijs 2025, KD2C',
+    source_wording: 'PacoGO-samenvatting van de kerndoelbeschrijving; geen woordelijk citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'De kerndoelinhoud is rechtstreeks uit KD2C afgeleid; de plaatsing in groep 7–8 is een voorlopige kandidaat-crosswalk en geen officieel groepsdoel.',
+    status: 'active'
+  },
+  {
+    id: 'KD2C-0002', domain: 'Teksten begrijpen', slo_group: 8, slo_group_label: 'Groep 7–8',
+    slo_source: 'SLO Kerndoelen Nederlands (2025) KD2C',
+    slo_component: 'KD2C — bronnen verkennen',
+    objective: 'Inhouds- en vormelementen benoemen die misleidend zijn of vragen oproepen.',
+    source_reference: 'SLO Kerndoelen primair onderwijs 2025, KD2C',
+    source_wording: 'PacoGO-samenvatting van de kerndoelbeschrijving; geen woordelijk citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'De plaatsing in groep 7–8 is een voorlopige kandidaat-crosswalk en geen officieel groepsdoel.',
+    status: 'active'
+  },
+  {
+    id: 'KD2C-0003', domain: 'Teksten begrijpen', slo_group: 8, slo_group_label: 'Groep 7–8',
+    slo_source: 'SLO Kerndoelen Nederlands (2025) KD2C',
+    slo_component: 'KD2C — bronnen verkennen',
+    objective: 'Verschillende bronnen vergelijkend beoordelen op basis van hun betrouwbaarheid.',
+    source_reference: 'SLO Kerndoelen primair onderwijs 2025, KD2C',
+    source_wording: 'PacoGO-samenvatting van de kerndoelbeschrijving; geen woordelijk citaat',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
+    coverage_note: 'De plaatsing in groep 7–8 is een voorlopige kandidaat-crosswalk en geen officieel groepsdoel.',
+    status: 'active'
+  }
+].map(Object.freeze));
+
 function validateObjective(objective, seenIds, exerciseIds) {
   if (!objective || typeof objective !== 'object') throw new TypeError('Curriculum objective must be an object.');
   if (!/^[A-Z][A-Z0-9]*-\d{4}$/.test(objective.id || '')) throw new Error('Curriculum objective ID must use a domain-prefix-0000 format.');
@@ -6674,7 +6876,7 @@ function validateObjective(objective, seenIds, exerciseIds) {
   if (!Array.isArray(objective.exercise_ids) || objective.exercise_ids.some(id => !exerciseIds.has(id))) throw new Error('Curriculum objective references an unknown exercise.');
   if (!Array.isArray(objective.related_skill_ids)) throw new Error('Curriculum objective related_skill_ids must be an array.');
 }
-export function createVerticalLearningLinesRegistry({ objectives = [...OBJECTIVES, ...KD10A_OBJECTIVES, ...KD11_OBJECTIVES], exercises = EXERCISES } = {}) {
+export function createVerticalLearningLinesRegistry({ objectives = [...OBJECTIVES, ...KD10A_OBJECTIVES, ...KD11_OBJECTIVES, ...KD2_OBJECTIVES], exercises = EXERCISES } = {}) {
   if (!Array.isArray(objectives) || !Array.isArray(exercises)) throw new TypeError('Curriculum objectives and exercises must be arrays.');
   const seenIds=new Set(), exerciseIds=new Set(exercises.map(exercise=>exercise.id));
   objectives.forEach(objective=>validateObjective(objective,seenIds,exerciseIds));

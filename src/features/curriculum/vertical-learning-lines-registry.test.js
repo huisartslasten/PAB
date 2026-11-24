@@ -46,6 +46,25 @@ describe('vertical learning lines registry', () => {
     });
   });
 
+  it('exposes all nine official Dutch core goals and the selected PacoGO scope', () => {
+    const goals = verticalLearningLinesRegistry.listDutchCoreObjectives();
+    expect(goals.map(item => item.id)).toEqual(['KD1', 'KD2', 'KD3', 'KD4', 'KD5', 'KD6', 'KD7', 'KD8', 'KD9']);
+    expect(goals.filter(item => item.status === 'selected').map(item => item.id)).toEqual(['KD2', 'KD6']);
+    expect(goals.find(item => item.id === 'KD1')).toMatchObject({
+      status_label: 'Nog niet uitgewerkt',
+      pacogo_note: expect.stringContaining('themawoorden')
+    });
+    expect(goals.find(item => item.id === 'KD2')).toMatchObject({
+      status_label: 'Geselecteerd — begrijpend lezen',
+      selected_components: ['Leescomponent van 2A', '2B — Diep tekstbegrip', '2C — Bronnen verkennen']
+    });
+    expect(goals.find(item => item.id === 'KD6')).toMatchObject({
+      status_label: 'Geselecteerd — grammatica en spelling',
+      selected_components: ['6A — Grammatica en taalbeschouwing', '6B — Spelling, formulering en interpunctie']
+    });
+    expect(goals.filter(item => item.status === 'not_yet_developed').every(item => item.status_label === 'Nog niet uitgewerkt')).toBe(true);
+  });
+
   it('loads all KD11 SLO group objectives as source-traceable, unassessed records', () => {
     const objectives = verticalLearningLinesRegistry.listObjectives({ domain: 'Grootheden en eenheden' });
     expect(objectives).toHaveLength(186);

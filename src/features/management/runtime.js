@@ -194,9 +194,15 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     });
   }
 
-  function renderDomainVerticalLearningLine({ domain, title: domainTitle, sourceLabel, showCurriculumSkills = false, scopeComponents = null, scopeSource = '', introText = 'Alle geïnventariseerde SLO-tussendoelen, gekoppeld aan bestaande PacoGO-curriculumonderdelen en oefenroutes.', scopeTitle = 'Actueel kerndoel KD10A — SLO 2026', scopeDescription = 'Dit is de actuele inhoudelijke afbakening van KD10A. De groepsgewijze doelen hieronder komen uit SLO 2017 en zijn een kandidaat-crosswalk; ze zijn geen officiële groepsdoelen uit de publicatie van 2026.' }) {
-    const objectives = verticalLearningLinesRegistry.listObjectives({ domain });
-    const summary = verticalLearningLinesRegistry.getCoverageSummary({ domain });
+  function renderDomainVerticalLearningLine({ domain, title: domainTitle, sourceLabel, showCurriculumSkills = false, scopeComponents = null, scopeSource = '', objectiveFilter = null, introText = 'Alle geïnventariseerde SLO-tussendoelen, gekoppeld aan bestaande PacoGO-curriculumonderdelen en oefenroutes.', scopeTitle = 'Actueel kerndoel KD10A — SLO 2026', scopeDescription = 'Dit is de actuele inhoudelijke afbakening van KD10A. De groepsgewijze doelen hieronder komen uit SLO 2017 en zijn een kandidaat-crosswalk; ze zijn geen officiële groepsdoelen uit de publicatie van 2026.' }) {
+    const allObjectives = verticalLearningLinesRegistry.listObjectives({ domain });
+    const objectives = typeof objectiveFilter === 'function' ? allObjectives.filter(objectiveFilter) : allObjectives;
+    const summary = typeof objectiveFilter === 'function' ? {
+      objectives: objectives.length,
+      exerciseLinks: objectives.reduce((total, item) => total + item.exercise_ids.length, 0),
+      partial: objectives.filter(item => item.coverage_status === 'partial').length,
+      notDemonstrated: objectives.filter(item => item.coverage_status === 'not_demonstrated').length
+    } : verticalLearningLinesRegistry.getCoverageSummary({ domain });
     const exercises = verticalLearningLinesRegistry.listExercises();
     const skills = verticalLearningLinesRegistry.listCurriculumSkills();
     const exerciseById = new Map(exercises.map(item => [item.id, item]));
@@ -440,40 +446,88 @@ export function createManagementRuntime({ app, templateMount, context, documentR
       renderDomainVerticalLearningLine({
         domain: 'Teksten begrijpen',
         title: 'KD2 — De leerling begrijpt teksten',
-        sourceLabel: 'Actuele kerndoelen: SLO Nederlands 2025 · leesopbouw: SLO Leerstoflijnen lezen beschreven (2010) · luisteropbouw: SLO Leerstoflijnen mondelinge taalvaardigheid beschreven (2015) · historische kandidaat-crosswalks',
-        introText: 'KD2A is uitgewerkt voor de drie modaliteiten uit het actuele kerndoel: aandachtig luisteren, kijken en aandachtig vloeiend lezen. De luisterdoelen zijn aangevuld vanuit SLO Leerstoflijnen mondelinge taalvaardigheid (2015); de leesdoelen komen uit SLO Leerstoflijnen lezen (2010). Beide groepsopbouwen zijn historische, voorbeeldmatige kandidaat-crosswalks en geen officiële tussendoelen uit 2025. De SLO-leerlijn luisteren betreft niet-interactieve luistersituaties; luisteren tijdens gesprekken valt buiten die specifieke bronafbakening.',
-        scopeComponents: [
+        sourceLabel: 'Actuele kerndoelen: SLO Nederlands 2025 · leesopbouw: SLO Leerstoflijnen lezen beschreven (2010) · historische kandidaat-crosswalk',
+        objectiveFilter: objective => !/luister|kijk/i.test((objective.slo_component || '') + ' ' + (objective.objective || '')),
+        introText: 'PacoGO werkt binnen KD2 alleen de leescomponenten uit: begrijpend lezen, diep tekstbegrip en bronnen verkennen. Luister- en kijkopdrachten blijven buiten de PacoGO-scope en worden aan school overgelaten. Woordenschat, waaronder themawoorden met definities, ondersteunt het lezen. De groepsopbouw is een historische, voorbeeldmatige kandidaat-crosswalk en geen officiële tussendoelenreeks uit 2025.',
           'KD2A — De leerling toont begrip van zakelijke en literaire teksten.',
           'KD2B — De leerling evalueert en reflecteert op zakelijke en literaire teksten.',
           'KD2C — De leerling verkent de betrouwbaarheid van verschillende bronnen.'
         ],
         scopeSource: 'SLO Kerndoelen primair onderwijs 2025, KD2A–KD2C',
         scopeTitle: 'Actueel kerndoel KD2 — SLO 2025',
-        scopeDescription: 'De drie onderdelen 2A, 2B en 2C zijn de actuele inhoudelijke afbakening. De onderstaande groepsindeling is een voorlopige kandidaat-crosswalk uit oudere SLO-leerstoflijnen; zij is niet door SLO als nieuwe tussendoelenreeks vastgesteld.'
+        scopeDescription: 'De officiële kerndoelbeschrijving 2A omvat luisteren, kijken en lezen. PacoGO kiest daarbinnen uitsluitend voor lezen. Ook 2B (diep tekstbegrip) en 2C (bronnen verkennen) worden alleen via leesactiviteiten benaderd. De groepsindeling hieronder is een voorlopige kandidaat-crosswalk uit een oudere SLO-leerstoflijn en is geen officiële tussendoelenreeks uit 2025.'
       });
       return;
     }
+    const coreObjectives = verticalLearningLinesRegistry.listDutchCoreObjectives();
     const section = documentRef.createElement('section');
     section.className = 'management-dashboard-section vertical-learning-lines';
+    section.style.backgroundColor = '#ffffff';
+    section.style.color = '#17345f';
+    section.style.borderRadius = '20px';
+    section.style.padding = '24px';
+
     const backButton = documentRef.createElement('button');
     backButton.type = 'button';
     backButton.className = 'vertical-learning-back';
     backButton.textContent = '← Terug naar leergebieden';
-    backButton.addEventListener('click', () => { selectedVerticalLearningArea = ''; render(); });
+    backButton.addEventListener('click', () => {
+      selectedVerticalLearningArea = '';
+      selectedVerticalLearningCoreGoal = '';
+      render();
+    });
+
     const heading = documentRef.createElement('h2');
-    heading.textContent = 'Verticale leerlijn — Nederlands';
+    heading.textContent = 'Verticale leerlijnen — Nederlands';
     const intro = documentRef.createElement('p');
     intro.className = 'vertical-learning-lines-intro';
-    intro.textContent = 'Kies een kerndoel om de verticale leerlijn te bekijken. De eerste uitwerking is KD2 — Teksten begrijpen.';
+    intro.textContent = 'Alle negen officiële SLO-kerndoelen blijven zichtbaar. De geselecteerde PacoGO-onderdelen zijn begrijpend lezen, woordenschat/themawoorden, grammatica en spelling. Klap een ander kerndoel open voor een korte uitleg.';
+    const source = documentRef.createElement('p');
+    source.className = 'vertical-learning-lines-source';
+    source.textContent = 'Bron: SLO, Kerndoelen primair onderwijs, herziene versie 2025, pp. 16–25. De beschrijvingen hieronder zijn compacte wegwijzers, geen vervanging van de officiële kerndoelteksten.';
+
     const grid = documentRef.createElement('div');
     grid.className = 'vertical-learning-objective-grid vertical-learning-core-grid';
-    grid.appendChild(createCard(documentRef, {
-      title: 'KD2 — De leerling begrijpt teksten',
-      description: 'Tekstbegrip, tekststructuur, interpreteren, evalueren en bronnen beoordelen.',
-      actionLabel: 'KD2 openen',
-      onClick: () => { selectedVerticalLearningCoreGoal = 'KD2'; render(); }
-    }));
-    section.append(backButton, heading, intro, grid);
+    coreObjectives.forEach(coreGoal => {
+      if (coreGoal.status === 'selected') {
+        const card = createCard(documentRef, {
+          title: coreGoal.id + ' — ' + coreGoal.title,
+          description: coreGoal.description,
+          actionLabel: coreGoal.id === 'KD2' ? 'KD2 openen' : '',
+          onClick: coreGoal.id === 'KD2' ? () => { selectedVerticalLearningCoreGoal = 'KD2'; render(); } : null
+        });
+        card.classList.add('vertical-learning-core-selected');
+        grid.appendChild(card);
+        return;
+      }
+
+      const details = documentRef.createElement('details');
+      details.className = 'management-dashboard-card vertical-learning-core-collapsed';
+      details.style.padding = '16px 18px';
+      details.style.border = '1px solid var(--paco-border)';
+      details.style.borderRadius = '16px';
+      details.style.background = '#ffffff';
+      const summaryLine = documentRef.createElement('summary');
+      summaryLine.textContent = coreGoal.id + ' — ' + coreGoal.title + ' · Nog niet uitgewerkt';
+      summaryLine.style.cursor = 'pointer';
+      summaryLine.style.fontWeight = '800';
+      summaryLine.style.lineHeight = '1.3';
+      const description = documentRef.createElement('p');
+      description.textContent = coreGoal.description;
+      description.style.margin = '12px 0 0';
+      description.style.color = '#38577d';
+      details.append(summaryLine, description);
+      if (coreGoal.pacogo_note) {
+        const note = documentRef.createElement('p');
+        note.textContent = coreGoal.pacogo_note;
+        note.style.margin = '8px 0 0';
+        note.style.color = '#38577d';
+        details.appendChild(note);
+      }
+      grid.appendChild(details);
+    });
+
+    section.append(backButton, heading, intro, source, grid);
     content.appendChild(section);
   }
 

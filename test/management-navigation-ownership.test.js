@@ -72,6 +72,15 @@ test('authenticated management context bar is owned globally, not by an individu
   assert.doesNotMatch(managementRuntime, /topbar:/);
 });
 
+test('Dutch vertical learning lines show all nine SLO core goals and selected PacoGO scope', () => {
+  assert.match(managementRuntime, /listDutchCoreObjectives\(\)/);
+  assert.match(managementRuntime, /createElement\('details'\)/);
+  assert.match(managementRuntime, /Nog niet uitgewerkt/);
+  assert.match(managementRuntime, /KD2 openen/);
+  assert.match(managementRuntime, /Luister- en kijkopdrachten blijven buiten de PacoGO-scope/);
+  assert.match(managementRuntime, /objectiveFilter: objective => !\/luister\|kijk\/i/);
+});
+
 test('test history derives its sidebar from the central navigation owner', () => {
   assert.match(historyRuntime, /import \{ createPacoNavigation \} from '\.\.\/\.\.\/components\/page-navigation\.js';/);
   assert.match(historyRuntime, /navigation: createPacoNavigation\(/);

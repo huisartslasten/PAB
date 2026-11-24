@@ -66,6 +66,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
 
   const selectedStudent = context.student || '';
   const filter = FILTER_LABELS[context.managementFilter] ? context.managementFilter : 'dashboard';
+  let selectedVerticalLearningArea = '';
   let selectedVerticalLearningCoreGoal = '';
   const content = documentRef.createElement('div');
   content.className = 'management-dashboard';
@@ -398,7 +399,54 @@ export function createManagementRuntime({ app, templateMount, context, documentR
   }
 
 
+  function renderVerticalLearningAreaMenu() {
+    const section = documentRef.createElement('section');
+    section.className = 'management-dashboard-section vertical-learning-lines';
+    const heading = documentRef.createElement('h2');
+    heading.textContent = 'Verticale leerlijnen';
+    const intro = documentRef.createElement('p');
+    intro.className = 'vertical-learning-lines-intro';
+    intro.textContent = 'Kies een leergebied.';
+    const grid = documentRef.createElement('div');
+    grid.className = 'vertical-learning-objective-grid vertical-learning-core-grid';
+    grid.append(
+      createCard(documentRef, {
+        title: 'Rekenen',
+        description: 'Bekijk de SLO-kerndoelen en de beschikbare verticale uitwerkingen voor rekenen.',
+        actionLabel: 'Rekenen openen',
+        onClick: () => { selectedVerticalLearningArea = 'rekenen'; selectedVerticalLearningCoreGoal = ''; render(); }
+      }),
+      createCard(documentRef, {
+        title: 'Nederlands',
+        description: 'De verticale leerlijn Nederlands wordt hier beschikbaar zodra de SLO-doelen zijn uitgewerkt.',
+        actionLabel: 'Nederlands openen',
+        onClick: () => { selectedVerticalLearningArea = 'nederlands'; selectedVerticalLearningCoreGoal = ''; render(); }
+      })
+    );
+    section.append(heading, intro, grid);
+    content.appendChild(section);
+  }
+
+  function renderDutchVerticalLearningLines() {
+    const section = documentRef.createElement('section');
+    section.className = 'management-dashboard-section vertical-learning-lines';
+    const backButton = documentRef.createElement('button');
+    backButton.type = 'button';
+    backButton.className = 'vertical-learning-back';
+    backButton.textContent = '← Terug naar leergebieden';
+    backButton.addEventListener('click', () => { selectedVerticalLearningArea = ''; render(); });
+    const heading = documentRef.createElement('h2');
+    heading.textContent = 'Verticale leerlijn — Nederlands';
+    const note = documentRef.createElement('p');
+    note.className = 'vertical-learning-lines-intro';
+    note.textContent = 'De SLO-doelen en de verticale uitwerking voor Nederlands zijn nog niet opgenomen in deze omgeving.';
+    section.append(backButton, heading, note);
+    content.appendChild(section);
+  }
+
   function renderVerticalLearningLines() {
+    if (!selectedVerticalLearningArea) { renderVerticalLearningAreaMenu(); return; }
+    if (selectedVerticalLearningArea === 'nederlands') { renderDutchVerticalLearningLines(); return; }
     if (selectedVerticalLearningCoreGoal === 'KD11') {
       const coreGoal = verticalLearningLinesRegistry.listCoreObjectives().find(item => item.id === 'KD11');
       renderDomainVerticalLearningLine({
@@ -426,8 +474,13 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     const coreObjectives = verticalLearningLinesRegistry.listCoreObjectives();
     const section = documentRef.createElement('section');
     section.className = 'management-dashboard-section vertical-learning-lines';
+    const backButton = documentRef.createElement('button');
+    backButton.type = 'button';
+    backButton.className = 'vertical-learning-back';
+    backButton.textContent = '← Terug naar leergebieden';
+    backButton.addEventListener('click', () => { selectedVerticalLearningArea = ''; selectedVerticalLearningCoreGoal = ''; render(); });
     const heading = documentRef.createElement('h2');
-    heading.textContent = 'Verticale leerlijnen — SLO-kerndoelen';
+    heading.textContent = 'Verticale leerlijnen — Rekenen';
     const intro = documentRef.createElement('p');
     intro.className = 'vertical-learning-lines-intro';
     intro.textContent = 'Kies een SLO-kerndoel om de bijbehorende verticale leerlijn te bekijken.';
@@ -499,7 +552,7 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     appendCards(crossCuttingObjectives, crossGrid);
     crossGroup.append(crossHeading, crossNote, crossGrid);
 
-    section.append(heading, intro, source, contentGroup, crossGroup);
+    section.append(backButton, heading, intro, source, contentGroup, crossGroup);
     content.appendChild(section);
   }
 

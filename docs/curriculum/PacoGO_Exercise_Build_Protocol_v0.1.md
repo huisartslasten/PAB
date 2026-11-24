@@ -150,3 +150,10 @@ De fases worden in volgorde doorlopen. Een fase wordt niet stilzwijgend overgesl
 Dit document is een werkprotocol voor het ontwerpen, bouwen, koppelen en verifiëren van oefeningen. Het introduceert op zichzelf geen nieuwe SLO-doelen, PacoGO-skills, developments, claims, task models, evidence targets, masteryregels, Learning Interfaces, databaseschema's of productfunctionaliteit. Bestaande bron- en architectuurcontracten blijven leidend.
 
 Het protocol verplicht tot het onderzoeken en traceerbaar voorbereiden van mogelijke domeinoverstijgende doelrelaties, maar bouwt nog geen centraal oefeningennetwerk of nieuw technisch registratiesysteem.
+
+
+## 12. Aanvullende kwaliteitscontrole — begrijpend lezen
+
+Voor oefeningen binnen begrijpend lezen wordt tijdens fase 3 (didactisch ontwerp) en fase 6 (verificatie) ook de centrale **PacoGO Kwaliteitschecklist Begrijpend Lezen v0.1** geraadpleegd: `docs/curriculum/PacoGO_Kwaliteitschecklist_Begrijpend_Lezen_v0.1.md`.
+
+De checklist controleert tekstkwaliteit, leesvaardigheden/taakdekking, vraagkwaliteit en beoordeling. Zij is een PacoGO-ontwerpstandaard, geen officiële Cito-checklist en geen bewijs van Cito-equivalentie, betrouwbaarheid of validiteit. Er wordt geen aparte begrijpend-lezen-bouwmodule of runtime geïntroduceerd. De bestaande centrale paginatemplates, Learning Interfaces en curriculum-/runtimecontracten blijven leidend.

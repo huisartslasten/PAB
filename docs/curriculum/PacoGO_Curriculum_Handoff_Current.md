@@ -10021,3 +10021,28 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 1. Voer Full Regression uit op de commit met deze handoff-update.
 2. Bij groen: KD6 eerste brongebaseerde uitwerking is afgerond. Wacht op de volgende expliciete opdracht; voeg geen extra functionaliteit toe.
 3. Bij rood: stop, isoleer de exacte oorzaak en herstel eerst de onderliggende oorzaak voordat verder wordt gebouwd.
+
+
+---
+
+## 63. Centrale kwaliteitschecklist begrijpend lezen (24 november 2026)
+
+**Vastgelegd**
+- Nieuw centraal document: `docs/curriculum/PacoGO_Kwaliteitschecklist_Begrijpend_Lezen_v0.1.md`.
+- De checklist omvat tekstkwaliteit, leesvaardigheden en taakdekking, vraagkwaliteit, beoordeling/feedback, kwaliteitsstatussen en bronafbakening.
+- De checklist is een PacoGO-ontwerpstandaard, geen officiële Cito-checklist. Het volgen ervan bewijst geen Cito-equivalentie, betrouwbaarheid of validiteit.
+- De historische Cito 3.0-tekstverdeling is als historische toetskeuze afgebakend en niet als universele PacoGO-norm vastgelegd.
+- Het centrale Oefeningenbouwprotocol verwijst nu naar deze checklist tijdens didactisch ontwerp en verificatie.
+- Er is geen aparte begrijpend-lezen-bouwmodule, renderer, Learning Interface, database of runtime toegevoegd.
+
+**Wijzigingen**
+- Alleen documentatie op branch `refactor/professional-v1`; LIVE `main` niet aangeraakt.
+- Geen curriculumregistraties, Skills, claims, evidence targets, task models, masteryregels, studentdata of Supabase gewijzigd.
+
+**Engineering en verificatie**
+- Baseline vóór deze documentatiewijziging: commit `70cf7a3ac545742984ef6c5b6c4263979f1e05bf`.
+- Full Regression #4300 / run `45504366575`: `completed / success` op exact commit `70cf7a3ac545742984ef6c5b6c4263979f1e05bf`.
+- De commit met deze checklist, protocolverwijzing en handoff-update moet zelf nog door Full Regression worden geverifieerd; tot die verificatie wordt geen groene status geclaimd.
+
+**Volgende concrete stap**
+- Voer Full Regression uit op de nieuwe documentatiecommit. Bij rood: stop en isoleer de oorzaak; bij groen is de checklist formeel vastgelegd en beschikbaar voor toekomstige begrijpend-lezenoefeningen.

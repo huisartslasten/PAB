@@ -202,6 +202,13 @@ export function createManagementRuntime({ app, templateMount, context, documentR
     const exerciseById = new Map(exercises.map(item => [item.id, item]));
     const section = documentRef.createElement('section');
     section.className = 'management-dashboard-section vertical-learning-lines';
+    // Keep the complete vertical-learning page readable on the blue management canvas.
+    // This is the shared central template, so the white surface applies consistently to every domain.
+    section.style.backgroundColor = '#ffffff';
+    section.style.color = '#17345f';
+    section.style.borderRadius = '20px';
+    section.style.padding = '24px';
+
     const backButton = documentRef.createElement('button');
     backButton.type = 'button';
     backButton.className = 'vertical-learning-back';

@@ -22,8 +22,8 @@ export const SPACE_WATER_READING_IMAGES = Object.freeze({
   comet: Object.freeze({
     src: 'https://media.esa.int/legacy/web/images/esa_multimedia/images/2015/03/comet_on_21_march_2015_navcam/15333813-1-eng-GB/173995/image-thumb__173995__fit_large/Comet_on_21_March_2015_NavCam.a2a48df3.webp',
     alt: 'Komeet 67P, gefotografeerd door de navigatiecamera van de Rosetta-missie.',
-    caption: 'Bronvermelding: ESA – European Space Agency (Rosetta/NAVCAM). Ongewijzigd weergegeven.',
-    author: 'ESA – European Space Agency (Rosetta/NAVCAM)',
+    caption: 'Bronvermelding: ESA - European Space Agency (Rosetta/NAVCAM). Ongewijzigd weergegeven.',
+    author: 'ESA - European Space Agency (Rosetta/NAVCAM)',
     sourceUrl: 'https://www.esa.int/media/comet-on-21-march-2015-navcam',
     license: 'CC BY-SA 3.0 IGO',
     licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/igo/',

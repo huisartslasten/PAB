@@ -38,7 +38,7 @@ test('space water reading exercise provides inline text sources and image-use re
     assert.ok(image.author);
   }
   assert.equal(SPACE_WATER_READING_IMAGES.comet.license, 'CC BY-SA 3.0 IGO');
-  assert.match(SPACE_WATER_READING_IMAGES.comet.caption, /ESA – European Space Agency/);
+  assert.match(SPACE_WATER_READING_IMAGES.comet.caption, /ESA - European Space Agency/);
 });
 
 test('space water exercise is registered with a stable ID and central route without inventing curriculum coverage', () => {

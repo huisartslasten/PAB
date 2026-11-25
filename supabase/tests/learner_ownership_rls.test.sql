@@ -138,14 +138,12 @@ select public.persist_curriculum_learning_cycle(
   '{"observation_ids":[],"inference":{"status":"insufficient"},"decision":{"next_action":"continue"}}'::jsonb
 );
 
--- The RPC clears its transaction-local write capability before returning.
--- Direct table writes in the same transaction must still be rejected by RLS.
+-- A caller can set arbitrary custom GUCs. Even after forging the former
+-- write-context name, authenticated clients must not have direct DML access.
+select set_config('app.pacogo_learning_cycle_write', auth.uid()::text, true);
+
 do $test$
 begin
-  if coalesce(current_setting('app.pacogo_learning_cycle_write', true), '') <> '' then
-    raise exception 'Learning-cycle write capability leaked after RPC return';
-  end if;
-
   begin
     insert into public.student_evidence (
       student_key, curriculum_registry_version_id, skill_id,
@@ -155,14 +153,58 @@ begin
       current_setting('test.registry_id')::uuid,
       'TEST-SKILL-A',
       '{}'::jsonb, '{}'::jsonb, '{}'::jsonb,
-      'rls-direct-write'
+      'rls-forged-guc-evidence'
     );
-    raise exception 'Direct evidence insert unexpectedly succeeded';
-  exception
-    when insufficient_privilege then null;
+    raise exception 'Forged-GUC direct evidence insert unexpectedly succeeded';
+  exception when insufficient_privilege then null;
+  end;
+
+  begin
+    insert into public.student_longitudinal_state (
+      student_key, curriculum_registry_version_id, skill_id, state
+    ) values (
+      current_setting('test.learner_a'),
+      current_setting('test.registry_id')::uuid,
+      'TEST-SKILL-FORGED',
+      '{}'::jsonb
+    );
+    raise exception 'Forged-GUC direct state insert unexpectedly succeeded';
+  exception when insufficient_privilege then null;
+  end;
+
+  begin
+    update public.student_longitudinal_state
+    set state = '{"forged":true}'::jsonb
+    where student_key = current_setting('test.learner_a')
+      and skill_id = 'TEST-SKILL-A';
+    raise exception 'Forged-GUC direct state update unexpectedly succeeded';
+  exception when insufficient_privilege then null;
+  end;
+
+  begin
+    insert into public.curriculum_decision_trace (
+      student_key, curriculum_registry_version_id, skill_id
+    ) values (
+      current_setting('test.learner_a'),
+      current_setting('test.registry_id')::uuid,
+      'TEST-SKILL-FORGED'
+    );
+    raise exception 'Forged-GUC direct decision-trace insert unexpectedly succeeded';
+  exception when insufficient_privilege then null;
   end;
 end;
 $test$;
+
+-- The supported SECURITY INVOKER RPC remains usable after the forged setting.
+select set_config('app.pacogo_learning_cycle_write', '', true);
+select public.persist_curriculum_learning_cycle(
+  current_setting('test.learner_a'),
+  current_setting('test.registry_id')::uuid,
+  'TEST-SKILL-A',
+  '{"source_event_id":"rls-test-event-after-forged-guc","performance":{"correct":true},"observation":{"response":13},"evidence_assessment":{"status":"observed"}}'::jsonb,
+  '{"state":{"status":"in_progress"},"last_observed_at":"2026-11-04T12:01:00Z"}'::jsonb,
+  '{"observation_ids":[],"inference":{"status":"insufficient"},"decision":{"next_action":"continue"}}'::jsonb
+);
 
 -- Parent A sees its own learner and data, but cannot see Parent B's learner or data.
 do $test$
@@ -382,6 +424,14 @@ begin
      or has_table_privilege('anon', 'public.learner_profiles', 'SELECT')
      or has_table_privilege('anon', 'public.learner_profile_links', 'SELECT') then
     raise exception 'Anonymous role retains learner-data table privileges';
+  end if;
+
+  if has_table_privilege('authenticated', 'public.student_evidence', 'INSERT')
+     or has_table_privilege('authenticated', 'public.student_evidence', 'UPDATE')
+     or has_table_privilege('authenticated', 'public.student_longitudinal_state', 'INSERT')
+     or has_table_privilege('authenticated', 'public.student_longitudinal_state', 'UPDATE')
+     or has_table_privilege('authenticated', 'public.curriculum_decision_trace', 'INSERT') then
+    raise exception 'Authenticated role retains direct learner-cycle DML privileges';
   end if;
 end;
 $test$;

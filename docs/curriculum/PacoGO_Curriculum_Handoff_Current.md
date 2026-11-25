@@ -10247,3 +10247,11 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Alleen de ontbrekende komma is hersteld; herstelcommit: `f9df27ad2900a5619e798c8ded25e5fd76c5355b`. De bestaande tests zijn niet aangepast om de fout te maskeren.
 - Browser proof #909 / run `45606044179` op de oorspronkelijke bouwcommit `d01f45612e1cb328efe7a4ba2a4add8c13149852` was bij deze registratie nog `in_progress`; deze run verifieert de syntaxcorrectie niet.
 - Full Regression op de gecorrigeerde code plus deze handoff-update moet nog op de exacte resulterende commit worden uitgevoerd. Er wordt nog geen groene status geclaimd.
+
+### Engineering follow-up — bestaande KD2A-relatietest
+- Full Regression #4325 / run `45606182200` eindigde `completed / failure` op syntaxcorrectiecommit `f9df27ad2900a5619e798c8ded25e5fd76c5355b`: maintained Node-regressie 535 geslaagd, 1 gefaald.
+- Full Regression #4326 / run `45606208976` eindigde eveneens `completed / failure` op handoffcommit `ceb409e70f9b39d30becf8ecd9898096557a819a`, met dezelfde ene fout.
+- Exacte fout: `test/reading-comprehension-bees.test.js:45` verwachtte voor KD2A-0009 alleen `bees-reading-01`, terwijl de bewust goedgekeurde nieuwe relatie ook `moon-origin-reading-01` bevat.
+- Dit was een verouderde testverwachting na een expliciete curriculumrelatie, niet een reden om de relatie of de testdekking te verwijderen.
+- Testcorrectiecommit: `978adf761d700500aa9bfba54f24800b3240d692`. De test controleert nu afzonderlijk KD2A-0008 en KD2A-0009 en blijft voor beide `coverage_status: unassessed` eisen. De inhoudelijke runtime, vragen en beoordelingsregels zijn niet aangepast.
+- Full Regression op de testcorrectie plus deze handoff-update moet nog op de exacte resulterende commit worden geverifieerd. Totdat die run `completed / success` toont, blijft de bouwstatus niet-groen.

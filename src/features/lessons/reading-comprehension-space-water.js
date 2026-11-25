@@ -62,11 +62,11 @@ export const SPACE_WATER_READING_EXERCISE = Object.freeze({
     Object.freeze({
       heading: 'Water uit asteroïden',
       paragraphs: Object.freeze([
-        'In het jonge zonnestelsel zweefden nog veel stukken gesteente en ijs rond. Sommige daarvan botsten op de jonge aarde. Asteroïden bestaan vooral uit gesteente en metaal. Sommige bevatten ook water, bijvoorbeeld in mineralen of als ijs.',
+        'In het jonge zonnestelsel zweefden nog veel stukken gesteente en ijs rond. Sommige daarvan botsten op de jonge aarde. Asteroïden zijn rotsachtige hemellichamen. Sommige bevatten ook water, bijvoorbeeld in mineralen of als ijs.',
         'Wanneer een waterrijke asteroïde op de aarde botste, kon dat water aan onze planeet worden toegevoegd. Onderzoekers bestuderen het water in oceanen en vergelijken de kenmerken daarvan met materiaal uit de ruimte. Veel aanwijzingen wijzen erop dat asteroïden een belangrijke bron van het water op aarde zijn.'
       ]),
       images: Object.freeze([SPACE_WATER_READING_IMAGES.asteroid]),
-      sourceIds: Object.freeze(['ocean-worlds', 'water-origin'])
+      sourceIds: Object.freeze(['ocean-worlds', 'water-origin', 'comets'])
     }),
     Object.freeze({
       heading: 'En de kometen?',

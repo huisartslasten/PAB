@@ -30,6 +30,7 @@ test('space water reading exercise provides inline text sources and image-use re
   assert.equal(SPACE_WATER_READING_EXERCISE.sources.length, 6);
   assert.ok(SPACE_WATER_READING_EXERCISE.text.every(section => section.sourceIds.length > 0));
   assert.equal(Object.keys(SPACE_WATER_READING_IMAGES).length, 4);
+  assert.ok(SPACE_WATER_READING_EXERCISE.text[1].sourceIds.includes('comets'));
   for (const image of Object.values(SPACE_WATER_READING_IMAGES)) {
     assert.ok(image.src.startsWith('https://'));
     assert.ok(image.sourceUrl.startsWith('https://'));

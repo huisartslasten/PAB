@@ -10239,3 +10239,11 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 1. Controleer Full Regression op de exacte commit met deze handoff-update.
 2. Bij rood: stop en isoleer de exacte oorzaak; wijzig geen tests om alleen de regressie groen te maken.
 3. Bij groen: controleer de oefening in de ontwikkelomgeving. Voeg geen extra vragen, functies, curriculumkoppelingen of vormgevingswijzigingen toe zonder expliciete opdracht.
+
+### Engineering follow-up — Full Regression #4323 en syntaxcorrectie
+- Full Regression #4323 / run `45606044176` eindigde `completed / failure` op bouwcommit `d01f45612e1cb328efe7a4ba2a4add8c13149852`.
+- De curriculum-, architectuur- en Double or Nothing-stappen waren geslaagd. De maintained Node-regressie stopte bij het laden van het curriculumregister; 527 tests slaagden en drie testbestanden faalden door dezelfde importfout. Browserregressie en clean-working-tree-controle zijn daardoor overgeslagen.
+- Exacte oorzaak: ontbrekende komma na `coverage_note` in de nieuwe KD2A-0009-record in `src/features/curriculum/vertical-learning-lines-registry.js`, waardoor Node een `SyntaxError: Unexpected identifier 'status'` meldde. Dit was een code-/syntaxfout, geen runtime-, test-, schema- of CI/environmentprobleem.
+- Alleen de ontbrekende komma is hersteld; herstelcommit: `f9df27ad2900a5619e798c8ded25e5fd76c5355b`. De bestaande tests zijn niet aangepast om de fout te maskeren.
+- Browser proof #909 / run `45606044179` op de oorspronkelijke bouwcommit `d01f45612e1cb328efe7a4ba2a4add8c13149852` was bij deze registratie nog `in_progress`; deze run verifieert de syntaxcorrectie niet.
+- Full Regression op de gecorrigeerde code plus deze handoff-update moet nog op de exacte resulterende commit worden uitgevoerd. Er wordt nog geen groene status geclaimd.

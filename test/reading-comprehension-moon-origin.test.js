@@ -42,7 +42,7 @@ test('moon origin exercise is registered centrally without claiming verified cur
   assert.deepEqual(exercise.route, { page: 'reading-comprehension-moon-origin.html' });
   assert.equal(exercise.kind, 'non_formal_learning_activity');
   assert.deepEqual(verticalLearningLinesRegistry.getObjective('KD2A-0008').exercise_ids, []);
-  assert.deepEqual(verticalLearningLinesRegistry.getObjective('KD2A-0009').exercise_ids, ['bees-reading-01', 'moon-origin-reading-01', 'space-water-origin-reading-01']);
+  assert.deepEqual(verticalLearningLinesRegistry.getObjective('KD2A-0009').exercise_ids, ['bees-reading-01', 'moon-origin-reading-01', 'space-water-origin-reading-01', 'exercise-0001']);
   assert.equal(verticalLearningLinesRegistry.getObjective('KD2A-0008').coverage_status, 'unassessed');
   assert.equal(verticalLearningLinesRegistry.getObjective('KD2A-0009').coverage_status, 'unassessed');
 });

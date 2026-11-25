@@ -20,15 +20,15 @@ test('Mars life reading exercise has a short group 8 text and five text-based qu
   }
   assert.deepEqual(MARS_LIFE_READING_EXERCISE.questions.map(question => question.correctOptionId), ['A', 'B', 'B', 'A', 'A']);
   const allText = MARS_LIFE_READING_EXERCISE.text.flatMap(section => [section.heading, ...section.paragraphs]).join(' ');
-  assert.match(allText, /Cheyava Falls/);
+  assert.match(allText, /In 2024 ontdekte de ruimtewagen Perseverance een bijzondere steen/);
   assert.match(allText, /september 2025/);
   assert.match(allText, /bijzondere stoffen en patronen/);
   assert.doesNotMatch(allText, /biosignaturen/i);
   const allQuestionContent = MARS_LIFE_READING_EXERCISE.questions.map(question => [question.prompt, question.explanation, ...question.options.map(option => option.text), ...question.distractorRationales.map(item => item.reason)].join(' ')).join(' ');
   assert.doesNotMatch(allQuestionContent, /biosignaturen/i);
-  assert.match(allText, /gewone chemische reacties/);
+  assert.match(allText, /Dezelfde stoffen kunnen namelijk ook ontstaan zonder dat er levende wezens zijn/);
   assert.match(allText, /Diep onder de grond/);
-  assert.match(allText, /Toch blijft Mars een interessante plek/);
+  assert.match(allText, /Toch weten wetenschappers nog niet zeker of er ooit leven is geweest/);
 });
 
 test('Mars exercise provides traceable text sources and NASA image-use records', () => {

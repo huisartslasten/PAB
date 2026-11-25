@@ -10255,3 +10255,11 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Dit was een verouderde testverwachting na een expliciete curriculumrelatie, niet een reden om de relatie of de testdekking te verwijderen.
 - Testcorrectiecommit: `978adf761d700500aa9bfba54f24800b3240d692`. De test controleert nu afzonderlijk KD2A-0008 en KD2A-0009 en blijft voor beide `coverage_status: unassessed` eisen. De inhoudelijke runtime, vragen en beoordelingsregels zijn niet aangepast.
 - Full Regression op de testcorrectie plus deze handoff-update moet nog op de exacte resulterende commit worden geverifieerd. Totdat die run `completed / success` toont, blijft de bouwstatus niet-groen.
+
+### Engineering follow-up — gedeeld image-array contract
+- Full Regression #4327 / run `45606313377` eindigde `completed / failure` op commit `978adf761d700500aa9bfba54f24800b3240d692`; 536 maintained Node-tests en 122 browser-tests slaagden, maar de nieuwe maan-browser-test faalde bij het ontbreken van de templateversiebadge.
+- Full Regression #4328 / run `45606359769` eindigde eveneens `completed / failure` op handoffcommit `e2aa51a5e59849b47db5d0ede23023336e607bdb`, met dezelfde browserfout.
+- Exacte oorzaak na inspectie van de gedeelde runtime: `renderText()` leest `textSection.images.length`. De maanconfiguratie had geen `images`-property; daardoor stopte de runtime vóór het monteren van de centrale template. De bestaande bee- en space-waterconfiguraties leveren altijd een array.
+- Oplossing: alle vier de maan-tekstonderdelen leveren nu expliciet `images: Object.freeze([])`. De gedeelde runtime, CSS, template en browserasserties zijn niet aangepast.
+- De unit-test controleert nu ook dat elk tekstonderdeel een `images`-array bevat. Correctiecommit: `44099d57bf48f65ba0a117da47fcc8d29f969807`.
+- Full Regression op deze configuratiecorrectie en de volgende handoff-update moet nog op de exacte resulterende commit worden geverifieerd. Er wordt nog geen groene status geclaimd.

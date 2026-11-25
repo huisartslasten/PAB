@@ -81,3 +81,18 @@ Tests:
 The TEST registry rows `pacogo-curriculum@0.3.0-candidate` and `pacogo-curriculum@0.4.0-candidate` were inserted and verified. Version 0.4 supersedes 0.3, includes B3, and is sourced from `docs/curriculum/PacoGO_Curriculum_Registry_v0.4.json`. These were registry-data inserts only; no schema migration was required. Learner profiles, guardian links, evidence, longitudinal state and decision traces remain at zero rows. LIVE was not touched.
 
 The B1 catalogue remains a three-task operational practice slice. B2 and B3 each have a fourteen-task operational practice catalogue across seven candidate developments. The reusable Quantity Representation interface separates its pedagogical model from its visual renderer; the current first slice is display-only. These catalogues and interface are not empirical validation or a complete grade-six recovery curriculum. The SLO mapping remains the source of truth; the executable registry currently contains A1, B1, B2, B3 and FR2. Continue implementing the remaining mapped skills along their full developmental lines.
+
+
+## Security correction — forged transaction-local GUC (25 November 2026)
+
+A security review found that PostgreSQL custom settings are caller-settable. The former `app.pacogo_learning_cycle_write` transaction-local setting was therefore not a trustworthy write capability: an authenticated guardian could set it manually and satisfy the RLS write predicate. The earlier statement that direct writes were denied whenever the RPC had not set this value was incomplete and is superseded by this correction.
+
+The corrected persistence boundary is:
+
+- `public.persist_curriculum_learning_cycle` remains `SECURITY INVOKER` and remains the public application entry point.
+- It delegates the atomic evidence/state/decision-trace operation to `private.persist_curriculum_learning_cycle`, a narrowly scoped `SECURITY DEFINER` helper in the non-exposed `private` schema.
+- The private helper independently checks that `auth.uid()` is present and that the caller is a guardian linked to the supplied learner key before performing any write. It uses an empty pinned `search_path`.
+- Authenticated clients have no direct INSERT/UPDATE/DELETE privileges on `student_evidence`, `student_longitudinal_state` or `curriculum_decision_trace`. The former GUC-based write policies and helper are removed.
+- The complete evidence/state/decision-trace operation remains atomic. Direct table DML must fail even if the caller sets the former custom GUC manually. The public invoker RPC must continue to succeed for an authorized guardian and reject cross-guardian access.
+
+This is a security correction to the persistence implementation. It does not change learner identity, curriculum semantics, evidence contracts, mastery rules or the public RPC payload contract.

@@ -240,3 +240,26 @@ Deze 30%-grens is een voorlopige PacoGO-ontwerpregel voor inhoudelijke curriculu
 
 ### 14.4 Herbeoordeling van bestaande relaties
 Bestaande oefenrelaties zijn niet automatisch grandfathered. Beoordeel ze opnieuw aan deze regel voordat ze als inhoudelijk bevestigde koppeling worden behandeld. Verwijder of wijzig bestaande relaties pas na die afzonderlijke itemanalyse en volgens de normale regression-first workflow.
+
+
+## 15. Verplichte signaalwoorden-vraag bij begrijpend lezen
+
+Iedere PacoGO-oefening begrijpend lezen bevat minimaal **één inhoudelijk beoordeelde vraag over een signaalwoord en het tekstverband dat dit woord in de gekozen context aangeeft**. Deze vraag is een vaste didactische eis en wordt niet overgeslagen.
+
+### 15.1 Vraagopbouw
+1. Geef waar nodig een korte, leerlinggerichte uitleg van het betreffende tekstverband (bijvoorbeeld tegenstelling, opsomming, voorbeeld, vergelijking, uitleg/reden, samenvatting of conclusie).
+2. Kies een daadwerkelijke zin uit de leestekst waarin een relevant signaalwoord voorkomt.
+3. Laat het signaalwoord duidelijk aanwijzen of benoemen.
+4. Vraag wat het signaalwoord **in deze zin en context** betekent of welk verband het aangeeft.
+5. Maak het verwachte antwoord, de inhoudelijke onderbouwing en eventuele afleiders vooraf expliciet.
+
+### 15.2 Kwaliteitsvoorwaarden
+- Toets betekenis en functie in context; niet uitsluitend het herkennen of reproduceren van een los woord.
+- Gebruik een signaalwoord dat daadwerkelijk in de leestekst voorkomt. Verzin geen voorbeeldzin die niet tot de tekst behoort.
+- De korte uitleg ondersteunt de leerling, maar verklapt niet het antwoord op de vraag.
+- Meerkeuze-afleiders zijn inhoudelijk plausibel en vertegenwoordigen waar passend andere tekstverbanden.
+- Houd rekening met contextafhankelijkheid: leid het tekstverband af uit de volledige zin en de relatie met de omliggende informatie; ken een woord niet automatisch één vaste functie toe.
+- Varieer de behandelde tekstverbanden over de totale verzameling oefeningen. Niet iedere afzonderlijke oefening hoeft alle categorieën te behandelen.
+- Controleer dat de vraag geen dubbelzinnige interpretatie heeft en dat het antwoord door de tekstcontext wordt ondersteund.
+
+Deze eis introduceert geen aparte bouwmodule, pagina, Learning Interface, curriculumdoel, skill, claim, evidence target, runtime of masteryregel. De bestaande centrale paginatemplate, begrijpend-lezenruntime, curriculumcontracten en kwaliteitschecklist blijven leidend.

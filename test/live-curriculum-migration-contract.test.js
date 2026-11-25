@@ -54,7 +54,7 @@ test('LIVE curriculum migration preserves the authenticated learner ownership an
   assert.match(sql, /revoke insert, update, delete on public\.curriculum_decision_trace from authenticated/i);
   assert.match(sql, /drop function if exists private\.learner_cycle_write_enabled\(\)/i);
   const finalRpcStart = sql.lastIndexOf('create or replace function public.persist_curriculum_learning_cycle(');
-  const finalRpcEnd = sql.indexOf('\\n' + '
+  const finalRpcEnd = sql.indexOf(String.fromCharCode(10) + '$' + '$' + ';', finalRpcStart);
   assert.ok(finalRpcStart >= 0 && finalRpcEnd > finalRpcStart, 'Final SECURITY INVOKER RPC definition must be present');
   assert.doesNotMatch(sql.slice(finalRpcStart, finalRpcEnd), /pacogo_learning_cycle_write|set_config/i);
   assert.match(sql, /learner_profiles_key_is_uuid/);

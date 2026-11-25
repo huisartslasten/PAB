@@ -14,7 +14,7 @@ export const SPACE_WATER_READING_IMAGES = Object.freeze({
     alt: 'Een gedetailleerd beeld van het oppervlak van asteroïde Bennu.',
     caption: 'Asteroïde Bennu, gefotografeerd door de ruimtesonde OSIRIS-REx.',
     author: 'NASA/Goddard/University of Arizona',
-    sourceUrl: 'https://science.nasa.gov/gallery/osiris-rex-full-mission-gallery/',
+    sourceUrl: 'https://science.nasa.gov/resource/bennu-mosaic/',
     license: 'NASA media usage guidelines',
     licenseUrl: 'https://www.nasa.gov/nasa-brand-center/images-and-media/',
     fit: 'contain'
@@ -24,7 +24,7 @@ export const SPACE_WATER_READING_IMAGES = Object.freeze({
     alt: 'Komeet 67P, gefotografeerd door de navigatiecamera van de Rosetta-missie.',
     caption: 'Bronvermelding: ESA - European Space Agency (Rosetta/NAVCAM). Ongewijzigd weergegeven.',
     author: 'ESA - European Space Agency (Rosetta/NAVCAM)',
-    sourceUrl: 'https://www.esa.int/media/comet-on-21-march-2015-navcam',
+    sourceUrl: 'https://www.esa.int/ESA_Multimedia/Images/2015/03/Comet_on_21_March_2015_NavCam',
     license: 'CC BY-SA 3.0 IGO',
     licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/igo/',
     fit: 'contain'

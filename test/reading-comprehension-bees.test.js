@@ -40,8 +40,8 @@ test('the reading exercises link only to relevant KD2A objectives without claimi
   const exercise = verticalLearningLinesRegistry.getExercise('bees-reading-01');
   assert.deepEqual(exercise.route, { page: 'reading-comprehension-bees.html' });
   assert.equal(exercise.kind, 'non_formal_learning_activity');
-  assert.deepEqual(verticalLearningLinesRegistry.getObjective('KD2A-0008').exercise_ids, ['bees-reading-01']);
-  assert.deepEqual(verticalLearningLinesRegistry.getObjective('KD2A-0009').exercise_ids, ['bees-reading-01', 'moon-origin-reading-01']);
+  assert.deepEqual(verticalLearningLinesRegistry.getObjective('KD2A-0008').exercise_ids, ['bees-reading-01', 'moon-origin-reading-01', 'space-water-origin-reading-01']);
+  assert.deepEqual(verticalLearningLinesRegistry.getObjective('KD2A-0009').exercise_ids, ['bees-reading-01', 'moon-origin-reading-01', 'space-water-origin-reading-01']);
   for (const id of ['KD2A-0008', 'KD2A-0009']) {
     assert.equal(verticalLearningLinesRegistry.getObjective(id).coverage_status, 'unassessed');
   }

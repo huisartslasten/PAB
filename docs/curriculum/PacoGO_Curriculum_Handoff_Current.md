@@ -10281,3 +10281,23 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Wijziging omvat alleen gedeelde leesruntime, gedeelde CSS, browserasserties voor maan- en wateroefening en deze handoff.
 - De codecommit en de daaropvolgende handoffcommit moeten elk op hun exacte SHA met Full Regression worden geverifieerd voordat groen wordt gerapporteerd.
 - Volgende stap: controleer de volledige regression; bij rood eerst de exacte oorzaak isoleren en niet symptoompatchen.
+
+
+## 69. Inhoudelijke herziening koppelingen begrijpend lezen — KD2A-0008 en KD2A-0009 (25 november 2026)
+
+### Besluit op basis van tekst en vragen
+- Curriculumkoppelingen worden bepaald door de leesvaardigheden die tekst en vragen daadwerkelijk aanspreken. Een oefening wordt aan alle relevante doelen gekoppeld; er wordt niet kunstmatig één doel gekozen.
+- KD2A-0008 betreft: hoofdgedachte, hoofd- en bijzaken, thema en strekking bepalen en de betekenis van een tekst weergeven.
+- KD2A-0009 betreft: tekststructuren en verbanden herkennen en benutten, en inferenties maken over niet-letterlijke informatie.
+- **Bijen** blijft gekoppeld aan beide doelen. KD2A-0008: vraag 7 vraagt de hoofdgedachte; KD2A-0009: onder meer vraag 3 combineert informatie over bestuiving en vruchtvorming, vraag 5 verbindt informatie over verschillende bijensoorten en beschermingsmaatregelen, vraag 8 vraagt naar het schrijversdoel en vraag 10 vraagt een uitspraak met tekstinformatie te beoordelen.
+- **Water in de ruimte** wordt toegevoegd aan beide doelen. KD2A-0008: vraag 5 vraagt de hoofdgedachte van de gehele tekst. KD2A-0009: vragen 2–4 vragen om oorzaak-gevolgrelaties, het combineren van aanwijzingen en gevolgtrekkingen over wat nog onbekend is.
+- **Ontstaan van de maan** wordt ook toegevoegd aan KD2A-0008. Vraag 4 vraagt een uitspraak te kiezen die de hoofdverklaring en de resterende onzekerheid van de hele tekst samenvat. De bestaande KD2A-0009-relatie blijft staan: vragen 1 en 3 vragen om gevolgtrekkingen uit tekstverbanden en aanwijzingen.
+- De resulterende oefenrelaties voor beide doelen zijn: `bees-reading-01`, `moon-origin-reading-01` en `space-water-origin-reading-01`.
+- Beide `coverage_status`-waarden blijven `unassessed`. Een relevante oefenrelatie is geen bewijs van volledige doeldekking, mastery of empirische validiteit.
+- Geen tekst, vraag, antwoord, feedback, skill, claim, evidence-contract of inhoudelijke leerdoelomschrijving is gewijzigd.
+
+### Engineering en verificatie
+- Branch: `refactor/professional-v1`; LIVE `main` onaangeroerd.
+- Voorbouwbaseline: Full Regression #4331 / run `45607895554`, `completed / success` op exact HEAD `89a99b9ee5b1d09d5c942828beb17fd2020b6e38`.
+- Gewijzigd: centrale curriculumregistratie, drie bestaande unit-tests en deze handoff.
+- De nieuwe codecommit en daaropvolgende handoffcommit moeten ieder op hun exacte SHA met Full Regression worden geverifieerd.

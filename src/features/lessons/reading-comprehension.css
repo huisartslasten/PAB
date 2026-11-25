@@ -52,3 +52,36 @@
 .reading-comprehension-notice{margin:0 4px 8px}
 .reading-comprehension-visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media(max-width:760px){.reading-comprehension-card{padding:14px}.reading-comprehension-figure{width:min(100%,220px)}.reading-comprehension-text-section p{font-size:14px}}
+
+.reading-comprehension-toolbar{display:flex;justify-content:flex-end;align-items:center}
+.reading-comprehension-print-button{min-width:116px}
+.reading-comprehension-print-version{display:none}
+.reading-comprehension-print-questions{margin-top:24px}
+.reading-comprehension-print-question{margin:0 0 18px;break-inside:avoid}
+.reading-comprehension-print-question h3{margin:0 0 7px;color:#17345f;font:800 16px/1.3 "Baloo 2",Nunito,sans-serif}
+.reading-comprehension-print-options{display:grid;gap:5px;padding-left:28px;color:#263f62;font-size:14px;line-height:1.45;list-style-type:upper-alpha}
+.reading-comprehension-print-answer-lines{display:grid;gap:22px;margin:14px 0 8px}
+.reading-comprehension-print-answer-lines span{display:block;height:1px;border-bottom:1px solid #9baabd}
+@media print{
+  @page{size:A4;margin:16mm}
+  html,body,.paco-page-template{min-height:0!important;background:#fff!important;color:#111!important}
+  .paco-template-hero,.paco-template-sidebar,.paco-template-page-header{display:none!important}
+  .paco-template-body{display:block!important;width:100%!important;margin:0!important;padding:0!important}
+  .paco-template-main,.paco-template-page-content{width:100%!important;margin:0!important;padding:0!important}
+  .reading-comprehension{display:block!important;color:#111!important}
+  .reading-comprehension>:not(.reading-comprehension-print-version){display:none!important}
+  .reading-comprehension-print-version{display:block!important;color:#111!important}
+  .reading-comprehension-print-version .reading-comprehension-card{padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+  .reading-comprehension-print-version h2{margin:0 0 12px!important;color:#111!important;font-size:21px!important}
+  .reading-comprehension-print-version .reading-comprehension-text-section{margin-top:15px!important;break-inside:auto}
+  .reading-comprehension-print-version .reading-comprehension-text-section h3,.reading-comprehension-print-version .reading-comprehension-print-question h3{color:#111!important;break-after:avoid}
+  .reading-comprehension-print-version .reading-comprehension-text-section p{color:#111!important;font-size:11pt!important;line-height:1.45!important;orphans:3;widows:3}
+  .reading-comprehension-print-version .reading-comprehension-figure{width:45%!important;max-width:80mm!important;break-inside:avoid}
+  .reading-comprehension-print-version .reading-comprehension-figure img{max-height:48mm!important;object-fit:contain!important}
+  .reading-comprehension-print-version .reading-comprehension-figure figcaption{color:#333!important}
+  .reading-comprehension-print-version .reading-comprehension-image-credit{color:#555!important}
+  .reading-comprehension-print-question{break-inside:avoid;margin-bottom:17px}
+  .reading-comprehension-print-question .reading-comprehension-question-meta{color:#444!important}
+  .reading-comprehension-print-options{color:#111!important;font-size:10.5pt!important}
+  .reading-comprehension-print-answer-lines span{border-color:#777!important}
+}

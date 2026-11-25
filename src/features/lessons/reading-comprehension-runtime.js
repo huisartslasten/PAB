@@ -126,6 +126,35 @@ function renderText(documentRef) {
   });
   return section;
 }
+function renderPrintVersion(documentRef, textSection) {
+  const printVersion = element(documentRef, 'section', 'reading-comprehension-print-version');
+  printVersion.setAttribute('aria-label', 'Printversie van de volledige les');
+  printVersion.appendChild(textSection.cloneNode(true));
+  const questions = element(documentRef, 'section', 'reading-comprehension-print-questions');
+  questions.appendChild(element(documentRef, 'h2', '', 'Vragen'));
+  BEE_READING_QUESTIONS.forEach((question, index) => {
+    const item = element(documentRef, 'article', 'reading-comprehension-print-question');
+    item.append(
+      element(documentRef, 'p', 'reading-comprehension-question-meta', 'Vraag ' + (index + 1) + ' · ' + (question.type === 'open' ? 'Open vraag' : 'Meerkeuze')),
+      element(documentRef, 'h3', '', question.prompt)
+    );
+    if (question.type === 'multiple_choice') {
+      const options = element(documentRef, 'ol', 'reading-comprehension-print-options');
+      options.type = 'A';
+      question.options.forEach(option => options.appendChild(element(documentRef, 'li', '', option.text)));
+      item.appendChild(options);
+    } else {
+      const lines = element(documentRef, 'div', 'reading-comprehension-print-answer-lines');
+      lines.setAttribute('aria-label', 'Ruimte om het antwoord op te schrijven');
+      for (let line = 0; line < 4; line += 1) lines.appendChild(element(documentRef, 'span'));
+      item.appendChild(lines);
+    }
+    questions.appendChild(item);
+  });
+  printVersion.appendChild(questions);
+  return printVersion;
+}
+
 function renderProgress(documentRef, host, index, total) {
   host.replaceChildren();
   const label = element(documentRef, 'div', 'reading-comprehension-progress-label');
@@ -149,6 +178,11 @@ export function createReadingComprehensionRuntime({ templateMount, context = {},
   if (!templateMount || typeof navigate !== 'function') throw new TypeError('Reading comprehension runtime requires a template mount and navigation owner.');
   const student = String(context?.student || '');
   const content = element(documentRef, 'div', 'reading-comprehension');
+  const printToolbar = element(documentRef, 'div', 'reading-comprehension-toolbar');
+  const printButton = actionButton(documentRef, 'Print PDF', 'secondary', () => documentRef.defaultView?.print?.());
+  printButton.classList.add('reading-comprehension-print-button');
+  printButton.setAttribute('aria-label', 'Print de volledige les als PDF');
+  printToolbar.appendChild(printButton);
   const intro = element(documentRef, 'section', 'reading-comprehension-card reading-comprehension-intro');
   intro.append(element(documentRef, 'p', 'reading-comprehension-kicker', 'PacoGO · Nederlands · Groep 8'), element(documentRef, 'p', '', 'Lees de tekst en beantwoord daarna de tien vragen. Je kunt de tekst altijd opnieuw bekijken.'));
   const textSection = renderText(documentRef);
@@ -158,7 +192,8 @@ export function createReadingComprehensionRuntime({ templateMount, context = {},
   const questionHost = element(documentRef, 'div', 'reading-comprehension-question-host');
   questionSection.append(element(documentRef, 'h2', '', 'Vragen'), progress, questionHost);
   const notice = element(documentRef, 'p', 'reading-comprehension-notice', 'Dit is een niet-formele oefening. Je antwoorden worden niet opgeslagen en tellen niet mee voor een toets, formele beoordeling of mastery-beslissing.');
-  content.append(intro, textSection, questionSection, notice);
+  const printVersion = renderPrintVersion(documentRef, textSection);
+  content.append(printToolbar, intro, textSection, questionSection, notice, printVersion);
 
   let currentIndex = 0;
   let multipleChoiceCorrect = 0;

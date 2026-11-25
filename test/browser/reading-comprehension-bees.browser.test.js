@@ -9,6 +9,14 @@ test('bee reading exercise uses the central page template and completes all ten 
   await expect(page.locator('.paco-template-version-badge')).toHaveText('V7.0');
   await expect(page.locator('.paco-template-main h1')).toHaveText('Begrijpend lezen');
   await expect(page.locator('.paco-template-greeting')).toHaveText('Hoi, Zyon!');
+  await expect(page.getByRole('button', { name: 'Print de volledige les als PDF' })).toBeVisible();
+  await expect(page.locator('.reading-comprehension-toolbar')).toBeVisible();
+  await expect(page.locator('.reading-comprehension-print-version .reading-comprehension-print-question')).toHaveCount(10);
+  await page.emulateMedia({ media: 'print' });
+  await expect(page.locator('.reading-comprehension-print-version')).toBeVisible();
+  await expect(page.locator('.reading-comprehension-print-button')).toBeHidden();
+  await expect(page.locator('.reading-comprehension-questions')).toBeHidden();
+  await page.emulateMedia({ media: 'screen' });
   await expect(page.locator('#readingText h2')).toHaveText('Bijen: belangrijke werkers van onze natuur');
   await expect(page.locator('#readingText .reading-comprehension-text-section')).toHaveCount(7);
   await expect(page.locator('#readingText figure')).toHaveCount(4);

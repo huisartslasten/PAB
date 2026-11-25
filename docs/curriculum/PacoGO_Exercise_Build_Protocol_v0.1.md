@@ -214,3 +214,29 @@ Een aanduiding als 'gratis', 'free download' of 'voor educatief gebruik' is op z
 - Bronvermelding is verplicht waar de bron/licentie dit vereist en blijft daarnaast PacoGO-standaard voor transparantie. Bronvermelding maakt ongeoorloofd gebruik niet alsnog toegestaan.
 
 **Bouwpoort:** een externe afbeelding of tekstbron wordt pas opgenomen nadat de broninhoud en de relevante gebruiksvoorwaarden zijn gecontroleerd. Bij ontbrekende zekerheid wordt het item vervangen of weggelaten. Deze regel geldt ook wanneer het materiaal al in een eerdere conceptversie of chat is voorgesteld.
+
+
+## 14. Kwantitatieve ondergrens voor doelkoppelingen (25 november 2026)
+
+### 14.1 Ontwerpregel
+Een oefening wordt alleen aan een afzonderlijk SLO-tussendoel gekoppeld wanneer **minimaal 30% van de beoordeelde vragen/items** dat specifieke tussendoel daadwerkelijk aanspreekt.
+
+Deze 30%-grens is een voorlopige PacoGO-ontwerpregel voor inhoudelijke curriculumregistratie. Het is geen empirisch gevalideerde norm, geen SLO-norm en geen bewijs van betrouwbaarheid, validiteit, beheersing of volledige dekking.
+
+### 14.2 Tellen en beoordelen
+1. Beoordeel elk tussendoel afzonderlijk; tel geen vragen voor verschillende tussendoelen bij elkaar op om de grens te halen.
+2. De noemer is het totale aantal inhoudelijk beoordeelde/scorende vragen of items in de oefening. Niet-beoordeelde tekst, instructies en louter decoratieve onderdelen tellen niet mee.
+3. De teller bevat alleen items waarbij de leerling de betreffende vaardigheid nodig heeft om het antwoord te bepalen en waarbij de taak daar observeerbaar bewijs voor vraagt.
+4. Een onderwerp, woord, tekstverband of context die alleen in de tekst voorkomt, telt niet als bewijs dat de vraag die vaardigheid aanspreekt.
+5. Tel ieder item maximaal één keer per tussendoel. Eén item kan wel voor meer dan één tussendoel relevant zijn als het antwoord aantoonbaar beide vaardigheden vereist.
+6. De minimale aantallen worden naar boven afgerond: ceil(0,30 × totaal aantal beoordeelde items).
+7. Bij een klein aantal items is de procentuele uitkomst grofmazig. Leg daarom altijd de itemnummers en inhoudelijke motivering vast; het percentage vervangt de inhoudelijke beoordeling niet.
+
+### 14.3 Interpretatie
+- Minder dan 30%: geen curriculumkoppeling met dat tussendoel; hoogstens incidentele aandacht.
+- 30% of meer: de oefening mag als relevante oefening voor dat tussendoel worden geregistreerd, mits de inhoudelijke itemanalyse dit ondersteunt.
+- Een koppeling betekent niet dat het tussendoel volledig wordt gedekt of dat de leerling het beheerst.
+- Volledige of brede doeldekking vereist een afzonderlijke inhoudelijke analyse van de breedte van het doel en het bewijs. De 30%-grens alleen is daarvoor nooit voldoende.
+
+### 14.4 Herbeoordeling van bestaande relaties
+Bestaande oefenrelaties zijn niet automatisch grandfathered. Beoordeel ze opnieuw aan deze regel voordat ze als inhoudelijk bevestigde koppeling worden behandeld. Verwijder of wijzig bestaande relaties pas na die afzonderlijke itemanalyse en volgens de normale regression-first workflow.

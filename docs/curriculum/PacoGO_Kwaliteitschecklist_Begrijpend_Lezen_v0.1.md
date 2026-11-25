@@ -40,6 +40,18 @@ Beoordeel welke leesvaardigheden de oefening daadwerkelijk aanspreekt:
 
 Een losse oefening hoeft niet alle vaardigheden te meten. De verzameling PacoGO-oefeningen moet gezamenlijk een evenwichtige en doelbewuste dekking opbouwen. De beoogde vaardigheid moet aansluiten op het gekozen kerndoel en de relevante tussendoelen; een oppervlakkige overeenkomst is geen doeldekking.
 
+### 3.1 Kwantitatieve ondergrens voor een doelkoppeling
+Gebruik voor ieder afzonderlijk tussendoel de voorlopige PacoGO-ontwerpgrens van **minimaal 30% relevante beoordeelde vragen/items**:
+- Noemer: alle inhoudelijk beoordeelde/scorende vragen/items in de oefening.
+- Teller: alleen items waarvoor de leerling de betreffende vaardigheid daadwerkelijk nodig heeft en waarop het antwoord observeerbaar bewijs vraagt.
+- Minimumaantal: naar boven afronden: ceil(0,30 × totaal aantal beoordeelde items).
+- Beoordeel tussendoelen afzonderlijk; tel items voor verschillende doelen niet samen.
+- Alleen een onderwerp of verband noemen in de tekst telt niet.
+- Onder 30%: geen curriculumkoppeling. Vanaf 30%: mogelijke relevante oefening, mits inhoudelijk onderbouwd.
+- Deze ontwerpgrens is niet empirisch gevalideerd en bewijst geen volledige dekking, beheersing, betrouwbaarheid of validiteit. Leg per koppeling de relevante itemnummers en motivering vast.
+
+Bij een klein aantal items is het percentage grofmazig. De inhoudelijke onderbouwing per item blijft daarom verplicht. Zie ook §14 van het centrale PacoGO Oefeningenbouwprotocol.
+
 ## 4. Vraagkwaliteit
 
 Controleer iedere vraag:

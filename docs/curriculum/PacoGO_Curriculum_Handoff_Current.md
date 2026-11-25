@@ -10301,3 +10301,27 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Voorbouwbaseline: Full Regression #4331 / run `45607895554`, `completed / success` op exact HEAD `89a99b9ee5b1d09d5c942828beb17fd2020b6e38`.
 - Gewijzigd: centrale curriculumregistratie, drie bestaande unit-tests en deze handoff.
 - De nieuwe codecommit en daaropvolgende handoffcommit moeten ieder op hun exacte SHA met Full Regression worden geverifieerd.
+
+
+## 70. Voorlopige 30%-ondergrens voor curriculumkoppelingen (25 november 2026)
+
+### Besluit
+- De gebruiker heeft ingestemd met een **30%-ondergrens** als voorlopige PacoGO-ontwerpregel voor het koppelen van een oefening aan een afzonderlijk SLO-tussendoel.
+- Beoordeel ieder tussendoel afzonderlijk. De noemer is het aantal beoordeelde/scorende items; de teller telt alleen items waarvoor de leerling die specifieke vaardigheid daadwerkelijk nodig heeft en waarop de taak observeerbaar bewijs vraagt.
+- Minimumaantal relevante items: naar boven afronden met ceil(0,30 × totaal aantal beoordeelde items).
+- Een item mag per afzonderlijk tussendoel maximaal één keer tellen. Het mag bij meer dan één tussendoel meetellen als de taak aantoonbaar meerdere vaardigheden vereist.
+- Minder dan 30% betekent geen curriculumkoppeling; vanaf 30% kan een koppeling worden geregistreerd als de inhoudelijke itemanalyse dit ondersteunt.
+- Een doelkoppeling betekent niet dat het doel volledig wordt gedekt of dat een leerling het beheerst. Volledige doeldekking vraagt afzonderlijke inhoudelijke beoordeling.
+- De grens is een voorlopige ontwerpregel, geen empirisch gevalideerde norm, geen officiële SLO-norm en geen bewijs van validiteit of betrouwbaarheid.
+- Vastgelegd in PacoGO_Exercise_Build_Protocol_v0.1.md §14 en PacoGO_Kwaliteitschecklist_Begrijpend_Lezen_v0.1.md §3.1.
+
+### Gevolg voor bestaande begrijpend-lezenoefeningen
+- De huidige relaties van Bijen, Water in de ruimte en Ontstaan van de maan met KD2A-0008 en KD2A-0009 moeten opnieuw per vraag/item worden geteld en inhoudelijk beoordeeld tegen de 30%-grens.
+- De bestaande relaties worden niet automatisch als geldig beschouwd en ook niet zonder analyse verwijderd. De centrale registratie blijft ongewijzigd totdat die itemanalyse is afgerond.
+- De huidige status unassessed blijft behouden; een geregistreerde relatie is geen claim van volledige dekking.
+
+### Engineering en verificatie
+- Branch: refactor/professional-v1; LIVE main onaangeroerd.
+- Voorbouwbaseline: Full Regression #4332 / run 45608406397, completed / success op exact HEAD a7ee4081a43a340e2883406da945b9a2f93d591c.
+- Deze stap wijzigt alleen het centrale bouwprotocol, de checklist voor begrijpend lezen en deze handoff. Er zijn geen curriculumrelaties, runtimecode, tests, studentdata of Supabase-contracten gewijzigd.
+- De resulterende handoffcommit moet op de exacte SHA met Full Regression worden geverifieerd voordat de documentwijziging als afgerond wordt gemeld.

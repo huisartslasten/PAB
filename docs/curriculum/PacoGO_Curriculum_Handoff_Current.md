@@ -10156,3 +10156,46 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 1. Voer Full Regression uit op de commit met de protocol- en handoffwijzigingen.
 2. Bij rood: stop, isoleer de exacte oorzaak en bepaal of die uit code, test, architectuurcontract, data/schema of CI/environment komt. Niet symptoom-patchen.
 3. Bij groen: pas de bron- en beeldrechtencontrole toe bij de volgende expliciet goedgekeurde oefenbouw.
+
+## 66. Eerste korte begrijpend-lezenoefening — De ruimte: oorsprong van water (24 november 2026)
+
+### Gebouwd
+- Nieuwe oefening: **De ruimte – Waar komt al het water op aarde vandaan?**
+- Serieaanduiding: **DE RUIMTE**; lengte-aanduiding: **KORT**; doelgroep: groep 8.
+- Stabiele oefen-ID: `space-water-origin-reading-01`.
+- Pagina: `reading-comprehension-space-water.html`.
+- De oefening bevat vijf tekstonderdelen, vier afbeeldingen en vijf tekstgebonden meerkeuzevragen.
+- De antwoordvolgorde voor de vijf vragen is B, C, B, D, C. Per vraag zijn tekstbewijs, uitleg van het juiste antwoord en verklaringen voor de afleiders vastgelegd.
+- De oefening is als `non_formal_learning_activity` geregistreerd. Er zijn geen KD2A-0008- of KD2A-0009-koppelingen toegevoegd en er wordt geen curriculumdekking of mastery geclaimd.
+
+### Centrale hergebruik
+- De bestaande centrale PacoGO-paginatemplate V7.0 wordt gebruikt.
+- De bestaande gedeelde begrijpend-lezenruntime en `reading-comprehension.css` worden gebruikt; de bijenoefening blijft de standaardconfiguratie en is niet vervangen.
+- De nieuwe oefening wordt via de bestaande router aan dezelfde runtime gekoppeld met een oefenconfiguratie. Er is geen afzonderlijke renderer of nieuwe paginatemplate gemaakt.
+- De printweergave gebruikt de bestaande printfunctionaliteit.
+
+### Bronnen en afbeeldingen
+- Tekstuele bronnen zijn per tekstonderdeel inline gekoppeld en daarnaast als bronnenlijst opgenomen.
+- Vier beelditems zijn opgenomen met maker/credit, directe bronpagina en gebruiksvoorwaarden:
+  - Jonge aarde — NASA, bronpagina *Artist Concept of an Early Earth*; NASA Media Usage Guidelines.
+  - Asteroïde Bennu — NASA/Goddard/University of Arizona; directe bronpagina *Bennu Mosaic*; NASA Media Usage Guidelines.
+  - Komeet 67P — ESA/Rosetta/NAVCAM; CC BY-SA 3.0 IGO, met vereiste ESA-vermelding, licentielink en vermelding dat het beeld ongewijzigd is weergegeven.
+  - Waterkringloop — NASA Scientific Visualization Studio; NASA SVS geeft aan dat de inhoud publiek domein is tenzij een item anders vermeldt; credits voor Deborah McLean en Marit Jentoft-Nilsen zijn opgenomen.
+- De bronlinks voor Bennu en de ESA-afbeelding zijn aangescherpt naar de specifieke oorspronkelijke bronpagina's in commit `1460fa9376cabec84d96349268aaa6438d9559a3`.
+- NASA Media Usage Guidelines zijn geen Creative Commons-licentie. Gebruik blijft onderworpen aan de NASA-voorwaarden, waaronder geen impliciete NASA-goedkeuring of promotionele associatie. De ESA-afbeelding blijft onderworpen aan de ShareAlike-voorwaarde; zij is ongewijzigd opgenomen.
+- Externe bron- en beeldrechten zijn voor deze vier items gecontroleerd; dit is geen algemene vrijwaring voor toekomstig gebruik of andere media.
+
+### Engineering en verificatie
+- Branch: `refactor/professional-v1`; LIVE `main` niet aangeraakt.
+- Bouwcommit: `d40337a1f312cbafe7124aa8b9ce4eb4dd5ff0f9`; daarna volgden gerichte correcties aan herbruikbare configuratie, tests, ESA-attributie en bronverwijzingen.
+- Laatste inhoudelijke bronlinkcommit: `1460fa9376cabec84d96349268aaa6438d9559a3`.
+- Full Regression #4315 / run `45541095759` is `completed / success` op commit `4840ca08b15153e3de0fb5d2ca081556bec34f46`.
+- Na de laatste bronlinkcorrectie is browser proof run `45541473676` `completed / success` op commit `1460fa9376cabec84d96349268aaa6438d9559a3`.
+- Full Regression run `45541473668` op diezelfde commit is bij deze handoff-update nog `in_progress`; de curriculum-, architectuur-, maintained Node- en migrated Node-stappen zijn geslaagd, browserregressie loopt nog. Er wordt dus nog geen groene Full Regression-status voor commit `1460fa9376cabec84d96349268aaa6438d9559a3` geclaimd.
+- Geen Supabase-schema, runtime-persistencecontract, studentdata of bestaande curriculumdoelen gewijzigd.
+
+### Volgende concrete stap
+1. Wacht op Full Regression run `45541473668` voor commit `1460fa9376cabec84d96349268aaa6438d9559a3`.
+2. Bij rood: stop, isoleer de exacte oorzaak en classificeer die voordat er iets wordt aangepast.
+3. Bij groen: verifieer deze handoff-update met een nieuwe Full Regression op de handoffcommit.
+4. Laat de gebruiker daarna de oefening in de ontwikkelomgeving bekijken. Voeg geen extra vragen, functies, curriculumkoppelingen of vormgevingswijzigingen toe zonder expliciete opdracht.

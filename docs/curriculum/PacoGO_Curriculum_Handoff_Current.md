@@ -10046,3 +10046,53 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 
 **Volgende concrete stap**
 - Voer Full Regression uit op de nieuwe documentatiecommit. Bij rood: stop en isoleer de oorzaak; bij groen is de checklist formeel vastgelegd en beschikbaar voor toekomstige begrijpend-lezenoefeningen.
+---
+
+## 64. Eerste begrijpend-lezenoefening groep 8 — bijen (25 november 2026)
+
+**Actuele projectstatus**
+- De eerste niet-formele begrijpend-lezenoefening voor groep 8 is gebouwd op basis van de goedgekeurde bijentekst versie 2 en de tien goedgekeurde vragen.
+- De oefening is beschikbaar via reading-comprehension-bees.html en heeft de stabiele exercise-ID bees-reading-01.
+- De oefening gebruikt de bestaande centrale PacoGO-paginatemplate (layoutMode: practice). Er is geen generieke begrijpend-lezenbouwer, aparte renderer of nieuwe Learning Interface toegevoegd.
+
+**Afgerond**
+- Tekstredactie: titel aangepast naar “Bijen: belangrijke werkers van onze natuur”; uitleg van de stempel van de stamper gepreciseerd; formulering over wilde bijensoorten en voedselgewassen genuanceerd.
+- Zeven tekstonderdelen opgenomen.
+- Vier natuurgetrouwe bijenfoto’s opgenomen met bron- en licentievermelding:
+  - Bij op bloem — TylerMascola, CC0 1.0: https://commons.wikimedia.org/wiki/File:Bee_pollinating_flower.png
+  - Honingbijen bij kolonie — Ken Thomas, publiek domein: https://commons.wikimedia.org/wiki/File:Honeybees-27527-1.jpg
+  - Solitaire bij — Alvesgaspar, CC BY-SA 3.0: https://commons.wikimedia.org/wiki/File:Solitary_bee-1.jpg
+  - Bij bij bijenhotel — Heath Hunter, CC BY-SA 4.0: https://commons.wikimedia.org/wiki/File:Megachile_aurifrons_using_bee_hotel.jpg
+- Tien vragen opgenomen: acht meerkeuzevragen met directe feedback en twee open vragen met voorbeeldantwoord en drie zelfcontrolecriteria per vraag.
+- De open antwoorden worden niet automatisch beoordeeld. De getoonde punten zijn zelfcontrole, geen formele beoordeling.
+- De oefening slaat geen antwoorden of leerlingresultaten op en schrijft geen formele evidence of mastery.
+- De oefenroute is gekoppeld aan KD2A-0008 en KD2A-0009. Beide doelregistraties blijven unassessed; de koppeling claimt geen volledige SLO-dekking.
+
+**Belangrijke besluiten en afbakening**
+- Geen nieuwe Skills, developments, claims, evidence targets, task models, masteryregels, studentdata of Supabase-objecten toegevoegd of gewijzigd.
+- De oefening is een niet-formele leeractiviteit (non_formal_learning_activity).
+- De afbeeldingen worden vanaf Wikimedia Commons geladen; de pagina vereist internettoegang voor weergave van de foto’s. Bij een mislukte afbeeldingsaanvraag verschijnt een tekstuele fallback.
+- De tekst en vragen zijn didactisch ontworpen en technisch getest, maar de oefening is niet empirisch gevalideerd met leerlingdata. De KD2A-koppeling is geen bewijs van doelbeheersing.
+- De eerdere checklistregistratie in sectie 63 is geverifieerd door Full Regression #4301 / run 45513655421 op commit dc542cff4f64b5a83d64bf0ae550375788bfe2d4.
+
+**Engineering en verificatie**
+- Branch: refactor/professional-v1; LIVE main is niet aangeraakt.
+- Eerste implementatiecommit: d89cdbe5293d444c47664a082a1951ef3b066f02.
+- Correctie van het tekstbewijs bij vraag 3: 894d0b676222dcb22b962879d8e232b76ea4ce88.
+- Correctie van de browser-testinteractie voor de drie open-antwoordcriteria: 4167a4e65c2421fc97e1507de4adae1e6a49896a.
+- Full Regression #4304 / run 45520743585: completed / success op exact commit 4167a4e65c2421fc97e1507de4adae1e6a49896a.
+- Gecontroleerd: 530 maintained Node-tests geslaagd, 21 migrated native Node-tests geslaagd, 121 browser-tests geslaagd, curriculum-engine- en architectuurcontroles geslaagd, working-tree-check geslaagd.
+- De handoff-update in deze sectie moet nog zelf door Full Regression worden geverifieerd.
+
+**Openstaande onderzoeksvragen**
+- De oefening is nog niet empirisch onderzocht op moeilijkheid, betrouwbaarheid, validiteit of leerlingprestaties.
+- De open antwoorden hebben een zelfcontrolemodel; automatische inhoudelijke beoordeling is niet ontworpen en mag niet stilzwijgend worden toegevoegd.
+- De biologische tekst is inhoudelijk geredigeerd, maar deze oefenbouw vormt geen volledige onafhankelijke wetenschappelijke factaudit.
+- De historische SLO-groepsindeling blijft een kandidaat-crosswalk; de oefenlink bewijst geen volledige dekking van KD2A-0008 of KD2A-0009.
+
+**Volgende concrete stap**
+1. Voer Full Regression uit op de commit met deze handoff-update.
+2. Bij groen: laat de gebruiker de oefening in de ontwikkelomgeving bekijken en alleen concrete feedback geven.
+3. Voeg geen extra vragen, functies, opslag, curriculumcontracten of vormgevingswijzigingen toe zonder expliciete opdracht.
+4. Bij rood: stop, isoleer de exacte oorzaak en herstel eerst de onderliggende oorzaak.
+

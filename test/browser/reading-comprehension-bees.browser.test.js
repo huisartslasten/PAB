@@ -12,6 +12,8 @@ test('bee reading exercise uses the central page template and completes all ten 
   await expect(page.getByRole('button', { name: 'Print de volledige les als PDF' })).toBeVisible();
   await expect(page.locator('.reading-comprehension-toolbar')).toBeVisible();
   await expect(page.locator('.reading-comprehension-print-version .reading-comprehension-print-question')).toHaveCount(10);
+  await expect(page.locator('#readingText')).toHaveCount(1);
+  await expect(page.locator('#readingTextPrint')).toHaveCount(1);
   await page.emulateMedia({ media: 'print' });
   await expect(page.locator('.reading-comprehension-print-version')).toBeVisible();
   await expect(page.locator('.reading-comprehension-print-button')).toBeHidden();

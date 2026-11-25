@@ -129,7 +129,9 @@ function renderText(documentRef) {
 function renderPrintVersion(documentRef, textSection) {
   const printVersion = element(documentRef, 'section', 'reading-comprehension-print-version');
   printVersion.setAttribute('aria-label', 'Printversie van de volledige les');
-  printVersion.appendChild(textSection.cloneNode(true));
+  const printTextSection = textSection.cloneNode(true);
+  printTextSection.id = 'readingTextPrint';
+  printVersion.appendChild(printTextSection);
   const questions = element(documentRef, 'section', 'reading-comprehension-print-questions');
   questions.appendChild(element(documentRef, 'h2', '', 'Vragen'));
   BEE_READING_QUESTIONS.forEach((question, index) => {

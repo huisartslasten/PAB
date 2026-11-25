@@ -36,12 +36,12 @@ select set_config(
 -- Provisioning the same stable app key twice must return the same opaque profile key.
 select set_config(
   'test.learner_b_app_key',
-  public.link_app_learner_profile('zenith', current_setting('test.learner_b')),
+  public.link_app_learner_profile('rls-test-learner-b', current_setting('test.learner_b')),
   true
 );
 select set_config(
   'test.learner_b_app_key_repeat',
-  public.create_app_learner_profile('zenith', 'Different display name is not identity'),
+  public.create_app_learner_profile('rls-test-learner-b', 'Different display name is not identity'),
   true
 );
 
@@ -50,12 +50,12 @@ select set_config('request.jwt.claims',
   '{"sub":"a1000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
 select set_config(
   'test.learner_a_app_key',
-  public.link_app_learner_profile('zyon', current_setting('test.learner_a')),
+  public.link_app_learner_profile('rls-test-learner-a', current_setting('test.learner_a')),
   true
 );
 select set_config(
   'test.learner_a_app_key_repeat',
-  public.create_app_learner_profile('zyon', 'Different display name is not identity'),
+  public.create_app_learner_profile('rls-test-learner-a', 'Different display name is not identity'),
   true
 );
 
@@ -71,7 +71,7 @@ begin
   end if;
   if exists (
     select 1 from public.learner_profile_links
-    where app_student_key = 'zyon'
+    where app_student_key = 'rls-test-learner-a'
   ) then
     raise exception 'Parent B can read Parent A PacoGO learner mapping';
   end if;
@@ -218,7 +218,7 @@ begin
 
   if not exists (
     select 1 from public.learner_profile_links
-    where app_student_key = 'zyon'
+    where app_student_key = 'rls-test-learner-a'
       and learner_key = current_setting('test.learner_a')
   ) then
     raise exception 'Parent A cannot read its own PacoGO learner mapping';
@@ -226,7 +226,7 @@ begin
 
   if exists (
     select 1 from public.learner_profile_links
-    where app_student_key = 'zenith'
+    where app_student_key = 'rls-test-learner-b'
   ) then
     raise exception 'Parent A can read Parent B PacoGO learner mapping';
   end if;
@@ -268,7 +268,7 @@ $test$;
 do $test$
 begin
   begin
-    perform public.link_app_learner_profile('zephon', current_setting('test.learner_b'));
+    perform public.link_app_learner_profile('rls-test-learner-cross', current_setting('test.learner_b'));
     raise exception 'Cross-guardian learner-profile linking unexpectedly succeeded';
   exception
     when insufficient_privilege then null;

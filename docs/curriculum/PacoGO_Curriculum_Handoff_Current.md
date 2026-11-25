@@ -10354,3 +10354,26 @@ De drie bestaande oefeningen zijn per afzonderlijke vraag beoordeeld. De volledi
 1. Voer Full Regression uit op de laatste commit van deze wijzigingsreeks.
 2. Bij rood: stop en isoleer de exacte oorzaak voordat iets wordt aangepast.
 3. Bij groen: leg de geverifieerde commit en runstatus vast in deze handoff.
+
+## 72. Afronding herbeoordeling SLO-koppelingen begrijpend lezen — 25 november 2026
+
+### Definitieve uitkomst
+- De herbeoordeling van de drie bestaande korte oefeningen is afgerond volgens de voorlopige PacoGO-ontwerpregel van 30%.
+- KD2A-0008-koppelingen zijn voor Bijen, Water in de ruimte en Ontstaan van de maan verwijderd: respectievelijk 1/10 (10%), 1/5 (20%) en 1/4 (25%).
+- KD2A-0009-koppelingen zijn voor alle drie behouden: respectievelijk 5/10 (50%), 2/5 (40%) en 2/4 (50%).
+- Voor beide doelen blijft `coverage_status: unassessed`. De 30%-grens is een voorlopige PacoGO-ontwerpregel, geen officiële SLO-norm en geen empirisch gevalideerde grens.
+- Er zijn geen teksten, vragen, antwoorden, feedback, skills, claims, evidence-contracten of masteryregels gewijzigd. De centrale registratie en de drie bijbehorende regressietests weerspiegelen de goedgekeurde relaties.
+- De afzonderlijke testcorrecties zijn afgerond; de laatste daarvan is commit `057077693c1d113bb0fef67d081b888d78551c6f`.
+
+### Engineering en verificatie
+- Branch: `refactor/professional-v1`; LIVE `main` is niet aangeraakt.
+- Laatste inhoudelijke/testcommit: `057077693c1d113bb0fef67d081b888d78551c6f`.
+- Full Regression #4338 / run `45612413566` is daadwerkelijk `completed / success` op exact die commit.
+- De branch-HEAD is vóór deze handoff-update gecontroleerd en stond op exact `057077693c1d113bb0fef67d081b888d78551c6f`.
+- Deze handoff-update is de enige wijziging in de volgende commit. Full Regression moet opnieuw worden uitgevoerd op de exacte commit die deze update bevat; tot die run succesvol is afgerond, is de handoff-update zelf nog niet geverifieerd.
+- Geen Supabase-schema, persistencecontract, studentdata of LIVE-code gewijzigd.
+
+### Volgende concrete stap
+1. Verifieer deze handoff-update met Full Regression op de exacte nieuwe commit.
+2. Bij rood: stop en isoleer de exacte oorzaak; wijzig geen tests om alleen de regressie groen te maken.
+3. Bij groen: de formele afronding van deze curriculumkoppelingsstap is compleet. Ga daarna verder met de drie resterende korte KD2-oefeningen, één voor één, beginnend met **Is er ooit leven geweest op Mars? Is er misschien nog steeds leven?** Gebruik eerst de centrale handoff en de bestaande bouw- en kwaliteitschecklists; hergebruik de centrale PacoGO-template en de gedeelde begrijpend-lezenruntime. Voeg geen extra functies, vragen of curriculumkoppelingen toe zonder expliciete opdracht.

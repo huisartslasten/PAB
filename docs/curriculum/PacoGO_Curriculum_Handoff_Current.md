@@ -10325,3 +10325,32 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Voorbouwbaseline: Full Regression #4332 / run 45608406397, completed / success op exact HEAD a7ee4081a43a340e2883406da945b9a2f93d591c.
 - Deze stap wijzigt alleen het centrale bouwprotocol, de checklist voor begrijpend lezen en deze handoff. Er zijn geen curriculumrelaties, runtimecode, tests, studentdata of Supabase-contracten gewijzigd.
 - De resulterende handoffcommit moet op de exacte SHA met Full Regression worden geverifieerd voordat de documentwijziging als afgerond wordt gemeld.
+
+
+## 71. Herbeoordeling SLO-koppelingen begrijpend-lezenoefeningen (25 november 2026)
+
+### Besluit volgens de voorlopige 30%-ontwerpregel
+De drie bestaande oefeningen zijn per afzonderlijke vraag beoordeeld. De volledige vraagconfiguraties van Bijen, Water in de ruimte en Ontstaan van de maan zijn hiervoor gecontroleerd. De noemer is het aantal beoordeelde vragen; de teller bevat alleen vragen die de betreffende vaardigheid daadwerkelijk vereisen en observeerbaar uitlokken.
+
+| Oefening | KD2A-0008 | KD2A-0009 |
+|---|---:|---:|
+| Bijen (10 vragen) | 1/10 = 10% — geen koppeling | 5/10 = 50% — koppeling behouden |
+| Water in de ruimte (5 vragen) | 1/5 = 20% — geen koppeling | 2/5 = 40% — koppeling behouden |
+| Ontstaan van de maan (4 vragen) | 1/4 = 25% — geen koppeling | 2/4 = 50% — koppeling behouden |
+
+- KD2A-0008: alleen de expliciete hoofdgedachte-/samenvattingsvraag per oefening telt. De uitkomsten blijven alle onder de vereiste minimumgrens van 30%.
+- KD2A-0009: de getelde vragen vereisen aantoonbaar verbanden, oorzakelijke relaties of inferenties uit de tekst. De uitkomsten liggen boven de minimumgrens.
+- De auteursdoelvraag in Bijen is niet meegeteld voor KD2A-0009; die hoort inhoudelijk bij een ander doel en wordt hier niet automatisch gekoppeld.
+- De oefenrelaties voor KD2A-0008 zijn daarom verwijderd. De drie relaties voor KD2A-0009 blijven staan.
+- `coverage_status` blijft voor beide doelen `unassessed`. De 30%-regel is een voorlopige PacoGO-ontwerpregel, geen officiële SLO-norm en geen bewijs van volledige doeldekking, mastery, betrouwbaarheid of empirische validiteit.
+
+### Engineering
+- Branch: `refactor/professional-v1`; `main` / LIVE niet aangeraakt.
+- Voor de wijziging is Full Regression run `45609367374` daadwerkelijk als `completed / success` geverifieerd op exact de toenmalige HEAD `bc739460461aa0215ea807f9def47341ca59a13f`.
+- Registry en de bijbehorende regressieassertie zijn aangepast; deze handoff-update documenteert de inhoudelijke beslissing.
+- De nieuwe commits moeten nog afzonderlijk met Full Regression worden geverifieerd. Er wordt voor deze wijzigingscommits nog geen groene status geclaimd.
+
+### Volgende concrete stap
+1. Voer Full Regression uit op de laatste commit van deze wijzigingsreeks.
+2. Bij rood: stop en isoleer de exacte oorzaak voordat iets wordt aangepast.
+3. Bij groen: leg de geverifieerde commit en runstatus vast in deze handoff.

@@ -10499,3 +10499,46 @@ Current branch: `refactor/professional-v1`.
 Last verified code commit: `c50bd5008085dc20158048d8d8e67e1f3ab656fe`.
 Last verified Full Regression: #4364 / `45666457771`, completed success on that exact commit.
 LIVE `main`, Supabase LIVE and `pacogo.org`: unchanged.
+
+
+## 76. Learner persistence security correction — forged custom GUC (25 November 2026)
+
+### Finding
+- During the LIVE migration review, a focused TEST transaction demonstrated that an authenticated guardian could set the custom PostgreSQL setting `app.pacogo_learning_cycle_write` manually and then satisfy the RLS write predicate for direct evidence insertion.
+- The test used synthetic context and was rolled back. Follow-up checks showed zero synthetic evidence/profile/auth records from that experiment. This invalidated the former assumption that the transaction-local GUC was a private write capability.
+- LIVE was not changed.
+
+### Approved correction and implementation
+- The user approved the correction on 25 November 2026.
+- The public `public.persist_curriculum_learning_cycle` remains `SECURITY INVOKER`.
+- The atomic evidence/state/decision-trace writes now run in `private.persist_curriculum_learning_cycle`, a narrowly scoped `SECURITY DEFINER` helper in the non-exposed `private` schema. The helper independently checks `auth.uid()` and guardian membership and pins an empty `search_path`.
+- Direct INSERT/UPDATE/DELETE privileges are revoked from `authenticated` for `student_evidence`, `student_longitudinal_state` and `curriculum_decision_trace`. The old GUC-based write policies and `private.learner_cycle_write_enabled()` helper are removed.
+- The public RPC payload, learner identity model, evidence model, curriculum logic and mastery rules are unchanged.
+- The LIVE-specific consolidated migration `supabase/migrations/20261125180000_add_curriculum_persistence_and_ownership_live.sql` contains the corrected final implementation.
+- TEST corrective migration `20261125184652_harden_learner_cycle_persistence_security` was applied to PacoGO TEST and source-controlled as `supabase/migrations/20261125184652_harden_learner_cycle_persistence_security.sql`.
+- The SQL ownership integration test now includes four direct-DML denial attempts after manually setting the former GUC. Its fixture app keys are isolated from existing TEST roster mappings. The LIVE migration contract test asserts the new helper/invoker boundary and the absence of GUC authorization in the final RPC.
+- `PacoGO_Learner_Ownership_and_Persistence_Contract_v0.1.md` has a dated security addendum explaining that the old GUC assumption is superseded.
+
+### TEST verification
+- TEST project: `btnhhvtpmuvrpbnkyjnm`. Migration history records version `20261125184652`.
+- Post-migration grants were checked: authenticated has no direct INSERT on evidence, no direct UPDATE on longitudinal state, and no direct INSERT on decision trace; authenticated can execute the private atomic helper.
+- Focused transaction tests passed: all four direct DML attempts were denied even with the former GUC forged; the public invoker RPC successfully wrote the complete cycle while the forged GUC remained set; duplicate event replay returned the existing cycle; malformed decision-trace data rolled back evidence and state; cross-guardian persistence was denied.
+- The verification transaction was rolled back. Follow-up counts remained 0 evidence, 0 longitudinal-state rows and 0 decision-trace rows. Existing TEST learner profile, guardian membership and app link counts remained 1 each.
+- Supabase Security Advisors did not flag the new private helper. They reported existing unrelated public SECURITY DEFINER warnings for game-access functions and leaked-password protection disabled; those are outside this correction and were not changed.
+- The complete `supabase/tests/learner_ownership_rls.test.sql` file has not yet been executed end-to-end in this run; the focused SQL checks covered the security boundary, RPC success, idempotency, atomic rollback and guardian denial.
+
+### Regression and release gate
+- Baseline Full Regression #4374 / run `45675619846` was green on `0a0ec726a0464692621f0c02ecd96c6438f16b6d`, before this correction.
+- Current implementation commit: `340f0fbd40838e9ba845b3498ac70a797c13b709`.
+- Full Regression for the current implementation commit is still pending. The available GitHub actions connection in this session did not expose a workflow-dispatch action; the current commit has no reported status checks. Do not claim this commit is green.
+- The handoff update itself also still requires Full Regression verification.
+- No LIVE migration, LIVE data change, deployment or `main` change occurred.
+
+### Next concrete step
+1. Run Full Regression on exact commit `340f0fbd40838e9ba845b3498ac70a797c13b709` and verify this handoff update on its resulting commit.
+2. If regression is green, continue the remaining LIVE release gates: clean-database migration validation, approved restorable LIVE backup and before/after integrity manifest. Do not apply the LIVE migration before those gates are complete.
+
+Current branch: `refactor/professional-v1`.
+Current implementation commit: `340f0fbd40838e9ba845b3498ac70a797c13b709`.
+Last verified Full Regression: #4374 / `45675619846`, green on baseline commit `0a0ec726a0464692621f0c02ecd96c6438f16b6d` only; current implementation regression pending.
+LIVE `main`, Supabase LIVE and `pacogo.org`: unchanged.

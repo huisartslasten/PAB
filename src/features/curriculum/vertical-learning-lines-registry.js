@@ -6782,7 +6782,7 @@ const KD2_OBJECTIVES = Object.freeze([
     objective: 'Hoofdgedachte, hoofd- en bijzaken, thema en strekking bepalen en de betekenis van een tekst in eigen woorden weergeven, passend bij het leesdoel.',
     source_reference: 'SLO 2010, Leerstoflijnen lezen beschreven, hoofdstuk 3.4.3, pp. 157–159',
     source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
-    related_skill_ids: [], exercise_ids: ['bees-reading-01', 'moon-origin-reading-01', 'space-water-origin-reading-01'], coverage_status: 'unassessed',
+    related_skill_ids: [], exercise_ids: [], coverage_status: 'unassessed',
     coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. De SLO-publicatie beschrijft een mogelijke onderwijsopbouw voor groep 7–8; geen officieel groepsdoel uit de kerndoelen 2025.',
     status: 'active'
   },

@@ -43,7 +43,7 @@ export const MARS_LIFE_READING_EXERCISE = Object.freeze({
       heading: 'Een bijzondere steen',
       paragraphs: Object.freeze([
         'De Marswagen Perseverance onderzoekt stenen en grond in een gebied waar vroeger water stroomde. In juli 2024 onderzocht de rover een steen die Cheyava Falls wordt genoemd. In de steen vond hij bijzondere patronen en stoffen die mogelijk iets vertellen over vroegere omstandigheden op Mars.',
-        'In september 2025 maakten wetenschappers bekend dat een meegenomen monster uit deze steen mogelijke biosignaturen bevat. Dat zijn aanwijzingen die bij leven zouden kunnen passen. De ontdekking is belangrijk, maar bewijst niet dat er echt leven is geweest.'
+        'In september 2025 vertelden wetenschappers dat een monster uit deze steen bijzondere stoffen en patronen bevat. Die zijn misschien door leven ontstaan. Maar ze kunnen ook op een andere manier ontstaan. Daarom weten we nog niet of er vroeger echt leven op Mars was.'
       ]),
       images: Object.freeze([MARS_LIFE_READING_IMAGES.rover, MARS_LIFE_READING_IMAGES.rock]),
       sourceIds: Object.freeze(['nasa-cheyava-2024', 'nasa-biosignature-2025'])
@@ -90,7 +90,7 @@ export const MARS_LIFE_READING_EXERCISE = Object.freeze({
     Object.freeze({
       id: 'MARS-Q2',
       type: 'multiple_choice',
-      prompt: 'Waarom bewijzen de mogelijke biosignaturen in de steen nog niet dat er vroeger leven op Mars was?',
+      prompt: 'Waarom weten wetenschappers nog niet zeker of er vroeger leven op Mars was?',
       options: Object.freeze([
         Object.freeze({ id: 'A', text: 'Omdat de rover de steen niet goed heeft kunnen bekijken.' }),
         Object.freeze({ id: 'B', text: 'Omdat zulke stoffen en patronen ook zonder levende wezens kunnen ontstaan.' }),
@@ -109,7 +109,7 @@ export const MARS_LIFE_READING_EXERCISE = Object.freeze({
     Object.freeze({
       id: 'MARS-Q3',
       type: 'multiple_choice',
-      prompt: 'Lees de zin: “Toch blijft Mars een interessante plek om te zoeken.” Het woord ‘toch’ verbindt deze zin met de uitleg dat de mogelijke biosignaturen nog geen bewijs zijn. Welk verband geeft ‘toch’ hier aan?',
+      prompt: 'Lees de zin: “Toch blijft Mars een interessante plek om te zoeken.” Het woord ‘toch’ verbindt deze zin met de uitleg dat de gevonden stoffen en patronen nog geen bewijs voor leven zijn. Welk verband geeft ‘toch’ hier aan?',
       options: Object.freeze([
         Object.freeze({ id: 'A', text: 'Een opsomming: er worden meerdere redenen achter elkaar genoemd.' }),
         Object.freeze({ id: 'B', text: 'Een tegenstelling: ondanks de onzekerheid blijft Mars interessant.' }),
@@ -118,7 +118,7 @@ export const MARS_LIFE_READING_EXERCISE = Object.freeze({
       ]),
       correctOptionId: 'B',
       evidence: 'De overgang tussen de alinea’s in ‘Waarom is er nog geen zekerheid?’.',
-      explanation: 'Eerst staat dat de aanwijzingen nog geen bewijs zijn. De zin met ‘toch’ laat zien dat Mars ondanks die onzekerheid interessant blijft om te onderzoeken.',
+      explanation: 'Eerst staat dat de gevonden stoffen en patronen nog geen bewijs voor leven zijn. De zin met ‘toch’ laat zien dat Mars ondanks die onzekerheid interessant blijft om te onderzoeken.',
       distractorRationales: Object.freeze([
         Object.freeze({ optionId: 'A', reason: 'De zin noemt geen reeks verschillende zaken.' }),
         Object.freeze({ optionId: 'C', reason: 'Het woord geeft hier geen volgorde van gebeurtenissen aan.' }),

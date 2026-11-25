@@ -29,7 +29,11 @@ test('bee reading exercise uses the central page template and completes all ten 
     await question.getByRole('button', { name: 'Vergelijk met voorbeeldantwoord' }).click();
     await expect(question.locator('.reading-comprehension-model-answer')).toBeVisible();
     await expect(question.locator('.reading-comprehension-criterion')).toHaveCount(3);
-    await question.locator('.reading-comprehension-criterion input').check();
+    const criteria = question.locator('.reading-comprehension-criterion input');
+    for (let criterionIndex = 0; criterionIndex < 3; criterionIndex += 1) await criteria.nth(criterionIndex).check();
+    await expect(criteria.nth(0)).toBeChecked();
+    await expect(criteria.nth(1)).toBeChecked();
+    await expect(criteria.nth(2)).toBeChecked();
     await question.getByRole('button', { name: index === 1 ? 'Bekijk resultaat' : 'Volgende vraag' }).click();
   }
   await expect(page.locator('#readingResults')).toBeVisible();

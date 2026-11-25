@@ -10542,3 +10542,23 @@ Current branch: `refactor/professional-v1`.
 Current implementation commit: `340f0fbd40838e9ba845b3498ac70a797c13b709`.
 Last verified Full Regression: #4374 / `45675619846`, green on baseline commit `0a0ec726a0464692621f0c02ecd96c6438f16b6d` only; current implementation regression pending.
 LIVE `main`, Supabase LIVE and `pacogo.org`: unchanged.
+
+
+## 77. Full Regression #4392 — hardened persistence correction verified
+
+Date: 25 November 2026.
+
+- Full Regression #4391 failed on commit `50e30d6eb8a754cfacbcbc516b91302a9314d08f`. Root cause was malformed duplicated fragments in `test/live-curriculum-migration-contract.test.js`: stray `+ '` content and repeated assertions/test blocks after the completed registry test.
+- The intended security and ownership assertions were retained. Only the malformed duplicated tail was removed; no assertion was weakened or removed from the intended test.
+- Correction commit: `4e921a03482a7f4bd9017c66296b436447edca99` on `refactor/professional-v1`.
+- Full Regression #4392 / run `45680211854` completed successfully on that exact commit. All workflow steps passed, including curriculum engine regression, architecture boundary tests, Double or Nothing runtime regression, maintained Node regression, migrated native Node regression, Chromium installation, local fixture server, browser regression, and clean working-tree verification.
+- This verifies the branch commit and its regression suite. It does not complete the LIVE release gates and does not authorize applying the LIVE migration.
+- No changes were made to `main`, Supabase LIVE, or `pacogo.org`.
+
+### Next concrete step
+Continue with read-only preparation and validation of the remaining LIVE release gates: approved clean-database migration validation environment, approved restorable LIVE backup/export, and a before/after integrity manifest for all existing LIVE records and relationships. Ask before creating or using any new Supabase project/branch. Do not apply the LIVE migration until every gate is complete.
+
+Current branch: `refactor/professional-v1`.
+Latest verified commit: `4e921a03482a7f4bd9017c66296b436447edca99`.
+Last verified Full Regression: #4392 / run `45680211854`, green on exact commit `4e921a03482a7f4bd9017c66296b436447edca99`.
+LIVE `main`, Supabase LIVE and `pacogo.org`: unchanged.

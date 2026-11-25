@@ -8,6 +8,9 @@ const routes = readFileSync(new URL('../src/app/routes.js', import.meta.url), 'u
 
 test('central Skills entry renders subject navigation and opens the fraction overview', () => {
   assert.match(runtime, /MATH_SKILL_SUBJECTS/);
+  assert.match(runtime, /renderAreaOverview/);
+  assert.match(runtime, /area === 'math'/);
+  assert.match(routes, /area: url\\.searchParams\\.get\\('area'\\)/);
   assert.match(runtime, /FRACTION_NAVIGATION_TOPICS/);
   assert.match(runtime, /renderFractionAdditionOverview/);
   assert.match(runtime, /topic === 'optellen'/);

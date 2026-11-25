@@ -71,6 +71,7 @@ export function createSkillsRuntime({
   app,
   templateMount,
   context,
+  area = '',
   domain = '',
   topic = '',
   exercise = '',
@@ -84,6 +85,47 @@ export function createSkillsRuntime({
   const student = context?.student || '';
   const content = documentRef.createElement('div');
   let quantitySubtractionPractice = null;
+
+  function openMathSubjects() {
+    navigate(buildViewUrl('skills.html', {
+      student,
+      mode: context?.mode,
+      extra: { area: 'math' }
+    }));
+  }
+
+  function renderAreaOverview() {
+    content.replaceChildren();
+    const card = documentRef.createElement('section');
+    card.className = 'paco-template-card skills-navigation-card skills-area-card';
+    const heading = documentRef.createElement('h2');
+    heading.textContent = 'Leergebieden';
+    const introduction = documentRef.createElement('p');
+    introduction.className = 'skills-navigation-introduction';
+    introduction.textContent = 'Kies een leergebied.';
+    const grid = createPacoTileGrid({ documentRef, className: 'skills-navigation-grid skills-area-grid' });
+
+    grid.appendChild(createPacoTile({
+      documentRef,
+      title: 'Rekenen',
+      description: 'Bekijk de rekenonderwerpen.',
+      icon: '🔢',
+      className: 'skills-navigation-tile skills-area-tile',
+      actionLabel: 'Openen →',
+      onActivate: openMathSubjects
+    }));
+    grid.appendChild(createPacoTile({
+      documentRef,
+      title: 'Nederlands',
+      description: 'De Nederlandse Skills verschijnen hier zodra de centrale catalogus is vastgelegd.',
+      icon: '📚',
+      className: 'skills-navigation-tile skills-area-tile skills-area-tile--pending',
+      meta: 'Catalogus in voorbereiding'
+    }));
+
+    card.append(heading, introduction, grid);
+    content.appendChild(card);
+  }
 
   function openFractions() {
     navigate(buildViewUrl('skills.html', {
@@ -3937,7 +3979,8 @@ export function createSkillsRuntime({
     else if (showingDivision) renderFractionDivisionOverview();
     else if (showingSubtraction) renderFractionSubtractionOverview();
     else if (showingFractions) renderFractionOverview();
-    else renderSubjectOverview();
+    else if (area === 'math') renderSubjectOverview();
+    else renderAreaOverview();
   }
 
   return Object.freeze({

@@ -7,13 +7,20 @@
 
 ## 1. Purpose
 
-The Skills entry point should first show the learner the mathematics topics. Selecting **Breuken** opens the fraction-topic overview. The detailed curriculum content is built only from the existing PacoGO-SLO skills and curriculum sources.
+The Skills entry point first shows two compact learning-area tiles: **Rekenen** and **Nederlands**. Selecting **Rekenen** opens the existing mathematics topic catalogue. Selecting **Breuken** opens the fraction-topic overview. The Nederlands tile remains a non-actionable placeholder until a central Dutch Skills catalogue is formally established. The detailed curriculum content is built only from the existing PacoGO-SLO skills and curriculum sources.
 
 The labels in this document organise navigation. They do not create or rename curriculum Skills, Developments, Claims, Evidence Targets, Task Models or prerequisites.
 
 ## 2. Navigation hierarchy
 
-### 2.1 Mathematics overview
+### 2.1 Learning-area overview
+
+Display two compact tiles, using the shared PacoGO tile and tile-grid components:
+
+1. Rekenen — opens the existing mathematics topic catalogue.
+2. Nederlands — visible but not actionable until the central Dutch Skills catalogue is formally established. Do not derive Skills by treating KD1–KD12 as Skills.
+
+### 2.2 Mathematics overview
 
 Display these 18 topics in this order:
 
@@ -38,7 +45,7 @@ Display these 18 topics in this order:
 
 Only **Breuken** is currently connected to a second navigation level. Other topics remain visible but are not represented as implemented learning routes.
 
-### 2.2 Fraction overview
+### 2.3 Fraction overview
 
 Display these six topics in this order:
 
@@ -74,7 +81,8 @@ Every fraction practice page must additionally comply with the central **PacoGO 
 
 ## 5. Current implementation boundary
 
-- The central Skills page displays all 18 mathematics topics.
+- The central Skills entry first displays two compact learning-area tiles; selecting Rekenen displays all 18 mathematics topics.
+- Nederlands is visible as a non-actionable tile until a central Dutch Skills catalogue is formally established.
 - Selecting Breuken opens the six-topic fraction overview within the same Skills route and canonical page template.
 - Other mathematics topics and the six fraction subtopics are visible but are not yet connected to completed learning content.
 - The previous FR2 detail page is no longer offered from the central Skills entry point. Its route and underlying curriculum artifacts are not deleted by this navigation change.

@@ -23,7 +23,9 @@ test('Mars life reading exercise has a short group 8 text and five text-based qu
   assert.match(allText, /Cheyava Falls/);
   assert.match(allText, /september 2025/);
   assert.match(allText, /bijzondere stoffen en patronen/);
-  assert.doesNotMatch(allText, /biosignaturen/);
+  assert.doesNotMatch(allText, /biosignaturen/i);
+  const allQuestionContent = MARS_LIFE_READING_EXERCISE.questions.map(question => [question.prompt, question.explanation, ...question.options.map(option => option.text), ...question.distractorRationales.map(item => item.reason)].join(' ')).join(' ');
+  assert.doesNotMatch(allQuestionContent, /biosignaturen/i);
   assert.match(allText, /gewone chemische reacties/);
   assert.match(allText, /Diep onder de grond/);
   assert.match(allText, /Toch blijft Mars een interessante plek/);

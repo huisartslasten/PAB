@@ -36,6 +36,13 @@ const EXERCISES = Object.freeze([
     kind: 'non_formal_learning_activity'
   },
   {
+    id: 'space-water-origin-reading-01',
+    label: 'Groep 8 — De ruimte: Waar komt al het water op aarde vandaan?',
+    topic: 'begrijpend-lezen',
+    route: { page: 'reading-comprehension-space-water.html' },
+    kind: 'non_formal_learning_activity'
+  },
+  {
     "id": "fr2-pencil-length-ordering",
     "label": "FR-0002 — potloden van klein naar groot ordenen",
     "topic": "vergelijken-en-ordenen",

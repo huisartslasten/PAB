@@ -64,6 +64,16 @@ export const BEE_READING_QUESTIONS = Object.freeze([
   criteria: question.criteria ? Object.freeze(question.criteria) : undefined
 })));
 
+export const BEE_READING_EXERCISE = Object.freeze({
+  id: 'bees-reading-01',
+  subtitle: exercise.subtitle,
+  textTitle: 'Bijen: belangrijke werkers van onze natuur',
+  textIntro: 'Lees de tekst rustig door. Je mag tijdens het beantwoorden van de vragen steeds teruglezen.',
+  text: BEE_READING_TEXT,
+  questions: BEE_READING_QUESTIONS,
+  sources: Object.freeze([])
+});
+
 function element(documentRef, tag, className = '', text = '') {
   const node = documentRef.createElement(tag);
   if (className) node.className = className;
@@ -83,6 +93,7 @@ function imageFigure(documentRef, image) {
   img.alt = image.alt;
   img.loading = 'lazy';
   img.decoding = 'async';
+  img.style.objectFit = image.fit || 'cover';
   img.addEventListener('error', () => {
     img.hidden = true;
     figure.classList.add('reading-comprehension-figure--unavailable');
@@ -106,14 +117,14 @@ function imageFigure(documentRef, image) {
   figure.append(img, caption);
   return figure;
 }
-function renderText(documentRef) {
+function renderText(documentRef, exercise) {
   const section = element(documentRef, 'section', 'reading-comprehension-card reading-comprehension-text');
   section.id = 'readingText';
   section.append(
-    element(documentRef, 'h2', '', 'Bijen: belangrijke werkers van onze natuur'),
-    element(documentRef, 'p', 'reading-comprehension-text-intro', 'Lees de tekst rustig door. Je mag tijdens het beantwoorden van de vragen steeds teruglezen.')
+    element(documentRef, 'h2', '', exercise.textTitle),
+    element(documentRef, 'p', 'reading-comprehension-text-intro', exercise.textIntro)
   );
-  BEE_READING_TEXT.forEach(textSection => {
+  exercise.text.forEach(textSection => {
     const block = element(documentRef, 'section', 'reading-comprehension-text-section');
     block.appendChild(element(documentRef, 'h3', '', textSection.heading));
     textSection.paragraphs.forEach(paragraph => block.appendChild(element(documentRef, 'p', '', paragraph)));
@@ -123,10 +134,41 @@ function renderText(documentRef) {
       block.appendChild(row);
     }
     section.appendChild(block);
+    if (textSection.sourceIds?.length) {
+      const inlineSources = element(documentRef, 'p', 'reading-comprehension-image-credit', 'Bronnen: ');
+      const sourceMap = new Map((exercise.sources || []).map(source => [source.id, source]));
+      textSection.sourceIds.forEach((sourceId, index) => {
+        const source = sourceMap.get(sourceId);
+        if (!source) return;
+        if (index) inlineSources.append(' · ');
+        const link = element(documentRef, 'a', '', source.title);
+        link.href = source.url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        inlineSources.appendChild(link);
+      });
+      block.appendChild(inlineSources);
+    }
   });
+  if (exercise.sources?.length) {
+    const sourceSection = element(documentRef, 'section', 'reading-comprehension-text-section');
+    sourceSection.appendChild(element(documentRef, 'h3', '', 'Bronnen bij de tekst'));
+    const sourceList = element(documentRef, 'ul');
+    exercise.sources.forEach(source => {
+      const item = element(documentRef, 'li');
+      const link = element(documentRef, 'a', '', source.title);
+      link.href = source.url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      item.appendChild(link);
+      sourceList.appendChild(item);
+    });
+    sourceSection.appendChild(sourceList);
+    section.appendChild(sourceSection);
+  }
   return section;
 }
-function renderPrintVersion(documentRef, textSection) {
+function renderPrintVersion(documentRef, textSection, exercise) {
   const printVersion = element(documentRef, 'section', 'reading-comprehension-print-version');
   printVersion.setAttribute('aria-label', 'Printversie van de volledige les');
   const printTextSection = textSection.cloneNode(true);
@@ -134,7 +176,7 @@ function renderPrintVersion(documentRef, textSection) {
   printVersion.appendChild(printTextSection);
   const questions = element(documentRef, 'section', 'reading-comprehension-print-questions');
   questions.appendChild(element(documentRef, 'h2', '', 'Vragen'));
-  BEE_READING_QUESTIONS.forEach((question, index) => {
+  exercise.questions.forEach((question, index) => {
     const item = element(documentRef, 'article', 'reading-comprehension-print-question');
     item.append(
       element(documentRef, 'p', 'reading-comprehension-question-meta', 'Vraag ' + (index + 1) + ' · ' + (question.type === 'open' ? 'Open vraag' : 'Meerkeuze')),
@@ -176,7 +218,7 @@ function distractorDetails(documentRef, question) {
   return details;
 }
 
-export function createReadingComprehensionRuntime({ templateMount, context = {}, documentRef = document, navigate } = {}) {
+export function createReadingComprehensionRuntime({ templateMount, context = {}, documentRef = document, navigate, exercise = BEE_READING_EXERCISE } = {}) {
   if (!templateMount || typeof navigate !== 'function') throw new TypeError('Reading comprehension runtime requires a template mount and navigation owner.');
   const student = String(context?.student || '');
   const content = element(documentRef, 'div', 'reading-comprehension');
@@ -186,21 +228,26 @@ export function createReadingComprehensionRuntime({ templateMount, context = {},
   printButton.setAttribute('aria-label', 'Print de volledige les als PDF');
   printToolbar.appendChild(printButton);
   const intro = element(documentRef, 'section', 'reading-comprehension-card reading-comprehension-intro');
-  intro.append(element(documentRef, 'p', 'reading-comprehension-kicker', 'PacoGO · Nederlands · Groep 8'), element(documentRef, 'p', '', 'Lees de tekst en beantwoord daarna de tien vragen. Je kunt de tekst altijd opnieuw bekijken.'));
-  const textSection = renderText(documentRef);
+  intro.appendChild(element(documentRef, 'p', 'reading-comprehension-kicker', 'PacoGO · Nederlands · Groep 8'));
+  if (exercise.seriesLabel) intro.appendChild(element(documentRef, 'p', 'reading-comprehension-kicker', exercise.seriesLabel));
+  if (exercise.durationLabel) intro.appendChild(element(documentRef, 'p', 'reading-comprehension-kicker', exercise.durationLabel));
+  intro.appendChild(element(documentRef, 'p', '', 'Lees de tekst en beantwoord daarna de ' + exercise.questions.length + ' vragen. Je kunt de tekst altijd opnieuw bekijken.'));
+  const textSection = renderText(documentRef, exercise);
   const questionSection = element(documentRef, 'section', 'reading-comprehension-card reading-comprehension-questions');
   questionSection.id = 'readingQuestions';
   const progress = element(documentRef, 'div', 'reading-comprehension-progress');
   const questionHost = element(documentRef, 'div', 'reading-comprehension-question-host');
   questionSection.append(element(documentRef, 'h2', '', 'Vragen'), progress, questionHost);
   const notice = element(documentRef, 'p', 'reading-comprehension-notice', 'Dit is een niet-formele oefening. Je antwoorden worden niet opgeslagen en tellen niet mee voor een toets, formele beoordeling of mastery-beslissing.');
-  const printVersion = renderPrintVersion(documentRef, textSection);
+  const printVersion = renderPrintVersion(documentRef, textSection, exercise);
   content.append(printToolbar, intro, textSection, questionSection, notice, printVersion);
 
   let currentIndex = 0;
   let multipleChoiceCorrect = 0;
   let openSelfCheckPoints = 0;
   let currentOpenPoints = 0;
+  const multipleChoiceTotal = exercise.questions.filter(question => question.type === 'multiple_choice').length;
+  const openQuestionPointTotal = exercise.questions.filter(question => question.type === 'open').reduce((total, question) => total + (question.criteria?.length || 0), 0);
 
   function showCompletion() {
     questionHost.replaceChildren();
@@ -209,20 +256,19 @@ export function createReadingComprehensionRuntime({ templateMount, context = {},
     result.id = 'readingResults';
     result.append(
       element(documentRef, 'h3', '', 'Oefening afgerond'),
-      element(documentRef, 'p', '', 'Meerkeuzevragen: ' + multipleChoiceCorrect + ' van 8 goed.'),
-      element(documentRef, 'p', '', 'Open vragen: ' + openSelfCheckPoints + ' van 6 punten bij je eigen controle.'),
-      element(documentRef, 'p', 'reading-comprehension-results-note', 'De punten bij de open vragen zijn door jou zelf gecontroleerd. Dit overzicht is geen formele toetsuitslag.'),
+      element(documentRef, 'p', '', 'Meerkeuzevragen: ' + multipleChoiceCorrect + ' van ' + multipleChoiceTotal + ' goed.'),
       actionButton(documentRef, 'Opnieuw oefenen', 'success', reset),
       actionButton(documentRef, 'Terug naar de tekst', 'secondary', () => textSection.scrollIntoView({ behavior: 'smooth', block: 'start' }))
     );
+    if (openQuestionPointTotal > 0) result.append(element(documentRef, 'p', '', 'Open vragen: ' + openSelfCheckPoints + ' van ' + openQuestionPointTotal + ' punten bij je eigen controle.'), element(documentRef, 'p', 'reading-comprehension-results-note', 'De punten bij de open vragen zijn door jou zelf gecontroleerd. Dit overzicht is geen formele toetsuitslag.'));
     questionHost.appendChild(result);
   }
 
   function renderQuestion() {
-    if (currentIndex >= BEE_READING_QUESTIONS.length) return showCompletion();
-    const question = BEE_READING_QUESTIONS[currentIndex];
+    if (currentIndex >= exercise.questions.length) return showCompletion();
+    const question = exercise.questions[currentIndex];
     questionHost.replaceChildren();
-    renderProgress(documentRef, progress, currentIndex, BEE_READING_QUESTIONS.length);
+    renderProgress(documentRef, progress, currentIndex, exercise.questions.length);
     const card = element(documentRef, 'article', 'reading-comprehension-question');
     card.dataset.questionId = question.id;
     const meta = element(documentRef, 'p', 'reading-comprehension-question-meta', question.type === 'open' ? 'Open vraag' : 'Meerkeuze');
@@ -259,7 +305,7 @@ export function createReadingComprehensionRuntime({ templateMount, context = {},
           distractorDetails(documentRef, question)
         );
         card.appendChild(feedback);
-        card.appendChild(actionButton(documentRef, currentIndex === BEE_READING_QUESTIONS.length - 1 ? 'Bekijk resultaat' : 'Volgende vraag', 'success', () => { currentIndex += 1; renderQuestion(); }));
+        card.appendChild(actionButton(documentRef, currentIndex === exercise.questions.length - 1 ? 'Bekijk resultaat' : 'Volgende vraag', 'success', () => { currentIndex += 1; renderQuestion(); }));
       });
       check.disabled = true;
       fieldset.addEventListener('change', () => { check.disabled = !selected; });

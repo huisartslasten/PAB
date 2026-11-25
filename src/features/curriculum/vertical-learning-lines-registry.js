@@ -50,6 +50,13 @@ const EXERCISES = Object.freeze([
     kind: 'non_formal_learning_activity'
   },
   {
+    id: 'exercise-0001',
+    label: 'Groep 8 — De ruimte: Heeft Mars ooit leven gehad?',
+    topic: 'begrijpend-lezen',
+    route: { page: 'reading-comprehension-mars-life.html' },
+    kind: 'non_formal_learning_activity'
+  },
+  {
     "id": "fr2-pencil-length-ordering",
     "label": "FR-0002 — potloden van klein naar groot ordenen",
     "topic": "vergelijken-en-ordenen",
@@ -6793,7 +6800,7 @@ const KD2_OBJECTIVES = Object.freeze([
     objective: 'Tekststructuren en verbanden op macro-, meso- en microniveau herkennen en benutten; inferenties maken over informatie die niet letterlijk in de tekst staat.',
     source_reference: 'SLO 2010, Leerstoflijnen lezen beschreven, hoofdstuk 3.4.2–3.4.3, pp. 153–159',
     source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
-    related_skill_ids: [], exercise_ids: ['bees-reading-01', 'moon-origin-reading-01', 'space-water-origin-reading-01'], coverage_status: 'unassessed',
+    related_skill_ids: [], exercise_ids: ['bees-reading-01', 'moon-origin-reading-01', 'space-water-origin-reading-01', 'exercise-0001'], coverage_status: 'unassessed',
     coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. Historische leerstoflijn; geen officieel groepsdoel uit de kerndoelen 2025.',
     status: 'active'
   },

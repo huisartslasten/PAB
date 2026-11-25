@@ -10,7 +10,7 @@ test('moon origin reading exercise has a short, coherent group 8 text with four 
   assert.equal(MOON_ORIGIN_READING_EXERCISE.durationLabel, 'KORT');
   assert.equal(MOON_ORIGIN_READING_EXERCISE.text.length, 4);
   assert.equal(MOON_ORIGIN_READING_EXERCISE.questions.length, 4);
-  assert.ok(MOON_ORIGIN_READING_EXERCISE.text.every(section => section.paragraphs.length > 0 && section.sourceIds.length > 0));
+  assert.ok(MOON_ORIGIN_READING_EXERCISE.text.every(section => section.paragraphs.length > 0 && Array.isArray(section.images) && section.sourceIds.length > 0));
   assert.ok(MOON_ORIGIN_READING_EXERCISE.questions.every(question => question.type === 'multiple_choice' && question.options.length === 4));
   for (const question of MOON_ORIGIN_READING_EXERCISE.questions) {
     assert.ok(question.evidence);

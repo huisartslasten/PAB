@@ -14,6 +14,7 @@ export const MOON_ORIGIN_READING_EXERCISE = Object.freeze({
         'Ongeveer 4,5 miljard jaar geleden was ons zonnestelsel nog volop in ontwikkeling. De aarde was toen nog jong. Volgens de meest geaccepteerde wetenschappelijke verklaring botste een hemellichaam, ongeveer zo groot als Mars, tegen de jonge aarde. Wetenschappers noemen dit hemellichaam Theia.',
         'Door de enorme kracht van de botsing kwam veel materiaal van de aarde en Theia in de ruimte terecht. Een deel van dat materiaal bleef rond de aarde draaien. Langzaam klonterden de stukken samen. Uiteindelijk ontstond daaruit de maan.'
       ]),
+      images: Object.freeze([]),
       sourceIds: Object.freeze(['nasa-formation', 'canup-asphaug'])
     }),
     Object.freeze({
@@ -22,6 +23,7 @@ export const MOON_ORIGIN_READING_EXERCISE = Object.freeze({
         'De jonge maan zag er heel anders uit dan nu. Door de enorme hitte was een groot deel van de maan gesmolten. Wetenschappers denken dat er een diepe oceaan van magma was: vloeibaar, gloeiend heet gesteente.',
         'Na verloop van lange tijd koelde de maan af. Het gesteente werd steeds harder en vormde een vaste buitenlaag. De maan kreeg zo langzaam het uiterlijk dat we tegenwoordig kennen.'
       ]),
+      images: Object.freeze([]),
       sourceIds: Object.freeze(['nasa-formation'])
     }),
     Object.freeze({
@@ -30,6 +32,7 @@ export const MOON_ORIGIN_READING_EXERCISE = Object.freeze({
         'Wetenschappers kunnen de botsing zelf natuurlijk niet terugzien. Toch hebben ze belangrijke aanwijzingen gevonden. Tijdens de Apollo-missies brachten astronauten honderden kilo’s maanstenen en maanstof naar de aarde. Onderzoekers ontdekten dat deze materialen aanwijzingen bevatten over de enorme hitte waarmee de maan ooit is ontstaan.',
         'De samenstelling van maanstenen en andere metingen ondersteunen de theorie van de grote botsing. Toch zijn wetenschappers nog niet over alle details eens. Ze onderzoeken bijvoorbeeld hoe de botsing precies verliep en hoe snel het materiaal samenklonterde.'
       ]),
+      images: Object.freeze([]),
       sourceIds: Object.freeze(['nasa-formation', 'apollo-samples', 'nielsen-isotopes'])
     }),
     Object.freeze({
@@ -37,6 +40,7 @@ export const MOON_ORIGIN_READING_EXERCISE = Object.freeze({
       paragraphs: Object.freeze([
         'De grote botsing is op dit moment de belangrijkste wetenschappelijke verklaring voor het ontstaan van de maan. Maar dat betekent niet dat ieder detail al vaststaat. Met nieuwe metingen en computersimulaties proberen onderzoekers steeds beter te begrijpen wat er miljarden jaren geleden gebeurde.'
       ]),
+      images: Object.freeze([]),
       sourceIds: Object.freeze(['nasa-formation', 'nielsen-isotopes'])
     })
   ]),

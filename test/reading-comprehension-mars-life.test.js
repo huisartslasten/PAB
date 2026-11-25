@@ -22,7 +22,7 @@ test('Mars life reading exercise has a short group 8 text and five text-based qu
   const allText = MARS_LIFE_READING_EXERCISE.text.flatMap(section => [section.heading, ...section.paragraphs]).join(' ');
   assert.match(allText, /In 2024 ontdekte de ruimtewagen Perseverance een bijzondere steen/);
   assert.match(allText, /september 2025/);
-  assert.match(allText, /bijzondere stoffen en patronen/);
+  assert.match(allText, /In deze steen zaten stoffen die mogelijk iets te maken hebben met vroeger leven/);
   assert.doesNotMatch(allText, /biosignaturen/i);
   const allQuestionContent = MARS_LIFE_READING_EXERCISE.questions.map(question => [question.prompt, question.explanation, ...question.options.map(option => option.text), ...question.distractorRationales.map(item => item.reason)].join(' ')).join(' ');
   assert.doesNotMatch(allQuestionContent, /biosignaturen/i);

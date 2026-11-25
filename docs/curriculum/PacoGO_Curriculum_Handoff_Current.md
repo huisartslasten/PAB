@@ -10263,3 +10263,21 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Oplossing: alle vier de maan-tekstonderdelen leveren nu expliciet `images: Object.freeze([])`. De gedeelde runtime, CSS, template en browserasserties zijn niet aangepast.
 - De unit-test controleert nu ook dat elk tekstonderdeel een `images`-array bevat. Correctiecommit: `44099d57bf48f65ba0a117da47fcc8d29f969807`.
 - Full Regression op deze configuratiecorrectie en de volgende handoff-update moet nog op de exacte resulterende commit worden geverifieerd. Er wordt nog geen groene status geclaimd.
+
+
+## 68. Centrale bronvermelding begrijpend lezen (25 november 2026)
+
+### Besluit en wijziging
+- Op verzoek van de gebruiker worden bronnen niet langer na afzonderlijke tekstonderdelen herhaald.
+- De gedeelde begrijpend-lezenruntime toont de bronnen één keer in een bronnenlijst onderaan de volledige leestekst.
+- De bronnenlijst gebruikt een iets kleiner lettertype (12px) dan de gewone leestekst (15px).
+- De bestaande centrale runtime is aangepast; dit geldt consequent voor de maan- en water-in-de-ruimte-oefening en andere oefeningen die dezelfde runtime gebruiken.
+- Bronverwijzingen blijven inhoudelijk behouden: de bestaande bronrecords en bron-URL's zijn niet gewijzigd. De bronlijst bevat de volledige opgegeven bronnen; afbeeldingen houden hun afzonderlijke beeldcredits.
+- Geen nieuwe pagina, template, renderer, curriculumkoppeling, inhoud, vraag, Supabase-wijziging of functionaliteit toegevoegd.
+
+### Engineering en verificatie
+- Branch: `refactor/professional-v1`; LIVE `main` onaangeroerd.
+- Voorbouwbaseline: Full Regression #4330 / run `45606721469`, `completed / success` op exact HEAD `5e987d026d85953cf9f1e6a42dca0b6c15e061df`.
+- Wijziging omvat alleen gedeelde leesruntime, gedeelde CSS, browserasserties voor maan- en wateroefening en deze handoff.
+- De codecommit en de daaropvolgende handoffcommit moeten elk op hun exacte SHA met Full Regression worden geverifieerd voordat groen wordt gerapporteerd.
+- Volgende stap: controleer de volledige regression; bij rood eerst de exacte oorzaak isoleren en niet symptoompatchen.

@@ -17,7 +17,9 @@ test('moon origin reading exercise uses the central page template and completes 
   await expect(page.locator('#readingText h2')).toHaveText('De ruimte – Hoe is de maan ontstaan?');
   await expect(page.locator('#readingText .reading-comprehension-text-section')).toHaveCount(5);
   await expect(page.locator('#readingText figure')).toHaveCount(0);
-  await expect(page.locator('#readingText a')).toHaveCount(12);
+  await expect(page.locator('#readingText .reading-comprehension-sources-list')).toHaveCount(1);
+  await expect(page.locator('#readingText .reading-comprehension-sources-list a')).toHaveCount(4);
+  await expect(page.locator('#readingText .reading-comprehension-text-section:not(.reading-comprehension-sources) a')).toHaveCount(0);
   const correctAnswers = ['A', 'B', 'A', 'C'];
   for (let index = 0; index < correctAnswers.length; index += 1) {
     const question = page.locator('.reading-comprehension-question');

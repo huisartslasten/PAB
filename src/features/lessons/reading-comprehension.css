@@ -8,6 +8,8 @@
 .reading-comprehension-text-section{display:grid;gap:7px;margin-top:17px}
 .reading-comprehension-text-section h3{margin:0;color:#17345f;font:900 18px/1.2 "Baloo 2",Nunito,sans-serif}
 .reading-comprehension-text-section p{color:#263f62;font-size:15px}
+.reading-comprehension-sources-list{display:grid;gap:4px;margin:0;padding-left:19px;color:#647894;font-size:12px;line-height:1.5}
+.reading-comprehension-sources-list a{color:#286ca8;text-decoration:underline}
 .reading-comprehension-image-row{display:flex;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-top:4px}
 .reading-comprehension-figure{width:min(100%,250px);margin:0;overflow:hidden;border:1px solid #dce9f6;border-radius:13px;background:#f7fbff}
 .reading-comprehension-figure img{display:block;width:100%;max-height:175px;object-fit:cover}

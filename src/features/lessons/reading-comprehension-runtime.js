@@ -134,26 +134,11 @@ function renderText(documentRef, exercise) {
       block.appendChild(row);
     }
     section.appendChild(block);
-    if (textSection.sourceIds?.length) {
-      const inlineSources = element(documentRef, 'p', 'reading-comprehension-image-credit', 'Bronnen: ');
-      const sourceMap = new Map((exercise.sources || []).map(source => [source.id, source]));
-      textSection.sourceIds.forEach((sourceId, index) => {
-        const source = sourceMap.get(sourceId);
-        if (!source) return;
-        if (index) inlineSources.append(' · ');
-        const link = element(documentRef, 'a', '', source.title);
-        link.href = source.url;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        inlineSources.appendChild(link);
-      });
-      block.appendChild(inlineSources);
-    }
   });
   if (exercise.sources?.length) {
-    const sourceSection = element(documentRef, 'section', 'reading-comprehension-text-section');
+    const sourceSection = element(documentRef, 'section', 'reading-comprehension-text-section reading-comprehension-sources');
     sourceSection.appendChild(element(documentRef, 'h3', '', 'Bronnen bij de tekst'));
-    const sourceList = element(documentRef, 'ul');
+    const sourceList = element(documentRef, 'ul', 'reading-comprehension-sources-list');
     exercise.sources.forEach(source => {
       const item = element(documentRef, 'li');
       const link = element(documentRef, 'a', '', source.title);

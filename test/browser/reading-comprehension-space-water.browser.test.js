@@ -19,7 +19,9 @@ test('space water reading exercise uses the central page template and completes 
   await expect(page.locator('#readingText figure')).toHaveCount(4);
   await expect(page.locator('#readingText img')).toHaveCount(4);
   await expect(page.locator('#readingText figure .reading-comprehension-image-credit a')).toHaveCount(8);
-  await expect(page.locator('#readingText a')).toHaveCount(25);
+  await expect(page.locator('#readingText .reading-comprehension-sources-list')).toHaveCount(1);
+  await expect(page.locator('#readingText .reading-comprehension-sources-list a')).toHaveCount(6);
+  await expect(page.locator('#readingText .reading-comprehension-text-section:not(.reading-comprehension-sources) a')).toHaveCount(8);
   await page.emulateMedia({ media: 'print' });
   await expect(page.locator('.reading-comprehension-print-version')).toBeVisible();
   await expect(page.locator('.reading-comprehension-print-button')).toBeHidden();

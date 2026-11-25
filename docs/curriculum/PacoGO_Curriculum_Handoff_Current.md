@@ -10199,3 +10199,43 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 2. Bij rood: stop, isoleer de exacte oorzaak en classificeer die voordat er iets wordt aangepast.
 3. Bij groen: verifieer deze handoff-update met een nieuwe Full Regression op de handoffcommit.
 4. Laat de gebruiker daarna de oefening in de ontwikkelomgeving bekijken. Voeg geen extra vragen, functies, curriculumkoppelingen of vormgevingswijzigingen toe zonder expliciete opdracht.
+
+## 67. Tweede korte begrijpend-lezenoefening — De ruimte: hoe is de maan ontstaan? (25 november 2026)
+
+### Gebouwd
+- Nieuwe korte oefening voor groep 8: **De ruimte — Hoe is de maan ontstaan?**
+- Stabiele oefen-ID: `moon-origin-reading-01`.
+- Pagina: `reading-comprehension-moon-origin.html`.
+- De goedgekeurde tekst is opgebouwd uit vier tekstonderdelen en bevat de vier goedgekeurde meerkeuzevragen.
+- Antwoorden: A, B, A, C. Iedere vraag bevat tekstbewijs, uitleg van het juiste antwoord en verklaringen voor de drie afleiders.
+
+### Bronnen
+- NASA — *Moon Formation*: https://science.nasa.gov/moon/formation/
+- Canup & Asphaug (2001), *Origin of the Moon in a giant impact near the end of the Earth's formation*, Nature 412, 708–712: https://doi.org/10.1038/35089010
+- Nielsen, Bekaert & Auro (2021), *Isotopic evidence for the formation of the Moon in a canonical giant impact*, Nature Communications 12, 1817: https://doi.org/10.1038/s41467-021-22155-7
+- NASA (2025), *NASA’s Apollo Samples Yield New Information about the Moon*: https://science.nasa.gov/science-research/planetary-science/astrobiology/nasas-apollo-samples-yield-new-information-about-the-moon/
+- De bronnen zijn per relevant tekstonderdeel inline gekoppeld en daarnaast als bronnenlijst opgenomen. De tekst is een eigen didactische formulering; de grote-inslaghypothese wordt als leidende verklaring gepresenteerd, niet als rechtstreeks waargenomen gebeurtenis.
+
+### Centrale hergebruik
+- De bestaande centrale PacoGO Page Template V7.0 wordt gebruikt.
+- De bestaande gedeelde begrijpend-lezenruntime, `reading-comprehension.css`, vraagweergave, feedback en printfunctionaliteit worden hergebruikt.
+- Er is alleen een eigen oefenconfiguratie, route en dunne HTML-entry toegevoegd; geen nieuwe renderer, Learning Interface, paginatemplate of bouwmodule.
+- Er zijn geen afbeeldingen toegevoegd; er is dus geen nieuw beeldmateriaal of beeldlicentie geïntroduceerd.
+
+### Curriculumrelatie
+- De oefening is centraal geregistreerd als `non_formal_learning_activity`.
+- De oefening is als beoogde relatie toegevoegd aan KD2A-0009, omdat de vragen inferenties en verbanden tussen tekstdelen aanspreken.
+- `coverage_status` blijft `unassessed`. Er wordt geen volledige doeldekking, mastery of empirische validiteit geclaimd.
+- KD2A-doelrecords, skill-/claim-/evidence-contracten en masteryregels zijn niet gewijzigd.
+
+### Engineering en verificatie
+- Branch: `refactor/professional-v1`; LIVE `main` niet aangeraakt.
+- Voorbouwbaseline: Full Regression #4322 / run `45541651594`, `completed / success` op exact parentcommit `ad75d9243ae1eb64b93a3701425c6671044ef866`.
+- Bouwcommit: `d01f45612e1cb328efe7a4ba2a4add8c13149852`.
+- Deze handoff-update is een volgende documentwijziging; Full Regression op de resulterende handoffcommit moet de nieuwe oefening en tests verifiëren. Totdat die run `completed / success` op de exacte commit toont, wordt geen groene status voor deze bouw geclaimd.
+- Geen Supabase-schema, persistencecontract, studentdata of bestaande curriculum-enginecontracten gewijzigd.
+
+### Volgende concrete stap
+1. Controleer Full Regression op de exacte commit met deze handoff-update.
+2. Bij rood: stop en isoleer de exacte oorzaak; wijzig geen tests om alleen de regressie groen te maken.
+3. Bij groen: controleer de oefening in de ontwikkelomgeving. Voeg geen extra vragen, functies, curriculumkoppelingen of vormgevingswijzigingen toe zonder expliciete opdracht.

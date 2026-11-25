@@ -106,3 +106,21 @@ De SLO-leerstoflijnen uit 2010 zijn historische uitwerkingen. Ze mogen niet word
 Deze checklist wordt geraadpleegd tijdens het didactisch ontwerp en de kwaliteitscontrole van begrijpend-lezenoefeningen, volgens het centrale Oefeningenbouwprotocol. De checklist schrijft geen aparte pagina, renderer, Learning Interface, database, skill, claim, evidence target of masteryregel voor.
 
 Bij een nieuwe oefening blijven de bestaande centrale paginatemplate, relevante centrale Learning Interface en bestaande curriculum-/runtimecontracten leidend. Een eventuele toekomstige technische beoordelingsmodule vereist een afzonderlijk ontwerpbesluit en mag niet uit dit document alleen worden afgeleid.
+
+
+### 4.1 Verplichte vraag over signaalwoorden
+
+Iedere begrijpend-lezenoefening bevat minimaal één beoordeelde vraag over de betekenis/functie van een signaalwoord in de context van een zin uit de leestekst.
+
+Controleer:
+1. Staat het gekozen signaalwoord daadwerkelijk in de leestekst?
+2. Is de zin waarin het woord voorkomt letterlijk terug te vinden in de tekst?
+3. Krijgt de leerling zo nodig een korte uitleg van het tekstverband, zonder dat het antwoord wordt weggegeven?
+4. Wordt gevraagd wat het signaalwoord in deze specifieke context betekent of welk verband het aangeeft?
+5. Toetst de vraag contextbegrip en niet alleen woordherkenning?
+6. Zijn antwoord en onderbouwing eenduidig en tekstueel te verantwoorden?
+7. Zijn eventuele afleiders plausibel, maar aantoonbaar niet passend bij de betreffende zin en context?
+
+Tekstverbanden kunnen onder meer betrekking hebben op voorbeelden, opsommingen, tegenstellingen, vergelijkingen, uitleg/redenen, samenvattingen en conclusies. Varieer deze categorieën over de totale oefenverzameling; één oefening hoeft niet alle categorieën te bevatten. Beoordeel een signaalwoord altijd in context, omdat de functie mede afhangt van de relatie tussen de zinnen en informatie.
+
+Deze controle is verplicht naast de overige vraagkwaliteitscriteria. Zie ook §15 van het centrale PacoGO Oefeningenbouwprotocol.

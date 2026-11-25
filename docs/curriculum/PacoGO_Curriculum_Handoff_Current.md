@@ -10405,3 +10405,24 @@ De drie bestaande oefeningen zijn per afzonderlijke vraag beoordeeld. De volledi
 1. Verifieer de exacte branch-HEAD en Full Regression op de volledige documentatiewijziging.
 2. Bij rood: stop en isoleer de oorzaak; wijzig geen tests zonder aangetoonde contractfout.
 3. Bij groen: hervat de Mars-begrijpend-lezenoefening. Gebruik de centrale template en bestaande begrijpend-lezenruntime; voeg minimaal één contextuele signaalwoorden-vraag toe volgens §15 en checklist §4.1. Voeg geen andere extra functies of vragen toe zonder expliciete opdracht.
+
+## 74. Mars begrijpend-lezen-oefening — Heeft Mars ooit leven gehad?
+
+**Status:** geïmplementeerd op `refactor/professional-v1`; Full Regression na implementatie nog te verifiëren.
+
+- Stabiele PacoGO-oefen-ID: `exercise-0001` (neutrale ID, niet gekoppeld aan domein, kerndoel, groep, oefentype of interface).
+- Leerlingroute: `reading-comprehension-mars-life.html`.
+- Centrale hergebruik: Page Template V7.0, bestaande `createReadingComprehensionRuntime`, centrale leesopmaak en bestaande centrale oefenregistratie. Geen nieuwe template, renderer, Learning Interface, runtimecontract, database of Supabase-wijziging.
+- Inhoud: korte groep-8-leestekst in vier delen, vijf meerkeuzevragen met vier antwoordopties, onderbouwing, feedbackuitleg en afleiderredenen.
+- Verplichte signaalwoorden-vraag: MARS-Q3 gebruikt de werkelijke tekstzin “Toch blijft Mars een interessante plek om te zoeken.” en toetst de tegenstelling in context.
+- Beeld: twee NASA-beelden (Perseverance-selfie met Cheyava Falls en close-up van Cheyava Falls). Onder elke afbeelding staat afzonderlijk een kleine credit met bron- en gebruiksrichtlijn. De gebruikte tekstbronnen staan één keer in een bronnenlijst onderaan de leestekst. NASA Media Usage Guidelines zijn geraadpleegd; gebruik blijft onderworpen aan de NASA-regels en eventuele uitzonderingen voor materiaal van derden.
+- Tekstinhoud: onderscheidt mogelijke biosignaturen van bewijs voor leven. De NASA/JPL-publicatie van 10 september 2025 meldt mogelijke biosignaturen in monster Sapphire Canyon; dit is geen bevestiging dat leven is gevonden.
+- Primair beoogd tussendoel: **KD2A-0009** — tekststructuren en verbanden op macro-, meso- en microniveau herkennen en benutten; inferenties maken over niet-letterlijke informatie. Bronrecord in de verticale leerlijn Nederlands, groep 7–8; historische SLO-leerstoflijn 2010, kandidaat-crosswalk naar KD2A.
+- Itemanalyse KD2A-0009: MARS-Q1 (inferentie vanuit vroeger water naar onderzoek naar mogelijk leven), MARS-Q2 (verklarende relatie en onderscheid tussen mogelijke aanwijzing en bewijs), MARS-Q3 (signaalwoord en tegenstelling in context), MARS-Q5 (inferentie over mogelijke bescherming onder het oppervlak). MARS-Q4 is een tekstvergelijking/terugvindvraag en telt niet mee voor de drempel. Resultaat: 4/5 = 80%; de voorlopige PacoGO-ontwerpgrens van 30% wordt gehaald.
+- KD2A-0008 is niet gekoppeld: geen vraag vraagt rechtstreeks om hoofdgedachte, hoofd-/bijzaken, thema/strekking of weergave in eigen woorden.
+- De registry-relatie naar KD2A-0009 is toegevoegd, maar `coverage_status` blijft **unassessed**. De drempel maakt de oefening relevant voor het doel, maar bewijst geen volledige dekking, validiteit of leerlingbeheersing.
+- Nieuwe verificatiebestanden: `test/reading-comprehension-mars-life.test.js` en `test/browser/reading-comprehension-mars-life.browser.test.js`.
+
+**Laatste implementatiecommits vóór handoff-update:** module `39deeb2eab42d9bd53d72861bab08f2e7e9a073f`; route `a5c0a22c880b6bdedf6a864ad934974ea257bbed`; registry `1d5aedce2386726f277d1716cfc66ce97abafbab`; pagina/tests `4e278b6126045ac65eeb0be06b838badc5f81c28`.
+
+**Volgende stap:** Full Regression op de uiteindelijke handoff-commit uitvoeren; bij rood eerst de exacte oorzaak isoleren. Daarna pas de fase als afgerond rapporteren.

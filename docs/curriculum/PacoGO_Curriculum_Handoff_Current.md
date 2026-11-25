@@ -10377,3 +10377,31 @@ De drie bestaande oefeningen zijn per afzonderlijke vraag beoordeeld. De volledi
 1. Verifieer deze handoff-update met Full Regression op de exacte nieuwe commit.
 2. Bij rood: stop en isoleer de exacte oorzaak; wijzig geen tests om alleen de regressie groen te maken.
 3. Bij groen: de formele afronding van deze curriculumkoppelingsstap is compleet. Ga daarna verder met de drie resterende korte KD2-oefeningen, één voor één, beginnend met **Is er ooit leven geweest op Mars? Is er misschien nog steeds leven?** Gebruik eerst de centrale handoff en de bestaande bouw- en kwaliteitschecklists; hergebruik de centrale PacoGO-template en de gedeelde begrijpend-lezenruntime. Voeg geen extra functies, vragen of curriculumkoppelingen toe zonder expliciete opdracht.
+
+
+## 73. Verplichte signaalwoorden-vraag in begrijpend-lezenoefeningen — 25 november 2026
+
+### Besluit en documentatie
+- Vastgelegd als vaste didactische eis: iedere PacoGO-oefening begrijpend lezen bevat minimaal één inhoudelijk beoordeelde vraag over de betekenis/functie van een signaalwoord in de context van een zin uit de eigen leestekst.
+- De vraag geeft waar nodig een korte leerlinggerichte uitleg van het tekstverband, wijst een daadwerkelijk in de tekst voorkomend signaalwoord aan en vraagt wat dit woord in die specifieke context betekent of welk verband het aangeeft.
+- De vraag toetst contextbegrip, niet alleen woordherkenning. Antwoord, onderbouwing en plausibele afleiders worden vooraf gecontroleerd.
+- Tekstverbanden (onder meer voorbeelden, opsommingen, tegenstellingen, vergelijkingen, uitleg/redenen, samenvattingen en conclusies) worden over de totale oefenverzameling gevarieerd; niet iedere oefening hoeft alle categorieën te bevatten.
+- De context bepaalt de functie; een signaalwoord krijgt niet automatisch één vaste betekenis.
+- Geen aparte bouwmodule, pagina, Learning Interface, curriculumdoel, skill, claim, evidence target, runtime of masteryregel toegevoegd.
+
+### Gewijzigde centrale documenten
+- docs/curriculum/PacoGO_Exercise_Build_Protocol_v0.1.md — nieuwe §15, commit 8d769d2090a7fbd4fbeef3ddfab46a86c06cad4a.
+- docs/curriculum/PacoGO_Kwaliteitschecklist_Begrijpend_Lezen_v0.1.md — nieuwe §4.1, commit 366543aceef972e83b68d34df14133895af4d2ef.
+- Alleen deze twee documentbestanden zijn inhoudelijk gewijzigd; geen runtime, template, curriculumregistratie, leerlingdata of Supabase aangepast.
+
+### Engineering en verificatie
+- Branch: refactor/professional-v1; LIVE main niet aangeraakt.
+- Startpunt: Full Regression #4339 is volgens de GitHub Actions-runweergave GREEN (success) op commit 30a1c2c59f3b3b19fa0f2ae13eafe9b5eb0d0b9a.
+- Documentatiecommits: protocol 8d769d2090a7fbd4fbeef3ddfab46a86c06cad4a; checklist 366543aceef972e83b68d34df14133895af4d2ef.
+- Deze handoff-update moet nog worden geverifieerd. Full Regression moet draaien op de exacte resulterende branch-HEAD; tot die run succesvol is afgerond, is de documentatiewijziging nog niet als regression-groen aangemerkt.
+- Geen wijzigingen aan tests; er is geen test aangepast om een regressie te omzeilen.
+
+### Volgende concrete stap
+1. Verifieer de exacte branch-HEAD en Full Regression op de volledige documentatiewijziging.
+2. Bij rood: stop en isoleer de oorzaak; wijzig geen tests zonder aangetoonde contractfout.
+3. Bij groen: hervat de Mars-begrijpend-lezenoefening. Gebruik de centrale template en bestaande begrijpend-lezenruntime; voeg minimaal één contextuele signaalwoorden-vraag toe volgens §15 en checklist §4.1. Voeg geen andere extra functies of vragen toe zonder expliciete opdracht.

@@ -6794,7 +6794,7 @@ const KD2_OBJECTIVES = Object.freeze([
     source_reference: 'SLO 2010, Leerstoflijnen lezen beschreven, hoofdstuk 3.4.2–3.4.3, pp. 153–159',
     source_wording: 'PacoGO-samenvatting van de leerstoflijn; geen woordelijk SLO-citaat',
     related_skill_ids: [], exercise_ids: ['bees-reading-01', 'moon-origin-reading-01'], coverage_status: 'unassessed',
-    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. Historische leerstoflijn; geen officieel groepsdoel uit de kerndoelen 2025.'
+    coverage_note: 'Nog niet beoordeeld op PacoGO-dekking. Historische leerstoflijn; geen officieel groepsdoel uit de kerndoelen 2025.',
     status: 'active'
   },
   {

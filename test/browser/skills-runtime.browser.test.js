@@ -24,14 +24,28 @@ test('Skills entry shows compact learning-area tiles and opens the existing math
     const areaGridColumns = getComputedStyle(document.querySelector('.skills-area-grid')).gridTemplateColumns;
     const dutchTile = [...document.querySelectorAll('.skills-area-tile')].find(tile => tile.querySelector('.paco-tile-title')?.textContent === 'Nederlands');
     const dutchHasAction = Boolean(dutchTile.querySelector('.paco-tile-action'));
+    dutchTile.querySelector('.paco-tile-action').click();
+    const dutchNavigation = navigatedTo;
+    const dutchUrl = new URL(dutchNavigation, window.location.href);
+    const dutchRuntime = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'management' },
+      area: dutchUrl.searchParams.get('area'), documentRef: document, navigate: () => {}
+    });
+    await dutchRuntime.mount();
+    const dutchTiles = [...document.querySelectorAll('.skills-dutch-grid .skills-dutch-tile')];
+    const dutchSubjects = dutchTiles.map(tile => tile.querySelector('.paco-tile-title')?.textContent);
+    const pendingStatuses = dutchTiles.map(tile => tile.querySelector('.paco-tile-meta')?.textContent || '');
     const mathTile = [...document.querySelectorAll('.skills-area-tile')].find(tile => tile.querySelector('.paco-tile-title')?.textContent === 'Rekenen');
     mathTile.querySelector('.paco-tile-action').click();
-    return { areaTitles, areaTileCount, areaGridColumns, dutchHasAction, navigation: navigatedTo };
+    return { areaTitles, areaTileCount, areaGridColumns, dutchHasAction, dutchNavigation, dutchSubjects, pendingStatuses, navigation: navigatedTo };
   });
   expect(result.areaTitles).toEqual(['Rekenen', 'Nederlands']);
   expect(result.areaTileCount).toBe(2);
   expect(result.areaGridColumns.split(' ').length).toBe(2);
-  expect(result.dutchHasAction).toBe(false);
+  expect(result.dutchHasAction).toBe(true);
+  expect(result.dutchNavigation).toContain('area=dutch');
+  expect(result.dutchSubjects).toEqual(['Grammatica', 'Begrijpend lezen', 'Spelling', 'Woordenschat']);
+  expect(result.pendingStatuses).toEqual(['Nog niet uitgewerkt', '', 'Nog niet uitgewerkt', 'Nog niet uitgewerkt']);
   expect(result.navigation).toContain('area=math');
   expect(result.navigation).toContain('viewStudent=Zyon');
   expect(result.navigation).toContain('mode=management');

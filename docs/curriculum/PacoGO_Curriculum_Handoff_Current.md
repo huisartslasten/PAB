@@ -10096,3 +10096,26 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 3. Voeg geen extra vragen, functies, opslag, curriculumcontracten of vormgevingswijzigingen toe zonder expliciete opdracht.
 4. Bij rood: stop, isoleer de exacte oorzaak en herstel eerst de onderliggende oorzaak.
 
+
+
+## 64. Nederlandse Skills-navigatie — vier onderdelen (24 november 2026)
+
+### Afspraak en uitvoering
+- Onder **Nederlands** staan vier compacte tegels, via de centrale PacoGO-tegeltemplate:
+  1. Grammatica
+  2. Begrijpend lezen
+  3. Spelling
+  4. Woordenschat
+- Op **Grammatica**, **Spelling** en **Woordenschat** staat in de tegel de status **Nog niet uitgewerkt**.
+- **Begrijpend lezen** krijgt die status niet; de checklist en de eerste begrijpend-lezenoefening zijn al uitgewerkt.
+- Deze vier namen zijn navigatiecategorieën, geen nieuwe curriculum Skills of SLO-definities. Er is geen Nederlandse curriculuminhoud toegevoegd.
+- De tegel Begrijpend lezen is hier alleen als categorie zichtbaar; er is geen nieuwe route of extra functionaliteit toegekend.
+
+### Engineering
+- Voorafgaande Full Regression #4307 / run ID `45527677234` was GREEN op baseline commit `761fb7abbe2de909055bd3c4b2071fca748c33d0`.
+- Skills-navigatie en correctie van de source-contracttest staan op commit `132ee9a7569ac01f63d922ddf084599e5eebf5df`.
+- Full Regression #4308 / run ID `45528349696` completed GREEN op exact commit `132ee9a7569ac01f63d922ddf084599e5eebf5df`, inclusief browserregressie en controle op een schone working tree.
+- Branch: `refactor/professional-v1`. LIVE `main` is niet gewijzigd.
+
+### Volgende concrete stap
+- Voer Full Regression uit op de commit met deze Nederlandse vier-tegelnavigatie en handoff-update. Bij rood: stop en isoleer de exacte oorzaak. Bij groen: wacht op de volgende expliciete opdracht; werk geen Nederlandse curriculumonderdelen uit zonder brongebaseerde opdracht.

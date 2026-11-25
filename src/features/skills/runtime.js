@@ -117,10 +117,11 @@ export function createSkillsRuntime({
     grid.appendChild(createPacoTile({
       documentRef,
       title: 'Nederlands',
-      description: 'De Nederlandse Skills verschijnen hier zodra de centrale catalogus is vastgelegd.',
+      description: 'Bekijk de onderdelen van Nederlands.',
       icon: '📚',
-      className: 'skills-navigation-tile skills-area-tile skills-area-tile--pending',
-      meta: 'Catalogus in voorbereiding'
+      className: 'skills-navigation-tile skills-area-tile',
+      actionLabel: 'Openen →',
+      onActivate: openDutchAreas
     }));
 
     card.append(heading, introduction, grid);
@@ -133,6 +134,42 @@ export function createSkillsRuntime({
       mode: context?.mode,
       extra: { domain: FRACTION_DOMAIN }
     }));
+  }
+
+  function openDutchAreas() {
+    navigate(buildViewUrl('skills.html', {
+      student,
+      mode: context?.mode,
+      extra: { area: 'dutch' }
+    }));
+  }
+
+  function renderDutchOverview() {
+    content.replaceChildren();
+    const card = documentRef.createElement('section');
+    card.className = 'paco-template-card skills-navigation-card skills-area-card';
+    const heading = documentRef.createElement('h2');
+    heading.textContent = 'Nederlands';
+    const introduction = documentRef.createElement('p');
+    introduction.className = 'skills-navigation-introduction';
+    introduction.textContent = 'Kies een onderdeel.';
+    const grid = createPacoTileGrid({ documentRef, className: 'skills-navigation-grid skills-area-grid skills-dutch-grid' });
+    [
+      { title: 'Grammatica', icon: '📝', meta: 'Nog niet uitgewerkt' },
+      { title: 'Begrijpend lezen', icon: '📖' },
+      { title: 'Spelling', icon: '✏️', meta: 'Nog niet uitgewerkt' },
+      { title: 'Woordenschat', icon: '🔤', meta: 'Nog niet uitgewerkt' }
+    ].forEach(item => {
+      grid.appendChild(createPacoTile({
+        documentRef,
+        title: item.title,
+        icon: item.icon,
+        ...(item.meta ? { meta: item.meta } : {}),
+        className: 'skills-navigation-tile skills-area-tile skills-dutch-tile'
+      }));
+    });
+    card.append(heading, introduction, grid);
+    content.appendChild(card);
   }
 
   function renderSubjectOverview() {
@@ -3980,6 +4017,7 @@ export function createSkillsRuntime({
     else if (showingSubtraction) renderFractionSubtractionOverview();
     else if (showingFractions) renderFractionOverview();
     else if (area === 'math') renderSubjectOverview();
+    else if (area === 'dutch') renderDutchOverview();
     else renderAreaOverview();
   }
 

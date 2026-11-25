@@ -7,7 +7,7 @@
 
 ## 1. Purpose
 
-The Skills entry point first shows two compact learning-area tiles: **Rekenen** and **Nederlands**. Selecting **Rekenen** opens the existing mathematics topic catalogue. Selecting **Breuken** opens the fraction-topic overview. The Nederlands tile remains a non-actionable placeholder until a central Dutch Skills catalogue is formally established. The detailed curriculum content is built only from the existing PacoGO-SLO skills and curriculum sources.
+The Skills entry point first shows two compact learning-area tiles: **Rekenen** and **Nederlands**. Selecting **Rekenen** opens the existing mathematics topic catalogue. Selecting **Nederlands** opens four compact tiles: **Grammatica**, **Begrijpend lezen**, **Spelling** and **Woordenschat**. The three areas other than Begrijpend lezen display **Nog niet uitgewerkt**. These are navigation labels/statuses only; they do not create curriculum Skills or assert that the other areas have been specified. The detailed curriculum content is built only from the existing PacoGO-SLO skills and curriculum sources.
 
 The labels in this document organise navigation. They do not create or rename curriculum Skills, Developments, Claims, Evidence Targets, Task Models or prerequisites.
 
@@ -18,7 +18,7 @@ The labels in this document organise navigation. They do not create or rename cu
 Display two compact tiles, using the shared PacoGO tile and tile-grid components:
 
 1. Rekenen — opens the existing mathematics topic catalogue.
-2. Nederlands — visible but not actionable until the central Dutch Skills catalogue is formally established. Do not derive Skills by treating KD1–KD12 as Skills.
+2. Nederlands — opens four compact navigation tiles: Grammatica, Begrijpend lezen, Spelling and Woordenschat. Grammatica, Spelling and Woordenschat display “Nog niet uitgewerkt”. Begrijpend lezen is the exception because its exercise/checklist work has already been developed. These labels do not derive Skills directly from KD1–KD12 and do not create curriculum definitions.
 
 ### 2.2 Mathematics overview
 
@@ -82,7 +82,7 @@ Every fraction practice page must additionally comply with the central **PacoGO 
 ## 5. Current implementation boundary
 
 - The central Skills entry first displays two compact learning-area tiles; selecting Rekenen displays all 18 mathematics topics.
-- Nederlands is visible as a non-actionable tile until a central Dutch Skills catalogue is formally established.
+- Nederlands opens four compact tiles: Grammatica, Begrijpend lezen, Spelling and Woordenschat; the first, third and fourth display “Nog niet uitgewerkt”. These tiles are navigation only and do not imply that new Dutch curriculum Skills have been created.
 - Selecting Breuken opens the six-topic fraction overview within the same Skills route and canonical page template.
 - Other mathematics topics and the six fraction subtopics are visible but are not yet connected to completed learning content.
 - The previous FR2 detail page is no longer offered from the central Skills entry point. Its route and underlying curriculum artifacts are not deleted by this navigation change.

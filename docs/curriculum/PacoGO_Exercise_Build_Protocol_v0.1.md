@@ -157,3 +157,60 @@ Het protocol verplicht tot het onderzoeken en traceerbaar voorbereiden van mogel
 Voor oefeningen binnen begrijpend lezen wordt tijdens fase 3 (didactisch ontwerp) en fase 6 (verificatie) ook de centrale **PacoGO Kwaliteitschecklist Begrijpend Lezen v0.1** geraadpleegd: `docs/curriculum/PacoGO_Kwaliteitschecklist_Begrijpend_Lezen_v0.1.md`.
 
 De checklist controleert tekstkwaliteit, leesvaardigheden/taakdekking, vraagkwaliteit en beoordeling. Zij is een PacoGO-ontwerpstandaard, geen officiële Cito-checklist en geen bewijs van Cito-equivalentie, betrouwbaarheid of validiteit. Er wordt geen aparte begrijpend-lezen-bouwmodule of runtime geïntroduceerd. De bestaande centrale paginatemplates, Learning Interfaces en curriculum-/runtimecontracten blijven leidend.
+
+## 13. Bronvermelding en gebruiksrechten van tekst en beeld
+
+Deze regels gelden voor **alle PacoGO-oefeningen, lessen, teksten, afbeeldingen, illustraties, schema's, kaarten, diagrammen, audio en ander extern materiaal**. Broncontrole is een vast onderdeel van het bouwproces en mag niet worden overgeslagen.
+
+### 13.1 Bronnen bij tekstuele inhoud
+
+1. Vermeld externe bronnen bij de relevante tekst of passage, zodat zichtbaar is welke bron welke informatie ondersteunt.
+2. Neem daarnaast een overzichtelijke bronnenlijst op bij de oefening of het lesmateriaal. Een bronvermelding onderaan vervangt niet de verwijzing bij een specifieke bewering wanneer die relatie anders onduidelijk wordt.
+3. Controleer of de geraadpleegde bron de betreffende bewering daadwerkelijk ondersteunt. Een algemene website of een bron die alleen over het onderwerp gaat, is niet automatisch voldoende.
+4. Noteer waar relevant auteur/organisatie, titel, publicatiedatum of actualisatiedatum en een directe, stabiele URL. Vermeld bij dynamische of veranderlijke bronnen ook de raadpleegdatum.
+5. Maak onderscheid tussen letterlijk citaat, parafrase, feitelijke informatie en eigen didactische formulering. Gebruik citaten beperkt en respecteer auteursrecht en eventuele licentievoorwaarden.
+6. Controleer bij wetenschappelijke, historische, medische of andere feitelijke claims of de bron voldoende gezaghebbend en actueel is. Bij onzekerheid wordt de formulering genuanceerd of wordt eerst aanvullend onderzoek gedaan.
+7. Verzin geen bronvermeldingen en presenteer een bron niet als onderbouwing wanneer de inhoud die claim niet ondersteunt.
+
+### 13.2 Afbeeldingen en ander extern materiaal
+
+Controleer **vóór opname** van ieder extern beeld- of mediabestand of PacoGO het materiaal daadwerkelijk mag gebruiken in de beoogde context.
+
+Leg per gebruikt item minimaal vast:
+- directe bronpagina en, waar mogelijk, de oorspronkelijke downloadpagina;
+- titel of korte omschrijving van het item;
+- maker, fotograaf, illustrator of rechthebbende, voor zover vermeld;
+- exacte licentie of expliciete gebruikstoestemming;
+- de URL naar de licentievoorwaarden;
+- de vereiste naamsvermelding en eventuele verplichte formulering;
+- of bewerken, bijsnijden, aanpassen of combineren is toegestaan;
+- of hergebruik, verspreiding en commercieel gebruik zijn toegestaan;
+- welke wijzigingen PacoGO zelf aan het materiaal heeft aangebracht.
+
+Een zoekresultaat, afbeeldingsvoorbeeld, zoekmachinevermelding of het enkele feit dat een afbeelding op een bekende website staat, geldt **niet** als bewijs van gebruiksrecht. Controleer de voorwaarden bij de oorspronkelijke bron en let op materiaal van derden dat van de algemene voorwaarden van de website kan zijn uitgesloten.
+
+### 13.3 Voorkeursvolgorde voor beeldmateriaal
+
+Kies bij voorkeur materiaal in deze volgorde:
+
+1. Eigen, door of voor PacoGO gemaakt materiaal waarvan de gebruiksrechten duidelijk bij PacoGO liggen.
+2. Materiaal in het publieke domein, mits de status en eventuele uitzonderingen bij de oorspronkelijke bron zijn gecontroleerd.
+3. Materiaal onder **CC0**.
+4. Materiaal onder een Creative Commons-licentie die het beoogde gebruik toestaat, bij voorkeur **CC BY** wanneer correcte naamsvermelding volstaat.
+
+Omdat PacoGO later commercieel kan worden aangeboden en materiaal mogelijk voor de interface moet worden aangepast, hebben licenties die commercieel gebruik en bewerking toestaan de voorkeur. Controleer daarom expliciet:
+- **NC (NonCommercial):** niet gebruiken voor materiaal dat mogelijk onderdeel wordt van een commercieel PacoGO-product, tenzij afzonderlijke toestemming voor dat gebruik is verkregen.
+- **ND (NoDerivatives):** vermijden wanneer bijsnijden, aanpassen, vertalen, annoteren of andere bewerkingen nodig kunnen zijn; alleen gebruiken wanneer het materiaal ongewijzigd en volgens de voorwaarden kan worden geplaatst.
+- **SA (ShareAlike):** controleer vóór gebruik welke verplichtingen gelden voor aangepaste versies en of die verenigbaar zijn met de beoogde verspreiding van PacoGO.
+
+Een aanduiding als 'gratis', 'free download' of 'voor educatief gebruik' is op zichzelf geen voldoende licentiecontrole. Ook een publiek toegankelijke afbeelding kan rechten of voorwaarden hebben.
+
+### 13.4 Beslisregel bij twijfel
+
+- Is de licentie of toestemming niet duidelijk, niet controleerbaar of niet passend bij het beoogde gebruik? **Gebruik het materiaal dan niet.**
+- Zoek een aantoonbaar vrij alternatief of maak eigen materiaal.
+- Ga niet uit van toestemming op basis van de naam van een organisatie, zoals NASA, ESA, een museum, universiteit of onderwijswebsite. Controleer steeds de specifieke afbeelding en eventuele uitzonderingen.
+- Bewaar de bron- en licentiegegevens bij het oefen-/lesdossier, zodat herkomst en toegestane gebruikswijze later opnieuw controleerbaar zijn.
+- Bronvermelding is verplicht waar de bron/licentie dit vereist en blijft daarnaast PacoGO-standaard voor transparantie. Bronvermelding maakt ongeoorloofd gebruik niet alsnog toegestaan.
+
+**Bouwpoort:** een externe afbeelding of tekstbron wordt pas opgenomen nadat de broninhoud en de relevante gebruiksvoorwaarden zijn gecontroleerd. Bij ontbrekende zekerheid wordt het item vervangen of weggelaten. Deze regel geldt ook wanneer het materiaal al in een eerdere conceptversie of chat is voorgesteld.

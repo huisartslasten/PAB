@@ -6418,7 +6418,7 @@ returns jsonb
 language plpgsql
 security invoker
 set search_path = ''
-as $
+as $$
 begin
   if (select auth.uid()) is null
      or not private.is_learner_guardian(p_student_key) then
@@ -6434,7 +6434,7 @@ begin
     p_decision_trace
   );
 end;
-$;
+$$;
 
 revoke all on function public.persist_curriculum_learning_cycle(text, uuid, text, jsonb, jsonb, jsonb) from public, anon;
 grant execute on function public.persist_curriculum_learning_cycle(text, uuid, text, jsonb, jsonb, jsonb) to authenticated;

@@ -10442,3 +10442,13 @@ De drie bestaande oefeningen zijn per afzonderlijke vraag beoordeeld. De volledi
 - De regressietest controleert nu expliciet dat het woord biosignaturen niet meer in de leerlingtekst voorkomt.
 - Gewijzigde commits: module `9f855757049910154b0a30240f162e26ff620a10`; unit-test `7e61be7717ae0d69bcf728db03cc669bab2ceb68`.
 - Full Regression op deze vereenvoudiging moet nog worden uitgevoerd en geverifieerd; er wordt nog geen groene status geclaimd.
+
+### 74.3 Herstel naar de door gebruiker goedgekeurde Mars-tekst
+
+- De gebruiker wees terecht op een ernstige afwijking: de gebouwde tekst bevatte opnieuw het afgewezen vakwoord **biosignaturen**, terwijl de goedgekeurde tekst de formulering “mogelijke aanwijzingen bevat voor leven dat vroeger op Mars kan hebben bestaan” gebruikte.
+- Oorzaak: bij het opdelen en omzetten van de eerder goedgekeurde leestekst naar de vier secties van de oefenmodule is inhoud opnieuw geformuleerd. De eerdere gedeeltelijke vereenvoudiging liet bovendien nog een afgewezen term staan in een antwoordafleider. Dit was een uitvoeringsfout; goedgekeurde tekst had letterlijk moeten worden overgenomen.
+- De leestekst is nu teruggezet naar de zes alinea's uit de door gebruiker goedgekeurde versie, inclusief de oorspronkelijke titel, intro, woordkeuze en formuleringen. De secties zijn alleen gebruikt voor de presentatie; de alinea-inhoud volgt de goedgekeurde tekst.
+- Alle vijf vragen zijn opnieuw afgestemd op die exacte leestekst. MARS-Q3 gebruikt nu de echte zin “Toch weten wetenschappers nog niet zeker of er ooit leven is geweest.” en toetst het contrast met de mogelijke aanwijzingen in de voorafgaande tekst. De vraaginhoud, antwoordopties, feedback en afleiderredenen zijn gecontroleerd op de afgewezen term.
+- De Mars-unit-test controleert nu expliciet dat de term `biosignaturen` nergens in de leerlingvragen, uitleg of antwoordopties voorkomt.
+- Module herstelcommit: `5e343744728ce7141316ab55725b4c058830c29c`; testcommit: `de23c6126732678509ad511276dc7ca2f44d4415`.
+- Full Regression na deze herstelwijziging moet nog draaien en succesvol eindigen voordat de stap als afgerond wordt beschouwd.

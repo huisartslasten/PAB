@@ -49,7 +49,7 @@ test('LIVE curriculum migration preserves the authenticated learner ownership an
   assert.match(sql, /exception\s+when others then[\s\S]*?set_config\('app\.pacogo_learning_cycle_write', '', true\)/i);
   assert.match(sql, /learner_profiles_key_is_uuid/);
   assert.match(sql, /owner_user_id = \(select auth\.uid\(\)\)/);
-  assert.match(sql, /learner profile creation is restricted to the authenticated owner/i);
+  assert.match(sql, /learner owner must be the authenticated user/i);
   assert.doesNotMatch(sql, /insert\s+into\s+public\.learner_profiles\s*\([^)]*\)\s*values/i);
   assert.doesNotMatch(sql, /insert\s+into\s+public\.learner_profile_links\s*\([^)]*\)\s*values\s*\([^)]*'zyon'/i);
   assert.doesNotMatch(sql, /insert\s+into\s+public\.learner_profile_links\s*\([^)]*\)\s*values\s*\([^)]*'zenith'/i);

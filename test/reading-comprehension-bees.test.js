@@ -36,13 +36,13 @@ test('bee reading questions have eight multiple-choice and two rubric-guided ope
   assert.match(BEE_READING_QUESTIONS[2].evidence, /stempel/);
 });
 
-test('the bee exercise links only to relevant KD2A objectives without claiming coverage', () => {
+test('the reading exercises link only to relevant KD2A objectives without claiming coverage', () => {
   const exercise = verticalLearningLinesRegistry.getExercise('bees-reading-01');
   assert.deepEqual(exercise.route, { page: 'reading-comprehension-bees.html' });
   assert.equal(exercise.kind, 'non_formal_learning_activity');
+  assert.deepEqual(verticalLearningLinesRegistry.getObjective('KD2A-0008').exercise_ids, ['bees-reading-01']);
+  assert.deepEqual(verticalLearningLinesRegistry.getObjective('KD2A-0009').exercise_ids, ['bees-reading-01', 'moon-origin-reading-01']);
   for (const id of ['KD2A-0008', 'KD2A-0009']) {
-    const objective = verticalLearningLinesRegistry.getObjective(id);
-    assert.deepEqual(objective.exercise_ids, ['bees-reading-01']);
-    assert.equal(objective.coverage_status, 'unassessed');
+    assert.equal(verticalLearningLinesRegistry.getObjective(id).coverage_status, 'unassessed');
   }
 });

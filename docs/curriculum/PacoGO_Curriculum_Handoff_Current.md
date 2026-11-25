@@ -10426,3 +10426,10 @@ De drie bestaande oefeningen zijn per afzonderlijke vraag beoordeeld. De volledi
 **Laatste implementatiecommits vóór handoff-update:** module `39deeb2eab42d9bd53d72861bab08f2e7e9a073f`; route `a5c0a22c880b6bdedf6a864ad934974ea257bbed`; registry `1d5aedce2386726f277d1716cfc66ce97abafbab`; pagina/tests `4e278b6126045ac65eeb0be06b838badc5f81c28`.
 
 **Volgende stap:** Full Regression op de uiteindelijke handoff-commit uitvoeren; bij rood eerst de exacte oorzaak isoleren. Daarna pas de fase als afgerond rapporteren.
+### 74.1 Regressionbevinding en gerichte testcorrectie
+
+- Full Regression #4349 / run-ID `45647555659` op commit `b8c70f6c62925fcc2f534dc973e4f754bfb7a3d6` was **RED** in stap 12 (maintained Node regression).
+- Exacte oorzaak: drie bestaande begrijpend-lezen-unit-tests (bijen, maan en water) vergeleken de volledige `KD2A-0009.exercise_ids`-lijst nog met de oude drie items. De nieuwe Mars-oefening was terecht als vierde relatie geregistreerd; daardoor waren de oude exacte verwachtingen verouderd.
+- De drie testverwachtingen zijn bijgewerkt om de bedoelde centrale registry-uitbreiding expliciet mee te nemen. Geen runtime-, curriculumdoel-, evidence- of masterycontract gewijzigd. De eigen Mars-unit-tests slaagden in run #4349.
+- Correctiecommits: `fe256beb70cce8ffd8a4922f380bb7cff009187f`, `592c175bec6ce44bfd63bf253286359bcaa72194`, `900a2ecb7287ae0ed4d4f78e7a54b9e1cdb973b7`.
+- Volgende stap: Full Regression opnieuw uitvoeren op de nieuwe eindcommit. De status blijft rood/onbeslist totdat de nieuwe workflow daadwerkelijk `completed / success` rapporteert.

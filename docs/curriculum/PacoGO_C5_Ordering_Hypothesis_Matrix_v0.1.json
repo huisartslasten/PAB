@@ -1,0 +1,45 @@
+{
+  "schema_version": "0.1",
+  "matrix_version": "0.1.0-candidate",
+  "status": "candidate",
+  "epistemic_status": "[O]",
+  "role": "C5_developmental_ordering_hypotheses",
+  "registry_version": "0.2.0-seed",
+  "not_empirical_validation": true,
+  "allowed_relation_types": [
+    "temporal_precedence",
+    "prediction",
+    "prerequisite",
+    "causal_instructional"
+  ],
+  "alternative_models": [
+    "M0_unordered",
+    "M1_task",
+    "M2_familiarity",
+    "M3_representation_specific",
+    "M4_shared_latent",
+    "M5_context_language",
+    "M6_reciprocal",
+    "M7_instruction_exposure"
+  ],
+  "development_relations": [
+    {"relation_id":"A1.R1","from":"A1.D1","to":"A1.D2","candidate_relation_types":["temporal_precedence","prediction","prerequisite"],"status":"candidate_hypothesis","claim":"A1.D1 may precede and contribute to later A1.D2 development.","required_evidence":["repeated_measurement","task_variation","alternative_model_comparison","baseline_control_for_prediction"],"stronger_claim_requires":"prerequisite requires evidence beyond prediction; causal_instructional requires intervention."},
+    {"relation_id":"A1.R2","from":"A1.D2","to":"A1.D3","candidate_relation_types":["temporal_precedence","prediction","prerequisite"],"status":"candidate_hypothesis","claim":"A1.D2 may precede and contribute to later A1.D3 development.","required_evidence":["repeated_measurement","task_variation","representation_variation","alternative_model_comparison","baseline_control_for_prediction"],"stronger_claim_requires":"prerequisite requires evidence beyond prediction; causal_instructional requires intervention."},
+    {"relation_id":"A1.R3","from":"A1.D1","to":"A1.D3","candidate_relation_types":["prediction","prerequisite"],"status":"candidate_hypothesis","claim":"A1.D1 may predict later A1.D3 directly or through intermediate development.","required_evidence":["longitudinal_prediction","comparison_with_A1_D2","alternative_model_comparison"],"stronger_claim_requires":"do not infer direct prerequisite if an intermediate or parallel route explains the data."},
+    {"relation_id":"B1.R1","from":"B1.D1","to":"B1.D2","candidate_relation_types":["temporal_precedence","prediction","prerequisite"],"status":"candidate_hypothesis","claim":"B1.D1 may precede and contribute to later B1.D2 development.","required_evidence":["repeated_measurement","task_variation","representation_variation","alternative_model_comparison"],"stronger_claim_requires":"prerequisite requires evidence of restricted access to B1.D2 without B1.D1."},
+    {"relation_id":"B1.R2","from":"B1.D2","to":"B1.D3","candidate_relation_types":["temporal_precedence","prediction","prerequisite"],"status":"candidate_hypothesis","claim":"B1.D2 may precede and contribute to later B1.D3 development.","required_evidence":["repeated_measurement","strategy_variation","task_difficulty_control","alternative_model_comparison"],"stronger_claim_requires":"prerequisite requires ruling out independent strategy development routes."},
+    {"relation_id":"B1.R3","from":"B1.D3","to":"B1.D4","candidate_relation_types":["temporal_precedence","prediction","prerequisite"],"status":"candidate_hypothesis","claim":"B1.D3 may precede and contribute to later B1.D4 development.","required_evidence":["repeated_measurement","context_variation","representation_variation","alternative_model_comparison"],"stronger_claim_requires":"prerequisite requires evidence that integrated performance cannot emerge through an alternative route."},
+    {"relation_id":"B1.R4","from":"B1.D1","to":"B1.D4","candidate_relation_types":["prediction","prerequisite"],"status":"candidate_hypothesis","claim":"B1.D1 may predict later B1.D4 development, potentially through intermediate developments.","required_evidence":["longitudinal_prediction","comparison_with_B1_D2_and_B1_D3","alternative_model_comparison"],"stronger_claim_requires":"do not treat distal prediction as proof of a direct prerequisite."},
+    {"relation_id":"FR2.R1","from":"FR2.D1","to":"FR2.D2","candidate_relation_types":["temporal_precedence","prediction","prerequisite"],"status":"candidate_hypothesis","claim":"FR2.D1 may precede and contribute to later FR2.D2 development.","required_evidence":["repeated_measurement","representation_variation","process_evidence","alternative_model_comparison"],"stronger_claim_requires":"prerequisite requires evidence beyond successful recognition performance."},
+    {"relation_id":"FR2.R2","from":"FR2.D2","to":"FR2.D3","candidate_relation_types":["temporal_precedence","prediction","prerequisite"],"status":"candidate_hypothesis","claim":"FR2.D2 may precede and contribute to later FR2.D3 development.","required_evidence":["repeated_measurement","transfer_variation","process_evidence","alternative_model_comparison"],"stronger_claim_requires":"prerequisite requires ruling out functional use through alternative non-explanatory routes."},
+    {"relation_id":"FR2.R3","from":"FR2.D1","to":"FR2.D3","candidate_relation_types":["prediction","prerequisite"],"status":"candidate_hypothesis","claim":"FR2.D1 may predict later FR2.D3 development directly or through FR2.D2.","required_evidence":["longitudinal_prediction","comparison_with_FR2_D2","alternative_model_comparison"],"stronger_claim_requires":"do not infer a direct prerequisite when an intermediate route explains the relation."}
+  ],
+  "required_negative_tests": [
+    "unordered alternative must be represented",
+    "task difficulty/familiarity alternatives must be considered where relevant",
+    "representation/context/language alternatives must be considered where relevant",
+    "reciprocal relations must be considered where theory and data permit",
+    "shared latent explanations must be considered for correlated developments",
+    "candidate_order must not be treated as confirmed ordering"
+  ]
+}

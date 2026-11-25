@@ -10433,3 +10433,12 @@ De drie bestaande oefeningen zijn per afzonderlijke vraag beoordeeld. De volledi
 - De drie testverwachtingen zijn bijgewerkt om de bedoelde centrale registry-uitbreiding expliciet mee te nemen. Geen runtime-, curriculumdoel-, evidence- of masterycontract gewijzigd. De eigen Mars-unit-tests slaagden in run #4349.
 - Correctiecommits: `fe256beb70cce8ffd8a4922f380bb7cff009187f`, `592c175bec6ce44bfd63bf253286359bcaa72194`, `900a2ecb7287ae0ed4d4f78e7a54b9e1cdb973b7`.
 - Volgende stap: Full Regression opnieuw uitvoeren op de nieuwe eindcommit. De status blijft rood/onbeslist totdat de nieuwe workflow daadwerkelijk `completed / success` rapporteert.
+
+### 74.2 Vereenvoudiging leerlingtaal Mars-oefening
+
+- Naar aanleiding van leerlinggerichte controle is het vakwoord **biosignaturen** uit de leestekst en vragen verwijderd.
+- Vervangen door concrete formulering: bijzondere stoffen en patronen die misschien door leven zijn ontstaan, maar ook op een andere manier kunnen ontstaan. Daarmee blijft het onderscheid tussen mogelijke aanwijzing en bewijs intact zonder onnodig vakjargon.
+- Vraag 2 is herschreven naar: “Waarom weten wetenschappers nog niet zeker of er vroeger leven op Mars was?” De inhoudelijke antwoordredenering blijft gelijk.
+- De regressietest controleert nu expliciet dat het woord biosignaturen niet meer in de leerlingtekst voorkomt.
+- Gewijzigde commits: module `9f855757049910154b0a30240f162e26ff620a10`; unit-test `7e61be7717ae0d69bcf728db03cc669bab2ceb68`.
+- Full Regression op deze vereenvoudiging moet nog worden uitgevoerd en geverifieerd; er wordt nog geen groene status geclaimd.

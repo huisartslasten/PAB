@@ -47,5 +47,5 @@ test('space water exercise is registered with a stable ID and central route with
   assert.deepEqual(exercise.route, { page: 'reading-comprehension-space-water.html' });
   assert.equal(exercise.kind, 'non_formal_learning_activity');
   assert.deepEqual(verticalLearningLinesRegistry.getObjective('KD2A-0008').exercise_ids, []);
-  assert.deepEqual(verticalLearningLinesRegistry.getObjective('KD2A-0009').exercise_ids, ['bees-reading-01', 'moon-origin-reading-01', 'space-water-origin-reading-01']);
+  assert.deepEqual(verticalLearningLinesRegistry.getObjective('KD2A-0009').exercise_ids, ['bees-reading-01', 'moon-origin-reading-01', 'space-water-origin-reading-01', 'exercise-0001']);
 });

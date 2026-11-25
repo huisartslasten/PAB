@@ -76,10 +76,12 @@ test('LIVE migration preserves TEST registry history and appends source-controll
 
   for (const v of ['0.3','0.4','0.5','0.6']) {
     const delimiter = '$pacogo_registry_' + v.replace('.','') + '$';
-    const match = sql.match(new RegExp(delimiter + '([\\s\\S]*?)' + delimiter));
-    assert.ok(match, `Missing exact payload for v${v}`);
+    const payloadStart = sql.indexOf(delimiter);
+    const payloadEnd = payloadStart < 0 ? -1 : sql.indexOf(delimiter, payloadStart + delimiter.length);
+    assert.ok(payloadStart >= 0 && payloadEnd >= 0, `Missing exact payload for v${v}`);
+    const payload = sql.slice(payloadStart + delimiter.length, payloadEnd);
     const expected = readFileSync(new URL('../docs/curriculum/PacoGO_Curriculum_Registry_v' + v + '.json', import.meta.url), 'utf8');
-    assert.equal(match[1], expected, `v${v} must match its exact source file bytes`);
+    assert.equal(payload, expected, `v${v} must match its exact source file bytes`);
   }
 
   const registry = JSON.parse(registrySource);

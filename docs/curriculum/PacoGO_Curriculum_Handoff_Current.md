@@ -10457,3 +10457,45 @@ De drie bestaande oefeningen zijn per afzonderlijke vraag beoordeeld. De volledi
 
 
 - Full Regression #4361 was RED on handoff commit `f8f9937e59c2baeffc43a0fe6b92fbed5c9a6bd9`. Exact failure: `test/reading-comprehension-mars-life.test.js:25` still asserted `/bijzondere stoffen en patronen/`, wording from the superseded text. The approved paragraph instead says: “In deze steen zaten stoffen die mogelijk iets te maken hebben met vroeger leven.” Only this stale assertion was updated to match the approved wording; no exercise text was changed. Test correction commit: `9f66450a2e16651043dfe741223a3b9984e614ee`. Full Regression after this correction remains pending.
+
+
+## 75. LIVE/TEST release preparation — LIVE history integrated into development branch (25 November 2026)
+
+### Branch integration decision and result
+- The user confirmed the intended release is TEST branch `refactor/professional-v1` to the existing LIVE website `pacogo.org`, with existing LIVE application and Supabase data preserved and merged rather than replaced.
+- Before integration, exact branch state was `refactor/professional-v1` at `11a35019a010125eb9bfaf67904e70def562b193`; LIVE `main` was `9ddb18aaafec265f2239bb68b05723468c5607f9`.
+- Compare against the common ancestor `c35ee75ddea6bc2cb76379f099bdb9f8e54b117f` showed 17 commits only on LIVE/main, affecting 11 files. The three Double or Nothing runtime/page/test files were byte-identical on both branches. The only shared-file divergence was the canonical page template version marker: main had V6.0 while the development branch had V7.0 and additional central template capabilities. The development V7.0 template was deliberately retained; do not downgrade it to V6.0.
+- Seven LIVE-only files were added to the development tree: `CNAME`, `.github/workflows/double-or-nothing-live-regression.yml`, C5 developmental-ordering protocol, C5 ordering hypothesis matrix, the 2026-11-02 chat transfer, C5 ordering matrix test, and the Tic-Tac-Toe Supabase migration.
+- A true two-parent merge commit was created with development as first parent and LIVE/main as second parent: `c50bd5008085dc20158048d8d8e67e1f3ab656fe`. The branch ref was advanced with an expected-SHA guard. No force push was used.
+- After integration, compare reports `ahead_by=1963`, `behind_by=0`; PR #17 reports `mergeable=true`, `mergeable_state=clean`. This does not authorize merging PR #17 into main; it remains a draft research PR and main is still LIVE.
+- The LIVE/main branch was not modified. No deployment or Supabase change occurred.
+
+### Regression verification
+- Full Regression #4364 / run ID `45666457771` completed `completed / success` on exact merge commit `c50bd5008085dc20158048d8d8e67e1f3ab656fe`.
+- All workflow steps passed, including curriculum engine, architecture boundaries, maintained Node regression, migrated native Node regression, Chromium browser regression and clean working-tree verification.
+- The resulting handoff update must itself be verified by Full Regression on its resulting exact commit.
+
+### Read-only Supabase release inventory and corrections
+- LIVE project ID: `ncpkqrvxljxwboavxtak`. TEST project ID: `btnhhvtpmuvrpbnkyjnm`.
+- LIVE has 37 lesson rows, 488 lesson-item rows, 19 test attempts, 195 test-attempt answers, 3 game results, 23 learning topics, 19 learning material cards, 8 lesson-order rows, 12 legacy skill definitions and 36 legacy skill assignments. These are aggregate baseline counts, not learner-level counts. Preserve all rows and their relationships.
+- LIVE roster has three existing learner identities in the application registry. No curriculum ownership/profile tables exist in LIVE yet. LIVE has 2 auth users.
+- TEST has 4 curriculum registry version rows (0.2.0-seed through 0.5.0-candidate), 0 student evidence rows, 0 longitudinal-state rows and 0 decision-trace rows.
+- TEST currently has 1 learner profile, 1 guardian membership and 1 app-profile link, for stable app roster key `zyon`. This contradicts the earlier statement in this handoff's ownership contract that TEST has zero learner profiles/links; that historical statement is stale and must not be used as current inventory. Do not copy this TEST profile or its auth identity to LIVE.
+- The v0.6.0-candidate curriculum registry exists in the development branch source file `docs/curriculum/PacoGO_Curriculum_Registry_v0.6.json`, with 7 Skills, 37 Developments, 37 Claims, 73 Evidence Targets and 42 Task Models. It is not yet present in TEST's `curriculum_registry_versions` table; current TEST rows end at 0.5.0-candidate.
+- The vertical learning-line registry is source-controlled at `src/features/curriculum/vertical-learning-lines-registry.js`; it is code/data in the branch, not a separate existing Supabase table.
+- The TEST learner ownership/identity migrations explicitly state TEST-first and not to apply unchanged to LIVE. They require opaque UUID learner profiles, explicit authenticated guardian ownership and explicit mapping from stable app keys; they forbid inferring identities from display names. LIVE has 2 auth users while TEST has 1, so TEST auth/profile IDs must not be transferred.
+- A LIVE-specific migration design is required. It must add the necessary curriculum persistence and ownership schema without replacing or altering existing LIVE lesson, agenda, test-history, game, topic, legacy-skill or access data. Production learner profiles should be provisioned only through the authenticated ownership flow; do not seed or map profiles by guessing from names.
+- No Supabase data or schema has been changed. No production backup/export has yet been created or verified. Before applying any LIVE DDL, establish an approved restorable backup and a before/after integrity manifest covering all existing LIVE records and relationships.
+
+### Current release gate and next concrete step
+1. Keep `main` and `pacogo.org` untouched.
+2. Design a LIVE-specific, additive migration from the actual LIVE baseline. Reconcile the TEST-first ownership/RLS contract with production auth identities; do not copy TEST profiles or infer identity.
+3. Register the exact source-controlled v0.6.0-candidate curriculum configuration in LIVE only after the schema and security design are reviewed and tested.
+4. Verify the migration and complete persistence chain using synthetic test data in TEST, with full rollback and zero residual test records.
+5. Create and verify a restorable LIVE backup and integrity baseline before any production migration.
+6. Only after the database and code release gates are complete, prepare a separate explicit release PR/deployment to GitHub Pages. Preserve `CNAME`, the V7.0 central template, all existing LIVE functionality and all existing LIVE data.
+
+Current branch: `refactor/professional-v1`.
+Last verified code commit: `c50bd5008085dc20158048d8d8e67e1f3ab656fe`.
+Last verified Full Regression: #4364 / `45666457771`, completed success on that exact commit.
+LIVE `main`, Supabase LIVE and `pacogo.org`: unchanged.

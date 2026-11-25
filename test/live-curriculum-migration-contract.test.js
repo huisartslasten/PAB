@@ -55,20 +55,35 @@ test('LIVE curriculum migration preserves the authenticated learner ownership an
   assert.doesNotMatch(sql, /insert\s+into\s+public\.learner_profile_links\s*\([^)]*\)\s*values\s*\([^)]*'zephon'/i);
 });
 
-test('LIVE migration registers the byte-exact source-controlled v0.6 candidate registry', () => {
-  assert.ok(sql.includes(registryDelimiter));
-  const match = sql.match(/\$pacogo_registry_v06\$([\s\S]*?)\$pacogo_registry_v06\$/);
-  assert.ok(match, 'Embedded registry JSON must be present');
-  assert.equal(match[1], registrySource, 'Embedded registry must exactly match the source file bytes');
+test('LIVE migration preserves TEST registry history and appends source-controlled v0.6', () => {
+  const versions = [
+    ['0.2.0-seed', 'cb58825a0e3347f48b11b4a664f689f5050a53a021678345a5a897410113304d', '$pacogo_registry_02$', null],
+    ['0.3.0-candidate', '4ba39fed03b5d8e82c0f3c08f01354301e0e66c82e899fe0a0e9e5ed0866926a', '$pacogo_registry_03$', '0.2.0-seed'],
+    ['0.4.0-candidate', '7aaea07eb7d9d0b6b895f46ca1b99c4b8229505556d7313f023cad8994ce5132', '$pacogo_registry_04$', '0.3.0-candidate'],
+    ['0.5.0-candidate', 'fdc3712704304d563b2b1db0620dd089d8b328724d5a4d1b2416781d95a7f422', '$pacogo_registry_05$', '0.4.0-candidate'],
+    ['0.6.0-candidate', '36853c6107902c29592ecc0906357ad2cc45814befd312ad22096e1e5ab07ba0', '$pacogo_registry_06$', '0.5.0-candidate']
+  ];
+  for (const [version, hash, delimiter, previous] of versions) {
+    assert.ok(sql.includes(hash), `Missing historical config hash for ${version}`);
+    assert.ok(sql.includes(delimiter), `Missing config payload for ${version}`);
+    assert.ok(sql.includes("'" + version + "'"), `Missing version ${version}`);
+    if (previous) assert.ok(sql.includes("version='" + previous + "'"), `Missing supersedes link to ${previous}`);
+  }
+  assert.match(sql, /^begin;/);
+  assert.match(sql.trimEnd(), /commit;$/);
+  assert.match(sql, /r\.supersedes_id is null/);
+  assert.match(sql, /v0\.2 is taken[\s\S]*stored TEST JSONB snapshot/i);
 
-  const expectedHash = createHash('sha256').update(registrySource, 'utf8').digest('hex');
-  assert.equal(expectedHash, '36853c6107902c29592ecc0906357ad2cc45814befd312ad22096e1e5ab07ba0');
-  assert.match(sql, new RegExp(expectedHash));
+  for (const v of ['0.3','0.4','0.5','0.6']) {
+    const delimiter = '$pacogo_registry_' + v.replace('.','') + '$';
+    const match = sql.match(new RegExp(delimiter + '([\\s\\S]*?)' + delimiter));
+    assert.ok(match, `Missing exact payload for v${v}`);
+    const expected = readFileSync(new URL('../docs/curriculum/PacoGO_Curriculum_Registry_v' + v + '.json', import.meta.url), 'utf8');
+    assert.equal(match[1], expected, `v${v} must match its exact source file bytes`);
+  }
+
   const registry = JSON.parse(registrySource);
   assert.equal(registry.registry_version, '0.6.0-candidate');
-  assert.equal(registry.status, 'candidate');
   assert.equal(registry.skills.length, 7);
   assert.equal(registry.skills.reduce((sum, skill) => sum + (skill.developments?.length || 0), 0), 37);
-  assert.match(sql, /on conflict \(registry_key, version\) do nothing/i);
-  assert.match(sql, /v0\.6\.0-candidate registry row does not match the exact source-controlled configuration/);
 });

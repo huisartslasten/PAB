@@ -35,6 +35,12 @@ test('Skills entry shows compact learning-area tiles and opens the existing math
     const dutchTiles = [...document.querySelectorAll('.skills-dutch-grid .skills-dutch-tile')];
     const dutchSubjects = dutchTiles.map(tile => tile.querySelector('.paco-tile-title')?.textContent);
     const pendingStatuses = dutchTiles.map(tile => tile.querySelector('.paco-tile-meta')?.textContent || '');
+
+    const areaRuntime = createSkillsRuntime({
+      app, templateMount, context: { student: 'Zyon', mode: 'management' },
+      documentRef: document, navigate: target => { navigatedTo = String(target); }
+    });
+    await areaRuntime.mount();
     const mathTile = [...document.querySelectorAll('.skills-area-tile')].find(tile => tile.querySelector('.paco-tile-title')?.textContent === 'Rekenen');
     mathTile.querySelector('.paco-tile-action').click();
     return { areaTitles, areaTileCount, areaGridColumns, dutchHasAction, dutchNavigation, dutchSubjects, pendingStatuses, navigation: navigatedTo };

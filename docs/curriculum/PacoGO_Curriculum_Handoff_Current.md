@@ -10452,3 +10452,5 @@ De drie bestaande oefeningen zijn per afzonderlijke vraag beoordeeld. De volledi
 - De Mars-unit-test controleert nu expliciet dat de term `biosignaturen` nergens in de leerlingvragen, uitleg of antwoordopties voorkomt.
 - Module herstelcommit: `5e343744728ce7141316ab55725b4c058830c29c`; testcommit: `de23c6126732678509ad511276dc7ca2f44d4415`.
 - Full Regression na deze herstelwijziging moet nog draaien en succesvol eindigen voordat de stap als afgerond wordt beschouwd.
+
+- Regressionbevinding herstel: Full Regression #4357 op modulecommit `5e343744728ce7141316ab55725b4c058830c29c` was RED door een verouderde unit-testassertie die nog eiste dat `Cheyava Falls` in de goedgekeurde leerlingtekst stond. De goedgekeurde tekst noemt alleen “een bijzondere steen”; de implementatie is dus leidend conform akkoord. Ook de oude testassertie voor de eerder afwijkende zin met “Toch blijft Mars...” is vervangen door de exacte goedgekeurde zin. Testcorrectiecommit: `0dfb7004af8058344b11d430c60e72e7639d34c4`. Full Regression moet opnieuw worden geverifieerd.

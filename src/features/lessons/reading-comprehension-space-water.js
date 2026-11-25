@@ -1,3 +1,46 @@
+export const SPACE_WATER_READING_IMAGES = Object.freeze({
+  earlyEarth: Object.freeze({
+    src: 'https://assets.science.nasa.gov/dynamicimage/assets/science/psd/mars/downloadable_items/3/8/38146_astrobiology-artist-concept-early-earth.jpg',
+    alt: 'Artistieke voorstelling van de jonge aarde met vulkanische activiteit.',
+    caption: 'Een artistieke voorstelling van de jonge aarde.',
+    author: 'NASA',
+    sourceUrl: 'https://science.nasa.gov/resource/artist-concept-of-an-early-earth/',
+    license: 'NASA media usage guidelines',
+    licenseUrl: 'https://www.nasa.gov/nasa-brand-center/images-and-media/',
+    fit: 'contain'
+  }),
+  asteroid: Object.freeze({
+    src: 'https://assets.science.nasa.gov/dynamicimage/assets/science/psd/solar/2023/07/bennu-mosaic.jpg',
+    alt: 'Een gedetailleerd beeld van het oppervlak van asteroïde Bennu.',
+    caption: 'Asteroïde Bennu, gefotografeerd door de ruimtesonde OSIRIS-REx.',
+    author: 'NASA/Goddard/University of Arizona',
+    sourceUrl: 'https://science.nasa.gov/gallery/osiris-rex-full-mission-gallery/',
+    license: 'NASA media usage guidelines',
+    licenseUrl: 'https://www.nasa.gov/nasa-brand-center/images-and-media/',
+    fit: 'contain'
+  }),
+  comet: Object.freeze({
+    src: 'https://media.esa.int/legacy/web/images/esa_multimedia/images/2015/03/comet_on_21_march_2015_navcam/15333813-1-eng-GB/173995/image-thumb__173995__fit_large/Comet_on_21_March_2015_NavCam.a2a48df3.webp',
+    alt: 'Komeet 67P, gefotografeerd door de navigatiecamera van de Rosetta-missie.',
+    caption: 'Bronvermelding: ESA – European Space Agency (Rosetta/NAVCAM). Ongewijzigd weergegeven.',
+    author: 'ESA – European Space Agency (Rosetta/NAVCAM)',
+    sourceUrl: 'https://www.esa.int/media/comet-on-21-march-2015-navcam',
+    license: 'CC BY-SA 3.0 IGO',
+    licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/igo/',
+    fit: 'contain'
+  }),
+  waterCycle: Object.freeze({
+    src: 'https://svs.gsfc.nasa.gov/vis/a030000/a030500/a030580/water_cycle.png',
+    alt: 'Schema dat laat zien hoe water verdampt, wolken vormt en als neerslag terugvalt.',
+    caption: 'Schema van de waterkringloop op aarde.',
+    author: 'NASA SVS; ontwerp Deborah McLean; technische ondersteuning Marit Jentoft-Nilsen',
+    sourceUrl: 'https://svs.gsfc.nasa.gov/30580',
+    license: 'NASA media usage guidelines',
+    licenseUrl: 'https://www.nasa.gov/nasa-brand-center/images-and-media/',
+    fit: 'contain'
+  })
+});
+
 export const SPACE_WATER_READING_EXERCISE = Object.freeze({
   id: 'space-water-origin-reading-01',
   title: 'De ruimte – Waar komt al het water op aarde vandaan?',
@@ -158,47 +201,4 @@ export const SPACE_WATER_READING_EXERCISE = Object.freeze({
     Object.freeze({ id: 'water-cycle', title: 'NASA — The Water Cycle', url: 'https://science.nasa.gov/earth/earth-observatory/the-water-cycle/' }),
     Object.freeze({ id: 'water-cycle-diagram', title: 'NASA Scientific Visualization Studio — The Water Cycle (afbeelding)', url: 'https://svs.gsfc.nasa.gov/30580' })
   ])
-});
-
-export const SPACE_WATER_READING_IMAGES = Object.freeze({
-  earlyEarth: Object.freeze({
-    src: 'https://assets.science.nasa.gov/dynamicimage/assets/science/psd/mars/downloadable_items/3/8/38146_astrobiology-artist-concept-early-earth.jpg',
-    alt: 'Artistieke voorstelling van de jonge aarde met vulkanische activiteit.',
-    caption: 'Een artistieke voorstelling van de jonge aarde.',
-    author: 'NASA',
-    sourceUrl: 'https://science.nasa.gov/resource/artist-concept-of-an-early-earth/',
-    license: 'NASA media usage guidelines',
-    licenseUrl: 'https://www.nasa.gov/nasa-brand-center/images-and-media/',
-    fit: 'contain'
-  }),
-  asteroid: Object.freeze({
-    src: 'https://assets.science.nasa.gov/dynamicimage/assets/science/psd/solar/2023/07/bennu-mosaic.jpg',
-    alt: 'Een gedetailleerd beeld van het oppervlak van asteroïde Bennu.',
-    caption: 'Asteroïde Bennu, gefotografeerd door de ruimtesonde OSIRIS-REx.',
-    author: 'NASA/Goddard/University of Arizona',
-    sourceUrl: 'https://science.nasa.gov/gallery/osiris-rex-full-mission-gallery/',
-    license: 'NASA media usage guidelines',
-    licenseUrl: 'https://www.nasa.gov/nasa-brand-center/images-and-media/',
-    fit: 'contain'
-  }),
-  comet: Object.freeze({
-    src: 'https://media.esa.int/legacy/web/images/esa_multimedia/images/2015/03/comet_on_21_march_2015_navcam/15333813-1-eng-GB/173995/image-thumb__173995__fit_large/Comet_on_21_March_2015_NavCam.a2a48df3.webp',
-    alt: 'Komeet 67P, gefotografeerd door de navigatiecamera van de Rosetta-missie.',
-    caption: 'Bronvermelding: ESA – European Space Agency (Rosetta/NAVCAM). Ongewijzigd weergegeven.',
-    author: 'ESA – European Space Agency (Rosetta/NAVCAM)',
-    sourceUrl: 'https://www.esa.int/media/comet-on-21-march-2015-navcam',
-    license: 'CC BY-SA 3.0 IGO',
-    licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/igo/',
-    fit: 'contain'
-  }),
-  waterCycle: Object.freeze({
-    src: 'https://svs.gsfc.nasa.gov/vis/a030000/a030500/a030580/water_cycle.png',
-    alt: 'Schema dat laat zien hoe water verdampt, wolken vormt en als neerslag terugvalt.',
-    caption: 'Schema van de waterkringloop op aarde.',
-    author: 'NASA SVS; ontwerp Deborah McLean; technische ondersteuning Marit Jentoft-Nilsen',
-    sourceUrl: 'https://svs.gsfc.nasa.gov/30580',
-    license: 'NASA media usage guidelines',
-    licenseUrl: 'https://www.nasa.gov/nasa-brand-center/images-and-media/',
-    fit: 'contain'
-  })
 });

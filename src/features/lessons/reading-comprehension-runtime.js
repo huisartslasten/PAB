@@ -339,7 +339,7 @@ export function createReadingComprehensionRuntime({ templateMount, context = {},
         });
         model.append(checklist, element(documentRef, 'p', 'reading-comprehension-self-check-note', 'Een antwoord mag anders geformuleerd zijn dan het voorbeeld, zolang de inhoud klopt.'));
         card.appendChild(model);
-        card.appendChild(actionButton(documentRef, currentIndex === BEE_READING_QUESTIONS.length - 1 ? 'Bekijk resultaat' : 'Volgende vraag', 'success', () => {
+        card.appendChild(actionButton(documentRef, currentIndex === exercise.questions.length - 1 ? 'Bekijk resultaat' : 'Volgende vraag', 'success', () => {
           openSelfCheckPoints += currentOpenPoints;
           currentOpenPoints = 0;
           currentIndex += 1;

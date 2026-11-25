@@ -28,13 +28,13 @@ export const MARS_LIFE_READING_EXERCISE = Object.freeze({
   durationLabel: 'KORT',
   subtitle: 'Groep 8 · De ruimte',
   textTitle: 'Heeft Mars ooit leven gehad?',
-  textIntro: 'Wetenschappers zoeken naar sporen van heel klein leven',
+  textIntro: 'Wetenschappers zoeken naar sporen van leven op de rode planeet.',
   text: Object.freeze([
     Object.freeze({
       heading: 'Een planeet met een ander verleden',
       paragraphs: Object.freeze([
-        'Mars is nu een koude, droge planeet. Aan het oppervlak zijn geen rivieren en meren zoals op aarde. Maar miljarden jaren geleden zag Mars er waarschijnlijk heel anders uit.',
-        'Wetenschappers hebben op Mars sporen gevonden van oude rivierbeddingen en meren. Er stroomde vroeger dus water over het oppervlak. Omdat water belangrijk is voor leven zoals wij dat kennen, onderzoeken wetenschappers of er toen kleine levende wezens op Mars kunnen hebben bestaan.'
+        'Mars is een bijzondere planeet. Tegenwoordig is het er erg koud en droog. Er zijn geen rivieren en meren meer zoals op aarde. Maar miljarden jaren geleden zag Mars er waarschijnlijk heel anders uit.',
+        'Wetenschappers hebben ontdekt dat er vroeger rivieren en meren op Mars waren. Er stroomde water over de grond. Omdat water belangrijk is voor leven zoals wij dat kennen, vragen wetenschappers zich af of er vroeger kleine levende wezens op Mars hebben geleefd.'
       ]),
       images: Object.freeze([]),
       sourceIds: Object.freeze(['nasa-mars-report', 'nasa-mars-water'])
@@ -42,8 +42,8 @@ export const MARS_LIFE_READING_EXERCISE = Object.freeze({
     Object.freeze({
       heading: 'Een bijzondere steen',
       paragraphs: Object.freeze([
-        'De Marswagen Perseverance onderzoekt stenen en grond in een gebied waar vroeger water stroomde. In juli 2024 onderzocht de rover een steen die Cheyava Falls wordt genoemd. In de steen vond hij bijzondere patronen en stoffen die mogelijk iets vertellen over vroegere omstandigheden op Mars.',
-        'In september 2025 vertelden wetenschappers dat een monster uit deze steen bijzondere stoffen en patronen bevat. Die zijn misschien door leven ontstaan. Maar ze kunnen ook op een andere manier ontstaan. Daarom weten we nog niet of er vroeger echt leven op Mars was.'
+        'Ruimtewagens onderzoeken daarom de stenen en de grond van Mars. In 2024 ontdekte de ruimtewagen Perseverance een bijzondere steen. In deze steen zaten stoffen die mogelijk iets te maken hebben met vroeger leven.',
+        'In september 2025 vertelde NASA dat deze ontdekking mogelijke aanwijzingen bevat voor leven dat vroeger op Mars kan hebben bestaan.'
       ]),
       images: Object.freeze([MARS_LIFE_READING_IMAGES.rover, MARS_LIFE_READING_IMAGES.rock]),
       sourceIds: Object.freeze(['nasa-cheyava-2024', 'nasa-biosignature-2025'])
@@ -51,8 +51,8 @@ export const MARS_LIFE_READING_EXERCISE = Object.freeze({
     Object.freeze({
       heading: 'Waarom is er nog geen zekerheid?',
       paragraphs: Object.freeze([
-        'Wetenschappers moeten voorzichtig zijn. Sommige stoffen en patronen kunnen ontstaan door levende wezens, maar ze kunnen ook door gewone chemische reacties ontstaan. Daarom is verder onderzoek nodig voordat onderzoekers kunnen zeggen dat er ooit leven op Mars was.',
-        'Toch blijft Mars een interessante plek om te zoeken. De oude rivierbeddingen laten zien dat er vroeger water was, en de bijzondere steen geeft onderzoekers nieuwe aanwijzingen. Samen kunnen die gegevens helpen om het verleden van Mars beter te begrijpen.'
+        'Toch weten wetenschappers nog niet zeker of er ooit leven is geweest. Dezelfde stoffen kunnen namelijk ook ontstaan zonder dat er levende wezens zijn. Er is dus meer onderzoek nodig.',
+        'Mars blijft voorlopig een groot raadsel. We weten dat er vroeger water was, maar we weten nog niet of er ooit leven is geweest. De zoektocht gaat verder.'
       ]),
       images: Object.freeze([]),
       sourceIds: Object.freeze(['nasa-biosignature-2025', 'nature-study'])
@@ -60,8 +60,8 @@ export const MARS_LIFE_READING_EXERCISE = Object.freeze({
     Object.freeze({
       heading: 'Zou er nu nog leven kunnen zijn?',
       paragraphs: Object.freeze([
-        'Aan het oppervlak is leven moeilijk. Het is er erg koud, er is weinig bescherming tegen gevaarlijke straling en vloeibaar water blijft er niet gemakkelijk bestaan. Diep onder de grond kan de omgeving beter beschermd zijn.',
-        'Onderzoekers bestuderen daarom of er onder het oppervlak plaatsen zijn waar micro-organismen zouden kunnen overleven. Er is op dit moment geen leven op Mars gevonden. Of er ooit leven was, of dat er misschien nog ergens leven bestaat, is dus nog een open vraag.'
+        'Aan de buitenkant van Mars is het erg moeilijk om te overleven. Het is er koud en er is gevaarlijke straling. Diep onder de grond is de situatie misschien anders.',
+        'Wetenschappers onderzoeken of daar plaatsen zijn waar kleine levende wezens zouden kunnen overleven.'
       ]),
       images: Object.freeze([]),
       sourceIds: Object.freeze(['nasa-mars-report', 'nasa-search-life'])
@@ -82,7 +82,7 @@ export const MARS_LIFE_READING_EXERCISE = Object.freeze({
       evidence: 'De tweede alinea van ‘Een planeet met een ander verleden’.',
       explanation: 'De tekst legt uit dat er vroeger water was. Omdat water belangrijk is voor leven zoals wij dat kennen, onderzoeken wetenschappers of er toen leven kan zijn geweest.',
       distractorRationales: Object.freeze([
-        Object.freeze({ optionId: 'B', reason: 'De tekst noemt geen bossen op Mars.' }),
+        Object.freeze({ optionId: 'B', reason: 'De tekst zegt niet dat er vroeger geen water op Mars was.' }),
         Object.freeze({ optionId: 'C', reason: 'De tekst zegt niet dat mensen ooit op Mars hebben gewoond.' }),
         Object.freeze({ optionId: 'D', reason: 'De tekst beschrijft Mars juist als een koude planeet.' })
       ])
@@ -90,26 +90,26 @@ export const MARS_LIFE_READING_EXERCISE = Object.freeze({
     Object.freeze({
       id: 'MARS-Q2',
       type: 'multiple_choice',
-      prompt: 'Waarom weten wetenschappers nog niet zeker of er vroeger leven op Mars was?',
+      prompt: 'Waarom weten wetenschappers nog niet zeker of er ooit leven op Mars is geweest?',
       options: Object.freeze([
         Object.freeze({ id: 'A', text: 'Omdat de rover de steen niet goed heeft kunnen bekijken.' }),
-        Object.freeze({ id: 'B', text: 'Omdat zulke stoffen en patronen ook zonder levende wezens kunnen ontstaan.' }),
+        Object.freeze({ id: 'B', text: 'Omdat dezelfde stoffen ook kunnen ontstaan zonder dat er levende wezens zijn.' }),
         Object.freeze({ id: 'C', text: 'Omdat er op Mars nooit water is geweest.' }),
-        Object.freeze({ id: 'D', text: 'Omdat biosignaturen alleen op aarde voorkomen.' })
+        Object.freeze({ id: 'D', text: 'Omdat er op Mars geen water meer aan de oppervlakte is.' })
       ]),
       correctOptionId: 'B',
       evidence: 'De eerste alinea van ‘Waarom is er nog geen zekerheid?’.',
       explanation: 'De tekst noemt een andere mogelijke verklaring: gewone chemische reacties kunnen dezelfde stoffen en patronen veroorzaken.',
       distractorRationales: Object.freeze([
         Object.freeze({ optionId: 'A', reason: 'De tekst zegt niet dat de rover de steen niet goed kon bekijken.' }),
-        Object.freeze({ optionId: 'C', reason: 'De tekst beschrijft juist aanwijzingen voor vroeger water op Mars.' }),
-        Object.freeze({ optionId: 'D', reason: 'De tekst zegt niet dat biosignaturen alleen op aarde voorkomen.' })
+        Object.freeze({ optionId: 'C', reason: 'De tekst zegt juist dat er vroeger water op Mars was.' }),
+        Object.freeze({ optionId: 'D', reason: 'De tekst zegt niet dat er geen leven op Mars kan zijn geweest.' })
       ])
     }),
     Object.freeze({
       id: 'MARS-Q3',
       type: 'multiple_choice',
-      prompt: 'Lees de zin: “Toch blijft Mars een interessante plek om te zoeken.” Het woord ‘toch’ verbindt deze zin met de uitleg dat de gevonden stoffen en patronen nog geen bewijs voor leven zijn. Welk verband geeft ‘toch’ hier aan?',
+      prompt: 'Lees de zin: “Toch weten wetenschappers nog niet zeker of er ooit leven is geweest.” Het woord ‘toch’ verbindt deze zin met de mogelijke aanwijzingen voor vroeger leven die in de vorige alinea worden genoemd. Welk verband geeft ‘toch’ hier aan?',
       options: Object.freeze([
         Object.freeze({ id: 'A', text: 'Een opsomming: er worden meerdere redenen achter elkaar genoemd.' }),
         Object.freeze({ id: 'B', text: 'Een tegenstelling: ondanks de onzekerheid blijft Mars interessant.' }),
@@ -117,8 +117,8 @@ export const MARS_LIFE_READING_EXERCISE = Object.freeze({
         Object.freeze({ id: 'D', text: 'Een voorbeeld: er wordt één voorbeeld genoemd.' })
       ]),
       correctOptionId: 'B',
-      evidence: 'De overgang tussen de alinea’s in ‘Waarom is er nog geen zekerheid?’.',
-      explanation: 'Eerst staat dat de gevonden stoffen en patronen nog geen bewijs voor leven zijn. De zin met ‘toch’ laat zien dat Mars ondanks die onzekerheid interessant blijft om te onderzoeken.',
+      evidence: 'De overgang tussen het tekstgedeelte over de bijzondere steen en het tekstgedeelte over de onzekerheid.',
+      explanation: 'Eerst noemt de tekst mogelijke aanwijzingen voor vroeger leven. Met ‘toch’ laat de schrijver zien dat er ondanks die aanwijzingen nog geen zekerheid is.',
       distractorRationales: Object.freeze([
         Object.freeze({ optionId: 'A', reason: 'De zin noemt geen reeks verschillende zaken.' }),
         Object.freeze({ optionId: 'C', reason: 'Het woord geeft hier geen volgorde van gebeurtenissen aan.' }),

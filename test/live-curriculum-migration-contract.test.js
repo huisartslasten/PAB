@@ -37,7 +37,7 @@ test('LIVE curriculum migration is additive and refuses partial/conflicting targ
   assert.doesNotMatch(sql, /\bupdate\s+public\.(lessons|lesson_items|test_attempts|test_attempt_answers|agenda_items|agenda_import_drafts|game_results|skill_definitions|skill_assignments)\b/i);
 });
 
-test('LIVE curriculum migration preserves the authenticated learner ownership and atomic-write contract', () => {
+test('LIVE curriculum migration preserves the authenticated learner ownership and hardened atomic-write contract', () => {
   assert.match(sql, /create table public\.learner_profiles/i);
   assert.match(sql, /create table public\.learner_guardians/i);
   assert.match(sql, /create table public\.learner_profile_links/i);
@@ -45,8 +45,18 @@ test('LIVE curriculum migration preserves the authenticated learner ownership an
   assert.match(sql, /create or replace function public\.create_app_learner_profile/i);
   assert.match(sql, /create or replace function public\.link_app_learner_profile/i);
   assert.match(sql, /create or replace function public\.persist_curriculum_learning_cycle/i);
-  assert.match(sql, /language plpgsql\s+security invoker\s+set search_path = ''[\s\S]*?app\.pacogo_learning_cycle_write/);
-  assert.match(sql, /exception\s+when others then[\s\S]*?set_config\('app\.pacogo_learning_cycle_write', '', true\)/i);
+  assert.match(sql, /create or replace function private\.persist_curriculum_learning_cycle[\s\S]*?security definer\s+set search_path = ''/i);
+  assert.match(sql, /create or replace function public\.persist_curriculum_learning_cycle[\s\S]*?security invoker\s+set search_path = ''/i);
+  assert.match(sql, /private\.persist_curriculum_learning_cycle\(/i);
+  assert.match(sql, /if \(select auth\.uid\(\)\) is null[\s\S]*?not private\.is_learner_guardian\(p_student_key\)/i);
+  assert.match(sql, /revoke insert, update, delete on public\.student_evidence from authenticated/i);
+  assert.match(sql, /revoke insert, update, delete on public\.student_longitudinal_state from authenticated/i);
+  assert.match(sql, /revoke insert, update, delete on public\.curriculum_decision_trace from authenticated/i);
+  assert.match(sql, /drop function if exists private\.learner_cycle_write_enabled\(\)/i);
+  const finalRpcStart = sql.lastIndexOf('create or replace function public.persist_curriculum_learning_cycle(');
+  const finalRpcEnd = sql.indexOf('\\n$;', finalRpcStart);
+  assert.ok(finalRpcStart >= 0 && finalRpcEnd > finalRpcStart, 'Final SECURITY INVOKER RPC definition must be present');
+  assert.doesNotMatch(sql.slice(finalRpcStart, finalRpcEnd), /pacogo_learning_cycle_write|set_config/i);
   assert.match(sql, /learner_profiles_key_is_uuid/);
   assert.match(sql, /owner_user_id = \(select auth\.uid\(\)\)/);
   assert.match(sql, /learner owner must be the authenticated user/i);

@@ -10119,3 +10119,13 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 
 ### Volgende concrete stap
 - Voer Full Regression uit op de commit met deze Nederlandse vier-tegelnavigatie en handoff-update. Bij rood: stop en isoleer de exacte oorzaak. Bij groen: wacht op de volgende expliciete opdracht; werk geen Nederlandse curriculumonderdelen uit zonder brongebaseerde opdracht.
+
+
+### Full Regression #4310 — browsertestvolgorde gecorrigeerd
+- Full Regression #4310 / run ID `45529079031` faalde uitsluitend in de browserregressie bij de nieuwe Skills-ingangstest.
+- Exacte oorzaak: de test navigeerde van de leergebiedpagina naar Nederlands, controleerde daar de vier Nederlandse tegels en zocht daarna ten onrechte de tegel Rekenen op diezelfde Nederlandse pagina. De tegel Rekenen bestaat daar niet; de test veroorzaakte daardoor een `TypeError` bij `querySelector`.
+- Alle 530 maintained Node-tests slaagden; curriculum-engine, architectuurgrenzen, Double or Nothing en gemigreerde native Node-tests slaagden eveneens. Chromium-installatie en lokale fixtureserver slaagden.
+- Dit is een testvolgorde-/testopstellingsfout, geen aangetoonde runtime- of curriculumfout.
+- Correctie: na de controle van de Nederlandse tegels wordt de centrale leergebiedpagina opnieuw gemount voordat de test Rekenen opent. Geen runtimecode of curriculumcontract gewijzigd.
+- Testcorrectiecommit: `31cab5e6e86cbc63b4ca2d22622555d2c4b47ed1`.
+- Handoff-updatecommit en nieuwe Full Regression: pending.

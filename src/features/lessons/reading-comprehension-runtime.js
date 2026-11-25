@@ -66,7 +66,7 @@ export const BEE_READING_QUESTIONS = Object.freeze([
 
 export const BEE_READING_EXERCISE = Object.freeze({
   id: 'bees-reading-01',
-  subtitle: exercise.subtitle,
+  subtitle: 'Groep 8 · Bijen',
   textTitle: 'Bijen: belangrijke werkers van onze natuur',
   textIntro: 'Lees de tekst rustig door. Je mag tijdens het beantwoorden van de vragen steeds teruglezen.',
   text: BEE_READING_TEXT,
@@ -369,7 +369,7 @@ export function createReadingComprehensionRuntime({ templateMount, context = {},
     navigation,
     title: 'Begrijpend lezen',
     icon: '📖',
-    subtitle: 'Groep 8 · Bijen',
+    subtitle: exercise.subtitle,
     content,
     layoutMode: 'practice'
   });

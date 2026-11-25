@@ -10129,3 +10129,30 @@ De taakbankwijziging moet op een nieuwe commit door Full Regression worden gever
 - Correctie: na de controle van de Nederlandse tegels wordt de centrale leergebiedpagina opnieuw gemount voordat de test Rekenen opent. Geen runtimecode of curriculumcontract gewijzigd.
 - Testcorrectiecommit: `31cab5e6e86cbc63b4ca2d22622555d2c4b47ed1`.
 - Handoff-updatecommit en nieuwe Full Regression: pending.
+
+## 65. Bronvermelding en beeldlicenties vastgelegd in het oefeningenbouwprotocol (24 november 2026)
+
+**Besluit**
+- Bronvermelding en controle van gebruiksrechten zijn verplichte onderdelen van het centrale PacoGO-oefeningenbouwproces.
+- Externe tekstuele informatie krijgt bronvermelding bij de relevante passage en een bronnenoverzicht bij de oefening/les. Bronnen moeten de bijbehorende beweringen daadwerkelijk ondersteunen.
+- Voor ieder extern beeld- of mediabestand worden de oorspronkelijke bron, maker/rechthebbende, exacte licentie of toestemming, licentie-URL, verplichte naamsvermelding, toegestane bewerkingen en commercieel hergebruik gecontroleerd en vastgelegd.
+- Voorkeur gaat uit naar eigen materiaal, aantoonbaar publiek domein, CC0 en passende Creative Commons-licenties die commercieel gebruik en noodzakelijke bewerkingen toestaan.
+- NC- en ND-licenties worden vermeden wanneer zij niet passen bij mogelijk commercieel PacoGO-gebruik of noodzakelijke bewerkingen. SA-voorwaarden moeten vooraf op verenigbaarheid worden gecontroleerd.
+- Bij onduidelijke rechten of voorwaarden wordt het materiaal niet gebruikt; er wordt een aantoonbaar vrij alternatief gezocht of eigen materiaal gemaakt.
+- Een zoekresultaat of het enkele feit dat materiaal op een bekende website staat, geldt niet als bewijs van gebruiksrecht. Bronvermelding legaliseert geen ongeoorloofd gebruik.
+
+**Wijziging**
+- Bestaand centraal document uitgebreid: `docs/curriculum/PacoGO_Exercise_Build_Protocol_v0.1.md`, nieuwe sectie 13.
+- Protocolcommit: `0d145acd136d93135fa989e373d80a377953bce0`.
+- Alleen documentatie op branch `refactor/professional-v1`; LIVE `main` niet aangeraakt.
+- Geen code, curriculumregistraties, studentdata, runtimecontracten of Supabase gewijzigd.
+
+**Engineering en verificatie**
+- Baseline vóór de protocolwijziging: Full Regression #4312 / run `45534214911`, `completed / success` op commit `6572f8b90ef2cd00462e29793a12bb2f092cb914`.
+- De nieuwe protocolcommit `0d145acd136d93135fa989e373d80a377953bce0` moet nog door Full Regression worden geverifieerd.
+- Deze handoff-update is een afzonderlijke documentatiewijziging en moet eveneens worden meegenomen in de verificatie. Totdat de workflow op de uiteindelijke commit `completed / success` is, wordt geen groene status geclaimd.
+
+**Volgende concrete stap**
+1. Voer Full Regression uit op de commit met de protocol- en handoffwijzigingen.
+2. Bij rood: stop, isoleer de exacte oorzaak en bepaal of die uit code, test, architectuurcontract, data/schema of CI/environment komt. Niet symptoom-patchen.
+3. Bij groen: pas de bron- en beeldrechtencontrole toe bij de volgende expliciet goedgekeurde oefenbouw.

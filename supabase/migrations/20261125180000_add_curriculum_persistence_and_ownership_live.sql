@@ -6246,7 +6246,7 @@ returns jsonb
 language plpgsql
 security definer
 set search_path = ''
-as $
+as $$
 declare
   v_event_id text;
   v_evidence_id uuid;
@@ -6401,7 +6401,7 @@ begin
     'duplicate', false
   );
 end;
-$;
+$$;
 
 revoke all on function private.persist_curriculum_learning_cycle(text, uuid, text, jsonb, jsonb, jsonb) from public, anon;
 grant execute on function private.persist_curriculum_learning_cycle(text, uuid, text, jsonb, jsonb, jsonb) to authenticated;

@@ -43,7 +43,7 @@ create or replace function public.get_game_access(p_student text)
 returns table (game_key text, unlocked boolean, cycle integer, required_tests integer, minimum_score integer, credited_tests integer)
 language sql stable
 set search_path = public
-as $
+as $function$
   with settings as (
     select
       coalesce(nullif(trim(p_student), ''), '') as student,
@@ -88,14 +88,14 @@ as $
   cross join settings
   cross join credited
   left join games g on g.game_key = catalog.game_key;
-$;
+$function$;
 
 create or replace function public.claim_game_unlock(p_student text, p_game_key text)
 returns table (game_key text, unlocked boolean, cycle integer, required_tests integer, minimum_score integer, credited_tests integer)
 language plpgsql
 security definer
 set search_path = public
-as $
+as $function$
 declare
   v_student text := trim(coalesce(p_student, ''));
   v_game_key text := trim(coalesce(p_game_key, ''));
@@ -174,14 +174,14 @@ begin
 
   return query select * from public.get_game_access(v_student);
 end;
-$;
+$function$;
 
 create or replace function public.admin_set_game_access(p_student text, p_game_key text, p_unlocked boolean)
 returns table (game_key text, unlocked boolean, cycle integer, required_tests integer, minimum_score integer, credited_tests integer)
 language plpgsql
 security definer
 set search_path = public
-as $
+as $function$
 declare
   v_student text := trim(coalesce(p_student, ''));
   v_game_key text := trim(coalesce(p_game_key, ''));
@@ -225,7 +225,7 @@ begin
 
   return query select * from public.get_game_access(v_student);
 end;
-$;
+$function$;
 
 CREATE OR REPLACE FUNCTION public.admin_set_game_access_settings(p_student text, p_required_tests integer, p_minimum_score integer)
  RETURNS TABLE(required_tests integer, minimum_score integer)

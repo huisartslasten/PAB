@@ -59,19 +59,40 @@ test('LIVE private learning-topic media bucket is configured without importing T
 });
 
 
+
+function functionBlock(name) {
+  const marker = 'create or replace function public.' + name.toLowerCase() + '(';
+  const start = sql.toLowerCase().indexOf(marker);
+  assert.ok(start >= 0, 'Missing function: ' + name);
+  const endMarker = '$function$;';
+  const end = sql.indexOf(endMarker, start);
+  assert.ok(end > start, 'Function is missing its named dollar-quote terminator: ' + name);
+  return sql.slice(start, end + endMarker.length);
+}
+
 test('LIVE game-access RPCs expose RPS while preserving the qualifying-test cycle gate', () => {
-  assert.match(sql, /create or replace function public\\.get_game_access[\\s\\S]*?rock-paper-scissors/i);
-  assert.match(sql, /create or replace function public\\.claim_game_unlock[\\s\\S]*?game_access_cycle_tests[\\s\\S]*?v_credited < v_required[\\s\\S]*?rock-paper-scissors/i);
-  const adminAccess = sql.match(/create or replace function public\\.admin_set_game_access[\\s\\S]*?\\$function\\$;/i)?.[0] || '';
-  const adminSettings = sql.match(/create or replace function public\\.admin_set_game_access_settings[\\s\\S]*?\\$function\\$;/i)?.[0] || '';
-  assert.ok(adminAccess.includes(LIVE_MAIN_ADMIN_ID));
-  assert.ok(adminSettings.includes(LIVE_MAIN_ADMIN_ID));
+  const getAccess = functionBlock('get_game_access');
+  const claimUnlock = functionBlock('claim_game_unlock');
+  const adminAccess = functionBlock('admin_set_game_access');
+  const adminSettings = functionBlock('admin_set_game_access_settings');
+
+  for (const block of [getAccess, claimUnlock, adminAccess, adminSettings]) {
+    assert.ok(block.toLowerCase().includes('as $function$'), 'Every replaced RPC must use a valid named dollar quote');
+  }
+  assert.ok(getAccess.includes('rock-paper-scissors'));
+  assert.ok(claimUnlock.includes('rock-paper-scissors'));
+  assert.ok(claimUnlock.includes('game_access_cycle_tests'));
+  assert.ok(claimUnlock.includes('if v_credited < v_required'));
   assert.ok(adminAccess.includes('rock-paper-scissors'));
-  assert.doesNotMatch(adminAccess + adminSettings, /f0f92b9c-5eb7-4b78-aca0-1fea615b1999/i);
+
+  for (const block of [adminAccess, adminSettings]) {
+    assert.ok(block.includes(LIVE_MAIN_ADMIN_ID));
+    assert.ok(!block.includes('f0f92b9c-5eb7-4b78-aca0-1fea615b1999'));
+  }
 });
 
 test('LIVE authorization policy replacements are idempotent', () => {
-  assert.match(sql, /drop policy if exists "Parents can read challenge configurations"/i);
-  assert.match(sql, /drop policy if exists "Main administrator can manage challenge configurations"/i);
-  assert.match(sql, /drop policy if exists "Main administrator can manage skill definitions"/i);
+  assert.ok(sql.includes('drop policy if exists "Parents can read challenge configurations"'));
+  assert.ok(sql.includes('drop policy if exists "Main administrator can manage challenge configurations"'));
+  assert.ok(sql.includes('drop policy if exists "Main administrator can manage skill definitions"'));
 });

@@ -57,3 +57,21 @@ test('LIVE private learning-topic media bucket is configured without importing T
   assert.match(sql, /image\/heic/i);
   assert.match(sql, /image\/heif/i);
 });
+
+
+test('LIVE game-access RPCs expose RPS while preserving the qualifying-test cycle gate', () => {
+  assert.match(sql, /create or replace function public\\.get_game_access[\\s\\S]*?rock-paper-scissors/i);
+  assert.match(sql, /create or replace function public\\.claim_game_unlock[\\s\\S]*?game_access_cycle_tests[\\s\\S]*?v_credited < v_required[\\s\\S]*?rock-paper-scissors/i);
+  const adminAccess = sql.match(/create or replace function public\\.admin_set_game_access[\\s\\S]*?\\$function\\$;/i)?.[0] || '';
+  const adminSettings = sql.match(/create or replace function public\\.admin_set_game_access_settings[\\s\\S]*?\\$function\\$;/i)?.[0] || '';
+  assert.ok(adminAccess.includes(LIVE_MAIN_ADMIN_ID));
+  assert.ok(adminSettings.includes(LIVE_MAIN_ADMIN_ID));
+  assert.ok(adminAccess.includes('rock-paper-scissors'));
+  assert.doesNotMatch(adminAccess + adminSettings, /f0f92b9c-5eb7-4b78-aca0-1fea615b1999/i);
+});
+
+test('LIVE authorization policy replacements are idempotent', () => {
+  assert.match(sql, /drop policy if exists "Parents can read challenge configurations"/i);
+  assert.match(sql, /drop policy if exists "Main administrator can manage challenge configurations"/i);
+  assert.match(sql, /drop policy if exists "Main administrator can manage skill definitions"/i);
+});

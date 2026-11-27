@@ -36,6 +36,216 @@ alter table public.lesson_items
 create unique index if not exists skill_assignments_student_skill_id_key
   on public.skill_assignments (student, skill_id);
 
+-- Align the game-access RPCs with the current LIVE game catalogue.
+-- Keep LIVE's qualifying-test cycle gate in claim_game_unlock. The TEST database's
+-- current function body is a simplified override and is deliberately not copied.
+create or replace function public.get_game_access(p_student text)
+returns table (game_key text, unlocked boolean, cycle integer, required_tests integer, minimum_score integer, credited_tests integer)
+language sql stable
+set search_path = public
+as $
+  with settings as (
+    select
+      coalesce(nullif(trim(p_student), ''), '') as student,
+      coalesce(s.required_tests, 10) as required_tests,
+      coalesce(s.minimum_score, 9) as minimum_score,
+      coalesce(c.cycle, 1) as cycle
+    from (select 1) seed
+    left join public.game_access_settings s on s.student = trim(p_student)
+    left join public.game_access_cycles c on c.student = trim(p_student)
+  ),
+  credited as (
+    select count(*)::integer as credited_tests
+    from public.game_access_cycle_tests ct
+    where ct.student = trim(p_student)
+      and ct.cycle = (select cycle from settings)
+  ),
+  games as (
+    select game_key, unlocked
+    from public.game_access_state
+    where student = trim(p_student)
+  )
+  select
+    catalog.game_key,
+    case when catalog.game_key = 'double-or-nothing' then true else coalesce(g.unlocked, false) end,
+    settings.cycle,
+    settings.required_tests,
+    settings.minimum_score,
+    credited.credited_tests
+  from (
+    values
+      ('double-or-nothing'),
+      ('memory'),
+      ('flash-question'),
+      ('tic-tac-toe'),
+      ('drop4'),
+      ('connect-the-dots'),
+      ('word-reveal'),
+      ('word-chase'),
+      ('lexo'),
+      ('rock-paper-scissors')
+  ) as catalog(game_key)
+  cross join settings
+  cross join credited
+  left join games g on g.game_key = catalog.game_key;
+$;
+
+create or replace function public.claim_game_unlock(p_student text, p_game_key text)
+returns table (game_key text, unlocked boolean, cycle integer, required_tests integer, minimum_score integer, credited_tests integer)
+language plpgsql
+security definer
+set search_path = public
+as $
+declare
+  v_student text := trim(coalesce(p_student, ''));
+  v_game_key text := trim(coalesce(p_game_key, ''));
+  v_cycle integer;
+  v_required integer;
+  v_minimum integer;
+  v_credited integer;
+begin
+  if v_student = '' then raise exception 'A student is required.'; end if;
+  if v_game_key not in ('memory','flash-question','tic-tac-toe','drop4','connect-the-dots','word-reveal','word-chase','lexo','rock-paper-scissors') then raise exception 'Game is not unlockable.'; end if;
+
+  insert into public.game_access_settings (student)
+  values (v_student)
+  on conflict (student) do nothing;
+
+  insert into public.game_access_cycles (student)
+  values (v_student)
+  on conflict (student) do nothing;
+
+  select c.cycle into v_cycle
+  from public.game_access_cycles c
+  where c.student = v_student
+  for update;
+
+  select s.required_tests, s.minimum_score into v_required, v_minimum
+  from public.game_access_settings s
+  where s.student = v_student;
+
+  insert into public.game_access_cycle_tests (student, cycle, lesson_id, qualifying_score)
+  select v_student, v_cycle, q.lesson_id, q.score
+  from (
+    select ta.lesson_id,
+      max(round((ta.score::numeric / nullif(ta.total_questions, 0)) * 10, 2)) as score
+    from public.test_attempts ta
+    where ta.student = v_student
+      and ta.is_test = true
+      and ta.completed_at is not null
+      and ta.total_questions > 0
+    group by ta.lesson_id
+  ) q
+  where q.score >= v_minimum
+    and not exists (
+      select 1
+      from public.game_access_cycle_tests existing
+      where existing.student = v_student
+        and existing.cycle = v_cycle
+        and existing.lesson_id = q.lesson_id
+    );
+
+  select count(*)::integer into v_credited
+  from public.game_access_cycle_tests ct
+  where ct.student = v_student and ct.cycle = v_cycle;
+
+  if v_credited < v_required then
+    raise exception 'Not enough qualifying tests: % of %.', v_credited, v_required;
+  end if;
+
+  insert into public.game_access_state (student, game_key, unlocked)
+  values (v_student, 'double-or-nothing', true)
+  on conflict on constraint game_access_state_pkey do update
+    set unlocked = true, updated_at = now();
+
+  update public.game_access_state gas
+    set unlocked = false, updated_at = now()
+  where gas.student = v_student
+    and gas.game_key <> 'double-or-nothing';
+
+  insert into public.game_access_state (student, game_key, unlocked)
+  values (v_student, v_game_key, true)
+  on conflict on constraint game_access_state_pkey do update
+    set unlocked = true, updated_at = now();
+
+  update public.game_access_cycles gac
+    set cycle = v_cycle + 1, updated_at = now()
+  where gac.student = v_student;
+
+  return query select * from public.get_game_access(v_student);
+end;
+$;
+
+create or replace function public.admin_set_game_access(p_student text, p_game_key text, p_unlocked boolean)
+returns table (game_key text, unlocked boolean, cycle integer, required_tests integer, minimum_score integer, credited_tests integer)
+language plpgsql
+security definer
+set search_path = public
+as $
+declare
+  v_student text := trim(coalesce(p_student, ''));
+  v_game_key text := trim(coalesce(p_game_key, ''));
+  v_cycle integer;
+begin
+  if auth.uid() is null or auth.uid() <> '5d0e1e5c-1dbe-4909-bd3a-81a1e7b26d09'::uuid then raise exception 'Not authorized.'; end if;
+  if v_student = '' then raise exception 'A student is required.'; end if;
+  if v_game_key not in ('double-or-nothing','memory','flash-question','tic-tac-toe','drop4','connect-the-dots','word-reveal','word-chase','lexo','rock-paper-scissors') then raise exception 'Game is not available.'; end if;
+
+  insert into public.game_access_settings (student)
+  values (v_student)
+  on conflict (student) do nothing;
+
+  insert into public.game_access_cycles (student)
+  values (v_student)
+  on conflict (student) do nothing;
+
+  select c.cycle into v_cycle
+  from public.game_access_cycles c
+  where c.student = v_student
+  for update;
+
+  if p_unlocked then
+    update public.game_access_state gas
+      set unlocked = false, updated_at = now()
+    where gas.student = v_student and gas.game_key <> 'double-or-nothing';
+
+    insert into public.game_access_state (student, game_key, unlocked)
+    values (v_student, v_game_key, true)
+    on conflict on constraint game_access_state_pkey do update
+      set unlocked = true, updated_at = now();
+
+    update public.game_access_cycles gac
+      set cycle = v_cycle + 1, updated_at = now()
+    where gac.student = v_student;
+  elsif v_game_key <> 'double-or-nothing' then
+    update public.game_access_state gas
+      set unlocked = false, updated_at = now()
+    where gas.student = v_student and gas.game_key = v_game_key;
+  end if;
+
+  return query select * from public.get_game_access(v_student);
+end;
+$;
+
+CREATE OR REPLACE FUNCTION public.admin_set_game_access_settings(p_student text, p_required_tests integer, p_minimum_score integer)
+ RETURNS TABLE(required_tests integer, minimum_score integer)
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+begin
+  if auth.uid() is null or auth.uid() <> '5d0e1e5c-1dbe-4909-bd3a-81a1e7b26d09'::uuid then raise exception 'Not authorized.'; end if;
+  if trim(coalesce(p_student, '')) = '' then raise exception 'A student is required.'; end if;
+  if p_required_tests is null or p_required_tests < 1 then raise exception 'Required tests must be at least 1.'; end if;
+  if p_minimum_score is null or p_minimum_score < 0 or p_minimum_score > 10 then raise exception 'Minimum score must be between 0 and 10.'; end if;
+  insert into public.game_access_settings (student, required_tests, minimum_score)
+  values (trim(p_student), p_required_tests, p_minimum_score)
+  on conflict (student) do update set required_tests = excluded.required_tests, minimum_score = excluded.minimum_score, updated_at = now();
+  return query select s.required_tests, s.minimum_score from public.game_access_settings s where s.student = trim(p_student);
+end;
+$function$
+
+
 -- Game results are readable by both actual LIVE parent accounts.
 drop policy if exists "Parents can view game results" on public.game_results;
 create policy "Parents can view game results"
@@ -100,6 +310,8 @@ create policy "Main administrator can delete Skill assignments"
 
 -- Challenge configuration is readable by LIVE parents, but writable only by the main administrator.
 drop policy if exists "Parents can manage challenge configurations" on public.challenge_configurations;
+drop policy if exists "Parents can read challenge configurations" on public.challenge_configurations;
+drop policy if exists "Main administrator can manage challenge configurations" on public.challenge_configurations;
 create policy "Parents can read challenge configurations"
   on public.challenge_configurations
   for select
@@ -120,6 +332,7 @@ create policy "Main administrator can manage challenge configurations"
 
 -- Skill definitions remain publicly readable as before; only the main administrator may write them.
 drop policy if exists "Parents can manage skill definitions" on public.skill_definitions;
+drop policy if exists "Main administrator can manage skill definitions" on public.skill_definitions;
 create policy "Main administrator can manage skill definitions"
   on public.skill_definitions
   for all

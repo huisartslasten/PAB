@@ -10939,3 +10939,71 @@ The regression green result verifies the branch/test contract and disposable reg
 Do not apply the migration to LIVE merely because regression is green. First review the reduced SQL and the exact approved game-state scope. Then obtain explicit user authorization before any Supabase LIVE write. Separately retain the outstanding release gates from earlier handoff sections for other LIVE runtime migrations; this green run does not clear those gates.
 
 This section supersedes section 81 only for the TEST → LIVE lesson/content/history transfer scope. Other separately documented release work and gates remain as documented unless explicitly changed by the user.
+
+
+## 83. TEST → LIVE game-state transfer executed and verified (27 November 2026)
+
+### Production authorization and backup
+- The user explicitly approved the limited game-state-only TEST → LIVE migration.
+- The user supplied a Supabase dashboard screenshot showing project **PAB / main / PRODUCTION**, Database Backups, with completed scheduled backups dated 20–27 November 2026. The latest visible backup is 27 Nov 2026 13:20:52 UTC and is marked COMPLETED.
+- The migration does not modify Storage buckets or Storage objects; therefore no Storage copy/restore action was part of this scope.
+- LIVE project ref: `ncpkqrvxljxwboavxtak`. TEST project ref: `btnhhvtpmuvrpbnkyjnm`.
+
+### Preflight performed
+- Confirmed both Supabase projects are ACTIVE_HEALTHY.
+- Re-exported the exact bounded TEST source records immediately before execution. They matched the approved embedded payload:
+  - 2 game_results;
+  - 2 game_access_settings;
+  - 2 game_access_cycles;
+  - 4 game_access_state rows.
+- Rechecked LIVE baseline immediately before execution:
+  - lessons 37;
+  - lesson_items 488;
+  - test_attempts 19;
+  - test_attempt_answers 195;
+  - learning_topics 23;
+  - lesson_order 8;
+  - game_results 3;
+  - game_access_settings/cycles/state for Zenith and Zephon: 0.
+- Confirmed LIVE lesson 13 remains Zephon / Rekenen / Optellen tot 10 and lesson 14 remains Zenith / Nederlands / Thema 2: week 2.
+- Confirmed Full Regression #4415 / run 46083648589 SUCCESS on commit `fb885d171ac75cf897986aa83bdf95378ef19930`.
+
+### Production SQL execution
+Executed only:
+`supabase/migrations/20261127120000_live_additive_test_content_history_transfer.sql`
+
+Target: Supabase LIVE `ncpkqrvxljxwboavxtak`.
+
+The SQL ran transactionally and completed without an error. No other migration was applied. No changes were made to TEST, GitHub main, application code, Edge Functions, Storage buckets or Storage objects.
+
+### Post-migration verification — LIVE
+Verified exact results:
+- lessons: 37 (unchanged);
+- lesson_items: 488 (unchanged);
+- test_attempts: 19 (unchanged);
+- test_attempt_answers: 195 (unchanged);
+- learning_topics: 23 (unchanged);
+- lesson_order: 8 (unchanged);
+- game_results: 5 (3 existing + 2 imported);
+- game_access_settings: 2 imported;
+- game_access_cycles: 2 imported;
+- game_access_state: 4 imported.
+
+Verified the exact two imported game results:
+- Zenith / word-reveal / lesson 14 / score 18 / played_at 2026-10-22T23:34:01.448632+00:00;
+- Zephon / double-or-nothing / lesson 13 / score 10240 / played_at 2026-10-27T20:25:24.984684+00:00.
+
+Verified access settings: Zenith and Zephon both required_tests=10, minimum_score=9.
+Verified cycles: Zenith=3, Zephon=5.
+Verified states: Zenith memory=false; Zephon lexo=false, rock-paper-scissors=true, word-chase=false.
+Verified LIVE lesson 13 and 14 identities remain unchanged.
+
+### Current status and next step
+- The limited game-state transfer is complete and post-verified on LIVE.
+- No lessons or lesson-bound records were transferred.
+- Do not execute the other three pending runtime/curriculum/Millionaire migrations as part of this completed scope; they remain separate release gates requiring their own review and authorization.
+- The application-code release, Edge Function compatibility/secrets and runtime smoke tests remain separate work. Do not touch `main` or deploy functions without explicit approval.
+- Branch: `refactor/professional-v1`.
+- Last verified pre-handoff commit: `fb885d171ac75cf897986aa83bdf95378ef19930`.
+- Last verified Full Regression: #4415 / run `46083648589`, SUCCESS on that exact commit.
+- This section is a handoff update and therefore creates a new commit; run Full Regression on that resulting commit before claiming the handoff update itself is verified.

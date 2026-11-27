@@ -9,6 +9,20 @@ on:
 jobs:
   agenda-cutover-and-regression:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: pacogo_migration_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d pacogo_migration_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - name: Checkout triggering commit
         uses: actions/checkout@v4
@@ -28,6 +42,8 @@ jobs:
           cache: npm
       - name: Install dependencies from committed lockfile
         run: npm ci --ignore-scripts
+      - name: Validate LIVE migrations against disposable PostgreSQL 17
+        run: bash test/run-live-migration-postgres-regression.sh
       - name: Verify zero known dependency vulnerabilities
         run: npm audit --audit-level=low
       - name: Verify canonical Agenda ownership boundary
@@ -91,5 +107,5 @@ jobs:
         run: |
           rm -rf test-results playwright-report node_modules
           status=$(git status --porcelain)
-          printf '%s\n' "$status"
+          printf '%s\\n' "$status"
           test -z "$status"

@@ -58,6 +58,15 @@ test('LIVE private learning-topic media bucket is configured without importing T
   assert.match(sql, /image\/heif/i);
 });
 
+test('LIVE lesson-order access does not grant anonymous access to learner order data', () => {
+  assert.match(sql, /drop policy if exists "Public can read lesson order"/i);
+  assert.doesNotMatch(sql, /create policy "Public can read lesson order"/i);
+  const parentPolicy = policy('parents manage lesson order');
+  assert.match(parentPolicy, /to authenticated/i);
+  assert.ok(parentPolicy.includes(LIVE_MAIN_ADMIN_ID));
+  assert.ok(parentPolicy.includes(LIVE_SECOND_PARENT_ID));
+});
+
 
 
 function functionBlock(name) {

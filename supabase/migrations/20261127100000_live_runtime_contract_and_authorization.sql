@@ -259,14 +259,10 @@ create policy "Parents can view game results"
     ])
   );
 
--- Lesson order is readable by learners and writable by either LIVE parent.
+-- Preserve the existing privacy boundary: do not expose every learner's
+-- lesson-order rows to anonymous visitors. The parent-management policy below
+-- also permits the two LIVE parents to read their saved order.
 drop policy if exists "Public can read lesson order" on public.lesson_order;
-create policy "Public can read lesson order"
-  on public.lesson_order
-  for select
-  to anon, authenticated
-  using (true);
-
 drop policy if exists "parents manage lesson order" on public.lesson_order;
 create policy "parents manage lesson order"
   on public.lesson_order

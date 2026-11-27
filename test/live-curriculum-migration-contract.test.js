@@ -82,6 +82,8 @@ test('LIVE migration preserves TEST registry history and appends source-controll
   assert.match(sql, /^begin;/);
   assert.match(sql.trimEnd(), /commit;$/);
   assert.match(sql, /r\.supersedes_id is null/);
+  assert.match(sql, /r\.config\s*->>\s*'registry_version'/i);
+  assert.doesNotMatch(sql, /r\.config\s*=\s*\$pacogo_registry_0[2-6]\$::jsonb/i);
   assert.match(sql, /Version 0\.2 is taken[\s\S]*stored TEST JSONB snapshot/i);
 
   for (const v of ['0.3','0.4','0.5','0.6']) {

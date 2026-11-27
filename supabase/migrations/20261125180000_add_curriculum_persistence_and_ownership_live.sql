@@ -6177,41 +6177,44 @@ $pacogo_registry_06$::jsonb,
 )
 on conflict (registry_key,version) do nothing;
 
+-- Verify the inserted immutable source snapshots through their stored SHA-256,
+-- registry_version field and explicit supersedes chain. Dollar-quote tags above
+-- delimit payload literals; they are not reusable SQL variables here.
 do $registry_check$
 begin
 if not exists (
  select 1 from public.curriculum_registry_versions r
  where r.registry_key='pacogo-curriculum' and r.version='0.2.0-seed'
  and r.config_sha256='cb58825a0e3347f48b11b4a664f689f5050a53a021678345a5a897410113304d'
- and r.config=$pacogo_registry_02$::jsonb
+ and r.config ->> 'registry_version' = '0.2.0-seed'
  and r.supersedes_id is null
 ) then raise exception 'Curriculum registry 0.2.0-seed does not match preserved TEST/source config or version chain'; end if;
 if not exists (
  select 1 from public.curriculum_registry_versions r
  where r.registry_key='pacogo-curriculum' and r.version='0.3.0-candidate'
  and r.config_sha256='4ba39fed03b5d8e82c0f3c08f01354301e0e66c82e899fe0a0e9e5ed0866926a'
- and r.config=$pacogo_registry_03$::jsonb
+ and r.config ->> 'registry_version' = '0.3.0-candidate'
  and r.supersedes_id=(select id from public.curriculum_registry_versions where registry_key='pacogo-curriculum' and version='0.2.0-seed')
 ) then raise exception 'Curriculum registry 0.3.0-candidate does not match preserved TEST/source config or version chain'; end if;
 if not exists (
  select 1 from public.curriculum_registry_versions r
  where r.registry_key='pacogo-curriculum' and r.version='0.4.0-candidate'
  and r.config_sha256='7aaea07eb7d9d0b6b895f46ca1b99c4b8229505556d7313f023cad8994ce5132'
- and r.config=$pacogo_registry_04$::jsonb
+ and r.config ->> 'registry_version' = '0.4.0-candidate'
  and r.supersedes_id=(select id from public.curriculum_registry_versions where registry_key='pacogo-curriculum' and version='0.3.0-candidate')
 ) then raise exception 'Curriculum registry 0.4.0-candidate does not match preserved TEST/source config or version chain'; end if;
 if not exists (
  select 1 from public.curriculum_registry_versions r
  where r.registry_key='pacogo-curriculum' and r.version='0.5.0-candidate'
  and r.config_sha256='fdc3712704304d563b2b1db0620dd089d8b328724d5a4d1b2416781d95a7f422'
- and r.config=$pacogo_registry_05$::jsonb
+ and r.config ->> 'registry_version' = '0.5.0-candidate'
  and r.supersedes_id=(select id from public.curriculum_registry_versions where registry_key='pacogo-curriculum' and version='0.4.0-candidate')
 ) then raise exception 'Curriculum registry 0.5.0-candidate does not match preserved TEST/source config or version chain'; end if;
 if not exists (
  select 1 from public.curriculum_registry_versions r
  where r.registry_key='pacogo-curriculum' and r.version='0.6.0-candidate'
  and r.config_sha256='36853c6107902c29592ecc0906357ad2cc45814befd312ad22096e1e5ab07ba0'
- and r.config=$pacogo_registry_06$::jsonb
+ and r.config ->> 'registry_version' = '0.6.0-candidate'
  and r.supersedes_id=(select id from public.curriculum_registry_versions where registry_key='pacogo-curriculum' and version='0.5.0-candidate')
 ) then raise exception 'Curriculum registry 0.6.0-candidate does not match preserved TEST/source config or version chain'; end if;
 end;

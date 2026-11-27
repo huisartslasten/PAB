@@ -10883,3 +10883,59 @@ Current branch before this handoff update: `refactor/professional-v1`.
 Last fully verified code commit: `88a156d4adda814b3669b235250d77d596e4e057`.
 Last verified Full Regression: #4408 / run `46024266340`, SUCCESS on that exact SHA.
 This handoff update creates a new commit; its own Full Regression must run before the next build step.
+
+
+## 82. TEST → LIVE migration — lesson transfer explicitly removed; game-state-only scope (27 November 2026)
+
+### User-confirmed scope
+The user explicitly clarified: **no lesson needs to be transferred**. This is the controlling decision for the current migration preparation.
+
+Do not transfer any of the following from TEST to LIVE:
+- lessons;
+- lesson_items;
+- learning_topics, including the TEST Topografie topic;
+- lesson_order;
+- test_attempts;
+- test_attempt_answers;
+- any lesson snapshots or other lesson-bound content.
+
+The previous broader content/history transfer described in section 81 is superseded for this migration. In particular, do not execute the six-lesson / 25-item / 11-attempt / 54-answer / Topografie transfer described there.
+
+### Current reduced migration candidate
+File: `supabase/migrations/20261127120000_live_additive_test_content_history_transfer.sql`.
+
+It now contains only:
+- 2 TEST game_results referencing already-existing LIVE lessons 13 and 14;
+- 2 game_access_settings (Zenith and Zephon);
+- 2 game_access_cycles (Zenith cycle 3, Zephon cycle 5);
+- 4 game_access_state rows (Zenith memory; Zephon lexo, rock-paper-scissors and word-chase).
+
+The two game-result rows are:
+- Zenith / word-reveal / lesson 14 / score 18 / played_at 2026-10-22T23:34:01.448632+00:00;
+- Zephon / double-or-nothing / lesson 13 / score 10240 / played_at 2026-10-27T20:25:24.984684+00:00.
+
+The SQL is additive and transactional. It checks that LIVE lesson 13 is still Zephon / Rekenen / Optellen tot 10 and LIVE lesson 14 is still Zenith / Nederlands / Thema 2: week 2. It stops if game-access rows for Zenith or Zephon already exist rather than overwriting them. It does not update or delete existing LIVE rows.
+
+### Regression history for this reduced scope
+- Full Regression #4410 / run `46048198087`: FAILURE. The migration had been reduced, but the fixture still expected the earlier broader transfer.
+- Full Regression #4411 / run `46048536203`: FAILURE. The fixture's broad lesson-title assertion falsely matched an existing LIVE lesson.
+- Full Regression #4412 / run `46082351345`: FAILURE. The separate Node transfer tests still asserted the previous six-lesson payload and related imports.
+- Full Regression #4413 / run `46082473132`: FAILURE. One new test incorrectly searched for `lesson_id=13` in the LIVE lesson identity check; the migration correctly uses `where id=13`.
+- Commit `242fef74cc97af4f7174c648d5bbb3f382aa11f8` corrected that test assertion.
+- **Full Regression #4414 / run `46083243218`: SUCCESS** on exact commit `242fef74cc97af4f7174c648d5bbb3f382aa11f8`.
+
+The regression green result verifies the branch/test contract and disposable regression environment only. It does not mean any Supabase migration has been applied.
+
+### Current safety and production status
+- Branch: `refactor/professional-v1`.
+- Last verified code commit: `242fef74cc97af4f7174c648d5bbb3f382aa11f8`.
+- Last verified Full Regression: #4414 / run `46083243218`, SUCCESS on that exact commit.
+- No Supabase write has been performed for this migration. LIVE project `ncpkqrvxljxwboavxtak` remains unchanged by this migration.
+- TEST project `btnhhvtpmuvrpbnkyjnm` remains unchanged.
+- GitHub `main` / LIVE has not been touched.
+- No lessons or lesson-bound records have been transferred.
+
+### Next concrete step
+Do not apply the migration to LIVE merely because regression is green. First review the reduced SQL and the exact approved game-state scope. Then obtain explicit user authorization before any Supabase LIVE write. Separately retain the outstanding release gates from earlier handoff sections for other LIVE runtime migrations; this green run does not clear those gates.
+
+This section supersedes section 81 only for the TEST → LIVE lesson/content/history transfer scope. Other separately documented release work and gates remain as documented unless explicitly changed by the user.

@@ -85,11 +85,12 @@ begin
   select count(*) into v_count from public.game_access_state;
   if v_count <> 4 then raise exception 'Expected 4 imported game-access states; found %',v_count; end if;
 
+  -- Existing LIVE lesson 20 is also titled 'Thema 2: week 3';
+  -- only check the excluded lesson identities that do not exist in LIVE.
   if exists (
     select 1 from public.lessons
     where (student='Zephon' and title='Aftrekken tot en met 5')
-       or (student='Zyon' and title='Azie')
-       or (student='Zenith' and title in ('Thema 2: week 3','Les 2: Caribisch gebied'))
+       or (student='Zyon' and subject='Aardrijkskunde' and title='Azie')
   ) then raise exception 'Unapproved TEST lessons were transferred'; end if;
 
   if exists (

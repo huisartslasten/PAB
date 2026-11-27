@@ -10797,3 +10797,89 @@ The following files were added or modified on `refactor/professional-v1`:
 Current branch: `refactor/professional-v1`.
 Last code commit verified by Full Regression #4399: `9ef91dfce620ad0b2984a992a7837ffd557a0850`.
 Next commit: handoff update; its SHA and regression result must be recorded after the new run completes.
+
+
+## 81. TEST → LIVE cutover preparation — SQL integration validation and additive data transfer (27 November 2026)
+
+### Verified branch and regression baseline
+- Working branch: `refactor/professional-v1`. `main` remains LIVE and has not been changed.
+- Code HEAD before this handoff update: `88a156d4adda814b3669b235250d77d596e4e057`.
+- Full Regression #4408 / run `46024266340`: SUCCESS on that exact SHA.
+- The Full Regression workflow now starts a disposable PostgreSQL 17 service and runs the four intended LIVE migrations against a clean fixture shaped from the inspected LIVE schema. The SQL integration step, all Node tests, browser regression and clean-working-tree check passed.
+- The PostgreSQL fixture is a clean representative validation database, not a restored copy of LIVE and not a Supabase branch. No new Supabase branch or project was created or used.
+
+### Migration and test changes on the development branch
+
+1. `supabase/migrations/20261125180000_add_curriculum_persistence_and_ownership_live.sql`
+   - The PostgreSQL integration test exposed a genuine SQL syntax defect in the final curriculum-registry verification block: dollar-quote tags such as `$pacogo_registry_02$` were incorrectly used as if they were reusable SQL variables, producing an unterminated dollar-quoted string.
+   - Replaced those invalid comparisons with explicit `config ->> 'registry_version'` checks. The stored source SHA-256 and supersedes-chain checks remain in place.
+   - The complete migration now executes successfully in the disposable PostgreSQL 17 validation database.
+
+2. `supabase/migrations/20261127100000_live_runtime_contract_and_authorization.sql`
+   - Adds `lesson_items.content_data jsonb` and the unique `skill_assignments(student, skill_id)` index with preflight checks.
+   - Replaces affected LIVE authorization policies using the verified LIVE parent/admin identities.
+   - Does **not** create anonymous SELECT access to `lesson_order`; the previous draft's public-read policy was removed. Existing LIVE lesson-order records are not changed.
+   - Creates the private `lesson-photos` bucket and LIVE-parent Storage policies. No TEST Storage objects are copied.
+   - Replaces the central game-access RPCs while retaining the LIVE qualifying-test/cycle gate and adding the canonical RPS game key.
+   - Adds `rock-paper-scissors` to the `game_results` canonical CHECK constraint. This was necessary because the active game catalog and result service persist RPS results, while the existing LIVE and TEST constraint rejected that key.
+   - This migration has not been applied to Supabase LIVE or TEST.
+
+3. `supabase/migrations/20261127110000_live_millionaire_unlock_policy.sql`
+   - Narrow, transactional update of the LIVE Millionaire unlock policy.
+   - Target: all lesson types (`allowedLessonTypes=["*"]`) and minimum score 4.
+   - Preserves `enabled=true`, 11 questions and all three existing lifelines.
+   - Preflight accepts only the inspected LIVE source configuration or the already-correct target configuration; unexpected state stops the migration.
+   - This migration has not been applied to Supabase LIVE.
+
+4. `supabase/migrations/20261127120000_live_additive_test_content_history_transfer.sql`
+   - Embeds the bounded TEST source snapshot and transfers additively with generated LIVE identity IDs. TEST numeric IDs are used only in temporary mapping tables; they are never copied as target IDs.
+   - Six TEST lesson records: active lessons 22 and 41, plus hidden historical snapshots 20, 21, 39 and 40.
+   - 25 lesson items, 11 test attempts (including duplicate-looking rows, not deduplicated), 54 answers, four real game results, two game-access settings, two cycle rows and four game-access state rows.
+   - Remaps attempts/answers and game results to the generated LIVE lesson/attempt IDs. Results for unchanged LIVE lessons 13 and 14 remain attached to those verified LIVE lessons; results for TEST lessons 20 and 39 point to their hidden snapshots.
+   - Snapshots 20, 21 and 39 are archived; snapshot 40 remains deleted. Active lessons 22 and 41 remain active.
+   - Existing LIVE topic records are mapped by natural key without changing their archived/deleted flags. TEST topic 8 (Zyon / Aardrijkskunde / Topografie) is kept distinct from LIVE topic 15 (Azie); the migration creates a separate active Topografie topic if no exact LIVE counterpart exists.
+   - Does not copy TEST's changed Zenith lesson order, legacy Breuken Skill rows, placeholder learning cards/media, inactive guest links, temporary photo-upload sessions or cascade fixtures.
+   - No existing LIVE lesson, item, attempt, answer, game result, topic or lesson-order row is updated or deleted.
+   - This migration has not been applied to Supabase LIVE.
+
+5. Validation infrastructure:
+   - Added `test/fixtures/live-migration-postgres-schema.sql`, `test/fixtures/live-migration-postgres-assertions.sql` and `test/run-live-migration-postgres-regression.sh`.
+   - Updated `.github/workflows/full-regression-refactor-v1.yml` to run all four intended LIVE migrations against disposable PostgreSQL 17 and verify schema, policy, data-count and preservation assertions.
+   - This replaces the need for a paid Supabase validation branch for SQL syntax/logic testing. It does not claim to be a restored copy of LIVE.
+
+### Decisions and conservative defaults
+- Millionaire target was explicitly confirmed by the user: all lesson types, minimum score 4; keep 11 questions and all three lifelines.
+- LIVE lesson order is preserved: Zenith remains 19, 14, 20; all five LIVE-only Zyon order rows remain. TEST's alternative Zenith order is not imported.
+- TEST topic 8 is not merged into LIVE Azie. The current migration proposes a distinct Topografie topic; confirm this data addition before production execution.
+- Existing deleted LIVE topic records are not reactivated. The migration preserves their current flags.
+- Legacy Breuken Skill definitions/assignments remain excluded.
+- No TEST lesson content is allowed to overwrite existing LIVE lessons.
+
+### Exact safety state
+- Supabase LIVE project `ncpkqrvxljxwboavxtak`: unchanged. No SQL migration, table, column, index, policy, function, bucket, secret or data change has been applied.
+- Supabase TEST project `btnhhvtpmuvrpbnkyjnm`: unchanged.
+- GitHub `main` and `pacogo.org`: unchanged.
+- No Edge Function has been deployed. No Storage objects have been copied.
+- LIVE's existing `audio` bucket and its nine objects have not been changed.
+- No restorable LIVE database backup or separate Storage recovery has been verified.
+
+### Additional release dependencies found
+- The current `main` version of `src/core/auth-authorization.js` lists only the TEST administrator UUID (`f0f92b9c-5eb7-4b78-aca0-1fea615b1999`) in `MAIN_ADMINISTRATOR_IDS`. The verified LIVE main-administrator UUID (`5d0e1e5c-1dbe-4909-bd3a-81a1e7b26d09`) is in `PARENT_IDS`, but not in the main-admin list. The development branch recognizes both environment identities. Since `main` is LIVE and must not be touched, do not merge or patch it without explicit approval. Before release, determine whether this affects main-admin-only UI controls after the database migration.
+- TEST-only `ai-content-v1` is called by the development branch's central AI-content service but is absent in LIVE. Its code requires `OPENAI_API_KEY`; the current Supabase connection cannot verify the LIVE secret. Do not deploy it until the LIVE secret is confirmed.
+- Do not deploy TEST `photo-upload-v1` v5 unchanged: its UUID/`uploaded_at` session contract differs from LIVE's bigint session schema. Preserve LIVE `photo-upload-v1` v1.
+- Preserve LIVE `grade-answer-v2` v12, `speak-word-v1` v3 and LIVE-only Edge Functions.
+
+### Remaining production gates and next steps
+1. Verify a restorable LIVE database backup and the separate Storage recovery path in the Supabase dashboard. Neither has been verified through the current tools.
+2. Immediately before production execution, re-export the bounded TEST source records and compare them with the embedded transfer snapshot; stop if any source records/counts changed.
+3. Confirm the separate Topografie topic creation and the decision to preserve LIVE's existing lesson order.
+4. Resolve the LIVE main-admin application-code dependency without touching `main` unless the user explicitly approves a controlled app release.
+5. Verify the LIVE `OPENAI_API_KEY` secret only if `ai-content-v1` is included in a separately approved code/function release. Do not deploy incompatible photo-upload v5.
+6. Apply only the four targeted migrations, in timestamp order: `20261125180000`, `20261127100000`, `20261127110000`, `20261127120000`. Do not replay the TEST migration history and do not merge the development branch into `main` as part of this database transfer.
+7. After production execution, verify before/after counts, generated ID mappings, foreign keys, preserved LIVE lesson order/content, policies, RPCs, Millionaire settings and a focused LIVE smoke test.
+8. Report the exact production migration status and run Full Regression again. Do not claim LIVE is migrated until the production checks actually pass.
+
+Current branch before this handoff update: `refactor/professional-v1`.
+Last fully verified code commit: `88a156d4adda814b3669b235250d77d596e4e057`.
+Last verified Full Regression: #4408 / run `46024266340`, SUCCESS on that exact SHA.
+This handoff update creates a new commit; its own Full Regression must run before the next build step.

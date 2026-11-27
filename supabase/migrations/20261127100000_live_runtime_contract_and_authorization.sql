@@ -246,6 +246,40 @@ end;
 $function$;
 
 
+-- The canonical game catalog and game-result service include RPS. The existing
+-- LIVE CHECK constraint predates RPS and would reject its persisted score.
+do $game_result_key_preflight$
+begin
+  if exists (
+    select 1 from public.game_results
+    where game_key not in (
+      'double-or-nothing','memory','flash-question','tic-tac-toe','drop4',
+      'connect-the-dots','word-reveal','word-chase','lexo','rock-paper-scissors'
+    )
+  ) then
+    raise exception 'LIVE game_results contains an unknown game_key; reconcile before updating the canonical constraint';
+  end if;
+end;
+$game_result_key_preflight$;
+
+alter table public.game_results
+  drop constraint if exists game_results_game_key_canonical_check;
+
+alter table public.game_results
+  add constraint game_results_game_key_canonical_check
+  check (game_key = any (array[
+    'double-or-nothing'::text,
+    'memory'::text,
+    'flash-question'::text,
+    'tic-tac-toe'::text,
+    'drop4'::text,
+    'connect-the-dots'::text,
+    'word-reveal'::text,
+    'word-chase'::text,
+    'lexo'::text,
+    'rock-paper-scissors'::text
+  ]));
+
 -- Game results are readable by both actual LIVE parent accounts.
 drop policy if exists "Parents can view game results" on public.game_results;
 create policy "Parents can view game results"

@@ -100,6 +100,13 @@ test('LIVE game-access RPCs expose RPS while preserving the qualifying-test cycl
   }
 });
 
+test('LIVE game-result persistence accepts every canonical active game, including RPS', () => {
+  assert.match(sql, /drop constraint if exists game_results_game_key_canonical_check/i);
+  assert.match(sql, /add constraint game_results_game_key_canonical_check/i);
+  assert.match(sql, /game_key = any \(array\[[\s\S]*'rock-paper-scissors'::text/i);
+  assert.match(sql, /LIVE game_results contains an unknown game_key/i);
+});
+
 test('LIVE authorization policy replacements are idempotent', () => {
   assert.ok(sql.includes('drop policy if exists "Parents can read challenge configurations"'));
   assert.ok(sql.includes('drop policy if exists "Main administrator can manage challenge configurations"'));

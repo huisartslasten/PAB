@@ -243,7 +243,7 @@ begin
   on conflict (student) do update set required_tests = excluded.required_tests, minimum_score = excluded.minimum_score, updated_at = now();
   return query select s.required_tests, s.minimum_score from public.game_access_settings s where s.student = trim(p_student);
 end;
-$function$
+$function$;
 
 
 -- Game results are readable by both actual LIVE parent accounts.

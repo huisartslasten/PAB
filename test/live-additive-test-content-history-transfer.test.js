@@ -55,7 +55,8 @@ test('LIVE transfer keeps the deleted LIVE topic records untouched and creates d
   assert.match(sql, /Create it as a distinct topic/i);
   assert.match(sql, /never merge it into the deleted Azie topic/i);
   assert.match(sql, /insert into public\.learning_topics\(student,subject,subvak,created_at,archived,deleted\)/i);
-  assert.match(sql, /No LIVE Topografie topic exists/i);
+  assert.match(sql, /if v_count = 0 then[\\s\\S]*insert into public\\.learning_topics/i);
+  assert.match(sql, /A LIVE Topografie topic exists but is archived\\/deleted/i);
 });
 
 test('LIVE game-access transfer stops instead of overwriting existing learner progress', () => {

@@ -40,8 +40,8 @@ test('LIVE transfer is additive and does not import or modify lesson-related dat
 
 test('LIVE transfer appends only the two approved game results without changing lesson records', () => {
   assert.match(sql, /jsonb_array_length\(v_payload -> 'game_results'\) <> 2/);
-  assert.match(sql, /lesson_id=13 and student='Zephon' and subject='Rekenen' and title='Optellen tot 10'/);
-  assert.match(sql, /lesson_id=14 and student='Zenith' and subject='Nederlands' and title='Thema 2: week 2'/);
+  assert.match(sql, /where id\s*=\s*13 and student='Zephon' and subject='Rekenen' and title='Optellen tot 10'/i);
+  assert.match(sql, /where id\s*=\s*14 and student='Zenith' and subject='Nederlands' and title='Thema 2: week 2'/i);
   assert.match(sql, /where lesson_id not in \(13,14\)/);
   assert.match(sql, /Expected 2 imported game results; inserted %/);
 });

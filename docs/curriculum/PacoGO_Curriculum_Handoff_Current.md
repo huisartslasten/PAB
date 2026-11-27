@@ -10733,3 +10733,67 @@ Current branch: `refactor/professional-v1`.
 Current HEAD: `b310825ccff3b1f03ac8af5369411eea0e8e357d`.
 Last verified Full Regression: #4394 / run `45939877249`, success on that exact HEAD.
 LIVE `main`, Supabase LIVE, Supabase TEST and `pacogo.org`: unchanged by this audit.
+
+
+## 80. TEST → LIVE release preparation — authorization/runtime migration drafted (27 November 2026)
+
+### Verified repository and regression baseline
+- Work branch: `refactor/professional-v1`.
+- Current branch HEAD before this handoff update: `9ef91dfce620ad0b2984a992a7837ffd557a0850`.
+- Full Regression #4399 / run `45942322411` completed SUCCESS on that exact SHA.
+- Verified steps include curriculum engine regression, architecture boundary tests, Double or Nothing runtime regression, maintained Node regression, migrated native Node regression, Chromium installation, browser regression, and clean-working-tree verification.
+- Recent history: #4395 SUCCESS on `90366a0350d4675e40bff30b6917ecade2ea1727`; #4396 SUCCESS on `721df98d421b3b22b1315c13e00a154d8ad8f250`; #4397 FAILURE on `7946745b9fdf162b4c4ae2fdf920f640d009abd3`; #4398 FAILURE on `c8f8ad47f0f1dbdd89cfe85d7b0f4ab251d122da`; #4399 SUCCESS on `9ef91dfce620ad0b2984a992a7837ffd557a0850`. The two failed runs occurred during migration SQL quoting / migration-contract test development; fixes were made at the underlying SQL delimiter/test-contract level, and the subsequent complete run passed.
+- The handoff file itself is now being updated in this commit. Because that changes the branch, a new Full Regression must run on the resulting handoff commit; do not reuse #4399 as verification for the new commit.
+- This section supersedes earlier branch/HEAD/regression metadata in sections 78–79. Older historical counts and mappings remain useful; re-query only if a later schema/data change makes them uncertain.
+
+### Changes made on the development branch
+The following files were added or modified on `refactor/professional-v1`:
+
+1. `src/core/auth-authorization.js`
+   - Added the verified LIVE main-administrator Supabase Auth UUID alongside the existing TEST UUID.
+   - The shared app code can therefore recognize the main administrator in both TEST and LIVE.
+   - The second LIVE parent is deliberately not promoted to main administrator.
+   - This is application code only; no LIVE deployment occurred.
+
+2. `test/auth-authorization.test.js`
+   - Added explicit coverage for the TEST and LIVE administrator identities and the second LIVE parent's non-admin status.
+
+3. `supabase/migrations/20261127100000_live_runtime_contract_and_authorization.sql`
+   - Drafted a transaction-wrapped, additive LIVE runtime/authorization migration.
+   - Adds `lesson_items.content_data jsonb` if absent.
+   - Adds the unique `skill_assignments(student, skill_id)` index required by the current Skill configuration service upsert conflict target, with a preflight that stops if duplicate natural keys are found.
+   - Replaces the affected LIVE policies for game-result reads, lesson-order reads/writes, Skill assignment writes, Challenge configuration reads/writes and Skill-definition writes, using the verified LIVE parent/admin UUIDs. The non-admin parent is not granted admin writes.
+   - Prepares the private `lesson-photos` Storage bucket with the TEST runtime's 5 MB and JPEG/PNG/WebP/HEIC/HEIF contract, without copying TEST placeholder objects. Storage policies restrict writes/deletes to the two LIVE parent accounts; reads are authenticated.
+   - Adds the current central game-access RPC definitions for `get_game_access`, `claim_game_unlock`, `admin_set_game_access` and `admin_set_game_access_settings`, with the LIVE main-admin UUID in admin RPCs.
+   - The LIVE qualifying-test/cycle gate in `claim_game_unlock` is intentionally retained. The simplified TEST function body was not copied. The current Rock-Paper-Scissors game key is included.
+   - Includes preflight/verification checks and avoids deleting or rewriting lesson/test/game history.
+   - This migration is a draft in Git only. It has NOT been executed against LIVE or TEST.
+
+4. `test/live-runtime-contract-migration.test.js`
+   - Adds contract tests for additive behavior, correct LIVE authorization identities, Storage bucket contract, idempotent policy replacement and game-access RPC/cycle-gate content.
+   - The migration SQL quoting was corrected after two failed regression runs. The current branch commit passed the full regression #4399.
+
+### Exact status and safety boundaries
+- Current verified code HEAD before this handoff update: `9ef91dfce620ad0b2984a992a7837ffd557a0850`.
+- Full Regression #4399: SUCCESS on that exact SHA.
+- Supabase LIVE project `ncpkqrvxljxwboavxtak`: unchanged.
+- Supabase TEST project `btnhhvtpmuvrpbnkyjnm`: unchanged.
+- GitHub `main`: unchanged.
+- `pacogo.org`: unchanged.
+- No Supabase SQL migration was run; no table, column, index, policy, function, bucket, secret or data was changed in either project.
+- No Edge Function was deployed; no Storage objects were copied; no lessons, topics, attempts, answers, game results or learner-state rows were transferred.
+- No database backup/restore readiness has been verified. The prior requirement to verify LIVE database backup and separate Storage recovery remains open.
+
+### Required next steps — continue from here, do not repeat completed inventory
+1. At the start of the next chat, re-read this handoff, verify branch HEAD and latest Full Regression. The handoff update itself creates a new commit and must receive its own regression run; #4399 only verifies the code commit before this handoff update.
+2. Inspect the final diff of `20261127100000_live_runtime_contract_and_authorization.sql` and its tests in full. Review exact policy semantics, grants, function signatures/return types, function ownership/search_path/security-definer behavior, Storage object access paths, and whether all replaced policy names match the current LIVE schema. Do not execute it merely because regression is green.
+3. If the migration has any issue, stop and isolate the exact cause; do not patch symptoms or relax tests to get green.
+4. Validate the migration's SQL in a permitted validation environment. Do not create a Supabase project, restore, or branch without explicit user approval and cost disclosure. A previous temporary restore attempt failed and must not be repeated casually.
+5. Keep all existing release gates from section 79 open: Millionaire unlock policy decision; Zenith lesson-order decision; TEST topic 8 Topografie mapping decision; approved scope for new lessons/history/attempts/game results/game-access rows; legacy Breuken Skill exclusion; LIVE backup plus separate Storage recovery; Edge Function and secret checks.
+6. Continue the add-only content/history mapping already documented in section 79. Preserve all LIVE records and IDs; never attach TEST attempts to a semantically different LIVE lesson.
+7. Only after decisions, backup/recovery verification, complete SQL review and explicit production-action approval may the LIVE migration/data/storage/function steps be executed.
+8. After any significant change, update this handoff again and verify the exact resulting commit with Full Regression.
+
+Current branch: `refactor/professional-v1`.
+Last code commit verified by Full Regression #4399: `9ef91dfce620ad0b2984a992a7837ffd557a0850`.
+Next commit: handoff update; its SHA and regression result must be recorded after the new run completes.

@@ -10652,3 +10652,84 @@ Current branch: `refactor/professional-v1`.
 Current HEAD: `626f4dfc883b668da9f27442e57bb20a07e95564`.
 Last verified Full Regression: #4393 / run `45680863712`, success on that exact HEAD.
 LIVE `main`, Supabase LIVE, Supabase TEST and `pacogo.org`: unchanged by this audit.
+
+
+## 79. TEST → LIVE second-pass reconciliation and release blockers (27 November 2026)
+
+### Verified current baseline — supersedes section 78's stale metadata
+- Branch: `refactor/professional-v1`.
+- Current HEAD: `b310825ccff3b1f03ac8af5369411eea0e8e357d`.
+- Full Regression #4394 / run `45939877249` completed successfully on that exact commit. Chromium installation, browser regression and clean-working-tree verification all passed.
+- Section 78 incorrectly retained the previous baseline `626f4dfc883b668da9f27442e57bb20a07e95564` / #4393. This section corrects that metadata.
+- All checks and SQL queries in this second pass were read-only. No database, Storage, Edge Function, deployment, `main`, or LIVE website changes occurred.
+
+### Branch release size
+- GitHub comparison: `main` base `9ddb18aaafec265f2239bb68b05723468c5607f9`; development branch is 1,991 commits ahead and 0 behind.
+- The compare response returned 300 changed-file entries (294 added, 5 modified, 1 renamed; the response reached the 300-file result limit). It includes the curriculum engine, many curriculum learner pages, and extensive curriculum documentation.
+- A direct branch-to-main merge is therefore a major product release, not a narrow database transfer. Do not merge PR #17 or update `main` as an assumed part of this cutover. Release scope must be explicit.
+
+### Corrected lesson and history disposition
+- TEST 4 `Piraten`, 13 `Optellen tot 10`, and 14 `Thema 2: week 2` match the corresponding LIVE lessons exactly. Reuse LIVE records; do not insert or overwrite them.
+- TEST 19 `Thema 2: week 1` matches 11/13 items. The two TEST differences are poorer/malformed answer text; LIVE has the corrected versions. Keep LIVE 19 unchanged.
+- TEST 20 `Thema 2: week 3` matches 11/12 items. At sort order 5, TEST has the corrected question `zijwaarts`; LIVE has `zijwaart`. TEST has two attempt rows and one game result. Preserve LIVE 20; retain the exact TEST version as a separate hidden historical snapshot for history. Any correction of the active LIVE item is a separate content update and requires approval.
+- TEST 21 `Les 2: Caribisch gebied` has 4 items, all contained in LIVE 21's 14 items. Preserve the more complete LIVE lesson; keep a separate historical TEST snapshot for its one attempt.
+- TEST 39 `Woordendictee` is an archived one-item Zenith version; LIVE 39 `Dictee` is a 45-item active lesson. Keep a separate archived historical snapshot for its two attempts and one game result.
+- TEST 40 `Woordendictee` is a deleted four-item Zyon version with six attempts. LIVE 40 belongs to another learner and is unrelated. If history is transferred, create a new deleted/hidden historical lesson ID; never map to LIVE 40.
+- TEST 22 `Aftrekken tot en met 5` is an active three-item Zephon lesson with no LIVE semantic counterpart. Its numeric ID 22 is currently free in LIVE, but use a generated LIVE ID in the import mapping rather than depending on source identity.
+- TEST 41 `Azie` is an active one-item Zyon lesson. Its numeric ID 41 conflicts with LIVE 41 `Redactie oefenblad`. It needs a generated LIVE lesson ID.
+- TEST 36/37/38 are deleted Zyon dictation records without attempts; TEST 34 is a `__cascade_test__` fixture; TEST 42/43/44 are generic test records (42 is deleted and has the only non-empty TEST `content_data`). Exclude these from normal learner content transfer.
+- Preserve all 11 TEST attempt rows and 54 answer rows if history is approved. Five pairs are exact duplicate attempt records; do not deduplicate. Generate new attempt and answer IDs and remap all foreign keys.
+- Four TEST game results are attached to real lessons 13, 14, 20 and 39. Preserve these four with generated IDs and mapped lesson IDs. Exclude the fifth result attached to `__cascade_test__`.
+- This yields two new active lessons (22 and 41) plus four separate historical lesson snapshots (20, 21, 39 and 40); existing exact/expanded LIVE lessons remain in place. No source numeric IDs should be blindly copied.
+
+### Corrected learning-topic mapping
+Natural-key comparison of student, subject and subvak supports these mappings:
+- TEST topic 1 → LIVE topic 12 (Zyon / Nederlands / Woordendictee).
+- TEST topic 2 → LIVE topic 36 (Zyon / Nederlands / empty subvak). It does NOT map to LIVE topic 2, whose subvak is `Themawoorden`.
+- TEST topic 4 → LIVE topic 6 (Zyon / Geschiedenis).
+- TEST topic 5 → LIVE topic 5 (Zenith / Nederlands / Themawoorden).
+- TEST topic 6 → LIVE topic 7 (Zenith / Aardrijkskunde / empty subvak).
+- TEST topic 7 → LIVE topic 9 (Zenith / Nederlands / Woordendictee).
+- TEST topic 9 → LIVE topic 11 (Zephon / Rekenen / empty subvak).
+- TEST topic 8 is Zyon / Aardrijkskunde / Topografie. No exact LIVE natural-key match exists. LIVE topic 15 is Zyon / Aardrijkskunde / Azie and is a possible semantic candidate, but it is not an exact match. Do not merge these without an explicit decision; the safe default is a new topic with a generated ID.
+- TEST topic 3 is a cascade fixture. TEST topics 12, 16, 17, 19, 22 and 31 are placeholder/test topics used by dummy media. Exclude them.
+- The four TEST learning-material cards are placeholder HTML/content, attached to topics 2 and 8; exclude them unless their content is separately approved. The 19 TEST media rows and 19 Storage objects are attached only to dummy topics; exclude all 19 objects from content transfer.
+
+### Additional TEST-only learner state discovered
+- LIVE has 0 rows in `game_access_settings`, `game_access_cycles` and `game_access_state`. TEST has 2 settings rows, 2 cycle rows and 4 state rows for Zenith and Zephon; `game_access_cycle_tests` is empty in both.
+- These are real student-keyed settings/progress records, not fixture rows. If the game-access state is included in the cutover, insert them additively using their natural keys (`student`, `student + game_key`); LIVE currently has no conflicting rows. Do not copy unrelated TEST authorization policies.
+- TEST `lesson_order` has 3 Zenith/Nederlands rows in order 19, 20, 14. LIVE has 3 corresponding rows in order 19, 14, 20, plus 5 Zyon/Nederlands rows that exist only in LIVE. Preserve all 8 LIVE rows and all Zyon order. Whether to adopt TEST's changed Zenith order is a separate user-facing product choice; do not silently reorder LIVE.
+- TEST `challenge_configurations` differs from LIVE for `millionaire`: LIVE has minimum score 10 and allowed lesson types [`dictation`]; TEST has minimum score 4 and allowed types [`*`]. This changes game-unlock behavior and must not be overwritten without explicit approval.
+- TEST's single guest-access record has the same token fingerprint as LIVE guest record 1 but a different display name. Its two guest-lesson links are inactive. Preserve LIVE guest records and do not copy/overwrite this shared guest token or its label.
+- `audio_queue` contains the same three words in both projects; no transfer is needed.
+- LIVE-only data remains: agenda import drafts 1, creator AI rules 8, parent feedback 1 and lesson order 8. LIVE `agenda_items` and `creator_notes` tables exist but currently contain 0 rows. Preserve these tables and all records.
+
+### Full schema, migration-history and authorization reconciliation
+- LIVE has 25 public tables; TEST has 29. LIVE-only tables: `agenda_import_drafts`, `agenda_items`, `creator_ai_rules`, `creator_notes`. TEST-only tables: the seven curriculum/learner tables (`curriculum_registry_versions`, `student_evidence`, `student_longitudinal_state`, `curriculum_decision_trace`, `learner_profiles`, `learner_guardians`, `learner_profile_links`) plus empty `lesson_photos`.
+- TEST has four curriculum registry rows (0.2–0.5); evidence, longitudinal state and decision trace are empty. TEST has one Zyon learner profile, one guardian membership and one app-student link. Do not copy TEST owner UUIDs or learner key to LIVE. The LIVE-specific curriculum migration seeds the source-controlled 0.2–0.6 registry chain and creates learner identity through the authenticated LIVE application flow.
+- LIVE does not contain the seven curriculum/learner tables or the `private` schema/functions used by the consolidated LIVE migration. The migration preflight objects are absent. The migration is a candidate for LIVE after clean-environment validation and backup gates; it has not been applied.
+- Migration histories are divergent (LIVE 39 rows; TEST 60; current branch has 61 SQL files). Do not replay TEST's historical migration chain into LIVE. Build from the verified LIVE baseline using the consolidated LIVE migration and narrowly scoped additive changes.
+- LIVE-only lesson columns `explanation`, `ai_instruction`, `editor_labels`; LIVE-only item columns `min_words`, `required_terms`; and LIVE-only `parent_feedback.user_id` must be preserved. TEST-only `lesson_items.content_data` is an additive requirement for the current branch writer. Its only non-empty TEST row is in deleted fixture lesson 42, which is excluded from content transfer.
+- TEST `question_parts`/`answer_parts` are NOT NULL while LIVE allows NULL; the current writer sends arrays, so do not tighten LIVE nullability. TEST `lesson_order.position` has no default while LIVE defaults to 0; the current service explicitly sends position. TEST `photo_upload_sessions.id` is UUID and includes `uploaded_at`; LIVE uses bigint and lacks `uploaded_at`. Do not migrate temporary sessions or deploy TEST `photo-upload-v1` v5 unchanged.
+- TEST has the unique `skill_assignments(student, skill_id)` index; LIVE does not. LIVE has no duplicate natural keys and the current Skill configuration service performs upsert on this key, so this unique index is required. TEST's extra unique `lesson_order(student, subject, position)` index is not required by the current delete-and-reinsert writer; no duplicate LIVE positions were found. Do not add it without a demonstrated contract need.
+- TEST has one additional legacy `Breuken` Skill definition and Zenith assignment. Project instructions say not to migrate legacy Skills automatically; keep it out unless separately approved.
+- RLS is enabled on all 25 LIVE and 29 TEST public tables. Many policy definitions differ because TEST policies use the TEST auth UUID while LIVE has two different parent UUIDs. `auth.users.raw_app_meta_data` has no role key in either project; the source currently hardcodes the TEST main-admin UUID in `MAIN_ADMINISTRATOR_IDS`. Do not copy TEST policies or simply replace the TEST UUID in code, which would break TEST. Design an environment-safe administrator/parent identity contract, then a dedicated LIVE policy migration. Existing LIVE policies and LIVE-only data must remain intact.
+- LIVE has only the public `audio` bucket. TEST has a private `lesson-photos` bucket (5 MB limit; JPEG/PNG/WebP/HEIC/HEIF) used by `learning-topic-media-service.js`; the bucket is a runtime dependency if this feature is released. The 19 TEST objects are dummy media and should not be copied. Create LIVE bucket/policies for the two LIVE parent identities only if approved; never copy TEST storage policies verbatim.
+- TEST-only `ai-content-v1` v4 is called by the current app's central AI-content service. Its code uses `OPENAI_API_KEY`, `gpt-5.6-terra` and `/v1/responses`. The model and Responses endpoint are listed in current official OpenAI model documentation. The LIVE secret value cannot be inspected through the current Supabase connection; verify `OPENAI_API_KEY` in the LIVE dashboard before deployment.
+- Preserve LIVE `grade-answer-v2` v12 (do not downgrade to TEST v2), LIVE `speak-word-v1` v3, and LIVE-only functions. Do not deploy TEST `photo-upload-v1` v5 until the incompatible `uploaded_at` contract is resolved. No Edge Function has been deployed.
+
+### Remaining release gates and next actions
+1. Confirm whether to adopt the TEST Millionaire unlock policy (score 4 / all lesson types) or preserve LIVE (score 10 / dictation only).
+2. Confirm whether to adopt TEST's Zenith lesson order 19, 20, 14 or preserve LIVE's 19, 14, 20. Preserve all five LIVE-only Zyon order rows either way.
+3. Decide whether TEST topic 8 should be a new Topografie topic or map to LIVE topic 15 (Azie). Do not infer the mapping.
+4. Confirm the narrow active content/history scope: new lessons 22 and 41; hidden history snapshots 20, 21, 39 and 40; four real game results; 11 attempts and 54 answers (including duplicates); and two game-access settings, two cycle rows and four state rows. Preserve all LIVE content.
+5. Keep the legacy Breuken Skill, placeholder cards/media, inactive guest links and temporary photo sessions out unless separately approved.
+6. Prepare an environment-safe admin identity/RLS design, the additive `content_data` and Skill-index changes, LIVE private media bucket/policies, and `ai-content-v1` secret check.
+7. Verify a restorable LIVE database backup and separate Storage recovery in the Supabase dashboard. No restorable backup has been verified through current tools.
+8. Validate the complete mapping/migration in an approved clean validation environment. Do not create or use a new Supabase project/branch without explicit approval.
+9. Only after all decisions, gates and explicit production-action approval, execute the add-only transfer, verify before/after counts and foreign keys, smoke-test, run Full Regression and update this handoff.
+
+Current branch: `refactor/professional-v1`.
+Current HEAD: `b310825ccff3b1f03ac8af5369411eea0e8e357d`.
+Last verified Full Regression: #4394 / run `45939877249`, success on that exact HEAD.
+LIVE `main`, Supabase LIVE, Supabase TEST and `pacogo.org`: unchanged by this audit.

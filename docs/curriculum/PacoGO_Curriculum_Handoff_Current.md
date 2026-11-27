@@ -10562,3 +10562,93 @@ Current branch: `refactor/professional-v1`.
 Latest verified commit: `4e921a03482a7f4bd9017c66296b436447edca99`.
 Last verified Full Regression: #4392 / run `45680211854`, green on exact commit `4e921a03482a7f4bd9017c66296b436447edca99`.
 LIVE `main`, Supabase LIVE and `pacogo.org`: unchanged.
+
+
+## 78. TEST → LIVE read-only release audit (27 November 2026)
+
+### Verification baseline
+- Current branch HEAD: `626f4dfc883b668da9f27442e57bb20a07e95564`.
+- Full Regression #4393 / run `45680863712` completed successfully on that exact commit. The job's curriculum, architecture, maintained Node, migrated Node, browser and clean-working-tree steps all completed successfully.
+- This is the verified development baseline, not approval to write to LIVE.
+- Both existing Supabase projects report `ACTIVE_HEALTHY`. LIVE runs PostgreSQL 17.11.0.003; TEST runs PostgreSQL 17.6.1.166.
+- No repository code, LIVE/TEST database, Storage object, Edge Function, deployment or `main` branch was changed during this audit. All database queries were read-only.
+
+### Data mapping findings
+Current verified row counts for the relevant tables:
+
+| Table | LIVE | TEST |
+|---|---:|---:|
+| lessons | 37 | 17 |
+| lesson_items | 488 | 88 |
+| learning_topics | 23 | 15 |
+| learning_material_cards | 19 | 4 |
+| learning_topic_media | 0 | 19 |
+| test_attempts | 19 | 11 |
+| test_attempt_answers | 195 | 54 |
+| game_results | 3 | 5 |
+| skill_definitions | 12 | 13 |
+| skill_assignments | 36 | 37 |
+
+Lesson comparison:
+- 13 of the 17 TEST lesson IDs already exist in LIVE. Seven are semantic candidates for existing LIVE lessons; six are unrelated ID collisions. Four TEST lesson IDs do not currently collide.
+- TEST 4 `Piraten` ↔ LIVE 4: all 16 question/answer pairs match.
+- TEST 13 `Optellen tot 10` ↔ LIVE 13: all 11 pairs match.
+- TEST 14 `Thema 2: week 2` ↔ LIVE 14: all 13 pairs match.
+- TEST 19 `Thema 2: week 1` ↔ LIVE 19: 11/13 pairs match; two content differences. No TEST attempts.
+- TEST 20 `Thema 2: week 3` ↔ LIVE 20: 11/12 pairs match; one wording/spelling difference. TEST has two attempt rows and one game result for this lesson.
+- TEST 21 `Les 2: Caribisch gebied` ↔ LIVE 21: all four TEST items are contained in the 14 LIVE items. TEST has one attempt.
+- TEST 39 `Woordendictee` (Zenith, archived, one item) has one item also present in LIVE 39 `Dictee` (Zenith, 45 items), but the titles and historical lesson versions differ. TEST has two attempts and one game result. Do not silently change the historical lesson title by mapping it to LIVE 39.
+- TEST 40 `Woordendictee` (Zyon, deleted, four items) has six attempts. LIVE 40 is a different lesson for another learner. If this history is migrated, it needs a new hidden/deleted historical lesson ID; never map it to LIVE 40.
+- TEST 22 `Aftrekken tot en met 5` (Zephon, active, three items) and TEST 41 `Azie` (Zyon, active, one item) have no semantic LIVE counterpart. TEST 41's numeric ID conflicts with LIVE 41 `Redactie oefenblad`; both require explicit ID mapping if imported.
+- TEST 36/37/38 are deleted Zyon `Dicteewoorden` records with no attempts and unrelated LIVE ID collisions. TEST 34 is a `__cascade_test__` fixture with no items and one game result. TEST 42/43/44 are generic test records; TEST 42 is deleted and contains the only non-empty TEST `content_data` row. Do not automatically publish/import these fixtures.
+- TEST has 11 attempt rows and 54 answer rows. Five attempt pairs are exact duplicate records by lesson/student/score/question count/time; preserve all as recorded unless the user explicitly approves deduplication. Four TEST attempt IDs collide with LIVE IDs; all 54 TEST answer IDs collide with LIVE IDs. Every attempt and answer therefore needs an explicit generated-ID mapping.
+- TEST has five game-result rows; three IDs collide with LIVE. One is attached to the synthetic `__cascade_test__` fixture. The other results refer to lessons 13, 14, 20 and 39 and need explicit lesson mapping.
+- Of 88 TEST lesson items, 27 IDs collide with LIVE and have identical question/answer content (the shared Piraten and Optellen rows). The other 61 IDs do not collide, but several contain content already present under different IDs in LIVE; item IDs alone cannot decide whether to import them.
+- TEST has 15 learning topics; 12 numeric IDs collide with LIVE. Seven natural-key/context candidates are: TEST topic 1 → LIVE 12; 2 → 36; 4 → 6; 5 → 5; 6 → 7; 7 → 9; 9 → 11. Topic 9 is active in TEST but deleted in LIVE, so that mapping has a state conflict. The other eight TEST topics have no confirmed LIVE semantic counterpart; several are synthetic or placeholder topics.
+- The four TEST learning-material cards are placeholder/test content attached to topics 2 and 8; all four card IDs collide with LIVE. LIVE's 19 existing cards must remain untouched.
+- TEST has one additional legacy Skill definition, `Breuken`, and one matching assignment for Zenith. The other 12 definitions and 36 assignment natural keys already exist in LIVE. Do not automatically import or change the legacy Breuken Skill without explicit approval.
+
+### Schema and persistence contract findings
+- The current database schemas do not match some earlier handoff notes. TEST `lessons` lacks `explanation`, `ai_instruction` and `editor_labels`; the current lesson service drops these fields, so do not add a migration based on the old note. LIVE's existing columns must remain.
+- TEST `lesson_items` has `content_data`; LIVE does not. The current development-branch `lesson-service.js` includes `content_data` in persisted lesson-item payloads. If this code is released, LIVE needs the additive `content_data jsonb` contract (the branch migration `20261029160000_add_lesson_item_content_model.sql` is the source to review). The only non-empty TEST content_data row is in deleted test lesson 42. Keep LIVE's existing `min_words` and `required_terms`; do not drop them.
+- TEST `question_parts` and `answer_parts` are NOT NULL; LIVE permits NULL. The current writer sends arrays, so this does not require a destructive schema change.
+- TEST `photo_upload_sessions.id` is UUID and includes `uploaded_at`; LIVE uses bigint identity and has no `uploaded_at`. TEST has 12 old sessions (two uploaded with photo_data, ten waiting); LIVE has six waiting sessions. TEST Edge Function `photo-upload-v1` v5 writes `uploaded_at`, so it cannot be deployed unchanged to LIVE. Do not migrate stale temporary sessions automatically.
+- TEST-only `lesson_photos` has zero rows and no current active route was found for its service. Do not add it to LIVE without a demonstrated runtime requirement.
+- LIVE already has `learning_topic_media`, but no `lesson-photos` Storage bucket. The current `learning-topic-media-service.js` uses this private bucket for uploads and signed URLs, so the bucket/configuration is a real runtime dependency.
+- TEST has 19 `learning_topic_media` rows and all 19 corresponding Storage objects in private bucket `lesson-photos`; no orphan media objects were found. The objects have identical size/ETag metadata and are attached to TEST-only topics 12, 16, 17, 19, 22 and 31. If approved for transfer, topic IDs and object paths must be remapped together. Do not copy TEST owner UUIDs.
+- LIVE's existing public `audio` bucket and its nine objects must remain untouched. LIVE currently has no `lesson-photos` bucket or its policies. Do not copy TEST Storage policies verbatim; their owner allowlist mixes TEST and LIVE UUIDs.
+- The TEST `photo-upload.html` static page points to the TEST Supabase endpoint even on the current `main` version; `photo-phone.html` points to LIVE. No active application route/reference to these pages was found in the inspected app entrypoints. Treat this as a legacy-entrypoint decision, not an automatic rewrite.
+
+### Authorization and Skill persistence blockers
+- The TEST main-administrator auth account was matched to an existing LIVE account by comparing email hashes without exposing the email. Its LIVE UUID differs from the TEST UUID.
+- `src/core/auth-authorization.js` in both `main` and the development branch lists only the TEST UUID in `MAIN_ADMINISTRATOR_IDS`. Both LIVE users are in `PARENT_IDS`, but the corresponding LIVE main administrator is not recognized as the main administrator by the application.
+- LIVE RLS policies for `skill_assignments` INSERT/UPDATE/DELETE and `game_results` SELECT refer only to the TEST UUID, which is absent from LIVE. The `challenge_configurations` and `skill_definitions` policies already include the current LIVE users.
+- TEST has a unique constraint/index on `skill_assignments(student, skill_id)`; LIVE does not. The current `skill-configuration-service.js` uses `upsert(..., { onConflict: 'student,skill_id' })`. A read-only duplicate check found no duplicate natural keys in LIVE, so a unique index can be prepared safely, but no change has been made.
+- The game-result service reads high scores from `game_results`; the current LIVE SELECT policy therefore blocks current LIVE parent accounts from seeing those results. These authorization corrections are required for intended runtime behavior, but must be explicitly included in the approved release scope before implementation.
+
+### Edge Function comparison
+- TEST-only `ai-content-v1` v4 is called by the current main application through the central AI-content service, but the LIVE project does not have the function. It is a missing backend dependency for that existing feature. Verify the required LIVE secret before deployment.
+- Keep LIVE `grade-answer-v2` v12; TEST v2 lacks the LIVE `aiInstruction` support. Do not downgrade it.
+- TEST `speak-word-v1` v6 differs from LIVE v3 mainly in trimming/error handling; no contract reason to replace LIVE was found.
+- TEST `photo-upload-v1` v5 has expiry validation and writes `uploaded_at`; retain LIVE v1 until its schema and entrypoint are deliberately resolved.
+- TEST `photo-understand-v1` v1 has a different prompt, but no active app callsite was found in the inspected entrypoints. Do not replace LIVE automatically.
+- TEST-only `check-dictation-spelling-v1` v3 has no active callsite in the current lesson-editor runtime. Do not deploy it automatically.
+- Preserve LIVE-only `ai-item-edit-v1`, `ai-assignment-v1`, `grade-answer` and `agenda-understand-v1`. No Edge Function was deployed or changed.
+
+### Backup and release gate
+- The connected Supabase project status does not expose backup/PITR readiness, and no backup-management action is available in the current connection. No restorable LIVE backup or Storage backup has been verified. Verify database backup/PITR and separate Storage recovery in the Supabase dashboard before any production write.
+- Do not create a new Supabase project or restore/branch project without explicit user approval and clear cost confirmation.
+- No LIVE database write, Storage copy, Edge Function deployment, website deployment or main-branch change is authorized by this read-only audit.
+
+### Next concrete steps
+1. Present the lesson/topic/history disposition and obtain approval for which TEST-only real content, archived history, placeholder cards/media and legacy Breuken Skill should be transferred. Never overwrite LIVE records.
+2. Obtain explicit approval for the narrowly scoped LIVE role/RLS and Skill unique-index corrections; preserve TEST authorization and existing LIVE data.
+3. Verify a restorable LIVE database backup and separate Storage recovery; if unavailable through current tools, the user must verify it in the dashboard.
+4. Complete the additive schema/Storage/Edge Function release matrix, including `content_data`, the Skill unique index, `lesson-photos` bucket/policies and `ai-content-v1`. Do not deploy `photo-upload-v1` v5 without resolving `uploaded_at` and the static page endpoint.
+5. Validate the full ID/FK mapping and migration in an approved clean validation environment. Ask before creating any new Supabase project/branch.
+6. Only after these gates and explicit production-action approval, execute the add-only release, verify all before/after LIVE counts and relationships, run smoke tests and Full Regression, then update this handoff again.
+
+Current branch: `refactor/professional-v1`.
+Current HEAD: `626f4dfc883b668da9f27442e57bb20a07e95564`.
+Last verified Full Regression: #4393 / run `45680863712`, success on that exact HEAD.
+LIVE `main`, Supabase LIVE, Supabase TEST and `pacogo.org`: unchanged by this audit.

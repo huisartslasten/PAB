@@ -11,7 +11,7 @@ test('LIVE Millionaire migration changes only the approved unlock-policy fields'
   assert.match(sql, /challenge_key = 'millionaire'/i);
   assert.match(sql, /minimumScore/);
   assert.match(sql, /allowedLessonTypes/);
-  assert.match(sql, /\['\*'\]/);
+  assert.match(sql, /\["\*"\]/);
   assert.match(sql, /enabled is true/i);
   assert.match(sql, /questionCount' = '11'/i);
   assert.match(sql, /askSomeone/);

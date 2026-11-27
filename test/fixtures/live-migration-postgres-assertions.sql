@@ -52,26 +52,29 @@ begin
     raise exception 'Anonymous lesson-order read policy must not exist';
   end if;
 
+  -- The disposable LIVE baseline starts with 10 lessons, 7 topics,
+  -- 3 game results and no lesson items or test history. The approved
+  -- transfer must leave all of those datasets unchanged.
   select count(*) into v_count from public.lessons;
-  if v_count <> 16 then raise exception 'Expected 16 total lessons after additive import; found %',v_count; end if;
+  if v_count <> 10 then raise exception 'LIVE lesson baseline changed; expected 10, found %',v_count; end if;
 
   select count(*) into v_count from public.lesson_items;
-  if v_count <> 25 then raise exception 'Expected 25 imported lesson items; found %',v_count; end if;
+  if v_count <> 0 then raise exception 'Lesson items must not be transferred; found %',v_count; end if;
 
   select count(*) into v_count from public.test_attempts;
-  if v_count <> 11 then raise exception 'Expected 11 imported attempts; found %',v_count; end if;
+  if v_count <> 0 then raise exception 'Test attempts must not be transferred; found %',v_count; end if;
 
   select count(*) into v_count from public.test_attempt_answers;
-  if v_count <> 54 then raise exception 'Expected 54 imported answers; found %',v_count; end if;
+  if v_count <> 0 then raise exception 'Test answers must not be transferred; found %',v_count; end if;
 
   select count(*) into v_count from public.game_results;
-  if v_count <> 7 then raise exception 'Expected 7 total game results (3 existing + 4 imported); found %',v_count; end if;
+  if v_count <> 5 then raise exception 'Expected 3 existing + 2 approved game results; found %',v_count; end if;
 
   select count(*) into v_count from public.lesson_order;
   if v_count <> 8 then raise exception 'LIVE lesson_order rows changed; expected 8, found %',v_count; end if;
 
   select count(*) into v_count from public.learning_topics;
-  if v_count <> 8 then raise exception 'Expected 7 existing topics + distinct Topografie; found %',v_count; end if;
+  if v_count <> 7 then raise exception 'LIVE learning_topics must remain unchanged at 7; found %',v_count; end if;
 
   select count(*) into v_count from public.game_access_settings;
   if v_count <> 2 then raise exception 'Expected 2 imported game-access settings; found %',v_count; end if;
@@ -82,58 +85,74 @@ begin
   select count(*) into v_count from public.game_access_state;
   if v_count <> 4 then raise exception 'Expected 4 imported game-access states; found %',v_count; end if;
 
-  if not exists (
+  if exists (
     select 1 from public.lessons
-    where student='Zephon' and subject='Rekenen' and title='Aftrekken tot en met 5'
-      and archived=false and deleted=false
-  ) then raise exception 'New Zephon lesson was not imported as active'; end if;
+    where (student='Zephon' and title='Aftrekken tot en met 5')
+       or (student='Zyon' and title='Azie')
+       or (student='Zenith' and title in ('Thema 2: week 3','Les 2: Caribisch gebied'))
+  ) then raise exception 'Unapproved TEST lessons were transferred'; end if;
 
-  if not exists (
-    select 1 from public.lessons
-    where student='Zyon' and subject='Aardrijkskunde' and title='Azie'
-      and subvak='Topografie' and archived=false and deleted=false
-  ) then raise exception 'New Zyon Topografie lesson was not imported as active'; end if;
-
-  if not exists (
-    select 1 from public.lessons
-    where student='Zenith' and title='Thema 2: week 3'
-      and archived=true and deleted=false
-  ) then raise exception 'TEST lesson 20 history snapshot was not hidden in archive'; end if;
-
-  if not exists (
-    select 1 from public.lessons
-    where student='Zenith' and title='Les 2: Caribisch gebied'
-      and archived=true and deleted=false
-  ) then raise exception 'TEST lesson 21 history snapshot was not hidden in archive'; end if;
-
-  if not exists (
-    select 1 from public.lessons
-    where student='Zenith' and title='Woordendictee'
-      and archived=true and deleted=false
-  ) then raise exception 'TEST lesson 39 history snapshot was not hidden in archive'; end if;
-
-  if not exists (
-    select 1 from public.lessons
-    where student='Zyon' and title='Woordendictee'
-      and deleted=true and archived=false
-  ) then raise exception 'TEST lesson 40 deleted history snapshot was not preserved'; end if;
+  if exists (
+    select 1 from public.learning_topics
+    where student='Zyon' and subject='Aardrijkskunde' and subvak='Topografie'
+  ) then raise exception 'Topografie topic must not be transferred'; end if;
 
   if not exists (
     select 1 from public.lessons
     where id=20 and explanation='LIVE_ONLY_KEEP'
       and ai_instruction='LIVE_AI_KEEP' and editor_labels='["keep"]'::jsonb
-  ) then raise exception 'LIVE-only lesson fields were overwritten';
-  end if;
+  ) then raise exception 'LIVE-only lesson fields were overwritten'; end if;
 
   if not exists (
     select 1 from public.game_results
     where id=1 and lesson_id=41 and student='Zyon' and score=9 and game_key='memory'
   ) or not exists (
     select 1 from public.game_results
+    where id=2 and lesson_id=41 and student='Zyon' and score=8 and game_key='memory'
+  ) or not exists (
+    select 1 from public.game_results
     where id=3 and lesson_id=13 and student='Zephon' and score=10240 and game_key='double-or-nothing'
   ) then
-    raise exception 'Existing LIVE game results were overwritten or lost';
-  end if;
+    raise exception 'Existing LIVE game results were overwritten or lost'; end if;
+
+  if not exists (
+    select 1 from public.game_results
+    where lesson_id=14 and student='Zenith' and score=18 and game_key='word-reveal'
+      and played_at='2026-10-22T23:34:01.448632+00:00'::timestamptz
+  ) or not exists (
+    select 1 from public.game_results
+    where lesson_id=13 and student='Zephon' and score=10240 and game_key='double-or-nothing'
+      and played_at='2026-10-27T20:25:24.984684+00:00'::timestamptz
+  ) then
+    raise exception 'Approved TEST game history was not appended correctly'; end if;
+
+  if not exists (
+    select 1 from public.game_access_settings
+    where student='Zenith' and required_tests=10 and minimum_score=9
+  ) or not exists (
+    select 1 from public.game_access_settings
+    where student='Zephon' and required_tests=10 and minimum_score=9
+  ) then raise exception 'Approved game-access settings did not transfer'; end if;
+
+  if not exists (
+    select 1 from public.game_access_cycles where student='Zenith' and cycle=3
+  ) or not exists (
+    select 1 from public.game_access_cycles where student='Zephon' and cycle=5
+  ) then raise exception 'Approved game-access cycles did not transfer'; end if;
+
+  if not exists (
+    select 1 from public.game_access_state
+    where student='Zenith' and game_key='memory' and unlocked=false
+  ) or not exists (
+    select 1 from public.game_access_state
+    where student='Zephon' and game_key='lexo' and unlocked=false
+  ) or not exists (
+    select 1 from public.game_access_state
+    where student='Zephon' and game_key='rock-paper-scissors' and unlocked=true
+  ) or not exists (
+    select 1 from public.game_access_state
+    where student='Zephon' and game_key='word-chase' and unlocked=false
+  ) then raise exception 'Approved per-game access state did not transfer'; end if;
 
   if not exists (
     select 1 from public.challenge_configurations
@@ -150,12 +169,6 @@ begin
     where id='lesson-photos' and public=false and file_size_limit=5242880
       and allowed_mime_types=array['image/jpeg','image/png','image/webp','image/heic','image/heif']::text[]
   ) then raise exception 'Private lesson-photos bucket contract did not verify'; end if;
-
-  if not exists (
-    select 1 from public.learning_topics
-    where student='Zyon' and subject='Aardrijkskunde'
-      and subvak='Topografie' and deleted=false and archived=false
-  ) then raise exception 'Distinct active Topografie topic was not created'; end if;
 
   if not exists (
     select 1 from public.learning_topics

@@ -11007,3 +11007,50 @@ Verified LIVE lesson 13 and 14 identities remain unchanged.
 - Last verified pre-handoff commit: `fb885d171ac75cf897986aa83bdf95378ef19930`.
 - Last verified Full Regression: #4415 / run `46083648589`, SUCCESS on that exact commit.
 - This section is a handoff update and therefore creates a new commit; run Full Regression on that resulting commit before claiming the handoff update itself is verified.
+
+
+## 84. Remaining approved LIVE database migrations executed and verified (28 November 2026)
+
+### Authorization and preflight
+- The user explicitly approved execution of the three remaining prepared Supabase LIVE migrations after reviewing their scope.
+- Target project: PAB LIVE `ncpkqrvxljxwboavxtak`.
+- Branch remained `refactor/professional-v1`; GitHub `main` was not modified or deployed.
+- Latest Full Regression before execution: #4416 / run `46084694733`, SUCCESS on `470add0fc72abb08bdc0c519df46cc1301cef01e`.
+- Verified the latest completed database backup visible in the user's Supabase dashboard screenshot: 27 Nov 2026 13:20:52 UTC, status COMPLETED.
+- Rechecked preconditions: all seven curriculum target tables absent; required runtime tables present; no duplicate student/skill assignments; no unknown game keys; no `content_data` column or unique assignment index yet; no `lesson-photos` bucket; Millionaire config exactly one row, enabled, 11 questions, all three lifelines, prior policy minimum 10 / dictation only.
+- LIVE baseline before these migrations: lessons 37, lesson_items 488, test_attempts 19, test_attempt_answers 195, learning_topics 23, lesson_order 8, game_results 5, game_access_settings 2, game_access_cycles 2, game_access_state 4.
+
+### Executed migrations — exact order
+1. `supabase/migrations/20261125180000_add_curriculum_persistence_and_ownership_live.sql`
+   - Commit blob SHA: `f93fc038a9e8e6a2773e9248461779b4de582a7d`
+   - Created curriculum registry, append-only student evidence, longitudinal state, decision trace, learner profiles, guardians and profile-link tables; created associated indexes, RLS policies and persistence functions.
+   - Registry versions now present: 0.2.0-seed, 0.3.0-candidate, 0.4.0-candidate, 0.5.0-candidate, 0.6.0-candidate. All remain status candidate and epistemic_status [S]/[O]; no empirical validation implied.
+2. `supabase/migrations/20261127100000_live_runtime_contract_and_authorization.sql`
+   - Commit blob SHA: `78bf8da35b90e2a280b435eac3e4c219a8b0a88c`
+   - Added `lesson_items.content_data jsonb`, unique student/skill assignment index, canonical RPS game key support, aligned game access RPCs and parent/admin RLS policies.
+   - Created the private `lesson-photos` bucket with 5 MB limit and allowed image MIME types; no Storage objects were copied or modified.
+3. `supabase/migrations/20261127110000_live_millionaire_unlock_policy.sql`
+   - Commit blob SHA: `0a14213da67aef62399acbf6a271847a6a9419a7`
+   - Changed only Millionaire unlock policy to minimumScore 4 and allowedLessonTypes ["*"]. Preserved enabled=true, questionCount=11, AI settings and all three lifelines.
+
+All three SQL executions returned without errors and were wrapped in their own transactions. No lesson, lesson_item, test attempt, test answer, learning topic or lesson_order data was imported or deleted. No Storage objects were touched.
+
+### Post-migration verification — LIVE
+- Existing data counts unchanged: lessons 37; lesson_items 488; test_attempts 19; test_attempt_answers 195; learning_topics 23; lesson_order 8; game_results 5.
+- Existing game access rows remain: settings 2, cycles 2, state 4.
+- All seven curriculum/learner tables exist.
+- Five candidate curriculum registry versions exist as listed above.
+- Runtime: content_data is jsonb; unique skill assignment index exists; RPS is allowed by game_results constraint; get_game_access(text) and claim_game_unlock(text,text) exist.
+- Private lesson-photos bucket exists with expected 5 MB limit and image MIME types.
+- Millionaire verified enabled, min score 4, allowed lesson types ["*"], 11 questions, all three lifelines preserved.
+- LIVE lesson data counts were preserved exactly.
+
+### Remaining work — application release and smoke tests
+- Database migrations are complete; do not replay them.
+- The application code has NOT been deployed. LIVE `main` remains at `9ddb18aaafec265f2239bb68b05723468c5607f9`; development branch remains `refactor/professional-v1`.
+- The development branch authorization module includes both TEST and LIVE administrator UUIDs; LIVE main's current module has only the LIVE UUID. The current branch contains many other changes and must not be merged wholesale without a controlled release review.
+- Next concrete step: inspect and isolate the minimum application-code release needed for compatibility with the now-migrated LIVE database; validate the exact candidate with regression and smoke tests. Do not modify or deploy `main` without explicit user authorization.
+- Verify LIVE sign-in for both parents, administrator access, lesson CRUD/content_data, lesson photo upload/read, game access/unlock and RPS result persistence, curriculum persistence authorization, and Millionaire unlock behavior.
+- Edge Functions/secrets remain separate: do not deploy TEST functions or change LIVE secrets without a scoped review and explicit authorization.
+- Current database state is migrated; current code state is not yet released. Do not describe the full TEST → LIVE application migration as complete.
+- This handoff update must itself pass Full Regression on its resulting commit before it is considered verified.

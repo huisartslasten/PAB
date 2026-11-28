@@ -1,0 +1,63 @@
+{
+  "schema_version": "0.1",
+  "status": "candidate",
+  "epistemic_status": "[O]",
+  "synthetic_or_empirical": "design_only",
+  "purpose": "Pre-specify the W1 baseline-discrimination protocol after W0 feasibility, without allowing automatic curriculum promotion or mastery-rule changes.",
+  "wave_id": "W1",
+  "role": "baseline_discrimination",
+  "confirmatory": true,
+  "claim_support_scope": "within_protocol_scope_only",
+  "prerequisite": {
+    "required_w0_outcome": "FEASIBLE",
+    "w0_failure": "W1 execution must not proceed when W0 is REVISE_PROTOCOL or INDETERMINATE."
+  },
+  "sampling_and_assignment": {
+    "unit": "learner_task_instance",
+    "assignment_rule": "Every focal claim must receive the pre-specified task forms in its manifest task set, with planned variation recorded per task instance.",
+    "repeat_rule": "Do not treat multiple attempts of the same administered instance as independent task instances.",
+    "randomisation": "If randomisation or counterbalancing is used, record the assignment mechanism and preserve it in provenance.",
+    "exclusions": "No post-hoc exclusion based on performance; exclusions must be pre-specified or documented as technical invalidity."
+  },
+  "required_per_focal_claim": {
+    "task_forms": "At least two distinct task forms when the manifest specifies two or more.",
+    "variation": "At least one planned variation relevant to the claim or its stated alternative explanations.",
+    "process_evidence": true,
+    "independence_evidence": true,
+    "alternative_tracking": true
+  },
+  "execution_requirements": {
+    "registration": "Use the standardized task-instance registration contract before administration.",
+    "observation": "Record one immutable raw observation linked to exactly one administered task instance.",
+    "coding": "Generate an uncoded C3 packet from the validated execution export; independent coders then create separate coding records.",
+    "provenance": "Learner, study, session, wave, task, registry version and administration timestamp must remain linked end-to-end.",
+    "technical_invalidity": "Technical failures are coded explicitly and do not silently become missing observations."
+  },
+  "c3_requirements": {
+    "double_coding": true,
+    "independent_coders": 2,
+    "preserve_original_codes": true,
+    "adjudication": "Separate from original independent coding records.",
+    "dimensions": ["target_match", "performance_status", "process_status", "independence_status", "evidence_quality", "contradiction_status", "alternative_explanation_flags"]
+  },
+  "analysis_order": [
+    "provenance",
+    "missingness",
+    "task_and_variation_coverage",
+    "coding_reliability",
+    "evidence_quality_and_independence",
+    "alternative_explanations",
+    "claim-level measurement readiness",
+    "within-protocol claim evidence"
+  ],
+  "analysis_boundaries": {
+    "allowed": ["descriptive distributions", "coding agreement", "task/variation coverage", "within-protocol evidence patterns", "explicitly pre-specified claim-scope comparisons"],
+    "not_allowed": ["automatic developmental ordering", "automatic prerequisite inference", "automatic mastery classification", "automatic registry promotion", "changing mastery rules from W1 alone"]
+  },
+  "decision_states": ["FEASIBILITY_ONLY", "INDETERMINATE", "SUPPORTS_CANDIDATE_WITHIN_SCOPE", "CONTRADICTS_CANDIDATE_WITHIN_SCOPE", "REVISE_PROTOCOL"],
+  "c5_boundary": "W1 is baseline discrimination. It does not establish temporal precedence or prerequisite status. Repeated measurement or another explicitly justified longitudinal design is required for C5 ordering questions.",
+  "supabase": {
+    "required_for_protocol_design": false,
+    "runtime_rule": "If W1 is actually administered through persistent PacoGO runtime, perform a targeted PacoGO TEST persistence smoke test before accepting the runtime implementation. MAIN/LIVE remains untouched."
+  }
+}

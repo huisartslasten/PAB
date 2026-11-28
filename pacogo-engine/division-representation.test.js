@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {createDivisionRepresentationModel} from './division-representation-model.js';
+test('sharing model leaves amount per group unknown',()=>{const m=createDivisionRepresentationModel({mode:'sharing',total:12,group_count:3});assert.equal(m.total,12);assert.match(m.accessible_label,/hoeveelheid per groep onbekend/);assert.throws(()=>createDivisionRepresentationModel({mode:'sharing',total:3,group_count:4}),/cannot exceed/);});
+test('grouping model leaves number of groups unknown',()=>{const m=createDivisionRepresentationModel({mode:'grouping',total:18,items_per_group:3});assert.equal(m.items_per_group,3);assert.match(m.accessible_label,/aantal groepen onbekend/);});

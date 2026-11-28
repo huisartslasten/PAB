@@ -4,10 +4,9 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "test:vitest": "vitest run vitest"
+    "test:additional": "node --test vitest/*.test.js"
   },
   "devDependencies": {
-    "@playwright/test": "^1.55.0",
-    "vitest": "5.0.3"
+    "@playwright/test": "^1.55.0"
   }
 }

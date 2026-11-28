@@ -23,12 +23,25 @@ function shuffle(values, random) {
   return result;
 }
 
+function normalizeCardDescriptor(card, fallbackType, fallbackValue) {
+  if (card && typeof card === 'object') {
+    return {
+      type: String(card.type || fallbackType),
+      value: String(card.value ?? ''),
+      audioText: card.audioText ? String(card.audioText) : ''
+    };
+  }
+  return { type: fallbackType, value: String(card ?? fallbackValue ?? ''), audioText: '' };
+}
+
 function createCards(items, random = Math.random) {
   const cards = [];
   normalizeItems(items).forEach((item, pairIndex) => {
-    const matchKey = normalizeMatchKey(item.answer);
-    cards.push({ id: `${pairIndex}:question`, pairId: pairIndex, type: 'question', value: item.question, matchKey });
-    cards.push({ id: `${pairIndex}:answer`, pairId: pairIndex, type: 'answer', value: item.answer, matchKey });
+    const question = normalizeCardDescriptor(item.question, 'question', '');
+    const answer = normalizeCardDescriptor(item.answer, 'answer', '');
+    const matchKey = normalizeMatchKey(item.matchKey ?? answer.value ?? question.audioText ?? question.value);
+    cards.push({ id: `${pairIndex}:question`, pairId: pairIndex, ...question, matchKey });
+    cards.push({ id: `${pairIndex}:answer`, pairId: pairIndex, ...answer, matchKey });
   });
   return shuffle(cards, random);
 }

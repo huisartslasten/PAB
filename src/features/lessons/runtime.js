@@ -1,8 +1,10 @@
 import { mountPacoPageTemplate } from '../../components/page-template.js';
-import { createPacoNavigation } from '../../components/page-navigation.js';
+import { createPacoNavigation, createPacoManagementNavigation } from '../../components/page-navigation.js';
 import { createPacoTile, createPacoTileGrid } from '../../components/paco-tile.js';
 import { attachPacoTileSorting } from '../../components/paco-tile-sort.js';
 import { applyViewContext, buildViewUrl } from '../../core/view-context.js';
+import { listStudents } from '../../core/student-registry.js';
+import { createManagementTopbar } from '../management/management-context.js';
 import { createContentManagementActions } from '../management/content-management-actions.js';
 import { getLessonSubjectGroups, getLessonSubjectIcon, getSubjectSubvakGroups, normalizeLessonSubject } from './list-view-model.js';
 
@@ -12,6 +14,7 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
   if (typeof navigate !== 'function') throw new TypeError('Lessons runtime requires navigation.');
 
   const selectedStudent = context?.student || '';
+  const isManagementContext = context?.mode === 'management';
   const pageKey = 'lessons';
   const content = documentRef.createElement('div');
   content.className = 'lessons-page paco-template-card';
@@ -158,7 +161,20 @@ export function createLessonsRuntime({ app, templateMount, context, selectedSubj
   }
 
   async function mount() {
-    mountPacoPageTemplate({ mount: templateMount, greeting: `Hoi ${selectedStudent}! 🐶`, title: 'Mijn vakken', icon: '📚', subtitle: 'Kies eerst een vak en open daarna het onderwerp of de les die je wilt doen.', navigation: createPacoNavigation({ app, active: 'lessons', student: selectedStudent, viewMode: context?.mode, includeManagement: true, navigate }), content });
+    const navigation = isManagementContext
+      ? createPacoManagementNavigation({ app, active: context?.managementFilter || 'vakken', student: selectedStudent, managementStudents: listStudents(), navigate })
+      : createPacoNavigation({ app, active: 'lessons', student: selectedStudent, viewMode: context?.mode, includeManagement: true, navigate });
+    mountPacoPageTemplate({
+      mount: templateMount,
+      className: isManagementContext ? 'management-template' : '',
+      topbar: isManagementContext ? createManagementTopbar({ app, student: selectedStudent, managementFilter: context?.managementFilter || 'lessons', navigate }) : null,
+      greeting: isManagementContext ? 'PacoGO beheer ⚙️' : `Hoi ${selectedStudent}! 🐶`,
+      title: isManagementContext ? 'Lessen' : 'Mijn vakken',
+      icon: isManagementContext ? '⚙️' : '📚',
+      subtitle: isManagementContext ? `Beheer de lessen en leerstof van ${selectedStudent}.` : 'Kies eerst een vak en open daarna het onderwerp of de les die je wilt doen.',
+      navigation,
+      content
+    });
     content.appendChild(state);
     try {
       if (!selectedStudent) throw new Error('Geen leerling geselecteerd.');

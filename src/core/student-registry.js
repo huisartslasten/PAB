@@ -1,7 +1,7 @@
 const STUDENT_PROFILES = Object.freeze({
-  Zyon: Object.freeze({ id: 'Zyon', level: 'advanced' }),
-  Zenith: Object.freeze({ id: 'Zenith', level: 'intermediate' }),
-  Zephon: Object.freeze({ id: 'Zephon', level: 'beginner' })
+  Zyon: Object.freeze({ id: 'Zyon', curriculumKey: 'zyon', level: 'advanced' }),
+  Zenith: Object.freeze({ id: 'Zenith', curriculumKey: 'zenith', level: 'intermediate' }),
+  Zephon: Object.freeze({ id: 'Zephon', curriculumKey: 'zephon', level: 'beginner' })
 });
 
 const STUDENT_ROSTER = Object.freeze(Object.keys(STUDENT_PROFILES));

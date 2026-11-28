@@ -29,16 +29,28 @@ test('management page delegates its shell and feature composition to the canonic
   assert.match(managementPage, /startPacoRuntime/);
   assert.match(managementPage, /src\/features\/management\/management-support\.css/);
   assert.match(managementRuntime, /mountPacoPageTemplate/);
-  assert.match(managementRuntime, /title\.textContent = selectedStudent \? `Beheer van \$\{selectedStudent\}` : 'Beheer'/);
-  assert.match(managementRuntime, /createPacoNavigation/);
-  assert.match(managementRuntime, /active: 'dashboard'/);
+  assert.match(managementRuntime, /title: FILTER_LABELS\[filter\]/);
+  assert.match(managementRuntime, /createPacoManagementNavigation/);
+  assert.doesNotMatch(managementRuntime, /topbar: createManagementTopbar\(/);
 });
 
-test('shared learning navigation uses the canonical Mijn vakken terminology', () => {
+test('management LB is a filter and keeps every management destination inside the canonical management dashboard', () => {
+  assert.match(navigation, /const goFilter = nextFilter => go\(navigate, 'management\.html', \{ student, mode: 'management', managementFilter: nextFilter \}\)/);
+  assert.match(navigation, /onClick: \(\) => goFilter\(child\.filter\)/);
+  assert.doesNotMatch(navigation, /onClick: \(\) => goChild\(child\)/);
+  assert.doesNotMatch(navigation, /const goChild = child =>/);
+  assert.doesNotMatch(navigation, /path: 'lessons\.html'/);
+  assert.doesNotMatch(navigation, /path: 'skills\.html'/);
+  assert.doesNotMatch(navigation, /path: 'agenda\.html'/);
+});
+
+test('shared learning navigation keeps learner presentation and explicit management presentation in the canonical lessons owner', () => {
   assert.match(navigation, /key: 'lessons',[\s\S]*?label: 'Mijn vakken'/);
   assert.doesNotMatch(navigation, /isManagementView/);
-  assert.match(lessonsRuntime, /title: 'Mijn vakken'/);
-  assert.match(lessonsRuntime, /Kies eerst een vak en open daarna het onderwerp of de les/);
+  assert.match(lessonsRuntime, /isManagementContext = context\?\.mode === 'management'/);
+  assert.match(lessonsRuntime, /title: isManagementContext \? 'Lessen' : 'Mijn vakken'/);
+  assert.match(lessonsRuntime, /subtitle: isManagementContext \? `Beheer de lessen en leerstof van \$\{selectedStudent\}\.`/);
+  assert.match(lessonsRuntime, /createManagementTopbar/);
 });
 
 test('management test history keeps the selected student context through the central navigation owner', () => {

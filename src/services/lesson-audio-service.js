@@ -1,8 +1,10 @@
-// Lesson audio boundary for the professional player.
-// The service owns the Edge Function call and audio lifecycle; pages only request
-// speech for the currently displayed lesson item.
+// Central lesson audio boundary for every learner-facing exercise.
+// Pages request speech; provider selection and playback lifecycle stay here.
 
-export function createLessonAudioService(db, { AudioCtor = globalThis.Audio, URLRef = globalThis.URL } = {}) {
+export function createLessonAudioService(db, {
+  AudioCtor = globalThis.Audio,
+  URLRef = globalThis.URL
+} = {}) {
   if (!db?.functions?.invoke) throw new Error('A Supabase functions client is required.');
 
   let audio = null;
@@ -31,13 +33,11 @@ export function createLessonAudioService(db, { AudioCtor = globalThis.Audio, URL
     const normalizedText = String(text);
 
     // Safari may reject the first play() because it happens after the async
-    // speech request. Keep that already-created audio alive so the user action
-    // behind "Nog een keer" can retry the same playback without rebuilding or
-    // revoking the Blob URL underneath WebKit.
+    // speech request. Keep the generated audio alive so a user action can retry.
     if (audio && objectUrl && pendingText === normalizedText) {
       try {
         await audio.play();
-        onStatus?.('AI-stem speelt.');
+        onStatus?.('OpenAI-stem speelt.');
         return;
       } catch (error) {
         if (isAutoplayBlocked(error)) {
@@ -51,7 +51,7 @@ export function createLessonAudioService(db, { AudioCtor = globalThis.Audio, URL
     }
 
     stop();
-    onStatus?.('🔄 AI-stem maken...');
+    onStatus?.('🔄 OpenAI-stem maken...');
 
     let result;
     try {
@@ -59,19 +59,19 @@ export function createLessonAudioService(db, { AudioCtor = globalThis.Audio, URL
         body: { text: normalizedText, language: String(language || 'nl') }
       });
     } catch (error) {
-      onStatus?.('⚠️ AI-stem kon niet worden gemaakt.');
+      onStatus?.('⚠️ OpenAI-stem kon niet worden gemaakt.');
       throw error;
     }
 
     const { data, error } = result;
     if (error) {
-      onStatus?.('⚠️ AI-stem kon niet worden gemaakt.');
+      onStatus?.('⚠️ OpenAI-stem kon niet worden gemaakt.');
       throw error;
     }
     if (!data || typeof AudioCtor !== 'function' || !URLRef?.createObjectURL || typeof Blob !== 'function') {
-      const error = new Error('AI-stem leverde geen afspeelbaar audiobestand op.');
-      onStatus?.('⚠️ AI-stem kon niet worden afgespeeld.');
-      throw error;
+      const playbackError = new Error('OpenAI-stem leverde geen afspeelbaar audiobestand op.');
+      onStatus?.('⚠️ OpenAI-stem kon niet worden afgespeeld.');
+      throw playbackError;
     }
 
     try {
@@ -91,14 +91,14 @@ export function createLessonAudioService(db, { AudioCtor = globalThis.Audio, URL
       };
 
       await audio.play();
-      onStatus?.('AI-stem speelt.');
+      onStatus?.('OpenAI-stem speelt.');
     } catch (error) {
       if (isAutoplayBlocked(error)) {
         onStatus?.('🔊 Klik op Nog een keer om de stem af te spelen.');
         return;
       }
       stop();
-      onStatus?.('⚠️ AI-stem kon niet worden afgespeeld.');
+      onStatus?.('⚠️ OpenAI-stem kon niet worden afgespeeld.');
       throw error;
     }
   }

@@ -2,6 +2,8 @@ import { createPacoGOApp } from './bootstrap.js';
 import { createPacoRouter } from '../core/router.js';
 import { createPacoRouteRegistry } from './routes.js';
 import { installPacoManagementSwitch } from '../components/paco-management-switch.js';
+import { syncPacoGlobalManagementBar } from '../components/paco-global-management-bar.js';
+import { createManagementTopbar } from '../features/management/management-context.js';
 
 export function createPacoRuntime({
   supabaseLib = window.supabase,
@@ -25,7 +27,15 @@ export function createPacoRuntime({
     managementCapabilities: app.managementCapabilities
   });
 
+  const syncManagementBar = () => syncPacoGlobalManagementBar({
+    app,
+    createTopbar: createManagementTopbar,
+    navigate: router.navigate,
+    documentRef
+  });
+
   router.onChange(() => {
+    void syncManagementBar();
     installPacoManagementSwitch({
       templateMount,
       app,
@@ -41,7 +51,12 @@ export async function startPacoRuntime(options = {}) {
   const runtime = createPacoRuntime(options);
   const stop = runtime.router.start();
 
-  void runtime.app.initializeSession().catch(error => {
+  void runtime.app.initializeSession().then(() => syncPacoGlobalManagementBar({
+    app: runtime.app,
+    createTopbar: createManagementTopbar,
+    navigate: runtime.router.navigate,
+    documentRef: options.documentRef || document
+  })).catch(error => {
     console.error('PacoGO session initialization error:', error);
   });
 

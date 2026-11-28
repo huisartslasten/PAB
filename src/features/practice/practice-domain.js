@@ -2,8 +2,8 @@ import { getPacoGames, getPacoGame, getActivePacoGames, PACOGO_GAMES } from '../
 
 export const PRACTICE_MODES = Object.freeze([
   Object.freeze({ id: 'flashcards', label: 'Flashcards', status: 'active' }),
-  Object.freeze({ id: 'practice-test', label: 'Oefentoets', status: 'active' }),
-  Object.freeze({ id: 'games', label: 'Spelletjes', status: 'active' })
+  Object.freeze({ id: 'games', label: 'Spelletjes', status: 'active' }),
+  Object.freeze({ id: 'practice-test', label: 'Oefentoets', status: 'active' })
 ]);
 
 // Compatibility exports: the game catalog itself is owned by game-catalog.js.

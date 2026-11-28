@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PacoGO — Potloden ordenen</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <link rel="stylesheet" href="./src/components/page-template.css">
+  <link rel="stylesheet" href="./pacogo-engine/length-order-learning-interface.css">
+</head>
+<body>
+  <div id="paco-template-mount"></div>
+  <script type="module">
+    import { createPacoGOApp } from './src/app/bootstrap.js';
+    import { mountPacoPageTemplate } from './src/components/page-template.js';
+    import { createPacoNavigation } from './src/components/page-navigation.js';
+    import { readViewContext } from './src/core/view-context.js';
+    import { createLengthOrderLearningInterface } from './pacogo-engine/length-order-learning-interface.js';
+    import { LENGTH_ORDER_TASKS, evaluateLengthOrder } from './pacogo-engine/length-order-task-bank.js';
+    import { createPracticeSessionCore } from './pacogo-engine/practice-session-core.js';
+
+    const app = createPacoGOApp({ supabaseLib: window.supabase, storage: window.localStorage });
+    const context = readViewContext(new URLSearchParams(window.location.search));
+    const student = context.student || '';
+    const content = document.createElement('div');
+    const intro = document.createElement('p');
+    intro.className = 'muted';
+    intro.textContent = 'Kijk goed naar de potloden. Je hoeft geen getallen te lezen: vergelijk de lengtes.';
+    const progress = document.createElement('p');
+    progress.className = 'muted';
+    const host = document.createElement('div');
+    const controls = document.createElement('div');
+    controls.className = 'pacogo-length-order__actions';
+    const speak = document.createElement('button');
+    speak.type = 'button';
+    speak.className = 'pacogo-length-order__primary';
+    speak.textContent = '🔊 Luister nog een keer';
+    const speechStatus = document.createElement('p');
+    speechStatus.className = 'muted';
+    speechStatus.setAttribute('role', 'status');
+    speechStatus.setAttribute('aria-live', 'polite');
+    content.append(intro, progress, host, controls, speechStatus);
+
+    const session = createPracticeSessionCore({ tasks: LENGTH_ORDER_TASKS, completionMode: 'automatic' });
+    let interfaceInstance = null;
+    let completed = false;
+    let speechText = '';
+    const speakCurrent = () => app.audio.speak(speechText, { language: 'nl', onStatus: message => { speechStatus.textContent = message; } }).catch(() => {});
+    speak.addEventListener('click', speakCurrent);
+    controls.appendChild(speak);
+
+    function renderTask() {
+      completed = false;
+      const task = session.getCurrentTask();
+      if (!task) { renderCompleted(); return; }
+      speechText = task.prompt + ' Sleep de potloden naar de juiste volgorde. Het kortste potlood komt links.';
+      progress.textContent = 'Oefening ' + (session.getProgress().completedCount + 1) + ' van ' + session.getProgress().totalCount;
+      interfaceInstance = createLengthOrderLearningInterface({
+        mount: host,
+        task,
+        onCheck: order => {
+          const correct = evaluateLengthOrder(task, order);
+          session.recordAttempt({ taskId: task.id, classification: correct ? 'valid' : 'incorrect_answer', response: { orderedIndexes: order } });
+          if (correct) queueMicrotask(finishTask);
+          return { correct };
+        }
+      });
+      speakCurrent();
+    }
+
+    function renderCompleted() {
+      progress.textContent = 'Alle potloden zijn goed geordend. Goed gewerkt!';
+      host.replaceChildren();
+      const done = document.createElement('p');
+      done.className = 'pacogo-length-order__instruction';
+      done.textContent = 'Je hebt alle potloden van klein naar groot gelegd.';
+      const restart = document.createElement('button');
+      restart.type = 'button';
+      restart.className = 'pacogo-length-order__primary';
+      restart.textContent = 'OPNIEUW OEFENEN';
+      restart.addEventListener('click', () => { session.reset(); renderTask(); });
+      host.append(done, restart);
+      restart.focus();
+    }
+
+    function finishTask() {
+      if (completed) return;
+      completed = true;
+      if (session.getProgress().isComplete) { renderCompleted(); return; }
+      const next = document.createElement('button');
+      next.type = 'button';
+      next.className = 'pacogo-length-order__primary';
+      next.textContent = 'Volgende oefening';
+      next.addEventListener('click', renderTask);
+      host.querySelector('.pacogo-length-order__actions')?.appendChild(next);
+      next.focus();
+    }
+
+    mountPacoPageTemplate({
+      mount: document.querySelector('#paco-template-mount'),
+      greeting: student ? 'Hoi ' + student + '! 🐶' : 'Welkom bij PacoGO',
+      title: 'Potloden van klein naar groot', icon: '✏️',
+      subtitle: 'Vergelijk de lengtes en zet de potloden in de juiste volgorde.',
+      navigation: createPacoNavigation({ app, active: 'skills', student, includeAccount: false, navigate: target => window.location.assign(target) }),
+      content, layoutMode: 'practice'
+    });
+    renderTask();
+  </script>
+</body>
+</html>

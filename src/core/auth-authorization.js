@@ -7,7 +7,10 @@ export const PARENT_IDS = Object.freeze([
   'f0f92b9c-5eb7-4b78-aca0-1fea615b1999'
 ]);
 
+// TEST and LIVE use different Supabase Auth UUIDs for the same main administrator.
+// Keep both environment identities so the shared application code authorizes the correct account in either project.
 export const MAIN_ADMINISTRATOR_IDS = Object.freeze([
+  '5d0e1e5c-1dbe-4909-bd3a-81a1e7b26d09',
   'f0f92b9c-5eb7-4b78-aca0-1fea615b1999'
 ]);
 

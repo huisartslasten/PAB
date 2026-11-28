@@ -30,3 +30,20 @@ test('central editor formatting rejects empty insertions before touching the DOM
 
   assert.equal(formatting.insertTextWithFontSize(null, 28, ''), false);
 });
+
+test('central inline formatting keeps bold and italic state independently', () => {
+  const selectionStore = {
+    restore() { return null; },
+    remember() {},
+  };
+  const formatting = createEditorFormatting({ selectionStore });
+  const surface = {};
+
+  assert.deepEqual(formatting.inlineState(surface), { bold: false, italic: false });
+  assert.equal(formatting.toggleInlineFormat(surface, 'bold'), true);
+  assert.deepEqual(formatting.inlineState(surface), { bold: true, italic: false });
+  assert.equal(formatting.toggleInlineFormat(surface, 'italic'), true);
+  assert.deepEqual(formatting.inlineState(surface), { bold: true, italic: true });
+  assert.equal(formatting.toggleInlineFormat(surface, 'bold'), false);
+  assert.deepEqual(formatting.inlineState(surface), { bold: false, italic: true });
+});

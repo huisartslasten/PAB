@@ -1,0 +1,288 @@
+{
+  "schema_version": "0.1",
+  "status": "candidate",
+  "epistemic_status": "[S]/[O]",
+  "skill_id": "B3",
+  "name": "Vermenigvuldigen",
+  "definition": "Gelijke groepen, herhaalde hoeveelheden en multiplicatieve relaties begrijpen, representeren en gebruiken om producten en verhoudingen te bepalen.",
+  "purpose": "Kandidaatmodel voor vermenigvuldigen vanuit gelijke groepen en multiplicatieve structuren. Het begrijpen en gebruiken van de multiplicatieve relatie staat centraal; tafels memoriseren is niet de skill-definitie.",
+  "curriculum_scope": "SLO KD10A: gehele en decimale getallen. Breukbewerkingen blijven binnen de FR-skillfamilie.",
+  "concept_links": [
+    {
+      "concept": "Vermenigvuldigen",
+      "relation": "primary"
+    },
+    {
+      "concept": "Gelijke groepen",
+      "relation": "foundational"
+    },
+    {
+      "concept": "Multiplicatieve relaties",
+      "relation": "primary"
+    },
+    {
+      "skill_id": "B1",
+      "relation": "supporting_additive_to_multiplicative_transition",
+      "status": "candidate"
+    },
+    {
+      "skill_id": "B4",
+      "relation": "strong_inverse_operation",
+      "status": "candidate"
+    },
+    {
+      "skill_id": "B5",
+      "relation": "separate_integrative_skill",
+      "status": "candidate"
+    },
+    {
+      "skill_id": "A1",
+      "relation": "supporting_number_representation",
+      "status": "candidate"
+    },
+    {
+      "skill_id": "A4",
+      "relation": "supporting_place_value",
+      "status": "candidate"
+    },
+    {
+      "skill_id": "A5",
+      "relation": "supporting_flexible_number_relations",
+      "status": "candidate"
+    }
+  ],
+  "developments": [
+    {
+      "id": "B3.D1",
+      "focus": "Gelijke hoeveelheden herkennen",
+      "candidate_order": 1,
+      "interaction_forms": [
+        "identify_equal_units",
+        "count_groups",
+        "match_groups"
+      ],
+      "primary_interfaces": [
+        "quantity-representation"
+      ],
+      "evidence_targets": [
+        "B3.ET1",
+        "B3.ET2"
+      ],
+      "content_principles": [
+        "Maak gelijkheid van groepen zichtbaar.",
+        "Varieer aantal groepen en hoeveelheid per groep.",
+        "Laat de leerling beide factoren onderscheiden van het totaal."
+      ]
+    },
+    {
+      "id": "B3.D2",
+      "focus": "Gelijke groepen en arrays begrijpen",
+      "candidate_order": 2,
+      "interaction_forms": [
+        "build_array",
+        "read_rows_columns",
+        "rotate_array"
+      ],
+      "primary_interfaces": [
+        "quantity-representation"
+      ],
+      "evidence_targets": [
+        "B3.ET3",
+        "B3.ET4"
+      ],
+      "content_principles": [
+        "Gebruik rijen en kolommen als twee factoren.",
+        "Varieer de oriëntatie van een array zonder het product te veranderen.",
+        "Verbind het rechthoekmodel met factoren en totaal."
+      ]
+    },
+    {
+      "id": "B3.D3",
+      "focus": "Herhaald optellen verbinden met vermenigvuldigen",
+      "candidate_order": 3,
+      "interaction_forms": [
+        "translate_repeated_addition",
+        "identify_factors",
+        "interpret_product"
+      ],
+      "primary_interfaces": [
+        "quantity-representation"
+      ],
+      "evidence_targets": [
+        "B3.ET5",
+        "B3.ET6"
+      ],
+      "content_principles": [
+        "Herhaald optellen is een vroege representatie van gelijke groepen, niet de volledige skill.",
+        "Verbind herhaalde hoeveelheden met factoren en product.",
+        "Maak duidelijk welke factor het aantal groepen en welke de groepsgrootte beschrijft."
+      ]
+    },
+    {
+      "id": "B3.D4",
+      "focus": "Multiplicatieve relaties structureren",
+      "candidate_order": 4,
+      "interaction_forms": [
+        "decompose_factor",
+        "distribute",
+        "transform_product"
+      ],
+      "primary_interfaces": [
+        "quantity-representation"
+      ],
+      "evidence_targets": [
+        "B3.ET7",
+        "B3.ET8"
+      ],
+      "content_principles": [
+        "Gebruik factorontleding en distributiviteit om producten te structureren.",
+        "Behoud de productwaarde bij transformaties.",
+        "Strategieën zijn aanpakken binnen B3, geen afzonderlijke skills."
+      ]
+    },
+    {
+      "id": "B3.D5",
+      "focus": "Vermenigvuldigen met grotere getallen",
+      "candidate_order": 5,
+      "interaction_forms": [
+        "calculate_large_product",
+        "align_place_value",
+        "decompose_numbers"
+      ],
+      "primary_interfaces": [
+        "quantity-representation"
+      ],
+      "evidence_targets": [
+        "B3.ET9",
+        "B3.ET10"
+      ],
+      "content_principles": [
+        "Grotere getallen verhogen niet automatisch de conceptuele complexiteit.",
+        "Behoud plaatswaarde en multiplicatieve structuur.",
+        "Gebruik zowel hoofdrekenrelaties als formele representaties waar passend."
+      ]
+    },
+    {
+      "id": "B3.D6",
+      "focus": "Verschillende getaltypen en representaties",
+      "candidate_order": 6,
+      "interaction_forms": [
+        "multiply_decimals",
+        "interpret_scale",
+        "translate_representations"
+      ],
+      "primary_interfaces": [
+        "quantity-representation"
+      ],
+      "evidence_targets": [
+        "B3.ET11",
+        "B3.ET12"
+      ],
+      "content_principles": [
+        "Maak de schaal en waarde van decimale producten betekenisvol.",
+        "Varieer tussen model, context en symbolische notatie.",
+        "Breukbewerkingen vallen buiten deze B3-scope."
+      ]
+    },
+    {
+      "id": "B3.D7",
+      "focus": "Flexibel en gecontroleerd vermenigvuldigen",
+      "candidate_order": 7,
+      "interaction_forms": [
+        "choose_strategy",
+        "calculate",
+        "check",
+        "transfer"
+      ],
+      "primary_interfaces": [
+        "quantity-representation"
+      ],
+      "evidence_targets": [
+        "B3.ET13",
+        "B3.ET14"
+      ],
+      "content_principles": [
+        "Kies een passende aanpak op basis van factoren en getalstructuur.",
+        "Controleer bijvoorbeeld met delen, bekende producten of schatten.",
+        "Transfer vereist variatie in representatie of context."
+      ]
+    }
+  ],
+  "reference_task_sequence": [
+    {
+      "task_id": "B3-L01",
+      "development_id": "B3.D1",
+      "task_model_id": "B3.TM1",
+      "interface": "quantity-representation",
+      "interaction": "equal-groups"
+    },
+    {
+      "task_id": "B3-L03",
+      "development_id": "B3.D2",
+      "task_model_id": "B3.TM2",
+      "interface": "quantity-representation",
+      "interaction": "array"
+    },
+    {
+      "task_id": "B3-L05",
+      "development_id": "B3.D3",
+      "task_model_id": "B3.TM3",
+      "interface": "quantity-representation",
+      "interaction": "repeated-addition-to-product"
+    },
+    {
+      "task_id": "B3-L07",
+      "development_id": "B3.D4",
+      "task_model_id": "B3.TM4",
+      "interface": "symbolic-multiplication",
+      "interaction": "structure-and-select"
+    },
+    {
+      "task_id": "B3-L09",
+      "development_id": "B3.D5",
+      "task_model_id": "B3.TM5",
+      "interface": "symbolic-multiplication",
+      "interaction": "larger-whole-numbers"
+    },
+    {
+      "task_id": "B3-L11",
+      "development_id": "B3.D6",
+      "task_model_id": "B3.TM6",
+      "interface": "symbolic-multiplication",
+      "interaction": "decimal-products"
+    },
+    {
+      "task_id": "B3-L13",
+      "development_id": "B3.D7",
+      "task_model_id": "B3.TM7",
+      "interface": "symbolic-multiplication",
+      "interaction": "choose-and-check"
+    }
+  ],
+  "complexity_model": {
+    "core_rule": "Een taak wordt complexer wanneer de multiplicatieve structuur minder direct zichtbaar is en de leerling meer afhankelijkheden tussen groepen, factoren, totaal en context moet coördineren.",
+    "dimensions": [
+      "dependencies_between_groups_factors_and_total",
+      "distance_given_to_asked",
+      "representation_variation",
+      "strategy_choice",
+      "approach_variation",
+      "number_of_elements",
+      "abstraction",
+      "missing_information",
+      "contextual_load",
+      "number_range_and_type",
+      "simultaneous_skill_demands"
+    ],
+    "boundary": "Getalgrootte alleen bepaalt niet de complexiteit. Tafels, verdubbelen, halveren, splitsen, compenseren en standaardprocedures zijn kennis of aanpakken binnen B3, geen afzonderlijke skills."
+  },
+  "developmental_order_status": "candidate_hypothesis_not_proven_linear",
+  "cross_skill_boundary": {
+    "B1": "Ondersteunt de overgang van additieve naar multiplicatieve structuur; 4+4+4+4 is niet automatisch conceptueel gelijk aan 4×4.",
+    "B4": "Sterke inverse relatie met delen; B3 en B4 zijn onderscheiden skills en kunnen relationeel samen worden ontwikkeld.",
+    "B5": "B5 is een afzonderlijke integratieve skill voor combineren en structureren van bewerkingen; geen eindniveau van B3.",
+    "tables": "Tafels en productfluency zijn kennis/fluency binnen B3 en B4, geen aparte skill.",
+    "strategies": "Verdubbelen, halveren, ontleden, compenseren en bekende producten zijn strategieën, geen aparte skills."
+  },
+  "mastery_boundary": "De mastery-parameters in de registry zijn prototype-only kandidaatparameters en geen gevalideerde beslisgrenzen."
+}

@@ -1,0 +1,16 @@
+import assert from "node:assert/strict";
+import {FRACTION_ADDITION_LEVEL_3_TASKS} from "./fraction-addition-level-3-task-bank.js";
+import {FRACTION_ADDITION_LEVEL_3B_TASKS} from "./fraction-addition-level-3b-task-bank.js";
+import {FRACTION_ADDITION_LEVEL_4_TASKS} from "./fraction-addition-level-4-task-bank.js";
+assert.equal(FRACTION_ADDITION_LEVEL_4_TASKS.length,15);
+assert.equal(new Set(FRACTION_ADDITION_LEVEL_4_TASKS.map(t=>t.id)).size,15);
+assert.ok(FRACTION_ADDITION_LEVEL_4_TASKS.every(t=>t.source==="pacogo-original-variation"));
+const key=t=>[t.leftFraction.numerator,t.leftFraction.denominator,t.rightFraction.numerator,t.rightFraction.denominator].join("/");
+const prior=[...FRACTION_ADDITION_LEVEL_3_TASKS,...FRACTION_ADDITION_LEVEL_3B_TASKS].map(key);
+assert.ok(FRACTION_ADDITION_LEVEL_4_TASKS.every(t=>!prior.includes(key(t))));
+assert.ok(FRACTION_ADDITION_LEVEL_4_TASKS.every(t=>t.leftFraction.denominator!==t.rightFraction.denominator));
+assert.ok(FRACTION_ADDITION_LEVEL_4_TASKS.every(t=>t.leftFraction.numerator<t.leftFraction.denominator&&t.rightFraction.numerator<t.rightFraction.denominator));
+assert.ok(FRACTION_ADDITION_LEVEL_4_TASKS.some(t=>t.leftFraction.numerator/t.leftFraction.denominator+t.rightFraction.numerator/t.rightFraction.denominator<1));
+assert.ok(FRACTION_ADDITION_LEVEL_4_TASKS.some(t=>t.leftFraction.numerator/t.leftFraction.denominator+t.rightFraction.numerator/t.rightFraction.denominator>1));
+assert.throws(()=>{FRACTION_ADDITION_LEVEL_4_TASKS[0].leftFraction.numerator=99;},TypeError);
+console.log("PacoGO level 4 task bank tests passed.");

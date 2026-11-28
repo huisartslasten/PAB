@@ -1,26 +1,35 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { getPracticeMode, getPracticeModes, getActivePracticeModes, isPracticeModeActive } from '../src/features/practice/practice-domain.js';
+import { getPracticeModesForLesson, getPracticeSelectionCopy } from '../src/features/lessons/learning-experience-registry.js';
 import { createFlashcardSession, getCurrentFlashcard, nextFlashcard, revealFlashcard } from '../src/features/practice/flashcards/flashcard-domain.js';
 
 test('practice structure exposes the canonical active practice modes', () => {
-  assert.deepEqual(getPracticeModes(), [
-    { id: 'flashcards', label: 'Flashcards', status: 'active' },
-    { id: 'practice-test', label: 'Oefentoets', status: 'active' },
-    { id: 'games', label: 'Spelletjes', status: 'active' }
+  assert.deepEqual(getPracticeModesForLesson({ lessonType: 'dictation', contentKind: 'words' }), [
+    { id: 'dictation', label: 'Dictee', description: 'Luister en schrijf wat je hoort.' },
+    { id: 'flashcards', label: 'Flashcards', description: 'Oefen vraag en antwoord met kaarten.' },
+    { id: 'memory', label: 'Memory', description: 'Koppel de juiste vraag aan het antwoord.' },
+    { id: 'practice-test', label: 'Oefentoets', description: 'Maak een oefentoets met deze lesstof.' },
+    { id: 'games', label: 'Spelletjes', description: 'Oefen de les spelenderwijs.' }
   ]);
-  assert.deepEqual(getActivePracticeModes(), [
-    { id: 'flashcards', label: 'Flashcards', status: 'active' },
-    { id: 'practice-test', label: 'Oefentoets', status: 'active' },
-    { id: 'games', label: 'Spelletjes', status: 'active' }
+
+  assert.deepEqual(getPracticeModesForLesson({ lessonType: 'words', contentKind: 'words' }), [
+    { id: 'flashcards', label: 'Flashcards', description: 'Oefen vraag en antwoord met kaarten.' },
+    { id: 'practice-test', label: 'Oefentoets', description: 'Maak een oefentoets met deze lesstof.' },
+    { id: 'games', label: 'Spelletjes', description: 'Oefen de les spelenderwijs.' }
   ]);
-  assert.equal(isPracticeModeActive('flashcards'), true);
-  assert.equal(isPracticeModeActive('practice-test'), true);
-  assert.equal(isPracticeModeActive('games'), true);
-  assert.deepEqual(getPracticeMode('games'), {
-    id: 'games',
-    label: 'Spelletjes',
-    status: 'active'
+});
+
+test('practice selection copy is owned by the experience registry', () => {
+  assert.deepEqual(getPracticeSelectionCopy({ contentKind: 'words', hasMultipleContentKinds: false }), {
+    subtitle: 'Kies de oefenvorm.',
+    heading: 'HOE wil je woorden oefenen?',
+    description: 'Kies de oefenvorm.'
+  });
+
+  assert.deepEqual(getPracticeSelectionCopy({ hasMultipleContentKinds: true }), {
+    subtitle: 'Kies eerst WAT je wilt oefenen en daarna HOE.',
+    heading: 'WAT wil je oefenen?',
+    description: 'Kies eerst welk onderdeel van deze les je wilt oefenen.'
   });
 });
 

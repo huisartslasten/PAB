@@ -11,7 +11,8 @@ export const PACOGO_GAMES = Object.freeze([
   Object.freeze({ id: 'connect-the-dots', label: 'Connect the Dots', path: 'connect-the-dots.html', icon: '🔵', description: 'Zet lijnen tussen stippen, sluit vakjes en pak de meeste vakjes.', status: 'active', scoreDirection: 'high' }),
   Object.freeze({ id: 'word-reveal', label: 'Letter Hunt', path: 'word-reveal.html', icon: '🐶', description: 'Beantwoord de lesvragen, kies zelf letters en onthul het geheime doel.', status: 'active', scoreDirection: 'low' }),
   Object.freeze({ id: 'word-chase', label: 'Word Chase', path: 'word-chase.html', icon: '🏃', description: 'Beantwoord de lesvragen en jaag op een geheim woord van vijf letters.', status: 'active', scoreDirection: 'low' }),
-  Object.freeze({ id: 'lexo', label: 'LEXO', path: 'lexo.html', icon: '🔤', description: 'Beantwoord de lesvragen en maak zoveel mogelijk woorden met zestien letters.', status: 'active', scoreDirection: 'high' })
+  Object.freeze({ id: 'lexo', label: 'LEXO', path: 'lexo.html', icon: '🔤', description: 'Beantwoord de lesvragen en maak zoveel mogelijk woorden met zestien letters.', status: 'active', scoreDirection: 'high' }),
+  Object.freeze({ id: 'rock-paper-scissors', label: 'Rock Paper Scissors', path: 'rock-paper-scissors.html', icon: '🪨', description: 'Beantwoord de lesvragen, kies een kaart en ontdek Paco’s keuze.', status: 'active', scoreDirection: 'high' })
 ]);
 
 export function getPacoGames() { return PACOGO_GAMES.map(game => ({ ...game })); }

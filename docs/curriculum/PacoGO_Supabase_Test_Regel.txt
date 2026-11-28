@@ -1,0 +1,37 @@
+PACOGO — SUPABASE TESTREGEL VOOR ELKE VOLGENDE CHAT
+
+Deze regel is verplicht onderdeel van de technische workflow.
+
+Wanneer je in PacoGO iets bouwt, wijzigt of uitbreidt dat de dataflow, curriculum-engine, evidence, observations, longitudinal state, decision trace, curriculum registry of persistent learner data kan raken, moet je niet alleen unit-/integratietests en CI uitvoeren, maar ook beoordelen of een Supabase-test nodig is.
+
+VASTE VOLGORDE:
+1. bepaal of de wijziging alleen lokale/pure logica betreft of ook de persistence/dataflow raakt;
+2. als Supabase relevant is: controleer de bestaande schema/migrations en exacte registry version;
+3. voer een gerichte Supabase smoke/integration test uit met synthetic/pseudonymous testdata;
+4. controleer de volledige persistence-keten waar relevant:
+   Registry → exact version → observation/evidence → longitudinal state → decision trace;
+5. controleer IDs, provenance, curriculum version, uncertainty/alternatives en validation hooks indien van toepassing;
+6. gebruik GEEN echte learner data voor tests;
+7. ruim synthetic testrecords na afloop volledig op / rollback;
+8. controleer dat de database na de test geen testdata heeft achtergelaten;
+9. rapporteer expliciet of Supabase is getest, niet nodig was, of nog openstaat.
+
+BELANGRIJK:
+- Een groene lokale test is niet automatisch bewijs dat de Supabase-persistence werkt.
+- Een groene Supabase smoke test is technische validatie van de keten, GEEN empirische validatie van curriculumclaims.
+- Wijzigingen aan migrations/schema vereisen extra aandacht en moeten via de bestaande migratiestructuur lopen.
+- MAIN/LIVE mag niet worden aangepast.
+- Bestaande Supabase security warnings die bewust buiten scope zijn, niet eigenhandig wijzigen.
+
+Bekende relevante tabellen:
+- public.curriculum_registry_versions
+- public.student_evidence
+- public.student_longitudinal_state
+- public.curriculum_decision_trace
+
+Bekende migrations:
+- 20261101230000_create_curriculum_registry_and_student_evidence.sql
+- 20261102040237_create_curriculum_decision_trace_and_longitudinal_state.sql
+- 20261102043000_add_uncertainty_and_validation_hooks.sql
+
+De volgende ChatGPT-sessie moet deze regel meenemen voordat een technische wijziging als afgerond wordt beschouwd.

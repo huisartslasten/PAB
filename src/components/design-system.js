@@ -107,3 +107,36 @@ export function createPacoDropdown({
     close
   };
 }
+
+
+const PACO_BONE_SILHOUETTE = "M11 5.5C8.2 2.2 3.5 2.7 2.1 6.2c-1.3 3.1.4 6.1 4.2 7.8-3.8 1.7-5.5 4.7-4.2 7.8 1.4 3.5 6.1 4 8.9.7l3.5-4h19l3.5 4c2.8 3.3 7.5 2.8 8.9-.7 1.3-3.1-.4-6.1-4.2-7.8 3.8-1.7 5.5-4.7 4.2-7.8-1.4-3.5-6.1-4-8.9-.7l-3.5 4H14.5z";
+
+function createPacoBoneDifficulty({ level, maxLevel = 5, label = "Moeilijkheidsgraad", documentRef = document } = {}) {
+  const maximum = Number(maxLevel);
+  const current = Number(level);
+  if (!Number.isInteger(maximum) || maximum < 1 || maximum > 10) throw new RangeError("maxLevel must be an integer between 1 and 10.");
+  if (!Number.isInteger(current) || current < 1 || current > maximum) throw new RangeError("level must be an integer between 1 and maxLevel.");
+
+  const root = documentRef.createElement("div");
+  root.className = "paco-bone-difficulty";
+  root.dataset.level = String(current);
+  root.dataset.maxLevel = String(maximum);
+  root.setAttribute("role", "img");
+  root.setAttribute("aria-label", label + ": " + current + " van " + maximum);
+
+  for (let index = 1; index <= maximum; index += 1) {
+    const svg = documentRef.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 48 28");
+    svg.setAttribute("aria-hidden", "true");
+    svg.classList.add("paco-bone-difficulty__bone");
+    if (index <= current) svg.classList.add("is-filled");
+    const path = documentRef.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", PACO_BONE_SILHOUETTE);
+    path.setAttribute("class", "paco-bone-difficulty__shape");
+    svg.appendChild(path);
+    root.appendChild(svg);
+  }
+  return root;
+}
+
+export { createPacoBoneDifficulty };

@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { FRACTION_ADDITION_PRACTICE_TASKS } from "./fraction-addition-practice-task-bank.js";
+import { FRACTION_ADDITION_LEVEL_3_TASKS } from "./fraction-addition-level-3-task-bank.js";
+assert.equal(FRACTION_ADDITION_PRACTICE_TASKS.length,6);
+assert.equal(FRACTION_ADDITION_LEVEL_3_TASKS.length,10);
+assert.deepEqual(FRACTION_ADDITION_LEVEL_3_TASKS.slice(0,6),FRACTION_ADDITION_PRACTICE_TASKS);
+assert.deepEqual(FRACTION_ADDITION_LEVEL_3_TASKS.slice(6).map(task=>task.id),["fraction-addition-original-07","fraction-addition-original-08","fraction-addition-original-09","fraction-addition-original-10"]);
+assert.equal(FRACTION_ADDITION_LEVEL_3_TASKS.every(task=>task.source),true);
+assert.equal(new Set(FRACTION_ADDITION_LEVEL_3_TASKS.map(task=>task.id)).size,10);
+assert.throws(()=>{FRACTION_ADDITION_LEVEL_3_TASKS[6].leftFraction.numerator=99;},TypeError);
+console.log("PacoGO fraction addition level 3 task bank tests passed.");

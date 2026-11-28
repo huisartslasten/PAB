@@ -76,3 +76,100 @@
 @media(max-width:800px){.management-recovery-grid{grid-template-columns:1fr}}
 @media(max-width:700px){.management-actions{grid-template-columns:1fr}}
 @media(max-width:620px){.skill-editor-range-grid,.skill-config-choices{grid-template-columns:1fr}.skill-management-card{grid-template-columns:1fr}.skill-management-actions{justify-content:flex-start}}
+
+/* New central management dashboard UI. */
+.management-dashboard{display:grid;gap:24px}
+.management-dashboard-notice{padding:16px 18px;border:1px solid var(--paco-border);border-radius:16px;background:#fff8e8;color:#765a19;font-weight:800}
+.management-dashboard-section{display:grid;gap:13px}
+.management-dashboard-section>h2{margin:0;color:var(--paco-text);font-size:25px;line-height:1.1;font-weight:900}
+.management-dashboard-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.management-dashboard-card{display:grid;gap:10px;min-height:170px;padding:20px;border:1px solid var(--paco-border);border-radius:20px;background:#fff;box-shadow:var(--paco-shadow)}
+.management-dashboard-card h3{margin:0;color:var(--paco-text);font-size:22px;line-height:1.1;font-weight:900}
+.management-dashboard-card p{margin:0;color:var(--paco-muted);line-height:1.4}
+.management-dashboard-card-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:auto}
+.management-dashboard-card-primary,.management-dashboard-card-secondary{min-height:40px;border-radius:11px;padding:8px 12px;font:800 14px/1.1 "Baloo 2",Nunito,sans-serif;cursor:pointer}
+.management-dashboard-card-primary{border:0;background:var(--paco-blue);color:#fff}
+.management-dashboard-card-secondary{border:1px solid var(--paco-border);background:#fff;color:var(--paco-text)}
+.management-dashboard-card-primary:hover:not([disabled]),.management-dashboard-card-secondary:hover:not([disabled]){filter:brightness(.97)}
+.management-dashboard-card-primary[disabled],.management-dashboard-card-secondary[disabled]{opacity:.5;cursor:not-allowed}
+@media(max-width:1050px){.management-dashboard-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.management-dashboard-grid{grid-template-columns:1fr}}
+
+.management-learner-link-card{min-height:0}
+.management-learner-link-status{font-weight:800}
+.management-learner-link-status.is-error{color:#b42318}
+.management-learner-link-select{min-height:40px;max-width:100%;border:1px solid var(--paco-border);border-radius:11px;padding:8px 12px;background:#fff;color:var(--paco-text);font:700 14px/1.2 "Baloo 2",Nunito,sans-serif}
+.management-learner-link-card .management-dashboard-card-actions{align-items:center}
+
+/* Central curriculum administration: vertical learning lines. */
+.vertical-learning-lines{min-width:0}
+.vertical-learning-lines>h3{margin:4px 0;color:var(--paco-text);font-size:21px;font-weight:900}
+.vertical-learning-lines-table-wrap{width:100%;overflow-x:auto;border:1px solid var(--paco-border);border-radius:16px;background:#fff}
+.vertical-learning-lines-table{width:100%;min-width:980px;border-collapse:collapse;text-align:left}
+.vertical-learning-lines-table th,.vertical-learning-lines-table td{padding:13px 15px;border-bottom:1px solid var(--paco-border);vertical-align:top;line-height:1.35}
+.vertical-learning-lines-table thead th{background:#f7fbff;color:var(--paco-text);font-size:13px;font-weight:900;white-space:nowrap}
+.vertical-learning-lines-table tbody th{color:var(--paco-blue-dark);font-weight:900;white-space:nowrap}
+.vertical-learning-lines-table tbody tr:last-child th,.vertical-learning-lines-table tbody tr:last-child td{border-bottom:0}
+.vertical-learning-lines-note{margin:0;color:var(--paco-muted);font-size:14px;line-height:1.45}
+
+
+/* SLO core-objective landing layer; reuses the central vertical-learning-lines surface. */
+.vertical-learning-core-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.vertical-learning-core-card{display:grid;align-content:start;gap:10px;min-width:0;padding:18px;border:1px solid #dce7f3;border-radius:17px;background:#fff;box-shadow:0 4px 12px rgba(16,55,100,.08)}
+.vertical-learning-core-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.vertical-learning-core-card-top strong{color:#159447;font-size:15px;font-weight:950}
+.vertical-learning-core-card-top span{color:#6b7f98;font-size:11px;font-weight:850}
+.vertical-learning-core-card h3{margin:0;color:#173f72;font-size:18px;line-height:1.2;font-weight:900}
+.vertical-learning-core-card p{margin:0;color:#526985;font-size:13px;line-height:1.45}
+.vertical-learning-core-card .management-dashboard-card-primary{justify-self:start;margin-top:4px}
+.vertical-learning-core-status{color:#78889b;font-size:12px;font-weight:800}
+.vertical-learning-core-section-title{margin:7px 0 0;color:#14365f;font-size:20px;font-weight:900}
+.vertical-learning-core-note{margin:0;color:#526985;font-size:13px;line-height:1.45}
+.vertical-learning-back{justify-self:start;min-height:38px;padding:7px 11px;border:1px solid #cfe0f4;border-radius:10px;background:#fff;color:#1269bc;font:800 13px/1.1 "Baloo 2",Nunito,sans-serif;cursor:pointer}
+.vertical-learning-back:hover{background:#e5f1ff;border-color:#8db9e8}
+@media(max-width:1000px){.vertical-learning-core-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.vertical-learning-core-grid{grid-template-columns:1fr}}
+
+/* Vertical learning lines: objective cards on the PacoGO blue management canvas. */
+.vertical-learning-lines{display:grid;gap:18px;min-width:0}
+.vertical-learning-lines-intro,.vertical-learning-lines-source{margin:0;color:#17365f;line-height:1.5}
+.vertical-learning-lines-source{font-size:13px;font-weight:800;opacity:.82}
+.vertical-learning-lines-summary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.vertical-learning-lines-metric{display:grid;gap:4px;padding:15px 17px;border:1px solid #dce7f3;border-radius:16px;background:#fff;box-shadow:0 4px 12px rgba(16,55,100,.08)}
+.vertical-learning-lines-metric strong{color:#173f72;font-size:27px;line-height:1.1}
+.vertical-learning-lines-metric span{color:#526985;font-size:13px;font-weight:750}
+.vertical-learning-lines-legend{padding:12px 15px;border:1px solid rgba(255,255,255,.75);border-radius:12px;background:rgba(255,255,255,.86);color:#34516f;font-size:13px;line-height:1.45}
+.vertical-learning-lines>h3{margin:5px 0 0;color:#14365f;font-size:20px;font-weight:900}
+.vertical-learning-lines-skill-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.vertical-learning-skill-card{display:grid;gap:7px;padding:16px;border:1px solid #dce7f3;border-radius:15px;background:#fff;box-shadow:0 4px 12px rgba(16,55,100,.07)}
+.vertical-learning-skill-card strong{color:#173f72;font-size:15px}
+.vertical-learning-skill-status{color:#6b7f98;font-size:12px;font-weight:800}
+.vertical-learning-skill-card p{margin:0;color:#526985;font-size:12px;line-height:1.5}
+.vertical-learning-lines-groups{display:grid;gap:20px}
+.vertical-learning-group{display:grid;gap:12px;padding:17px;border:1px solid #d9e6f4;border-radius:19px;background:#f8fbff;box-shadow:0 5px 16px rgba(16,55,100,.08)}
+.vertical-learning-group-header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.vertical-learning-group-header h3{margin:0;color:#173f72;font-size:21px;font-weight:900}
+.vertical-learning-group-header span{padding:5px 10px;border-radius:999px;background:#e6f0fc;color:#496789;font-size:12px;font-weight:800}
+.vertical-learning-objective-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.vertical-learning-objective-card{display:flex;flex-direction:column;gap:10px;min-width:0;padding:17px;border:1px solid #dce5ef;border-radius:16px;background:#fff;box-shadow:0 3px 11px rgba(16,55,100,.06)}
+.vertical-learning-objective-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.vertical-learning-objective-id{color:#159447;font-size:17px;font-weight:950;letter-spacing:.02em}
+.vertical-learning-coverage{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:900;white-space:nowrap}
+.vertical-learning-coverage--partial{background:#fff2d8;color:#8a5b0a}
+.vertical-learning-coverage--not_demonstrated{background:#fee8e7;color:#a3342d}
+.vertical-learning-coverage--full{background:#e2f5e8;color:#19723b}
+.vertical-learning-coverage--unassessed{background:#edf1f5;color:#526274}
+.vertical-learning-objective-card h4{margin:0;color:#193d69;font-size:16px;line-height:1.35;font-weight:900}
+.vertical-learning-objective-meta{margin:0;color:#71839a;font-size:11px;font-weight:750}
+.vertical-learning-skill-tags{display:flex;gap:6px;flex-wrap:wrap}
+.vertical-learning-skill-tags span{padding:4px 8px;border-radius:7px;background:#e9f2fc;color:#285786;font-size:11px;font-weight:900}
+.vertical-learning-exercise-heading{margin:2px 0 0;color:#304d6c;font-size:12px;font-weight:900}
+.vertical-learning-exercise-list{display:flex;gap:7px;flex-wrap:wrap}
+.vertical-learning-exercise-link{padding:7px 10px;border:1px solid #cfe0f4;border-radius:9px;background:#f2f7fd;color:#1269bc;font:inherit;font-size:12px;font-weight:800;text-align:left;cursor:pointer}
+.vertical-learning-exercise-link:hover{background:#e5f1ff;border-color:#8db9e8}
+.vertical-learning-exercise-caution,.vertical-learning-no-exercises{margin:0;color:#78889b;font-size:11px;line-height:1.4}
+.vertical-learning-objective-rationale{margin-top:auto;padding-top:8px;border-top:1px solid #edf1f5;color:#526985;font-size:12px}
+.vertical-learning-objective-rationale summary{color:#456384;font-weight:850;cursor:pointer}
+.vertical-learning-objective-rationale p{margin:8px 0 0;line-height:1.45}
+@media(max-width:900px){.vertical-learning-objective-grid{grid-template-columns:1fr}.vertical-learning-lines-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.vertical-learning-lines-skill-grid{grid-template-columns:1fr}.vertical-learning-group{padding:12px}.vertical-learning-objective-card{padding:14px}}

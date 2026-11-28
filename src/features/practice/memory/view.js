@@ -11,6 +11,7 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
     onTimingModeChange,
     onResolveTurn,
     onCardSelect,
+    onPlayAudio,
     onFinished,
     onNextRound
   }) {
@@ -26,8 +27,38 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
         button.disabled = state.phase !== 'playing' || state.matchedCardIds.has(card.id);
         if (state.matchedCardIds.has(card.id)) button.classList.add('matched');
         if (visible) button.classList.add('revealed');
+
         if (visible) {
-          button.innerHTML = `<span class="memory-card-type">${card.type === 'question' ? 'Vraag' : 'Antwoord'}</span><span>${escapeHtml(card.value ?? '')}</span>`;
+          const type = documentRef.createElement('span');
+          type.className = 'memory-card-type';
+          type.textContent = card.type === 'audio' ? 'Luisteren' : card.type === 'text' ? 'Geschreven' : (card.type === 'question' ? 'Vraag' : 'Antwoord');
+          button.appendChild(type);
+
+          if (card.audioText) {
+            const audioAction = documentRef.createElement('span');
+            audioAction.className = 'memory-card-audio-button';
+            audioAction.textContent = '🔊';
+            audioAction.title = 'Laat de kaart opnieuw horen';
+            audioAction.setAttribute('aria-label', 'Laat de kaart opnieuw horen');
+            audioAction.setAttribute('role', 'button');
+            audioAction.tabIndex = 0;
+            const playAudio = event => {
+              event.stopPropagation();
+              onPlayAudio(card.audioText);
+            };
+            audioAction.addEventListener('click', playAudio);
+            audioAction.addEventListener('keydown', event => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                playAudio(event);
+              }
+            });
+            button.appendChild(audioAction);
+          } else {
+            const value = documentRef.createElement('span');
+            value.textContent = card.value;
+            button.appendChild(value);
+          }
         } else {
           const image = documentRef.createElement('img');
           image.className = 'memory-card-back-image';
@@ -35,7 +66,10 @@ export function createMemoryView({ documentRef = document, escapeHtml = value =>
           image.alt = 'Paco';
           button.appendChild(image);
         }
-        if (state.phase === 'playing' && !state.matchedCardIds.has(card.id)) button.addEventListener('click', () => onCardSelect(card.id));
+
+        if (state.phase === 'playing' && !state.matchedCardIds.has(card.id)) {
+          button.addEventListener('click', () => onCardSelect(card.id));
+        }
         grid.appendChild(button);
       });
     }

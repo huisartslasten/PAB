@@ -9,12 +9,32 @@ on:
 jobs:
   agenda-cutover-and-regression:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: pacogo_migration_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d pacogo_migration_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
     steps:
-      - name: Checkout refactor branch
+      - name: Checkout triggering commit
         uses: actions/checkout@v4
         with:
-          ref: refactor/professional-v1
+          ref: ${{ github.sha }}
           fetch-depth: 0
+      - name: Verify exact refactor branch and triggering commit
+        run: |
+          test "$GITHUB_REF" = "refs/heads/refactor/professional-v1"
+          actual=$(git rev-parse HEAD)
+          printf 'Workflow trigger SHA: %s\\nChecked out SHA: %s\\n' "$GITHUB_SHA" "$actual"
+          test "$actual" = "$GITHUB_SHA"
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -22,6 +42,8 @@ jobs:
           cache: npm
       - name: Install dependencies from committed lockfile
         run: npm ci --ignore-scripts
+      - name: Validate LIVE migrations against disposable PostgreSQL 17
+        run: bash test/run-live-migration-postgres-regression.sh
       - name: Verify zero known dependency vulnerabilities
         run: npm audit --audit-level=low
       - name: Verify canonical Agenda ownership boundary
@@ -54,8 +76,12 @@ jobs:
           ! grep -q 'professionalPlayerHost' index.html
           ! grep -q 'player-runtime-bootstrap.js' index.html
           ! grep -q 'window.pacoGOProfessionalPlayerReady' index.html
+      - name: Run curriculum engine regression
+        run: node --test pacogo-engine/*.test.js
       - name: Run architecture boundary tests
         run: node --test test/architecture-boundaries.test.js
+      - name: Run Double or Nothing runtime regression
+        run: node --test src/features/practice/double-or-nothing/runtime.test.js
       - name: Run maintained Node regression
         run: |
           files=$(find test -maxdepth 1 -type f -name '*.test.js' \
@@ -63,14 +89,14 @@ jobs:
             ! -name 'lesson-edit-model.test.js' ! -name 'lesson-editor-model.test.js' \
             ! -name 'lesson-editor.test.js' ! -name 'lesson-item-collector-types.test.js' \
             ! -name 'lesson-part-model.test.js' ! -name 'lesson-save-controller.test.js' \
-            ! -name 'lesson-save-flow.test.js' ! -name 'lesson-save-persistence.test.js' \
+            ! -name 'lesson-save-flow.test.js' \
             ! -name 'lesson-test-date-model.test.js' ! -name 'parity-contracts.test.js' \
             ! -name 'practice-evaluation-runtime-source-contract.test.js' \
             ! -name 'refactor-pure-modules.test.js' ! -name 'word-row-model.test.js' \
             ! -name 'skill-definition-service.test.js' ! -name 'skill-configuration-service.test.js' | sort)
           node --test $files
-      - name: Run maintained Vitest regression
-        run: npx vitest run test/lesson-item-collector-types.test.js test/lesson-part-model.test.js test/lesson-save-flow.test.js test/lesson-save-persistence.test.js src/services/learning-content-service.test.js test/skill-definition-service.test.js test/skill-configuration-service.test.js
+      - name: Run migrated native Node regression
+        run: node --test test/lesson-item-collector-types.test.js test/lesson-part-model.test.js test/lesson-save-flow.test.js src/services/learning-content-service.test.js test/skill-definition-service.test.js test/skill-configuration-service.test.js
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Start local fixture server
@@ -81,5 +107,5 @@ jobs:
         run: |
           rm -rf test-results playwright-report node_modules
           status=$(git status --porcelain)
-          printf '%s\n' "$status"
+          printf '%s\\n' "$status"
           test -z "$status"

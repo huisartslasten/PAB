@@ -1,0 +1,72 @@
+{
+  "schema_version": "0.1",
+  "status": "candidate",
+  "epistemic_status": "[O]",
+  "purpose": "Machine-readable contract for raw pilot observations before C3 coding and C4/C5 inference.",
+  "synthetic_or_empirical": "design_only",
+  "registry_version_source": "PacoGO_Empirical_Pilot_Manifest_v0.1.json",
+  "important_boundary": "Raw observations must not contain inferred mastery, developmental position, prerequisite status, causal claims, or next-action decisions.",
+  "required_fields": {
+    "observation_id": "stable unique observation identifier",
+    "learner_id": "stable pseudonymous learner identifier",
+    "study_id": "pilot study identifier",
+    "session_id": "session identifier",
+    "wave_id": "W0 | W1 | W2_plus",
+    "task_instance_id": "unique administered task instance",
+    "task_id": "pre-specified task from pilot task set",
+    "registry_version": "exact curriculum registry version used",
+    "skill_id": "skill identifier",
+    "development_id": "development identifier",
+    "claim_id": "focal claim identifier",
+    "evidence_target_ids": "one or more pre-specified evidence targets",
+    "task_model_id": "pre-specified task model",
+    "variation_metadata": "structured description of planned variation actually presented",
+    "interaction_events": "ordered raw interaction events where available",
+    "response": "raw learner response or structured response payload",
+    "performance_status": "correct | incorrect | mixed | not_observed | not_scorable",
+    "process_status": "present | absent | ambiguous | not_collected",
+    "prompt_level": "none | minimal | moderate | substantial | unknown",
+    "instruction_exposure": "structured exposure metadata; never inferred from performance",
+    "language_context": "language/context metadata relevant to interpretation",
+    "technical_quality": "structured technical/data-quality status",
+    "observed_at": "timestamp of observation"
+  },
+  "missingness": {
+    "allowed": true,
+    "rule": "Missingness must be explicit and must never be silently converted to incorrect, mismatch, or negative evidence.",
+    "recommended_codes": ["NOT_MISSING", "NOT_COLLECTED", "NOT_APPLICABLE", "TECHNICAL_FAILURE", "OBSERVER_UNABLE", "LEARNER_DID_NOT_RESPOND"]
+  },
+  "provenance_requirements": [
+    "observation_id",
+    "study_id",
+    "session_id",
+    "task_instance_id",
+    "task_id",
+    "registry_version",
+    "observed_at"
+  ],
+  "immutability": {
+    "raw_observation": true,
+    "correction_rule": "Corrections create a new version or correction record; the original raw observation is retained."
+  },
+  "coding_boundary": {
+    "raw_observation_may_include": ["performance_status", "process_status", "prompt_level", "technical_quality"],
+    "c3_coded_fields_are_separate": true,
+    "coded_fields": [
+      "target_match",
+      "independence_status",
+      "evidence_quality",
+      "contradiction_status",
+      "alternative_explanation_flags"
+    ]
+  },
+  "forbidden_in_raw_observation": [
+    "mastery_status",
+    "developmental_position",
+    "developmental_stage",
+    "prerequisite_status",
+    "causal_inference",
+    "curriculum_promotion",
+    "next_action_decision"
+  ]
+}

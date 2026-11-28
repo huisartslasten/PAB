@@ -1,5 +1,14 @@
-import { describe, expect, it, vi } from 'vitest';
+import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
+import { isDeepStrictEqual } from 'node:util';
 import { createLessonSaveFlow } from '../src/features/lessons/lesson-save-flow.js';
+
+function assertCalledWith(mockFn, expectedArguments) {
+  assert.ok(
+    mockFn.mock.calls.some(call => isDeepStrictEqual(call.arguments, expectedArguments)),
+    'Expected mock to have been called with the supplied arguments'
+  );
+}
 
 describe('createLessonSaveFlow', () => {
   it('keeps the V4.78 completion order after persistence', async () => {
@@ -37,43 +46,46 @@ describe('createLessonSaveFlow', () => {
       testDate: '2026-11-11'
     });
 
-    expect(order.map(value => Array.isArray(value) ? value[0] : value)).toEqual([
+    assert.deepStrictEqual(order.map(value => Array.isArray(value) ? value[0] : value), [
       'persist', 'subject', 'clear-lesson', 'load', 'find', 'upsert-date', 'calendar', 'sidebars', 'message'
     ]);
-    expect(order.find(value => Array.isArray(value) && value[0] === 'find')).toEqual(['find', 42]);
-    expect(result.savedLesson).toBe(savedLesson);
-    expect(order.at(-1)).toEqual(['message', 'Les opgeslagen en toetsdatum toegevoegd.', 'success']);
+    assert.deepStrictEqual(order.find(value => Array.isArray(value) && value[0] === 'find'), ['find', 42]);
+    assert.strictEqual(result.savedLesson, savedLesson);
+    assert.deepStrictEqual(order.at(-1), ['message', 'Les opgeslagen en toetsdatum toegevoegd.', 'success']);
   });
 
-  it('removes the existing test date when no test date is supplied', async () => {
-    const removeTestDate = vi.fn();
-    const upsertTestDate = vi.fn();
+  it('removes the existing test date when no test date is supplied', async t => {
+    const removeTestDate = t.mock.fn();
+    const upsertTestDate = t.mock.fn();
+    const loadLessons = t.mock.fn();
+    const findSavedLesson = t.mock.fn(() => ({ id: 7, student: 'Zyon' }));
+    const save = t.mock.fn(async () => ({ lessonId: 7, items: [] }));
 
     const flow = createLessonSaveFlow({
-      persistence: { save: vi.fn().mockResolvedValue({ lessonId: 7, items: [] }) },
-      loadLessons: vi.fn(),
-      findSavedLesson: vi.fn(() => ({ id: 7, student: 'Zyon' })),
+      persistence: { save },
+      loadLessons,
+      findSavedLesson,
       upsertTestDate,
       removeTestDate
     });
 
     await flow.save({ lessonId: 7, student: 'Zyon', testDate: '' });
 
-    expect(removeTestDate).toHaveBeenCalledWith(7, 'Zyon');
-    expect(upsertTestDate).not.toHaveBeenCalled();
+    assertCalledWith(removeTestDate, [7, 'Zyon']);
+    assert.equal(upsertTestDate.mock.callCount(), 0);
   });
 
-  it('does not reload or touch the calendar when persistence fails', async () => {
-    const loadLessons = vi.fn();
+  it('does not reload or touch the calendar when persistence fails', async t => {
+    const loadLessons = t.mock.fn();
     const flow = createLessonSaveFlow({
-      persistence: { save: vi.fn().mockRejectedValue(new Error('save failed')) },
+      persistence: { save: t.mock.fn(async () => { throw new Error('save failed'); }) },
       loadLessons,
-      findSavedLesson: vi.fn(),
-      renderTestCalendar: vi.fn(),
-      refreshPageSidebars: vi.fn()
+      findSavedLesson: t.mock.fn(),
+      renderTestCalendar: t.mock.fn(),
+      refreshPageSidebars: t.mock.fn()
     });
 
-    await expect(flow.save({ lessonId: 7 })).rejects.toThrow('save failed');
-    expect(loadLessons).not.toHaveBeenCalled();
+    await assert.rejects(flow.save({ lessonId: 7 }), /save failed/);
+    assert.equal(loadLessons.mock.callCount(), 0);
   });
 });

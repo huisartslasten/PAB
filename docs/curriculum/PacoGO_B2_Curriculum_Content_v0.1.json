@@ -1,0 +1,290 @@
+{
+  "schema_version": "0.1",
+  "status": "candidate",
+  "epistemic_status": "[S]/[O]",
+  "skill_id": "B2",
+  "name": "Aftrekken",
+  "definition": "Een verschil of verandering tussen hoeveelheden of waarden bepalen door te begrijpen wat overblijft, wat het verschil is of hoeveel moet worden aangevuld.",
+  "purpose": "Kandidaatmodel voor aftrekken waarin wegnemen, verschil bepalen en aanvullen onderscheiden blijven als betekenissen binnen één skill. Strategie en taakcomplexiteit worden niet als aparte skills gemodelleerd.",
+  "curriculum_scope": "SLO KD10A: gehele en decimale getallen. Breukbewerkingen blijven binnen de FR-skillfamilie.",
+  "concept_links": [
+    {
+      "concept": "Aftrekken",
+      "relation": "primary"
+    },
+    {
+      "concept": "Bewerkingsbegrip",
+      "relation": "shared"
+    },
+    {
+      "concept": "Relaties tussen bewerkingen",
+      "relation": "shared"
+    },
+    {
+      "skill_id": "B1",
+      "relation": "strong_inverse_operation",
+      "status": "candidate"
+    },
+    {
+      "skill_id": "A1",
+      "relation": "supporting_number_representation",
+      "status": "candidate"
+    },
+    {
+      "skill_id": "A2",
+      "relation": "supporting_number_meaning",
+      "status": "candidate"
+    },
+    {
+      "skill_id": "A4",
+      "relation": "supporting_place_value",
+      "status": "candidate"
+    },
+    {
+      "skill_id": "A5",
+      "relation": "supporting_flexible_number_relations",
+      "status": "candidate"
+    }
+  ],
+  "developments": [
+    {
+      "id": "B2.D1",
+      "focus": "Wegnemen en rest bepalen",
+      "candidate_order": 1,
+      "interaction_forms": [
+        "remove",
+        "represent",
+        "identify_remaining"
+      ],
+      "primary_interfaces": [
+        "quantity-representation",
+        "number-line"
+      ],
+      "evidence_targets": [
+        "B2.ET1",
+        "B2.ET2"
+      ],
+      "content_principles": [
+        "Maak beginhoeveelheid, afname en rest zichtbaar.",
+        "Varieer tussen concrete hoeveelheid en getallenlijn.",
+        "Een juist antwoord alleen bewijst niet dat de relatie betekenisvol wordt gerepresenteerd."
+      ]
+    },
+    {
+      "id": "B2.D2",
+      "focus": "Verschil tussen hoeveelheden bepalen",
+      "candidate_order": 2,
+      "interaction_forms": [
+        "compare",
+        "measure_distance",
+        "match"
+      ],
+      "primary_interfaces": [
+        "number-line",
+        "quantity-representation"
+      ],
+      "evidence_targets": [
+        "B2.ET3",
+        "B2.ET4"
+      ],
+      "content_principles": [
+        "Behandel verschil als afstand/relatie tussen twee waarden, niet uitsluitend als wegnemen.",
+        "Varieer welke hoeveelheid eerst wordt genoemd of getoond.",
+        "Maak de afstand tussen waarden zichtbaar."
+      ]
+    },
+    {
+      "id": "B2.D3",
+      "focus": "Aanvullen tot een doelwaarde",
+      "candidate_order": 3,
+      "interaction_forms": [
+        "complete",
+        "bridge",
+        "find_missing_amount"
+      ],
+      "primary_interfaces": [
+        "number-line",
+        "quantity-representation"
+      ],
+      "evidence_targets": [
+        "B2.ET5",
+        "B2.ET6"
+      ],
+      "content_principles": [
+        "Maak startwaarde en doelwaarde zichtbaar en laat de ontbrekende hoeveelheid bepalen.",
+        "Gebruik aanvullen als betekenis van aftrekken, niet als aparte skill.",
+        "Varieer de afstand en de positie van het ontbrekende deel."
+      ]
+    },
+    {
+      "id": "B2.D4",
+      "focus": "Aftrekrelaties representeren",
+      "candidate_order": 4,
+      "interaction_forms": [
+        "place",
+        "model",
+        "translate",
+        "symbolise"
+      ],
+      "primary_interfaces": [
+        "number-line",
+        "quantity-representation"
+      ],
+      "evidence_targets": [
+        "B2.ET7",
+        "B2.ET8"
+      ],
+      "content_principles": [
+        "Verbind situatie, visueel model, getallenlijn en symbolische notatie.",
+        "Behoud de onderliggende aftrekrelatie bij representatiewisseling.",
+        "Een andere representatie is geen bewijs van transfer zonder een passende vergelijking."
+      ]
+    },
+    {
+      "id": "B2.D5",
+      "focus": "Aftrekken structureren",
+      "candidate_order": 5,
+      "interaction_forms": [
+        "decompose",
+        "regroup",
+        "compensate",
+        "transform"
+      ],
+      "primary_interfaces": [
+        "number-line",
+        "quantity-representation"
+      ],
+      "evidence_targets": [
+        "B2.ET9",
+        "B2.ET10"
+      ],
+      "content_principles": [
+        "Laat ontleden, hergroeperen of compenseren de waarde van de aftrekrelatie behouden.",
+        "Strategieën zijn taakaanpakken, geen aparte skills.",
+        "Strategiekeuze kan in specifieke taken worden vastgelegd zonder bij iedere oefening uitleg te eisen."
+      ]
+    },
+    {
+      "id": "B2.D6",
+      "focus": "Aftrekken bij grotere getallen en getaltypen",
+      "candidate_order": 6,
+      "interaction_forms": [
+        "calculate",
+        "align-place-value",
+        "represent-decimals"
+      ],
+      "primary_interfaces": [
+        "quantity-representation",
+        "number-line"
+      ],
+      "evidence_targets": [
+        "B2.ET11",
+        "B2.ET12"
+      ],
+      "content_principles": [
+        "Varieer getalgrootte zonder getalgrootte gelijk te stellen aan ontwikkeling.",
+        "Maak plaatswaarde en decimale waarde zichtbaar waar dat nodig is.",
+        "Gebruik getallen en contexten die de aftrekrelatie centraal houden."
+      ]
+    },
+    {
+      "id": "B2.D7",
+      "focus": "Flexibel en gecontroleerd aftrekken",
+      "candidate_order": 7,
+      "interaction_forms": [
+        "choose",
+        "calculate",
+        "check",
+        "transfer"
+      ],
+      "primary_interfaces": [
+        "number-line",
+        "quantity-representation"
+      ],
+      "evidence_targets": [
+        "B2.ET13",
+        "B2.ET14"
+      ],
+      "content_principles": [
+        "Kies een passende aanpak op basis van de relatie en de context.",
+        "Controleer bijvoorbeeld met de inverse optelrelatie of een schatting.",
+        "Transfer vereist variatie in representatie of context; een correct antwoord alleen is onvoldoende."
+      ]
+    }
+  ],
+  "reference_task_sequence": [
+    {
+      "task_id": "B2-L01",
+      "development_id": "B2.D1",
+      "task_model_id": "B2.TM1",
+      "interface": "number-line",
+      "interaction": "remove-and-place"
+    },
+    {
+      "task_id": "B2-L03",
+      "development_id": "B2.D2",
+      "task_model_id": "B2.TM2",
+      "interface": "number-line",
+      "interaction": "compare-distance"
+    },
+    {
+      "task_id": "B2-L05",
+      "development_id": "B2.D3",
+      "task_model_id": "B2.TM3",
+      "interface": "number-line",
+      "interaction": "complete-to-target"
+    },
+    {
+      "task_id": "B2-L07",
+      "development_id": "B2.D4",
+      "task_model_id": "B2.TM4",
+      "interface": "number-line",
+      "interaction": "represent-relation"
+    },
+    {
+      "task_id": "B2-L09",
+      "development_id": "B2.D5",
+      "task_model_id": "B2.TM5",
+      "interface": "symbolic-subtraction",
+      "interaction": "structure-and-select"
+    },
+    {
+      "task_id": "B2-L11",
+      "development_id": "B2.D6",
+      "task_model_id": "B2.TM6",
+      "interface": "symbolic-subtraction",
+      "interaction": "larger-and-decimal"
+    },
+    {
+      "task_id": "B2-L13",
+      "development_id": "B2.D7",
+      "task_model_id": "B2.TM7",
+      "interface": "symbolic-subtraction",
+      "interaction": "choose-and-check"
+    }
+  ],
+  "complexity_model": {
+    "core_rule": "Een taak wordt complexer wanneer de aftrekrelatie minder direct zichtbaar is en de leerling meer relaties tussen geheel, afname en verschil moet coördineren.",
+    "dimensions": [
+      "meaning_structure",
+      "distance_given_to_asked",
+      "representation_distance",
+      "abstraction",
+      "missing_information",
+      "number_of_elements",
+      "dependencies",
+      "strategy_choice",
+      "contextual_load",
+      "number_range_and_type",
+      "cross_skill_integration"
+    ],
+    "boundary": "Getalgrootte alleen bepaalt niet de complexiteit. Hoofdrekenen, cijferen, splitsen en compenseren zijn aanpakken/taakcondities, geen aparte skills."
+  },
+  "developmental_order_status": "candidate_hypothesis_not_proven_linear",
+  "cross_skill_boundary": {
+    "B1": "Sterke inverse relatie; B1 en B2 kunnen parallel ontwikkelen. B2 vereist geen volledige beheersing van B1 als starre voorwaarde.",
+    "B5": "B5 is de afzonderlijke integratieve skill voor combineren en structureren van bewerkingen; niet het laatste ontwikkelingsniveau van B2.",
+    "strategies": "Strategieën, standaardalgoritmen, bereiken en contexten zijn geen afzonderlijke skills."
+  },
+  "mastery_boundary": "De mastery-parameters in de registry zijn prototype-only kandidaatparameters en geen gevalideerde beslisgrenzen."
+}

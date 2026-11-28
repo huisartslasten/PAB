@@ -132,7 +132,29 @@ export function createDashboardRuntime({ app, templateMount, chooserMount, conte
     if (!subjectGrid.children.length) { const empty = documentRef.createElement('div'); empty.className = 'dashboard-state'; empty.style.marginTop = '15px'; empty.textContent = `Nog geen actieve lessen voor ${selectedStudent}.`; subjectsCard.appendChild(empty); }
     else subjectsCard.appendChild(subjectGrid);
 
+    const curriculumPracticeCard = documentRef.createElement('article');
+    curriculumPracticeCard.className = 'dashboard-card';
+    const curriculumPracticeHeading = documentRef.createElement('h2');
+    curriculumPracticeHeading.textContent = 'Rekenen oefenen';
+    const curriculumPracticeGrid = createPacoTileGrid({ documentRef });
+    curriculumPracticeGrid.style.marginTop = '15px';
+    const fractionPreviewTarget = buildViewUrl('curriculum-fraction-diagnostic-learner.html', {
+      student: selectedStudent,
+      mode: context.mode
+    });
+    curriculumPracticeGrid.appendChild(createPacoTile({
+      documentRef,
+      title: 'Breuken',
+      description: 'Ontdek welke tussenstappen bij breuken al lukken en wat je volgende leerstap is.',
+      icon: '½',
+      meta: 'Formatieve diagnose · geen mastery-beslissing',
+      actionLabel: 'Start diagnose →',
+      onActivate: () => navigate(fractionPreviewTarget)
+    }));
+    curriculumPracticeCard.append(curriculumPracticeHeading, curriculumPracticeGrid);
+
     main.appendChild(renderAgenda(agendaItems));
+    main.appendChild(curriculumPracticeCard);
     main.appendChild(subjectsCard);
     const challenges = renderChallenges(availableChallenges, lessonMap);
     if (challenges) main.appendChild(challenges);

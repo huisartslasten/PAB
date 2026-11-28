@@ -1,0 +1,452 @@
+{
+  "schema_version": "0.1",
+  "status": "operational_candidate",
+  "purpose": "Separate learner-practice catalogue for the complete candidate B3 multiplication developmental line. This is not the C1-C3 pilot measurement task set.",
+  "synthetic_or_empirical": "operational_practice_definition",
+  "skill_id": "B3",
+  "curriculum_registry_version": "0.4.0-candidate",
+  "tasks": [
+    {
+      "task_id": "B3-L01",
+      "title": "Gelijke groepjes",
+      "instruction": "4 gelijke groepjes van 3. Hoeveel zijn het samen?",
+      "skill_id": "B3",
+      "development_id": "B3.D1",
+      "claim_id": "B3.C1",
+      "evidence_target_ids": [
+        "B3.ET1"
+      ],
+      "task_model_id": "B3.TM1",
+      "variation_key": "equal_groups_4x3",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "equal_groups",
+      "response_type": "numeric_multiplication",
+      "operation_type": "equal_groups",
+      "factor_a": 4,
+      "factor_b": 3,
+      "expected_answer": 12,
+      "quantity_model": {
+        "mode": "equal-groups",
+        "groups": 4,
+        "items_per_group": 3
+      },
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "4 groepjes van 3"
+    },
+    {
+      "task_id": "B3-L02",
+      "title": "Zakjes met knikkers",
+      "instruction": "5 zakjes hebben elk 2 knikkers. Hoeveel knikkers zijn er samen?",
+      "skill_id": "B3",
+      "development_id": "B3.D1",
+      "claim_id": "B3.C1",
+      "evidence_target_ids": [
+        "B3.ET2"
+      ],
+      "task_model_id": "B3.TM1",
+      "variation_key": "equal_groups_5x2",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "equal_groups",
+      "response_type": "numeric_multiplication",
+      "operation_type": "equal_groups",
+      "factor_a": 5,
+      "factor_b": 2,
+      "expected_answer": 10,
+      "quantity_model": {
+        "mode": "equal-groups",
+        "groups": 5,
+        "items_per_group": 2
+      },
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "5 groepjes van 2"
+    },
+    {
+      "task_id": "B3-L03",
+      "title": "Array met rijen en kolommen",
+      "instruction": "De rechthoek heeft 3 rijen en 4 kolommen. Hoeveel vakjes zijn er?",
+      "skill_id": "B3",
+      "development_id": "B3.D2",
+      "claim_id": "B3.C2",
+      "evidence_target_ids": [
+        "B3.ET3"
+      ],
+      "task_model_id": "B3.TM2",
+      "variation_key": "array_3x4",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "array",
+      "response_type": "numeric_multiplication",
+      "operation_type": "array",
+      "factor_a": 3,
+      "factor_b": 4,
+      "expected_answer": 12,
+      "quantity_model": {
+        "mode": "array",
+        "rows": 3,
+        "columns": 4
+      },
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "3 rijen × 4 kolommen"
+    },
+    {
+      "task_id": "B3-L04",
+      "title": "Array draaien",
+      "instruction": "Een array heeft 4 rijen en 6 kolommen. Hoeveel vakjes zijn er?",
+      "skill_id": "B3",
+      "development_id": "B3.D2",
+      "claim_id": "B3.C2",
+      "evidence_target_ids": [
+        "B3.ET4"
+      ],
+      "task_model_id": "B3.TM2",
+      "variation_key": "array_4x6",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "array",
+      "response_type": "numeric_multiplication",
+      "operation_type": "array",
+      "factor_a": 4,
+      "factor_b": 6,
+      "expected_answer": 24,
+      "quantity_model": {
+        "mode": "array",
+        "rows": 4,
+        "columns": 6
+      },
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "4 rijen × 6 kolommen"
+    },
+    {
+      "task_id": "B3-L05",
+      "title": "Herhaald optellen",
+      "instruction": "4 + 4 + 4 + 4. Hoeveel is dat samen?",
+      "skill_id": "B3",
+      "development_id": "B3.D3",
+      "claim_id": "B3.C3",
+      "evidence_target_ids": [
+        "B3.ET5"
+      ],
+      "task_model_id": "B3.TM3",
+      "variation_key": "repeated_addition_4x4",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "equal_groups",
+      "response_type": "numeric_multiplication",
+      "operation_type": "equal_groups",
+      "factor_a": 4,
+      "factor_b": 4,
+      "expected_answer": 16,
+      "quantity_model": {
+        "mode": "equal-groups",
+        "groups": 4,
+        "items_per_group": 4
+      },
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "4 + 4 + 4 + 4"
+    },
+    {
+      "task_id": "B3-L06",
+      "title": "Gelijke dozen",
+      "instruction": "6 dozen bevatten elk 5 potloden. Hoeveel potloden zijn dat?",
+      "skill_id": "B3",
+      "development_id": "B3.D3",
+      "claim_id": "B3.C3",
+      "evidence_target_ids": [
+        "B3.ET6"
+      ],
+      "task_model_id": "B3.TM3",
+      "variation_key": "context_6x5",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "equal_groups",
+      "response_type": "numeric_multiplication",
+      "operation_type": "equal_groups",
+      "factor_a": 6,
+      "factor_b": 5,
+      "expected_answer": 30,
+      "quantity_model": {
+        "mode": "equal-groups",
+        "groups": 6,
+        "items_per_group": 5
+      },
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "6 dozen × 5 potloden"
+    },
+    {
+      "task_id": "B3-L07",
+      "title": "Product structureren",
+      "instruction": "Reken uit: 7 × 8. Kies een handige manier om het product te structureren.",
+      "skill_id": "B3",
+      "development_id": "B3.D4",
+      "claim_id": "B3.C4",
+      "evidence_target_ids": [
+        "B3.ET7"
+      ],
+      "task_model_id": "B3.TM4",
+      "variation_key": "structure_7x8",
+      "prompt_level": "none",
+      "response_process_required": true,
+      "representation": "symbolic",
+      "response_type": "numeric_multiplication",
+      "operation_type": "symbolic",
+      "factor_a": 7,
+      "factor_b": 8,
+      "expected_answer": 56,
+      "quantity_model": null,
+      "strategy_options": [
+        {
+          "id": "decomposition",
+          "label": "7 × 5 + 7 × 3"
+        },
+        {
+          "id": "compensation",
+          "label": "7 × 10 − 7 × 2"
+        }
+      ],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "7 × 8 = ?"
+    },
+    {
+      "task_id": "B3-L08",
+      "title": "Factor ontleden",
+      "instruction": "Reken uit: 12 × 6. Kies een manier om de factor 12 te ontleden.",
+      "skill_id": "B3",
+      "development_id": "B3.D4",
+      "claim_id": "B3.C4",
+      "evidence_target_ids": [
+        "B3.ET8"
+      ],
+      "task_model_id": "B3.TM4",
+      "variation_key": "structure_12x6",
+      "prompt_level": "none",
+      "response_process_required": true,
+      "representation": "symbolic",
+      "response_type": "numeric_multiplication",
+      "operation_type": "symbolic",
+      "factor_a": 12,
+      "factor_b": 6,
+      "expected_answer": 72,
+      "quantity_model": null,
+      "strategy_options": [
+        {
+          "id": "decomposition",
+          "label": "10 × 6 + 2 × 6"
+        },
+        {
+          "id": "doubling",
+          "label": "6 × 6 verdubbelen"
+        }
+      ],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "12 × 6 = ?"
+    },
+    {
+      "task_id": "B3-L09",
+      "title": "Grotere factoren",
+      "instruction": "Reken uit: 24 × 13.",
+      "skill_id": "B3",
+      "development_id": "B3.D5",
+      "claim_id": "B3.C5",
+      "evidence_target_ids": [
+        "B3.ET9"
+      ],
+      "task_model_id": "B3.TM5",
+      "variation_key": "larger_product_24x13",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic",
+      "response_type": "numeric_multiplication",
+      "operation_type": "symbolic",
+      "factor_a": 24,
+      "factor_b": 13,
+      "expected_answer": 312,
+      "quantity_model": null,
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "24 × 13 = ?"
+    },
+    {
+      "task_id": "B3-L10",
+      "title": "Plaatswaarde en product",
+      "instruction": "Reken uit: 125 × 8.",
+      "skill_id": "B3",
+      "development_id": "B3.D5",
+      "claim_id": "B3.C5",
+      "evidence_target_ids": [
+        "B3.ET10"
+      ],
+      "task_model_id": "B3.TM5",
+      "variation_key": "place_value_125x8",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic",
+      "response_type": "numeric_multiplication",
+      "operation_type": "symbolic",
+      "factor_a": 125,
+      "factor_b": 8,
+      "expected_answer": 1000,
+      "quantity_model": null,
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "125 × 8 = ?"
+    },
+    {
+      "task_id": "B3-L11",
+      "title": "Decimale factor",
+      "instruction": "Reken uit: 2,5 × 4.",
+      "skill_id": "B3",
+      "development_id": "B3.D6",
+      "claim_id": "B3.C6",
+      "evidence_target_ids": [
+        "B3.ET11"
+      ],
+      "task_model_id": "B3.TM6",
+      "variation_key": "decimal_2_5x4",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic",
+      "response_type": "numeric_multiplication",
+      "operation_type": "symbolic",
+      "factor_a": 2.5,
+      "factor_b": 4,
+      "expected_answer": 10,
+      "quantity_model": null,
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "2,5 × 4 = ?"
+    },
+    {
+      "task_id": "B3-L12",
+      "title": "Twee decimale factoren",
+      "instruction": "Reken uit: 1,2 × 3,5.",
+      "skill_id": "B3",
+      "development_id": "B3.D6",
+      "claim_id": "B3.C6",
+      "evidence_target_ids": [
+        "B3.ET12"
+      ],
+      "task_model_id": "B3.TM6",
+      "variation_key": "decimal_1_2x3_5",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic",
+      "response_type": "numeric_multiplication",
+      "operation_type": "symbolic",
+      "factor_a": 1.2,
+      "factor_b": 3.5,
+      "expected_answer": 4.2,
+      "quantity_model": null,
+      "strategy_options": [],
+      "check_required": false,
+      "check_methods": [],
+      "display_expression": "1,2 × 3,5 = ?"
+    },
+    {
+      "task_id": "B3-L13",
+      "title": "Flexibel vermenigvuldigen",
+      "instruction": "Reken uit: 25 × 16. Kies een aanpak en controleer je product.",
+      "skill_id": "B3",
+      "development_id": "B3.D7",
+      "claim_id": "B3.C7",
+      "evidence_target_ids": [
+        "B3.ET13"
+      ],
+      "task_model_id": "B3.TM7",
+      "variation_key": "flexible_25x16",
+      "prompt_level": "none",
+      "response_process_required": true,
+      "representation": "symbolic",
+      "response_type": "numeric_multiplication",
+      "operation_type": "symbolic",
+      "factor_a": 25,
+      "factor_b": 16,
+      "expected_answer": 400,
+      "quantity_model": null,
+      "strategy_options": [
+        {
+          "id": "doubling_halving",
+          "label": "25 × 16 als 50 × 8"
+        },
+        {
+          "id": "known_product",
+          "label": "4 × 100"
+        }
+      ],
+      "check_required": true,
+      "check_methods": [
+        {
+          "id": "inverse_division",
+          "label": "Controleren met delen"
+        },
+        {
+          "id": "estimation",
+          "label": "Controleren met een schatting"
+        }
+      ],
+      "display_expression": "25 × 16 = ?"
+    },
+    {
+      "task_id": "B3-L14",
+      "title": "Product in context",
+      "instruction": "Een doos bevat 48 pakjes met elk 25 kaarten. Hoeveel kaarten zijn dat? Kies een aanpak en controleer je antwoord.",
+      "skill_id": "B3",
+      "development_id": "B3.D7",
+      "claim_id": "B3.C7",
+      "evidence_target_ids": [
+        "B3.ET14"
+      ],
+      "task_model_id": "B3.TM7",
+      "variation_key": "context_48x25",
+      "prompt_level": "none",
+      "response_process_required": true,
+      "representation": "symbolic",
+      "response_type": "numeric_multiplication",
+      "operation_type": "symbolic",
+      "factor_a": 48,
+      "factor_b": 25,
+      "expected_answer": 1200,
+      "quantity_model": null,
+      "strategy_options": [
+        {
+          "id": "compensation",
+          "label": "50 × 25 − 2 × 25"
+        },
+        {
+          "id": "known_product",
+          "label": "48 × 100 ÷ 4"
+        }
+      ],
+      "check_required": true,
+      "check_methods": [
+        {
+          "id": "inverse_division",
+          "label": "Controleren met delen"
+        },
+        {
+          "id": "estimation",
+          "label": "Controleren met een schatting"
+        }
+      ],
+      "display_expression": "48 × 25 = ?"
+    }
+  ]
+}

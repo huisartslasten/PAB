@@ -1,0 +1,165 @@
+{
+  "schema_version": "0.2",
+  "status": "operational_candidate",
+  "purpose": "Version 0.2 of the operational B1 addition practice catalogue. Retains B1-L01–L05 unchanged and adds controlled whole-number execution variation within the existing B1.D2 / B1.TM3 / B1.ET3 contract. This is not the C1-C3 pilot measurement task set.",
+  "synthetic_or_empirical": "operational_practice_definition",
+  "skill_id": "B1",
+  "curriculum_registry_version": "0.4.0-candidate",
+  "tasks": [
+    {
+      "task_id": "B1-L01",
+      "title": "Hoeveel zijn het samen?",
+      "instruction": "Bekijk de twee hoeveelheden. Hoeveel zijn het samen?",
+      "skill_id": "B1",
+      "development_id": "B1.D1",
+      "claim_id": "B1.C1",
+      "evidence_target_ids": [
+        "B1.ET1"
+      ],
+      "task_model_id": "B1.TM1",
+      "variation_key": "learner_quantity_groups_small",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "quantity_groups",
+      "response_type": "quantity_addition",
+      "addends": [
+        7,
+        5
+      ],
+      "expected_answer": 12
+    },
+    {
+      "task_id": "B1-L02",
+      "title": "Reken de som uit",
+      "instruction": "Reken de optelling uit.",
+      "skill_id": "B1",
+      "development_id": "B1.D2",
+      "claim_id": "B1.C2",
+      "evidence_target_ids": [
+        "B1.ET3"
+      ],
+      "task_model_id": "B1.TM3",
+      "variation_key": "learner_symbolic_execution_two_digit_a",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic_expression",
+      "response_type": "symbolic_addition",
+      "addends": [
+        28,
+        17
+      ],
+      "expected_answer": 45
+    },
+    {
+      "task_id": "B1-L03",
+      "title": "Nog een optelling",
+      "instruction": "Reken deze optelling uit.",
+      "skill_id": "B1",
+      "development_id": "B1.D2",
+      "claim_id": "B1.C2",
+      "evidence_target_ids": [
+        "B1.ET3"
+      ],
+      "task_model_id": "B1.TM3",
+      "variation_key": "learner_symbolic_execution_two_digit_b",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic_expression",
+      "response_type": "symbolic_addition",
+      "addends": [
+        46,
+        28
+      ],
+      "expected_answer": 74
+    },
+    {
+      "task_id": "B1-L04",
+      "title": "Tel de hoeveelheden bij elkaar",
+      "instruction": "Bekijk beide groepen. Hoeveel zijn het samen?",
+      "skill_id": "B1",
+      "development_id": "B1.D1",
+      "claim_id": "B1.C1",
+      "evidence_target_ids": [
+        "B1.ET1"
+      ],
+      "task_model_id": "B1.TM1",
+      "variation_key": "learner_quantity_groups_medium",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "quantity_groups",
+      "response_type": "quantity_addition",
+      "addends": [
+        9,
+        6
+      ],
+      "expected_answer": 15
+    },
+    {
+      "task_id": "B1-L05",
+      "title": "Tel drie hoeveelheden bij elkaar",
+      "instruction": "Bekijk de drie groepen. Hoeveel zijn het samen?",
+      "skill_id": "B1",
+      "development_id": "B1.D1",
+      "claim_id": "B1.C1",
+      "evidence_target_ids": [
+        "B1.ET1"
+      ],
+      "task_model_id": "B1.TM1",
+      "variation_key": "learner_quantity_groups_three_groups",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "quantity_groups",
+      "response_type": "quantity_addition",
+      "addends": [
+        2,
+        3,
+        4
+      ],
+      "expected_answer": 9
+    },
+    {
+      "task_id": "B1-L06",
+      "title": "Reken de som uit",
+      "instruction": "Reken deze optelling uit.",
+      "skill_id": "B1",
+      "development_id": "B1.D2",
+      "claim_id": "B1.C2",
+      "evidence_target_ids": [
+        "B1.ET3"
+      ],
+      "task_model_id": "B1.TM3",
+      "variation_key": "learner_symbolic_execution_two_digit_no_regrouping",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic_expression",
+      "response_type": "symbolic_addition",
+      "addends": [
+        34,
+        25
+      ],
+      "expected_answer": 59
+    },
+    {
+      "task_id": "B1-L07",
+      "title": "Reken met grotere getallen",
+      "instruction": "Reken deze optelling uit.",
+      "skill_id": "B1",
+      "development_id": "B1.D2",
+      "claim_id": "B1.C2",
+      "evidence_target_ids": [
+        "B1.ET3"
+      ],
+      "task_model_id": "B1.TM3",
+      "variation_key": "learner_symbolic_execution_three_digit_regrouping",
+      "prompt_level": "none",
+      "response_process_required": false,
+      "representation": "symbolic_expression",
+      "response_type": "symbolic_addition",
+      "addends": [
+        126,
+        37
+      ],
+      "expected_answer": 163
+    }
+  ]
+}

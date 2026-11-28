@@ -11054,3 +11054,37 @@ All three SQL executions returned without errors and were wrapped in their own t
 - Edge Functions/secrets remain separate: do not deploy TEST functions or change LIVE secrets without a scoped review and explicit authorization.
 - Current database state is migrated; current code state is not yet released. Do not describe the full TEST → LIVE application migration as complete.
 - This handoff update must itself pass Full Regression on its resulting commit before it is considered verified.
+
+
+## 85. Corrected TEST → LIVE objective: independent exact Supabase copy (28 November 2026)
+
+### Controlling user decision
+The user clarified that the goal is **not** to make PacoGO LIVE connect to the TEST Supabase project.
+
+The required end state is:
+- Supabase LIVE becomes an exact copy of Supabase TEST.
+- PacoGO LIVE continues connecting to Supabase LIVE.
+- PacoGO TEST continues connecting to Supabase TEST.
+- The two environments remain independent after the copy; later TEST development must not change LIVE.
+- The intended copy direction is TEST → LIVE, not the reverse.
+
+This supersedes the mistaken direction proposed in the preceding cutover discussion. Do not change production host routing to point at TEST. Do not deploy the mistaken TEST-as-production backend change.
+
+### Code correction
+- The temporary commit `19a0d2f871db4d0ee58e31f98a3592c3816f9ab8` incorrectly made TEST the backend for every host.
+- That change was corrected on `refactor/professional-v1` by commit `cb2fe91bfdfd7f9420d0caea7b9c10fa15570d47`, restoring host-based selection: pacogo.org / www.pacogo.org use LIVE; local and TEST use TEST.
+- Full Regression #4421 succeeded on the temporary incorrect commit `19a0d2f871db4d0ee58e31f98a3592c3816f9ab8`; it does not verify the corrective commit.
+- Full Regression #4420 succeeded on parent commit `cb749a553f6aa6a49788b6fd22a4c54566c51515`.
+- Corrective commit `cb2fe91bfdfd7f9420d0caea7b9c10fa15570d47` still requires its own Full Regression. Do not claim it green until the exact SHA is verified.
+
+### Database-copy status and safety
+- No database copy from TEST to LIVE has been performed as part of this correction.
+- No Supabase LIVE or TEST database has been overwritten by this correction.
+- No LIVE or TEST application deployment has been performed.
+- The previous read-only account-count comparison found 1 auth user in TEST and 2 in LIVE. A true exact replacement of LIVE with TEST will therefore replace the current LIVE auth-user set as well as its database contents; preserve the verified backup/rollback path before any destructive copy.
+- The user's previously prepared local LIVE lesson archive backup is separate from a full Supabase database backup and does not replace one.
+- An exact Supabase project copy must be treated as a full, scoped migration/restore exercise, not as changing the application URL. Verify which Supabase components are included (database/schema/data including Auth, Storage objects, Edge Functions, secrets/configuration and project settings) and explicitly identify any component that cannot be cloned automatically. Do not claim the whole project is identical based only on PostgreSQL row counts.
+- Do not use the prior targeted additive TEST → LIVE migrations as a substitute for the newly clarified exact-copy objective. The user is now asking for an exact TEST → LIVE copy.
+
+### Next concrete step
+First verify Full Regression on the corrective branch state. Then prepare a source/target inventory and a restorable LIVE backup/rollback plan for the exact TEST → LIVE copy. Before any destructive LIVE restore or overwrite, verify the exact scope and recovery path. Keep application host routing independent: LIVE → LIVE, TEST → TEST.
